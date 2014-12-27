@@ -6,7 +6,10 @@ set(HARP_VERSION_MINOR 1)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+enable_testing()
+
 add_subdirectory(doc)
+add_subdirectory(tests)
 
 set(HAVE_NETCDF 1)
 
