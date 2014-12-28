@@ -10,14 +10,15 @@
 #include <fstream>
 #include <iostream>
 
-#include "logging.hpp"
+#include "Logger.hpp"
 
 using namespace harp;
 
-Logger logger;
+// Singleton instance
+Logger Logger::instance = Logger();
 
-Logger::Logger(LogLevel _level){
-    level = _level;
+Logger::Logger(){
+    level = WARNING;
     os = &std::clog;
     is_file = false;
 }
@@ -26,8 +27,11 @@ Logger::~Logger(void){
     close();
 }
 
-
 std::ostream& Logger::out(LogLevel _level){
+    return instance.get_stream(_level);
+}
+
+std::ostream& Logger::get_stream(LogLevel _level){
     // Don't write anything if the out level is less important than
     // the current level
     if (_level > level)
@@ -53,26 +57,30 @@ std::ostream& Logger::out(LogLevel _level){
 }
 
 
-void Logger::set_level(LogLevel _level){
-    level = _level;
+void Logger::set_level(LogLevel level){
+    instance.level = level;
 }
 
 void Logger::log_to_stdout(void){
-    close();
-    is_file = false;
-    os = &std::cout;
+    instance.close();
+    instance.is_file = false;
+    instance.os = &std::cout;
 }
 
 void Logger::log_to_stderr(void){
-    close();
-    is_file = false;
-    os = &std::cerr;
+    instance.close();
+    instance.is_file = false;
+    instance.os = &std::cerr;
 }
 
 void Logger::set_log_file(const std::string &filename){
-    close();
-    is_file = true;
-    os = new std::ofstream(filename.c_str(), std::ofstream::out);
+    return set_log_file(filename.c_str());
+}
+
+void Logger::set_log_file(const char* filename){
+    instance.close();
+    instance.is_file = true;
+    instance.os = new std::ofstream(filename, std::ofstream::out);
 }
 
 void Logger::close(void){

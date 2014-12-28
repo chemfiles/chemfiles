@@ -29,26 +29,34 @@ public:
         DEBUG
     } LogLevel;
 
-    //! Construct a Logger with the specific level
-    Logger(LogLevel level = WARNING);
     ~Logger();
 
     //! Set the logging level
-    void set_level(LogLevel level);
+    static void set_level(LogLevel level);
     //! Get the current logging level
-    LogLevel getLevel(void){return level;}
+    static LogLevel get_level(void){return instance.level;}
     //! Set the file for logging
-    void set_log_file(const std::string &filename);
+    static void set_log_file(const std::string &filename);
+    //! Set the file for logging, C-version
+    static void set_log_file(const char* filename);
     //! Make the logger output to stdout
-    void log_to_stdout(void);
+    static void log_to_stdout(void);
     //! Make the logger output to stderr
-    void log_to_stderr(void);
-    //! Return a stream to write the log
-    std::ostream& out(LogLevel _level);
+    static void log_to_stderr(void);
+
+    //! Get the singleton out stream
+    static std::ostream& out(LogLevel _level);
 
 private:
     //! Close the log file if it exists.
     void close(void);
+    //! Return a stream to write the log
+    std::ostream& get_stream(LogLevel _level);
+    //! Constructor
+    Logger();
+
+    //! Singleton instance
+    static Logger instance;
 
     //! Logging level
     LogLevel level;
@@ -58,13 +66,9 @@ private:
     bool is_file;
 };
 
-
-//! Global logger variable
-extern Logger logger;
+} // namespace harp
 
 //! LOG macro to send a message.
-#define LOG(level) logger.out(Logger::level)
-
-} // namespace harp
+#define LOG(level) harp::Logger::out(harp::Logger::level)
 
 #endif
