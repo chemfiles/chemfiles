@@ -3,14 +3,12 @@
 #include <fstream>
 #include <string>
 
-#include "gtest/gtest.h"
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
 
 #include "Harp.hpp"
 
-using namespace harp;
-
-TEST(Logging, BasicLogUsage){
-
+TEST_CASE("Basic logging usage", "[logging]"){
     std::stringstream out_buffer;
 
     // Save clog's buffer here
@@ -19,61 +17,64 @@ TEST(Logging, BasicLogUsage){
     std::clog.rdbuf(out_buffer.rdbuf());
 
     LOG(ERROR) << "an error" << std::endl;
-    EXPECT_STREQ("Harp error: an error\n", out_buffer.str().c_str());
+    REQUIRE("Harp error: an error\n" == out_buffer.str());
     out_buffer.str(std::string()); // Clean the buffer
 
     LOG(WARNING) << "a warning" << std::endl;
-    EXPECT_STREQ("Harp warning: a warning\n", out_buffer.str().c_str());
+    REQUIRE("Harp warning: a warning\n" == out_buffer.str());
     out_buffer.str(std::string());
 
     // The level should be WARNING by default
     LOG(INFO) << "an info" << std::endl;
-    EXPECT_STREQ("", out_buffer.str().c_str());
+    REQUIRE("" == out_buffer.str());
     out_buffer.str(std::string());
 
     LOG(DEBUG) << "a debug info" << std::endl;
-    EXPECT_STREQ("", out_buffer.str().c_str());
+    REQUIRE("" == out_buffer.str());
     out_buffer.str(std::string());
 
     // Redirect clog to its old self
     std::clog.rdbuf(sbuf);
 }
 
-TEST(Logging, SetLogStream){
-
-    // redirect log to stdout
-    Logger::log_to_stdout();
+TEST_CASE("Set the log stream", "[logging]"){
     std::stringstream out_buffer;
+    std::streambuf *sbuf;
 
-    std::streambuf *sbuf = std::cout.rdbuf();
-    std::cout.rdbuf(out_buffer.rdbuf());
+    SECTION("Redirect log to stdout") {
+        harp::Logger::log_to_stdout();
+        sbuf = std::cout.rdbuf();
+        std::cout.rdbuf(out_buffer.rdbuf());
 
-    LOG(WARNING) << "a warning" << std::endl;
-    EXPECT_STREQ("Harp warning: a warning\n", out_buffer.str().c_str());
-    out_buffer.str(std::string());
+        LOG(WARNING) << "a warning" << std::endl;
+        REQUIRE("Harp warning: a warning\n" == out_buffer.str());
 
-    std::cout.rdbuf(sbuf);
+        std::cout.rdbuf(sbuf);
+    }
 
-    // redirect log to stderr
-    sbuf = std::cerr.rdbuf();
-    std::cerr.rdbuf(out_buffer.rdbuf());
+    SECTION("Redirect log to stderr") {
+        harp::Logger::log_to_stderr();
+        sbuf = std::cerr.rdbuf();
+        std::cerr.rdbuf(out_buffer.rdbuf());
 
-    Logger::log_to_stderr();
+        LOG(WARNING) << "a warning" << std::endl;
+        REQUIRE("Harp warning: a warning\n" == out_buffer.str());
 
-    LOG(WARNING) << "a warning" << std::endl;
-    EXPECT_STREQ("Harp warning: a warning\n", out_buffer.str().c_str());
-    out_buffer.str(std::string());
+        std::cerr.rdbuf(sbuf);
+    }
 
-    std::cerr.rdbuf(sbuf);
+    SECTION("Redirect log to a file") {
+        harp::Logger::set_log_file("test-logging-tmp.log");
 
-    // redirect log to a file
-    Logger::set_log_file("test-logging-tmp.log");
-    LOG(WARNING) << "a warning" << std::endl;
-    std::ifstream logfile("test-logging-tmp.log");
-    std::string log_content;
-    std::getline(logfile, log_content);
-    logfile.close();
-    EXPECT_STREQ("Harp warning: a warning", log_content.c_str());
+        LOG(WARNING) << "a warning" << std::endl;
 
-    remove("test-logging-tmp.log");
+        std::ifstream logfile("test-logging-tmp.log");
+        std::string log_content;
+        std::getline(logfile, log_content);
+        logfile.close();
+
+        REQUIRE("Harp warning: a warning" == log_content);
+
+        remove("test-logging-tmp.log");
+    }
 }
