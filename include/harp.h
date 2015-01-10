@@ -17,21 +17,17 @@
 #ifndef HARP_C_API_H
 #define HARP_C_API_H
 
-#ifdef __cplusplus
-    #include <cstddef>
-#else
-    #include <stddef>
-#endif
+#define uint unsigned int
 
 #ifdef __cplusplus
 extern "C" {
 
     namespace harp {
-        class File;
+        class HarpIO;
         class Frame;
         class Atom;
     }
-    typedef harp::File HARP_FILE;
+    typedef harp::HarpIO HARP_FILE;
     typedef harp::Frame HARP_FRAME;
     typedef harp::Atom HARP_ATOM;
 #else
@@ -64,7 +60,7 @@ extern "C" {
     * @param size The array size (N).
     * @return The status code
     */
-    int harp_frame_positions(const HARP_FRAME* frame, float** data, const size_t size);
+    int harp_frame_positions(const HARP_FRAME* frame, float** data, const uint size);
 
     /*!
     * @brief Get the velocities from a frame, if they exists
@@ -73,7 +69,7 @@ extern "C" {
     * @param size The array size (N).
     * @return The status code
     */
-    int harp_frame_velocities(const HARP_FRAME* frame, float** data, const size_t size);
+    int harp_frame_velocities(const HARP_FRAME* frame, float** data, const uint size);
 
     /*!
     * @brief Get the atomic informations from a file
@@ -90,7 +86,7 @@ extern "C" {
     */
     int harp_frame_delete(HARP_FRAME* frame);
 
-    /*!*******************************************************************/
+    /**************************************************************************/
 
     /*!
     * @brief Get the mass of an atom, in atomic mass units
@@ -120,16 +116,17 @@ extern "C" {
     * @param buffsize The size of the string buffer
     * @return The string buffer
     */
-    char* harp_get_name(const HARP_ATOM* atom, char* name, const size_t buffsize);
+    char* harp_get_name(const HARP_ATOM* atom, char* name, const uint buffsize);
 
-    /*!*******************************************************************/
+    /**************************************************************************/
 
     /*!
     * @brief Open a trajectory file.
     * @param filename The filename
+    * @param mode The opening ("r" or "w") for the file. The default is read mode.
     * @return A pointer to the file
     */
-    HARP_FILE* harp_open(const char* filename);
+    HARP_FILE* harp_open(const char* filename, const char* mode);
 
     /*!
     * @brief Read a specific step of a trajectory in a frame
@@ -158,5 +155,7 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#undef uint
 
 #endif

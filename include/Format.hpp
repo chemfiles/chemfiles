@@ -10,23 +10,64 @@
 #ifndef HARP_FORMAT_HPP
 #define HARP_FORMAT_HPP
 
-#include "Frame.hpp"
-
 namespace harp {
 
-/*!
- * @class Format Format.hpp Format.cpp
- * @brief Abstract format class
- *
- *
- * Abstract base class for file formats
- *
- */
-class Format {
-    public:
+class Frame;
+class File;
 
-    private:
-        Frame frame;
+/*!
+ * @class FormatReader Format.hpp Format.cpp
+ * @brief Abstract format reader class
+ *
+ * Abstract base class for file formats reader
+ */
+class FormatReader {
+public:
+    /*!
+    * @brief Read a specific step from a file.
+    * @param file The file to read from
+    * @param step The step to read
+    * @return A reference to the read frame
+    *
+    * Can throw an exception in case of error.
+    *
+    */
+    virtual Frame& read_at_step(const File& file, const int step) = 0;
+
+    /*!
+    * @brief Read a specific step from a file.
+    * @param file The file to read from
+    * @param step The step to read
+    * @return A reference to the read frame
+    *
+    * Can throw an exception in case of error.
+    *
+    */
+    virtual Frame& read_next_step(const File& file, const int step) = 0;
+
+private:
+};
+
+/*!
+* @class FormatWriter Format.hpp Format.cpp
+* @brief Abstract format writer class
+*
+* Abstract base class for file formats writer.
+*/
+class FormatWriter {
+public:
+    /*!
+    * @brief Write a step (frame) to a file.
+    * @param file The file to write to
+    * @param frame The frame to be writen
+    * @return A reference to the read frame
+    *
+    * Can throw an exception in case of error.
+    *
+    */
+    virtual void write_step(const File& file, const Frame& frame) = 0;
+
+private:
 };
 
 } // namespace harp

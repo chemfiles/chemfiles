@@ -18,7 +18,7 @@ namespace harp {
  *
  *
  */
-class Files {
+class File {
     public:
 
     private:
