@@ -7,6 +7,6 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "HarpIO.hpp"
+#include "Stream.hpp"
 
 using namespace harp;

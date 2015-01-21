@@ -18,5 +18,6 @@
 #define HARP_H
 
 #include "Logger.hpp"
+#include "HarpFile.hpp"
 
 #endif

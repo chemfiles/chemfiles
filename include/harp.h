@@ -23,11 +23,11 @@
 extern "C" {
 
     namespace harp {
-        class HarpIO;
+        class HarpFile;
         class Frame;
         class Atom;
     }
-    typedef harp::HarpIO HARP_FILE;
+    typedef harp::HarpFile HARP_FILE;
     typedef harp::Frame HARP_FRAME;
     typedef harp::Atom HARP_ATOM;
 #else
