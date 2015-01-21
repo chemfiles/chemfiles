@@ -7,18 +7,17 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-/*! @file Harp.hpp
-* Harp main C++ API header.
-*
-* This file contains all the function definitions for the C++ API of Harp, and
-* should be self-documented enough.
-*/
+#ifndef HARP_ERROR_HPP
+#define HARP_ERROR_HPP
 
-#ifndef HARP_H
-#define HARP_H
+#include <exception>
 
-#include "Logger.hpp"
-#include "HarpFile.hpp"
-#include "Error.hpp"
+namespace harp {
+
+class Error : public std::exception {
+    // TODO
+};
+
+} // namespace harp
 
 #endif
