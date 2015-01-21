@@ -30,7 +30,6 @@ public:
     * @return A reference to the read frame
     *
     * Can throw an exception in case of error.
-    *
     */
     virtual Frame& read_at_step(const File& file, const int step) = 0;
 
@@ -40,8 +39,8 @@ public:
     * @param step The step to read
     * @return A reference to the read frame
     *
-    * Can throw an exception in case of error.
-    *
+    * Can throw an exception in case of error. The cursor is assumed to be at
+    * the right position in case of text files.
     */
     virtual Frame& read_next_step(const File& file, const int step) = 0;
 
@@ -63,7 +62,6 @@ public:
     * @return A reference to the read frame
     *
     * Can throw an exception in case of error.
-    *
     */
     virtual void write_step(const File& file, const Frame& frame) = 0;
 
