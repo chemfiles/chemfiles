@@ -8,5 +8,28 @@
 */
 
 #include "formats/XYZ.hpp"
+#include "Frame.hpp"
 
 using namespace harp;
+
+XYZReader::XYZReader(){
+    // TODO
+}
+
+XYZReader::~XYZReader(){
+    // TODO
+}
+
+Frame& XYZReader::read_at_step(const File& file, const int step){
+    // TODO
+    Frame frame=Frame();
+    return frame;
+}
+
+Frame& XYZReader::read_next_step(const File& file, const int step){
+    // TODO
+    Frame frame=Frame();
+    return frame;
+}
+
+REGISTER_READER(XYZReader, ".xyz")

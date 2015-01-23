@@ -10,3 +10,11 @@
 #include "Frame.hpp"
 
 using namespace harp;
+
+Frame::Frame(){
+    // TODO
+}
+
+Frame::~Frame(){
+    // TODO
+}

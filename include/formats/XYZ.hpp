@@ -10,20 +10,28 @@
 #ifndef HARP_FORMAT_XYZ_HPP
 #define HARP_FORMAT_XYZ_HPP
 
-namespace harp {
-/*!
- * @class XYZ formats/XYZ.hpp formats/XYZ.cpp
- * @brief XYZ file format
- *
- *
- * XYZ file format.
- * TODO: add a reference to the format
- *
- */
-class XYZ {
-    public:
+#include <string>
 
-    private:
+#include "Format.hpp"
+#include "FormatFactory.hpp"
+
+namespace harp {
+
+/*!
+ * @class XYZReader formats/XYZ.hpp formats/XYZ.cpp
+ * @brief XYZ file format reader.
+ *
+ * TODO: add a reference to the format
+ */
+class XYZReader : public FormatReader {
+public:
+    XYZReader();
+    ~XYZReader();
+
+    Frame& read_at_step(const File& file, const int step);
+    Frame& read_next_step(const File& file, const int step);
+private:
+    READER_REGISTER_MEMBER(XYZReader);
 };
 
 } // namespace harp

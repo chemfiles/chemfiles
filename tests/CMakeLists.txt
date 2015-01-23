@@ -17,5 +17,6 @@ if(RUN_TESTS)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
     harp_cpp_test(logging)
+    harp_cpp_test(format_factory)
     harp_c_test(capi)
 endif()
