@@ -3,6 +3,7 @@ option(RUN_TESTS "Run harp tests." OFF)
 function(harp_cpp_test _name_)
     add_executable(${_name_} ${PROJECT_SOURCE_DIR}/tests/${_name_}.cpp)
     target_link_libraries(${_name_} harp)
+    set_property(TARGET ${_name_} PROPERTY CXX_STANDARD 11)
     add_test(${_name_} ${_name_})
 endfunction()
 
