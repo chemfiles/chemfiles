@@ -66,7 +66,7 @@ HARP_FILE* harp_open(const char* filename){
     try {
         file = new HarpFile(filename);
     }
-    catch(harp::Error) {
+    catch(harp::HarpError) {
         // TODO
     }
     return file;
@@ -84,7 +84,7 @@ int harp_close(HARP_FILE* file){
     try {
         delete file;
     }
-    catch(harp::Error) {
+    catch(harp::HarpError) {
         // TODO
     }
     return 0;

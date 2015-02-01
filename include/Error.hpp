@@ -10,12 +10,27 @@
 #ifndef HARP_ERROR_HPP
 #define HARP_ERROR_HPP
 
-#include <exception>
+#include <stdexcept>
+#include <string>
 
 namespace harp {
 
-class Error : public std::exception {
-    // TODO
+/*!
+ * @class HarpError Error.hpp Error.cpp
+ * @brief Base exception for Harp library
+ */
+class HarpError : public std::runtime_error {
+public:
+    HarpError(const std::string &message) : std::runtime_error(message) {}
+};
+
+/*!
+ * @class HarpFileError Error.hpp Error.cpp
+ * @brief Exception for files related failures
+ */
+class HarpFileError : public HarpError {
+public:
+    HarpFileError(const std::string &message) : HarpError(message) {}
 };
 
 } // namespace harp
