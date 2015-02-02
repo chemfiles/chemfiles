@@ -3,8 +3,12 @@ cmake_minimum_required(VERSION 3.0.0)
 project(harp)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-# TODO: get this
-set(HAVE_NETCDF 1)
+set(HAVE_NETCDF 0)
+set(NETCDF_CXX "YES")
+find_package(NetCDF)
+if(${NETCDF_FOUND})
+    set(HAVE_NETCDF 1)
+endif()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CXX_STANDARD_REQUIRED ON)
