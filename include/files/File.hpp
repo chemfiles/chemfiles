@@ -34,46 +34,68 @@ public:
     // Removing default comparison operator
     bool operator==(File const&) = delete;
     bool operator!=(File const&) = delete;
-
-    virtual bool is_open(void) = 0;
 };
 
 /*!
  * @class TextFile File.hpp File.cpp
  * @brief Text file abstraction
  *
- * This is only a thin wrapper around the C++ stream. This class is inteded to
- * be heritated by any form of text files: compressed files, memory-mapped files,
- * and any other.
+ * This class is inteded to be inherited by any form of text files: compressed
+ * files, memory-mapped files, and any other.
  */
-class TextFile : public File{
+class TextFile : public File {
 public:
-    explicit TextFile(std::string filename);
-    ~TextFile();
+    virtual ~TextFile() {};
 
     //! Read a line from the file
-    virtual const std::string& getline(void);
+    virtual const std::string& getline(void) = 0;
     //! Read a line from the file, stream version
-    TextFile& operator>>(std::string& line);
+    virtual TextFile& operator>>(std::string& line) = 0;
     //! Read \c n lines from the file
-    virtual const std::vector<std::string>& readlines(int n);
+    virtual const std::vector<std::string>& readlines(int n) = 0;
     //! Reset the file cursor
-    virtual inline void rewind(){
+    virtual inline void rewind() = 0;
+    //! Number of lines in the file
+    virtual int nlines() = 0;
+
+    virtual inline bool is_open(void) = 0;
+    virtual inline void close(void) = 0;
+
+    //! Write a line to the file
+    virtual void writeline(const std::string& line) = 0;
+    //! Write a line to the file, stream version
+    virtual TextFile& operator<<(const std::string& line) = 0;
+    //! Read \c n lines from the file
+    virtual void writelines(const std::vector<std::string>& lines) = 0;
+};
+
+/*!
+ * @class BasicFile File.hpp File.cpp
+ * @brief Basic text file
+ *
+ * This is only a thin wrapper on top of standard C++ streams. It can be updated
+ * later to use directly
+ */
+class BasicFile : public TextFile {
+public:
+    explicit BasicFile(std::string filename);
+    ~BasicFile();
+
+    const std::string& getline(void);
+    BasicFile& operator>>(std::string& line);
+    const std::vector<std::string>& readlines(int n);
+    inline void rewind(){
         stream.seekg(0);
         stream.clear();
     }
-    //! Number of lines in the file
-    virtual int nlines();
+    int nlines();
 
-    virtual inline bool is_open(void) {return stream.is_open();}
-    virtual inline void close(void) {return stream.close();}
+    inline bool is_open(void) {return stream.is_open();}
+    inline void close(void) {return stream.close();}
 
-    //! Write a line to the file
-    virtual void writeline(const std::string& line);
-    //! Write a line to the file, stream version
-    TextFile& operator<<(const std::string& line);
-    //! Read \c n lines from the file
-    virtual void writelines(const std::vector<std::string>& lines);
+    void writeline(const std::string& line);
+    BasicFile& operator<<(const std::string& line);
+    void writelines(const std::vector<std::string>& lines);
 private:
     std::fstream stream;
     // Caching a vector of strings

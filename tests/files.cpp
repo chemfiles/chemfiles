@@ -11,7 +11,7 @@ using namespace harp;
 
 
 TEST_CASE("Read a text file", "[Files]"){
-    TextFile file(SRCDIR"/helium.xyz");
+    BasicFile file(SRCDIR"/helium.xyz");
     REQUIRE(file.is_open());
 
     CHECK(file.nlines() == 128);
@@ -43,7 +43,7 @@ TEST_CASE("Read a text file", "[Files]"){
 }
 
 TEST_CASE("Write a text file", "[Files]"){
-    TextFile file(SRCDIR"/tmp.dat");
+    BasicFile file(SRCDIR"/tmp.dat");
     REQUIRE(file.is_open());
 
     file << "Test";
