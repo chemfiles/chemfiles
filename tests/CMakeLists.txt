@@ -1,4 +1,4 @@
-option(RUN_TESTS "Run harp tests." OFF)
+option(BUILD_TESTS "Build harp tests." OFF)
 
 function(harp_cpp_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
@@ -14,7 +14,7 @@ function(harp_c_test _name_)
     add_test(${_name_} ${_name_})
 endfunction()
 
-if(RUN_TESTS)
+if(BUILD_TESTS)
     include_directories(${CMAKE_SOURCE_DIR}/include)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
