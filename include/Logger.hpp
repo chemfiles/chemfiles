@@ -34,7 +34,7 @@ public:
     //! Set the logging level
     static void set_level(LogLevel level);
     //! Get the current logging level
-    static LogLevel get_level(void){return instance.level;}
+    static LogLevel level(void){return instance.current_level;}
     //! Set the file for logging
     static void set_log_file(const std::string &filename);
     //! Set the file for logging, C-version
@@ -45,13 +45,13 @@ public:
     static void log_to_stderr(void);
 
     //! Get the singleton out stream
-    static std::ostream& out(LogLevel _level);
+    static std::ostream& out(LogLevel level);
 
 private:
     //! Close the log file if it exists.
     void close(void);
     //! Return a stream to write the log
-    std::ostream& get_stream(LogLevel _level);
+    std::ostream& get_stream(LogLevel level);
     //! Constructor
     Logger();
 
@@ -59,9 +59,9 @@ private:
     static Logger instance;
 
     //! Logging level
-    LogLevel level;
+    LogLevel current_level;
     //! Current log stream
-    std::ostream *os;
+    std::ostream* os; // A raw pointer is needed to hold reference to the standard streams
     //! Is the current stream a file ?
     bool is_file;
 };

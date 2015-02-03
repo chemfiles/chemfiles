@@ -17,29 +17,25 @@ using namespace harp;
 // Singleton instance
 Logger Logger::instance = Logger();
 
-Logger::Logger(){
-    level = WARNING;
-    os = &std::clog;
-    is_file = false;
-}
+Logger::Logger() : current_level(WARNING), os(&std::clog), is_file(false) {}
 
 Logger::~Logger(void){
     close();
 }
 
-std::ostream& Logger::out(LogLevel _level){
-    return instance.get_stream(_level);
+std::ostream& Logger::out(LogLevel level){
+    return instance.get_stream(level);
 }
 
-std::ostream& Logger::get_stream(LogLevel _level){
+std::ostream& Logger::get_stream(LogLevel level){
     // Don't write anything if the out level is less important than
     // the current level
-    if (_level > level)
+    if (level > current_level)
         os->clear(std::ios_base::badbit);
     else
         os->clear(std::ios_base::goodbit);
 
-    switch(_level){
+    switch(level){
         case ERROR:
             *os << "Harp error: ";
             break;
@@ -58,7 +54,7 @@ std::ostream& Logger::get_stream(LogLevel _level){
 
 
 void Logger::set_level(LogLevel level){
-    instance.level = level;
+    instance.current_level = level;
 }
 
 void Logger::log_to_stdout(void){
