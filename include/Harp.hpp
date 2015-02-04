@@ -10,12 +10,12 @@
 /*! @file Harp.hpp
 * Harp main C++ API header.
 *
-* This file contains all the function definitions for the C++ API of Harp, and
-* should be self-documented enough.
+* This file includes the public API headers for Harp, and should be the only one
+* included by client applications.
 */
 
-#ifndef HARP_H
-#define HARP_H
+#ifndef HARP_HPP
+#define HARP_HPP
 
 #include "Logger.hpp"
 #include "HarpFile.hpp"
