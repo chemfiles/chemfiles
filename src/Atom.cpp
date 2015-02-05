@@ -29,7 +29,7 @@ Atom::Atom() : Atom(UNDEFINED) {}
 
 // Check if the string \c s is in the vector of strings \c v
 inline bool str_in_vector(const string& s, const vector<string>& v){
-    for (int i=0; i<v.size(); i++){
+    for (size_t i=0; i<v.size(); i++){
         if (s == v[i]) {
             return true;
         }

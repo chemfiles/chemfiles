@@ -35,11 +35,11 @@ BasicFile& BasicFile::operator>>(std::string& line){
     return *this;
 }
 
-const std::vector<std::string>& BasicFile::readlines(int n){
+const std::vector<std::string>& BasicFile::readlines(size_t n){
     lines.reserve(n);
-    int initial_size = lines.size();
+    size_t initial_size = lines.size();
     std::string line;
-    for (int i=0; i<n; i++){
+    for (size_t i=0; i<n; i++){
         std::getline(stream, line);
         if (i < initial_size)
             lines[i] = line;
@@ -53,13 +53,14 @@ const std::vector<std::string>& BasicFile::readlines(int n){
     return lines;
 }
 
-int BasicFile::nlines(){
+size_t BasicFile::nlines(){
     auto position = stream.tellg();
     rewind();
-    int n = std::count(std::istreambuf_iterator<char>(stream),
-                       std::istreambuf_iterator<char>(),
-                       '\n') + 1; // The 1 is here because of the 0-based
-                                  // indexing in C++
+    size_t n = static_cast<size_t>(
+                std::count(std::istreambuf_iterator<char>(stream),
+                           std::istreambuf_iterator<char>(),
+                           '\n'));
+    n += 1; // The 1 is here because of the 0-based indexing in C++
     stream.seekg(position);
     return n;
 }

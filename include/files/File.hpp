@@ -52,11 +52,11 @@ public:
     //! Read a line from the file, stream version
     virtual TextFile& operator>>(std::string& line) = 0;
     //! Read \c n lines from the file
-    virtual const std::vector<std::string>& readlines(int n) = 0;
+    virtual const std::vector<std::string>& readlines(size_t n) = 0;
     //! Reset the file cursor
     virtual inline void rewind() = 0;
     //! Number of lines in the file
-    virtual int nlines() = 0;
+    virtual size_t nlines() = 0;
 
     virtual inline bool is_open(void) = 0;
     virtual inline void close(void) = 0;
@@ -83,12 +83,12 @@ public:
 
     const std::string& getline(void);
     BasicFile& operator>>(std::string& line);
-    const std::vector<std::string>& readlines(int n);
+    const std::vector<std::string>& readlines(size_t n);
     inline void rewind(){
         stream.seekg(0);
         stream.clear();
     }
-    int nlines();
+    size_t nlines();
 
     inline bool is_open(void) {return stream.is_open();}
     inline void close(void) {return stream.close();}

@@ -29,11 +29,11 @@ public:
     //! Read a line from the file, stream version
     MappedFile& operator>>(std::string& line);
     //! Read \c n lines from the file
-    const std::vector<std::string>& readlines(int n);
+    const std::vector<std::string>& readlines(size_t n);
     //! Reset the file cursor
     void rewind();
     //! Number of lines in the file
-    int nlines();
+    size_t nlines();
 
     bool is_open(void);
     void close(void);
