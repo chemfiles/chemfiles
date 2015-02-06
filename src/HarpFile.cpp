@@ -8,7 +8,7 @@
 */
 
 #include "HarpFile.hpp"
-#include "Stream.hpp"
+#include "HarpIO.hpp"
 #include "FormatFactory.hpp"
 
 using namespace harp;

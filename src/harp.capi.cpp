@@ -12,7 +12,7 @@
 #include "Harp.hpp"
 
 // Private headers
-#include "Stream.hpp"
+#include "HarpIO.hpp"
 #include "Frame.hpp"
 
 using namespace harp;

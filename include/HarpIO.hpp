@@ -15,25 +15,25 @@
 namespace harp {
 
 /*!
-* @class Stream Stream.hpp Stream.cpp
+* @class HarpIO HarpIO.hpp HarpIO.cpp
 * @brief Jonction of Format and File.
 *
-* The Stream class puts together a format and a file, and implement the main
+* The HarpIO class puts together a format and a file, and implement the main
 * read/write operations
 */
-class Stream {
+class HarpIO {
 public:
-    virtual ~Stream() = 0;
+    virtual ~HarpIO() = 0;
 
     //! Read operator, stream form
-    virtual Stream& operator>>(Frame& frame);
+    virtual HarpIO& operator>>(Frame& frame);
     //! Read operator, method form
     virtual Frame& read_next_step();
     //! Read operator, method form with specific step
-    virtual Frame& read_at_step(int);
+    virtual Frame& read_at_step(size_t);
 
     //! Write operator, stream form
-    virtual Stream& operator<<(const Frame& frame);
+    virtual HarpIO& operator<<(const Frame& frame);
     //! Write operator, method form
     virtual void write_step(Frame& frame);
 protected:
@@ -46,14 +46,14 @@ protected:
 * @brief The Reader class read a file using a specific Format
 */
 template <class File, class Format>
-class Reader : public Stream, private File, private Format {
+class Reader : public HarpIO, private File, private Format {
 public:
     explicit Reader(std::string filename);
     ~Reader();
 
     Reader& operator>>(Frame& frame);
     Frame& read_next_step();
-    Frame& read_at_step(int);
+    Frame& read_at_step(size_t);
 private:
     //! The current step
     int current_step;
@@ -69,7 +69,7 @@ private:
 * @brief The Writer class write frames to a file using a specific Format
 */
 template <class File, class Format>
-class Writer : public Stream, private File, private Format {
+class Writer : public HarpIO, private File, private Format {
 public:
     explicit Writer(std::string filename);
     ~Writer();

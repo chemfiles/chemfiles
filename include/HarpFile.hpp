@@ -16,10 +16,10 @@
 namespace harp {
 
 class Frame;
-class Stream;
+class HarpIO;
 
 /*!
-* @class HarpFile HarpIO.hpp HarpIO.cpp
+* @class HarpFile HarpFile.hpp HarpFile.cpp
 * @brief The main entry point for harp library
 */
 class HarpFile {
@@ -48,7 +48,7 @@ public:
     inline void write_step(Frame& frame);
 private:
     // PIMPL pointer
-    std::unique_ptr<Stream> file;
+    std::unique_ptr<HarpIO> file;
 };
 
 } // namespace harp
