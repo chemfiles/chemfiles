@@ -8,6 +8,7 @@
 */
 
 #include "files/File.hpp"
+#include <algorithm>
 
 using namespace harp;
 
