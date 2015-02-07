@@ -1,6 +1,5 @@
 #include <string>
 
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
 #include "Harp.hpp"
@@ -14,11 +13,11 @@ using namespace harp;
 /******************************************************************************/
 class DummyReader : public FormatReader {
 public:
-    Frame& read_at_step(const File& file, const int step){
+    Frame& read_at_step(File& file, const int step){
         static Frame frame=Frame();
         return frame;
     }
-    Frame& read_next_step(const File& file, const int step){
+    Frame& read_next_step(File& file){
         static Frame frame=Frame();
         return frame;
     }

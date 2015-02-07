@@ -1,7 +1,6 @@
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <cmath>
+
+#include "catch.hpp"
 
 #include "Harp.hpp"
 #include "UnitCell.hpp"

@@ -3,7 +3,6 @@
 #include <fstream>
 #include <string>
 
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
 #include "Harp.hpp"

@@ -1,8 +1,8 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <cstdio>
 
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
 #include "Harp.hpp"
@@ -74,5 +74,5 @@ TEST_CASE("Write a text file", "[Files]"){
 
     verification.close();
 
-    unlink(SRCDIR"/tmp.dat");
+    remove(SRCDIR"/tmp.dat");
 }
