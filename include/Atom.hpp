@@ -40,6 +40,8 @@ public:
     Atom(const std::string& name);
     Atom(AtomType type, const string& name = "");
     Atom();
+    Atom(const Atom &) = default;
+    Atom& operator=(const Atom &) = default;
 
     ~Atom(){};
 
@@ -68,9 +70,14 @@ private:
     AtomType _type;
 };
 
+inline bool operator==(const Atom& a, const Atom& b){
+    return (a.name() == b.name() && a.mass() == b.mass() &&
+            a.charge() == b.charge() && a.type() == b.type());
+}
+
 //! All the elements in the periodic table
 const vector<string> ALL_ELEMENTS = vector<string>{
-"H" ,                                                                                                  "He",
+"H" ,                                                                                                 "He",
 "Li", "Be",                                                             "B" , "C" , "N" , "O" , "F" , "Ne",
 "Na", "Mg",                                                             "Al", "Si", "P" , "S" , "Cl", "Ar",
 "K" , "Ca", "Sc", "Ti", "V" , "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr",

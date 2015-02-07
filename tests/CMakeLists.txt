@@ -16,7 +16,7 @@ endfunction()
 
 if(BUILD_TESTS)
     include_directories(${CMAKE_SOURCE_DIR}/include)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/catch)
+    include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/catch)
     add_library(catch OBJECT ${CMAKE_CURRENT_SOURCE_DIR}/catch/catch.cpp)
 
     file(GLOB all_test_files
