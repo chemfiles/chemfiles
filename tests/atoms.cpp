@@ -31,7 +31,7 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
         a1.type(Atom::DUMMY);
         CHECK(a1.type() == Atom::DUMMY);
 
-        a1.mass(14.789);
+        a1.mass(14.789f);
         CHECK(a1.mass() == 14.789f);
 
         a1.charge(-2);

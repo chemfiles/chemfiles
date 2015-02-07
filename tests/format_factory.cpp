@@ -13,11 +13,11 @@ using namespace harp;
 /******************************************************************************/
 class DummyReader : public FormatReader {
 public:
-    Frame& read_at_step(File& file, const int step){
+    Frame& read_at_step(File&, const int){
         static Frame frame=Frame();
         return frame;
     }
-    Frame& read_next_step(File& file){
+    Frame& read_next_step(File&){
         static Frame frame=Frame();
         return frame;
     }
@@ -28,8 +28,8 @@ REGISTER_READER(DummyReader, ".dummy_reader");
 
 class DummyWriter : public FormatWriter {
 public:
-    void write_step(const File& file, const Frame& frame){
-        // doing nothing
+    void write_step(const File&, const Frame&){
+        // Do nothing
     }
 private:
     WRITER_REGISTER_MEMBER(DummyWriter);
