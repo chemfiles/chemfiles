@@ -16,7 +16,7 @@
 namespace harp {
 
 /*!
- * @class HarpError Error.hpp Error.cpp
+ * @class HarpError Error.hpp
  * @brief Base exception for Harp library
  */
 class HarpError : public std::runtime_error {
@@ -25,13 +25,23 @@ public:
 };
 
 /*!
- * @class HarpFileError Error.hpp Error.cpp
+ * @class HarpFileError Error.hpp
  * @brief Exception for files related failures
  */
 class HarpFileError : public HarpError {
 public:
     HarpFileError(const std::string &message) : HarpError(message) {}
 };
+
+/*!
+ * @class HarpMemoryError Error.hpp
+ * @brief Exception for memory related failures
+ */
+class HarpMemoryError : public HarpError {
+public:
+    HarpMemoryError(const std::string &message) : HarpError(message) {}
+};
+
 
 } // namespace harp
 
