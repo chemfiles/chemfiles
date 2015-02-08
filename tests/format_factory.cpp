@@ -13,7 +13,7 @@ using namespace harp;
 /******************************************************************************/
 class DummyReader : public FormatReader {
 public:
-    Frame& read_at_step(File&, const int){
+    Frame& read_at_step(File&, const size_t){
         static Frame frame=Frame();
         return frame;
     }

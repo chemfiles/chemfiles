@@ -10,6 +10,8 @@
 #ifndef HARP_FORMAT_HPP
 #define HARP_FORMAT_HPP
 
+#include <cstddef>
+
 namespace harp {
 
 class Frame;
@@ -29,22 +31,19 @@ public:
     * @param step The step to read
     * @return A reference to the read frame
     *
-    * Can throw an exception in case of error.
+    * This function can throw an exception in case of error.
     */
-    virtual Frame& read_at_step(const File& file, const int step) = 0;
+    virtual Frame& read_at_step(File& file, const size_t step) = 0;
 
     /*!
     * @brief Read a specific step from a file.
     * @param file The file to read from
-    * @param step The step to read
     * @return A reference to the read frame
     *
-    * Can throw an exception in case of error. The cursor is assumed to be at
+    * This function can throw an exception in case of error. The cursor is assumed to be at
     * the right position in case of text files.
     */
-    virtual Frame& read_next_step(const File& file, const int step) = 0;
-
-private:
+    virtual Frame& read_next_step(File& file) = 0;
 };
 
 /*!
@@ -61,11 +60,9 @@ public:
     * @param frame The frame to be writen
     * @return A reference to the read frame
     *
-    * Can throw an exception in case of error.
+    * This function can throw an exception in case of error.
     */
     virtual void write_step(const File& file, const Frame& frame) = 0;
-
-private:
 };
 
 } // namespace harp
