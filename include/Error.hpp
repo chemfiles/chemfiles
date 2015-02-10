@@ -42,6 +42,15 @@ public:
     HarpMemoryError(const std::string &message) : HarpError(message) {}
 };
 
+/*!
+ * @class HarpFileError Error.hpp
+ * @brief Exception for formats related failures
+ */
+class HarpFormatError : public HarpError {
+public:
+    HarpFormatError(const std::string &message) : HarpError(message) {}
+};
+
 
 } // namespace harp
 

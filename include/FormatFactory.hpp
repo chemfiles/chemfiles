@@ -17,17 +17,8 @@
 
 namespace harp {
 
-//! Create a format reader
-template <class FormatClass>
-std::unique_ptr<FormatReader> new_format_reader() {
-    return std::unique_ptr<FormatReader>(new FormatClass());
-}
-
-//! Create a format writer
-template <class FormatClass>
-std::unique_ptr<FormatWriter> new_format_writer() {
-    return std::unique_ptr<FormatWriter>(new FormatClass());
-}
+using std::unique_ptr;
+using std::string;
 
 /*!
 * @class FormatFactory FormatFactory.hpp
@@ -38,64 +29,40 @@ std::unique_ptr<FormatWriter> new_format_writer() {
 * asked politely.
 */
 class FormatFactory{
-public:
-    //! Get a format reader from an \c extention. Throw an error if the format can not be found
-    static std::unique_ptr<FormatReader> get_reader(const std::string& extension){
-        // TODO check if the key is present and throw error
-        return get_reader_map()[extension]();
-    }
-    //! Get a format writer from an \c extention. Throw an error if the format can not be found
-    static std::unique_ptr<FormatWriter> get_writer(const std::string& extension){
-        // TODO check if the key is present and throw error
-        return get_writer_map()[extension]();
-    }
-protected:
+private:
     //! Files extensions to format reader associations
-    typedef std::map<std::string, std::unique_ptr<FormatReader>(*)()> reader_map_t;
-    //! Files extensions to format writer associations
-    typedef std::map<std::string, std::unique_ptr<FormatWriter>(*)()> writer_map_t;
+    typedef std::map<string, Format*> format_map_t;
 
     //! Static reader_map instance
-    static reader_map_t& get_reader_map(){
-        static reader_map_t reader_map = reader_map_t();
-        return reader_map;
+    static format_map_t& format_map(){
+        static format_map_t map = format_map_t();
+        return map;
     }
-    //! Static writer_map instance
-    static writer_map_t& get_writer_map(){
-        static writer_map_t writer_map = writer_map_t();
-        return writer_map;
+public:
+    /*!
+     * @brief Get a format reader from an \c extention.
+     *
+     * Throw an error if the format can not be found
+     */
+    static Format* format(const string& ext){
+        // TODO check if the key is present and throw error
+        return format_map()[ext];
     }
-};
-
-template <class ReaderClass>
-struct ReaderRegister : public FormatFactory {
-    ReaderRegister(const std::string &name){
-        // TODO: Check if the key already exist
-        get_reader_map().insert(std::make_pair(name, &new_format_reader<ReaderClass>));
-    }
-};
-
-template <class WriterClass>
-struct WriterRegister : public FormatFactory {
-    WriterRegister(const std::string &name){
-        // TODO: Check if the key already exist
-        get_writer_map().insert(std::make_pair(name, &new_format_writer<WriterClass>));
+    //! Register a format in the internal list.
+    static bool register_format(const string& ext, Format* fc){
+        // TODO check if the key is already present and throw error
+        format_map().insert(std::make_pair(ext, fc));
+        return true;
     }
 };
-
-//! Add a register as a static class member for FormatReader.
-#define READER_REGISTER_MEMBER(type) \
-    static ReaderRegister<type> __reg__;
-//! Add a register as a static class member for FormatWriter.
-#define WRITER_REGISTER_MEMBER(type) \
-    static WriterRegister<type> __reg__;
 
 //! Register a FormatReader by associating it to a specific extension.
-#define REGISTER_READER(type, extension) \
-    ReaderRegister<type> type::__reg__ = ReaderRegister<type>(extension);
-//! Register a FormatWriter by associating it to a specific extension.
-#define REGISTER_WRITER(type, extension) \
-    WriterRegister<type> type::__reg__ = WriterRegister<type>(extension);
+#define REGISTER_FORMAT(type, extension)              \
+    /* Instanciate the template */                          \
+    static type type ## instance = type();     \
+    /* register the format */                               \
+    static bool type ## _registered = \
+                FormatFactory::register_format(extension, &type ## instance);
 
 } // namespace harp
 

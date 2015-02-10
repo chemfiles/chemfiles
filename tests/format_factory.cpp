@@ -9,44 +9,20 @@
 
 using namespace harp;
 
-// Dummy clases
-/******************************************************************************/
-class DummyReader : public FormatReader {
+// Dummy format clase
+class DummyFormat : public Format {
 public:
-    Frame& read_at_step(File&, const size_t){
-        static Frame frame=Frame();
-        return frame;
-    }
-    Frame& read_next_step(File&){
-        static Frame frame=Frame();
-        return frame;
-    }
-private:
-    READER_REGISTER_MEMBER(DummyReader);
+    DummyFormat(){}
+    std::string description() const {return "";}
 };
-REGISTER_READER(DummyReader, ".dummy_reader");
-
-class DummyWriter : public FormatWriter {
-public:
-    void write_step(const File&, const Frame&){
-        // Do nothing
-    }
-private:
-    WRITER_REGISTER_MEMBER(DummyWriter);
-};
-REGISTER_WRITER(DummyWriter, ".dummy_writer");
-/******************************************************************************/
+REGISTER_FORMAT(DummyFormat, ".dummy");
 
 TEST_CASE("Get registered format", "[format factory]"){
-    auto reader = FormatFactory::get_reader(".dummy_reader");
-    auto dummy_reader = DummyReader();
-    REQUIRE(typeid(dummy_reader) == typeid(*reader));
+    auto format = FormatFactory::format(".dummy");
+    auto dummy = DummyFormat();
+    REQUIRE(typeid(dummy) == typeid(*format));
 
-    auto writer = FormatFactory::get_writer(".dummy_writer");
-    auto dummy_writer = DummyWriter();
-    REQUIRE(typeid(dummy_writer) == typeid(*writer));
-
-    auto reader_2 = FormatFactory::get_reader(".xyz");
-    auto XYZ_reader = XYZReader();
-    REQUIRE(typeid(XYZ_reader) == typeid(*reader_2));
+    auto format2 = FormatFactory::format(".xyz");
+    auto XYZ = XYZFormat();
+    REQUIRE(typeid(XYZ) == typeid(*format2));
 }

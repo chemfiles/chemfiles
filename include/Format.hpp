@@ -10,59 +10,56 @@
 #ifndef HARP_FORMAT_HPP
 #define HARP_FORMAT_HPP
 
-#include <cstddef>
+#include <string>
+#include <memory>
+using std::shared_ptr;
+
+#include "files/File.hpp"
 
 namespace harp {
 
 class Frame;
-class File;
 
 /*!
- * @class FormatReader Format.hpp Format.cpp
- * @brief Abstract format reader class
+ * @class Format Format.hpp Format.cpp
+ * @brief Abstract format class
  *
- * Abstract base class for file formats reader
+ * Abstract base class for file formats reader and writer
  */
-class FormatReader {
+class Format {
 public:
     /*!
-    * @brief Read a specific step from a file.
-    * @param file The file to read from
+    * @brief Read a specific step from the internal file.
+    * @param file The file to read from.
     * @param step The step to read
     * @return A reference to the read frame
     *
     * This function can throw an exception in case of error.
     */
-    virtual Frame& read_at_step(File& file, const size_t step) = 0;
+    virtual void read_at_step(shared_ptr<File> file, const size_t step, Frame& frame);
 
     /*!
     * @brief Read a specific step from a file.
-    * @param file The file to read from
+    * @param file The file to read from.
     * @return A reference to the read frame
     *
-    * This function can throw an exception in case of error. The cursor is assumed to be at
-    * the right position in case of text files.
+    * This function can throw an exception in case of error. The cursor is
+    * assumed to be at the right position in case of text files.
     */
-    virtual Frame& read_next_step(File& file) = 0;
-};
+    virtual void read_next_step(shared_ptr<File> file, Frame& frame);
 
-/*!
-* @class FormatWriter Format.hpp Format.cpp
-* @brief Abstract format writer class
-*
-* Abstract base class for file formats writer.
-*/
-class FormatWriter {
-public:
     /*!
     * @brief Write a step (frame) to a file.
-    * @param file The file to write to
+    * @param file The file to read from.
     * @param frame The frame to be writen
     * @return A reference to the read frame
     *
     * This function can throw an exception in case of error.
     */
-    virtual void write_step(const File& file, const Frame& frame) = 0;
+    virtual void write_step(shared_ptr<File> file, const Frame& frame);
+
+    //! A short string describing the format.
+    virtual std::string description() const = 0;
 };
 
 } // namespace harp

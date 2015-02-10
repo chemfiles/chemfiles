@@ -8,5 +8,18 @@
 */
 
 #include "Format.hpp"
-
+#include "Frame.hpp"
+#include "Error.hpp"
 using namespace harp;
+
+void Format::read_at_step(shared_ptr<File>, const size_t, Frame&){
+    throw HarpFormatError("Not implemented function read_at_step.");
+}
+
+void Format::read_next_step(shared_ptr<File>, Frame&){
+    throw HarpFormatError("Not implemented function read_at_step.");
+}
+
+void Format::write_step(shared_ptr<File>, const Frame&){
+    throw HarpFormatError("Not implemented function read_at_step.");
+}
