@@ -1,0 +1,3 @@
+[submodule "tests/test-files"]
+	path = tests/files
+	url = https://Luthaf@bitbucket.org/Luthaf/harptestscases.git
