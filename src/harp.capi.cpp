@@ -11,13 +11,9 @@
 #include "harp.h"
 #include "Harp.hpp"
 
-// Private headers
-#include "HarpIO.hpp"
-#include "Frame.hpp"
-
 using namespace harp;
 
-HARP_FRAME* harp_frame(const HARP_FILE* file){
+HARP_FRAME* harp_frame(const HARP_TRAJECTORY* file){
     return NULL;
 }
 
@@ -61,10 +57,10 @@ char* harp_get_name(const HARP_ATOM* atom, char* name, const int size){
 
 /******************************************************************************/
 
-HARP_FILE* harp_open(const char* filename){
-    HARP_FILE* file = NULL;
+HARP_TRAJECTORY* harp_open(const char* filename){
+    HARP_TRAJECTORY* file = NULL;
     try {
-        file = new HarpFile(filename);
+        file = new Trajectory(filename);
     }
     catch(harp::HarpError) {
         // TODO
@@ -72,15 +68,15 @@ HARP_FILE* harp_open(const char* filename){
     return file;
 }
 
-int harp_read_step(const HARP_FILE* file, const int step, HARP_FRAME* frame){
+int harp_read_step(const HARP_TRAJECTORY* file, const int step, HARP_FRAME* frame){
     return 0;
 }
 
-int harp_read_next_step(const HARP_FILE* file, HARP_FRAME* frame){
+int harp_read_next_step(const HARP_TRAJECTORY* file, HARP_FRAME* frame){
     return 0;
 }
 
-int harp_close(HARP_FILE* file){
+int harp_close(HARP_TRAJECTORY* file){
     try {
         delete file;
     }

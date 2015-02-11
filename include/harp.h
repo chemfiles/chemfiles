@@ -23,16 +23,16 @@
 extern "C" {
 
     namespace harp {
-        class HarpFile;
+        class Trajectory;
         class Frame;
         class Atom;
     }
-    typedef harp::HarpFile HARP_FILE;
+    typedef harp::Trajectory HARP_TRAJECTORY;
     typedef harp::Frame HARP_FRAME;
     typedef harp::Atom HARP_ATOM;
 #else
     //! Opaque type handling trajectories files
-    typedef struct HARP_FILE HARP_FILE;
+    typedef struct HARP_TRAJECTORY HARP_TRAJECTORY;
     //! Opaque type handling frames, *i.e* data from a step
     typedef struct HARP_FRAME HARP_FRAME;
     //! Opaque type handling an atom
@@ -44,7 +44,7 @@ extern "C" {
     * @param file A trajectory to work with
     * @return A pointer to the frame
     */
-    HARP_FRAME* harp_frame(const HARP_FILE* file);
+    HARP_FRAME* harp_frame(const HARP_TRAJECTORY* file);
 
     /*!
     * @brief Get the frame size, i.e. the current number of atoms
@@ -126,7 +126,7 @@ extern "C" {
     * @param mode The opening ("r" or "w") for the file. The default is read mode.
     * @return A pointer to the file
     */
-    HARP_FILE* harp_open(const char* filename, const char* mode);
+    HARP_TRAJECTORY* harp_open(const char* filename, const char* mode);
 
     /*!
     * @brief Read a specific step of a trajectory in a frame
@@ -135,7 +135,7 @@ extern "C" {
     * @param frame A frame to fill with the data
     * @return TODO
     */
-    int harp_read_step(const HARP_FILE *file, const int step, HARP_FRAME* frame);
+    int harp_read_step(const HARP_TRAJECTORY *file, const int step, HARP_FRAME* frame);
 
     /*!
     * @brief Read the next step of a trajectory in a frame
@@ -143,14 +143,14 @@ extern "C" {
     * @param frame A frame to fill with the data
     * @return TODO
     */
-    int harp_read_next_step(const HARP_FILE *file, HARP_FRAME *frame);
+    int harp_read_next_step(const HARP_TRAJECTORY *file, HARP_FRAME *frame);
 
     /*!
     * @brief Close a trajectory file
     * @param file A pointer to the file
     * @return The status code
     */
-    int harp_close(HARP_FILE *file);
+    int harp_close(HARP_TRAJECTORY *file);
 
 #ifdef __cplusplus
 }

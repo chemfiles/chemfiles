@@ -19,10 +19,10 @@ class Frame;
 class HarpIO;
 
 /*!
-* @class HarpFile HarpFile.hpp HarpFile.cpp
+* @class Trajectory Trajectory.hpp Trajectory.cpp
 * @brief The main entry point for harp library
 */
-class HarpFile {
+class Trajectory {
 public:
     /*!
     * @brief Open a trajectory file
@@ -33,17 +33,18 @@ public:
     * extension.
     */
     //!
-    HarpFile(std::string filename, std::string mode = "r");
+    Trajectory(std::string filename, std::string mode = "r");
+    ~Trajectory();
 
     //! Read operator, stream form
-    inline HarpFile& operator>>(Frame& frame);
+    inline Trajectory& operator>>(Frame& frame);
     //! Read operator, method form
     inline Frame& read_next_step();
     //! Read operator, method form with specific step
     inline Frame& read_at_step(int step);
 
     //! Write operator, stream form
-    inline HarpFile& operator<<(const Frame& frame);
+    inline Trajectory& operator<<(const Frame& frame);
     //! Write operator, method form
     inline void write_step(Frame& frame);
 private:

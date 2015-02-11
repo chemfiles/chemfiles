@@ -18,7 +18,7 @@
 #define HARP_HPP
 
 #include "Logger.hpp"
-#include "HarpFile.hpp"
+#include "Trajectory.hpp"
 #include "Error.hpp"
 #include "Frame.hpp"
 

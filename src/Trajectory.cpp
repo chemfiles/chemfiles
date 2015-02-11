@@ -7,34 +7,36 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "HarpFile.hpp"
+#include "Trajectory.hpp"
 #include "HarpIO.hpp"
 #include "FormatFactory.hpp"
 
 using namespace harp;
 
-HarpFile::HarpFile(std::string filename, std::string mode){
+Trajectory::Trajectory(std::string filename, std::string mode){
     // TODO
 }
 
-HarpFile& HarpFile::operator>>(Frame& frame){
+Trajectory::~Trajectory(){}
+
+Trajectory& Trajectory::operator>>(Frame& frame){
     *file >> frame;
     return *this;
 };
 
-Frame& HarpFile::read_next_step(){
+Frame& Trajectory::read_next_step(){
     return file->read_next_step();
 };
 
-Frame& HarpFile::read_at_step(int step){
+Frame& Trajectory::read_at_step(int step){
     return file->read_at_step(step);
 }
 
-HarpFile& HarpFile::operator<<(const Frame& frame){
+Trajectory& Trajectory::operator<<(const Frame& frame){
     *file << frame;
     return *this;
 }
 
-void HarpFile::write_step(Frame& frame){
+void Trajectory::write_step(Frame& frame){
     file->write_step(frame);
 }
