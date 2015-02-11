@@ -80,6 +80,12 @@ vector<dihedral> Topology::dihedrals(void){
     return std::move(res);
 }
 
+void Topology::clear(){
+    _atom_types.clear();
+    _atoms.clear();
+    _bonds.clear();
+}
+
 Topology harp::dummy_topology(size_t natoms){
     Topology top(natoms);
     for (size_t i=0; i<natoms; i++)

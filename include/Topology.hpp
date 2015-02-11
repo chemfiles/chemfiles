@@ -77,6 +77,12 @@ public:
     size_t natoms() {return _atoms.size();}
     //! Reserve space for \c natoms in the topology
     void reserve(size_t natoms) {_atoms.reserve(natoms); _bonds.reserve(natoms);}
+    //! Clear the topology
+    void clear();
+
+    //! Try to guess the bonds in the system.
+    //! TODO
+    void guess_bonds() {};
 
     //! Get the bonds in the system
     vector<bond> bonds(void);

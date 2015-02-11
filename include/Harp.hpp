@@ -20,5 +20,6 @@
 #include "Logger.hpp"
 #include "HarpFile.hpp"
 #include "Error.hpp"
+#include "Frame.hpp"
 
 #endif

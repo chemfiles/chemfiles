@@ -66,6 +66,7 @@ void Frame::reserve(size_t size, bool reserve_velocities){
         _velocities.reserve(size);
         _velocities.assign(size, Vector3D(0, 0, 0));
     }
+    _topology.reserve(size);
 }
 
 bool Frame::has_velocities(){
