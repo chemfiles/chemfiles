@@ -1,4 +1,9 @@
 option(BUILD_TESTS "Build harp tests." OFF)
+option(CODE_COVERAGE "Build code coverage" OFF)
+
+if(CODE_COVERAGE)
+    include(EnableCoverageReport)
+endif()
 
 function(harp_cpp_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
