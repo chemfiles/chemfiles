@@ -13,25 +13,22 @@
 #include <string>
 
 #include "Format.hpp"
-#include "FormatFactory.hpp"
 
 namespace harp {
 
+class TextFile;
+
 /*!
- * @class XYZReader formats/XYZ.hpp formats/XYZ.cpp
+ * @class XYZFormat formats/XYZ.hpp formats/XYZ.cpp
  * @brief XYZ file format reader.
  *
  * TODO: add a reference to the format
  */
-class XYZReader : public FormatReader {
+class XYZFormat : public Format {
 public:
-    XYZReader();
-    ~XYZReader();
-
-    Frame& read_at_step(const File& file, const int step);
-    Frame& read_next_step(const File& file, const int step);
-private:
-    READER_REGISTER_MEMBER(XYZReader);
+    void read_at_step(shared_ptr<File> file, const size_t step, Frame& frame);
+    void read_next_step(shared_ptr<File> file, Frame& frame);
+    std::string description() const;
 };
 
 } // namespace harp
