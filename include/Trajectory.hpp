@@ -33,20 +33,22 @@ public:
     * extension.
     */
     //!
-    Trajectory(std::string filename, std::string mode = "r");
+    Trajectory(const std::string& filename, const std::string& mode = "r");
+    Trajectory(Trajectory&&);
+    Trajectory& operator=(Trajectory&&);
     ~Trajectory();
 
     //! Read operator, stream form
-    inline Trajectory& operator>>(Frame& frame);
+    Trajectory& operator>>(Frame& frame);
     //! Read operator, method form
-    inline Frame& read_next_step();
+    Frame& read_next_step();
     //! Read operator, method form with specific step
-    inline Frame& read_at_step(int step);
+    Frame& read_at_step(const size_t step);
 
     //! Write operator, stream form
-    inline Trajectory& operator<<(const Frame& frame);
+    Trajectory& operator<<(const Frame& frame);
     //! Write operator, method form
-    inline void write_step(Frame& frame);
+    void write_step(Frame& frame);
 private:
     // PIMPL pointer
     std::unique_ptr<HarpIO> file;

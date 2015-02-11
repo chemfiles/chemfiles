@@ -9,12 +9,20 @@
 
 #include "Trajectory.hpp"
 #include "HarpIO.hpp"
-#include "FormatFactory.hpp"
 
 using namespace harp;
 
-Trajectory::Trajectory(std::string filename, std::string mode){
-    // TODO
+Trajectory::Trajectory(const std::string& filename, const std::string& mode){
+    file = std::unique_ptr<HarpIO>(new HarpIO(filename, mode));
+}
+
+Trajectory::Trajectory(Trajectory&& other){
+    file = std::move(other.file);
+}
+
+Trajectory& Trajectory::operator=(Trajectory&& other){
+    file = std::move(other.file);
+    return *this;
 }
 
 Trajectory::~Trajectory(){}
@@ -28,7 +36,7 @@ Frame& Trajectory::read_next_step(){
     return file->read_next_step();
 };
 
-Frame& Trajectory::read_at_step(int step){
+Frame& Trajectory::read_at_step(const size_t step){
     return file->read_at_step(step);
 }
 

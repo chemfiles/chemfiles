@@ -21,6 +21,7 @@ if(BUILD_TESTS)
 
     file(GLOB all_test_files
         ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/formats/*.cpp
     )
 
     add_definitions("-DSRCDIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")

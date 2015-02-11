@@ -28,25 +28,27 @@ class Format;
 */
 class HarpIO {
 public:
-    virtual ~HarpIO() = 0;
+    HarpIO(const std::string& filename, const std::string& mode);
+    ~HarpIO();
 
     //! Read operator, in *stream* version
-    virtual HarpIO& operator>>(Frame& frame);
+    HarpIO& operator>>(Frame& frame);
     //! Read operator, in *method* version
-    virtual Frame& read_next_step();
+    Frame& read_next_step();
     //! Read operator, in *method* version with specific step
-    virtual Frame& read_at_step(size_t);
+    Frame& read_at_step(const size_t);
 
     //! Write operator, in *stream* version
-    virtual HarpIO& operator<<(const Frame& frame);
+    HarpIO& operator<<(const Frame& frame);
     //! Write operator, in *method* version
-    virtual void write_step(Frame& frame);
-protected:
-    bool read_mode;
-    bool write_mode;
-
+    void write_step(Frame& frame);
+private:
+    //! Cache a frame, as it can get very heavy
+    Frame _frame;
+    //! Used format
     Format* _format;
-    std::unique_ptr<File> _file;
+    //! File, to be shared with the format.
+    std::shared_ptr<File> _file;
 };
 
 } // namespace harp

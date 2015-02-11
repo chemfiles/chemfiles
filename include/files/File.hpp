@@ -113,7 +113,7 @@ private:
 */
 class BinaryFile : public File{
 public:
-    virtual ~BinaryFile();
+    virtual ~BinaryFile() = 0;
 private:
 };
 
