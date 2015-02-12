@@ -32,7 +32,7 @@ configure_file (
   "${PROJECT_SOURCE_DIR}/include/config.hpp"
 )
 
-add_library(harp ${sources})
+add_library(harp SHARED ${sources})
 target_link_libraries(harp ${Boost_LIBRARIES})
 
 add_subdirectory(doc)

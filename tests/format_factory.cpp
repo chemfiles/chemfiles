@@ -14,8 +14,9 @@ class DummyFormat : public Format {
 public:
     DummyFormat(){}
     std::string description() const {return "";}
+    REGISTER_FORMAT;
 };
-REGISTER_FORMAT(DummyFormat, ".dummy");
+REGISTER(DummyFormat, ".dummy");
 
 TEST_CASE("Get registered format", "[format factory]"){
     auto format = FormatFactory::format(".dummy");

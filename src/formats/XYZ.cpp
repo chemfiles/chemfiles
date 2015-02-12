@@ -10,7 +10,6 @@
 #include <sstream>
 
 #include "formats/XYZ.hpp"
-#include "FormatFactory.hpp"
 
 #include "Error.hpp"
 #include "Frame.hpp"
@@ -75,4 +74,4 @@ void XYZFormat::read_next_step(shared_ptr<File> file, Frame& frame){
 }
 
 // Register the xyz format with the .xyz extension
-REGISTER_FORMAT(XYZFormat, ".xyz")
+REGISTER(XYZFormat, ".xyz")

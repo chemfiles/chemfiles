@@ -10,13 +10,15 @@
 #ifndef HARP_FORMAT_FACTORY_HPP
 #define HARP_FORMAT_FACTORY_HPP
 
-#include <map>
+#include <unordered_map>
 #include <memory>
 
 #include "Format.hpp"
+#include "Error.hpp"
 
 namespace harp {
 
+using std::shared_ptr;
 using std::unique_ptr;
 using std::string;
 
@@ -30,13 +32,15 @@ using std::string;
 */
 class FormatFactory{
 private:
+    //! Function type to create a format
+    typedef unique_ptr<Format> (*format_creator_t) ();
     //! Files extensions to format reader associations
-    typedef std::map<string, Format*> format_map_t;
+    typedef std::unordered_map<string, format_creator_t> format_map_t;
 
     //! Static reader_map instance
-    static format_map_t& format_map(){
-        static format_map_t map = format_map_t();
-        return map;
+    static format_map_t& map(){
+        static format_map_t umap = format_map_t();
+        return umap;
     }
 public:
     /*!
@@ -44,26 +48,31 @@ public:
      *
      * Throw an error if the format can not be found
      */
-    static Format* format(const string& ext){
-        // TODO check if the key is present and throw error
-        return format_map()[ext];
+    static unique_ptr<Format> format(const string& ext){
+        auto m = map();
+        if (map().find(ext) == map().end())
+            throw HarpFormatError("Can not find a format "
+                "associated with the \"" + ext + "\" extension.");
+        return (*map()[ext])();
     }
     //! Register a format in the internal list.
-    static bool register_format(const string& ext, Format* fc){
-        // TODO check if the key is already present and throw error
-        format_map().insert(std::make_pair(ext, fc));
+    static bool register_format(const string& ext, format_creator_t fc){
+        if (map().find(ext) != map().end())
+            throw HarpFormatError("The extension " + ext +
+                " is already associated with a format.");
+        map().emplace(ext, fc);
         return true;
     }
 };
 
-//! Register a FormatReader by associating it to a specific extension.
-#define REGISTER_FORMAT(type, extension)              \
-    /* Instanciate the template */                          \
-    static type type ## instance = type();     \
-    /* register the format */                               \
-    static bool type ## _registered = \
-                FormatFactory::register_format(extension, &type ## instance);
 
+//! Register a Format by associating it to a specific extension.
+#define REGISTER(type, extension)                              \
+bool type::_registered_extension_ =                            \
+FormatFactory::register_format(extension, [](){return unique_ptr<Format>(new type());});
+
+//! Add a static member in the class to register a format.
+#define REGISTER_FORMAT static bool _registered_extension_
 } // namespace harp
 
 #endif

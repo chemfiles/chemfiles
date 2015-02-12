@@ -46,7 +46,7 @@ private:
     //! Cache a frame, as it can get very heavy
     Frame _frame;
     //! Used format
-    Format* _format;
+    std::unique_ptr<Format> _format;
     //! File, to be shared with the format.
     std::shared_ptr<File> _file;
 };
