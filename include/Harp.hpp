@@ -18,8 +18,12 @@
 #define HARP_HPP
 
 #include "Logger.hpp"
-#include "Trajectory.hpp"
 #include "Error.hpp"
-#include "Frame.hpp"
 
-#endif
+#include "Atom.hpp"
+#include "Topology.hpp"
+#include "Frame.hpp"
+#include "UnitCell.hpp"
+#include "Trajectory.hpp"
+
+#endif // HARP_HPP
