@@ -58,19 +58,17 @@ void XYZFormat::read_next_step(shared_ptr<File> file, Frame& frame){
     frame.topology().clear();
     frame.reserve(natoms);
 
-    float x(0), y(0), z(0);
-    string name;
-    std::istringstream string_stream;
-    auto positions = frame.positions();
-    auto topology = frame.topology();
-
     for (size_t i=0; i<lines.size(); i++) {
+        std::istringstream string_stream;
+        float x, y, z;
+        string name;
+
         string_stream.str(lines[i]);
         string_stream >> name >> x >> y >> z ;
-        positions[i] = Vector3D(x, y, z);
-        topology.add_atom(Atom(name));
+        frame.positions()[i] = Vector3D(x, y, z);
+        frame.topology().add_atom(Atom(name));
     }
-    topology.guess_bonds();
+    frame.topology().guess_bonds();
 }
 
 // Register the xyz format with the .xyz extension

@@ -15,7 +15,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         // Check positions
         auto positions = frame.positions();
         CHECK(positions[0] == Vector3D(0.49053f, 8.41351f, 0.0777257f));
-        CHECK(positions[125] == Vector3D(8.57951f, 8.65712f, 8.06678f));
+        CHECK(positions[124] == Vector3D(8.57951f, 8.65712f, 8.06678f));
         // Check topology
         auto topology = frame.topology();
         CHECK(topology.atom_types().size() == 1);
@@ -29,7 +29,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         // Check positions
         auto positions = frame.positions();
         CHECK(positions[0] == Vector3D(0.49053f, 8.41351f, 0.0777257f));
-        CHECK(positions[125] == Vector3D(8.57951f, 8.65712f, 8.06678f));
+        CHECK(positions[124] == Vector3D(8.57951f, 8.65712f, 8.06678f));
         // Check topology
         auto topology = frame.topology();
         CHECK(topology.atom_types().size() == 1);
