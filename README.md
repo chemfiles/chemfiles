@@ -39,21 +39,47 @@ second point.
 
 ### Planned formats
 
-| Format        | Read ? | Write ? |
-| ------------- | ------ | ------- |
-| Amber NetCDF  | yes    |  yes    |
-| Gromacs XTC   | yes    |  ?      |
-| Gromacs TNG   | yes    |  ?      |
-| Lammps Native | yes    |  ?      |
-| PDB           | yes    |  ?      |
-
-And many others, as needed and requested.
+See the [issue list](https://github.com/Luthaf/Chemharp/labels/New%20Format) for
+planned formats. If you want a new format to be added to Chemharp, you can either
+do it by yourself (it is easy !) and create a pull-request to incorporate your
+changes, or create a new issue with a link to the format reference and some
+example of well-formed files.
 
 ## Getting started
 
-### Installation
+### Getting the code, building, installing
 
-`cmake`, and so on.
+To get the code, please use `git`
+```bash
+git clone --recursive https://github.com/Luthaf/Chemharp
+cd Chemharp
+```
+
+Then, [`cmake`](http://cmake.org/) is used to build the code. It should be
+available in your favorite package manager. So, create a folder and go for the
+build:
+```bash
+mkdir build
+cd build
+cmake ..
+```
+
+You can also configure the build at command line. The mains options are `-DBUILD_TESTS=ON` to build the tests suite, and `-DBUILD_DOCUMENTATION` to build a local copy of the documentation.
+
+Then, you can build and install the library by running the following commands:
+```bash
+make
+make install
+```
+
+### Testing the code
+
+You may want to run the tests before installing. To do so, use the `ctest` command:
+```bash
+ctest # or ctest -jn to run n parallel processes
+```
+
+All tests should pass, if they don't please fill an [issue](https://github.com/Luthaf/Chemharp/issues).
 
 ### Usage
 
