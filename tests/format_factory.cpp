@@ -2,7 +2,7 @@
 
 #include "catch.hpp"
 
-#include "Harp.hpp"
+#include "Chemharp.hpp"
 #include "FormatFactory.hpp"
 #include "Frame.hpp"
 #include "formats/XYZ.hpp"

@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "Harp.hpp"
+#include "Chemharp.hpp"
 #include "Topology.hpp"
 using namespace harp;
 

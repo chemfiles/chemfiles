@@ -2,7 +2,7 @@
 
 #include "catch.hpp"
 
-#include "Harp.hpp"
+#include "Chemharp.hpp"
 #include "UnitCell.hpp"
 
 using namespace harp;

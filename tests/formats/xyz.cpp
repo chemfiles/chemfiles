@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "Harp.hpp"
+#include "Chemharp.hpp"
 using namespace harp;
 
 #define XYZDIR SRCDIR "/files/xyz/"

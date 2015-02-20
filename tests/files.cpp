@@ -5,7 +5,7 @@
 
 #include "catch.hpp"
 
-#include "Harp.hpp"
+#include "Chemharp.hpp"
 #include "files/File.hpp"
 using namespace harp;
 

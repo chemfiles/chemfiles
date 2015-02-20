@@ -5,7 +5,7 @@
 
 #include "catch.hpp"
 
-#include "Harp.hpp"
+#include "Chemharp.hpp"
 
 TEST_CASE("Basic logging usage", "[logging]"){
     std::stringstream out_buffer;
@@ -16,11 +16,11 @@ TEST_CASE("Basic logging usage", "[logging]"){
     std::clog.rdbuf(out_buffer.rdbuf());
 
     LOG(ERROR) << "an error" << std::endl;
-    REQUIRE("Harp error: an error\n" == out_buffer.str());
+    REQUIRE("Chemharp error: an error\n" == out_buffer.str());
     out_buffer.str(std::string()); // Clean the buffer
 
     LOG(WARNING) << "a warning" << std::endl;
-    REQUIRE("Harp warning: a warning\n" == out_buffer.str());
+    REQUIRE("Chemharp warning: a warning\n" == out_buffer.str());
     out_buffer.str(std::string());
 
     // The level should be WARNING by default
@@ -46,7 +46,7 @@ TEST_CASE("Set the log stream", "[logging]"){
         std::cout.rdbuf(out_buffer.rdbuf());
 
         LOG(WARNING) << "a warning" << std::endl;
-        REQUIRE("Harp warning: a warning\n" == out_buffer.str());
+        REQUIRE("Chemharp warning: a warning\n" == out_buffer.str());
 
         std::cout.rdbuf(sbuf);
     }
@@ -57,7 +57,7 @@ TEST_CASE("Set the log stream", "[logging]"){
         std::cerr.rdbuf(out_buffer.rdbuf());
 
         LOG(WARNING) << "a warning" << std::endl;
-        REQUIRE("Harp warning: a warning\n" == out_buffer.str());
+        REQUIRE("Chemharp warning: a warning\n" == out_buffer.str());
 
         std::cerr.rdbuf(sbuf);
     }
@@ -72,7 +72,7 @@ TEST_CASE("Set the log stream", "[logging]"){
         std::getline(logfile, log_content);
         logfile.close();
 
-        REQUIRE("Harp warning: a warning" == log_content);
+        REQUIRE("Chemharp warning: a warning" == log_content);
 
         remove("test-logging-tmp.log");
     }

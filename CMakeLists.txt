@@ -16,7 +16,7 @@ find_package(Boost REQUIRED COMPONENTS filesystem system)
 set(CMAKE_CXX_STANDARD 11)
 set(CXX_STANDARD_REQUIRED ON)
 
-include(HarpCompilerFlags)
+include(CompilerFlags)
 
 set(HARP_VERSION_MAJOR 0)
 set(HARP_VERSION_MINOR 1)

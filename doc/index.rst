@@ -1,5 +1,5 @@
-Welcome to Harp's documentation!
-================================
+Welcome to Chemharp's documentation!
+====================================
 
 Contents:
 

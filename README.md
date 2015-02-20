@@ -1,17 +1,17 @@
-# Harp, an efficient IO library for chemistry file formats
+# Chemharp, an efficient IO library for chemistry file formats
 
-Harp is a modern C++ library for reading and writing from and to trajectory
+Chemharp is a modern C++ library for reading and writing from and to trajectory
 files. These files are created by your favorite program, and contains informations
 about atomic or residues names and positions. Some format also have additional
 informations, such as velocities, forces, energy, masses, charges, …
 
-The main targeted audience of Harp (libharp) is chemistry researcher working on
-their own code to do some kind of awesome science, without bothering about
-handling all the format that may exist in the world.
+The main targeted audience of Chemharp (libchemharp) is chemistry researcher
+working on their own code to do some kind of awesome science, without bothering
+about handling all the format that may exist in the world.
 
 Running simulation (either minimisations, Monte Carlo or Molecular Dynamic) often
 require a two-step process: running the simulation and writing data to a file,
-and then using some analysis tool on that data. Harp try to help you for the
+and then using some analysis tool on that data. Chemharp try to help you for the
 second point.
 
 ## Features
@@ -19,7 +19,7 @@ second point.
  - Automatic recognition of file type based on filename extension;
  - Open-source under the Mozilla Public License;
  - Cross platform: Windows, Linux, Mac OS X, maybe others;
- - Support for a number of atoms not constant.
+ - Support for a number of atoms which is not constant.
 
 ## Planned Features
 

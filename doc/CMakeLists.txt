@@ -25,7 +25,7 @@ if(BUILD_DOCUMENTATION)
 
   if( ${SPHINX_HTML_OUTPUT} )
     install( DIRECTORY ${SPHINX_DESTINATION}/html
-      DESTINATION share/harp/doc
+      DESTINATION share/chemharp/doc
       COMPONENT Doc
       PATTERN "${SPHINX_DESTINATION}/html/*"
       )
@@ -43,12 +43,12 @@ if(BUILD_DOCUMENTATION)
       add_custom_command( TARGET ${sphinx_target_base_name}_latex
         POST_BUILD
         COMMAND ${PDFLATEX_COMPILER}
-          ${SPHINX_DESTINATION}/latex/Harp.tex
+          ${SPHINX_DESTINATION}/latex/Chemharp.tex
           -output-directory ${SPHINX_DESTINATION}/latex
         COMMAND ${MAKEINDEX_COMPILER}
-          Harp.idx
+            Chemharp.idx
         COMMAND ${PDFLATEX_COMPILER}
-          ${SPHINX_DESTINATION}/latex/Harp.tex
+          ${SPHINX_DESTINATION}/latex/Chemharp.tex
           -output-directory ${SPHINX_DESTINATION}/latex
         WORKING_DIRECTORY ${SPHINX_DESTINATION}/latex
         COMMENT "Building PDF"

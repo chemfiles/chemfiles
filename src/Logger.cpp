@@ -1,6 +1,6 @@
 /*
-* Harp, an efficient IO library for chemistry file formats
-* Copyright (C) 2014 Guillaume Fraux
+* Chemharp, an efficient IO library for chemistry file formats
+* Copyright (C) 2015 Guillaume Fraux
 *
 * This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -37,16 +37,16 @@ std::ostream& Logger::get_stream(LogLevel level){
 
     switch(level){
         case ERROR:
-            *os << "Harp error: ";
+            *os << "Chemharp error: ";
             break;
         case WARNING:
-            *os << "Harp warning: ";
+            *os << "Chemharp warning: ";
             break;
         case INFO:
-            *os << "Harp info: ";
+            *os << "Chemharp info: ";
             break;
         case DEBUG:
-            *os << "Harp debug: ";
+            *os << "Chemharp debug: ";
             break;
     }
     return *os;

@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "Harp.hpp"
+#include "Chemharp.hpp"
 #include "Frame.hpp"
 #include "UnitCell.hpp"
 
