@@ -16,9 +16,16 @@ using namespace boost::filesystem;
 using namespace harp;
 using std::string;
 
-HarpIO::HarpIO(const string& filename, const string& mode) {
-    auto ext = extension(filename);
-    _format = FormatFactory::format(ext);
+HarpIO::HarpIO(const string& filename, const string& mode, const string& format) {
+    if (format == ""){
+        // try to guess the format by extension
+        auto ext = extension(filename);
+        _format = FormatFactory::by_extension(ext);
+    }
+    else {
+        _format = FormatFactory::format(format);
+    }
+
     // TODO: use mode to set the mode in file
     _file = std::shared_ptr<File>(new BasicFile(filename));
 }

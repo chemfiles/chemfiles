@@ -71,5 +71,6 @@ void XYZFormat::read_next_step(shared_ptr<File> file, Frame& frame){
     frame.topology().guess_bonds();
 }
 
-// Register the xyz format with the .xyz extension
-REGISTER(XYZFormat, ".xyz")
+// Register the xyz format with the ".xyz" extension and the "XYZ" description.
+REGISTER(XYZFormat, "XYZ");
+REGISTER_EXTENSION(XYZFormat, ".xyz");

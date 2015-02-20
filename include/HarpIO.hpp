@@ -28,7 +28,7 @@ class Format;
 */
 class HarpIO {
 public:
-    HarpIO(const std::string& filename, const std::string& mode);
+    HarpIO(const std::string& filename, const std::string& mode, const std::string& format);
     ~HarpIO();
 
     //! Read operator, in *stream* version

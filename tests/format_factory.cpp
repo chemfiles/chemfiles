@@ -16,14 +16,19 @@ public:
     std::string description() const {return "";}
     REGISTER_FORMAT;
 };
-REGISTER(DummyFormat, ".dummy");
+REGISTER(DummyFormat, "Dummy");
+REGISTER_EXTENSION(DummyFormat, ".dummy");
 
 TEST_CASE("Get registered format", "[format factory]"){
-    auto format = FormatFactory::format(".dummy");
     auto dummy = DummyFormat();
+    auto format = FormatFactory::by_extension(".dummy");
+    REQUIRE(typeid(dummy) == typeid(*format));
+    format = FormatFactory::format("Dummy");
     REQUIRE(typeid(dummy) == typeid(*format));
 
-    auto format2 = FormatFactory::format(".xyz");
     auto XYZ = XYZFormat();
-    REQUIRE(typeid(XYZ) == typeid(*format2));
+    format = FormatFactory::by_extension(".xyz");
+    REQUIRE(typeid(XYZ) == typeid(*format));
+    format = FormatFactory::format("XYZ");
+    REQUIRE(typeid(XYZ) == typeid(*format));
 }

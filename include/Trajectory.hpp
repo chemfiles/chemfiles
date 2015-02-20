@@ -27,13 +27,15 @@ public:
     /*!
     * @brief Open a trajectory file
     * @param filename The file path
+    * @param format Specific format to use. Needed when there is no way to guess
+    *               the format from the extension of the file.
     * @param mode Opening mode for the file. Default mode is "r" for read.
     *
     * Open a file, automatically gessing the file format and type from the
     * extension.
     */
     //!
-    Trajectory(const std::string& filename, const std::string& mode = "r");
+    Trajectory(const std::string& filename, const std::string& mode = "r", const std::string& format = "");
     Trajectory(Trajectory&&);
     Trajectory& operator=(Trajectory&&);
     ~Trajectory();

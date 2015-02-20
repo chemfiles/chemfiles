@@ -12,8 +12,8 @@
 
 using namespace harp;
 
-Trajectory::Trajectory(const std::string& filename, const std::string& mode){
-    file = std::unique_ptr<HarpIO>(new HarpIO(filename, mode));
+Trajectory::Trajectory(const std::string& filename, const std::string& mode, const std::string& format){
+    file = std::unique_ptr<HarpIO>(new HarpIO(filename, mode, format));
 }
 
 Trajectory::Trajectory(Trajectory&& other){
