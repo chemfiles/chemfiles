@@ -16,39 +16,39 @@
 namespace harp {
 
 /*!
- * @class HarpError Error.hpp
- * @brief Base exception for Harp library
+ * @class Error Error.hpp
+ * @brief Base exception for Chemharp library
  */
-class HarpError : public std::runtime_error {
+class Error : public std::runtime_error {
 public:
-    HarpError(const std::string &message) : std::runtime_error(message) {}
+    Error(const std::string &message) : std::runtime_error(message) {}
 };
 
 /*!
- * @class HarpFileError Error.hpp
+ * @class FileError Error.hpp
  * @brief Exception for files related failures
  */
-class HarpFileError : public HarpError {
+class FileError : public Error {
 public:
-    HarpFileError(const std::string &message) : HarpError(message) {}
+    FileError(const std::string &message) : Error(message) {}
 };
 
 /*!
- * @class HarpMemoryError Error.hpp
+ * @class MemoryError Error.hpp
  * @brief Exception for memory related failures
  */
-class HarpMemoryError : public HarpError {
+class MemoryError : public Error {
 public:
-    HarpMemoryError(const std::string &message) : HarpError(message) {}
+    MemoryError(const std::string &message) : Error(message) {}
 };
 
 /*!
- * @class HarpFileError Error.hpp
+ * @class FormatError Error.hpp
  * @brief Exception for formats related failures
  */
-class HarpFormatError : public HarpError {
+class FormatError : public Error {
 public:
-    HarpFormatError(const std::string &message) : HarpError(message) {}
+    FormatError(const std::string &message) : Error(message) {}
 };
 
 

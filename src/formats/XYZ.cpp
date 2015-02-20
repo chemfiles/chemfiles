@@ -31,8 +31,8 @@ void XYZFormat::read_at_step(shared_ptr<File> file, const size_t step, Frame& fr
             size_t natoms = std::stoul(textfile->getline());
             textfile->readlines(natoms+1);
         }
-        catch (const HarpFileError& e) {
-            throw HarpFormatError("Can not read step " + std::to_string(step) +
+        catch (const FileError& e) {
+            throw FormatError("Can not read step " + std::to_string(step) +
                                   ": " + e.what());
         }
         i += 1;
@@ -51,8 +51,8 @@ void XYZFormat::read_next_step(shared_ptr<File> file, Frame& frame){
     try {
         lines = textfile->readlines(natoms);
     }
-    catch (const HarpFileError& e) {
-        throw HarpFormatError("Can not read file: " + string(e.what()));
+    catch (const FileError& e) {
+        throw FormatError("Can not read file: " + string(e.what()));
     }
 
     frame.topology().clear();

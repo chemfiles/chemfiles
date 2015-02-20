@@ -74,7 +74,7 @@ void UnitCell::raw_matricial(double mat[3][3]) const {
 void UnitCell::type(CellType type){
     if (type == ORTHOROMBIC) {
         if (!(_alpha == 90 && _beta == 90 && _gamma == 90)){
-            throw HarpError("UnitCell type can not be set to ORTHOROMBIC : some"
+            throw Error("UnitCell type can not be set to ORTHOROMBIC : some"
                             " angles are not 90°");
         }
     }

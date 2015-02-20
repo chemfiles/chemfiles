@@ -15,7 +15,7 @@ using namespace harp;
 BasicFile::BasicFile(std::string filename) :
 stream(filename, std::ios_base::in | std::ios_base::out | std::ios_base::app) {
     if (!stream.is_open()) {
-        throw HarpFileError("Could not open the file " + filename);
+        throw FileError("Could not open the file " + filename);
     }
     lines.reserve(1);
     rewind();

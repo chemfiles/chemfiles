@@ -59,7 +59,7 @@ TEST_CASE("Frame class usage", "[Frame]"){
     SECTION("Errors"){
         auto mat = new float[3][3];
 
-        CHECK_THROWS_AS(frame.raw_positions(mat, 3), HarpMemoryError);
+        CHECK_THROWS_AS(frame.raw_positions(mat, 3), MemoryError);
 
         // This is not throwing, but only filling the array with zeroes
         frame.raw_velocities(mat, 3);
@@ -68,7 +68,7 @@ TEST_CASE("Frame class usage", "[Frame]"){
                 CHECK(mat[i][j] == 0);
 
         frame.reserve(10, true);
-        CHECK_THROWS_AS(frame.raw_velocities(mat, 3), HarpMemoryError);
+        CHECK_THROWS_AS(frame.raw_velocities(mat, 3), MemoryError);
         delete[] mat;
     }
 }

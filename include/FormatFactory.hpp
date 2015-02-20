@@ -58,7 +58,7 @@ public:
      */
     static unique_ptr<Format> format(const string& name){
         if (formats().find(name) == formats().end())
-            throw HarpFormatError("Can not find the format \"" + name + "\".");
+            throw FormatError("Can not find the format \"" + name + "\".");
         return (*formats()[name])();
     }
 
@@ -72,7 +72,7 @@ public:
      */
     static unique_ptr<Format> by_extension(const string& ext){
         if (extensions().find(ext) == extensions().end())
-            throw HarpFormatError("Can not find a format associated with the \""
+            throw FormatError("Can not find a format associated with the \""
                                    + ext + "\" extension.");
         return (*extensions()[ext])();
     }
@@ -81,7 +81,7 @@ public:
     //! Register a format in the internal list.
     static bool register_format(const string& name, format_creator_t fc){
         if (formats().find(name) != formats().end())
-            throw HarpFormatError("The name \"" + name + "\" is already "
+            throw FormatError("The name \"" + name + "\" is already "
                                   "associated with a format.");
         formats().emplace(name, fc);
         return true;
@@ -89,7 +89,7 @@ public:
     //! Register an extension in the internal list.
     static bool register_extension(const string& ext, format_creator_t fc){
         if (extensions().find(ext) != extensions().end())
-            throw HarpFormatError("The extension \"" + ext + "\" is already "
+            throw FormatError("The extension \"" + ext + "\" is already "
                                   "associated with a format.");
         extensions().emplace(ext, fc);
         return true;
