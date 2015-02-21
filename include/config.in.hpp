@@ -7,7 +7,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
+#ifndef HARP_CONFIG_HPP
+#define HARP_CONFIG_HPP
+
 #define HARP_VERSION_MAJOR @HARP_VERSION_MAJOR@
 #define HARP_VERSION_MINOR @HARP_VERSION_MINOR@
 
 #define HAVE_NETCDF @HAVE_NETCDF@
+
+#endif
