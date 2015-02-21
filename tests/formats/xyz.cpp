@@ -3,6 +3,9 @@
 #include "Chemharp.hpp"
 using namespace harp;
 
+#include <boost/filesystem.hpp>
+namespace fs=boost::filesystem;
+
 #define XYZDIR SRCDIR "/files/xyz/"
 
 TEST_CASE("Read files in XYZ format", "[XYZ]"){
@@ -35,5 +38,28 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         CHECK(topology.atom_types().size() == 1);
         CHECK(topology.atom_list().size() == 125);
         CHECK(topology[0] == Atom("He"));
+    }
+}
+
+// To use in loops in order to iterate over files in a specific directory.
+struct directory_files_iterator {
+    typedef fs::recursive_directory_iterator iterator;
+    directory_files_iterator(fs::path p) : p_(p) {}
+
+    iterator begin() { return fs::recursive_directory_iterator(p_); }
+    iterator end() { return fs::recursive_directory_iterator(); }
+
+    fs::path p_;
+};
+
+#include <iostream>
+using namespace std;
+
+TEST_CASE("Errors in XYZ format", "[XYZ]"){
+
+    for (auto entry : directory_files_iterator(XYZDIR"bad/")){
+        cout << entry << endl;
+        auto file = Trajectory(entry.path().string());
+        CHECK_THROWS_AS(file.read_next_step(), FormatError);
     }
 }

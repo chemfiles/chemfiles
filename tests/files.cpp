@@ -76,3 +76,7 @@ TEST_CASE("Write a text file", "[Files]"){
 
     remove(SRCDIR"/tmp.dat");
 }
+
+TEST_CASE("Errors", "[Files]"){
+
+}

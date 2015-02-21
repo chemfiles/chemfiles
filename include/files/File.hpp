@@ -97,6 +97,8 @@ public:
     BasicFile& operator<<(const std::string& line);
     void writelines(const std::vector<std::string>& lines);
 private:
+    // The fstream does not store the file name, so let's do it here
+    const std::string filename;
     std::fstream stream;
     // Caching a vector of strings
     std::vector<std::string> lines;

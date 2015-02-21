@@ -12,8 +12,8 @@
 
 using namespace harp;
 
-BasicFile::BasicFile(std::string filename) :
-stream(filename, std::ios_base::in | std::ios_base::out | std::ios_base::app) {
+BasicFile::BasicFile(std::string _filename) : filename(_filename),
+stream(_filename, std::ios_base::in | std::ios_base::out | std::ios_base::app) {
     if (!stream.is_open()) {
         throw FileError("Could not open the file " + filename);
     }
@@ -47,6 +47,9 @@ const std::vector<std::string>& BasicFile::readlines(size_t n){
         else
             lines.push_back(line);
     }
+
+    if (not stream)
+        throw FileError("Error while reading file " + filename);
 
     if (lines.size() > 2*n)
         lines.shrink_to_fit();
