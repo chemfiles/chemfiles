@@ -8,10 +8,12 @@ set(NETCDF_CXX "YES")
 find_package(NetCDF)
 if(${NETCDF_FOUND})
     set(HAVE_NETCDF 1)
+    include_directories(${NETCDF_INCLUDES})
 endif()
 
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost REQUIRED COMPONENTS filesystem system)
+include_directories(${Boost_INCLUDE_DIR})
 
 set(CMAKE_CXX_STANDARD 11)
 set(CXX_STANDARD_REQUIRED ON)
@@ -34,6 +36,9 @@ configure_file (
 
 add_library(harp SHARED ${sources})
 target_link_libraries(harp ${Boost_LIBRARIES})
+if(${NETCDF_FOUND})
+    target_link_libraries(harp ${NETCDF_LIBRARIES})
+endif()
 
 add_subdirectory(doc)
 enable_testing()

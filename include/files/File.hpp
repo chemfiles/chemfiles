@@ -34,6 +34,11 @@ public:
     // Removing default comparison operator
     bool operator==(File const&) = delete;
     bool operator!=(File const&) = delete;
+
+    //! Is the file opended ?
+    virtual bool is_open(void) = 0;
+    //! Close the file before the destructor call.
+    virtual void close(void) = 0;
 };
 
 /*!
@@ -58,14 +63,11 @@ public:
     //! Number of lines in the file
     virtual size_t nlines() = 0;
 
-    virtual inline bool is_open(void) = 0;
-    virtual inline void close(void) = 0;
-
     //! Write a line to the file
     virtual void writeline(const std::string& line) = 0;
     //! Write a line to the file, stream version
     virtual TextFile& operator<<(const std::string& line) = 0;
-    //! Read \c n lines from the file
+    //! Read \c n lines to the file
     virtual void writelines(const std::vector<std::string>& lines) = 0;
 };
 
@@ -113,13 +115,7 @@ private:
 * instanciated directly, but rather to serve as a base class for all the binary
 * file operations.
 */
-class BinaryFile : public File{
-public:
-    virtual ~BinaryFile() = 0;
-private:
-};
-
-// TODO: class NetDCFFile : public BinaryFile
+class BinaryFile : public File {};
 
 } // namespace harp
 
