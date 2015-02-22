@@ -9,9 +9,10 @@
 #include "files/File.hpp"
 using namespace harp;
 
+#define FILESDIR SRCDIR "/files/"
 
 TEST_CASE("Read a text file", "[Files]"){
-    BasicFile file(SRCDIR"/helium.xyz");
+    BasicFile file(FILESDIR "xyz/helium.xyz");
     REQUIRE(file.is_open());
 
     CHECK(file.nlines() == 128);
@@ -21,7 +22,7 @@ TEST_CASE("Read a text file", "[Files]"){
 
     auto lines = file.readlines(42);
     REQUIRE(lines.size() == 42);
-    CHECK(lines[0] == "Dummy comment");
+    CHECK(lines[0] == "Helium as a Lennard-Jone fluid");
     CHECK(lines[1] == "He 0.49053 8.41351 0.0777257");
 
     // Geting line count after some operations
@@ -34,7 +35,7 @@ TEST_CASE("Read a text file", "[Files]"){
     // State is preserved by the nlines function
     file.nlines();
     line = file.getline();
-    CHECK(line == "Dummy comment");
+    CHECK(line == "Helium as a Lennard-Jone fluid");
 
     // Check stream version
     file.rewind();
