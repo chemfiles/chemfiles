@@ -27,6 +27,9 @@ class TextFile;
  */
 class XYZFormat : public Format {
 public:
+    XYZFormat() = default;
+    ~XYZFormat() = default;
+
     void read_at_step(shared_ptr<File> file, const size_t step, Frame& frame);
     void read_next_step(shared_ptr<File> file, Frame& frame);
     std::string description() const;

@@ -31,7 +31,7 @@ namespace harp {
  */
 class NCFile : public BinaryFile {
 public:
-    explicit NCFile(std::string filename);
+    explicit NCFile(const std::string& filename);
     ~NCFile(){}
 
     //! Get a global attribut from the file
@@ -52,8 +52,6 @@ private:
     NcFile file;
     // Behaviour on error
     NcError error_behaviour;
-    // Filename, for error messages
-    const std::string filename;
 };
 
 } // namespace harp

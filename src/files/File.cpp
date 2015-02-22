@@ -12,7 +12,7 @@
 
 using namespace harp;
 
-BasicFile::BasicFile(std::string _filename) : filename(_filename),
+BasicFile::BasicFile(const std::string& _filename) : TextFile(_filename),
 stream(_filename, std::ios_base::in | std::ios_base::out | std::ios_base::app) {
     if (!stream.is_open()) {
         throw FileError("Could not open the file " + filename);

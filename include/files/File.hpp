@@ -24,8 +24,7 @@ namespace harp {
 */
 class File {
 public:
-    // Providing a constructor.
-    File(){}
+    explicit File(const std::string path) : filename(path) {}
     virtual ~File(){};
 
     // Removing default copy constructors
@@ -39,6 +38,10 @@ public:
     virtual bool is_open(void) = 0;
     //! Close the file before the destructor call.
     virtual void close(void) = 0;
+    //! File name
+    const std::string& name() const {return filename;};
+protected:
+    const std::string filename;
 };
 
 /*!
@@ -50,6 +53,7 @@ public:
  */
 class TextFile : public File {
 public:
+    explicit TextFile(const std::string path) : File(path) {}
     virtual ~TextFile() {};
 
     //! Read a line from the file
@@ -80,7 +84,7 @@ public:
  */
 class BasicFile : public TextFile {
 public:
-    explicit BasicFile(std::string filename);
+    explicit BasicFile(const std::string& filename);
     ~BasicFile();
 
     const std::string& getline(void);
@@ -99,8 +103,6 @@ public:
     BasicFile& operator<<(const std::string& line);
     void writelines(const std::vector<std::string>& lines);
 private:
-    // The fstream does not store the file name, so let's do it here
-    const std::string filename;
     std::fstream stream;
     // Caching a vector of strings
     std::vector<std::string> lines;
@@ -115,7 +117,10 @@ private:
 * instanciated directly, but rather to serve as a base class for all the binary
 * file operations.
 */
-class BinaryFile : public File {};
+class BinaryFile : public File {
+public:
+    explicit BinaryFile(const std::string path) : File(path) {}
+};
 
 } // namespace harp
 
