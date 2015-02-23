@@ -52,13 +52,8 @@ struct directory_files_iterator {
     fs::path p_;
 };
 
-#include <iostream>
-using namespace std;
-
 TEST_CASE("Errors in XYZ format", "[XYZ]"){
-
     for (auto entry : directory_files_iterator(XYZDIR"bad/")){
-        cout << entry << endl;
         auto file = Trajectory(entry.path().string());
         CHECK_THROWS_AS(file.read_next_step(), FormatError);
     }
