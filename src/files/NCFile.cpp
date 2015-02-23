@@ -13,6 +13,8 @@
 using namespace harp;
 using std::string;
 
+#if HAVE_NETCDF
+
 NCFile::NCFile(const std::string& _filename) : BinaryFile(_filename),
 file(NcFile(_filename.c_str())), error_behaviour(NcError::verbose_nonfatal) {
     if (not file.is_valid()) {
@@ -73,3 +75,5 @@ bool NCFile::is_open(void) {
 void NCFile::close(void) {
     file.close();
 }
+
+#endif // HAVE_NETCDF
