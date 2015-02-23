@@ -44,6 +44,13 @@ public:
         INFINITE
     };
 
+    //! Copy constructor
+    UnitCell(const UnitCell& other) = default;
+    UnitCell& operator=(const UnitCell& other) = default;
+    //! Move constructor
+    UnitCell(UnitCell&& other) = default;
+    UnitCell& operator=(UnitCell&& other) = default;
+
     //! Construct an INFINITE unit cell
     UnitCell();
     //! Construct a cubic unit cell of side size \c a
