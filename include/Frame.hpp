@@ -10,20 +10,11 @@
 #ifndef HARP_FRAME_HPP
 #define HARP_FRAME_HPP
 
-#include <array>
-#include <vector>
-
+#include "Vector3D.hpp"
 #include "Topology.hpp"
 #include "UnitCell.hpp"
 
 namespace harp {
-
-//! Fixed-size array of 3 components: x, y and z values.
-typedef std::array<float, 3> Vector3D;
-//! Variable-size array of vector of 3 components
-typedef std::vector<Vector3D> Array3D;
-
-#define Vector3D(x, y, z) (Vector3D{{(x), (y), (z)}})
 
 /*!
  * @class Frame Frame.hpp Frame.cpp
