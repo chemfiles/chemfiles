@@ -8,7 +8,7 @@
 */
 
 #include "Trajectory.hpp"
-#include "FormatFactory.hpp"
+#include "TrajectoryFactory.hpp"
 
 #include <boost/filesystem.hpp>
 using namespace boost::filesystem;
@@ -17,17 +17,24 @@ using namespace harp;
 using std::string;
 
 Trajectory::Trajectory(const string& filename, const string& mode, const string& format) {
+    trajectory_builder_t builder;
     if (format == ""){
         // try to guess the format by extension
         auto ext = extension(filename);
-        _format = FormatFactory::by_extension(ext);
+        builder = TrajectoryFactory::by_extension(ext);
     }
     else {
-        _format = FormatFactory::format(format);
+        builder = TrajectoryFactory::format(format);
     }
 
-    // TODO: use mode to set the mode in file
-    _file = std::unique_ptr<File>(new BasicFile(filename));
+    _format = builder.format_creator();
+    if (builder.file_creator) {
+        _file = builder.file_creator(filename, mode);
+    }
+    else {
+        // Defaulting to a BasicFile
+        _file = std::unique_ptr<File>(new BasicFile(filename, mode));
+    }
 }
 
 Trajectory::~Trajectory(){}

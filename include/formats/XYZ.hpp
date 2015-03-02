@@ -13,7 +13,7 @@
 #include <string>
 
 #include "Format.hpp"
-#include "FormatFactory.hpp"
+#include "TrajectoryFactory.hpp"
 
 namespace harp {
 
