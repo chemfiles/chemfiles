@@ -21,8 +21,8 @@ std::string XYZFormat::description() const {
     return "XYZ file format.";
 }
 
-void XYZFormat::read_at_step(shared_ptr<File> file, const size_t step, Frame& frame){
-    auto textfile = std::dynamic_pointer_cast<TextFile>(file);
+void XYZFormat::read_at_step(File* file, const size_t step, Frame& frame){
+    auto textfile = dynamic_cast<TextFile*>(file);
     textfile->rewind();
     size_t i=0;
     while (i < step - 1){
@@ -40,8 +40,8 @@ void XYZFormat::read_at_step(shared_ptr<File> file, const size_t step, Frame& fr
     read_next_step(file, frame);
 }
 
-void XYZFormat::read_next_step(shared_ptr<File> file, Frame& frame){
-    auto textfile = std::dynamic_pointer_cast<TextFile>(file);
+void XYZFormat::read_next_step(File* file, Frame& frame){
+    auto textfile = dynamic_cast<TextFile*>(file);
     size_t natoms = std::stoul(textfile->getline());
 
     textfile->getline(); // XYZ comment line;

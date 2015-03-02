@@ -27,31 +27,31 @@ HarpIO::HarpIO(const string& filename, const string& mode, const string& format)
     }
 
     // TODO: use mode to set the mode in file
-    _file = std::shared_ptr<File>(new BasicFile(filename));
+    _file = std::unique_ptr<File>(new BasicFile(filename));
 }
 
 HarpIO::~HarpIO(){}
 
 HarpIO& HarpIO::operator>>(Frame& frame){
-    _format->read_next_step(_file, frame);
+    _format->read_next_step(_file.get(), frame);
     return *this;
 }
 
 Frame& HarpIO::read_next_step(){
-    _format->read_next_step(_file, _frame);
+    _format->read_next_step(_file.get(), _frame);
     return _frame;
 }
 
 Frame& HarpIO::read_at_step(const size_t step){
-    _format->read_at_step(_file, step, _frame);
+    _format->read_at_step(_file.get(), step, _frame);
     return _frame;
 }
 
 HarpIO& HarpIO::operator<<(const Frame& frame){
-    _format->write_step(_file, frame);
+    _format->write_step(_file.get(), frame);
     return *this;
 }
 
 void HarpIO::write_step(Frame& frame){
-    _format->write_step(_file, frame);
+    _format->write_step(_file.get(), frame);
 }
