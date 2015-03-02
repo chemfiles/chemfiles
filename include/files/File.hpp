@@ -24,7 +24,7 @@ namespace harp {
 */
 class File {
 public:
-    explicit File(const std::string path) : filename(path) {}
+    explicit File(const std::string& path) : filename(path) {}
     virtual ~File(){};
 
     // Removing default copy constructors
@@ -53,7 +53,7 @@ protected:
  */
 class TextFile : public File {
 public:
-    explicit TextFile(const std::string path) : File(path) {}
+    explicit TextFile(const std::string& path, const std::string& = "") : File(path) {}
     virtual ~TextFile() {};
 
     //! Read a line from the file
@@ -84,7 +84,7 @@ public:
  */
 class BasicFile : public TextFile {
 public:
-    explicit BasicFile(const std::string& filename);
+    explicit BasicFile(const std::string& filename, const std::string& mode = "r");
     ~BasicFile();
 
     const std::string& getline(void);
@@ -119,7 +119,7 @@ private:
 */
 class BinaryFile : public File {
 public:
-    explicit BinaryFile(const std::string path) : File(path) {}
+    explicit BinaryFile(const std::string& path, const std::string& = "") : File(path) {}
 };
 
 } // namespace harp

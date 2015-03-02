@@ -21,7 +21,7 @@ namespace harp {
  */
 class GzipFile : public TextFile {
 public:
-    explicit GzipFile(std::string filename);
+    explicit GzipFile(const std::string& filename, const std::string&);
     ~GzipFile();
 
     //! Read a line from the file

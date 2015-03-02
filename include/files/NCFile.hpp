@@ -31,7 +31,7 @@ namespace harp {
  */
 class NCFile : public BinaryFile {
 public:
-    explicit NCFile(const std::string& filename);
+    explicit NCFile(const std::string& filename, const std::string& = "");
     ~NCFile(){}
 
     //! Get a global attribut from the file

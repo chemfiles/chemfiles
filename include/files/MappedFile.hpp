@@ -21,7 +21,7 @@ namespace harp {
  */
 class MappedFile : public TextFile {
 public:
-    explicit MappedFile(std::string filename);
+    explicit MappedFile(const std::string& filename, const std::string&);
     ~MappedFile();
 
     //! Read a line from the file
