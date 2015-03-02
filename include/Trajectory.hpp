@@ -7,20 +7,25 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#ifndef HARP_HARPFILE_HPP
-#define HARP_HARPFILE_HPP
+#ifndef HARP_IO_HPP
+#define HARP_IO_HPP
 
-#include <string>
 #include <memory>
+#include <string>
+
+#include "Frame.hpp"
 
 namespace harp {
 
-class Frame;
-class HarpIO;
+class File;
+class Format;
 
 /*!
 * @class Trajectory Trajectory.hpp Trajectory.cpp
-* @brief The main entry point for harp library
+* @brief Jonction of Format and File.
+*
+* The Trajectory class puts together a format and a file, and implement the main
+* read/write operations
 */
 class Trajectory {
 public:
@@ -40,21 +45,26 @@ public:
     Trajectory& operator=(Trajectory&&);
     ~Trajectory();
 
-    //! Read operator, stream form
+    //! Read operator, in *stream* version
     Trajectory& operator>>(Frame& frame);
-    //! Read operator, method form
+    //! Read operator, in *method* version
     Frame& read_next_step();
-    //! Read operator, method form with specific step
-    Frame& read_at_step(const size_t step);
+    //! Read operator, in *method* version with specific step
+    Frame& read_at_step(const size_t);
 
-    //! Write operator, stream form
+    //! Write operator, in *stream* version
     Trajectory& operator<<(const Frame& frame);
-    //! Write operator, method form
+    //! Write operator, in *method* version
     void write_step(Frame& frame);
 private:
-    // PIMPL pointer
-    std::unique_ptr<HarpIO> file;
+    //! Cache a frame, as it can get very heavy
+    Frame _frame;
+    //! Used format
+    std::unique_ptr<Format> _format;
+    //! File, to be shared with the format.
+    std::unique_ptr<File> _file;
 };
 
 } // namespace harp
+
 #endif

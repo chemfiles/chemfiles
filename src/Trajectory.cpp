@@ -8,43 +8,50 @@
 */
 
 #include "Trajectory.hpp"
-#include "HarpIO.hpp"
+#include "FormatFactory.hpp"
+
+#include <boost/filesystem.hpp>
+using namespace boost::filesystem;
 
 using namespace harp;
+using std::string;
 
-Trajectory::Trajectory(const std::string& filename, const std::string& mode, const std::string& format){
-    file = std::unique_ptr<HarpIO>(new HarpIO(filename, mode, format));
-}
+Trajectory::Trajectory(const string& filename, const string& mode, const string& format) {
+    if (format == ""){
+        // try to guess the format by extension
+        auto ext = extension(filename);
+        _format = FormatFactory::by_extension(ext);
+    }
+    else {
+        _format = FormatFactory::format(format);
+    }
 
-Trajectory::Trajectory(Trajectory&& other){
-    file = std::move(other.file);
-}
-
-Trajectory& Trajectory::operator=(Trajectory&& other){
-    file = std::move(other.file);
-    return *this;
+    // TODO: use mode to set the mode in file
+    _file = std::unique_ptr<File>(new BasicFile(filename));
 }
 
 Trajectory::~Trajectory(){}
 
 Trajectory& Trajectory::operator>>(Frame& frame){
-    *file >> frame;
+    _format->read_next_step(_file.get(), frame);
     return *this;
-};
+}
 
 Frame& Trajectory::read_next_step(){
-    return file->read_next_step();
-};
+    _format->read_next_step(_file.get(), _frame);
+    return _frame;
+}
 
 Frame& Trajectory::read_at_step(const size_t step){
-    return file->read_at_step(step);
+    _format->read_at_step(_file.get(), step, _frame);
+    return _frame;
 }
 
 Trajectory& Trajectory::operator<<(const Frame& frame){
-    *file << frame;
+    _format->write_step(_file.get(), frame);
     return *this;
 }
 
 void Trajectory::write_step(Frame& frame){
-    file->write_step(frame);
+    _format->write_step(_file.get(), frame);
 }
