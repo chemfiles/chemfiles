@@ -118,6 +118,8 @@ TEST_CASE("Read a NetCDF file", "[Files]"){
 
 TEST_CASE("Errors in NetCDF files", "[Files]"){
     NCFile file(FILESDIR "netcdf/water.nc");
+    // Silent error messages.
+    auto error = NcError(NcError::silent_nonfatal);
     REQUIRE(file.is_open());
     CHECK_THROWS_AS(file.global_attribute("FOO"), FileError);
     CHECK_THROWS_AS(file.dimmension("FOO"), FileError);

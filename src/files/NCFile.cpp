@@ -16,7 +16,7 @@ using std::string;
 #if HAVE_NETCDF
 
 NCFile::NCFile(const std::string& _filename, const string& mode) : BinaryFile(_filename),
-file(NcFile(_filename.c_str())), error_behaviour(NcError::verbose_nonfatal) {
+file(NcFile(_filename.c_str())), error_behaviour(NcError::silent_nonfatal) {
     if (not file.is_valid()) {
         throw FileError("Could not open the file " + filename);
     }
