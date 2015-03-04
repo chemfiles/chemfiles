@@ -55,7 +55,7 @@ public:
     const AtomType& type(void) const {return _type;}
 
     //! Set the atom name
-    void name(string n) {_name = n;}
+    void name(const string& n) {_name = n;}
     //! Set the atom mass
     void mass(float m) {_mass = m;}
     //! Set the atom charge

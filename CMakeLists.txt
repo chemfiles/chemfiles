@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-project(harp)
+project(chemharp)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 set(HAVE_NETCDF 0)
@@ -34,10 +34,10 @@ configure_file (
   "${PROJECT_SOURCE_DIR}/include/config.hpp"
 )
 
-add_library(harp SHARED ${sources})
-target_link_libraries(harp ${Boost_LIBRARIES})
+add_library(chemharp SHARED ${sources})
+target_link_libraries(chemharp ${Boost_LIBRARIES})
 if(${NETCDF_FOUND})
-    target_link_libraries(harp ${NETCDF_LIBRARIES})
+    target_link_libraries(chemharp ${NETCDF_LIBRARIES})
 endif()
 
 add_subdirectory(doc)

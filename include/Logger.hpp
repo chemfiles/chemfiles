@@ -23,6 +23,7 @@ class Logger {
 public:
 
     typedef enum{
+        NONE,
         ERROR,
         WARNING,
         INFO,
