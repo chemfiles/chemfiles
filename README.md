@@ -90,9 +90,40 @@ C++ API:
 
 C API:
 ```c
-HARP_FILE *file = harp_open("filename.xyz");
+#include <stdint.h>
+#include <stdio.h>
 
-harp_close(file);
+#include "chemharp.h"
+
+int main(){
+    CHRP_TRAJECTORY *traj = chrp_open("filename.xyz");
+    CHRP_FRAME *frame = NULL;
+    size_t natoms = 0;
+    int status;
+
+    if (!traj) {
+        printf("Error while reading: %s", chrp_last_error());
+    }
+
+    status = chrp_read_next_step(traj, frame);
+    if (!status){
+        /* handle error */
+    }
+    chrp_frame_size(frame, &natoms);
+    printf("Their are %d atoms in the frame", natoms);
+
+    float** positions = (float**)malloc(natoms*3);
+
+    status = chrp_frame_positions(frame, positions, natoms);
+    if (!status){
+        /* handle error */
+    }
+
+    /* Do awesome things with the positions here ! */
+
+    chrp_frame_free(frame);
+    chrp_close(traj);
+}
 ```
 
 TODO: add a link to the doc
