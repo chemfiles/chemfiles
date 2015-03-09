@@ -4,8 +4,8 @@
 #include <string>
 
 #include "catch.hpp"
-
 #include "Chemharp.hpp"
+using namespace harp;
 
 TEST_CASE("Basic logging usage", "[logging]"){
     std::stringstream out_buffer;
@@ -16,20 +16,20 @@ TEST_CASE("Basic logging usage", "[logging]"){
     std::clog.rdbuf(out_buffer.rdbuf());
 
     LOG(ERROR) << "an error" << std::endl;
-    REQUIRE("Chemharp error: an error\n" == out_buffer.str());
+    CHECK("Chemharp error: an error\n" == out_buffer.str());
     out_buffer.str(std::string()); // Clean the buffer
 
     LOG(WARNING) << "a warning" << std::endl;
-    REQUIRE("Chemharp warning: a warning\n" == out_buffer.str());
+    CHECK("Chemharp warning: a warning\n" == out_buffer.str());
     out_buffer.str(std::string());
 
     // The level should be WARNING by default
     LOG(INFO) << "an info" << std::endl;
-    REQUIRE("" == out_buffer.str());
+    CHECK("" == out_buffer.str());
     out_buffer.str(std::string());
 
     LOG(DEBUG) << "a debug info" << std::endl;
-    REQUIRE("" == out_buffer.str());
+    CHECK("" == out_buffer.str());
     out_buffer.str(std::string());
 
     // Redirect clog to its old self
@@ -41,29 +41,29 @@ TEST_CASE("Set the log stream", "[logging]"){
     std::streambuf *sbuf;
 
     SECTION("Redirect log to stdout") {
-        harp::Logger::log_to_stdout();
+        Logger::log_to_stdout();
         sbuf = std::cout.rdbuf();
         std::cout.rdbuf(out_buffer.rdbuf());
 
         LOG(WARNING) << "a warning" << std::endl;
-        REQUIRE("Chemharp warning: a warning\n" == out_buffer.str());
+        CHECK("Chemharp warning: a warning\n" == out_buffer.str());
 
         std::cout.rdbuf(sbuf);
     }
 
     SECTION("Redirect log to stderr") {
-        harp::Logger::log_to_stderr();
+        Logger::log_to_stderr();
         sbuf = std::cerr.rdbuf();
         std::cerr.rdbuf(out_buffer.rdbuf());
 
         LOG(WARNING) << "a warning" << std::endl;
-        REQUIRE("Chemharp warning: a warning\n" == out_buffer.str());
+        CHECK("Chemharp warning: a warning\n" == out_buffer.str());
 
         std::cerr.rdbuf(sbuf);
     }
 
     SECTION("Redirect log to a file") {
-        harp::Logger::set_log_file("test-logging-tmp.log");
+        Logger::set_log_file("test-logging-tmp.log");
 
         LOG(WARNING) << "a warning" << std::endl;
 
@@ -72,8 +72,40 @@ TEST_CASE("Set the log stream", "[logging]"){
         std::getline(logfile, log_content);
         logfile.close();
 
-        REQUIRE("Chemharp warning: a warning" == log_content);
+        CHECK("Chemharp warning: a warning" == log_content);
 
         remove("test-logging-tmp.log");
     }
+    Logger::log_to_stdlog();
+}
+
+TEST_CASE("Set the log level", "[logging]"){
+    std::stringstream out_buffer;
+    std::streambuf *sbuf = std::clog.rdbuf();
+    std::clog.rdbuf(out_buffer.rdbuf());
+
+    SECTION("NONE level") {
+        Logger::set_level(Logger::NONE);
+
+        LOG(ERROR) << "an error" << std::endl;
+        CHECK("" == out_buffer.str());
+        out_buffer.str(std::string());
+
+        LOG(INFO) << "an info" << std::endl;
+        CHECK("" == out_buffer.str());
+        out_buffer.str(std::string());
+    }
+
+    SECTION("INFO level") {
+        Logger::set_level(Logger::INFO);
+
+        LOG(ERROR) << "an error" << std::endl;
+        CHECK("Chemharp error: an error\n" == out_buffer.str());
+        out_buffer.str(std::string());
+
+        LOG(INFO) << "an info" << std::endl;
+        CHECK("Chemharp info: an info\n" == out_buffer.str());
+        out_buffer.str(std::string());
+    }
+    std::clog.rdbuf(sbuf);
 }

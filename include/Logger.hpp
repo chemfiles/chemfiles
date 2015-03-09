@@ -18,17 +18,26 @@
 #include <ostream>
 
 namespace harp {
+
+/*!
+ * @class Logger Logger.hpp Logger.cpp
+ * @brief The Logger class is a singleton class providing logging facilities.
+ */
 class Logger {
-
 public:
-
-    typedef enum{
+    //! The \c LogLevel control what will be logged and what will be dismissed
+    enum LogLevel{
+        //! No logging at all
         NONE,
+        //! Logging only errors
         ERROR,
+        //! Logging errors and warnings
         WARNING,
+        //! Logging errors, warnings and informations
         INFO,
+        //! Logging everything and debug informations
         DEBUG
-    } LogLevel;
+    };
 
     ~Logger();
 
@@ -38,12 +47,12 @@ public:
     static LogLevel level(void){return instance.current_level;}
     //! Set the file for logging
     static void set_log_file(const std::string &filename);
-    //! Set the file for logging, C-version
-    static void set_log_file(const char* filename);
     //! Make the logger output to stdout
     static void log_to_stdout(void);
     //! Make the logger output to stderr
     static void log_to_stderr(void);
+    //! Make the logger output to stdlog
+    static void log_to_stdlog(void);
 
     //! Get the singleton out stream
     static std::ostream& out(LogLevel level);
