@@ -8,10 +8,11 @@
 */
 
 #include "Atom.hpp"
+#include "periodic.hpp"
 
 using namespace harp;
 
-bool str_in_vector(const string& s, const vector<string>& v);
+static bool str_in_vector(const string& s, const vector<string>& v);
 
 Atom::Atom(const string& name) : _name(name), _mass(0), _charge(0) {
     if (str_in_vector(name, ALL_ELEMENTS))
@@ -19,7 +20,9 @@ Atom::Atom(const string& name) : _name(name), _mass(0), _charge(0) {
     else
         _type = CORSE_GRAIN;
 
-    // TODO: get mass
+    if (PERIODIC_INFORMATION.find(name) != PERIODIC_INFORMATION.end()){
+        _mass = PERIODIC_INFORMATION.at(name).mass ;
+    }
 }
 
 Atom::Atom(AtomType type, const string& name) :
@@ -28,11 +31,39 @@ Atom::Atom(AtomType type, const string& name) :
 Atom::Atom() : Atom(UNDEFINED) {}
 
 // Check if the string \c s is in the vector of strings \c v
-inline bool str_in_vector(const string& s, const vector<string>& v){
+static bool str_in_vector(const string& s, const vector<string>& v){
     for (size_t i=0; i<v.size(); i++){
         if (s == v[i]) {
             return true;
         }
     }
     return false;
+}
+
+std::string Atom::full_name() const {
+    if (PERIODIC_INFORMATION.find(_name) != PERIODIC_INFORMATION.end()){
+        return string(PERIODIC_INFORMATION.at(_name).name) ;
+    }
+    return "";
+}
+
+float Atom::vdw_radius() const {
+    if (PERIODIC_INFORMATION.find(_name) != PERIODIC_INFORMATION.end()){
+        return PERIODIC_INFORMATION.at(_name).vdw_radius ;
+    }
+    return -1;
+}
+
+float Atom::covalent_radius() const {
+    if (PERIODIC_INFORMATION.find(_name) != PERIODIC_INFORMATION.end()){
+        return PERIODIC_INFORMATION.at(_name).colvalent_radius ;
+    }
+    return -1;
+}
+
+int Atom::atomic_number() const {
+    if (PERIODIC_INFORMATION.find(_name) != PERIODIC_INFORMATION.end()){
+        return PERIODIC_INFORMATION.at(_name).number ;
+    }
+    return -1;
 }

@@ -9,10 +9,11 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
     Atom a1("H");
     Atom a2 = Atom();
     Atom a3(Atom::CORSE_GRAIN, "CH4");
+    Atom a4("W");
 
     SECTION("Check constructors"){
         CHECK(a1.name() == "H");
-        //TODO: CHECK(a1.mass() == 1.01);
+        CHECK(a1.mass() == 1.008f);
         CHECK(a1.type() == Atom::ELEMENT);
         CHECK(a1.charge() == 0);
 
@@ -39,5 +40,16 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
 
         a1.name("foo");
         CHECK(a1.name() == "foo");
+
+        CHECK(a4.mass() == 183.84f);
+        CHECK(a4.atomic_number() == 74);
+        CHECK(a4.full_name() == "Tungsten");
+        CHECK(a4.covalent_radius() == 1.46f);
+        CHECK(a4.vdw_radius() == 2.1f);
+
+        CHECK(a3.atomic_number() == -1);
+        CHECK(a3.full_name() == "");
+        CHECK(a3.covalent_radius() == -1.0f);
+        CHECK(a3.vdw_radius() == -1.0f);
     }
 }

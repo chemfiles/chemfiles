@@ -63,6 +63,15 @@ public:
     //! Set the atom type
     void type(AtomType t) {_type = t;}
 
+    //! Try to get the full element name, return and empty string if this is
+    //! impossible
+    std::string full_name() const;
+    //! Try to get the Van der Waals or the covalent radius of the atom. Returns
+    //! -1 if they can not be found.
+    float vdw_radius() const;
+    float covalent_radius() const;
+    //! Try to get the atomic number, if defined. Return -1 if it can not be found.
+    int atomic_number() const;
 private:
     string _name;
     float _mass;
@@ -87,11 +96,6 @@ const vector<string> ALL_ELEMENTS = vector<string>{
 
 "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu",
 "Th", "Pa", "U" , "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr"
-};
-
-//! Name->mass mapping
-const map<string, float> ELEMENTS_MASSES = map<string, float>{
-    {"H", 1.01} //TODO: other values
 };
 
 } // namespace harp
