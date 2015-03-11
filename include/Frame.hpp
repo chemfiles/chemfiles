@@ -66,6 +66,7 @@ public:
 
     //! Get a const (non-modifiable) reference to the unit cell of the system
     const UnitCell& cell() const {return _cell;}
+    UnitCell& cell() {return _cell;}
     //! Set the unit cell fo the system
     void cell(const UnitCell& c) {_cell = c;}
 

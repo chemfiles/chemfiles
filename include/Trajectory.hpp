@@ -25,7 +25,11 @@ class Format;
 * @brief Jonction of Format and File.
 *
 * The Trajectory class puts together a format and a file, and implement the main
-* read/write operations
+* read/write operations.
+*
+* The returned frame is cached, and a reference to it is used as return value.
+* This means that any call to read_at_step or read_next_step will invalidate any
+* previously used frame.
 */
 class Trajectory {
 public:

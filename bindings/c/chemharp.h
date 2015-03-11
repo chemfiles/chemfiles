@@ -18,7 +18,7 @@
 #define HARP_CAPI_H
 
 #ifdef __cplusplus
-    #include <cstdint>
+    #include <cstddef>
 extern "C" {
 
     namespace harp {
@@ -106,7 +106,7 @@ CHRP_TRAJECTORY* chrp_open(const char* filename, const char* mode);
 * @param frame A frame to fill with the data
 * @return The status code.
 */
-int chrp_read_step(const CHRP_TRAJECTORY *file, const size_t step, CHRP_FRAME* frame);
+int chrp_read_step(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame);
 
 /*!
 * @brief Read the next step of a trajectory in a frame
@@ -114,7 +114,7 @@ int chrp_read_step(const CHRP_TRAJECTORY *file, const size_t step, CHRP_FRAME* f
 * @param frame A frame to fill with the data
 * @return The status code.
 */
-int chrp_read_next_step(const CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
+int chrp_read_next_step(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
 
 /*!
 * @brief Write a step (a frame) to a trajectory.
@@ -122,7 +122,7 @@ int chrp_read_next_step(const CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
 * @param frame the frame which will be writen to the file
 * @return The status code.
 */
-int chrp_write_step(const CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
+int chrp_write_step(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
 
 /*!
 * @brief Close a trajectory file, and free the associated memory
@@ -138,7 +138,7 @@ int chrp_close(CHRP_TRAJECTORY *file);
 * @param natoms the size of the wanted frame
 * @return A pointer to the frame
 */
-CHRP_FRAME* chrp_frame(const size_t natoms);
+CHRP_FRAME* chrp_frame(size_t natoms);
 
 /*!
 * @brief Get the frame size, i.e. the current number of atoms
@@ -155,7 +155,7 @@ int chrp_frame_size(const CHRP_FRAME* frame, size_t *natoms);
 * @param size The array size (N).
 * @return The status code
 */
-int chrp_frame_positions(const CHRP_FRAME* frame, float** data, const size_t size);
+int chrp_frame_positions(const CHRP_FRAME* frame, float** data, size_t size);
 
 /*!
 * @brief Set the positions from a frame
@@ -164,7 +164,7 @@ int chrp_frame_positions(const CHRP_FRAME* frame, float** data, const size_t siz
 * @param size The array size (N).
 * @return The status code
 */
-int chrp_frame_positions_set(CHRP_FRAME* frame, float** data, const size_t size);
+int chrp_frame_positions_set(CHRP_FRAME* frame, float** data, size_t size);
 
 /*!
 * @brief Get the velocities from a frame, if they exists
@@ -173,7 +173,7 @@ int chrp_frame_positions_set(CHRP_FRAME* frame, float** data, const size_t size)
 * @param size The array size (N).
 * @return The status code
 */
-int chrp_frame_velocities(const CHRP_FRAME* frame, float** data, const size_t size);
+int chrp_frame_velocities(const CHRP_FRAME* frame, float** data, size_t size);
 
 /*!
 * @brief Set the velocities from a frame.
@@ -182,7 +182,7 @@ int chrp_frame_velocities(const CHRP_FRAME* frame, float** data, const size_t si
 * @param size The array size (N).
 * @return The status code
 */
-int chrp_frame_velocities_set(CHRP_FRAME* frame, float** data, const size_t size);
+int chrp_frame_velocities_set(CHRP_FRAME* frame, float** data, size_t size);
 
 /*!
 * @brief Destroy a frame, and free the associated memory
@@ -197,7 +197,7 @@ int chrp_frame_free(CHRP_FRAME* frame);
 * @param frame the frame
 * @return A pointer to the topology
 */
-CHRP_CELL* chrp_cell(const CHRP_FRAME* frame);
+CHRP_CELL* chrp_cell(CHRP_FRAME* frame);
 
 /*!
 * @brief Get the cell lenghts.
@@ -213,7 +213,7 @@ int chrp_cell_lengths(const CHRP_CELL* cell, double* a, double* b, double* c);
 * @param a,b,c the cell lenghts
 * @return The status code
 */
-int chrp_cell_lengths_set(CHRP_CELL* cell, double* a, double* b, double* c);
+int chrp_cell_lengths_set(CHRP_CELL* cell, double a, double b, double c);
 
 /*!
 * @brief Get the cell angles, in degrees.
@@ -229,7 +229,7 @@ int chrp_cell_angles(const CHRP_CELL* cell, double* alpha, double* beta, double*
 * @param alpha,beta,gamma the angles to use, in degrees
 * @return The status code
 */
-int chrp_cell_angles_set(CHRP_CELL* cell, double* alpha, double* beta, double* gamma);
+int chrp_cell_angles_set(CHRP_CELL* cell, double alpha, double beta, double gamma);
 
 /*!
 * @brief Get the unit cell matricial representation.
@@ -278,7 +278,7 @@ int chrp_cell_periodicity(const CHRP_CELL* cell, bool* x, bool* y, bool* z);
 * @param cell the cell to modify
 * @return The status code
 */
-int chrp_cell_periodicity_set(CHRP_CELL* cell, bool* x, bool* y, bool* z);
+int chrp_cell_periodicity_set(CHRP_CELL* cell, bool x, bool y, bool z);
 
 /*!
 * @brief Destroy an unit cell, and free the associated memory
@@ -297,7 +297,7 @@ int chrp_cell_free(CHRP_CELL* cell);
 * @param idx The atom index
 * @return A pointer to an atom
 */
-CHRP_ATOM* chrp_atom(const CHRP_TOPOLOGY* topology, const size_t idx);
+CHRP_ATOM* chrp_atom(CHRP_FRAME* frame, size_t idx);
 
 /*!
 * @brief Get the mass of an atom, in atomic mass units
@@ -333,7 +333,7 @@ int chrp_atom_charge_set(CHRP_ATOM* atom, float charge);
 * @param name A string buffer to be filled with the name
 * @param buffsize The size of the string buffer
 */
-int chrp_atom_name(const CHRP_ATOM* atom, char* name, const size_t buffsize);
+int chrp_atom_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
 
 /*!
 * @brief Get the name of an atom, in atomic mass units
@@ -348,7 +348,7 @@ int chrp_atom_name_set(CHRP_ATOM* atom, const char* name);
 * @param atoms The atoms to destroy
 * @return The status code
 */
-int chrp_atom_free(CHRP_ATOM* atoms);
+int chrp_atom_free(CHRP_ATOM* atom);
 
 
 #ifdef __cplusplus

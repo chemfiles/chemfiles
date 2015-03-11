@@ -34,7 +34,7 @@ configure_file (
   "${PROJECT_SOURCE_DIR}/include/config.hpp"
 )
 
-add_library(chemharp SHARED ${sources})
+add_library(chemharp SHARED ${sources} bindings/c/capi.cpp)
 target_link_libraries(chemharp ${Boost_LIBRARIES})
 if(${NETCDF_FOUND})
     target_link_libraries(chemharp ${NETCDF_LIBRARIES})

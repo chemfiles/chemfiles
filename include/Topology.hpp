@@ -52,6 +52,7 @@ public:
     Topology(const Topology &) = default;
     Topology& operator=(const Topology &) = default;
     Atom& operator[](size_t index);
+    const Atom& operator[](size_t index) const;
 
     //! Get a const (non-modifiable) reference to the list of atoms
     const vector<size_t>& atom_list(void) const {return _atoms;}

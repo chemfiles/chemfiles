@@ -58,27 +58,43 @@ private:
     const char* messages[LAST];
 };
 
-#define CATCH_AND_RETURN_STATUS(error, status)        \
+static CAPIStatus status = CAPIStatus();
+
+#define CATCH_AND_RETURN(error, retval)               \
     catch(const harp::error& e) {                     \
-        CAPIStatus.last_error = string(e.what());     \
-        LOG(ERROR) << e.what() << endl;               \
-        return CAPIStatus::status;                    \
+        status.last_error = string(e.what());         \
+        LOG(ERROR) << e.what() << std::endl;          \
+        return retval;                                \
     }
 
-///! Wrap \c instructions in a try/catch bloc automatically
-#define CHRP_ERROR_WRAP(instructions)                       \
-    try {                                                   \
-        instructions                                        \
-    }                                                       \
-    CATCH_AND_RETURN_STATUS(FileError, FILE)                \
-    CATCH_AND_RETURN_STATUS(MemoryError, MEMORY)            \
-    CATCH_AND_RETURN_STATUS(FormatError, FORMAT)            \
-    CATCH_AND_RETURN_STATUS(Error, GENERIC)                 \
-    catch(const std::exception& e) {                        \
-        CAPIStatus.last_error = string(e.what());           \
-        return CAPIStatus::STD_ERROR;                       \
-    }                                                       \
+///! Wrap \c instructions in a try/catch bloc automatically, and return a status code
+#define CHRP_ERROR_WRAP_RETCODE(instructions)                                  \
+    try {                                                                      \
+        instructions                                                           \
+    }                                                                          \
+    CATCH_AND_RETURN(FileError, CAPIStatus::FILE)                              \
+    CATCH_AND_RETURN(MemoryError, CAPIStatus::MEMORY)                          \
+    CATCH_AND_RETURN(FormatError, CAPIStatus::FORMAT)                          \
+    CATCH_AND_RETURN(Error, CAPIStatus::GENERIC)                               \
+    catch(const std::exception& e) {                                           \
+        status.last_error = string(e.what());                                  \
+        return CAPIStatus::STD_ERROR;                                          \
+    }                                                                          \
     return CAPIStatus::SUCESS;
+
+///! Wrap \c instructions in a try/catch bloc automatically, and return a \c value
+#define CHRP_ERROR_WRAP_RETVAL(instructions, retval)                           \
+    try {                                                                      \
+        instructions                                                           \
+    }                                                                          \
+    CATCH_AND_RETURN(FileError, retval)                                        \
+    CATCH_AND_RETURN(MemoryError, retval)                                      \
+    CATCH_AND_RETURN(FormatError, retval)                                      \
+    CATCH_AND_RETURN(Error, retval)                                            \
+    catch(const std::exception& e) {                                           \
+        status.last_error = string(e.what());                                  \
+        return retval;                                                         \
+    }
 
 }
 
