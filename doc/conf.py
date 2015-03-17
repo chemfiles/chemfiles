@@ -2,10 +2,14 @@
 
 import sys
 import os
+import sphinx_bootstrap_theme
+import subprocess
+
 DOC_ROOT = os.path.abspath(os.path.dirname(__file__))
 
-sys.path.append("@CMAKE_CURRENT_SOURCE_DIR@")
-import sphinx_bootstrap_theme
+read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+if read_the_docs_build:
+    subprocess.call('cd ..; doxygen', shell=True)
 
 # -- General configuration ------------------------------------------------
 
@@ -21,7 +25,7 @@ extensions = [
 ]
 
 # Breathe projects
-breathe_projects = { "Chemharp": os.path.join(DOC_ROOT, "doxygen", "xml") }
+breathe_projects = {"Chemharp": os.path.join(DOC_ROOT, "doxygen", "xml")}
 breathe_default_project = "Chemharp"
 
 # Add any paths that contain templates here, relative to this directory.

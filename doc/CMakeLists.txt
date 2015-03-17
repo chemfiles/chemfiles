@@ -6,8 +6,8 @@ if(BUILD_DOCUMENTATION)
   find_package(Sphinx REQUIRED)
   find_package(Doxygen REQUIRED)
 
-  configure_file(${CMAKE_SOURCE_DIR}/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
-  configure_file(${CMAKE_SOURCE_DIR}/doc/conf.in.py ${CMAKE_BINARY_DIR}/doc/conf.py)
+  configure_file(${CMAKE_SOURCE_DIR}/Doxyfile ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
+  configure_file(${CMAKE_SOURCE_DIR}/doc/conf.cmake.py ${CMAKE_BINARY_DIR}/doc/conf.py)
 
   add_custom_target( doxygendoc ALL
     COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
