@@ -22,7 +22,7 @@ class Format;
 
 /*!
 * @class Trajectory Trajectory.hpp Trajectory.cpp
-* @brief Jonction of Format and File.
+* @brief Jonction of a Format and a File.
 *
 * The Trajectory class puts together a format and a file, and implement the main
 * read/write operations.

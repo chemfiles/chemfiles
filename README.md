@@ -1,18 +1,21 @@
 # Chemharp, an efficient IO library for chemistry file formats
 
 Chemharp is a modern C++ library for reading and writing from and to trajectory
-files. These files are created by your favorite program, and contains informations
-about atomic or residues names and positions. Some format also have additional
-informations, such as velocities, forces, energy, masses, charges, …
+files. These files are created by your favorite theoretical chemistry program, and
+contains informations about atomic or residues names and positions. Some format
+also have additional informations, such as velocities, forces, energy, …
 
-The main targeted audience of Chemharp (libchemharp) is chemistry researcher
-working on their own code to do some kind of awesome science, without bothering
-about handling all the format that may exist in the world.
+The main targeted audience of Chemharp (*libchemharp*) is chemistry researcher
+working on their own code to do some kind of awesome science, without wanting to
+bother about handling all the format that may exist in the world.
 
-Running simulation (either minimisations, Monte Carlo or Molecular Dynamic) often
-require a two-step process: running the simulation and writing data to a file,
-and then using some analysis tool on that data. Chemharp try to help you for the
-second point.
+Running simulation (either Quantum Dynamic, Monte Carlo, Molecular Dynamic, or
+any other method) often produce enormous amounts of data, which had to be
+post-processed in order to extract informations. This post-processing step involve
+reading and parsing the data, and computing physical values with the help of
+statistical thermodynamic. Chemharp try to help you on the first point, by providing
+the same interface to all the trajectory formats. If you ever need to change your
+output format, your analysis tools will still work the same way.
 
 ## Features
 

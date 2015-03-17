@@ -1,19 +1,67 @@
-Welcome to Chemharp's documentation!
-====================================
+Chemharp, an efficient IO library for chemistry file formats
+============================================================
 
-Contents:
+Chemharp is a modern C++ library for reading and writing from and to trajectory
+files. These files are created by your favorite theoretical chemistry program, and
+contains informations about atomic or residues names and positions. Some format
+also have additional informations, such as velocities, forces, energy, …
+
+The main targeted audience of Chemharp (*libchemharp*) is chemistry researcher
+working on their own code to do some kind of awesome science, without wanting to
+bother about handling all the format that may exist in the world.
+
+Running simulation (either Quantum Dynamic, Monte Carlo, Molecular Dynamic, or
+any other method) often produce enormous amounts of data, which had to be
+post-processed in order to extract informations. This post-processing step involve
+reading and parsing the data, and computing physical values with the help of
+statistical thermodynamic. Chemharp try to help you on the first point, by providing
+the same interface to all the trajectory formats. If you ever need to change your
+output format, your analysis tools will still work the same way. Chemharp is
+efficient because it allow you to write and debug your code only once, and then
+to re-use it as needed.
+
+.. note::
+
+    Chemharp is still is alpha stage, and no backward compatibility is assured.
+    I hope I can reach a stable API pretty soon, once it have been validated on
+    various formats.
+
+User manual
+-----------
+
+Even if Chemharp is written in C++, it have bindings to the most popular
+scientific programming languages: C, Fortran, Python, … So you do not need to
+write your code in C++ in order to use it. This part of the documentation presents
+the data model used by Chemharp to store information about the trajectories, and
+how to query for it in each language of the official bindings.
+
+TODO: add usage example on front page
+
+.. toctree::
+    :maxdepth: 2
+
+    installation
+    example
+    bindings/cpp-api
+    bindings/c-api
+    bindings/python-api
+    bindings/fortran-api
+    formats
+
+Class reference
+---------------
 
 .. toctree::
    :maxdepth: 2
 
-.. doxygenfunction:: harp_close
+   classes/trajectory
+   classes/frame
+   classes/topology
+   classes/atom
+   classes/unitcell
+   classes/logger
 
-.. doxygenfunction:: harp_frame_velocities
+Developer documentation
+-----------------------
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+Coming soon …
