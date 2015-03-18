@@ -11,7 +11,6 @@ if(${NETCDF_FOUND})
     include_directories(${NETCDF_INCLUDES})
 endif()
 
-set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost REQUIRED COMPONENTS filesystem system)
 include_directories(${Boost_INCLUDE_DIR})
 

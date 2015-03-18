@@ -7,6 +7,6 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "files/GzipFile.hpp"
+#include "files/GZipFile.hpp"
 
 using namespace harp;
