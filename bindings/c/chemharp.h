@@ -143,7 +143,7 @@ CHRP_FRAME* chrp_frame(size_t natoms);
 /*!
 * @brief Get the frame size, i.e. the current number of atoms
 * @param frame The frame to analyse
-* @return natoms the number of atoms in the frame
+* @param natoms the number of atoms in the frame
 * @return The status code
 */
 int chrp_frame_size(const CHRP_FRAME* frame, size_t *natoms);
@@ -276,6 +276,7 @@ int chrp_cell_periodicity(const CHRP_CELL* cell, bool* x, bool* y, bool* z);
 /*!
 * @brief Set the cell periodic boundary conditions along the three axis
 * @param cell the cell to modify
+* @param x,y,z the new periodicity of the cell along the three axis.
 * @return The status code
 */
 int chrp_cell_periodicity_set(CHRP_CELL* cell, bool x, bool y, bool z);
@@ -292,8 +293,8 @@ int chrp_cell_free(CHRP_CELL* cell);
 
 /******************************************************************************/
 /*!
-* @brief Get the atomic informations from a frame's topology
-* @param topology The topology
+* @brief Get a specific atom from a frame
+* @param frame The frame
 * @param idx The atom index
 * @return A pointer to an atom
 */
@@ -307,7 +308,7 @@ CHRP_ATOM* chrp_atom(CHRP_FRAME* frame, size_t idx);
 int chrp_atom_mass(const CHRP_ATOM* atom, float* mass);
 
 /*!
-* @brief Get the mass of an atom, in atomic mass units
+* @brief Set the mass of an atom, in atomic mass units
 * @param atom The atom
 * @param mass The atom mass
 */
@@ -321,14 +322,14 @@ int chrp_atom_mass_set(CHRP_ATOM* atom, float mass);
 int chrp_atom_charge(const CHRP_ATOM* atom, float* charge);
 
 /*!
-* @brief Get the charge of an atom, in number of the electron charge e
+* @brief Set the charge of an atom, in number of the electron charge e
 * @param atom The atom
 * @param charge The atom charge
 */
 int chrp_atom_charge_set(CHRP_ATOM* atom, float charge);
 
 /*!
-* @brief Get the name of an atom, in atomic mass units
+* @brief Get the name of an atom
 * @param atom The atom
 * @param name A string buffer to be filled with the name
 * @param buffsize The size of the string buffer
@@ -336,16 +337,15 @@ int chrp_atom_charge_set(CHRP_ATOM* atom, float charge);
 int chrp_atom_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
 
 /*!
-* @brief Get the name of an atom, in atomic mass units
+* @brief Set the name of an atom
 * @param atom The atom
 * @param name A null terminated string containing the name
-* @param buffsize The size of the string buffer
 */
 int chrp_atom_name_set(CHRP_ATOM* atom, const char* name);
 
 /*!
 * @brief Destroy an atoms, and free the associated memory
-* @param atoms The atoms to destroy
+* @param atom The atom to destroy
 * @return The status code
 */
 int chrp_atom_free(CHRP_ATOM* atom);

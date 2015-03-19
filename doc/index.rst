@@ -36,6 +36,7 @@ the data model used by Chemharp to store information about the trajectories, and
 how to query for it in each language of the official bindings.
 
 Basic usage looks like this in C++:
+
 .. code-block:: cpp
 
     #include <iostream>
