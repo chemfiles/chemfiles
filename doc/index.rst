@@ -62,6 +62,7 @@ The interfaces for the other supported languages are described in the links belo
     :maxdepth: 2
 
     installation
+    overview
     example
     bindings/cpp-api
     bindings/c-api
