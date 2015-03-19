@@ -17,7 +17,7 @@ stream(_filename, std::ios_base::in | std::ios_base::out | std::ios_base::app) {
     if (!stream.is_open()) {
         throw FileError("Could not open the file " + filename);
     }
-    lines.reserve(1);
+    lines.resize(1);
     rewind();
 }
 
@@ -37,22 +37,15 @@ BasicFile& BasicFile::operator>>(std::string& line){
 }
 
 const std::vector<std::string>& BasicFile::readlines(size_t n){
-    lines.reserve(n);
-    size_t initial_size = lines.size();
+    lines.resize(n);
     std::string line;
     for (size_t i=0; i<n; i++){
         std::getline(stream, line);
-        if (i < initial_size)
-            lines[i] = line;
-        else
-            lines.push_back(line);
+        lines[i] = line;
     }
 
     if (not stream)
         throw FileError("Error while reading file " + filename);
-
-    if (lines.size() > 2*n)
-        lines.shrink_to_fit();
 
     return lines;
 }
