@@ -14,7 +14,7 @@ Running simulation (either Quantum Dynamic, Monte Carlo, Molecular Dynamic, or
 any other method) often produce enormous amounts of data, which had to be
 post-processed in order to extract informations. This post-processing step involve
 reading and parsing the data, and computing physical values with the help of
-statistical thermodynamic. Chemharp try to help you on the first point, by providing
+statistical thermodynamic. Chemharp tries to help you on the first point, by providing
 the same interface to all the trajectory formats. If you ever need to change your
 output format, your analysis tools will still work the same way. Chemharp is
 efficient because it allow you to write and debug your code only once, and then
@@ -35,7 +35,27 @@ write your code in C++ in order to use it. This part of the documentation presen
 the data model used by Chemharp to store information about the trajectories, and
 how to query for it in each language of the official bindings.
 
-TODO: add usage example on front page
+Basic usage looks like this in C++:
+.. code-block:: cpp
+
+    #include <iostream>
+
+    #include "Chemharp.cpp"
+    using namespace harp;
+
+    int main() {
+        Trajectory traj("filename.xyz");
+        Frame frame;
+
+        traj >> frame;
+        std::cout << "There is " << frame.natoms() << " atoms in the frame" << std::endl;
+        auto positions = frame.positions();
+
+        // Do stuff here with the positions
+    }
+
+
+The interfaces for the other supported languages are described in the links below.
 
 .. toctree::
     :maxdepth: 2
@@ -47,6 +67,8 @@ TODO: add usage example on front page
     bindings/python-api
     bindings/fortran-api
     formats
+
+.. _classes-reference:
 
 Class reference
 ---------------

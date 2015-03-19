@@ -21,9 +21,7 @@ Such optional libraries are listed here:
   It is available in all the package managers.
 
 Finally, Chemharp needs uses the `CMake`_ build system, which is also available
-in all the package managers.
-
-All these dependencies can be installed in one command:
+in all the package managers. All these dependencies can be installed in one command:
 
 .. code-block:: bash
 
@@ -57,6 +55,13 @@ live. To get the latest developpement version, use git:
 
     cd where/you/whant/chemharp/to/live
     git clone https://github.com/Luthaf/Chemharp
+
+If you want to run the tests, you will need the test data. These are available
+as a git submodule that you can download directly at the first clone:
+
+.. code-block:: bash
+
+    git clone --recursive https://github.com/Luthaf/Chemharp
 
 .. _release: https://github.com/Luthaf/Chemharp/releases
 

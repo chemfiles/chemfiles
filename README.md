@@ -87,8 +87,22 @@ All tests should pass, if they don't please fill an [issue](https://github.com/L
 ### Usage
 
 C++ API:
-```c++
+```cpp
+#include <iostream>
 
+#include "Chemharp.cpp"
+using namespace harp;
+
+int main() {
+    Trajectory traj("filename.xyz");
+    Frame frame;
+
+    traj >> frame;
+    std::cout << "There is " << frame.natoms() << " atoms in the frame" << std::endl;
+    auto positions = frame.positions();
+
+    // Do stuff here with the positions
+}
 ```
 
 C API:
@@ -113,7 +127,7 @@ int main(){
         /* handle error */
     }
     chrp_frame_size(frame, &natoms);
-    printf("Their are %d atoms in the frame", natoms);
+    printf("There is %d atoms in the frame", natoms);
 
     float** positions = (float**)malloc(natoms*3);
 
