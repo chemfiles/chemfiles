@@ -25,7 +25,7 @@ BasicFile::BasicFile(const std::string& _filename, const std::string& _mode)
         throw FileError("Unrecognized file mode: " + _mode);
     }
 
-    stream = std::fstream(_filename, mode);
+    stream.open(_filename, mode);
     if (!stream.is_open())
         throw FileError("Could not open the file " + filename);
     lines.resize(1);

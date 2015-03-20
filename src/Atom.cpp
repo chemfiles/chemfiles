@@ -12,9 +12,9 @@
 
 using namespace harp;
 
-static bool str_in_vector(const string& s, const vector<string>& v);
+static bool str_in_vector(const std::string& s, const std::vector<std::string>& v);
 
-Atom::Atom(const string& name) : _name(name), _mass(0), _charge(0) {
+Atom::Atom(const std::string& name) : _name(name), _mass(0), _charge(0) {
     if (str_in_vector(name, ALL_ELEMENTS))
         _type = ELEMENT;
     else
@@ -25,13 +25,13 @@ Atom::Atom(const string& name) : _name(name), _mass(0), _charge(0) {
     }
 }
 
-Atom::Atom(AtomType type, const string& name) :
+Atom::Atom(AtomType type, const std::string& name) :
                                 _name(name), _mass(0), _charge(0), _type(type){}
 
 Atom::Atom() : Atom(UNDEFINED) {}
 
 // Check if the string \c s is in the vector of strings \c v
-static bool str_in_vector(const string& s, const vector<string>& v){
+static bool str_in_vector(const std::string& s, const std::vector<std::string>& v){
     for (size_t i=0; i<v.size(); i++){
         if (s == v[i]) {
             return true;
@@ -42,7 +42,7 @@ static bool str_in_vector(const string& s, const vector<string>& v){
 
 std::string Atom::full_name() const {
     if (PERIODIC_INFORMATION.find(_name) != PERIODIC_INFORMATION.end()){
-        return string(PERIODIC_INFORMATION.at(_name).name) ;
+        return std::string(PERIODIC_INFORMATION.at(_name).name) ;
     }
     return "";
 }

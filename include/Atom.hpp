@@ -16,10 +16,6 @@
 
 namespace harp {
 
-using std::string;
-using std::vector;
-using std::map;
-
 /*!
  * @class Atom Atom.hpp Atom.cpp
  * @brief Atom representation class
@@ -38,15 +34,20 @@ public:
     };
 
     Atom(const std::string& name);
-    Atom(AtomType type, const string& name = "");
+    Atom(AtomType type, const std::string& name = "");
     Atom();
     Atom(const Atom &) = default;
     Atom& operator=(const Atom &) = default;
 
+    bool operator==(const Atom& other) const{
+        return (_name == other._name && _mass == other._mass &&
+                _charge == other._charge && _type == other._type);
+    }
+
     ~Atom(){};
 
     //! Get a const (non-modifiable) reference to the atom name
-    const string& name(void) const {return _name;}
+    const std::string& name(void) const {return _name;}
     //! Get a const (non-modifiable) reference to the atom mass
     const float& mass(void) const {return _mass;}
     //! Get a const (non-modifiable) reference to the atom charge
@@ -55,7 +56,7 @@ public:
     const AtomType& type(void) const {return _type;}
 
     //! Set the atom name
-    void name(const string& n) {_name = n;}
+    void name(const std::string& n) {_name = n;}
     //! Set the atom mass
     void mass(float m) {_mass = m;}
     //! Set the atom charge
@@ -73,19 +74,14 @@ public:
     //! Try to get the atomic number, if defined. Return -1 if it can not be found.
     int atomic_number() const;
 private:
-    string _name;
+    std::string _name;
     float _mass;
     float _charge;
     AtomType _type;
 };
 
-inline bool operator==(const Atom& a, const Atom& b){
-    return (a.name() == b.name() && a.mass() == b.mass() &&
-            a.charge() == b.charge() && a.type() == b.type());
-}
-
 //! All the elements in the periodic table
-const vector<string> ALL_ELEMENTS = vector<string>{
+const std::vector<std::string> ALL_ELEMENTS = std::vector<std::string>{
 "H" ,                                                                                                 "He",
 "Li", "Be",                                                             "B" , "C" , "N" , "O" , "F" , "Ne",
 "Na", "Mg",                                                             "Al", "Si", "P" , "S" , "Cl", "Ar",

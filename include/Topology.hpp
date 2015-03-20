@@ -65,7 +65,7 @@ public:
     vector<Atom>& atom_types(void) {return _atom_types;}
 
     //! Add an atom in the system
-    void append(Atom at);
+    void append(const Atom& _atom);
     //! Add a bond in the system, between the atoms at index \c atom_i and \c atom_j
     void add_bond(size_t atom_i, size_t atom_j);
 

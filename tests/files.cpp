@@ -98,7 +98,7 @@ TEST_CASE("Read a NetCDF file", "[Files]"){
 
     auto var = file.variable("coordinates");
     // var->name() has NcToke, i.e. const char* type.
-    CHECK(string(var->name()) == "coordinates");
+    CHECK(std::string(var->name()) == "coordinates");
     CHECK(var->num_dims() == 3);
     auto edges = var->edges();
     CHECK(edges[0] == 100);

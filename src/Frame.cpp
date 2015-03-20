@@ -60,10 +60,10 @@ size_t Frame::natoms() const {
 }
 
 void Frame::reserve(size_t size, bool reserve_velocities){
-    _positions.reserve(size);
+    _positions.resize(size);
     _positions.assign(size, Vector3D(0, 0, 0));
     if (reserve_velocities) {
-        _velocities.reserve(size);
+        _velocities.resize(size);
         _velocities.assign(size, Vector3D(0, 0, 0));
     }
     _topology.reserve(size);
