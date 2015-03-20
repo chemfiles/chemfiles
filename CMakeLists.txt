@@ -42,3 +42,5 @@ endif()
 add_subdirectory(doc)
 enable_testing()
 add_subdirectory(tests)
+
+add_subdirectory(bindings)
