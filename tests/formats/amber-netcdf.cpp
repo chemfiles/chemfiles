@@ -27,7 +27,6 @@ TEST_CASE("Read files in NetCDF format", "[Amber NetCDF]"){
         CHECK(frame.natoms() == 297);
         // Check positions
         auto positions = frame.positions();
-        auto p = positions[0];
 
         CHECK(roughly(positions[0], Vector3D(0.35772f, 8.3064f, 11.7449f), 1e-4));
         CHECK(roughly(positions[296], Vector3D(6.70083f, 11.6056f, 12.8412f), 1e-4));
