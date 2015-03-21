@@ -82,33 +82,39 @@ void UnitCell::type(CellType type){
 }
 
 void UnitCell::a(double val){
-    assert(_type != INFINITE);
+    if (_type == INFINITE)
+        throw Error("Can not set 'a' on infinite cell");
     _a = val;
 }
 
 
 void UnitCell::b(double val){
-    assert(_type != INFINITE);
+    if (_type == INFINITE)
+        throw Error("Can not set 'b' on infinite cell");
     _b = val;
 }
 
 
 void UnitCell::c(double val){
-    assert(_type != INFINITE);
+    if (_type == INFINITE)
+        throw Error("Can not set 'c' on infinite cell");
     _c = val;
 }
 
 void UnitCell::alpha(double val){
-    assert(_type == TRICLINIC);
+    if (_type != TRICLINIC)
+        throw Error("Can not set 'alpha' on non triclinic cell");
     _alpha = val;
 }
 
 void UnitCell::beta(double val){
-    assert(_type == TRICLINIC);
+    if (_type != TRICLINIC)
+        throw Error("Can not set 'beta' on non triclinic cell");
     _beta = val;
 }
 
 void UnitCell::gamma(double val){
-    assert(_type == TRICLINIC);
+    if (_type != TRICLINIC)
+        throw Error("Can not set 'gamma' on non triclinic cell");
     _gamma = val;
 }

@@ -96,15 +96,15 @@ public:
 
     //! Get the first angle (alpha) of the cell
     double alpha() const {return _alpha;}
-    //! Set the first lenght (alpha) of the cell if possible
+    //! Set the first angle (alpha) of the cell if possible
     void alpha(double val);
-    //! Get the second lenght (beta) of the cell
+    //! Get the second angle (beta) of the cell
     double beta() const {return _beta;}
-    //! Set the second lenght (beta) of the cell if possible
+    //! Set the second angle (beta) of the cell if possible
     void beta(double val);
-    //! Get the third lenght (gamma) of the cell
+    //! Get the third angle (gamma) of the cell
     double gamma() const {return _gamma;}
-    //! Set the third lenght (gamma) of the cell if possible
+    //! Set the third angle (gamma) of the cell if possible
     void gamma(double val);
 
     //! Get the cell periodicity for the x axis
