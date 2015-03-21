@@ -29,3 +29,7 @@ target_link_libraries(_chemharp
     boost_numpy
     ${Boost_LIBRARIES}
 )
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_chemharp.so
+        DESTINATION ${PYTHON_SITE_PACKAGES}
+        RENAME chemharp.so)
