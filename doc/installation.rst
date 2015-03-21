@@ -98,6 +98,13 @@ most important options:
 | ``-DCMAKE_BUILD_TYPE=type``        | ``release``         | Set to ``debug`` for debug   |
 |                                    |                     | informations                 |
 +------------------------------------+---------------------+------------------------------+
+| ``-DBUILD_DOCUMENTATION=ON|OFF``   | ``OFF``             | Build the documentation.     |
+|                                    |                     | This needs `sphinx`_ and     |
+|                                    |                     | `doxygen`_ to be installed   |
++------------------------------------+---------------------+------------------------------+
+| ``-DBUILD_TESTS=ON|OFF``           | ``OFF``             | Build the test suite, for    |
+|                                    |                     | later running                |
++------------------------------------+---------------------+------------------------------+
 
 For instance, to install to :file:`$HOME/local`, use:
 
@@ -105,14 +112,52 @@ For instance, to install to :file:`$HOME/local`, use:
 
     cmake -DCMAKE_INSTALL_PREFIX=$HOME/local ..
 
+.. _doxygen: http://doxygen.org/
+.. _sphinx: http://sphinx-doc.org/
+
 Building the bindings
 ---------------------
 
 Only the C interface is always compiled with the core library. All the other
-interface needs to be activated with :command:`cmake`.
+interface needs to be activated with :command:`cmake` flags.
 
 The other languages bindings for Chemharp have supplementary requirements. The
 Python interface requires Boost.Python, the Fortran interface requires a Fortran
-compiler, …
+compiler, … Please ensure that those requirements are fullfiled before filling
+an issue.
 
-TODO: more about this
+Python interface
+^^^^^^^^^^^^^^^^
+
+The Python interface expose data to Python, and make uses of Numpy arrays. It
+needs the following libraries to be installed:
+
+* `Boost.Python`_, the Python module of Boost libraries;
+* The CPython developement module, usullay called ``python-dev`` or ``python-devel``;
+* The Numpy library, with developement headers.
+
+It also needs a network conection, to download and compile the unoficial
+``Boost.Numpy`` library.
+
+All these library can be installed in few lines too:
+
+.. code-block:: bash
+
+    # On apt-get based distributions
+    apt-get install libboost-python-dev python-numpy python-dev
+
+    # On yum based distributions
+    yum install boost-python numpy python-devel
+
+    # On OS X with Homebrew
+    brew tap homebrew/python
+    brew install boost-python numpy
+
+You can also use :command:`pip` to install ``numpy`` if you prefer doing so.
+
+.. _Boost.Python: http://www.boost.org/doc/libs/1_57_0/libs/python/doc/
+
+Then, compiling the Python interface to Chemharp can be activated by the
+``-DENABLE_PYTHON=ON`` option for :command:`cmake`. The usual :command:`make install`
+will then compile and install the python extention at the right place. After that,
+you should be able to ``import chemharp`` from Python prompt.

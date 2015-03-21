@@ -1,10 +1,11 @@
 Chemharp, an efficient IO library for chemistry file formats
 ============================================================
 
-Chemharp is a modern C++ library for reading and writing from and to trajectory
-files. These files are created by your favorite theoretical chemistry program, and
-contains informations about atomic or residues names and positions. Some format
-also have additional informations, such as velocities, forces, energy, …
+Chemharp is a multi-language library written in modern C++ for reading and writing
+from and to molecular trajectory files. These files are created by your favorite
+theoretical chemistry program, and contains informations about atomic or residues
+names and positions. Some format also have additional informations, such as
+velocities, forces, energy, …
 
 The main targeted audience of Chemharp (*libchemharp*) is chemistry researcher
 working on their own code to do some kind of awesome science, without wanting to
@@ -29,11 +30,11 @@ to re-use it as needed.
 User manual
 -----------
 
-Even if Chemharp is written in C++, it have bindings to the most popular
-scientific programming languages: C, Fortran, Python, … So you do not need to
-write your code in C++ in order to use it. This part of the documentation presents
-the data model used by Chemharp to store information about the trajectories, and
-how to query for it in each language of the official bindings.
+Even if Chemharp is written in C++, it can be used from the most popular
+scientific programming languages: C, Fortran, Python, … You can just pick up your
+favorite language to use it. This part of the documentation presents the data
+model used by Chemharp to store information about the trajectories, and how to
+acess that data in each of the supported languages.
 
 Basic usage looks like this in C++:
 
