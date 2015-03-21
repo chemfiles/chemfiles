@@ -91,7 +91,7 @@ int chrp_frame_positions(const CHRP_FRAME* frame, float (*data)[3] , size_t size
     )
 }
 
-int chrp_frame_positions_set(CHRP_FRAME* frame, float** data, size_t size){
+int chrp_frame_positions_set(CHRP_FRAME* frame, float (*data)[3], size_t size){
     // TODO
     return -1;
 }
@@ -102,7 +102,7 @@ int chrp_frame_velocities(const CHRP_FRAME* frame, float (*data)[3], size_t size
     )
 }
 
-int chrp_frame_velocities_set(CHRP_FRAME* frame, float** data, size_t size){
+int chrp_frame_velocities_set(CHRP_FRAME* frame, float (*data)[3], size_t size){
     // TODO
     return -1;
 }

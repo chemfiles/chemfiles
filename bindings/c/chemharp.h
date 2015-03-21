@@ -155,7 +155,7 @@ int chrp_frame_size(const CHRP_FRAME* frame, size_t *natoms);
 * @param size The array size (N).
 * @return The status code
 */
-int chrp_frame_positions(const CHRP_FRAME* frame, float** data, size_t size);
+int chrp_frame_positions(const CHRP_FRAME* frame, float (*data)[3], size_t size);
 
 /*!
 * @brief Set the positions from a frame
@@ -164,7 +164,7 @@ int chrp_frame_positions(const CHRP_FRAME* frame, float** data, size_t size);
 * @param size The array size (N).
 * @return The status code
 */
-int chrp_frame_positions_set(CHRP_FRAME* frame, float** data, size_t size);
+int chrp_frame_positions_set(CHRP_FRAME* frame, float (*data)[3], size_t size);
 
 /*!
 * @brief Get the velocities from a frame, if they exists
@@ -173,7 +173,7 @@ int chrp_frame_positions_set(CHRP_FRAME* frame, float** data, size_t size);
 * @param size The array size (N).
 * @return The status code
 */
-int chrp_frame_velocities(const CHRP_FRAME* frame, float** data, size_t size);
+int chrp_frame_velocities(const CHRP_FRAME* frame, float (*data)[3], size_t size);
 
 /*!
 * @brief Set the velocities from a frame.
@@ -182,7 +182,7 @@ int chrp_frame_velocities(const CHRP_FRAME* frame, float** data, size_t size);
 * @param size The array size (N).
 * @return The status code
 */
-int chrp_frame_velocities_set(CHRP_FRAME* frame, float** data, size_t size);
+int chrp_frame_velocities_set(CHRP_FRAME* frame, float (*data)[3], size_t size);
 
 /*!
 * @brief Destroy a frame, and free the associated memory
