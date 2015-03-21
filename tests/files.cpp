@@ -45,7 +45,7 @@ TEST_CASE("Read a text file", "[Files]"){
 }
 
 TEST_CASE("Write a text file", "[Files]"){
-    BasicFile file(SRCDIR"/tmp.dat");
+    BasicFile file(SRCDIR"/tmp.dat", "w");
     REQUIRE(file.is_open());
 
     file << "Test";
