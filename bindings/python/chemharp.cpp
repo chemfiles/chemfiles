@@ -33,7 +33,7 @@ struct Array3D_convertor {
         struct type {
             // Convert Array3D to ndarray.
             PyObject* operator()(const Array3D& A) const {
-                py::tuple shape = py::make_tuple(3, A.size());
+                py::tuple shape = py::make_tuple(A.size(), 3);
                 np::dtype dtype = np::dtype::get_builtin<float>();
                 np::ndarray res = np::empty(shape, dtype);
 
