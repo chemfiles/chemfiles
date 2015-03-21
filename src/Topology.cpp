@@ -24,7 +24,7 @@ Atom& Topology::operator[](size_t index) {
     return _atom_types[_atoms[index]];
 }
 
-void Topology::add_atom(Atom atom){
+void Topology::append(Atom atom){
     size_t index = static_cast<size_t>(-1);
     for (size_t i = 0 ; i<_atoms.size(); i++)
         if (_atom_types[i] == atom)
@@ -89,6 +89,6 @@ void Topology::clear(){
 Topology harp::dummy_topology(size_t natoms){
     Topology top(natoms);
     for (size_t i=0; i<natoms; i++)
-        top.add_atom(Atom(Atom::UNDEFINED));
+        top.append(Atom(Atom::UNDEFINED));
     return top;
 }

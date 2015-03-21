@@ -26,7 +26,7 @@ TEST_CASE("Frame class usage", "[Frame]"){
         CHECK(frame.cell().type() == UnitCell::ORTHOROMBIC);
 
         CHECK(frame.topology().atom_types().size() == 0);
-        frame.topology().add_atom(Atom("H"));
+        frame.topology().append(Atom("H"));
         CHECK(frame.topology().atom_types().size() == 1);
 
         frame.reserve(15);

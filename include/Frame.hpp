@@ -63,6 +63,8 @@ public:
     Topology& topology() {return _topology;}
     //! Get a const (non-modifiable) reference to the internal topology
     const Topology& topology() const {return _topology;}
+    //! Set the system topology
+    void topology(const Topology& top) {_topology = top;}
 
     //! Get a const (non-modifiable) reference to the unit cell of the system
     const UnitCell& cell() const {return _cell;}

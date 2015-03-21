@@ -10,7 +10,7 @@ TEST_CASE("Use the Topology class", "[Topology]"){
         auto topo = Topology(42);
         CHECK(topo.atom_list().capacity() == 42);
 
-        topo.add_atom(Atom("H"));
+        topo.append(Atom("H"));
         CHECK(topo[0].type() == Atom::ELEMENT);
         CHECK(topo[0].name() == "H");
 
@@ -32,9 +32,9 @@ TEST_CASE("Use the Topology class", "[Topology]"){
         auto topo = Topology(6);
 
         for (int i=0; i<4; i++)
-            topo.add_atom(Atom("H"));
-        topo.add_atom(Atom("O"));
-        topo.add_atom(Atom("O"));
+            topo.append(Atom("H"));
+        topo.append(Atom("O"));
+        topo.append(Atom("O"));
 
         topo.add_bond(0, 4);
         topo.add_bond(1, 4);
@@ -57,7 +57,7 @@ TEST_CASE("Use the Topology class", "[Topology]"){
         CHECK(topo.angles()[2] == angle(2, 5, 3));
         CHECK(topo.angles()[3] == angle(3, 5, 2));
 
-        topo.add_atom(Atom("O"));
+        topo.append(Atom("O"));
         topo.add_bond(3, 6);
         CHECK(topo.bonds().size() == 10);
         CHECK(topo.dihedrals().size() == 2);

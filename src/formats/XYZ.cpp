@@ -66,7 +66,7 @@ void XYZFormat::read_next_step(File* file, Frame& frame){
         string_stream.str(lines[i]);
         string_stream >> name >> x >> y >> z ;
         frame.positions()[i] = Vector3D(x, y, z);
-        frame.topology().add_atom(Atom(name));
+        frame.topology().append(Atom(name));
     }
     frame.topology().guess_bonds();
 }
