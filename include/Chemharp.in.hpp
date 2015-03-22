@@ -14,16 +14,16 @@
 * one included by client applications.
 */
 
-#ifndef HARP_HPP
-#define HARP_HPP
+#ifndef CHEMHARP_HPP
+#define CHEMHARP_HPP
 
-#include "Logger.hpp"
-#include "Error.hpp"
+#include "@CHEMHARP_PREFIX@Logger.hpp"
+#include "@CHEMHARP_PREFIX@Error.hpp"
 
-#include "Atom.hpp"
-#include "Topology.hpp"
-#include "Frame.hpp"
-#include "UnitCell.hpp"
-#include "Trajectory.hpp"
+#include "@CHEMHARP_PREFIX@Atom.hpp"
+#include "@CHEMHARP_PREFIX@Topology.hpp"
+#include "@CHEMHARP_PREFIX@Frame.hpp"
+#include "@CHEMHARP_PREFIX@UnitCell.hpp"
+#include "@CHEMHARP_PREFIX@Trajectory.hpp"
 
 #endif // HARP_HPP
