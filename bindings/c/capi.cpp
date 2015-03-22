@@ -92,8 +92,18 @@ int chrp_frame_positions(const CHRP_FRAME* frame, float (*data)[3] , size_t size
 }
 
 int chrp_frame_positions_set(CHRP_FRAME* frame, float (*data)[3], size_t size){
-    // TODO
-    return -1;
+    if (size != frame->natoms()){
+        status.last_error = "Wrong data size in function 'chrp_frame_positions_set'.";
+        return CAPIStatus::MEMORY;
+    }
+    CHRP_ERROR_WRAP_RETCODE(
+        auto positions = frame->positions();
+        for (size_t i=0; i<frame->natoms(); i++) {
+            positions[i][0] = data[i][0];
+            positions[i][1] = data[i][1];
+            positions[i][2] = data[i][2];
+        }
+    )
 }
 
 int chrp_frame_velocities(const CHRP_FRAME* frame, float (*data)[3], size_t size){
@@ -103,8 +113,18 @@ int chrp_frame_velocities(const CHRP_FRAME* frame, float (*data)[3], size_t size
 }
 
 int chrp_frame_velocities_set(CHRP_FRAME* frame, float (*data)[3], size_t size){
-    // TODO
-    return -1;
+    if (size != frame->natoms()){
+        status.last_error = "Wrong data size in function 'chrp_frame_velocities_set'.";
+        return CAPIStatus::MEMORY;
+    }
+    CHRP_ERROR_WRAP_RETCODE(
+        auto velocities = frame->velocities();
+        for (size_t i=0; i<frame->natoms(); i++) {
+            velocities[i][0] = data[i][0];
+            velocities[i][1] = data[i][1];
+            velocities[i][2] = data[i][2];
+        }
+    )
 }
 
 int chrp_frame_free(CHRP_FRAME* frame) {
