@@ -69,14 +69,15 @@ struct std_vector_convertor {
     };
 };
 
-
-BOOST_PYTHON_MODULE(chemharp){
+void init_module(){
     // Removing this line will result in bad stuff appening, like segfaults and
     // your grand mother being kidnaped by aliens. So don't do this!
     np::initialize();
+}
 
-    py::class_<std::vector<size_t>>("Test")
-            .def(py::vector_indexing_suite<std::vector<size_t>>() );
+
+BOOST_PYTHON_MODULE(chemharp){
+    init_module();
 
     /* Exception management ***************************************************/
     py::register_exception_translator<Error>(&translate_Error);
@@ -123,12 +124,12 @@ BOOST_PYTHON_MODULE(chemharp){
     ;
 
     /* Atom class *************************************************************/
-    py::class_<Atom>("Atom", py::init<std::string>())
+    py::scope atom_scope = py::class_<Atom>("Atom", py::init<std::string>())
         .add_property("name",
             py::make_function(
-                static_cast<const string& (Atom::*)(void) const>(&Atom::name),
+                static_cast<const std::string& (Atom::*)(void) const>(&Atom::name),
                 py::return_value_policy<py::copy_const_reference>()),
-            static_cast<void (Atom::*)(const string&)>(&Atom::name))
+            static_cast<void (Atom::*)(const std::string&)>(&Atom::name))
         .add_property("mass",
             py::make_function(
                 static_cast<const float& (Atom::*)(void) const>(&Atom::mass),
@@ -139,7 +140,6 @@ BOOST_PYTHON_MODULE(chemharp){
                 static_cast<const float& (Atom::*)(void) const>(&Atom::charge),
                 py::return_value_policy<py::copy_const_reference>()),
             static_cast<void (Atom::*)(float)>(&Atom::charge))
-        // TODO: wrap the Atom::AtomType enum to Python
         .add_property("type",
             py::make_function(
                 static_cast<const Atom::AtomType& (Atom::*)(void) const>(&Atom::type),
@@ -147,36 +147,40 @@ BOOST_PYTHON_MODULE(chemharp){
             static_cast<void (Atom::*)(Atom::AtomType)>(&Atom::type))
     ;
 
+    /* AtomType enum **********************************************************/
+    py::enum_<Atom::AtomType>("AtomType")
+        .value("ELEMENT", Atom::ELEMENT)
+        .value("CORSE_GRAIN", Atom::CORSE_GRAIN)
+        .value("DUMMY", Atom::DUMMY)
+        .value("UNDEFINED", Atom::UNDEFINED)
+    ;
 
+    /* Topology class *********************************************************/
     py::class_<Topology>("Topology")
-        .def("atom_list",
-            static_cast<const vector<size_t>& (Topology::*)(void) const>(&Topology::atom_list),
-            py::return_value_policy<std_vector_convertor>())
-        .def("atom_types",
-            static_cast<const vector<Atom>& (Topology::*)(void) const>(&Topology::atom_types),
-            py::return_value_policy<std_vector_convertor>())
         .def("append", &Topology::append)
         .def("add_bond", &Topology::add_bond)
         .def("__len__", &Topology::natoms)
         .add_property("natoms", &Topology::natoms)
+        .add_property("natom_types", &Topology::natom_types)
         .def("clear", &Topology::clear)
-        .def("atom", py::make_function(
-            static_cast<const Atom& (Topology::*)(size_t) const>(&Topology::atom),
-            py::return_value_policy<py::copy_const_reference>()))
         .def("reserve", &Topology::reserve)
-/*      TODO
+/*      TODO:
+        operator[]
+        void guess_bonds();
         vector<bond> bonds(void);
         vector<angle> angles(void);
         vector<dihedral> dihedrals(void);
 */
     ;
 
+    /* UnitCell class *********************************************************/
     py::class_<UnitCell>("UnitCell", py::init<>())
         .def(py::init<double>())
         .def(py::init<double, double, double>())
         .def(py::init<double, double, double, double, double, double>())
-        // TODO Wrap CellType enum
-        // TODO Constructors with cell type
+        .def(py::init<UnitCell::CellType>())
+        .def(py::init<UnitCell::CellType, double>())
+        .def(py::init<UnitCell::CellType, double, double, double>())
         // TODO Matrix3D matricial() const;
         .add_property("type",
             py::make_function(
@@ -213,6 +217,13 @@ BOOST_PYTHON_MODULE(chemharp){
         .add_property("full_periodic",
             static_cast<bool (UnitCell::*)(void) const>(&UnitCell::full_periodic),
             static_cast<void (UnitCell::*)(bool)>(&UnitCell::full_periodic))
+    ;
+
+    /* CellType enum **********************************************************/
+    py::enum_<UnitCell::CellType>("CellType")
+        .value("ORTHOROMBIC", UnitCell::ORTHOROMBIC)
+        .value("TRICLINIC", UnitCell::TRICLINIC)
+        .value("INFINITE", UnitCell::INFINITE)
     ;
 
     // TODO: Logger class
