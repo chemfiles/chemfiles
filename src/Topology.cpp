@@ -19,23 +19,15 @@ Topology::Topology(size_t natoms) {
 
 Topology::Topology() : Topology(100) {}
 
-Atom& Topology::operator[](size_t index) {
-    assert(index < natoms());
-    return _atom_types[_atoms[index]];
-}
-
-#include <iostream>
-using namespace std;
-
 void Topology::append(const Atom& _atom){
     size_t index = static_cast<size_t>(-1);
 
-    for (size_t i = 0 ; i<_atom_types.size(); i++)
-        if (_atom_types[i] == _atom)
+    for (size_t i = 0 ; i<_templates.size(); i++)
+        if (_templates[i] == _atom)
             index = i;
     if (index == static_cast<size_t>(-1)) { // Atom not found
-        _atom_types.push_back(_atom);
-        index = _atom_types.size() - 1;
+        _templates.push_back(_atom);
+        index = _templates.size() - 1;
     }
 
     _atoms.push_back(index);
@@ -85,7 +77,7 @@ vector<dihedral> Topology::dihedrals(void){
 }
 
 void Topology::clear(){
-    _atom_types.clear();
+    _templates.clear();
     _atoms.clear();
     _bonds.clear();
 }

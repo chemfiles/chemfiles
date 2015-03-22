@@ -12,7 +12,6 @@ TEST_CASE("Frame class usage", "[Frame]"){
 
     SECTION("Contructor"){
         CHECK(frame.positions().capacity() == 10);
-        CHECK(frame.topology().atom_list().capacity() == 10);
         CHECK(frame.cell().type() == UnitCell::INFINITE);
     }
 
@@ -25,9 +24,9 @@ TEST_CASE("Frame class usage", "[Frame]"){
         frame.cell(UnitCell(10));
         CHECK(frame.cell().type() == UnitCell::ORTHOROMBIC);
 
-        CHECK(frame.topology().atom_types().size() == 0);
+        CHECK(frame.topology().natom_types() == 0);
         frame.topology().append(Atom("H"));
-        CHECK(frame.topology().atom_types().size() == 1);
+        CHECK(frame.topology().natom_types() == 1);
 
         frame.reserve(15);
         CHECK(frame.natoms() == 15);

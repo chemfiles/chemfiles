@@ -51,31 +51,21 @@ public:
     Topology();
     Topology(const Topology &) = default;
     Topology& operator=(const Topology &) = default;
-    Atom& operator[](size_t index);
-    const Atom& operator[](size_t index) const;
 
-    //! Get a const (non-modifiable) reference to the list of atoms
-    const vector<size_t>& atom_list(void) const {return _atoms;}
-    //! Get a modifiable reference to the list of atoms
-    vector<size_t>& atom_list(void) {return _atoms;}
-
-    //! Get a const (non-modifiable) reference to the list of atom types
-    const vector<Atom>& atom_types(void) const {return _atom_types;}
-    //! Get a modifiable reference to the list of atoms
-    vector<Atom>& atom_types(void) {return _atom_types;}
+    //! Get a reference to the atom at the position \c index
+    Atom& operator[](size_t index) {return _templates[_atoms[index]];}
+    //! Get a const (non-modifiable) reference to the atom at the position \c index
+    const Atom& operator[](size_t index) const {return _templates[_atoms[index]];}
 
     //! Add an atom in the system
     void append(const Atom& _atom);
     //! Add a bond in the system, between the atoms at index \c atom_i and \c atom_j
     void add_bond(size_t atom_i, size_t atom_j);
 
-    //! Get a reference to the atom at the position \c index
-    Atom& atom(size_t index) {return _atom_types[_atoms[index]];}
-    //! Get a const (non-modifiable) reference to the atom at the position \c index
-    const Atom& atom(size_t index) const {return _atom_types[_atoms[index]];}
-
     //! Get the number of atoms in the topology
     size_t natoms() {return _atoms.size();}
+    //! Get the number of atom types in the topology
+    size_t natom_types() {return _templates.size();}
     //! Reserve space for \c natoms in the topology
     void reserve(size_t natoms) {_atoms.reserve(natoms); _bonds.reserve(natoms);}
     //! Clear the topology
@@ -92,9 +82,11 @@ public:
     //! Get the dihedral angles in the system
     vector<dihedral> dihedrals(void);
 private:
-    //! Internal list of atoms types
-    vector<Atom> _atom_types;
-    //! Internal list of atoms. The index refers to the _atom_types list
+    //! Internal list of particle templates. If the same particle can be found
+    //! more than one in a topology, the Atom class will have only one instance,
+    //! pointing to this vector.
+    vector<Atom> _templates;
+    //! Internal list of atoms. The index refers to the _templates list
     vector<size_t> _atoms;
     //! Internal list of liaisons. The vector at index i contains the index of
     //! all the atoms linked to the atom i.

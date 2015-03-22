@@ -1,30 +1,33 @@
 #include "catch.hpp"
 
-#include "Chemharp.hpp"
+#define private public
 #include "Topology.hpp"
+#undef private
+
+#include "Chemharp.hpp"
 using namespace harp;
 
 TEST_CASE("Use the Topology class", "[Topology]"){
 
     SECTION("Basic usage"){
         auto topo = Topology(42);
-        CHECK(topo.atom_list().capacity() == 42);
+        CHECK(topo._atoms.capacity() == 42);
 
         topo.append(Atom("H"));
         CHECK(topo[0].type() == Atom::ELEMENT);
         CHECK(topo[0].name() == "H");
 
         topo.reserve(100);
-        CHECK(topo.atom_list().capacity() == 100);
+        CHECK(topo._atoms.capacity() == 100);
     }
 
     SECTION("Dummy topology provider"){
         auto topo = dummy_topology(42);
-        CHECK(topo.atom_list().capacity() == 42);
-        CHECK(topo.atom_list().size() == 42);
+        CHECK(topo._atoms.capacity() == 42);
+        CHECK(topo.natoms() == 42);
 
-        CHECK(topo.atom_types().size() == 1);
-        CHECK(topo.atom_types()[0] == Atom(Atom::UNDEFINED));
+        CHECK(topo.natom_types() == 1);
+        CHECK(topo._templates[0] == Atom(Atom::UNDEFINED));
         CHECK(topo[10] == Atom(Atom::UNDEFINED));
     }
 
@@ -41,7 +44,7 @@ TEST_CASE("Use the Topology class", "[Topology]"){
         topo.add_bond(2, 5);
         topo.add_bond(3, 5);
 
-        CHECK(topo.atom_types().size() == 2);
+        CHECK(topo.natom_types() == 2);
         CHECK(topo.bonds().size() == 8);
 
         CHECK(topo.bonds()[0] == bond(0, 4));
@@ -67,9 +70,5 @@ TEST_CASE("Use the Topology class", "[Topology]"){
 
         topo.add_bond(5, 5); // This should do nothing
         CHECK(topo.bonds().size() == 10);
-
-        for (size_t i=0; i<6; i++) {
-            CHECK(topo.atom(i) == topo[i]);
-        }
     }
 }
