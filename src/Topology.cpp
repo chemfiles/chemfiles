@@ -42,7 +42,7 @@ void Topology::add_bond(size_t atom_i, size_t atom_j){
     _bonds[atom_j].push_back(atom_i);
 }
 
-vector<bond> Topology::bonds(void){
+vector<bond> Topology::bonds(void) const{
     vector<bond> res;
     res.reserve(2*natoms());
     for (size_t i=0; i<natoms(); i++)
@@ -52,7 +52,7 @@ vector<bond> Topology::bonds(void){
     return std::move(res);
 }
 
-vector<angle> Topology::angles(void){
+vector<angle> Topology::angles(void) const{
     vector<angle> res;
     res.reserve(3*natoms());
     for (size_t i=0; i<natoms(); i++)
@@ -63,7 +63,7 @@ vector<angle> Topology::angles(void){
     return std::move(res);
 }
 
-vector<dihedral> Topology::dihedrals(void){
+vector<dihedral> Topology::dihedrals(void) const{
     vector<dihedral> res;
     res.reserve(4*natoms());
     for (size_t i=0; i<natoms(); i++)

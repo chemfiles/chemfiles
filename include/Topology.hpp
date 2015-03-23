@@ -63,9 +63,9 @@ public:
     void add_bond(size_t atom_i, size_t atom_j);
 
     //! Get the number of atoms in the topology
-    size_t natoms() {return _atoms.size();}
+    size_t natoms() const {return _atoms.size();}
     //! Get the number of atom types in the topology
-    size_t natom_types() {return _templates.size();}
+    size_t natom_types() const {return _templates.size();}
     //! Reserve space for \c natoms in the topology
     void reserve(size_t natoms) {_atoms.reserve(natoms); _bonds.reserve(natoms);}
     //! Clear the topology
@@ -76,11 +76,11 @@ public:
     void guess_bonds() {};
 
     //! Get the bonds in the system
-    vector<bond> bonds(void);
+    vector<bond> bonds(void) const;
     //! Get the angles in the system
-    vector<angle> angles(void);
+    vector<angle> angles(void) const;
     //! Get the dihedral angles in the system
-    vector<dihedral> dihedrals(void);
+    vector<dihedral> dihedrals(void) const;
 private:
     //! Internal list of particle templates. If the same particle can be found
     //! more than one in a topology, the Atom class will have only one instance,
