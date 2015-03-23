@@ -32,6 +32,7 @@ public:
 
     void read_at_step(File* file, const size_t step, Frame& frame);
     void read_next_step(File* file, Frame& frame);
+    void write_step(File* file, const Frame& frame);
     std::string description() const;
 private:
     REGISTER_FORMAT;

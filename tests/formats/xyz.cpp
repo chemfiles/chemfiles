@@ -1,3 +1,6 @@
+#include <streambuf>
+#include <fstream>
+
 #include "catch.hpp"
 
 #include "Chemharp.hpp"
@@ -57,4 +60,36 @@ TEST_CASE("Errors in XYZ format", "[XYZ]"){
         auto file = Trajectory(entry.path().string());
         CHECK_THROWS_AS(file.read_next_step(), FormatError);
     }
+}
+
+TEST_CASE("Write files in XYZ format", "[XYZ]"){
+    const auto expected_content =
+    "4\n"
+    "Written by Chemharp\n"
+    "X 1 2 3\n"
+    "X 1 2 3\n"
+    "X 1 2 3\n"
+    "X 1 2 3\n";
+
+    Frame frame(0);
+    frame.topology(dummy_topology(4));
+
+    Array3D positions;
+    for(int i=0; i<4; i++)
+        positions.push_back(Vector3D(1, 2, 3));
+
+    frame.positions(positions);
+
+    auto file = Trajectory("test-tmp.xyz", "w");
+    file << frame;
+    file.close();
+
+    std::ifstream checking("test-tmp.xyz");
+    std::string content((std::istreambuf_iterator<char>(checking)),
+                         std::istreambuf_iterator<char>());
+    checking.close();
+
+    CHECK(content == expected_content);
+
+    unlink("test-tmp.xyz");
 }

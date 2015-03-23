@@ -8,6 +8,7 @@
 */
 
 #include <sstream>
+#include <cassert>
 
 #include "formats/XYZ.hpp"
 
@@ -70,6 +71,27 @@ void XYZFormat::read_next_step(File* file, Frame& frame){
     }
     frame.topology().guess_bonds();
 }
+
+void XYZFormat::write_step(File* file, const Frame& frame){
+    auto textfile = dynamic_cast<TextFile*>(file);
+
+    const auto topology = frame.topology();
+    const auto positions = frame.positions();
+    assert(frame.natoms() == topology.natoms());
+
+    *textfile << frame.natoms() << "\n";
+    *textfile << "Written by Chemharp\n";
+
+    for (size_t i=0; i<frame.natoms(); i++){
+        auto& pos = positions[i];
+        auto name = topology[i].name();
+        if (name == "")
+            name = "X";
+        *textfile << name   << " "
+                  << pos[0] << " " << pos[1] << " " << pos[2] << "\n";
+    }
+}
+
 
 // Register the xyz format with the ".xyz" extension and the "XYZ" description.
 REGISTER(XYZFormat, "XYZ");
