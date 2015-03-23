@@ -16,7 +16,6 @@ TEST_CASE("Frame class usage", "[Frame]"){
     }
 
     SECTION("Get and set"){
-
         CHECK(frame.step() == 0);
         frame.step(1000);
         CHECK(frame.step() == 1000);
@@ -53,6 +52,20 @@ TEST_CASE("Frame class usage", "[Frame]"){
         CHECK(mat[0][2] == 7);
 
         delete[] mat;
+
+        Array3D data;
+        for (size_t i=0; i<10; i++)
+            data.push_back(Vector3D(4.f, 3.4f, 1.f));
+        frame.positions(data);
+        frame.velocities(data);
+
+        auto positions = frame.positions();
+        auto velocities = frame.velocities();
+
+        for (size_t i=0; i<10; i++){
+            CHECK(positions[i] == Vector3D(4.f, 3.4f, 1.f));
+            CHECK(velocities[i] == Vector3D(4.f, 3.4f, 1.f));
+        }
     }
 
     SECTION("Errors"){

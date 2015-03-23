@@ -106,7 +106,7 @@ CHRP_TRAJECTORY* chrp_open(const char* filename, const char* mode);
 * @param frame A frame to fill with the data
 * @return The status code.
 */
-int chrp_read_step(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame);
+int chrp_read_step(CHRP_TRAJECTORY *file, size_t step, const CHRP_FRAME* frame);
 
 /*!
 * @brief Read the next step of a trajectory in a frame
@@ -114,7 +114,7 @@ int chrp_read_step(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame);
 * @param frame A frame to fill with the data
 * @return The status code.
 */
-int chrp_read_next_step(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
+int chrp_read_next_step(CHRP_TRAJECTORY *file, const CHRP_FRAME *frame);
 
 /*!
 * @brief Write a step (a frame) to a trajectory.
@@ -122,7 +122,7 @@ int chrp_read_next_step(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
 * @param frame the frame which will be writen to the file
 * @return The status code.
 */
-int chrp_write_step(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
+int chrp_write_step(CHRP_TRAJECTORY *file, const CHRP_FRAME *frame);
 
 /*!
 * @brief Close a trajectory file, and free the associated memory

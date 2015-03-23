@@ -38,6 +38,8 @@ public:
     Array3D& positions() {return _positions;}
     //! Get a const (non modifiable) reference to the positions
     const Array3D& positions() const {return _positions;}
+    //! Set the positions
+    void positions(const Array3D& pos) {_positions = pos;}
 
     //! Does this frame have velocity data ?
     bool has_velocities();
@@ -46,6 +48,8 @@ public:
     Array3D& velocities() {return _velocities;}
     //! Get a const (non modifiable) reference to the velocities
     const Array3D& velocities() const {return _velocities;}
+    //! Set the velocities
+    void velocities(const Array3D& vel) {_velocities = vel;}
 
     //! Get a *copy* of the positions, as a C-style array. The array is assumed
     //! to have a shape (size x 3); i.e. pos[size][3]. The \c size should be

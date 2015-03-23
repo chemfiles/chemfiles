@@ -44,12 +44,12 @@ Trajectory& Trajectory::operator>>(Frame& frame){
     return *this;
 }
 
-Frame& Trajectory::read_next_step(){
+const Frame& Trajectory::read_next_step(){
     _format->read_next_step(_file.get(), _frame);
     return _frame;
 }
 
-Frame& Trajectory::read_at_step(const size_t step){
+const Frame& Trajectory::read_at_step(const size_t step){
     _format->read_at_step(_file.get(), step, _frame);
     return _frame;
 }
@@ -59,6 +59,10 @@ Trajectory& Trajectory::operator<<(const Frame& frame){
     return *this;
 }
 
-void Trajectory::write_step(Frame& frame){
+void Trajectory::write_step(const Frame& frame){
     _format->write_step(_file.get(), frame);
+}
+
+void Trajectory::close(){
+    _file->close();
 }
