@@ -77,8 +77,8 @@ void BasicFile::writeline(const std::string& line){
     *this << line;
 }
 
-BasicFile& BasicFile::operator<<(const std::string& line){
-    stream << line << std::endl;
+BasicFile& BasicFile::operator<<(const any& data){
+    stream << data;
     return *this;
 }
 

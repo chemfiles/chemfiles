@@ -24,26 +24,19 @@ public:
     explicit GzipFile(const std::string& filename, const std::string&);
     ~GzipFile();
 
-    //! Read a line from the file
-    const std::string& getline(void);
-    //! Read a line from the file, stream version
-    GzipFile& operator>>(std::string& line);
-    //! Read \c n lines from the file
-    const std::vector<std::string>& readlines(size_t n);
-    //! Reset the file cursor
-    void rewind();
-    //! Number of lines in the file
-    size_t nlines();
+    virtual const std::string& getline(void);
+    virtual GzipFile& operator>>(std::string& line);
+    virtual const std::vector<std::string>& readlines(size_t n);
 
-    bool is_open(void);
-    void close(void);
+    virtual void rewind();
+    virtual size_t nlines();
 
-    //! Write a line to the file
-    void writeline(const std::string& line);
-    //! Write a line to the file, stream version
-    GzipFile& operator<<(const std::string& line);
-    //! Read \c n lines from the file
-    void writelines(const std::vector<std::string>& lines);
+    virtual bool is_open(void);
+    virtual void close(void);
+
+    virtual void writeline(const std::string& line);
+    virtual GzipFile& operator<<(const any& line);
+    virtual void writelines(const std::vector<std::string>& lines);
 private:
 };
 

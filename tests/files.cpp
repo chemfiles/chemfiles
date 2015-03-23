@@ -1,7 +1,4 @@
-#include <string>
-#include <vector>
-#include <fstream>
-#include <cstdio>
+#include <iostream>
 
 #include "catch.hpp"
 
@@ -48,13 +45,13 @@ TEST_CASE("Write a text file", "[Files]"){
     BasicFile file(SRCDIR"/tmp.dat", "w");
     REQUIRE(file.is_open());
 
-    file << "Test";
+    file << "Test" << "\n";
 
-    file.writeline("Test again");
+    file.writeline("Test again\n");
 
     std::vector<std::string> lines;
-    lines.push_back("Hello");
-    lines.push_back("world");
+    lines.push_back("Hello\n");
+    lines.push_back("world\n");
     file.writelines(lines);
 
     file.close();

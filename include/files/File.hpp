@@ -16,7 +16,20 @@
 #include <vector>
 #include <fstream>
 
+#include <boost/type_erasure/any.hpp>
+#include <boost/type_erasure/operators.hpp>
+#include <boost/mpl/vector.hpp>
+
+
 namespace harp {
+    namespace bte = boost::type_erasure;
+    namespace mpl = boost::mpl;
+    typedef bte::any<
+                mpl::vector<
+                    bte::ostreamable<>,
+                    bte::copy_constructible<>
+                    >
+                > any;
 
 /*!
 * @class File File.hpp File.cpp
@@ -67,11 +80,11 @@ public:
     //! Number of lines in the file
     virtual size_t nlines() = 0;
 
-    //! Write a line to the file
+    //! Write any data to the file in stream version
+    virtual TextFile& operator<<(const any& data) = 0;
+    //! Write a string to the file
     virtual void writeline(const std::string& line) = 0;
-    //! Write a line to the file, stream version
-    virtual TextFile& operator<<(const std::string& line) = 0;
-    //! Read \c n lines to the file
+    //! Write \c n lines to the file
     virtual void writelines(const std::vector<std::string>& lines) = 0;
 };
 
@@ -87,21 +100,22 @@ public:
     explicit BasicFile(const std::string& filename, const std::string& mode = "r");
     ~BasicFile();
 
-    const std::string& getline(void);
-    BasicFile& operator>>(std::string& line);
-    const std::vector<std::string>& readlines(size_t n);
-    inline void rewind(){
+    virtual const std::string& getline(void);
+    virtual BasicFile& operator>>(std::string& line);
+    virtual const std::vector<std::string>& readlines(size_t n);
+
+    virtual void rewind(){
         stream.seekg(0);
         stream.clear();
     }
-    size_t nlines();
+    virtual size_t nlines();
 
-    inline bool is_open(void) {return stream.is_open();}
-    inline void close(void) {return stream.close();}
+    virtual bool is_open(void) {return stream.is_open();}
+    virtual void close(void) {return stream.close();}
 
-    void writeline(const std::string& line);
-    BasicFile& operator<<(const std::string& line);
-    void writelines(const std::vector<std::string>& lines);
+    virtual BasicFile& operator<<(const any& data);
+    virtual void writeline(const std::string& line);
+    virtual void writelines(const std::vector<std::string>& lines);
 private:
     std::fstream stream;
     // Caching a vector of strings
