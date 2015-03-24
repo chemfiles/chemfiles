@@ -3,6 +3,7 @@
 #include "catch.hpp"
 
 #include "Chemharp.hpp"
+#include "config.hpp"
 #include "files/File.hpp"
 #include "files/NCFile.hpp"
 using namespace harp;
@@ -80,6 +81,8 @@ TEST_CASE("Errors in text files", "[Files]"){
     // TODO
 }
 
+#if HAVE_NETCDF
+
 TEST_CASE("Read a NetCDF file", "[Files]"){
     NCFile file(FILESDIR "netcdf/water.nc");
     REQUIRE(file.is_open());
@@ -124,3 +127,5 @@ TEST_CASE("Errors in NetCDF files", "[Files]"){
     CHECK_THROWS_AS(file.f_attribute("cell_lengths", "Bar"), FileError);
     CHECK_THROWS_AS(file.variable("FOO"), FileError);
 }
+
+#endif // HAVE_NETCDF
