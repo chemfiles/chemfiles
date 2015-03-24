@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 2.8)
 
 project(chemharp)
 set(HARP_VERSION_MAJOR 0)
@@ -55,7 +55,7 @@ install(FILES "${CMAKE_BINARY_DIR}/Chemharp.install.hpp" DESTINATION include REN
 # C main header
 install(FILES bindings/c/chemharp.h DESTINATION include)
 # Dynamic library
-install(TARGETS chemharp LIBRARY DESTINATION lib)
+install(TARGETS chemharp DESTINATION lib)
 
 add_subdirectory(doc)
 enable_testing()
