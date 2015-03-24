@@ -1,9 +1,10 @@
 # Chemharp, an efficient IO library for chemistry file formats
 
-Chemharp is a modern C++ library for reading and writing from and to trajectory
-files. These files are created by your favorite theoretical chemistry program, and
-contains informations about atomic or residues names and positions. Some format
-also have additional informations, such as velocities, forces, energy, …
+Chemharp is a multi-language library written in modern C++ for reading and writing
+from and to molecular trajectory files. These files are created by your favorite
+theoretical chemistry program, and contains informations about atomic or residues
+names and positions. Some format also have additional informations, such as
+velocities, forces, energy, …
 
 The main targeted audience of Chemharp (*libchemharp*) is chemistry researcher
 working on their own code to do some kind of awesome science, without wanting to
@@ -13,24 +14,40 @@ Running simulation (either Quantum Dynamic, Monte Carlo, Molecular Dynamic, or
 any other method) often produce enormous amounts of data, which had to be
 post-processed in order to extract informations. This post-processing step involve
 reading and parsing the data, and computing physical values with the help of
-statistical thermodynamic. Chemharp try to help you on the first point, by providing
+statistical thermodynamic. Chemharp tries to help you on the first point, by providing
 the same interface to all the trajectory formats. If you ever need to change your
-output format, your analysis tools will still work the same way.
+output format, your analysis tools will still work the same way. Chemharp is
+efficient because it allow you to write and debug your code only once, and then
+to re-use it as needed.
+
+## Goals
+
+The Chemharp library tries to be:
+
+ - Easy and simple to use. There are only five main classes, which are really
+   easy to understand. No messy templates and uninformative functions names;
+ - Multi-languages, it can be used from whatever language you prefer. If your
+   favorite language is not supported, it have a clean C interface so that you
+   can add a binding;
+ -
+
+
 
 ## Features
 
  - Automatic recognition of file type based on filename extension;
  - Open-source under the Mozilla Public License;
- - Cross platform: Windows, Linux, Mac OS X, maybe others;
- - Support for a number of atoms which is not constant.
+ - Cross platform: it runs on Windows, Linux, Mac OS X, and maybe others systems;
+ - Support for a number of atoms which is not constant;
+ - Bindings to the most used scientific languages:  Python, C, Fortran 95;
+ - Work with binary formats, if the corresponding libraries are available.
 
 ## Planned Features
 
- - Bindings to the most used scientific languages:  Python, Julia, C, Fortran 95
- - Binding to even more languages: Lua, Java, ...
+ - Binding to even more languages: Julia, Lua, …
  - More formats !
  - More speed !
- - Support for very big files, over network.
+ - Support for other files types: very big files, over network, compressed text files.
 
 ## File formats
 
