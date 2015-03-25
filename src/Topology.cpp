@@ -14,7 +14,7 @@
 using namespace harp;
 
 Topology::Topology(size_t natoms) {
-    reserve(natoms);
+    resize(natoms);
 }
 
 Topology::Topology() : Topology(100) {}

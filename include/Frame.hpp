@@ -76,10 +76,10 @@ public:
     //! Set the unit cell fo the system
     void cell(const UnitCell& c) {_cell = c;}
 
-    //! Reserve some size in the internal arrays, and initialize the array with 0.
-    //! The \c reserve_velocities parameter should be \c true to reserve space for
-    //! the velocities.
-    void reserve(size_t size, bool reserve_velocities = false);
+    //! Resize the internal arrays, and initialize them with 0.
+    //! The \c resize_velocities parameter should be \c true to resize also the
+    //! velocities array.
+    void resize(size_t size, bool resize_velocities = false);
 
     //! Get the current simulation step
     size_t step() const {return _step;}

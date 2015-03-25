@@ -6,12 +6,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-
-#include <algorithm>
-#include <iostream>
-#include <algorithm>
-using std::endl;
-
 #include "formats/NCFormat.hpp"
 
 #include "Error.hpp"
@@ -19,6 +13,12 @@ using std::endl;
 #include "Frame.hpp"
 #include "files/NCFile.hpp"
 using namespace harp;
+
+#include <algorithm>
+#include <iostream>
+#include <algorithm>
+using std::endl;
+using std::vector;
 
 #if HAVE_NETCDF
 

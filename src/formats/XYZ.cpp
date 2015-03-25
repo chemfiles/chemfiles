@@ -57,7 +57,7 @@ void XYZFormat::read_next_step(File* file, Frame& frame){
     }
 
     frame.topology().clear();
-    frame.reserve(natoms);
+    frame.resize(natoms);
 
     for (size_t i=0; i<lines.size(); i++) {
         std::istringstream string_stream;

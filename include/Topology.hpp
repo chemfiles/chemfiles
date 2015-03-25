@@ -67,7 +67,7 @@ public:
     //! Get the number of atom types in the topology
     size_t natom_types() const {return _templates.size();}
     //! Reserve space for \c natoms in the topology
-    void reserve(size_t natoms) {_atoms.reserve(natoms); _bonds.reserve(natoms);}
+    void resize(size_t natoms) {_atoms.resize(natoms);}
     //! Clear the topology
     void clear();
 

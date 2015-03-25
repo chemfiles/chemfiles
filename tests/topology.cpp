@@ -17,8 +17,8 @@ TEST_CASE("Use the Topology class", "[Topology]"){
         CHECK(topo[0].type() == Atom::ELEMENT);
         CHECK(topo[0].name() == "H");
 
-        topo.reserve(100);
-        CHECK(topo._atoms.capacity() == 100);
+        topo.resize(100);
+        CHECK(topo._atoms.size() == 100);
     }
 
     SECTION("Dummy topology provider"){

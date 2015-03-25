@@ -18,7 +18,7 @@ using namespace harp;
 Frame::Frame() : Frame(100) {}
 
 Frame::Frame(size_t natoms) : _step(0), _topology(natoms), _cell() {
-    reserve(natoms);
+    resize(natoms);
 }
 
 void Frame::raw_positions(float pos[][3], size_t size) const{
@@ -59,14 +59,14 @@ size_t Frame::natoms() const {
     }
 }
 
-void Frame::reserve(size_t size, bool reserve_velocities){
+void Frame::resize(size_t size, bool reserve_velocities){
     _positions.resize(size);
     _positions.assign(size, Vector3D(0, 0, 0));
     if (reserve_velocities) {
         _velocities.resize(size);
         _velocities.assign(size, Vector3D(0, 0, 0));
     }
-    _topology.reserve(size);
+    _topology.resize(size);
 }
 
 bool Frame::has_velocities(){

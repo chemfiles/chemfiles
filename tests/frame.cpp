@@ -27,12 +27,12 @@ TEST_CASE("Frame class usage", "[Frame]"){
         frame.topology().append(Atom("H"));
         CHECK(frame.topology().natom_types() == 1);
 
-        frame.reserve(15);
+        frame.resize(15);
         CHECK(frame.natoms() == 15);
         // No velocity data yet
         CHECK_FALSE(frame.has_velocities());
 
-        frame.reserve(15, true);
+        frame.resize(15, true);
         CHECK(frame.has_velocities());
 
         frame.positions()[0] = Vector3D(1, 2, 3);
@@ -79,7 +79,7 @@ TEST_CASE("Frame class usage", "[Frame]"){
             for (size_t j=0; j<3; j++)
                 CHECK(mat[i][j] == 0);
 
-        frame.reserve(10, true);
+        frame.resize(10, true);
         CHECK_THROWS_AS(frame.raw_velocities(mat, 3), MemoryError);
         delete[] mat;
     }
