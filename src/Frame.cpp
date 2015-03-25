@@ -66,7 +66,6 @@ void Frame::resize(size_t size, bool reserve_velocities){
         _velocities.resize(size);
         _velocities.assign(size, Vector3D(0, 0, 0));
     }
-    _topology.resize(size);
 }
 
 bool Frame::has_velocities(){

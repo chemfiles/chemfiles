@@ -7,6 +7,15 @@
 #include "Chemharp.hpp"
 using namespace harp;
 
+template <class T>
+bool find(const std::vector<T>& vec, const T& val){
+    for (auto content : vec){
+        if (val == content)
+            return true;
+    }
+    return false;
+}
+
 TEST_CASE("Use the Topology class", "[Topology]"){
 
     SECTION("Basic usage"){
@@ -23,7 +32,6 @@ TEST_CASE("Use the Topology class", "[Topology]"){
 
     SECTION("Dummy topology provider"){
         auto topo = dummy_topology(42);
-        CHECK(topo._atoms.capacity() == 42);
         CHECK(topo.natoms() == 42);
 
         CHECK(topo.natom_types() == 1);
@@ -45,30 +53,24 @@ TEST_CASE("Use the Topology class", "[Topology]"){
         topo.add_bond(3, 5);
 
         CHECK(topo.natom_types() == 2);
-        CHECK(topo.bonds().size() == 8);
 
-        CHECK(topo.bonds()[0] == bond(0, 4));
-        CHECK(topo.bonds()[3] == bond(3, 5));
-        for (size_t i=0; i<4; i++) {
-            CHECK(topo.bonds()[i][0] == topo.bonds()[i + 4][1]);
-            CHECK(topo.bonds()[i][1] == topo.bonds()[i + 4][0]);
-        }
+        auto bonds = topo.bonds();
+        CHECK(bonds.size() == 4);
+        CHECK(find(bonds, bond(0, 4)));
+        CHECK(find(bonds, bond(1, 4)));
+        CHECK(find(bonds, bond(2, 5)));
+        CHECK(find(bonds, bond(3, 5)));
 
-        CHECK(topo.angles().size() == 4);
-        CHECK(topo.angles()[0] == angle(0, 4, 1));
-        CHECK(topo.angles()[1] == angle(1, 4, 0));
-        CHECK(topo.angles()[2] == angle(2, 5, 3));
-        CHECK(topo.angles()[3] == angle(3, 5, 2));
+        auto angles = topo.angles();
+        CHECK(angles.size() == 2);
+        CHECK(find(angles, angle(0, 4, 1)));
+        CHECK(find(angles, angle(2, 5, 3)));
 
         topo.append(Atom("O"));
         topo.add_bond(3, 6);
-        CHECK(topo.bonds().size() == 10);
-        CHECK(topo.dihedrals().size() == 2);
-        CHECK(topo.dihedrals()[0] == dihedral(2, 5, 3, 6));
-        CHECK(topo.dihedrals()[1] == dihedral(6, 3, 5, 2));
-
-
-        topo.add_bond(5, 5); // This should do nothing
-        CHECK(topo.bonds().size() == 10);
+        CHECK(topo.bonds().size() == 5);
+        auto dihedrals = topo.dihedrals();
+        CHECK(dihedrals.size() == 1);
+        CHECK(find(dihedrals, dihedral(2, 5, 3, 6)));
     }
 }

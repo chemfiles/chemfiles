@@ -14,31 +14,37 @@ using namespace harp;
 using std::vector;
 
 void Connectivity::recalculate() const{
-    for (auto const& b1 : _bonds){
+    for (auto const& bond1 : _bonds){
         // Find angles
-        for (auto const& b2 : _bonds){
-            if (b1 == b2) continue;
+        for (auto const& bond2 : _bonds){
+            if (bond1 == bond2) continue;
             // Initializing angle to an invalid value
-            angle a1(static_cast<size_t>(-1), static_cast<size_t>(-2), static_cast<size_t>(-3));
-            if (b1[0] == b2[1]) {
-                a1 = angle(b2[0], b2[1], b1[1]);
-                _angles.insert(a1);
-            } else if (b1[1] == b2[0]) {
-                a1 = angle(b1[0], b1[1], b2[1]);
-                _angles.insert(a1);
+            angle angle1(static_cast<size_t>(-1), static_cast<size_t>(-2), static_cast<size_t>(-3));
+            if (bond1[0] == bond2[1]) {
+                angle1 = angle(bond2[0], bond2[1], bond1[1]);
+                _angles.insert(angle1);
+            } else if (bond1[1] == bond2[0]) {
+                angle1 = angle(bond1[0], bond1[1], bond2[1]);
+                _angles.insert(angle1);
+            } else if (bond1[1] == bond2[1]) {
+                angle1 = angle(bond1[0], bond1[1], bond2[0]);
+                _angles.insert(angle1);
+            } else if (bond1[0] == bond2[0]) {
+                angle1 = angle(bond1[1], bond1[0], bond2[1]);
+                _angles.insert(angle1);
             } else {
                 // We will not find any dihedral angle from these bonds
                 continue;
             }
             // Find dihedral angles
-            for (auto const& b3 : _bonds){
-                if (b2 == b3) continue;
+            for (auto const& bond3 : _bonds){
+                if (bond2 == bond3) continue;
 
-                if (a1[2] == b3[0]){
-                    _dihedrals.insert(dihedral(a1[0], a1[1], a1[2], b3[1]));
-                } else if (a1[0] == b3[1]) {
-                    _dihedrals.insert(dihedral(b3[0], a1[0], a1[1], a1[2]));
-                } else if (a1[2] == b3[0] || a1[2] == b3[1]) {
+                if (angle1[2] == bond3[0] && angle1[1] != bond3[1]){
+                    _dihedrals.insert(dihedral(angle1[0], angle1[1], angle1[2], bond3[1]));
+                } else if (angle1[0] == bond3[1] && angle1[1] != bond3[0]) {
+                    _dihedrals.insert(dihedral(bond3[0], angle1[0], angle1[1], angle1[2]));
+                } else if (angle1[2] == bond3[0] || angle1[2] == bond3[1]) {
                     // TODO this is an improper dihedral
                 }
             }
@@ -157,7 +163,7 @@ void Topology::guess_bonds(){
 }
 
 Topology harp::dummy_topology(size_t natoms){
-    Topology top(natoms);
+    Topology top(0);
     for (size_t i=0; i<natoms; i++)
         top.append(Atom(Atom::UNDEFINED));
     return top;
