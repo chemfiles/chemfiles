@@ -51,13 +51,13 @@ extern "C" {
 /*!
 * @brief Get the error message corresponding to an error code.
 * @param status The error code
-* @return A textual representation of the error.
+* @return A null-terminated string encoding the textual representation of the status.
 */
 const char* chrp_strerror(int status);
 
 /*!
 * @brief Get the last error message.
-* @return A textual representation of the error.
+* @return A null-terminated string encoding the textual representation of the last error.
 */
 const char* chrp_last_error(void);
 
@@ -289,16 +289,155 @@ int chrp_cell_periodicity_set(CHRP_CELL* cell, bool x, bool y, bool z);
 int chrp_cell_free(CHRP_CELL* cell);
 
 /******************************************************************************/
-// TODO CHRP_TOPOLOGY
+
+/*!
+* @brief Extract the topology from a frame
+* @param frame The frame
+* @return A pointer to the new Topology
+*/
+CHRP_TOPOLOGY* chrp_topology(CHRP_FRAME* frame);
+
+/*!
+* @brief Add an atom to a topology
+* @param topology The topology
+* @param atom The atom to be added
+* @return The status code
+*/
+int chrp_topology_append(CHRP_TOPOLOGY* topology, CHRP_ATOM* atom);
+
+/*!
+* @brief Remove an atom from a topology by index
+* @param topology The topology
+* @param i The atomic index
+* @return The status code
+*/
+int chrp_topology_remove(CHRP_TOPOLOGY* topology, size_t i);
+
+/*!
+* @brief Tell if the atoms \c i and \c j are bonded
+* @param topology The topology
+* @param i,j The atomic indexes
+* @param result true if the atoms are bonded, false otherwise
+* @return The status code
+*/
+int chrp_topology_isbond(CHRP_TOPOLOGY* topology, size_t i, size_t j, bool* result);
+
+/*!
+* @brief Tell if the atoms \c i, \c j and \c k constitues an angle
+* @param topology The topology
+* @param i,j,k The atomic indexes
+* @param result true if the atoms constitues an angle, false otherwise
+* @return The status code
+*/
+int chrp_topology_isangle(CHRP_TOPOLOGY* topology,
+                            size_t i, size_t j, size_t k, bool* result);
+
+/*!
+* @brief Tell if the atoms \c i, \c j, \c k and \c m constitues a dihedral angle
+* @param topology The topology
+* @param i,j,k,m The atomic indexes
+* @param result true if the atoms constitues a dihedral angle, false otherwise
+* @return The status code
+*/
+int chrp_topology_isdihedral(CHRP_TOPOLOGY* topology,
+                             size_t i, size_t j, size_t k, size_t m, bool* result);
+
+/*!
+* @brief Get the number of bonds in the system
+* @param topology The topology
+* @param nbonds After the call, contains the number of bond
+* @return The status code
+*/
+int chrp_topology_bonds_count(CHRP_TOPOLOGY* topology, size_t* nbonds);
+
+/*!
+* @brief Get the number of angles in the system
+* @param topology The topology
+* @param nangles After the call, contains the number of angles
+* @return The status code
+*/
+int chrp_topology_angles_count(CHRP_TOPOLOGY* topology, size_t* nangles);
+
+/*!
+* @brief Get the number of dihedral angles in the system
+* @param topology The topology
+* @param ndihedrals After the call, contains the number of dihedral angles
+* @return The status code
+*/
+int chrp_topology_dihedrals_count(CHRP_TOPOLOGY* topology, size_t* ndihedrals);
+
+/*!
+* @brief Get the bonds in the system
+* @param topology The topology
+* @param data A nbonds x 2 array to be filled with the bonds in the system
+* @param nbonds The size of the array. This should equal the value give by the
+*               chrp_topology_bonds_count function
+* @return The status code
+*/
+int chrp_topology_bonds(CHRP_TOPOLOGY* topology, size_t (*data)[2], size_t nbonds);
+
+/*!
+* @brief Get the angles in the system
+* @param topology The topology
+* @param data A nangles x 3 array to be filled with the angles in the system
+* @param nangles The size of the array. This should equal the value give by the
+*               chrp_topology_angles_count function
+* @return The status code
+*/
+int chrp_topology_angles(CHRP_TOPOLOGY* topology, size_t (*data)[3], size_t nangles);
+
+/*!
+* @brief Get the dihedral angles in the system
+* @param topology The topology
+* @param data A ndihedrals x 4 array to be filled with the dihedral angles in the system
+* @param ndihedrals The size of the array. This should equal the value give by the
+*               chrp_topology_dihedrals_count function
+* @return The status code
+*/
+int chrp_topology_dihedrals(CHRP_TOPOLOGY* topology, size_t (*data)[4], size_t ndihedrals);
+
+/*!
+* @brief Add a bond between the atoms \c i and \c j in the system
+* @param topology The topology
+* @param i,j The atomic indexes
+* @return The status code
+*/
+int chrp_topology_add_bond(CHRP_TOPOLOGY* topology, size_t i, size_t j);
+
+/*!
+* @brief Remove a bond between the atoms \c i and \c j in the system
+* @param topology The topology
+* @param i,j The atomic indexes
+* @return The status code
+*/
+int chrp_topology_remove_bond(CHRP_TOPOLOGY* topology, size_t i, size_t j);
+
+/*!
+* @brief Destroy a topology, and free the associated memory
+* @param topology The topology to destroy
+* @return The status code
+*/
+int chrp_topology_free(CHRP_TOPOLOGY* topology);
 
 /******************************************************************************/
 /*!
 * @brief Get a specific atom from a frame
 * @param frame The frame
 * @param idx The atom index
-* @return A pointer to an atom
+* @return A pointer to the corresponding atom
 */
 CHRP_ATOM* chrp_atom(CHRP_FRAME* frame, size_t idx);
+
+/*!
+* @brief Get a specific atom from a topology
+* @param topology The topology
+* @param idx The atom index
+* @return A pointer to the corresponding atom
+*/
+CHRP_ATOM* chrp_topology_atom(CHRP_TOPOLOGY* topology, size_t idx);
+
+// TODO: constructor by name
+// TODO: more constructors for each types
 
 /*!
 * @brief Get the mass of an atom, in atomic mass units
@@ -344,7 +483,7 @@ int chrp_atom_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
 int chrp_atom_name_set(CHRP_ATOM* atom, const char* name);
 
 /*!
-* @brief Destroy an atoms, and free the associated memory
+* @brief Destroy an atom, and free the associated memory
 * @param atom The atom to destroy
 * @return The status code
 */

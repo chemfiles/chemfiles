@@ -94,12 +94,38 @@ Function manipulating ``CHRP_CELL``
 Function manipulating ``CHRP_TOPOLOGY``
 ---------------------------------------
 
-Comming soon.
+.. doxygenfunction:: chrp_topology
+
+.. doxygenfunction:: chrp_topology_is_bond
+
+.. doxygenfunction:: chrp_topology_is_angle
+
+.. doxygenfunction:: chrp_topology_is_dihedral
+
+.. doxygenfunction:: chrp_topology_bonds_count
+
+.. doxygenfunction:: chrp_topology_angles_count
+
+.. doxygenfunction:: chrp_topology_dihedrals_count
+
+.. doxygenfunction:: chrp_topology_bonds
+
+.. doxygenfunction:: chrp_topology_angles
+
+.. doxygenfunction:: chrp_topology_dihedrals
+
+.. doxygenfunction:: chrp_topology_add_bond
+
+.. doxygenfunction:: chrp_topology_delete_bond
+
+.. doxygenfunction:: chrp_topology_free
 
 Function manipulating ``CHRP_ATOM``
 -----------------------------------
 
 .. doxygenfunction:: chrp_atom
+
+.. doxygenfunction:: chrp_topology_atom
 
 .. doxygenfunction:: chrp_atom_mass
 

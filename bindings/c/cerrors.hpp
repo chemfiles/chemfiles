@@ -60,14 +60,21 @@ private:
 
 static CAPIStatus status = CAPIStatus();
 
-#define CATCH_AND_RETURN(error, retval)               \
-    catch(const harp::error& e) {                     \
+#define CATCH_AND_RETURN(exception, retval)           \
+    catch(const harp::exception& e) {                 \
         status.last_error = string(e.what());         \
         LOG(ERROR) << e.what() << std::endl;          \
         return retval;                                \
     }
 
-///! Wrap \c instructions in a try/catch bloc automatically, and return a status code
+#define CATCH_AND_GOTO(exception)                     \
+    catch(const harp::exception& e) {                 \
+        status.last_error = string(e.what());         \
+        LOG(ERROR) << e.what() << std::endl;          \
+        goto error;                                   \
+    }
+
+//! Wrap \c instructions in a try/catch bloc automatically, and return a status code
 #define CHRP_ERROR_WRAP_RETCODE(instructions)                                  \
     try {                                                                      \
         instructions                                                           \
@@ -82,18 +89,19 @@ static CAPIStatus status = CAPIStatus();
     }                                                                          \
     return CAPIStatus::SUCESS;
 
-///! Wrap \c instructions in a try/catch bloc automatically, and return a \c value
-#define CHRP_ERROR_WRAP_RETVAL(instructions, retval)                           \
+//! Wrap \c instructions in a try/catch bloc automatically, and goto the \c error
+//! label in case of error.
+#define CHRP_ERROR_WRAP(instructions)                                          \
     try {                                                                      \
         instructions                                                           \
     }                                                                          \
-    CATCH_AND_RETURN(FileError, retval)                                        \
-    CATCH_AND_RETURN(MemoryError, retval)                                      \
-    CATCH_AND_RETURN(FormatError, retval)                                      \
-    CATCH_AND_RETURN(Error, retval)                                            \
+    CATCH_AND_GOTO(FileError)                                                  \
+    CATCH_AND_GOTO(MemoryError)                                                \
+    CATCH_AND_GOTO(FormatError)                                                \
+    CATCH_AND_GOTO(Error)                                                      \
     catch(const std::exception& e) {                                           \
         status.last_error = string(e.what());                                  \
-        return retval;                                                         \
+        goto error;                                                            \
     }
 
 }

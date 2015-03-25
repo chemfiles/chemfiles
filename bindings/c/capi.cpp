@@ -39,9 +39,10 @@ void chrp_log_stderr(void){
 
 CHRP_TRAJECTORY* chrp_open(const char* filename, const char* mode){
     CHRP_TRAJECTORY* traj = NULL;
-    CHRP_ERROR_WRAP_RETVAL(
-        traj = new Trajectory(filename, mode); , traj
+    CHRP_ERROR_WRAP(
+        traj = new Trajectory(filename, mode);
     )
+error:
     return traj;
 }
 
@@ -73,9 +74,10 @@ int chrp_close(CHRP_TRAJECTORY *file){
 
 CHRP_FRAME* chrp_frame(size_t natoms){
     CHRP_FRAME* frame = NULL;
-    CHRP_ERROR_WRAP_RETVAL(
-        frame = new Frame(natoms); , frame
+    CHRP_ERROR_WRAP(
+        frame = new Frame(natoms);
     )
+error:
     return frame;
 }
 
@@ -137,9 +139,10 @@ int chrp_frame_free(CHRP_FRAME* frame) {
 
 CHRP_CELL* chrp_cell(CHRP_FRAME* frame){
     CHRP_CELL* cell = NULL;
-    CHRP_ERROR_WRAP_RETVAL(
-        cell = &frame->cell(); , cell
+    CHRP_ERROR_WRAP(
+        cell = &frame->cell();
     )
+error:
     return cell;
 }
 
@@ -217,11 +220,146 @@ int chrp_cell_free(CHRP_CELL* cell) {
 
 /******************************************************************************/
 
+CHRP_TOPOLOGY* chrp_topology(CHRP_FRAME* frame){
+    CHRP_TOPOLOGY* topology = NULL;
+    CHRP_ERROR_WRAP(
+        topology = &(frame->topology());
+    )
+error:
+    return topology;
+}
+
+CHRP_ATOM* chrp_topology_atom(CHRP_TOPOLOGY* topology, size_t idx){
+    CHRP_ATOM* atom = NULL;
+    CHRP_ERROR_WRAP(
+        atom = &((*topology)[idx]);
+    )
+error:
+    return atom;
+}
+
+int chrp_topology_append(CHRP_TOPOLOGY* topology, CHRP_ATOM* atom){
+    CHRP_ERROR_WRAP_RETCODE(
+        topology->append(*atom);
+    )
+}
+
+int chrp_topology_remove(CHRP_TOPOLOGY* topology, size_t i){
+    CHRP_ERROR_WRAP_RETCODE(
+        topology->remove(i);
+    )
+}
+
+int chrp_topology_isbond(CHRP_TOPOLOGY* topology, size_t i, size_t j, bool* result){
+    CHRP_ERROR_WRAP_RETCODE(
+        *result = topology->isbond(i, j);
+    )
+}
+
+int chrp_topology_isangle(CHRP_TOPOLOGY* topology, size_t i, size_t j, size_t k, bool* result){
+    CHRP_ERROR_WRAP_RETCODE(
+        *result = topology->isangle(i, j, k);
+    )
+}
+
+int chrp_topology_isdihedral(CHRP_TOPOLOGY* topology, size_t i, size_t j, size_t k, size_t m, bool* result){
+    CHRP_ERROR_WRAP_RETCODE(
+        *result = topology->isdihedral(i, j, k, m);
+    )
+}
+
+int chrp_topology_bonds_count(CHRP_TOPOLOGY* topology, size_t* nbonds){
+    CHRP_ERROR_WRAP_RETCODE(
+        *nbonds = topology->bonds().size();
+    )
+}
+
+int chrp_topology_angles_count(CHRP_TOPOLOGY* topology, size_t* nangles){
+    CHRP_ERROR_WRAP_RETCODE(
+        *nangles = topology->angles().size();
+    )
+}
+
+int chrp_topology_dihedrals_count(CHRP_TOPOLOGY* topology, size_t* ndihedrals){
+    CHRP_ERROR_WRAP_RETCODE(
+        *ndihedrals = topology->dihedrals().size();
+    )
+}
+
+int chrp_topology_bonds(CHRP_TOPOLOGY* topology, size_t (*data)[2], size_t nbonds){
+    if (nbonds != topology->bonds().size()){
+        status.last_error = "Wrong data size in function 'chrp_topology_bonds'.";
+        return CAPIStatus::MEMORY;
+    }
+
+    auto bonds = topology->bonds();
+    CHRP_ERROR_WRAP_RETCODE(
+        for (size_t i = 0; i<nbonds; i++){
+            data[i][0] = bonds[i][0];
+            data[i][1] = bonds[i][1];
+        }
+    )
+}
+
+int chrp_topology_angles(CHRP_TOPOLOGY* topology, size_t (*data)[3], size_t nangles){
+    if (nangles != topology->angles().size()){
+        status.last_error = "Wrong data size in function 'chrp_topology_angles'.";
+        return CAPIStatus::MEMORY;
+    }
+
+    auto angles = topology->angles();
+    CHRP_ERROR_WRAP_RETCODE(
+        for (size_t i = 0; i<nangles; i++){
+            data[i][0] = angles[i][0];
+            data[i][1] = angles[i][1];
+            data[i][2] = angles[i][2];
+        }
+    )
+}
+
+int chrp_topology_dihedrals(CHRP_TOPOLOGY* topology, size_t (*data)[4], size_t ndihedrals){
+    if (ndihedrals != topology->dihedrals().size()){
+        status.last_error = "Wrong data size in function 'chrp_topology_bonds'.";
+        return CAPIStatus::MEMORY;
+    }
+
+    auto dihedrals = topology->dihedrals();
+    CHRP_ERROR_WRAP_RETCODE(
+        for (size_t i = 0; i<ndihedrals; i++){
+            data[i][0] = dihedrals[i][0];
+            data[i][1] = dihedrals[i][1];
+            data[i][2] = dihedrals[i][2];
+            data[i][3] = dihedrals[i][3];
+        }
+    )
+}
+
+int chrp_topology_add_bond(CHRP_TOPOLOGY* topology, size_t i, size_t j){
+    CHRP_ERROR_WRAP_RETCODE(
+        topology->add_bond(i, j);
+    )
+}
+
+int chrp_topology_remove_bond(CHRP_TOPOLOGY* topology, size_t i, size_t j){
+    CHRP_ERROR_WRAP_RETCODE(
+        topology->remove_bond(i, j);
+    )
+}
+
+int chrp_topology_free(CHRP_TOPOLOGY* topology){
+    CHRP_ERROR_WRAP_RETCODE(
+        delete topology;
+    )
+}
+
+/******************************************************************************/
+
 CHRP_ATOM* chrp_atom(CHRP_FRAME* frame, size_t idx){
     CHRP_ATOM* atom = NULL;
-    CHRP_ERROR_WRAP_RETVAL(
-        atom = &(frame->topology()[idx]); , atom
+    CHRP_ERROR_WRAP(
+        atom = &(frame->topology()[idx]);
     )
+error:
     return atom;
 }
 
