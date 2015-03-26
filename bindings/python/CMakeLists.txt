@@ -20,7 +20,7 @@ set_property(TARGET boost_numpy
 find_package(Boost REQUIRED COMPONENTS python)
 find_package(PythonLibsNew REQUIRED)
 
-include_directories(${PYTHON_INCLUDE_DIRS})
+include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
 PYTHON_ADD_MODULE(_chemharp chemharp.cpp)
 

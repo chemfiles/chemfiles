@@ -14,8 +14,8 @@ if(${NETCDF_FOUND})
     include_directories(${NETCDF_INCLUDES})
 endif()
 
-find_package(Boost REQUIRED COMPONENTS filesystem system)
-include_directories(${Boost_INCLUDE_DIR})
+find_package(Boost 1.54.0 REQUIRED COMPONENTS filesystem system)
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
 set(CMAKE_CXX_STANDARD 11)
 set(CXX_STANDARD_REQUIRED ON)
