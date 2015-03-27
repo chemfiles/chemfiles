@@ -14,12 +14,16 @@ in the :ref:`classes-reference` section for the C++ API. All the bindings may no
 provide all the functionalities, so if something is missing, just
 `ask for it! <https://github.com/Luthaf/Chemharp/issues/new>`_
 
+.. _overview-trajectory:
+
 Trajectory: the main entry point
 --------------------------------
 
 A ``Trajectory`` uses a file and a format together to read simulation data from
 the file. It can read and write one or many ``Frame`` to this file. The file
 type and the format are automatically determined from the extention.
+
+.. _overview-frame:
 
 Frame: data from a simulation step
 ----------------------------------
@@ -34,6 +38,7 @@ A ``Frame`` may contains the following data:
 * The ``Topology`` of the system;
 * The ``UnitCell`` of the system.
 
+.. _overview-topology:
 
 Topology: how are the atoms organised
 -------------------------------------
@@ -42,12 +47,15 @@ A ``Topology`` describes the organisation of the particles in the system.
 What are they names, how are they bonded together, … A topology is mainly a list
 of ``Atom`` in the system.
 
+.. _overview-atom:
+
 Atom: building blocks for simulations
 -------------------------------------
 
 The ``Atom`` type contains basic information about the particles in the system:
 the name (if it is disponible), mass, kind of particle and so on.
 
+.. _overview-cell:
 
 UnitCell: wrapping the atoms together
 -------------------------------------

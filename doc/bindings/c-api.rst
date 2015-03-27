@@ -6,11 +6,16 @@ all the programs using Chemharp. All the functions and enums have a ``chrp_``
 prefix indicating the provenance of the functions. The types are defined as
 opaque pointer types, in all caps. The following types are defined:
 
-* ``CHRP_TRAJECTORY`` maps to the ``harp::Trajectory`` class;
-* ``CHRP_FRAME`` maps to the ``harp::Frame`` class;
-* ``CHRP_ATOM`` maps to the ``harp::Atom`` class;
-* ``CHRP_CELL`` maps to the ``harp::UnitCell`` class;
-* ``CHRP_TOPOLOGY`` maps to the ``harp::Topology`` class.
+* :ref:`CHRP_TRAJECTORY <capi-trajectory>` maps to the :ref:`Trajectory <overview-trajectory>` class;
+* :ref:`CHRP_FRAME <capi-frame>` maps to the :ref:`Frame  <overview-frame>` class;
+* :ref:`CHRP_ATOM <capi-atom>` maps to the :ref:`Atom  <overview-atom>` class;
+* :ref:`CHRP_CELL <capi-cell>` maps to the :ref:`UnitCell  <overview-cell>` class;
+* :ref:`CHRP_TOPOLOGY <capi-topology>` maps to the :ref:`Topology  <overview-topology>` class.
+
+The user is reponsible for memory management when using these types. Constructors
+functions (functions returning pointers to types defined above) return freshly
+allocated memory, and calling the ``chrp_*_free`` functions return the corresponding
+memory to the operating system.
 
 Functions for errors handling
 -----------------------------
@@ -32,9 +37,14 @@ allow for error handling from the C side.
 
 .. doxygenfunction:: chrp_log_stderr
 
+.. _capi-trajectory:
 
 Function manipulating ``CHRP_TRAJECTORY``
 -----------------------------------------
+
+The Trajectory type is the main entry point when using Chemharp. A trajectory
+behave a bit like a ``FILE*`` pointer, and the ``chrp_close`` free the memory
+associated with the file.
 
 .. doxygenfunction:: chrp_open
 
@@ -45,6 +55,8 @@ Function manipulating ``CHRP_TRAJECTORY``
 .. doxygenfunction:: chrp_write_step
 
 .. doxygenfunction:: chrp_close
+
+.. _capi-frame:
 
 Function manipulating ``CHRP_FRAME``
 ------------------------------------
@@ -62,6 +74,8 @@ Function manipulating ``CHRP_FRAME``
 .. doxygenfunction:: chrp_frame_velocities_set
 
 .. doxygenfunction:: chrp_frame_free
+
+.. _capi-cell:
 
 Function manipulating ``CHRP_CELL``
 -----------------------------------
@@ -90,6 +104,7 @@ Function manipulating ``CHRP_CELL``
 
 .. doxygenfunction:: chrp_cell_free
 
+.. _capi-topology:
 
 Function manipulating ``CHRP_TOPOLOGY``
 ---------------------------------------
@@ -119,6 +134,8 @@ Function manipulating ``CHRP_TOPOLOGY``
 .. doxygenfunction:: chrp_topology_delete_bond
 
 .. doxygenfunction:: chrp_topology_free
+
+.. _capi-atom:
 
 Function manipulating ``CHRP_ATOM``
 -----------------------------------
