@@ -17,6 +17,8 @@
 #include <map>
 #include <string>
 
+namespace harp {
+
 //! Storing basic elemental data: mass, colvalent and Van der Waals radii
 struct ElementData {
     //! Atomic number
@@ -152,5 +154,7 @@ static const std::map<std::string, ElementData> PERIODIC_INFORMATION = {
     {"Uus", ElementData{117, "Ununseptium", 294.0f, 1.45f, 2.0f} },
     {"Uuo", ElementData{118, "Ununoctium", 294.0f, 1.45f, 2.0f} },
 };
+
+} // namespace harp
 
 #endif

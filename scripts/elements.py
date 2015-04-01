@@ -1,8 +1,17 @@
 #!/usr/bin/env python
 # -* coding: utf-8 -*
 
+"""
+This python script use Blue Obelisk's element.xml file to create the
+corresponding C++ header with atomic information.
+
+The element.xml file can be found at the official SVN repo:
+    http://svn.code.sf.net/p/bodr/code/trunk/bodr
+"""
+
 import sys
 from xml.etree import ElementTree as ET
+
 
 class Atom:
     def __init__(self, symbol, name, number, mass, cov, VdW):
@@ -12,9 +21,11 @@ class Atom:
         self.mass = mass
         self.cov = cov
         self.VdW = VdW
+
     def __str__(self):
-        return '{{"{}", ElementData{{{}, "{}", {}f, {}f, {}f}} }}'.format(self.symbol,
-                        self.number, self.name, self.mass, self.cov, self.VdW)
+        return '{{"{}", ElementData{{{}, "{}", {}f, {}f, {}f}} }}'.format(
+            self.symbol, self.number, self.name, self.mass, self.cov, self.VdW)
+
 
 def read_elements(path):
     root = ET.parse(path).getroot()
@@ -59,6 +70,8 @@ HEADER = """/*
 
 #include <map>
 #include <string>
+
+namespace harp {
 """
 
 STRUCT = """
@@ -81,6 +94,7 @@ ARRAY = """
 static const std::map<std::string, ElementData> PERIODIC_INFORMATION = {
 """
 
+
 def write_elements(path, elements):
     f = open(path, "w")
     f.write(HEADER)
@@ -88,7 +102,10 @@ def write_elements(path, elements):
     f.write(ARRAY)
     for atom in atoms:
         f.write("    " + str(atom) + ",\n")
-    f.write("};\n\n#endif\n") # closing the map.
+    f.write("};\n\n")  # closing the map.
+    f.write("} // namespace harp\n\n")  # closing the namespace.
+    f.write("#endif\n")  # closing the header guard
+
 
 def usage():
     print(sys.argv[0] + " path/to/elements.xml periodic.hpp")
