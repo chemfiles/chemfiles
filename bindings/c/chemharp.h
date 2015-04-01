@@ -34,7 +34,7 @@ extern "C" {
     typedef harp::UnitCell CHRP_CELL;
     typedef harp::Topology CHRP_TOPOLOGY;
 #else
-    #include <stdint.h>
+    #include <stddef.h>
     #include <stdbool.h>
     //! Opaque type handling trajectories files
     typedef struct CHRP_TRAJECTORY CHRP_TRAJECTORY;
