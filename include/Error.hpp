@@ -51,6 +51,15 @@ public:
     FormatError(const std::string &message) : Error(message) {}
 };
 
+/*!
+ * @class PluginError Error.hpp
+ * @brief Exception for dynamic library loading errors
+ */
+class PluginError : public Error {
+public:
+    PluginError(const std::string &message) : Error(message) {}
+};
+
 
 } // namespace harp
 

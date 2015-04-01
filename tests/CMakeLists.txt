@@ -11,6 +11,9 @@ if(BUILD_TESTS)
     include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/catch)
     add_library(catch OBJECT ${CMAKE_CURRENT_SOURCE_DIR}/catch/catch.cpp)
 
+    add_library(libtest SHARED ${CMAKE_CURRENT_SOURCE_DIR}/test.c)
+    set_target_properties(libtest PROPERTIES PREFIX "" SUFFIX ".so")
+
     file(GLOB all_test_files
         ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/files/*.cpp
@@ -18,6 +21,7 @@ if(BUILD_TESTS)
     )
 
     add_definitions("-DSRCDIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
+    add_definitions("-DBINDIR=\"${CMAKE_CURRENT_BINARY_DIR}\"")
 
     foreach(test_file IN LISTS all_test_files)
         chrp_cpp_test(${test_file})
