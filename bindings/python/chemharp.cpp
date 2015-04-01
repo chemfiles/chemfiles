@@ -163,7 +163,7 @@ BOOST_PYTHON_MODULE(chemharp){
         .add_property("natoms", &Topology::natoms)
         .add_property("natom_types", &Topology::natom_types)
         .def("clear", &Topology::clear)
-        .def("reserve", &Topology::reserve)
+        .def("resize", &Topology::resize)
 /*      TODO:
         operator[]
         void guess_bonds();

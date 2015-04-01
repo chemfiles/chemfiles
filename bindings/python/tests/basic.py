@@ -2,8 +2,10 @@
 # -* coding: utf-8 -*
 
 from chemharp import *
+import os
 
-traj = Trajectory("../../../tests/files/xyz/helium.xyz")
+traj = Trajectory(os.path.join(os.path.dirname(__file__),
+                  "../../../tests/files/xyz/helium.xyz"))
 frame = traj.read_next_step()
 
 assert(frame.has_velocities() == False)

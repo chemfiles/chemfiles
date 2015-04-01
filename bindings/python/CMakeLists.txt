@@ -23,7 +23,7 @@ find_package(PythonLibsNew REQUIRED)
 include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
 PYTHON_ADD_MODULE(_chemharp chemharp.cpp)
-
+add_dependencies(_chemharp boost_numpy)
 target_link_libraries(_chemharp
     chemharp
     boost_numpy
