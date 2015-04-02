@@ -82,6 +82,17 @@ configure_file ( # This version of the file is used for installations
   "${CMAKE_BINARY_DIR}/Chemharp.install.hpp"
 )
 
+# ============================================================================ #
+include(ExternalProject)
+ExternalProject_Add(molfile
+    PREFIX molfile
+    URL https://github.com/Luthaf/VMD-Molfiles/archive/1.9.2.tar.gz
+    URL_HASH SHA1=92c094a2536d97d953df03fe14a838382b3ebe5b
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
+)
+include_directories(${CMAKE_BINARY_DIR}/include)
+# ============================================================================ #
+
 include(Platforms)
 
 add_library(chemharp SHARED ${sources} bindings/c/capi.cpp)
@@ -95,6 +106,7 @@ if(${HAVE_NETCDF})
     add_dependencies(chemharp netcdfcxx)
     target_link_libraries(chemharp ${NETCDF_LIBRARIES} netcdf_cxx4)
 endif()
+add_dependencies(chemharp molfile)
 
 file(GLOB_RECURSE headers include/**.hpp)
 

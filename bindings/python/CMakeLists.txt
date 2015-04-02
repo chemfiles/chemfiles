@@ -11,7 +11,6 @@ ExternalProject_add(Boost.Numpy
                 -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     UPDATE_COMMAND ""
 )
-include_directories(${CMAKE_BINARY_DIR}/include)
 add_library(boost_numpy STATIC IMPORTED)
 set_property(TARGET boost_numpy
              PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/lib/libboost_numpy.a)
