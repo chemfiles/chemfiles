@@ -31,3 +31,4 @@ if __name__ == "__main__":
     fvisitor.visit(ast)
 
     write_cdef(os.path.join(FORTRAN_ROOT, "cdef.f90"), fvisitor.functions)
+    write_types(os.path.join(FORTRAN_ROOT, "ftypes.f90"), fvisitor.functions)
