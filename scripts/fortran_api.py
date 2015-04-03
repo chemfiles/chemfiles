@@ -26,3 +26,8 @@ if __name__ == "__main__":
     evisitor.visit(ast)
 
     write_enums(os.path.join(FORTRAN_ROOT, "cenums.f90"), evisitor.enums)
+
+    fvisitor = FunctionVisitor()
+    fvisitor.visit(ast)
+
+    write_cdef(os.path.join(FORTRAN_ROOT, "cdef.f90"), fvisitor.functions)

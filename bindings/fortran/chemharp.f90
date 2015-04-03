@@ -14,7 +14,7 @@ module chemharp
     implicit none
 
     include "cenums.f90"
-    !include "cdef.f90"
+    include "cdef.f90"
     !include "ftypes.f90"
 contains
     !include "fortran_interface.f90"
