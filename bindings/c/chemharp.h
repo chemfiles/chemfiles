@@ -59,7 +59,7 @@ const char* chrp_strerror(int status);
 * @brief Get the last error message.
 * @return A null-terminated string encoding the textual representation of the last error.
 */
-const char* chrp_last_error(void);
+const char* chrp_last_error();
 
 //! Available logging level
 typedef enum CHRP_LOG_LEVEL {
@@ -77,18 +77,21 @@ typedef enum CHRP_LOG_LEVEL {
 
 /*!
 * @brief Set the current log level to \c level
+* @return The status code
 */
-void chrp_loglevel(chrp_log_level_t level);
+int chrp_loglevel(chrp_log_level_t level);
 
 /*!
 * @brief Redirect the logs to \c file, overwriting the file if it exists
+* @return The status code
 */
-void chrp_logfile(const char* file);
+int chrp_logfile(const char* file);
 
 /*!
 * @brief Redirect the logs to the standard error output. This is enabled by default.
+* @return The status code
 */
-void chrp_log_stderr(void);
+int chrp_log_stderr();
 
 /******************************************************************************/
 /*!
@@ -237,7 +240,7 @@ int chrp_cell_angles_set(CHRP_CELL* cell, double alpha, double beta, double gamm
 * @param mat the matrix to fill. It should be a 3x3 matrix.
 * @return The status code
 */
-int chrp_cell_matrix(const CHRP_CELL* cell, double* mat[]);
+int chrp_cell_matrix(const CHRP_CELL* cell, double mat[3][3]);
 
 //! Available cell types in Chemharp
 typedef enum CHRP_CELL_TYPES {
