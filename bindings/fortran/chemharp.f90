@@ -17,6 +17,5 @@ module chemharp
     include "cdef.f90"
     include "ftypes.f90"
 contains
-    !include "fortran_interface.f90"
-
+    include "interface.f90"
 end module chemharp

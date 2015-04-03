@@ -4,17 +4,8 @@
 This module generate Chemharp main (fortran) types and bind specific
 functions to them, using the name of the function.
 """
-from fortran.constants import BEGINING, FTYPES
-
-FUNCTIONS = { name:[] for name in FTYPES}
-FUNCTIONS["trajectory"] = [
-    'chrp_open', 'chrp_read_step', 'chrp_read_next_step',
-    'chrp_write_step', 'chrp_close'
-]
-FUNCTIONS["free"] = [
-    'chrp_strerror', 'chrp_last_error', 'chrp_loglevel', 'chrp_logfile',
-    'chrp_log_stderr'
-]
+from fortran.constants import BEGINING
+from fortran.functions import members_functions, FUNCTIONS
 
 TEMPLATE = """
 type {name}
@@ -60,31 +51,18 @@ def write_types(path, functions):
     '''
     Generate types definitions for the fortran interface.
     '''
+    members = members_functions(functions)
+
     traj = Type("trajectory")
     for proc in FUNCTIONS["trajectory"]:
         traj.add_procedure(BoundProcedure(proc[5:], proc))
     types = [traj]
 
-    fnames = [f.name for f in functions]
-    members = {}
-    for name in fnames:
-        if name in FUNCTIONS["free"] or name in FUNCTIONS["trajectory"]:
-            continue
-        tmp = name[5:]
-        typename = tmp.split('_')[0]
-        assert(typename in FTYPES)
-        func = '_'.join(tmp.split('_')[1:])
-        if not func:
-            continue
-        try:
-            members[typename].append(func)
-        except KeyError:
-            members[typename] = [func]
-
     for typename, functions in members.items():
         t = Type(typename)
+        t.add_procedure(BoundProcedure("init", "chrp_" + typename))
         for func in functions:
-            t.add_procedure(BoundProcedure(func, "chrp_" + func))
+            t.add_procedure(BoundProcedure(func, "chrp_" + typename + "_" + func))
         types.append(t)
 
     with open(path, "w") as fd:

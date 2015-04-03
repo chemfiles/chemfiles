@@ -8,6 +8,7 @@ header.
 
 from pycparser import c_ast
 from fortran.constants import BEGINING
+from fortran.functions import TypeVisitor
 
 
 class Function:
@@ -58,6 +59,10 @@ class FunctionVisitor(c_ast.NodeVisitor):
         super(FunctionVisitor, self).__init__(*args, **kwargs)
         self.functions = []
 
+    def visit(self, *args, **kwargs):
+        super(FunctionVisitor, self).visit(*args, **kwargs)
+        return self.functions
+
     def visit_FuncDecl(self, node):
         if hasattr(node.type, "declname"):
             f = Function(node.type.declname, node.coord)
@@ -91,7 +96,9 @@ CHRP_TYPES = [
     "CHRP_ATOM", "CHRP_TRAJECTORY", "CHRP_FRAME", "CHRP_CELL", "CHRP_TOPOLOGY"
 ]
 
-C2F_TYPENAMES = {
+CHRP_TYPES_TO_F = {name:"type(c_ptr)" for name in CHRP_TYPES}
+
+C_TO_F = {
     "float": "real(kind=c_float)",
     "double": "real(kind=c_double)",
     "size_t": "integer(kind=c_size_t)",
@@ -110,42 +117,14 @@ def interface(function):
     else:
         ret_type = "integer(c_int)"
 
+    vis = TypeVisitor(C_TO_F, CHRP_TYPES_TO_F)
+
     declarations = ""
     for arg in function.args:
-        typedecl = "    "
-        if isinstance(arg.type, c_ast.TypeDecl):
-            typedecl += C2F_TYPENAMES[arg.type.type.names[0]]
-            typedecl += ", value"
-            typedecl += " :: " + arg.type.declname
-        if isinstance(arg.type, c_ast.ArrayDecl):
-            typedecl += C2F_TYPENAMES[arg.type.type.type.type.names[0]]
-            typedecl += ", dimension(3, 3)"
-            typedecl += " :: " + arg.type.type.type.declname
-        elif isinstance(arg.type, c_ast.PtrDecl):
-            if isinstance(arg.type.type, c_ast.ArrayDecl):
-                typename = C2F_TYPENAMES[arg.type.type.type.type.names[0]]
-                typedecl += typename
-                typedecl += ", dimension(:, :)".format(
-                                                  size=arg.type.type.dim.value)
-
-                typedecl += " :: " + arg.type.type.type.declname
-            else:
-                typename = arg.type.type.type.names[0]
-                if typename in CHRP_TYPES:
-                    typename = "type(c_ptr)"
-                elif typename == "char":
-                    typename = "character(len=1, kind=c_char), dimension(:)"
-                else:
-                    typename = C2F_TYPENAMES[typename]
-
-                typedecl += typename
-                if "const" in arg.type.type.quals:
-                    typedecl += ", intent(in)"
-                typedecl += " :: " + arg.type.type.declname
-
-        declarations += typedecl + "\n"
-
+        declarations += vis.visit(arg.type)
+        declarations += " :: " + arg.name + "\n"
     declarations = declarations[:-1]  # Remove last \n
+
     return TEMPLATE.format(fname=function.name,
                            args=args,
                            coord=function.coord,

@@ -14,8 +14,8 @@
 using namespace harp;
 using std::string;
 
-const char* chrp_strerror(int errno){
-    return status.message(errno);
+const char* chrp_strerror(int code){
+    return status.message(code);
 }
 
 const char* chrp_last_error(){

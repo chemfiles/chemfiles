@@ -29,60 +29,64 @@ type cell
     private
     type(c_ptr) :: ptr
 contains
-    procedure :: lengths => chrp_lengths
-    procedure :: lengths_set => chrp_lengths_set
-    procedure :: angles => chrp_angles
-    procedure :: angles_set => chrp_angles_set
-    procedure :: matrix => chrp_matrix
-    procedure :: type => chrp_type
-    procedure :: type_set => chrp_type_set
-    procedure :: periodicity => chrp_periodicity
-    procedure :: periodicity_set => chrp_periodicity_set
-    procedure :: free => chrp_free
+    procedure :: init => chrp_cell
+    procedure :: lengths => chrp_cell_lengths
+    procedure :: lengths_set => chrp_cell_lengths_set
+    procedure :: angles => chrp_cell_angles
+    procedure :: angles_set => chrp_cell_angles_set
+    procedure :: matrix => chrp_cell_matrix
+    procedure :: type => chrp_cell_type
+    procedure :: type_set => chrp_cell_type_set
+    procedure :: periodicity => chrp_cell_periodicity
+    procedure :: periodicity_set => chrp_cell_periodicity_set
+    procedure :: free => chrp_cell_free
 end type
 
 type frame
     private
     type(c_ptr) :: ptr
 contains
-    procedure :: size => chrp_size
-    procedure :: positions => chrp_positions
-    procedure :: positions_set => chrp_positions_set
-    procedure :: velocities => chrp_velocities
-    procedure :: velocities_set => chrp_velocities_set
-    procedure :: free => chrp_free
+    procedure :: init => chrp_frame
+    procedure :: size => chrp_frame_size
+    procedure :: positions => chrp_frame_positions
+    procedure :: positions_set => chrp_frame_positions_set
+    procedure :: velocities => chrp_frame_velocities
+    procedure :: velocities_set => chrp_frame_velocities_set
+    procedure :: free => chrp_frame_free
 end type
 
 type atom
     private
     type(c_ptr) :: ptr
 contains
-    procedure :: mass => chrp_mass
-    procedure :: mass_set => chrp_mass_set
-    procedure :: charge => chrp_charge
-    procedure :: charge_set => chrp_charge_set
-    procedure :: name => chrp_name
-    procedure :: name_set => chrp_name_set
-    procedure :: free => chrp_free
+    procedure :: init => chrp_atom
+    procedure :: mass => chrp_atom_mass
+    procedure :: mass_set => chrp_atom_mass_set
+    procedure :: charge => chrp_atom_charge
+    procedure :: charge_set => chrp_atom_charge_set
+    procedure :: name => chrp_atom_name
+    procedure :: name_set => chrp_atom_name_set
+    procedure :: free => chrp_atom_free
 end type
 
 type topology
     private
     type(c_ptr) :: ptr
 contains
-    procedure :: append => chrp_append
-    procedure :: remove => chrp_remove
-    procedure :: isbond => chrp_isbond
-    procedure :: isangle => chrp_isangle
-    procedure :: isdihedral => chrp_isdihedral
-    procedure :: bonds_count => chrp_bonds_count
-    procedure :: angles_count => chrp_angles_count
-    procedure :: dihedrals_count => chrp_dihedrals_count
-    procedure :: bonds => chrp_bonds
-    procedure :: angles => chrp_angles
-    procedure :: dihedrals => chrp_dihedrals
-    procedure :: add_bond => chrp_add_bond
-    procedure :: remove_bond => chrp_remove_bond
-    procedure :: free => chrp_free
-    procedure :: atom => chrp_atom
+    procedure :: init => chrp_topology
+    procedure :: append => chrp_topology_append
+    procedure :: remove => chrp_topology_remove
+    procedure :: isbond => chrp_topology_isbond
+    procedure :: isangle => chrp_topology_isangle
+    procedure :: isdihedral => chrp_topology_isdihedral
+    procedure :: bonds_count => chrp_topology_bonds_count
+    procedure :: angles_count => chrp_topology_angles_count
+    procedure :: dihedrals_count => chrp_topology_dihedrals_count
+    procedure :: bonds => chrp_topology_bonds
+    procedure :: angles => chrp_topology_angles
+    procedure :: dihedrals => chrp_topology_dihedrals
+    procedure :: add_bond => chrp_topology_add_bond
+    procedure :: remove_bond => chrp_topology_remove_bond
+    procedure :: free => chrp_topology_free
+    procedure :: atom => chrp_topology_atom
 end type

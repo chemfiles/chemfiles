@@ -7,6 +7,7 @@ import os
 from fortran.cenums import write_enums, EnumVisitor
 from fortran.cdef import write_cdef, FunctionVisitor
 from fortran.ftypes import write_types
+from fortran.interface import write_interface
 from pycparser import parse_file
 
 
@@ -28,7 +29,8 @@ if __name__ == "__main__":
     write_enums(os.path.join(FORTRAN_ROOT, "cenums.f90"), evisitor.enums)
 
     fvisitor = FunctionVisitor()
-    fvisitor.visit(ast)
+    functions = fvisitor.visit(ast)
 
-    write_cdef(os.path.join(FORTRAN_ROOT, "cdef.f90"), fvisitor.functions)
-    write_types(os.path.join(FORTRAN_ROOT, "ftypes.f90"), fvisitor.functions)
+    write_cdef(os.path.join(FORTRAN_ROOT, "cdef.f90"), functions)
+    write_types(os.path.join(FORTRAN_ROOT, "ftypes.f90"), functions)
+    write_interface(os.path.join(FORTRAN_ROOT, "interface.f90"), functions)
