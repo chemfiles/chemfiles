@@ -158,6 +158,18 @@ You can also use :command:`pip` to install ``numpy`` if you prefer doing so.
 .. _Boost.Python: http://www.boost.org/doc/libs/1_57_0/libs/python/doc/
 
 Then, compiling the Python interface to Chemharp can be activated by the
-``-DENABLE_PYTHON=ON`` option for :command:`cmake`. The usual :command:`make install`
+``-DPYTHON_BINDING=ON`` option for :command:`cmake`. The usual :command:`make install`
 will then compile and install the python extention at the right place. After that,
 you should be able to ``import chemharp`` from Python prompt.
+
+Fortran interface
+^^^^^^^^^^^^^^^^^
+
+The Fortran interface needs a Fortran 95 capable compiler, with support for the
+``iso_c_binding`` module from Fortran 2003. The vast majority of Fortran 95
+compiler does support at least this module from Fortran 2003. In particular,
+``gfortran`` version 4.6 and upper and Intel Fortran version 10.0 and upper should
+work.
+
+Then, the Fortran interface is activated with the ``-DFORTRAN_BINDING=ON``
+option at :command:`cmake` comand line.
