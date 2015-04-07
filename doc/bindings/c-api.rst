@@ -111,11 +111,15 @@ Function manipulating ``CHRP_TOPOLOGY``
 
 .. doxygenfunction:: chrp_topology
 
-.. doxygenfunction:: chrp_topology_is_bond
+.. doxygenfunction:: chrp_topology_append
 
-.. doxygenfunction:: chrp_topology_is_angle
+.. doxygenfunction:: chrp_topology_remove
 
-.. doxygenfunction:: chrp_topology_is_dihedral
+.. doxygenfunction:: chrp_topology_isbond
+
+.. doxygenfunction:: chrp_topology_isangle
+
+.. doxygenfunction:: chrp_topology_isdihedral
 
 .. doxygenfunction:: chrp_topology_bonds_count
 
@@ -131,7 +135,7 @@ Function manipulating ``CHRP_TOPOLOGY``
 
 .. doxygenfunction:: chrp_topology_add_bond
 
-.. doxygenfunction:: chrp_topology_delete_bond
+.. doxygenfunction:: chrp_topology_remove_bond
 
 .. doxygenfunction:: chrp_topology_free
 
