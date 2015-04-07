@@ -52,8 +52,13 @@ of ``Atom`` in the system.
 Atom: building blocks for simulations
 -------------------------------------
 
-The ``Atom`` type contains basic information about the particles in the system:
-the name (if it is disponible), mass, kind of particle and so on.
+The ``Atom`` type contains basic information about the atoms in the system:
+the name (if it is disponible), mass, kind of atom and so on. Atoms are not
+limited to plain chemical elements. Four types of atoms are defined: *Element*
+are Atoms from the periodic classification; *Corse grained* atoms are particles
+taking together more than one element (*CH4* or *H2O* are examples); *Dummy*
+atoms are fictitous points associated with some data, like the fourth site in
+the TIP4P model of water; and *Undefined* atoms are all the other atoms types.
 
 .. _overview-cell:
 
@@ -61,4 +66,7 @@ UnitCell: wrapping the atoms together
 -------------------------------------
 
 The ``UnitCell`` type describe the boundary conditions of the system: where are
-the boundaries, and what is the periodicity of theses boundaries.
+the boundaries, and what is the periodicity of theses boundaries. An unit cell
+can be of three types: *Infinite*, *Orthorombic* or *Triclinic*. Inifinite cells
+does not have any boundaries. Orthorombic cells are defined by three orthogonals
+vectors, and Triclinic cells are defined by three vectors without any constrains.

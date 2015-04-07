@@ -105,7 +105,7 @@ BOOST_PYTHON_MODULE(chemharp){
         .def("velocities",
             static_cast<const Array3D& (Frame::*)(void) const>(&Frame::velocities),
             py::return_value_policy<Array3D_convertor>())
-        .def("has_velocities", &Frame::has_velocities)
+        .add_property("has_velocities", &Frame::has_velocities)
         .def("__len__", &Frame::natoms)
         .add_property("natoms", &Frame::natoms)
         .add_property("topology",
@@ -170,6 +170,10 @@ BOOST_PYTHON_MODULE(chemharp){
         vector<bond> bonds(void);
         vector<angle> angles(void);
         vector<dihedral> dihedrals(void);
+        isbond,
+        isangle,
+        isdihedral,
+        constuctor
 */
     ;
 
