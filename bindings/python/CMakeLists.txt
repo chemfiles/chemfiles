@@ -33,3 +33,16 @@ target_link_libraries(_chemharp
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_chemharp.so
         DESTINATION ${PYTHON_SITE_PACKAGES}
         RENAME chemharp.so)
+
+function(chrp_python_test _file_)
+    get_filename_component(_name_ ${_file_} NAME_WE)
+    add_test(NAME python-${_name_} COMMAND ${PYTHON_EXECUTABLE} ${_file_})
+endfunction()
+
+if(BUILD_TESTS)
+    file(GLOB python_test_files ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.py)
+
+    foreach(test_file IN LISTS python_test_files)
+        chrp_python_test(${test_file})
+    endforeach(test_file)
+endif()
