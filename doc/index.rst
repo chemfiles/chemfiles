@@ -65,11 +65,11 @@ The interfaces for the other supported languages are described in the links belo
     installation
     overview
     example
+    formats
     bindings/cpp-api
     bindings/c-api
     bindings/python-api
     bindings/fortran-api
-    formats
 
 .. _classes-reference:
 
