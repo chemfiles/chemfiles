@@ -7,8 +7,13 @@ header.
 """
 
 from pycparser import c_ast
-from fortran.constants import BEGINING
+from fortran.constants import BEGINING, FTYPES
 from fortran.functions import TypeVisitor
+
+SPECIAL_CONSTRUCTORS = {
+    "chrp_open": "trajectory",
+    "chrp_topology_atom": "atom",
+}
 
 
 class Function:
@@ -33,6 +38,23 @@ class Function:
         if args:
             args = args[:-2]
         return args
+
+    @property
+    def is_constructor(self):
+        if not self.return_ptr:
+            return False
+        if self.name[5:] in FTYPES:
+            return True
+        if self.name in SPECIAL_CONSTRUCTORS.keys():
+            return True
+        return False
+
+    def return_type(self):
+        assert(self.is_constructor)
+        try:
+            return SPECIAL_CONSTRUCTORS[self.name]
+        except KeyError:
+            return self.name[5:]
 
 
 class Argument:

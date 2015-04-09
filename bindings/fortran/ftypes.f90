@@ -67,6 +67,7 @@ contains
     procedure :: name => chrp_atom_name
     procedure :: name_set => chrp_atom_name_set
     procedure :: free => chrp_atom_free
+    procedure :: init_topology => chrp_topology_atom
 end type
 
 type topology
@@ -88,5 +89,4 @@ contains
     procedure :: add_bond => chrp_topology_add_bond
     procedure :: remove_bond => chrp_topology_remove_bond
     procedure :: free => chrp_topology_free
-    procedure :: atom => chrp_topology_atom
 end type

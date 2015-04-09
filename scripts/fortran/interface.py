@@ -30,6 +30,11 @@ function {name}({args}) result(string)
 end function
 """
 
+COPY_RETURN_STATUS = """
+    if (present(status)) then
+        status = status_tmp_
+    end if"""
+
 CHRP_TYPES_TO_F = {
     "CHRP_ATOM": "class(atom)",
     "CHRP_TRAJECTORY": "class(trajectory)",
@@ -50,6 +55,24 @@ C_TO_F = {
 }
 
 
+def call_interface(args):
+    '''
+    Translate the arguments from fortran to C in function call
+    '''
+    interface = "("
+
+    f_types = [name + "_" for name in FTYPES]
+    f_types.append("this")
+
+    for arg in args.split(", "):
+        if arg in f_types:
+            interface += arg + "%ptr, "
+        else:
+            interface += arg + ", "
+    interface = interface[:-2]
+    interface += ")"
+    return interface
+
 def write_interface(path, functions):
     '''
     Generate fortran subroutines corresponding to the C functions
@@ -58,18 +81,10 @@ def write_interface(path, functions):
     vis = TypeVisitor(C_TO_F, CHRP_TYPES_TO_F, target="fortran")
 
     for function in functions:
-        # We make a special case for chrp_open, as it will be the only function
-        # not folowing the pattern
-        if function.name == "chrp_open":
-            T = Type("trajectory")
-            new_arg = Argument("this", T)
-            function.args = [new_arg] + function.args
-            continue
-
         # If the function is a constructor, prepend the "this" argument in the
         # arguments list
-        if function.name[5:] in FTYPES:
-            T = Type(function.name[5:])
+        if function.is_constructor:
+            T = Type(function.return_type())
             new_arg = Argument("this", T)
             function.args = [new_arg] + function.args
 
@@ -99,6 +114,7 @@ def write_interface(path, functions):
         fd.write(BEGINING)
         for function in functions:
             declarations = ""
+            instructions = ""
             for arg in function.args:
                 declarations += vis.visit(arg.type)
                 declarations += " :: " + arg.name + "\n"
@@ -111,12 +127,20 @@ def write_interface(path, functions):
                             declarations=declarations))
             else:
                 args=function.args_str()
-                if not function.return_ptr:
+
+                if function.is_constructor:
+                    instructions = "    this%ptr = "
+                    instructions += function.name + "_c" + call_interface(args[6:])
+                else:
+                    instructions = "    status_tmp_ = "
+                    instructions += function.name + "_c" + call_interface(args)
                     args = args + ", status" if args else "status"
                     declarations += "\n    integer, optional :: status"
+                    declarations += "\n    integer :: status_tmp_"
+                    instructions += COPY_RETURN_STATUS
 
                 fd.write(TEMPLATE.format(
                             name=function.name,
                             args=args,
                             declarations=declarations,
-                            instructions="! TODO"))
+                            instructions=instructions))

@@ -65,6 +65,10 @@ def write_types(path, functions):
             t.add_procedure(BoundProcedure(func, "chrp_" + typename + "_" + func))
         types.append(t)
 
+        if typename == "atom":
+            t.add_procedure(BoundProcedure("init_topology",
+                                           "chrp_topology_atom"))
+
     with open(path, "w") as fd:
         fd.write(BEGINING)
         for t in types:

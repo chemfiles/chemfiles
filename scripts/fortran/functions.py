@@ -15,6 +15,7 @@ FUNCTIONS = {
         'chrp_strerror', 'chrp_last_error', 'chrp_loglevel',
         'chrp_logfile', 'chrp_log_stderr'
     ],
+    "atom": ['chrp_topology_atom']
 }
 
 
@@ -24,8 +25,13 @@ def members_functions(functions):
     '''
     fnames = [f.name for f in functions]
     members = {}
+
+    ignored = []
+    for names in FUNCTIONS.values():
+        ignored.extend(names)
+
     for name in fnames:
-        if name in FUNCTIONS["free"] or name in FUNCTIONS["trajectory"]:
+        if name in ignored:
             continue
         tmp = name[5:]
         typename = tmp.split('_')[0]
@@ -37,7 +43,6 @@ def members_functions(functions):
             members[typename].append(func)
         except KeyError:
             members[typename] = [func]
-
     return members
 
 
