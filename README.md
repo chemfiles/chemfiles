@@ -22,16 +22,15 @@ to re-use it as needed.
 
 ## Goals
 
-The Chemharp library tries to be:
+The Chemharp library tries to:
 
- - Easy and simple to use. There are only five main classes, which are really
+ - Be easy and simple to use. There are only five main classes, which are really
    easy to understand. No messy templates and uninformative functions names;
- - Multi-languages, it can be used from whatever language you prefer. If your
-   favorite language is not supported, it have a clean C interface so that you
+ - Be a multi-languages library, usable from whatever language you prefer. If your
+   favorite language is not supported, Chemharp have a clean C interface so that you
    can add a binding;
- -
-
-
+ - Do one thing, and do it well. Following the UNIX idea, Chemharp tries to do
+   only one thing, but doing it well.
 
 ## Features
 
@@ -84,7 +83,9 @@ cd build
 cmake ..
 ```
 
-You can also configure the build at command line. The mains options are `-DBUILD_TESTS=ON` to build the tests suite, and `-DBUILD_DOCUMENTATION` to build a local copy of the documentation.
+You can also configure the build at command line. The mains options are
+`-DBUILD_TESTS=ON` to build the tests suite, and `-DBUILD_DOCUMENTATION=ON`
+to build a local copy of the documentation.
 
 Then, you can build and install the library by running the following commands:
 ```bash
@@ -162,7 +163,9 @@ int main(){
 
 TODO: add a link to the doc
 
-## Why not OpenBabel ?
+## Why not use OpenBabel ?
+
+OpenBabel is another software for reading and writing chemistry trajectory files.
 
 Hard question … OpenBabel is a pretty big and good piece of software. I just
 didn't find in this project what I was looking for: a simple abstraction on the
@@ -173,11 +176,11 @@ file format to an other, and not for analysis.
 Moreover, OpenBabel is GPL software, which might make it harder to use by
 other softwares. For that point, MPL is (in my own opinion) a good compromise:
 you have to publish the files you modified under MPL, but you can use whatever
-licence you want for the rest of your code.
+license you want for the rest of your code.
 
 But maybe I am just reinventing the squared wheel =)
 
-## Licence
+## License
 
 All this code is copyrighted by Guillaume Fraux, and put to your disposition
-under the termes of the Mozilla Public Licence v2.0.
+under the terms of the Mozilla Public License v2.0.
