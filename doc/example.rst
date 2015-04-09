@@ -164,4 +164,4 @@ Python example
         print("  - {}".format(i))
 
 
-TODO: add example with more than one frame
+.. TODO:: add example with more than one frame

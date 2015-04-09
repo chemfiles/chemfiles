@@ -21,6 +21,7 @@ if read_the_docs_build:
 # ones.
 extensions = [
     'sphinx.ext.mathjax',
+    'sphinx.ext.todo',
     'breathe',
 ]
 
