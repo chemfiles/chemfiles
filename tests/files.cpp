@@ -14,7 +14,7 @@ TEST_CASE("Read a text file", "[Files]"){
     BasicFile file(FILESDIR "xyz/helium.xyz");
     REQUIRE(file.is_open());
 
-    CHECK(file.nlines() == 128);
+    CHECK(file.nlines() == 50419);
 
     std::string line = file.getline();
     CHECK(line == "125");
@@ -25,7 +25,7 @@ TEST_CASE("Read a text file", "[Files]"){
     CHECK(lines[1] == "He 0.49053 8.41351 0.0777257");
 
     // Geting line count after some operations
-    CHECK(file.nlines() == 128);
+    CHECK(file.nlines() == 50419);
 
     file.rewind();
     line = file.getline();
