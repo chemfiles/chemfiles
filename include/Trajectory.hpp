@@ -66,12 +66,23 @@ public:
     Trajectory& operator<<(const Frame& frame);
     //! Write operator, in *method* version
     void write_step(const Frame& frame);
+
+    //! Get the number of steps (the number of Frames) in this trajectory
+    size_t nsteps() {return _nsteps;}
+    //! Have we read all the Frames in this file ?
+    bool done();
 private:
     //! Cache a frame, as it can get very heavy
     Frame _frame;
-    //! Used format
+    //! Current step
+    size_t _step;
+    //! Number of steps in the file, if available
+    size_t _nsteps;
+    //! TODO
+    std::unique_ptr<Topology> _topology;
+    //! Format used to read the file
     std::unique_ptr<Format> _format;
-    //! File, to be shared with the format.
+    //! The file we are reading from
     std::unique_ptr<File> _file;
 };
 

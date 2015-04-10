@@ -32,7 +32,6 @@ public:
     * @brief Read a specific step from the internal file.
     * @param file The file to read from.
     * @param step The step to read
-    * @return A reference to the read frame
     *
     * This function can throw an exception in case of error.
     */
@@ -41,7 +40,6 @@ public:
     /*!
     * @brief Read a specific step from a file.
     * @param file The file to read from.
-    * @return A reference to the read frame
     *
     * This function can throw an exception in case of error. The cursor is
     * assumed to be at the right position in case of text files.
@@ -52,11 +50,17 @@ public:
     * @brief Write a step (frame) to a file.
     * @param file The file to read from.
     * @param frame The frame to be writen
-    * @return A reference to the read frame
     *
     * This function can throw an exception in case of error.
     */
     virtual void write_step(File* file, const Frame& frame);
+
+    /*!
+    * @brief Get the number of frames in a file
+    * @param file The file to read from.
+    * @return The number of frames
+    */
+    virtual size_t nsteps(File* file) const = 0;
 
     //! A short string describing the format.
     virtual std::string description() const = 0;

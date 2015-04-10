@@ -15,6 +15,7 @@ class DummyFormat : public Format {
 public:
     DummyFormat(){}
     std::string description() const {return "";}
+    size_t nsteps(File*) const {return 0;}
     REGISTER_FORMAT;
 };
 
@@ -22,6 +23,7 @@ class DummyFormat2 : public Format {
 public:
     DummyFormat2(){}
     std::string description() const {return "";}
+    size_t nsteps(File*) const {return 0;}
     REGISTER_FORMAT;
 };
 REGISTER(DummyFormat, "Dummy");

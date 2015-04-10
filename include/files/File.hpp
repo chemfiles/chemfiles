@@ -79,6 +79,8 @@ public:
     virtual inline void rewind() = 0;
     //! Number of lines in the file
     virtual size_t nlines() = 0;
+    //! Are we at the end of the file ?
+    virtual bool eof() = 0;
 
     //! Write any data to the file in stream version
     virtual TextFile& operator<<(const any& data) = 0;
@@ -110,8 +112,9 @@ public:
     }
     virtual size_t nlines();
 
-    virtual bool is_open(void) {return stream.is_open();}
-    virtual void close(void) {return stream.close();}
+    virtual bool is_open() {return stream.is_open();}
+    virtual void close() {return stream.close();}
+    virtual bool eof() {return stream.eof();}
 
     virtual BasicFile& operator<<(const any& data);
     virtual void writeline(const std::string& line);

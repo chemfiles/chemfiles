@@ -22,22 +22,38 @@ std::string XYZFormat::description() const {
     return "XYZ file format.";
 }
 
+// Quick forward the file for nsteps
+static void forward(TextFile* file, size_t nsteps) {
+    size_t i=0;
+    // Move the file pointer to the good position
+    while (i < nsteps){
+        try {
+            auto natoms = std::stoul(file->getline());
+            file->readlines(natoms+1);
+        }
+        catch (const FileError& e) {
+            throw FormatError("Can not read step " + std::to_string(nsteps) +
+                                  ": " + e.what());
+        }
+        i++;
+    }
+}
+
+size_t XYZFormat::nsteps(File* file) const {
+    auto textfile = dynamic_cast<TextFile*>(file);
+    textfile->rewind();
+    size_t n = 0;
+    while (not textfile->eof()) {
+        forward(textfile, 1);
+        n++;
+    }
+    return n;
+}
+
 void XYZFormat::read_at_step(File* file, const size_t step, Frame& frame){
     auto textfile = dynamic_cast<TextFile*>(file);
     textfile->rewind();
-    size_t i=0;
-    while (i < step - 1){
-        // Move the file pointer to the good position
-        try {
-            size_t natoms = std::stoul(textfile->getline());
-            textfile->readlines(natoms+1);
-        }
-        catch (const FileError& e) {
-            throw FormatError("Can not read step " + std::to_string(step) +
-                                  ": " + e.what());
-        }
-        i += 1;
-    }
+    forward(textfile, step - 1);
     read_next_step(file, frame);
 }
 

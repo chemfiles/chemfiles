@@ -26,6 +26,13 @@ std::string NCFormat::description() const {
     return "Amber NetCDF file format.";
 }
 
+size_t NCFormat::nsteps(File* file) const {
+    auto ncfile = dynamic_cast<NCFile*>(file);
+    validate(ncfile);
+    auto nsteps = ncfile->dimmension("frame");
+    return static_cast<size_t>(nsteps);
+}
+
 // Register the Amber NetCDF format with the ".nc" extension and the
 // "AmberNetCDF" description.
 REGISTER_WITH_FILE(NCFormat, "AmberNetCDF", NCFile);
@@ -63,22 +70,21 @@ static bool is_valid(NCFile* file){
     return validity;
 }
 
-void NCFormat::read_at_step(File* file, const size_t _step, Frame& frame){
-    auto ncfile = dynamic_cast<NCFile*>(file);
+void NCFormat::validate(NCFile* file) const{
     // Using the pointer adress before I come up with a better hash function
     auto file_hash = reinterpret_cast<size_t>(file);
     if (last_file_hash != file_hash){
         last_file_hash = file_hash;
-        last_file_was_valid = is_valid(ncfile);
+        last_file_was_valid = is_valid(file);
     }
     if (not last_file_was_valid)
         throw FormatError("Invalid AMBER NetCDF file " + file->name());
+}
 
-    auto nsteps = ncfile->dimmension("frame");
-    if (step > nsteps)
-        throw FormatError("Can not read step " + std::to_string(step) +
-                          ". Maximum step is " + std::to_string(nsteps) );
+void NCFormat::read_at_step(File* file, const size_t _step, Frame& frame){
+    auto ncfile = dynamic_cast<NCFile*>(file);
 
+    validate(ncfile);
     // Set the internal step before further reading
     step = _step;
     reserve(ncfile->dimmension("atom"));

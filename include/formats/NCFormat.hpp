@@ -36,6 +36,7 @@ public:
 
     void read_at_step(File* file, const size_t step, Frame& frame);
     void read_next_step(File* file, Frame& frame);
+    size_t nsteps(File* file) const;
     std::string description() const;
 private:
     //! Reserve size for \c natoms on the internal cache.
@@ -49,13 +50,15 @@ private:
     //! Generic function to read an Array3D at the current internal step,
     //! assumed to be valid.
     void read_array3D(NCFile* file, Array3D& arr, const string& name) const;
+    //! Validate a file before reading it
+    void validate(NCFile* file) const;
 
     //! Last read step
-    size_t step;
+    mutable size_t step;
     //! Store the adress of the last read file, and its validity
-    size_t last_file_hash;
+    mutable size_t last_file_hash;
     //! Was the last seen file valid ?
-    bool last_file_was_valid;
+    mutable bool last_file_was_valid;
     // Temporary cache for read and write operations.
     mutable std::vector<float> cache;
     // Let's register the format
