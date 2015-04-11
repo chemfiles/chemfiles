@@ -7,7 +7,7 @@ using namespace harp;
 namespace fs=boost::filesystem;
 const double EPS = 1e-5;
 
-#define NCDIR SRCDIR "/files/netcdf/"
+#define NCDIR SRCDIR "/data/netcdf/"
 
 #include <iostream>
 using namespace std;

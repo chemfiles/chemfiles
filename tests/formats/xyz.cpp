@@ -9,7 +9,7 @@ using namespace harp;
 #include <boost/filesystem.hpp>
 namespace fs=boost::filesystem;
 
-#define XYZDIR SRCDIR "/files/xyz/"
+#define XYZDIR SRCDIR "/data/xyz/"
 
 TEST_CASE("Read files in XYZ format", "[XYZ]"){
     auto file = Trajectory(XYZDIR"helium.xyz");
