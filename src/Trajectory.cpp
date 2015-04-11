@@ -37,7 +37,8 @@ Trajectory::Trajectory(const string& filename, const string& mode, const string&
         // Defaulting to a BasicFile
         _file = std::unique_ptr<File>(new BasicFile(filename, mode));
     }
-    _nsteps = _format->nsteps(_file.get());
+    if (mode == "r")
+        _nsteps = _format->nsteps(_file.get());
 }
 
 Trajectory::~Trajectory(){}
@@ -48,7 +49,7 @@ Trajectory& Trajectory::operator>>(Frame& frame){
 }
 
 const Frame& Trajectory::read_next_step(){
-    if (_step > _nsteps)
+    if (_step >= _nsteps)
         throw FileError("Can not read file \"" + _file->name() + "\" past end.");
     _format->read_next_step(_file.get(), _frame);
     _step++;
@@ -56,7 +57,7 @@ const Frame& Trajectory::read_next_step(){
 }
 
 const Frame& Trajectory::read_at_step(const size_t step){
-    if (_step > _nsteps)
+    if (_step >= _nsteps)
         throw FileError(
             "Can not read file \"" + _file->name() + "\" at step " +
             std::to_string(step) + ". Max step is " + std::to_string(_nsteps) + "."
@@ -67,12 +68,14 @@ const Frame& Trajectory::read_at_step(const size_t step){
 }
 
 Trajectory& Trajectory::operator<<(const Frame& frame){
-    _format->write_step(_file.get(), frame);
+    write_step(frame);
     return *this;
 }
 
 void Trajectory::write_step(const Frame& frame){
     _format->write_step(_file.get(), frame);
+    _step++;
+    _nsteps++;
 }
 
 void Trajectory::close(){
