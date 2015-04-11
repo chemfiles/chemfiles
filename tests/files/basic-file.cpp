@@ -41,7 +41,7 @@ TEST_CASE("Read a text file", "[Files]"){
 }
 
 TEST_CASE("Write a text file", "[Files]"){
-    BasicFile file(SRCDIR"/tmp.dat", "w");
+    BasicFile file("tmp.dat", "w");
     REQUIRE(file.is_open());
 
     file << "Test" << "\n";
@@ -55,7 +55,7 @@ TEST_CASE("Write a text file", "[Files]"){
 
     file.close();
 
-    std::ifstream verification(SRCDIR"/tmp.dat");
+    std::ifstream verification("tmp.dat");
     REQUIRE(verification.is_open());
 
     std::string line;

@@ -25,35 +25,54 @@ TEST_CASE("Read a NetCDF file", "[Files]"){
     CHECK(file.f_attribute("cell_lengths", "scale_factor") == 1.0f);
 
     auto var = file.variable("coordinates");
-    // var->name() has NcToke, i.e. const char* type.
-    CHECK(std::string(var->name()) == "coordinates");
-    CHECK(var->num_dims() == 3);
-    auto edges = var->edges();
-    CHECK(edges[0] == 100);
-    CHECK(edges[1] == 297);
-    CHECK(edges[2] == 3);
-    delete[] edges; // We have to delete edges ourselves.
+    CHECK(var.getDimCount() == 3);
+    auto dims = var.getDims();
+    CHECK(dims[0].getSize() == 100);
+    CHECK(dims[1].getSize() == 297);
+    CHECK(dims[2].getSize() == 3);
 
-    auto positions = new float[297*3];
+    auto positions = std::vector<float>(297*3);
     float EPS = 1e-5f;
-    CHECK(var->get(positions, 1, 297, 3));
+    var.getVar(std::vector<size_t>{0, 0, 0},
+               std::vector<size_t>{1, 297, 3},
+               positions.data());
     CHECK(fabs(positions[0] - 0.4172191f) < EPS);
     CHECK(fabs(positions[1] - 8.303366f) < EPS);
     CHECK(fabs(positions[2] - 11.73717f) < EPS);
-
-    delete[] positions;
 }
 
 TEST_CASE("Errors in NetCDF files", "[Files]"){
     NCFile file(FILESDIR "netcdf/water.nc");
-    // Silent error messages.
-    auto error = NcError(NcError::silent_nonfatal);
     REQUIRE(file.is_open());
+
     CHECK_THROWS_AS(file.global_attribute("FOO"), FileError);
     CHECK_THROWS_AS(file.dimmension("FOO"), FileError);
     CHECK_THROWS_AS(file.s_attribute("cell_lengths", "Bar"), FileError);
     CHECK_THROWS_AS(file.f_attribute("cell_lengths", "Bar"), FileError);
     CHECK_THROWS_AS(file.variable("FOO"), FileError);
+}
+
+TEST_CASE("Write NetCDF files", "[Files]"){
+    NCFile file("tmp.nc", "w");
+    REQUIRE(file.is_open());
+
+    file.add_global_attribute("global", "global.value");
+    file.add_dimmension("infinite");
+    file.add_dimmension("finite", 42);
+    file.add_f_variable("variable", "infinite", "finite");
+    file.add_s_attribute("variable", "variable.string", "hello");
+    file.add_f_attribute("variable", "variable.float", 35.67f);
+
+    file.close();
+
+    NCFile check("tmp.nc");
+    CHECK(check.global_attribute("global") == "global.value");
+    CHECK(check.dimmension("infinite") == 0);
+    CHECK(check.dimmension("finite") == 42);
+    CHECK(check.s_attribute("variable", "variable.string") == "hello");
+    CHECK(check.f_attribute("variable", "variable.float") == 35.67f);
+
+    unlink("tmp.nc");
 }
 
 #endif // HAVE_NETCDF

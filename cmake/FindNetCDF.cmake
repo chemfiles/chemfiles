@@ -9,16 +9,20 @@
 # Your package can require certain interfaces to be FOUND by setting these
 #
 #  NETCDF_CXX         - require the C++ interface and link the C++ library
+#  NETCDF_CXX         - require the C++ legacy interface and link the C++ library
 #  NETCDF_F77         - require the F77 interface and link the fortran library
 #  NETCDF_F90         - require the F90 interface and link the fortran library
+#  NETCDF_F03         - require the F2003 interface and link the fortran library
 #
 # The following are not for general use and are included in
 # NETCDF_LIBRARIES if the corresponding option above is set.
 #
-#  NETCDF_LIBRARIES_C    - Just the C interface
-#  NETCDF_LIBRARIES_CXX  - C++ interface, if available
-#  NETCDF_LIBRARIES_F77  - Fortran 77 interface, if available
-#  NETCDF_LIBRARIES_F90  - Fortran 90 interface, if available
+#  NETCDF_LIBRARIES_C           - Just the C interface
+#  NETCDF_LIBRARIES_CXX         - C++ interface, if available
+#  NETCDF_LIBRARIES_CXX_LEGACY  - C++ legacy interface, if available
+#  NETCDF_LIBRARIES_F77         - Fortran 77 interface, if available
+#  NETCDF_LIBRARIES_F90         - Fortran 90 interface, if available
+#  NETCDF_LIBRARIES_F03         - Fortran 2003 interface, if available
 #
 # Normal usage would be:
 #  set (NETCDF_F90 "YES")
@@ -58,7 +62,8 @@ macro (NetCDF_check_interface lang header libs)
   endif (NETCDF_${lang})
 endmacro (NetCDF_check_interface)
 
-NetCDF_check_interface (CXX netcdfcpp.h netcdf_c++)
+NetCDF_check_interface (CXX netcdf netcdf_c++4)
+NetCDF_check_interface (CXX_LEGACY netcdfcpp.h netcdf_c++)
 NetCDF_check_interface (F77 netcdf.inc  netcdff)
 NetCDF_check_interface (F90 netcdf.mod  netcdff)
 
