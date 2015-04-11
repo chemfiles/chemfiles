@@ -95,18 +95,34 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
     "X 1 2 3\n"
     "X 1 2 3\n"
     "X 1 2 3\n"
-    "X 1 2 3\n";
+    "X 1 2 3\n"
+    "6\n"
+    "Written by Chemharp\n"
+    "X 4 5 6\n"
+    "X 4 5 6\n"
+    "X 4 5 6\n"
+    "X 4 5 6\n"
+    "X 4 5 6\n"
+    "X 4 5 6\n";
 
-    Frame frame(0);
+    Array3D positions(4);
+    for(size_t i=0; i<4; i++)
+        positions[i] = Vector3D(1, 2, 3);
+
+    Frame frame;
     frame.topology(dummy_topology(4));
-
-    Array3D positions;
-    for(int i=0; i<4; i++)
-        positions.push_back(Vector3D(1, 2, 3));
-
     frame.positions(positions);
 
     auto file = Trajectory("test-tmp.xyz", "w");
+    file << frame;
+
+    positions.resize(6);
+    for(size_t i=0; i<6; i++)
+        positions[i] = Vector3D(4, 5, 6);
+
+    frame.topology(dummy_topology(6));
+    frame.positions(positions);
+
     file << frame;
     file.close();
 
