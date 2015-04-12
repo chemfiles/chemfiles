@@ -21,8 +21,8 @@ TEST_CASE("Read a NetCDF file", "[Files]"){
     // Unlimited dimension
     CHECK(file.dimmension("frame") == 100);
 
-    CHECK(file.s_attribute("cell_lengths", "units") == "Angstrom");
-    CHECK(file.f_attribute("cell_lengths", "scale_factor") == 1.0f);
+    CHECK(file.attribute<string>("cell_lengths", "units") == "Angstrom");
+    CHECK(file.attribute<float>("cell_lengths", "scale_factor") == 1.0f);
 
     auto var = file.variable("coordinates");
     CHECK(var.getDimCount() == 3);
@@ -47,8 +47,7 @@ TEST_CASE("Errors in NetCDF files", "[Files]"){
 
     CHECK_THROWS_AS(file.global_attribute("FOO"), FileError);
     CHECK_THROWS_AS(file.dimmension("FOO"), FileError);
-    CHECK_THROWS_AS(file.s_attribute("cell_lengths", "Bar"), FileError);
-    CHECK_THROWS_AS(file.f_attribute("cell_lengths", "Bar"), FileError);
+    CHECK_THROWS_AS(file.attribute<float>("cell_lengths", "Bar"), FileError);
     CHECK_THROWS_AS(file.variable("FOO"), FileError);
 }
 
@@ -59,9 +58,9 @@ TEST_CASE("Write NetCDF files", "[Files]"){
     file.add_global_attribute("global", "global.value");
     file.add_dimmension("infinite");
     file.add_dimmension("finite", 42);
-    file.add_f_variable("variable", "infinite", "finite");
-    file.add_s_attribute("variable", "variable.string", "hello");
-    file.add_f_attribute("variable", "variable.float", 35.67f);
+    file.add_variable<float>("variable", "infinite", "finite");
+    file.add_attribute("variable", "variable.string", "hello");
+    file.add_attribute("variable", "variable.float", 35.67f);
 
     file.close();
 
@@ -69,8 +68,8 @@ TEST_CASE("Write NetCDF files", "[Files]"){
     CHECK(check.global_attribute("global") == "global.value");
     CHECK(check.dimmension("infinite") == 0);
     CHECK(check.dimmension("finite") == 42);
-    CHECK(check.s_attribute("variable", "variable.string") == "hello");
-    CHECK(check.f_attribute("variable", "variable.float") == 35.67f);
+    CHECK(check.attribute<string>("variable", "variable.string") == "hello");
+    CHECK(check.attribute<float>("variable", "variable.float") == 35.67f);
 
     unlink("tmp.nc");
 }

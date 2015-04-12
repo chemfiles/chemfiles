@@ -7,12 +7,10 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "config.hpp"
-#if HAVE_NETCDF
-
 #ifndef HARP_NCFILE_HPP
 #define HARP_NCFILE_HPP
 
+#include <vector>
 #include <string>
 
 #include "files/File.hpp"
@@ -41,22 +39,21 @@ public:
     size_t dimmension(const string& name) const;
     //! Get a valid pointer to a NetCDF variable
     netCDF::NcVar variable(const string& name) const;
-    //! Get a string attribute from a variable
-    string s_attribute(const string& var, const string& name) const;
-    //! Get a float attribute from a file
-    float f_attribute(const string& var, const string& name) const;
+    //! Get an attribute of type \c T and name \c name from the variable of name \c var
+    template <typename T>
+    T attribute(const string& var, const string& name) const;
 
     //! Create a global attribut in the file
     void add_global_attribute(const string& name, const string& value);
     //! Create a dimmension with the specified value. If \c value == -1, then
     //! the dimension is infinite
     void add_dimmension(const string& name, size_t value = static_cast<size_t>(-1));
-    //! Create a new float variable, with dimension \c dim_i x \c dim_j
-    void add_f_variable(const string& name, const string& dim_i, const string& dim_j);
-    //! Add a string attribute to a variable
-    void add_s_attribute(const string& var, const string& name, const string& value);
-    //! Add a float attribute to a file
-    void add_f_attribute(const string& var, const string& name, float value);
+    //! Create a new variable of type \c T with name \c name along the dimensions in \c dims
+    template <typename T, class ...Dims>
+    void add_variable(const string& name, Dims... dims);
+    //! Add an attribute of type \c T and name \c name to the variable with name \c var
+    template <typename T>
+    void add_attribute(const string& var, const string& name, T value);
 
     virtual bool is_open(void);
     virtual void close(void);
@@ -65,8 +62,89 @@ private:
     netCDF::NcFile file;
 };
 
+//! Get the NetCDF type associated to a c++ type
+template <typename T> inline netCDF::NcType::ncType get_nctype() {
+    throw FileError("Can not convert this type to NetCDF type.");
+}
+
+//! Get the NetCDF type associated to a c++ type: float -> nc_FLOAT
+template <> inline netCDF::NcType::ncType get_nctype<float>() {
+    return netCDF::NcType::nc_FLOAT;
+}
+
+//! Get the NetCDF type associated to a c++ type: char -> nc_CHAR
+template <> inline netCDF::NcType::ncType get_nctype<char>() {
+    return netCDF::NcType::nc_CHAR;
+}
+
+template <typename T>
+inline T NCFile::attribute(const string& varname, const string& name) const {
+    auto var = variable(varname);
+    T value;
+    try {
+        auto attr = var.getAtt(name);
+        if(attr.isNull())
+            FileError("Invalid attribute " + name + ".");
+        attr.getValues(&value);
+    } catch (const netCDF::exceptions::NcException& e) {
+        throw FileError("Can not read attribute " + name + ".\n     " + e.what());
+    }
+    return value;
+}
+
+template <>
+inline std::string NCFile::attribute(const string& varname, const string& name) const {
+    auto var = variable(varname);
+    std::string value;
+    try {
+        auto attr = var.getAtt(name);
+        if(attr.isNull())
+            FileError("Invalid attribute " + name + ".");
+        attr.getValues(value);
+    } catch (const netCDF::exceptions::NcException& e) {
+        throw FileError("Can not read attribute " + name + ".\n     " + e.what());
+    }
+    return value;
+}
+
+template <typename T, class ...Dims>
+void NCFile::add_variable(const string& name, Dims... dims) {
+    try {
+        auto dimensions = std::vector<netCDF::NcDim>();
+        auto dim_names = std::vector<std::string>{dims...};
+
+        for (auto name : dim_names){
+            dimensions.push_back(file.getDim(name));
+            if (dimensions.back().isNull())
+                throw FileError("Can not get dimensions \"" + name + "\".");
+        }
+
+        file.addVar(name, get_nctype<T>(), dimensions);
+    } catch (const netCDF::exceptions::NcException& e) {
+        throw FileError("Can not add variable \"" + name + "\".\n" + e.what());
+    }
+}
+
+template <typename T>
+inline void NCFile::add_attribute(const string& var, const string& name, T value) {
+    auto ncvar = variable(var);
+    try {
+        ncvar.putAtt(name, get_nctype<T>(), value);
+    } catch (const netCDF::exceptions::NcException& e) {
+        throw FileError("Can not add atribute \"" + name + "\".\n" + e.what());
+    }
+}
+
+template <>
+inline void NCFile::add_attribute(const string& var, const string& name, const char* value) {
+    auto ncvar = variable(var);
+    try {
+        ncvar.putAtt(name, std::string(value));
+    } catch (const netCDF::exceptions::NcException& e) {
+        throw FileError("Can not add atribute \"" + name + "\".\n" + e.what());
+    }
+}
+
 } // namespace harp
 
 #endif
-
-#endif // HAVE_NETCDF
