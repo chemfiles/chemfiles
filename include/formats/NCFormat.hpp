@@ -36,22 +36,27 @@ public:
 
     void read_at_step(File* file, const size_t step, Frame& frame);
     void read_next_step(File* file, Frame& frame);
+    void write_step(File* file, const Frame& frame);
+
     size_t nsteps(File* file) const;
     std::string description() const;
 private:
     //! Reserve size for \c natoms on the internal cache.
     void reserve(size_t natoms) const;
-    //! Read the unit cell at the current internal step, assumed to be valid.
+    //! Read the unit cell at the current internal step, the file is assumed to be valid.
     UnitCell read_cell(NCFile* file) const;
-    //! Read the positions at the current internal step, assumed to be valid.
-    void read_positions(NCFile* file, Array3D& pos) const;
-    //! Read the velocities at the current internal step, assumed to be valid.
-    void read_velocities(NCFile* file, Array3D& vel) const;
     //! Generic function to read an Array3D at the current internal step,
-    //! assumed to be valid.
+    //! the file is assumed to be valid.
     void read_array3D(NCFile* file, Array3D& arr, const string& name) const;
-    //! Validate a file before reading it
-    void validate(NCFile* file) const;
+    //! Validate a file before reading it. If the \c natoms argument is present,
+    //! we also check that the corresponding dimension match this value
+    void validate(NCFile* file, size_t natoms=static_cast<size_t>(-1)) const;
+
+    //! Write an Array3D to the file, as a variable with the name \c name, at
+    //! the current internal step.
+    void write_array3D(NCFile* file, const Array3D& arr, const string& name) const;
+    //! Write an UnitCell to the file, at the current internal step
+    void write_cell(NCFile* file, const UnitCell& cell) const;
 
     //! Last read step
     mutable size_t step;

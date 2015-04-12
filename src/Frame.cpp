@@ -68,6 +68,6 @@ void Frame::resize(size_t size, bool reserve_velocities){
     }
 }
 
-bool Frame::has_velocities(){
+bool Frame::has_velocities() const{
     return _velocities.size() == _positions.size() && _velocities.size() > 0;
 }

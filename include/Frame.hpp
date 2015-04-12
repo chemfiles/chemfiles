@@ -42,7 +42,7 @@ public:
     void positions(const Array3D& pos) {_positions = pos;}
 
     //! Does this frame have velocity data ?
-    bool has_velocities();
+    bool has_velocities() const;
 
     //! Get a modifiable reference to the velocities
     Array3D& velocities() {return _velocities;}

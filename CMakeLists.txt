@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(chemharp)
-set(HARP_VERSION_MAJOR 0)
-set(HARP_VERSION_MINOR 1)
+set(CHRP_VERSION_MAJOR 0)
+set(CHRP_VERSION_MINOR 1)
+set(CHRP_VERSION_PATCH 0)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 cmake_policy(SET CMP0042 NEW)

@@ -10,8 +10,17 @@
 #ifndef HARP_CONFIG_HPP
 #define HARP_CONFIG_HPP
 
-#define HARP_VERSION_MAJOR @HARP_VERSION_MAJOR@
-#define HARP_VERSION_MINOR @HARP_VERSION_MINOR@
+#define CHRP_VERSION_MAJOR @CHRP_VERSION_MAJOR@
+#define CHRP_VERSION_MINOR @CHRP_VERSION_MINOR@
+#define CHRP_VERSION_PATCH @CHRP_VERSION_PATCH@
+
+// Macro to string conversion
+#define QUOTE(name) #name
+#define STR(macro) QUOTE(macro)
+
+#define CHRP_VERSION STR(CHRP_VERSION_MAJOR) "." \
+                     STR(CHRP_VERSION_MINOR) "." \
+                     STR(CHRP_VERSION_PATCH)
 
 #define HAVE_NETCDF @HAVE_NETCDF@
 
