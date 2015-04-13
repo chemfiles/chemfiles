@@ -1,9 +1,7 @@
-include(ExternalProject)
-
 #==============================================================================#
 # Boost.Numpy library will be built as an external project
-ExternalProject_add(
-    Boost.Numpy
+ExternalProject_add(Boost.Numpy
+    PREFIX external/Boost.Numpy
     GIT_REPOSITORY https://github.com/ndarray/Boost.NumPy
     CMAKE_ARGS  -DBUILD_EXAMPLES=OFF
                 -DBUILD_TESTS=OFF

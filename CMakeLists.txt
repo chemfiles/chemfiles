@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.12)
+include(ExternalProject)
 
 project(chemharp)
 set(CHRP_VERSION_MAJOR 0)
@@ -6,14 +7,40 @@ set(CHRP_VERSION_MINOR 1)
 set(CHRP_VERSION_PATCH 0)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-cmake_policy(SET CMP0042 NEW)
+if(${CMAKE_VERSION} VERSION_GREATER 3.0.0)
+    cmake_policy(SET CMP0042 NEW)
+endif()
+
+# Set a default build type if none was specified
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to 'release' as none was specified.")
+  set(CMAKE_BUILD_TYPE "release" CACHE STRING "Choose the type of build." FORCE)
+endif()
 
 set(HAVE_NETCDF 0)
-set(NETCDF_CXX "YES")
 find_package(NetCDF)
+
 if(${NETCDF_FOUND})
     set(HAVE_NETCDF 1)
     include_directories(${NETCDF_INCLUDES})
+    #==========================================================================#
+    # NetCDF CXX4 library will be built as an external project
+    ExternalProject_add(netcdfcxx
+        PREFIX external/netcdfcxx
+        URL "https://github.com/Luthaf/netcdf-cxx4/archive/open-close.tar.gz"
+        URL_MD5 eebe475d39f3a4a42a783a7045132a0d
+        BUILD_IN_SOURCE 1
+        CONFIGURE_COMMAND
+            COMMAND autoreconf -if
+            COMMAND ./configure --prefix=${CMAKE_BINARY_DIR} --with-pic
+        BUILD_COMMAND make
+    )
+    include_directories(SYSTEM ${CMAKE_BINARY_DIR}/include)
+    add_library(netcdf_cxx4 STATIC IMPORTED)
+    set_property(
+        TARGET netcdf_cxx4
+        PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/lib/libnetcdf_c++4${CMAKE_STATIC_LIBRARY_SUFFIX})
+    #==========================================================================#
 endif()
 
 find_package(Boost 1.54.0 REQUIRED COMPONENTS filesystem system)
@@ -45,7 +72,8 @@ configure_file ( # This version of the file is used for installations
 add_library(chemharp SHARED ${sources} bindings/c/capi.cpp)
 target_link_libraries(chemharp ${Boost_LIBRARIES})
 if(${HAVE_NETCDF})
-    target_link_libraries(chemharp ${NETCDF_LIBRARIES})
+    add_dependencies(chemharp netcdfcxx)
+    target_link_libraries(chemharp ${NETCDF_LIBRARIES} netcdf_cxx4)
 endif()
 
 file(GLOB_RECURSE headers include/**.hpp)
