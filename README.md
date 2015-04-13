@@ -1,5 +1,13 @@
 # Chemharp, an efficient IO library for chemistry file formats
 
+
+<a href="http://chemharp.readthedocs.org">
+    <img src="https://readthedocs.org/projects/chemharp/badge/?version=latest">
+</a>
+<a href="https://travis-ci.org/Luthaf/Chemharp/">
+    <img src="https://travis-ci.org/Luthaf/Chemharp.svg">
+</a>
+
 Chemharp is a multi-language library written in modern C++ for reading and writing
 from and to molecular trajectory files. These files are created by your favorite
 theoretical chemistry program, and contains informations about atomic or residues
@@ -55,6 +63,7 @@ The Chemharp library tries to:
 | Format        | Read ? | Write ? |
 | ------------- | ------ | ------- |
 | XYZ           | yes    |  yes    |
+| Amber NetCDF  | yes    |  yes    |
 
 ### Planned formats
 
@@ -104,7 +113,7 @@ All tests should pass, if they don't please fill an [issue](https://github.com/L
 
 ### Usage
 
-C++ API:
+The documentation is hosted at [readthedocs](http://chemharp.readthedocs.org), but here is an example of how the API feels like in C++:
 ```cpp
 #include <iostream>
 
@@ -123,7 +132,7 @@ int main() {
 }
 ```
 
-C API:
+And in C:
 ```c
 #include <stdint.h>
 #include <stdio.h>
@@ -160,8 +169,6 @@ int main(){
     chrp_close(traj);
 }
 ```
-
-TODO: add a link to the doc
 
 ## Why not use OpenBabel ?
 
