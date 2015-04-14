@@ -1,5 +1,8 @@
 #include "catch.hpp"
 
+#include "config.hpp"
+#if HAVE_NETCDF
+
 #include "Chemharp.hpp"
 using namespace harp;
 
@@ -91,3 +94,5 @@ TEST_CASE("Write files in NetCDF format", "[Amber NetCDF]"){
         unlink("tmp.nc");
     }
 }
+
+#endif // HAVE_NETCDF

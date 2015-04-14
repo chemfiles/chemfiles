@@ -2,14 +2,14 @@
 
 #include "catch.hpp"
 
-#include "Chemharp.hpp"
 #include "config.hpp"
+#if HAVE_NETCDF
+
+#include "Chemharp.hpp"
 #include "files/NCFile.hpp"
 using namespace harp;
 
 #define FILESDIR SRCDIR "/data/"
-
-#if HAVE_NETCDF
 
 TEST_CASE("Read a NetCDF file", "[Files]"){
     NCFile file(FILESDIR "netcdf/water.nc");

@@ -6,9 +6,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-#include "formats/NCFormat.hpp"
 
 #include "config.hpp"
+#if HAVE_NETCDF
+
+#include "formats/NCFormat.hpp"
+
 #include "Error.hpp"
 #include "Logger.hpp"
 #include "Frame.hpp"
@@ -21,8 +24,6 @@ using namespace netCDF;
 #include <algorithm>
 using std::endl;
 using std::vector;
-
-#if HAVE_NETCDF
 
 std::string NCFormat::description() const {
     return "Amber NetCDF file format.";
