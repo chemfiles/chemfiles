@@ -90,6 +90,7 @@ install(TARGETS chemharp DESTINATION lib)
 add_subdirectory(doc)
 enable_testing()
 add_subdirectory(tests)
+add_subdirectory(examples)
 add_subdirectory(bindings)
 
 # uninstall target
