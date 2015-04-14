@@ -10,6 +10,7 @@
 #ifndef HARP_ATOM_HPP
 #define HARP_ATOM_HPP
 
+#include <iostream>
 #include <string>
 #include <vector>
 #include <map>
@@ -79,6 +80,11 @@ private:
     float _charge;
     AtomType _type;
 };
+
+inline std::ostream& operator<<(std::ostream& out, const Atom& atom){
+    out << "Atom \"" << atom.name() << "\"";
+    return out;
+}
 
 //! All the elements in the periodic table
 const std::vector<std::string> ALL_ELEMENTS = std::vector<std::string>{
