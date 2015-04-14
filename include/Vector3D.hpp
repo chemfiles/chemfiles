@@ -15,7 +15,7 @@
 #include <iostream>
 
 //! Fixed-size array of 3 components: x, y and z values.
-class Vector3D : public std::array<float, 3> {
+class Vector3D : private std::array<float, 3> {
 public:
     Vector3D() : Vector3D(0, 0, 0) {}
     Vector3D(float x, float y, float z){
@@ -26,12 +26,16 @@ public:
 
     Vector3D(const Vector3D&) = default;
     Vector3D(Vector3D&&) = default;
-
     Vector3D& operator=(const Vector3D&) = default;
     Vector3D& operator=(Vector3D&&) = default;
-
     ~Vector3D() = default;
+
+    using std::array<float, 3>::operator[];
 };
+
+inline bool operator==(const Vector3D& u, const Vector3D& v){
+    return u[0] == v[0] && u[1] == v[1] && u[2] == v[2];
+}
 
 inline std::ostream& operator<<(std::ostream& out, const Vector3D& v){
     out << v[0] << ", " << v[1] << ", " << v[2];
