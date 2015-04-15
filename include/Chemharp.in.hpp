@@ -17,6 +17,11 @@
 #ifndef CHEMHARP_HPP
 #define CHEMHARP_HPP
 
+// This will be used as a protection to prevent internal macro from being exported
+#define CHEMHARP_PUBLIC
+
+#include "@CHEMHARP_PREFIX@config.hpp"
+
 #include "@CHEMHARP_PREFIX@Logger.hpp"
 #include "@CHEMHARP_PREFIX@Error.hpp"
 
@@ -25,5 +30,7 @@
 #include "@CHEMHARP_PREFIX@Frame.hpp"
 #include "@CHEMHARP_PREFIX@UnitCell.hpp"
 #include "@CHEMHARP_PREFIX@Trajectory.hpp"
+
+#undef CHEMHARP_PUBLIC
 
 #endif // HARP_HPP

@@ -17,6 +17,10 @@
 #ifndef HARP_CAPI_H
 #define HARP_CAPI_H
 
+//#define CHEMHARP_PUBLIC
+//    #include "config.hpp"
+//#undef CHEMHARP_PUBLIC
+
 #ifdef __cplusplus
     #include <cstddef>
 extern "C" {

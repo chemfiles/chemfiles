@@ -4,6 +4,7 @@
 #include <string>
 
 #include "catch.hpp"
+#include "Logger.hpp"
 #include "Chemharp.hpp"
 using namespace harp;
 

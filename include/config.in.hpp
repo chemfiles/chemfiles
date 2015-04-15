@@ -13,15 +13,11 @@
 #define CHRP_VERSION_MAJOR @CHRP_VERSION_MAJOR@
 #define CHRP_VERSION_MINOR @CHRP_VERSION_MINOR@
 #define CHRP_VERSION_PATCH @CHRP_VERSION_PATCH@
+#define CHRP_VERSION "@CHRP_VERSION@"
 
-// Macro to string conversion
-#define QUOTE(name) #name
-#define STR(macro) QUOTE(macro)
 
-#define CHRP_VERSION STR(CHRP_VERSION_MAJOR) "." \
-                     STR(CHRP_VERSION_MINOR) "." \
-                     STR(CHRP_VERSION_PATCH)
-
-#define HAVE_NETCDF @HAVE_NETCDF@
+#ifndef CHEMHARP_PUBLIC
+    #define HAVE_NETCDF @HAVE_NETCDF@
+#endif // CHEMHARP_PUBLIC
 
 #endif

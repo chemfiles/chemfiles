@@ -85,7 +85,9 @@ private:
 
 } // namespace harp
 
-//! LOG macro to send a message.
-#define LOG(level) harp::Logger::out(harp::Logger::level)
+#ifndef CHEMHARP_PUBLIC
+    //! The LOG macro should be used to get a stream with the good logging level
+    #define LOG(level) harp::Logger::out(harp::Logger::level)
+#endif // CHEMHARP_PUBLIC
 
 #endif
