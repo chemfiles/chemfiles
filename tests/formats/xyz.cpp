@@ -13,11 +13,21 @@ namespace fs=boost::filesystem;
 #define XYZDIR SRCDIR "/data/xyz/"
 
 TEST_CASE("Read files in XYZ format", "[XYZ]"){
-    auto file = Trajectory(XYZDIR"helium.xyz");
+    SECTION("Check nsteps"){
+        Trajectory file1(XYZDIR "trajectory.xyz");
+        CHECK(file1.nsteps() == 2);
+
+        Trajectory file2(XYZDIR "helium.xyz");
+        CHECK(file2.nsteps() == 397);
+
+        Trajectory file3(XYZDIR "topology.xyz");
+        CHECK(file3.nsteps() == 1);
+    }
+
+    Trajectory file(XYZDIR"helium.xyz");
     Frame frame;
 
     SECTION("Stream style reading"){
-        CHECK(file.nsteps() == 397);
         file >> frame;
         CHECK(frame.natoms() == 125);
         // Check positions
@@ -55,9 +65,16 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         CHECK(topology.natom_types() == 1);
         CHECK(topology.natoms() == 125);
         CHECK(topology[0] == Atom("He"));
+
+        frame = file.read_at_step(0);
+        positions = frame.positions();
+        CHECK(positions[0] == Vector3D(0.49053f, 8.41351f, 0.0777257f));
+        CHECK(positions[124] == Vector3D(8.57951f, 8.65712f, 8.06678f));
     }
 
     SECTION("Read the whole file"){
+        CHECK(file.nsteps() == 397);
+
         while (not file.done()){
             file >> frame;
         }

@@ -13,6 +13,7 @@
 #include "formats/XYZ.hpp"
 
 #include "Error.hpp"
+#include "Logger.hpp"
 #include "Frame.hpp"
 #include "files/File.hpp"
 
@@ -22,21 +23,28 @@ std::string XYZFormat::description() const {
     return "XYZ file format.";
 }
 
-// Quick forward the file for nsteps
-static void forward(TextFile* file, size_t nsteps) {
+// Quick forward the file for nsteps, return false if the end of file (eof) was
+// reach before the end.
+static bool forward(TextFile* file, size_t nsteps) {
     size_t i=0;
-    // Move the file pointer to the good position
+    // Move the file pointer to the good position step by step, as the number of
+    // atoms may not be constant
+    std::string line;
     while (i < nsteps){
         try {
-            auto natoms = std::stoul(file->getline());
-            file->readlines(natoms+1);
-        }
-        catch (const FileError& e) {
-            throw FormatError("Can not read step " + std::to_string(nsteps) +
-                                  ": " + e.what());
+            line = file->getline();
+            auto natoms = std::stoul(line);
+            file->readlines(natoms + 1);
+        } catch (const std::exception& e) {
+            // handling single new line at the end of the file
+            if (line == "" && file->eof())
+                return false;
+            else
+                throw FormatError("Can not read step: " + string(e.what()));
         }
         i++;
     }
+    return true;
 }
 
 size_t XYZFormat::nsteps(File* file) const {
@@ -44,8 +52,8 @@ size_t XYZFormat::nsteps(File* file) const {
     textfile->rewind();
     size_t n = 0;
     while (not textfile->eof()) {
-        forward(textfile, 1);
-        n++;
+        if (forward(textfile, 1))
+            n++;
     }
     textfile->rewind();
     return n;
@@ -60,11 +68,16 @@ void XYZFormat::read_at_step(File* file, const size_t step, Frame& frame){
 
 void XYZFormat::read_next_step(File* file, Frame& frame){
     auto textfile = dynamic_cast<TextFile*>(file);
-    size_t natoms = std::stoul(textfile->getline());
+    size_t natoms;
 
-    textfile->getline(); // XYZ comment line;
-    std::vector<std::string> lines;
-    lines.reserve(natoms);
+    try {
+        natoms = std::stoul(textfile->getline());
+        textfile->getline(); // XYZ comment line;
+    } catch (const std::exception& e) {
+        throw FormatError("Can not read next step: " + string(e.what()));
+    }
+
+    std::vector<std::string> lines(natoms);
 
     try {
         lines = textfile->readlines(natoms);
