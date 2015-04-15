@@ -23,3 +23,11 @@ set_debug_flag_if_possible("-Wextra")
 set_debug_flag_if_possible("-Wconversion")
 set_debug_flag_if_possible("-Wsign-conversion")
 set_debug_flag_if_possible("-Wsign-promo")
+
+
+include(CheckCCompilerFlag)
+CHECK_C_COMPILER_FLAG("-std=c99" COMPILER_SUPPORTS_C99)
+
+if(COMPILER_SUPPORTS_C99)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+endif()

@@ -33,6 +33,7 @@ if(${NETCDF_FOUND})
         CONFIGURE_COMMAND
             COMMAND autoreconf -if
             COMMAND ./configure --prefix=${CMAKE_BINARY_DIR} --with-pic
+                    CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}
         BUILD_COMMAND make
     )
     include_directories(SYSTEM ${CMAKE_BINARY_DIR}/include)

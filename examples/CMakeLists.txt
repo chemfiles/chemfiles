@@ -2,7 +2,6 @@ function(chrp_cpp_example _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     add_executable(example-cpp-${_name_} ${_file_})
     target_link_libraries(example-cpp-${_name_} chemharp)
-    set_property(TARGET example-cpp-${_name_} PROPERTY CXX_STANDARD 11)
 endfunction()
 
 function(chrp_c_example _file_)
@@ -15,6 +14,9 @@ function(chrp_fortran_example _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     add_executable(example-f90-${_name_} ${_file_})
     target_link_libraries(example-f90-${_name_} chemharp chemharpf)
+
+    
+
 endfunction()
 
 
