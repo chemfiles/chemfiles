@@ -77,7 +77,7 @@ public:
     void raw_matricial(double[3][3]) const;
 
     //! Get the cell type
-    const CellType& type() const {return _type;}
+    CellType type() const {return _type;}
     //! Set the cell type to t
     void type(CellType t);
 
