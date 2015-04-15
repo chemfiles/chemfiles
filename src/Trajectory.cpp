@@ -48,23 +48,28 @@ Trajectory& Trajectory::operator>>(Frame& frame){
     return *this;
 }
 
-const Frame& Trajectory::read_next_step(){
+Frame Trajectory::read_next_step(){
     if (_step >= _nsteps)
         throw FileError("Can not read file \"" + _file->name() + "\" past end.");
-    _format->read_next_step(_file.get(), _frame);
+
+    Frame frame;
+    _format->read_next_step(_file.get(), frame);
     _step++;
-    return _frame;
+    return frame;
 }
 
-const Frame& Trajectory::read_at_step(const size_t step){
-    if (_step >= _nsteps)
+Frame Trajectory::read_at_step(const size_t step){
+    if (step >= _nsteps)
         throw FileError(
             "Can not read file \"" + _file->name() + "\" at step " +
             std::to_string(step) + ". Max step is " + std::to_string(_nsteps) + "."
         );
+
+    Frame frame;
     _step = step;
-    _format->read_at_step(_file.get(), step, _frame);
-    return _frame;
+    _format->read_at_step(_file.get(), _step, frame);
+
+    return frame;
 }
 
 Trajectory& Trajectory::operator<<(const Frame& frame){

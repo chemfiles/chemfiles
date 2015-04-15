@@ -49,15 +49,15 @@ error:
     return traj;
 }
 
-int chrp_read_step(CHRP_TRAJECTORY *file, size_t step, const CHRP_FRAME* frame){
+int chrp_read_step(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame){
     CHRP_ERROR_WRAP_RETCODE(
-        frame = &(file->read_at_step(step));
+        *frame = file->read_at_step(step);
     )
 }
 
-int chrp_read_next_step(CHRP_TRAJECTORY *file, const CHRP_FRAME *frame){
+int chrp_read_next_step(CHRP_TRAJECTORY *file, CHRP_FRAME *frame){
     CHRP_ERROR_WRAP_RETCODE(
-        frame = &(file->read_next_step());
+        *frame = file->read_next_step();
     )
 }
 

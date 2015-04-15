@@ -56,9 +56,9 @@ public:
     //! Read operator, in *stream* version
     Trajectory& operator>>(Frame& frame);
     //! Read operator, in *method* version
-    const Frame& read_next_step();
+    Frame read_next_step();
     //! Read operator, in *method* version with specific step
-    const Frame& read_at_step(const size_t);
+    Frame read_at_step(const size_t);
     //! Close a trajectory
     void close();
 
@@ -72,8 +72,6 @@ public:
     //! Have we read all the Frames in this file ?
     bool done();
 private:
-    //! Cache a frame, as it can get very heavy
-    Frame _frame;
     //! Current step
     size_t _step;
     //! Number of steps in the file, if available
