@@ -24,7 +24,7 @@ static NullBuffer nullbuff;
 static std::ostream nullstream(&nullbuff);
 
 // Singleton instance
-Logger Logger::instance = Logger();
+Logger Logger::instance{};
 
 Logger::Logger() : current_level(WARNING), os(&std::clog), is_file(false) {}
 
@@ -62,7 +62,7 @@ std::ostream& Logger::get_stream(LogLevel level){
 }
 
 
-void Logger::set_level(LogLevel level){
+void Logger::level(LogLevel level){
     instance.current_level = level;
 }
 
@@ -84,7 +84,7 @@ void Logger::log_to_stdlog(void){
     instance.os = &std::clog;
 }
 
-void Logger::set_log_file(const std::string &filename){
+void Logger::log_to_file(const std::string &filename){
     instance.close();
     instance.is_file = true;
     instance.os = new std::ofstream(filename, std::ofstream::out);

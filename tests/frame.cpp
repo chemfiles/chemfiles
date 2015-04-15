@@ -8,7 +8,6 @@ using namespace harp;
 
 TEST_CASE("Frame class usage", "[Frame]"){
     auto frame = Frame(10);
-    Logger::set_level(Logger::DEBUG);
 
     SECTION("Contructor"){
         CHECK(frame.positions().capacity() == 10);

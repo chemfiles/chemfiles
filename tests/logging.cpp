@@ -63,7 +63,7 @@ TEST_CASE("Set the log stream", "[logging]"){
     }
 
     SECTION("Redirect log to a file") {
-        Logger::set_log_file("test-logging-tmp.log");
+        Logger::log_to_file("test-logging-tmp.log");
 
         LOG(WARNING) << "a warning" << std::endl;
 
@@ -85,7 +85,7 @@ TEST_CASE("Set the log level", "[logging]"){
     std::clog.rdbuf(out_buffer.rdbuf());
 
     SECTION("NONE level") {
-        Logger::set_level(Logger::NONE);
+        Logger::level(Logger::NONE);
 
         LOG(ERROR) << "an error" << std::endl;
         CHECK("" == out_buffer.str());
@@ -97,7 +97,7 @@ TEST_CASE("Set the log level", "[logging]"){
     }
 
     SECTION("INFO level") {
-        Logger::set_level(Logger::INFO);
+        Logger::level(Logger::INFO);
 
         LOG(ERROR) << "an error" << std::endl;
         CHECK("Chemharp error: an error\n" == out_buffer.str());

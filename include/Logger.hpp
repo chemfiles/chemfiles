@@ -42,17 +42,17 @@ public:
     ~Logger();
 
     //! Set the logging level
-    static void set_level(LogLevel level);
+    static void level(LogLevel);
     //! Get the current logging level
-    static LogLevel level(void){return instance.current_level;}
+    static LogLevel level() {return instance.current_level;}
     //! Set the file for logging
-    static void set_log_file(const std::string &filename);
+    static void log_to_file(const std::string &filename);
     //! Make the logger output to stdout
-    static void log_to_stdout(void);
+    static void log_to_stdout();
     //! Make the logger output to stderr
-    static void log_to_stderr(void);
+    static void log_to_stderr();
     //! Make the logger output to stdlog
-    static void log_to_stdlog(void);
+    static void log_to_stdlog();
 
     //! Get the singleton out stream
     static std::ostream& out(LogLevel level);
@@ -64,6 +64,13 @@ private:
     std::ostream& get_stream(LogLevel level);
     //! Constructor
     Logger();
+
+    //! Copy/move is not permited
+    Logger(const Logger&) = delete;
+    Logger(Logger&&) = delete;
+    //! Afectation is not permited
+    Logger& operator=(const Logger&) = delete;
+    Logger& operator=(Logger&&) = delete;
 
     //! Singleton instance
     static Logger instance;

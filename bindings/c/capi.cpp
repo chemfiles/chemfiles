@@ -23,19 +23,21 @@ const char* chrp_last_error(){
 }
 
 int chrp_loglevel(chrp_log_level_t level) {
-    Logger::set_level(static_cast<Logger::LogLevel>(level));
-    return CAPIStatus::SUCESS;
+    CHRP_ERROR_WRAP_RETCODE(
+        Logger::level(static_cast<Logger::LogLevel>(level));
+    )
 }
 
 int chrp_logfile(const char* file){
-    // TODO this can throw an error
-    Logger::set_log_file(string(file));
-    return CAPIStatus::SUCESS;
+    CHRP_ERROR_WRAP_RETCODE(
+        Logger::log_to_file(string(file));
+    )
 }
 
 int chrp_log_stderr(){
-    Logger::log_to_stderr();
-    return CAPIStatus::SUCESS;
+    CHRP_ERROR_WRAP_RETCODE(
+        Logger::log_to_stderr();
+    )
 }
 
 /******************************************************************************/
