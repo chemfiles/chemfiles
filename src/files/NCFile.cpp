@@ -31,64 +31,64 @@ NCFile::NCFile(const std::string& _filename, const string& mode): BinaryFile(_fi
     }
 }
 
-string NCFile::global_attribute(const string& name) const {
+string NCFile::global_attribute(const string& attname) const {
     string value;
     try {
-        auto attr = file.getAtt(name);
+        auto attr = file.getAtt(attname);
         if(attr.isNull())
-            FileError("Invalid attribute " + name + ".");
+            FileError("Invalid attribute " + attname + ".");
         attr.getValues(value);
     } catch (const netCDF::exceptions::NcException& e) {
-        throw FileError("Can not read attribute " + name + ".\n" + e.what());
+        throw FileError("Can not read attribute " + attname + ".\n" + e.what());
     }
     return value;
 }
 
-size_t NCFile::dimmension(const string& name) const {
+size_t NCFile::dimmension(const string& dimname) const {
     size_t size;
     try {
-        auto dim = file.getDim(name.c_str());
+        auto dim = file.getDim(dimname.c_str());
         if(dim.isNull())
-           FileError("Invalid dimension " + name + ".");
+           FileError("Invalid dimension " + dimname + ".");
         size = dim.getSize();
     } catch (const netCDF::exceptions::NcException& e) {
-        throw FileError("Can not read dimmension " + name + ".\n" + e.what());
+        throw FileError("Can not read dimmension " + dimname + ".\n" + e.what());
     }
     return size;
 }
 
-NcVar NCFile::variable(const string& name) const {
+NcVar NCFile::variable(const string& varname) const {
     NcVar var;
     try {
-        var = file.getVar(name);
+        var = file.getVar(varname);
         if(var.isNull())
-            FileError("Invalid variable " + name + ".");
+            FileError("Invalid variable " + varname + ".");
         var.getName(); // Force error when the var is built with a bad ncid
     } catch (const netCDF::exceptions::NcException& e) {
-        throw FileError("Can not read variable " + name + ".\n" + e.what());
+        throw FileError("Can not read variable " + varname + ".\n" + e.what());
     }
     return var;
 }
 
 /******************************************************************************/
 
-void NCFile::add_global_attribute(const string& _name, const string& value) {
+void NCFile::add_global_attribute(const string& attname, const string& value) {
     try {
-        file.putAtt(_name, value);
+        file.putAtt(attname, value);
     } catch (const netCDF::exceptions::NcException& e) {
-        throw FileError("Could not add the \"" + _name + "\" global attribute " +
+        throw FileError("Could not add the \"" + attname + "\" global attribute " +
                         "with value \"" + value + "\".\n" + e.what());
     }
 }
 
-void NCFile::add_dimmension(const string& name, size_t value) {
+void NCFile::add_dimmension(const string& dimname, size_t value) {
     try {
         if (value == static_cast<size_t>(-1) )
-            file.addDim(name);
+            file.addDim(dimname);
         else
-            file.addDim(name, value);
+            file.addDim(dimname, value);
     } catch (const netCDF::exceptions::NcException& e) {
-        throw FileError("Can not add dimension \"" + name + "\"" + e.what());
+        throw FileError("Can not add dimension \"" + dimname + "\"" + e.what());
     }
 }
 

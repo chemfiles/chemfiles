@@ -12,8 +12,6 @@
 
 using namespace harp;
 
-#include <iostream>
-
 BasicFile::BasicFile(const std::string& _filename, const std::string& _mode)
 : TextFile(_filename) {
     std::ios_base::openmode mode;
@@ -82,7 +80,7 @@ BasicFile& BasicFile::operator<<(const any& data){
     return *this;
 }
 
-void BasicFile::writelines(const std::vector<std::string>& lines){
-    for (auto line : lines)
+void BasicFile::writelines(const std::vector<std::string>& _lines){
+    for (auto line : _lines)
         *this << line;
 }

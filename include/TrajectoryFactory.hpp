@@ -155,7 +155,7 @@ TrajectoryFactory::register_extension(extension, {                \
 //! Add the static members in a class to register a format.
 #define REGISTER_FORMAT                   \
     static bool _registered_extension_;   \
-    static bool _registered_format_;
+    static bool _registered_format_
 
 } // namespace harp
 

@@ -45,7 +45,7 @@ public:
                 _charge == other._charge && _type == other._type);
     }
 
-    ~Atom(){};
+    ~Atom(){}
 
     //! Get a const (non-modifiable) reference to the atom name
     const std::string& name(void) const {return _name;}

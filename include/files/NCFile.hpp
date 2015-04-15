@@ -93,22 +93,22 @@ inline T NCFile::attribute(const string& varname, const string& name) const {
 }
 
 template <>
-inline std::string NCFile::attribute(const string& varname, const string& name) const {
+inline std::string NCFile::attribute(const string& varname, const string& attname) const {
     auto var = variable(varname);
     std::string value;
     try {
-        auto attr = var.getAtt(name);
+        auto attr = var.getAtt(attname);
         if(attr.isNull())
-            FileError("Invalid attribute " + name + ".");
+            FileError("Invalid attribute " + attname + ".");
         attr.getValues(value);
     } catch (const netCDF::exceptions::NcException& e) {
-        throw FileError("Can not read attribute " + name + ".\n     " + e.what());
+        throw FileError("Can not read attribute " + attname + ".\n     " + e.what());
     }
     return value;
 }
 
 template <typename T, class ...Dims>
-void NCFile::add_variable(const string& name, Dims... dims) {
+void NCFile::add_variable(const string& varname, Dims... dims) {
     try {
         auto dimensions = std::vector<netCDF::NcDim>();
         auto dim_names = std::vector<std::string>{dims...};
@@ -119,29 +119,29 @@ void NCFile::add_variable(const string& name, Dims... dims) {
                 throw FileError("Can not get dimensions \"" + name + "\".");
         }
 
-        file.addVar(name, get_nctype<T>(), dimensions);
+        file.addVar(varname, get_nctype<T>(), dimensions);
     } catch (const netCDF::exceptions::NcException& e) {
-        throw FileError("Can not add variable \"" + name + "\".\n" + e.what());
+        throw FileError("Can not add variable \"" + varname + "\".\n" + e.what());
     }
 }
 
 template <typename T>
-inline void NCFile::add_attribute(const string& var, const string& name, T value) {
-    auto ncvar = variable(var);
+inline void NCFile::add_attribute(const string& varname, const string& attname, T value) {
+    auto ncvar = variable(varname);
     try {
-        ncvar.putAtt(name, get_nctype<T>(), value);
+        ncvar.putAtt(attname, get_nctype<T>(), value);
     } catch (const netCDF::exceptions::NcException& e) {
-        throw FileError("Can not add atribute \"" + name + "\".\n" + e.what());
+        throw FileError("Can not add atribute \"" + attname + "\".\n" + e.what());
     }
 }
 
 template <>
-inline void NCFile::add_attribute(const string& var, const string& name, const char* value) {
-    auto ncvar = variable(var);
+inline void NCFile::add_attribute(const string& varname, const string& attname, const char* value) {
+    auto ncvar = variable(varname);
     try {
-        ncvar.putAtt(name, std::string(value));
+        ncvar.putAtt(attname, std::string(value));
     } catch (const netCDF::exceptions::NcException& e) {
-        throw FileError("Can not add atribute \"" + name + "\".\n" + e.what());
+        throw FileError("Can not add atribute \"" + attname + "\".\n" + e.what());
     }
 }
 

@@ -22,14 +22,10 @@
 
 
 namespace harp {
-    namespace bte = boost::type_erasure;
-    namespace mpl = boost::mpl;
-    typedef bte::any<
-                mpl::vector<
-                    bte::ostreamable<>,
-                    bte::copy_constructible<>
-                    >
-                > any;
+namespace bte = boost::type_erasure;
+namespace mpl = boost::mpl;
+typedef bte::any<mpl::vector<bte::ostreamable<>,
+                             bte::copy_constructible<>>> any;
 
 /*!
 * @class File File.hpp File.cpp
@@ -38,7 +34,7 @@ namespace harp {
 class File {
 public:
     explicit File(const std::string& path) : filename(path) {}
-    virtual ~File(){};
+    virtual ~File(){}
 
     // Removing default copy constructors
     File(File const&) = delete;
@@ -52,7 +48,7 @@ public:
     //! Close the file before the destructor call.
     virtual void close(void) = 0;
     //! File name
-    const std::string& name() const {return filename;};
+    const std::string& name() const {return filename;}
 protected:
     const std::string filename;
 };
@@ -67,7 +63,7 @@ protected:
 class TextFile : public File {
 public:
     explicit TextFile(const std::string& path, const std::string& = "") : File(path) {}
-    virtual ~TextFile() {};
+    virtual ~TextFile() {}
 
     //! Read a line from the file
     virtual const std::string& getline(void) = 0;
@@ -76,18 +72,18 @@ public:
     //! Read \c n lines from the file
     virtual const std::vector<std::string>& readlines(size_t n) = 0;
     //! Reset the file cursor
-    virtual inline void rewind() = 0;
+    virtual void rewind() = 0;
     //! Number of lines in the file
     virtual size_t nlines() = 0;
     //! Are we at the end of the file ?
     virtual bool eof() = 0;
 
     //! Write any data to the file in stream version
-    virtual TextFile& operator<<(const any& data) = 0;
+    virtual TextFile& operator<<(const any&) = 0;
     //! Write a string to the file
-    virtual void writeline(const std::string& line) = 0;
-    //! Write \c n lines to the file
-    virtual void writelines(const std::vector<std::string>& lines) = 0;
+    virtual void writeline(const std::string&) = 0;
+    //! Write a vector of lines to the file
+    virtual void writelines(const std::vector<std::string>&) = 0;
 };
 
 /*!
@@ -116,9 +112,9 @@ public:
     virtual void close() {return stream.close();}
     virtual bool eof() {return stream.eof();}
 
-    virtual BasicFile& operator<<(const any& data);
-    virtual void writeline(const std::string& line);
-    virtual void writelines(const std::vector<std::string>& lines);
+    virtual BasicFile& operator<<(const any&);
+    virtual void writeline(const std::string&);
+    virtual void writelines(const std::vector<std::string>&);
 private:
     std::fstream stream;
     // Caching a vector of strings

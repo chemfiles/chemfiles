@@ -33,8 +33,8 @@ REGISTER_EXTENSION(DummyFormat, ".dummy");
 class DummyFile : public BinaryFile {
 public:
     DummyFile(const string&, const string&) : BinaryFile("") {}
-    bool is_open(void) {return true;};
-    void close(void) {};
+    bool is_open(void) {return true;}
+    void close(void) {}
 };
 
 REGISTER_WITH_FILE(DummyFormat2, "Dummy2", DummyFile);
