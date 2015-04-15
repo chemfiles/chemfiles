@@ -20,7 +20,9 @@ find_package(PythonLibsNew REQUIRED)
 
 include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
-PYTHON_ADD_MODULE(_chemharp chemharp.cpp)
+file(GLOB python_sources *.cpp)
+
+PYTHON_ADD_MODULE(_chemharp ${python_sources})
 add_dependencies(_chemharp Boost.Numpy)
 target_link_libraries(_chemharp
     chemharp
