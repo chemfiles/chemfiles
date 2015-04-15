@@ -9,6 +9,7 @@
 
 #include "Trajectory.hpp"
 #include "TrajectoryFactory.hpp"
+#include "Logger.hpp"
 
 #include <boost/filesystem.hpp>
 using namespace boost::filesystem;
@@ -17,7 +18,7 @@ using namespace harp;
 using std::string;
 
 Trajectory::Trajectory(const string& filename, const string& mode, const string& format)
-: _step(0), _nsteps(0)
+: _step(0), _nsteps(0), _topology(), use_custom_topology(false)
 {
     trajectory_builder_t builder;
     if (format == ""){
@@ -55,6 +56,11 @@ Frame Trajectory::read_next_step(){
     Frame frame;
     _format->read_next_step(_file.get(), frame);
     _step++;
+
+    // Set the frame trajectory if needed
+    if (use_custom_topology)
+        frame.topology(_topology);
+
     return frame;
 }
 
@@ -69,6 +75,10 @@ Frame Trajectory::read_at_step(const size_t step){
     _step = step;
     _format->read_at_step(_file.get(), _step, frame);
 
+    // Set the frame trajectory if needed
+    if (use_custom_topology)
+        frame.topology(_topology);
+
     return frame;
 }
 
@@ -77,10 +87,30 @@ Trajectory& Trajectory::operator<<(const Frame& frame){
     return *this;
 }
 
-void Trajectory::write_step(const Frame& frame){
+void Trajectory::write_step(const Frame& input_frame){
+    // Maybe that is not the better way to do this, performance-wise. I'll have
+    // to benchmark this part.
+    Frame frame = input_frame;
+    if (use_custom_topology)
+        frame.topology(_topology);
+
     _format->write_step(_file.get(), frame);
     _step++;
     _nsteps++;
+}
+
+void Trajectory::topology(const Topology& top){
+    LOG(DEBUG) << "Setting the trajectory topology" << std::endl;
+    use_custom_topology = true;
+    _topology = top;
+}
+
+void Trajectory::topology(const std::string& filename) {
+    Trajectory topolgy_file(filename, "r");
+    assert(topolgy_file.nsteps() > 0);
+
+    auto frame = topolgy_file.read_at_step(0);
+    Trajectory::topology(frame.topology());
 }
 
 void Trajectory::close(){

@@ -67,6 +67,13 @@ public:
     //! Write operator, in *method* version
     void write_step(const Frame& frame);
 
+    //! Set a topology to use while writing or reading format where no
+    //! topological information is present.
+    void topology(const Topology&);
+    //! Use the topology of the first frame of the following file to read or
+    //! write all the following files.
+    void topology(const std::string& filename);
+
     //! Get the number of steps (the number of Frames) in this trajectory
     size_t nsteps() {return _nsteps;}
     //! Have we read all the Frames in this file ?
@@ -76,12 +83,14 @@ private:
     size_t _step;
     //! Number of steps in the file, if available
     size_t _nsteps;
-    //! TODO
-    std::unique_ptr<Topology> _topology;
     //! Format used to read the file
     std::unique_ptr<Format> _format;
     //! The file we are reading from
     std::unique_ptr<File> _file;
+    //! Topology to use for writing files where no topological data is present
+    Topology _topology;
+    //! Do we have to use a specific topology ?
+    bool use_custom_topology;
 };
 
 } // namespace harp

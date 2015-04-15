@@ -91,7 +91,7 @@ public:
  * @brief Basic text file
  *
  * This is only a thin wrapper on top of standard C++ streams. It can be updated
- * later to use directly
+ * later to use directly the C functions.
  */
 class BasicFile : public TextFile {
 public:
@@ -103,8 +103,8 @@ public:
     virtual const std::vector<std::string>& readlines(size_t n);
 
     virtual void rewind(){
-        stream.seekg(0);
         stream.clear();
+        stream.seekg(0, std::ios::beg);
     }
     virtual size_t nlines();
 
