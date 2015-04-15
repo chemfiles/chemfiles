@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdio>
 
 #include "catch.hpp"
 
@@ -71,7 +72,7 @@ TEST_CASE("Write NetCDF files", "[Files]"){
     CHECK(check.attribute<string>("variable", "variable.string") == "hello");
     CHECK(check.attribute<float>("variable", "variable.float") == 35.67f);
 
-    unlink("tmp.nc");
+    remove("tmp.nc");
 }
 
 #endif // HAVE_NETCDF

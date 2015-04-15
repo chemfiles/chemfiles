@@ -1,5 +1,6 @@
 #include <streambuf>
 #include <fstream>
+#include <cstdio>
 
 #include "catch.hpp"
 
@@ -133,5 +134,5 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
 
     CHECK(content == expected_content);
 
-    unlink("test-tmp.xyz");
+    remove("test-tmp.xyz");
 }

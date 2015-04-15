@@ -1,3 +1,5 @@
+#include <cstdio>
+
 #include "catch.hpp"
 
 #include "config.hpp"
@@ -91,7 +93,7 @@ TEST_CASE("Write files in NetCDF format", "[Amber NetCDF]"){
         CHECK(roughly(positions[1], Vector3D(1, 2, 3), 1e-4));
         CHECK(roughly(positions[2], Vector3D(1, 2, 3), 1e-4));
         CHECK(roughly(positions[3], Vector3D(1, 2, 3), 1e-4));
-        unlink("tmp.nc");
+        remove("tmp.nc");
     }
 }
 
