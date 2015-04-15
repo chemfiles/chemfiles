@@ -15,7 +15,7 @@
 
 using namespace harp;
 
-Frame::Frame() : Frame(100) {}
+Frame::Frame() : Frame(0) {}
 
 Frame::Frame(size_t natoms) : _step(0), _topology(natoms), _cell() {
     resize(natoms);

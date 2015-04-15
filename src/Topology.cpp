@@ -90,7 +90,7 @@ Topology::Topology(size_t natoms) {
     resize(natoms);
 }
 
-Topology::Topology() : Topology(100) {}
+Topology::Topology() : Topology(0) {}
 
 void Topology::append(const Atom& _atom){
     size_t index = static_cast<size_t>(-1);
