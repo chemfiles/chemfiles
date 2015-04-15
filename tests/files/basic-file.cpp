@@ -3,7 +3,7 @@
 #include "catch.hpp"
 
 #include "Chemharp.hpp"
-#include "files/File.hpp"
+#include "files/BasicFile.hpp"
 using namespace harp;
 
 #define FILESDIR SRCDIR "/data/"

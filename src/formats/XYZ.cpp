@@ -15,7 +15,7 @@
 #include "Error.hpp"
 #include "Logger.hpp"
 #include "Frame.hpp"
-#include "files/File.hpp"
+#include "File.hpp"
 
 using namespace harp;
 

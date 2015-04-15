@@ -10,6 +10,7 @@
 #include "Trajectory.hpp"
 #include "TrajectoryFactory.hpp"
 #include "Logger.hpp"
+#include "files/BasicFile.hpp"
 
 #include <boost/filesystem.hpp>
 using namespace boost::filesystem;

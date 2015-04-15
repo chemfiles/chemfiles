@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "files/File.hpp"
+#include "files/BasicFile.hpp"
 #include <algorithm>
 
 using namespace harp;

@@ -87,42 +87,7 @@ public:
 };
 
 /*!
- * @class BasicFile File.hpp File.cpp
- * @brief Basic text file
- *
- * This is only a thin wrapper on top of standard C++ streams. It can be updated
- * later to use directly the C functions.
- */
-class BasicFile : public TextFile {
-public:
-    explicit BasicFile(const std::string& filename, const std::string& mode = "r");
-    ~BasicFile();
-
-    virtual const std::string& getline(void);
-    virtual BasicFile& operator>>(std::string& line);
-    virtual const std::vector<std::string>& readlines(size_t n);
-
-    virtual void rewind(){
-        stream.clear();
-        stream.seekg(0, std::ios::beg);
-    }
-    virtual size_t nlines();
-
-    virtual bool is_open() {return stream.is_open();}
-    virtual void close() {return stream.close();}
-    virtual bool eof() {return stream.eof();}
-
-    virtual BasicFile& operator<<(const any&);
-    virtual void writeline(const std::string&);
-    virtual void writelines(const std::vector<std::string>&);
-private:
-    std::fstream stream;
-    // Caching a vector of strings
-    std::vector<std::string> lines;
-};
-
-/*!
-* @class BinaryFile File.hpp File.cpp
+* @class BinaryFile File.hpp
 * @brief Binary file abstraction class.
 *
 * Because the binary formats can be everything, this class does not provides any

@@ -14,7 +14,7 @@
 #include <memory>
 using std::shared_ptr;
 
-#include "files/File.hpp"
+#include "File.hpp"
 
 namespace harp {
 
