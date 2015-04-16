@@ -182,8 +182,10 @@ public:
     //! Clear the topology
     void clear();
 
-    //! Try to guess the bonds in the system.
-    void guess_bonds();
+    //! Try to guess the bonds, angles and dihedrals in the system. If \c bonds
+    //! is true, guess everything; else only guess the angles and dihedrals from
+    //! the bond list.
+    void guess(bool bonds = true);
 
     //! Check wether the atoms at indexes \c i and \c j are bonded or not
     bool isbond(size_t i, size_t j);

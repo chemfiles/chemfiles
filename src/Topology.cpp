@@ -8,6 +8,7 @@
 */
 
 #include "Topology.hpp"
+#include "Error.hpp"
 #include <algorithm>
 
 using namespace harp;
@@ -158,8 +159,8 @@ void Topology::clear(){
     _connect.clear();
 }
 
-void Topology::guess_bonds(){
-    //! TODO
+void Topology::guess(bool){
+    throw Error("Unimplemented function: Topology::guess");
 }
 
 Topology harp::dummy_topology(size_t natoms){
