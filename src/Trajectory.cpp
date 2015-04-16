@@ -118,6 +118,6 @@ void Trajectory::close(){
     _file->close();
 }
 
-bool Trajectory::done() {
+bool Trajectory::done() const {
     return _step >= _nsteps;
 }

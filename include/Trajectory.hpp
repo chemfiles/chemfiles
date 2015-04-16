@@ -75,9 +75,9 @@ public:
     void topology(const std::string& filename);
 
     //! Get the number of steps (the number of Frames) in this trajectory
-    size_t nsteps() {return _nsteps;}
+    size_t nsteps() const {return _nsteps;}
     //! Have we read all the Frames in this file ?
-    bool done();
+    bool done() const;
 private:
     //! Current step
     size_t _step;
