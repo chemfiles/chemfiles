@@ -5,14 +5,12 @@
 
 int main() {
     CHRP_TRAJECTORY* traj = chrp_open("tests/files/xyz/helium.xyz", "r");
-    CHRP_FRAME* frame = chrp_frame(100);
-    int errno = 0;
+    CHRP_FRAME* frame = NULL;
 
     if (traj == NULL)
         goto error;
 
-    errno = chrp_read_next_step(traj, frame);
-    if (errno)
+    if (!chrp_trajectory_read_next(traj, frame) || frame == NULL)
         goto error;
 
     size_t natoms = 0;
@@ -27,8 +25,7 @@ int main() {
         indexes[i] = (unsigned)-1;
     }
 
-    errno = chrp_frame_positions(frame, positions, natoms);
-    if (errno)
+    if (!chrp_frame_positions(frame, positions, natoms))
         goto error;
 
     unsigned last_index = 0;
@@ -47,13 +44,13 @@ int main() {
     }
     printf("Number of atoms: %d\n", i);
 
-    chrp_close(traj);
+    chrp_trajectory_close(traj);
     chrp_frame_free(frame);
     return 0;
 
 error:
     printf("Error, cleaning up …\n");
-    chrp_close(traj);
+    chrp_trajectory_close(traj);
     chrp_frame_free(frame);
     return 1;
 }

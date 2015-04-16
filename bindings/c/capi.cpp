@@ -11,6 +11,8 @@
 #include "cerrors.hpp"
 #include "Chemharp.hpp"
 
+#include <cstring>
+
 using namespace harp;
 using std::string;
 
@@ -51,25 +53,43 @@ error:
     return traj;
 }
 
-int chrp_read_step(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame){
+int chrp_trajectory_read(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame){
     CHRP_ERROR_WRAP_RETCODE(
         *frame = file->read_at_step(step);
     )
 }
 
-int chrp_read_next_step(CHRP_TRAJECTORY *file, CHRP_FRAME *frame){
+int chrp_trajectory_read_next(CHRP_TRAJECTORY *file, CHRP_FRAME *frame){
     CHRP_ERROR_WRAP_RETCODE(
         *frame = file->read_next_step();
     )
 }
 
-int chrp_write_step(CHRP_TRAJECTORY *file, const CHRP_FRAME *frame){
+int chrp_trajectory_write(CHRP_TRAJECTORY *file, const CHRP_FRAME *frame){
     CHRP_ERROR_WRAP_RETCODE(
          file->write_step(*frame);
     )
 }
 
-int chrp_close(CHRP_TRAJECTORY *file){
+int chrp_trajectory_topology(CHRP_TRAJECTORY *file, CHRP_TOPOLOGY *topology){
+    CHRP_ERROR_WRAP_RETCODE(
+        file->topology(*topology);
+    )
+}
+
+int chrp_trajectory_topology_file(CHRP_TRAJECTORY *file, const char* filename){
+    CHRP_ERROR_WRAP_RETCODE(
+        file->topology(string(filename));
+    )
+}
+
+int chrp_trajectory_nsteps(CHRP_TRAJECTORY *file, size_t *nsteps){
+    CHRP_ERROR_WRAP_RETCODE(
+        *nsteps = file->nsteps();
+    )
+}
+
+int chrp_trajectory_close(CHRP_TRAJECTORY *file){
     CHRP_ERROR_WRAP_RETCODE(
         delete file;
     )
@@ -104,6 +124,7 @@ int chrp_frame_positions_set(CHRP_FRAME* frame, float (*data)[3], size_t size){
         return CAPIStatus::MEMORY;
     }
     CHRP_ERROR_WRAP_RETCODE(
+        frame->resize(size);
         auto positions = frame->positions();
         for (size_t i=0; i<frame->natoms(); i++) {
             positions[i][0] = data[i][0];
@@ -125,12 +146,37 @@ int chrp_frame_velocities_set(CHRP_FRAME* frame, float (*data)[3], size_t size){
         return CAPIStatus::MEMORY;
     }
     CHRP_ERROR_WRAP_RETCODE(
+        frame->resize(size, true);
         auto velocities = frame->velocities();
         for (size_t i=0; i<frame->natoms(); i++) {
             velocities[i][0] = data[i][0];
             velocities[i][1] = data[i][1];
             velocities[i][2] = data[i][2];
         }
+    )
+}
+
+int chrp_frame_has_velocities(const CHRP_FRAME* frame, bool *has_vel)  {
+    CHRP_ERROR_WRAP_RETCODE(
+        *has_vel = frame->has_velocities();
+    )
+}
+
+int chrp_frame_cell_set(CHRP_FRAME* frame, const CHRP_CELL* cell) {
+    CHRP_ERROR_WRAP_RETCODE(
+        frame->cell(*cell);
+    )
+}
+
+int chrp_frame_step(const CHRP_FRAME* frame, size_t* step) {
+    CHRP_ERROR_WRAP_RETCODE(
+        *step = frame->step();
+    )
+}
+
+int chrp_frame_step_set(CHRP_FRAME* frame, size_t step) {
+    CHRP_ERROR_WRAP_RETCODE(
+        frame->step(step);
     )
 }
 
@@ -142,7 +188,17 @@ int chrp_frame_free(CHRP_FRAME* frame) {
 
 /******************************************************************************/
 
-CHRP_CELL* chrp_cell(CHRP_FRAME* frame){
+CHRP_CELL* chrp_cell(double a, double b, double c, double alpha, double beta, double gamma) {
+    CHRP_CELL* cell = NULL;
+    CHRP_ERROR_WRAP(
+        cell = new UnitCell(a, b, c, alpha, beta, gamma);
+    )
+error:
+    return cell;
+}
+
+
+CHRP_CELL* chrp_frame_cell(CHRP_FRAME* frame){
     CHRP_CELL* cell = NULL;
     CHRP_ERROR_WRAP(
         cell = &frame->cell();
@@ -241,6 +297,27 @@ CHRP_ATOM* chrp_topology_atom(CHRP_TOPOLOGY* topology, size_t idx){
     )
 error:
     return atom;
+}
+
+CHRP_TOPOLOGY* chrp_empty_topology() {
+    CHRP_TOPOLOGY* topology = NULL;
+    CHRP_ERROR_WRAP(
+        topology = new Topology();
+    )
+error:
+    return topology;
+}
+
+int chrp_topology_size(const CHRP_TOPOLOGY* topology, size_t *natoms){
+    CHRP_ERROR_WRAP_RETCODE(
+        *natoms = topology->natoms();
+    )
+}
+
+int chrp_topology_guess(CHRP_TOPOLOGY* topology, bool bonds){
+    CHRP_ERROR_WRAP_RETCODE(
+        topology->guess(bonds);
+    )
 }
 
 int chrp_topology_append(CHRP_TOPOLOGY* topology, CHRP_ATOM* atom){
@@ -368,6 +445,15 @@ error:
     return atom;
 }
 
+CHRP_ATOM* chrp_atom_from_name(const char* name){
+    CHRP_ATOM* atom = NULL;
+    CHRP_ERROR_WRAP(
+        atom = new Atom(string(name));
+    )
+error:
+    return atom;
+}
+
 int chrp_atom_mass(const CHRP_ATOM* atom, float* mass){
     CHRP_ERROR_WRAP_RETCODE(
         *mass = atom->mass();
@@ -393,10 +479,9 @@ int chrp_atom_charge_set(CHRP_ATOM* atom, float charge){
 }
 
 int chrp_atom_name(const CHRP_ATOM* atom, char* name, size_t buffsize){
-    std::string tmp;
     CHRP_ERROR_WRAP_RETCODE(
-        tmp = atom->name();
-        name = const_cast<char*>(tmp.substr(0, buffsize).c_str());
+        auto tmp = atom->name();
+        strcpy(name, tmp.substr(0, buffsize).c_str());
     )
 }
 

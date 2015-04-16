@@ -48,13 +48,19 @@ associated with the file.
 
 .. doxygenfunction:: chrp_open
 
-.. doxygenfunction:: chrp_read_step
+.. doxygenfunction:: chrp_trajectory_read
 
-.. doxygenfunction:: chrp_read_next_step
+.. doxygenfunction:: chrp_trajectory_read_next
 
-.. doxygenfunction:: chrp_write_step
+.. doxygenfunction:: chrp_trajectory_write
 
-.. doxygenfunction:: chrp_close
+.. doxygenfunction:: chrp_trajectory_topology
+
+.. doxygenfunction:: chrp_trajectory_topology_file
+
+.. doxygenfunction:: chrp_trajectory_nsteps
+
+.. doxygenfunction:: chrp_trajectory_close
 
 .. _capi-frame:
 
@@ -69,9 +75,17 @@ Function manipulating ``CHRP_FRAME``
 
 .. doxygenfunction:: chrp_frame_positions_set
 
+.. doxygenfunction:: chrp_frame_has_velocities
+
 .. doxygenfunction:: chrp_frame_velocities
 
 .. doxygenfunction:: chrp_frame_velocities_set
+
+.. doxygenfunction:: chrp_frame_cell_set
+
+.. doxygenfunction:: chrp_frame_step
+
+.. doxygenfunction:: chrp_frame_step_set
 
 .. doxygenfunction:: chrp_frame_free
 
@@ -81,6 +95,8 @@ Function manipulating ``CHRP_CELL``
 -----------------------------------
 
 .. doxygenfunction:: chrp_cell
+
+.. doxygenfunction:: chrp_frame_cell
 
 .. doxygenfunction:: chrp_cell_lengths
 
@@ -110,6 +126,12 @@ Function manipulating ``CHRP_TOPOLOGY``
 ---------------------------------------
 
 .. doxygenfunction:: chrp_topology
+
+.. doxygenfunction:: chrp_empty_topology
+
+.. doxygenfunction:: chrp_topology_size
+
+.. doxygenfunction:: chrp_topology_guess
 
 .. doxygenfunction:: chrp_topology_append
 
@@ -145,6 +167,8 @@ Function manipulating ``CHRP_ATOM``
 -----------------------------------
 
 .. doxygenfunction:: chrp_atom
+
+.. doxygenfunction:: chrp_atom_from_name
 
 .. doxygenfunction:: chrp_topology_atom
 

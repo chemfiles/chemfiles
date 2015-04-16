@@ -108,35 +108,62 @@ CHRP_TRAJECTORY* chrp_open(const char* filename, const char* mode);
 
 /*!
 * @brief Read a specific step of a trajectory in a frame
-* @param file A pointer to the file
+* @param file A pointer to the trajectory
 * @param step The step to read
 * @param frame A frame to fill with the data
 * @return The status code.
 */
-int chrp_read_step(CHRP_TRAJECTORY *file, size_t step, const CHRP_FRAME* frame);
+int chrp_trajectory_read(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame);
 
 /*!
 * @brief Read the next step of a trajectory in a frame
-* @param file A pointer to the file
+* @param file A pointer to the trajectory
 * @param frame A frame to fill with the data
 * @return The status code.
 */
-int chrp_read_next_step(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
+int chrp_trajectory_read_next(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
 
 /*!
 * @brief Write a step (a frame) to a trajectory.
-* @param file The file to write
+* @param file The trajectory to write
 * @param frame the frame which will be writen to the file
 * @return The status code.
 */
-int chrp_write_step(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
+int chrp_trajectory_write(CHRP_TRAJECTORY *file, const CHRP_FRAME *frame);
+
+/*!
+* @brief Set the topology associated with a trajectory. This topology will be
+*        used when reading and writing the files, replacing any topology in the
+*        frames or files.
+* @param file A pointer to the trajectory
+* @param topology The new topology to use
+* @return The status code.
+*/
+int chrp_trajectory_topology(CHRP_TRAJECTORY *file, CHRP_TOPOLOGY *topology);
+
+/*!
+* @brief Set the topology associated with a trajectory by reading the first
+*        frame of \c filename; and extracting the topology of this frame.
+* @param file A pointer to the trajectory
+* @param filename The file to read in order to get the new topology
+* @return The status code.
+*/
+int chrp_trajectory_topology_file(CHRP_TRAJECTORY *file, const char* filename);
+
+/*!
+* @brief Get the number of steps (the number of frames) in a trajectory.
+* @param file A pointer to the trajectory
+* @param nsteps This will contain the number of steps
+* @return The status code.
+*/
+int chrp_trajectory_nsteps(CHRP_TRAJECTORY *file, size_t *nsteps);
 
 /*!
 * @brief Close a trajectory file, and free the associated memory
 * @param file A pointer to the file
 * @return The status code
 */
-int chrp_close(CHRP_TRAJECTORY *file);
+int chrp_trajectory_close(CHRP_TRAJECTORY *file);
 
 /******************************************************************************/
 /*!
@@ -192,6 +219,38 @@ int chrp_frame_velocities(const CHRP_FRAME* frame, float (*data)[3], size_t size
 int chrp_frame_velocities_set(CHRP_FRAME* frame, float (*data)[3], size_t size);
 
 /*!
+* @brief Check if a frame has velocity information.
+* @param frame The frame
+* @param has_vel true if the frame has velocities, false otherwise.
+* @return The status code
+*/
+int chrp_frame_has_velocities(const CHRP_FRAME* frame, bool *has_vel);
+
+/*!
+* @brief Set the UnitCell of a frame.
+* @param frame The frame
+* @param cell The cell
+* @return The status code
+*/
+int chrp_frame_cell_set(CHRP_FRAME* frame, const CHRP_CELL* cell);
+
+/*!
+* @brief Get the Frame step, i.e. the frame number in the trajectory
+* @param frame The frame
+* @param step This will contains the step number
+* @return The status code
+*/
+int chrp_frame_step(const CHRP_FRAME* frame, size_t* step);
+
+/*!
+* @brief Set the Frame step.
+* @param frame The frame
+* @param step The new frame step
+* @return The status code
+*/
+int chrp_frame_step_set(CHRP_FRAME* frame, size_t step);
+
+/*!
 * @brief Destroy a frame, and free the associated memory
 * @param frame The frame to destroy
 * @return The status code
@@ -200,11 +259,19 @@ int chrp_frame_free(CHRP_FRAME* frame);
 
 /******************************************************************************/
 /*!
-* @brief Get the topology from a frame
-* @param frame the frame
-* @return A pointer to the topology
+* @brief Create an UnitCell from the three lenghts and the three angles
+* @param a,b,c the three lenghts of the cell
+* @param alpha,beta,gamma the three angles of the cell
+* @return A pointer to the UnitCell
 */
-CHRP_CELL* chrp_cell(CHRP_FRAME* frame);
+CHRP_CELL* chrp_cell(double a, double b, double c, double alpha, double beta, double gamma);
+
+/*!
+* @brief Get the UnitCell from a frame
+* @param frame the frame
+* @return A pointer to the UnitCell
+*/
+CHRP_CELL* chrp_frame_cell(CHRP_FRAME* frame);
 
 /*!
 * @brief Get the cell lenghts.
@@ -303,6 +370,30 @@ int chrp_cell_free(CHRP_CELL* cell);
 * @return A pointer to the new Topology
 */
 CHRP_TOPOLOGY* chrp_topology(CHRP_FRAME* frame);
+
+/*!
+* @brief Create an empty topology, with no atoms inside
+* @return A pointer to the new Topology
+*/
+CHRP_TOPOLOGY* chrp_empty_topology();
+
+/*!
+* @brief Get the topology size, i.e. the current number of atoms
+* @param topology The topology to analyse
+* @param natoms Will contain the number of atoms in the frame
+* @return The status code
+*/
+int chrp_topology_size(const CHRP_TOPOLOGY* topology, size_t *natoms);
+
+/*!
+* @brief Try to guess the bonds, angles and dihedrals in the system. If \c bonds
+*        is true, guess everything; else only guess the angles and dihedrals from
+*        the bond list.
+* @param topology The topology to analyse
+* @param bonds Should we recompute the bonds from the positions or not ?
+* @return The status code
+*/
+int chrp_topology_guess(CHRP_TOPOLOGY* topology, bool bonds);
 
 /*!
 * @brief Add an atom to a topology
@@ -436,15 +527,19 @@ int chrp_topology_free(CHRP_TOPOLOGY* topology);
 CHRP_ATOM* chrp_atom(CHRP_FRAME* frame, size_t idx);
 
 /*!
+* @brief Create an atom from an atomic name
+* @param name The new atom name
+* @return A pointer to the corresponding atom
+*/
+CHRP_ATOM* chrp_atom_from_name(const char* name);
+
+/*!
 * @brief Get a specific atom from a topology
 * @param topology The topology
 * @param idx The atom index
 * @return A pointer to the corresponding atom
 */
 CHRP_ATOM* chrp_topology_atom(CHRP_TOPOLOGY* topology, size_t idx);
-
-// TODO: constructor by name
-// TODO: more constructors for each types
 
 /*!
 * @brief Get the mass of an atom, in atomic mass units
