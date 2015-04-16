@@ -82,10 +82,14 @@ configure_file ( # This version of the file is used for installations
   "${CMAKE_BINARY_DIR}/Chemharp.install.hpp"
 )
 
+include(Platforms)
+
 add_library(chemharp SHARED ${sources} bindings/c/capi.cpp)
-target_link_libraries(chemharp ${Boost_LIBRARIES})
+
 set_property(TARGET chemharp PROPERTY VERSION ${CHRP_VERSION})
 set_property(TARGET chemharp PROPERTY SOVERSION ${CHRP_VERSION})
+
+target_link_libraries(chemharp ${Boost_LIBRARIES} ${OTHER_CHRP_LIBRARIES})
 
 if(${HAVE_NETCDF})
     add_dependencies(chemharp netcdfcxx)
