@@ -22,15 +22,15 @@ include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
 file(GLOB python_sources *.cpp)
 
-PYTHON_ADD_MODULE(_chemharp ${python_sources})
-add_dependencies(_chemharp Boost.Numpy)
-target_link_libraries(_chemharp
+PYTHON_ADD_MODULE(chemharp_python ${python_sources})
+add_dependencies(chemharp_python Boost.Numpy)
+target_link_libraries(chemharp_python
     chemharp
     boost_numpy
     ${Boost_LIBRARIES}
 )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_chemharp.so
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/chemharp_python.so
         DESTINATION ${PYTHON_SITE_PACKAGES}
         RENAME chemharp.so)
 
