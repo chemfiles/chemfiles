@@ -73,6 +73,9 @@ configure_file ( # This version of the file is used for installations
 
 add_library(chemharp SHARED ${sources} bindings/c/capi.cpp)
 target_link_libraries(chemharp ${Boost_LIBRARIES})
+set_property(TARGET chemharp PROPERTY VERSION ${CHRP_VERSION})
+set_property(TARGET chemharp PROPERTY SOVERSION ${CHRP_VERSION})
+
 if(${HAVE_NETCDF})
     add_dependencies(chemharp netcdfcxx)
     target_link_libraries(chemharp ${NETCDF_LIBRARIES} netcdf_cxx4)

@@ -2,6 +2,8 @@
 enable_language(Fortran)
 add_library(chemharpf SHARED chemharp.f90)
 target_link_libraries(chemharpf chemharp)
+set_property(TARGET chemharpf PROPERTY VERSION ${CHRP_VERSION})
+set_property(TARGET chemharpf PROPERTY SOVERSION ${CHRP_VERSION})
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/chemharp.mod DESTINATION include)
 install(TARGETS chemharpf DESTINATION lib)
