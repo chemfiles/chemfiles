@@ -4,7 +4,7 @@
 """
 Testing the reading of a trajectory, and the read access to all the types
 """
-
+import add_chemharp_to_path
 from chemharp import *
 import os
 
@@ -28,7 +28,7 @@ MIDLE_FRAME = {
 
 
 def check_frame(frame, reference):
-    assert(frame.has_velocities == False)
+    assert(not frame.has_velocities)
     assert(frame.natoms == 125)
     assert(len(frame) == 125)
 

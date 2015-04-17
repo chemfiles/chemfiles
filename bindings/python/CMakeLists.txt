@@ -30,13 +30,18 @@ target_link_libraries(chemharp_python
     ${Boost_LIBRARIES}
 )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/chemharp_python.so
-        DESTINATION ${PYTHON_SITE_PACKAGES}
-        RENAME chemharp.so)
+add_custom_command(TARGET chemharp_python POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy
+                       $<TARGET_FILE:chemharp_python>
+                       chemharp.so
+                   COMMENT "Copying Python binding to 'chemharp.so'")
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/chemharp.so
+        DESTINATION ${PYTHON_SITE_PACKAGES})
 
 function(chrp_python_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
-    add_test(NAME python-${_name_} COMMAND ${PYTHON_EXECUTABLE} ${_file_})
+    add_test(NAME python-${_name_} COMMAND ${PYTHON_EXECUTABLE} ${_file_} ${CMAKE_CURRENT_BINARY_DIR})
 endfunction()
 
 if(BUILD_TESTS)
