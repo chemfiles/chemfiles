@@ -13,9 +13,9 @@ void register_trajectory() {
     /* Trajectory class *******************************************************/
     py::class_<Trajectory, boost::noncopyable>("Trajectory",
             py::init<string, py::optional<string, string>>())
-        .def("read_next_step", &Trajectory::read_next_step)
-        .def("read_at_step", &Trajectory::read_at_step)
-        .def("write_step", &Trajectory::write_step)
+        .def("read", &Trajectory::read)
+        .def("read_at", &Trajectory::read_at)
+        .def("write", &Trajectory::write)
         .def("done", &Trajectory::done)
         .def("close", &Trajectory::close)
         .def("nsteps", &Trajectory::nsteps)
