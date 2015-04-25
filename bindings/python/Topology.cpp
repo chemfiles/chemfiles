@@ -15,7 +15,7 @@ void topology_setitem(Topology& top, size_t index, const Atom& atom) {
 
 void register_topology() {
     /* Topology class *********************************************************/
-    py::class_<Topology>("Topology")
+    py::class_<Topology>("Topology", py::init<py::optional<size_t>>())
         .def("append", &Topology::append)
         .def("remove", &Topology::remove)
         .def("add_bond", &Topology::add_bond)

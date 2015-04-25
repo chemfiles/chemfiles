@@ -11,7 +11,7 @@
 
 void register_frame() {
     /* Frame class ************************************************************/
-    py::class_<Frame>("Frame")
+    py::class_<Frame>("Frame", py::init<py::optional<size_t>>())
         .add_property("positions",
             py::make_function(
                 static_cast<const Array3D& (Frame::*)(void) const>(&Frame::positions),
