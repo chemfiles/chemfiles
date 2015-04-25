@@ -50,7 +50,7 @@ associated with the file.
 
 .. doxygenfunction:: chrp_trajectory_read
 
-.. doxygenfunction:: chrp_trajectory_read_next
+.. doxygenfunction:: chrp_trajectory_read_at
 
 .. doxygenfunction:: chrp_trajectory_write
 

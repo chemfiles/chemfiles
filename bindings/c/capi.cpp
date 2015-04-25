@@ -53,21 +53,21 @@ error:
     return traj;
 }
 
-int chrp_trajectory_read(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame){
+int chrp_trajectory_read_at(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame){
     CHRP_ERROR_WRAP_RETCODE(
-        *frame = file->read_at_step(step);
+        *frame = file->read_at(step);
     )
 }
 
-int chrp_trajectory_read_next(CHRP_TRAJECTORY *file, CHRP_FRAME *frame){
+int chrp_trajectory_read(CHRP_TRAJECTORY *file, CHRP_FRAME *frame){
     CHRP_ERROR_WRAP_RETCODE(
-        *frame = file->read_next_step();
+        *frame = file->read();
     )
 }
 
 int chrp_trajectory_write(CHRP_TRAJECTORY *file, const CHRP_FRAME *frame){
     CHRP_ERROR_WRAP_RETCODE(
-         file->write_step(*frame);
+         file->write(*frame);
     )
 }
 

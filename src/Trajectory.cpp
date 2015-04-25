@@ -46,16 +46,16 @@ Trajectory::Trajectory(const string& filename, const string& mode, const string&
 Trajectory::~Trajectory(){}
 
 Trajectory& Trajectory::operator>>(Frame& frame){
-    frame = read_next_step();
+    frame = read();
     return *this;
 }
 
-Frame Trajectory::read_next_step(){
+Frame Trajectory::read(){
     if (_step >= _nsteps)
         throw FileError("Can not read file \"" + _file->name() + "\" past end.");
 
     Frame frame;
-    _format->read_next_step(_file.get(), frame);
+    _format->read(_file.get(), frame);
     _step++;
 
     // Set the frame trajectory if needed
@@ -65,7 +65,7 @@ Frame Trajectory::read_next_step(){
     return frame;
 }
 
-Frame Trajectory::read_at_step(const size_t step){
+Frame Trajectory::read_at(const size_t step){
     if (step >= _nsteps)
         throw FileError(
             "Can not read file \"" + _file->name() + "\" at step " +
@@ -74,7 +74,7 @@ Frame Trajectory::read_at_step(const size_t step){
 
     Frame frame;
     _step = step;
-    _format->read_at_step(_file.get(), _step, frame);
+    _format->read_at(_file.get(), _step, frame);
 
     // Set the frame trajectory if needed
     if (use_custom_topology)
@@ -84,18 +84,18 @@ Frame Trajectory::read_at_step(const size_t step){
 }
 
 Trajectory& Trajectory::operator<<(const Frame& frame){
-    write_step(frame);
+    write(frame);
     return *this;
 }
 
-void Trajectory::write_step(const Frame& input_frame){
+void Trajectory::write(const Frame& input_frame){
     // Maybe that is not the better way to do this, performance-wise. I'll have
     // to benchmark this part.
     Frame frame = input_frame;
     if (use_custom_topology)
         frame.topology(_topology);
 
-    _format->write_step(_file.get(), frame);
+    _format->write(_file.get(), frame);
     _step++;
     _nsteps++;
 }
@@ -110,7 +110,7 @@ void Trajectory::topology(const std::string& filename) {
     Trajectory topolgy_file(filename, "r");
     assert(topolgy_file.nsteps() > 0);
 
-    auto frame = topolgy_file.read_at_step(0);
+    auto frame = topolgy_file.read_at(0);
     Trajectory::topology(frame.topology());
 }
 

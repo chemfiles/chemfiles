@@ -35,7 +35,7 @@ public:
     *
     * This function can throw an exception in case of error.
     */
-    virtual void read_at_step(File* file, const size_t step, Frame& frame);
+    virtual void read_at(File* file, const size_t step, Frame& frame);
 
     /*!
     * @brief Read a specific step from a file.
@@ -44,7 +44,7 @@ public:
     * This function can throw an exception in case of error. The cursor is
     * assumed to be at the right position in case of text files.
     */
-    virtual void read_next_step(File* file, Frame& frame);
+    virtual void read(File* file, Frame& frame);
 
     /*!
     * @brief Write a step (frame) to a file.
@@ -53,7 +53,7 @@ public:
     *
     * This function can throw an exception in case of error.
     */
-    virtual void write_step(File* file, const Frame& frame);
+    virtual void write(File* file, const Frame& frame);
 
     /*!
     * @brief Get the number of frames in a file

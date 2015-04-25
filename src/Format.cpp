@@ -12,14 +12,14 @@
 #include "Error.hpp"
 using namespace harp;
 
-void Format::read_at_step(File*, const size_t, Frame&){
-    throw FormatError("Not implemented function read_at_step.");
+void Format::read_at(File*, const size_t, Frame&){
+    throw FormatError("Not implemented function read.");
 }
 
-void Format::read_next_step(File*, Frame&){
-    throw FormatError("Not implemented function read_at_step.");
+void Format::read(File*, Frame&){
+    throw FormatError("Not implemented function read.");
 }
 
-void Format::write_step(File*, const Frame&){
-    throw FormatError("Not implemented function read_at_step.");
+void Format::write(File*, const Frame&){
+    throw FormatError("Not implemented function read.");
 }

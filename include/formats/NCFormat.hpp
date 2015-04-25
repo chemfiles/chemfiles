@@ -34,9 +34,9 @@ public:
     NCFormat();
     ~NCFormat() = default;
 
-    void read_at_step(File* file, const size_t step, Frame& frame);
-    void read_next_step(File* file, Frame& frame);
-    void write_step(File* file, const Frame& frame);
+    void read_at(File* file, const size_t step, Frame& frame);
+    void read(File* file, Frame& frame);
+    void write(File* file, const Frame& frame);
 
     size_t nsteps(File* file) const;
     std::string description() const;

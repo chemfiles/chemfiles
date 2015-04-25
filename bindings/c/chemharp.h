@@ -113,7 +113,7 @@ CHRP_TRAJECTORY* chrp_open(const char* filename, const char* mode);
 * @param frame A frame to fill with the data
 * @return The status code.
 */
-int chrp_trajectory_read(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame);
+int chrp_trajectory_read_at(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame);
 
 /*!
 * @brief Read the next step of a trajectory in a frame
@@ -121,7 +121,7 @@ int chrp_trajectory_read(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame);
 * @param frame A frame to fill with the data
 * @return The status code.
 */
-int chrp_trajectory_read_next(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
+int chrp_trajectory_read(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
 
 /*!
 * @brief Write a step (a frame) to a trajectory.

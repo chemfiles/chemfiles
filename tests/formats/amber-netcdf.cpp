@@ -42,7 +42,7 @@ TEST_CASE("Read files in NetCDF format", "[Amber NetCDF]"){
     }
 
     SECTION("Method style reading"){
-        frame = file.read_next_step();
+        frame = file.read();
         CHECK(frame.natoms() == 297);
         // Check positions
         auto positions = frame.positions();
@@ -87,7 +87,7 @@ TEST_CASE("Write files in NetCDF format", "[Amber NetCDF]"){
 
     SECTION("Check the file") {
         Trajectory check("tmp.nc", "r");
-        auto frame = check.read_next_step();
+        auto frame = check.read();
         auto positions = frame.positions();
         CHECK(roughly(positions[0], Vector3D(1, 2, 3), 1e-4));
         CHECK(roughly(positions[1], Vector3D(1, 2, 3), 1e-4));

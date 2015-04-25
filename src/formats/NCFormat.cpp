@@ -90,7 +90,7 @@ void NCFormat::validate(NCFile* file, size_t natoms) const{
         throw FormatError("Invalid AMBER NetCDF file " + file->name());
 }
 
-void NCFormat::read_at_step(File* file, const size_t _step, Frame& frame){
+void NCFormat::read_at(File* file, const size_t _step, Frame& frame){
     auto ncfile = dynamic_cast<NCFile*>(file);
 
     validate(ncfile);
@@ -105,8 +105,8 @@ void NCFormat::read_at_step(File* file, const size_t _step, Frame& frame){
     read_array3D(ncfile, vel, "velocities");
 }
 
-void NCFormat::read_next_step(File* file, Frame& frame) {
-    read_at_step(file, step, frame);
+void NCFormat::read(File* file, Frame& frame) {
+    read_at(file, step, frame);
     step++;
 }
 
@@ -207,7 +207,7 @@ static void initialize(NCFile* file, size_t natoms, bool velocities){
     }
 }
 
-void NCFormat::write_step(File* file, const Frame& frame) {
+void NCFormat::write(File* file, const Frame& frame) {
     auto ncfile = dynamic_cast<NCFile*>(file);
     auto natoms = frame.natoms();
     try {

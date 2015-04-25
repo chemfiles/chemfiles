@@ -26,10 +26,6 @@ class Format;
 *
 * The Trajectory class puts together a format and a file, and implement the main
 * read/write operations.
-*
-* The returned frame is cached, and a reference to it is used as return value.
-* This means that any call to read_at_step or read_next_step will invalidate any
-* previously used frame.
 */
 class Trajectory {
 public:
@@ -56,16 +52,16 @@ public:
     //! Read operator, in *stream* version
     Trajectory& operator>>(Frame& frame);
     //! Read operator, in *method* version
-    Frame read_next_step();
+    Frame read();
     //! Read operator, in *method* version with specific step
-    Frame read_at_step(const size_t);
+    Frame read_at(const size_t);
     //! Close a trajectory
     void close();
 
     //! Write operator, in *stream* version
     Trajectory& operator<<(const Frame& frame);
     //! Write operator, in *method* version
-    void write_step(const Frame& frame);
+    void write(const Frame& frame);
 
     //! Set a topology to use while writing or reading format where no
     //! topological information is present.

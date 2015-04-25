@@ -10,7 +10,7 @@ int main() {
     if (traj == NULL)
         goto error;
 
-    if (!chrp_trajectory_read_next(traj, frame) || frame == NULL)
+    if (!chrp_trajectory_read(traj, frame) || frame == NULL)
         goto error;
 
     size_t natoms = 0;

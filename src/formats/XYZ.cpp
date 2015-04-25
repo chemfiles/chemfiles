@@ -59,14 +59,14 @@ size_t XYZFormat::nsteps(File* file) const {
     return n;
 }
 
-void XYZFormat::read_at_step(File* file, const size_t step, Frame& frame){
+void XYZFormat::read_at(File* file, const size_t step, Frame& frame){
     auto textfile = dynamic_cast<TextFile*>(file);
     textfile->rewind();
     forward(textfile, step);
-    read_next_step(file, frame);
+    read(file, frame);
 }
 
-void XYZFormat::read_next_step(File* file, Frame& frame){
+void XYZFormat::read(File* file, Frame& frame){
     auto textfile = dynamic_cast<TextFile*>(file);
     size_t natoms;
 
@@ -102,7 +102,7 @@ void XYZFormat::read_next_step(File* file, Frame& frame){
     // TODO: frame.topology().guess();
 }
 
-void XYZFormat::write_step(File* file, const Frame& frame){
+void XYZFormat::write(File* file, const Frame& frame){
     auto textfile = dynamic_cast<TextFile*>(file);
 
     const auto topology = frame.topology();

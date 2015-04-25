@@ -42,7 +42,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
     }
 
     SECTION("Method style reading"){
-        frame = file.read_next_step();
+        frame = file.read();
         CHECK(frame.natoms() == 125);
         // Check positions
         auto positions = frame.positions();
@@ -57,7 +57,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
 
     SECTION("Read a specific step"){
         // Read frame at a specific positions
-        frame = file.read_at_step(42);
+        frame = file.read_at(42);
         auto positions = frame.positions();
         CHECK(positions[0] == Vector3D(-0.145821f, 8.540648f, 1.090281f));
         CHECK(positions[124] == Vector3D(8.446093f, 8.168162f, 9.350953f));
@@ -66,7 +66,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         CHECK(topology.natoms() == 125);
         CHECK(topology[0] == Atom("He"));
 
-        frame = file.read_at_step(0);
+        frame = file.read_at(0);
         positions = frame.positions();
         CHECK(positions[0] == Vector3D(0.49053f, 8.41351f, 0.0777257f));
         CHECK(positions[124] == Vector3D(8.57951f, 8.65712f, 8.06678f));
@@ -101,7 +101,7 @@ TEST_CASE("Errors in XYZ format", "[XYZ]"){
             // We can throw either when creating the trajectory, or when reading
             // the frame, depending on the type of error
             auto file = Trajectory(entry.path().string());
-            file.read_next_step(),
+            file.read(),
         FormatError);
     }
 }
