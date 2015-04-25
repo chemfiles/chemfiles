@@ -5,12 +5,12 @@
 
 int main() {
     CHRP_TRAJECTORY* traj = chrp_open("tests/files/xyz/helium.xyz", "r");
-    CHRP_FRAME* frame = NULL;
+    CHRP_FRAME* frame = chrp_frame(0);
 
     if (traj == NULL)
         goto error;
 
-    if (!chrp_trajectory_read(traj, frame) || frame == NULL)
+    if (chrp_trajectory_read(traj, frame))
         goto error;
 
     size_t natoms = 0;
@@ -25,7 +25,7 @@ int main() {
         indexes[i] = (unsigned)-1;
     }
 
-    if (!chrp_frame_positions(frame, positions, natoms))
+    if (chrp_frame_positions(frame, positions, natoms))
         goto error;
 
     unsigned last_index = 0;
@@ -46,6 +46,8 @@ int main() {
 
     chrp_trajectory_close(traj);
     chrp_frame_free(frame);
+    free(positions);
+
     return 0;
 
 error:
