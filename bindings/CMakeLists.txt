@@ -14,6 +14,8 @@ endfunction()
 
 if(BUILD_TESTS)
     file(GLOB c_test_files ${CMAKE_CURRENT_SOURCE_DIR}/c/tests/*.c)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c)
+    add_definitions("-DDATADIR=\"${CMAKE_SOURCE_DIR}/tests/data/\"")
     foreach(test_file IN LISTS c_test_files)
         chrp_c_test(${test_file})
     endforeach(test_file)
