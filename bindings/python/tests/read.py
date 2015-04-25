@@ -4,7 +4,6 @@
 """
 Testing the reading of a trajectory, and the read access to all the types
 """
-import add_chemharp_to_path
 from chemharp import *
 import os
 
@@ -57,7 +56,7 @@ def check_cell(cell):
 
 if __name__ == "__main__":
     traj = Trajectory(XYZFILE)
-    frame = traj.read_next_step()
+    frame = traj.read()
     assert(frame.step == 0)
 
     check_frame(frame, FIRST_FRAME)
@@ -65,9 +64,9 @@ if __name__ == "__main__":
     check_cell(frame.cell)
 
     while not traj.done():
-        frame = traj.read_next_step()
+        frame = traj.read()
 
     check_frame(frame, LAST_FRAME)
 
-    frame = traj.read_at_step(42)
+    frame = traj.read_at(42)
     check_frame(frame, MIDLE_FRAME)

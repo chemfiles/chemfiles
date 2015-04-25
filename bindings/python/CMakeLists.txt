@@ -41,7 +41,9 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/chemharp.so
 
 function(chrp_python_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
-    add_test(NAME python-${_name_} COMMAND ${PYTHON_EXECUTABLE} ${_file_} ${CMAKE_CURRENT_BINARY_DIR})
+    add_test(NAME python-${_name_} COMMAND ${PYTHON_EXECUTABLE} ${_file_})
+    set_tests_properties(python-${_name_}
+        PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}")
 endfunction()
 
 if(BUILD_TESTS)
