@@ -83,6 +83,8 @@ Function manipulating ``CHRP_FRAME``
 
 .. doxygenfunction:: chrp_frame_cell_set
 
+.. doxygenfunction:: chrp_frame_topology_set
+
 .. doxygenfunction:: chrp_frame_step
 
 .. doxygenfunction:: chrp_frame_step_set

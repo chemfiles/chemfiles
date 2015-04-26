@@ -227,12 +227,20 @@ int chrp_frame_velocities_set(CHRP_FRAME* frame, float (*data)[3], size_t size);
 int chrp_frame_has_velocities(const CHRP_FRAME* frame, bool *has_vel);
 
 /*!
-* @brief Set the UnitCell of a frame.
+* @brief Set the UnitCell of a Frame.
 * @param frame The frame
-* @param cell The cell
+* @param cell The new cell
 * @return The status code
 */
 int chrp_frame_cell_set(CHRP_FRAME* frame, const CHRP_CELL* cell);
+
+/*!
+* @brief Set the Topology of a Frame.
+* @param frame The frame
+* @param topology The new topology
+* @return The status code
+*/
+int chrp_frame_topology_set(CHRP_FRAME* frame, const CHRP_TOPOLOGY* topology);
 
 /*!
 * @brief Get the Frame step, i.e. the frame number in the trajectory

@@ -168,6 +168,12 @@ int chrp_frame_cell_set(CHRP_FRAME* frame, const CHRP_CELL* cell) {
     )
 }
 
+int chrp_frame_topology_set(CHRP_FRAME* frame, const CHRP_TOPOLOGY* topology) {
+    CHRP_ERROR_WRAP_RETCODE(
+        frame->topology(*topology);
+    )
+}
+
 int chrp_frame_step(const CHRP_FRAME* frame, size_t* step) {
     CHRP_ERROR_WRAP_RETCODE(
         *step = frame->step();
