@@ -125,7 +125,7 @@ int chrp_frame_positions_set(CHRP_FRAME* frame, float (*data)[3], size_t size){
     }
     CHRP_ERROR_WRAP_RETCODE(
         frame->resize(size);
-        auto positions = frame->positions();
+        auto& positions = frame->positions();
         for (size_t i=0; i<frame->natoms(); i++) {
             positions[i][0] = data[i][0];
             positions[i][1] = data[i][1];
@@ -147,7 +147,7 @@ int chrp_frame_velocities_set(CHRP_FRAME* frame, float (*data)[3], size_t size){
     }
     CHRP_ERROR_WRAP_RETCODE(
         frame->resize(size, true);
-        auto velocities = frame->velocities();
+        auto& velocities = frame->velocities();
         for (size_t i=0; i<frame->natoms(); i++) {
             velocities[i][0] = data[i][0];
             velocities[i][1] = data[i][1];
