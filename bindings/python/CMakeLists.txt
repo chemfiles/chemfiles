@@ -7,6 +7,8 @@ ExternalProject_add(Boost.Numpy
                 -DBUILD_TESTS=OFF
                 -DLIBRARY_TYPE=STATIC
                 -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
+                -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+                -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     UPDATE_COMMAND ""
 )
 include_directories(${CMAKE_BINARY_DIR}/include)
