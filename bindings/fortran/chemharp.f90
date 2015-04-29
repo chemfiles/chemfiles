@@ -13,9 +13,9 @@ module chemharp
     use iso_c_binding
     implicit none
 
-    include "cenums.f90"
-    include "cdef.f90"
-    include "ftypes.f90"
+    include "generated/cenums.f90"
+    include "generated/cdef.f90"
+    include "generated/ftypes.f90"
 contains
-    include "interface.f90"
+    include "generated/interface.f90"
 end module chemharp
