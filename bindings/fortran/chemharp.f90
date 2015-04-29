@@ -11,6 +11,7 @@
 
 module chemharp
     use iso_c_binding
+    use strings
     implicit none
 
     include "generated/cenums.f90"

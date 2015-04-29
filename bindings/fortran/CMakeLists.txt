@@ -1,6 +1,7 @@
 
 enable_language(Fortran)
-add_library(chemharpf SHARED chemharp.f90)
+file(GLOB fortran-sources *.f90)
+add_library(chemharpf SHARED ${fortran-sources})
 target_link_libraries(chemharpf chemharp)
 set_property(TARGET chemharpf PROPERTY VERSION ${CHRP_VERSION})
 set_property(TARGET chemharpf PROPERTY SOVERSION ${CHRP_VERSION})
