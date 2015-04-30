@@ -35,7 +35,7 @@ function chrp_loglevel_c(level) bind(C, name="chrp_loglevel")
     use iso_c_binding
     implicit none
     integer(c_int) :: chrp_loglevel_c
-    include "cenums.f90"
+    include "generated/cenums.f90"
     integer(kind(log_level)), value :: level
 end function
 
@@ -317,7 +317,7 @@ function chrp_cell_type_c(cell, type) bind(C, name="chrp_cell_type")
     implicit none
     integer(c_int) :: chrp_cell_type_c
     type(c_ptr), intent(in) :: cell
-    include "cenums.f90"
+    include "generated/cenums.f90"
     integer(kind(cell_type)) :: type
 end function
 
@@ -327,7 +327,7 @@ function chrp_cell_type_set_c(cell, type) bind(C, name="chrp_cell_type_set")
     implicit none
     integer(c_int) :: chrp_cell_type_set_c
     type(c_ptr) :: cell
-    include "cenums.f90"
+    include "generated/cenums.f90"
     integer(kind(cell_type)), value :: type
 end function
 

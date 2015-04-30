@@ -3,100 +3,109 @@
 """
 This module associate functions names and types
 """
-from pycparser import c_ast
-from fortran.constants import FTYPES
+from .constants import FTYPES
 
-FUNCTIONS = {
-    "trajectory": [
-        'chrp_open', 'chrp_read_step', 'chrp_read_next_step',
-        'chrp_write_step', 'chrp_close'
-    ],
+
+class Argument:
+    '''
+    Representing a function argument, or return type
+    '''
+
+    def __init__(self, name, _type):
+        self.name = name
+        self.type = _type
+
+    def __str__(self):
+        return str(self.name)
+
+    def to_fortran(self, *args, **kwargs):
+        '''
+        Render the fortran type declaration of this argument
+        '''
+        res = self.type.to_fortran(*args, **kwargs)
+        res += " :: " + self.name
+        return res
+
+
+class Function:
+    '''
+    Representing a function, with a name, a return type and some arguments
+    '''
+    def __init__(self, name, coord, rettype):
+        self.name = name
+        self.coord = coord
+        self.args = []
+        self.rettype = rettype
+
+    def add_arg(self, arg):
+        '''Add an argument to the list of arguments'''
+        self.args.append(arg)
+
+    def args_str(self):
+        '''Get a comma-separated string containing the argument names'''
+        return ", ".join(map(str, self.args))
+
+    @property
+    def fname(self):
+        '''
+        Fortran function name
+        '''
+        name = self.name
+        if self.is_constructor:
+            name += "_init_"
+        return name
+
+    @property
+    def c_interface_name(self):
+        '''
+        C-interface function name
+        '''
+        return self.name + "_c"
+
+    @property
+    def typename(self):
+        '''
+        Get the Fortran type associated with this function, or None in case of
+        free functions.
+        '''
+        typename = "_".join(self.name.split("_")[:2])
+        if typename in FTYPES:
+            return typename
+        else:
+            return None
+
+    @property
+    def member_name(self):
+        '''
+        Get the member part in the name of this function. For example, in
+            chrp_trajectory_topology_set
+        the member name part is
+            topology_set
+        '''
+        typename = self.typename
+        assert(typename)
+        if typename == self.name:
+            return "init"
+        else:
+            return self.name[len(typename) + 1:]
+
+    @property
+    def is_constructor(self):
+        '''
+        True if this function return a pointer to one of the chemharp types
+        '''
+        return self.rettype.cname.startswith("CHRP_")
+
+
+# All the fucntions not following the 'chrp_' + typename + fucntion_name
+# pattern.
+SPECIAL_FUNCTIONS = {
     "free": [
         'chrp_strerror', 'chrp_last_error', 'chrp_loglevel',
         'chrp_logfile', 'chrp_log_stderr'
     ],
-    "atom": ['chrp_topology_atom']
+    "chrp_trajectory": ['chrp_open'],
+    "chrp_atom": ['chrp_topology_atom'],
+    "chrp_topology": ['chrp_empty_topology'],
+    "chrp_cell": ['chrp_frame_cell'],
 }
-
-
-def members_functions(functions):
-    '''
-    Guess type <--> functions associations from the function names
-    '''
-    fnames = [f.name for f in functions]
-    members = {}
-
-    ignored = []
-    for names in FUNCTIONS.values():
-        ignored.extend(names)
-
-    for name in fnames:
-        if name in ignored:
-            continue
-        tmp = name[5:]
-        typename = tmp.split('_')[0]
-        assert(typename in FTYPES)
-        func = '_'.join(tmp.split('_')[1:])
-        if not func:
-            continue
-        try:
-            members[typename].append(func)
-        except KeyError:
-            members[typename] = [func]
-    return members
-
-
-class Type:
-
-    def __init__(self, typename):
-        self.typename = typename
-
-    def children(self):
-        return []
-
-
-class TypeVisitor(c_ast.NodeVisitor):
-    '''AST visitor for C function arguments'''
-
-    def __init__(self, C_TO_F, CHRP_TO_F, target="iso_c_binding"):
-        super(TypeVisitor, self).__init__()
-        self.C_TO_F = C_TO_F
-        self.CHRP_TO_F = CHRP_TO_F
-        self.target = target
-
-    def visit(self, *args, **kwargs):
-        self.declaration = "    "
-        super(TypeVisitor, self).visit(*args, **kwargs)
-        return self.declaration
-
-    def visit_TypeDecl(self, node):
-        self.declaration += self.C_TO_F[node.type.names[0]]
-        if self.target == "iso_c_binding":
-            self.declaration += ", value"
-
-    def visit_Type(self, node):
-        self.declaration += "class(" + node.typename + ")"
-
-    def visit_PtrDecl(self, node):
-        if isinstance(node.type, c_ast.ArrayDecl):
-            typename = self.C_TO_F[node.type.type.type.names[0]]
-            self.declaration += typename
-            self.declaration += ", dimension(:, :)"
-        else:
-            typename = node.type.type.names[0]
-            if typename in self.CHRP_TO_F.keys():
-                typename = self.CHRP_TO_F[typename]
-            elif typename == "char" and self.target == "iso_c_binding":
-                typename = "character(len=1, kind=c_char), dimension(:)"
-            elif typename == "char" and self.target == "fortran":
-                typename = "character(len=*)"
-            else:
-                typename = self.C_TO_F[typename]
-
-            self.declaration += typename
-            if "const" in node.type.quals:
-                self.declaration += ", intent(in)"
-
-    def visit_ArrayDecl(self, node, dims=[]):
-        self.declaration += self.C_TO_F[node.type.type.type.names[0]]
-        self.declaration += ", dimension(3, 3)"

@@ -3,7 +3,7 @@
 """
 This module generate wrappers for the enums in the C interface
 """
-from fortran.constants import BEGINING
+from .constants import BEGINING
 from pycparser import c_ast
 
 TEMPLATE = """

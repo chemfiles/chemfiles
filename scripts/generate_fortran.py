@@ -4,8 +4,9 @@
 import sys
 import os
 
+from fortran.parse import FunctionVisitor
 from fortran.cenums import write_enums, EnumVisitor
-from fortran.cdef import write_cdef, FunctionVisitor
+from fortran.cdef import write_cdef
 from fortran.ftypes import write_types
 from fortran.interface import write_interface
 from pycparser import parse_file
@@ -18,10 +19,11 @@ if __name__ == "__main__":
     if len(sys.argv) < 3:
         usage()
         sys.exit(0)
-    FORTRAN_ROOT = sys.argv[2]
+    C_HEADER = sys.argv[1]
+    FORTRAN_ROOT = os.path.join(sys.argv[2], "generated")
     libc_path = os.path.join(os.path.dirname(__file__), "libc")
-    ast = parse_file(sys.argv[1], use_cpp=True,
-                     cpp_path="gcc", cpp_args=["-E", "-I" + libc_path])
+    ast = parse_file(C_HEADER, use_cpp=True, cpp_path="gcc",
+                     cpp_args=["-E", "-I" + libc_path])
 
     evisitor = EnumVisitor()
     evisitor.visit(ast)

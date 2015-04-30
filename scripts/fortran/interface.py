@@ -3,9 +3,9 @@
 """
 This module generate Chemharp Fortran API by calling the C interfae
 """
-from fortran.constants import BEGINING, FTYPES
-from fortran.cdef import Argument
-from fortran.functions import FUNCTIONS, TypeVisitor, Type
+from .constants import BEGINING, FTYPES, STRING_LENGTH
+from .functions import SPECIAL_FUNCTIONS, Argument
+from .ctype import CType, StringType
 
 TEMPLATE = """
 subroutine {name}({args})
@@ -22,10 +22,10 @@ TEMPLATE_STR_FUNCTIONS = """
 function {name}({args}) result(string)
     implicit none
 {declarations}
-    character, pointer, dimension(:) :: string
+    character(len={str_len}) :: string
     type(c_ptr) :: c_string
 
-    c_string = {name}_c({args})
+    c_string = {cname}({args})
     call c_f_pointer(c_string, string, [1])
 end function
 """
@@ -35,112 +35,77 @@ COPY_RETURN_STATUS = """
         status = status_tmp_
     end if"""
 
-CHRP_TYPES_TO_F = {
-    "CHRP_ATOM": "class(atom)",
-    "CHRP_TRAJECTORY": "class(trajectory)",
-    "CHRP_FRAME": "class(frame)",
-    "CHRP_CELL": "class(cell)",
-    "CHRP_TOPOLOGY": "class(topology)",
-}
-
-C_TO_F = {
-    "float": "real(kind=c_float)",
-    "double": "real(kind=c_double)",
-    "size_t": "integer(kind=c_size_t)",
-    "int": "integer(kind=c_int)",
-    "bool": "logical(kind=c_bool)",
-    # Enums wrapped to Fortran
-    "chrp_cell_type_t": 'include "cenums.f90"\n    integer(kind(cell_type))',
-    "chrp_log_level_t": 'include "cenums.f90"\n    integer(kind(log_level))',
-}
-
 
 def call_interface(args):
     '''
     Translate the arguments from fortran to C in function call
     '''
-    interface = "("
-
-    f_types = [name + "_" for name in FTYPES]
+    f_types = [type_[5:] for type_ in FTYPES]
     f_types.append("this")
 
-    for arg in args.split(", "):
-        if arg in f_types:
-            interface += arg + "%ptr, "
-        else:
-            interface += arg + ", "
-    interface = interface[:-2]
-    interface += ")"
+    args_call = [arg + "%ptr" * (arg in f_types) for arg in args.split(", ")]
+    interface = "(" + ", ".join(args_call) + ")"
     return interface
 
-def write_interface(path, functions):
+
+def write_interface(path, _functions):
     '''
     Generate fortran subroutines corresponding to the C functions
     '''
-
-    vis = TypeVisitor(C_TO_F, CHRP_TYPES_TO_F, target="fortran")
+    # Create a local copy of the functions list
+    functions = _functions[:]
 
     for function in functions:
         # If the function is a constructor, prepend the "this" argument in the
         # arguments list
         if function.is_constructor:
-            T = Type(function.return_type())
-            new_arg = Argument("this", T)
+            type_ = CType(function.rettype.cname, ptr=True)
+            new_arg = Argument("this", type_)
             function.args = [new_arg] + function.args
+            function.fname = function.name + "_init_"
 
         # Replace the first argument name by "this" if it is one of the
         # Chemharp types.
         try:
             arg = function.args[0]
-            typename = arg.type.type.type.names[0]
-            if typename in CHRP_TYPES_TO_F.keys():
+            typename = arg.type.cname
+            if typename.startswith("CHRP_"):
                 arg.name = "this"
-        except (IndexError, AttributeError):
+        except IndexError:
             pass
-
-        # Replace all the other occurences of a Chemharp type as argument name
-        # by the argument name with a "_" suffix.
-        for arg in function.args[1:]:
-            try:
-                typename = arg.type.type.type.names[0]
-            except AttributeError:
-                continue
-
-            if typename in CHRP_TYPES_TO_F.keys():
-                arg.name += "_"
-
 
     with open(path, "w") as fd:
         fd.write(BEGINING)
         for function in functions:
-            declarations = ""
-            instructions = ""
-            for arg in function.args:
-                declarations += vis.visit(arg.type)
-                declarations += " :: " + arg.name + "\n"
-            declarations = declarations[:-1]
+            declarations = "\n".join([arg.to_fortran(interface=True)
+                                     for arg in function.args])
 
-            if function.name in STR_FUNCTIONS:
+            if isinstance(function.rettype, StringType):
                 fd.write(TEMPLATE_STR_FUNCTIONS.format(
                             name=function.name,
+                            cname=function.c_interface_name,
                             args=function.args_str(),
-                            declarations=declarations))
+                            declarations=declarations,
+                            str_len=STRING_LENGTH))
             else:
-                args=function.args_str()
+                instructions = ""
+                args = function.args_str()
 
                 if function.is_constructor:
                     instructions = "    this%ptr = "
-                    instructions += function.name + "_c" + call_interface(args[6:])
+                    instructions += function.c_interface_name
+                    instructions += call_interface(args[6:])
                 else:
                     instructions = "    status_tmp_ = "
-                    instructions += function.name + "_c" + call_interface(args)
+                    instructions += function.c_interface_name
+                    instructions += call_interface(args)
                     args = args + ", status" if args else "status"
                     declarations += "\n    integer, optional :: status"
                     declarations += "\n    integer :: status_tmp_"
                     instructions += COPY_RETURN_STATUS
 
                 fd.write(TEMPLATE.format(
-                            name=function.name,
+                            name=function.fname,
                             args=args,
                             declarations=declarations,
                             instructions=instructions))

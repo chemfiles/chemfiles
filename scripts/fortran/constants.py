@@ -4,8 +4,13 @@
 Various constants for fortran API generation
 """
 
+# Maximum string length
+STRING_LENGTH = 512
 
-FTYPES = ["trajectory", "cell", "atom", "frame", "topology"]
+# List of type which have to be wrapped to fortran
+FTYPES = [
+    "chrp_trajectory", "chrp_cell", "chrp_atom", "chrp_frame", "chrp_topology"
+]
 
 LICENCE = """! Chemharp, an efficient IO library for chemistry file formats
 ! Copyright (C) 2015 Guillaume Fraux
