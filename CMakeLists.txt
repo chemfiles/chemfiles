@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 include(ExternalProject)
 
-project(chemharp)
+project(chemharp C CXX Fortran)
 set(CHRP_VERSION_MAJOR 0)
 set(CHRP_VERSION_MINOR 1)
 set(CHRP_VERSION_PATCH 0)

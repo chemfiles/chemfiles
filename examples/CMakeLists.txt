@@ -15,7 +15,7 @@ function(chrp_fortran_example _file_)
     add_executable(example-f90-${_name_} ${_file_})
     target_link_libraries(example-f90-${_name_} chemharp chemharpf)
 
-    
+
 
 endfunction()
 
@@ -33,6 +33,7 @@ if(BUILD_TESTS)
     endforeach()
 
     if(${FORTRAN_BINDING})
+        include_directories(${CMAKE_BINARY_DIR}/bindings/fortran)
         file(GLOB fortran_examples fortran/*.f90)
         foreach(example IN LISTS fortran_examples)
             chrp_fortran_example(${example})
