@@ -21,7 +21,7 @@ function chrp_strerror(status) result(string)
     type(c_ptr) :: c_string
 
     c_string = chrp_strerror_c(status)
-    call c_f_pointer(c_string, string, [1])
+    string = c_to_f_str(c_string)
 end function
 
 function chrp_last_error() result(string)
@@ -31,7 +31,7 @@ function chrp_last_error() result(string)
     type(c_ptr) :: c_string
 
     c_string = chrp_last_error_c()
-    call c_f_pointer(c_string, string, [1])
+    string = c_to_f_str(c_string)
 end function
 
 subroutine chrp_loglevel(level, status)

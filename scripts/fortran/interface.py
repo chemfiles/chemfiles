@@ -26,7 +26,7 @@ function {name}({args}) result(string)
     type(c_ptr) :: c_string
 
     c_string = {cname}({args})
-    call c_f_pointer(c_string, string, [1])
+    string = c_to_f_str(c_string)
 end function
 """
 

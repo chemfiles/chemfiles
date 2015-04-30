@@ -6,19 +6,17 @@ contains
     !** Convert a C string to a Fortran string
     function c_to_f_str(c_string) result(f_string)
         implicit none
-        character(len=1, kind=c_char), dimension(*), intent(in) :: c_string
-        character(len=:), allocatable :: f_string
-        integer :: N, i
+        type(c_ptr), target, intent(in) :: c_string
+        character(len=1024), pointer    :: tmp
+        character(len=1024)             :: f_string
+        integer                         :: str_len, i
 
-        i = 1
-        do
-           if (c_string(i) == c_null_char) exit
-           i = i + 1
+        call c_f_pointer(c_loc(c_string), tmp)
+        str_len = index(tmp, c_null_char) - 1
+
+        do i=1, str_len
+            f_string(i:i) = tmp(i:i)
         end do
-        N = i - 1  ! Exclude null character from Fortran string
-
-        allocate(character(len=N) :: f_string)
-        f_string = transfer(c_string(1:N), f_string)
     end function
 
     !** Convert a Fortran string to a C string
