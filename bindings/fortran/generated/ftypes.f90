@@ -35,6 +35,7 @@ contains
     procedure :: add_bond => chrp_topology_add_bond
     procedure :: remove_bond => chrp_topology_remove_bond
     procedure :: free => chrp_topology_free
+    procedure :: empty => chrp_empty_topology_init_
 end type
 
 type chrp_trajectory
@@ -48,6 +49,7 @@ contains
     procedure :: topology_file => chrp_trajectory_topology_file
     procedure :: nsteps => chrp_trajectory_nsteps
     procedure :: close => chrp_trajectory_close
+    procedure :: open => chrp_open_init_
 end type
 
 type chrp_frame

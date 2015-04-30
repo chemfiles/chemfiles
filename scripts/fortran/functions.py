@@ -105,7 +105,5 @@ SPECIAL_FUNCTIONS = {
         'chrp_logfile', 'chrp_log_stderr'
     ],
     "chrp_trajectory": ['chrp_open'],
-    "chrp_atom": ['chrp_topology_atom'],
     "chrp_topology": ['chrp_empty_topology'],
-    "chrp_cell": ['chrp_frame_cell'],
 }

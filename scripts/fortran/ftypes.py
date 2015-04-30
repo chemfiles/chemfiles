@@ -55,7 +55,7 @@ def write_types(path, functions):
 
     for func in functions:
         if func.name in SPECIAL_FUNCTIONS.values():
-            pass  # TODO
+            continue
         else:
             typename = func.typename
             if typename is None:
@@ -67,6 +67,14 @@ def write_types(path, functions):
                 types[typename] = ftype
 
             ftype.add_procedure(BoundProcedure(func.member_name, func.fname))
+
+    # TODO: find something generic here
+    types["chrp_trajectory"].add_procedure(
+            BoundProcedure('open', 'chrp_open_init_')
+    )
+    types["chrp_topology"].add_procedure(
+            BoundProcedure('empty', 'chrp_empty_topology_init_')
+    )
 
     with open(path, "w") as fd:
         fd.write(BEGINING)
