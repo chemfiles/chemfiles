@@ -279,7 +279,7 @@ CHRP_CELL* chrp_cell(double a, double b, double c, double alpha, double beta, do
 * @param frame the frame
 * @return A pointer to the UnitCell
 */
-CHRP_CELL* chrp_frame_cell(CHRP_FRAME* frame);
+CHRP_CELL* chrp_cell_from_frame(CHRP_FRAME* frame);
 
 /*!
 * @brief Get the cell lenghts.
@@ -547,7 +547,7 @@ CHRP_ATOM* chrp_atom_from_name(const char* name);
 * @param idx The atom index
 * @return A pointer to the corresponding atom
 */
-CHRP_ATOM* chrp_topology_atom(CHRP_TOPOLOGY* topology, size_t idx);
+CHRP_ATOM* chrp_atom_from_topology(CHRP_TOPOLOGY* topology, size_t idx);
 
 /*!
 * @brief Get the mass of an atom, in atomic mass units

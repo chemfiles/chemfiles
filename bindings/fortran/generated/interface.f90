@@ -338,12 +338,12 @@ subroutine chrp_cell_init_(this, a, b, c, alpha, beta, gamma)
     this%ptr = chrp_cell_c(a, b, c, alpha, beta, gamma)
 end subroutine
 
-subroutine chrp_frame_cell_init_(this, frame)
+subroutine chrp_cell_from_frame_init_(this, frame)
     implicit none
     class(chrp_cell) :: this
     class(chrp_frame) :: frame
 
-    this%ptr = chrp_frame_cell_c(frame%ptr)
+    this%ptr = chrp_cell_from_frame_c(frame%ptr)
 end subroutine
 
 subroutine chrp_cell_lengths(this, a, b, c, status)
@@ -742,13 +742,13 @@ subroutine chrp_atom_from_name_init_(this, name)
     this%ptr = chrp_atom_from_name_c(name)
 end subroutine
 
-subroutine chrp_topology_atom_init_(this, topology, idx)
+subroutine chrp_atom_from_topology_init_(this, topology, idx)
     implicit none
     class(chrp_atom) :: this
     class(chrp_topology) :: topology
     integer(kind=c_size_t), value :: idx
 
-    this%ptr = chrp_topology_atom_c(topology%ptr, idx)
+    this%ptr = chrp_atom_from_topology_c(topology%ptr, idx)
 end subroutine
 
 subroutine chrp_atom_mass(this, mass, status)

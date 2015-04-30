@@ -35,7 +35,6 @@ contains
     procedure :: add_bond => chrp_topology_add_bond
     procedure :: remove_bond => chrp_topology_remove_bond
     procedure :: free => chrp_topology_free
-    procedure :: atom => chrp_topology_atom_init_
 end type
 
 type chrp_trajectory
@@ -67,7 +66,6 @@ contains
     procedure :: step => chrp_frame_step
     procedure :: step_set => chrp_frame_step_set
     procedure :: free => chrp_frame_free
-    procedure :: cell => chrp_frame_cell_init_
 end type
 
 type chrp_atom
@@ -76,6 +74,7 @@ type chrp_atom
 contains
     procedure :: init => chrp_atom_init_
     procedure :: from_name => chrp_atom_from_name_init_
+    procedure :: from_topology => chrp_atom_from_topology_init_
     procedure :: mass => chrp_atom_mass
     procedure :: mass_set => chrp_atom_mass_set
     procedure :: charge => chrp_atom_charge
@@ -90,6 +89,7 @@ type chrp_cell
     type(c_ptr) :: ptr
 contains
     procedure :: init => chrp_cell_init_
+    procedure :: from_frame => chrp_cell_from_frame_init_
     procedure :: lengths => chrp_cell_lengths
     procedure :: lengths_set => chrp_cell_lengths_set
     procedure :: angles => chrp_cell_angles

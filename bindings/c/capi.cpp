@@ -204,7 +204,7 @@ error:
 }
 
 
-CHRP_CELL* chrp_frame_cell(CHRP_FRAME* frame){
+CHRP_CELL* chrp_cell_from_frame(CHRP_FRAME* frame){
     CHRP_CELL* cell = NULL;
     CHRP_ERROR_WRAP(
         cell = &frame->cell();
@@ -296,7 +296,7 @@ error:
     return topology;
 }
 
-CHRP_ATOM* chrp_topology_atom(CHRP_TOPOLOGY* topology, size_t idx){
+CHRP_ATOM* chrp_atom_from_topology(CHRP_TOPOLOGY* topology, size_t idx){
     CHRP_ATOM* atom = NULL;
     CHRP_ERROR_WRAP(
         atom = &((*topology)[idx]);

@@ -44,7 +44,7 @@ int main(int argc, char** argv){
     assert(topology != NULL);
     check_topology(topology);
 
-    CHRP_CELL* cell = chrp_frame_cell(frame);
+    CHRP_CELL* cell = chrp_cell_from_frame(frame);
 
     assert(cell != NULL);
     check_cell(cell);
@@ -93,7 +93,7 @@ void check_topology(CHRP_TOPOLOGY* topology){
     assert(!chrp_topology_size(topology, &natoms));
     assert(natoms == 125);
 
-    CHRP_ATOM* atom = chrp_topology_atom(topology, 3);
+    CHRP_ATOM* atom = chrp_atom_from_topology(topology, 3);
     assert(atom != NULL);
 
     char name[5];

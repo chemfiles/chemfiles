@@ -98,7 +98,7 @@ Function manipulating ``CHRP_CELL``
 
 .. doxygenfunction:: chrp_cell
 
-.. doxygenfunction:: chrp_frame_cell
+.. doxygenfunction:: chrp_cell_from_frame
 
 .. doxygenfunction:: chrp_cell_lengths
 
@@ -172,7 +172,7 @@ Function manipulating ``CHRP_ATOM``
 
 .. doxygenfunction:: chrp_atom_from_name
 
-.. doxygenfunction:: chrp_topology_atom
+.. doxygenfunction:: chrp_atom_from_topology
 
 .. doxygenfunction:: chrp_atom_mass
 

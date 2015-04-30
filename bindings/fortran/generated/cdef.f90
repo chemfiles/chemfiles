@@ -250,11 +250,11 @@ function chrp_cell_c(a, b, c, alpha, beta, gamma) bind(C, name="chrp_cell")
     real(kind=c_double), value :: gamma
 end function
 
-! Function "chrp_frame_cell", at bindings/c/chemharp.h:282
-function chrp_frame_cell_c(frame) bind(C, name="chrp_frame_cell")
+! Function "chrp_cell_from_frame", at bindings/c/chemharp.h:282
+function chrp_cell_from_frame_c(frame) bind(C, name="chrp_cell_from_frame")
     use iso_c_binding
     implicit none
-    type(c_ptr) :: chrp_frame_cell_c
+    type(c_ptr) :: chrp_cell_from_frame_c
     type(c_ptr) :: frame
 end function
 
@@ -551,11 +551,11 @@ function chrp_atom_from_name_c(name) bind(C, name="chrp_atom_from_name")
     character(len=1, kind=c_char), dimension(:), intent(in) :: name
 end function
 
-! Function "chrp_topology_atom", at bindings/c/chemharp.h:550
-function chrp_topology_atom_c(topology, idx) bind(C, name="chrp_topology_atom")
+! Function "chrp_atom_from_topology", at bindings/c/chemharp.h:550
+function chrp_atom_from_topology_c(topology, idx) bind(C, name="chrp_atom_from_topology")
     use iso_c_binding
     implicit none
-    type(c_ptr) :: chrp_topology_atom_c
+    type(c_ptr) :: chrp_atom_from_topology_c
     type(c_ptr) :: topology
     integer(kind=c_size_t), value :: idx
 end function
