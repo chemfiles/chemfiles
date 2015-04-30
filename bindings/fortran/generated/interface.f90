@@ -49,11 +49,11 @@ end subroutine
 
 subroutine chrp_logfile(file, status)
     implicit none
-    character, pointer, dimension(:), intent(in) :: file
+    character(len=*), intent(in) :: file
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_logfile_c(file)
+    status_tmp_ = chrp_logfile_c(f_to_c_str(file))
     if (present(status)) then
         status = status_tmp_
     end if
@@ -74,10 +74,10 @@ end subroutine
 subroutine chrp_open_init_(this, filename, mode)
     implicit none
     class(chrp_trajectory) :: this
-    character, pointer, dimension(:), intent(in) :: filename
-    character, pointer, dimension(:), intent(in) :: mode
+    character(len=*), intent(in) :: filename
+    character(len=*), intent(in) :: mode
 
-    this%ptr = chrp_open_c(filename, mode)
+    this%ptr = chrp_open_c(f_to_c_str(filename), f_to_c_str(mode))
 end subroutine
 
 subroutine chrp_trajectory_read_at(this, step, frame, status)
@@ -136,11 +136,11 @@ end subroutine
 subroutine chrp_trajectory_topology_file(this, filename, status)
     implicit none
     class(chrp_trajectory) :: this
-    character, pointer, dimension(:), intent(in) :: filename
+    character(len=*), intent(in) :: filename
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_trajectory_topology_file_c(this%ptr, filename)
+    status_tmp_ = chrp_trajectory_topology_file_c(this%ptr, f_to_c_str(filename))
     if (present(status)) then
         status = status_tmp_
     end if
@@ -737,9 +737,9 @@ end subroutine
 subroutine chrp_atom_from_name_init_(this, name)
     implicit none
     class(chrp_atom) :: this
-    character, pointer, dimension(:), intent(in) :: name
+    character(len=*), intent(in) :: name
 
-    this%ptr = chrp_atom_from_name_c(name)
+    this%ptr = chrp_atom_from_name_c(f_to_c_str(name))
 end subroutine
 
 subroutine chrp_atom_from_topology_init_(this, topology, idx)
@@ -806,12 +806,12 @@ end subroutine
 subroutine chrp_atom_name(this, name, buffsize, status)
     implicit none
     class(chrp_atom), intent(in) :: this
-    character, pointer, dimension(:) :: name
+    character(len=*) :: name
     integer(kind=c_size_t), value :: buffsize
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_atom_name_c(this%ptr, name, buffsize)
+    status_tmp_ = chrp_atom_name_c(this%ptr, f_to_c_str(name), buffsize)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -820,11 +820,11 @@ end subroutine
 subroutine chrp_atom_name_set(this, name, status)
     implicit none
     class(chrp_atom) :: this
-    character, pointer, dimension(:), intent(in) :: name
+    character(len=*), intent(in) :: name
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_atom_name_set_c(this%ptr, name)
+    status_tmp_ = chrp_atom_name_set_c(this%ptr, f_to_c_str(name))
     if (present(status)) then
         status = status_tmp_
     end if

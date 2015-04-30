@@ -43,7 +43,16 @@ def call_interface(args):
     f_types = [type_[5:] for type_ in FTYPES]
     f_types.append("this")
 
-    args_call = [arg + "%ptr" * (arg in f_types) for arg in args.split(", ")]
+    args_call = []
+    for arg in args:
+        if isinstance(arg.type, StringType):
+            call = "f_to_c_str(" + arg.name + ")"
+        else:
+            call = arg.name
+            if arg.name in f_types:
+                call += "%ptr"
+        args_call.append(call)
+
     interface = "(" + ", ".join(args_call) + ")"
     return interface
 
@@ -89,16 +98,15 @@ def write_interface(path, _functions):
                             str_len=STRING_LENGTH))
             else:
                 instructions = ""
-                args = function.args_str()
-
+                args = ", ".join([arg.name for arg in function.args])
                 if function.is_constructor:
                     instructions = "    this%ptr = "
                     instructions += function.c_interface_name
-                    instructions += call_interface(args[6:])
+                    instructions += call_interface(function.args[1:])
                 else:
                     instructions = "    status_tmp_ = "
                     instructions += function.c_interface_name
-                    instructions += call_interface(args)
+                    instructions += call_interface(function.args)
                     args = args + ", status" if args else "status"
                     declarations += "\n    integer, optional :: status"
                     declarations += "\n    integer :: status_tmp_"

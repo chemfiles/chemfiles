@@ -84,7 +84,7 @@ class StringType(CType):
         if kwargs.get("cdef", False):
             self.CONVERSIONS["char"] = "character(len=1, kind=c_char), dimension(:)"
         elif kwargs.get("interface", False):
-            self.CONVERSIONS["char"] = "character, pointer, dimension(:)"
+            self.CONVERSIONS["char"] = "character(len=*)"
         else:
             raise ValueError
         return super(StringType, self).to_fortran(*args, **kwargs)
