@@ -29,11 +29,11 @@ CHRP_TYPES_TO_FORTRAN_INTERFACE = {
 
 # Converting Chemharp types for the c functions declarations
 CHRP_TYPES_TO_C_DECLARATIONS = {
-    "CHRP_ATOM": "type(c_ptr)",
-    "CHRP_TRAJECTORY": "type(c_ptr)",
-    "CHRP_FRAME": "type(c_ptr)",
-    "CHRP_CELL": "type(c_ptr)",
-    "CHRP_TOPOLOGY": "type(c_ptr)",
+    "CHRP_ATOM": "type(c_ptr), value",
+    "CHRP_TRAJECTORY": "type(c_ptr), value",
+    "CHRP_FRAME": "type(c_ptr), value",
+    "CHRP_CELL": "type(c_ptr), value",
+    "CHRP_TOPOLOGY": "type(c_ptr), value",
 }
 
 

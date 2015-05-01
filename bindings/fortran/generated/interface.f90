@@ -200,6 +200,8 @@ subroutine chrp_frame_positions(this, data, size, status)
     integer, optional :: status
     integer :: status_tmp_
 
+    print*, data
+
     status_tmp_ = chrp_frame_positions_c(this%ptr, data, size)
     if (present(status)) then
         status = status_tmp_
