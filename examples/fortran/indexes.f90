@@ -8,8 +8,7 @@ program indexes_example
 
     real(real32), dimension(:, :), allocatable :: positions
     integer, dimension(:), allocatable :: indexes
-    integer :: i, j, status
-    integer(int64) :: natoms
+    integer(int64) :: natoms, i, j, status
 
     call traj%open("filename.xyz", "r")
 

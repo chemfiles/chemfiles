@@ -1,5 +1,7 @@
 
 enable_language(Fortran)
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fdefault-integer-8")
+
 file(GLOB fortran-sources *.f90)
 add_library(chemharpf SHARED ${fortran-sources})
 target_link_libraries(chemharpf chemharp)
@@ -15,7 +17,7 @@ function(chrp_fortran_test _file_)
     set(_name_ "f-${_name_}")
     add_executable(${_name_} ${_file_})
     target_link_libraries(${_name_} chemharp chemharpf)
-    add_test(NAME ${_name_} COMMAND ${_name_})
+    add_test(NAME ${_name_} COMMAND ${_name_} ${CMAKE_SOURE_DIR}/tests/data)
 endfunction()
 
 if(BUILD_TESTS)
