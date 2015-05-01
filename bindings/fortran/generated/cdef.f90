@@ -44,7 +44,7 @@ function chrp_logfile_c(file) bind(C, name="chrp_logfile")
     use iso_c_binding
     implicit none
     integer(c_int) :: chrp_logfile_c
-    character(len=1, kind=c_char), dimension(:), intent(in) :: file
+    character(len=1, kind=c_char), dimension(*), intent(in) :: file
 end function
 
 ! Function "chrp_log_stderr", at bindings/c/chemharp.h:98
@@ -60,8 +60,8 @@ function chrp_open_c(filename, mode) bind(C, name="chrp_open")
     use iso_c_binding
     implicit none
     type(c_ptr) :: chrp_open_c
-    character(len=1, kind=c_char), dimension(:), intent(in) :: filename
-    character(len=1, kind=c_char), dimension(:), intent(in) :: mode
+    character(len=1, kind=c_char), dimension(*), intent(in) :: filename
+    character(len=1, kind=c_char), dimension(*), intent(in) :: mode
 end function
 
 ! Function "chrp_trajectory_read_at", at bindings/c/chemharp.h:116
@@ -107,7 +107,7 @@ function chrp_trajectory_topology_file_c(file, filename) bind(C, name="chrp_traj
     implicit none
     integer(c_int) :: chrp_trajectory_topology_file_c
     type(c_ptr) :: file
-    character(len=1, kind=c_char), dimension(:), intent(in) :: filename
+    character(len=1, kind=c_char), dimension(*), intent(in) :: filename
 end function
 
 ! Function "chrp_trajectory_nsteps", at bindings/c/chemharp.h:159
@@ -548,7 +548,7 @@ function chrp_atom_from_name_c(name) bind(C, name="chrp_atom_from_name")
     use iso_c_binding
     implicit none
     type(c_ptr) :: chrp_atom_from_name_c
-    character(len=1, kind=c_char), dimension(:), intent(in) :: name
+    character(len=1, kind=c_char), dimension(*), intent(in) :: name
 end function
 
 ! Function "chrp_atom_from_topology", at bindings/c/chemharp.h:550
@@ -602,7 +602,7 @@ function chrp_atom_name_c(atom, name, buffsize) bind(C, name="chrp_atom_name")
     implicit none
     integer(c_int) :: chrp_atom_name_c
     type(c_ptr), intent(in) :: atom
-    character(len=1, kind=c_char), dimension(:) :: name
+    character(len=1, kind=c_char), dimension(*) :: name
     integer(kind=c_size_t), value :: buffsize
 end function
 
@@ -612,7 +612,7 @@ function chrp_atom_name_set_c(atom, name) bind(C, name="chrp_atom_name_set")
     implicit none
     integer(c_int) :: chrp_atom_name_set_c
     type(c_ptr) :: atom
-    character(len=1, kind=c_char), dimension(:), intent(in) :: name
+    character(len=1, kind=c_char), dimension(*), intent(in) :: name
 end function
 
 ! Function "chrp_atom_free", at bindings/c/chemharp.h:600

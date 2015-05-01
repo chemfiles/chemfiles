@@ -82,7 +82,7 @@ class StringType(CType):
 
     def to_fortran(self, *args, **kwargs):
         if kwargs.get("cdef", False):
-            self.CONVERSIONS["char"] = "character(len=1, kind=c_char), dimension(:)"
+            self.CONVERSIONS["char"] = "character(len=1, kind=c_char), dimension(*)"
         elif kwargs.get("interface", False):
             self.CONVERSIONS["char"] = "character(len=*)"
         else:
