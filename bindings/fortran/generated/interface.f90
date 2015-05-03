@@ -811,10 +811,11 @@ subroutine chrp_atom_name(this, name, buffsize, status)
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_atom_name_c(this%ptr, f_to_c_str(name), buffsize)
+    status_tmp_ = chrp_atom_name_c(this%ptr, name, buffsize)
     if (present(status)) then
         status = status_tmp_
     end if
+    name = rm_c_null_in_str(name)
 end subroutine
 
 subroutine chrp_atom_name_set(this, name, status)

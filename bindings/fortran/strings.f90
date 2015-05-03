@@ -12,10 +12,22 @@ contains
         integer                         :: str_len, i
 
         call c_f_pointer(c_loc(c_string), tmp)
-        str_len = index(tmp, c_null_char) - 1
+        f_string = rm_c_null_in_str(tmp)
+    end function
 
+    !** Convert a C_NULL terminated-Fortran string to a Fortran string
+    function rm_c_null_in_str(c_string) result(f_string)
+        implicit none
+        character(len=*), intent(in)      :: c_string
+        character(len=len_trim(c_string)) :: f_string
+        integer                           :: str_len, i
+
+        str_len = index(c_string, c_null_char) - 1
         do i=1, str_len
-            f_string(i:i) = tmp(i:i)
+            f_string(i:i) = c_string(i:i)
+        end do
+        do i=str_len+1, len_trim(c_string)
+            f_string(i:i) = " "
         end do
     end function
 

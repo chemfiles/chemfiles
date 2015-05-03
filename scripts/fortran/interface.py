@@ -61,6 +61,17 @@ def call_interface(args):
     return interface
 
 
+def post_call_processing(args):
+    '''
+    Post-process strings after call when needed
+    '''
+    res = ""
+    for arg in args:
+        if isinstance(arg.type, StringType) and not arg.type.const:
+            res = arg.name + " = rm_c_null_in_str(" + arg.name + ")"
+    return res
+
+
 def write_interface(path, _functions):
     '''
     Generate fortran subroutines corresponding to the C functions
@@ -103,6 +114,7 @@ def write_interface(path, _functions):
             else:
                 instructions = ""
                 args = ", ".join([arg.name for arg in function.args])
+
                 if function.is_constructor:
                     instructions = "    this%ptr = "
                     instructions += function.c_interface_name
@@ -111,10 +123,16 @@ def write_interface(path, _functions):
                     instructions = "    status_tmp_ = "
                     instructions += function.c_interface_name
                     instructions += call_interface(function.args)
-                    args = args + ", status" if args else "status"
+
                     declarations += "\n    integer, optional :: status"
                     declarations += "\n    integer :: status_tmp_"
                     instructions += COPY_RETURN_STATUS
+
+                    args += ", status" if args else "status"
+
+                post_call = post_call_processing(function.args)
+                if post_call:
+                    instructions += "\n    " + post_call
 
                 fd.write(TEMPLATE.format(
                             name=function.fname,
