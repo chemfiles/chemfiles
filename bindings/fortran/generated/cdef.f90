@@ -150,7 +150,7 @@ function chrp_frame_positions_c(frame, data, size) bind(C, name="chrp_frame_posi
     implicit none
     integer(c_int) :: chrp_frame_positions_c
     type(c_ptr), value, intent(in) :: frame
-    real(kind=c_float), dimension(:, :) :: data
+    type(c_ptr), value :: data
     integer(kind=c_size_t), value :: size
 end function
 
@@ -160,7 +160,7 @@ function chrp_frame_positions_set_c(frame, data, size) bind(C, name="chrp_frame_
     implicit none
     integer(c_int) :: chrp_frame_positions_set_c
     type(c_ptr), value :: frame
-    real(kind=c_float), dimension(:, :) :: data
+    type(c_ptr), value :: data
     integer(kind=c_size_t), value :: size
 end function
 
@@ -170,7 +170,7 @@ function chrp_frame_velocities_c(frame, data, size) bind(C, name="chrp_frame_vel
     implicit none
     integer(c_int) :: chrp_frame_velocities_c
     type(c_ptr), value, intent(in) :: frame
-    real(kind=c_float), dimension(:, :) :: data
+    type(c_ptr), value :: data
     integer(kind=c_size_t), value :: size
 end function
 
@@ -180,7 +180,7 @@ function chrp_frame_velocities_set_c(frame, data, size) bind(C, name="chrp_frame
     implicit none
     integer(c_int) :: chrp_frame_velocities_set_c
     type(c_ptr), value :: frame
-    real(kind=c_float), dimension(:, :) :: data
+    type(c_ptr), value :: data
     integer(kind=c_size_t), value :: size
 end function
 
@@ -308,7 +308,7 @@ function chrp_cell_matrix_c(cell, mat) bind(C, name="chrp_cell_matrix")
     implicit none
     integer(c_int) :: chrp_cell_matrix_c
     type(c_ptr), value, intent(in) :: cell
-    real(kind=c_double), dimension(3, 3) :: mat
+    type(c_ptr), value :: mat
 end function
 
 ! Function "chrp_cell_type", at bindings/c/chemharp.h:340
@@ -482,7 +482,7 @@ function chrp_topology_bonds_c(topology, data, nbonds) bind(C, name="chrp_topolo
     implicit none
     integer(c_int) :: chrp_topology_bonds_c
     type(c_ptr), value :: topology
-    integer(kind=c_size_t), dimension(:, :) :: data
+    type(c_ptr), value :: data
     integer(kind=c_size_t), value :: nbonds
 end function
 
@@ -492,7 +492,7 @@ function chrp_topology_angles_c(topology, data, nangles) bind(C, name="chrp_topo
     implicit none
     integer(c_int) :: chrp_topology_angles_c
     type(c_ptr), value :: topology
-    integer(kind=c_size_t), dimension(:, :) :: data
+    type(c_ptr), value :: data
     integer(kind=c_size_t), value :: nangles
 end function
 
@@ -502,7 +502,7 @@ function chrp_topology_dihedrals_c(topology, data, ndihedrals) bind(C, name="chr
     implicit none
     integer(c_int) :: chrp_topology_dihedrals_c
     type(c_ptr), value :: topology
-    integer(kind=c_size_t), dimension(:, :) :: data
+    type(c_ptr), value :: data
     integer(kind=c_size_t), value :: ndihedrals
 end function
 

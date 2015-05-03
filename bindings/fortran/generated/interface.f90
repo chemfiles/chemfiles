@@ -195,14 +195,12 @@ end subroutine
 subroutine chrp_frame_positions(this, data, size, status)
     implicit none
     class(chrp_frame), intent(in) :: this
-    real(kind=c_float), dimension(:, :) :: data
+    real(kind=c_float), dimension(:, :), target :: data
     integer(kind=c_size_t), value :: size
     integer, optional :: status
     integer :: status_tmp_
 
-    print*, data
-
-    status_tmp_ = chrp_frame_positions_c(this%ptr, data, size)
+    status_tmp_ = chrp_frame_positions_c(this%ptr, c_loc(data), size)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -211,12 +209,12 @@ end subroutine
 subroutine chrp_frame_positions_set(this, data, size, status)
     implicit none
     class(chrp_frame) :: this
-    real(kind=c_float), dimension(:, :) :: data
+    real(kind=c_float), dimension(:, :), target :: data
     integer(kind=c_size_t), value :: size
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_frame_positions_set_c(this%ptr, data, size)
+    status_tmp_ = chrp_frame_positions_set_c(this%ptr, c_loc(data), size)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -225,12 +223,12 @@ end subroutine
 subroutine chrp_frame_velocities(this, data, size, status)
     implicit none
     class(chrp_frame), intent(in) :: this
-    real(kind=c_float), dimension(:, :) :: data
+    real(kind=c_float), dimension(:, :), target :: data
     integer(kind=c_size_t), value :: size
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_frame_velocities_c(this%ptr, data, size)
+    status_tmp_ = chrp_frame_velocities_c(this%ptr, c_loc(data), size)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -239,12 +237,12 @@ end subroutine
 subroutine chrp_frame_velocities_set(this, data, size, status)
     implicit none
     class(chrp_frame) :: this
-    real(kind=c_float), dimension(:, :) :: data
+    real(kind=c_float), dimension(:, :), target :: data
     integer(kind=c_size_t), value :: size
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_frame_velocities_set_c(this%ptr, data, size)
+    status_tmp_ = chrp_frame_velocities_set_c(this%ptr, c_loc(data), size)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -411,11 +409,11 @@ end subroutine
 subroutine chrp_cell_matrix(this, mat, status)
     implicit none
     class(chrp_cell), intent(in) :: this
-    real(kind=c_double), dimension(3, 3) :: mat
+    real(kind=c_double), dimension(3, 3), target :: mat
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_cell_matrix_c(this%ptr, mat)
+    status_tmp_ = chrp_cell_matrix_c(this%ptr, c_loc(mat))
     if (present(status)) then
         status = status_tmp_
     end if
@@ -648,12 +646,12 @@ end subroutine
 subroutine chrp_topology_bonds(this, data, nbonds, status)
     implicit none
     class(chrp_topology) :: this
-    integer(kind=c_size_t), dimension(:, :) :: data
+    integer(kind=c_size_t), dimension(:, :), target :: data
     integer(kind=c_size_t), value :: nbonds
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_topology_bonds_c(this%ptr, data, nbonds)
+    status_tmp_ = chrp_topology_bonds_c(this%ptr, c_loc(data), nbonds)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -662,12 +660,12 @@ end subroutine
 subroutine chrp_topology_angles(this, data, nangles, status)
     implicit none
     class(chrp_topology) :: this
-    integer(kind=c_size_t), dimension(:, :) :: data
+    integer(kind=c_size_t), dimension(:, :), target :: data
     integer(kind=c_size_t), value :: nangles
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_topology_angles_c(this%ptr, data, nangles)
+    status_tmp_ = chrp_topology_angles_c(this%ptr, c_loc(data), nangles)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -676,12 +674,12 @@ end subroutine
 subroutine chrp_topology_dihedrals(this, data, ndihedrals, status)
     implicit none
     class(chrp_topology) :: this
-    integer(kind=c_size_t), dimension(:, :) :: data
+    integer(kind=c_size_t), dimension(:, :), target :: data
     integer(kind=c_size_t), value :: ndihedrals
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_topology_dihedrals_c(this%ptr, data, ndihedrals)
+    status_tmp_ = chrp_topology_dihedrals_c(this%ptr, c_loc(data), ndihedrals)
     if (present(status)) then
         status = status_tmp_
     end if

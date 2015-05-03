@@ -119,12 +119,17 @@ class ArrayType(CType):
                 self.unknown = True
 
     def to_fortran(self, *args, **kwargs):
-        res = super(ArrayType, self).to_fortran(*args, **kwargs)
-        res += ", dimension("
-        if self.unknown:
-            res += ", ".join([":" for i in range(len(self.all_dims))])
-        else:
-            res += ", ".join(map(str, self.all_dims))
-        res += ")"
+        if kwargs.get("cdef", False):
+            return "    type(c_ptr), value"
+        elif kwargs.get("interface", False):
+            res = super(ArrayType, self).to_fortran(*args, **kwargs)
+            res += ", dimension("
+            if self.unknown:
+                res += ", ".join([":" for i in range(len(self.all_dims))])
+            else:
+                res += ", ".join(map(str, self.all_dims))
+            res += "), target"
 
-        return res
+            return res
+        else:
+            raise ValueError

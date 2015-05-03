@@ -5,7 +5,7 @@ This module generate Chemharp Fortran API by calling the C interfae
 """
 from .constants import BEGINING, FTYPES, STRING_LENGTH
 from .functions import SPECIAL_FUNCTIONS, Argument
-from .ctype import CType, StringType
+from .ctype import CType, StringType, ArrayType
 
 TEMPLATE = """
 subroutine {name}({args})
@@ -45,8 +45,12 @@ def call_interface(args):
 
     args_call = []
     for arg in args:
-        if isinstance(arg.type, StringType):
+        if isinstance(arg.type, StringType) and arg.type.const:
+            # Convert const string
             call = "f_to_c_str(" + arg.name + ")"
+        elif isinstance(arg.type, ArrayType):
+            # Use pointers for arrays
+            call = "c_loc(" + arg.name + ")"
         else:
             call = arg.name
             if arg.name in f_types:
