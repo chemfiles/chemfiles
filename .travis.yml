@@ -5,14 +5,14 @@ compiler:
   - clang
 
 install:
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y  # gcc-4.8
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y  # gcc-4.9
   - sudo add-apt-repository ppa:boost-latest/ppa -y         # boost-1.55.0
   - sudo add-apt-repository ppa:h-rayflood/llvm -y          # clang-3.5
   - sudo apt-get update -qq
   - sudo apt-get install -y libnetcdf-dev
-  - sudo apt-get install -y g++-4.8        # Needed by clang for a C++11 stdlib
-  - sudo apt-get install -y gfortran-4.8
-  - export FC=gfortran-4.8
+  - sudo apt-get install -y g++-4.9        # Needed by clang for a C++11 stdlib
+  - sudo apt-get install -y gfortran-4.9
+  - export FC=gfortran-4.9
   - sudo apt-get install -y libboost1.55-dev
   - sudo apt-get install -y libboost-filesystem1.55.0 libboost-filesystem1.55-dev
   - sudo apt-get install -y libboost-python1.55-dev libboost-python1.55.0
@@ -20,8 +20,8 @@ install:
   - |
     if [ ${CC} == "gcc" ]
     then
-        export CC=gcc-4.8
-        export CXX=g++-4.8
+        export CC=gcc-4.9
+        export CXX=g++-4.9
     fi
   - |
     if [ ${CC} == "clang" ]
