@@ -53,7 +53,14 @@ Basic usage looks like this in C++:
         std::cout << "There is " << frame.natoms() << " atoms in the frame" << std::endl;
         auto positions = frame.positions();
 
-        // Do stuff here with the positions
+        // Do awesome science here with the positions
+
+        if (frame.has_velocities()) {
+            auto velocities = frame.velocities();
+
+            // If the file contains information about the velocities, you will
+            // find them here.
+        }
     }
 
 

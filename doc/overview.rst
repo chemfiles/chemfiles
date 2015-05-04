@@ -1,5 +1,5 @@
-Chemharp overview
-=================
+Chemharp features overview
+==========================
 
 This figure represent how the basic types of Chemharp are arganised and how they
 interact together. The only types a Chemharp user should worry about are the
