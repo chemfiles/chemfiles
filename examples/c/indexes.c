@@ -1,3 +1,6 @@
+/* File indexes.c, example for the Chemharp library
+ * Any copyright is dedicated to the Public Domain.
+ * http://creativecommons.org/publicdomain/zero/1.0/ */
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -47,12 +50,12 @@ int main() {
     chrp_trajectory_close(traj);
     chrp_frame_free(frame);
     free(positions);
-
     return 0;
 
 error:
     printf("Error, cleaning up …\n");
     chrp_trajectory_close(traj);
     chrp_frame_free(frame);
+    free(positions);
     return 1;
 }

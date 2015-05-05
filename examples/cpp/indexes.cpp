@@ -1,3 +1,6 @@
+/* File indexes.cpp, example for the Chemharp library
+ * Any copyright is dedicated to the Public Domain.
+ * http://creativecommons.org/publicdomain/zero/1.0/ */
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -22,4 +25,6 @@ int main() {
     for (auto i : indexes) {
         std::cout << "  - " << i << std::endl;
     }
+
+    return 0;
 }

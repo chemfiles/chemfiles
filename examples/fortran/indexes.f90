@@ -1,4 +1,7 @@
-program indexes_example
+!* File indexes.c, example for the Chemharp library
+!* Any copyright is dedicated to the Public Domain.
+!* http://creativecommons.org/publicdomain/zero/1.0/
+program indexes_
     use iso_fortran_env, only: real32, int64
     use chemharp
     implicit none

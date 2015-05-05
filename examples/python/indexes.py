@@ -1,3 +1,7 @@
+# File indexes.py, example for the Chemharp library
+# Any copyright is dedicated to the Public Domain.
+# http://creativecommons.org/publicdomain/zero/1.0/
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
