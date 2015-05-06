@@ -7,7 +7,7 @@ endfunction()
 function(chrp_c_example _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     add_executable(example-c-${_name_} ${_file_})
-    target_link_libraries(example-c-${_name_} chemharp)
+    target_link_libraries(example-c-${_name_} chemharp m)
 endfunction()
 
 function(chrp_fortran_example _file_)

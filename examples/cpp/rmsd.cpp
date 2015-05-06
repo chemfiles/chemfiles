@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <numeric>
+#include <cmath>
 using namespace std;
 
 #include "Chemharp.hpp"
