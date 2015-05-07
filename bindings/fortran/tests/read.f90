@@ -41,7 +41,7 @@ program read
     if (status /= 0) stop "trajectory%read"
     call check_frame(frame, FIRST_FRAME)
 
-    call topology%init(frame)
+    call topology%from_frame(frame)
     call check_topology(topology)
 
     call cell%from_frame(frame)

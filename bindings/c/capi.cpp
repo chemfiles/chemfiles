@@ -287,7 +287,7 @@ int chrp_cell_free(CHRP_CELL* cell) {
 
 /******************************************************************************/
 
-CHRP_TOPOLOGY* chrp_topology(CHRP_FRAME* frame){
+CHRP_TOPOLOGY* chrp_topology_from_frame(CHRP_FRAME* frame){
     CHRP_TOPOLOGY* topology = NULL;
     CHRP_ERROR_WRAP(
         topology = &(frame->topology());
@@ -305,7 +305,7 @@ error:
     return atom;
 }
 
-CHRP_TOPOLOGY* chrp_empty_topology() {
+CHRP_TOPOLOGY* chrp_topology() {
     CHRP_TOPOLOGY* topology = NULL;
     CHRP_ERROR_WRAP(
         topology = new Topology();

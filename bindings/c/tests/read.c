@@ -39,7 +39,7 @@ int main(int argc, char** argv){
     assert(!chrp_trajectory_read(traj, frame));
     check_frame(frame, FIRST_FRAME);
 
-    CHRP_TOPOLOGY* topology = chrp_topology(frame);
+    CHRP_TOPOLOGY* topology = chrp_topology_from_frame(frame);
 
     assert(topology != NULL);
     check_topology(topology);

@@ -19,6 +19,7 @@ type chrp_topology
     type(c_ptr) :: ptr
 contains
     procedure :: init => chrp_topology_init_
+    procedure :: from_frame => chrp_topology_from_frame_init_
     procedure :: size => chrp_topology_size
     procedure :: guess => chrp_topology_guess
     procedure :: append => chrp_topology_append
@@ -35,7 +36,6 @@ contains
     procedure :: add_bond => chrp_topology_add_bond
     procedure :: remove_bond => chrp_topology_remove_bond
     procedure :: free => chrp_topology_free
-    procedure :: empty => chrp_empty_topology_init_
 end type
 
 type chrp_trajectory

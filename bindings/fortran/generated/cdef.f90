@@ -361,20 +361,20 @@ function chrp_cell_free_c(cell) bind(C, name="chrp_cell_free")
     type(c_ptr), value :: cell
 end function
 
-! Function "chrp_topology", at bindings/c/chemharp.h:380
-function chrp_topology_c(frame) bind(C, name="chrp_topology")
+! Function "chrp_topology", at bindings/c/chemharp.h:379
+function chrp_topology_c() bind(C, name="chrp_topology")
     use iso_c_binding
     implicit none
     type(c_ptr) :: chrp_topology_c
-    type(c_ptr), value :: frame
+
 end function
 
-! Function "chrp_empty_topology", at bindings/c/chemharp.h:386
-function chrp_empty_topology_c() bind(C, name="chrp_empty_topology")
+! Function "chrp_topology_from_frame", at bindings/c/chemharp.h:386
+function chrp_topology_from_frame_c(frame) bind(C, name="chrp_topology_from_frame")
     use iso_c_binding
     implicit none
-    type(c_ptr) :: chrp_empty_topology_c
-
+    type(c_ptr) :: chrp_topology_from_frame_c
+    type(c_ptr), value :: frame
 end function
 
 ! Function "chrp_topology_size", at bindings/c/chemharp.h:394

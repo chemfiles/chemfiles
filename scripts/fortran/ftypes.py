@@ -72,9 +72,6 @@ def write_types(path, functions):
     types["chrp_trajectory"].add_procedure(
             BoundProcedure('open', 'chrp_open_init_')
     )
-    types["chrp_topology"].add_procedure(
-            BoundProcedure('empty', 'chrp_empty_topology_init_')
-    )
 
     with open(path, "w") as fd:
         fd.write(BEGINING)

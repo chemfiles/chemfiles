@@ -30,7 +30,7 @@ program read
 !------------------------------------------------------------------------------!
 
     call traj%open(FILENAME, "w")
-    call topology%empty()
+    call topology%init()
     call atom%from_name("He")
     call frame%init(4)
 

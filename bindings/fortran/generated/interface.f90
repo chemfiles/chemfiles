@@ -489,19 +489,19 @@ subroutine chrp_cell_free(this, status)
     end if
 end subroutine
 
-subroutine chrp_topology_init_(this, frame)
+subroutine chrp_topology_init_(this)
+    implicit none
+    class(chrp_topology) :: this
+
+    this%ptr = chrp_topology_c()
+end subroutine
+
+subroutine chrp_topology_from_frame_init_(this, frame)
     implicit none
     class(chrp_topology) :: this
     class(chrp_frame) :: frame
 
-    this%ptr = chrp_topology_c(frame%ptr)
-end subroutine
-
-subroutine chrp_empty_topology_init_(this)
-    implicit none
-    class(chrp_topology) :: this
-
-    this%ptr = chrp_empty_topology_c()
+    this%ptr = chrp_topology_from_frame_c(frame%ptr)
 end subroutine
 
 subroutine chrp_topology_size(this, natoms, status)

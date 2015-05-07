@@ -373,17 +373,17 @@ int chrp_cell_free(CHRP_CELL* cell);
 /******************************************************************************/
 
 /*!
+* @brief Create a new empty topology
+* @return A pointer to the new Topology
+*/
+CHRP_TOPOLOGY* chrp_topology();
+
+/*!
 * @brief Extract the topology from a frame
 * @param frame The frame
 * @return A pointer to the new Topology
 */
-CHRP_TOPOLOGY* chrp_topology(CHRP_FRAME* frame);
-
-/*!
-* @brief Create an empty topology, with no atoms inside
-* @return A pointer to the new Topology
-*/
-CHRP_TOPOLOGY* chrp_empty_topology();
+CHRP_TOPOLOGY* chrp_topology_from_frame(CHRP_FRAME* frame);
 
 /*!
 * @brief Get the topology size, i.e. the current number of atoms
