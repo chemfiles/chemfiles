@@ -1,4 +1,4 @@
-!* File indexes.c, example for the Chemharp library
+!* File indexes.f90, example for the Chemharp library
 !* Any copyright is dedicated to the Public Domain.
 !* http://creativecommons.org/publicdomain/zero/1.0/
 program indexes_
