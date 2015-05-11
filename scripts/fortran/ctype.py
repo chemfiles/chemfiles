@@ -11,11 +11,6 @@ C_TO_F = {
     "size_t": "integer(kind=c_size_t)",
     "int": "integer(kind=c_int)",
     "bool": "logical(kind=c_bool)",
-    # Enums wrapped to Fortran
-    "chrp_cell_type_t":
-            'include "generated/cenums.f90"\n    integer(kind(cell_type))',
-    "chrp_log_level_t":
-            'include "generated/cenums.f90"\n    integer(kind(log_level))',
 }
 
 # Converting Chemharp types for the fortran interface
@@ -25,6 +20,12 @@ CHRP_TYPES_TO_FORTRAN_INTERFACE = {
     "CHRP_FRAME": "class(chrp_frame)",
     "CHRP_CELL": "class(chrp_cell)",
     "CHRP_TOPOLOGY": "class(chrp_topology)",
+
+    # Enums wrapped to Fortran
+    "chrp_cell_type_t":
+    'include "generated/cenums.f90"\n    integer(kind(cell_type))',
+    "chrp_log_level_t":
+    'include "generated/cenums.f90"\n    integer(kind(log_level))',
 }
 
 # Converting Chemharp types for the c functions declarations
@@ -34,6 +35,9 @@ CHRP_TYPES_TO_C_DECLARATIONS = {
     "CHRP_FRAME": "type(c_ptr), value",
     "CHRP_CELL": "type(c_ptr), value",
     "CHRP_TOPOLOGY": "type(c_ptr), value",
+
+    "chrp_cell_type_t": "integer(kind=c_int)",
+    "chrp_log_level_t": "integer(kind=c_int)",
 }
 
 

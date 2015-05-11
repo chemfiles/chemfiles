@@ -35,8 +35,7 @@ function chrp_loglevel_c(level) bind(C, name="chrp_loglevel")
     use iso_c_binding
     implicit none
     integer(c_int) :: chrp_loglevel_c
-    include "generated/cenums.f90"
-    integer(kind(log_level)), value :: level
+    integer(kind=c_int), value :: level
 end function
 
 ! Function "chrp_logfile", at bindings/c/chemharp.h:92
@@ -317,8 +316,7 @@ function chrp_cell_type_c(cell, type) bind(C, name="chrp_cell_type")
     implicit none
     integer(c_int) :: chrp_cell_type_c
     type(c_ptr), value, intent(in) :: cell
-    include "generated/cenums.f90"
-    integer(kind(cell_type)) :: type
+    integer(kind=c_int) :: type
 end function
 
 ! Function "chrp_cell_type_set", at bindings/c/chemharp.h:348
@@ -327,8 +325,7 @@ function chrp_cell_type_set_c(cell, type) bind(C, name="chrp_cell_type_set")
     implicit none
     integer(c_int) :: chrp_cell_type_set_c
     type(c_ptr), value :: cell
-    include "generated/cenums.f90"
-    integer(kind(cell_type)), value :: type
+    integer(kind=c_int), value :: type
 end function
 
 ! Function "chrp_cell_periodicity", at bindings/c/chemharp.h:356
