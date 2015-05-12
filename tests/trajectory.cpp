@@ -9,8 +9,8 @@ using namespace harp;
 
 #define XYZDIR SRCDIR "/data/xyz/"
 
-// This file only test the trajectory <-> topology association, all the
-// differents formats are tested in the formats folder
+// This file only test the trajectory <-> topology and trajectory <-> cell
+//  association. All the differents formats are tested in the formats folder
 
 TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
 
@@ -82,5 +82,17 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
 
         CHECK(content == expected_content);
         remove("tmp.xyz");
+    }
+}
+
+TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]"){
+    SECTION("Reading"){
+        Trajectory file(XYZDIR "trajectory.xyz");
+        Frame frame;
+
+        file.cell(UnitCell(25, 32, 94));
+        file >> frame;
+
+        CHECK(frame.cell() == UnitCell(25, 32, 94));
     }
 }

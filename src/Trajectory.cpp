@@ -19,7 +19,7 @@ using namespace harp;
 using std::string;
 
 Trajectory::Trajectory(const string& filename, const string& mode, const string& format)
-: _step(0), _nsteps(0), _topology(), use_custom_topology(false)
+: _step(0), _nsteps(0), _topology(), _use_custom_topology(false), _cell(), _use_custom_cell(false)
 {
     trajectory_builder_t builder;
     if (format == ""){
@@ -58,9 +58,13 @@ Frame Trajectory::read(){
     _format->read(_file.get(), frame);
     _step++;
 
-    // Set the frame trajectory if needed
-    if (use_custom_topology)
+    // Set the frame topology if needed
+    if (_use_custom_topology)
         frame.topology(_topology);
+
+    // Set the frame unit cell if needed
+    if (_use_custom_cell)
+        frame.cell(_cell);
 
     return frame;
 }
@@ -76,9 +80,13 @@ Frame Trajectory::read_at(const size_t step){
     _step = step;
     _format->read_at(_file.get(), _step, frame);
 
-    // Set the frame trajectory if needed
-    if (use_custom_topology)
+    // Set the frame topology if needed
+    if (_use_custom_topology)
         frame.topology(_topology);
+
+    // Set the frame unit cell if needed
+    if (_use_custom_cell)
+        frame.cell(_cell);
 
     return frame;
 }
@@ -92,8 +100,10 @@ void Trajectory::write(const Frame& input_frame){
     // Maybe that is not the better way to do this, performance-wise. I'll have
     // to benchmark this part.
     Frame frame = input_frame;
-    if (use_custom_topology)
+    if (_use_custom_topology)
         frame.topology(_topology);
+    if (_use_custom_cell)
+        frame.cell(_cell);
 
     _format->write(_file.get(), frame);
     _step++;
@@ -101,8 +111,7 @@ void Trajectory::write(const Frame& input_frame){
 }
 
 void Trajectory::topology(const Topology& top){
-    LOG(DEBUG) << "Setting the trajectory topology" << std::endl;
-    use_custom_topology = true;
+    _use_custom_topology = true;
     _topology = top;
 }
 
@@ -112,6 +121,11 @@ void Trajectory::topology(const std::string& filename) {
 
     auto frame = topolgy_file.read_at(0);
     Trajectory::topology(frame.topology());
+}
+
+void Trajectory::cell(const UnitCell& new_cell){
+    _use_custom_cell = true;
+    _cell = new_cell;
 }
 
 void Trajectory::close(){

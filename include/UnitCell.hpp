@@ -136,6 +136,15 @@ private:
     bool pbc_x, pbc_y, pbc_z;
 };
 
+inline bool operator==(const UnitCell& rhs, const UnitCell& lhs) {
+    if (lhs.type() != rhs.type())
+        return false;
+
+    return rhs.a() == lhs.a() && rhs.b() == lhs.b() && rhs.c() == lhs.c() &&
+           rhs.alpha() == lhs.alpha() && rhs.beta() == lhs.beta() && rhs.gamma() == lhs.gamma() &&
+           rhs.periodic_x() == lhs.periodic_x() && rhs.periodic_y() == lhs.periodic_y() && rhs.periodic_z() == lhs.periodic_z();
+}
+
 } // namespace harp
 
 #endif

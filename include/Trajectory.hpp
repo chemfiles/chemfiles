@@ -70,6 +70,10 @@ public:
     //! write all the following files.
     void topology(const std::string& filename);
 
+    //! Set an unit cell to use while writing or reading format when no
+    //! information about unit cell is present.
+    void cell(const UnitCell&);
+
     //! Get the number of steps (the number of Frames) in this trajectory
     size_t nsteps() const {return _nsteps;}
     //! Have we read all the Frames in this file ?
@@ -83,10 +87,14 @@ private:
     std::unique_ptr<Format> _format;
     //! The file we are reading from
     std::unique_ptr<File> _file;
-    //! Topology to use for writing files where no topological data is present
+    //! Topology to use for reading/writing files when no topological data is present
     Topology _topology;
     //! Do we have to use a specific topology ?
-    bool use_custom_topology;
+    bool _use_custom_topology;
+    //! UnitCell to use for reading/writing files when no unit cell information is present
+    UnitCell _cell;
+    //! Do we have to use a specific unit cell ?
+    bool _use_custom_cell;
 };
 
 } // namespace harp
