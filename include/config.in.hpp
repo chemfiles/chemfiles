@@ -15,7 +15,8 @@
 #define CHRP_VERSION_PATCH @CHRP_VERSION_PATCH@
 #define CHRP_VERSION "@CHRP_VERSION@"
 
-
+// The CHEMHARP_PUBLIC macro should be defined when including this file to prevent
+// unwanted macros from being exported.
 #ifndef CHEMHARP_PUBLIC
     #define HAVE_NETCDF @HAVE_NETCDF@
 #endif // CHEMHARP_PUBLIC
