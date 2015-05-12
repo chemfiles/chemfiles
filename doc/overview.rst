@@ -10,7 +10,7 @@ them are described in this section.
     :align: center
 
 They are various way of interacting with these types, all of them being described
-in the :ref:`classes-reference` section for the C++ API. All the bindings may not
+in the :ref:`classes-reference` section for the C++ interface. All the bindings may not
 provide all the functionalities, so if something is missing, just
 `ask for it! <https://github.com/Luthaf/Chemharp/issues/new>`_
 

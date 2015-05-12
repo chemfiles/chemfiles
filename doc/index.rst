@@ -24,7 +24,7 @@ to re-use it as needed.
 .. note::
 
     Chemharp is still is alpha stage, and no backward compatibility is assured.
-    I hope I can reach a stable API pretty soon, once it have been validated on
+    I hope I can reach a stable interface pretty soon, once it have been validated on
     various formats.
 
 User manual

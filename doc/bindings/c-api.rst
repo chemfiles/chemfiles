@@ -1,7 +1,7 @@
-C API
-=====
+C interface
+===========
 
-The C API is define in the ``chemharp.h`` header, which should be included in
+The C interface is define in the ``chemharp.h`` header, which should be included in
 all the programs using Chemharp. All the functions and enums have a ``chrp_``
 prefix indicating the provenance of the functions. The types are defined as
 opaque pointer types, in all caps. The following types are defined:

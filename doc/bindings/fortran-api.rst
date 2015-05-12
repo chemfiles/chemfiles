@@ -1,4 +1,4 @@
-Fortran API
-===========
+Fortran interface
+=================
 
 .. TODO:: document the fortran API

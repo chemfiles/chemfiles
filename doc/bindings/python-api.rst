@@ -1,13 +1,13 @@
-Python API
-==========
+Python interface
+================
 
-The Python API follow closely the C++ API, and defines the same classes and
-functions.
+The Python interface follow closely the C++ interface, and defines the same
+classes and functions.
 
 Trajectory class
 ----------------
 
-.. py:class:: Trajectory(filname, mode="", format="")
+.. py:class:: Trajectory(filename, mode="", format="")
 
     .. py:method:: read_next_step()
 
