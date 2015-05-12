@@ -123,7 +123,7 @@ end subroutine
 subroutine chrp_trajectory_topology(this, topology, status)
     implicit none
     class(chrp_trajectory) :: this
-    class(chrp_topology) :: topology
+    class(chrp_topology), intent(in) :: topology
     integer, optional :: status
     integer :: status_tmp_
 
@@ -141,6 +141,19 @@ subroutine chrp_trajectory_topology_file(this, filename, status)
     integer :: status_tmp_
 
     status_tmp_ = chrp_trajectory_topology_file_c(this%ptr, f_to_c_str(filename))
+    if (present(status)) then
+        status = status_tmp_
+    end if
+end subroutine
+
+subroutine chrp_trajectory_cell(this, cell, status)
+    implicit none
+    class(chrp_trajectory) :: this
+    class(chrp_cell), intent(in) :: cell
+    integer, optional :: status
+    integer :: status_tmp_
+
+    status_tmp_ = chrp_trajectory_cell_c(this%ptr, cell%ptr)
     if (present(status)) then
         status = status_tmp_
     end if

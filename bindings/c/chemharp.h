@@ -139,7 +139,7 @@ int chrp_trajectory_write(CHRP_TRAJECTORY *file, const CHRP_FRAME *frame);
 * @param topology The new topology to use
 * @return The status code.
 */
-int chrp_trajectory_topology(CHRP_TRAJECTORY *file, CHRP_TOPOLOGY *topology);
+int chrp_trajectory_topology(CHRP_TRAJECTORY *file, const CHRP_TOPOLOGY *topology);
 
 /*!
 * @brief Set the topology associated with a trajectory by reading the first
@@ -149,6 +149,16 @@ int chrp_trajectory_topology(CHRP_TRAJECTORY *file, CHRP_TOPOLOGY *topology);
 * @return The status code.
 */
 int chrp_trajectory_topology_file(CHRP_TRAJECTORY *file, const char* filename);
+
+/*!
+* @brief Set the unit cell associated with a trajectory. This cell will be
+*        used when reading and writing the files, replacing any unit cell in the
+*        frames or files.
+* @param file A pointer to the trajectory
+* @param cell The new cell to use
+* @return The status code.
+*/
+int chrp_trajectory_cell(CHRP_TRAJECTORY *file, const CHRP_CELL *cell);
 
 /*!
 * @brief Get the number of steps (the number of frames) in a trajectory.

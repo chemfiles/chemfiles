@@ -71,7 +71,7 @@ int chrp_trajectory_write(CHRP_TRAJECTORY *file, const CHRP_FRAME *frame){
     )
 }
 
-int chrp_trajectory_topology(CHRP_TRAJECTORY *file, CHRP_TOPOLOGY *topology){
+int chrp_trajectory_topology(CHRP_TRAJECTORY *file, const CHRP_TOPOLOGY *topology){
     CHRP_ERROR_WRAP_RETCODE(
         file->topology(*topology);
     )
@@ -80,6 +80,12 @@ int chrp_trajectory_topology(CHRP_TRAJECTORY *file, CHRP_TOPOLOGY *topology){
 int chrp_trajectory_topology_file(CHRP_TRAJECTORY *file, const char* filename){
     CHRP_ERROR_WRAP_RETCODE(
         file->topology(string(filename));
+    )
+}
+
+int chrp_trajectory_cell(CHRP_TRAJECTORY *file, const CHRP_CELL *cell){
+    CHRP_ERROR_WRAP_RETCODE(
+        file->cell(*cell);
     )
 }
 

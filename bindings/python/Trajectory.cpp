@@ -23,5 +23,7 @@ void register_trajectory() {
             static_cast<void (Trajectory::*)(const Topology&)>(&Trajectory::topology))
         .def("topology",
             static_cast<void (Trajectory::*)(const string&)>(&Trajectory::topology))
+        .def("cell",
+            static_cast<void (Trajectory::*)(const UnitCell&)>(&Trajectory::cell))
     ;
 }
