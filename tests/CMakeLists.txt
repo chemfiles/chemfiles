@@ -1,13 +1,3 @@
-option(BUILD_TESTS "Build harp tests." OFF)
-option(CODE_COVERAGE "Build code coverage" OFF)
-
-if(CODE_COVERAGE)
-    set(BUILD_TESTS ON)
-    # Code coverage should use gcc
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-endif()
-
 function(chrp_cpp_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     add_executable(${_name_} ${_file_} $<TARGET_OBJECTS:catch>)

@@ -7,6 +7,17 @@ set(CHRP_VERSION_MINOR 1)
 set(CHRP_VERSION_PATCH 0)
 set(CHRP_VERSION "${CHRP_VERSION_MAJOR}.${CHRP_VERSION_MINOR}.${CHRP_VERSION_PATCH}")
 
+option(BUILD_TESTS "Build harp tests." OFF)
+option(CODE_COVERAGE "Build code coverage" OFF)
+
+if(CODE_COVERAGE)
+    set(BUILD_TESTS ON)
+    message(STATUS "Code coverage enabled")
+    # Code coverage should use gcc
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+endif()
+
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 if(${CMAKE_VERSION} VERSION_GREATER 3.0.0)
     cmake_policy(SET CMP0042 NEW)
