@@ -1,12 +1,9 @@
 # Chemharp, an efficient IO library for chemistry file formats
 
 
-<a href="http://chemharp.readthedocs.org">
-    <img src="https://readthedocs.org/projects/chemharp/badge/?version=latest">
-</a>
-<a href="https://travis-ci.org/Luthaf/Chemharp/">
-    <img src="https://travis-ci.org/Luthaf/Chemharp.svg">
-</a>
+[![Documentation](https://readthedocs.org/projects/chemharp/badge/?version=latest)](http://chemharp.readthedocs.org)
+[![Build Status](https://travis-ci.org/Luthaf/Chemharp.svg)](https://travis-ci.org/Luthaf/Chemharp/)
+[![Coverage Status](https://coveralls.io/repos/Luthaf/Chemharp/badge.svg)](https://coveralls.io/r/Luthaf/Chemharp)
 
 Chemharp is a multi-language library written in modern C++ for reading and writing
 from and to molecular trajectory files. These files are created by your favorite
