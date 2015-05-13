@@ -17,6 +17,7 @@ install:
   - sudo apt-get install -y libboost-filesystem1.55.0 libboost-filesystem1.55-dev
   - sudo apt-get install -y libboost-python1.55-dev libboost-python1.55.0
   - sudo apt-get install -y python-numpy
+  - sudo apt-get install -y lcov
   - |
     if [ ${CC} == "gcc" ]
     then
@@ -30,5 +31,25 @@ install:
         export CC=clang-3.4
         export CXX=clang++-3.4
     fi
+  - wget http://www.cmake.org/files/v3.2/cmake-3.2.1-Linux-x86_64.sh
+  - sh cmake-3.2.1-Linux-x86_64.sh --prefix=. --exclude-subdir
 
-script: ./scripts/travis-build.sh
+before_script:
+  - cd ${TRAVIS_BUILD_DIR}
+  - mkdir build
+  - cd build
+  - ../bin/cmake -DCMAKE_BUILD_TYPE=debug -DCODE_COVERAGE=ON -DBUILD_TESTS=ON -DPYTHON_BINDING=ON -DFORTRAN_BINDING=ON ..
+  # Cleanup the coverage data
+  - lcov --directory . --zerocounters
+
+script:
+  - cd ${TRAVIS_BUILD_DIR}/build
+  - make
+  - ctest --output-on-failure
+
+after_success:
+  - cd ${TRAVIS_BUILD_DIR}/build
+  - lcov --directory . --capture --output-file coverage.info
+  - lcov --remove coverage.info 'tests/*' '/usr/*' --output-file coverage.info
+  - lcov --list coverage.info
+  - coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info
