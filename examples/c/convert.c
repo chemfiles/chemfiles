@@ -15,8 +15,8 @@ int main() {
     CHRP_CELL* cell = chrp_cell(20, 15, 35, 90, 90, 90);
 
     // Create Atoms
-    CHRP_ATOM* O = chrp_atom_from_name("O");
-    CHRP_ATOM* H = chrp_atom_from_name("H");
+    CHRP_ATOM* O = chrp_atom("O");
+    CHRP_ATOM* H = chrp_atom("H");
 
     if (input == NULL || frame == NULL || water_topology == NULL ||
         cell == NULL || O == NULL || H == NULL || output == NULL)

@@ -23,8 +23,8 @@ program convert
     call cell%init(20d0, 15d0, 35d0, 90d0, 90d0, 90d0)
 
     ! Create Atoms
-    call O%from_name("O")
-    call H%from_name("H")
+    call O%init("O")
+    call H%init("H")
 
     ! Fill the topology with one water molecule
     call water_topology%append(O)

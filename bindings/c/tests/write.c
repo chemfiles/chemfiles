@@ -25,7 +25,7 @@ static char* read_whole_file(const char* name);
 int main(int argc, char** argv){
     CHRP_TRAJECTORY* traj = chrp_open(FILENAME, "w");
     CHRP_TOPOLOGY* topology = chrp_topology();
-    CHRP_ATOM* atom = chrp_atom_from_name("He");
+    CHRP_ATOM* atom = chrp_atom("He");
     CHRP_FRAME* frame = chrp_frame(4);
 
     assert(traj != NULL && topology != NULL && atom != NULL && frame != NULL);

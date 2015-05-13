@@ -536,20 +536,21 @@ int chrp_topology_remove_bond(CHRP_TOPOLOGY* topology, size_t i, size_t j);
 int chrp_topology_free(CHRP_TOPOLOGY* topology);
 
 /******************************************************************************/
-/*!
-* @brief Get a specific atom from a frame
-* @param frame The frame
-* @param idx The atom index
-* @return A pointer to the corresponding atom
-*/
-CHRP_ATOM* chrp_atom(CHRP_FRAME* frame, size_t idx);
 
 /*!
 * @brief Create an atom from an atomic name
 * @param name The new atom name
 * @return A pointer to the corresponding atom
 */
-CHRP_ATOM* chrp_atom_from_name(const char* name);
+CHRP_ATOM* chrp_atom(const char* name);
+
+/*!
+* @brief Get a specific atom from a frame
+* @param frame The frame
+* @param idx The atom index
+* @return A pointer to the corresponding atom
+*/
+CHRP_ATOM* chrp_atom_from_frame(CHRP_FRAME* frame, size_t idx);
 
 /*!
 * @brief Get a specific atom from a topology

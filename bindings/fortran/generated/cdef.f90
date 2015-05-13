@@ -541,23 +541,23 @@ function chrp_topology_free_c(topology) bind(C, name="chrp_topology_free")
 end function
 
 ! Function "chrp_atom", at bindings/c/chemharp.h:545
-function chrp_atom_c(frame, idx) bind(C, name="chrp_atom")
+function chrp_atom_c(name) bind(C, name="chrp_atom")
     use iso_c_binding
     implicit none
     type(c_ptr) :: chrp_atom_c
+    character(len=1, kind=c_char), dimension(*), intent(in) :: name
+end function
+
+! Function "chrp_atom_from_frame", at bindings/c/chemharp.h:553
+function chrp_atom_from_frame_c(frame, idx) bind(C, name="chrp_atom_from_frame")
+    use iso_c_binding
+    implicit none
+    type(c_ptr) :: chrp_atom_from_frame_c
     type(c_ptr), value :: frame
     integer(kind=c_size_t), value :: idx
 end function
 
-! Function "chrp_atom_from_name", at bindings/c/chemharp.h:552
-function chrp_atom_from_name_c(name) bind(C, name="chrp_atom_from_name")
-    use iso_c_binding
-    implicit none
-    type(c_ptr) :: chrp_atom_from_name_c
-    character(len=1, kind=c_char), dimension(*), intent(in) :: name
-end function
-
-! Function "chrp_atom_from_topology", at bindings/c/chemharp.h:560
+! Function "chrp_atom_from_topology", at bindings/c/chemharp.h:561
 function chrp_atom_from_topology_c(topology, idx) bind(C, name="chrp_atom_from_topology")
     use iso_c_binding
     implicit none
@@ -566,7 +566,7 @@ function chrp_atom_from_topology_c(topology, idx) bind(C, name="chrp_atom_from_t
     integer(kind=c_size_t), value :: idx
 end function
 
-! Function "chrp_atom_mass", at bindings/c/chemharp.h:567
+! Function "chrp_atom_mass", at bindings/c/chemharp.h:568
 function chrp_atom_mass_c(atom, mass) bind(C, name="chrp_atom_mass")
     use iso_c_binding
     implicit none
@@ -575,7 +575,7 @@ function chrp_atom_mass_c(atom, mass) bind(C, name="chrp_atom_mass")
     real(kind=c_float) :: mass
 end function
 
-! Function "chrp_atom_mass_set", at bindings/c/chemharp.h:574
+! Function "chrp_atom_mass_set", at bindings/c/chemharp.h:575
 function chrp_atom_mass_set_c(atom, mass) bind(C, name="chrp_atom_mass_set")
     use iso_c_binding
     implicit none
@@ -584,7 +584,7 @@ function chrp_atom_mass_set_c(atom, mass) bind(C, name="chrp_atom_mass_set")
     real(kind=c_float), value :: mass
 end function
 
-! Function "chrp_atom_charge", at bindings/c/chemharp.h:581
+! Function "chrp_atom_charge", at bindings/c/chemharp.h:582
 function chrp_atom_charge_c(atom, charge) bind(C, name="chrp_atom_charge")
     use iso_c_binding
     implicit none
@@ -593,7 +593,7 @@ function chrp_atom_charge_c(atom, charge) bind(C, name="chrp_atom_charge")
     real(kind=c_float) :: charge
 end function
 
-! Function "chrp_atom_charge_set", at bindings/c/chemharp.h:588
+! Function "chrp_atom_charge_set", at bindings/c/chemharp.h:589
 function chrp_atom_charge_set_c(atom, charge) bind(C, name="chrp_atom_charge_set")
     use iso_c_binding
     implicit none
@@ -602,7 +602,7 @@ function chrp_atom_charge_set_c(atom, charge) bind(C, name="chrp_atom_charge_set
     real(kind=c_float), value :: charge
 end function
 
-! Function "chrp_atom_name", at bindings/c/chemharp.h:596
+! Function "chrp_atom_name", at bindings/c/chemharp.h:597
 function chrp_atom_name_c(atom, name, buffsize) bind(C, name="chrp_atom_name")
     use iso_c_binding
     implicit none
@@ -612,7 +612,7 @@ function chrp_atom_name_c(atom, name, buffsize) bind(C, name="chrp_atom_name")
     integer(kind=c_size_t), value :: buffsize
 end function
 
-! Function "chrp_atom_name_set", at bindings/c/chemharp.h:603
+! Function "chrp_atom_name_set", at bindings/c/chemharp.h:604
 function chrp_atom_name_set_c(atom, name) bind(C, name="chrp_atom_name_set")
     use iso_c_binding
     implicit none
@@ -621,7 +621,7 @@ function chrp_atom_name_set_c(atom, name) bind(C, name="chrp_atom_name_set")
     character(len=1, kind=c_char), dimension(*), intent(in) :: name
 end function
 
-! Function "chrp_atom_free", at bindings/c/chemharp.h:610
+! Function "chrp_atom_free", at bindings/c/chemharp.h:611
 function chrp_atom_free_c(atom) bind(C, name="chrp_atom_free")
     use iso_c_binding
     implicit none

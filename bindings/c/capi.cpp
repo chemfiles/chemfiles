@@ -448,19 +448,19 @@ int chrp_topology_free(CHRP_TOPOLOGY* topology){
 
 /******************************************************************************/
 
-CHRP_ATOM* chrp_atom(CHRP_FRAME* frame, size_t idx){
+CHRP_ATOM* chrp_atom(const char* name){
     CHRP_ATOM* atom = NULL;
     CHRP_ERROR_WRAP(
-        atom = &(frame->topology()[idx]);
+        atom = new Atom(string(name));
     )
 error:
     return atom;
 }
 
-CHRP_ATOM* chrp_atom_from_name(const char* name){
+CHRP_ATOM* chrp_atom_from_frame(CHRP_FRAME* frame, size_t idx){
     CHRP_ATOM* atom = NULL;
     CHRP_ERROR_WRAP(
-        atom = new Atom(string(name));
+        atom = &(frame->topology()[idx]);
     )
 error:
     return atom;

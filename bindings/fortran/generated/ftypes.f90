@@ -76,7 +76,7 @@ type chrp_atom
     type(c_ptr) :: ptr
 contains
     procedure :: init => chrp_atom_init_
-    procedure :: from_name => chrp_atom_from_name_init_
+    procedure :: from_frame => chrp_atom_from_frame_init_
     procedure :: from_topology => chrp_atom_from_topology_init_
     procedure :: mass => chrp_atom_mass
     procedure :: mass_set => chrp_atom_mass_set

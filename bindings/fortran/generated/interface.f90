@@ -738,21 +738,21 @@ subroutine chrp_topology_free(this, status)
     end if
 end subroutine
 
-subroutine chrp_atom_init_(this, frame, idx)
+subroutine chrp_atom_init_(this, name)
+    implicit none
+    class(chrp_atom) :: this
+    character(len=*), intent(in) :: name
+
+    this%ptr = chrp_atom_c(f_to_c_str(name))
+end subroutine
+
+subroutine chrp_atom_from_frame_init_(this, frame, idx)
     implicit none
     class(chrp_atom) :: this
     class(chrp_frame) :: frame
     integer(kind=c_size_t), value :: idx
 
-    this%ptr = chrp_atom_c(frame%ptr, idx)
-end subroutine
-
-subroutine chrp_atom_from_name_init_(this, name)
-    implicit none
-    class(chrp_atom) :: this
-    character(len=*), intent(in) :: name
-
-    this%ptr = chrp_atom_from_name_c(f_to_c_str(name))
+    this%ptr = chrp_atom_from_frame_c(frame%ptr, idx)
 end subroutine
 
 subroutine chrp_atom_from_topology_init_(this, topology, idx)

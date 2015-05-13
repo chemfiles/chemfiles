@@ -31,7 +31,7 @@ program read
 
     call traj%open(FILENAME, "w")
     call topology%init()
-    call atom%from_name("He")
+    call atom%init("He")
     call frame%init(4)
 
     do i=1, 4
