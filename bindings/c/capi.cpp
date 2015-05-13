@@ -503,6 +503,32 @@ int chrp_atom_name_set(CHRP_ATOM* atom, const char* name){
     )
 }
 
+
+int chrp_atom_full_name(const CHRP_ATOM* atom, char* name, size_t buffsize){
+    CHRP_ERROR_WRAP_RETCODE(
+        string tmp = atom->full_name();
+        strcpy(name, tmp.substr(0, buffsize).c_str());
+    )
+}
+
+int chrp_atom_vdw_radius(const CHRP_ATOM* atom, double* radius) {
+    CHRP_ERROR_WRAP_RETCODE(
+        *radius = atom->vdw_radius();
+    )
+}
+
+int chrp_atom_covalent_radius(const CHRP_ATOM* atom, double* radius) {
+    CHRP_ERROR_WRAP_RETCODE(
+        *radius = atom->covalent_radius();
+    )
+}
+
+int chrp_atom_atomic_number(const CHRP_ATOM* atom, int* number) {
+    CHRP_ERROR_WRAP_RETCODE(
+        *number = atom->atomic_number();
+    )
+}
+
 int chrp_atom_free(CHRP_ATOM* atom){
     CHRP_ERROR_WRAP_RETCODE(
         delete atom;

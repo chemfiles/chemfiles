@@ -564,6 +564,7 @@ CHRP_ATOM* chrp_atom_from_topology(CHRP_TOPOLOGY* topology, size_t idx);
 * @brief Get the mass of an atom, in atomic mass units
 * @param atom The atom
 * @param mass The atom mass
+* @return The status code
 */
 int chrp_atom_mass(const CHRP_ATOM* atom, float* mass);
 
@@ -571,6 +572,7 @@ int chrp_atom_mass(const CHRP_ATOM* atom, float* mass);
 * @brief Set the mass of an atom, in atomic mass units
 * @param atom The atom
 * @param mass The atom mass
+* @return The status code
 */
 int chrp_atom_mass_set(CHRP_ATOM* atom, float mass);
 
@@ -578,6 +580,7 @@ int chrp_atom_mass_set(CHRP_ATOM* atom, float mass);
 * @brief Get the charge of an atom, in number of the electron charge e
 * @param atom The atom
 * @param charge The atom charge
+* @return The status code
 */
 int chrp_atom_charge(const CHRP_ATOM* atom, float* charge);
 
@@ -585,6 +588,7 @@ int chrp_atom_charge(const CHRP_ATOM* atom, float* charge);
 * @brief Set the charge of an atom, in number of the electron charge e
 * @param atom The atom
 * @param charge The atom charge
+* @return The status code
 */
 int chrp_atom_charge_set(CHRP_ATOM* atom, float charge);
 
@@ -593,6 +597,7 @@ int chrp_atom_charge_set(CHRP_ATOM* atom, float charge);
 * @param atom The atom
 * @param name A string buffer to be filled with the name
 * @param buffsize The size of the string buffer
+* @return The status code
 */
 int chrp_atom_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
 
@@ -600,8 +605,42 @@ int chrp_atom_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
 * @brief Set the name of an atom
 * @param atom The atom
 * @param name A null terminated string containing the name
+* @return The status code
 */
 int chrp_atom_name_set(CHRP_ATOM* atom, const char* name);
+
+/*!
+* @brief Get the Van der Waals radius of an atom from the short name
+* @param atom The atom
+* @param name A string buffer to be filled with the name
+* @param buffsize The size of the string buffer
+* @return The status code
+*/
+int chrp_atom_full_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
+
+/*!
+* @brief Get the Van der Waals radius of an atom from the short name
+* @param atom The atom
+* @param radius The Van der Waals radius of the atom or -1 if no value could be found.
+* @return The status code
+*/
+int chrp_atom_vdw_radius(const CHRP_ATOM* atom, double* radius);
+
+/*!
+* @brief Get the Van der Waals radius of an atom from the short name
+* @param atom The atom
+* @param radius The Van der Waals radius of the atom or -1 if no value could be found.
+* @return The status code
+*/
+int chrp_atom_covalent_radius(const CHRP_ATOM* atom, double* radius);
+
+/*!
+* @brief Get the atomic number of an atom from the short name
+* @param atom The atom
+* @param number The atomic number
+* @return The status code
+*/
+int chrp_atom_atomic_number(const CHRP_ATOM* atom, int* number);
 
 /*!
 * @brief Destroy an atom, and free the associated memory
