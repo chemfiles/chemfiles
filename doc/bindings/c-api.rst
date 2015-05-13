@@ -129,7 +129,7 @@ Function manipulating ``CHRP_TOPOLOGY``
 
 .. doxygenfunction:: chrp_topology
 
-.. doxygenfunction:: chrp_empty_topology
+.. doxygenfunction:: chrp_topology_from_frame
 
 .. doxygenfunction:: chrp_topology_size
 
@@ -170,7 +170,7 @@ Function manipulating ``CHRP_ATOM``
 
 .. doxygenfunction:: chrp_atom
 
-.. doxygenfunction:: chrp_atom_from_name
+.. doxygenfunction:: chrp_atom_from_frame
 
 .. doxygenfunction:: chrp_atom_from_topology
 
@@ -185,5 +185,13 @@ Function manipulating ``CHRP_ATOM``
 .. doxygenfunction:: chrp_atom_name
 
 .. doxygenfunction:: chrp_atom_name_set
+
+.. doxygenfunction:: chrp_atom_full_name
+
+.. doxygenfunction:: chrp_atom_vdw_radius
+
+.. doxygenfunction:: chrp_atom_covalent_radius
+
+.. doxygenfunction:: chrp_atom_atomic_number
 
 .. doxygenfunction:: chrp_atom_free
