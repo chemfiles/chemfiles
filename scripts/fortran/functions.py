@@ -33,7 +33,7 @@ class Function:
     '''
     def __init__(self, name, coord, rettype):
         self.name = name
-        self.coord = coord
+        self.coord = str(coord).split("/")[-1].split("\\")[-1]
         self.args = []
         self.rettype = rettype
 

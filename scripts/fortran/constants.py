@@ -5,7 +5,7 @@ Various constants for fortran API generation
 """
 
 # Maximum string length
-STRING_LENGTH = 512
+STRING_LENGTH = 1024
 
 # List of type which have to be wrapped to fortran
 FTYPES = [

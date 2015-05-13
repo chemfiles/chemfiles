@@ -17,7 +17,7 @@
 function chrp_strerror(status) result(string)
     implicit none
     integer(kind=c_int), value :: status
-    character(len=512) :: string
+    character(len=1024) :: string
     type(c_ptr) :: c_string
 
     c_string = chrp_strerror_c(status)
@@ -27,7 +27,7 @@ end function
 function chrp_last_error() result(string)
     implicit none
 
-    character(len=512) :: string
+    character(len=1024) :: string
     type(c_ptr) :: c_string
 
     c_string = chrp_last_error_c()
