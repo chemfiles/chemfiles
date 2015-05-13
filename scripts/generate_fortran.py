@@ -11,19 +11,15 @@ from fortran.ftypes import write_types
 from fortran.interface import write_interface
 from pycparser import parse_file
 
-
-def usage():
-    print(sys.argv[0] + " path/to/chemharp.h path/to/fortran/binding/dir")
+ROOT_DIR = os.path.join(os.path.dirname(__file__), "..")
+C_HEADER = os.path.join(ROOT_DIR, "bindings", "c", "chemharp.h")
+CXX_INCLUDES = os.path.join(ROOT_DIR, "include")
+FORTRAN_ROOT = os.path.join(ROOT_DIR, "bindings", "fortran", "generated")
+LIBC_PATH = os.path.join(os.path.dirname(__file__), "libc")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        usage()
-        sys.exit(0)
-    C_HEADER = sys.argv[1]
-    FORTRAN_ROOT = os.path.join(sys.argv[2], "generated")
-    libc_path = os.path.join(os.path.dirname(__file__), "libc")
     ast = parse_file(C_HEADER, use_cpp=True, cpp_path="gcc",
-                     cpp_args=["-E", "-I" + libc_path])
+                     cpp_args=["-E", "-I" + LIBC_PATH, "-I" + CXX_INCLUDES])
 
     evisitor = EnumVisitor()
     evisitor.visit(ast)

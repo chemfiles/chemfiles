@@ -84,6 +84,10 @@ contains
     procedure :: charge_set => chrp_atom_charge_set
     procedure :: name => chrp_atom_name
     procedure :: name_set => chrp_atom_name_set
+    procedure :: full_name => chrp_atom_full_name
+    procedure :: vdw_radius => chrp_atom_vdw_radius
+    procedure :: covalent_radius => chrp_atom_covalent_radius
+    procedure :: atomic_number => chrp_atom_atomic_number
     procedure :: free => chrp_atom_free
 end type
 

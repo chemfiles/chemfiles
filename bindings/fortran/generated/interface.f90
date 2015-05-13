@@ -844,6 +844,60 @@ subroutine chrp_atom_name_set(this, name, status)
     end if
 end subroutine
 
+subroutine chrp_atom_full_name(this, name, buffsize, status)
+    implicit none
+    class(chrp_atom), intent(in) :: this
+    character(len=*) :: name
+    integer(kind=c_size_t), value :: buffsize
+    integer, optional :: status
+    integer :: status_tmp_
+
+    status_tmp_ = chrp_atom_full_name_c(this%ptr, name, buffsize)
+    if (present(status)) then
+        status = status_tmp_
+    end if
+    name = rm_c_null_in_str(name)
+end subroutine
+
+subroutine chrp_atom_vdw_radius(this, radius, status)
+    implicit none
+    class(chrp_atom), intent(in) :: this
+    real(kind=c_double) :: radius
+    integer, optional :: status
+    integer :: status_tmp_
+
+    status_tmp_ = chrp_atom_vdw_radius_c(this%ptr, radius)
+    if (present(status)) then
+        status = status_tmp_
+    end if
+end subroutine
+
+subroutine chrp_atom_covalent_radius(this, radius, status)
+    implicit none
+    class(chrp_atom), intent(in) :: this
+    real(kind=c_double) :: radius
+    integer, optional :: status
+    integer :: status_tmp_
+
+    status_tmp_ = chrp_atom_covalent_radius_c(this%ptr, radius)
+    if (present(status)) then
+        status = status_tmp_
+    end if
+end subroutine
+
+subroutine chrp_atom_atomic_number(this, number, status)
+    implicit none
+    class(chrp_atom), intent(in) :: this
+    integer(kind=c_int) :: number
+    integer, optional :: status
+    integer :: status_tmp_
+
+    status_tmp_ = chrp_atom_atomic_number_c(this%ptr, number)
+    if (present(status)) then
+        status = status_tmp_
+    end if
+end subroutine
+
 subroutine chrp_atom_free(this, status)
     implicit none
     class(chrp_atom) :: this
