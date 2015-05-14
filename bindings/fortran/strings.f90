@@ -9,7 +9,6 @@ contains
         type(c_ptr), target, intent(in) :: c_string
         character(len=1024), pointer    :: tmp
         character(len=1024)             :: f_string
-        integer                         :: str_len, i
 
         call c_f_pointer(c_loc(c_string), tmp)
         f_string = rm_c_null_in_str(tmp)
