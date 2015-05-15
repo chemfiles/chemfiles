@@ -12,9 +12,9 @@ enum, bind(C)
 end enum
 """
 
-C2F_ENUMS = {
-    "CHRP_LOG_LEVEL": "log_level",
-    "CHRP_CELL_TYPES": "cell_type",
+ENUMS_PREFIX = {
+    "CHRP_LOG_LEVEL": "CHRP_LOG_",
+    "CHRP_CELL_TYPES": "CHRP_CELL_",
 }
 
 
@@ -29,7 +29,7 @@ class Enum:
         '''
         Append a name in the enum list, with optional value
         '''
-        self.enumerator.append((name, value))
+        self.enumerator.append((ENUMS_PREFIX[self.name] + name, value))
 
     def __str__(self):
         res = ""
@@ -51,7 +51,7 @@ class EnumVisitor(c_ast.NodeVisitor):
         self.enums = []
 
     def visit_Enum(self, node):
-        enum = Enum(C2F_ENUMS[node.name])
+        enum = Enum(node.name)
         for enumerator in node.values.enumerators:
             enum.append(enumerator.name, enumerator.value)
         self.enums.append(enum)

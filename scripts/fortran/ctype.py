@@ -23,9 +23,9 @@ CHRP_TYPES_TO_FORTRAN_INTERFACE = {
 
     # Enums wrapped to Fortran
     "chrp_cell_type_t":
-    'include "generated/cenums.f90"\n    integer(kind(cell_type))',
+    'include "generated/cenums.f90"\n    integer(kind=kind(CHRP_CELL_TYPES))',
     "chrp_log_level_t":
-    'include "generated/cenums.f90"\n    integer(kind(log_level))',
+    'include "generated/cenums.f90"\n    integer(kind=kind(CHRP_LOG_LEVEL))',
 }
 
 # Converting Chemharp types for the c functions declarations

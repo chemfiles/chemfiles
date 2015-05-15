@@ -15,19 +15,19 @@
 
 
 enum, bind(C)
-    enumerator :: NONE
-    enumerator :: ERROR
-    enumerator :: WARNING
-    enumerator :: INFO
-    enumerator :: DEBUG
+    enumerator :: CHRP_LOG_NONE
+    enumerator :: CHRP_LOG_ERROR
+    enumerator :: CHRP_LOG_WARNING
+    enumerator :: CHRP_LOG_INFO
+    enumerator :: CHRP_LOG_DEBUG
     ! Enumeration name:
-    enumerator :: log_level
+    enumerator :: CHRP_LOG_LEVEL
 end enum
 
 enum, bind(C)
-    enumerator :: ORTHOROMBIC
-    enumerator :: TRICLINIC
-    enumerator :: INFINITE
+    enumerator :: CHRP_CELL_ORTHOROMBIC
+    enumerator :: CHRP_CELL_TRICLINIC
+    enumerator :: CHRP_CELL_INFINITE
     ! Enumeration name:
-    enumerator :: cell_type
+    enumerator :: CHRP_CELL_TYPES
 end enum

@@ -37,7 +37,7 @@ end function
 subroutine chrp_loglevel(level, status)
     implicit none
     include "generated/cenums.f90"
-    integer(kind(log_level)), value :: level
+    integer(kind=kind(CHRP_LOG_LEVEL)), value :: level
     integer, optional :: status
     integer :: status_tmp_
 
@@ -436,7 +436,7 @@ subroutine chrp_cell_type(this, type, status)
     implicit none
     class(chrp_cell), intent(in) :: this
     include "generated/cenums.f90"
-    integer(kind(cell_type)) :: type
+    integer(kind=kind(CHRP_CELL_TYPES)) :: type
     integer, optional :: status
     integer :: status_tmp_
 
@@ -450,7 +450,7 @@ subroutine chrp_cell_type_set(this, type, status)
     implicit none
     class(chrp_cell) :: this
     include "generated/cenums.f90"
-    integer(kind(cell_type)), value :: type
+    integer(kind=kind(CHRP_CELL_TYPES)), value :: type
     integer, optional :: status
     integer :: status_tmp_
 

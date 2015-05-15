@@ -115,7 +115,7 @@ contains
 
         real(kind=real64) :: a = 0, b = 0, c = 0, alpha = 0, beta = 0, gamma = 0
         integer :: status
-        integer(kind=kind(cell_type)) :: celltype
+        integer(kind=kind(CHRP_CELL_TYPES)) :: celltype
 
         call cell%lengths(a, b, c, status)
         if (status /= 0) stop "cell%lengths"
@@ -133,6 +133,6 @@ contains
 
         call cell%type(celltype)
         if (status /= 0) stop "cell%type"
-        if (celltype /= INFINITE) stop "celltype /= INFINITE"
+        if (celltype /= CHRP_CELL_INFINITE) stop "celltype /= INFINITE"
     end subroutine
 end program
