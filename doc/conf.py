@@ -6,6 +6,7 @@ import sphinx_bootstrap_theme
 import subprocess
 
 DOC_ROOT = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(os.path.join(DOC_ROOT, "ext"))
 
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 if read_the_docs_build:
@@ -23,6 +24,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.todo',
     'breathe',
+    'fortran_domain'
 ]
 
 # Breathe projects
