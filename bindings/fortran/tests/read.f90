@@ -34,7 +34,8 @@ program read
     DATAFILE = trim(DATAFILE) // "/xyz/helium.xyz"
 
 !------------------------------------------------------------------------------!
-    call traj%open(trim(DATAFILE), "r")
+    call traj%open(trim(DATAFILE), "r", status=status)
+    if (status /= 0) stop "trajectory%open"
     call frame%init(0)
 
     call traj%read(frame, status)

@@ -71,13 +71,25 @@ subroutine chrp_log_stderr(status)
     end if
 end subroutine
 
-subroutine chrp_open_init_(this, filename, mode)
+subroutine chrp_open_init_(this, filename, mode, status)
     implicit none
     class(chrp_trajectory) :: this
     character(len=*), intent(in) :: filename
     character(len=*), intent(in) :: mode
+    integer, optional :: status
+    integer :: status_tmp_
 
     this%ptr = chrp_open_c(f_to_c_str(filename), f_to_c_str(mode))
+
+    if (.not. c_associated(this%ptr)) then
+        status_tmp_ = -1
+    else
+        status_tmp_ = 0
+    end if
+
+    if (present(status)) then
+        status = status_tmp_
+    end if
 end subroutine
 
 subroutine chrp_trajectory_read_at(this, step, frame, status)
@@ -184,12 +196,24 @@ subroutine chrp_trajectory_close(this, status)
     end if
 end subroutine
 
-subroutine chrp_frame_init_(this, natoms)
+subroutine chrp_frame_init_(this, natoms, status)
     implicit none
     class(chrp_frame) :: this
     integer(kind=c_size_t), value :: natoms
+    integer, optional :: status
+    integer :: status_tmp_
 
     this%ptr = chrp_frame_c(natoms)
+
+    if (.not. c_associated(this%ptr)) then
+        status_tmp_ = -1
+    else
+        status_tmp_ = 0
+    end if
+
+    if (present(status)) then
+        status = status_tmp_
+    end if
 end subroutine
 
 subroutine chrp_frame_size(this, natoms, status)
@@ -338,7 +362,7 @@ subroutine chrp_frame_free(this, status)
     end if
 end subroutine
 
-subroutine chrp_cell_init_(this, a, b, c, alpha, beta, gamma)
+subroutine chrp_cell_init_(this, a, b, c, alpha, beta, gamma, status)
     implicit none
     class(chrp_cell) :: this
     real(kind=c_double), value :: a
@@ -347,16 +371,40 @@ subroutine chrp_cell_init_(this, a, b, c, alpha, beta, gamma)
     real(kind=c_double), value :: alpha
     real(kind=c_double), value :: beta
     real(kind=c_double), value :: gamma
+    integer, optional :: status
+    integer :: status_tmp_
 
     this%ptr = chrp_cell_c(a, b, c, alpha, beta, gamma)
+
+    if (.not. c_associated(this%ptr)) then
+        status_tmp_ = -1
+    else
+        status_tmp_ = 0
+    end if
+
+    if (present(status)) then
+        status = status_tmp_
+    end if
 end subroutine
 
-subroutine chrp_cell_from_frame_init_(this, frame)
+subroutine chrp_cell_from_frame_init_(this, frame, status)
     implicit none
     class(chrp_cell) :: this
     class(chrp_frame) :: frame
+    integer, optional :: status
+    integer :: status_tmp_
 
     this%ptr = chrp_cell_from_frame_c(frame%ptr)
+
+    if (.not. c_associated(this%ptr)) then
+        status_tmp_ = -1
+    else
+        status_tmp_ = 0
+    end if
+
+    if (present(status)) then
+        status = status_tmp_
+    end if
 end subroutine
 
 subroutine chrp_cell_lengths(this, a, b, c, status)
@@ -502,19 +550,43 @@ subroutine chrp_cell_free(this, status)
     end if
 end subroutine
 
-subroutine chrp_topology_init_(this)
+subroutine chrp_topology_init_(this, status)
     implicit none
     class(chrp_topology) :: this
+    integer, optional :: status
+    integer :: status_tmp_
 
     this%ptr = chrp_topology_c()
+
+    if (.not. c_associated(this%ptr)) then
+        status_tmp_ = -1
+    else
+        status_tmp_ = 0
+    end if
+
+    if (present(status)) then
+        status = status_tmp_
+    end if
 end subroutine
 
-subroutine chrp_topology_from_frame_init_(this, frame)
+subroutine chrp_topology_from_frame_init_(this, frame, status)
     implicit none
     class(chrp_topology) :: this
     class(chrp_frame) :: frame
+    integer, optional :: status
+    integer :: status_tmp_
 
     this%ptr = chrp_topology_from_frame_c(frame%ptr)
+
+    if (.not. c_associated(this%ptr)) then
+        status_tmp_ = -1
+    else
+        status_tmp_ = 0
+    end if
+
+    if (present(status)) then
+        status = status_tmp_
+    end if
 end subroutine
 
 subroutine chrp_topology_size(this, natoms, status)
@@ -738,30 +810,66 @@ subroutine chrp_topology_free(this, status)
     end if
 end subroutine
 
-subroutine chrp_atom_init_(this, name)
+subroutine chrp_atom_init_(this, name, status)
     implicit none
     class(chrp_atom) :: this
     character(len=*), intent(in) :: name
+    integer, optional :: status
+    integer :: status_tmp_
 
     this%ptr = chrp_atom_c(f_to_c_str(name))
+
+    if (.not. c_associated(this%ptr)) then
+        status_tmp_ = -1
+    else
+        status_tmp_ = 0
+    end if
+
+    if (present(status)) then
+        status = status_tmp_
+    end if
 end subroutine
 
-subroutine chrp_atom_from_frame_init_(this, frame, idx)
+subroutine chrp_atom_from_frame_init_(this, frame, idx, status)
     implicit none
     class(chrp_atom) :: this
     class(chrp_frame) :: frame
     integer(kind=c_size_t), value :: idx
+    integer, optional :: status
+    integer :: status_tmp_
 
     this%ptr = chrp_atom_from_frame_c(frame%ptr, idx)
+
+    if (.not. c_associated(this%ptr)) then
+        status_tmp_ = -1
+    else
+        status_tmp_ = 0
+    end if
+
+    if (present(status)) then
+        status = status_tmp_
+    end if
 end subroutine
 
-subroutine chrp_atom_from_topology_init_(this, topology, idx)
+subroutine chrp_atom_from_topology_init_(this, topology, idx, status)
     implicit none
     class(chrp_atom) :: this
     class(chrp_topology) :: topology
     integer(kind=c_size_t), value :: idx
+    integer, optional :: status
+    integer :: status_tmp_
 
     this%ptr = chrp_atom_from_topology_c(topology%ptr, idx)
+
+    if (.not. c_associated(this%ptr)) then
+        status_tmp_ = -1
+    else
+        status_tmp_ = 0
+    end if
+
+    if (present(status)) then
+        status = status_tmp_
+    end if
 end subroutine
 
 subroutine chrp_atom_mass(this, mass, status)

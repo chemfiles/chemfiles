@@ -35,6 +35,14 @@ COPY_RETURN_STATUS = """
         status = status_tmp_
     end if"""
 
+CHECK_NULL_POINTER = """
+
+    if (.not. c_associated(this%ptr)) then
+        status_tmp_ = -1
+    else
+        status_tmp_ = 0
+    end if
+"""
 
 def call_interface(args):
     '''
@@ -119,16 +127,17 @@ def write_interface(path, _functions):
                     instructions = "    this%ptr = "
                     instructions += function.c_interface_name
                     instructions += call_interface(function.args[1:])
+                    instructions += CHECK_NULL_POINTER
                 else:
                     instructions = "    status_tmp_ = "
                     instructions += function.c_interface_name
                     instructions += call_interface(function.args)
 
-                    declarations += "\n    integer, optional :: status"
-                    declarations += "\n    integer :: status_tmp_"
-                    instructions += COPY_RETURN_STATUS
+                declarations += "\n    integer, optional :: status"
+                declarations += "\n    integer :: status_tmp_"
+                instructions += COPY_RETURN_STATUS
 
-                    args += ", status" if args else "status"
+                args += ", status" if args else "status"
 
                 post_call = post_call_processing(function.args)
                 if post_call:
