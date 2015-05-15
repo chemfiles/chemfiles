@@ -102,14 +102,22 @@ int chrp_log_stderr();
 /******************************************************************************/
 /*!
 * @brief Open a trajectory file.
-* @param filename The filename
-* @param mode The opening ("r" or "w") for the file. The default is read mode.
+* @param filename The path to the trajectory file
+* @param mode The opening ("r" for read or "w" for write) mode for the file.
 * @return A pointer to the file
 */
 CHRP_TRAJECTORY* chrp_open(const char* filename, const char* mode);
 
 /*!
-* @brief Read a specific step of a trajectory in a frame
+* @brief Read the next step of the trajectory into a frame
+* @param file A pointer to the trajectory
+* @param frame A frame to fill with the data
+* @return The status code.
+*/
+int chrp_trajectory_read(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
+
+/*!
+* @brief Read a specific step of the trajectory in a frame
 * @param file A pointer to the trajectory
 * @param step The step to read
 * @param frame A frame to fill with the data
@@ -118,15 +126,7 @@ CHRP_TRAJECTORY* chrp_open(const char* filename, const char* mode);
 int chrp_trajectory_read_at(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame);
 
 /*!
-* @brief Read the next step of a trajectory in a frame
-* @param file A pointer to the trajectory
-* @param frame A frame to fill with the data
-* @return The status code.
-*/
-int chrp_trajectory_read(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
-
-/*!
-* @brief Write a step (a frame) to a trajectory.
+* @brief Write a frame to the trajectory.
 * @param file The trajectory to write
 * @param frame the frame which will be writen to the file
 * @return The status code.
@@ -171,7 +171,8 @@ int chrp_trajectory_cell(CHRP_TRAJECTORY *file, const CHRP_CELL *cell);
 int chrp_trajectory_nsteps(CHRP_TRAJECTORY *file, size_t *nsteps);
 
 /*!
-* @brief Close a trajectory file, and free the associated memory
+* @brief Close a trajectory file, flush any buffer content to the hard drive, and
+*        free the associated memory
 * @param file A pointer to the file
 * @return The status code
 */
@@ -180,7 +181,7 @@ int chrp_trajectory_close(CHRP_TRAJECTORY *file);
 /******************************************************************************/
 /*!
 * @brief Create an empty frame with initial capacity of \c natoms. It will be
-*        resized if needed.
+*        resized by the library as needed.
 * @param natoms the size of the wanted frame
 * @return A pointer to the frame
 */
@@ -204,7 +205,7 @@ int chrp_frame_size(const CHRP_FRAME* frame, size_t *natoms);
 int chrp_frame_positions(const CHRP_FRAME* frame, float (*data)[3], size_t size);
 
 /*!
-* @brief Set the positions from a frame
+* @brief Set the positions of a frame
 * @param frame The frame
 * @param data A Nx3 float array containing the positions in row-major order.
 * @param size The array size (N).
@@ -222,7 +223,7 @@ int chrp_frame_positions_set(CHRP_FRAME* frame, float (*data)[3], size_t size);
 int chrp_frame_velocities(const CHRP_FRAME* frame, float (*data)[3], size_t size);
 
 /*!
-* @brief Set the velocities from a frame.
+* @brief Set the velocities of a frame.
 * @param frame The frame
 * @param data A Nx3 float array containing the velocities in row-major order.
 * @param size The array size (N).
@@ -320,7 +321,7 @@ int chrp_cell_angles(const CHRP_CELL* cell, double* alpha, double* beta, double*
 /*!
 * @brief Set the cell angles, in degrees
 * @param cell the unit cell to modify
-* @param alpha,beta,gamma the angles to use, in degrees
+* @param alpha,beta,gamma the new angles values, in degrees
 * @return The status code
 */
 int chrp_cell_angles_set(CHRP_CELL* cell, double alpha, double beta, double gamma);
@@ -354,7 +355,7 @@ int chrp_cell_type(const CHRP_CELL* cell, chrp_cell_type_t* type);
 /*!
 * @brief Set the cell type
 * @param cell the cell to modify
-* @param type the type of the cell
+* @param type the new type of the cell
 * @return The status code
 */
 int chrp_cell_type_set(CHRP_CELL* cell, chrp_cell_type_t type);
@@ -488,7 +489,7 @@ int chrp_topology_dihedrals_count(CHRP_TOPOLOGY* topology, size_t* ndihedrals);
 * @brief Get the bonds in the system
 * @param topology The topology
 * @param data A nbonds x 2 array to be filled with the bonds in the system
-* @param nbonds The size of the array. This should equal the value give by the
+* @param nbonds The size of the array. This should equal the value given by the
 *               chrp_topology_bonds_count function
 * @return The status code
 */
@@ -498,7 +499,7 @@ int chrp_topology_bonds(CHRP_TOPOLOGY* topology, size_t (*data)[2], size_t nbond
 * @brief Get the angles in the system
 * @param topology The topology
 * @param data A nangles x 3 array to be filled with the angles in the system
-* @param nangles The size of the array. This should equal the value give by the
+* @param nangles The size of the array. This should equal the value given by the
 *               chrp_topology_angles_count function
 * @return The status code
 */
@@ -508,7 +509,7 @@ int chrp_topology_angles(CHRP_TOPOLOGY* topology, size_t (*data)[3], size_t nang
 * @brief Get the dihedral angles in the system
 * @param topology The topology
 * @param data A ndihedrals x 4 array to be filled with the dihedral angles in the system
-* @param ndihedrals The size of the array. This should equal the value give by the
+* @param ndihedrals The size of the array. This should equal the value given by the
 *               chrp_topology_dihedrals_count function
 * @return The status code
 */
@@ -523,7 +524,7 @@ int chrp_topology_dihedrals(CHRP_TOPOLOGY* topology, size_t (*data)[4], size_t n
 int chrp_topology_add_bond(CHRP_TOPOLOGY* topology, size_t i, size_t j);
 
 /*!
-* @brief Remove a bond between the atoms \c i and \c j in the system
+* @brief Remove any existing bond between the atoms \c i and \c j in the system
 * @param topology The topology
 * @param i,j The atomic indexes
 * @return The status code
@@ -549,7 +550,7 @@ CHRP_ATOM* chrp_atom(const char* name);
 /*!
 * @brief Get a specific atom from a frame
 * @param frame The frame
-* @param idx The atom index
+* @param idx The atom index in the frame
 * @return A pointer to the corresponding atom
 */
 CHRP_ATOM* chrp_atom_from_frame(CHRP_FRAME* frame, size_t idx);
@@ -557,7 +558,7 @@ CHRP_ATOM* chrp_atom_from_frame(CHRP_FRAME* frame, size_t idx);
 /*!
 * @brief Get a specific atom from a topology
 * @param topology The topology
-* @param idx The atom index
+* @param idx The atom index in the topology
 * @return A pointer to the corresponding atom
 */
 CHRP_ATOM* chrp_atom_from_topology(CHRP_TOPOLOGY* topology, size_t idx);
@@ -573,7 +574,7 @@ int chrp_atom_mass(const CHRP_ATOM* atom, float* mass);
 /*!
 * @brief Set the mass of an atom, in atomic mass units
 * @param atom The atom
-* @param mass The atom mass
+* @param mass The new atom mass
 * @return The status code
 */
 int chrp_atom_mass_set(CHRP_ATOM* atom, float mass);
@@ -589,7 +590,7 @@ int chrp_atom_charge(const CHRP_ATOM* atom, float* charge);
 /*!
 * @brief Set the charge of an atom, in number of the electron charge e
 * @param atom The atom
-* @param charge The atom charge
+* @param charge The new atom charge
 * @return The status code
 */
 int chrp_atom_charge_set(CHRP_ATOM* atom, float charge);
@@ -606,13 +607,13 @@ int chrp_atom_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
 /*!
 * @brief Set the name of an atom
 * @param atom The atom
-* @param name A null terminated string containing the name
+* @param name A null terminated string containing the new name
 * @return The status code
 */
 int chrp_atom_name_set(CHRP_ATOM* atom, const char* name);
 
 /*!
-* @brief Get the Van der Waals radius of an atom from the short name
+* @brief Try to get the full name of an atom from the short name
 * @param atom The atom
 * @param name A string buffer to be filled with the name
 * @param buffsize The size of the string buffer
@@ -621,7 +622,7 @@ int chrp_atom_name_set(CHRP_ATOM* atom, const char* name);
 int chrp_atom_full_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
 
 /*!
-* @brief Get the Van der Waals radius of an atom from the short name
+* @brief Try to get the Van der Waals radius of an atom from the short name
 * @param atom The atom
 * @param radius The Van der Waals radius of the atom or -1 if no value could be found.
 * @return The status code
@@ -629,17 +630,17 @@ int chrp_atom_full_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
 int chrp_atom_vdw_radius(const CHRP_ATOM* atom, double* radius);
 
 /*!
-* @brief Get the Van der Waals radius of an atom from the short name
+* @brief Try to get the covalent radius of an atom from the short name
 * @param atom The atom
-* @param radius The Van der Waals radius of the atom or -1 if no value could be found.
+* @param radius The covalent radius of the atom or -1 if no value could be found.
 * @return The status code
 */
 int chrp_atom_covalent_radius(const CHRP_ATOM* atom, double* radius);
 
 /*!
-* @brief Get the atomic number of an atom from the short name
+* @brief Try to get the atomic number of an atom from the short name
 * @param atom The atom
-* @param number The atomic number
+* @param number The atomic number, or -1 if no value could be found.
 * @return The status code
 */
 int chrp_atom_atomic_number(const CHRP_ATOM* atom, int* number);
