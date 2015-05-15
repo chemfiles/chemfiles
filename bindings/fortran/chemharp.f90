@@ -13,6 +13,14 @@ module chemharp
     use iso_c_binding
     use strings
     implicit none
+    private
+    ! Export types
+    public :: chrp_trajectory, chrp_frame, chrp_cell, chrp_topology, chrp_atom
+    ! Export enums
+    public:: CHRP_LOG_LEVEL, CHRP_LOG_NONE, CHRP_LOG_ERROR, CHRP_LOG_WARNING, CHRP_LOG_INFO, CHRP_LOG_DEBUG
+    public:: CHRP_CELL_TYPES, CHRP_CELL_ORTHOROMBIC, CHRP_CELL_TRICLINIC, CHRP_CELL_INFINITE
+    ! Export free functions
+    public :: chrp_log_stderr, chrp_logfile, chrp_loglevel, chrp_last_error, chrp_strerror
 
     include "generated/cenums.f90"
     include "generated/cdef.f90"
