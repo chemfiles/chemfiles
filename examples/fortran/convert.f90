@@ -14,7 +14,8 @@ program convert
 
     integer(int64) :: nsteps, i, status
 
-    call input%open("water.xyz", "r")
+    call input%open("water.xyz", "r", status=status)
+    if (status /= 0) stop "Error while opening input file"
     call ouput_file%open("water.pdb", "w")
 
     call frame%init(0)

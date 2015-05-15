@@ -13,7 +13,8 @@ program rmsd_
     integer(kind=int64) :: nsteps = 0, natoms=0, i, status
     real(kind=real64) :: distance = 0, mean = 0, rmsd = 0
 
-    call traj%open("filename.nc", "r")
+    call traj%open("filename.nc", "r", status=status)
+    if (status /= 0) stop "Error while opening input file"
     call frame%init(0)
 
     call traj%nsteps(nsteps)
