@@ -33,12 +33,15 @@ class Dynlib {
 public:
     //! Load a library from it path
     explicit Dynlib(const std::string& path);
+    Dynlib();
     ~Dynlib();
 
     //! Load a specific symbol from the library. The template parameter is the
     //! typedef of the function
     template<class function_t>
     function_t symbol(const std::string& name){
+        if (handle == nullptr)
+            throw PluginError("The dynamic library was not opened.");
         #ifdef WIN32
             function_t sym = reinterpret_cast<function_t>(GetProcAddress(handle, name));
             if (!sym)

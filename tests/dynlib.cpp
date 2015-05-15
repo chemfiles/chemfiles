@@ -11,4 +11,7 @@ TEST_CASE("Dynamic library loading", "[Dynlib]"){
 
     auto bar = lib.symbol<double (*)(void)>("bar");
     CHECK(bar() == 42);
+
+    Dynlib lib_empty;
+    CHECK_THROWS_AS(lib_empty.symbol<double (*)(void)>("HEY"), PluginError);
 }

@@ -11,6 +11,8 @@
 
 using namespace harp;
 
+Dynlib::Dynlib() : handle(nullptr) {}
+
 Dynlib::Dynlib(const std::string& path){
 #ifdef WIN32
     // use SetDllDirectory to set the search path
