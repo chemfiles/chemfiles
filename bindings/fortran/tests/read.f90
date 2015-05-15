@@ -1,6 +1,7 @@
 program read
     use iso_fortran_env, only: real32, real64, int64
     use chemharp
+    use testing
     implicit none
 
     real(kind=real32), dimension(3, 2) :: FIRST_FRAME, LAST_FRAME, MIDLE_FRAME
@@ -35,11 +36,12 @@ program read
 
 !------------------------------------------------------------------------------!
     call traj%open(trim(DATAFILE), "r", status=status)
-    if (status /= 0) stop "trajectory%open"
+    write(*, *) status
+    call check((status == 0), "trajectory%open")
     call frame%init(0)
 
     call traj%read(frame, status)
-    if (status /= 0) stop "trajectory%read"
+    call check((status == 0), "trajectory%read")
     call check_frame(frame, FIRST_FRAME)
 
     call topology%from_frame(frame)
@@ -49,11 +51,11 @@ program read
     call check_cell(cell)
 
     call traj%nsteps(nsteps, status)
-    if (status /= 0) stop "trajectory%nsteps"
+    call check((status == 0), "trajectory%nsteps")
 
     do i=2,nsteps
         call traj%read(frame, status)
-        if (status /= 0) stop "trajectory%read"
+        call check((status == 0), "trajectory%read")
     end do
 
     call check_frame(frame, LAST_FRAME)
@@ -74,19 +76,19 @@ contains
         real(kind=real32), dimension(:, :), allocatable :: positions
 
         call frame%size(natoms)
-        if (natoms /= 125) stop "frame%size"
+        call check((natoms == 125), "frame%size")
 
         call frame%has_velocities(has_velocities, status)
-        if (status /= 0 .or. has_velocities) stop "frame%has_velocities"
+        call check((status == 0 .and. .not. has_velocities), "frame%has_velocities")
 
         allocate(positions(3, natoms))
 
         call frame%positions(positions, natoms, status)
-        if (status /= 0) stop "frame%positions"
+        call check((status == 0), "frame%positions")
 
         do i=1,3
-            if (abs(positions(i, 1) - reference(i, 1)) > 1e-5) stop "Wrong positions"
-            if (abs(positions(i, 125) - reference(i, 2)) > 1e-5) stop "Wrong positions"
+            call check((abs(positions(i, 1) - reference(i, 1)) < 1e-5), "Wrong positions")
+            call check((abs(positions(i, 125) - reference(i, 2)) < 1e-5), "Wrong positions")
         end do
 
         deallocate(positions)
@@ -101,13 +103,14 @@ contains
         character(len=5) :: name
 
         call topology%size(natoms, status)
-        if (status /= 0) stop "topology%size"
+        call check((status == 0), "topology%size")
+        call check((natoms == 125), "natoms == 125")
 
-        if (natoms /= 125) stop "natoms /= 125"
-
-        call atom%from_topology(topology, 3)
-        call atom%name(name, 5)
-        if (name /= 'He') stop "name /= He"
+        call atom%from_topology(topology, 3, status)
+        call check((status == 0), "atom%from_topology")
+        call atom%name(name, 5, status)
+        call check((status == 0), "atom%name")
+        call check((name == 'He'), "name == 'He'")
     end subroutine
 
     subroutine check_cell(cell)
@@ -119,21 +122,21 @@ contains
         integer(kind=kind(CHRP_CELL_TYPES)) :: celltype
 
         call cell%lengths(a, b, c, status)
-        if (status /= 0) stop "cell%lengths"
+        call check((status == 0), "cell%lengths")
 
-        if (a /= 0.0) stop "a /= 0.0"
-        if (b /= 0.0) stop "b /= 0.0"
-        if (c /= 0.0) stop "c /= 0.0"
+        call check((a == 0.0), "a == 0.0")
+        call check((b == 0.0), "b == 0.0")
+        call check((c == 0.0), "c == 0.0")
 
         call cell%angles(alpha, beta, gamma, status)
-        if (status /= 0) stop "cell%angles"
+        call check((status == 0), "cell%angles")
 
-        if (alpha /= 90.0) stop "alpha /= 0.0"
-        if (beta /= 90.0) stop "beta /= 0.0"
-        if (gamma /= 90.0) stop "gamma /= 0.0"
+        call check((alpha == 90.0), "alpha == 90.0")
+        call check((beta == 90.0), "beta == 90.0")
+        call check((gamma == 90.0), "gamma == 90.0")
 
         call cell%type(celltype)
-        if (status /= 0) stop "cell%type"
-        if (celltype /= CHRP_CELL_INFINITE) stop "celltype /= INFINITE"
+        call check((status == 0), "cell%type")
+        call check((celltype == CHRP_CELL_INFINITE), "celltype == INFINITE")
     end subroutine
 end program

@@ -1,6 +1,7 @@
 program read
     use iso_fortran_env, only: real32, real64, int64
     use chemharp
+    use testing
     implicit none
 
     type(chrp_trajectory) :: traj
@@ -29,30 +30,34 @@ program read
 
 !------------------------------------------------------------------------------!
 
-    call traj%open(FILENAME, "w")
-    call topology%init()
-    call atom%init("He")
-    call frame%init(4)
+    call traj%open(FILENAME, "w", status)
+    call check((status == 0), "trajectory%open")
+    call topology%init(status)
+    call check((status == 0), "topology%init")
+    call atom%init("He", status)
+    call check((status == 0), "atom%init")
+    call frame%init(4, status)
+    call check((status == 0), "frame%init")
 
     do i=1, 4
         call topology%append(atom, status)
-        if (status /= 0) stop "topology%append"
+        call check((status == 0), "topology%append")
     end do
 
     call frame%positions_set(positions, 4, status)
-    if (status /= 0) stop "frame%positions_set"
+    call check((status == 0), "frame%positions_set")
 
     call frame%topology_set(topology, status)
-    if (status /= 0) stop "frame%topology_set"
+    call check((status == 0), "frame%topology_set")
 
     call traj%write(frame)
-    if (status /= 0) stop "traj%write"
+    call check((status == 0), "frame%write")
 
     call traj%close()
-    if (status /= 0) stop "traj%close"
+    call check((status == 0), "frame%close")
 
     file_content = read_whole_file(FILENAME)
-    if (trim(file_content) /= trim(CONTENT)) stop "Wrong file content"
+    call check((trim(file_content) == trim(CONTENT)), "Wrong file content")
 
     open(unit=11, iostat=status, file=FILENAME, status='old')
     if (status == 0) close(11, status='delete')
