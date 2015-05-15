@@ -26,12 +26,12 @@ specify which format to use.
 .. _XYZ: http://openbabel.org/wiki/XYZ
 .. _Amber NetCDF: http://ambermd.org/netcdf/nctraj.xhtml
 
-.. |yes| image:: img/yes.png
+.. |yes| image:: static/img/yes.png
           :alt: Yes
           :width: 16px
           :height: 16px
 
-.. |no| image:: img/no.png
+.. |no| image:: static/img/no.png
           :alt: No
           :width: 16px
           :height: 16px

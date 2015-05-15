@@ -30,7 +30,7 @@ breathe_projects = {"Chemharp": os.path.join(DOC_ROOT, "doxygen", "xml")}
 breathe_default_project = "Chemharp"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = []
+templates_path = [os.path.join(DOC_ROOT, "templates")]
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -127,7 +127,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
+html_static_path = [os.path.join(DOC_ROOT, "static", "css", "chemharp.css")]
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied

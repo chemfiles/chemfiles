@@ -1,3 +1,5 @@
+.. _overview:
+
 Chemharp features overview
 ==========================
 
@@ -6,7 +8,7 @@ interact together. The only types a Chemharp user should worry about are the
 ``Trajectory``, ``Frame``, ``Topology``, ``Atom`` and ``UnitCell`` types. All of
 them are described in this section.
 
-.. image:: img/chemharp.*
+.. image:: static/img/chemharp.*
     :align: center
 
 They are various way of interacting with these types, all of them being described
