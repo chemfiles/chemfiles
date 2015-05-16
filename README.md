@@ -72,41 +72,55 @@ example of well-formed files.
 
 ## Getting started
 
-### Getting the code, building, installing
+The whole installation is documented [here](http://chemharp.readthedocs.org/en/latest/installation.html), this page only
+show the basic steps. Please refer to the link below in case of problem.
 
-To get the code, please use `git`
+### Getting the dependencies
+
+Long story made short, just use the right commands for your system:
+
 ```bash
-git clone --recursive https://github.com/Luthaf/Chemharp
-cd Chemharp
+# On apt-get based distributions
+apt-get update
+apt-get install cmake libnetcdf-dev libboost-filesystem-dev libboost-dev
+
+# On yum based distributions
+yum install epel-release # The EPEL repository have the netcdf lib
+yum install cmake netcdf-devel netcdf-cxx-devel boost-devel boost-filesystem
+
+# On OS X with Homebrew (brew.sh)
+brew tap homebrew/science
+brew install cmake netcdf boost
 ```
 
-Then, [`cmake`](http://cmake.org/) is used to build the code. It should be
-available in your favorite package manager. So, create a folder and go for the
-build:
+You will also need a recent C++ compiler: gcc 4.9, clang 3.5 and icpc 14 are
+known to work.
+
+### Getting the code, building, installing
+
+Get the code from the [release](https://github.com/Luthaf/Chemharp/releases) page,
+and extract the archive. Then in a terminal, go to the folder where you put the
+code (`~/Chemharp` is assumed here):
+```bash
+cd ~/Chemharp
+```
+
+Then, [`cmake`](http://cmake.org/) is used to build the code. So, create a folder
+and go for the build:
 ```bash
 mkdir build
 cd build
 cmake ..
 ```
 
-You can also configure the build at command line. The mains options are
-`-DBUILD_TESTS=ON` to build the tests suite, and `-DBUILD_DOCUMENTATION=ON`
-to build a local copy of the documentation.
-
-Then, you can build and install the library by running the following commands:
+Then, you can build install the library:
 ```bash
 make
 make install
 ```
 
-### Testing the code
-
-You may want to run the tests before installing. To do so, use the `ctest` command:
-```bash
-ctest # or ctest -jn to run n parallel processes
-```
-
-All tests should pass, if they don't please fill an [issue](https://github.com/Luthaf/Chemharp/issues).
+For more informations about how to configure the build, and how to build the
+bindings to Python or Fortran, please [read the doc](http://chemharp.readthedocs.org/en/latest/installation.html)!
 
 ### Usage
 
@@ -137,8 +151,8 @@ And in C:
 #include "chemharp.h"
 
 int main(){
-    CHRP_TRAJECTORY *traj = chrp_open("filename.xyz");
-    CHRP_FRAME *frame = NULL;
+    CHRP_TRAJECTORY *traj = chrp_open("filename.xyz", "r");
+    CHRP_FRAME *frame = chrp_frame(0);
     size_t natoms = 0;
     int status;
 
@@ -146,17 +160,16 @@ int main(){
         printf("Error while reading: %s", chrp_last_error());
     }
 
-    status = chrp_read_next_step(traj, frame);
+    status = chrp_trajectory_read(traj, frame);
     if (!status){
-        /* handle error */
+        /* handle error here */
     }
     chrp_frame_size(frame, &natoms);
     printf("There is %d atoms in the frame", natoms);
 
-    float** positions = (float**)malloc(natoms*3);
+    float (*positions)[3] = (float(*)[3])malloc(sizeof(float[natoms][3]));
 
-    status = chrp_frame_positions(frame, positions, natoms);
-    if (!status){
+    if (!chrp_frame_positions(frame, positions, natoms)){
         /* handle error */
     }
 
@@ -166,23 +179,6 @@ int main(){
     chrp_close(traj);
 }
 ```
-
-## Why not use OpenBabel ?
-
-OpenBabel is another software for reading and writing chemistry trajectory files.
-
-Hard question … OpenBabel is a pretty big and good piece of software. I just
-didn't find in this project what I was looking for: a simple abstraction on the
-top of chemistry file formats to allow me, *as a programmer*, to write my own
-code without thinking about IO. OpenBabel is mainly made for conversions from a
-file format to an other, and not for analysis.
-
-Moreover, OpenBabel is GPL software, which might make it harder to use by
-other softwares. For that point, MPL is (in my own opinion) a good compromise:
-you have to publish the files you modified under MPL, but you can use whatever
-license you want for the rest of your code.
-
-But maybe I am just reinventing the squared wheel =)
 
 ## License
 
