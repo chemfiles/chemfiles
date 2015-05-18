@@ -27,9 +27,11 @@ Dynlib::Dynlib(const std::string& path){
 }
 
 Dynlib::~Dynlib(){
+    if (handle) {
 #ifdef WIN32
     FreeLibrary(handle);
 #else
     dlclose(handle);
 #endif
+    }
 }
