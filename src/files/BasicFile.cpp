@@ -25,7 +25,7 @@ BasicFile::BasicFile(const std::string& _filename, const std::string& _mode)
 
     stream.open(_filename, mode);
     if (!stream.is_open())
-        throw FileError("Could not open the file " + filename);
+        throw FileError("Could not open the file " + _filename);
     lines.resize(1);
     rewind();
 }
@@ -54,7 +54,7 @@ const std::vector<std::string>& BasicFile::readlines(size_t n){
     }
 
     if (not stream)
-        throw FileError("Error while reading file " + filename);
+        throw FileError("Error while reading file " + filename());
 
     return lines;
 }

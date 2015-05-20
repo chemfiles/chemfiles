@@ -52,7 +52,7 @@ Trajectory& Trajectory::operator>>(Frame& frame){
 
 Frame Trajectory::read(){
     if (_step >= _nsteps)
-        throw FileError("Can not read file \"" + _file->name() + "\" past end.");
+        throw FileError("Can not read file \"" + _file->filename() + "\" past end.");
 
     Frame frame;
     _format->read(_file.get(), frame);
@@ -72,7 +72,7 @@ Frame Trajectory::read(){
 Frame Trajectory::read_at(const size_t step){
     if (step >= _nsteps)
         throw FileError(
-            "Can not read file \"" + _file->name() + "\" at step " +
+            "Can not read file \"" + _file->filename() + "\" at step " +
             std::to_string(step) + ". Max step is " + std::to_string(_nsteps) + "."
         );
 

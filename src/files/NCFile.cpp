@@ -27,7 +27,7 @@ NCFile::NCFile(const std::string& _filename, const string& mode): BinaryFile(_fi
         else
             throw FileError("Unknown mode for file opening: " + mode);
     } catch (const netCDF::exceptions::NcException& e) {
-        throw FileError("Could not open the file " + filename + ".\n   " + e.what());
+        throw FileError("Could not open the file " + _filename + ".\n   " + e.what());
     }
 }
 

@@ -87,7 +87,7 @@ void NCFormat::validate(NCFile* file, size_t natoms) const{
         last_file_was_valid = is_valid(file, natoms);
     }
     if (not last_file_was_valid)
-        throw FormatError("Invalid AMBER NetCDF file " + file->name());
+        throw FormatError("Invalid AMBER NetCDF file " + file->filename());
 }
 
 void NCFormat::read_at(File* file, const size_t _step, Frame& frame){

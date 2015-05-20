@@ -33,7 +33,6 @@ typedef bte::any<mpl::vector<bte::ostreamable<>,
 */
 class File {
 public:
-    explicit File(const std::string& path) : filename(path) {}
     virtual ~File(){}
 
     // Removing default copy constructors
@@ -48,9 +47,11 @@ public:
     //! Close the file before the destructor call.
     virtual void close(void) = 0;
     //! File name
-    const std::string& name() const {return filename;}
+    const std::string& filename() const {return _filename;}
 protected:
-    const std::string filename;
+    explicit File(const std::string& path) : _filename(path) {}
+private:
+    const std::string _filename;
 };
 
 /*!
@@ -62,7 +63,6 @@ protected:
  */
 class TextFile : public File {
 public:
-    explicit TextFile(const std::string& path, const std::string& = "") : File(path) {}
     virtual ~TextFile() {}
 
     //! Read a line from the file
@@ -84,6 +84,8 @@ public:
     virtual void writeline(const std::string&) = 0;
     //! Write a vector of lines to the file
     virtual void writelines(const std::vector<std::string>&) = 0;
+protected:
+    explicit TextFile(const std::string& path, const std::string& = "") : File(path) {}
 };
 
 /*!
@@ -96,7 +98,7 @@ public:
 * file operations.
 */
 class BinaryFile : public File {
-public:
+protected:
     explicit BinaryFile(const std::string& path, const std::string& = "") : File(path) {}
 };
 
