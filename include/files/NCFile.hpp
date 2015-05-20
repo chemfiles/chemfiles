@@ -36,7 +36,7 @@ public:
     //! Get a global attribut from the file
     string global_attribute(const string& name) const;
     //! Get the value of a specific dimmension
-    size_t dimmension(const string& name) const;
+    size_t dimension(const string& name) const;
     //! Get a valid pointer to a NetCDF variable
     netCDF::NcVar variable(const string& name) const;
     //! Get an attribute of type \c T and name \c name from the variable of name \c var
@@ -47,7 +47,7 @@ public:
     void add_global_attribute(const string& name, const string& value);
     //! Create a dimmension with the specified value. If \c value == -1, then
     //! the dimension is infinite
-    void add_dimmension(const string& name, size_t value = static_cast<size_t>(-1));
+    void add_dimension(const string& name, size_t value = static_cast<size_t>(-1));
     //! Create a new variable of type \c T with name \c name along the dimensions in \c dims
     template <typename T, class ...Dims>
     void add_variable(const string& name, Dims... dims);

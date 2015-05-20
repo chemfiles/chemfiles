@@ -44,7 +44,7 @@ string NCFile::global_attribute(const string& attname) const {
     return value;
 }
 
-size_t NCFile::dimmension(const string& dimname) const {
+size_t NCFile::dimension(const string& dimname) const {
     size_t size;
     try {
         auto dim = file.getDim(dimname.c_str());
@@ -81,7 +81,7 @@ void NCFile::add_global_attribute(const string& attname, const string& value) {
     }
 }
 
-void NCFile::add_dimmension(const string& dimname, size_t value) {
+void NCFile::add_dimension(const string& dimname, size_t value) {
     try {
         if (value == static_cast<size_t>(-1) )
             file.addDim(dimname);

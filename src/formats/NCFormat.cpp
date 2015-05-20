@@ -32,7 +32,7 @@ std::string NCFormat::description() const {
 size_t NCFormat::nsteps(File* file) const {
     auto ncfile = dynamic_cast<NCFile*>(file);
     validate(ncfile);
-    auto nsteps = ncfile->dimmension("frame");
+    auto nsteps = ncfile->dimension("frame");
     return static_cast<size_t>(nsteps);
 }
 
@@ -62,17 +62,17 @@ static bool is_valid(NCFile* file, size_t natoms){
         return false;
     }
 
-    if (file->dimmension("spatial") != 3){
+    if (file->dimension("spatial") != 3){
         if (writing)
-            LOG(ERROR) << "Wrong size for spatial dimmension. Should be 3, is "
-                       << file->dimmension("spatial") << "." << endl;
+            LOG(ERROR) << "Wrong size for spatial dimension. Should be 3, is "
+                       << file->dimension("spatial") << "." << endl;
         return false;
     }
 
     if (writing) {
-        if (file->dimmension("atom") != natoms){
-            LOG(ERROR) << "Wrong size for atoms dimmension. Should be " << natoms
-                       << ", is " << file->dimmension("atom") << "." << endl;
+        if (file->dimension("atom") != natoms){
+            LOG(ERROR) << "Wrong size for atoms dimension. Should be " << natoms
+                       << ", is " << file->dimension("atom") << "." << endl;
         return false;
         }
     }
@@ -96,7 +96,7 @@ void NCFormat::read_at(File* file, const size_t _step, Frame& frame){
     validate(ncfile);
     // Set the internal step before further reading
     step = _step;
-    reserve(ncfile->dimmension("atom"));
+    reserve(ncfile->dimension("atom"));
     frame.cell(read_cell(ncfile));
 
     auto& pos = frame.positions();
@@ -116,7 +116,7 @@ void NCFormat::reserve(size_t natoms) const{
 }
 
 UnitCell NCFormat::read_cell(NCFile* file) const {
-    if (file->dimmension("cell_spatial") != 3 or file->dimmension("cell_angular") != 3)
+    if (file->dimension("cell_spatial") != 3 or file->dimension("cell_angular") != 3)
         return UnitCell(); // No UnitCell information
 
     NcVar length_var;
@@ -150,7 +150,7 @@ void NCFormat::read_array3D(NCFile* file, Array3D& arr, const string& name) cons
         return; // No information for this variable in the file
     }
 
-    auto natoms = file->dimmension("atom");
+    auto natoms = file->dimension("atom");
 
     vector<size_t> start{step, 0, 0};
     vector<size_t> count{1, natoms, 3};
@@ -172,12 +172,12 @@ static void initialize(NCFile* file, size_t natoms, bool velocities){
     file->add_global_attribute("program", "Chemharp");
     file->add_global_attribute("programVersion", CHRP_VERSION);
 
-    file->add_dimmension("frame");
-    file->add_dimmension("spatial", 3);
-    file->add_dimmension("atom", natoms);
-    file->add_dimmension("cell_spatial", 3);
-    file->add_dimmension("cell_angular", 3);
-    file->add_dimmension("label", 10);
+    file->add_dimension("frame");
+    file->add_dimension("spatial", 3);
+    file->add_dimension("atom", natoms);
+    file->add_dimension("cell_spatial", 3);
+    file->add_dimension("cell_angular", 3);
+    file->add_dimension("label", 10);
 
     file->add_variable<char>("spatial", "spatial");
     auto spatial = file->variable("spatial");

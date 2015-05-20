@@ -18,9 +18,9 @@ TEST_CASE("Read a NetCDF file", "[Files]"){
 
     CHECK(file.global_attribute("Conventions") == "AMBER");
     // Usual dimmensions
-    CHECK(file.dimmension("atom") == 297);
+    CHECK(file.dimension("atom") == 297);
     // Unlimited dimension
-    CHECK(file.dimmension("frame") == 100);
+    CHECK(file.dimension("frame") == 100);
 
     CHECK(file.attribute<string>("cell_lengths", "units") == "Angstrom");
     CHECK(file.attribute<float>("cell_lengths", "scale_factor") == 1.0f);
@@ -47,7 +47,7 @@ TEST_CASE("Errors in NetCDF files", "[Files]"){
     REQUIRE(file.is_open());
 
     CHECK_THROWS_AS(file.global_attribute("FOO"), FileError);
-    CHECK_THROWS_AS(file.dimmension("FOO"), FileError);
+    CHECK_THROWS_AS(file.dimension("FOO"), FileError);
     CHECK_THROWS_AS(file.attribute<float>("cell_lengths", "Bar"), FileError);
     CHECK_THROWS_AS(file.variable("FOO"), FileError);
 }
@@ -57,8 +57,8 @@ TEST_CASE("Write NetCDF files", "[Files]"){
     REQUIRE(file.is_open());
 
     file.add_global_attribute("global", "global.value");
-    file.add_dimmension("infinite");
-    file.add_dimmension("finite", 42);
+    file.add_dimension("infinite");
+    file.add_dimension("finite", 42);
     file.add_variable<float>("variable", "infinite", "finite");
     file.add_attribute("variable", "variable.string", "hello");
     file.add_attribute("variable", "variable.float", 35.67f);
@@ -67,8 +67,8 @@ TEST_CASE("Write NetCDF files", "[Files]"){
 
     NCFile check("tmp.nc");
     CHECK(check.global_attribute("global") == "global.value");
-    CHECK(check.dimmension("infinite") == 0);
-    CHECK(check.dimmension("finite") == 42);
+    CHECK(check.dimension("infinite") == 0);
+    CHECK(check.dimension("finite") == 42);
     CHECK(check.attribute<string>("variable", "variable.string") == "hello");
     CHECK(check.attribute<float>("variable", "variable.float") == 35.67f);
 
