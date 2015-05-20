@@ -34,12 +34,12 @@ public:
     NCFormat();
     ~NCFormat() = default;
 
-    void read_at(File* file, const size_t step, Frame& frame);
-    void read(File* file, Frame& frame);
-    void write(File* file, const Frame& frame);
+    virtual void read_at(File* file, const size_t step, Frame& frame) override;
+    virtual void read(File* file, Frame& frame) override;
+    virtual void write(File* file, const Frame& frame) override;
 
-    size_t nsteps(File* file) const;
-    std::string description() const;
+    virtual size_t nsteps(File* file) const override;
+    virtual std::string description() const override;
 private:
     //! Reserve size for \c natoms on the internal cache.
     void reserve(size_t natoms) const;

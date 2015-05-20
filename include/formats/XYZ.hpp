@@ -30,11 +30,11 @@ public:
     XYZFormat() = default;
     ~XYZFormat() = default;
 
-    void read_at(File* file, const size_t step, Frame& frame);
-    void read(File* file, Frame& frame);
-    void write(File* file, const Frame& frame);
-    std::string description() const;
-    size_t nsteps(File* file) const;
+    virtual void read_at(File* file, const size_t step, Frame& frame) override;
+    virtual void read(File* file, Frame& frame) override;
+    virtual void write(File* file, const Frame& frame) override;
+    virtual std::string description() const override;
+    virtual size_t nsteps(File* file) const override;
 private:
     REGISTER_FORMAT;
 };

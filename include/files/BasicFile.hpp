@@ -26,23 +26,23 @@ public:
     explicit BasicFile(const std::string& filename, const std::string& mode = "r");
     ~BasicFile();
 
-    virtual const std::string& getline(void);
-    virtual BasicFile& operator>>(std::string& line);
-    virtual const std::vector<std::string>& readlines(size_t n);
+    virtual const std::string& getline(void) override;
+    virtual BasicFile& operator>>(std::string& line) override;
+    virtual const std::vector<std::string>& readlines(size_t n) override;
 
-    virtual void rewind(){
+    virtual void rewind() override{
         stream.clear();
         stream.seekg(0, std::ios::beg);
     }
-    virtual size_t nlines();
+    virtual size_t nlines() override;
 
-    virtual bool is_open() {return stream.is_open();}
-    virtual void close() {return stream.close();}
-    virtual bool eof() {return stream.eof();}
+    virtual bool is_open() override {return stream.is_open();}
+    virtual void close() override {return stream.close();}
+    virtual bool eof() override {return stream.eof();}
 
-    virtual BasicFile& operator<<(const any&);
-    virtual void writeline(const std::string&);
-    virtual void writelines(const std::vector<std::string>&);
+    virtual BasicFile& operator<<(const any&) override;
+    virtual void writeline(const std::string&) override;
+    virtual void writelines(const std::vector<std::string>&) override;
 private:
     std::fstream stream;
     // Caching a vector of strings
