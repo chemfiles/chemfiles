@@ -32,9 +32,38 @@ namespace harp {
 class Dynlib {
 public:
     //! Load a library from it path
-    explicit Dynlib(const std::string& path);
-    Dynlib();
-    ~Dynlib();
+    explicit Dynlib(const std::string& path){
+    #ifdef WIN32
+        // use SetDllDirectory to set the search path
+        handle = LoadLibrary(TEXT(path.c_str()));
+        if (!handle)
+            throw PluginError("Cannot load library: " + path);
+    #else
+        handle = dlopen(path.c_str(), RTLD_LAZY);
+        if (!handle)
+            throw PluginError("Cannot load library: " + path + ". " + dlerror());
+    #endif
+    }
+    //! A default constructor with no library associated
+    Dynlib() : handle(nullptr) {}
+
+    Dynlib(Dynlib&& other) : handle(other.handle){
+        other.handle = nullptr;
+    }
+    Dynlib& operator=(Dynlib&& other) {
+        std::swap(handle, other.handle);
+        return *this;
+    }
+
+    ~Dynlib() {
+        if (handle) {
+    #ifdef WIN32
+        FreeLibrary(handle);
+    #else
+        dlclose(handle);
+    #endif
+        }
+    }
 
     //! Load a specific symbol from the library. The template parameter is the
     //! typedef of the function
