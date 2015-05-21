@@ -13,13 +13,13 @@
 using namespace harp;
 
 void Format::read_at(File*, const size_t, Frame&){
-    throw FormatError("Not implemented function read.");
+    throw FormatError("Not implemented function 'read_at'");
 }
 
 void Format::read(File*, Frame&){
-    throw FormatError("Not implemented function read.");
+    throw FormatError("Not implemented function 'read'");
 }
 
 void Format::write(File*, const Frame&){
-    throw FormatError("Not implemented function read.");
+    throw FormatError("Not implemented function 'write'");
 }
