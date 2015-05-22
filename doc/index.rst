@@ -77,6 +77,7 @@ The interfaces for the other supported languages are described in the links belo
     bindings/c-api
     bindings/python-api
     bindings/fortran-api
+    others
 
 .. _classes-reference:
 
