@@ -26,8 +26,8 @@ if(BUILD_TESTS)
     foreach(test_file IN LISTS all_test_files)
         chrp_cpp_test(${test_file})
     endforeach(test_file)
-endif()
 
-# Because the files may not be installed yet, we use the environment variable
-set_tests_properties(molfile
-PROPERTIES ENVIRONMENT "CHRP_MOLFILES=${CMAKE_BINARY_DIR}/lib/")
+    # Because the files may not be installed yet, we use the environment variable
+    set_tests_properties(molfile
+    PROPERTIES ENVIRONMENT "CHRP_MOLFILES=${CMAKE_BINARY_DIR}/lib/")
+endif()
