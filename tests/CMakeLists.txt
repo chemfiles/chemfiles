@@ -27,3 +27,7 @@ if(BUILD_TESTS)
         chrp_cpp_test(${test_file})
     endforeach(test_file)
 endif()
+
+# Because the files may not be installed yet, we use the environment variable
+set_tests_properties(molfile
+PROPERTIES ENVIRONMENT "CHRP_MOLFILES=${CMAKE_BINARY_DIR}/lib/")

@@ -84,8 +84,8 @@ configure_file ( # This version of the file is used for installations
 
 # ============================================================================ #
 include(ExternalProject)
-ExternalProject_Add(molfile
-    PREFIX molfile
+ExternalProject_Add(vmd-molfile
+    PREFIX vmd-molfile
     URL https://github.com/Luthaf/VMD-Molfiles/archive/1.9.2.tar.gz
     URL_HASH SHA1=92c094a2536d97d953df03fe14a838382b3ebe5b
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
@@ -106,7 +106,13 @@ if(${HAVE_NETCDF})
     add_dependencies(chemharp netcdfcxx)
     target_link_libraries(chemharp ${NETCDF_LIBRARIES} netcdf_cxx4)
 endif()
-add_dependencies(chemharp molfile)
+
+add_dependencies(chemharp vmd-molfile)
+add_definitions("-DCHRP_MOLFILES_DIR=\"${CMAKE_INSTALL_PREFIX}/molfiles/\"")
+
+#==============================================================================#
+# Installation configuration
+#==============================================================================#
 
 file(GLOB_RECURSE headers include/**.hpp)
 
@@ -118,6 +124,16 @@ install(FILES "${CMAKE_BINARY_DIR}/Chemharp.install.hpp" DESTINATION include REN
 install(FILES bindings/c/chemharp.h DESTINATION include)
 # Dynamic library
 install(TARGETS chemharp DESTINATION lib)
+
+set(_molfiles_ pdb)
+set(molfiles "")
+foreach(file ${_molfiles_})
+    set(molfiles "${molfiles};${CMAKE_BINARY_DIR}/lib/${file}plugin.so")
+endforeach()
+install(FILES ${molfiles} DESTINATION lib/molfiles/
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                    GROUP_READ             GROUP_EXECUTE
+                    WORLD_READ             WORLD_EXECUTE)
 
 add_subdirectory(doc)
 enable_testing()
