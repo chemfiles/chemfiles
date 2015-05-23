@@ -125,6 +125,9 @@ void Molfile<F>::read(File* file, Frame& frame){
     open_file_if_needed(file->filename());
 
     molfile_timestep_t timestep;
+    timestep.coords = NULL;
+    timestep.velocities = NULL;
+
     timestep.coords = new float[3*natoms];
     if (molfile_plugins[F].have_velocities)
         timestep.velocities = new float[3*natoms];
