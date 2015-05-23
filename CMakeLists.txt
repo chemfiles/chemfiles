@@ -84,11 +84,13 @@ configure_file ( # This version of the file is used for installations
 
 # ============================================================================ #
 include(ExternalProject)
-ExternalProject_Add(vmd-molfile
-    PREFIX vmd-molfile
+ExternalProject_Add(molfile-plugins
+    PREFIX external/molfile
     URL https://github.com/Luthaf/VMD-Molfiles/archive/1.9.2.tar.gz
     URL_HASH SHA1=92c094a2536d97d953df03fe14a838382b3ebe5b
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
+               -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+               -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
 )
 include_directories(${CMAKE_BINARY_DIR}/include)
 # ============================================================================ #
@@ -107,7 +109,7 @@ if(${HAVE_NETCDF})
     target_link_libraries(chemharp ${NETCDF_LIBRARIES} netcdf_cxx4)
 endif()
 
-add_dependencies(chemharp vmd-molfile)
+add_dependencies(chemharp molfile-plugins)
 add_definitions("-DCHRP_MOLFILES_DIR=\"${CMAKE_INSTALL_PREFIX}/molfiles/\"")
 
 #==============================================================================#
