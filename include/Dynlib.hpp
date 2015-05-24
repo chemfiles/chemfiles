@@ -47,13 +47,16 @@ public:
     //! A default constructor with no library associated
     Dynlib() : handle(nullptr) {}
 
-    Dynlib(Dynlib&& other) : handle(other.handle){
+    Dynlib(Dynlib&& other) : handle(other.handle) {
         other.handle = nullptr;
     }
     Dynlib& operator=(Dynlib&& other) {
         std::swap(handle, other.handle);
         return *this;
     }
+
+    Dynlib(const Dynlib& other) = delete;
+    Dynlib& operator=(const Dynlib& other) = delete;
 
     ~Dynlib() {
         if (handle) {
