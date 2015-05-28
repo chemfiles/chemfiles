@@ -2,7 +2,7 @@
 
 
 [![Documentation](https://readthedocs.org/projects/chemharp/badge/?version=latest)](http://chemharp.readthedocs.org)
-[![Build Status](https://travis-ci.org/Luthaf/Chemharp.svg)](https://travis-ci.org/Luthaf/Chemharp/)
+[![Build Status](https://travis-ci.org/Luthaf/Chemharp.svg?branch=master)](https://travis-ci.org/Luthaf/Chemharp)
 [![Coverage Status](https://coveralls.io/repos/Luthaf/Chemharp/badge.svg)](https://coveralls.io/r/Luthaf/Chemharp)
 
 Chemharp is a multi-language library written in modern C++ for reading and writing
