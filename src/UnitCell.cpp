@@ -12,6 +12,7 @@
 
 #include "UnitCell.hpp"
 #include "Error.hpp"
+#include "Vector3D.hpp"
 using namespace harp;
 
 // Sinus and Cosine for degree values
@@ -26,8 +27,8 @@ UnitCell::UnitCell(double a) : UnitCell(a, a, a) {}
 UnitCell::UnitCell(double a, double b, double c) : UnitCell(a, b, c, 90, 90, 90) {}
 
 UnitCell::UnitCell(double a, double b, double c, double alpha, double beta, double gamma)
-: _a(a), _b(b), _c(c), _alpha(alpha), _beta(beta), _gamma(gamma), pbc_x(false),
-pbc_y(false), pbc_z(false) {
+: _a(a), _b(b), _c(c), _alpha(alpha), _beta(beta), _gamma(gamma), pbc_x(true),
+pbc_y(true), pbc_z(true) {
     if (alpha == 90 && beta == 90 && gamma == 90)
         _type = ORTHOROMBIC;
     else
@@ -39,8 +40,8 @@ UnitCell::UnitCell(CellType type) : UnitCell(type, 0) {}
 UnitCell::UnitCell(CellType type, double a) : UnitCell(type, a, a, a) {}
 
 UnitCell::UnitCell(CellType type, double a, double b, double c)
-: _a(a), _b(b), _c(c), _alpha(90), _beta(90), _gamma(90), _type(type), pbc_x(false),
-pbc_y(false), pbc_z(false) {}
+: _a(a), _b(b), _c(c), _alpha(90), _beta(90), _gamma(90), _type(type), pbc_x(true),
+pbc_y(true), pbc_z(true) {}
 
 
 
@@ -117,4 +118,50 @@ void UnitCell::gamma(double val){
     if (_type != TRICLINIC)
         throw Error("Can not set 'gamma' on non triclinic cell");
     _gamma = val;
+}
+
+// Wrap a vector in an Orthorombic UnitCell
+static Vector3D wrap_orthorombic(const UnitCell& cell, const Vector3D& vect) {
+    Vector3D res;
+    res[0] = static_cast<float>(vect[0] - round(vect[0]/cell.a())*cell.a());
+    res[1] = static_cast<float>(vect[1] - round(vect[1]/cell.b())*cell.b());
+    res[2] = static_cast<float>(vect[2] - round(vect[2]/cell.c())*cell.c());
+    return res;
+}
+
+// Wrap a vector in an Orthorombic UnitCell
+static Vector3D wrap_triclinic(const UnitCell& cell, const Vector3D& vect) {
+    Vector3D res = vect;
+
+    auto mat = cell.matricial();
+    for (size_t i=2 ; i != static_cast<size_t>(-1) ; i--) {
+        while (fabs(res[i]) > mat[i][i]/2) {
+            if (res[i] < 0) {
+                res[0] += static_cast<float>(mat[i][0]);
+                res[1] += static_cast<float>(mat[i][1]);
+                res[2] += static_cast<float>(mat[i][2]);
+            } else {
+                res[0] -= static_cast<float>(mat[i][0]);
+                res[1] -= static_cast<float>(mat[i][1]);
+                res[2] -= static_cast<float>(mat[i][2]);
+            }
+        }
+    }
+    return res;
+}
+
+Vector3D UnitCell::wrap(const Vector3D& vect) const{
+    if (not full_periodic()){
+        // TODO: implement this
+        throw Error("Unimplemend vector wrapping for non fully-periodic cells.");
+    }
+
+    if (_type == INFINITE)
+        return vect;
+    else if (_type == ORTHOROMBIC)
+        return wrap_orthorombic(*this, vect);
+    else if (_type == TRICLINIC)
+        return wrap_triclinic(*this, vect);
+    else
+        throw Error("Unknown cell type when wrapping a vector.");
 }

@@ -14,6 +14,8 @@
 
 namespace harp {
 
+class Vector3D;
+
 //! 3 x 3 matrix type
 typedef std::array<std::array<double, 3>, 3> Matrix3D;
 
@@ -125,6 +127,8 @@ public:
     //! Set the cell periodicity in three dimmensions
     void full_periodic(bool p) {pbc_x = p; pbc_y = p; pbc_z = p;}
 
+    //! Wrap the vector \c vect in the unit cell
+    Vector3D wrap(const Vector3D& vect) const;
 private:
     //! Cell lenghts
     double _a, _b, _c;

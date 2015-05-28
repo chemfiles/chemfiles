@@ -7,6 +7,10 @@
 
 using namespace harp;
 
+bool roughly(const Vector3D& u, const Vector3D& v, double eps = 1e-9) {
+    return (fabs(u[0] - v[0]) < eps) && (fabs(u[1] - v[1]) < eps) && (fabs(u[2] - v[2]) < eps);
+}
+
 TEST_CASE("Use the UnitCell type", "[UnitCell]"){
 
     SECTION("Constructors"){
@@ -19,9 +23,9 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(infinite.beta() == 90);
         CHECK(infinite.gamma() == 90);
 
-        CHECK_FALSE(infinite.periodic_x());
-        CHECK_FALSE(infinite.periodic_y());
-        CHECK_FALSE(infinite.periodic_z());
+        CHECK(infinite.periodic_x());
+        CHECK(infinite.periodic_y());
+        CHECK(infinite.periodic_z());
 
         UnitCell ortho1(10);
         CHECK(ortho1.type() == UnitCell::ORTHOROMBIC);
@@ -137,5 +141,19 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
             }
         }
         delete[] mat2;
+    }
+
+    SECTION("Wraping vectors"){
+        UnitCell infinite{};
+        UnitCell ortho(10, 11, 12);
+        UnitCell triclinic(UnitCell::TRICLINIC, 10, 11, 12);
+
+        Vector3D v(22.0f, -15.0f, 5.8f);
+
+        CHECK(infinite.wrap(v) == v);
+
+        CHECK(roughly(ortho.wrap(v), Vector3D(2.0f, -4.0f, 5.8f), 1e-5));
+
+        CHECK(roughly(ortho.wrap(v), triclinic.wrap(v), 1e-5));
     }
 }
