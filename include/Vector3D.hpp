@@ -14,6 +14,8 @@
 #include <vector>
 #include <iostream>
 
+namespace harp {
+
 //! Fixed-size array of 3 components: x, y and z values.
 class Vector3D : private std::array<float, 3> {
 public:
@@ -45,4 +47,5 @@ inline std::ostream& operator<<(std::ostream& out, const Vector3D& v){
 //! Variable-size array of vector of 3 components
 typedef std::vector<Vector3D> Array3D;
 
+}
 #endif
