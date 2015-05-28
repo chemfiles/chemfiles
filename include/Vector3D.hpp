@@ -13,6 +13,7 @@
 #include <array>
 #include <vector>
 #include <iostream>
+#include <cmath>
 
 namespace harp {
 
@@ -42,6 +43,21 @@ inline bool operator==(const Vector3D& u, const Vector3D& v){
 inline std::ostream& operator<<(std::ostream& out, const Vector3D& v){
     out << v[0] << ", " << v[1] << ", " << v[2];
     return out;
+}
+
+//! Compute the dot product of the vectors \c u and \c v.
+inline double dot(const Vector3D& v, const Vector3D& u) {
+    return v[0]*u[0] + v[1]*u[1] + v[2]*u[2];
+}
+
+//! Compute the squared euclidean norm of a vector.
+inline double norm2(const Vector3D& v) {
+    return dot(v, v);
+}
+
+//! Compute the euclidean norm of a vector.
+inline double norm(const Vector3D& v) {
+    return std::sqrt(norm2(v));
 }
 
 //! Variable-size array of vector of 3 components
