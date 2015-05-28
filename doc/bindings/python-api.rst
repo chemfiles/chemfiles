@@ -82,6 +82,12 @@ Frame class
                        improve performances with very larges frames, but a :class:`Frame`
                        will be resized internally as needed.
 
+    .. py:method:: guess_topology(bonds)
+
+        Try to guess the bonds, angles and dihedrals in the system. If ``bonds``
+        is ``.true.``, guess everything; else only guess the angles and dihedrals from
+        the bond list.
+
     .. py:attribute:: positions
 
         This attribute hold the positions of the particles in the system as a

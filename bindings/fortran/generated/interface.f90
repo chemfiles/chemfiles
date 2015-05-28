@@ -92,6 +92,19 @@ subroutine chrp_open_init_(this, filename, mode, status)
     end if
 end subroutine
 
+subroutine chrp_trajectory_read(this, frame, status)
+    implicit none
+    class(chrp_trajectory) :: this
+    class(chrp_frame) :: frame
+    integer, optional :: status
+    integer :: status_tmp_
+
+    status_tmp_ = chrp_trajectory_read_c(this%ptr, frame%ptr)
+    if (present(status)) then
+        status = status_tmp_
+    end if
+end subroutine
+
 subroutine chrp_trajectory_read_at(this, step, frame, status)
     implicit none
     class(chrp_trajectory) :: this
@@ -101,19 +114,6 @@ subroutine chrp_trajectory_read_at(this, step, frame, status)
     integer :: status_tmp_
 
     status_tmp_ = chrp_trajectory_read_at_c(this%ptr, step, frame%ptr)
-    if (present(status)) then
-        status = status_tmp_
-    end if
-end subroutine
-
-subroutine chrp_trajectory_read(this, frame, status)
-    implicit none
-    class(chrp_trajectory) :: this
-    class(chrp_frame) :: frame
-    integer, optional :: status
-    integer :: status_tmp_
-
-    status_tmp_ = chrp_trajectory_read_c(this%ptr, frame%ptr)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -345,6 +345,19 @@ subroutine chrp_frame_step_set(this, step, status)
     integer :: status_tmp_
 
     status_tmp_ = chrp_frame_step_set_c(this%ptr, step)
+    if (present(status)) then
+        status = status_tmp_
+    end if
+end subroutine
+
+subroutine chrp_frame_guess_topology(this, bonds, status)
+    implicit none
+    class(chrp_frame) :: this
+    logical(kind=c_bool), value :: bonds
+    integer, optional :: status
+    integer :: status_tmp_
+
+    status_tmp_ = chrp_frame_guess_topology_c(this%ptr, bonds)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -597,19 +610,6 @@ subroutine chrp_topology_size(this, natoms, status)
     integer :: status_tmp_
 
     status_tmp_ = chrp_topology_size_c(this%ptr, natoms)
-    if (present(status)) then
-        status = status_tmp_
-    end if
-end subroutine
-
-subroutine chrp_topology_guess(this, bonds, status)
-    implicit none
-    class(chrp_topology) :: this
-    logical(kind=c_bool), value :: bonds
-    integer, optional :: status
-    integer :: status_tmp_
-
-    status_tmp_ = chrp_topology_guess_c(this%ptr, bonds)
     if (present(status)) then
         status = status_tmp_
     end if

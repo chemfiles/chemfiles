@@ -182,11 +182,6 @@ public:
     //! Clear the topology
     void clear();
 
-    //! Try to guess the bonds, angles and dihedrals in the system. If \c bonds
-    //! is true, guess everything; else only guess the angles and dihedrals from
-    //! the bond list.
-    void guess(bool bonds = true);
-
     //! Check wether the atoms at indexes \c i and \c j are bonded or not
     bool isbond(size_t i, size_t j);
     //! Check wether the atoms at indexes \c i, \c j and \c k constitues an angle
@@ -201,6 +196,9 @@ public:
     std::vector<angle> angles(void) const;
     //! Get the dihedral angles in the system
     std::vector<dihedral> dihedrals(void) const;
+
+    //! Recalculate the angles and dihedrals list from the bond list.
+    void recalculate() {_connect.recalculate();}
 private:
     //! Internal list of particle templates. If the same particle can be found
     //! more than one in a topology, the Atom class will have only one instance,

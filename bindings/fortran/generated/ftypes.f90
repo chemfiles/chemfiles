@@ -21,7 +21,6 @@ contains
     procedure :: init => chrp_topology_init_
     procedure :: from_frame => chrp_topology_from_frame_init_
     procedure :: size => chrp_topology_size
-    procedure :: guess => chrp_topology_guess
     procedure :: append => chrp_topology_append
     procedure :: remove => chrp_topology_remove
     procedure :: isbond => chrp_topology_isbond
@@ -42,8 +41,8 @@ type chrp_trajectory
     private
     type(c_ptr) :: ptr
 contains
-    procedure :: read_at => chrp_trajectory_read_at
     procedure :: read => chrp_trajectory_read
+    procedure :: read_at => chrp_trajectory_read_at
     procedure :: write => chrp_trajectory_write
     procedure :: topology => chrp_trajectory_topology
     procedure :: topology_file => chrp_trajectory_topology_file
@@ -68,6 +67,7 @@ contains
     procedure :: topology_set => chrp_frame_topology_set
     procedure :: step => chrp_frame_step
     procedure :: step_set => chrp_frame_step_set
+    procedure :: guess_topology => chrp_frame_guess_topology
     procedure :: free => chrp_frame_free
 end type
 

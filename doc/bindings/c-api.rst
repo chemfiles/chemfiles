@@ -89,6 +89,8 @@ Function manipulating ``CHRP_FRAME``
 
 .. doxygenfunction:: chrp_frame_step_set
 
+.. doxygenfunction:: chrp_frame_guess_topology
+
 .. doxygenfunction:: chrp_frame_free
 
 .. _capi-cell:
@@ -132,8 +134,6 @@ Function manipulating ``CHRP_TOPOLOGY``
 .. doxygenfunction:: chrp_topology_from_frame
 
 .. doxygenfunction:: chrp_topology_size
-
-.. doxygenfunction:: chrp_topology_guess
 
 .. doxygenfunction:: chrp_topology_append
 

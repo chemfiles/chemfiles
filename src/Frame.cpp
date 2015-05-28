@@ -71,3 +71,15 @@ void Frame::resize(size_t size, bool reserve_velocities){
 bool Frame::has_velocities() const{
     return _velocities.size() == _positions.size() && _velocities.size() > 0;
 }
+
+void Frame::guess_topology(bool please_guess_bonds) {
+    if (please_guess_bonds) {
+        guess_bonds();
+    }
+
+    _topology.recalculate();
+}
+
+void Frame::guess_bonds() {
+    throw Error("Unimplemented function 'guess_bonds'");
+}

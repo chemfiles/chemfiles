@@ -63,22 +63,22 @@ function chrp_open_c(filename, mode) bind(C, name="chrp_open")
     character(len=1, kind=c_char), dimension(*), intent(in) :: mode
 end function
 
-! Function "chrp_trajectory_read_at", at chemharp.h:118
+! Function "chrp_trajectory_read", at chemharp.h:117
+function chrp_trajectory_read_c(file, frame) bind(C, name="chrp_trajectory_read")
+    use iso_c_binding
+    implicit none
+    integer(c_int) :: chrp_trajectory_read_c
+    type(c_ptr), value :: file
+    type(c_ptr), value :: frame
+end function
+
+! Function "chrp_trajectory_read_at", at chemharp.h:126
 function chrp_trajectory_read_at_c(file, step, frame) bind(C, name="chrp_trajectory_read_at")
     use iso_c_binding
     implicit none
     integer(c_int) :: chrp_trajectory_read_at_c
     type(c_ptr), value :: file
     integer(kind=c_size_t), value :: step
-    type(c_ptr), value :: frame
-end function
-
-! Function "chrp_trajectory_read", at chemharp.h:126
-function chrp_trajectory_read_c(file, frame) bind(C, name="chrp_trajectory_read")
-    use iso_c_binding
-    implicit none
-    integer(c_int) :: chrp_trajectory_read_c
-    type(c_ptr), value :: file
     type(c_ptr), value :: frame
 end function
 
@@ -127,7 +127,7 @@ function chrp_trajectory_nsteps_c(file, nsteps) bind(C, name="chrp_trajectory_ns
     integer(kind=c_size_t) :: nsteps
 end function
 
-! Function "chrp_trajectory_close", at chemharp.h:178
+! Function "chrp_trajectory_close", at chemharp.h:179
 function chrp_trajectory_close_c(file) bind(C, name="chrp_trajectory_close")
     use iso_c_binding
     implicit none
@@ -135,7 +135,7 @@ function chrp_trajectory_close_c(file) bind(C, name="chrp_trajectory_close")
     type(c_ptr), value :: file
 end function
 
-! Function "chrp_frame", at chemharp.h:187
+! Function "chrp_frame", at chemharp.h:188
 function chrp_frame_c(natoms) bind(C, name="chrp_frame")
     use iso_c_binding
     implicit none
@@ -143,7 +143,7 @@ function chrp_frame_c(natoms) bind(C, name="chrp_frame")
     integer(kind=c_size_t), value :: natoms
 end function
 
-! Function "chrp_frame_size", at chemharp.h:195
+! Function "chrp_frame_size", at chemharp.h:196
 function chrp_frame_size_c(frame, natoms) bind(C, name="chrp_frame_size")
     use iso_c_binding
     implicit none
@@ -152,7 +152,7 @@ function chrp_frame_size_c(frame, natoms) bind(C, name="chrp_frame_size")
     integer(kind=c_size_t) :: natoms
 end function
 
-! Function "chrp_frame_positions", at chemharp.h:204
+! Function "chrp_frame_positions", at chemharp.h:205
 function chrp_frame_positions_c(frame, data, size) bind(C, name="chrp_frame_positions")
     use iso_c_binding
     implicit none
@@ -162,7 +162,7 @@ function chrp_frame_positions_c(frame, data, size) bind(C, name="chrp_frame_posi
     integer(kind=c_size_t), value :: size
 end function
 
-! Function "chrp_frame_positions_set", at chemharp.h:213
+! Function "chrp_frame_positions_set", at chemharp.h:214
 function chrp_frame_positions_set_c(frame, data, size) bind(C, name="chrp_frame_positions_set")
     use iso_c_binding
     implicit none
@@ -172,7 +172,7 @@ function chrp_frame_positions_set_c(frame, data, size) bind(C, name="chrp_frame_
     integer(kind=c_size_t), value :: size
 end function
 
-! Function "chrp_frame_velocities", at chemharp.h:222
+! Function "chrp_frame_velocities", at chemharp.h:223
 function chrp_frame_velocities_c(frame, data, size) bind(C, name="chrp_frame_velocities")
     use iso_c_binding
     implicit none
@@ -182,7 +182,7 @@ function chrp_frame_velocities_c(frame, data, size) bind(C, name="chrp_frame_vel
     integer(kind=c_size_t), value :: size
 end function
 
-! Function "chrp_frame_velocities_set", at chemharp.h:231
+! Function "chrp_frame_velocities_set", at chemharp.h:232
 function chrp_frame_velocities_set_c(frame, data, size) bind(C, name="chrp_frame_velocities_set")
     use iso_c_binding
     implicit none
@@ -192,7 +192,7 @@ function chrp_frame_velocities_set_c(frame, data, size) bind(C, name="chrp_frame
     integer(kind=c_size_t), value :: size
 end function
 
-! Function "chrp_frame_has_velocities", at chemharp.h:239
+! Function "chrp_frame_has_velocities", at chemharp.h:240
 function chrp_frame_has_velocities_c(frame, has_vel) bind(C, name="chrp_frame_has_velocities")
     use iso_c_binding
     implicit none
@@ -201,7 +201,7 @@ function chrp_frame_has_velocities_c(frame, has_vel) bind(C, name="chrp_frame_ha
     logical(kind=c_bool) :: has_vel
 end function
 
-! Function "chrp_frame_cell_set", at chemharp.h:247
+! Function "chrp_frame_cell_set", at chemharp.h:248
 function chrp_frame_cell_set_c(frame, cell) bind(C, name="chrp_frame_cell_set")
     use iso_c_binding
     implicit none
@@ -210,7 +210,7 @@ function chrp_frame_cell_set_c(frame, cell) bind(C, name="chrp_frame_cell_set")
     type(c_ptr), value, intent(in) :: cell
 end function
 
-! Function "chrp_frame_topology_set", at chemharp.h:255
+! Function "chrp_frame_topology_set", at chemharp.h:256
 function chrp_frame_topology_set_c(frame, topology) bind(C, name="chrp_frame_topology_set")
     use iso_c_binding
     implicit none
@@ -219,7 +219,7 @@ function chrp_frame_topology_set_c(frame, topology) bind(C, name="chrp_frame_top
     type(c_ptr), value, intent(in) :: topology
 end function
 
-! Function "chrp_frame_step", at chemharp.h:263
+! Function "chrp_frame_step", at chemharp.h:264
 function chrp_frame_step_c(frame, step) bind(C, name="chrp_frame_step")
     use iso_c_binding
     implicit none
@@ -228,7 +228,7 @@ function chrp_frame_step_c(frame, step) bind(C, name="chrp_frame_step")
     integer(kind=c_size_t) :: step
 end function
 
-! Function "chrp_frame_step_set", at chemharp.h:271
+! Function "chrp_frame_step_set", at chemharp.h:272
 function chrp_frame_step_set_c(frame, step) bind(C, name="chrp_frame_step_set")
     use iso_c_binding
     implicit none
@@ -237,7 +237,16 @@ function chrp_frame_step_set_c(frame, step) bind(C, name="chrp_frame_step_set")
     integer(kind=c_size_t), value :: step
 end function
 
-! Function "chrp_frame_free", at chemharp.h:278
+! Function "chrp_frame_guess_topology", at chemharp.h:282
+function chrp_frame_guess_topology_c(frame, bonds) bind(C, name="chrp_frame_guess_topology")
+    use iso_c_binding
+    implicit none
+    integer(c_int) :: chrp_frame_guess_topology_c
+    type(c_ptr), value :: frame
+    logical(kind=c_bool), value :: bonds
+end function
+
+! Function "chrp_frame_free", at chemharp.h:289
 function chrp_frame_free_c(frame) bind(C, name="chrp_frame_free")
     use iso_c_binding
     implicit none
@@ -245,7 +254,7 @@ function chrp_frame_free_c(frame) bind(C, name="chrp_frame_free")
     type(c_ptr), value :: frame
 end function
 
-! Function "chrp_cell", at chemharp.h:287
+! Function "chrp_cell", at chemharp.h:298
 function chrp_cell_c(a, b, c, alpha, beta, gamma) bind(C, name="chrp_cell")
     use iso_c_binding
     implicit none
@@ -258,7 +267,7 @@ function chrp_cell_c(a, b, c, alpha, beta, gamma) bind(C, name="chrp_cell")
     real(kind=c_double), value :: gamma
 end function
 
-! Function "chrp_cell_from_frame", at chemharp.h:294
+! Function "chrp_cell_from_frame", at chemharp.h:305
 function chrp_cell_from_frame_c(frame) bind(C, name="chrp_cell_from_frame")
     use iso_c_binding
     implicit none
@@ -266,7 +275,7 @@ function chrp_cell_from_frame_c(frame) bind(C, name="chrp_cell_from_frame")
     type(c_ptr), value :: frame
 end function
 
-! Function "chrp_cell_lengths", at chemharp.h:302
+! Function "chrp_cell_lengths", at chemharp.h:313
 function chrp_cell_lengths_c(cell, a, b, c) bind(C, name="chrp_cell_lengths")
     use iso_c_binding
     implicit none
@@ -277,7 +286,7 @@ function chrp_cell_lengths_c(cell, a, b, c) bind(C, name="chrp_cell_lengths")
     real(kind=c_double) :: c
 end function
 
-! Function "chrp_cell_lengths_set", at chemharp.h:310
+! Function "chrp_cell_lengths_set", at chemharp.h:321
 function chrp_cell_lengths_set_c(cell, a, b, c) bind(C, name="chrp_cell_lengths_set")
     use iso_c_binding
     implicit none
@@ -288,7 +297,7 @@ function chrp_cell_lengths_set_c(cell, a, b, c) bind(C, name="chrp_cell_lengths_
     real(kind=c_double), value :: c
 end function
 
-! Function "chrp_cell_angles", at chemharp.h:318
+! Function "chrp_cell_angles", at chemharp.h:329
 function chrp_cell_angles_c(cell, alpha, beta, gamma) bind(C, name="chrp_cell_angles")
     use iso_c_binding
     implicit none
@@ -299,7 +308,7 @@ function chrp_cell_angles_c(cell, alpha, beta, gamma) bind(C, name="chrp_cell_an
     real(kind=c_double) :: gamma
 end function
 
-! Function "chrp_cell_angles_set", at chemharp.h:326
+! Function "chrp_cell_angles_set", at chemharp.h:337
 function chrp_cell_angles_set_c(cell, alpha, beta, gamma) bind(C, name="chrp_cell_angles_set")
     use iso_c_binding
     implicit none
@@ -310,7 +319,7 @@ function chrp_cell_angles_set_c(cell, alpha, beta, gamma) bind(C, name="chrp_cel
     real(kind=c_double), value :: gamma
 end function
 
-! Function "chrp_cell_matrix", at chemharp.h:334
+! Function "chrp_cell_matrix", at chemharp.h:345
 function chrp_cell_matrix_c(cell, mat) bind(C, name="chrp_cell_matrix")
     use iso_c_binding
     implicit none
@@ -319,7 +328,7 @@ function chrp_cell_matrix_c(cell, mat) bind(C, name="chrp_cell_matrix")
     type(c_ptr), value :: mat
 end function
 
-! Function "chrp_cell_type", at chemharp.h:352
+! Function "chrp_cell_type", at chemharp.h:363
 function chrp_cell_type_c(cell, type) bind(C, name="chrp_cell_type")
     use iso_c_binding
     implicit none
@@ -328,7 +337,7 @@ function chrp_cell_type_c(cell, type) bind(C, name="chrp_cell_type")
     integer(kind=c_int) :: type
 end function
 
-! Function "chrp_cell_type_set", at chemharp.h:360
+! Function "chrp_cell_type_set", at chemharp.h:371
 function chrp_cell_type_set_c(cell, type) bind(C, name="chrp_cell_type_set")
     use iso_c_binding
     implicit none
@@ -337,7 +346,7 @@ function chrp_cell_type_set_c(cell, type) bind(C, name="chrp_cell_type_set")
     integer(kind=c_int), value :: type
 end function
 
-! Function "chrp_cell_periodicity", at chemharp.h:368
+! Function "chrp_cell_periodicity", at chemharp.h:379
 function chrp_cell_periodicity_c(cell, x, y, z) bind(C, name="chrp_cell_periodicity")
     use iso_c_binding
     implicit none
@@ -348,7 +357,7 @@ function chrp_cell_periodicity_c(cell, x, y, z) bind(C, name="chrp_cell_periodic
     logical(kind=c_bool) :: z
 end function
 
-! Function "chrp_cell_periodicity_set", at chemharp.h:376
+! Function "chrp_cell_periodicity_set", at chemharp.h:387
 function chrp_cell_periodicity_set_c(cell, x, y, z) bind(C, name="chrp_cell_periodicity_set")
     use iso_c_binding
     implicit none
@@ -359,7 +368,7 @@ function chrp_cell_periodicity_set_c(cell, x, y, z) bind(C, name="chrp_cell_peri
     logical(kind=c_bool), value :: z
 end function
 
-! Function "chrp_cell_free", at chemharp.h:383
+! Function "chrp_cell_free", at chemharp.h:394
 function chrp_cell_free_c(cell) bind(C, name="chrp_cell_free")
     use iso_c_binding
     implicit none
@@ -367,7 +376,7 @@ function chrp_cell_free_c(cell) bind(C, name="chrp_cell_free")
     type(c_ptr), value :: cell
 end function
 
-! Function "chrp_topology", at chemharp.h:391
+! Function "chrp_topology", at chemharp.h:402
 function chrp_topology_c() bind(C, name="chrp_topology")
     use iso_c_binding
     implicit none
@@ -375,7 +384,7 @@ function chrp_topology_c() bind(C, name="chrp_topology")
 
 end function
 
-! Function "chrp_topology_from_frame", at chemharp.h:398
+! Function "chrp_topology_from_frame", at chemharp.h:409
 function chrp_topology_from_frame_c(frame) bind(C, name="chrp_topology_from_frame")
     use iso_c_binding
     implicit none
@@ -383,7 +392,7 @@ function chrp_topology_from_frame_c(frame) bind(C, name="chrp_topology_from_fram
     type(c_ptr), value :: frame
 end function
 
-! Function "chrp_topology_size", at chemharp.h:406
+! Function "chrp_topology_size", at chemharp.h:417
 function chrp_topology_size_c(topology, natoms) bind(C, name="chrp_topology_size")
     use iso_c_binding
     implicit none
@@ -392,16 +401,7 @@ function chrp_topology_size_c(topology, natoms) bind(C, name="chrp_topology_size
     integer(kind=c_size_t) :: natoms
 end function
 
-! Function "chrp_topology_guess", at chemharp.h:416
-function chrp_topology_guess_c(topology, bonds) bind(C, name="chrp_topology_guess")
-    use iso_c_binding
-    implicit none
-    integer(c_int) :: chrp_topology_guess_c
-    type(c_ptr), value :: topology
-    logical(kind=c_bool), value :: bonds
-end function
-
-! Function "chrp_topology_append", at chemharp.h:424
+! Function "chrp_topology_append", at chemharp.h:425
 function chrp_topology_append_c(topology, atom) bind(C, name="chrp_topology_append")
     use iso_c_binding
     implicit none
@@ -410,7 +410,7 @@ function chrp_topology_append_c(topology, atom) bind(C, name="chrp_topology_appe
     type(c_ptr), value :: atom
 end function
 
-! Function "chrp_topology_remove", at chemharp.h:432
+! Function "chrp_topology_remove", at chemharp.h:433
 function chrp_topology_remove_c(topology, i) bind(C, name="chrp_topology_remove")
     use iso_c_binding
     implicit none
@@ -419,7 +419,7 @@ function chrp_topology_remove_c(topology, i) bind(C, name="chrp_topology_remove"
     integer(kind=c_size_t), value :: i
 end function
 
-! Function "chrp_topology_isbond", at chemharp.h:441
+! Function "chrp_topology_isbond", at chemharp.h:442
 function chrp_topology_isbond_c(topology, i, j, result) bind(C, name="chrp_topology_isbond")
     use iso_c_binding
     implicit none
@@ -430,7 +430,7 @@ function chrp_topology_isbond_c(topology, i, j, result) bind(C, name="chrp_topol
     logical(kind=c_bool) :: result
 end function
 
-! Function "chrp_topology_isangle", at chemharp.h:450
+! Function "chrp_topology_isangle", at chemharp.h:451
 function chrp_topology_isangle_c(topology, i, j, k, result) bind(C, name="chrp_topology_isangle")
     use iso_c_binding
     implicit none
@@ -442,7 +442,7 @@ function chrp_topology_isangle_c(topology, i, j, k, result) bind(C, name="chrp_t
     logical(kind=c_bool) :: result
 end function
 
-! Function "chrp_topology_isdihedral", at chemharp.h:460
+! Function "chrp_topology_isdihedral", at chemharp.h:461
 function chrp_topology_isdihedral_c(topology, i, j, k, m, result) bind(C, name="chrp_topology_isdihedral")
     use iso_c_binding
     implicit none
@@ -455,7 +455,7 @@ function chrp_topology_isdihedral_c(topology, i, j, k, m, result) bind(C, name="
     logical(kind=c_bool) :: result
 end function
 
-! Function "chrp_topology_bonds_count", at chemharp.h:469
+! Function "chrp_topology_bonds_count", at chemharp.h:470
 function chrp_topology_bonds_count_c(topology, nbonds) bind(C, name="chrp_topology_bonds_count")
     use iso_c_binding
     implicit none
@@ -464,7 +464,7 @@ function chrp_topology_bonds_count_c(topology, nbonds) bind(C, name="chrp_topolo
     integer(kind=c_size_t) :: nbonds
 end function
 
-! Function "chrp_topology_angles_count", at chemharp.h:477
+! Function "chrp_topology_angles_count", at chemharp.h:478
 function chrp_topology_angles_count_c(topology, nangles) bind(C, name="chrp_topology_angles_count")
     use iso_c_binding
     implicit none
@@ -473,7 +473,7 @@ function chrp_topology_angles_count_c(topology, nangles) bind(C, name="chrp_topo
     integer(kind=c_size_t) :: nangles
 end function
 
-! Function "chrp_topology_dihedrals_count", at chemharp.h:485
+! Function "chrp_topology_dihedrals_count", at chemharp.h:486
 function chrp_topology_dihedrals_count_c(topology, ndihedrals) bind(C, name="chrp_topology_dihedrals_count")
     use iso_c_binding
     implicit none
@@ -482,7 +482,7 @@ function chrp_topology_dihedrals_count_c(topology, ndihedrals) bind(C, name="chr
     integer(kind=c_size_t) :: ndihedrals
 end function
 
-! Function "chrp_topology_bonds", at chemharp.h:495
+! Function "chrp_topology_bonds", at chemharp.h:496
 function chrp_topology_bonds_c(topology, data, nbonds) bind(C, name="chrp_topology_bonds")
     use iso_c_binding
     implicit none
@@ -492,7 +492,7 @@ function chrp_topology_bonds_c(topology, data, nbonds) bind(C, name="chrp_topolo
     integer(kind=c_size_t), value :: nbonds
 end function
 
-! Function "chrp_topology_angles", at chemharp.h:505
+! Function "chrp_topology_angles", at chemharp.h:506
 function chrp_topology_angles_c(topology, data, nangles) bind(C, name="chrp_topology_angles")
     use iso_c_binding
     implicit none
@@ -502,7 +502,7 @@ function chrp_topology_angles_c(topology, data, nangles) bind(C, name="chrp_topo
     integer(kind=c_size_t), value :: nangles
 end function
 
-! Function "chrp_topology_dihedrals", at chemharp.h:515
+! Function "chrp_topology_dihedrals", at chemharp.h:516
 function chrp_topology_dihedrals_c(topology, data, ndihedrals) bind(C, name="chrp_topology_dihedrals")
     use iso_c_binding
     implicit none
@@ -512,7 +512,7 @@ function chrp_topology_dihedrals_c(topology, data, ndihedrals) bind(C, name="chr
     integer(kind=c_size_t), value :: ndihedrals
 end function
 
-! Function "chrp_topology_add_bond", at chemharp.h:523
+! Function "chrp_topology_add_bond", at chemharp.h:524
 function chrp_topology_add_bond_c(topology, i, j) bind(C, name="chrp_topology_add_bond")
     use iso_c_binding
     implicit none
@@ -522,7 +522,7 @@ function chrp_topology_add_bond_c(topology, i, j) bind(C, name="chrp_topology_ad
     integer(kind=c_size_t), value :: j
 end function
 
-! Function "chrp_topology_remove_bond", at chemharp.h:531
+! Function "chrp_topology_remove_bond", at chemharp.h:532
 function chrp_topology_remove_bond_c(topology, i, j) bind(C, name="chrp_topology_remove_bond")
     use iso_c_binding
     implicit none
@@ -532,7 +532,7 @@ function chrp_topology_remove_bond_c(topology, i, j) bind(C, name="chrp_topology
     integer(kind=c_size_t), value :: j
 end function
 
-! Function "chrp_topology_free", at chemharp.h:538
+! Function "chrp_topology_free", at chemharp.h:539
 function chrp_topology_free_c(topology) bind(C, name="chrp_topology_free")
     use iso_c_binding
     implicit none
@@ -540,7 +540,7 @@ function chrp_topology_free_c(topology) bind(C, name="chrp_topology_free")
     type(c_ptr), value :: topology
 end function
 
-! Function "chrp_atom", at chemharp.h:547
+! Function "chrp_atom", at chemharp.h:548
 function chrp_atom_c(name) bind(C, name="chrp_atom")
     use iso_c_binding
     implicit none
@@ -548,7 +548,7 @@ function chrp_atom_c(name) bind(C, name="chrp_atom")
     character(len=1, kind=c_char), dimension(*), intent(in) :: name
 end function
 
-! Function "chrp_atom_from_frame", at chemharp.h:555
+! Function "chrp_atom_from_frame", at chemharp.h:556
 function chrp_atom_from_frame_c(frame, idx) bind(C, name="chrp_atom_from_frame")
     use iso_c_binding
     implicit none
@@ -557,7 +557,7 @@ function chrp_atom_from_frame_c(frame, idx) bind(C, name="chrp_atom_from_frame")
     integer(kind=c_size_t), value :: idx
 end function
 
-! Function "chrp_atom_from_topology", at chemharp.h:563
+! Function "chrp_atom_from_topology", at chemharp.h:564
 function chrp_atom_from_topology_c(topology, idx) bind(C, name="chrp_atom_from_topology")
     use iso_c_binding
     implicit none
@@ -566,7 +566,7 @@ function chrp_atom_from_topology_c(topology, idx) bind(C, name="chrp_atom_from_t
     integer(kind=c_size_t), value :: idx
 end function
 
-! Function "chrp_atom_mass", at chemharp.h:571
+! Function "chrp_atom_mass", at chemharp.h:572
 function chrp_atom_mass_c(atom, mass) bind(C, name="chrp_atom_mass")
     use iso_c_binding
     implicit none
@@ -575,7 +575,7 @@ function chrp_atom_mass_c(atom, mass) bind(C, name="chrp_atom_mass")
     real(kind=c_float) :: mass
 end function
 
-! Function "chrp_atom_mass_set", at chemharp.h:579
+! Function "chrp_atom_mass_set", at chemharp.h:580
 function chrp_atom_mass_set_c(atom, mass) bind(C, name="chrp_atom_mass_set")
     use iso_c_binding
     implicit none
@@ -584,7 +584,7 @@ function chrp_atom_mass_set_c(atom, mass) bind(C, name="chrp_atom_mass_set")
     real(kind=c_float), value :: mass
 end function
 
-! Function "chrp_atom_charge", at chemharp.h:587
+! Function "chrp_atom_charge", at chemharp.h:588
 function chrp_atom_charge_c(atom, charge) bind(C, name="chrp_atom_charge")
     use iso_c_binding
     implicit none
@@ -593,7 +593,7 @@ function chrp_atom_charge_c(atom, charge) bind(C, name="chrp_atom_charge")
     real(kind=c_float) :: charge
 end function
 
-! Function "chrp_atom_charge_set", at chemharp.h:595
+! Function "chrp_atom_charge_set", at chemharp.h:596
 function chrp_atom_charge_set_c(atom, charge) bind(C, name="chrp_atom_charge_set")
     use iso_c_binding
     implicit none
@@ -602,7 +602,7 @@ function chrp_atom_charge_set_c(atom, charge) bind(C, name="chrp_atom_charge_set
     real(kind=c_float), value :: charge
 end function
 
-! Function "chrp_atom_name", at chemharp.h:604
+! Function "chrp_atom_name", at chemharp.h:605
 function chrp_atom_name_c(atom, name, buffsize) bind(C, name="chrp_atom_name")
     use iso_c_binding
     implicit none
@@ -612,7 +612,7 @@ function chrp_atom_name_c(atom, name, buffsize) bind(C, name="chrp_atom_name")
     integer(kind=c_size_t), value :: buffsize
 end function
 
-! Function "chrp_atom_name_set", at chemharp.h:612
+! Function "chrp_atom_name_set", at chemharp.h:613
 function chrp_atom_name_set_c(atom, name) bind(C, name="chrp_atom_name_set")
     use iso_c_binding
     implicit none
@@ -621,7 +621,7 @@ function chrp_atom_name_set_c(atom, name) bind(C, name="chrp_atom_name_set")
     character(len=1, kind=c_char), dimension(*), intent(in) :: name
 end function
 
-! Function "chrp_atom_full_name", at chemharp.h:621
+! Function "chrp_atom_full_name", at chemharp.h:622
 function chrp_atom_full_name_c(atom, name, buffsize) bind(C, name="chrp_atom_full_name")
     use iso_c_binding
     implicit none
@@ -631,7 +631,7 @@ function chrp_atom_full_name_c(atom, name, buffsize) bind(C, name="chrp_atom_ful
     integer(kind=c_size_t), value :: buffsize
 end function
 
-! Function "chrp_atom_vdw_radius", at chemharp.h:629
+! Function "chrp_atom_vdw_radius", at chemharp.h:630
 function chrp_atom_vdw_radius_c(atom, radius) bind(C, name="chrp_atom_vdw_radius")
     use iso_c_binding
     implicit none
@@ -640,7 +640,7 @@ function chrp_atom_vdw_radius_c(atom, radius) bind(C, name="chrp_atom_vdw_radius
     real(kind=c_double) :: radius
 end function
 
-! Function "chrp_atom_covalent_radius", at chemharp.h:637
+! Function "chrp_atom_covalent_radius", at chemharp.h:638
 function chrp_atom_covalent_radius_c(atom, radius) bind(C, name="chrp_atom_covalent_radius")
     use iso_c_binding
     implicit none
@@ -649,7 +649,7 @@ function chrp_atom_covalent_radius_c(atom, radius) bind(C, name="chrp_atom_coval
     real(kind=c_double) :: radius
 end function
 
-! Function "chrp_atom_atomic_number", at chemharp.h:645
+! Function "chrp_atom_atomic_number", at chemharp.h:646
 function chrp_atom_atomic_number_c(atom, number) bind(C, name="chrp_atom_atomic_number")
     use iso_c_binding
     implicit none
@@ -658,7 +658,7 @@ function chrp_atom_atomic_number_c(atom, number) bind(C, name="chrp_atom_atomic_
     integer(kind=c_int) :: number
 end function
 
-! Function "chrp_atom_free", at chemharp.h:652
+! Function "chrp_atom_free", at chemharp.h:653
 function chrp_atom_free_c(atom) bind(C, name="chrp_atom_free")
     use iso_c_binding
     implicit none

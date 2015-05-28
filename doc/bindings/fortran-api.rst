@@ -300,6 +300,15 @@ Error and logging functions
     :parameter integer step: The new frame step
     :optional integer status [optional]: The status code
 
+.. f:subroutine:: guess_topology(bonds[, status])
+
+    Try to guess the bonds, angles and dihedrals in the system. If ``bonds``
+    is ``.true.``, guess everything; else only guess the angles and dihedrals from
+    the bond list.
+
+    :parameter logical bonds: Should we recompute the bonds from the positions or not ?
+    :optional integer status [optional]: The status code
+
 .. f:subroutine:: free(status)
 
     Destroy a frame, and free the associated memory
@@ -495,15 +504,6 @@ Error and logging functions
     Get the topology size, i.e. the current number of atoms
 
     :parameter integer natoms: Will contain the number of atoms in the frame
-    :optional integer status [optional]: The status code
-
-.. f:subroutine:: guess(bonds[, status])
-
-    Try to guess the bonds, angles and dihedrals in the system. If ``bonds``
-    is ``.true.``, guess everything; else only guess the angles and dihedrals from
-    the bond list.
-
-    :parameter logical bonds: Should we recompute the bonds from the positions or not ?
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: append(atom[, status])

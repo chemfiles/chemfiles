@@ -192,6 +192,13 @@ int chrp_frame_step_set(CHRP_FRAME* frame, size_t step) {
     )
 }
 
+int chrp_frame_guess_topology(CHRP_FRAME* frame, bool bonds){
+    CHRP_ERROR_WRAP_RETCODE(
+        frame->guess_topology(bonds);
+    )
+}
+
+
 int chrp_frame_free(CHRP_FRAME* frame) {
     CHRP_ERROR_WRAP_RETCODE(
         delete frame;
@@ -323,12 +330,6 @@ error:
 int chrp_topology_size(const CHRP_TOPOLOGY* topology, size_t *natoms){
     CHRP_ERROR_WRAP_RETCODE(
         *natoms = topology->natoms();
-    )
-}
-
-int chrp_topology_guess(CHRP_TOPOLOGY* topology, bool bonds){
-    CHRP_ERROR_WRAP_RETCODE(
-        topology->guess(bonds);
     )
 }
 

@@ -272,6 +272,16 @@ int chrp_frame_step(const CHRP_FRAME* frame, size_t* step);
 int chrp_frame_step_set(CHRP_FRAME* frame, size_t step);
 
 /*!
+* @brief Try to guess the bonds, angles and dihedrals in the system. If \c bonds
+*        is true, guess everything; else only guess the angles and dihedrals from
+*        the topology bond list.
+* @param frame The Frame to analyse
+* @param bonds Should we recompute the bonds from the positions or not ?
+* @return The status code
+*/
+int chrp_frame_guess_topology(CHRP_FRAME* frame, bool bonds);
+
+/*!
 * @brief Destroy a frame, and free the associated memory
 * @param frame The frame to destroy
 * @return The status code
@@ -405,16 +415,6 @@ CHRP_TOPOLOGY* chrp_topology_from_frame(CHRP_FRAME* frame);
 * @return The status code
 */
 int chrp_topology_size(const CHRP_TOPOLOGY* topology, size_t *natoms);
-
-/*!
-* @brief Try to guess the bonds, angles and dihedrals in the system. If \c bonds
-*        is true, guess everything; else only guess the angles and dihedrals from
-*        the bond list.
-* @param topology The topology to analyse
-* @param bonds Should we recompute the bonds from the positions or not ?
-* @return The status code
-*/
-int chrp_topology_guess(CHRP_TOPOLOGY* topology, bool bonds);
 
 /*!
 * @brief Add an atom to a topology

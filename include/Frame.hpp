@@ -86,7 +86,15 @@ public:
     //! Set the current simulation step
     void step(size_t s) {_step = s;}
 
+
+    //! Try to guess the bonds, angles and dihedrals in the system. If \c bonds
+    //! is true, guess everything; else only guess the angles and dihedrals from
+    //! the bond list.
+    void guess_topology(bool bonds = true);
 private:
+    //! Guess the bond list and add it to the internal topology
+    void guess_bonds();
+
     //! Current simulation step
     size_t _step;
     //! Positions of the particles

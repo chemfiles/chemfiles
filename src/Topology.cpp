@@ -159,10 +159,6 @@ void Topology::clear(){
     _connect.clear();
 }
 
-void Topology::guess(bool){
-    throw Error("Unimplemented function: Topology::guess");
-}
-
 Topology harp::dummy_topology(size_t natoms){
     Topology top(0);
     for (size_t i=0; i<natoms; i++)

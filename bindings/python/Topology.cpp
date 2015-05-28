@@ -32,8 +32,6 @@ void register_topology() {
         .def("isangle", &Topology::isangle)
         .def("isdihedral", &Topology::isdihedral)
 
-        .def("guess", &Topology::guess)
-
         .def( "__getitem__",
                 static_cast<const Atom& (Topology::*)(size_t) const>(&Topology::operator[]),
                 py::return_internal_reference<>())
