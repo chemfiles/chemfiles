@@ -1,5 +1,9 @@
 language: cpp
 
+cache:
+  directories:
+    - ${TRAVIS_BUILD_DIR}/build/external/boost
+
 env:
   global:
     secure: Mf7f3PP+AHqyOMEp9koj+mTBSVfo03XNFLJ6offmH3IWIj+N5fxwn+tN3H/hKUeL8mvzfHjXPAkYkWKVwcamoQ9ktoYLDJ83HCa4muCUxENz/SAR2DvWf8ix7ggvIP8wZCrNyq8ssw+5F1FRmauF7HjTDPCtBiz/sjvK94XVwXU=
@@ -9,20 +13,25 @@ compiler:
   - gcc
   - clang
 
+sudo: false
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    - llvm-toolchain-precise-3.5
+    packages:
+    - g++-4.9
+    - gfortran-4.9
+    - libnetcdf-dev
+    - clang-3.5
+
 install:
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y  # gcc-4.9
-  - sudo add-apt-repository ppa:h-rayflood/llvm -y          # clang-3.5
-  - sudo apt-get update -qq
-  # Compilers
-  - sudo apt-get install -y g++-4.9        # Needed by clang for a C++11 stdlib
-  - sudo apt-get install -y gfortran-4.9
-  # Libraries
-  - sudo apt-get install -y libnetcdf-dev
   # Coverage stuff
   - gem install coveralls-lcov
   - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz
   - tar xf lcov_1.11.orig.tar.gz
-  - sudo make -C lcov-1.11/ install
+  - export LCOV='./../lcov-1.11/bin/lcov'
   # Setting environement
   - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DBUILD_TESTS=ON -DPYTHON_BINDING=ON -DFORTRAN_BINDING=ON"
   - export FC=gfortran-4.9
@@ -36,11 +45,10 @@ install:
   - |
     if [ ${CC} == "clang" ]
     then
-        sudo apt-get install -y clang-3.4
-        export CC=clang-3.4
-        export CXX=clang++-3.4
+        export CC=clang-3.5
+        export CXX=clang++-3.5
     fi
-  - mkdir build
+  - mkdir -p build
   - cd build
   - wget http://www.cmake.org/files/v3.2/cmake-3.2.1-Linux-x86_64.sh
   - sh cmake-3.2.1-Linux-x86_64.sh --prefix=. --exclude-subdir
@@ -56,23 +64,22 @@ before_script:
   - cd ${TRAVIS_BUILD_DIR}/build
   - ./bin/cmake $CMAKE_ARGS ..
   # Cleanup the coverage data
-  - lcov --directory $(pwd) --zerocounters
+  - ${LCOV} --directory $(pwd) --zerocounters
 
 script:
   - cd ${TRAVIS_BUILD_DIR}/build
   - make
   - ctest --output-on-failure
   # Build conda recipe
-  - sudo apt-get install -y tree
   - cd ${TRAVIS_BUILD_DIR}
   - conda build $CONDA_RECIPE
 
 after_success:
   - cd ${TRAVIS_BUILD_DIR}/build
   # Parse and submit coverage data
-  - lcov --gcov-tool gcov-4.9 --directory $(pwd) --capture --output-file coverage.info
-  - lcov --remove coverage.info 'tests/*' 'Chemharp/build/*' '/usr/*' --output-file coverage.info
-  - lcov --list coverage.info
+  - ${LCOV} --gcov-tool gcov-4.9 --directory $(pwd) --capture --output-file coverage.info
+  - ${LCOV} --remove coverage.info 'tests/*' 'Chemharp/build/*' '/usr/*' --output-file coverage.info
+  - ${LCOV} --list coverage.info
   - coveralls-lcov --repo-token=${COVERALLS_TOKEN} coverage.info
   # Submit binary build to binstar for conda
   - cd ${TRAVIS_BUILD_DIR}
@@ -82,3 +89,7 @@ after_success:
         python $CONDA_RECIPE/move-conda-package.py
         binstar -t $BINSTAR_TOKEN upload --force *.tar.bz2
     fi
+
+before_cache:
+  - cd ${TRAVIS_BUILD_DIR}/build/external/boost
+  - find -name "*.log" -delete
