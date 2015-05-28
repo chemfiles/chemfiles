@@ -52,48 +52,48 @@ static std::string libpath(const std::string& lib_name){
 /******************************************************************************/
 
 template <MolfileFormat F> Molfile<F>::Molfile()
-: plugin(nullptr), fini_fun(nullptr), last_file_name(""), file_handler(nullptr), natoms(0){
-    // Open the library
-    lib = Dynlib(libpath(molfile_plugins[F].lib_name));
+: _plugin(nullptr), _fini_fun(nullptr), _last_file_name(""), _file_handler(nullptr),
+_natoms(0), _use_topology(false) {
+    // Open the _library
+    _lib = Dynlib(libpath(molfile_plugins[F].lib_name));
 
     // Get the pointer to the initialization function
-    auto init_fun = lib.symbol<init_function_t>("vmdplugin_init");
+    auto init_fun = _lib.symbol<init_function_t>("vmdplugin_init");
     if (init_fun())
-        throw PluginError("Could not initialize the " + molfile_plugins[F].format + " plugin.");
+        throw PluginError("Could not initialize the " + molfile_plugins[F].format + " _plugin.");
 
     // Get the pointer to the registration function
-    auto register_fun = lib.symbol<register_function_t>("vmdplugin_register");
+    auto register_fun = _lib.symbol<register_function_t>("vmdplugin_register");
 
     // Get the pointer to the freeing function
-    fini_fun = lib.symbol<init_function_t>("vmdplugin_fini");
-
+    _fini_fun = _lib.symbol<init_function_t>("vmdplugin_fini");
 
     plugin_reginfo_t reginfo;
     reginfo.plugin = nullptr;
 
-    // The first argument here is passed as the first argument to register_plugin ...
+    // The first argument in 'register_fun' is passed as the first argument to register_plugin ...
     if (register_fun(&reginfo, register_plugin))
-        throw PluginError("Could not register the " + molfile_plugins[F].format + " plugin.");
+        throw PluginError("Could not register the " + molfile_plugins[F].format + " _plugin.");
 
-    plugin = static_cast<molfile_plugin_t*>(reginfo.plugin);
+    _plugin = static_cast<molfile_plugin_t*>(reginfo.plugin);
 
-    // Check the ABI version of the loaded plugin
-    if (plugin->abiversion != vmdplugin_ABIVERSION)
+    // Check the ABI version of the loaded _plugin
+    if (_plugin->abiversion != vmdplugin_ABIVERSION)
         throw PluginError("The ABI version does not match! Please recompile "
-                          "chemharp or provide another plugin");
+                          "chemharp or provide another _plugin");
     // Check that needed functions are here
-    if ((plugin->open_file_read == NULL)      ||
-        (plugin->read_next_timestep  == NULL) ||
-        (plugin->close_file_read == NULL))
+    if ((_plugin->open_file_read == NULL)      ||
+        (_plugin->read_next_timestep  == NULL) ||
+        (_plugin->close_file_read == NULL))
             throw PluginError("The " + molfile_plugins[F].format +
-                              " plugin does not have read capacities");
+                              " _plugin does not have read capacities");
 }
 
 template <MolfileFormat F> Molfile<F>::~Molfile(){
-    if (file_handler) {
-        plugin->close_file_read(file_handler);
+    if (_file_handler) {
+        _plugin->close_file_read(_file_handler);
     }
-    fini_fun();
+    _fini_fun();
 }
 
 template <MolfileFormat F>
@@ -103,56 +103,50 @@ std::string Molfile<F>::description() const {
 
 template <MolfileFormat F>
 void Molfile<F>::open_file_if_needed(const std::string& path) const {
-    if (path != last_file_name){
-        last_file_name = path;
+    if (path != _last_file_name){
+        _last_file_name = path;
 
         // Cleanup
-        if (file_handler) {
-            plugin->close_file_read(file_handler);
-            file_handler = nullptr;
+        if (_file_handler) {
+            _plugin->close_file_read(_file_handler);
+            _file_handler = nullptr;
         }
 
-        file_handler = plugin->open_file_read(last_file_name.c_str(), plugin->name, &natoms);
+        _file_handler = _plugin->open_file_read(_last_file_name.c_str(), _plugin->name, &_natoms);
     }
 
-    if (!file_handler) {
+    if (!_file_handler) {
         throw FileError("Could not open the file: " + path + " with VMD molfile");
     }
+
+    read_topology();
 }
 
 template <MolfileFormat F>
 void Molfile<F>::read(File* file, Frame& frame){
     open_file_if_needed(file->filename());
 
+    std::vector<float> coords(3*static_cast<size_t>(_natoms));
+    std::vector<float> velocities(0);
+
     molfile_timestep_t timestep;
-    timestep.coords = NULL;
-    timestep.velocities = NULL;
-
-    timestep.coords = new float[3*natoms];
-    if (molfile_plugins[F].have_velocities)
-        timestep.velocities = new float[3*natoms];
-
-    if (timestep.coords == NULL || (molfile_plugins[F].have_velocities && timestep.velocities == NULL)) {
-        delete[] timestep.coords;
-        delete[] timestep.velocities;
-        throw FormatError("Error allocating memory. Sorry ...");
+    timestep.coords = coords.data();
+    if (molfile_plugins[F].have_velocities){
+        velocities.resize(3*static_cast<size_t>(_natoms));
+        timestep.velocities = coords.data();
     }
 
-    int result = plugin->read_next_timestep(file_handler, natoms, &timestep);
+    int result = _plugin->read_next_timestep(_file_handler, _natoms, &timestep);
 
     if (result != MOLFILE_SUCCESS){
-        delete[] timestep.coords;
-        delete[] timestep.velocities;
-        throw FormatError("Error while reading the file " + last_file_name +
+        throw FormatError("Error while reading the file " + _last_file_name +
                           " using Molfile format " + molfile_plugins[F].format);
     }
 
+    if (_use_topology){
+        frame.topology(_topology);
+    }
     molfile_to_frame(timestep, frame);
-    auto& topology = frame.topology();
-    read_topology(topology);
-
-    delete[] timestep.coords;
-    delete[] timestep.velocities;
 }
 
 template <MolfileFormat F>
@@ -162,15 +156,15 @@ size_t Molfile<F>::nsteps(File* file) const {
     size_t n = 0;
     int result = MOLFILE_SUCCESS;
     while (true) {
-        result = plugin->read_next_timestep(file_handler, natoms, NULL);
+        result = _plugin->read_next_timestep(_file_handler, _natoms, NULL);
         if (result == MOLFILE_SUCCESS)
             n++;
         else
             break;
     }
     // We need to close and re-open the file
-    plugin->close_file_read(file_handler);
-    file_handler = plugin->open_file_read(last_file_name.c_str(), plugin->name, &natoms);
+    _plugin->close_file_read(_file_handler);
+    _file_handler = _plugin->open_file_read(_last_file_name.c_str(), _plugin->name, &_natoms);
 
     return n;
 }
@@ -182,8 +176,8 @@ void Molfile<F>::molfile_to_frame(const molfile_timestep_t& timestep, Frame& fra
     frame.cell(cell);
 
     auto& positions = frame.positions();
-    positions.resize(static_cast<size_t>(natoms));
-    for (size_t i=0; i<static_cast<size_t>(natoms); i++) {
+    positions.resize(static_cast<size_t>(_natoms));
+    for (size_t i=0; i<static_cast<size_t>(_natoms); i++) {
         positions[i][0] = timestep.coords[3*i];
         positions[i][1] = timestep.coords[3*i + 1];
         positions[i][2] = timestep.coords[3*i + 2];
@@ -191,8 +185,8 @@ void Molfile<F>::molfile_to_frame(const molfile_timestep_t& timestep, Frame& fra
 
     if (molfile_plugins[F].have_velocities){
         auto& velocities = frame.velocities();
-        velocities.resize(static_cast<size_t>(natoms));
-        for (size_t i=0; i<static_cast<size_t>(natoms); i++) {
+        velocities.resize(static_cast<size_t>(_natoms));
+        for (size_t i=0; i<static_cast<size_t>(_natoms); i++) {
             velocities[i][0] = timestep.velocities[3*i];
             velocities[i][1] = timestep.velocities[3*i + 1];
             velocities[i][2] = timestep.velocities[3*i + 2];
@@ -201,16 +195,59 @@ void Molfile<F>::molfile_to_frame(const molfile_timestep_t& timestep, Frame& fra
 }
 
 template <MolfileFormat F>
-void Molfile<F>::read_topology(Topology&) {
-    if (plugin->read_structure == NULL)
+void Molfile<F>::read_topology() const {
+    if (_plugin->read_structure == NULL)
+        return;
+    else
+        _use_topology = true;
+
+    std::vector<molfile_atom_t> atoms(static_cast<size_t>(_natoms));
+    int optflags;
+    int ret = _plugin->read_structure(_file_handler, &optflags, atoms.data());
+
+    if (ret != MOLFILE_SUCCESS){
+        throw PluginError("Error while reading atomic names.");
+    }
+
+    _topology = Topology();
+
+    for (auto& vmd_atom : atoms){
+        Atom atom(vmd_atom.name);
+        if (optflags & MOLFILE_MASS){
+            atom.mass(vmd_atom.mass);
+        }
+        _topology.append(atom);
+    }
+
+    if (_plugin->read_bonds == NULL)
         return;
 
-    // TODO: read atoms names
+    int nbonds, nbondtypes;
 
-    if (plugin->read_bonds == NULL)
-        return;
+    int** from = new int*[_natoms];
+    int** to = new int*[_natoms];
+    float** bondorder = new float*[_natoms];
+    int** bondtype = new int*[_natoms];
+    char*** bondtypename = new char**[_natoms];
 
-    // TODO: read bonds
+    ret = _plugin->read_bonds(_file_handler, &nbonds, from, to, bondorder,
+                              bondtype, &nbondtypes, bondtypename);
+
+    if (ret != MOLFILE_SUCCESS){
+        throw PluginError("Error while reading bonds.");
+    }
+
+    for (size_t i=0; i<static_cast<size_t>(nbonds); i++){
+        _topology.add_bond(static_cast<size_t>(*(from[i])),
+                           static_cast<size_t>(*(to[i])));
+    }
+    _topology.recalculate();
+
+    delete[] from;
+    delete[] to;
+    delete[] bondorder;
+    delete[] bondtype;
+    delete[] bondtypename;
 }
 
 /******************************************************************************/

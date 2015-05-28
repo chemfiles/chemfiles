@@ -14,6 +14,7 @@
 #include "Format.hpp"
 #include "Dynlib.hpp"
 #include "TrajectoryFactory.hpp"
+#include "Topology.hpp"
 
 #include <memory>
 
@@ -48,27 +49,33 @@ public:
 private:
     /// Convert a molfile timestep to a chemharp frame
     void molfile_to_frame(const molfile_timestep_t& timestep, Frame& frame);
-    /// Read topological information, if any.
-    void read_topology(Topology& topology);
+    /// Read topological information in the current file, if any.
+    void read_topology() const;
     /// Open the file at the given path if needed
     void open_file_if_needed(const std::string& path) const;
 
     /// Dynamic library associated with the VMD plugin
-    Dynlib lib;
+    Dynlib _lib;
     /// VMD molfile plugin
-    molfile_plugin_t* plugin;
+    molfile_plugin_t* _plugin;
 
     typedef int (*init_function_t)(void);
     typedef int (*register_function_t)(void*, vmdplugin_register_cb);
     /// Function to call at in the destructor
-    init_function_t fini_fun;
+    init_function_t _fini_fun;
 
     /// The last file name
-    mutable std::string last_file_name;
+    mutable std::string _last_file_name;
     /// The file handler
-    mutable void* file_handler;
+    mutable void* _file_handler;
     /// The number of atoms in the last trajectory read
-    mutable int natoms;
+    mutable int _natoms;
+
+    /// Do we have topological information in this plugin ?
+    mutable bool _use_topology;
+    /// Store topological information
+    mutable Topology _topology;
+
 
     REGISTER_FORMAT;
 };
