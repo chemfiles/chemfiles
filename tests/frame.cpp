@@ -82,4 +82,23 @@ TEST_CASE("Frame class usage", "[Frame]"){
         CHECK_THROWS_AS(frame.raw_velocities(mat, 3), MemoryError);
         delete[] mat;
     }
+
+    SECTION("Guess bonds"){
+        Trajectory file(SRCDIR "/data/xyz/methane.xyz");
+        Frame frame;
+
+        file >> frame;
+        frame.guess_topology();
+
+        auto topology =  frame.topology();
+        for (size_t i=1; i<5; i++){
+            CHECK(topology.isbond(0, i));
+        }
+
+        CHECK(topology.isangle(1, 0, 2));
+        CHECK(topology.isangle(3, 0, 2));
+        CHECK(topology.isangle(2, 0, 4));
+
+        CHECK(topology.bonds().size() == 4);
+    }
 }

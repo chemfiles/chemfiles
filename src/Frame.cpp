@@ -76,10 +76,24 @@ void Frame::guess_topology(bool please_guess_bonds) {
     if (please_guess_bonds) {
         guess_bonds();
     }
-
     _topology.recalculate();
 }
 
 void Frame::guess_bonds() {
-    throw Error("Unimplemented function 'guess_bonds'");
+    for (size_t i=0; i<natoms(); i++) {
+        float irad = _topology[i].covalent_radius();
+        if (irad == -1) {
+            throw Error(""); // TODO
+        }
+        for (size_t j=0; j<natoms(); j++) {
+            float jrad = _topology[j].covalent_radius();
+            if (jrad == -1) {
+                throw Error(""); // TODO
+            }
+            double d = norm(_cell.wrap(_positions[i] - _positions[j]));
+            if (d > 0.4 && d < irad + jrad + 0.56) { // This criterium comes from Rasmol
+                _topology.add_bond(i, j);
+            }
+        }
+    }
 }
