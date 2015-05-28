@@ -5,6 +5,20 @@
 using namespace harp;
 
 TEST_CASE("Vector3D", "[Vector3D]"){
+
+    SECTION("Operators"){
+        Vector3D u(1.0f, 1.0f, 1.0f);
+        Vector3D v(-21.0f, 15.0f, 23.5f);
+
+        CHECK((u + v) == Vector3D(-20.0f, 16.0f, 24.5f));
+        CHECK((u - v) == Vector3D(22.0f, -14.0f, -22.5f));
+
+        CHECK((3.0 * u) == Vector3D(3.0f, 3.0f, 3.0f));
+        CHECK((u / 2.0) == Vector3D(0.5f, 0.5f, 0.5f));
+
+        CHECK((v * 4.75) == (4.75 * v));
+    }
+
     SECTION("Geometry"){
         Vector3D v(1.0f, 1.0f, 1.0f);
 

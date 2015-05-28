@@ -60,6 +60,26 @@ inline double norm(const Vector3D& v) {
     return std::sqrt(norm2(v));
 }
 
+inline Vector3D operator+(const Vector3D& u, const Vector3D& v){
+    return Vector3D(u[0] + v[0], u[1] + v[1], u[2] + v[2]);
+}
+
+inline Vector3D operator-(const Vector3D& u, const Vector3D& v){
+    return Vector3D(u[0] - v[0], u[1] - v[1], u[2] - v[2]);
+}
+
+inline Vector3D operator*(const Vector3D& u, float a){
+    return Vector3D(u[0] * a, u[1] * a, u[2] * a);
+}
+
+inline Vector3D operator*(float a, const Vector3D& v){
+    return Vector3D(a * v[0], a * v[1], a * v[2]);
+}
+
+inline Vector3D operator/(const Vector3D& u, float a){
+    return Vector3D(u[0] / a, u[1] / a, u[2] / a);
+}
+
 //! Variable-size array of vector of 3 components
 typedef std::vector<Vector3D> Array3D;
 
