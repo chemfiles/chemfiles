@@ -15,7 +15,7 @@ class DummyFormat : public Format {
 public:
     DummyFormat(){}
     std::string description() const {return "";}
-    size_t nsteps(File*) const {return 0;}
+    size_t nsteps(File*) const {return 42;}
     REGISTER_FORMAT;
 };
 
@@ -23,7 +23,7 @@ class DummyFormat2 : public Format {
 public:
     DummyFormat2(){}
     std::string description() const {return "";}
-    size_t nsteps(File*) const {return 0;}
+    size_t nsteps(File*) const {return 42;}
     REGISTER_FORMAT;
 };
 REGISTER(DummyFormat, "Dummy");
@@ -77,4 +77,19 @@ TEST_CASE("Geting file type associated to a format", "[Trajectory factory]"){
 
     file = TrajectoryFactory::by_extension(".dummy2").file_creator;
     CHECK(typeid(dummy) == typeid(*file("", "")));
+}
+
+TEST_CASE("Check error throwing in formats", "[Format errors]"){
+    // Create a dummy file
+    std::string filename("test-file.dummy");
+    std::ofstream out(filename);
+    out << "hey !" << std::endl;
+
+    Frame frame;
+    Trajectory traj(filename);
+    CHECK_THROWS_AS(traj.read(), FormatError);
+    CHECK_THROWS_AS(traj.read_at(2), FormatError);
+    CHECK_THROWS_AS(traj.write(frame), FormatError);
+
+    remove(filename.c_str());
 }
