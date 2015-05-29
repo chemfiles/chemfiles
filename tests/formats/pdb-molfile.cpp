@@ -50,5 +50,11 @@ TEST_CASE("Read files in PDB format using Molfile", "[Molfile]"){
         CHECK(topology.isbond(58, 62));
         CHECK(topology.isbond(37, 24));
         CHECK(topology.isbond(27, 31));
+
+        CHECK(topology.isangle(20, 21, 23));
+        CHECK(topology.isangle(9, 38, 44));
+
+        CHECK(topology.isdihedral(64, 62, 58, 53));
+        CHECK(topology.isdihedral(22, 21, 23, 33));
     }
 }
