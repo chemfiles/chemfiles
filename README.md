@@ -1,9 +1,23 @@
 # Chemharp, an efficient IO library for chemistry file formats
 
-
-[![Documentation](https://readthedocs.org/projects/chemharp/badge/?version=latest)](http://chemharp.readthedocs.org)
-[![Build Status](https://travis-ci.org/Luthaf/Chemharp.svg?branch=master)](https://travis-ci.org/Luthaf/Chemharp)
-[![Coverage Status](https://coveralls.io/repos/Luthaf/Chemharp/badge.svg)](https://coveralls.io/r/Luthaf/Chemharp)
+<div align="center">
+   <a href="http://chemharp.readthedocs.org">
+      <img alt="Documentation" src="https://readthedocs.org/projects/chemharp/badge/?version=latest"></img>
+   </a>
+   <a href="https://travis-ci.org/Luthaf/Chemharp">
+      <img alt="Build Status" src="https://img.shields.io/travis/Luthaf/Chemharp/master.svg"></img>
+   </a>
+   <a href="https://coveralls.io/r/Luthaf/Chemharp">
+      <img alt="Coverage Status" src="https://img.shields.io/coveralls/Luthaf/Chemharp/master.svg"></img>
+   </a>
+   <hr />
+   <a href="https://github.com/Luthaf/Chemharp/releases">
+      <img alt="Latest release" src="https://img.shields.io/github/release/Luthaf/Chemharp.svg"></img>
+   </a>
+   <a href="https://github.com/Luthaf/Chemharp/blob/master/LICENCE.txt">
+      <img alt="License" src="https://img.shields.io/github/license/Luthaf/Chemharp.svg"></img>
+   </a>
+</div>
 
 Chemharp is a multi-language library written in modern C++ for reading and writing
 from and to molecular trajectory files. These files are created by your favorite
