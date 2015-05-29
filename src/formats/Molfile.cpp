@@ -222,32 +222,27 @@ void Molfile<F>::read_topology() const {
     if (_plugin->read_bonds == NULL)
         return;
 
-    int nbonds, nbondtypes;
+    int nbonds = 0, nbondtypes = 0;
 
-    int** from = new int*[_natoms];
-    int** to = new int*[_natoms];
-    float** bondorder = new float*[_natoms];
-    int** bondtype = new int*[_natoms];
-    char*** bondtypename = new char**[_natoms];
+    int* from = NULL;
+    int* to = NULL;
+    float* bondorder = NULL;
+    int* bondtype = NULL;
+    char** bondtypename = NULL ;
 
-    ret = _plugin->read_bonds(_file_handler, &nbonds, from, to, bondorder,
-                              bondtype, &nbondtypes, bondtypename);
+    ret = _plugin->read_bonds(_file_handler, &nbonds, &from, &to, &bondorder,
+                              &bondtype, &nbondtypes, &bondtypename);
 
     if (ret != MOLFILE_SUCCESS){
         throw PluginError("Error while reading bonds.");
     }
 
     for (size_t i=0; i<static_cast<size_t>(nbonds); i++){
-        _topology.add_bond(static_cast<size_t>(*(from[i])),
-                           static_cast<size_t>(*(to[i])));
+        // Indexes are 1-based in Molfile
+        _topology.add_bond(static_cast<size_t>(from[i] - 1),
+                           static_cast<size_t>(to[i]) - 1);
     }
     _topology.recalculate();
-
-    delete[] from;
-    delete[] to;
-    delete[] bondorder;
-    delete[] bondtype;
-    delete[] bondtypename;
 }
 
 /******************************************************************************/
