@@ -15,6 +15,8 @@ using namespace harp;
 using std::vector;
 
 void Connectivity::recalculate() const{
+    _angles.clear();
+    _dihedrals.clear();
     for (auto const& bond1 : _bonds){
         // Find angles
         for (auto const& bond2 : _bonds){
@@ -83,6 +85,7 @@ void Connectivity::remove_bond(size_t i, size_t j){
     if (pos != _bonds.end()){
         _bonds.erase(pos);
     }
+    recalculate();
 }
 
 /******************************************************************************/
@@ -115,6 +118,7 @@ void Topology::remove(size_t idx) {
         if (bond[0] == idx || bond[1] == idx)
             _connect.remove_bond(bond[0], bond[1]);
     }
+    recalculate();
 }
 
 vector<bond> Topology::bonds(void)  const{

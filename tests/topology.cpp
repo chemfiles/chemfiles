@@ -7,15 +7,6 @@
 #include "Chemharp.hpp"
 using namespace harp;
 
-template <class T>
-bool find(const std::vector<T>& vec, const T& val){
-    for (auto content : vec){
-        if (val == content)
-            return true;
-    }
-    return false;
-}
-
 TEST_CASE("Use the Topology class", "[Topology]"){
 
     SECTION("Basic usage"){
@@ -39,8 +30,8 @@ TEST_CASE("Use the Topology class", "[Topology]"){
         CHECK(topo[10] == Atom(Atom::UNDEFINED));
     }
 
-    SECTION("Add atoms and liaisons"){
-        auto topo = Topology(6);
+    SECTION("Add and remove items in the topology"){
+        auto topo = Topology();
 
         for (int i=0; i<4; i++)
             topo.append(Atom("H"));
@@ -54,23 +45,33 @@ TEST_CASE("Use the Topology class", "[Topology]"){
 
         CHECK(topo.natom_types() == 2);
 
-        auto bonds = topo.bonds();
-        CHECK(bonds.size() == 4);
-        CHECK(find(bonds, bond(0, 4)));
-        CHECK(find(bonds, bond(1, 4)));
-        CHECK(find(bonds, bond(2, 5)));
-        CHECK(find(bonds, bond(3, 5)));
+        CHECK(topo.bonds().size() == 4);
+        CHECK(topo.isbond(0, 4));
+        CHECK(topo.isbond(1, 4));
+        CHECK(topo.isbond(2, 5));
+        CHECK(topo.isbond(3, 5));
 
-        auto angles = topo.angles();
-        CHECK(angles.size() == 2);
-        CHECK(find(angles, angle(0, 4, 1)));
-        CHECK(find(angles, angle(2, 5, 3)));
+        CHECK(topo.angles().size() == 2);
+        CHECK(topo.isangle(0, 4, 1));
+        CHECK(topo.isangle(2, 5, 3));
 
         topo.append(Atom("O"));
         topo.add_bond(3, 6);
         CHECK(topo.bonds().size() == 5);
-        auto dihedrals = topo.dihedrals();
-        CHECK(dihedrals.size() == 1);
-        CHECK(find(dihedrals, dihedral(2, 5, 3, 6)));
+        CHECK(topo.dihedrals().size() == 1);
+        CHECK(topo.isdihedral(2, 5, 3, 6));
+
+        topo.remove(6);
+        CHECK(topo.natoms() == 6);
+        CHECK(topo.bonds().size() == 4);
+
+        topo.remove_bond(0, 4);
+        topo.remove_bond(1, 4);
+        CHECK(topo.natoms() == 6);
+        CHECK(topo.bonds().size() == 2);
+
+        CHECK_FALSE(topo.isbond(0, 4));
+        CHECK_FALSE(topo.isbond(1, 4));
+        CHECK_FALSE(topo.isangle(0, 4, 1));
     }
 }
