@@ -48,7 +48,7 @@ if(${NETCDF_FOUND})
                     CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}
         BUILD_COMMAND make
     )
-    include_directories(SYSTEM ${CMAKE_BINARY_DIR}/include)
+    include_directories(BEFORE SYSTEM ${CMAKE_BINARY_DIR}/include)
     add_library(netcdf_cxx4 STATIC IMPORTED)
     set_property(
         TARGET netcdf_cxx4
