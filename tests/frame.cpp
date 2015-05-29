@@ -95,6 +95,9 @@ TEST_CASE("Frame class usage", "[Frame]"){
             CHECK(topology.isbond(0, i));
         }
 
+        CHECK_FALSE(topology.isbond(2, 4));
+        CHECK_FALSE(topology.isbond(1, 2));
+
         CHECK(topology.isangle(1, 0, 2));
         CHECK(topology.isangle(3, 0, 2));
         CHECK(topology.isangle(2, 0, 4));
