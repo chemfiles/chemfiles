@@ -48,10 +48,10 @@ TEST_CASE("Registering a new format", "[Trajectory factory]"){
         FormatError
     );
 
-    CHECK(TrajectoryFactory::register_extension("Testing", {nullptr, nullptr}));
+    CHECK(TrajectoryFactory::register_format("Testing", {nullptr, nullptr}));
     // We can not register the same format twice
     CHECK_THROWS_AS(
-        TrajectoryFactory::register_extension("Testing", {nullptr, nullptr}),
+        TrajectoryFactory::register_format("Testing", {nullptr, nullptr}),
         FormatError
     );
 }
@@ -68,6 +68,9 @@ TEST_CASE("Geting registered format", "[Trajectory factory]"){
     CHECK(typeid(XYZ) == typeid(*format));
     format = TrajectoryFactory::format("XYZ").format_creator();
     CHECK(typeid(XYZ) == typeid(*format));
+
+    CHECK_THROWS_AS(TrajectoryFactory::format("UNKOWN"), FormatError);
+    CHECK_THROWS_AS(TrajectoryFactory::by_extension(".UNKOWN"), FormatError);
 }
 
 TEST_CASE("Geting file type associated to a format", "[Trajectory factory]"){
