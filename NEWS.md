@@ -4,6 +4,11 @@
 * Use VMD molfile plugins as a format provider to read trajectories. The following formats are
 added through Molfile:
     * PDB;
+    * Gromacs gro;
+    * Gromacs xtc;
+    * Gromacs trj;
+    * Gromacs trr;
+    * CHARMM dcd;
 
 # 0.1
 

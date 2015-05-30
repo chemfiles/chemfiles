@@ -19,12 +19,29 @@ specify which format to use.
 +===================+============+===================+=========+=========+
 | `XYZ`_            | .xyz       | |yes| Atom names  | |yes|   | |yes|   |
 +-------------------+------------+-------------------+---------+---------+
-| `Amber NetCDF`_   | .nc        | |no|              | |yes|   | |no|    |
+| `Amber NetCDF`_   | .nc        | |no|              | |yes|   | |yes|   |
 +-------------------+------------+-------------------+---------+---------+
-
+| `PDB`_            | .pdb       | |yes|             | |yes|   | |no|    |
++-------------------+------------+-------------------+---------+---------+
+| `Gromacs .gro`_   | .gro       | |yes| Atom names  | |yes|   | |no|    |
++-------------------+------------+-------------------+---------+---------+
+| `Gromacs .xtc`_   | .xtc       | |no|              | |yes|   | |no|    |
++-------------------+------------+-------------------+---------+---------+
+| `Gromacs .trj`_   | .trj       | |no|              | |yes|   | |no|    |
++-------------------+------------+-------------------+---------+---------+
+| `Gromacs .trr`_   | .trr       | |no|              | |yes|   | |no|    |
++-------------------+------------+-------------------+---------+---------+
+| `DCD`_            | .dcd       | |no|              | |yes|   | |no|    |
++-------------------+------------+-------------------+---------+---------+
 
 .. _XYZ: http://openbabel.org/wiki/XYZ
 .. _Amber NetCDF: http://ambermd.org/netcdf/nctraj.xhtml
+.. _PDB: http://www.rcsb.org/pdb/static.do?p=file_formats/pdb/index.html
+.. _Gromacs .gro: http://manual.gromacs.org/current/online/gro.html
+.. _Gromacs .xtc: http://manual.gromacs.org/current/online/xtc.html
+.. _Gromacs .trj: http://manual.gromacs.org/current/online/trj.html
+.. _Gromacs .trr: http://manual.gromacs.org/current/online/trr.html
+.. _DCD: http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/dcdplugin.html
 
 .. |yes| image:: static/img/yes.png
           :alt: Yes
@@ -43,11 +60,12 @@ If you want to use Chemharp with a format which is not yet implemented, you may
 easily add it by yourself if you know some C++. Just see the :file:`src/formats/XYZ.cpp`
 file for example.
 
-The list of planned formats can be found `here <https://github.com/Luthaf/Chemharp/labels/New%20Format>`_.
-If and only if you can not find your format in this list, you can also add
-another format request at `Github <https://github.com/Luthaf/Chemharp/issues/new>`_.
-In that case, please use the following header at the top of your message, and
-complete everything between square braces.
+The list of planned formats can be found `here
+<https://github.com/Luthaf/Chemharp/labels/New%20Format>`_. If and only if you can
+not find your format in this list, you can also add another format request at `Github
+<https://github.com/Luthaf/Chemharp/issues/new>`_. In that case, please use the
+following header at the top of your message, and complete everything between square
+braces.
 
 .. code-block:: text
 
@@ -59,3 +77,9 @@ complete everything between square braces.
 
     Format specification: [link to the specification]
     File example: [link to a file example]
+
+If your format is in the `list of formats`_ supported by VMD, then you are lucky ! It
+will be easy to add support for this format. Just provide a file example to test the
+plugin against it.
+
+.. _list of formats: http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/

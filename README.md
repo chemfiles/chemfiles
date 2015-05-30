@@ -76,6 +76,17 @@ The Chemharp library tries to:
 | XYZ           | yes    |  yes    |
 | Amber NetCDF  | yes    |  yes    |
 
+The following formats are supported through the VMD molfile plugins, and are read-only:
+
+| Format        | Read ? | Write ? |
+| ------------- | ------ | ------- |
+| PDB           | yes    |  no     |
+| Gromacs .gro  | yes    |  no     |
+| Gromacs .xtc  | yes    |  no     |
+| Gromacs .trj  | yes    |  no     |
+| Gromacs .trr  | yes    |  no     |
+| CHARMM DCD    | yes    |  no     |
+
 ### Planned formats
 
 See the [issue list](https://github.com/Luthaf/Chemharp/labels/New%20Format) for
