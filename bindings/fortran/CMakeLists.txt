@@ -1,4 +1,3 @@
-enable_language(Fortran)
 set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fdefault-integer-8")
 
 file(GLOB fortran-sources *.f90)

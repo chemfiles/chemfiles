@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 include(ExternalProject)
 
-project(chemharp C CXX Fortran)
+project(chemharp C CXX)
 set(CHRP_VERSION_MAJOR 0)
 set(CHRP_VERSION_MINOR 2)
 set(CHRP_VERSION_PATCH 0)
@@ -9,6 +9,12 @@ set(CHRP_VERSION "${CHRP_VERSION_MAJOR}.${CHRP_VERSION_MINOR}.${CHRP_VERSION_PAT
 
 option(BUILD_TESTS "Build harp tests." OFF)
 option(CODE_COVERAGE "Build code coverage" OFF)
+option(PYTHON_BINDING "Build python interface to Chemharp." OFF)
+option(FORTRAN_BINDING "Build FORTRAN interface to Chemharp." OFF)
+
+if(${FORTRAN_BINDING})
+    enable_language(Fortran)
+endif()
 
 if(CODE_COVERAGE)
     set(BUILD_TESTS ON)

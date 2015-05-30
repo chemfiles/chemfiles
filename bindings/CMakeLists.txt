@@ -1,5 +1,3 @@
-option(PYTHON_BINDING "Build python interface to Chemharp." OFF)
-
 if(${PYTHON_BINDING})
     add_subdirectory(python)
 endif()
@@ -20,8 +18,6 @@ if(BUILD_TESTS)
         chrp_c_test(${test_file})
     endforeach(test_file)
 endif()
-
-option(FORTRAN_BINDING "Build FORTRAN interface to Chemharp." OFF)
 
 if(${FORTRAN_BINDING})
     add_subdirectory(fortran)
