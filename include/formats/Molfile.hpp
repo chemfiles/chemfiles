@@ -29,7 +29,11 @@ class Topology;
 
 enum MolfileFormat {
     PDB,
-    LAMMPS,
+    DCD,
+    GRO,
+    TRR,
+    XTC,
+    TRJ,
 };
 
 /*!

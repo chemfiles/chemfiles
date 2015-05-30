@@ -19,24 +19,38 @@ using namespace harp;
 
 struct plugin_data_t {
     std::string format;
-    std::string lib_name;
+    std::string path;
+    std::string plugin_name;
     bool have_velocities;
 };
 
 static std::map<MolfileFormat, plugin_data_t> molfile_plugins {
-    {PDB, {"PDB", "pdbplugin.so", false}},
+    {PDB, {"PDB", "pdbplugin.so", "pdb", false}},
+    {DCD, {"DCD", "dcdplugin.so", "dcd", false}},
+    {GRO, {"GRO", "gromacsplugin.so", "gro", false}},
+    {TRR, {"TRR", "gromacsplugin.so", "trr", true}},
+    {XTC, {"XTC", "gromacsplugin.so", "xtc", false}},
+    {TRJ, {"Gromacs trj", "gromacsplugin.so", "trj", true}},
 };
-
 
 struct plugin_reginfo_t {
-    void* plugin;
+    plugin_reginfo_t() : plugin(nullptr) {}
+    molfile_plugin_t* plugin;
 };
 
+template<MolfileFormat F>
 static int register_plugin(void *v, vmdplugin_t *p) {
-    plugin_reginfo_t *r = static_cast<plugin_reginfo_t *>(v);
+    plugin_reginfo_t *reginfo = static_cast<plugin_reginfo_t *>(v);
     if (std::string(MOLFILE_PLUGIN_TYPE) != std::string(p->type))
         throw PluginError("Wrong plugin type");
-    r->plugin = static_cast<void *>(p);
+
+    auto plugin = reinterpret_cast<molfile_plugin_t *>(p);
+    if (molfile_plugins[F].plugin_name == plugin->name){
+        // When this callback is called multiple times with more
+        // than one plugin, only register the one whe want
+        reginfo->plugin = plugin;
+    }
+
     return VMDPLUGIN_SUCCESS;
 }
 
@@ -55,7 +69,7 @@ template <MolfileFormat F> Molfile<F>::Molfile()
 : _plugin(nullptr), _fini_fun(nullptr), _last_file_name(""), _file_handler(nullptr),
 _natoms(0), _use_topology(false) {
     // Open the _library
-    _lib = Dynlib(libpath(molfile_plugins[F].lib_name));
+    _lib = Dynlib(libpath(molfile_plugins[F].path));
 
     // Get the pointer to the initialization function
     auto init_fun = _lib.symbol<init_function_t>("vmdplugin_init");
@@ -69,13 +83,10 @@ _natoms(0), _use_topology(false) {
     _fini_fun = _lib.symbol<init_function_t>("vmdplugin_fini");
 
     plugin_reginfo_t reginfo;
-    reginfo.plugin = nullptr;
-
     // The first argument in 'register_fun' is passed as the first argument to register_plugin ...
-    if (register_fun(&reginfo, register_plugin))
+    if (register_fun(&reginfo, register_plugin<F>))
         throw PluginError("Could not register the " + molfile_plugins[F].format + " _plugin.");
-
-    _plugin = static_cast<molfile_plugin_t*>(reginfo.plugin);
+    _plugin = reginfo.plugin;
 
     // Check the ABI version of the loaded _plugin
     if (_plugin->abiversion != vmdplugin_ABIVERSION)
@@ -249,6 +260,10 @@ void Molfile<F>::read_topology() const {
 
 // Instanciate the templates
 template class harp::Molfile<PDB>;
+template class harp::Molfile<DCD>;
+template class harp::Molfile<TRR>;
+template class harp::Molfile<XTC>;
+template class harp::Molfile<TRJ>;
 
 // Redefine the registering macros
 #undef REGISTER
@@ -272,3 +287,18 @@ TrajectoryFactory::register_extension(extension, {        \
 
 REGISTER(Molfile<PDB>, "PDB");
 REGISTER_EXTENSION(Molfile<PDB>, ".pdb");
+
+REGISTER(Molfile<DCD>, "DCD");
+REGISTER_EXTENSION(Molfile<DCD>, ".dcd");
+
+REGISTER(Molfile<GRO>, "GRO");
+REGISTER_EXTENSION(Molfile<GRO>, ".gro");
+
+REGISTER(Molfile<TRR>, "TRR");
+REGISTER_EXTENSION(Molfile<TRR>, ".trr");
+
+REGISTER(Molfile<XTC>, "XTC");
+REGISTER_EXTENSION(Molfile<XTC>, ".xtc");
+
+REGISTER(Molfile<TRJ>, "Gromacs trj");
+REGISTER_EXTENSION(Molfile<TRJ>, ".trj");

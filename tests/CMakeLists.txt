@@ -28,6 +28,8 @@ if(BUILD_TESTS)
     endforeach(test_file)
 
     # Because the files may not be installed yet, we use the environment variable
-    set_tests_properties(pdb-molfile
-    PROPERTIES ENVIRONMENT "CHRP_MOLFILES=${CMAKE_BINARY_DIR}/lib/")
+    foreach(_test_ pdb-molfile dcd-molfile gro-molfile xtc-molfile trr-molfile)
+        set_tests_properties(${_test_}
+            PROPERTIES ENVIRONMENT "CHRP_MOLFILES=${CMAKE_BINARY_DIR}/lib/")
+    endforeach()
 endif()
