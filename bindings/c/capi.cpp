@@ -220,7 +220,8 @@ error:
 CHRP_CELL* chrp_cell_from_frame(CHRP_FRAME* frame){
     CHRP_CELL* cell = NULL;
     CHRP_ERROR_WRAP(
-        cell = &frame->cell();
+        cell = new UnitCell();
+        *cell = frame->cell();
     )
 error:
     return cell;
@@ -303,7 +304,8 @@ int chrp_cell_free(CHRP_CELL* cell) {
 CHRP_TOPOLOGY* chrp_topology_from_frame(CHRP_FRAME* frame){
     CHRP_TOPOLOGY* topology = NULL;
     CHRP_ERROR_WRAP(
-        topology = &(frame->topology());
+        topology = new Topology();
+        *topology = frame->topology();
     )
 error:
     return topology;
@@ -312,7 +314,8 @@ error:
 CHRP_ATOM* chrp_atom_from_topology(CHRP_TOPOLOGY* topology, size_t idx){
     CHRP_ATOM* atom = NULL;
     CHRP_ERROR_WRAP(
-        atom = &((*topology)[idx]);
+        atom = new Atom("");
+        *atom = (*topology)[idx];
     )
 error:
     return atom;
@@ -461,7 +464,8 @@ error:
 CHRP_ATOM* chrp_atom_from_frame(CHRP_FRAME* frame, size_t idx){
     CHRP_ATOM* atom = NULL;
     CHRP_ERROR_WRAP(
-        atom = &(frame->topology()[idx]);
+        atom = new Atom("");
+        *atom = frame->topology()[idx];
     )
 error:
     return atom;
