@@ -133,11 +133,7 @@ install(FILES bindings/c/chemharp.h DESTINATION include)
 # Dynamic library
 install(TARGETS chemharp DESTINATION lib)
 
-set(_molfiles_ pdb gromacs dcd)
-set(molfiles "")
-foreach(file ${_molfiles_})
-    set(molfiles "${molfiles};${CMAKE_BINARY_DIR}/lib/${file}plugin.so")
-endforeach()
+file(GLOB_RECURSE molfiles ${CMAKE_BINARY_DIR}/lib/*plugin.so)
 install(FILES ${molfiles} DESTINATION lib/molfiles/
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                     GROUP_READ             GROUP_EXECUTE
