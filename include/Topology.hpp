@@ -120,7 +120,7 @@ public:
     //! Clear all the content
     void clear();
     //! Access the underlying data
-    const std::unordered_set<bond, hash>& bonds() const {return _bonds;}
+    const std::unordered_set<bond, hash>& bonds() const;
     const std::unordered_set<angle, hash>& angles() const;
     const std::unordered_set<dihedral, hash>& dihedrals() const;
     //! Add a bond between the atoms \c i and \c j

@@ -62,6 +62,12 @@ void Connectivity::clear(){
     _dihedrals.clear();
 }
 
+const std::unordered_set<bond, hash>& Connectivity::bonds() const {
+    if (not uptodate)
+        recalculate();
+    return _bonds;
+}
+
 const std::unordered_set<angle, hash>& Connectivity::angles() const {
     if (not uptodate)
         recalculate();
@@ -85,7 +91,6 @@ void Connectivity::remove_bond(size_t i, size_t j){
     if (pos != _bonds.end()){
         _bonds.erase(pos);
     }
-    recalculate();
 }
 
 /******************************************************************************/
