@@ -72,7 +72,7 @@ function chrp_trajectory_read_c(file, frame) bind(C, name="chrp_trajectory_read"
     type(c_ptr), value :: frame
 end function
 
-! Function "chrp_trajectory_read_at", at chemharp.h:126
+! Function "chrp_trajectory_read_step", at chemharp.h:126
 function chrp_trajectory_read_step_c(file, step, frame) bind(C, name="chrp_trajectory_read_step")
     use iso_c_binding
     implicit none
@@ -162,11 +162,11 @@ function chrp_frame_positions_c(frame, data, size) bind(C, name="chrp_frame_posi
     integer(kind=c_size_t), value :: size
 end function
 
-! Function "chrp_frame_positions_set", at chemharp.h:214
-function chrp_frame_positions_set_c(frame, data, size) bind(C, name="chrp_frame_positions_set")
+! Function "chrp_frame_set_positions", at chemharp.h:214
+function chrp_frame_set_positions_c(frame, data, size) bind(C, name="chrp_frame_set_positions")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_frame_positions_set_c
+    integer(c_int) :: chrp_frame_set_positions_c
     type(c_ptr), value :: frame
     type(c_ptr), value :: data
     integer(kind=c_size_t), value :: size
@@ -182,11 +182,11 @@ function chrp_frame_velocities_c(frame, data, size) bind(C, name="chrp_frame_vel
     integer(kind=c_size_t), value :: size
 end function
 
-! Function "chrp_frame_velocities_set", at chemharp.h:232
-function chrp_frame_velocities_set_c(frame, data, size) bind(C, name="chrp_frame_velocities_set")
+! Function "chrp_frame_set_velocities", at chemharp.h:232
+function chrp_frame_set_velocities_c(frame, data, size) bind(C, name="chrp_frame_set_velocities")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_frame_velocities_set_c
+    integer(c_int) :: chrp_frame_set_velocities_c
     type(c_ptr), value :: frame
     type(c_ptr), value :: data
     integer(kind=c_size_t), value :: size
@@ -201,20 +201,20 @@ function chrp_frame_has_velocities_c(frame, has_vel) bind(C, name="chrp_frame_ha
     logical(kind=c_bool) :: has_vel
 end function
 
-! Function "chrp_frame_cell_set", at chemharp.h:248
-function chrp_frame_cell_set_c(frame, cell) bind(C, name="chrp_frame_cell_set")
+! Function "chrp_frame_set_cell", at chemharp.h:248
+function chrp_frame_set_cell_c(frame, cell) bind(C, name="chrp_frame_set_cell")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_frame_cell_set_c
+    integer(c_int) :: chrp_frame_set_cell_c
     type(c_ptr), value :: frame
     type(c_ptr), value, intent(in) :: cell
 end function
 
-! Function "chrp_frame_topology_set", at chemharp.h:256
-function chrp_frame_topology_set_c(frame, topology) bind(C, name="chrp_frame_topology_set")
+! Function "chrp_frame_set_topology", at chemharp.h:256
+function chrp_frame_set_topology_c(frame, topology) bind(C, name="chrp_frame_set_topology")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_frame_topology_set_c
+    integer(c_int) :: chrp_frame_set_topology_c
     type(c_ptr), value :: frame
     type(c_ptr), value, intent(in) :: topology
 end function
@@ -228,11 +228,11 @@ function chrp_frame_step_c(frame, step) bind(C, name="chrp_frame_step")
     integer(kind=c_size_t) :: step
 end function
 
-! Function "chrp_frame_step_set", at chemharp.h:272
-function chrp_frame_step_set_c(frame, step) bind(C, name="chrp_frame_step_set")
+! Function "chrp_frame_set_step", at chemharp.h:272
+function chrp_frame_set_step_c(frame, step) bind(C, name="chrp_frame_set_step")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_frame_step_set_c
+    integer(c_int) :: chrp_frame_set_step_c
     type(c_ptr), value :: frame
     integer(kind=c_size_t), value :: step
 end function
@@ -286,11 +286,11 @@ function chrp_cell_lengths_c(cell, a, b, c) bind(C, name="chrp_cell_lengths")
     real(kind=c_double) :: c
 end function
 
-! Function "chrp_cell_lengths_set", at chemharp.h:321
-function chrp_cell_lengths_set_c(cell, a, b, c) bind(C, name="chrp_cell_lengths_set")
+! Function "chrp_cell_set_lengths", at chemharp.h:321
+function chrp_cell_set_lengths_c(cell, a, b, c) bind(C, name="chrp_cell_set_lengths")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_cell_lengths_set_c
+    integer(c_int) :: chrp_cell_set_lengths_c
     type(c_ptr), value :: cell
     real(kind=c_double), value :: a
     real(kind=c_double), value :: b
@@ -308,11 +308,11 @@ function chrp_cell_angles_c(cell, alpha, beta, gamma) bind(C, name="chrp_cell_an
     real(kind=c_double) :: gamma
 end function
 
-! Function "chrp_cell_angles_set", at chemharp.h:337
-function chrp_cell_angles_set_c(cell, alpha, beta, gamma) bind(C, name="chrp_cell_angles_set")
+! Function "chrp_cell_set_angles", at chemharp.h:337
+function chrp_cell_set_angles_c(cell, alpha, beta, gamma) bind(C, name="chrp_cell_set_angles")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_cell_angles_set_c
+    integer(c_int) :: chrp_cell_set_angles_c
     type(c_ptr), value :: cell
     real(kind=c_double), value :: alpha
     real(kind=c_double), value :: beta
@@ -337,11 +337,11 @@ function chrp_cell_type_c(cell, type) bind(C, name="chrp_cell_type")
     integer(kind=c_int) :: type
 end function
 
-! Function "chrp_cell_type_set", at chemharp.h:371
-function chrp_cell_type_set_c(cell, type) bind(C, name="chrp_cell_type_set")
+! Function "chrp_cell_set_type", at chemharp.h:371
+function chrp_cell_set_type_c(cell, type) bind(C, name="chrp_cell_set_type")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_cell_type_set_c
+    integer(c_int) :: chrp_cell_set_type_c
     type(c_ptr), value :: cell
     integer(kind=c_int), value :: type
 end function
@@ -357,11 +357,11 @@ function chrp_cell_periodicity_c(cell, x, y, z) bind(C, name="chrp_cell_periodic
     logical(kind=c_bool) :: z
 end function
 
-! Function "chrp_cell_periodicity_set", at chemharp.h:387
-function chrp_cell_periodicity_set_c(cell, x, y, z) bind(C, name="chrp_cell_periodicity_set")
+! Function "chrp_cell_set_periodicity", at chemharp.h:387
+function chrp_cell_set_periodicity_c(cell, x, y, z) bind(C, name="chrp_cell_set_periodicity")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_cell_periodicity_set_c
+    integer(c_int) :: chrp_cell_set_periodicity_c
     type(c_ptr), value :: cell
     logical(kind=c_bool), value :: x
     logical(kind=c_bool), value :: y
@@ -575,11 +575,11 @@ function chrp_atom_mass_c(atom, mass) bind(C, name="chrp_atom_mass")
     real(kind=c_float) :: mass
 end function
 
-! Function "chrp_atom_mass_set", at chemharp.h:580
-function chrp_atom_mass_set_c(atom, mass) bind(C, name="chrp_atom_mass_set")
+! Function "chrp_atom_set_mass", at chemharp.h:580
+function chrp_atom_set_mass_c(atom, mass) bind(C, name="chrp_atom_set_mass")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_atom_mass_set_c
+    integer(c_int) :: chrp_atom_set_mass_c
     type(c_ptr), value :: atom
     real(kind=c_float), value :: mass
 end function
@@ -593,11 +593,11 @@ function chrp_atom_charge_c(atom, charge) bind(C, name="chrp_atom_charge")
     real(kind=c_float) :: charge
 end function
 
-! Function "chrp_atom_charge_set", at chemharp.h:596
-function chrp_atom_charge_set_c(atom, charge) bind(C, name="chrp_atom_charge_set")
+! Function "chrp_atom_set_charge", at chemharp.h:596
+function chrp_atom_set_charge_c(atom, charge) bind(C, name="chrp_atom_set_charge")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_atom_charge_set_c
+    integer(c_int) :: chrp_atom_set_charge_c
     type(c_ptr), value :: atom
     real(kind=c_float), value :: charge
 end function
@@ -612,11 +612,11 @@ function chrp_atom_name_c(atom, name, buffsize) bind(C, name="chrp_atom_name")
     integer(kind=c_size_t), value :: buffsize
 end function
 
-! Function "chrp_atom_name_set", at chemharp.h:613
-function chrp_atom_name_set_c(atom, name) bind(C, name="chrp_atom_name_set")
+! Function "chrp_atom_set_name", at chemharp.h:613
+function chrp_atom_set_name_c(atom, name) bind(C, name="chrp_atom_set_name")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_atom_name_set_c
+    integer(c_int) :: chrp_atom_set_name_c
     type(c_ptr), value :: atom
     character(len=1, kind=c_char), dimension(*), intent(in) :: name
 end function

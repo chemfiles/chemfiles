@@ -211,7 +211,7 @@ int chrp_frame_positions(const CHRP_FRAME* frame, float (*data)[3], size_t size)
 * @param size The array size (N).
 * @return The status code
 */
-int chrp_frame_positions_set(CHRP_FRAME* frame, float (*data)[3], size_t size);
+int chrp_frame_set_positions(CHRP_FRAME* frame, float (*data)[3], size_t size);
 
 /*!
 * @brief Get the velocities from a frame, if they exists
@@ -229,7 +229,7 @@ int chrp_frame_velocities(const CHRP_FRAME* frame, float (*data)[3], size_t size
 * @param size The array size (N).
 * @return The status code
 */
-int chrp_frame_velocities_set(CHRP_FRAME* frame, float (*data)[3], size_t size);
+int chrp_frame_set_velocities(CHRP_FRAME* frame, float (*data)[3], size_t size);
 
 /*!
 * @brief Check if a frame has velocity information.
@@ -245,7 +245,7 @@ int chrp_frame_has_velocities(const CHRP_FRAME* frame, bool *has_vel);
 * @param cell The new cell
 * @return The status code
 */
-int chrp_frame_cell_set(CHRP_FRAME* frame, const CHRP_CELL* cell);
+int chrp_frame_set_cell(CHRP_FRAME* frame, const CHRP_CELL* cell);
 
 /*!
 * @brief Set the Topology of a Frame.
@@ -253,7 +253,7 @@ int chrp_frame_cell_set(CHRP_FRAME* frame, const CHRP_CELL* cell);
 * @param topology The new topology
 * @return The status code
 */
-int chrp_frame_topology_set(CHRP_FRAME* frame, const CHRP_TOPOLOGY* topology);
+int chrp_frame_set_topology(CHRP_FRAME* frame, const CHRP_TOPOLOGY* topology);
 
 /*!
 * @brief Get the Frame step, i.e. the frame number in the trajectory
@@ -269,7 +269,7 @@ int chrp_frame_step(const CHRP_FRAME* frame, size_t* step);
 * @param step The new frame step
 * @return The status code
 */
-int chrp_frame_step_set(CHRP_FRAME* frame, size_t step);
+int chrp_frame_set_step(CHRP_FRAME* frame, size_t step);
 
 /*!
 * @brief Try to guess the bonds, angles and dihedrals in the system. If \c bonds
@@ -318,7 +318,7 @@ int chrp_cell_lengths(const CHRP_CELL* cell, double* a, double* b, double* c);
 * @param a,b,c the cell lenghts
 * @return The status code
 */
-int chrp_cell_lengths_set(CHRP_CELL* cell, double a, double b, double c);
+int chrp_cell_set_lengths(CHRP_CELL* cell, double a, double b, double c);
 
 /*!
 * @brief Get the cell angles, in degrees.
@@ -334,7 +334,7 @@ int chrp_cell_angles(const CHRP_CELL* cell, double* alpha, double* beta, double*
 * @param alpha,beta,gamma the new angles values, in degrees
 * @return The status code
 */
-int chrp_cell_angles_set(CHRP_CELL* cell, double alpha, double beta, double gamma);
+int chrp_cell_set_angles(CHRP_CELL* cell, double alpha, double beta, double gamma);
 
 /*!
 * @brief Get the unit cell matricial representation.
@@ -368,7 +368,7 @@ int chrp_cell_type(const CHRP_CELL* cell, chrp_cell_type_t* type);
 * @param type the new type of the cell
 * @return The status code
 */
-int chrp_cell_type_set(CHRP_CELL* cell, chrp_cell_type_t type);
+int chrp_cell_set_type(CHRP_CELL* cell, chrp_cell_type_t type);
 
 /*!
 * @brief Get the cell periodic boundary conditions along the three axis
@@ -384,7 +384,7 @@ int chrp_cell_periodicity(const CHRP_CELL* cell, bool* x, bool* y, bool* z);
 * @param x,y,z the new periodicity of the cell along the three axis.
 * @return The status code
 */
-int chrp_cell_periodicity_set(CHRP_CELL* cell, bool x, bool y, bool z);
+int chrp_cell_set_periodicity(CHRP_CELL* cell, bool x, bool y, bool z);
 
 /*!
 * @brief Destroy an unit cell, and free the associated memory
@@ -577,7 +577,7 @@ int chrp_atom_mass(const CHRP_ATOM* atom, float* mass);
 * @param mass The new atom mass
 * @return The status code
 */
-int chrp_atom_mass_set(CHRP_ATOM* atom, float mass);
+int chrp_atom_set_mass(CHRP_ATOM* atom, float mass);
 
 /*!
 * @brief Get the charge of an atom, in number of the electron charge e
@@ -593,7 +593,7 @@ int chrp_atom_charge(const CHRP_ATOM* atom, float* charge);
 * @param charge The new atom charge
 * @return The status code
 */
-int chrp_atom_charge_set(CHRP_ATOM* atom, float charge);
+int chrp_atom_set_charge(CHRP_ATOM* atom, float charge);
 
 /*!
 * @brief Get the name of an atom
@@ -610,7 +610,7 @@ int chrp_atom_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
 * @param name A null terminated string containing the new name
 * @return The status code
 */
-int chrp_atom_name_set(CHRP_ATOM* atom, const char* name);
+int chrp_atom_set_name(CHRP_ATOM* atom, const char* name);
 
 /*!
 * @brief Try to get the full name of an atom from the short name

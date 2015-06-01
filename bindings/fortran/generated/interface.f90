@@ -243,7 +243,7 @@ subroutine chrp_frame_positions(this, data, size, status)
     end if
 end subroutine
 
-subroutine chrp_frame_positions_set(this, data, size, status)
+subroutine chrp_frame_set_positions(this, data, size, status)
     implicit none
     class(chrp_frame) :: this
     real(kind=c_float), dimension(:, :), target :: data
@@ -251,7 +251,7 @@ subroutine chrp_frame_positions_set(this, data, size, status)
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_frame_positions_set_c(this%ptr, c_loc(data), size)
+    status_tmp_ = chrp_frame_set_positions_c(this%ptr, c_loc(data), size)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -271,7 +271,7 @@ subroutine chrp_frame_velocities(this, data, size, status)
     end if
 end subroutine
 
-subroutine chrp_frame_velocities_set(this, data, size, status)
+subroutine chrp_frame_set_velocities(this, data, size, status)
     implicit none
     class(chrp_frame) :: this
     real(kind=c_float), dimension(:, :), target :: data
@@ -279,7 +279,7 @@ subroutine chrp_frame_velocities_set(this, data, size, status)
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_frame_velocities_set_c(this%ptr, c_loc(data), size)
+    status_tmp_ = chrp_frame_set_velocities_c(this%ptr, c_loc(data), size)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -298,27 +298,27 @@ subroutine chrp_frame_has_velocities(this, has_vel, status)
     end if
 end subroutine
 
-subroutine chrp_frame_cell_set(this, cell, status)
+subroutine chrp_frame_set_cell(this, cell, status)
     implicit none
     class(chrp_frame) :: this
     class(chrp_cell), intent(in) :: cell
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_frame_cell_set_c(this%ptr, cell%ptr)
+    status_tmp_ = chrp_frame_set_cell_c(this%ptr, cell%ptr)
     if (present(status)) then
         status = status_tmp_
     end if
 end subroutine
 
-subroutine chrp_frame_topology_set(this, topology, status)
+subroutine chrp_frame_set_topology(this, topology, status)
     implicit none
     class(chrp_frame) :: this
     class(chrp_topology), intent(in) :: topology
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_frame_topology_set_c(this%ptr, topology%ptr)
+    status_tmp_ = chrp_frame_set_topology_c(this%ptr, topology%ptr)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -337,14 +337,14 @@ subroutine chrp_frame_step(this, step, status)
     end if
 end subroutine
 
-subroutine chrp_frame_step_set(this, step, status)
+subroutine chrp_frame_set_step(this, step, status)
     implicit none
     class(chrp_frame) :: this
     integer(kind=c_size_t), value :: step
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_frame_step_set_c(this%ptr, step)
+    status_tmp_ = chrp_frame_set_step_c(this%ptr, step)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -435,7 +435,7 @@ subroutine chrp_cell_lengths(this, a, b, c, status)
     end if
 end subroutine
 
-subroutine chrp_cell_lengths_set(this, a, b, c, status)
+subroutine chrp_cell_set_lengths(this, a, b, c, status)
     implicit none
     class(chrp_cell) :: this
     real(kind=c_double), value :: a
@@ -444,7 +444,7 @@ subroutine chrp_cell_lengths_set(this, a, b, c, status)
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_cell_lengths_set_c(this%ptr, a, b, c)
+    status_tmp_ = chrp_cell_set_lengths_c(this%ptr, a, b, c)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -465,7 +465,7 @@ subroutine chrp_cell_angles(this, alpha, beta, gamma, status)
     end if
 end subroutine
 
-subroutine chrp_cell_angles_set(this, alpha, beta, gamma, status)
+subroutine chrp_cell_set_angles(this, alpha, beta, gamma, status)
     implicit none
     class(chrp_cell) :: this
     real(kind=c_double), value :: alpha
@@ -474,7 +474,7 @@ subroutine chrp_cell_angles_set(this, alpha, beta, gamma, status)
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_cell_angles_set_c(this%ptr, alpha, beta, gamma)
+    status_tmp_ = chrp_cell_set_angles_c(this%ptr, alpha, beta, gamma)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -507,7 +507,7 @@ subroutine chrp_cell_type(this, type, status)
     end if
 end subroutine
 
-subroutine chrp_cell_type_set(this, type, status)
+subroutine chrp_cell_set_type(this, type, status)
     implicit none
     class(chrp_cell) :: this
     include "generated/cenums.f90"
@@ -515,7 +515,7 @@ subroutine chrp_cell_type_set(this, type, status)
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_cell_type_set_c(this%ptr, type)
+    status_tmp_ = chrp_cell_set_type_c(this%ptr, type)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -536,7 +536,7 @@ subroutine chrp_cell_periodicity(this, x, y, z, status)
     end if
 end subroutine
 
-subroutine chrp_cell_periodicity_set(this, x, y, z, status)
+subroutine chrp_cell_set_periodicity(this, x, y, z, status)
     implicit none
     class(chrp_cell) :: this
     logical(kind=c_bool), value :: x
@@ -545,7 +545,7 @@ subroutine chrp_cell_periodicity_set(this, x, y, z, status)
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_cell_periodicity_set_c(this%ptr, x, y, z)
+    status_tmp_ = chrp_cell_set_periodicity_c(this%ptr, x, y, z)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -885,14 +885,14 @@ subroutine chrp_atom_mass(this, mass, status)
     end if
 end subroutine
 
-subroutine chrp_atom_mass_set(this, mass, status)
+subroutine chrp_atom_set_mass(this, mass, status)
     implicit none
     class(chrp_atom) :: this
     real(kind=c_float), value :: mass
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_atom_mass_set_c(this%ptr, mass)
+    status_tmp_ = chrp_atom_set_mass_c(this%ptr, mass)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -911,14 +911,14 @@ subroutine chrp_atom_charge(this, charge, status)
     end if
 end subroutine
 
-subroutine chrp_atom_charge_set(this, charge, status)
+subroutine chrp_atom_set_charge(this, charge, status)
     implicit none
     class(chrp_atom) :: this
     real(kind=c_float), value :: charge
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_atom_charge_set_c(this%ptr, charge)
+    status_tmp_ = chrp_atom_set_charge_c(this%ptr, charge)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -939,14 +939,14 @@ subroutine chrp_atom_name(this, name, buffsize, status)
     name = rm_c_null_in_str(name)
 end subroutine
 
-subroutine chrp_atom_name_set(this, name, status)
+subroutine chrp_atom_set_name(this, name, status)
     implicit none
     class(chrp_atom) :: this
     character(len=*), intent(in) :: name
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_atom_name_set_c(this%ptr, f_to_c_str(name))
+    status_tmp_ = chrp_atom_set_name_c(this%ptr, f_to_c_str(name))
     if (present(status)) then
         status = status_tmp_
     end if

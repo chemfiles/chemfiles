@@ -40,8 +40,8 @@ int main(int argc, char** argv){
         {4, 5, 6},
     };
 
-    assert(!chrp_frame_positions_set(frame, positions, 4));
-    assert(!chrp_frame_topology_set(frame, topology));
+    assert(!chrp_frame_set_positions(frame, positions, 4));
+    assert(!chrp_frame_set_topology(frame, topology));
     assert(!chrp_trajectory_write(traj, frame));
     assert(!chrp_trajectory_close(traj));
 

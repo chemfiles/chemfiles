@@ -40,8 +40,8 @@ program convert
         call input%read(frame, status)
         if (status /= 0) stop "Error while reading input file"
         ! Set the frame cell and topology
-        call frame%cell_set(cell)
-        call frame%topology_set(water_topology)
+        call frame%set_cell(cell)
+        call frame%set_topology(water_topology)
         ! Write the frame to the output file, using PDB format
         call ouput_file%write(frame, status)
         if (status /= 0) stop "Error while writing ouput file"

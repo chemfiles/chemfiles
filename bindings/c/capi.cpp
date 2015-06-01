@@ -124,7 +124,7 @@ int chrp_frame_positions(const CHRP_FRAME* frame, float (*data)[3] , size_t size
     )
 }
 
-int chrp_frame_positions_set(CHRP_FRAME* frame, float (*data)[3], size_t size){
+int chrp_frame_set_positions(CHRP_FRAME* frame, float (*data)[3], size_t size){
     CHRP_ERROR_WRAP_RETCODE(
         frame->resize(size);
         auto& positions = frame->positions();
@@ -142,7 +142,7 @@ int chrp_frame_velocities(const CHRP_FRAME* frame, float (*data)[3], size_t size
     )
 }
 
-int chrp_frame_velocities_set(CHRP_FRAME* frame, float (*data)[3], size_t size){
+int chrp_frame_set_velocities(CHRP_FRAME* frame, float (*data)[3], size_t size){
     CHRP_ERROR_WRAP_RETCODE(
         frame->resize(size, true);
         auto& velocities = frame->velocities();
@@ -160,13 +160,13 @@ int chrp_frame_has_velocities(const CHRP_FRAME* frame, bool *has_vel)  {
     )
 }
 
-int chrp_frame_cell_set(CHRP_FRAME* frame, const CHRP_CELL* cell) {
+int chrp_frame_set_cell(CHRP_FRAME* frame, const CHRP_CELL* cell) {
     CHRP_ERROR_WRAP_RETCODE(
         frame->cell(*cell);
     )
 }
 
-int chrp_frame_topology_set(CHRP_FRAME* frame, const CHRP_TOPOLOGY* topology) {
+int chrp_frame_set_topology(CHRP_FRAME* frame, const CHRP_TOPOLOGY* topology) {
     CHRP_ERROR_WRAP_RETCODE(
         frame->topology(*topology);
     )
@@ -178,7 +178,7 @@ int chrp_frame_step(const CHRP_FRAME* frame, size_t* step) {
     )
 }
 
-int chrp_frame_step_set(CHRP_FRAME* frame, size_t step) {
+int chrp_frame_set_step(CHRP_FRAME* frame, size_t step) {
     CHRP_ERROR_WRAP_RETCODE(
         frame->step(step);
     )
@@ -227,7 +227,7 @@ int chrp_cell_lengths(const CHRP_CELL* cell, double* a, double* b, double* c){
     )
 }
 
-int chrp_cell_lengths_set(CHRP_CELL* cell, double a, double b, double c){
+int chrp_cell_set_lengths(CHRP_CELL* cell, double a, double b, double c){
     CHRP_ERROR_WRAP_RETCODE(
         cell->a(a);
         cell->b(b);
@@ -243,7 +243,7 @@ int chrp_cell_angles(const CHRP_CELL* cell, double* alpha, double* beta, double*
     )
 }
 
-int chrp_cell_angles_set(CHRP_CELL* cell, double alpha, double beta, double gamma){
+int chrp_cell_set_angles(CHRP_CELL* cell, double alpha, double beta, double gamma){
     CHRP_ERROR_WRAP_RETCODE(
         cell->alpha(alpha);
         cell->beta(beta);
@@ -263,7 +263,7 @@ int chrp_cell_type(const CHRP_CELL* cell, chrp_cell_type_t* type){
     )
 }
 
-int chrp_cell_type_set(CHRP_CELL* cell, chrp_cell_type_t type){
+int chrp_cell_set_type(CHRP_CELL* cell, chrp_cell_type_t type){
     CHRP_ERROR_WRAP_RETCODE(
         cell->type(static_cast<UnitCell::CellType>(type));
     )
@@ -277,7 +277,7 @@ int chrp_cell_periodicity(const CHRP_CELL* cell, bool* x, bool* y, bool* z){
     )
 }
 
-int chrp_cell_periodicity_set(CHRP_CELL* cell, bool x, bool y, bool z){
+int chrp_cell_set_periodicity(CHRP_CELL* cell, bool x, bool y, bool z){
     CHRP_ERROR_WRAP_RETCODE(
         cell->periodic_x(x);
         cell->periodic_y(y);
@@ -469,7 +469,7 @@ int chrp_atom_mass(const CHRP_ATOM* atom, float* mass){
     )
 }
 
-int chrp_atom_mass_set(CHRP_ATOM* atom, float mass){
+int chrp_atom_set_mass(CHRP_ATOM* atom, float mass){
     CHRP_ERROR_WRAP_RETCODE(
         atom->mass(mass);
     )
@@ -481,7 +481,7 @@ int chrp_atom_charge(const CHRP_ATOM* atom, float* charge){
     )
 }
 
-int chrp_atom_charge_set(CHRP_ATOM* atom, float charge){
+int chrp_atom_set_charge(CHRP_ATOM* atom, float charge){
     CHRP_ERROR_WRAP_RETCODE(
         atom->charge(charge);
     )
@@ -494,7 +494,7 @@ int chrp_atom_name(const CHRP_ATOM* atom, char* name, size_t buffsize){
     )
 }
 
-int chrp_atom_name_set(CHRP_ATOM* atom, const char* name){
+int chrp_atom_set_name(CHRP_ATOM* atom, const char* name){
     CHRP_ERROR_WRAP_RETCODE(
         atom->name(string(name));
     )

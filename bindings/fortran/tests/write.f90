@@ -44,11 +44,11 @@ program read
         call check((status == 0), "topology%append")
     end do
 
-    call frame%positions_set(positions, 4, status)
-    call check((status == 0), "frame%positions_set")
+    call frame%set_positions(positions, 4, status)
+    call check((status == 0), "frame%set_positions")
 
-    call frame%topology_set(topology, status)
-    call check((status == 0), "frame%topology_set")
+    call frame%set_topology(topology, status)
+    call check((status == 0), "frame%set_topology")
 
     call traj%write(frame)
     call check((status == 0), "frame%write")

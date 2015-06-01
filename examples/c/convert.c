@@ -35,8 +35,8 @@ int main() {
     for (size_t i=0; i<nsteps; i++) {
         chrp_trajectory_read(input, frame);
         // Set the frame cell and topology
-        chrp_frame_cell_set(frame, cell);
-        chrp_frame_topology_set(frame, water_topology);
+        chrp_frame_set_cell(frame, cell);
+        chrp_frame_set_topology(frame, water_topology);
         // Write the frame to the output file, using PDB format
         chrp_trajectory_write(output, frame);
     }

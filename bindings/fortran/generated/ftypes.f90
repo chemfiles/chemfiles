@@ -59,14 +59,14 @@ contains
     procedure :: init => chrp_frame_init_
     procedure :: size => chrp_frame_size
     procedure :: positions => chrp_frame_positions
-    procedure :: positions_set => chrp_frame_positions_set
+    procedure :: set_positions => chrp_frame_set_positions
     procedure :: velocities => chrp_frame_velocities
-    procedure :: velocities_set => chrp_frame_velocities_set
+    procedure :: set_velocities => chrp_frame_set_velocities
     procedure :: has_velocities => chrp_frame_has_velocities
-    procedure :: cell_set => chrp_frame_cell_set
-    procedure :: topology_set => chrp_frame_topology_set
+    procedure :: set_cell => chrp_frame_set_cell
+    procedure :: set_topology => chrp_frame_set_topology
     procedure :: step => chrp_frame_step
-    procedure :: step_set => chrp_frame_step_set
+    procedure :: set_step => chrp_frame_set_step
     procedure :: guess_topology => chrp_frame_guess_topology
     procedure :: free => chrp_frame_free
 end type
@@ -79,11 +79,11 @@ contains
     procedure :: from_frame => chrp_atom_from_frame_init_
     procedure :: from_topology => chrp_atom_from_topology_init_
     procedure :: mass => chrp_atom_mass
-    procedure :: mass_set => chrp_atom_mass_set
+    procedure :: set_mass => chrp_atom_set_mass
     procedure :: charge => chrp_atom_charge
-    procedure :: charge_set => chrp_atom_charge_set
+    procedure :: set_charge => chrp_atom_set_charge
     procedure :: name => chrp_atom_name
-    procedure :: name_set => chrp_atom_name_set
+    procedure :: set_name => chrp_atom_set_name
     procedure :: full_name => chrp_atom_full_name
     procedure :: vdw_radius => chrp_atom_vdw_radius
     procedure :: covalent_radius => chrp_atom_covalent_radius
@@ -98,13 +98,13 @@ contains
     procedure :: init => chrp_cell_init_
     procedure :: from_frame => chrp_cell_from_frame_init_
     procedure :: lengths => chrp_cell_lengths
-    procedure :: lengths_set => chrp_cell_lengths_set
+    procedure :: set_lengths => chrp_cell_set_lengths
     procedure :: angles => chrp_cell_angles
-    procedure :: angles_set => chrp_cell_angles_set
+    procedure :: set_angles => chrp_cell_set_angles
     procedure :: matrix => chrp_cell_matrix
     procedure :: type => chrp_cell_type
-    procedure :: type_set => chrp_cell_type_set
+    procedure :: set_type => chrp_cell_set_type
     procedure :: periodicity => chrp_cell_periodicity
-    procedure :: periodicity_set => chrp_cell_periodicity_set
+    procedure :: set_periodicity => chrp_cell_set_periodicity
     procedure :: free => chrp_cell_free
 end type
