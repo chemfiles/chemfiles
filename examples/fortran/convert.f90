@@ -21,7 +21,7 @@ program convert
     call frame%init(0)
     call water_topology%init()
     ! Orthorombic UnitCell with lengths of 20, 15 and 35 A
-    call cell%init(20d0, 15d0, 35d0, 90d0, 90d0, 90d0)
+    call cell%init(20d0, 15d0, 35d0)
 
     ! Create Atoms
     call O%init("O")

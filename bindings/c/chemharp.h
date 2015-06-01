@@ -290,12 +290,19 @@ int chrp_frame_free(CHRP_FRAME* frame);
 
 /******************************************************************************/
 /*!
-* @brief Create an UnitCell from the three lenghts and the three angles
+* @brief Create an ORTHOROMBIC UnitCell from the three lenghts
+* @param a,b,c the three lenghts of the cell
+* @return A pointer to the UnitCell
+*/
+CHRP_CELL* chrp_cell(double a, double b, double c);
+
+/*!
+* @brief Create a TRICLINIC UnitCell from the three lenghts and the three angles
 * @param a,b,c the three lenghts of the cell
 * @param alpha,beta,gamma the three angles of the cell
 * @return A pointer to the UnitCell
 */
-CHRP_CELL* chrp_cell(double a, double b, double c, double alpha, double beta, double gamma);
+CHRP_CELL* chrp_cell_triclinic(double a, double b, double c, double alpha, double beta, double gamma);
 
 /*!
 * @brief Get the UnitCell from a frame

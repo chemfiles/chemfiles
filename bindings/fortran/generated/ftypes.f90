@@ -96,6 +96,7 @@ type chrp_cell
     type(c_ptr) :: ptr
 contains
     procedure :: init => chrp_cell_init_
+    procedure :: triclinic => chrp_cell_triclinic_init_
     procedure :: from_frame => chrp_cell_from_frame_init_
     procedure :: lengths => chrp_cell_lengths
     procedure :: set_lengths => chrp_cell_set_lengths

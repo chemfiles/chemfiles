@@ -199,7 +199,16 @@ int chrp_frame_free(CHRP_FRAME* frame) {
 
 /******************************************************************************/
 
-CHRP_CELL* chrp_cell(double a, double b, double c, double alpha, double beta, double gamma) {
+CHRP_CELL* chrp_cell(double a, double b, double c) {
+    CHRP_CELL* cell = NULL;
+    CHRP_ERROR_WRAP(
+        cell = new UnitCell(a, b, c);
+    )
+error:
+    return cell;
+}
+
+CHRP_CELL* chrp_cell_triclinic(double a, double b, double c, double alpha, double beta, double gamma) {
     CHRP_CELL* cell = NULL;
     CHRP_ERROR_WRAP(
         cell = new UnitCell(a, b, c, alpha, beta, gamma);

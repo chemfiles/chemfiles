@@ -375,7 +375,29 @@ subroutine chrp_frame_free(this, status)
     end if
 end subroutine
 
-subroutine chrp_cell_init_(this, a, b, c, alpha, beta, gamma, status)
+subroutine chrp_cell_init_(this, a, b, c, status)
+    implicit none
+    class(chrp_cell) :: this
+    real(kind=c_double), value :: a
+    real(kind=c_double), value :: b
+    real(kind=c_double), value :: c
+    integer, optional :: status
+    integer :: status_tmp_
+
+    this%ptr = chrp_cell_c(a, b, c)
+
+    if (.not. c_associated(this%ptr)) then
+        status_tmp_ = -1
+    else
+        status_tmp_ = 0
+    end if
+
+    if (present(status)) then
+        status = status_tmp_
+    end if
+end subroutine
+
+subroutine chrp_cell_triclinic_init_(this, a, b, c, alpha, beta, gamma, status)
     implicit none
     class(chrp_cell) :: this
     real(kind=c_double), value :: a
@@ -387,7 +409,7 @@ subroutine chrp_cell_init_(this, a, b, c, alpha, beta, gamma, status)
     integer, optional :: status
     integer :: status_tmp_
 
-    this%ptr = chrp_cell_c(a, b, c, alpha, beta, gamma)
+    this%ptr = chrp_cell_triclinic_c(a, b, c, alpha, beta, gamma)
 
     if (.not. c_associated(this%ptr)) then
         status_tmp_ = -1

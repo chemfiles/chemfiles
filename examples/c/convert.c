@@ -12,7 +12,7 @@ int main() {
     CHRP_FRAME* frame = chrp_frame(0);
     CHRP_TOPOLOGY* water_topology = chrp_topology();
     // Orthorombic UnitCell with lengths of 20, 15 and 35 A
-    CHRP_CELL* cell = chrp_cell(20, 15, 35, 90, 90, 90);
+    CHRP_CELL* cell = chrp_cell(20, 15, 35);
 
     // Create Atoms
     CHRP_ATOM* O = chrp_atom("O");
