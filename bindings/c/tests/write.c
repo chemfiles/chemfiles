@@ -1,14 +1,12 @@
 #include "chemharp.h"
 
-#include <stdio.h>
-
 // Force NDEBUG to be undefined
 #undef NDEBUG
-
 #include <assert.h>
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 const char* FILENAME = "test-c.xyz";
 
