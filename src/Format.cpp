@@ -12,7 +12,7 @@
 #include "Error.hpp"
 using namespace harp;
 
-void Format::read_at(File*, const size_t, Frame&){
+void Format::read_step(File*, const size_t, Frame&){
     throw FormatError("Not implemented function 'read_at'");
 }
 

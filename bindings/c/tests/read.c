@@ -57,7 +57,7 @@ int main(int argc, char** argv){
     }
     check_frame(frame, LAST_FRAME);
 
-    assert(!chrp_trajectory_read_at(traj, 42, frame));
+    assert(!chrp_trajectory_read_step(traj, 42, frame));
     check_frame(frame, MIDLE_FRAME);
 
 	return 0;

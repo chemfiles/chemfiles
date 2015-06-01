@@ -73,10 +73,10 @@ function chrp_trajectory_read_c(file, frame) bind(C, name="chrp_trajectory_read"
 end function
 
 ! Function "chrp_trajectory_read_at", at chemharp.h:126
-function chrp_trajectory_read_at_c(file, step, frame) bind(C, name="chrp_trajectory_read_at")
+function chrp_trajectory_read_step_c(file, step, frame) bind(C, name="chrp_trajectory_read_step")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_trajectory_read_at_c
+    integer(c_int) :: chrp_trajectory_read_step_c
     type(c_ptr), value :: file
     integer(kind=c_size_t), value :: step
     type(c_ptr), value :: frame

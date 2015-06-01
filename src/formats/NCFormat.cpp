@@ -90,7 +90,7 @@ void NCFormat::validate(NCFile* file, size_t natoms) const{
         throw FormatError("Invalid AMBER NetCDF file " + file->filename());
 }
 
-void NCFormat::read_at(File* file, const size_t _step, Frame& frame){
+void NCFormat::read_step(File* file, const size_t _step, Frame& frame){
     auto ncfile = dynamic_cast<NCFile*>(file);
 
     validate(ncfile);
@@ -106,7 +106,7 @@ void NCFormat::read_at(File* file, const size_t _step, Frame& frame){
 }
 
 void NCFormat::read(File* file, Frame& frame) {
-    read_at(file, step, frame);
+    read_step(file, step, frame);
     step++;
 }
 

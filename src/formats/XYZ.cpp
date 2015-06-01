@@ -59,7 +59,7 @@ size_t XYZFormat::nsteps(File* file) const {
     return n;
 }
 
-void XYZFormat::read_at(File* file, const size_t step, Frame& frame){
+void XYZFormat::read_step(File* file, const size_t step, Frame& frame){
     auto textfile = dynamic_cast<TextFile*>(file);
     textfile->rewind();
     forward(textfile, step);

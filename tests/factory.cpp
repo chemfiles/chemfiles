@@ -91,7 +91,7 @@ TEST_CASE("Check error throwing in formats", "[Format errors]"){
     Frame frame;
     Trajectory traj(filename);
     CHECK_THROWS_AS(traj.read(), FormatError);
-    CHECK_THROWS_AS(traj.read_at(2), FormatError);
+    CHECK_THROWS_AS(traj.read_step(2), FormatError);
     CHECK_THROWS_AS(traj.write(frame), FormatError);
 
     remove(filename.c_str());

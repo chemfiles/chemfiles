@@ -68,5 +68,5 @@ if __name__ == "__main__":
 
     check_frame(frame, LAST_FRAME)
 
-    frame = traj.read_at(42)
+    frame = traj.read_step(42)
     check_frame(frame, MIDLE_FRAME)

@@ -35,7 +35,7 @@ public:
     *
     * This function can throw an exception in case of error.
     */
-    virtual void read_at(File* file, const size_t step, Frame& frame);
+    virtual void read_step(File* file, const size_t step, Frame& frame);
 
     /*!
     * @brief Read a specific step from a file.

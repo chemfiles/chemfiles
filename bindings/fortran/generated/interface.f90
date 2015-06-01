@@ -105,7 +105,7 @@ subroutine chrp_trajectory_read(this, frame, status)
     end if
 end subroutine
 
-subroutine chrp_trajectory_read_at(this, step, frame, status)
+subroutine chrp_trajectory_read_step(this, step, frame, status)
     implicit none
     class(chrp_trajectory) :: this
     integer(kind=c_size_t), value :: step
@@ -113,7 +113,7 @@ subroutine chrp_trajectory_read_at(this, step, frame, status)
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_trajectory_read_at_c(this%ptr, step, frame%ptr)
+    status_tmp_ = chrp_trajectory_read_step_c(this%ptr, step, frame%ptr)
     if (present(status)) then
         status = status_tmp_
     end if

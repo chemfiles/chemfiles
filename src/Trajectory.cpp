@@ -69,7 +69,7 @@ Frame Trajectory::read(){
     return frame;
 }
 
-Frame Trajectory::read_at(const size_t step){
+Frame Trajectory::read_step(const size_t step){
     if (step >= _nsteps)
         throw FileError(
             "Can not read file \"" + _file->filename() + "\" at step " +
@@ -78,7 +78,7 @@ Frame Trajectory::read_at(const size_t step){
 
     Frame frame;
     _step = step;
-    _format->read_at(_file.get(), _step, frame);
+    _format->read_step(_file.get(), _step, frame);
 
     // Set the frame topology if needed
     if (_use_custom_topology)
@@ -119,7 +119,7 @@ void Trajectory::topology(const std::string& filename) {
     Trajectory topolgy_file(filename, "r");
     assert(topolgy_file.nsteps() > 0);
 
-    auto frame = topolgy_file.read_at(0);
+    auto frame = topolgy_file.read_step(0);
     Trajectory::topology(frame.topology());
 }
 

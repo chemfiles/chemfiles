@@ -42,7 +42,7 @@ type chrp_trajectory
     type(c_ptr) :: ptr
 contains
     procedure :: read => chrp_trajectory_read
-    procedure :: read_at => chrp_trajectory_read_at
+    procedure :: read_step => chrp_trajectory_read_step
     procedure :: write => chrp_trajectory_write
     procedure :: topology => chrp_trajectory_topology
     procedure :: topology_file => chrp_trajectory_topology_file

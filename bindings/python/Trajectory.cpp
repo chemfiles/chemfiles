@@ -14,7 +14,7 @@ void register_trajectory() {
     py::class_<Trajectory, boost::noncopyable>("Trajectory",
             py::init<string, py::optional<string, string>>())
         .def("read", &Trajectory::read)
-        .def("read_at", &Trajectory::read_at)
+        .def("read_step", &Trajectory::read_step)
         .def("write", &Trajectory::write)
         .def("done", &Trajectory::done)
         .def("close", &Trajectory::close)

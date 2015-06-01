@@ -60,7 +60,7 @@ program read
 
     call check_frame(frame, LAST_FRAME)
 
-    call traj%read_at(42, frame, status)
+    call traj%read_step(42, frame, status)
     call check_frame(frame, MIDLE_FRAME)
 
 contains

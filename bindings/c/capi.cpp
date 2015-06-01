@@ -53,9 +53,9 @@ error:
     return traj;
 }
 
-int chrp_trajectory_read_at(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame){
+int chrp_trajectory_read_step(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame){
     CHRP_ERROR_WRAP_RETCODE(
-        *frame = file->read_at(step);
+        *frame = file->read_step(step);
     )
 }
 

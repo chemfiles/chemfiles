@@ -54,7 +54,7 @@ public:
     //! Read operator, in *method* version
     Frame read();
     //! Read operator, in *method* version with specific step
-    Frame read_at(const size_t);
+    Frame read_step(const size_t);
     //! Close a trajectory
     void close();
 
