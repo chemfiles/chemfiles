@@ -46,6 +46,8 @@ int main() {
     assert(!chrp_atom_atomic_number(a, &number));
     assert(number == 30);
 
+    assert(!chrp_atom_free(a));
+
     return EXIT_SUCCESS;
 }
 

@@ -70,5 +70,7 @@ int main() {
     assert(y == true);
     assert(z == false);
 
+    assert(!chrp_cell_free(cell));
+
     return EXIT_SUCCESS;
 }
