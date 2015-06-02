@@ -62,6 +62,17 @@ if(${NETCDF_FOUND})
     #==========================================================================#
 endif()
 
+option(USE_STATIC_BOOST "Force use of static BOOST libraries" NO)
+set(Boost_USE_STATIC_LIBS ${USE_STATIC_BOOST})
+set(Boost_USE_MULTITHREADED OFF)
+if(USE_STATIC_BOOST)
+   unset(Boost_INCLUDE_DIR CACHE)
+   unset(Boost_LIBRARY_DIRS CACHE)
+   message(STATUS "Linking against boost static libraries")
+else()
+   unset(Boost_INCLUDE_DIR CACHE)
+   unset(Boost_LIBRARY_DIRS CACHE)
+endif()
 find_package(Boost 1.54.0 REQUIRED COMPONENTS filesystem system)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
@@ -153,3 +164,16 @@ configure_file(
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake)
+
+#========================================================================================#
+# Packaging stuff
+#========================================================================================#
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Chemharp, efficient chemistry IO library")
+set(CPACK_PACKAGE_VENDOR "Guillaume Fraux")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENCE.txt")
+set(CPACK_PACKAGE_VERSION_MAJOR ${CHRP_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${CHRP_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${CHRP_VERSION_PATCH})
+set(CPACK_GENERATOR "TGZ;ZIP")
+include(CPack)
