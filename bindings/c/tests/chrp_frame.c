@@ -79,15 +79,15 @@ int main() {
     /*********************/
 
     top = chrp_topology_from_frame(frame);
-    CHRP_ATOM* At = chrp_atom_from_topology(top, 0);
+    CHRP_ATOM* atom = chrp_atom_from_topology(top, 0);
     char name[32];
-    assert(!chrp_atom_name(At, name, sizeof(a)/sizeof(char)));
+    assert(!chrp_atom_name(atom, name, sizeof(name)));
     assert(strcmp(name, "Zn") == 0);
 
-    At = chrp_atom_from_topology(top, 1);
-    assert(!chrp_atom_name(At, name, sizeof(a)/sizeof(char)));
+    atom = chrp_atom_from_topology(top, 1);
+    assert(!chrp_atom_name(atom, name, sizeof(name)));
     assert(strcmp(name, "Ar") == 0);
-    chrp_atom_free(At);
+    chrp_atom_free(atom);
 
     assert(!chrp_frame_free(frame));
 

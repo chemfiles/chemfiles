@@ -18,7 +18,7 @@ int main() {
     assert(fabs(charge) < 1e-6);
 
     char name[32];
-    assert(!chrp_atom_name(a, name, sizeof(a)/sizeof(char)));
+    assert(!chrp_atom_name(a, name, sizeof(name)));
     assert(strcmp(name, "He") == 0);
 
     assert(!chrp_atom_set_mass(a, 678));
@@ -30,10 +30,10 @@ int main() {
     assert(fabs(charge + 1.5) < 1e-6);
 
     assert(!chrp_atom_set_name(a, "Zn"));
-    assert(!chrp_atom_name(a, name, sizeof(a)/sizeof(char)));
+    assert(!chrp_atom_name(a, name, sizeof(name)));
     assert(strcmp(name, "Zn") == 0);
 
-    assert(!chrp_atom_full_name(a, name, sizeof(a)/sizeof(char)));
+    assert(!chrp_atom_full_name(a, name, sizeof(name)));
     assert(strcmp(name, "Zinc") == 0);
 
     double radius=0;
