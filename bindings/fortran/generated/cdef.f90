@@ -91,29 +91,29 @@ function chrp_trajectory_write_c(file, frame) bind(C, name="chrp_trajectory_writ
     type(c_ptr), value, intent(in) :: frame
 end function
 
-! Function "chrp_trajectory_topology", at chemharp.h:144
-function chrp_trajectory_topology_c(file, topology) bind(C, name="chrp_trajectory_topology")
+! Function "chrp_trajectory_set_topology", at chemharp.h:144
+function chrp_trajectory_set_topology_c(file, topology) bind(C, name="chrp_trajectory_set_topology")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_trajectory_topology_c
+    integer(c_int) :: chrp_trajectory_set_topology_c
     type(c_ptr), value :: file
     type(c_ptr), value, intent(in) :: topology
 end function
 
-! Function "chrp_trajectory_topology_file", at chemharp.h:153
-function chrp_trajectory_topology_file_c(file, filename) bind(C, name="chrp_trajectory_topology_file")
+! Function "chrp_trajectory_set_topology_file", at chemharp.h:153
+function chrp_trajectory_set_topology_file_c(file, filename) bind(C, name="chrp_trajectory_set_topology_file")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_trajectory_topology_file_c
+    integer(c_int) :: chrp_trajectory_set_topology_file_c
     type(c_ptr), value :: file
     character(len=1, kind=c_char), dimension(*), intent(in) :: filename
 end function
 
-! Function "chrp_trajectory_cell", at chemharp.h:163
-function chrp_trajectory_cell_c(file, cell) bind(C, name="chrp_trajectory_cell")
+! Function "chrp_trajectory_set_cell", at chemharp.h:163
+function chrp_trajectory_set_cell_c(file, cell) bind(C, name="chrp_trajectory_set_cell")
     use iso_c_binding
     implicit none
-    integer(c_int) :: chrp_trajectory_cell_c
+    integer(c_int) :: chrp_trajectory_set_cell_c
     type(c_ptr), value :: file
     type(c_ptr), value, intent(in) :: cell
 end function

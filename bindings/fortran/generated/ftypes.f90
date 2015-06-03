@@ -44,9 +44,9 @@ contains
     procedure :: read => chrp_trajectory_read
     procedure :: read_step => chrp_trajectory_read_step
     procedure :: write => chrp_trajectory_write
-    procedure :: topology => chrp_trajectory_topology
-    procedure :: topology_file => chrp_trajectory_topology_file
-    procedure :: cell => chrp_trajectory_cell
+    procedure :: set_topology => chrp_trajectory_set_topology
+    procedure :: set_topology_file => chrp_trajectory_set_topology_file
+    procedure :: set_cell => chrp_trajectory_set_cell
     procedure :: nsteps => chrp_trajectory_nsteps
     procedure :: close => chrp_trajectory_close
     procedure :: open => chrp_open_init_
