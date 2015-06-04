@@ -59,7 +59,7 @@ public:
 
 private:
     //! Close the log file if it exists.
-    void close(void);
+    void close();
     //! Return a stream to write the log
     std::ostream& get_stream(LogLevel level);
     //! Constructor

@@ -48,13 +48,13 @@ public:
     ~Atom() = default;
 
     //! Get a const (non-modifiable) reference to the atom name
-    const std::string& name(void) const {return _name;}
+    const std::string& name() const {return _name;}
     //! Get a const (non-modifiable) reference to the atom mass
-    const float& mass(void) const {return _mass;}
+    const float& mass() const {return _mass;}
     //! Get a const (non-modifiable) reference to the atom charge
-    const float& charge(void) const {return _charge;}
+    const float& charge() const {return _charge;}
     //! Get a const (non-modifiable) reference to the atom type
-    const AtomType& type(void) const {return _type;}
+    const AtomType& type() const {return _type;}
 
     //! Set the atom name
     void name(const std::string& n) {_name = n;}

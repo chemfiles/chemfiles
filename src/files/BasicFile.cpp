@@ -35,7 +35,7 @@ BasicFile::~BasicFile(){
 }
 
 
-const std::string& BasicFile::getline(void){
+const std::string& BasicFile::getline(){
     *this >> lines[0];
     return lines[0];
 }

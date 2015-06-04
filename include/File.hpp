@@ -43,9 +43,9 @@ public:
     bool operator!=(File const&) = delete;
 
     //! Is the file opended ?
-    virtual bool is_open(void) = 0;
+    virtual bool is_open() = 0;
     //! Close the file before the destructor call.
-    virtual void close(void) = 0;
+    virtual void close() = 0;
     //! File name
     const std::string& filename() const {return _filename;}
 protected:
@@ -66,7 +66,7 @@ public:
     virtual ~TextFile() = default;
 
     //! Read a line from the file
-    virtual const std::string& getline(void) = 0;
+    virtual const std::string& getline() = 0;
     //! Read a line from the file, stream version
     virtual TextFile& operator>>(std::string& line) = 0;
     //! Read \c n lines from the file

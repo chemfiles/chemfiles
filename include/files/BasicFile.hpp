@@ -26,7 +26,7 @@ public:
     explicit BasicFile(const std::string& filename, const std::string& mode = "r");
     ~BasicFile();
 
-    virtual const std::string& getline(void) override;
+    virtual const std::string& getline() override;
     virtual BasicFile& operator>>(std::string& line) override;
     virtual const std::vector<std::string>& readlines(size_t n) override;
 

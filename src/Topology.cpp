@@ -126,19 +126,19 @@ void Topology::remove(size_t idx) {
     recalculate();
 }
 
-vector<bond> Topology::bonds(void)  const{
+vector<bond> Topology::bonds() const{
     vector<bond> res;
     res.insert(begin(res), begin(_connect.bonds()), end(_connect.bonds()));
     return std::move(res);
 }
 
-vector<angle> Topology::angles(void) const{
+vector<angle> Topology::angles() const{
     vector<angle> res;
     res.insert(begin(res), begin(_connect.angles()), end(_connect.angles()));
     return std::move(res);
 }
 
-vector<dihedral> Topology::dihedrals(void) const{
+vector<dihedral> Topology::dihedrals() const{
     vector<dihedral> res;
     res.insert(begin(res), begin(_connect.dihedrals()), end(_connect.dihedrals()));
     return std::move(res);

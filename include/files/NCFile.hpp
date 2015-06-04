@@ -55,8 +55,8 @@ public:
     template <typename T>
     void add_attribute(const string& var, const string& name, T value);
 
-    virtual bool is_open(void) override;
-    virtual void close(void) override;
+    virtual bool is_open() override;
+    virtual void close() override;
 private:
     // Underlying NetCDF file
     netCDF::NcFile file;

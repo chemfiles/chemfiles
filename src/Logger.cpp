@@ -28,7 +28,7 @@ Logger Logger::instance{};
 
 Logger::Logger() : current_level(WARNING), os(&std::clog), is_file(false) {}
 
-Logger::~Logger(void){
+Logger::~Logger(){
     close();
 }
 
@@ -66,19 +66,19 @@ void Logger::level(LogLevel level){
     instance.current_level = level;
 }
 
-void Logger::log_to_stdout(void){
+void Logger::log_to_stdout(){
     instance.close();
     instance.is_file = false;
     instance.os = &std::cout;
 }
 
-void Logger::log_to_stderr(void){
+void Logger::log_to_stderr(){
     instance.close();
     instance.is_file = false;
     instance.os = &std::cerr;
 }
 
-void Logger::log_to_stdlog(void){
+void Logger::log_to_stdlog(){
     instance.close();
     instance.is_file = false;
     instance.os = &std::clog;
@@ -90,7 +90,7 @@ void Logger::log_to_file(const std::string &filename){
     instance.os = new std::ofstream(filename, std::ofstream::out);
 }
 
-void Logger::close(void){
+void Logger::close(){
     if(is_file){
         static_cast<std::ofstream *>(os)->close();
         delete os;

@@ -194,11 +194,11 @@ public:
     bool isdihedral(size_t i, size_t j, size_t k, size_t m);
 
     //! Get the bonds in the system
-    std::vector<bond> bonds(void) const;
+    std::vector<bond> bonds() const;
     //! Get the angles in the system
-    std::vector<angle> angles(void) const;
+    std::vector<angle> angles() const;
     //! Get the dihedral angles in the system
-    std::vector<dihedral> dihedrals(void) const;
+    std::vector<dihedral> dihedrals() const;
 
     //! Recalculate the angles and dihedrals list from the bond list.
     void recalculate() {_connect.recalculate();}

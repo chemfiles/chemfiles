@@ -92,11 +92,11 @@ void NCFile::add_dimension(const string& dimname, size_t value) {
     }
 }
 
-bool NCFile::is_open(void) {
+bool NCFile::is_open() {
     return (not file.isNull());
 }
 
-void NCFile::close(void) {
+void NCFile::close() {
     file.close();
 }
 
