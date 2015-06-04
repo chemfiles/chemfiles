@@ -33,7 +33,7 @@ typedef bte::any<mpl::vector<bte::ostreamable<>,
 */
 class File {
 public:
-    virtual ~File(){}
+    virtual ~File() = default;
 
     // Removing default copy constructors
     File(File const&) = delete;
@@ -63,7 +63,7 @@ private:
  */
 class TextFile : public File {
 public:
-    virtual ~TextFile() {}
+    virtual ~TextFile() = default;
 
     //! Read a line from the file
     virtual const std::string& getline(void) = 0;
@@ -98,6 +98,8 @@ protected:
 * file operations.
 */
 class BinaryFile : public File {
+public:
+    virtual ~BinaryFile() = default;
 protected:
     explicit BinaryFile(const std::string& path, const std::string& = "") : File(path) {}
 };

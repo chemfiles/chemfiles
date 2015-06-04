@@ -72,6 +72,8 @@ public:
     //! and all angles set to 90°
     UnitCell(CellType type, double a, double b, double c);
 
+    ~UnitCell() = default;
+
     //! Get a matricial representation of the cell.
     Matrix3D matricial() const;
     //! Populate C-style matricial representation of the cell. The array should

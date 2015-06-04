@@ -28,6 +28,8 @@ class Frame;
  */
 class Format {
 public:
+    Format() = default;
+    virtual ~Format() = default;
     /*!
     * @brief Read a specific step from the internal file.
     * @param file The file to read from.

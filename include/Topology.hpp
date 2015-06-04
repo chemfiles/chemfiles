@@ -26,8 +26,8 @@ struct bond {
         _data[0] = std::min(first, second);
         _data[1] = std::max(first, second);
     }
+    ~bond() = default;
     //! Indexing operator
-    size_t& operator[](size_t i) {return _data[i];}
     const size_t& operator[](size_t i) const {return _data[i];}
     //! Comparison operator
     bool operator==(const bond& other) const{
@@ -47,8 +47,8 @@ struct angle {
         _data[1] = midle;
         _data[2] = std::max(first, last);
     }
+    ~angle() = default;
     //! Indexing operator
-    size_t& operator[](size_t i) {return _data[i];}
     const size_t& operator[](size_t i) const {return _data[i];}
     //! Comparison operator
     bool operator==(const angle& other) const {
@@ -78,8 +78,8 @@ struct dihedral {
             _data[3] = first;
         }
     }
+    ~dihedral() = default;
     //! Indexing operator
-    size_t& operator[](size_t i) {return _data[i];}
     const size_t& operator[](size_t i) const {return _data[i];}
     //! Comparison operator
     bool operator==(const dihedral& other) const {
@@ -115,6 +115,8 @@ struct hash {
  */
 class Connectivity {
 public:
+    Connectivity() = default;
+    ~Connectivity() = default;
     //! Recalculate the angles and the dihedrals from the bond list
     void recalculate() const;
     //! Clear all the content
@@ -154,6 +156,7 @@ public:
     Topology();
     Topology(const Topology &) = default;
     Topology& operator=(const Topology &) = default;
+    ~Topology() = default;
 
     //! Get a reference to the atom at the position \c index
     Atom& operator[](size_t index) {return _templates[_atoms[index]];}

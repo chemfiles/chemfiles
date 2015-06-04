@@ -32,7 +32,7 @@ public:
     //! Constructor called to build a frame that can hold the data from a
     //! specific topology.
     explicit Frame(Topology top, bool has_velocities = false);
-    ~Frame(){}
+    ~Frame() = default;
 
     //! Get a modifiable reference to the positions
     Array3D& positions() {return _positions;}
