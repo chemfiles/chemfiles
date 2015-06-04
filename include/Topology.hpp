@@ -14,6 +14,8 @@
 #include <array>
 #include <vector>
 #include <unordered_set>
+#include <functional>
+
 #include "Atom.hpp"
 
 namespace harp {
@@ -90,20 +92,30 @@ private:
     std::array<size_t, 4> _data;
 };
 
+} // namespace harp
 
-// We need a hashing function for the std::unordered_set, but it will not be used.
-// We will use the operator== instead to ensure the element unicity in the sets.
-struct hash {
-    std::size_t operator()(bond const& ) const {
-        return 42;
-    }
-    std::size_t operator()(angle const& ) const {
-        return 42;
-    }
-    std::size_t operator()(dihedral const& ) const {
-        return 42;
-    }
-};
+namespace std {
+    // We need a hashing function for the std::unordered_set, but it will not
+    // be used. We will use the operator== instead to ensure the element
+    // unicity in the sets.
+    template<> struct hash<harp::bond> {
+        size_t operator()(harp::bond const&) const {
+            return 42;
+        }
+    };
+    template<> struct hash<harp::angle> {
+        size_t operator()(harp::angle const&) const {
+            return 42;
+        }
+    };
+    template<> struct hash<harp::dihedral> {
+        size_t operator()(harp::dihedral const&) const {
+            return 42;
+        }
+    };
+} // namespace std
+
+namespace harp {
 
 /*!
  * @class connectivity Topology.hpp Topology.cpp
@@ -122,20 +134,20 @@ public:
     //! Clear all the content
     void clear();
     //! Access the underlying data
-    const std::unordered_set<bond, hash>& bonds() const;
-    const std::unordered_set<angle, hash>& angles() const;
-    const std::unordered_set<dihedral, hash>& dihedrals() const;
+    const std::unordered_set<bond>& bonds() const;
+    const std::unordered_set<angle>& angles() const;
+    const std::unordered_set<dihedral>& dihedrals() const;
     //! Add a bond between the atoms \c i and \c j
     void add_bond(size_t i, size_t j);
     //! Remove any bond between the atoms \c i and \c j
     void remove_bond(size_t i, size_t j);
 private:
     //! Bonds in the system
-    std::unordered_set<bond, hash> _bonds;
+    std::unordered_set<bond> _bonds;
     //! Angles in the system
-    mutable std::unordered_set<angle, hash> _angles;
+    mutable std::unordered_set<angle> _angles;
     //! Dihedral angles in the system
-    mutable std::unordered_set<dihedral, hash> _dihedrals;
+    mutable std::unordered_set<dihedral> _dihedrals;
     //! Is the cached content up to date ?
     mutable bool uptodate;
 };
