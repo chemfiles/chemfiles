@@ -98,4 +98,10 @@ Class reference
 Developer documentation
 -----------------------
 
-Coming soon …
+.. toctree::
+   :maxdepth: 2
+
+   devdoc/contributing
+   devdoc/internals
+   devdoc/file
+   devdoc/format

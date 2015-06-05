@@ -1,3 +1,5 @@
+.. _julia-api:
+
 Julia interface
 ===============
 

@@ -1,3 +1,5 @@
+.. _fortran-api:
+
 Fortran interface
 =================
 

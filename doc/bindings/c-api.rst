@@ -1,3 +1,5 @@
+.. _c-api:
+
 C interface
 ===========
 
