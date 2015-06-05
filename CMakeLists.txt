@@ -62,8 +62,8 @@ if(${NETCDF_FOUND})
     #==========================================================================#
 endif()
 
-option(USE_STATIC_BOOST "Force use of static BOOST libraries" NO)
-set(Boost_USE_STATIC_LIBS ${USE_STATIC_BOOST})
+option(USE_STATIC_LIBS "Prefer use of static libraries" NO)
+set(Boost_USE_STATIC_LIBS ${USE_STATIC_LIBS})
 set(Boost_USE_MULTITHREADED OFF)
 if(USE_STATIC_BOOST)
    unset(Boost_INCLUDE_DIR CACHE)
