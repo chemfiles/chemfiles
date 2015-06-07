@@ -45,20 +45,22 @@ if(${NETCDF_FOUND})
     # NetCDF CXX4 library will be built as an external project
     ExternalProject_add(netcdfcxx
         PREFIX external/netcdfcxx
-        URL "https://github.com/Luthaf/netcdf-cxx4/archive/open-close.tar.gz"
-        URL_MD5 eebe475d39f3a4a42a783a7045132a0d
-        BUILD_IN_SOURCE 1
-        CONFIGURE_COMMAND
-            COMMAND autoreconf -if
-            COMMAND ./configure --prefix=${CMAKE_BINARY_DIR} --with-pic
-                    CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}
-        BUILD_COMMAND make
+        URL "https://github.com/Unidata/netcdf-cxx4/archive/420a0f26edcc09d35e47fac5c01802c3c65afa3d.zip"
+        URL_MD5 7f6828a0fa5a95ee3b052cb164d2f2f1
+        CMAKE_ARGS  -DBUILD_SHARED_LIBS=OFF
+                    -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+                    -DBUILD_TESTING=OFF
+                    -DNCXX_ENABLE_TESTS=OFF
+                    -DCMAKE_BUILD_TYPE=release
+                    -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
+                    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+                    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     )
     include_directories(BEFORE SYSTEM ${CMAKE_BINARY_DIR}/include)
     add_library(netcdf_cxx4 STATIC IMPORTED)
     set_property(
         TARGET netcdf_cxx4
-        PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/lib/libnetcdf_c++4${CMAKE_STATIC_LIBRARY_SUFFIX})
+    PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/lib/libnetcdf-cxx4${CMAKE_STATIC_LIBRARY_SUFFIX})
     #==========================================================================#
 endif()
 
