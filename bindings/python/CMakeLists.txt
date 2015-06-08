@@ -9,6 +9,7 @@ ExternalProject_add(Boost.Numpy
                 -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
                 -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
                 -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+                -DBOOST_INCLUDEDIR=${Boost_INCLUDE_DIR}
                 -DBoost_USE_STATIC_LIBS=${Boost_USE_STATIC_LIBS}
                 -DBoost_USE_MULTITHREADED=${Boost_USE_MULTITHREADED}
     UPDATE_COMMAND ""
