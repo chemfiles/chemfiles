@@ -51,7 +51,7 @@ size_t XYZFormat::nsteps(File* file) const {
     auto textfile = dynamic_cast<TextFile*>(file);
     textfile->rewind();
     size_t n = 0;
-    while (not textfile->eof()) {
+    while (!textfile->eof()) {
         if (forward(textfile, 1))
             n++;
     }

@@ -53,7 +53,7 @@ const std::vector<std::string>& BasicFile::readlines(size_t n){
         lines[i] = line;
     }
 
-    if (not stream)
+    if (!stream)
         throw FileError("Error while reading file " + filename());
 
     return lines;

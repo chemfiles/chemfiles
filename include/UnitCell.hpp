@@ -10,6 +10,10 @@
 #ifndef HARP_UNIT_CELL_HPP
 #define HARP_UNIT_CELL_HPP
 
+#ifdef COMPILER_IS_MSVC
+    #undef INFINITE
+#endif
+
 #include <array>
 
 namespace harp {

@@ -151,7 +151,7 @@ static Vector3D wrap_triclinic(const UnitCell& cell, const Vector3D& vect) {
 }
 
 Vector3D UnitCell::wrap(const Vector3D& vect) const{
-    if (not full_periodic()){
+    if (!full_periodic()){
         // TODO: implement this
         throw Error("Unimplemend vector wrapping for non fully-periodic cells.");
     }

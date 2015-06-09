@@ -12,6 +12,7 @@
 #define HARP_DYNLIB_HPP
 
 #include <string>
+#include <sstream>
 #include "Error.hpp"
 
 #ifdef WIN32
@@ -75,9 +76,12 @@ public:
         if (handle == nullptr)
             throw PluginError("The dynamic library was not opened.");
         #ifdef WIN32
-            function_t sym = reinterpret_cast<function_t>(GetProcAddress(handle, name));
-            if (!sym)
-                throw PluginError("Cannot load symbol " + name + ": " + GetLastError());
+            function_t sym = reinterpret_cast<function_t>(GetProcAddress(handle, name.c_str()));
+            if (!sym){
+                std::stringstream message;
+                message << "Cannot load symbol " << name << ": " << GetLastError();
+                throw PluginError(message.str());
+            }
         #else
             dlerror(); // reset errors
             function_t sym = reinterpret_cast<function_t>(dlsym(handle, name.c_str()));

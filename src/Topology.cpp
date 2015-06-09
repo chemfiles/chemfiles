@@ -63,19 +63,19 @@ void Connectivity::clear(){
 }
 
 const std::unordered_set<bond>& Connectivity::bonds() const {
-    if (not uptodate)
+    if (!uptodate)
         recalculate();
     return _bonds;
 }
 
 const std::unordered_set<angle>& Connectivity::angles() const {
-    if (not uptodate)
+    if (!uptodate)
         recalculate();
     return _angles;
 }
 
 const std::unordered_set<dihedral>& Connectivity::dihedrals() const {
-    if (not uptodate)
+    if (!uptodate)
         recalculate();
     return _dihedrals;
 }
