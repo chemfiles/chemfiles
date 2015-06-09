@@ -105,8 +105,8 @@ configure_file ( # This version of the file is used for installations
 include(ExternalProject)
 ExternalProject_Add(molfile-plugins
     PREFIX external/molfile
-    URL https://github.com/Luthaf/VMD-Molfiles/archive/1.9.2.tar.gz
-    URL_HASH SHA1=92c094a2536d97d953df03fe14a838382b3ebe5b
+    URL https://github.com/Luthaf/VMD-Molfiles/archive/f9aefb164e1dd57767b0ad0f7596c6e51ce45764.tar.gz
+    URL_HASH SHA1=c6d4ba0ded93a497f404cd8e4da573e305db61cc
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
                -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
                -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
