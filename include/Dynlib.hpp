@@ -33,9 +33,8 @@ namespace harp {
 class Dynlib {
 public:
     //! Load a library from it path
-    explicit Dynlib(const std::string& path){
+    explicit Dynlib(const std::string& path) : handle(nullptr) {
     #ifdef WIN32
-        // use SetDllDirectory to set the search path
         handle = LoadLibrary(TEXT(path.c_str()));
         if (!handle)
             throw PluginError("Cannot load library: " + path);
@@ -52,7 +51,8 @@ public:
         other.handle = nullptr;
     }
     Dynlib& operator=(Dynlib&& other) {
-        std::swap(handle, other.handle);
+        handle = other.handle;
+        other.handle = nullptr;
         return *this;
     }
 
