@@ -1,13 +1,26 @@
 include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
 
-if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif(COMPILER_SUPPORTS_CXX0X)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-else()
-    message(SEND_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+# C++11 support in some compilers. The other compilers are supported with the
+# set(CMAKE_CXX_STANDARD 11) command in the top-level CMakeLists.txt
+set(cxx11_flag_needed OFF)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+    set(cxx11_flag_needed ON)
+elseif(${CMAKE_COMPILER_IS_GNUCC} AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 5.0)
+    set(cxx11_flag_needed ON)
+endif()
+
+if(${cxx11_flag_needed})
+    CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+    CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+    if(COMPILER_SUPPORTS_CXX11)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    elseif(COMPILER_SUPPORTS_CXXOX)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+    else()
+        message(SEND_ERROR
+            "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support.
+            Please use a different C++ compiler.")
+    endif()
 endif()
 
 macro(set_debug_flag_if_possible _flag_)
