@@ -121,6 +121,12 @@ add_library(chemharp SHARED ${sources} bindings/c/capi.cpp)
 set_property(TARGET chemharp PROPERTY VERSION ${CHRP_VERSION})
 set_property(TARGET chemharp PROPERTY SOVERSION ${CHRP_VERSION})
 
+include(GenerateExportHeader)
+generate_export_header(chemharp
+          BASE_NAME CHRP
+          EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/exports.hpp
+)
+
 target_link_libraries(chemharp ${Boost_LIBRARIES} ${OTHER_CHRP_LIBRARIES})
 
 if(${HAVE_NETCDF})
@@ -135,7 +141,7 @@ add_definitions("-DCHRP_MOLFILES_DIR=\"${CMAKE_INSTALL_PREFIX}/molfiles/\"")
 # Installation configuration
 #==============================================================================#
 
-file(GLOB_RECURSE headers include/**.hpp)
+file(GLOB_RECURSE headers include/**.hpp ${CMAKE_BINARY_DIR}/include/exports.hpp)
 
 # All headers
 install(FILES ${headers} DESTINATION include/chemharp)

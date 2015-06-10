@@ -14,6 +14,7 @@
 #include <string>
 
 #include "Frame.hpp"
+#include "exports.hpp"
 
 namespace harp {
 
@@ -27,7 +28,7 @@ class Format;
 * The Trajectory class puts together a format and a file, and implement the main
 * read/write operations.
 */
-class Trajectory {
+class CHRP_EXPORT Trajectory {
 public:
     /*!
      * Open a file, automatically gessing the file format and type from the

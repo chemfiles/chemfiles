@@ -15,13 +15,15 @@
 #include <vector>
 #include <map>
 
+#include "exports.hpp"
+
 namespace harp {
 
 /*!
  * @class Atom Atom.hpp Atom.cpp
  * @brief Atom representation class
  */
-class Atom {
+class CHRP_EXPORT Atom {
 public:
     enum AtomType {
         //! Element from the periodic table of elements

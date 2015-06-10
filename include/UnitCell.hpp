@@ -10,11 +10,12 @@
 #ifndef HARP_UNIT_CELL_HPP
 #define HARP_UNIT_CELL_HPP
 
-#ifdef COMPILER_IS_MSVC
+#ifdef WIN32
     #undef INFINITE
 #endif
 
 #include <array>
+#include "exports.hpp"
 
 namespace harp {
 
@@ -39,7 +40,7 @@ typedef std::array<std::array<double, 3>, 3> Matrix3D;
  * 				|  0    b_y   c_y |
  * 				|  0     0    c_z |
  */
-class UnitCell {
+class CHRP_EXPORT UnitCell {
 public:
     enum CellType {
         //! Orthorombic cell, with the three angles equals to 90°

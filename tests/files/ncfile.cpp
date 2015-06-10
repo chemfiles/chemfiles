@@ -1,3 +1,5 @@
+#ifndef WIN32
+
 #include <iostream>
 #include <cstdio>
 
@@ -76,3 +78,4 @@ TEST_CASE("Write NetCDF files", "[Files]"){
 }
 
 #endif // HAVE_NETCDF
+#endif // WIN32

@@ -17,13 +17,15 @@
 #include <string>
 #include <ostream>
 
+#include "exports.hpp"
+
 namespace harp {
 
 /*!
  * @class Logger Logger.hpp Logger.cpp
  * @brief The Logger class is a singleton class providing logging facilities.
  */
-class Logger {
+class CHRP_EXPORT Logger {
 public:
     //! The \c LogLevel control what will be logged and what will be dismissed
     enum LogLevel{

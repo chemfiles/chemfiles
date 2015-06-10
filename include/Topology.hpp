@@ -17,12 +17,13 @@
 #include <functional>
 
 #include "Atom.hpp"
+#include "exports.hpp"
 
 namespace harp {
 
 //! The bond struct ensure a canonical representation of a bond between atoms
 //! i and j, with i<j
-struct bond {
+struct CHRP_EXPORT bond {
     bond(size_t first, size_t second){
         assert(first != second);
         _data[0] = std::min(first, second);
@@ -41,7 +42,7 @@ private:
 
 //! The angle struct ensure a canonical representation of an angle between the
 //! atoms i, j and k, with i < k
-struct angle {
+struct CHRP_EXPORT angle {
     angle(size_t first, size_t midle, size_t last){
         assert(first != last);
         assert(first != midle);
@@ -62,7 +63,7 @@ private:
 
 //! The dihedral struct ensure a canonical representation of a dihedral angle
 //! between the atoms i, j, k and m, with max(i, j) < max(k, m))
-struct dihedral {
+struct CHRP_EXPORT dihedral {
     dihedral(size_t first, size_t second, size_t third, size_t fourth){
         assert(first != second);
         assert(second != third);
@@ -125,7 +126,7 @@ namespace harp {
  * added or removed. The \c bonds set is the main source of information, all the
  * other data are cached from it.
  */
-class Connectivity {
+class CHRP_EXPORT Connectivity {
 public:
     Connectivity() = default;
     ~Connectivity() = default;
@@ -160,7 +161,7 @@ private:
  * liaisons between the particles (bonds, angles, dihedrals, ...). Only the atoms
  * and the bonds are stored, the angles and the dihedrals are computed automaticaly.
  */
-class Topology {
+class CHRP_EXPORT Topology {
 public:
     //! Construct a topology with capacity for \c natoms atoms.
     explicit Topology(size_t natoms);
@@ -226,7 +227,7 @@ private:
 };
 
 //! Create a topology containing \c natoms atoms, all of the UNDEFINED type.
-Topology dummy_topology(size_t natoms);
+CHRP_EXPORT Topology dummy_topology(size_t natoms);
 
 } // namespace harp
 

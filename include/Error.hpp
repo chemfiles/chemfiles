@@ -13,13 +13,15 @@
 #include <stdexcept>
 #include <string>
 
+#include "exports.hpp"
+
 namespace harp {
 
 /*!
  * @class Error Error.hpp
  * @brief Base exception for Chemharp library
  */
-class Error : public std::runtime_error {
+class CHRP_EXPORT Error : public std::runtime_error {
 public:
     Error(const std::string &message) : std::runtime_error(message) {}
 };
@@ -28,7 +30,7 @@ public:
  * @class FileError Error.hpp
  * @brief Exception for files related failures
  */
-class FileError : public Error {
+class CHRP_EXPORT FileError : public Error {
 public:
     FileError(const std::string &message) : Error(message) {}
 };
@@ -37,7 +39,7 @@ public:
  * @class MemoryError Error.hpp
  * @brief Exception for memory related failures
  */
-class MemoryError : public Error {
+class CHRP_EXPORT MemoryError : public Error {
 public:
     MemoryError(const std::string &message) : Error(message) {}
 };
@@ -46,7 +48,7 @@ public:
  * @class FormatError Error.hpp
  * @brief Exception for formats related failures
  */
-class FormatError : public Error {
+class CHRP_EXPORT FormatError : public Error {
 public:
     FormatError(const std::string &message) : Error(message) {}
 };
@@ -55,7 +57,7 @@ public:
  * @class PluginError Error.hpp
  * @brief Exception for dynamic library loading errors
  */
-class PluginError : public Error {
+class CHRP_EXPORT PluginError : public Error {
 public:
     PluginError(const std::string &message) : Error(message) {}
 };

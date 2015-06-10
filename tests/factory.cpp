@@ -1,3 +1,5 @@
+#ifndef WIN32
+
 #include <string>
 
 #include "catch.hpp"
@@ -96,3 +98,5 @@ TEST_CASE("Check error throwing in formats", "[Format errors]"){
 
     remove(filename.c_str());
 }
+
+#endif

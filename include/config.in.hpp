@@ -15,6 +15,9 @@
 #define CHRP_VERSION_PATCH @CHRP_VERSION_PATCH@
 #define CHRP_VERSION "@CHRP_VERSION@"
 
+// Include the MSVC export definitions
+#include "@CHEMHARP_PREFIX@exports.hpp"
+
 // The CHEMHARP_PUBLIC macro should be defined when including this file to prevent
 // unwanted macros from being exported.
 #ifndef CHEMHARP_PUBLIC

@@ -13,6 +13,7 @@
 #include "Vector3D.hpp"
 #include "Topology.hpp"
 #include "UnitCell.hpp"
+#include "exports.hpp"
 
 namespace harp {
 
@@ -23,7 +24,7 @@ namespace harp {
  * The Frame class holds data from one step of a simulation: the current topology,
  * the positions, and maybe the velocities of the particles in the system.
  */
-class Frame {
+class CHRP_EXPORT Frame {
 public:
     //! Default constructor, reserving space for 100 atoms
     Frame();

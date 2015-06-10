@@ -1,3 +1,5 @@
+#ifndef WIN32
+
 #include <iostream>
 
 #include "catch.hpp"
@@ -78,3 +80,5 @@ TEST_CASE("Write a text file", "[Files]"){
 TEST_CASE("Errors in text files", "[Files]"){
     // TODO
 }
+
+#endif

@@ -57,13 +57,13 @@ extern "C" {
 * @param status The error code
 * @return A null-terminated string encoding the textual representation of the status.
 */
-const char* chrp_strerror(int status);
+CHRP_EXPORT const char* chrp_strerror(int status);
 
 /*!
 * @brief Get the last error message.
 * @return A null-terminated string encoding the textual representation of the last error.
 */
-const char* chrp_last_error();
+CHRP_EXPORT const char* chrp_last_error();
 
 //! Available logging level
 typedef enum CHRP_LOG_LEVEL {
@@ -84,20 +84,20 @@ typedef enum CHRP_LOG_LEVEL {
 * @param level The new logging level
 * @return The status code
 */
-int chrp_loglevel(chrp_log_level_t level);
+CHRP_EXPORT int chrp_loglevel(chrp_log_level_t level);
 
 /*!
 * @brief Redirect the logs to \c file, overwriting the file if it exists
 * @param file The filename for the new log file.
 * @return The status code
 */
-int chrp_logfile(const char* file);
+CHRP_EXPORT int chrp_logfile(const char* file);
 
 /*!
 * @brief Redirect the logs to the standard error output. This is enabled by default.
 * @return The status code
 */
-int chrp_log_stderr();
+CHRP_EXPORT int chrp_log_stderr();
 
 /******************************************************************************/
 /*!
@@ -106,7 +106,7 @@ int chrp_log_stderr();
 * @param mode The opening ("r" for read or "w" for write) mode for the file.
 * @return A pointer to the file
 */
-CHRP_TRAJECTORY* chrp_open(const char* filename, const char* mode);
+CHRP_EXPORT CHRP_TRAJECTORY* chrp_open(const char* filename, const char* mode);
 
 /*!
 * @brief Read the next step of the trajectory into a frame
@@ -114,7 +114,7 @@ CHRP_TRAJECTORY* chrp_open(const char* filename, const char* mode);
 * @param frame A frame to fill with the data
 * @return The status code.
 */
-int chrp_trajectory_read(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
+CHRP_EXPORT int chrp_trajectory_read(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
 
 /*!
 * @brief Read a specific step of the trajectory in a frame
@@ -123,7 +123,7 @@ int chrp_trajectory_read(CHRP_TRAJECTORY *file, CHRP_FRAME *frame);
 * @param frame A frame to fill with the data
 * @return The status code.
 */
-int chrp_trajectory_read_step(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame);
+CHRP_EXPORT int chrp_trajectory_read_step(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame);
 
 /*!
 * @brief Write a frame to the trajectory.
@@ -131,7 +131,7 @@ int chrp_trajectory_read_step(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* fr
 * @param frame the frame which will be writen to the file
 * @return The status code.
 */
-int chrp_trajectory_write(CHRP_TRAJECTORY *file, const CHRP_FRAME *frame);
+CHRP_EXPORT int chrp_trajectory_write(CHRP_TRAJECTORY *file, const CHRP_FRAME *frame);
 
 /*!
 * @brief Set the topology associated with a trajectory. This topology will be
@@ -141,7 +141,7 @@ int chrp_trajectory_write(CHRP_TRAJECTORY *file, const CHRP_FRAME *frame);
 * @param topology The new topology to use
 * @return The status code.
 */
-int chrp_trajectory_set_topology(CHRP_TRAJECTORY *file, const CHRP_TOPOLOGY *topology);
+CHRP_EXPORT int chrp_trajectory_set_topology(CHRP_TRAJECTORY *file, const CHRP_TOPOLOGY *topology);
 
 /*!
 * @brief Set the topology associated with a trajectory by reading the first
@@ -150,7 +150,7 @@ int chrp_trajectory_set_topology(CHRP_TRAJECTORY *file, const CHRP_TOPOLOGY *top
 * @param filename The file to read in order to get the new topology
 * @return The status code.
 */
-int chrp_trajectory_set_topology_file(CHRP_TRAJECTORY *file, const char* filename);
+CHRP_EXPORT int chrp_trajectory_set_topology_file(CHRP_TRAJECTORY *file, const char* filename);
 
 /*!
 * @brief Set the unit cell associated with a trajectory. This cell will be
@@ -160,7 +160,7 @@ int chrp_trajectory_set_topology_file(CHRP_TRAJECTORY *file, const char* filenam
 * @param cell The new cell to use
 * @return The status code.
 */
-int chrp_trajectory_set_cell(CHRP_TRAJECTORY *file, const CHRP_CELL *cell);
+CHRP_EXPORT int chrp_trajectory_set_cell(CHRP_TRAJECTORY *file, const CHRP_CELL *cell);
 
 /*!
 * @brief Get the number of steps (the number of frames) in a trajectory.
@@ -168,7 +168,7 @@ int chrp_trajectory_set_cell(CHRP_TRAJECTORY *file, const CHRP_CELL *cell);
 * @param nsteps This will contain the number of steps
 * @return The status code.
 */
-int chrp_trajectory_nsteps(CHRP_TRAJECTORY *file, size_t *nsteps);
+CHRP_EXPORT int chrp_trajectory_nsteps(CHRP_TRAJECTORY *file, size_t *nsteps);
 
 /*!
 * @brief Close a trajectory file, flush any buffer content to the hard drive, and
@@ -176,7 +176,7 @@ int chrp_trajectory_nsteps(CHRP_TRAJECTORY *file, size_t *nsteps);
 * @param file A pointer to the file
 * @return The status code
 */
-int chrp_trajectory_close(CHRP_TRAJECTORY *file);
+CHRP_EXPORT int chrp_trajectory_close(CHRP_TRAJECTORY *file);
 
 /******************************************************************************/
 /*!
@@ -185,7 +185,7 @@ int chrp_trajectory_close(CHRP_TRAJECTORY *file);
 * @param natoms the size of the wanted frame
 * @return A pointer to the frame
 */
-CHRP_FRAME* chrp_frame(size_t natoms);
+CHRP_EXPORT CHRP_FRAME* chrp_frame(size_t natoms);
 
 /*!
 * @brief Get the frame size, i.e. the current number of atoms
@@ -193,7 +193,7 @@ CHRP_FRAME* chrp_frame(size_t natoms);
 * @param natoms the number of atoms in the frame
 * @return The status code
 */
-int chrp_frame_size(const CHRP_FRAME* frame, size_t *natoms);
+CHRP_EXPORT int chrp_frame_size(const CHRP_FRAME* frame, size_t *natoms);
 
 /*!
 * @brief Get the positions from a frame
@@ -202,7 +202,7 @@ int chrp_frame_size(const CHRP_FRAME* frame, size_t *natoms);
 * @param size The array size (N).
 * @return The status code
 */
-int chrp_frame_positions(const CHRP_FRAME* frame, float (*data)[3], size_t size);
+CHRP_EXPORT int chrp_frame_positions(const CHRP_FRAME* frame, float (*data)[3], size_t size);
 
 /*!
 * @brief Set the positions of a frame
@@ -211,7 +211,7 @@ int chrp_frame_positions(const CHRP_FRAME* frame, float (*data)[3], size_t size)
 * @param size The array size (N).
 * @return The status code
 */
-int chrp_frame_set_positions(CHRP_FRAME* frame, float (*data)[3], size_t size);
+CHRP_EXPORT int chrp_frame_set_positions(CHRP_FRAME* frame, float (*data)[3], size_t size);
 
 /*!
 * @brief Get the velocities from a frame, if they exists
@@ -220,7 +220,7 @@ int chrp_frame_set_positions(CHRP_FRAME* frame, float (*data)[3], size_t size);
 * @param size The array size (N).
 * @return The status code
 */
-int chrp_frame_velocities(const CHRP_FRAME* frame, float (*data)[3], size_t size);
+CHRP_EXPORT int chrp_frame_velocities(const CHRP_FRAME* frame, float (*data)[3], size_t size);
 
 /*!
 * @brief Set the velocities of a frame.
@@ -229,7 +229,7 @@ int chrp_frame_velocities(const CHRP_FRAME* frame, float (*data)[3], size_t size
 * @param size The array size (N).
 * @return The status code
 */
-int chrp_frame_set_velocities(CHRP_FRAME* frame, float (*data)[3], size_t size);
+CHRP_EXPORT int chrp_frame_set_velocities(CHRP_FRAME* frame, float (*data)[3], size_t size);
 
 /*!
 * @brief Check if a frame has velocity information.
@@ -237,7 +237,7 @@ int chrp_frame_set_velocities(CHRP_FRAME* frame, float (*data)[3], size_t size);
 * @param has_vel true if the frame has velocities, false otherwise.
 * @return The status code
 */
-int chrp_frame_has_velocities(const CHRP_FRAME* frame, bool *has_vel);
+CHRP_EXPORT int chrp_frame_has_velocities(const CHRP_FRAME* frame, bool *has_vel);
 
 /*!
 * @brief Set the UnitCell of a Frame.
@@ -245,7 +245,7 @@ int chrp_frame_has_velocities(const CHRP_FRAME* frame, bool *has_vel);
 * @param cell The new cell
 * @return The status code
 */
-int chrp_frame_set_cell(CHRP_FRAME* frame, const CHRP_CELL* cell);
+CHRP_EXPORT int chrp_frame_set_cell(CHRP_FRAME* frame, const CHRP_CELL* cell);
 
 /*!
 * @brief Set the Topology of a Frame.
@@ -253,7 +253,7 @@ int chrp_frame_set_cell(CHRP_FRAME* frame, const CHRP_CELL* cell);
 * @param topology The new topology
 * @return The status code
 */
-int chrp_frame_set_topology(CHRP_FRAME* frame, const CHRP_TOPOLOGY* topology);
+CHRP_EXPORT int chrp_frame_set_topology(CHRP_FRAME* frame, const CHRP_TOPOLOGY* topology);
 
 /*!
 * @brief Get the Frame step, i.e. the frame number in the trajectory
@@ -261,7 +261,7 @@ int chrp_frame_set_topology(CHRP_FRAME* frame, const CHRP_TOPOLOGY* topology);
 * @param step This will contains the step number
 * @return The status code
 */
-int chrp_frame_step(const CHRP_FRAME* frame, size_t* step);
+CHRP_EXPORT int chrp_frame_step(const CHRP_FRAME* frame, size_t* step);
 
 /*!
 * @brief Set the Frame step.
@@ -269,7 +269,7 @@ int chrp_frame_step(const CHRP_FRAME* frame, size_t* step);
 * @param step The new frame step
 * @return The status code
 */
-int chrp_frame_set_step(CHRP_FRAME* frame, size_t step);
+CHRP_EXPORT int chrp_frame_set_step(CHRP_FRAME* frame, size_t step);
 
 /*!
 * @brief Try to guess the bonds, angles and dihedrals in the system. If \c bonds
@@ -279,14 +279,14 @@ int chrp_frame_set_step(CHRP_FRAME* frame, size_t step);
 * @param bonds Should we recompute the bonds from the positions or not ?
 * @return The status code
 */
-int chrp_frame_guess_topology(CHRP_FRAME* frame, bool bonds);
+CHRP_EXPORT int chrp_frame_guess_topology(CHRP_FRAME* frame, bool bonds);
 
 /*!
 * @brief Destroy a frame, and free the associated memory
 * @param frame The frame to destroy
 * @return The status code
 */
-int chrp_frame_free(CHRP_FRAME* frame);
+CHRP_EXPORT int chrp_frame_free(CHRP_FRAME* frame);
 
 /******************************************************************************/
 /*!
@@ -294,7 +294,7 @@ int chrp_frame_free(CHRP_FRAME* frame);
 * @param a,b,c the three lenghts of the cell
 * @return A pointer to the UnitCell
 */
-CHRP_CELL* chrp_cell(double a, double b, double c);
+CHRP_EXPORT CHRP_CELL* chrp_cell(double a, double b, double c);
 
 /*!
 * @brief Create a TRICLINIC UnitCell from the three lenghts and the three angles
@@ -302,14 +302,14 @@ CHRP_CELL* chrp_cell(double a, double b, double c);
 * @param alpha,beta,gamma the three angles of the cell
 * @return A pointer to the UnitCell
 */
-CHRP_CELL* chrp_cell_triclinic(double a, double b, double c, double alpha, double beta, double gamma);
+CHRP_EXPORT CHRP_CELL* chrp_cell_triclinic(double a, double b, double c, double alpha, double beta, double gamma);
 
 /*!
 * @brief Get the UnitCell from a frame
 * @param frame the frame
 * @return A pointer to the UnitCell
 */
-CHRP_CELL* chrp_cell_from_frame(CHRP_FRAME* frame);
+CHRP_EXPORT CHRP_CELL* chrp_cell_from_frame(CHRP_FRAME* frame);
 
 /*!
 * @brief Get the cell lenghts.
@@ -317,7 +317,7 @@ CHRP_CELL* chrp_cell_from_frame(CHRP_FRAME* frame);
 * @param a,b,c the three cell lenghts
 * @return The status code
 */
-int chrp_cell_lengths(const CHRP_CELL* cell, double* a, double* b, double* c);
+CHRP_EXPORT int chrp_cell_lengths(const CHRP_CELL* cell, double* a, double* b, double* c);
 
 /*!
 * @brief Set the unit cell lenghts.
@@ -325,7 +325,7 @@ int chrp_cell_lengths(const CHRP_CELL* cell, double* a, double* b, double* c);
 * @param a,b,c the cell lenghts
 * @return The status code
 */
-int chrp_cell_set_lengths(CHRP_CELL* cell, double a, double b, double c);
+CHRP_EXPORT int chrp_cell_set_lengths(CHRP_CELL* cell, double a, double b, double c);
 
 /*!
 * @brief Get the cell angles, in degrees.
@@ -333,7 +333,7 @@ int chrp_cell_set_lengths(CHRP_CELL* cell, double a, double b, double c);
 * @param alpha,beta,gamma the three cell angles
 * @return The status code
 */
-int chrp_cell_angles(const CHRP_CELL* cell, double* alpha, double* beta, double* gamma);
+CHRP_EXPORT int chrp_cell_angles(const CHRP_CELL* cell, double* alpha, double* beta, double* gamma);
 
 /*!
 * @brief Set the cell angles, in degrees
@@ -341,7 +341,7 @@ int chrp_cell_angles(const CHRP_CELL* cell, double* alpha, double* beta, double*
 * @param alpha,beta,gamma the new angles values, in degrees
 * @return The status code
 */
-int chrp_cell_set_angles(CHRP_CELL* cell, double alpha, double beta, double gamma);
+CHRP_EXPORT int chrp_cell_set_angles(CHRP_CELL* cell, double alpha, double beta, double gamma);
 
 /*!
 * @brief Get the unit cell matricial representation.
@@ -349,7 +349,7 @@ int chrp_cell_set_angles(CHRP_CELL* cell, double alpha, double beta, double gamm
 * @param mat the matrix to fill. It should be a 3x3 matrix.
 * @return The status code
 */
-int chrp_cell_matrix(const CHRP_CELL* cell, double mat[3][3]);
+CHRP_EXPORT int chrp_cell_matrix(const CHRP_CELL* cell, double mat[3][3]);
 
 //! Available cell types in Chemharp
 typedef enum CHRP_CELL_TYPES {
@@ -367,7 +367,7 @@ typedef enum CHRP_CELL_TYPES {
 * @param type the type of the cell
 * @return The status code
 */
-int chrp_cell_type(const CHRP_CELL* cell, chrp_cell_type_t* type);
+CHRP_EXPORT int chrp_cell_type(const CHRP_CELL* cell, chrp_cell_type_t* type);
 
 /*!
 * @brief Set the cell type
@@ -375,7 +375,7 @@ int chrp_cell_type(const CHRP_CELL* cell, chrp_cell_type_t* type);
 * @param type the new type of the cell
 * @return The status code
 */
-int chrp_cell_set_type(CHRP_CELL* cell, chrp_cell_type_t type);
+CHRP_EXPORT int chrp_cell_set_type(CHRP_CELL* cell, chrp_cell_type_t type);
 
 /*!
 * @brief Get the cell periodic boundary conditions along the three axis
@@ -383,7 +383,7 @@ int chrp_cell_set_type(CHRP_CELL* cell, chrp_cell_type_t type);
 * @param x,y,z the periodicity of the cell along the three axis.
 * @return The status code
 */
-int chrp_cell_periodicity(const CHRP_CELL* cell, bool* x, bool* y, bool* z);
+CHRP_EXPORT int chrp_cell_periodicity(const CHRP_CELL* cell, bool* x, bool* y, bool* z);
 
 /*!
 * @brief Set the cell periodic boundary conditions along the three axis
@@ -391,14 +391,14 @@ int chrp_cell_periodicity(const CHRP_CELL* cell, bool* x, bool* y, bool* z);
 * @param x,y,z the new periodicity of the cell along the three axis.
 * @return The status code
 */
-int chrp_cell_set_periodicity(CHRP_CELL* cell, bool x, bool y, bool z);
+CHRP_EXPORT int chrp_cell_set_periodicity(CHRP_CELL* cell, bool x, bool y, bool z);
 
 /*!
 * @brief Destroy an unit cell, and free the associated memory
 * @param cell The cell to destroy
 * @return The status code
 */
-int chrp_cell_free(CHRP_CELL* cell);
+CHRP_EXPORT int chrp_cell_free(CHRP_CELL* cell);
 
 /******************************************************************************/
 
@@ -406,14 +406,14 @@ int chrp_cell_free(CHRP_CELL* cell);
 * @brief Create a new empty topology
 * @return A pointer to the new Topology
 */
-CHRP_TOPOLOGY* chrp_topology();
+CHRP_EXPORT CHRP_TOPOLOGY* chrp_topology();
 
 /*!
 * @brief Extract the topology from a frame
 * @param frame The frame
 * @return A pointer to the new Topology
 */
-CHRP_TOPOLOGY* chrp_topology_from_frame(CHRP_FRAME* frame);
+CHRP_EXPORT CHRP_TOPOLOGY* chrp_topology_from_frame(CHRP_FRAME* frame);
 
 /*!
 * @brief Get the topology size, i.e. the current number of atoms
@@ -421,7 +421,7 @@ CHRP_TOPOLOGY* chrp_topology_from_frame(CHRP_FRAME* frame);
 * @param natoms Will contain the number of atoms in the frame
 * @return The status code
 */
-int chrp_topology_size(const CHRP_TOPOLOGY* topology, size_t *natoms);
+CHRP_EXPORT int chrp_topology_size(const CHRP_TOPOLOGY* topology, size_t *natoms);
 
 /*!
 * @brief Add an atom to a topology
@@ -429,7 +429,7 @@ int chrp_topology_size(const CHRP_TOPOLOGY* topology, size_t *natoms);
 * @param atom The atom to be added
 * @return The status code
 */
-int chrp_topology_append(CHRP_TOPOLOGY* topology, CHRP_ATOM* atom);
+CHRP_EXPORT int chrp_topology_append(CHRP_TOPOLOGY* topology, CHRP_ATOM* atom);
 
 /*!
 * @brief Remove an atom from a topology by index
@@ -437,7 +437,7 @@ int chrp_topology_append(CHRP_TOPOLOGY* topology, CHRP_ATOM* atom);
 * @param i The atomic index
 * @return The status code
 */
-int chrp_topology_remove(CHRP_TOPOLOGY* topology, size_t i);
+CHRP_EXPORT int chrp_topology_remove(CHRP_TOPOLOGY* topology, size_t i);
 
 /*!
 * @brief Tell if the atoms \c i and \c j are bonded
@@ -446,7 +446,7 @@ int chrp_topology_remove(CHRP_TOPOLOGY* topology, size_t i);
 * @param result true if the atoms are bonded, false otherwise
 * @return The status code
 */
-int chrp_topology_isbond(CHRP_TOPOLOGY* topology, size_t i, size_t j, bool* result);
+CHRP_EXPORT int chrp_topology_isbond(CHRP_TOPOLOGY* topology, size_t i, size_t j, bool* result);
 
 /*!
 * @brief Tell if the atoms \c i, \c j and \c k constitues an angle
@@ -455,7 +455,7 @@ int chrp_topology_isbond(CHRP_TOPOLOGY* topology, size_t i, size_t j, bool* resu
 * @param result true if the atoms constitues an angle, false otherwise
 * @return The status code
 */
-int chrp_topology_isangle(CHRP_TOPOLOGY* topology,
+CHRP_EXPORT int chrp_topology_isangle(CHRP_TOPOLOGY* topology,
                             size_t i, size_t j, size_t k, bool* result);
 
 /*!
@@ -465,7 +465,7 @@ int chrp_topology_isangle(CHRP_TOPOLOGY* topology,
 * @param result true if the atoms constitues a dihedral angle, false otherwise
 * @return The status code
 */
-int chrp_topology_isdihedral(CHRP_TOPOLOGY* topology,
+CHRP_EXPORT int chrp_topology_isdihedral(CHRP_TOPOLOGY* topology,
                              size_t i, size_t j, size_t k, size_t m, bool* result);
 
 /*!
@@ -474,7 +474,7 @@ int chrp_topology_isdihedral(CHRP_TOPOLOGY* topology,
 * @param nbonds After the call, contains the number of bond
 * @return The status code
 */
-int chrp_topology_bonds_count(CHRP_TOPOLOGY* topology, size_t* nbonds);
+CHRP_EXPORT int chrp_topology_bonds_count(CHRP_TOPOLOGY* topology, size_t* nbonds);
 
 /*!
 * @brief Get the number of angles in the system
@@ -482,7 +482,7 @@ int chrp_topology_bonds_count(CHRP_TOPOLOGY* topology, size_t* nbonds);
 * @param nangles After the call, contains the number of angles
 * @return The status code
 */
-int chrp_topology_angles_count(CHRP_TOPOLOGY* topology, size_t* nangles);
+CHRP_EXPORT int chrp_topology_angles_count(CHRP_TOPOLOGY* topology, size_t* nangles);
 
 /*!
 * @brief Get the number of dihedral angles in the system
@@ -490,7 +490,7 @@ int chrp_topology_angles_count(CHRP_TOPOLOGY* topology, size_t* nangles);
 * @param ndihedrals After the call, contains the number of dihedral angles
 * @return The status code
 */
-int chrp_topology_dihedrals_count(CHRP_TOPOLOGY* topology, size_t* ndihedrals);
+CHRP_EXPORT int chrp_topology_dihedrals_count(CHRP_TOPOLOGY* topology, size_t* ndihedrals);
 
 /*!
 * @brief Get the bonds in the system
@@ -500,7 +500,7 @@ int chrp_topology_dihedrals_count(CHRP_TOPOLOGY* topology, size_t* ndihedrals);
 *               chrp_topology_bonds_count function
 * @return The status code
 */
-int chrp_topology_bonds(CHRP_TOPOLOGY* topology, size_t (*data)[2], size_t nbonds);
+CHRP_EXPORT int chrp_topology_bonds(CHRP_TOPOLOGY* topology, size_t (*data)[2], size_t nbonds);
 
 /*!
 * @brief Get the angles in the system
@@ -510,7 +510,7 @@ int chrp_topology_bonds(CHRP_TOPOLOGY* topology, size_t (*data)[2], size_t nbond
 *               chrp_topology_angles_count function
 * @return The status code
 */
-int chrp_topology_angles(CHRP_TOPOLOGY* topology, size_t (*data)[3], size_t nangles);
+CHRP_EXPORT int chrp_topology_angles(CHRP_TOPOLOGY* topology, size_t (*data)[3], size_t nangles);
 
 /*!
 * @brief Get the dihedral angles in the system
@@ -520,7 +520,7 @@ int chrp_topology_angles(CHRP_TOPOLOGY* topology, size_t (*data)[3], size_t nang
 *               chrp_topology_dihedrals_count function
 * @return The status code
 */
-int chrp_topology_dihedrals(CHRP_TOPOLOGY* topology, size_t (*data)[4], size_t ndihedrals);
+CHRP_EXPORT int chrp_topology_dihedrals(CHRP_TOPOLOGY* topology, size_t (*data)[4], size_t ndihedrals);
 
 /*!
 * @brief Add a bond between the atoms \c i and \c j in the system
@@ -528,7 +528,7 @@ int chrp_topology_dihedrals(CHRP_TOPOLOGY* topology, size_t (*data)[4], size_t n
 * @param i,j The atomic indexes
 * @return The status code
 */
-int chrp_topology_add_bond(CHRP_TOPOLOGY* topology, size_t i, size_t j);
+CHRP_EXPORT int chrp_topology_add_bond(CHRP_TOPOLOGY* topology, size_t i, size_t j);
 
 /*!
 * @brief Remove any existing bond between the atoms \c i and \c j in the system
@@ -536,14 +536,14 @@ int chrp_topology_add_bond(CHRP_TOPOLOGY* topology, size_t i, size_t j);
 * @param i,j The atomic indexes
 * @return The status code
 */
-int chrp_topology_remove_bond(CHRP_TOPOLOGY* topology, size_t i, size_t j);
+CHRP_EXPORT int chrp_topology_remove_bond(CHRP_TOPOLOGY* topology, size_t i, size_t j);
 
 /*!
 * @brief Destroy a topology, and free the associated memory
 * @param topology The topology to destroy
 * @return The status code
 */
-int chrp_topology_free(CHRP_TOPOLOGY* topology);
+CHRP_EXPORT int chrp_topology_free(CHRP_TOPOLOGY* topology);
 
 /******************************************************************************/
 
@@ -552,7 +552,7 @@ int chrp_topology_free(CHRP_TOPOLOGY* topology);
 * @param name The new atom name
 * @return A pointer to the corresponding atom
 */
-CHRP_ATOM* chrp_atom(const char* name);
+CHRP_EXPORT CHRP_ATOM* chrp_atom(const char* name);
 
 /*!
 * @brief Get a specific atom from a frame
@@ -560,7 +560,7 @@ CHRP_ATOM* chrp_atom(const char* name);
 * @param idx The atom index in the frame
 * @return A pointer to the corresponding atom
 */
-CHRP_ATOM* chrp_atom_from_frame(CHRP_FRAME* frame, size_t idx);
+CHRP_EXPORT CHRP_ATOM* chrp_atom_from_frame(CHRP_FRAME* frame, size_t idx);
 
 /*!
 * @brief Get a specific atom from a topology
@@ -568,7 +568,7 @@ CHRP_ATOM* chrp_atom_from_frame(CHRP_FRAME* frame, size_t idx);
 * @param idx The atom index in the topology
 * @return A pointer to the corresponding atom
 */
-CHRP_ATOM* chrp_atom_from_topology(CHRP_TOPOLOGY* topology, size_t idx);
+CHRP_EXPORT CHRP_ATOM* chrp_atom_from_topology(CHRP_TOPOLOGY* topology, size_t idx);
 
 /*!
 * @brief Get the mass of an atom, in atomic mass units
@@ -576,7 +576,7 @@ CHRP_ATOM* chrp_atom_from_topology(CHRP_TOPOLOGY* topology, size_t idx);
 * @param mass The atom mass
 * @return The status code
 */
-int chrp_atom_mass(const CHRP_ATOM* atom, float* mass);
+CHRP_EXPORT int chrp_atom_mass(const CHRP_ATOM* atom, float* mass);
 
 /*!
 * @brief Set the mass of an atom, in atomic mass units
@@ -584,7 +584,7 @@ int chrp_atom_mass(const CHRP_ATOM* atom, float* mass);
 * @param mass The new atom mass
 * @return The status code
 */
-int chrp_atom_set_mass(CHRP_ATOM* atom, float mass);
+CHRP_EXPORT int chrp_atom_set_mass(CHRP_ATOM* atom, float mass);
 
 /*!
 * @brief Get the charge of an atom, in number of the electron charge e
@@ -592,7 +592,7 @@ int chrp_atom_set_mass(CHRP_ATOM* atom, float mass);
 * @param charge The atom charge
 * @return The status code
 */
-int chrp_atom_charge(const CHRP_ATOM* atom, float* charge);
+CHRP_EXPORT int chrp_atom_charge(const CHRP_ATOM* atom, float* charge);
 
 /*!
 * @brief Set the charge of an atom, in number of the electron charge e
@@ -600,7 +600,7 @@ int chrp_atom_charge(const CHRP_ATOM* atom, float* charge);
 * @param charge The new atom charge
 * @return The status code
 */
-int chrp_atom_set_charge(CHRP_ATOM* atom, float charge);
+CHRP_EXPORT int chrp_atom_set_charge(CHRP_ATOM* atom, float charge);
 
 /*!
 * @brief Get the name of an atom
@@ -609,7 +609,7 @@ int chrp_atom_set_charge(CHRP_ATOM* atom, float charge);
 * @param buffsize The size of the string buffer
 * @return The status code
 */
-int chrp_atom_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
+CHRP_EXPORT int chrp_atom_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
 
 /*!
 * @brief Set the name of an atom
@@ -617,7 +617,7 @@ int chrp_atom_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
 * @param name A null terminated string containing the new name
 * @return The status code
 */
-int chrp_atom_set_name(CHRP_ATOM* atom, const char* name);
+CHRP_EXPORT int chrp_atom_set_name(CHRP_ATOM* atom, const char* name);
 
 /*!
 * @brief Try to get the full name of an atom from the short name
@@ -626,7 +626,7 @@ int chrp_atom_set_name(CHRP_ATOM* atom, const char* name);
 * @param buffsize The size of the string buffer
 * @return The status code
 */
-int chrp_atom_full_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
+CHRP_EXPORT int chrp_atom_full_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
 
 /*!
 * @brief Try to get the Van der Waals radius of an atom from the short name
@@ -634,7 +634,7 @@ int chrp_atom_full_name(const CHRP_ATOM* atom, char* name, size_t buffsize);
 * @param radius The Van der Waals radius of the atom or -1 if no value could be found.
 * @return The status code
 */
-int chrp_atom_vdw_radius(const CHRP_ATOM* atom, double* radius);
+CHRP_EXPORT int chrp_atom_vdw_radius(const CHRP_ATOM* atom, double* radius);
 
 /*!
 * @brief Try to get the covalent radius of an atom from the short name
@@ -642,7 +642,7 @@ int chrp_atom_vdw_radius(const CHRP_ATOM* atom, double* radius);
 * @param radius The covalent radius of the atom or -1 if no value could be found.
 * @return The status code
 */
-int chrp_atom_covalent_radius(const CHRP_ATOM* atom, double* radius);
+CHRP_EXPORT int chrp_atom_covalent_radius(const CHRP_ATOM* atom, double* radius);
 
 /*!
 * @brief Try to get the atomic number of an atom from the short name
@@ -650,14 +650,14 @@ int chrp_atom_covalent_radius(const CHRP_ATOM* atom, double* radius);
 * @param number The atomic number, or -1 if no value could be found.
 * @return The status code
 */
-int chrp_atom_atomic_number(const CHRP_ATOM* atom, int* number);
+CHRP_EXPORT int chrp_atom_atomic_number(const CHRP_ATOM* atom, int* number);
 
 /*!
 * @brief Destroy an atom, and free the associated memory
 * @param atom The atom to destroy
 * @return The status code
 */
-int chrp_atom_free(CHRP_ATOM* atom);
+CHRP_EXPORT int chrp_atom_free(CHRP_ATOM* atom);
 
 
 #ifdef __cplusplus
