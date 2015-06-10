@@ -17,7 +17,7 @@ int main() {
 
     // Accumulate the distances to the origin of the 10th atom throughtout the
     // trajectory
-    while (not traj.done()) {
+    while (!traj.done()) {
         traj >> frame;
         // Position of the 10th atom
         auto pos = frame.positions()[9];

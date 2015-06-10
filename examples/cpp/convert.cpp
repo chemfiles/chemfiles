@@ -23,7 +23,7 @@ int main() {
 
     harp::Trajectory output("water.pdb", "w");
 
-    while (not input.done()) {
+    while (!input.done()) {
         input >> frame;
         // Set the frame cell and topology
         frame.cell(cell);

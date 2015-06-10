@@ -75,7 +75,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
     SECTION("Read the whole file"){
         CHECK(file.nsteps() == 397);
 
-        while (not file.done()){
+        while (!file.done()){
             file >> frame;
         }
         auto positions = frame.positions();
