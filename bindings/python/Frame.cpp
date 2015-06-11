@@ -40,6 +40,6 @@ void register_frame() {
         .add_property("step",
             static_cast<size_t (Frame::*)(void) const>(&Frame::step),
             static_cast<void (Frame::*)(size_t)>(&Frame::step))
-        .def("guess", &Frame::guess_topology)
+        .def("guess_topology", &Frame::guess_topology)
     ;
 }
