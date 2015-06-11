@@ -24,7 +24,7 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
 
         CHECK(a3.type() == Atom::CORSE_GRAIN);
         CHECK(a3.name() == "CH4");
-        //TODO: CHECK(a3.mass() == 0);
+        CHECK(a3.mass() == 0);
         CHECK(a3.charge() == 0);
     }
 

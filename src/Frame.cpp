@@ -83,12 +83,12 @@ void Frame::guess_bonds() {
     for (size_t i=0; i<natoms(); i++) {
         float irad = _topology[i].covalent_radius();
         if (irad == -1) {
-            throw Error(""); // TODO
+            throw Error("Missing covalent radius for the atom " + _topology[i].name());
         }
         for (size_t j=0; j<natoms(); j++) {
             float jrad = _topology[j].covalent_radius();
             if (jrad == -1) {
-                throw Error(""); // TODO
+                throw Error("Missing covalent radius for the atom " + _topology[j].name());
             }
             double d = norm(_cell.wrap(_positions[i] - _positions[j]));
             if (d > 0.4 && d < irad + jrad + 0.56) { // This criterium comes from Rasmol

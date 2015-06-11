@@ -84,7 +84,7 @@ int main() {
     assert(!chrp_atom_name(atom, name, sizeof(name)));
     assert(strcmp(name, "Zn") == 0);
 
-    atom = chrp_atom_from_topology(top, 1);
+    atom = chrp_atom_from_frame(frame, 1);
     assert(!chrp_atom_name(atom, name, sizeof(name)));
     assert(strcmp(name, "Ar") == 0);
     chrp_atom_free(atom);

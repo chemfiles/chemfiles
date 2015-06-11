@@ -99,7 +99,6 @@ void XYZFormat::read(File* file, Frame& frame){
         frame.positions()[i] = Vector3D(x, y, z);
         frame.topology().append(Atom(name));
     }
-    // TODO: frame.topology().guess();
 }
 
 void XYZFormat::write(File* file, const Frame& frame){

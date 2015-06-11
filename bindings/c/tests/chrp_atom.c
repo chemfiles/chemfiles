@@ -50,8 +50,3 @@ int main() {
 
     return EXIT_SUCCESS;
 }
-
-/* TODO: Missing functions:
- * chrp_atom_from_frame
- * chrp_atom_from_topology
- */

@@ -23,7 +23,7 @@ class TextFile;
  * @class XYZFormat formats/XYZ.hpp formats/XYZ.cpp
  * @brief XYZ file format reader.
  *
- * TODO: add a reference to the format
+ * The format is described at http://openbabel.org/wiki/XYZ
  */
 class XYZFormat : public Format {
 public:
