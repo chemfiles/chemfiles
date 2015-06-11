@@ -34,7 +34,7 @@ int main() {
         size_t natoms = 0;
         if (i == 0) {
             chrp_frame_size(frame, &natoms);
-            positions = (float(*)[3])malloc(sizeof(float[natoms][3]));
+            positions = (float(*)[3])malloc(natoms*3*sizeof(float));
             if (positions == NULL)
                 goto error;
         }
