@@ -166,7 +166,7 @@ Error and logging functions
 .. f:subroutine:: topology_file(filename[, status])
 
     Set the topology associated with a trajectory by reading the first
-    frame of \c filename; and extracting the topology of this frame.
+    frame of ``filename``; and extracting the topology of this frame.
 
     :parameter string filename: The file to read in order to get the new topology
     :optional integer status [optional]: The status code
@@ -343,7 +343,7 @@ Error and logging functions
 
 .. f:subroutine:: init(a, b, c, alpha, beta, gamma[, status])
 
-    Create an UnitCell from the three lenghts and the three angles
+    Create an ``chrp_cell`` from the three lenghts and the three angles.
 
     :parameter real a: the a cell length, in angstroms
     :parameter real b: the b cell length, in angstroms
@@ -355,7 +355,7 @@ Error and logging functions
 
 .. f:subroutine:: from_frame_init_(frame[, status])
 
-    Get the UnitCell from a frame
+    Get a copy of the ``chrp_cell`` of a frame.
 
     :parameter chrp_frame frame: the frame
     :optional integer status [optional]: The status code
@@ -398,7 +398,15 @@ Error and logging functions
 
 .. f:subroutine:: matrix(mat[, status])
 
-    Get the unit cell matricial representation.
+    Get the unit cell matricial representation, i.e. the representation of the three
+    base vectors arranged as:
+
+    .. code-block:: sh
+
+        | a_x b_x c_x |
+        |  0  b_y c_y |
+        |  0   0  c_z |
+
 
     :parameter real mat [dimension(3, 3)]: the matrix to fill.
     :optional integer status [optional]: The status code
@@ -494,21 +502,21 @@ Error and logging functions
 
 .. f:subroutine:: from_frame(frame[, status])
 
-    Extract the topology from a frame
+    Extract the topology from a frame.
 
     :parameter chrp_frame frame: The frame
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: size(natoms[, status])
 
-    Get the topology size, i.e. the current number of atoms
+    Get the topology size, i.e. the current number of atoms.
 
     :parameter integer natoms: Will contain the number of atoms in the frame
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: append(atom[, status])
 
-    Add an atom to a topology
+    Add an atom at the end of a topology.
 
     :parameter chrp_atom atom: The atom to be added
     :optional integer status [optional]: The status code
@@ -516,7 +524,7 @@ Error and logging functions
 
 .. f:subroutine:: remove(i[, status])
 
-    Remove an atom from a topology by index
+    Remove an atom from a topology by index.
 
     :parameter integer i: The atomic index
     :optional integer status [optional]: The status code

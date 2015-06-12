@@ -11,9 +11,9 @@ Trajectory class
 
 .. py:class:: Trajectory(filename[, mode="r", format=""])
 
-    A trajectory is a file containing informations about the positions of
-    particles during a simulation, and sometimes more. The default constructor
-    open the file at ``filename``, in read mode, with automatic format guessing.
+    A trajectory is a file containing informations about the positions of particles
+    during a simulation, and sometimes other quantities. The default constructor open
+    the file at ``filename``, in read mode, with automatic format guessing.
 
     :param str filename: path to the file to open
     :param str mode: file opening mode. Can be "r" for read mode or "w" for write
@@ -218,7 +218,7 @@ Topology class
 
     The :class:`Topology` class hold data about which atoms are linked together
     to form bonds, angles, *etc.* in a :class:`Frame`. The atoms in a topology
-    are represented by they index in the :class:`Frame`.
+    are represented by they index in the associated :class:`Frame`.
 
     A topology can be indexed, and ``topology[i]`` is the ith :class:`Atom` in
     the topology.

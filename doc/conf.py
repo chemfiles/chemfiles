@@ -24,7 +24,8 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.todo',
     'breathe',
-    'fortran_domain'
+    'fortran_domain',
+    'julia'
 ]
 
 # Breathe projects
