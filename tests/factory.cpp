@@ -5,11 +5,11 @@
 #include "catch.hpp"
 
 #include "Chemharp.hpp"
-#include "TrajectoryFactory.hpp"
-#include "Error.hpp"
-#include "formats/XYZ.hpp"
+#include "chemharp/TrajectoryFactory.hpp"
+#include "chemharp/Error.hpp"
+#include "chemharp/formats/XYZ.hpp"
 
-#include "Frame.hpp"
+#include "chemharp/Frame.hpp"
 using namespace harp;
 
 // Dummy format clase

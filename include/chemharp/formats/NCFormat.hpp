@@ -7,15 +7,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "config.hpp"
+#include "chemharp/config.hpp"
 #if HAVE_NETCDF
 
 #ifndef HARP_FORMAT_NC_HPP
 #define HARP_FORMAT_NC_HPP
 
-#include "Vector3D.hpp"
-#include "Format.hpp"
-#include "TrajectoryFactory.hpp"
+#include "chemharp/Vector3D.hpp"
+#include "chemharp/Format.hpp"
+#include "chemharp/TrajectoryFactory.hpp"
 
 namespace harp {
 

@@ -12,8 +12,8 @@
 
 #include <string>
 
-#include "Format.hpp"
-#include "TrajectoryFactory.hpp"
+#include "chemharp/Format.hpp"
+#include "chemharp/TrajectoryFactory.hpp"
 
 namespace harp {
 

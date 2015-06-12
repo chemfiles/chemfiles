@@ -13,7 +13,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "exports.hpp"
+#include "chemharp/exports.hpp"
 
 namespace harp {
 

@@ -2,7 +2,7 @@
 
 #include "catch.hpp"
 
-#include "config.hpp"
+#include "chemharp/config.hpp"
 #if HAVE_NETCDF
 
 #include "Chemharp.hpp"

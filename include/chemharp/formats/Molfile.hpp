@@ -11,10 +11,10 @@
 #ifndef HARP_FORMAT_MOLFILE_HPP
 #define HARP_FORMAT_MOLFILE_HPP
 
-#include "Format.hpp"
-#include "Dynlib.hpp"
-#include "TrajectoryFactory.hpp"
-#include "Topology.hpp"
+#include "chemharp/Format.hpp"
+#include "chemharp/Dynlib.hpp"
+#include "chemharp/TrajectoryFactory.hpp"
+#include "chemharp/Topology.hpp"
 
 #include <memory>
 

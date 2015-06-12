@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "Dynlib.hpp"
+#include "chemharp/Dynlib.hpp"
 using namespace harp;
 
 TEST_CASE("Dynamic library loading", "[Dynlib]"){

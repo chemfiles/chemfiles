@@ -13,7 +13,7 @@
 
 #include <string>
 #include <sstream>
-#include "Error.hpp"
+#include "chemharp/Error.hpp"
 
 #ifdef WIN32
     #include <direct.h>

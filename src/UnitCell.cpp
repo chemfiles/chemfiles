@@ -10,9 +10,9 @@
 #include <cassert>
 #include <cmath>
 
-#include "UnitCell.hpp"
-#include "Error.hpp"
-#include "Vector3D.hpp"
+#include "chemharp/UnitCell.hpp"
+#include "chemharp/Error.hpp"
+#include "chemharp/Vector3D.hpp"
 using namespace harp;
 
 // Sinus and Cosine for degree values

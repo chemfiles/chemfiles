@@ -9,9 +9,9 @@
 
 #include <iostream>
 
-#include "Frame.hpp"
-#include "Logger.hpp"
-#include "Error.hpp"
+#include "chemharp/Frame.hpp"
+#include "chemharp/Logger.hpp"
+#include "chemharp/Error.hpp"
 
 using namespace harp;
 

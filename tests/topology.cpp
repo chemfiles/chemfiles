@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
 #define private public
-#include "Topology.hpp"
+#include "chemharp/Topology.hpp"
 #undef private
 
 #include "Chemharp.hpp"

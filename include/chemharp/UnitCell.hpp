@@ -15,7 +15,7 @@
 #endif
 
 #include <array>
-#include "exports.hpp"
+#include "chemharp/exports.hpp"
 
 namespace harp {
 

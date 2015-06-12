@@ -1,8 +1,8 @@
 #include "catch.hpp"
 
 #include "Chemharp.hpp"
-#include "Frame.hpp"
-#include "UnitCell.hpp"
+#include "chemharp/Frame.hpp"
+#include "chemharp/UnitCell.hpp"
 
 using namespace harp;
 

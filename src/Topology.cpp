@@ -7,8 +7,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "Topology.hpp"
-#include "Error.hpp"
+#include "chemharp/Topology.hpp"
+#include "chemharp/Error.hpp"
 #include <algorithm>
 
 using namespace harp;

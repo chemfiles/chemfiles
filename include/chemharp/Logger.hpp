@@ -17,7 +17,7 @@
 #include <string>
 #include <ostream>
 
-#include "exports.hpp"
+#include "chemharp/exports.hpp"
 
 namespace harp {
 

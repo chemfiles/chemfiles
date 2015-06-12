@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "files/BasicFile.hpp"
+#include "chemharp/files/BasicFile.hpp"
 #include <algorithm>
 
 using namespace harp;

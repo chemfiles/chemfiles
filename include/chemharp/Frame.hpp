@@ -10,10 +10,10 @@
 #ifndef HARP_FRAME_HPP
 #define HARP_FRAME_HPP
 
-#include "Vector3D.hpp"
-#include "Topology.hpp"
-#include "UnitCell.hpp"
-#include "exports.hpp"
+#include "chemharp/Vector3D.hpp"
+#include "chemharp/Topology.hpp"
+#include "chemharp/UnitCell.hpp"
+#include "chemharp/exports.hpp"
 
 namespace harp {
 

@@ -7,8 +7,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "Atom.hpp"
-#include "periodic.hpp"
+#include "chemharp/Atom.hpp"
+#include "chemharp/periodic.hpp"
 
 using namespace harp;
 

@@ -7,9 +7,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "Format.hpp"
-#include "Frame.hpp"
-#include "Error.hpp"
+#include "chemharp/Format.hpp"
+#include "chemharp/Frame.hpp"
+#include "chemharp/Error.hpp"
 using namespace harp;
 
 void Format::read_step(File*, const size_t, Frame&){

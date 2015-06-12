@@ -7,10 +7,10 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "Trajectory.hpp"
-#include "TrajectoryFactory.hpp"
-#include "Logger.hpp"
-#include "files/BasicFile.hpp"
+#include "chemharp/Trajectory.hpp"
+#include "chemharp/TrajectoryFactory.hpp"
+#include "chemharp/Logger.hpp"
+#include "chemharp/files/BasicFile.hpp"
 
 #include <boost/filesystem.hpp>
 using namespace boost::filesystem;

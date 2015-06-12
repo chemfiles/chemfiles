@@ -13,8 +13,8 @@
 #include <unordered_map>
 #include <memory>
 
-#include "Format.hpp"
-#include "Error.hpp"
+#include "chemharp/Format.hpp"
+#include "chemharp/Error.hpp"
 
 namespace harp {
 

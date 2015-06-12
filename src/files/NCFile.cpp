@@ -6,12 +6,12 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-#include "config.hpp"
+#include "chemharp/config.hpp"
 #if HAVE_NETCDF
 
-#include "files/NCFile.hpp"
-#include "Error.hpp"
-#include "Logger.hpp"
+#include "chemharp/files/NCFile.hpp"
+#include "chemharp/Error.hpp"
+#include "chemharp/Logger.hpp"
 using namespace harp;
 using namespace netCDF;
 using std::string;

@@ -7,15 +7,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "config.hpp"
+#include "chemharp/config.hpp"
 #if HAVE_NETCDF
 
-#include "formats/NCFormat.hpp"
+#include "chemharp/formats/NCFormat.hpp"
 
-#include "Error.hpp"
-#include "Logger.hpp"
-#include "Frame.hpp"
-#include "files/NCFile.hpp"
+#include "chemharp/Error.hpp"
+#include "chemharp/Logger.hpp"
+#include "chemharp/Frame.hpp"
+#include "chemharp/files/NCFile.hpp"
 using namespace harp;
 using namespace netCDF;
 

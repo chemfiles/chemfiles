@@ -15,7 +15,7 @@
 #include <vector>
 #include <map>
 
-#include "exports.hpp"
+#include "chemharp/exports.hpp"
 
 namespace harp {
 

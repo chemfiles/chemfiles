@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
 #include "Chemharp.hpp"
-#include "Atom.hpp"
+#include "chemharp/Atom.hpp"
 using namespace harp;
 
 

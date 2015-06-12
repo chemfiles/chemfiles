@@ -86,8 +86,8 @@ include_directories(include)
 file(GLOB_RECURSE sources src/**.cpp)
 
 configure_file (
-  "${PROJECT_SOURCE_DIR}/include/config.in.hpp"
-  "${PROJECT_SOURCE_DIR}/include/config.hpp"
+  "${PROJECT_SOURCE_DIR}/include/chemharp/config.in.hpp"
+  "${PROJECT_SOURCE_DIR}/include/chemharp/config.hpp"
 )
 
 set(CHEMHARP_PREFIX "")
@@ -124,7 +124,7 @@ set_property(TARGET chemharp PROPERTY SOVERSION ${CHRP_VERSION})
 include(GenerateExportHeader)
 generate_export_header(chemharp
           BASE_NAME CHRP
-          EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/exports.hpp
+          EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/chemharp/exports.hpp
 )
 
 target_link_libraries(chemharp ${Boost_LIBRARIES} ${OTHER_CHRP_LIBRARIES})
@@ -141,10 +141,10 @@ add_definitions("-DCHRP_MOLFILES_DIR=\"${CMAKE_INSTALL_PREFIX}/molfiles/\"")
 # Installation configuration
 #==============================================================================#
 
-file(GLOB_RECURSE headers include/**.hpp ${CMAKE_BINARY_DIR}/include/exports.hpp)
+file(GLOB_RECURSE headers include/chemharp/*.hpp ${CMAKE_BINARY_DIR}/include/chemharp/exports.hpp)
 
 # All headers
-install(FILES ${headers} DESTINATION include/chemharp)
+install(FILES ${headers} DESTINATION include/chemharp/)
 # C++ main headers
 install(FILES "${CMAKE_BINARY_DIR}/Chemharp.install.hpp" DESTINATION include RENAME Chemharp.hpp)
 # C main header

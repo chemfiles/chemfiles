@@ -10,12 +10,12 @@
 #include <sstream>
 #include <cassert>
 
-#include "formats/XYZ.hpp"
+#include "chemharp/formats/XYZ.hpp"
 
-#include "Error.hpp"
-#include "Logger.hpp"
-#include "Frame.hpp"
-#include "File.hpp"
+#include "chemharp/Error.hpp"
+#include "chemharp/Logger.hpp"
+#include "chemharp/Frame.hpp"
+#include "chemharp/File.hpp"
 
 using namespace harp;
 

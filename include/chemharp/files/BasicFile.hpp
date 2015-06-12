@@ -10,7 +10,7 @@
 #ifndef HARP_BASIC_FILES_HPP
 #define HARP_BASIC_FILES_HPP
 
-#include "File.hpp"
+#include "chemharp/File.hpp"
 
 namespace harp {
 

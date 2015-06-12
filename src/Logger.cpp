@@ -10,7 +10,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "Logger.hpp"
+#include "chemharp/Logger.hpp"
 using namespace harp;
 
 // No-op buffer for no-op stream

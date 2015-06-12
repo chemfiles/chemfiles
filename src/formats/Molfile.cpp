@@ -10,9 +10,9 @@
 #include <map>
 #include <cstdlib>
 
-#include "formats/Molfile.hpp"
-#include "Frame.hpp"
-#include "Topology.hpp"
+#include "chemharp/formats/Molfile.hpp"
+#include "chemharp/Frame.hpp"
+#include "chemharp/Topology.hpp"
 using namespace harp;
 
 /******************************************************************************/

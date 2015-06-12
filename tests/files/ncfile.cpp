@@ -5,11 +5,11 @@
 
 #include "catch.hpp"
 
-#include "config.hpp"
+#include "chemharp/config.hpp"
 #if HAVE_NETCDF
 
 #include "Chemharp.hpp"
-#include "files/NCFile.hpp"
+#include "chemharp/files/NCFile.hpp"
 using namespace harp;
 
 #define FILESDIR SRCDIR "/data/"

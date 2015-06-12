@@ -16,8 +16,8 @@
 #include <unordered_set>
 #include <functional>
 
-#include "Atom.hpp"
-#include "exports.hpp"
+#include "chemharp/Atom.hpp"
+#include "chemharp/exports.hpp"
 
 namespace harp {
 

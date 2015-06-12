@@ -10,7 +10,7 @@
 #ifndef HARP_FILES_HPP
 #define HARP_FILES_HPP
 
-#include "Error.hpp"
+#include "chemharp/Error.hpp"
 
 #include <string>
 #include <vector>

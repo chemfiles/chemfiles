@@ -13,8 +13,8 @@
 #include <memory>
 #include <string>
 
-#include "Frame.hpp"
-#include "exports.hpp"
+#include "chemharp/Frame.hpp"
+#include "chemharp/exports.hpp"
 
 namespace harp {
 

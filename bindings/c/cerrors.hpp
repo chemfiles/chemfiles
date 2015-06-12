@@ -15,7 +15,7 @@
 #define HARP_CAPI_ERRORS_H
 
 #include <string>
-#include "Logger.hpp"
+#include "chemharp/Logger.hpp"
 
 namespace harp {
 

@@ -18,7 +18,7 @@
 #define HARP_CAPI_H
 
 #define CHEMHARP_PUBLIC
-    #include "config.hpp"
+    #include "chemharp/config.hpp"
 #undef CHEMHARP_PUBLIC
 
 #ifdef __cplusplus
