@@ -114,3 +114,27 @@ Write frames (convert.f90)
 .. literalinclude:: ../examples/fortran/convert.f90
    :language: fortran
    :lines: 4-
+
+Julia examples
+^^^^^^^^^^^^^^
+
+Read a single frame (indexes.jl)
+--------------------------------
+
+.. literalinclude:: ../examples/julia/indexes.jl
+   :language: julia
+   :lines: 4-
+
+Read Multiple frames (rmsd.jl)
+------------------------------
+
+.. literalinclude:: ../examples/julia/rmsd.jl
+   :language: julia
+   :lines: 4-
+
+Write frames (convert.jl)
+-------------------------
+
+.. literalinclude:: ../examples/julia/convert.jl
+   :language: julia
+   :lines: 4-
