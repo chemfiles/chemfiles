@@ -3,7 +3,7 @@ function(chrp_cpp_test _file_)
     add_executable(${_name_} ${_file_} $<TARGET_OBJECTS:catch>)
     target_link_libraries(${_name_} chemharp)
     set_property(TARGET ${_name_} PROPERTY CXX_STANDARD 11)
-    add_test(${_name_} ${_name_})
+    add_test(NAME ${_name_} COMMAND ${_name_} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 endfunction()
 
 if(BUILD_TESTS)

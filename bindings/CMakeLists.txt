@@ -7,7 +7,7 @@ function(chrp_c_test _file_)
     set(_name_ "c-${_name_}")
     add_executable(${_name_} ${_file_})
     target_link_libraries(${_name_} chemharp)
-    add_test(NAME ${_name_} COMMAND ${_name_})
+    add_test(NAME ${_name_} COMMAND ${_name_} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 endfunction()
 
 if(BUILD_TESTS)
