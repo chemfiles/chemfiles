@@ -1,3 +1,8 @@
+# 0.3
+
+* Julia binding
+* Initial Windows support, with both MSVC and mingw
+
 # 0.2
 
 * Add basic geometrical operations on vectors and implement basic periodic boundaries condition with the `UnitCell::wrap` function;

@@ -60,12 +60,22 @@ The Chemharp library tries to:
  - Bindings to the most used scientific languages:  Python, C, Fortran 95;
  - Work with binary formats, if the corresponding libraries are available.
 
-## Planned Features
+## Compilers, architecture and OS support
 
- - Binding to even more languages: Julia, Lua, …
- - More formats !
- - More speed !
- - Support for other files types: very big files, over network, compressed text files.
+Chemharp have been tested on the following platforms, with the following compilers :
+
+ - Linux (64 bit)
+    * GCC: gcc/g++/gfortran 4.9.2
+ - OS X (64 bit)
+    * GCC: gcc/g++/gfortran 4.9.2
+    * LLVM: clang/clang++ 3.5
+    * Intel: icc/icpc/ifort 14
+ - Windows (32 bit) (only the C++ and C interfaces have been tested)
+    * MSVC 2015rc (MSVC 2013 DO NOT work)
+    * mingw64 gcc/g++ 4.9.2
+
+If you manage to compile Chemharp on any other OS/compiler/architecture
+combination, please let me know so that I can add it to this list.
 
 ## File formats
 
