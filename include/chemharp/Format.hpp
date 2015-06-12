@@ -34,6 +34,7 @@ public:
     * @brief Read a specific step from the internal file.
     * @param file The file to read from.
     * @param step The step to read
+    * @param frame The frame to fill
     *
     * This function can throw an exception in case of error.
     */
@@ -42,6 +43,7 @@ public:
     /*!
     * @brief Read a specific step from a file.
     * @param file The file to read from.
+    * @param frame The frame to fill
     *
     * This function can throw an exception in case of error. The cursor is
     * assumed to be at the right position in case of text files.
