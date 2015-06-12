@@ -279,7 +279,7 @@ Topology class
 
         Tell if the atoms ``i``, ``j`` and ``k`` are linked together as an angle.
         They will form an angle if and only if ``i`` is linked to ``j``, and ``j``
-        is linked to ``k``; with i ≠ k.
+        is linked to ``k``; with $i \neq k$.
 
         :param int i: the index of the first atom of the angle
         :param int j: the index of the second atom of the angle

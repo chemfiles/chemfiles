@@ -195,12 +195,9 @@ latex_elements = {
 #'preamble': '',
 }
 
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title,
-#  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   ('index', 'Chemharp.tex', u'Chemharp Documentation',
-   u'Guillaume Fraux', 'manual'),
+   u'Guillaume Fraux', 'howto'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
