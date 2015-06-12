@@ -113,10 +113,10 @@ Error and logging functions
 
     :field subroutine open:
     :field subroutine read:
-    :field subroutine read_at:
+    :field subroutine read_step:
     :field subroutine write:
-    :field subroutine topology:
-    :field subroutine topology_file:
+    :field subroutine set_topology:
+    :field subroutine set_topology_file:
     :field subroutine cell:
     :field subroutine nstep:
     :field subroutine close:
@@ -139,7 +139,7 @@ Error and logging functions
     :parameter chrp_frame frame: A frame to fill with the data
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: read_at(step, frame[, status])
+.. f:subroutine:: read_step(step, frame[, status])
 
     Read a specific step of the trajectory in a frame
 
@@ -154,7 +154,7 @@ Error and logging functions
     :parameter chrp_frame frame: the frame which will be writen to the file
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: topology(topology[, status])
+.. f:subroutine:: set_topology(topology[, status])
 
     Set the topology associated with a trajectory. This topology will be
     used when reading and writing the files, replacing any topology in the
@@ -163,7 +163,7 @@ Error and logging functions
     :parameter chrp_topology topology: The new topology to use
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: topology_file(filename[, status])
+.. f:subroutine:: set_topology_file(filename[, status])
 
     Set the topology associated with a trajectory by reading the first
     frame of ``filename``; and extracting the topology of this frame.
@@ -207,14 +207,14 @@ Error and logging functions
     :field subroutine init:
     :field subroutine size:
     :field subroutine positions:
-    :field subroutine positions_set:
+    :field subroutine set_positions:
     :field subroutine velocities:
-    :field subroutine velocities_set:
+    :field subroutine set_velocities:
     :field subroutine has_velocities:
-    :field subroutine cell_set:
-    :field subroutine topology_set:
+    :field subroutine set_cell:
+    :field subroutine set_topology:
     :field subroutine step:
-    :field subroutine step_set:
+    :field subroutine set_step:
     :field subroutine free:
 
 .. f:subroutine:: init(natoms[, status])
@@ -240,7 +240,7 @@ Error and logging functions
     :parameter integer size: The array size (N).
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: positions_set(data, size[, status])
+.. f:subroutine:: set_positions(data, size[, status])
 
     Set the positions of a frame
 
@@ -257,7 +257,7 @@ Error and logging functions
     :parameter integer size: The array size (N).
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: velocities_set(data, size[, status])
+.. f:subroutine:: set_velocities(data, size[, status])
 
     Set the velocities of a frame.
 
@@ -272,14 +272,14 @@ Error and logging functions
     :parameter logical has_vel: ``.true.`` if the frame has velocities, ``.false.`` otherwise.
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: cell_set(cell[, status])
+.. f:subroutine:: set_cell(cell[, status])
 
     Set the UnitCell of a Frame.
 
     :parameter chrp_cell cell: The new unit cell
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: topology_set(topology[, status])
+.. f:subroutine:: set_topology(topology[, status])
 
     Set the Topology of a Frame.
 
@@ -293,7 +293,7 @@ Error and logging functions
     :parameter integer step: This will contains the step number
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: step_set(step[, status])
+.. f:subroutine:: set_step(step[, status])
 
     Set the Frame step.
 
@@ -328,14 +328,14 @@ Error and logging functions
     :field subroutine init:
     :field subroutine from_frame:
     :field subroutine lengths:
-    :field subroutine lengths_set:
+    :field subroutine set_lengths:
     :field subroutine angles:
-    :field subroutine angles_set:
+    :field subroutine set_angles:
     :field subroutine matrix:
     :field subroutine type:
-    :field subroutine type_set:
+    :field subroutine set_type:
     :field subroutine periodicity:
-    :field subroutine periodicity_set:
+    :field subroutine set_periodicity:
     :field subroutine free:
 
     The initialization routine are ``init`` and ``from_frame``.
@@ -369,7 +369,7 @@ Error and logging functions
     :parameter real c: the c cell length, in angstroms
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: lengths_set(a, b, c[, status])
+.. f:subroutine:: set_lengths(a, b, c[, status])
 
     Set the unit cell lenghts.
 
@@ -387,7 +387,7 @@ Error and logging functions
     :parameter real gamma: the gamma angles, in degrees
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: angles_set(alpha, beta, gamma[, status])
+.. f:subroutine:: set_angles(alpha, beta, gamma[, status])
 
     Set the cell angles, in degrees
 
@@ -432,7 +432,7 @@ Error and logging functions
 
             Cell type when there is no periodic boundary conditions
 
-.. f:subroutine:: type_set(type[, status])
+.. f:subroutine:: set_type(type[, status])
 
     Set the cell type
 
@@ -448,7 +448,7 @@ Error and logging functions
     :parameter logical z: the periodicity of the cell along the z axis.
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: periodicity_set(x, y, z[, status])
+.. f:subroutine:: set_periodicity(x, y, z[, status])
 
     Set the cell periodic boundary conditions along the three axis
 
@@ -646,11 +646,11 @@ Error and logging functions
     :field subroutine from_frame:
     :field subroutine from_topology:
     :field subroutine mass:
-    :field subroutine mass_set:
+    :field subroutine set_mass:
     :field subroutine charge:
-    :field subroutine charge_set:
+    :field subroutine set_charge:
     :field subroutine name:
-    :field subroutine name_set:
+    :field subroutine set_name:
     :field subroutine full_name:
     :field subroutine vdw_radius:
     :field subroutine covalent_radius:
@@ -689,7 +689,7 @@ Error and logging functions
     :parameter real mass: The atom mass
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: mass_set(mass[, status])
+.. f:subroutine:: set_mass(mass[, status])
 
     Set the mass of an atom, in atomic mass units
 
@@ -703,7 +703,7 @@ Error and logging functions
     :parameter real charge: The atom charge
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: charge_set(charge[, status])
+.. f:subroutine:: set_charge(charge[, status])
 
     Set the charge of an atom, in number of the electron charge e
 
@@ -718,7 +718,7 @@ Error and logging functions
     :parameter buffsize: The lenght of the string ``name``
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: name_set(name[, status])
+.. f:subroutine:: set_name(name[, status])
 
     Set the name of an atom
 

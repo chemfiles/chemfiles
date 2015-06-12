@@ -50,13 +50,13 @@ associated with the file.
 
 .. doxygenfunction:: chrp_trajectory_read
 
-.. doxygenfunction:: chrp_trajectory_read_at
+.. doxygenfunction:: chrp_trajectory_read_step
 
 .. doxygenfunction:: chrp_trajectory_write
 
-.. doxygenfunction:: chrp_trajectory_topology
+.. doxygenfunction:: chrp_trajectory_set_topology
 
-.. doxygenfunction:: chrp_trajectory_topology_file
+.. doxygenfunction:: chrp_trajectory_set_topology_file
 
 .. doxygenfunction:: chrp_trajectory_nsteps
 
@@ -73,21 +73,21 @@ Function manipulating ``CHRP_FRAME``
 
 .. doxygenfunction:: chrp_frame_positions
 
-.. doxygenfunction:: chrp_frame_positions_set
+.. doxygenfunction:: chrp_frame_set_positions
 
 .. doxygenfunction:: chrp_frame_has_velocities
 
 .. doxygenfunction:: chrp_frame_velocities
 
-.. doxygenfunction:: chrp_frame_velocities_set
+.. doxygenfunction:: chrp_frame_set_velocities
 
-.. doxygenfunction:: chrp_frame_cell_set
+.. doxygenfunction:: chrp_frame_set_cell
 
-.. doxygenfunction:: chrp_frame_topology_set
+.. doxygenfunction:: chrp_frame_set_topology
 
 .. doxygenfunction:: chrp_frame_step
 
-.. doxygenfunction:: chrp_frame_step_set
+.. doxygenfunction:: chrp_frame_set_step
 
 .. doxygenfunction:: chrp_frame_guess_topology
 
@@ -104,11 +104,11 @@ Function manipulating ``CHRP_CELL``
 
 .. doxygenfunction:: chrp_cell_lengths
 
-.. doxygenfunction:: chrp_cell_lengths_set
+.. doxygenfunction:: chrp_cell_set_lengths
 
 .. doxygenfunction:: chrp_cell_angles
 
-.. doxygenfunction:: chrp_cell_angles_set
+.. doxygenfunction:: chrp_cell_set_angles
 
 .. doxygenfunction:: chrp_cell_matrix
 
@@ -116,11 +116,11 @@ Function manipulating ``CHRP_CELL``
 
 .. doxygenfunction:: chrp_cell_type
 
-.. doxygenfunction:: chrp_cell_type_set
+.. doxygenfunction:: chrp_cell_set_type
 
 .. doxygenfunction:: chrp_cell_periodicity
 
-.. doxygenfunction:: chrp_cell_periodicity_set
+.. doxygenfunction:: chrp_cell_set_periodicity
 
 .. doxygenfunction:: chrp_cell_free
 
@@ -176,15 +176,15 @@ Function manipulating ``CHRP_ATOM``
 
 .. doxygenfunction:: chrp_atom_mass
 
-.. doxygenfunction:: chrp_atom_mass_set
+.. doxygenfunction:: chrp_atom_set_mass
 
 .. doxygenfunction:: chrp_atom_charge
 
-.. doxygenfunction:: chrp_atom_charge_set
+.. doxygenfunction:: chrp_atom_set_charge
 
 .. doxygenfunction:: chrp_atom_name
 
-.. doxygenfunction:: chrp_atom_name_set
+.. doxygenfunction:: chrp_atom_set_name
 
 .. doxygenfunction:: chrp_atom_full_name
 

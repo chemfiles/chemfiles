@@ -25,7 +25,7 @@ Trajectory class
 
         :return: the next :class:`Frame` in the trajectory
 
-    .. py:method:: read_at(idx)
+    .. py:method:: read_step(idx)
 
         :param int idx: the index to be read
         :return: the :class:`Frame` at index ``idx`` in the trajectory
@@ -59,8 +59,8 @@ Trajectory class
         used when reading and writing the files, replacing any topology in the
         frames or files.
 
-        If ``new_topology`` is a :class:`Topology`, it is used directly, and if it is the
-        path to a trajectory file, the Topology associated with the first frame
+        If ``new_topology`` is a :class:`Topology`, it is used directly, and if it is
+        the path to a trajectory file, the Topology associated with the first frame
         of this trajectory file is used.
 
     .. py:method:: cell(new_cell)
