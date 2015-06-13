@@ -21,7 +21,12 @@ Such optional libraries are listed here:
   It is available in all the package managers.
 
 Finally, Chemharp needs uses the `CMake`_ build system, which is also available
-in all the package managers. All these dependencies can be installed in one command:
+in all the package managers.
+
+On UNIX-like systems (Linux, OS X, ...)
+"""""""""""""""""""""""""""""""""""""""
+
+All these dependencies can be installed in one command:
 
 .. code-block:: bash
 
@@ -40,6 +45,27 @@ in all the package managers. All these dependencies can be installed in one comm
 .. _Boost: http://boost.org/
 .. _NetCDF: http://www.unidata.ucar.edu/software/netcdf/
 .. _CMake: http://cmake.org/
+
+On Windows
+""""""""""
+
+You can use either MSVC 2015-rc compiler, or `mingw-w64`_ provided gcc. `MSYS2`_ offer
+a package manager to install all the needed libraries. I recomend using it if you
+have no preference over your compiler. After the initial installation steps, you can
+run the following to install most of the dependencies :
+
+.. code-block:: bash
+
+    # On 64-bits windows
+    pacman -S mingw64/mingw-w64-x86_64-gcc mingw64/mingw-w64-x86_64-boost
+
+    # On 32-bits windows
+    pacman -S mingw32/mingw-w64-i686-gcc mingw32/mingw-w64-i686-boost
+
+You will also need to install cmake, which can be found `here <http://www.cmake.org/download/>`_.
+
+.. _mingw-w64: http://mingw-w64.org/doku.php
+.. _MSYS2: http://msys2.github.io/
 
 Build steps
 -----------
