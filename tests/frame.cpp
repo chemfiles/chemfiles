@@ -85,7 +85,6 @@ TEST_CASE("Frame class usage", "[Frame]"){
 
     SECTION("Guess bonds"){
         Trajectory file(SRCDIR "/data/xyz/methane.xyz");
-        Frame frame;
 
         file >> frame;
         frame.guess_topology();
