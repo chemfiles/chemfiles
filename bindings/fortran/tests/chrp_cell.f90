@@ -2,8 +2,8 @@ program cell_test
     use iso_fortran_env, only: real64
     use chemharp
     use testing
-    implicit none
 
+    implicit none
     type(chrp_cell) :: cell
     real(kind=real64) :: a, b, c
     real(kind=real64), dimension(3, 3) :: expected_mat, mat

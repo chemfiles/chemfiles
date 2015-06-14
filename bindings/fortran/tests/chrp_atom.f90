@@ -2,8 +2,8 @@ program atom_test
     use iso_fortran_env, only: real32, real64, int32
     use chemharp
     use testing
-    implicit none
 
+    implicit none
     type(chrp_atom) :: atom
     real(kind=real32) :: mass = 0, charge = 0
     real(kind=real64) :: radius = 0
