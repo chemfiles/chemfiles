@@ -3,12 +3,16 @@
 <div align="center">
    <a href="http://chemfiles.readthedocs.org">
       <img alt="Documentation"
-      src="https://readthedocs.org/projects/chemfiles/badge/?version=latest"></img>
+      src="https://readthedocs.org/projects/chemfiles/badge/?version=latest" />
    </a>
    <a href="https://travis-ci.org/chemfiles/chemfiles">
       <img alt="Build Status"
-      src="https://img.shields.io/travis/chemfiles/chemfiles/master.svg"></img>
+      src="https://img.shields.io/travis/chemfiles/chemfiles/master.svg" />
    </a>
+    <a href="https://ci.appveyor.com/project/Luthaf/chemharp/branch/master">
+       <img alt="Build Status -- Windows"
+       src="https://ci.appveyor.com/api/projects/status/v3sixf2si6507xg7/branch/master?svg=true" />
+    </a>
    <a href="http://codecov.io/github/chemfiles/chemfiles?branch=master">
     <img alt="Code Coverage"
          src="http://codecov.io/github/chemfiles/chemfiles/coverage.svg?branch=master"/>
@@ -16,10 +20,10 @@
    <hr />
    <a href="https://github.com/chemfiles/chemfiles/releases">
       <img alt="Latest release"
-      src="https://img.shields.io/github/release/chemfiles/chemfiles.svg"></img>
+      src="https://img.shields.io/github/release/chemfiles/chemfiles.svg" />
    </a>
    <a href="https://github.com/chemfiles/chemfiles/blob/master/LICENCE.txt">
-      <img alt="License" src="https://img.shields.io/github/license/chemfiles/chemfiles.svg"></img>
+      <img alt="License" src="https://img.shields.io/github/license/chemfiles/chemfiles.svg" />
    </a>
 </div>
 
