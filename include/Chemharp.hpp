@@ -20,16 +20,16 @@
 // This will be used as a protection to prevent internal macro from being exported
 #define CHEMHARP_PUBLIC
 
-#include "chemharp/@CHEMHARP_PREFIX@config.hpp"
+#include "chemharp/config.hpp"
 
-#include "chemharp/@CHEMHARP_PREFIX@Logger.hpp"
-#include "chemharp/@CHEMHARP_PREFIX@Error.hpp"
+#include "chemharp/Logger.hpp"
+#include "chemharp/Error.hpp"
 
-#include "chemharp/@CHEMHARP_PREFIX@Atom.hpp"
-#include "chemharp/@CHEMHARP_PREFIX@Topology.hpp"
-#include "chemharp/@CHEMHARP_PREFIX@Frame.hpp"
-#include "chemharp/@CHEMHARP_PREFIX@UnitCell.hpp"
-#include "chemharp/@CHEMHARP_PREFIX@Trajectory.hpp"
+#include "chemharp/Atom.hpp"
+#include "chemharp/Topology.hpp"
+#include "chemharp/Frame.hpp"
+#include "chemharp/UnitCell.hpp"
+#include "chemharp/Trajectory.hpp"
 
 #undef CHEMHARP_PUBLIC
 

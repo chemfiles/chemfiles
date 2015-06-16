@@ -95,17 +95,6 @@ configure_file (
   "${PROJECT_SOURCE_DIR}/include/chemharp/config.hpp"
 )
 
-set(CHEMHARP_PREFIX "")
-configure_file ( # This version of the file is used when compiling the C interface
-  "${PROJECT_SOURCE_DIR}/include/Chemharp.in.hpp"
-  "${PROJECT_SOURCE_DIR}/include/Chemharp.hpp"
-)
-set(CHEMHARP_PREFIX "chemharp/")
-configure_file ( # This version of the file is used for installations
-  "${PROJECT_SOURCE_DIR}/include/Chemharp.in.hpp"
-  "${CMAKE_BINARY_DIR}/Chemharp.install.hpp"
-)
-
 # ============================================================================ #
 include(ExternalProject)
 ExternalProject_Add(molfile-plugins
@@ -146,12 +135,15 @@ add_definitions("-DCHRP_MOLFILES_DIR=\"${CMAKE_INSTALL_PREFIX}/molfiles/\"")
 # Installation configuration
 #==============================================================================#
 
-file(GLOB_RECURSE headers include/chemharp/*.hpp ${CMAKE_BINARY_DIR}/include/chemharp/exports.hpp)
+file(GLOB_RECURSE headers
+    include/chemharp/*.hpp
+    ${CMAKE_BINARY_DIR}/include/chemharp/exports.hpp
+)
 
 # All headers
 install(FILES ${headers} DESTINATION include/chemharp/)
 # C++ main headers
-install(FILES "${CMAKE_BINARY_DIR}/Chemharp.install.hpp" DESTINATION include RENAME Chemharp.hpp)
+install(FILES include/Chemharp.hpp DESTINATION include)
 # C main header
 install(FILES bindings/c/chemharp.h DESTINATION include)
 # Dynamic library
