@@ -20,14 +20,6 @@ public:
     size_t nsteps(File*) const {return 42;}
     REGISTER_FORMAT;
 };
-
-class DummyFormat2 : public Format {
-public:
-    DummyFormat2(){}
-    std::string description() const {return "";}
-    size_t nsteps(File*) const {return 42;}
-    REGISTER_FORMAT;
-};
 REGISTER(DummyFormat, "Dummy");
 REGISTER_EXTENSION(DummyFormat, ".dummy");
 
@@ -38,9 +30,16 @@ public:
     bool is_open() {return true;}
     void close() {}
 };
-
-REGISTER_WITH_FILE(DummyFormat2, "Dummy2", DummyFile);
-REGISTER_EXTENSION_AND_FILE(DummyFormat2, ".dummy2", DummyFile);
+class DummyFormat2 : public Format {
+public:
+    DummyFormat2(){}
+    std::string description() const {return "";}
+    size_t nsteps(File*) const {return 42;}
+    REGISTER_FORMAT;
+    using file_t = DummyFile;
+};
+REGISTER(DummyFormat2, "Dummy2");
+REGISTER_EXTENSION(DummyFormat2, ".dummy2");
 
 TEST_CASE("Registering a new format", "[Trajectory factory]"){
     CHECK(TrajectoryFactory::register_extension(".testing", {nullptr, nullptr}));
@@ -77,10 +76,7 @@ TEST_CASE("Geting registered format", "[Trajectory factory]"){
 
 TEST_CASE("Geting file type associated to a format", "[Trajectory factory]"){
     DummyFile dummy("", "");
-    auto file = TrajectoryFactory::by_extension(".dummy").file_creator;
-    CHECK(file == nullptr);
-
-    file = TrajectoryFactory::by_extension(".dummy2").file_creator;
+    auto file = TrajectoryFactory::by_extension(".dummy2").file_creator;
     CHECK(typeid(dummy) == typeid(*file("", "")));
 }
 

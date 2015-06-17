@@ -15,6 +15,7 @@
 using std::shared_ptr;
 
 #include "chemharp/File.hpp"
+#include "chemharp/files/BasicFile.hpp"
 
 namespace harp {
 
@@ -68,6 +69,8 @@ public:
 
     //! A short string describing the format.
     virtual std::string description() const = 0;
+
+    using file_t = BasicFile;
 };
 
 } // namespace harp

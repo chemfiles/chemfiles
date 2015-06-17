@@ -38,8 +38,8 @@ size_t NCFormat::nsteps(File* file) const {
 
 // Register the Amber NetCDF format with the ".nc" extension and the
 // "AmberNetCDF" description.
-REGISTER_WITH_FILE(NCFormat, "AmberNetCDF", NCFile);
-REGISTER_EXTENSION_AND_FILE(NCFormat, ".nc", NCFile);
+REGISTER(NCFormat, "AmberNetCDF");
+REGISTER_EXTENSION(NCFormat, ".nc");
 
 NCFormat::NCFormat() : step(0), last_file_hash(0), last_file_was_valid(false) {}
 

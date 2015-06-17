@@ -17,8 +17,6 @@
 
 namespace harp {
 
-class TextFile;
-
 /*!
  * @class XYZFormat formats/XYZ.hpp formats/XYZ.cpp
  * @brief XYZ file format reader.

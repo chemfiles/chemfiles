@@ -40,6 +40,8 @@ public:
 
     virtual size_t nsteps(File* file) const override;
     virtual std::string description() const override;
+
+    using file_t = NCFile;
 private:
     //! Reserve size for \c natoms on the internal cache.
     void reserve(size_t natoms) const;

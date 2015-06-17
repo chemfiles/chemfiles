@@ -36,6 +36,9 @@ struct trajectory_builder_t {
     file_creator_t file_creator;
 };
 
+//! Files extensions to trajectory builder associations
+using trajectory_map_t = std::unordered_map<string, trajectory_builder_t>;
+
 /*!
 * @class TrajectoryFactory TrajectoryFactory.hpp
 * @brief Factory for FormatReader and FormatWriter classes
@@ -46,19 +49,10 @@ struct trajectory_builder_t {
 */
 class TrajectoryFactory{
 private:
-    //! Files extensions to format reader associations
-    typedef std::unordered_map<string, trajectory_builder_t> trajectory_map_t;
-
+    //! Get a static reader_map instance associating format descriptions and readers
+    static trajectory_map_t& names();
     //! Static reader_map instance associating format descriptions and readers
-    static trajectory_map_t& names(){
-        static auto umap = trajectory_map_t();
-        return umap;
-    }
-    //! Static reader_map instance associating format descriptions and readers
-    static trajectory_map_t& extensions(){
-        static auto umap = trajectory_map_t();
-        return umap;
-    }
+    static trajectory_map_t& extensions();
 public:
     /*!
      * @brief Get a trajectory_builder from a format type name.
@@ -68,11 +62,7 @@ public:
      *
      * Throws an error if the format can not be found
      */
-     static trajectory_builder_t format(const string& name){
-        if (names().find(name) == names().end())
-            throw FormatError("Can not find the format \"" + name + "\".");
-        return names()[name];
-    }
+    static trajectory_builder_t format(const string& name);
 
     /*!
      * @brief Get a trajectory_builder from a format \c extention.
@@ -82,56 +72,32 @@ public:
      *
      * Throws an error if the format can not be found
      */
-     static trajectory_builder_t by_extension(const string& ext){
-        if (extensions().find(ext) == extensions().end())
-            throw FormatError("Can not find a format associated with the \""
-                                   + ext + "\" extension.");
-        return extensions()[ext];
-    }
-
+    static trajectory_builder_t by_extension(const string& ext);
 
     //! Register a trajectory_builder in the internal format names list.
-    static bool register_format(const string& name, trajectory_builder_t tb){
-        if (names().find(name) != names().end())
-            throw FormatError("The name \"" + name + "\" is already "
-                                  "associated with a format.");
-        names().emplace(name, tb);
-        return true;
-    }
+    static bool register_format(const string& name, trajectory_builder_t tb);
     //! Register an trajectory_builder in the internal extensions list.
-    static bool register_extension(const string& ext, trajectory_builder_t tb){
-        if (extensions().find(ext) != extensions().end())
-            throw FormatError("The extension \"" + ext + "\" is already "
-                                  "associated with a format.");
-        extensions().emplace(ext, tb);
-        return true;
-    }
+    static bool register_extension(const string& ext, trajectory_builder_t tb);
 };
 
-//! Lambda function to create a file
-#define FILE_CREATOR(file_t)                              \
-    [](const string& p, const string& m){                 \
-        return unique_ptr<File>(new file_t(p, m));        \
-    }                                                     \
+//! Function to create a file
+template <class file_t>
+unique_ptr<File> new_file(const string& p, const string& m){
+    return unique_ptr<File>(new file_t(p, m));
+}
 
-//! Lambda function to create a format
-#define FORMAT_CREATOR(format_t)                         \
-    [](){return unique_ptr<Format>(new format_t());}     \
+//! Function to create a format
+template <class format_t>
+unique_ptr<Format> new_format(){
+    return unique_ptr<Format>(new format_t());
+}
 
 //! Register a format by associating it to a format name, and no file type.
 #define REGISTER(format_t, name)                          \
 bool format_t::_registered_format_ =                      \
 TrajectoryFactory::register_format(name, {                \
-    FORMAT_CREATOR(format_t),                             \
-    nullptr                                               \
-});
-
-//! Register a format by associating it to a format name and a file type.
-#define REGISTER_WITH_FILE(format_t, name, file_t)        \
-bool format_t::_registered_format_ =                      \
-TrajectoryFactory::register_format(name, {                \
-    FORMAT_CREATOR(format_t),                             \
-    FILE_CREATOR(file_t)                                  \
+    new_format<format_t>,                                 \
+    new_file<typename format_t::file_t>                   \
 });
 
 //! Register a format by associating it to an extention, and no file type.
@@ -139,23 +105,17 @@ TrajectoryFactory::register_format(name, {                \
 #define REGISTER_EXTENSION(format_t, extension)           \
 bool format_t::_registered_extension_ =                   \
 TrajectoryFactory::register_extension(extension, {        \
-    FORMAT_CREATOR(format_t),                             \
-    nullptr                                               \
-});
-
-//! Register a format by associating it to an extention and a file type.
-//! The extension should starts with a "."
-#define REGISTER_EXTENSION_AND_FILE(format_t, extension, file_t)  \
-bool format_t::_registered_extension_ =                           \
-TrajectoryFactory::register_extension(extension, {                \
-    FORMAT_CREATOR(format_t),                                     \
-    FILE_CREATOR(file_t)                                          \
+    new_format<format_t>,                                 \
+    new_file<typename format_t::file_t>                   \
 });
 
 //! Add the static members in a class to register a format.
 #define REGISTER_FORMAT                   \
     static bool _registered_extension_;   \
     static bool _registered_format_
+
+#define FORMAT_NAME(x) static constexpr const char name[] = x;
+#define FORMAT_EXTENSION(x) static constexpr const char extension[] = x;
 
 } // namespace harp
 

@@ -272,14 +272,14 @@ template class harp::Molfile<TRJ>;
 #define REGISTER(format_t, name)                          \
 template<> bool format_t::_registered_format_ =           \
 TrajectoryFactory::register_format(name, {                \
-    FORMAT_CREATOR(format_t),                             \
+    new_format<format_t>,                                 \
     nullptr                                               \
 });
 
 #define REGISTER_EXTENSION(format_t, extension)           \
 template<> bool format_t::_registered_extension_ =        \
 TrajectoryFactory::register_extension(extension, {        \
-    FORMAT_CREATOR(format_t),                             \
+    new_format<format_t>,                                 \
     nullptr                                               \
 });
 
