@@ -21,45 +21,40 @@ namespace harp {
  * @class Error Error.hpp
  * @brief Base exception for Chemharp library
  */
-class CHRP_EXPORT Error : public std::runtime_error {
-public:
-    Error(const std::string &message) : std::runtime_error(message) {}
+struct CHRP_EXPORT Error : public std::runtime_error {
+    using runtime_error::runtime_error;
 };
 
 /*!
  * @class FileError Error.hpp
  * @brief Exception for files related failures
  */
-class CHRP_EXPORT FileError : public Error {
-public:
-    FileError(const std::string &message) : Error(message) {}
+struct CHRP_EXPORT FileError : public Error {
+    using Error::Error;
 };
 
 /*!
  * @class MemoryError Error.hpp
  * @brief Exception for memory related failures
  */
-class CHRP_EXPORT MemoryError : public Error {
-public:
-    MemoryError(const std::string &message) : Error(message) {}
+struct CHRP_EXPORT MemoryError : public Error {
+    using Error::Error;
 };
 
 /*!
  * @class FormatError Error.hpp
  * @brief Exception for formats related failures
  */
-class CHRP_EXPORT FormatError : public Error {
-public:
-    FormatError(const std::string &message) : Error(message) {}
+struct CHRP_EXPORT FormatError : public Error {
+    using Error::Error;
 };
 
 /*!
  * @class PluginError Error.hpp
  * @brief Exception for dynamic library loading errors
  */
-class CHRP_EXPORT PluginError : public Error {
-public:
-    PluginError(const std::string &message) : Error(message) {}
+struct CHRP_EXPORT PluginError : public Error {
+    using Error::Error;
 };
 
 
