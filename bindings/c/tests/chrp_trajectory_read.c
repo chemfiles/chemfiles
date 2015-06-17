@@ -41,13 +41,19 @@ int main(){
     assert(!chrp_atom_free(atom));
     assert(!chrp_topology_free(topology));
 
+    CHRP_CELL* cell = chrp_cell(30, 30, 30);
+    assert(!chrp_trajectory_set_cell(file, cell));
+    assert(!chrp_cell_free(cell));
 
-/*
-set_cell!(file, UnitCell(30, 30, 30))
-frame = read_step(file, 41)
+    assert(!chrp_trajectory_read_step(file, 41, frame));
+    cell = chrp_cell_from_frame(frame);
+    double a=0, b=0, c=0;
+    assert(!chrp_cell_lengths(cell, &a, &b, &c));
+    assert(a == 30.0);
+    assert(b == 30.0);
+    assert(c == 30.0);
+    assert(!chrp_cell_free(cell));
 
-@fact lengths(UnitCell(frame)) => (30.0, 30.0, 30.0)
-*/
     assert(!chrp_trajectory_read_step(file, 41, frame));
     pos_0[0] = 0.761277; pos_0[1] = 8.106125; pos_0[2] = 10.622949;
     pos_124[0] = 5.13242; pos_124[1] = 0.079862; pos_124[2] = 14.194161;
@@ -92,15 +98,20 @@ frame = read_step(file, 41)
         assert(!chrp_topology_append(topology, atom));
 
     assert(!chrp_trajectory_set_topology(file, topology));
-/*
-        set_topology!(file, topology)
-        frame = read_step(file, 10)
-        @fact name(Atom(frame, 10)) => "Cs"
+    assert(!chrp_trajectory_read_step(file, 10, frame));
 
-        set_topology!(file, joinpath(DATAPATH, "topology.xyz"))
-        frame = read(file)
-        @fact name(Atom(frame, 100)) => "Rd"
-*/
+    atom = chrp_atom_from_frame(frame, 1);
+    assert(!chrp_atom_name(atom, name, sizeof(name)));
+    assert(strcmp(name, "Cs") == 0);
+    assert(!chrp_atom_free(atom));
+
+    assert(!chrp_trajectory_set_topology_file(file, DATADIR "/xyz/topology.xyz"));
+    assert(!chrp_trajectory_read(file, frame));
+    atom = chrp_atom_from_frame(frame, 0);
+    assert(!chrp_atom_name(atom, name, sizeof(name)));
+    assert(strcmp(name, "Zn") == 0);
+    assert(!chrp_atom_free(atom));
+
     assert(!chrp_frame_free(frame));
     assert(!chrp_trajectory_close(file));
     return EXIT_SUCCESS;

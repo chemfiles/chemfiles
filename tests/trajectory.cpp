@@ -25,9 +25,9 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
             CHECK(frame.natoms() == 9);
             auto topology = frame.topology();
             CHECK(topology.natoms() == 9);
-            CHECK(topology[0] == Atom("O"));
-            CHECK(topology[1] == Atom("H"));
-            CHECK(topology[2] == Atom("H"));
+            CHECK(topology[0] == Atom("Zn"));
+            CHECK(topology[1] == Atom("Cs"));
+            CHECK(topology[2] == Atom("Ar"));
         }
 
         SECTION("Directely"){
