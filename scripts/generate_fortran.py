@@ -19,7 +19,12 @@ LIBC_PATH = os.path.join(os.path.dirname(__file__), "libc")
 
 if __name__ == "__main__":
     ast = parse_file(C_HEADER, use_cpp=True, cpp_path="gcc",
-                     cpp_args=["-E", "-I" + LIBC_PATH, "-I" + CXX_INCLUDES])
+                     cpp_args=[
+                        "-E",
+                        "-I" + LIBC_PATH,
+                        "-I" + CXX_INCLUDES,
+                        "-DCHRP_EXPORT="
+                     ])
 
     evisitor = EnumVisitor()
     evisitor.visit(ast)

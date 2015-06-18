@@ -312,6 +312,14 @@ CHRP_EXPORT CHRP_CELL* chrp_cell_triclinic(double a, double b, double c, double 
 CHRP_EXPORT CHRP_CELL* chrp_cell_from_frame(CHRP_FRAME* frame);
 
 /*!
+* @brief Get the cell volume.
+* @param cell the unit cell to read
+* @param V the volume
+* @return The status code
+*/
+CHRP_EXPORT int chrp_cell_volume(const CHRP_CELL* cell, double* V);
+
+/*!
 * @brief Get the cell lenghts.
 * @param cell the unit cell to read
 * @param a,b,c the three cell lenghts

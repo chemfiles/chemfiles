@@ -19,7 +19,7 @@ bool roughly(double A[3][3], double B[3][3]) {
 int main() {
     CHRP_CELL* cell = chrp_cell(2, 3, 4);
 
-    double a=0, b=0, c=0;
+    double a=0, b=0, c=0, V=0;
     assert(!chrp_cell_lengths(cell, &a, &b, &c));
     assert(fabs(a - 2) < 1e-10);
     assert(fabs(b - 3) < 1e-10);
@@ -29,6 +29,9 @@ int main() {
     assert(fabs(a - 90) < 1e-10);
     assert(fabs(b - 90) < 1e-10);
     assert(fabs(c - 90) < 1e-10);
+
+    assert(!chrp_cell_volume(cell, &V));
+    assert(fabs(V - 2*3*4) < 1e-10);
 
     assert(!chrp_cell_set_lengths(cell, 10, 20, 30));
     assert(!chrp_cell_lengths(cell, &a, &b, &c));

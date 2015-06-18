@@ -228,6 +228,12 @@ error:
     return cell;
 }
 
+int chrp_cell_volume(const CHRP_CELL* cell, double* V) {
+    CHRP_ERROR_WRAP_RETCODE(
+        *V = cell->volume();
+    )
+}
+
 int chrp_cell_lengths(const CHRP_CELL* cell, double* a, double* b, double* c){
     CHRP_ERROR_WRAP_RETCODE(
         *a = cell->a();

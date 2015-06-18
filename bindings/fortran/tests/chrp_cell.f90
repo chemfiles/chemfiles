@@ -5,7 +5,7 @@ program cell_test
 
     implicit none
     type(chrp_cell) :: cell
-    real(kind=real64) :: a, b, c
+    real(kind=real64) :: a, b, c, V
     real(kind=real64), dimension(3, 3) :: expected_mat, mat
     integer :: status, i, j
     integer(kind=kind(CHRP_CELL_TYPES)) :: cell_type
@@ -25,6 +25,10 @@ program cell_test
     call check((a == 90.0), "cell%angles")
     call check((b == 90.0), "cell%angles")
     call check((c == 90.0), "cell%angles")
+
+    call cell%volume(V, status=status)
+    call check((status == 0), "cell%volume")
+    call check((V == 2.0*3.0*4.0), "cell%volume")
 
     call cell%set_lengths(10d0, 20d0, 30d0, status=status)
     call check((status == 0), "cell%set_lengths")

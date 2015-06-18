@@ -442,6 +442,19 @@ subroutine chrp_cell_from_frame_init_(this, frame, status)
     end if
 end subroutine
 
+subroutine chrp_cell_volume(this, V, status)
+    implicit none
+    class(chrp_cell), intent(in) :: this
+    real(kind=c_double) :: V
+    integer, optional :: status
+    integer :: status_tmp_
+
+    status_tmp_ = chrp_cell_volume_c(this%ptr, V)
+    if (present(status)) then
+        status = status_tmp_
+    end if
+end subroutine
+
 subroutine chrp_cell_lengths(this, a, b, c, status)
     implicit none
     class(chrp_cell), intent(in) :: this

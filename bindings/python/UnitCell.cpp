@@ -40,6 +40,8 @@ void register_unit_cell() {
         .add_property("gamma",
             static_cast<double (UnitCell::*)(void) const>(&UnitCell::gamma),
             static_cast<void (UnitCell::*)(double)>(&UnitCell::gamma))
+        .add_property("volume",
+            static_cast<double (UnitCell::*)(void) const>(&UnitCell::volume))
         .add_property("periodic_x",
             static_cast<bool (UnitCell::*)(void) const>(&UnitCell::periodic_x),
             static_cast<void (UnitCell::*)(bool)>(&UnitCell::periodic_x))
