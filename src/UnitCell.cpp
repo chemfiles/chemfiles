@@ -43,7 +43,28 @@ UnitCell::UnitCell(CellType type, double a, double b, double c)
 : _a(a), _b(b), _c(c), _alpha(90), _beta(90), _gamma(90), _type(type), pbc_x(true),
 pbc_y(true), pbc_z(true) {}
 
+inline double deg2rad(double x) {
+    const double pi = 3.141592653589793238463;
+    return x * pi / 180.0;
+}
 
+double UnitCell::volume() const {
+    switch (_type) {
+        case INFINITE:
+            return 0;
+        case ORTHOROMBIC:
+            return _a * _b * _c;
+        case TRICLINIC:
+            break; // The computation is too complexe to take place in a switch
+    }
+    double cos_alpha = cos(deg2rad(_alpha));
+    double cos_beta = cos(deg2rad(_beta));
+    double cos_gamma = cos(deg2rad(_gamma));
+
+    double factor = sqrt(1 - cos_alpha*cos_alpha - cos_beta*cos_beta - cos_gamma*cos_gamma
+                         + 2 * cos_alpha * cos_beta * cos_gamma);
+    return _a * _b * _c * factor;
+}
 
 Matrix3D UnitCell::matricial() const {
     auto mat = Matrix3D();

@@ -116,6 +116,9 @@ public:
     //! Set the third angle (gamma) of the cell if possible
     void gamma(double val);
 
+    //! Get the unit cell volume
+    double volume() const;
+
     //! Get the cell periodicity for the x axis
     bool periodic_x() const {return pbc_x;}
     //! Get the cell periodicity for the y axis

@@ -22,6 +22,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(infinite.alpha() == 90);
         CHECK(infinite.beta() == 90);
         CHECK(infinite.gamma() == 90);
+        CHECK(infinite.volume() == 0);
 
         CHECK(infinite.periodic_x());
         CHECK(infinite.periodic_y());
@@ -44,6 +45,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(ortho2.alpha() == 90);
         CHECK(ortho2.beta() == 90);
         CHECK(ortho2.gamma() == 90);
+        CHECK(ortho2.volume() == 10*11*12);
 
         UnitCell triclinic(10, 11, 12, 90, 80, 120);
         CHECK(triclinic.type() == UnitCell::TRICLINIC);
@@ -53,6 +55,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(triclinic.alpha() == 90);
         CHECK(triclinic.beta() == 80);
         CHECK(triclinic.gamma() == 120);
+        CHECK(triclinic.volume() == 1119.9375925598192);
 
         UnitCell infinite2(UnitCell::INFINITE);
         CHECK(infinite2.type() == UnitCell::INFINITE);
