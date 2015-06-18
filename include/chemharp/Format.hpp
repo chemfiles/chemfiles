@@ -29,7 +29,7 @@ class Frame;
  */
 class Format {
 public:
-    Format() = default;
+    Format(File& f) : file(f) {}
     virtual ~Format() = default;
     /*!
     * @brief Read a specific step from the internal file.
@@ -39,7 +39,7 @@ public:
     *
     * This function can throw an exception in case of error.
     */
-    virtual void read_step(File* file, const size_t step, Frame& frame);
+    virtual void read_step(const size_t step, Frame& frame);
 
     /*!
     * @brief Read a specific step from a file.
@@ -49,7 +49,7 @@ public:
     * This function can throw an exception in case of error. The cursor is
     * assumed to be at the right position in case of text files.
     */
-    virtual void read(File* file, Frame& frame);
+    virtual void read(Frame& frame);
 
     /*!
     * @brief Write a step (frame) to a file.
@@ -58,18 +58,20 @@ public:
     *
     * This function can throw an exception in case of error.
     */
-    virtual void write(File* file, const Frame& frame);
+    virtual void write(const Frame& frame);
 
     /*!
     * @brief Get the number of frames in a file
     * @param file The file to read from.
     * @return The number of frames
     */
-    virtual size_t nsteps(File* file) const = 0;
+    virtual size_t nsteps() const = 0;
 
     //! A short string describing the format.
     virtual std::string description() const = 0;
-
+    //! TODO
+    File& file;
+    //! TODO
     using file_t = BasicFile;
 };
 

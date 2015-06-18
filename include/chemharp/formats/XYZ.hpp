@@ -25,15 +25,17 @@ namespace harp {
  */
 class XYZFormat : public Format {
 public:
-    XYZFormat() = default;
+    XYZFormat(File& f);
+    using Format::Format;
     ~XYZFormat() = default;
 
-    virtual void read_step(File* file, const size_t step, Frame& frame) override;
-    virtual void read(File* file, Frame& frame) override;
-    virtual void write(File* file, const Frame& frame) override;
+    virtual void read_step(const size_t step, Frame& frame) override;
+    virtual void read(Frame& frame) override;
+    virtual void write(const Frame& frame) override;
     virtual std::string description() const override;
-    virtual size_t nsteps(File* file) const override;
+    virtual size_t nsteps() const override;
 private:
+    TextFile& textfile;
     REGISTER_FORMAT;
 };
 

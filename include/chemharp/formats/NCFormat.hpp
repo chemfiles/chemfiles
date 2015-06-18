@@ -31,14 +31,14 @@ class NCFile;
  */
 class NCFormat : public Format {
 public:
-    NCFormat();
+    NCFormat(File& file);
     ~NCFormat() = default;
 
-    virtual void read_step(File* file, const size_t step, Frame& frame) override;
-    virtual void read(File* file, Frame& frame) override;
-    virtual void write(File* file, const Frame& frame) override;
+    virtual void read_step(const size_t step, Frame& frame) override;
+    virtual void read(Frame& frame) override;
+    virtual void write(const Frame& frame) override;
 
-    virtual size_t nsteps(File* file) const override;
+    virtual size_t nsteps() const override;
     virtual std::string description() const override;
 
     using file_t = NCFile;
@@ -46,26 +46,21 @@ private:
     //! Reserve size for \c natoms on the internal cache.
     void reserve(size_t natoms) const;
     //! Read the unit cell at the current internal step, the file is assumed to be valid.
-    UnitCell read_cell(NCFile* file) const;
+    UnitCell read_cell() const;
     //! Generic function to read an Array3D at the current internal step,
     //! the file is assumed to be valid.
-    void read_array3D(NCFile* file, Array3D& arr, const string& name) const;
-    //! Validate a file before reading it. If the \c natoms argument is present,
-    //! we also check that the corresponding dimension match this value
-    void validate(NCFile* file, size_t natoms=static_cast<size_t>(-1)) const;
+    void read_array3D(Array3D& arr, const string& name) const;
 
     //! Write an Array3D to the file, as a variable with the name \c name, at
     //! the current internal step.
-    void write_array3D(NCFile* file, const Array3D& arr, const string& name) const;
+    void write_array3D(const Array3D& arr, const string& name) const;
     //! Write an UnitCell to the file, at the current internal step
-    void write_cell(NCFile* file, const UnitCell& cell) const;
+    void write_cell(const UnitCell& cell) const;
 
+    //! TODO
+    NCFile& ncfile;
     //! Last read step
-    mutable size_t step;
-    //! Store the adress of the last read file, and its validity
-    mutable size_t last_file_hash;
-    //! Was the last seen file valid ?
-    mutable bool last_file_was_valid;
+    size_t step;
     // Temporary cache for read and write operations.
     mutable std::vector<float> cache;
     // Let's register the format

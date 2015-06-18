@@ -25,19 +25,19 @@ std::string XYZFormat::description() const {
 
 // Quick forward the file for nsteps, return false if the end of file (eof) was
 // reach before the end.
-static bool forward(TextFile* file, size_t nsteps) {
+static bool forward(TextFile& file, size_t nsteps) {
     size_t i=0;
     // Move the file pointer to the good position step by step, as the number of
     // atoms may not be constant
     std::string line;
     while (i < nsteps){
         try {
-            line = file->getline();
+            line = file.getline();
             auto natoms = std::stoul(line);
-            file->readlines(natoms + 1);
+            file.readlines(natoms + 1);
         } catch (const std::exception& e) {
             // handling single new line at the end of the file
-            if (line == "" && file->eof())
+            if (line == "" && file.eof())
                 return false;
             else
                 throw FormatError("Can not read step: " + string(e.what()));
@@ -47,32 +47,31 @@ static bool forward(TextFile* file, size_t nsteps) {
     return true;
 }
 
-size_t XYZFormat::nsteps(File* file) const {
-    auto textfile = dynamic_cast<TextFile*>(file);
-    textfile->rewind();
+XYZFormat::XYZFormat(File& f) : Format(f), textfile(static_cast<TextFile&>(file)) {}
+
+size_t XYZFormat::nsteps() const {
+    textfile.rewind();
     size_t n = 0;
-    while (!textfile->eof()) {
+    while (!textfile.eof()) {
         if (forward(textfile, 1))
             n++;
     }
-    textfile->rewind();
+    textfile.rewind();
     return n;
 }
 
-void XYZFormat::read_step(File* file, const size_t step, Frame& frame){
-    auto textfile = dynamic_cast<TextFile*>(file);
-    textfile->rewind();
+void XYZFormat::read_step(const size_t step, Frame& frame){
+    textfile.rewind();
     forward(textfile, step);
-    read(file, frame);
+    read(frame);
 }
 
-void XYZFormat::read(File* file, Frame& frame){
-    auto textfile = dynamic_cast<TextFile*>(file);
+void XYZFormat::read(Frame& frame){
     size_t natoms;
 
     try {
-        natoms = std::stoul(textfile->getline());
-        textfile->getline(); // XYZ comment line;
+        natoms = std::stoul(textfile.getline());
+        textfile.getline(); // XYZ comment line;
     } catch (const std::exception& e) {
         throw FormatError("Can not read next step: " + string(e.what()));
     }
@@ -80,7 +79,7 @@ void XYZFormat::read(File* file, Frame& frame){
     std::vector<std::string> lines(natoms);
 
     try {
-        lines = textfile->readlines(natoms);
+        lines = textfile.readlines(natoms);
     }
     catch (const FileError& e) {
         throw FormatError("Can not read file: " + string(e.what()));
@@ -101,22 +100,20 @@ void XYZFormat::read(File* file, Frame& frame){
     }
 }
 
-void XYZFormat::write(File* file, const Frame& frame){
-    auto textfile = dynamic_cast<TextFile*>(file);
-
+void XYZFormat::write(const Frame& frame){
     const auto topology = frame.topology();
     const auto positions = frame.positions();
     assert(frame.natoms() == topology.natoms());
 
-    *textfile << frame.natoms() << "\n";
-    *textfile << "Written by Chemharp\n";
+    textfile << frame.natoms() << "\n";
+    textfile << "Written by Chemharp\n";
 
     for (size_t i=0; i<frame.natoms(); i++){
         auto& pos = positions[i];
         auto name = topology[i].name();
         if (name == "")
             name = "X";
-        *textfile << name   << " "
+        textfile << name   << " "
                   << pos[0] << " " << pos[1] << " " << pos[2] << "\n";
     }
 }

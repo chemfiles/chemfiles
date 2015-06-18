@@ -15,9 +15,9 @@ using namespace harp;
 // Dummy format clase
 class DummyFormat : public Format {
 public:
-    DummyFormat(){}
+    DummyFormat(File& file) : Format(file){}
     std::string description() const {return "";}
-    size_t nsteps(File*) const {return 42;}
+    size_t nsteps() const {return 42;}
     REGISTER_FORMAT;
 };
 REGISTER(DummyFormat, "Dummy");
@@ -32,9 +32,9 @@ public:
 };
 class DummyFormat2 : public Format {
 public:
-    DummyFormat2(){}
+    DummyFormat2(File& file) : Format(file){}
     std::string description() const {return "";}
-    size_t nsteps(File*) const {return 42;}
+    size_t nsteps() const {return 42;}
     REGISTER_FORMAT;
     using file_t = DummyFile;
 };
@@ -58,16 +58,18 @@ TEST_CASE("Registering a new format", "[Trajectory factory]"){
 }
 
 TEST_CASE("Geting registered format", "[Trajectory factory]"){
-    auto dummy = DummyFormat();
-    auto format = TrajectoryFactory::by_extension(".dummy").format_creator();
+    BasicFile file("tmp.dat", "w");
+
+    auto dummy = DummyFormat(file);
+    auto format = TrajectoryFactory::by_extension(".dummy").format_creator(file);
     CHECK(typeid(dummy) == typeid(*format));
-    format = TrajectoryFactory::format("Dummy").format_creator();
+    format = TrajectoryFactory::format("Dummy").format_creator(file);
     CHECK(typeid(dummy) == typeid(*format));
 
-    auto XYZ = XYZFormat();
-    format = TrajectoryFactory::by_extension(".xyz").format_creator();
+    auto XYZ = XYZFormat(file);
+    format = TrajectoryFactory::by_extension(".xyz").format_creator(file);
     CHECK(typeid(XYZ) == typeid(*format));
-    format = TrajectoryFactory::format("XYZ").format_creator();
+    format = TrajectoryFactory::format("XYZ").format_creator(file);
     CHECK(typeid(XYZ) == typeid(*format));
 
     CHECK_THROWS_AS(TrajectoryFactory::format("UNKOWN"), FormatError);

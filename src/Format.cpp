@@ -12,14 +12,14 @@
 #include "chemharp/Error.hpp"
 using namespace harp;
 
-void Format::read_step(File*, const size_t, Frame&){
+void Format::read_step(const size_t, Frame&){
     throw FormatError("Not implemented function 'read_at'");
 }
 
-void Format::read(File*, Frame&){
+void Format::read(Frame&){
     throw FormatError("Not implemented function 'read'");
 }
 
-void Format::write(File*, const Frame&){
+void Format::write(const Frame&){
     throw FormatError("Not implemented function 'write'");
 }

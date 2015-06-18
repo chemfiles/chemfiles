@@ -31,16 +31,11 @@ Trajectory::Trajectory(const string& filename, const string& mode, const string&
         builder = TrajectoryFactory::format(format);
     }
 
-    _format = builder.format_creator();
-    if (builder.file_creator) {
-        _file = builder.file_creator(filename, mode);
-    }
-    else {
-        // Defaulting to a BasicFile
-        _file = std::unique_ptr<File>(new BasicFile(filename, mode));
-    }
+    _file = builder.file_creator(filename, mode);
+    _format = builder.format_creator(*_file);
+
     if (mode == "r")
-        _nsteps = _format->nsteps(_file.get());
+        _nsteps = _format->nsteps();
 }
 
 Trajectory::~Trajectory(){}
@@ -55,7 +50,7 @@ Frame Trajectory::read(){
         throw FileError("Can not read file \"" + _file->filename() + "\" past end.");
 
     Frame frame;
-    _format->read(_file.get(), frame);
+    _format->read(frame);
     _step++;
 
     // Set the frame topology if needed
@@ -78,7 +73,7 @@ Frame Trajectory::read_step(const size_t step){
 
     Frame frame;
     _step = step;
-    _format->read_step(_file.get(), _step, frame);
+    _format->read_step(_step, frame);
 
     // Set the frame topology if needed
     if (_use_custom_topology)
@@ -105,7 +100,7 @@ void Trajectory::write(const Frame& input_frame){
     if (_use_custom_cell)
         frame.cell(_cell);
 
-    _format->write(_file.get(), frame);
+    _format->write(frame);
     _step++;
     _nsteps++;
 }

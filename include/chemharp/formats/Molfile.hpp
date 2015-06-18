@@ -44,19 +44,17 @@ enum MolfileFormat {
 template <MolfileFormat F>
 class Molfile : public Format {
 public:
-    Molfile();
+    Molfile(File& file);
     ~Molfile();
 
-    virtual void read(File* file, Frame& frame) override;
+    virtual void read(Frame& frame) override;
     virtual std::string description() const override;
-    virtual size_t nsteps(File* file) const override;
+    virtual size_t nsteps() const override;
 private:
     /// Convert a molfile timestep to a chemharp frame
     void molfile_to_frame(const molfile_timestep_t& timestep, Frame& frame);
     /// Read topological information in the current file, if any.
     void read_topology() const;
-    /// Open the file at the given path if needed
-    void open_file_if_needed(const std::string& path) const;
 
     /// Dynamic library associated with the VMD plugin
     Dynlib _lib;
@@ -68,18 +66,15 @@ private:
     /// Function to call at in the destructor
     init_function_t _fini_fun;
 
-    /// The last file name
-    mutable std::string _last_file_name;
     /// The file handler
     mutable void* _file_handler;
     /// The number of atoms in the last trajectory read
-    mutable int _natoms;
+    int _natoms;
 
     /// Do we have topological information in this plugin ?
     mutable bool _use_topology;
     /// Store topological information
     mutable Topology _topology;
-
 
     REGISTER_FORMAT;
 };

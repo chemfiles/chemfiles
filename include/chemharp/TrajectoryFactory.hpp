@@ -23,7 +23,7 @@ using std::unique_ptr;
 using std::string;
 
 //! Function type to create a format
-typedef unique_ptr<Format> (*format_creator_t) ();
+typedef unique_ptr<Format> (*format_creator_t) (File& f);
 //! Function type to create a file
 typedef unique_ptr<File> (*file_creator_t) (const string& path, const string& mode);
 
@@ -88,8 +88,8 @@ unique_ptr<File> new_file(const string& p, const string& m){
 
 //! Function to create a format
 template <class format_t>
-unique_ptr<Format> new_format(){
-    return unique_ptr<Format>(new format_t());
+unique_ptr<Format> new_format(File& f){
+    return unique_ptr<Format>(new format_t(f));
 }
 
 //! Register a format by associating it to a format name, and no file type.

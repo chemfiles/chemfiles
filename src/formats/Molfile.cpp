@@ -65,8 +65,10 @@ static std::string libpath(const std::string& lib_name){
 
 /******************************************************************************/
 
-template <MolfileFormat F> Molfile<F>::Molfile()
-: _plugin(nullptr), _fini_fun(nullptr), _last_file_name(""), _file_handler(nullptr),
+#include <iostream>
+
+template <MolfileFormat F> Molfile<F>::Molfile(File& file) : Format(file),
+_plugin(nullptr), _fini_fun(nullptr), _file_handler(nullptr),
 _natoms(0), _use_topology(false) {
     // Open the _library
     _lib = Dynlib(libpath(molfile_plugins[F].path));
@@ -98,6 +100,16 @@ _natoms(0), _use_topology(false) {
         (_plugin->close_file_read == NULL))
             throw PluginError("The " + molfile_plugins[F].format +
                               " _plugin does not have read capacities");
+
+    std::cout << file.filename() << std::endl;
+
+    _file_handler = _plugin->open_file_read(file.filename().c_str(), _plugin->name, &_natoms);
+
+    if (!_file_handler) {
+        throw FileError("Could not open the file: " + file.filename() + " with VMD molfile");
+    }
+
+    read_topology();
 }
 
 template <MolfileFormat F> Molfile<F>::~Molfile(){
@@ -113,30 +125,7 @@ std::string Molfile<F>::description() const {
 }
 
 template <MolfileFormat F>
-void Molfile<F>::open_file_if_needed(const std::string& path) const {
-    if (path != _last_file_name){
-        _last_file_name = path;
-
-        // Cleanup
-        if (_file_handler) {
-            _plugin->close_file_read(_file_handler);
-            _file_handler = nullptr;
-        }
-
-        _file_handler = _plugin->open_file_read(_last_file_name.c_str(), _plugin->name, &_natoms);
-    }
-
-    if (!_file_handler) {
-        throw FileError("Could not open the file: " + path + " with VMD molfile");
-    }
-
-    read_topology();
-}
-
-template <MolfileFormat F>
-void Molfile<F>::read(File* file, Frame& frame){
-    open_file_if_needed(file->filename());
-
+void Molfile<F>::read(Frame& frame){
     std::vector<float> coords(3*static_cast<size_t>(_natoms));
     std::vector<float> velocities(0);
 
@@ -144,13 +133,12 @@ void Molfile<F>::read(File* file, Frame& frame){
     timestep.coords = coords.data();
     if (molfile_plugins[F].have_velocities){
         velocities.resize(3*static_cast<size_t>(_natoms));
-        timestep.velocities = coords.data();
+        timestep.velocities = velocities.data();
     }
 
     int result = _plugin->read_next_timestep(_file_handler, _natoms, &timestep);
-
     if (result != MOLFILE_SUCCESS){
-        throw FormatError("Error while reading the file " + _last_file_name +
+        throw FormatError("Error while reading the file " + file.filename() +
                           " using Molfile format " + molfile_plugins[F].format);
     }
 
@@ -161,9 +149,7 @@ void Molfile<F>::read(File* file, Frame& frame){
 }
 
 template <MolfileFormat F>
-size_t Molfile<F>::nsteps(File* file) const {
-    open_file_if_needed(file->filename());
-
+size_t Molfile<F>::nsteps() const {
     size_t n = 0;
     int result = MOLFILE_SUCCESS;
     while (true) {
@@ -175,7 +161,9 @@ size_t Molfile<F>::nsteps(File* file) const {
     }
     // We need to close and re-open the file
     _plugin->close_file_read(_file_handler);
-    _file_handler = _plugin->open_file_read(_last_file_name.c_str(), _plugin->name, &_natoms);
+    int tmp = 0;
+    _file_handler = _plugin->open_file_read(file.filename().c_str(), _plugin->name, &tmp);
+    read_topology();
 
     return n;
 }
@@ -273,14 +261,14 @@ template class harp::Molfile<TRJ>;
 template<> bool format_t::_registered_format_ =           \
 TrajectoryFactory::register_format(name, {                \
     new_format<format_t>,                                 \
-    nullptr                                               \
+    new_file<typename format_t::file_t>                   \
 });
 
 #define REGISTER_EXTENSION(format_t, extension)           \
 template<> bool format_t::_registered_extension_ =        \
 TrajectoryFactory::register_extension(extension, {        \
     new_format<format_t>,                                 \
-    nullptr                                               \
+    new_file<typename format_t::file_t>                   \
 });
 
 /******************************************************************************/
