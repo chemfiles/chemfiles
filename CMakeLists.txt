@@ -118,7 +118,7 @@ set_property(TARGET chemharp PROPERTY SOVERSION ${CHRP_VERSION})
 include(GenerateExportHeader)
 generate_export_header(chemharp
           BASE_NAME CHRP
-          EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/include/chemharp/exports.hpp
+          EXPORT_FILE_NAME ${CMAKE_SOURCE_DIR}/include/chemharp/exports.hpp
 )
 
 target_link_libraries(chemharp ${Boost_LIBRARIES} ${OTHER_CHRP_LIBRARIES})
@@ -135,10 +135,7 @@ add_definitions("-DCHRP_MOLFILES_DIR=\"${CMAKE_INSTALL_PREFIX}/molfiles/\"")
 # Installation configuration
 #==============================================================================#
 
-file(GLOB_RECURSE headers
-    include/chemharp/*.hpp
-    ${CMAKE_BINARY_DIR}/include/chemharp/exports.hpp
-)
+file(GLOB_RECURSE headers include/chemharp/*.hpp)
 
 # All headers
 install(FILES ${headers} DESTINATION include/chemharp/)
