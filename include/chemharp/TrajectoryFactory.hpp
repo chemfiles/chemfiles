@@ -29,7 +29,7 @@ typedef unique_ptr<File> (*file_creator_t) (const string& path, const string& mo
 
 /*!
 * @class trajectory_builder TrajectoryFactory.hpp
-* @brief Structure associating format and file classes
+* @brief Structure associating format and file classes builder functions.
 */
 struct trajectory_builder_t {
     format_creator_t format_creator;
@@ -41,13 +41,14 @@ using trajectory_map_t = std::unordered_map<string, trajectory_builder_t>;
 
 /*!
 * @class TrajectoryFactory TrajectoryFactory.hpp
-* @brief Factory for FormatReader and FormatWriter classes
 *
-* This class allow to register at compile time various FormatReader and FormatWriter
-* classes, giving at runtime the good format (by the associated extension) when
-* asked politely.
+* This class allow to register at compile time various Format and the associated
+* File class, giving at runtime the good format when asked politely.
+*
+* Each couple (File, Format) is represented by a trajectory_builder_t instance, and can
+* be registered by an extension, or by a Format name.
 */
-class TrajectoryFactory{
+class TrajectoryFactory {
 private:
     //! Get a static reader_map instance associating format descriptions and readers
     static trajectory_map_t& names();

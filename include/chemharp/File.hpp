@@ -29,7 +29,7 @@ typedef bte::any<mpl::vector<bte::ostreamable<>,
 
 /*!
 * @class File File.hpp File.cpp
-* @brief File base abstraction
+* @brief Abstract base class for file representation.
 */
 class File {
 public:
@@ -38,15 +38,12 @@ public:
     // Removing default copy constructors
     File(File const&) = delete;
     File& operator=(File const&) = delete;
-    // Removing default comparison operator
-    bool operator==(File const&) = delete;
-    bool operator!=(File const&) = delete;
 
     //! Is the file opended ?
     virtual bool is_open() = 0;
     //! Close the file before the destructor call.
     virtual void close() = 0;
-    //! File name
+    //! File name, i.e. complete path to this file on disk.
     const std::string& filename() const {return _filename;}
 protected:
     explicit File(const std::string& path) : _filename(path) {}
@@ -56,10 +53,9 @@ private:
 
 /*!
  * @class TextFile File.hpp File.cpp
- * @brief Text file abstraction
  *
- * This class is inteded to be inherited by any form of text files: compressed
- * files, memory-mapped files, and any other.
+ * Abstract base class representing a text file. This class is inteded to be inherited by
+ * any form of text files: compressed files, memory-mapped files, and any other.
  */
 class TextFile : public File {
 public:
@@ -90,12 +86,12 @@ protected:
 
 /*!
 * @class BinaryFile File.hpp
-* @brief Binary file abstraction class.
+* @brief Abstract base class for binary files representation
 *
 * Because the binary formats can be everything, this class does not provides any
 * of the usual methods for working with streams, and is not intended to be
-* instanciated directly, but rather to serve as a base class for all the binary
-* file operations.
+* instanciated, but rather to serve as a base class for all the binary
+* file classes.
 */
 class BinaryFile : public File {
 public:

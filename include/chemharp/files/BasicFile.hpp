@@ -16,10 +16,8 @@ namespace harp {
 
 /*!
  * @class BasicFile BasicFile.hpp BasicFile.cpp
- * @brief Basic text file
  *
- * This is only a thin wrapper on top of standard C++ streams. It can be updated
- * later to use directly the C functions.
+ * Basic text file, only a thin wrapper on top of standard C++ fstreams.
  */
 class BasicFile : public TextFile {
 public:

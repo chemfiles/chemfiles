@@ -23,17 +23,17 @@ class Frame;
 
 /*!
  * @class Format Format.hpp Format.cpp
- * @brief Abstract format class
  *
- * Abstract base class for file formats reader and writer
+ * Abstract base class for formats reader and writer
  */
 class Format {
 public:
+    //! Constructor associating a file to this Format instance. The file should have the
+    //! file_t class.
     Format(File& f) : file(f) {}
     virtual ~Format() = default;
     /*!
-    * @brief Read a specific step from the internal file.
-    * @param file The file to read from.
+    * @brief Read a specific step from the associated file.
     * @param step The step to read
     * @param frame The frame to fill
     *
@@ -42,18 +42,15 @@ public:
     virtual void read_step(const size_t step, Frame& frame);
 
     /*!
-    * @brief Read a specific step from a file.
-    * @param file The file to read from.
+    * @brief Read a specific step from the associated file.
     * @param frame The frame to fill
     *
-    * This function can throw an exception in case of error. The cursor is
-    * assumed to be at the right position in case of text files.
+    * This function can throw an exception in case of error.
     */
     virtual void read(Frame& frame);
 
     /*!
-    * @brief Write a step (frame) to a file.
-    * @param file The file to read from.
+    * @brief Write a step (frame) to the associated file.
     * @param frame The frame to be writen
     *
     * This function can throw an exception in case of error.
@@ -61,18 +58,19 @@ public:
     virtual void write(const Frame& frame);
 
     /*!
-    * @brief Get the number of frames in a file
-    * @param file The file to read from.
+    * @brief Get the number of frames in the associated file
     * @return The number of frames
     */
     virtual size_t nsteps() const = 0;
 
     //! A short string describing the format.
     virtual std::string description() const = 0;
-    //! TODO
-    File& file;
-    //! TODO
+
+    //! File class to use with this Format. This is for registration in the Factory.
     using file_t = BasicFile;
+protected:
+    //! File associated with this Format instance.
+    File& file;
 };
 
 } // namespace harp

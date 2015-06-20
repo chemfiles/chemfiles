@@ -27,19 +27,24 @@ namespace harp {
 
 class Topology;
 
+/*!
+ * List all the VMD molfile plugins enabled. For more documentation about VMD molfile
+ * plugins, please see: http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/
+ */
 enum MolfileFormat {
-    PDB,
-    DCD,
-    GRO,
-    TRR,
-    XTC,
-    TRJ,
+    PDB, ///< PDB file format
+    DCD, ///< DCD binary file format
+    GRO, ///< Gromacs .gro file format
+    TRR, ///< Gromacs .trr file format
+    XTC, ///< Gromacs .xtc file format
+    TRJ, ///< Gromacs .trj file format
 };
 
 /*!
  * @class Molfile formats/Molfile.hpp formats/Molfile.cpp
  *
- * Use of VMD Molfile plugins as format reader/writer.
+ * Use of VMD Molfile plugins as format reader/writer. This class is templated by a value
+ * in the MolfileFormat enum.
  */
 template <MolfileFormat F>
 class Molfile : public Format {
