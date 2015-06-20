@@ -4,3 +4,6 @@
 [submodule "bindings/julia"]
 	path = bindings/julia
 	url = https://github.com/Luthaf/Chemharp.jl
+[submodule "chrp"]
+	path = bin
+	url = https://github.com/Luthaf/chrp

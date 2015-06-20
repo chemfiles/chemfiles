@@ -2,6 +2,8 @@
 
 * Julia binding
 * Initial Windows support, with both MSVC and mingw
+* Add a binary frontend called `chrp`, implementing some analysis algorithms.
+  For more informations, see the [specific repository](https://github.com/Luthaf/chrp).
 
 # 0.2
 

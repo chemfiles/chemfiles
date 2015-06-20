@@ -1,20 +1,26 @@
 cmake_minimum_required(VERSION 2.8.12)
-include(ExternalProject)
-
 project(chemharp C CXX)
 set(CHRP_VERSION_MAJOR 0)
 set(CHRP_VERSION_MINOR 2)
 set(CHRP_VERSION_PATCH 0)
 set(CHRP_VERSION "${CHRP_VERSION_MAJOR}.${CHRP_VERSION_MINOR}.${CHRP_VERSION_PATCH}")
 
-option(BUILD_TESTS "Build harp tests." OFF)
-option(CODE_COVERAGE "Build code coverage" OFF)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+if(${CMAKE_VERSION} VERSION_GREATER 3.0.0)
+    cmake_policy(SET CMP0042 NEW)
+endif()
+
+option(BUILD_TESTS "Build unit tests." OFF)
+option(BUILD_FRONTEND "Build the binary frontend." ON)
+option(CODE_COVERAGE "Enable code coverage" OFF)
 option(PYTHON_BINDING "Build python interface to Chemharp." OFF)
 option(FORTRAN_BINDING "Build FORTRAN interface to Chemharp." OFF)
 
 if(${FORTRAN_BINDING})
     enable_language(Fortran)
 endif()
+
+include(ExternalProject)
 
 if(CODE_COVERAGE)
     set(BUILD_TESTS ON)
@@ -27,11 +33,6 @@ if(CODE_COVERAGE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
     set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
     set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-endif()
-
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-if(${CMAKE_VERSION} VERSION_GREATER 3.0.0)
-    cmake_policy(SET CMP0042 NEW)
 endif()
 
 # Set a default build type if none was specified
@@ -152,12 +153,6 @@ install(FILES ${molfiles} DESTINATION lib/molfiles/
                     GROUP_READ             GROUP_EXECUTE
                     WORLD_READ             WORLD_EXECUTE)
 
-add_subdirectory(doc)
-enable_testing()
-add_subdirectory(tests)
-add_subdirectory(examples)
-add_subdirectory(bindings)
-
 # uninstall target
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.in.cmake"
@@ -179,3 +174,18 @@ set(CPACK_PACKAGE_VERSION_MINOR ${CHRP_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${CHRP_VERSION_PATCH})
 set(CPACK_GENERATOR "TGZ;ZIP")
 include(CPack)
+
+#========================================================================================#
+# Sub projects
+#========================================================================================#
+enable_testing()
+add_subdirectory(doc)
+add_subdirectory(tests)
+add_subdirectory(examples)
+add_subdirectory(bindings)
+
+if(${BUILD_FRONTEND})
+    set(CHEMHARP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    set(CHEMHARP_LIBDIR ${CMAKE_CURRENT_BINARY_DIR})
+    add_subdirectory(bin)
+endif()
