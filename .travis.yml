@@ -28,7 +28,7 @@ install:
   - tar xf lcov_1.11.orig.tar.gz
   - sudo make -C lcov-1.11/ install
   # Setting environement
-  - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DBUILD_TESTS=ON -DPYTHON_BINDING=ON -DFORTRAN_BINDING=ON -DBUILD_FRONTEND=OFF"
+  - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DBUILD_TESTS=ON -DPYTHON_BINDING=ON -DFORTRAN_BINDING=ON"
   - export FC=gfortran-4.9
   - |
     if [ ${CC} == "gcc" ]
