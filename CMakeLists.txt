@@ -1,14 +1,19 @@
 cmake_minimum_required(VERSION 2.8.12)
-project(chemharp C CXX)
-set(CHRP_VERSION_MAJOR 0)
-set(CHRP_VERSION_MINOR 2)
-set(CHRP_VERSION_PATCH 0)
-set(CHRP_VERSION "${CHRP_VERSION_MAJOR}.${CHRP_VERSION_MINOR}.${CHRP_VERSION_PATCH}")
-
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 if(${CMAKE_VERSION} VERSION_GREATER 3.0.0)
     cmake_policy(SET CMP0042 NEW)
 endif()
+
+#----------------------------------------------------------------------------------------#
+project(chemharp C CXX)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CXX_STANDARD_REQUIRED ON)
+
+set(CHRP_VERSION_MAJOR 0)
+set(CHRP_VERSION_MINOR 2)
+set(CHRP_VERSION_PATCH 0)
+set(CHRP_VERSION "${CHRP_VERSION_MAJOR}.${CHRP_VERSION_MINOR}.${CHRP_VERSION_PATCH}")
 
 option(BUILD_TESTS "Build unit tests." OFF)
 option(BUILD_FRONTEND "Build the binary frontend." ON)
@@ -20,7 +25,8 @@ if(${FORTRAN_BINDING})
     enable_language(Fortran)
 endif()
 
-include(ExternalProject)
+include(CompilerFlags)
+include(Platforms)
 
 if(CODE_COVERAGE)
     set(BUILD_TESTS ON)
@@ -31,8 +37,8 @@ if(CODE_COVERAGE)
     # Code coverage should use gcc
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-    set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
-    set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
 endif()
 
 # Set a default build type if none was specified
@@ -41,13 +47,15 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "release" CACHE STRING "Choose the type of build." FORCE)
 endif()
 
+#----------------------------------------------------------------------------------------#
+include(ExternalProject)
+
 set(HAVE_NETCDF 0)
 find_package(NetCDF)
 
 if(${NETCDF_FOUND})
     set(HAVE_NETCDF 1)
     include_directories(${NETCDF_INCLUDES})
-    #==========================================================================#
     # NetCDF CXX4 library will be built as an external project
     ExternalProject_add(netcdfcxx
         PREFIX external/netcdfcxx
@@ -67,36 +75,23 @@ if(${NETCDF_FOUND})
     set_property(
         TARGET netcdf_cxx4
     PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/lib/libnetcdf-cxx4${CMAKE_STATIC_LIBRARY_SUFFIX})
-    #==========================================================================#
 endif()
 
-option(USE_STATIC_LIBS "Prefer use of static libraries" NO)
-set(Boost_USE_STATIC_LIBS ${USE_STATIC_LIBS})
-set(Boost_USE_MULTITHREADED OFF)
-if(USE_STATIC_BOOST)
-   unset(Boost_INCLUDE_DIR CACHE)
-   unset(Boost_LIBRARY_DIRS CACHE)
-   message(STATUS "Linking against boost static libraries")
-else()
-   unset(Boost_INCLUDE_DIR CACHE)
-   unset(Boost_LIBRARY_DIRS CACHE)
+#----------------------------------------------------------------------------------------#
+# Building Boost as an external project
+set(BOOST_VERSION 1.58.0)
+set(BOOST_MD5 b0605a9323f1e960f7434dbbd95a7a5c)
+set(BOOST_PREFIX ${CMAKE_BINARY_DIR})
+set(BOOST_LIBS filesystem system)
+if(PYTHON_BINDING)
+    list(APPEND BOOST_LIBS python)
 endif()
-find_package(Boost 1.54.0 REQUIRED COMPONENTS filesystem system)
+
+include(BuildBoost)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
-set(CMAKE_CXX_STANDARD 11)
-set(CXX_STANDARD_REQUIRED ON)
-include(CompilerFlags)
-
-include_directories(include)
-file(GLOB_RECURSE sources src/**.cpp)
-
-configure_file (
-  "${PROJECT_SOURCE_DIR}/include/chemharp/config.in.hpp"
-  "${PROJECT_SOURCE_DIR}/include/chemharp/config.hpp"
-)
-
-# ============================================================================ #
+#----------------------------------------------------------------------------------------#
+# VMD Molfiles as an external project
 include(ExternalProject)
 ExternalProject_Add(molfile-plugins
     PREFIX external/molfile
@@ -107,10 +102,10 @@ ExternalProject_Add(molfile-plugins
                -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
 )
 include_directories(${CMAKE_BINARY_DIR}/include)
-# ============================================================================ #
+#----------------------------------------------------------------------------------------#
 
-include(Platforms)
-
+include_directories(include)
+file(GLOB_RECURSE sources src/**.cpp)
 add_library(chemharp SHARED ${sources} bindings/c/capi.cpp)
 
 set_property(TARGET chemharp PROPERTY VERSION ${CHRP_VERSION})
@@ -121,20 +116,24 @@ generate_export_header(chemharp
           BASE_NAME CHRP
           EXPORT_FILE_NAME ${CMAKE_SOURCE_DIR}/include/chemharp/exports.hpp
 )
-
 target_link_libraries(chemharp ${Boost_LIBRARIES} ${OTHER_CHRP_LIBRARIES})
+
+configure_file (
+  "${PROJECT_SOURCE_DIR}/include/chemharp/config.in.hpp"
+  "${PROJECT_SOURCE_DIR}/include/chemharp/config.hpp"
+)
 
 if(${HAVE_NETCDF})
     add_dependencies(chemharp netcdfcxx)
     target_link_libraries(chemharp ${NETCDF_LIBRARIES} netcdf_cxx4)
 endif()
 
-add_dependencies(chemharp molfile-plugins)
+add_dependencies(chemharp molfile-plugins Boost)
 add_definitions("-DCHRP_MOLFILES_DIR=\"${CMAKE_INSTALL_PREFIX}/molfiles/\"")
 
-#==============================================================================#
+#----------------------------------------------------------------------------------------#
 # Installation configuration
-#==============================================================================#
+#----------------------------------------------------------------------------------------#
 
 file(GLOB_RECURSE headers include/chemharp/*.hpp)
 
@@ -162,9 +161,9 @@ configure_file(
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake)
 
-#========================================================================================#
+#----------------------------------------------------------------------------------------#
 # Packaging stuff
-#========================================================================================#
+#----------------------------------------------------------------------------------------#
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Chemharp, efficient chemistry IO library")
 set(CPACK_PACKAGE_VENDOR "Guillaume Fraux")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
@@ -175,17 +174,14 @@ set(CPACK_PACKAGE_VERSION_PATCH ${CHRP_VERSION_PATCH})
 set(CPACK_GENERATOR "TGZ;ZIP")
 include(CPack)
 
-#========================================================================================#
+#----------------------------------------------------------------------------------------#
 # Sub projects
-#========================================================================================#
+#----------------------------------------------------------------------------------------#
 enable_testing()
 add_subdirectory(doc)
 add_subdirectory(tests)
 add_subdirectory(examples)
 add_subdirectory(bindings)
-
 if(${BUILD_FRONTEND})
-    set(CHEMHARP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    set(CHEMHARP_LIBDIR ${CMAKE_CURRENT_BINARY_DIR})
     add_subdirectory(bin)
 endif()
