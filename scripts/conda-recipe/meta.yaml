@@ -1,0 +1,21 @@
+package:
+  name: chemharp
+  version: "0.3.dev"
+
+source:
+  path: ../../bindings/python
+
+requirements:
+  build:
+    - cmake
+    - python
+    - numpy
+    - libnetcdf
+  run:
+    - python
+    - numpy
+    - libnetcdf
+
+about:
+  home: https://github.com/Luthaf/Chemharp
+  license: MPL v2.0
