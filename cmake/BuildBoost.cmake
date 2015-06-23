@@ -44,7 +44,7 @@ set(BOOST_BUILD_ARGS "--prefix=${BOOST_PREFIX}" link=static threading=multi runt
 list(APPEND BOOST_BUILD_ARGS "toolset=${B2_TOOLSET}-cmake")
 
 # We want position independent code.
-if(LINUX)
+IF("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
     list(APPEND BOOST_BUILD_ARGS "cxxflags=-fPIC")
 endif()
 
@@ -66,6 +66,7 @@ ExternalProject_Add(
     BUILD_COMMAND ./b2 ${BOOST_BUILD_ARGS} install
     BUILD_IN_SOURCE 1
     INSTALL_COMMAND ""
+    LOG_BUILD 1
 )
 
 # Set the exact compiler path, as needed
