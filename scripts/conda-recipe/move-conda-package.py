@@ -7,9 +7,9 @@ import os
 import yaml
 import glob
 import shutil
-from conda_build import config
+from conda_build.config import config
 
-with open(os.path.join(os.path.dirpath(__file__), 'meta.yaml')) as fd:
+with open(os.path.join(os.path.dirname(__file__), 'meta.yaml')) as fd:
     name = yaml.load(fd)['package']['name']
 
 binary_package_glob = os.path.join(config.bldpkgs_dir, '{0}*.tar.bz2'.format(name))
