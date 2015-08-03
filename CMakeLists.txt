@@ -183,5 +183,11 @@ add_subdirectory(tests)
 add_subdirectory(examples)
 add_subdirectory(bindings)
 if(${BUILD_FRONTEND})
-    add_subdirectory(bin)
+    if(EXISTS "${CMAKE_SOURCE_DIR}/bin/CMakeLists.txt")
+        add_subdirectory(bin)
+    else()
+        message(WARNING
+        "The binary frontend source does not exist at ${CMAKE_SOURCE_DIR}/bin/, "
+        "the frontend will not be built.")
+    endif()
 endif()
