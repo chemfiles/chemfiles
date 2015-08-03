@@ -65,6 +65,8 @@ before_script:
   - ./bin/cmake $CMAKE_ARGS ..
   # Cleanup the coverage data
   - ${LCOV} --directory $(pwd) --zerocounters
+  # Force installation of the cached Boost build
+  - rm -f external/boost/src/Boost-stamp/Boost-build
 
 script:
   - cd ${TRAVIS_BUILD_DIR}/build
