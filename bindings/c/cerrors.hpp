@@ -27,12 +27,12 @@ struct CAPIStatus {
         //! Error in the C++ standard library
         STD_ERROR,
         //! Catch all harp::Error errors
-        GENERIC,
+        CHEMHARP,
         //! Memory error: wrong pre-allocated arrays, ...
         MEMORY,
         //! File error: inexistent, can not open, ...
         FILE,
-        //! Error in the C++ standard library
+        //! Error in file formating
         FORMAT,
         //! Counter for the number of error codes.
         LAST,
@@ -41,7 +41,7 @@ struct CAPIStatus {
     CAPIStatus() {
         messages[SUCESS] = "Operation was sucessfull";
         messages[STD_ERROR] = "Error in C++ runtime. Use chrp_last_error for more informations.";
-        messages[GENERIC] = "Error in Chemharp library. Use chrp_last_error for more informations.";
+        messages[CHEMHARP] = "Error in Chemharp library. Use chrp_last_error for more informations.";
         messages[MEMORY] = "Memory error.";
         messages[FILE] = "Error while reading a file.";
         messages[FORMAT] = "Error while reading a format.";
@@ -83,7 +83,7 @@ static CAPIStatus status = CAPIStatus();
     CATCH_AND_RETURN(FileError, CAPIStatus::FILE)                              \
     CATCH_AND_RETURN(MemoryError, CAPIStatus::MEMORY)                          \
     CATCH_AND_RETURN(FormatError, CAPIStatus::FORMAT)                          \
-    CATCH_AND_RETURN(Error, CAPIStatus::GENERIC)                               \
+    CATCH_AND_RETURN(Error, CAPIStatus::CHEMHARP)                              \
     catch(const std::exception& e) {                                           \
         status.last_error = string(e.what());                                  \
         return CAPIStatus::STD_ERROR;                                          \
