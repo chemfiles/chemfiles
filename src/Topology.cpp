@@ -144,19 +144,19 @@ vector<dihedral> Topology::dihedrals() const{
     return std::move(res);
 }
 
-bool Topology::isbond(size_t i, size_t j) {
+bool Topology::isbond(size_t i, size_t j) const  {
     auto bonds = _connect.bonds();
     auto pos = bonds.find(bond(i, j));
     return pos != end(bonds);
 }
 
-bool Topology::isangle(size_t i, size_t j, size_t k) {
+bool Topology::isangle(size_t i, size_t j, size_t k) const {
     auto angles = _connect.angles();
     auto pos = angles.find(angle(i, j, k));
     return pos != end(angles);
 }
 
-bool Topology::isdihedral(size_t i, size_t j, size_t k, size_t m) {
+bool Topology::isdihedral(size_t i, size_t j, size_t k, size_t m) const {
     auto dihedrals = _connect.dihedrals();
     auto pos = dihedrals.find(dihedral(i, j, k, m));
     return pos != end(dihedrals);

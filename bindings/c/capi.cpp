@@ -355,43 +355,43 @@ int chrp_topology_remove(CHRP_TOPOLOGY* topology, size_t i){
     )
 }
 
-int chrp_topology_isbond(CHRP_TOPOLOGY* topology, size_t i, size_t j, bool* result){
+int chrp_topology_isbond(const CHRP_TOPOLOGY* topology, size_t i, size_t j, bool* result){
     CHRP_ERROR_WRAP_RETCODE(
         *result = topology->isbond(i, j);
     )
 }
 
-int chrp_topology_isangle(CHRP_TOPOLOGY* topology, size_t i, size_t j, size_t k, bool* result){
+int chrp_topology_isangle(const CHRP_TOPOLOGY* topology, size_t i, size_t j, size_t k, bool* result){
     CHRP_ERROR_WRAP_RETCODE(
         *result = topology->isangle(i, j, k);
     )
 }
 
-int chrp_topology_isdihedral(CHRP_TOPOLOGY* topology, size_t i, size_t j, size_t k, size_t m, bool* result){
+int chrp_topology_isdihedral(const CHRP_TOPOLOGY* topology, size_t i, size_t j, size_t k, size_t m, bool* result){
     CHRP_ERROR_WRAP_RETCODE(
         *result = topology->isdihedral(i, j, k, m);
     )
 }
 
-int chrp_topology_bonds_count(CHRP_TOPOLOGY* topology, size_t* nbonds){
+int chrp_topology_bonds_count(const CHRP_TOPOLOGY* topology, size_t* nbonds){
     CHRP_ERROR_WRAP_RETCODE(
         *nbonds = topology->bonds().size();
     )
 }
 
-int chrp_topology_angles_count(CHRP_TOPOLOGY* topology, size_t* nangles){
+int chrp_topology_angles_count(const CHRP_TOPOLOGY* topology, size_t* nangles){
     CHRP_ERROR_WRAP_RETCODE(
         *nangles = topology->angles().size();
     )
 }
 
-int chrp_topology_dihedrals_count(CHRP_TOPOLOGY* topology, size_t* ndihedrals){
+int chrp_topology_dihedrals_count(const CHRP_TOPOLOGY* topology, size_t* ndihedrals){
     CHRP_ERROR_WRAP_RETCODE(
         *ndihedrals = topology->dihedrals().size();
     )
 }
 
-int chrp_topology_bonds(CHRP_TOPOLOGY* topology, size_t (*data)[2], size_t nbonds){
+int chrp_topology_bonds(const CHRP_TOPOLOGY* topology, size_t (*data)[2], size_t nbonds){
     if (nbonds != topology->bonds().size()){
         status.last_error = "Wrong data size in function 'chrp_topology_bonds'.";
         return CAPIStatus::MEMORY;
@@ -406,7 +406,7 @@ int chrp_topology_bonds(CHRP_TOPOLOGY* topology, size_t (*data)[2], size_t nbond
     )
 }
 
-int chrp_topology_angles(CHRP_TOPOLOGY* topology, size_t (*data)[3], size_t nangles){
+int chrp_topology_angles(const CHRP_TOPOLOGY* topology, size_t (*data)[3], size_t nangles){
     if (nangles != topology->angles().size()){
         status.last_error = "Wrong data size in function 'chrp_topology_angles'.";
         return CAPIStatus::MEMORY;
@@ -422,7 +422,7 @@ int chrp_topology_angles(CHRP_TOPOLOGY* topology, size_t (*data)[3], size_t nang
     )
 }
 
-int chrp_topology_dihedrals(CHRP_TOPOLOGY* topology, size_t (*data)[4], size_t ndihedrals){
+int chrp_topology_dihedrals(const CHRP_TOPOLOGY* topology, size_t (*data)[4], size_t ndihedrals){
     if (ndihedrals != topology->dihedrals().size()){
         status.last_error = "Wrong data size in function 'chrp_topology_bonds'.";
         return CAPIStatus::MEMORY;

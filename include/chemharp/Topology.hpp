@@ -199,12 +199,12 @@ public:
     void clear();
 
     //! Check wether the atoms at indexes \c i and \c j are bonded or not
-    bool isbond(size_t i, size_t j);
+    bool isbond(size_t i, size_t j) const;
     //! Check wether the atoms at indexes \c i, \c j and \c k constitues an angle
-    bool isangle(size_t i, size_t j, size_t k);
+    bool isangle(size_t i, size_t j, size_t k) const;
     //! Check wether the atoms at indexes \c i \c j, \c k and \c m constitues a
     //! dihedral angle
-    bool isdihedral(size_t i, size_t j, size_t k, size_t m);
+    bool isdihedral(size_t i, size_t j, size_t k, size_t m) const;
 
     //! Get the bonds in the system
     std::vector<bond> bonds() const;

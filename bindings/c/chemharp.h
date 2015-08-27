@@ -454,7 +454,7 @@ CHRP_EXPORT int chrp_topology_remove(CHRP_TOPOLOGY* topology, size_t i);
 * @param result true if the atoms are bonded, false otherwise
 * @return The status code
 */
-CHRP_EXPORT int chrp_topology_isbond(CHRP_TOPOLOGY* topology, size_t i, size_t j, bool* result);
+CHRP_EXPORT int chrp_topology_isbond(const CHRP_TOPOLOGY* topology, size_t i, size_t j, bool* result);
 
 /*!
 * @brief Tell if the atoms \c i, \c j and \c k constitues an angle
@@ -463,8 +463,7 @@ CHRP_EXPORT int chrp_topology_isbond(CHRP_TOPOLOGY* topology, size_t i, size_t j
 * @param result true if the atoms constitues an angle, false otherwise
 * @return The status code
 */
-CHRP_EXPORT int chrp_topology_isangle(CHRP_TOPOLOGY* topology,
-                            size_t i, size_t j, size_t k, bool* result);
+CHRP_EXPORT int chrp_topology_isangle(const CHRP_TOPOLOGY* topology, size_t i, size_t j, size_t k, bool* result);
 
 /*!
 * @brief Tell if the atoms \c i, \c j, \c k and \c m constitues a dihedral angle
@@ -473,8 +472,7 @@ CHRP_EXPORT int chrp_topology_isangle(CHRP_TOPOLOGY* topology,
 * @param result true if the atoms constitues a dihedral angle, false otherwise
 * @return The status code
 */
-CHRP_EXPORT int chrp_topology_isdihedral(CHRP_TOPOLOGY* topology,
-                             size_t i, size_t j, size_t k, size_t m, bool* result);
+CHRP_EXPORT int chrp_topology_isdihedral(const CHRP_TOPOLOGY* topology, size_t i, size_t j, size_t k, size_t m, bool* result);
 
 /*!
 * @brief Get the number of bonds in the system
@@ -482,7 +480,7 @@ CHRP_EXPORT int chrp_topology_isdihedral(CHRP_TOPOLOGY* topology,
 * @param nbonds After the call, contains the number of bond
 * @return The status code
 */
-CHRP_EXPORT int chrp_topology_bonds_count(CHRP_TOPOLOGY* topology, size_t* nbonds);
+CHRP_EXPORT int chrp_topology_bonds_count(const CHRP_TOPOLOGY* topology, size_t* nbonds);
 
 /*!
 * @brief Get the number of angles in the system
@@ -490,7 +488,7 @@ CHRP_EXPORT int chrp_topology_bonds_count(CHRP_TOPOLOGY* topology, size_t* nbond
 * @param nangles After the call, contains the number of angles
 * @return The status code
 */
-CHRP_EXPORT int chrp_topology_angles_count(CHRP_TOPOLOGY* topology, size_t* nangles);
+CHRP_EXPORT int chrp_topology_angles_count(const CHRP_TOPOLOGY* topology, size_t* nangles);
 
 /*!
 * @brief Get the number of dihedral angles in the system
@@ -498,7 +496,7 @@ CHRP_EXPORT int chrp_topology_angles_count(CHRP_TOPOLOGY* topology, size_t* nang
 * @param ndihedrals After the call, contains the number of dihedral angles
 * @return The status code
 */
-CHRP_EXPORT int chrp_topology_dihedrals_count(CHRP_TOPOLOGY* topology, size_t* ndihedrals);
+CHRP_EXPORT int chrp_topology_dihedrals_count(const CHRP_TOPOLOGY* topology, size_t* ndihedrals);
 
 /*!
 * @brief Get the bonds in the system
@@ -508,7 +506,7 @@ CHRP_EXPORT int chrp_topology_dihedrals_count(CHRP_TOPOLOGY* topology, size_t* n
 *               chrp_topology_bonds_count function
 * @return The status code
 */
-CHRP_EXPORT int chrp_topology_bonds(CHRP_TOPOLOGY* topology, size_t (*data)[2], size_t nbonds);
+CHRP_EXPORT int chrp_topology_bonds(const CHRP_TOPOLOGY* topology, size_t (*data)[2], size_t nbonds);
 
 /*!
 * @brief Get the angles in the system
@@ -518,7 +516,7 @@ CHRP_EXPORT int chrp_topology_bonds(CHRP_TOPOLOGY* topology, size_t (*data)[2], 
 *               chrp_topology_angles_count function
 * @return The status code
 */
-CHRP_EXPORT int chrp_topology_angles(CHRP_TOPOLOGY* topology, size_t (*data)[3], size_t nangles);
+CHRP_EXPORT int chrp_topology_angles(const CHRP_TOPOLOGY* topology, size_t (*data)[3], size_t nangles);
 
 /*!
 * @brief Get the dihedral angles in the system
@@ -528,7 +526,7 @@ CHRP_EXPORT int chrp_topology_angles(CHRP_TOPOLOGY* topology, size_t (*data)[3],
 *               chrp_topology_dihedrals_count function
 * @return The status code
 */
-CHRP_EXPORT int chrp_topology_dihedrals(CHRP_TOPOLOGY* topology, size_t (*data)[4], size_t ndihedrals);
+CHRP_EXPORT int chrp_topology_dihedrals(const CHRP_TOPOLOGY* topology, size_t (*data)[4], size_t ndihedrals);
 
 /*!
 * @brief Add a bond between the atoms \c i and \c j in the system
