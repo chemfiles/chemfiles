@@ -437,7 +437,7 @@ CHRP_EXPORT int chrp_topology_size(const CHRP_TOPOLOGY* topology, size_t *natoms
 * @param atom The atom to be added
 * @return The status code
 */
-CHRP_EXPORT int chrp_topology_append(CHRP_TOPOLOGY* topology, CHRP_ATOM* atom);
+CHRP_EXPORT int chrp_topology_append(CHRP_TOPOLOGY* topology, const CHRP_ATOM* atom);
 
 /*!
 * @brief Remove an atom from a topology by index

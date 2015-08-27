@@ -343,7 +343,7 @@ int chrp_topology_size(const CHRP_TOPOLOGY* topology, size_t *natoms){
     )
 }
 
-int chrp_topology_append(CHRP_TOPOLOGY* topology, CHRP_ATOM* atom){
+int chrp_topology_append(CHRP_TOPOLOGY* topology, const CHRP_ATOM* atom){
     CHRP_ERROR_WRAP_RETCODE(
         topology->append(*atom);
     )
