@@ -318,7 +318,7 @@ error:
     return topology;
 }
 
-CHRP_ATOM* chrp_atom_from_topology(CHRP_TOPOLOGY* topology, size_t idx){
+CHRP_ATOM* chrp_atom_from_topology(const CHRP_TOPOLOGY* topology, size_t idx){
     CHRP_ATOM* atom = NULL;
     CHRP_ERROR_WRAP(
         atom = new Atom("");
@@ -468,7 +468,7 @@ error:
     return atom;
 }
 
-CHRP_ATOM* chrp_atom_from_frame(CHRP_FRAME* frame, size_t idx){
+CHRP_ATOM* chrp_atom_from_frame(const CHRP_FRAME* frame, size_t idx){
     CHRP_ATOM* atom = NULL;
     CHRP_ERROR_WRAP(
         atom = new Atom("");

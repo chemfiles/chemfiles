@@ -566,7 +566,7 @@ CHRP_EXPORT CHRP_ATOM* chrp_atom(const char* name);
 * @param idx The atom index in the frame
 * @return A pointer to the corresponding atom
 */
-CHRP_EXPORT CHRP_ATOM* chrp_atom_from_frame(CHRP_FRAME* frame, size_t idx);
+CHRP_EXPORT CHRP_ATOM* chrp_atom_from_frame(const CHRP_FRAME* frame, size_t idx);
 
 /*!
 * @brief Get a specific atom from a topology
@@ -574,7 +574,7 @@ CHRP_EXPORT CHRP_ATOM* chrp_atom_from_frame(CHRP_FRAME* frame, size_t idx);
 * @param idx The atom index in the topology
 * @return A pointer to the corresponding atom
 */
-CHRP_EXPORT CHRP_ATOM* chrp_atom_from_topology(CHRP_TOPOLOGY* topology, size_t idx);
+CHRP_EXPORT CHRP_ATOM* chrp_atom_from_topology(const CHRP_TOPOLOGY* topology, size_t idx);
 
 /*!
 * @brief Get the mass of an atom, in atomic mass units
