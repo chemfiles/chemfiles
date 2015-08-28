@@ -159,26 +159,76 @@ bindings to Python or Fortran, please [read the doc](http://chemharp.readthedocs
 
 ### Usage
 
-The documentation is hosted at [readthedocs](http://chemharp.readthedocs.org), but here is an example of how the API feels like in C++:
+The documentation is hosted at [readthedocs](http://chemharp.readthedocs.org), but here
+are some examples of how the API feels in all the supported languages:
+
+#### C++
 ```cpp
 #include <iostream>
-
 #include "Chemharp.cpp"
-using namespace harp;
 
 int main() {
-    Trajectory traj("filename.xyz");
-    Frame frame;
+    harp::Trajectory trajectory("filename.xyz");
+    harp::Frame frame;
 
-    traj >> frame;
-    std::cout << "There is " << frame.natoms() << " atoms in the frame" << std::endl;
+    trajectory >> frame;
+    std::cout << "There are " << frame.natoms() << " atoms in the frame" << std::endl;
     auto positions = frame.positions();
 
-    // Do stuff here with the positions
+    // Do awesome things with the positions here !
 }
 ```
 
-And in C:
+#### Python
+
+```python
+from chemharp import Trajectory, Frame
+
+trajectory = Trajectory("filename.xyz")
+frame = trajectory.read()
+
+print("There are {} atoms in the frame".format(frame.natoms()))
+positions = frame.positions()
+
+# Do awesome things with the positions here !
+```
+
+#### Julia
+
+```julia
+using Chemharp
+
+trajectory = Trajectory("filename.xyz")
+frame = read(trajectory)
+
+println("There are $(natoms(frame)) atoms in the frame")
+positions = positions(frame)
+
+# Do awesome things with the positions here !
+```
+
+#### Rust
+
+```rust
+extern crate chemharp;
+
+use chemharp::Trajectory;
+
+fn main() {
+    let mut trajectory = Trajectory::new("filename.xyz").unwrap();
+    let mut frame = Frame::new(0).unwrap();
+
+    trajectory.read(&mut frame).unwrap();
+
+    println!("There are {} atoms in the frame", frame.natoms().unwrap())
+
+    let positions = frame.positions.unwrap();
+
+    // Do awesome things with the positions here !
+}
+```
+
+#### C
 ```c
 #include <stdint.h>
 #include <stdio.h>
@@ -186,32 +236,65 @@ And in C:
 #include "chemharp.h"
 
 int main(){
-    CHRP_TRAJECTORY *traj = chrp_open("filename.xyz", "r");
-    CHRP_FRAME *frame = chrp_frame(0);
+    CHRP_TRAJECTORY * trajectory = chrp_open("filename.xyz", "r");
+    CHRP_FRAME * frame = chrp_frame(0);
     size_t natoms = 0;
-    int status;
 
     if (!traj) {
-        printf("Error while reading: %s", chrp_last_error());
+        printf("Error while opening file: %s", chrp_last_error());
     }
 
-    status = chrp_trajectory_read(traj, frame);
-    if (!status){
-        /* handle error here */
+    if (!chrp_trajectory_read(trajectory, frame)){
+        // handle error here
     }
-    chrp_frame_size(frame, &natoms);
-    printf("There is %d atoms in the frame", natoms);
+    chrp_frame_atoms_count(frame, &natoms);
+    printf("There are %d atoms in the frame", natoms);
 
     float (*positions)[3] = (float(*)[3])malloc(sizeof(float[natoms][3]));
 
     if (!chrp_frame_positions(frame, positions, natoms)){
-        /* handle error */
+        // handle error
     }
 
-    /* Do awesome things with the positions here ! */
+    // Do awesome things with the positions here !
 
     chrp_frame_free(frame);
-    chrp_close(traj);
+    chrp_close(trajectory);
+}
+```
+
+#### Fortran
+
+```fortran
+program example
+    use chemharp
+    use iso_fortran_env, only: int64, real32
+
+    implicit none
+    type(chrp_trajectory) :: trajectory
+    type(chrp_frame) :: frame
+    integer(int64) :: natoms
+    real(real32), dimension(:, :), allocatable :: positions
+    integer :: status
+
+    call trajectory%open("filename.xyz", "r", status=status)
+    if status /= 0 stop "Error while opening file"
+    call frame%init(0)
+
+    call file%read(frame, status=status)
+    if status /= 0 stop "Error while reading file"
+
+    call frame%atoms_count(natoms)
+    write(*, *) "There are ", natoms, "atoms in the frame"
+
+    allocate(positions(3, natoms))
+
+    call frame%positions(positions, natoms)
+
+    // Do awesome things with the positions here !
+
+    call frame%free()
+    call trajectory%close()
 }
 ```
 
