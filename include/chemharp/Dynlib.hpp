@@ -14,8 +14,9 @@
 #include <string>
 #include <sstream>
 #include "chemharp/Error.hpp"
+#include "chemharp/config.hpp"
 
-#ifdef WIN32
+#ifdef CHRP_WINDOWS
     #include <direct.h>
     #include <windows.h>
 #else
@@ -34,15 +35,15 @@ class Dynlib {
 public:
     //! Load a library from it path
     explicit Dynlib(const std::string& path) : handle(nullptr) {
-    #ifdef WIN32
-        handle = LoadLibrary(TEXT(path.c_str()));
-        if (!handle)
-            throw PluginError("Cannot load library: " + path);
-    #else
-        handle = dlopen(path.c_str(), RTLD_LAZY);
-        if (!handle)
-            throw PluginError("Cannot load library: " + path + ". " + dlerror());
-    #endif
+        #ifdef CHRP_WINDOWS
+            handle = LoadLibrary(TEXT(path.c_str()));
+            if (!handle)
+                throw PluginError("Cannot load library: " + path);
+        #else
+            handle = dlopen(path.c_str(), RTLD_LAZY);
+            if (!handle)
+                throw PluginError("Cannot load library: " + path + ". " + dlerror());
+        #endif
     }
     //! A default constructor with no library associated
     Dynlib() : handle(nullptr) {}
@@ -61,11 +62,11 @@ public:
 
     ~Dynlib() {
         if (handle) {
-    #ifdef WIN32
-        FreeLibrary(handle);
-    #else
-        dlclose(handle);
-    #endif
+            #ifdef CHRP_WINDOWS
+                FreeLibrary(handle);
+            #else
+                dlclose(handle);
+            #endif
         }
     }
 
@@ -75,24 +76,24 @@ public:
     function_t symbol(const std::string& name){
         if (handle == nullptr)
             throw PluginError("The dynamic library was not opened.");
-        #ifdef WIN32
-            function_t sym = reinterpret_cast<function_t>(GetProcAddress(handle, name.c_str()));
-            if (!sym){
-                std::stringstream message;
-                message << "Cannot load symbol " << name << ": " << GetLastError();
-                throw PluginError(message.str());
-            }
-        #else
-            dlerror(); // reset errors
-            function_t sym = reinterpret_cast<function_t>(dlsym(handle, name.c_str()));
-            const char* dlsym_error = dlerror();
-            if (dlsym_error)
-                throw PluginError("Cannot load symbol " + name + ": " + std::string(dlsym_error));
-        #endif
+            #ifdef WIN32
+                function_t sym = reinterpret_cast<function_t>(GetProcAddress(handle, name.c_str()));
+                if (!sym){
+                    std::stringstream message;
+                    message << "Cannot load symbol " << name << ": " << GetLastError();
+                    throw PluginError(message.str());
+                }
+            #else
+                dlerror(); // reset errors
+                function_t sym = reinterpret_cast<function_t>(dlsym(handle, name.c_str()));
+                const char* dlsym_error = dlerror();
+                if (dlsym_error)
+                    throw PluginError("Cannot load symbol " + name + ": " + std::string(dlsym_error));
+            #endif
             return sym;
     }
 private:
-    #ifdef WIN32
+    #ifdef CHRP_WINDOWS
         HINSTANCE handle;
     #else
         void* handle;

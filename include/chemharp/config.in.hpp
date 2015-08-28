@@ -15,8 +15,14 @@
 #define CHRP_VERSION_PATCH @CHRP_VERSION_PATCH@
 #define CHRP_VERSION "@CHRP_VERSION@"
 
-// Include the MSVC export definitions
+// Include the export definitions
 #include "chemharp/@CHEMHARP_PREFIX@exports.hpp"
+
+// Are we compiling for Windows ?
+#if defined( WIN32 ) || defined( _WIN32 ) || defined( __WIN32__ ) || defined( __CYGWIN__ ) || \
+    defined( WIN64 ) || defined( _WIN64 ) || defined( __WIN64__ )
+    #define CHRP_WINDOWS
+#endif
 
 // The CHEMHARP_PUBLIC macro should be defined when including this file to prevent
 // unwanted macros from being exported.
