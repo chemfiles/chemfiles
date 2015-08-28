@@ -69,8 +69,8 @@ if(${NETCDF_FOUND})
     # NetCDF CXX4 library will be built as an external project
     ExternalProject_add(netcdfcxx
         PREFIX external/netcdfcxx
-        URL "https://github.com/Unidata/netcdf-cxx4/archive/420a0f26edcc09d35e47fac5c01802c3c65afa3d.zip"
-        URL_MD5 7f6828a0fa5a95ee3b052cb164d2f2f1
+        URL file://${CMAKE_CURRENT_SOURCE_DIR}/external/netcdfcxx.tar.gz
+        URL_MD5 a50ba13ff6593c3c9293fd205addf288
         CMAKE_ARGS  -DBUILD_SHARED_LIBS=OFF
                     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
                     -DBUILD_TESTING=OFF
@@ -92,8 +92,8 @@ endif()
 include(ExternalProject)
 ExternalProject_Add(molfile-plugins
     PREFIX external/molfile
-    URL https://github.com/Luthaf/VMD-Molfiles/archive/761a47cd593c474a4d4e205b5d892c7f7e6a1cb2.zip
-    URL_HASH SHA1=a2b9912f2c002dcc350f9dff4d06486ac2a3ef2a
+    URL file://${CMAKE_CURRENT_SOURCE_DIR}/external/molfiles.tar.gz
+    URL_HASH SHA1=266b3e1b95ca422428f6a723aab1fcab0ca7b04d
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
                -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
                -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
