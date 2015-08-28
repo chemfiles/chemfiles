@@ -10,3 +10,6 @@
 [submodule "bindings/python"]
 	path = bindings/python
 	url = https://github.com/Luthaf/Chemharp-python
+[submodule "bindings/rust"]
+	path = bindings/rust
+	url = https://github.com/Luthaf/Chemharp.rs
