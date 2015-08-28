@@ -216,14 +216,14 @@ subroutine chrp_frame_init_(this, natoms, status)
     end if
 end subroutine
 
-subroutine chrp_frame_size(this, natoms, status)
+subroutine chrp_frame_atoms_count(this, natoms, status)
     implicit none
     class(chrp_frame), intent(in) :: this
     integer(kind=c_size_t) :: natoms
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_frame_size_c(this%ptr, natoms)
+    status_tmp_ = chrp_frame_atoms_count_c(this%ptr, natoms)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -637,14 +637,14 @@ subroutine chrp_topology_from_frame_init_(this, frame, status)
     end if
 end subroutine
 
-subroutine chrp_topology_size(this, natoms, status)
+subroutine chrp_topology_atoms_count(this, natoms, status)
     implicit none
     class(chrp_topology), intent(in) :: this
     integer(kind=c_size_t) :: natoms
     integer, optional :: status
     integer :: status_tmp_
 
-    status_tmp_ = chrp_topology_size_c(this%ptr, natoms)
+    status_tmp_ = chrp_topology_atoms_count_c(this%ptr, natoms)
     if (present(status)) then
         status = status_tmp_
     end if
@@ -653,7 +653,7 @@ end subroutine
 subroutine chrp_topology_append(this, atom, status)
     implicit none
     class(chrp_topology) :: this
-    class(chrp_atom) :: atom
+    class(chrp_atom), intent(in) :: atom
     integer, optional :: status
     integer :: status_tmp_
 
@@ -678,7 +678,7 @@ end subroutine
 
 subroutine chrp_topology_isbond(this, i, j, result, status)
     implicit none
-    class(chrp_topology) :: this
+    class(chrp_topology), intent(in) :: this
     integer(kind=c_size_t), value :: i
     integer(kind=c_size_t), value :: j
     logical(kind=c_bool) :: result
@@ -693,7 +693,7 @@ end subroutine
 
 subroutine chrp_topology_isangle(this, i, j, k, result, status)
     implicit none
-    class(chrp_topology) :: this
+    class(chrp_topology), intent(in) :: this
     integer(kind=c_size_t), value :: i
     integer(kind=c_size_t), value :: j
     integer(kind=c_size_t), value :: k
@@ -709,7 +709,7 @@ end subroutine
 
 subroutine chrp_topology_isdihedral(this, i, j, k, m, result, status)
     implicit none
-    class(chrp_topology) :: this
+    class(chrp_topology), intent(in) :: this
     integer(kind=c_size_t), value :: i
     integer(kind=c_size_t), value :: j
     integer(kind=c_size_t), value :: k
@@ -726,7 +726,7 @@ end subroutine
 
 subroutine chrp_topology_bonds_count(this, nbonds, status)
     implicit none
-    class(chrp_topology) :: this
+    class(chrp_topology), intent(in) :: this
     integer(kind=c_size_t) :: nbonds
     integer, optional :: status
     integer :: status_tmp_
@@ -739,7 +739,7 @@ end subroutine
 
 subroutine chrp_topology_angles_count(this, nangles, status)
     implicit none
-    class(chrp_topology) :: this
+    class(chrp_topology), intent(in) :: this
     integer(kind=c_size_t) :: nangles
     integer, optional :: status
     integer :: status_tmp_
@@ -752,7 +752,7 @@ end subroutine
 
 subroutine chrp_topology_dihedrals_count(this, ndihedrals, status)
     implicit none
-    class(chrp_topology) :: this
+    class(chrp_topology), intent(in) :: this
     integer(kind=c_size_t) :: ndihedrals
     integer, optional :: status
     integer :: status_tmp_
@@ -765,7 +765,7 @@ end subroutine
 
 subroutine chrp_topology_bonds(this, data, nbonds, status)
     implicit none
-    class(chrp_topology) :: this
+    class(chrp_topology), intent(in) :: this
     integer(kind=c_size_t), dimension(:, :), target :: data
     integer(kind=c_size_t), value :: nbonds
     integer, optional :: status
@@ -779,7 +779,7 @@ end subroutine
 
 subroutine chrp_topology_angles(this, data, nangles, status)
     implicit none
-    class(chrp_topology) :: this
+    class(chrp_topology), intent(in) :: this
     integer(kind=c_size_t), dimension(:, :), target :: data
     integer(kind=c_size_t), value :: nangles
     integer, optional :: status
@@ -793,7 +793,7 @@ end subroutine
 
 subroutine chrp_topology_dihedrals(this, data, ndihedrals, status)
     implicit none
-    class(chrp_topology) :: this
+    class(chrp_topology), intent(in) :: this
     integer(kind=c_size_t), dimension(:, :), target :: data
     integer(kind=c_size_t), value :: ndihedrals
     integer, optional :: status
@@ -868,7 +868,7 @@ end subroutine
 subroutine chrp_atom_from_frame_init_(this, frame, idx, status)
     implicit none
     class(chrp_atom) :: this
-    class(chrp_frame) :: frame
+    class(chrp_frame), intent(in) :: frame
     integer(kind=c_size_t), value :: idx
     integer, optional :: status
     integer :: status_tmp_
@@ -889,7 +889,7 @@ end subroutine
 subroutine chrp_atom_from_topology_init_(this, topology, idx, status)
     implicit none
     class(chrp_atom) :: this
-    class(chrp_topology) :: topology
+    class(chrp_topology), intent(in) :: topology
     integer(kind=c_size_t), value :: idx
     integer, optional :: status
     integer :: status_tmp_

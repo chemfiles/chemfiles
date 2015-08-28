@@ -17,7 +17,7 @@ int main(){
     assert(!chrp_trajectory_read(file, frame));
 
     size_t natoms=0;
-    assert(!chrp_frame_size(frame, &natoms));
+    assert(!chrp_frame_atoms_count(frame, &natoms));
     assert(natoms == 297);
 
     float pos_0[3] = {0.417219, 8.303366, 11.737172};
@@ -33,7 +33,7 @@ int main(){
 
     // Check topology in the first frame
     CHRP_TOPOLOGY* topology = chrp_topology_from_frame(frame);
-    assert(!chrp_topology_size(topology, &natoms));
+    assert(!chrp_topology_atoms_count(topology, &natoms));
     assert(natoms == 297);
     size_t n = 0;
     assert(!chrp_topology_bonds_count(topology, &n));
@@ -96,7 +96,7 @@ int main(){
 
     assert(!chrp_trajectory_set_topology(file, topology));
     assert(!chrp_topology_free(topology));
-    
+
     assert(!chrp_trajectory_read_step(file, 10, frame));
 
     atom = chrp_atom_from_frame(frame, 1);

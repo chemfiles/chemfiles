@@ -12,7 +12,7 @@ int main() {
     CHRP_TOPOLOGY* topology = chrp_topology();
 
     size_t natoms=100, n=0;
-    assert(!chrp_topology_size(topology, &natoms));
+    assert(!chrp_topology_atoms_count(topology, &natoms));
     assert(natoms == 0);
 
     // Creating some H2O2
@@ -22,7 +22,7 @@ int main() {
     assert(!chrp_topology_append(topology, O));
     assert(!chrp_topology_append(topology, O));
     assert(!chrp_topology_append(topology, H));
-    assert(!chrp_topology_size(topology, &natoms));
+    assert(!chrp_topology_atoms_count(topology, &natoms));
     assert(natoms == 4);
     assert(!chrp_atom_free(O));
     assert(!chrp_atom_free(H));
@@ -90,7 +90,7 @@ int main() {
     assert(n == 0);
 
     assert(!chrp_topology_remove(topology, 3));
-    assert(!chrp_topology_size(topology, &natoms));
+    assert(!chrp_topology_atoms_count(topology, &natoms));
     assert(natoms == 3);
 
     assert(!chrp_topology_free(topology));

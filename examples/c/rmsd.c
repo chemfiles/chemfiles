@@ -33,7 +33,7 @@ int main() {
         // of particles
         size_t natoms = 0;
         if (i == 0) {
-            chrp_frame_size(frame, &natoms);
+            chrp_frame_atoms_count(frame, &natoms);
             positions = (float(*)[3])malloc(natoms*3*sizeof(float));
             if (positions == NULL)
                 goto error;

@@ -17,7 +17,7 @@ int main() {
         goto error;
 
     size_t natoms = 0;
-    chrp_frame_size(frame, &natoms);
+    chrp_frame_atoms_count(frame, &natoms);
 
     float (*positions)[3] = (float(*)[3])malloc(natoms*3*sizeof(float));
     unsigned* indexes = (unsigned*)malloc(natoms*sizeof(unsigned));

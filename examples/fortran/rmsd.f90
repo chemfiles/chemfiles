@@ -29,7 +29,7 @@ program rmsd_
         ! Only allocate on the first iteration. This assume a constant number
         ! of particles
         if (i == 0) then
-            call frame%size(natoms)
+            call frame%atoms_count(natoms)
             allocate(positions(3, natoms))
         end if
 

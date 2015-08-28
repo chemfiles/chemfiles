@@ -39,9 +39,9 @@ program trajectory_read
     call file%read(frame, status=status)
     call check((status == 0), "file%read")
 
-    call frame%size(natoms, status=status)
-    call check((status == 0), "frame%size")
-    call check((natoms == 297), "frame%size")
+    call frame%atoms_count(natoms, status=status)
+    call check((status == 0), "frame%atoms_count")
+    call check((natoms == 297), "frame%atoms_count")
 
     ! Check positions in the first frame
     pos_1 = [0.417219, 8.303366, 11.737172]
@@ -58,9 +58,9 @@ program trajectory_read
     call topology%from_frame(frame, status=status)
     call check((status == 0), "topology%from_frame")
 
-    call topology%size(natoms, status=status)
-    call check((status == 0), "topology%size")
-    call check((natoms == 297), "topology%size")
+    call topology%atoms_count(natoms, status=status)
+    call check((status == 0), "topology%atoms_count")
+    call check((natoms == 297), "topology%atoms_count")
 
     call topology%bonds_count(n, status=status)
     call check((status == 0), "topology%bonds_count")

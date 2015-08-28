@@ -12,7 +12,7 @@ int main() {
     CHRP_FRAME* frame = chrp_frame(5);
 
     size_t natoms=0, step=0;
-    assert(!chrp_frame_size(frame, &natoms));
+    assert(!chrp_frame_atoms_count(frame, &natoms));
     assert(natoms == 5);
 
     assert(!chrp_frame_step(frame, &step));
@@ -29,7 +29,7 @@ int main() {
             data[i][j] = i*j;
 
     assert(!chrp_frame_set_positions(frame, data, 4));
-    assert(!chrp_frame_size(frame, &natoms));
+    assert(!chrp_frame_atoms_count(frame, &natoms));
     assert(natoms == 4);
 
     assert(!chrp_frame_positions(frame, pos, 4));

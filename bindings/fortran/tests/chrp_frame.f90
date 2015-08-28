@@ -18,9 +18,9 @@ program frame_test
     call frame%init(5, status=status)
     call check((status == 0), "frame%init")
 
-    call frame%size(natoms, status=status)
-    call check((status == 0), "frame%size")
-    call check((natoms == 5), "frame%size")
+    call frame%atoms_count(natoms, status=status)
+    call check((status == 0), "frame%atoms_count")
+    call check((natoms == 5), "frame%atoms_count")
 
     call frame%step(step, status=status)
     call check((status == 0), "frame%step")
@@ -41,9 +41,9 @@ program frame_test
     call frame%set_positions(new_data, 4, status=status)
     call check((status == 0), "frame%set_positions")
 
-    call frame%size(natoms, status=status)
-    call check((status == 0), "frame%size")
-    call check((natoms == 4), "frame%size")
+    call frame%atoms_count(natoms, status=status)
+    call check((status == 0), "frame%atoms_count")
+    call check((natoms == 4), "frame%atoms_count")
 
     call frame%positions(pos, 4, status=status)
     call check((status == 0), "frame%positions")

@@ -20,7 +20,7 @@ type chrp_topology
 contains
     procedure :: init => chrp_topology_init_
     procedure :: from_frame => chrp_topology_from_frame_init_
-    procedure :: size => chrp_topology_size
+    procedure :: atoms_count => chrp_topology_atoms_count
     procedure :: append => chrp_topology_append
     procedure :: remove => chrp_topology_remove
     procedure :: isbond => chrp_topology_isbond
@@ -57,7 +57,7 @@ type chrp_frame
     type(c_ptr) :: ptr
 contains
     procedure :: init => chrp_frame_init_
-    procedure :: size => chrp_frame_size
+    procedure :: atoms_count => chrp_frame_atoms_count
     procedure :: positions => chrp_frame_positions
     procedure :: set_positions => chrp_frame_set_positions
     procedure :: velocities => chrp_frame_velocities

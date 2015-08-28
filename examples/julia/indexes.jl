@@ -11,7 +11,7 @@ positions = positions(frame)
 
 indexes = Int[]
 
-for i=1:size(frame)
+for i=1:natoms(frame)
     if positions[1, i] < 5
         push!(indexes, i)
     end

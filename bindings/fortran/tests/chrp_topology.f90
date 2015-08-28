@@ -16,7 +16,7 @@ program topology_test
     call topology%init(status=status)
     call check((status == 0), "topology%init")
 
-    call topology%size(natoms, status=status)
+    call topology%atoms_count(natoms, status=status)
     call check((status == 0), "topology%natoms")
     call check((natoms == 0), "topology%natoms")
 
@@ -33,9 +33,9 @@ program topology_test
     call topology%append(H, status=status)
     call check((status == 0), "topology%append")
 
-    call topology%size(natoms, status=status)
-    call check((status == 0), "topology%size")
-    call check((natoms == 4), "topology%size")
+    call topology%atoms_count(natoms, status=status)
+    call check((status == 0), "topology%atoms_count")
+    call check((natoms == 4), "topology%atoms_count")
 
     call O%free()
     call H%free()
@@ -135,9 +135,9 @@ program topology_test
     call check((n == 0), "topology%dihedrals_count")
 
     call topology%remove(3, status=status)
-    call topology%size(natoms, status=status)
-    call check((status == 0), "topology%size")
-    call check((natoms == 3), "topology%size")
+    call topology%atoms_count(natoms, status=status)
+    call check((status == 0), "topology%atoms_count")
+    call check((natoms == 3), "topology%atoms_count")
 
     call topology%free(status=status)
     call check((status == 0), "topology%free")

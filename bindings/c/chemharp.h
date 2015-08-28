@@ -188,12 +188,12 @@ CHRP_EXPORT int chrp_trajectory_close(CHRP_TRAJECTORY *file);
 CHRP_EXPORT CHRP_FRAME* chrp_frame(size_t natoms);
 
 /*!
-* @brief Get the frame size, i.e. the current number of atoms
+* @brief Get the current number of atoms in the frame.
 * @param frame The frame to analyse
 * @param natoms the number of atoms in the frame
 * @return The status code
 */
-CHRP_EXPORT int chrp_frame_size(const CHRP_FRAME* frame, size_t *natoms);
+CHRP_EXPORT int chrp_frame_atoms_count(const CHRP_FRAME* frame, size_t *natoms);
 
 /*!
 * @brief Get the positions from a frame
@@ -424,12 +424,12 @@ CHRP_EXPORT CHRP_TOPOLOGY* chrp_topology();
 CHRP_EXPORT CHRP_TOPOLOGY* chrp_topology_from_frame(CHRP_FRAME* frame);
 
 /*!
-* @brief Get the topology size, i.e. the current number of atoms
+* @brief Get the current number of atoms in the topology.
 * @param topology The topology to analyse
 * @param natoms Will contain the number of atoms in the frame
 * @return The status code
 */
-CHRP_EXPORT int chrp_topology_size(const CHRP_TOPOLOGY* topology, size_t *natoms);
+CHRP_EXPORT int chrp_topology_atoms_count(const CHRP_TOPOLOGY* topology, size_t *natoms);
 
 /*!
 * @brief Add an atom to a topology

@@ -112,7 +112,7 @@ error:
     return frame;
 }
 
-int chrp_frame_size(const CHRP_FRAME* frame, size_t *natoms){
+int chrp_frame_atoms_count(const CHRP_FRAME* frame, size_t *natoms){
     CHRP_ERROR_WRAP_RETCODE(
         *natoms = frame->natoms();
     )
@@ -337,7 +337,7 @@ error:
     return topology;
 }
 
-int chrp_topology_size(const CHRP_TOPOLOGY* topology, size_t *natoms){
+int chrp_topology_atoms_count(const CHRP_TOPOLOGY* topology, size_t *natoms){
     CHRP_ERROR_WRAP_RETCODE(
         *natoms = topology->natoms();
     )

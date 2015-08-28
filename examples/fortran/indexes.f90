@@ -21,7 +21,7 @@ program indexes_
     end if
 
     ! Read the number of atoms
-    call frame%size(natoms)
+    call frame%atoms_count(natoms)
 
     allocate(indexes(natoms), positions(3, natoms))
     call frame%positions(positions, natoms)
