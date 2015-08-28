@@ -76,9 +76,19 @@ if(${NETCDF_FOUND})
                     -DBUILD_TESTING=OFF
                     -DNCXX_ENABLE_TESTS=OFF
                     -DCMAKE_BUILD_TYPE=release
-                    -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
+                    # Setting compilers
                     -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
                     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+                    -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
+                    # Setting installation directory
+                    -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
+                    # Support cross-compilation
+                    # -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+                    -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
+                    -DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}
+                    -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=${CMAKE_FIND_ROOT_PATH_MODE_LIBRARY}
+                    -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=${CMAKE_FIND_ROOT_PATH_MODE_INCLUDE}
+                    -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=${CMAKE_FIND_ROOT_PATH_MODE_PROGRAM}
     )
     include_directories(BEFORE SYSTEM ${CMAKE_BINARY_DIR}/include)
     add_library(netcdf_cxx4 STATIC IMPORTED)
@@ -90,13 +100,24 @@ endif()
 #----------------------------------------------------------------------------------------#
 # VMD Molfiles as an external project
 include(ExternalProject)
-ExternalProject_Add(molfile-plugins
-    PREFIX external/molfile
+ExternalProject_Add(molfiles
+    PREFIX external/molfiles
     URL file://${CMAKE_CURRENT_SOURCE_DIR}/external/molfiles.tar.gz
     URL_HASH SHA1=266b3e1b95ca422428f6a723aab1fcab0ca7b04d
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
-               -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-               -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+    CMAKE_ARGS  -DCMAKE_BUILD_TYPE=release
+                # Setting compilers
+                -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+                -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+                -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
+                # Setting installation directory
+                -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
+                # Support cross-compilation
+                # -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+                -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
+                -DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}
+                -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=${CMAKE_FIND_ROOT_PATH_MODE_LIBRARY}
+                -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=${CMAKE_FIND_ROOT_PATH_MODE_INCLUDE}
+                -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=${CMAKE_FIND_ROOT_PATH_MODE_PROGRAM}
 )
 include_directories(${CMAKE_BINARY_DIR}/include)
 #----------------------------------------------------------------------------------------#
@@ -125,7 +146,7 @@ if(${HAVE_NETCDF})
     target_link_libraries(chemharp ${NETCDF_LIBRARIES} netcdf_cxx4)
 endif()
 
-add_dependencies(chemharp molfile-plugins)
+add_dependencies(chemharp molfiles)
 add_definitions("-DCHRP_MOLFILES_DIR=\"${CMAKE_INSTALL_PREFIX}/molfiles/\"")
 
 #----------------------------------------------------------------------------------------#
@@ -143,7 +164,7 @@ install(FILES bindings/c/chemharp.h DESTINATION include)
 # Dynamic library
 install(TARGETS chemharp DESTINATION lib)
 
-file(GLOB_RECURSE molfiles ${CMAKE_BINARY_DIR}/lib/*plugin.so)
+file(GLOB molfiles ${CMAKE_BINARY_DIR}/lib/*plugin.so)
 install(FILES ${molfiles} DESTINATION lib/molfiles/
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                     GROUP_READ             GROUP_EXECUTE

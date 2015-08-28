@@ -8,6 +8,8 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 elseif(${CMAKE_COMPILER_IS_GNUCC})
     if(${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 5.0)
         set(cxx11_flag_needed ON)
+    elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+        set(cxx11_flag_needed ON)
     endif()
 endif()
 
