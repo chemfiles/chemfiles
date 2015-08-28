@@ -47,6 +47,16 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "release" CACHE STRING "Choose the type of build." FORCE)
 endif()
 
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/boost/CMakeLists.txt")
+    message(STATUS "Unpacking Boost sources")
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_SOURCE_DIR}/external/boost.tar.gz
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external
+    )
+endif()
+add_subdirectory(external)
+include_directories(BEFORE SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/boost)
+
 #----------------------------------------------------------------------------------------#
 include(ExternalProject)
 
@@ -78,19 +88,6 @@ if(${NETCDF_FOUND})
 endif()
 
 #----------------------------------------------------------------------------------------#
-# Building Boost as an external project
-set(BOOST_VERSION 1.58.0)
-set(BOOST_MD5 b0605a9323f1e960f7434dbbd95a7a5c)
-set(BOOST_PREFIX ${CMAKE_BINARY_DIR})
-set(BOOST_LIBS filesystem system)
-if(PYTHON_BINDING)
-    list(APPEND BOOST_LIBS python)
-endif()
-
-include(BuildBoost)
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-
-#----------------------------------------------------------------------------------------#
 # VMD Molfiles as an external project
 include(ExternalProject)
 ExternalProject_Add(molfile-plugins
@@ -116,7 +113,7 @@ generate_export_header(chemharp
           BASE_NAME CHRP
           EXPORT_FILE_NAME ${CMAKE_SOURCE_DIR}/include/chemharp/exports.hpp
 )
-target_link_libraries(chemharp ${Boost_LIBRARIES} ${OTHER_CHRP_LIBRARIES})
+target_link_libraries(chemharp boost_system boost_filesystem ${OTHER_CHRP_LIBRARIES})
 
 configure_file (
   "${PROJECT_SOURCE_DIR}/include/chemharp/config.in.hpp"
@@ -128,7 +125,7 @@ if(${HAVE_NETCDF})
     target_link_libraries(chemharp ${NETCDF_LIBRARIES} netcdf_cxx4)
 endif()
 
-add_dependencies(chemharp molfile-plugins Boost)
+add_dependencies(chemharp molfile-plugins)
 add_definitions("-DCHRP_MOLFILES_DIR=\"${CMAKE_INSTALL_PREFIX}/molfiles/\"")
 
 #----------------------------------------------------------------------------------------#

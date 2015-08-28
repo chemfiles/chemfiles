@@ -2,3 +2,4 @@ build
 # CMake generated file
 include/chemharp/config.hpp
 include/chemharp/exports.hpp
+external/boost/
