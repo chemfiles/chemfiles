@@ -57,7 +57,7 @@ install:
   - bash Miniconda-3.5.5-Linux-x86_64.sh -b
   - export PATH=$HOME/miniconda/bin:$PATH
   - conda update --yes conda
-  - conda install --yes conda-build jinja2 binstar numpy
+  - conda install --yes conda-build jinja2 anaconda-client numpy
   - export CONDA_RECIPE=${TRAVIS_BUILD_DIR}/scripts/conda-recipe
 
 before_script:
