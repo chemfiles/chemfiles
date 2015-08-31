@@ -47,82 +47,18 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "release" CACHE STRING "Choose the type of build." FORCE)
 endif()
 
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/boost/CMakeLists.txt")
-    message(STATUS "Unpacking Boost sources")
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_SOURCE_DIR}/external/boost.tar.gz
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external
-    )
-endif()
-add_subdirectory(external)
-include_directories(BEFORE SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/boost)
-
-#----------------------------------------------------------------------------------------#
-include(ExternalProject)
-
 set(HAVE_NETCDF 0)
 find_package(NetCDF)
-
 if(${NETCDF_FOUND})
     set(HAVE_NETCDF 1)
-    include_directories(${NETCDF_INCLUDES})
-    # NetCDF CXX4 library will be built as an external project
-    ExternalProject_add(netcdfcxx
-        PREFIX external/netcdfcxx
-        URL file://${CMAKE_CURRENT_SOURCE_DIR}/external/netcdfcxx.tar.gz
-        URL_MD5 a50ba13ff6593c3c9293fd205addf288
-        CMAKE_ARGS  -DBUILD_SHARED_LIBS=OFF
-                    -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-                    -DBUILD_TESTING=OFF
-                    -DNCXX_ENABLE_TESTS=OFF
-                    -DCMAKE_BUILD_TYPE=release
-                    # Setting compilers
-                    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-                    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-                    -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
-                    # Setting installation directory
-                    -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
-                    # Support cross-compilation
-                    # -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
-                    -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
-                    -DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}
-                    -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=${CMAKE_FIND_ROOT_PATH_MODE_LIBRARY}
-                    -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=${CMAKE_FIND_ROOT_PATH_MODE_INCLUDE}
-                    -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=${CMAKE_FIND_ROOT_PATH_MODE_PROGRAM}
-    )
-    include_directories(BEFORE SYSTEM ${CMAKE_BINARY_DIR}/include)
-    add_library(netcdf_cxx4 STATIC IMPORTED)
-    set_property(
-        TARGET netcdf_cxx4
-    PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/lib/libnetcdf-cxx4${CMAKE_STATIC_LIBRARY_SUFFIX})
 endif()
 
-#----------------------------------------------------------------------------------------#
-# VMD Molfiles as an external project
-include(ExternalProject)
-ExternalProject_Add(molfiles
-    PREFIX external/molfiles
-    URL file://${CMAKE_CURRENT_SOURCE_DIR}/external/molfiles.tar.gz
-    URL_HASH SHA1=266b3e1b95ca422428f6a723aab1fcab0ca7b04d
-    CMAKE_ARGS  -DCMAKE_BUILD_TYPE=release
-                # Setting compilers
-                -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-                -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-                -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
-                # Setting installation directory
-                -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
-                # Support cross-compilation
-                # -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
-                -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
-                -DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}
-                -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=${CMAKE_FIND_ROOT_PATH_MODE_LIBRARY}
-                -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=${CMAKE_FIND_ROOT_PATH_MODE_INCLUDE}
-                -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=${CMAKE_FIND_ROOT_PATH_MODE_PROGRAM}
-)
-include_directories(${CMAKE_BINARY_DIR}/include)
-#----------------------------------------------------------------------------------------#
+add_subdirectory(external)
 
 include_directories(include)
+include_directories(BEFORE SYSTEM ${CMAKE_BINARY_DIR}/include)
+include_directories(BEFORE SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/boost)
+
 file(GLOB_RECURSE sources src/**.cpp)
 add_library(chemharp SHARED ${sources} bindings/c/capi.cpp)
 
