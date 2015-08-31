@@ -67,9 +67,10 @@ script:
   - make
   - ctest --output-on-failure
 
+
 deploy:
   provider: script
-  script: scripts/conda-recipe/deploy.sh
+  script: bash ${TRAVIS_BUILD_DIR}/scripts/conda-recipe/deploy.sh
   on:
     condition: ${C_COMPILER} == "gcc"
     tags: true
