@@ -23,6 +23,7 @@ addons:
     - clang-3.5
 
 install:
+  - export C_COMPILER=$CC
   # Coverage stuff
   - gem install coveralls-lcov
   - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz
@@ -32,14 +33,14 @@ install:
   - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DBUILD_TESTS=ON -DPYTHON_BINDING=ON -DFORTRAN_BINDING=ON"
   - export FC=gfortran-4.9
   - |
-    if [ ${CC} == "gcc" ]
+    if [ ${C_COMPILER} == "gcc" ]
     then
         export CC=gcc-4.9
         export CXX=g++-4.9
         export CMAKE_ARGS="$CMAKE_ARGS -DCODE_COVERAGE=ON"
     fi
   - |
-    if [ ${CC} == "clang" ]
+    if [ ${C_COMPILER} == "clang" ]
     then
         export CC=clang-3.5
         export CXX=clang++-3.5
@@ -48,13 +49,12 @@ install:
   - cd build
   - wget http://www.cmake.org/files/v3.2/cmake-3.2.1-Linux-x86_64.sh
   - sh cmake-3.2.1-Linux-x86_64.sh --prefix=. --exclude-subdir
-   # Conda: binary builds for Python
+  # Conda: binary builds for Python
   - wget "http://repo.continuum.io/miniconda/Miniconda-3.5.5-Linux-x86_64.sh"
   - bash Miniconda-3.5.5-Linux-x86_64.sh -b
   - export PATH=$HOME/miniconda/bin:$PATH
   - conda update --yes conda
-  - conda install --yes conda-build jinja2 anaconda-client numpy
-  - export CONDA_RECIPE=${TRAVIS_BUILD_DIR}/scripts/conda-recipe
+  - conda install --yes numpy
 
 before_script:
   - cd ${TRAVIS_BUILD_DIR}/build
@@ -66,9 +66,14 @@ script:
   - cd ${TRAVIS_BUILD_DIR}/build
   - make
   - ctest --output-on-failure
-  # Build conda recipe
-  - cd ${TRAVIS_BUILD_DIR}
-  - conda build $CONDA_RECIPE
+
+deploy:
+  provider: script
+  script: scripts/conda-recipe/deploy.sh
+  on:
+    condition: ${C_COMPILER} == "gcc"
+    tags: true
+
 
 after_success:
   - cd ${TRAVIS_BUILD_DIR}/build
@@ -77,11 +82,3 @@ after_success:
   - ${LCOV} --remove coverage.info 'tests/*' 'Chemharp/build/*' '/usr/*' --output-file coverage.info
   - ${LCOV} --list coverage.info
   - coveralls-lcov --repo-token=${COVERALLS_TOKEN} coverage.info
-  # Submit binary build to binstar for conda
-  - cd ${TRAVIS_BUILD_DIR}
-  - |
-    if [ ${CC} == "gcc-4.9" ]
-    then
-        python $CONDA_RECIPE/move-conda-package.py
-        binstar -t $BINSTAR_TOKEN upload --force *.tar.bz2
-    fi

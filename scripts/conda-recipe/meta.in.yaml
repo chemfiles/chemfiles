@@ -1,6 +1,6 @@
 package:
   name: chemharp
-  version: "0.3.dev"
+  version: "@CHRP_VERSION@"
 
 source:
   path: ../../bindings/python

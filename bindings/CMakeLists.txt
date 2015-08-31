@@ -8,7 +8,10 @@ if(${PYTHON_BINDING})
       "${PROJECT_SOURCE_DIR}/scripts/conda-recipe/bld.in.bat"
       "${PROJECT_SOURCE_DIR}/scripts/conda-recipe/bld.bat"
     )
-
+    configure_file (
+      "${PROJECT_SOURCE_DIR}/scripts/conda-recipe/meta.in.yaml"
+      "${PROJECT_SOURCE_DIR}/scripts/conda-recipe/meta.yaml"
+    )
 endif()
 
 function(chrp_c_test _file_)
