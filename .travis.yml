@@ -1,9 +1,5 @@
 language: cpp
 
-cache:
-  directories:
-    - ${TRAVIS_BUILD_DIR}/build/external/boost
-
 env:
   global:
     secure: Mf7f3PP+AHqyOMEp9koj+mTBSVfo03XNFLJ6offmH3IWIj+N5fxwn+tN3H/hKUeL8mvzfHjXPAkYkWKVwcamoQ9ktoYLDJ83HCa4muCUxENz/SAR2DvWf8ix7ggvIP8wZCrNyq8ssw+5F1FRmauF7HjTDPCtBiz/sjvK94XVwXU=
@@ -65,8 +61,6 @@ before_script:
   - ./bin/cmake $CMAKE_ARGS ..
   # Cleanup the coverage data
   - ${LCOV} --directory $(pwd) --zerocounters
-  # Force installation of the cached Boost build
-  - rm -f external/boost/src/Boost-stamp/Boost-build
 
 script:
   - cd ${TRAVIS_BUILD_DIR}/build
@@ -91,7 +85,3 @@ after_success:
         python $CONDA_RECIPE/move-conda-package.py
         binstar -t $BINSTAR_TOKEN upload --force *.tar.bz2
     fi
-
-before_cache:
-  - cd ${TRAVIS_BUILD_DIR}/build/external/boost
-  - find -name "*.log" -delete
