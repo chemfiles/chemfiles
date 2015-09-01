@@ -66,6 +66,7 @@ set(HAVE_NETCDF 0)
 find_package(NetCDF)
 if(${NETCDF_FOUND})
     set(HAVE_NETCDF 1)
+    include_directories(${NETCDF_INCLUDES})
 endif()
 
 add_subdirectory(external)
