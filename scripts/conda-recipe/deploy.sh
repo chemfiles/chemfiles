@@ -5,15 +5,22 @@
 
 set -evx
 
-rm -rf ${TRAVIS_BUILD_DIR}/build
+cd ${TRAVIS_BUILD_DIR}
 
 if [ ${TRAVIS_OS_NAME} == "linux" ]
 then
     export CONDA_URL="http://repo.continuum.io/miniconda/Miniconda-3.9.1-Linux-x86_64.sh"
-else if [ ${TRAVIS_OS_NAME} == "osx" ]
+elif [ ${TRAVIS_OS_NAME} == "osx" ]
 then
     export CONDA_URL="http://repo.continuum.io/miniconda/Miniconda-3.9.1-MacOSX-x86_64.sh"
+    # Enforce the netcdf and numpy version for conda build
+    brew rm netcdf numpy
 fi
+
+# Ensure that the meta.yaml file is created
+mkdir -p build
+cd build
+$CMAKE $CMAKE_ARGS ..
 
 wget $CONDA_URL -O Miniconda.sh
 bash Miniconda.sh -b

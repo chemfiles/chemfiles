@@ -3,7 +3,7 @@ package:
   version: "@CHRP_VERSION@"
 
 source:
-  path: ../../bindings/python
+  path: ../..
 
 requirements:
   build:
@@ -15,6 +15,12 @@ requirements:
     - python
     - numpy
     - libnetcdf
+
+build:
+    script_env:
+        - CC
+        - CXX
+        - FC
 
 about:
   home: https://github.com/Luthaf/Chemharp

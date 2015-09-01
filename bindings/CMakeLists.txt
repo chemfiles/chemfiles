@@ -1,14 +1,6 @@
 if(${PYTHON_BINDING})
     add_subdirectory(python)
     configure_file (
-      "${PROJECT_SOURCE_DIR}/scripts/conda-recipe/build.in.sh"
-      "${PROJECT_SOURCE_DIR}/scripts/conda-recipe/build.sh"
-    )
-    configure_file (
-      "${PROJECT_SOURCE_DIR}/scripts/conda-recipe/bld.in.bat"
-      "${PROJECT_SOURCE_DIR}/scripts/conda-recipe/bld.bat"
-    )
-    configure_file (
       "${PROJECT_SOURCE_DIR}/scripts/conda-recipe/meta.in.yaml"
       "${PROJECT_SOURCE_DIR}/scripts/conda-recipe/meta.yaml"
     )

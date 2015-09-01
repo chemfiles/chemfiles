@@ -69,7 +69,7 @@ install:
   - |
     if [ ${TRAVIS_OS_NAME} == "osx" ]
     then
-        brew tap homebrew/versions
+        brew tap homebrew/science
         brew tap homebrew/python
         brew update
         brew install netcdf numpy gcc
