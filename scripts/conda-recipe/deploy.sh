@@ -1,8 +1,25 @@
 #!/usr/bin/env bash
+#
+# This script is intended to be used on Travis, to build and deploy the conda recipe.
+# The meta.yaml file should be configured by CMake first.
 
 set -evx
 
-conda install --yes conda-build jinja2 anaconda-client
+rm -rf ${TRAVIS_BUILD_DIR}/build
+
+if [ ${TRAVIS_OS_NAME} == "linux" ]
+then
+    export CONDA_URL="http://repo.continuum.io/miniconda/Miniconda-3.9.1-Linux-x86_64.sh"
+else if [ ${TRAVIS_OS_NAME} == "osx" ]
+then
+    export CONDA_URL="http://repo.continuum.io/miniconda/Miniconda-3.9.1-MacOSX-x86_64.sh"
+fi
+
+wget $CONDA_URL -O Miniconda.sh
+bash Miniconda.sh -b
+export PATH=$HOME/miniconda/bin:$PATH
+conda update --yes conda
+conda install --yes conda-build jinja2 anaconda-client numpy
 export CONDA_RECIPE=${TRAVIS_BUILD_DIR}/scripts/conda-recipe
 
 # Build conda recipe
