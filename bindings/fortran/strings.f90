@@ -10,7 +10,7 @@ contains
         character(len=1024), pointer    :: tmp
         character(len=1024)             :: f_string
 
-        call c_f_pointer(c_loc(c_string), tmp)
+        call c_f_pointer(c_string, tmp)
         f_string = rm_c_null_in_str(tmp)
     end function
 
