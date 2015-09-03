@@ -21,14 +21,18 @@ namespace harp {
 
 /*!
  * @class Atom Atom.hpp Atom.cpp
- * @brief Atom representation class
+ *
+ * An Atom is a particle in the current Frame. It can be used to store and retrieve
+ * informations about a particle, such as mass, name, atomic number, etc.
  */
 class CHRP_EXPORT Atom {
 public:
+    //! An Atom can be of various kind. This is encoded by a value in this enum.
     enum AtomType {
         //! Element from the periodic table of elements
         ELEMENT,
-        //! Corse-grained atom: CH4, …
+        //! Corse-grained atom are composed of more than one element: CH3 groups,
+        //! amino-acids are corse-grained atoms.
         CORSE_GRAIN,
         //! Dummy site, with no physical reality
         DUMMY,
@@ -36,16 +40,15 @@ public:
         UNDEFINED
     };
 
+    //! Create an element from its \c name
     Atom(const std::string& name);
+    //! Create an element from its \c name and its type
     Atom(AtomType type, const std::string& name = "");
+    //! Default is to create an UNDEFINED atom type with no name
     Atom();
+
     Atom(const Atom &) = default;
     Atom& operator=(const Atom &) = default;
-
-    bool operator==(const Atom& other) const{
-        return (_name == other._name && _mass == other._mass &&
-                _charge == other._charge && _type == other._type);
-    }
 
     ~Atom() = default;
 
@@ -67,14 +70,13 @@ public:
     //! Set the atom type
     void type(AtomType t) {_type = t;}
 
-    //! Try to get the full element name, return and empty string if this is
-    //! impossible
+    //! Try to get the full element name, return and empty string if this is impossible
     std::string full_name() const;
-    //! Try to get the Van der Waals or the covalent radius of the atom. Returns
-    //! -1 if they can not be found.
+    //! Try to get the Van der Waals of the atom. Returns -1 if it can not be found.
     float vdw_radius() const;
+    //! Try to get the covalent radius of the atom. Returns -1 if it can not be found.
     float covalent_radius() const;
-    //! Try to get the atomic number, if defined. Return -1 if it can not be found.
+    //! Try to get the atomic number, if defined. Returns -1 if it can not be found.
     int atomic_number() const;
 private:
     std::string _name;
@@ -82,6 +84,11 @@ private:
     float _charge;
     AtomType _type;
 };
+
+inline bool operator==(const Atom& lhs, const Atom& rhs) {
+    return (lhs.name() == rhs.name() && lhs.mass() == rhs.mass() &&
+            lhs.charge() == rhs.charge() && lhs.type() == rhs.type());
+}
 
 inline std::ostream& operator<<(std::ostream& out, const Atom& atom){
     out << "Atom \"" << atom.name() << "\"";
