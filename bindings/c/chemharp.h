@@ -68,15 +68,15 @@ CHRP_EXPORT const char* chrp_last_error();
 //! Available logging level
 typedef enum CHRP_LOG_LEVEL {
     //! Do not log anything
-    NONE,
+    CHRP_LOG_NONE,
     //! Only log on errors
-    ERROR,
+    CHRP_LOG_ERROR,
     //! Log warnings and erors
-    WARNING,
+    CHRP_LOG_WARNING,
     //! Log infos, warnings and errors
-    INFO,
+    CHRP_LOG_INFO,
     //! Log everything
-    DEBUG
+    CHRP_LOG_DEBUG
 } chrp_log_level_t ;
 
 /*!
@@ -369,11 +369,11 @@ CHRP_EXPORT int chrp_cell_matrix(const CHRP_CELL* cell, double mat[3][3]);
 //! Available cell types in Chemharp
 typedef enum CHRP_CELL_TYPES {
     //! The three angles are 90°
-    ORTHOROMBIC,
+    CHRP_CELL_ORTHOROMBIC,
     //! The three angles may not be 90°
-    TRICLINIC,
+    CHRP_CELL_TRICLINIC,
     //! Cell type when there is no periodic boundary conditions
-    INFINITE,
+    CHRP_CELL_INFINITE,
 } chrp_cell_type_t ;
 
 /*!

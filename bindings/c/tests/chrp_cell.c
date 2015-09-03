@@ -49,11 +49,11 @@ int main() {
 
     chrp_cell_type_t type;
     assert(!chrp_cell_type(cell, &type));
-    assert(type == ORTHOROMBIC);
+    assert(type == CHRP_CELL_ORTHOROMBIC);
 
-    assert(!chrp_cell_set_type(cell, TRICLINIC));
+    assert(!chrp_cell_set_type(cell, CHRP_CELL_TRICLINIC));
     assert(!chrp_cell_type(cell, &type));
-    assert(type == TRICLINIC);
+    assert(type == CHRP_CELL_TRICLINIC);
 
     assert(!chrp_cell_set_angles(cell, 80, 89, 100));
     assert(!chrp_cell_angles(cell, &a, &b, &c));
