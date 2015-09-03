@@ -24,7 +24,13 @@ const char* chrp_last_error(){
     return status.last_error.c_str();
 }
 
-int chrp_loglevel(chrp_log_level_t level) {
+int chrp_loglevel(chrp_log_level_t* level) {
+    CHRP_ERROR_WRAP_RETCODE(
+        *level = static_cast<chrp_log_level_t>(Logger::level());
+    )
+}
+
+int chrp_set_loglevel(chrp_log_level_t level) {
     CHRP_ERROR_WRAP_RETCODE(
         Logger::level(static_cast<Logger::LogLevel>(level));
     )

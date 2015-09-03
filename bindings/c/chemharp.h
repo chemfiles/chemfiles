@@ -80,11 +80,18 @@ typedef enum CHRP_LOG_LEVEL {
 } chrp_log_level_t ;
 
 /*!
+* @brief Get the current logging level
+* @param level The logging level
+* @return The status code
+*/
+CHRP_EXPORT int chrp_loglevel(chrp_log_level_t* level);
+
+/*!
 * @brief Set the current logging level to \c level
 * @param level The new logging level
 * @return The status code
 */
-CHRP_EXPORT int chrp_loglevel(chrp_log_level_t level);
+CHRP_EXPORT int chrp_set_loglevel(chrp_log_level_t level);
 
 /*!
 * @brief Redirect the logs to \c file, overwriting the file if it exists
