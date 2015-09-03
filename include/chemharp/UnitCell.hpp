@@ -39,6 +39,8 @@ typedef std::array<std::array<double, 3>, 3> Matrix3D;
  * 				| a_x   b_x   c_x |
  * 				|  0    b_y   c_y |
  * 				|  0     0    c_z |
+ *
+ * An unit cell also have a cell type, represented by the `CellType` enum.
  */
 class CHRP_EXPORT UnitCell {
 public:
@@ -47,7 +49,7 @@ public:
         ORTHOROMBIC,
         //! Triclinic cell, with any values for the angles.
         TRICLINIC,
-        //! Infinit cell, to use when there is no cell
+        //! Infinite cell, to use when there is no cell
         INFINITE
     };
 
