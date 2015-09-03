@@ -37,11 +37,24 @@ end function
 subroutine chrp_loglevel(level, status)
     implicit none
     include "generated/cenums.f90"
-    integer(kind=kind(CHRP_LOG_LEVEL)), value :: level
+    integer(kind=kind(CHRP_LOG_LEVEL)) :: level
     integer, optional :: status
     integer :: status_tmp_
 
     status_tmp_ = chrp_loglevel_c(level)
+    if (present(status)) then
+        status = status_tmp_
+    end if
+end subroutine
+
+subroutine chrp_set_loglevel(level, status)
+    implicit none
+    include "generated/cenums.f90"
+    integer(kind=kind(CHRP_LOG_LEVEL)), value :: level
+    integer, optional :: status
+    integer :: status_tmp_
+
+    status_tmp_ = chrp_set_loglevel_c(level)
     if (present(status)) then
         status = status_tmp_
     end if

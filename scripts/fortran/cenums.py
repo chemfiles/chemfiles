@@ -12,12 +12,6 @@ enum, bind(C)
 end enum
 """
 
-ENUMS_PREFIX = {
-    "CHRP_LOG_LEVEL": "CHRP_LOG_",
-    "CHRP_CELL_TYPES": "CHRP_CELL_",
-}
-
-
 class Enum:
     '''Class representing a C enum'''
 
@@ -29,7 +23,7 @@ class Enum:
         '''
         Append a name in the enum list, with optional value
         '''
-        self.enumerator.append((ENUMS_PREFIX[self.name] + name, value))
+        self.enumerator.append((name, value))
 
     def __str__(self):
         res = ""
