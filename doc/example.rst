@@ -43,6 +43,30 @@ Write frames (convert.cpp)
    :language: cpp
    :lines: 4-
 
+Python examples
+^^^^^^^^^^^^^^^
+
+Read a single frame (indexes.py)
+--------------------------------
+
+.. literalinclude:: ../bindings/python/examples/indexes.py
+   :language: python
+   :lines: 4-
+
+Read Multiple frames (rmsd.py)
+------------------------------
+
+.. literalinclude:: ../bindings/python/examples/rmsd.py
+   :language: python
+   :lines: 4-
+
+Write frames (convert.py)
+-------------------------
+
+.. literalinclude:: ../bindings/python/examples/convert.py
+   :language: python
+   :lines: 4-
+
 C examples
 ^^^^^^^^^^
 
@@ -65,30 +89,6 @@ Write frames (convert.c)
 
 .. literalinclude:: ../examples/c/convert.c
    :language: c
-   :lines: 4-
-
-Python examples
-^^^^^^^^^^^^^^^
-
-Read a single frame (indexes.py)
---------------------------------
-
-.. literalinclude:: ../examples/python/indexes.py
-   :language: python
-   :lines: 4-
-
-Read Multiple frames (rmsd.py)
-------------------------------
-
-.. literalinclude:: ../examples/python/rmsd.py
-   :language: python
-   :lines: 4-
-
-Write frames (convert.py)
--------------------------
-
-.. literalinclude:: ../examples/python/convert.py
-   :language: python
    :lines: 4-
 
 Fortran examples
@@ -121,20 +121,45 @@ Julia examples
 Read a single frame (indexes.jl)
 --------------------------------
 
-.. literalinclude:: ../examples/julia/indexes.jl
+.. literalinclude:: ../bindings/julia/examples/indexes.jl
    :language: julia
    :lines: 4-
 
 Read Multiple frames (rmsd.jl)
 ------------------------------
 
-.. literalinclude:: ../examples/julia/rmsd.jl
+.. literalinclude:: ../bindings/julia/examples/rmsd.jl
    :language: julia
    :lines: 4-
 
 Write frames (convert.jl)
 -------------------------
 
-.. literalinclude:: ../examples/julia/convert.jl
+.. literalinclude:: ../bindings/julia/examples/convert.jl
    :language: julia
+   :lines: 4-
+
+
+Rust examples
+^^^^^^^^^^^^^^
+
+Read a single frame (indexes.rs)
+--------------------------------
+
+.. literalinclude:: ../bindings/rust/examples/indexes.rs
+   :language: rust
+   :lines: 4-
+
+Read Multiple frames (rmsd.rs)
+------------------------------
+
+.. literalinclude:: ../bindings/rust/examples/rmsd.rs
+   :language: rust
+   :lines: 4-
+
+Write frames (convert.rs)
+-------------------------
+
+.. literalinclude:: ../bindings/rust/examples/convert.rs
+   :language: rust
    :lines: 4-
