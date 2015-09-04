@@ -3,9 +3,11 @@
 """
 This module generate Chemharp Fortran API by calling the C interfae
 """
+from generate.functions import SPECIAL_FUNCTIONS, Argument
+from generate.ctype import *
+
 from .constants import BEGINING, FTYPES, STRING_LENGTH
-from .functions import SPECIAL_FUNCTIONS, Argument
-from .ctype import CType, StringType, ArrayType
+from .convert import arg_to_fortran, function_name_to_fortran
 
 TEMPLATE = """
 subroutine {name}({args})
@@ -44,6 +46,7 @@ CHECK_NULL_POINTER = """
     end if
 """
 
+
 def call_interface(args):
     '''
     Translate the arguments from fortran to C in function call
@@ -53,7 +56,7 @@ def call_interface(args):
 
     args_call = []
     for arg in args:
-        if isinstance(arg.type, StringType) and arg.type.const:
+        if isinstance(arg.type, StringType) and arg.type.is_const:
             # Convert const string
             call = "f_to_c_str(" + arg.name + ")"
         elif isinstance(arg.type, ArrayType):
@@ -75,7 +78,7 @@ def post_call_processing(args):
     '''
     res = ""
     for arg in args:
-        if isinstance(arg.type, StringType) and not arg.type.const:
+        if isinstance(arg.type, StringType) and not arg.type.is_const:
             res = arg.name + " = rm_c_null_in_str(" + arg.name + ")"
     return res
 
@@ -91,7 +94,7 @@ def write_interface(path, _functions):
         # If the function is a constructor, prepend the "this" argument in the
         # arguments list
         if function.is_constructor:
-            type_ = CType(function.rettype.cname, ptr=True)
+            type_ = CType(function.rettype.cname, is_ptr=True)
             new_arg = Argument("this", type_)
             function.args = [new_arg] + function.args
             function.fname = function.name + "_init_"
@@ -109,28 +112,28 @@ def write_interface(path, _functions):
     with open(path, "w") as fd:
         fd.write(BEGINING)
         for function in functions:
-            declarations = "\n".join([arg.to_fortran(interface=True)
+            declarations = "\n".join([arg_to_fortran(arg, interface=True)
                                      for arg in function.args])
 
             if isinstance(function.rettype, StringType):
                 fd.write(TEMPLATE_STR_FUNCTIONS.format(
-                            name=function.name,
-                            cname=function.c_interface_name,
-                            args=function.args_str(),
-                            declarations=declarations,
-                            str_len=STRING_LENGTH))
+                    name=function.name,
+                    cname=function.name + "_c",
+                    args=function.args_str(),
+                    declarations=declarations,
+                    str_len=STRING_LENGTH))
             else:
                 instructions = ""
                 args = ", ".join([arg.name for arg in function.args])
 
                 if function.is_constructor:
                     instructions = "    this%ptr = "
-                    instructions += function.c_interface_name
+                    instructions += function.name + "_c"
                     instructions += call_interface(function.args[1:])
                     instructions += CHECK_NULL_POINTER
                 else:
                     instructions = "    status_tmp_ = "
-                    instructions += function.c_interface_name
+                    instructions += function.name + "_c"
                     instructions += call_interface(function.args)
 
                 declarations += "\n    integer, optional :: status"
@@ -144,7 +147,7 @@ def write_interface(path, _functions):
                     instructions += "\n    " + post_call
 
                 fd.write(TEMPLATE.format(
-                            name=function.fname,
-                            args=args,
-                            declarations=declarations,
-                            instructions=instructions))
+                    name=function_name_to_fortran(function),
+                    args=args,
+                    declarations=declarations,
+                    instructions=instructions))

@@ -1,14 +1,11 @@
 # -* coding: utf-8 -*
 
 """
-This module tries to generate the a Fortran interface declaration for the
-functions it finds in a C header. It only handle edge cases for the chemharp.h
-header.
+This module generate the Fortran interface declaration for the functions it
+finds in a C header. It only handle edge cases for the chemharp.h header.
 """
-
-from pycparser import c_ast
 from .constants import BEGINING, FTYPES, STRING_LENGTH
-from .ctype import StringType
+from .convert import arg_to_fortran
 
 BEGINING += "interface\n"
 END = "end interface\n"
@@ -24,15 +21,16 @@ end function\n
 
 
 def interface(function):
-    args = function.args_str()
-    if function.rettype.ptr:
+    args = ", ".join(map(str, function.args))
+    if function.rettype.is_ptr:
         rettype = "type(c_ptr)"
     else:
         rettype = "integer(c_int)"
 
-    declarations = "\n".join([arg.to_fortran(cdef=True)
-                              for arg in function.args])
-    return TEMPLATE.format(name=function.c_interface_name,
+    declarations = "\n".join(
+        [arg_to_fortran(arg, cdef=True) for arg in function.args]
+    )
+    return TEMPLATE.format(name=function.name + "_c",
                            cname=function.name,
                            args=args,
                            coord=function.coord,

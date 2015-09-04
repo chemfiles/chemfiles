@@ -1,11 +1,12 @@
 # -* coding: utf-8 -*
 
 """
-This module generate Chemharp main (fortran) types and bind specific
-functions to them, using the name of the function.
+This module generate Chemharp main (fortran) types and bind specific functions
+to them, using the name of the function.
 """
 from .constants import BEGINING, FTYPES
-from .functions import SPECIAL_FUNCTIONS
+from .convert import function_name_to_fortran
+from generate.functions import SPECIAL_FUNCTIONS
 
 TEMPLATE = """
 type {name}
@@ -60,17 +61,26 @@ def write_types(path, functions):
             typename = func.typename
             if typename is None:
                 continue
+            else:
+                typename = typename.lower()
+
             try:
                 ftype = types[typename]
             except KeyError:
                 ftype = Type(typename)
                 types[typename] = ftype
 
-            ftype.add_procedure(BoundProcedure(func.member_name, func.fname))
+            member_name = func.member_name
+            if not member_name:
+                member_name = "init"
+
+            ftype.add_procedure(
+                BoundProcedure(member_name, function_name_to_fortran(func))
+            )
 
     # TODO: find something generic here
     types["chrp_trajectory"].add_procedure(
-            BoundProcedure('open', 'chrp_open_init_')
+        BoundProcedure('open', 'chrp_open_init_')
     )
 
     with open(path, "w") as fd:

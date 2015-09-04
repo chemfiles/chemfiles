@@ -22,7 +22,7 @@ LICENCE = """! Chemharp, an efficient IO library for chemistry file formats
 
 BEGINING = LICENCE + """!
 ! =========================================================================== !
-! !!!! AUTO-GENERATED FILE !!!! Do not edit. See scripts/fortran for the code.
+! !!!! AUTO-GENERATED FILE !!!! Do not edit. See scripts/generate for the code.
 ! This file contains Fortran 2003 ISO C Binding interface to the C API
 !
 ! This file is not compilable on his own, but should be 'include'd in another
