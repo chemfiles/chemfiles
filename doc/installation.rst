@@ -1,17 +1,35 @@
 Installation
 ============
 
+Pre-compiled binaries
+^^^^^^^^^^^^^^^^^^^^^
+
+A few precompiled binary of the latest release are provided through the `conda`_
+cross-plateform package manager. These binary provide the C++, C and Python
+interfaces, and the :command:`chrp` command. To install them, you can use:
+
+.. code-block:: bash
+
+    conda install -c https://conda.binstar.org/luthaf chemharp
+
+.. _conda: http://conda.pydata.org/docs/
+
+These precompiled binaries are also used for the :ref:`julia-api`, and thus you can
+install the Julia ``Chemharp`` module just by running ``Pkg.add("Chemharp")``.
+
+Building from sources
+^^^^^^^^^^^^^^^^^^^^^
+
+If you want full control over the way the code is built, you can built Chemharp from
+sources.
+
 Core library dependencies
 -------------------------
 
-In order to build the core library, you will need a C++11 compiler, like g++>4.7,
+In order to build the core library, you will need a C++11 compiler, like g++>4.9,
 clang++>3.3. Chemharp is tested against GCC, Clang and Intel C++ compilers, and
 is ISO C++11, so it should compile with other compilers as well. Please report
 any sucessfull compilation with other compilers!
-
-Chemharp also needs a compiled version of `Boost`_, with the *filesystem* library.
-Boost should be available from your package manager, or you can install it from
-the Boost website.
 
 Some functionalities of Chemharp needs aditional library, and will be activated
 or not at compile-time if the system can find the appropriate headers and files.
@@ -32,17 +50,16 @@ All these dependencies can be installed in one command:
 
     # On apt-get based distributions
     apt-get update
-    apt-get install cmake libnetcdf-dev libboost-filesystem-dev libboost-dev
+    apt-get install cmake libnetcdf-dev
 
     # On yum based distributions
     yum install epel-release # The EPEL repository have the netcdf lib
-    yum install cmake netcdf-devel netcdf-cxx-devel boost-devel boost-filesystem
+    yum install cmake netcdf-devel netcdf-cxx-devel
 
     # On OS X with Homebrew
     brew tap homebrew/science
-    brew install cmake netcdf boost
+    brew install cmake netcdf
 
-.. _Boost: http://boost.org/
 .. _NetCDF: http://www.unidata.ucar.edu/software/netcdf/
 .. _CMake: http://cmake.org/
 
@@ -57,10 +74,10 @@ run the following to install most of the dependencies :
 .. code-block:: bash
 
     # On 64-bits windows
-    pacman -S mingw64/mingw-w64-x86_64-gcc mingw64/mingw-w64-x86_64-boost
+    pacman -S mingw64/mingw-w64-x86_64-gcc
 
     # On 32-bits windows
-    pacman -S mingw32/mingw-w64-i686-gcc mingw32/mingw-w64-i686-boost
+    pacman -S mingw32/mingw-w64-i686-gcc
 
 You will also need to install cmake, which can be found `here <http://www.cmake.org/download/>`_.
 
@@ -69,9 +86,6 @@ You will also need to install cmake, which can be found `here <http://www.cmake.
 
 Build steps
 -----------
-
-Getting the source code
-^^^^^^^^^^^^^^^^^^^^^^^
 
 You can get the source code from either git, or from the `release`_ page of Github.
 In the later case, just unpack the archive wherever you want the source code to
@@ -82,17 +96,14 @@ live. To get the latest developpement version, use git:
     cd where/you/whant/chemharp/to/live
     git clone https://github.com/Luthaf/Chemharp
 
-If you want to run the tests, you will need the test data. These are available
-as a git submodule that you can download directly at the first clone:
+If you want to run the tests or use the bindings, you will need the corresponding
+code. It is available as a git submodule that you can get directly:
 
 .. code-block:: bash
 
     git clone --recursive https://github.com/Luthaf/Chemharp
 
 .. _release: https://github.com/Luthaf/Chemharp/releases
-
-Compiling
-^^^^^^^^^
 
 The following command can build and install Chemharp on a standard UNIX environement.
 
@@ -147,46 +158,41 @@ Building the bindings
 Only the C interface is always compiled with the core library. All the other
 interface needs to be activated with :command:`cmake` flags.
 
-The other languages bindings for Chemharp have supplementary requirements. The
-Python interface requires Boost.Python, the Fortran interface requires a Fortran
-compiler, … Please ensure that those requirements are fullfiled before filling
-an issue.
+The other languages bindings for Chemharp have supplementary requirements. The Python
+interface requires Boost.Python, the Fortran interface requires a Fortran compiler, …
+Please ensure that those requirements are fullfiled before filling an issue.
 
 Python interface
 ^^^^^^^^^^^^^^^^
 
-The Python interface expose data to Python, and make uses of Numpy arrays. It
-needs the following libraries to be installed:
+The Python interface expose data to Python, and make uses of Numpy arrays. It needs
+the following libraries to be installed:
 
-* `Boost.Python`_, the Python module of Boost libraries;
 * The CPython developement module, usullay called ``python-dev`` or ``python-devel``;
 * The Numpy library, with developement headers.
-
-It also needs a network conection, to download and compile the unoficial
-``Boost.Numpy`` library.
 
 All these library can be installed in few lines too:
 
 .. code-block:: bash
 
     # On apt-get based distributions
-    apt-get install libboost-python-dev python-numpy python-dev
+    apt-get install python-numpy python-dev
 
     # On yum based distributions
-    yum install boost-python numpy python-devel
+    yum install numpy python-devel
 
     # On OS X with Homebrew
     brew tap homebrew/python
-    brew install boost-python numpy
+    brew install numpy
 
-You can also use :command:`pip` to install ``numpy`` if you prefer doing so.
+You can also use :command:`pip` or :command:`conda` to install ``numpy`` if you
+prefer doing so.
 
-.. _Boost.Python: http://www.boost.org/doc/libs/1_57_0/libs/python/doc/
 
 Then, compiling the Python interface to Chemharp can be activated by the
-``-DPYTHON_BINDING=ON`` option for :command:`cmake`. The usual :command:`make install`
-will then compile and install the python extention at the right place. After that,
-you should be able to ``import chemharp`` from Python prompt.
+``-DPYTHON_BINDING=ON`` option for :command:`cmake`. The usual :command:`make
+install` will then compile and install the python extention at the right place. After
+that, you should be able to ``import chemharp`` from Python prompt.
 
 Fortran interface
 ^^^^^^^^^^^^^^^^^
