@@ -351,7 +351,7 @@ CHRP_EXPORT int chrp_cell_set_lengths(CHRP_CELL* cell, double a, double b, doubl
 CHRP_EXPORT int chrp_cell_angles(const CHRP_CELL* cell, double* alpha, double* beta, double* gamma);
 
 /*!
-* @brief Set the cell angles, in degrees
+* @brief Set the cell angles, in degrees. This is only possible for TRICLINIC cells.
 * @param cell the unit cell to modify
 * @param alpha,beta,gamma the new angles values, in degrees
 * @return The status code
@@ -439,7 +439,7 @@ CHRP_EXPORT CHRP_TOPOLOGY* chrp_topology_from_frame(CHRP_FRAME* frame);
 CHRP_EXPORT int chrp_topology_atoms_count(const CHRP_TOPOLOGY* topology, size_t *natoms);
 
 /*!
-* @brief Add an atom to a topology
+* @brief Add an atom at the end of a topology
 * @param topology The topology
 * @param atom The atom to be added
 * @return The status code
@@ -447,7 +447,7 @@ CHRP_EXPORT int chrp_topology_atoms_count(const CHRP_TOPOLOGY* topology, size_t 
 CHRP_EXPORT int chrp_topology_append(CHRP_TOPOLOGY* topology, const CHRP_ATOM* atom);
 
 /*!
-* @brief Remove an atom from a topology by index
+* @brief Remove an atom from a topology by index. This modify all the other atoms indexes.
 * @param topology The topology
 * @param i The atomic index
 * @return The status code
@@ -455,7 +455,7 @@ CHRP_EXPORT int chrp_topology_append(CHRP_TOPOLOGY* topology, const CHRP_ATOM* a
 CHRP_EXPORT int chrp_topology_remove(CHRP_TOPOLOGY* topology, size_t i);
 
 /*!
-* @brief Tell if the atoms \c i and \c j are bonded
+* @brief Tell if the atoms \c i and \c j are bonded together
 * @param topology The topology
 * @param i,j The atomic indexes
 * @param result true if the atoms are bonded, false otherwise
@@ -506,7 +506,7 @@ CHRP_EXPORT int chrp_topology_angles_count(const CHRP_TOPOLOGY* topology, size_t
 CHRP_EXPORT int chrp_topology_dihedrals_count(const CHRP_TOPOLOGY* topology, size_t* ndihedrals);
 
 /*!
-* @brief Get the bonds in the system
+* @brief Get the list of bonds in the system
 * @param topology The topology
 * @param data A nbonds x 2 array to be filled with the bonds in the system
 * @param nbonds The size of the array. This should equal the value given by the
@@ -516,7 +516,7 @@ CHRP_EXPORT int chrp_topology_dihedrals_count(const CHRP_TOPOLOGY* topology, siz
 CHRP_EXPORT int chrp_topology_bonds(const CHRP_TOPOLOGY* topology, size_t (*data)[2], size_t nbonds);
 
 /*!
-* @brief Get the angles in the system
+* @brief Get the list of angles in the system
 * @param topology The topology
 * @param data A nangles x 3 array to be filled with the angles in the system
 * @param nangles The size of the array. This should equal the value given by the
@@ -526,7 +526,7 @@ CHRP_EXPORT int chrp_topology_bonds(const CHRP_TOPOLOGY* topology, size_t (*data
 CHRP_EXPORT int chrp_topology_angles(const CHRP_TOPOLOGY* topology, size_t (*data)[3], size_t nangles);
 
 /*!
-* @brief Get the dihedral angles in the system
+* @brief Get the list of dihedral angles in the system
 * @param topology The topology
 * @param data A ndihedrals x 4 array to be filled with the dihedral angles in the system
 * @param ndihedrals The size of the array. This should equal the value given by the

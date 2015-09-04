@@ -222,7 +222,7 @@ fn main() {
 
     println!("There are {} atoms in the frame", frame.natoms().unwrap())
 
-    let positions = frame.positions.unwrap();
+    let positions = frame.positions().unwrap();
 
     // Do awesome things with the positions here !
 }

@@ -23,10 +23,11 @@ class Format;
 
 /*!
 * @class Trajectory Trajectory.hpp Trajectory.cpp
-* @brief Jonction of a Format and a File.
+* @brief A Trajectory is a chemistry file on the hard drive. It is the main entry point
+*        of Chemharp.
 *
-* The Trajectory class puts together a format and a file, and implement the main
-* read/write operations.
+* A Trajectory is made with a File and a Format. The File implements all the physical
+* operations, while the Format provides a way to interpret the file.
 */
 class CHRP_EXPORT Trajectory {
 public:

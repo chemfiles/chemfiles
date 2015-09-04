@@ -153,13 +153,12 @@ private:
     mutable bool uptodate;
 };
 
-/*!
- * @class Topology Topology.hpp Topology.cpp
- * @brief A topology contains the definition of all the particles in the system.
+/*! @class Topology Topology.hpp Topology.cpp
+ *  @brief A topology contains the definition of all the particles in the system, and the
+ *         liaisons between the particles (bonds, angles, dihedrals, ...).
  *
- * A topology contains the definition of all the particles in the system, and the
- * liaisons between the particles (bonds, angles, dihedrals, ...). Only the atoms
- * and the bonds are stored, the angles and the dihedrals are computed automaticaly.
+ * Only the atoms and the bonds are stored, the angles and the dihedrals are computed
+ * automaticaly.
  */
 class CHRP_EXPORT Topology {
 public:
