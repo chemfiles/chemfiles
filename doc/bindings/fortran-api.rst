@@ -207,7 +207,7 @@ Error and logging functions
     subroutine are available:
 
     :field subroutine init:
-    :field subroutine size:
+    :field subroutine atoms_count:
     :field subroutine positions:
     :field subroutine set_positions:
     :field subroutine velocities:
@@ -227,9 +227,9 @@ Error and logging functions
     :parameter integer natoms: the size of the wanted frame
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: size(natoms[, status])
+.. f:subroutine:: atoms_count(natoms[, status])
 
-    Get the frame size, i.e. the current number of atoms
+    Get the current number of atoms in the frame
 
     :parameter integer natoms: the number of atoms in the frame
     :optional integer status [optional]: The status code
@@ -477,7 +477,7 @@ Error and logging functions
 
     :field subroutine init:
     :field subroutine from_frame:
-    :field subroutine size:
+    :field subroutine atoms_count:
     :field subroutine guess:
     :field subroutine append:
     :field subroutine remove:
@@ -509,9 +509,9 @@ Error and logging functions
     :parameter chrp_frame frame: The frame
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: size(natoms[, status])
+.. f:subroutine:: atoms_count(natoms[, status])
 
-    Get the topology size, i.e. the current number of atoms.
+    Get the current number of atoms in the topology.
 
     :parameter integer natoms: Will contain the number of atoms in the frame
     :optional integer status [optional]: The status code

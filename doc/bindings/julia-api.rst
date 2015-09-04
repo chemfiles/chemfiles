@@ -3,20 +3,22 @@
 Julia interface
 ===============
 
-The Julia interface to Chemharp wrap around the C interface providing a Julian API.
-All the jl:functionalities are in the ``Chemharp`` module, which can be imported by the
+The `Julia`_ interface to Chemharp wrap around the C interface providing a Julian API.
+All the functionalities are in the ``Chemharp`` module, which can be imported by the
 ``using Chemharp`` expression. The ``Chemharp`` module is built around the 5 main
 types of Chemharp: ``Trajectory``, ``Frame``, ``UnitCell``, ``Topology``, and
 ``Atom``. For more information about these types, please see the :ref:`overview`.
 
 The julia interface only support Julia 0.4, but few work would be needed to also
-support the O.3 version. You can install this interface by running
+support the 0.3 version. You can install this interface by running
 
 .. code-block:: julia
 
     julia> Pkg.clone("https://github.com/Luthaf/Chemharp.jl")
 
     julia> Pkg.build("Chemharp")
+
+.. _Julia: http://julialang.org/
 
 Error and logging functions
 ---------------------------

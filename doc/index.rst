@@ -74,10 +74,11 @@ The interfaces for the other supported languages are described in the links belo
     example
     formats
     bindings/cpp-api
-    bindings/c-api
     bindings/python-api
+    bindings/c-api
     bindings/fortran-api
     bindings/julia-api
+    bindings/rust-api
     others
 
 .. _classes-reference:

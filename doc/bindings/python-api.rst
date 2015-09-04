@@ -3,10 +3,9 @@
 Python interface
 ================
 
-The Python interface follow closely the C++ interface. This page list all the
-classes availables in the ``chemharp`` module, and for each class all the
-methods and attributes of the class.
-
+The Python interface follow closely the C++ interface. This page list all the classes
+availables in the ``chemharp`` module, and for each class all the methods and
+attributes of the class.
 
 Trajectory class
 ----------------

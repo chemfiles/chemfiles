@@ -35,6 +35,8 @@ allow for error handling from the C side.
 
 .. doxygenfunction:: chrp_loglevel
 
+.. doxygenfunction:: chrp_set_loglevel
+
 .. doxygenfunction:: chrp_logfile
 
 .. doxygenfunction:: chrp_log_stderr
@@ -71,7 +73,7 @@ Function manipulating ``CHRP_FRAME``
 
 .. doxygenfunction:: chrp_frame
 
-.. doxygenfunction:: chrp_frame_size
+.. doxygenfunction:: chrp_frame_atoms_count
 
 .. doxygenfunction:: chrp_frame_positions
 
@@ -135,7 +137,7 @@ Function manipulating ``CHRP_TOPOLOGY``
 
 .. doxygenfunction:: chrp_topology_from_frame
 
-.. doxygenfunction:: chrp_topology_size
+.. doxygenfunction:: chrp_topology_atoms_count
 
 .. doxygenfunction:: chrp_topology_append
 
