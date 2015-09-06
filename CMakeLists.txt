@@ -18,9 +18,9 @@ if(GIT_FOUND)
         ERROR_QUIET
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" CHRP_VERSION_MAJOR "${CHRP_VERSION}")
-    string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" CHRP_VERSION_MINOR "${CHRP_VERSION}")
-    string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CHRP_VERSION_PATCH "${CHRP_VERSION}")
+    string(REGEX REPLACE "^([0-9]+)\\..*" "\\1" CHRP_VERSION_MAJOR "${CHRP_VERSION}")
+    string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" CHRP_VERSION_MINOR "${CHRP_VERSION}")
+    string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CHRP_VERSION_PATCH "${CHRP_VERSION}")
     set(CHRP_VERSION_SHORT "${CHRP_VERSION_MAJOR}.${CHRP_VERSION_MINOR}.${CHRP_VERSION_PATCH}")
 else()
     set(CHRP_VERSION "Unknown-version")
@@ -78,8 +78,8 @@ include_directories(BEFORE SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/boost)
 file(GLOB_RECURSE sources src/**.cpp)
 add_library(chemharp SHARED ${sources} bindings/c/capi.cpp)
 
-set_property(TARGET chemharp PROPERTY VERSION ${CHRP_VERSION})
-set_property(TARGET chemharp PROPERTY SOVERSION ${CHRP_VERSION})
+set_property(TARGET chemharp PROPERTY VERSION ${CHRP_VERSION_SHORT})
+set_property(TARGET chemharp PROPERTY SOVERSION ${CHRP_VERSION_SHORT})
 
 include(GenerateExportHeader)
 generate_export_header(chemharp
