@@ -30,15 +30,15 @@ public:
     //! The \c LogLevel control what will be logged and what will be dismissed
     enum LogLevel{
         //! No logging at all
-        NONE,
+        NONE = 0,
         //! Logging only errors
-        ERROR,
+        ERROR = 1,
         //! Logging errors and warnings
-        WARNING,
+        WARNING = 2,
         //! Logging errors, warnings and informations
-        INFO,
+        INFO = 3,
         //! Logging everything and debug informations
-        DEBUG
+        DEBUG = 4
     };
 
     ~Logger();

@@ -46,11 +46,11 @@ class CHRP_EXPORT UnitCell {
 public:
     enum CellType {
         //! Orthorombic cell, with the three angles equals to 90°
-        ORTHOROMBIC,
+        ORTHOROMBIC = 0,
         //! Triclinic cell, with any values for the angles.
-        TRICLINIC,
+        TRICLINIC = 1,
         //! Infinite cell, to use when there is no cell
-        INFINITE
+        INFINITE = 2
     };
 
     //! Copy constructor
