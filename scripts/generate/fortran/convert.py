@@ -104,7 +104,7 @@ def enum_to_fortran(enum):
     for e in enum.enumerators:
         res += "    enumerator :: " + e.name
         if e.value is not None:
-            res += " = " + value
+            res += " = " + e.value.value
         res += "\n"
     res += "    ! Enumeration name:\n"
     res += "    enumerator :: " + enum.name

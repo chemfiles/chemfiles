@@ -6,7 +6,7 @@
 ! file, You can obtain one at http://mozilla.org/MPL/2.0/
 !
 ! =========================================================================== !
-! !!!! AUTO-GENERATED FILE !!!! Do not edit. See scripts/fortran for the code.
+! !!!! AUTO-GENERATED FILE !!!! Do not edit. See scripts/generate for the code.
 ! This file contains Fortran 2003 ISO C Binding interface to the C API
 !
 ! This file is not compilable on his own, but should be 'include'd in another

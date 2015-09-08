@@ -6,7 +6,7 @@
 ! file, You can obtain one at http://mozilla.org/MPL/2.0/
 !
 ! =========================================================================== !
-! !!!! AUTO-GENERATED FILE !!!! Do not edit. See scripts/fortran for the code.
+! !!!! AUTO-GENERATED FILE !!!! Do not edit. See scripts/generate for the code.
 ! This file contains Fortran 2003 ISO C Binding interface to the C API
 !
 ! This file is not compilable on his own, but should be 'include'd in another
@@ -15,19 +15,19 @@
 
 
 enum, bind(C)
-    enumerator :: CHRP_LOG_NONE
-    enumerator :: CHRP_LOG_ERROR
-    enumerator :: CHRP_LOG_WARNING
-    enumerator :: CHRP_LOG_INFO
-    enumerator :: CHRP_LOG_DEBUG
+    enumerator :: CHRP_LOG_NONE = 0
+    enumerator :: CHRP_LOG_ERROR = 1
+    enumerator :: CHRP_LOG_WARNING = 2
+    enumerator :: CHRP_LOG_INFO = 3
+    enumerator :: CHRP_LOG_DEBUG = 4
     ! Enumeration name:
     enumerator :: CHRP_LOG_LEVEL
 end enum
 
 enum, bind(C)
-    enumerator :: CHRP_CELL_ORTHOROMBIC
-    enumerator :: CHRP_CELL_TRICLINIC
-    enumerator :: CHRP_CELL_INFINITE
+    enumerator :: CHRP_CELL_ORTHOROMBIC = 0
+    enumerator :: CHRP_CELL_TRICLINIC = 1
+    enumerator :: CHRP_CELL_INFINITE = 2
     ! Enumeration name:
     enumerator :: CHRP_CELL_TYPES
 end enum
