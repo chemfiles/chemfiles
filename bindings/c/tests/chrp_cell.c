@@ -39,8 +39,10 @@ int main() {
     assert(fabs(b - 20) < 1e-10);
     assert(fabs(c - 30) < 1e-10);
 
+    chrp_set_loglevel(CHRP_LOG_NONE);
     // This should be an error
     assert(chrp_cell_set_angles(cell, 80, 89, 100));
+    chrp_set_loglevel(CHRP_LOG_ERROR);
 
     double expected_mat[3][3] = {{10, 0, 0}, {0, 20, 0}, {0, 0, 30}};
     double mat[3][3];
