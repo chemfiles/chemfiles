@@ -24,7 +24,18 @@ from ctypes import *
 from .errors import _check
 from .find_chemharp import find_chemharp
 
-c_lib = find_chemharp()
+
+class ChemharpLibrary(object):
+    def __init__(self):
+        self._cache = None
+
+    def __call__(self):
+        if self._cache is None:
+            self._cache = find_chemharp()
+            set_interface(self._cache)
+        return self._cache
+
+get_c_library = ChemharpLibrary()
 """
 
 
@@ -41,10 +52,10 @@ class {name}(c_int):
 """
 
 FUNCTION_TEMPLATE = """
-# Function "{name}", at {coord}
-c_lib.{name}.argtypes = {argtypes}
-c_lib.{name}.restype = {restype}
-{errcheck}
+    # Function "{name}", at {coord}
+    c_lib.{name}.argtypes = {argtypes}
+    c_lib.{name}.restype = {restype}
+    {errcheck}
 """
 
 
@@ -67,13 +78,15 @@ def interface(function):
 
 def wrap_enum(enum):
     '''Wrap an enum'''
+    values = []
     i = 0
     for e in enum.enumerators:
         if e.value is None:
-            e.value = i
+            value = i
             i += 1
-
-    values = [str(e.name) + " = " + str(e.value) for e in enum.enumerators]
+        else:
+            value = e.value.value
+        values.append(str(e.name) + " = " + str(value))
     return ENUM_TEMPLATE.format(name=enum.name, values="\n    ".join(values))
 
 
@@ -87,5 +100,6 @@ def write_ffi(filename, enums, functions):
         for name in TYPES:
             fd.write(CLASS_TEMPLATE.format(name=name))
 
+        fd.write("\n\ndef set_interface(c_lib):")
         for func in functions:
             fd.write(interface(func))
