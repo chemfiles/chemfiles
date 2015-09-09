@@ -85,6 +85,7 @@ install:
             export CXX=clang++
         fi
     fi
+  - pip install --user enum34
   - $FC --version
 
 before_script:
