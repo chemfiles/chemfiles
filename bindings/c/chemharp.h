@@ -674,6 +674,34 @@ CHRP_EXPORT int chrp_atom_covalent_radius(const CHRP_ATOM* atom, double* radius)
 */
 CHRP_EXPORT int chrp_atom_atomic_number(const CHRP_ATOM* atom, int* number);
 
+typedef enum CHRP_ATOM_TYPE {
+    //! Element from the periodic table of elements
+    CHRP_ATOM_ELEMENT = 0,
+    //! Corse-grained atom are composed of more than one element: CH3 groups,
+    //! amino-acids are corse-grained atoms.
+    CHRP_ATOM_CORSE_GRAIN = 1,
+    //! Dummy site, with no physical reality
+    CHRP_ATOM_DUMMY = 2,
+    //! Undefined atom-type
+    CHRP_ATOM_UNDEFINED = 3,
+} chrp_atom_type_t;
+
+/*!
+* @brief Get the atom type
+* @param atom the atom to read
+* @param type the type of the atom
+* @return The status code
+*/
+CHRP_EXPORT int chrp_atom_type(const CHRP_ATOM* atom, chrp_atom_type_t* type);
+
+/*!
+* @brief Set the atom type
+* @param atom the atom to modify
+* @param type the new type of the atom
+* @return The status code
+*/
+CHRP_EXPORT int chrp_atom_set_type(CHRP_ATOM* atom, chrp_atom_type_t type);
+
 /*!
 * @brief Destroy an atom, and free the associated memory
 * @param atom The atom to destroy

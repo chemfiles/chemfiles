@@ -30,14 +30,14 @@ public:
     //! An Atom can be of various kind. This is encoded by a value in this enum.
     enum AtomType {
         //! Element from the periodic table of elements
-        ELEMENT,
+        ELEMENT = 0,
         //! Corse-grained atom are composed of more than one element: CH3 groups,
         //! amino-acids are corse-grained atoms.
-        CORSE_GRAIN,
+        CORSE_GRAIN = 1,
         //! Dummy site, with no physical reality
-        DUMMY,
+        DUMMY = 2,
         //! Undefined atom-type
-        UNDEFINED
+        UNDEFINED = 3,
     };
 
     //! Create an element from its \c name

@@ -556,6 +556,18 @@ int chrp_atom_atomic_number(const CHRP_ATOM* atom, int* number) {
     )
 }
 
+int chrp_atom_type(const CHRP_ATOM* atom, chrp_atom_type_t* type){
+    CHRP_ERROR_WRAP_RETCODE(
+        *type = static_cast<chrp_atom_type_t>(atom->type());
+    )
+}
+
+int chrp_atom_set_type(CHRP_ATOM* atom, chrp_atom_type_t type){
+    CHRP_ERROR_WRAP_RETCODE(
+        atom->type(static_cast<Atom::AtomType>(type));
+    )
+}
+
 int chrp_atom_free(CHRP_ATOM* atom){
     CHRP_ERROR_WRAP_RETCODE(
         delete atom;

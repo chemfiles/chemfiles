@@ -200,4 +200,10 @@ Function manipulating ``CHRP_ATOM``
 
 .. doxygenfunction:: chrp_atom_atomic_number
 
+.. doxygenenum:: CHRP_ATOM_TYPES
+
+.. doxygenfunction:: chrp_atom_type
+
+.. doxygenfunction:: chrp_atom_set_type
+
 .. doxygenfunction:: chrp_atom_free
