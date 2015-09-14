@@ -9,11 +9,9 @@ using namespace harp;
 
 #define XYZDIR SRCDIR "/data/xyz/"
 
-// This file only test the trajectory <-> topology and trajectory <-> cell
-//  association. All the differents formats are tested in the formats folder
-
+// This file only perform basic testing of the trajectory class. All the differents
+// formats are tested in the formats folder
 TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
-
     SECTION("Reading"){
         Trajectory file(XYZDIR "trajectory.xyz");
         Frame frame;
@@ -95,4 +93,12 @@ TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]"){
 
         CHECK(frame.cell() == UnitCell(25, 32, 94));
     }
+}
+
+TEST_CASE("Specify a format parameter", "[Trajectory]"){
+    Trajectory file(XYZDIR "helium.xyz.but.not.really", "r", "XYZ");
+    Frame frame;
+
+    file >> frame;
+    CHECK(frame.natoms() == 125);
 }
