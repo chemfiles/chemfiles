@@ -52,6 +52,8 @@ associated with the file.
 
 .. doxygenfunction:: chrp_open
 
+.. doxygenfunction:: chrp_open_with_format
+
 .. doxygenfunction:: chrp_trajectory_read
 
 .. doxygenfunction:: chrp_trajectory_read_step

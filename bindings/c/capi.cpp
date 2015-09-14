@@ -59,6 +59,15 @@ error:
     return traj;
 }
 
+CHRP_TRAJECTORY* chrp_open_with_format(const char* filename, const char* mode, const char* format){
+    CHRP_TRAJECTORY* traj = NULL;
+    CHRP_ERROR_WRAP(
+        traj = new Trajectory(filename, mode, format);
+    )
+error:
+    return traj;
+}
+
 int chrp_trajectory_read_step(CHRP_TRAJECTORY *file, size_t step, CHRP_FRAME* frame){
     CHRP_ERROR_WRAP_RETCODE(
         *frame = file->read_step(step);

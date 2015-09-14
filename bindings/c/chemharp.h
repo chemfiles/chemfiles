@@ -116,6 +116,15 @@ CHRP_EXPORT int chrp_log_stderr();
 CHRP_EXPORT CHRP_TRAJECTORY* chrp_open(const char* filename, const char* mode);
 
 /*!
+* @brief Open a trajectory file using a given format to read the file.
+* @param filename The path to the trajectory file
+* @param mode The opening ("r" for read or "w" for write) mode for the file.
+* @param format The format to use
+* @return A pointer to the file
+*/
+CHRP_EXPORT CHRP_TRAJECTORY* chrp_open_with_format(const char* filename, const char* mode, const char* format);
+
+/*!
 * @brief Read the next step of the trajectory into a frame
 * @param file A pointer to the trajectory
 * @param frame A frame to fill with the data

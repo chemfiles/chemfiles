@@ -112,7 +112,15 @@ int main(){
     assert(strcmp(name, "Zn") == 0);
     assert(!chrp_atom_free(atom));
 
+    assert(!chrp_trajectory_close(file));
+
+    file = chrp_open_with_format(DATADIR "xyz/helium.xyz.but.not.really", "r", "XYZ");
+    assert(!chrp_trajectory_read(file, frame));
+    assert(!chrp_frame_atoms_count(frame, &natoms));
+    assert(natoms == 125);
+
     assert(!chrp_frame_free(frame));
     assert(!chrp_trajectory_close(file));
+
     return EXIT_SUCCESS;
 }
