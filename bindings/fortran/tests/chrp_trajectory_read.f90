@@ -182,8 +182,21 @@ program trajectory_read
 
     call atom%free(status=status)
     call check((status == 0), "atom%free")
+    call file%close(status=status)
+    call check((status == 0), "file%close")
+
+    call file%with_format(trim(DATADIR) // "/xyz/helium.xyz.but.not.really", "r", "XYZ", status=status)
+    call check((status == 0), "file%open_with_format")
+
+    call file%read(frame, status=status)
+    call check((status == 0), "file%read")
+
+    call frame%atoms_count(natoms, status=status)
+    call check((status == 0), "frame%atoms_count")
+    call check((natoms == 125), "frame%atoms_count")
+
     call frame%free(status=status)
-    call check((status == 0), "file%free")
+    call check((status == 0), "frame%free")
     call file%close(status=status)
     call check((status == 0), "file%close")
 end program

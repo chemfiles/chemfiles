@@ -31,3 +31,12 @@ enum, bind(C)
     ! Enumeration name:
     enumerator :: CHRP_CELL_TYPES
 end enum
+
+enum, bind(C)
+    enumerator :: CHRP_ATOM_ELEMENT = 0
+    enumerator :: CHRP_ATOM_CORSE_GRAIN = 1
+    enumerator :: CHRP_ATOM_DUMMY = 2
+    enumerator :: CHRP_ATOM_UNDEFINED = 3
+    ! Enumeration name:
+    enumerator :: CHRP_ATOM_TYPES
+end enum

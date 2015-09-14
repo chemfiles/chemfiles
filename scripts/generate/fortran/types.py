@@ -6,7 +6,7 @@ to them, using the name of the function.
 """
 from .constants import BEGINING, FTYPES
 from .convert import function_name_to_fortran
-from generate.functions import SPECIAL_FUNCTIONS
+from generate.functions import FREE_FUNCTIONS
 
 TEMPLATE = """
 type {name}
@@ -55,7 +55,7 @@ def write_types(path, functions):
     types = {}
 
     for func in functions:
-        if func.name in SPECIAL_FUNCTIONS.values():
+        if func.name in FREE_FUNCTIONS:
             continue
         else:
             typename = func.typename
@@ -77,11 +77,6 @@ def write_types(path, functions):
             ftype.add_procedure(
                 BoundProcedure(member_name, function_name_to_fortran(func))
             )
-
-    # TODO: find something generic here
-    types["chrp_trajectory"].add_procedure(
-        BoundProcedure('open', 'chrp_open_init_')
-    )
 
     with open(path, "w") as fd:
         fd.write(BEGINING)

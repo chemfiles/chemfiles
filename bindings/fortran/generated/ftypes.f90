@@ -41,6 +41,8 @@ type chrp_trajectory
     private
     type(c_ptr) :: ptr
 contains
+    procedure :: open => chrp_trajectory_open_init_
+    procedure :: with_format => chrp_trajectory_with_format_init_
     procedure :: read => chrp_trajectory_read
     procedure :: read_step => chrp_trajectory_read_step
     procedure :: write => chrp_trajectory_write
@@ -49,7 +51,6 @@ contains
     procedure :: set_cell => chrp_trajectory_set_cell
     procedure :: nsteps => chrp_trajectory_nsteps
     procedure :: close => chrp_trajectory_close
-    procedure :: open => chrp_open_init_
 end type
 
 type chrp_frame
@@ -88,6 +89,8 @@ contains
     procedure :: vdw_radius => chrp_atom_vdw_radius
     procedure :: covalent_radius => chrp_atom_covalent_radius
     procedure :: atomic_number => chrp_atom_atomic_number
+    procedure :: type => chrp_atom_type
+    procedure :: set_type => chrp_atom_set_type
     procedure :: free => chrp_atom_free
 end type
 

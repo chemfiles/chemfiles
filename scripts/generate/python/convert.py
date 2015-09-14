@@ -22,6 +22,7 @@ CONVERSIONS = {
 
     "chrp_cell_type_t": "c_int",
     "chrp_log_level_t": "c_int",
+    "chrp_atom_type_t": "c_int",
 }
 
 NUMPY_CONVERSIONS = {

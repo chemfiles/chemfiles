@@ -3,15 +3,11 @@ from pycparser import c_ast
 
 from .ctype import *
 
-# All the fucntions not following the 'chrp_' + typename + fucntion_name
-# pattern.
-SPECIAL_FUNCTIONS = {
-    "free": [
-        'chrp_strerror', 'chrp_last_error', 'chrp_loglevel',
-        'chrp_logfile', 'chrp_log_stderr'
-    ],
-    "chrp_trajectory": ['chrp_open'],
-}
+# All the functions not associated with a type.
+FREE_FUNCTIONS = [
+    'chrp_strerror', 'chrp_last_error', 'chrp_loglevel', 'chrp_logfile',
+    'chrp_log_stderr'
+]
 
 TYPES = [
     "CHRP_TRAJECTORY", "CHRP_CELL", "CHRP_ATOM", "CHRP_FRAME", "CHRP_TOPOLOGY"

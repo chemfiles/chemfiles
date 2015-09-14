@@ -3,7 +3,7 @@
 """
 This module generate Chemharp Fortran API by calling the C interfae
 """
-from generate.functions import SPECIAL_FUNCTIONS, Argument
+from generate.functions import Argument
 from generate.ctype import *
 
 from .constants import BEGINING, FTYPES, STRING_LENGTH

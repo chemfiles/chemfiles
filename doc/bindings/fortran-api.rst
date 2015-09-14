@@ -114,6 +114,7 @@ Error and logging functions
     subroutine are available:
 
     :field subroutine open:
+    :field subroutine with_format:
     :field subroutine read:
     :field subroutine read_step:
     :field subroutine write:
@@ -123,8 +124,8 @@ Error and logging functions
     :field subroutine nstep:
     :field subroutine close:
 
-    The initialization routine is the ``open`` one, and the memory liberation
-    routine is the ``close`` one.
+    The initialization routine are ``open`` and ``with_format``, and the memory
+    liberation routine is ``close``.
 
 .. f:subroutine:: open(filename, mode, [, status])
 
@@ -132,6 +133,15 @@ Error and logging functions
 
     :parameter string filename: The path to the trajectory file
     :parameter string mode: The opening ("r" for read or "w" for write) mode for the file.
+    :optional integer status [optional]: The status code
+
+.. f:subroutine:: with_format(filename, mode, [, status])
+
+    Open a trajectory file using a given format to read the file.
+
+    :parameter string filename: The path to the trajectory file
+    :parameter string mode: The opening ("r" for read or "w" for write) mode for the file.
+    :parameter string format: The format to use
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: read(frame[, status])

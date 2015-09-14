@@ -84,7 +84,7 @@ subroutine chrp_log_stderr(status)
     end if
 end subroutine
 
-subroutine chrp_open_init_(this, filename, mode, status)
+subroutine chrp_trajectory_open_init_(this, filename, mode, status)
     implicit none
     class(chrp_trajectory) :: this
     character(len=*), intent(in) :: filename
@@ -92,7 +92,29 @@ subroutine chrp_open_init_(this, filename, mode, status)
     integer, optional :: status
     integer :: status_tmp_
 
-    this%ptr = chrp_open_c(f_to_c_str(filename), f_to_c_str(mode))
+    this%ptr = chrp_trajectory_open_c(f_to_c_str(filename), f_to_c_str(mode))
+
+    if (.not. c_associated(this%ptr)) then
+        status_tmp_ = -1
+    else
+        status_tmp_ = 0
+    end if
+
+    if (present(status)) then
+        status = status_tmp_
+    end if
+end subroutine
+
+subroutine chrp_trajectory_with_format_init_(this, filename, mode, format, status)
+    implicit none
+    class(chrp_trajectory) :: this
+    character(len=*), intent(in) :: filename
+    character(len=*), intent(in) :: mode
+    character(len=*), intent(in) :: format
+    integer, optional :: status
+    integer :: status_tmp_
+
+    this%ptr = chrp_trajectory_with_format_c(f_to_c_str(filename), f_to_c_str(mode), f_to_c_str(format))
 
     if (.not. c_associated(this%ptr)) then
         status_tmp_ = -1
@@ -1049,6 +1071,34 @@ subroutine chrp_atom_atomic_number(this, number, status)
     integer :: status_tmp_
 
     status_tmp_ = chrp_atom_atomic_number_c(this%ptr, number)
+    if (present(status)) then
+        status = status_tmp_
+    end if
+end subroutine
+
+subroutine chrp_atom_type(this, type, status)
+    implicit none
+    class(chrp_atom), intent(in) :: this
+    include "generated/cenums.f90"
+    integer(kind=kind(CHRP_ATOM_TYPES)) :: type
+    integer, optional :: status
+    integer :: status_tmp_
+
+    status_tmp_ = chrp_atom_type_c(this%ptr, type)
+    if (present(status)) then
+        status = status_tmp_
+    end if
+end subroutine
+
+subroutine chrp_atom_set_type(this, type, status)
+    implicit none
+    class(chrp_atom) :: this
+    include "generated/cenums.f90"
+    integer(kind=kind(CHRP_ATOM_TYPES)), value :: type
+    integer, optional :: status
+    integer :: status_tmp_
+
+    status_tmp_ = chrp_atom_set_type_c(this%ptr, type)
     if (present(status)) then
         status = status_tmp_
     end if

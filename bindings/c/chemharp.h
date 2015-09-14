@@ -674,7 +674,7 @@ CHRP_EXPORT int chrp_atom_covalent_radius(const CHRP_ATOM* atom, double* radius)
 */
 CHRP_EXPORT int chrp_atom_atomic_number(const CHRP_ATOM* atom, int* number);
 
-typedef enum CHRP_ATOM_TYPE {
+typedef enum CHRP_ATOM_TYPES {
     //! Element from the periodic table of elements
     CHRP_ATOM_ELEMENT = 0,
     //! Corse-grained atom are composed of more than one element: CH3 groups,

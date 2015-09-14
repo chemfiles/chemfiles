@@ -27,6 +27,8 @@ CHRP_TYPES_TO_FORTRAN_INTERFACE = {
     'include "generated/cenums.f90"\n    integer(kind=kind(CHRP_CELL_TYPES))',
     "chrp_log_level_t":
     'include "generated/cenums.f90"\n    integer(kind=kind(CHRP_LOG_LEVEL))',
+    "chrp_atom_type_t":
+    'include "generated/cenums.f90"\n    integer(kind=kind(CHRP_ATOM_TYPES))',
 }
 
 # Converting Chemharp types for the c functions declarations
@@ -39,6 +41,7 @@ CHRP_TYPES_TO_C_DECLARATIONS = {
 
     "chrp_cell_type_t": "integer(kind=c_int)",
     "chrp_log_level_t": "integer(kind=c_int)",
+    "chrp_atom_type_t": "integer(kind=c_int)",
 }
 
 
