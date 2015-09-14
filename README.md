@@ -236,7 +236,7 @@ fn main() {
 #include "chemharp.h"
 
 int main(){
-    CHRP_TRAJECTORY * trajectory = chrp_open("filename.xyz", "r");
+    CHRP_TRAJECTORY * trajectory = chrp_trajectory_open("filename.xyz", "r");
     CHRP_FRAME * frame = chrp_frame(0);
     size_t natoms = 0;
 

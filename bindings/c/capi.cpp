@@ -50,7 +50,7 @@ int chrp_log_stderr(){
 
 /******************************************************************************/
 
-CHRP_TRAJECTORY* chrp_open(const char* filename, const char* mode){
+CHRP_TRAJECTORY* chrp_trajectory_open(const char* filename, const char* mode){
     CHRP_TRAJECTORY* traj = NULL;
     CHRP_ERROR_WRAP(
         traj = new Trajectory(filename, mode);
@@ -59,7 +59,7 @@ error:
     return traj;
 }
 
-CHRP_TRAJECTORY* chrp_open_with_format(const char* filename, const char* mode, const char* format){
+CHRP_TRAJECTORY* chrp_trajectory_with_format(const char* filename, const char* mode, const char* format){
     CHRP_TRAJECTORY* traj = NULL;
     CHRP_ERROR_WRAP(
         traj = new Trajectory(filename, mode, format);

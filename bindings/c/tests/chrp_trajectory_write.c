@@ -42,7 +42,7 @@ int main(){
     assert(!chrp_frame_set_positions(frame, pos, 4));
     assert(!chrp_frame_set_topology(frame, top));
 
-    CHRP_TRAJECTORY* file = chrp_open("test-tmp.xyz", "w");
+    CHRP_TRAJECTORY* file = chrp_trajectory_open("test-tmp.xyz", "w");
     assert(!chrp_trajectory_write(file, frame));
 
     float pos_2[6][3];

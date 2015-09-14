@@ -50,9 +50,9 @@ The Trajectory type is the main entry point when using Chemharp. A trajectory
 behave a bit like a ``FILE*`` pointer, and the ``chrp_close`` free the memory
 associated with the file.
 
-.. doxygenfunction:: chrp_open
+.. doxygenfunction:: chrp_trajectory_open
 
-.. doxygenfunction:: chrp_open_with_format
+.. doxygenfunction:: chrp_trajectory_with_format
 
 .. doxygenfunction:: chrp_trajectory_read
 

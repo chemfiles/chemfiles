@@ -8,7 +8,7 @@
 #include "chemharp.h"
 
 int main() {
-    CHRP_TRAJECTORY* traj = chrp_open("filename.nc", "r");
+    CHRP_TRAJECTORY* traj = chrp_trajectory_open("filename.nc", "r");
     CHRP_FRAME* frame = chrp_frame(0);
     float (*positions)[3] = NULL;
     double* distances = NULL;

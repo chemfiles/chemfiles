@@ -7,8 +7,8 @@
 #include "chemharp.h"
 
 int main() {
-    CHRP_TRAJECTORY* input = chrp_open("water.xyz", "r");
-    CHRP_TRAJECTORY* output = chrp_open("water.pdb", "w");
+    CHRP_TRAJECTORY* input = chrp_trajectory_open("water.xyz", "r");
+    CHRP_TRAJECTORY* output = chrp_trajectory_open("water.pdb", "w");
     CHRP_FRAME* frame = chrp_frame(0);
     CHRP_TOPOLOGY* water_topology = chrp_topology();
     // Orthorombic UnitCell with lengths of 20, 15 and 35 A

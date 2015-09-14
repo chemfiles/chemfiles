@@ -11,7 +11,7 @@
 
 int main(){
     CHRP_FRAME* frame = chrp_frame(0);
-    CHRP_TRAJECTORY* file = chrp_open(DATADIR "/xyz/water.xyz", "r");
+    CHRP_TRAJECTORY* file = chrp_trajectory_open(DATADIR "/xyz/water.xyz", "r");
 
     // Read the first frame
     assert(!chrp_trajectory_read(file, frame));
@@ -114,7 +114,7 @@ int main(){
 
     assert(!chrp_trajectory_close(file));
 
-    file = chrp_open_with_format(DATADIR "xyz/helium.xyz.but.not.really", "r", "XYZ");
+    file = chrp_trajectory_with_format(DATADIR "xyz/helium.xyz.but.not.really", "r", "XYZ");
     assert(!chrp_trajectory_read(file, frame));
     assert(!chrp_frame_atoms_count(frame, &natoms));
     assert(natoms == 125);

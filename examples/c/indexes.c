@@ -7,7 +7,7 @@
 #include "chemharp.h"
 
 int main() {
-    CHRP_TRAJECTORY* traj = chrp_open("tests/files/xyz/helium.xyz", "r");
+    CHRP_TRAJECTORY* traj = chrp_trajectory_open("tests/files/xyz/helium.xyz", "r");
     CHRP_FRAME* frame = chrp_frame(0);
 
     if (traj == NULL)
