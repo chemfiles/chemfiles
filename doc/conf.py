@@ -23,6 +23,7 @@ if read_the_docs_build:
 extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.todo',
+    'sphinx.ext.autodoc',
     'breathe',
     'fortran_domain',
     'julia'
