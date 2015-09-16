@@ -1,3 +1,10 @@
+# 0.4
+
+* Add and experimental Rust binding
+* Rewrite the Python binding to use ctypes. The same code can be used with Python 2 & 3,
+  and with all numpy versions.
+* Easier Python and Julia binding installation, using conda binary packaging.
+
 # 0.3
 
 * Julia binding
