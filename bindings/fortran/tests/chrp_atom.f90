@@ -9,6 +9,7 @@ program atom_test
     real(kind=real64) :: radius = 0
     integer :: status
     integer(kind=int32) :: number
+    integer(kind=kind(CHRP_ATOM_TYPES)) :: atom_type
     character(len=32) :: name
 
     call atom%init("He", status=status)
@@ -59,6 +60,16 @@ program atom_test
     call atom%atomic_number(number, status=status)
     call check((status == 0), "atom%atomic_number")
     call check((number == 30), "atom%atomic_number")
+
+    call atom%type(atom_type, status=status)
+    call check((status == 0), "atom%type")
+    call check((atom_type == CHRP_ATOM_ELEMENT), "atom%atomic_number")
+
+    call atom%set_type(CHRP_ATOM_DUMMY, status=status)
+    call check((status == 0), "atom%set_type")
+    call atom%type(atom_type, status=status)
+    call check((status == 0), "atom%type")
+    call check((atom_type == CHRP_ATOM_DUMMY), "atom%atomic_number")
 
     call atom%free(status=status)
     call check((status == 0), "atom%free")

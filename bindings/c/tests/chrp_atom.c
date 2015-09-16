@@ -46,6 +46,14 @@ int main() {
     assert(!chrp_atom_atomic_number(a, &number));
     assert(number == 30);
 
+    chrp_atom_type_t type;
+    assert(!chrp_atom_type(a, &type));
+    assert(type == CHRP_ATOM_ELEMENT);
+
+    assert(!chrp_atom_set_type(a, CHRP_ATOM_DUMMY));
+    assert(!chrp_atom_type(a, &type));
+    assert(type == CHRP_ATOM_DUMMY);
+
     assert(!chrp_atom_free(a));
 
     return EXIT_SUCCESS;

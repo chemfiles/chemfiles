@@ -674,6 +674,7 @@ CHRP_EXPORT int chrp_atom_covalent_radius(const CHRP_ATOM* atom, double* radius)
 */
 CHRP_EXPORT int chrp_atom_atomic_number(const CHRP_ATOM* atom, int* number);
 
+//! Available types of atoms
 typedef enum CHRP_ATOM_TYPES {
     //! Element from the periodic table of elements
     CHRP_ATOM_ELEMENT = 0,
@@ -682,7 +683,7 @@ typedef enum CHRP_ATOM_TYPES {
     CHRP_ATOM_CORSE_GRAIN = 1,
     //! Dummy site, with no physical reality
     CHRP_ATOM_DUMMY = 2,
-    //! Undefined atom-type
+    //! Undefined atom type
     CHRP_ATOM_UNDEFINED = 3,
 } chrp_atom_type_t;
 
