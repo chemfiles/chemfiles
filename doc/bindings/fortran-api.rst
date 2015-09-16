@@ -65,7 +65,7 @@ Error and logging functions
     :paramter integer(kind=kind(CHRP_LOG_LEVEL)): The new logging level
     :optional integer status [optional]: The status code
 
-    The following loggin level are available:
+    The following logging level are available:
 
     .. cpp:enum:: CHRP_LOG_LEVEL
 
@@ -430,6 +430,8 @@ Error and logging functions
     :parameter integer type [kind=kind(CHRP_CELL_TYPES)]: the type of the cell
     :optional integer status [optional]: The status code
 
+    Available cell types are:
+
     .. cpp:enum:: CHRP_CELL_TYPES
 
         .. cpp:enumerator:: CHRP_CELL_ORTHOROMBIC
@@ -764,6 +766,41 @@ Error and logging functions
     Try to get the atomic number of an atom from the short name
 
     :parameter integer number: The atomic number, or -1 if no value could be found.
+    :optional integer status [optional]: The status code
+
+.. f:subroutine:: type(type[, status])
+
+    Get the atom type
+
+    :parameter integer type [kind=kind(CHRP_ATOM_TYPES)]: the type of the atom
+    :optional integer status [optional]: The status code
+
+    Available atoms types are:
+
+    .. cpp:enum:: CHRP_ATOM_TYPES
+
+        .. cpp:enumerator:: CHRP_ATOM_ELEMENT
+
+            Element from the periodic table of elements.
+
+        .. cpp:enumerator:: CHRP_ATOM_CORSE_GRAIN
+
+            Corse-grained atom are composed of more than one element: CH3 groups,
+            amino-acids are corse-grained atoms.
+
+        .. cpp:enumerator:: CHRP_ATOM_DUMMY
+
+            Dummy site, with no physical reality.
+
+        .. cpp:enumerator:: CHRP_ATOM_UNDEFINED
+
+            Undefined atom type.
+
+.. f:subroutine:: set_type(type[, status])
+
+    Set the atom type
+
+    :parameter integer type [kind=kind(CHRP_ATOM_TYPES)]: the new type of the atom
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: free(status)
