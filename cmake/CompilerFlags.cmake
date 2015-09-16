@@ -8,9 +8,13 @@ if(COMPILER_SUPPORTS_CXX11)
 elseif(COMPILER_SUPPORTS_CXXOX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 else()
-    message(SEND_ERROR
-        "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support.
-    Please use a different C++ compiler.")
+    if(MSVC)
+        if(MSVC_VERSION LESS 1900)
+            message(SEND_ERROR "MSVC < 14.0 is not supported. Please update your compiler or use mingw")
+        endif()
+    else()
+        message(SEND_ERROR "The ${CMAKE_CXX_COMPILER} compiler lacks C++11 support. Use another compiler.")
+    endif()
 endif()
 
 macro(set_debug_flag_if_possible _flag_)
@@ -22,7 +26,7 @@ endmacro()
 
 # Add some warnings in debug mode
 if(MSVC)
-    set_debug_flag_if_possible("/W4")
+    # set_debug_flag_if_possible("/W4")
 else()
     set_debug_flag_if_possible("-Wall")
     set_debug_flag_if_possible("-Wextra")
