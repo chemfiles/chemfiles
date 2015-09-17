@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 2.8.12)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+project(chemharp C CXX)
+
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 if(${CMAKE_VERSION} VERSION_GREATER 3.0.0)
     cmake_policy(SET CMP0042 NEW)
 endif()
 
 #----------------------------------------------------------------------------------------#
-project(chemharp C CXX)
-
 set(CMAKE_CXX_STANDARD 11)
 set(CXX_STANDARD_REQUIRED ON)
 
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/VERSION CHRP_VERSION)
+file(READ ${PROJECT_SOURCE_DIR}/VERSION CHRP_VERSION)
 string(STRIP ${CHRP_VERSION} CHRP_VERSION)
 string(REGEX REPLACE "^([0-9]+)\\..*" "\\1" CHRP_VERSION_MAJOR "${CHRP_VERSION}")
 string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" CHRP_VERSION_MINOR "${CHRP_VERSION}")
@@ -59,8 +59,8 @@ endif()
 add_subdirectory(external)
 
 include_directories(include)
-include_directories(BEFORE SYSTEM ${CMAKE_BINARY_DIR}/include)
-include_directories(BEFORE SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/boost)
+include_directories(BEFORE SYSTEM ${PROJECT_BINARY_DIR}/include)
+include_directories(BEFORE SYSTEM ${PROJECT_SOURCE_DIR}/external/boost)
 
 file(GLOB_RECURSE sources src/**.cpp)
 add_library(chemharp SHARED ${sources} bindings/c/capi.cpp)
@@ -71,7 +71,7 @@ set_property(TARGET chemharp PROPERTY SOVERSION ${CHRP_VERSION_SHORT})
 include(GenerateExportHeader)
 generate_export_header(chemharp
           BASE_NAME CHRP
-          EXPORT_FILE_NAME ${CMAKE_SOURCE_DIR}/include/chemharp/exports.hpp
+          EXPORT_FILE_NAME ${PROJECT_SOURCE_DIR}/include/chemharp/exports.hpp
 )
 target_link_libraries(chemharp boost_system boost_filesystem ${OTHER_CHRP_LIBRARIES})
 
@@ -103,7 +103,7 @@ install(FILES bindings/c/chemharp.h DESTINATION include)
 # Dynamic library
 install(TARGETS chemharp DESTINATION lib)
 
-file(GLOB molfiles ${CMAKE_BINARY_DIR}/lib/*plugin.so)
+file(GLOB molfiles ${PROJECT_BINARY_DIR}/lib/*plugin.so)
 install(FILES ${molfiles} DESTINATION lib/molfiles/
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                     GROUP_READ             GROUP_EXECUTE
@@ -111,20 +111,20 @@ install(FILES ${molfiles} DESTINATION lib/molfiles/
 
 # uninstall target
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.in.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake"
+    "${PROJECT_SOURCE_DIR}/cmake/uninstall.in.cmake"
+    "${PROJECT_BINARY_DIR}/uninstall.cmake"
     IMMEDIATE @ONLY)
 
 add_custom_target(uninstall
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake)
+    COMMAND ${CMAKE_COMMAND} -P ${PROJECT_BINARY_DIR}/uninstall.cmake)
 
 #----------------------------------------------------------------------------------------#
 # Packaging stuff
 #----------------------------------------------------------------------------------------#
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Chemharp, efficient chemistry IO library")
 set(CPACK_PACKAGE_VENDOR "Guillaume Fraux")
-set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENCE.txt")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
+set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENCE.txt")
 set(CPACK_PACKAGE_VERSION_MAJOR ${CHRP_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${CHRP_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${CHRP_VERSION_PATCH})
@@ -140,11 +140,11 @@ add_subdirectory(tests)
 add_subdirectory(examples)
 add_subdirectory(bindings)
 if(${BUILD_FRONTEND})
-    if(EXISTS "${CMAKE_SOURCE_DIR}/bin/CMakeLists.txt")
+    if(EXISTS "${PROJECT_SOURCE_DIR}/bin/CMakeLists.txt")
         add_subdirectory(bin)
     else()
         message(WARNING
-        "The binary frontend source does not exist at ${CMAKE_SOURCE_DIR}/bin/, "
+        "The binary frontend source does not exist at ${PROJECT_SOURCE_DIR}/bin/, "
         "the frontend will not be built.")
     endif()
 endif()

@@ -3,11 +3,11 @@ function(chrp_cpp_test _file_)
     add_executable(${_name_} ${_file_} $<TARGET_OBJECTS:catch>)
     target_link_libraries(${_name_} chemharp)
     set_property(TARGET ${_name_} PROPERTY CXX_STANDARD 11)
-    add_test(NAME ${_name_} COMMAND ${_name_} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    add_test(NAME ${_name_} COMMAND ${_name_} WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 endfunction()
 
 if(BUILD_TESTS)
-    include_directories(${CMAKE_SOURCE_DIR}/include)
+    include_directories(${PROJECT_SOURCE_DIR}/include)
     include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/catch)
     add_library(catch OBJECT ${CMAKE_CURRENT_SOURCE_DIR}/catch/catch.cpp)
 
@@ -30,6 +30,6 @@ if(BUILD_TESTS)
     # Because the files may not be installed yet, we use the environment variable
     foreach(_test_ pdb-molfile dcd-molfile gro-molfile xtc-molfile trr-molfile)
         set_tests_properties(${_test_}
-            PROPERTIES ENVIRONMENT "CHRP_MOLFILES=${CMAKE_BINARY_DIR}/lib/")
+            PROPERTIES ENVIRONMENT "CHRP_MOLFILES=${PROJECT_BINARY_DIR}/lib/")
     endforeach()
 endif()

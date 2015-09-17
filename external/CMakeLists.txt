@@ -39,7 +39,7 @@ if(${NETCDF_FOUND})
                     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
                     -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
                     # Setting installation directory
-                    -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
+                    -DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}
                     # Support cross-compilation
                     -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
                     -DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}
@@ -50,7 +50,7 @@ if(${NETCDF_FOUND})
     add_library(netcdf_cxx4 STATIC IMPORTED GLOBAL)
     set_property(
         TARGET netcdf_cxx4
-        PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/lib/libnetcdf-cxx4${CMAKE_STATIC_LIBRARY_SUFFIX}
+        PROPERTY IMPORTED_LOCATION ${PROJECT_BINARY_DIR}/lib/libnetcdf-cxx4${CMAKE_STATIC_LIBRARY_SUFFIX}
     )
 endif()
 
@@ -65,7 +65,7 @@ ExternalProject_Add(molfiles
                 -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
                 -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
                 # Setting installation directory
-                -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
+                -DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}
                 # Support cross-compilation
                 -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
                 -DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}

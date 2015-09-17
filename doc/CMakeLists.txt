@@ -6,18 +6,18 @@ if(BUILD_DOCUMENTATION)
   find_package(Sphinx REQUIRED)
   find_package(Doxygen REQUIRED)
 
-  configure_file(${CMAKE_SOURCE_DIR}/Doxyfile ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
-  configure_file(${CMAKE_SOURCE_DIR}/doc/conf.cmake.py ${CMAKE_BINARY_DIR}/doc/conf.py)
+  configure_file(${PROJECT_SOURCE_DIR}/Doxyfile ${PROJECT_BINARY_DIR}/Doxyfile @ONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/doc/conf.cmake.py ${PROJECT_BINARY_DIR}/doc/conf.py)
 
   add_custom_target( doxygendoc ALL
-    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
     COMMENT "Generating API documentation with Doxygen"
   )
 
-  set(SPHINX_CONF_DIR ${CMAKE_BINARY_DIR}/doc)
-  set(SPHINX_INPUT_DIR ${CMAKE_SOURCE_DIR}/doc)
-  set(SPHINX_DESTINATION ${CMAKE_BINARY_DIR}/doc)
+  set(SPHINX_CONF_DIR ${PROJECT_BINARY_DIR}/doc)
+  set(SPHINX_INPUT_DIR ${PROJECT_SOURCE_DIR}/doc)
+  set(SPHINX_DESTINATION ${PROJECT_BINARY_DIR}/doc)
   set(SPHINX_DEPENDENCIES doxygendoc)
 
   set(sphinx_target_base_name doc)

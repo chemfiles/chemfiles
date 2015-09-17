@@ -27,13 +27,13 @@ if(BUILD_TESTS)
     endforeach()
 
     file(GLOB c_examples c/*.c)
-    include_directories(${CMAKE_SOURCE_DIR}/bindings/c)
+    include_directories(${PROJECT_SOURCE_DIR}/bindings/c)
     foreach(example IN LISTS c_examples)
         chrp_c_example(${example})
     endforeach()
 
     if(${FORTRAN_BINDING})
-        include_directories(${CMAKE_BINARY_DIR}/bindings/fortran)
+        include_directories(${PROJECT_BINARY_DIR}/bindings/fortran)
         set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fdefault-integer-8")
 
         file(GLOB fortran_examples fortran/*.f90)
