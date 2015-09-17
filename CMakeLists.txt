@@ -10,25 +10,12 @@ project(chemharp C CXX)
 set(CMAKE_CXX_STANDARD 11)
 set(CXX_STANDARD_REQUIRED ON)
 
-find_package(Git)
-if(GIT_FOUND)
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} describe --tags
-        OUTPUT_VARIABLE CHRP_VERSION
-        ERROR_QUIET
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    string(REGEX REPLACE "^([0-9]+)\\..*" "\\1" CHRP_VERSION_MAJOR "${CHRP_VERSION}")
-    string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" CHRP_VERSION_MINOR "${CHRP_VERSION}")
-    string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CHRP_VERSION_PATCH "${CHRP_VERSION}")
-    set(CHRP_VERSION_SHORT "${CHRP_VERSION_MAJOR}.${CHRP_VERSION_MINOR}.${CHRP_VERSION_PATCH}")
-else()
-    set(CHRP_VERSION "Unknown-version")
-    set(CHRP_VERSION_SHORT "0.0.0")
-    set(CHRP_VERSION_MAJOR "0")
-    set(CHRP_VERSION_MINOR "0")
-    set(CHRP_VERSION_PATCH "0")
-endif()
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/VERSION CHRP_VERSION)
+string(STRIP ${CHRP_VERSION} CHRP_VERSION)
+string(REGEX REPLACE "^([0-9]+)\\..*" "\\1" CHRP_VERSION_MAJOR "${CHRP_VERSION}")
+string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" CHRP_VERSION_MINOR "${CHRP_VERSION}")
+string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CHRP_VERSION_PATCH "${CHRP_VERSION}")
+set(CHRP_VERSION_SHORT "${CHRP_VERSION_MAJOR}.${CHRP_VERSION_MINOR}.${CHRP_VERSION_PATCH}")
 
 option(BUILD_TESTS "Build unit tests." OFF)
 option(BUILD_FRONTEND "Build the binary frontend." ON)
