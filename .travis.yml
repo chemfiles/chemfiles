@@ -25,7 +25,6 @@ addons:
     - gfortran-4.9
     - libnetcdf-dev
     - clang-3.6
-    - python-numpy
 
 install:
   - export C_COMPILER=$CC
@@ -70,11 +69,10 @@ install:
     if [ ${TRAVIS_OS_NAME} == "osx" ]
     then
         brew tap homebrew/science
-        brew tap homebrew/python
         brew update
-        brew install netcdf numpy gcc
+        brew install netcdf gcc
         export CMAKE=cmake
-        export FC=gfortran-5
+        export FC=gfortran
         if [ ${C_COMPILER} == "gcc" ]
         then
             export CC=gcc-5
