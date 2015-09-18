@@ -67,7 +67,7 @@ include_directories(BEFORE SYSTEM ${PROJECT_BINARY_DIR}/include)
 include_directories(BEFORE SYSTEM ${PROJECT_SOURCE_DIR}/external/boost)
 
 file(GLOB_RECURSE sources src/**.cpp)
-add_library(chemharp ${sources} bindings/c/capi.cpp)
+add_library(chemharp ${sources} bindings/c/capi.cpp $<TARGET_OBJECTS:boost_system> $<TARGET_OBJECTS:boost_filesystem>)
 
 set_property(TARGET chemharp PROPERTY VERSION ${CHRP_VERSION_SHORT})
 set_property(TARGET chemharp PROPERTY SOVERSION ${CHRP_VERSION_SHORT})
@@ -77,7 +77,7 @@ generate_export_header(chemharp
           BASE_NAME CHRP
           EXPORT_FILE_NAME ${PROJECT_SOURCE_DIR}/include/chemharp/exports.hpp
 )
-target_link_libraries(chemharp boost_system boost_filesystem ${OTHER_CHRP_LIBRARIES})
+target_link_libraries(chemharp ${OTHER_CHRP_LIBRARIES})
 
 configure_file (
   "${PROJECT_SOURCE_DIR}/include/chemharp/config.in.hpp"
