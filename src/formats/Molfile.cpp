@@ -21,16 +21,17 @@ struct plugin_data_t {
     std::string format;
     std::string path;
     std::string plugin_name;
+    std::string extension;
     bool have_velocities;
 };
 
 static std::map<MolfileFormat, plugin_data_t> molfile_plugins {
-    {PDB, {"PDB", "pdbplugin.so", "pdb", false}},
-    {DCD, {"DCD", "dcdplugin.so", "dcd", false}},
-    {GRO, {"GRO", "gromacsplugin.so", "gro", false}},
-    {TRR, {"TRR", "gromacsplugin.so", "trr", true}},
-    {XTC, {"XTC", "gromacsplugin.so", "xtc", false}},
-    {TRJ, {"Gromacs trj", "gromacsplugin.so", "trj", true}},
+    {PDB, {"PDB", "pdbplugin.so", "pdb", ".pdb", false}},
+    {DCD, {"DCD", "dcdplugin.so", "dcd", ".dcd", false}},
+    {GRO, {"GRO", "gromacsplugin.so", "gro", ".gro", false}},
+    {TRR, {"TRR", "gromacsplugin.so", "trr", ".trr", true}},
+    {XTC, {"XTC", "gromacsplugin.so", "xtc", ".xtc", false}},
+    {TRJ, {"Gromacs trj", "gromacsplugin.so", "trj", ".trj", true}},
 };
 
 struct plugin_reginfo_t {
@@ -244,49 +245,22 @@ void Molfile<F>::read_topology() const {
     _topology.recalculate();
 }
 
+template <MolfileFormat F> const char* Molfile<F>::name() {
+    static const char* val = molfile_plugins[F].format.c_str();
+    return val;
+}
+
+template <MolfileFormat F> const char* Molfile<F>::extension() {
+    static const char* val = molfile_plugins[F].extension.c_str();
+    return val;
+}
+
 /******************************************************************************/
 
 // Instanciate the templates
 template class harp::Molfile<PDB>;
 template class harp::Molfile<DCD>;
+template class harp::Molfile<GRO>;
 template class harp::Molfile<TRR>;
 template class harp::Molfile<XTC>;
 template class harp::Molfile<TRJ>;
-
-// Redefine the registering macros
-#undef REGISTER
-#undef REGISTER_EXTENSION
-
-#define REGISTER(format_t, name)                          \
-template<> bool format_t::_registered_format_ =           \
-TrajectoryFactory::register_format(name, {                \
-    new_format<format_t>,                                 \
-    new_file<typename format_t::file_t>                   \
-});
-
-#define REGISTER_EXTENSION(format_t, extension)           \
-template<> bool format_t::_registered_extension_ =        \
-TrajectoryFactory::register_extension(extension, {        \
-    new_format<format_t>,                                 \
-    new_file<typename format_t::file_t>                   \
-});
-
-/******************************************************************************/
-
-REGISTER(Molfile<PDB>, "PDB");
-REGISTER_EXTENSION(Molfile<PDB>, ".pdb");
-
-REGISTER(Molfile<DCD>, "DCD");
-REGISTER_EXTENSION(Molfile<DCD>, ".dcd");
-
-REGISTER(Molfile<GRO>, "GRO");
-REGISTER_EXTENSION(Molfile<GRO>, ".gro");
-
-REGISTER(Molfile<TRR>, "TRR");
-REGISTER_EXTENSION(Molfile<TRR>, ".trr");
-
-REGISTER(Molfile<XTC>, "XTC");
-REGISTER_EXTENSION(Molfile<XTC>, ".xtc");
-
-REGISTER(Molfile<TRJ>, "Gromacs trj");
-REGISTER_EXTENSION(Molfile<TRJ>, ".trj");

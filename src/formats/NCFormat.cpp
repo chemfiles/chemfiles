@@ -242,9 +242,4 @@ void NCFormat::write_cell(const UnitCell& cell) const {
     angles.putVar(start, count, angles_data);
 }
 
-// Register the Amber NetCDF format with the ".nc" extension and the
-// "AmberNetCDF" description.
-REGISTER(NCFormat, "AmberNetCDF");
-REGISTER_EXTENSION(NCFormat, ".nc");
-
 #endif // HAVE_NETCDF

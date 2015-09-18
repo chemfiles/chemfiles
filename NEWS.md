@@ -4,6 +4,8 @@
 * Rewrite the Python binding to use ctypes. The same code can be used with Python 2 & 3,
   and with all numpy versions.
 * Easier Python and Julia binding installation, using conda binary packaging.
+* Chemharp can now be compiled as a static library! This should allow for easier embedding
+  in external code, and easier distribution of binaries.
 
 # 0.3
 

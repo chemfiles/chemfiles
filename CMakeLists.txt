@@ -22,9 +22,13 @@ option(BUILD_FRONTEND "Build the binary frontend." ON)
 option(CODE_COVERAGE "Enable code coverage" OFF)
 option(PYTHON_BINDING "Build python interface to Chemharp." OFF)
 option(FORTRAN_BINDING "Build FORTRAN interface to Chemharp." OFF)
+option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
 
 if(${FORTRAN_BINDING})
     enable_language(Fortran)
+endif()
+if(${PYTHON_BINDING} AND NOT ${BUILD_SHARED_LIBS})
+    message(SEND_ERROR "The Python binding can not be built using static libs. Please set BUILD_SHARED_LIBS to ON.")
 endif()
 
 include(CompilerFlags)
@@ -63,7 +67,7 @@ include_directories(BEFORE SYSTEM ${PROJECT_BINARY_DIR}/include)
 include_directories(BEFORE SYSTEM ${PROJECT_SOURCE_DIR}/external/boost)
 
 file(GLOB_RECURSE sources src/**.cpp)
-add_library(chemharp SHARED ${sources} bindings/c/capi.cpp)
+add_library(chemharp ${sources} bindings/c/capi.cpp)
 
 set_property(TARGET chemharp PROPERTY VERSION ${CHRP_VERSION_SHORT})
 set_property(TARGET chemharp PROPERTY SOVERSION ${CHRP_VERSION_SHORT})

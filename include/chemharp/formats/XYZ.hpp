@@ -34,10 +34,17 @@ public:
     virtual void write(const Frame& frame) override;
     virtual std::string description() const override;
     virtual size_t nsteps() const override;
+
+    // Register the xyz format with the ".xyz" extension and the "XYZ" description.
+    FORMAT_NAME(XYZ);
+    FORMAT_EXTENSION(.xyz);
 private:
     TextFile& textfile;
-    REGISTER_FORMAT;
 };
+
+typedef typename concat<FORMATS_LIST, XYZFormat>::type FormatListXYZ;
+#undef FORMATS_LIST
+#define FORMATS_LIST FormatListXYZ
 
 } // namespace harp
 

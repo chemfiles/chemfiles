@@ -117,8 +117,3 @@ void XYZFormat::write(const Frame& frame){
                   << pos[0] << " " << pos[1] << " " << pos[2] << "\n";
     }
 }
-
-
-// Register the xyz format with the ".xyz" extension and the "XYZ" description.
-REGISTER(XYZFormat, "XYZ");
-REGISTER_EXTENSION(XYZFormat, ".xyz");

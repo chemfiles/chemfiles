@@ -30,30 +30,46 @@ unique_ptr<Format> new_format(File& f){
     return unique_ptr<Format>(new format_t(f));
 }
 
-//! Register a format by associating it to a format name, and no file type.
-#define REGISTER(format_t, name)                          \
-bool format_t::_registered_format_ =                      \
-TrajectoryFactory::register_format(name, {                \
-    new_format<format_t>,                                 \
-    new_file<typename format_t::file_t>                   \
-});
+// //! Register a format by associating it to a format name, and no file type.
+// #define REGISTER(format_t, name)                          \
+// bool format_t::_registered_format_ =                      \
+// TrajectoryFactory::register_format(name, {                \
+//     new_format<format_t>,                                 \
+//     new_file<typename format_t::file_t>                   \
+// });
+//
+// //! Register a format by associating it to an extention, and no file type.
+// //! The extension should starts with a "."
+// #define REGISTER_EXTENSION(format_t, extension)           \
+// bool format_t::_registered_extension_ =                   \
+// TrajectoryFactory::register_extension(extension, {        \
+//     new_format<format_t>,                                 \
+//     new_file<typename format_t::file_t>                   \
+// });
 
-//! Register a format by associating it to an extention, and no file type.
-//! The extension should starts with a "."
-#define REGISTER_EXTENSION(format_t, extension)           \
-bool format_t::_registered_extension_ =                   \
-TrajectoryFactory::register_extension(extension, {        \
-    new_format<format_t>,                                 \
-    new_file<typename format_t::file_t>                   \
-});
+#define FORMAT_EXTENSION(x) static const char* extension() {static constexpr char val[] = #x; return val;}
+#define FORMAT_NAME(x) static const char* name() {static constexpr char val[] = #x; return val;}
 
-//! Add the static members in a class to register a format.
-#define REGISTER_FORMAT                   \
-    static bool _registered_extension_;   \
-    static bool _registered_format_
+// Create a vector of types at compile time
+struct Void {};
 
-#define FORMAT_NAME(x) static constexpr const char name[] = x;
-#define FORMAT_EXTENSION(x) static constexpr const char extension[] = x;
+template <typename ...> struct concat;
+
+template <template <typename ...> class List, typename T>
+struct concat<List<Void>, T>{
+    typedef List<T> type;
+};
+
+template <template <typename ...> class List, typename ...Types, typename T>
+struct concat<List<Types...>, T> {
+    typedef List<Types..., T> type;
+};
+
+template <typename...> struct FormatList {};
+
+template <> struct FormatList<Void> {};
+typedef FormatList<Void> FormatListVoid;
+#define FORMATS_LIST FormatListVoid
 
 } // namespace harp
 

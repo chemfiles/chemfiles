@@ -1,7 +1,7 @@
 set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fdefault-integer-8")
 
 file(GLOB fortran-sources *.f90)
-add_library(chemharpf SHARED ${fortran-sources})
+add_library(chemharpf ${fortran-sources})
 target_link_libraries(chemharpf chemharp)
 set_property(TARGET chemharpf PROPERTY VERSION ${CHRP_VERSION})
 set_property(TARGET chemharpf PROPERTY SOVERSION ${CHRP_VERSION})

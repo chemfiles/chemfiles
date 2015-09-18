@@ -8,7 +8,36 @@
 */
 
 #include "chemharp/TrajectoryFactory.hpp"
+
+
+#include "chemharp/formats/XYZ.hpp"
+#include "chemharp/formats/NCFormat.hpp"
+#include "chemharp/formats/Molfile.hpp"
+
+#include "chemharp/files/NCFile.hpp"
 using namespace harp;
+
+typedef FORMATS_LIST formats_list;
+
+template <typename T>
+inline void register_all_formats(FormatList<T>) {
+    auto creator = trajectory_builder_t{new_format<T>, new_file<typename T::file_t>};
+    if (T::extension() != std::string("")){
+        TrajectoryFactory::register_extension(T::extension(), creator);
+    }
+    if (T::name() != std::string("")){
+        TrajectoryFactory::register_format(T::name(), creator);
+    }
+}
+
+template <typename T, typename S, typename ...Types>
+inline void register_all_formats(FormatList<T, S, Types...>) {
+    register_all_formats(FormatList<T>());
+    register_all_formats(FormatList<S, Types...>());
+}
+
+// Initializing to false before main.
+bool TrajectoryFactory::initialized = false;
 
 trajectory_map_t& TrajectoryFactory::names(){
     static auto umap = trajectory_map_t();
@@ -21,30 +50,36 @@ trajectory_map_t& TrajectoryFactory::extensions(){
 }
 
 trajectory_builder_t TrajectoryFactory::format(const string& name){
+    if (!TrajectoryFactory::initialized) {
+        register_all_formats(formats_list());
+        TrajectoryFactory::initialized = true;
+    }
     if (names().find(name) == names().end())
         throw FormatError("Can not find the format \"" + name + "\".");
     return names()[name];
 }
 
 trajectory_builder_t TrajectoryFactory::by_extension(const string& ext){
+    if (!TrajectoryFactory::initialized) {
+        register_all_formats(formats_list());
+        TrajectoryFactory::initialized = true;
+    }
     if (extensions().find(ext) == extensions().end())
         throw FormatError("Can not find a format associated with the \""
                            + ext + "\" extension.");
     return extensions()[ext];
 }
 
-bool TrajectoryFactory::register_format(const string& name, trajectory_builder_t tb){
+void TrajectoryFactory::register_format(const string& name, trajectory_builder_t tb){
     if (names().find(name) != names().end())
         throw FormatError("The name \"" + name + "\" is already "
                               "associated with a format.");
     names().emplace(name, tb);
-    return true;
 }
 
-bool TrajectoryFactory::register_extension(const string& ext, trajectory_builder_t tb){
+void TrajectoryFactory::register_extension(const string& ext, trajectory_builder_t tb){
     if (extensions().find(ext) != extensions().end())
         throw FormatError("The extension \"" + ext + "\" is already "
                           "associated with a format.");
     extensions().emplace(ext, tb);
-    return true;
 }

@@ -42,6 +42,11 @@ public:
     virtual std::string description() const override;
 
     using file_t = NCFile;
+
+    // Register the Amber NetCDF format with the ".nc" extension and the
+    // "AmberNetCDF" description.
+    FORMAT_NAME(AmberNetCDF);
+    FORMAT_EXTENSION(.nc);
 private:
     //! Reserve size for \c natoms on the internal cache.
     void reserve(size_t natoms) const;
@@ -57,15 +62,17 @@ private:
     //! Write an UnitCell to the file, at the current internal step
     void write_cell(const UnitCell& cell) const;
 
-    //! TODO
+    //! Reference to the associated file.
     NCFile& ncfile;
     //! Last read step
     size_t step;
     // Temporary cache for read and write operations.
     mutable std::vector<float> cache;
-    // Let's register the format
-    REGISTER_FORMAT;
 };
+
+typedef typename concat<FORMATS_LIST, NCFormat>::type FormatListNC;
+#undef FORMATS_LIST
+#define FORMATS_LIST FormatListNC
 
 } // namespace harp
 

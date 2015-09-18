@@ -76,9 +76,11 @@ public:
     static trajectory_builder_t by_extension(const string& ext);
 
     //! Register a trajectory_builder in the internal format names list.
-    static bool register_format(const string& name, trajectory_builder_t tb);
+    static void register_format(const string& name, trajectory_builder_t tb);
     //! Register an trajectory_builder in the internal extensions list.
-    static bool register_extension(const string& ext, trajectory_builder_t tb);
+    static void register_extension(const string& ext, trajectory_builder_t tb);
+    //! Are the maps initialized ?
+    static bool initialized;
 };
 
 } // namespace harp

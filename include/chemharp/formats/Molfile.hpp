@@ -55,6 +55,9 @@ public:
     virtual void read(Frame& frame) override;
     virtual std::string description() const override;
     virtual size_t nsteps() const override;
+
+    static const char* name();
+    static const char* extension();
 private:
     /// Convert a molfile timestep to a chemharp frame
     void molfile_to_frame(const molfile_timestep_t& timestep, Frame& frame);
@@ -80,9 +83,17 @@ private:
     mutable bool _use_topology;
     /// Store topological information
     mutable Topology _topology;
-
-    REGISTER_FORMAT;
 };
+
+typedef typename concat<FORMATS_LIST, Molfile<PDB>>::type molfile_list_1;
+typedef typename concat<molfile_list_1, Molfile<DCD>>::type molfile_list_2;
+typedef typename concat<molfile_list_2, Molfile<GRO>>::type molfile_list_3;
+typedef typename concat<molfile_list_3, Molfile<TRR>>::type molfile_list_4;
+typedef typename concat<molfile_list_4, Molfile<XTC>>::type molfile_list_5;
+typedef typename concat<molfile_list_5, Molfile<TRJ>>::type molfile_list_6;
+
+#undef FORMATS_LIST
+#define FORMATS_LIST molfile_list_6
 
 }
 
