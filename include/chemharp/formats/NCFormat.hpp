@@ -15,7 +15,7 @@
 
 #include "chemharp/Vector3D.hpp"
 #include "chemharp/Format.hpp"
-#include "chemharp/TrajectoryFactory.hpp"
+#include "chemharp/register_formats.hpp"
 
 namespace harp {
 

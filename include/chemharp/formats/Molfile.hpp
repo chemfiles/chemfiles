@@ -13,7 +13,7 @@
 
 #include "chemharp/Format.hpp"
 #include "chemharp/Dynlib.hpp"
-#include "chemharp/TrajectoryFactory.hpp"
+#include "chemharp/register_formats.hpp"
 #include "chemharp/Topology.hpp"
 
 #include <memory>
