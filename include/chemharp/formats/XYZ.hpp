@@ -42,7 +42,7 @@ private:
     TextFile& textfile;
 };
 
-typedef typename concat<FORMATS_LIST, XYZFormat>::type FormatListXYZ;
+typedef concat<FORMATS_LIST, XYZFormat>::type FormatListXYZ;
 #undef FORMATS_LIST
 #define FORMATS_LIST FormatListXYZ
 

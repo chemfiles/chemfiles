@@ -70,7 +70,7 @@ private:
     mutable std::vector<float> cache;
 };
 
-typedef typename concat<FORMATS_LIST, NCFormat>::type FormatListNC;
+typedef concat<FORMATS_LIST, NCFormat>::type FormatListNC;
 #undef FORMATS_LIST
 #define FORMATS_LIST FormatListNC
 
