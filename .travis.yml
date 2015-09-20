@@ -23,7 +23,7 @@ addons:
     packages:
     - g++-4.9
     - gfortran-4.9
-    - libnetcdf-dev
+    #- libnetcdf-dev
     - clang-3.6
 
 install:
@@ -70,7 +70,8 @@ install:
     then
         brew tap homebrew/science
         brew update
-        brew install netcdf gcc
+        brew unlink gcc
+        brew install gcc
         export CMAKE=cmake
         export FC=gfortran
         if [ ${C_COMPILER} == "gcc" ]
