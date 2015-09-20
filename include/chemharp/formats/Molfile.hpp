@@ -85,12 +85,12 @@ private:
     mutable Topology _topology;
 };
 
-typedef typename concat<FORMATS_LIST, Molfile<PDB>>::type molfile_list_1;
-typedef typename concat<molfile_list_1, Molfile<DCD>>::type molfile_list_2;
-typedef typename concat<molfile_list_2, Molfile<GRO>>::type molfile_list_3;
-typedef typename concat<molfile_list_3, Molfile<TRR>>::type molfile_list_4;
-typedef typename concat<molfile_list_4, Molfile<XTC>>::type molfile_list_5;
-typedef typename concat<molfile_list_5, Molfile<TRJ>>::type molfile_list_6;
+typedef concat<FORMATS_LIST, Molfile<PDB>>::type molfile_list_1;
+typedef concat<molfile_list_1, Molfile<DCD>>::type molfile_list_2;
+typedef concat<molfile_list_2, Molfile<GRO>>::type molfile_list_3;
+typedef concat<molfile_list_3, Molfile<TRR>>::type molfile_list_4;
+typedef concat<molfile_list_4, Molfile<XTC>>::type molfile_list_5;
+typedef concat<molfile_list_5, Molfile<TRJ>>::type molfile_list_6;
 
 #undef FORMATS_LIST
 #define FORMATS_LIST molfile_list_6
