@@ -7,6 +7,9 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
+#include "chemharp/config.hpp"
+#if HAVE_NETCDF
+
 #ifndef HARP_NCFILE_HPP
 #define HARP_NCFILE_HPP
 
@@ -147,4 +150,5 @@ inline void NCFile::add_attribute(const string& varname, const string& attname, 
 
 } // namespace harp
 
-#endif
+#endif // defined HARP_NCFILE_HPP
+#endif // HAVE_NETCDF
