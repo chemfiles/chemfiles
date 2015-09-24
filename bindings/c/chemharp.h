@@ -227,7 +227,7 @@ CHRP_EXPORT int chrp_frame_positions(const CHRP_FRAME* frame, float (*data)[3], 
 * @param size The array size (N).
 * @return The status code
 */
-CHRP_EXPORT int chrp_frame_set_positions(CHRP_FRAME* frame, float (*data)[3], size_t size);
+CHRP_EXPORT int chrp_frame_set_positions(CHRP_FRAME* frame, float const (*data)[3], size_t size);
 
 /*!
 * @brief Get the velocities from a frame, if they exists
@@ -245,7 +245,7 @@ CHRP_EXPORT int chrp_frame_velocities(const CHRP_FRAME* frame, float (*data)[3],
 * @param size The array size (N).
 * @return The status code
 */
-CHRP_EXPORT int chrp_frame_set_velocities(CHRP_FRAME* frame, float (*data)[3], size_t size);
+CHRP_EXPORT int chrp_frame_set_velocities(CHRP_FRAME* frame, float const (*data)[3], size_t size);
 
 /*!
 * @brief Check if a frame has velocity information.
