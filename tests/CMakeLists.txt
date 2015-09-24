@@ -9,7 +9,7 @@ function(chfl_cpp_test _file_)
     add_executable(${_name_} ${_file_} $<TARGET_OBJECTS:catch>)
     target_link_libraries(${_name_} chemfiles boost_filesystem)
     set_property(TARGET ${_name_} PROPERTY CXX_STANDARD 11)
-    add_test(NAME ${_name_} COMMAND ${_name_} WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    add_test(NAME ${_name_} COMMAND ${_name_} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 endfunction()
 
 include_directories(${PROJECT_SOURCE_DIR}/include)

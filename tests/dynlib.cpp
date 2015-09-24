@@ -3,7 +3,7 @@
 using namespace chemfiles;
 
 TEST_CASE("Dynamic library loading", "[Dynlib]"){
-    Dynlib lib(BINDIR "/libtest.so");
+    Dynlib lib("libtest.so");
 
     auto foo = lib.symbol<int (*)(int)>("foo");
     CHECK(foo(3) == 13);
