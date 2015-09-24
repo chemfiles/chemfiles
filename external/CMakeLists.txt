@@ -31,6 +31,16 @@ if(${ENABLE_NETCDF})
     )
 endif()
 
+#----------------------------------------------------------------------------------------#
+if(MSVC)
+    # Do not issue warning for insecure code in Molfiles
+    set(MOLFILE_CXX_FLAGS "-D_CRT_SECURE_OVERLOAD_STANDARD_NAMES=1")
+    # strcasecmp and strncasecmp are POSIX functions
+    set(MOLFILE_CXX_FLAGS "${MOLFILE_CXX_FLAGS} -Dstrcasecmp=_stricmp -Dstrncasecmp=_strnicmp")
+else()
+    set(MOLFILE_CXX_FLAGS "")
+endif()
+
 ExternalProject_Add(molfiles
     PREFIX molfiles
     URL file://${CMAKE_CURRENT_SOURCE_DIR}/molfiles.tar.gz
@@ -40,6 +50,7 @@ ExternalProject_Add(molfiles
                 -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
                 -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
                 -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
+                -DCMAKE_CXX_FLAGS=${MOLFILE_CXX_FLAGS}
                 # Setting installation directory
                 -DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}
                 # Support cross-compilation

@@ -59,7 +59,6 @@ else()
 endif()
 
 add_subdirectory(external)
-
 include_directories(include)
 include_directories(BEFORE SYSTEM ${PROJECT_BINARY_DIR}/include)
 
