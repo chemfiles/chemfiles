@@ -25,10 +25,10 @@ Trajectory::Trajectory(const string& filename, const string& mode, const string&
     if (format == ""){
         // try to guess the format by extension
         auto ext = extension(filename);
-        builder = TrajectoryFactory::by_extension(ext);
+        builder = TrajectoryFactory::get().by_extension(ext);
     }
     else {
-        builder = TrajectoryFactory::format(format);
+        builder = TrajectoryFactory::get().format(format);
     }
 
     _file = builder.file_creator(filename, mode);

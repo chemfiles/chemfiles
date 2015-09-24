@@ -50,11 +50,16 @@ using trajectory_map_t = std::unordered_map<string, trajectory_builder_t>;
 */
 class TrajectoryFactory {
 private:
-    //! Get a static reader_map instance associating format descriptions and readers
-    static trajectory_map_t& names();
-    //! Static reader_map instance associating format descriptions and readers
-    static trajectory_map_t& extensions();
+    //! Trajectory map associating format descriptions and readers
+    trajectory_map_t formats;
+    //! Trajectory map associating format descriptions and readers
+    trajectory_map_t extensions;
+
+    TrajectoryFactory() = default;
 public:
+    //! Get the instance of the TrajectoryFactory
+    static TrajectoryFactory& get();
+
     /*!
      * @brief Get a trajectory_builder from a format type name.
      * @param name the format name
@@ -63,7 +68,7 @@ public:
      *
      * Throws an error if the format can not be found
      */
-    static trajectory_builder_t format(const string& name);
+    trajectory_builder_t format(const string& name);
 
     /*!
      * @brief Get a trajectory_builder from a format \c extention.
@@ -73,14 +78,12 @@ public:
      *
      * Throws an error if the format can not be found
      */
-    static trajectory_builder_t by_extension(const string& ext);
+    trajectory_builder_t by_extension(const string& ext);
 
     //! Register a trajectory_builder in the internal format names list.
-    static void register_format(const string& name, trajectory_builder_t tb);
+    void register_format(const string& name, trajectory_builder_t tb);
     //! Register an trajectory_builder in the internal extensions list.
-    static void register_extension(const string& ext, trajectory_builder_t tb);
-    //! Are the maps initialized ?
-    static bool initialized;
+    void register_extension(const string& ext, trajectory_builder_t tb);
 };
 
 } // namespace harp
