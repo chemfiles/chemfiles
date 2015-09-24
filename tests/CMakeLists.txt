@@ -28,6 +28,7 @@ file(GLOB all_test_files
 
 add_definitions("-DSRCDIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
 add_definitions("-DBINDIR=\"${CMAKE_CURRENT_BINARY_DIR}\"")
+add_definitions("-DBOOST_ALL_NO_LIB")
 
 foreach(test_file IN LISTS all_test_files)
     chfl_cpp_test(${test_file})
