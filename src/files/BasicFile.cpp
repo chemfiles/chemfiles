@@ -32,11 +32,6 @@ BasicFile::BasicFile(const std::string& filename, const std::string& str_mode) :
     rewind();
 }
 
-BasicFile::~BasicFile(){
-    stream.close();
-}
-
-
 const std::string& BasicFile::getline(){
     *this >> lines[0];
     return lines[0];

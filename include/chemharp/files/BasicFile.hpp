@@ -33,7 +33,6 @@ public:
      *
      */
     explicit BasicFile(const std::string& filename, const std::string& mode);
-    ~BasicFile();
 
     virtual const std::string& getline() override;
     virtual BasicFile& operator>>(std::string& line) override;
