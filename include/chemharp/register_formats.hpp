@@ -30,23 +30,6 @@ unique_ptr<Format> new_format(File& f){
     return unique_ptr<Format>(new format_t(f));
 }
 
-// //! Register a format by associating it to a format name, and no file type.
-// #define REGISTER(format_t, name)                          \
-// bool format_t::_registered_format_ =                      \
-// TrajectoryFactory::register_format(name, {                \
-//     new_format<format_t>,                                 \
-//     new_file<typename format_t::file_t>                   \
-// });
-//
-// //! Register a format by associating it to an extention, and no file type.
-// //! The extension should starts with a "."
-// #define REGISTER_EXTENSION(format_t, extension)           \
-// bool format_t::_registered_extension_ =                   \
-// TrajectoryFactory::register_extension(extension, {        \
-//     new_format<format_t>,                                 \
-//     new_file<typename format_t::file_t>                   \
-// });
-
 #define FORMAT_EXTENSION(x) static const char* extension() {static constexpr char val[] = #x; return val;}
 #define FORMAT_NAME(x) static const char* name() {static constexpr char val[] = #x; return val;}
 
