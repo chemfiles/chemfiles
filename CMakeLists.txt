@@ -20,9 +20,12 @@ set(CHRP_VERSION_SHORT "${CHRP_VERSION_MAJOR}.${CHRP_VERSION_MINOR}.${CHRP_VERSI
 option(BUILD_TESTS "Build unit tests." OFF)
 option(BUILD_FRONTEND "Build the binary frontend." ON)
 option(CODE_COVERAGE "Enable code coverage" OFF)
+option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
+
+option(ENABLE_NETCDF "Enable AMBER NetCDF format." OFF)
+
 option(PYTHON_BINDING "Build python interface to Chemharp." OFF)
 option(FORTRAN_BINDING "Build FORTRAN interface to Chemharp." OFF)
-option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
 
 if(${FORTRAN_BINDING})
     enable_language(Fortran)
@@ -53,11 +56,16 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "release" CACHE STRING "Choose the type of build." FORCE)
 endif()
 
-set(HAVE_NETCDF 0)
-find_package(NetCDF)
-if(${NETCDF_FOUND})
-    set(HAVE_NETCDF 1)
+if(${ENABLE_NETCDF})
+    find_package(NetCDF REQUIRED)
     include_directories(${NETCDF_INCLUDES})
+    SET(HAVE_NETCDF 1)
+else()
+    find_package(NetCDF)
+    if(${NetCDF_FOUND})
+        message(STATUS "Found NetCDF library. Consider activating the associated format with -DENABLE_NETCDF=ON")
+    endif()
+    SET(HAVE_NETCDF 0)
 endif()
 
 add_subdirectory(external)
@@ -84,7 +92,7 @@ configure_file (
   "${PROJECT_SOURCE_DIR}/include/chemharp/config.hpp"
 )
 
-if(${HAVE_NETCDF})
+if(${ENABLE_NETCDF})
     add_dependencies(chemharp netcdfcxx)
     target_link_libraries(chemharp ${NETCDF_LIBRARIES} netcdf_cxx4)
 endif()
@@ -117,7 +125,8 @@ install(FILES ${molfiles} DESTINATION lib/molfiles/
 configure_file(
     "${PROJECT_SOURCE_DIR}/cmake/uninstall.in.cmake"
     "${PROJECT_BINARY_DIR}/uninstall.cmake"
-    IMMEDIATE @ONLY)
+    @ONLY
+)
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${PROJECT_BINARY_DIR}/uninstall.cmake)

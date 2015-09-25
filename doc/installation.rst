@@ -31,9 +31,9 @@ clang++>3.3. Chemharp is tested against GCC, Clang and Intel C++ compilers, and
 is ISO C++11, so it should compile with other compilers as well. Please report
 any sucessfull compilation with other compilers!
 
-Some functionalities of Chemharp needs aditional library, and will be activated
-or not at compile-time if the system can find the appropriate headers and files.
-Such optional libraries are listed here:
+Some optional functionalities of Chemharp needs aditional library. As the
+functionalities are activated when configuring the build, these additionals libraries
+are optionals. Here is the list of these libraries:
 
 * The `NetCDF`_ library is needed to read and write the AMBER NetCDF format.
   It is available in all the package managers.
@@ -126,7 +126,7 @@ The :command:`cmake` step can be further configured by using the curse-based GUI
 most important options:
 
 +------------------------------------+---------------------+------------------------------+
-| Option                             | Default value       | Effect                       |
+| Option                             | Default value       | Effect/Informations          |
 +====================================+=====================+==============================+
 | ``-DCMAKE_INSTALL_PREFIX=prefix``  | :file:`/usr/local`  | Set the installation prefix  |
 |                                    |                     | to ``prefix``                |
@@ -139,8 +139,10 @@ most important options:
 |                                    |                     | This needs `sphinx`_ and     |
 |                                    |                     | `doxygen`_ to be installed   |
 +------------------------------------+---------------------+------------------------------+
-| ``-DBUILD_TESTS=ON|OFF``           | ``OFF``             | Build the test suite, for    |
-|                                    |                     | later running                |
+| ``-DBUILD_TESTS=ON|OFF``           | ``OFF``             | Build the test suite.        |
++------------------------------------+---------------------+------------------------------+
+| ``-DENABLE_NETCDF=ON|OFF``         | ``OFF``             | Enable the Amber NetCDF      |
+|                                    |                     | format                       |
 +------------------------------------+---------------------+------------------------------+
 
 For instance, to install to :file:`$HOME/local`, use:

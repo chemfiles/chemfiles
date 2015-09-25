@@ -24,7 +24,7 @@ set_property(TARGET boost_filesystem PROPERTY VERSION ${BOOST_VERSION})
 set_property(TARGET boost_filesystem PROPERTY POSITION_INDEPENDENT_CODE true)
 
 #----------------------------------------------------------------------------------------#
-if(${NETCDF_FOUND})
+if(${ENABLE_NETCDF})
     include_directories(${NETCDF_INCLUDES})
     ExternalProject_add(netcdfcxx
         PREFIX netcdfcxx
