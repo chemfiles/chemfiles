@@ -23,7 +23,7 @@ addons:
     packages:
     - g++-4.9
     - gfortran-4.9
-    #- libnetcdf-dev
+    - libnetcdf-dev
     - clang-3.6
 
 install:
@@ -34,7 +34,7 @@ install:
         export DO_COVERAGE=1
     fi
   # Setting environement
-  - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DBUILD_TESTS=ON -DFORTRAN_BINDING=ON"
+  - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DBUILD_TESTS=ON -DFORTRAN_BINDING=ON -DENABLE_NETCDF=ON"
   # Install code coverage stuff
   - |
     if [ ${DO_COVERAGE} == 1 ]
@@ -70,8 +70,8 @@ install:
     then
         brew tap homebrew/science
         brew update
-        brew unlink gcc
-        brew install gcc
+        brew rm gcc
+        brew install gcc netcdf
         export CMAKE=cmake
         export FC=gfortran
         if [ ${C_COMPILER} == "gcc" ]
