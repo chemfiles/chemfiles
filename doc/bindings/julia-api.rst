@@ -64,7 +64,7 @@ during a simulation, and sometimes other quantities.
     Open a trajectory file.
 
     :parameter string filename: The path to the trajectory file
-    :parameter string mode: The opening ("r" for read or "w" for write) mode for the file.
+    :parameter string mode: The opening mode: "r" for read, "w" for write and  "a" for append.
 
 .. jl:function:: read(trajectory::Trajectory) -> Frame
 

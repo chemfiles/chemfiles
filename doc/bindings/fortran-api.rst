@@ -132,7 +132,7 @@ Error and logging functions
     Open a trajectory file.
 
     :parameter string filename: The path to the trajectory file
-    :parameter string mode: The opening ("r" for read or "w" for write) mode for the file.
+    :parameter string mode: The opening mode: "r" for read, "w" for write and  "a" for append.
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: with_format(filename, mode, [, status])
@@ -140,7 +140,7 @@ Error and logging functions
     Open a trajectory file using a given format to read the file.
 
     :parameter string filename: The path to the trajectory file
-    :parameter string mode: The opening ("r" for read or "w" for write) mode for the file.
+    :parameter string mode: The opening mode: "r" for read, "w" for write and  "a" for append.
     :parameter string format: The format to use
     :optional integer status [optional]: The status code
 
