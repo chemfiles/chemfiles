@@ -6,8 +6,6 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-#include <mutex>
-
 #include "chemharp/TrajectoryFactory.hpp"
 
 #include "chemharp/formats/XYZ.hpp"
@@ -46,12 +44,12 @@ inline void register_all_formats(trajectory_map_t& formats, trajectory_map_t& ex
     register_all_formats(formats, extensions, FormatList<S, Types...>());
 }
 
-std::once_flag call_once_flag;
+TrajectoryFactory::TrajectoryFactory() : formats(), extensions() {
+    register_all_formats(formats, extensions, formats_list());
+}
+
 TrajectoryFactory& TrajectoryFactory::get() {
     static auto instance = TrajectoryFactory();
-    std::call_once(call_once_flag, [](){
-        register_all_formats(instance.formats, instance.extensions, formats_list());
-    });
     return instance;
 }
 

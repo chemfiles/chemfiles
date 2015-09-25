@@ -55,7 +55,7 @@ private:
     //! Trajectory map associating format descriptions and readers
     trajectory_map_t extensions;
 
-    TrajectoryFactory() = default;
+    TrajectoryFactory();
 public:
     //! Get the instance of the TrajectoryFactory
     static TrajectoryFactory& get();
