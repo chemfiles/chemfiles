@@ -34,7 +34,7 @@ Trajectory::Trajectory(const string& filename, const string& mode, const string&
     _file = builder.file_creator(filename, mode);
     _format = builder.format_creator(*_file);
 
-    if (mode == "r")
+    if (mode == "r" || mode == "a")
         _nsteps = _format->nsteps();
 }
 
@@ -46,8 +46,12 @@ Trajectory& Trajectory::operator>>(Frame& frame){
 }
 
 Frame Trajectory::read(){
-    if (_step >= _nsteps)
+    if (_step >= _nsteps) {
         throw FileError("Can not read file \"" + _file->filename() + "\" past end.");
+    }
+    if (!(_file->mode() == "r" || _file->mode() == "a")) {
+        throw FileError("File \"" + _file->filename() + "\" was not openened in read or append mode.");
+    }
 
     Frame frame;
     _format->read(frame);
@@ -65,11 +69,15 @@ Frame Trajectory::read(){
 }
 
 Frame Trajectory::read_step(const size_t step){
-    if (step >= _nsteps)
+    if (step >= _nsteps) {
         throw FileError(
             "Can not read file \"" + _file->filename() + "\" at step " +
             std::to_string(step) + ". Max step is " + std::to_string(_nsteps) + "."
         );
+    }
+    if (!(_file->mode() == "r" || _file->mode() == "a")) {
+        throw FileError("File \"" + _file->filename() + "\" was not openened in read or append mode.");
+    }
 
     Frame frame;
     _step = step;
@@ -92,6 +100,10 @@ Trajectory& Trajectory::operator<<(const Frame& frame){
 }
 
 void Trajectory::write(const Frame& input_frame){
+    if (!(_file->mode() == "w" || _file->mode() == "a")) {
+        throw FileError("File \"" + _file->filename() + "\" was not openened in write or append mode.");
+    }
+
     // Maybe that is not the better way to do this, performance-wise. I'll have
     // to benchmark this part.
     Frame frame = input_frame;

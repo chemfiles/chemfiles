@@ -83,12 +83,13 @@ TEST_CASE("Geting file type associated to a format", "[Trajectory factory]"){
 
 TEST_CASE("Check error throwing in formats", "[Format errors]"){
     // Create a dummy file
-    std::string filename("test-file.dummy");
+    std::string filename = "test-file.dummy";
     std::ofstream out(filename);
     out << "hey !" << std::endl;
+    out.close();
 
     Frame frame;
-    Trajectory traj(filename);
+    Trajectory traj(filename, "a");
     CHECK_THROWS_AS(traj.read(), FormatError);
     CHECK_THROWS_AS(traj.read_step(2), FormatError);
     CHECK_THROWS_AS(traj.write(frame), FormatError);
