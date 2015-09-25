@@ -21,7 +21,18 @@ namespace harp {
  */
 class BasicFile : public TextFile {
 public:
-    explicit BasicFile(const std::string& filename, const std::string& mode = "r");
+    /*!
+     * Open a text file.
+     *
+     * @param filename The file path. In \c "w" or \c "a" modes, the file is
+     *                 created if it does not exist yet. In "r" mode, and
+     *                 exception is throwed is the file does not exist yet.
+     * @param mode Opening mode for the file. Supported modes are "r" for read,
+     *             "w" for write, and "a" for append. "w" mode discard any
+     *             previously existing file.
+     *
+     */
+    explicit BasicFile(const std::string& filename, const std::string& mode);
     ~BasicFile();
 
     virtual const std::string& getline() override;

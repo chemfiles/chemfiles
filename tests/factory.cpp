@@ -24,7 +24,7 @@ public:
 // Dummy file clase
 class DummyFile : public BinaryFile {
 public:
-    DummyFile(const string&, const string&) : BinaryFile("") {}
+    DummyFile(const string&, const string&) : BinaryFile("", "") {}
     bool is_open() {return true;}
     void close() {}
 };

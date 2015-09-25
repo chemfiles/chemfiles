@@ -33,7 +33,7 @@ namespace harp {
  */
 class NCFile : public BinaryFile {
 public:
-    explicit NCFile(const string& filename, const string& mode = "r");
+    explicit NCFile(const string& filename, const string& mode);
     ~NCFile(){}
 
     //! Get a global attribut from the file

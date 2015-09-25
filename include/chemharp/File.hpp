@@ -45,10 +45,13 @@ public:
     virtual void close() = 0;
     //! File name, i.e. complete path to this file on disk.
     const std::string& filename() const {return _filename;}
+    //! File opening mode.
+    const std::string& mode() const {return _mode;}
 protected:
-    explicit File(const std::string& path) : _filename(path) {}
+    File(const std::string& path, const std::string& mode) : _filename(path), _mode(mode) {}
 private:
     const std::string _filename;
+    const std::string _mode;
 };
 
 /*!
@@ -81,7 +84,7 @@ public:
     //! Write a vector of lines to the file
     virtual void writelines(const std::vector<std::string>&) = 0;
 protected:
-    explicit TextFile(const std::string& path, const std::string& = "") : File(path) {}
+    explicit TextFile(const std::string& path, const std::string& mode) : File(path, mode) {}
 };
 
 /*!
@@ -97,7 +100,7 @@ class BinaryFile : public File {
 public:
     virtual ~BinaryFile() = default;
 protected:
-    explicit BinaryFile(const std::string& path, const std::string& = "") : File(path) {}
+    explicit BinaryFile(const std::string& path, const std::string& mode) : File(path, mode) {}
 };
 
 } // namespace harp

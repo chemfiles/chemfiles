@@ -35,7 +35,7 @@ public:
      * Open a file, automatically gessing the file format and type from the
      * extension.
      *
-     * @param filename The file path. In \c "w" or \c "wa" modes, the file is
+     * @param filename The file path. In \c "w" or \c "a" modes, the file is
      *                 created if it does not exist yet. In "r" mode, and
      *                 exception is throwed is the file does not exist yet.
      * @param format Specific format to use. Needed when there is no way to guess
@@ -43,7 +43,8 @@ public:
      *               would be wrong.
      * @param mode Opening mode for the file. Default mode is "r" for read. Other
      *             supported modes depends on the underlying format and are "w"
-     *             for write, and "a" for append.
+     *             for write, and "a" for append. "w" mode discard any
+     *             previously existing file.
      */
     //!
     Trajectory(const std::string& filename, const std::string& mode = "r", const std::string& format = "");

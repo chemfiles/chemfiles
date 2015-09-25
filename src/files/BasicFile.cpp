@@ -12,20 +12,22 @@
 
 using namespace harp;
 
-BasicFile::BasicFile(const std::string& _filename, const std::string& _mode)
-: TextFile(_filename) {
+BasicFile::BasicFile(const std::string& filename, const std::string& str_mode) : TextFile(filename, str_mode) {
     std::ios_base::openmode mode;
-    if (_mode == "r") {
+    if (str_mode == "r") {
         mode = std::ios_base::in;
-    } else if (_mode == "w") {
+    } else if (str_mode == "a") {
         mode = std::ios_base::out | std::ios_base::app;
+    } else if (str_mode == "w") {
+        mode = std::ios_base::out | std::ios_base::trunc;
     } else {
-        throw FileError("Unrecognized file mode: " + _mode);
+        throw FileError("Unrecognized file mode: " + str_mode);
     }
 
-    stream.open(_filename, mode);
-    if (!stream.is_open())
-        throw FileError("Could not open the file " + _filename);
+    stream.open(filename, mode);
+    if (!stream.is_open()) {
+        throw FileError("Could not open the file " + filename);
+    }
     lines.resize(1);
     rewind();
 }

@@ -32,10 +32,11 @@ std::string NCFormat::description() const {
 //! Check the validity of a NetCDF file
 static bool is_valid(const NCFile& ncfile, size_t natoms){
     bool writing;
-    if (natoms == static_cast<size_t>(-1))
+    if (natoms == static_cast<size_t>(-1)) {
         writing = false;
-    else
+    } else {
         writing = true;
+    }
 
     if (ncfile.global_attribute("Conventions") != "AMBER"){
         if (!writing)
@@ -66,7 +67,13 @@ static bool is_valid(const NCFile& ncfile, size_t natoms){
     return true;
 }
 
-NCFormat::NCFormat(File& file) : Format(file), ncfile(static_cast<NCFile&>(file)), step(0) {
+NCFormat::NCFormat(File& file) : Format(file), ncfile(static_cast<NCFile&>(file)), step(0), validated(false) {
+    if (ncfile.mode() == "r" || ncfile.mode() == "a") {
+        if (!is_valid(ncfile, static_cast<size_t>(-1))) {
+            throw FormatError("Invalid AMBER NetCDF file " + file.filename());
+        }
+        validated = true;
+    }
 }
 
 size_t NCFormat::nsteps() const {
@@ -75,8 +82,6 @@ size_t NCFormat::nsteps() const {
 
 
 void NCFormat::read_step(const size_t _step, Frame& frame){
-    if (!is_valid(ncfile, static_cast<size_t>(-1)))
-        throw FormatError("Invalid AMBER NetCDF file " + file.filename());
     // Set the internal step before further reading
     step = _step;
     reserve(ncfile.dimension("atom"));
@@ -192,13 +197,11 @@ static void initialize(NCFile& ncfile, size_t natoms, bool velocities){
 
 void NCFormat::write(const Frame& frame) {
     auto natoms = frame.natoms();
-    // If the file is invalid, try to initialize it.
-    try {
-        if (!is_valid(ncfile, natoms)){
-            throw FileError("Invalid file.");
-        }
-    } catch (const FileError&) {
+    // If we created the file, let's initialize it.
+    if (!validated) {
         initialize(ncfile, natoms, frame.has_velocities());
+        assert(is_valid(ncfile, natoms));
+        validated = true;
     }
     write_cell(frame.cell());
     write_array3D(frame.positions(), "coordinates");

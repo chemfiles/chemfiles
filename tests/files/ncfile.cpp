@@ -15,7 +15,7 @@ using namespace harp;
 #define FILESDIR SRCDIR "/data/"
 
 TEST_CASE("Read a NetCDF file", "[Files]"){
-    NCFile file(FILESDIR "netcdf/water.nc");
+    NCFile file(FILESDIR "netcdf/water.nc", "r");
     REQUIRE(file.is_open());
 
     CHECK(file.global_attribute("Conventions") == "AMBER");
@@ -45,7 +45,7 @@ TEST_CASE("Read a NetCDF file", "[Files]"){
 }
 
 TEST_CASE("Errors in NetCDF files", "[Files]"){
-    NCFile file(FILESDIR "netcdf/water.nc");
+    NCFile file(FILESDIR "netcdf/water.nc", "r");
     REQUIRE(file.is_open());
 
     CHECK_THROWS_AS(file.global_attribute("FOO"), FileError);
@@ -67,7 +67,7 @@ TEST_CASE("Write NetCDF files", "[Files]"){
 
     file.close();
 
-    NCFile check("tmp.nc");
+    NCFile check("tmp.nc", "r");
     CHECK(check.global_attribute("global") == "global.value");
     CHECK(check.dimension("infinite") == 0);
     CHECK(check.dimension("finite") == 42);

@@ -11,7 +11,7 @@ using namespace harp;
 #define FILESDIR SRCDIR "/data/"
 
 TEST_CASE("Read a text file", "[Files]"){
-    BasicFile file(FILESDIR "xyz/helium.xyz");
+    BasicFile file(FILESDIR "xyz/helium.xyz", "r");
     REQUIRE(file.is_open());
 
     CHECK(file.nlines() == 50419);
@@ -74,7 +74,7 @@ TEST_CASE("Write a text file", "[Files]"){
 
     verification.close();
 
-    remove(SRCDIR"/tmp.dat");
+    remove("tmp.dat");
 }
 
 TEST_CASE("Errors in text files", "[Files]"){

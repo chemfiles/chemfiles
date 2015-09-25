@@ -66,8 +66,10 @@ private:
     NCFile& ncfile;
     //! Last read step
     size_t step;
-    // Temporary cache for read and write operations.
+    //! Temporary cache for read and write operations.
     mutable std::vector<float> cache;
+    //! Was the associated file validated?
+    bool validated;
 };
 
 typedef concat<FORMATS_LIST, NCFormat>::type FormatListNC;

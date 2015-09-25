@@ -16,18 +16,19 @@ using namespace harp;
 using namespace netCDF;
 using std::string;
 
-NCFile::NCFile(const std::string& _filename, const string& mode): BinaryFile(_filename){
+NCFile::NCFile(const std::string& filename, const string& mode): BinaryFile(filename, mode){
     try {
         if (mode == "r"){
-            file.open(_filename, NcFile::read);
-        }
-        else if (mode == "w"){
-            file.open(_filename, NcFile::replace, NcFile::classic64);
-        }
-        else
+            file.open(filename, NcFile::read);
+        } else if (mode == "a"){
+            file.open(filename, NcFile::write, NcFile::classic64);
+        } else if (mode == "w"){
+            file.open(filename, NcFile::replace, NcFile::classic64);
+        } else {
             throw FileError("Unknown mode for file opening: " + mode);
+        }
     } catch (const netCDF::exceptions::NcException& e) {
-        throw FileError("Could not open the file " + _filename + ".\n   " + e.what());
+        throw FileError("Could not open the file " + filename + ".\n   " + e.what());
     }
 }
 
@@ -35,8 +36,9 @@ string NCFile::global_attribute(const string& attname) const {
     string value;
     try {
         auto attr = file.getAtt(attname);
-        if(attr.isNull())
+        if(attr.isNull()) {
             FileError("Invalid attribute " + attname + ".");
+        }
         attr.getValues(value);
     } catch (const netCDF::exceptions::NcException& e) {
         throw FileError("Can not read attribute " + attname + ".\n" + e.what());
@@ -61,8 +63,9 @@ NcVar NCFile::variable(const string& varname) const {
     NcVar var;
     try {
         var = file.getVar(varname);
-        if(var.isNull())
+        if(var.isNull()) {
             FileError("Invalid variable " + varname + ".");
+        }
         var.getName(); // Force error when the var is built with a bad ncid
     } catch (const netCDF::exceptions::NcException& e) {
         throw FileError("Can not read variable " + varname + ".\n" + e.what());
