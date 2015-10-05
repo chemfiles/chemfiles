@@ -11,17 +11,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boost/LICENSE_1_0.txt")
     )
 endif()
 
-include_directories(BEFORE SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/boost)
-
-file(GLOB_RECURSE boost_system_src boost/libs/system/src/**.cpp)
-add_library(boost_system OBJECT ${boost_system_src})
-set_property(TARGET boost_system PROPERTY VERSION ${BOOST_VERSION})
-set_property(TARGET boost_system PROPERTY POSITION_INDEPENDENT_CODE true)
-
-file(GLOB_RECURSE boost_filesystem_src boost/libs/filesystem/src/**.cpp)
-add_library(boost_filesystem OBJECT ${boost_filesystem_src})
-set_property(TARGET boost_filesystem PROPERTY VERSION ${BOOST_VERSION})
-set_property(TARGET boost_filesystem PROPERTY POSITION_INDEPENDENT_CODE true)
+set(BOOST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/boost PARENT_SCOPE)
 
 #----------------------------------------------------------------------------------------#
 if(${ENABLE_NETCDF})

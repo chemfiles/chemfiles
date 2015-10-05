@@ -12,11 +12,19 @@
 #include "chemharp/Logger.hpp"
 #include "chemharp/files/BasicFile.hpp"
 
-#include <boost/filesystem.hpp>
-using namespace boost::filesystem;
-
 using namespace harp;
 using std::string;
+
+//! Get the extension part of a filename. Filename is assumed to be valid here.
+static string extension(const string& filename) {
+    auto idx = filename.rfind('.');
+
+    if(idx != std::string::npos) {
+        return filename.substr(idx);
+    } else {
+        return "";
+    }
+}
 
 Trajectory::Trajectory(const string& filename, const string& mode, const string& format)
 : _step(0), _nsteps(0), _topology(), _use_custom_topology(false), _cell(), _use_custom_cell(false)

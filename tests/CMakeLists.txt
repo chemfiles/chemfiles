@@ -1,7 +1,9 @@
+add_subdirectory(external)
+
 function(chrp_cpp_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     add_executable(${_name_} ${_file_} $<TARGET_OBJECTS:catch>)
-    target_link_libraries(${_name_} chemharp)
+    target_link_libraries(${_name_} chemharp boost_system boost_filesystem)
     if(${NETCDF_FOUND})
         target_link_libraries(${_name_} ${NETCDF_LIBRARIES})
     endif()
@@ -9,30 +11,28 @@ function(chrp_cpp_test _file_)
     add_test(NAME ${_name_} COMMAND ${_name_} WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 endfunction()
 
-if(BUILD_TESTS)
-    include_directories(${PROJECT_SOURCE_DIR}/include)
-    include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/catch)
-    add_library(catch OBJECT ${CMAKE_CURRENT_SOURCE_DIR}/catch/catch.cpp)
+include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/catch)
+add_library(catch OBJECT ${CMAKE_CURRENT_SOURCE_DIR}/external/catch/catch.cpp)
 
-    add_library(libtest SHARED ${CMAKE_CURRENT_SOURCE_DIR}/test.c)
-    set_target_properties(libtest PROPERTIES PREFIX "" SUFFIX ".so")
+add_library(libtest SHARED ${CMAKE_CURRENT_SOURCE_DIR}/test.c)
+set_target_properties(libtest PROPERTIES PREFIX "" SUFFIX ".so")
 
-    file(GLOB all_test_files
-        ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/files/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/formats/*.cpp
-    )
+file(GLOB all_test_files
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/files/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/formats/*.cpp
+)
 
-    add_definitions("-DSRCDIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
-    add_definitions("-DBINDIR=\"${CMAKE_CURRENT_BINARY_DIR}\"")
+add_definitions("-DSRCDIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
+add_definitions("-DBINDIR=\"${CMAKE_CURRENT_BINARY_DIR}\"")
 
-    foreach(test_file IN LISTS all_test_files)
-        chrp_cpp_test(${test_file})
-    endforeach(test_file)
+foreach(test_file IN LISTS all_test_files)
+    chrp_cpp_test(${test_file})
+endforeach(test_file)
 
-    # Because the files may not be installed yet, we use the environment variable
-    foreach(_test_ pdb-molfile dcd-molfile gro-molfile xtc-molfile trr-molfile)
-        set_tests_properties(${_test_}
-            PROPERTIES ENVIRONMENT "CHRP_MOLFILES=${PROJECT_BINARY_DIR}/lib/")
-    endforeach()
-endif()
+# Because the files may not be installed yet, we use the environment variable
+foreach(_test_ pdb-molfile dcd-molfile gro-molfile xtc-molfile trr-molfile)
+    set_tests_properties(${_test_}
+        PROPERTIES ENVIRONMENT "CHRP_MOLFILES=${PROJECT_BINARY_DIR}/lib/")
+endforeach()
