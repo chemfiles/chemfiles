@@ -113,7 +113,7 @@ UnitCell NCFormat::read_cell() const {
         length_var = ncfile.variable("cell_lengths");
         angles_var = ncfile.variable("cell_angles");
     }
-    catch (const FileError& e) {
+    catch (const FileError&) {
         return UnitCell(); // No UnitCell information
     }
 
@@ -134,7 +134,7 @@ void NCFormat::read_array3D(Array3D& arr, const string& name) const{
     try {
         array_var = ncfile.variable(name);
     }
-    catch (const FileError& e) {
+    catch (const FileError&) {
         return; // No information for this variable in the file
     }
 
