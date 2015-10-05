@@ -10,6 +10,7 @@
 #include "chemharp/Topology.hpp"
 #include "chemharp/Error.hpp"
 #include <algorithm>
+#include <cstddef>
 
 using namespace harp;
 using std::vector;
@@ -117,7 +118,7 @@ void Topology::append(const Atom& _atom){
 
 void Topology::remove(size_t idx) {
     if (idx < _atoms.size())
-        _atoms.erase(begin(_atoms) + idx);
+        _atoms.erase(begin(_atoms) + static_cast<ptrdiff_t>(idx));
     auto bonds = _connect.bonds();
     for (auto& bond : bonds){
         if (bond[0] == idx || bond[1] == idx)
