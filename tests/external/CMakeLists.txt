@@ -1,13 +1,16 @@
-include_directories(BEFORE SYSTEM ${BOOST_DIR})
+set(BOOST_VERSION 1.58.0)
 
-message(STATUS ${BOOST_DIR})
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boost/LICENSE_1_0.txt")
+    message(STATUS "Unpacking Boost sources")
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_SOURCE_DIR}/boost-${BOOST_VERSION}.tar.gz
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+endif()
 
-file(GLOB_RECURSE boost_system_src ${BOOST_DIR}/libs/system/src/**.cpp)
-add_library(boost_system STATIC ${boost_system_src})
-set_property(TARGET boost_system PROPERTY VERSION ${BOOST_VERSION})
-set_property(TARGET boost_system PROPERTY POSITION_INDEPENDENT_CODE true)
+include_directories(BEFORE SYSTEM boost/include)
 
-file(GLOB_RECURSE boost_filesystem_src ${BOOST_DIR}/libs/filesystem/src/**.cpp)
+file(GLOB_RECURSE boost_filesystem_src boost/src/*.cpp)
 add_library(boost_filesystem STATIC ${boost_filesystem_src})
 set_property(TARGET boost_filesystem PROPERTY VERSION ${BOOST_VERSION})
 set_property(TARGET boost_filesystem PROPERTY POSITION_INDEPENDENT_CODE true)

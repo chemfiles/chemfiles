@@ -72,7 +72,6 @@ add_subdirectory(external)
 
 include_directories(include)
 include_directories(BEFORE SYSTEM ${PROJECT_BINARY_DIR}/include)
-include_directories(BEFORE SYSTEM ${PROJECT_SOURCE_DIR}/external/boost)
 
 file(GLOB_RECURSE sources src/**.cpp)
 add_library(chemharp ${sources} bindings/c/capi.cpp)

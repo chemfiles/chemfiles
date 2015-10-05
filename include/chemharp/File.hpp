@@ -14,18 +14,10 @@
 
 #include <string>
 #include <vector>
+#include <ostream>
 #include <fstream>
 
-#include <boost/type_erasure/any.hpp>
-#include <boost/type_erasure/operators.hpp>
-#include <boost/mpl/vector.hpp>
-
-
 namespace harp {
-namespace bte = boost::type_erasure;
-namespace mpl = boost::mpl;
-typedef bte::any<mpl::vector<bte::ostreamable<>,
-                             bte::copy_constructible<>>> any;
 
 /*!
 * @class File File.hpp File.cpp
@@ -60,7 +52,7 @@ private:
  * Abstract base class representing a text file. This class is inteded to be inherited by
  * any form of text files: compressed files, memory-mapped files, and any other.
  */
-class TextFile : public File {
+class TextFile : public File, public std::ostream {
 public:
     virtual ~TextFile() = default;
 
@@ -78,11 +70,22 @@ public:
     virtual bool eof() = 0;
 
     //! Write any data to the file in stream version
-    virtual TextFile& operator<<(const any&) = 0;
+    using std::ostream::operator<<;
     //! Write a string to the file
     virtual void writeline(const std::string&) = 0;
     //! Write a vector of lines to the file
     virtual void writelines(const std::vector<std::string>&) = 0;
+
+    //! Set the underlying buffer. This is needed in order to make operator<<
+    //! work.
+    using std::ostream::rdbuf;
+
+    //! Needed for resolving the overload ambiguity when using const char[] or
+    //! const char* arguments.
+    TextFile& operator<<(const char* val) {
+        *this << std::string(val);
+        return *this;
+    }
 protected:
     explicit TextFile(const std::string& path, const std::string& mode) : File(path, mode) {}
 };

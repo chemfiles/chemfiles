@@ -1,19 +1,5 @@
 include(ExternalProject)
 
-#----------------------------------------------------------------------------------------#
-set(BOOST_VERSION 1.58.0)
-
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boost/LICENSE_1_0.txt")
-    message(STATUS "Unpacking Boost sources")
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_SOURCE_DIR}/boost.tar.gz
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    )
-endif()
-
-set(BOOST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/boost PARENT_SCOPE)
-
-#----------------------------------------------------------------------------------------#
 if(${ENABLE_NETCDF})
     include_directories(${NETCDF_INCLUDES})
     ExternalProject_add(netcdfcxx
@@ -45,7 +31,6 @@ if(${ENABLE_NETCDF})
     )
 endif()
 
-#----------------------------------------------------------------------------------------#
 ExternalProject_Add(molfiles
     PREFIX molfiles
     URL file://${CMAKE_CURRENT_SOURCE_DIR}/molfiles.tar.gz

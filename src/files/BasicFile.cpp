@@ -28,6 +28,7 @@ BasicFile::BasicFile(const std::string& filename, const std::string& str_mode) :
     if (!stream.is_open()) {
         throw FileError("Could not open the file " + filename);
     }
+    TextFile::rdbuf(stream.rdbuf());
     lines.resize(1);
     rewind();
 }
@@ -70,11 +71,6 @@ size_t BasicFile::nlines(){
 
 void BasicFile::writeline(const std::string& line){
     *this << line;
-}
-
-BasicFile& BasicFile::operator<<(const any& data){
-    stream << data;
-    return *this;
 }
 
 void BasicFile::writelines(const std::vector<std::string>& _lines){

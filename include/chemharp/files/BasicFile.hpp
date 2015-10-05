@@ -48,7 +48,6 @@ public:
     virtual void close() override {return stream.close();}
     virtual bool eof() override {return stream.eof();}
 
-    virtual BasicFile& operator<<(const any&) override;
     virtual void writeline(const std::string&) override;
     virtual void writelines(const std::vector<std::string>&) override;
 private:
