@@ -16,9 +16,10 @@
 using namespace harp;
 
 // Sinus and Cosine for degree values
-constexpr double pi = 3.1415926535897;
-inline double cosd(double theta) {return cos(theta*pi/180);}
-inline double sind(double theta) {return sin(theta*pi/180);}
+constexpr double pi = 3.141592653589793238463;
+inline double deg2rad(double x) {return x * pi / 180.0;}
+inline double cosd(double theta) {return cos(deg2rad(theta));}
+inline double sind(double theta) {return sin(deg2rad(theta));}
 
 UnitCell::UnitCell() : UnitCell(INFINITE) {}
 
@@ -42,11 +43,6 @@ UnitCell::UnitCell(CellType type, double a) : UnitCell(type, a, a, a) {}
 UnitCell::UnitCell(CellType type, double a, double b, double c)
 : _a(a), _b(b), _c(c), _alpha(90), _beta(90), _gamma(90), _type(type), pbc_x(true),
 pbc_y(true), pbc_z(true) {}
-
-inline double deg2rad(double x) {
-    const double pi = 3.141592653589793238463;
-    return x * pi / 180.0;
-}
 
 double UnitCell::volume() const {
     switch (_type) {
