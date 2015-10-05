@@ -45,8 +45,8 @@ public:
 
     // Register the Amber NetCDF format with the ".nc" extension and the
     // "AmberNetCDF" description.
-    FORMAT_NAME(AmberNetCDF);
-    FORMAT_EXTENSION(.nc);
+    FORMAT_NAME(AmberNetCDF)
+    FORMAT_EXTENSION(.nc)
 private:
     //! Reserve size for \c natoms on the internal cache.
     void reserve(size_t natoms) const;

@@ -36,8 +36,8 @@ public:
     virtual size_t nsteps() const override;
 
     // Register the xyz format with the ".xyz" extension and the "XYZ" description.
-    FORMAT_NAME(XYZ);
-    FORMAT_EXTENSION(.xyz);
+    FORMAT_NAME(XYZ)
+    FORMAT_EXTENSION(.xyz)
 private:
     TextFile& textfile;
 };
