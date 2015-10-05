@@ -29,7 +29,6 @@ struct CHRP_EXPORT bond {
         _data[0] = std::min(first, second);
         _data[1] = std::max(first, second);
     }
-    ~bond() = default;
     //! Indexing operator
     const size_t& operator[](size_t i) const {return _data[i];}
     //! Comparison operator
@@ -50,7 +49,6 @@ struct CHRP_EXPORT angle {
         _data[1] = midle;
         _data[2] = std::max(first, last);
     }
-    ~angle() = default;
     //! Indexing operator
     const size_t& operator[](size_t i) const {return _data[i];}
     //! Comparison operator
@@ -81,7 +79,6 @@ struct CHRP_EXPORT dihedral {
             _data[3] = first;
         }
     }
-    ~dihedral() = default;
     //! Indexing operator
     const size_t& operator[](size_t i) const {return _data[i];}
     //! Comparison operator
@@ -129,7 +126,6 @@ namespace harp {
 class CHRP_EXPORT Connectivity {
 public:
     Connectivity() = default;
-    ~Connectivity() = default;
     //! Recalculate the angles and the dihedrals from the bond list
     void recalculate() const;
     //! Clear all the content
@@ -168,7 +164,6 @@ public:
     Topology();
     Topology(const Topology &) = default;
     Topology& operator=(const Topology &) = default;
-    ~Topology() = default;
 
     //! Get a reference to the atom at the position \c index
     Atom& operator[](size_t index) {return _templates[_atoms[index]];}
