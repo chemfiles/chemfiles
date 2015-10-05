@@ -34,7 +34,7 @@ install:
         export DO_COVERAGE=1
     fi
   # Setting environement
-  - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DBUILD_TESTS=ON -DFORTRAN_BINDING=ON -DENABLE_NETCDF=ON"
+  - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DBUILD_TESTS=ON -DFORTRAN_BINDING=ON -DENABLE_NETCDF=ON -DBUILD_SHARED_LIBS=ON"
   # Install code coverage stuff
   - |
     if [ ${DO_COVERAGE} == 1 ]
