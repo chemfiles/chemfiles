@@ -10,10 +10,7 @@
 #ifndef HARP_ATOM_HPP
 #define HARP_ATOM_HPP
 
-#include <iostream>
 #include <string>
-#include <vector>
-#include <map>
 
 #include "chemharp/exports.hpp"
 
@@ -89,25 +86,6 @@ inline bool operator==(const Atom& lhs, const Atom& rhs) {
     return (lhs.name() == rhs.name() && lhs.mass() == rhs.mass() &&
             lhs.charge() == rhs.charge() && lhs.type() == rhs.type());
 }
-
-inline std::ostream& operator<<(std::ostream& out, const Atom& atom){
-    out << "Atom \"" << atom.name() << "\"";
-    return out;
-}
-
-//! All the elements in the periodic table
-const std::vector<std::string> ALL_ELEMENTS = std::vector<std::string>{
-"H" ,                                                                                                 "He",
-"Li", "Be",                                                             "B" , "C" , "N" , "O" , "F" , "Ne",
-"Na", "Mg",                                                             "Al", "Si", "P" , "S" , "Cl", "Ar",
-"K" , "Ca", "Sc", "Ti", "V" , "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr",
-"Rb", "Sr", "Y" , "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ar", "Cd", "In", "Sn", "Sb", "Te", "I" , "Xe",
-"Cs", "Ba", "La", "Hf", "Ta", "W" , "Re", "Os", "Ir", "Pt", "Au", "Hg", "Ti", "Pb", "Bi", "Po", "At", "Rn",
-"Fr", "Ra", "Ac", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn",
-
-"Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu",
-"Th", "Pa", "U" , "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr"
-};
 
 } // namespace harp
 

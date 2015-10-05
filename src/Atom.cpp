@@ -12,33 +12,43 @@
 
 using namespace harp;
 
-static bool str_in_vector(const std::string& s, const std::vector<std::string>& v);
+// Check if the string \c name is the name of an element
+static bool is_element(const std::string& name){
+    const auto ALL_ELEMENTS = {
+    "H" ,                                                                                                 "He",
+    "Li", "Be",                                                             "B" , "C" , "N" , "O" , "F" , "Ne",
+    "Na", "Mg",                                                             "Al", "Si", "P" , "S" , "Cl", "Ar",
+    "K" , "Ca", "Sc", "Ti", "V" , "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr",
+    "Rb", "Sr", "Y" , "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ar", "Cd", "In", "Sn", "Sb", "Te", "I" , "Xe",
+    "Cs", "Ba", "La", "Hf", "Ta", "W" , "Re", "Os", "Ir", "Pt", "Au", "Hg", "Ti", "Pb", "Bi", "Po", "At", "Rn",
+    "Fr", "Ra", "Ac", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn",
+
+    "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu",
+    "Th", "Pa", "U" , "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr"
+    };
+    for (auto& element: ALL_ELEMENTS){
+        if (name == element) {
+            return true;
+        }
+    }
+    return false;
+}
 
 Atom::Atom(const std::string& name) : _name(name), _mass(0), _charge(0) {
-    if (str_in_vector(name, ALL_ELEMENTS))
+    if (is_element(name)) {
         _type = ELEMENT;
-    else
+    } else {
         _type = CORSE_GRAIN;
+    }
 
     if (PERIODIC_INFORMATION.find(name) != PERIODIC_INFORMATION.end()){
         _mass = PERIODIC_INFORMATION.at(name).mass ;
     }
 }
 
-Atom::Atom(AtomType type, const std::string& name) :
-                                _name(name), _mass(0), _charge(0), _type(type){}
+Atom::Atom(AtomType type, const std::string& name) : _name(name), _mass(0), _charge(0), _type(type){}
 
 Atom::Atom() : Atom(UNDEFINED) {}
-
-// Check if the string \c s is in the vector of strings \c v
-static bool str_in_vector(const std::string& s, const std::vector<std::string>& v){
-    for (size_t i=0; i<v.size(); i++){
-        if (s == v[i]) {
-            return true;
-        }
-    }
-    return false;
-}
 
 std::string Atom::full_name() const {
     if (PERIODIC_INFORMATION.find(_name) != PERIODIC_INFORMATION.end()){
