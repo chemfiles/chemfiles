@@ -117,15 +117,15 @@ Long story made short, just use the right commands for your system:
 ```bash
 # On apt-get based distributions
 apt-get update
-apt-get install cmake libnetcdf-dev libboost-filesystem-dev libboost-dev
+apt-get install cmake libnetcdf-dev
 
 # On yum based distributions
 yum install epel-release # The EPEL repository have the netcdf lib
-yum install cmake netcdf-devel netcdf-cxx-devel boost-devel boost-filesystem
+yum install cmake netcdf-devel netcdf-cxx-devel
 
 # On OS X with Homebrew (brew.sh)
 brew tap homebrew/science
-brew install cmake netcdf boost
+brew install cmake netcdf
 ```
 
 You will also need a recent C++ compiler: gcc 4.9, clang 3.5 and icpc 14 are
