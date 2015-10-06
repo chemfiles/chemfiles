@@ -87,7 +87,7 @@ public:
         return *this;
     }
 protected:
-    explicit TextFile(const std::string& path, const std::string& mode) : File(path, mode) {}
+    explicit TextFile(const std::string& path, const std::string& mode) : File(path, mode), std::ostream(nullptr) {}
 };
 
 /*!
