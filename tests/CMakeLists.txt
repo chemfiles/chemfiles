@@ -24,6 +24,7 @@ file(GLOB all_test_files
 
 add_definitions("-DSRCDIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
 add_definitions("-DBINDIR=\"${CMAKE_CURRENT_BINARY_DIR}\"")
+add_definitions("-DDATADIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data/\"")
 
 foreach(test_file IN LISTS all_test_files)
     chrp_cpp_test(${test_file})
@@ -34,3 +35,18 @@ foreach(_test_ pdb-molfile dcd-molfile gro-molfile xtc-molfile trr-molfile)
     set_tests_properties(${_test_}
         PROPERTIES ENVIRONMENT "CHRP_MOLFILES=${PROJECT_BINARY_DIR}/lib/")
 endforeach()
+
+function(chrp_c_test _file_)
+    get_filename_component(_name_ ${_file_} NAME_WE)
+    set(_name_ "c-${_name_}")
+    add_executable(${_name_} ${_file_})
+    target_link_libraries(${_name_} chemharp)
+    add_test(NAME ${_name_} COMMAND ${_name_} WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+endfunction()
+
+if(BUILD_TESTS)
+    file(GLOB c_test_files ${CMAKE_CURRENT_SOURCE_DIR}/c/*.c)
+    foreach(test_file IN LISTS c_test_files)
+        chrp_c_test(${test_file})
+    endforeach(test_file)
+endif()

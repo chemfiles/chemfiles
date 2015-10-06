@@ -63,7 +63,7 @@ include_directories(include)
 include_directories(BEFORE SYSTEM ${PROJECT_BINARY_DIR}/include)
 
 file(GLOB_RECURSE sources src/**.cpp)
-add_library(chemharp ${sources} bindings/c/capi.cpp)
+add_library(chemharp ${sources})
 
 set_property(TARGET chemharp PROPERTY VERSION ${CHRP_VERSION_SHORT})
 set_property(TARGET chemharp PROPERTY SOVERSION ${CHRP_VERSION_SHORT})
@@ -99,8 +99,8 @@ install(FILES ${headers} DESTINATION include/chemharp/)
 # C++ main headers
 install(FILES include/Chemharp.hpp DESTINATION include)
 # C main header
-install(FILES bindings/c/chemharp.h DESTINATION include)
-# Dynamic library
+install(FILES include/chemharp.h DESTINATION include)
+# Libraries
 install(TARGETS chemharp DESTINATION lib)
 
 file(GLOB molfiles ${PROJECT_BINARY_DIR}/lib/*plugin.so)
@@ -139,6 +139,7 @@ enable_testing()
 add_subdirectory(doc)
 if(${BUILD_TESTS})
     add_subdirectory(tests)
+    add_subdirectory(examples)
 endif()
 add_subdirectory(examples)
 add_subdirectory(bindings)

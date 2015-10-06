@@ -8,7 +8,7 @@
 */
 
 #include "chemharp.h"
-#include "cerrors.hpp"
+#include "chemharp/cerrors.hpp"
 #include "Chemharp.hpp"
 
 #include <cstring>
