@@ -60,23 +60,6 @@ The Chemharp library tries to:
  - Bindings to the most used scientific languages:  Python, C, Fortran 95;
  - Work with binary formats, if the corresponding libraries are available.
 
-## Compilers, architecture and OS support
-
-Chemharp have been tested on the following platforms, with the following compilers :
-
- - Linux (64 bit)
-    * GCC: gcc/g++ 4.9.2
- - OS X (64 bit)
-    * GCC: gcc/g++ 4.9.2
-    * LLVM: clang/clang++ 3.5
-    * Intel: icc/icpc 14
- - Windows (32 bit) (only the C++ and C interfaces have been tested)
-    * MSVC 2015rc (MSVC 2013 DO NOT work)
-    * mingw64 gcc/g++ 4.9.2
-
-If you manage to compile Chemharp on any other OS/compiler/architecture
-combination, please let me know so that I can add it to this list.
-
 ## File formats
 
 ### Supported formats
@@ -159,10 +142,10 @@ For more informations about how to configure the build, please [read the doc](ht
 ### Usage
 
 The documentation is hosted at [readthedocs](http://chemharp.readthedocs.org), but here
-are some examples of how the API feels in all the supported languages:
+are some examples of how the usage feels in c++ and in C:
 
-#### C++
 ```cpp
+// C++ version
 #include <iostream>
 #include "Chemharp.cpp"
 
@@ -178,57 +161,8 @@ int main() {
 }
 ```
 
-#### Python
-
-```python
-from chemharp import Trajectory, Frame
-
-trajectory = Trajectory("filename.xyz")
-frame = trajectory.read()
-
-print("There are {} atoms in the frame".format(frame.natoms()))
-positions = frame.positions()
-
-# Do awesome things with the positions here !
-```
-
-#### Julia
-
-```julia
-using Chemharp
-
-trajectory = Trajectory("filename.xyz")
-frame = read(trajectory)
-
-println("There are $(natoms(frame)) atoms in the frame")
-positions = positions(frame)
-
-# Do awesome things with the positions here !
-```
-
-#### Rust
-
-```rust
-extern crate chemharp;
-
-use chemharp::Trajectory;
-
-fn main() {
-    let mut trajectory = Trajectory::new("filename.xyz").unwrap();
-    let mut frame = Frame::new(0).unwrap();
-
-    trajectory.read(&mut frame).unwrap();
-
-    println!("There are {} atoms in the frame", frame.natoms().unwrap())
-
-    let positions = frame.positions().unwrap();
-
-    // Do awesome things with the positions here !
-}
-```
-
-#### C
 ```c
+// C version
 #include <stdint.h>
 #include <stdio.h>
 
@@ -261,6 +195,30 @@ int main(){
     chrp_close(trajectory);
 }
 ```
+
+## Contributing
+
+Any contribution is very welcome, from feedback to pull request.
+
+Please report any bug you find and any feature you may want as a [github issue](https://github.com/Luthaf/Chemharp/issues/new).
+
+## Compilers, architecture and OS support
+
+Chemharp have been tested on the following platforms, with the following compilers :
+
+ - Linux (64 bit)
+    * GCC: gcc/g++ 4.9.2
+ - OS X (64 bit)
+    * GCC: gcc/g++ 4.9.2
+    * LLVM: clang/clang++ 3.5
+    * Intel: icc/icpc 14
+ - Windows (32 bit) (only the C++ and C interfaces have been tested)
+    * MSVC 2015rc (MSVC 2013 DO NOT work)
+    * mingw64 gcc/g++ 4.9.2
+
+If you manage to compile Chemharp on any other OS/compiler/architecture
+combination, please let me know so that I can add it to this list.
+
 
 ## License
 
