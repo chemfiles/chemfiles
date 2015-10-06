@@ -1,11 +1,3 @@
-if(${PYTHON_BINDING})
-    add_subdirectory(python)
-    configure_file (
-      "${PROJECT_SOURCE_DIR}/scripts/conda-recipe/meta.in.yaml"
-      "${PROJECT_SOURCE_DIR}/scripts/conda-recipe/meta.yaml"
-    )
-endif()
-
 function(chrp_c_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     set(_name_ "c-${_name_}")

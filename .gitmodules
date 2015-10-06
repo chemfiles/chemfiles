@@ -7,9 +7,6 @@
 [submodule "bindings/julia"]
 	path = bindings/julia
 	url = https://github.com/Luthaf/Chemharp.jl
-[submodule "bindings/python"]
-	path = bindings/python
-	url = https://github.com/Luthaf/Chemharp.py
 [submodule "bindings/rust"]
 	path = bindings/rust
 	url = https://github.com/Luthaf/Chemharp.rs

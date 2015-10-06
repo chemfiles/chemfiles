@@ -24,14 +24,10 @@ option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
 
 option(ENABLE_NETCDF "Enable AMBER NetCDF format." OFF)
 
-option(PYTHON_BINDING "Build python interface to Chemharp." OFF)
 option(FORTRAN_BINDING "Build FORTRAN interface to Chemharp." OFF)
 
 if(${FORTRAN_BINDING})
     enable_language(Fortran)
-endif()
-if(${PYTHON_BINDING} AND NOT ${BUILD_SHARED_LIBS})
-    message(SEND_ERROR "The Python binding can not be built using static libs. Please set BUILD_SHARED_LIBS to ON.")
 endif()
 
 include(CompilerFlags)
