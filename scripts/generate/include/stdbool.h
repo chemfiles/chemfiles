@@ -1,1 +1,0 @@
-typedef _Bool bool;
