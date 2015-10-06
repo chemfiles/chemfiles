@@ -31,18 +31,6 @@ else()
     set_debug_flag_if_possible("-Wsign-promo")
 endif()
 
-if(FORTRAN_BINDING)
-include(CheckFortranCompilerFlag)
-macro(set_fortran_debug_flag_if_possible _flag_)
-    CHECK_Fortran_COMPILER_FLAG("${_flag_}" FC_SUPPORTS${_flag_})
-    if(FC_SUPPORTS${_flag_})
-        set(CMAKE_Fortran_FLAGS_DEBUG "${CMAKE_Fortran_FLAGS_DEBUG} ${_flag_}")
-    endif()
-endmacro()
-
-set_fortran_debug_flag_if_possible("-Wall")
-endif()
-
 include(CheckCCompilerFlag)
 CHECK_C_COMPILER_FLAG("-std=c99" CC_SUPPORTS_C99)
 

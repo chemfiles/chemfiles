@@ -14,7 +14,3 @@ if(BUILD_TESTS)
         chrp_c_test(${test_file})
     endforeach(test_file)
 endif()
-
-if(${FORTRAN_BINDING})
-    add_subdirectory(fortran)
-endif()

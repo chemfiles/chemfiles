@@ -65,11 +65,11 @@ The Chemharp library tries to:
 Chemharp have been tested on the following platforms, with the following compilers :
 
  - Linux (64 bit)
-    * GCC: gcc/g++/gfortran 4.9.2
+    * GCC: gcc/g++ 4.9.2
  - OS X (64 bit)
-    * GCC: gcc/g++/gfortran 4.9.2
+    * GCC: gcc/g++ 4.9.2
     * LLVM: clang/clang++ 3.5
-    * Intel: icc/icpc/ifort 14
+    * Intel: icc/icpc 14
  - Windows (32 bit) (only the C++ and C interfaces have been tested)
     * MSVC 2015rc (MSVC 2013 DO NOT work)
     * mingw64 gcc/g++ 4.9.2
@@ -154,8 +154,7 @@ make
 make install
 ```
 
-For more informations about how to configure the build, and how to build the
-bindings to Python or Fortran, please [read the doc](http://chemharp.readthedocs.org/en/latest/installation.html)!
+For more informations about how to configure the build, please [read the doc](http://chemharp.readthedocs.org/en/latest/installation.html)!
 
 ### Usage
 
@@ -260,41 +259,6 @@ int main(){
 
     chrp_frame_free(frame);
     chrp_close(trajectory);
-}
-```
-
-#### Fortran
-
-```fortran
-program example
-    use chemharp
-    use iso_fortran_env, only: int64, real32
-
-    implicit none
-    type(chrp_trajectory) :: trajectory
-    type(chrp_frame) :: frame
-    integer(int64) :: natoms
-    real(real32), dimension(:, :), allocatable :: positions
-    integer :: status
-
-    call trajectory%open("filename.xyz", "r", status=status)
-    if status /= 0 stop "Error while opening file"
-    call frame%init(0)
-
-    call file%read(frame, status=status)
-    if status /= 0 stop "Error while reading file"
-
-    call frame%atoms_count(natoms)
-    write(*, *) "There are ", natoms, "atoms in the frame"
-
-    allocate(positions(3, natoms))
-
-    call frame%positions(positions, natoms)
-
-    // Do awesome things with the positions here !
-
-    call frame%free()
-    call trajectory%close()
 }
 ```
 

@@ -1,11 +1,17 @@
 # 0.4
 
-* Add and experimental Rust binding
+* Add a Rust binding
 * Rewrite the Python binding to use ctypes. The same code can be used with Python 2 & 3,
   and with all numpy versions.
 * Easier Python and Julia binding installation, using conda binary packaging.
 * Chemharp can now be compiled as a static library! This should allow for easier embedding
   in external code, and easier distribution of binaries.
+* All the bindings now live on there own repository:
+      - [Fortran](https://github.com/Luthaf/Chemharp.f03)
+      - [Python](https://github.com/Luthaf/Chemharp.py)
+      - [Julia](https://github.com/Luthaf/Chemharp.jl)
+      - [Rust](https://github.com/Luthaf/Chemharp.rs)
+* Various bugfixes and code improvements
 
 # 0.3
 

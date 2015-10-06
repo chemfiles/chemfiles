@@ -21,14 +21,7 @@ option(BUILD_TESTS "Build unit tests." OFF)
 option(BUILD_FRONTEND "Build the binary frontend." ON)
 option(CODE_COVERAGE "Enable code coverage" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
-
 option(ENABLE_NETCDF "Enable AMBER NetCDF format." OFF)
-
-option(FORTRAN_BINDING "Build FORTRAN interface to Chemharp." OFF)
-
-if(${FORTRAN_BINDING})
-    enable_language(Fortran)
-endif()
 
 include(CompilerFlags)
 include(Platforms)
