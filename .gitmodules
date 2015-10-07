@@ -1,6 +1,6 @@
 [submodule "Tests datafiles"]
 	path = tests/data
-	url = https://github.com/Luthaf/Chemharp-Tests
+	url = https://github.com/chemfiles/tests-data
 [submodule "chrp"]
 	path = bin
-	url = https://github.com/Luthaf/chrp
+	url = https://github.com/chemfiles/chrp

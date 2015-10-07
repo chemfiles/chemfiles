@@ -52,8 +52,7 @@ def read_elements(path):
 
     return atoms
 
-HEADER = """/*
- * Chemharp, an efficient IO library for chemistry file formats
+HEADER = """/* Chemfiles, an efficient IO library for chemistry file formats
  * Copyright (C) 2015 Guillaume Fraux
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -71,7 +70,7 @@ HEADER = """/*
 #include <map>
 #include <string>
 
-namespace harp {
+namespace chemfiles {
 """
 
 STRUCT = """
@@ -103,7 +102,7 @@ def write_elements(path, elements):
     for atom in atoms:
         f.write("    " + str(atom) + ",\n")
     f.write("};\n\n")  # closing the map.
-    f.write("} // namespace harp\n\n")  # closing the namespace.
+    f.write("} // namespace chemfiles\n\n")  # closing the namespace.
     f.write("#endif\n")  # closing the header guard
 
 

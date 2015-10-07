@@ -1,23 +1,21 @@
-/*
- * Chemharp, an efficient IO library for chemistry file formats
+/* Chemfiles, an efficient IO library for chemistry file formats
  * Copyright (C) 2015 Guillaume Fraux
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-
 #include <sstream>
 #include <cassert>
 
-#include "chemharp/formats/XYZ.hpp"
+#include "chemfiles/formats/XYZ.hpp"
 
-#include "chemharp/Error.hpp"
-#include "chemharp/Logger.hpp"
-#include "chemharp/Frame.hpp"
-#include "chemharp/File.hpp"
+#include "chemfiles/Error.hpp"
+#include "chemfiles/Logger.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/File.hpp"
 
-using namespace harp;
+using namespace chemfiles;
 
 std::string XYZFormat::description() const {
     return "XYZ file format.";
@@ -106,7 +104,7 @@ void XYZFormat::write(const Frame& frame){
     assert(frame.natoms() == topology.natoms());
 
     textfile << frame.natoms() << "\n";
-    textfile << "Written by Chemharp\n";
+    textfile << "Written by the chemfiles library\n";
 
     for (size_t i=0; i<frame.natoms(); i++){
         auto& pos = positions[i];

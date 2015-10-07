@@ -1,7 +1,6 @@
 #include "catch.hpp"
-
-#include "chemharp/Dynlib.hpp"
-using namespace harp;
+#include "chemfiles/Dynlib.hpp"
+using namespace chemfiles;
 
 TEST_CASE("Dynamic library loading", "[Dynlib]"){
     Dynlib lib(BINDIR "/libtest.so");

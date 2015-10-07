@@ -3,9 +3,8 @@
 #include <cstdio>
 
 #include "catch.hpp"
-
-#include "Chemharp.hpp"
-using namespace harp;
+#include "chemfiles.hpp"
+using namespace chemfiles;
 
 #include <boost/filesystem.hpp>
 namespace fs=boost::filesystem;
@@ -109,13 +108,13 @@ TEST_CASE("Errors in XYZ format", "[XYZ]"){
 TEST_CASE("Write files in XYZ format", "[XYZ]"){
     const auto expected_content =
     "4\n"
-    "Written by Chemharp\n"
+    "Written by the chemfiles library\n"
     "X 1 2 3\n"
     "X 1 2 3\n"
     "X 1 2 3\n"
     "X 1 2 3\n"
     "6\n"
-    "Written by Chemharp\n"
+    "Written by the chemfiles library\n"
     "X 4 5 6\n"
     "X 4 5 6\n"
     "X 4 5 6\n"

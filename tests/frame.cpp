@@ -1,10 +1,8 @@
 #include "catch.hpp"
-
-#include "Chemharp.hpp"
-#include "chemharp/Frame.hpp"
-#include "chemharp/UnitCell.hpp"
-
-using namespace harp;
+#include "chemfiles.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/UnitCell.hpp"
+using namespace chemfiles;
 
 TEST_CASE("Frame class usage", "[Frame]"){
     auto frame = Frame(10);

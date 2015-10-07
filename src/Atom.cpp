@@ -1,5 +1,4 @@
-/*
- * Chemharp, an efficient IO library for chemistry file formats
+/* Chemfiles, an efficient IO library for chemistry file formats
  * Copyright (C) 2015 Guillaume Fraux
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,10 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "chemharp/Atom.hpp"
-#include "chemharp/periodic.hpp"
+#include "chemfiles/Atom.hpp"
+#include "chemfiles/periodic.hpp"
 
-using namespace harp;
+using namespace chemfiles;
 
 // Check if the string \c name is the name of an element
 static bool is_element(const std::string& name){

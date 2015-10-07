@@ -1,19 +1,17 @@
-/*
- * Chemharp, an efficient IO library for chemistry file formats
+/* Chemfiles, an efficient IO library for chemistry file formats
  * Copyright (C) 2015 Guillaume Fraux
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-
 #include <map>
 #include <cstdlib>
 
-#include "chemharp/formats/Molfile.hpp"
-#include "chemharp/Frame.hpp"
-#include "chemharp/Topology.hpp"
-using namespace harp;
+#include "chemfiles/formats/Molfile.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/Topology.hpp"
+using namespace chemfiles;
 
 /******************************************************************************/
 
@@ -56,11 +54,11 @@ static int register_plugin(void *v, vmdplugin_t *p) {
 }
 
 static std::string libpath(const std::string& lib_name){
-    // First look for the CHRP_MOLFILES environement variable
-    if(const char* MOLFILE_DIR = std::getenv("CHRP_MOLFILES")) {
-        return MOLFILE_DIR + lib_name;
-    } else { // Use the compile-time macro CHRP_MOLFILES_DIR
-        return CHRP_MOLFILES_DIR + lib_name;
+    // First look for the MOLFILES_DIRECTORY environement variable
+    if(const char* molfile_dir = std::getenv("MOLFILES_DIRECTORY")) {
+        return molfile_dir + lib_name;
+    } else { // Use the compile-time macro MOLFILES_DIRECTORY
+        return INSTALL_MOLFILE_DIR + lib_name;
     }
 }
 
@@ -94,7 +92,7 @@ _natoms(0), _use_topology(false) {
     // Check the ABI version of the loaded _plugin
     if (_plugin->abiversion != vmdplugin_ABIVERSION)
         throw PluginError("The ABI version does not match! Please recompile "
-                          "chemharp or provide another _plugin");
+                          "chemfiles or provide another _plugin");
     // Check that needed functions are here
     if ((_plugin->open_file_read == NULL)      ||
         (_plugin->read_next_timestep  == NULL) ||
@@ -258,9 +256,9 @@ template <MolfileFormat F> const char* Molfile<F>::extension() {
 /******************************************************************************/
 
 // Instanciate the templates
-template class harp::Molfile<PDB>;
-template class harp::Molfile<DCD>;
-template class harp::Molfile<GRO>;
-template class harp::Molfile<TRR>;
-template class harp::Molfile<XTC>;
-template class harp::Molfile<TRJ>;
+template class chemfiles::Molfile<PDB>;
+template class chemfiles::Molfile<DCD>;
+template class chemfiles::Molfile<GRO>;
+template class chemfiles::Molfile<TRR>;
+template class chemfiles::Molfile<XTC>;
+template class chemfiles::Molfile<TRJ>;

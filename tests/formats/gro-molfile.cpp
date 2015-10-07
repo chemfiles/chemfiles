@@ -1,7 +1,6 @@
 #include "catch.hpp"
-
-#include "Chemharp.hpp"
-using namespace harp;
+#include "chemfiles.hpp"
+using namespace chemfiles;
 
 #define GRODIR SRCDIR "/data/gro/"
 

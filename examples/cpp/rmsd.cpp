@@ -1,19 +1,18 @@
-/* File rmsd.cpp, example for the Chemharp library
+/* File rmsd.cpp, example for the chemfiles library
  * Any copyright is dedicated to the Public Domain.
  * http://creativecommons.org/publicdomain/zero/1.0/ */
 #include <iostream>
 #include <vector>
 #include <numeric>
 #include <cmath>
-using namespace std;
 
-#include "Chemharp.hpp"
+#include "chemfiles.hpp"
 
 int main() {
-    harp::Trajectory traj("filename.nc");
-    harp::Frame frame;
+    chemfiles::Trajectory traj("filename.nc");
+    chemfiles::Frame frame;
 
-    vector<double> distances;
+    std::vector<double> distances;
 
     // Accumulate the distances to the origin of the 10th atom throughtout the
     // trajectory
@@ -25,10 +24,7 @@ int main() {
         distances.push_back(distance);
     }
 
-    double mean = accumulate(distances.begin(),
-                             distances.end(),
-                             0.0) / distances.size();
-
+    double mean = std::accumulate(std::begin(distances), std::end(distances), 0.0) / distances.size();
     double rmsd = 0.0;
     for (auto dist : distances) {
         rmsd += (mean - dist)*(mean - dist);

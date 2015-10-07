@@ -1,5 +1,4 @@
-/*
-* Chemharp, an efficient IO library for chemistry file formats
+/* Chemfiles, an efficient IO library for chemistry file formats
 * Copyright (C) 2015 Guillaume Fraux
 *
 * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,12 +6,12 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "chemharp/Trajectory.hpp"
-#include "chemharp/TrajectoryFactory.hpp"
-#include "chemharp/Logger.hpp"
-#include "chemharp/files/BasicFile.hpp"
+#include "chemfiles/Trajectory.hpp"
+#include "chemfiles/TrajectoryFactory.hpp"
+#include "chemfiles/Logger.hpp"
+#include "chemfiles/files/BasicFile.hpp"
 
-using namespace harp;
+using namespace chemfiles;
 using std::string;
 
 //! Get the extension part of a filename. Filename is assumed to be valid here.

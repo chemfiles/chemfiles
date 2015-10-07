@@ -1,18 +1,18 @@
-/* File convert.cpp, example for the Chemharp library
+/* File convert.cpp, example for the chemfiles library
  * Any copyright is dedicated to the Public Domain.
  * http://creativecommons.org/publicdomain/zero/1.0/ */
-#include "Chemharp.hpp"
+#include "chemfiles.hpp"
 
 int main() {
-    harp::Trajectory input("water.xyz");
-    harp::Frame frame{};
-    harp::Topology water_topology{};
+    chemfiles::Trajectory input("water.xyz");
+    chemfiles::Frame frame{};
+    chemfiles::Topology water_topology{};
     // Orthorombic UnitCell with lengths of 20, 15 and 35 A
-    harp::UnitCell cell(20, 15, 35);
+    chemfiles::UnitCell cell(20, 15, 35);
 
     // Create Atoms
-    harp::Atom O("O");
-    harp::Atom H("H");
+    chemfiles::Atom O("O");
+    chemfiles::Atom H("H");
 
     // Fill the topology with one water molecule
     water_topology.append(O);
@@ -21,7 +21,7 @@ int main() {
     water_topology.add_bond(0, 1);
     water_topology.add_bond(0, 2);
 
-    harp::Trajectory output("water.pdb", "w");
+    chemfiles::Trajectory output("water.pdb", "w");
 
     while (!input.done()) {
         input >> frame;

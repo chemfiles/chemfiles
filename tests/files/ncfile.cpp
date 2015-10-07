@@ -4,13 +4,12 @@
 #include <cstdio>
 
 #include "catch.hpp"
-
-#include "chemharp/config.hpp"
+#include "chemfiles/config.hpp"
 #if HAVE_NETCDF
 
-#include "Chemharp.hpp"
-#include "chemharp/files/NCFile.hpp"
-using namespace harp;
+#include "chemfiles.hpp"
+#include "chemfiles/files/NCFile.hpp"
+using namespace chemfiles;
 
 #define FILESDIR SRCDIR "/data/"
 

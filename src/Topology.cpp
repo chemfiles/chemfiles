@@ -1,18 +1,17 @@
-/*
- * Chemharp, an efficient IO library for chemistry file formats
+/* Chemfiles, an efficient IO library for chemistry file formats
  * Copyright (C) 2015 Guillaume Fraux
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-
-#include "chemharp/Topology.hpp"
-#include "chemharp/Error.hpp"
 #include <algorithm>
 #include <cstddef>
 
-using namespace harp;
+#include "chemfiles/Topology.hpp"
+#include "chemfiles/Error.hpp"
+
+using namespace chemfiles;
 using std::vector;
 
 void Connectivity::recalculate() const{
@@ -169,7 +168,7 @@ void Topology::clear(){
     _connect.clear();
 }
 
-Topology harp::dummy_topology(size_t natoms){
+Topology chemfiles::dummy_topology(size_t natoms){
     Topology top(0);
     for (size_t i=0; i<natoms; i++)
         top.append(Atom(Atom::UNDEFINED));

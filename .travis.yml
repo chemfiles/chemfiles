@@ -107,7 +107,7 @@ after_success:
     if [ ${DO_COVERAGE} == 1 ]
     then
         ${LCOV} --gcov-tool gcov-4.9 --directory $(pwd) --capture --output-file coverage.info
-        ${LCOV} --remove coverage.info 'tests/*' 'Chemharp/build/*' '/usr/*' --output-file coverage.info
+        ${LCOV} --remove coverage.info 'tests/*' 'chemfiles/build/*' '/usr/*' --output-file coverage.info
         ${LCOV} --list coverage.info
         coveralls-lcov --repo-token=${COVERALLS_TOKEN} coverage.info
     fi

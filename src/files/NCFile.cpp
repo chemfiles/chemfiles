@@ -1,18 +1,17 @@
-/*
-* Chemharp, an efficient IO library for chemistry file formats
+/* Chemfiles, an efficient IO library for chemistry file formats
 * Copyright (C) 2015 Guillaume Fraux
 *
 * This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-#include "chemharp/config.hpp"
+#include "chemfiles/config.hpp"
 #if HAVE_NETCDF
 
-#include "chemharp/files/NCFile.hpp"
-#include "chemharp/Error.hpp"
-#include "chemharp/Logger.hpp"
-using namespace harp;
+#include "chemfiles/files/NCFile.hpp"
+#include "chemfiles/Error.hpp"
+#include "chemfiles/Logger.hpp"
+using namespace chemfiles;
 using namespace netCDF;
 using std::string;
 

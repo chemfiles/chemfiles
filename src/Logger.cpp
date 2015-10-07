@@ -1,5 +1,4 @@
-/*
-* Chemharp, an efficient IO library for chemistry file formats
+/* Chemfiles, an efficient IO library for chemistry file formats
 * Copyright (C) 2015 Guillaume Fraux
 *
 * This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +9,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "chemharp/Logger.hpp"
-using namespace harp;
+#include "chemfiles/Logger.hpp"
+using namespace chemfiles;
 
 // No-op buffer for no-op stream
 class NullBuffer : public std::streambuf {
@@ -44,16 +43,16 @@ std::ostream& Logger::get_stream(LogLevel level){
 
     switch(level){
         case ERROR:
-            *os << "Chemharp error: ";
+            *os << "Chemfiles error: ";
             break;
         case WARNING:
-            *os << "Chemharp warning: ";
+            *os << "Chemfiles warning: ";
             break;
         case INFO:
-            *os << "Chemharp info: ";
+            *os << "Chemfiles info: ";
             break;
         case DEBUG:
-            *os << "Chemharp debug: ";
+            *os << "Chemfiles debug: ";
             break;
         case NONE:
             break;

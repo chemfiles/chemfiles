@@ -1,8 +1,8 @@
 #include "catch.hpp"
 
-#include "Chemharp.hpp"
-#include "chemharp/Atom.hpp"
-using namespace harp;
+#include "chemfiles.hpp"
+#include "chemfiles/Atom.hpp"
+using namespace chemfiles;
 
 
 TEST_CASE("Use the Atom type", "[Atoms]"){

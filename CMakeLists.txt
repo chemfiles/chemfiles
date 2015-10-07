@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.12)
-project(chemharp C CXX)
+project(chemfiles C CXX)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 if(${CMAKE_VERSION} VERSION_GREATER 3.0.0)
@@ -10,12 +10,12 @@ endif()
 set(CMAKE_CXX_STANDARD 11)
 set(CXX_STANDARD_REQUIRED ON)
 
-file(READ ${PROJECT_SOURCE_DIR}/VERSION CHRP_VERSION)
-string(STRIP ${CHRP_VERSION} CHRP_VERSION)
-string(REGEX REPLACE "^([0-9]+)\\..*" "\\1" CHRP_VERSION_MAJOR "${CHRP_VERSION}")
-string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" CHRP_VERSION_MINOR "${CHRP_VERSION}")
-string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CHRP_VERSION_PATCH "${CHRP_VERSION}")
-set(CHRP_VERSION_SHORT "${CHRP_VERSION_MAJOR}.${CHRP_VERSION_MINOR}.${CHRP_VERSION_PATCH}")
+file(READ ${PROJECT_SOURCE_DIR}/VERSION CHEMFILES_VERSION)
+string(STRIP ${CHEMFILES_VERSION} CHEMFILES_VERSION)
+string(REGEX REPLACE "^([0-9]+)\\..*" "\\1" CHEMFILES_VERSION_MAJOR "${CHEMFILES_VERSION}")
+string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" CHEMFILES_VERSION_MINOR "${CHEMFILES_VERSION}")
+string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CHEMFILES_VERSION_PATCH "${CHEMFILES_VERSION}")
+set(CHEMFILES_VERSION_SHORT "${CHEMFILES_VERSION_MAJOR}.${CHEMFILES_VERSION_MINOR}.${CHEMFILES_VERSION_PATCH}")
 
 option(BUILD_TESTS "Build unit tests." OFF)
 option(BUILD_FRONTEND "Build the binary frontend." OFF)
@@ -64,45 +64,45 @@ include_directories(include)
 include_directories(BEFORE SYSTEM ${PROJECT_BINARY_DIR}/include)
 
 file(GLOB_RECURSE sources src/**.cpp)
-add_library(chemharp ${sources})
+add_library(chemfiles ${sources})
 
-set_property(TARGET chemharp PROPERTY VERSION ${CHRP_VERSION_SHORT})
-set_property(TARGET chemharp PROPERTY SOVERSION ${CHRP_VERSION_SHORT})
+set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
+set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
 
 include(GenerateExportHeader)
-generate_export_header(chemharp
-          BASE_NAME CHRP
-          EXPORT_FILE_NAME ${PROJECT_SOURCE_DIR}/include/chemharp/exports.hpp
+generate_export_header(chemfiles
+          BASE_NAME CHFL
+          EXPORT_FILE_NAME ${PROJECT_SOURCE_DIR}/include/chemfiles/exports.hpp
 )
-target_link_libraries(chemharp ${OTHER_CHRP_LIBRARIES})
+target_link_libraries(chemfiles ${OTHER_CHEMFILES_LIBRARIES})
 
 configure_file (
-  "${PROJECT_SOURCE_DIR}/include/chemharp/config.in.hpp"
-  "${PROJECT_SOURCE_DIR}/include/chemharp/config.hpp"
+  "${PROJECT_SOURCE_DIR}/include/chemfiles/config.in.hpp"
+  "${PROJECT_SOURCE_DIR}/include/chemfiles/config.hpp"
 )
 
 if(${ENABLE_NETCDF})
-    add_dependencies(chemharp netcdfcxx)
-    target_link_libraries(chemharp ${NETCDF_LIBRARIES} netcdf_cxx4)
+    add_dependencies(chemfiles netcdfcxx)
+    target_link_libraries(chemfiles ${NETCDF_LIBRARIES} netcdf_cxx4)
 endif()
 
-add_dependencies(chemharp molfiles)
-add_definitions("-DCHRP_MOLFILES_DIR=\"${CMAKE_INSTALL_PREFIX}/molfiles/\"")
+add_dependencies(chemfiles molfiles)
+add_definitions("-DINSTALL_MOLFILE_DIR=\"${CMAKE_INSTALL_PREFIX}/lib/molfiles/\"")
 
 #----------------------------------------------------------------------------------------#
 # Installation configuration
 #----------------------------------------------------------------------------------------#
 
-file(GLOB_RECURSE headers include/chemharp/*.hpp)
+file(GLOB_RECURSE headers include/chemfiles/*.hpp)
 
 # All headers
-install(FILES ${headers} DESTINATION include/chemharp/)
+install(FILES ${headers} DESTINATION include/chemfiles/)
 # C++ main headers
-install(FILES include/Chemharp.hpp DESTINATION include)
+install(FILES include/chemfiles.hpp DESTINATION include)
 # C main header
-install(FILES include/chemharp.h DESTINATION include)
+install(FILES include/chemfiles.h DESTINATION include)
 # Libraries
-install(TARGETS chemharp DESTINATION lib)
+install(TARGETS chemfiles DESTINATION lib)
 
 file(GLOB molfiles ${PROJECT_BINARY_DIR}/lib/*plugin.so)
 install(FILES ${molfiles} DESTINATION lib/molfiles/
@@ -123,13 +123,13 @@ add_custom_target(uninstall
 #----------------------------------------------------------------------------------------#
 # Packaging stuff
 #----------------------------------------------------------------------------------------#
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Chemharp, efficient chemistry IO library")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Chemfiles, an efficient chemistry IO library")
 set(CPACK_PACKAGE_VENDOR "Guillaume Fraux")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENCE.txt")
-set(CPACK_PACKAGE_VERSION_MAJOR ${CHRP_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${CHRP_VERSION_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH ${CHRP_VERSION_PATCH})
+set(CPACK_PACKAGE_VERSION_MAJOR ${CHEMFILES_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${CHEMFILES_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${CHEMFILES_VERSION_PATCH})
 set(CPACK_GENERATOR "TGZ;ZIP")
 include(CPack)
 

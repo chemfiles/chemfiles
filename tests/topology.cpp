@@ -1,11 +1,11 @@
 #include "catch.hpp"
 
 #define private public
-#include "chemharp/Topology.hpp"
+#include "chemfiles/Topology.hpp"
 #undef private
 
-#include "Chemharp.hpp"
-using namespace harp;
+#include "chemfiles.hpp"
+using namespace chemfiles;
 
 TEST_CASE("Use the Topology class", "[Topology]"){
 

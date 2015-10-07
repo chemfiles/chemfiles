@@ -1,12 +1,11 @@
 #include <cstdio>
 
 #include "catch.hpp"
-
-#include "chemharp/config.hpp"
+#include "chemfiles/config.hpp"
 #if HAVE_NETCDF
 
-#include "Chemharp.hpp"
-using namespace harp;
+#include "chemfiles.hpp"
+using namespace chemfiles;
 
 #include <boost/filesystem.hpp>
 namespace fs=boost::filesystem;

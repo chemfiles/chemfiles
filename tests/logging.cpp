@@ -4,9 +4,9 @@
 #include <string>
 
 #include "catch.hpp"
-#include "chemharp/Logger.hpp"
-#include "Chemharp.hpp"
-using namespace harp;
+#include "chemfiles/Logger.hpp"
+#include "chemfiles.hpp"
+using namespace chemfiles;
 
 TEST_CASE("Basic logging usage", "[logging]"){
     std::stringstream out_buffer;
@@ -17,11 +17,11 @@ TEST_CASE("Basic logging usage", "[logging]"){
     std::clog.rdbuf(out_buffer.rdbuf());
 
     LOG(ERROR) << "an error" << std::endl;
-    CHECK("Chemharp error: an error\n" == out_buffer.str());
+    CHECK("Chemfiles error: an error\n" == out_buffer.str());
     out_buffer.str(std::string()); // Clean the buffer
 
     LOG(WARNING) << "a warning" << std::endl;
-    CHECK("Chemharp warning: a warning\n" == out_buffer.str());
+    CHECK("Chemfiles warning: a warning\n" == out_buffer.str());
     out_buffer.str(std::string());
 
     // The level should be WARNING by default
@@ -47,7 +47,7 @@ TEST_CASE("Set the log stream", "[logging]"){
         std::cout.rdbuf(out_buffer.rdbuf());
 
         LOG(WARNING) << "a warning" << std::endl;
-        CHECK("Chemharp warning: a warning\n" == out_buffer.str());
+        CHECK("Chemfiles warning: a warning\n" == out_buffer.str());
 
         std::cout.rdbuf(sbuf);
     }
@@ -58,7 +58,7 @@ TEST_CASE("Set the log stream", "[logging]"){
         std::cerr.rdbuf(out_buffer.rdbuf());
 
         LOG(WARNING) << "a warning" << std::endl;
-        CHECK("Chemharp warning: a warning\n" == out_buffer.str());
+        CHECK("Chemfiles warning: a warning\n" == out_buffer.str());
 
         std::cerr.rdbuf(sbuf);
     }
@@ -73,7 +73,7 @@ TEST_CASE("Set the log stream", "[logging]"){
         std::getline(logfile, log_content);
         logfile.close();
 
-        CHECK("Chemharp warning: a warning" == log_content);
+        CHECK("Chemfiles warning: a warning" == log_content);
 
         remove("test-logging-tmp.log");
     }
@@ -101,11 +101,11 @@ TEST_CASE("Set the log level", "[logging]"){
         Logger::level(Logger::INFO);
 
         LOG(ERROR) << "an error" << std::endl;
-        CHECK("Chemharp error: an error\n" == out_buffer.str());
+        CHECK("Chemfiles error: an error\n" == out_buffer.str());
         out_buffer.str(std::string());
 
         LOG(INFO) << "an info" << std::endl;
-        CHECK("Chemharp info: an info\n" == out_buffer.str());
+        CHECK("Chemfiles info: an info\n" == out_buffer.str());
         out_buffer.str(std::string());
     }
     std::clog.rdbuf(sbuf);

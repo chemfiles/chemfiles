@@ -1,8 +1,8 @@
 #include <cmath>
 #include "catch.hpp"
-#include "Chemharp.hpp"
+#include "chemfiles.hpp"
 
-using namespace harp;
+using namespace chemfiles;
 
 TEST_CASE("Vector3D", "[Vector3D]"){
 

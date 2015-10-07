@@ -1,11 +1,9 @@
 #include <cmath>
-
 #include "catch.hpp"
+#include "chemfiles.hpp"
+#include "chemfiles/UnitCell.hpp"
 
-#include "Chemharp.hpp"
-#include "chemharp/UnitCell.hpp"
-
-using namespace harp;
+using namespace chemfiles;
 
 bool roughly(const Vector3D& u, const Vector3D& v, double eps = 1e-9) {
     return (fabs(u[0] - v[0]) < eps) && (fabs(u[1] - v[1]) < eps) && (fabs(u[2] - v[2]) < eps);

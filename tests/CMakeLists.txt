@@ -4,10 +4,10 @@ endif()
 
 add_subdirectory(external)
 
-function(chrp_cpp_test _file_)
+function(chfl_cpp_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     add_executable(${_name_} ${_file_} $<TARGET_OBJECTS:catch>)
-    target_link_libraries(${_name_} chemharp boost_filesystem)
+    target_link_libraries(${_name_} chemfiles boost_filesystem)
     set_property(TARGET ${_name_} PROPERTY CXX_STANDARD 11)
     add_test(NAME ${_name_} COMMAND ${_name_} WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 endfunction()
@@ -30,24 +30,24 @@ add_definitions("-DSRCDIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
 add_definitions("-DBINDIR=\"${CMAKE_CURRENT_BINARY_DIR}\"")
 
 foreach(test_file IN LISTS all_test_files)
-    chrp_cpp_test(${test_file})
+    chfl_cpp_test(${test_file})
 endforeach(test_file)
 
 # Because the files may not be installed yet, we use the environment variable
 foreach(_test_ pdb-molfile dcd-molfile gro-molfile xtc-molfile trr-molfile)
     set_tests_properties(${_test_}
-        PROPERTIES ENVIRONMENT "CHRP_MOLFILES=${PROJECT_BINARY_DIR}/lib/")
+    PROPERTIES ENVIRONMENT "MOLFILES_DIRECTORY=${PROJECT_BINARY_DIR}/lib/")
 endforeach()
 
-function(chrp_c_test _file_)
+function(chfl_c_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     set(_name_ "c-${_name_}")
     add_executable(${_name_} ${_file_})
-    target_link_libraries(${_name_} chemharp)
+    target_link_libraries(${_name_} chemfiles)
     add_test(NAME ${_name_} COMMAND ${_name_} WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 endfunction()
 
 file(GLOB c_test_files ${CMAKE_CURRENT_SOURCE_DIR}/c/*.c)
 foreach(test_file IN LISTS c_test_files)
-    chrp_c_test(${test_file})
+    chfl_c_test(${test_file})
 endforeach(test_file)

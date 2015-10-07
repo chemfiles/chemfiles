@@ -1,5 +1,4 @@
-/*
- * Chemharp, an efficient IO library for chemistry file formats
+/* Chemfiles, an efficient IO library for chemistry file formats
  * Copyright (C) 2015 Guillaume Fraux
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,10 +9,10 @@
 #include <cassert>
 #include <cmath>
 
-#include "chemharp/UnitCell.hpp"
-#include "chemharp/Error.hpp"
-#include "chemharp/Vector3D.hpp"
-using namespace harp;
+#include "chemfiles/UnitCell.hpp"
+#include "chemfiles/Error.hpp"
+#include "chemfiles/Vector3D.hpp"
+using namespace chemfiles;
 
 // Sinus and Cosine for degree values
 constexpr double pi = 3.141592653589793238463;

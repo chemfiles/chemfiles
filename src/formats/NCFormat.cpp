@@ -1,29 +1,27 @@
-/*
- * Chemharp, an efficient IO library for chemistry file formats
+/* Chemfiles, an efficient IO library for chemistry file formats
  * Copyright (C) 2015 Guillaume Fraux
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-
-#include "chemharp/config.hpp"
-#if HAVE_NETCDF
-
-#include "chemharp/formats/NCFormat.hpp"
-
-#include "chemharp/Error.hpp"
-#include "chemharp/Logger.hpp"
-#include "chemharp/Frame.hpp"
-#include "chemharp/files/NCFile.hpp"
-using namespace harp;
-using namespace netCDF;
-
 #include <algorithm>
 #include <iostream>
-#include <algorithm>
+#include <vector>
 using std::endl;
 using std::vector;
+
+#include "chemfiles/config.hpp"
+#if HAVE_NETCDF
+
+#include "chemfiles/formats/NCFormat.hpp"
+
+#include "chemfiles/Error.hpp"
+#include "chemfiles/Logger.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/files/NCFile.hpp"
+using namespace chemfiles;
+using namespace netCDF;
 
 std::string NCFormat::description() const {
     return "Amber NetCDF file format.";
@@ -157,8 +155,8 @@ void NCFormat::read_array3D(Array3D& arr, const string& name) const{
 static void initialize(NCFile& ncfile, size_t natoms, bool velocities){
     ncfile.add_global_attribute("Conventions", "AMBER");
     ncfile.add_global_attribute("ConventionVersion", "1.0");
-    ncfile.add_global_attribute("program", "Chemharp");
-    ncfile.add_global_attribute("programVersion", CHRP_VERSION);
+    ncfile.add_global_attribute("program", "Chemfiles");
+    ncfile.add_global_attribute("programVersion", CHEMFILES_VERSION);
 
     ncfile.add_dimension("frame");
     ncfile.add_dimension("spatial", 3);

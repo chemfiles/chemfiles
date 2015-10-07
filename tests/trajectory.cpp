@@ -1,11 +1,9 @@
 #include <streambuf>
 #include <fstream>
 #include <cstdio>
-
 #include "catch.hpp"
-
-#include "Chemharp.hpp"
-using namespace harp;
+#include "chemfiles.hpp"
+using namespace chemfiles;
 
 #define XYZDIR SRCDIR "/data/xyz/"
 
@@ -48,7 +46,7 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
     SECTION("Writing"){
         const auto expected_content =
         "5\n"
-        "Written by Chemharp\n"
+        "Written by the chemfiles library\n"
         "Fe 1 2 3\n"
         "Fe 1 2 3\n"
         "Fe 1 2 3\n"

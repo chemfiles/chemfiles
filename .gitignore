@@ -1,4 +1,4 @@
 build
 # CMake generated file
-include/chemharp/config.hpp
-include/chemharp/exports.hpp
+include/chemfiles/config.hpp
+include/chemfiles/exports.hpp

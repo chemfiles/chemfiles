@@ -1,8 +1,8 @@
 # Example directory
 
-This directory contains usage examples of the Chemharp library, for the C and C++
+This directory contains usage examples of the chemfiles library, for the C and C++
 languages. Similar examples can be found in the corresponding repository for
-all the bindings to Chemharp.
+all the bindings to chemfiles.
 
 All of these example are compiled with the latest release to ensure that they are
 up-to-date.

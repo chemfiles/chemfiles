@@ -4,14 +4,14 @@
 
 #include "catch.hpp"
 
-#include "Chemharp.hpp"
-#include "chemharp/TrajectoryFactory.hpp"
-#include "chemharp/register_formats.hpp"
-#include "chemharp/Error.hpp"
-#include "chemharp/formats/XYZ.hpp"
+#include "chemfiles.hpp"
+#include "chemfiles/TrajectoryFactory.hpp"
+#include "chemfiles/register_formats.hpp"
+#include "chemfiles/Error.hpp"
+#include "chemfiles/formats/XYZ.hpp"
 
-#include "chemharp/Frame.hpp"
-using namespace harp;
+#include "chemfiles/Frame.hpp"
+using namespace chemfiles;
 
 // Dummy format clase
 class DummyFormat : public Format {

@@ -1,19 +1,18 @@
-/*
-* Chemharp, an efficient IO library for chemistry file formats
+/* Chemfiles, an efficient IO library for chemistry file formats
 * Copyright (C) 2015 Guillaume Fraux
 *
 * This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-#include "chemharp/TrajectoryFactory.hpp"
+#include "chemfiles/TrajectoryFactory.hpp"
 
-#include "chemharp/formats/XYZ.hpp"
-#include "chemharp/formats/NCFormat.hpp"
-#include "chemharp/formats/Molfile.hpp"
+#include "chemfiles/formats/XYZ.hpp"
+#include "chemfiles/formats/NCFormat.hpp"
+#include "chemfiles/formats/Molfile.hpp"
 
-#include "chemharp/files/NCFile.hpp"
-using namespace harp;
+#include "chemfiles/files/NCFile.hpp"
+using namespace chemfiles;
 
 typedef FORMATS_LIST formats_list;
 

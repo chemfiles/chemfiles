@@ -1,5 +1,4 @@
-/*
- * Chemharp, an efficient IO library for chemistry file formats
+/* Chemfiles, an efficient IO library for chemistry file formats
  * Copyright (C) 2015 Guillaume Fraux
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,10 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include "chemharp/Format.hpp"
-#include "chemharp/Frame.hpp"
-#include "chemharp/Error.hpp"
-using namespace harp;
+#include "chemfiles/Format.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/Error.hpp"
+using namespace chemfiles;
 
 void Format::read_step(const size_t, Frame&){
     throw FormatError("Not implemented function 'read_at'");

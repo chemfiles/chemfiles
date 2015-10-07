@@ -12,6 +12,7 @@
       - [Julia](https://github.com/Luthaf/Chemharp.jl)
       - [Rust](https://github.com/Luthaf/Chemharp.rs)
 * Various bugfixes and code improvements
+* Renamed the library to chemfiles.
 
 # 0.3
 

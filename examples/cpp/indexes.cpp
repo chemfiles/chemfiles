@@ -1,19 +1,18 @@
-/* File indexes.cpp, example for the Chemharp library
+/* File indexes.cpp, example for the chemfiles library
  * Any copyright is dedicated to the Public Domain.
  * http://creativecommons.org/publicdomain/zero/1.0/ */
 #include <iostream>
 #include <vector>
-using namespace std;
 
-#include "Chemharp.hpp"
+#include "chemfiles.hpp"
 
 int main() {
-    harp::Trajectory traj("filename.xyz");
-    harp::Frame frame;
+    chemfiles::Trajectory traj("filename.xyz");
+    chemfiles::Frame frame;
 
     traj >> frame;
     auto positions = frame.positions();
-    vector<size_t> indexes;
+    std::vector<size_t> indexes;
 
     for (size_t i=0; i<frame.natoms(); i++) {
         if (positions[i][0] < 5) {

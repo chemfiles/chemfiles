@@ -4,9 +4,9 @@
 
 #include "catch.hpp"
 
-#include "Chemharp.hpp"
-#include "chemharp/files/BasicFile.hpp"
-using namespace harp;
+#include "chemfiles.hpp"
+#include "chemfiles/files/BasicFile.hpp"
+using namespace chemfiles;
 
 #define FILESDIR SRCDIR "/data/"
 
