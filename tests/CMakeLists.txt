@@ -1,3 +1,7 @@
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/data/README.md")
+    message(SEND_ERROR "Missing data files for tests. Please run `git submodule update --init`.")
+endif()
+
 add_subdirectory(external)
 
 function(chrp_cpp_test _file_)
