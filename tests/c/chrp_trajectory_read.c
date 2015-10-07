@@ -9,9 +9,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define DATADIR SRCDIR "/data/xyz/"
+
 int main(){
     CHRP_FRAME* frame = chrp_frame(0);
-    CHRP_TRAJECTORY* file = chrp_trajectory_open(DATADIR "/xyz/water.xyz", "r");
+    CHRP_TRAJECTORY* file = chrp_trajectory_open(DATADIR "water.xyz", "r");
 
     // Read the first frame
     assert(!chrp_trajectory_read(file, frame));
@@ -105,7 +107,7 @@ int main(){
     assert(!chrp_atom_free(atom));
 
     // Set the topology associated with a trajectory from a file
-    assert(!chrp_trajectory_set_topology_file(file, DATADIR "/xyz/topology.xyz"));
+    assert(!chrp_trajectory_set_topology_file(file, DATADIR "topology.xyz"));
     assert(!chrp_trajectory_read(file, frame));
     atom = chrp_atom_from_frame(frame, 0);
     assert(!chrp_atom_name(atom, name, sizeof(name)));
@@ -114,7 +116,7 @@ int main(){
 
     assert(!chrp_trajectory_close(file));
 
-    file = chrp_trajectory_with_format(DATADIR "xyz/helium.xyz.but.not.really", "r", "XYZ");
+    file = chrp_trajectory_with_format(DATADIR "helium.xyz.but.not.really", "r", "XYZ");
     assert(!chrp_trajectory_read(file, frame));
     assert(!chrp_frame_atoms_count(frame, &natoms));
     assert(natoms == 125);
