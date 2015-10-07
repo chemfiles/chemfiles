@@ -100,13 +100,6 @@ script:
   - make
   - ctest --output-on-failure
 
-deploy:
-  provider: script
-  script: bash ${TRAVIS_BUILD_DIR}/scripts/conda-recipe/deploy.sh
-  on:
-    condition: (${C_COMPILER} == "gcc" && ${TRAVIS_OS_NAME} == "linux") || (${C_COMPILER} == "clang" && ${TRAVIS_OS_NAME} == "osx")
-    tags: true
-
 after_success:
   - cd ${TRAVIS_BUILD_DIR}/build
   # Parse and submit coverage data
