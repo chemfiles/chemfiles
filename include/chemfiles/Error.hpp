@@ -20,7 +20,8 @@ namespace chemfiles {
  * @brief Base exception for chemfiles library
  */
 struct CHFL_EXPORT Error : public std::runtime_error {
-    using runtime_error::runtime_error;
+    Error(const std::string& err) : std::runtime_error(err) {}
+    virtual ~Error() noexcept = default;
 };
 
 /*!
@@ -28,7 +29,8 @@ struct CHFL_EXPORT Error : public std::runtime_error {
  * @brief Exception for files related failures
  */
 struct CHFL_EXPORT FileError : public Error {
-    using Error::Error;
+    FileError(const std::string& err) : Error(err) {}
+    virtual ~FileError() noexcept = default;
 };
 
 /*!
@@ -36,7 +38,8 @@ struct CHFL_EXPORT FileError : public Error {
  * @brief Exception for memory related failures
  */
 struct CHFL_EXPORT MemoryError : public Error {
-    using Error::Error;
+    MemoryError(const std::string& err) : Error(err) {}
+    virtual ~MemoryError() noexcept = default;
 };
 
 /*!
@@ -44,7 +47,8 @@ struct CHFL_EXPORT MemoryError : public Error {
  * @brief Exception for formats related failures
  */
 struct CHFL_EXPORT FormatError : public Error {
-    using Error::Error;
+    FormatError(const std::string& err) : Error(err) {}
+    virtual ~FormatError() noexcept = default;
 };
 
 /*!
@@ -52,7 +56,8 @@ struct CHFL_EXPORT FormatError : public Error {
  * @brief Exception for dynamic library loading errors
  */
 struct CHFL_EXPORT PluginError : public Error {
-    using Error::Error;
+    PluginError(const std::string& err) : Error(err) {}
+    virtual ~PluginError() noexcept = default;
 };
 
 
