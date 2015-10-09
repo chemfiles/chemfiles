@@ -9,9 +9,9 @@
       <img alt="Build Status"
       src="https://img.shields.io/travis/chemfiles/chemfiles/master.svg"></img>
    </a>
-   <a href="https://coveralls.io/r/Luthaf/Chemharp">
-      <img alt="Coverage Status"
-      src="https://img.shields.io/coveralls/Luthaf/Chemharp/master.svg"></img>
+   <a href="http://codecov.io/github/chemfiles/chemfiles?branch=master">
+    <img alt="Code Coverage"
+         src="http://codecov.io/github/chemfiles/chemfiles/coverage.svg?branch=master"/>
    </a>
    <hr />
    <a href="https://github.com/chemfiles/chemfiles/releases">

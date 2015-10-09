@@ -1,20 +1,15 @@
 language: cpp
-
 sudo: false
-
 os:
   - linux
   - osx
-
 compiler:
   - gcc
   - clang
-
 env:
   global:
     secure: Mf7f3PP+AHqyOMEp9koj+mTBSVfo03XNFLJ6offmH3IWIj+N5fxwn+tN3H/hKUeL8mvzfHjXPAkYkWKVwcamoQ9ktoYLDJ83HCa4muCUxENz/SAR2DvWf8ix7ggvIP8wZCrNyq8ssw+5F1FRmauF7HjTDPCtBiz/sjvK94XVwXU=
     secure: vemv2pi+y10L/3QkiDTdgbsug2Qv97OUiMjyRw9pYIjDoNhws1jzuKMFJt1YvUNZcROUA1hEkDYDDCmGTXAo7zr+pk+ru9e8h6q9LH+uPZWKgWHUzEyFlLB3wve3fCzeTIqvvSC+87bxYhJg53TrrCyRXBu3jnHoqJKr2RhWwOQ=
-
 addons:
   apt:
     sources:
@@ -25,29 +20,21 @@ addons:
     - libnetcdf-dev
     - clang-3.6
 
-install:
-  - export C_COMPILER=$CC
-  - |
-    if [ ${TRAVIS_OS_NAME} == "linux" && ${C_COMPILER} == "gcc" ]
-    then
-        export DO_COVERAGE=1
-    fi
+before_install:
   # Setting environement
+  - export C_COMPILER="$CC"
   - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DBUILD_TESTS=ON -DENABLE_NETCDF=ON -DBUILD_SHARED_LIBS=ON"
-  # Install code coverage stuff
   - |
-    if [ ${DO_COVERAGE} == 1 ]
-    then
-        gem install coveralls-lcov
-        wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz
-        tar xf lcov_1.11.orig.tar.gz
-        export LCOV='./../lcov-1.11/bin/lcov'
+    if test "$TRAVIS_OS_NAME" == "linux" && test "$C_COMPILER" == "gcc"; then
+        export DO_COVERAGE=true
         export CMAKE_ARGS="$CMAKE_ARGS -DCODE_COVERAGE=ON"
+        pip install --user codecov
+    else
+        export DO_COVERAGE=false
     fi
   # Install Linux stuff
   - |
-    if [ ${TRAVIS_OS_NAME} == "linux" ]
-    then
+    if test "${TRAVIS_OS_NAME}" == "linux"; then
         wget http://www.cmake.org/files/v3.2/cmake-3.2.1-Linux-x86_64.sh
         mkdir -p build
         sh cmake-3.2.1-Linux-x86_64.sh --prefix=build --exclude-subdir
@@ -64,8 +51,7 @@ install:
     fi
   # Install OS X stuff
   - |
-    if [ ${TRAVIS_OS_NAME} == "osx" ]
-    then
+    if test "$TRAVIS_OS_NAME" == "osx"; then
         brew tap homebrew/science
         brew update
         brew rm gcc
@@ -81,19 +67,12 @@ install:
             export CXX=clang++
         fi
     fi
-  - pip install --user enum34
 
-before_script:
+install:
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir -p build
   - cd build
   - $CMAKE $CMAKE_ARGS ..
-  # Cleanup of the coverage data
-  - |
-    if [ ${DO_COVERAGE} == 1 ]
-    then
-        ${LCOV} --directory $(pwd) --zerocounters
-    fi
 
 script:
   - cd ${TRAVIS_BUILD_DIR}/build
@@ -101,13 +80,7 @@ script:
   - ctest --output-on-failure
 
 after_success:
-  - cd ${TRAVIS_BUILD_DIR}/build
-  # Parse and submit coverage data
   - |
-    if [ ${DO_COVERAGE} == 1 ]
-    then
-        ${LCOV} --gcov-tool gcov-4.9 --directory $(pwd) --capture --output-file coverage.info
-        ${LCOV} --remove coverage.info 'tests/*' 'chemfiles/build/*' '/usr/*' --output-file coverage.info
-        ${LCOV} --list coverage.info
-        coveralls-lcov --repo-token=${COVERALLS_TOKEN} coverage.info
+    if ${DO_COVERAGE}; then
+        codecov --gcov-exec=gcov-4.9
     fi
