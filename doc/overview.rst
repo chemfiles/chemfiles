@@ -1,20 +1,20 @@
 .. _overview:
 
-Chemharp features overview
+Chemfiles features overview
 ==========================
 
-This figure represent how the basic types of Chemharp are arganised and how they
-interact together. The only types a Chemharp user should worry about are the
+This figure represent how the basic types of chemfiles are arganised and how they
+interact together. The only types a chemfiles user should worry about are the
 ``Trajectory``, ``Frame``, ``Topology``, ``Atom`` and ``UnitCell`` types. All of
-them are described in this section.
+these are described in this section.
 
-.. image:: static/img/chemharp.*
+.. image:: static/img/classes.*
     :align: center
 
 They are various way of interacting with these types, all of them being described
 in the :ref:`classes-reference` section for the C++ interface. All the bindings may not
 provide all the functionalities, so if something is missing, just
-`ask for it! <https://github.com/Luthaf/Chemharp/issues/new>`_
+`ask for it! <https://github.com/chemfiles/chemfiles/issues/new>`_
 
 .. _overview-trajectory:
 

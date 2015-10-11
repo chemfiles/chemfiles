@@ -3,10 +3,10 @@
 Julia interface
 ===============
 
-The `Julia`_ interface to Chemharp wrap around the C interface providing a Julian API.
-All the functionalities are in the ``Chemharp`` module, which can be imported by the
-``using Chemharp`` expression. The ``Chemharp`` module is built around the 5 main
-types of Chemharp: ``Trajectory``, ``Frame``, ``UnitCell``, ``Topology``, and
+The `Julia`_ interface to chemfiles wrap around the C interface providing a Julian API.
+All the functionalities are in the ``Chemfiles`` module, which can be imported by the
+``using Chemfiles`` expression. The ``Chemfiles`` module is built around the 5 main
+types of chemfiles: ``Trajectory``, ``Frame``, ``UnitCell``, ``Topology``, and
 ``Atom``. For more information about these types, please see the :ref:`overview`.
 
 The julia interface only support Julia 0.4, but few work would be needed to also
@@ -14,9 +14,9 @@ support the 0.3 version. You can install this interface by running
 
 .. code-block:: julia
 
-    julia> Pkg.clone("https://github.com/Luthaf/Chemharp.jl")
+    julia> Pkg.clone("https://github.com/chemfiles/Chemfiles.jl")
 
-    julia> Pkg.build("Chemharp")
+    julia> Pkg.build("Chemfiles")
 
 .. _Julia: http://julialang.org/
 
@@ -27,28 +27,28 @@ These jl:functions are not exported, and should be called by there fully qualifi
 
 .. code-block:: julia
 
-    Chemharp.last_error()
-    Chemharp.loglevel(Chemharp.ERROR)
+    Chemfiles.last_error()
+    Chemfiles.loglevel(Chemfiles.ERROR)
 
-.. jl:function:: Chemharp.last_error()
+.. jl:function:: Chemfiles.last_error()
 
     Get the last error message.
 
-.. jl:function:: Chemharp.loglevel(level)
+.. jl:function:: Chemfiles.loglevel(level)
 
     Set the current log level to ``level``. The following loggin level are available:
 
-    - ``Chemharp.NONE`` : Do not log anything;
-    - ``Chemharp.ERROR`` : Only log errors;
-    - ``Chemharp.WARNING`` : Log warnings and erors. This is the default;
-    - ``Chemharp.INFO`` : Log infos, warnings and errors;
-    - ``Chemharp.DEBUG`` : Log everything.
+    - ``Chemfiles.NONE`` : Do not log anything;
+    - ``Chemfiles.ERROR`` : Only log errors;
+    - ``Chemfiles.WARNING`` : Log warnings and erors. This is the default;
+    - ``Chemfiles.INFO`` : Log infos, warnings and errors;
+    - ``Chemfiles.DEBUG`` : Log everything.
 
-.. jl:function:: Chemharp.logfile(file)
+.. jl:function:: Chemfiles.logfile(file)
 
     Redirect the logs to ``file``, overwriting the file if it exists.
 
-.. jl:function:: Chemharp.log_to_stderr()
+.. jl:function:: Chemfiles.log_to_stderr()
 
     Redirect the logs to the standard error output. This is enabled by default.
 
@@ -233,9 +233,9 @@ base vectors of lengthes ``a``, ``b`` and ``c``; and the angles between these ve
 
     Get the cell type. The following cell types are defined:
 
-    - ``Chemharp.ORTHOROMBIC`` : The three angles are 90°
-    - ``Chemharp.TRICLINIC`` : The three angles may not be 90°
-    - ``Chemharp.INFINITE`` : Cell type when there is no periodic boundary conditions
+    - ``Chemfiles.ORTHOROMBIC`` : The three angles are 90°
+    - ``Chemfiles.TRICLINIC`` : The three angles may not be 90°
+    - ``Chemfiles.INFINITE`` : Cell type when there is no periodic boundary conditions
 
 .. jl:function:: set_type!(cell::UnitCell, celltype)
 

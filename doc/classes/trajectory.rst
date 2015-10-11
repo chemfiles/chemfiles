@@ -1,5 +1,5 @@
 Trajectory
 ==========
 
-.. doxygenclass:: harp::Trajectory
+.. doxygenclass:: chemfiles::Trajectory
     :members:

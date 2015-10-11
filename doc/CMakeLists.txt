@@ -20,13 +20,13 @@ Sphinx_add_targets(${sphinx_target_base_name} ${SPHINX_CONF_DIR} ${SPHINX_INPUT_
 
 if( ${SPHINX_HTML_OUTPUT} )
     install( DIRECTORY ${SPHINX_DESTINATION}/html
-        DESTINATION share/chemharp/doc
+        DESTINATION share/chemfiles/doc
         COMPONENT Doc
         PATTERN "${SPHINX_DESTINATION}/html/*"
         )
 endif()
 
-if( ${SPHINX_LATEX_OUTPUT} )
+if(${SPHINX_LATEX_OUTPUT})
     set(DOC_WITH_LOCAL_DOXYGEN OFF)
 
     # Build the PDF with pdflatex
@@ -38,16 +38,15 @@ if( ${SPHINX_LATEX_OUTPUT} )
       add_custom_command( TARGET ${sphinx_target_base_name}_latex
         POST_BUILD
         COMMAND ${PDFLATEX_COMPILER}
-          ${SPHINX_DESTINATION}/latex/Chemharp.tex
+          ${SPHINX_DESTINATION}/latex/chemfiles.tex
           -output-directory ${SPHINX_DESTINATION}/latex
         COMMAND ${MAKEINDEX_COMPILER}
-            Chemharp.idx
+            chemfiles.idx
         COMMAND ${PDFLATEX_COMPILER}
-          ${SPHINX_DESTINATION}/latex/Chemharp.tex
+          ${SPHINX_DESTINATION}/latex/chemfiles.tex
           -output-directory ${SPHINX_DESTINATION}/latex
         WORKING_DIRECTORY ${SPHINX_DESTINATION}/latex
         COMMENT "Building PDF"
         )
-    endif()
   endif()
 endif()

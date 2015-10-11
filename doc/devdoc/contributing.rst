@@ -1,7 +1,7 @@
 Contributing
 ============
 
-Chemharp is an open-source project, that I make on my free time. Any contribution,
+Chemfiles is an open-source project, that I make on my free time. Any contribution,
 from documentation improvement to new features including bug fixes are very welcome!
 
 I would like to help, what can I do ?
@@ -18,27 +18,27 @@ code, or any `issue`_ in the list. If you plan to add a new feature which is not
 the issue list, please open a new one so that every one knows you are working on it,
 and so that the implementation can be discussed!
 
-.. _pick up a TODO: https://github.com/Luthaf/Chemharp/search?utf8=%E2%9C%93&q=todo
-.. _issue: https://github.com/Luthaf/Chemharp/issues
+.. _pick up a TODO: https://github.com/chemfiles/chemfiles/search?utf8=%E2%9C%93&q=todo
+.. _issue: https://github.com/chemfiles/chemfiles/issues
 
 Improve documentation
 ^^^^^^^^^^^^^^^^^^^^^
 
 This documentation try to be easy to use, but there is always room for improvements.
 You can easily edit any :file:`.rst` file on `the github repository
-<https://github.com/Luthaf/Chemharp/tree/master/doc>`_, and propose your changes even
-with no git knowledge. All you need is a Github account.
+<https://github.com/chemfiles/chemfiles/tree/master/doc>`_, and propose your changes
+even with no git knowledge. All you need is a Github account.
 
 Share and spread the word
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you think that Chemharp is awsome, share it! The more users it will have, the more
-features we can add to it, together!
+If you think that chemfiles is awesome, share it! The more users it will have, the
+more features we can add to it, together!
 
 External project used
 ---------------------
 
-A few external projects are used in Chemharp developement, and you will need a bit
+A few external projects are used in chemfiles developement, and you will need a bit
 of knowledge of them to contribute. Depending on what you want to do, not all these
 projects are needed.
 
@@ -58,13 +58,13 @@ projects are needed.
 .. _breathe: http://breathe.readthedocs.org/
 .. _cmake: http://cmake.org/
 .. _CATCH: https://github.com/philsquared/Catch/
-.. _travis: https://travis-ci.org/Luthaf/Chemharp/
+.. _travis: https://travis-ci.org/chemfiles/chemfiles/
 
 
 Coding style, and other formating issues
 ----------------------------------------
 
-When writing code for Chemharp, please respect the overall coding style. This is not
+When writing code for chemfiles, please respect the overall coding style. This is not
 only a question of style, but make it easier to enter in the project if all the files
 are formatted consistently. Do not use non standard features of any programming
 language unless there is no other way to do it. In that case, please wrap the code in

@@ -3,114 +3,114 @@
 Fortran interface
 =================
 
-The Fortran interface to Chemharp is built in an object-oriented fashion, using
+The Fortran interface to chemfiles is built in an object-oriented fashion, using
 the Fortran 2003 standard. It make use of the C interface and the ``iso_c_binding``
 intrisic module to call the needed functions.
 
-All the functionalities are in the ``chemharp`` module, which should be used in
-all the programs using Chemharp. The ``iso_fortran_env`` instrisic module can also
+All the functionalities are in the ``chemfiles`` module, which should be used in
+all the programs using chemfiles. The ``iso_fortran_env`` instrisic module can also
 be usefull to set the kind of real and doubles where needed.
 
-The ``chemharp`` module is built around the 5 main types of Chemharp: ``chrp_trajectory``,
-``chrp_frame``, ``chrp_cell``, ``chrp_topology``, and ``chrp_atom``. For more
+The ``chemfiles`` module is built around the 5 main types of chemfiles: ``chfl_trajectory``,
+``chfl_frame``, ``chfl_cell``, ``chfl_topology``, and ``chfl_atom``. For more
 information about these types, please see the :ref:`overview`.
 
 Naming conventions and call conventions
 ---------------------------------------
 
-All the functions and types have the ``chrp_`` prefix. Except for the ``chrp_strerror``
-and ``chrp_last_error`` functions, all the functions take a ``status`` parameter,
+All the functions and types have the ``chfl_`` prefix. Except for the ``chfl_strerror``
+and ``chfl_last_error`` functions, all the functions take a ``status`` parameter,
 which will indicate the status of the operation. It should be 0 if everything
 was OK, and can be any other number in case of error.
 
-When creating a variable of one of the Chemharp types, the first routine to be
+When creating a variable of one of the chemfiles types, the first routine to be
 called should be an initialization routine. It can be either the ``init`` routine
 for default initialization, or another routine documented as initializing.
 
 .. code-block:: fortran
 
     implicit none
-    type(chrp_cell) :: cell
-    type(chrp_frame) :: frame
+    type(chfl_cell) :: cell
+    type(chfl_frame) :: frame
 
     call cell%init(20, 20, 20, 90, 90, 90)
     call frame%init(3)
 
 These initialization function should only be called once. In order to free the
-memory asssociated with any Chemharp variable, the ``free`` subroutine should
+memory asssociated with any chemfiles variable, the ``free`` subroutine should
 be called. After a call the the ``free`` subroutine, the ``init`` subroutine
-can be called again whithout any memory leak risk. Not initializing Chemharp
+can be called again whithout any memory leak risk. Not initializing chemfiles
 variables will lead to segmentations faults.
 
 Error and logging functions
 ---------------------------
 
-.. f:function:: chrp_strerror(status)
+.. f:function:: chfl_strerror(status)
 
     Get the error message corresponding to an error code.
 
     :argument integer status: The status code
     :return string strerror: The error message corresponding to the status code
 
-.. f:function:: chrp_last_error()
+.. f:function:: chfl_last_error()
 
     Get the last error message.
 
     :return string strerror: The error message corresponding to the status code
 
-.. f:subroutine:: chrp_loglevel(level[, status])
+.. f:subroutine:: chfl_loglevel(level[, status])
 
     Set the current log level to ``level``.
 
-    :paramter integer(kind=kind(CHRP_LOG_LEVEL)): The new logging level
+    :paramter integer(kind=kind(CHFL_LOG_LEVEL)): The new logging level
     :optional integer status [optional]: The status code
 
     The following logging level are available:
 
-    .. cpp:enum:: CHRP_LOG_LEVEL
+    .. cpp:enum:: CHFL_LOG_LEVEL
 
-        .. cpp:enumerator:: CHRP_LOG_NONE
+        .. cpp:enumerator:: CHFL_LOG_NONE
 
             Do not log anything
 
-        .. cpp:enumerator:: CHRP_LOG_ERROR
+        .. cpp:enumerator:: CHFL_LOG_ERROR
 
             Only log errors
 
-        .. cpp:enumerator:: CHRP_LOG_WARNING
+        .. cpp:enumerator:: CHFL_LOG_WARNING
 
             Log warnings and erors. This is the default.
 
-        .. cpp:enumerator:: CHRP_LOG_INFO
+        .. cpp:enumerator:: CHFL_LOG_INFO
 
            Log infos, warnings and errors
 
-        .. cpp:enumerator:: CHRP_LOG_DEBUG
+        .. cpp:enumerator:: CHFL_LOG_DEBUG
 
            Log everything
 
 
-.. f:subroutine:: chrp_logfile(file[, status])
+.. f:subroutine:: chfl_logfile(file[, status])
 
     Redirect the logs to ``file``, overwriting the file if it exists.
 
     :parameter string file: The path to the log file
     :optional integer status [optional]: The status code
 
-.. f:subroutine:: chrp_log_stderr(status)
+.. f:subroutine:: chfl_log_stderr(status)
 
     Redirect the logs to the standard error output. This is enabled by default.
 
     :optional integer status [optional]: The status code
 
-``chrp_trajectory`` type
+``chfl_trajectory`` type
 ------------------------
 
-.. f:currentmodule:: chrp_trajectory
+.. f:currentmodule:: chfl_trajectory
 
-.. f:type:: chrp_trajectory
+.. f:type:: chfl_trajectory
 
-    Wrapping around a C pointer of type ``CHRP_TRAJECTORY*``. The following
+    Wrapping around a C pointer of type ``CHFL_TRAJECTORY*``. The following
     subroutine are available:
 
     :field subroutine open:
@@ -148,7 +148,7 @@ Error and logging functions
 
     Read the next step of the trajectory into a frame
 
-    :parameter chrp_frame frame: A frame to fill with the data
+    :parameter chfl_frame frame: A frame to fill with the data
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: read_step(step, frame[, status])
@@ -156,14 +156,14 @@ Error and logging functions
     Read a specific step of the trajectory in a frame
 
     :parameter integer step: The step to read
-    :parameter chrp_frame frame: A frame to fill with the data
+    :parameter chfl_frame frame: A frame to fill with the data
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: write(frame[, status])
 
     Write a frame to the trajectory.
 
-    :parameter chrp_frame frame: the frame which will be writen to the file
+    :parameter chfl_frame frame: the frame which will be writen to the file
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: set_topology(topology[, status])
@@ -172,7 +172,7 @@ Error and logging functions
     used when reading and writing the files, replacing any topology in the
     frames or files.
 
-    :parameter chrp_topology topology: The new topology to use
+    :parameter chfl_topology topology: The new topology to use
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: set_topology_file(filename[, status])
@@ -189,7 +189,7 @@ Error and logging functions
     used when reading and writing the files, replacing any unit cell in the
     frames or files.
 
-    :parameter chrp_cell cell: The new cell to use
+    :parameter chfl_cell cell: The new cell to use
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: nsteps(nsteps[, status])
@@ -206,14 +206,14 @@ Error and logging functions
 
     :optional integer status [optional]: The status code
 
-``chrp_frame`` type
+``chfl_frame`` type
 -------------------
 
-.. f:currentmodule:: chrp_frame
+.. f:currentmodule:: chfl_frame
 
-.. f:type:: chrp_frame
+.. f:type:: chfl_frame
 
-    Wrapping around a C pointer of type ``CHRP_FRAME*``. The following
+    Wrapping around a C pointer of type ``CHFL_FRAME*``. The following
     subroutine are available:
 
     :field subroutine init:
@@ -288,14 +288,14 @@ Error and logging functions
 
     Set the UnitCell of a Frame.
 
-    :parameter chrp_cell cell: The new unit cell
+    :parameter chfl_cell cell: The new unit cell
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: set_topology(topology[, status])
 
     Set the Topology of a Frame.
 
-    :parameter chrp_topology topology: The new topology
+    :parameter chfl_topology topology: The new topology
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: step(step[, status])
@@ -327,14 +327,14 @@ Error and logging functions
 
     :optional integer status [optional]: The status code
 
-``chrp_cell`` type
+``chfl_cell`` type
 ------------------
 
-.. f:currentmodule:: chrp_cell
+.. f:currentmodule:: chfl_cell
 
-.. f:type:: chrp_cell
+.. f:type:: chfl_cell
 
-    Wrapping around a C pointer of type ``CHRP_CELL*``. The following
+    Wrapping around a C pointer of type ``CHFL_CELL*``. The following
     subroutine are available:
 
     :field subroutine init:
@@ -355,7 +355,7 @@ Error and logging functions
 
 .. f:subroutine:: init(a, b, c, alpha, beta, gamma[, status])
 
-    Create an ``chrp_cell`` from the three lenghts and the three angles.
+    Create an ``chfl_cell`` from the three lenghts and the three angles.
 
     :parameter real a: the a cell length, in angstroms
     :parameter real b: the b cell length, in angstroms
@@ -367,9 +367,9 @@ Error and logging functions
 
 .. f:subroutine:: from_frame_init_(frame[, status])
 
-    Get a copy of the ``chrp_cell`` of a frame.
+    Get a copy of the ``chfl_cell`` of a frame.
 
-    :parameter chrp_frame frame: the frame
+    :parameter chfl_frame frame: the frame
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: lengths(a, b, c[, status])
@@ -427,22 +427,22 @@ Error and logging functions
 
     Get the cell type
 
-    :parameter integer type [kind=kind(CHRP_CELL_TYPES)]: the type of the cell
+    :parameter integer type [kind=kind(CHFL_CELL_TYPES)]: the type of the cell
     :optional integer status [optional]: The status code
 
     Available cell types are:
 
-    .. cpp:enum:: CHRP_CELL_TYPES
+    .. cpp:enum:: CHFL_CELL_TYPES
 
-        .. cpp:enumerator:: CHRP_CELL_ORTHOROMBIC
+        .. cpp:enumerator:: CHFL_CELL_ORTHOROMBIC
 
             The three angles are 90°
 
-        .. cpp:enumerator:: CHRP_CELL_TRICLINIC
+        .. cpp:enumerator:: CHFL_CELL_TRICLINIC
 
             The three angles may not be 90°
 
-        .. cpp:enumerator:: CHRP_CELL_INFINITE
+        .. cpp:enumerator:: CHFL_CELL_INFINITE
 
             Cell type when there is no periodic boundary conditions
 
@@ -450,7 +450,7 @@ Error and logging functions
 
     Set the cell type
 
-    :parameter integer type [kind=kind(CHRP_CELL_TYPES)]: the new type of the cell
+    :parameter integer type [kind=kind(CHFL_CELL_TYPES)]: the new type of the cell
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: periodicity(x, y, z[, status])
@@ -477,14 +477,14 @@ Error and logging functions
 
     :optional integer status [optional]: The status code
 
-``chrp_topology`` type
+``chfl_topology`` type
 ----------------------
 
-.. f:currentmodule:: chrp_topology
+.. f:currentmodule:: chfl_topology
 
-.. f:type:: chrp_topology
+.. f:type:: chfl_topology
 
-    Wrapping around a C pointer of type ``CHRP_TOPOLOGY*``. The following
+    Wrapping around a C pointer of type ``CHFL_TOPOLOGY*``. The following
     subroutine are available:
 
     :field subroutine init:
@@ -518,7 +518,7 @@ Error and logging functions
 
     Extract the topology from a frame.
 
-    :parameter chrp_frame frame: The frame
+    :parameter chfl_frame frame: The frame
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: atoms_count(natoms[, status])
@@ -532,7 +532,7 @@ Error and logging functions
 
     Add an atom at the end of a topology.
 
-    :parameter chrp_atom atom: The atom to be added
+    :parameter chfl_atom atom: The atom to be added
     :optional integer status [optional]: The status code
 
 
@@ -601,7 +601,7 @@ Error and logging functions
     :parameter integer data [dimension(2, nbonds)]: A 2x ``nbonds`` array to be
                                             filled with the bonds in the system
     :parameter integer nbonds: The size of the array. This should equal the value
-                                given by the ``chrp_topology%bonds_count`` function
+                                given by the ``chfl_topology%bonds_count`` function
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: angles(data, nangles[, status])
@@ -611,7 +611,7 @@ Error and logging functions
     :parameter integer data [dimension(3, nangles)]: A 3x ``nangles`` array to be
                                             filled with the angles in the system
     :parameter integer nangles: The size of the array. This should equal the
-                        value give by the ``chrp_topology%angles_count`` function
+                        value give by the ``chfl_topology%angles_count`` function
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: dihedrals(data, ndihedrals[, status])
@@ -621,7 +621,7 @@ Error and logging functions
     :parameter integer data [dimension(4, ndihedrals)]: A 4x ``ndihedrals`` array
                             to be filled with the dihedral angles in the system
     :parameter integer ndihedrals: The size of the array. This should equal the
-                    value give by the ``chrp_topology%dihedrals_count`` function
+                    value give by the ``chfl_topology%dihedrals_count`` function
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: add_bond(i, j[, status])
@@ -646,14 +646,14 @@ Error and logging functions
 
     :optional integer status [optional]: The status code
 
-``chrp_atom`` type
+``chfl_atom`` type
 ------------------
 
-.. f:currentmodule:: chrp_atom
+.. f:currentmodule:: chfl_atom
 
-.. f:type:: chrp_atom
+.. f:type:: chfl_atom
 
-    Wrapping around a C pointer of type ``CHRP_ATOM*``. The following
+    Wrapping around a C pointer of type ``CHFL_ATOM*``. The following
     subroutine are available:
 
     :field subroutine init:
@@ -684,7 +684,7 @@ Error and logging functions
 
     Get a specific atom from a frame
 
-    :parameter chrp_frame frame: The frame
+    :parameter chfl_frame frame: The frame
     :parameter integer idx: The atom index in the frame
     :optional integer status [optional]: The status code
 
@@ -692,7 +692,7 @@ Error and logging functions
 
     Get a specific atom from a topology
 
-    :parameter chrp_topology topology: The topology
+    :parameter chfl_topology topology: The topology
     :parameter integer idx: The atom index in the topology
     :optional integer status [optional]: The status code
 
@@ -772,27 +772,27 @@ Error and logging functions
 
     Get the atom type
 
-    :parameter integer type [kind=kind(CHRP_ATOM_TYPES)]: the type of the atom
+    :parameter integer type [kind=kind(CHFL_ATOM_TYPES)]: the type of the atom
     :optional integer status [optional]: The status code
 
     Available atoms types are:
 
-    .. cpp:enum:: CHRP_ATOM_TYPES
+    .. cpp:enum:: CHFL_ATOM_TYPES
 
-        .. cpp:enumerator:: CHRP_ATOM_ELEMENT
+        .. cpp:enumerator:: CHFL_ATOM_ELEMENT
 
             Element from the periodic table of elements.
 
-        .. cpp:enumerator:: CHRP_ATOM_CORSE_GRAIN
+        .. cpp:enumerator:: CHFL_ATOM_CORSE_GRAIN
 
             Corse-grained atom are composed of more than one element: CH3 groups,
             amino-acids are corse-grained atoms.
 
-        .. cpp:enumerator:: CHRP_ATOM_DUMMY
+        .. cpp:enumerator:: CHFL_ATOM_DUMMY
 
             Dummy site, with no physical reality.
 
-        .. cpp:enumerator:: CHRP_ATOM_UNDEFINED
+        .. cpp:enumerator:: CHFL_ATOM_UNDEFINED
 
             Undefined atom type.
 
@@ -800,7 +800,7 @@ Error and logging functions
 
     Set the atom type
 
-    :parameter integer type [kind=kind(CHRP_ATOM_TYPES)]: the new type of the atom
+    :parameter integer type [kind=kind(CHFL_ATOM_TYPES)]: the new type of the atom
     :optional integer status [optional]: The status code
 
 .. f:subroutine:: free(status)

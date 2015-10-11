@@ -8,7 +8,7 @@ Abstract class
 
 This classe only define the interface, which as to be implemented by all formats.
 
-.. doxygenclass:: harp::Format
+.. doxygenclass:: chemfiles::Format
     :members:
 
 Implemented formats
@@ -16,15 +16,15 @@ Implemented formats
 
 These classes implement the interface defined previously.
 
-.. doxygenclass:: harp::XYZFormat
+.. doxygenclass:: chemfiles::XYZFormat
     :members:
 
-.. doxygenclass:: harp::NCFormat
+.. doxygenclass:: chemfiles::NCFormat
     :members:
 
-.. doxygenclass:: harp::Molfile
+.. doxygenclass:: chemfiles::Molfile
     :members:
 
-.. doxygenenum:: harp::MolfileFormat
+.. doxygenenum:: chemfiles::MolfileFormat
 
 .. TODO:: adding a new format

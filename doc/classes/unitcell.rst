@@ -1,7 +1,7 @@
 Unit Cell
 =========
 
-.. doxygenclass:: harp::UnitCell
+.. doxygenclass:: chemfiles::UnitCell
     :members:
 
-.. doxygenenum:: harp::UnitCell::CellType
+.. doxygenenum:: chemfiles::UnitCell::CellType

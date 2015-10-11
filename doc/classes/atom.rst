@@ -1,5 +1,5 @@
 Atoms and atomic informations
 =============================
 
-.. doxygenclass:: harp::Atom
+.. doxygenclass:: chemfiles::Atom
     :members:

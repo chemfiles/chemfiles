@@ -1,4 +1,4 @@
-# chemfiles, an efficient IO library for chemistry file formats
+# Chemfiles, an efficient IO library for chemistry file formats
 
 <div align="center">
    <a href="http://chemfiles.readthedocs.org">

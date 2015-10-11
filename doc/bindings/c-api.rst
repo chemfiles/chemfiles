@@ -3,20 +3,20 @@
 C interface
 ===========
 
-The C interface is define in the ``chemharp.h`` header, which should be included in
-all the programs using Chemharp. All the functions and enums have a ``chrp_``
+The C interface is define in the ``chemfiles.h`` header, which should be included in
+all the programs using chemfiles. All the functions and enums have a ``chfl_``
 prefix indicating the provenance of the functions. The types are defined as
 opaque pointer types, in all caps. The following types are defined:
 
-* :ref:`CHRP_TRAJECTORY <capi-trajectory>` maps to the :ref:`Trajectory <overview-trajectory>` class;
-* :ref:`CHRP_FRAME <capi-frame>` maps to the :ref:`Frame  <overview-frame>` class;
-* :ref:`CHRP_ATOM <capi-atom>` maps to the :ref:`Atom  <overview-atom>` class;
-* :ref:`CHRP_CELL <capi-cell>` maps to the :ref:`UnitCell  <overview-cell>` class;
-* :ref:`CHRP_TOPOLOGY <capi-topology>` maps to the :ref:`Topology  <overview-topology>` class.
+* :ref:`CHFL_TRAJECTORY <capi-trajectory>` maps to the :ref:`Trajectory <overview-trajectory>` class;
+* :ref:`CHFL_FRAME <capi-frame>` maps to the :ref:`Frame  <overview-frame>` class;
+* :ref:`CHFL_ATOM <capi-atom>` maps to the :ref:`Atom  <overview-atom>` class;
+* :ref:`CHFL_CELL <capi-cell>` maps to the :ref:`UnitCell  <overview-cell>` class;
+* :ref:`CHFL_TOPOLOGY <capi-topology>` maps to the :ref:`Topology  <overview-topology>` class.
 
 The user is reponsible for memory management when using these types. Constructors
 functions (functions returning pointers to types defined above) return freshly
-allocated memory, and calling the ``chrp_*_free`` functions return the corresponding
+allocated memory, and calling the ``chfl_*_free`` functions return the corresponding
 memory to the operating system.
 
 Functions for errors handling
@@ -27,183 +27,183 @@ types defined above); all the functions return a status code, which is 0 if
 nothing went wrong, and another value in case of error. The following function
 allow for error handling from the C side.
 
-.. doxygenfunction:: chrp_strerror
+.. doxygenfunction:: chfl_strerror
 
-.. doxygenfunction:: chrp_last_error
+.. doxygenfunction:: chfl_last_error
 
-.. doxygenenum:: CHRP_LOG_LEVEL
+.. doxygenenum:: CHFL_LOG_LEVEL
 
-.. doxygenfunction:: chrp_loglevel
+.. doxygenfunction:: chfl_loglevel
 
-.. doxygenfunction:: chrp_set_loglevel
+.. doxygenfunction:: chfl_set_loglevel
 
-.. doxygenfunction:: chrp_logfile
+.. doxygenfunction:: chfl_logfile
 
-.. doxygenfunction:: chrp_log_stderr
+.. doxygenfunction:: chfl_log_stderr
 
 .. _capi-trajectory:
 
-Function manipulating ``CHRP_TRAJECTORY``
+Function manipulating ``CHFL_TRAJECTORY``
 -----------------------------------------
 
-The Trajectory type is the main entry point when using Chemharp. A trajectory
-behave a bit like a ``FILE*`` pointer, and the ``chrp_close`` free the memory
+The Trajectory type is the main entry point when using chemfiles. A trajectory
+behave a bit like a ``FILE*`` pointer, and the ``chfl_close`` free the memory
 associated with the file.
 
-.. doxygenfunction:: chrp_trajectory_open
+.. doxygenfunction:: chfl_trajectory_open
 
-.. doxygenfunction:: chrp_trajectory_with_format
+.. doxygenfunction:: chfl_trajectory_with_format
 
-.. doxygenfunction:: chrp_trajectory_read
+.. doxygenfunction:: chfl_trajectory_read
 
-.. doxygenfunction:: chrp_trajectory_read_step
+.. doxygenfunction:: chfl_trajectory_read_step
 
-.. doxygenfunction:: chrp_trajectory_write
+.. doxygenfunction:: chfl_trajectory_write
 
-.. doxygenfunction:: chrp_trajectory_set_topology
+.. doxygenfunction:: chfl_trajectory_set_topology
 
-.. doxygenfunction:: chrp_trajectory_set_topology_file
+.. doxygenfunction:: chfl_trajectory_set_topology_file
 
-.. doxygenfunction:: chrp_trajectory_nsteps
+.. doxygenfunction:: chfl_trajectory_nsteps
 
-.. doxygenfunction:: chrp_trajectory_close
+.. doxygenfunction:: chfl_trajectory_close
 
 .. _capi-frame:
 
-Function manipulating ``CHRP_FRAME``
+Function manipulating ``CHFL_FRAME``
 ------------------------------------
 
-.. doxygenfunction:: chrp_frame
+.. doxygenfunction:: chfl_frame
 
-.. doxygenfunction:: chrp_frame_atoms_count
+.. doxygenfunction:: chfl_frame_atoms_count
 
-.. doxygenfunction:: chrp_frame_positions
+.. doxygenfunction:: chfl_frame_positions
 
-.. doxygenfunction:: chrp_frame_set_positions
+.. doxygenfunction:: chfl_frame_set_positions
 
-.. doxygenfunction:: chrp_frame_has_velocities
+.. doxygenfunction:: chfl_frame_has_velocities
 
-.. doxygenfunction:: chrp_frame_velocities
+.. doxygenfunction:: chfl_frame_velocities
 
-.. doxygenfunction:: chrp_frame_set_velocities
+.. doxygenfunction:: chfl_frame_set_velocities
 
-.. doxygenfunction:: chrp_frame_set_cell
+.. doxygenfunction:: chfl_frame_set_cell
 
-.. doxygenfunction:: chrp_frame_set_topology
+.. doxygenfunction:: chfl_frame_set_topology
 
-.. doxygenfunction:: chrp_frame_step
+.. doxygenfunction:: chfl_frame_step
 
-.. doxygenfunction:: chrp_frame_set_step
+.. doxygenfunction:: chfl_frame_set_step
 
-.. doxygenfunction:: chrp_frame_guess_topology
+.. doxygenfunction:: chfl_frame_guess_topology
 
-.. doxygenfunction:: chrp_frame_free
+.. doxygenfunction:: chfl_frame_free
 
 .. _capi-cell:
 
-Function manipulating ``CHRP_CELL``
+Function manipulating ``CHFL_CELL``
 -----------------------------------
 
-.. doxygenfunction:: chrp_cell
+.. doxygenfunction:: chfl_cell
 
-.. doxygenfunction:: chrp_cell_from_frame
+.. doxygenfunction:: chfl_cell_from_frame
 
-.. doxygenfunction:: chrp_cell_lengths
+.. doxygenfunction:: chfl_cell_lengths
 
-.. doxygenfunction:: chrp_cell_set_lengths
+.. doxygenfunction:: chfl_cell_set_lengths
 
-.. doxygenfunction:: chrp_cell_angles
+.. doxygenfunction:: chfl_cell_angles
 
-.. doxygenfunction:: chrp_cell_set_angles
+.. doxygenfunction:: chfl_cell_set_angles
 
-.. doxygenfunction:: chrp_cell_matrix
+.. doxygenfunction:: chfl_cell_matrix
 
-.. doxygenenum:: CHRP_CELL_TYPES
+.. doxygenenum:: CHFL_CELL_TYPES
 
-.. doxygenfunction:: chrp_cell_type
+.. doxygenfunction:: chfl_cell_type
 
-.. doxygenfunction:: chrp_cell_set_type
+.. doxygenfunction:: chfl_cell_set_type
 
-.. doxygenfunction:: chrp_cell_periodicity
+.. doxygenfunction:: chfl_cell_periodicity
 
-.. doxygenfunction:: chrp_cell_set_periodicity
+.. doxygenfunction:: chfl_cell_set_periodicity
 
-.. doxygenfunction:: chrp_cell_free
+.. doxygenfunction:: chfl_cell_free
 
 .. _capi-topology:
 
-Function manipulating ``CHRP_TOPOLOGY``
+Function manipulating ``CHFL_TOPOLOGY``
 ---------------------------------------
 
-.. doxygenfunction:: chrp_topology
+.. doxygenfunction:: chfl_topology
 
-.. doxygenfunction:: chrp_topology_from_frame
+.. doxygenfunction:: chfl_topology_from_frame
 
-.. doxygenfunction:: chrp_topology_atoms_count
+.. doxygenfunction:: chfl_topology_atoms_count
 
-.. doxygenfunction:: chrp_topology_append
+.. doxygenfunction:: chfl_topology_append
 
-.. doxygenfunction:: chrp_topology_remove
+.. doxygenfunction:: chfl_topology_remove
 
-.. doxygenfunction:: chrp_topology_isbond
+.. doxygenfunction:: chfl_topology_isbond
 
-.. doxygenfunction:: chrp_topology_isangle
+.. doxygenfunction:: chfl_topology_isangle
 
-.. doxygenfunction:: chrp_topology_isdihedral
+.. doxygenfunction:: chfl_topology_isdihedral
 
-.. doxygenfunction:: chrp_topology_bonds_count
+.. doxygenfunction:: chfl_topology_bonds_count
 
-.. doxygenfunction:: chrp_topology_angles_count
+.. doxygenfunction:: chfl_topology_angles_count
 
-.. doxygenfunction:: chrp_topology_dihedrals_count
+.. doxygenfunction:: chfl_topology_dihedrals_count
 
-.. doxygenfunction:: chrp_topology_bonds
+.. doxygenfunction:: chfl_topology_bonds
 
-.. doxygenfunction:: chrp_topology_angles
+.. doxygenfunction:: chfl_topology_angles
 
-.. doxygenfunction:: chrp_topology_dihedrals
+.. doxygenfunction:: chfl_topology_dihedrals
 
-.. doxygenfunction:: chrp_topology_add_bond
+.. doxygenfunction:: chfl_topology_add_bond
 
-.. doxygenfunction:: chrp_topology_remove_bond
+.. doxygenfunction:: chfl_topology_remove_bond
 
-.. doxygenfunction:: chrp_topology_free
+.. doxygenfunction:: chfl_topology_free
 
 .. _capi-atom:
 
-Function manipulating ``CHRP_ATOM``
+Function manipulating ``CHFL_ATOM``
 -----------------------------------
 
-.. doxygenfunction:: chrp_atom
+.. doxygenfunction:: chfl_atom
 
-.. doxygenfunction:: chrp_atom_from_frame
+.. doxygenfunction:: chfl_atom_from_frame
 
-.. doxygenfunction:: chrp_atom_from_topology
+.. doxygenfunction:: chfl_atom_from_topology
 
-.. doxygenfunction:: chrp_atom_mass
+.. doxygenfunction:: chfl_atom_mass
 
-.. doxygenfunction:: chrp_atom_set_mass
+.. doxygenfunction:: chfl_atom_set_mass
 
-.. doxygenfunction:: chrp_atom_charge
+.. doxygenfunction:: chfl_atom_charge
 
-.. doxygenfunction:: chrp_atom_set_charge
+.. doxygenfunction:: chfl_atom_set_charge
 
-.. doxygenfunction:: chrp_atom_name
+.. doxygenfunction:: chfl_atom_name
 
-.. doxygenfunction:: chrp_atom_set_name
+.. doxygenfunction:: chfl_atom_set_name
 
-.. doxygenfunction:: chrp_atom_full_name
+.. doxygenfunction:: chfl_atom_full_name
 
-.. doxygenfunction:: chrp_atom_vdw_radius
+.. doxygenfunction:: chfl_atom_vdw_radius
 
-.. doxygenfunction:: chrp_atom_covalent_radius
+.. doxygenfunction:: chfl_atom_covalent_radius
 
-.. doxygenfunction:: chrp_atom_atomic_number
+.. doxygenfunction:: chfl_atom_atomic_number
 
-.. doxygenenum:: CHRP_ATOM_TYPES
+.. doxygenenum:: CHFL_ATOM_TYPES
 
-.. doxygenfunction:: chrp_atom_type
+.. doxygenfunction:: chfl_atom_type
 
-.. doxygenfunction:: chrp_atom_set_type
+.. doxygenfunction:: chfl_atom_set_type
 
-.. doxygenfunction:: chrp_atom_free
+.. doxygenfunction:: chfl_atom_free

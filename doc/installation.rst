@@ -10,35 +10,35 @@ interfaces, and the :command:`chrp` command. To install them, you can use:
 
 .. code-block:: bash
 
-    conda install -c https://conda.binstar.org/luthaf chemharp
+    conda install -c https://conda.binstar.org/luthaf chemfiles
 
 .. _conda: http://conda.pydata.org/docs/
 
 These precompiled binaries are also used for the :ref:`julia-api`, and thus you can
-install the Julia ``Chemharp`` module just by running ``Pkg.add("Chemharp")``.
+install the Julia ``Chemfiles`` module just by running ``Pkg.add("Chemfiles")``.
 
 Building from sources
 ^^^^^^^^^^^^^^^^^^^^^
 
-If you want full control over the way the code is built, you can built Chemharp from
+If you want full control over the way the code is built, you can built chemfiles from
 sources.
 
 Core library dependencies
 -------------------------
 
-In order to build the core library, you will need a C++11 compiler, like g++>4.9,
-clang++>3.3. Chemharp is tested against GCC, Clang and Intel C++ compilers, and
+In order to build the core library, you will need a C++11 compiler, like g++>4.9 or
+clang++>3.3. Chemfiles is tested against GCC, Clang and Intel C++ compilers, and
 is ISO C++11, so it should compile with other compilers as well. Please report
 any sucessfull compilation with other compilers!
 
-Some optional functionalities of Chemharp needs aditional library. As the
+Some optional functionalities of chemfiles needs aditional library. As the
 functionalities are activated when configuring the build, these additionals libraries
 are optionals. Here is the list of these libraries:
 
 * The `NetCDF`_ library is needed to read and write the AMBER NetCDF format.
   It is available in all the package managers.
 
-Finally, Chemharp needs uses the `CMake`_ build system, which is also available
+Finally, chemfiles needs uses the `CMake`_ build system, which is also available
 in all the package managers.
 
 On UNIX-like systems (Linux, OS X, ...)
@@ -93,26 +93,26 @@ live. To get the latest developpement version, use git:
 
 .. code-block:: bash
 
-    cd where/you/whant/chemharp/to/live
-    git clone https://github.com/Luthaf/Chemharp
+    cd where/you/whant/chemfiles/to/live
+    git clone https://github.com/chemfiles/chemfiles
+    cd chemfiles
 
-If you want to run the tests or use the bindings, you will need the corresponding
-code. It is available as a git submodule that you can get directly:
-
-.. code-block:: bash
-
-    git clone --recursive https://github.com/Luthaf/Chemharp
-
-.. _release: https://github.com/Luthaf/Chemharp/releases
-
-The following command can build and install Chemharp on a standard UNIX environement.
+If you want to run the unit and regression tests, you will need the tests data files.
 
 .. code-block:: bash
 
-    cd Chemharp
+    git submodule update --init
+
+.. _release: https://github.com/Luthaf/chemfiles/releases
+
+The following command can build and install chemfiles on a standard UNIX environement.
+
+.. code-block:: bash
+
+    cd chemfiles
     mkdir build
     cd build
-    cmake .. # other options are allowed
+    cmake .. # various options are allowed
     make
     # if you whant to run the tests before installing:
     ctest
@@ -160,7 +160,7 @@ Building the bindings
 Only the C interface is always compiled with the core library. All the other
 interface needs to be activated with :command:`cmake` flags.
 
-The other languages bindings for Chemharp have supplementary requirements. The Python
+The other languages bindings for chemfiles have supplementary requirements. The Python
 interface requires Boost.Python, the Fortran interface requires a Fortran compiler, …
 Please ensure that those requirements are fullfiled before filling an issue.
 
@@ -191,10 +191,10 @@ You can also use :command:`pip` or :command:`conda` to install ``numpy`` if you
 prefer doing so.
 
 
-Then, compiling the Python interface to Chemharp can be activated by the
+Then, compiling the Python interface to chemfiles can be activated by the
 ``-DPYTHON_BINDING=ON`` option for :command:`cmake`. The usual :command:`make
 install` will then compile and install the python extention at the right place. After
-that, you should be able to ``import chemharp`` from Python prompt.
+that, you should be able to ``import chemfiles`` from Python prompt.
 
 Fortran interface
 ^^^^^^^^^^^^^^^^^

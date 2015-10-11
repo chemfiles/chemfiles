@@ -1,8 +1,8 @@
 Other libraries for reading trajectories
 ========================================
 
-If Chemharp does not provide what you are looking for, here are some other libraries
-for reading and/or writing trajectories, and the main differencies with Chemharp.
+If chemfiles does not provide what you are looking for, here are some other libraries
+for reading and/or writing trajectories, and the main differencies with chemfiles.
 
 VMD Molfile plugins
 -------------------
@@ -18,7 +18,7 @@ it from other languages than C or C++.
 Majors differencies
 ^^^^^^^^^^^^^^^^^^^
 
-* More formats than Chemharp;
+* More formats than chemfiles;
 * No automatic format regognition;
 * Does not support a variable number of atoms;
 * Not multi-language;
@@ -37,7 +37,7 @@ also provide stand-alone tools for conversions and analysis of trajectories.
 Majors differencies
 ^^^^^^^^^^^^^^^^^^^
 
-* More formats than Chemharp;
+* More formats than chemfiles;
 * Provide analysis tools, SMILES matching and database searching;
 * OpenBabel is distributed under the GNU Public Licence, which might make it harder
   to use by other softwares: the other software *must* be GPL softwares;

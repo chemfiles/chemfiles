@@ -1,5 +1,5 @@
 Frames
 ======
 
-.. doxygenclass:: harp::Frame
+.. doxygenclass:: chemfiles::Frame
     :members:

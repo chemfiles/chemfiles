@@ -1,5 +1,5 @@
 Logging capacities
 ==================
 
-.. doxygenclass:: harp::Logger
+.. doxygenclass:: chemfiles::Logger
     :members:

@@ -6,7 +6,7 @@ which means that you are free to do whatever you want with it (*i.e.* it is Publ
 Domain code)
 
 This page contains the following examples, written in all the languages
-supported by Chemharp:
+supported by chemfiles:
 
 * The ``indexes`` program read the first frame of a trajectory and fill a
   vector called ``indexes`` with the indexes of all the atom obeying the

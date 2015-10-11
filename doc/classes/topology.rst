@@ -1,5 +1,5 @@
 Topology
 ========
 
-.. doxygenclass:: harp::Topology
+.. doxygenclass:: chemfiles::Topology
     :members:

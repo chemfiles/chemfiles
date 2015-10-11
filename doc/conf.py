@@ -30,8 +30,8 @@ extensions = [
 ]
 
 # Breathe projects
-breathe_projects = {"Chemharp": os.path.join(DOC_ROOT, "doxygen", "xml")}
-breathe_default_project = "Chemharp"
+breathe_projects = {"chemfiles": os.path.join(DOC_ROOT, "doxygen", "xml")}
+breathe_default_project = "chemfiles"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = [os.path.join(DOC_ROOT, "templates")]
@@ -46,7 +46,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Chemharp'
+project = u'Chemfiles'
 copyright = u'2015, Guillaume Fraux'
 
 
@@ -142,7 +142,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = [os.path.join(DOC_ROOT, "static", "css", "chemharp.css")]
+html_static_path = [os.path.join(DOC_ROOT, "static", "css", "chemfiles.css")]
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -191,7 +191,7 @@ html_static_path = [os.path.join(DOC_ROOT, "static", "css", "chemharp.css")]
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Chemharpdoc'
+htmlhelp_basename = 'chemfiles'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -208,7 +208,7 @@ latex_elements = {
 }
 
 latex_documents = [
-    ('index', 'Chemharp.tex', u'Chemharp Documentation',
+    ('index', 'chemfiles.tex', u'Chemfiles Documentation',
      u'Guillaume Fraux', 'howto'),
 ]
 
@@ -235,13 +235,13 @@ latex_documents = [
 # -- Options for Epub output ----------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'Chemharp'
+epub_title = u'chemfiles'
 epub_author = u'Guillaume Fraux'
 epub_publisher = u'Guillaume Fraux'
 epub_copyright = u'2014, Guillaume Fraux'
 
 # The basename for the epub file. It defaults to the project name.
-# epub_basename = u'Chemharp'
+# epub_basename = u'chemfiles'
 
 # The HTML theme for the epub output. Since the default themes are not
 # optimized for small screen space, using the same theme for HTML and epub

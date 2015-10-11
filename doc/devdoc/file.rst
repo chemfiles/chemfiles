@@ -15,15 +15,15 @@ Abstract classes
 
 These classes only define the interface, which as to be implemented by all sub-classes.
 
-.. doxygenclass:: harp::File
+.. doxygenclass:: chemfiles::File
     :members:
     :protected-members:
 
-.. doxygenclass:: harp::TextFile
+.. doxygenclass:: chemfiles::TextFile
     :members:
     :protected-members:
 
-.. doxygenclass:: harp::BinaryFile
+.. doxygenclass:: chemfiles::BinaryFile
     :members:
     :protected-members:
 
@@ -32,10 +32,10 @@ Implemented classes
 
 These classes implement the interface defined previously.
 
-.. doxygenclass:: harp::BasicFile
+.. doxygenclass:: chemfiles::BasicFile
     :members:
 
-.. doxygenclass:: harp::NCFile
+.. doxygenclass:: chemfiles::NCFile
     :members:
 
 .. TODO:: adding a new file class

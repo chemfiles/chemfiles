@@ -4,9 +4,9 @@ C++ interface
 =============
 
 
-The full public C++ interface is contained in the ``Chemharp.hpp`` header, which should
-be included in all the programs using Chemharp. All the classes are in the
-``harp`` namespace, so you may want to use ``using namespace harp;`` at the
+The full public C++ interface is contained in the ``chemfiles.hpp`` header, which
+should be included in all the programs using chemfiles. All the classes are in the
+``chemfiles`` namespace, so you may want to use ``using namespace chemfiles;`` at the
 begining of your program in order to bring all the class in the main namespace.
 
 
