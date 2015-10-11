@@ -29,6 +29,8 @@ else()
     set_debug_flag_if_possible("-Wconversion")
     set_debug_flag_if_possible("-Wsign-conversion")
     set_debug_flag_if_possible("-Wsign-promo")
+    set_debug_flag_if_possible("-Wsuggest-override")
+    set_debug_flag_if_possible("-pedantic")
 endif()
 
 include(CheckCCompilerFlag)
