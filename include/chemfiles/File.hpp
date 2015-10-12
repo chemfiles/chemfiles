@@ -13,8 +13,7 @@
 
 #include <string>
 #include <vector>
-#include <ostream>
-#include <fstream>
+#include <iostream>
 
 namespace chemfiles {
 
@@ -51,7 +50,7 @@ private:
  * Abstract base class representing a text file. This class is inteded to be inherited by
  * any form of text files: compressed files, memory-mapped files, and any other.
  */
-class TextFile : public File, public std::ostream {
+class TextFile : public File, public std::iostream {
 public:
     virtual ~TextFile() = default;
 
@@ -86,7 +85,7 @@ public:
         return *this;
     }
 protected:
-    explicit TextFile(const std::string& path, const std::string& mode) : File(path, mode), std::ostream(nullptr) {}
+    explicit TextFile(const std::string& path, const std::string& mode) : File(path, mode), std::iostream(nullptr) {}
 };
 
 /*!

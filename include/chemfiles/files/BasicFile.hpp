@@ -9,6 +9,7 @@
 #ifndef CHEMFILES_BASIC_FILES_HPP
 #define CHEMFILES_BASIC_FILES_HPP
 
+#include <fstream>
 #include "chemfiles/File.hpp"
 
 namespace chemfiles {
@@ -47,7 +48,8 @@ public:
     virtual bool eof() override {return stream.eof();}
 
     virtual void sync() override {
-        TextFile::flush();
+        std::iostream::sync();
+        std::iostream::flush();
     }
 
     virtual void writeline(const std::string&) override;
