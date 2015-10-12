@@ -108,6 +108,12 @@ int chfl_trajectory_nsteps(CHFL_TRAJECTORY *file, size_t *nsteps){
     )
 }
 
+int chfl_trajectory_sync(CHFL_TRAJECTORY *file){
+    CHFL_ERROR_WRAP_RETCODE(
+        file->sync();
+    )
+}
+
 int chfl_trajectory_close(CHFL_TRAJECTORY *file){
     CHFL_ERROR_WRAP_RETCODE(
         delete file;

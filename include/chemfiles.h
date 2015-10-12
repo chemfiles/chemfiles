@@ -186,8 +186,14 @@ CHFL_EXPORT int chfl_trajectory_set_cell(CHFL_TRAJECTORY *file, const CHFL_CELL 
 CHFL_EXPORT int chfl_trajectory_nsteps(CHFL_TRAJECTORY *file, size_t *nsteps);
 
 /*!
-* @brief Close a trajectory file, flush any buffer content to the hard drive, and
-*        free the associated memory
+* @brief Synchronize any buffered content to the hard drive.
+* @param file A pointer to the file
+* @return The status code
+*/
+CHFL_EXPORT int chfl_trajectory_sync(CHFL_TRAJECTORY *file);
+
+/*!
+* @brief Close a trajectory file, and free the associated memory
 * @param file A pointer to the file
 * @return The status code
 */
