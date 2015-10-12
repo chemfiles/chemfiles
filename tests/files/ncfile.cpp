@@ -64,7 +64,7 @@ TEST_CASE("Write NetCDF files", "[Files]"){
     file.add_attribute("variable", "variable.string", "hello");
     file.add_attribute("variable", "variable.float", 35.67f);
 
-    file.close();
+    file.sync();
 
     NCFile check("tmp.nc", "r");
     CHECK(check.global_attribute("global") == "global.value");

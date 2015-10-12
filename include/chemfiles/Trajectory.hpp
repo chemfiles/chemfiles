@@ -57,8 +57,9 @@ public:
     Frame read();
     //! Read operator, in *method* version with specific step
     Frame read_step(const size_t);
-    //! Close a trajectory
-    void close();
+
+    //! Synchronize any content in the underlying buffer to the disk
+    void sync();
 
     //! Write operator, in *stream* version
     Trajectory& operator<<(const Frame& frame);

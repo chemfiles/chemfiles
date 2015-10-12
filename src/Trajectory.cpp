@@ -142,8 +142,8 @@ void Trajectory::cell(const UnitCell& new_cell){
     _cell = new_cell;
 }
 
-void Trajectory::close(){
-    _file->close();
+void Trajectory::sync() {
+    _file->sync();
 }
 
 bool Trajectory::done() const {

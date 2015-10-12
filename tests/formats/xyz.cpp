@@ -141,7 +141,7 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
     frame.positions(positions);
 
     file << frame;
-    file.close();
+    file.sync();
 
     std::ifstream checking("test-tmp.xyz");
     std::string content((std::istreambuf_iterator<char>(checking)),

@@ -55,7 +55,7 @@ TEST_CASE("Write a text file", "[Files]"){
     lines.push_back("world\n");
     file.writelines(lines);
 
-    file.close();
+    file.sync();
 
     std::ifstream verification("tmp.dat");
     REQUIRE(verification.is_open());

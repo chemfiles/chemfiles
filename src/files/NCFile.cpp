@@ -8,6 +8,8 @@
 #include "chemfiles/config.hpp"
 #if HAVE_NETCDF
 
+#include <cassert>
+
 #include "chemfiles/files/NCFile.hpp"
 #include "chemfiles/Error.hpp"
 #include "chemfiles/Logger.hpp"
@@ -98,8 +100,15 @@ bool NCFile::is_open() {
     return (not file.isNull());
 }
 
-void NCFile::close() {
-    file.close();
+void NCFile::sync() {
+    int res = nc_enddef(file.getId());
+    assert(res == NC_NOERR && "Got a bad NetCDF id.");
+    res = nc_sync(file.getId());
+    assert(res == NC_NOERR && "Got a bad NetCDF id.");
+    if (mode() == "a" || mode() == "w") {
+        res = nc_redef(file.getId());
+        assert(res == NC_NOERR && "Error in nc_redef!");
+    }
 }
 
 #endif // HAVE_NETCDF

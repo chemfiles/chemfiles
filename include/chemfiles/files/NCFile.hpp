@@ -57,7 +57,7 @@ public:
     void add_attribute(const string& var, const string& name, T value);
 
     virtual bool is_open() override;
-    virtual void close() override;
+    virtual void sync() override;
 private:
     // Underlying NetCDF file
     netCDF::NcFile file;

@@ -44,8 +44,11 @@ public:
     virtual size_t nlines() override;
 
     virtual bool is_open() override {return stream.is_open();}
-    virtual void close() override {return stream.close();}
     virtual bool eof() override {return stream.eof();}
+
+    virtual void sync() override {
+        TextFile::flush();
+    }
 
     virtual void writeline(const std::string&) override;
     virtual void writelines(const std::vector<std::string>&) override;

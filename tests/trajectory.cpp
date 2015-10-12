@@ -69,7 +69,7 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
 
         file.topology(top);
         file << frame;
-        file.close();
+        file.sync();
 
         std::ifstream checking("tmp.xyz");
         std::string content((std::istreambuf_iterator<char>(checking)),

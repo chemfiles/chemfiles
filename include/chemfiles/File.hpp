@@ -32,8 +32,8 @@ public:
 
     //! Is the file opended ?
     virtual bool is_open() = 0;
-    //! Close the file before the destructor call.
-    virtual void close() = 0;
+    //! Sync any content in the underlying buffer to the disk
+    virtual void sync() = 0;
     //! File name, i.e. complete path to this file on disk.
     const std::string& filename() const {return _filename;}
     //! File opening mode.
