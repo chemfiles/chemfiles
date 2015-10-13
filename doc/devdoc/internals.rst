@@ -1,5 +1,5 @@
 Chemfiles internals
-==================
+===================
 
 Sources organisation
 --------------------

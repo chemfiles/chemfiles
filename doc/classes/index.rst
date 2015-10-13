@@ -1,7 +1,7 @@
 .. _cpp-api:
 
-C++ interface
-=============
+C++ interface reference
+=======================
 
 
 The full public C++ interface is contained in the ``chemfiles.hpp`` header, which
@@ -10,5 +10,12 @@ should be included in all the programs using chemfiles. All the classes are in t
 begining of your program in order to bring all the class in the main namespace.
 
 
-No macro are defined, and all the classes are described in the :ref:`classes-reference`
-section, which is the main documentation reference for the C++ interface.
+.. toctree::
+   :maxdepth: 2
+
+   trajectory
+   frame
+   topology
+   atom
+   unitcell
+   logger

@@ -1,7 +1,7 @@
 .. _c-api:
 
-C interface
-===========
+C interface reference
+=====================
 
 The C interface is define in the ``chemfiles.h`` header, which should be included in
 all the programs using chemfiles. All the functions and enums have a ``chfl_``

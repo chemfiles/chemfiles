@@ -30,13 +30,13 @@ to re-use it as needed.
 User manual
 -----------
 
-Even if chemfiles is written in C++, it can be used from the most popular
-scientific programming languages: C, Fortran, Python, … You can just pick up your
-favorite language to use it. This part of the documentation presents the data
-model used by chemfiles to store information about the trajectories, and how to
-acess that data in each of the supported languages.
+Even if chemfiles is written in C++, it can be used from the most popular scientific
+programming languages: C, Fortran, Python, … You can just pick up your favorite
+language to use it. This part of the documentation presents the data model used by
+chemfiles to store information about the trajectories, and how to acess that data in
+C and C++.
 
-Basic usage looks like this in C++:
+Basic usage of chemfiles looks like this in C++:
 
 .. code-block:: cpp
 
@@ -50,7 +50,7 @@ Basic usage looks like this in C++:
         Frame frame;
 
         traj >> frame;
-        std::cout << "There is " << frame.natoms() << " atoms in the frame" << std::endl;
+        std::cout << "There are " << frame.natoms() << " atoms in the frame" << std::endl;
         auto positions = frame.positions();
 
         // Do awesome science here with the positions
@@ -63,8 +63,8 @@ Basic usage looks like this in C++:
         }
     }
 
-
-The interfaces for the other supported languages are described in the links below.
+In the following parts, the documentation will cover how to install chemfiles, and
+how the data are organised.
 
 .. toctree::
     :maxdepth: 2
@@ -73,28 +73,21 @@ The interfaces for the other supported languages are described in the links belo
     overview
     example
     formats
-    bindings/cpp-api
-    bindings/python-api
-    bindings/c-api
-    bindings/fortran-api
-    bindings/julia-api
-    bindings/rust-api
     others
 
 .. _classes-reference:
 
-Class reference
----------------
+Classes and functions reference
+-------------------------------
+
+All the public classes (for the C++ interface) and functions (for the C interface)
+are extensively documented here.
 
 .. toctree::
    :maxdepth: 2
 
-   classes/trajectory
-   classes/frame
-   classes/topology
-   classes/atom
-   classes/unitcell
-   classes/logger
+   classes/index
+   c-api
 
 Developer documentation
 -----------------------

@@ -14,9 +14,6 @@ interfaces, and the :command:`chrp` command. To install them, you can use:
 
 .. _conda: http://conda.pydata.org/docs/
 
-These precompiled binaries are also used for the :ref:`julia-api`, and thus you can
-install the Julia ``Chemfiles`` module just by running ``Pkg.add("Chemfiles")``.
-
 Building from sources
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -66,10 +63,10 @@ All these dependencies can be installed in one command:
 On Windows
 """"""""""
 
-You can use either MSVC 2015-rc compiler, or `mingw-w64`_ provided gcc. `MSYS2`_ offer
-a package manager to install all the needed libraries. I recomend using it if you
-have no preference over your compiler. After the initial installation steps, you can
-run the following to install most of the dependencies :
+You can use either MSVC 2015 compiler, or `mingw-w64`_ provided gcc. `MSYS2`_ offer a
+package manager to install all the needed libraries. I recomend using it if you have
+no preference over your compiler. After the initial installation steps, you can run
+the following to install a recent C++ compiler:
 
 .. code-block:: bash
 
@@ -88,8 +85,8 @@ Build steps
 -----------
 
 You can get the source code from either git, or from the `release`_ page of Github.
-In the later case, just unpack the archive wherever you want the source code to
-live. To get the latest developpement version, use git:
+In the later case, just unpack the archive wherever you want the source code to live.
+To get the latest developpement version, use git:
 
 .. code-block:: bash
 
@@ -97,7 +94,8 @@ live. To get the latest developpement version, use git:
     git clone https://github.com/chemfiles/chemfiles
     cd chemfiles
 
-If you want to run the unit and regression tests, you will need the tests data files.
+If you want to run the unit and regression tests, you will need the tests data files,
+which are provided as submodules.
 
 .. code-block:: bash
 
@@ -105,14 +103,14 @@ If you want to run the unit and regression tests, you will need the tests data f
 
 .. _release: https://github.com/Luthaf/chemfiles/releases
 
-The following command can build and install chemfiles on a standard UNIX environement.
+The following command can build and install chemfiles on a standard POSIX environement.
 
 .. code-block:: bash
 
     cd chemfiles
     mkdir build
     cd build
-    cmake .. # various options are allowed
+    cmake .. # various options are allowed here
     make
     # if you whant to run the tests before installing:
     ctest
@@ -153,57 +151,3 @@ For instance, to install to :file:`$HOME/local`, use:
 
 .. _doxygen: http://doxygen.org/
 .. _sphinx: http://sphinx-doc.org/
-
-Building the bindings
----------------------
-
-Only the C interface is always compiled with the core library. All the other
-interface needs to be activated with :command:`cmake` flags.
-
-The other languages bindings for chemfiles have supplementary requirements. The Python
-interface requires Boost.Python, the Fortran interface requires a Fortran compiler, …
-Please ensure that those requirements are fullfiled before filling an issue.
-
-Python interface
-^^^^^^^^^^^^^^^^
-
-The Python interface expose data to Python, and make uses of Numpy arrays. It needs
-the following libraries to be installed:
-
-* The CPython developement module, usullay called ``python-dev`` or ``python-devel``;
-* The Numpy library, with developement headers.
-
-All these library can be installed in few lines too:
-
-.. code-block:: bash
-
-    # On apt-get based distributions
-    apt-get install python-numpy python-dev
-
-    # On yum based distributions
-    yum install numpy python-devel
-
-    # On OS X with Homebrew
-    brew tap homebrew/python
-    brew install numpy
-
-You can also use :command:`pip` or :command:`conda` to install ``numpy`` if you
-prefer doing so.
-
-
-Then, compiling the Python interface to chemfiles can be activated by the
-``-DPYTHON_BINDING=ON`` option for :command:`cmake`. The usual :command:`make
-install` will then compile and install the python extention at the right place. After
-that, you should be able to ``import chemfiles`` from Python prompt.
-
-Fortran interface
-^^^^^^^^^^^^^^^^^
-
-The Fortran interface needs a Fortran 95 capable compiler, with support for the
-``iso_c_binding`` module from Fortran 2003. The vast majority of Fortran 95
-compiler does support at least this module from Fortran 2003. In particular,
-``gfortran`` version 4.6 and upper and Intel Fortran version 10.0 and upper should
-work.
-
-Then, the Fortran interface is activated with the ``-DFORTRAN_BINDING=ON``
-option at :command:`cmake` comand line.
