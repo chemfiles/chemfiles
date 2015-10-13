@@ -43,6 +43,18 @@ output format, your analysis tools will still work the same way. Chemfiles is
 efficient because it allow you to write and debug your code only once, and then
 to re-use it as needed.
 
+## Quick links
+
+- [Goals of chemfiles](#goals)
+- [Features](#features)
+- [Supported file formats](#supported-formats)
+- [Getting started](#getting-started)
+- [Full documentation](http://chemfiles.readthedocs.org/en/latest/)
+- [Python interface](https://github.com/chemfiles/chemfiles.py)
+- [Fortran interface](https://github.com/chemfiles/chemfiles.f03)
+- [Julia interface](https://github.com/chemfiles/Chemharp.jl)
+- [Rust interface](https://github.com/chemfiles/chemfiles.rs)
+
 ## Goals
 
 The chemfiles library tries to:
@@ -108,6 +120,14 @@ example of well-formed files.
 
 The whole installation is documented [here](http://chemfiles.readthedocs.org/en/latest/installation.html), this page only
 show the basic steps. Please refer to the link below in case of problem.
+
+If you want to use chemfiles from one of the available bindings, please refer to the
+corresponding repository:
+
+- [Python interface](https://github.com/chemfiles/chemfiles.py)
+- [Fortran interface](https://github.com/chemfiles/chemfiles.f03)
+- [Julia interface](https://github.com/chemfiles/Chemharp.jl)
+- [Rust interface](https://github.com/chemfiles/chemfiles.rs)
 
 ### Getting the dependencies
 
