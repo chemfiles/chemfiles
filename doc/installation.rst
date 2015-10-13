@@ -133,6 +133,9 @@ most important options:
 | ``-DCMAKE_BUILD_TYPE=type``        | ``release``         | Set to ``debug`` for debug   |
 |                                    |                     | informations                 |
 +------------------------------------+---------------------+------------------------------+
+| ``-DBUILD_SHARED_LIBS=ON|OFF``     | ``OFF``             | Build shared library instead |
+|                                    |                     | of static one.               |
++------------------------------------+---------------------+------------------------------+
 | ``-DBUILD_DOCUMENTATION=ON|OFF``   | ``OFF``             | Build the documentation.     |
 |                                    |                     | This needs `sphinx`_ and     |
 |                                    |                     | `doxygen`_ to be installed   |
