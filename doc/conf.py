@@ -21,12 +21,8 @@ if read_the_docs_build:
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.mathjax',
     'sphinx.ext.todo',
-    'sphinx.ext.autodoc',
     'breathe',
-    'fortran_domain',
-    'julia'
 ]
 
 # Breathe projects
