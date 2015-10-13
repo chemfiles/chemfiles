@@ -47,7 +47,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Chemfiles'
-copyright = u'2015, Guillaume Fraux'
+copyright = u'2015, Guillaume Fraux — MPLv2 licence'
 
 
 def version():
