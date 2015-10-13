@@ -5,7 +5,7 @@ if(${ENABLE_NETCDF})
     ExternalProject_add(netcdfcxx
         PREFIX netcdfcxx
         URL file://${CMAKE_CURRENT_SOURCE_DIR}/netcdfcxx.tar.gz
-        URL_MD5 a50ba13ff6593c3c9293fd205addf288
+        URL_MD5 445dda3fa385b1454446ed584a3ec73f
         CMAKE_ARGS  -DBUILD_SHARED_LIBS=OFF
                     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
                     -DBUILD_TESTING=OFF
@@ -34,7 +34,7 @@ endif()
 ExternalProject_Add(molfiles
     PREFIX molfiles
     URL file://${CMAKE_CURRENT_SOURCE_DIR}/molfiles.tar.gz
-    URL_HASH SHA1=266b3e1b95ca422428f6a723aab1fcab0ca7b04d
+    URL_MD5 b7fc2e98e60931b6ced51355971fbc74
     CMAKE_ARGS  -DCMAKE_BUILD_TYPE=release
                 # Setting compilers
                 -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
