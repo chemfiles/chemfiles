@@ -37,12 +37,10 @@ before_install:
   # Install Linux stuff
   - |
     if test "${TRAVIS_OS_NAME}" == "linux"; then
-        if [ ${C_COMPILER} == "gcc" ]
-        then
+        if test "${C_COMPILER}" == "gcc"; then
             export CC=gcc-4.9
             export CXX=g++-4.9
-        elif [ ${C_COMPILER} == "clang" ]
-        then
+        elif test "${C_COMPILER}" == "clang"; then
             export CC=clang-3.6
             export CXX=clang++-3.6
         fi
@@ -54,12 +52,10 @@ before_install:
         brew update
         brew rm gcc
         brew install gcc netcdf
-        if [ ${C_COMPILER} == "gcc" ]
-        then
+        if test "${C_COMPILER}" == "gcc"; then
             export CC=gcc-5
             export CXX=g++-5
-        elif [ ${C_COMPILER} == "clang" ]
-        then
+        elif test "${C_COMPILER}" == "clang"; then
             export CC=clang
             export CXX=clang++
         fi
@@ -69,17 +65,7 @@ install:
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir -p build
   - cd build
-<<<<<<< HEAD
-  - $CMAKE $CMAKE_ARGS ..
-=======
   - cmake $CMAKE_ARGS ..
-  # Cleanup of the coverage data
-  - |
-    if [ ${DO_COVERAGE} == 1 ]
-    then
-        ${LCOV} --directory $(pwd) --zerocounters
-    fi
->>>>>>> Use Cmake 2.8.11 in Travis
 
 script:
   - cd ${TRAVIS_BUILD_DIR}/build
