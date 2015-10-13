@@ -7,14 +7,11 @@ Sources organisation
 You may find the following directory in the chemfiles sources :
 
 - ``bin``: the sources of the binary frontend to chemfiles;
-- ``bindings``: the sources of the bindings, with one directory by language: C, Fortran,
-  Python, Julia.
 - ``cmake``: some CMake modules used for build configuration;
 - ``doc``: this documentation;
-- ``examples``: usage examples, with one folder by supported language;
+- ``examples``: usage examples;
 - ``include``: the headers of chemfiles;
-- ``scripts``: some python scripts used for developpement. The most important is the
-  Fortran binding generator;
+- ``scripts``: some python scripts used for developpement.
 - ``src``: the sources of the library;
 - ``tests``: the sources of the unit tests;
 
@@ -34,7 +31,7 @@ For more informations, read the following:
    file
    format
 
-All the File <-> Format associations are managed by the TrajectoryFactory class.
+All the File to Format associations are managed by the TrajectoryFactory class.
 
 .. doxygenclass:: chemfiles::TrajectoryFactory
     :members:
