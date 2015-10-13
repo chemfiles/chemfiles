@@ -29,7 +29,7 @@ theoretical chemistry program, and contains informations about atomic or residue
 names and positions. Some format also have additional informations, such as
 velocities, forces, energy, …
 
-The main targeted audience of chemfiles (*libchemfiles*) is chemistry researcher
+The main targeted audience of chemfiles (`libchemfiles`) is chemistry researcher
 working on their own code to do some kind of awesome science, without wanting to
 bother about handling all the format that may exist in the world.
 
@@ -45,24 +45,36 @@ to re-use it as needed.
 
 ## Goals
 
-The Chemfiles library tries to:
+The chemfiles library tries to:
 
  - Be easy and simple to use. There are only five main classes, which are really
    easy to understand. No messy templates and uninformative functions names;
  - Be a multi-languages library, usable from whatever language you prefer. If your
    favorite language is not supported, chemfiles have a clean C interface so that you
    can add a binding;
- - Do one thing, and do it well. Following the UNIX idea, chemfiles tries to do
-   only one thing, but doing it well.
+ - Following the UNIX moto, do one thing, and do it well.
+ - Be cross-platform, and usable from Linux, OS X and Windows;
+ - Have high-quality code, using modern software building technics (unit testing, code
+   coverage, git for code versioning, ...).
+
+ Chemfiles also have non goals, or explicitly refused goals:
+
+ - It will not contains any code for analysis. You can find implementation of some
+   analysis algorithms and a ready-to-use command line program in the
+   [chrp](https://github.com/chemfiles/chrp) repository.
+ - It will not contain molecular dynamics, Monte-Carlo, energy minimization or quantum
+   chemistry code. If you want such code with access to the chemfiles features, please see
+   the [cymbalum](https://github.com/Luthaf/cymbalum) molecular simulation engine, by the
+   same author.
 
 ## Features
 
  - Automatic recognition of file type based on filename extension;
- - Open-source under the Mozilla Public License;
- - Cross platform: it runs on Windows, Linux, Mac OS X, and maybe others systems;
  - Support for a number of atoms which is not constant;
+ - Set custom `UnitCell` or `Topology` when reading/writing;
  - Bindings to the most used scientific languages:  Python, C, Fortran 95;
  - Work with binary formats, if the corresponding libraries are available.
+ - Open-source and freely available under the Mozilla Public License;
 
 ## File formats
 
