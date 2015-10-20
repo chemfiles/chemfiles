@@ -13,6 +13,8 @@
       - [Rust](https://github.com/Luthaf/Chemharp.rs)
 * Various bugfixes and code improvements
 * Renamed the library to chemfiles.
+* Add a chemfiles::Trajectory::sync method to sync any buffered operation with the disk.
+  The chfl_trajectory_sync function exposes it to the C API.
 
 # 0.3
 
