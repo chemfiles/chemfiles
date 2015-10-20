@@ -6,11 +6,11 @@ Pre-compiled binaries
 
 A few precompiled binary of the latest release are provided through the `conda`_
 cross-plateform package manager. These binary provide the C++, C and Python
-interfaces, and the :command:`chrp` command. To install them, you can use:
+interfaces. To install them, you can use:
 
 .. code-block:: bash
 
-    conda install -c https://conda.binstar.org/luthaf chemfiles
+    conda install -c https://conda.anaconda.org/luthaf chemfiles
 
 .. _conda: http://conda.pydata.org/docs/
 
