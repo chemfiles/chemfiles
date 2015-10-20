@@ -23,13 +23,13 @@ specify which format to use.
 +-------------------+------------+-------------------+---------+---------+
 | `PDB`_            | .pdb       | |yes|             | |yes|   | |no|    |
 +-------------------+------------+-------------------+---------+---------+
-| `Gromacs .gro`_   | .gro       | |yes| Atom names  | |yes|   | |no|    |
+| `GRO`_            | .gro       | |yes| Atom names  | |yes|   | |no|    |
 +-------------------+------------+-------------------+---------+---------+
-| `Gromacs .xtc`_   | .xtc       | |no|              | |yes|   | |no|    |
+| `XTC`_            | .xtc       | |no|              | |yes|   | |no|    |
 +-------------------+------------+-------------------+---------+---------+
-| `Gromacs .trj`_   | .trj       | |no|              | |yes|   | |no|    |
+| `TRJ`_            | .trj       | |no|              | |yes|   | |no|    |
 +-------------------+------------+-------------------+---------+---------+
-| `Gromacs .trr`_   | .trr       | |no|              | |yes|   | |no|    |
+| `TRR`_            | .trr       | |no|              | |yes|   | |no|    |
 +-------------------+------------+-------------------+---------+---------+
 | `DCD`_            | .dcd       | |no|              | |yes|   | |no|    |
 +-------------------+------------+-------------------+---------+---------+
@@ -37,10 +37,10 @@ specify which format to use.
 .. _XYZ: http://openbabel.org/wiki/XYZ
 .. _Amber NetCDF: http://ambermd.org/netcdf/nctraj.xhtml
 .. _PDB: http://www.rcsb.org/pdb/static.do?p=file_formats/pdb/index.html
-.. _Gromacs .gro: http://manual.gromacs.org/current/online/gro.html
-.. _Gromacs .xtc: http://manual.gromacs.org/current/online/xtc.html
-.. _Gromacs .trj: http://manual.gromacs.org/current/online/trj.html
-.. _Gromacs .trr: http://manual.gromacs.org/current/online/trr.html
+.. _GRO: http://manual.gromacs.org/current/online/gro.html
+.. _XTC: http://manual.gromacs.org/current/online/xtc.html
+.. _TRJ: http://manual.gromacs.org/current/online/trj.html
+.. _TRR: http://manual.gromacs.org/current/online/trr.html
 .. _DCD: http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/dcdplugin.html
 
 .. |yes| image:: static/img/yes.png

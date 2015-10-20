@@ -29,7 +29,7 @@ static std::map<MolfileFormat, plugin_data_t> molfile_plugins {
     {GRO, {"GRO", "gromacsplugin.so", "gro", ".gro", false}},
     {TRR, {"TRR", "gromacsplugin.so", "trr", ".trr", true}},
     {XTC, {"XTC", "gromacsplugin.so", "xtc", ".xtc", false}},
-    {TRJ, {"Gromacs trj", "gromacsplugin.so", "trj", ".trj", true}},
+    {TRJ, {"TRJ", "gromacsplugin.so", "trj", ".trj", true}},
 };
 
 struct plugin_reginfo_t {
@@ -63,8 +63,6 @@ static std::string libpath(const std::string& lib_name){
 }
 
 /******************************************************************************/
-
-#include <iostream>
 
 template <MolfileFormat F> Molfile<F>::Molfile(File& file) : Format(file),
 _plugin(nullptr), _fini_fun(nullptr), _file_handler(nullptr),
