@@ -1,4 +1,4 @@
-version: 0.2-{build}
+version: "{build}"
 
 os:
   - Visual Studio 2015
@@ -27,7 +27,7 @@ build_script:
   - mkdir build
   - cd build
   - cmake -DBUILD_TESTS=ON ..
-  - cmake --build . --config release
+  - cmake --build . --config debug --target ALL_BUILD
 
 test_script:
-  - ctest --build-config release --output-on-failure --verbose
+  - ctest --build-config debug --output-on-failure -E dcd-molfile
