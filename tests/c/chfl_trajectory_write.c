@@ -10,28 +10,33 @@
 #include <stdio.h>
 
 // Read a whole file at once
-static char* read_whole_file(const char* name);
+static const char* read_whole_file(const char* name);
 
-const char* expected_content = "4\n"
-                               "Written by the chemfiles library\n"
-                               "He 1 2 3\n"
-                               "He 1 2 3\n"
-                               "He 1 2 3\n"
-                               "He 1 2 3\n"
-                               "6\n"
-                               "Written by the chemfiles library\n"
-                               "He 4 5 6\n"
-                               "He 4 5 6\n"
-                               "He 4 5 6\n"
-                               "He 4 5 6\n"
-                               "He 4 5 6\n"
-                               "He 4 5 6\n";
+#if (defined(WIN32) || defined(WIN64))
+#define EOL "\r\n"
+#else
+#define EOL "\n"
+#endif
+const char* expected_content = "4" EOL
+                               "Written by the chemfiles library" EOL
+                               "He 1 2 3" EOL
+                               "He 1 2 3" EOL
+                               "He 1 2 3" EOL
+                               "He 1 2 3" EOL
+                               "6" EOL
+                               "Written by the chemfiles library" EOL
+                               "He 4 5 6" EOL
+                               "He 4 5 6" EOL
+                               "He 4 5 6" EOL
+                               "He 4 5 6" EOL
+                               "He 4 5 6" EOL
+                               "He 4 5 6" EOL;
 
 int main(){
     float pos[4][3];
     for (unsigned i=0; i<4; i++)
         for (unsigned j=0; j<3; j++)
-            pos[i][j] = j + 1;
+            pos[i][j] = j + 1.0f;
 
     CHFL_TOPOLOGY* top = chfl_topology();
     CHFL_ATOM* atom = chfl_atom("He");
@@ -48,7 +53,7 @@ int main(){
     float pos_2[6][3];
     for (unsigned i=0; i<6; i++)
         for (unsigned j=0; j<3; j++)
-            pos_2[i][j] = j + 4;
+            pos_2[i][j] = j + 4.0f;
 
     assert(!chfl_topology_append(top, atom));
     assert(!chfl_topology_append(top, atom));
@@ -62,7 +67,7 @@ int main(){
     assert(!chfl_trajectory_write(file, frame));
     assert(!chfl_trajectory_sync(file));
 
-    char* content = read_whole_file("test-tmp.xyz");
+    const char* content = read_whole_file("test-tmp.xyz");
     assert(strcmp(content, expected_content) == 0);
     free(content);
 
@@ -74,7 +79,7 @@ int main(){
 }
 
 
-static char* read_whole_file(const char* name) {
+static const char* read_whole_file(const char* name) {
     char *buffer = NULL;
     FILE *file = fopen(name, "rb");
 
