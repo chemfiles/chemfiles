@@ -70,6 +70,7 @@ install:
 script:
   - cd ${TRAVIS_BUILD_DIR}/build
   - make
+  - ls tests
   - ctest --output-on-failure
 
 after_success:
