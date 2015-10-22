@@ -33,15 +33,12 @@ The main targeted audience of chemfiles (`libchemfiles`) is chemistry researcher
 working on their own code to do some kind of awesome science, without wanting to
 bother about handling all the format that may exist in the world.
 
-Running simulation (either Quantum Dynamic, Monte Carlo, Molecular Dynamic, or
-any other method) often produce enormous amounts of data, which had to be
-post-processed in order to extract informations. This post-processing step involve
-reading and parsing the data, and computing physical values with the help of
-statistical thermodynamic. Chemfiles tries to help you on the first point, by providing
-the same interface to all the trajectory formats. If you ever need to change your
-output format, your analysis tools will still work the same way. Chemfiles is
-efficient because it allow you to write and debug your code only once, and then
-to re-use it as needed.
+Running molecular or quantum simulations produce enormous amounts of data, which had to be
+post-processed in order to extract physical informations about the system. This
+post-processing step involve reading and parsing the data, and computing physical values
+with various algorithms. Chemfiles helps YOU on the first part of this, by providing the
+same interface to all the trajectory formats. If you need to change the output format,
+your analysis tools will still work the same way.
 
 ## Quick links
 
@@ -60,7 +57,7 @@ to re-use it as needed.
 The chemfiles library tries to:
 
  - Be easy and simple to use. There are only five main classes, which are really
-   easy to understand. No messy templates and uninformative functions names;
+   easy to understand. The interface is coherent and easy to understand.
  - Be a multi-languages library, usable from whatever language you prefer. If your
    favorite language is not supported, chemfiles have a clean C interface so that you
    can add a binding;
@@ -69,7 +66,20 @@ The chemfiles library tries to:
  - Have high-quality code, using modern software building technics (unit testing, code
    coverage, git for code versioning, ...).
 
- Chemfiles also have non goals, or explicitly refused goals:
+### Why you should use chemfiles
+
+You should use chemfiles if (at least) one of theses assertions is true for you:
+
+- you want to write analysis algorithm, but not have to worry about reading the data;
+- you want to use binary formats, because they are faster or you have to;
+- you want to write some analyse code that will work with any format, leaving you free
+  to change the simulation software as you need but keeping any code working the same;
+- you want to write a simulation software, and provide rich input-output interface to your
+  users;
+
+### Non-goals of chemfiles
+
+Chemfiles also have non goals, or explicitly refused goals:
 
  - It will not contains any code for analysis. You can find implementation of some
    analysis algorithms and a ready-to-use command line program in the
