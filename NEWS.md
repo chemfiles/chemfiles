@@ -1,20 +1,21 @@
 # 0.4
 
+* Chemharp can now be compiled as a static library! This should allow for easier embedding
+  in external code, and easier distribution of binaries.
+* Add a chemfiles::Trajectory::sync method to sync any buffered operation with the disk.
+  The chfl_trajectory_sync function exposes it to the C API.
 * Add a Rust binding
 * Rewrite the Python binding to use ctypes. The same code can be used with Python 2 & 3,
   and with all numpy versions.
 * Easier Python and Julia binding installation, using conda binary packaging.
-* Chemharp can now be compiled as a static library! This should allow for easier embedding
-  in external code, and easier distribution of binaries.
-* All the bindings now live on there own repository:
+* All the bindings now live on their own repository:
       - [Fortran](https://github.com/Luthaf/Chemharp.f03)
       - [Python](https://github.com/Luthaf/Chemharp.py)
       - [Julia](https://github.com/Luthaf/Chemharp.jl)
       - [Rust](https://github.com/Luthaf/Chemharp.rs)
+* The library is now continuously tested on Visual Studio
 * Various bugfixes and code improvements
 * Renamed the library to chemfiles.
-* Add a chemfiles::Trajectory::sync method to sync any buffered operation with the disk.
-  The chfl_trajectory_sync function exposes it to the C API.
 
 # 0.3
 
