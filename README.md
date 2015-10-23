@@ -9,9 +9,9 @@
       <img alt="Build Status"
       src="https://img.shields.io/travis/chemfiles/chemfiles/master.svg" />
    </a>
-    <a href="https://ci.appveyor.com/project/Luthaf/chemharp/branch/master">
+    <a href="https://ci.appveyor.com/project/Luthaf/chemfiles/branch/master">
        <img alt="Build Status -- Windows"
-       src="https://ci.appveyor.com/api/projects/status/v3sixf2si6507xg7/branch/master?svg=true" />
+       src="https://ci.appveyor.com/api/projects/status/dvn6nr3lsssd23lo/branch/master?svg=true" />
     </a>
    <a href="http://codecov.io/github/chemfiles/chemfiles?branch=master">
     <img alt="Code Coverage"
