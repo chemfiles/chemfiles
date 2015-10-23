@@ -259,12 +259,13 @@ Chemfiles have been tested on the following platforms, with the following compil
 
  - Linux (64 bit)
     * GCC: gcc/g++ 4.9.2
+    * Intel: icc/icpc 14
  - OS X (64 bit)
     * GCC: gcc/g++ 4.9.2
     * LLVM: clang/clang++ 3.5
     * Intel: icc/icpc 14
- - Windows (32 bit) (only the C++ and C interfaces have been tested)
-    * MSVC 2015rc (MSVC 2013 DO NOT work)
+ - Windows (32 & 64 bit) (only the C++ and C interfaces have been tested)
+    * Visual Studio 2015 (Visual Studio 2013 DO NOT work)
     * mingw64 gcc/g++ 4.9.2
 
 If you manage to compile chemfiles on any other OS/compiler/architecture combination,
