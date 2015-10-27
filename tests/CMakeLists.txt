@@ -37,7 +37,7 @@ endforeach(test_file)
 # Because the files may not be installed yet, we use the environment variable
 foreach(_test_ pdb-molfile dcd-molfile gro-molfile xtc-molfile trr-molfile)
     set_tests_properties(${_test_}
-    PROPERTIES ENVIRONMENT "MOLFILES_DIRECTORY=${PROJECT_BINARY_DIR}/lib/")
+    PROPERTIES ENVIRONMENT "CHEMFILES_PLUGINS=${PROJECT_BINARY_DIR}/lib/")
 endforeach()
 
 function(chfl_c_test _file_)

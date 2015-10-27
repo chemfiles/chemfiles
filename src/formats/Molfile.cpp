@@ -53,12 +53,29 @@ static int register_plugin(void *v, vmdplugin_t *p) {
     return VMDPLUGIN_SUCCESS;
 }
 
-static std::string libpath(const std::string& lib_name){
-    // First look for the MOLFILES_DIRECTORY environement variable
-    if(const char* molfile_dir = std::getenv("MOLFILES_DIRECTORY")) {
-        return molfile_dir + lib_name;
-    } else { // Use the compile-time macro MOLFILES_DIRECTORY
-        return INSTALL_MOLFILE_DIR + lib_name;
+//! Check if a path exists on the filesystem
+static inline bool exists(const std::string& path) {
+    return std::ifstream(path).good();
+}
+
+
+//! Get the path to the molfile plugin `name`
+static std::string plugin_path(const std::string& name){
+    std::string path = "";
+    // First look for the CHEMFILES_PLUGINS environement variable
+    if(const char* plugin_dir = std::getenv("CHEMFILES_PLUGINS")) {
+        path = plugin_dir + std::string("/") + name;
+    } else { // Use the compile-time macro INSTALL_MOLFILE_DIR
+        path = INSTALL_MOLFILE_DIR + std::string("/") + name;
+    }
+
+    if (exists(path)) {
+        return path;
+    } else {
+        throw PluginError(
+            "Could not find the '" + name + "' shared library. Try setting "\
+            "the CHEMFILES_PLUGINS environement variable."
+        );
     }
 }
 
@@ -68,7 +85,7 @@ template <MolfileFormat F> Molfile<F>::Molfile(File& file) : Format(file),
 _plugin(nullptr), _fini_fun(nullptr), _file_handler(nullptr),
 _natoms(0), _use_topology(false) {
     // Open the _library
-    _lib = Dynlib(libpath(molfile_plugins[F].path));
+    _lib = Dynlib(plugin_path(molfile_plugins[F].path));
 
     // Get the pointer to the initialization function
     auto init_fun = _lib.symbol<init_function_t>("vmdplugin_init");
