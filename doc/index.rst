@@ -63,6 +63,21 @@ Basic usage of chemfiles looks like this in C++:
         }
     }
 
+The documentation for the other languages interfaces to chemfiles are accessibles at the
+following places:
+
+* `Python interface`_, usable with Python 2 and 3;
+* `Fortran interface`_, for Fortran 2003;
+* `Julia interface`_, for `Julia`_ 0.4+;
+* `Rust interface`_, for the `Rust`_ language;
+
+.. _Python interface: http://chemfiles.readthedocs.org/projects/python/en/latest/
+.. _Fortran interface: http://chemfiles.readthedocs.org/projects/fortran/en/latest/
+.. _Julia interface: http://chemfiles.readthedocs.org/projects/julia/en/latest/
+.. _Rust interface: http://chemfiles.github.io/chemfiles.rs/chemfiles/index.html
+.. _Julia: http://julialang.org/
+.. _Rust: http://rust-lang.org/
+
 In the following parts, the documentation will cover how to install chemfiles, and
 how the data are organised.
 
