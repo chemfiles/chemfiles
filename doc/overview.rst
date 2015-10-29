@@ -1,7 +1,7 @@
 .. _overview:
 
 Chemfiles features overview
-==========================
+===========================
 
 This figure represent how the basic types of chemfiles are arganised and how they
 interact together. The only types a chemfiles user should worry about are the
