@@ -12,7 +12,7 @@ clone_depth: 10
 clone_folder: c:\Chemharp
 
 build:
-  verbosity: minimal
+  verbosity: quiet
 
 notifications:
   - provider: Email
