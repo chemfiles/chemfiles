@@ -25,7 +25,7 @@ namespace chemfiles {
  */
 class CHFL_EXPORT Frame {
 public:
-    //! Default constructor, reserving space for 100 atoms
+    //! Default constructor
     Frame();
     //! Constructor reserving some space for \c natoms
     explicit Frame(size_t natoms);
