@@ -57,11 +57,9 @@ size_t Frame::natoms() const {
 }
 
 void Frame::resize(size_t size, bool reserve_velocities){
-    _positions.resize(size);
-    _positions.assign(size, Vector3D(0, 0, 0));
+    _positions.resize(size, 0.0);
     if (reserve_velocities) {
-        _velocities.resize(size);
-        _velocities.assign(size, Vector3D(0, 0, 0));
+        _velocities.resize(size, 0.0);
     }
 }
 

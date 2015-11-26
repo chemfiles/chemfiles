@@ -12,7 +12,7 @@
 #ifndef CHEMFILES_FORMAT_NC_HPP
 #define CHEMFILES_FORMAT_NC_HPP
 
-#include "chemfiles/Vector3D.hpp"
+#include "chemfiles/Array3D.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/register_formats.hpp"
 

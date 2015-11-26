@@ -32,10 +32,10 @@ TEST_CASE("Frame class usage", "[Frame]"){
         frame.resize(15, true);
         CHECK(frame.has_velocities());
 
-        frame.positions()[0] = Vector3D(1, 2, 3);
-        CHECK(frame.positions()[0] == Vector3D(1, 2, 3));
-        frame.velocities()[0] = Vector3D(5, 6, 7);
-        CHECK(frame.velocities()[0] == Vector3D(5, 6, 7));
+        frame.positions()[0] = vector3d(1, 2, 3);
+        CHECK(frame.positions()[0] == vector3d(1, 2, 3));
+        frame.velocities()[0] = vector3d(5, 6, 7);
+        CHECK(frame.velocities()[0] == vector3d(5, 6, 7));
 
         auto mat = new float[15][3];
         frame.raw_positions(mat, 15);
@@ -50,9 +50,10 @@ TEST_CASE("Frame class usage", "[Frame]"){
 
         delete[] mat;
 
-        Array3D data;
-        for (size_t i=0; i<10; i++)
-            data.push_back(Vector3D(4.f, 3.4f, 1.f));
+        Array3D data(10);
+        for (size_t i=0; i<10; i++) {
+            data[i] = vector3d(4.f, 3.4f, 1.f);
+        }
         frame.positions(data);
         frame.velocities(data);
 
@@ -60,8 +61,8 @@ TEST_CASE("Frame class usage", "[Frame]"){
         auto velocities = frame.velocities();
 
         for (size_t i=0; i<10; i++){
-            CHECK(positions[i] == Vector3D(4.f, 3.4f, 1.f));
-            CHECK(velocities[i] == Vector3D(4.f, 3.4f, 1.f));
+            CHECK(positions[i] == vector3d(4.f, 3.4f, 1.f));
+            CHECK(velocities[i] == vector3d(4.f, 3.4f, 1.f));
         }
     }
 

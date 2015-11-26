@@ -9,7 +9,7 @@
 #ifndef CHEMFILES_FRAME_HPP
 #define CHEMFILES_FRAME_HPP
 
-#include "chemfiles/Vector3D.hpp"
+#include "chemfiles/Array3D.hpp"
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/UnitCell.hpp"
 #include "chemfiles/exports.hpp"

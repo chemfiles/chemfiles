@@ -13,12 +13,10 @@
     #undef INFINITE
 #endif
 
-#include <array>
 #include "chemfiles/exports.hpp"
+#include "chemfiles/Array3D.hpp"
 
 namespace chemfiles {
-
-class Vector3D;
 
 //! 3 x 3 matrix type
 typedef std::array<std::array<double, 3>, 3> Matrix3D;
@@ -139,7 +137,7 @@ public:
     void full_periodic(bool p) {pbc_x = p; pbc_y = p; pbc_z = p;}
 
     //! Wrap the vector \c vect in the unit cell
-    Vector3D wrap(const Vector3D& vect) const;
+    std::array<float, 3> wrap(const std::array<float, 3>& vect) const;
 private:
     //! Cell lenghts
     double _a, _b, _c;

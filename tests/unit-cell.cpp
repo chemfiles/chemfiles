@@ -149,11 +149,11 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         UnitCell ortho(10, 11, 12);
         UnitCell triclinic(UnitCell::TRICLINIC, 10, 11, 12);
 
-        Vector3D v(22.0f, -15.0f, 5.8f);
+        auto v = vector3d(22.0f, -15.0f, 5.8f);
 
         CHECK(infinite.wrap(v) == v);
 
-        CHECK(roughly(ortho.wrap(v), Vector3D(2.0f, -4.0f, 5.8f), 1e-5));
+        CHECK(roughly(ortho.wrap(v), vector3d(2.0f, -4.0f, 5.8f), 1e-5));
 
         CHECK(roughly(ortho.wrap(v), triclinic.wrap(v), 1e-5));
     }

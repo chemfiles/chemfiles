@@ -11,7 +11,6 @@
 
 #include "chemfiles/UnitCell.hpp"
 #include "chemfiles/Error.hpp"
-#include "chemfiles/Vector3D.hpp"
 using namespace chemfiles;
 
 // Sinus and Cosine for degree values
@@ -137,8 +136,8 @@ void UnitCell::gamma(double val){
 }
 
 // Wrap a vector in an Orthorombic UnitCell
-static Vector3D wrap_orthorombic(const UnitCell& cell, const Vector3D& vect) {
-    Vector3D res;
+static std::array<float, 3> wrap_orthorombic(const UnitCell& cell, const std::array<float, 3>& vect) {
+    std::array<float, 3> res;
     res[0] = static_cast<float>(vect[0] - round(vect[0]/cell.a())*cell.a());
     res[1] = static_cast<float>(vect[1] - round(vect[1]/cell.b())*cell.b());
     res[2] = static_cast<float>(vect[2] - round(vect[2]/cell.c())*cell.c());
@@ -146,8 +145,8 @@ static Vector3D wrap_orthorombic(const UnitCell& cell, const Vector3D& vect) {
 }
 
 // Wrap a vector in an Orthorombic UnitCell
-static Vector3D wrap_triclinic(const UnitCell& cell, const Vector3D& vect) {
-    Vector3D res = vect;
+static std::array<float, 3> wrap_triclinic(const UnitCell& cell, const std::array<float, 3>& vect) {
+    std::array<float, 3> res = vect;
 
     auto mat = cell.matricial();
     for (size_t i=2 ; i != static_cast<size_t>(-1) ; i--) {
@@ -166,7 +165,7 @@ static Vector3D wrap_triclinic(const UnitCell& cell, const Vector3D& vect) {
     return res;
 }
 
-Vector3D UnitCell::wrap(const Vector3D& vect) const{
+std::array<float, 3> UnitCell::wrap(const std::array<float, 3>& vect) const{
     if (!full_periodic()){
         // TODO: implement this
         throw Error("Unimplemend vector wrapping for non fully-periodic cells.");

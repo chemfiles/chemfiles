@@ -31,8 +31,8 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         CHECK(frame.natoms() == 125);
         // Check positions
         auto positions = frame.positions();
-        CHECK(positions[0] == Vector3D(0.49053f, 8.41351f, 0.0777257f));
-        CHECK(positions[124] == Vector3D(8.57951f, 8.65712f, 8.06678f));
+        CHECK(positions[0] == vector3d(0.49053f, 8.41351f, 0.0777257f));
+        CHECK(positions[124] == vector3d(8.57951f, 8.65712f, 8.06678f));
         // Check topology
         auto topology = frame.topology();
         CHECK(topology.natom_types() == 1);
@@ -45,8 +45,8 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         CHECK(frame.natoms() == 125);
         // Check positions
         auto positions = frame.positions();
-        CHECK(positions[0] == Vector3D(0.49053f, 8.41351f, 0.0777257f));
-        CHECK(positions[124] == Vector3D(8.57951f, 8.65712f, 8.06678f));
+        CHECK(positions[0] == vector3d(0.49053f, 8.41351f, 0.0777257f));
+        CHECK(positions[124] == vector3d(8.57951f, 8.65712f, 8.06678f));
         // Check topology
         auto topology = frame.topology();
         CHECK(topology.natom_types() == 1);
@@ -58,8 +58,8 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         // Read frame at a specific positions
         frame = file.read_step(42);
         auto positions = frame.positions();
-        CHECK(positions[0] == Vector3D(-0.145821f, 8.540648f, 1.090281f));
-        CHECK(positions[124] == Vector3D(8.446093f, 8.168162f, 9.350953f));
+        CHECK(positions[0] == vector3d(-0.145821f, 8.540648f, 1.090281f));
+        CHECK(positions[124] == vector3d(8.446093f, 8.168162f, 9.350953f));
         auto topology = frame.topology();
         CHECK(topology.natom_types() == 1);
         CHECK(topology.natoms() == 125);
@@ -67,8 +67,8 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
 
         frame = file.read_step(0);
         positions = frame.positions();
-        CHECK(positions[0] == Vector3D(0.49053f, 8.41351f, 0.0777257f));
-        CHECK(positions[124] == Vector3D(8.57951f, 8.65712f, 8.06678f));
+        CHECK(positions[0] == vector3d(0.49053f, 8.41351f, 0.0777257f));
+        CHECK(positions[124] == vector3d(8.57951f, 8.65712f, 8.06678f));
     }
 
     SECTION("Read the whole file"){
@@ -78,8 +78,8 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
             file >> frame;
         }
         auto positions = frame.positions();
-        CHECK(positions[0] == Vector3D(-1.186037f, 11.439334f, 0.529939f));
-        CHECK(positions[124] == Vector3D(5.208778f, 12.707273f, 10.940157f));
+        CHECK(positions[0] == vector3d(-1.186037f, 11.439334f, 0.529939f));
+        CHECK(positions[124] == vector3d(5.208778f, 12.707273f, 10.940157f));
     }
 }
 
@@ -124,7 +124,7 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
 
     Array3D positions(4);
     for(size_t i=0; i<4; i++)
-        positions[i] = Vector3D(1, 2, 3);
+        positions[i] = vector3d(1, 2, 3);
 
     Frame frame;
     frame.topology(dummy_topology(4));
@@ -135,7 +135,7 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
 
     positions.resize(6);
     for(size_t i=0; i<6; i++)
-        positions[i] = Vector3D(4, 5, 6);
+        positions[i] = vector3d(4, 5, 6);
 
     frame.topology(dummy_topology(6));
     frame.positions(positions);

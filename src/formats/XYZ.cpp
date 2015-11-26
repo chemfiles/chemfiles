@@ -93,7 +93,9 @@ void XYZFormat::read(Frame& frame){
 
         string_stream.str(lines[i]);
         string_stream >> name >> x >> y >> z ;
-        frame.positions()[i] = Vector3D(x, y, z);
+        frame.positions()[i][0] = x;
+        frame.positions()[i][1] = y;
+        frame.positions()[i][2] = z;
         frame.topology().append(Atom(name));
     }
 }
@@ -107,7 +109,7 @@ void XYZFormat::write(const Frame& frame){
     textfile << "Written by the chemfiles library\n";
 
     for (size_t i=0; i<frame.natoms(); i++){
-        auto& pos = positions[i];
+        auto pos = positions[i];
         auto name = topology[i].name();
         if (name == "")
             name = "X";
