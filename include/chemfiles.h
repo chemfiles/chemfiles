@@ -685,7 +685,7 @@ typedef enum CHFL_ATOM_TYPES {
     CHFL_ATOM_ELEMENT = 0,
     //! Corse-grained atom are composed of more than one element: CH3 groups,
     //! amino-acids are corse-grained atoms.
-    CHFL_ATOM_CORSE_GRAIN = 1,
+    CHFL_ATOM_CORSE_GRAINED = 1,
     //! Dummy site, with no physical reality
     CHFL_ATOM_DUMMY = 2,
     //! Undefined atom type

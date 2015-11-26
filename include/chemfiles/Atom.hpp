@@ -29,7 +29,7 @@ public:
         ELEMENT = 0,
         //! Corse-grained atom are composed of more than one element: CH3 groups,
         //! amino-acids are corse-grained atoms.
-        CORSE_GRAIN = 1,
+        CORSE_GRAINED = 1,
         //! Dummy site, with no physical reality
         DUMMY = 2,
         //! Undefined atom-type
