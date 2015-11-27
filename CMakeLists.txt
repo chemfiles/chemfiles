@@ -18,7 +18,6 @@ string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CHEMFILES_VERSION_PAT
 set(CHEMFILES_VERSION_SHORT "${CHEMFILES_VERSION_MAJOR}.${CHEMFILES_VERSION_MINOR}.${CHEMFILES_VERSION_PATCH}")
 
 option(BUILD_TESTS "Build unit tests." OFF)
-option(BUILD_FRONTEND "Build the binary frontend." OFF)
 option(BUILD_DOCUMENTATION "Build the documentation." OFF)
 option(CODE_COVERAGE "Enable code coverage" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
@@ -142,13 +141,4 @@ endif()
 if(BUILD_TESTS)
     add_subdirectory(tests)
     add_subdirectory(examples)
-endif()
-if(BUILD_FRONTEND)
-    if(EXISTS "${PROJECT_SOURCE_DIR}/bin/CMakeLists.txt")
-        add_subdirectory(bin)
-    else()
-        message(WARNING
-        "The binary frontend source does not exist at ${PROJECT_SOURCE_DIR}/bin/, "
-        "the frontend will not be built.")
-    endif()
 endif()
