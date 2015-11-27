@@ -6,10 +6,10 @@ Sources organisation
 
 You may find the following directory in the chemfiles sources :
 
-- ``bin``: the sources of the binary frontend to chemfiles;
 - ``cmake``: some CMake modules used for build configuration;
 - ``doc``: this documentation;
-- ``examples``: usage examples;
+- ``examples``: usage examples for C and C++ interfaces;
+- ``external``: external libraries used by chemfiles;
 - ``include``: the headers of chemfiles;
 - ``scripts``: some python scripts used for developpement.
 - ``src``: the sources of the library;
