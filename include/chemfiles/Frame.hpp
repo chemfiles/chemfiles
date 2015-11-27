@@ -50,15 +50,6 @@ public:
     //! Set the velocities
     void velocities(const Array3D& vel) {_velocities = vel;}
 
-    //! Get a *copy* of the positions, as a C-style array. The array is assumed
-    //! to have a shape (size x 3); i.e. pos[size][3]. The \c size should be
-    //! equal to the number of particles in the system.
-    void raw_positions(float pos[][3], size_t size) const;
-    //! Get a *copy* of the velocities, as a C-style array. The array is assumed
-    //! to have a shape (size x 3); i.e. vel[size][3]. The \c size should be
-    //! equal to the number of particles in the system.
-    void raw_velocities(float vel[][3], size_t size) const;
-
     //! Get the number of particles in the system
     size_t natoms() const;
 
@@ -84,7 +75,6 @@ public:
     size_t step() const {return _step;}
     //! Set the current simulation step
     void step(size_t s) {_step = s;}
-
 
     //! Try to guess the bonds, angles and dihedrals in the system. If \c bonds
     //! is true, guess everything; else only guess the angles and dihedrals from

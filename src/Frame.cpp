@@ -18,31 +18,6 @@ Frame::Frame(size_t natoms) : _step(0), _topology(natoms), _cell() {
     resize(natoms);
 }
 
-void Frame::raw_positions(float pos[][3], size_t size) const{
-    if (size < _positions.size())
-        throw MemoryError("Too small array passed to get_raw_positions.");
-    for (size_t i = 0; i<size; i++) {
-        for (size_t j = 0; j<3; j++) {
-            pos[i][j] = _positions[i][j];
-        }
-    }
-}
-
-void Frame::raw_velocities(float vel[][3], size_t size) const{
-    if (size < _velocities.size())
-        throw MemoryError("Too small array passed to get_raw_velocities.");
-    if (_velocities.empty()){ // Filling the matrix with zeroes
-        for (size_t i = 0; i<size; i++)
-            for (size_t j = 0; j<3; j++)
-                vel[i][j] = 0;
-    }
-    else {
-        for (size_t i = 0; i<size; i++)
-            for (size_t j = 0; j<3; j++)
-                vel[i][j] = _velocities[i][j];
-    }
-}
-
 size_t Frame::natoms() const {
     auto npos = _positions.size();
     auto nvel = _velocities.size();
