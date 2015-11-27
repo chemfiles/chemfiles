@@ -17,19 +17,15 @@ int main() {
         goto error;
 
     size_t natoms = 0;
-    chfl_frame_atoms_count(frame, &natoms);
-
-    float (*positions)[3] = (float(*)[3])malloc(natoms*3*sizeof(float));
+    float (*positions)[3] = NULL;
+    chfl_frame_positions(frame, &positions, &natoms);
     unsigned* indexes = (unsigned*)malloc(natoms*sizeof(unsigned));
-    if (positions == NULL || indexes == NULL)
+    if (indexes == NULL)
         goto error;
 
     for (int i=0; i<natoms; i++) {
         indexes[i] = (unsigned)-1;
     }
-
-    if (chfl_frame_positions(frame, positions, natoms))
-        goto error;
 
     unsigned last_index = 0;
     for (int i=0; i<natoms; i++) {

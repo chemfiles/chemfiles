@@ -137,33 +137,45 @@ int chfl_frame_atoms_count(const CHFL_FRAME* frame, size_t *natoms){
     )
 }
 
-int chfl_frame_set_positions(CHFL_FRAME* frame, float const (*data)[3], size_t size){
+int chfl_frame_positions(CHFL_FRAME* frame, float (**data)[3], size_t* size) {
     CHFL_ERROR_WRAP_RETCODE(
         auto& positions = frame->positions();
-        positions.resize(size);
-        for (size_t i=0; i<frame->natoms(); i++) {
-            positions[i][0] = data[i][0];
-            positions[i][1] = data[i][1];
-            positions[i][2] = data[i][2];
-        }
+        *size = positions.size();
+        *data = reinterpret_cast<float(*)[3]>(positions.data());
     )
 }
 
-int chfl_frame_set_velocities(CHFL_FRAME* frame, float const (*data)[3], size_t size){
+int chfl_frame_velocities(CHFL_FRAME* frame, float (**data)[3], size_t* size) {
+    if (!frame->velocities()) {
+        status.last_error = "No velocities in this frame!";
+        return CAPIStatus::MEMORY;
+    }
     CHFL_ERROR_WRAP_RETCODE(
         auto& velocities = frame->velocities();
-        velocities.resize(size);
-        for (size_t i=0; i<frame->natoms(); i++) {
-            velocities[i][0] = data[i][0];
-            velocities[i][1] = data[i][1];
-            velocities[i][2] = data[i][2];
-        }
+        *size = velocities->size();
+        *data = reinterpret_cast<float(*)[3]>(velocities->data());
     )
 }
 
-int chfl_frame_has_velocities(const CHFL_FRAME* frame, bool *has_vel)  {
+int chfl_frame_resize(CHFL_FRAME* frame, size_t natoms) {
     CHFL_ERROR_WRAP_RETCODE(
-        *has_vel = frame->has_velocities();
+        frame->resize(natoms);
+    )
+}
+
+int chfl_frame_add_velocities(CHFL_FRAME* frame) {
+    if (frame->velocities()) {
+        return CAPIStatus::SUCESS;
+    }
+    CHFL_ERROR_WRAP_RETCODE(
+        auto natoms = frame->natoms();
+        frame->velocities() = Array3D(natoms);
+    )
+}
+
+int chfl_frame_has_velocities(const CHFL_FRAME* frame, bool* has_velocities) {
+    CHFL_ERROR_WRAP_RETCODE(
+        *has_velocities = bool(frame->velocities());
     )
 }
 
@@ -196,7 +208,6 @@ int chfl_frame_guess_topology(CHFL_FRAME* frame, bool bonds){
         frame->guess_topology(bonds);
     )
 }
-
 
 int chfl_frame_free(CHFL_FRAME* frame) {
     CHFL_ERROR_WRAP_RETCODE(

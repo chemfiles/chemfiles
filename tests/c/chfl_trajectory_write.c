@@ -33,32 +33,40 @@ const char* expected_content = "4" EOL
                                "He 4 5 6" EOL;
 
 int main(){
-    float pos[4][3];
-    for (unsigned i=0; i<4; i++)
-        for (unsigned j=0; j<3; j++)
-            pos[i][j] = j + 1.0f;
-
     CHFL_TOPOLOGY* top = chfl_topology();
     CHFL_ATOM* atom = chfl_atom("He");
     for (unsigned i=0; i<4; i++)
         assert(!chfl_topology_append(top, atom));
 
-    CHFL_FRAME* frame = chfl_frame(0);
-    assert(!chfl_frame_set_positions(frame, pos, 4));
+    CHFL_FRAME* frame = chfl_frame(4);
+
+    float (*positions)[3] = NULL;
+    size_t natoms = 0;
+    assert(!chfl_frame_positions(frame, &positions, &natoms));
+    assert(natoms = 4);
+
+    for (unsigned i=0; i<4; i++) {
+        for (unsigned j=0; j<3; j++) {
+            positions[i][j] = j + 1.0f;
+        }
+    }
+
     assert(!chfl_frame_set_topology(frame, top));
 
     CHFL_TRAJECTORY* file = chfl_trajectory_open("test-tmp.xyz", "w");
     assert(!chfl_trajectory_write(file, frame));
 
-    float pos_2[6][3];
-    for (unsigned i=0; i<6; i++)
-        for (unsigned j=0; j<3; j++)
-            pos_2[i][j] = j + 4.0f;
-
+    assert(!chfl_frame_resize(frame, 6));
+    assert(!chfl_frame_positions(frame, &positions, &natoms));
+    assert(natoms = 6);
+    for (unsigned i=0; i<6; i++) {
+        for (unsigned j=0; j<3; j++) {
+            positions[i][j] = j + 4.0f;
+        }
+    }
     assert(!chfl_topology_append(top, atom));
     assert(!chfl_topology_append(top, atom));
 
-    assert(!chfl_frame_set_positions(frame, pos_2, 6));
     assert(!chfl_frame_set_topology(frame, top));
 
     assert(!chfl_atom_free(atom));

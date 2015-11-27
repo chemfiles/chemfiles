@@ -1,3 +1,11 @@
+# 0.5
+
+* The C API now provide a direct view into the `positions` and `velocities` arrays. This
+  remove the need for copy and separated getter (`chfl_frame_{position,velocities}`) and
+  setter (`chfl_frame_{position,velocities}_set`) function. This also force usage of
+  `chfl_frame_add_velocities` to add velocity data to a frame, and `chfl_frame_resize`
+  to change the size of the frame.
+
 # 0.4
 
 * Chemharp can now be compiled as a static library! This should allow for easier embedding

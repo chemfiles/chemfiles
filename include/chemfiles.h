@@ -217,48 +217,60 @@ CHFL_EXPORT CHFL_FRAME* chfl_frame(size_t natoms);
 CHFL_EXPORT int chfl_frame_atoms_count(const CHFL_FRAME* frame, size_t *natoms);
 
 /*!
-* @brief Get the positions from a frame
+* @brief Get a pointer to the positions array from a frame. The positions are stored as a
+*        N x 3 array, this function set a pointer to point to the first element of this
+*        array, and give the value of N. If the frame is resized (by writing to it, or
+*        calling `chfl_frame_resize`), the pointer is invalidated.
 * @param frame The frame
-* @param data A Nx3 float array to be filled with the data
-* @param size The array size (N).
+* @param data A pointer to a pointer to float[3] array, which will point to the data
+* @param size A pointer to the an integer to be filled with the array size
 * @return The status code
 */
-CHFL_EXPORT int chfl_frame_positions(const CHFL_FRAME* frame, float (*data)[3], size_t size);
+CHFL_EXPORT int chfl_frame_positions(CHFL_FRAME* frame, float (**data)[3], size_t* size);
 
 /*!
-* @brief Set the positions of a frame
+* @brief Get a pointer to the velocities array from a frame. The velocities are stored as a
+*        `N x 3` array, this function set a pointer to point to the first element of this
+*        array, and give the value of N. If the frame is resized (by writing to it, or
+*        calling `chfl_frame_resize`), the pointer is invalidated.
+*
+* 		 If the frame do not have velocity, this will return an error. Use
+* 		 `chfl_frame_add_velocities` to add velocities to a frame before calling this
+* 		 function.
 * @param frame The frame
-* @param data A Nx3 float array containing the positions in row-major order.
-* @param size The array size (N).
+* @param data A pointer to a pointer to float[3] array, which will point to the data
+* @param size A pointer to the an integer to be filled with the array size
 * @return The status code
 */
-CHFL_EXPORT int chfl_frame_set_positions(CHFL_FRAME* frame, float const (*data)[3], size_t size);
+CHFL_EXPORT int chfl_frame_velocities(CHFL_FRAME* frame, float (**data)[3], size_t* size);
 
 /*!
-* @brief Get the velocities from a frame, if they exists
+* @brief Resize the positions and the velocities in frame, to make space for N atoms.
+*        This function may invalidate any pointer to the positions or the velocities if
+*        the new size is bigger than the old one. In all the cases, previous data is
+*        conserved. This function conserve the presence of abscence of velocities.
 * @param frame The frame
-* @param data A Nx3 float array to be filled with the data
-* @param size The array size (N).
+* @param natoms The new number of atoms.
 * @return The status code
 */
-CHFL_EXPORT int chfl_frame_velocities(const CHFL_FRAME* frame, float (*data)[3], size_t size);
+CHFL_EXPORT int chfl_frame_resize(CHFL_FRAME* frame, size_t natoms);
 
 /*!
-* @brief Set the velocities of a frame.
+* @brief Add velocity storage to this frame. The storage is initialized with the result of
+*        `chfl_frame_atoms_count` as number of atoms. If the frame already have velocities,
+*        this does nothing.
 * @param frame The frame
-* @param data A Nx3 float array containing the velocities in row-major order.
-* @param size The array size (N).
 * @return The status code
 */
-CHFL_EXPORT int chfl_frame_set_velocities(CHFL_FRAME* frame, float const (*data)[3], size_t size);
+CHFL_EXPORT int chfl_frame_add_velocities(CHFL_FRAME* frame);
 
 /*!
-* @brief Check if a frame has velocity information.
+* @brief Ask wether this frame contains velocity data or not.
 * @param frame The frame
-* @param has_vel true if the frame has velocities, false otherwise.
+* @param has_velocities A boolean, will be true if the frame have velocities, false otherwise.
 * @return The status code
 */
-CHFL_EXPORT int chfl_frame_has_velocities(const CHFL_FRAME* frame, bool *has_vel);
+CHFL_EXPORT int chfl_frame_has_velocities(const CHFL_FRAME* frame, bool* has_velocities);
 
 /*!
 * @brief Set the UnitCell of a Frame.

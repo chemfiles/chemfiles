@@ -22,35 +22,49 @@ int main() {
     assert(!chfl_frame_step(frame, &step));
     assert(step == 42);
 
-    float data[4][3];
-    float pos[4][3];
-    for (unsigned i=0; i<4; i++)
-        for (unsigned j=0; j<3; j++)
-            data[i][j] = i*j;
-
-    assert(!chfl_frame_set_positions(frame, data, 4));
+    assert(!chfl_frame_resize(frame, 4));
     assert(!chfl_frame_atoms_count(frame, &natoms));
     assert(natoms == 4);
 
-    assert(!chfl_frame_positions(frame, pos, 4));
-    for (unsigned i=0; i<4; i++)
-        for (unsigned j=0; j<3; j++)
-            assert(fabs(data[i][j] - pos[i][j]) < 1e-9);
+    float (*data)[3] = NULL;
+    assert(!chfl_frame_positions(frame, &data, &natoms));
+    assert(natoms == 4);
 
+    for (unsigned i=0; i<4; i++) {
+        for (unsigned j=0; j<3; j++) {
+            data[i][j] = i * j;
+        }
+    }
+
+    assert(!chfl_frame_positions(frame, &data, &natoms));
+    for (unsigned i=0; i<4; i++) {
+        for (unsigned j=0; j<3; j++) {
+            assert(fabs(data[i][j] - i * j) < 1e-9);
+        }
+    }
 
     bool has_vel = true;
     assert(!chfl_frame_has_velocities(frame, &has_vel));
     assert(has_vel == false);
-
-    assert(!chfl_frame_set_velocities(frame, data, 4));
-    float vel[4][3];
-    assert(!chfl_frame_velocities(frame, vel, 4));
-    for (unsigned i=0; i<4; i++)
-        for (unsigned j=0; j<3; j++)
-            assert(fabs(data[i][j] - vel[i][j]) < 1e-9);
-
+    assert(!chfl_frame_add_velocities(frame));
     assert(!chfl_frame_has_velocities(frame, &has_vel));
     assert(has_vel == true);
+
+    assert(!chfl_frame_velocities(frame, &data, &natoms));
+    assert(natoms == 4);
+
+    for (unsigned i=0; i<4; i++) {
+        for (unsigned j=0; j<3; j++) {
+            data[i][j] = i * j;
+        }
+    }
+
+    assert(!chfl_frame_velocities(frame, &data, &natoms));
+    for (unsigned i=0; i<4; i++) {
+        for (unsigned j=0; j<3; j++) {
+            assert(fabs(data[i][j] - i * j) < 1e-9);
+        }
+    }
 
     /*********************/
     CHFL_CELL* cell = chfl_cell(3, 4, 5);

@@ -29,18 +29,9 @@ int main() {
         if(!chfl_trajectory_read(traj, frame))
             goto error;
 
-        // Only allocate on the first iteration. This assume a constant number
-        // of particles
         size_t natoms = 0;
-        if (i == 0) {
-            chfl_frame_atoms_count(frame, &natoms);
-            positions = (float(*)[3])malloc(natoms*3*sizeof(float));
-            if (positions == NULL)
-                goto error;
-        }
-
         // Position of the 10th atom
-        chfl_frame_positions(frame, positions, natoms);
+        chfl_frame_positions(frame, &positions, &natoms);
         double distance = sqrt(positions[9][0]*positions[9][0] +
                                positions[9][1]*positions[9][1] +
                                positions[9][2]*positions[9][2]);
