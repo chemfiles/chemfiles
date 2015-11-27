@@ -115,25 +115,9 @@ configure_file(
     @ONLY
 )
 
-add_custom_target(uninstall
-    COMMAND ${CMAKE_COMMAND} -P ${PROJECT_BINARY_DIR}/uninstall.cmake)
+add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${PROJECT_BINARY_DIR}/uninstall.cmake)
 
-#----------------------------------------------------------------------------------------#
-# Packaging stuff
-#----------------------------------------------------------------------------------------#
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Chemfiles, an efficient chemistry IO library")
-set(CPACK_PACKAGE_VENDOR "Guillaume Fraux")
-set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
-set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENCE.txt")
-set(CPACK_PACKAGE_VERSION_MAJOR ${CHEMFILES_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${CHEMFILES_VERSION_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH ${CHEMFILES_VERSION_PATCH})
-set(CPACK_GENERATOR "TGZ;ZIP")
-include(CPack)
-
-#----------------------------------------------------------------------------------------#
-# Sub projects
-#----------------------------------------------------------------------------------------#
+# Testing
 enable_testing()
 if(BUILD_DOCUMENTATION)
     add_subdirectory(doc)
