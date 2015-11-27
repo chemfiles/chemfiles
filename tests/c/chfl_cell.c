@@ -44,10 +44,10 @@ int main() {
     assert(chfl_cell_set_angles(cell, 80, 89, 100));
     chfl_set_loglevel(CHFL_LOG_ERROR);
 
-    double expected_mat[3][3] = {{10, 0, 0}, {0, 20, 0}, {0, 0, 30}};
-    double mat[3][3];
-    assert(!chfl_cell_matrix(cell, mat));
-    assert(roughly(expected_mat, mat));
+    double expected_matrix[3][3] = {{10, 0, 0}, {0, 20, 0}, {0, 0, 30}};
+    double matrix[3][3];
+    assert(!chfl_cell_matrix(cell, matrix));
+    assert(roughly(expected_matrix, matrix));
 
     chfl_cell_type_t type;
     assert(!chfl_cell_type(cell, &type));
