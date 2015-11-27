@@ -19,27 +19,25 @@ Frame::Frame(size_t natoms) : _step(0), _topology(natoms), _cell() {
 }
 
 size_t Frame::natoms() const {
+    if (!_velocities) {
+        return _positions.size();
+    }
+
     auto npos = _positions.size();
-    auto nvel = _velocities.size();
+    auto nvel = _velocities->size();
 
-    if (npos == nvel || nvel == 0 /* No velocity data */) {
-        return npos;
+    if (npos != nvel) {
+        LOG(WARNING) << "Inconsistent size in frame. Positions contains " << npos << " atoms, but velocities contains " << nvel << " atoms." << std::endl;
     }
-    else {
-        LOG(DEBUG) << "Inconsistent size in frame." << std::endl;
-        return npos;
-    }
+
+    return npos;
 }
 
-void Frame::resize(size_t size, bool reserve_velocities){
+void Frame::resize(size_t size){
     _positions.resize(size, 0.0);
-    if (reserve_velocities) {
-        _velocities.resize(size, 0.0);
+    if (_velocities) {
+        _velocities->resize(size, 0.0);
     }
-}
-
-bool Frame::has_velocities() const{
-    return _velocities.size() == _positions.size() && _velocities.size() > 0;
 }
 
 void Frame::guess_topology(bool please_guess_bonds) {

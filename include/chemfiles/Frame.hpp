@@ -12,16 +12,25 @@
 #include "chemfiles/Array3D.hpp"
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/UnitCell.hpp"
+
 #include "chemfiles/exports.hpp"
+#include "chemfiles/optional.hpp"
 
 namespace chemfiles {
+using std::experimental::optional;
 
 /*!
  * @class Frame Frame.hpp Frame.cpp
  * @brief A frame contains data from one simulation step
  *
  * The Frame class holds data from one step of a simulation: the current topology,
- * the positions, and maybe the velocities of the particles in the system.
+ * the positions, and the velocities of the particles in the system. If some information
+ * is missing (topology or velocity or unit cell), the corresponding data is filled with
+ * a default value. Specifically:
+ * 	- `velocities` is the `nullopt` version of `optional<Array3D>`. Here, `optional<T>`
+ * 	  refers to the optional template as defined in [std::experimental::optional](http://en.cppreference.com/w/cpp/experimental/optional)
+ * 	- `cell` is an infinite unit cell;
+ * 	- `topology` is empty, and contains no data.
  */
 class CHFL_EXPORT Frame {
 public:
@@ -37,15 +46,12 @@ public:
     //! Set the positions
     void positions(const Array3D& pos) {_positions = pos;}
 
-    //! Does this frame have velocity data ?
-    bool has_velocities() const;
-
-    //! Get a modifiable reference to the velocities
-    Array3D& velocities() {return _velocities;}
-    //! Get a const (non modifiable) reference to the velocities
-    const Array3D& velocities() const {return _velocities;}
-    //! Set the velocities
-    void velocities(const Array3D& vel) {_velocities = vel;}
+    //! Get an optional modifiable reference to the velocities
+    optional<Array3D>& velocities() {return _velocities;}
+    //! Get an optional const (non modifiable) reference to the velocities
+    const optional<Array3D>& velocities() const {return _velocities;}
+    //! Set the velocities to `vel`
+    void velocities(const Array3D& vel) {_velocities.emplace(vel);}
 
     //! Get the number of particles in the system
     size_t natoms() const;
@@ -63,10 +69,10 @@ public:
     //! Set the unit cell fo the system
     void cell(const UnitCell& c) {_cell = c;}
 
-    //! Resize the internal arrays, and initialize them with 0.
-    //! The \c resize_velocities parameter should be \c true to resize also the
-    //! velocities array.
-    void resize(size_t size, bool resize_velocities = false);
+    //! Resize the frame to store data for `natoms` atoms. If the new size is bigger than
+    //! the old one, missing data is initializd to 0. Pre-existing values are conserved.
+    //! This function only resize the velocities if the data is present.
+    void resize(size_t natoms);
 
     //! Get the current simulation step
     size_t step() const {return _step;}
@@ -86,7 +92,7 @@ private:
     //! Positions of the particles
     Array3D _positions;
     //! Velocities of the particles
-    Array3D _velocities;
+    optional<Array3D> _velocities;
     //! Topology of the described system
     Topology _topology;
     //! Unit cell of the system

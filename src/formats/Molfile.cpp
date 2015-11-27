@@ -198,11 +198,16 @@ void Molfile<F>::molfile_to_frame(const molfile_timestep_t& timestep, Frame& fra
 
     if (molfile_plugins[F].have_velocities){
         auto& velocities = frame.velocities();
-        velocities.resize(static_cast<size_t>(_natoms));
+        if (!velocities) {
+            velocities = Array3D(static_cast<size_t>(_natoms));
+        } else {
+            velocities->resize(static_cast<size_t>(_natoms));
+        }
+
         for (size_t i=0; i<static_cast<size_t>(_natoms); i++) {
-            velocities[i][0] = timestep.velocities[3*i];
-            velocities[i][1] = timestep.velocities[3*i + 1];
-            velocities[i][2] = timestep.velocities[3*i + 2];
+            (*velocities)[i][0] = timestep.velocities[3*i];
+            (*velocities)[i][1] = timestep.velocities[3*i + 1];
+            (*velocities)[i][2] = timestep.velocities[3*i + 2];
         }
     }
 }

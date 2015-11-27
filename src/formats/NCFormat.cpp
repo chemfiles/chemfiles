@@ -78,17 +78,19 @@ size_t NCFormat::nsteps() const {
     return static_cast<size_t>(ncfile.dimension("frame"));
 }
 
-
 void NCFormat::read_step(const size_t _step, Frame& frame){
     // Set the internal step before further reading
     step = _step;
     reserve(ncfile.dimension("atom"));
     frame.cell(read_cell());
 
-    auto& pos = frame.positions();
-    read_array3D(pos, "coordinates");
-    auto& vel = frame.velocities();
-    read_array3D(vel, "velocities");
+    auto& positions = frame.positions();
+    read_array3D(positions, "coordinates");
+    auto& velocities = frame.velocities();
+    if (!velocities) {
+        velocities = Array3D();
+    }
+    read_array3D(*velocities, "velocities");
 }
 
 void NCFormat::read(Frame& frame) {
@@ -197,14 +199,16 @@ void NCFormat::write(const Frame& frame) {
     auto natoms = frame.natoms();
     // If we created the file, let's initialize it.
     if (!validated) {
-        initialize(ncfile, natoms, frame.has_velocities());
+        initialize(ncfile, natoms, bool(frame.velocities()));
         assert(is_valid(ncfile, natoms));
         validated = true;
     }
     write_cell(frame.cell());
     write_array3D(frame.positions(), "coordinates");
-    if (frame.has_velocities())
-        write_array3D(frame.velocities(), "velocities");
+    auto& velocities = frame.velocities();
+    if (velocities) {
+        write_array3D(*velocities, "velocities");
+    }
 
     step++;
 }

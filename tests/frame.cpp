@@ -27,28 +27,16 @@ TEST_CASE("Frame class usage", "[Frame]"){
         frame.resize(15);
         CHECK(frame.natoms() == 15);
         // No velocity data yet
-        CHECK_FALSE(frame.has_velocities());
+        CHECK_FALSE(frame.velocities());
 
-        frame.resize(15, true);
-        CHECK(frame.has_velocities());
+        frame.velocities() = Array3D(15);
+        CHECK(frame.velocities());
 
         frame.positions()[0] = vector3d(1, 2, 3);
         CHECK(frame.positions()[0] == vector3d(1, 2, 3));
-        frame.velocities()[0] = vector3d(5, 6, 7);
-        CHECK(frame.velocities()[0] == vector3d(5, 6, 7));
 
-        auto mat = new float[15][3];
-        frame.raw_positions(mat, 15);
-        CHECK(mat[0][0] == 1);
-        CHECK(mat[0][1] == 2);
-        CHECK(mat[0][2] == 3);
-
-        frame.raw_velocities(mat, 15);
-        CHECK(mat[0][0] == 5);
-        CHECK(mat[0][1] == 6);
-        CHECK(mat[0][2] == 7);
-
-        delete[] mat;
+        (*frame.velocities())[0] = vector3d(5, 6, 7);
+        CHECK((*frame.velocities())[0] == vector3d(5, 6, 7));
 
         Array3D data(10);
         for (size_t i=0; i<10; i++) {
@@ -62,24 +50,8 @@ TEST_CASE("Frame class usage", "[Frame]"){
 
         for (size_t i=0; i<10; i++){
             CHECK(positions[i] == vector3d(4.f, 3.4f, 1.f));
-            CHECK(velocities[i] == vector3d(4.f, 3.4f, 1.f));
+            CHECK((*velocities)[i] == vector3d(4.f, 3.4f, 1.f));
         }
-    }
-
-    SECTION("Errors"){
-        auto mat = new float[3][3];
-
-        CHECK_THROWS_AS(frame.raw_positions(mat, 3), MemoryError);
-
-        // This is not throwing, but only filling the array with zeroes
-        frame.raw_velocities(mat, 3);
-        for (size_t i=0; i<3; i++)
-            for (size_t j=0; j<3; j++)
-                CHECK(mat[i][j] == 0);
-
-        frame.resize(10, true);
-        CHECK_THROWS_AS(frame.raw_velocities(mat, 3), MemoryError);
-        delete[] mat;
     }
 
     SECTION("Guess bonds"){
