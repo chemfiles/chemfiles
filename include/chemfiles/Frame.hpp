@@ -29,9 +29,6 @@ public:
     Frame();
     //! Constructor reserving some space for \c natoms
     explicit Frame(size_t natoms);
-    //! Constructor called to build a frame that can hold the data from a
-    //! specific topology.
-    explicit Frame(Topology top, bool has_velocities = false);
 
     //! Get a modifiable reference to the positions
     Array3D& positions() {return _positions;}

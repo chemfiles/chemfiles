@@ -137,12 +137,6 @@ int chfl_frame_atoms_count(const CHFL_FRAME* frame, size_t *natoms){
     )
 }
 
-int chfl_frame_positions(const CHFL_FRAME* frame, float (*data)[3] , size_t size){
-    CHFL_ERROR_WRAP_RETCODE(
-        frame->raw_positions(data, size);
-    )
-}
-
 int chfl_frame_set_positions(CHFL_FRAME* frame, float const (*data)[3], size_t size){
     CHFL_ERROR_WRAP_RETCODE(
         auto& positions = frame->positions();
@@ -152,12 +146,6 @@ int chfl_frame_set_positions(CHFL_FRAME* frame, float const (*data)[3], size_t s
             positions[i][1] = data[i][1];
             positions[i][2] = data[i][2];
         }
-    )
-}
-
-int chfl_frame_velocities(const CHFL_FRAME* frame, float (*data)[3], size_t size){
-    CHFL_ERROR_WRAP_RETCODE(
-        frame->raw_velocities(data, size);
     )
 }
 
