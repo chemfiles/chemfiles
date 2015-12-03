@@ -400,7 +400,7 @@ CHFL_EXPORT int chfl_cell_set_angles(CHFL_CELL* cell, double alpha, double beta,
 /*!
 * @brief Get the unit cell matricial representation.
 * @param cell the unit cell to use
-* @param mat the matrix to fill. It should be a 3x3 matrix.
+* @param matrix the matrix to fill. It should be a 3x3 matrix.
 * @return The status code
 */
 CHFL_EXPORT int chfl_cell_matrix(const CHFL_CELL* cell, double matrix[3][3]);
