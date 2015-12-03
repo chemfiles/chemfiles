@@ -198,7 +198,7 @@ int chfl_frame_resize(CHFL_FRAME* frame, size_t natoms) {
 int chfl_frame_add_velocities(CHFL_FRAME* frame) {
     assert(frame != nullptr);
     if (frame->velocities()) {
-        return CAPIStatus::SUCESS;
+        return CAPIStatus::SUCCESS;
     }
     CHFL_ERROR_WRAP_RETCODE(
         auto natoms = frame->natoms();

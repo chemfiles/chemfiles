@@ -41,6 +41,20 @@ allow for error handling from the C side.
 
 .. doxygenfunction:: chfl_log_stderr
 
+The return values for this status code correspond to the following macros:
+
+.. doxygendefine:: CHFL_SUCCESS
+
+.. doxygendefine:: CHFL_MEMORY_ERROR
+
+.. doxygendefine:: CHFL_FILE_ERROR
+
+.. doxygendefine:: CHFL_FORMAT_ERROR
+
+.. doxygendefine:: CHFL_GENERIC_ERROR
+
+.. doxygendefine:: CHFL_CXX_ERROR
+
 .. _capi-trajectory:
 
 Function manipulating ``CHFL_TRAJECTORY``

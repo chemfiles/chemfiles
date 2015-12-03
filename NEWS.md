@@ -5,6 +5,9 @@
   setter (`chfl_frame_{position,velocities}_set`) function. This also force usage of
   `chfl_frame_add_velocities` to add velocity data to a frame, and `chfl_frame_resize`
   to change the size of the frame.
+* Add constants for error codes in C API. The following macro are defined:
+  `CHFL_SUCCESS`, `CHFL_MEMORY_ERROR`, `CHFL_FILE_ERROR`, `CHFL_FORMAT_ERROR`,
+  `CHFL_GENERIC_ERROR`, `CHFL_CXX_ERROR`.
 
 # 0.4
 

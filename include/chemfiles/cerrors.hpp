@@ -11,6 +11,7 @@
 
 #include <string>
 #include "chemfiles/Logger.hpp"
+#include "chemfiles.h"
 
 namespace chemfiles {
 
@@ -18,28 +19,28 @@ namespace chemfiles {
 struct CAPIStatus {
     enum {
         //! Everythig is OK
-        SUCESS = 0,
-        //! Error in the C++ standard library
-        STD_ERROR,
-        //! Catch all chemfiles::Error errors
-        CHEMHARP,
+        SUCCESS = CHFL_SUCCESS,
         //! Memory error: wrong pre-allocated arrays, ...
-        MEMORY,
+        MEMORY = CHFL_MEMORY_ERROR,
         //! File error: inexistent, can not open, ...
-        FILE,
+        FILE = CHFL_FILE_ERROR,
         //! Error in file formating
-        FORMAT,
+        FORMAT = CHFL_FORMAT_ERROR,
+        //! Catch all chemfiles::Error errors
+        CHEMFILES = CHFL_GENERIC_ERROR,
+        //! Error in the C++ standard library
+        CXX_ERROR = CHFL_CXX_ERROR,
         //! Counter for the number of error codes.
         LAST,
     };
 
     CAPIStatus() {
-        messages[SUCESS] = "Operation was sucessfull";
-        messages[STD_ERROR] = "Error in C++ runtime. Use chfl_last_error for more informations.";
-        messages[CHEMHARP] = "Error in chemfiles library. Use chfl_last_error for more informations.";
-        messages[MEMORY] = "Memory error.";
-        messages[FILE] = "Error while reading a file.";
-        messages[FORMAT] = "Error while reading a format.";
+        messages[SUCCESS] = "Operation was sucessfull";
+        messages[MEMORY] = "Memory error. Use chfl_last_error for more informations.";
+        messages[FILE] = "Error while reading a file. Use chfl_last_error for more informations.";
+        messages[FORMAT] = "Error while reading a format. Use chfl_last_error for more informations.";
+        messages[CHEMFILES] = "Error in chemfiles library. Use chfl_last_error for more informations.";
+        messages[CXX_ERROR] = "Error in C++ runtime. Use chfl_last_error for more informations.";
     }
 
     /// Retrive the message corresponding to an error code.
@@ -78,12 +79,12 @@ static CAPIStatus status = CAPIStatus();
     CATCH_AND_RETURN(FileError, CAPIStatus::FILE)                              \
     CATCH_AND_RETURN(MemoryError, CAPIStatus::MEMORY)                          \
     CATCH_AND_RETURN(FormatError, CAPIStatus::FORMAT)                          \
-    CATCH_AND_RETURN(Error, CAPIStatus::CHEMHARP)                              \
+    CATCH_AND_RETURN(Error, CAPIStatus::CHEMFILES)                             \
     catch(const std::exception& e) {                                           \
         status.last_error = string(e.what());                                  \
-        return CAPIStatus::STD_ERROR;                                          \
+        return CAPIStatus::CXX_ERROR;                                          \
     }                                                                          \
-    return CAPIStatus::SUCESS;
+    return CAPIStatus::SUCCESS;
 
 //! Wrap \c instructions in a try/catch bloc automatically, and goto the \c error
 //! label in case of error.

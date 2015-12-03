@@ -51,6 +51,19 @@ extern "C" {
     typedef struct CHFL_TOPOLOGY CHFL_TOPOLOGY;
 #endif
 
+//! Status code for success
+#define CHFL_SUCCESS 0
+//! Memory error: out of memory, wrong size for arrays parameters, ...
+#define CHFL_MEMORY_ERROR 1
+//! File error: file do not exist, you do not have rights to open it, ...
+#define CHFL_FILE_ERROR 2
+//! Error in file formating
+#define CHFL_FORMAT_ERROR 3
+//! Any other error from Chemfiles
+#define CHFL_GENERIC_ERROR 4
+//! Error in the C++ standard library
+#define CHFL_CXX_ERROR 5
+
 /*!
 * @brief Get the error message corresponding to an error code.
 * @param status The error code
