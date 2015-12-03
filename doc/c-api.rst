@@ -19,6 +19,9 @@ functions (functions returning pointers to types defined above) return freshly
 allocated memory, and calling the ``chfl_*_free`` functions return the corresponding
 memory to the operating system.
 
+In addition to the functions below, the :ref:`same macro <exported-macro>` as in the C++
+interface are defined.
+
 Functions for errors handling
 -----------------------------
 
