@@ -337,15 +337,21 @@ CHFL_EXPORT int chfl_frame_free(CHFL_FRAME* frame);
 /******************************************************************************/
 /*!
 * @brief Create an ORTHOROMBIC UnitCell from the three lenghts
-* @param a,b,c the three lenghts of the cell
+* @param a first lenght of the cell (in Angstroms)
+* @param b second lenght of the cell (in Angstroms)
+* @param c third lenght of the cell (in Angstroms)
 * @return A pointer to the UnitCell
 */
 CHFL_EXPORT CHFL_CELL* chfl_cell(double a, double b, double c);
 
 /*!
 * @brief Create a TRICLINIC UnitCell from the three lenghts and the three angles
-* @param a,b,c the three lenghts of the cell
-* @param alpha,beta,gamma the three angles of the cell
+* @param a first lenght of the cell (in Angstroms)
+* @param b second lenght of the cell (in Angstroms)
+* @param c third lenght of the cell (in Angstroms)
+* @param alpha angle of the cell between the vectors `b` and `c` (in degree)
+* @param beta angle of the cell between the vectors `a` and `c` (in degree)
+* @param gamma angle of the cell between the vectors `a` and `b` (in degree)
 * @return A pointer to the UnitCell
 */
 CHFL_EXPORT CHFL_CELL* chfl_cell_triclinic(double a, double b, double c, double alpha, double beta, double gamma);
@@ -368,7 +374,9 @@ CHFL_EXPORT int chfl_cell_volume(const CHFL_CELL* cell, double* V);
 /*!
 * @brief Get the cell lenghts.
 * @param cell the unit cell to read
-* @param a,b,c the three cell lenghts
+* @param a first lenght of the cell (in Angstroms)
+* @param b second lenght of the cell (in Angstroms)
+* @param c third lenght of the cell (in Angstroms)
 * @return The status code
 */
 CHFL_EXPORT int chfl_cell_lengths(const CHFL_CELL* cell, double* a, double* b, double* c);
@@ -376,7 +384,9 @@ CHFL_EXPORT int chfl_cell_lengths(const CHFL_CELL* cell, double* a, double* b, d
 /*!
 * @brief Set the unit cell lenghts.
 * @param cell the unit cell to modify
-* @param a,b,c the cell lenghts
+* @param a first lenght of the cell (in Angstroms)
+* @param b second lenght of the cell (in Angstroms)
+* @param c third lenght of the cell (in Angstroms)
 * @return The status code
 */
 CHFL_EXPORT int chfl_cell_set_lengths(CHFL_CELL* cell, double a, double b, double c);
@@ -384,7 +394,9 @@ CHFL_EXPORT int chfl_cell_set_lengths(CHFL_CELL* cell, double a, double b, doubl
 /*!
 * @brief Get the cell angles, in degrees.
 * @param cell the cell to read
-* @param alpha,beta,gamma the three cell angles
+* @param alpha angle of the cell between the vectors `b` and `c` (in degree)
+* @param beta angle of the cell between the vectors `a` and `c` (in degree)
+* @param gamma angle of the cell between the vectors `a` and `b` (in degree)
 * @return The status code
 */
 CHFL_EXPORT int chfl_cell_angles(const CHFL_CELL* cell, double* alpha, double* beta, double* gamma);
@@ -392,7 +404,9 @@ CHFL_EXPORT int chfl_cell_angles(const CHFL_CELL* cell, double* alpha, double* b
 /*!
 * @brief Set the cell angles, in degrees. This is only possible for TRICLINIC cells.
 * @param cell the unit cell to modify
-* @param alpha,beta,gamma the new angles values, in degrees
+* @param alpha angle of the cell between the vectors `b` and `c` (in degree)
+* @param beta angle of the cell between the vectors `a` and `c` (in degree)
+* @param gamma angle of the cell between the vectors `a` and `b` (in degree)
 * @return The status code
 */
 CHFL_EXPORT int chfl_cell_set_angles(CHFL_CELL* cell, double alpha, double beta, double gamma);
@@ -434,7 +448,9 @@ CHFL_EXPORT int chfl_cell_set_type(CHFL_CELL* cell, chfl_cell_type_t type);
 /*!
 * @brief Get the cell periodic boundary conditions along the three axis
 * @param cell the cell to read
-* @param x,y,z the periodicity of the cell along the three axis.
+* @param x periodicity of the cell along the first axis.
+* @param y periodicity of the cell along the second axis.
+* @param z periodicity of the cell along the third axis.
 * @return The status code
 */
 CHFL_EXPORT int chfl_cell_periodicity(const CHFL_CELL* cell, bool* x, bool* y, bool* z);
@@ -442,7 +458,9 @@ CHFL_EXPORT int chfl_cell_periodicity(const CHFL_CELL* cell, bool* x, bool* y, b
 /*!
 * @brief Set the cell periodic boundary conditions along the three axis
 * @param cell the cell to modify
-* @param x,y,z the new periodicity of the cell along the three axis.
+* @param x new periodicity of the cell along the first axis.
+* @param y new periodicity of the cell along the second axis.
+* @param z new periodicity of the cell along the third axis.
 * @return The status code
 */
 CHFL_EXPORT int chfl_cell_set_periodicity(CHFL_CELL* cell, bool x, bool y, bool z);
@@ -496,7 +514,8 @@ CHFL_EXPORT int chfl_topology_remove(CHFL_TOPOLOGY* topology, size_t i);
 /*!
 * @brief Tell if the atoms \c i and \c j are bonded together
 * @param topology The topology
-* @param i,j The atomic indexes
+* @param i index of the first atom in the topology
+* @param j index of the second atom in the topology
 * @param result true if the atoms are bonded, false otherwise
 * @return The status code
 */
@@ -505,7 +524,9 @@ CHFL_EXPORT int chfl_topology_isbond(const CHFL_TOPOLOGY* topology, size_t i, si
 /*!
 * @brief Tell if the atoms \c i, \c j and \c k constitues an angle
 * @param topology The topology
-* @param i,j,k The atomic indexes
+* @param i index of the first atom in the topology
+* @param j index of the second atom in the topology
+* @param k index of the third atom in the topology
 * @param result true if the atoms constitues an angle, false otherwise
 * @return The status code
 */
@@ -514,7 +535,10 @@ CHFL_EXPORT int chfl_topology_isangle(const CHFL_TOPOLOGY* topology, size_t i, s
 /*!
 * @brief Tell if the atoms \c i, \c j, \c k and \c m constitues a dihedral angle
 * @param topology The topology
-* @param i,j,k,m The atomic indexes
+* @param i index of the first atom in the topology
+* @param j index of the second atom in the topology
+* @param k index of the third atom in the topology
+* @param m index of the fourth atom in the topology
 * @param result true if the atoms constitues a dihedral angle, false otherwise
 * @return The status code
 */
@@ -577,7 +601,8 @@ CHFL_EXPORT int chfl_topology_dihedrals(const CHFL_TOPOLOGY* topology, size_t (*
 /*!
 * @brief Add a bond between the atoms \c i and \c j in the system
 * @param topology The topology
-* @param i,j The atomic indexes
+* @param i index of the first atom in the topology
+* @param j index of the second atom in the topology
 * @return The status code
 */
 CHFL_EXPORT int chfl_topology_add_bond(CHFL_TOPOLOGY* topology, size_t i, size_t j);
@@ -585,7 +610,8 @@ CHFL_EXPORT int chfl_topology_add_bond(CHFL_TOPOLOGY* topology, size_t i, size_t
 /*!
 * @brief Remove any existing bond between the atoms \c i and \c j in the system
 * @param topology The topology
-* @param i,j The atomic indexes
+* @param i index of the first atom in the topology
+* @param j index of the second atom in the topology
 * @return The status code
 */
 CHFL_EXPORT int chfl_topology_remove_bond(CHFL_TOPOLOGY* topology, size_t i, size_t j);
