@@ -27,9 +27,9 @@ public:
     enum AtomType {
         //! Element from the periodic table of elements
         ELEMENT = 0,
-        //! Corse-grained atom are composed of more than one element: CH3 groups,
-        //! amino-acids are corse-grained atoms.
-        CORSE_GRAINED = 1,
+        //! Coarse-grained atom are composed of more than one element: CH3 groups,
+        //! amino-acids are coarse-grained atoms.
+        COARSE_GRAINED = 1,
         //! Dummy site, with no physical reality
         DUMMY = 2,
         //! Undefined atom-type

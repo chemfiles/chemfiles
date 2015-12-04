@@ -37,7 +37,7 @@ Atom::Atom(const std::string& name) : _name(name), _mass(0), _charge(0) {
     if (is_element(name)) {
         _type = ELEMENT;
     } else {
-        _type = CORSE_GRAINED;
+        _type = COARSE_GRAINED;
     }
 
     if (PERIODIC_INFORMATION.find(name) != PERIODIC_INFORMATION.end()){

@@ -8,7 +8,7 @@ using namespace chemfiles;
 TEST_CASE("Use the Atom type", "[Atoms]"){
     Atom a1("H");
     Atom a2 = Atom();
-    Atom a3(Atom::CORSE_GRAINED, "CH4");
+    Atom a3(Atom::COARSE_GRAINED, "CH4");
     Atom a4("W");
 
     SECTION("Check constructors"){
@@ -22,7 +22,7 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
         CHECK(a2.mass() == 0);
         CHECK(a2.charge() == 0);
 
-        CHECK(a3.type() == Atom::CORSE_GRAINED);
+        CHECK(a3.type() == Atom::COARSE_GRAINED);
         CHECK(a3.name() == "CH4");
         CHECK(a3.mass() == 0);
         CHECK(a3.charge() == 0);

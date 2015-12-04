@@ -708,9 +708,9 @@ CHFL_EXPORT int chfl_atom_atomic_number(const CHFL_ATOM* atom, int* number);
 typedef enum CHFL_ATOM_TYPES {
     //! Element from the periodic table of elements
     CHFL_ATOM_ELEMENT = 0,
-    //! Corse-grained atom are composed of more than one element: CH3 groups,
-    //! amino-acids are corse-grained atoms.
-    CHFL_ATOM_CORSE_GRAINED = 1,
+    //! Coarse-grained atom are composed of more than one element: CH3 groups,
+    //! amino-acids are coarse-grained atoms.
+    CHFL_ATOM_COARSE_GRAINED = 1,
     //! Dummy site, with no physical reality
     CHFL_ATOM_DUMMY = 2,
     //! Undefined atom type
