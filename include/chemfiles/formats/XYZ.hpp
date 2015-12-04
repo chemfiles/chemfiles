@@ -22,7 +22,7 @@ namespace chemfiles {
  *
  * The format is described at http://openbabel.org/wiki/XYZ
  */
-class XYZFormat : public Format {
+class XYZFormat final: public Format {
 public:
     XYZFormat(File& f);
     using Format::Format;

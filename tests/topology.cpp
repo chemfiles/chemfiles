@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch.hpp>
 
 #define private public
 #include "chemfiles/Topology.hpp"

@@ -45,7 +45,7 @@ public:
 
     /// Construct a Vector3D from a pointer to the data. This pointer MUST be valid and
     /// point to the first element of a 3-dimmensional array of float.
-    View3D(T* data) : data(data) {
+    View3D(T* data_) : data(data_) {
         assert(data != nullptr);
     }
 
@@ -61,7 +61,7 @@ public:
         (*this)[1] = other[1];
         (*this)[2] = other[2];
         return *this;
-    };
+    }
 
     View3D& operator=(const View3D&) = delete;
     View3D(const View3D&) = delete;

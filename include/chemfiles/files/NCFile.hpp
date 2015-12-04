@@ -30,7 +30,7 @@ namespace chemfiles {
  * format. This interface is read-only for now. All the operation are guaranteed
  * to return a valid value or throw an error.
  */
-class NCFile : public BinaryFile {
+class NCFile final: public BinaryFile {
 public:
     explicit NCFile(const string& filename, const string& mode);
 

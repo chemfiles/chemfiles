@@ -15,7 +15,7 @@ using namespace chemfiles;
 // No-op buffer for no-op stream
 class NullBuffer : public std::streambuf {
 public:
-  int overflow(int c) { return c; }
+  int overflow(int c) override { return c; }
 };
 
 static NullBuffer nullbuff;

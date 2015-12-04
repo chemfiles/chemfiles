@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch.hpp>
 #include "chemfiles.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/UnitCell.hpp"

@@ -1,8 +1,7 @@
 #ifndef WIN32
 
 #include <string>
-
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include "chemfiles.hpp"
 #include "chemfiles/TrajectoryFactory.hpp"
@@ -17,22 +16,22 @@ using namespace chemfiles;
 class DummyFormat : public Format {
 public:
     DummyFormat(File& file) : Format(file){}
-    std::string description() const {return "";}
-    size_t nsteps() const {return 42;}
+    std::string description() const override {return "";}
+    size_t nsteps() const override {return 42;}
 };
 
 // Dummy file clase
 class DummyFile : public BinaryFile {
 public:
     DummyFile(const string&, const string&) : BinaryFile("", "") {}
-    bool is_open() {return true;}
-    void sync() {}
+    bool is_open() override {return true;}
+    void sync() override {}
 };
 class DummyFormat2 : public Format {
 public:
     DummyFormat2(File& file) : Format(file){}
-    std::string description() const {return "";}
-    size_t nsteps() const {return 42;}
+    std::string description() const override {return "";}
+    size_t nsteps() const override {return 42;}
     using file_t = DummyFile;
 };
 
@@ -58,13 +57,13 @@ TEST_CASE("Geting registered format", "[Trajectory factory]"){
 
     BasicFile file("tmp.dat", "w");
 
-    auto dummy = DummyFormat(file);
+    DummyFormat dummy(file);
     auto format = TrajectoryFactory::get().by_extension(".dummy").format_creator(file);
     CHECK(typeid(dummy) == typeid(*format));
     format = TrajectoryFactory::get().format("Dummy").format_creator(file);
     CHECK(typeid(dummy) == typeid(*format));
 
-    auto XYZ = XYZFormat(file);
+    XYZFormat XYZ(file);
     format = TrajectoryFactory::get().by_extension(".xyz").format_creator(file);
     CHECK(typeid(XYZ) == typeid(*format));
     format = TrajectoryFactory::get().format("XYZ").format_creator(file);

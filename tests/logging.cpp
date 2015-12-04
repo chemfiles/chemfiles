@@ -2,8 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <catch.hpp>
 
-#include "catch.hpp"
 #include "chemfiles/Logger.hpp"
 #include "chemfiles.hpp"
 using namespace chemfiles;

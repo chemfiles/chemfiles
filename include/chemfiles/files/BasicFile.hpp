@@ -19,7 +19,7 @@ namespace chemfiles {
  *
  * Basic text file, only a thin wrapper on top of standard C++ fstreams.
  */
-class BasicFile : public TextFile {
+class BasicFile final: public TextFile {
 public:
     /*!
      * Open a text file.

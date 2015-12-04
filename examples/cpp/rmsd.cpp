@@ -24,12 +24,12 @@ int main() {
         distances.push_back(distance);
     }
 
-    double mean = std::accumulate(std::begin(distances), std::end(distances), 0.0) / distances.size();
+    double mean = std::accumulate(std::begin(distances), std::end(distances), 0.0) / static_cast<double>(distances.size());
     double rmsd = 0.0;
     for (auto dist : distances) {
         rmsd += (mean - dist)*(mean - dist);
     }
-    rmsd /= distances.size();
+    rmsd /= static_cast<double>(distances.size());
     rmsd = sqrt(rmsd);
 
     std::cout << "Root-mean square displacement is: " << rmsd << std::endl;

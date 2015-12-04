@@ -31,6 +31,8 @@ public:
     //! file_t class.
     Format(File& f) : file(f) {}
     virtual ~Format() = default;
+    Format& operator=(const Format&) = delete;
+    Format(const Format&) = delete;
     /*!
     * @brief Read a specific step from the associated file.
     * @param step The step to read

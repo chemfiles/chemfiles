@@ -28,7 +28,7 @@ class NCFile;
  *
  * http://ambermd.org/netcdf/nctraj.xhtml
  */
-class NCFormat : public Format {
+class NCFormat final: public Format {
 public:
     NCFormat(File& file);
     ~NCFormat() = default;

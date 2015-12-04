@@ -46,7 +46,7 @@ enum MolfileFormat {
  * in the MolfileFormat enum.
  */
 template <MolfileFormat F>
-class Molfile : public Format {
+class Molfile final: public Format {
 public:
     Molfile(File& file);
     ~Molfile();

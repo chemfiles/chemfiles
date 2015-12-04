@@ -21,7 +21,6 @@ namespace chemfiles {
  */
 struct CHFL_EXPORT Error : public std::runtime_error {
     Error(const std::string& err) : std::runtime_error(err) {}
-    virtual ~Error() noexcept = default;
 };
 
 /*!
@@ -30,7 +29,6 @@ struct CHFL_EXPORT Error : public std::runtime_error {
  */
 struct CHFL_EXPORT FileError : public Error {
     FileError(const std::string& err) : Error(err) {}
-    virtual ~FileError() noexcept = default;
 };
 
 /*!
@@ -39,7 +37,6 @@ struct CHFL_EXPORT FileError : public Error {
  */
 struct CHFL_EXPORT MemoryError : public Error {
     MemoryError(const std::string& err) : Error(err) {}
-    virtual ~MemoryError() noexcept = default;
 };
 
 /*!
@@ -48,7 +45,6 @@ struct CHFL_EXPORT MemoryError : public Error {
  */
 struct CHFL_EXPORT FormatError : public Error {
     FormatError(const std::string& err) : Error(err) {}
-    virtual ~FormatError() noexcept = default;
 };
 
 /*!
@@ -57,7 +53,6 @@ struct CHFL_EXPORT FormatError : public Error {
  */
 struct CHFL_EXPORT PluginError : public Error {
     PluginError(const std::string& err) : Error(err) {}
-    virtual ~PluginError() noexcept = default;
 };
 
 

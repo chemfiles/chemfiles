@@ -1,5 +1,5 @@
 #include <cmath>
-#include "catch.hpp"
+#include <catch.hpp>
 #include "chemfiles.hpp"
 
 using namespace chemfiles;
