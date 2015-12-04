@@ -14,6 +14,10 @@
 using namespace chemfiles;
 using std::string;
 
+const char* chfl_version(void) {
+    return CHEMFILES_VERSION;
+}
+
 const char* chfl_strerror(int code){
     return status.message(code);
 }

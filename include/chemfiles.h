@@ -65,6 +65,12 @@ extern "C" {
 #define CHFL_CXX_ERROR 5
 
 /*!
+* @brief Get the version of the chemfiles library
+* @return A null-terminated string containing the version of Chemfiles.
+*/
+CHFL_EXPORT const char* chfl_version(void);
+
+/*!
 * @brief Get the error message corresponding to an error code.
 * @param status The error code
 * @return A null-terminated string encoding the textual representation of the status.

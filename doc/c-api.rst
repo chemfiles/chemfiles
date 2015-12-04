@@ -20,7 +20,10 @@ allocated memory, and calling the ``chfl_*_free`` functions return the correspon
 memory to the operating system.
 
 In addition to the functions below, the :ref:`same macro <exported-macro>` as in the C++
-interface are defined.
+interface are defined, and the ``chfl_version`` function allow to access the version of
+the Chemfiles library.
+
+.. doxygenfunction:: chfl_version
 
 Functions for errors handling
 -----------------------------

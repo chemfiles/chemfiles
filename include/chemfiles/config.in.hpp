@@ -16,7 +16,7 @@
 //! An integer containing the patch (0.0.x) version number
 #define CHEMFILES_VERSION_PATCH @CHEMFILES_VERSION_PATCH@
 //! The full version of chemfiles, as a string
-#define CHEMFILES_VERSION "@CHEMFILES_VERSION_SHORT@"
+#define CHEMFILES_VERSION "@CHEMFILES_VERSION@"
 
 // Include the export definitions
 #include "chemfiles/exports.hpp"
