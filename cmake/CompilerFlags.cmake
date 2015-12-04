@@ -1,4 +1,7 @@
 include(CheckCXXCompilerFlag)
+include(CheckCCompilerFlag)
+
+option(USE_WARNINGS "Compile the code with warnings (default in debug mode)" OFF)
 
 # C++11 support.
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -17,28 +20,52 @@ else()
     endif()
 endif()
 
-macro(set_debug_flag_if_possible _flag_)
+macro(add_warning _flag_)
     CHECK_CXX_COMPILER_FLAG("${_flag_}" CXX_SUPPORTS${_flag_})
+    CHECK_C_COMPILER_FLAG("${_flag_}" CC_SUPPORTS${_flag_})
     if(CXX_SUPPORTS${_flag_})
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${_flag_}")
+        if(USE_WARNINGS)
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_flag_}")
+        endif()
+    endif()
+
+    if(C_SUPPORTS${_flag_})
+        set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${_flag_}")
+        if(USE_WARNINGS)
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_flag_}")
+        endif()
     endif()
 endmacro()
 
 # Add some warnings in debug mode
 if(MSVC)
-    # set_debug_flag_if_possible("/W4")
+    add_warning("/W2")
 else()
-    set_debug_flag_if_possible("-Wall")
-    set_debug_flag_if_possible("-Wextra")
-    set_debug_flag_if_possible("-Wconversion")
-    set_debug_flag_if_possible("-Wsign-conversion")
-    set_debug_flag_if_possible("-Wsign-promo")
-    set_debug_flag_if_possible("-Wsuggest-override")
-    set_debug_flag_if_possible("-pedantic")
+    # Basic set of warnings
+    add_warning("-Wall")
+    add_warning("-Wextra")
+    # Initialization and convertion values
+    add_warning("-Wuninitialized")
+    add_warning("-Wconversion")
+    add_warning("-Wsign-conversion")
+    add_warning("-Wsign-promo")
+    # C++11 functionalities
+    add_warning("-Wsuggest-override")
+    add_warning("-Wsuggest-final-types")
+    # C++ standard conformance
+    add_warning("-Wpedantic")
+    add_warning("-pedantic")
+    # The compiler is your friend
+    add_warning("-Wdocumentation")
+    add_warning("-Wdeprecated")
+    add_warning("-Wextra-semi")
+
+    # Remove some warnings
+    add_warning("-Wno-potentially-evaluated-expression")
 endif()
 
-include(CheckCCompilerFlag)
-CHECK_C_COMPILER_FLAG("-std=c99" CC_SUPPORTS_C99)
+CHECK_C_COMPILER_FLAG("-std=c99" COMPILER_SUPPORTS_C99)
 
 if(CC_SUPPORTS_C99)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
