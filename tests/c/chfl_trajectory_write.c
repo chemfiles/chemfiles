@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 // Read a whole file at once
-static const char* read_whole_file(const char* name);
+static char* read_whole_file(const char* name);
 
 #if (defined(WIN32) || defined(WIN64))
 #define EOL "\r\n"
@@ -75,7 +75,7 @@ int main(){
     assert(!chfl_trajectory_write(file, frame));
     assert(!chfl_trajectory_sync(file));
 
-    const char* content = read_whole_file("test-tmp.xyz");
+    char* content = read_whole_file("test-tmp.xyz");
     assert(strcmp(content, expected_content) == 0);
     free(content);
 
@@ -87,13 +87,13 @@ int main(){
 }
 
 
-static const char* read_whole_file(const char* name) {
+static char* read_whole_file(const char* name) {
     char *buffer = NULL;
     FILE *file = fopen(name, "rb");
 
     if (file != NULL){
         fseek(file, 0L, SEEK_END);
-        long s = ftell(file);
+        size_t s = ftell(file);
         rewind(file);
         buffer = (char*)malloc(sizeof(char)*(s+1));
 
