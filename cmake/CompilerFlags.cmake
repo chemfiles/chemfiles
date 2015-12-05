@@ -66,8 +66,7 @@ else()
 endif()
 
 CHECK_C_COMPILER_FLAG("-std=c99" COMPILER_SUPPORTS_C99)
-
-if(CC_SUPPORTS_C99)
+if(COMPILER_SUPPORTS_C99)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 endif()
 
