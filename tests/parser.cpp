@@ -172,3 +172,96 @@ TEST_CASE("Lexing", "[selection]") {
         }
     }
 }
+
+TEST_CASE("Parsing", "[selection]") {
+    // This section uses the pretty-printing of AST to check the parsing
+    SECTION("Operators") {
+        auto ast = "and -> index == 1\n    -> index == 1";
+        CHECK(parse(tokenize("index == 1 and index == 1"))->print() == ast);
+
+        ast = "or -> index == 1\n   -> index == 1";
+        CHECK(parse(tokenize("index == 1 or index == 1"))->print() == ast);
+
+        ast = "not index == 1";
+        CHECK(parse(tokenize("not index == 1"))->print() == ast);
+
+        ast = "and -> index == 1\n    -> not index == 1";
+        CHECK(parse(tokenize("index == 1 and not index == 1"))->print() == ast);
+
+        ast = "or -> and -> index == 1\n          -> index == 1\n   -> index == 1";
+        CHECK(parse(tokenize("index == 1 and index == 1 or index == 1"))->print() == ast);
+
+        ast = "and -> index == 1\n    -> or -> index == 1\n          -> index == 1";
+        CHECK(parse(tokenize("index == 1 and (index == 1 or index == 1)"))->print() == ast);
+    }
+
+    SECTION("Name") {
+        CHECK(parse(tokenize("name == goo"))->print() == "name == goo");
+        // Short form
+        CHECK(parse(tokenize("name goo"))->print() == "name == goo");
+        CHECK(parse(tokenize("name != goo"))->print() == "name != goo");
+    }
+
+    SECTION("Index") {
+        CHECK(parse(tokenize("index == 4"))->print() == "index == 4");
+        // Short form
+        CHECK(parse(tokenize("index 5"))->print() == "index == 5");
+
+        CHECK(parse(tokenize("index <= 42"))->print() == "index <= 42");
+        CHECK(parse(tokenize("index != 12"))->print() == "index != 12");
+    }
+
+    SECTION("Position & velocity") {
+        CHECK(parse(tokenize("x == 4"))->print() == "x == 4.000000");
+        CHECK(parse(tokenize("y < 4"))->print() == "y < 4.000000");
+        CHECK(parse(tokenize("z >= 4"))->print() == "z >= 4.000000");
+
+        CHECK(parse(tokenize("vx == 4"))->print() == "vx == 4.000000");
+        CHECK(parse(tokenize("vy < 4"))->print() == "vy < 4.000000");
+        CHECK(parse(tokenize("vz >= 4"))->print() == "vz >= 4.000000");
+    }
+
+    SECTION("Parsing errors") {
+        std::vector<std::string> parse_fail = {
+            /* Giberish at the end of the selection */
+            "index == 23 6",
+            "index == 23 njzk",
+            "index == 23 !=",
+            "index == 23 name == 1",
+            /* Bad usage of the boolean operators */
+            "index == 23 and ",
+            "and index == 23",
+            "not and index == 23",
+            "index == 23 or ",
+            "or index == 23",
+            "not or index == 23",
+            "index == 23 not index == 1",
+            /* Name expressions */
+            "name == <",
+            "name == 56",
+            "name < foo",
+            "name 56",
+            "name >=",
+            /* index expressions */
+            "index == <",
+            "index == bar",
+            "index <=",
+            "index bar",
+            /* x|y|z expressions */
+            "z == <",
+            "y == bar",
+            "x <=",
+            "z bar",
+            /* vx|vy|vz expressions */
+            "vz == <",
+            "vy == bar",
+            "vx <=",
+            "vz bar",
+        };
+
+        for (auto& failure: parse_fail) {
+            auto toks = tokenize(failure);
+            CHECK_THROWS_AS(parse(toks), ParserError);
+        }
+    }
+}

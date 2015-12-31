@@ -40,6 +40,11 @@ public:
 //! Pretty-print an AST to any output stream
 std::ostream& operator<<(std::ostream& out, const Ast& expr);
 
+using token_iterator_t = std::vector<Token>::const_iterator;
+//! Dispatch to subexpressions for parsing, from the current value of `begin`
+//! This is an internal detail of the parsing algorithm.
+Ast dispatch_parsing(token_iterator_t& begin, const token_iterator_t& end);
+
 }} // namespace chemfiles && namespace selections
 
 #endif

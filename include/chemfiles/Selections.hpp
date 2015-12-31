@@ -28,6 +28,27 @@ namespace chemfiles {
 * The selection language is built by combining basic operations. Each basic
 * operation follows the `<selector> <operator> <value>` structure, where
 * `<operator>` can be a comparison operator in `== != < <= > >=`.
+*
+* Implemented `<selector>` and associated `<value>` types are given below:
+*
+* - `name`: select atoms on their name. `<value>` must be a string, and only the
+*   `==` and `!=` operators are allowed. Examples: `name == C`; `name != Hw`.
+* - `index`: select atoms on their index in the frame. `<value>` must be an
+*    integer. Examples: `index == 4`; `index > 304`.
+* - `x|y|z`: select atoms on their position. <value>` must be a number.
+*    Examples: `x <= 7.3`; `z != 4.2`; `y > 2`.
+* - `vx|vy|vz`: select atoms on their velocity. <value>` must be a number.
+*    Examples: `vx <= 7.3`; `vz != 4.2`; `vy > 2`.
+*
+* These basic operations can be combined by three logical operators: `and`, `or`
+* and `not`. Parentheses can be used to remove ambiguity when using multiple
+* operators.
+*
+* 	`name == H and (x < 45.9 or vz >= 67) and (not index == 67)`
+*
+* Some selections also accept a short form, where the comparison operator is
+* elided and implicitly `==`. These selections are `name` and `index`, as in
+* `name O or index 234` which is equivalent to `name == O or index == 234`.
 */
 class Selection {
 public:
