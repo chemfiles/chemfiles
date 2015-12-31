@@ -30,6 +30,8 @@
 #include "chemfiles/UnitCell.hpp"
 #include "chemfiles/Trajectory.hpp"
 
+#include "chemfiles/Selections.hpp"
+
 #undef CHEMFILES_PUBLIC
 
 #endif // CHEMFILES_HPP

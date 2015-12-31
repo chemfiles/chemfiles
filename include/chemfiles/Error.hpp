@@ -15,46 +15,42 @@
 
 namespace chemfiles {
 
-/*!
- * @class Error Error.hpp
- * @brief Base exception for chemfiles library
- */
+//! @exception Error Base exception class for chemfiles library
 struct CHFL_EXPORT Error : public std::runtime_error {
     Error(const std::string& err) : std::runtime_error(err) {}
 };
 
-/*!
- * @class FileError Error.hpp
- * @brief Exception for files related failures
- */
+//! @exception FileError Exception for files related failures
 struct CHFL_EXPORT FileError : public Error {
     FileError(const std::string& err) : Error(err) {}
 };
 
-/*!
- * @class MemoryError Error.hpp
- * @brief Exception for memory related failures
- */
+//! @exception MemoryError Exception for memory related failures
 struct CHFL_EXPORT MemoryError : public Error {
     MemoryError(const std::string& err) : Error(err) {}
 };
 
-/*!
- * @class FormatError Error.hpp
- * @brief Exception for formats related failures
- */
+//! @exception FormatError Exception for formats related failures
 struct CHFL_EXPORT FormatError : public Error {
     FormatError(const std::string& err) : Error(err) {}
 };
 
-/*!
- * @class PluginError Error.hpp
- * @brief Exception for dynamic library loading errors
- */
+//! @exception PluginError Exception for dynamic library loading errors
 struct CHFL_EXPORT PluginError : public Error {
     PluginError(const std::string& err) : Error(err) {}
 };
 
+//! @exception LexerError Exception for syntaxic errors in selections
+class LexerError: public Error {
+public:
+    LexerError(const std::string& err): Error(err) {}
+};
+
+//! @exception ParserError Exception for semantic and parsing errors in selections
+class ParserError: public Error {
+public:
+    ParserError(const std::string& err): Error(err) {}
+};
 
 } // namespace chemfiles
 
