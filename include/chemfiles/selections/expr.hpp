@@ -30,6 +30,61 @@ enum class BinOp {
     GE = Token::GE,     //! ">="
 };
 
+//! Helper class representing a specific component of a 3D vector. This class
+//! can take three values: X, Y or Z.
+class Coordinate {
+public:
+    Coordinate(const Coordinate& other) = default;
+    Coordinate(Coordinate&& other) = default;
+    Coordinate& operator=(const Coordinate& other) = default;
+    Coordinate& operator=(Coordinate&& other) = default;
+
+    //! Create a coordinate from a string. `"x"` maps to X, `"y"` to Y and
+    //! `"z"` to Z. Any other string is an error.
+    explicit Coordinate(const std::string& name) {
+        if (name == "x") {
+            coord_ = X;
+        } else if (name == "y") {
+            coord_ = Y;
+        } else if (name == "z") {
+            coord_ = Z;
+        } else {
+            throw std::runtime_error("Could not convert '" + name + "' to coordinate.");
+        }
+    }
+
+    //! Convert the coordinate to the corresponding index: 0 for X, 1 for Y and
+    //! 2 for Z.
+    size_t as_index() const {
+        switch (coord_) {
+        case X:
+            return 0;
+        case Y:
+            return 1;
+        case Z:
+            return 2;
+        }
+    }
+
+    //! Convert the coordinate to the corresponding string
+    std::string to_string() const {
+        switch (coord_) {
+        case X:
+            return "x";
+        case Y:
+            return "y";
+        case Z:
+            return "z";
+        }
+    }
+private:
+    enum {
+        X,
+        Y,
+        Z
+    } coord_;
+};
+
 //! @class NameExpr selections/expr.hpp selections/expr.cpp
 //! @brief Select atoms using their name.
 //!
@@ -62,11 +117,6 @@ private:
 //! the component of the position to use.
 class PositionExpr final: public Expr {
 public:
-    enum Coordinate {
-        X,
-        Y,
-        Z
-    };
     PositionExpr(Coordinate coord, BinOp op, double val): Expr(), coord_(coord), op_(op), val_(val) {}
     std::string print(unsigned delta) const override;
 private:
@@ -81,11 +131,6 @@ private:
 //! component of the velocity to use.
 class VelocityExpr final: public Expr {
 public:
-    enum Coordinate {
-        X,
-        Y,
-        Z
-    };
     VelocityExpr(Coordinate coord, BinOp op, double val): Expr(), coord_(coord), op_(op), val_(val) {}
     std::string print(unsigned delta) const override;
 private:

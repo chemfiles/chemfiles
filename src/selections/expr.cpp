@@ -17,7 +17,7 @@ std::ostream& operator<<(std::ostream& out, const std::unique_ptr<Expr>& expr) {
     return out;
 }
 
-//! Get the associated string to a binary operator as opstr<Op>::str;
+//! Get the associated string to a binary operator
 static std::string binop_str(BinOp op) {
     switch (op) {
     case BinOp::EQ:
@@ -61,15 +61,7 @@ template<> Ast selections::parse<NameExpr>(token_iterator_t& begin, const token_
 
 /****************************************************************************************/
 std::string PositionExpr::print(unsigned) const {
-    std::string coord;
-    if (coord_ == X) {
-        coord += "x ";
-    } else if (coord_ == Y) {
-        coord += "y ";
-    } else if (coord_ == Z) {
-        coord += "z ";
-    };
-    return coord + binop_str(op_) + " " + std::to_string(val_);
+    return coord_.to_string() + " " + binop_str(op_) + " " + std::to_string(val_);
 }
 
 template<> Ast selections::parse<PositionExpr>(token_iterator_t& begin, const token_iterator_t& end) {
@@ -78,18 +70,7 @@ template<> Ast selections::parse<PositionExpr>(token_iterator_t& begin, const to
     assert(begin[2].ident() == "x" || begin[2].ident() == "y" || begin[2].ident() == "z");
     assert(begin->is_binary_op());
 
-    decltype(PositionExpr::X) coord;
-    auto coord_name = begin[2].ident();
-    if (coord_name == "x") {
-        coord = PositionExpr::X;
-    } else if (coord_name == "y") {
-        coord = PositionExpr::Y;
-    } else if (coord_name == "z") {
-        coord = PositionExpr::Z;
-    } else {
-        throw std::runtime_error("Hit the default case in coordinate identification");
-    }
-
+    auto coord = Coordinate(begin[2].ident());
     auto op = BinOp(begin->type());
     if (begin[1].type() != Token::NUM) {
         throw ParserError("Position selection can only contain number as criterium.");
@@ -101,15 +82,7 @@ template<> Ast selections::parse<PositionExpr>(token_iterator_t& begin, const to
 
 /****************************************************************************************/
 std::string VelocityExpr::print(unsigned) const {
-    std::string coord;
-    if (coord_ == X) {
-        coord = "vx ";
-    } else if (coord_ == Y) {
-        coord = "vy ";
-    } else if (coord_ == Z) {
-        coord = "vz ";
-    };
-    return coord + binop_str(op_) + " " + std::to_string(val_);
+    return "v" + coord_.to_string() + " "  + binop_str(op_) + " " + std::to_string(val_);
 }
 
 template<> Ast selections::parse<VelocityExpr>(token_iterator_t& begin, const token_iterator_t& end) {
@@ -118,18 +91,7 @@ template<> Ast selections::parse<VelocityExpr>(token_iterator_t& begin, const to
     assert(begin[2].ident() == "vx" || begin[2].ident() == "vy" || begin[2].ident() == "vz");
     assert(begin->is_binary_op());
 
-    decltype(VelocityExpr::X) coord;
-    auto coord_name = begin[2].ident();
-    if (coord_name == "vx") {
-        coord = VelocityExpr::X;
-    } else if (coord_name == "vy") {
-        coord = VelocityExpr::Y;
-    } else if (coord_name == "vz") {
-        coord = VelocityExpr::Z;
-    } else {
-        throw std::runtime_error("Hit the default case in coordinate identification");
-    }
-
+    auto coord = Coordinate(begin[2].ident().substr(1));
     auto op = BinOp(begin->type());
     if (begin[1].type() != Token::NUM) {
         throw ParserError("Veclocity selection can only contain number as criterium.");
