@@ -11,7 +11,15 @@
 
 using namespace chemfiles;
 
+Selection::~Selection() = default;
+Selection::Selection(Selection&& other) = default;
+Selection& Selection::operator=(Selection&& other) = default;
+
 Selection::Selection(const std::string& selection) : selection_(selection), ast_(nullptr) {
     auto tokens = selections::tokenize(selection_);
     ast_ = selections::parse(tokens);
+}
+
+std::vector<Bool> Selection::evaluate(const Frame& frame) const {
+    return ast_->evaluate(frame);
 }

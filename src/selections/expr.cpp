@@ -6,6 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
  */
 #include <cmath>
+#include <functional>
+
 #include "chemfiles/selections/parser.hpp"
 #include "chemfiles/selections/expr.hpp"
 
@@ -37,6 +39,27 @@ static std::string binop_str(BinOp op) {
     }
 }
 
+//! Get the associated function to a binary operator for type `T`
+template<typename T>
+std::function<bool(T, T)> binop_comparison(BinOp op) {
+    switch (op) {
+    case BinOp::EQ:
+        return std::equal_to<T>();
+    case BinOp::NEQ:
+        return std::not_equal_to<T>();
+    case BinOp::LT:
+        return std::less<T>();
+    case BinOp::LE:
+        return std::less_equal<T>();
+    case BinOp::GT:
+        return std::greater<T>();
+    case BinOp::GE:
+        return std::greater_equal<T>();
+    default:
+        throw std::runtime_error("Hit the default case in binop_str");
+    }
+}
+
 /****************************************************************************************/
 std::string NameExpr::print(unsigned) const {
     if (equals_) {
@@ -44,6 +67,15 @@ std::string NameExpr::print(unsigned) const {
     } else {
         return "name != " + name_;
     }
+}
+
+std::vector<Bool> NameExpr::evaluate(const Frame& frame) const {
+    auto res = std::vector<Bool>(frame.natoms(), false);
+    auto topology = frame.topology();
+    for (size_t i=0; i<frame.natoms(); i++) {
+        res[i] = ((topology[i].name() == name_) == equals_);
+    }
+    return res;
 }
 
 template<> Ast selections::parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
@@ -62,6 +94,17 @@ template<> Ast selections::parse<NameExpr>(token_iterator_t& begin, const token_
 /****************************************************************************************/
 std::string PositionExpr::print(unsigned) const {
     return coord_.to_string() + " " + binop_str(op_) + " " + std::to_string(val_);
+}
+
+std::vector<Bool> PositionExpr::evaluate(const Frame& frame) const {
+    auto res = std::vector<Bool>(frame.natoms(), false);
+    auto compare = binop_comparison<double>(op_);
+    auto j = coord_.as_index();
+    auto positions = frame.positions();
+    for (size_t i=0; i<frame.natoms(); i++) {
+        res[i] = compare(positions[i][j], val_);
+    }
+    return res;
 }
 
 template<> Ast selections::parse<PositionExpr>(token_iterator_t& begin, const token_iterator_t& end) {
@@ -85,6 +128,19 @@ std::string VelocityExpr::print(unsigned) const {
     return "v" + coord_.to_string() + " "  + binop_str(op_) + " " + std::to_string(val_);
 }
 
+std::vector<Bool> VelocityExpr::evaluate(const Frame& frame) const {
+    auto res = std::vector<Bool>(frame.natoms(), false);
+    if (frame.velocities()) {
+        auto compare = binop_comparison<double>(op_);
+        auto j = coord_.as_index();
+        auto velocities = *frame.velocities();
+        for (size_t i=0; i<frame.natoms(); i++) {
+            res[i] = compare(velocities[i][j], val_);
+        }
+    }
+    return res;
+}
+
 template<> Ast selections::parse<VelocityExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
     assert(begin[2].type() == Token::IDENT);
@@ -104,6 +160,15 @@ template<> Ast selections::parse<VelocityExpr>(token_iterator_t& begin, const to
 /****************************************************************************************/
 std::string IndexExpr::print(unsigned) const {
     return "index " + binop_str(op_) + " " + std::to_string(val_);
+}
+
+std::vector<Bool> IndexExpr::evaluate(const Frame& frame) const {
+    auto res = std::vector<Bool>(frame.natoms(), false);
+    auto compare = binop_comparison<double>(op_);
+    for (size_t i=0; i<frame.natoms(); i++) {
+        res[i] = compare(i, val_);
+    }
+    return res;
 }
 
 template<> Ast selections::parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t& end) {
@@ -131,6 +196,17 @@ std::string AndExpr::print(unsigned delta) const {
     auto lhs = lhs_->print(7);
     auto rhs = rhs_->print(7);
     return "and -> " + lhs + "\n" + std::string(delta, ' ') + "    -> " + rhs;
+}
+
+std::vector<Bool> AndExpr::evaluate(const Frame& frame) const {
+    auto lhs = lhs_->evaluate(frame);
+    auto rhs = rhs_->evaluate(frame);
+    assert(lhs.size() == rhs.size());
+    assert(lhs.size() == frame.natoms());
+    for (size_t i=0; i<frame.natoms(); i++) {
+        lhs[i] = lhs[i] && rhs[i];
+    }
+    return lhs;
 }
 
 template<> Ast selections::parse<AndExpr>(token_iterator_t& begin, const token_iterator_t& end) {
@@ -163,6 +239,17 @@ std::string OrExpr::print(unsigned delta) const {
     return "or -> " + lhs + "\n" + std::string(delta, ' ') + "   -> " + rhs;
 }
 
+std::vector<Bool> OrExpr::evaluate(const Frame& frame) const {
+    auto lhs = lhs_->evaluate(frame);
+    auto rhs = rhs_->evaluate(frame);
+    assert(lhs.size() == rhs.size());
+    assert(lhs.size() == frame.natoms());
+    for (size_t i=0; i<frame.natoms(); i++) {
+        lhs[i] = lhs[i] || rhs[i];
+    }
+    return lhs;
+}
+
 template<> Ast selections::parse<OrExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin->type() == Token::OR);
     begin += 1;
@@ -190,6 +277,15 @@ template<> Ast selections::parse<OrExpr>(token_iterator_t& begin, const token_it
 std::string NotExpr::print(unsigned) const {
     auto ast = ast_->print(4);
     return "not " + ast;
+}
+
+std::vector<Bool> NotExpr::evaluate(const Frame& frame) const {
+    auto res = ast_->evaluate(frame);
+    assert(res.size() == frame.natoms());
+    for (size_t i=0; i<frame.natoms(); i++) {
+        res[i] = !res[i];
+    }
+    return res;
 }
 
 template<> Ast selections::parse<NotExpr>(token_iterator_t& begin, const token_iterator_t& end) {

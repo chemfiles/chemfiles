@@ -13,6 +13,7 @@
 #include <string>
 
 #include "chemfiles/Frame.hpp"
+#include "chemfiles/bool.hpp"
 
 namespace chemfiles {
     namespace selections {
@@ -58,8 +59,9 @@ public:
     //! @throws LexerError if there is a syntaxic error in the selection
     explicit Selection(const std::string& selection);
 
-    Selection(Selection&& other) = default;
-    Selection& operator=(Selection&& other) = default;
+    ~Selection();
+    Selection(Selection&& other);
+    Selection& operator=(Selection&& other);
 
     Selection(const Selection& other) = delete;
     Selection& operator=(const Selection& other) = delete;
@@ -67,7 +69,7 @@ public:
     //! Evaluate the selection on a given `frame`. This function returns a
     //! vector of size `Frame::natoms()`, containing `true` at the index `i` if
     //! the atom at index `i` matches the selection, and `false` otherwise.
-    std::vector<bool> evaluate(const Frame& frame);
+    std::vector<Bool> evaluate(const Frame& frame) const;
 private:
     std::string selection_;
     selections::Ast ast_;
