@@ -34,9 +34,9 @@ size_t Frame::natoms() const {
 }
 
 void Frame::resize(size_t size){
-    _positions.resize(size, 0.0);
+    _positions.resize(size, vector3d(0.0, 0.0, 0.0));
     if (_velocities) {
-        _velocities->resize(size, 0.0);
+        _velocities->resize(size, vector3d(0.0, 0.0, 0.0));
     }
 }
 
