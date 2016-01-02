@@ -20,9 +20,10 @@ TEST_CASE("Frame class usage", "[Frame]"){
         frame.cell(UnitCell(10));
         CHECK(frame.cell().type() == UnitCell::ORTHOROMBIC);
 
-        CHECK(frame.topology().natom_types() == 0);
-        frame.topology().append(Atom("H"));
+        // We already have dummy atoms in the topology
         CHECK(frame.topology().natom_types() == 1);
+        frame.topology().append(Atom("H"));
+        CHECK(frame.topology().natom_types() == 2);
 
         frame.resize(15);
         CHECK(frame.natoms() == 15);

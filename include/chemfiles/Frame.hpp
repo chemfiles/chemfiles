@@ -38,6 +38,9 @@ public:
     Frame();
     //! Constructor reserving some space for \c natoms
     explicit Frame(size_t natoms);
+    //! Constructor reserving space for `topology.natoms()`, and using `cell`
+    //! as unit cell. `cell` default to an `INFINITE` unit cell.
+    explicit Frame(const Topology& topology, const UnitCell& cell = UnitCell());
 
     //! Get a modifiable reference to the positions
     Array3D& positions() {return _positions;}
