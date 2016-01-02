@@ -38,6 +38,14 @@ inline double dot(const Vector3D& lhs, const Vector3D& rhs) {
     return lhs[0]*rhs[0] + lhs[1]*rhs[1] + lhs[2]*rhs[2];
 }
 
+//! Compute the cross product of the vectors `lhs` and `rhs`.
+inline Vector3D cross(const Vector3D& lhs, const Vector3D& rhs) {
+    auto x = lhs[1]*rhs[2] - lhs[2]*rhs[1];
+    auto y = lhs[2]*rhs[0] - lhs[0]*rhs[2];
+    auto z = lhs[0]*rhs[1] - lhs[1]*rhs[0];
+    return vector3d(x, y, z);
+}
+
 //! Compute the squared euclidean norm of a vector.
 inline double norm2(const Vector3D& rhs) {
     return dot(rhs, rhs);
