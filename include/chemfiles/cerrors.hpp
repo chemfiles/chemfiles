@@ -26,6 +26,8 @@ struct CAPIStatus {
         FILE = CHFL_FILE_ERROR,
         //! Error in file formating
         FORMAT = CHFL_FORMAT_ERROR,
+        //! Error in selection parsing
+        SELECTION = CHFL_SELECTION_ERROR,
         //! Catch all chemfiles::Error errors
         CHEMFILES = CHFL_GENERIC_ERROR,
         //! Error in the C++ standard library
@@ -39,6 +41,7 @@ struct CAPIStatus {
         messages[MEMORY] = "Memory error. Use chfl_last_error for more informations.";
         messages[FILE] = "Error while reading a file. Use chfl_last_error for more informations.";
         messages[FORMAT] = "Error while reading a format. Use chfl_last_error for more informations.";
+        messages[SELECTION] = "Error in selection string parsing. Use chfl_last_error for more informations.";
         messages[CHEMFILES] = "Error in chemfiles library. Use chfl_last_error for more informations.";
         messages[CXX_ERROR] = "Error in C++ runtime. Use chfl_last_error for more informations.";
     }
@@ -79,6 +82,8 @@ static CAPIStatus status = CAPIStatus();
     CATCH_AND_RETURN(FileError, CAPIStatus::FILE)                              \
     CATCH_AND_RETURN(MemoryError, CAPIStatus::MEMORY)                          \
     CATCH_AND_RETURN(FormatError, CAPIStatus::FORMAT)                          \
+    CATCH_AND_RETURN(LexerError, CAPIStatus::SELECTION)                        \
+    CATCH_AND_RETURN(ParserError, CAPIStatus::SELECTION)                       \
     CATCH_AND_RETURN(Error, CAPIStatus::CHEMFILES)                             \
     catch(const std::exception& e) {                                           \
         status.last_error = string(e.what());                                  \
@@ -95,6 +100,8 @@ static CAPIStatus status = CAPIStatus();
     CATCH_AND_GOTO(FileError)                                                  \
     CATCH_AND_GOTO(MemoryError)                                                \
     CATCH_AND_GOTO(FormatError)                                                \
+    CATCH_AND_GOTO(LexerError)                                                 \
+    CATCH_AND_GOTO(ParserError)                                                \
     CATCH_AND_GOTO(Error)                                                      \
     catch(const std::exception& e) {                                           \
         status.last_error = string(e.what());                                  \

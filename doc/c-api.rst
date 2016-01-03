@@ -117,6 +117,8 @@ Function manipulating ``CHFL_FRAME``
 
 .. doxygenfunction:: chfl_frame_guess_topology
 
+.. doxygenfunction:: chfl_frame_selection
+
 .. doxygenfunction:: chfl_frame_free
 
 .. _capi-cell:

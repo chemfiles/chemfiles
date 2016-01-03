@@ -256,6 +256,24 @@ int chfl_frame_guess_topology(CHFL_FRAME* frame, bool bonds){
     )
 }
 
+int chfl_frame_selection(const CHFL_FRAME* frame, const char* selection, bool matched[], size_t natoms) {
+    assert(frame != nullptr);
+    assert(selection != nullptr);
+    assert(matched != nullptr);
+    if (frame->natoms() != natoms) {
+        status.last_error = "The 'select' array have a wrong size: it is "
+                            + std::to_string(natoms) + " but should be " + std::to_string(frame->natoms());
+        return CAPIStatus::MEMORY;
+    }
+    CHFL_ERROR_WRAP_RETCODE(
+        auto sel = Selection(selection);
+        auto matched_vec = sel.evaluate(*frame);
+        for (size_t i=0; i<natoms; i++) {
+            matched[i] = static_cast<bool>(matched_vec[i]);
+        }
+    )
+}
+
 int chfl_frame_free(CHFL_FRAME* frame) {
     assert(frame != nullptr);
     CHFL_ERROR_WRAP_RETCODE(

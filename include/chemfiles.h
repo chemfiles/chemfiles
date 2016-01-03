@@ -59,10 +59,12 @@ extern "C" {
 #define CHFL_FILE_ERROR 2
 //! Error in file formating
 #define CHFL_FORMAT_ERROR 3
+//! Error in selection parsing
+#define CHFL_SELECTION_ERROR 4
 //! Any other error from Chemfiles
-#define CHFL_GENERIC_ERROR 4
+#define CHFL_GENERIC_ERROR 5
 //! Error in the C++ standard library
-#define CHFL_CXX_ERROR 5
+#define CHFL_CXX_ERROR 6
 
 /*!
 * @brief Get the version of the chemfiles library
@@ -332,6 +334,29 @@ CHFL_EXPORT int chfl_frame_set_step(CHFL_FRAME* frame, size_t step);
 * @return The status code
 */
 CHFL_EXPORT int chfl_frame_guess_topology(CHFL_FRAME* frame, bool bonds);
+
+/*!
+* @brief Select atoms in a frame, from a specific selection string.
+*
+* This function select atoms in a frame matching a selection string. For example,
+* "name H and x > 4" will select all the atoms with name "H" and $x$ coordinate
+* less than 4. See the C++ documentation for the full selection language.
+*
+* Results of this function are used to fill a pre-allocated array containing
+* `natoms` bool, where `natoms` is the number of atoms in the frame. The array
+* will contain `true` at position `i` if the atom at position `i` matches the
+* selection string, and false otherwise.
+*
+* @pre The range from `select` to `(select + natoms)` is a valid adress range.
+*
+* @param frame The frame to analyse
+* @param selection A null-terminated string containing the selection string
+* @param matched a pre-allocated array, with space for `natoms` booleans
+* @param natoms the size of the `matched` array. This MUST be the same number as
+*               the `frame` number of atoms.
+* @return The status code
+*/
+CHFL_EXPORT int chfl_frame_selection(const CHFL_FRAME* frame, const char* selection, bool matched[], size_t natoms);
 
 /*!
 * @brief Destroy a frame, and free the associated memory
