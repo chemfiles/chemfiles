@@ -22,7 +22,7 @@ namespace chemfiles {
     }
 
 /*!
-* @class Selection Selection.hpp Selection.cpp
+* @class Selection Selections.hpp Selections.cpp
 * @brief This class allow to select some atoms in a `Frame`, using a specific
 * selection language.
 *

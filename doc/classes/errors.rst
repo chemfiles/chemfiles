@@ -31,17 +31,23 @@ All the exceptions derives from ``chemfiles::Error``, so catching only
 grain control. ``chemfiles::Error`` derives from ``std::runtime_error``, and thus
 should play nicely with any exisiting C++ error handling.
 
-.. doxygenclass:: chemfiles::Error
+.. doxygenstruct:: chemfiles::Error
     :members:
 
-.. doxygenclass:: chemfiles::FileError
+.. doxygenstruct:: chemfiles::FileError
     :members:
 
-.. doxygenclass:: chemfiles::MemoryError
+.. doxygenstruct:: chemfiles::MemoryError
     :members:
 
-.. doxygenclass:: chemfiles::FormatError
+.. doxygenstruct:: chemfiles::FormatError
     :members:
 
-.. doxygenclass:: chemfiles::PluginError
+.. doxygenstruct:: chemfiles::PluginError
+    :members:
+
+.. doxygenstruct:: chemfiles::ParserError
+    :members:
+
+.. doxygenstruct:: chemfiles::LexerError
     :members:
