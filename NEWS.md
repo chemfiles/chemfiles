@@ -9,6 +9,9 @@
   `CHFL_SUCCESS`, `CHFL_MEMORY_ERROR`, `CHFL_FILE_ERROR`, `CHFL_FORMAT_ERROR`,
   `CHFL_GENERIC_ERROR`, `CHFL_CXX_ERROR`.
 * Add the `chfl_version` function in C API.
+* Add a small selection language *a la* VMD, allowing to select atoms matching
+  a selection string like `"name H and x > 4"`. This is exposed to C++ with the
+  public `Selection` class, and to C with the `chfl_frame_selection` function.
 
 # 0.4
 
