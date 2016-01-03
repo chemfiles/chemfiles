@@ -41,14 +41,12 @@ struct CHFL_EXPORT PluginError : public Error {
 };
 
 //! @exception LexerError Exception for syntaxic errors in selections
-class LexerError: public Error {
-public:
+struct CHFL_EXPORT LexerError: public Error {
     LexerError(const std::string& err): Error(err) {}
 };
 
 //! @exception ParserError Exception for semantic and parsing errors in selections
-class ParserError: public Error {
-public:
+struct CHFL_EXPORT ParserError: public Error {
     ParserError(const std::string& err): Error(err) {}
 };
 

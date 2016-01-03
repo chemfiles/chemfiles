@@ -51,7 +51,7 @@ namespace chemfiles {
 * elided and implicitly `==`. These selections are `name` and `index`, as in
 * `name O or index 234` which is equivalent to `name == O or index == 234`.
 */
-class Selection {
+class CHFL_EXPORT Selection {
 public:
     //! Create a selection using the given string.
     //!
