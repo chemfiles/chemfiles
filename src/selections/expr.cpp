@@ -61,6 +61,23 @@ std::function<bool(T, T)> binop_comparison(BinOp op) {
 }
 
 /****************************************************************************************/
+std::string AllExpr::print(unsigned) const {
+    return "all";
+}
+
+std::vector<Bool> AllExpr::evaluate(const Frame& frame) const {
+    return std::vector<Bool>(frame.natoms(), true);
+}
+
+template<> Ast parse<AllExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+    assert(end - begin >= 1);
+    assert(begin->type() == Token::IDENT);
+    assert(begin->ident() == "all");
+    begin += 1;
+    return Ast(new AllExpr());
+}
+
+/****************************************************************************************/
 std::string NameExpr::print(unsigned) const {
     if (equals_) {
         return "name == " + name_;

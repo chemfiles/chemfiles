@@ -89,6 +89,15 @@ private:
     } coord_;
 };
 
+//! @class AllExpr selections/expr.hpp selections/expr.cpp
+//! @brief Selection matching all atoms
+class AllExpr final: public Expr {
+public:
+    AllExpr(): Expr() {}
+    std::string print(unsigned delta) const override;
+    std::vector<Bool> evaluate(const Frame& frame) const override;
+};
+
 //! @class NameExpr selections/expr.hpp selections/expr.cpp
 //! @brief Select atoms using their name.
 //!

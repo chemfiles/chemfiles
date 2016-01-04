@@ -8,6 +8,16 @@ Frame testing_frame();
 TEST_CASE("Selections", "[selection]") {
     auto frame = testing_frame();
 
+    SECTION("all") {
+        auto sel = Selection("all");
+        auto res = std::vector<Bool>{true, true, true, true};
+        CHECK(sel.evaluate(frame) == res);
+
+        sel = Selection("index != 2 and all");
+        res = std::vector<Bool>{true, true, false, true};
+        CHECK(sel.evaluate(frame) == res);
+    }
+
     SECTION("index") {
         auto sel = Selection("index == 2");
         auto res = std::vector<Bool>{false, false, true, false};

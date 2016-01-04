@@ -129,6 +129,8 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
         } else {
             throw ParserError("Unknown operation: " + ident);
         }
+    } else if (begin->type() == Token::IDENT && begin->ident() == "all") {
+        return parse<AllExpr>(begin, end);
     } else {
         throw ParserError("Could not parse the selection");
     }

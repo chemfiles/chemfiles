@@ -195,6 +195,18 @@ TEST_CASE("Parsing", "[selection]") {
         CHECK(parse(tokenize("index == 1 and (index == 1 or index == 1)"))->print() == ast);
     }
 
+    SECTION("all") {
+        CHECK(parse(tokenize("all"))->print() == "all");
+
+        auto ast = "or -> all\n   -> name == H";
+        CHECK(parse(tokenize("all or name H"))->print() == ast);
+
+        ast = "or -> name == H\n   -> all";
+        CHECK(parse(tokenize("name H or all"))->print() == ast);
+
+        CHECK(parse(tokenize("not all"))->print() == "not all");
+    }
+
     SECTION("Name") {
         CHECK(parse(tokenize("name == goo"))->print() == "name == goo");
         // Short form
