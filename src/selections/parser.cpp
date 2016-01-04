@@ -15,20 +15,21 @@
 using namespace chemfiles;
 using namespace selections;
 
-// Standard shunting-yard algorithm, as described in Wikipedia
-// https://en.wikipedia.org/wiki/Shunting-yard_algorithm
-//
-// This convert infix expressions into an AST-like expression, while checking parentheses.
-// The following input:
-//      name == bar and x <= 56
-// is converted to:
-//      and <= 56 x == bar name
-// which is the AST for
-//            and
-//        /         \
-//       ==         <=
-//      /  \       /  \
-//  name   bar    x   56
+/* Standard shunting-yard algorithm, as described in Wikipedia
+ * https://en.wikipedia.org/wiki/Shunting-yard_algorithm
+ *
+ * This convert infix expressions into an AST-like expression, while checking parentheses.
+ * The following input:
+ *       name == bar and x <= 56
+ * is converted to:
+ *       and <= 56 x == bar name
+ * which is the AST for
+ *             and
+ *         /          \
+ *        ==          <=
+ *       /  \        /  \
+ *    name   bar    x    56
+ */
 static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t end) {
     std::stack<Token> operators;
     std::vector<Token> output;
@@ -78,10 +79,11 @@ static bool have_short_form(const std::string& expr) {
     return expr == "name" || expr == "index";
 }
 
-/// Rewrite the token stream to convert short form for the expressions to the long one.
-///
-/// Short forms are expressions like `name foo` or `index 3`, which are equivalent
-/// to `name == foo` and `index == 3`.
+/* Rewrite the token stream to convert short form for the expressions to the long one.
+ *
+ * Short forms are expressions like `name foo` or `index 3`, which are equivalent
+ * to `name == foo` and `index == 3`.
+ */
 static std::vector<Token> clean_token_stream(std::vector<Token> stream) {
     auto out = std::vector<Token>();
     for (auto it=stream.cbegin(); it != stream.cend(); it++) {
