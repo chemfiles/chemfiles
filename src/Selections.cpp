@@ -12,8 +12,8 @@
 using namespace chemfiles;
 
 Selection::~Selection() = default;
-Selection::Selection(Selection&& other) = default;
-Selection& Selection::operator=(Selection&& other) = default;
+Selection::Selection(Selection&&) = default;
+Selection& Selection::operator=(Selection&&) = default;
 
 Selection::Selection(const std::string& selection) : selection_(selection), ast_(nullptr) {
     auto tokens = selections::tokenize(selection_);
