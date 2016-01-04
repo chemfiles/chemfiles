@@ -82,21 +82,31 @@ public:
 
     //! Check whether this token is a boolean operator, *i.e.* one of `and`, `or` or `not`
     bool is_boolean_op() const {
-        return (type_ == AND) || (type_ == OR) || (type_ == NOT);
+        return (type() == AND || type() == OR || type() == NOT);
     }
 
     //! Check whether this token is a binary comparison operator, *i.e.* one of `==`, `!=`
     //! `<`, `<=`, `>` or `>=`.
     bool is_binary_op() const {
-        return (type_ == EQ) || (type_ == NEQ) ||
-               (type_ == LT) || (type_ == LE)  ||
-               (type_ == GT) || (type_ == GE);
+        return (type() == EQ || type() == NEQ ||
+                type() == LT || type() == LE  ||
+                type() == GT || type() == GE);
     }
 
     //! Check whether this token is an operator, either a binary comparison operator or a
     //! boolean operator
     bool is_operator() const {
         return is_binary_op() || is_boolean_op();
+    }
+
+    //! Check whether this token is an identifier
+    bool is_ident() const {
+        return type() == IDENT;
+    }
+
+    //! Check whether this token is a number
+    bool is_number() const {
+        return type() == NUM;
     }
 
     //! Get the precedence of this token. Parentheses have a precedence of 0, operators

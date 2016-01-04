@@ -69,6 +69,7 @@ TEST_CASE("Tokens", "[selection]") {
         auto token = Token("blabla");
 
         REQUIRE(token.type() == Token::IDENT);
+        CHECK(token.is_ident());
         CHECK(token.ident() == "blabla");
 
         CHECK_FALSE(token.is_binary_op());
@@ -80,6 +81,7 @@ TEST_CASE("Tokens", "[selection]") {
         auto token = Token(3.4);
 
         REQUIRE(token.type() == Token::NUM);
+        CHECK(token.is_number());
         CHECK(token.number() == 3.4);
 
         CHECK_FALSE(token.is_binary_op());

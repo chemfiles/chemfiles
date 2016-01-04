@@ -34,7 +34,7 @@ static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t
     std::stack<Token> operators;
     std::vector<Token> output;
     while (token != end) {
-        if (token->type() == Token::IDENT || token->type() == Token::NUM) {
+        if (token->is_ident() || token->is_number()) {
             output.push_back(*token);
         } else if (token->is_operator()) {
             while (!operators.empty()) {
@@ -87,7 +87,7 @@ static bool have_short_form(const std::string& expr) {
 static std::vector<Token> clean_token_stream(std::vector<Token> stream) {
     auto out = std::vector<Token>();
     for (auto it=stream.cbegin(); it != stream.cend(); it++) {
-        if (it->type() == Token::IDENT && have_short_form(it->ident())) {
+        if (it->is_ident() && have_short_form(it->ident())) {
             auto next = it + 1;
             if (next != stream.cend() && !next->is_operator()) {
                 out.emplace_back(Token(Token::EQ));
@@ -131,7 +131,7 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
         } else {
             throw ParserError("Unknown operation: " + ident);
         }
-    } else if (begin->type() == Token::IDENT && begin->ident() == "all") {
+    } else if (begin->is_ident() && begin->ident() == "all") {
         return parse<AllExpr>(begin, end);
     } else {
         throw ParserError("Could not parse the selection");

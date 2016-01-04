@@ -71,7 +71,7 @@ std::vector<Bool> AllExpr::evaluate(const Frame& frame) const {
 
 template<> Ast parse<AllExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 1);
-    assert(begin->type() == Token::IDENT);
+    assert(begin->is_ident());
     assert(begin->ident() == "all");
     begin += 1;
     return Ast(new AllExpr());
@@ -97,12 +97,12 @@ std::vector<Bool> NameExpr::evaluate(const Frame& frame) const {
 
 template<> Ast parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
-    assert(begin[2].type() == Token::IDENT);
+    assert(begin[2].is_ident());
     assert(begin[2].ident() == "name");
-    if (begin[1].type() != Token::IDENT || !(begin->type() == Token::EQ || begin->type() == Token::NEQ)) {
+    if (!begin[1].is_ident() || !(begin[0].type() == Token::EQ || begin[0].type() == Token::NEQ)) {
         throw ParserError("Name selection must follow the pattern: 'name == {name} | name != {name}'");
     }
-    auto equals = (begin->type() == Token::EQ);
+    auto equals = (begin[0].type() == Token::EQ);
     auto name = begin[1].ident();
     begin += 3;
     return Ast(new NameExpr(name, equals));
@@ -126,13 +126,13 @@ std::vector<Bool> PositionExpr::evaluate(const Frame& frame) const {
 
 template<> Ast parse<PositionExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
-    assert(begin[2].type() == Token::IDENT);
+    assert(begin[2].is_ident());
     assert(begin[2].ident() == "x" || begin[2].ident() == "y" || begin[2].ident() == "z");
     assert(begin->is_binary_op());
 
     auto coord = Coordinate(begin[2].ident());
-    auto op = BinOp(begin->type());
-    if (begin[1].type() != Token::NUM) {
+    auto op = BinOp(begin[0].type());
+    if (!begin[1].is_number()) {
         throw ParserError("Position selection can only contain number as criterium.");
     }
     auto val = begin[1].number();
@@ -160,13 +160,13 @@ std::vector<Bool> VelocityExpr::evaluate(const Frame& frame) const {
 
 template<> Ast parse<VelocityExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
-    assert(begin[2].type() == Token::IDENT);
+    assert(begin[2].is_ident());
     assert(begin[2].ident() == "vx" || begin[2].ident() == "vy" || begin[2].ident() == "vz");
     assert(begin->is_binary_op());
 
     auto coord = Coordinate(begin[2].ident().substr(1));
-    auto op = BinOp(begin->type());
-    if (begin[1].type() != Token::NUM) {
+    auto op = BinOp(begin[0].type());
+    if (!begin[1].is_number()) {
         throw ParserError("Veclocity selection can only contain number as criterium.");
     }
     auto val = begin[1].number();
@@ -190,12 +190,12 @@ std::vector<Bool> IndexExpr::evaluate(const Frame& frame) const {
 
 template<> Ast parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
-    assert(begin[2].type() == Token::IDENT);
+    assert(begin[2].is_ident());
     assert(begin[2].ident() == "index");
     assert(begin->is_binary_op());
 
-    auto op = BinOp(begin->type());
-    if (begin[1].type() == Token::NUM) {
+    auto op = BinOp(begin[0].type());
+    if (begin[1].is_number()) {
         auto num = begin[1].number();
         if (ceil(num) != num) {
             throw ParserError("Index selection should contain an integer");
@@ -227,7 +227,7 @@ std::vector<Bool> AndExpr::evaluate(const Frame& frame) const {
 }
 
 template<> Ast parse<AndExpr>(token_iterator_t& begin, const token_iterator_t& end) {
-    assert(begin->type() == Token::AND);
+    assert(begin[0].type() == Token::AND);
     begin += 1;
     if (begin == end) throw ParserError("Missing right-hand side operand to 'and'");
 
@@ -268,7 +268,7 @@ std::vector<Bool> OrExpr::evaluate(const Frame& frame) const {
 }
 
 template<> Ast parse<OrExpr>(token_iterator_t& begin, const token_iterator_t& end) {
-    assert(begin->type() == Token::OR);
+    assert(begin[0].type() == Token::OR);
     begin += 1;
     if (begin == end) throw ParserError("Missing right-hand side operand to 'or'");
 
@@ -306,7 +306,7 @@ std::vector<Bool> NotExpr::evaluate(const Frame& frame) const {
 }
 
 template<> Ast parse<NotExpr>(token_iterator_t& begin, const token_iterator_t& end) {
-    assert(begin->type() == Token::NOT);
+    assert(begin[0].type() == Token::NOT);
     begin += 1;
     if (begin == end) throw ParserError("Missing operand to 'not'");
 
