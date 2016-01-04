@@ -11,8 +11,8 @@
 #include "chemfiles/selections/parser.hpp"
 #include "chemfiles/selections/expr.hpp"
 
-using namespace chemfiles;
-using namespace chemfiles::selections;
+namespace chemfiles {
+namespace selections {
 
 std::ostream& operator<<(std::ostream& out, const std::unique_ptr<Expr>& expr) {
     out << expr->print();
@@ -78,7 +78,7 @@ std::vector<Bool> NameExpr::evaluate(const Frame& frame) const {
     return res;
 }
 
-template<> Ast selections::parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template<> Ast parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
     assert(begin[2].type() == Token::IDENT);
     assert(begin[2].ident() == "name");
@@ -107,7 +107,7 @@ std::vector<Bool> PositionExpr::evaluate(const Frame& frame) const {
     return res;
 }
 
-template<> Ast selections::parse<PositionExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template<> Ast parse<PositionExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
     assert(begin[2].type() == Token::IDENT);
     assert(begin[2].ident() == "x" || begin[2].ident() == "y" || begin[2].ident() == "z");
@@ -141,7 +141,7 @@ std::vector<Bool> VelocityExpr::evaluate(const Frame& frame) const {
     return res;
 }
 
-template<> Ast selections::parse<VelocityExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template<> Ast parse<VelocityExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
     assert(begin[2].type() == Token::IDENT);
     assert(begin[2].ident() == "vx" || begin[2].ident() == "vy" || begin[2].ident() == "vz");
@@ -164,14 +164,14 @@ std::string IndexExpr::print(unsigned) const {
 
 std::vector<Bool> IndexExpr::evaluate(const Frame& frame) const {
     auto res = std::vector<Bool>(frame.natoms(), false);
-    auto compare = binop_comparison<double>(op_);
+    auto compare = binop_comparison<size_t>(op_);
     for (size_t i=0; i<frame.natoms(); i++) {
         res[i] = compare(i, val_);
     }
     return res;
 }
 
-template<> Ast selections::parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template<> Ast parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
     assert(begin[2].type() == Token::IDENT);
     assert(begin[2].ident() == "index");
@@ -209,7 +209,7 @@ std::vector<Bool> AndExpr::evaluate(const Frame& frame) const {
     return lhs;
 }
 
-template<> Ast selections::parse<AndExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template<> Ast parse<AndExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin->type() == Token::AND);
     begin += 1;
     if (begin == end) throw ParserError("Missing right-hand side operand to 'and'");
@@ -250,7 +250,7 @@ std::vector<Bool> OrExpr::evaluate(const Frame& frame) const {
     return lhs;
 }
 
-template<> Ast selections::parse<OrExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template<> Ast parse<OrExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin->type() == Token::OR);
     begin += 1;
     if (begin == end) throw ParserError("Missing right-hand side operand to 'or'");
@@ -288,7 +288,7 @@ std::vector<Bool> NotExpr::evaluate(const Frame& frame) const {
     return res;
 }
 
-template<> Ast selections::parse<NotExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template<> Ast parse<NotExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin->type() == Token::NOT);
     begin += 1;
     if (begin == end) throw ParserError("Missing operand to 'not'");
@@ -302,3 +302,5 @@ template<> Ast selections::parse<NotExpr>(token_iterator_t& begin, const token_i
 
     return Ast(new NotExpr(std::move(ast)));
 }
+
+}} // namespace chemfiles && namespace selections

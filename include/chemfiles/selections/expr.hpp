@@ -66,6 +66,7 @@ public:
         case Z:
             return 2;
         }
+        throw std::runtime_error("Unreachable");
     }
 
     //! Convert the coordinate to the corresponding string
@@ -78,6 +79,7 @@ public:
         case Z:
             return "z";
         }
+        throw std::runtime_error("Unreachable");
     }
 private:
     enum {
