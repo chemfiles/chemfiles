@@ -6,6 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
  */
 #include <algorithm>
+#include <locale>
+
 #include "chemfiles/Error.hpp"
 #include "chemfiles/selections/lexer.hpp"
 
@@ -128,7 +130,7 @@ static std::vector<std::string> split(const std::string& data) {
             }
             token.clear();
             tokens.push_back(std::string{c});
-        } else if (!std::isspace(c)) {
+        } else if (!std::isspace(c, std::locale("C"))) {
             token += c;
         } else {
             if (token.length()) {
