@@ -17,6 +17,7 @@ begining of your program in order to bring all the class in the main namespace.
    topology
    atom
    unitcell
+   selection
    logger
    errors
 

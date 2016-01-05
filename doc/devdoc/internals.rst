@@ -18,12 +18,13 @@ You may find the following directory in the chemfiles sources :
 Classes organisation
 --------------------
 
-Chemfiles is written in C++11, in an object-oriented fashion. In addition to the
-:ref:`5 public classes <classes-reference>`, other classes are used. A ``Trajectory``
-is built on the top of two other classes: a :ref:`File <file-class>` and  a
+Chemfiles is written in C++11, in an object-oriented fashion. A ``Trajectory``
+is built on the top of two other private classes: a :ref:`File <file-class>` and a
 :ref:`Format <format-class>`. The ``File`` classes provides IO operation, and the
 ``Format`` classes do all the work for reading/writing information from the ``File``.
-For more informations, read the following:
+
+.. image:: /static/img/classes.*
+    :align: center
 
 .. toctree::
    :maxdepth: 2

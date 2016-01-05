@@ -3,18 +3,13 @@
 Chemfiles features overview
 ===========================
 
-This figure represent how the basic types of chemfiles are arganised and how they
-interact together. The only types a chemfiles user should worry about are the
-``Trajectory``, ``Frame``, ``Topology``, ``Atom`` and ``UnitCell`` types. All of
-these are described in this section.
+This figure represent how the basic classs of chemfiles are arganised and how they
+interact together. The only classs a chemfiles user should worry about are the
+``Trajectory``, ``Frame``, ``Topology``, ``Atom``, ``UnitCell`` and ``Selection``.
+All of these are described in this section.
 
-.. image:: static/img/classes.*
-    :align: center
-
-They are various way of interacting with these types, all of them being described
-in the :ref:`classes-reference` section for the C++ interface. All the bindings may not
-provide all the functionalities, so if something is missing, just
-`ask for it! <https://github.com/chemfiles/chemfiles/issues/new>`_
+They are various way of interacting with these classes, all of them being described
+in the :ref:`classes-reference` section for the C++ interface.
 
 .. _overview-trajectory:
 
@@ -54,7 +49,7 @@ of ``Atom`` in the system.
 Atom: building blocks for simulations
 -------------------------------------
 
-The ``Atom`` type contains basic information about the atoms in the system:
+The ``Atom`` class contains basic information about the atoms in the system:
 the name (if it is disponible), mass, kind of atom and so on. Atoms are not
 limited to plain chemical elements. Four types of atoms are defined: *Element*
 are Atoms from the periodic classification; *coarse grained* atoms are particles
@@ -67,8 +62,18 @@ the TIP4P model of water; and *Undefined* atoms are all the other atoms types.
 UnitCell: wrapping the atoms together
 -------------------------------------
 
-The ``UnitCell`` type describe the boundary conditions of the system: where are
+The ``UnitCell`` class describe the boundary conditions of the system: where are
 the boundaries, and what is the periodicity of theses boundaries. An unit cell
 can be of three types: *Infinite*, *Orthorombic* or *Triclinic*. Inifinite cells
 does not have any boundaries. Orthorombic cells are defined by three orthogonals
 vectors, and Triclinic cells are defined by three vectors without any constrains.
+
+.. _overview-selection:
+
+Selections: selecting groups of atoms
+-------------------------------------
+
+Chemfiles provides a :ref:`selection language <selection-language>`, implemented in
+the ``Selection`` class. This selection language allow the users to select a group of
+atoms using a simple string. Examples of selections are ``"name H"`` and ``"(x < 45
+and name O) or name C"``. 

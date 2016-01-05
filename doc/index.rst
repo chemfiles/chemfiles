@@ -27,9 +27,6 @@ to re-use it as needed.
     I hope I can reach a stable interface pretty soon, once it have been validated on
     various formats.
 
-User manual
------------
-
 Even if chemfiles is written in C++, it can be used from the most popular scientific
 programming languages: C, Fortran, Python, … You can just pick up your favorite
 language to use it. This part of the documentation presents the data model used by
@@ -55,8 +52,8 @@ Basic usage of chemfiles looks like this in C++:
 
         // Do awesome science here with the positions
 
-        if (frame.has_velocities()) {
-            auto velocities = frame.velocities();
+        if (frame.velocities()) {
+            auto velocities = *frame.velocities();
 
             // If the file contains information about the velocities, you will
             // find them here.
@@ -78,14 +75,20 @@ following places:
 .. _Julia: http://julialang.org/
 .. _Rust: http://rust-lang.org/
 
-In the following parts, the documentation will cover how to install chemfiles, and
-how the data are organised.
+User manual
+-----------
+
+This section of the documentation will cover how to install chemfiles, give an
+high-level overview of the functionalities and the supported formats. In order to use
+chemfiles in your code, you should refer for now to the :ref:`classes-reference`, a
+more comprehensive tutorial is on the way.
 
 .. toctree::
     :maxdepth: 2
 
     installation
     overview
+    selections
     example
     formats
     others

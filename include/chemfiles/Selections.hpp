@@ -51,8 +51,8 @@ namespace chemfiles {
 * elided and implicitly `==`. These selections are `name` and `index`, as in
 * `name O or index 234` which is equivalent to `name == O or index == 234`.
 *
-* Another special basic operation is the "all" selection, matching all the atoms
-* in the frame. 
+* Another special basic operation is the `all` selection, matching all the atoms
+* in the frame.
 */
 class CHFL_EXPORT Selection {
 public:
