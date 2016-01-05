@@ -26,7 +26,7 @@
 namespace chemfiles {
 
 /*!
- * @class DynLib DynLib.hpp DynLib.cpp
+ * @class Dynlib Dynlib.hpp
  *
  * Cross-platform dynamic library loading, and symbol resolving
  */
