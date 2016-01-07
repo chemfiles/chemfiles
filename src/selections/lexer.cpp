@@ -6,13 +6,26 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
  */
 #include <algorithm>
-#include <locale>
 
 #include "chemfiles/Error.hpp"
 #include "chemfiles/selections/lexer.hpp"
 
 using namespace chemfiles;
 using namespace chemfiles::selections;
+
+// This intentionally does not account for other encoding or locale. Selection strings
+// should be given in ASCII or UTF-8 encoding.
+static bool is_alpha(char c) {
+    return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'));
+}
+
+static bool is_digit(char c) {
+    return (c >= '0' && c <= '9');
+}
+
+static bool is_space(char c) {
+    return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v' || c == '\f');
+}
 
 std::ostream& operator<<(std::ostream& out, const Token& token) {
     switch (token.type()) {
@@ -130,7 +143,7 @@ static std::vector<std::string> split(const std::string& data) {
             }
             token.clear();
             tokens.push_back(std::string{c});
-        } else if (!std::isspace(c, std::locale("C"))) {
+        } else if (!is_space(c)) {
             token += c;
         } else {
             if (token.length()) {
@@ -147,21 +160,18 @@ static std::vector<std::string> split(const std::string& data) {
 }
 
 static bool is_identifier(const std::string& token) {
-    if (token.length() == 0 || !std::isalpha(token[0], std::locale("C"))) {
+    if (token.length() == 0 || !is_alpha(token[0])) {
         return false;
     }
     auto it = std::find_if_not(std::begin(token), std::end(token), [](char c){
-        auto is_alpha = std::isalpha(c, std::locale("C"));
-        auto is_digit = std::isdigit(c, std::locale("C"));
-        return is_alpha || is_digit || c == '_';
+        return is_alpha(c) || is_digit(c) || c == '_';
     });
     return it == std::end(token);
 }
 
 static bool is_number(const std::string& token) {
     auto it = std::find_if_not(std::begin(token), std::end(token), [&](char c) {
-        auto is_digit = std::isdigit(c, std::locale("C"));
-        return is_digit || c == '.' || c == 'e' || c == '-' || c == '+';
+        return is_digit(c) || c == '.' || c == 'e' || c == '-' || c == '+';
     });
     return it == std::end(token);
 }
