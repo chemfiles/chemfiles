@@ -77,7 +77,7 @@ static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t
 }
 
 static bool have_short_form(const std::string& expr) {
-    return expr == "name" || expr == "index";
+    return expr == "name" || expr == "index" || expr == "mass";
 }
 
 /* Rewrite the token stream to convert short form for the expressions to the long one.
@@ -121,6 +121,8 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
             return parse<NameExpr>(begin, end);
         } else if (ident == "index") {
             return parse<IndexExpr>(begin, end);
+        } else if (ident == "mass") {
+            return parse<MassExpr>(begin, end);
         } else if (ident == "x" || ident == "y" || ident == "z") {
             return parse<PositionExpr>(begin, end);
         } else if (ident == "vx" || ident == "vy" || ident == "vz") {

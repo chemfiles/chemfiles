@@ -150,6 +150,18 @@ private:
     double val_;
 };
 
+//! @class MassExpr selections/expr.hpp selections/expr.cpp
+//! @brief Select atoms using their mass, in atomic mass unit.
+class MassExpr final: public Expr {
+public:
+    MassExpr(BinOp op, double val): Expr(), op_(op), val_(val) {}
+    std::string print(unsigned delta) const override;
+    std::vector<Bool> evaluate(const Frame& frame) const override;
+private:
+    BinOp op_;
+    double val_;
+};
+
 /****************************************************************************************/
 
 //! @class AndExpr selections/expr.hpp selections/expr.cpp

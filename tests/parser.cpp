@@ -225,6 +225,15 @@ TEST_CASE("Parsing", "[selection]") {
         CHECK(parse(tokenize("index != 12"))->print() == "index != 12");
     }
 
+    SECTION("Mass") {
+        CHECK(parse(tokenize("mass == 4"))->print() == "mass == 4.000000");
+        // Short form
+        CHECK(parse(tokenize("mass 5"))->print() == "mass == 5.000000");
+
+        CHECK(parse(tokenize("mass <= 42"))->print() == "mass <= 42.000000");
+        CHECK(parse(tokenize("mass != 12"))->print() == "mass != 12.000000");
+    }
+
     SECTION("Position & velocity") {
         CHECK(parse(tokenize("x == 4"))->print() == "x == 4.000000");
         CHECK(parse(tokenize("y < 4"))->print() == "y < 4.000000");

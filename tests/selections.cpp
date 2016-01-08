@@ -28,6 +28,12 @@ TEST_CASE("Selections", "[selection]") {
         CHECK(sel.evaluate(frame) == res);
     }
 
+    SECTION("mass") {
+        auto sel = Selection("mass < 2");
+        auto res = std::vector<Bool>{true, false, false, true};
+        CHECK(sel.evaluate(frame) == res);
+    }
+
     SECTION("name") {
         auto sel = Selection("name O");
         auto res = std::vector<Bool>{false, true, true, false};

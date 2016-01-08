@@ -24,6 +24,9 @@ Simple selections consist of a selector and a condition. Supported selectors are
   and the atom index is compared to a positive integer value. The short form
   ``index <value>`` is equivalent to ``index == <value>``. Examples: ``index < 6``,
   ``index >= 42``;
+- ``mass``: select atoms based on their mass. Any operator can be used. The short form
+  ``mass <value>`` is equivalent to ``mass == <value>``. Examples: ``mass < 2.0``,
+  ``mass == 4.2``;
 - ``x``, ``y`` and ``z``: select atoms based on their position components. Any
   operator can be used, and their is no short form with this selection. ``==`` and
   ``!=`` can be used, but comparing floating point values will procude strange

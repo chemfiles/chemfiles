@@ -36,6 +36,8 @@ namespace chemfiles {
 *   `==` and `!=` operators are allowed. Examples: `name == C`; `name != Hw`.
 * - `index`: select atoms on their index in the frame. `<value>` must be an
 *    integer. Examples: `index == 4`; `index > 304`.
+* - `mass`: select atoms on their mass. `<value>` must be a number. Examples:
+*   `mass 4`; `mass < 2.0`.
 * - `x|y|z`: select atoms on their position. <value>` must be a number.
 *    Examples: `x <= 7.3`; `z != 4.2`; `y > 2`.
 * - `vx|vy|vz`: select atoms on their velocity. <value>` must be a number.
@@ -48,8 +50,8 @@ namespace chemfiles {
 * 	`name == H and (x < 45.9 or vz >= 67) and (not index == 67)`
 *
 * Some selections also accept a short form, where the comparison operator is
-* elided and implicitly `==`. These selections are `name` and `index`, as in
-* `name O or index 234` which is equivalent to `name == O or index == 234`.
+* elided and implicitly `==`. These selections are `name`, `index` and `mass`.
+* So `name O or index 234` is equivalent to `name == O or index == 234`.
 *
 * Another special basic operation is the `all` selection, matching all the atoms
 * in the frame.

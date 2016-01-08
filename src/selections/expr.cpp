@@ -209,6 +209,37 @@ template<> Ast parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t&
 }
 
 /****************************************************************************************/
+std::string MassExpr::print(unsigned) const {
+    return "mass " + binop_str(op_) + " " + std::to_string(val_);
+}
+
+std::vector<Bool> MassExpr::evaluate(const Frame& frame) const {
+    auto res = std::vector<Bool>(frame.natoms(), false);
+    auto compare = binop_comparison<double>(op_);
+    auto topology = frame.topology();
+    for (size_t i=0; i<frame.natoms(); i++) {
+        res[i] = compare(topology[i].mass(), val_);
+    }
+    return res;
+}
+
+template<> Ast parse<MassExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+    assert(end - begin >= 3);
+    assert(begin[2].is_ident());
+    assert(begin[2].ident() == "mass");
+    assert(begin[0].is_binary_op());
+
+    if (!begin[1].is_number()) {
+        throw ParserError("Mass selection should contain a number");
+    }
+
+    auto op = BinOp(begin[0].type());
+    auto val = static_cast<std::size_t>(begin[1].number());
+    begin += 3;
+    return Ast(new MassExpr(op, val));;
+}
+
+/****************************************************************************************/
 std::string AndExpr::print(unsigned delta) const {
     auto lhs = lhs_->print(7);
     auto rhs = rhs_->print(7);
