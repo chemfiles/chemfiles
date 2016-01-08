@@ -78,6 +78,23 @@ template<> Ast parse<AllExpr>(token_iterator_t& begin, const token_iterator_t& e
 }
 
 /****************************************************************************************/
+std::string NoneExpr::print(unsigned) const {
+    return "none";
+}
+
+std::vector<Bool> NoneExpr::evaluate(const Frame& frame) const {
+    return std::vector<Bool>(frame.natoms(), false);
+}
+
+template<> Ast parse<NoneExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+    assert(end - begin >= 1);
+    assert(begin->is_ident());
+    assert(begin->ident() == "none");
+    begin += 1;
+    return Ast(new NoneExpr());
+}
+
+/****************************************************************************************/
 std::string NameExpr::print(unsigned) const {
     if (equals_) {
         return "name == " + name_;

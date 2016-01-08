@@ -197,14 +197,15 @@ TEST_CASE("Parsing", "[selection]") {
         CHECK(parse(tokenize("index == 1 and (index == 1 or index == 1)"))->print() == ast);
     }
 
-    SECTION("all") {
+    SECTION("all & none") {
         CHECK(parse(tokenize("all"))->print() == "all");
+        CHECK(parse(tokenize("none"))->print() == "none");
 
         auto ast = "or -> all\n   -> name == H";
         CHECK(parse(tokenize("all or name H"))->print() == ast);
 
-        ast = "or -> name == H\n   -> all";
-        CHECK(parse(tokenize("name H or all"))->print() == ast);
+        ast = "or -> name == H\n   -> none";
+        CHECK(parse(tokenize("name H or none"))->print() == ast);
 
         CHECK(parse(tokenize("not all"))->print() == "not all");
     }

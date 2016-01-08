@@ -17,6 +17,7 @@ more or equal.
 
 Simple selections consist of a selector and a condition. Supported selectors are:
 
+- ``all`` and ``none``: Select respectively all and none of the atoms.
 - ``name``: select atoms based on their name. This selector support three forms:
   ``name == <value>``, ``name != <value>`` and a short form ``name <value>``
   which is equivalent to ``name == <value>``;

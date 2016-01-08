@@ -8,9 +8,13 @@ Frame testing_frame();
 TEST_CASE("Selections", "[selection]") {
     auto frame = testing_frame();
 
-    SECTION("all") {
+    SECTION("all & none") {
         auto sel = Selection("all");
         auto res = std::vector<Bool>{true, true, true, true};
+        CHECK(sel.evaluate(frame) == res);
+
+        sel = Selection("none");
+        res = std::vector<Bool>{false, false, false, false};
         CHECK(sel.evaluate(frame) == res);
 
         sel = Selection("index != 2 and all");
