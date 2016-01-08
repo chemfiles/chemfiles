@@ -8,7 +8,6 @@
 
 #ifndef CHFL_SELECTION_PARSER_HPP
 #define CHFL_SELECTION_PARSER_HPP
-#include "chemfiles/Error.hpp"
 #include "chemfiles/Selections.hpp"
 #include "chemfiles/selections/lexer.hpp"
 #include "chemfiles/bool.hpp"
@@ -19,7 +18,7 @@ namespace selections {
 //! Parse and create an AST from a stream of tokens
 //!
 //! @throws ParserError if the
-Ast parse(std::vector<Token> tstream);
+CHFL_EXPORT Ast parse(std::vector<Token> tstream);
 
 //! @class Expr parser.hpp
 //! @brief Abstract base class for expressions in the selection AST

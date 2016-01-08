@@ -8,12 +8,6 @@
 
 #ifndef CHFL_SELECTION_EXPR_HPP
 #define CHFL_SELECTION_EXPR_HPP
-#include <memory>
-#include <vector>
-#include <string>
-
-#include "chemfiles/bool.hpp"
-#include "chemfiles/selections/lexer.hpp"
 #include "chemfiles/selections/parser.hpp"
 
 namespace chemfiles {

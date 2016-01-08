@@ -11,6 +11,7 @@
 
 #include "chemfiles/selections/parser.hpp"
 #include "chemfiles/selections/expr.hpp"
+#include "chemfiles/Error.hpp"
 
 using namespace chemfiles;
 using namespace selections;

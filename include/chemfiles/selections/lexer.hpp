@@ -12,6 +12,7 @@
 #include <vector>
 #include <ostream>
 #include <cassert>
+#include <chemfiles/exports.hpp>
 
 namespace chemfiles {
 namespace selections {
@@ -25,7 +26,7 @@ namespace selections {
  * 	- numbers, the scientific notation is alowed;
  * 	- identifiers, obeing to the ([a-Z][a-Z_1-9]+) regular expression
  */
-class Token {
+class CHFL_EXPORT Token {
 public:
     //! Available token types
     enum TokenType {
@@ -129,7 +130,7 @@ private:
 //! Convert an `input` string to a stream of tokens
 //!
 //! @throws LexerError if the input string can not be tokenized
-std::vector<Token> tokenize(const std::string& input);
+CHFL_EXPORT std::vector<Token> tokenize(const std::string& input);
 
 }} // namespace chemfiles && namespace selections
 

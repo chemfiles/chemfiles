@@ -1,8 +1,8 @@
 #include <catch.hpp>
 
+#include "chemfiles.hpp"
 #include "chemfiles/selections/lexer.hpp"
 #include "chemfiles/selections/parser.hpp"
-#include "chemfiles/Error.hpp"
 
 using namespace chemfiles;
 using namespace chemfiles::selections;

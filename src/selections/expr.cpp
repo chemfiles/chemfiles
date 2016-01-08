@@ -8,7 +8,7 @@
 #include <cmath>
 #include <functional>
 
-#include "chemfiles/selections/parser.hpp"
+#include "chemfiles/Error.hpp"
 #include "chemfiles/selections/expr.hpp"
 
 namespace chemfiles {
