@@ -15,6 +15,7 @@ if(${ENABLE_NETCDF})
                     -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
                     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
                     -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
+                    -DCMAKE_RC_COMPILER=${CMAKE_RC_COMPILER}
                     # Setting installation directory
                     -DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}
                     # Support cross-compilation
@@ -52,6 +53,7 @@ ExternalProject_Add(molfiles
                 -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
                 -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
                 -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
+                -DCMAKE_RC_COMPILER=${CMAKE_RC_COMPILER}
                 -DCMAKE_CXX_FLAGS=${MOLFILE_FLAGS}
                 -DCMAKE_C_FLAGS=${MOLFILE_FLAGS}
                 # Setting installation directory
