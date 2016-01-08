@@ -113,11 +113,7 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
         }
     } else if (begin->is_binary_op()) {
         if ((end - begin) < 3 || begin[2].type() != Token::IDENT) {
-            std::stringstream tokens;
-            for (auto tok = end - 1; tok != begin - 1; tok--) {
-                tokens << tok->str() << " ";
-            }
-            throw ParserError("Bad binary operator: " + tokens.str());
+            throw ParserError("Bad binary operation around " + begin->str());
         }
 
         auto ident = begin[2].ident();
