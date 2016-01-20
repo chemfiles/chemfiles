@@ -14,7 +14,7 @@
 
 #include "chemfiles/Array3D.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/register_formats.hpp"
+#include "chemfiles/TrajectoryFactory.hpp"
 
 namespace chemfiles {
 
@@ -70,10 +70,6 @@ private:
     //! Was the associated file validated?
     bool validated_;
 };
-
-typedef concat<FORMATS_LIST, NCFormat>::type FormatListNC;
-#undef FORMATS_LIST
-#define FORMATS_LIST FormatListNC
 
 } // namespace chemfiles
 

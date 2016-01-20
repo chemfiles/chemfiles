@@ -12,8 +12,9 @@
 #include <unordered_map>
 #include <memory>
 
-#include "chemfiles/Format.hpp"
 #include "chemfiles/Error.hpp"
+#include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
 
 namespace chemfiles {
 
@@ -25,6 +26,21 @@ using std::string;
 typedef unique_ptr<Format> (*format_creator_t) (File& f);
 //! Function type to create a file
 typedef unique_ptr<File> (*file_creator_t) (const string& path, const string& mode);
+
+//! Function to create a file
+template <class file_t>
+unique_ptr<File> new_file(const string& path, const string& mode){
+    return unique_ptr<File>(new file_t(path, mode));
+}
+
+//! Function to create a format
+template <class format_t>
+unique_ptr<Format> new_format(File& file){
+    return unique_ptr<Format>(new format_t(file));
+}
+
+#define FORMAT_EXTENSION(x) static const char* extension() {static constexpr char val[] = #x; return val;}
+#define FORMAT_NAME(x) static const char* name() {static constexpr char val[] = #x; return val;}
 
 /*!
 * @class trajectory_builder TrajectoryFactory.hpp

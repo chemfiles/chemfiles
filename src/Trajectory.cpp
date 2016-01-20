@@ -8,6 +8,10 @@
 
 #include "chemfiles/Trajectory.hpp"
 #include "chemfiles/TrajectoryFactory.hpp"
+
+#include "chemfiles/Format.hpp"
+#include "chemfiles/File.hpp"
+
 #include "chemfiles/Logger.hpp"
 #include "chemfiles/files/BasicFile.hpp"
 

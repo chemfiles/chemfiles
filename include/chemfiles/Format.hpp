@@ -17,7 +17,6 @@ using std::shared_ptr;
 #include "chemfiles/files/BasicFile.hpp"
 
 namespace chemfiles {
-
 class Frame;
 
 /*!

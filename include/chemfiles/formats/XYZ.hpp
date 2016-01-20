@@ -12,13 +12,13 @@
 #include <string>
 
 #include "chemfiles/Format.hpp"
-#include "chemfiles/register_formats.hpp"
+#include "chemfiles/TrajectoryFactory.hpp"
 
 namespace chemfiles {
 
 /*!
  * @class XYZFormat formats/XYZ.hpp formats/XYZ.cpp
- * @brief XYZ file format reader.
+ * @brief XYZ file format reader and writer.
  *
  * The format is described at http://openbabel.org/wiki/XYZ
  */
@@ -40,10 +40,6 @@ public:
 private:
     TextFile& textfile_;
 };
-
-typedef concat<FORMATS_LIST, XYZFormat>::type FormatListXYZ;
-#undef FORMATS_LIST
-#define FORMATS_LIST FormatListXYZ
 
 } // namespace chemfiles
 

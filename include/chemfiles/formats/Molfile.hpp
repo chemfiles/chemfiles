@@ -19,7 +19,6 @@ extern "C" {
 #include "chemfiles/optional.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Dynlib.hpp"
-#include "chemfiles/register_formats.hpp"
 #include "chemfiles/Topology.hpp"
 
 namespace chemfiles {
@@ -81,16 +80,6 @@ private:
     /// Store optional topological information
     mutable optional<Topology> topology_;
 };
-
-typedef concat<FORMATS_LIST, Molfile<PDB>>::type molfile_list_1;
-typedef concat<molfile_list_1, Molfile<DCD>>::type molfile_list_2;
-typedef concat<molfile_list_2, Molfile<GRO>>::type molfile_list_3;
-typedef concat<molfile_list_3, Molfile<TRR>>::type molfile_list_4;
-typedef concat<molfile_list_4, Molfile<XTC>>::type molfile_list_5;
-typedef concat<molfile_list_5, Molfile<TRJ>>::type molfile_list_6;
-
-#undef FORMATS_LIST
-#define FORMATS_LIST molfile_list_6
 
 } // namespace chemfiles
 

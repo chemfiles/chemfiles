@@ -5,7 +5,6 @@
 
 #include "chemfiles.hpp"
 #include "chemfiles/TrajectoryFactory.hpp"
-#include "chemfiles/register_formats.hpp"
 #include "chemfiles/Error.hpp"
 #include "chemfiles/formats/XYZ.hpp"
 

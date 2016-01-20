@@ -6,6 +6,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 #include "chemfiles/TrajectoryFactory.hpp"
+#include "chemfiles/Format.hpp"
 
 #include "chemfiles/formats/XYZ.hpp"
 #include "chemfiles/formats/NCFormat.hpp"
@@ -14,10 +15,8 @@
 #include "chemfiles/files/NCFile.hpp"
 using namespace chemfiles;
 
-typedef FORMATS_LIST formats_list;
-
-template <typename T>
-inline void register_all_formats(trajectory_map_t& formats, trajectory_map_t& extensions, FormatList<T>) {
+template<typename T>
+void registration(trajectory_map_t& formats, trajectory_map_t& extensions) {
     auto creator = trajectory_builder_t{new_format<T>, new_file<typename T::file_t>};
 
     auto ext = std::string(T::extension());
@@ -37,14 +36,17 @@ inline void register_all_formats(trajectory_map_t& formats, trajectory_map_t& ex
     }
 }
 
-template <typename T, typename S, typename ...Types>
-inline void register_all_formats(trajectory_map_t& formats, trajectory_map_t& extensions, FormatList<T, S, Types...>) {
-    register_all_formats(formats, extensions, FormatList<T>());
-    register_all_formats(formats, extensions, FormatList<S, Types...>());
-}
-
 TrajectoryFactory::TrajectoryFactory() : formats_(), extensions_() {
-    register_all_formats(formats_, extensions_, formats_list());
+    registration<XYZFormat>(formats_, extensions_);
+    registration<NCFormat>(formats_, extensions_);
+
+    // Molfile-based formats
+    registration<Molfile<PDB>>(formats_, extensions_);
+    registration<Molfile<DCD>>(formats_, extensions_);
+    registration<Molfile<GRO>>(formats_, extensions_);
+    registration<Molfile<TRR>>(formats_, extensions_);
+    registration<Molfile<XTC>>(formats_, extensions_);
+    registration<Molfile<TRJ>>(formats_, extensions_);
 }
 
 TrajectoryFactory& TrajectoryFactory::get() {
