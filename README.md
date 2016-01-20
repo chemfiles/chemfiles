@@ -87,7 +87,7 @@ Chemfiles also have non goals, or explicitly refused goals:
 
  - It will not contains any code for analysis. You can find implementation of some
    analysis algorithms and a ready-to-use command line program in the
-   [chrp](https://github.com/chemfiles/chrp) repository.
+   [cfiles](https://github.com/chemfiles/cfiles) repository.
  - It will not contain molecular dynamics, Monte-Carlo, energy minimization or quantum
    chemistry code. If you want such code with access to the chemfiles features, please see
    the [cymbalum](https://github.com/Luthaf/cymbalum) molecular simulation engine, by the
@@ -99,8 +99,9 @@ Chemfiles also have non goals, or explicitly refused goals:
  - Support for a number of atoms which is not constant;
  - Set custom `UnitCell` or `Topology` when reading/writing;
  - Bindings to the most used scientific languages:  Python, C, Fortran 95;
- - Work with binary formats, if the corresponding libraries are available.
- - Open-source and freely available under the Mozilla Public License;
+ - Work with binary formats, if the corresponding libraries are available;
+ - No dependencies outside of the C++ standard library;
+ - Open-source and freely available under the Mozilla Public License.
 
 ## File formats
 
