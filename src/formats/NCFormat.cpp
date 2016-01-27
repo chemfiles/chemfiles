@@ -82,7 +82,7 @@ void NCFormat::read_step(const size_t step, Frame& frame){
     // Set the internal step_ before further reading
     step_ = step;
     reserve(ncfile_.dimension("atom"));
-    frame.cell(read_cell());
+    frame.set_cell(read_cell());
 
     auto& positions = frame.positions();
     read_array3D(positions, "coordinates");

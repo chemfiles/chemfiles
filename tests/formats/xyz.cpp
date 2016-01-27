@@ -127,8 +127,8 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
         positions[i] = vector3d(1, 2, 3);
 
     Frame frame;
-    frame.topology(dummy_topology(4));
-    frame.positions(positions);
+    frame.set_topology(dummy_topology(4));
+    frame.set_positions(positions);
 
     auto file = Trajectory("test-tmp.xyz", "w");
     file << frame;
@@ -137,8 +137,8 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
     for(size_t i=0; i<6; i++)
         positions[i] = vector3d(4, 5, 6);
 
-    frame.topology(dummy_topology(6));
-    frame.positions(positions);
+    frame.set_topology(dummy_topology(6));
+    frame.set_positions(positions);
 
     file << frame;
     file.sync();

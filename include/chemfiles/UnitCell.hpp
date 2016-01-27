@@ -92,34 +92,34 @@ public:
     //! Get the first lenght (a) of the cell
     double a() const {return a_;}
     //! Set the first lenght (a) of the cell
-    void a(double val);
+    void set_a(double val);
     //! Get the second lenght (b) of the cell
     double b() const {return b_;}
     //! Set the second lenght (b) of the cell
-    void b(double val);
+    void set_b(double val);
     //! Get the third lenght (c) of the cell
     double c() const {return c_;}
     //! Set the third lenght (c) of the cell
-    void c(double val);
+    void set_c(double val);
 
     //! Get the first angle (alpha) of the cell
     double alpha() const {return alpha_;}
     //! Set the first angle (alpha) of the cell if possible
-    void alpha(double val);
+    void set_alpha(double val);
     //! Get the second angle (beta) of the cell
     double beta() const {return beta_;}
     //! Set the second angle (beta) of the cell if possible
-    void beta(double val);
+    void set_beta(double val);
     //! Get the third angle (gamma) of the cell
     double gamma() const {return gamma_;}
     //! Set the third angle (gamma) of the cell if possible
-    void gamma(double val);
+    void set_gamma(double val);
 
     //! Get the unit cell volume
     double volume() const;
 
     //! Wrap the vector \c vect in the unit cell, using periodic boundary conditions.
-    std::array<float, 3> wrap(const std::array<float, 3>& vect) const;
+    Vector3D wrap(const Vector3D& vect) const;
 private:
     //! Cell lenghts
     double a_, b_, c_;

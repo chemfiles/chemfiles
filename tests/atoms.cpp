@@ -29,16 +29,16 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
     }
 
     SECTION("Set and get properties"){
-        a1.type(Atom::DUMMY);
+        a1.set_type(Atom::DUMMY);
         CHECK(a1.type() == Atom::DUMMY);
 
-        a1.mass(14.789f);
+        a1.set_mass(14.789f);
         CHECK(a1.mass() == 14.789f);
 
-        a1.charge(-2);
+        a1.set_charge(-2);
         CHECK(a1.charge() == -2);
 
-        a1.name("foo");
+        a1.set_name("foo");
         CHECK(a1.name() == "foo");
 
         CHECK(a4.mass() == 183.84f);

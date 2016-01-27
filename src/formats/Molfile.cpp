@@ -156,7 +156,7 @@ void Molfile<F>::read(Frame& frame){
     }
 
     if (topology_){
-        frame.topology(*topology_);
+        frame.set_topology(*topology_);
     }
     molfile_to_frame(timestep, frame);
 }
@@ -185,7 +185,7 @@ template <MolfileFormat F>
 void Molfile<F>::molfile_to_frame(const molfile_timestep_t& timestep, Frame& frame){
     auto cell = UnitCell(timestep.A, timestep.B, timestep.C,
                          timestep.alpha, timestep.beta, timestep.gamma);
-    frame.cell(cell);
+    frame.set_cell(cell);
 
     auto& positions = frame.positions();
     positions.resize(static_cast<size_t>(natoms_));
@@ -230,7 +230,7 @@ void Molfile<F>::read_topology() const {
     for (auto& vmd_atom : atoms){
         Atom atom(vmd_atom.name);
         if (optflags & MOLFILE_MASS){
-            atom.mass(vmd_atom.mass);
+            atom.set_mass(vmd_atom.mass);
         }
         topology_->append(atom);
     }

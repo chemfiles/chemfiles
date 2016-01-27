@@ -14,6 +14,8 @@
   public `Selection` class, and to C with the `chfl_frame_selection` function.
 * Remove the periodicity handling from UnitCell. It was not implemented in boundaries
   conditions. The corresponding function where removed from the C API.
+* Rename all setter function from `void xxx(const XXX& value)` to
+  `void set_xxx(const XXX& value)` in C++ API.
 
 # 0.4
 

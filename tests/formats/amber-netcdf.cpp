@@ -13,9 +13,6 @@ const double EPS = 1e-5;
 
 #define NCDIR SRCDIR "/data/netcdf/"
 
-#include <iostream>
-using namespace std;
-
 bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
     return (fabs(a[0] - b[0]) < eps)
         && (fabs(a[1] - b[1]) < eps)
@@ -78,8 +75,8 @@ TEST_CASE("Write files in NetCDF format", "[Amber NetCDF]"){
             positions[i] = vector3d(1, 2, 3);
 
         Frame frame;
-        frame.topology(dummy_topology(4));
-        frame.positions(positions);
+        frame.set_topology(dummy_topology(4));
+        frame.set_positions(positions);
 
         file << frame;
     }

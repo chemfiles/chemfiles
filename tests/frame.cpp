@@ -14,10 +14,10 @@ TEST_CASE("Frame class usage", "[Frame]"){
 
     SECTION("Get and set"){
         CHECK(frame.step() == 0);
-        frame.step(1000);
+        frame.set_step(1000);
         CHECK(frame.step() == 1000);
 
-        frame.cell(UnitCell(10));
+        frame.set_cell(UnitCell(10));
         CHECK(frame.cell().type() == UnitCell::ORTHOROMBIC);
 
         // We already have dummy atoms in the topology
@@ -43,8 +43,8 @@ TEST_CASE("Frame class usage", "[Frame]"){
         for (size_t i=0; i<10; i++) {
             data[i] = vector3d(4.f, 3.4f, 1.f);
         }
-        frame.positions(data);
-        frame.velocities(data);
+        frame.set_positions(data);
+        frame.set_velocities(data);
 
         auto positions = frame.positions();
         auto velocities = frame.velocities();

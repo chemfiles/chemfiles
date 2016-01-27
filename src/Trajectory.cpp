@@ -69,10 +69,10 @@ Frame Trajectory::read(){
 
     // Set the frame topology and/or cell if needed
     if (custom_topology_) {
-        frame.topology(*custom_topology_);
+        frame.set_topology(*custom_topology_);
     }
     if (custom_cell_) {
-        frame.cell(*custom_cell_);
+        frame.set_cell(*custom_cell_);
     }
     return frame;
 }
@@ -94,10 +94,10 @@ Frame Trajectory::read_step(const size_t step){
 
     // Set the frame topology and/or cell if needed
     if (custom_topology_) {
-        frame.topology(*custom_topology_);
+        frame.set_topology(*custom_topology_);
     }
     if (custom_cell_) {
-        frame.cell(*custom_cell_);
+        frame.set_cell(*custom_cell_);
     }
     return frame;
 }
@@ -116,10 +116,10 @@ void Trajectory::write(const Frame& input_frame){
     // to benchmark this part.
     Frame frame = input_frame;
     if (custom_topology_) {
-        frame.topology(*custom_topology_);
+        frame.set_topology(*custom_topology_);
     }
     if (custom_cell_) {
-        frame.cell(*custom_cell_);
+        frame.set_cell(*custom_cell_);
     }
 
     format_->write(frame);
@@ -127,19 +127,19 @@ void Trajectory::write(const Frame& input_frame){
     nsteps_++;
 }
 
-void Trajectory::topology(const Topology& top){
+void Trajectory::set_topology(const Topology& top){
     custom_topology_ = top;
 }
 
-void Trajectory::topology(const std::string& filename) {
+void Trajectory::set_topology(const std::string& filename) {
     Trajectory topolgy_file(filename, "r");
     assert(topolgy_file.nsteps() > 0);
 
     auto frame = topolgy_file.read_step(0);
-    Trajectory::topology(frame.topology());
+    set_topology(frame.topology());
 }
 
-void Trajectory::cell(const UnitCell& new_cell){
+void Trajectory::set_cell(const UnitCell& new_cell){
     custom_cell_ = new_cell;
 }
 

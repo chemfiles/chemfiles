@@ -26,8 +26,8 @@ int main() {
     while (!input.done()) {
         input >> frame;
         // Set the frame cell and topology
-        frame.cell(cell);
-        frame.topology(water_topology);
+        frame.set_cell(cell);
+        frame.set_topology(water_topology);
         // Write the frame to the output file, using PDB format
         output << frame;
     }

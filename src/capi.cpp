@@ -105,7 +105,7 @@ int chfl_trajectory_set_topology(CHFL_TRAJECTORY *file, const CHFL_TOPOLOGY *top
     assert(file != nullptr);
     assert(topology != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        file->topology(*topology);
+        file->set_topology(*topology);
     )
 }
 
@@ -113,7 +113,7 @@ int chfl_trajectory_set_topology_file(CHFL_TRAJECTORY *file, const char* filenam
     assert(file != nullptr);
     assert(filename != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        file->topology(string(filename));
+        file->set_topology(string(filename));
     )
 }
 
@@ -121,7 +121,7 @@ int chfl_trajectory_set_cell(CHFL_TRAJECTORY *file, const CHFL_CELL *cell){
     assert(file != nullptr);
     assert(cell != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        file->cell(*cell);
+        file->set_cell(*cell);
     )
 }
 
@@ -222,7 +222,7 @@ int chfl_frame_set_cell(CHFL_FRAME* frame, const CHFL_CELL* cell) {
     assert(frame != nullptr);
     assert(cell != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        frame->cell(*cell);
+        frame->set_cell(*cell);
     )
 }
 
@@ -230,7 +230,7 @@ int chfl_frame_set_topology(CHFL_FRAME* frame, const CHFL_TOPOLOGY* topology) {
     assert(frame != nullptr);
     assert(topology != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        frame->topology(*topology);
+        frame->set_topology(*topology);
     )
 }
 
@@ -245,7 +245,7 @@ int chfl_frame_step(const CHFL_FRAME* frame, size_t* step) {
 int chfl_frame_set_step(CHFL_FRAME* frame, size_t step) {
     assert(frame != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        frame->step(step);
+        frame->set_step(step);
     )
 }
 
@@ -336,9 +336,9 @@ int chfl_cell_lengths(const CHFL_CELL* cell, double* a, double* b, double* c){
 int chfl_cell_set_lengths(CHFL_CELL* cell, double a, double b, double c){
     assert(cell != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        cell->a(a);
-        cell->b(b);
-        cell->c(c);
+        cell->set_a(a);
+        cell->set_b(b);
+        cell->set_c(c);
     )
 }
 
@@ -357,9 +357,9 @@ int chfl_cell_angles(const CHFL_CELL* cell, double* alpha, double* beta, double*
 int chfl_cell_set_angles(CHFL_CELL* cell, double alpha, double beta, double gamma){
     assert(cell != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        cell->alpha(alpha);
-        cell->beta(beta);
-        cell->gamma(gamma);
+        cell->set_alpha(alpha);
+        cell->set_beta(beta);
+        cell->set_gamma(gamma);
     )
 }
 
@@ -605,7 +605,7 @@ int chfl_atom_mass(const CHFL_ATOM* atom, float* mass){
 int chfl_atom_set_mass(CHFL_ATOM* atom, float mass){
     assert(atom != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        atom->mass(mass);
+        atom->set_mass(mass);
     )
 }
 
@@ -620,7 +620,7 @@ int chfl_atom_charge(const CHFL_ATOM* atom, float* charge){
 int chfl_atom_set_charge(CHFL_ATOM* atom, float charge){
     assert(atom != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        atom->charge(charge);
+        atom->set_charge(charge);
     )
 }
 
@@ -637,7 +637,7 @@ int chfl_atom_set_name(CHFL_ATOM* atom, const char* name){
     assert(atom != nullptr);
     assert(name != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        atom->name(string(name));
+        atom->set_name(string(name));
     )
 }
 
@@ -686,7 +686,7 @@ int chfl_atom_type(const CHFL_ATOM* atom, chfl_atom_type_t* type){
 int chfl_atom_set_type(CHFL_ATOM* atom, chfl_atom_type_t type){
     assert(atom != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        atom->type(static_cast<Atom::AtomType>(type));
+        atom->set_type(static_cast<Atom::AtomType>(type));
     )
 }
 

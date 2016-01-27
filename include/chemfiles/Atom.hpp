@@ -58,13 +58,13 @@ public:
     AtomType type() const {return type_;}
 
     //! Set the atom name
-    void name(const std::string& n) {name_ = n;}
+    void set_name(const std::string& n) {name_ = n;}
     //! Set the atom mass
-    void mass(float m) {mass_ = m;}
+    void set_mass(float m) {mass_ = m;}
     //! Set the atom charge
-    void charge(float c) {charge_ = c;}
+    void set_charge(float c) {charge_ = c;}
     //! Set the atom type
-    void type(AtomType t) {type_ = t;}
+    void set_type(AtomType t) {type_ = t;}
 
     //! Try to get the full element name, return and empty string if this is impossible
     std::string full_name() const;

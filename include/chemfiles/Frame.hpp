@@ -46,14 +46,14 @@ public:
     //! Get a const (non modifiable) reference to the positions
     const Array3D& positions() const {return positions_;}
     //! Set the positions
-    void positions(const Array3D& pos) {positions_ = pos;}
+    void set_positions(const Array3D& pos) {positions_ = pos;}
 
     //! Get an optional modifiable reference to the velocities
     optional<Array3D>& velocities() {return velocities_;}
     //! Get an optional const (non modifiable) reference to the velocities
     const optional<Array3D>& velocities() const {return velocities_;}
     //! Set the velocities to `vel`
-    void velocities(const Array3D& vel) {velocities_.emplace(vel);}
+    void set_velocities(const Array3D& vel) {velocities_.emplace(vel);}
 
     //! Get the number of particles in the system
     size_t natoms() const;
@@ -63,13 +63,13 @@ public:
     //! Get a const (non-modifiable) reference to the internal topology
     const Topology& topology() const {return topology_;}
     //! Set the system topology
-    void topology(const Topology& top) {topology_ = top;}
+    void set_topology(const Topology& top) {topology_ = top;}
 
     //! Get a const (non-modifiable) reference to the unit cell of the system
     const UnitCell& cell() const {return cell_;}
     UnitCell& cell() {return cell_;}
     //! Set the unit cell fo the system
-    void cell(const UnitCell& c) {cell_ = c;}
+    void set_cell(const UnitCell& c) {cell_ = c;}
 
     //! Resize the frame to store data for `natoms` atoms. If the new size is bigger than
     //! the old one, missing data is initializd to 0. Pre-existing values are conserved.
@@ -79,7 +79,7 @@ public:
     //! Get the current simulation step
     size_t step() const {return step_;}
     //! Set the current simulation step
-    void step(size_t s) {step_ = s;}
+    void set_step(size_t s) {step_ = s;}
 
     //! Try to guess the bonds, angles and dihedrals in the system. If \c bonds
     //! is true, guess everything; else only guess the angles and dihedrals from

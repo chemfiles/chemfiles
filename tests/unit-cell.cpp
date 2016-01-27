@@ -85,21 +85,21 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         cell.type(UnitCell::ORTHOROMBIC);
         CHECK(cell.type() == UnitCell::ORTHOROMBIC);
 
-        cell.a(10);
+        cell.set_a(10);
         CHECK(cell.a() == 10);
-        cell.b(15);
+        cell.set_b(15);
         CHECK(cell.b() == 15);
-        cell.c(20);
+        cell.set_c(20);
         CHECK(cell.c() == 20);
 
         cell.type(UnitCell::TRICLINIC);
         CHECK(cell.type() == UnitCell::TRICLINIC);
 
-        cell.alpha(80);
+        cell.set_alpha(80);
         CHECK(cell.alpha() == 80);
-        cell.beta(120);
+        cell.set_beta(120);
         CHECK(cell.beta() == 120);
-        cell.gamma(60);
+        cell.set_gamma(60);
         CHECK(cell.gamma() == 60);
     }
 

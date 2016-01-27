@@ -15,7 +15,7 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
         Frame frame;
 
         SECTION("From a file"){
-            file.topology(XYZDIR "topology.xyz");
+            file.set_topology(XYZDIR "topology.xyz");
             file >> frame;
 
             CHECK(frame.natoms() == 9);
@@ -31,7 +31,7 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
             for (size_t i=0; i<9; i++)
                 top.append(Atom("Fe"));
 
-            file.topology(top);
+            file.set_topology(top);
             file >> frame;
 
             CHECK(frame.natoms() == 9);
@@ -61,14 +61,14 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
         }
 
         Frame frame;
-        frame.positions(positions);
-        frame.topology(dummy_topology(5));
+        frame.set_positions(positions);
+        frame.set_topology(dummy_topology(5));
 
         Topology top;
         for (size_t i=0; i<5; i++)
             top.append(Atom("Fe"));
 
-        file.topology(top);
+        file.set_topology(top);
         file << frame;
         file.sync();
 
@@ -87,7 +87,7 @@ TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]"){
         Trajectory file(XYZDIR "trajectory.xyz");
         Frame frame;
 
-        file.cell(UnitCell(25, 32, 94));
+        file.set_cell(UnitCell(25, 32, 94));
         file >> frame;
 
         CHECK(frame.cell() == UnitCell(25, 32, 94));

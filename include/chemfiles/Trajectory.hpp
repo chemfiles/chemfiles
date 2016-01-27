@@ -67,16 +67,19 @@ public:
     //! Write operator, in *method* version
     void write(const Frame& frame);
 
-    //! Set a topology to use while writing or reading format where no
-    //! topological information is present.
-    void topology(const Topology&);
-    //! Use the topology of the first frame of the following file to read or
-    //! write all the following files.
-    void topology(const std::string& filename);
+    //! Set the Topology of all the Frame read or written to `topology`. This
+    //! replace any topology in the file being read, or in the Frame being
+    //! written.
+    void set_topology(const Topology&);
+    //! Use the Topology of the first Frame of the following file as Topology
+    //! for all the Frame read or written. This replace any topology in the
+    //! file being read, or in the Frame being written.
+    void set_topology(const std::string& filename);
 
-    //! Set an unit cell to use while writing or reading format when no
-    //! information about unit cell is present.
-    void cell(const UnitCell&);
+    //! Set the unit cell of all the Frame read or written to `cell`. This
+    //! replace any cell in the file being read, or in the Frame being
+    //! written.
+    void set_cell(const UnitCell&);
 
     //! Get the number of steps (the number of Frames) in this trajectory
     size_t nsteps() const {return nsteps_;}
