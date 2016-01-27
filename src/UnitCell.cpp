@@ -26,8 +26,7 @@ UnitCell::UnitCell(double a) : UnitCell(a, a, a) {}
 UnitCell::UnitCell(double a, double b, double c) : UnitCell(a, b, c, 90, 90, 90) {}
 
 UnitCell::UnitCell(double a, double b, double c, double alpha, double beta, double gamma)
-: _a(a), _b(b), _c(c), _alpha(alpha), _beta(beta), _gamma(gamma), pbc_x(true),
-pbc_y(true), pbc_z(true) {
+: _a(a), _b(b), _c(c), _alpha(alpha), _beta(beta), _gamma(gamma) {
     if (alpha == 90 && beta == 90 && gamma == 90)
         _type = ORTHOROMBIC;
     else
@@ -39,8 +38,7 @@ UnitCell::UnitCell(CellType type) : UnitCell(type, 0) {}
 UnitCell::UnitCell(CellType type, double a) : UnitCell(type, a, a, a) {}
 
 UnitCell::UnitCell(CellType type, double a, double b, double c)
-: _a(a), _b(b), _c(c), _alpha(90), _beta(90), _gamma(90), _type(type), pbc_x(true),
-pbc_y(true), pbc_z(true) {}
+: _a(a), _b(b), _c(c), _alpha(90), _beta(90), _gamma(90), _type(type) {}
 
 double UnitCell::volume() const {
     switch (_type) {
@@ -166,11 +164,6 @@ static std::array<float, 3> wrap_triclinic(const UnitCell& cell, const std::arra
 }
 
 std::array<float, 3> UnitCell::wrap(const std::array<float, 3>& vect) const{
-    if (!full_periodic()){
-        // TODO: implement this
-        throw Error("Unimplemend vector wrapping for non fully-periodic cells.");
-    }
-
     if (_type == INFINITE)
         return vect;
     else if (_type == ORTHOROMBIC)

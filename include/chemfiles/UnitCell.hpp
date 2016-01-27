@@ -118,25 +118,7 @@ public:
     //! Get the unit cell volume
     double volume() const;
 
-    //! Get the cell periodicity for the x axis
-    bool periodic_x() const {return pbc_x;}
-    //! Get the cell periodicity for the y axis
-    bool periodic_y() const {return pbc_y;}
-    //! Get the cell periodicity for the z axis
-    bool periodic_z() const {return pbc_z;}
-    //! True if the cell is periodic in the three dimmensions
-    bool full_periodic() const {return pbc_x && pbc_y && pbc_z;}
-
-    //! Set the cell periodicity for the x axis
-    void periodic_x(bool p) {pbc_x = p;}
-    //! Set the cell periodicity for the y axis
-    void periodic_y(bool p) {pbc_y = p;}
-    //! Set the cell periodicity for the z axis
-    void periodic_z(bool p) {pbc_z = p;}
-    //! Set the cell periodicity in three dimmensions
-    void full_periodic(bool p) {pbc_x = p; pbc_y = p; pbc_z = p;}
-
-    //! Wrap the vector \c vect in the unit cell
+    //! Wrap the vector \c vect in the unit cell, using periodic boundary conditions.
     std::array<float, 3> wrap(const std::array<float, 3>& vect) const;
 private:
     //! Cell lenghts
@@ -145,8 +127,6 @@ private:
     double _alpha, _beta, _gamma;
     //! Cell type
     CellType _type;
-    //! Cell periodicity
-    bool pbc_x, pbc_y, pbc_z;
 };
 
 inline bool operator==(const UnitCell& rhs, const UnitCell& lhs) {
@@ -154,8 +134,7 @@ inline bool operator==(const UnitCell& rhs, const UnitCell& lhs) {
         return false;
 
     return rhs.a() == lhs.a() && rhs.b() == lhs.b() && rhs.c() == lhs.c() &&
-           rhs.alpha() == lhs.alpha() && rhs.beta() == lhs.beta() && rhs.gamma() == lhs.gamma() &&
-           rhs.periodic_x() == lhs.periodic_x() && rhs.periodic_y() == lhs.periodic_y() && rhs.periodic_z() == lhs.periodic_z();
+           rhs.alpha() == lhs.alpha() && rhs.beta() == lhs.beta() && rhs.gamma() == lhs.gamma();
 }
 
 } // namespace chemfiles

@@ -22,10 +22,6 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(infinite.gamma() == 90);
         CHECK(infinite.volume() == 0);
 
-        CHECK(infinite.periodic_x());
-        CHECK(infinite.periodic_y());
-        CHECK(infinite.periodic_z());
-
         UnitCell ortho1(10);
         CHECK(ortho1.type() == UnitCell::ORTHOROMBIC);
         CHECK(ortho1.a() == 10);
@@ -105,18 +101,6 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(cell.beta() == 120);
         cell.gamma(60);
         CHECK(cell.gamma() == 60);
-
-        cell.periodic_x(true);
-        CHECK(cell.periodic_x());
-        cell.periodic_y(true);
-        CHECK(cell.periodic_y());
-        cell.periodic_z(true);
-        CHECK(cell.periodic_z());
-
-        cell.periodic_z(false);
-        CHECK_FALSE(cell.full_periodic());
-        cell.full_periodic(true);
-        CHECK(cell.full_periodic());
     }
 
     SECTION("Matricial representation"){

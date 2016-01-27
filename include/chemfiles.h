@@ -477,26 +477,6 @@ CHFL_EXPORT int chfl_cell_type(const CHFL_CELL* cell, chfl_cell_type_t* type);
 CHFL_EXPORT int chfl_cell_set_type(CHFL_CELL* cell, chfl_cell_type_t type);
 
 /*!
-* @brief Get the cell periodic boundary conditions along the three axis
-* @param cell the cell to read
-* @param x periodicity of the cell along the first axis.
-* @param y periodicity of the cell along the second axis.
-* @param z periodicity of the cell along the third axis.
-* @return The status code
-*/
-CHFL_EXPORT int chfl_cell_periodicity(const CHFL_CELL* cell, bool* x, bool* y, bool* z);
-
-/*!
-* @brief Set the cell periodic boundary conditions along the three axis
-* @param cell the cell to modify
-* @param x new periodicity of the cell along the first axis.
-* @param y new periodicity of the cell along the second axis.
-* @param z new periodicity of the cell along the third axis.
-* @return The status code
-*/
-CHFL_EXPORT int chfl_cell_set_periodicity(CHFL_CELL* cell, bool x, bool y, bool z);
-
-/*!
 * @brief Destroy an unit cell, and free the associated memory
 * @param cell The cell to destroy
 * @return The status code

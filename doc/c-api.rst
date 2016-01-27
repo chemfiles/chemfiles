@@ -146,10 +146,6 @@ Function manipulating ``CHFL_CELL``
 
 .. doxygenfunction:: chfl_cell_set_type
 
-.. doxygenfunction:: chfl_cell_periodicity
-
-.. doxygenfunction:: chfl_cell_set_periodicity
-
 .. doxygenfunction:: chfl_cell_free
 
 .. _capi-topology:

@@ -63,18 +63,6 @@ int main() {
     assert(fabs(b - 89) < 1e-10);
     assert(fabs(c - 100) < 1e-10);
 
-    bool x=false, y=false, z=false;
-    assert(!chfl_cell_periodicity(cell, &x, &y, &z));
-    assert(x == true);
-    assert(y == true);
-    assert(z == true);
-
-    assert(!chfl_cell_set_periodicity(cell, false, true, false));
-    assert(!chfl_cell_periodicity(cell, &x, &y, &z));
-    assert(x == false);
-    assert(y == true);
-    assert(z == false);
-
     assert(!chfl_cell_free(cell));
 
     return EXIT_SUCCESS;

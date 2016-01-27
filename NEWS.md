@@ -12,6 +12,8 @@
 * Add a small selection language *a la* VMD, allowing to select atoms matching
   a selection string like `"name H and x > 4"`. This is exposed to C++ with the
   public `Selection` class, and to C with the `chfl_frame_selection` function.
+* Remove the periodicity handling from UnitCell. It was not implemented in boundaries
+  conditions. The corresponding function where removed from the C API.
 
 # 0.4
 

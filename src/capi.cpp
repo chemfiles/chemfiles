@@ -386,27 +386,6 @@ int chfl_cell_set_type(CHFL_CELL* cell, chfl_cell_type_t type){
     )
 }
 
-int chfl_cell_periodicity(const CHFL_CELL* cell, bool* x, bool* y, bool* z){
-    assert(cell != nullptr);
-    assert(x != nullptr);
-    assert(y != nullptr);
-    assert(z != nullptr);
-    CHFL_ERROR_WRAP_RETCODE(
-        *x = cell->periodic_x();
-        *y = cell->periodic_y();
-        *z = cell->periodic_z();
-    )
-}
-
-int chfl_cell_set_periodicity(CHFL_CELL* cell, bool x, bool y, bool z){
-    assert(cell != nullptr);
-    CHFL_ERROR_WRAP_RETCODE(
-        cell->periodic_x(x);
-        cell->periodic_y(y);
-        cell->periodic_z(z);
-    )
-}
-
 int chfl_cell_free(CHFL_CELL* cell) {
     assert(cell != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
