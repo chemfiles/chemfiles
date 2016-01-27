@@ -251,7 +251,7 @@ template<> Ast parse<MassExpr>(token_iterator_t& begin, const token_iterator_t& 
     }
 
     auto op = BinOp(begin[0].type());
-    auto val = static_cast<std::size_t>(begin[1].number());
+    auto val = begin[1].number();
     begin += 3;
     return Ast(new MassExpr(op, val));;
 }
