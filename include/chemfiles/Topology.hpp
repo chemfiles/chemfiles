@@ -22,8 +22,8 @@ namespace chemfiles {
 
 //! The bond struct ensure a canonical representation of a bond between atoms
 //! i and j, with i<j
-struct CHFL_EXPORT bond {
-    bond(size_t first, size_t second){
+struct CHFL_EXPORT Bond {
+    Bond(size_t first, size_t second){
         assert(first != second);
         _data[0] = std::min(first, second);
         _data[1] = std::max(first, second);
@@ -31,7 +31,7 @@ struct CHFL_EXPORT bond {
     //! Indexing operator
     const size_t& operator[](size_t i) const {return _data[i];}
     //! Comparison operator
-    bool operator==(const bond& other) const{
+    bool operator==(const Bond& other) const{
         return _data[0] == other[0] && _data[1] == other[1];
     }
 private:
@@ -40,8 +40,8 @@ private:
 
 //! The angle struct ensure a canonical representation of an angle between the
 //! atoms i, j and k, with i < k
-struct CHFL_EXPORT angle {
-    angle(size_t first, size_t midle, size_t last){
+struct CHFL_EXPORT Angle {
+    Angle(size_t first, size_t midle, size_t last){
         assert(first != last);
         assert(first != midle);
         _data[0] = std::min(first, last);
@@ -51,7 +51,7 @@ struct CHFL_EXPORT angle {
     //! Indexing operator
     const size_t& operator[](size_t i) const {return _data[i];}
     //! Comparison operator
-    bool operator==(const angle& other) const {
+    bool operator==(const Angle& other) const {
         return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2];
     }
 private:
@@ -60,8 +60,8 @@ private:
 
 //! The dihedral struct ensure a canonical representation of a dihedral angle
 //! between the atoms i, j, k and m, with max(i, j) < max(k, m))
-struct CHFL_EXPORT dihedral {
-    dihedral(size_t first, size_t second, size_t third, size_t fourth){
+struct CHFL_EXPORT Dihedral {
+    Dihedral(size_t first, size_t second, size_t third, size_t fourth){
         assert(first != second);
         assert(second != third);
         assert(third != fourth);
@@ -81,7 +81,7 @@ struct CHFL_EXPORT dihedral {
     //! Indexing operator
     const size_t& operator[](size_t i) const {return _data[i];}
     //! Comparison operator
-    bool operator==(const dihedral& other) const {
+    bool operator==(const Dihedral& other) const {
         return _data[0] == other[0] && _data[1] == other[1] &&
                _data[2] == other[2] && _data[3] == other[3];
     }
@@ -95,18 +95,18 @@ namespace std {
     // We need a hashing function for the std::unordered_set, but it will not
     // be used. We will use the operator== instead to ensure the element
     // unicity in the sets.
-    template<> struct hash<chemfiles::bond> {
-        size_t operator()(chemfiles::bond const&) const {
+    template<> struct hash<chemfiles::Bond> {
+        size_t operator()(chemfiles::Bond const&) const {
             return 42;
         }
     };
-    template<> struct hash<chemfiles::angle> {
-        size_t operator()(chemfiles::angle const&) const {
+    template<> struct hash<chemfiles::Angle> {
+        size_t operator()(chemfiles::Angle const&) const {
             return 42;
         }
     };
-    template<> struct hash<chemfiles::dihedral> {
-        size_t operator()(chemfiles::dihedral const&) const {
+    template<> struct hash<chemfiles::Dihedral> {
+        size_t operator()(chemfiles::Dihedral const&) const {
             return 42;
         }
     };
@@ -130,20 +130,20 @@ public:
     //! Clear all the content
     void clear();
     //! Access the underlying data
-    const std::unordered_set<bond>& bonds() const;
-    const std::unordered_set<angle>& angles() const;
-    const std::unordered_set<dihedral>& dihedrals() const;
+    const std::unordered_set<Bond>& bonds() const;
+    const std::unordered_set<Angle>& angles() const;
+    const std::unordered_set<Dihedral>& dihedrals() const;
     //! Add a bond between the atoms \c i and \c j
     void add_bond(size_t i, size_t j);
     //! Remove any bond between the atoms \c i and \c j
     void remove_bond(size_t i, size_t j);
 private:
     //! Bonds in the system
-    std::unordered_set<bond> _bonds;
+    std::unordered_set<Bond> _bonds;
     //! Angles in the system
-    mutable std::unordered_set<angle> _angles;
+    mutable std::unordered_set<Angle> _angles;
     //! Dihedral angles in the system
-    mutable std::unordered_set<dihedral> _dihedrals;
+    mutable std::unordered_set<Dihedral> _dihedrals;
     //! Is the cached content up to date ?
     mutable bool uptodate;
 };
@@ -200,11 +200,11 @@ public:
     bool isdihedral(size_t i, size_t j, size_t k, size_t m) const;
 
     //! Get the bonds in the system
-    std::vector<bond> bonds() const;
+    std::vector<Bond> bonds() const;
     //! Get the angles in the system
-    std::vector<angle> angles() const;
+    std::vector<Angle> angles() const;
     //! Get the dihedral angles in the system
-    std::vector<dihedral> dihedrals() const;
+    std::vector<Dihedral> dihedrals() const;
 
     //! Recalculate the angles and dihedrals list from the bond list.
     void recalculate() {_connect.recalculate();}

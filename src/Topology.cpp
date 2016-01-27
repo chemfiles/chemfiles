@@ -12,7 +12,6 @@
 #include "chemfiles/Error.hpp"
 
 using namespace chemfiles;
-using std::vector;
 
 void Connectivity::recalculate() const{
     _angles.clear();
@@ -22,18 +21,18 @@ void Connectivity::recalculate() const{
         for (auto const& bond2 : _bonds){
             if (bond1 == bond2) continue;
             // Initializing angle to an invalid value
-            angle angle1(static_cast<size_t>(-1), static_cast<size_t>(-2), static_cast<size_t>(-3));
+            Angle angle1(static_cast<size_t>(-1), static_cast<size_t>(-2), static_cast<size_t>(-3));
             if (bond1[0] == bond2[1]) {
-                angle1 = angle(bond2[0], bond2[1], bond1[1]);
+                angle1 = Angle(bond2[0], bond2[1], bond1[1]);
                 _angles.insert(angle1);
             } else if (bond1[1] == bond2[0]) {
-                angle1 = angle(bond1[0], bond1[1], bond2[1]);
+                angle1 = Angle(bond1[0], bond1[1], bond2[1]);
                 _angles.insert(angle1);
             } else if (bond1[1] == bond2[1]) {
-                angle1 = angle(bond1[0], bond1[1], bond2[0]);
+                angle1 = Angle(bond1[0], bond1[1], bond2[0]);
                 _angles.insert(angle1);
             } else if (bond1[0] == bond2[0]) {
-                angle1 = angle(bond1[1], bond1[0], bond2[1]);
+                angle1 = Angle(bond1[1], bond1[0], bond2[1]);
                 _angles.insert(angle1);
             } else {
                 // We will not find any dihedral angle from these bonds
@@ -44,9 +43,9 @@ void Connectivity::recalculate() const{
                 if (bond2 == bond3) continue;
 
                 if (angle1[2] == bond3[0] && angle1[1] != bond3[1]){
-                    _dihedrals.insert(dihedral(angle1[0], angle1[1], angle1[2], bond3[1]));
+                    _dihedrals.emplace(angle1[0], angle1[1], angle1[2], bond3[1]);
                 } else if (angle1[0] == bond3[1] && angle1[1] != bond3[0]) {
-                    _dihedrals.insert(dihedral(bond3[0], angle1[0], angle1[1], angle1[2]));
+                    _dihedrals.emplace(bond3[0], angle1[0], angle1[1], angle1[2]);
                 } else if (angle1[2] == bond3[0] || angle1[2] == bond3[1]) {
                     // TODO this is an improper dihedral
                 }
@@ -62,19 +61,19 @@ void Connectivity::clear(){
     _dihedrals.clear();
 }
 
-const std::unordered_set<bond>& Connectivity::bonds() const {
+const std::unordered_set<Bond>& Connectivity::bonds() const {
     if (!uptodate)
         recalculate();
     return _bonds;
 }
 
-const std::unordered_set<angle>& Connectivity::angles() const {
+const std::unordered_set<Angle>& Connectivity::angles() const {
     if (!uptodate)
         recalculate();
     return _angles;
 }
 
-const std::unordered_set<dihedral>& Connectivity::dihedrals() const {
+const std::unordered_set<Dihedral>& Connectivity::dihedrals() const {
     if (!uptodate)
         recalculate();
     return _dihedrals;
@@ -82,12 +81,12 @@ const std::unordered_set<dihedral>& Connectivity::dihedrals() const {
 
 void Connectivity::add_bond(size_t i, size_t j){
     uptodate = false;
-    _bonds.insert(bond(i, j));
+    _bonds.emplace(i, j);
 }
 
 void Connectivity::remove_bond(size_t i, size_t j){
     uptodate = false;
-    auto pos = _bonds.find(bond(i, j));
+    auto pos = _bonds.find(Bond(i, j));
     if (pos != _bonds.end()){
         _bonds.erase(pos);
     }
@@ -126,39 +125,39 @@ void Topology::remove(size_t idx) {
     recalculate();
 }
 
-vector<bond> Topology::bonds() const{
-    vector<bond> res;
+std::vector<Bond> Topology::bonds() const{
+    std::vector<Bond> res;
     res.insert(begin(res), begin(_connect.bonds()), end(_connect.bonds()));
     return res;
 }
 
-vector<angle> Topology::angles() const{
-    vector<angle> res;
+std::vector<Angle> Topology::angles() const{
+    std::vector<Angle> res;
     res.insert(begin(res), begin(_connect.angles()), end(_connect.angles()));
     return res;
 }
 
-vector<dihedral> Topology::dihedrals() const{
-    vector<dihedral> res;
+std::vector<Dihedral> Topology::dihedrals() const{
+    std::vector<Dihedral> res;
     res.insert(begin(res), begin(_connect.dihedrals()), end(_connect.dihedrals()));
     return res;
 }
 
 bool Topology::isbond(size_t i, size_t j) const  {
     auto bonds = _connect.bonds();
-    auto pos = bonds.find(bond(i, j));
+    auto pos = bonds.find(Bond(i, j));
     return pos != end(bonds);
 }
 
 bool Topology::isangle(size_t i, size_t j, size_t k) const {
     auto angles = _connect.angles();
-    auto pos = angles.find(angle(i, j, k));
+    auto pos = angles.find(Angle(i, j, k));
     return pos != end(angles);
 }
 
 bool Topology::isdihedral(size_t i, size_t j, size_t k, size_t m) const {
     auto dihedrals = _connect.dihedrals();
-    auto pos = dihedrals.find(dihedral(i, j, k, m));
+    auto pos = dihedrals.find(Dihedral(i, j, k, m));
     return pos != end(dihedrals);
 }
 
