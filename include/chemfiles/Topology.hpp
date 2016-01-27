@@ -188,8 +188,11 @@ public:
     size_t natom_types() const {return _templates.size();}
     //! Reserve space for \c natoms in the topology
     void resize(size_t natoms) {_atoms.resize(natoms);}
-    //! Clear the topology
+    //! Clear the topology: this remove all atoms and all bonds, angles and dihedrals
     void clear();
+
+    //! Clear the bonds (angles and dihedrals too) in the topology
+    void clear_bonds() {_connect.clear();}
 
     //! Check wether the atoms at indexes \c i and \c j are bonded or not
     bool isbond(size_t i, size_t j) const;
