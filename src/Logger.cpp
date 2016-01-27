@@ -22,76 +22,76 @@ static NullBuffer nullbuff;
 // nullstream is a no-op ostream.
 static std::ostream nullstream(&nullbuff);
 
-// Singleton instance
-Logger Logger::instance{};
+// Singleton instance_
+Logger Logger::instance_{};
 
-Logger::Logger() : current_level(WARNING), os(&std::clog), is_file(false) {}
+Logger::Logger() : current_level_(WARNING), ostream_(&std::clog), is_file_(false) {}
 
 Logger::~Logger(){
     close();
 }
 
 std::ostream& Logger::out(LogLevel level){
-    return instance.get_stream(level);
+    return instance_.get_stream(level);
 }
 
 std::ostream& Logger::get_stream(LogLevel level){
     // Don't write anything if the out level is less important than
     // the current level, or if the current level is NONE.
-    if (level > current_level || current_level == NONE)
+    if (level > current_level_ || current_level_ == NONE)
         return nullstream;
 
     switch(level){
         case ERROR:
-            *os << "Chemfiles error: ";
+            *ostream_ << "Chemfiles error: ";
             break;
         case WARNING:
-            *os << "Chemfiles warning: ";
+            *ostream_ << "Chemfiles warning: ";
             break;
         case INFO:
-            *os << "Chemfiles info: ";
+            *ostream_ << "Chemfiles info: ";
             break;
         case DEBUG:
-            *os << "Chemfiles debug: ";
+            *ostream_ << "Chemfiles debug: ";
             break;
         case NONE:
             break;
     }
-    return *os;
+    return *ostream_;
 }
 
 
 void Logger::level(LogLevel level){
-    instance.current_level = level;
+    instance_.current_level_ = level;
 }
 
 void Logger::log_to_stdout(){
-    instance.close();
-    instance.is_file = false;
-    instance.os = &std::cout;
+    instance_.close();
+    instance_.is_file_ = false;
+    instance_.ostream_ = &std::cout;
 }
 
 void Logger::log_to_stderr(){
-    instance.close();
-    instance.is_file = false;
-    instance.os = &std::cerr;
+    instance_.close();
+    instance_.is_file_ = false;
+    instance_.ostream_ = &std::cerr;
 }
 
 void Logger::log_to_stdlog(){
-    instance.close();
-    instance.is_file = false;
-    instance.os = &std::clog;
+    instance_.close();
+    instance_.is_file_ = false;
+    instance_.ostream_ = &std::clog;
 }
 
 void Logger::log_to_file(const std::string &filename){
-    instance.close();
-    instance.is_file = true;
-    instance.os = new std::ofstream(filename, std::ofstream::out);
+    instance_.close();
+    instance_.is_file_ = true;
+    instance_.ostream_ = new std::ofstream(filename, std::ofstream::out);
 }
 
 void Logger::close(){
-    if(is_file){
-        static_cast<std::ofstream *>(os)->close();
-        delete os;
+    if(is_file_){
+        static_cast<std::ofstream *>(ostream_)->close();
+        delete ostream_;
     }
 }

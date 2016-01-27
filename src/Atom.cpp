@@ -33,46 +33,46 @@ static bool is_element(const std::string& name){
     return false;
 }
 
-Atom::Atom(const std::string& name) : _name(name), _mass(0), _charge(0) {
+Atom::Atom(const std::string& name) : name_(name), mass_(0), charge_(0) {
     if (is_element(name)) {
-        _type = ELEMENT;
+        type_ = ELEMENT;
     } else {
-        _type = COARSE_GRAINED;
+        type_ = COARSE_GRAINED;
     }
 
     if (PERIODIC_INFORMATION.find(name) != PERIODIC_INFORMATION.end()){
-        _mass = PERIODIC_INFORMATION.at(name).mass ;
+        mass_ = PERIODIC_INFORMATION.at(name).mass ;
     }
 }
 
-Atom::Atom(AtomType type, const std::string& name) : _name(name), _mass(0), _charge(0), _type(type){}
+Atom::Atom(AtomType type, const std::string& name) : name_(name), mass_(0), charge_(0), type_(type){}
 
 Atom::Atom() : Atom(UNDEFINED) {}
 
 std::string Atom::full_name() const {
-    if (PERIODIC_INFORMATION.find(_name) != PERIODIC_INFORMATION.end()){
-        return std::string(PERIODIC_INFORMATION.at(_name).name) ;
+    if (PERIODIC_INFORMATION.find(name_) != PERIODIC_INFORMATION.end()){
+        return std::string(PERIODIC_INFORMATION.at(name_).name) ;
     }
     return "";
 }
 
 float Atom::vdw_radius() const {
-    if (PERIODIC_INFORMATION.find(_name) != PERIODIC_INFORMATION.end()){
-        return PERIODIC_INFORMATION.at(_name).vdw_radius ;
+    if (PERIODIC_INFORMATION.find(name_) != PERIODIC_INFORMATION.end()){
+        return PERIODIC_INFORMATION.at(name_).vdw_radius ;
     }
     return -1;
 }
 
 float Atom::covalent_radius() const {
-    if (PERIODIC_INFORMATION.find(_name) != PERIODIC_INFORMATION.end()){
-        return PERIODIC_INFORMATION.at(_name).colvalent_radius ;
+    if (PERIODIC_INFORMATION.find(name_) != PERIODIC_INFORMATION.end()){
+        return PERIODIC_INFORMATION.at(name_).colvalent_radius ;
     }
     return -1;
 }
 
 int Atom::atomic_number() const {
-    if (PERIODIC_INFORMATION.find(_name) != PERIODIC_INFORMATION.end()){
-        return PERIODIC_INFORMATION.at(_name).number ;
+    if (PERIODIC_INFORMATION.find(name_) != PERIODIC_INFORMATION.end()){
+        return PERIODIC_INFORMATION.at(name_).number ;
     }
     return -1;
 }

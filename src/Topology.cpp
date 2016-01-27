@@ -14,38 +14,38 @@
 using namespace chemfiles;
 
 void Connectivity::recalculate() const{
-    _angles.clear();
-    _dihedrals.clear();
-    for (auto const& bond1 : _bonds){
+    angles_.clear();
+    dihedrals_.clear();
+    for (auto const& bond1 : bonds_){
         // Find angles
-        for (auto const& bond2 : _bonds){
+        for (auto const& bond2 : bonds_){
             if (bond1 == bond2) continue;
             // Initializing angle to an invalid value
             Angle angle1(static_cast<size_t>(-1), static_cast<size_t>(-2), static_cast<size_t>(-3));
             if (bond1[0] == bond2[1]) {
                 angle1 = Angle(bond2[0], bond2[1], bond1[1]);
-                _angles.insert(angle1);
+                angles_.insert(angle1);
             } else if (bond1[1] == bond2[0]) {
                 angle1 = Angle(bond1[0], bond1[1], bond2[1]);
-                _angles.insert(angle1);
+                angles_.insert(angle1);
             } else if (bond1[1] == bond2[1]) {
                 angle1 = Angle(bond1[0], bond1[1], bond2[0]);
-                _angles.insert(angle1);
+                angles_.insert(angle1);
             } else if (bond1[0] == bond2[0]) {
                 angle1 = Angle(bond1[1], bond1[0], bond2[1]);
-                _angles.insert(angle1);
+                angles_.insert(angle1);
             } else {
                 // We will not find any dihedral angle from these bonds
                 continue;
             }
             // Find dihedral angles
-            for (auto const& bond3 : _bonds){
+            for (auto const& bond3 : bonds_){
                 if (bond2 == bond3) continue;
 
                 if (angle1[2] == bond3[0] && angle1[1] != bond3[1]){
-                    _dihedrals.emplace(angle1[0], angle1[1], angle1[2], bond3[1]);
+                    dihedrals_.emplace(angle1[0], angle1[1], angle1[2], bond3[1]);
                 } else if (angle1[0] == bond3[1] && angle1[1] != bond3[0]) {
-                    _dihedrals.emplace(bond3[0], angle1[0], angle1[1], angle1[2]);
+                    dihedrals_.emplace(bond3[0], angle1[0], angle1[1], angle1[2]);
                 } else if (angle1[2] == bond3[0] || angle1[2] == bond3[1]) {
                     // TODO this is an improper dihedral
                 }
@@ -56,39 +56,39 @@ void Connectivity::recalculate() const{
 }
 
 void Connectivity::clear(){
-    _bonds.clear();
-    _angles.clear();
-    _dihedrals.clear();
+    bonds_.clear();
+    angles_.clear();
+    dihedrals_.clear();
 }
 
 const std::unordered_set<Bond>& Connectivity::bonds() const {
     if (!uptodate)
         recalculate();
-    return _bonds;
+    return bonds_;
 }
 
 const std::unordered_set<Angle>& Connectivity::angles() const {
     if (!uptodate)
         recalculate();
-    return _angles;
+    return angles_;
 }
 
 const std::unordered_set<Dihedral>& Connectivity::dihedrals() const {
     if (!uptodate)
         recalculate();
-    return _dihedrals;
+    return dihedrals_;
 }
 
 void Connectivity::add_bond(size_t i, size_t j){
     uptodate = false;
-    _bonds.emplace(i, j);
+    bonds_.emplace(i, j);
 }
 
 void Connectivity::remove_bond(size_t i, size_t j){
     uptodate = false;
-    auto pos = _bonds.find(Bond(i, j));
-    if (pos != _bonds.end()){
-        _bonds.erase(pos);
+    auto pos = bonds_.find(Bond(i, j));
+    if (pos != bonds_.end()){
+        bonds_.erase(pos);
     }
 }
 
@@ -100,71 +100,71 @@ Topology::Topology(size_t natoms) {
 
 Topology::Topology() : Topology(0) {}
 
-void Topology::append(const Atom& _atom){
+void Topology::append(const Atom& atom){
     size_t index = static_cast<size_t>(-1);
 
-    for (size_t i = 0 ; i<_templates.size(); i++)
-        if (_templates[i] == _atom)
+    for (size_t i = 0 ; i<templates_.size(); i++)
+        if (templates_[i] == atom)
             index = i;
     if (index == static_cast<size_t>(-1)) { // Atom not found
-        _templates.push_back(_atom);
-        index = _templates.size() - 1;
+        templates_.push_back(atom);
+        index = templates_.size() - 1;
     }
 
-    _atoms.push_back(index);
+    atoms_.push_back(index);
 }
 
 void Topology::remove(size_t idx) {
-    if (idx < _atoms.size())
-        _atoms.erase(begin(_atoms) + static_cast<ptrdiff_t>(idx));
-    auto bonds = _connect.bonds();
+    if (idx < atoms_.size())
+        atoms_.erase(begin(atoms_) + static_cast<ptrdiff_t>(idx));
+    auto bonds = connect_.bonds();
     for (auto& bond : bonds){
         if (bond[0] == idx || bond[1] == idx)
-            _connect.remove_bond(bond[0], bond[1]);
+            connect_.remove_bond(bond[0], bond[1]);
     }
     recalculate();
 }
 
 std::vector<Bond> Topology::bonds() const{
     std::vector<Bond> res;
-    res.insert(begin(res), begin(_connect.bonds()), end(_connect.bonds()));
+    res.insert(begin(res), begin(connect_.bonds()), end(connect_.bonds()));
     return res;
 }
 
 std::vector<Angle> Topology::angles() const{
     std::vector<Angle> res;
-    res.insert(begin(res), begin(_connect.angles()), end(_connect.angles()));
+    res.insert(begin(res), begin(connect_.angles()), end(connect_.angles()));
     return res;
 }
 
 std::vector<Dihedral> Topology::dihedrals() const{
     std::vector<Dihedral> res;
-    res.insert(begin(res), begin(_connect.dihedrals()), end(_connect.dihedrals()));
+    res.insert(begin(res), begin(connect_.dihedrals()), end(connect_.dihedrals()));
     return res;
 }
 
 bool Topology::isbond(size_t i, size_t j) const  {
-    auto bonds = _connect.bonds();
+    auto bonds = connect_.bonds();
     auto pos = bonds.find(Bond(i, j));
     return pos != end(bonds);
 }
 
 bool Topology::isangle(size_t i, size_t j, size_t k) const {
-    auto angles = _connect.angles();
+    auto angles = connect_.angles();
     auto pos = angles.find(Angle(i, j, k));
     return pos != end(angles);
 }
 
 bool Topology::isdihedral(size_t i, size_t j, size_t k, size_t m) const {
-    auto dihedrals = _connect.dihedrals();
+    auto dihedrals = connect_.dihedrals();
     auto pos = dihedrals.find(Dihedral(i, j, k, m));
     return pos != end(dihedrals);
 }
 
 void Topology::clear(){
-    _templates.clear();
-    _atoms.clear();
-    _connect.clear();
+    templates_.clear();
+    atoms_.clear();
+    connect_.clear();
 }
 
 Topology chemfiles::dummy_topology(size_t natoms){

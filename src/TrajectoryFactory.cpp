@@ -43,8 +43,8 @@ inline void register_all_formats(trajectory_map_t& formats, trajectory_map_t& ex
     register_all_formats(formats, extensions, FormatList<S, Types...>());
 }
 
-TrajectoryFactory::TrajectoryFactory() : formats(), extensions() {
-    register_all_formats(formats, extensions, formats_list());
+TrajectoryFactory::TrajectoryFactory() : formats_(), extensions_() {
+    register_all_formats(formats_, extensions_, formats_list());
 }
 
 TrajectoryFactory& TrajectoryFactory::get() {
@@ -53,29 +53,29 @@ TrajectoryFactory& TrajectoryFactory::get() {
 }
 
 trajectory_builder_t TrajectoryFactory::format(const string& name){
-    if (formats.find(name) == formats.end()) {
+    if (formats_.find(name) == formats_.end()) {
         throw FormatError("Can not find the format \"" + name + "\".");
     }
-    return formats[name];
+    return formats_[name];
 }
 
 trajectory_builder_t TrajectoryFactory::by_extension(const string& ext){
-    if (extensions.find(ext) == extensions.end()) {
+    if (extensions_.find(ext) == extensions_.end()) {
         throw FormatError("Can not find a format associated with the \"" + ext + "\" extension.");
     }
-    return extensions[ext];
+    return extensions_[ext];
 }
 
 void TrajectoryFactory::register_format(const string& name, trajectory_builder_t tb){
-    if (formats.find(name) != formats.end()) {
+    if (formats_.find(name) != formats_.end()) {
         throw FormatError("The name \"" + name + "\" is already associated with a format.");
     }
-    formats.emplace(name, tb);
+    formats_.emplace(name, tb);
 }
 
 void TrajectoryFactory::register_extension(const string& ext, trajectory_builder_t tb){
-    if (extensions.find(ext) != extensions.end()) {
+    if (extensions_.find(ext) != extensions_.end()) {
         throw FormatError("The extension \"" + ext + "\" is already associated with a format.");
     }
-    extensions.emplace(ext, tb);
+    extensions_.emplace(ext, tb);
 }

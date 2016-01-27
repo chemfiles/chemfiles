@@ -38,7 +38,7 @@ public:
     FORMAT_NAME(XYZ)
     FORMAT_EXTENSION(.xyz)
 private:
-    TextFile& textfile;
+    TextFile& textfile_;
 };
 
 typedef concat<FORMATS_LIST, XYZFormat>::type FormatListXYZ;

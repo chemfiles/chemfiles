@@ -33,26 +33,26 @@ namespace chemfiles {
 class Dynlib {
 public:
     //! Load a library from it path
-    explicit Dynlib(const std::string& path) : handle(nullptr) {
+    explicit Dynlib(const std::string& path) : handle_(nullptr) {
         #ifdef CHFL_WINDOWS
-            handle = LoadLibrary(TEXT(path.c_str()));
-            if (!handle)
+            handle_ = LoadLibrary(TEXT(path.c_str()));
+            if (!handle_)
                 throw PluginError("Cannot load library: " + path);
         #else
-            handle = dlopen(path.c_str(), RTLD_LAZY);
-            if (!handle)
+            handle_ = dlopen(path.c_str(), RTLD_LAZY);
+            if (!handle_)
                 throw PluginError("Cannot load library: " + path + ". " + dlerror());
         #endif
     }
     //! A default constructor with no library associated
-    Dynlib() : handle(nullptr) {}
+    Dynlib() : handle_(nullptr) {}
 
-    Dynlib(Dynlib&& other) : handle(other.handle) {
-        other.handle = nullptr;
+    Dynlib(Dynlib&& other) : handle_(other.handle_) {
+        other.handle_ = nullptr;
     }
     Dynlib& operator=(Dynlib&& other) {
-        handle = other.handle;
-        other.handle = nullptr;
+        handle_ = other.handle_;
+        other.handle_ = nullptr;
         return *this;
     }
 
@@ -60,11 +60,11 @@ public:
     Dynlib& operator=(const Dynlib& other) = delete;
 
     ~Dynlib() {
-        if (handle) {
+        if (handle_) {
             #ifdef CHFL_WINDOWS
-                FreeLibrary(handle);
+                FreeLibrary(handle_);
             #else
-                dlclose(handle);
+                dlclose(handle_);
             #endif
         }
     }
@@ -73,10 +73,10 @@ public:
     //! typedef of the function
     template<class function_t>
     function_t symbol(const std::string& name){
-        if (handle == nullptr)
+        if (handle_ == nullptr)
             throw PluginError("The dynamic library was not opened.");
             #ifdef CHFL_WINDOWS
-                function_t sym = reinterpret_cast<function_t>(GetProcAddress(handle, name.c_str()));
+                function_t sym = reinterpret_cast<function_t>(GetProcAddress(handle_, name.c_str()));
                 if (!sym){
                     std::stringstream message;
                     message << "Cannot load symbol " << name << ": " << GetLastError();
@@ -84,7 +84,7 @@ public:
                 }
             #else
                 dlerror(); // reset errors
-                function_t sym = reinterpret_cast<function_t>(dlsym(handle, name.c_str()));
+                function_t sym = reinterpret_cast<function_t>(dlsym(handle_, name.c_str()));
                 const char* dlsym_error = dlerror();
                 if (dlsym_error)
                     throw PluginError("Cannot load symbol " + name + ": " + std::string(dlsym_error));
@@ -93,9 +93,9 @@ public:
     }
 private:
     #ifdef CHFL_WINDOWS
-        HINSTANCE handle;
+        HINSTANCE handle_;
     #else
-        void* handle;
+        void* handle_;
     #endif
 };
 

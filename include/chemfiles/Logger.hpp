@@ -40,12 +40,18 @@ public:
         DEBUG = 4
     };
 
+    //! Copy/move is not permited
+    Logger(const Logger&) = delete;
+    Logger(Logger&&) = delete;
+    //! Afectation is not permited
+    Logger& operator=(const Logger&) = delete;
+    Logger& operator=(Logger&&) = delete;
     ~Logger();
 
     //! Set the logging level
     static void level(LogLevel);
     //! Get the current logging level
-    static LogLevel level() {return instance.current_level;}
+    static LogLevel level() {return instance_.current_level_;}
     //! Set the file for logging
     static void log_to_file(const std::string &filename);
     //! Make the logger output to stdout
@@ -59,29 +65,23 @@ public:
     static std::ostream& out(LogLevel level);
 
 private:
+    //! Constructor
+    Logger();
+
     //! Close the log file if it exists.
     void close();
     //! Return a stream to write the log
     std::ostream& get_stream(LogLevel level);
-    //! Constructor
-    Logger();
-
-    //! Copy/move is not permited
-    Logger(const Logger&) = delete;
-    Logger(Logger&&) = delete;
-    //! Afectation is not permited
-    Logger& operator=(const Logger&) = delete;
-    Logger& operator=(Logger&&) = delete;
 
     //! Singleton instance
-    static Logger instance;
+    static Logger instance_;
 
     //! Logging level
-    LogLevel current_level;
+    LogLevel current_level_;
     //! Current log stream
-    std::ostream* os; // A raw pointer is needed to hold reference to the standard streams
+    std::ostream* ostream_; // A raw pointer is needed to hold reference to the standard streams
     //! Is the current stream a file ?
-    bool is_file;
+    bool is_file_;
 };
 
 } // namespace chemfiles

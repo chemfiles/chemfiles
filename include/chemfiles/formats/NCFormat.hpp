@@ -62,13 +62,13 @@ private:
     void write_cell(const UnitCell& cell) const;
 
     //! Reference to the associated file.
-    NCFile& ncfile;
+    NCFile& ncfile_;
     //! Last read step
-    size_t step;
+    size_t step_;
     //! Temporary cache for read and write operations.
-    mutable std::vector<float> cache;
+    mutable std::vector<float> cache_;
     //! Was the associated file validated?
-    bool validated;
+    bool validated_;
 };
 
 typedef concat<FORMATS_LIST, NCFormat>::type FormatListNC;

@@ -78,26 +78,26 @@ public:
     void cell(const UnitCell&);
 
     //! Get the number of steps (the number of Frames) in this trajectory
-    size_t nsteps() const {return _nsteps;}
+    size_t nsteps() const {return nsteps_;}
     //! Have we read all the Frames in this file ?
     bool done() const;
 private:
     //! Current step
-    size_t _step;
+    size_t step_;
     //! Number of steps in the file, if available
-    size_t _nsteps;
+    size_t nsteps_;
     //! Format used to read the file
-    std::unique_ptr<Format> _format;
+    std::unique_ptr<Format> format_;
     //! The file we are reading from
-    std::unique_ptr<File> _file;
+    std::unique_ptr<File> file_;
     //! Topology to use for reading/writing files when no topological data is present
-    Topology _topology;
+    Topology topology_;
     //! Do we have to use a specific topology ?
-    bool _use_custom_topology;
+    bool use_custom_topology_;
     //! UnitCell to use for reading/writing files when no unit cell information is present
-    UnitCell _cell;
+    UnitCell cell_;
     //! Do we have to use a specific unit cell ?
-    bool _use_custom_cell;
+    bool use_custom_cell_;
 };
 
 } // namespace chemfiles

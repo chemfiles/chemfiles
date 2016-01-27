@@ -1,9 +1,9 @@
-/* Chemfiles, an efficient IO library for chemistry file formats
+/* Chemfiles, an efficient IO library for chemistry file_ formats
 * Copyright (C) 2015 Guillaume Fraux
 *
 * This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
-* file, You can obtain one at http://mozilla.org/MPL/2.0/
+* file_, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
 #include "chemfiles/config.hpp"
@@ -34,7 +34,7 @@ class NCFile final: public BinaryFile {
 public:
     explicit NCFile(const string& filename, const string& mode);
 
-    //! Get a global attribut from the file
+    //! Get a global attribut from the file_
     string global_attribute(const string& name) const;
     //! Get the value of a specific dimmension
     size_t dimension(const string& name) const;
@@ -44,7 +44,7 @@ public:
     template <typename T>
     T attribute(const string& var, const string& name) const;
 
-    //! Create a global attribut in the file
+    //! Create a global attribut in the file_
     void add_global_attribute(const string& name, const string& value);
     //! Create a dimmension with the specified value. If \c value == -1, then
     //! the dimension is infinite
@@ -59,8 +59,8 @@ public:
     virtual bool is_open() override;
     virtual void sync() override;
 private:
-    // Underlying NetCDF file
-    netCDF::NcFile file;
+    // Underlying NetCDF file_
+    netCDF::NcFile file_;
 };
 
 //! Get the NetCDF type associated to a c++ type
@@ -115,12 +115,12 @@ void NCFile::add_variable(const string& varname, Dims... dims) {
         auto dim_names = std::vector<std::string>{dims...};
 
         for (auto name : dim_names){
-            dimensions.push_back(file.getDim(name));
+            dimensions.push_back(file_.getDim(name));
             if (dimensions.back().isNull())
                 throw FileError("Can not get dimensions \"" + name + "\".");
         }
 
-        file.addVar(varname, get_nctype<T>(), dimensions);
+        file_.addVar(varname, get_nctype<T>(), dimensions);
     } catch (const netCDF::exceptions::NcException& e) {
         throw FileError("Can not add variable \"" + varname + "\".\n" + e.what());
     }

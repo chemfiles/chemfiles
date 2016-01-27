@@ -37,25 +37,25 @@ struct CAPIStatus {
     };
 
     CAPIStatus() {
-        messages[SUCCESS] = "Operation was sucessfull";
-        messages[MEMORY] = "Memory error. Use chfl_last_error for more informations.";
-        messages[FILE] = "Error while reading a file. Use chfl_last_error for more informations.";
-        messages[FORMAT] = "Error while reading a format. Use chfl_last_error for more informations.";
-        messages[SELECTION] = "Error in selection string parsing. Use chfl_last_error for more informations.";
-        messages[CHEMFILES] = "Error in chemfiles library. Use chfl_last_error for more informations.";
-        messages[CXX_ERROR] = "Error in C++ runtime. Use chfl_last_error for more informations.";
+        messages_[SUCCESS] = "Operation was sucessfull";
+        messages_[MEMORY] = "Memory error. Use chfl_last_error for more informations.";
+        messages_[FILE] = "Error while reading a file. Use chfl_last_error for more informations.";
+        messages_[FORMAT] = "Error while reading a format. Use chfl_last_error for more informations.";
+        messages_[SELECTION] = "Error in selection string parsing. Use chfl_last_error for more informations.";
+        messages_[CHEMFILES] = "Error in chemfiles library. Use chfl_last_error for more informations.";
+        messages_[CXX_ERROR] = "Error in C++ runtime. Use chfl_last_error for more informations.";
     }
 
     /// Retrive the message corresponding to an error code.
     const char* message(int i) const {
         if (i >= 0 && i < LAST)
-            return messages[i];
+            return messages_[i];
         else
             return "";
     }
     std::string last_error;
 private:
-    const char* messages[LAST];
+    const char* messages_[LAST];
 };
 
 static CAPIStatus status = CAPIStatus();

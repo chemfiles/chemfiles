@@ -29,7 +29,7 @@ class Format {
 public:
     //! Constructor associating a file to this Format instance. The file should have the
     //! file_t class.
-    Format(File& f) : file(f) {}
+    Format(File& file) : file_(file) {}
     virtual ~Format() = default;
     Format& operator=(const Format&) = delete;
     Format(const Format&) = delete;
@@ -40,7 +40,7 @@ public:
     *
     * This function can throw an exception in case of error.
     */
-    virtual void read_step(const size_t step, Frame& frame);
+    virtual void read_step(size_t step, Frame& frame);
 
     /*!
     * @brief Read a specific step from the associated file.
@@ -71,7 +71,7 @@ public:
     using file_t = BasicFile;
 protected:
     //! File associated with this Format instance.
-    File& file;
+    File& file_;
 };
 
 } // namespace chemfiles

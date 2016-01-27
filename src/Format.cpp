@@ -11,7 +11,7 @@
 #include "chemfiles/Error.hpp"
 using namespace chemfiles;
 
-void Format::read_step(const size_t, Frame&){
+void Format::read_step(size_t, Frame&){
     throw FormatError("Not implemented function 'read_at'");
 }
 

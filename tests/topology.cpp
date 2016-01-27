@@ -11,14 +11,14 @@ TEST_CASE("Use the Topology class", "[Topology]"){
 
     SECTION("Basic usage"){
         auto topo = Topology(42);
-        CHECK(topo._atoms.capacity() == 42);
+        CHECK(topo.atoms_.capacity() == 42);
 
         topo.append(Atom("H"));
         CHECK(topo[0].type() == Atom::ELEMENT);
         CHECK(topo[0].name() == "H");
 
         topo.resize(100);
-        CHECK(topo._atoms.size() == 100);
+        CHECK(topo.atoms_.size() == 100);
     }
 
     SECTION("Dummy topology provider"){
@@ -26,7 +26,7 @@ TEST_CASE("Use the Topology class", "[Topology]"){
         CHECK(topo.natoms() == 42);
 
         CHECK(topo.natom_types() == 1);
-        CHECK(topo._templates[0] == Atom(Atom::UNDEFINED));
+        CHECK(topo.templates_[0] == Atom(Atom::UNDEFINED));
         CHECK(topo[10] == Atom(Atom::UNDEFINED));
     }
 

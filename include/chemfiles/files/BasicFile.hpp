@@ -39,13 +39,13 @@ public:
     virtual const std::vector<std::string>& readlines(size_t n) override;
 
     virtual void rewind() override{
-        stream.clear();
-        stream.seekg(0, std::ios::beg);
+        stream_.clear();
+        stream_.seekg(0, std::ios::beg);
     }
     virtual size_t nlines() override;
 
-    virtual bool is_open() override {return stream.is_open();}
-    virtual bool eof() override {return stream.eof();}
+    virtual bool is_open() override {return stream_.is_open();}
+    virtual bool eof() override {return stream_.eof();}
 
     virtual void sync() override {
         std::iostream::sync();
@@ -55,9 +55,9 @@ public:
     virtual void writeline(const std::string&) override;
     virtual void writelines(const std::vector<std::string>&) override;
 private:
-    std::fstream stream;
+    std::fstream stream_;
     // Caching a vector of strings
-    std::vector<std::string> lines;
+    std::vector<std::string> lines_;
 };
 
 } // namespace chemfiles

@@ -26,8 +26,7 @@ static string extension(const string& filename) {
 }
 
 Trajectory::Trajectory(const string& filename, const string& mode, const string& format)
-: _step(0), _nsteps(0), _topology(), _use_custom_topology(false), _cell(), _use_custom_cell(false)
-{
+: step_(0), nsteps_(0), format_(nullptr), file_(nullptr), topology_(), use_custom_topology_(false), cell_(), use_custom_cell_(false) {
     trajectory_builder_t builder;
     if (format == ""){
         // try to guess the format by extension
@@ -38,11 +37,11 @@ Trajectory::Trajectory(const string& filename, const string& mode, const string&
         builder = TrajectoryFactory::get().format(format);
     }
 
-    _file = builder.file_creator(filename, mode);
-    _format = builder.format_creator(*_file);
+    file_ = builder.file_creator(filename, mode);
+    format_ = builder.format_creator(*file_);
 
     if (mode == "r" || mode == "a")
-        _nsteps = _format->nsteps();
+        nsteps_ = format_->nsteps();
 }
 
 Trajectory::~Trajectory(){}
@@ -53,50 +52,50 @@ Trajectory& Trajectory::operator>>(Frame& frame){
 }
 
 Frame Trajectory::read(){
-    if (_step >= _nsteps) {
-        throw FileError("Can not read file \"" + _file->filename() + "\" past end.");
+    if (step_ >= nsteps_) {
+        throw FileError("Can not read file \"" + file_->filename() + "\" past end.");
     }
-    if (!(_file->mode() == "r" || _file->mode() == "a")) {
-        throw FileError("File \"" + _file->filename() + "\" was not openened in read or append mode.");
+    if (!(file_->mode() == "r" || file_->mode() == "a")) {
+        throw FileError("File \"" + file_->filename() + "\" was not openened in read or append mode.");
     }
 
     Frame frame;
-    _format->read(frame);
-    _step++;
+    format_->read(frame);
+    step_++;
 
     // Set the frame topology if needed
-    if (_use_custom_topology)
-        frame.topology(_topology);
+    if (use_custom_topology_)
+        frame.topology(topology_);
 
     // Set the frame unit cell if needed
-    if (_use_custom_cell)
-        frame.cell(_cell);
+    if (use_custom_cell_)
+        frame.cell(cell_);
 
     return frame;
 }
 
 Frame Trajectory::read_step(const size_t step){
-    if (step >= _nsteps) {
+    if (step >= nsteps_) {
         throw FileError(
-            "Can not read file \"" + _file->filename() + "\" at step " +
-            std::to_string(step) + ". Max step is " + std::to_string(_nsteps) + "."
+            "Can not read file \"" + file_->filename() + "\" at step " +
+            std::to_string(step) + ". Max step is " + std::to_string(nsteps_) + "."
         );
     }
-    if (!(_file->mode() == "r" || _file->mode() == "a")) {
-        throw FileError("File \"" + _file->filename() + "\" was not openened in read or append mode.");
+    if (!(file_->mode() == "r" || file_->mode() == "a")) {
+        throw FileError("File \"" + file_->filename() + "\" was not openened in read or append mode.");
     }
 
     Frame frame;
-    _step = step;
-    _format->read_step(_step, frame);
+    step_ = step;
+    format_->read_step(step_, frame);
 
     // Set the frame topology if needed
-    if (_use_custom_topology)
-        frame.topology(_topology);
+    if (use_custom_topology_)
+        frame.topology(topology_);
 
     // Set the frame unit cell if needed
-    if (_use_custom_cell)
-        frame.cell(_cell);
+    if (use_custom_cell_)
+        frame.cell(cell_);
 
     return frame;
 }
@@ -107,26 +106,26 @@ Trajectory& Trajectory::operator<<(const Frame& frame){
 }
 
 void Trajectory::write(const Frame& input_frame){
-    if (!(_file->mode() == "w" || _file->mode() == "a")) {
-        throw FileError("File \"" + _file->filename() + "\" was not openened in write or append mode.");
+    if (!(file_->mode() == "w" || file_->mode() == "a")) {
+        throw FileError("File \"" + file_->filename() + "\" was not openened in write or append mode.");
     }
 
     // Maybe that is not the better way to do this, performance-wise. I'll have
     // to benchmark this part.
     Frame frame = input_frame;
-    if (_use_custom_topology)
-        frame.topology(_topology);
-    if (_use_custom_cell)
-        frame.cell(_cell);
+    if (use_custom_topology_)
+        frame.topology(topology_);
+    if (use_custom_cell_)
+        frame.cell(cell_);
 
-    _format->write(frame);
-    _step++;
-    _nsteps++;
+    format_->write(frame);
+    step_++;
+    nsteps_++;
 }
 
 void Trajectory::topology(const Topology& top){
-    _use_custom_topology = true;
-    _topology = top;
+    use_custom_topology_ = true;
+    topology_ = top;
 }
 
 void Trajectory::topology(const std::string& filename) {
@@ -138,14 +137,14 @@ void Trajectory::topology(const std::string& filename) {
 }
 
 void Trajectory::cell(const UnitCell& new_cell){
-    _use_custom_cell = true;
-    _cell = new_cell;
+    use_custom_cell_ = true;
+    cell_ = new_cell;
 }
 
 void Trajectory::sync() {
-    _file->sync();
+    file_->sync();
 }
 
 bool Trajectory::done() const {
-    return _step >= _nsteps;
+    return step_ >= nsteps_;
 }

@@ -25,17 +25,17 @@ namespace chemfiles {
 struct CHFL_EXPORT Bond {
     Bond(size_t first, size_t second){
         assert(first != second);
-        _data[0] = std::min(first, second);
-        _data[1] = std::max(first, second);
+        data_[0] = std::min(first, second);
+        data_[1] = std::max(first, second);
     }
     //! Indexing operator
-    const size_t& operator[](size_t i) const {return _data[i];}
+    const size_t& operator[](size_t i) const {return data_[i];}
     //! Comparison operator
     bool operator==(const Bond& other) const{
-        return _data[0] == other[0] && _data[1] == other[1];
+        return data_[0] == other[0] && data_[1] == other[1];
     }
 private:
-    std::array<size_t, 2> _data;
+    std::array<size_t, 2> data_;
 };
 
 //! The angle struct ensure a canonical representation of an angle between the
@@ -44,18 +44,18 @@ struct CHFL_EXPORT Angle {
     Angle(size_t first, size_t midle, size_t last){
         assert(first != last);
         assert(first != midle);
-        _data[0] = std::min(first, last);
-        _data[1] = midle;
-        _data[2] = std::max(first, last);
+        data_[0] = std::min(first, last);
+        data_[1] = midle;
+        data_[2] = std::max(first, last);
     }
     //! Indexing operator
-    const size_t& operator[](size_t i) const {return _data[i];}
+    const size_t& operator[](size_t i) const {return data_[i];}
     //! Comparison operator
     bool operator==(const Angle& other) const {
-        return _data[0] == other[0] && _data[1] == other[1] && _data[2] == other[2];
+        return data_[0] == other[0] && data_[1] == other[1] && data_[2] == other[2];
     }
 private:
-    std::array<size_t, 3> _data;
+    std::array<size_t, 3> data_;
 };
 
 //! The dihedral struct ensure a canonical representation of a dihedral angle
@@ -67,26 +67,26 @@ struct CHFL_EXPORT Dihedral {
         assert(third != fourth);
 
         if (std::max(first, second) < std::max(third, fourth)) {
-            _data[0] = first;
-            _data[1] = second;
-            _data[2] = third;
-            _data[3] = fourth;
+            data_[0] = first;
+            data_[1] = second;
+            data_[2] = third;
+            data_[3] = fourth;
         } else {
-            _data[0] = fourth;
-            _data[1] = third;
-            _data[2] = second;
-            _data[3] = first;
+            data_[0] = fourth;
+            data_[1] = third;
+            data_[2] = second;
+            data_[3] = first;
         }
     }
     //! Indexing operator
-    const size_t& operator[](size_t i) const {return _data[i];}
+    const size_t& operator[](size_t i) const {return data_[i];}
     //! Comparison operator
     bool operator==(const Dihedral& other) const {
-        return _data[0] == other[0] && _data[1] == other[1] &&
-               _data[2] == other[2] && _data[3] == other[3];
+        return data_[0] == other[0] && data_[1] == other[1] &&
+               data_[2] == other[2] && data_[3] == other[3];
     }
 private:
-    std::array<size_t, 4> _data;
+    std::array<size_t, 4> data_;
 };
 
 } // namespace chemfiles
@@ -122,7 +122,7 @@ namespace chemfiles {
  * added or removed. The \c bonds set is the main source of information, all the
  * other data are cached from it.
  */
-class CHFL_EXPORT Connectivity {
+class Connectivity {
 public:
     Connectivity() = default;
     //! Recalculate the angles and the dihedrals from the bond list
@@ -139,11 +139,11 @@ public:
     void remove_bond(size_t i, size_t j);
 private:
     //! Bonds in the system
-    std::unordered_set<Bond> _bonds;
+    std::unordered_set<Bond> bonds_;
     //! Angles in the system
-    mutable std::unordered_set<Angle> _angles;
+    mutable std::unordered_set<Angle> angles_;
     //! Dihedral angles in the system
-    mutable std::unordered_set<Dihedral> _dihedrals;
+    mutable std::unordered_set<Dihedral> dihedrals_;
     //! Is the cached content up to date ?
     mutable bool uptodate;
 };
@@ -165,9 +165,9 @@ public:
     Topology& operator=(const Topology &) = default;
 
     //! Get a reference to the atom at the position \c index
-    Atom& operator[](size_t index) {return _templates[_atoms[index]];}
+    Atom& operator[](size_t index) {return templates_[atoms_[index]];}
     //! Get a const (non-modifiable) reference to the atom at the position \c index
-    const Atom& operator[](size_t index) const {return _templates[_atoms[index]];}
+    const Atom& operator[](size_t index) const {return templates_[atoms_[index]];}
 
     //! Add an atom in the system
     void append(const Atom& _atom);
@@ -175,24 +175,24 @@ public:
     void remove(size_t idx);
     //! Add a bond in the system, between the atoms at index \c atom_i and \c atom_j
     void add_bond(size_t atom_i, size_t atom_j) {
-        _connect.add_bond(atom_i, atom_j);
+        connect_.add_bond(atom_i, atom_j);
     }
     //! Remove a bond in the system, between the atoms at index \c atom_i and \c atom_j
     void remove_bond(size_t atom_i, size_t atom_j){
-        _connect.remove_bond(atom_i, atom_j);
+        connect_.remove_bond(atom_i, atom_j);
     }
 
     //! Get the number of atoms in the topology
-    size_t natoms() const {return _atoms.size();}
+    size_t natoms() const {return atoms_.size();}
     //! Get the number of atom types in the topology
-    size_t natom_types() const {return _templates.size();}
+    size_t natom_types() const {return templates_.size();}
     //! Reserve space for \c natoms in the topology
-    void resize(size_t natoms) {_atoms.resize(natoms);}
+    void resize(size_t natoms) {atoms_.resize(natoms);}
     //! Clear the topology: this remove all atoms and all bonds, angles and dihedrals
     void clear();
 
     //! Clear the bonds (angles and dihedrals too) in the topology
-    void clear_bonds() {_connect.clear();}
+    void clear_bonds() {connect_.clear();}
 
     //! Check wether the atoms at indexes \c i and \c j are bonded or not
     bool isbond(size_t i, size_t j) const;
@@ -210,16 +210,16 @@ public:
     std::vector<Dihedral> dihedrals() const;
 
     //! Recalculate the angles and dihedrals list from the bond list.
-    void recalculate() {_connect.recalculate();}
+    void recalculate() {connect_.recalculate();}
 private:
     //! Internal list of particle templates. If the same particle can be found
     //! more than one in a topology, the Atom class will have only one instance,
     //! pointing to this vector.
-    std::vector<Atom> _templates;
-    //! Internal list of atoms. The index refers to the _templates list
-    std::vector<size_t> _atoms;
-    //! Connectivity of the system. All the indices refers to the atoms in \c _atoms
-    Connectivity _connect;
+    std::vector<Atom> templates_;
+    //! Internal list of atoms. The index refers to the templates_ list
+    std::vector<size_t> atoms_;
+    //! Connectivity of the system. All the indices refers to the atoms in \c atoms_
+    Connectivity connect_;
 };
 
 //! Create a topology containing \c natoms atoms, all of the UNDEFINED type.

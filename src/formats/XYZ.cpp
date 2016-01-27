@@ -45,22 +45,22 @@ static bool forward(TextFile& file, size_t nsteps) {
     return true;
 }
 
-XYZFormat::XYZFormat(File& f) : Format(f), textfile(static_cast<TextFile&>(file)) {}
+XYZFormat::XYZFormat(File& f) : Format(f), textfile_(static_cast<TextFile&>(file_)) {}
 
 size_t XYZFormat::nsteps() const {
-    textfile.rewind();
+    textfile_.rewind();
     size_t n = 0;
-    while (!textfile.eof()) {
-        if (forward(textfile, 1))
+    while (!textfile_.eof()) {
+        if (forward(textfile_, 1))
             n++;
     }
-    textfile.rewind();
+    textfile_.rewind();
     return n;
 }
 
 void XYZFormat::read_step(const size_t step, Frame& frame){
-    textfile.rewind();
-    forward(textfile, step);
+    textfile_.rewind();
+    forward(textfile_, step);
     read(frame);
 }
 
@@ -68,8 +68,8 @@ void XYZFormat::read(Frame& frame){
     size_t natoms;
 
     try {
-        natoms = std::stoul(textfile.getline());
-        textfile.getline(); // XYZ comment line;
+        natoms = std::stoul(textfile_.getline());
+        textfile_.getline(); // XYZ comment line;
     } catch (const std::exception& e) {
         throw FormatError("Can not read next step: " + string(e.what()));
     }
@@ -77,7 +77,7 @@ void XYZFormat::read(Frame& frame){
     std::vector<std::string> lines(natoms);
 
     try {
-        lines = textfile.readlines(natoms);
+        lines = textfile_.readlines(natoms);
     }
     catch (const FileError& e) {
         throw FormatError("Can not read file: " + string(e.what()));
@@ -105,15 +105,15 @@ void XYZFormat::write(const Frame& frame){
     const auto positions = frame.positions();
     assert(frame.natoms() == topology.natoms());
 
-    textfile << frame.natoms() << "\n";
-    textfile << "Written by the chemfiles library\n";
+    textfile_ << frame.natoms() << "\n";
+    textfile_ << "Written by the chemfiles library\n";
 
     for (size_t i=0; i<frame.natoms(); i++){
         auto pos = positions[i];
         auto name = topology[i].name();
         if (name == "")
             name = "X";
-        textfile << name   << " "
+        textfile_ << name   << " "
                   << pos[0] << " " << pos[1] << " " << pos[2] << "\n";
     }
 }

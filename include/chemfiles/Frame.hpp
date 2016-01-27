@@ -43,34 +43,34 @@ public:
     explicit Frame(const Topology& topology, const UnitCell& cell = UnitCell());
 
     //! Get a modifiable reference to the positions
-    Array3D& positions() {return _positions;}
+    Array3D& positions() {return positions_;}
     //! Get a const (non modifiable) reference to the positions
-    const Array3D& positions() const {return _positions;}
+    const Array3D& positions() const {return positions_;}
     //! Set the positions
-    void positions(const Array3D& pos) {_positions = pos;}
+    void positions(const Array3D& pos) {positions_ = pos;}
 
     //! Get an optional modifiable reference to the velocities
-    optional<Array3D>& velocities() {return _velocities;}
+    optional<Array3D>& velocities() {return velocities_;}
     //! Get an optional const (non modifiable) reference to the velocities
-    const optional<Array3D>& velocities() const {return _velocities;}
+    const optional<Array3D>& velocities() const {return velocities_;}
     //! Set the velocities to `vel`
-    void velocities(const Array3D& vel) {_velocities.emplace(vel);}
+    void velocities(const Array3D& vel) {velocities_.emplace(vel);}
 
     //! Get the number of particles in the system
     size_t natoms() const;
 
     //! Get a modifiable reference to the internal topology
-    Topology& topology() {return _topology;}
+    Topology& topology() {return topology_;}
     //! Get a const (non-modifiable) reference to the internal topology
-    const Topology& topology() const {return _topology;}
+    const Topology& topology() const {return topology_;}
     //! Set the system topology
-    void topology(const Topology& top) {_topology = top;}
+    void topology(const Topology& top) {topology_ = top;}
 
     //! Get a const (non-modifiable) reference to the unit cell of the system
-    const UnitCell& cell() const {return _cell;}
-    UnitCell& cell() {return _cell;}
+    const UnitCell& cell() const {return cell_;}
+    UnitCell& cell() {return cell_;}
     //! Set the unit cell fo the system
-    void cell(const UnitCell& c) {_cell = c;}
+    void cell(const UnitCell& c) {cell_ = c;}
 
     //! Resize the frame to store data for `natoms` atoms. If the new size is bigger than
     //! the old one, missing data is initializd to 0. Pre-existing values are conserved.
@@ -78,9 +78,9 @@ public:
     void resize(size_t natoms);
 
     //! Get the current simulation step
-    size_t step() const {return _step;}
+    size_t step() const {return step_;}
     //! Set the current simulation step
-    void step(size_t s) {_step = s;}
+    void step(size_t s) {step_ = s;}
 
     //! Try to guess the bonds, angles and dihedrals in the system. If \c bonds
     //! is true, guess everything; else only guess the angles and dihedrals from
@@ -91,15 +91,15 @@ private:
     void guess_bonds();
 
     //! Current simulation step
-    size_t _step;
+    size_t step_;
     //! Positions of the particles
-    Array3D _positions;
+    Array3D positions_;
     //! Velocities of the particles
-    optional<Array3D> _velocities;
+    optional<Array3D> velocities_;
     //! Topology of the described system
-    Topology _topology;
+    Topology topology_;
     //! Unit cell of the system
-    UnitCell _cell;
+    UnitCell cell_;
 };
 
 } // namespace chemfiles

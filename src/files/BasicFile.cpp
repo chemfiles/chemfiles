@@ -22,48 +22,48 @@ BasicFile::BasicFile(const std::string& filename, const std::string& str_mode) :
         throw FileError("Unrecognized file mode: " + str_mode);
     }
 
-    stream.open(filename, mode);
-    if (!stream.is_open()) {
+    stream_.open(filename, mode);
+    if (!stream_.is_open()) {
         throw FileError("Could not open the file " + filename);
     }
-    TextFile::rdbuf(stream.rdbuf());
-    lines.resize(1);
+    TextFile::rdbuf(stream_.rdbuf());
+    lines_.resize(1);
     rewind();
 }
 
 const std::string& BasicFile::getline(){
-    *this >> lines[0];
-    return lines[0];
+    *this >> lines_[0];
+    return lines_[0];
 }
 
 BasicFile& BasicFile::operator>>(std::string& line){
-    std::getline(stream, line);
+    std::getline(stream_, line);
     return *this;
 }
 
 const std::vector<std::string>& BasicFile::readlines(size_t n){
-    lines.resize(n);
+    lines_.resize(n);
     std::string line;
     for (size_t i=0; i<n; i++){
-        std::getline(stream, line);
-        lines[i] = line;
+        std::getline(stream_, line);
+        lines_[i] = line;
     }
 
-    if (!stream)
+    if (!stream_)
         throw FileError("Error while reading file " + filename());
 
-    return lines;
+    return lines_;
 }
 
 size_t BasicFile::nlines(){
-    auto position = stream.tellg();
+    auto position = stream_.tellg();
     rewind();
     size_t n = static_cast<size_t>(
-                std::count(std::istreambuf_iterator<char>(stream),
+                std::count(std::istreambuf_iterator<char>(stream_),
                            std::istreambuf_iterator<char>(),
                            '\n'));
     n += 1; // The 1 is here because of the 0-based indexing in C++
-    stream.seekg(position);
+    stream_.seekg(position);
     return n;
 }
 

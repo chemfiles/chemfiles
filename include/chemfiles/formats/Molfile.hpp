@@ -64,24 +64,24 @@ private:
     void read_topology() const;
 
     /// Dynamic library associated with the VMD plugin
-    Dynlib _lib;
+    Dynlib lib_;
     /// VMD molfile plugin
-    molfile_plugin_t* _plugin;
+    molfile_plugin_t* plugin_;
 
     typedef int (*init_function_t)(void);
     typedef int (*register_function_t)(void*, vmdplugin_register_cb);
     /// Function to call at in the destructor
-    init_function_t _fini_fun;
+    init_function_t fini_fun_;
 
     /// The file handler
-    mutable void* _file_handler;
+    mutable void* file_handler_;
     /// The number of atoms in the last trajectory read
-    int _natoms;
+    int natoms_;
 
     /// Do we have topological information in this plugin ?
-    mutable bool _use_topology;
+    mutable bool use_topology_;
     /// Store topological information
-    mutable Topology _topology;
+    mutable Topology topology_;
 };
 
 typedef concat<FORMATS_LIST, Molfile<PDB>>::type molfile_list_1;

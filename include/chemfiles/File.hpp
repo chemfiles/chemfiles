@@ -34,14 +34,14 @@ public:
     //! Sync any content in the underlying buffer to the disk
     virtual void sync() = 0;
     //! File name, i.e. complete path to this file on disk.
-    const std::string& filename() const {return _filename;}
+    const std::string& filename() const {return filename_;}
     //! File opening mode.
-    const std::string& mode() const {return _mode;}
+    const std::string& mode() const {return mode_;}
 protected:
-    File(const std::string& path, const std::string& mode) : _filename(path), _mode(mode) {}
+    File(const std::string& path, const std::string& mode) : filename_(path), mode_(mode) {}
 private:
-    const std::string _filename;
-    const std::string _mode;
+    const std::string filename_;
+    const std::string mode_;
 };
 
 /*!

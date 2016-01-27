@@ -85,33 +85,33 @@ public:
     void raw_matricial(double[3][3]) const;
 
     //! Get the cell type
-    CellType type() const {return _type;}
+    CellType type() const {return type_;}
     //! Set the cell type to t
     void type(CellType t);
 
     //! Get the first lenght (a) of the cell
-    double a() const {return _a;}
+    double a() const {return a_;}
     //! Set the first lenght (a) of the cell
     void a(double val);
     //! Get the second lenght (b) of the cell
-    double b() const {return _b;}
+    double b() const {return b_;}
     //! Set the second lenght (b) of the cell
     void b(double val);
     //! Get the third lenght (c) of the cell
-    double c() const {return _c;}
+    double c() const {return c_;}
     //! Set the third lenght (c) of the cell
     void c(double val);
 
     //! Get the first angle (alpha) of the cell
-    double alpha() const {return _alpha;}
+    double alpha() const {return alpha_;}
     //! Set the first angle (alpha) of the cell if possible
     void alpha(double val);
     //! Get the second angle (beta) of the cell
-    double beta() const {return _beta;}
+    double beta() const {return beta_;}
     //! Set the second angle (beta) of the cell if possible
     void beta(double val);
     //! Get the third angle (gamma) of the cell
-    double gamma() const {return _gamma;}
+    double gamma() const {return gamma_;}
     //! Set the third angle (gamma) of the cell if possible
     void gamma(double val);
 
@@ -122,11 +122,11 @@ public:
     std::array<float, 3> wrap(const std::array<float, 3>& vect) const;
 private:
     //! Cell lenghts
-    double _a, _b, _c;
+    double a_, b_, c_;
     //! Cell angles
-    double _alpha, _beta, _gamma;
+    double alpha_, beta_, gamma_;
     //! Cell type
-    CellType _type;
+    CellType type_;
 };
 
 inline bool operator==(const UnitCell& rhs, const UnitCell& lhs) {

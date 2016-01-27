@@ -49,22 +49,22 @@ public:
     ~Atom() = default;
 
     //! Get a const (non-modifiable) reference to the atom name
-    const std::string& name() const {return _name;}
-    //! Get a const (non-modifiable) reference to the atom mass
-    const float& mass() const {return _mass;}
-    //! Get a const (non-modifiable) reference to the atom charge
-    const float& charge() const {return _charge;}
-    //! Get a const (non-modifiable) reference to the atom type
-    const AtomType& type() const {return _type;}
+    const std::string& name() const {return name_;}
+    //! Get the atom mass
+    float mass() const {return mass_;}
+    //! Get the atom charge
+    float charge() const {return charge_;}
+    //! Get the atom type
+    AtomType type() const {return type_;}
 
     //! Set the atom name
-    void name(const std::string& n) {_name = n;}
+    void name(const std::string& n) {name_ = n;}
     //! Set the atom mass
-    void mass(float m) {_mass = m;}
+    void mass(float m) {mass_ = m;}
     //! Set the atom charge
-    void charge(float c) {_charge = c;}
+    void charge(float c) {charge_ = c;}
     //! Set the atom type
-    void type(AtomType t) {_type = t;}
+    void type(AtomType t) {type_ = t;}
 
     //! Try to get the full element name, return and empty string if this is impossible
     std::string full_name() const;
@@ -75,10 +75,10 @@ public:
     //! Try to get the atomic number, if defined. Returns -1 if it can not be found.
     int atomic_number() const;
 private:
-    std::string _name;
-    float _mass;
-    float _charge;
-    AtomType _type;
+    std::string name_;
+    float mass_;
+    float charge_;
+    AtomType type_;
 };
 
 inline bool operator==(const Atom& lhs, const Atom& rhs) {

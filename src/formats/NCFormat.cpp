@@ -28,7 +28,7 @@ std::string NCFormat::description() const {
 }
 
 //! Check the validity of a NetCDF file
-static bool is_valid(const NCFile& ncfile, size_t natoms){
+static bool is_valid(const NCFile& ncfile_, size_t natoms){
     bool writing;
     if (natoms == static_cast<size_t>(-1)) {
         writing = false;
@@ -36,52 +36,52 @@ static bool is_valid(const NCFile& ncfile, size_t natoms){
         writing = true;
     }
 
-    if (ncfile.global_attribute("Conventions") != "AMBER"){
+    if (ncfile_.global_attribute("Conventions") != "AMBER"){
         if (!writing)
             LOG(ERROR) << "We can only read AMBER convention NetCDF files." << endl;
         return false;
     }
 
-    if (ncfile.global_attribute("ConventionVersion") != "1.0"){
+    if (ncfile_.global_attribute("ConventionVersion") != "1.0"){
         if (!writing)
             LOG(ERROR) << "We can only read version 1.0 of AMBER convention NetCDF files." << endl;
         return false;
     }
 
-    if (ncfile.dimension("spatial") != 3){
+    if (ncfile_.dimension("spatial") != 3){
         if (!writing)
             LOG(ERROR) << "Wrong size for spatial dimension. Should be 3, is "
-                       << ncfile.dimension("spatial") << "." << endl;
+                       << ncfile_.dimension("spatial") << "." << endl;
         return false;
     }
 
     if (writing) {
-        if (ncfile.dimension("atom") != natoms){
+        if (ncfile_.dimension("atom") != natoms){
             LOG(ERROR) << "Wrong size for atoms dimension. Should be " << natoms
-                       << ", is " << ncfile.dimension("atom") << "." << endl;
+                       << ", is " << ncfile_.dimension("atom") << "." << endl;
         return false;
         }
     }
     return true;
 }
 
-NCFormat::NCFormat(File& file) : Format(file), ncfile(static_cast<NCFile&>(file)), step(0), validated(false) {
-    if (ncfile.mode() == "r" || ncfile.mode() == "a") {
-        if (!is_valid(ncfile, static_cast<size_t>(-1))) {
+NCFormat::NCFormat(File& file) : Format(file), ncfile_(static_cast<NCFile&>(file)), step_(0), validated_(false) {
+    if (ncfile_.mode() == "r" || ncfile_.mode() == "a") {
+        if (!is_valid(ncfile_, static_cast<size_t>(-1))) {
             throw FormatError("Invalid AMBER NetCDF file " + file.filename());
         }
-        validated = true;
+        validated_ = true;
     }
 }
 
 size_t NCFormat::nsteps() const {
-    return static_cast<size_t>(ncfile.dimension("frame"));
+    return static_cast<size_t>(ncfile_.dimension("frame"));
 }
 
-void NCFormat::read_step(const size_t _step, Frame& frame){
-    // Set the internal step before further reading
-    step = _step;
-    reserve(ncfile.dimension("atom"));
+void NCFormat::read_step(const size_t step, Frame& frame){
+    // Set the internal step_ before further reading
+    step_ = step;
+    reserve(ncfile_.dimension("atom"));
     frame.cell(read_cell());
 
     auto& positions = frame.positions();
@@ -94,24 +94,24 @@ void NCFormat::read_step(const size_t _step, Frame& frame){
 }
 
 void NCFormat::read(Frame& frame) {
-    read_step(step, frame);
-    step++;
+    read_step(step_, frame);
+    step_++;
 }
 
 void NCFormat::reserve(size_t natoms) const{
-    cache = vector<float>(3*natoms);
-    std::fill(begin(cache), end(cache), 0);
+    cache_ = vector<float>(3*natoms);
+    std::fill(begin(cache_), end(cache_), 0);
 }
 
 UnitCell NCFormat::read_cell() const {
-    if (ncfile.dimension("cell_spatial") != 3 or ncfile.dimension("cell_angular") != 3)
+    if (ncfile_.dimension("cell_spatial") != 3 or ncfile_.dimension("cell_angular") != 3)
         return UnitCell(); // No UnitCell information
 
     NcVar length_var;
     NcVar angles_var;
     try {
-        length_var = ncfile.variable("cell_lengths");
-        angles_var = ncfile.variable("cell_angles");
+        length_var = ncfile_.variable("cell_lengths");
+        angles_var = ncfile_.variable("cell_angles");
     }
     catch (const FileError&) {
         return UnitCell(); // No UnitCell information
@@ -120,7 +120,7 @@ UnitCell NCFormat::read_cell() const {
     float length[3];
     float angles[3];
 
-    vector<size_t> start{step, 0};
+    vector<size_t> start{step_, 0};
     vector<size_t> count{1, 3};
 
     length_var.getVar(start, count, length);
@@ -132,76 +132,76 @@ UnitCell NCFormat::read_cell() const {
 void NCFormat::read_array3D(Array3D& arr, const string& name) const{
     NcVar array_var;
     try {
-        array_var = ncfile.variable(name);
+        array_var = ncfile_.variable(name);
     }
     catch (const FileError&) {
         return; // No information for this variable in the file
     }
 
-    auto natoms = ncfile.dimension("atom");
+    auto natoms = ncfile_.dimension("atom");
 
-    vector<size_t> start{step, 0, 0};
+    vector<size_t> start{step_, 0, 0};
     vector<size_t> count{1, natoms, 3};
-    array_var.getVar(start, count, cache.data());
+    array_var.getVar(start, count, cache_.data());
 
     arr = Array3D(natoms);
 
     for (size_t i=0; i<natoms; i++) {
-        arr[i][0] = cache[3*i + 0];
-        arr[i][1] = cache[3*i + 1];
-        arr[i][2] = cache[3*i + 2];
+        arr[i][0] = cache_[3*i + 0];
+        arr[i][1] = cache_[3*i + 1];
+        arr[i][2] = cache_[3*i + 2];
     }
 }
 
 // Initialize a file, assuming that it is empty
-static void initialize(NCFile& ncfile, size_t natoms, bool velocities){
-    ncfile.add_global_attribute("Conventions", "AMBER");
-    ncfile.add_global_attribute("ConventionVersion", "1.0");
-    ncfile.add_global_attribute("program", "Chemfiles");
-    ncfile.add_global_attribute("programVersion", CHEMFILES_VERSION);
+static void initialize(NCFile& ncfile_, size_t natoms, bool velocities){
+    ncfile_.add_global_attribute("Conventions", "AMBER");
+    ncfile_.add_global_attribute("ConventionVersion", "1.0");
+    ncfile_.add_global_attribute("program", "Chemfiles");
+    ncfile_.add_global_attribute("programVersion", CHEMFILES_VERSION);
 
-    ncfile.add_dimension("frame");
-    ncfile.add_dimension("spatial", 3);
-    ncfile.add_dimension("atom", natoms);
-    ncfile.add_dimension("cell_spatial", 3);
-    ncfile.add_dimension("cell_angular", 3);
-    ncfile.add_dimension("label", 10);
+    ncfile_.add_dimension("frame");
+    ncfile_.add_dimension("spatial", 3);
+    ncfile_.add_dimension("atom", natoms);
+    ncfile_.add_dimension("cell_spatial", 3);
+    ncfile_.add_dimension("cell_angular", 3);
+    ncfile_.add_dimension("label", 10);
 
-    ncfile.add_variable<char>("spatial", "spatial");
-    auto spatial = ncfile.variable("spatial");
+    ncfile_.add_variable<char>("spatial", "spatial");
+    auto spatial = ncfile_.variable("spatial");
     spatial.putVar("xyz");
 
-    ncfile.add_variable<char>("cell_spatial", "cell_spatial");
-    auto cell_spatial = ncfile.variable("cell_spatial");
+    ncfile_.add_variable<char>("cell_spatial", "cell_spatial");
+    auto cell_spatial = ncfile_.variable("cell_spatial");
     cell_spatial.putVar("abc");
 
-    ncfile.add_variable<char>("cell_angular", "cell_angular", "label");
-    auto cell_angular = ncfile.variable("cell_angular");
+    ncfile_.add_variable<char>("cell_angular", "cell_angular", "label");
+    auto cell_angular = ncfile_.variable("cell_angular");
     const char angles[3][10]{"alpha", "beta", "gamma"};
     cell_angular.putVar(angles);
 
-    ncfile.add_variable<float>("coordinates", "frame", "atom", "spatial");
-    ncfile.add_attribute("coordinates", "units", "angstrom");
+    ncfile_.add_variable<float>("coordinates", "frame", "atom", "spatial");
+    ncfile_.add_attribute("coordinates", "units", "angstrom");
 
-    ncfile.add_variable<float>("cell_lengths", "frame", "cell_spatial");
-    ncfile.add_attribute("cell_lengths", "units", "angstrom");
+    ncfile_.add_variable<float>("cell_lengths", "frame", "cell_spatial");
+    ncfile_.add_attribute("cell_lengths", "units", "angstrom");
 
-    ncfile.add_variable<float>("cell_angles", "frame", "cell_angular");
-    ncfile.add_attribute("cell_angles", "units", "degree");
+    ncfile_.add_variable<float>("cell_angles", "frame", "cell_angular");
+    ncfile_.add_attribute("cell_angles", "units", "degree");
 
     if (velocities) {
-        ncfile.add_variable<float>("velocities", "frame", "atom", "spatial");
-        ncfile.add_attribute("velocities", "units", "angstrom/picosecond");
+        ncfile_.add_variable<float>("velocities", "frame", "atom", "spatial");
+        ncfile_.add_attribute("velocities", "units", "angstrom/picosecond");
     }
 }
 
 void NCFormat::write(const Frame& frame) {
     auto natoms = frame.natoms();
     // If we created the file, let's initialize it.
-    if (!validated) {
-        initialize(ncfile, natoms, bool(frame.velocities()));
-        assert(is_valid(ncfile, natoms));
-        validated = true;
+    if (!validated_) {
+        initialize(ncfile_, natoms, bool(frame.velocities()));
+        assert(is_valid(ncfile_, natoms));
+        validated_ = true;
     }
     write_cell(frame.cell());
     write_array3D(frame.positions(), "coordinates");
@@ -210,13 +210,13 @@ void NCFormat::write(const Frame& frame) {
         write_array3D(*velocities, "velocities");
     }
 
-    step++;
+    step_++;
 }
 
 void NCFormat::write_array3D(const Array3D& arr, const string& name) const {
-    auto var = ncfile.variable(name);
+    auto var = ncfile_.variable(name);
     auto natoms = arr.size();
-    vector<size_t> start{step, 0, 0};
+    vector<size_t> start{step_, 0, 0};
     vector<size_t> count{1, natoms, 3};
 
     auto data = vector<float>(natoms * 3);
@@ -229,8 +229,8 @@ void NCFormat::write_array3D(const Array3D& arr, const string& name) const {
 }
 
 void NCFormat::write_cell(const UnitCell& cell) const {
-    auto length = ncfile.variable("cell_lengths");
-    auto angles = ncfile.variable("cell_angles");
+    auto length = ncfile_.variable("cell_lengths");
+    auto angles = ncfile_.variable("cell_angles");
 
     float length_data[3], angles_data[3];
     length_data[0] = static_cast<float>(cell.a());
@@ -241,7 +241,7 @@ void NCFormat::write_cell(const UnitCell& cell) const {
     angles_data[1] = static_cast<float>(cell.beta());
     angles_data[2] = static_cast<float>(cell.gamma());
 
-    vector<size_t> start{step, 0};
+    vector<size_t> start{step_, 0};
     vector<size_t> count{1, 3};
     length.putVar(start, count, length_data);
     angles.putVar(start, count, angles_data);

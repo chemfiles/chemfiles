@@ -49,11 +49,6 @@ using trajectory_map_t = std::unordered_map<string, trajectory_builder_t>;
 */
 class TrajectoryFactory {
 private:
-    //! Trajectory map associating format descriptions and readers
-    trajectory_map_t formats;
-    //! Trajectory map associating format descriptions and readers
-    trajectory_map_t extensions;
-
     TrajectoryFactory();
 public:
     //! Get the instance of the TrajectoryFactory
@@ -83,6 +78,11 @@ public:
     void register_format(const string& name, trajectory_builder_t tb);
     //! Register an trajectory_builder in the internal extensions list.
     void register_extension(const string& ext, trajectory_builder_t tb);
+private:
+    //! Trajectory map associating format descriptions and readers
+    trajectory_map_t formats_;
+    //! Trajectory map associating format descriptions and readers
+    trajectory_map_t extensions_;
 };
 
 } // namespace chemfiles
