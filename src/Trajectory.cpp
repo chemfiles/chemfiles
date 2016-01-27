@@ -26,7 +26,7 @@ static string extension(const string& filename) {
 }
 
 Trajectory::Trajectory(const string& filename, const string& mode, const string& format)
-: step_(0), nsteps_(0), format_(nullptr), file_(nullptr), topology_(), use_custom_topology_(false), cell_(), use_custom_cell_(false) {
+: step_(0), nsteps_(0), format_(nullptr), file_(nullptr), custom_topology_(), custom_cell_() {
     trajectory_builder_t builder;
     if (format == ""){
         // try to guess the format by extension
@@ -63,14 +63,13 @@ Frame Trajectory::read(){
     format_->read(frame);
     step_++;
 
-    // Set the frame topology if needed
-    if (use_custom_topology_)
-        frame.topology(topology_);
-
-    // Set the frame unit cell if needed
-    if (use_custom_cell_)
-        frame.cell(cell_);
-
+    // Set the frame topology and/or cell if needed
+    if (custom_topology_) {
+        frame.topology(*custom_topology_);
+    }
+    if (custom_cell_) {
+        frame.cell(*custom_cell_);
+    }
     return frame;
 }
 
@@ -89,14 +88,13 @@ Frame Trajectory::read_step(const size_t step){
     step_ = step;
     format_->read_step(step_, frame);
 
-    // Set the frame topology if needed
-    if (use_custom_topology_)
-        frame.topology(topology_);
-
-    // Set the frame unit cell if needed
-    if (use_custom_cell_)
-        frame.cell(cell_);
-
+    // Set the frame topology and/or cell if needed
+    if (custom_topology_) {
+        frame.topology(*custom_topology_);
+    }
+    if (custom_cell_) {
+        frame.cell(*custom_cell_);
+    }
     return frame;
 }
 
@@ -113,10 +111,12 @@ void Trajectory::write(const Frame& input_frame){
     // Maybe that is not the better way to do this, performance-wise. I'll have
     // to benchmark this part.
     Frame frame = input_frame;
-    if (use_custom_topology_)
-        frame.topology(topology_);
-    if (use_custom_cell_)
-        frame.cell(cell_);
+    if (custom_topology_) {
+        frame.topology(*custom_topology_);
+    }
+    if (custom_cell_) {
+        frame.cell(*custom_cell_);
+    }
 
     format_->write(frame);
     step_++;
@@ -124,8 +124,7 @@ void Trajectory::write(const Frame& input_frame){
 }
 
 void Trajectory::topology(const Topology& top){
-    use_custom_topology_ = true;
-    topology_ = top;
+    custom_topology_ = top;
 }
 
 void Trajectory::topology(const std::string& filename) {
@@ -137,8 +136,7 @@ void Trajectory::topology(const std::string& filename) {
 }
 
 void Trajectory::cell(const UnitCell& new_cell){
-    use_custom_cell_ = true;
-    cell_ = new_cell;
+    custom_cell_ = new_cell;
 }
 
 void Trajectory::sync() {

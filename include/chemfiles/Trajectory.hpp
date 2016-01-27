@@ -12,6 +12,7 @@
 #include <memory>
 #include <string>
 
+#include "chemfiles/optional.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/exports.hpp"
 
@@ -91,13 +92,9 @@ private:
     //! The file we are reading from
     std::unique_ptr<File> file_;
     //! Topology to use for reading/writing files when no topological data is present
-    Topology topology_;
-    //! Do we have to use a specific topology ?
-    bool use_custom_topology_;
+    optional<Topology> custom_topology_;
     //! UnitCell to use for reading/writing files when no unit cell information is present
-    UnitCell cell_;
-    //! Do we have to use a specific unit cell ?
-    bool use_custom_cell_;
+    optional<UnitCell> custom_cell_;
 };
 
 } // namespace chemfiles

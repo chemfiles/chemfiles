@@ -81,9 +81,8 @@ static std::string plugin_path(const std::string& name){
 
 /******************************************************************************/
 
-template <MolfileFormat F> Molfile<F>::Molfile(File& file) : Format(file),
-plugin_(nullptr), fini_fun_(nullptr), file_handler_(nullptr),
-natoms_(0), use_topology_(false) {
+template <MolfileFormat F> Molfile<F>::Molfile(File& file)
+: Format(file), plugin_(nullptr), fini_fun_(nullptr), file_handler_(nullptr), natoms_(0) {
     // Open the _library
     lib_ = Dynlib(plugin_path(molfile_plugins[F].path));
 
@@ -156,8 +155,8 @@ void Molfile<F>::read(Frame& frame){
                           " using Molfile format " + molfile_plugins[F].format);
     }
 
-    if (use_topology_){
-        frame.topology(topology_);
+    if (topology_){
+        frame.topology(*topology_);
     }
     molfile_to_frame(timestep, frame);
 }
@@ -214,13 +213,12 @@ void Molfile<F>::molfile_to_frame(const molfile_timestep_t& timestep, Frame& fra
 
 template <MolfileFormat F>
 void Molfile<F>::read_topology() const {
-    if (plugin_->read_structure == NULL)
+    if (plugin_->read_structure == NULL) {
         return;
-    else
-        use_topology_ = true;
+    }
 
     std::vector<molfile_atom_t> atoms(static_cast<size_t>(natoms_));
-    int optflags;
+    int optflags = 0;
     int ret = plugin_->read_structure(file_handler_, &optflags, atoms.data());
 
     if (ret != MOLFILE_SUCCESS){
@@ -234,7 +232,7 @@ void Molfile<F>::read_topology() const {
         if (optflags & MOLFILE_MASS){
             atom.mass(vmd_atom.mass);
         }
-        topology_.append(atom);
+        topology_->append(atom);
     }
 
     if (plugin_->read_bonds == NULL)
@@ -257,10 +255,10 @@ void Molfile<F>::read_topology() const {
 
     for (size_t i=0; i<static_cast<size_t>(nbonds); i++){
         // Indexes are 1-based in Molfile
-        topology_.add_bond(static_cast<size_t>(from[i] - 1),
+        topology_->add_bond(static_cast<size_t>(from[i] - 1),
                            static_cast<size_t>(to[i]) - 1);
     }
-    topology_.recalculate();
+    topology_->recalculate();
 }
 
 template <MolfileFormat F> const char* Molfile<F>::name() {

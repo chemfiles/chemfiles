@@ -17,7 +17,6 @@
 #include "chemfiles/optional.hpp"
 
 namespace chemfiles {
-using std::experimental::optional;
 
 /*!
  * @class Frame Frame.hpp Frame.cpp

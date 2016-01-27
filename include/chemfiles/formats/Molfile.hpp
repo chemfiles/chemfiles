@@ -6,7 +6,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-
 #ifndef CHEMFILES_FORMAT_MOLFILE_HPP
 #define CHEMFILES_FORMAT_MOLFILE_HPP
 
@@ -17,6 +16,7 @@ extern "C" {
 #include "molfile_plugin.h"
 }
 
+#include "chemfiles/optional.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Dynlib.hpp"
 #include "chemfiles/register_formats.hpp"
@@ -78,10 +78,8 @@ private:
     /// The number of atoms in the last trajectory read
     int natoms_;
 
-    /// Do we have topological information in this plugin ?
-    mutable bool use_topology_;
-    /// Store topological information
-    mutable Topology topology_;
+    /// Store optional topological information
+    mutable optional<Topology> topology_;
 };
 
 typedef concat<FORMATS_LIST, Molfile<PDB>>::type molfile_list_1;
