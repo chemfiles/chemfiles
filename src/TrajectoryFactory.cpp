@@ -38,7 +38,10 @@ void registration(trajectory_map_t& formats, trajectory_map_t& extensions) {
 
 TrajectoryFactory::TrajectoryFactory() : formats_(), extensions_() {
     registration<XYZFormat>(formats_, extensions_);
+
+#if HAVE_NETCDF
     registration<NCFormat>(formats_, extensions_);
+#endif
 
     // Molfile-based formats
     registration<Molfile<PDB>>(formats_, extensions_);
