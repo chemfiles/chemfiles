@@ -42,19 +42,19 @@ int chfl_set_loglevel(chfl_log_level_t level) {
 int chfl_logfile(const char* file){
     assert(file != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        Logger::file(string(file));
+        Logger::to_file(string(file));
     )
 }
 
 int chfl_log_stdout() {
     CHFL_ERROR_WRAP_RETCODE(
-        Logger::stdout();
+        Logger::to_stdout();
     )
 }
 
 int chfl_log_stderr(){
     CHFL_ERROR_WRAP_RETCODE(
-        Logger::stderr();
+        Logger::to_stderr();
     )
 }
 

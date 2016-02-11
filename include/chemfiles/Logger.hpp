@@ -59,14 +59,14 @@ public:
     static LogLevel level() {return instance_.level_;}
 
     //! Make the logger output to stdout
-    static void stdout();
+    static void to_stdout();
     //! Make the logger output to stderr
-    static void stderr();
+    static void to_stderr();
     //! Silent the logger
     static void silent();
     //! Make the logger output to the file at `path`. The file will be created and
     //! overwrited if it already exists.
-    static void file(const std::string& path);
+    static void to_file(const std::string& path);
     //! Set a callback that will be called to perform logging
     static void callback(logging_cb);
     //! Get the current logging backend

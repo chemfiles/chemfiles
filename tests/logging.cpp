@@ -42,7 +42,7 @@ TEST_CASE("Set the log stream", "[logging]"){
     std::streambuf *sbuf;
 
     SECTION("Redirect log to stdout") {
-        Logger::stdout();
+        Logger::to_stdout();
         sbuf = std::cout.rdbuf();
         std::cout.rdbuf(out_buffer.rdbuf());
 
@@ -53,7 +53,7 @@ TEST_CASE("Set the log stream", "[logging]"){
     }
 
     SECTION("Redirect log to a file") {
-        Logger::file("test-logging-tmp.log");
+        Logger::to_file("test-logging-tmp.log");
 
         Logger::log(LogLevel::WARNING, "a warning");
 
@@ -94,7 +94,7 @@ TEST_CASE("Set the log stream", "[logging]"){
         CHECK(last_level == LogLevel::ERROR);
     }
 
-    Logger::stderr();
+    Logger::to_stderr();
 }
 
 TEST_CASE("Set the log level", "[logging]"){

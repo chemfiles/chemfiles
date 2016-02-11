@@ -67,12 +67,12 @@ void Logger::set_level(LogLevel level){
     instance_.level_ = level;
 }
 
-void Logger::stdout(){
+void Logger::to_stdout(){
     instance_.logfile_.close();
     instance_.backend_ = STDOUT;
 }
 
-void Logger::stderr(){
+void Logger::to_stderr(){
     instance_.logfile_.close();
     instance_.backend_ = STDERR;
 }
@@ -82,7 +82,7 @@ void Logger::silent(){
     instance_.backend_ = SILENT;
 }
 
-void Logger::file(const std::string &filename){
+void Logger::to_file(const std::string &filename){
     instance_.logfile_.close();
     instance_.backend_ = FILE;
     instance_.logfile_.open(filename, std::ofstream::out);
