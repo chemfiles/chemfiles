@@ -8,8 +8,6 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
-using std::endl;
-using std::vector;
 
 #include "chemfiles/config.hpp"
 #if HAVE_NETCDF
@@ -38,27 +36,29 @@ static bool is_valid(const NCFile& ncfile_, size_t natoms){
 
     if (ncfile_.global_attribute("Conventions") != "AMBER"){
         if (!writing)
-            LOG(ERROR) << "We can only read AMBER convention NetCDF files." << endl;
+            Logger::log(LogLevel::ERROR, "We can only read AMBER convention NetCDF files.");
         return false;
     }
 
     if (ncfile_.global_attribute("ConventionVersion") != "1.0"){
         if (!writing)
-            LOG(ERROR) << "We can only read version 1.0 of AMBER convention NetCDF files." << endl;
+            Logger::log(LogLevel::ERROR, "We can only read version 1.0 of AMBER convention NetCDF files.");
         return false;
     }
 
     if (ncfile_.dimension("spatial") != 3){
         if (!writing)
-            LOG(ERROR) << "Wrong size for spatial dimension. Should be 3, is "
-                       << ncfile_.dimension("spatial") << "." << endl;
+            Logger::log(LogLevel::ERROR,
+                "Wrong size for spatial dimension. Should be 3, is " +
+                std::to_string(ncfile_.dimension("spatial")) + ".");
         return false;
     }
 
     if (writing) {
         if (ncfile_.dimension("atom") != natoms){
-            LOG(ERROR) << "Wrong size for atoms dimension. Should be " << natoms
-                       << ", is " << ncfile_.dimension("atom") << "." << endl;
+            Logger::log(LogLevel::ERROR,
+                "Wrong size for atoms dimension. Should be " + std::to_string(natoms) +
+                ", is " + std::to_string(ncfile_.dimension("atom")) + ".");
         return false;
         }
     }
@@ -99,7 +99,7 @@ void NCFormat::read(Frame& frame) {
 }
 
 void NCFormat::reserve(size_t natoms) const{
-    cache_ = vector<float>(3*natoms);
+    cache_ = std::vector<float>(3*natoms);
     std::fill(begin(cache_), end(cache_), 0);
 }
 
@@ -120,8 +120,8 @@ UnitCell NCFormat::read_cell() const {
     float length[3];
     float angles[3];
 
-    vector<size_t> start{step_, 0};
-    vector<size_t> count{1, 3};
+    std::vector<size_t> start{step_, 0};
+    std::vector<size_t> count{1, 3};
 
     length_var.getVar(start, count, length);
     angles_var.getVar(start, count, angles);
@@ -140,8 +140,8 @@ void NCFormat::read_array3D(Array3D& arr, const string& name) const{
 
     auto natoms = ncfile_.dimension("atom");
 
-    vector<size_t> start{step_, 0, 0};
-    vector<size_t> count{1, natoms, 3};
+    std::vector<size_t> start{step_, 0, 0};
+    std::vector<size_t> count{1, natoms, 3};
     array_var.getVar(start, count, cache_.data());
 
     arr = Array3D(natoms);
@@ -216,10 +216,10 @@ void NCFormat::write(const Frame& frame) {
 void NCFormat::write_array3D(const Array3D& arr, const string& name) const {
     auto var = ncfile_.variable(name);
     auto natoms = arr.size();
-    vector<size_t> start{step_, 0, 0};
-    vector<size_t> count{1, natoms, 3};
+    std::vector<size_t> start{step_, 0, 0};
+    std::vector<size_t> count{1, natoms, 3};
 
-    auto data = vector<float>(natoms * 3);
+    auto data = std::vector<float>(natoms * 3);
     for (size_t i=0; i<natoms; i++){
         data[3*i + 0] = arr[i][0];
         data[3*i + 1] = arr[i][1];
@@ -241,8 +241,8 @@ void NCFormat::write_cell(const UnitCell& cell) const {
     angles_data[1] = static_cast<float>(cell.beta());
     angles_data[2] = static_cast<float>(cell.gamma());
 
-    vector<size_t> start{step_, 0};
-    vector<size_t> count{1, 3};
+    std::vector<size_t> start{step_, 0};
+    std::vector<size_t> count{1, 3};
     length.putVar(start, count, length_data);
     angles.putVar(start, count, angles_data);
 }

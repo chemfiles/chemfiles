@@ -11,30 +11,30 @@ using namespace chemfiles;
 TEST_CASE("Basic logging usage", "[logging]"){
     std::stringstream out_buffer;
 
-    // Save clog's buffer here
-    std::streambuf *sbuf = std::clog.rdbuf();
-    // Redirect clog to the new buffer
-    std::clog.rdbuf(out_buffer.rdbuf());
+    // Save cerr's buffer here
+    std::streambuf *sbuf = std::cerr.rdbuf();
+    // Redirect cerr to the new buffer
+    std::cerr.rdbuf(out_buffer.rdbuf());
 
-    LOG(ERROR) << "an error" << std::endl;
+    Logger::log(LogLevel::ERROR, "an error");
     CHECK("Chemfiles error: an error\n" == out_buffer.str());
     out_buffer.str(std::string()); // Clean the buffer
 
-    LOG(WARNING) << "a warning" << std::endl;
+    Logger::log(LogLevel::WARNING, "a warning");
     CHECK("Chemfiles warning: a warning\n" == out_buffer.str());
     out_buffer.str(std::string());
 
     // The level should be WARNING by default
-    LOG(INFO) << "an info" << std::endl;
+    Logger::log(LogLevel::INFO, "an info");
     CHECK("" == out_buffer.str());
     out_buffer.str(std::string());
 
-    LOG(DEBUG) << "a debug info" << std::endl;
+    Logger::log(LogLevel::DEBUG, "a debug info");
     CHECK("" == out_buffer.str());
     out_buffer.str(std::string());
 
-    // Redirect clog to its old self
-    std::clog.rdbuf(sbuf);
+    // Redirect cerr to its old self
+    std::cerr.rdbuf(sbuf);
 }
 
 TEST_CASE("Set the log stream", "[logging]"){
@@ -42,31 +42,20 @@ TEST_CASE("Set the log stream", "[logging]"){
     std::streambuf *sbuf;
 
     SECTION("Redirect log to stdout") {
-        Logger::log_to_stdout();
+        Logger::stdout();
         sbuf = std::cout.rdbuf();
         std::cout.rdbuf(out_buffer.rdbuf());
 
-        LOG(WARNING) << "a warning" << std::endl;
+        Logger::log(LogLevel::WARNING, "a warning");
         CHECK("Chemfiles warning: a warning\n" == out_buffer.str());
 
         std::cout.rdbuf(sbuf);
     }
 
-    SECTION("Redirect log to stderr") {
-        Logger::log_to_stderr();
-        sbuf = std::cerr.rdbuf();
-        std::cerr.rdbuf(out_buffer.rdbuf());
-
-        LOG(WARNING) << "a warning" << std::endl;
-        CHECK("Chemfiles warning: a warning\n" == out_buffer.str());
-
-        std::cerr.rdbuf(sbuf);
-    }
-
     SECTION("Redirect log to a file") {
-        Logger::log_to_file("test-logging-tmp.log");
+        Logger::file("test-logging-tmp.log");
 
-        LOG(WARNING) << "a warning" << std::endl;
+        Logger::log(LogLevel::WARNING, "a warning");
 
         std::ifstream logfile("test-logging-tmp.log");
         std::string log_content;
@@ -74,39 +63,58 @@ TEST_CASE("Set the log stream", "[logging]"){
         logfile.close();
 
         CHECK("Chemfiles warning: a warning" == log_content);
-
         remove("test-logging-tmp.log");
     }
-    Logger::log_to_stdlog();
+
+    SECTION("Silent logs") {
+        sbuf = std::cerr.rdbuf();
+        std::cerr.rdbuf(out_buffer.rdbuf());
+        Logger::silent();
+
+        Logger::log(LogLevel::ERROR, "an error");
+        CHECK("" == out_buffer.str());
+        out_buffer.str(std::string());
+
+        std::cerr.rdbuf(sbuf);
+    }
+
+    SECTION("Use a callback for logs") {
+        std::string buffer;
+        LogLevel last_level;
+
+        auto callback = [&buffer, &last_level](LogLevel level, const std::string& message) {
+            buffer += message;
+            last_level = level;
+        };
+
+        Logger::callback(callback);
+
+        Logger::log(LogLevel::ERROR, "an error");
+        CHECK("an error" == buffer);
+        CHECK(last_level == LogLevel::ERROR);
+    }
+
+    Logger::stderr();
 }
 
 TEST_CASE("Set the log level", "[logging]"){
     std::stringstream out_buffer;
-    std::streambuf *sbuf = std::clog.rdbuf();
-    std::clog.rdbuf(out_buffer.rdbuf());
+    std::streambuf *sbuf = std::cerr.rdbuf();
+    std::cerr.rdbuf(out_buffer.rdbuf());
 
-    SECTION("NONE level") {
-        Logger::level(Logger::NONE);
+    Logger::set_level(LogLevel::INFO);
 
-        LOG(ERROR) << "an error" << std::endl;
-        CHECK("" == out_buffer.str());
-        out_buffer.str(std::string());
+    Logger::log(LogLevel::ERROR, "an error");
+    CHECK("Chemfiles error: an error\n" == out_buffer.str());
+    out_buffer.str(std::string());
 
-        LOG(INFO) << "an info" << std::endl;
-        CHECK("" == out_buffer.str());
-        out_buffer.str(std::string());
-    }
+    Logger::log(LogLevel::INFO, "an info");
+    CHECK("Chemfiles info: an info\n" == out_buffer.str());
+    out_buffer.str(std::string());
 
-    SECTION("INFO level") {
-        Logger::level(Logger::INFO);
+    Logger::log(LogLevel::DEBUG, "a debug info");
+    CHECK("" == out_buffer.str());
+    out_buffer.str(std::string());
 
-        LOG(ERROR) << "an error" << std::endl;
-        CHECK("Chemfiles error: an error\n" == out_buffer.str());
-        out_buffer.str(std::string());
-
-        LOG(INFO) << "an info" << std::endl;
-        CHECK("Chemfiles info: an info\n" == out_buffer.str());
-        out_buffer.str(std::string());
-    }
-    std::clog.rdbuf(sbuf);
+    std::cerr.rdbuf(sbuf);
 }

@@ -28,7 +28,8 @@ size_t Frame::natoms() const {
     auto nvel = velocities_->size();
 
     if (npos != nvel) {
-        LOG(WARNING) << "Inconsistent size in frame. Positions contains " << npos << " atoms, but velocities contains " << nvel << " atoms." << std::endl;
+        Logger::log(LogLevel::WARNING, "Inconsistent size in frame. Positions contains "
+        + std::to_string(npos) + " atoms, but velocities contains " + std::to_string(nvel) + " atoms.");
     }
 
     return npos;

@@ -6,19 +6,27 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-/*! @file Logger.hpp
-* Log utilities and configuration
-*/
-
 #ifndef CHEMFILES_LOGGING_H
 #define CHEMFILES_LOGGING_H
 
 #include <string>
-#include <ostream>
+#include <fstream>
+#include <functional>
 
 #include "chemfiles/exports.hpp"
 
 namespace chemfiles {
+
+enum class LogLevel {
+    //! Only logging errors
+    ERROR = 0,
+    //! Logging errors and warnings
+    WARNING = 1,
+    //! Logging errors, warnings and informations
+    INFO = 2,
+    //! Logging everything and debug informations
+    DEBUG = 3
+};
 
 /*!
  * @class Logger Logger.hpp Logger.cpp
@@ -26,69 +34,65 @@ namespace chemfiles {
  */
 class CHFL_EXPORT Logger {
 public:
-    //! The \c LogLevel control what will be logged and what will be dismissed
-    enum LogLevel{
-        //! No logging at all
-        NONE = 0,
-        //! Logging only errors
-        ERROR = 1,
-        //! Logging errors and warnings
-        WARNING = 2,
-        //! Logging errors, warnings and informations
-        INFO = 3,
-        //! Logging everything and debug informations
-        DEBUG = 4
+    //! Where the log message should go
+    enum LogBackend {
+        //! Do not log anything
+        SILENT,
+        //! Log to stdout
+        STDOUT,
+        //! Log to stderr
+        STDERR,
+        //! Log to a file
+        FILE,
+        //! Log to the C callback
+        CALLBACK
     };
 
-    //! Copy/move is not permited
+    //! Callback function type for logging the `message` at `level`
+    using logging_cb = std::function<void(LogLevel level, const std::string& message)>;
+
+    //! Log a `message` if the `level` is lower than the maximal curent logging level
+    static void log(LogLevel level, std::string message);
+    //! Set the logging level
+    static void set_level(LogLevel);
+    //! Get the current logging level
+    static LogLevel level() {return instance_.level_;}
+
+    //! Make the logger output to stdout
+    static void stdout();
+    //! Make the logger output to stderr
+    static void stderr();
+    //! Silent the logger
+    static void silent();
+    //! Make the logger output to the file at `path`. The file will be created and
+    //! overwrited if it already exists.
+    static void file(const std::string& path);
+    //! Set a callback that will be called to perform logging
+    static void callback(logging_cb);
+    //! Get the current logging backend
+    static LogBackend backend() {return instance_.backend_;}
+
     Logger(const Logger&) = delete;
     Logger(Logger&&) = delete;
-    //! Afectation is not permited
     Logger& operator=(const Logger&) = delete;
     Logger& operator=(Logger&&) = delete;
-    ~Logger();
-
-    //! Set the logging level
-    static void level(LogLevel);
-    //! Get the current logging level
-    static LogLevel level() {return instance_.current_level_;}
-    //! Set the file for logging
-    static void log_to_file(const std::string &filename);
-    //! Make the logger output to stdout
-    static void log_to_stdout();
-    //! Make the logger output to stderr
-    static void log_to_stderr();
-    //! Make the logger output to stdlog
-    static void log_to_stdlog();
-
-    //! Get the singleton out stream
-    static std::ostream& out(LogLevel level);
-
 private:
-    //! Constructor
     Logger();
-
-    //! Close the log file if it exists.
-    void close();
-    //! Return a stream to write the log
-    std::ostream& get_stream(LogLevel level);
+    void write_message(LogLevel level, const std::string& message);
 
     //! Singleton instance
     static Logger instance_;
 
-    //! Logging level
-    LogLevel current_level_;
-    //! Current log stream
-    std::ostream* ostream_; // A raw pointer is needed to hold reference to the standard streams
-    //! Is the current stream a file ?
-    bool is_file_;
+    //! Current maximal logging level
+    LogLevel level_;
+    //! Current logging backend
+    LogBackend backend_;
+    //! Current log file, if `backend_ == FILE`
+    std::fstream logfile_;
+    //! Current callback, if `backend_ == CALLBACK`
+    logging_cb callback_;
 };
 
 } // namespace chemfiles
-
-#ifndef CHEMFILES_PUBLIC
-    //! The LOG macro should be used to get a stream with the good logging level
-    #define LOG(level) chemfiles::Logger::out(chemfiles::Logger::level)
-#endif // CHEMFILES_PUBLIC
 
 #endif

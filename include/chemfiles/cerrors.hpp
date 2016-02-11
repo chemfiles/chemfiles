@@ -63,14 +63,14 @@ static CAPIStatus status = CAPIStatus();
 #define CATCH_AND_RETURN(exception, retval)           \
     catch(const chemfiles::exception& e) {            \
         status.last_error = string(e.what());         \
-        LOG(ERROR) << e.what() << std::endl;          \
+        Logger::log(LogLevel::ERROR, e.what());       \
         return retval;                                \
     }
 
 #define CATCH_AND_GOTO(exception)                     \
     catch(const chemfiles::exception& e) {            \
         status.last_error = string(e.what());         \
-        LOG(ERROR) << e.what() << std::endl;          \
+        Logger::log(LogLevel::ERROR, e.what());       \
         goto error;                                   \
     }
 

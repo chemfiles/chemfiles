@@ -16,6 +16,10 @@
   conditions. The corresponding function where removed from the C API.
 * Rename all setter function from `void xxx(const XXX& value)` to
   `void set_xxx(const XXX& value)` in C++ API.
+* It is now possible to provide a callback for logging from the C API. The
+  `chfl_log_stdout`, `chfl_log_silent` and `chfl_log_callback` function where
+  added to the C API. 
+
 
 # 0.4 (30 Oct 2015)
 

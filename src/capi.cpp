@@ -35,22 +35,43 @@ int chfl_loglevel(chfl_log_level_t* level) {
 
 int chfl_set_loglevel(chfl_log_level_t level) {
     CHFL_ERROR_WRAP_RETCODE(
-        Logger::level(static_cast<Logger::LogLevel>(level));
+        Logger::set_level(static_cast<LogLevel>(level));
     )
 }
 
 int chfl_logfile(const char* file){
     assert(file != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        Logger::log_to_file(string(file));
+        Logger::file(string(file));
+    )
+}
+
+int chfl_log_stdout() {
+    CHFL_ERROR_WRAP_RETCODE(
+        Logger::stdout();
     )
 }
 
 int chfl_log_stderr(){
     CHFL_ERROR_WRAP_RETCODE(
-        Logger::log_to_stderr();
+        Logger::stderr();
     )
 }
+
+int chfl_log_silent() {
+    CHFL_ERROR_WRAP_RETCODE(
+        Logger::silent();
+    )
+}
+
+int chfl_log_callback(chfl_logging_cb callback) {
+    CHFL_ERROR_WRAP_RETCODE(
+        Logger::callback([callback](LogLevel level, const std::string& message){
+            callback(static_cast<chfl_log_level_t>(level), message.c_str());
+        });
+    )
+}
+
 
 /******************************************************************************/
 

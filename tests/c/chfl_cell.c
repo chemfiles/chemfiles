@@ -39,10 +39,10 @@ int main() {
     assert(fabs(b - 20) < 1e-10);
     assert(fabs(c - 30) < 1e-10);
 
-    chfl_set_loglevel(CHFL_LOG_NONE);
+    chfl_log_silent();
     // This should be an error
     assert(chfl_cell_set_angles(cell, 80, 89, 100));
-    chfl_set_loglevel(CHFL_LOG_ERROR);
+    chfl_log_stderr();
 
     double expected_matrix[3][3] = {{10, 0, 0}, {0, 20, 0}, {0, 0, 30}};
     double matrix[3][3];

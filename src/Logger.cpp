@@ -6,92 +6,90 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include <fstream>
 #include <iostream>
+#include <cassert>
 
 #include "chemfiles/Logger.hpp"
 using namespace chemfiles;
 
-// No-op buffer for no-op stream
-class NullBuffer : public std::streambuf {
-public:
-  int overflow(int c) override { return c; }
-};
-
-static NullBuffer nullbuff;
-// nullstream is a no-op ostream.
-static std::ostream nullstream(&nullbuff);
-
-// Singleton instance_
+// Singleton instance
 Logger Logger::instance_{};
 
-Logger::Logger() : current_level_(WARNING), ostream_(&std::clog), is_file_(false) {}
+Logger::Logger() : level_(LogLevel::WARNING), backend_(STDERR), logfile_() {}
 
-Logger::~Logger(){
-    close();
-}
+void Logger::log(LogLevel level, std::string message){
+    // Don't write anything if the output level is less important than
+    // the current level.
+    if (level > Logger::level()) return;
 
-std::ostream& Logger::out(LogLevel level){
-    return instance_.get_stream(level);
-}
-
-std::ostream& Logger::get_stream(LogLevel level){
-    // Don't write anything if the out level is less important than
-    // the current level, or if the current level is NONE.
-    if (level > current_level_ || current_level_ == NONE)
-        return nullstream;
-
-    switch(level){
-        case ERROR:
-            *ostream_ << "Chemfiles error: ";
-            break;
-        case WARNING:
-            *ostream_ << "Chemfiles warning: ";
-            break;
-        case INFO:
-            *ostream_ << "Chemfiles info: ";
-            break;
-        case DEBUG:
-            *ostream_ << "Chemfiles debug: ";
-            break;
-        case NONE:
-            break;
+    if (Logger::backend() != CALLBACK && Logger::backend() != SILENT) {
+        switch(level) {
+        case LogLevel::ERROR:
+                message = "Chemfiles error: " + message;
+                break;
+            case LogLevel::WARNING:
+                message = "Chemfiles warning: " + message;
+                break;
+            case LogLevel::INFO:
+                message = "Chemfiles info: " + message;
+                break;
+            case LogLevel::DEBUG:
+                message = "Chemfiles debug: " + message;
+                break;
+        }
     }
-    return *ostream_;
+
+    instance_.write_message(level, message);
 }
 
-
-void Logger::level(LogLevel level){
-    instance_.current_level_ = level;
-}
-
-void Logger::log_to_stdout(){
-    instance_.close();
-    instance_.is_file_ = false;
-    instance_.ostream_ = &std::cout;
-}
-
-void Logger::log_to_stderr(){
-    instance_.close();
-    instance_.is_file_ = false;
-    instance_.ostream_ = &std::cerr;
-}
-
-void Logger::log_to_stdlog(){
-    instance_.close();
-    instance_.is_file_ = false;
-    instance_.ostream_ = &std::clog;
-}
-
-void Logger::log_to_file(const std::string &filename){
-    instance_.close();
-    instance_.is_file_ = true;
-    instance_.ostream_ = new std::ofstream(filename, std::ofstream::out);
-}
-
-void Logger::close(){
-    if(is_file_){
-        static_cast<std::ofstream *>(ostream_)->close();
-        delete ostream_;
+void Logger::write_message(LogLevel level, const std::string &message) {
+    switch(backend_) {
+    case SILENT:
+        break;
+    case STDOUT:
+        std::cout << message << std::endl;
+        break;
+    case STDERR:
+        std::cerr << message << std::endl;
+        break;
+    case FILE:
+        assert(logfile_.is_open());
+        logfile_ << message << std::endl;
+        break;
+    case CALLBACK:
+        assert(callback_ != nullptr);
+        callback_(level, message.c_str());
+        break;
     }
+}
+
+void Logger::set_level(LogLevel level){
+    instance_.level_ = level;
+}
+
+void Logger::stdout(){
+    instance_.logfile_.close();
+    instance_.backend_ = STDOUT;
+}
+
+void Logger::stderr(){
+    instance_.logfile_.close();
+    instance_.backend_ = STDERR;
+}
+
+void Logger::silent(){
+    instance_.logfile_.close();
+    instance_.backend_ = SILENT;
+}
+
+void Logger::file(const std::string &filename){
+    instance_.logfile_.close();
+    instance_.backend_ = FILE;
+    instance_.logfile_.open(filename, std::ofstream::out);
+}
+
+void Logger::callback(logging_cb function) {
+    instance_.logfile_.close();
+    instance_.backend_ = CALLBACK;
+    instance_.callback_ = function;
 }

@@ -87,27 +87,25 @@ CHFL_EXPORT const char* chfl_last_error();
 
 //! Available logging level
 typedef enum CHFL_LOG_LEVEL {
-    //! Do not log anything
-    CHFL_LOG_NONE = 0,
     //! Only log on errors
-    CHFL_LOG_ERROR = 1,
+    CHFL_LOG_ERROR = 0,
     //! Log warnings and erors
-    CHFL_LOG_WARNING = 2,
+    CHFL_LOG_WARNING = 1,
     //! Log infos, warnings and errors
-    CHFL_LOG_INFO = 3,
+    CHFL_LOG_INFO = 2,
     //! Log everything
-    CHFL_LOG_DEBUG = 4
+    CHFL_LOG_DEBUG = 3
 } chfl_log_level_t ;
 
 /*!
-* @brief Get the current logging level
+* @brief Get the current maximal logging level
 * @param level The logging level
 * @return The status code
 */
 CHFL_EXPORT int chfl_loglevel(chfl_log_level_t* level);
 
 /*!
-* @brief Set the current logging level to \c level
+* @brief Set the current maximal logging level to \c level
 * @param level The new logging level
 * @return The status code
 */
@@ -121,10 +119,33 @@ CHFL_EXPORT int chfl_set_loglevel(chfl_log_level_t level);
 CHFL_EXPORT int chfl_logfile(const char* file);
 
 /*!
+* @brief Redirect the logs to the standard output.
+* @return The status code
+*/
+CHFL_EXPORT int chfl_log_stdout();
+
+/*!
 * @brief Redirect the logs to the standard error output. This is enabled by default.
 * @return The status code
 */
 CHFL_EXPORT int chfl_log_stderr();
+
+/*!
+* @brief Remove all logging output
+* @return The status code
+*/
+CHFL_EXPORT int chfl_log_silent();
+
+//! Callback function type for user-provided logging
+typedef void(*chfl_logging_cb)(chfl_log_level_t level, const char* message);
+
+/*!
+* @brief Redirect all logging to user-provided logging. The `callback` function will be
+*        called at each loggin operation with the level of the message, and the the
+*        message itself.
+* @return The status code
+*/
+CHFL_EXPORT int chfl_log_callback(chfl_logging_cb callback);
 
 /******************************************************************************/
 /*!
