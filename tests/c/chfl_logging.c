@@ -7,6 +7,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#if (defined(WIN32) || defined(WIN64))
+#define EOL "\r\n"
+#else
+#define EOL "\n"
+#endif
+
 // Read a whole file at once
 char* read_whole_file(FILE* file);
 // Global variables for access from callback and main
@@ -34,14 +40,18 @@ int main() {
 
     assert(!chfl_logfile("test.log"));
 
-    // Check for file existence
-    FILE* file = fopen("test.log","r");
+    // Check for file existence (it must be opened in binary mode for the
+    // good behaviour of read_whole_file on Windows)
+    FILE* file = fopen("test.log","rb");
     assert(file != NULL);
 
     // Test writing to the file
     CHFL_TRAJECTORY* traj = chfl_trajectory_open("noformat", "r");
+    // Close the file and sync it with the HD
+    assert(!chfl_log_stderr());
+
     char* content = read_whole_file(file);
-    assert(strcmp(content, "Chemfiles error: Can not find a format associated with the \"\" extension.\n") == 0);
+    assert(strcmp(content, "Chemfiles error: Can not find a format associated with the \"\" extension." EOL) == 0);
 
     free(content);
     fclose(file);
@@ -53,7 +63,6 @@ int main() {
     assert(last_level == CHFL_LOG_ERROR);
     free(buffer);
 
-    assert(!chfl_log_stderr());
     remove("test.log");
     return EXIT_SUCCESS;
 }
