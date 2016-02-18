@@ -413,7 +413,7 @@ CHFL_EXPORT CHFL_CELL* chfl_cell_triclinic(double a, double b, double c, double 
 * @param frame the frame
 * @return A pointer to the UnitCell
 */
-CHFL_EXPORT CHFL_CELL* chfl_cell_from_frame(CHFL_FRAME* frame);
+CHFL_EXPORT CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* frame);
 
 /*!
 * @brief Get the cell volume.
@@ -513,11 +513,11 @@ CHFL_EXPORT int chfl_cell_free(CHFL_CELL* cell);
 CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology();
 
 /*!
-* @brief Extract the topology from a frame
+* @brief Get a copy of the topology of a frame
 * @param frame The frame
 * @return A pointer to the new Topology
 */
-CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_from_frame(CHFL_FRAME* frame);
+CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* frame);
 
 /*!
 * @brief Get the current number of atoms in the topology.

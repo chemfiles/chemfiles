@@ -323,7 +323,7 @@ error:
 }
 
 
-CHFL_CELL* chfl_cell_from_frame(CHFL_FRAME* frame){
+CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* frame){
     assert(frame != nullptr);
     CHFL_CELL* cell = nullptr;
     CHFL_ERROR_WRAP(
@@ -416,7 +416,7 @@ int chfl_cell_free(CHFL_CELL* cell) {
 
 /******************************************************************************/
 
-CHFL_TOPOLOGY* chfl_topology_from_frame(CHFL_FRAME* frame){
+CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* frame){
     assert(frame != nullptr);
     CHFL_TOPOLOGY* topology = nullptr;
     CHFL_ERROR_WRAP(
