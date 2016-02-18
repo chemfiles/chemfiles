@@ -368,7 +368,7 @@ CHFL_EXPORT int chfl_frame_guess_topology(CHFL_FRAME* frame, bool bonds);
 * will contain `true` at position `i` if the atom at position `i` matches the
 * selection string, and false otherwise.
 *
-* @pre The range from `select` to `(select + natoms)` is a valid adress range.
+* @pre The range from `matched` to `(matched + natoms)` is a valid adress range.
 *
 * @param frame The frame to analyse
 * @param selection A null-terminated string containing the selection string
