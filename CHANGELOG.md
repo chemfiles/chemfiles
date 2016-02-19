@@ -1,3 +1,7 @@
+# 0.6 (Next release)
+
+* Add the `chfl_clear_errors` function, to cleanup the error state.
+
 # 0.5 (19 Feb 2016)
 
 * The C API now provide a direct view into the `positions` and `velocities`

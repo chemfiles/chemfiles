@@ -64,6 +64,11 @@ int main() {
     free(buffer);
 
     remove("test.log");
+
+    assert(strcmp(chfl_last_error(), "") != 0);
+    assert(!chfl_clear_errors());
+    assert(strcmp(chfl_last_error(), "") == 0);
+
     return EXIT_SUCCESS;
 }
 

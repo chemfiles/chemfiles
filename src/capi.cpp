@@ -26,6 +26,12 @@ const char* chfl_last_error(){
     return status.last_error.c_str();
 }
 
+int chfl_clear_errors(){
+    CHFL_ERROR_WRAP_RETCODE(
+        status = CAPIStatus();
+    )
+}
+
 int chfl_loglevel(chfl_log_level_t* level) {
     assert(level != nullptr);
     CHFL_ERROR_WRAP_RETCODE(

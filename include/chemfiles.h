@@ -85,6 +85,12 @@ CHFL_EXPORT const char* chfl_strerror(int status);
 */
 CHFL_EXPORT const char* chfl_last_error();
 
+/*!
+* @brief Clear the last error message.
+* @return The status code
+*/
+CHFL_EXPORT int chfl_clear_errors();
+
 //! Available logging level
 typedef enum CHFL_LOG_LEVEL {
     //! Only log on errors
