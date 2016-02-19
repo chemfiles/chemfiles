@@ -27,7 +27,7 @@ void callback(chfl_log_level_t level, const char* message) {
 }
 
 int main() {
-    assert(strcmp(chfl_strerror(0), "Operation was sucessfull") == 0);
+    assert(strcmp(chfl_strerror(CHFL_SUCCESS), "Operation was sucessfull") == 0);
     assert(strcmp(chfl_last_error(), "") == 0);
 
     chfl_log_level_t level;
