@@ -12,7 +12,8 @@
 #include "chemfiles.hpp"
 
 using namespace chemfiles;
-using std::string;
+
+static CAPIStatus status = CAPIStatus();
 
 const char* chfl_version(void) {
     return CHEMFILES_VERSION;
@@ -48,7 +49,7 @@ int chfl_set_loglevel(chfl_log_level_t level) {
 int chfl_logfile(const char* file){
     assert(file != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        Logger::to_file(string(file));
+        Logger::to_file(std::string(file));
     )
 }
 
@@ -140,7 +141,7 @@ int chfl_trajectory_set_topology_file(CHFL_TRAJECTORY *file, const char* filenam
     assert(file != nullptr);
     assert(filename != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        file->set_topology(string(filename));
+        file->set_topology(std::string(filename));
     )
 }
 
@@ -593,7 +594,7 @@ int chfl_topology_free(CHFL_TOPOLOGY* topology){
 CHFL_ATOM* chfl_atom(const char* name){
     CHFL_ATOM* atom = nullptr;
     CHFL_ERROR_WRAP(
-        atom = new Atom(string(name));
+        atom = new Atom(std::string(name));
     )
 error:
     return atom;
@@ -664,7 +665,7 @@ int chfl_atom_set_name(CHFL_ATOM* atom, const char* name){
     assert(atom != nullptr);
     assert(name != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        atom->set_name(string(name));
+        atom->set_name(std::string(name));
     )
 }
 
@@ -673,7 +674,7 @@ int chfl_atom_full_name(const CHFL_ATOM* atom, char* name, size_t buffsize){
     assert(atom != nullptr);
     assert(name != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        string tmp = atom->full_name();
+        std::string tmp = atom->full_name();
         strcpy(name, tmp.substr(0, buffsize).c_str());
     )
 }

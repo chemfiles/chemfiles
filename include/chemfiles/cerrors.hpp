@@ -58,18 +58,16 @@ private:
     const char* messages_[LAST];
 };
 
-static CAPIStatus status = CAPIStatus();
-
 #define CATCH_AND_RETURN(exception, retval)           \
     catch(const chemfiles::exception& e) {            \
-        status.last_error = string(e.what());         \
+        status.last_error = std::string(e.what());    \
         Logger::log(LogLevel::ERROR, e.what());       \
         return retval;                                \
     }
 
 #define CATCH_AND_GOTO(exception)                     \
     catch(const chemfiles::exception& e) {            \
-        status.last_error = string(e.what());         \
+        status.last_error = std::string(e.what());    \
         Logger::log(LogLevel::ERROR, e.what());       \
         goto error;                                   \
     }
@@ -86,7 +84,7 @@ static CAPIStatus status = CAPIStatus();
     CATCH_AND_RETURN(ParserError, CAPIStatus::SELECTION)                       \
     CATCH_AND_RETURN(Error, CAPIStatus::CHEMFILES)                             \
     catch(const std::exception& e) {                                           \
-        status.last_error = string(e.what());                                  \
+        status.last_error = std::string(e.what());                             \
         return CAPIStatus::CXX_ERROR;                                          \
     }                                                                          \
     return CAPIStatus::SUCCESS;
@@ -104,7 +102,7 @@ static CAPIStatus status = CAPIStatus();
     CATCH_AND_GOTO(ParserError)                                                \
     CATCH_AND_GOTO(Error)                                                      \
     catch(const std::exception& e) {                                           \
-        status.last_error = string(e.what());                                  \
+        status.last_error = std::string(e.what());                             \
         goto error;                                                            \
     }
 
