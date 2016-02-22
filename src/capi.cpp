@@ -23,11 +23,11 @@ const char* chfl_strerror(int code){
     return status.message(code);
 }
 
-const char* chfl_last_error(){
+const char* chfl_last_error(void){
     return status.last_error.c_str();
 }
 
-int chfl_clear_errors(){
+int chfl_clear_errors(void){
     CHFL_ERROR_WRAP_RETCODE(
         status = CAPIStatus();
     )
@@ -53,19 +53,19 @@ int chfl_logfile(const char* file){
     )
 }
 
-int chfl_log_stdout() {
+int chfl_log_stdout(void){
     CHFL_ERROR_WRAP_RETCODE(
         Logger::to_stdout();
     )
 }
 
-int chfl_log_stderr(){
+int chfl_log_stderr(void){
     CHFL_ERROR_WRAP_RETCODE(
         Logger::to_stderr();
     )
 }
 
-int chfl_log_silent() {
+int chfl_log_silent(void){
     CHFL_ERROR_WRAP_RETCODE(
         Logger::silent();
     )
@@ -434,7 +434,7 @@ error:
     return topology;
 }
 
-CHFL_TOPOLOGY* chfl_topology() {
+CHFL_TOPOLOGY* chfl_topology(void){
     CHFL_TOPOLOGY* topology = nullptr;
     CHFL_ERROR_WRAP(
         topology = new Topology();

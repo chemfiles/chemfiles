@@ -83,13 +83,13 @@ CHFL_EXPORT const char* chfl_strerror(int status);
 * @brief Get the last error message.
 * @return A null-terminated string encoding the textual representation of the last error.
 */
-CHFL_EXPORT const char* chfl_last_error();
+CHFL_EXPORT const char* chfl_last_error(void);
 
 /*!
 * @brief Clear the last error message.
 * @return The status code
 */
-CHFL_EXPORT int chfl_clear_errors();
+CHFL_EXPORT int chfl_clear_errors(void);
 
 //! Available logging level
 typedef enum CHFL_LOG_LEVEL {
@@ -128,19 +128,19 @@ CHFL_EXPORT int chfl_logfile(const char* file);
 * @brief Redirect the logs to the standard output.
 * @return The status code
 */
-CHFL_EXPORT int chfl_log_stdout();
+CHFL_EXPORT int chfl_log_stdout(void);
 
 /*!
 * @brief Redirect the logs to the standard error output. This is enabled by default.
 * @return The status code
 */
-CHFL_EXPORT int chfl_log_stderr();
+CHFL_EXPORT int chfl_log_stderr(void);
 
 /*!
 * @brief Remove all logging output
 * @return The status code
 */
-CHFL_EXPORT int chfl_log_silent();
+CHFL_EXPORT int chfl_log_silent(void);
 
 //! Callback function type for user-provided logging
 typedef void(*chfl_logging_cb)(chfl_log_level_t level, const char* message);
