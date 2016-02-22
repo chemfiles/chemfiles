@@ -1,4 +1,4 @@
-# Chemfiles, an efficient IO library for chemistry file formats
+# Chemfiles, an efficient IO library for chemistry files
 
 <div align="center">
    <a href="http://chemfiles.readthedocs.org">
@@ -27,22 +27,19 @@
    </a>
 </div>
 
-Chemfiles is a multi-language library written in modern C++ for reading and writing
-from and to molecular trajectory files. These files are created by your favorite
-theoretical chemistry program, and contains informations about atomic or residues
-names and positions. Some format also have additional informations, such as
-velocities, forces, energy, …
+Chemfiles is a library for reading and writing molecular trajectory files.
+These files are created by your favorite theoretical chemistry program, 
+and contains informations about positions, velocities, atomic names, *etc.* 
 
-The main targeted audience of chemfiles (`libchemfiles`) is chemistry researcher
-working on their own code to do some kind of awesome science, without wanting to
-bother about handling all the format that may exist in the world.
+Running simulations produce enormous amounts of data, which has to be
+post-processed in order to extract physical informations about the simulated 
+system. Chemfiles provides an interface to access this information which is
+- **unified**: the same code will work with PDB, NetCDF and XTC trajectories;
+- **simple**: chemfiles is easy to use and extensively documented.
 
-Running molecular or quantum simulations produce enormous amounts of data, which had to be
-post-processed in order to extract physical informations about the system. This
-post-processing step involve reading and parsing the data, and computing physical values
-with various algorithms. Chemfiles helps YOU on the first part of this, by providing the
-same interface to all the trajectory formats. If you need to change the output format,
-your analysis tools will still work the same way.
+Chemfiles is written in modern C++, and have interface for Python, Fortran, C, Rust
+and Julia languages.
+
 
 ## Quick links
 
@@ -51,6 +48,8 @@ your analysis tools will still work the same way.
 - [Supported file formats](#supported-formats)
 - [Getting started](#getting-started)
 - [Full documentation](http://chemfiles.readthedocs.org/en/latest/)
+
+Using Chemfiles from other languages:
 - [Python interface](https://github.com/chemfiles/chemfiles.py)
 - [Fortran interface](https://github.com/chemfiles/chemfiles.f03)
 - [Julia interface](https://github.com/chemfiles/Chemharp.jl)
