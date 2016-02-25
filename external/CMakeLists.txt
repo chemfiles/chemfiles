@@ -43,6 +43,10 @@ if(MSVC)
 else()
     # Disable warnings about this code
     set(MOLFILE_FLAGS "${MOLFILE_FLAGS} -w")
+
+    if(BUILD_SHARED_LIBS)
+        set(MOLFILE_FLAGS "${MOLFILE_FLAGS} -fPIC")
+    endif()
 endif()
 
 if(WIN32)
