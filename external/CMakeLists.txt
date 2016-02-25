@@ -55,7 +55,14 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/molfiles/LICENSE")
     )
 endif()
 
-set(VMD_MOLFILE_PLUGINS_SRC
+set(VMD_MOLFILE_PLUGINS_ENABLED
+    molfiles/src/dcdplugin.c
+    molfiles/src/gromacsplugin.cxx
+    molfiles/src/pdbplugin.c
+)
+
+# These plugins are not yet activated, but can be compiled into chemfiles easily
+set(VMD_MOLFILE_PLUGINS_DISABLED
     molfiles/src/abinitplugin.c
     molfiles/src/avsplugin.cxx
     molfiles/src/babelplugin.c
@@ -68,36 +75,24 @@ set(VMD_MOLFILE_PLUGINS_SRC
     molfiles/src/ccp4plugin.cxx
     molfiles/src/cifplugin.cxx
     molfiles/src/corplugin.c
-    # error: no member named 'have_esp' in 'molfile_qm_metadata_t'
-    # molfiles/src/cpmdlogplugin.c
     molfiles/src/cpmdplugin.c
     molfiles/src/crdplugin.c
     molfiles/src/cubeplugin.cxx
-    molfiles/src/dcdplugin.c
     molfiles/src/dlpolyplugin.c
-    # Needs to link the sqlite3 library
-    # molfiles/src/dmsplugin.cxx
     molfiles/src/dsn6plugin.cxx
     molfiles/src/dtrplugin.cxx
     molfiles/src/dxplugin.cxx
     molfiles/src/edmplugin.cxx
     molfiles/src/fs4plugin.cxx
     molfiles/src/gamessplugin.c
-    # error: no member named 'have_esp' in 'molfile_qm_metadata_t'
-    # molfiles/src/gaussianplugin.c
     molfiles/src/graspplugin.cxx
     molfiles/src/grdplugin.cxx
     molfiles/src/gridplugin.cxx
-    molfiles/src/gromacsplugin.cxx
-    # Needs to link to some XML parser
-    # molfiles/src/hoomdplugin.c
     molfiles/src/jsplugin.c
     molfiles/src/lammpsplugin.c
     molfiles/src/maeffplugin.cxx
     molfiles/src/mapplugin.cxx
     molfiles/src/mdfplugin.cxx
-    # The code is not yet written ...
-    # molfiles/src/mmcif.cxx
     molfiles/src/mol2plugin.cxx
     molfiles/src/moldenplugin.c
     molfiles/src/molemeshplugin.cxx
@@ -108,7 +103,6 @@ set(VMD_MOLFILE_PLUGINS_SRC
     molfiles/src/parm7plugin.cxx
     molfiles/src/parmplugin.cxx
     molfiles/src/pbeqplugin.cxx
-    molfiles/src/pdbplugin.c
     molfiles/src/phiplugin.cxx
     molfiles/src/pltplugin.cxx
     molfiles/src/pqrplugin.c
@@ -119,8 +113,6 @@ set(VMD_MOLFILE_PLUGINS_SRC
     molfiles/src/spiderplugin.cxx
     molfiles/src/stlplugin.cxx
     molfiles/src/tinkerplugin.c
-    # Needs to link the TNGio library
-    # molfiles/src/tngplugin.cxx
     molfiles/src/uhbdplugin.cxx
     molfiles/src/vasp5xdatcarplugin.c
     molfiles/src/vaspchgcarplugin.c
@@ -130,17 +122,33 @@ set(VMD_MOLFILE_PLUGINS_SRC
     molfiles/src/vaspxdatcarplugin.c
     molfiles/src/vaspxmlplugin.c
     molfiles/src/vtfplugin.c
-    # Needs to link to TCL interpreter
-    # molfiles/src/webpdbplugin.c
     molfiles/src/xbgfplugin.cxx
     molfiles/src/xsfplugin.cxx
     molfiles/src/xyzplugin.c
 )
 
-foreach(file IN ITEMS ${VMD_MOLFILE_PLUGINS_SRC})
+# These plugins do not compile or link
+set(VMD_MOLFILE_PLUGINS_FAILED
+    # error: no member named 'have_esp' in 'molfile_qm_metadata_t'
+    molfiles/src/cpmdlogplugin.c
+    # Needs to link the sqlite3 library
+    molfiles/src/dmsplugin.cxx
+    # error: no member named 'have_esp' in 'molfile_qm_metadata_t'
+    molfiles/src/gaussianplugin.c
+    # Needs to link to some XML parser
+    molfiles/src/hoomdplugin.c
+    # The code is not yet written ...
+    molfiles/src/mmcif.cxx
+    # Needs to link the TNGio library
+    molfiles/src/tngplugin.cxx
+    # Needs to link to TCL interpreter
+    molfiles/src/webpdbplugin.c
+)
+
+foreach(file IN ITEMS ${VMD_MOLFILE_PLUGINS_ENABLED})
     get_filename_component(plugin ${file} NAME_WE)
     set_source_files_properties(${file} PROPERTIES COMPILE_FLAGS "-DVMDPLUGIN=${plugin} ${MOLFILE_FLAGS}")
 endforeach()
 
 include_directories(molfiles/include)
-add_library(molfiles OBJECT ${VMD_MOLFILE_PLUGINS_SRC})
+add_library(molfiles OBJECT ${VMD_MOLFILE_PLUGINS_ENABLED})
