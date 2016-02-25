@@ -59,10 +59,11 @@ endif()
 
 add_subdirectory(external)
 include_directories(include)
+include_directories(external/molfiles/include)
 include_directories(BEFORE SYSTEM ${PROJECT_BINARY_DIR}/include)
 
 file(GLOB_RECURSE sources src/**.cpp)
-add_library(chemfiles ${sources})
+add_library(chemfiles ${sources} $<TARGET_OBJECTS:molfiles>)
 
 set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
 set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
@@ -84,7 +85,7 @@ if(${ENABLE_NETCDF})
     target_link_libraries(chemfiles ${NETCDF_LIBRARIES} netcdf_cxx4)
 endif()
 
-add_dependencies(chemfiles molfiles)
+
 add_definitions("-DINSTALL_MOLFILE_DIR=\"${CMAKE_INSTALL_PREFIX}/lib/molfiles/\"")
 
 #----------------------------------------------------------------------------------------#
@@ -101,12 +102,6 @@ install(FILES include/chemfiles.hpp DESTINATION include)
 install(FILES include/chemfiles.h DESTINATION include)
 # Libraries
 install(TARGETS chemfiles DESTINATION lib)
-
-file(GLOB molfiles ${PROJECT_BINARY_DIR}/lib/*plugin.so)
-install(FILES ${molfiles} DESTINATION lib/molfiles/
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                    GROUP_READ             GROUP_EXECUTE
-                    WORLD_READ             WORLD_EXECUTE)
 
 # uninstall target
 configure_file(
