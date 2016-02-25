@@ -33,6 +33,8 @@ if(${ENABLE_NETCDF})
 endif()
 
 #----------------------------------------------------------------------------------------#
+set(MOLFILE_FLAGS "-DSTATIC_PLUGIN")
+
 if(MSVC)
     # Do not issue warning for insecure code in Molfiles
     set(MOLFILE_FLAGS "${MOLFILE_FLAGS} -D_CRT_SECURE_OVERLOAD_STANDARD_NAMES=1")

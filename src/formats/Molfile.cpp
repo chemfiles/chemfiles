@@ -236,9 +236,9 @@ template <MolfileFormat F> const char* Molfile<F>::extension() {
 // Instanciate all the templates
 
 #define PLUGINS_FUNCTIONS(PLUGIN, FORMAT)                                      \
-VMDPLUGIN_EXTERN int PLUGIN ## _register(void *, vmdplugin_register_cb);       \
-VMDPLUGIN_EXTERN int PLUGIN ## _fini(void);                                    \
-VMDPLUGIN_EXTERN int PLUGIN ## _init(void);                                    \
+extern "C" int PLUGIN ## _register(void *, vmdplugin_register_cb);             \
+extern "C" int PLUGIN ## _fini(void);                                          \
+extern "C" int PLUGIN ## _init(void);                                          \
 namespace chemfiles {                                                          \
 template<> struct VMDFunctions<FORMAT> {                                       \
     int init() {return PLUGIN ## _init();}                                     \
