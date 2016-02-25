@@ -18,7 +18,6 @@ extern "C" {
 
 #include "chemfiles/optional.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/Dynlib.hpp"
 #include "chemfiles/Topology.hpp"
 
 namespace chemfiles {
@@ -36,6 +35,17 @@ enum MolfileFormat {
     TRR, ///< Gromacs .trr file format
     XTC, ///< Gromacs .xtc file format
     TRJ, ///< Gromacs .trj file format
+};
+
+//! A thin wrapper around the vmd plugin functions
+template <MolfileFormat F>
+struct VMDFunctions {
+    /// Initialize the plugin
+    int init();
+    /// Register the plugin.
+    int registration(void* data, vmdplugin_register_cb callback);
+    /// Unload the plugin
+    int fini();
 };
 
 /*!
@@ -62,15 +72,10 @@ private:
     /// Read topological information in the current file, if any.
     void read_topology() const;
 
-    /// Dynamic library associated with the VMD plugin
-    Dynlib lib_;
+    /// VMD plugin functions
+    VMDFunctions<F> functions_;
     /// VMD molfile plugin
     molfile_plugin_t* plugin_;
-
-    typedef int (*init_function_t)(void);
-    typedef int (*register_function_t)(void*, vmdplugin_register_cb);
-    /// Function to call at in the destructor
-    init_function_t fini_fun_;
 
     /// The file handler
     mutable void* file_handler_;

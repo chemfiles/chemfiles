@@ -85,9 +85,6 @@ if(${ENABLE_NETCDF})
     target_link_libraries(chemfiles ${NETCDF_LIBRARIES} netcdf_cxx4)
 endif()
 
-
-add_definitions("-DINSTALL_MOLFILE_DIR=\"${CMAKE_INSTALL_PREFIX}/lib/molfiles/\"")
-
 #----------------------------------------------------------------------------------------#
 # Installation configuration
 #----------------------------------------------------------------------------------------#

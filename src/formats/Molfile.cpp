@@ -17,19 +17,19 @@ using namespace chemfiles;
 
 struct plugin_data_t {
     std::string format;
-    std::string path;
-    std::string plugin_name;
+    std::string plugin;
+    std::string reader;
     std::string extension;
     bool have_velocities;
 };
 
 static std::map<MolfileFormat, plugin_data_t> molfile_plugins {
-    {PDB, {"PDB", "pdbplugin.so", "pdb", ".pdb", false}},
-    {DCD, {"DCD", "dcdplugin.so", "dcd", ".dcd", false}},
-    {GRO, {"GRO", "gromacsplugin.so", "gro", ".gro", false}},
-    {TRR, {"TRR", "gromacsplugin.so", "trr", ".trr", true}},
-    {XTC, {"XTC", "gromacsplugin.so", "xtc", ".xtc", false}},
-    {TRJ, {"TRJ", "gromacsplugin.so", "trj", ".trj", true}},
+    {PDB, {"PDB", "pdbplugin", "pdb", ".pdb", false}},
+    {DCD, {"DCD", "dcdplugin", "dcd", ".dcd", false}},
+    {GRO, {"GRO", "gromacsplugin", "gro", ".gro", false}},
+    {TRR, {"TRR", "gromacsplugin", "trr", ".trr", true}},
+    {XTC, {"XTC", "gromacsplugin", "xtc", ".xtc", false}},
+    {TRJ, {"TRJ", "gromacsplugin", "trj", ".trj", true}},
 };
 
 struct plugin_reginfo_t {
@@ -44,7 +44,7 @@ static int register_plugin(void *v, vmdplugin_t *p) {
         throw PluginError("Wrong plugin type");
 
     auto plugin = reinterpret_cast<molfile_plugin_t *>(p);
-    if (molfile_plugins[F].plugin_name == plugin->name){
+    if (molfile_plugins[F].reader == plugin->name){
         // When this callback is called multiple times with more
         // than one plugin, only register the one whe want
         reginfo->plugin = plugin;
@@ -53,68 +53,29 @@ static int register_plugin(void *v, vmdplugin_t *p) {
     return VMDPLUGIN_SUCCESS;
 }
 
-//! Check if a path exists on the filesystem
-static inline bool exists(const std::string& path) {
-    return std::ifstream(path).good();
-}
-
-
-//! Get the path to the molfile plugin `name`
-static std::string plugin_path(const std::string& name){
-    std::string path = "";
-    // First look for the CHEMFILES_PLUGINS environement variable
-    if(const char* plugin_dir = std::getenv("CHEMFILES_PLUGINS")) {
-        path = plugin_dir + std::string("/") + name;
-    } else { // Use the compile-time macro INSTALL_MOLFILE_DIR
-        path = INSTALL_MOLFILE_DIR + std::string("/") + name;
-    }
-
-    if (exists(path)) {
-        return path;
-    } else {
-        throw PluginError(
-            "Could not find the '" + name + "' shared library. Try setting "\
-            "the CHEMFILES_PLUGINS environement variable."
-        );
-    }
-}
-
 /******************************************************************************/
 
-template <MolfileFormat F> Molfile<F>::Molfile(File& file)
-: Format(file), plugin_(nullptr), fini_fun_(nullptr), file_handler_(nullptr), natoms_(0) {
-    // Open the _library
-    lib_ = Dynlib(plugin_path(molfile_plugins[F].path));
+template <MolfileFormat F> Molfile<F>::Molfile(File& file):
+Format(file), plugin_(nullptr), file_handler_(nullptr), natoms_(0) {
 
-    // Get the pointer to the initialization function
-    auto init_fun = lib_.symbol<init_function_t>("vmdplugin_init");
-    if (init_fun())
+    if (functions_.init()) {
         throw PluginError("Could not initialize the " + molfile_plugins[F].format + " plugin_.");
-
-    // Get the pointer to the registration function
-    auto register_fun = lib_.symbol<register_function_t>("vmdplugin_register");
-
-    // Get the pointer to the freeing function
-    fini_fun_ = lib_.symbol<init_function_t>("vmdplugin_fini");
+    }
 
     plugin_reginfo_t reginfo;
     // The first argument in 'register_fun' is passed as the first argument to register_plugin ...
-    if (register_fun(&reginfo, register_plugin<F>))
+    if (functions_.registration(&reginfo, register_plugin<F>)) {
         throw PluginError("Could not register the " + molfile_plugins[F].format + " plugin_.");
+    }
     plugin_ = reginfo.plugin;
 
     // Check the ABI version of the loaded plugin_
-    if (plugin_->abiversion != vmdplugin_ABIVERSION)
-        throw PluginError("The ABI version does not match! Please recompile "
-                          "chemfiles or provide another plugin_");
-    // Check that needed functions are here
-    if ((plugin_->open_file_read == NULL)      ||
-        (plugin_->read_next_timestep  == NULL) ||
-        (plugin_->close_file_read == NULL))
-            throw PluginError("The " + molfile_plugins[F].format +
-                              " plugin_ does not have read capacities");
+    assert(plugin_->abiversion == vmdplugin_ABIVERSION);
 
-    std::cout << file.filename() << std::endl;
+    // Check that needed functions are here
+    if ((plugin_->open_file_read == NULL) || (plugin_->read_next_timestep  == NULL) || (plugin_->close_file_read == NULL)) {
+        throw PluginError("The " + molfile_plugins[F].format + " plugin_ does not have read capacities");
+    }
 
     file_handler_ = plugin_->open_file_read(file.filename().c_str(), plugin_->name, &natoms_);
 
@@ -129,7 +90,7 @@ template <MolfileFormat F> Molfile<F>::~Molfile(){
     if (file_handler_) {
         plugin_->close_file_read(file_handler_);
     }
-    fini_fun_();
+    functions_.fini();
 }
 
 template <MolfileFormat F>
@@ -272,8 +233,30 @@ template <MolfileFormat F> const char* Molfile<F>::extension() {
 }
 
 /******************************************************************************/
+// Instanciate all the templates
 
-// Instanciate the templates
+#define PLUGINS_FUNCTIONS(PLUGIN, FORMAT)                                      \
+VMDPLUGIN_EXTERN int PLUGIN ## _register(void *, vmdplugin_register_cb);       \
+VMDPLUGIN_EXTERN int PLUGIN ## _fini(void);                                    \
+VMDPLUGIN_EXTERN int PLUGIN ## _init(void);                                    \
+template<> struct VMDFunctions<FORMAT> {                                       \
+    int init() {return PLUGIN ## _init();}                                     \
+    int registration(void* data, vmdplugin_register_cb callback) {             \
+        return PLUGIN ## _register(data, callback);                            \
+    }                                                                          \
+    int fini() {return PLUGIN ## _fini();}                                     \
+}                                                                              \
+
+PLUGINS_FUNCTIONS(pdbplugin, PDB);
+PLUGINS_FUNCTIONS(dcdplugin, DCD);
+PLUGINS_FUNCTIONS(gromacsplugin, GRO);
+PLUGINS_FUNCTIONS(gromacsplugin, TRR);
+PLUGINS_FUNCTIONS(gromacsplugin, XTC);
+PLUGINS_FUNCTIONS(gromacsplugin, TRJ);
+
+#undef PLUGINS_FUNCTIONS
+
+
 template class chemfiles::Molfile<PDB>;
 template class chemfiles::Molfile<DCD>;
 template class chemfiles::Molfile<GRO>;
