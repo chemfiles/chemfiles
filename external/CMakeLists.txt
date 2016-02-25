@@ -75,7 +75,8 @@ set(VMD_MOLFILE_PLUGINS_SRC
     molfiles/src/cubeplugin.cxx
     molfiles/src/dcdplugin.c
     molfiles/src/dlpolyplugin.c
-    molfiles/src/dmsplugin.cxx
+    # Needs to link the sqlite3 library
+    # molfiles/src/dmsplugin.cxx
     molfiles/src/dsn6plugin.cxx
     molfiles/src/dtrplugin.cxx
     molfiles/src/dxplugin.cxx
@@ -88,7 +89,8 @@ set(VMD_MOLFILE_PLUGINS_SRC
     molfiles/src/grdplugin.cxx
     molfiles/src/gridplugin.cxx
     molfiles/src/gromacsplugin.cxx
-    molfiles/src/hoomdplugin.c
+    # Needs to link to some XML parser
+    # molfiles/src/hoomdplugin.c
     molfiles/src/jsplugin.c
     molfiles/src/lammpsplugin.c
     molfiles/src/maeffplugin.cxx
@@ -117,7 +119,8 @@ set(VMD_MOLFILE_PLUGINS_SRC
     molfiles/src/spiderplugin.cxx
     molfiles/src/stlplugin.cxx
     molfiles/src/tinkerplugin.c
-    molfiles/src/tngplugin.cxx
+    # Needs to link the TNGio library
+    # molfiles/src/tngplugin.cxx
     molfiles/src/uhbdplugin.cxx
     molfiles/src/vasp5xdatcarplugin.c
     molfiles/src/vaspchgcarplugin.c
@@ -127,7 +130,8 @@ set(VMD_MOLFILE_PLUGINS_SRC
     molfiles/src/vaspxdatcarplugin.c
     molfiles/src/vaspxmlplugin.c
     molfiles/src/vtfplugin.c
-    molfiles/src/webpdbplugin.c
+    # Needs to link to TCL interpreter
+    # molfiles/src/webpdbplugin.c
     molfiles/src/xbgfplugin.cxx
     molfiles/src/xsfplugin.cxx
     molfiles/src/xyzplugin.c
