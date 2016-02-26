@@ -12,7 +12,6 @@
 #include <unordered_map>
 #include <memory>
 
-#include "chemfiles/Error.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 

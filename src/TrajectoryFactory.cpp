@@ -6,8 +6,8 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 #include "chemfiles/TrajectoryFactory.hpp"
+#include "chemfiles/Error.hpp"
 #include "chemfiles/Format.hpp"
-
 #include "chemfiles/formats/XYZ.hpp"
 #include "chemfiles/formats/NCFormat.hpp"
 #include "chemfiles/formats/Molfile.hpp"

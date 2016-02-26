@@ -7,7 +7,6 @@
 */
 
 #include "chemfiles/Format.hpp"
-#include "chemfiles/Frame.hpp"
 #include "chemfiles/Error.hpp"
 using namespace chemfiles;
 

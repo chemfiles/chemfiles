@@ -13,7 +13,6 @@
 #include <memory>
 using std::shared_ptr;
 
-#include "chemfiles/File.hpp"
 #include "chemfiles/files/BasicFile.hpp"
 
 namespace chemfiles {

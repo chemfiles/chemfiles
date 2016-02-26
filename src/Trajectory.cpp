@@ -12,9 +12,6 @@
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
 
-#include "chemfiles/Logger.hpp"
-#include "chemfiles/files/BasicFile.hpp"
-
 using namespace chemfiles;
 using std::string;
 
