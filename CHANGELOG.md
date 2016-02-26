@@ -1,6 +1,9 @@
 # 0.6 (Next release)
 
-* Add the `chfl_clear_errors` function, to cleanup the error state.
+* Add the `chfl_clear_errors` function, to cleanup the error state of the C API.
+* Molfiles plugins are now incorporated in the chemfiles library, and no longer
+  distributed as shared libraries. The `CHEMFILES_PLUGINS` environment variable
+  is a no-op.
 
 # 0.5 (19 Feb 2016)
 
