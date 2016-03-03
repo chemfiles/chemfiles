@@ -45,45 +45,41 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "release" CACHE STRING "Choose the type of build." FORCE)
 endif()
 
+add_subdirectory(external)
+
+file(GLOB_RECURSE sources src/**.cpp)
+add_library(chemfiles ${sources} $<TARGET_OBJECTS:molfiles>)
+target_link_libraries(chemfiles ${OTHER_CHEMFILES_LIBRARIES})
+
+set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
+set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
+
+target_include_directories(chemfiles PUBLIC include)
+target_include_directories(chemfiles PUBLIC external/molfiles/include)
+
 if(${ENABLE_NETCDF})
     find_package(NetCDF REQUIRED)
-    include_directories(${NETCDF_INCLUDES})
-    SET(HAVE_NETCDF 1)
+    target_include_directories(chemfiles PUBLIC ${NETCDF_INCLUDES})
+    target_link_libraries(chemfiles ${NETCDF_LIBRARIES})
+    set(HAVE_NETCDF 1)
 else()
     find_package(NetCDF)
     if(${NetCDF_FOUND})
         message(STATUS "Found NetCDF library. Consider activating the associated format with -DENABLE_NETCDF=ON")
     endif()
-    SET(HAVE_NETCDF 0)
+    set(HAVE_NETCDF 0)
 endif()
-
-add_subdirectory(external)
-include_directories(include)
-include_directories(external/molfiles/include)
-include_directories(BEFORE SYSTEM ${PROJECT_BINARY_DIR}/include)
-
-file(GLOB_RECURSE sources src/**.cpp)
-add_library(chemfiles ${sources} $<TARGET_OBJECTS:molfiles>)
-
-set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
-set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
-
-include(GenerateExportHeader)
-generate_export_header(chemfiles
-          BASE_NAME CHFL
-          EXPORT_FILE_NAME ${PROJECT_SOURCE_DIR}/include/chemfiles/exports.hpp
-)
-target_link_libraries(chemfiles ${OTHER_CHEMFILES_LIBRARIES})
 
 configure_file (
   "${PROJECT_SOURCE_DIR}/include/chemfiles/config.in.hpp"
   "${PROJECT_SOURCE_DIR}/include/chemfiles/config.hpp"
 )
 
-if(${ENABLE_NETCDF})
-    add_dependencies(chemfiles netcdfcxx)
-    target_link_libraries(chemfiles ${NETCDF_LIBRARIES} netcdf_cxx4)
-endif()
+include(GenerateExportHeader)
+generate_export_header(chemfiles
+    BASE_NAME CHFL
+    EXPORT_FILE_NAME ${PROJECT_SOURCE_DIR}/include/chemfiles/exports.hpp
+)
 
 #----------------------------------------------------------------------------------------#
 # Installation configuration

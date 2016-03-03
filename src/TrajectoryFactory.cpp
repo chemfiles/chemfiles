@@ -9,10 +9,10 @@
 #include "chemfiles/Error.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/formats/XYZ.hpp"
-#include "chemfiles/formats/NCFormat.hpp"
+#include "chemfiles/formats/NcFormat.hpp"
 #include "chemfiles/formats/Molfile.hpp"
 
-#include "chemfiles/files/NCFile.hpp"
+#include "chemfiles/files/NcFile.hpp"
 using namespace chemfiles;
 
 template<typename T>
