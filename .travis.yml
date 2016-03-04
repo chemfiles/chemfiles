@@ -80,8 +80,3 @@ after_success:
     if ${DO_COVERAGE}; then
         codecov --gcov-exec=gcov-4.9
     fi
-
-env:
-  global:
-    secure: Mf7f3PP+AHqyOMEp9koj+mTBSVfo03XNFLJ6offmH3IWIj+N5fxwn+tN3H/hKUeL8mvzfHjXPAkYkWKVwcamoQ9ktoYLDJ83HCa4muCUxENz/SAR2DvWf8ix7ggvIP8wZCrNyq8ssw+5F1FRmauF7HjTDPCtBiz/sjvK94XVwXU=
-    secure: vemv2pi+y10L/3QkiDTdgbsug2Qv97OUiMjyRw9pYIjDoNhws1jzuKMFJt1YvUNZcROUA1hEkDYDDCmGTXAo7zr+pk+ru9e8h6q9LH+uPZWKgWHUzEyFlLB3wve3fCzeTIqvvSC+87bxYhJg53TrrCyRXBu3jnHoqJKr2RhWwOQ=
