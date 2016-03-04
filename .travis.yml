@@ -1,5 +1,7 @@
 language: cpp
 sudo: false
+
+# Build matrix
 os:
   - linux
   - osx
@@ -7,9 +9,13 @@ compiler:
   - gcc
   - clang
 env:
-  global:
-    secure: Mf7f3PP+AHqyOMEp9koj+mTBSVfo03XNFLJ6offmH3IWIj+N5fxwn+tN3H/hKUeL8mvzfHjXPAkYkWKVwcamoQ9ktoYLDJ83HCa4muCUxENz/SAR2DvWf8ix7ggvIP8wZCrNyq8ssw+5F1FRmauF7HjTDPCtBiz/sjvK94XVwXU=
-    secure: vemv2pi+y10L/3QkiDTdgbsug2Qv97OUiMjyRw9pYIjDoNhws1jzuKMFJt1YvUNZcROUA1hEkDYDDCmGTXAo7zr+pk+ru9e8h6q9LH+uPZWKgWHUzEyFlLB3wve3fCzeTIqvvSC+87bxYhJg53TrrCyRXBu3jnHoqJKr2RhWwOQ=
+  - BUILD_TYPE=debug SHARED_LIBS=ON
+  - BUILD_TYPE=debug SHARED_LIBS=OFF
+  - BUILD_TYPE=release SHARED_LIBS=ON
+  - BUILD_TYPE=release SHARED_LIBS=OFF
+matrix:
+  fast_finish: true
+
 addons:
   apt:
     sources:
@@ -25,7 +31,7 @@ addons:
 before_install:
   # Setting environement
   - export C_COMPILER="$CC"
-  - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DBUILD_TESTS=ON -DENABLE_NETCDF=ON -DBUILD_SHARED_LIBS=ON"
+  - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DBUILD_TESTS=ON -DENABLE_NETCDF=ON -DBUILD_SHARED_LIBS=${SHARED_LIBS}"
   - |
     if test "$TRAVIS_OS_NAME" == "linux" && test "$C_COMPILER" == "gcc"; then
         export DO_COVERAGE=true
@@ -74,3 +80,8 @@ after_success:
     if ${DO_COVERAGE}; then
         codecov --gcov-exec=gcov-4.9
     fi
+
+env:
+  global:
+    secure: Mf7f3PP+AHqyOMEp9koj+mTBSVfo03XNFLJ6offmH3IWIj+N5fxwn+tN3H/hKUeL8mvzfHjXPAkYkWKVwcamoQ9ktoYLDJ83HCa4muCUxENz/SAR2DvWf8ix7ggvIP8wZCrNyq8ssw+5F1FRmauF7HjTDPCtBiz/sjvK94XVwXU=
+    secure: vemv2pi+y10L/3QkiDTdgbsug2Qv97OUiMjyRw9pYIjDoNhws1jzuKMFJt1YvUNZcROUA1hEkDYDDCmGTXAo7zr+pk+ru9e8h6q9LH+uPZWKgWHUzEyFlLB3wve3fCzeTIqvvSC+87bxYhJg53TrrCyRXBu3jnHoqJKr2RhWwOQ=
