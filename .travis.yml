@@ -17,7 +17,7 @@ addons:
     - llvm-toolchain-precise-3.6
     - kalakris-cmake
     packages:
-    - g++-4.9
+    - g++-4.8
     - libnetcdf-dev
     - clang-3.6
     - cmake
@@ -38,8 +38,8 @@ before_install:
   - |
     if test "${TRAVIS_OS_NAME}" == "linux"; then
         if test "${C_COMPILER}" == "gcc"; then
-            export CC=gcc-4.9
-            export CXX=g++-4.9
+            export CC=gcc-4.8
+            export CXX=g++-4.8
         elif test "${C_COMPILER}" == "clang"; then
             export CC=clang-3.6
             export CXX=clang++-3.6
@@ -61,16 +61,12 @@ before_install:
         fi
     fi
 
-install:
+script:
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir -p build
   - cd build
   - cmake $CMAKE_ARGS ..
-
-script:
-  - cd ${TRAVIS_BUILD_DIR}/build
   - make
-  - ls tests
   - ctest --output-on-failure
 
 after_success:
