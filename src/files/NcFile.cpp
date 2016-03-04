@@ -36,8 +36,8 @@ NcFile::NcFile(const std::string& filename, const string& mode): BinaryFile(file
         status = nc_open(filename.c_str(), NC_WRITE, &file_id_);
     } else if (mode == "w"){
         status = nc_create(filename.c_str(), NC_64BIT_OFFSET | NC_CLASSIC_MODEL, &file_id_);
-        // Put the file in DATA mode
-        assert(nc_enddef(file_id_) == NC_NOERR);
+        // Put the file in DATA mode. This can only fail for bad id, which we check later.
+        nc_enddef(file_id_);
     } else {
         throw FileError("Unknown mode for file opening: " + mode);
     }
