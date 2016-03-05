@@ -24,7 +24,6 @@ option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
 option(ENABLE_NETCDF "Enable AMBER NetCDF format." OFF)
 
 include(CompilerFlags)
-include(Platforms)
 
 if(CODE_COVERAGE)
     set(BUILD_TESTS ON)
@@ -49,7 +48,6 @@ add_subdirectory(external)
 
 file(GLOB_RECURSE sources src/**.cpp)
 add_library(chemfiles ${sources} $<TARGET_OBJECTS:molfiles>)
-target_link_libraries(chemfiles ${OTHER_CHEMFILES_LIBRARIES})
 
 set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
 set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
