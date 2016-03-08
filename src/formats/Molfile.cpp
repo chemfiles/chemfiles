@@ -239,22 +239,22 @@ template <MolfileFormat F> const char* Molfile<F>::extension() {
 extern "C" int PLUGIN ## _register(void *, vmdplugin_register_cb);             \
 extern "C" int PLUGIN ## _fini(void);                                          \
 extern "C" int PLUGIN ## _init(void);                                          \
-namespace chemfiles {                                                          \
 template<> struct VMDFunctions<FORMAT> {                                       \
     int init() {return PLUGIN ## _init();}                                     \
     int registration(void* data, vmdplugin_register_cb callback) {             \
         return PLUGIN ## _register(data, callback);                            \
     }                                                                          \
     int fini() {return PLUGIN ## _fini();}                                     \
-};                                                                             \
-}                                                                              \
+}
 
-PLUGINS_FUNCTIONS(pdbplugin, PDB);
-PLUGINS_FUNCTIONS(dcdplugin, DCD);
-PLUGINS_FUNCTIONS(gromacsplugin, GRO);
-PLUGINS_FUNCTIONS(gromacsplugin, TRR);
-PLUGINS_FUNCTIONS(gromacsplugin, XTC);
-PLUGINS_FUNCTIONS(gromacsplugin, TRJ);
+namespace chemfiles {
+    PLUGINS_FUNCTIONS(pdbplugin, PDB);
+    PLUGINS_FUNCTIONS(dcdplugin, DCD);
+    PLUGINS_FUNCTIONS(gromacsplugin, GRO);
+    PLUGINS_FUNCTIONS(gromacsplugin, TRR);
+    PLUGINS_FUNCTIONS(gromacsplugin, XTC);
+    PLUGINS_FUNCTIONS(gromacsplugin, TRJ);
+}
 
 #undef PLUGINS_FUNCTIONS
 

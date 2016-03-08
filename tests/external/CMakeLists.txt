@@ -8,6 +8,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boost/LICENSE_1_0.txt")
     )
 endif()
 
+set(CMAKE_CXX_FLAGS "")
 add_definitions("-DBOOST_ALL_NO_LIB")
 
 file(GLOB_RECURSE boost_filesystem_src boost/src/*.cpp)
