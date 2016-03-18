@@ -50,6 +50,7 @@ TrajectoryFactory::TrajectoryFactory() : formats_(), extensions_() {
     registration<Molfile<TRR>>(formats_, extensions_);
     registration<Molfile<XTC>>(formats_, extensions_);
     registration<Molfile<TRJ>>(formats_, extensions_);
+    registration<Molfile<LAMMPS>>(formats_, extensions_);
 }
 
 TrajectoryFactory& TrajectoryFactory::get() {

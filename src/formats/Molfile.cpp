@@ -30,6 +30,7 @@ static std::map<MolfileFormat, plugin_data_t> molfile_plugins {
     {TRR, {"TRR", "gromacsplugin", "trr", ".trr", true}},
     {XTC, {"XTC", "gromacsplugin", "xtc", ".xtc", false}},
     {TRJ, {"TRJ", "gromacsplugin", "trj", ".trj", true}},
+    {LAMMPS, {"LAMMPS", "lammpsplugin", "lammpstrj", ".lammpstrj", false}},
 };
 
 struct plugin_reginfo_t {
@@ -103,7 +104,7 @@ void Molfile<F>::read(Frame& frame){
     std::vector<float> coords(3*static_cast<size_t>(natoms_));
     std::vector<float> velocities(0);
 
-    molfile_timestep_t timestep;
+    molfile_timestep_t timestep{};
     timestep.coords = coords.data();
     if (molfile_plugins[F].have_velocities){
         velocities.resize(3*static_cast<size_t>(natoms_));
@@ -254,6 +255,7 @@ namespace chemfiles {
     PLUGINS_FUNCTIONS(gromacsplugin, TRR);
     PLUGINS_FUNCTIONS(gromacsplugin, XTC);
     PLUGINS_FUNCTIONS(gromacsplugin, TRJ);
+    PLUGINS_FUNCTIONS(lammpsplugin, LAMMPS);
 }
 
 #undef PLUGINS_FUNCTIONS
@@ -265,3 +267,4 @@ template class chemfiles::Molfile<GRO>;
 template class chemfiles::Molfile<TRR>;
 template class chemfiles::Molfile<XTC>;
 template class chemfiles::Molfile<TRJ>;
+template class chemfiles::Molfile<LAMMPS>;

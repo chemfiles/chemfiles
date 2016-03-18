@@ -30,6 +30,7 @@ set(VMD_MOLFILE_PLUGINS_ENABLED
     molfiles/src/dcdplugin.c
     molfiles/src/gromacsplugin.cxx
     molfiles/src/pdbplugin.c
+    molfiles/src/lammpsplugin.c
 )
 
 # These plugins are not yet activated, but can be compiled into chemfiles easily
@@ -60,7 +61,6 @@ set(VMD_MOLFILE_PLUGINS_DISABLED
     molfiles/src/grdplugin.cxx
     molfiles/src/gridplugin.cxx
     molfiles/src/jsplugin.c
-    molfiles/src/lammpsplugin.c
     molfiles/src/maeffplugin.cxx
     molfiles/src/mapplugin.cxx
     molfiles/src/mdfplugin.cxx
