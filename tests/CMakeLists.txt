@@ -1,5 +1,5 @@
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/data/README.md")
-    message(SEND_ERROR "Missing data files for tests. Please run `git submodule update --init`.")
+    message(SEND_ERROR "Missing data files for tests. Please run `git submodule update --init` from ${chemfiles_SOURCE_DIR}.")
 endif()
 
 add_subdirectory(external)
