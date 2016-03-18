@@ -10,6 +10,9 @@ endif()
 
 set(CMAKE_CXX_FLAGS "")
 add_definitions("-DBOOST_ALL_NO_LIB")
+if(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+endif()
 
 file(GLOB_RECURSE boost_filesystem_src boost/src/*.cpp)
 add_library(boost_filesystem STATIC ${boost_filesystem_src})

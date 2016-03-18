@@ -73,6 +73,7 @@ endif()
 if(MSVC)
     add_definitions("/D COMPILER_IS_MSVC")
     add_definitions("/D NOMINMAX")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 else()
     if(USE_WARNINGS)
         # Make sure to have asserts compiled
