@@ -135,7 +135,7 @@ void NCFormat::read_array3D(Array3D& array, const string& name) const{
 }
 
 // Initialize a file, assuming that it is empty
-static void initialize(NcFile& file, size_t natoms, bool velocities){
+static void initialize(NcFile& file, size_t natoms, bool with_velocities){
     file.set_file_mode(NcFile::DEFINE);
 
     file.add_global_attribute("Conventions", "AMBER");
@@ -163,7 +163,7 @@ static void initialize(NcFile& file, size_t natoms, bool velocities){
     auto cell_angles = file.add_variable<float>("cell_angles", "frame", "cell_angular");
     cell_angles.add_attribute("units", "degree");
 
-    if (velocities) {
+    if (with_velocities) {
         auto velocities = file.add_variable<float>("velocities", "frame", "atom", "spatial");
         velocities.add_attribute("units", "angstrom/picosecond");
     }

@@ -14,6 +14,9 @@ if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 endif()
 
+set(CMAKE_CXX_FLAGS_DEBUG "")
+set(CMAKE_CXX_FLAGS "-Wno-deprecated")
+
 file(GLOB_RECURSE boost_filesystem_src boost/src/*.cpp)
 add_library(boost_filesystem STATIC ${boost_filesystem_src})
 set_property(TARGET boost_filesystem PROPERTY VERSION ${BOOST_VERSION})

@@ -60,6 +60,13 @@ else()
     add_warning("-Wdocumentation")
     add_warning("-Wdeprecated")
     add_warning("-Wextra-semi")
+    add_warning("-Wshadow")
+    add_warning("-Wnon-virtual-dtor")
+
+    add_warning("-Wold-style-cast")
+    add_warning("-Wcast-align")
+    add_warning("-Wunused")
+    add_warning("-Woverloaded-virtual")
 
     # Remove some warnings
     add_warning("-Wno-potentially-evaluated-expression")
