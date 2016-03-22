@@ -22,8 +22,18 @@ option(BUILD_DOCUMENTATION "Build the documentation." OFF)
 option(CODE_COVERAGE "Enable code coverage" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
 option(ENABLE_NETCDF "Enable AMBER NetCDF format." OFF)
+option(USE_WARNINGS "Compile the code with warnings (default in debug mode)" OFF)
 
 include(CompilerFlags)
+
+if(USE_WARNINGS)
+    # Make sure to have asserts compiled
+    add_definitions("-UNDEBUG")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CHEMFILES_CXX_WARNINGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CHEMFILES_C_WARNINGS}")
+endif()
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${CHEMFILES_CXX_WARNINGS}")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${CHEMFILES_C_WARNINGS}")
 
 if(CODE_COVERAGE)
     set(BUILD_TESTS ON)

@@ -1,8 +1,6 @@
 include(CheckCXXCompilerFlag)
 include(CheckCCompilerFlag)
 
-option(USE_WARNINGS "Compile the code with warnings (default in debug mode)" OFF)
-
 # C++11 support.
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
@@ -20,23 +18,31 @@ else()
     endif()
 endif()
 
+CHECK_C_COMPILER_FLAG("-std=c99" COMPILER_SUPPORTS_C99)
+if(COMPILER_SUPPORTS_C99)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+endif()
+
+if(MSVC)
+    add_definitions("/D COMPILER_IS_MSVC")
+    add_definitions("/D NOMINMAX")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+endif()
+
 macro(add_warning _flag_)
     CHECK_CXX_COMPILER_FLAG("${_flag_}" CXX_SUPPORTS${_flag_})
     CHECK_C_COMPILER_FLAG("${_flag_}" CC_SUPPORTS${_flag_})
     if(CXX_SUPPORTS${_flag_})
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${_flag_}")
-        if(USE_WARNINGS)
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_flag_}")
-        endif()
+        set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} ${_flag_}")
     endif()
 
-    if(C_SUPPORTS${_flag_})
-        set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${_flag_}")
-        if(USE_WARNINGS)
-            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_flag_}")
-        endif()
+    if(CC_SUPPORTS${_flag_})
+        set(CHEMFILES_C_WARNINGS "${CHEMFILES_C_FLAGS_DEBUG} ${_flag_}")
     endif()
 endmacro()
+
+set(CHEMFILES_CXX_WARNINGS "")
+set(CHEMFILES_C_WARNINGS "")
 
 # Add some warnings in debug mode
 if(MSVC)
@@ -70,20 +76,4 @@ else()
 
     # Remove some warnings
     add_warning("-Wno-potentially-evaluated-expression")
-endif()
-
-CHECK_C_COMPILER_FLAG("-std=c99" COMPILER_SUPPORTS_C99)
-if(COMPILER_SUPPORTS_C99)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
-endif()
-
-if(MSVC)
-    add_definitions("/D COMPILER_IS_MSVC")
-    add_definitions("/D NOMINMAX")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
-else()
-    if(USE_WARNINGS)
-        # Make sure to have asserts compiled
-        add_definitions("-UNDEBUG")
-    endif()
 endif()
