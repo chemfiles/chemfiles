@@ -16,20 +16,20 @@ TEST_CASE("Basic logging usage", "[logging]"){
     // Redirect cerr to the new buffer
     std::cerr.rdbuf(out_buffer.rdbuf());
 
-    Logger::log(LogLevel::ERROR, "an error");
+    Logger::error("an error");
     CHECK("Chemfiles error: an error\n" == out_buffer.str());
     out_buffer.str(std::string()); // Clean the buffer
 
-    Logger::log(LogLevel::WARNING, "a warning");
+    Logger::warn("a warning");
     CHECK("Chemfiles warning: a warning\n" == out_buffer.str());
     out_buffer.str(std::string());
 
     // The level should be WARNING by default
-    Logger::log(LogLevel::INFO, "an info");
+    Logger::info("an info");
     CHECK("" == out_buffer.str());
     out_buffer.str(std::string());
 
-    Logger::log(LogLevel::DEBUG, "a debug info");
+    Logger::debug("a debug info");
     CHECK("" == out_buffer.str());
     out_buffer.str(std::string());
 
@@ -46,7 +46,7 @@ TEST_CASE("Set the log stream", "[logging]"){
         sbuf = std::cout.rdbuf();
         std::cout.rdbuf(out_buffer.rdbuf());
 
-        Logger::log(LogLevel::WARNING, "a warning");
+        Logger::warn("a warning");
         CHECK("Chemfiles warning: a warning\n" == out_buffer.str());
 
         std::cout.rdbuf(sbuf);
@@ -55,7 +55,7 @@ TEST_CASE("Set the log stream", "[logging]"){
     SECTION("Redirect log to a file") {
         Logger::to_file("test-logging-tmp.log");
 
-        Logger::log(LogLevel::WARNING, "a warning");
+        Logger::warn("a warning");
 
         std::ifstream logfile("test-logging-tmp.log");
         std::string log_content;
@@ -71,7 +71,7 @@ TEST_CASE("Set the log stream", "[logging]"){
         std::cerr.rdbuf(out_buffer.rdbuf());
         Logger::silent();
 
-        Logger::log(LogLevel::ERROR, "an error");
+        Logger::error("an error");
         CHECK("" == out_buffer.str());
         out_buffer.str(std::string());
 
@@ -89,7 +89,7 @@ TEST_CASE("Set the log stream", "[logging]"){
 
         Logger::callback(callback);
 
-        Logger::log(LogLevel::ERROR, "an error");
+        Logger::error("an error");
         CHECK("an error" == buffer);
         CHECK(last_level == LogLevel::ERROR);
     }
@@ -104,15 +104,15 @@ TEST_CASE("Set the log level", "[logging]"){
 
     Logger::set_level(LogLevel::INFO);
 
-    Logger::log(LogLevel::ERROR, "an error");
+    Logger::error("an error");
     CHECK("Chemfiles error: an error\n" == out_buffer.str());
     out_buffer.str(std::string());
 
-    Logger::log(LogLevel::INFO, "an info");
+    Logger::info("an info");
     CHECK("Chemfiles info: an info\n" == out_buffer.str());
     out_buffer.str(std::string());
 
-    Logger::log(LogLevel::DEBUG, "a debug info");
+    Logger::debug("a debug info");
     CHECK("" == out_buffer.str());
     out_buffer.str(std::string());
 

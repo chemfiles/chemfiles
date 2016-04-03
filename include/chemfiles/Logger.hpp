@@ -53,6 +53,23 @@ public:
 
     //! Log a `message` if the `level` is lower than the maximal curent logging level
     static void log(LogLevel level, std::string message);
+    //! Log `message` at error level.
+    static void error(const std::string& message) {
+        Logger::log(LogLevel::ERROR, message);
+    }
+    //! Log `message` at warning level.
+    static void warn(const std::string& message) {
+        Logger::log(LogLevel::WARNING, message);
+    }
+    //! Log `message` at info level.
+    static void info(const std::string& message) {
+        Logger::log(LogLevel::INFO, message);
+    }
+    //! Log `message` at debug level.
+    static void debug(const std::string& message) {
+        Logger::log(LogLevel::DEBUG, message);
+    }
+
     //! Set the logging level
     static void set_level(LogLevel);
     //! Get the current logging level

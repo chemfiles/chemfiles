@@ -61,14 +61,14 @@ private:
 #define CATCH_AND_RETURN(exception, retval)           \
     catch(const chemfiles::exception& e) {            \
         status.last_error = std::string(e.what());    \
-        Logger::log(LogLevel::ERROR, e.what());       \
+        Logger::error(e.what());       \
         return retval;                                \
     }
 
 #define CATCH_AND_GOTO(exception)                     \
     catch(const chemfiles::exception& e) {            \
         status.last_error = std::string(e.what());    \
-        Logger::log(LogLevel::ERROR, e.what());       \
+        Logger::error(e.what());       \
         goto error;                                   \
     }
 

@@ -31,19 +31,19 @@ static bool is_valid(const NcFile& ncfile_, size_t natoms){
 
     if (ncfile_.global_attribute("Conventions") != "AMBER"){
         if (!writing)
-            Logger::log(LogLevel::ERROR, "We can only read AMBER convention NetCDF files.");
+            Logger::error("We can only read AMBER convention NetCDF files.");
         return false;
     }
 
     if (ncfile_.global_attribute("ConventionVersion") != "1.0"){
         if (!writing)
-            Logger::log(LogLevel::ERROR, "We can only read version 1.0 of AMBER convention NetCDF files.");
+            Logger::error("We can only read version 1.0 of AMBER convention NetCDF files.");
         return false;
     }
 
     if (ncfile_.dimension("spatial") != 3){
         if (!writing)
-            Logger::log(LogLevel::ERROR,
+            Logger::error(
                 "Wrong size for spatial dimension. Should be 3, is " +
                 std::to_string(ncfile_.dimension("spatial")) + ".");
         return false;
@@ -51,7 +51,7 @@ static bool is_valid(const NcFile& ncfile_, size_t natoms){
 
     if (writing) {
         if (ncfile_.dimension("atom") != natoms){
-            Logger::log(LogLevel::ERROR,
+            Logger::error(
                 "Wrong size for atoms dimension. Should be " + std::to_string(natoms) +
                 ", is " + std::to_string(ncfile_.dimension("atom")) + ".");
         return false;
