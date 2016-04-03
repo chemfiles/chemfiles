@@ -9,6 +9,7 @@
 #include "chemfiles/Error.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/formats/XYZ.hpp"
+#include "chemfiles/formats/PDB.hpp"
 #include "chemfiles/formats/NcFormat.hpp"
 #include "chemfiles/formats/Molfile.hpp"
 
@@ -38,13 +39,13 @@ void registration(trajectory_map_t& formats, trajectory_map_t& extensions) {
 
 TrajectoryFactory::TrajectoryFactory() : formats_(), extensions_() {
     registration<XYZFormat>(formats_, extensions_);
+    registration<PDBFormat>(formats_, extensions_);
 
 #if HAVE_NETCDF
     registration<NCFormat>(formats_, extensions_);
 #endif
 
     // Molfile-based formats
-    registration<Molfile<PDB>>(formats_, extensions_);
     registration<Molfile<DCD>>(formats_, extensions_);
     registration<Molfile<GRO>>(formats_, extensions_);
     registration<Molfile<TRR>>(formats_, extensions_);

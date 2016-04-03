@@ -29,7 +29,6 @@ class Topology;
  * plugins, please see: http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/
  */
 enum MolfileFormat {
-    PDB, ///< PDB file format
     DCD, ///< DCD binary file format
     GRO, ///< Gromacs .gro file format
     TRR, ///< Gromacs .trr file format

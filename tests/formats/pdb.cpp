@@ -10,7 +10,7 @@ bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
         && (fabs(a[2] - b[2]) < eps);
 }
 
-TEST_CASE("Read files in PDB format using Molfile", "[Molfile]"){
+TEST_CASE("Read files in PDB format", "[Molfile]"){
     SECTION("Read trajectory") {
         Trajectory file(PDBDIR"water.pdb");
         Frame frame = file.read();
@@ -27,6 +27,7 @@ TEST_CASE("Read files in PDB format using Molfile", "[Molfile]"){
         file >> frame;
         file >> frame;
 
+        CHECK(frame.natoms() == 297);
         positions = frame.positions();
         CHECK(roughly(positions[0], vector3d(0.299f, 8.310f, 11.721f), 1e-4));
         CHECK(roughly(positions[296], vector3d(6.798f, 11.509f, 12.704f), 1e-4));

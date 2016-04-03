@@ -24,7 +24,6 @@ struct plugin_data_t {
 };
 
 static std::map<MolfileFormat, plugin_data_t> molfile_plugins {
-    {PDB, {"PDB", "pdbplugin", "pdb", ".pdb", false}},
     {DCD, {"DCD", "dcdplugin", "dcd", ".dcd", false}},
     {GRO, {"GRO", "gromacsplugin", "gro", ".gro", false}},
     {TRR, {"TRR", "gromacsplugin", "trr", ".trr", true}},
@@ -244,7 +243,6 @@ template<> struct VMDFunctions<FORMAT> {                                       \
 }
 
 namespace chemfiles {
-    PLUGINS_FUNCTIONS(pdbplugin, PDB);
     PLUGINS_FUNCTIONS(dcdplugin, DCD);
     PLUGINS_FUNCTIONS(gromacsplugin, GRO);
     PLUGINS_FUNCTIONS(gromacsplugin, TRR);
@@ -256,7 +254,6 @@ namespace chemfiles {
 #undef PLUGINS_FUNCTIONS
 
 
-template class chemfiles::Molfile<PDB>;
 template class chemfiles::Molfile<DCD>;
 template class chemfiles::Molfile<GRO>;
 template class chemfiles::Molfile<TRR>;
