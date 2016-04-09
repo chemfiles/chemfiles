@@ -11,13 +11,13 @@
 using namespace chemfiles;
 
 void Format::read_step(size_t, Frame&){
-    throw FormatError("Not implemented function 'read_at'");
+    throw FormatError("Operation 'read_step' is not implemented for " + description());
 }
 
 void Format::read(Frame&){
-    throw FormatError("Not implemented function 'read'");
+    throw FormatError("Operation 'read' is not implemented for " + description());
 }
 
 void Format::write(const Frame&){
-    throw FormatError("Not implemented function 'write'");
+    throw FormatError("Operation 'write' is not implemented for " + description());
 }
