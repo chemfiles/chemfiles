@@ -19,9 +19,11 @@ specify which format to use.
 +===================+============+===================+=========+=========+
 | `XYZ`_            | .xyz       | |yes| Atom names  | |yes|   | |yes|   |
 +-------------------+------------+-------------------+---------+---------+
+| `PDB`_            | .pdb       | |yes|             | |yes|   | |yes|    |
++-------------------+------------+-------------------+---------+---------+
 | `Amber NetCDF`_   | .nc        | |no|              | |yes|   | |yes|   |
 +-------------------+------------+-------------------+---------+---------+
-| `PDB`_            | .pdb       | |yes|             | |yes|   | |no|    |
+| LAMMPS            | .lammpstrj | |no|              | |yes|   | |no|   |
 +-------------------+------------+-------------------+---------+---------+
 | `GRO`_            | .gro       | |yes| Atom names  | |yes|   | |no|    |
 +-------------------+------------+-------------------+---------+---------+
@@ -35,8 +37,9 @@ specify which format to use.
 +-------------------+------------+-------------------+---------+---------+
 
 .. _XYZ: http://openbabel.org/wiki/XYZ
-.. _Amber NetCDF: http://ambermd.org/netcdf/nctraj.xhtml
 .. _PDB: http://www.rcsb.org/pdb/static.do?p=file_formats/pdb/index.html
+.. _Amber NetCDF: http://ambermd.org/netcdf/nctraj.xhtml
+
 .. _GRO: http://manual.gromacs.org/current/online/gro.html
 .. _XTC: http://manual.gromacs.org/current/online/xtc.html
 .. _TRJ: http://manual.gromacs.org/current/online/trj.html

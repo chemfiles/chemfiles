@@ -28,11 +28,11 @@
 </div>
 
 Chemfiles is a library for reading and writing molecular trajectory files.
-These files are created by your favorite theoretical chemistry program, 
-and contains informations about positions, velocities, atomic names, *etc.* 
+These files are created by your favorite theoretical chemistry program,
+and contains informations about positions, velocities, atomic names, *etc.*
 
 Running simulations produce enormous amounts of data, which has to be
-post-processed in order to extract physical informations about the simulated 
+post-processed in order to extract physical informations about the simulated
 system. Chemfiles provides an interface to access this information which is
 - **unified**: the same code will work with PDB, NetCDF and XTC trajectories;
 - **simple**: chemfiles is easy to use and extensively documented.
@@ -109,13 +109,14 @@ Chemfiles also have non goals, or explicitly refused goals:
 | Format        | Read ? | Write ? |
 | ------------- | ------ | ------- |
 | XYZ           | yes    |  yes    |
+| PDB           | yes    |  yes    |
 | Amber NetCDF  | yes    |  yes    |
 
 The following formats are supported through the VMD molfile plugins, and are read-only:
 
 | Format        | Read ? | Write ? |
 | ------------- | ------ | ------- |
-| PDB           | yes    |  no     |
+| LAMMPS        | yes    |  no     |
 | Gromacs .gro  | yes    |  no     |
 | Gromacs .xtc  | yes    |  no     |
 | Gromacs .trj  | yes    |  no     |
