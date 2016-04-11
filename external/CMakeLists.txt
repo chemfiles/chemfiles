@@ -1,23 +1,32 @@
-set(MOLFILE_FLAGS "-DSTATIC_PLUGIN")
-
+set(EXTERNAL_FLAGS "")
 if(MSVC)
-    # Do not issue warning for insecure code in Molfiles
-    set(MOLFILE_FLAGS "${MOLFILE_FLAGS} -D_CRT_SECURE_OVERLOAD_STANDARD_NAMES=1")
+    # Do not issue warning for insecure code
+    set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -D_CRT_SECURE_OVERLOAD_STANDARD_NAMES=1")
     # strcasecmp and strncasecmp are POSIX functions
-    set(MOLFILE_FLAGS "${MOLFILE_FLAGS} -Dstrcasecmp=_stricmp -Dstrncasecmp=_strnicmp")
+    set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -Dstrcasecmp=_stricmp -Dstrncasecmp=_strnicmp")
 else()
     # Disable warnings about this code
-    set(MOLFILE_FLAGS "${MOLFILE_FLAGS} -w")
+    set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -w")
 
-    if(BUILD_SHARED_LIBS)
-        set(MOLFILE_FLAGS "${MOLFILE_FLAGS} -fPIC")
+    if(${BUILD_SHARED_LIBS})
+        set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -fPIC")
     endif()
 endif()
 
 if(WIN32)
-    set(MOLFILE_FLAGS "${MOLFILE_FLAGS} -DWIN32")
+    set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -DWIN32")
 endif()
 
+# ============================================================================ #
+
+# cppformat library
+include_directories(cppformat/include)
+add_library(cppformat OBJECT cppformat/format.cpp)
+set_target_properties(cppformat PROPERTIES COMPILE_FLAGS ${EXTERNAL_FLAGS})
+
+# ============================================================================ #
+
+# VMD Molfile plugins
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/molfiles/LICENSE")
     message(STATUS "Unpacking molfiles sources")
     execute_process(
@@ -116,6 +125,7 @@ set(VMD_MOLFILE_PLUGINS_FAILED
     molfiles/src/webpdbplugin.c
 )
 
+set(MOLFILE_FLAGS "-DSTATIC_PLUGIN ${EXTERNAL_FLAGS}")
 foreach(file IN ITEMS ${VMD_MOLFILE_PLUGINS_ENABLED})
     get_filename_component(plugin ${file} NAME_WE)
     set_source_files_properties(${file} PROPERTIES COMPILE_FLAGS "-DVMDPLUGIN=${plugin} ${MOLFILE_FLAGS}")

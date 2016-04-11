@@ -10,6 +10,8 @@
 #include <algorithm>
 #include <cctype>
 
+#include "format.hpp"
+
 #include "chemfiles/formats/PDB.hpp"
 
 #include "chemfiles/Error.hpp"
@@ -234,4 +236,59 @@ Record get_record(const std::string& line) {
     } else {
         return Record::_UNKNOWN_;
     }
+}
+
+
+void PDBFormat::write(const Frame& frame) {
+    auto& cell = frame.cell();
+    fmt::print(textfile_,
+        // Do not try to guess the space group and the z value, just use the
+        // default one.
+        "CRYST1{:9.3f}{:9.3f}{:9.3f}{:7.2f}{:7.2f}{:7.2f} P 1           1\n",
+        cell.a(), cell.b(), cell.c(), cell.alpha(), cell.beta(), cell.gamma()
+    );
+
+    for (size_t i = 0; i<frame.natoms(); i++) {
+        auto& name = frame.topology()[i].name();
+        auto& pos = frame.positions()[i];
+        // Print all atoms as HETATM, because there is no way we can know if we
+        // are handling a biomolecule or not.
+        //
+        // We ignore the 'altLoc', 'resName' and 'iCode' fields, as we do not
+        // know them.
+        //
+        // 'chainID' is set to be 'X', and 'resSeq' to be the atomic number.
+        // TODO: get molecules informations, and set 'resSeq' accordingly
+        fmt::print(textfile_,
+            "HETATM{:5d}{: >4s} {:3}X{:4d} {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}{: >2s}\n",
+            i, name, "", i, pos[0], pos[1], pos[2], 0.0, 0.0, name
+        );
+    }
+
+    auto connect = std::vector<std::vector<size_t>>(frame.natoms());
+    for (auto& bond: frame.topology().bonds()) {
+        connect[bond[0]].push_back(bond[1]);
+        connect[bond[1]].push_back(bond[0]);
+    }
+
+    for (size_t i = 0; i<frame.natoms(); i++) {
+        auto connections = connect[i].size();
+        if (connections == 0) {
+            continue;
+        } else if (connections > 4) {
+            Logger::warn(
+                "PDB 'CONNECT' record can not handle more than 4 bonds, got " +
+                std::to_string(connections) + " around atom " + std::to_string(i) + "."
+            );
+        }
+
+        fmt::print(textfile_, "CONECT{:5d}", i);
+        auto last = std::min(connections, size_t(4));
+        for (size_t j = 0; j < last; j++) {
+            fmt::print(textfile_, "{:5d}", connect[i][j]);
+        }
+        fmt::print(textfile_, "\n");
+    }
+
+    fmt::print(textfile_, "END\n");
 }

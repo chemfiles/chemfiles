@@ -57,13 +57,14 @@ endif()
 add_subdirectory(external)
 
 file(GLOB_RECURSE sources src/**.cpp)
-add_library(chemfiles ${sources} $<TARGET_OBJECTS:molfiles>)
+add_library(chemfiles ${sources} $<TARGET_OBJECTS:molfiles> $<TARGET_OBJECTS:cppformat>)
 
 set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
 set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
 
 target_include_directories(chemfiles PUBLIC include)
 target_include_directories(chemfiles PUBLIC external/molfiles/include)
+target_include_directories(chemfiles PUBLIC external/cppformat)
 
 if(${ENABLE_NETCDF})
     find_package(NetCDF REQUIRED)

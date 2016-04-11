@@ -58,3 +58,66 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
         CHECK(topology.isdihedral(22, 21, 23, 33));
     }
 }
+
+TEST_CASE("Write files in PDB format", "[PDB]"){
+    const auto EXPECTED_CONTENT =
+    "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
+    "HETATM    0   A    X   0    1.000   2.000   3.000  0.00  0.00 A\n"
+    "HETATM    1   B    X   1    1.000   2.000   3.000  0.00  0.00 B\n"
+    "HETATM    2   C    X   2    1.000   2.000   3.000  0.00  0.00 C\n"
+    "HETATM    3   D    X   3    1.000   2.000   3.000  0.00  0.00 D\n"
+    "CONECT    0    1\n"
+    "CONECT    1    0\n"
+    "END\n"
+    "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
+    "HETATM    0   A    X   0    4.000   5.000   6.000  0.00  0.00 A\n"
+    "HETATM    1   B    X   1    4.000   5.000   6.000  0.00  0.00 B\n"
+    "HETATM    2   C    X   2    4.000   5.000   6.000  0.00  0.00 C\n"
+    "HETATM    3   D    X   3    4.000   5.000   6.000  0.00  0.00 D\n"
+    "HETATM    4   E    X   4    4.000   5.000   6.000  0.00  0.00 E\n"
+    "HETATM    5   F    X   5    4.000   5.000   6.000  0.00  0.00 F\n"
+    "CONECT    0    1\n"
+    "CONECT    1    0\n"
+    "CONECT    4    5\n"
+    "CONECT    5    4\n"
+    "END\n";
+
+    Topology topology;
+    topology.append(Atom("A"));
+    topology.append(Atom("B"));
+    topology.append(Atom("C"));
+    topology.append(Atom("D"));
+    topology.add_bond(0, 1);
+
+    Frame frame(topology);
+    frame.set_cell(UnitCell(22));
+
+    auto positions = frame.positions();
+    for(size_t i=0; i<4; i++)
+        positions[i] = vector3d(1, 2, 3);
+
+
+    auto file = Trajectory("test-tmp.pdb", "w");
+    file << frame;
+
+    frame.resize(6);
+    positions = frame.positions();
+    for(size_t i=0; i<6; i++)
+        positions[i] = vector3d(4, 5, 6);
+
+    topology.append(Atom("E"));
+    topology.append(Atom("F"));
+    topology.add_bond(4, 5);
+    frame.set_topology(topology);
+
+    file << frame;
+    file.sync();
+
+    std::ifstream checking("test-tmp.pdb");
+    std::string content((std::istreambuf_iterator<char>(checking)),
+                         std::istreambuf_iterator<char>());
+    checking.close();
+
+    CHECK(content == EXPECTED_CONTENT);
+    remove("test-tmp.pdb");
+}

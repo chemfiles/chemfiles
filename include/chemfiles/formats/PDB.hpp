@@ -33,6 +33,7 @@ public:
 
     virtual void read_step(const size_t step, Frame& frame) override;
     virtual void read(Frame& frame) override;
+    virtual void write(const Frame& frame) override;
     virtual std::string description() const override;
     virtual size_t nsteps() const override;
 
