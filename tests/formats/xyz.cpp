@@ -109,25 +109,31 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
     const auto expected_content =
     "4\n"
     "Written by the chemfiles library\n"
-    "X 1 2 3\n"
-    "X 1 2 3\n"
-    "X 1 2 3\n"
-    "X 1 2 3\n"
+    "A 1 2 3\n"
+    "B 1 2 3\n"
+    "C 1 2 3\n"
+    "D 1 2 3\n"
     "6\n"
     "Written by the chemfiles library\n"
-    "X 4 5 6\n"
-    "X 4 5 6\n"
-    "X 4 5 6\n"
-    "X 4 5 6\n"
-    "X 4 5 6\n"
-    "X 4 5 6\n";
+    "A 4 5 6\n"
+    "B 4 5 6\n"
+    "C 4 5 6\n"
+    "D 4 5 6\n"
+    "E 4 5 6\n"
+    "F 4 5 6\n";
 
     Array3D positions(4);
     for(size_t i=0; i<4; i++)
         positions[i] = vector3d(1, 2, 3);
 
+    Topology topology;
+    topology.append(Atom("A"));
+    topology.append(Atom("B"));
+    topology.append(Atom("C"));
+    topology.append(Atom("D"));
+
     Frame frame;
-    frame.set_topology(dummy_topology(4));
+    frame.set_topology(topology);
     frame.set_positions(positions);
 
     auto file = Trajectory("test-tmp.xyz", "w");
@@ -137,7 +143,9 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
     for(size_t i=0; i<6; i++)
         positions[i] = vector3d(4, 5, 6);
 
-    frame.set_topology(dummy_topology(6));
+    topology.append(Atom("E"));
+    topology.append(Atom("F"));
+    frame.set_topology(topology);
     frame.set_positions(positions);
 
     file << frame;
