@@ -13,12 +13,12 @@
 
 using namespace chemfiles;
 
-void Connectivity::recalculate() const{
+void Connectivity::recalculate() const {
     angles_.clear();
     dihedrals_.clear();
-    for (auto const& bond1 : bonds_){
+    for (auto const& bond1 : bonds_) {
         // Find angles
-        for (auto const& bond2 : bonds_){
+        for (auto const& bond2 : bonds_) {
             if (bond1 == bond2) continue;
             // Initializing angle to an invalid value
             Angle angle1(static_cast<size_t>(-1), static_cast<size_t>(-2), static_cast<size_t>(-3));
@@ -39,10 +39,10 @@ void Connectivity::recalculate() const{
                 continue;
             }
             // Find dihedral angles
-            for (auto const& bond3 : bonds_){
+            for (auto const& bond3 : bonds_) {
                 if (bond2 == bond3) continue;
 
-                if (angle1[2] == bond3[0] && angle1[1] != bond3[1]){
+                if (angle1[2] == bond3[0] && angle1[1] != bond3[1]) {
                     dihedrals_.emplace(angle1[0], angle1[1], angle1[2], bond3[1]);
                 } else if (angle1[0] == bond3[1] && angle1[1] != bond3[0]) {
                     dihedrals_.emplace(bond3[0], angle1[0], angle1[1], angle1[2]);
@@ -53,12 +53,6 @@ void Connectivity::recalculate() const{
         }
     }
     uptodate = true;
-}
-
-void Connectivity::clear(){
-    bonds_.clear();
-    angles_.clear();
-    dihedrals_.clear();
 }
 
 const std::unordered_set<Bond>& Connectivity::bonds() const {
@@ -79,65 +73,47 @@ const std::unordered_set<Dihedral>& Connectivity::dihedrals() const {
     return dihedrals_;
 }
 
-void Connectivity::add_bond(size_t i, size_t j){
+void Connectivity::add_bond(size_t i, size_t j) {
     uptodate = false;
     bonds_.emplace(i, j);
 }
 
-void Connectivity::remove_bond(size_t i, size_t j){
-    uptodate = false;
+void Connectivity::remove_bond(size_t i, size_t j) {
     auto pos = bonds_.find(Bond(i, j));
-    if (pos != bonds_.end()){
+    if (pos != bonds_.end()) {
+        uptodate = false;
         bonds_.erase(pos);
     }
 }
 
 /******************************************************************************/
 
-Topology::Topology(size_t natoms) {
-    resize(natoms);
-}
-
-Topology::Topology() : Topology(0) {}
-
-void Topology::append(const Atom& atom){
-    size_t index = static_cast<size_t>(-1);
-
-    for (size_t i = 0 ; i<templates_.size(); i++)
-        if (templates_[i] == atom)
-            index = i;
-    if (index == static_cast<size_t>(-1)) { // Atom not found
-        templates_.push_back(atom);
-        index = templates_.size() - 1;
-    }
-
-    atoms_.push_back(index);
+void Topology::append(const Atom& atom) {
+    atoms_.push_back(atom);
 }
 
 void Topology::remove(size_t idx) {
-    if (idx < atoms_.size())
-        atoms_.erase(begin(atoms_) + static_cast<ptrdiff_t>(idx));
+    atoms_.erase(begin(atoms_) + static_cast<ptrdiff_t>(idx));
     auto bonds = connect_.bonds();
-    for (auto& bond : bonds){
+    for (auto& bond : bonds) {
         if (bond[0] == idx || bond[1] == idx)
             connect_.remove_bond(bond[0], bond[1]);
     }
-    recalculate();
 }
 
-std::vector<Bond> Topology::bonds() const{
+std::vector<Bond> Topology::bonds() const {
     std::vector<Bond> res;
     res.insert(begin(res), begin(connect_.bonds()), end(connect_.bonds()));
     return res;
 }
 
-std::vector<Angle> Topology::angles() const{
+std::vector<Angle> Topology::angles() const {
     std::vector<Angle> res;
     res.insert(begin(res), begin(connect_.angles()), end(connect_.angles()));
     return res;
 }
 
-std::vector<Dihedral> Topology::dihedrals() const{
+std::vector<Dihedral> Topology::dihedrals() const {
     std::vector<Dihedral> res;
     res.insert(begin(res), begin(connect_.dihedrals()), end(connect_.dihedrals()));
     return res;
@@ -161,15 +137,9 @@ bool Topology::isdihedral(size_t i, size_t j, size_t k, size_t m) const {
     return pos != end(dihedrals);
 }
 
-void Topology::clear(){
-    templates_.clear();
-    atoms_.clear();
-    connect_.clear();
-}
-
-Topology chemfiles::dummy_topology(size_t natoms){
-    Topology top(0);
+Topology chemfiles::dummy_topology(size_t natoms) {
+    Topology topology;
     for (size_t i=0; i<natoms; i++)
-        top.append(Atom(Atom::UNDEFINED));
-    return top;
+        topology.append(Atom(Atom::UNDEFINED));
+    return topology;
 }

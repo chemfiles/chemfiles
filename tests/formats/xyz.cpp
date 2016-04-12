@@ -35,7 +35,6 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         CHECK(positions[124] == vector3d(8.57951f, 8.65712f, 8.06678f));
         // Check topology
         auto topology = frame.topology();
-        CHECK(topology.natom_types() == 1);
         CHECK(topology.natoms() == 125);
         CHECK(topology[0] == Atom("He"));
     }
@@ -49,7 +48,6 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         CHECK(positions[124] == vector3d(8.57951f, 8.65712f, 8.06678f));
         // Check topology
         auto topology = frame.topology();
-        CHECK(topology.natom_types() == 1);
         CHECK(topology.natoms() == 125);
         CHECK(topology[0] == Atom("He"));
     }
@@ -61,7 +59,6 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         CHECK(positions[0] == vector3d(-0.145821f, 8.540648f, 1.090281f));
         CHECK(positions[124] == vector3d(8.446093f, 8.168162f, 9.350953f));
         auto topology = frame.topology();
-        CHECK(topology.natom_types() == 1);
         CHECK(topology.natoms() == 125);
         CHECK(topology[0] == Atom("He"));
 

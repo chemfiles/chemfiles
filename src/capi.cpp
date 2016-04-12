@@ -277,10 +277,10 @@ int chfl_frame_set_step(CHFL_FRAME* frame, size_t step) {
     )
 }
 
-int chfl_frame_guess_topology(CHFL_FRAME* frame, bool bonds){
+int chfl_frame_guess_topology(CHFL_FRAME* frame){
     assert(frame != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        frame->guess_topology(bonds);
+        frame->guess_topology();
     )
 }
 

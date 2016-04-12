@@ -42,14 +42,7 @@ void Frame::resize(size_t size){
     }
 }
 
-void Frame::guess_topology(bool please_guess_bonds) {
-    if (please_guess_bonds) {
-        guess_bonds();
-    }
-    topology_.recalculate();
-}
-
-void Frame::guess_bonds() {
+void Frame::guess_topology() {
     topology_.clear_bonds();
     // This bond guessing algorithm comes from VMD
     double cutoff = 0.833;

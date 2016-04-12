@@ -127,8 +127,6 @@ public:
     Connectivity() = default;
     //! Recalculate the angles and the dihedrals from the bond list
     void recalculate() const;
-    //! Clear all the content
-    void clear();
     //! Access the underlying data
     const std::unordered_set<Bond>& bonds() const;
     const std::unordered_set<Angle>& angles() const;
@@ -157,17 +155,17 @@ private:
  */
 class CHFL_EXPORT Topology {
 public:
-    //! Construct a topology with capacity for \c natoms atoms.
-    explicit Topology(size_t natoms);
     //! Construct an empty topology
-    Topology();
+    Topology() {}
     Topology(const Topology &) = default;
     Topology& operator=(const Topology &) = default;
+    Topology(Topology &&) = default;
+    Topology& operator=(Topology &&) = default;
 
     //! Get a reference to the atom at the position \c index
-    Atom& operator[](size_t index) {return templates_[atoms_[index]];}
+    Atom& operator[](size_t index) {return atoms_[index];}
     //! Get a const (non-modifiable) reference to the atom at the position \c index
-    const Atom& operator[](size_t index) const {return templates_[atoms_[index]];}
+    const Atom& operator[](size_t index) const {return atoms_[index];}
 
     //! Add an atom in the system
     void append(const Atom& _atom);
@@ -184,15 +182,6 @@ public:
 
     //! Get the number of atoms in the topology
     size_t natoms() const {return atoms_.size();}
-    //! Get the number of atom types in the topology
-    size_t natom_types() const {return templates_.size();}
-    //! Reserve space for \c natoms in the topology
-    void resize(size_t natoms) {atoms_.resize(natoms);}
-    //! Clear the topology: this remove all atoms and all bonds, angles and dihedrals
-    void clear();
-
-    //! Clear the bonds (angles and dihedrals too) in the topology
-    void clear_bonds() {connect_.clear();}
 
     //! Check wether the atoms at indexes \c i and \c j are bonded or not
     bool isbond(size_t i, size_t j) const;
@@ -209,15 +198,11 @@ public:
     //! Get the dihedral angles in the system
     std::vector<Dihedral> dihedrals() const;
 
-    //! Recalculate the angles and dihedrals list from the bond list.
-    void recalculate() {connect_.recalculate();}
+    //! Remove all bonding information in the topology (bonds, angles and dihedrals)
+    void clear_bonds() {connect_ = Connectivity();}
 private:
-    //! Internal list of particle templates. If the same particle can be found
-    //! more than one in a topology, the Atom class will have only one instance,
-    //! pointing to this vector.
-    std::vector<Atom> templates_;
-    //! Internal list of atoms. The index refers to the templates_ list
-    std::vector<size_t> atoms_;
+    //! Atoms in the system.
+    std::vector<Atom> atoms_;
     //! Connectivity of the system. All the indices refers to the atoms in \c atoms_
     Connectivity connect_;
 };

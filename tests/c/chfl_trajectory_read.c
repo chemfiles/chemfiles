@@ -84,7 +84,7 @@ int main(){
     assert(!chfl_atom_free(atom));
 
     // Guess the system topology
-    assert(!chfl_frame_guess_topology(frame, true));
+    assert(!chfl_frame_guess_topology(frame));
     topology = chfl_topology_from_frame(frame);
     assert(!chfl_topology_bonds_count(topology, &n));
     assert(n == 181);

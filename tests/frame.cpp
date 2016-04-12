@@ -20,11 +20,6 @@ TEST_CASE("Frame class usage", "[Frame]"){
         frame.set_cell(UnitCell(10));
         CHECK(frame.cell().type() == UnitCell::ORTHOROMBIC);
 
-        // We already have dummy atoms in the topology
-        CHECK(frame.topology().natom_types() == 1);
-        frame.topology().append(Atom("H"));
-        CHECK(frame.topology().natom_types() == 2);
-
         frame.resize(15);
         CHECK(frame.natoms() == 15);
         // No velocity data yet

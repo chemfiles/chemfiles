@@ -4,6 +4,9 @@
 * Molfiles plugins are now incorporated in the chemfiles library, and no longer
   distributed as shared libraries. The `CHEMFILES_PLUGINS` environment variable
   is a no-op.
+* The caching of angles and dihedrals is now an implementation detail. That
+  means that `Topology::recalculate` is gone, and that `Frame::guess_topology`
+  and `chfl_frame_guess_topology` do not take a boolean parameter anymore.
 
 # 0.5 (19 Feb 2016)
 

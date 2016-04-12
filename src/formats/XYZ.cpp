@@ -83,7 +83,7 @@ void XYZFormat::read(Frame& frame){
         throw FormatError("Can not read file: " + string(e.what()));
     }
 
-    frame.topology().clear();
+    frame.set_topology(Topology());
     frame.resize(natoms);
 
     for (size_t i=0; i<lines.size(); i++) {

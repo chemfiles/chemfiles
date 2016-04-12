@@ -353,14 +353,14 @@ CHFL_EXPORT int chfl_frame_step(const CHFL_FRAME* frame, size_t* step);
 CHFL_EXPORT int chfl_frame_set_step(CHFL_FRAME* frame, size_t step);
 
 /*!
-* @brief Try to guess the bonds, angles and dihedrals in the system. If \c bonds
-*        is true, guess everything; else only guess the angles and dihedrals from
-*        the topology bond list.
+* @brief  Guess the bonds, angles and dihedrals in the system. The bonds are guessed
+*         using a distance-based algorithm, and then angles and dihedrals are guessed
+*         from the bonds.
+*
 * @param frame The Frame to analyse
-* @param bonds Should we recompute the bonds from the positions or not ?
 * @return The status code
 */
-CHFL_EXPORT int chfl_frame_guess_topology(CHFL_FRAME* frame, bool bonds);
+CHFL_EXPORT int chfl_frame_guess_topology(CHFL_FRAME* frame);
 
 /*!
 * @brief Select atoms in a frame, from a specific selection string.

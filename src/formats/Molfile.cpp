@@ -220,7 +220,6 @@ void Molfile<F>::read_topology() const {
         topology_->add_bond(static_cast<size_t>(from[i] - 1),
                            static_cast<size_t>(to[i]) - 1);
     }
-    topology_->recalculate();
 }
 
 template <MolfileFormat F> const char* Molfile<F>::name() {
