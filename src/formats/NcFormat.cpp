@@ -60,7 +60,7 @@ static bool is_valid(const NcFile& ncfile_, size_t natoms){
     return true;
 }
 
-NCFormat::NCFormat(File& file) : Format(file), ncfile_(static_cast<NcFile&>(file)), step_(0), validated_(false) {
+NCFormat::NCFormat(File& file) : Format(file), ncfile_(dynamic_cast<NcFile&>(file)), step_(0), validated_(false) {
     if (ncfile_.mode() == "r" || ncfile_.mode() == "a") {
         if (!is_valid(ncfile_, static_cast<size_t>(-1))) {
             throw FormatError("Invalid AMBER NetCDF file " + file.filename());
