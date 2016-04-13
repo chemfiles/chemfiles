@@ -15,6 +15,8 @@
 #include <cmath>
 #include <cassert>
 
+#include "span.hpp"
+
 namespace chemfiles {
 
 typedef std::array<float, 3> Vector3D;
@@ -82,10 +84,17 @@ inline Vector3D operator/(const Vector3D& lhs, float rhs){
 }
 
 // As `std::array<float, 3>` (i.e. Vector3D) is POD, its memory layout is
-// equivalent to a `float[3]` array. So the pointer return by
-// `std::vector<Vector3D>::data` is compatible with the C type `(*float)[3]`
+// equivalent to a `float[3]` array. So the pointer return by `Array3D::data`
+// is compatible with the C type `(*float)[3]`.
+
+//! A vector of `Vector3D`, used as a list of positions or velocities in a
+//! system.
 using Array3D = std::vector<Vector3D>;
 
+//! A Span3D is a view into an array of `Vector3D`, usually an `Array3D`. This
+//! view can mutate the memory and modify the `Vector3D`, but not change the
+//! size of the array.
+using Span3D = span<Vector3D>;
 } // namespace chemfiles
 
 #endif

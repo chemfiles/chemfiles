@@ -69,15 +69,12 @@ TEST_CASE("Read files in NetCDF format", "[Amber NetCDF]"){
 TEST_CASE("Write files in NetCDF format", "[Amber NetCDF]"){
     SECTION("Write the file") {
         Trajectory file("tmp.nc", "w");
-
-        Array3D positions(4);
+        Frame frame(4);
+        auto positions = frame.positions();
         for(size_t i=0; i<4; i++)
             positions[i] = vector3d(1, 2, 3);
 
-        Frame frame;
         frame.set_topology(dummy_topology(4));
-        frame.set_positions(positions);
-
         file << frame;
     }
 

@@ -78,15 +78,11 @@ void NCFormat::read_step(const size_t step, Frame& frame){
     step_ = step;
     frame.set_cell(read_cell());
 
-    auto& positions = frame.positions();
-    read_array3D(positions, "coordinates");
-
+    frame.resize(ncfile_.dimension("atom"));
+    read_array3D(frame.positions(), "coordinates");
     if (ncfile_.variable_exists("velocities")) {
-        auto& velocities = frame.velocities();
-        if (!velocities) {
-            velocities = Array3D();
-        }
-        read_array3D(*velocities, "velocities");
+        frame.add_velocities();
+        read_array3D(*frame.velocities(), "velocities");
     }
 }
 
@@ -118,15 +114,15 @@ UnitCell NCFormat::read_cell() const {
     return UnitCell(length[0], length[1], length[2], angles[0], angles[1], angles[2]);
 }
 
-void NCFormat::read_array3D(Array3D& array, const string& name) const{
+void NCFormat::read_array3D(Span3D array, const string& name) const{
     auto array_var = ncfile_.variable<float>(name);
     auto natoms = ncfile_.dimension("atom");
+    assert(array.size() == natoms);
 
     std::vector<size_t> start{step_, 0, 0};
     std::vector<size_t> count{1, natoms, 3};
     auto data = array_var.get(start, count);
 
-    array.resize(natoms);
     for (size_t i=0; i<natoms; i++) {
         array[i][0] = data[3*i + 0];
         array[i][1] = data[3*i + 1];
@@ -184,7 +180,7 @@ void NCFormat::write(const Frame& frame) {
     }
     write_cell(frame.cell());
     write_array3D(frame.positions(), "coordinates");
-    auto& velocities = frame.velocities();
+    auto velocities = frame.velocities();
     if (velocities) {
         write_array3D(*velocities, "velocities");
     }

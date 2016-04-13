@@ -134,7 +134,7 @@ std::vector<Bool> PositionExpr::evaluate(const Frame& frame) const {
     auto res = std::vector<Bool>(frame.natoms(), false);
     auto compare = binop_comparison<double>(op_);
     auto j = coord_.as_index();
-    auto positions = frame.positions();
+    auto& positions = frame.positions();
     for (size_t i=0; i<frame.natoms(); i++) {
         res[i] = compare(positions[i][j], val_);
     }
@@ -164,12 +164,12 @@ std::string VelocityExpr::print(unsigned) const {
 
 std::vector<Bool> VelocityExpr::evaluate(const Frame& frame) const {
     auto res = std::vector<Bool>(frame.natoms(), false);
-    if (frame.velocities()) {
+    auto velocities = frame.velocities();
+    if (velocities) {
         auto compare = binop_comparison<double>(op_);
         auto j = coord_.as_index();
-        auto velocities = *frame.velocities();
         for (size_t i=0; i<frame.natoms(); i++) {
-            res[i] = compare(velocities[i][j], val_);
+            res[i] = compare((*velocities)[i][j], val_);
         }
     }
     return res;

@@ -182,6 +182,9 @@ public:
 
     //! Get the number of atoms in the topology
     size_t natoms() const {return atoms_.size();}
+    //! Resize the topology to hold `natoms` atoms, adding `UNDEFINED` atoms
+    //! as needed.
+    void resize(size_t natoms);
 
     //! Check wether the atoms at indexes \c i and \c j are bonded or not
     bool isbond(size_t i, size_t j) const;

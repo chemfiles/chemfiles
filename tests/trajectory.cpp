@@ -55,14 +55,11 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
 
         Trajectory file("tmp.xyz", "w");
 
-        Array3D positions(5);
+        Frame frame(5);
+        auto positions = frame.positions();
         for(size_t i=0; i<5; i++) {
             positions[i] = vector3d(1, 2, 3);
         }
-
-        Frame frame;
-        frame.set_positions(positions);
-        frame.set_topology(dummy_topology(5));
 
         Topology top;
         for (size_t i=0; i<5; i++)

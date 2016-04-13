@@ -8,7 +8,7 @@ TEST_CASE("Frame class usage", "[Frame]"){
     auto frame = Frame(10);
 
     SECTION("Contructor"){
-        CHECK(frame.positions().capacity() == 10);
+        CHECK(frame.positions().size() == 10);
         CHECK(frame.cell().type() == UnitCell::INFINITE);
     }
 
@@ -25,7 +25,7 @@ TEST_CASE("Frame class usage", "[Frame]"){
         // No velocity data yet
         CHECK_FALSE(frame.velocities());
 
-        frame.velocities() = Array3D(15);
+        frame.add_velocities();
         CHECK(frame.velocities());
 
         frame.positions()[0] = vector3d(1, 2, 3);
@@ -34,16 +34,17 @@ TEST_CASE("Frame class usage", "[Frame]"){
         (*frame.velocities())[0] = vector3d(5, 6, 7);
         CHECK((*frame.velocities())[0] == vector3d(5, 6, 7));
 
-        Array3D data(10);
-        for (size_t i=0; i<10; i++) {
-            data[i] = vector3d(4.f, 3.4f, 1.f);
+        {
+            auto positions = frame.positions();
+            auto velocities = frame.velocities();
+            for (size_t i=0; i<15; i++) {
+                positions[i] = vector3d(4.f, 3.4f, 1.f);
+                (*velocities)[i] = vector3d(4.f, 3.4f, 1.f);
+            }
         }
-        frame.set_positions(data);
-        frame.set_velocities(data);
 
         auto positions = frame.positions();
         auto velocities = frame.velocities();
-
         for (size_t i=0; i<10; i++){
             CHECK(positions[i] == vector3d(4.f, 3.4f, 1.f));
             CHECK((*velocities)[i] == vector3d(4.f, 3.4f, 1.f));
@@ -56,7 +57,7 @@ TEST_CASE("Frame class usage", "[Frame]"){
         file >> frame;
         frame.guess_topology();
 
-        auto topology =  frame.topology();
+        auto topology = frame.topology();
         for (size_t i=1; i<5; i++){
             CHECK(topology.isbond(0, i));
         }

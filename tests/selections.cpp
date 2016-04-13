@@ -123,7 +123,7 @@ Frame testing_frame() {
         i++;
     }
 
-    frame.set_velocities(Array3D(4));
+    frame.add_velocities();
     i = 0;
     for (auto& vel: *frame.velocities()) {
         vel[0] = i + 1;

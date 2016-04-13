@@ -42,18 +42,19 @@ public:
     explicit Frame(const Topology& topology, const UnitCell& cell = UnitCell());
 
     //! Get a modifiable reference to the positions
-    Array3D& positions() {return positions_;}
+    Span3D positions() {return positions_;}
     //! Get a const (non modifiable) reference to the positions
     const Array3D& positions() const {return positions_;}
-    //! Set the positions
-    void set_positions(const Array3D& pos) {positions_ = pos;}
 
     //! Get an optional modifiable reference to the velocities
-    optional<Array3D>& velocities() {return velocities_;}
+    optional<Span3D> velocities() {
+        return velocities_ ? optional<Span3D>(as_span(*velocities_)) : optional<Span3D>(nullopt);
+    }
     //! Get an optional const (non modifiable) reference to the velocities
     const optional<Array3D>& velocities() const {return velocities_;}
-    //! Set the velocities to `vel`
-    void set_velocities(const Array3D& vel) {velocities_.emplace(vel);}
+    //! Add velocities to this frame. If velocities are already defined,
+    //! this functions does nothing.
+    void add_velocities();
 
     //! Get the number of particles in the system
     size_t natoms() const;

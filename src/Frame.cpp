@@ -20,25 +20,24 @@ Frame::Frame(const Topology& topology, const UnitCell& cell): step_(0), topology
 }
 
 size_t Frame::natoms() const {
-    if (!velocities_) {
-        return positions_.size();
+    assert(positions_.size() == topology_.natoms());
+    if (velocities_) {
+        assert(positions_.size() == velocities_->size());
     }
-
-    auto npos = positions_.size();
-    auto nvel = velocities_->size();
-
-    if (npos != nvel) {
-        Logger::warn("Inconsistent size in frame. Positions contains "
-        + std::to_string(npos) + " atoms, but velocities contains " + std::to_string(nvel) + " atoms.");
-    }
-
-    return npos;
+    return positions_.size();
 }
 
-void Frame::resize(size_t size){
+void Frame::resize(size_t size) {
+    topology_.resize(size);
     positions_.resize(size, vector3d(0.0, 0.0, 0.0));
     if (velocities_) {
         velocities_->resize(size, vector3d(0.0, 0.0, 0.0));
+    }
+}
+
+void Frame::add_velocities() {
+    if (!velocities_) {
+        velocities_ = Array3D(natoms(), vector3d(0.0, 0.0, 0.0));
     }
 }
 

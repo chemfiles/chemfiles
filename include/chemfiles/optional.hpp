@@ -1059,8 +1059,11 @@ namespace std
 # undef TR2_OPTIONAL_ASSERTED_EXPRESSION
 
 namespace chemfiles {
-	template<typename T>
-	using optional = std::experimental::optional<T>;
+	using std::experimental::optional;
+	using std::experimental::make_optional;
+
+	using nullopt_t = std::experimental::nullopt_t;
+	constexpr nullopt_t nullopt{nullopt_t::init()};
 }
 
 # endif //CHEMFILES_OPTIONAL_HPP

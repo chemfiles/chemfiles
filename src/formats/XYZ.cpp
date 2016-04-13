@@ -83,9 +83,9 @@ void XYZFormat::read(Frame& frame){
         throw FormatError("Can not read file: " + string(e.what()));
     }
 
-    frame.set_topology(Topology());
     frame.resize(natoms);
-
+    auto positions = frame.positions();
+    auto& topology = frame.topology();
     for (size_t i=0; i<lines.size(); i++) {
         std::istringstream string_stream;
         float x, y, z;
@@ -93,16 +93,16 @@ void XYZFormat::read(Frame& frame){
 
         string_stream.str(lines[i]);
         string_stream >> name >> x >> y >> z ;
-        frame.positions()[i][0] = x;
-        frame.positions()[i][1] = y;
-        frame.positions()[i][2] = z;
-        frame.topology().append(Atom(name));
+        positions[i][0] = x;
+        positions[i][1] = y;
+        positions[i][2] = z;
+        topology[i] = Atom(name);
     }
 }
 
 void XYZFormat::write(const Frame& frame){
-    const auto topology = frame.topology();
-    const auto positions = frame.positions();
+    auto& topology = frame.topology();
+    auto& positions = frame.positions();
     assert(frame.natoms() == topology.natoms());
 
     textfile_ << frame.natoms() << "\n";

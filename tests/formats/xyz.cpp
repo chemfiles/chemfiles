@@ -119,7 +119,8 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
     "E 4 5 6\n"
     "F 4 5 6\n";
 
-    Array3D positions(4);
+    Frame frame(4);
+    auto positions = frame.positions();
     for(size_t i=0; i<4; i++)
         positions[i] = vector3d(1, 2, 3);
 
@@ -128,22 +129,19 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
     topology.append(Atom("B"));
     topology.append(Atom("C"));
     topology.append(Atom("D"));
-
-    Frame frame;
     frame.set_topology(topology);
-    frame.set_positions(positions);
 
     auto file = Trajectory("test-tmp.xyz", "w");
     file << frame;
 
-    positions.resize(6);
+    frame.resize(6);
+    positions = frame.positions();
     for(size_t i=0; i<6; i++)
         positions[i] = vector3d(4, 5, 6);
 
     topology.append(Atom("E"));
     topology.append(Atom("F"));
     frame.set_topology(topology);
-    frame.set_positions(positions);
 
     file << frame;
     file.sync();

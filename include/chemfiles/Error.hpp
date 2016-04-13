@@ -35,9 +35,14 @@ struct CHFL_EXPORT FormatError : public Error {
     FormatError(const std::string& err) : Error(err) {}
 };
 
-//! @brief Exception for dynamic library loading errors
+//! @brief Exception for Molfile plugins errors
 struct CHFL_EXPORT PluginError : public Error {
     PluginError(const std::string& err) : Error(err) {}
+};
+
+//! @brief Exception for bad API usage
+struct CHFL_EXPORT APIError : public Error {
+    APIError(const std::string& err) : Error(err) {}
 };
 
 //! @brief Exception for syntaxic errors in selections

@@ -51,7 +51,7 @@ private:
     UnitCell read_cell() const;
     //! Generic function to read an Array3D at the current internal step,
     //! the file is assumed to be valid.
-    void read_array3D(Array3D& arr, const string& name) const;
+    void read_array3D(Span3D arr, const string& name) const;
 
     //! Write an Array3D to the file, as a variable with the name \c name, at
     //! the current internal step.

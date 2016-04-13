@@ -199,7 +199,7 @@ int chfl_frame_positions(CHFL_FRAME* frame, float (**data)[3], size_t* size) {
     assert(data != nullptr);
     assert(size != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
-        auto& positions = frame->positions();
+        auto positions = frame->positions();
         *size = positions.size();
         *data = reinterpret_cast<float(*)[3]>(positions.data());
     )
@@ -214,7 +214,7 @@ int chfl_frame_velocities(CHFL_FRAME* frame, float (**data)[3], size_t* size) {
         return CAPIStatus::MEMORY;
     }
     CHFL_ERROR_WRAP_RETCODE(
-        auto& velocities = frame->velocities();
+        auto velocities = frame->velocities();
         *size = velocities->size();
         *data = reinterpret_cast<float(*)[3]>(velocities->data());
     )
@@ -229,12 +229,8 @@ int chfl_frame_resize(CHFL_FRAME* frame, size_t natoms) {
 
 int chfl_frame_add_velocities(CHFL_FRAME* frame) {
     assert(frame != nullptr);
-    if (frame->velocities()) {
-        return CAPIStatus::SUCCESS;
-    }
     CHFL_ERROR_WRAP_RETCODE(
-        auto natoms = frame->natoms();
-        frame->velocities() = Array3D(natoms);
+        frame->add_velocities();
     )
 }
 
