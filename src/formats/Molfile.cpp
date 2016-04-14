@@ -118,6 +118,7 @@ void Molfile<F>::read(Frame& frame){
     }
 
     if (topology_){
+        frame.resize(topology_->natoms());
         frame.set_topology(*topology_);
     }
     molfile_to_frame(timestep, frame);

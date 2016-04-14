@@ -85,6 +85,8 @@ int main() {
     CHFL_ATOM* Ar = chfl_atom("Ar");
     assert(!chfl_topology_append(top, Zn));
     assert(!chfl_topology_append(top, Ar));
+    assert(!chfl_topology_append(top, Zn));
+    assert(!chfl_topology_append(top, Ar));
 
     assert(!chfl_frame_set_topology(frame, top));
     chfl_topology_free(top);

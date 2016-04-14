@@ -90,3 +90,14 @@ void Frame::guess_topology() {
         topology_.remove_bond(bond[0], bond[1]);
     }
 }
+
+void Frame::set_topology(const Topology& topology) {
+    if (topology.natoms() != positions_.size()) {
+        throw APIError(
+            "Error: the topology contains " + std::to_string(topology.natoms()) +
+            " atoms, but the frame contains " + std::to_string(positions_.size()) +
+            " atoms."
+        );
+    }
+    topology_ = topology;
+}

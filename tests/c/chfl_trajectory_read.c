@@ -95,7 +95,7 @@ int main(){
     // Set the topology associated with a trajectory by hand
     topology = chfl_topology();
     atom = chfl_atom("Cs");
-    for (unsigned i=0; i<3; i++)
+    for (unsigned i=0; i<297; i++)
         assert(!chfl_topology_append(topology, atom));
 
     assert(!chfl_trajectory_set_topology(file, topology));
@@ -107,6 +107,9 @@ int main(){
     assert(!chfl_atom_name(atom, name, sizeof(name)));
     assert(strcmp(name, "Cs") == 0);
     assert(!chfl_atom_free(atom));
+
+    assert(!chfl_trajectory_close(file));
+    file = chfl_trajectory_open(DATADIR "trajectory.xyz", "r");
 
     // Set the topology associated with a trajectory from a file
     assert(!chfl_trajectory_set_topology_file(file, DATADIR "topology.xyz"));
