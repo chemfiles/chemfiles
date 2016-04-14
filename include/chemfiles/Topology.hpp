@@ -143,7 +143,7 @@ private:
     //! Dihedral angles in the system
     mutable std::unordered_set<Dihedral> dihedrals_;
     //! Is the cached content up to date ?
-    mutable bool uptodate;
+    mutable bool uptodate = false;
 };
 
 /*! @class Topology Topology.hpp Topology.cpp
