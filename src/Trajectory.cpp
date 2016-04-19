@@ -45,7 +45,9 @@ Trajectory::Trajectory(const string& filename, const string& mode, const string&
         nsteps_ = format_->nsteps();
 }
 
-Trajectory::~Trajectory(){}
+Trajectory::~Trajectory() = default;
+Trajectory::Trajectory(Trajectory&&) = default;
+Trajectory& Trajectory::operator=(Trajectory&&) = default;
 
 Trajectory& Trajectory::operator>>(Frame& frame){
     frame = read();
