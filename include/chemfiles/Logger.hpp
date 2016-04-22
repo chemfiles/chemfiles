@@ -9,9 +9,9 @@
 #ifndef CHEMFILES_LOGGING_H
 #define CHEMFILES_LOGGING_H
 
-#include <string>
 #include <fstream>
 #include <functional>
+#include <string>
 
 #include "chemfiles/exports.hpp"
 
@@ -27,6 +27,9 @@ enum class LogLevel {
     //! Logging everything and debug informations
     DEBUG = 3
 };
+
+//! Callback function type for logging the `message` at `level`
+using logging_cb_t = std::function<void(LogLevel level, const std::string& message)>;
 
 /*!
  * @class Logger Logger.hpp Logger.cpp
@@ -48,10 +51,8 @@ public:
         CALLBACK
     };
 
-    //! Callback function type for logging the `message` at `level`
-    using logging_cb = std::function<void(LogLevel level, const std::string& message)>;
-
-    //! Log a `message` if the `level` is lower than the maximal curent logging level
+    //! Log a `message` if the `level` is lower than the maximal curent logging
+    //! level
     static void log(LogLevel level, std::string message);
     //! Log `message` at error level.
     static void error(const std::string& message) {
@@ -73,7 +74,7 @@ public:
     //! Set the logging level
     static void set_level(LogLevel);
     //! Get the current logging level
-    static LogLevel level() {return instance_.level_;}
+    static LogLevel level() { return instance_.level_; }
 
     //! Make the logger output to stdout
     static void to_stdout();
@@ -81,18 +82,20 @@ public:
     static void to_stderr();
     //! Silent the logger
     static void silent();
-    //! Make the logger output to the file at `path`. The file will be created and
+    //! Make the logger output to the file at `path`. The file will be created
+    //! and
     //! overwrited if it already exists.
     static void to_file(const std::string& path);
     //! Set a callback that will be called to perform logging
-    static void callback(logging_cb);
+    static void callback(logging_cb_t);
     //! Get the current logging backend
-    static LogBackend backend() {return instance_.backend_;}
+    static LogBackend backend() { return instance_.backend_; }
 
     Logger(const Logger&) = delete;
     Logger(Logger&&) = delete;
     Logger& operator=(const Logger&) = delete;
     Logger& operator=(Logger&&) = delete;
+
 private:
     Logger();
     void write_message(LogLevel level, const std::string& message);
@@ -107,7 +110,7 @@ private:
     //! Current log file, if `backend_ == FILE`
     std::fstream logfile_;
     //! Current callback, if `backend_ == CALLBACK`
-    logging_cb callback_;
+    logging_cb_t callback_;
 };
 
 } // namespace chemfiles

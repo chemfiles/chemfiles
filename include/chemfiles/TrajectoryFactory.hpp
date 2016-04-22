@@ -9,8 +9,8 @@
 #ifndef CHEMFILES_FORMAT_FACTORY_HPP
 #define CHEMFILES_FORMAT_FACTORY_HPP
 
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
@@ -22,24 +22,32 @@ using std::unique_ptr;
 using std::string;
 
 //! Function type to create a format
-typedef unique_ptr<Format> (*format_creator_t) (File& f);
+typedef unique_ptr<Format> (*format_creator_t)(File& f);
 //! Function type to create a file
-typedef unique_ptr<File> (*file_creator_t) (const string& path, const string& mode);
+typedef unique_ptr<File> (*file_creator_t)(const string& path,
+                                           const string& mode);
 
 //! Function to create a file
 template <class file_t>
-unique_ptr<File> new_file(const string& path, const string& mode){
+unique_ptr<File> new_file(const string& path, const string& mode) {
     return unique_ptr<File>(new file_t(path, mode));
 }
 
 //! Function to create a format
-template <class format_t>
-unique_ptr<Format> new_format(File& file){
+template <class format_t> unique_ptr<Format> new_format(File& file) {
     return unique_ptr<Format>(new format_t(file));
 }
 
-#define FORMAT_EXTENSION(x) static const char* extension() {static constexpr char val[] = #x; return val;}
-#define FORMAT_NAME(x) static const char* name() {static constexpr char val[] = #x; return val;}
+#define FORMAT_EXTENSION(x)                                                    \
+    static const char* extension() {                                           \
+        static constexpr char val[] = #x;                                      \
+        return val;                                                            \
+    }
+#define FORMAT_NAME(x)                                                         \
+    static const char* name() {                                                \
+        static constexpr char val[] = #x;                                      \
+        return val;                                                            \
+    }
 
 /*!
 * @class trajectory_builder TrajectoryFactory.hpp
@@ -59,12 +67,14 @@ using trajectory_map_t = std::unordered_map<string, trajectory_builder_t>;
 * This class allow to register at compile time various Format and the associated
 * File class, giving at runtime the good format when asked politely.
 *
-* Each couple (File, Format) is represented by a trajectory_builder_t instance, and can
+* Each couple (File, Format) is represented by a trajectory_builder_t instance,
+* and can
 * be registered by an extension, or by a Format name.
 */
 class TrajectoryFactory {
 private:
     TrajectoryFactory();
+
 public:
     //! Get the instance of the TrajectoryFactory
     static TrajectoryFactory& get();
@@ -93,6 +103,7 @@ public:
     void register_format(const string& name, trajectory_builder_t tb);
     //! Register an trajectory_builder in the internal extensions list.
     void register_extension(const string& ext, trajectory_builder_t tb);
+
 private:
     //! Trajectory map associating format descriptions and readers
     trajectory_map_t formats_;

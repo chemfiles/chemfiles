@@ -13,7 +13,8 @@
 using namespace chemfiles;
 using namespace chemfiles::selections;
 
-// This intentionally does not account for other encoding or locale. Selection strings
+// This intentionally does not account for other encoding or locale. Selection
+// strings
 // should be given in ASCII or UTF-8 encoding.
 static bool is_alpha(char c) {
     return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'));
@@ -24,7 +25,8 @@ static bool is_digit(char c) {
 }
 
 static bool is_space(char c) {
-    return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v' || c == '\f');
+    return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v' ||
+            c == '\f');
 }
 
 std::ostream& operator<<(std::ostream& out, const Token& token) {
@@ -134,9 +136,10 @@ unsigned Token::precedence() const {
 static std::vector<std::string> split(const std::string& data) {
     std::string token;
     std::vector<std::string> tokens;
-    for(auto c: data) {
+    for (auto c : data) {
         if (c == '(' || c == ')') {
-            // Handle parenthese token. They may not be separated from the others tokens
+            // Handle parenthese token. They may not be separated from the
+            // others tokens
             // by spaces, so let split them manually.
             if (token.length()) {
                 tokens.emplace_back(token);
@@ -163,7 +166,7 @@ static bool is_identifier(const std::string& token) {
     if (token.length() == 0 || !is_alpha(token[0])) {
         return false;
     }
-    auto it = std::find_if_not(std::begin(token), std::end(token), [](char c){
+    auto it = std::find_if_not(std::begin(token), std::end(token), [](char c) {
         return is_alpha(c) || is_digit(c) || c == '_';
     });
     return it == std::end(token);
@@ -178,7 +181,7 @@ static bool is_number(const std::string& token) {
 
 std::vector<Token> selections::tokenize(const std::string& input) {
     auto tokens = std::vector<Token>();
-    for (auto& word: split(input)) {
+    for (auto& word : split(input)) {
         if (word == "(") {
             tokens.emplace_back(Token(Token::LPAREN));
             continue;
@@ -226,7 +229,8 @@ std::vector<Token> selections::tokenize(const std::string& input) {
                 throw LexerError("Could not parse number in: '" + word + "'");
             }
         } else {
-            throw LexerError("Could not parse '" + word + "' in selection: '" + input + "'");
+            throw LexerError("Could not parse '" + word + "' in selection: '" +
+                             input + "'");
         }
     }
     return tokens;

@@ -10,7 +10,8 @@
 #include "chemfiles/files/BasicFile.hpp"
 using namespace chemfiles;
 
-BasicFile::BasicFile(const std::string& filename, const std::string& str_mode) : TextFile(filename, str_mode) {
+BasicFile::BasicFile(const std::string& filename, const std::string& str_mode)
+    : TextFile(filename, str_mode) {
     std::ios_base::openmode mode;
     if (str_mode == "r") {
         mode = std::ios_base::in;
@@ -31,20 +32,20 @@ BasicFile::BasicFile(const std::string& filename, const std::string& str_mode) :
     rewind();
 }
 
-const std::string& BasicFile::getline(){
+const std::string& BasicFile::getline() {
     *this >> lines_[0];
     return lines_[0];
 }
 
-BasicFile& BasicFile::operator>>(std::string& line){
+BasicFile& BasicFile::operator>>(std::string& line) {
     std::getline(stream_, line);
     return *this;
 }
 
-const std::vector<std::string>& BasicFile::readlines(size_t n){
+const std::vector<std::string>& BasicFile::readlines(size_t n) {
     lines_.resize(n);
     std::string line;
-    for (size_t i=0; i<n; i++){
+    for (size_t i = 0; i < n; i++) {
         std::getline(stream_, line);
         lines_[i] = line;
     }
@@ -55,23 +56,22 @@ const std::vector<std::string>& BasicFile::readlines(size_t n){
     return lines_;
 }
 
-size_t BasicFile::nlines(){
+size_t BasicFile::nlines() {
     auto position = stream_.tellg();
     rewind();
-    size_t n = static_cast<size_t>(
-                std::count(std::istreambuf_iterator<char>(stream_),
-                           std::istreambuf_iterator<char>(),
-                           '\n'));
+    size_t n =
+        static_cast<size_t>(std::count(std::istreambuf_iterator<char>(stream_),
+                                       std::istreambuf_iterator<char>(), '\n'));
     n += 1; // The 1 is here because of the 0-based indexing in C++
     stream_.seekg(position);
     return n;
 }
 
-void BasicFile::writeline(const std::string& line){
+void BasicFile::writeline(const std::string& line) {
     *this << line;
 }
 
-void BasicFile::writelines(const std::vector<std::string>& _lines){
+void BasicFile::writelines(const std::vector<std::string>& _lines) {
     for (auto line : _lines)
         *this << line;
 }

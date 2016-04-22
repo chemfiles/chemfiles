@@ -8,8 +8,8 @@
 #include <algorithm>
 #include <cstddef>
 
-#include "chemfiles/Topology.hpp"
 #include "chemfiles/Error.hpp"
+#include "chemfiles/Topology.hpp"
 
 using namespace chemfiles;
 
@@ -19,9 +19,11 @@ void Connectivity::recalculate() const {
     for (auto const& bond1 : bonds_) {
         // Find angles
         for (auto const& bond2 : bonds_) {
-            if (bond1 == bond2) continue;
+            if (bond1 == bond2)
+                continue;
             // Initializing angle to an invalid value
-            Angle angle1(static_cast<size_t>(-1), static_cast<size_t>(-2), static_cast<size_t>(-3));
+            Angle angle1(static_cast<size_t>(-1), static_cast<size_t>(-2),
+                         static_cast<size_t>(-3));
             if (bond1[0] == bond2[1]) {
                 angle1 = Angle(bond2[0], bond2[1], bond1[1]);
                 angles_.insert(angle1);
@@ -40,12 +42,15 @@ void Connectivity::recalculate() const {
             }
             // Find dihedral angles
             for (auto const& bond3 : bonds_) {
-                if (bond2 == bond3) continue;
+                if (bond2 == bond3)
+                    continue;
 
                 if (angle1[2] == bond3[0] && angle1[1] != bond3[1]) {
-                    dihedrals_.emplace(angle1[0], angle1[1], angle1[2], bond3[1]);
+                    dihedrals_.emplace(angle1[0], angle1[1], angle1[2],
+                                       bond3[1]);
                 } else if (angle1[0] == bond3[1] && angle1[1] != bond3[0]) {
-                    dihedrals_.emplace(bond3[0], angle1[0], angle1[1], angle1[2]);
+                    dihedrals_.emplace(bond3[0], angle1[0], angle1[1],
+                                       angle1[2]);
                 } else if (angle1[2] == bond3[0] || angle1[2] == bond3[1]) {
                     // TODO this is an improper dihedral
                 }
@@ -89,13 +94,12 @@ void Connectivity::remove_bond(size_t i, size_t j) {
 /******************************************************************************/
 
 void Topology::resize(size_t size) {
-    for (auto bond: bonds()) {
+    for (auto bond : bonds()) {
         if (bond[0] >= size || bond[1] >= size) {
             throw APIError(
                 "Can not resize the topology to " + std::to_string(size) +
                 " as there is a bond between atoms " + std::to_string(bond[0]) +
-                "-" + std::to_string(bond[1]) + "."
-            );
+                "-" + std::to_string(bond[1]) + ".");
         }
     }
     atoms_.resize(size, Atom(Atom::UNDEFINED));
@@ -128,11 +132,12 @@ std::vector<Angle> Topology::angles() const {
 
 std::vector<Dihedral> Topology::dihedrals() const {
     std::vector<Dihedral> res;
-    res.insert(begin(res), begin(connect_.dihedrals()), end(connect_.dihedrals()));
+    res.insert(begin(res), begin(connect_.dihedrals()),
+               end(connect_.dihedrals()));
     return res;
 }
 
-bool Topology::isbond(size_t i, size_t j) const  {
+bool Topology::isbond(size_t i, size_t j) const {
     auto bonds = connect_.bonds();
     auto pos = bonds.find(Bond(i, j));
     return pos != end(bonds);
@@ -152,7 +157,7 @@ bool Topology::isdihedral(size_t i, size_t j, size_t k, size_t m) const {
 
 Topology chemfiles::dummy_topology(size_t natoms) {
     Topology topology;
-    for (size_t i=0; i<natoms; i++)
+    for (size_t i = 0; i < natoms; i++)
         topology.append(Atom(Atom::UNDEFINED));
     return topology;
 }

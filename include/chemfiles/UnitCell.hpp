@@ -10,11 +10,11 @@
 #define CHEMFILES_UNIT_CELL_HPP
 
 #ifdef WIN32
-    #undef INFINITE
+#undef INFINITE
 #endif
 
-#include "chemfiles/exports.hpp"
 #include "chemfiles/Array3D.hpp"
+#include "chemfiles/exports.hpp"
 
 namespace chemfiles {
 
@@ -23,7 +23,8 @@ typedef std::array<std::array<double, 3>, 3> Matrix3D;
 
 /*!
  * @class UnitCell UnitCell.hpp UnitCell.cpp
- * @brief An UnitCell represent the box containing the atoms, and its periodicity
+ * @brief An UnitCell represent the box containing the atoms, and its
+ * periodicity
  *
  * A unit cell is fully represented by three lenghts (a, b, c); and three angles
  * (alpha, beta, gamma). The angles are stored in degrees, and the lenghts in
@@ -66,10 +67,12 @@ public:
     //! Construct a TRICLINIC unit cell of side size \c a, \c b, \c c, and cell
     //! angles \c alpha, \c beta, \c gamma
     UnitCell(double a, double b, double c, double alpha, double beta, double gamma);
-    //! Construct a cell of type \c type, with all lenghts set to 0 and all angles
+    //! Construct a cell of type \c type, with all lenghts set to 0 and all
+    //! angles
     //! set to 90°
     UnitCell(CellType type);
-    //! Construct a cell of type \c type, with all lenghts set to \c a and all angles
+    //! Construct a cell of type \c type, with all lenghts set to \c a and all
+    //! angles
     //! set to 90°
     UnitCell(CellType type, double a);
     //! Construct a cell of type \c type, with lenghts set to \c a ,\c b, \c d,
@@ -85,41 +88,43 @@ public:
     void raw_matricial(double[3][3]) const;
 
     //! Get the cell type
-    CellType type() const {return type_;}
+    CellType type() const { return type_; }
     //! Set the cell type to t
     void type(CellType t);
 
     //! Get the first lenght (a) of the cell
-    double a() const {return a_;}
+    double a() const { return a_; }
     //! Set the first lenght (a) of the cell
     void set_a(double val);
     //! Get the second lenght (b) of the cell
-    double b() const {return b_;}
+    double b() const { return b_; }
     //! Set the second lenght (b) of the cell
     void set_b(double val);
     //! Get the third lenght (c) of the cell
-    double c() const {return c_;}
+    double c() const { return c_; }
     //! Set the third lenght (c) of the cell
     void set_c(double val);
 
     //! Get the first angle (alpha) of the cell
-    double alpha() const {return alpha_;}
+    double alpha() const { return alpha_; }
     //! Set the first angle (alpha) of the cell if possible
     void set_alpha(double val);
     //! Get the second angle (beta) of the cell
-    double beta() const {return beta_;}
+    double beta() const { return beta_; }
     //! Set the second angle (beta) of the cell if possible
     void set_beta(double val);
     //! Get the third angle (gamma) of the cell
-    double gamma() const {return gamma_;}
+    double gamma() const { return gamma_; }
     //! Set the third angle (gamma) of the cell if possible
     void set_gamma(double val);
 
     //! Get the unit cell volume
     double volume() const;
 
-    //! Wrap the vector \c vect in the unit cell, using periodic boundary conditions.
+    //! Wrap the vector \c vect in the unit cell, using periodic boundary
+    //! conditions.
     Vector3D wrap(const Vector3D& vect) const;
+
 private:
     //! Cell lenghts
     double a_, b_, c_;
@@ -133,8 +138,12 @@ inline bool operator==(const UnitCell& rhs, const UnitCell& lhs) {
     if (lhs.type() != rhs.type())
         return false;
 
-    return rhs.a() == lhs.a() && rhs.b() == lhs.b() && rhs.c() == lhs.c() &&
-           rhs.alpha() == lhs.alpha() && rhs.beta() == lhs.beta() && rhs.gamma() == lhs.gamma();
+    return rhs.a() == lhs.a() &&
+           rhs.b() == lhs.b() &&
+           rhs.c() == lhs.c() &&
+           rhs.alpha() == lhs.alpha() &&
+           rhs.beta() == lhs.beta() &&
+           rhs.gamma() == lhs.gamma();
 }
 
 } // namespace chemfiles

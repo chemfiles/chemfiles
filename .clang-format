@@ -1,0 +1,16 @@
+---
+BasedOnStyle: LLVM
+Language: Cpp
+IndentWidth: 4
+AccessModifierOffset: -4
+TabWidth: 4
+UseTab: Never
+AllowShortFunctionsOnASingleLine: Inline
+PointerAlignment: Left
+ReflowComments:    true
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesInParentheses: false
+BinPackParameters: false
+
+DisableFormat: true

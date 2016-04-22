@@ -14,6 +14,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+// clang-format off
 #include <iostream>
 
 #ifndef SPAN_HPP
@@ -274,3 +275,4 @@ span<typename Cont::value_type> as_span(Cont & cont) {
 } // namespace chemfiles
 
 #endif
+// clang-format on

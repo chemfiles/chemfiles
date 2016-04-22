@@ -12,8 +12,8 @@
 namespace chemfiles {
 
 //! Because the standard spacialization `std::vector<bool>` is optimized for
-//! space requirements and hard to work with, chemfiles uses a small wrapper around the
-//! `bool` type, the `Bool` class.
+//! space requirements and hard to work with, chemfiles uses a small wrapper
+//! around the  `bool` type, the `Bool` class.
 class Bool {
 public:
     Bool() noexcept = default;
@@ -22,12 +22,13 @@ public:
     Bool& operator=(const Bool& other) noexcept = default;
     Bool& operator=(Bool&& other) noexcept = default;
 
-    //! Construct a `Bool` from a given `bool` value 
-    Bool(bool value): value_(value) {}
+    //! Construct a `Bool` from a given `bool` value
+    Bool(bool value) : value_(value) {}
     //! Negate this boolean
-    bool operator!() const {return !value_;}
+    bool operator!() const { return !value_; }
     //! Convert this boolean to the `bool` standard type
-    operator bool() const {return value_;}
+    operator bool() const { return value_; }
+
 private:
     bool value_;
 };

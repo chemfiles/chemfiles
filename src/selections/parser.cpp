@@ -5,12 +5,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
  */
-#include <stack>
 #include <algorithm>
+#include <stack>
 
-#include "chemfiles/selections/parser.hpp"
-#include "chemfiles/selections/expr.hpp"
 #include "chemfiles/Error.hpp"
+#include "chemfiles/selections/expr.hpp"
+#include "chemfiles/selections/parser.hpp"
 
 using namespace chemfiles;
 using namespace selections;
@@ -18,7 +18,8 @@ using namespace selections;
 /* Standard shunting-yard algorithm, as described in Wikipedia
  * https://en.wikipedia.org/wiki/Shunting-yard_algorithm
  *
- * This convert infix expressions into an AST-like expression, while checking parentheses.
+ * This convert infix expressions into an AST-like expression, while checking
+ * parentheses.
  * The following input:
  *       name == bar and x <= 56
  * is converted to:
@@ -30,7 +31,8 @@ using namespace selections;
  *       /  \        /  \
  *    name   bar    x    56
  */
-static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t end) {
+static std::vector<Token> shunting_yard(token_iterator_t token,
+                                        token_iterator_t end) {
     std::stack<Token> operators;
     std::vector<Token> output;
     while (token != end) {
@@ -40,8 +42,8 @@ static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t
             while (!operators.empty()) {
                 // All the operators are left-associative
                 if (token->precedence() <= operators.top().precedence()) {
-                     output.push_back(operators.top());
-                     operators.pop();
+                    output.push_back(operators.top());
+                    operators.pop();
                 } else {
                     break;
                 }
@@ -50,7 +52,8 @@ static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t
         } else if (token->type() == Token::LPAREN) {
             operators.push(*token);
         } else if (token->type() == Token::RPAREN) {
-            while (!operators.empty() && operators.top().type() != Token::LPAREN) {
+            while (!operators.empty() &&
+                   operators.top().type() != Token::LPAREN) {
                 output.push_back(operators.top());
                 operators.pop();
             }
@@ -63,14 +66,16 @@ static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t
         token++;
     }
     while (!operators.empty()) {
-        if (operators.top().type() == Token::LPAREN || operators.top().type() == Token::RPAREN) {
+        if (operators.top().type() == Token::LPAREN ||
+            operators.top().type() == Token::RPAREN) {
             throw ParserError("Parentheses mismatched");
         } else {
             output.push_back(operators.top());
             operators.pop();
         }
     }
-    // AST come out as reverse polish notation, let's reverse it for easier parsing after
+    // AST come out as reverse polish notation, let's reverse it for easier
+    // parsing after
     std::reverse(std::begin(output), std::end(output));
     return output;
 }
@@ -79,14 +84,16 @@ static bool have_short_form(const std::string& expr) {
     return expr == "name" || expr == "index" || expr == "mass";
 }
 
-/* Rewrite the token stream to convert short form for the expressions to the long one.
+/* Rewrite the token stream to convert short form for the expressions to the
+ * long one.
  *
- * Short forms are expressions like `name foo` or `index 3`, which are equivalent
+ * Short forms are expressions like `name foo` or `index 3`, which are
+ * equivalent
  * to `name == foo` and `index == 3`.
  */
 static std::vector<Token> clean_token_stream(std::vector<Token> stream) {
     auto out = std::vector<Token>();
-    for (auto it=stream.cbegin(); it != stream.cend(); it++) {
+    for (auto it = stream.cbegin(); it != stream.cend(); it++) {
         if (it->is_ident() && have_short_form(it->ident())) {
             auto next = it + 1;
             if (next != stream.cend() && !next->is_operator()) {
@@ -98,7 +105,8 @@ static std::vector<Token> clean_token_stream(std::vector<Token> stream) {
     return out;
 }
 
-Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t& end) {
+Ast selections::dispatch_parsing(token_iterator_t& begin,
+                                 const token_iterator_t& end) {
     if (begin->is_boolean_op()) {
         switch (begin->type()) {
         case Token::AND:
@@ -108,7 +116,8 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
         case Token::NOT:
             return parse<NotExpr>(begin, end);
         default:
-            throw std::runtime_error("Hit the default case in dispatch_parsing");
+            throw std::runtime_error(
+                "Hit the default case in dispatch_parsing");
         }
     } else if (begin->is_binary_op()) {
         if ((end - begin) < 3 || begin[2].type() != Token::IDENT) {
@@ -150,6 +159,7 @@ Ast selections::parse(std::vector<Token> token_stream) {
     const auto end = rpn.cend();
     auto ast = dispatch_parsing(begin, end);
 
-    if (begin != end) throw ParserError("Could not parse the end of the selection.");
+    if (begin != end)
+        throw ParserError("Could not parse the end of the selection.");
     return ast;
 }

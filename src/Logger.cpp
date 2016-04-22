@@ -6,10 +6,11 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#include <iostream>
-#include <cassert>
-
 #include "chemfiles/Logger.hpp"
+
+#include <cassert>
+#include <iostream>
+
 using namespace chemfiles;
 
 // Singleton instance
@@ -17,33 +18,34 @@ Logger Logger::instance_{};
 
 Logger::Logger() : level_(LogLevel::WARNING), backend_(STDERR), logfile_() {}
 
-void Logger::log(LogLevel level, std::string message){
+void Logger::log(LogLevel level, std::string message) {
     // Don't write anything if the output level is less important than
     // the current level.
-    if (level > Logger::level()) return;
+    if (level > Logger::level())
+        return;
 
     if (Logger::backend() != CALLBACK && Logger::backend() != SILENT) {
-        switch(level) {
+        switch (level) {
         case LogLevel::ERROR:
-                message = "Chemfiles error: " + message;
-                break;
-            case LogLevel::WARNING:
-                message = "Chemfiles warning: " + message;
-                break;
-            case LogLevel::INFO:
-                message = "Chemfiles info: " + message;
-                break;
-            case LogLevel::DEBUG:
-                message = "Chemfiles debug: " + message;
-                break;
+            message = "Chemfiles error: " + message;
+            break;
+        case LogLevel::WARNING:
+            message = "Chemfiles warning: " + message;
+            break;
+        case LogLevel::INFO:
+            message = "Chemfiles info: " + message;
+            break;
+        case LogLevel::DEBUG:
+            message = "Chemfiles debug: " + message;
+            break;
         }
     }
 
     instance_.write_message(level, message);
 }
 
-void Logger::write_message(LogLevel level, const std::string &message) {
-    switch(backend_) {
+void Logger::write_message(LogLevel level, const std::string& message) {
+    switch (backend_) {
     case SILENT:
         break;
     case STDOUT:
@@ -63,32 +65,32 @@ void Logger::write_message(LogLevel level, const std::string &message) {
     }
 }
 
-void Logger::set_level(LogLevel level){
+void Logger::set_level(LogLevel level) {
     instance_.level_ = level;
 }
 
-void Logger::to_stdout(){
+void Logger::to_stdout() {
     instance_.logfile_.close();
     instance_.backend_ = STDOUT;
 }
 
-void Logger::to_stderr(){
+void Logger::to_stderr() {
     instance_.logfile_.close();
     instance_.backend_ = STDERR;
 }
 
-void Logger::silent(){
+void Logger::silent() {
     instance_.logfile_.close();
     instance_.backend_ = SILENT;
 }
 
-void Logger::to_file(const std::string &filename){
+void Logger::to_file(const std::string& filename) {
     instance_.logfile_.close();
     instance_.backend_ = FILE;
     instance_.logfile_.open(filename, std::ofstream::out);
 }
 
-void Logger::callback(logging_cb function) {
+void Logger::callback(logging_cb_t function) {
     instance_.logfile_.close();
     instance_.backend_ = CALLBACK;
     instance_.callback_ = function;

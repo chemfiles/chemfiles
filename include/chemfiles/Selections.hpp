@@ -9,17 +9,17 @@
 #ifndef CHFL_SELECTION_HPP
 #define CHFL_SELECTION_HPP
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/bool.hpp"
 
 namespace chemfiles {
-    namespace selections {
-        class Expr;
-        typedef std::unique_ptr<Expr> Ast;
-    }
+namespace selections {
+    class Expr;
+    typedef std::unique_ptr<Expr> Ast;
+}
 
 /*!
 * @class Selection Selections.hpp Selections.cpp
@@ -53,8 +53,8 @@ namespace chemfiles {
 * elided and implicitly `==`. These selections are `name`, `index` and `mass`.
 * So `name O or index 234` is equivalent to `name == O or index == 234`.
 *
-* Two other special operation are the `all` and `none` selection, matching respectively
-* all and none of the atoms in the frame.
+* Two other special operation are the `all` and `none` selection, matching
+* respectively all and none of the atoms in the frame.
 */
 class CHFL_EXPORT Selection {
 public:
@@ -75,6 +75,7 @@ public:
     //! vector of size `Frame::natoms()`, containing `true` at the index `i` if
     //! the atom at index `i` matches the selection, and `false` otherwise.
     std::vector<Bool> evaluate(const Frame& frame) const;
+
 private:
     std::string selection_;
     selections::Ast ast_;

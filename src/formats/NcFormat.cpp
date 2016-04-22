@@ -11,8 +11,8 @@
 #include "chemfiles/formats/NcFormat.hpp"
 
 #include "chemfiles/Error.hpp"
-#include "chemfiles/Logger.hpp"
 #include "chemfiles/Frame.hpp"
+#include "chemfiles/Logger.hpp"
 #include "chemfiles/files/NcFile.hpp"
 using namespace chemfiles;
 
@@ -21,7 +21,7 @@ std::string NCFormat::description() const {
 }
 
 //! Check the validity of a NetCDF file
-static bool is_valid(const NcFile& ncfile_, size_t natoms){
+static bool is_valid(const NcFile& ncfile_, size_t natoms) {
     bool writing;
     if (natoms == static_cast<size_t>(-1)) {
         writing = false;
@@ -29,38 +29,40 @@ static bool is_valid(const NcFile& ncfile_, size_t natoms){
         writing = true;
     }
 
-    if (ncfile_.global_attribute("Conventions") != "AMBER"){
+    if (ncfile_.global_attribute("Conventions") != "AMBER") {
         if (!writing)
             Logger::error("We can only read AMBER convention NetCDF files.");
         return false;
     }
 
-    if (ncfile_.global_attribute("ConventionVersion") != "1.0"){
+    if (ncfile_.global_attribute("ConventionVersion") != "1.0") {
         if (!writing)
-            Logger::error("We can only read version 1.0 of AMBER convention NetCDF files.");
+            Logger::error("We can only read version 1.0 of AMBER convention "
+                          "NetCDF files.");
         return false;
     }
 
-    if (ncfile_.dimension("spatial") != 3){
+    if (ncfile_.dimension("spatial") != 3) {
         if (!writing)
-            Logger::error(
-                "Wrong size for spatial dimension. Should be 3, is " +
-                std::to_string(ncfile_.dimension("spatial")) + ".");
+            Logger::error("Wrong size for spatial dimension. Should be 3, is " +
+                          std::to_string(ncfile_.dimension("spatial")) + ".");
         return false;
     }
 
     if (writing) {
-        if (ncfile_.dimension("atom") != natoms){
-            Logger::error(
-                "Wrong size for atoms dimension. Should be " + std::to_string(natoms) +
-                ", is " + std::to_string(ncfile_.dimension("atom")) + ".");
-        return false;
+        if (ncfile_.dimension("atom") != natoms) {
+            Logger::error("Wrong size for atoms dimension. Should be " +
+                          std::to_string(natoms) + ", is " +
+                          std::to_string(ncfile_.dimension("atom")) + ".");
+            return false;
         }
     }
     return true;
 }
 
-NCFormat::NCFormat(File& file) : Format(file), ncfile_(dynamic_cast<NcFile&>(file)), step_(0), validated_(false) {
+NCFormat::NCFormat(File& file)
+    : Format(file), ncfile_(dynamic_cast<NcFile&>(file)), step_(0),
+      validated_(false) {
     if (ncfile_.mode() == "r" || ncfile_.mode() == "a") {
         if (!is_valid(ncfile_, static_cast<size_t>(-1))) {
             throw FormatError("Invalid AMBER NetCDF file " + file.filename());
@@ -73,7 +75,7 @@ size_t NCFormat::nsteps() {
     return static_cast<size_t>(ncfile_.dimension("frame"));
 }
 
-void NCFormat::read_step(const size_t step, Frame& frame){
+void NCFormat::read_step(const size_t step, Frame& frame) {
     // Set the internal step_ before further reading
     step_ = step;
     frame.set_cell(read_cell());
@@ -92,10 +94,12 @@ void NCFormat::read(Frame& frame) {
 }
 
 UnitCell NCFormat::read_cell() const {
-    if (ncfile_.dimension("cell_spatial") != 3 or ncfile_.dimension("cell_angular") != 3)
+    if (ncfile_.dimension("cell_spatial") != 3 or
+        ncfile_.dimension("cell_angular") != 3)
         return UnitCell(); // No UnitCell information
 
-    if (!ncfile_.variable_exists("cell_lengths") || !ncfile_.variable_exists("cell_angles")) {
+    if (!ncfile_.variable_exists("cell_lengths") ||
+        !ncfile_.variable_exists("cell_angles")) {
         return UnitCell(); // No UnitCell information
     }
 
@@ -111,10 +115,11 @@ UnitCell NCFormat::read_cell() const {
     assert(length.size() == 3);
     assert(angles.size() == 3);
 
-    return UnitCell(length[0], length[1], length[2], angles[0], angles[1], angles[2]);
+    return UnitCell(length[0], length[1], length[2], angles[0], angles[1],
+                    angles[2]);
 }
 
-void NCFormat::read_array3D(Span3D array, const string& name) const{
+void NCFormat::read_array3D(Span3D array, const string& name) const {
     auto array_var = ncfile_.variable<float>(name);
     auto natoms = ncfile_.dimension("atom");
     assert(array.size() == natoms);
@@ -123,15 +128,15 @@ void NCFormat::read_array3D(Span3D array, const string& name) const{
     std::vector<size_t> count{1, natoms, 3};
     auto data = array_var.get(start, count);
 
-    for (size_t i=0; i<natoms; i++) {
-        array[i][0] = data[3*i + 0];
-        array[i][1] = data[3*i + 1];
-        array[i][2] = data[3*i + 2];
+    for (size_t i = 0; i < natoms; i++) {
+        array[i][0] = data[3 * i + 0];
+        array[i][1] = data[3 * i + 1];
+        array[i][2] = data[3 * i + 2];
     }
 }
 
 // Initialize a file, assuming that it is empty
-static void initialize(NcFile& file, size_t natoms, bool with_velocities){
+static void initialize(NcFile& file, size_t natoms, bool with_velocities) {
     file.set_file_mode(NcFile::DEFINE);
 
     file.add_global_attribute("Conventions", "AMBER");
@@ -148,19 +153,24 @@ static void initialize(NcFile& file, size_t natoms, bool with_velocities){
 
     auto spatial = file.add_variable<char>("spatial", "spatial");
     auto cell_spatial = file.add_variable<char>("cell_spatial", "cell_spatial");
-    auto cell_angular = file.add_variable<char>("cell_angular", "cell_angular", "label");
+    auto cell_angular =
+        file.add_variable<char>("cell_angular", "cell_angular", "label");
 
-    auto coordinates = file.add_variable<float>("coordinates", "frame", "atom", "spatial");
+    auto coordinates =
+        file.add_variable<float>("coordinates", "frame", "atom", "spatial");
     coordinates.add_attribute("units", "angstrom");
 
-    auto cell_lenght = file.add_variable<float>("cell_lengths", "frame", "cell_spatial");
+    auto cell_lenght =
+        file.add_variable<float>("cell_lengths", "frame", "cell_spatial");
     cell_lenght.add_attribute("units", "angstrom");
 
-    auto cell_angles = file.add_variable<float>("cell_angles", "frame", "cell_angular");
+    auto cell_angles =
+        file.add_variable<float>("cell_angles", "frame", "cell_angular");
     cell_angles.add_attribute("units", "degree");
 
     if (with_velocities) {
-        auto velocities = file.add_variable<float>("velocities", "frame", "atom", "spatial");
+        auto velocities =
+            file.add_variable<float>("velocities", "frame", "atom", "spatial");
         velocities.add_attribute("units", "angstrom/picosecond");
     }
     file.set_file_mode(NcFile::DATA);
@@ -195,10 +205,10 @@ void NCFormat::write_array3D(const Array3D& arr, const string& name) const {
     std::vector<size_t> count{1, natoms, 3};
 
     auto data = std::vector<float>(natoms * 3);
-    for (size_t i=0; i<natoms; i++){
-        data[3*i + 0] = arr[i][0];
-        data[3*i + 1] = arr[i][1];
-        data[3*i + 2] = arr[i][2];
+    for (size_t i = 0; i < natoms; i++) {
+        data[3 * i + 0] = arr[i][0];
+        data[3 * i + 1] = arr[i][1];
+        data[3 * i + 2] = arr[i][2];
     }
     var.add(start, count, data);
 }
@@ -207,17 +217,13 @@ void NCFormat::write_cell(const UnitCell& cell) const {
     auto length = ncfile_.variable<float>("cell_lengths");
     auto angles = ncfile_.variable<float>("cell_angles");
 
-    auto length_data = std::vector<float>{
-        static_cast<float>(cell.a()),
-        static_cast<float>(cell.b()),
-        static_cast<float>(cell.c())
-    };
+    auto length_data = std::vector<float>{static_cast<float>(cell.a()),
+                                          static_cast<float>(cell.b()),
+                                          static_cast<float>(cell.c())};
 
-    auto angles_data = std::vector<float>{
-        static_cast<float>(cell.alpha()),
-        static_cast<float>(cell.beta()),
-        static_cast<float>(cell.gamma())
-    };
+    auto angles_data = std::vector<float>{static_cast<float>(cell.alpha()),
+                                          static_cast<float>(cell.beta()),
+                                          static_cast<float>(cell.gamma())};
 
     std::vector<size_t> start{step_, 0};
     std::vector<size_t> count{1, 3};

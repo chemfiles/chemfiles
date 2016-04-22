@@ -11,9 +11,9 @@
 
 #include "chemfiles/Error.hpp"
 
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 namespace chemfiles {
 
@@ -34,11 +34,14 @@ public:
     //! Sync any content in the underlying buffer to the disk
     virtual void sync() = 0;
     //! File name, i.e. complete path to this file on disk.
-    const std::string& filename() const {return filename_;}
+    const std::string& filename() const { return filename_; }
     //! File opening mode.
-    const std::string& mode() const {return mode_;}
+    const std::string& mode() const { return mode_; }
+
 protected:
-    File(const std::string& path, const std::string& mode) : filename_(path), mode_(mode) {}
+    File(const std::string& path, const std::string& mode)
+        : filename_(path), mode_(mode) {}
+
 private:
     const std::string filename_;
     const std::string mode_;
@@ -47,7 +50,8 @@ private:
 /*!
  * @class TextFile File.hpp File.cpp
  *
- * Abstract base class representing a text file. This class is inteded to be inherited by
+ * Abstract base class representing a text file. This class is inteded to be
+ * inherited by
  * any form of text files: compressed files, memory-mapped files, and any other.
  */
 class TextFile : public File, public std::iostream {
@@ -84,8 +88,10 @@ public:
         *this << std::string(val);
         return *this;
     }
+
 protected:
-    explicit TextFile(const std::string& path, const std::string& mode) : File(path, mode), std::iostream(nullptr) {}
+    explicit TextFile(const std::string& path, const std::string& mode)
+        : File(path, mode), std::iostream(nullptr) {}
 };
 
 /*!
@@ -100,8 +106,10 @@ protected:
 class BinaryFile : public File {
 public:
     virtual ~BinaryFile() = default;
+
 protected:
-    explicit BinaryFile(const std::string& path, const std::string& mode) : File(path, mode) {}
+    explicit BinaryFile(const std::string& path, const std::string& mode)
+        : File(path, mode) {}
 };
 
 } // namespace chemfiles

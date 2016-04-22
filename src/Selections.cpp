@@ -15,7 +15,8 @@ Selection::~Selection() = default;
 Selection::Selection(Selection&&) = default;
 Selection& Selection::operator=(Selection&&) = default;
 
-Selection::Selection(const std::string& selection) : selection_(selection), ast_(nullptr) {
+Selection::Selection(const std::string& selection)
+    : selection_(selection), ast_(nullptr) {
     auto tokens = selections::tokenize(selection_);
     ast_ = selections::parse(tokens);
 }

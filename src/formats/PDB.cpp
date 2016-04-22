@@ -5,19 +5,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-#include <sstream>
-#include <cassert>
 #include <algorithm>
+#include <cassert>
 #include <cctype>
+#include <sstream>
 
 #include "format.hpp"
 
 #include "chemfiles/formats/PDB.hpp"
 
 #include "chemfiles/Error.hpp"
-#include "chemfiles/Logger.hpp"
-#include "chemfiles/Frame.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/Logger.hpp"
 
 using namespace chemfiles;
 
@@ -48,13 +48,17 @@ enum class Record {
 // Get the record type for a line.
 static Record get_record(const std::string&);
 
-static inline std::string trim(const std::string &s) {
-   auto front = std::find_if_not(s.begin(), s.end(), [](int c){return std::isspace(c);} );
-   auto back = std::find_if_not(s.rbegin(), s.rend(), [](int c){return std::isspace(c);} ).base();
-   return (back <= front ? std::string() : std::string(front, back));
+static inline std::string trim(const std::string& s) {
+    auto front = std::find_if_not(s.begin(), s.end(),
+                                  [](int c) { return std::isspace(c); });
+    auto back = std::find_if_not(s.rbegin(), s.rend(), [](int c) {
+                    return std::isspace(c);
+                }).base();
+    return (back <= front ? std::string() : std::string(front, back));
 }
 
-PDBFormat::PDBFormat(File& f) : Format(f), textfile_(dynamic_cast<TextFile&>(file_)) {}
+PDBFormat::PDBFormat(File& f)
+    : Format(f), textfile_(dynamic_cast<TextFile&>(file_)) {}
 
 size_t PDBFormat::nsteps() {
     textfile_.rewind();
@@ -71,36 +75,36 @@ size_t PDBFormat::nsteps() {
     return n;
 }
 
-void PDBFormat::read_step(const size_t step, Frame& frame){
+void PDBFormat::read_step(const size_t step, Frame& frame) {
     textfile_.rewind();
     forward(textfile_, step);
     read(frame);
 }
 
-void PDBFormat::read(Frame& frame){
+void PDBFormat::read(Frame& frame) {
     assert(frame.natoms() == 0);
     std::string line;
     while (!textfile_.eof()) {
         line = textfile_.getline();
         auto record = get_record(line);
         switch (record) {
-            case Record::CRYST1:
-                read_cryst1(frame, line);
-                break;
-            case Record::ATOM:
-            case Record::HETATM:
-                read_atom(frame, line);
-                break;
-            case Record::CONECT:
-                read_conect(frame, line);
-                break;
-            case Record::END:
-                return; // We have read a frame!
-            case Record::_IGNORED_:
-                break; // Nothing to do
-            case Record::_UNKNOWN_:
-                Logger::warn("Unknown PDB record: " + line);
-                break;
+        case Record::CRYST1:
+            read_cryst1(frame, line);
+            break;
+        case Record::ATOM:
+        case Record::HETATM:
+            read_atom(frame, line);
+            break;
+        case Record::CONECT:
+            read_conect(frame, line);
+            break;
+        case Record::END:
+            return; // We have read a frame!
+        case Record::_IGNORED_:
+            break; // Nothing to do
+        case Record::_UNKNOWN_:
+            Logger::warn("Unknown PDB record: " + line);
+            break;
         }
     }
 }
@@ -123,10 +127,8 @@ void PDBFormat::read_cryst1(Frame& frame, const std::string& line) {
 
         auto space_group = trim(line.substr(55, 10));
         if (space_group != "P 1" && space_group != "P1") {
-            Logger::warn(
-                "Space group is not P1 (got '" + space_group + "') in '" +
-                file_.filename() + "', ignored."
-            );
+            Logger::warn("Space group is not P1 (got '" + space_group +
+                         "') in '" + file_.filename() + "', ignored.");
         }
     } catch (std::invalid_argument& e) {
         throw FormatError("Could not read CRYST1 record: '" + line + "'");
@@ -137,7 +139,8 @@ void PDBFormat::read_atom(Frame& frame, const std::string& line) {
     assert(line.substr(0, 6) == "ATOM  " || line.substr(0, 6) == "HETATM");
 
     if (line.length() < 54) {
-        throw FormatError(line.substr(0, 6) + " record is too small: '" + line + "'");
+        throw FormatError(line.substr(0, 6) + " record is too small: '" + line +
+                          "'");
     }
 
     auto i = frame.natoms();
@@ -164,18 +167,20 @@ void PDBFormat::read_conect(Frame& frame, const std::string& full_line) {
     // Helper lambdas
     auto add_bond = [&frame, &line](size_t i, size_t j) {
         if (i >= frame.natoms() || j >= frame.natoms()) {
-            Logger::warn("Bad atomic numbers in CONECT, ignored. (" + line + ")");
+            Logger::warn("Bad atomic numbers in CONECT, ignored. (" + line +
+                         ")");
             return;
         }
         frame.topology().add_bond(i, j);
     };
 
-    auto read_index = [&line] (size_t initial) -> size_t {
+    auto read_index = [&line](size_t initial) -> size_t {
         try {
             // PDB indexing is 1-based, and chemfiles is 0-based
             return std::stoul(line.substr(initial, 5)) - 1;
         } catch (std::invalid_argument& e) {
-            throw FormatError("Could not read atomic number in: '" + line + "'");
+            throw FormatError("Could not read atomic number in: '" + line +
+                              "'");
         }
     };
 
@@ -184,26 +189,34 @@ void PDBFormat::read_conect(Frame& frame, const std::string& full_line) {
     if (line.length() > 11) {
         auto j = read_index(11);
         add_bond(i, j);
-    } else { return; }
+    } else {
+        return;
+    }
 
     if (line.length() > 16) {
         auto j = read_index(16);
         add_bond(i, j);
-    } else { return; }
+    } else {
+        return;
+    }
 
     if (line.length() > 21) {
         auto j = read_index(21);
         add_bond(i, j);
-    } else { return; }
+    } else {
+        return;
+    }
 
     if (line.length() > 26) {
         auto j = read_index(26);
         add_bond(i, j);
-    } else { return; }
+    } else {
+        return;
+    }
 }
 
 void forward(TextFile& file, size_t nsteps) {
-    size_t i=0;
+    size_t i = 0;
     // Move the file pointer to the good position step by step, as the number of
     // atoms may not be constant
     std::string line;
@@ -238,17 +251,16 @@ Record get_record(const std::string& line) {
     }
 }
 
-
 void PDBFormat::write(const Frame& frame) {
     auto& cell = frame.cell();
-    fmt::print(textfile_,
+    fmt::print(
+        textfile_,
         // Do not try to guess the space group and the z value, just use the
         // default one.
         "CRYST1{:9.3f}{:9.3f}{:9.3f}{:7.2f}{:7.2f}{:7.2f} P 1           1\n",
-        cell.a(), cell.b(), cell.c(), cell.alpha(), cell.beta(), cell.gamma()
-    );
+        cell.a(), cell.b(), cell.c(), cell.alpha(), cell.beta(), cell.gamma());
 
-    for (size_t i = 0; i<frame.natoms(); i++) {
+    for (size_t i = 0; i < frame.natoms(); i++) {
         auto& name = frame.topology()[i].name();
         auto& pos = frame.positions()[i];
         // Print all atoms as HETATM, because there is no way we can know if we
@@ -259,27 +271,26 @@ void PDBFormat::write(const Frame& frame) {
         //
         // 'chainID' is set to be 'X', and 'resSeq' to be the atomic number.
         // TODO: get molecules informations, and set 'resSeq' accordingly
-        fmt::print(textfile_,
-            "HETATM{:5d}{: >4s} {:3}X{:4d} {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}{: >2s}\n",
-            i, name, "", i, pos[0], pos[1], pos[2], 0.0, 0.0, name
-        );
+        fmt::print(textfile_, "HETATM{:5d}{: >4s} {:3}X{:4d} "
+                              "{:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}{: >2s}\n",
+                   i, name, "", i, pos[0], pos[1], pos[2], 0.0, 0.0, name);
     }
 
     auto connect = std::vector<std::vector<size_t>>(frame.natoms());
-    for (auto& bond: frame.topology().bonds()) {
+    for (auto& bond : frame.topology().bonds()) {
         connect[bond[0]].push_back(bond[1]);
         connect[bond[1]].push_back(bond[0]);
     }
 
-    for (size_t i = 0; i<frame.natoms(); i++) {
+    for (size_t i = 0; i < frame.natoms(); i++) {
         auto connections = connect[i].size();
         if (connections == 0) {
             continue;
         } else if (connections > 4) {
             Logger::warn(
                 "PDB 'CONNECT' record can not handle more than 4 bonds, got " +
-                std::to_string(connections) + " around atom " + std::to_string(i) + "."
-            );
+                std::to_string(connections) + " around atom " +
+                std::to_string(i) + ".");
         }
 
         fmt::print(textfile_, "CONECT{:5d}", i);

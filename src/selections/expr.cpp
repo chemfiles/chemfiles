@@ -40,8 +40,7 @@ static std::string binop_str(BinOp op) {
 }
 
 //! Get the associated function to a binary operator for type `T`
-template<typename T>
-std::function<bool(T, T)> binop_comparison(BinOp op) {
+template <typename T> std::function<bool(T, T)> binop_comparison(BinOp op) {
     switch (op) {
     case BinOp::EQ:
         return std::equal_to<T>();
@@ -69,7 +68,8 @@ std::vector<Bool> AllExpr::evaluate(const Frame& frame) const {
     return std::vector<Bool>(frame.natoms(), true);
 }
 
-template<> Ast parse<AllExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template <>
+Ast parse<AllExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 1);
     assert(begin->is_ident());
     assert(begin->ident() == "all");
@@ -86,7 +86,8 @@ std::vector<Bool> NoneExpr::evaluate(const Frame& frame) const {
     return std::vector<Bool>(frame.natoms(), false);
 }
 
-template<> Ast parse<NoneExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template <>
+Ast parse<NoneExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 1);
     assert(begin->is_ident());
     assert(begin->ident() == "none");
@@ -106,18 +107,21 @@ std::string NameExpr::print(unsigned) const {
 std::vector<Bool> NameExpr::evaluate(const Frame& frame) const {
     auto res = std::vector<Bool>(frame.natoms(), false);
     auto topology = frame.topology();
-    for (size_t i=0; i<frame.natoms(); i++) {
+    for (size_t i = 0; i < frame.natoms(); i++) {
         res[i] = ((topology[i].name() == name_) == equals_);
     }
     return res;
 }
 
-template<> Ast parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template <>
+Ast parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
     assert(begin[2].is_ident());
     assert(begin[2].ident() == "name");
-    if (!begin[1].is_ident() || !(begin[0].type() == Token::EQ || begin[0].type() == Token::NEQ)) {
-        throw ParserError("Name selection must follow the pattern: 'name == {name} | name != {name}'");
+    if (!begin[1].is_ident() ||
+        !(begin[0].type() == Token::EQ || begin[0].type() == Token::NEQ)) {
+        throw ParserError("Name selection must follow the pattern: 'name == "
+                          "{name} | name != {name}'");
     }
     auto equals = (begin[0].type() == Token::EQ);
     auto name = begin[1].ident();
@@ -127,7 +131,8 @@ template<> Ast parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& 
 
 /****************************************************************************************/
 std::string PositionExpr::print(unsigned) const {
-    return coord_.to_string() + " " + binop_str(op_) + " " + std::to_string(val_);
+    return coord_.to_string() + " " + binop_str(op_) + " " +
+           std::to_string(val_);
 }
 
 std::vector<Bool> PositionExpr::evaluate(const Frame& frame) const {
@@ -135,22 +140,25 @@ std::vector<Bool> PositionExpr::evaluate(const Frame& frame) const {
     auto compare = binop_comparison<double>(op_);
     auto j = coord_.as_index();
     auto& positions = frame.positions();
-    for (size_t i=0; i<frame.natoms(); i++) {
+    for (size_t i = 0; i < frame.natoms(); i++) {
         res[i] = compare(positions[i][j], val_);
     }
     return res;
 }
 
-template<> Ast parse<PositionExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template <>
+Ast parse<PositionExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
     assert(begin[2].is_ident());
-    assert(begin[2].ident() == "x" || begin[2].ident() == "y" || begin[2].ident() == "z");
+    assert(begin[2].ident() == "x" || begin[2].ident() == "y" ||
+           begin[2].ident() == "z");
     assert(begin->is_binary_op());
 
     auto coord = Coordinate(begin[2].ident());
     auto op = BinOp(begin[0].type());
     if (!begin[1].is_number()) {
-        throw ParserError("Position selection can only contain number as criterium.");
+        throw ParserError(
+            "Position selection can only contain number as criterium.");
     }
     auto val = begin[1].number();
     begin += 3;
@@ -159,7 +167,8 @@ template<> Ast parse<PositionExpr>(token_iterator_t& begin, const token_iterator
 
 /****************************************************************************************/
 std::string VelocityExpr::print(unsigned) const {
-    return "v" + coord_.to_string() + " "  + binop_str(op_) + " " + std::to_string(val_);
+    return "v" + coord_.to_string() + " " + binop_str(op_) + " " +
+           std::to_string(val_);
 }
 
 std::vector<Bool> VelocityExpr::evaluate(const Frame& frame) const {
@@ -168,27 +177,31 @@ std::vector<Bool> VelocityExpr::evaluate(const Frame& frame) const {
     if (velocities) {
         auto compare = binop_comparison<double>(op_);
         auto j = coord_.as_index();
-        for (size_t i=0; i<frame.natoms(); i++) {
+        for (size_t i = 0; i < frame.natoms(); i++) {
             res[i] = compare((*velocities)[i][j], val_);
         }
     }
     return res;
 }
 
-template<> Ast parse<VelocityExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template <>
+Ast parse<VelocityExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
     assert(begin[2].is_ident());
-    assert(begin[2].ident() == "vx" || begin[2].ident() == "vy" || begin[2].ident() == "vz");
+    assert(begin[2].ident() == "vx" || begin[2].ident() == "vy" ||
+           begin[2].ident() == "vz");
     assert(begin->is_binary_op());
 
     auto coord = Coordinate(begin[2].ident().substr(1));
     auto op = BinOp(begin[0].type());
     if (!begin[1].is_number()) {
-        throw ParserError("Veclocity selection can only contain number as criterium.");
+        throw ParserError(
+            "Veclocity selection can only contain number as criterium.");
     }
     auto val = begin[1].number();
     begin += 3;
-    return Ast(new VelocityExpr(coord, op, val));;
+    return Ast(new VelocityExpr(coord, op, val));
+    ;
 }
 
 /****************************************************************************************/
@@ -199,13 +212,14 @@ std::string IndexExpr::print(unsigned) const {
 std::vector<Bool> IndexExpr::evaluate(const Frame& frame) const {
     auto res = std::vector<Bool>(frame.natoms(), false);
     auto compare = binop_comparison<size_t>(op_);
-    for (size_t i=0; i<frame.natoms(); i++) {
+    for (size_t i = 0; i < frame.natoms(); i++) {
         res[i] = compare(i, val_);
     }
     return res;
 }
 
-template<> Ast parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template <>
+Ast parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
     assert(begin[2].is_ident());
     assert(begin[2].ident() == "index");
@@ -222,7 +236,8 @@ template<> Ast parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t&
     }
     auto val = static_cast<std::size_t>(begin[1].number());
     begin += 3;
-    return Ast(new IndexExpr(op, val));;
+    return Ast(new IndexExpr(op, val));
+    ;
 }
 
 /****************************************************************************************/
@@ -234,13 +249,14 @@ std::vector<Bool> MassExpr::evaluate(const Frame& frame) const {
     auto res = std::vector<Bool>(frame.natoms(), false);
     auto compare = binop_comparison<double>(op_);
     auto topology = frame.topology();
-    for (size_t i=0; i<frame.natoms(); i++) {
+    for (size_t i = 0; i < frame.natoms(); i++) {
         res[i] = compare(topology[i].mass(), val_);
     }
     return res;
 }
 
-template<> Ast parse<MassExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template <>
+Ast parse<MassExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
     assert(begin[2].is_ident());
     assert(begin[2].ident() == "mass");
@@ -253,7 +269,8 @@ template<> Ast parse<MassExpr>(token_iterator_t& begin, const token_iterator_t& 
     auto op = BinOp(begin[0].type());
     auto val = begin[1].number();
     begin += 3;
-    return Ast(new MassExpr(op, val));;
+    return Ast(new MassExpr(op, val));
+    ;
 }
 
 /****************************************************************************************/
@@ -268,31 +285,38 @@ std::vector<Bool> AndExpr::evaluate(const Frame& frame) const {
     auto rhs = rhs_->evaluate(frame);
     assert(lhs.size() == rhs.size());
     assert(lhs.size() == frame.natoms());
-    for (size_t i=0; i<frame.natoms(); i++) {
+    for (size_t i = 0; i < frame.natoms(); i++) {
         lhs[i] = lhs[i] && rhs[i];
     }
     return lhs;
 }
 
-template<> Ast parse<AndExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template <>
+Ast parse<AndExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin[0].type() == Token::AND);
     begin += 1;
-    if (begin == end) throw ParserError("Missing right-hand side operand to 'and'");
+    if (begin == end)
+        throw ParserError("Missing right-hand side operand to 'and'");
 
     Ast rhs = nullptr;
     try {
         rhs = dispatch_parsing(begin, end);
     } catch (const ParserError& e) {
-        throw ParserError(std::string("Error in right-hand side operand to 'and': ") + e.what());
+        throw ParserError(
+            std::string("Error in right-hand side operand to 'and': ") +
+            e.what());
     }
 
-    if (begin == end) throw ParserError("Missing left-hand side operand to 'and'");
+    if (begin == end)
+        throw ParserError("Missing left-hand side operand to 'and'");
 
     Ast lhs = nullptr;
     try {
         lhs = dispatch_parsing(begin, end);
     } catch (const ParserError& e) {
-        throw ParserError(std::string("Error in left-hand side operand to 'and': ") + e.what());
+        throw ParserError(
+            std::string("Error in left-hand side operand to 'and': ") +
+            e.what());
     }
     return Ast(new AndExpr(std::move(lhs), std::move(rhs)));
 }
@@ -309,31 +333,38 @@ std::vector<Bool> OrExpr::evaluate(const Frame& frame) const {
     auto rhs = rhs_->evaluate(frame);
     assert(lhs.size() == rhs.size());
     assert(lhs.size() == frame.natoms());
-    for (size_t i=0; i<frame.natoms(); i++) {
+    for (size_t i = 0; i < frame.natoms(); i++) {
         lhs[i] = lhs[i] || rhs[i];
     }
     return lhs;
 }
 
-template<> Ast parse<OrExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template <>
+Ast parse<OrExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin[0].type() == Token::OR);
     begin += 1;
-    if (begin == end) throw ParserError("Missing right-hand side operand to 'or'");
+    if (begin == end)
+        throw ParserError("Missing right-hand side operand to 'or'");
 
     Ast rhs = nullptr;
     try {
         rhs = dispatch_parsing(begin, end);
     } catch (const ParserError& e) {
-        throw ParserError(std::string("Error in right-hand side operand to 'or': ") + e.what());
+        throw ParserError(
+            std::string("Error in right-hand side operand to 'or': ") +
+            e.what());
     }
 
-    if (begin == end) throw ParserError("Missing left-hand side operand to 'or'");
+    if (begin == end)
+        throw ParserError("Missing left-hand side operand to 'or'");
 
     Ast lhs = nullptr;
     try {
         lhs = dispatch_parsing(begin, end);
     } catch (const ParserError& e) {
-        throw ParserError(std::string("Error in left-hand side operand to 'or': ") + e.what());
+        throw ParserError(
+            std::string("Error in left-hand side operand to 'or': ") +
+            e.what());
     }
     return Ast(new OrExpr(std::move(lhs), std::move(rhs)));
 }
@@ -347,25 +378,28 @@ std::string NotExpr::print(unsigned) const {
 std::vector<Bool> NotExpr::evaluate(const Frame& frame) const {
     auto res = ast_->evaluate(frame);
     assert(res.size() == frame.natoms());
-    for (size_t i=0; i<frame.natoms(); i++) {
+    for (size_t i = 0; i < frame.natoms(); i++) {
         res[i] = !res[i];
     }
     return res;
 }
 
-template<> Ast parse<NotExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+template <>
+Ast parse<NotExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin[0].type() == Token::NOT);
     begin += 1;
-    if (begin == end) throw ParserError("Missing operand to 'not'");
+    if (begin == end)
+        throw ParserError("Missing operand to 'not'");
 
     Ast ast = nullptr;
     try {
         ast = dispatch_parsing(begin, end);
     } catch (const ParserError& e) {
-        throw ParserError(std::string("Error in operand of 'not': ") + e.what());
+        throw ParserError(std::string("Error in operand of 'not': ") +
+                          e.what());
     }
 
     return Ast(new NotExpr(std::move(ast)));
 }
-
-}} // namespace chemfiles && namespace selections
+}
+} // namespace chemfiles && namespace selections

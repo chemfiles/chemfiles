@@ -7,6 +7,7 @@
 // The idea and interface is based on Boost.Optional library
 // authored by Fernando Luis Cacciola Carballal
 
+// clang-format off
 # ifndef CHEMFILES_OPTIONAL_HPP
 # define CHEMFILES_OPTIONAL_HPP
 
@@ -1067,3 +1068,4 @@ namespace chemfiles {
 }
 
 # endif //CHEMFILES_OPTIONAL_HPP
+// clang-format on

@@ -8,35 +8,39 @@
 #include "chemfiles/config.hpp"
 #if HAVE_NETCDF
 
-#include "chemfiles/files/NcFile.hpp"
 #include "chemfiles/Error.hpp"
 #include "chemfiles/Logger.hpp"
+#include "chemfiles/files/NcFile.hpp"
 using namespace chemfiles;
 
 void chemfiles::check_nc_error(const std::string& message, int status) {
     if (status != NC_NOERR) {
-        throw FileError(message + "\n    (NetCDF error is '" + nc_strerror(status) + "')");
+        throw FileError(message + "\n    (NetCDF error is '" +
+                        nc_strerror(status) + "')");
     }
 }
 
 size_t chemfiles::hyperslab_size(const count_t& count) {
     size_t counted = 1;
-    for (auto value: count) {
+    for (auto value : count) {
         counted *= value;
     }
     return counted;
 }
 
-NcFile::NcFile(const std::string& filename, const string& mode): BinaryFile(filename, mode), file_id_(-1), file_mode_(DATA) {
+NcFile::NcFile(const std::string& filename, const string& mode)
+    : BinaryFile(filename, mode), file_id_(-1), file_mode_(DATA) {
     int status = NC_NOERR;
 
-    if (mode == "r"){
+    if (mode == "r") {
         status = nc_open(filename.c_str(), NC_NOWRITE, &file_id_);
-    } else if (mode == "a"){
+    } else if (mode == "a") {
         status = nc_open(filename.c_str(), NC_WRITE, &file_id_);
-    } else if (mode == "w"){
-        status = nc_create(filename.c_str(), NC_64BIT_OFFSET | NC_CLASSIC_MODEL, &file_id_);
-        // Put the file in DATA mode. This can only fail for bad id, which we check later.
+    } else if (mode == "w") {
+        status = nc_create(filename.c_str(), NC_64BIT_OFFSET | NC_CLASSIC_MODEL,
+                           &file_id_);
+        // Put the file in DATA mode. This can only fail for bad id, which we
+        // check later.
         nc_enddef(file_id_);
     } else {
         throw FileError("Unknown mode for file opening: " + mode);
@@ -76,8 +80,10 @@ string NcFile::global_attribute(const string& name) const {
     check_nc_error("Can not read attribute '" + name + "'", status);
 
     string value(size, ' ');
-    // &value[0] get a pointer to the first char in the string. In C++11, the string
-    // storage must be contiguous, so we can use it here. value.c_str() returns a const
+    // &value[0] get a pointer to the first char in the string. In C++11, the
+    // string
+    // storage must be contiguous, so we can use it here. value.c_str() returns
+    // a const
     // char *, and thus can not be used by nc_get_att_text.
     status = nc_get_att_text(file_id_, NC_GLOBAL, name.c_str(), &value[0]);
     check_nc_error("Can not read attribute '" + name + "'", status);
@@ -86,13 +92,14 @@ string NcFile::global_attribute(const string& name) const {
 }
 
 void NcFile::add_global_attribute(const string& name, const string& value) {
-    assert(file_mode() == DEFINE && "File must be in define mode to add attribute");
-    int status = nc_put_att_text(file_id_, NC_GLOBAL, name.c_str(), value.size(), value.c_str());
+    assert(file_mode() == DEFINE &&
+           "File must be in define mode to add attribute");
+    int status = nc_put_att_text(file_id_, NC_GLOBAL, name.c_str(),
+                                 value.size(), value.c_str());
 
-    check_nc_error(
-        "Could not add the \"" + name + "\" global attribute with value \"" + value,
-        status
-    );
+    check_nc_error("Could not add the \"" + name +
+                       "\" global attribute with value \"" + value,
+                   status);
 }
 
 size_t NcFile::dimension(const string& name) const {
@@ -110,7 +117,8 @@ size_t NcFile::dimension(const string& name) const {
 }
 
 void NcFile::add_dimension(const string& name, size_t value) {
-    assert(file_mode() == DEFINE && "File must be in define mode to add dimmension");
+    assert(file_mode() == DEFINE &&
+           "File must be in define mode to add dimmension");
     netcdf_id_t dim_id = -1;
     int status = nc_def_dim(file_id_, name.c_str(), value, &dim_id);
     check_nc_error("Can not add dimension \"" + name + "\"", status);

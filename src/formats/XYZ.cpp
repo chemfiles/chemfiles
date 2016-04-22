@@ -5,20 +5,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-#include <sstream>
 #include <cassert>
+#include <sstream>
 
 #include "chemfiles/formats/XYZ.hpp"
 
 #include "chemfiles/Error.hpp"
-#include "chemfiles/Logger.hpp"
-#include "chemfiles/Frame.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/Logger.hpp"
 
 using namespace chemfiles;
 
-XYZFormat::XYZFormat(File& f):
-    Format(f), textfile_(dynamic_cast<TextFile&>(file_)), step_cursor_(0) {}
+XYZFormat::XYZFormat(File& f)
+    : Format(f), textfile_(dynamic_cast<TextFile&>(file_)), step_cursor_(0) {}
 
 std::string XYZFormat::description() const {
     return "XYZ file format.";
@@ -40,10 +40,8 @@ bool XYZFormat::forward(size_t nsteps) {
             return false;
         } catch (const FileError&) {
             // We could not read the lines from the file
-            throw FormatError(
-                "Not enough lines in '" + textfile_.filename() +
-                "' for XYZ format at step " + std::to_string(i)
-            );
+            throw FormatError("Not enough lines in '" + textfile_.filename() +
+                              "' for XYZ format at step " + std::to_string(i));
         }
         i++;
     }
@@ -61,13 +59,13 @@ size_t XYZFormat::nsteps() {
     return n;
 }
 
-void XYZFormat::read_step(const size_t step, Frame& frame){
+void XYZFormat::read_step(const size_t step, Frame& frame) {
     textfile_.rewind();
     forward(step);
     read(frame);
 }
 
-void XYZFormat::read(Frame& frame){
+void XYZFormat::read(Frame& frame) {
     size_t natoms;
 
     try {
@@ -81,21 +79,20 @@ void XYZFormat::read(Frame& frame){
 
     try {
         lines = textfile_.readlines(natoms);
-    }
-    catch (const FileError& e) {
+    } catch (const FileError& e) {
         throw FormatError("Can not read file: " + string(e.what()));
     }
 
     frame.resize(natoms);
     auto positions = frame.positions();
     auto& topology = frame.topology();
-    for (size_t i=0; i<lines.size(); i++) {
+    for (size_t i = 0; i < lines.size(); i++) {
         std::istringstream string_stream;
         float x, y, z;
         string name;
 
         string_stream.str(lines[i]);
-        string_stream >> name >> x >> y >> z ;
+        string_stream >> name >> x >> y >> z;
         positions[i][0] = x;
         positions[i][1] = y;
         positions[i][2] = z;
@@ -103,7 +100,7 @@ void XYZFormat::read(Frame& frame){
     }
 }
 
-void XYZFormat::write(const Frame& frame){
+void XYZFormat::write(const Frame& frame) {
     auto& topology = frame.topology();
     auto& positions = frame.positions();
     assert(frame.natoms() == topology.natoms());
@@ -111,12 +108,12 @@ void XYZFormat::write(const Frame& frame){
     textfile_ << frame.natoms() << "\n";
     textfile_ << "Written by the chemfiles library\n";
 
-    for (size_t i=0; i<frame.natoms(); i++){
+    for (size_t i = 0; i < frame.natoms(); i++) {
         auto pos = positions[i];
         auto name = topology[i].name();
         if (name == "")
             name = "X";
-        textfile_ << name   << " "
-                  << pos[0] << " " << pos[1] << " " << pos[2] << "\n";
+        textfile_ << name << " " << pos[0] << " " << pos[1] << " " << pos[2]
+                  << "\n";
     }
 }
