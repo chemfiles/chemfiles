@@ -37,7 +37,13 @@ public:
     FORMAT_NAME(XYZ)
     FORMAT_EXTENSION(.xyz)
 private:
+    //! Quick forward the file for `nsteps`, returning `false` if the file does
+    //! not seems to contain `nsteps` more steps.
+    bool forward(size_t nsteps);
+    //! Text file where we read from
     TextFile& textfile_;
+    //! Newt step we will read.
+    size_t step_cursor_ = 0;
 };
 
 } // namespace chemfiles

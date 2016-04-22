@@ -23,10 +23,10 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         CHECK(file3.nsteps() == 1);
     }
 
-    Trajectory file(XYZDIR"helium.xyz");
-    Frame frame;
+    Trajectory file(XYZDIR "helium.xyz");
 
     SECTION("Stream style reading"){
+        Frame frame;
         file >> frame;
         CHECK(frame.natoms() == 125);
         // Check positions
@@ -40,7 +40,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
     }
 
     SECTION("Method style reading"){
-        frame = file.read();
+        auto frame = file.read();
         CHECK(frame.natoms() == 125);
         // Check positions
         auto positions = frame.positions();
@@ -54,7 +54,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
 
     SECTION("Read a specific step"){
         // Read frame at a specific positions
-        frame = file.read_step(42);
+        auto frame = file.read_step(42);
         auto positions = frame.positions();
         CHECK(positions[0] == vector3d(-0.145821f, 8.540648f, 1.090281f));
         CHECK(positions[124] == vector3d(8.446093f, 8.168162f, 9.350953f));
@@ -71,12 +71,21 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
     SECTION("Read the whole file"){
         CHECK(file.nsteps() == 397);
 
+        Frame frame;
         while (!file.done()){
             file >> frame;
         }
         auto positions = frame.positions();
         CHECK(positions[0] == vector3d(-1.186037f, 11.439334f, 0.529939f));
         CHECK(positions[124] == vector3d(5.208778f, 12.707273f, 10.940157f));
+    }
+
+    SECTION("Read various files formatting"){
+        file = Trajectory(XYZDIR "spaces.xyz");
+
+        auto frame = file.read();
+        auto positions = frame.positions();
+        CHECK(positions[10] == vector3d(0.8336f, 0.3006f, 0.4968f));
     }
 }
 

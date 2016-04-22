@@ -17,41 +17,44 @@
 
 using namespace chemfiles;
 
+XYZFormat::XYZFormat(File& f):
+    Format(f), textfile_(dynamic_cast<TextFile&>(file_)), step_cursor_(0) {}
+
 std::string XYZFormat::description() const {
     return "XYZ file format.";
 }
 
-// Quick forward the file for nsteps, return false if the end of file (eof) was
-// reach before the end.
-static bool forward(TextFile& file, size_t nsteps) {
-    size_t i=0;
+bool XYZFormat::forward(size_t nsteps) {
+    size_t i = 0;
     // Move the file pointer to the good position step by step, as the number of
     // atoms may not be constant
     std::string line;
-    while (i < nsteps){
+    while (i < nsteps) {
         try {
-            line = file.getline();
+            line = textfile_.getline();
             auto natoms = std::stoul(line);
-            file.readlines(natoms + 1);
-        } catch (const std::exception& e) {
-            // handling single new line at the end of the file
-            if (line == "" && file.eof())
-                return false;
-            else
-                throw FormatError("Can not read step: " + string(e.what()));
+            textfile_.readlines(natoms + 1);
+            step_cursor_++;
+        } catch (const std::invalid_argument&) {
+            // We could not read an integer, so give up here
+            return false;
+        } catch (const FileError&) {
+            // We could not read the lines from the file
+            throw FormatError(
+                "Not enough lines in '" + textfile_.filename() +
+                "' for XYZ format at step " + std::to_string(i)
+            );
         }
         i++;
     }
     return true;
 }
 
-XYZFormat::XYZFormat(File& f) : Format(f), textfile_(dynamic_cast<TextFile&>(file_)) {}
-
 size_t XYZFormat::nsteps() {
     textfile_.rewind();
     size_t n = 0;
     while (!textfile_.eof()) {
-        if (forward(textfile_, 1))
+        if (forward(1))
             n++;
     }
     textfile_.rewind();
@@ -60,7 +63,7 @@ size_t XYZFormat::nsteps() {
 
 void XYZFormat::read_step(const size_t step, Frame& frame){
     textfile_.rewind();
-    forward(textfile_, step);
+    forward(step);
     read(frame);
 }
 
