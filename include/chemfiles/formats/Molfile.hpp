@@ -62,7 +62,7 @@ public:
 
     virtual void read(Frame& frame) override;
     virtual std::string description() const override;
-    virtual size_t nsteps() const override;
+    virtual size_t nsteps() override;
 
     static const char* name();
     static const char* extension();
@@ -70,7 +70,7 @@ private:
     /// Convert a molfile timestep to a chemfiles frame
     void molfile_to_frame(const molfile_timestep_t& timestep, Frame& frame);
     /// Read topological information in the current file, if any.
-    void read_topology() const;
+    void read_topology();
 
     /// VMD plugin functions
     VMDFunctions<F> functions_;
@@ -78,12 +78,12 @@ private:
     molfile_plugin_t* plugin_;
 
     /// The file handler
-    mutable void* file_handler_;
+    void* file_handler_;
     /// The number of atoms in the last trajectory read
     int natoms_;
 
     /// Store optional topological information
-    mutable optional<Topology> topology_;
+    optional<Topology> topology_;
 };
 
 } // namespace chemfiles

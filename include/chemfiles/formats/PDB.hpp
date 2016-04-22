@@ -35,7 +35,7 @@ public:
     virtual void read(Frame& frame) override;
     virtual void write(const Frame& frame) override;
     virtual std::string description() const override;
-    virtual size_t nsteps() const override;
+    virtual size_t nsteps() override;
 
     // Register the PDB format with the ".pdb" extension and the "PDB" description.
     FORMAT_NAME(PDB)

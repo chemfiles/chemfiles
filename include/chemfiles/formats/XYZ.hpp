@@ -31,7 +31,7 @@ public:
     virtual void read(Frame& frame) override;
     virtual void write(const Frame& frame) override;
     virtual std::string description() const override;
-    virtual size_t nsteps() const override;
+    virtual size_t nsteps() override;
 
     // Register the xyz format with the ".xyz" extension and the "XYZ" description.
     FORMAT_NAME(XYZ)

@@ -47,7 +47,7 @@ static bool forward(TextFile& file, size_t nsteps) {
 
 XYZFormat::XYZFormat(File& f) : Format(f), textfile_(dynamic_cast<TextFile&>(file_)) {}
 
-size_t XYZFormat::nsteps() const {
+size_t XYZFormat::nsteps() {
     textfile_.rewind();
     size_t n = 0;
     while (!textfile_.eof()) {

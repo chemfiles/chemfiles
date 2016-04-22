@@ -16,7 +16,7 @@ class DummyFormat : public Format {
 public:
     DummyFormat(File& file) : Format(file){}
     std::string description() const override {return "";}
-    size_t nsteps() const override {return 42;}
+    size_t nsteps() override {return 42;}
 };
 
 // Dummy file clase
@@ -30,7 +30,7 @@ class DummyFormat2 : public Format {
 public:
     DummyFormat2(File& file) : Format(file){}
     std::string description() const override {return "";}
-    size_t nsteps() const override {return 42;}
+    size_t nsteps() override {return 42;}
     using file_t = DummyFile;
 };
 

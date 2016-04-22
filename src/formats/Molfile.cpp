@@ -124,7 +124,7 @@ void Molfile<F>::read(Frame& frame){
 }
 
 template <MolfileFormat F>
-size_t Molfile<F>::nsteps() const {
+size_t Molfile<F>::nsteps() {
     size_t n = 0;
     int result = MOLFILE_SUCCESS;
     while (true) {
@@ -169,7 +169,7 @@ void Molfile<F>::molfile_to_frame(const molfile_timestep_t& timestep, Frame& fra
 }
 
 template <MolfileFormat F>
-void Molfile<F>::read_topology() const {
+void Molfile<F>::read_topology() {
     if (plugin_->read_structure == NULL) {
         return;
     }

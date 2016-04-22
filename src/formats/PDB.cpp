@@ -56,7 +56,7 @@ static inline std::string trim(const std::string &s) {
 
 PDBFormat::PDBFormat(File& f) : Format(f), textfile_(dynamic_cast<TextFile&>(file_)) {}
 
-size_t PDBFormat::nsteps() const {
+size_t PDBFormat::nsteps() {
     textfile_.rewind();
     size_t n = 0;
     while (true) {

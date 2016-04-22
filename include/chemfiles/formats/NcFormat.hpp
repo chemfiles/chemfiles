@@ -37,7 +37,7 @@ public:
     virtual void read(Frame& frame) override;
     virtual void write(const Frame& frame) override;
 
-    virtual size_t nsteps() const override;
+    virtual size_t nsteps() override;
     virtual std::string description() const override;
 
     using file_t = NcFile;

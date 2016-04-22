@@ -69,7 +69,7 @@ NCFormat::NCFormat(File& file) : Format(file), ncfile_(dynamic_cast<NcFile&>(fil
     }
 }
 
-size_t NCFormat::nsteps() const {
+size_t NCFormat::nsteps() {
     return static_cast<size_t>(ncfile_.dimension("frame"));
 }
 
