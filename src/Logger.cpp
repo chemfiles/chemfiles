@@ -18,13 +18,12 @@ Logger Logger::instance_{};
 
 Logger::Logger() : level_(LogLevel::WARNING), backend_(STDERR), logfile_() {}
 
-void Logger::log(LogLevel level, std::string message) {
-    // Don't write anything if the output level is less important than
-    // the current level.
-    if (level > Logger::level())
+void Logger::write_message(LogLevel level, std::string message) {
+    if (backend_ == SILENT) {
         return;
+    }
 
-    if (Logger::backend() != CALLBACK && Logger::backend() != SILENT) {
+    if (backend_ != CALLBACK && backend_ != SILENT) {
         switch (level) {
         case LogLevel::ERROR:
             message = "Chemfiles error: " + message;
@@ -41,10 +40,6 @@ void Logger::log(LogLevel level, std::string message) {
         }
     }
 
-    instance_.write_message(level, message);
-}
-
-void Logger::write_message(LogLevel level, const std::string& message) {
     switch (backend_) {
     case SILENT:
         break;

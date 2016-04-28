@@ -44,16 +44,15 @@ static bool is_valid(const NcFile& ncfile_, size_t natoms) {
 
     if (ncfile_.dimension("spatial") != 3) {
         if (!writing)
-            Logger::error("Wrong size for spatial dimension. Should be 3, is " +
-                          std::to_string(ncfile_.dimension("spatial")) + ".");
+            Logger::error("Wrong size for spatial dimension. Should be 3, is ",
+                          ncfile_.dimension("spatial"), ".");
         return false;
     }
 
     if (writing) {
         if (ncfile_.dimension("atom") != natoms) {
-            Logger::error("Wrong size for atoms dimension. Should be " +
-                          std::to_string(natoms) + ", is " +
-                          std::to_string(ncfile_.dimension("atom")) + ".");
+            Logger::error("Wrong size for atoms dimension. Should be ", natoms, ", is ",
+                          ncfile_.dimension("atom"), ".");
             return false;
         }
     }

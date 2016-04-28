@@ -103,7 +103,7 @@ void PDBFormat::read(Frame& frame) {
         case Record::_IGNORED_:
             break; // Nothing to do
         case Record::_UNKNOWN_:
-            Logger::warn("Unknown PDB record: " + line);
+            Logger::warn("Unknown PDB record: ", line);
             break;
         }
     }
@@ -127,8 +127,8 @@ void PDBFormat::read_cryst1(Frame& frame, const std::string& line) {
 
         auto space_group = trim(line.substr(55, 10));
         if (space_group != "P 1" && space_group != "P1") {
-            Logger::warn("Space group is not P1 (got '" + space_group +
-                         "') in '" + file_.filename() + "', ignored.");
+            Logger::warn("Space group is not P1 (got '", space_group, "') in '",
+                         file_.filename(), "', ignored.");
         }
     } catch (std::invalid_argument& e) {
         throw FormatError("Could not read CRYST1 record: '" + line + "'");
@@ -167,8 +167,7 @@ void PDBFormat::read_conect(Frame& frame, const std::string& full_line) {
     // Helper lambdas
     auto add_bond = [&frame, &line](size_t i, size_t j) {
         if (i >= frame.natoms() || j >= frame.natoms()) {
-            Logger::warn("Bad atomic numbers in CONECT, ignored. (" + line +
-                         ")");
+            Logger::warn("Bad atomic numbers in CONECT, ignored. (", line, ")");
             return;
         }
         frame.topology().add_bond(i, j);
@@ -179,8 +178,7 @@ void PDBFormat::read_conect(Frame& frame, const std::string& full_line) {
             // PDB indexing is 1-based, and chemfiles is 0-based
             return std::stoul(line.substr(initial, 5)) - 1;
         } catch (std::invalid_argument& e) {
-            throw FormatError("Could not read atomic number in: '" + line +
-                              "'");
+            throw FormatError("Could not read atomic number in: '" + line + "'");
         }
     };
 
@@ -288,9 +286,9 @@ void PDBFormat::write(const Frame& frame) {
             continue;
         } else if (connections > 4) {
             Logger::warn(
-                "PDB 'CONNECT' record can not handle more than 4 bonds, got " +
-                std::to_string(connections) + " around atom " +
-                std::to_string(i) + ".");
+                "PDB 'CONNECT' record can not handle more than 4 bonds, got ",
+                connections, " around atom ", i, "."
+            );
         }
 
         fmt::print(textfile_, "CONECT{:5d}", i);

@@ -10,6 +10,7 @@
 #define CHEMFILES_LOGGING_H
 
 #include <fstream>
+#include <sstream>
 #include <functional>
 #include <string>
 
@@ -52,23 +53,45 @@ public:
     };
 
     //! Log a `message` if the `level` is lower than the maximal curent logging
-    //! level
-    static void log(LogLevel level, std::string message);
-    //! Log `message` at error level.
-    static void error(const std::string& message) {
-        Logger::log(LogLevel::ERROR, message);
+    //! level. The message can be built using a variadic function call, like:
+    //! ```cxx
+    //! Logger::log(LogLevel::ERROR, "Here ", " and ", 4, " times ", there->call());
+    //! ```
+    template<typename... Args>
+    static void log(LogLevel level, Args const&... args) {
+        // Don't write anything if the output level is less important than
+        // the current level.
+        if (level > Logger::level())
+            return;
+
+        std::ostringstream stream;
+        // Some black magic using the comma operator to upack the template parameter
+        // pack while using it to build the stream.
+        auto _ = {0, ((void)(stream << args), 0)... };
+        // silent usused variable _ warning
+        (void)_;
+
+        instance_.write_message(level, stream.str());
     }
-    //! Log `message` at warning level.
-    static void warn(const std::string& message) {
-        Logger::log(LogLevel::WARNING, message);
+    //! Equivalent to `Logger::log(LogLevel::ERROR, args...)`
+    template<typename... Args>
+    static void error(Args const&... args) {
+        Logger::log(LogLevel::ERROR, args...);
     }
-    //! Log `message` at info level.
-    static void info(const std::string& message) {
-        Logger::log(LogLevel::INFO, message);
+    //! Equivalent to `Logger::log(LogLevel::ERROR, args...)`
+    template<typename... Args>
+    static void warn(Args const&... args) {
+        Logger::log(LogLevel::WARNING, args...);
     }
-    //! Log `message` at debug level.
-    static void debug(const std::string& message) {
-        Logger::log(LogLevel::DEBUG, message);
+    //! Equivalent to `Logger::log(LogLevel::ERROR, args...)`
+    template<typename... Args>
+    static void info(Args const&... args) {
+        Logger::log(LogLevel::INFO, args...);
+    }
+    //! Equivalent to `Logger::log(LogLevel::ERROR, args...)`
+    template<typename... Args>
+    static void debug(Args const&... args) {
+        Logger::log(LogLevel::DEBUG, args...);
     }
 
     //! Set the logging level
@@ -98,7 +121,7 @@ public:
 
 private:
     Logger();
-    void write_message(LogLevel level, const std::string& message);
+    void write_message(LogLevel level, std::string message);
 
     //! Singleton instance
     static Logger instance_;
