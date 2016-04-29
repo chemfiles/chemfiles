@@ -66,7 +66,6 @@ else()
     add_warning("-Wdocumentation")
     add_warning("-Wdeprecated")
     add_warning("-Wextra-semi")
-    add_warning("-Wshadow")
     add_warning("-Wnon-virtual-dtor")
 
     add_warning("-Wold-style-cast")
