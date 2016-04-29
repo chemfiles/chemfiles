@@ -110,7 +110,7 @@ template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
     std::vector<float> coords(3 * static_cast<size_t>(natoms_));
     std::vector<float> velocities(0);
 
-    molfile_timestep_t timestep{};
+    molfile_timestep_t timestep{nullptr, nullptr, 0, 0, 0, 0, 0, 0, 0};
     timestep.coords = coords.data();
     if (molfile_plugins[F].have_velocities) {
         velocities.resize(3 * static_cast<size_t>(natoms_));

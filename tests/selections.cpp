@@ -115,12 +115,12 @@ Frame testing_frame() {
     topology.append(Atom("H"));
 
     auto frame = Frame(topology);
-    size_t i = 0;
+    float i = 0;
     for (auto& pos: frame.positions()) {
-        pos[0] = i;
+        pos[0] = i + 0;
         pos[1] = i + 1;
         pos[2] = i + 2;
-        i++;
+        i += 1;
     }
 
     frame.add_velocities();
@@ -132,8 +132,8 @@ Frame testing_frame() {
     for (auto& vel: *span) {
         vel[0] = i + 1;
         vel[1] = i + 2;
-        vel[2] = i;
-        i++;
+        vel[2] = i + 0;
+        i += 1;
     }
 
     return frame;
