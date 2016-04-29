@@ -15,8 +15,6 @@
 // THE SOFTWARE.
 
 // clang-format off
-#include <iostream>
-
 #ifndef SPAN_HPP
 #define SPAN_HPP
 
