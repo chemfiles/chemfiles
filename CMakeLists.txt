@@ -42,16 +42,15 @@ if(CODE_COVERAGE)
         message(FATAL_ERROR "Code coverage can only be used with GCC")
     endif()
     # Code coverage should use gcc
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+    set(CMAKE_BUILD_TYPE "debug" CACHE STRING "Type of build: release|debug|relwithdebuginfo" FORCE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
 endif()
 
 # Set a default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to 'release' as none was specified.")
-  set(CMAKE_BUILD_TYPE "release" CACHE STRING "Choose the type of build." FORCE)
+  set(CMAKE_BUILD_TYPE "release" CACHE STRING "Type of build: release|debug|relwithdebuginfo" FORCE)
 endif()
 
 add_subdirectory(external)
