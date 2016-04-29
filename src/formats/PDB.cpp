@@ -124,14 +124,16 @@ void PDBFormat::read_cryst1(Frame& frame, const std::string& line) {
         auto cell = UnitCell(a, b, c, alpha, beta, gamma);
 
         frame.set_cell(cell);
+    } catch (std::invalid_argument& e) {
+        throw FormatError("Could not read CRYST1 record: '" + line + "'");
+    }
 
+    if (line.length() >= 55) {
         auto space_group = trim(line.substr(55, 10));
         if (space_group != "P 1" && space_group != "P1") {
             Logger::warn("Space group is not P1 (got '", space_group, "') in '",
                          file_.filename(), "', ignored.");
         }
-    } catch (std::invalid_argument& e) {
-        throw FormatError("Could not read CRYST1 record: '" + line + "'");
     }
 }
 

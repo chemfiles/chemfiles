@@ -57,6 +57,11 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
         CHECK(topology.isdihedral(64, 62, 58, 53));
         CHECK(topology.isdihedral(22, 21, 23, 33));
     }
+
+    SECTION("Support short records") {
+        Trajectory file(PDBDIR "cryst1.pdb");
+        Frame frame = file.read();
+    }
 }
 
 TEST_CASE("Write files in PDB format", "[PDB]"){
