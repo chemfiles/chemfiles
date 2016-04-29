@@ -12,7 +12,6 @@
 #include <array>
 #include <cassert>
 #include <cmath>
-#include <iostream>
 #include <vector>
 
 #include "span.hpp"
@@ -24,11 +23,6 @@ typedef std::array<float, 3> Vector3D;
 /// Create a Vector3D from the three components \c x, \c y, and \c z.
 inline Vector3D vector3d(float x, float y, float z) {
     return Vector3D{{x, y, z}};
-}
-
-inline std::ostream& operator<<(std::ostream& out, const Vector3D& rhs) {
-    out << rhs[0] << ", " << rhs[1] << ", " << rhs[2];
-    return out;
 }
 
 inline bool operator==(const Vector3D& lhs, const Vector3D& rhs) {
