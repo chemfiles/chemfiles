@@ -6,8 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#ifndef CHFL_SELECTION_LEXER_HPP
-#define CHFL_SELECTION_LEXER_HPP
+#ifndef CHEMFILES_SELECTION_LEXER_HPP
+#define CHEMFILES_SELECTION_LEXER_HPP
+
 #include <string>
 #include <vector>
 #include <ostream>

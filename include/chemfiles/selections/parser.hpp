@@ -6,8 +6,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#ifndef CHFL_SELECTION_PARSER_HPP
-#define CHFL_SELECTION_PARSER_HPP
+#ifndef CHEMFILES_SELECTION_PARSER_HPP
+#define CHEMFILES_SELECTION_PARSER_HPP
+
 #include "chemfiles/Selections.hpp"
 #include "chemfiles/selections/lexer.hpp"
 #include "chemfiles/bool.hpp"

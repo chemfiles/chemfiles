@@ -29,7 +29,7 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) ||                 \
     defined(__CYGWIN__) || defined(WIN64) || defined(_WIN64) ||                \
     defined(__WIN64__)
-#define CHFL_WINDOWS
+#define CHEMFILES_WINDOWS
 #endif
 
 #define HAVE_NETCDF @HAVE_NETCDF@

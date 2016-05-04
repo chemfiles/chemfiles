@@ -6,8 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#ifndef CHFL_BOOL_HPP
-#define CHFL_BOOL_HPP
+#ifndef CHEMFFILES_BOOL_HPP
+#define CHEMFFILES_BOOL_HPP
 
 namespace chemfiles {
 
