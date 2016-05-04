@@ -60,22 +60,22 @@ public:
 
     //! Construct an INFINITE unit cell
     UnitCell();
-    //! Construct a cubic unit cell of side size \c a
+    //! Construct a cubic unit cell of side size `a`
     UnitCell(double a);
-    //! Construct an ORTHOROMBIC unit cell of side size \c a, \c b, \c c
+    //! Construct an ORTHOROMBIC unit cell of side size `a`, `b`, `c`
     UnitCell(double a, double b, double c);
-    //! Construct a TRICLINIC unit cell of side size \c a, \c b, \c c, and cell
-    //! angles \c alpha, \c beta, \c gamma
+    //! Construct a TRICLINIC unit cell of side size `a`, `b`, `c`, and cell
+    //! angles `alpha`, `beta`, `gamma`
     UnitCell(double a, double b, double c, double alpha, double beta, double gamma);
-    //! Construct a cell of type \c type, with all lenghts set to 0 and all
+    //! Construct a cell of type `type`, with all lenghts set to 0 and all
     //! angles
     //! set to 90°
     UnitCell(CellType type);
-    //! Construct a cell of type \c type, with all lenghts set to \c a and all
+    //! Construct a cell of type `type`, with all lenghts set to `a` and all
     //! angles
     //! set to 90°
     UnitCell(CellType type, double a);
-    //! Construct a cell of type \c type, with lenghts set to \c a ,\c b, \c d,
+    //! Construct a cell of type `type`, with lenghts set to `a` ,`b`, `d`,
     //! and all angles set to 90°
     UnitCell(CellType type, double a, double b, double c);
 
@@ -121,7 +121,7 @@ public:
     //! Get the unit cell volume
     double volume() const;
 
-    //! Wrap the vector \c vect in the unit cell, using periodic boundary
+    //! Wrap the vector `vect` in the unit cell, using periodic boundary
     //! conditions.
     Vector3D wrap(const Vector3D& vect) const;
 

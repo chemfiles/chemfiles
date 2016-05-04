@@ -79,7 +79,7 @@ private:
         goto error;                                                            \
     }
 
-//! Wrap \c instructions in a try/catch bloc automatically, and return a status
+//! Wrap `instructions` in a try/catch bloc automatically, and return a status
 //! code
 #define CHFL_ERROR_WRAP_RETCODE(instructions)                                  \
     try {                                                                      \
@@ -97,9 +97,8 @@ private:
     }                                                                          \
     return CAPIStatus::SUCCESS;
 
-//! Wrap \c instructions in a try/catch bloc automatically, and goto the \c
-//! error
-//! label in case of error.
+//! Wrap `instructions` in a try/catch bloc automatically, and goto the
+//! `error` label in case of error.
 #define CHFL_ERROR_WRAP(instructions)                                          \
     try {                                                                      \
         instructions                                                           \

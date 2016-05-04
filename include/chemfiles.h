@@ -115,14 +115,14 @@ typedef enum CHFL_LOG_LEVEL {
 CHFL_EXPORT int chfl_loglevel(chfl_log_level_t* level);
 
 /*!
-* @brief Set the current maximal logging level to \c level
+* @brief Set the current maximal logging level to `level`
 * @param level The new logging level
 * @return The status code
 */
 CHFL_EXPORT int chfl_set_loglevel(chfl_log_level_t level);
 
 /*!
-* @brief Redirect the logs to \c file, overwriting the file if it exists
+* @brief Redirect the logs to `file`, overwriting the file if it exists
 * @param file The filename for the new log file.
 * @return The status code
 */
@@ -224,7 +224,7 @@ CHFL_EXPORT int chfl_trajectory_set_topology(CHFL_TRAJECTORY* file,
 
 /*!
 * @brief Set the topology associated with a trajectory by reading the first
-*        frame of \c filename; and extracting the topology of this frame.
+*        frame of `filename`; and extracting the topology of this frame.
 * @param file A pointer to the trajectory
 * @param filename The file to read in order to get the new topology
 * @return The status code.
@@ -234,7 +234,7 @@ CHFL_EXPORT int chfl_trajectory_set_topology_file(CHFL_TRAJECTORY* file,
 
 /*!
 * @brief Set the topology associated with a trajectory by reading the first
-*        frame of \c filename using the file format in \c format; and
+*        frame of `filename` using the file format in `format`; and
 *        extracting the topology of this frame.
 *
 * This can be needed when the topology file format does not match the extension, or
@@ -286,7 +286,7 @@ CHFL_EXPORT int chfl_trajectory_close(CHFL_TRAJECTORY* file);
 
 /******************************************************************************/
 /*!
-* @brief Create an empty frame with initial capacity of \c natoms. It will be
+* @brief Create an empty frame with initial capacity of `natoms`. It will be
 *        resized by the library as needed.
 * @param natoms the size of the wanted frame
 * @return A pointer to the frame
@@ -622,7 +622,7 @@ CHFL_EXPORT int chfl_topology_append(CHFL_TOPOLOGY* topology,
 CHFL_EXPORT int chfl_topology_remove(CHFL_TOPOLOGY* topology, size_t i);
 
 /*!
-* @brief Tell if the atoms \c i and \c j are bonded together
+* @brief Tell if the atoms `i` and `j` are bonded together
 * @param topology The topology
 * @param i index of the first atom in the topology
 * @param j index of the second atom in the topology
@@ -635,7 +635,7 @@ CHFL_EXPORT int chfl_topology_isbond(const CHFL_TOPOLOGY* topology,
                                      bool* result);
 
 /*!
-* @brief Tell if the atoms \c i, \c j and \c k constitues an angle
+* @brief Tell if the atoms `i`, `j` and `k` constitues an angle
 * @param topology The topology
 * @param i index of the first atom in the topology
 * @param j index of the second atom in the topology
@@ -647,7 +647,7 @@ CHFL_EXPORT int chfl_topology_isangle(
     const CHFL_TOPOLOGY* topology, size_t i, size_t j, size_t k, bool* result);
 
 /*!
-* @brief Tell if the atoms \c i, \c j, \c k and \c m constitues a dihedral angle
+* @brief Tell if the atoms `i`, `j`, `k` and `m` constitues a dihedral angle
 * @param topology The topology
 * @param i index of the first atom in the topology
 * @param j index of the second atom in the topology
@@ -729,7 +729,7 @@ CHFL_EXPORT int chfl_topology_dihedrals(const CHFL_TOPOLOGY* topology,
                                         size_t ndihedrals);
 
 /*!
-* @brief Add a bond between the atoms \c i and \c j in the system
+* @brief Add a bond between the atoms `i` and `j` in the system
 * @param topology The topology
 * @param i index of the first atom in the topology
 * @param j index of the second atom in the topology
@@ -739,7 +739,7 @@ CHFL_EXPORT int
 chfl_topology_add_bond(CHFL_TOPOLOGY* topology, size_t i, size_t j);
 
 /*!
-* @brief Remove any existing bond between the atoms \c i and \c j in the system
+* @brief Remove any existing bond between the atoms `i` and `j` in the system
 * @param topology The topology
 * @param i index of the first atom in the topology
 * @param j index of the second atom in the topology

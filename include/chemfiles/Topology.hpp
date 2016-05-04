@@ -116,8 +116,8 @@ namespace chemfiles {
  * @class connectivity Topology.hpp Topology.cpp
  *
  * The connectivity struct store a cache of the bonds, angles and dihedrals
- * in the system. The \c recalculate function should be called when bonds are
- * added or removed. The \c bonds set is the main source of information, all the
+ * in the system. The `recalculate` function should be called when bonds are
+ * added or removed. The `bonds` set is the main source of information, all the
  * other data are cached from it.
  */
 class Connectivity {
@@ -129,9 +129,9 @@ public:
     const std::unordered_set<Bond>& bonds() const;
     const std::unordered_set<Angle>& angles() const;
     const std::unordered_set<Dihedral>& dihedrals() const;
-    //! Add a bond between the atoms \c i and \c j
+    //! Add a bond between the atoms `i` and `j`
     void add_bond(size_t i, size_t j);
-    //! Remove any bond between the atoms \c i and \c j
+    //! Remove any bond between the atoms `i` and `j`
     void remove_bond(size_t i, size_t j);
 
 private:
@@ -163,23 +163,23 @@ public:
     Topology(Topology&&) = default;
     Topology& operator=(Topology&&) = default;
 
-    //! Get a reference to the atom at the position \c index
+    //! Get a reference to the atom at the position `index`
     Atom& operator[](size_t index) { return atoms_[index]; }
-    //! Get a const (non-modifiable) reference to the atom at the position \c
-    //! index
+    //! Get a const (non-modifiable) reference to the atom at the position
+    //! `index`
     const Atom& operator[](size_t index) const { return atoms_[index]; }
 
     //! Add an atom in the system
     void append(const Atom& _atom);
-    //! Delete an atom in the system. If \c idx is out of bounds, do nothing.
+    //! Delete an atom in the system. If `idx` is out of bounds, do nothing.
     void remove(size_t idx);
-    //! Add a bond in the system, between the atoms at index \c atom_i and \c
-    //! atom_j
+    //! Add a bond in the system, between the atoms at index `atom_i` and
+    //! `atom_j`
     void add_bond(size_t atom_i, size_t atom_j) {
         connect_.add_bond(atom_i, atom_j);
     }
-    //! Remove a bond in the system, between the atoms at index \c atom_i and \c
-    //! atom_j
+    //! Remove a bond in the system, between the atoms at index `atom_i` and
+    //! `atom_j`
     void remove_bond(size_t atom_i, size_t atom_j) {
         connect_.remove_bond(atom_i, atom_j);
     }
@@ -190,12 +190,12 @@ public:
     //! as needed.
     void resize(size_t natoms);
 
-    //! Check wether the atoms at indexes \c i and \c j are bonded or not
+    //! Check wether the atoms at indexes `i` and `j` are bonded or not
     bool isbond(size_t i, size_t j) const;
-    //! Check wether the atoms at indexes \c i, \c j and \c k constitues an
+    //! Check wether the atoms at indexes `i`, `j` and `k` constitues an
     //! angle
     bool isangle(size_t i, size_t j, size_t k) const;
-    //! Check wether the atoms at indexes \c i \c j, \c k and \c m constitues a
+    //! Check wether the atoms at indexes `i` `j`, `k` and `m` constitues a
     //! dihedral angle
     bool isdihedral(size_t i, size_t j, size_t k, size_t m) const;
 
@@ -213,12 +213,12 @@ public:
 private:
     //! Atoms in the system.
     std::vector<Atom> atoms_;
-    //! Connectivity of the system. All the indices refers to the atoms in \c
-    //! atoms_
+    //! Connectivity of the system. All the indices refers to the positions in
+    //! `atoms_`
     Connectivity connect_;
 };
 
-//! Create a topology containing \c natoms atoms, all of the UNDEFINED type.
+//! Create a topology containing `natoms` atoms, all of the UNDEFINED type.
 CHFL_EXPORT Topology dummy_topology(size_t natoms);
 
 } // namespace chemfiles

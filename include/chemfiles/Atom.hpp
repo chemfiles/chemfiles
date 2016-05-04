@@ -37,9 +37,9 @@ public:
         UNDEFINED = 3,
     };
 
-    //! Create an element from its \c name
+    //! Create an element from its `name`
     Atom(const std::string& name);
-    //! Create an element from its \c name and its type
+    //! Create an element from its `name` and its type
     Atom(AtomType type, const std::string& name = "");
     //! Default is to create an UNDEFINED atom type with no name
     Atom();

@@ -62,7 +62,7 @@ public:
     virtual const std::string& getline() = 0;
     //! Read a line from the file, stream version
     virtual TextFile& operator>>(std::string& line) = 0;
-    //! Read \c n lines from the file
+    //! Read `n` lines from the file
     virtual const std::vector<std::string>& readlines(size_t n) = 0;
     //! Reset the file cursor
     virtual void rewind() = 0;

@@ -38,7 +38,7 @@ class CHFL_EXPORT Frame {
 public:
     //! Default constructor
     Frame();
-    //! Constructor reserving some space for \c natoms
+    //! Constructor reserving some space for `natoms`
     explicit Frame(size_t natoms);
     //! Constructor reserving space for `topology.natoms()`, and using `cell`
     //! as unit cell. `cell` default to an `INFINITE` unit cell.

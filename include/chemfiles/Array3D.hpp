@@ -20,7 +20,7 @@ namespace chemfiles {
 
 typedef std::array<float, 3> Vector3D;
 
-/// Create a Vector3D from the three components \c x, \c y, and \c z.
+/// Create a Vector3D from the three components `x`, `y`, and `z`.
 inline Vector3D vector3d(float x, float y, float z) {
     return Vector3D{{x, y, z}};
 }

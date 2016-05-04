@@ -85,7 +85,7 @@ public:
     trajectory_builder_t format(const std::string& name);
 
     /*!
-     * @brief Get a trajectory_builder from a format \c extention.
+     * @brief Get a trajectory_builder from a format `extention`.
      * @param ext the format extention
      * @return A trajectory_builder corresponding to the format, if the format
      *         extension is found in the list of registered extensions.

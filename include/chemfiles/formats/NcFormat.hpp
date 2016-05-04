@@ -53,7 +53,7 @@ private:
     //! the file is assumed to be valid.
     void read_array3D(Span3D arr, const std::string& name) const;
 
-    //! Write an Array3D to the file, as a variable with the name \c name, at
+    //! Write an Array3D to the file, as a variable with the name `name`, at
     //! the current internal step.
     void write_array3D(const Array3D& arr, const std::string& name) const;
     //! Write an UnitCell to the file, at the current internal step

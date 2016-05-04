@@ -11,7 +11,7 @@
 
 using namespace chemfiles;
 
-// Check if the string \c name is the name of an element
+// Check if the string `name` is the name of an element
 static bool is_element(const std::string& name) {
     // clang-format off
     const auto ALL_ELEMENTS = {
