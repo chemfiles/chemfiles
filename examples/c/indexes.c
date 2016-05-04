@@ -7,28 +7,26 @@
 #include "chemfiles.h"
 
 int main() {
-    CHFL_TRAJECTORY* traj = chfl_trajectory_open("tests/files/xyz/helium.xyz", 'r');
+    CHFL_TRAJECTORY* file = chfl_trajectory_open("tests/files/xyz/helium.xyz", 'r');
     CHFL_FRAME* frame = chfl_frame(0);
+    unsigned* indexes = NULL;
 
-    if (traj == NULL)
-        goto error;
-
-    if (chfl_trajectory_read(traj, frame))
-        goto error;
+    if (file == NULL || chfl_trajectory_read(file, frame) != CHFL_SUCCESS)
+        goto cleanup;
 
     size_t natoms = 0;
     float (*positions)[3] = NULL;
     chfl_frame_positions(frame, &positions, &natoms);
-    unsigned* indexes = (unsigned*)malloc(natoms*sizeof(unsigned));
+    indexes = (unsigned*)malloc(natoms*sizeof(unsigned));
     if (indexes == NULL)
-        goto error;
+        goto cleanup;
 
-    for (int i=0; i<natoms; i++) {
+    for (unsigned i=0; i<natoms; i++) {
         indexes[i] = (unsigned)-1;
     }
 
     unsigned last_index = 0;
-    for (int i=0; i<natoms; i++) {
+    for (unsigned i=0; i<natoms; i++) {
         if (positions[i][0] < 5) {
             indexes[last_index] = i;
             last_index++;
@@ -36,22 +34,22 @@ int main() {
     }
 
     printf("Atoms with x < 5:\n");
-    int i = 0;
+    unsigned i = 0;
     while(indexes[i] != (unsigned)-1 && i < natoms) {
         printf("  - %d\n", indexes[i]);
         i++;
     }
     printf("Number of atoms: %d\n", i);
 
-    chfl_trajectory_close(traj);
+    chfl_trajectory_close(file);
     chfl_frame_free(frame);
-    free(positions);
-    return 0;
+    free(indexes);
+    return EXIT_SUCCESS;
 
-error:
+cleanup:
     printf("Error, cleaning up …\n");
-    chfl_trajectory_close(traj);
+    chfl_trajectory_close(file);
     chfl_frame_free(frame);
-    free(positions);
-    return 1;
+    free(indexes);
+    return EXIT_FAILURE;
 }

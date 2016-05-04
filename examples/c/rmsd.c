@@ -8,26 +8,26 @@
 #include "chemfiles.h"
 
 int main() {
-    CHFL_TRAJECTORY* traj = chfl_trajectory_open("filename.nc", 'r');
+    CHFL_TRAJECTORY* file = chfl_trajectory_open("filename.nc", 'r');
     CHFL_FRAME* frame = chfl_frame(0);
     float (*positions)[3] = NULL;
     double* distances = NULL;
 
-    if(traj == NULL || frame == NULL)
-        goto error;
+    if(file == NULL || frame == NULL)
+        goto cleanup;
 
     size_t nsteps = 0;
-    chfl_trajectory_nsteps(traj, &nsteps);
+    chfl_trajectory_nsteps(file, &nsteps);
 
     distances = (double*)malloc(sizeof(double)*nsteps);
     if (distances == NULL)
-        goto error;
+        goto cleanup;
 
     // Accumulate the distances to the origin of the 10th atom throughtout the
     // trajectory
     for (size_t i=0; i<nsteps; i++) {
-        if(!chfl_trajectory_read(traj, frame))
-            goto error;
+        if(!chfl_trajectory_read(file, frame))
+            goto cleanup;
 
         size_t natoms = 0;
         // Position of the 10th atom
@@ -53,18 +53,15 @@ int main() {
 
     printf("Root-mean square displacement is: %f", rmsd);
 
-    // Free the memory
-    chfl_trajectory_close(traj);
+    chfl_trajectory_close(file);
     chfl_frame_free(frame);
     free(distances);
-    free(positions);
     return 0;
 
-error:
+cleanup:
     printf("Error, cleaning up …\n");
-    chfl_trajectory_close(traj);
+    chfl_trajectory_close(file);
     chfl_frame_free(frame);
     free(distances);
-    free(positions);
     return 1;
 }

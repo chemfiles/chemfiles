@@ -7,9 +7,9 @@
 #include "chemfiles.hpp"
 
 int main() {
-    chemfiles::Trajectory traj("filename.xyz");
+    chemfiles::Trajectory file("filename.xyz");
 
-    auto frame = traj.read();
+    auto frame = file.read();
     auto positions = frame.positions();
     std::vector<size_t> indexes;
 

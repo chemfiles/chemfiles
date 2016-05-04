@@ -4,31 +4,27 @@
 #include "chemfiles.hpp"
 
 int main() {
+    // Open the input file for reading
     chemfiles::Trajectory input("water.xyz");
-    chemfiles::Frame frame{};
-    chemfiles::Topology water_topology{};
-    // Orthorombic UnitCell with lengths of 20, 15 and 35 A
-    chemfiles::UnitCell cell(20, 15, 35);
 
-    // Create Atoms
-    chemfiles::Atom O("O");
-    chemfiles::Atom H("H");
+    // Set the unit cell to an orthorombic cell with lengths of 20, 15 and 35 A
+    input.set_cell(chemfiles::UnitCell(20, 15, 35));
 
-    // Fill the topology with one water molecule
-    water_topology.append(O);
-    water_topology.append(H);
-    water_topology.append(H);
-    water_topology.add_bond(0, 1);
-    water_topology.add_bond(0, 2);
+    // Create a water molecule topology
+    chemfiles::Topology water;
+    water.append(chemfiles::Atom("O"));
+    water.append(chemfiles::Atom("H"));
+    water.append(chemfiles::Atom("H"));
+    water.add_bond(0, 1);
+    water.add_bond(0, 2);
+    input.set_topology(water);
 
+    // Write to the output file using PDB format
     chemfiles::Trajectory output("water.pdb", 'w');
-
     while (!input.done()) {
-        frame = input.read();
-        // Set the frame cell and topology
-        frame.set_cell(cell);
-        frame.set_topology(water_topology);
-        // Write the frame to the output file, using PDB format
+        // The UnitCell and the Topology are automatically set when reading a
+        // frame to the specified cell and topology.
+        auto frame = input.read();
         output.write(frame);
     }
 

@@ -9,15 +9,14 @@
 #include "chemfiles.hpp"
 
 int main() {
-    chemfiles::Trajectory traj("filename.nc");
-
+    chemfiles::Trajectory file("filename.nc");
     std::vector<double> distances;
 
     // Accumulate the distances to the origin of the 10th atom throughtout the
     // trajectory
     chemfiles::Frame frame;
-    while (!traj.done()) {
-        frame = traj.read();
+    while (!file.done()) {
+        frame = file.read();
         // Position of the 10th atom
         auto pos = frame.positions()[9];
         double distance = sqrt(pos[0]*pos[0] + pos[1]*pos[1] + pos[2]*pos[2]);
