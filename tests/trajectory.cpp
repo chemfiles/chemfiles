@@ -53,7 +53,7 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
         "Fe 1 2 3\n"
         "Fe 1 2 3\n";
 
-        Trajectory file("tmp.xyz", "w");
+        Trajectory file("tmp.xyz", 'w');
 
         Frame frame(5);
         auto positions = frame.positions();
@@ -92,7 +92,7 @@ TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]"){
 }
 
 TEST_CASE("Specify a format parameter", "[Trajectory]"){
-    Trajectory file(XYZDIR "helium.xyz.but.not.really", "r", "XYZ");
+    Trajectory file(XYZDIR "helium.xyz.but.not.really", 'r', "XYZ");
     Frame frame;
 
     file >> frame;

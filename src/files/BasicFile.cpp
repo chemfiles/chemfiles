@@ -8,22 +8,31 @@
 #include <algorithm>
 
 #include "chemfiles/files/BasicFile.hpp"
+#include "chemfiles/Logger.hpp"
+#include "chemfiles/Error.hpp"
 using namespace chemfiles;
 
-BasicFile::BasicFile(const std::string& filename, const std::string& str_mode)
-    : TextFile(filename, str_mode) {
-    std::ios_base::openmode mode;
-    if (str_mode == "r") {
-        mode = std::ios_base::in;
-    } else if (str_mode == "a") {
-        mode = std::ios_base::out | std::ios_base::app;
-    } else if (str_mode == "w") {
-        mode = std::ios_base::out | std::ios_base::trunc;
-    } else {
-        throw FileError("Unrecognized file mode: " + str_mode);
+BasicFile::BasicFile(const std::string& filename, File::Mode mode)
+    : TextFile(filename, mode) {
+    std::ios_base::openmode openmode;
+
+    switch (mode) {
+    case File::READ:
+        openmode = std::ios_base::in;
+        break;
+    case File::APPEND:
+        openmode = std::ios_base::out | std::ios_base::app;
+        break;
+    case File::WRITE:
+        openmode = std::ios_base::out | std::ios_base::trunc;
+        break;
+    default:
+        Logger::error(std::string("Got a bad file mode: ") + static_cast<char>(mode));
+        abort();
+        break;
     }
 
-    stream_.open(filename, mode);
+    stream_.open(filename, openmode);
     if (!stream_.is_open()) {
         throw FileError("Could not open the file " + filename);
     }
@@ -35,6 +44,24 @@ BasicFile::BasicFile(const std::string& filename, const std::string& str_mode)
 const std::string& BasicFile::getline() {
     *this >> lines_[0];
     return lines_[0];
+}
+
+void BasicFile::rewind() {
+    stream_.clear();
+    stream_.seekg(0, std::ios::beg);
+}
+
+bool BasicFile::is_open() {
+    return stream_.is_open();
+}
+
+bool BasicFile::eof() {
+    return stream_.eof();
+}
+
+void BasicFile::sync() {
+    std::iostream::sync();
+    std::iostream::flush();
 }
 
 BasicFile& BasicFile::operator>>(std::string& line) {
@@ -72,6 +99,6 @@ void BasicFile::writeline(const std::string& line) {
 }
 
 void BasicFile::writelines(const std::vector<std::string>& _lines) {
-    for (auto line : _lines)
+    for (auto& line : _lines)
         *this << line;
 }

@@ -21,7 +21,7 @@ int main() {
     water_topology.add_bond(0, 1);
     water_topology.add_bond(0, 2);
 
-    chemfiles::Trajectory output("water.pdb", "w");
+    chemfiles::Trajectory output("water.pdb", 'w');
 
     while (!input.done()) {
         input >> frame;

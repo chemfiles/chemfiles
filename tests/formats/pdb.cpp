@@ -102,7 +102,7 @@ TEST_CASE("Write files in PDB format", "[PDB]"){
         positions[i] = vector3d(1, 2, 3);
 
 
-    auto file = Trajectory("test-tmp.pdb", "w");
+    auto file = Trajectory("test-tmp.pdb", 'w');
     file << frame;
 
     frame.resize(6);

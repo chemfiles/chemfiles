@@ -7,7 +7,7 @@
 #include "chemfiles.h"
 
 int main() {
-    CHFL_TRAJECTORY* traj = chfl_trajectory_open("tests/files/xyz/helium.xyz", "r");
+    CHFL_TRAJECTORY* traj = chfl_trajectory_open("tests/files/xyz/helium.xyz", 'r');
     CHFL_FRAME* frame = chfl_frame(0);
 
     if (traj == NULL)

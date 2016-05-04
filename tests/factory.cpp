@@ -22,7 +22,7 @@ public:
 // Dummy file clase
 class DummyFile : public BinaryFile {
 public:
-    DummyFile(const string&, const string&) : BinaryFile("", "") {}
+    DummyFile(const string&, File::Mode) : BinaryFile("", File::READ) {}
     bool is_open() override {return true;}
     void sync() override {}
 };
@@ -54,7 +54,7 @@ TEST_CASE("Geting registered format", "[Trajectory factory]"){
     TrajectoryFactory::get().register_extension(".dummy", {new_format<DummyFormat>, new_file<typename DummyFormat::file_t>});
     TrajectoryFactory::get().register_format("Dummy", {new_format<DummyFormat>, new_file<typename DummyFormat::file_t>});
 
-    BasicFile file("tmp.dat", "w");
+    BasicFile file("tmp.dat", File::WRITE);
 
     DummyFormat dummy(file);
     auto format = TrajectoryFactory::get().by_extension(".dummy").format_creator(file);
@@ -74,9 +74,9 @@ TEST_CASE("Geting registered format", "[Trajectory factory]"){
 
 TEST_CASE("Geting file type associated to a format", "[Trajectory factory]"){
     TrajectoryFactory::get().register_extension(".dummy2", {new_format<DummyFormat2>, new_file<typename DummyFormat2::file_t>});
-    DummyFile dummy("", "");
+    DummyFile dummy("", File::READ);
     auto file = TrajectoryFactory::get().by_extension(".dummy2").file_creator;
-    CHECK(typeid(dummy) == typeid(*file("", "")));
+    CHECK(typeid(dummy) == typeid(*file("", File::READ)));
 }
 
 TEST_CASE("Check error throwing in formats", "[Format errors]"){
@@ -87,7 +87,7 @@ TEST_CASE("Check error throwing in formats", "[Format errors]"){
     out.close();
 
     Frame frame;
-    Trajectory traj(filename, "a");
+    Trajectory traj(filename, 'a');
     CHECK_THROWS_AS(traj.read(), FormatError);
     CHECK_THROWS_AS(traj.read_step(2), FormatError);
     CHECK_THROWS_AS(traj.write(frame), FormatError);

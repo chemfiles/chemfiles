@@ -8,7 +8,7 @@
 #include "chemfiles.h"
 
 int main() {
-    CHFL_TRAJECTORY* traj = chfl_trajectory_open("filename.nc", "r");
+    CHFL_TRAJECTORY* traj = chfl_trajectory_open("filename.nc", 'r');
     CHFL_FRAME* frame = chfl_frame(0);
     float (*positions)[3] = NULL;
     double* distances = NULL;

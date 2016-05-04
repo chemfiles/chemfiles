@@ -7,8 +7,8 @@
 #include "chemfiles.h"
 
 int main() {
-    CHFL_TRAJECTORY* input = chfl_trajectory_open("water.xyz", "r");
-    CHFL_TRAJECTORY* output = chfl_trajectory_open("water.pdb", "w");
+    CHFL_TRAJECTORY* input = chfl_trajectory_open("water.xyz", 'r');
+    CHFL_TRAJECTORY* output = chfl_trajectory_open("water.pdb", 'w');
     CHFL_FRAME* frame = chfl_frame(0);
     CHFL_TOPOLOGY* water_topology = chfl_topology();
     // Orthorombic UnitCell with lengths of 20, 15 and 35 A

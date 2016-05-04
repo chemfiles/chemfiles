@@ -20,7 +20,6 @@
 #include "chemfiles/File.hpp"
 
 namespace chemfiles {
-using std::string;
 
 //! Maximum lenght for strings in variables
 const size_t NC_STRING_MAXLEN = 10;
@@ -57,10 +56,10 @@ public:
     NcVariable(NcFile& file, netcdf_id_t var);
 
     //! Get the attribute `name`.
-    std::string attribute(const string& name);
+    std::string attribute(const std::string& name);
 
     //! Add an attribute with the given `value` and `name`.
-    void add_attribute(const string& name, const string& value);
+    void add_attribute(const std::string& name, const std::string& value);
 
     //! Get `count` values starting at `start` from this variable
     template<typename T = NcType, typename unused = enable_if_same<T, float>>
@@ -103,11 +102,11 @@ template<> struct nc_type<char> {static constexpr auto value = NC_CHAR;};
  */
 class NcFile final: public BinaryFile {
 public:
-    NcFile(const string& filename, const string& mode);
+    NcFile(const std::string& filename, File::Mode mode);
     ~NcFile();
 
     //! Possible file mode. By default, files are in the DATA mode.
-    enum FileMode {
+    enum NcMode {
         //! Files in DEFINE mode can have there attributes, dimmensions and variables
         //! modified, but no data can be read or written using NcVariable.
         DEFINE,
@@ -115,9 +114,9 @@ public:
         DATA,
     };
     //! Set the file mode for this file
-    void set_file_mode(FileMode mode);
+    void set_nc_mode(NcMode mode);
     //! Get the file mode for this file
-    FileMode file_mode() const;
+    NcMode nc_mode() const;
 
     //! Get the NetCDF id of this file.
     netcdf_id_t netcdf_id() const {
@@ -125,21 +124,21 @@ public:
     }
 
     //! Get a global string attribut from the file
-    string global_attribute(const string& name) const;
+    std::string global_attribute(const std::string& name) const;
     //! Create a global attribut in the file_
-    void add_global_attribute(const string& name, const string& value);
+    void add_global_attribute(const std::string& name, const std::string& value);
 
     //! Get the value of a specific dimmension
-    size_t dimension(const string& name) const;
+    size_t dimension(const std::string& name) const;
     //! Create a dimmension with the specified value. If `value == NC_UNLIMITED`,
     //! then the dimension is infinite.
-    void add_dimension(const string& name, size_t value =  NC_UNLIMITED);
+    void add_dimension(const std::string& name, size_t value =  NC_UNLIMITED);
 
     //! Check if a variable exists
-    bool variable_exists(const string& name) const;
+    bool variable_exists(const std::string& name) const;
     //! Get a NetCDF variable
     template <typename NcType>
-    NcVariable<NcType> variable(const string& name) {
+    NcVariable<NcType> variable(const std::string& name) {
         netcdf_id_t var_id = -1;
         int status = nc_inq_varid(file_id_, name.c_str(), &var_id);
         check_nc_error("Can not read variable '" + name + "'", status);
@@ -149,8 +148,8 @@ public:
     //! Create a new variable of type `NcType` with name `name` along the dimensions in
     //! `dims`. `dims` must be string or string-like values.
     template <typename NcType, typename ...Dims>
-    NcVariable<NcType> add_variable(const string& name, Dims... dims) {
-        assert(file_mode() == DEFINE && "File must be in define mode to add variable");
+    NcVariable<NcType> add_variable(const std::string& name, Dims... dims) {
+        assert(nc_mode() == DEFINE && "File must be in define mode to add variable");
 
         auto dim_ids = get_dimmensions(dims...);
         netcdf_id_t var_id = -1;
@@ -187,7 +186,7 @@ private:
     }
 
     netcdf_id_t file_id_;
-    FileMode file_mode_;
+    NcMode nc_mode_;
 };
 
 /******************************************************************************/
@@ -196,20 +195,20 @@ template <typename NcType>
 NcVariable<NcType>::NcVariable(NcFile& file, netcdf_id_t var): file_(file), var_id_(var) {}
 
 template <typename NcType>
-string NcVariable<NcType>::attribute(const string& name) {
+std::string NcVariable<NcType>::attribute(const std::string& name) {
     size_t size = 0;
     int status = nc_inq_attlen(file_.netcdf_id(), var_id_, name.c_str(), &size);
     check_nc_error("Can not read attribute id '" + name + "'", status);
 
-    string value(size, ' ');
+    std::string value(size, ' ');
     status = nc_get_att_text(file_.netcdf_id(), var_id_, name.c_str(), &value[0]);
     check_nc_error("Can not read attribute text '" + name + "'", status);
     return value;
 }
 
 template <typename NcType>
-void NcVariable<NcType>::add_attribute(const string& name, const string& value) {
-    assert(file_.file_mode() == NcFile::DEFINE && "File must be in define mode to add attribute");
+void NcVariable<NcType>::add_attribute(const std::string& name, const std::string& value) {
+    assert(file_.nc_mode() == NcFile::DEFINE && "File must be in define mode to add attribute");
     int status = nc_put_att_text(file_.netcdf_id(), var_id_, name.c_str(), value.size(), value.c_str());
     check_nc_error("Can not set attribute'" + name + "'", status);
 }

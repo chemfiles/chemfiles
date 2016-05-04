@@ -21,36 +21,22 @@ namespace chemfiles {
  */
 class BasicFile final: public TextFile {
 public:
-    /*!
-     * Open a text file.
-     *
-     * @param filename The file path. In \c "w" or \c "a" modes, the file is
-     *                 created if it does not exist yet. In "r" mode, and
-     *                 exception is throwed is the file does not exist yet.
-     * @param mode Opening mode for the file. Supported modes are "r" for read,
-     *             "w" for write, and "a" for append. "w" mode discard any
-     *             previously existing file.
-     *
-     */
-    explicit BasicFile(const std::string& filename, const std::string& mode);
+    //! Open a text file with name `filename` and mode `mode`.
+    //!
+    //! An `FileError` exception is thrown if the file does not exists in
+    //! `'r'` or `'a'` mode.
+    explicit BasicFile(const std::string& filename, File::Mode mode);
 
-    virtual const std::string& getline() override;
-    virtual BasicFile& operator>>(std::string& line) override;
-    virtual const std::vector<std::string>& readlines(size_t n) override;
+    const std::string& getline() override;
+    BasicFile& operator>>(std::string& line) override;
+    const std::vector<std::string>& readlines(size_t n) override;
 
-    virtual void rewind() override{
-        stream_.clear();
-        stream_.seekg(0, std::ios::beg);
-    }
-    virtual size_t nlines() override;
+    void rewind() override;
+    size_t nlines() override;
 
-    virtual bool is_open() override {return stream_.is_open();}
-    virtual bool eof() override {return stream_.eof();}
-
-    virtual void sync() override {
-        std::iostream::sync();
-        std::iostream::flush();
-    }
+    bool is_open() override;
+    bool eof() override;
+    void sync() override;
 
     virtual void writeline(const std::string&) override;
     virtual void writelines(const std::vector<std::string>&) override;

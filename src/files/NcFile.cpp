@@ -28,22 +28,27 @@ size_t chemfiles::hyperslab_size(const count_t& count) {
     return counted;
 }
 
-NcFile::NcFile(const std::string& filename, const string& mode)
-    : BinaryFile(filename, mode), file_id_(-1), file_mode_(DATA) {
+NcFile::NcFile(const std::string& filename, File::Mode mode)
+    : BinaryFile(filename, mode), file_id_(-1), nc_mode_(DATA) {
     int status = NC_NOERR;
 
-    if (mode == "r") {
+    switch (mode) {
+    case File::READ:
         status = nc_open(filename.c_str(), NC_NOWRITE, &file_id_);
-    } else if (mode == "a") {
+        break;
+    case File::APPEND:
         status = nc_open(filename.c_str(), NC_WRITE, &file_id_);
-    } else if (mode == "w") {
-        status = nc_create(filename.c_str(), NC_64BIT_OFFSET | NC_CLASSIC_MODEL,
-                           &file_id_);
+        break;
+    case File::WRITE:
+        status = nc_create(filename.c_str(), NC_64BIT_OFFSET | NC_CLASSIC_MODEL, &file_id_);
         // Put the file in DATA mode. This can only fail for bad id, which we
         // check later.
         nc_enddef(file_id_);
-    } else {
-        throw FileError("Unknown mode for file opening: " + mode);
+        break;
+    default:
+        Logger::error(std::string("Got a bad file mode: ") + static_cast<char>(mode));
+        abort();
+        break;
     }
 
     check_nc_error("Could not open the file '" + filename + "'", status);
@@ -54,32 +59,32 @@ NcFile::~NcFile() {
     assert(status == NC_NOERR);
 }
 
-void NcFile::set_file_mode(FileMode mode) {
-    if (mode == file_mode_) {
+void NcFile::set_nc_mode(NcMode mode) {
+    if (mode == nc_mode_) {
         return;
     }
 
     if (mode == DATA) {
         int status = nc_enddef(file_id_);
         check_nc_error("Could not change to data mode", status);
-        file_mode_ = DATA;
+        nc_mode_ = DATA;
     } else if (mode == DEFINE) {
         int status = nc_redef(file_id_);
         check_nc_error("Could not change to define mode", status);
-        file_mode_ = DEFINE;
+        nc_mode_ = DEFINE;
     }
 }
 
-NcFile::FileMode NcFile::file_mode() const {
-    return file_mode_;
+NcFile::NcMode NcFile::nc_mode() const {
+    return nc_mode_;
 }
 
-string NcFile::global_attribute(const string& name) const {
+std::string NcFile::global_attribute(const std::string& name) const {
     size_t size = 0;
     int status = nc_inq_attlen(file_id_, NC_GLOBAL, name.c_str(), &size);
     check_nc_error("Can not read attribute '" + name + "'", status);
 
-    string value(size, ' ');
+    std::string value(size, ' ');
     // &value[0] get a pointer to the first char in the string. In C++11, the
     // string
     // storage must be contiguous, so we can use it here. value.c_str() returns
@@ -91,8 +96,8 @@ string NcFile::global_attribute(const string& name) const {
     return value;
 }
 
-void NcFile::add_global_attribute(const string& name, const string& value) {
-    assert(file_mode() == DEFINE &&
+void NcFile::add_global_attribute(const std::string& name, const std::string& value) {
+    assert(nc_mode() == DEFINE &&
            "File must be in define mode to add attribute");
     int status = nc_put_att_text(file_id_, NC_GLOBAL, name.c_str(),
                                  value.size(), value.c_str());
@@ -102,7 +107,7 @@ void NcFile::add_global_attribute(const string& name, const string& value) {
                    status);
 }
 
-size_t NcFile::dimension(const string& name) const {
+size_t NcFile::dimension(const std::string& name) const {
     // Get the dimmension id
     netcdf_id_t dim_id = -1;
     int status = nc_inq_dimid(file_id_, name.c_str(), &dim_id);
@@ -116,8 +121,8 @@ size_t NcFile::dimension(const string& name) const {
     return size;
 }
 
-void NcFile::add_dimension(const string& name, size_t value) {
-    assert(file_mode() == DEFINE &&
+void NcFile::add_dimension(const std::string& name, size_t value) {
+    assert(nc_mode() == DEFINE &&
            "File must be in define mode to add dimmension");
     netcdf_id_t dim_id = -1;
     int status = nc_def_dim(file_id_, name.c_str(), value, &dim_id);
@@ -125,12 +130,12 @@ void NcFile::add_dimension(const string& name, size_t value) {
 }
 
 void NcFile::sync() {
-    assert(file_mode() == DATA && "File must be in data mode to sync");
+    assert(nc_mode() == DATA && "File must be in data mode to sync");
     int status = nc_sync(file_id_);
     assert(status == NC_NOERR);
 }
 
-bool NcFile::variable_exists(const string& name) const {
+bool NcFile::variable_exists(const std::string& name) const {
     netcdf_id_t id;
     int status = nc_inq_varid(file_id_, name.c_str(), &id);
     return status == NC_NOERR;

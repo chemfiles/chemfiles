@@ -13,7 +13,7 @@
 
 int main(){
     CHFL_FRAME* frame = chfl_frame(0);
-    CHFL_TRAJECTORY* file = chfl_trajectory_open(DATADIR "water.xyz", "r");
+    CHFL_TRAJECTORY* file = chfl_trajectory_open(DATADIR "water.xyz", 'r');
 
     // Read the first frame
     assert(!chfl_trajectory_read(file, frame));
@@ -109,7 +109,7 @@ int main(){
     assert(!chfl_atom_free(atom));
 
     assert(!chfl_trajectory_close(file));
-    file = chfl_trajectory_open(DATADIR "trajectory.xyz", "r");
+    file = chfl_trajectory_open(DATADIR "trajectory.xyz", 'r');
 
     // Set the topology associated with a trajectory from a file
     assert(!chfl_trajectory_set_topology_file(file, DATADIR "topology.xyz"));
@@ -121,7 +121,7 @@ int main(){
 
     assert(!chfl_trajectory_close(file));
 
-    file = chfl_trajectory_with_format(DATADIR "helium.xyz.but.not.really", "r", "XYZ");
+    file = chfl_trajectory_with_format(DATADIR "helium.xyz.but.not.really", 'r', "XYZ");
     assert(!chfl_trajectory_read(file, frame));
     assert(!chfl_frame_atoms_count(frame, &natoms));
     assert(natoms == 125);

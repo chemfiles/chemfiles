@@ -62,7 +62,7 @@ static bool is_valid(const NcFile& ncfile_, size_t natoms) {
 NCFormat::NCFormat(File& file)
     : Format(file), ncfile_(dynamic_cast<NcFile&>(file)), step_(0),
       validated_(false) {
-    if (ncfile_.mode() == "r" || ncfile_.mode() == "a") {
+    if (ncfile_.mode() == File::READ || ncfile_.mode() == File::APPEND) {
         if (!is_valid(ncfile_, static_cast<size_t>(-1))) {
             throw FormatError("Invalid AMBER NetCDF file " + file.filename());
         }
@@ -136,7 +136,7 @@ void NCFormat::read_array3D(Span3D array, const string& name) const {
 
 // Initialize a file, assuming that it is empty
 static void initialize(NcFile& file, size_t natoms, bool with_velocities) {
-    file.set_file_mode(NcFile::DEFINE);
+    file.set_nc_mode(NcFile::DEFINE);
 
     file.add_global_attribute("Conventions", "AMBER");
     file.add_global_attribute("ConventionVersion", "1.0");
@@ -172,7 +172,7 @@ static void initialize(NcFile& file, size_t natoms, bool with_velocities) {
             file.add_variable<float>("velocities", "frame", "atom", "spatial");
         velocities.add_attribute("units", "angstrom/picosecond");
     }
-    file.set_file_mode(NcFile::DATA);
+    file.set_nc_mode(NcFile::DATA);
 
     spatial.add("xyz");
     cell_spatial.add("abc");

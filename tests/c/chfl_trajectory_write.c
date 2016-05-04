@@ -53,7 +53,7 @@ int main(){
 
     assert(!chfl_frame_set_topology(frame, top));
 
-    CHFL_TRAJECTORY* file = chfl_trajectory_open("test-tmp.xyz", "w");
+    CHFL_TRAJECTORY* file = chfl_trajectory_open("test-tmp.xyz", 'w');
     assert(!chfl_trajectory_write(file, frame));
 
     assert(!chfl_frame_resize(frame, 6));

@@ -9,6 +9,7 @@
 #include "chemfiles/Trajectory.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/Error.hpp"
 #include "chemfiles/TrajectoryFactory.hpp"
 
 using namespace chemfiles;
@@ -25,8 +26,25 @@ static string extension(const string& filename) {
     }
 }
 
-Trajectory::Trajectory(const string& filename, const string& mode,
-                       const string& format)
+static File::Mode char_to_file_mode(char mode) {
+    switch (mode) {
+    case 'r':
+    case 'R':
+        return File::READ;
+    case 'a':
+    case 'A':
+        return File::APPEND;
+    case 'w':
+    case 'W':
+        return File::WRITE;
+    default:
+        throw FileError(
+            "Got an unknown file mode '" + std::to_string(mode) + "'"
+        );
+    }
+}
+
+Trajectory::Trajectory(const string& filename, char mode, const string& format)
     : step_(0), nsteps_(0), format_(nullptr), file_(nullptr),
       custom_topology_(), custom_cell_() {
     trajectory_builder_t builder;
@@ -38,10 +56,11 @@ Trajectory::Trajectory(const string& filename, const string& mode,
         builder = TrajectoryFactory::get().format(format);
     }
 
-    file_ = builder.file_creator(filename, mode);
+    auto filemode = char_to_file_mode(mode);
+    file_ = builder.file_creator(filename, filemode);
     format_ = builder.format_creator(*file_);
 
-    if (mode == "r" || mode == "a")
+    if (mode == 'r' || mode == 'a')
         nsteps_ = format_->nsteps();
 }
 
@@ -56,12 +75,14 @@ Trajectory& Trajectory::operator>>(Frame& frame) {
 
 Frame Trajectory::read() {
     if (step_ >= nsteps_) {
-        throw FileError("Can not read file \"" + file_->filename() +
-                        "\" past end.");
+        throw FileError(
+            "Can not read file '" + file_->filename() + "' past end."
+        );
     }
-    if (!(file_->mode() == "r" || file_->mode() == "a")) {
-        throw FileError("File \"" + file_->filename() +
-                        "\" was not openened in read or append mode.");
+    if (!(file_->mode() == File::READ || file_->mode() == File::APPEND)) {
+        throw FileError(
+            "File '" + file_->filename() + "' was not openened in read or append mode."
+        );
     }
 
     Frame frame;
@@ -80,13 +101,16 @@ Frame Trajectory::read() {
 
 Frame Trajectory::read_step(const size_t step) {
     if (step >= nsteps_) {
-        throw FileError("Can not read file \"" + file_->filename() +
-                        "\" at step " + std::to_string(step) +
-                        ". Max step is " + std::to_string(nsteps_) + ".");
+        throw FileError(
+            "Can not read file '" + file_->filename() + "' at step " +
+            std::to_string(step) + ". Max step is " + std::to_string(nsteps_) + "."
+        );
     }
-    if (!(file_->mode() == "r" || file_->mode() == "a")) {
-        throw FileError("File \"" + file_->filename() +
-                        "\" was not openened in read or append mode.");
+
+    if (!(file_->mode() == File::READ || file_->mode() == File::APPEND)) {
+        throw FileError(
+            "File '" + file_->filename() + "' was not openened in read or append mode."
+        );
     }
 
     Frame frame;
@@ -109,9 +133,10 @@ Trajectory& Trajectory::operator<<(const Frame& frame) {
 }
 
 void Trajectory::write(const Frame& input_frame) {
-    if (!(file_->mode() == "w" || file_->mode() == "a")) {
-        throw FileError("File \"" + file_->filename() +
-                        "\" was not openened in write or append mode.");
+    if (!(file_->mode() == File::WRITE || file_->mode() == File::APPEND)) {
+        throw FileError(
+            "File '" + file_->filename() + "' was not openened in write or append mode."
+        );
     }
 
     // Maybe that is not the better way to do this, performance-wise. I'll have
@@ -134,7 +159,7 @@ void Trajectory::set_topology(const Topology& top) {
 }
 
 void Trajectory::set_topology(const std::string& filename) {
-    Trajectory topolgy_file(filename, "r");
+    Trajectory topolgy_file(filename, 'r');
     assert(topolgy_file.nsteps() > 0);
 
     auto frame = topolgy_file.read_step(0);

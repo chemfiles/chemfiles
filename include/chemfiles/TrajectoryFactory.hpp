@@ -24,12 +24,11 @@ using std::string;
 //! Function type to create a format
 typedef unique_ptr<Format> (*format_creator_t)(File& f);
 //! Function type to create a file
-typedef unique_ptr<File> (*file_creator_t)(const string& path,
-                                           const string& mode);
+typedef unique_ptr<File> (*file_creator_t)(const string& path, File::Mode mode);
 
 //! Function to create a file
 template <class file_t>
-unique_ptr<File> new_file(const string& path, const string& mode) {
+unique_ptr<File> new_file(const string& path, File::Mode mode) {
     return unique_ptr<File>(new file_t(path, mode));
 }
 

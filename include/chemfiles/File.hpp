@@ -9,20 +9,25 @@
 #ifndef CHEMFILES_FILES_HPP
 #define CHEMFILES_FILES_HPP
 
-#include "chemfiles/Error.hpp"
-
 #include <iostream>
 #include <string>
 #include <vector>
 
 namespace chemfiles {
 
-/*!
-* @class File File.hpp File.cpp
-* @brief Abstract base class for file representation.
-*/
+//!  Abstract base class for file representation.
 class File {
 public:
+    //! Possible modes for opening a file
+    enum Mode: char {
+        //! Open in read-only mode
+        READ = 'r',
+        //! Open in read-write mode, and replace the file if it is already present
+        WRITE = 'w',
+        //! Open in read-write mode, and append new data at the end of the file
+        APPEND = 'a',
+    };
+
     virtual ~File() = default;
 
     // Removing default copy constructors
@@ -36,24 +41,19 @@ public:
     //! File name, i.e. complete path to this file on disk.
     const std::string& filename() const { return filename_; }
     //! File opening mode.
-    const std::string& mode() const { return mode_; }
+    Mode mode() const { return mode_; }
 
 protected:
-    File(const std::string& path, const std::string& mode)
-        : filename_(path), mode_(mode) {}
+    File(const std::string& path, Mode mode): filename_(path), mode_(mode) {}
 
 private:
     const std::string filename_;
-    const std::string mode_;
+    Mode mode_;
 };
 
-/*!
- * @class TextFile File.hpp File.cpp
- *
- * Abstract base class representing a text file. This class is inteded to be
- * inherited by
- * any form of text files: compressed files, memory-mapped files, and any other.
- */
+//! Abstract base class representing a text file. This class is inteded to be
+//! inherited by any form of text files: compressed files, memory-mapped files,
+//! etc.
 class TextFile : public File, public std::iostream {
 public:
     virtual ~TextFile() = default;
@@ -90,26 +90,22 @@ public:
     }
 
 protected:
-    explicit TextFile(const std::string& path, const std::string& mode)
+    explicit TextFile(const std::string& path, File::Mode mode)
         : File(path, mode), std::iostream(nullptr) {}
 };
 
-/*!
-* @class BinaryFile File.hpp
-* @brief Abstract base class for binary files representation
-*
-* Because the binary formats can be everything, this class does not provides any
-* of the usual methods for working with streams, and is not intended to be
-* instanciated, but rather to serve as a base class for all the binary
-* file classes.
-*/
+//! Abstract base class for binary files representation
+//!
+//! Because the binary formats can be everything, this class does not provides
+//! any of the usual methods for working with streams, and is not intended to
+//! be instanciated, but rather to serve as a base class for all the binary
+//! file classes.
 class BinaryFile : public File {
 public:
     virtual ~BinaryFile() = default;
 
 protected:
-    explicit BinaryFile(const std::string& path, const std::string& mode)
-        : File(path, mode) {}
+    explicit BinaryFile(const std::string& path, File::Mode mode): File(path, mode) {}
 };
 
 } // namespace chemfiles

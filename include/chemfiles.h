@@ -162,21 +162,20 @@ CHFL_EXPORT int chfl_log_callback(chfl_logging_cb callback);
 /*!
 * @brief Open a trajectory file.
 * @param filename The path to the trajectory file
-* @param mode The opening mode: "r" for read, "w" for write and  "a" for append.
+* @param mode The opening mode: 'r' for read, 'w' for write and 'a' for append.
 * @return A pointer to the file
 */
-CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_open(const char* filename,
-                                                  const char* mode);
+CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_open(const char* filename, char mode);
 
 /*!
 * @brief Open a trajectory file using a given format to read the file.
 * @param filename The path to the trajectory file
-* @param mode The opening mode: "r" for read, "w" for write and  "a" for append.
+* @param mode The opening mode: 'r' for read, 'w' for write and 'a' for append.
 * @param format The format to use
 * @return A pointer to the file
 */
 CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_with_format(const char* filename,
-                                                         const char* mode,
+                                                         char mode,
                                                          const char* format);
 
 /*!

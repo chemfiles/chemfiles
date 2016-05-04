@@ -140,7 +140,7 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
     topology.append(Atom("D"));
     frame.set_topology(topology);
 
-    auto file = Trajectory("test-tmp.xyz", "w");
+    auto file = Trajectory("test-tmp.xyz", 'w');
     file << frame;
 
     frame.resize(6);

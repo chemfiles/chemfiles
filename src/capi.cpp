@@ -83,9 +83,8 @@ int chfl_log_callback(chfl_logging_cb callback) {
 
 /******************************************************************************/
 
-CHFL_TRAJECTORY* chfl_trajectory_open(const char* filename, const char* mode) {
+CHFL_TRAJECTORY* chfl_trajectory_open(const char* filename, char mode) {
     assert(filename != nullptr);
-    assert(mode != nullptr);
     CHFL_TRAJECTORY* traj = nullptr;
     CHFL_ERROR_WRAP(
         traj = new Trajectory(filename, mode);
@@ -94,9 +93,8 @@ error:
     return traj;
 }
 
-CHFL_TRAJECTORY* chfl_trajectory_with_format(const char* filename, const char* mode, const char* format) {
+CHFL_TRAJECTORY* chfl_trajectory_with_format(const char* filename, char mode, const char* format) {
     assert(filename != nullptr);
-    assert(mode != nullptr);
     assert(format != nullptr);
     CHFL_TRAJECTORY* traj = nullptr;
     CHFL_ERROR_WRAP(

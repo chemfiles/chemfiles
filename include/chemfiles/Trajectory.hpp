@@ -24,12 +24,10 @@ class Format;
 /*!
 * @class Trajectory Trajectory.hpp Trajectory.cpp
 * @brief A Trajectory is a chemistry file on the hard drive. It is the main
-* entry point
-*        of the chemfiles library.
+* entry point of the chemfiles library.
 *
 * A Trajectory is made with a File and a Format. The File implements all the
-* physical
-* operations, while the Format provides a way to interpret the file.
+* physical operations, while the Format provides a way to interpret the file.
 */
 class CHFL_EXPORT Trajectory {
 public:
@@ -37,21 +35,18 @@ public:
      * Open a file, automatically gessing the file format and type from the
      * extension.
      *
-     * @param filename The file path. In \c "w" or \c "a" modes, the file is
-     *                 created if it does not exist yet. In "r" mode, and
-     *                 exception is throwed is the file does not exist yet.
+     * @param filename The file path. In `w` or `a` modes, the file is
+     *                 created if it does not exist yet. In `r` mode, an
+     *                 exception is thrown is the file does not exist yet.
+     * @param mode Opening mode for the file. Default mode is `r` for read.
+     *             Other supported modes depends on the underlying format and
+     *             are `w` for write, and `a` for append. `w` mode discard any
+     *             previously existing file.
      * @param format Specific format to use. Needed when there is no way to
      *               guess the format from the extension of the file, or when
      *               this guess would be wrong.
-     * @param mode Opening mode for the file. Default mode is "r" for read.
-     *             Other supported modes depends on the underlying format and
-     *             are "w" for write, and "a" for append. "w" mode discard any
-     *             previously existing file.
      */
-    //!
-    Trajectory(const std::string& filename,
-               const std::string& mode = "r",
-               const std::string& format = "");
+    Trajectory(const std::string& filename, char mode = 'r', const std::string& format = "");
     Trajectory(Trajectory&&);
     Trajectory& operator=(Trajectory&&);
     ~Trajectory();

@@ -14,7 +14,7 @@ using namespace chemfiles;
 #define DATADIR SRCDIR "/data/"
 
 TEST_CASE("Read a NetCDF file", "[Files]"){
-    NcFile file(DATADIR "netcdf/water.nc", "r");
+    NcFile file(DATADIR "netcdf/water.nc", File::READ);
     REQUIRE(file.is_open());
 
     CHECK(file.global_attribute("Conventions") == "AMBER");
@@ -40,7 +40,7 @@ TEST_CASE("Read a NetCDF file", "[Files]"){
 }
 
 TEST_CASE("Errors in NetCDF files", "[Files]"){
-    NcFile file(DATADIR "netcdf/water.nc", "r");
+    NcFile file(DATADIR "netcdf/water.nc", File::READ);
     REQUIRE(file.is_open());
 
     CHECK_THROWS_AS(file.global_attribute("FOO"), FileError);
@@ -51,9 +51,9 @@ TEST_CASE("Errors in NetCDF files", "[Files]"){
 
 TEST_CASE("Write NetCDF files", "[Files]"){
     {
-        NcFile file("tmp.nc", "w");
+        NcFile file("tmp.nc", File::WRITE);
         REQUIRE(file.is_open());
-        file.set_file_mode(NcFile::DEFINE);
+        file.set_nc_mode(NcFile::DEFINE);
         file.add_global_attribute("global", "global.value");
         file.add_dimension("infinite");
         file.add_dimension("finite", 42);
@@ -61,7 +61,7 @@ TEST_CASE("Write NetCDF files", "[Files]"){
         variable.add_attribute("attribute", "hello");
     }
 
-    NcFile file("tmp.nc", "r");
+    NcFile file("tmp.nc", File::READ);
     CHECK(file.global_attribute("global") == "global.value");
     CHECK(file.dimension("infinite") == 0);
     CHECK(file.dimension("finite") == 42);

@@ -18,8 +18,7 @@ using namespace chemfiles;
 
 template <typename T>
 void registration(trajectory_map_t& formats, trajectory_map_t& extensions) {
-    auto creator =
-        trajectory_builder_t{new_format<T>, new_file<typename T::file_t>};
+    auto creator = trajectory_builder_t{new_format<T>, new_file<typename T::file_t>};
 
     auto ext = std::string(T::extension());
     if (ext != "") {
