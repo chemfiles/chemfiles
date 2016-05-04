@@ -17,24 +17,20 @@
 
 namespace chemfiles {
 
-using std::shared_ptr;
-using std::unique_ptr;
-using std::string;
-
 //! Function type to create a format
-typedef unique_ptr<Format> (*format_creator_t)(File& f);
+typedef std::unique_ptr<Format> (*format_creator_t)(File& f);
 //! Function type to create a file
-typedef unique_ptr<File> (*file_creator_t)(const string& path, File::Mode mode);
+typedef std::unique_ptr<File> (*file_creator_t)(const std::string& path, File::Mode mode);
 
 //! Function to create a file
 template <class file_t>
-unique_ptr<File> new_file(const string& path, File::Mode mode) {
-    return unique_ptr<File>(new file_t(path, mode));
+std::unique_ptr<File> new_file(const std::string& path, File::Mode mode) {
+    return std::unique_ptr<File>(new file_t(path, mode));
 }
 
 //! Function to create a format
-template <class format_t> unique_ptr<Format> new_format(File& file) {
-    return unique_ptr<Format>(new format_t(file));
+template <class format_t> std::unique_ptr<Format> new_format(File& file) {
+    return std::unique_ptr<Format>(new format_t(file));
 }
 
 #define FORMAT_EXTENSION(x)                                                    \
@@ -58,7 +54,7 @@ struct trajectory_builder_t {
 };
 
 //! Files extensions to trajectory builder associations
-using trajectory_map_t = std::unordered_map<string, trajectory_builder_t>;
+using trajectory_map_t = std::unordered_map<std::string, trajectory_builder_t>;
 
 /*!
 * @class TrajectoryFactory TrajectoryFactory.hpp
@@ -86,7 +82,7 @@ public:
      *
      * Throws an error if the format can not be found
      */
-    trajectory_builder_t format(const string& name);
+    trajectory_builder_t format(const std::string& name);
 
     /*!
      * @brief Get a trajectory_builder from a format \c extention.
@@ -96,12 +92,12 @@ public:
      *
      * Throws an error if the format can not be found
      */
-    trajectory_builder_t by_extension(const string& ext);
+    trajectory_builder_t by_extension(const std::string& ext);
 
     //! Register a trajectory_builder in the internal format names list.
-    void register_format(const string& name, trajectory_builder_t tb);
+    void register_format(const std::string& name, trajectory_builder_t tb);
     //! Register an trajectory_builder in the internal extensions list.
-    void register_extension(const string& ext, trajectory_builder_t tb);
+    void register_extension(const std::string& ext, trajectory_builder_t tb);
 
 private:
     //! Trajectory map associating format descriptions and readers

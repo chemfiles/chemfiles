@@ -118,7 +118,7 @@ UnitCell NCFormat::read_cell() const {
                     angles[2]);
 }
 
-void NCFormat::read_array3D(Span3D array, const string& name) const {
+void NCFormat::read_array3D(Span3D array, const std::string& name) const {
     auto array_var = ncfile_.variable<float>(name);
     auto natoms = ncfile_.dimension("atom");
     assert(array.size() == natoms);
@@ -197,7 +197,7 @@ void NCFormat::write(const Frame& frame) {
     step_++;
 }
 
-void NCFormat::write_array3D(const Array3D& arr, const string& name) const {
+void NCFormat::write_array3D(const Array3D& arr, const std::string& name) const {
     auto var = ncfile_.variable<float>(name);
     auto natoms = arr.size();
     std::vector<size_t> start{step_, 0, 0};

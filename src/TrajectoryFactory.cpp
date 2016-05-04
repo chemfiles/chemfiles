@@ -61,14 +61,14 @@ TrajectoryFactory& TrajectoryFactory::get() {
     return instance;
 }
 
-trajectory_builder_t TrajectoryFactory::format(const string& name) {
+trajectory_builder_t TrajectoryFactory::format(const std::string& name) {
     if (formats_.find(name) == formats_.end()) {
         throw FormatError("Can not find the format \"" + name + "\".");
     }
     return formats_[name];
 }
 
-trajectory_builder_t TrajectoryFactory::by_extension(const string& ext) {
+trajectory_builder_t TrajectoryFactory::by_extension(const std::string& ext) {
     if (extensions_.find(ext) == extensions_.end()) {
         throw FormatError("Can not find a format associated with the \"" + ext +
                           "\" extension.");
@@ -76,7 +76,7 @@ trajectory_builder_t TrajectoryFactory::by_extension(const string& ext) {
     return extensions_[ext];
 }
 
-void TrajectoryFactory::register_format(const string& name,
+void TrajectoryFactory::register_format(const std::string& name,
                                         trajectory_builder_t tb) {
     if (formats_.find(name) != formats_.end()) {
         throw FormatError("The name \"" + name +
@@ -85,7 +85,7 @@ void TrajectoryFactory::register_format(const string& name,
     formats_.emplace(name, tb);
 }
 
-void TrajectoryFactory::register_extension(const string& ext,
+void TrajectoryFactory::register_extension(const std::string& ext,
                                            trajectory_builder_t tb) {
     if (extensions_.find(ext) != extensions_.end()) {
         throw FormatError("The extension \"" + ext +

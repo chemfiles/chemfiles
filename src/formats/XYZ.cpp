@@ -72,7 +72,7 @@ void XYZFormat::read(Frame& frame) {
         natoms = std::stoul(textfile_.getline());
         textfile_.getline(); // XYZ comment line;
     } catch (const std::exception& e) {
-        throw FormatError("Can not read next step: " + string(e.what()));
+        throw FormatError("Can not read next step: " + std::string(e.what()));
     }
 
     std::vector<std::string> lines(natoms);
@@ -80,7 +80,7 @@ void XYZFormat::read(Frame& frame) {
     try {
         lines = textfile_.readlines(natoms);
     } catch (const FileError& e) {
-        throw FormatError("Can not read file: " + string(e.what()));
+        throw FormatError("Can not read file: " + std::string(e.what()));
     }
 
     frame.resize(natoms);
@@ -89,7 +89,7 @@ void XYZFormat::read(Frame& frame) {
     for (size_t i = 0; i < lines.size(); i++) {
         std::istringstream string_stream;
         float x, y, z;
-        string name;
+        std::string name;
 
         string_stream.str(lines[i]);
         string_stream >> name >> x >> y >> z;

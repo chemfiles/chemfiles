@@ -22,7 +22,7 @@ public:
 // Dummy file clase
 class DummyFile : public BinaryFile {
 public:
-    DummyFile(const string&, File::Mode) : BinaryFile("", File::READ) {}
+    DummyFile(const std::string&, File::Mode) : BinaryFile("", File::READ) {}
     bool is_open() override {return true;}
     void sync() override {}
 };
