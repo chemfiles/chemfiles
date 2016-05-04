@@ -12,10 +12,9 @@ bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
 
 TEST_CASE("Read files in DCD format using Molfile", "[Molfile]"){
     double eps = 1e-4;
-    Frame frame;
     Trajectory file(DCDDIR "water.dcd");
 
-    file >> frame;
+    auto frame = file.read();
     CHECK(frame.natoms() == 297);
 
     auto positions = frame.positions();
@@ -26,8 +25,8 @@ TEST_CASE("Read files in DCD format using Molfile", "[Molfile]"){
     CHECK(cell.type() == UnitCell::ORTHOROMBIC);
     CHECK(fabs(cell.a() - 15.0) < eps);
 
-    file >> frame;
-    file >> frame;
+    file.read(); // Skip a frame
+    frame = file.read();
     CHECK(frame.natoms() == 297);
 
     positions = frame.positions();

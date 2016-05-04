@@ -14,8 +14,7 @@ TEST_CASE("Read files in Gromacs .trr format using Molfile", "[Molfile]"){
     double eps = 1e-4;
     SECTION("Ubiquitin"){
         Trajectory file(TRRDIR"ubiquitin.trr");
-        Frame frame;
-        file >> frame;
+        auto frame = file.read();
 
         CHECK(frame.natoms() == 20455);
         auto positions = frame.positions();
@@ -26,9 +25,7 @@ TEST_CASE("Read files in Gromacs .trr format using Molfile", "[Molfile]"){
 
     SECTION("Water"){
         Trajectory file(TRRDIR "water.trr");
-        Frame frame;
-
-        file >> frame;
+        auto frame = file.read();
         CHECK(frame.natoms() == 297);
 
         auto positions = frame.positions();
@@ -39,8 +36,8 @@ TEST_CASE("Read files in Gromacs .trr format using Molfile", "[Molfile]"){
         CHECK(cell.type() == UnitCell::ORTHOROMBIC);
         CHECK(fabs(cell.a() - 15.0) < eps);
 
-        file >> frame;
-        file >> frame;
+        file.read();
+        frame = file.read();
         CHECK(frame.natoms() == 297);
 
         positions = frame.positions();

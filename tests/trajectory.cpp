@@ -12,11 +12,10 @@ using namespace chemfiles;
 TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
     SECTION("Reading"){
         Trajectory file(XYZDIR "trajectory.xyz");
-        Frame frame;
 
         SECTION("From a file"){
             file.set_topology(XYZDIR "topology.xyz");
-            file >> frame;
+            auto frame = file.read();
 
             CHECK(frame.natoms() == 9);
             auto topology = frame.topology();
@@ -32,7 +31,7 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
                 top.append(Atom("Fe"));
 
             file.set_topology(top);
-            file >> frame;
+            auto frame = file.read();
 
             CHECK(frame.natoms() == 9);
             auto topology = frame.topology();
@@ -66,7 +65,7 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
             top.append(Atom("Fe"));
 
         file.set_topology(top);
-        file << frame;
+        file.write(frame);
         file.sync();
 
         std::ifstream checking("tmp.xyz");
@@ -82,10 +81,8 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
 TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]"){
     SECTION("Reading"){
         Trajectory file(XYZDIR "trajectory.xyz");
-        Frame frame;
-
         file.set_cell(UnitCell(25, 32, 94));
-        file >> frame;
+        auto frame = file.read();
 
         CHECK(frame.cell() == UnitCell(25, 32, 94));
     }
@@ -93,8 +90,6 @@ TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]"){
 
 TEST_CASE("Specify a format parameter", "[Trajectory]"){
     Trajectory file(XYZDIR "helium.xyz.but.not.really", 'r', "XYZ");
-    Frame frame;
-
-    file >> frame;
+    auto frame = file.read();
     CHECK(frame.natoms() == 125);
 }

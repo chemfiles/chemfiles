@@ -24,12 +24,12 @@ int main() {
     chemfiles::Trajectory output("water.pdb", 'w');
 
     while (!input.done()) {
-        input >> frame;
+        frame = input.read();
         // Set the frame cell and topology
         frame.set_cell(cell);
         frame.set_topology(water_topology);
         // Write the frame to the output file, using PDB format
-        output << frame;
+        output.write(frame);
     }
 
     return 0;

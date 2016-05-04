@@ -5,14 +5,14 @@
 using namespace chemfiles;
 
 TEST_CASE("Frame class usage", "[Frame]"){
-    auto frame = Frame(10);
-
     SECTION("Contructor"){
+        auto frame = Frame(10);
         CHECK(frame.positions().size() == 10);
         CHECK(frame.cell().type() == UnitCell::INFINITE);
     }
 
     SECTION("Get and set"){
+        auto frame = Frame();
         CHECK(frame.step() == 0);
         frame.set_step(1000);
         CHECK(frame.step() == 1000);
@@ -54,7 +54,7 @@ TEST_CASE("Frame class usage", "[Frame]"){
     SECTION("Guess bonds"){
         Trajectory file(SRCDIR "/data/xyz/methane.xyz");
 
-        file >> frame;
+        auto frame = file.read();
         frame.guess_topology();
 
         auto topology = frame.topology();

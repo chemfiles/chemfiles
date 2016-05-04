@@ -51,19 +51,12 @@ public:
     Trajectory& operator=(Trajectory&&);
     ~Trajectory();
 
-    //! Read operator, in *stream* version
-    Trajectory& operator>>(Frame& frame);
-    //! Read operator, in *method* version
+    //! Read the next frame in the trajectory
     Frame read();
-    //! Read operator, in *method* version with specific step
+    //! Read a single frame at specific step from the trajectory
     Frame read_step(const size_t);
 
-    //! Synchronize any content in the underlying buffer to the disk
-    void sync();
-
-    //! Write operator, in *stream* version
-    Trajectory& operator<<(const Frame& frame);
-    //! Write operator, in *method* version
+    //! Write a single frame to the trajectory
     void write(const Frame& frame);
 
     //! Set the Topology of all the Frame read or written to `topology`. This
@@ -84,6 +77,8 @@ public:
     size_t nsteps() const { return nsteps_; }
     //! Have we read all the Frames in this file ?
     bool done() const;
+    //! Synchronize any content in the underlying buffer to the disk
+    void sync();
 
 private:
     //! Current step

@@ -24,8 +24,8 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
         CHECK(cell.type() == UnitCell::ORTHOROMBIC);
         CHECK(fabs(cell.a() - 15.0) < 1e-5);
 
-        file >> frame;
-        file >> frame;
+        file.read(); // Skip a frame
+        frame = file.read();
 
         CHECK(frame.natoms() == 297);
         positions = frame.positions();
@@ -103,7 +103,7 @@ TEST_CASE("Write files in PDB format", "[PDB]"){
 
 
     auto file = Trajectory("test-tmp.pdb", 'w');
-    file << frame;
+    file.write(frame);
 
     frame.resize(6);
     positions = frame.positions();
@@ -115,7 +115,7 @@ TEST_CASE("Write files in PDB format", "[PDB]"){
     topology.add_bond(4, 5);
     frame.set_topology(topology);
 
-    file << frame;
+    file.write(frame);
     file.sync();
 
     std::ifstream checking("test-tmp.pdb");

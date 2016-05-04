@@ -9,6 +9,8 @@
   and `chfl_frame_guess_topology` do not take a boolean parameter anymore.
 * The opening mode is now a `char` instead of a string in `Trajectory`
   constructor, `chfl_trajectory_open`, and `chfl_trajectory_with_format`.
+* Remove `operator<<` and `operator>>` for `Trajectory`. Users should use
+  `Trajectory::read` and `Trajectory::write`
 
 # 0.5 (19 Feb 2016)
 

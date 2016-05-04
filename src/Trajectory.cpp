@@ -68,11 +68,6 @@ Trajectory::~Trajectory() = default;
 Trajectory::Trajectory(Trajectory&&) = default;
 Trajectory& Trajectory::operator=(Trajectory&&) = default;
 
-Trajectory& Trajectory::operator>>(Frame& frame) {
-    frame = read();
-    return *this;
-}
-
 Frame Trajectory::read() {
     if (step_ >= nsteps_) {
         throw FileError(
@@ -125,11 +120,6 @@ Frame Trajectory::read_step(const size_t step) {
         frame.set_cell(*custom_cell_);
     }
     return frame;
-}
-
-Trajectory& Trajectory::operator<<(const Frame& frame) {
-    write(frame);
-    return *this;
 }
 
 void Trajectory::write(const Frame& input_frame) {

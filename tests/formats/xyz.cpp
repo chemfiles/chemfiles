@@ -26,8 +26,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
     Trajectory file(XYZDIR "helium.xyz");
 
     SECTION("Stream style reading"){
-        Frame frame;
-        file >> frame;
+        auto frame = file.read();
         CHECK(frame.natoms() == 125);
         // Check positions
         auto positions = frame.positions();
@@ -73,7 +72,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
 
         Frame frame;
         while (!file.done()){
-            file >> frame;
+            frame = file.read();
         }
         auto positions = frame.positions();
         CHECK(positions[0] == vector3d(-1.186037f, 11.439334f, 0.529939f));
@@ -141,7 +140,7 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
     frame.set_topology(topology);
 
     auto file = Trajectory("test-tmp.xyz", 'w');
-    file << frame;
+    file.write(frame);
 
     frame.resize(6);
     positions = frame.positions();
@@ -152,7 +151,7 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
     topology.append(Atom("F"));
     frame.set_topology(topology);
 
-    file << frame;
+    file.write(frame);
     file.sync();
 
     std::ifstream checking("test-tmp.xyz");

@@ -8,9 +8,8 @@
 
 int main() {
     chemfiles::Trajectory traj("filename.xyz");
-    chemfiles::Frame frame;
 
-    traj >> frame;
+    auto frame = traj.read();
     auto positions = frame.positions();
     std::vector<size_t> indexes;
 
