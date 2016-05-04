@@ -11,6 +11,9 @@
   constructor, `chfl_trajectory_open`, and `chfl_trajectory_with_format`.
 * Remove `operator<<` and `operator>>` for `Trajectory`. Users should use
   `Trajectory::read` and `Trajectory::write`
+* Users can now specify the format when reading the topology associated with a
+  trajectory from a file. The `chfl_trajectory_set_topology_with_format`
+  function can be used to do so from the C API.
 
 # 0.5 (19 Feb 2016)
 

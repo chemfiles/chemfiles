@@ -168,10 +168,15 @@ CHFL_EXPORT int chfl_log_callback(chfl_logging_cb callback);
 CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_open(const char* filename, char mode);
 
 /*!
-* @brief Open a trajectory file using a given format to read the file.
+* @brief Open a trajectory file using a specific file format.
+*
+* This can be needed when the file format does not match the extension, or
+* when there is not standard extension for this format.
+*
 * @param filename The path to the trajectory file
 * @param mode The opening mode: 'r' for read, 'w' for write and 'a' for append.
-* @param format The format to use
+* @param format The file format to use. An empty string means that the format
+*               should be guessed from the extension.
 * @return A pointer to the file
 */
 CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_with_format(const char* filename,
@@ -226,6 +231,25 @@ CHFL_EXPORT int chfl_trajectory_set_topology(CHFL_TRAJECTORY* file,
 */
 CHFL_EXPORT int chfl_trajectory_set_topology_file(CHFL_TRAJECTORY* file,
                                                   const char* filename);
+
+/*!
+* @brief Set the topology associated with a trajectory by reading the first
+*        frame of \c filename using the file format in \c format; and
+*        extracting the topology of this frame.
+*
+* This can be needed when the topology file format does not match the extension, or
+* when there is not standard extension for this format.
+*
+* @param file A pointer to the trajectory
+* @param filename The file to read in order to get the new topology
+* @param format The name of the file format to use for reading the topology. An
+*               empty string means that the format should be guessed from the
+*               extension.
+* @return The status code.
+*/
+CHFL_EXPORT int chfl_trajectory_set_topology_with_format(CHFL_TRAJECTORY* file,
+                                                         const char* filename,
+                                                         const char* format);
 
 /*!
 * @brief Set the unit cell associated with a trajectory. This cell will be

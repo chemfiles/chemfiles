@@ -144,6 +144,15 @@ int chfl_trajectory_set_topology_file(CHFL_TRAJECTORY *file, const char* filenam
     )
 }
 
+int chfl_trajectory_set_topology_with_format(CHFL_TRAJECTORY *file, const char* filename, const char* format) {
+    assert(file != nullptr);
+    assert(filename != nullptr);
+    assert(format != nullptr);
+    CHFL_ERROR_WRAP_RETCODE(
+        file->set_topology(std::string(filename), std::string(format));
+    )
+}
+
 int chfl_trajectory_set_cell(CHFL_TRAJECTORY *file, const CHFL_CELL *cell) {
     assert(file != nullptr);
     assert(cell != nullptr);

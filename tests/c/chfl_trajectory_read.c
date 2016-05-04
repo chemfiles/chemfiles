@@ -112,6 +112,13 @@ int main(){
     file = chfl_trajectory_open(DATADIR "trajectory.xyz", 'r');
 
     // Set the topology associated with a trajectory from a file
+    assert(!chfl_trajectory_set_topology_with_format(file, DATADIR "topology.xyz.topology", "XYZ"));
+    assert(!chfl_trajectory_read(file, frame));
+    atom = chfl_atom_from_frame(frame, 0);
+    assert(!chfl_atom_name(atom, name, sizeof(name)));
+    assert(strcmp(name, "Zn") == 0);
+    assert(!chfl_atom_free(atom));
+
     assert(!chfl_trajectory_set_topology_file(file, DATADIR "topology.xyz"));
     assert(!chfl_trajectory_read(file, frame));
     atom = chfl_atom_from_frame(frame, 0);

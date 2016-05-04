@@ -14,7 +14,7 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
         Trajectory file(XYZDIR "trajectory.xyz");
 
         SECTION("From a file"){
-            file.set_topology(XYZDIR "topology.xyz");
+            file.set_topology(XYZDIR "topology.xyz.topology", "XYZ");
             auto frame = file.read();
 
             CHECK(frame.natoms() == 9);

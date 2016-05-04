@@ -148,8 +148,8 @@ void Trajectory::set_topology(const Topology& top) {
     custom_topology_ = top;
 }
 
-void Trajectory::set_topology(const std::string& filename) {
-    Trajectory topolgy_file(filename, 'r');
+void Trajectory::set_topology(const std::string& filename, const std::string& format) {
+    Trajectory topolgy_file(filename, 'r', format);
     assert(topolgy_file.nsteps() > 0);
 
     auto frame = topolgy_file.read_step(0);

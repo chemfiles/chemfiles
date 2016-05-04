@@ -65,8 +65,9 @@ public:
     void set_topology(const Topology&);
     //! Use the Topology of the first Frame of the following file as Topology
     //! for all the Frame read or written. This replace any topology in the
-    //! file being read, or in the Frame being written.
-    void set_topology(const std::string& filename);
+    //! file being read, or in the Frame being written. The optional parameter
+    //! `format` can be used to specify the topology file format.
+    void set_topology(const std::string& filename, const std::string& format = "");
 
     //! Set the unit cell of all the Frame read or written to `cell`. This
     //! replace any cell in the file being read, or in the Frame being
