@@ -18,7 +18,7 @@ namespace selections {
 
 //! Parse and create an AST from a stream of tokens
 //!
-//! @throws ParserError if the
+//! @throws SelectionError if the token stream does not correspond to an AST
 CHFL_EXPORT Ast parse(std::vector<Token> tstream);
 
 //! @class Expr parser.hpp

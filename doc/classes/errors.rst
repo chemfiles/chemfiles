@@ -46,8 +46,5 @@ should play nicely with any exisiting C++ error handling.
 .. doxygenstruct:: chemfiles::PluginError
     :members:
 
-.. doxygenstruct:: chemfiles::ParserError
-    :members:
-
-.. doxygenstruct:: chemfiles::LexerError
+.. doxygenstruct:: chemfiles::SelectionError
     :members:

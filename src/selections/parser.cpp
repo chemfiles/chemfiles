@@ -58,7 +58,7 @@ static std::vector<Token> shunting_yard(token_iterator_t token,
                 operators.pop();
             }
             if (operators.empty() || operators.top().type() != Token::LPAREN) {
-                throw ParserError("Parentheses mismatched");
+                throw SelectionError("Parentheses mismatched");
             } else {
                 operators.pop();
             }
@@ -68,7 +68,7 @@ static std::vector<Token> shunting_yard(token_iterator_t token,
     while (!operators.empty()) {
         if (operators.top().type() == Token::LPAREN ||
             operators.top().type() == Token::RPAREN) {
-            throw ParserError("Parentheses mismatched");
+            throw SelectionError("Parentheses mismatched");
         } else {
             output.push_back(operators.top());
             operators.pop();
@@ -121,7 +121,7 @@ Ast selections::dispatch_parsing(token_iterator_t& begin,
         }
     } else if (begin->is_binary_op()) {
         if ((end - begin) < 3 || begin[2].type() != Token::IDENT) {
-            throw ParserError("Bad binary operation around " + begin->str());
+            throw SelectionError("Bad binary operation around " + begin->str());
         }
 
         auto ident = begin[2].ident();
@@ -136,7 +136,7 @@ Ast selections::dispatch_parsing(token_iterator_t& begin,
         } else if (ident == "vx" || ident == "vy" || ident == "vz") {
             return parse<VelocityExpr>(begin, end);
         } else {
-            throw ParserError("Unknown operation: " + ident);
+            throw SelectionError("Unknown operation: " + ident);
         }
     } else if (begin->is_ident()) {
         if (begin->ident() == "all") {
@@ -144,10 +144,10 @@ Ast selections::dispatch_parsing(token_iterator_t& begin,
         } else if (begin->ident() == "none") {
             return parse<NoneExpr>(begin, end);
         } else {
-            throw ParserError("Could not parse the selection");
+            throw SelectionError("Could not parse the selection");
         }
     } else {
-        throw ParserError("Could not parse the selection");
+        throw SelectionError("Could not parse the selection");
     }
 }
 
@@ -160,6 +160,6 @@ Ast selections::parse(std::vector<Token> token_stream) {
     auto ast = dispatch_parsing(begin, end);
 
     if (begin != end)
-        throw ParserError("Could not parse the end of the selection.");
+        throw SelectionError("Could not parse the end of the selection.");
     return ast;
 }

@@ -130,7 +130,7 @@ private:
 
 //! Convert an `input` string to a stream of tokens
 //!
-//! @throws LexerError if the input string can not be tokenized
+//! @throws SelectionError if the input string can not be tokenized
 CHFL_EXPORT std::vector<Token> tokenize(const std::string& input);
 
 }} // namespace chemfiles && namespace selections

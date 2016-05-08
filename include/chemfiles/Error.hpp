@@ -45,14 +45,9 @@ struct CHFL_EXPORT APIError : public Error {
     APIError(const std::string& err) : Error(err) {}
 };
 
-//! @brief Exception for syntaxic errors in selections
-struct CHFL_EXPORT LexerError : public Error {
-    LexerError(const std::string& err) : Error(err) {}
-};
-
-//! @brief Exception for semantic and parsing errors in selections
-struct CHFL_EXPORT ParserError : public Error {
-    ParserError(const std::string& err) : Error(err) {}
+//! @brief Exception for errors in selections
+struct CHFL_EXPORT SelectionError : public Error {
+    SelectionError(const std::string& err) : Error(err) {}
 };
 
 } // namespace chemfiles

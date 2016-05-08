@@ -61,8 +61,7 @@ class CHFL_EXPORT Selection {
 public:
     //! Create a selection using the given string.
     //!
-    //! @throws ParserError if there is a semantic error in the selection
-    //! @throws LexerError if there is a syntaxic error in the selection
+    //! @throws SelectionError if there is a error in the selection string
     explicit Selection(const std::string& selection);
 
     ~Selection();

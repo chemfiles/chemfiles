@@ -170,7 +170,7 @@ TEST_CASE("Lexing", "[selection]") {
         };
 
         for (auto& failure: lex_fail) {
-            CHECK_THROWS_AS(tokenize(failure), LexerError);
+            CHECK_THROWS_AS(tokenize(failure), SelectionError);
         }
     }
 }
@@ -285,7 +285,7 @@ TEST_CASE("Parsing", "[selection]") {
 
         for (auto& failure: parse_fail) {
             auto toks = tokenize(failure);
-            CHECK_THROWS_AS(parse(toks), ParserError);
+            CHECK_THROWS_AS(parse(toks), SelectionError);
         }
     }
 }

@@ -226,11 +226,10 @@ std::vector<Token> selections::tokenize(const std::string& input) {
                 tokens.emplace_back(Token(data));
                 continue;
             } catch (const std::exception&) {
-                throw LexerError("Could not parse number in: '" + word + "'");
+                throw SelectionError("Could not parse number in: '" + word + "'");
             }
         } else {
-            throw LexerError("Could not parse '" + word + "' in selection: '" +
-                             input + "'");
+            throw SelectionError("Could not parse '" + word + "' in: '" + input + "'");
         }
     }
     return tokens;

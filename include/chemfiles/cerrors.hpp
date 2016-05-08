@@ -88,8 +88,7 @@ private:
     CATCH_AND_RETURN(FileError, CAPIStatus::FILE)                              \
     CATCH_AND_RETURN(MemoryError, CAPIStatus::MEMORY)                          \
     CATCH_AND_RETURN(FormatError, CAPIStatus::FORMAT)                          \
-    CATCH_AND_RETURN(LexerError, CAPIStatus::SELECTION)                        \
-    CATCH_AND_RETURN(ParserError, CAPIStatus::SELECTION)                       \
+    CATCH_AND_RETURN(SelectionError, CAPIStatus::SELECTION)                    \
     CATCH_AND_RETURN(Error, CAPIStatus::CHEMFILES)                             \
     catch (const std::exception& e) {                                          \
         status.last_error = std::string(e.what());                             \
@@ -106,8 +105,7 @@ private:
     CATCH_AND_GOTO(FileError)                                                  \
     CATCH_AND_GOTO(MemoryError)                                                \
     CATCH_AND_GOTO(FormatError)                                                \
-    CATCH_AND_GOTO(LexerError)                                                 \
-    CATCH_AND_GOTO(ParserError)                                                \
+    CATCH_AND_GOTO(SelectionError)                                             \
     CATCH_AND_GOTO(Error)                                                      \
     catch (const std::exception& e) {                                          \
         status.last_error = std::string(e.what());                             \
