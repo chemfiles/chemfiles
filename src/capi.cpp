@@ -85,23 +85,27 @@ int chfl_log_callback(chfl_logging_cb callback) {
 
 CHFL_TRAJECTORY* chfl_trajectory_open(const char* filename, char mode) {
     assert(filename != nullptr);
-    CHFL_TRAJECTORY* traj = nullptr;
+    CHFL_TRAJECTORY* trajectory = nullptr;
     CHFL_ERROR_WRAP(
-        traj = new Trajectory(filename, mode);
+        trajectory = new Trajectory(filename, mode);
     )
+    return trajectory;
 error:
-    return traj;
+    delete trajectory;
+    return nullptr;
 }
 
 CHFL_TRAJECTORY* chfl_trajectory_with_format(const char* filename, char mode, const char* format) {
     assert(filename != nullptr);
     assert(format != nullptr);
-    CHFL_TRAJECTORY* traj = nullptr;
+    CHFL_TRAJECTORY* trajectory = nullptr;
     CHFL_ERROR_WRAP(
-        traj = new Trajectory(filename, mode, format);
+        trajectory = new Trajectory(filename, mode, format);
     )
+    return trajectory;
 error:
-    return traj;
+    delete trajectory;
+    return nullptr;
 }
 
 int chfl_trajectory_read_step(CHFL_TRAJECTORY *file, size_t step, CHFL_FRAME* frame) {
@@ -177,9 +181,9 @@ int chfl_trajectory_sync(CHFL_TRAJECTORY *file) {
 }
 
 int chfl_trajectory_close(CHFL_TRAJECTORY *file) {
-    assert(file != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
         delete file;
+        file = nullptr;
     )
 }
 
@@ -190,8 +194,10 @@ CHFL_FRAME* chfl_frame(size_t natoms) {
     CHFL_ERROR_WRAP(
         frame = new Frame(natoms);
     )
-error:
     return frame;
+error:
+    delete frame;
+    return nullptr;
 }
 
 int chfl_frame_atoms_count(const CHFL_FRAME* frame, size_t *natoms) {
@@ -307,9 +313,9 @@ int chfl_frame_selection(const CHFL_FRAME* frame, const char* selection, bool ma
 }
 
 int chfl_frame_free(CHFL_FRAME* frame) {
-    assert(frame != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
         delete frame;
+        frame = nullptr;
     )
 }
 
@@ -320,8 +326,10 @@ CHFL_CELL* chfl_cell(double a, double b, double c) {
     CHFL_ERROR_WRAP(
         cell = new UnitCell(a, b, c);
     )
-error:
     return cell;
+error:
+    delete cell;
+    return nullptr;
 }
 
 CHFL_CELL* chfl_cell_triclinic(double a, double b, double c, double alpha, double beta, double gamma) {
@@ -329,8 +337,10 @@ CHFL_CELL* chfl_cell_triclinic(double a, double b, double c, double alpha, doubl
     CHFL_ERROR_WRAP(
         cell = new UnitCell(a, b, c, alpha, beta, gamma);
     )
-error:
     return cell;
+error:
+    delete cell;
+    return nullptr;
 }
 
 
@@ -341,8 +351,10 @@ CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* frame) {
         cell = new UnitCell();
         *cell = frame->cell();
     )
-error:
     return cell;
+error:
+    delete cell;
+    return nullptr;
 }
 
 int chfl_cell_volume(const CHFL_CELL* cell, double* V) {
@@ -419,9 +431,9 @@ int chfl_cell_set_type(CHFL_CELL* cell, chfl_cell_type_t type) {
 }
 
 int chfl_cell_free(CHFL_CELL* cell) {
-    assert(cell != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
         delete cell;
+        cell = nullptr;
     )
 }
 
@@ -434,8 +446,10 @@ CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* frame) {
         topology = new Topology();
         *topology = frame->topology();
     )
-error:
     return topology;
+error:
+    delete topology;
+    return nullptr;
 }
 
 CHFL_TOPOLOGY* chfl_topology(void) {
@@ -443,8 +457,10 @@ CHFL_TOPOLOGY* chfl_topology(void) {
     CHFL_ERROR_WRAP(
         topology = new Topology();
     )
-error:
     return topology;
+error:
+    delete topology;
+    return nullptr;
 }
 
 int chfl_topology_atoms_count(const CHFL_TOPOLOGY* topology, size_t *natoms) {
@@ -587,9 +603,9 @@ int chfl_topology_remove_bond(CHFL_TOPOLOGY* topology, size_t i, size_t j) {
 }
 
 int chfl_topology_free(CHFL_TOPOLOGY* topology) {
-    assert(topology != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
         delete topology;
+        topology = nullptr;
     )
 }
 
@@ -600,8 +616,10 @@ CHFL_ATOM* chfl_atom(const char* name) {
     CHFL_ERROR_WRAP(
         atom = new Atom(std::string(name));
     )
-error:
     return atom;
+error:
+    delete atom;
+    return nullptr;
 }
 
 CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* frame, size_t idx) {
@@ -611,8 +629,10 @@ CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* frame, size_t idx) {
         atom = new Atom("");
         *atom = frame->topology()[idx];
     )
-error:
     return atom;
+error:
+    delete atom;
+    return nullptr;
 }
 
 CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* topology, size_t idx) {
@@ -622,8 +642,10 @@ CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* topology, size_t idx) {
         atom = new Atom("");
         *atom = (*topology)[idx];
     )
-error:
     return atom;
+error:
+    delete atom;
+    return nullptr;
 }
 
 int chfl_atom_mass(const CHFL_ATOM* atom, float* mass) {
@@ -723,8 +745,8 @@ int chfl_atom_set_type(CHFL_ATOM* atom, chfl_atom_type_t type) {
 }
 
 int chfl_atom_free(CHFL_ATOM* atom) {
-    assert(atom != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
         delete atom;
+        atom = nullptr;
     )
 }
