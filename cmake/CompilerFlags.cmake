@@ -37,7 +37,7 @@ macro(add_warning _flag_)
     endif()
 
     if(CC_SUPPORTS${_flag_})
-        set(CHEMFILES_C_WARNINGS "${CHEMFILES_C_FLAGS_DEBUG} ${_flag_}")
+        set(CHEMFILES_C_WARNINGS "${CHEMFILES_C_WARNINGS} ${_flag_}")
     endif()
 endmacro()
 
@@ -72,7 +72,19 @@ else()
     add_warning("-Wcast-align")
     add_warning("-Wunused")
     add_warning("-Woverloaded-virtual")
-
-    # Remove some warnings
-    add_warning("-Wno-potentially-evaluated-expression")
 endif()
+
+macro(remove_warning _flag_)
+    CHECK_CXX_COMPILER_FLAG("${_flag_}" CXX_SUPPORTS${_flag_})
+    CHECK_C_COMPILER_FLAG("${_flag_}" CC_SUPPORTS${_flag_})
+    if(CXX_SUPPORTS${_flag_})
+        set(CHEMFILES_CXX_WARNINGS_REMOVE "${CHEMFILES_CXX_WARNINGS_REMOVE} ${_flag_}")
+    endif()
+
+    if(CC_SUPPORTS${_flag_})
+        set(CHEMFILES_C_WARNINGS_REMOVE "${CHEMFILES_C_WARNINGS_REMOVE} ${_flag_}")
+    endif()
+endmacro()
+
+# Remove spurious warnings
+remove_warning("-Wno-potentially-evaluated-expression")
