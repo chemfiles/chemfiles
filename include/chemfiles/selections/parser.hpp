@@ -28,18 +28,18 @@ public:
     //! Pretty-printing of this expression. The expression should use a shift
     //! of `delta` spaces in case of multilines output.
     virtual std::string print(unsigned delta = 0) const = 0;
-    //! Evaluate the selection on a given `frame`. This function returns a
-    //! vector of size `Frame::natoms()`, containing `true` at the index `i` if
-    //! the atom at index `i` matches the selection, and `false` otherwise.
-    virtual std::vector<Bool> evaluate(const Frame& frame) const = 0;
-    virtual ~Expr() = default;
+    //! For each potential match in the `matches` vector this function returns
+    //! `true` if the match is valid in the given `frame`.
+    virtual std::vector<Bool> evaluate(const Frame& frame, const Matches& matches) const = 0;
 
     Expr() = default;
-    Expr(const Expr&) = delete;
-    Expr& operator=(const Expr&) = delete;
+    virtual ~Expr() = default;
 
     Expr(Expr&&) = default;
     Expr& operator=(Expr&&) = default;
+
+    Expr(const Expr&) = delete;
+    Expr& operator=(const Expr&) = delete;
 };
 
 //! Pretty-print an AST to any output stream

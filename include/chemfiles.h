@@ -32,11 +32,13 @@ extern "C" {
         class UnitCell;
         class Topology;
     }
+    struct CAPISelection;
     typedef chemfiles::Trajectory CHFL_TRAJECTORY;
     typedef chemfiles::Frame CHFL_FRAME;
     typedef chemfiles::Atom CHFL_ATOM;
     typedef chemfiles::UnitCell CHFL_CELL;
     typedef chemfiles::Topology CHFL_TOPOLOGY;
+    typedef CAPISelection CHFL_SELECTION;
 #else
     #include <stdbool.h>
     #include <stddef.h>
@@ -50,6 +52,8 @@ extern "C" {
     typedef struct CHFL_CELL CHFL_CELL;
     //! Opaque type handling a topology
     typedef struct CHFL_TOPOLOGY CHFL_TOPOLOGY;
+    //! Opaque type handling a selection
+    typedef struct CHFL_SELECTION CHFL_SELECTION;
 #endif
 // clang-format on
 
@@ -67,6 +71,8 @@ extern "C" {
 #define CHFL_GENERIC_ERROR 5
 //! Error in the C++ standard library
 #define CHFL_CXX_ERROR 6
+//! Maximal size for a selection match
+#define CHFL_MAX_SELECTION_SIZE 4
 
 /*!
 * @brief Get the version of the chemfiles library
@@ -418,33 +424,6 @@ CHFL_EXPORT int chfl_frame_set_step(CHFL_FRAME* frame, size_t step);
 * @return The status code
 */
 CHFL_EXPORT int chfl_frame_guess_topology(CHFL_FRAME* frame);
-
-/*!
-* @brief Select atoms in a frame, from a specific selection string.
-*
-* This function select atoms in a frame matching a selection string. For
-* example, "name H and x > 4" will select all the atoms with name "H" and
-* $x$ coordinate less than 4. See the C++ documentation for the full selection
-* language.
-*
-* Results of this function are used to fill a pre-allocated array containing
-* `natoms` bool, where `natoms` is the number of atoms in the frame. The array
-* will contain `true` at position `i` if the atom at position `i` matches the
-* selection string, and false otherwise.
-*
-* @pre The range from `matched` to `(matched + natoms)` is a valid adress range.
-*
-* @param frame The frame to analyse
-* @param selection A null-terminated string containing the selection string
-* @param matched a pre-allocated array, with space for `natoms` booleans
-* @param natoms the size of the `matched` array. This MUST be the same number as
-*               the `frame` number of atoms.
-* @return The status code
-*/
-CHFL_EXPORT int chfl_frame_selection(const CHFL_FRAME* frame,
-                                     const char* selection,
-                                     bool matched[],
-                                     size_t natoms);
 
 /*!
 * @brief Destroy a frame, and free the associated memory
@@ -904,6 +883,73 @@ CHFL_EXPORT int chfl_atom_set_type(CHFL_ATOM* atom, chfl_atom_type_t type);
 * @return The status code
 */
 CHFL_EXPORT int chfl_atom_free(CHFL_ATOM* atom);
+
+/******************************************************************************/
+
+/*!
+* @brief Create a new selection from the given selection string.
+* @return A pointer to the corresponding selection, or NULL in case of error
+*/
+CHFL_EXPORT CHFL_SELECTION* chfl_selection(const char* selection);
+
+/*!
+* @brief Get the size of the selection, i.e. the number of atoms we are
+*        selecting together.
+*
+* This value is 1 for the 'atom' context, 2 for the 'pair' and 'bond' context,
+* 3 for the 'three' and 'angles' contextes and 4 for the 'four' and 'dihedral'
+* contextes.
+*
+* @param selection The selection
+* @param size The size of the selection
+* @return The status code
+*/
+CHFL_EXPORT int chfl_selection_size(const CHFL_SELECTION* selection, size_t* size);
+
+/*!
+* @brief Evaluate a selection for a given frame.
+*
+* Use the `chfl_selection_get` function to get the matches for this selection.
+*
+* @param selection The selection
+* @param frame The frame
+* @param n_matches The number of matches for the selection
+* @return The status code
+*/
+CHFL_EXPORT int chfl_selection_evalutate(CHFL_SELECTION* selection,
+                                         const CHFL_FRAME* frame,
+                                         size_t* n_matches);
+
+//! @brief A match from a selection evaluation
+//!
+//! A match is a set of atomic indexes matching a given selection. The size of
+/// a match depends on the associated selection, and can vary from 1 to 4.
+typedef struct {
+    //! The actual size of the match. Elements in `matches` are significant up
+    //! to this value, and filled with `(size_t)-1` for all the other values.
+    unsigned char size;
+    //! Indexes matching the associated selection
+    size_t atoms[CHFL_MAX_SELECTION_SIZE];
+} chfl_match_t;
+
+/*!
+* @brief Get the matches for a selection after a call to `chfl_selection_evalutate`
+*
+* @param selection the selection
+* @param matches a pre-allocated array of size (number of matches)
+* @param n_matches the number of matches, as indicated by `chfl_selection_evaluate`
+* @return The status code
+*/
+CHFL_EXPORT int chfl_selection_matches(const CHFL_SELECTION* selection,
+                                       chfl_match_t* matches,
+                                       size_t n_matches);
+
+/*!
+* @brief Destroy a selection, and free the associated memory
+* @param selection The selection to destroy
+* @return The status code
+*/
+CHFL_EXPORT int chfl_selection_free(CHFL_SELECTION* selection);
 
 #ifdef __cplusplus
 }

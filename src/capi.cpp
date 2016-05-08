@@ -294,24 +294,6 @@ int chfl_frame_guess_topology(CHFL_FRAME* frame) {
     )
 }
 
-int chfl_frame_selection(const CHFL_FRAME* frame, const char* selection, bool matched[], size_t natoms) {
-    assert(frame != nullptr);
-    assert(selection != nullptr);
-    assert(matched != nullptr);
-    if (frame->natoms() != natoms) {
-        status.last_error = "The 'select' array have a wrong size: it is "
-                            + std::to_string(natoms) + " but should be " + std::to_string(frame->natoms());
-        return CAPIStatus::MEMORY;
-    }
-    CHFL_ERROR_WRAP_RETCODE(
-        auto sel = Selection(selection);
-        auto matched_vec = sel.evaluate(*frame);
-        for (size_t i=0; i<natoms; i++) {
-            matched[i] = static_cast<bool>(matched_vec[i]);
-        }
-    )
-}
-
 int chfl_frame_free(CHFL_FRAME* frame) {
     CHFL_ERROR_WRAP_RETCODE(
         delete frame;
@@ -748,5 +730,69 @@ int chfl_atom_free(CHFL_ATOM* atom) {
     CHFL_ERROR_WRAP_RETCODE(
         delete atom;
         atom = nullptr;
+    )
+}
+
+/******************************************************************************/
+
+static_assert(
+    CHFL_MAX_SELECTION_SIZE == Match::MAX_MATCH_SIZE,
+    "CHFL_MAX_SELECTION_SIZE should match Match::MAX_MATCH_SIZE"
+);
+
+struct CAPISelection {
+    CAPISelection(Selection&& select): selection(std::move(select)), matches() {}
+    Selection selection;
+    std::vector<Match> matches;
+};
+
+CHFL_SELECTION* chfl_selection(const char* string) {
+    CHFL_SELECTION* c_selection = nullptr;
+    CHFL_ERROR_WRAP(
+        c_selection = new CAPISelection(Selection(std::string(string)));
+    )
+    return c_selection;
+error:
+    delete c_selection;
+    return nullptr;
+}
+
+int chfl_selection_size(const CHFL_SELECTION* c_selection, size_t* size) {
+    assert(c_selection != nullptr);
+    CHFL_ERROR_WRAP_RETCODE(
+        *size = c_selection->selection.size();
+    )
+}
+
+int chfl_selection_evalutate(CHFL_SELECTION* c_selection, const CHFL_FRAME* frame, size_t* n_matches) {
+    assert(c_selection != nullptr);
+    CHFL_ERROR_WRAP_RETCODE(
+        c_selection->matches = c_selection->selection.evaluate(*frame);
+        *n_matches = c_selection->matches.size();
+    )
+}
+
+int chfl_selection_matches(const CHFL_SELECTION* c_selection, chfl_match_t* matches, size_t n_matches) {
+    assert(c_selection != nullptr);
+    assert(n_matches == c_selection->matches.size());
+    CHFL_ERROR_WRAP_RETCODE(
+        auto size = c_selection->selection.size();
+        for (size_t i=0; i<n_matches; i++) {
+            matches[i].size = static_cast<unsigned char>(size);
+            for (size_t j=0; j<size; j++) {
+                matches[i].atoms[j] = c_selection->matches[i][j];
+            }
+
+            for (size_t j=size; j<CHFL_MAX_SELECTION_SIZE; j++) {
+                matches[i].atoms[j] = static_cast<size_t>(-1);
+            }
+        }
+    )
+}
+
+int chfl_selection_free(CHFL_SELECTION* c_selection) {
+    CHFL_ERROR_WRAP_RETCODE(
+        delete c_selection;
+        c_selection = nullptr;
     )
 }

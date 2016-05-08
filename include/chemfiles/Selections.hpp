@@ -22,6 +22,35 @@ namespace selections {
     typedef std::unique_ptr<Expr> Ast;
 }
 
+/// A match is a set of atomic indexes matching a given selection. The size of
+/// a match depends on the associated selection, and can vary from 1 to 4.
+class Match {
+public:
+    ///! Maximal number of atoms in a match
+    static constexpr size_t MAX_MATCH_SIZE = 4;
+
+    template<typename ...Args>
+    Match(Args ...args): data_({{args...}}), size_(sizeof...(args)) {
+        static_assert(sizeof...(args) < MAX_MATCH_SIZE,
+        "`Match` size can not be bigger than MAX_MATCH_SIZE");
+    }
+
+    const size_t& operator[](size_t idx) const {
+        assert(idx < size_ && "Out of bounds indexing of Match");
+        return data_[idx];
+    }
+
+    size_t size() const {
+        return size_;
+    }
+
+private:
+    std::array<size_t, MAX_MATCH_SIZE> data_ = {{0}};
+    size_t size_ = 0;
+};
+
+using Matches = std::vector<Match>;
+
 /*!
 * @class Selection Selections.hpp Selections.cpp
 * @brief This class allow to select some atoms in a `Frame`, using a specific
@@ -71,12 +100,24 @@ public:
     Selection(const Selection& other) = delete;
     Selection& operator=(const Selection& other) = delete;
 
-    //! Evaluate the selection on a given `frame`. This function returns a
-    //! vector of size `Frame::natoms()`, containing `true` at the index `i` if
-    //! the atom at index `i` matches the selection, and `false` otherwise.
-    std::vector<Bool> evaluate(const Frame& frame) const;
+    /// Evaluates the selection on a given `frame`. This function returns the
+    /// list of matches in the frame for this selection.
+    Matches evaluate(const Frame& frame) const;
+
+    /// Evaluates a selection of size 1 on a given `frame`. This function
+    /// returns the list of atomic indexes in the frame matching this selection.
+    ///
+    /// @throw SelectionError if the selection is not of size 1
+    std::vector<size_t> list(const Frame& frame) const;
+
+    ///! Size of the matches for this selection
+    size_t size() const;
 
 private:
+    //! Generate all possible (unconstrained) matches for this selection and
+    //! the given `frame`.
+    Matches generate_matches(const Frame& frame) const;
+
     std::string selection_;
     selections::Ast ast_;
 };
