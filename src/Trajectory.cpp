@@ -13,10 +13,9 @@
 #include "chemfiles/TrajectoryFactory.hpp"
 
 using namespace chemfiles;
-using std::string;
 
 //! Get the extension part of a filename. Filename is assumed to be valid here.
-static string extension(const string& filename) {
+static std::string extension(const std::string& filename) {
     auto idx = filename.rfind('.');
 
     if (idx != std::string::npos) {
@@ -44,7 +43,7 @@ static File::Mode char_to_file_mode(char mode) {
     }
 }
 
-Trajectory::Trajectory(const string& filename, char mode, const string& format)
+Trajectory::Trajectory(const std::string& filename, char mode, const std::string& format)
     : step_(0), nsteps_(0), format_(nullptr), file_(nullptr),
       custom_topology_(), custom_cell_() {
     trajectory_builder_t builder;

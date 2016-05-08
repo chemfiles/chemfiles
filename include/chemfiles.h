@@ -163,7 +163,7 @@ CHFL_EXPORT int chfl_log_callback(chfl_logging_cb callback);
 * @brief Open a trajectory file.
 * @param filename The path to the trajectory file
 * @param mode The opening mode: 'r' for read, 'w' for write and 'a' for append.
-* @return A pointer to the file
+* @return A pointer to the file, or NULL in case of error
 */
 CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_open(const char* filename, char mode);
 
@@ -177,7 +177,7 @@ CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_open(const char* filename, char mod
 * @param mode The opening mode: 'r' for read, 'w' for write and 'a' for append.
 * @param format The file format to use. An empty string means that the format
 *               should be guessed from the extension.
-* @return A pointer to the file
+* @return A pointer to the file, or NULL in case of error
 */
 CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_with_format(const char* filename,
                                                          char mode,
@@ -289,7 +289,7 @@ CHFL_EXPORT int chfl_trajectory_close(CHFL_TRAJECTORY* file);
 * @brief Create an empty frame with initial capacity of `natoms`. It will be
 *        resized by the library as needed.
 * @param natoms the size of the wanted frame
-* @return A pointer to the frame
+* @return A pointer to the frame, or NULL in case of error
 */
 CHFL_EXPORT CHFL_FRAME* chfl_frame(size_t natoms);
 
@@ -459,7 +459,7 @@ CHFL_EXPORT int chfl_frame_free(CHFL_FRAME* frame);
 * @param a first lenght of the cell (in Angstroms)
 * @param b second lenght of the cell (in Angstroms)
 * @param c third lenght of the cell (in Angstroms)
-* @return A pointer to the UnitCell
+* @return A pointer to the UnitCell, or NULL in case of error
 */
 CHFL_EXPORT CHFL_CELL* chfl_cell(double a, double b, double c);
 
@@ -471,7 +471,7 @@ CHFL_EXPORT CHFL_CELL* chfl_cell(double a, double b, double c);
 * @param alpha angle of the cell between the vectors `b` and `c` (in degree)
 * @param beta angle of the cell between the vectors `a` and `c` (in degree)
 * @param gamma angle of the cell between the vectors `a` and `b` (in degree)
-* @return A pointer to the UnitCell
+* @return A pointer to the UnitCell, or NULL in case of error
 */
 CHFL_EXPORT CHFL_CELL* chfl_cell_triclinic(
     double a, double b, double c, double alpha, double beta, double gamma);
@@ -479,7 +479,7 @@ CHFL_EXPORT CHFL_CELL* chfl_cell_triclinic(
 /*!
 * @brief Get the UnitCell from a frame
 * @param frame the frame
-* @return A pointer to the UnitCell
+* @return A pointer to the UnitCell, or NULL in case of error
 */
 CHFL_EXPORT CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* frame);
 
@@ -583,14 +583,14 @@ CHFL_EXPORT int chfl_cell_free(CHFL_CELL* cell);
 
 /*!
 * @brief Create a new empty topology
-* @return A pointer to the new Topology
+* @return A pointer to the new topology, or NULL in case of error
 */
 CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology();
 
 /*!
 * @brief Get a copy of the topology of a frame
 * @param frame The frame
-* @return A pointer to the new Topology
+* @return A pointer to the new topology, or NULL in case of error
 */
 CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* frame);
 
@@ -760,7 +760,7 @@ CHFL_EXPORT int chfl_topology_free(CHFL_TOPOLOGY* topology);
 /*!
 * @brief Create an atom from an atomic name
 * @param name The new atom name
-* @return A pointer to the corresponding atom
+* @return A pointer to the new atom, or NULL in case of error
 */
 CHFL_EXPORT CHFL_ATOM* chfl_atom(const char* name);
 
@@ -768,7 +768,7 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom(const char* name);
 * @brief Get a specific atom from a frame
 * @param frame The frame
 * @param idx The atom index in the frame
-* @return A pointer to the corresponding atom
+* @return A pointer to the new atom, or NULL in case of error
 */
 CHFL_EXPORT CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* frame,
                                             size_t idx);
@@ -777,7 +777,7 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* frame,
 * @brief Get a specific atom from a topology
 * @param topology The topology
 * @param idx The atom index in the topology
-* @return A pointer to the corresponding atom
+* @return A pointer to the new atom, or NULL in case of error
 */
 CHFL_EXPORT CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* topology,
                                                size_t idx);
