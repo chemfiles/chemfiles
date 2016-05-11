@@ -23,7 +23,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(infinite.volume() == 0);
 
         UnitCell ortho1(10);
-        CHECK(ortho1.type() == UnitCell::ORTHOROMBIC);
+        CHECK(ortho1.type() == UnitCell::ORTHORHOMBIC);
         CHECK(ortho1.a() == 10);
         CHECK(ortho1.b() == 10);
         CHECK(ortho1.c() == 10);
@@ -32,7 +32,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(ortho1.gamma() == 90);
 
         UnitCell ortho2(10, 11, 12);
-        CHECK(ortho2.type() == UnitCell::ORTHOROMBIC);
+        CHECK(ortho2.type() == UnitCell::ORTHORHOMBIC);
         CHECK(ortho2.a() == 10);
         CHECK(ortho2.b() == 11);
         CHECK(ortho2.c() == 12);
@@ -82,8 +82,8 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
     SECTION("Set the values"){
         UnitCell cell{};
 
-        cell.type(UnitCell::ORTHOROMBIC);
-        CHECK(cell.type() == UnitCell::ORTHOROMBIC);
+        cell.type(UnitCell::ORTHORHOMBIC);
+        CHECK(cell.type() == UnitCell::ORTHORHOMBIC);
 
         cell.set_a(10);
         CHECK(cell.a() == 10);

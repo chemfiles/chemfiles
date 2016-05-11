@@ -33,7 +33,7 @@ TEST_CASE("Read files in Gromacs .trr format using Molfile", "[Molfile]"){
         CHECK(roughly(positions[296], vector3d(6.664049f, 11.61418f, 12.96149f), eps));
 
         auto cell = frame.cell();
-        CHECK(cell.type() == UnitCell::ORTHOROMBIC);
+        CHECK(cell.type() == UnitCell::ORTHORHOMBIC);
         CHECK(fabs(cell.a() - 15.0) < eps);
 
         file.read();

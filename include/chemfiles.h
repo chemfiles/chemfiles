@@ -455,7 +455,7 @@ CHFL_EXPORT int chfl_frame_free(CHFL_FRAME* frame);
 
 /******************************************************************************/
 /*!
-* @brief Create an ORTHOROMBIC UnitCell from the three lenghts
+* @brief Create an ORTHORHOMBIC UnitCell from the three lenghts
 * @param a first lenght of the cell (in Angstroms)
 * @param b second lenght of the cell (in Angstroms)
 * @param c third lenght of the cell (in Angstroms)
@@ -549,7 +549,7 @@ CHFL_EXPORT int chfl_cell_matrix(const CHFL_CELL* cell, double matrix[3][3]);
 //! Available cell types in chemfiles
 typedef enum CHFL_CELL_TYPES {
     //! The three angles are 90°
-    CHFL_CELL_ORTHOROMBIC = 0,
+    CHFL_CELL_ORTHORHOMBIC = 0,
     //! The three angles may not be 90°
     CHFL_CELL_TRICLINIC = 1,
     //! Cell type when there is no periodic boundary conditions

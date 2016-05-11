@@ -43,8 +43,8 @@ typedef std::array<std::array<double, 3>, 3> Matrix3D;
 class CHFL_EXPORT UnitCell {
 public:
     enum CellType {
-        //! Orthorombic cell, with the three angles equals to 90°
-        ORTHOROMBIC = 0,
+        //! Orthorhombic cell, with the three angles equals to 90°
+        ORTHORHOMBIC = 0,
         //! Triclinic cell, with any values for the angles.
         TRICLINIC = 1,
         //! Infinite cell, to use when there is no cell

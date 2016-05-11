@@ -51,7 +51,7 @@ int main() {
 
     chfl_cell_type_t type;
     assert(!chfl_cell_type(cell, &type));
-    assert(type == CHFL_CELL_ORTHOROMBIC);
+    assert(type == CHFL_CELL_ORTHORHOMBIC);
 
     assert(!chfl_cell_set_type(cell, CHFL_CELL_TRICLINIC));
     assert(!chfl_cell_type(cell, &type));

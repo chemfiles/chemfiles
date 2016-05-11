@@ -34,7 +34,7 @@ UnitCell::UnitCell(double a, double b, double c, double alpha, double beta,
                    double gamma)
     : a_(a), b_(b), c_(c), alpha_(alpha), beta_(beta), gamma_(gamma) {
     if (alpha == 90 && beta == 90 && gamma == 90)
-        type_ = ORTHOROMBIC;
+        type_ = ORTHORHOMBIC;
     else
         type_ = TRICLINIC;
 }
@@ -50,7 +50,7 @@ double UnitCell::volume() const {
     switch (type_) {
     case INFINITE:
         return 0;
-    case ORTHOROMBIC:
+    case ORTHORHOMBIC:
         return a_ * b_ * c_;
     case TRICLINIC:
         break; // The computation is too complexe to take place in a switch
@@ -92,7 +92,7 @@ void UnitCell::raw_matricial(double mat[3][3]) const {
 }
 
 void UnitCell::type(CellType type) {
-    if (type == ORTHOROMBIC) {
+    if (type == ORTHORHOMBIC) {
         if (!(alpha_ == 90 && beta_ == 90 && gamma_ == 90)) {
             throw Error("UnitCell type can not be set to ORTHOROMBIC : some"
                         " angles are not 90°");
@@ -172,7 +172,7 @@ static std::array<float, 3> wrap_triclinic(const UnitCell& cell,
 std::array<float, 3> UnitCell::wrap(const std::array<float, 3>& vect) const {
     if (type_ == INFINITE)
         return vect;
-    else if (type_ == ORTHOROMBIC)
+    else if (type_ == ORTHORHOMBIC)
         return wrap_orthorombic(*this, vect);
     else if (type_ == TRICLINIC)
         return wrap_triclinic(*this, vect);

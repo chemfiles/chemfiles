@@ -18,7 +18,7 @@ TEST_CASE("Frame class usage", "[Frame]"){
         CHECK(frame.step() == 1000);
 
         frame.set_cell(UnitCell(10));
-        CHECK(frame.cell().type() == UnitCell::ORTHOROMBIC);
+        CHECK(frame.cell().type() == UnitCell::ORTHORHOMBIC);
 
         frame.resize(15);
         CHECK(frame.natoms() == 15);
