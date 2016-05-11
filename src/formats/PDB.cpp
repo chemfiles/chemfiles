@@ -10,7 +10,8 @@
 #include <cctype>
 #include <sstream>
 
-#include "format.hpp"
+#include "fmt/format.h"
+#include "fmt/ostream.h"
 
 #include "chemfiles/formats/PDB.hpp"
 

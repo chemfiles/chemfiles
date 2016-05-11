@@ -20,9 +20,10 @@ endif()
 # ============================================================================ #
 
 # cppformat library
-include_directories(cppformat/include)
-add_library(cppformat OBJECT cppformat/format.cpp)
-set_target_properties(cppformat PROPERTIES COMPILE_FLAGS ${EXTERNAL_FLAGS})
+include_directories(fmt)
+file(GLOB FMT_SOURCES fmt/fmt/*.cc)
+add_library(fmt OBJECT ${FMT_SOURCES})
+set_target_properties(fmt PROPERTIES COMPILE_FLAGS ${EXTERNAL_FLAGS})
 
 # ============================================================================ #
 
