@@ -146,16 +146,19 @@ private:
 };
 
 /*! @class Topology Topology.hpp Topology.cpp
- *  @brief A topology contains the definition of all the particles in the
- * system, and the
- *         liaisons between the particles (bonds, angles, dihedrals, ...).
+ * A topology contains the definition of all the atoms in the system, and
+ * the liaisons between the particles (bonds, angles, dihedrals, ...).
  *
  * Only the atoms and the bonds are stored, the angles and the dihedrals are
- * computed
- * automaticaly.
+ * computed automaticaly.
+ *
+ * Iterating over a Topology will yield the atoms in the system.
  */
 class CHFL_EXPORT Topology {
 public:
+    using iterator = std::vector<Atom>::iterator;
+    using const_iterator = std::vector<Atom>::const_iterator;
+
     //! Construct an empty topology
     Topology() {}
     Topology(const Topology&) = default;
@@ -168,6 +171,13 @@ public:
     //! Get a const (non-modifiable) reference to the atom at the position
     //! `index`
     const Atom& operator[](size_t index) const { return atoms_[index]; }
+
+    iterator begin() {return atoms_.begin();}
+    const_iterator begin() const {return atoms_.begin();}
+    const_iterator cbegin() const {return atoms_.cbegin();}
+    iterator end() {return atoms_.end();}
+    const_iterator end() const {return atoms_.end();}
+    const_iterator cend() const {return atoms_.cend();}
 
     //! Add an atom in the system
     void append(const Atom& _atom);

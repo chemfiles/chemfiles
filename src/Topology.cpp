@@ -110,7 +110,7 @@ void Topology::append(const Atom& atom) {
 }
 
 void Topology::remove(size_t idx) {
-    atoms_.erase(begin(atoms_) + static_cast<ptrdiff_t>(idx));
+    atoms_.erase(atoms_.begin() + static_cast<ptrdiff_t>(idx));
     auto bonds = connect_.bonds();
     for (auto& bond : bonds) {
         if (bond[0] == idx || bond[1] == idx)
@@ -120,39 +120,38 @@ void Topology::remove(size_t idx) {
 
 std::vector<Bond> Topology::bonds() const {
     std::vector<Bond> res;
-    res.insert(begin(res), begin(connect_.bonds()), end(connect_.bonds()));
+    res.insert(res.begin(), connect_.bonds().begin(), connect_.bonds().end());
     return res;
 }
 
 std::vector<Angle> Topology::angles() const {
     std::vector<Angle> res;
-    res.insert(begin(res), begin(connect_.angles()), end(connect_.angles()));
+    res.insert(res.begin(), connect_.angles().begin(), connect_.angles().end());
     return res;
 }
 
 std::vector<Dihedral> Topology::dihedrals() const {
     std::vector<Dihedral> res;
-    res.insert(begin(res), begin(connect_.dihedrals()),
-               end(connect_.dihedrals()));
+    res.insert(res.begin(), connect_.dihedrals().begin(), connect_.dihedrals().end());
     return res;
 }
 
 bool Topology::isbond(size_t i, size_t j) const {
     auto bonds = connect_.bonds();
     auto pos = bonds.find(Bond(i, j));
-    return pos != end(bonds);
+    return pos != bonds.end();
 }
 
 bool Topology::isangle(size_t i, size_t j, size_t k) const {
     auto angles = connect_.angles();
     auto pos = angles.find(Angle(i, j, k));
-    return pos != end(angles);
+    return pos != angles.end();
 }
 
 bool Topology::isdihedral(size_t i, size_t j, size_t k, size_t m) const {
     auto dihedrals = connect_.dihedrals();
     auto pos = dihedrals.find(Dihedral(i, j, k, m));
-    return pos != end(dihedrals);
+    return pos != dihedrals.end();
 }
 
 Topology chemfiles::dummy_topology(size_t natoms) {
