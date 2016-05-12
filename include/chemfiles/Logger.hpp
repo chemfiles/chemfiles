@@ -122,6 +122,7 @@ public:
 private:
     Logger();
     void write_message(LogLevel level, std::string message);
+    void close();
 
     //! Singleton instance
     static Logger instance_;

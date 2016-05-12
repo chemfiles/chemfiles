@@ -8,6 +8,15 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
+struct static_logger_t {
+    static_logger_t() {
+        Logger::to_stderr();
+    }
+};
+// Users should be able to call static functions on Logger statically.
+// This was segfaulting at some point, so keep it to make sure it works.
+static static_logger_t my_static_logger;
+
 TEST_CASE("Basic logging usage", "[logging]"){
     std::stringstream out_buffer;
 
