@@ -35,10 +35,14 @@ const char* expected_content = "4" EOL
 int main(){
     CHFL_TOPOLOGY* top = chfl_topology();
     CHFL_ATOM* atom = chfl_atom("He");
+    assert(top != NULL);
+    assert(atom != NULL);
+
     for (unsigned i=0; i<4; i++)
         assert(!chfl_topology_append(top, atom));
 
     CHFL_FRAME* frame = chfl_frame(4);
+    assert(frame != NULL);
 
     float (*positions)[3] = NULL;
     size_t natoms = 0;
@@ -54,6 +58,7 @@ int main(){
     assert(!chfl_frame_set_topology(frame, top));
 
     CHFL_TRAJECTORY* file = chfl_trajectory_open("test-tmp.xyz", 'w');
+    assert(file != NULL);
     assert(!chfl_trajectory_write(file, frame));
 
     assert(!chfl_frame_resize(frame, 6));

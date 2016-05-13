@@ -10,6 +10,7 @@
 
 int main() {
     CHFL_FRAME* frame = chfl_frame(5);
+    assert(frame != NULL);
 
     size_t natoms=0, step=0;
     assert(!chfl_frame_atoms_count(frame, &natoms));

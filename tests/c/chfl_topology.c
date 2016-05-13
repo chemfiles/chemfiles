@@ -10,6 +10,7 @@
 
 int main() {
     CHFL_TOPOLOGY* topology = chfl_topology();
+    assert(topology != NULL);
 
     size_t natoms=100, n=0;
     assert(!chfl_topology_atoms_count(topology, &natoms));

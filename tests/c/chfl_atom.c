@@ -10,6 +10,7 @@
 
 int main() {
     CHFL_ATOM* a = chfl_atom("He");
+    assert(a != NULL);
 
     float mass=0, charge=0;
     assert(!chfl_atom_mass(a, &mass));

@@ -14,6 +14,8 @@
 int main(){
     CHFL_FRAME* frame = chfl_frame(0);
     CHFL_TRAJECTORY* file = chfl_trajectory_open(DATADIR "water.xyz", 'r');
+    assert(frame != NULL);
+    assert(file != NULL);
 
     // Read the first frame
     assert(!chfl_trajectory_read(file, frame));

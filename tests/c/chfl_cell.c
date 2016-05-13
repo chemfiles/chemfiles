@@ -18,6 +18,7 @@ bool roughly(double A[3][3], double B[3][3]) {
 
 int main() {
     CHFL_CELL* cell = chfl_cell(2, 3, 4);
+    assert(cell != NULL);
 
     double a=0, b=0, c=0, V=0;
     assert(!chfl_cell_lengths(cell, &a, &b, &c));
