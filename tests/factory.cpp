@@ -1,5 +1,7 @@
 #ifndef WIN32
 
+#pragma clang diagnostic ignored "-Wpotentially-evaluated-expression"
+
 #include <string>
 #include <catch.hpp>
 

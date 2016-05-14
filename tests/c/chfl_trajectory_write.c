@@ -98,7 +98,7 @@ static char* read_whole_file(const char* name) {
 
     if (file != NULL){
         fseek(file, 0L, SEEK_END);
-        size_t s = ftell(file);
+        size_t s = (size_t)ftell(file);
         rewind(file);
         buffer = (char*)malloc(sizeof(char)*(s+1));
 

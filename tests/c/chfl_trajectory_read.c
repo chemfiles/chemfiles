@@ -24,8 +24,8 @@ int main(){
     assert(!chfl_frame_atoms_count(frame, &natoms));
     assert(natoms == 297);
 
-    float positions_0[3] = {0.417219, 8.303366, 11.737172};
-    float positions_124[3] = {5.099554, -0.045104, 14.153846};
+    float positions_0[3] = {0.417219f, 8.303366f, 11.737172f};
+    float positions_124[3] = {5.099554f, -0.045104f, 14.153846f};
     float (*positions)[3] = NULL;
 
     // Check positions in the first frame
@@ -68,8 +68,8 @@ int main(){
     assert(c == 30.0);
     assert(!chfl_cell_free(cell));
 
-    positions_0[0] = 0.761277;  positions_0[1] = 8.106125;   positions_0[2] = 10.622949;
-    positions_124[0] = 5.13242; positions_124[1] = 0.079862; positions_124[2] = 14.194161;
+    positions_0[0] = 0.761277f;  positions_0[1] = 8.106125f;   positions_0[2] = 10.622949f;
+    positions_124[0] = 5.13242f; positions_124[1] = 0.079862f; positions_124[2] = 14.194161f;
 
     assert(!chfl_frame_positions(frame, &positions, &natoms));
     assert(natoms == 297);

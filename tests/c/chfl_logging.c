@@ -73,19 +73,19 @@ int main() {
 }
 
 char* read_whole_file(FILE* file) {
-    char *buffer = NULL;
+    char *content = NULL;
 
     if (file != NULL){
         fseek(file, 0L, SEEK_END);
-        size_t size = ftell(file);
+        size_t size = (size_t)ftell(file);
         rewind(file);
-        buffer = (char*)malloc(sizeof(char)*(size + 1));
+        content = (char*)malloc(sizeof(char)*(size + 1));
 
-        if (buffer != NULL){
-            fread(buffer, size, 1, file);
-            buffer[size] = '\0';
+        if (content != NULL){
+            fread(content, size, 1, file);
+            content[size] = '\0';
         }
     }
 
-    return buffer;
+    return content;
 }
