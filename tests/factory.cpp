@@ -1,5 +1,3 @@
-#ifndef WIN32
-
 #pragma clang diagnostic ignored "-Wpotentially-evaluated-expression"
 
 #include <string>
@@ -96,5 +94,3 @@ TEST_CASE("Check error throwing in formats", "[Format errors]"){
 
     remove(filename.c_str());
 }
-
-#endif
