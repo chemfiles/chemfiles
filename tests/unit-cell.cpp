@@ -8,6 +8,8 @@ bool roughly(const Vector3D& u, const Vector3D& v, double eps = 1e-9) {
     return (fabs(u[0] - v[0]) < eps) && (fabs(u[1] - v[1]) < eps) && (fabs(u[2] - v[2]) < eps);
 }
 
+#include <iostream>
+
 TEST_CASE("Use the UnitCell type", "[UnitCell]"){
 
     SECTION("Constructors"){
@@ -108,8 +110,8 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         double a = 0, b = 0, c = 0;
 
         a = H[0][0];
-        b = sqrt(H[1][0] * H[1][0] + H[1][1] * H[1][1]);
-        c = sqrt(H[2][0] * H[2][0] + H[2][1] * H[2][1] + H[2][2] * H[2][2]);
+        b = sqrt(H[0][1] * H[0][1] + H[1][1] * H[1][1]);
+        c = sqrt(H[0][2] * H[0][2] + H[1][2] * H[1][2] + H[2][2] * H[2][2]);
 
         CHECK(a == triclinic.a());
         CHECK(b == triclinic.b());
@@ -128,14 +130,15 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
     SECTION("Wraping vectors"){
         UnitCell infinite{};
         UnitCell ortho(10, 11, 12);
-        UnitCell triclinic(UnitCell::TRICLINIC, 10, 11, 12);
-
+        UnitCell triclinic_algo(UnitCell::TRICLINIC, 10, 11, 12);
+        UnitCell triclinic(10, 11, 12, 90, 90, 80);
+        UnitCell tilted(10, 11, 12, 90, 90, 50);
         auto v = vector3d(22.0f, -15.0f, 5.8f);
 
         CHECK(infinite.wrap(v) == v);
-
         CHECK(roughly(ortho.wrap(v), vector3d(2.0f, -4.0f, 5.8f), 1e-5));
-
-        CHECK(roughly(ortho.wrap(v), triclinic.wrap(v), 1e-5));
+        CHECK(roughly(ortho.wrap(v), triclinic_algo.wrap(v), 1e-5));
+        CHECK(roughly(triclinic.wrap(v), vector3d(3.91013f, -4.16711f, 5.8f), 1e-5));
+        CHECK(roughly(tilted.wrap(v), vector3d(6.14132f, 1.85298f, 5.8f), 1e-5));
     }
 }

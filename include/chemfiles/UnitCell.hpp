@@ -125,6 +125,10 @@ public:
     Vector3D wrap(const Vector3D& vect) const;
 
 private:
+    /// Wrap a vector in orthorombic cell
+    Vector3D wrap_orthorombic(const Vector3D& vect) const;
+    /// Wrap a vector in triclinic cell
+    Vector3D wrap_triclinic(const Vector3D& vect) const;
     /// Compute the cell matrix from the cell parameters
     void update_matrix();
     /// Caching the cell matrix

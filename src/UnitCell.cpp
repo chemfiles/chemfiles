@@ -62,26 +62,27 @@ double UnitCell::volume() const {
     double cos_beta = cos(deg2rad(beta_));
     double cos_gamma = cos(deg2rad(gamma_));
 
-    double factor =
-        sqrt(1 - cos_alpha * cos_alpha - cos_beta * cos_beta -
-             cos_gamma * cos_gamma + 2 * cos_alpha * cos_beta * cos_gamma);
+    double factor = sqrt(
+        1 - cos_alpha * cos_alpha - cos_beta * cos_beta -
+        cos_gamma * cos_gamma + 2 * cos_alpha * cos_beta * cos_gamma
+    );
     return a_ * b_ * c_ * factor;
 }
 
 void UnitCell::update_matrix() {
     h_[0][0] = a_;
-    h_[0][1] = 0;
-    h_[0][2] = 0;
+    h_[1][0] = 0;
+    h_[2][0] = 0;
 
-    h_[1][0] = cosd(gamma_) * b_;
+    h_[0][1] = cosd(gamma_) * b_;
     h_[1][1] = sind(gamma_) * b_;
-    h_[1][2] = 0;
+    h_[2][1] = 0;
 
-    h_[2][0] = cosd(beta_);
-    h_[2][1] = (cosd(alpha_) - cosd(beta_) * cosd(gamma_)) / sind(gamma_);
-    h_[2][2] = sqrt(1 - h_[2][0] * h_[2][0] - h_[2][1] * h_[2][1]);
-    h_[2][0] *= c_;
-    h_[2][1] *= c_;
+    h_[0][2] = cosd(beta_);
+    h_[1][2] = (cosd(alpha_) - cosd(beta_) * cosd(gamma_)) / sind(gamma_);
+    h_[2][2] = sqrt(1 - h_[0][2] * h_[0][2] - h_[1][2] * h_[1][2]);
+    h_[0][2] *= c_;
+    h_[1][2] *= c_;
     h_[2][2] *= c_;
 
     // Do not try to invert a cell with a 0 volume
@@ -153,44 +154,30 @@ void UnitCell::set_gamma(double val) {
 }
 
 // Wrap a vector in an Orthorombic UnitCell
-static std::array<float, 3> wrap_orthorombic(const UnitCell& cell,
-                                             const std::array<float, 3>& vect) {
-    std::array<float, 3> res;
-    res[0] = static_cast<float>(vect[0] - round(vect[0] / cell.a()) * cell.a());
-    res[1] = static_cast<float>(vect[1] - round(vect[1] / cell.b()) * cell.b());
-    res[2] = static_cast<float>(vect[2] - round(vect[2] / cell.c()) * cell.c());
-    return res;
+Vector3D UnitCell::wrap_orthorombic(const Vector3D& vect) const {
+    return Vector3D({{
+        static_cast<float>(vect[0] - round(vect[0] / a_) * a_),
+        static_cast<float>(vect[1] - round(vect[1] / b_) * b_),
+        static_cast<float>(vect[2] - round(vect[2] / c_) * c_)
+    }});
 }
 
 // Wrap a vector in an Orthorombic UnitCell
-static std::array<float, 3> wrap_triclinic(const UnitCell& cell,
-                                           const std::array<float, 3>& vect) {
-    std::array<float, 3> res = vect;
-
-    auto mat = cell.matricial();
-    for (size_t i = 2; i != static_cast<size_t>(-1); i--) {
-        while (fabs(res[i]) > mat[i][i] / 2) {
-            if (res[i] < 0) {
-                res[0] += static_cast<float>(mat[i][0]);
-                res[1] += static_cast<float>(mat[i][1]);
-                res[2] += static_cast<float>(mat[i][2]);
-            } else {
-                res[0] -= static_cast<float>(mat[i][0]);
-                res[1] -= static_cast<float>(mat[i][1]);
-                res[2] -= static_cast<float>(mat[i][2]);
-            }
-        }
-    }
-    return res;
+Vector3D UnitCell::wrap_triclinic(const Vector3D& vect) const {
+    auto fractional = h_inv_ * vect;
+    fractional[0] -= round(fractional[0]);
+    fractional[1] -= round(fractional[1]);
+    fractional[2] -= round(fractional[2]);
+    return h_ * fractional;
 }
 
-std::array<float, 3> UnitCell::wrap(const std::array<float, 3>& vect) const {
-    if (type_ == INFINITE)
-        return vect;
-    else if (type_ == ORTHORHOMBIC)
-        return wrap_orthorombic(*this, vect);
-    else if (type_ == TRICLINIC)
-        return wrap_triclinic(*this, vect);
-    else
-        throw Error("Unknown cell type when wrapping a vector.");
+Vector3D UnitCell::wrap(const Vector3D& vect) const {
+    switch (type_) {
+        case INFINITE:
+            return vect;
+        case ORTHORHOMBIC:
+            return wrap_orthorombic(vect);
+        case TRICLINIC:
+            return wrap_triclinic(vect);
+    }
 }
