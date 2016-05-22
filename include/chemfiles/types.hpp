@@ -6,8 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#ifndef CHEMFILES_VECTOR3D_HPP
-#define CHEMFILES_VECTOR3D_HPP
+#ifndef CHEMFILES_TYPES_HPP
+#define CHEMFILES_TYPES_HPP
 
 #include <array>
 #include <cassert>
@@ -91,6 +91,73 @@ using Array3D = std::vector<Vector3D>;
 //! view can mutate the memory and modify the `Vector3D`, but not change the
 //! size of the array.
 using Span3D = span<Vector3D>;
+
+//! 3 x 3 matrix type
+using Matrix3D = std::array<std::array<double, 3>, 3>;
+
+//! Create a diagonal Matrix3D with the three diagonal elements `a`, `b` and `c`
+inline Matrix3D matrix3d(double a, double b, double c) {
+    return Matrix3D{{
+        {{a, 0, 0}},
+        {{0, b, 0}},
+        {{0, 0, c}},
+    }};
+}
+
+//! Create a Matrix3d filled with zeros.
+inline Matrix3D matrix3d() {
+    return matrix3d(0, 0, 0);
+}
+
+//! Multiplication of a vector by a matrix
+inline Vector3D operator*(const Matrix3D& lhs, const Vector3D& rhs) {
+    return vector3d(
+        static_cast<float>(lhs[0][0] * rhs[0] + lhs[0][1] * rhs[1] + lhs[0][2] * rhs[2]),
+        static_cast<float>(lhs[1][0] * rhs[0] + lhs[1][1] * rhs[1] + lhs[1][2] * rhs[2]),
+        static_cast<float>(lhs[2][0] * rhs[0] + lhs[2][1] * rhs[1] + lhs[2][2] * rhs[2])
+    );
+}
+
+//! Multiplication of two matrix
+inline Matrix3D operator*(const Matrix3D& lhs, const Matrix3D& rhs) {
+    auto res = matrix3d();
+    res[0][0] = lhs[0][0] * rhs[0][0] + lhs[0][1] * rhs[1][0] + lhs[0][2] * rhs[2][0];
+    res[1][0] = lhs[1][0] * rhs[0][0] + lhs[1][1] * rhs[1][0] + lhs[1][2] * rhs[2][0];
+    res[2][0] = lhs[2][0] * rhs[0][0] + lhs[2][1] * rhs[1][0] + lhs[2][2] * rhs[2][0];
+
+    res[0][1] = lhs[0][0] * rhs[0][1] + lhs[0][1] * rhs[1][1] + lhs[0][2] * rhs[2][1];
+    res[1][1] = lhs[1][0] * rhs[0][1] + lhs[1][1] * rhs[1][1] + lhs[1][2] * rhs[2][1];
+    res[2][1] = lhs[2][0] * rhs[0][1] + lhs[2][1] * rhs[1][1] + lhs[2][2] * rhs[2][1];
+
+    res[0][2] = lhs[0][0] * rhs[0][2] + lhs[0][1] * rhs[1][2] + lhs[0][2] * rhs[2][2];
+    res[1][2] = lhs[1][0] * rhs[0][2] + lhs[1][1] * rhs[1][2] + lhs[1][2] * rhs[2][2];
+    res[2][2] = lhs[2][0] * rhs[0][2] + lhs[2][1] * rhs[1][2] + lhs[2][2] * rhs[2][2];
+    return res;
+}
+
+//! Compute the inverse of an invertible matrix. The matrix `A` must be
+//! invertible.
+inline Matrix3D invert(const Matrix3D& A) {
+    double determinant = 0.0;
+    determinant += A[0][0] * (A[1][1] * A[2][2] - A[2][1] * A[1][2]);
+    determinant -= A[0][1] * (A[1][0] * A[2][2] - A[1][2] * A[2][0]);
+    determinant += A[0][2] * (A[1][0] * A[2][1] - A[1][1] * A[2][0]);;
+
+    assert(determinant != 0.0 && "The matrix is not inversible!");
+    auto invdet = 1.0 / determinant;
+    Matrix3D res;
+    res[0][0] = (A[1][1] * A[2][2] - A[2][1] * A[1][2]) * invdet;
+    res[0][1] = (A[0][2] * A[2][1] - A[0][1] * A[2][2]) * invdet;
+    res[0][2] = (A[0][1] * A[1][2] - A[0][2] * A[1][1]) * invdet;
+    res[1][0] = (A[1][2] * A[2][0] - A[1][0] * A[2][2]) * invdet;
+    res[1][1] = (A[0][0] * A[2][2] - A[0][2] * A[2][0]) * invdet;
+    res[1][2] = (A[1][0] * A[0][2] - A[0][0] * A[1][2]) * invdet;
+    res[2][0] = (A[1][0] * A[2][1] - A[2][0] * A[1][1]) * invdet;
+    res[2][1] = (A[2][0] * A[0][1] - A[0][0] * A[2][1]) * invdet;
+    res[2][2] = (A[0][0] * A[1][1] - A[1][0] * A[0][1]) * invdet;
+    return res;
+}
+
 } // namespace chemfiles
 
 #endif

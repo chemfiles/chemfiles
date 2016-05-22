@@ -13,13 +13,10 @@
 #undef INFINITE
 #endif
 
-#include "chemfiles/Array3D.hpp"
+#include "chemfiles/types.hpp"
 #include "chemfiles/exports.hpp"
 
 namespace chemfiles {
-
-//! 3 x 3 matrix type
-typedef std::array<std::array<double, 3>, 3> Matrix3D;
 
 /*!
  * @class UnitCell UnitCell.hpp UnitCell.cpp
