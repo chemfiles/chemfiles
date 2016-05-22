@@ -79,7 +79,9 @@ public:
     ~UnitCell() = default;
 
     //! Get a matricial representation of the cell.
-    Matrix3D matricial() const;
+    Matrix3D matricial() const {
+        return h_;
+    }
     //! Populate C-style matricial representation of the cell. The array should
     //! have a 3 x 3 size.
     void raw_matricial(double[3][3]) const;
@@ -123,6 +125,13 @@ public:
     Vector3D wrap(const Vector3D& vect) const;
 
 private:
+    /// Compute the cell matrix from the cell parameters
+    void update_matrix();
+    /// Caching the cell matrix
+    Matrix3D h_;
+    /// Caching the inverse of the cell matrix
+    Matrix3D h_inv_;
+
     //! Cell lenghts
     double a_, b_, c_;
     //! Cell angles

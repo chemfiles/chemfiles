@@ -23,20 +23,21 @@ inline double sind(double theta) {
     return sin(deg2rad(theta));
 }
 
-UnitCell::UnitCell() : UnitCell(INFINITE) {}
+UnitCell::UnitCell(): UnitCell(INFINITE) {}
 
-UnitCell::UnitCell(double a) : UnitCell(a, a, a) {}
+UnitCell::UnitCell(double a): UnitCell(a, a, a) {}
 
-UnitCell::UnitCell(double a, double b, double c)
-    : UnitCell(a, b, c, 90, 90, 90) {}
+UnitCell::UnitCell(double a, double b, double c): UnitCell(ORTHORHOMBIC, a, b, c) {}
 
-UnitCell::UnitCell(double a, double b, double c, double alpha, double beta,
-                   double gamma)
-    : a_(a), b_(b), c_(c), alpha_(alpha), beta_(beta), gamma_(gamma) {
-    if (alpha == 90 && beta == 90 && gamma == 90)
+UnitCell::UnitCell(double a, double b, double c,
+                   double alpha, double beta, double gamma)
+: a_(a), b_(b), c_(c), alpha_(alpha), beta_(beta), gamma_(gamma){
+    if (alpha_ == 90 && beta_ == 90 && gamma_ == 90) {
         type_ = ORTHORHOMBIC;
-    else
+    } else {
         type_ = TRICLINIC;
+    }
+    update_matrix();
 }
 
 UnitCell::UnitCell(CellType type) : UnitCell(type, 0) {}
@@ -44,7 +45,9 @@ UnitCell::UnitCell(CellType type) : UnitCell(type, 0) {}
 UnitCell::UnitCell(CellType type, double a) : UnitCell(type, a, a, a) {}
 
 UnitCell::UnitCell(CellType type, double a, double b, double c)
-    : a_(a), b_(b), c_(c), alpha_(90), beta_(90), gamma_(90), type_(type) {}
+    : a_(a), b_(b), c_(c), alpha_(90), beta_(90), gamma_(90), type_(type) {
+    update_matrix();
+}
 
 double UnitCell::volume() const {
     switch (type_) {
@@ -65,30 +68,36 @@ double UnitCell::volume() const {
     return a_ * b_ * c_ * factor;
 }
 
-Matrix3D UnitCell::matricial() const {
-    auto mat = Matrix3D();
-    mat[0][0] = a_;
+void UnitCell::update_matrix() {
+    h_[0][0] = a_;
+    h_[0][1] = 0;
+    h_[0][2] = 0;
 
-    mat[1][0] = cosd(gamma_) * b_;
-    mat[1][1] = sind(gamma_) * b_;
+    h_[1][0] = cosd(gamma_) * b_;
+    h_[1][1] = sind(gamma_) * b_;
+    h_[1][2] = 0;
 
-    mat[2][0] = cosd(beta_);
-    mat[2][1] = (cosd(alpha_) - cosd(beta_) * cosd(gamma_)) / sind(gamma_);
-    mat[2][2] = sqrt(1 - mat[2][0] * mat[2][0] - mat[2][1] * mat[2][1]);
-    mat[2][0] *= c_;
-    mat[2][1] *= c_;
-    mat[2][2] *= c_;
+    h_[2][0] = cosd(beta_);
+    h_[2][1] = (cosd(alpha_) - cosd(beta_) * cosd(gamma_)) / sind(gamma_);
+    h_[2][2] = sqrt(1 - h_[2][0] * h_[2][0] - h_[2][1] * h_[2][1]);
+    h_[2][0] *= c_;
+    h_[2][1] *= c_;
+    h_[2][2] *= c_;
 
-    return mat;
+    // Do not try to invert a cell with a 0 volume
+    if (volume() == 0.0) {
+        h_inv_ = Matrix3D{{{{0, 0, 0}}, {{0, 0, 0}}, {{0, 0, 0}}}};
+    } else {
+        h_inv_ = invert(h_);
+    }
 }
 
-void UnitCell::raw_matricial(double mat[3][3]) const {
-    auto cpp_mat = matricial();
-    for (size_t i = 0; i < 3; i++) {
-        for (size_t j = 0; j < 3; j++) {
-            mat[i][j] = cpp_mat[i][j];
-        }
-    }
+void UnitCell::raw_matricial(double matrix[3][3]) const {
+    static_assert(
+        sizeof(double[3][3]) == sizeof(Matrix3D),
+        "Matrix3D should have the same size as double[3][3]"
+    );
+    memcpy(matrix, h_.data(), sizeof(Matrix3D));
 }
 
 void UnitCell::type(CellType type) {
@@ -105,36 +114,42 @@ void UnitCell::set_a(double val) {
     if (type_ == INFINITE)
         throw Error("Can not set 'a' on infinite cell");
     a_ = val;
+    update_matrix();
 }
 
 void UnitCell::set_b(double val) {
     if (type_ == INFINITE)
         throw Error("Can not set 'b' on infinite cell");
     b_ = val;
+    update_matrix();
 }
 
 void UnitCell::set_c(double val) {
     if (type_ == INFINITE)
         throw Error("Can not set 'c' on infinite cell");
     c_ = val;
+    update_matrix();
 }
 
 void UnitCell::set_alpha(double val) {
     if (type_ != TRICLINIC)
         throw Error("Can not set 'alpha' on non triclinic cell");
     alpha_ = val;
+    update_matrix();
 }
 
 void UnitCell::set_beta(double val) {
     if (type_ != TRICLINIC)
         throw Error("Can not set 'beta' on non triclinic cell");
     beta_ = val;
+    update_matrix();
 }
 
 void UnitCell::set_gamma(double val) {
     if (type_ != TRICLINIC)
         throw Error("Can not set 'gamma' on non triclinic cell");
     gamma_ = val;
+    update_matrix();
 }
 
 // Wrap a vector in an Orthorombic UnitCell

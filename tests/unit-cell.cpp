@@ -2,7 +2,6 @@
 #include <catch.hpp>
 #include "chemfiles.hpp"
 #include "chemfiles/UnitCell.hpp"
-
 using namespace chemfiles;
 
 bool roughly(const Vector3D& u, const Vector3D& v, double eps = 1e-9) {
@@ -105,27 +104,25 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
 
     SECTION("Matricial representation"){
         UnitCell triclinic(10, 11, 12, 90, 60, 120);
-        auto mat1 = triclinic.matricial();
-        double a, b, c;
+        auto H = triclinic.matricial();
+        double a = 0, b = 0, c = 0;
 
-        a = mat1[0][0];
-        b = sqrt(mat1[1][0]*mat1[1][0] + mat1[1][1]*mat1[1][1]);
-        c = sqrt(mat1[2][0]*mat1[2][0] + mat1[2][1]*mat1[2][1] + mat1[2][2]*mat1[2][2]);
+        a = H[0][0];
+        b = sqrt(H[1][0] * H[1][0] + H[1][1] * H[1][1]);
+        c = sqrt(H[2][0] * H[2][0] + H[2][1] * H[2][1] + H[2][2] * H[2][2]);
 
         CHECK(a == triclinic.a());
         CHECK(b == triclinic.b());
         CHECK(c == triclinic.c());
 
-
-        auto mat2 = new double[3][3];
-        triclinic.raw_matricial(mat2);
+        double c_matrix[3][3];
+        triclinic.raw_matricial(c_matrix);
 
         for (size_t i=0; i<3; i++) {
             for (size_t j=0; j<3; j++) {
-                CHECK(mat1[i][j] == mat2[i][j]);
+                CHECK(H[i][j] == c_matrix[i][j]);
             }
         }
-        delete[] mat2;
     }
 
     SECTION("Wraping vectors"){
