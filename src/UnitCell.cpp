@@ -6,7 +6,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 #include <cmath>
-#include <cstring>
 
 #include "chemfiles/Error.hpp"
 #include "chemfiles/UnitCell.hpp"
@@ -95,11 +94,7 @@ void UnitCell::update_matrix() {
 }
 
 void UnitCell::raw_matricial(double matrix[3][3]) const {
-    static_assert(
-        sizeof(double[3][3]) == sizeof(Matrix3D),
-        "Matrix3D should have the same size as double[3][3]"
-    );
-    memcpy(matrix, h_.data(), sizeof(Matrix3D));
+    std::copy(&h_[0][0], &h_[0][0] + 9, &matrix[0][0]);
 }
 
 void UnitCell::type(CellType type) {
