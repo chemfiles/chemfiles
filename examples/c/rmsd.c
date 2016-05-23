@@ -42,13 +42,13 @@ int main() {
     for (size_t i=0; i<nsteps; i++) {
         mean += distances[i];
     }
-    mean /= nsteps;
+    mean /= (double)nsteps;
 
     double rmsd = 0.0;
     for (size_t i=0; i<nsteps; i++) {
         rmsd += (mean - distances[i])*(mean - distances[i]);
     }
-    rmsd /= nsteps;
+    rmsd /= (double)nsteps;
     rmsd = sqrt(rmsd);
 
     printf("Root-mean square displacement is: %f", rmsd);

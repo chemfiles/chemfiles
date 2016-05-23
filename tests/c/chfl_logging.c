@@ -45,9 +45,7 @@ int main() {
     FILE* file = fopen("test.log","rb");
     assert(file != NULL);
 
-    // Test writing to the file
-    CHFL_TRAJECTORY* traj = chfl_trajectory_open("noformat", 'r');
-    // Close the file and sync it with the HD
+    assert(chfl_trajectory_open("noformat", 'r') == NULL);
     assert(!chfl_log_stderr());
 
     char* content = read_whole_file(file);
@@ -58,7 +56,7 @@ int main() {
 
     // Test callback-based logging
     assert(!chfl_log_callback(callback));
-    traj = chfl_trajectory_open("noformat", 'r');
+    assert(chfl_trajectory_open("noformat", 'r') == NULL);
     assert(strcmp(buffer, "Can not find a format associated with the \"\" extension.") == 0);
     assert(last_level == CHFL_LOG_ERROR);
     free(buffer);

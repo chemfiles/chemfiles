@@ -33,14 +33,14 @@ int main() {
 
     for (unsigned i=0; i<4; i++) {
         for (unsigned j=0; j<3; j++) {
-            data[i][j] = i * j;
+            data[i][j] = (float)(i * j);
         }
     }
 
     assert(!chfl_frame_positions(frame, &data, &natoms));
     for (unsigned i=0; i<4; i++) {
         for (unsigned j=0; j<3; j++) {
-            assert(fabs(data[i][j] - i * j) < 1e-9);
+            assert(fabs(data[i][j] - (float)(i * j)) < 1e-9);
         }
     }
 
@@ -56,14 +56,14 @@ int main() {
 
     for (unsigned i=0; i<4; i++) {
         for (unsigned j=0; j<3; j++) {
-            data[i][j] = i * j;
+            data[i][j] = (float)(i * j);
         }
     }
 
     assert(!chfl_frame_velocities(frame, &data, &natoms));
     for (unsigned i=0; i<4; i++) {
         for (unsigned j=0; j<3; j++) {
-            assert(fabs(data[i][j] - i * j) < 1e-9);
+            assert(fabs(data[i][j] - (float)(i * j)) < 1e-9);
         }
     }
 
