@@ -9,6 +9,7 @@
 #include <functional>
 
 #include "chemfiles/Error.hpp"
+#include "chemfiles/Logger.hpp"
 #include "chemfiles/selections/expr.hpp"
 
 namespace chemfiles {
@@ -64,8 +65,8 @@ std::string AllExpr::print(unsigned) const {
     return "all";
 }
 
-std::vector<bool> AllExpr::evaluate(const Frame& frame, const Matches&) const {
-    return std::vector<bool>(frame.natoms(), true);
+std::vector<bool> AllExpr::evaluate(const Frame&, const Matches& matches) const {
+    return std::vector<bool>(matches.size(), true);
 }
 
 template <>
@@ -82,8 +83,8 @@ std::string NoneExpr::print(unsigned) const {
     return "none";
 }
 
-std::vector<bool> NoneExpr::evaluate(const Frame& frame, const Matches&) const {
-    return std::vector<bool>(frame.natoms(), false);
+std::vector<bool> NoneExpr::evaluate(const Frame&, const Matches& matches) const {
+    return std::vector<bool>(matches.size(), false);
 }
 
 template <>
@@ -104,11 +105,12 @@ std::string NameExpr::print(unsigned) const {
     }
 }
 
-std::vector<bool> NameExpr::evaluate(const Frame& frame, const Matches&) const {
-    auto res = std::vector<bool>(frame.natoms(), false);
+std::vector<bool> NameExpr::evaluate(const Frame& frame, const Matches& matches) const {
+    auto res = std::vector<bool>(matches.size(), false);
     auto topology = frame.topology();
-    for (size_t i = 0; i < frame.natoms(); i++) {
-        res[i] = ((topology[i].name() == name_) == equals_);
+    for (size_t i = 0; i < matches.size(); i++) {
+        auto idx = matches[i][0];
+        res[i] = ((topology[idx].name() == name_) == equals_);
     }
     return res;
 }
@@ -135,13 +137,14 @@ std::string PositionExpr::print(unsigned) const {
            std::to_string(val_);
 }
 
-std::vector<bool> PositionExpr::evaluate(const Frame& frame, const Matches&) const {
-    auto res = std::vector<bool>(frame.natoms(), false);
+std::vector<bool> PositionExpr::evaluate(const Frame& frame, const Matches& matches) const {
+    auto res = std::vector<bool>(matches.size(), false);
     auto compare = binop_comparison<double>(op_);
     auto j = coord_.as_index();
     auto& positions = frame.positions();
-    for (size_t i = 0; i < frame.natoms(); i++) {
-        res[i] = compare(positions[i][j], val_);
+    for (size_t i = 0; i < matches.size(); i++) {
+        auto position = positions[(matches[i][0])][j];
+        res[i] = compare(position, val_);
     }
     return res;
 }
@@ -171,15 +174,19 @@ std::string VelocityExpr::print(unsigned) const {
            std::to_string(val_);
 }
 
-std::vector<bool> VelocityExpr::evaluate(const Frame& frame, const Matches&) const {
-    auto res = std::vector<bool>(frame.natoms(), false);
-    auto velocities = frame.velocities();
-    if (velocities) {
+std::vector<bool> VelocityExpr::evaluate(const Frame& frame, const Matches& matches) const {
+    auto res = std::vector<bool>(matches.size(), false);
+
+    if (frame.velocities()) {
+        auto velocities = *frame.velocities();
         auto compare = binop_comparison<double>(op_);
         auto j = coord_.as_index();
-        for (size_t i = 0; i < frame.natoms(); i++) {
-            res[i] = compare((*velocities)[i][j], val_);
+        for (size_t i = 0; i < matches.size(); i++) {
+            auto velocity = velocities[(matches[i][0])][j];
+            res[i] = compare(velocity, val_);
         }
+    } else {
+        Logger::warn("No velocities in frame while evaluating " + print(0));
     }
     return res;
 }
@@ -209,11 +216,11 @@ std::string IndexExpr::print(unsigned) const {
     return "index " + binop_str(op_) + " " + std::to_string(val_);
 }
 
-std::vector<bool> IndexExpr::evaluate(const Frame& frame, const Matches&) const {
-    auto res = std::vector<bool>(frame.natoms(), false);
+std::vector<bool> IndexExpr::evaluate(const Frame&, const Matches& matches) const {
+    auto res = std::vector<bool>(matches.size(), false);
     auto compare = binop_comparison<size_t>(op_);
-    for (size_t i = 0; i < frame.natoms(); i++) {
-        res[i] = compare(i, val_);
+    for (size_t i = 0; i < matches.size(); i++) {
+        res[i] = compare(matches[i][0], val_);
     }
     return res;
 }
@@ -245,12 +252,13 @@ std::string MassExpr::print(unsigned) const {
     return "mass " + binop_str(op_) + " " + std::to_string(val_);
 }
 
-std::vector<bool> MassExpr::evaluate(const Frame& frame, const Matches&) const {
-    auto res = std::vector<bool>(frame.natoms(), false);
+std::vector<bool> MassExpr::evaluate(const Frame& frame, const Matches& matches) const {
+    auto res = std::vector<bool>(matches.size(), false);
     auto compare = binop_comparison<double>(op_);
     auto topology = frame.topology();
-    for (size_t i = 0; i < frame.natoms(); i++) {
-        res[i] = compare(topology[i].mass(), val_);
+    for (size_t i = 0; i < matches.size(); i++) {
+        auto idx = matches[i][0];
+        res[i] = compare(topology[idx].mass(), val_);
     }
     return res;
 }
@@ -284,8 +292,8 @@ std::vector<bool> AndExpr::evaluate(const Frame& frame, const Matches& matches) 
     auto lhs = lhs_->evaluate(frame, matches);
     auto rhs = rhs_->evaluate(frame, matches);
     assert(lhs.size() == rhs.size());
-    assert(lhs.size() == frame.natoms());
-    for (size_t i = 0; i < frame.natoms(); i++) {
+    assert(lhs.size() == matches.size());
+    for (size_t i = 0; i < matches.size(); i++) {
         lhs[i] = lhs[i] && rhs[i];
     }
     return lhs;
@@ -332,8 +340,8 @@ std::vector<bool> OrExpr::evaluate(const Frame& frame, const Matches& matches) c
     auto lhs = lhs_->evaluate(frame, matches);
     auto rhs = rhs_->evaluate(frame, matches);
     assert(lhs.size() == rhs.size());
-    assert(lhs.size() == frame.natoms());
-    for (size_t i = 0; i < frame.natoms(); i++) {
+    assert(lhs.size() == matches.size());
+    for (size_t i = 0; i < matches.size(); i++) {
         lhs[i] = lhs[i] || rhs[i];
     }
     return lhs;
@@ -378,8 +386,8 @@ std::string NotExpr::print(unsigned) const {
 
 std::vector<bool> NotExpr::evaluate(const Frame& frame, const Matches& matches) const {
     auto res = ast_->evaluate(frame, matches);
-    assert(res.size() == frame.natoms());
-    for (size_t i = 0; i < frame.natoms(); i++) {
+    assert(res.size() == matches.size());
+    for (size_t i = 0; i < matches.size(); i++) {
         res[i] = !res[i];
     }
     return res;
