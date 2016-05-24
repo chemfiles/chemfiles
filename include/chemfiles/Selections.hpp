@@ -14,7 +14,6 @@
 #include <vector>
 
 #include "chemfiles/Frame.hpp"
-#include "chemfiles/bool.hpp"
 
 namespace chemfiles {
 namespace selections {

@@ -11,7 +11,6 @@
 
 #include "chemfiles/Selections.hpp"
 #include "chemfiles/selections/lexer.hpp"
-#include "chemfiles/bool.hpp"
 
 namespace chemfiles {
 namespace selections {
@@ -30,7 +29,7 @@ public:
     virtual std::string print(unsigned delta = 0) const = 0;
     //! For each potential match in the `matches` vector this function returns
     //! `true` if the match is valid in the given `frame`.
-    virtual std::vector<Bool> evaluate(const Frame& frame, const Matches& matches) const = 0;
+    virtual std::vector<bool> evaluate(const Frame& frame, const Matches& matches) const = 0;
 
     Expr() = default;
     virtual ~Expr() = default;
