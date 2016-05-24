@@ -5,20 +5,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-#include <algorithm>
-#include <cassert>
-#include <cctype>
-#include <sstream>
-
 #include "fmt/format.h"
 #include "fmt/ostream.h"
 
 #include "chemfiles/formats/PDB.hpp"
 
 #include "chemfiles/Error.hpp"
+#include "chemfiles/Logger.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Frame.hpp"
-#include "chemfiles/Logger.hpp"
+#include "chemfiles/utils.hpp"
 
 using namespace chemfiles;
 
@@ -48,15 +44,6 @@ enum class Record {
 
 // Get the record type for a line.
 static Record get_record(const std::string&);
-
-static inline std::string trim(const std::string& s) {
-    auto front = std::find_if_not(s.begin(), s.end(),
-                                  [](int c) { return std::isspace(c); });
-    auto back = std::find_if_not(s.rbegin(), s.rend(), [](int c) {
-                    return std::isspace(c);
-                }).base();
-    return (back <= front ? std::string() : std::string(front, back));
-}
 
 PDBFormat::PDBFormat(File& f)
     : Format(f), textfile_(dynamic_cast<TextFile&>(file_)) {}

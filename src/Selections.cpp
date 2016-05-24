@@ -25,8 +25,7 @@ static Context get_context(const std::string& string, std::string& selection) {
         return Context::ATOM;
     } else if (splited.size() == 2) {
         selection = splited[1];
-        auto context = splited[0];
-        trim(context);
+        auto context = trim(splited[0]);
         if (context == "atom" || context == "one") {
             return Context::ATOM;
         } else if (context == "pair" || context == "two") {

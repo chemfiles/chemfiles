@@ -11,6 +11,8 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <cctype>
+#include <algorithm>
 
 inline std::vector<std::string> split(const std::string &s, char delim) {
     std::stringstream ss(s);
@@ -22,10 +24,14 @@ inline std::vector<std::string> split(const std::string &s, char delim) {
     return elems;
 }
 
-inline std::string trim(std::string& str) {
-    str.erase(0, str.find_first_not_of(' '));
-    str.erase(str.find_last_not_of(' ') + 1);
-    return str;
+inline std::string trim(const std::string& str) {
+    auto front = std::find_if_not(str.begin(), str.end(), [](int c) {
+        return std::isspace(c);
+    });
+    auto back = std::find_if_not(str.rbegin(), str.rend(), [](int c) {
+        return std::isspace(c);
+    }).base();
+    return (back <= front ? std::string() : std::string(front, back));
 }
 
 #endif
