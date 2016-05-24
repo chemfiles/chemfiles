@@ -44,10 +44,10 @@ Chemfiles is free and open source, and your
 - [Contributing](#contributions-welcome)
 - [Full documentation](http://chemfiles.readthedocs.org/en/latest/)
 - Documentation for using chemfile from various language:
-    - [Python 2 and 3](https://chemfiles.readthedocs.io/projects/python/)
-    - [Fortran](https://chemfiles.readthedocs.io/projects/fortran/)
+    - [Python 2 and 3](https://chemfiles.readthedocs.io/projects/python/en/latest/)
+    - [Fortran](https://chemfiles.readthedocs.io/projects/fortran/en/latest/)
     - [C and C++](https://chemfiles.readthedocs.io/)
-    - [Julia](https://chemfiles.readthedocs.io/projects/julia/)
+    - [Julia](https://chemfiles.readthedocs.io/projects/julia/en/latest/)
     - [Rust](http://chemfiles.github.io/chemfiles.rs/)
 
 ## Features
