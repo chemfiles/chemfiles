@@ -105,6 +105,25 @@ TEST_CASE("Selections", "[selection]") {
         res = std::vector<size_t>{1, 2};
         CHECK(sel.list(frame) == res);
     }
+
+    SECTION("Selection kind") {
+        auto sel = Selection("atom: all");
+        auto res = std::vector<size_t>{0, 1, 2, 3};
+        CHECK(sel.list(frame) == res);
+
+        sel = Selection("atom : none");
+        res = std::vector<size_t>{};
+        CHECK(sel.list(frame) == res);
+
+        sel = Selection("atom :not name H");
+        res = std::vector<size_t>{1, 2};
+        CHECK(sel.list(frame) == res);
+
+        // Unknown selection kind
+        CHECK_THROWS_AS(Selection("kind: all"), SelectionError);
+        // Too much colons
+        CHECK_THROWS_AS(Selection("atom: pair: atom"), SelectionError);
+    }
 }
 
 Frame testing_frame() {

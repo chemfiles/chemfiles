@@ -50,6 +50,24 @@ private:
 
 using Matches = std::vector<Match>;
 
+//! Selection context, i.e. what we are matching
+enum class Context {
+    //! Matching a single atom
+    ATOM,
+    //! Matching a pair of atoms
+    PAIR,
+    //! Matching three atoms
+    THREE,
+    //! Matching four atoms
+    FOUR,
+    //! Matching a bond
+    BOND,
+    //! Matching an angle
+    ANGLE,
+    //! Matching a dihedral angle
+    DIHEDRAL
+};
+
 /*!
 * @class Selection Selections.hpp Selections.cpp
 * @brief This class allow to select some atoms in a `Frame`, using a specific
@@ -117,7 +135,11 @@ private:
     //! the given `frame`.
     Matches generate_matches(const Frame& frame) const;
 
+    //! Store the selection string that generated this selection
     std::string selection_;
+    //! Selection kind
+    Context context_;
+    //! AST for evaluation of the selection
     selections::Ast ast_;
 };
 }

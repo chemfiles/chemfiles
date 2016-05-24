@@ -9,10 +9,49 @@
 #include "chemfiles/selections/lexer.hpp"
 #include "chemfiles/selections/parser.hpp"
 
-#include "chemfiles/Error.hpp"
-
 #include <algorithm>
+
+#include "chemfiles/Error.hpp"
+#include "chemfiles/utils.hpp"
 using namespace chemfiles;
+
+//! Extract the context from the `string`, and put the selection string
+//! (without the context) in `selection`
+static Context get_context(const std::string& string, std::string& selection) {
+    auto splited = split(string, ':');
+    if (splited.size() == 1) {
+        // Default to ATOM
+        selection = string;
+        return Context::ATOM;
+    } else if (splited.size() == 2) {
+        selection = splited[1];
+        auto context = splited[0];
+        trim(context);
+        if (context == "atom" || context == "one") {
+            return Context::ATOM;
+        } else if (context == "pair" || context == "two") {
+            return Context::PAIR;
+        } else if (context == "three") {
+            return Context::THREE;
+        } else if (context == "four") {
+            return Context::FOUR;
+        } else if (context == "bond") {
+            return Context::BOND;
+        } else if (context == "angle") {
+            return Context::ANGLE;
+        } else if (context == "dihedral") {
+            return Context::DIHEDRAL;
+        } else {
+            throw SelectionError(
+                "Unknown selection context '" + context + "' in \"" + string + "\""
+            );
+        }
+    } else {
+        throw SelectionError(
+            "Can not read selection context in \"" + string + "\", too much ':'"
+        );
+    }
+}
 
 Selection::~Selection() = default;
 Selection::Selection(Selection&&) = default;
@@ -20,12 +59,27 @@ Selection& Selection::operator=(Selection&&) = default;
 
 Selection::Selection(const std::string& selection)
     : selection_(selection), ast_(nullptr) {
-    auto tokens = selections::tokenize(selection_);
+    std::string selection_string;
+    context_ = get_context(selection, selection_string);
+    assert(context_ == Context::ATOM);
+    auto tokens = selections::tokenize(selection_string);
     ast_ = selections::parse(tokens);
 }
 
 size_t Selection::size() const {
-    return 1;
+    switch (context_) {
+        case Context::ATOM:
+            return 1;
+        case Context::PAIR:
+        case Context::BOND:
+            return 2;
+        case Context::THREE:
+        case Context::ANGLE:
+            return 3;
+        case Context::FOUR:
+        case Context::DIHEDRAL:
+            return 4;
+    }
 }
 
 Matches Selection::evaluate(const Frame& frame) const {
