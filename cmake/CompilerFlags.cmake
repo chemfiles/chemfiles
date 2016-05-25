@@ -72,4 +72,6 @@ else()
     add_warning("-Wcast-align")
     add_warning("-Wunused")
     add_warning("-Woverloaded-virtual")
+
+    add_warning("-Wno-unknown-pragmas")
 endif()
