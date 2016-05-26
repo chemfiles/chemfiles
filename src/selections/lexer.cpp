@@ -29,59 +29,16 @@ static bool is_space(char c) {
             c == '\f');
 }
 
-std::ostream& operator<<(std::ostream& out, const Token& token) {
-    switch (token.type()) {
-    case Token::LPAREN:
-        out << "LPAREN";
-        break;
-    case Token::RPAREN:
-        out << "RPAREN";
-        break;
-    case Token::EQ:
-        out << "EQ";
-        break;
-    case Token::NEQ:
-        out << "NEQ";
-        break;
-    case Token::LT:
-        out << "LT";
-        break;
-    case Token::LE:
-        out << "LE";
-        break;
-    case Token::GT:
-        out << "GT";
-        break;
-    case Token::GE:
-        out << "GE";
-        break;
-    case Token::NOT:
-        out << "NOT";
-        break;
-    case Token::AND:
-        out << "AND";
-        break;
-    case Token::OR:
-        out << "OR";
-        break;
-    case Token::IDENT:
-        out << "IDENT(" << token.ident() << ")";
-        break;
-    case Token::NUM:
-        out << "NUM(" << token.number() << ")";
-        break;
-    default:
-        throw std::runtime_error("Hit the default case in Token::operator<<");
-    }
-    return out;
-}
-
 std::string Token::str() const {
-    switch (type()) {
+    switch (type_) {
     case Token::LPAREN:
         return "(";
     case Token::RPAREN:
         return ")";
+    case Token::COMMA:
+        return ",";
+    case Token::VARIABLE:
+        return "$" + std::to_string(variable_);
     case Token::EQ:
         return "==";
     case Token::NEQ:
@@ -102,10 +59,8 @@ std::string Token::str() const {
         return "or";
     case Token::IDENT:
         return ident();
-    case Token::NUM:
+    case Token::NUMBER:
         return std::to_string(number());
-    default:
-        throw std::runtime_error("Hit the default case in Token::operator<<");
     }
 }
 
@@ -128,8 +83,11 @@ unsigned Token::precedence() const {
     case LPAREN:
     case RPAREN:
         return 0;
-    default:
-        throw std::runtime_error("Hit default case in Token::priority");
+    case IDENT:
+    case NUMBER:
+    case VARIABLE:
+    case COMMA:
+        throw SelectionError("Invalid case in Token::precedence");
     }
 }
 
@@ -137,11 +95,10 @@ static std::vector<std::string> split(const std::string& data) {
     std::string token;
     std::vector<std::string> tokens;
     for (auto c : data) {
-        if (c == '(' || c == ')') {
-            // Handle parenthese token. They may not be separated from the
-            // others tokens
-            // by spaces, so let split them manually.
-            if (token.length()) {
+        if (c == '(' || c == ')' || c == '$' || c == ',') {
+            // Handle some tokens that may not be separated from the others
+            // tokens by spaces, by splitting them manually.
+            if (token.length() != 0) {
                 tokens.emplace_back(token);
             }
             token.clear();
@@ -149,14 +106,14 @@ static std::vector<std::string> split(const std::string& data) {
         } else if (!is_space(c)) {
             token += c;
         } else {
-            if (token.length()) {
+            if (token.length() != 0) {
                 tokens.emplace_back(token);
             }
             token.clear();
         }
     }
     // Last token
-    if (token.length()) {
+    if (token.length() != 0) {
         tokens.emplace_back(token);
     }
     return tokens;
@@ -181,12 +138,17 @@ static bool is_number(const std::string& token) {
 
 std::vector<Token> selections::tokenize(const std::string& input) {
     auto tokens = std::vector<Token>();
-    for (auto& word : split(input)) {
+    auto splited = split(input);
+    for (size_t i=0; i<splited.size(); i++) {
+        auto& word = splited[i];
         if (word == "(") {
             tokens.emplace_back(Token(Token::LPAREN));
             continue;
         } else if (word == ")") {
             tokens.emplace_back(Token(Token::RPAREN));
+            continue;
+        } else if (word == ",") {
+            tokens.emplace_back(Token(Token::COMMA));
             continue;
         } else if (word == "==") {
             tokens.emplace_back(Token(Token::EQ));
@@ -206,6 +168,22 @@ std::vector<Token> selections::tokenize(const std::string& input) {
         } else if (word == ">=") {
             tokens.emplace_back(Token(Token::GE));
             continue;
+        } else if (word == "$") {
+            if (i == splited.size() - 1) {
+                throw SelectionError("Missing value after '$'");
+            }
+            // Get the next word and try to parse a number out of it
+            word = splited[++i];
+            try {
+                int data = std::stoi(word);
+                if (data > UINT8_MAX) {
+                    data = UINT8_MAX;
+                }
+                tokens.emplace_back(Token::variable(static_cast<uint8_t>(data)));
+                continue;
+            } catch (const std::exception&) {
+                throw SelectionError("Could not parse number in: '" + word + "'");
+            }
         } else if (is_identifier(word)) {
             if (word == "or") {
                 tokens.emplace_back(Token(Token::OR));
@@ -218,12 +196,12 @@ std::vector<Token> selections::tokenize(const std::string& input) {
                 continue;
             }
             // Default identifier. This will be resolved during parsing phase
-            tokens.emplace_back(Token(word));
+            tokens.emplace_back(Token::ident(word));
             continue;
         } else if (is_number(word)) {
             try {
                 double data = std::stod(word);
-                tokens.emplace_back(Token(data));
+                tokens.emplace_back(Token::number(data));
                 continue;
             } catch (const std::exception&) {
                 throw SelectionError("Could not parse number in: '" + word + "'");

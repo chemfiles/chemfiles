@@ -11,7 +11,6 @@
 
 #include <string>
 #include <vector>
-#include <ostream>
 #include <cassert>
 #include <chemfiles/exports.hpp>
 
@@ -30,20 +29,22 @@ namespace selections {
 class CHFL_EXPORT Token {
 public:
     //! Available token types
-    enum TokenType {
-        LPAREN, //! Left parenthesis
-        RPAREN, //! Right parenthesis
-        EQ,     //! "==" token
-        NEQ,    //! "!=" token
-        LT,     //! "<" token
-        LE,     //! "<=" token
-        GT,     //! ">" token
-        GE,     //! ">=" token
-        NOT,    //! "not" token
-        AND,    //! "and" token
-        OR,     //! "or" token
-        IDENT,  //! Generic identifier
-        NUM,    //! Number
+    enum Type {
+        LPAREN,    //! Left parenthesis
+        RPAREN,    //! Right parenthesis
+        COMMA,     //! Comma
+        EQ,        //! "==" token
+        NEQ,       //! "!=" token
+        LT,        //! "<" token
+        LE,        //! "<=" token
+        GT,        //! ">" token
+        GE,        //! ">=" token
+        NOT,       //! "not" token
+        AND,       //! "and" token
+        OR,        //! "or" token
+        IDENT,     //! Generic identifier
+        NUMBER,    //! Number
+        VARIABLE,  //! "$(\d)" token
     };
 
     //! Basic copy and move constructors
@@ -53,27 +54,39 @@ public:
     Token& operator=(Token&&) = default;
 
     //! Create an identifier token with `data` name
-    //! \post `type()` is IDENT.
-    Token(const std::string& data): Token(IDENT, data, 0.0) {}
+    static Token ident(const std::string& data) {
+        return Token(IDENT, data, 0.0, 0);
+    }
+
     //! Create a number token with `data` value
-    //! \post `type()` is NUM.
-    Token(double data): Token(NUM, "", data) {}
+    static Token number(double data) {
+        return Token(NUMBER, "", data, 0);
+    }
+
+    //! Create a variable token with `data` value
+    static Token variable(uint8_t variable) {
+        return Token(VARIABLE, "", 0.0, variable);
+    }
+
     //! Create a token with type `ttype`.
     //! \pre `ttype` can not be NUM or IDENT.
     //! \post `type()` is `ttype`.
-    Token(TokenType ttype): Token(ttype, "", 0.0) {
-        assert(ttype != IDENT && ttype != NUM && "Can only use this constructor for token without data");
-    }
-
-    //! Get the number value associated with this token.
-    //! \pre type() must be `NUM`.
-    double number() const {
-        assert(type_ == NUM && "Can only get number from NUM token");
-        return number_;
+    Token(Type ttype): Token(ttype, "", 0.0, 0) {
+        assert(
+            ttype != IDENT && ttype != NUMBER && ttype != VARIABLE &&
+            "Can only use this constructor for token without associated data"
+        );
     }
 
     //! Get the string which is at the origin of this token
     std::string str() const;
+
+    //! Get the number value associated with this token.
+    //! \pre type() must be `NUMBER`.
+    double number() const {
+        assert(type_ == NUMBER && "Can only get number from NUM token");
+        return number_;
+    }
 
     //! Get the identifier name associated with this token.
     //! \pre type() must be `IDENT`.
@@ -82,13 +95,21 @@ public:
         return ident_;
     }
 
-    //! Check whether this token is a boolean operator, *i.e.* one of `and`, `or` or `not`
+    //! Get the variable associated with this token.
+    //! \pre type() must be `VARIABLE`.
+    uint8_t variable() const {
+        assert(type_ == VARIABLE && "Can only get variable from VARIABLE token");
+        return variable_;
+    }
+
+    //! Check whether this token is a boolean operator, *i.e.* one of `and`,
+    //! `or` or `not`
     bool is_boolean_op() const {
         return (type() == AND || type() == OR || type() == NOT);
     }
 
-    //! Check whether this token is a binary comparison operator, *i.e.* one of `==`, `!=`
-    //! `<`, `<=`, `>` or `>=`.
+    //! Check whether this token is a binary comparison operator, *i.e.* one
+    //! of `==`, `!=`, `<`, `<=`, `>` or `>=`.
     bool is_binary_op() const {
         return (type() == EQ || type() == NEQ ||
                 type() == LT || type() == LE  ||
@@ -103,12 +124,17 @@ public:
 
     //! Check whether this token is an identifier
     bool is_ident() const {
-        return type() == IDENT;
+        return type_ == IDENT;
     }
 
     //! Check whether this token is a number
     bool is_number() const {
-        return type() == NUM;
+        return type_ == NUMBER;
+    }
+
+    //! Check whether this token is a variable
+    bool is_variable() const {
+        return type_ == VARIABLE;
     }
 
     //! Get the precedence of this token. Parentheses have a precedence of 0, operators
@@ -117,15 +143,18 @@ public:
     unsigned precedence() const;
 
     //! Get the token type of this token
-    TokenType type() const {return type_;}
+    Type type() const {return type_;}
 private:
-    Token(TokenType ttype, const std::string& s_data, double f_data): type_(ttype), number_(f_data), ident_(s_data) {}
+    Token(Type type, const std::string& ident, double number, uint8_t variable)
+        : type_(type), number_(number), ident_(ident), variable_(variable) {}
     //! Token type
-    TokenType type_;
-    //! Value of the number if the token is a TokenType::NUM
+    Type type_;
+    //! Value of the number if the token is a NUMBER
     double number_;
-    //! Value of the identifier if the token is a TokenType::IDENT
+    //! Value of the identifier if the token is an IDENT
     std::string ident_;
+    //! Value of the variable if the token is a VARIABLE
+    uint8_t variable_;
 };
 
 //! Convert an `input` string to a stream of tokens

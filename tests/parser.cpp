@@ -66,11 +66,14 @@ TEST_CASE("Tokens", "[selection]") {
     }
 
     SECTION("Identifers") {
-        auto token = Token("blabla");
+        auto token = Token::ident("blabla");
 
         REQUIRE(token.type() == Token::IDENT);
         CHECK(token.is_ident());
         CHECK(token.ident() == "blabla");
+
+        CHECK_FALSE(token.is_variable());
+        CHECK_FALSE(token.is_number());
 
         CHECK_FALSE(token.is_binary_op());
         CHECK_FALSE(token.is_boolean_op());
@@ -78,11 +81,41 @@ TEST_CASE("Tokens", "[selection]") {
     }
 
     SECTION("Numbers") {
-        auto token = Token(3.4);
+        auto token = Token::number(3.4);
 
-        REQUIRE(token.type() == Token::NUM);
+        REQUIRE(token.type() == Token::NUMBER);
         CHECK(token.is_number());
         CHECK(token.number() == 3.4);
+
+        CHECK_FALSE(token.is_variable());
+        CHECK_FALSE(token.is_ident());
+
+        CHECK_FALSE(token.is_binary_op());
+        CHECK_FALSE(token.is_boolean_op());
+        CHECK_FALSE(token.is_operator());
+    }
+
+    SECTION("Commas") {
+        auto token = Token(Token::COMMA);
+
+        CHECK_FALSE(token.is_variable());
+        CHECK_FALSE(token.is_number());
+        CHECK_FALSE(token.is_ident());
+
+        CHECK_FALSE(token.is_binary_op());
+        CHECK_FALSE(token.is_boolean_op());
+        CHECK_FALSE(token.is_operator());
+    }
+
+    SECTION("Dollar") {
+        auto token = Token::variable(18);
+
+        REQUIRE(token.type() == Token::VARIABLE);
+        CHECK(token.is_variable());
+        CHECK(token.variable() == 18);
+
+        CHECK_FALSE(token.is_number());
+        CHECK_FALSE(token.is_ident());
 
         CHECK_FALSE(token.is_binary_op());
         CHECK_FALSE(token.is_boolean_op());
@@ -111,7 +144,7 @@ TEST_CASE("Lexing", "[selection]") {
         for (auto& str: {"4", "-12748255723", "+3", "567.34", "452.1e4", "4.6784e-56"}) {
             auto toks = tokenize(str);
             CHECK(toks.size() == 1);
-            CHECK(toks[0].type() == Token::NUM);
+            CHECK(toks[0].type() == Token::NUMBER);
         }
     }
 
@@ -149,6 +182,25 @@ TEST_CASE("Lexing", "[selection]") {
         CHECK(tokenize("!=")[0].type() == Token::NEQ);
     }
 
+    SECTION("Functions") {
+        CHECK(tokenize("$9")[0].type() == Token::VARIABLE);
+        CHECK(tokenize("$ 9")[0].type() == Token::VARIABLE);
+
+        CHECK_THROWS_AS(tokenize("$ gabo"), SelectionError);
+        CHECK_THROWS_AS(tokenize("$"), SelectionError);
+        CHECK_THROWS_AS(tokenize("78 $"), SelectionError);
+        CHECK_THROWS_AS(tokenize("bhics $"), SelectionError);
+
+        CHECK(tokenize(",")[0].type() == Token::COMMA);
+        auto toks = tokenize(",bagyu");
+        CHECK(toks.size() == 2);
+        CHECK(toks[0].type() == Token::COMMA);
+
+        toks = tokenize("jsqsb,");
+        CHECK(toks.size() == 2);
+        CHECK(toks[1].type() == Token::COMMA);
+    }
+
     SECTION("Lexing errors") {
         std::vector<std::string> lex_fail = {
             "_not_an_id",
@@ -158,7 +210,6 @@ TEST_CASE("Lexing", "[selection]") {
             "è",
             "à",
             "ü",
-            "$",
             "/",
             "^",
             "`",
