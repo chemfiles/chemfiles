@@ -109,7 +109,7 @@ std::vector<bool> NameExpr::evaluate(const Frame& frame, const Matches& matches)
     auto res = std::vector<bool>(matches.size(), false);
     auto topology = frame.topology();
     for (size_t i = 0; i < matches.size(); i++) {
-        auto idx = matches[i][0];
+        auto idx = matches[i][argument_];
         res[i] = ((topology[idx].name() == name_) == equals_);
     }
     return res;
@@ -128,7 +128,7 @@ Ast parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     auto equals = (begin[0].type() == Token::EQ);
     auto name = begin[1].ident();
     begin += 3;
-    return Ast(new NameExpr(name, equals));
+    return Ast(new NameExpr(0, name, equals));
 }
 
 /****************************************************************************************/
@@ -143,7 +143,8 @@ std::vector<bool> PositionExpr::evaluate(const Frame& frame, const Matches& matc
     auto j = coord_.as_index();
     auto& positions = frame.positions();
     for (size_t i = 0; i < matches.size(); i++) {
-        auto position = positions[(matches[i][0])][j];
+        auto idx = matches[i][argument_];
+        auto position = positions[idx][j];
         res[i] = compare(position, val_);
     }
     return res;
@@ -165,7 +166,7 @@ Ast parse<PositionExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     }
     auto val = begin[1].number();
     begin += 3;
-    return Ast(new PositionExpr(coord, op, val));
+    return Ast(new PositionExpr(0, coord, op, val));
 }
 
 /****************************************************************************************/
@@ -182,7 +183,8 @@ std::vector<bool> VelocityExpr::evaluate(const Frame& frame, const Matches& matc
         auto compare = binop_comparison<double>(op_);
         auto j = coord_.as_index();
         for (size_t i = 0; i < matches.size(); i++) {
-            auto velocity = velocities[(matches[i][0])][j];
+            auto idx = matches[i][argument_];
+            auto velocity = velocities[idx][j];
             res[i] = compare(velocity, val_);
         }
     } else {
@@ -207,8 +209,7 @@ Ast parse<VelocityExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     }
     auto val = begin[1].number();
     begin += 3;
-    return Ast(new VelocityExpr(coord, op, val));
-    ;
+    return Ast(new VelocityExpr(0, coord, op, val));
 }
 
 /****************************************************************************************/
@@ -220,7 +221,8 @@ std::vector<bool> IndexExpr::evaluate(const Frame&, const Matches& matches) cons
     auto res = std::vector<bool>(matches.size(), false);
     auto compare = binop_comparison<size_t>(op_);
     for (size_t i = 0; i < matches.size(); i++) {
-        res[i] = compare(matches[i][0], val_);
+        auto idx = matches[i][argument_];
+        res[i] = compare(idx, val_);
     }
     return res;
 }
@@ -243,8 +245,7 @@ Ast parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     }
     auto val = static_cast<std::size_t>(begin[1].number());
     begin += 3;
-    return Ast(new IndexExpr(op, val));
-    ;
+    return Ast(new IndexExpr(0, op, val));
 }
 
 /****************************************************************************************/
@@ -257,7 +258,7 @@ std::vector<bool> MassExpr::evaluate(const Frame& frame, const Matches& matches)
     auto compare = binop_comparison<double>(op_);
     auto topology = frame.topology();
     for (size_t i = 0; i < matches.size(); i++) {
-        auto idx = matches[i][0];
+        auto idx = matches[i][argument_];
         res[i] = compare(topology[idx].mass(), val_);
     }
     return res;
@@ -277,8 +278,7 @@ Ast parse<MassExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     auto op = BinOp(begin[0].type());
     auto val = begin[1].number();
     begin += 3;
-    return Ast(new MassExpr(op, val));
-    ;
+    return Ast(new MassExpr(0, op, val));
 }
 
 /****************************************************************************************/
@@ -411,5 +411,5 @@ Ast parse<NotExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 
     return Ast(new NotExpr(std::move(ast)));
 }
-}
-} // namespace chemfiles && namespace selections
+
+}} // namespace chemfiles && namespace selections
