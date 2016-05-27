@@ -58,7 +58,7 @@ static std::vector<Token> shunting_yard(token_iterator_t token,
                 operators.pop();
             }
             if (operators.empty() || operators.top().type() != Token::LPAREN) {
-                throw SelectionError("Parentheses mismatched");
+                throw SelectionError("Mismatched parentheses");
             } else {
                 operators.pop();
             }
@@ -68,7 +68,7 @@ static std::vector<Token> shunting_yard(token_iterator_t token,
     while (!operators.empty()) {
         if (operators.top().type() == Token::LPAREN ||
             operators.top().type() == Token::RPAREN) {
-            throw SelectionError("Parentheses mismatched");
+            throw SelectionError("Mismatched parentheses");
         } else {
             output.push_back(operators.top());
             operators.pop();
@@ -105,8 +105,7 @@ static std::vector<Token> clean_token_stream(std::vector<Token> stream) {
     return out;
 }
 
-Ast selections::dispatch_parsing(token_iterator_t& begin,
-                                 const token_iterator_t& end) {
+Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t& end) {
     if (begin->is_boolean_op()) {
         switch (begin->type()) {
         case Token::AND:
@@ -116,8 +115,7 @@ Ast selections::dispatch_parsing(token_iterator_t& begin,
         case Token::NOT:
             return parse<NotExpr>(begin, end);
         default:
-            throw std::runtime_error(
-                "Hit the default case in dispatch_parsing");
+            throw SelectionError("Unknown boolean operator. This is a bug.");
         }
     } else if (begin->is_binary_op()) {
         if ((end - begin) < 3 || begin[2].type() != Token::IDENT) {
@@ -139,12 +137,13 @@ Ast selections::dispatch_parsing(token_iterator_t& begin,
             throw SelectionError("Unknown operation: " + ident);
         }
     } else if (begin->is_ident()) {
-        if (begin->ident() == "all") {
+        auto ident = begin->ident();
+        if (ident == "all") {
             return parse<AllExpr>(begin, end);
-        } else if (begin->ident() == "none") {
+        } else if (ident == "none") {
             return parse<NoneExpr>(begin, end);
         } else {
-            throw SelectionError("Could not parse the selection");
+            throw SelectionError("Unknown operation: " + ident);
         }
     } else {
         throw SelectionError("Could not parse the selection");
