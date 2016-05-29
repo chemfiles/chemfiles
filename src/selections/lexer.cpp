@@ -65,8 +65,9 @@ std::string Token::str() const {
 }
 
 unsigned Token::precedence() const {
-    assert(is_operator() || type_ == RPAREN || type_ == LPAREN);
     switch (type_) {
+    case IDENT:
+        return 40;
     case LT:
     case LE:
     case GT:
@@ -83,7 +84,6 @@ unsigned Token::precedence() const {
     case LPAREN:
     case RPAREN:
         return 0;
-    case IDENT:
     case NUMBER:
     case VARIABLE:
     case COMMA:

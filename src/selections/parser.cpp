@@ -7,6 +7,7 @@
  */
 #include <algorithm>
 #include <stack>
+#include <map>
 
 #include "chemfiles/Error.hpp"
 #include "chemfiles/selections/expr.hpp"
@@ -14,6 +15,28 @@
 
 using namespace chemfiles;
 using namespace selections;
+
+struct function_info_t {
+    /// Function arity, i.e. number of arguments
+    unsigned arity;
+};
+
+static std::map<std::string, function_info_t> FUNCTIONS = {
+    {"name", {1}},
+    {"mass", {1}},
+    {"index", {1}},
+    {"x", {1}},
+    {"y", {1}},
+    {"z", {1}},
+    {"vx", {1}},
+    {"vy", {1}},
+    {"vz", {1}},
+};
+
+/// Is this token a function token?
+static bool is_function(const Token& token) {
+    return token.is_ident() && FUNCTIONS.find(token.ident()) != FUNCTIONS.end();
+}
 
 /* Standard shunting-yard algorithm, as described in Wikipedia
  * https://en.wikipedia.org/wiki/Shunting-yard_algorithm
@@ -23,7 +46,7 @@ using namespace selections;
  * The following input:
  *       name == bar and x <= 56
  * is converted to:
- *       and <= 56 x == bar name
+ *       and == bar name <= 56 x
  * which is the AST for
  *             and
  *         /          \
@@ -31,13 +54,28 @@ using namespace selections;
  *       /  \        /  \
  *    name   bar    x    56
  */
-static std::vector<Token> shunting_yard(token_iterator_t token,
-                                        token_iterator_t end) {
+static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t end) {
     std::stack<Token> operators;
     std::vector<Token> output;
     while (token != end) {
-        if (token->is_ident() || token->is_number()) {
+        if (token->is_number() || token->is_variable()) {
             output.push_back(*token);
+        } else if (token->is_ident()) {
+            if (is_function(*token)) {
+                operators.push(*token);
+            } else {
+                output.push_back(*token);
+            }
+        } else if (token->type() == Token::COMMA) {
+            while (operators.top().type() != Token::LPAREN) {
+                output.push_back(operators.top());
+                operators.pop();
+                if (operators.empty()) {
+                    throw SelectionError(
+                        "Mismatched paretheses or additional comma found"
+                    );
+                }
+            }
         } else if (token->is_operator()) {
             while (!operators.empty()) {
                 // All the operators are left-associative
@@ -57,6 +95,12 @@ static std::vector<Token> shunting_yard(token_iterator_t token,
                 output.push_back(operators.top());
                 operators.pop();
             }
+
+            if (is_function(operators.top())) {
+                output.push_back(operators.top());
+                operators.pop();
+            }
+
             if (operators.empty() || operators.top().type() != Token::LPAREN) {
                 throw SelectionError("Mismatched parentheses");
             } else {
@@ -97,7 +141,9 @@ static std::vector<Token> clean_token_stream(std::vector<Token> stream) {
         if (it->is_ident() && have_short_form(it->ident())) {
             auto next = it + 1;
             if (next != stream.cend() && !next->is_operator()) {
+                out.emplace_back(*it);
                 out.emplace_back(Token(Token::EQ));
+                continue;
             }
         }
         out.emplace_back(*it);
