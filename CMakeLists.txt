@@ -53,6 +53,13 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "release" CACHE STRING "Type of build: release|debug|relwithdebuginfo" FORCE)
 endif()
 
+if(NOT CMAKE_CONFIGURATION_TYPES)
+    if(${CMAKE_BUILD_TYPE} STREQUAL "debug")
+        # Set CMAKE_CXX_FLAGS to pass this definition to all external libraries too
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_DEBUG")
+    endif()
+endif()
+
 add_subdirectory(external)
 
 file(GLOB_RECURSE sources src/**.cpp)
