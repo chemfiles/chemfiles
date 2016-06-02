@@ -1,4 +1,9 @@
-# 0.6 (Next release)
+# Change Log
+
+All notable changes to this project will be documented in this file.
+This project adheres to [Semantic Versioning](http://semver.org/).
+
+## Next Release (current master)
 
 * Add the `chfl_clear_errors` function, to cleanup the error state of the C API.
 * Molfiles plugins are now incorporated in the chemfiles library, and no longer
@@ -15,7 +20,7 @@
   trajectory from a file. The `chfl_trajectory_set_topology_with_format`
   function can be used to do so from the C API.
 
-# 0.5 (19 Feb 2016)
+## 0.5 (19 Feb 2016)
 
 * The C API now provide a direct view into the `positions` and `velocities`
   arrays. This remove the need for copy and separated getter
@@ -40,7 +45,7 @@
   added to the C API.
 
 
-# 0.4 (30 Oct 2015)
+## 0.4 (30 Oct 2015)
 
 * Chemharp can now be compiled as a static library! This should allow for easier
   embedding in external code, and easier distribution of binaries.
@@ -59,14 +64,14 @@
 * Various bugfixes and code improvements
 * Renamed the library to chemfiles.
 
-# 0.3 (3 Aug 2015)
+## 0.3 (3 Aug 2015)
 
 * Julia binding
 * Initial Windows support, with both MSVC and mingw
 * Add a binary frontend called `chrp`, implementing some analysis algorithms.
   For more informations, see the [specific repository](https://github.com/Luthaf/chrp).
 
-# 0.2 (31 May 2015)
+## 0.2 (31 May 2015)
 
 * Add basic geometrical operations on vectors and implement basic periodic boundaries condition with the `UnitCell::wrap` function;
 * Use VMD molfile plugins as a format provider to read trajectories. The following formats are
@@ -78,7 +83,7 @@ added through Molfile:
     * Gromacs trr;
     * CHARMM dcd;
 
-# 0.1 (16 May 2015)
+## 0.1 (16 May 2015)
 
 Initial release. See the documentation for the full API.
 
