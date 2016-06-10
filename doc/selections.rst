@@ -11,16 +11,16 @@ coordinate is bigger than 15.
 Chemfiles selections differs from the well-known `VMD`_ selections by the fact
 that they are *multiple selections*: we can select more than one atom at once.
 All selections starts with a context, indicating the number of atoms we are
-selecting, and the relation between these atoms. Existing contextes are ``atom``
-or ``one``, ``pair`` or ``two``, ``three`` and ``four``  to select one, two,
-three or four independent atoms; and ``bond``, ``angle`` and ``dihedral`` for
-two, three or four bonded atoms.
+selecting, and the relation between these atoms. Existing contextes are
+``atoms`` or ``one``, ``pairs`` or ``two``, ``three`` and ``four``  to select
+one, two, three or four independent atoms; and ``bonds``, ``angles`` and
+``dihedrals`` for two, three or four bonded atoms.
 
 .. _VMD: http://www.ks.uiuc.edu/Research/vmd/
 
 A selection is built using a context and a set of constraints separated by a
-colon. For example, ``atom: name == H`` will select all atoms whose name is
-``H``. ``angle: name($2) == O and distance($1, $3) < 1.5`` will select all sets
+colon. For example, ``atoms: name == H`` will select all atoms whose name is
+``H``. ``angles: name($2) == O and distance($1, $3) < 1.5`` will select all sets
 of three bonded atoms forming an angle such that the name of the second atom is
 ``O`` and the distance between the first and the third atom is less than 1.5.
 

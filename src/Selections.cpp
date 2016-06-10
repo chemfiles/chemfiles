@@ -27,19 +27,19 @@ static Context get_context(const std::string& string, std::string& selection) {
     } else if (splited.size() == 2) {
         selection = splited[1];
         auto context = trim(splited[0]);
-        if (context == "atom" || context == "one") {
+        if (context == "atoms" || context == "one") {
             return Context::ATOM;
-        } else if (context == "pair" || context == "two") {
+        } else if (context == "pairs" || context == "two") {
             return Context::PAIR;
         } else if (context == "three") {
             return Context::THREE;
         } else if (context == "four") {
             return Context::FOUR;
-        } else if (context == "bond") {
+        } else if (context == "bonds") {
             return Context::BOND;
-        } else if (context == "angle") {
+        } else if (context == "angles") {
             return Context::ANGLE;
-        } else if (context == "dihedral") {
+        } else if (context == "dihedrals") {
             return Context::DIHEDRAL;
         } else {
             throw SelectionError(

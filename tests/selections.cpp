@@ -106,23 +106,23 @@ TEST_CASE("Atoms selections", "[selection]") {
         CHECK(sel.list(frame) == res);
     }
 
-    SECTION("Selection kind") {
-        auto sel = Selection("atom: all");
+    SECTION("Selection context") {
+        auto sel = Selection("atoms: all");
         auto res = std::vector<size_t>{0, 1, 2, 3};
         CHECK(sel.list(frame) == res);
 
-        sel = Selection("atom : none");
+        sel = Selection("atoms : none");
         res = std::vector<size_t>{};
         CHECK(sel.list(frame) == res);
 
-        sel = Selection("atom :not name H");
+        sel = Selection("atoms :not name H");
         res = std::vector<size_t>{1, 2};
         CHECK(sel.list(frame) == res);
 
         // Unknown selection kind
         CHECK_THROWS_AS(Selection("kind: all"), SelectionError);
         // Too much colons
-        CHECK_THROWS_AS(Selection("atom: pair: atom"), SelectionError);
+        CHECK_THROWS_AS(Selection("atoms: pairs: atoms"), SelectionError);
     }
 }
 
@@ -130,7 +130,7 @@ TEST_CASE("Multiple selections", "[selection]") {
     auto frame = testing_frame();
 
     SECTION("Pairs & two") {
-        auto sel = Selection("pair: all");
+        auto sel = Selection("pairs: all");
         auto res = Matches{{0ul, 1ul}, {0ul, 2ul}, {0ul, 3ul}, {1ul, 2ul}, {1ul, 3ul}, {2ul, 3ul}};
         CHECK(sel.evaluate(frame) == res);
 
@@ -152,7 +152,7 @@ TEST_CASE("Multiple selections", "[selection]") {
     }
 
     SECTION("Angles") {
-        auto sel = Selection("angle: all");
+        auto sel = Selection("angles: all");
         auto res = Matches{{0ul, 1ul, 2ul}, {1ul, 2ul, 3ul}};
         auto eval = sel.evaluate(frame);
         CHECK(res.size() == eval.size());
@@ -162,7 +162,7 @@ TEST_CASE("Multiple selections", "[selection]") {
     }
 
     SECTION("Dihedrals") {
-        auto sel = Selection("dihedral: all");
+        auto sel = Selection("dihedrals: all");
         auto res = Matches{{0ul, 1ul, 2ul, 3ul}};
         CHECK(sel.evaluate(frame) == res);
     }
