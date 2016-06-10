@@ -15,6 +15,11 @@
 namespace chemfiles {
 namespace selections {
 
+std::ostream& operator<<(std::ostream& out, const std::unique_ptr<Expr>& expr) {
+    out << expr->print();
+    return out;
+}
+
 //! Get the associated string to a binary operator
 static std::string binop_str(BinOp op) {
     switch (op) {
@@ -93,11 +98,8 @@ Ast parse<NoneExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 
 /****************************************************************************************/
 std::string NameExpr::print(unsigned) const {
-    if (equals_) {
-        return "name == " + name_;
-    } else {
-        return "name != " + name_;
-    }
+    auto op = equals_ ? "==" : "!=";
+    return "name($" + std::to_string(argument_ + 1) + ") " + op + " " + name_;
 }
 
 std::vector<bool> NameExpr::evaluate(const Frame& frame, const Matches& matches) const {
@@ -128,8 +130,8 @@ Ast parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 
 /****************************************************************************************/
 std::string PositionExpr::print(unsigned) const {
-    return coord_.to_string() + " " + binop_str(op_) + " " +
-           std::to_string(val_);
+    return coord_.to_string() + "($" + std::to_string(argument_ + 1) + ") " +
+           binop_str(op_) + " " + std::to_string(val_);
 }
 
 std::vector<bool> PositionExpr::evaluate(const Frame& frame, const Matches& matches) const {
@@ -166,8 +168,8 @@ Ast parse<PositionExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 
 /****************************************************************************************/
 std::string VelocityExpr::print(unsigned) const {
-    return "v" + coord_.to_string() + " " + binop_str(op_) + " " +
-           std::to_string(val_);
+    return "v" + coord_.to_string() + "($" + std::to_string(argument_ + 1) +
+            ") " + binop_str(op_) + " " + std::to_string(val_);
 }
 
 std::vector<bool> VelocityExpr::evaluate(const Frame& frame, const Matches& matches) const {
@@ -209,8 +211,10 @@ Ast parse<VelocityExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 
 /****************************************************************************************/
 std::string IndexExpr::print(unsigned) const {
-    return "index " + binop_str(op_) + " " + std::to_string(val_);
+    return "index($" + std::to_string(argument_ + 1) + ") " + binop_str(op_) +
+           " " + std::to_string(val_);
 }
+
 
 std::vector<bool> IndexExpr::evaluate(const Frame&, const Matches& matches) const {
     auto res = std::vector<bool>(matches.size(), false);
@@ -245,7 +249,8 @@ Ast parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 
 /****************************************************************************************/
 std::string MassExpr::print(unsigned) const {
-    return "mass " + binop_str(op_) + " " + std::to_string(val_);
+    return "mass($" + std::to_string(argument_ + 1) + ") " + binop_str(op_) +
+           " " + std::to_string(val_);
 }
 
 std::vector<bool> MassExpr::evaluate(const Frame& frame, const Matches& matches) const {

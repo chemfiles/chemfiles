@@ -74,8 +74,8 @@ public:
         case Z:
             return "z";
         }
-        throw std::runtime_error("Unreachable");
     }
+
 private:
     enum {
         X,
