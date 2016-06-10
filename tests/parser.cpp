@@ -263,14 +263,14 @@ TEST_CASE("Parsing", "[selection]") {
 
     SECTION("Name") {
         CHECK(parse(tokenize("name == goo"))->print() == "name($1) == goo");
-        // Short form
+        CHECK(parse(tokenize("name($1) == goo"))->print() == "name($1) == goo");
         CHECK(parse(tokenize("name goo"))->print() == "name($1) == goo");
         CHECK(parse(tokenize("name != goo"))->print() == "name($1) != goo");
     }
 
     SECTION("Index") {
         CHECK(parse(tokenize("index == 4"))->print() == "index($1) == 4");
-        // Short form
+        CHECK(parse(tokenize("index($1) == 4"))->print() == "index($1) == 4");
         CHECK(parse(tokenize("index 5"))->print() == "index($1) == 5");
 
         CHECK(parse(tokenize("index <= 42"))->print() == "index($1) <= 42");
@@ -279,7 +279,7 @@ TEST_CASE("Parsing", "[selection]") {
 
     SECTION("Mass") {
         CHECK(parse(tokenize("mass == 4"))->print() == "mass($1) == 4.000000");
-        // Short form
+        CHECK(parse(tokenize("mass($1) == 4"))->print() == "mass($1) == 4.000000");
         CHECK(parse(tokenize("mass 5"))->print() == "mass($1) == 5.000000");
 
         CHECK(parse(tokenize("mass <= 42"))->print() == "mass($1) <= 42.000000");
@@ -288,6 +288,7 @@ TEST_CASE("Parsing", "[selection]") {
 
     SECTION("Position & velocity") {
         CHECK(parse(tokenize("x == 4"))->print() == "x($1) == 4.000000");
+        CHECK(parse(tokenize("x($1) == 4"))->print() == "x($1) == 4.000000");
         CHECK(parse(tokenize("y < 4"))->print() == "y($1) < 4.000000");
         CHECK(parse(tokenize("z >= 4"))->print() == "z($1) >= 4.000000");
 

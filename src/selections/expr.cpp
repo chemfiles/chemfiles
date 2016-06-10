@@ -124,8 +124,14 @@ Ast parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     }
     auto equals = (begin[0].type() == Token::EQ);
     auto name = begin[1].ident();
-    begin += 3;
-    return Ast(new NameExpr(0, name, equals));
+    if (end - begin >= 4 && begin[3].is_variable()) {
+        uint8_t argument = begin[3].variable() - 1;
+        begin += 4;
+        return Ast(new NameExpr(argument, name, equals));
+    } else {
+        begin += 3;
+        return Ast(new NameExpr(0, name, equals));
+    }
 }
 
 /****************************************************************************************/
@@ -162,8 +168,14 @@ Ast parse<PositionExpr>(token_iterator_t& begin, const token_iterator_t& end) {
             "Position selection can only contain number as criterium.");
     }
     auto val = begin[1].number();
-    begin += 3;
-    return Ast(new PositionExpr(0, coord, op, val));
+    if (end - begin >= 4 && begin[3].is_variable()) {
+        uint8_t argument = begin[3].variable() - 1;
+        begin += 4;
+        return Ast(new PositionExpr(argument, coord, op, val));
+    } else {
+        begin += 3;
+        return Ast(new PositionExpr(0, coord, op, val));
+    }
 }
 
 /****************************************************************************************/
@@ -205,8 +217,14 @@ Ast parse<VelocityExpr>(token_iterator_t& begin, const token_iterator_t& end) {
             "Veclocity selection can only contain number as criterium.");
     }
     auto val = begin[1].number();
-    begin += 3;
-    return Ast(new VelocityExpr(0, coord, op, val));
+    if (end - begin >= 4 && begin[3].is_variable()) {
+        uint8_t argument = begin[3].variable() - 1;
+        begin += 4;
+        return Ast(new VelocityExpr(argument, coord, op, val));
+    } else {
+        begin += 3;
+        return Ast(new VelocityExpr(0, coord, op, val));
+    }
 }
 
 /****************************************************************************************/
@@ -243,8 +261,14 @@ Ast parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t& end) {
         throw SelectionError("Index selection should contain an integer");
     }
     auto val = static_cast<std::size_t>(begin[1].number());
-    begin += 3;
-    return Ast(new IndexExpr(0, op, val));
+    if (end - begin >= 4 && begin[3].is_variable()) {
+        uint8_t argument = begin[3].variable() - 1;
+        begin += 4;
+        return Ast(new IndexExpr(argument, op, val));
+    } else {
+        begin += 3;
+        return Ast(new IndexExpr(0, op, val));
+    }
 }
 
 /****************************************************************************************/
@@ -277,8 +301,14 @@ Ast parse<MassExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 
     auto op = BinOp(begin[0].type());
     auto val = begin[1].number();
-    begin += 3;
-    return Ast(new MassExpr(0, op, val));
+    if (end - begin >= 4 && begin[3].is_variable()) {
+        uint8_t argument = begin[3].variable() - 1;
+        begin += 4;
+        return Ast(new MassExpr(argument, op, val));
+    } else {
+        begin += 3;
+        return Ast(new MassExpr(0, op, val));
+    }
 }
 
 /****************************************************************************************/

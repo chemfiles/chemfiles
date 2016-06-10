@@ -140,7 +140,7 @@ static std::vector<Token> clean_token_stream(std::vector<Token> stream) {
     for (auto it = stream.cbegin(); it != stream.cend(); it++) {
         if (it->is_ident() && have_short_form(it->ident())) {
             auto next = it + 1;
-            if (next != stream.cend() && !next->is_operator()) {
+            if (next != stream.cend() && !next->is_operator() && next->type() != Token::LPAREN) {
                 out.emplace_back(*it);
                 out.emplace_back(Token(Token::EQ));
                 continue;
