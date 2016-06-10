@@ -30,7 +30,7 @@ public:
 
     template<typename ...Args>
     Match(Args ...args): data_({{args...}}), size_(sizeof...(args)) {
-        static_assert(sizeof...(args) < MAX_MATCH_SIZE,
+        static_assert(sizeof...(args) <= MAX_MATCH_SIZE,
         "`Match` size can not be bigger than MAX_MATCH_SIZE");
     }
 
@@ -47,6 +47,18 @@ private:
     std::array<size_t, MAX_MATCH_SIZE> data_ = {{0}};
     size_t size_ = 0;
 };
+
+inline bool operator==(const Match& lhs, const Match& rhs) {
+    if (lhs.size() != rhs.size()) {
+        return false;
+    }
+    for (size_t i = 0; i<lhs.size(); i++) {
+        if (lhs[i] != rhs[i]) {
+            return false;
+        };
+    }
+    return true;
+}
 
 using Matches = std::vector<Match>;
 

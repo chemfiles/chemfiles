@@ -5,7 +5,7 @@ using namespace chemfiles;
 
 Frame testing_frame();
 
-TEST_CASE("Selections", "[selection]") {
+TEST_CASE("Atoms selections", "[selection]") {
     auto frame = testing_frame();
 
     SECTION("all & none") {
@@ -126,12 +126,58 @@ TEST_CASE("Selections", "[selection]") {
     }
 }
 
+TEST_CASE("Multiple selections", "[selection]") {
+    auto frame = testing_frame();
+
+    SECTION("Pairs & two") {
+        auto sel = Selection("pair: all");
+        auto res = Matches{{0ul, 1ul}, {0ul, 2ul}, {0ul, 3ul}, {1ul, 2ul}, {1ul, 3ul}, {2ul, 3ul}};
+        CHECK(sel.evaluate(frame) == res);
+
+        sel = Selection("two: none");
+        res = Matches{};
+        CHECK(sel.evaluate(frame) == res);
+    }
+
+    SECTION("Three") {
+        auto sel = Selection("three: all");
+        auto res = Matches{{0ul, 1ul, 2ul}, {0ul, 1ul, 3ul}, {0ul, 2ul, 3ul}, {1ul, 2ul, 3ul}};
+        CHECK(sel.evaluate(frame) == res);
+    }
+
+    SECTION("Four") {
+        auto sel = Selection("four: all");
+        auto res = Matches{{0ul, 1ul, 2ul, 3ul}};
+        CHECK(sel.evaluate(frame) == res);
+    }
+
+    SECTION("Angles") {
+        auto sel = Selection("angle: all");
+        auto res = Matches{{0ul, 1ul, 2ul}, {1ul, 2ul, 3ul}};
+        auto eval = sel.evaluate(frame);
+        CHECK(res.size() == eval.size());
+        for (auto& match: res) {
+            CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
+        }
+    }
+
+    SECTION("Dihedrals") {
+        auto sel = Selection("dihedral: all");
+        auto res = Matches{{0ul, 1ul, 2ul, 3ul}};
+        CHECK(sel.evaluate(frame) == res);
+    }
+}
+
 Frame testing_frame() {
     auto topology = Topology();
     topology.append(Atom("H"));
     topology.append(Atom("O"));
     topology.append(Atom("O"));
     topology.append(Atom("H"));
+
+    topology.add_bond(0, 1);
+    topology.add_bond(1, 2);
+    topology.add_bond(2, 3);
 
     auto frame = Frame(topology);
     float i = 0;

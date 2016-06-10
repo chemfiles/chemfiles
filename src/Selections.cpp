@@ -10,6 +10,7 @@
 #include "chemfiles/selections/parser.hpp"
 
 #include <algorithm>
+#include <numeric>
 
 #include "chemfiles/Error.hpp"
 #include "chemfiles/utils.hpp"
@@ -60,7 +61,6 @@ Selection::Selection(const std::string& selection)
     : selection_(selection), ast_(nullptr) {
     std::string selection_string;
     context_ = get_context(selection, selection_string);
-    assert(context_ == Context::ATOM);
     auto tokens = selections::tokenize(selection_string);
     ast_ = selections::parse(tokens);
 }
@@ -83,7 +83,6 @@ size_t Selection::size() const {
 
 Matches Selection::evaluate(const Frame& frame) const {
     auto matches = generate_matches(frame);
-
     auto valid = ast_->evaluate(frame, matches);
     auto n_valid = std::count(valid.begin(), valid.end(), true);
 
@@ -110,12 +109,131 @@ std::vector<size_t> Selection::list(const Frame& frame) const {
     return res;
 }
 
-Matches Selection::generate_matches(const Frame& frame) const {
-    assert(size() == 1);
+static Matches atom_matches(const Frame& frame) {
     auto natoms = frame.natoms();
     auto res = Matches(natoms);
     for (size_t i=0; i<natoms; i++) {
         res[i] = Match(i);
     }
     return res;
+}
+
+static Matches pair_matches(const Frame& frame) {
+    auto natoms = frame.natoms();
+    size_t npairs = natoms * (natoms - 1) / 2;
+    auto res = Matches(npairs);
+    size_t idx = 0;
+    for (size_t i=0; i<natoms; i++) {
+        for (size_t j=i+1; j<natoms; j++) {
+            res[idx] = Match(i, j);
+            idx += 1;
+        }
+    }
+    assert(idx == npairs);
+    return res;
+}
+
+static Matches three_matches(const Frame& frame) {
+    auto natoms = frame.natoms();
+    size_t nthree = natoms * (natoms - 1) * (natoms - 2) / 6;
+    if (natoms >= 2954 && sizeof(size_t) == 4) {
+        // This value will cause `nfour` to overflow in 32-bit systems
+        throw SelectionError(
+            "Can not match 3 atoms when the frame contains more than 2954 atoms"
+        );
+    }
+    auto res = Matches(nthree);
+    size_t idx = 0;
+    for (size_t i=0; i<natoms; i++) {
+        for (size_t j=i+1; j<natoms; j++) {
+            for (size_t k=j+1; k<natoms; k++) {
+                res[idx] = Match(i, j, k);
+                idx += 1;
+            }
+        }
+    }
+    assert(idx == nthree);
+    return res;
+}
+
+static Matches four_matches(const Frame& frame) {
+    auto natoms = frame.natoms();
+    if (natoms >= 145056 && sizeof(size_t) == 8) {
+        // This value will cause `nfour` to overflow in 64-bit systems
+        throw SelectionError(
+            "Can not match 4 atoms when the frame contains more than 145056 atoms"
+        );
+    } else if (natoms >= 568 && sizeof(size_t) == 4) {
+        // This value will cause `nfour` to overflow in 32-bit systems
+        throw SelectionError(
+            "Can not match 4 atoms when the frame contains more than 568 atoms"
+        );
+    }
+    size_t nfour = natoms * (natoms - 1) * (natoms - 2) * (natoms - 3) / 24;
+    auto res = Matches(nfour);
+    size_t idx = 0;
+    for (size_t i=0; i<natoms; i++) {
+        for (size_t j=i+1; j<natoms; j++) {
+            for (size_t k=j+1; k<natoms; k++) {
+                for (size_t m=k+1; m<natoms; m++) {
+                    res[idx] = Match(i, j, k, m);
+                    idx += 1;
+                }
+            }
+        }
+    }
+    assert(idx == nfour);
+    return res;
+}
+
+static Matches bond_matches(const Frame& frame) {
+    auto nbonds = frame.topology().bonds().size();
+    auto res = Matches(nbonds);
+    size_t i = 0;
+    for (auto& bond: frame.topology().bonds()) {
+        res[i] = Match(bond[0], bond[1]);
+        i += 1;
+    }
+    return res;
+}
+
+static Matches angle_matches(const Frame& frame) {
+    auto nangles = frame.topology().angles().size();
+    auto res = Matches(nangles);
+    size_t i = 0;
+    for (auto& angle: frame.topology().angles()) {
+        res[i] = Match(angle[0], angle[1], angle[2]);
+        i += 1;
+    }
+    return res;
+}
+
+static Matches dihedral_matches(const Frame& frame) {
+    auto ndihedrals = frame.topology().dihedrals().size();
+    auto res = Matches(ndihedrals);
+    size_t i = 0;
+    for (auto& dihedral: frame.topology().dihedrals()) {
+        res[i] = Match(dihedral[0], dihedral[1], dihedral[2] , dihedral[3]);
+        i += 1;
+    }
+    return res;
+}
+
+Matches Selection::generate_matches(const Frame& frame) const {
+    switch (context_) {
+        case Context::ATOM:
+            return atom_matches(frame);
+        case Context::PAIR:
+            return pair_matches(frame);
+        case Context::BOND:
+            return bond_matches(frame);
+        case Context::THREE:
+            return three_matches(frame);
+        case Context::ANGLE:
+            return angle_matches(frame);
+        case Context::FOUR:
+            return four_matches(frame);
+        case Context::DIHEDRAL:
+            return dihedral_matches(frame);
+    }
 }
