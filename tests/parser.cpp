@@ -265,6 +265,7 @@ TEST_CASE("Parsing", "[selection]") {
         CHECK(parse(tokenize("name == goo"))->print() == "name($1) == goo");
         CHECK(parse(tokenize("name($1) == goo"))->print() == "name($1) == goo");
         CHECK(parse(tokenize("name goo"))->print() == "name($1) == goo");
+        CHECK(parse(tokenize("name($3) goo"))->print() == "name($3) == goo");
         CHECK(parse(tokenize("name != goo"))->print() == "name($1) != goo");
     }
 
@@ -272,6 +273,7 @@ TEST_CASE("Parsing", "[selection]") {
         CHECK(parse(tokenize("index == 4"))->print() == "index($1) == 4");
         CHECK(parse(tokenize("index($1) == 4"))->print() == "index($1) == 4");
         CHECK(parse(tokenize("index 5"))->print() == "index($1) == 5");
+        CHECK(parse(tokenize("index($2) 5"))->print() == "index($2) == 5");
 
         CHECK(parse(tokenize("index <= 42"))->print() == "index($1) <= 42");
         CHECK(parse(tokenize("index != 12"))->print() == "index($1) != 12");
@@ -281,6 +283,7 @@ TEST_CASE("Parsing", "[selection]") {
         CHECK(parse(tokenize("mass == 4"))->print() == "mass($1) == 4.000000");
         CHECK(parse(tokenize("mass($1) == 4"))->print() == "mass($1) == 4.000000");
         CHECK(parse(tokenize("mass 5"))->print() == "mass($1) == 5.000000");
+        CHECK(parse(tokenize("mass($2) 5"))->print() == "mass($2) == 5.000000");
 
         CHECK(parse(tokenize("mass <= 42"))->print() == "mass($1) <= 42.000000");
         CHECK(parse(tokenize("mass != 12"))->print() == "mass($1) != 12.000000");
@@ -295,6 +298,15 @@ TEST_CASE("Parsing", "[selection]") {
         CHECK(parse(tokenize("vx == 4"))->print() == "vx($1) == 4.000000");
         CHECK(parse(tokenize("vy < 4"))->print() == "vy($1) < 4.000000");
         CHECK(parse(tokenize("vz >= 4"))->print() == "vz($1) >= 4.000000");
+    }
+
+    SECTION("Multiple selections") {
+        auto ast = "and -> mass($1) < 4.000000\n    -> name($3) == O";
+        CHECK(parse(tokenize("mass($1) < 4 and name($3) O"))->print() == ast);
+        ast = "name($4) != Cs";
+        CHECK(parse(tokenize("name($4) != Cs"))->print() == ast);
+        ast = "or -> index($1) < 4\n   -> name($2) == H";
+        CHECK(parse(tokenize("index($1) < 4 or name($2) H"))->print() == ast);
     }
 
     SECTION("Parsing errors") {

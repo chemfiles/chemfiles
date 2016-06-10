@@ -137,10 +137,27 @@ static std::vector<Token> add_missing_equals(std::vector<Token> stream) {
     for (auto it = stream.cbegin(); it != stream.cend(); it++) {
         if (is_function(*it) && FUNCTIONS[it->ident()].has_short_form) {
             auto next = it + 1;
-            if (next != stream.cend() && !next->is_operator() && next->type() != Token::LPAREN) {
-                out.emplace_back(*it);
-                out.emplace_back(Token(Token::EQ));
-                continue;
+            if (next->type() != Token::LPAREN) {
+                if (next < stream.cend() && !next->is_operator()) {
+                    out.emplace_back(*it);
+                    out.emplace_back(Token(Token::EQ));
+                    continue;
+                }
+            } else {
+                // Skip the following possible tokens: '(' - '$x' - ')'
+                next = it + 4;
+                if (next < stream.cend() && !next->is_operator() &&
+                    it[1].type() == Token::LPAREN && it[2].is_variable() &&
+                    it[3].type() == Token::RPAREN
+                    ) {
+                    out.emplace_back(it[0]);
+                    out.emplace_back(it[1]);
+                    out.emplace_back(it[2]);
+                    out.emplace_back(it[3]);
+                    out.emplace_back(Token(Token::EQ));
+                    it += 3;
+                    continue;
+                }
             }
         }
         out.emplace_back(*it);
