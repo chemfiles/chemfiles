@@ -19,18 +19,20 @@ using namespace selections;
 struct function_info_t {
     /// Function arity, i.e. number of arguments
     unsigned arity;
+    /// Does the fucntion admit a short form
+    bool has_short_form;
 };
 
 static std::map<std::string, function_info_t> FUNCTIONS = {
-    {"name", {1}},
-    {"mass", {1}},
-    {"index", {1}},
-    {"x", {1}},
-    {"y", {1}},
-    {"z", {1}},
-    {"vx", {1}},
-    {"vy", {1}},
-    {"vz", {1}},
+    {"name", {1, true}},
+    {"mass", {1, true}},
+    {"index", {1, true}},
+    {"x", {1, false}},
+    {"y", {1, false}},
+    {"z", {1, false}},
+    {"vx", {1, false}},
+    {"vy", {1, false}},
+    {"vz", {1, false}},
 };
 
 /// Is this token a function token?
@@ -124,21 +126,16 @@ static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t
     return output;
 }
 
-static bool have_short_form(const std::string& expr) {
-    return expr == "name" || expr == "index" || expr == "mass";
-}
-
 /* Rewrite the token stream to convert short form for the expressions to the
  * long one.
  *
  * Short forms are expressions like `name foo` or `index 3`, which are
- * equivalent
- * to `name == foo` and `index == 3`.
+ * equivalent to `name == foo` and `index == 3`.
  */
-static std::vector<Token> clean_token_stream(std::vector<Token> stream) {
+static std::vector<Token> add_missing_equals(std::vector<Token> stream) {
     auto out = std::vector<Token>();
     for (auto it = stream.cbegin(); it != stream.cend(); it++) {
-        if (it->is_ident() && have_short_form(it->ident())) {
+        if (is_function(*it) && FUNCTIONS[it->ident()].has_short_form) {
             auto next = it + 1;
             if (next != stream.cend() && !next->is_operator() && next->type() != Token::LPAREN) {
                 out.emplace_back(*it);
@@ -197,7 +194,7 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
 }
 
 Ast selections::parse(std::vector<Token> token_stream) {
-    token_stream = clean_token_stream(token_stream);
+    token_stream = add_missing_equals(token_stream);
     auto rpn = shunting_yard(std::begin(token_stream), std::end(token_stream));
 
     auto begin = rpn.cbegin();
