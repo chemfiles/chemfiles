@@ -246,6 +246,15 @@ TEST_CASE("Parsing", "[selection]") {
 
         ast = "and -> index($1) == 1\n    -> or -> index($1) == 1\n          -> index($1) == 1";
         CHECK(parse(tokenize("index == 1 and (index == 1 or index == 1)"))->print() == ast);
+
+        CHECK_THROWS_AS(parse(tokenize("name H and")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("name <= 4 and")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("and name H")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("and name <= 4")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("name <= 4 or")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("or name <= 4")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("not")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("not name <= 4")), SelectionError);
     }
 
     SECTION("all & none") {
@@ -267,6 +276,10 @@ TEST_CASE("Parsing", "[selection]") {
         CHECK(parse(tokenize("name goo"))->print() == "name($1) == goo");
         CHECK(parse(tokenize("name($3) goo"))->print() == "name($3) == goo");
         CHECK(parse(tokenize("name != goo"))->print() == "name($1) != goo");
+
+        CHECK_THROWS_AS(parse(tokenize("name < bar")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("name >= bar")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("name == 45")), SelectionError);
     }
 
     SECTION("Index") {
@@ -277,6 +290,9 @@ TEST_CASE("Parsing", "[selection]") {
 
         CHECK(parse(tokenize("index <= 42"))->print() == "index($1) <= 42");
         CHECK(parse(tokenize("index != 12"))->print() == "index($1) != 12");
+
+        CHECK_THROWS_AS(parse(tokenize("index == bar")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("index >= 42.3")), SelectionError);
     }
 
     SECTION("Mass") {
@@ -287,6 +303,8 @@ TEST_CASE("Parsing", "[selection]") {
 
         CHECK(parse(tokenize("mass <= 42"))->print() == "mass($1) <= 42.000000");
         CHECK(parse(tokenize("mass != 12"))->print() == "mass($1) != 12.000000");
+
+        CHECK_THROWS_AS(parse(tokenize("mass <= bar")), SelectionError);
     }
 
     SECTION("Position & velocity") {
@@ -298,6 +316,11 @@ TEST_CASE("Parsing", "[selection]") {
         CHECK(parse(tokenize("vx == 4"))->print() == "vx($1) == 4.000000");
         CHECK(parse(tokenize("vy < 4"))->print() == "vy($1) < 4.000000");
         CHECK(parse(tokenize("vz >= 4"))->print() == "vz($1) >= 4.000000");
+
+        CHECK_THROWS_AS(parse(tokenize("x <= bar")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("vy > bar")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("z != bar")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("vx == bar")), SelectionError);
     }
 
     SECTION("Multiple selections") {
