@@ -53,8 +53,8 @@ before_install:
         brew rm gcc
         brew install gcc netcdf
         if test "${C_COMPILER}" == "gcc"; then
-            export CC=gcc-5
-            export CXX=g++-5
+            export CC=gcc-6
+            export CXX=g++-6
         elif test "${C_COMPILER}" == "clang"; then
             export CC=clang
             export CXX=clang++
