@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+* Improve the selection language to allow selecting multiple atoms at once. For
+  example, `"pairs: name($1) H and mass($2) > 5"` will select all pairs of atoms
+  where the first atom name is `'H'` and the second atom mass is bigger than 5.
+    * The implemented modes for selections are `one`, `atoms`, `two`, `pairs`,
+      `three`, `four`, `bonds`, `angles` and `dihedrals`;
+    * The `Selection` class is now directly exposed to the C API, as
+      `CHFL_SELECTION*`. The `chfl_frame_selection` function is replaced by the
+      `chfl_selection`, `chfl_selection_size`, `chfl_selection_evalutate`,
+      `chfl_selection_matches` and `chfl_selection_free` functions, and the
+      `chfl_match_t` helper struct.
 * Add the `chfl_clear_errors` function, to cleanup the error state of the C API.
 * Molfiles plugins are now incorporated in the chemfiles library, and no longer
   distributed as shared libraries. The `CHEMFILES_PLUGINS` environment variable
