@@ -63,10 +63,13 @@ int main() {
 
     remove("test.log");
 
+    assert(!chfl_log_stdout());
+
     assert(strcmp(chfl_last_error(), "") != 0);
     assert(!chfl_clear_errors());
     assert(strcmp(chfl_last_error(), "") == 0);
 
+    assert(strstr(chfl_version(), "0.6.0") != NULL);
     return EXIT_SUCCESS;
 }
 

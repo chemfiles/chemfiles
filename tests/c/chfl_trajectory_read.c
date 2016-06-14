@@ -7,7 +7,6 @@
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #define DATADIR SRCDIR "/data/xyz/"
 
@@ -17,16 +16,23 @@ int main(){
     assert(frame != NULL);
     assert(file != NULL);
 
+    size_t nsteps = 0;
+    assert(!chfl_trajectory_nsteps(file, &nsteps));
+    assert(nsteps == 100);
+
     // Read the first frame
     assert(!chfl_trajectory_read(file, frame));
 
-    size_t natoms=0;
+    size_t natoms = 0;
     assert(!chfl_frame_atoms_count(frame, &natoms));
     assert(natoms == 297);
 
     float positions_0[3] = {0.417219f, 8.303366f, 11.737172f};
     float positions_124[3] = {5.099554f, -0.045104f, 14.153846f};
     float (*positions)[3] = NULL;
+
+    // Check for the error when requesting non-existent velocities
+    assert(chfl_frame_velocities(frame, &positions, &natoms) != CHFL_SUCCESS);
 
     // Check positions in the first frame
     assert(!chfl_frame_positions(frame, &positions, &natoms));

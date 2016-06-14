@@ -65,6 +65,21 @@ int main() {
     assert(fabs(c - 100) < 1e-10);
 
     assert(!chfl_cell_free(cell));
+    cell = NULL;
+    cell = chfl_cell_triclinic(20, 21, 22, 90, 100, 120);
+    assert(cell != NULL);
+
+    assert(!chfl_cell_lengths(cell, &a, &b, &c));
+    assert(fabs(a - 20) < 1e-10);
+    assert(fabs(b - 21) < 1e-10);
+    assert(fabs(c - 22) < 1e-10);
+
+    assert(!chfl_cell_angles(cell, &a, &b, &c));
+    assert(fabs(a - 90) < 1e-10);
+    assert(fabs(b - 100) < 1e-10);
+    assert(fabs(c - 120) < 1e-10);
+
+    assert(!chfl_cell_free(cell));
 
     return EXIT_SUCCESS;
 }
