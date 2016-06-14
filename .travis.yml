@@ -1,6 +1,5 @@
 language: cpp
 sudo: false
-
 # Build matrix
 os:
   - linux
@@ -20,12 +19,10 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-precise-3.6
     - kalakris-cmake
     packages:
     - g++-4.8
     - libnetcdf-dev
-    - clang-3.6
     - cmake
 
 before_install:
@@ -46,9 +43,6 @@ before_install:
         if test "${C_COMPILER}" == "gcc"; then
             export CC=gcc-4.8
             export CXX=g++-4.8
-        elif test "${C_COMPILER}" == "clang"; then
-            export CC=clang-3.6
-            export CXX=clang++-3.6
         fi
     fi
   # Install OS X stuff
