@@ -69,7 +69,7 @@ set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
 set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
 
 target_include_directories(chemfiles PUBLIC include)
-target_include_directories(chemfiles PUBLIC external/molfiles/include)
+target_include_directories(chemfiles PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/external/molfiles/include)
 target_include_directories(chemfiles PUBLIC external/fmt)
 
 if(${ENABLE_NETCDF})

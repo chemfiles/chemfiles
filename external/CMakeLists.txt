@@ -28,11 +28,11 @@ set_target_properties(fmt PROPERTIES COMPILE_FLAGS ${EXTERNAL_FLAGS})
 # ============================================================================ #
 
 # VMD Molfile plugins
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/molfiles/LICENSE")
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/molfiles/LICENSE")
     message(STATUS "Unpacking molfiles sources")
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_SOURCE_DIR}/molfiles.tar.gz
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 endif()
 
@@ -132,5 +132,5 @@ foreach(file IN ITEMS ${VMD_MOLFILE_PLUGINS_ENABLED})
     set_source_files_properties(${file} PROPERTIES COMPILE_FLAGS "-DVMDPLUGIN=${plugin} ${MOLFILE_FLAGS}")
 endforeach()
 
-include_directories(molfiles/include)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/molfiles/include)
 add_library(molfiles OBJECT ${VMD_MOLFILE_PLUGINS_ENABLED})
