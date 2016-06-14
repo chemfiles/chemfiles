@@ -87,6 +87,7 @@ int main(){
     remove("test-tmp.xyz");
 
     assert(!chfl_trajectory_close(file));
+    assert(!chfl_frame_free(frame));
 
     return EXIT_SUCCESS;
 }

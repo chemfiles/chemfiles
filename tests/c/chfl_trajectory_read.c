@@ -103,8 +103,10 @@ int main(){
     // Set the topology associated with a trajectory by hand
     topology = chfl_topology();
     atom = chfl_atom("Cs");
-    for (unsigned i=0; i<297; i++)
+    for (unsigned i=0; i<297; i++) {
         assert(!chfl_topology_append(topology, atom));
+    }
+    assert(!chfl_atom_free(atom));
 
     assert(!chfl_trajectory_set_topology(file, topology));
     assert(!chfl_topology_free(topology));

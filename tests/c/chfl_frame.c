@@ -81,25 +81,27 @@ int main() {
     /*********************/
 
     /*********************/
-    CHFL_TOPOLOGY* top = chfl_topology();
+    CHFL_TOPOLOGY* topology = chfl_topology();
     CHFL_ATOM* Zn = chfl_atom("Zn");
     CHFL_ATOM* Ar = chfl_atom("Ar");
-    assert(!chfl_topology_append(top, Zn));
-    assert(!chfl_topology_append(top, Ar));
-    assert(!chfl_topology_append(top, Zn));
-    assert(!chfl_topology_append(top, Ar));
+    assert(!chfl_topology_append(topology, Zn));
+    assert(!chfl_topology_append(topology, Ar));
+    assert(!chfl_topology_append(topology, Zn));
+    assert(!chfl_topology_append(topology, Ar));
 
-    assert(!chfl_frame_set_topology(frame, top));
-    chfl_topology_free(top);
+    assert(!chfl_frame_set_topology(frame, topology));
+    chfl_topology_free(topology);
     chfl_atom_free(Zn);
     chfl_atom_free(Ar);
     /*********************/
 
-    top = chfl_topology_from_frame(frame);
-    CHFL_ATOM* atom = chfl_atom_from_topology(top, 0);
+    topology = chfl_topology_from_frame(frame);
+    CHFL_ATOM* atom = chfl_atom_from_topology(topology, 0);
     char name[32];
     assert(!chfl_atom_name(atom, name, sizeof(name)));
     assert(strcmp(name, "Zn") == 0);
+    assert(!chfl_atom_free(atom));
+    assert(!chfl_topology_free(topology));
 
     atom = chfl_atom_from_frame(frame, 1);
     assert(!chfl_atom_name(atom, name, sizeof(name)));
