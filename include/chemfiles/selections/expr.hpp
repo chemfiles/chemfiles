@@ -10,6 +10,7 @@
 #define CHEMFILES_SELECTION_EXPR_HPP
 
 #include "chemfiles/selections/parser.hpp"
+#include "chemfiles/utils.hpp"
 
 namespace chemfiles {
 namespace selections {
@@ -46,7 +47,7 @@ public:
         } else if (name == "z") {
             coord_ = Z;
         } else {
-            throw std::runtime_error("Could not convert '" + name + "' to coordinate.");
+            throw SelectionError("Could not convert '" + name + "' to coordinate.");
         }
     }
 
@@ -61,7 +62,7 @@ public:
         case Z:
             return 2;
         }
-        throw std::runtime_error("Unreachable");
+        unreachable();
     }
 
     //! Convert the coordinate to the corresponding string
@@ -74,6 +75,7 @@ public:
         case Z:
             return "z";
         }
+        unreachable();
     }
 
 private:

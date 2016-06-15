@@ -79,6 +79,7 @@ size_t Selection::size() const {
         case Context::DIHEDRAL:
             return 4;
     }
+    unreachable();
 }
 
 Matches Selection::evaluate(const Frame& frame) const {
@@ -236,4 +237,5 @@ Matches Selection::generate_matches(const Frame& frame) const {
         case Context::DIHEDRAL:
             return dihedral_matches(frame);
     }
+    unreachable();
 }

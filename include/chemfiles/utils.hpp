@@ -8,6 +8,8 @@
 #ifndef CHEMFILES_UTILS_HPP
 #define CHEMFILES_UTILS_HPP
 
+#include "chemfiles/Logger.hpp"
+
 #include <vector>
 #include <string>
 #include <sstream>
@@ -33,5 +35,10 @@ inline std::string trim(const std::string& str) {
     }).base();
     return (back <= front ? std::string() : std::string(front, back));
 }
+
+#define unreachable() do {                                                     \
+    Logger::error("Entered unreachable code at ", __FILE__, ":", __LINE__);    \
+    abort();                                                                   \
+} while (false)
 
 #endif

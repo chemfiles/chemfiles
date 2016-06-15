@@ -35,9 +35,8 @@ static std::string binop_str(BinOp op) {
         return ">";
     case BinOp::GE:
         return ">=";
-    default:
-        throw std::runtime_error("Hit the default case in binop_str");
     }
+    unreachable();
 }
 
 //! Get the associated function to a binary operator for type `T`
@@ -55,9 +54,8 @@ template <typename T> std::function<bool(T, T)> binop_comparison(BinOp op) {
         return std::greater<T>();
     case BinOp::GE:
         return std::greater_equal<T>();
-    default:
-        throw std::runtime_error("Hit the default case in binop_str");
     }
+    unreachable();
 }
 
 /****************************************************************************************/

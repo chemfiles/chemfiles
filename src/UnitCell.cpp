@@ -8,6 +8,7 @@
 #include <cmath>
 
 #include "chemfiles/Error.hpp"
+#include "chemfiles/utils.hpp"
 #include "chemfiles/UnitCell.hpp"
 using namespace chemfiles;
 
@@ -176,4 +177,5 @@ Vector3D UnitCell::wrap(const Vector3D& vect) const {
         case TRICLINIC:
             return wrap_triclinic(vect);
     }
+    unreachable();
 }

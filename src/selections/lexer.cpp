@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "chemfiles/Error.hpp"
+#include "chemfiles/utils.hpp"
 #include "chemfiles/selections/lexer.hpp"
 
 using namespace chemfiles;
@@ -62,6 +63,7 @@ std::string Token::str() const {
     case Token::NUMBER:
         return std::to_string(number());
     }
+    unreachable();
 }
 
 unsigned Token::precedence() const {
@@ -89,6 +91,7 @@ unsigned Token::precedence() const {
     case COMMA:
         throw SelectionError("Invalid case in Token::precedence");
     }
+    unreachable();
 }
 
 static std::vector<std::string> split(const std::string& data) {
