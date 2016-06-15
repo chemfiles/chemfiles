@@ -7,6 +7,7 @@
 #include "crashs.h"
 
 CHFL_FRAME* testing_frame();
+bool find_match(const chfl_match_t* matches, size_t n_matches, chfl_match_t match);
 
 int main() {
     silent_crash_handlers();
@@ -70,12 +71,10 @@ int main() {
     assert(!chfl_selection_matches(selection, matches, n_matches));
     assert(matches[0].size == 3);
     assert(matches[1].size == 3);
-    assert(matches[0].atoms[0] == 0);
-    assert(matches[0].atoms[1] == 1);
-    assert(matches[0].atoms[2] == 2);
-    assert(matches[1].atoms[0] == 1);
-    assert(matches[1].atoms[1] == 2);
-    assert(matches[1].atoms[2] == 3);
+    chfl_match_t match_1 = {.size=3, .atoms={0, 1, 2, (size_t)-1}};
+    assert(find_match(matches, n_matches, match_1));
+    chfl_match_t match_2 = {.size=3, .atoms={1, 2, 3, (size_t)-1}};
+    assert(find_match(matches, n_matches, match_2));
 
     free(matches);
     assert(!chfl_selection_free(selection));
@@ -108,4 +107,18 @@ CHFL_FRAME* testing_frame() {
     assert(!chfl_frame_set_topology(frame, topology));
     assert(!chfl_topology_free(topology));
     return frame;
+}
+
+bool find_match(const chfl_match_t* matches, size_t n_matches, chfl_match_t match) {
+    assert(matches != NULL);
+    for (size_t i=0; i<n_matches; i++) {
+        assert(matches[i].size == match.size);
+        if (matches[i].atoms[0] == match.atoms[0] &&
+            matches[i].atoms[1] == match.atoms[1] &&
+            matches[i].atoms[2] == match.atoms[2] &&
+            matches[i].atoms[3] == match.atoms[3]) {
+            return true;
+        }
+    }
+    return false;
 }
