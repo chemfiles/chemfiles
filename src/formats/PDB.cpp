@@ -112,7 +112,7 @@ void PDBFormat::read_cryst1(Frame& frame, const std::string& line) {
         auto cell = UnitCell(a, b, c, alpha, beta, gamma);
 
         frame.set_cell(cell);
-    } catch (std::invalid_argument& e) {
+    } catch (std::invalid_argument&) {
         throw FormatError("Could not read CRYST1 record: '" + line + "'");
     }
 
@@ -143,7 +143,7 @@ void PDBFormat::read_atom(Frame& frame, const std::string& line) {
         position[0] = std::stof(line.substr(31, 8));
         position[1] = std::stof(line.substr(38, 8));
         position[2] = std::stof(line.substr(46, 8));
-    } catch (std::invalid_argument& e) {
+    } catch (std::invalid_argument&) {
         throw FormatError("Could not read positions in record: '" + line + "'");
     }
 
@@ -167,7 +167,7 @@ void PDBFormat::read_conect(Frame& frame, const std::string& full_line) {
         try {
             // PDB indexing is 1-based, and chemfiles is 0-based
             return std::stoul(line.substr(initial, 5)) - 1;
-        } catch (std::invalid_argument& e) {
+        } catch (std::invalid_argument&) {
             throw FormatError("Could not read atomic number in: '" + line + "'");
         }
     };

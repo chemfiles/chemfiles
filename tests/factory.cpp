@@ -1,4 +1,6 @@
+#ifdef __clang__
 #pragma clang diagnostic ignored "-Wpotentially-evaluated-expression"
+#endif
 
 #include <string>
 #include <catch.hpp>

@@ -1,9 +1,7 @@
 set(EXTERNAL_FLAGS "")
 if(MSVC)
-    # Do not issue warning for insecure code
-    set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -D_CRT_SECURE_OVERLOAD_STANDARD_NAMES=1")
-    # strcasecmp and strncasecmp are POSIX functions
-    set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -Dstrcasecmp=_stricmp -Dstrncasecmp=_strnicmp")
+    # Disable warnings about this code
+    set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} /W0")
 else()
     # Disable warnings about this code
     set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -w")

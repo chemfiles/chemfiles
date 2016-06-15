@@ -46,7 +46,7 @@ set(CHEMFILES_C_WARNINGS "")
 
 # Add some warnings in debug mode
 if(MSVC)
-    add_warning("/W2")
+    add_warning("/W3")
 else()
     # Basic set of warnings
     add_warning("-Wall")

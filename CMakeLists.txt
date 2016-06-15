@@ -39,6 +39,10 @@ if(WINDOWS)
     add_definitions("-DWINDOWS")
 endif()
 
+if(MSVC)
+    add_definitions("-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS")
+endif()
+
 if(CODE_COVERAGE)
     set(BUILD_TESTS ON)
     message(STATUS "Code coverage enabled")

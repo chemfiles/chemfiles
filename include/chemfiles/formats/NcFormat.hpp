@@ -33,7 +33,7 @@ public:
     NCFormat(File& file);
     ~NCFormat() = default;
 
-    virtual void read_step(const size_t step, Frame& frame) override;
+    virtual void read_step(size_t step, Frame& frame) override;
     virtual void read(Frame& frame) override;
     virtual void write(const Frame& frame) override;
 
