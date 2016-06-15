@@ -1,11 +1,12 @@
-#include "chemfiles.h"
-
 // Force NDEBUG to be undefined
 #undef NDEBUG
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "chemfiles.h"
+#include "crashs.h"
 
 #if (defined(WIN32) || defined(WIN64))
 #define EOL "\r\n"
@@ -27,6 +28,7 @@ void callback(chfl_log_level_t level, const char* message) {
 }
 
 int main() {
+    silent_crash_handlers();
     assert(strcmp(chfl_strerror(CHFL_SUCCESS), "Operation was sucessfull") == 0);
     assert(strcmp(chfl_last_error(), "") == 0);
 

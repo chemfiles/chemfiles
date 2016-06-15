@@ -35,6 +35,10 @@ endif()
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${CHEMFILES_CXX_WARNINGS}")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${CHEMFILES_C_WARNINGS}")
 
+if(WINDOWS)
+    add_definitions("-DWINDOWS")
+endif()
+
 if(CODE_COVERAGE)
     set(BUILD_TESTS ON)
     message(STATUS "Code coverage enabled")

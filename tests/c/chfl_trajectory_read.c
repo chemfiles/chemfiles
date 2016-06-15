@@ -1,16 +1,17 @@
-#include "chemfiles.h"
-
 // Force NDEBUG to be undefined
 #undef NDEBUG
-
 #include <assert.h>
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
 
+#include "chemfiles.h"
+#include "crashs.h"
+
 #define DATADIR SRCDIR "/data/xyz/"
 
-int main(){
+int main() {
+    silent_crash_handlers();
     CHFL_FRAME* frame = chfl_frame(0);
     CHFL_TRAJECTORY* file = chfl_trajectory_open(DATADIR "water.xyz", 'r');
     assert(frame != NULL);

@@ -6,16 +6,18 @@ add_subdirectory(external)
 
 function(chfl_cpp_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
-    add_executable(${_name_} ${_file_} $<TARGET_OBJECTS:catch>)
-    target_link_libraries(${_name_} chemfiles boost_filesystem)
+    add_executable(${_name_} ${_file_})
+    target_link_libraries(${_name_} chemfiles boost_filesystem catch crash-handlers)
     set_property(TARGET ${_name_} PROPERTY CXX_STANDARD 11)
     add_test(NAME ${_name_} COMMAND ${_name_} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 endfunction()
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/crashs)
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/catch)
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/boost/include)
-add_library(catch OBJECT ${CMAKE_CURRENT_SOURCE_DIR}/external/catch/catch.cpp)
+add_library(catch STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/catch/catch.cpp)
+add_library(crash-handlers STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/crashs/crashs.c)
 
 file(GLOB all_test_files
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
@@ -35,7 +37,7 @@ function(chfl_c_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     set(_name_ "c-${_name_}")
     add_executable(${_name_} ${_file_})
-    target_link_libraries(${_name_} chemfiles)
+    target_link_libraries(${_name_} chemfiles crash-handlers)
     add_test(NAME ${_name_} COMMAND ${_name_} WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 endfunction()
 

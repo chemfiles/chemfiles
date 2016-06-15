@@ -1,5 +1,3 @@
-#include "chemfiles.h"
-
 // Force NDEBUG to be undefined
 #undef NDEBUG
 #include <assert.h>
@@ -8,7 +6,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "chemfiles.h"
+#include "crashs.h"
+
 int main() {
+    silent_crash_handlers();
     CHFL_ATOM* a = chfl_atom("He");
     assert(a != NULL);
 

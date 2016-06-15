@@ -1,5 +1,3 @@
-#include "chemfiles.h"
-
 // Force NDEBUG to be undefined
 #undef NDEBUG
 #include <assert.h>
@@ -7,6 +5,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "chemfiles.h"
+#include "crashs.h"
 
 bool roughly(double A[3][3], double B[3][3]) {
     double eps = 1e-10;
@@ -17,6 +18,7 @@ bool roughly(double A[3][3], double B[3][3]) {
 }
 
 int main() {
+    silent_crash_handlers();
     CHFL_CELL* cell = chfl_cell(2, 3, 4);
     assert(cell != NULL);
 

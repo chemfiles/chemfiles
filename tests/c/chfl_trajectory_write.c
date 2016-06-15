@@ -1,13 +1,13 @@
-#include "chemfiles.h"
-
 // Force NDEBUG to be undefined
 #undef NDEBUG
-
 #include <assert.h>
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "chemfiles.h"
+#include "crashs.h"
 
 // Read a whole file at once
 static char* read_whole_file(const char* name);
@@ -32,7 +32,8 @@ const char* expected_content = "4" EOL
                                "He 4 5 6" EOL
                                "He 4 5 6" EOL;
 
-int main(){
+int main() {
+    silent_crash_handlers();
     CHFL_TOPOLOGY* top = chfl_topology();
     CHFL_ATOM* atom = chfl_atom("He");
     assert(top != NULL);

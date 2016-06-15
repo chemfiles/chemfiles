@@ -1,13 +1,15 @@
-#include "chemfiles.h"
-
 // Force NDEBUG to be undefined
 #undef NDEBUG
 #include <assert.h>
 #include <stdlib.h>
 
+#include "chemfiles.h"
+#include "crashs.h"
+
 CHFL_FRAME* testing_frame();
 
 int main() {
+    silent_crash_handlers();
     CHFL_FRAME* frame = testing_frame();
     CHFL_SELECTION* selection = chfl_selection("name O");
 
