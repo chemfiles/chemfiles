@@ -11,8 +11,12 @@ endif()
 add_definitions("-DBOOST_ALL_NO_LIB")
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+endif()
+
+# Disable warnings for boost
+if(MSVC)
+    string(REGEX REPLACE "/Wall" "/w" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 else()
-    # Disable warnings for boost
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 endif()
 

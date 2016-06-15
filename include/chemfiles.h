@@ -564,7 +564,7 @@ CHFL_EXPORT int chfl_cell_free(CHFL_CELL* cell);
 * @brief Create a new empty topology
 * @return A pointer to the new topology, or NULL in case of error
 */
-CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology();
+CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology(void);
 
 /*!
 * @brief Get a copy of the topology of a frame

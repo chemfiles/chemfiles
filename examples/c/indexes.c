@@ -6,7 +6,7 @@
 
 #include "chemfiles.h"
 
-int main() {
+int main(void) {
     CHFL_TRAJECTORY* file = chfl_trajectory_open("tests/files/xyz/helium.xyz", 'r');
     CHFL_FRAME* frame = chfl_frame(0);
     unsigned* indexes = NULL;

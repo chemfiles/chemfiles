@@ -1,14 +1,14 @@
 set(EXTERNAL_FLAGS "")
+# Disable warnings about this code
 if(MSVC)
-    # Disable warnings about this code
-    set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} /W0")
+    string(REGEX REPLACE "/Wall" "/w" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    string(REGEX REPLACE "/Wall" "/w" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 else()
-    # Disable warnings about this code
     set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -w")
+endif()
 
-    if(${BUILD_SHARED_LIBS})
-        set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -fPIC")
-    endif()
+if(${BUILD_SHARED_LIBS})
+    set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -fPIC")
 endif()
 
 if(WIN32)

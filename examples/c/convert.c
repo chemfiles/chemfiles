@@ -6,7 +6,7 @@
 
 #include "chemfiles.h"
 
-int main() {
+int main(void) {
     CHFL_TRAJECTORY* input = chfl_trajectory_open("water.xyz", 'r');
 
     // Set the unit cell to an orthorombic cell with lengths of 20, 15 and 35 A

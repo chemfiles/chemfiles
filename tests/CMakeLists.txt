@@ -2,6 +2,11 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/data/README.md")
     message(SEND_ERROR "Missing data files for tests. Please run `git submodule update --init` from ${chemfiles_SOURCE_DIR}.")
 endif()
 
+if(MSVC)
+    string(REGEX REPLACE "/Wall" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    string(REGEX REPLACE "/Wall" "/W4" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+endif()
+
 add_subdirectory(external)
 
 function(chfl_cpp_test _file_)

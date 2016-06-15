@@ -9,7 +9,7 @@ extern "C" {
 // requires an human intervention, and there is no one on Appveyor.
 //
 // On UNIX, does nothing
-void silent_crash_handlers();
+void silent_crash_handlers(void);
 
 #ifdef __cplusplus
 }

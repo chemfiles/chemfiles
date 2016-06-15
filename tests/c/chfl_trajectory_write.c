@@ -48,7 +48,7 @@ int main() {
     float (*positions)[3] = NULL;
     size_t natoms = 0;
     assert(!chfl_frame_positions(frame, &positions, &natoms));
-    assert(natoms = 4);
+    assert(natoms == 4);
 
     for (unsigned i=0; i<4; i++) {
         for (unsigned j=0; j<3; j++) {
@@ -64,7 +64,7 @@ int main() {
 
     assert(!chfl_frame_resize(frame, 6));
     assert(!chfl_frame_positions(frame, &positions, &natoms));
-    assert(natoms = 6);
+    assert(natoms == 6);
     for (unsigned i=0; i<6; i++) {
         for (unsigned j=0; j<3; j++) {
             positions[i][j] = j + 4.0f;

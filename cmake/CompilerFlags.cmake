@@ -44,9 +44,39 @@ endmacro()
 set(CHEMFILES_CXX_WARNINGS "")
 set(CHEMFILES_C_WARNINGS "")
 
+macro(remove_msvc_warning _warn_)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd${_warn_}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd${_warn_}")
+endmacro()
+
 # Add some warnings in debug mode
 if(MSVC)
-    add_warning("/W3")
+    if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+        string(REGEX REPLACE "/W[0-4]" "/Wall" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall")
+    endif()
+
+    if(CMAKE_C_FLAGS MATCHES "/W[0-4]")
+        string(REGEX REPLACE "/W[0-4]" "/Wall" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    else()
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Wall")
+    endif()
+
+    # Disable some too strong warnings
+    remove_msvc_warning(4061) # enumerator in switch of enum is not explicitly handled by a case label
+    remove_msvc_warning(4514) # unreferenced inline function has been removed
+    remove_msvc_warning(4582) # constructor is not implicitly called
+    remove_msvc_warning(4583) # destructor is not implicitly called
+    remove_msvc_warning(4623) # default constructor was implicitly defined as deleted
+    remove_msvc_warning(4625) # copy constructor was implicitly defined as deleted
+    remove_msvc_warning(4626) # assignment operator was implicitly defined as deleted
+    remove_msvc_warning(4668) # not defined preprocessor macro, replacing with '0' for '#if/#elif'
+    remove_msvc_warning(4627) # move assignment operator was implicitly defined as deleted
+    remove_msvc_warning(4710) # function not inlined
+    remove_msvc_warning(4820) # padding added
+    remove_msvc_warning(5026) # move constructor was implicitly defined as deleted
+    remove_msvc_warning(5027) # move assignment operator was implicitly defined as deleted
 else()
     # Basic set of warnings
     add_warning("-Wall")

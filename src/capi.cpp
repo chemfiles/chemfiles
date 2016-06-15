@@ -181,10 +181,9 @@ int chfl_trajectory_sync(CHFL_TRAJECTORY *file) {
 }
 
 int chfl_trajectory_close(CHFL_TRAJECTORY *file) {
-    CHFL_ERROR_WRAP_RETCODE(
-        delete file;
-        file = nullptr;
-    )
+    delete file;
+    file = nullptr;
+    return CHFL_SUCCESS;
 }
 
 /******************************************************************************/
@@ -295,10 +294,9 @@ int chfl_frame_guess_topology(CHFL_FRAME* frame) {
 }
 
 int chfl_frame_free(CHFL_FRAME* frame) {
-    CHFL_ERROR_WRAP_RETCODE(
-        delete frame;
-        frame = nullptr;
-    )
+    delete frame;
+    frame = nullptr;
+    return CHFL_SUCCESS;
 }
 
 /******************************************************************************/
@@ -413,10 +411,9 @@ int chfl_cell_set_type(CHFL_CELL* cell, chfl_cell_type_t type) {
 }
 
 int chfl_cell_free(CHFL_CELL* cell) {
-    CHFL_ERROR_WRAP_RETCODE(
-        delete cell;
-        cell = nullptr;
-    )
+    delete cell;
+    cell = nullptr;
+    return CHFL_SUCCESS;
 }
 
 /******************************************************************************/
@@ -585,10 +582,9 @@ int chfl_topology_remove_bond(CHFL_TOPOLOGY* topology, size_t i, size_t j) {
 }
 
 int chfl_topology_free(CHFL_TOPOLOGY* topology) {
-    CHFL_ERROR_WRAP_RETCODE(
-        delete topology;
-        topology = nullptr;
-    )
+    delete topology;
+    topology = nullptr;
+    return CHFL_SUCCESS;
 }
 
 /******************************************************************************/
@@ -727,10 +723,9 @@ int chfl_atom_set_type(CHFL_ATOM* atom, chfl_atom_type_t type) {
 }
 
 int chfl_atom_free(CHFL_ATOM* atom) {
-    CHFL_ERROR_WRAP_RETCODE(
-        delete atom;
-        atom = nullptr;
-    )
+    delete atom;
+    atom = nullptr;
+    return CHFL_SUCCESS;
 }
 
 /******************************************************************************/
@@ -791,8 +786,7 @@ int chfl_selection_matches(const CHFL_SELECTION* c_selection, chfl_match_t* matc
 }
 
 int chfl_selection_free(CHFL_SELECTION* c_selection) {
-    CHFL_ERROR_WRAP_RETCODE(
-        delete c_selection;
-        c_selection = nullptr;
-    )
+    delete c_selection;
+    c_selection = nullptr;
+    return CHFL_SUCCESS;
 }
