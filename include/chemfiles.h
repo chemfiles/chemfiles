@@ -941,7 +941,7 @@ typedef struct {
 * @return The status code
 */
 CHFL_EXPORT int chfl_selection_matches(const CHFL_SELECTION* selection,
-                                       chfl_match_t* matches,
+                                       chfl_match_t matches[],
                                        size_t n_matches);
 
 /*!
