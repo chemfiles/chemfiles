@@ -102,7 +102,7 @@ void Frame::guess_topology() {
 
 void Frame::set_topology(const Topology& topology) {
     if (topology.natoms() != positions_.size()) {
-        throw APIError("Error: the topology contains " +
+        throw APIError("the topology contains " +
                        std::to_string(topology.natoms()) +
                        " atoms, but the frame contains " +
                        std::to_string(positions_.size()) + " atoms.");
