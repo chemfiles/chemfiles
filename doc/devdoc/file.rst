@@ -35,7 +35,7 @@ These classes implement the interface defined previously.
 .. doxygenclass:: chemfiles::BasicFile
     :members:
 
-.. doxygenclass:: chemfiles::NCFile
+.. doxygenclass:: chemfiles::NcFile
     :members:
 
 .. TODO:: adding a new file class

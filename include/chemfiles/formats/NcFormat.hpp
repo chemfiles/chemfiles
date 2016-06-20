@@ -23,7 +23,7 @@ class Topology;
 class NcFile;
 
 /*!
- * @class NCFormat formats/NCFormat.hpp formats/NCFormat.cpp
+ * @class NCFormat formats/NcFormat.hpp formats/NcFormat.cpp
  * @brief Amber NetCDF file format reader.
  *
  * http://ambermd.org/netcdf/nctraj.xhtml
