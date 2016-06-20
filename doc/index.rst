@@ -105,7 +105,7 @@ are extensively documented here.
    :maxdepth: 2
 
    classes/index
-   c-api
+   capi/index
 
 Developer documentation
 -----------------------
