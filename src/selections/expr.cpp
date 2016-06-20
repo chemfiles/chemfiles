@@ -63,7 +63,7 @@ std::string AllExpr::print(unsigned) const {
     return "all";
 }
 
-std::vector<bool> AllExpr::evaluate(const Frame&, const Matches& matches) const {
+std::vector<bool> AllExpr::evaluate(const Frame&, const std::vector<Match>& matches) const {
     return std::vector<bool>(matches.size(), true);
 }
 
@@ -81,7 +81,7 @@ std::string NoneExpr::print(unsigned) const {
     return "none";
 }
 
-std::vector<bool> NoneExpr::evaluate(const Frame&, const Matches& matches) const {
+std::vector<bool> NoneExpr::evaluate(const Frame&, const std::vector<Match>& matches) const {
     return std::vector<bool>(matches.size(), false);
 }
 
@@ -100,7 +100,7 @@ std::string NameExpr::print(unsigned) const {
     return "name($" + std::to_string(argument_ + 1) + ") " + op + " " + name_;
 }
 
-std::vector<bool> NameExpr::evaluate(const Frame& frame, const Matches& matches) const {
+std::vector<bool> NameExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
     auto res = std::vector<bool>(matches.size(), false);
     auto topology = frame.topology();
     for (size_t i = 0; i < matches.size(); i++) {
@@ -139,7 +139,7 @@ std::string PositionExpr::print(unsigned) const {
            binop_str(op_) + " " + std::to_string(val_);
 }
 
-std::vector<bool> PositionExpr::evaluate(const Frame& frame, const Matches& matches) const {
+std::vector<bool> PositionExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
     auto res = std::vector<bool>(matches.size(), false);
     auto compare = binop_comparison<double>(op_);
     auto j = coord_.as_index();
@@ -184,7 +184,7 @@ std::string VelocityExpr::print(unsigned) const {
             ") " + binop_str(op_) + " " + std::to_string(val_);
 }
 
-std::vector<bool> VelocityExpr::evaluate(const Frame& frame, const Matches& matches) const {
+std::vector<bool> VelocityExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
     auto res = std::vector<bool>(matches.size(), false);
 
     if (frame.velocities()) {
@@ -235,7 +235,7 @@ std::string IndexExpr::print(unsigned) const {
 }
 
 
-std::vector<bool> IndexExpr::evaluate(const Frame&, const Matches& matches) const {
+std::vector<bool> IndexExpr::evaluate(const Frame&, const std::vector<Match>& matches) const {
     auto res = std::vector<bool>(matches.size(), false);
     auto compare = binop_comparison<size_t>(op_);
     for (size_t i = 0; i < matches.size(); i++) {
@@ -279,7 +279,7 @@ std::string MassExpr::print(unsigned) const {
            " " + std::to_string(val_);
 }
 
-std::vector<bool> MassExpr::evaluate(const Frame& frame, const Matches& matches) const {
+std::vector<bool> MassExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
     auto res = std::vector<bool>(matches.size(), false);
     auto compare = binop_comparison<double>(op_);
     auto topology = frame.topology();
@@ -321,7 +321,7 @@ std::string AndExpr::print(unsigned delta) const {
     return "and -> " + lhs + "\n" + std::string(delta, ' ') + "    -> " + rhs;
 }
 
-std::vector<bool> AndExpr::evaluate(const Frame& frame, const Matches& matches) const {
+std::vector<bool> AndExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
     auto lhs = lhs_->evaluate(frame, matches);
     auto rhs = rhs_->evaluate(frame, matches);
     assert(lhs.size() == rhs.size());
@@ -369,7 +369,7 @@ std::string OrExpr::print(unsigned delta) const {
     return "or -> " + lhs + "\n" + std::string(delta, ' ') + "   -> " + rhs;
 }
 
-std::vector<bool> OrExpr::evaluate(const Frame& frame, const Matches& matches) const {
+std::vector<bool> OrExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
     auto lhs = lhs_->evaluate(frame, matches);
     auto rhs = rhs_->evaluate(frame, matches);
     assert(lhs.size() == rhs.size());
@@ -417,7 +417,7 @@ std::string NotExpr::print(unsigned) const {
     return "not " + ast;
 }
 
-std::vector<bool> NotExpr::evaluate(const Frame& frame, const Matches& matches) const {
+std::vector<bool> NotExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
     auto res = ast_->evaluate(frame, matches);
     assert(res.size() == matches.size());
     for (size_t i = 0; i < matches.size(); i++) {

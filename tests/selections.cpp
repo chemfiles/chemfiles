@@ -131,29 +131,29 @@ TEST_CASE("Multiple selections", "[selection]") {
 
     SECTION("Pairs & two") {
         auto sel = Selection("pairs: all");
-        auto res = Matches{{0ul, 1ul}, {0ul, 2ul}, {0ul, 3ul}, {1ul, 2ul}, {1ul, 3ul}, {2ul, 3ul}};
+        std::vector<Match> res{{0ul, 1ul}, {0ul, 2ul}, {0ul, 3ul}, {1ul, 2ul}, {1ul, 3ul}, {2ul, 3ul}};
         CHECK(sel.evaluate(frame) == res);
 
         sel = Selection("two: none");
-        res = Matches{};
+        res = std::vector<Match>();
         CHECK(sel.evaluate(frame) == res);
     }
 
     SECTION("Three") {
         auto sel = Selection("three: all");
-        auto res = Matches{{0ul, 1ul, 2ul}, {0ul, 1ul, 3ul}, {0ul, 2ul, 3ul}, {1ul, 2ul, 3ul}};
+        std::vector<Match> res{{0ul, 1ul, 2ul}, {0ul, 1ul, 3ul}, {0ul, 2ul, 3ul}, {1ul, 2ul, 3ul}};
         CHECK(sel.evaluate(frame) == res);
     }
 
     SECTION("Four") {
         auto sel = Selection("four: all");
-        auto res = Matches{{0ul, 1ul, 2ul, 3ul}};
+        auto res = std::vector<Match>{{0ul, 1ul, 2ul, 3ul}};
         CHECK(sel.evaluate(frame) == res);
     }
 
     SECTION("Angles") {
         auto sel = Selection("angles: all");
-        auto res = Matches{{0ul, 1ul, 2ul}, {1ul, 2ul, 3ul}};
+        std::vector<Match> res{{0ul, 1ul, 2ul}, {1ul, 2ul, 3ul}};
         auto eval = sel.evaluate(frame);
         CHECK(res.size() == eval.size());
         for (auto& match: res) {
@@ -163,7 +163,7 @@ TEST_CASE("Multiple selections", "[selection]") {
 
     SECTION("Dihedrals") {
         auto sel = Selection("dihedrals: all");
-        auto res = Matches{{0ul, 1ul, 2ul, 3ul}};
+        std::vector<Match> res{{0ul, 1ul, 2ul, 3ul}};
         CHECK(sel.evaluate(frame) == res);
     }
 }

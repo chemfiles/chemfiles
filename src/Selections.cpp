@@ -82,12 +82,12 @@ size_t Selection::size() const {
     unreachable();
 }
 
-Matches Selection::evaluate(const Frame& frame) const {
+std::vector<Match> Selection::evaluate(const Frame& frame) const {
     auto matches = generate_matches(frame);
     auto valid = ast_->evaluate(frame, matches);
     auto n_valid = std::count(valid.begin(), valid.end(), true);
 
-    auto res = Matches();
+    auto res = std::vector<Match>();
     res.reserve(static_cast<size_t>(n_valid));
     assert(valid.size() == matches.size());
     for (size_t i=0; i<matches.size(); i++) {
@@ -110,19 +110,19 @@ std::vector<size_t> Selection::list(const Frame& frame) const {
     return res;
 }
 
-static Matches atom_matches(const Frame& frame) {
+static std::vector<Match> atom_matches(const Frame& frame) {
     auto natoms = frame.natoms();
-    auto res = Matches(natoms);
+    auto res = std::vector<Match>(natoms);
     for (size_t i=0; i<natoms; i++) {
         res[i] = Match(i);
     }
     return res;
 }
 
-static Matches pair_matches(const Frame& frame) {
+static std::vector<Match> pair_matches(const Frame& frame) {
     auto natoms = frame.natoms();
     size_t npairs = natoms * (natoms - 1) / 2;
-    auto res = Matches(npairs);
+    auto res = std::vector<Match>(npairs);
     size_t idx = 0;
     for (size_t i=0; i<natoms; i++) {
         for (size_t j=i+1; j<natoms; j++) {
@@ -134,7 +134,7 @@ static Matches pair_matches(const Frame& frame) {
     return res;
 }
 
-static Matches three_matches(const Frame& frame) {
+static std::vector<Match> three_matches(const Frame& frame) {
     auto natoms = frame.natoms();
     size_t nthree = natoms * (natoms - 1) * (natoms - 2) / 6;
     if (natoms >= 2954 && sizeof(size_t) == 4) {
@@ -143,7 +143,7 @@ static Matches three_matches(const Frame& frame) {
             "Can not match 3 atoms when the frame contains more than 2954 atoms"
         );
     }
-    auto res = Matches(nthree);
+    auto res = std::vector<Match>(nthree);
     size_t idx = 0;
     for (size_t i=0; i<natoms; i++) {
         for (size_t j=i+1; j<natoms; j++) {
@@ -157,7 +157,7 @@ static Matches three_matches(const Frame& frame) {
     return res;
 }
 
-static Matches four_matches(const Frame& frame) {
+static std::vector<Match> four_matches(const Frame& frame) {
     auto natoms = frame.natoms();
     if (natoms >= 145056 && sizeof(size_t) == 8) {
         // This value will cause `nfour` to overflow in 64-bit systems
@@ -171,7 +171,7 @@ static Matches four_matches(const Frame& frame) {
         );
     }
     size_t nfour = natoms * (natoms - 1) * (natoms - 2) * (natoms - 3) / 24;
-    auto res = Matches(nfour);
+    auto res = std::vector<Match>(nfour);
     size_t idx = 0;
     for (size_t i=0; i<natoms; i++) {
         for (size_t j=i+1; j<natoms; j++) {
@@ -187,9 +187,9 @@ static Matches four_matches(const Frame& frame) {
     return res;
 }
 
-static Matches bond_matches(const Frame& frame) {
+static std::vector<Match> bond_matches(const Frame& frame) {
     auto nbonds = frame.topology().bonds().size();
-    auto res = Matches(nbonds);
+    auto res = std::vector<Match>(nbonds);
     size_t i = 0;
     for (auto& bond: frame.topology().bonds()) {
         res[i] = Match(bond[0], bond[1]);
@@ -198,9 +198,9 @@ static Matches bond_matches(const Frame& frame) {
     return res;
 }
 
-static Matches angle_matches(const Frame& frame) {
+static std::vector<Match> angle_matches(const Frame& frame) {
     auto nangles = frame.topology().angles().size();
-    auto res = Matches(nangles);
+    auto res = std::vector<Match>(nangles);
     size_t i = 0;
     for (auto& angle: frame.topology().angles()) {
         res[i] = Match(angle[0], angle[1], angle[2]);
@@ -209,9 +209,9 @@ static Matches angle_matches(const Frame& frame) {
     return res;
 }
 
-static Matches dihedral_matches(const Frame& frame) {
+static std::vector<Match> dihedral_matches(const Frame& frame) {
     auto ndihedrals = frame.topology().dihedrals().size();
-    auto res = Matches(ndihedrals);
+    auto res = std::vector<Match>(ndihedrals);
     size_t i = 0;
     for (auto& dihedral: frame.topology().dihedrals()) {
         res[i] = Match(dihedral[0], dihedral[1], dihedral[2] , dihedral[3]);
@@ -220,7 +220,7 @@ static Matches dihedral_matches(const Frame& frame) {
     return res;
 }
 
-Matches Selection::generate_matches(const Frame& frame) const {
+std::vector<Match> Selection::generate_matches(const Frame& frame) const {
     switch (context_) {
         case Context::ATOM:
             return atom_matches(frame);

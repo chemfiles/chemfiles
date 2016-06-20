@@ -60,8 +60,6 @@ inline bool operator==(const Match& lhs, const Match& rhs) {
     return true;
 }
 
-using Matches = std::vector<Match>;
-
 //! Selection context, i.e. what we are matching
 enum class Context {
     //! Matching a single atom
@@ -131,7 +129,7 @@ public:
 
     /// Evaluates the selection on a given `frame`. This function returns the
     /// list of matches in the frame for this selection.
-    Matches evaluate(const Frame& frame) const;
+    std::vector<Match> evaluate(const Frame& frame) const;
 
     /// Evaluates a selection of size 1 on a given `frame`. This function
     /// returns the list of atomic indexes in the frame matching this selection.
@@ -145,7 +143,7 @@ public:
 private:
     //! Generate all possible (unconstrained) matches for this selection and
     //! the given `frame`.
-    Matches generate_matches(const Frame& frame) const;
+    std::vector<Match> generate_matches(const Frame& frame) const;
 
     //! Store the selection string that generated this selection
     std::string selection_;
