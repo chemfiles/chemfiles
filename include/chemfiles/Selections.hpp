@@ -25,7 +25,7 @@ namespace selections {
 /// a match depends on the associated selection, and can vary from 1 to 4.
 class Match {
 public:
-    ///! Maximal number of atoms in a match
+    /// Maximal number of atoms in a match
     static constexpr size_t MAX_MATCH_SIZE = 4;
 
     template<typename ...Args>
@@ -34,11 +34,15 @@ public:
         "`Match` size can not be bigger than MAX_MATCH_SIZE");
     }
 
-    const size_t& operator[](size_t idx) const {
-        assert(idx < size_ && "Out of bounds indexing of Match");
-        return data_[idx];
+    /// Get the `i`th index in the match. `i` should be lower than the actual
+    /// `size()` of the match.
+    const size_t& operator[](size_t i) const {
+        assert(i < size_ && "Out of bounds indexing of Match");
+        return data_[i];
     }
 
+    /// Size of the match, i.e. number of valid indexes in the match. This value
+    /// is always equals to the size of the `Selection` this match comes from.
     size_t size() const {
         return size_;
     }
@@ -80,38 +84,12 @@ enum class Context {
 
 /*!
 * @class Selection Selections.hpp Selections.cpp
-* @brief This class allow to select some atoms in a `Frame`, using a specific
-* selection language.
+* @brief This class allow to select atoms in a `Frame`, from a selection language.
 *
 * The selection language is built by combining basic operations. Each basic
-* operation follows the `<selector> <operator> <value>` structure, where
-* `<operator>` can be a comparison operator in `== != < <= > >=`.
-*
-* Implemented `<selector>` and associated `<value>` types are given below:
-*
-* - `name`: select atoms on their name. `<value>` must be a string, and only the
-*   `==` and `!=` operators are allowed. Examples: `name == C`; `name != Hw`.
-* - `index`: select atoms on their index in the frame. `<value>` must be an
-*    integer. Examples: `index == 4`; `index > 304`.
-* - `mass`: select atoms on their mass. `<value>` must be a number. Examples:
-*   `mass 4`; `mass < 2.0`.
-* - `x|y|z`: select atoms on their position. <value>` must be a number.
-*    Examples: `x <= 7.3`; `z != 4.2`; `y > 2`.
-* - `vx|vy|vz`: select atoms on their velocity. <value>` must be a number.
-*    Examples: `vx <= 7.3`; `vz != 4.2`; `vy > 2`.
-*
-* These basic operations can be combined by three logical operators: `and`, `or`
-* and `not`. Parentheses can be used to remove ambiguity when using multiple
-* operators.
-*
-* 	`name == H and (x < 45.9 or vz >= 67) and (not index == 67)`
-*
-* Some selections also accept a short form, where the comparison operator is
-* elided and implicitly `==`. These selections are `name`, `index` and `mass`.
-* So `name O or index 234` is equivalent to `name == O or index == 234`.
-*
-* Two other special operation are the `all` and `none` selection, matching
-* respectively all and none of the atoms in the frame.
+* operation follows the `<selector>[(<variable>)] <operator> <value>` structure,
+* where `<operator>` is a comparison operator in `== != < <= > >=`. Refer to
+* the full documentation to know the allowed selectors and how to use them.
 */
 class CHFL_EXPORT Selection {
 public:
@@ -134,10 +112,10 @@ public:
     /// Evaluates a selection of size 1 on a given `frame`. This function
     /// returns the list of atomic indexes in the frame matching this selection.
     ///
-    /// @throw SelectionError if the selection is not of size 1
+    /// @throw SelectionError if the selection size is not 1.
     std::vector<size_t> list(const Frame& frame) const;
 
-    ///! Size of the matches for this selection
+    /// Size of the matches for this selection
     size_t size() const;
 
 private:
