@@ -109,14 +109,14 @@ public:
 //! @brief Abstract base class for selector taking a single argument
 class SingleSelector: public Expr {
 public:
-    SingleSelector(uint8_t argument): argument_(argument) {
+    SingleSelector(unsigned argument): argument_(argument) {
         assert(argument <= 3 && "argument must be less than 3 in SingleSelector");
     }
     virtual ~SingleSelector() = default;
 
 protected:
     //! Index of the argument to apply the selector to
-    const uint8_t argument_;
+    const unsigned argument_;
 };
 
 //! @class NameExpr selections/expr.hpp selections/expr.cpp
@@ -126,7 +126,7 @@ protected:
 //! equivalent to `name == <value>`
 class NameExpr final: public SingleSelector {
 public:
-    NameExpr(uint8_t argument, std::string name, bool equals)
+    NameExpr(unsigned argument, std::string name, bool equals)
         : SingleSelector(argument), name_(name), equals_(equals) {}
     std::string print(unsigned delta) const override;
     std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
@@ -139,7 +139,7 @@ private:
 //! @brief Select atoms using their index in the frame.
 class IndexExpr final: public SingleSelector {
 public:
-    IndexExpr(uint8_t argument, BinOp op, std::size_t val)
+    IndexExpr(unsigned argument, BinOp op, std::size_t val)
         : SingleSelector(argument), op_(op), val_(val) {}
     std::string print(unsigned delta) const override;
     std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
@@ -155,7 +155,7 @@ private:
 //! the component of the position to use.
 class PositionExpr final: public SingleSelector {
 public:
-    PositionExpr(uint8_t argument, Coordinate coord, BinOp op, double val)
+    PositionExpr(unsigned argument, Coordinate coord, BinOp op, double val)
         : SingleSelector(argument), coord_(coord), op_(op), val_(val) {}
     std::string print(unsigned delta) const override;
     std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
@@ -171,7 +171,7 @@ private:
 //! component of the velocity to use.
 class VelocityExpr final: public SingleSelector {
 public:
-    VelocityExpr(uint8_t argument, Coordinate coord, BinOp op, double val)
+    VelocityExpr(unsigned argument, Coordinate coord, BinOp op, double val)
         : SingleSelector(argument), coord_(coord), op_(op), val_(val) {}
     std::string print(unsigned delta) const override;
     std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
@@ -185,7 +185,7 @@ private:
 //! @brief Select atoms using their mass, in atomic mass unit.
 class MassExpr final: public SingleSelector {
 public:
-    MassExpr(uint8_t argument, BinOp op, double val): SingleSelector(argument), op_(op), val_(val) {}
+    MassExpr(unsigned argument, BinOp op, double val): SingleSelector(argument), op_(op), val_(val) {}
     std::string print(unsigned delta) const override;
     std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
 private:

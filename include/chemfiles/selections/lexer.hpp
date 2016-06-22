@@ -97,7 +97,7 @@ public:
 
     //! Get the variable associated with this token.
     //! \pre type() must be `VARIABLE`.
-    uint8_t variable() const {
+    unsigned variable() const {
         assert(type_ == VARIABLE && "Can only get variable from VARIABLE token");
         return variable_;
     }
@@ -154,7 +154,7 @@ private:
     //! Value of the identifier if the token is an IDENT
     std::string ident_;
     //! Value of the variable if the token is a VARIABLE
-    uint8_t variable_;
+    unsigned variable_;
 };
 
 //! Convert an `input` string to a stream of tokens

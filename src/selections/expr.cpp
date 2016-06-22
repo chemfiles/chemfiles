@@ -123,8 +123,7 @@ Ast parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     auto equals = (begin[0].type() == Token::EQ);
     auto name = begin[1].ident();
     if (end - begin >= 4 && begin[3].is_variable()) {
-        uint8_t argument = begin[3].variable();
-        argument -= static_cast<uint8_t>(1);
+        auto argument = begin[3].variable() - 1;
         begin += 4;
         return Ast(new NameExpr(argument, name, equals));
     } else {
@@ -168,8 +167,7 @@ Ast parse<PositionExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     }
     auto val = begin[1].number();
     if (end - begin >= 4 && begin[3].is_variable()) {
-        uint8_t argument = begin[3].variable();
-        argument -= static_cast<uint8_t>(1);
+        auto argument = begin[3].variable() - 1;
         begin += 4;
         return Ast(new PositionExpr(argument, coord, op, val));
     } else {
@@ -218,8 +216,7 @@ Ast parse<VelocityExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     }
     auto val = begin[1].number();
     if (end - begin >= 4 && begin[3].is_variable()) {
-        uint8_t argument = begin[3].variable();
-        argument -= static_cast<uint8_t>(1);
+        auto argument = begin[3].variable() - 1;
         begin += 4;
         return Ast(new VelocityExpr(argument, coord, op, val));
     } else {
@@ -263,8 +260,7 @@ Ast parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     }
     auto val = static_cast<std::size_t>(begin[1].number());
     if (end - begin >= 4 && begin[3].is_variable()) {
-        uint8_t argument = begin[3].variable();
-        argument -= static_cast<uint8_t>(1);
+        auto argument = begin[3].variable() - 1;
         begin += 4;
         return Ast(new IndexExpr(argument, op, val));
     } else {
@@ -304,8 +300,7 @@ Ast parse<MassExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     auto op = BinOp(begin[0].type());
     auto val = begin[1].number();
     if (end - begin >= 4 && begin[3].is_variable()) {
-        uint8_t argument = begin[3].variable();
-        argument -= static_cast<uint8_t>(1);
+        auto argument = begin[3].variable() - 1;
         begin += 4;
         return Ast(new MassExpr(argument, op, val));
     } else {

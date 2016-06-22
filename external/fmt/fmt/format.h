@@ -83,7 +83,9 @@ typedef __int64          intmax_t;
 // Disable the warning about implicit conversions that may change the sign of
 // an integer; silencing it otherwise would require many explicit casts.
 #  pragma GCC diagnostic ignored "-Wsign-conversion"
-#  pragma GCC diagnostic ignored "-Wsuggest-override"
+#  if FMT_GCC_VERSION >= 500
+#   pragma GCC diagnostic ignored "-Wsuggest-override"
+#  endif
 # endif
 # if __cplusplus >= 201103L || defined __GXX_EXPERIMENTAL_CXX0X__
 #  define FMT_HAS_GXX_CXX11 1

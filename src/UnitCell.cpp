@@ -162,9 +162,9 @@ Vector3D UnitCell::wrap_orthorombic(const Vector3D& vect) const {
 // Wrap a vector in an Orthorombic UnitCell
 Vector3D UnitCell::wrap_triclinic(const Vector3D& vect) const {
     auto fractional = h_inv_ * vect;
-    fractional[0] -= round(fractional[0]);
-    fractional[1] -= round(fractional[1]);
-    fractional[2] -= round(fractional[2]);
+    fractional[0] -= static_cast<float>(round(fractional[0]));
+    fractional[1] -= static_cast<float>(round(fractional[1]));
+    fractional[2] -= static_cast<float>(round(fractional[2]));
     return h_ * fractional;
 }
 

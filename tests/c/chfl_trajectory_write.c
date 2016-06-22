@@ -52,7 +52,7 @@ int main() {
 
     for (unsigned i=0; i<4; i++) {
         for (unsigned j=0; j<3; j++) {
-            positions[i][j] = j + 1.0f;
+            positions[i][j] = (float)j + 1.0f;
         }
     }
 
@@ -67,7 +67,7 @@ int main() {
     assert(natoms == 6);
     for (unsigned i=0; i<6; i++) {
         for (unsigned j=0; j<3; j++) {
-            positions[i][j] = j + 4.0f;
+            positions[i][j] = (float)j + 4.0f;
         }
     }
     assert(!chfl_topology_append(top, atom));
