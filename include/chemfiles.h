@@ -523,7 +523,7 @@ chfl_cell_set_angles(CHFL_CELL* cell, double alpha, double beta, double gamma);
 * @param matrix the matrix to fill. It should be a 3x3 matrix.
 * @return The status code
 */
-CHFL_EXPORT int chfl_cell_matrix(const CHFL_CELL* cell, double matrix[3][3]);
+CHFL_EXPORT int chfl_cell_matrix(const CHFL_CELL* cell, double (*matrix)[3]);
 
 //! Available cell types in chemfiles
 typedef enum CHFL_CELL_TYPES {

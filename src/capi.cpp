@@ -387,7 +387,7 @@ int chfl_cell_set_angles(CHFL_CELL* cell, double alpha, double beta, double gamm
     )
 }
 
-int chfl_cell_matrix(const CHFL_CELL* cell, double matrix[3][3]) {
+int chfl_cell_matrix(const CHFL_CELL* cell, double (*matrix)[3]) {
     assert(cell != nullptr);
     assert(matrix != nullptr);
     CHFL_ERROR_WRAP_RETCODE(
