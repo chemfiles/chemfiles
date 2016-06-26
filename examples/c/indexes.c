@@ -11,15 +11,13 @@ int main(void) {
     CHFL_FRAME* frame = chfl_frame(0);
     unsigned* indexes = NULL;
 
-    if (file == NULL || chfl_trajectory_read(file, frame) != CHFL_SUCCESS)
-        goto cleanup;
+    if (chfl_trajectory_read(file, frame) != CHFL_SUCCESS) {/*Handle error*/}
 
     size_t natoms = 0;
     float (*positions)[3] = NULL;
     chfl_frame_positions(frame, &positions, &natoms);
-    indexes = (unsigned*)malloc(natoms*sizeof(unsigned));
-    if (indexes == NULL)
-        goto cleanup;
+    indexes = malloc(natoms * sizeof(unsigned));
+    if (indexes == NULL) {/*Handle error*/}
 
     for (unsigned i=0; i<natoms; i++) {
         indexes[i] = (unsigned)-1;
@@ -45,11 +43,4 @@ int main(void) {
     chfl_frame_free(frame);
     free(indexes);
     return EXIT_SUCCESS;
-
-cleanup:
-    printf("Error, cleaning up …\n");
-    chfl_trajectory_close(file);
-    chfl_frame_free(frame);
-    free(indexes);
-    return EXIT_FAILURE;
 }

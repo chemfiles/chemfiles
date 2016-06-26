@@ -9,31 +9,31 @@
 
 int main(void) {
     CHFL_TRAJECTORY* file = chfl_trajectory_open("filename.nc", 'r');
-    CHFL_FRAME* frame = chfl_frame(0);
-    float (*positions)[3] = NULL;
-    double* distances = NULL;
-
-    if(file == NULL || frame == NULL)
-        goto cleanup;
-
     size_t nsteps = 0;
     chfl_trajectory_nsteps(file, &nsteps);
 
-    distances = (double*)malloc(sizeof(double)*nsteps);
-    if (distances == NULL)
-        goto cleanup;
+    double* distances = malloc(sizeof(double) * nsteps);
+    if (distances == NULL) {/*Handle error*/}
 
+    CHFL_FRAME* frame = chfl_frame(0);
     // Accumulate the distances to the origin of the 10th atom throughtout the
     // trajectory
     for (size_t i=0; i<nsteps; i++) {
-        if(!chfl_trajectory_read(file, frame))
-            goto cleanup;
+        if(!chfl_trajectory_read(file, frame)) {/*Handle error*/}
 
         size_t natoms = 0;
-        // Position of the 10th atom
+        float (*positions)[3] = NULL;
+
+        // Get a pointer to the positions in `positions`. The array `positions`
+        // contains natoms entries.
         chfl_frame_positions(frame, &positions, &natoms);
-        double distance = sqrt(positions[9][0]*positions[9][0] +
-                               positions[9][1]*positions[9][1] +
+        if (natoms < 10) {
+            printf("Not enough atoms in the frame\n");
+            continue;
+        }
+        // Get the distance to the origin of the 10th atom
+        double distance = sqrt(positions[9][0] * positions[9][0] +
+                               positions[9][1] * positions[9][1] +
                                positions[9][2]*positions[9][2]);
         distances[i] = distance;
     }
@@ -57,11 +57,4 @@ int main(void) {
     chfl_frame_free(frame);
     free(distances);
     return 0;
-
-cleanup:
-    printf("Error, cleaning up …\n");
-    chfl_trajectory_close(file);
-    chfl_frame_free(frame);
-    free(distances);
-    return 1;
 }
