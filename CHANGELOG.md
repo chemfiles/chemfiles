@@ -29,6 +29,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Users can now specify the format when reading the topology associated with a
   trajectory from a file. The `chfl_trajectory_set_topology_with_format`
   function can be used to do so from the C API.
+* The `chfl_atom_from_{frame,topology}` function now return `NULL` in case of
+  out-of-bound access.
 
 ## 0.5 (19 Feb 2016)
 

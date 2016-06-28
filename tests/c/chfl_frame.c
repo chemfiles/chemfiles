@@ -105,10 +105,16 @@ int main() {
     assert(!chfl_atom_free(atom));
     assert(!chfl_topology_free(topology));
 
+    atom = chfl_atom_from_topology(topology, 10000);
+    assert(atom == NULL);
+
     atom = chfl_atom_from_frame(frame, 1);
     assert(!chfl_atom_name(atom, name, sizeof(name)));
     assert(strcmp(name, "Ar") == 0);
     chfl_atom_free(atom);
+
+    atom = chfl_atom_from_frame(frame, 10000);
+    assert(atom == NULL);
 
     assert(!chfl_frame_free(frame));
 

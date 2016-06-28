@@ -604,8 +604,11 @@ CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* frame, size_t idx) {
     assert(frame != nullptr);
     CHFL_ATOM* atom = nullptr;
     CHFL_ERROR_WRAP(
-        atom = new Atom("");
-        *atom = frame->topology()[idx];
+        // Return NULL if the index is out of bounds
+        if (idx < frame->natoms()) {
+            atom = new Atom("");
+            *atom = frame->topology()[idx];
+        }
     )
     return atom;
 error:
@@ -617,8 +620,11 @@ CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* topology, size_t idx) {
     assert(topology != nullptr);
     CHFL_ATOM* atom = nullptr;
     CHFL_ERROR_WRAP(
-        atom = new Atom("");
-        *atom = (*topology)[idx];
+        // Return NULL if the index is out of bounds
+        if (idx < topology->natoms()) {
+            atom = new Atom("");
+            *atom = (*topology)[idx];
+        }
     )
     return atom;
 error:

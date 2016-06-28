@@ -747,7 +747,8 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom(const char* name);
 * @brief Get a specific atom from a frame
 * @param frame The frame
 * @param idx The atom index in the frame
-* @return A pointer to the new atom, or NULL in case of error
+* @return A pointer to the new atom, or NULL in case of error or if `idx`
+*         is out of bounds
 */
 CHFL_EXPORT CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* frame,
                                             size_t idx);
@@ -756,7 +757,8 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* frame,
 * @brief Get a specific atom from a topology
 * @param topology The topology
 * @param idx The atom index in the topology
-* @return A pointer to the new atom, or NULL in case of error
+* @return A pointer to the new atom, or NULL in case of error or if `idx`
+*         is out of bounds
 */
 CHFL_EXPORT CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* topology,
                                                size_t idx);
