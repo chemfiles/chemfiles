@@ -105,6 +105,7 @@ known to work, and [cmake](http://cmake.org/).
 
 ```bash
 git clone https://github.com/chemfiles/chemfiles
+cd chemfiles
 mkdir build
 cd build
 cmake ..
