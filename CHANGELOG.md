@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+## 0.6 (1 July 2016)
+
 * Improve the selection language to allow selecting multiple atoms at once. For
   example, `"pairs: name($1) H and mass($2) > 5"` will select all pairs of atoms
   where the first atom name is `'H'` and the second atom mass is bigger than 5.
