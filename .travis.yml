@@ -30,34 +30,31 @@ before_install:
   - export C_COMPILER="$CC"
   - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DBUILD_TESTS=ON -DENABLE_NETCDF=ON -DBUILD_SHARED_LIBS=${SHARED_LIBS}"
   - |
-    if test "$TRAVIS_OS_NAME" == "linux" && test "$C_COMPILER" == "gcc"; then
-        export DO_COVERAGE=true
+    if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "gcc" && "$BUILD_TYPE" == "debug" && "$SHARED_LIBS" == "ON" ]]; then
+        export EXTRA_WORK=true
         export CMAKE_ARGS="$CMAKE_ARGS -DCODE_COVERAGE=ON"
         pip install --user codecov
     else
-        export DO_COVERAGE=false
+        export EXTRA_WORK=false
     fi
   # Install Linux stuff
   - |
-    if test "${TRAVIS_OS_NAME}" == "linux"; then
-        if test "${C_COMPILER}" == "gcc"; then
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+        if test "${CC}" == "gcc"; then
             export CC=gcc-4.8
             export CXX=g++-4.8
         fi
     fi
   # Install OS X stuff
   - |
-    if test "$TRAVIS_OS_NAME" == "osx"; then
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         brew tap homebrew/science
         brew update
         brew rm gcc
         brew install gcc netcdf
-        if test "${C_COMPILER}" == "gcc"; then
+        if test "${CC}" == "gcc"; then
             export CC=gcc-6
             export CXX=g++-6
-        elif test "${C_COMPILER}" == "clang"; then
-            export CC=clang
-            export CXX=clang++
         fi
     fi
 
@@ -71,6 +68,6 @@ script:
 
 after_success:
   - |
-    if ${DO_COVERAGE}; then
+    if ${EXTRA_WORK}; then
         codecov --gcov-exec=gcov-4.8
     fi
