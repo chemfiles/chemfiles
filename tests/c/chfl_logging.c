@@ -71,7 +71,18 @@ int main() {
     assert(!chfl_clear_errors());
     assert(strcmp(chfl_last_error(), "") == 0);
 
-    assert(strstr(chfl_version(), "0.6.0") != NULL);
+    file = fopen(SRCDIR "/../VERSION", "r");
+    assert(file != NULL);
+    char* version = read_whole_file(file);
+    assert(version != NULL);
+    // Remove the trailing \n
+    version[strlen(version) - 1] = 0;
+
+    assert(strstr(chfl_version(), version) != NULL);
+
+    free(version);
+    fclose(file);
+
     return EXIT_SUCCESS;
 }
 
