@@ -1,9 +1,9 @@
 # Chemfiles, an efficient IO library for chemistry files
 
 <div align="center">
-<a href="http://chemfiles.readthedocs.io">
+<a href="http://chemfiles.github.io/chemfiles/">
     <img alt="Documentation"
-    src="https://readthedocs.org/projects/chemfiles/badge/?version=latest" />
+    src="https://img.shields.io/badge/docs-latest-brightgreen.svg" />
 </a>
 <a href="https://travis-ci.org/chemfiles/chemfiles">
     <img alt="Build Status"
@@ -42,12 +42,12 @@ Chemfiles is free and open source, and your
 - [Supported file formats](#supported-formats)
 - [Getting started](#getting-started)
 - [Contributing](#contributions-welcome)
-- [Full documentation](http://chemfiles.readthedocs.org/en/latest/)
+- [Full documentation](http://chemfiles.github.io/chemfiles/)
 - Documentation for using chemfile from various language:
-    - [Python 2 and 3](https://chemfiles.readthedocs.io/projects/python/en/latest/)
-    - [Fortran](https://chemfiles.readthedocs.io/projects/fortran/en/latest/)
-    - [C and C++](https://chemfiles.readthedocs.io/)
-    - [Julia](https://chemfiles.readthedocs.io/projects/julia/en/latest/)
+    - [Python 2 and 3](http://chemfiles.github.io/chemfiles.py/)
+    - [Fortran](http://chemfiles.github.io/chemfiles.f03/)
+    - [C and C++](http://chemfiles.github.io/chemfiles/)
+    - [Julia](http://chemfiles.github.io/Chemfiles.jl/)
     - [Rust](http://chemfiles.github.io/chemfiles.rs/)
 
 ## Features
@@ -98,7 +98,7 @@ documentation.
 The [installation documentation][install] contains more information about
 pre-built version of the library, and more configuration options.
 
-[install]: http://chemfiles.readthedocs.io/en/latest/installation.html
+[install]: http://chemfiles.github.io/chemfiles/latest/installation.html
 
 You will need a recent C++ compiler: gcc 4.8, clang 3.3 and icpc 14 are
 known to work, and [cmake](http://cmake.org/).

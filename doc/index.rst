@@ -68,10 +68,10 @@ following places:
 * `Julia interface`_, for `Julia`_ 0.4+;
 * `Rust interface`_, for the `Rust`_ language;
 
-.. _Python interface: http://chemfiles.readthedocs.org/projects/python/en/latest/
-.. _Fortran interface: http://chemfiles.readthedocs.org/projects/fortran/en/latest/
-.. _Julia interface: http://chemfiles.readthedocs.org/projects/julia/en/latest/
-.. _Rust interface: http://chemfiles.github.io/chemfiles.rs/chemfiles/index.html
+.. _Python interface: http://chemfiles.github.io/chemfiles.py/latest/
+.. _Fortran interface: http://chemfiles.github.io/chemfiles.f03/latest/
+.. _Julia interface: http://chemfiles.github.io/Chemfiles.jl/latest/
+.. _Rust interface: http://chemfiles.github.io/chemfiles.rs/latest/
 .. _Julia: http://julialang.org/
 .. _Rust: http://rust-lang.org/
 
