@@ -26,7 +26,7 @@ if [[ "$TRAVIS_BRANCH == master" ]]; then
     rm -rf latest
     mv ../build/doc/html/ latest
 elif [[ "$TRAVIS_TAG" != "" ]]; then
-    cp build/doc/html/ $TRAVIS_TAG
+    mv ../build/doc/html/ $TRAVIS_TAG
 else
     echo "We should have exited earlier"
     exit 1
