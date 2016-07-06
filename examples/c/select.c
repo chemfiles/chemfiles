@@ -44,5 +44,10 @@ int main() {
         );
     }
 
+    free(matches);
+    chfl_selection_free(selection);
+    chfl_frame_free(frame);
+    chfl_trajectory_close(file);
+
     return 0;
 }
