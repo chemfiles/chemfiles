@@ -23,6 +23,7 @@ option(CODE_COVERAGE "Enable code coverage" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
 option(ENABLE_NETCDF "Enable AMBER NetCDF format." OFF)
 option(USE_WARNINGS "Compile the code with warnings (default in debug mode)" OFF)
+option(DEBUG_GLIBCXX "Use the debug version of GNU libstdcxx" OFF)
 
 include(CompilerFlags)
 
@@ -61,11 +62,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "release" CACHE STRING "Type of build: release|debug|relwithdebuginfo" FORCE)
 endif()
 
-if(NOT CMAKE_CONFIGURATION_TYPES)
-    if(${CMAKE_BUILD_TYPE} STREQUAL "debug")
-        # Set CMAKE_CXX_FLAGS to pass this definition to all external libraries too
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_DEBUG")
-    endif()
+if(${DEBUG_GLIBCXX})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_DEBUG")
 endif()
 
 add_subdirectory(external)
