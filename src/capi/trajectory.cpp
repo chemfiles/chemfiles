@@ -37,7 +37,7 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY *file, size_t step, CHFL_FRAME* frame) {
+chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY* const file, size_t step, CHFL_FRAME* const frame) {
     assert(file != nullptr);
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
@@ -45,7 +45,7 @@ chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY *file, size_t step, CHFL_F
     )
 }
 
-chfl_status chfl_trajectory_read(CHFL_TRAJECTORY *file, CHFL_FRAME *frame) {
+chfl_status chfl_trajectory_read(CHFL_TRAJECTORY* const file, CHFL_FRAME* const frame) {
     assert(file != nullptr);
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
@@ -53,7 +53,7 @@ chfl_status chfl_trajectory_read(CHFL_TRAJECTORY *file, CHFL_FRAME *frame) {
     )
 }
 
-chfl_status chfl_trajectory_write(CHFL_TRAJECTORY *file, const CHFL_FRAME *frame) {
+chfl_status chfl_trajectory_write(CHFL_TRAJECTORY* const file, const CHFL_FRAME* const frame) {
     assert(file != nullptr);
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
@@ -61,7 +61,7 @@ chfl_status chfl_trajectory_write(CHFL_TRAJECTORY *file, const CHFL_FRAME *frame
     )
 }
 
-chfl_status chfl_trajectory_set_topology(CHFL_TRAJECTORY *file, const CHFL_TOPOLOGY *topology) {
+chfl_status chfl_trajectory_set_topology(CHFL_TRAJECTORY* const file, const CHFL_TOPOLOGY* const topology) {
     assert(file != nullptr);
     assert(topology != nullptr);
     CHFL_ERROR_CATCH(
@@ -69,7 +69,7 @@ chfl_status chfl_trajectory_set_topology(CHFL_TRAJECTORY *file, const CHFL_TOPOL
     )
 }
 
-chfl_status chfl_trajectory_set_topology_file(CHFL_TRAJECTORY *file, const char* filename) {
+chfl_status chfl_trajectory_set_topology_file(CHFL_TRAJECTORY* const file, const char* filename) {
     assert(file != nullptr);
     assert(filename != nullptr);
     CHFL_ERROR_CATCH(
@@ -77,7 +77,7 @@ chfl_status chfl_trajectory_set_topology_file(CHFL_TRAJECTORY *file, const char*
     )
 }
 
-chfl_status chfl_trajectory_set_topology_with_format(CHFL_TRAJECTORY *file, const char* filename, const char* format) {
+chfl_status chfl_trajectory_set_topology_with_format(CHFL_TRAJECTORY* const file, const char* filename, const char* format) {
     assert(file != nullptr);
     assert(filename != nullptr);
     assert(format != nullptr);
@@ -86,7 +86,7 @@ chfl_status chfl_trajectory_set_topology_with_format(CHFL_TRAJECTORY *file, cons
     )
 }
 
-chfl_status chfl_trajectory_set_cell(CHFL_TRAJECTORY *file, const CHFL_CELL *cell) {
+chfl_status chfl_trajectory_set_cell(CHFL_TRAJECTORY* const file, const CHFL_CELL* const cell) {
     assert(file != nullptr);
     assert(cell != nullptr);
     CHFL_ERROR_CATCH(
@@ -94,7 +94,7 @@ chfl_status chfl_trajectory_set_cell(CHFL_TRAJECTORY *file, const CHFL_CELL *cel
     )
 }
 
-chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY *file, size_t *nsteps) {
+chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const file, size_t* nsteps) {
     assert(file != nullptr);
     assert(nsteps != nullptr);
     CHFL_ERROR_CATCH(
@@ -102,14 +102,14 @@ chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY *file, size_t *nsteps) {
     )
 }
 
-chfl_status chfl_trajectory_sync(CHFL_TRAJECTORY *file) {
+chfl_status chfl_trajectory_sync(CHFL_TRAJECTORY* const file) {
     assert(file != nullptr);
     CHFL_ERROR_CATCH(
         file->sync();
     )
 }
 
-chfl_status chfl_trajectory_close(CHFL_TRAJECTORY *file) {
+chfl_status chfl_trajectory_close(CHFL_TRAJECTORY* file) {
     delete file;
     file = nullptr;
     return CHFL_SUCCESS;

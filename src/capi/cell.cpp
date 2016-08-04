@@ -36,12 +36,11 @@ error:
 }
 
 
-CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* frame) {
+CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* const frame) {
     assert(frame != nullptr);
     CHFL_CELL* cell = nullptr;
     CHFL_ERROR_GOTO(
-        cell = new UnitCell();
-        *cell = frame->cell();
+        cell = new UnitCell(frame->cell());
     )
     return cell;
 error:
@@ -49,7 +48,7 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_cell_volume(const CHFL_CELL* cell, double* V) {
+chfl_status chfl_cell_volume(const CHFL_CELL* const cell, double* V) {
     assert(cell != nullptr);
     assert(V != nullptr);
     CHFL_ERROR_CATCH(
@@ -57,7 +56,7 @@ chfl_status chfl_cell_volume(const CHFL_CELL* cell, double* V) {
     )
 }
 
-chfl_status chfl_cell_lengths(const CHFL_CELL* cell, double* a, double* b, double* c) {
+chfl_status chfl_cell_lengths(const CHFL_CELL* const cell, double* a, double* b, double* c) {
     assert(cell != nullptr);
     assert(a != nullptr);
     assert(b != nullptr);
@@ -69,7 +68,7 @@ chfl_status chfl_cell_lengths(const CHFL_CELL* cell, double* a, double* b, doubl
     )
 }
 
-chfl_status chfl_cell_set_lengths(CHFL_CELL* cell, double a, double b, double c) {
+chfl_status chfl_cell_set_lengths(CHFL_CELL* const cell, double a, double b, double c) {
     assert(cell != nullptr);
     CHFL_ERROR_CATCH(
         cell->set_a(a);
@@ -78,7 +77,7 @@ chfl_status chfl_cell_set_lengths(CHFL_CELL* cell, double a, double b, double c)
     )
 }
 
-chfl_status chfl_cell_angles(const CHFL_CELL* cell, double* alpha, double* beta, double* gamma) {
+chfl_status chfl_cell_angles(const CHFL_CELL* const cell, double* alpha, double* beta, double* gamma) {
     assert(cell != nullptr);
     assert(alpha != nullptr);
     assert(beta != nullptr);
@@ -90,7 +89,7 @@ chfl_status chfl_cell_angles(const CHFL_CELL* cell, double* alpha, double* beta,
     )
 }
 
-chfl_status chfl_cell_set_angles(CHFL_CELL* cell, double alpha, double beta, double gamma) {
+chfl_status chfl_cell_set_angles(CHFL_CELL* const cell, double alpha, double beta, double gamma) {
     assert(cell != nullptr);
     CHFL_ERROR_CATCH(
         cell->set_alpha(alpha);
@@ -99,7 +98,7 @@ chfl_status chfl_cell_set_angles(CHFL_CELL* cell, double alpha, double beta, dou
     )
 }
 
-chfl_status chfl_cell_matrix(const CHFL_CELL* cell, double (*matrix)[3]) {
+chfl_status chfl_cell_matrix(const CHFL_CELL* const cell, double (*matrix)[3]) {
     assert(cell != nullptr);
     assert(matrix != nullptr);
     CHFL_ERROR_CATCH(
@@ -107,7 +106,7 @@ chfl_status chfl_cell_matrix(const CHFL_CELL* cell, double (*matrix)[3]) {
     )
 }
 
-chfl_status chfl_cell_type(const CHFL_CELL* cell, chfl_cell_type_t* type) {
+chfl_status chfl_cell_type(const CHFL_CELL* const cell, chfl_cell_type_t* const type) {
     assert(cell != nullptr);
     assert(type != nullptr);
     CHFL_ERROR_CATCH(
@@ -115,7 +114,7 @@ chfl_status chfl_cell_type(const CHFL_CELL* cell, chfl_cell_type_t* type) {
     )
 }
 
-chfl_status chfl_cell_set_type(CHFL_CELL* cell, chfl_cell_type_t type) {
+chfl_status chfl_cell_set_type(CHFL_CELL* const cell, chfl_cell_type_t type) {
     assert(cell != nullptr);
     CHFL_ERROR_CATCH(
         cell->type(static_cast<UnitCell::CellType>(type));

@@ -23,7 +23,7 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_frame_atoms_count(const CHFL_FRAME* frame, size_t *natoms) {
+chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame, size_t *natoms) {
     assert(frame != nullptr);
     assert(natoms != nullptr);
     CHFL_ERROR_CATCH(
@@ -31,7 +31,7 @@ chfl_status chfl_frame_atoms_count(const CHFL_FRAME* frame, size_t *natoms) {
     )
 }
 
-chfl_status chfl_frame_positions(CHFL_FRAME* frame, float (**data)[3], size_t* size) {
+chfl_status chfl_frame_positions(CHFL_FRAME* const frame, float (**data)[3], size_t* size) {
     assert(frame != nullptr);
     assert(data != nullptr);
     assert(size != nullptr);
@@ -42,7 +42,7 @@ chfl_status chfl_frame_positions(CHFL_FRAME* frame, float (**data)[3], size_t* s
     )
 }
 
-chfl_status chfl_frame_velocities(CHFL_FRAME* frame, float (**data)[3], size_t* size) {
+chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, float (**data)[3], size_t* size) {
     assert(frame != nullptr);
     assert(data != nullptr);
     assert(size != nullptr);
@@ -57,21 +57,21 @@ chfl_status chfl_frame_velocities(CHFL_FRAME* frame, float (**data)[3], size_t* 
     )
 }
 
-chfl_status chfl_frame_resize(CHFL_FRAME* frame, size_t natoms) {
+chfl_status chfl_frame_resize(CHFL_FRAME* const frame, size_t natoms) {
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
         frame->resize(natoms);
     )
 }
 
-chfl_status chfl_frame_add_velocities(CHFL_FRAME* frame) {
+chfl_status chfl_frame_add_velocities(CHFL_FRAME* const frame) {
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
         frame->add_velocities();
     )
 }
 
-chfl_status chfl_frame_has_velocities(const CHFL_FRAME* frame, bool* has_velocities) {
+chfl_status chfl_frame_has_velocities(const CHFL_FRAME* const frame, bool* has_velocities) {
     assert(frame != nullptr);
     assert(has_velocities != nullptr);
     CHFL_ERROR_CATCH(
@@ -79,7 +79,7 @@ chfl_status chfl_frame_has_velocities(const CHFL_FRAME* frame, bool* has_velocit
     )
 }
 
-chfl_status chfl_frame_set_cell(CHFL_FRAME* frame, const CHFL_CELL* cell) {
+chfl_status chfl_frame_set_cell(CHFL_FRAME* const frame, const CHFL_CELL* const cell) {
     assert(frame != nullptr);
     assert(cell != nullptr);
     CHFL_ERROR_CATCH(
@@ -87,7 +87,7 @@ chfl_status chfl_frame_set_cell(CHFL_FRAME* frame, const CHFL_CELL* cell) {
     )
 }
 
-chfl_status chfl_frame_set_topology(CHFL_FRAME* frame, const CHFL_TOPOLOGY* topology) {
+chfl_status chfl_frame_set_topology(CHFL_FRAME* const frame, const CHFL_TOPOLOGY* const topology) {
     assert(frame != nullptr);
     assert(topology != nullptr);
     CHFL_ERROR_CATCH(
@@ -95,7 +95,7 @@ chfl_status chfl_frame_set_topology(CHFL_FRAME* frame, const CHFL_TOPOLOGY* topo
     )
 }
 
-chfl_status chfl_frame_step(const CHFL_FRAME* frame, size_t* step) {
+chfl_status chfl_frame_step(const CHFL_FRAME* const frame, size_t* step) {
     assert(frame != nullptr);
     assert(step != nullptr);
     CHFL_ERROR_CATCH(
@@ -103,14 +103,14 @@ chfl_status chfl_frame_step(const CHFL_FRAME* frame, size_t* step) {
     )
 }
 
-chfl_status chfl_frame_set_step(CHFL_FRAME* frame, size_t step) {
+chfl_status chfl_frame_set_step(CHFL_FRAME* const frame, size_t step) {
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
         frame->set_step(step);
     )
 }
 
-chfl_status chfl_frame_guess_topology(CHFL_FRAME* frame) {
+chfl_status chfl_frame_guess_topology(CHFL_FRAME* const frame) {
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
         frame->guess_topology();

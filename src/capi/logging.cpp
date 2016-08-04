@@ -49,7 +49,7 @@ chfl_status chfl_clear_errors(void) {
     )
 }
 
-chfl_status chfl_loglevel(chfl_log_level_t* level) {
+chfl_status chfl_loglevel(chfl_log_level_t* const level) {
     assert(level != nullptr);
     CHFL_ERROR_CATCH(
         *level = static_cast<chfl_log_level_t>(Logger::level());

@@ -118,7 +118,7 @@ typedef enum CHFL_LOG_LEVEL {
 * @param level The logging level
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_loglevel(chfl_log_level_t* level);
+CHFL_EXPORT chfl_status chfl_loglevel(chfl_log_level_t* const level);
 
 /*!
 * @brief Set the current maximal logging level to `level`
@@ -196,8 +196,8 @@ CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_with_format(const char* filename,
 * @param frame A frame to fill with the data
 * @return The status code.
 */
-CHFL_EXPORT chfl_status chfl_trajectory_read(CHFL_TRAJECTORY* file,
-                                             CHFL_FRAME* frame);
+CHFL_EXPORT chfl_status chfl_trajectory_read(CHFL_TRAJECTORY*const file,
+                                             CHFL_FRAME* const frame);
 
 /*!
 * @brief Read a specific step of the trajectory in a frame
@@ -206,9 +206,9 @@ CHFL_EXPORT chfl_status chfl_trajectory_read(CHFL_TRAJECTORY* file,
 * @param frame A frame to fill with the data
 * @return The status code.
 */
-CHFL_EXPORT chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY* file,
+CHFL_EXPORT chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY* const file,
                                                   size_t step,
-                                                  CHFL_FRAME* frame);
+                                                  CHFL_FRAME* const frame);
 
 /*!
 * @brief Write a frame to the trajectory.
@@ -216,8 +216,8 @@ CHFL_EXPORT chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY* file,
 * @param frame the frame which will be writen to the file
 * @return The status code.
 */
-CHFL_EXPORT chfl_status chfl_trajectory_write(CHFL_TRAJECTORY* file,
-                                              const CHFL_FRAME* frame);
+CHFL_EXPORT chfl_status chfl_trajectory_write(CHFL_TRAJECTORY* const file,
+                                              const CHFL_FRAME* const frame);
 
 /*!
 * @brief Set the topology associated with a trajectory. This topology will be
@@ -228,8 +228,8 @@ CHFL_EXPORT chfl_status chfl_trajectory_write(CHFL_TRAJECTORY* file,
 * @return The status code.
 */
 CHFL_EXPORT chfl_status chfl_trajectory_set_topology(
-                                                CHFL_TRAJECTORY* file,
-                                                const CHFL_TOPOLOGY* topology);
+                                                CHFL_TRAJECTORY* const file,
+                                                const CHFL_TOPOLOGY* const topology);
 
 /*!
 * @brief Set the topology associated with a trajectory by reading the first
@@ -239,7 +239,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_set_topology(
 * @return The status code.
 */
 CHFL_EXPORT chfl_status chfl_trajectory_set_topology_file(
-                                                CHFL_TRAJECTORY* file,
+                                                CHFL_TRAJECTORY* const file,
                                                 const char* filename);
 
 /*!
@@ -258,7 +258,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_set_topology_file(
 * @return The status code.
 */
 CHFL_EXPORT chfl_status chfl_trajectory_set_topology_with_format(
-                                                CHFL_TRAJECTORY* file,
+                                                CHFL_TRAJECTORY* const file,
                                                 const char* filename,
                                                 const char* format);
 
@@ -270,8 +270,8 @@ CHFL_EXPORT chfl_status chfl_trajectory_set_topology_with_format(
 * @param cell The new cell to use
 * @return The status code.
 */
-CHFL_EXPORT chfl_status chfl_trajectory_set_cell(CHFL_TRAJECTORY* file,
-                                                 const CHFL_CELL* cell);
+CHFL_EXPORT chfl_status chfl_trajectory_set_cell(CHFL_TRAJECTORY* const file,
+                                                 const CHFL_CELL* const cell);
 
 /*!
 * @brief Get the number of steps (the number of frames) in a trajectory.
@@ -279,7 +279,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_set_cell(CHFL_TRAJECTORY* file,
 * @param nsteps This will contain the number of steps
 * @return The status code.
 */
-CHFL_EXPORT chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* file,
+CHFL_EXPORT chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const file,
                                                size_t* nsteps);
 
 /*!
@@ -287,7 +287,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* file,
 * @param file A pointer to the file
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_trajectory_sync(CHFL_TRAJECTORY* file);
+CHFL_EXPORT chfl_status chfl_trajectory_sync(CHFL_TRAJECTORY* const file);
 
 /*!
 * @brief Close a trajectory file, and free the associated memory
@@ -311,7 +311,7 @@ CHFL_EXPORT CHFL_FRAME* chfl_frame(size_t natoms);
 * @param natoms the number of atoms in the frame
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_atoms_count(const CHFL_FRAME* frame,
+CHFL_EXPORT chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame,
                                                size_t* natoms);
 
 /*!
@@ -328,7 +328,7 @@ CHFL_EXPORT chfl_status chfl_frame_atoms_count(const CHFL_FRAME* frame,
 * @param size A pointer to the an integer to be filled with the array size
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_positions(CHFL_FRAME* frame,
+CHFL_EXPORT chfl_status chfl_frame_positions(CHFL_FRAME* const frame,
                                              float (**data)[3],
                                              size_t* size);
 
@@ -350,7 +350,7 @@ CHFL_EXPORT chfl_status chfl_frame_positions(CHFL_FRAME* frame,
 * @param size A pointer to the an integer to be filled with the array size
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_velocities(CHFL_FRAME* frame,
+CHFL_EXPORT chfl_status chfl_frame_velocities(CHFL_FRAME* const frame,
                                               float (**data)[3],
                                               size_t* size);
 
@@ -367,7 +367,7 @@ CHFL_EXPORT chfl_status chfl_frame_velocities(CHFL_FRAME* frame,
 * @param natoms The new number of atoms.
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_resize(CHFL_FRAME* frame, size_t natoms);
+CHFL_EXPORT chfl_status chfl_frame_resize(CHFL_FRAME* const frame, size_t natoms);
 
 /*!
 * @brief Add velocity storage to this frame.
@@ -378,7 +378,7 @@ CHFL_EXPORT chfl_status chfl_frame_resize(CHFL_FRAME* frame, size_t natoms);
 * @param frame The frame
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_add_velocities(CHFL_FRAME* frame);
+CHFL_EXPORT chfl_status chfl_frame_add_velocities(CHFL_FRAME* const frame);
 
 /*!
 * @brief Ask wether this frame contains velocity data or not.
@@ -387,7 +387,7 @@ CHFL_EXPORT chfl_status chfl_frame_add_velocities(CHFL_FRAME* frame);
 *                       false otherwise.
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_has_velocities(const CHFL_FRAME* frame,
+CHFL_EXPORT chfl_status chfl_frame_has_velocities(const CHFL_FRAME* const frame,
                                                   bool* has_velocities);
 
 /*!
@@ -396,8 +396,8 @@ CHFL_EXPORT chfl_status chfl_frame_has_velocities(const CHFL_FRAME* frame,
 * @param cell The new cell
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_set_cell(CHFL_FRAME* frame,
-                                            const CHFL_CELL* cell);
+CHFL_EXPORT chfl_status chfl_frame_set_cell(CHFL_FRAME* const frame,
+                                            const CHFL_CELL* const cell);
 
 /*!
 * @brief Set the Topology of a Frame.
@@ -405,8 +405,8 @@ CHFL_EXPORT chfl_status chfl_frame_set_cell(CHFL_FRAME* frame,
 * @param topology The new topology
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_set_topology(CHFL_FRAME* frame,
-                                                const CHFL_TOPOLOGY* topology);
+CHFL_EXPORT chfl_status chfl_frame_set_topology(CHFL_FRAME* const frame,
+                                                const CHFL_TOPOLOGY* const topology);
 
 /*!
 * @brief Get the Frame step, i.e. the frame number in the trajectory
@@ -414,7 +414,7 @@ CHFL_EXPORT chfl_status chfl_frame_set_topology(CHFL_FRAME* frame,
 * @param step This will contains the step number
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_step(const CHFL_FRAME* frame, size_t* step);
+CHFL_EXPORT chfl_status chfl_frame_step(const CHFL_FRAME* const frame, size_t* step);
 
 /*!
 * @brief Set the Frame step.
@@ -422,7 +422,7 @@ CHFL_EXPORT chfl_status chfl_frame_step(const CHFL_FRAME* frame, size_t* step);
 * @param step The new frame step
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_set_step(CHFL_FRAME* frame, size_t step);
+CHFL_EXPORT chfl_status chfl_frame_set_step(CHFL_FRAME* const frame, size_t step);
 
 /*!
 * @brief  Guess the bonds, angles and dihedrals in the system.
@@ -433,7 +433,7 @@ CHFL_EXPORT chfl_status chfl_frame_set_step(CHFL_FRAME* frame, size_t step);
 * @param frame The Frame to analyse
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_guess_topology(CHFL_FRAME* frame);
+CHFL_EXPORT chfl_status chfl_frame_guess_topology(CHFL_FRAME* const frame);
 
 /*!
 * @brief Destroy a frame, and free the associated memory
@@ -474,7 +474,7 @@ CHFL_EXPORT CHFL_CELL* chfl_cell_triclinic(double a,
 * @param frame the frame
 * @return A pointer to the UnitCell, or NULL in case of error
 */
-CHFL_EXPORT CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* frame);
+CHFL_EXPORT CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* const frame);
 
 /*!
 * @brief Get the cell volume.
@@ -482,7 +482,7 @@ CHFL_EXPORT CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* frame);
 * @param volume the volume
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_cell_volume(const CHFL_CELL* cell, double* volume);
+CHFL_EXPORT chfl_status chfl_cell_volume(const CHFL_CELL* const cell, double* volume);
 
 /*!
 * @brief Get the cell lenghts.
@@ -492,7 +492,7 @@ CHFL_EXPORT chfl_status chfl_cell_volume(const CHFL_CELL* cell, double* volume);
 * @param c third lenght of the cell (in Angstroms)
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_cell_lengths(const CHFL_CELL* cell,
+CHFL_EXPORT chfl_status chfl_cell_lengths(const CHFL_CELL* const cell,
                                           double* a,
                                           double* b,
                                           double* c);
@@ -505,7 +505,7 @@ CHFL_EXPORT chfl_status chfl_cell_lengths(const CHFL_CELL* cell,
 * @param c third lenght of the cell (in Angstroms)
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_cell_set_lengths(CHFL_CELL* cell,
+CHFL_EXPORT chfl_status chfl_cell_set_lengths(CHFL_CELL* const cell,
                                               double a,
                                               double b,
                                               double c);
@@ -518,7 +518,7 @@ CHFL_EXPORT chfl_status chfl_cell_set_lengths(CHFL_CELL* cell,
 * @param gamma angle of the cell between the vectors `a` and `b` (in degree)
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_cell_angles(const CHFL_CELL* cell,
+CHFL_EXPORT chfl_status chfl_cell_angles(const CHFL_CELL* const cell,
                                         double* alpha,
                                         double* beta,
                                         double* gamma);
@@ -532,7 +532,7 @@ CHFL_EXPORT chfl_status chfl_cell_angles(const CHFL_CELL* cell,
 * @param gamma angle of the cell between the vectors `a` and `b` (in degree)
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_cell_set_angles(CHFL_CELL* cell,
+CHFL_EXPORT chfl_status chfl_cell_set_angles(CHFL_CELL* const cell,
                                              double alpha,
                                              double beta,
                                              double gamma);
@@ -543,7 +543,7 @@ CHFL_EXPORT chfl_status chfl_cell_set_angles(CHFL_CELL* cell,
 * @param matrix the matrix to fill. It should be a 3x3 matrix.
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_cell_matrix(const CHFL_CELL* cell,
+CHFL_EXPORT chfl_status chfl_cell_matrix(const CHFL_CELL* const cell,
                                          double (*matrix)[3]);
 
 //! Available cell types in chemfiles
@@ -562,8 +562,8 @@ typedef enum CHFL_CELL_TYPES {
 * @param type the type of the cell
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_cell_type(const CHFL_CELL* cell,
-                                       chfl_cell_type_t* type);
+CHFL_EXPORT chfl_status chfl_cell_type(const CHFL_CELL* const cell,
+                                       chfl_cell_type_t* const type);
 
 /*!
 * @brief Set the cell type
@@ -571,7 +571,7 @@ CHFL_EXPORT chfl_status chfl_cell_type(const CHFL_CELL* cell,
 * @param type the new type of the cell
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_cell_set_type(CHFL_CELL* cell,
+CHFL_EXPORT chfl_status chfl_cell_set_type(CHFL_CELL* const cell,
                                            chfl_cell_type_t type);
 
 /*!
@@ -594,7 +594,7 @@ CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology(void);
 * @param frame The frame
 * @return A pointer to the new topology, or NULL in case of error
 */
-CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* frame);
+CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* const frame);
 
 /*!
 * @brief Get the current number of atoms in the topology.
@@ -602,7 +602,7 @@ CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* frame);
 * @param natoms Will contain the number of atoms in the frame
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* topology,
+CHFL_EXPORT chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const topology,
                                                   size_t* natoms);
 
 /*!
@@ -611,8 +611,8 @@ CHFL_EXPORT chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* topology,
 * @param atom The atom to be added
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_append(CHFL_TOPOLOGY* topology,
-                                             const CHFL_ATOM* atom);
+CHFL_EXPORT chfl_status chfl_topology_append(CHFL_TOPOLOGY* const topology,
+                                             const CHFL_ATOM* const atom);
 
 /*!
 * @brief Remove an atom from a topology by index. This modify all the other
@@ -621,7 +621,7 @@ CHFL_EXPORT chfl_status chfl_topology_append(CHFL_TOPOLOGY* topology,
 * @param i The atomic index
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_remove(CHFL_TOPOLOGY* topology, size_t i);
+CHFL_EXPORT chfl_status chfl_topology_remove(CHFL_TOPOLOGY* const topology, size_t i);
 
 /*!
 * @brief Tell if the atoms `i` and `j` are bonded together
@@ -631,7 +631,7 @@ CHFL_EXPORT chfl_status chfl_topology_remove(CHFL_TOPOLOGY* topology, size_t i);
 * @param result true if the atoms are bonded, false otherwise
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_isbond(const CHFL_TOPOLOGY* topology,
+CHFL_EXPORT chfl_status chfl_topology_isbond(const CHFL_TOPOLOGY* const topology,
                                             size_t i,
                                             size_t j,
                                             bool* result);
@@ -645,7 +645,7 @@ CHFL_EXPORT chfl_status chfl_topology_isbond(const CHFL_TOPOLOGY* topology,
 * @param result true if the atoms constitues an angle, false otherwise
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_isangle(const CHFL_TOPOLOGY* topology,
+CHFL_EXPORT chfl_status chfl_topology_isangle(const CHFL_TOPOLOGY* const topology,
                                               size_t i,
                                               size_t j,
                                               size_t k,
@@ -661,7 +661,7 @@ CHFL_EXPORT chfl_status chfl_topology_isangle(const CHFL_TOPOLOGY* topology,
 * @param result true if the atoms constitues a dihedral angle, false otherwise
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_isdihedral(const CHFL_TOPOLOGY* topology,
+CHFL_EXPORT chfl_status chfl_topology_isdihedral(const CHFL_TOPOLOGY* const topology,
                                                  size_t i,
                                                  size_t j,
                                                  size_t k,
@@ -674,7 +674,7 @@ CHFL_EXPORT chfl_status chfl_topology_isdihedral(const CHFL_TOPOLOGY* topology,
 * @param nbonds After the call, contains the number of bond
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_bonds_count(const CHFL_TOPOLOGY* topology,
+CHFL_EXPORT chfl_status chfl_topology_bonds_count(const CHFL_TOPOLOGY* const topology,
                                                   size_t* nbonds);
 
 /*!
@@ -683,7 +683,7 @@ CHFL_EXPORT chfl_status chfl_topology_bonds_count(const CHFL_TOPOLOGY* topology,
 * @param nangles After the call, contains the number of angles
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_angles_count(const CHFL_TOPOLOGY* topology,
+CHFL_EXPORT chfl_status chfl_topology_angles_count(const CHFL_TOPOLOGY* const topology,
                                                    size_t* nangles);
 
 /*!
@@ -693,7 +693,7 @@ CHFL_EXPORT chfl_status chfl_topology_angles_count(const CHFL_TOPOLOGY* topology
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_topology_dihedrals_count(
-                                            const CHFL_TOPOLOGY* topology,
+                                            const CHFL_TOPOLOGY* const topology,
                                             size_t* ndihedrals);
 
 /*!
@@ -704,7 +704,7 @@ CHFL_EXPORT chfl_status chfl_topology_dihedrals_count(
 *               `chfl_topology_bonds_count` function
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* topology,
+CHFL_EXPORT chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology,
                                             size_t (*data)[2],
                                             size_t nbonds);
 
@@ -716,7 +716,7 @@ CHFL_EXPORT chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* topology,
 *               `chfl_topology_angles_count` function
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* topology,
+CHFL_EXPORT chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology,
                                              size_t (*data)[3],
                                              size_t nangles);
 
@@ -729,7 +729,7 @@ CHFL_EXPORT chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* topology,
 * the `chfl_topology_dihedrals_count` function
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* topology,
+CHFL_EXPORT chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topology,
                                                 size_t (*data)[4],
                                                 size_t ndihedrals);
 
@@ -740,7 +740,7 @@ CHFL_EXPORT chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* topology,
 * @param j index of the second atom in the topology
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_add_bond(CHFL_TOPOLOGY* topology,
+CHFL_EXPORT chfl_status chfl_topology_add_bond(CHFL_TOPOLOGY* const topology,
                                                size_t i,
                                                size_t j);
 
@@ -751,7 +751,7 @@ CHFL_EXPORT chfl_status chfl_topology_add_bond(CHFL_TOPOLOGY* topology,
 * @param j index of the second atom in the topology
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_remove_bond(CHFL_TOPOLOGY* topology,
+CHFL_EXPORT chfl_status chfl_topology_remove_bond(CHFL_TOPOLOGY* const topology,
                                                   size_t i,
                                                   size_t j);
 
@@ -778,7 +778,7 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom(const char* name);
 * @return A pointer to the new atom, or NULL in case of error or if `idx`
 *         is out of bounds
 */
-CHFL_EXPORT CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* frame,
+CHFL_EXPORT CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame,
                                             size_t idx);
 
 /*!
@@ -788,7 +788,7 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* frame,
 * @return A pointer to the new atom, or NULL in case of error or if `idx`
 *         is out of bounds
 */
-CHFL_EXPORT CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* topology,
+CHFL_EXPORT CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* const topology,
                                                size_t idx);
 
 /*!
@@ -797,7 +797,7 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* topology,
 * @param mass The atom mass
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_mass(const CHFL_ATOM* atom, float* mass);
+CHFL_EXPORT chfl_status chfl_atom_mass(const CHFL_ATOM* const atom, float* mass);
 
 /*!
 * @brief Set the mass of an atom, in atomic mass units
@@ -805,7 +805,7 @@ CHFL_EXPORT chfl_status chfl_atom_mass(const CHFL_ATOM* atom, float* mass);
 * @param mass The new atom mass
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_set_mass(CHFL_ATOM* atom, float mass);
+CHFL_EXPORT chfl_status chfl_atom_set_mass(CHFL_ATOM* const atom, float mass);
 
 /*!
 * @brief Get the charge of an atom, in number of the electron charge e
@@ -813,7 +813,7 @@ CHFL_EXPORT chfl_status chfl_atom_set_mass(CHFL_ATOM* atom, float mass);
 * @param charge The atom charge
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_charge(const CHFL_ATOM* atom, float* charge);
+CHFL_EXPORT chfl_status chfl_atom_charge(const CHFL_ATOM* const atom, float* charge);
 
 /*!
 * @brief Set the charge of an atom, in number of the electron charge e
@@ -821,7 +821,7 @@ CHFL_EXPORT chfl_status chfl_atom_charge(const CHFL_ATOM* atom, float* charge);
 * @param charge The new atom charge
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_set_charge(CHFL_ATOM* atom, float charge);
+CHFL_EXPORT chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, float charge);
 
 /*!
 * @brief Get the name of an atom
@@ -830,8 +830,8 @@ CHFL_EXPORT chfl_status chfl_atom_set_charge(CHFL_ATOM* atom, float charge);
 * @param buffsize The size of the string buffer
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_name(const CHFL_ATOM* atom,
-                                       char* name,
+CHFL_EXPORT chfl_status chfl_atom_name(const CHFL_ATOM* const atom,
+                                       char* const name,
                                        size_t buffsize);
 
 /*!
@@ -840,7 +840,7 @@ CHFL_EXPORT chfl_status chfl_atom_name(const CHFL_ATOM* atom,
 * @param name A null terminated string containing the new name
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_set_name(CHFL_ATOM* atom, const char* name);
+CHFL_EXPORT chfl_status chfl_atom_set_name(CHFL_ATOM* const atom, const char* name);
 
 /*!
 * @brief Try to get the full name of an atom from the short name
@@ -849,8 +849,8 @@ CHFL_EXPORT chfl_status chfl_atom_set_name(CHFL_ATOM* atom, const char* name);
 * @param buffsize The size of the string buffer
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_full_name(const CHFL_ATOM* atom,
-                                            char* name,
+CHFL_EXPORT chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom,
+                                            char* const name,
                                             size_t buffsize);
 
 /*!
@@ -860,7 +860,7 @@ CHFL_EXPORT chfl_status chfl_atom_full_name(const CHFL_ATOM* atom,
 * found.
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_vdw_radius(const CHFL_ATOM* atom,
+CHFL_EXPORT chfl_status chfl_atom_vdw_radius(const CHFL_ATOM* const atom,
                                              double* radius);
 
 /*!
@@ -870,7 +870,7 @@ CHFL_EXPORT chfl_status chfl_atom_vdw_radius(const CHFL_ATOM* atom,
 * found.
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* atom,
+CHFL_EXPORT chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* const atom,
                                                   double* radius);
 
 /*!
@@ -879,7 +879,7 @@ CHFL_EXPORT chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* atom,
 * @param number The atomic number, or -1 if no value could be found.
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_atomic_number(const CHFL_ATOM* atom,
+CHFL_EXPORT chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom,
                                                 int* number);
 
 //! Available types of atoms
@@ -901,8 +901,8 @@ typedef enum CHFL_ATOM_TYPES {
 * @param type the type of the atom
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_type(const CHFL_ATOM* atom,
-                                       chfl_atom_type_t* type);
+CHFL_EXPORT chfl_status chfl_atom_type(const CHFL_ATOM* const atom,
+                                       chfl_atom_type_t* const type);
 
 /*!
 * @brief Set the atom type
@@ -910,7 +910,7 @@ CHFL_EXPORT chfl_status chfl_atom_type(const CHFL_ATOM* atom,
 * @param type the new type of the atom
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_set_type(CHFL_ATOM* atom,
+CHFL_EXPORT chfl_status chfl_atom_set_type(CHFL_ATOM* const atom,
                                            chfl_atom_type_t type);
 
 /*!
@@ -940,7 +940,7 @@ CHFL_EXPORT CHFL_SELECTION* chfl_selection(const char* selection);
 * @param size The size of the selection
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_selection_size(const CHFL_SELECTION* selection,
+CHFL_EXPORT chfl_status chfl_selection_size(const CHFL_SELECTION* const selection,
                                             size_t* size);
 
 /*!
@@ -953,8 +953,8 @@ CHFL_EXPORT chfl_status chfl_selection_size(const CHFL_SELECTION* selection,
 * @param n_matches The number of matches for the selection
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_selection_evalutate(CHFL_SELECTION* selection,
-                                                 const CHFL_FRAME* frame,
+CHFL_EXPORT chfl_status chfl_selection_evalutate(CHFL_SELECTION* const selection,
+                                                 const CHFL_FRAME* const frame,
                                                  size_t* n_matches);
 
 //! Maximal size for a selection match
@@ -980,7 +980,7 @@ typedef struct {
 * @param n_matches the number of matches, as indicated by `chfl_selection_evaluate`
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_selection_matches(const CHFL_SELECTION* selection,
+CHFL_EXPORT chfl_status chfl_selection_matches(const CHFL_SELECTION* const selection,
                                                chfl_match_t matches[],
                                                size_t n_matches);
 
