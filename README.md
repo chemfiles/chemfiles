@@ -19,9 +19,10 @@
 </a>
 </div>
 
-Chemfiles is a library for reading and writing trajectory files created by
-simulations program. These trajectories are created by theoretical chemistry
-programs, and contains atomic positions, velocities, names, topology and more.
+Chemfiles is a modern and high-quality library for reading and writing
+trajectory files created by simulations program. These trajectories are created
+by computational chemistry softwares, and contains atomic positions, velocities,
+names, topology and sometimes more.
 
 Running simulations produce enormous amounts of data, which has to be
 post-processed in order to extract physical informations about the simulated
@@ -31,7 +32,9 @@ system. Chemfiles provides an interface to access this information which is
 
 This repository contains the core of the library which is a programmer
 interface, written in C++11. Ready to use program for analysis of trajectories
-are provided in the [cfiles](https://github.com/chemfiles/cfiles) project.
+are provided in the [cfiles](https://github.com/chemfiles/cfiles) project. Other
+languages interfaces are provided in their [respective
+repositories](https://github.com/chemfiles/).
 
 Chemfiles is free and open source, and your
 [contributions](#contributions-welcome) are very welcome!
@@ -56,19 +59,26 @@ Chemfiles is free and open source, and your
 - Automatic recognition of file format based on the extension;
 - Support a varying number of atoms;
 - Set custom `UnitCell` or `Topology` when reading/writing;
-
 - Usable from Python, C++, C, Fortran 95, Julia and Rust;
-- Simple and coherent programming and scripting interface;
-- Open-source and freely available under the Mozilla Public License;
+- Easy to use programming and scripting interface;
+- Open-source and freely available (Mozilla Public License);
 - Cross-platform, usable from Linux, OS X and Windows.
 
-### Why you should use chemfiles
+### Is chemfiles for you?
 
-You should use chemfiles if one of theses assertions is true for you:
+You should give a try to chemfiles if one of theses sentence is true for you:
 
-- you write analysis algorithm, and want to read more than one trajectory format;
+- you do no want to spend time writing and debugging a file parser (CIF files
+  anyone?)
 - you use binary formats, because they are faster and take less disk space;
-- you write a simulation software, and want to be able to read and write to mutiple formats.
+- you write analysis algorithm, and want to read more than one trajectory
+  format;
+- you write a simulation software, and want to be able to read and write to
+  multiple formats.
+
+If you find other uses for chemfiles, let us know! The main author is using it
+for both analysis algorithm in [cfiles](https://github.com/chemfiles/cfiles),
+and for IO in two simulation softwares.
 
 ## File formats
 
@@ -100,8 +110,8 @@ pre-built version of the library, and more configuration options.
 
 [install]: http://chemfiles.github.io/chemfiles/latest/installation.html
 
-You will need a recent C++ compiler: gcc 4.8, clang 3.3 and icpc 14 are
-known to work, and [cmake](http://cmake.org/).
+You will need [cmake](http://cmake.org/) and a C++11 compiler: GCC 4.8, clang
+3.3 and Intel 14 are known to work.
 
 ```bash
 git clone https://github.com/chemfiles/chemfiles
@@ -161,15 +171,29 @@ following compilers :
     - GCC 5.3
     - Clang 3.5
 - Windows (32 & 64 bit)
-    - Visual Studio 2015 (Visual Studio 2013 DO NOT work)
+    - Visual Studio 2015 (Visual Studio 2013 DOES NOT support C++11)
 
-It is known to also work with the Intel compilers (icc and icpc 14) on both OS X
-and Linux, and with mingw64 on Windows. If you manage to compile chemfiles on
-any other OS/compiler/architecture combination, please let us know so that I can
-add it to this list.
+It is known to also work with the Intel compilers on both OS X and Linux, and
+with mingw64 on Windows. If you manage to compile chemfiles on any other
+OS/compiler/architecture combination, please let us know so that I can add it to
+this list.
 
+## High quality
+
+The quality of a project can be defined in various ways. Here is what we mean
+when speaking about quality.
+
+1. Documentation: always up-to-date, detailed as much as possible, both for API
+and user documentations.
+2. Unit tests: each functions, each class is unit tested. No new code should be
+added without a unit test.
+3. Continuous Integration: each set of changes must compile and must not
+introduce a regression on all build targets.
+4. High code coverage: unit tests and continuous integration are used together
+to check that most of the code paths are tested.
 
 ## Contributors and license
 
 Chemfiles is written by Guillaume Fraux, and put to your disposition under the
-terms of the Mozilla Public License v2.0.
+terms of the Mozilla Public License v2.0. By contributing to chemfiles, you
+agree to distribute your contributions under the same license.
