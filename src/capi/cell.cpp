@@ -49,7 +49,7 @@ error:
     return nullptr;
 }
 
-int chfl_cell_volume(const CHFL_CELL* cell, double* V) {
+chfl_status chfl_cell_volume(const CHFL_CELL* cell, double* V) {
     assert(cell != nullptr);
     assert(V != nullptr);
     CHFL_ERROR_CATCH(
@@ -57,7 +57,7 @@ int chfl_cell_volume(const CHFL_CELL* cell, double* V) {
     )
 }
 
-int chfl_cell_lengths(const CHFL_CELL* cell, double* a, double* b, double* c) {
+chfl_status chfl_cell_lengths(const CHFL_CELL* cell, double* a, double* b, double* c) {
     assert(cell != nullptr);
     assert(a != nullptr);
     assert(b != nullptr);
@@ -69,7 +69,7 @@ int chfl_cell_lengths(const CHFL_CELL* cell, double* a, double* b, double* c) {
     )
 }
 
-int chfl_cell_set_lengths(CHFL_CELL* cell, double a, double b, double c) {
+chfl_status chfl_cell_set_lengths(CHFL_CELL* cell, double a, double b, double c) {
     assert(cell != nullptr);
     CHFL_ERROR_CATCH(
         cell->set_a(a);
@@ -78,7 +78,7 @@ int chfl_cell_set_lengths(CHFL_CELL* cell, double a, double b, double c) {
     )
 }
 
-int chfl_cell_angles(const CHFL_CELL* cell, double* alpha, double* beta, double* gamma) {
+chfl_status chfl_cell_angles(const CHFL_CELL* cell, double* alpha, double* beta, double* gamma) {
     assert(cell != nullptr);
     assert(alpha != nullptr);
     assert(beta != nullptr);
@@ -90,7 +90,7 @@ int chfl_cell_angles(const CHFL_CELL* cell, double* alpha, double* beta, double*
     )
 }
 
-int chfl_cell_set_angles(CHFL_CELL* cell, double alpha, double beta, double gamma) {
+chfl_status chfl_cell_set_angles(CHFL_CELL* cell, double alpha, double beta, double gamma) {
     assert(cell != nullptr);
     CHFL_ERROR_CATCH(
         cell->set_alpha(alpha);
@@ -99,7 +99,7 @@ int chfl_cell_set_angles(CHFL_CELL* cell, double alpha, double beta, double gamm
     )
 }
 
-int chfl_cell_matrix(const CHFL_CELL* cell, double (*matrix)[3]) {
+chfl_status chfl_cell_matrix(const CHFL_CELL* cell, double (*matrix)[3]) {
     assert(cell != nullptr);
     assert(matrix != nullptr);
     CHFL_ERROR_CATCH(
@@ -107,7 +107,7 @@ int chfl_cell_matrix(const CHFL_CELL* cell, double (*matrix)[3]) {
     )
 }
 
-int chfl_cell_type(const CHFL_CELL* cell, chfl_cell_type_t* type) {
+chfl_status chfl_cell_type(const CHFL_CELL* cell, chfl_cell_type_t* type) {
     assert(cell != nullptr);
     assert(type != nullptr);
     CHFL_ERROR_CATCH(
@@ -115,14 +115,14 @@ int chfl_cell_type(const CHFL_CELL* cell, chfl_cell_type_t* type) {
     )
 }
 
-int chfl_cell_set_type(CHFL_CELL* cell, chfl_cell_type_t type) {
+chfl_status chfl_cell_set_type(CHFL_CELL* cell, chfl_cell_type_t type) {
     assert(cell != nullptr);
     CHFL_ERROR_CATCH(
         cell->type(static_cast<UnitCell::CellType>(type));
     )
 }
 
-int chfl_cell_free(CHFL_CELL* cell) {
+chfl_status chfl_cell_free(CHFL_CELL* cell) {
     delete cell;
     cell = nullptr;
     return CHFL_SUCCESS;

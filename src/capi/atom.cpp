@@ -59,7 +59,7 @@ error:
     return nullptr;
 }
 
-int chfl_atom_mass(const CHFL_ATOM* atom, float* mass) {
+chfl_status chfl_atom_mass(const CHFL_ATOM* atom, float* mass) {
     assert(atom != nullptr);
     assert(mass != nullptr);
     CHFL_ERROR_CATCH(
@@ -67,14 +67,14 @@ int chfl_atom_mass(const CHFL_ATOM* atom, float* mass) {
     )
 }
 
-int chfl_atom_set_mass(CHFL_ATOM* atom, float mass) {
+chfl_status chfl_atom_set_mass(CHFL_ATOM* atom, float mass) {
     assert(atom != nullptr);
     CHFL_ERROR_CATCH(
         atom->set_mass(mass);
     )
 }
 
-int chfl_atom_charge(const CHFL_ATOM* atom, float* charge) {
+chfl_status chfl_atom_charge(const CHFL_ATOM* atom, float* charge) {
     assert(atom != nullptr);
     assert(charge != nullptr);
     CHFL_ERROR_CATCH(
@@ -82,14 +82,14 @@ int chfl_atom_charge(const CHFL_ATOM* atom, float* charge) {
     )
 }
 
-int chfl_atom_set_charge(CHFL_ATOM* atom, float charge) {
+chfl_status chfl_atom_set_charge(CHFL_ATOM* atom, float charge) {
     assert(atom != nullptr);
     CHFL_ERROR_CATCH(
         atom->set_charge(charge);
     )
 }
 
-int chfl_atom_name(const CHFL_ATOM* atom, char* name, size_t buffsize) {
+chfl_status chfl_atom_name(const CHFL_ATOM* atom, char* name, size_t buffsize) {
     assert(atom != nullptr);
     assert(name != nullptr);
     CHFL_ERROR_CATCH(
@@ -98,7 +98,7 @@ int chfl_atom_name(const CHFL_ATOM* atom, char* name, size_t buffsize) {
     )
 }
 
-int chfl_atom_set_name(CHFL_ATOM* atom, const char* name) {
+chfl_status chfl_atom_set_name(CHFL_ATOM* atom, const char* name) {
     assert(atom != nullptr);
     assert(name != nullptr);
     CHFL_ERROR_CATCH(
@@ -107,7 +107,7 @@ int chfl_atom_set_name(CHFL_ATOM* atom, const char* name) {
 }
 
 
-int chfl_atom_full_name(const CHFL_ATOM* atom, char* name, size_t buffsize) {
+chfl_status chfl_atom_full_name(const CHFL_ATOM* atom, char* name, size_t buffsize) {
     assert(atom != nullptr);
     assert(name != nullptr);
     CHFL_ERROR_CATCH(
@@ -116,7 +116,7 @@ int chfl_atom_full_name(const CHFL_ATOM* atom, char* name, size_t buffsize) {
     )
 }
 
-int chfl_atom_vdw_radius(const CHFL_ATOM* atom, double* radius) {
+chfl_status chfl_atom_vdw_radius(const CHFL_ATOM* atom, double* radius) {
     assert(atom != nullptr);
     assert(radius != nullptr);
     CHFL_ERROR_CATCH(
@@ -124,7 +124,7 @@ int chfl_atom_vdw_radius(const CHFL_ATOM* atom, double* radius) {
     )
 }
 
-int chfl_atom_covalent_radius(const CHFL_ATOM* atom, double* radius) {
+chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* atom, double* radius) {
     assert(atom != nullptr);
     assert(radius != nullptr);
     CHFL_ERROR_CATCH(
@@ -132,7 +132,7 @@ int chfl_atom_covalent_radius(const CHFL_ATOM* atom, double* radius) {
     )
 }
 
-int chfl_atom_atomic_number(const CHFL_ATOM* atom, int* number) {
+chfl_status chfl_atom_atomic_number(const CHFL_ATOM* atom, int* number) {
     assert(atom != nullptr);
     assert(number != nullptr);
     CHFL_ERROR_CATCH(
@@ -140,7 +140,7 @@ int chfl_atom_atomic_number(const CHFL_ATOM* atom, int* number) {
     )
 }
 
-int chfl_atom_type(const CHFL_ATOM* atom, chfl_atom_type_t* type) {
+chfl_status chfl_atom_type(const CHFL_ATOM* atom, chfl_atom_type_t* type) {
     assert(atom != nullptr);
     assert(type != nullptr);
     CHFL_ERROR_CATCH(
@@ -148,14 +148,14 @@ int chfl_atom_type(const CHFL_ATOM* atom, chfl_atom_type_t* type) {
     )
 }
 
-int chfl_atom_set_type(CHFL_ATOM* atom, chfl_atom_type_t type) {
+chfl_status chfl_atom_set_type(CHFL_ATOM* atom, chfl_atom_type_t type) {
     assert(atom != nullptr);
     CHFL_ERROR_CATCH(
         atom->set_type(static_cast<Atom::AtomType>(type));
     )
 }
 
-int chfl_atom_free(CHFL_ATOM* atom) {
+chfl_status chfl_atom_free(CHFL_ATOM* atom) {
     delete atom;
     atom = nullptr;
     return CHFL_SUCCESS;

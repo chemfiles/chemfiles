@@ -34,14 +34,14 @@ error:
     return nullptr;
 }
 
-int chfl_selection_size(const CHFL_SELECTION* c_selection, size_t* size) {
+chfl_status chfl_selection_size(const CHFL_SELECTION* c_selection, size_t* size) {
     assert(c_selection != nullptr);
     CHFL_ERROR_CATCH(
         *size = c_selection->selection.size();
     )
 }
 
-int chfl_selection_evalutate(CHFL_SELECTION* c_selection, const CHFL_FRAME* frame, size_t* n_matches) {
+chfl_status chfl_selection_evalutate(CHFL_SELECTION* c_selection, const CHFL_FRAME* frame, size_t* n_matches) {
     assert(c_selection != nullptr);
     CHFL_ERROR_CATCH(
         c_selection->matches = c_selection->selection.evaluate(*frame);
@@ -49,7 +49,7 @@ int chfl_selection_evalutate(CHFL_SELECTION* c_selection, const CHFL_FRAME* fram
     )
 }
 
-int chfl_selection_matches(const CHFL_SELECTION* c_selection, chfl_match_t* matches, size_t n_matches) {
+chfl_status chfl_selection_matches(const CHFL_SELECTION* c_selection, chfl_match_t* matches, size_t n_matches) {
     assert(c_selection != nullptr);
     assert(n_matches == c_selection->matches.size());
     CHFL_ERROR_CATCH(
@@ -67,7 +67,7 @@ int chfl_selection_matches(const CHFL_SELECTION* c_selection, chfl_match_t* matc
     )
 }
 
-int chfl_selection_free(CHFL_SELECTION* c_selection) {
+chfl_status chfl_selection_free(CHFL_SELECTION* c_selection) {
     delete c_selection;
     c_selection = nullptr;
     return CHFL_SUCCESS;
