@@ -159,10 +159,6 @@ void Trajectory::set_cell(const UnitCell& new_cell) {
     custom_cell_ = new_cell;
 }
 
-void Trajectory::sync() {
-    file_->sync();
-}
-
 bool Trajectory::done() const {
     return step_ >= nsteps_;
 }

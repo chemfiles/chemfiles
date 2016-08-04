@@ -283,13 +283,6 @@ CHFL_EXPORT chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const file,
                                                size_t* nsteps);
 
 /*!
-* @brief Synchronize any buffered content to the hard drive.
-* @param file A pointer to the file
-* @return The status code
-*/
-CHFL_EXPORT chfl_status chfl_trajectory_sync(CHFL_TRAJECTORY* const file);
-
-/*!
 * @brief Close a trajectory file, and free the associated memory
 * @param file A pointer to the file
 * @return The status code

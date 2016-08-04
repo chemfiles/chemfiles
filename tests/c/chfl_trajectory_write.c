@@ -79,16 +79,14 @@ int main() {
     assert(!chfl_topology_free(top));
 
     assert(!chfl_trajectory_write(file, frame));
-    assert(!chfl_trajectory_sync(file));
+    assert(!chfl_trajectory_close(file));
+    assert(!chfl_frame_free(frame));
 
     char* content = read_whole_file("test-tmp.xyz");
     assert(strcmp(content, expected_content) == 0);
     free(content);
 
     remove("test-tmp.xyz");
-
-    assert(!chfl_trajectory_close(file));
-    assert(!chfl_frame_free(frame));
 
     return EXIT_SUCCESS;
 }

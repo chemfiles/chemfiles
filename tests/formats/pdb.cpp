@@ -98,12 +98,14 @@ TEST_CASE("Write files in PDB format", "[PDB]"){
     frame.set_cell(UnitCell(22));
 
     auto positions = frame.positions();
-    for(size_t i=0; i<4; i++)
+    for(size_t i=0; i<4; i++) {
         positions[i] = vector3d(1, 2, 3);
+    }
 
-
-    auto file = Trajectory("test-tmp.pdb", 'w');
-    file.write(frame);
+    {
+        auto file = Trajectory("test-tmp.pdb", 'w');
+        file.write(frame);
+    }
 
     frame.resize(6);
     positions = frame.positions();
@@ -115,8 +117,10 @@ TEST_CASE("Write files in PDB format", "[PDB]"){
     topology.add_bond(4, 5);
     frame.set_topology(topology);
 
-    file.write(frame);
-    file.sync();
+    {
+        auto file = Trajectory("test-tmp.pdb", 'a');
+        file.write(frame);
+    }
 
     std::ifstream checking("test-tmp.pdb");
     std::string content((std::istreambuf_iterator<char>(checking)),

@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+* Remove the `Trajectory::sync` and the `chfl_trajectory_sync` functions.
+To ensure that all content of a file is written to the disk, close it.
+
 ## 0.6 (1 July 2016)
 
 * Improve the selection language to allow selecting multiple atoms at once. For

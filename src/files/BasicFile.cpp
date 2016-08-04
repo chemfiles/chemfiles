@@ -59,11 +59,6 @@ bool BasicFile::eof() {
     return stream_.eof();
 }
 
-void BasicFile::sync() {
-    std::iostream::sync();
-    std::iostream::flush();
-}
-
 BasicFile& BasicFile::operator>>(std::string& line) {
     std::getline(stream_, line);
     return *this;

@@ -139,8 +139,11 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
     topology.append(Atom("D"));
     frame.set_topology(topology);
 
-    auto file = Trajectory("test-tmp.xyz", 'w');
-    file.write(frame);
+    {
+        auto file = Trajectory("test-tmp.xyz", 'w');
+        file.write(frame);
+    }
+
 
     frame.resize(6);
     positions = frame.positions();
@@ -151,8 +154,10 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
     topology.append(Atom("F"));
     frame.set_topology(topology);
 
-    file.write(frame);
-    file.sync();
+    {
+        auto file = Trajectory("test-tmp.xyz", 'a');
+        file.write(frame);
+    }
 
     std::ifstream checking("test-tmp.xyz");
     std::string content((std::istreambuf_iterator<char>(checking)),

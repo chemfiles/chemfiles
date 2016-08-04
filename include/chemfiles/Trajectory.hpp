@@ -78,8 +78,6 @@ public:
     size_t nsteps() const { return nsteps_; }
     //! Have we read all the Frames in this file ?
     bool done() const;
-    //! Synchronize any content in the underlying buffer to the disk
-    void sync();
 
 private:
     //! Current step

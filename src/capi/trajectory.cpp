@@ -102,13 +102,6 @@ chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const file, size_t* nsteps) 
     )
 }
 
-chfl_status chfl_trajectory_sync(CHFL_TRAJECTORY* const file) {
-    assert(file != nullptr);
-    CHFL_ERROR_CATCH(
-        file->sync();
-    )
-}
-
 chfl_status chfl_trajectory_close(CHFL_TRAJECTORY* file) {
     delete file;
     file = nullptr;

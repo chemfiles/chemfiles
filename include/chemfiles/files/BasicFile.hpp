@@ -36,7 +36,6 @@ public:
 
     bool is_open() override;
     bool eof() override;
-    void sync() override;
 
     virtual void writeline(const std::string&) override;
     virtual void writelines(const std::vector<std::string>&) override;

@@ -129,12 +129,6 @@ void NcFile::add_dimension(const std::string& name, size_t value) {
     check_nc_error("Can not add dimension \"" + name + "\"", status);
 }
 
-void NcFile::sync() {
-    assert(nc_mode() == DATA && "File must be in data mode to sync");
-    int status = nc_sync(file_id_);
-    assert(status == NC_NOERR);
-}
-
 bool NcFile::variable_exists(const std::string& name) const {
     netcdf_id_t id;
     int status = nc_inq_varid(file_id_, name.c_str(), &id);

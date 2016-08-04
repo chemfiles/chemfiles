@@ -26,7 +26,6 @@ class DummyFile : public BinaryFile {
 public:
     DummyFile(const std::string&, File::Mode) : BinaryFile("", File::READ) {}
     bool is_open() override {return true;}
-    void sync() override {}
 };
 class DummyFormat2 : public Format {
 public:

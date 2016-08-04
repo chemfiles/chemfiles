@@ -52,7 +52,6 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
         "Fe 1 2 3\n"
         "Fe 1 2 3\n";
 
-        Trajectory file("tmp.xyz", 'w');
         Frame frame(5);
         auto positions = frame.positions();
         for(size_t i=0; i<5; i++) {
@@ -63,9 +62,11 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
         for (size_t i=0; i<5; i++)
             top.append(Atom("Fe"));
 
-        file.set_topology(top);
-        file.write(frame);
-        file.sync();
+        {
+            Trajectory file("tmp.xyz", 'w');
+            file.set_topology(top);
+            file.write(frame);
+        }
 
         std::ifstream checking("tmp.xyz");
         std::string content{
@@ -96,15 +97,17 @@ TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]"){
         "HETATM    2        X   2    1.000   2.000   3.000  0.00  0.00  \n"
         "END\n";
 
-        Trajectory file("tmp.pdb", 'w');
         Frame frame(3);
         auto positions = frame.positions();
         for(size_t i=0; i<3; i++) {
             positions[i] = vector3d(1, 2, 3);
         }
-        file.set_cell(UnitCell(3, 4, 5));
-        file.write(frame);
-        file.sync();
+
+        {
+            Trajectory file("tmp.pdb", 'w');
+            file.set_cell(UnitCell(3, 4, 5));
+            file.write(frame);
+        }
 
         std::ifstream checking("tmp.pdb");
         std::string content{

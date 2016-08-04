@@ -170,7 +170,6 @@ public:
 
     // A NcFile will always be in a consistent mode
     virtual bool is_open() override {return true;}
-    virtual void sync() override;
 private:
     template <typename ...Dims>
     std::vector<netcdf_id_t> get_dimmensions(Dims... dims) {
