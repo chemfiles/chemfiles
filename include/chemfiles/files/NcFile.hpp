@@ -3,7 +3,7 @@
 *
 * This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
-* file_, You can obtain one at http://mozilla.org/MPL/2.0/
+* file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
 #include "chemfiles/config.hpp"
@@ -174,8 +174,6 @@ public:
         return nc::NcVariable<NcType>(*this, var_id);
     }
 
-    // A NcFile will always be in a consistent mode
-    bool is_open() override {return true;}
 private:
     template <typename ...Dims>
     std::vector<nc::netcdf_id_t> get_dimmensions(Dims... dims) {

@@ -15,7 +15,6 @@ using namespace chemfiles;
 
 TEST_CASE("Read a NetCDF file", "[Files]"){
     NcFile file(DATADIR "netcdf/water.nc", File::READ);
-    REQUIRE(file.is_open());
 
     CHECK(file.global_attribute("Conventions") == "AMBER");
     // Usual dimmensions
@@ -41,7 +40,6 @@ TEST_CASE("Read a NetCDF file", "[Files]"){
 
 TEST_CASE("Errors in NetCDF files", "[Files]"){
     NcFile file(DATADIR "netcdf/water.nc", File::READ);
-    REQUIRE(file.is_open());
 
     CHECK_THROWS_AS(file.global_attribute("FOO"), FileError);
     CHECK_THROWS_AS(file.dimension("FOO"), FileError);
@@ -52,7 +50,6 @@ TEST_CASE("Errors in NetCDF files", "[Files]"){
 TEST_CASE("Write NetCDF files", "[Files]"){
     {
         NcFile file("tmp.nc", File::WRITE);
-        REQUIRE(file.is_open());
         file.set_nc_mode(NcFile::DEFINE);
         file.add_global_attribute("global", "global.value");
         file.add_dimension("infinite");

@@ -35,8 +35,6 @@ public:
 
     void rewind() override;
     size_t nlines() override;
-
-    bool is_open() override;
     bool eof() override;
 
      void writeline(const std::string&) override;

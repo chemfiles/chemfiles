@@ -12,7 +12,6 @@ using namespace chemfiles;
 
 TEST_CASE("Read a text file", "[Files]"){
     BasicFile file(FILESDIR "xyz/helium.xyz", File::READ);
-    REQUIRE(file.is_open());
 
     CHECK(file.nlines() == 50419);
 
@@ -44,7 +43,6 @@ TEST_CASE("Read a text file", "[Files]"){
 
 TEST_CASE("Write a text file", "[Files]"){
     BasicFile file("tmp.dat", File::WRITE);
-    REQUIRE(file.is_open());
 
     file << "Test" << "\n";
 

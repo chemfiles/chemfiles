@@ -51,10 +51,6 @@ void BasicFile::rewind() {
     stream_.seekg(0, std::ios::beg);
 }
 
-bool BasicFile::is_open() {
-    return stream_.is_open();
-}
-
 bool BasicFile::eof() {
     return stream_.eof();
 }

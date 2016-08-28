@@ -35,8 +35,6 @@ public:
     File(File const&) = delete;
     File& operator=(File const&) = delete;
 
-    //! Is the file opended ?
-    virtual bool is_open() = 0;
     //! File name, i.e. complete path to this file on disk.
     const std::string& filename() const { return filename_; }
     //! File opening mode.
