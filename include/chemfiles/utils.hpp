@@ -54,4 +54,9 @@ inline std::string trim(const std::string& str) {
 #endif
 
 
+/// Get the name of the computer used
+std::string hostname();
+/// Get the user name
+std::string user_name();
+
 #endif
