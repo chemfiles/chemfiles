@@ -1,5 +1,5 @@
 set(EXTERNAL_FLAGS "")
-# Disable warnings about this code
+# Disable warnings about external code
 if(MSVC)
     string(REGEX REPLACE "/Wall" "/w" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     string(REGEX REPLACE "/Wall" "/w" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
@@ -22,6 +22,34 @@ include_directories(fmt)
 file(GLOB FMT_SOURCES fmt/fmt/*.cc)
 add_library(fmt OBJECT ${FMT_SOURCES})
 set_target_properties(fmt PROPERTIES COMPILE_FLAGS ${EXTERNAL_FLAGS})
+
+# ============================================================================ #
+
+# TNG IO library
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/tng_io/CMakeLists.txt")
+    message(STATUS "Unpacking TNG sources")
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_SOURCE_DIR}/tng_io.tar.gz
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+endif()
+
+set(CMAKE_C_FLAGS ${EXTERNAL_FLAGS})
+set(CMAKE_CXX_FLAGS ${EXTERNAL_FLAGS})
+
+add_subdirectory(
+    ${CMAKE_CURRENT_BINARY_DIR}/tng_io
+    ${CMAKE_CURRENT_BINARY_DIR}/tng-build
+)
+
+# Hide TNG variables from CMake GUI
+mark_as_advanced(FORCE
+    TNG_BUILD_COMPRESSION_TESTS
+    TNG_BUILD_EXAMPLES
+    TNG_BUILD_FORTRAN
+    TNG_BUILD_OWN_ZLIB
+    TNG_BUILD_TEST
+)
 
 # ============================================================================ #
 

@@ -80,13 +80,19 @@ endif()
 add_subdirectory(external)
 
 file(GLOB_RECURSE sources src/**.cpp)
-add_library(chemfiles ${sources} $<TARGET_OBJECTS:molfiles> $<TARGET_OBJECTS:fmt>)
+add_library(
+    chemfiles ${sources}
+    $<TARGET_OBJECTS:molfiles>
+    $<TARGET_OBJECTS:fmt>
+    $<TARGET_OBJECTS:tng_io>
+)
 
 set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
 set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
 
 target_include_directories(chemfiles PUBLIC include)
 target_include_directories(chemfiles PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/external/molfiles/include)
+target_include_directories(chemfiles PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/external/tng_io/include)
 target_include_directories(chemfiles PUBLIC external/fmt)
 
 if(${CHFL_ENABLE_NETCDF})

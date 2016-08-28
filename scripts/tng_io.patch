@@ -1,0 +1,110 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 84126b0..52b493c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -12,15 +12,12 @@ endif()
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+ 
+-option(BUILD_SHARED_LIBS "Enable shared libraries" ON)
+-
+ option(TNG_BUILD_FORTRAN "Build Fortran compatible library and examples for testing" OFF)
+-
+-option(TNG_BUILD_EXAMPLES "Build examples showing usage of the TNG API" ON)
+-option(TNG_BUILD_TEST "Build TNG testing binary." ON)
++option(TNG_BUILD_EXAMPLES "Build examples showing usage of the TNG API" OFF)
++option(TNG_BUILD_TEST "Build TNG testing binary." OFF)
+ option(TNG_BUILD_COMPRESSION_TESTS "Build tests of the TNG compression library" OFF)
+ 
+-option(TNG_BUILD_OWN_ZLIB "Build and use the internal zlib library" OFF)
++option(TNG_BUILD_OWN_ZLIB "Build and use the internal zlib library" ON)
+ if(NOT TNG_BUILD_OWN_ZLIB)
+   find_package(ZLIB QUIET)
+ endif()
+@@ -39,60 +36,5 @@ check_include_file(inttypes.h   HAVE_INTTYPES_H)
+ include(BuildTNG.cmake)
+ tng_get_source_list(${BUILD_OWN_ZLIB} TNG_SOURCES TNG_COMPILE_DEFS)
+ 
+-add_library(tng_io ${TNG_SOURCES})
+-
+-if (UNIX)
+-  list(APPEND EXTRA_LIBRARIES m)
+-endif()
+-
+-# Use GNUInstallDirs to set paths on multiarch systems
+-include(GNUInstallDirs)
+-
+-target_link_libraries(tng_io ${EXTRA_LIBRARIES})
+-
+-set_target_properties(tng_io PROPERTIES VERSION ${TNG_IO_VERSION} SOVERSION ${TNG_MAJOR_VERSION})
+-
+-# Create the tng_ioConfig.cmake and tng_ioConfigVersion.cmake files for the install tree
+-set(CONF_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
+-configure_file(              src/lib/tng_io-config.cmake.in
+-  "${CMAKE_CURRENT_BINARY_DIR}/cmake/tng_io-config.cmake" @ONLY)
+-configure_file(              src/lib/tng_io-configVersion.cmake.in
+-  "${CMAKE_CURRENT_BINARY_DIR}/cmake/tng_io-configVersion.cmake" @ONLY)
+-
+-# Install the tng_ioConfig.cmake and tng_ioConfigVersion.cmake
+-install(FILES
+-  "${CMAKE_CURRENT_BINARY_DIR}/cmake/tng_io-config.cmake"
+-  "${CMAKE_CURRENT_BINARY_DIR}/cmake/tng_io-configVersion.cmake"
+-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/tng_io")
+-
+-install(TARGETS tng_io
+-        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+-        ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+-
+-install(FILES include/tng/tng_io.h include/tng/tng_io_fwd.h ${CMAKE_CURRENT_BINARY_DIR}/include/tng/version.h
+-        DESTINATION include/tng)
+-
+-#-- Add an Option to toggle the generation of the API documentation
+-option(TNG_BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
+-if(TNG_BUILD_DOCUMENTATION)
+-  find_package(Doxygen)
+-  if (NOT DOXYGEN_FOUND)
+-    message(FATAL_ERROR
+-      "Doxygen is needed to build the documentation. Please install it correctly")
+-  endif()
+-  #-- Configure the Template Doxyfile for our specific project
+-  configure_file(Doxyfile.in
+-                 ${PROJECT_BINARY_DIR}/Doxyfile  @ONLY IMMEDIATE)
+-  #-- Add a custom target to run Doxygen when ever the project is built
+-  add_custom_target (Docs ALL
+-                                        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
+-                                        SOURCES ${PROJECT_BINARY_DIR}/Doxyfile)
+-  # IF you do NOT want the documentation to be generated EVERY time you build the project
+-  # then leave out the 'ALL' keyword from the above command.
+-
+-  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Documentation/
+-      DESTINATION share/tng/doc)
+-endif()
+-
+-add_subdirectory(src)
++add_library(tng_io OBJECT ${TNG_SOURCES})
+ 
+diff --git a/include/tng/tng_io.h b/include/tng/tng_io.h
+index 750d38e..7967a08 100644
+--- a/include/tng/tng_io.h
++++ b/include/tng/tng_io.h
+@@ -297,6 +297,11 @@
+ #ifndef TNG_IO_H
+ #define TNG_IO_H     1
+ 
++#if defined(__clang__) && !defined(__ICC)
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wdocumentation"
++#endif
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -4948,4 +4953,8 @@ tng_function_status DECLSPECDLLEXPORT tng_util_num_frames_with_data_of_block_id_
+ }  /* end extern "C" */
+ #endif
+ 
++#if defined(__clang__) && !defined(__ICC)
++#pragma clang diagnostic pop
++#endif
++
+ #endif /* TNG_IO_H */
