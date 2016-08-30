@@ -48,11 +48,11 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_cell_volume(const CHFL_CELL* const cell, double* V) {
+chfl_status chfl_cell_volume(const CHFL_CELL* const cell, double* volume) {
     assert(cell != nullptr);
-    assert(V != nullptr);
+    assert(volume != nullptr);
     CHFL_ERROR_CATCH(
-        *V = cell->volume();
+        *volume = cell->volume();
     )
 }
 

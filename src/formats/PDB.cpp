@@ -43,10 +43,10 @@ enum class Record {
 };
 
 // Get the record type for a line.
-static Record get_record(const std::string&);
+static Record get_record(const std::string& line);
 
-PDBFormat::PDBFormat(File& f)
-    : Format(f), textfile_(dynamic_cast<TextFile&>(file_)) {}
+PDBFormat::PDBFormat(File& file)
+    : Format(file), textfile_(dynamic_cast<TextFile&>(file)) {}
 
 size_t PDBFormat::nsteps() {
     textfile_.rewind();
@@ -77,14 +77,14 @@ void PDBFormat::read(Frame& frame) {
         auto record = get_record(line);
         switch (record) {
         case Record::CRYST1:
-            read_cryst1(frame, line);
+            read_CRYST1(frame, line);
             break;
         case Record::ATOM:
         case Record::HETATM:
-            read_atom(frame, line);
+            read_ATOM(frame, line);
             break;
         case Record::CONECT:
-            read_conect(frame, line);
+            read_CONECT(frame, line);
             break;
         case Record::END:
             return; // We have read a frame!
@@ -97,7 +97,7 @@ void PDBFormat::read(Frame& frame) {
     }
 }
 
-void PDBFormat::read_cryst1(Frame& frame, const std::string& line) {
+void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
     assert(line.substr(0, 6) == "CRYST1");
     if (line.length() < 54) {
         throw FormatError("CRYST1 record is too small: '" + line + "'");
@@ -125,7 +125,7 @@ void PDBFormat::read_cryst1(Frame& frame, const std::string& line) {
     }
 }
 
-void PDBFormat::read_atom(Frame& frame, const std::string& line) {
+void PDBFormat::read_ATOM(Frame& frame, const std::string& line) {
     assert(line.substr(0, 6) == "ATOM  " || line.substr(0, 6) == "HETATM");
 
     if (line.length() < 54) {
@@ -150,9 +150,9 @@ void PDBFormat::read_atom(Frame& frame, const std::string& line) {
     frame.topology()[i] = atom;
 }
 
-void PDBFormat::read_conect(Frame& frame, const std::string& full_line) {
-    auto line = trim(full_line);
+void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
     assert(line.substr(0, 6) == "CONECT");
+    auto line_length = trim(line).length();
 
     // Helper lambdas
     auto add_bond = [&frame, &line](size_t i, size_t j) {
@@ -168,34 +168,36 @@ void PDBFormat::read_conect(Frame& frame, const std::string& full_line) {
             // PDB indexing is 1-based, and chemfiles is 0-based
             return std::stoul(line.substr(initial, 5)) - 1;
         } catch (std::invalid_argument&) {
-            throw FormatError("Could not read atomic number in: '" + line + "'");
+            throw FormatError(
+                "Could not read atomic number at index " + std::to_string(initial) + " in : '" + trim(line) + "'"
+            );
         }
     };
 
     auto i = read_index(6);
 
-    if (line.length() > 11) {
+    if (line_length > 11) {
         auto j = read_index(11);
         add_bond(i, j);
     } else {
         return;
     }
 
-    if (line.length() > 16) {
+    if (line_length > 16) {
         auto j = read_index(16);
         add_bond(i, j);
     } else {
         return;
     }
 
-    if (line.length() > 21) {
+    if (line_length > 21) {
         auto j = read_index(21);
         add_bond(i, j);
     } else {
         return;
     }
 
-    if (line.length() > 26) {
+    if (line_length > 26) {
         auto j = read_index(26);
         add_bond(i, j);
     } else {

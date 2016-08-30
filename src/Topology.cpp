@@ -19,8 +19,9 @@ void Connectivity::recalculate() const {
     for (auto const& bond1 : bonds_) {
         // Find angles
         for (auto const& bond2 : bonds_) {
-            if (bond1 == bond2)
+            if (bond1 == bond2) {
                 continue;
+            }
             // Initializing angle to an invalid value
             Angle angle1(static_cast<size_t>(-1), static_cast<size_t>(-2),
                          static_cast<size_t>(-3));
@@ -42,8 +43,9 @@ void Connectivity::recalculate() const {
             }
             // Find dihedral angles
             for (auto const& bond3 : bonds_) {
-                if (bond2 == bond3)
+                if (bond2 == bond3) {
                     continue;
+                }
 
                 if (angle1[2] == bond3[0] && angle1[1] != bond3[1]) {
                     dihedrals_.emplace(angle1[0], angle1[1], angle1[2],
@@ -61,20 +63,23 @@ void Connectivity::recalculate() const {
 }
 
 const std::unordered_set<Bond>& Connectivity::bonds() const {
-    if (!uptodate)
+    if (!uptodate) {
         recalculate();
+    }
     return bonds_;
 }
 
 const std::unordered_set<Angle>& Connectivity::angles() const {
-    if (!uptodate)
+    if (!uptodate) {
         recalculate();
+    }
     return angles_;
 }
 
 const std::unordered_set<Dihedral>& Connectivity::dihedrals() const {
-    if (!uptodate)
+    if (!uptodate) {
         recalculate();
+    }
     return dihedrals_;
 }
 
@@ -93,16 +98,16 @@ void Connectivity::remove_bond(size_t i, size_t j) {
 
 /******************************************************************************/
 
-void Topology::resize(size_t size) {
+void Topology::resize(size_t natoms) {
     for (auto bond : bonds()) {
-        if (bond[0] >= size || bond[1] >= size) {
+        if (bond[0] >= natoms || bond[1] >= natoms) {
             throw Error(
-                "Can not resize the topology to " + std::to_string(size) +
+                "Can not resize the topology to " + std::to_string(natoms) +
                 " as there is a bond between atoms " + std::to_string(bond[0]) +
                 "-" + std::to_string(bond[1]) + ".");
         }
     }
-    atoms_.resize(size, Atom(Atom::UNDEFINED));
+    atoms_.resize(natoms, Atom(Atom::UNDEFINED));
 }
 
 void Topology::append(const Atom& atom) {
@@ -113,8 +118,9 @@ void Topology::remove(size_t idx) {
     atoms_.erase(atoms_.begin() + static_cast<ptrdiff_t>(idx));
     auto bonds = connect_.bonds();
     for (auto& bond : bonds) {
-        if (bond[0] == idx || bond[1] == idx)
+        if (bond[0] == idx || bond[1] == idx) {
             connect_.remove_bond(bond[0], bond[1]);
+        }
     }
 }
 

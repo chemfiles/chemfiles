@@ -38,9 +38,9 @@ public:
     };
 
     //! Create an element from its `name`
-    Atom(const std::string& name);
+    Atom(std::string name);
     //! Create an element from its `name` and its type
-    Atom(AtomType type, const std::string& name = "");
+    Atom(AtomType type, std::string name = "");
     //! Default is to create an UNDEFINED atom type with no name
     Atom();
 

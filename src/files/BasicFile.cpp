@@ -72,8 +72,9 @@ const std::vector<std::string>& BasicFile::readlines(size_t n) {
         lines_[i] = line;
     }
 
-    if (!stream_)
+    if (!stream_) {
         throw FileError("Error while reading file " + filename());
+    }
 
     return lines_;
 }
@@ -94,6 +95,7 @@ void BasicFile::writeline(const std::string& line) {
 }
 
 void BasicFile::writelines(const std::vector<std::string>& _lines) {
-    for (auto& line : _lines)
+    for (auto& line : _lines) {
         *this << line;
+    }
 }

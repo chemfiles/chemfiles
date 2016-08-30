@@ -17,8 +17,8 @@ Frame::Frame(size_t natoms) : Frame(Topology()) {
     resize(natoms);
 }
 
-Frame::Frame(const Topology& topology, const UnitCell& cell)
-    : step_(0), topology_(topology), cell_(cell) {
+Frame::Frame(Topology topology, UnitCell cell)
+    : step_(0), topology_(std::move(topology)), cell_(std::move(cell)) {
     resize(topology_.natoms());
 }
 
@@ -30,11 +30,11 @@ size_t Frame::natoms() const {
     return positions_.size();
 }
 
-void Frame::resize(size_t size) {
-    topology_.resize(size);
-    positions_.resize(size, vector3d(0.0, 0.0, 0.0));
+void Frame::resize(size_t natoms) {
+    topology_.resize(natoms);
+    positions_.resize(natoms, vector3d(0.0, 0.0, 0.0));
     if (velocities_) {
-        velocities_->resize(size, vector3d(0.0, 0.0, 0.0));
+        velocities_->resize(natoms, vector3d(0.0, 0.0, 0.0));
     }
 }
 

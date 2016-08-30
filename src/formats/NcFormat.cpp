@@ -22,30 +22,28 @@ std::string NCFormat::description() const {
 
 //! Check the validity of a NetCDF file
 static bool is_valid(const NcFile& ncfile_, size_t natoms) {
-    bool writing;
-    if (natoms == static_cast<size_t>(-1)) {
-        writing = false;
-    } else {
-        writing = true;
-    }
+    bool writing = (natoms != static_cast<size_t>(-1));
 
     if (ncfile_.global_attribute("Conventions") != "AMBER") {
-        if (!writing)
+        if (!writing) {
             Logger::error("We can only read AMBER convention NetCDF files.");
+        }
         return false;
     }
 
     if (ncfile_.global_attribute("ConventionVersion") != "1.0") {
-        if (!writing)
+        if (!writing) {
             Logger::error("We can only read version 1.0 of AMBER convention "
                           "NetCDF files.");
+        }
         return false;
     }
 
     if (ncfile_.dimension("spatial") != 3) {
-        if (!writing)
+        if (!writing) {
             Logger::error("Wrong size for spatial dimension. Should be 3, is ",
                           ncfile_.dimension("spatial"), ".");
+        }
         return false;
     }
 
@@ -93,9 +91,11 @@ void NCFormat::read(Frame& frame) {
 }
 
 UnitCell NCFormat::read_cell() const {
-    if (ncfile_.dimension("cell_spatial") != 3 or
-        ncfile_.dimension("cell_angular") != 3)
-        return UnitCell(); // No UnitCell information
+    if (ncfile_.dimension("cell_spatial") != 3 ||
+        ncfile_.dimension("cell_angular") != 3) {
+            return UnitCell(); // No UnitCell information
+    }
+
 
     if (!ncfile_.variable_exists("cell_lengths") ||
         !ncfile_.variable_exists("cell_angles")) {
@@ -197,17 +197,17 @@ void NCFormat::write(const Frame& frame) {
     step_++;
 }
 
-void NCFormat::write_array3D(const Array3D& arr, const std::string& name) const {
+void NCFormat::write_array3D(const Array3D& array, const std::string& name) const {
     auto var = ncfile_.variable<float>(name);
-    auto natoms = arr.size();
+    auto natoms = array.size();
     std::vector<size_t> start{step_, 0, 0};
     std::vector<size_t> count{1, natoms, 3};
 
     auto data = std::vector<float>(natoms * 3);
     for (size_t i = 0; i < natoms; i++) {
-        data[3 * i + 0] = arr[i][0];
-        data[3 * i + 1] = arr[i][1];
-        data[3 * i + 2] = arr[i][2];
+        data[3 * i + 0] = array[i][0];
+        data[3 * i + 1] = array[i][1];
+        data[3 * i + 2] = array[i][2];
     }
     var.add(start, count, data);
 }

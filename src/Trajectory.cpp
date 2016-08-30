@@ -59,8 +59,9 @@ Trajectory::Trajectory(const std::string& filename, char mode, const std::string
     file_ = builder.file_creator(filename, filemode);
     format_ = builder.format_creator(*file_);
 
-    if (mode == 'r' || mode == 'a')
+    if (mode == 'r' || mode == 'a') {
         nsteps_ = format_->nsteps();
+    }
 }
 
 Trajectory::~Trajectory() = default;
@@ -121,7 +122,7 @@ Frame Trajectory::read_step(const size_t step) {
     return frame;
 }
 
-void Trajectory::write(const Frame& input_frame) {
+void Trajectory::write(const Frame& frame) {
     if (!(file_->mode() == File::WRITE || file_->mode() == File::APPEND)) {
         throw FileError(
             "File '" + file_->filename() + "' was not openened in write or append mode."
@@ -130,15 +131,15 @@ void Trajectory::write(const Frame& input_frame) {
 
     // Maybe that is not the better way to do this, performance-wise. I'll have
     // to benchmark this part.
-    Frame frame = input_frame;
+    Frame frame_copy = frame;
     if (custom_topology_) {
-        frame.set_topology(*custom_topology_);
+        frame_copy.set_topology(*custom_topology_);
     }
     if (custom_cell_) {
-        frame.set_cell(*custom_cell_);
+        frame_copy.set_cell(*custom_cell_);
     }
 
-    format_->write(frame);
+    format_->write(frame_copy);
     step_++;
     nsteps_++;
 }

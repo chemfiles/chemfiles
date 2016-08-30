@@ -42,7 +42,7 @@ public:
     explicit Frame(size_t natoms);
     //! Constructor reserving space for `topology.natoms()`, and using `cell`
     //! as unit cell. `cell` default to an `INFINITE` unit cell.
-    explicit Frame(const Topology& topology, const UnitCell& cell = UnitCell());
+    explicit Frame(Topology topology, UnitCell cell = UnitCell());
 
     //! Get a modifiable reference to the positions
     Span3D positions() { return positions_; }

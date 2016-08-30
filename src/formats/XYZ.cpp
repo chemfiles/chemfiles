@@ -17,8 +17,8 @@
 
 using namespace chemfiles;
 
-XYZFormat::XYZFormat(File& f)
-    : Format(f), textfile_(dynamic_cast<TextFile&>(file_)), step_cursor_(0) {}
+XYZFormat::XYZFormat(File& file)
+    : Format(file), textfile_(dynamic_cast<TextFile&>(file)), step_cursor_(0) {}
 
 std::string XYZFormat::description() const {
     return "XYZ file format.";
@@ -52,8 +52,9 @@ size_t XYZFormat::nsteps() {
     textfile_.rewind();
     size_t n = 0;
     while (!textfile_.eof()) {
-        if (forward(1))
+        if (forward(1)) {
             n++;
+        }
     }
     textfile_.rewind();
     return n;
@@ -111,8 +112,9 @@ void XYZFormat::write(const Frame& frame) {
     for (size_t i = 0; i < frame.natoms(); i++) {
         auto pos = positions[i];
         auto name = topology[i].name();
-        if (name == "")
+        if (name == "") {
             name = "X";
+        }
         textfile_ << name << " " << pos[0] << " " << pos[1] << " " << pos[2]
                   << "\n";
     }

@@ -109,43 +109,49 @@ void UnitCell::type(CellType type) {
 }
 
 void UnitCell::set_a(double val) {
-    if (type_ == INFINITE)
+    if (type_ == INFINITE) {
         throw Error("Can not set 'a' on infinite cell");
+    }
     a_ = val;
     update_matrix();
 }
 
 void UnitCell::set_b(double val) {
-    if (type_ == INFINITE)
+    if (type_ == INFINITE) {
         throw Error("Can not set 'b' on infinite cell");
+    }
     b_ = val;
     update_matrix();
 }
 
 void UnitCell::set_c(double val) {
-    if (type_ == INFINITE)
+    if (type_ == INFINITE) {
         throw Error("Can not set 'c' on infinite cell");
+    }
     c_ = val;
     update_matrix();
 }
 
 void UnitCell::set_alpha(double val) {
-    if (type_ != TRICLINIC)
+    if (type_ != TRICLINIC) {
         throw Error("Can not set 'alpha' on non triclinic cell");
+    }
     alpha_ = val;
     update_matrix();
 }
 
 void UnitCell::set_beta(double val) {
-    if (type_ != TRICLINIC)
+    if (type_ != TRICLINIC) {
         throw Error("Can not set 'beta' on non triclinic cell");
+    }
     beta_ = val;
     update_matrix();
 }
 
 void UnitCell::set_gamma(double val) {
-    if (type_ != TRICLINIC)
+    if (type_ != TRICLINIC) {
         throw Error("Can not set 'gamma' on non triclinic cell");
+    }
     gamma_ = val;
     update_matrix();
 }

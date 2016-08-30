@@ -59,11 +59,11 @@ template <typename T> std::function<bool(T, T)> binop_comparison(BinOp op) {
 }
 
 /****************************************************************************************/
-std::string AllExpr::print(unsigned) const {
+std::string AllExpr::print(unsigned /*unused*/) const {
     return "all";
 }
 
-std::vector<bool> AllExpr::evaluate(const Frame&, const std::vector<Match>& matches) const {
+std::vector<bool> AllExpr::evaluate(const Frame& /*unused*/, const std::vector<Match>& matches) const {
     return std::vector<bool>(matches.size(), true);
 }
 
@@ -77,11 +77,11 @@ Ast parse<AllExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 }
 
 /****************************************************************************************/
-std::string NoneExpr::print(unsigned) const {
+std::string NoneExpr::print(unsigned /*unused*/) const {
     return "none";
 }
 
-std::vector<bool> NoneExpr::evaluate(const Frame&, const std::vector<Match>& matches) const {
+std::vector<bool> NoneExpr::evaluate(const Frame& /*unused*/, const std::vector<Match>& matches) const {
     return std::vector<bool>(matches.size(), false);
 }
 
@@ -95,7 +95,7 @@ Ast parse<NoneExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 }
 
 /****************************************************************************************/
-std::string NameExpr::print(unsigned) const {
+std::string NameExpr::print(unsigned /*unused*/) const {
     auto op = equals_ ? "==" : "!=";
     return "name($" + std::to_string(argument_ + 1) + ") " + op + " " + name_;
 }
@@ -133,7 +133,7 @@ Ast parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 }
 
 /****************************************************************************************/
-std::string PositionExpr::print(unsigned) const {
+std::string PositionExpr::print(unsigned /*unused*/) const {
     return coord_.to_string() + "($" + std::to_string(argument_ + 1) + ") " +
            binop_str(op_) + " " + std::to_string(val_);
 }
@@ -177,7 +177,7 @@ Ast parse<PositionExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 }
 
 /****************************************************************************************/
-std::string VelocityExpr::print(unsigned) const {
+std::string VelocityExpr::print(unsigned /*unused*/) const {
     return "v" + coord_.to_string() + "($" + std::to_string(argument_ + 1) +
             ") " + binop_str(op_) + " " + std::to_string(val_);
 }
@@ -226,13 +226,13 @@ Ast parse<VelocityExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 }
 
 /****************************************************************************************/
-std::string IndexExpr::print(unsigned) const {
+std::string IndexExpr::print(unsigned /*unused*/) const {
     return "index($" + std::to_string(argument_ + 1) + ") " + binop_str(op_) +
            " " + std::to_string(val_);
 }
 
 
-std::vector<bool> IndexExpr::evaluate(const Frame&, const std::vector<Match>& matches) const {
+std::vector<bool> IndexExpr::evaluate(const Frame& /*unused*/, const std::vector<Match>& matches) const {
     auto res = std::vector<bool>(matches.size(), false);
     auto compare = binop_comparison<size_t>(op_);
     for (size_t i = 0; i < matches.size(); i++) {
@@ -270,7 +270,7 @@ Ast parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 }
 
 /****************************************************************************************/
-std::string MassExpr::print(unsigned) const {
+std::string MassExpr::print(unsigned /*unused*/) const {
     return "mass($" + std::to_string(argument_ + 1) + ") " + binop_str(op_) +
            " " + std::to_string(val_);
 }
@@ -331,8 +331,9 @@ template <>
 Ast parse<AndExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin[0].type() == Token::AND);
     begin += 1;
-    if (begin == end)
+    if (begin == end) {
         throw SelectionError("Missing right-hand side operand to 'and'");
+    }
 
     Ast rhs = nullptr;
     try {
@@ -343,8 +344,9 @@ Ast parse<AndExpr>(token_iterator_t& begin, const token_iterator_t& end) {
             e.what());
     }
 
-    if (begin == end)
+    if (begin == end) {
         throw SelectionError("Missing left-hand side operand to 'and'");
+    }
 
     Ast lhs = nullptr;
     try {
@@ -379,8 +381,9 @@ template <>
 Ast parse<OrExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin[0].type() == Token::OR);
     begin += 1;
-    if (begin == end)
+    if (begin == end) {
         throw SelectionError("Missing right-hand side operand to 'or'");
+    }
 
     Ast rhs = nullptr;
     try {
@@ -391,8 +394,9 @@ Ast parse<OrExpr>(token_iterator_t& begin, const token_iterator_t& end) {
             e.what());
     }
 
-    if (begin == end)
+    if (begin == end) {
         throw SelectionError("Missing left-hand side operand to 'or'");
+    }
 
     Ast lhs = nullptr;
     try {
@@ -407,7 +411,7 @@ Ast parse<OrExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 }
 
 /****************************************************************************************/
-std::string NotExpr::print(unsigned) const {
+std::string NotExpr::print(unsigned /*unused*/) const {
     auto ast = ast_->print(4);
     return "not " + ast;
 }
@@ -425,8 +429,9 @@ template <>
 Ast parse<NotExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin[0].type() == Token::NOT);
     begin += 1;
-    if (begin == end)
+    if (begin == end) {
         throw SelectionError("Missing operand to 'not'");
+    }
 
     Ast ast = nullptr;
     try {

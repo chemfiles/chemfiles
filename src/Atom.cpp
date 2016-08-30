@@ -35,20 +35,20 @@ static bool is_element(const std::string& name) {
     return false;
 }
 
-Atom::Atom(const std::string& name) : name_(name), mass_(0), charge_(0) {
-    if (is_element(name)) {
+Atom::Atom(std::string name) : name_(std::move(name)), mass_(0), charge_(0) {
+    if (is_element(name_)) {
         type_ = ELEMENT;
     } else {
         type_ = COARSE_GRAINED;
     }
 
-    if (PERIODIC_INFORMATION.find(name) != PERIODIC_INFORMATION.end()) {
-        mass_ = PERIODIC_INFORMATION.at(name).mass;
+    if (PERIODIC_INFORMATION.find(name_) != PERIODIC_INFORMATION.end()) {
+        mass_ = PERIODIC_INFORMATION.at(name_).mass;
     }
 }
 
-Atom::Atom(AtomType type, const std::string& name)
-    : name_(name), mass_(0), charge_(0), type_(type) {}
+Atom::Atom(AtomType type, std::string name)
+    : name_(std::move(name)), mass_(0), charge_(0), type_(type) {}
 
 Atom::Atom() : Atom(UNDEFINED) {}
 

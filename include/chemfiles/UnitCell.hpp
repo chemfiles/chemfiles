@@ -88,8 +88,8 @@ public:
 
     //! Get the cell type
     CellType type() const { return type_; }
-    //! Set the cell type to t
-    void type(CellType t);
+    //! Set the cell type to `type`
+    void type(CellType type);
 
     //! Get the first lenght (a) of the cell
     double a() const { return a_; }

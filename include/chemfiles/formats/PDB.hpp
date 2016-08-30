@@ -28,7 +28,7 @@ namespace chemfiles {
  */
 class PDBFormat final: public Format {
 public:
-    PDBFormat(File& f);
+    PDBFormat(File& file);
     ~PDBFormat() = default;
 
     virtual void read_step(size_t step, Frame& frame) override;
@@ -42,11 +42,11 @@ public:
     FORMAT_EXTENSION(.pdb)
 private:
     // Read CRYST1 record
-    void read_cryst1(Frame& frame, const std::string& line);
+    void read_CRYST1(Frame& frame, const std::string& line);
     // Read ATOM an HETATM records
-    void read_atom(Frame& frame, const std::string& line);
+    void read_ATOM(Frame& frame, const std::string& line);
     // Read CONECT record
-    void read_conect(Frame& frame, const std::string& line);
+    void read_CONECT(Frame& frame, const std::string& line);
 
     TextFile& textfile_;
 };

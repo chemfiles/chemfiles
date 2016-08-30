@@ -23,10 +23,10 @@ struct CAPISelection {
     std::vector<Match> matches;
 };
 
-CHFL_SELECTION* chfl_selection(const char* string) {
+CHFL_SELECTION* chfl_selection(const char* selection) {
     CHFL_SELECTION* c_selection = nullptr;
     CHFL_ERROR_GOTO(
-        c_selection = new CAPISelection(Selection(std::string(string)));
+        c_selection = new CAPISelection(Selection(std::string(selection)));
     )
     return c_selection;
 error:
@@ -34,30 +34,30 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_selection_size(const CHFL_SELECTION* const c_selection, size_t* size) {
-    assert(c_selection != nullptr);
+chfl_status chfl_selection_size(const CHFL_SELECTION* const selection, size_t* size) {
+    assert(selection != nullptr);
     CHFL_ERROR_CATCH(
-        *size = c_selection->selection.size();
+        *size = selection->selection.size();
     )
 }
 
-chfl_status chfl_selection_evalutate(CHFL_SELECTION* const c_selection, const CHFL_FRAME* const frame, size_t* n_matches) {
-    assert(c_selection != nullptr);
+chfl_status chfl_selection_evalutate(CHFL_SELECTION* const selection, const CHFL_FRAME* const frame, size_t* n_matches) {
+    assert(selection != nullptr);
     CHFL_ERROR_CATCH(
-        c_selection->matches = c_selection->selection.evaluate(*frame);
-        *n_matches = c_selection->matches.size();
+        selection->matches = selection->selection.evaluate(*frame);
+        *n_matches = selection->matches.size();
     )
 }
 
-chfl_status chfl_selection_matches(const CHFL_SELECTION* const c_selection, chfl_match_t* const matches, size_t n_matches) {
-    assert(c_selection != nullptr);
-    assert(n_matches == c_selection->matches.size());
+chfl_status chfl_selection_matches(const CHFL_SELECTION* const selection, chfl_match_t* const matches, size_t n_matches) {
+    assert(selection != nullptr);
+    assert(n_matches == selection->matches.size());
     CHFL_ERROR_CATCH(
-        auto size = c_selection->selection.size();
+        auto size = selection->selection.size();
         for (size_t i=0; i<n_matches; i++) {
             matches[i].size = static_cast<unsigned char>(size);
             for (size_t j=0; j<size; j++) {
-                matches[i].atoms[j] = c_selection->matches[i][j];
+                matches[i].atoms[j] = selection->matches[i][j];
             }
 
             for (size_t j=size; j<CHFL_MAX_SELECTION_SIZE; j++) {
@@ -67,8 +67,8 @@ chfl_status chfl_selection_matches(const CHFL_SELECTION* const c_selection, chfl
     )
 }
 
-chfl_status chfl_selection_free(CHFL_SELECTION* c_selection) {
-    delete c_selection;
-    c_selection = nullptr;
+chfl_status chfl_selection_free(CHFL_SELECTION* selection) {
+    delete selection;
+    selection = nullptr;
     return CHFL_SUCCESS;
 }

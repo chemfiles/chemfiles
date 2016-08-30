@@ -218,7 +218,8 @@ Ast selections::parse(std::vector<Token> token_stream) {
     const auto end = rpn.cend();
     auto ast = dispatch_parsing(begin, end);
 
-    if (begin != end)
+    if (begin != end) {
         throw SelectionError("Could not parse the end of the selection.");
+    }
     return ast;
 }

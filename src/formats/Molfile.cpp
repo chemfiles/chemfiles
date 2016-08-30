@@ -77,9 +77,9 @@ Molfile<F>::Molfile(File& file)
     assert(plugin_->abiversion == vmdplugin_ABIVERSION);
 
     // Check that needed functions are here
-    if ((plugin_->open_file_read == NULL) ||
-        (plugin_->read_next_timestep == NULL) ||
-        (plugin_->close_file_read == NULL)) {
+    if ((plugin_->open_file_read == nullptr) ||
+        (plugin_->read_next_timestep == nullptr) ||
+        (plugin_->close_file_read == nullptr)) {
         throw FormatError("The " + molfile_plugins[F].format +
                           " plugin_ does not have read capacities");
     }
@@ -87,7 +87,7 @@ Molfile<F>::Molfile(File& file)
     file_handler_ = plugin_->open_file_read(file.filename().c_str(),
                                             plugin_->name, &natoms_);
 
-    if (!file_handler_) {
+    if (file_handler_ == nullptr) {
         throw FileError("Could not open the file: " + file.filename() +
                         " with VMD molfile");
     }
@@ -118,8 +118,8 @@ template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
         timestep.velocities = velocities.data();
     }
 
-    int result = plugin_->read_next_timestep(file_handler_, natoms_, &timestep);
-    if (result != MOLFILE_SUCCESS) {
+    int status = plugin_->read_next_timestep(file_handler_, natoms_, &timestep);
+    if (status != MOLFILE_SUCCESS) {
         throw FormatError("Error while reading the file " + file_.filename() +
                           " using Molfile format " + molfile_plugins[F].format);
     }
@@ -133,13 +133,14 @@ template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
 
 template <MolfileFormat F> size_t Molfile<F>::nsteps() {
     size_t n = 0;
-    int result = MOLFILE_SUCCESS;
+    int status = MOLFILE_SUCCESS;
     while (true) {
-        result = plugin_->read_next_timestep(file_handler_, natoms_, NULL);
-        if (result == MOLFILE_SUCCESS)
+        status = plugin_->read_next_timestep(file_handler_, natoms_, nullptr);
+        if (status == MOLFILE_SUCCESS) {
             n++;
-        else
+        } else {
             break;
+        }
     }
     // We need to close and re-open the file
     plugin_->close_file_read(file_handler_);
@@ -178,15 +179,14 @@ void Molfile<F>::molfile_to_frame(const molfile_timestep_t& timestep,
 }
 
 template <MolfileFormat F> void Molfile<F>::read_topology() {
-    if (plugin_->read_structure == NULL) {
+    if (plugin_->read_structure == nullptr) {
         return;
     }
 
     std::vector<molfile_atom_t> atoms(static_cast<size_t>(natoms_));
     int optflags = 0;
-    int ret = plugin_->read_structure(file_handler_, &optflags, atoms.data());
-
-    if (ret != MOLFILE_SUCCESS) {
+    int status = plugin_->read_structure(file_handler_, &optflags, atoms.data());
+    if (status != MOLFILE_SUCCESS) {
         throw FormatError("Error while reading atomic names.");
     }
 
@@ -200,21 +200,20 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
         topology_->append(atom);
     }
 
-    if (plugin_->read_bonds == NULL)
+    if (plugin_->read_bonds == nullptr) {
         return;
+    }
 
     int nbonds = 0, nbondtypes = 0;
+    int* from = nullptr;
+    int* to = nullptr;
+    float* bondorder = nullptr;
+    int* bondtype = nullptr;
+    char** bondtypename = nullptr;
 
-    int* from = NULL;
-    int* to = NULL;
-    float* bondorder = NULL;
-    int* bondtype = NULL;
-    char** bondtypename = NULL;
-
-    ret = plugin_->read_bonds(file_handler_, &nbonds, &from, &to, &bondorder,
+    status = plugin_->read_bonds(file_handler_, &nbonds, &from, &to, &bondorder,
                               &bondtype, &nbondtypes, &bondtypename);
-
-    if (ret != MOLFILE_SUCCESS) {
+    if (status != MOLFILE_SUCCESS) {
         throw FormatError("Error while reading bonds.");
     }
 

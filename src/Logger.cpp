@@ -79,10 +79,10 @@ void Logger::silent() {
     instance_.backend_ = SILENT;
 }
 
-void Logger::to_file(const std::string& filename) {
+void Logger::to_file(const std::string& path) {
     instance_.close();
     instance_.backend_ = FILE;
-    instance_.logfile_.open(filename, std::ofstream::out);
+    instance_.logfile_.open(path, std::ofstream::out);
 }
 
 void Logger::callback(logging_cb_t function) {
