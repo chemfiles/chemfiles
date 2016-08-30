@@ -21,13 +21,6 @@ TEST_CASE("Use the Topology class", "[Topology]"){
         CHECK(topology.bonds()[0] == Bond(0, 1));
     }
 
-    SECTION("Dummy topology provider"){
-        auto topo = dummy_topology(42);
-        CHECK(topo.natoms() == 42);
-
-        CHECK(topo[10] == Atom(Atom::UNDEFINED));
-    }
-
     SECTION("Add and remove items in the topology"){
         auto topo = Topology();
 

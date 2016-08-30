@@ -13,7 +13,9 @@
 using namespace chemfiles;
 
 Frame::Frame() : Frame(0) {}
-Frame::Frame(size_t natoms) : Frame(dummy_topology(natoms)) {}
+Frame::Frame(size_t natoms) : Frame(Topology()) {
+    resize(natoms);
+}
 
 Frame::Frame(const Topology& topology, const UnitCell& cell)
     : step_(0), topology_(topology), cell_(cell) {

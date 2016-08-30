@@ -228,9 +228,6 @@ private:
     Connectivity connect_;
 };
 
-//! Create a topology containing `natoms` atoms, all of the UNDEFINED type.
-CHFL_EXPORT Topology dummy_topology(size_t natoms);
-
 } // namespace chemfiles
 
 #endif

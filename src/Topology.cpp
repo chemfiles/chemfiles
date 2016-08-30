@@ -153,10 +153,3 @@ bool Topology::isdihedral(size_t i, size_t j, size_t k, size_t m) const {
     auto pos = dihedrals.find(Dihedral(i, j, k, m));
     return pos != dihedrals.end();
 }
-
-Topology chemfiles::dummy_topology(size_t natoms) {
-    Topology topology;
-    for (size_t i = 0; i < natoms; i++)
-        topology.append(Atom(Atom::UNDEFINED));
-    return topology;
-}
