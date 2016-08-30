@@ -93,8 +93,7 @@ chfl_status chfl_atom_name(const CHFL_ATOM* const atom, char* const name, size_t
     assert(atom != nullptr);
     assert(name != nullptr);
     CHFL_ERROR_CATCH(
-        auto tmp = atom->name();
-        strcpy(name, tmp.substr(0, buffsize).c_str());
+        strlcpy(name, atom->name().c_str(), buffsize);
     )
 }
 
@@ -111,8 +110,7 @@ chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* const name, s
     assert(atom != nullptr);
     assert(name != nullptr);
     CHFL_ERROR_CATCH(
-        std::string tmp = atom->full_name();
-        strcpy(name, tmp.substr(0, buffsize).c_str());
+        strlcpy(name, atom->full_name().c_str(), buffsize);
     )
 }
 
