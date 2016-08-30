@@ -41,8 +41,7 @@ struct plugin_reginfo_t {
 
 template <MolfileFormat F> static int register_plugin(void* v, vmdplugin_t* p) {
     plugin_reginfo_t* reginfo = static_cast<plugin_reginfo_t*>(v);
-    if (std::string(MOLFILE_PLUGIN_TYPE) != std::string(p->type))
-        throw PluginError("Wrong plugin type");
+    assert(std::string(MOLFILE_PLUGIN_TYPE) == std::string(p->type));
 
     auto plugin = reinterpret_cast<molfile_plugin_t*>(p);
     if (molfile_plugins[F].reader == plugin->name) {
@@ -61,7 +60,7 @@ Molfile<F>::Molfile(File& file)
     : Format(file), plugin_(nullptr), file_handler_(nullptr), natoms_(0) {
 
     if (functions_.init()) {
-        throw PluginError("Could not initialize the " +
+        throw FormatError("Could not initialize the " +
                           molfile_plugins[F].format + " plugin_.");
     }
 
@@ -69,7 +68,7 @@ Molfile<F>::Molfile(File& file)
     // The first argument in 'register_fun' is passed as the first argument to
     // register_plugin ...
     if (functions_.registration(&reginfo, register_plugin<F>)) {
-        throw PluginError("Could not register the " +
+        throw FormatError("Could not register the " +
                           molfile_plugins[F].format + " plugin_.");
     }
     plugin_ = reginfo.plugin;
@@ -81,7 +80,7 @@ Molfile<F>::Molfile(File& file)
     if ((plugin_->open_file_read == NULL) ||
         (plugin_->read_next_timestep == NULL) ||
         (plugin_->close_file_read == NULL)) {
-        throw PluginError("The " + molfile_plugins[F].format +
+        throw FormatError("The " + molfile_plugins[F].format +
                           " plugin_ does not have read capacities");
     }
 
@@ -188,7 +187,7 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
     int ret = plugin_->read_structure(file_handler_, &optflags, atoms.data());
 
     if (ret != MOLFILE_SUCCESS) {
-        throw PluginError("Error while reading atomic names.");
+        throw FormatError("Error while reading atomic names.");
     }
 
     topology_ = Topology();
@@ -216,7 +215,7 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
                               &bondtype, &nbondtypes, &bondtypename);
 
     if (ret != MOLFILE_SUCCESS) {
-        throw PluginError("Error while reading bonds.");
+        throw FormatError("Error while reading bonds.");
     }
 
     for (size_t i = 0; i < static_cast<size_t>(nbonds); i++) {
