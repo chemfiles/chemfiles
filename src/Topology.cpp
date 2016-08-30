@@ -96,7 +96,7 @@ void Connectivity::remove_bond(size_t i, size_t j) {
 void Topology::resize(size_t size) {
     for (auto bond : bonds()) {
         if (bond[0] >= size || bond[1] >= size) {
-            throw APIError(
+            throw Error(
                 "Can not resize the topology to " + std::to_string(size) +
                 " as there is a bond between atoms " + std::to_string(bond[0]) +
                 "-" + std::to_string(bond[1]) + ".");

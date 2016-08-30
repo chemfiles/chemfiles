@@ -35,11 +35,6 @@ struct CHFL_EXPORT FormatError : public Error {
     FormatError(const std::string& err) : Error(err) {}
 };
 
-//! @brief Exception for bad API usage
-struct CHFL_EXPORT APIError : public Error {
-    APIError(const std::string& err) : Error(err) {}
-};
-
 //! @brief Exception for errors in selections
 struct CHFL_EXPORT SelectionError : public Error {
     SelectionError(const std::string& err) : Error(err) {}

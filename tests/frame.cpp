@@ -93,6 +93,6 @@ TEST_CASE("Frame class usage", "[Frame]"){
 
         // Wrong topology size
         frame = Frame(5);
-        CHECK_THROWS_AS(frame.set_topology(Topology()), APIError);
+        CHECK_THROWS_AS(frame.set_topology(Topology()), Error);
     }
 }
