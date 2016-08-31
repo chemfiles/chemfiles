@@ -32,11 +32,11 @@ addons:
 before_install:
   # Setting environement
   - export C_COMPILER="$CC"
-  - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DBUILD_TESTS=ON -DENABLE_NETCDF=ON -DBUILD_SHARED_LIBS=${SHARED_LIBS}"
+  - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCHFL_BUILD_TESTS=ON -DCHFL_ENABLE_NETCDF=ON -DBUILD_SHARED_LIBS=${SHARED_LIBS}"
   - |
     if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "gcc" && "$BUILD_TYPE" == "debug" && "$SHARED_LIBS" == "ON" ]]; then
         export EXTRA_WORK=true
-        export CMAKE_ARGS="$CMAKE_ARGS -DCODE_COVERAGE=ON"
+        export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_CODE_COVERAGE=ON"
         pip install --user codecov
     else
         export EXTRA_WORK=false

@@ -28,7 +28,7 @@ build_script:
   - cd C:\Chemharp
   - mkdir build
   - cd build
-  - cmake -DBUILD_TESTS=ON -G "%GENERATOR%" ..
+  - cmake -DCHFL_BUILD_TESTS=ON -G "%GENERATOR%" ..
   - cmake --build . --config debug --target ALL_BUILD
 
 test_script:

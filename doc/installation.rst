@@ -136,13 +136,13 @@ most important options:
 | ``-DBUILD_SHARED_LIBS=ON|OFF``     | ``OFF``             | Build shared library instead |
 |                                    |                     | of static one.               |
 +------------------------------------+---------------------+------------------------------+
-| ``-DBUILD_DOCUMENTATION=ON|OFF``   | ``OFF``             | Build the documentation.     |
+| ``-DCHFL_BUILD_DOCUMENTATION=ON|OFF``   | ``OFF``             | Build the documentation.     |
 |                                    |                     | This needs `sphinx`_ and     |
 |                                    |                     | `doxygen`_ to be installed   |
 +------------------------------------+---------------------+------------------------------+
-| ``-DBUILD_TESTS=ON|OFF``           | ``OFF``             | Build the test suite.        |
+| ``-DCHFL_BUILD_TESTS=ON|OFF``           | ``OFF``             | Build the test suite.        |
 +------------------------------------+---------------------+------------------------------+
-| ``-DENABLE_NETCDF=ON|OFF``         | ``OFF``             | Enable the Amber NetCDF      |
+| ``-DCHFL_ENABLE_NETCDF=ON|OFF``         | ``OFF``             | Enable the Amber NetCDF      |
 |                                    |                     | format                       |
 +------------------------------------+---------------------+------------------------------+
 
