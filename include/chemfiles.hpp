@@ -28,6 +28,7 @@
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Topology.hpp"
+#include "chemfiles/Residue.hpp"
 #include "chemfiles/Trajectory.hpp"
 #include "chemfiles/UnitCell.hpp"
 
