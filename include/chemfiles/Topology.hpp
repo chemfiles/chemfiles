@@ -10,10 +10,14 @@
 #define CHEMFILES_TOPOLOGY_HPP
 
 #include <vector>
+#include <unordered_map>
 
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/Connectivity.hpp"
+#include "chemfiles/Residue.hpp"
 #include "chemfiles/exports.hpp"
+
+#include "chemfiles/optional.hpp"
 
 namespace chemfiles {
 
@@ -94,12 +98,33 @@ public:
     //! dihedrals)
     void clear_bonds() { connect_ = Connectivity(); }
 
+    //! Add a `residue` to this topology.
+    //!
+    //! This function throws a `chemfiles::Error` if any atom in the `residue`
+    //! is already in another residue in this topology. In that case, the
+    //! topology is not modified.
+    void add_residue(Residue residue);
+    //! Check if two residues are linked together, i.e. if there is a bond
+    //! between any of the atoms in the residues.
+    bool are_linked(const Residue& res_1, const Residue& res_2) const;
+    //! Get the residue containing the `atom` at the given index.
+    optional<const Residue&> residue(size_t atom) const;
+    //! Get all the residues in the topology
+    const std::vector<Residue>& residues() const {
+        return residues_;
+    }
+
 private:
     //! Atoms in the system.
     std::vector<Atom> atoms_;
-    //! Connectivity of the system. All the indices refers to the positions in
+    //! Connectivity of the system. All the indexes refers to the positions in
     //! `atoms_`
     Connectivity connect_;
+    //! List of residues in the system. All the indexes refers to the positions
+    //! in `atoms_`
+    std::vector<Residue> residues_;
+    //! Association between atom indexes and residues indexes.
+    std::unordered_map<size_t, size_t> residue_mapping_;
 };
 
 } // namespace chemfiles
