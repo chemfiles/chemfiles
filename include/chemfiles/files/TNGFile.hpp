@@ -24,6 +24,8 @@ public:
     TNGFile(TNGFile&&) = default;
     TNGFile& operator=(TNGFile&&) = default;
 
+    operator tng_trajectory_t() {return handle_;}
+
 private:
     /// underlying pointer to the tng file
     tng_trajectory_t handle_;

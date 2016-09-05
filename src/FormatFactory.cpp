@@ -12,8 +12,10 @@
 #include "chemfiles/formats/NcFormat.hpp"
 #include "chemfiles/formats/PDB.hpp"
 #include "chemfiles/formats/XYZ.hpp"
+#include "chemfiles/formats/TNG.hpp"
 
 #include "chemfiles/files/NcFile.hpp"
+#include "chemfiles/files/TNGFile.hpp"
 using namespace chemfiles;
 
 template <typename T>
@@ -42,6 +44,7 @@ void registration(trajectory_map_t& formats, trajectory_map_t& extensions) {
 FormatFactory::FormatFactory() : formats_(), extensions_() {
     registration<XYZFormat>(formats_, extensions_);
     registration<PDBFormat>(formats_, extensions_);
+    registration<TNGFormat>(formats_, extensions_);
 
 #if HAVE_NETCDF
     registration<NCFormat>(formats_, extensions_);
