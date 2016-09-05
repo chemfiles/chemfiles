@@ -21,74 +21,76 @@
 
 namespace chemfiles {
 
-//! Maximum lenght for strings in variables
-const size_t NC_STRING_MAXLEN = 10;
-
-//! NetCDF id type definition
-using netcdf_id_t = int;
-
-//! Count for variable stride and starting point
-using count_t = std::vector<size_t>;
-//! Get the number of elements in an hyperslab with `count` elements.
-size_t hyperslab_size(const count_t& count);
-
-//! Check for netcdf return `status`. This will throw a `FileError` with the
-//! given `message` in case of error.
-void check_nc_error(const std::string& message, int status);
-
-//! Enable a member function at compile-time if T and U are the same types
-template<class T, class U>
-using enable_if_same = typename std::enable_if<std::is_same<T, U>::value>::type;
-
 class NcFile;
 
-/*!
- * @class NcVariable NcFile.hpp NcFile.cpp
- * @brief RAII wrapper around NetCDF variable
- *
- * This class is manually instanciated for float and char types, which are the
- * only ones needed by chemfiles.
- */
-template <typename NcType>
-class NcVariable {
-public:
-    //! Create a new variable from `file` with id `var`.
-    NcVariable(NcFile& file, netcdf_id_t var);
+namespace nc {
+    //! Maximum lenght for strings in variables
+    const size_t STRING_MAXLEN = 10;
 
-    //! Get the attribute `name`.
-    std::string attribute(const std::string& name);
+    //! NetCDF id type definition
+    using netcdf_id_t = int;
 
-    //! Add an attribute with the given `value` and `name`.
-    void add_attribute(const std::string& name, const std::string& value);
+    //! Count for variable stride and starting point
+    using count_t = std::vector<size_t>;
+    //! Get the number of elements in a NetCDF hyperslab with `count` elements.
+    size_t hyperslab_size(const count_t& count);
 
-    //! Get `count` values starting at `start` from this variable
-    template<typename T = NcType, typename unused = enable_if_same<T, float>>
-    std::vector<float> get(count_t start, count_t count) const;
+    //! Check for netcdf return `status`. This will throw a `FileError` with the
+    //! given `message` in case of error.
+    void check(int status, const std::string& message);
 
-    //! Add `cout` values from `data` starting at `start` in this variable
-    template<typename T = NcType, typename unused = enable_if_same<T, float>>
-    void add(count_t start, count_t count, std::vector<float> data);
+    //! Enable a member function at compile-time if T and U are the same types
+    template<class T, class U>
+    using enable_if_same = typename std::enable_if<std::is_same<T, U>::value>::type;
 
-    //! Put a single string of data in this variable
-    template<typename T = NcType, typename unused = enable_if_same<T, char>>
-    void add(std::string data);
+    /*!
+     * @class NcVariable NcFile.hpp NcFile.cpp
+     * @brief RAII wrapper around NetCDF variable
+     *
+     * This class is manually instanciated for float and char types, which are the
+     * only ones needed by chemfiles.
+     */
+    template <typename NcType>
+    class NcVariable {
+    public:
+        //! Create a new variable from `file` with id `var`.
+        NcVariable(NcFile& file, netcdf_id_t var);
 
-    //! Put multiple strings of data in this variable
-    template<typename T = NcType, typename unused = enable_if_same<T, char>>
-    void add(std::vector<const char*> data);
+        //! Get the attribute `name`.
+        std::string attribute(const std::string& name);
 
-    //! Get the dimensions size for this variable
-    std::vector<size_t> dimmensions() const;
-private:
-    NcFile& file_;
-    netcdf_id_t var_id_;
-};
+        //! Add an attribute with the given `value` and `name`.
+        void add_attribute(const std::string& name, const std::string& value);
 
-//! Mapping between C++ and NetCDF data types
-template<typename NcType> struct nc_type {};
+        //! Get `count` values starting at `start` from this variable
+        template<typename T = NcType, typename unused = enable_if_same<T, float>>
+        std::vector<float> get(count_t start, count_t count) const;
 
-template<> struct nc_type<float> {static constexpr auto value = NC_FLOAT;};
-template<> struct nc_type<char> {static constexpr auto value = NC_CHAR;};
+        //! Add `cout` values from `data` starting at `start` in this variable
+        template<typename T = NcType, typename unused = enable_if_same<T, float>>
+        void add(count_t start, count_t count, std::vector<float> data);
+
+        //! Put a single string of data in this variable
+        template<typename T = NcType, typename unused = enable_if_same<T, char>>
+        void add(std::string data);
+
+        //! Put multiple strings of data in this variable
+        template<typename T = NcType, typename unused = enable_if_same<T, char>>
+        void add(std::vector<const char*> data);
+
+        //! Get the dimensions size for this variable
+        std::vector<size_t> dimmensions() const;
+    private:
+        NcFile& file_;
+        netcdf_id_t var_id_;
+    };
+
+    //! Mapping between C++ and NetCDF data types
+    template<typename NcType> struct nc_type {};
+
+    template<> struct nc_type<float> {static constexpr auto value = NC_FLOAT;};
+    template<> struct nc_type<char> {static constexpr auto value = NC_CHAR;};
+} // namespace nc
 
 /*!
  * @class NcFile NcFile.hpp NcFile.cpp
@@ -119,7 +121,7 @@ public:
     NcMode nc_mode() const;
 
     //! Get the NetCDF id of this file.
-    netcdf_id_t netcdf_id() const {
+    nc::netcdf_id_t netcdf_id() const {
         return file_id_;
     }
 
@@ -138,147 +140,148 @@ public:
     bool variable_exists(const std::string& name) const;
     //! Get a NetCDF variable
     template <typename NcType>
-    NcVariable<NcType> variable(const std::string& name) {
-        netcdf_id_t var_id = -1;
-        int status = nc_inq_varid(file_id_, name.c_str(), &var_id);
-        check_nc_error("Can not read variable '" + name + "'", status);
-        return NcVariable<NcType>(*this, var_id);
+    nc::NcVariable<NcType> variable(const std::string& name) {
+        auto var_id = nc::netcdf_id_t(-1);
+        auto status = nc_inq_varid(file_id_, name.c_str(), &var_id);
+        nc::check(status, "Can not read variable '" + name + "'");
+        return nc::NcVariable<NcType>(*this, var_id);
     }
 
     //! Create a new variable of type `NcType` with name `name` along the dimensions in
     //! `dims`. `dims` must be string or string-like values.
     template <typename NcType, typename ...Dims>
-    NcVariable<NcType> add_variable(const std::string& name, Dims... dims) {
+    nc::NcVariable<NcType> add_variable(const std::string& name, Dims... dims) {
         assert(nc_mode() == DEFINE && "File must be in define mode to add variable");
 
         auto dim_ids = get_dimmensions(dims...);
-        netcdf_id_t var_id = -1;
+        auto var_id = nc::netcdf_id_t(-1);
 
         auto status = nc_def_var(
             // Variable file and name
             file_id_, name.c_str(),
             // Variable type
-            nc_type<NcType>::value,
+            nc::nc_type<NcType>::value,
             // Variable dimmensions
             sizeof...(dims), dim_ids.data(),
             &var_id
         );
-        check_nc_error("Can not add variable '" + name + "'", status);
+        nc::check(status, "Can not add variable '" + name + "'");
 
-        return NcVariable<NcType>(*this, var_id);
+        return nc::NcVariable<NcType>(*this, var_id);
     }
 
     // A NcFile will always be in a consistent mode
     virtual bool is_open() override {return true;}
     virtual void sync() override;
+
 private:
     template <typename ...Dims>
-    std::vector<netcdf_id_t> get_dimmensions(Dims... dims) {
+    std::vector<nc::netcdf_id_t> get_dimmensions(Dims... dims) {
         std::vector<std::string> dimmensions = {dims...};
-        std::vector<netcdf_id_t> dim_ids;
+        std::vector<nc::netcdf_id_t> dim_ids;
         for (auto& name: dimmensions) {
-            netcdf_id_t dim_id = -1;
+            auto dim_id = nc::netcdf_id_t(-1);
             auto status = nc_inq_dimid(file_id_, name.c_str(), &dim_id);
-            check_nc_error("Can not get dimmension '" + name + "'", status);
+            nc::check(status, "Can not get dimmension '" + name + "'");
             dim_ids.push_back(dim_id);
         }
         return dim_ids;
     }
 
-    netcdf_id_t file_id_;
+    nc::netcdf_id_t file_id_ = -1;
     NcMode nc_mode_;
 };
 
-/******************************************************************************/
+namespace nc {
+    template <typename NcType>
+    NcVariable<NcType>::NcVariable(NcFile& file, netcdf_id_t var): file_(file), var_id_(var) {}
 
-template <typename NcType>
-NcVariable<NcType>::NcVariable(NcFile& file, netcdf_id_t var): file_(file), var_id_(var) {}
+    template <typename NcType>
+    std::string NcVariable<NcType>::attribute(const std::string& name) {
+        size_t size = 0;
+        int status = nc_inq_attlen(file_.netcdf_id(), var_id_, name.c_str(), &size);
+        nc::check(status, "Can not read attribute id '" + name + "'");
 
-template <typename NcType>
-std::string NcVariable<NcType>::attribute(const std::string& name) {
-    size_t size = 0;
-    int status = nc_inq_attlen(file_.netcdf_id(), var_id_, name.c_str(), &size);
-    check_nc_error("Can not read attribute id '" + name + "'", status);
+        std::string value(size, ' ');
+        status = nc_get_att_text(file_.netcdf_id(), var_id_, name.c_str(), &value[0]);
+        nc::check(status, "Can not read attribute text '" + name + "'");
+        return value;
+    }
 
-    std::string value(size, ' ');
-    status = nc_get_att_text(file_.netcdf_id(), var_id_, name.c_str(), &value[0]);
-    check_nc_error("Can not read attribute text '" + name + "'", status);
-    return value;
-}
+    template <typename NcType>
+    void NcVariable<NcType>::add_attribute(const std::string& name, const std::string& value) {
+        assert(file_.nc_mode() == NcFile::DEFINE && "File must be in define mode to add attribute");
+        int status = nc_put_att_text(file_.netcdf_id(), var_id_, name.c_str(), value.size(), value.c_str());
+        nc::check(status, "Can not set attribute'" + name + "'");
+    }
 
-template <typename NcType>
-void NcVariable<NcType>::add_attribute(const std::string& name, const std::string& value) {
-    assert(file_.nc_mode() == NcFile::DEFINE && "File must be in define mode to add attribute");
-    int status = nc_put_att_text(file_.netcdf_id(), var_id_, name.c_str(), value.size(), value.c_str());
-    check_nc_error("Can not set attribute'" + name + "'", status);
-}
-
-template<> template<typename T, typename U>
-std::vector<float> NcVariable<float>::get(count_t start, count_t count) const {
-    auto size = hyperslab_size(count);
-    auto result = std::vector<float>(size, 0.0);
-    int status = nc_get_vara_float(
-        file_.netcdf_id(), var_id_,
-        start.data(), count.data(),
-        result.data()
-    );
-    check_nc_error("Could not read variable", status);
-    return result;
-}
-
-template<> template<typename T, typename U>
-void NcVariable<float>::add(count_t start, count_t count, std::vector<float> data) {
-    assert(data.size() == hyperslab_size(count));
-    int status = nc_put_vara_float(
-        file_.netcdf_id(), var_id_,
-        start.data(), count.data(),
-        data.data()
-    );
-    check_nc_error("Could not put data in variable", status);
-}
-
-template<> template<typename T, typename U>
-void NcVariable<char>::add(std::string data) {
-    int status = nc_put_var_text(file_.netcdf_id(), var_id_, data.c_str());
-    check_nc_error("Could not put text data in variable", status);
-}
-
-template<> template<typename T, typename U>
-void NcVariable<char>::add(std::vector<const char*> data) {
-    size_t i = 0;
-    for (auto string: data) {
-        size_t start[] = {i, 0};
-        size_t count[] = {1, NC_STRING_MAXLEN};
-        int status = nc_put_vara_text(
+    template<> template<typename T, typename U>
+    std::vector<float> NcVariable<float>::get(count_t start, count_t count) const {
+        auto size = hyperslab_size(count);
+        auto result = std::vector<float>(size, 0.0);
+        int status = nc_get_vara_float(
             file_.netcdf_id(), var_id_,
-            start, count,
-            string
+            start.data(), count.data(),
+            result.data()
         );
-        check_nc_error("Could not put vector text data in variable", status);
-        i++;
+        nc::check(status, "Could not read variable");
+        return result;
     }
 
-}
-
-template<typename NcType>
-std::vector<size_t> NcVariable<NcType>::dimmensions() const {
-    int size = 0;
-    int status = nc_inq_varndims(file_.netcdf_id(), var_id_, &size);
-    check_nc_error("Could not get the number of dimmensions", status);
-
-    auto dim_ids = std::vector<netcdf_id_t>(static_cast<size_t>(size), 0);
-    status = nc_inq_vardimid(file_.netcdf_id(), var_id_, dim_ids.data());
-    check_nc_error("Could not get the dimmensions id", status);
-
-    std::vector<size_t> result;
-    for (auto dim_id: dim_ids) {
-        size_t length = 0;
-        status = nc_inq_dimlen(file_.netcdf_id(), dim_id, &length);
-        check_nc_error("Could not get the dimmensions size", status);
-        result.push_back(length);
+    template<> template<typename T, typename U>
+    void NcVariable<float>::add(count_t start, count_t count, std::vector<float> data) {
+        assert(data.size() == hyperslab_size(count));
+        int status = nc_put_vara_float(
+            file_.netcdf_id(), var_id_,
+            start.data(), count.data(),
+            data.data()
+        );
+        nc::check(status, "Could not put data in variable");
     }
-    return result;
-}
+
+    template<> template<typename T, typename U>
+    void NcVariable<char>::add(std::string data) {
+        int status = nc_put_var_text(file_.netcdf_id(), var_id_, data.c_str());
+        nc::check(status, "Could not put text data in variable");
+    }
+
+    template<> template<typename T, typename U>
+    void NcVariable<char>::add(std::vector<const char*> data) {
+        size_t i = 0;
+        for (auto string: data) {
+            size_t start[] = {i, 0};
+            size_t count[] = {1, STRING_MAXLEN};
+            int status = nc_put_vara_text(
+                file_.netcdf_id(), var_id_,
+                start, count,
+                string
+            );
+            nc::check(status, "Could not put vector text data in variable");
+            i++;
+        }
+
+    }
+
+    template<typename NcType>
+    std::vector<size_t> NcVariable<NcType>::dimmensions() const {
+        int size = 0;
+        int status = nc_inq_varndims(file_.netcdf_id(), var_id_, &size);
+        nc::check(status, "Could not get the number of dimmensions");
+
+        auto dim_ids = std::vector<netcdf_id_t>(static_cast<size_t>(size), 0);
+        status = nc_inq_vardimid(file_.netcdf_id(), var_id_, dim_ids.data());
+        nc::check(status, "Could not get the dimmensions id");
+
+        std::vector<size_t> result;
+        for (auto dim_id: dim_ids) {
+            size_t length = 0;
+            status = nc_inq_dimlen(file_.netcdf_id(), dim_id, &length);
+            check(status, "Could not get the dimmensions size");
+            result.push_back(length);
+        }
+        return result;
+    }
+} // namespace nc
 
 } // namespace chemfiles
 

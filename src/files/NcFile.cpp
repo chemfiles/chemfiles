@@ -13,14 +13,14 @@
 #include "chemfiles/files/NcFile.hpp"
 using namespace chemfiles;
 
-void chemfiles::check_nc_error(const std::string& message, int status) {
+void chemfiles::nc::check(int status, const std::string& message) {
     if (status != NC_NOERR) {
         throw FileError(message + "\n    (NetCDF error is '" +
                         nc_strerror(status) + "')");
     }
 }
 
-size_t chemfiles::hyperslab_size(const count_t& count) {
+size_t chemfiles::nc::hyperslab_size(const count_t& count) {
     size_t counted = 1;
     for (auto value : count) {
         counted *= value;
@@ -30,7 +30,7 @@ size_t chemfiles::hyperslab_size(const count_t& count) {
 
 NcFile::NcFile(const std::string& filename, File::Mode mode)
     : BinaryFile(filename, mode), file_id_(-1), nc_mode_(DATA) {
-    int status = NC_NOERR;
+    auto status = NC_NOERR;
 
     switch (mode) {
     case File::READ:
@@ -51,11 +51,11 @@ NcFile::NcFile(const std::string& filename, File::Mode mode)
         break;
     }
 
-    check_nc_error("Could not open the file '" + filename + "'", status);
+    nc::check(status, "Could not open the file '" + filename + "'");
 }
 
 NcFile::~NcFile() {
-    int status = nc_close(file_id_);
+    auto status = nc_close(file_id_);
     assert(status == NC_NOERR);
 }
 
@@ -65,12 +65,12 @@ void NcFile::set_nc_mode(NcMode mode) {
     }
 
     if (mode == DATA) {
-        int status = nc_enddef(file_id_);
-        check_nc_error("Could not change to data mode", status);
+        auto status = nc_enddef(file_id_);
+        nc::check(status, "Could not change to data mode");
         nc_mode_ = DATA;
     } else if (mode == DEFINE) {
-        int status = nc_redef(file_id_);
-        check_nc_error("Could not change to define mode", status);
+        auto status = nc_redef(file_id_);
+        nc::check(status, "Could not change to define mode");
         nc_mode_ = DEFINE;
     }
 }
@@ -81,8 +81,8 @@ NcFile::NcMode NcFile::nc_mode() const {
 
 std::string NcFile::global_attribute(const std::string& name) const {
     size_t size = 0;
-    int status = nc_inq_attlen(file_id_, NC_GLOBAL, name.c_str(), &size);
-    check_nc_error("Can not read attribute '" + name + "'", status);
+    auto status = nc_inq_attlen(file_id_, NC_GLOBAL, name.c_str(), &size);
+    nc::check(status, "Can not read attribute '" + name + "'");
 
     std::string value(size, ' ');
     // &value[0] get a pointer to the first char in the string. In C++11, the
@@ -91,7 +91,7 @@ std::string NcFile::global_attribute(const std::string& name) const {
     // a const
     // char *, and thus can not be used by nc_get_att_text.
     status = nc_get_att_text(file_id_, NC_GLOBAL, name.c_str(), &value[0]);
-    check_nc_error("Can not read attribute '" + name + "'", status);
+    nc::check(status, "Can not read attribute '" + name + "'");
 
     return value;
 }
@@ -99,24 +99,25 @@ std::string NcFile::global_attribute(const std::string& name) const {
 void NcFile::add_global_attribute(const std::string& name, const std::string& value) {
     assert(nc_mode() == DEFINE &&
            "File must be in define mode to add attribute");
-    int status = nc_put_att_text(file_id_, NC_GLOBAL, name.c_str(),
+    auto status = nc_put_att_text(file_id_, NC_GLOBAL, name.c_str(),
                                  value.size(), value.c_str());
 
-    check_nc_error("Could not add the \"" + name +
-                       "\" global attribute with value \"" + value,
-                   status);
+    nc::check(status,
+        "Could not add the \"" + name +
+        "\" global attribute with value \"" + value
+    );
 }
 
 size_t NcFile::dimension(const std::string& name) const {
     // Get the dimmension id
-    netcdf_id_t dim_id = -1;
-    int status = nc_inq_dimid(file_id_, name.c_str(), &dim_id);
-    check_nc_error("Can not read dimmension '" + name + "'", status);
+    auto dim_id = nc::netcdf_id_t(-1);
+    auto status = nc_inq_dimid(file_id_, name.c_str(), &dim_id);
+    nc::check(status, "Can not read dimmension '" + name + "'");
 
     // Get dimmension size
     size_t size = 0;
     status = nc_inq_dimlen(file_id_, dim_id, &size);
-    check_nc_error("Can not read dimmension '" + name + "'", status);
+    nc::check(status, "Can not read dimmension '" + name + "'");
 
     return size;
 }
@@ -124,9 +125,9 @@ size_t NcFile::dimension(const std::string& name) const {
 void NcFile::add_dimension(const std::string& name, size_t value) {
     assert(nc_mode() == DEFINE &&
            "File must be in define mode to add dimmension");
-    netcdf_id_t dim_id = -1;
-    int status = nc_def_dim(file_id_, name.c_str(), value, &dim_id);
-    check_nc_error("Can not add dimension \"" + name + "\"", status);
+    auto dim_id = nc::netcdf_id_t(-1);
+    auto status = nc_def_dim(file_id_, name.c_str(), value, &dim_id);
+    nc::check(status, "Can not add dimension \"" + name + "\"");
 }
 
 void NcFile::sync() {
@@ -136,8 +137,8 @@ void NcFile::sync() {
 }
 
 bool NcFile::variable_exists(const std::string& name) const {
-    netcdf_id_t id;
-    int status = nc_inq_varid(file_id_, name.c_str(), &id);
+    auto id = nc::netcdf_id_t(-1);
+    auto status = nc_inq_varid(file_id_, name.c_str(), &id);
     return status == NC_NOERR;
 }
 
