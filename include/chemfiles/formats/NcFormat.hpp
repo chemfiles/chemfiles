@@ -31,14 +31,13 @@ class NcFile;
 class NCFormat final: public Format {
 public:
     NCFormat(File& file);
-    ~NCFormat() = default;
 
-    virtual void read_step(size_t step, Frame& frame) override;
-    virtual void read(Frame& frame) override;
-    virtual void write(const Frame& frame) override;
+    void read_step(size_t step, Frame& frame) override;
+    void read(Frame& frame) override;
+    void write(const Frame& frame) override;
 
-    virtual size_t nsteps() override;
-    virtual std::string description() const override;
+    size_t nsteps() override;
+    std::string description() const override;
 
     using file_t = NcFile;
 

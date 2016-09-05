@@ -148,7 +148,7 @@ static void initialize(NcFile& file, size_t natoms, bool with_velocities) {
     file.add_dimension("atom", natoms);
     file.add_dimension("cell_spatial", 3);
     file.add_dimension("cell_angular", 3);
-    file.add_dimension("label", NC_STRING_MAXLEN);
+    file.add_dimension("label", nc::STRING_MAXLEN);
 
     auto spatial = file.add_variable<char>("spatial", "spatial");
     auto cell_spatial = file.add_variable<char>("cell_spatial", "cell_spatial");
