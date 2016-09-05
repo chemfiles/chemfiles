@@ -27,11 +27,11 @@ public:
     XYZFormat(File& file);
     ~XYZFormat() = default;
 
-    virtual void read_step(size_t step, Frame& frame) override;
-    virtual void read(Frame& frame) override;
-    virtual void write(const Frame& frame) override;
-    virtual std::string description() const override;
-    virtual size_t nsteps() override;
+     void read_step(size_t step, Frame& frame) override;
+     void read(Frame& frame) override;
+     void write(const Frame& frame) override;
+     std::string description() const override;
+     size_t nsteps() override;
 
     // Register the xyz format with the ".xyz" extension and the "XYZ" description.
     FORMAT_NAME(XYZ)

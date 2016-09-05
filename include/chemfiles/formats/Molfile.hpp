@@ -60,9 +60,9 @@ public:
     Molfile(File& file);
     ~Molfile();
 
-    virtual void read(Frame& frame) override;
-    virtual std::string description() const override;
-    virtual size_t nsteps() override;
+     void read(Frame& frame) override;
+     std::string description() const override;
+     size_t nsteps() override;
 
     static const char* name();
     static const char* extension();

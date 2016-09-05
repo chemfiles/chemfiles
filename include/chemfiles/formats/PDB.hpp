@@ -31,11 +31,11 @@ public:
     PDBFormat(File& file);
     ~PDBFormat() = default;
 
-    virtual void read_step(size_t step, Frame& frame) override;
-    virtual void read(Frame& frame) override;
-    virtual void write(const Frame& frame) override;
-    virtual std::string description() const override;
-    virtual size_t nsteps() override;
+     void read_step(size_t step, Frame& frame) override;
+     void read(Frame& frame) override;
+     void write(const Frame& frame) override;
+     std::string description() const override;
+     size_t nsteps() override;
 
     // Register the PDB format with the ".pdb" extension and the "PDB" description.
     FORMAT_NAME(PDB)
