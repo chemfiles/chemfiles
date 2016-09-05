@@ -16,6 +16,11 @@
 
 #include "chemfiles/exports.hpp"
 
+#ifdef WIN32
+#undef ERROR
+#undef CALLBACK
+#endif
+
 namespace chemfiles {
 
 enum class LogLevel {
