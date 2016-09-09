@@ -26,11 +26,16 @@ addons:
     - libnetcdf-dev
     - cmake
     - doxygen
+    - valgrind
 
 before_install:
   # Setting environement
   - export C_COMPILER="$CC"
-  - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DCHFL_BUILD_TESTS=ON -DCHFL_ENABLE_NETCDF=ON -DBUILD_SHARED_LIBS=${SHARED_LIBS}"
+  - |
+    export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug \
+                       -DCHFL_BUILD_TESTS=ON \
+                       -DCHFL_ENABLE_NETCDF=ON \
+                       -DBUILD_SHARED_LIBS=${SHARED_LIBS}"
   - |
     if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "gcc" && "$SHARED_LIBS" == "ON" ]]; then
         export EXTRA_WORK=true
@@ -46,6 +51,7 @@ before_install:
             export CC=gcc-4.8
             export CXX=g++-4.8
         fi
+        export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_TEST_RUNNER=valgrind"
     fi
   # Install OS X stuff
   - |
