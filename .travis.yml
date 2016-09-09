@@ -9,10 +9,8 @@ compiler:
   - clang
 env:
   matrix:
-    - BUILD_TYPE=debug SHARED_LIBS=ON
-    - BUILD_TYPE=debug SHARED_LIBS=OFF
-    - BUILD_TYPE=release SHARED_LIBS=ON
-    - BUILD_TYPE=release SHARED_LIBS=OFF
+    - SHARED_LIBS=ON
+    - SHARED_LIBS=OFF
   global:
     secure: "DituZnehFQWFs6o3h9+sqGDxlHIPTImWxBvzHjV0w7dmvKcl6rakf6fNsTjcM9lrk2Q9owxwzT7EWxhI/1E28ivtNwxWod6jMuwmrw+6jz7dQG0JTs3icTeCO6z1dnRaLRDHlVpiVob9Cz6ZYPCB86XzOeVlvh7693WXoHpZ944="
 matrix:
@@ -32,9 +30,9 @@ addons:
 before_install:
   # Setting environement
   - export C_COMPILER="$CC"
-  - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCHFL_BUILD_TESTS=ON -DCHFL_ENABLE_NETCDF=ON -DBUILD_SHARED_LIBS=${SHARED_LIBS}"
+  - export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DCHFL_BUILD_TESTS=ON -DCHFL_ENABLE_NETCDF=ON -DBUILD_SHARED_LIBS=${SHARED_LIBS}"
   - |
-    if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "gcc" && "$BUILD_TYPE" == "debug" && "$SHARED_LIBS" == "ON" ]]; then
+    if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "gcc" && "$SHARED_LIBS" == "ON" ]]; then
         export EXTRA_WORK=true
         export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_CODE_COVERAGE=ON"
         pip install --user codecov
