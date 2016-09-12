@@ -13,18 +13,16 @@ TEST_CASE("Residue class usage", "[Residue]"){
 
     CHECK(residue.size() == 0);
     residue.add_atom(0);
+    residue.add_atom(56);
     residue.add_atom(30);
-    residue.add_atom(56);
     CHECK(residue.size() == 3);
 
     residue.add_atom(56);
     CHECK(residue.size() == 3);
 
-    std::set<size_t> atoms(residue.begin(), residue.end());
-    CHECK(atoms.size() == 3);
-    CHECK(atoms.find(0) != atoms.end());
-    CHECK(atoms.find(30) != atoms.end());
-    CHECK(atoms.find(56) != atoms.end());
+    auto atoms = std::vector<size_t>(residue.begin(), residue.end());
+    auto expected = std::vector<size_t>{0, 30, 56};
+    CHECK(atoms == expected);
 
     CHECK(residue.contains(56));
 }

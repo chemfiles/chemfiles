@@ -9,10 +9,10 @@
 #ifndef CHEMFILES_RESIDUE_HPP
 #define CHEMFILES_RESIDUE_HPP
 
-#include <unordered_set>
 #include <string>
 
 #include "chemfiles/exports.hpp"
+#include "chemfiles/sorted_set.hpp"
 
 namespace chemfiles {
 
@@ -56,7 +56,7 @@ public:
     /// CHeck if the residue contains a given atom with index `i`
     bool contains(size_t i) const;
 
-    using const_iterator = std::unordered_set<size_t>::const_iterator;
+    using const_iterator = sorted_set<size_t>::const_iterator;
     // Iterators over the indexes of the atoms in the residue
     const_iterator begin() const {return atoms_.begin();}
     const_iterator end() const {return atoms_.end();}
@@ -70,7 +70,7 @@ private:
     size_t id_ = static_cast<size_t>(-1);
     /// Indexes of the atoms in this residue. These indexes refers to the
     /// associated topology.
-    std::unordered_set<size_t> atoms_;
+    sorted_set<size_t> atoms_;
 };
 
 } // namespace chemfiles
