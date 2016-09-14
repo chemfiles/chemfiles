@@ -13,6 +13,8 @@
 # ifndef CHEMFILES_OPTIONAL_HPP
 # define CHEMFILES_OPTIONAL_HPP
 
+#define TR2_OPTIONAL_DISABLE_EMULATION_OF_TYPE_TRAITS
+
 # include <utility>
 # include <type_traits>
 # include <initializer_list>
