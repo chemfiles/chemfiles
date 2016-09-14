@@ -25,7 +25,6 @@ namespace chemfiles {
 class XYZFormat final: public Format {
 public:
     XYZFormat(File& file);
-    ~XYZFormat() = default;
 
      void read_step(size_t step, Frame& frame) override;
      void read(Frame& frame) override;

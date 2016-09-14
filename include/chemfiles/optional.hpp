@@ -381,7 +381,7 @@ class optional : private OptionalBase<T>
   }
 
   template <class... Args>
-  void initialize(Args&&... args) noexcept(noexcept(T(std::forward<Args>(args)...)))
+  void initialize(Args&&... args) // FIXME: this specification is not understood by intel compiler: "noexcept(noexcept(T(std::forward<Args>(args)...)))"
   {
     assert(!OptionalBase<T>::init_);
     ::new (static_cast<void*>(dataptr())) T(std::forward<Args>(args)...);

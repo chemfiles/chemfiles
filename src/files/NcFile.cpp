@@ -54,7 +54,7 @@ NcFile::NcFile(const std::string& filename, File::Mode mode)
     nc::check(status, "Could not open the file '" + filename + "'");
 }
 
-NcFile::~NcFile() {
+NcFile::~NcFile() noexcept {
     auto status = nc_close(file_id_);
     assert(status == NC_NOERR);
 }

@@ -28,7 +28,7 @@ public:
     //! have the
     //! file_t class.
     Format(File& file) : file_(file) {}
-    virtual ~Format() = default;
+    virtual ~Format() noexcept = default;
     Format& operator=(const Format&) = delete;
     Format(const Format&) = delete;
     /*!

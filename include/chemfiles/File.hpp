@@ -54,7 +54,7 @@ private:
 //! etc.
 class TextFile : public File, public std::iostream {
 public:
-    virtual ~TextFile() = default;
+    virtual ~TextFile() noexcept {}
 
     //! Read a line from the file
     virtual const std::string& getline() = 0;
@@ -100,7 +100,7 @@ protected:
 //! file classes.
 class BinaryFile : public File {
 public:
-    virtual ~BinaryFile() = default;
+    virtual ~BinaryFile() noexcept {}
 
 protected:
     explicit BinaryFile(const std::string& path, File::Mode mode): File(path, mode) {}

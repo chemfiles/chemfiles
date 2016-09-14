@@ -95,7 +95,7 @@ Molfile<F>::Molfile(File& file)
     read_topology();
 }
 
-template <MolfileFormat F> Molfile<F>::~Molfile() {
+template <MolfileFormat F> Molfile<F>::~Molfile() noexcept {
     if (file_handler_) {
         plugin_->close_file_read(file_handler_);
     }

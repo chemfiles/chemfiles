@@ -58,7 +58,7 @@ template <MolfileFormat F>
 class Molfile final: public Format {
 public:
     Molfile(File& file);
-    ~Molfile();
+    ~Molfile() noexcept;
 
      void read(Frame& frame) override;
      std::string description() const override;

@@ -112,7 +112,7 @@ public:
     SingleSelector(unsigned argument): argument_(argument) {
         assert(argument <= 3 && "argument must be less than 3 in SingleSelector");
     }
-    virtual ~SingleSelector() = default;
+    virtual ~SingleSelector() noexcept = default;
 
 protected:
     //! Index of the argument to apply the selector to

@@ -105,7 +105,7 @@ namespace nc {
 class NcFile final: public BinaryFile {
 public:
     NcFile(const std::string& filename, File::Mode mode);
-    ~NcFile();
+    ~NcFile() noexcept;
 
     //! Possible file mode. By default, files are in the DATA mode.
     enum NcMode {

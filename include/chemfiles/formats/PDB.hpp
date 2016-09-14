@@ -29,7 +29,6 @@ namespace chemfiles {
 class PDBFormat final: public Format {
 public:
     PDBFormat(File& file);
-    ~PDBFormat() = default;
 
      void read_step(size_t step, Frame& frame) override;
      void read(Frame& frame) override;

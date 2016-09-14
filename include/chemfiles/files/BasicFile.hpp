@@ -27,6 +27,8 @@ public:
     //! `'r'` or `'a'` mode.
     explicit BasicFile(const std::string& filename, File::Mode mode);
 
+    ~BasicFile() noexcept {}
+
     const std::string& getline() override;
     BasicFile& operator>>(std::string& line) override;
     const std::vector<std::string>& readlines(size_t n) override;
