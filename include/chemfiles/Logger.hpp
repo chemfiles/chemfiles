@@ -37,6 +37,8 @@ using logging_cb_t = std::function<void(LogLevel level, const std::string& messa
  * @brief The Logger class is a singleton class providing logging facilities.
  */
 class CHFL_EXPORT Logger {
+    /// Helper struct to do something with each value in a template parameter pack.
+    struct for_each { template<typename... T> for_each(T&&...) { } };
 public:
     //! Where the log message should go
     enum LogBackend {
@@ -61,16 +63,9 @@ public:
     static void log(LogLevel level, Args const&... args) {
         // Don't write anything if the output level is less important than
         // the current level.
-        if (level > Logger::level())
-            return;
-
+        if (level > Logger::level()) {return;}
         std::ostringstream stream;
-        // Some black magic using the comma operator to upack the template parameter
-        // pack while using it to build the stream.
-        auto _ = {0, ((void)(stream << args), 0)... };
-        // silent usused variable _ warning
-        (void)_;
-
+        for_each{stream << args...};
         instance_.write_message(level, stream.str());
     }
     //! Equivalent to `Logger::log(LogLevel::ERROR, args...)`
