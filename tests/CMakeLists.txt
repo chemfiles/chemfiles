@@ -6,7 +6,7 @@ set(CHFL_TEST_RUNNER "none" CACHE STRING "External runner for the tests")
 set_property(CACHE CHFL_TEST_RUNNER PROPERTY STRINGS none valgrind wine)
 
 if(${CHFL_TEST_RUNNER} STREQUAL "valgrind")
-    set(RUNNER_COMMAND "valgrind" "--error-exitcode=125" "--leak-check=full")
+    set(RUNNER_COMMAND "valgrind" "--error-exitcode=125" "--leak-check=full" "--dsymutil=yes" "--track-origins=yes")
 elseif(${CHFL_TEST_RUNNER} STREQUAL "wine")
     set(RUNNER_COMMAND "wine")
 else()
