@@ -9,7 +9,6 @@ using namespace chemfiles;
 
 #include <boost/filesystem.hpp>
 namespace fs=boost::filesystem;
-const double EPS = 1e-5;
 
 #define NCDIR SRCDIR "/data/netcdf/"
 

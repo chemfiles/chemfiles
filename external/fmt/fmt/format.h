@@ -105,6 +105,10 @@ typedef __int64          intmax_t;
 # pragma clang diagnostic ignored "-Wdocumentation"
 #endif
 
+#if defined(FMT_ICC_VERSION) && !defined(__clang__)
+# pragma warning disable 1682
+#endif
+
 #if defined(_MSC_VER)
 # pragma warning(push)
 # pragma warning(disable: 4365 4388)  // signed/unsigned mismatch

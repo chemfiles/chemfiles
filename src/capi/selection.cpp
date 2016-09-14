@@ -55,7 +55,7 @@ chfl_status chfl_selection_matches(const CHFL_SELECTION* const selection, chfl_m
     CHFL_ERROR_CATCH(
         auto size = selection->selection.size();
         for (size_t i=0; i<n_matches; i++) {
-            matches[i].size = static_cast<unsigned char>(size);
+            matches[i].size = size;
             for (size_t j=0; j<size; j++) {
                 matches[i].atoms[j] = selection->matches[i][j];
             }

@@ -24,7 +24,6 @@ if(COMPILER_SUPPORTS_C99)
 endif()
 
 if(MSVC)
-    add_definitions("/D COMPILER_IS_MSVC")
     add_definitions("/D NOMINMAX")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 endif()
@@ -104,4 +103,12 @@ else()
     add_warning("-Woverloaded-virtual")
 
     add_warning("-Wno-unknown-pragmas")
+
+    if(${CMAKE_C_COMPILER} MATCHES "icc.*$")
+        # Intel compiler is too strict in errors about 'explicit' keyword
+        set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 2304")
+        set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 2305")
+        # 'parameter "args" was never referenced' => yes it was
+        set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 869")
+    endif()
 endif()
