@@ -958,9 +958,9 @@ CHFL_EXPORT chfl_status chfl_selection_evalutate(CHFL_SELECTION* const selection
 //! A match is a set of atomic indexes matching a given selection. The size of
 /// a match depends on the associated selection, and can vary from 1 to 4.
 typedef struct {
-    //! The actual size of the match. Elements in `matches` are significant up
+    //! The actual size of the match. Elements in `atoms` are significant up
     //! to this value, and filled with `(size_t)-1` for all the other values.
-    unsigned char size;
+    size_t size;
     //! Indexes matching the associated selection
     size_t atoms[CHFL_MAX_SELECTION_SIZE];
 } chfl_match_t;
