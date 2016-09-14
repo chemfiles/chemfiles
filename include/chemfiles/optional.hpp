@@ -6,6 +6,8 @@
 //
 // The idea and interface is based on Boost.Optional library
 // authored by Fernando Luis Cacciola Carballal
+//
+// https://github.com/akrzemi1/Optional
 
 // clang-format off
 # ifndef CHEMFILES_OPTIONAL_HPP
@@ -102,20 +104,20 @@ namespace std{
 
 namespace experimental{
 
-// // BEGIN workaround for missing is_trivially_destructible
-// # if defined TR2_OPTIONAL_GCC_4_8_AND_HIGHER___
-//     // leave it: it is already there
-// # elif defined TR2_OPTIONAL_CLANG_3_4_2_AND_HIGHER_
-//     // leave it: it is already there
-// # elif defined TR2_OPTIONAL_MSVC_2015_AND_HIGHER___
-//     // leave it: it is already there
-// # elif defined TR2_OPTIONAL_DISABLE_EMULATION_OF_TYPE_TRAITS
-//     // leave it: the user doesn't want it
-// # else
-// 	template <typename T>
-// 	using is_trivially_destructible = std::has_trivial_destructor<T>;
-// # endif
-// // END workaround for missing is_trivially_destructible
+// BEGIN workaround for missing is_trivially_destructible
+# if defined TR2_OPTIONAL_GCC_4_8_AND_HIGHER___
+    // leave it: it is already there
+# elif defined TR2_OPTIONAL_CLANG_3_4_2_AND_HIGHER_
+    // leave it: it is already there
+# elif defined TR2_OPTIONAL_MSVC_2015_AND_HIGHER___
+    // leave it: it is already there
+# elif defined TR2_OPTIONAL_DISABLE_EMULATION_OF_TYPE_TRAITS
+    // leave it: the user doesn't want it
+# else
+	template <typename T>
+	using is_trivially_destructible = std::has_trivial_destructor<T>;
+# endif
+// END workaround for missing is_trivially_destructible
 
 # if (defined TR2_OPTIONAL_GCC_4_7_AND_HIGHER___)
     // leave it; our metafunctions are already defined.
@@ -197,30 +199,11 @@ template <class T> inline constexpr typename std::remove_reference<T>::type&& co
 }
 
 
-#define TR2_OPTIONAL_ASSERTED_EXPRESSION(CHECK, EXPR) (EXPR)
-// This fails on Travis with OS X and gcc 5.2
-// #if defined NDEBUG
-// # define TR2_OPTIONAL_ASSERTED_EXPRESSION(CHECK, EXPR) (EXPR)
-// #elif defined __clang__ || defined __GNU_LIBRARY__
-// # define TR2_OPTIONAL_ASSERTED_EXPRESSION(CHECK, EXPR) ((CHECK) ? (EXPR) : (fail(#CHECK, __FILE__, __LINE__), (EXPR)))
-//   inline void fail(const char* expr, const char* file, int line)
-//   {
-//     __assert(expr, file, line);
-//   }
-// #elif defined __GNUC__
-// # define TR2_OPTIONAL_ASSERTED_EXPRESSION(CHECK, EXPR) ((CHECK) ? (EXPR) : (fail(#CHECK, __FILE__, __LINE__), (EXPR)))
-//   inline void fail(const char* expr, const char* file, unsigned line)
-//   {
-//     _assert(expr, file, line);
-//   }
-// #elif defined _MSC_VER
-// # define TR2_OPTIONAL_ASSERTED_EXPRESSION(CHECK, EXPR) ((CHECK) ? (EXPR) : ([]{assert(!#CHECK);}(), (EXPR)))
-// #else
-// # error UNSUPPORTED COMPILER
-// #endif
-
-
-
+#if defined NDEBUG
+# define TR2_OPTIONAL_ASSERTED_EXPRESSION(CHECK, EXPR) (EXPR)
+#else
+# define TR2_OPTIONAL_ASSERTED_EXPRESSION(CHECK, EXPR) ((CHECK) ? (EXPR) : ([]{assert(false && #CHECK);}(), (EXPR)))
+#endif
 
 
 namespace detail_
@@ -254,7 +237,7 @@ T* static_addressof(T& ref)
 
 // the call to convert<A>(b) has return type A and converts b to type A iff b decltype(b) is implicitly convertible to A
 template <class U>
-U convert(U v) { return v; }
+constexpr U convert(U v) { return v; }
 
 } // namespace detail
 
@@ -361,8 +344,8 @@ struct constexpr_optional_base
 template <class T>
 using OptionalBase = typename std::conditional<
     is_trivially_destructible<T>::value,
-    constexpr_optional_base<T>,
-    optional_base<T>
+    constexpr_optional_base<typename std::remove_const<T>::type>,
+    optional_base<typename std::remove_const<T>::type>
 >::type;
 
 
@@ -375,7 +358,7 @@ class optional : private OptionalBase<T>
 
 
   constexpr bool initialized() const noexcept { return OptionalBase<T>::init_; }
-  T* dataptr() {  return std::addressof(OptionalBase<T>::storage_.value_); }
+  typename std::remove_const<T>::type* dataptr() {  return std::addressof(OptionalBase<T>::storage_.value_); }
   constexpr const T* dataptr() const { return detail_::static_addressof(OptionalBase<T>::storage_.value_); }
 
 # if OPTIONAL_HAS_THIS_RVALUE_REFS == 1
@@ -417,7 +400,7 @@ public:
   typedef T value_type;
 
   // 20.5.5.1, constructors
-  constexpr optional() noexcept : OptionalBase<T>()  {}
+  constexpr optional() noexcept : OptionalBase<T>() {}
   constexpr optional(nullopt_t) noexcept : OptionalBase<T>() {}
 
   optional(const optional& rhs)
