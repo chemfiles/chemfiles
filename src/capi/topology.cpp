@@ -45,6 +45,13 @@ chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const topology, size_
     )
 }
 
+chfl_status chfl_topology_resize(CHFL_TOPOLOGY* const topology, size_t natoms) {
+    assert(topology != nullptr);
+    CHFL_ERROR_CATCH(
+        topology->resize(natoms);
+    )
+}
+
 chfl_status chfl_topology_append(CHFL_TOPOLOGY* const topology, const CHFL_ATOM* const atom) {
     assert(topology != nullptr);
     assert(atom != nullptr);

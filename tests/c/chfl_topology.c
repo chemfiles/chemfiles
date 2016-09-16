@@ -98,5 +98,19 @@ int main() {
 
     assert(!chfl_topology_free(topology));
 
+
+    topology = chfl_topology();
+    assert(topology != NULL);
+
+    natoms = 100;
+    assert(!chfl_topology_atoms_count(topology, &natoms));
+    assert(natoms == 0);
+
+    assert(!chfl_topology_resize(topology, 42));
+    assert(!chfl_topology_atoms_count(topology, &natoms));
+    assert(natoms == 42);
+
+    assert(!chfl_topology_free(topology));
+
     return EXIT_SUCCESS;
 }

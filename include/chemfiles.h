@@ -348,8 +348,8 @@ CHFL_EXPORT chfl_status chfl_frame_velocities(CHFL_FRAME* const frame,
                                               size_t* size);
 
 /*!
-* @brief Resize the positions and the velocities in frame, to make space for N
-*        atoms.
+* @brief Resize the positions and the velocities in frame, to make space for
+*        `natoms` atoms.
 *
 * This function may invalidate any pointer to the positions or the
 * velocities if the new size is bigger than the old one. In all the cases,
@@ -597,6 +597,16 @@ CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* const fram
 */
 CHFL_EXPORT chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const topology,
                                                   size_t* natoms);
+
+/*!
+* @brief Resize the topology to hold `natoms` atoms, adding `CHFL_ATOM_UNDEFINED`
+*        atoms as needed.
+*
+* @param topology The topology
+* @param natoms The new number of atoms.
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_topology_resize(CHFL_TOPOLOGY* const topology, size_t natoms);
 
 /*!
 * @brief Add an atom at the end of a topology
