@@ -37,9 +37,9 @@ enum class Record {
     // End of file
     END,
     // Ignored records
-    _IGNORED_,
+    IGNORED_,
     // Unknown record type
-    _UNKNOWN_,
+    UNKNOWN_,
 };
 
 // Get the record type for a line.
@@ -88,9 +88,9 @@ void PDBFormat::read(Frame& frame) {
             break;
         case Record::END:
             return; // We have read a frame!
-        case Record::_IGNORED_:
+        case Record::IGNORED_:
             break; // Nothing to do
-        case Record::_UNKNOWN_:
+        case Record::UNKNOWN_:
             Logger::warn("Unknown PDB record: ", line);
             break;
         }
@@ -233,9 +233,9 @@ Record get_record(const std::string& line) {
                rec == "KEYWDS" || rec == "OBSLTE" || rec == "SOURCE" ||
                rec == "SPLIT " || rec == "SPRSDE" || rec == "TITLE " ||
                rec == "JRNL  ") {
-        return Record::_IGNORED_;
+        return Record::IGNORED_;
     } else {
-        return Record::_UNKNOWN_;
+        return Record::UNKNOWN_;
     }
 }
 
