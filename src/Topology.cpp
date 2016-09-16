@@ -114,6 +114,10 @@ void Topology::append(Atom atom) {
     atoms_.emplace_back(std::move(atom));
 }
 
+void Topology::reserve(size_t natoms) {
+    atoms_.reserve(natoms);
+}
+
 void Topology::remove(size_t idx) {
     atoms_.erase(atoms_.begin() + static_cast<ptrdiff_t>(idx));
     auto bonds = connect_.bonds();

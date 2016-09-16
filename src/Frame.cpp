@@ -38,6 +38,14 @@ void Frame::resize(size_t natoms) {
     }
 }
 
+void Frame::reserve(size_t natoms) {
+    topology_.reserve(natoms);
+    positions_.reserve(natoms);
+    if (velocities_) {
+        velocities_->reserve(natoms);
+    }
+}
+
 void Frame::add_velocities() {
     if (!velocities_) {
         velocities_ = Array3D(natoms(), vector3d(0.0, 0.0, 0.0));

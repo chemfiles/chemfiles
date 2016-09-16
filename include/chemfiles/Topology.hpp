@@ -199,6 +199,8 @@ public:
     //! Resize the topology to hold `natoms` atoms, adding `UNDEFINED` atoms
     //! as needed.
     void resize(size_t natoms);
+    //! Reserve size in the topology to store data for `natoms` atoms.
+    void reserve(size_t natoms);
 
     //! Check wether the atoms at indexes `i` and `j` are bonded or not
     bool isbond(size_t i, size_t j) const;

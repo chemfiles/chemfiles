@@ -82,6 +82,11 @@ public:
     //! This function only resize the velocities if the data is present.
     void resize(size_t natoms);
 
+    //! Reserve size in the frame to store data for `natoms` atoms.
+    //! This function only reserve storage for the the velocities if the data
+    //! is present.
+    void reserve(size_t natoms);
+
     //! Add an `atom` at the given `position` and optionally with the given
     //! `velocity`. The `velocity` value will only be used if this frame
     //! contains velocity data.
