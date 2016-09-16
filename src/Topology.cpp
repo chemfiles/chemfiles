@@ -110,8 +110,8 @@ void Topology::resize(size_t natoms) {
     atoms_.resize(natoms, Atom(Atom::UNDEFINED));
 }
 
-void Topology::append(const Atom& atom) {
-    atoms_.push_back(atom);
+void Topology::append(Atom atom) {
+    atoms_.emplace_back(std::move(atom));
 }
 
 void Topology::remove(size_t idx) {

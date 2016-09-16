@@ -180,7 +180,7 @@ public:
     const_iterator cend() const {return atoms_.cend();}
 
     //! Add an atom in the system
-    void append(const Atom& atom);
+    void append(Atom atom);
     //! Delete an atom in the system. If `idx` is out of bounds, do nothing.
     void remove(size_t idx);
     //! Add a bond in the system, between the atoms at index `atom_i` and
