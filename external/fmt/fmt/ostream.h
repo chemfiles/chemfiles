@@ -4,31 +4,13 @@
  Copyright (c) 2012 - 2016, Victor Zverovich
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice, this
-    list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ For the license information refer to format.h.
  */
 
 #ifndef FMT_OSTREAM_H_
 #define FMT_OSTREAM_H_
 
-#include "format.h"
+#include "fmt/format.h"
 #include <ostream>
 
 namespace fmt {
@@ -84,12 +66,15 @@ struct ConvertToIntImpl<T, true> {
     value = sizeof(convert(get<DummyStream>() << get<T>())) == sizeof(No)
   };
 };
+
+// Write the content of w to os.
+void write(std::ostream &os, Writer &w);
 }  // namespace internal
 
 // Formats a value.
 template <typename Char, typename ArgFormatter, typename T>
-void format(BasicFormatter<Char, ArgFormatter> &f,
-            const Char *&format_str, const T &value) {
+void format_arg(BasicFormatter<Char, ArgFormatter> &f,
+                const Char *&format_str, const T &value) {
   internal::MemoryBuffer<Char, internal::INLINE_BUFFER_SIZE> buffer;
 
   internal::FormatBuf<Char> format_buf(buffer);
@@ -112,18 +97,6 @@ void format(BasicFormatter<Char, ArgFormatter> &f,
  */
 FMT_API void print(std::ostream &os, CStringRef format_str, ArgList args);
 FMT_VARIADIC(void, print, std::ostream &, CStringRef)
-
-/**
-  \rst
-  Prints formatted data to the stream *os*.
-
-  **Example**::
-
-    fprintf(cerr, "Don't %s!", "panic");
-  \endrst
- */
-FMT_API int fprintf(std::ostream &os, CStringRef format_str, ArgList args);
-FMT_VARIADIC(int, fprintf, std::ostream &, CStringRef)
 }  // namespace fmt
 
 #ifdef FMT_HEADER_ONLY
