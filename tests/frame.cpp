@@ -30,6 +30,15 @@ TEST_CASE("Frame class usage", "[Frame]"){
         CHECK(frame.positions().size() == 2);
         REQUIRE(frame.velocities());
         CHECK(frame.velocities()->size() == 2);
+
+        frame.add_atom(Atom("H"), vector3d(1, 2, 3), vector3d(4, 5, 6));
+        CHECK(frame.natoms() == 3);
+        CHECK(frame.positions().size() == 3);
+        CHECK(frame.positions()[2] == vector3d(1, 2, 3));
+        REQUIRE(frame.velocities());
+        CHECK(frame.velocities()->size() == 3);
+        CHECK((*frame.velocities())[2] == vector3d(4, 5, 6));
+
     }
 
     SECTION("Positions and velocities"){

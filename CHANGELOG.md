@@ -8,7 +8,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Remove the `Trajectory::sync` and the `chfl_trajectory_sync` functions.
   To ensure that all content of a file is written to the disk, the user need to
   close it.
-* Add missing `chfl_topology_resize` function to C API. 
+* Add missing `chfl_topology_resize` function to C API.
+* Add "Frame::add_atom" function to add an atom and the corresponding position
+  (and velocity) data to a frame.
 
 ## 0.6 (1 July 2016)
 

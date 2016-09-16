@@ -82,6 +82,11 @@ public:
     //! This function only resize the velocities if the data is present.
     void resize(size_t natoms);
 
+    //! Add an `atom` at the given `position` and optionally with the given
+    //! `velocity`. The `velocity` value will only be used if this frame
+    //! contains velocity data.
+    void add_atom(Atom atom, Vector3D position, Vector3D velocity = Vector3D());
+
     //! Get the current simulation step
     size_t step() const { return step_; }
     //! Set the current simulation step

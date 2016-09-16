@@ -111,3 +111,12 @@ void Frame::set_topology(const Topology& topology) {
     }
     topology_ = topology;
 }
+
+void Frame::add_atom(Atom atom, Vector3D position, Vector3D velocity) {
+    topology_.append(std::move(atom));
+    positions_.push_back(position);
+    if (velocities_) {
+        velocities_->push_back(velocity);
+    }
+    assert(natoms() == topology_.natoms());
+}
