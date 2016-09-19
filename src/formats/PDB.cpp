@@ -129,25 +129,21 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line) {
     assert(line.substr(0, 6) == "ATOM  " || line.substr(0, 6) == "HETATM");
 
     if (line.length() < 54) {
-        throw FormatError(line.substr(0, 6) + " record is too small: '" + line +
-                          "'");
+        throw FormatError(
+            line.substr(0, 6) + " record is too small: '" + line + "'"
+        );
     }
 
-    auto i = frame.natoms();
-    frame.resize(i + 1);
-
-    auto name = trim(line.substr(12, 4));
-    auto atom = Atom(name);
-    auto& position = frame.positions()[i];
+    auto atom = Atom(trim(line.substr(12, 4)));
     try {
-        position[0] = std::stof(line.substr(31, 8));
-        position[1] = std::stof(line.substr(38, 8));
-        position[2] = std::stof(line.substr(46, 8));
+        auto x = std::stof(line.substr(31, 8));
+        auto y = std::stof(line.substr(38, 8));
+        auto z = std::stof(line.substr(46, 8));
+
+        frame.add_atom(std::move(atom), {{x, y, z}});
     } catch (std::invalid_argument&) {
         throw FormatError("Could not read positions in record: '" + line + "'");
     }
-
-    frame.topology()[i] = atom;
 }
 
 void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {

@@ -67,8 +67,7 @@ void XYZFormat::read_step(const size_t step, Frame& frame) {
 }
 
 void XYZFormat::read(Frame& frame) {
-    size_t natoms;
-
+    size_t natoms = 0;
     try {
         natoms = std::stoul(textfile_.getline());
         textfile_.getline(); // XYZ comment line;
@@ -76,28 +75,25 @@ void XYZFormat::read(Frame& frame) {
         throw FormatError("Can not read next step: " + std::string(e.what()));
     }
 
-    std::vector<std::string> lines(natoms);
-
+    std::vector<std::string> lines;
     try {
         lines = textfile_.readlines(natoms);
     } catch (const FileError& e) {
         throw FormatError("Can not read file: " + std::string(e.what()));
     }
 
-    frame.resize(natoms);
-    auto positions = frame.positions();
-    auto& topology = frame.topology();
+    frame.reserve(natoms);
+    frame.resize(0);
+
     for (size_t i = 0; i < lines.size(); i++) {
         std::istringstream string_stream;
-        float x, y, z;
+        float x = 0, y = 0, z = 0;
         std::string name;
 
         string_stream.str(lines[i]);
         string_stream >> name >> x >> y >> z;
-        positions[i][0] = x;
-        positions[i][1] = y;
-        positions[i][2] = z;
-        topology[i] = Atom(name);
+
+        frame.add_atom(Atom(name), {{x, y, z}});
     }
 }
 
@@ -110,12 +106,11 @@ void XYZFormat::write(const Frame& frame) {
     textfile_ << "Written by the chemfiles library\n";
 
     for (size_t i = 0; i < frame.natoms(); i++) {
-        auto pos = positions[i];
         auto name = topology[i].name();
-        if (name == "") {
-            name = "X";
-        }
-        textfile_ << name << " " << pos[0] << " " << pos[1] << " " << pos[2]
-                  << "\n";
+        if (name == "") {name = "X";}
+        textfile_ << name << " "
+                  << positions[i][0] << " "
+                  << positions[i][1] << " "
+                  << positions[i][2] << "\n";
     }
 }
