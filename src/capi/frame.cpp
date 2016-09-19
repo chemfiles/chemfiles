@@ -65,6 +65,21 @@ chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vector_t** data,
     )
 }
 
+chfl_status chfl_frame_add_atom(CHFL_FRAME* const frame, const CHFL_ATOM* const atom, chfl_vector_t position, chfl_vector_t velocity) {
+    assert(frame != nullptr);
+    assert(atom != nullptr);
+    assert(position != nullptr);
+    CHFL_ERROR_CATCH(
+        auto pos = vector3d(position[0], position[1], position[2]);
+        if (velocity != nullptr) {
+            auto vel = vector3d(velocity[0], velocity[1], velocity[2]);
+            frame->add_atom(*atom, pos, vel);
+        } else {
+            frame->add_atom(*atom, pos);
+        }
+    )
+}
+
 chfl_status chfl_frame_resize(CHFL_FRAME* const frame, size_t natoms) {
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(

@@ -350,6 +350,22 @@ CHFL_EXPORT chfl_status chfl_frame_velocities(CHFL_FRAME* const frame,
                                               size_t* size);
 
 /*!
+* @brief Add an atom and the corresponding position (and velocity) data to a
+*        frame.
+*
+* @param frame The frame
+* @param atom The atom to add
+* @param position The position of the atom
+* @param velocity The velocity of the atom. This parameter can be `NULL` if no
+*                 velocity is associated with the atom.
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_frame_add_atom(CHFL_FRAME* const frame,
+                                            const CHFL_ATOM* const atom,
+                                            chfl_vector_t position,
+                                            chfl_vector_t velocity);
+
+/*!
 * @brief Resize the positions and the velocities in frame, to make space for
 *        `natoms` atoms.
 *

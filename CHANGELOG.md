@@ -10,7 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   close it.
 * Add missing `chfl_topology_resize` function to C API.
 * Add "Frame::add_atom" function to add an atom and the corresponding position
-  (and velocity) data to a frame.
+  (and velocity) data to a frame, and the C API `chfl_frame_add_atom` function.
 
 ## 0.6 (1 July 2016)
 

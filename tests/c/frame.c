@@ -111,10 +111,35 @@ int main() {
     atom = chfl_atom_from_frame(frame, 1);
     assert(!chfl_atom_name(atom, name, sizeof(name)));
     assert(strcmp(name, "Ar") == 0);
-    chfl_atom_free(atom);
+    assert(!chfl_atom_free(atom));
 
     atom = chfl_atom_from_frame(frame, 10000);
     assert(atom == NULL);
+
+    assert(!chfl_frame_resize(frame, 2));
+    assert(!chfl_frame_atoms_count(frame, &natoms));
+    assert(natoms == 2);
+
+    atom = chfl_atom("U");
+    assert(!chfl_frame_add_atom(frame, atom, (chfl_vector_t){2, 3, 4}, NULL));
+
+    assert(!chfl_frame_atoms_count(frame, &natoms));
+    assert(natoms == 3);
+
+    assert(!chfl_frame_positions(frame, &data, &natoms));
+    assert(natoms == 3);
+    assert(data[2][0] == 2);
+    assert(data[2][1] == 3);
+    assert(data[2][2] == 4);
+
+    assert(!chfl_frame_add_atom(frame, atom, (chfl_vector_t){0}, (chfl_vector_t){1, 2, 1}));
+    assert(!chfl_atom_free(atom));
+
+    assert(!chfl_frame_velocities(frame, &data, &natoms));
+    assert(natoms == 4);
+    assert(data[3][0] == 1);
+    assert(data[3][1] == 2);
+    assert(data[3][2] == 1);
 
     assert(!chfl_frame_free(frame));
 
