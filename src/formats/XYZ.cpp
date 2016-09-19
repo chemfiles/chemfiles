@@ -87,7 +87,7 @@ void XYZFormat::read(Frame& frame) {
 
     for (size_t i = 0; i < lines.size(); i++) {
         std::istringstream string_stream;
-        float x = 0, y = 0, z = 0;
+        double x = 0, y = 0, z = 0;
         std::string element;
 
         string_stream.str(lines[i]);

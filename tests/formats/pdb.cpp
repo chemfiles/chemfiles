@@ -17,8 +17,8 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
 
         CHECK(frame.natoms() == 297);
         auto positions = frame.positions();
-        CHECK(roughly(positions[0], vector3d(0.417f, 8.303f, 11.737f), 1e-3));
-        CHECK(roughly(positions[296], vector3d(6.664f, 11.6148f, 12.961f), 1e-3));
+        CHECK(roughly(positions[0], vector3d(0.417, 8.303, 11.737), 1e-3));
+        CHECK(roughly(positions[296], vector3d(6.664, 11.6148, 12.961), 1e-3));
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
@@ -29,8 +29,8 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
 
         CHECK(frame.natoms() == 297);
         positions = frame.positions();
-        CHECK(roughly(positions[0], vector3d(0.299f, 8.310f, 11.721f), 1e-4));
-        CHECK(roughly(positions[296], vector3d(6.798f, 11.509f, 12.704f), 1e-4));
+        CHECK(roughly(positions[0], vector3d(0.299, 8.310, 11.721), 1e-4));
+        CHECK(roughly(positions[296], vector3d(6.798, 11.509, 12.704), 1e-4));
     }
 
     SECTION("Read bonds") {

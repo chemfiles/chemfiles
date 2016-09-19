@@ -13,29 +13,29 @@ bool operator==(const Matrix3D& lhs, const Matrix3D& rhs) {
 
 
 TEST_CASE("Vector3d", "[types]"){
-    auto u = vector3d(1.0f, 1.0f, 1.0f);
-    auto v = vector3d(-21.0f, 15.0f, 23.5f);
+    auto u = vector3d(1.0, 1.0, 1.0);
+    auto v = vector3d(-21.0, 15.0, 23.5);
 
-    CHECK((u + v) == vector3d(-20.0f, 16.0f, 24.5f));
-    CHECK((u - v) == vector3d(22.0f, -14.0f, -22.5f));
+    CHECK((u + v) == vector3d(-20.0, 16.0, 24.5));
+    CHECK((u - v) == vector3d(22.0, -14.0, -22.5));
 
-    CHECK((3.0 * u) == vector3d(3.0f, 3.0f, 3.0f));
-    CHECK((u / 2.0) == vector3d(0.5f, 0.5f, 0.5f));
+    CHECK((3.0 * u) == vector3d(3.0, 3.0, 3.0));
+    CHECK((u / 2.0) == vector3d(0.5, 0.5, 0.5));
 
     CHECK((v * 4.75) == (4.75 * v));
 }
 
 TEST_CASE("Geometry", "[types]"){
-    auto v = vector3d(1.0f, 1.0f, 1.0f);
+    auto v = vector3d(1.0, 1.0, 1.0);
 
     CHECK(norm(v) == sqrt(3.0));
     CHECK(norm2(v) == 3.0);
 
-    auto u = vector3d(-1.0f, 0.0f, 1.0f);
+    auto u = vector3d(-1.0, 0.0, 1.0);
     CHECK(dot(u, v) == 0.0);
 
-    auto w = vector3d(1.0f, 0.0f, 0.0f);
-    auto k = vector3d(std::cos(1.3f), std::sin(1.3f), 0.0f);
+    auto w = vector3d(1.0, 0.0, 0.0);
+    auto k = vector3d(std::cos(1.3), std::sin(1.3), 0.0);
     CHECK(fabs(dot(w, k) - cos(1.3)) < 1e-7);
 
     CHECK(dot(cross(w, k), k) == 0.0);

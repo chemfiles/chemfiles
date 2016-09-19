@@ -78,7 +78,7 @@ typedef enum {
     CHFL_CXX_ERROR = 6
 } chfl_status;
 
-typedef float chfl_vector_t[3];
+typedef double chfl_vector_t[3];
 
 /*!
 * @brief Get the version of the chemfiles library

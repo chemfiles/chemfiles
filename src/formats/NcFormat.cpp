@@ -204,9 +204,9 @@ void NCFormat::write_array3D(const Array3D& array, const std::string& name) cons
 
     auto data = std::vector<float>(natoms * 3);
     for (size_t i = 0; i < natoms; i++) {
-        data[3 * i + 0] = array[i][0];
-        data[3 * i + 1] = array[i][1];
-        data[3 * i + 2] = array[i][2];
+        data[3 * i + 0] = static_cast<float>(array[i][0]);
+        data[3 * i + 1] = static_cast<float>(array[i][1]);
+        data[3 * i + 2] = static_cast<float>(array[i][2]);
     }
     var.add(start, count, data);
 }

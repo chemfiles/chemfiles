@@ -67,7 +67,7 @@ void Frame::add_velocities() {
 void Frame::guess_topology() {
     topology_.clear_bonds();
     // This bond guessing algorithm comes from VMD
-    double cutoff = 0.833;
+    auto cutoff = 0.833;
     for (size_t i = 0; i < natoms(); i++) {
         auto rad = topology_[i].vdw_radius();
         cutoff = fmax(cutoff, rad);
@@ -75,18 +75,18 @@ void Frame::guess_topology() {
     cutoff = 1.2 * cutoff;
 
     for (size_t i = 0; i < natoms(); i++) {
-        float irad = topology_[i].vdw_radius();
+        auto irad = topology_[i].vdw_radius();
         if (irad == -1) {
             throw Error("Missing Van der Waals radius for the atom " +
                         topology_[i].element());
         }
         for (size_t j = i + 1; j < natoms(); j++) {
-            float jrad = topology_[j].vdw_radius();
+            auto jrad = topology_[j].vdw_radius();
             if (jrad == -1) {
                 throw Error("Missing Van der Waals radius for the atom " +
                             topology_[j].element());
             }
-            double d = norm(cell_.wrap(positions_[i] - positions_[j]));
+            auto d = norm(cell_.wrap(positions_[i] - positions_[j]));
             if (0.03 < d && d < 0.6 * (irad + jrad) && d < cutoff) {
                 topology_.add_bond(i, j);
             }

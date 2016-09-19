@@ -18,8 +18,8 @@ TEST_CASE("Read files in DCD format using Molfile", "[Molfile]"){
     CHECK(frame.natoms() == 297);
 
     auto positions = frame.positions();
-    CHECK(roughly(positions[0], vector3d(0.4172191f, 8.303366f, 11.73717f), eps));
-    CHECK(roughly(positions[296], vector3d(6.664049f, 11.61418f, 12.96149f), eps));
+    CHECK(roughly(positions[0], vector3d(0.4172191, 8.303366, 11.73717), eps));
+    CHECK(roughly(positions[296], vector3d(6.664049, 11.61418, 12.96149), eps));
 
     auto cell = frame.cell();
     CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
@@ -30,6 +30,6 @@ TEST_CASE("Read files in DCD format using Molfile", "[Molfile]"){
     CHECK(frame.natoms() == 297);
 
     positions = frame.positions();
-    CHECK(roughly(positions[0], vector3d(0.2990952f, 8.31003f, 11.72146f), eps));
-    CHECK(roughly(positions[296], vector3d(6.797599f, 11.50882f, 12.70423f), eps));
+    CHECK(roughly(positions[0], vector3d(0.2990952, 8.31003, 11.72146), eps));
+    CHECK(roughly(positions[296], vector3d(6.797599, 11.50882, 12.70423), eps));
 }

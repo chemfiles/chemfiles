@@ -131,12 +131,12 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         UnitCell triclinic_algo(UnitCell::TRICLINIC, 10, 11, 12);
         UnitCell triclinic(10, 11, 12, 90, 90, 80);
         UnitCell tilted(10, 10, 10, 140, 100, 100);
-        auto v = vector3d(22.0f, -15.0f, 5.8f);
+        auto v = vector3d(22.0, -15.0, 5.8);
 
         CHECK(infinite.wrap(v) == v);
-        CHECK(roughly(ortho.wrap(v), vector3d(2.0f, -4.0f, 5.8f), 1e-5));
+        CHECK(roughly(ortho.wrap(v), vector3d(2.0, -4.0, 5.8), 1e-5));
         CHECK(roughly(ortho.wrap(v), triclinic_algo.wrap(v), 1e-5));
-        CHECK(roughly(triclinic.wrap(v), vector3d(3.91013f, -4.16711f, 5.8f), 1e-5));
-        CHECK(roughly(tilted.wrap(vector3d(6, 8, -7)), vector3d(4.26352f, -0.08481f, -1.37679f), 1e-5));
+        CHECK(roughly(triclinic.wrap(v), vector3d(3.91013, -4.16711, 5.8), 1e-5));
+        CHECK(roughly(tilted.wrap(vector3d(6, 8, -7)), vector3d(4.26352, -0.08481, -1.37679), 1e-5));
     }
 }

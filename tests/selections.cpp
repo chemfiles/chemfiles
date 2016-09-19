@@ -194,12 +194,12 @@ Frame testing_frame() {
     topology.add_bond(2, 3);
 
     auto frame = Frame(topology);
-    float i = 0;
+    int i = 0;
     for (auto& pos: frame.positions()) {
         pos[0] = i + 0;
         pos[1] = i + 1;
         pos[2] = i + 2;
-        i += 1;
+        i++;
     }
 
     frame.add_velocities();

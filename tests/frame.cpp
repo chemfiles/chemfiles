@@ -55,16 +55,16 @@ TEST_CASE("Frame class usage", "[Frame]"){
             auto positions = frame.positions();
             auto velocities = frame.velocities();
             for (size_t i=0; i<15; i++) {
-                positions[i] = vector3d(4.f, 3.4f, 1.f);
-                (*velocities)[i] = vector3d(4.f, 3.4f, 1.f);
+                positions[i] = vector3d(4.0, 3.4, 1.0);
+                (*velocities)[i] = vector3d(4.0, 3.4, 1.0);
             }
         }
 
         auto positions = frame.positions();
         auto velocities = frame.velocities();
         for (size_t i=0; i<10; i++){
-            CHECK(positions[i] == vector3d(4.f, 3.4f, 1.f));
-            CHECK((*velocities)[i] == vector3d(4.f, 3.4f, 1.f));
+            CHECK(positions[i] == vector3d(4.0, 3.4, 1.0));
+            CHECK((*velocities)[i] == vector3d(4.0, 3.4, 1.0));
         }
     }
 

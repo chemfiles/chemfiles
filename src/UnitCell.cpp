@@ -160,19 +160,19 @@ void UnitCell::set_gamma(double val) {
 
 // Wrap a vector in an Orthorombic UnitCell
 Vector3D UnitCell::wrap_orthorombic(const Vector3D& vect) const {
-    return Vector3D({{
-        static_cast<float>(vect[0] - round(vect[0] / a_) * a_),
-        static_cast<float>(vect[1] - round(vect[1] / b_) * b_),
-        static_cast<float>(vect[2] - round(vect[2] / c_) * c_)
-    }});
+    return {{
+        vect[0] - round(vect[0] / a_) * a_,
+        vect[1] - round(vect[1] / b_) * b_,
+        vect[2] - round(vect[2] / c_) * c_
+    }};
 }
 
 // Wrap a vector in an Orthorombic UnitCell
 Vector3D UnitCell::wrap_triclinic(const Vector3D& vect) const {
     auto fractional = h_inv_ * vect;
-    fractional[0] -= static_cast<float>(round(fractional[0]));
-    fractional[1] -= static_cast<float>(round(fractional[1]));
-    fractional[2] -= static_cast<float>(round(fractional[2]));
+    fractional[0] -= round(fractional[0]);
+    fractional[1] -= round(fractional[1]);
+    fractional[2] -= round(fractional[2]);
     return h_ * fractional;
 }
 

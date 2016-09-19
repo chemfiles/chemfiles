@@ -18,10 +18,10 @@
 
 namespace chemfiles {
 
-typedef std::array<float, 3> Vector3D;
+typedef std::array<double, 3> Vector3D;
 
 /// Create a Vector3D from the three components `x`, `y`, and `z`.
-inline Vector3D vector3d(float x, float y, float z) {
+inline Vector3D vector3d(double x, double y, double z) {
     return Vector3D{{x, y, z}};
 }
 
@@ -54,34 +54,32 @@ inline double norm(const Vector3D& rhs) {
 
 //! Add two vectors
 inline Vector3D operator+(const Vector3D& lhs, const Vector3D& rhs) {
-    return std::array<float, 3>{
-        {lhs[0] + rhs[0], lhs[1] + rhs[1], lhs[2] + rhs[2]}};
+    return {{lhs[0] + rhs[0], lhs[1] + rhs[1], lhs[2] + rhs[2]}};
 }
 
 //! Substract two vectors
 inline Vector3D operator-(const Vector3D& lhs, const Vector3D& rhs) {
-    return std::array<float, 3>{
-        {lhs[0] - rhs[0], lhs[1] - rhs[1], lhs[2] - rhs[2]}};
+    return {{lhs[0] - rhs[0], lhs[1] - rhs[1], lhs[2] - rhs[2]}};
 }
 
 //! Multiply a vector by a scalar on the right
-inline Vector3D operator*(const Vector3D& lhs, float rhs) {
-    return vector3d(lhs[0] * rhs, lhs[1] * rhs, lhs[2] * rhs);
+inline Vector3D operator*(const Vector3D& lhs, double rhs) {
+    return {{lhs[0] * rhs, lhs[1] * rhs, lhs[2] * rhs}};
 }
 
 //! Multiply a vector by a scalar on the left
-inline Vector3D operator*(float lhs, const Vector3D& rhs) {
-    return vector3d(lhs * rhs[0], lhs * rhs[1], lhs * rhs[2]);
+inline Vector3D operator*(double lhs, const Vector3D& rhs) {
+    return {{lhs * rhs[0], lhs * rhs[1], lhs * rhs[2]}};
 }
 
 //! Divide a vector by a scalar
-inline Vector3D operator/(const Vector3D& lhs, float rhs) {
-    return vector3d(lhs[0] / rhs, lhs[1] / rhs, lhs[2] / rhs);
+inline Vector3D operator/(const Vector3D& lhs, double rhs) {
+    return {{lhs[0] / rhs, lhs[1] / rhs, lhs[2] / rhs}};
 }
 
-// As `std::array<float, 3>` (i.e. Vector3D) is POD, its memory layout is
-// equivalent to a `float[3]` array. So the pointer return by `Array3D::data`
-// is compatible with the C type `(*float)[3]`.
+// As `std::array<double, 3>` (i.e. Vector3D) is POD, its memory layout is
+// equivalent to a `double[3]` array. So the pointer return by `Array3D::data`
+// is compatible with the C type `(*double)[3] == chfl_vector_t`.
 
 //! A vector of `Vector3D`, used as a list of positions or velocities in a
 //! system.
@@ -111,11 +109,9 @@ inline Matrix3D matrix3d() {
 
 //! Multiplication of a vector by a matrix
 inline Vector3D operator*(const Matrix3D& lhs, const Vector3D& rhs) {
-    return vector3d(
-        static_cast<float>(lhs[0][0] * rhs[0] + lhs[0][1] * rhs[1] + lhs[0][2] * rhs[2]),
-        static_cast<float>(lhs[1][0] * rhs[0] + lhs[1][1] * rhs[1] + lhs[1][2] * rhs[2]),
-        static_cast<float>(lhs[2][0] * rhs[0] + lhs[2][1] * rhs[1] + lhs[2][2] * rhs[2])
-    );
+    return {{lhs[0][0] * rhs[0] + lhs[0][1] * rhs[1] + lhs[0][2] * rhs[2],
+             lhs[1][0] * rhs[0] + lhs[1][1] * rhs[1] + lhs[1][2] * rhs[2],
+             lhs[2][0] * rhs[0] + lhs[2][1] * rhs[1] + lhs[2][2] * rhs[2]}};
 }
 
 //! Multiplication of two matrix
