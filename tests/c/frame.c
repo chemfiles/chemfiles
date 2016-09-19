@@ -29,7 +29,7 @@ int main() {
     assert(!chfl_frame_atoms_count(frame, &natoms));
     assert(natoms == 4);
 
-    float (*data)[3] = NULL;
+    chfl_vector_t* data = NULL;
     assert(!chfl_frame_positions(frame, &data, &natoms));
     assert(natoms == 4);
 

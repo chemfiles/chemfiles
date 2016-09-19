@@ -14,7 +14,7 @@ int main(void) {
     if (chfl_trajectory_read(file, frame) != CHFL_SUCCESS) {/*Handle error*/}
 
     size_t natoms = 0;
-    float (*positions)[3] = NULL;
+    chfl_vector_t* positions = NULL;
     chfl_frame_positions(frame, &positions, &natoms);
     indexes = malloc(natoms * sizeof(unsigned));
     if (indexes == NULL) {/*Handle error*/}

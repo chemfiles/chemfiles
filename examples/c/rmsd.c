@@ -22,7 +22,7 @@ int main(void) {
         if(!chfl_trajectory_read(file, frame)) {/*Handle error*/}
 
         size_t natoms = 0;
-        float (*positions)[3] = NULL;
+        chfl_vector_t* positions = NULL;
 
         // Get a pointer to the positions in `positions`. The array `positions`
         // contains natoms entries.

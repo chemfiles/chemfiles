@@ -74,6 +74,8 @@ typedef enum {
     CHFL_CXX_ERROR = 6
 } chfl_status;
 
+typedef float chfl_vector_t[3];
+
 /*!
 * @brief Get the version of the chemfiles library
 * @return A null-terminated string containing the version of Chemfiles.
@@ -316,13 +318,13 @@ CHFL_EXPORT chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame,
 * pointer is invalidated.
 *
 * @param frame The frame
-* @param data A pointer to a pointer to float[3] array, which will point to the
-*             data
+* @param data A pointer to a `chfl_vector_t` array, which will be set to point
+*             to the positions data.
 * @param size A pointer to the an integer to be filled with the array size
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_frame_positions(CHFL_FRAME* const frame,
-                                             float (**data)[3],
+                                             chfl_vector_t** data,
                                              size_t* size);
 
 /*!
@@ -338,13 +340,13 @@ CHFL_EXPORT chfl_status chfl_frame_positions(CHFL_FRAME* const frame,
 * this function.
 *
 * @param frame The frame
-* @param data A pointer to a pointer to float[3] array, which will point to the
-*             data
+* @param data A pointer to a `chfl_vector_t` array, which will be set to point
+*             to the velocity data.
 * @param size A pointer to the an integer to be filled with the array size
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_frame_velocities(CHFL_FRAME* const frame,
-                                              float (**data)[3],
+                                              chfl_vector_t** data,
                                               size_t* size);
 
 /*!

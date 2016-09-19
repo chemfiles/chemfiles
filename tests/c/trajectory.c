@@ -42,9 +42,9 @@ static void test_read() {
     assert(!chfl_frame_atoms_count(frame, &natoms));
     assert(natoms == 297);
 
-    float positions_0[3] = {0.417219f, 8.303366f, 11.737172f};
-    float positions_124[3] = {5.099554f, -0.045104f, 14.153846f};
-    float (*positions)[3] = NULL;
+    chfl_vector_t positions_0 = {0.417219f, 8.303366f, 11.737172f};
+    chfl_vector_t positions_124 = {5.099554f, -0.045104f, 14.153846f};
+    chfl_vector_t* positions = NULL;
 
     // Check for the error when requesting non-existent velocities
     assert(chfl_frame_velocities(frame, &positions, &natoms) != CHFL_SUCCESS);
@@ -198,7 +198,7 @@ static void test_write() {
     CHFL_FRAME* frame = chfl_frame(4);
     assert(frame != NULL);
 
-    float (*positions)[3] = NULL;
+    chfl_vector_t* positions = NULL;
     size_t natoms = 0;
     assert(!chfl_frame_positions(frame, &positions, &natoms));
     assert(natoms == 4);

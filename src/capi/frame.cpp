@@ -31,21 +31,29 @@ chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame, size_t *natoms
     )
 }
 
-chfl_status chfl_frame_positions(CHFL_FRAME* const frame, float (**data)[3], size_t* size) {
+chfl_status chfl_frame_positions(CHFL_FRAME* const frame, chfl_vector_t** data, size_t* size) {
     assert(frame != nullptr);
     assert(data != nullptr);
     assert(size != nullptr);
+    static_assert(
+        sizeof(chfl_vector_t) == sizeof(Vector3D),
+        "Wrong size for chfl_vector_t. It should match Vector3D."
+    );
     CHFL_ERROR_CATCH(
         auto positions = frame->positions();
         *size = positions.size();
-        *data = reinterpret_cast<float(*)[3]>(positions.data());
+        *data = reinterpret_cast<chfl_vector_t*>(positions.data());
     )
 }
 
-chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, float (**data)[3], size_t* size) {
+chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vector_t** data, size_t* size) {
     assert(frame != nullptr);
     assert(data != nullptr);
     assert(size != nullptr);
+    static_assert(
+        sizeof(chfl_vector_t) == sizeof(Vector3D),
+        "Wrong size for chfl_vector_t. It should match Vector3D."
+    );
     if (!frame->velocities()) {
         chemfiles::CAPI_LAST_ERROR = "No velocities in this frame!";
         return CHFL_MEMORY_ERROR;
@@ -53,7 +61,7 @@ chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, float (**data)[3], si
     CHFL_ERROR_CATCH(
         auto velocities = frame->velocities();
         *size = velocities->size();
-        *data = reinterpret_cast<float(*)[3]>(velocities->data());
+        *data = reinterpret_cast<chfl_vector_t*>(velocities->data());
     )
 }
 
