@@ -65,9 +65,13 @@ endif()
 
 # Set a default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to 'release' as none was specified.")
-  set(CMAKE_BUILD_TYPE "release" CACHE STRING "Type of build: release|debug|relwithdebuginfo" FORCE)
+    message(STATUS "Setting build type to 'release' as none was specified.")
+    set(CMAKE_BUILD_TYPE "release"
+        CACHE STRING
+        "Choose the type of build, options are: none(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) debug release relwithdebinfo minsizerel."
+    FORCE)
 endif()
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS release debug relwithdebuginfo minsizerel none)
 
 if(${CHFL_DEBUG_GLIBCXX})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_DEBUG")
