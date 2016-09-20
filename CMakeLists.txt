@@ -94,23 +94,28 @@ endif()
 
 configure_file (
   "${PROJECT_SOURCE_DIR}/include/chemfiles/config.in.hpp"
-  "${PROJECT_SOURCE_DIR}/include/chemfiles/config.hpp"
+  "${PROJECT_BINARY_DIR}/include/chemfiles/config.hpp"
 )
 
 include(GenerateExportHeader)
 generate_export_header(chemfiles
     BASE_NAME CHFL
-    EXPORT_FILE_NAME ${PROJECT_SOURCE_DIR}/include/chemfiles/exports.hpp
+    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/chemfiles/exports.hpp
 )
+
+target_include_directories(chemfiles PUBLIC ${PROJECT_BINARY_DIR}/include)
 
 #----------------------------------------------------------------------------------------#
 # Installation configuration
 #----------------------------------------------------------------------------------------#
 
-file(GLOB_RECURSE headers include/chemfiles/*.hpp)
+file(GLOB_RECURSE CHFL_HEADERS
+    include/chemfiles/*.hpp
+    ${PROJECT_BINARY_DIR}/include/chemfiles/*.hpp
+)
 
 # All headers
-install(FILES ${headers} DESTINATION include/chemfiles/)
+install(FILES ${CHFL_HEADERS} DESTINATION include/chemfiles/)
 # C++ main headers
 install(FILES include/chemfiles.hpp DESTINATION include)
 # C main header
@@ -127,11 +132,11 @@ configure_file(
 
 add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${PROJECT_BINARY_DIR}/uninstall.cmake)
 
-# Testing
-enable_testing()
 if(CHFL_BUILD_DOCUMENTATION)
     add_subdirectory(doc)
 endif()
+
+enable_testing()
 if(CHFL_BUILD_TESTS)
     add_subdirectory(tests)
     add_subdirectory(examples)

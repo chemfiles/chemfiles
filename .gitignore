@@ -1,4 +1,1 @@
 build
-# CMake generated file
-include/chemfiles/config.hpp
-include/chemfiles/exports.hpp
