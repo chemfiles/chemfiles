@@ -44,10 +44,10 @@ public:
     //! Default is to create an UNDEFINED atom type with no name
     Atom();
 
+    Atom(Atom&&) = default;
+    Atom& operator=(Atom&&) = default;
     Atom(const Atom&) = default;
     Atom& operator=(const Atom&) = default;
-
-    ~Atom() = default;
 
     //! Get a const (non-modifiable) reference to the atom name
     const std::string& name() const { return name_; }

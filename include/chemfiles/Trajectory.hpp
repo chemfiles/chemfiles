@@ -51,6 +51,9 @@ public:
     Trajectory& operator=(Trajectory&&);
     ~Trajectory();
 
+    Trajectory(const Trajectory&) = delete;
+    Trajectory& operator=(const Trajectory&) = delete;
+
     //! Read the next frame in the trajectory
     Frame read();
     //! Read a single frame at specific step from the trajectory

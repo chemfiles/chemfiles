@@ -35,6 +35,11 @@ struct CHFL_EXPORT Bond {
         return data_[0] == other[0] && data_[1] == other[1];
     }
 
+    Bond(Bond&&) = default;
+    Bond& operator=(Bond&&) = default;
+    Bond(const Bond&) = default;
+    Bond& operator=(const Bond&) = default;
+
 private:
     std::array<size_t, 2> data_;
 };
@@ -56,6 +61,11 @@ struct CHFL_EXPORT Angle {
         return data_[0] == other[0] && data_[1] == other[1] &&
                data_[2] == other[2];
     }
+
+    Angle(Angle&&) = default;
+    Angle& operator=(Angle&&) = default;
+    Angle(const Angle&) = default;
+    Angle& operator=(const Angle&) = default;
 
 private:
     std::array<size_t, 3> data_;
@@ -88,6 +98,11 @@ struct CHFL_EXPORT Dihedral {
         return data_[0] == other[0] && data_[1] == other[1] &&
                data_[2] == other[2] && data_[3] == other[3];
     }
+
+    Dihedral(Dihedral&&) = default;
+    Dihedral& operator=(Dihedral&&) = default;
+    Dihedral(const Dihedral&) = default;
+    Dihedral& operator=(const Dihedral&) = default;
 
 private:
     std::array<size_t, 4> data_;
@@ -133,6 +148,11 @@ public:
     void add_bond(size_t i, size_t j);
     //! Remove any bond between the atoms `i` and `j`
     void remove_bond(size_t i, size_t j);
+
+    Connectivity(Connectivity&&) = default;
+    Connectivity& operator=(Connectivity&&) = default;
+    Connectivity(const Connectivity&) = default;
+    Connectivity& operator=(const Connectivity&) = default;
 
 private:
     //! Bonds in the system
