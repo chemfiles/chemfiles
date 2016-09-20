@@ -70,7 +70,7 @@ void PDBFormat::read_step(const size_t step, Frame& frame) {
 }
 
 void PDBFormat::read(Frame& frame) {
-    assert(frame.natoms() == 0);
+    frame.resize(0);
     std::string line;
     while (!textfile_.eof()) {
         line = textfile_.getline();
@@ -144,6 +144,8 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line) {
     } catch (std::invalid_argument&) {
         throw FormatError("Could not read positions in record: '" + line + "'");
     }
+
+
 }
 
 void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
