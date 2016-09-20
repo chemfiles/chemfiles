@@ -44,6 +44,18 @@ public:
     //! as unit cell. `cell` default to an `INFINITE` unit cell.
     explicit Frame(Topology topology, UnitCell cell = UnitCell());
 
+    Frame(Frame&&) = default;
+    Frame& operator=(Frame&&) = default;
+
+    Frame(const Frame&) = delete;
+    Frame& operator=(const Frame&) = delete;
+
+    //! Get a clone (exact copy) of this frame.
+    //!
+    //! This replace the implicit copy constructor (which is disabled) to
+    //! make an explicit copy of the frame.
+    Frame clone() const;
+
     //! Get a modifiable reference to the positions
     Span3D positions() { return positions_; }
     //! Get a const (non modifiable) reference to the positions

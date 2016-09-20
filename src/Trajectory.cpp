@@ -131,7 +131,7 @@ void Trajectory::write(const Frame& frame) {
 
     // Maybe that is not the better way to do this, performance-wise. I'll have
     // to benchmark this part.
-    Frame frame_copy = frame;
+    Frame frame_copy = frame.clone();
     if (custom_topology_) {
         frame_copy.set_topology(*custom_topology_);
     }
