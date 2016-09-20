@@ -71,9 +71,10 @@ void PDBFormat::read_step(const size_t step, Frame& frame) {
 
 void PDBFormat::read(Frame& frame) {
     frame.resize(0);
-    std::string line;
+    residues_.clear();
+
     while (!textfile_.eof()) {
-        line = textfile_.getline();
+        auto line = textfile_.getline();
         auto record = get_record(line);
         switch (record) {
         case Record::CRYST1:
@@ -87,13 +88,20 @@ void PDBFormat::read(Frame& frame) {
             read_CONECT(frame, line);
             break;
         case Record::END:
-            return; // We have read a frame!
+            goto end; // We have read a frame!
         case Record::IGNORED_:
             break; // Nothing to do
         case Record::UNKNOWN_:
             Logger::warn("Unknown PDB record: ", line);
             break;
         }
+    }
+
+    // If we are here, we got EOF before an END record
+    Logger::warn("Missing END record in PDB file");
+end:
+    for (auto& residue: residues_) {
+        frame.topology().add_residue(residue.second);
     }
 }
 
@@ -145,6 +153,21 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line) {
         throw FormatError("Could not read positions in record: '" + line + "'");
     }
 
+    auto atom_id = frame.natoms() - 1;
+    try {
+        auto resid = std::stoul(line.substr(22, 4));
+        if (residues_.find(resid) == residues_.end()) {
+            auto name = trim(line.substr(17, 3));
+            Residue residue(std::move(name), resid);
+            residue.add_atom(atom_id);
+            residues_.insert({resid, residue});
+        } else {
+            // Just add this atom to the residue
+            residues_.at(resid).add_atom(atom_id);
+        }
+    } catch (std::invalid_argument&) {
+        Logger::debug("No residue information in record '", line, "'");
+    }
 
 }
 

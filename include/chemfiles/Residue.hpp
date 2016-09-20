@@ -53,7 +53,7 @@ public:
 
     /// Add an atom with index `i` to this residue
     void add_atom(size_t i);
-    /// CHeck if the residue contains a given atom with index `i`
+    /// Check if the residue contains a given atom with index `i`
     bool contains(size_t i) const;
 
     using const_iterator = sorted_set<size_t>::const_iterator;

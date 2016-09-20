@@ -62,6 +62,28 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
         Trajectory file(PDBDIR "cryst1.pdb");
         Frame frame = file.read();
     }
+
+    SECTION("Read residue information") {
+        Trajectory file(PDBDIR "water.pdb");
+        Frame frame = file.read();
+
+        CHECK(frame.topology().residues().size() == 99);
+
+        REQUIRE(frame.topology().residue(1));
+        auto residue = (*frame.topology().residue(1));
+        CHECK(residue.size() == 3);
+        CHECK(residue.contains(0));
+        CHECK(residue.contains(1));
+        CHECK(residue.contains(2));
+
+        file = Trajectory(PDBDIR "MOF-5.pdb");
+        frame = file.read();
+
+        CHECK(frame.topology().residues().size() == 1);
+        residue = frame.topology().residues()[0];
+        CHECK(residue.size() == frame.natoms());
+        CHECK(residue.name() == "LIG");
+    }
 }
 
 TEST_CASE("Write files in PDB format", "[PDB]"){
