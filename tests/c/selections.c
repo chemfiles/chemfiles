@@ -4,10 +4,10 @@
 #include <stdlib.h>
 
 #include "chemfiles.h"
-#include "crashs.h"
+#include "helpers.h"
 
-CHFL_FRAME* testing_frame();
-bool find_match(const chfl_match_t* matches, size_t n_matches, chfl_match_t match);
+static CHFL_FRAME* testing_frame();
+static bool find_match(const chfl_match_t* matches, size_t n_matches, chfl_match_t match);
 
 int main() {
     silent_crash_handlers();
@@ -83,7 +83,7 @@ int main() {
     return EXIT_SUCCESS;
 }
 
-CHFL_FRAME* testing_frame() {
+static CHFL_FRAME* testing_frame() {
     CHFL_TOPOLOGY* topology = chfl_topology();
     CHFL_ATOM* O = chfl_atom("O");
     CHFL_ATOM* H = chfl_atom("H");
@@ -109,7 +109,7 @@ CHFL_FRAME* testing_frame() {
     return frame;
 }
 
-bool find_match(const chfl_match_t* matches, size_t n_matches, chfl_match_t match) {
+static bool find_match(const chfl_match_t* matches, size_t n_matches, chfl_match_t match) {
     assert(matches != NULL);
     for (size_t i=0; i<n_matches; i++) {
         assert(matches[i].size == match.size);

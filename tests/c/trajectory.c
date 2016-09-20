@@ -7,12 +7,10 @@
 #include <stdio.h>
 
 #include "chemfiles.h"
-#include "crashs.h"
+#include "helpers.h"
 
 #define DATADIR SRCDIR "/data/xyz/"
 
-// Read a whole file at once
-static char* read_whole_file(const char* name);
 static void test_read();
 static void test_write();
 
@@ -164,26 +162,21 @@ static void test_read() {
 
 /******************************************************************************/
 
-#if (defined(WIN32) || defined(WIN64))
-#define EOL "\r\n"
-#else
-#define EOL "\n"
-#endif
 const char* expected_content =
-"4" EOL
-"Written by the chemfiles library" EOL
-"He 1 2 3" EOL
-"He 1 2 3" EOL
-"He 1 2 3" EOL
-"He 1 2 3" EOL
-                               "6" EOL
-                               "Written by the chemfiles library" EOL
-                               "He 4 5 6" EOL
-                               "He 4 5 6" EOL
-                               "He 4 5 6" EOL
-                               "He 4 5 6" EOL
-                               "He 4 5 6" EOL
-                               "He 4 5 6" EOL;
+"4\n"
+"Written by the chemfiles library\n"
+"He 1 2 3\n"
+"He 1 2 3\n"
+"He 1 2 3\n"
+"He 1 2 3\n"
+"6\n"
+"Written by the chemfiles library\n"
+"He 4 5 6\n"
+"He 4 5 6\n"
+"He 4 5 6\n"
+"He 4 5 6\n"
+"He 4 5 6\n"
+"He 4 5 6\n";
 
 
 static void test_write() {
@@ -240,26 +233,4 @@ static void test_write() {
     free(content);
 
     remove("test-tmp.xyz");
-}
-
-/******************************************************************************/
-
-static char* read_whole_file(const char* name) {
-    char *buffer = NULL;
-    FILE *file = fopen(name, "rb");
-
-    if (file != NULL){
-        fseek(file, 0L, SEEK_END);
-        size_t s = (size_t)ftell(file);
-        rewind(file);
-        buffer = (char*)malloc(sizeof(char)*(s+1));
-
-        if (buffer != NULL){
-            fread(buffer, s, 1, file);
-            buffer[s] = '\0';
-        }
-    }
-
-    fclose(file);
-    return buffer;
 }

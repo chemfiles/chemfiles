@@ -6,16 +6,8 @@
 #include <stdio.h>
 
 #include "chemfiles.h"
-#include "crashs.h"
+#include "helpers.h"
 
-#if (defined(WIN32) || defined(WIN64))
-#define EOL "\r\n"
-#else
-#define EOL "\n"
-#endif
-
-// Read a whole file at once
-char* read_whole_file(FILE* file);
 // Global variables for access from callback and main
 char* buffer;
 chfl_log_level_t last_level;
@@ -50,8 +42,8 @@ int main() {
     assert(chfl_trajectory_open("noformat", 'r') == NULL);
     assert(!chfl_log_stderr());
 
-    char* content = read_whole_file(file);
-    assert(strcmp(content, "Chemfiles error: Can not find a format associated with the \"\" extension." EOL) == 0);
+    char* content = read_whole_file("test.log");
+    assert(strcmp(content, "Chemfiles error: Can not find a format associated with the \"\" extension.\n") == 0);
 
     free(content);
     fclose(file);
@@ -71,9 +63,7 @@ int main() {
     assert(!chfl_clear_errors());
     assert(strcmp(chfl_last_error(), "") == 0);
 
-    file = fopen(SRCDIR "/../VERSION", "r");
-    assert(file != NULL);
-    char* version = read_whole_file(file);
+    char* version = read_whole_file(SRCDIR "/../VERSION");
     assert(version != NULL);
     // Remove the trailing \n
     version[strlen(version) - 1] = 0;
@@ -81,25 +71,6 @@ int main() {
     assert(strstr(chfl_version(), version) != NULL);
 
     free(version);
-    fclose(file);
 
     return EXIT_SUCCESS;
-}
-
-char* read_whole_file(FILE* file) {
-    char *content = NULL;
-
-    if (file != NULL){
-        fseek(file, 0L, SEEK_END);
-        size_t size = (size_t)ftell(file);
-        rewind(file);
-        content = (char*)malloc(sizeof(char)*(size + 1));
-
-        if (content != NULL){
-            fread(content, size, 1, file);
-            content[size] = '\0';
-        }
-    }
-
-    return content;
 }

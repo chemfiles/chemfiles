@@ -1,5 +1,5 @@
-#ifndef CHEMFILES_CRASHS_HANDLERS_HPP
-#define CHEMFILES_CRASHS_HANDLERS_HPP
+#ifndef CHEMFILES_TESTS_HELPERS_H
+#define CHEMFILES_TESTS_HELPERS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,6 +10,9 @@ extern "C" {
 //
 // On UNIX, does nothing
 void silent_crash_handlers(void);
+
+// Read a whole file at once, normalizing lines ending to '\n'
+char* read_whole_file(const char* path);
 
 #ifdef __cplusplus
 }

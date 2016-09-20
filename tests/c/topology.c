@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 #include "chemfiles.h"
-#include "crashs.h"
+#include "helpers.h"
 
 int main() {
     silent_crash_handlers();
