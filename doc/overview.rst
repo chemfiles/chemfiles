@@ -3,13 +3,13 @@
 Chemfiles features overview
 ===========================
 
-This figure represent how the basic classs of chemfiles are arganised and how they
-interact together. The only classs a chemfiles user should worry about are the
-``Trajectory``, ``Frame``, ``Topology``, ``Atom``, ``UnitCell`` and ``Selection``.
-All of these are described in this section.
+This figure represent how the basic classs of chemfiles are arganised and how
+they interact together. The only classs a chemfiles user should worry about are
+the ``Trajectory``, ``Frame``, ``Topology``, ``Residue``, ``Atom``, ``UnitCell``
+and ``Selection``. All of these are described in this section.
 
-They are various way of interacting with these classes, all of them being described
-in the :ref:`classes-reference` section for the C++ interface.
+They are various way of interacting with these classes, all of them being
+described in the :ref:`classes-reference` section for the C++ interface.
 
 .. _overview-trajectory:
 
@@ -44,6 +44,16 @@ A ``Topology`` describes the organisation of the particles in the system.
 What are they names, how are they bonded together, … A topology is mainly a list
 of ``Atom`` in the system.
 
+.. _overview-residue:
+
+Residue: molecular-sized units
+------------------------------
+
+A ``Residue`` is a group of atoms bonded together, which may or may not
+correspond to molecules. When working with bio-molecules and specifically
+proteins from the PDB data bank, the residues should correspond to amino-acids
+in the protein.
+
 .. _overview-atom:
 
 Atom: building blocks for simulations
@@ -66,14 +76,15 @@ The ``UnitCell`` class describe the boundary conditions of the system: where are
 the boundaries, and what is the periodicity of theses boundaries. An unit cell
 can be of three types: *Infinite*, *Orthorombic* or *Triclinic*. Inifinite cells
 does not have any boundaries. Orthorombic cells are defined by three orthogonals
-vectors, and Triclinic cells are defined by three vectors without any constrains.
+vectors, and Triclinic cells are defined by three vectors without any
+constrains.
 
 .. _overview-selection:
 
 Selections: selecting groups of atoms
 -------------------------------------
 
-Chemfiles provides a :ref:`selection language <selection-language>`, implemented in
-the ``Selection`` class. This selection language allow the users to select a group of
-atoms using a simple string. Examples of selections are ``"name H"`` and ``"(x < 45
-and name O) or name C"``. 
+Chemfiles provides a :ref:`selection language <selection-language>`, implemented
+in the ``Selection`` class. This selection language allow the users to select a
+group of atoms using a simple string. Examples of selections are ``"name H"``
+and ``"(x < 45 and name O) or name C"``.
