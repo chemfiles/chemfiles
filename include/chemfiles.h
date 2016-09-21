@@ -942,7 +942,7 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* const topolo
 * @param mass The atom mass
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_mass(const CHFL_ATOM* const atom, float* mass);
+CHFL_EXPORT chfl_status chfl_atom_mass(const CHFL_ATOM* const atom, double* mass);
 
 /*!
 * @brief Set the mass of an atom, in atomic mass units
@@ -950,7 +950,7 @@ CHFL_EXPORT chfl_status chfl_atom_mass(const CHFL_ATOM* const atom, float* mass)
 * @param mass The new atom mass
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_set_mass(CHFL_ATOM* const atom, float mass);
+CHFL_EXPORT chfl_status chfl_atom_set_mass(CHFL_ATOM* const atom, double mass);
 
 /*!
 * @brief Get the charge of an atom, in number of the electron charge e
@@ -958,7 +958,7 @@ CHFL_EXPORT chfl_status chfl_atom_set_mass(CHFL_ATOM* const atom, float mass);
 * @param charge The atom charge
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_charge(const CHFL_ATOM* const atom, float* charge);
+CHFL_EXPORT chfl_status chfl_atom_charge(const CHFL_ATOM* const atom, double* charge);
 
 /*!
 * @brief Set the charge of an atom, in number of the electron charge e
@@ -966,7 +966,7 @@ CHFL_EXPORT chfl_status chfl_atom_charge(const CHFL_ATOM* const atom, float* cha
 * @param charge The new atom charge
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, float charge);
+CHFL_EXPORT chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, double charge);
 
 /*!
 * @brief Get the element name of an atom

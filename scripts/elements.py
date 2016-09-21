@@ -23,7 +23,7 @@ class Atom:
         self.VdW = VdW
 
     def __str__(self):
-        return '{{"{}", ElementData{{{}, "{}", {}f, {}f, {}f}} }}'.format(
+        return '{{"{}", ElementData{{{}, "{}", {}, {}, {}}} }}'.format(
             self.symbol, self.number, self.name, self.mass, self.cov, self.VdW)
 
 
@@ -64,8 +64,8 @@ HEADER = """/* Chemfiles, an efficient IO library for chemistry file formats
  * http://svn.code.sf.net/p/bodr/code/trunk/bodr
  */
 
-#ifndef HARP_PERIODIC_H
-#define HARP_PERIODIC_H
+#ifndef CHEMFILES_PERIODIC_HPP
+#define CHEMFILES_PERIODIC_HPP
 
 #include <map>
 #include <string>
@@ -81,11 +81,11 @@ struct ElementData {
     //! Full name
     const char* name;
     //! Mass in atomic units
-    const float mass;
+    const double mass;
     //! Covalent radius in Angstrom
-    const float colvalent_radius;
+    const double colvalent_radius;
     //! Van der Waals radius in Angstrom
-    const float vdw_radius;
+    const double vdw_radius;
 };
 """
 

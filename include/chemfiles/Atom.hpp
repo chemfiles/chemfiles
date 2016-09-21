@@ -56,9 +56,9 @@ public:
     //! Get a const (non-modifiable) reference to the atom label
     const std::string& label() const { return label_; }
     //! Get the atom mass
-    float mass() const { return mass_; }
+    double mass() const { return mass_; }
     //! Get the atom charge
-    float charge() const { return charge_; }
+    double charge() const { return charge_; }
     //! Get the atom type
     AtomType type() const { return type_; }
 
@@ -67,9 +67,9 @@ public:
     //! Set the atom label
     void set_label(const std::string& label) { label_ = label; }
     //! Set the atom mass
-    void set_mass(float mass) { mass_ = mass; }
+    void set_mass(double mass) { mass_ = mass; }
     //! Set the atom charge
-    void set_charge(float charge) { charge_ = charge; }
+    void set_charge(double charge) { charge_ = charge; }
     //! Set the atom type
     void set_type(AtomType type) { type_ = type; }
 
@@ -78,10 +78,10 @@ public:
     std::string full_name() const;
     //! Try to get the Van der Waals of the atom. Returns -1 if it can not be
     //! found.
-    float vdw_radius() const;
+    double vdw_radius() const;
     //! Try to get the covalent radius of the atom. Returns -1 if it can not be
     //! found.
-    float covalent_radius() const;
+    double covalent_radius() const;
     //! Try to get the atomic number, if defined. Returns -1 if it can not be
     //! found.
     int atomic_number() const;
@@ -89,8 +89,8 @@ public:
 private:
     std::string element_;
     std::string label_;
-    float mass_ = 0;
-    float charge_ = 0;
+    double mass_ = 0;
+    double charge_ = 0;
     AtomType type_;
 };
 

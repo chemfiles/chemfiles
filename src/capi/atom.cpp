@@ -59,7 +59,7 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_atom_mass(const CHFL_ATOM* const atom, float* mass) {
+chfl_status chfl_atom_mass(const CHFL_ATOM* const atom, double* mass) {
     assert(atom != nullptr);
     assert(mass != nullptr);
     CHFL_ERROR_CATCH(
@@ -67,14 +67,14 @@ chfl_status chfl_atom_mass(const CHFL_ATOM* const atom, float* mass) {
     )
 }
 
-chfl_status chfl_atom_set_mass(CHFL_ATOM* const atom, float mass) {
+chfl_status chfl_atom_set_mass(CHFL_ATOM* const atom, double mass) {
     assert(atom != nullptr);
     CHFL_ERROR_CATCH(
         atom->set_mass(mass);
     )
 }
 
-chfl_status chfl_atom_charge(const CHFL_ATOM* const atom, float* charge) {
+chfl_status chfl_atom_charge(const CHFL_ATOM* const atom, double* charge) {
     assert(atom != nullptr);
     assert(charge != nullptr);
     CHFL_ERROR_CATCH(
@@ -82,7 +82,7 @@ chfl_status chfl_atom_charge(const CHFL_ATOM* const atom, float* charge) {
     )
 }
 
-chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, float charge) {
+chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, double charge) {
     assert(atom != nullptr);
     CHFL_ERROR_CATCH(
         atom->set_charge(charge);

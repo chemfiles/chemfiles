@@ -74,14 +74,14 @@ std::string Atom::full_name() const {
     return "";
 }
 
-float Atom::vdw_radius() const {
+double Atom::vdw_radius() const {
     if (PERIODIC_INFORMATION.find(element_) != PERIODIC_INFORMATION.end()) {
         return PERIODIC_INFORMATION.at(element_).vdw_radius;
     }
     return -1;
 }
 
-float Atom::covalent_radius() const {
+double Atom::covalent_radius() const {
     if (PERIODIC_INFORMATION.find(element_) != PERIODIC_INFORMATION.end()) {
         return PERIODIC_INFORMATION.at(element_).colvalent_radius;
     }

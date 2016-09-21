@@ -17,7 +17,7 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
     SECTION("Check constructors"){
         CHECK(a1.element() == "H");
         CHECK(a1.label() == "H");
-        CHECK(a1.mass() == 1.008f);
+        CHECK(a1.mass() == 1.008);
         CHECK(a1.type() == Atom::ELEMENT);
         CHECK(a1.charge() == 0);
 
@@ -36,7 +36,7 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
         CHECK(a5.type() == Atom::ELEMENT);
         CHECK(a5.element() == "C");
         CHECK(a5.label() == "CB");
-        CHECK(a5.mass() == 12.011f);
+        CHECK(a5.mass() == 12.011);
         CHECK(a5.charge() == 0);
 
         CHECK(a6.type() == Atom::COARSE_GRAINED);
@@ -48,7 +48,7 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
         CHECK(a7.type() == Atom::ELEMENT);
         CHECK(a7.element() == "Na");
         CHECK(a7.label() == "Na");
-        CHECK(a7.mass() == 22.98976928f);
+        CHECK(a7.mass() == 22.98976928);
         CHECK(a7.charge() == 0);
     }
 
@@ -56,8 +56,8 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
         a1.set_type(Atom::DUMMY);
         CHECK(a1.type() == Atom::DUMMY);
 
-        a1.set_mass(14.789f);
-        CHECK(a1.mass() == 14.789f);
+        a1.set_mass(14.789);
+        CHECK(a1.mass() == 14.789);
 
         a1.set_charge(-2);
         CHECK(a1.charge() == -2);
@@ -65,26 +65,18 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
         a1.set_element("foo");
         CHECK(a1.element() == "foo");
 
-        a5.set_type(Atom::DUMMY);
-        CHECK(a5.type() == Atom::DUMMY);
-        a5.set_mass(14.789f);
-        CHECK(a5.mass() == 14.789f);
-        a5.set_charge(-2);
-        CHECK(a5.charge() == -2);
-        a5.set_element("foo");
-        CHECK(a5.element() == "foo");
-        a5.set_label("HE22");
-        CHECK(a5.label() == "HE22");
+        a1.set_label("HE22");
+        CHECK(a1.label() == "HE22");
 
-        CHECK(a4.mass() == 183.84f);
+        CHECK(a4.mass() == 183.84);
         CHECK(a4.atomic_number() == 74);
         CHECK(a4.full_name() == "Tungsten");
-        CHECK(a4.covalent_radius() == 1.46f);
-        CHECK(a4.vdw_radius() == 2.1f);
+        CHECK(a4.covalent_radius() == 1.46);
+        CHECK(a4.vdw_radius() == 2.1);
 
         CHECK(a3.atomic_number() == -1);
         CHECK(a3.full_name() == "");
-        CHECK(a3.covalent_radius() == -1.0f);
-        CHECK(a3.vdw_radius() == -1.0f);
+        CHECK(a3.covalent_radius() == -1.0);
+        CHECK(a3.vdw_radius() == -1.0);
     }
 }
