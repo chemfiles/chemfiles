@@ -13,10 +13,11 @@
 #include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
-CHFL_CELL* chfl_cell(double a, double b, double c) {
+CHFL_CELL* chfl_cell(const chfl_vector_t lenghts) {
+    assert(lenghts != nullptr);
     CHFL_CELL* cell = nullptr;
     CHFL_ERROR_GOTO(
-        cell = new UnitCell(a, b, c);
+        cell = new UnitCell(lenghts[0], lenghts[1], lenghts[2]);
     )
     return cell;
 error:
@@ -24,10 +25,15 @@ error:
     return nullptr;
 }
 
-CHFL_CELL* chfl_cell_triclinic(double a, double b, double c, double alpha, double beta, double gamma) {
+CHFL_CELL* chfl_cell_triclinic(const chfl_vector_t lenghts, const chfl_vector_t angles) {
+    assert(lenghts != nullptr);
+    assert(angles != nullptr);
     CHFL_CELL* cell = nullptr;
     CHFL_ERROR_GOTO(
-        cell = new UnitCell(a, b, c, alpha, beta, gamma);
+        cell = new UnitCell(
+            lenghts[0], lenghts[1], lenghts[2],
+            angles[0], angles[1], angles[2]
+        );
     )
     return cell;
 error:
@@ -56,49 +62,46 @@ chfl_status chfl_cell_volume(const CHFL_CELL* const cell, double* volume) {
     )
 }
 
-chfl_status chfl_cell_lengths(const CHFL_CELL* const cell, double* a, double* b, double* c) {
+chfl_status chfl_cell_lengths(const CHFL_CELL* const cell, chfl_vector_t lenghts) {
     assert(cell != nullptr);
-    assert(a != nullptr);
-    assert(b != nullptr);
-    assert(c != nullptr);
+    assert(lenghts != nullptr);
     CHFL_ERROR_CATCH(
-        *a = cell->a();
-        *b = cell->b();
-        *c = cell->c();
+        lenghts[0] = cell->a();
+        lenghts[1] = cell->b();
+        lenghts[2] = cell->c();
     )
 }
 
-chfl_status chfl_cell_set_lengths(CHFL_CELL* const cell, double a, double b, double c) {
+chfl_status chfl_cell_set_lengths(CHFL_CELL* const cell, const chfl_vector_t lenghts) {
     assert(cell != nullptr);
+    assert(lenghts != nullptr);
     CHFL_ERROR_CATCH(
-        cell->set_a(a);
-        cell->set_b(b);
-        cell->set_c(c);
+        cell->set_a(lenghts[0]);
+        cell->set_b(lenghts[1]);
+        cell->set_c(lenghts[2]);
     )
 }
 
-chfl_status chfl_cell_angles(const CHFL_CELL* const cell, double* alpha, double* beta, double* gamma) {
+chfl_status chfl_cell_angles(const CHFL_CELL* const cell, chfl_vector_t angles) {
     assert(cell != nullptr);
-    assert(alpha != nullptr);
-    assert(beta != nullptr);
-    assert(gamma != nullptr);
+    assert(angles != nullptr);
     CHFL_ERROR_CATCH(
-        *alpha = cell->alpha();
-        *beta = cell->beta();
-        *gamma = cell->gamma();
+        angles[0] = cell->alpha();
+        angles[1] = cell->beta();
+        angles[2] = cell->gamma();
     )
 }
 
-chfl_status chfl_cell_set_angles(CHFL_CELL* const cell, double alpha, double beta, double gamma) {
+chfl_status chfl_cell_set_angles(CHFL_CELL* const cell, const chfl_vector_t angles) {
     assert(cell != nullptr);
     CHFL_ERROR_CATCH(
-        cell->set_alpha(alpha);
-        cell->set_beta(beta);
-        cell->set_gamma(gamma);
+        cell->set_alpha(angles[0]);
+        cell->set_beta(angles[1]);
+        cell->set_gamma(angles[2]);
     )
 }
 
-chfl_status chfl_cell_matrix(const CHFL_CELL* const cell, double (*matrix)[3]) {
+chfl_status chfl_cell_matrix(const CHFL_CELL* const cell, chfl_vector_t matrix[3]) {
     assert(cell != nullptr);
     assert(matrix != nullptr);
     CHFL_ERROR_CATCH(

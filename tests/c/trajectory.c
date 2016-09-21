@@ -71,7 +71,7 @@ static void test_read() {
     assert(!chfl_topology_free(topology));
 
     // Set the cell associated with a trajectory
-    CHFL_CELL* cell = chfl_cell(30, 30, 30);
+    CHFL_CELL* cell = chfl_cell((chfl_vector_t){30, 30, 30});
     assert(!chfl_trajectory_set_cell(file, cell));
     assert(!chfl_cell_free(cell));
 
@@ -80,11 +80,11 @@ static void test_read() {
 
     // Check that the cell was set
     cell = chfl_cell_from_frame(frame);
-    double a=0, b=0, c=0;
-    assert(!chfl_cell_lengths(cell, &a, &b, &c));
-    assert(a == 30.0);
-    assert(b == 30.0);
-    assert(c == 30.0);
+    chfl_vector_t lengths = {0};
+    assert(!chfl_cell_lengths(cell, lengths));
+    assert(lengths[0] == 30.0);
+    assert(lengths[1] == 30.0);
+    assert(lengths[2] == 30.0);
     assert(!chfl_cell_free(cell));
 
     positions_0[0] = 0.761277;  positions_0[1] = 8.106125;   positions_0[2] = 10.622949;

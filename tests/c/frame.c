@@ -70,15 +70,15 @@ int main() {
     }
 
     /*********************/
-    CHFL_CELL* cell = chfl_cell(3, 4, 5);
+    CHFL_CELL* cell = chfl_cell((chfl_vector_t){3, 4, 5});
     assert(!chfl_frame_set_cell(frame, cell));
     chfl_cell_free(cell);
     cell = chfl_cell_from_frame(frame);
-    double a, b, c;
-    assert(!chfl_cell_lengths(cell, &a, &b, &c));
-    assert(fabs(a - 3.0) < 1e-9);
-    assert(fabs(b - 4.0) < 1e-9);
-    assert(fabs(c - 5.0) < 1e-9);
+    chfl_vector_t lengths = {0};
+    assert(!chfl_cell_lengths(cell, lengths));
+    assert(fabs(lengths[0] - 3.0) < 1e-9);
+    assert(fabs(lengths[1] - 4.0) < 1e-9);
+    assert(fabs(lengths[2] - 5.0) < 1e-9);
     chfl_cell_free(cell);
     /*********************/
 

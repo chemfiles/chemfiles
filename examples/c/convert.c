@@ -10,7 +10,7 @@ int main(void) {
     CHFL_TRAJECTORY* input = chfl_trajectory_open("water.xyz", 'r');
 
     // Set the unit cell to an orthorombic cell with lengths of 20, 15 and 35 A
-    CHFL_CELL* cell = chfl_cell(20, 15, 35);
+    CHFL_CELL* cell = chfl_cell((chfl_vector_t){20, 15, 35});
     chfl_trajectory_set_cell(input, cell);
     chfl_cell_free(cell);
 
