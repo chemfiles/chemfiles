@@ -1,6 +1,6 @@
 .. _overview:
 
-Chemfiles features overview
+Chemfiles classes overview
 ===========================
 
 This figure represent how the basic classs of chemfiles are arganised and how
@@ -11,66 +11,31 @@ and ``Selection``. All of these are described in this section.
 They are various way of interacting with these classes, all of them being
 described in the :ref:`classes-reference` section for the C++ interface.
 
-.. _overview-trajectory:
+.. image:: /static/img/classes.*
+    :align: center
 
-Trajectory: the main entry point
---------------------------------
+A ``Trajectory`` is the main entry point of chemfiles. It read one or many
+``Frame`` from a file on the disk using a specific format. The file type and the
+format are automatically determined from the extention.
 
-A ``Trajectory`` uses a file and a format together to read simulation data from
-the file. It can read and write one or many ``Frame`` to this file. The file
-type and the format are automatically determined from the extention.
+A ``Frame`` holds data for one step of a simulation, consisting in the positions
+for all the atoms; optionally the velocities for all the atoms; the ``Topology``
+and the ``UnitCell`` of the system.
 
-.. _overview-frame:
+The ``Topology`` describes the organisation of the particles in the system. It
+contains a list of ``Atom`` in the system, and informations about which atoms
+are bonded together. A ``Residue`` is a group of atoms bonded together, which
+may or may not correspond to molecules. When working with bio-molecules and
+specifically proteins from the PDB data bank, the residues should correspond to
+amino-acids in the protein.
 
-Frame: data from a simulation step
-----------------------------------
-
-A ``Frame`` holds data for one step of a simulation. As not all formats provides
-all the types of informations, some fields may be initialized to a default value.
-
-A ``Frame`` may contains the following data:
-
-* Positions for all the atoms in the system;
-* Velocities for all the atoms in the system;
-* The ``Topology`` of the system;
-* The ``UnitCell`` of the system.
-
-.. _overview-topology:
-
-Topology: how are the atoms organised
--------------------------------------
-
-A ``Topology`` describes the organisation of the particles in the system.
-What are they names, how are they bonded together, … A topology is mainly a list
-of ``Atom`` in the system.
-
-.. _overview-residue:
-
-Residue: molecular-sized units
-------------------------------
-
-A ``Residue`` is a group of atoms bonded together, which may or may not
-correspond to molecules. When working with bio-molecules and specifically
-proteins from the PDB data bank, the residues should correspond to amino-acids
-in the protein.
-
-.. _overview-atom:
-
-Atom: building blocks for simulations
--------------------------------------
-
-The ``Atom`` class contains basic information about the atoms in the system:
-the name (if it is disponible), mass, kind of atom and so on. Atoms are not
-limited to plain chemical elements. Four types of atoms are defined: *Element*
-are Atoms from the periodic classification; *coarse grained* atoms are particles
-taking together more than one element (*CH4* or *H2O* are examples); *Dummy*
-atoms are fictitous points associated with some data, like the fourth site in
-the TIP4P model of water; and *Undefined* atoms are all the other atoms types.
-
-.. _overview-cell:
-
-UnitCell: wrapping the atoms together
--------------------------------------
+The ``Atom`` class contains basic information about the atoms in the system: the
+name (if it is disponible), mass, kind of atom and so on. Atoms are not limited
+to plain chemical elements. Four types of atoms are defined: *Element* are Atoms
+from the periodic classification; *coarse grained* atoms are particles taking
+together more than one element (*CH4* or *H2O* are examples); *Dummy* atoms are
+fictitous points associated with some data, like the fourth site in the TIP4P
+model of water; and *Undefined* atoms are all the other atoms types.
 
 The ``UnitCell`` class describe the boundary conditions of the system: where are
 the boundaries, and what is the periodicity of theses boundaries. An unit cell
@@ -79,12 +44,7 @@ does not have any boundaries. Orthorombic cells are defined by three orthogonals
 vectors, and Triclinic cells are defined by three vectors without any
 constrains.
 
-.. _overview-selection:
-
-Selections: selecting groups of atoms
--------------------------------------
-
-Chemfiles provides a :ref:`selection language <selection-language>`, implemented
-in the ``Selection`` class. This selection language allow the users to select a
-group of atoms using a simple string. Examples of selections are ``"name H"``
-and ``"(x < 45 and name O) or name C"``.
+Chemfiles also provides a :ref:`selection language <selection-language>`,
+implemented in the ``Selection`` class. This selection language allow the users
+to select a group of atoms from a ``Frame`` using a selection string. Examples
+of selections strings are ``"name H"`` and ``"(x < 45 and name O) or name C"``.

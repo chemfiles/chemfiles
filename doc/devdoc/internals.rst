@@ -19,12 +19,9 @@ Classes organisation
 --------------------
 
 Chemfiles is written in C++11, in an object-oriented fashion. A ``Trajectory``
-is built on the top of two other private classes: a :ref:`File <file-class>` and
-a :ref:`Format <format-class>`. These are pure abstract class defining the
+is built on the top of two other private classes: a :ref:`File <class-File>` and
+a :ref:`Format <class-Format>`. These are pure abstract class defining the
 interface for reading and writing data.
-
-.. image:: /static/img/classes.*
-    :align: center
 
 Adding new formats and tweaking behaviour of existing formats should be done
 either in the ``File`` implementation for everything related to interactions

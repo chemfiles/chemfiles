@@ -1,3 +1,5 @@
+.. _class-UnitCell:
+
 Unit Cell
 =========
 

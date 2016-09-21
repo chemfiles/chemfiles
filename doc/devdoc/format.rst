@@ -1,4 +1,4 @@
-.. _format-class:
+.. _class-Format:
 
 ``Format`` classes
 ==================
@@ -6,7 +6,8 @@
 Abstract class
 --------------
 
-This classe only define the interface, which as to be implemented by all formats.
+This classe define the ``Format`` interface, which has to be implemented in
+formats.
 
 .. doxygenclass:: chemfiles::Format
     :members:

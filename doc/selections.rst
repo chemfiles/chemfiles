@@ -4,7 +4,7 @@ Selection language
 ==================
 
 Chemfiles selection language allows to select some atoms in a :ref:`Frame
-<overview-frame>` matching a set of constraints. For examples, ``atom: name H
+<class-Frame>` matching a set of constraints. For examples, ``atom: name H
 and x > 15`` would select all *single atoms* whose name is ``H`` and x
 coordinate is bigger than 15.
 
