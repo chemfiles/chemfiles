@@ -36,9 +36,22 @@ inline std::string trim(const std::string& str) {
     return (back <= front ? std::string() : std::string(front, back));
 }
 
-#define unreachable() do {                                                     \
-    Logger::error("Entered unreachable code at ", __FILE__, ":", __LINE__);    \
-    abort();                                                                   \
-} while (false)
+#ifndef __has_builtin
+  #define __has_builtin(x) 0
+#endif
+
+#if __has_builtin(__builtin_unreachable)
+    #define unreachable() __builtin_unreachable()
+#elif GCC_VERSION >= 40500
+    #define unreachable() __builtin_unreachable()
+#elif defined(_MSC_VER)
+    #define unreachable() __assume(false)
+#else
+    #define unreachable() do {                                                     \
+        Logger::error("Entered unreachable code at ", __FILE__, ":", __LINE__);    \
+        abort();                                                                   \
+    } while (false)
+#endif
+
 
 #endif
