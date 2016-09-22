@@ -183,6 +183,36 @@ chfl_status chfl_topology_remove_bond(CHFL_TOPOLOGY* const topology, size_t i, s
     )
 }
 
+chfl_status chfl_topology_residues_count(const CHFL_TOPOLOGY* const topology, size_t* residues) {
+    assert(topology != nullptr);
+    assert(residues != nullptr);
+    CHFL_ERROR_CATCH(
+        *residues = topology->residues().size();
+    )
+}
+
+chfl_status chfl_topology_add_residue(CHFL_TOPOLOGY* const topology, const CHFL_RESIDUE* const residue) {
+    assert(topology != nullptr);
+    assert(residue != nullptr);
+    CHFL_ERROR_CATCH(
+        topology->add_residue(*residue);
+    )
+}
+
+chfl_status chfl_topology_are_linked(CHFL_TOPOLOGY* const topology,
+                                    const CHFL_RESIDUE* const res_1,
+                                    const CHFL_RESIDUE* const res_2,
+                                    bool* result) {
+    assert(topology != nullptr);
+    assert(res_1 != nullptr);
+    assert(res_2 != nullptr);
+    assert(result != nullptr);
+    CHFL_ERROR_CATCH(
+        *result = topology->are_linked(*res_1, *res_2);
+    )
+}
+
+
 chfl_status chfl_topology_free(CHFL_TOPOLOGY* topology) {
     delete topology;
     topology = nullptr;

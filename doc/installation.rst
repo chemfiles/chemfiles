@@ -123,28 +123,27 @@ The :command:`cmake` step can be further configured by using the curse-based GUI
 (:command:`ccmake .`) or providing some command-line arguments. Here are the
 most important options:
 
-+------------------------------------+---------------------+------------------------------+
-| Option                             | Default value       | Effect/Informations          |
-+====================================+=====================+==============================+
-| ``-DCMAKE_INSTALL_PREFIX=prefix``  | :file:`/usr/local`  | Set the installation prefix  |
-|                                    |                     | to ``prefix``                |
-|                                    |                     |                              |
-+------------------------------------+---------------------+------------------------------+
-| ``-DCMAKE_BUILD_TYPE=type``        | ``release``         | Set to ``debug`` for debug   |
-|                                    |                     | informations                 |
-+------------------------------------+---------------------+------------------------------+
-| ``-DBUILD_SHARED_LIBS=ON|OFF``     | ``OFF``             | Build shared library instead |
-|                                    |                     | of static one.               |
-+------------------------------------+---------------------+------------------------------+
-| ``-DCHFL_BUILD_DOCUMENTATION=ON|OFF``   | ``OFF``             | Build the documentation.     |
-|                                    |                     | This needs `sphinx`_ and     |
-|                                    |                     | `doxygen`_ to be installed   |
-+------------------------------------+---------------------+------------------------------+
-| ``-DCHFL_BUILD_TESTS=ON|OFF``           | ``OFF``             | Build the test suite.        |
-+------------------------------------+---------------------+------------------------------+
-| ``-DCHFL_ENABLE_NETCDF=ON|OFF``         | ``OFF``             | Enable the Amber NetCDF      |
-|                                    |                     | format                       |
-+------------------------------------+---------------------+------------------------------+
++---------------------------------------+---------------------+------------------------------+
+| Option                                | Default value       | Effect/Informations          |
++=======================================+=====================+==============================+
+| ``-DCMAKE_INSTALL_PREFIX=prefix``     | :file:`/usr/local`  | Set the installation prefix  |
+|                                       |                     | to ``prefix``                |
++---------------------------------------+---------------------+------------------------------+
+| ``-DCMAKE_BUILD_TYPE=type``           | ``release``         | Set to ``debug`` for debug   |
+|                                       |                     | informations                 |
++---------------------------------------+---------------------+------------------------------+
+| ``-DBUILD_SHARED_LIBS=ON|OFF``        | ``OFF``             | Build shared library instead |
+|                                       |                     | of static one.               |
++---------------------------------------+---------------------+------------------------------+
+| ``-DCHFL_BUILD_DOCUMENTATION=ON|OFF`` | ``OFF``             | Build the documentation.     |
+|                                       |                     | This needs `sphinx`_ and     |
+|                                       |                     | `doxygen`_ to be installed   |
++---------------------------------------+---------------------+------------------------------+
+| ``-DCHFL_BUILD_TESTS=ON|OFF``         | ``OFF``             | Build the test suite.        |
++---------------------------------------+---------------------+------------------------------+
+| ``-DCHFL_ENABLE_NETCDF=ON|OFF``       | ``OFF``             | Enable the Amber NetCDF      |
+|                                       |                     | format                       |
++---------------------------------------+---------------------+------------------------------+
 
 For instance, to install to :file:`$HOME/local`, use:
 

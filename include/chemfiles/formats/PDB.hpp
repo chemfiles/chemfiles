@@ -10,8 +10,10 @@
 #define CHEMFILES_FORMAT_PDB_HPP
 
 #include <string>
+#include <unordered_map>
 
 #include "chemfiles/Format.hpp"
+#include "chemfiles/Residue.hpp"
 #include "chemfiles/TrajectoryFactory.hpp"
 
 namespace chemfiles {
@@ -48,6 +50,8 @@ private:
     void read_CONECT(Frame& frame, const std::string& line);
 
     TextFile& textfile_;
+    /// Map of residues, indexed by residue id.
+    std::unordered_map<size_t, Residue> residues_;
 };
 
 } // namespace chemfiles

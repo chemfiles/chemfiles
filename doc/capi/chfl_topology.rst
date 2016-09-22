@@ -35,4 +35,8 @@ Function manipulating ``CHFL_TOPOLOGY``
 
 .. doxygenfunction:: chfl_topology_remove_bond
 
+.. doxygenfunction:: chfl_topology_add_residue
+
+.. doxygenfunction:: chfl_topology_residues_count
+
 .. doxygenfunction:: chfl_topology_free

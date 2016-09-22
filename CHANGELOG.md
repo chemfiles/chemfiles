@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+* Add a public `Residue` class to C++ and C API to represent residue data.
+  Residues are groups of atoms bonded together, which may or may not correspond
+  to molecules; and are often used for bio-molecules.
 * Remove the `Trajectory::sync` and the `chfl_trajectory_sync` functions.
   To ensure that all content of a file is written to the disk, the user need to
   close it.

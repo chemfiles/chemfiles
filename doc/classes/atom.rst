@@ -1,5 +1,7 @@
-Atoms and atomic informations
-=============================
+.. _class-Atom:
+
+Atoms
+=====
 
 .. doxygenclass:: chemfiles::Atom
     :members:

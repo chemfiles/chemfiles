@@ -1,0 +1,88 @@
+/* Chemfiles, an efficient IO library for chemistry file formats
+ * Copyright (C) 2015 Guillaume Fraux
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, rhs. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/
+*/
+
+#ifndef CHEMFILES_SORTED_SET_HPP
+#define CHEMFILES_SORTED_SET_HPP
+
+#include <vector>
+#include <algorithm>
+
+namespace chemfiles {
+
+/// A set backed by a sorted vector, using binary search to insert/remove
+/// values. This class follow the STL interface of `std::set`.
+template<class T>
+class sorted_set final: private std::vector<T> {
+    using super = std::vector<T>;
+public:
+    using const_iterator = typename super::const_iterator;
+    using iterator = typename super::const_iterator;
+    using value_type = typename super::value_type;
+
+    sorted_set(): super() {}
+    sorted_set(const sorted_set&) = default;
+    sorted_set& operator=(const sorted_set&) = default;
+    sorted_set(sorted_set&&) = default;
+    sorted_set& operator=(sorted_set&&) = default;
+
+    using super::operator[];
+    using super::cbegin;
+    using super::cend;
+    using super::crbegin;
+    using super::crend;
+    const_iterator begin() const {return super::begin();}
+    const_iterator end() const {return super::end();}
+    const_iterator rbegin() const {return super::rbegin();}
+    const_iterator rend() const {return super::rend();}
+
+    using super::empty;
+    using super::size;
+    using super::max_size;
+    using super::clear;
+    using super::erase;
+
+    std::pair<iterator, bool> insert(const value_type& value) {
+        auto it = std::lower_bound(super::begin(), super::end(), value);
+        if (it == super::end() || *it != value) {
+            it = super::insert(it, value);
+            return std::pair<iterator, bool>(it, false);
+        } else {
+            // Do nothing, we found the value
+            return std::pair<iterator, bool>(it, false);
+        }
+    }
+
+    std::pair<iterator, bool> insert(value_type&& value) {
+        auto it = std::lower_bound(super::begin(), super::end(), value);
+        if (it == super::end() || *it != value) {
+            it = super::insert(it, std::move(value));
+            return std::pair<iterator, bool>(it, false);
+        } else {
+            // Do nothing, we found the value
+            return std::pair<iterator, bool>(it, false);
+        }
+    }
+
+    template<class... Args>
+    std::pair<iterator, bool> emplace(Args&&... args) {
+        return insert(std::move(T(std::forward<Args...>(args...))));
+    }
+
+    iterator find(const T& value) const {
+        auto it = std::lower_bound(begin(), end(), value);
+        if (it == end() || *it != value) {
+            return end();
+        } else {
+            return it;
+        }
+    }
+};
+
+} // namespace chemfiles
+
+#endif

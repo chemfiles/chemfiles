@@ -31,6 +31,7 @@
         class Atom;
         class UnitCell;
         class Topology;
+        class Residue;
     }
     struct CAPISelection;
     typedef chemfiles::Trajectory CHFL_TRAJECTORY;
@@ -38,6 +39,7 @@
     typedef chemfiles::Atom CHFL_ATOM;
     typedef chemfiles::UnitCell CHFL_CELL;
     typedef chemfiles::Topology CHFL_TOPOLOGY;
+    typedef chemfiles::Residue CHFL_RESIDUE;
     typedef CAPISelection CHFL_SELECTION;
 #else
     #include <stdbool.h>
@@ -52,6 +54,8 @@
     typedef struct CHFL_CELL CHFL_CELL;
     //! Opaque type handling a topology
     typedef struct CHFL_TOPOLOGY CHFL_TOPOLOGY;
+    //! Opaque type handling a residue
+    typedef struct CHFL_RESIDUE CHFL_RESIDUE;
     //! Opaque type handling a selection
     typedef struct CHFL_SELECTION CHFL_SELECTION;
 #endif
@@ -777,11 +781,131 @@ CHFL_EXPORT chfl_status chfl_topology_remove_bond(CHFL_TOPOLOGY* const topology,
                                                   size_t j);
 
 /*!
+* @brief Get the number of residues in the system
+* @param topology The topology
+* @param residues The number of residues
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_topology_residues_count(const CHFL_TOPOLOGY* const topology,
+                                                     size_t* residues);
+
+/*!
+* @brief Add a residue to this topology
+* @param topology The topology
+* @param residue The new residue
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_topology_add_residue(CHFL_TOPOLOGY* const topology,
+                                                  const CHFL_RESIDUE* const residue);
+
+/*!
+* @brief Check if two residues are linked together, i.e. if there is a bond
+*        between one atom in the first residue and one atom in the second one.
+* @param topology The topology
+* @param res_1 The first residue
+* @param res_2 The second residue
+* @param result true if the residues are linked, false otherwise
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_topology_are_linked(CHFL_TOPOLOGY* const topology,
+                                                 const CHFL_RESIDUE* const res_1,
+                                                 const CHFL_RESIDUE* const res_2,
+                                                 bool* result);
+
+/*!
 * @brief Destroy a topology, and free the associated memory
 * @param topology The topology to destroy
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_topology_free(CHFL_TOPOLOGY* topology);
+
+/******************************************************************************/
+
+/*!
+* @brief Create a new residue
+* @param name The residue name
+* @param resid The residue identifier, or `size_t(-1)` if the residue do not
+*              have an identifier
+* @return The status code
+*/
+CHFL_EXPORT CHFL_RESIDUE* chfl_residue(const char* name, size_t resid);
+
+/*!
+* @brief Get a residue from a topology
+* @param topology The topology
+* @param i The residue index in the topology. This is not always the same as
+*          the `resid`. This value should be between 0 and the result of
+*          `chfl_topology_residues_count`.
+* @return The status code
+*/
+CHFL_EXPORT CHFL_RESIDUE* chfl_residue_from_topology(const CHFL_TOPOLOGY* const topology,
+                                                     size_t i);
+
+/*!
+* @brief Get a the residue containing a given atom, or NULL if the atom is not
+*        in a residue.
+* @param topology The topology
+* @param i The atom index
+* @return The status code
+*/
+CHFL_EXPORT CHFL_RESIDUE* chfl_residue_for_atom(const CHFL_TOPOLOGY* const topology,
+                                                size_t i);
+
+/*!
+* @brief Get the number of atoms in a residue
+* @param residue The residue
+* @param size The size of the residue
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_residue_atoms_count(const CHFL_RESIDUE* const residue,
+                                                 size_t* size);
+
+/*!
+* @brief Get the identifier of a residue in the initial topology file
+* @param residue The residue
+* @param id The id of the residue
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_residue_id(const CHFL_RESIDUE* const residue,
+                                        size_t* id);
+
+/*!
+* @brief Get the name of a residue
+* @param residue The residue
+* @param name A string buffer to be filled with the name
+* @param buffsize The size of the string buffer
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_residue_name(const CHFL_RESIDUE* const residue,
+                                          char* name,
+                                          size_t buffsize);
+
+/*!
+* @brief Add the atom at index `i` in the residue
+* @param residue The residue
+* @param i The atomic index
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_residue_add_atom(CHFL_RESIDUE* const residue,
+                                              size_t i);
+
+/*!
+* @brief Check if the atom at index `i` is in the residue
+* @param residue The residue
+* @param i The atomic index
+* @param result true if the atom is in the residue, false otherwise
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_residue_contains(const CHFL_RESIDUE* const residue,
+                                              size_t i,
+                                              bool* result);
+
+/*!
+* @brief Destroy a residue, and free the associated memory
+* @param residue The residue to destroy
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_residue_free(CHFL_RESIDUE* residue);
 
 /******************************************************************************/
 

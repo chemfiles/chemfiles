@@ -17,11 +17,6 @@
 
 namespace chemfiles {
 
-//! Function type to create a format
-typedef std::unique_ptr<Format> (*format_creator_t)(File& f);
-//! Function type to create a file
-typedef std::unique_ptr<File> (*file_creator_t)(const std::string& path, File::Mode mode);
-
 //! Function to create a file
 template <class file_t>
 std::unique_ptr<File> new_file(const std::string& path, File::Mode mode) {
@@ -45,12 +40,14 @@ template <class format_t> std::unique_ptr<Format> new_format(File& file) {
     }
 
 /*!
-* @class trajectory_builder TrajectoryFactory.hpp
+* @class trajectory_builder_t TrajectoryFactory.hpp
 * @brief Structure associating format and file classes builder functions.
 */
 struct trajectory_builder_t {
-    format_creator_t format_creator;
-    file_creator_t file_creator;
+    //! Function to create the `Format`
+    std::unique_ptr<Format> (*format_creator)(File& file);
+    //! Function to create the `File`
+    std::unique_ptr<File> (*file_creator)(const std::string& path, File::Mode mode);
 };
 
 //! Files extensions to trajectory builder associations

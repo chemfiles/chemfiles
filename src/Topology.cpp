@@ -5,98 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-#include <algorithm>
-#include <cstddef>
 
 #include "chemfiles/Error.hpp"
 #include "chemfiles/Topology.hpp"
 
 using namespace chemfiles;
-
-void Connectivity::recalculate() const {
-    angles_.clear();
-    dihedrals_.clear();
-    for (auto const& bond1 : bonds_) {
-        // Find angles
-        for (auto const& bond2 : bonds_) {
-            if (bond1 == bond2) {
-                continue;
-            }
-            // Initializing angle to an invalid value
-            Angle angle1(static_cast<size_t>(-1), static_cast<size_t>(-2),
-                         static_cast<size_t>(-3));
-            if (bond1[0] == bond2[1]) {
-                angle1 = Angle(bond2[0], bond2[1], bond1[1]);
-                angles_.insert(angle1);
-            } else if (bond1[1] == bond2[0]) {
-                angle1 = Angle(bond1[0], bond1[1], bond2[1]);
-                angles_.insert(angle1);
-            } else if (bond1[1] == bond2[1]) {
-                angle1 = Angle(bond1[0], bond1[1], bond2[0]);
-                angles_.insert(angle1);
-            } else if (bond1[0] == bond2[0]) {
-                angle1 = Angle(bond1[1], bond1[0], bond2[1]);
-                angles_.insert(angle1);
-            } else {
-                // We will not find any dihedral angle from these bonds
-                continue;
-            }
-            // Find dihedral angles
-            for (auto const& bond3 : bonds_) {
-                if (bond2 == bond3) {
-                    continue;
-                }
-
-                if (angle1[2] == bond3[0] && angle1[1] != bond3[1]) {
-                    dihedrals_.emplace(angle1[0], angle1[1], angle1[2],
-                                       bond3[1]);
-                } else if (angle1[0] == bond3[1] && angle1[1] != bond3[0]) {
-                    dihedrals_.emplace(bond3[0], angle1[0], angle1[1],
-                                       angle1[2]);
-                } else if (angle1[2] == bond3[0] || angle1[2] == bond3[1]) {
-                    // TODO this is an improper dihedral
-                }
-            }
-        }
-    }
-    uptodate = true;
-}
-
-const std::unordered_set<Bond>& Connectivity::bonds() const {
-    if (!uptodate) {
-        recalculate();
-    }
-    return bonds_;
-}
-
-const std::unordered_set<Angle>& Connectivity::angles() const {
-    if (!uptodate) {
-        recalculate();
-    }
-    return angles_;
-}
-
-const std::unordered_set<Dihedral>& Connectivity::dihedrals() const {
-    if (!uptodate) {
-        recalculate();
-    }
-    return dihedrals_;
-}
-
-void Connectivity::add_bond(size_t i, size_t j) {
-    uptodate = false;
-    bonds_.emplace(i, j);
-}
-
-void Connectivity::remove_bond(size_t i, size_t j) {
-    auto pos = bonds_.find(Bond(i, j));
-    if (pos != bonds_.end()) {
-        uptodate = false;
-        bonds_.erase(pos);
-    }
-}
-
-/******************************************************************************/
 
 void Topology::resize(size_t natoms) {
     for (auto bond : bonds()) {
@@ -119,7 +32,7 @@ void Topology::reserve(size_t natoms) {
 }
 
 void Topology::remove(size_t idx) {
-    atoms_.erase(atoms_.begin() + static_cast<ptrdiff_t>(idx));
+    atoms_.erase(atoms_.begin() + static_cast<std::ptrdiff_t>(idx));
     auto bonds = connect_.bonds();
     for (auto& bond : bonds) {
         if (bond[0] == idx || bond[1] == idx) {
@@ -162,4 +75,43 @@ bool Topology::isdihedral(size_t i, size_t j, size_t k, size_t m) const {
     auto dihedrals = connect_.dihedrals();
     auto pos = dihedrals.find(Dihedral(i, j, k, m));
     return pos != dihedrals.end();
+}
+
+void Topology::add_residue(Residue residue) {
+    for (auto i: residue) {
+        auto it = residue_mapping_.find(i);
+        if (it != residue_mapping_.end()) {
+            auto resid = residues_[it->second].id();
+            throw Error(
+                "Can not add this residue: atom " + std::to_string(i) +
+                " is already in the residue " + std::to_string(resid)
+            );
+        }
+    }
+    auto resid = residues_.size();
+    residues_.emplace_back(std::move(residue));
+    for (auto i: residues_.back()) {
+        residue_mapping_.insert({i, resid});
+    }
+}
+
+bool Topology::are_linked(const Residue& res_1, const Residue& res_2) const {
+    for (auto i: res_1) {
+        for (auto j: res_2) {
+            if (isbond(i, j)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+optional<const Residue&> Topology::residue(size_t atom) const {
+    auto it = residue_mapping_.find(atom);
+    if (it == residue_mapping_.end()) {
+        // This atom is not in a residue
+        return nullopt;
+    } else {
+        return residues_[it->second];
+    }
 }

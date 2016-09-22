@@ -1,3 +1,5 @@
+.. _class-Logger:
+
 Logging capacities
 ==================
 

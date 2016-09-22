@@ -9,161 +9,17 @@
 #ifndef CHEMFILES_TOPOLOGY_HPP
 #define CHEMFILES_TOPOLOGY_HPP
 
-#include <array>
-#include <cassert>
-#include <functional>
-#include <unordered_set>
 #include <vector>
+#include <unordered_map>
 
 #include "chemfiles/Atom.hpp"
+#include "chemfiles/Connectivity.hpp"
+#include "chemfiles/Residue.hpp"
 #include "chemfiles/exports.hpp"
 
-namespace chemfiles {
-
-//! The bond struct ensure a canonical representation of a bond between atoms
-//! i and j, with i<j
-struct CHFL_EXPORT Bond {
-    Bond(size_t first, size_t second) {
-        assert(first != second);
-        data_[0] = std::min(first, second);
-        data_[1] = std::max(first, second);
-    }
-    //! Indexing operator
-    const size_t& operator[](size_t i) const { return data_[i]; }
-    //! Comparison operator
-    bool operator==(const Bond& other) const {
-        return data_[0] == other[0] && data_[1] == other[1];
-    }
-
-    Bond(Bond&&) = default;
-    Bond& operator=(Bond&&) = default;
-    Bond(const Bond&) = default;
-    Bond& operator=(const Bond&) = default;
-
-private:
-    std::array<size_t, 2> data_;
-};
-
-//! The angle struct ensure a canonical representation of an angle between the
-//! atoms i, j and k, with i < k
-struct CHFL_EXPORT Angle {
-    Angle(size_t first, size_t midle, size_t last) {
-        assert(first != last);
-        assert(first != midle);
-        data_[0] = std::min(first, last);
-        data_[1] = midle;
-        data_[2] = std::max(first, last);
-    }
-    //! Indexing operator
-    const size_t& operator[](size_t i) const { return data_[i]; }
-    //! Comparison operator
-    bool operator==(const Angle& other) const {
-        return data_[0] == other[0] && data_[1] == other[1] &&
-               data_[2] == other[2];
-    }
-
-    Angle(Angle&&) = default;
-    Angle& operator=(Angle&&) = default;
-    Angle(const Angle&) = default;
-    Angle& operator=(const Angle&) = default;
-
-private:
-    std::array<size_t, 3> data_;
-};
-
-//! The dihedral struct ensure a canonical representation of a dihedral angle
-//! between the atoms i, j, k and m, with max(i, j) < max(k, m))
-struct CHFL_EXPORT Dihedral {
-    Dihedral(size_t first, size_t second, size_t third, size_t fourth) {
-        assert(first != second);
-        assert(second != third);
-        assert(third != fourth);
-
-        if (std::max(first, second) < std::max(third, fourth)) {
-            data_[0] = first;
-            data_[1] = second;
-            data_[2] = third;
-            data_[3] = fourth;
-        } else {
-            data_[0] = fourth;
-            data_[1] = third;
-            data_[2] = second;
-            data_[3] = first;
-        }
-    }
-    //! Indexing operator
-    const size_t& operator[](size_t i) const { return data_[i]; }
-    //! Comparison operator
-    bool operator==(const Dihedral& other) const {
-        return data_[0] == other[0] && data_[1] == other[1] &&
-               data_[2] == other[2] && data_[3] == other[3];
-    }
-
-    Dihedral(Dihedral&&) = default;
-    Dihedral& operator=(Dihedral&&) = default;
-    Dihedral(const Dihedral&) = default;
-    Dihedral& operator=(const Dihedral&) = default;
-
-private:
-    std::array<size_t, 4> data_;
-};
-
-} // namespace chemfiles
-
-namespace std {
-    // We need a hashing function for the std::unordered_set, but it will not
-    // be used. We will use the operator== instead to ensure the element
-    // unicity in the sets.
-    template <> struct hash<chemfiles::Bond> {
-        size_t operator()(chemfiles::Bond const&) const { return 42; }
-    };
-    template <> struct hash<chemfiles::Angle> {
-        size_t operator()(chemfiles::Angle const&) const { return 42; }
-    };
-    template <> struct hash<chemfiles::Dihedral> {
-        size_t operator()(chemfiles::Dihedral const&) const { return 42; }
-    };
-} // namespace std
+#include "chemfiles/optional.hpp"
 
 namespace chemfiles {
-
-/*!
- * @class connectivity Topology.hpp Topology.cpp
- *
- * The connectivity struct store a cache of the bonds, angles and dihedrals
- * in the system. The `recalculate` function should be called when bonds are
- * added or removed. The `bonds` set is the main source of information, all the
- * other data are cached from it.
- */
-class Connectivity {
-public:
-    Connectivity() = default;
-    //! Recalculate the angles and the dihedrals from the bond list
-    void recalculate() const;
-    //! Access the underlying data
-    const std::unordered_set<Bond>& bonds() const;
-    const std::unordered_set<Angle>& angles() const;
-    const std::unordered_set<Dihedral>& dihedrals() const;
-    //! Add a bond between the atoms `i` and `j`
-    void add_bond(size_t i, size_t j);
-    //! Remove any bond between the atoms `i` and `j`
-    void remove_bond(size_t i, size_t j);
-
-    Connectivity(Connectivity&&) = default;
-    Connectivity& operator=(Connectivity&&) = default;
-    Connectivity(const Connectivity&) = default;
-    Connectivity& operator=(const Connectivity&) = default;
-
-private:
-    //! Bonds in the system
-    std::unordered_set<Bond> bonds_;
-    //! Angles in the system
-    mutable std::unordered_set<Angle> angles_;
-    //! Dihedral angles in the system
-    mutable std::unordered_set<Dihedral> dihedrals_;
-    //! Is the cached content up to date ?
-    mutable bool uptodate = false;
-};
 
 /*! @class Topology Topology.hpp Topology.cpp
  * A topology contains the definition of all the atoms in the system, and
@@ -242,12 +98,33 @@ public:
     //! dihedrals)
     void clear_bonds() { connect_ = Connectivity(); }
 
+    //! Add a `residue` to this topology.
+    //!
+    //! This function throws a `chemfiles::Error` if any atom in the `residue`
+    //! is already in another residue in this topology. In that case, the
+    //! topology is not modified.
+    void add_residue(Residue residue);
+    //! Check if two residues are linked together, i.e. if there is a bond
+    //! between one atom in the first residue and one atom in the second one.
+    bool are_linked(const Residue& res_1, const Residue& res_2) const;
+    //! Get the residue containing the `atom` at the given index.
+    optional<const Residue&> residue(size_t atom) const;
+    //! Get all the residues in the topology
+    const std::vector<Residue>& residues() const {
+        return residues_;
+    }
+
 private:
     //! Atoms in the system.
     std::vector<Atom> atoms_;
-    //! Connectivity of the system. All the indices refers to the positions in
+    //! Connectivity of the system. All the indexes refers to the positions in
     //! `atoms_`
     Connectivity connect_;
+    //! List of residues in the system. All the indexes refers to the positions
+    //! in `atoms_`
+    std::vector<Residue> residues_;
+    //! Association between atom indexes and residues indexes.
+    std::unordered_map<size_t, size_t> residue_mapping_;
 };
 
 } // namespace chemfiles
