@@ -1,7 +1,6 @@
 coverage:
   ignore:
-  - tests/*
-  - external/*
+  - tests/.*
+  - external/.*
 
-comments: false
-
+comment: off
