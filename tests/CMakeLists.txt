@@ -23,7 +23,7 @@ add_subdirectory(external)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/helpers)
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/catch)
-include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/boost/include)
+include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR}/external/boost/include)
 add_library(catch STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/catch/catch.cpp)
 add_library(helpers STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/helpers/helpers.cpp)
 
