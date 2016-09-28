@@ -47,4 +47,5 @@ constrains.
 Chemfiles also provides a :ref:`selection language <selection-language>`,
 implemented in the ``Selection`` class. This selection language allow the users
 to select a group of atoms from a ``Frame`` using a selection string. Examples
-of selections strings are ``"name H"`` and ``"(x < 45 and name O) or name C"``.
+of selections strings are ``"element H"`` and ``"(x < 45 and element O) or
+element C"``.
