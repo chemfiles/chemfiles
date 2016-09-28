@@ -10,7 +10,7 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
     Atom a2 = Atom();
     Atom a3(Atom::COARSE_GRAINED, "CH4");
     Atom a4("W");
-	Atom a5("C", "CA")
+	Atom a5("C", "CB")
 
     SECTION("Check constructors"){
         CHECK(a1.element() == "H");
@@ -30,6 +30,7 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
 
 		CHECK(a5.type() == Atom::ELEMENT);
         CHECK(a5.element() == "C");
+		CHECK(a5.label() == "CB");
         CHECK(a5.mass() == 12.011f);
         CHECK(a5.charge() == 0);
     }
