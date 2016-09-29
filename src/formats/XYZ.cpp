@@ -88,12 +88,12 @@ void XYZFormat::read(Frame& frame) {
     for (size_t i = 0; i < lines.size(); i++) {
         std::istringstream string_stream;
         float x = 0, y = 0, z = 0;
-        std::string name;
+        std::string element;
 
         string_stream.str(lines[i]);
-        string_stream >> name >> x >> y >> z;
+        string_stream >> element >> x >> y >> z;
 
-        frame.add_atom(Atom(name), {{x, y, z}});
+        frame.add_atom(Atom(element), {{x, y, z}});
     }
 }
 
@@ -106,9 +106,9 @@ void XYZFormat::write(const Frame& frame) {
     textfile_ << "Written by the chemfiles library\n";
 
     for (size_t i = 0; i < frame.natoms(); i++) {
-        auto name = topology[i].name();
-        if (name == "") {name = "X";}
-        textfile_ << name << " "
+        auto element = topology[i].element();
+        if (element == "") {element = "X";}
+        textfile_ << element << " "
                   << positions[i][0] << " "
                   << positions[i][1] << " "
                   << positions[i][2] << "\n";

@@ -272,7 +272,7 @@ void PDBFormat::write(const Frame& frame) {
         cell.a(), cell.b(), cell.c(), cell.alpha(), cell.beta(), cell.gamma());
 
     for (size_t i = 0; i < frame.natoms(); i++) {
-        auto& name = frame.topology()[i].name();
+        auto& element = frame.topology()[i].element();
         auto& pos = frame.positions()[i];
         // Print all atoms as HETATM, because there is no way we can know if we
         // are handling a biomolecule or not.
@@ -284,7 +284,7 @@ void PDBFormat::write(const Frame& frame) {
         // TODO: get molecules informations, and set 'resSeq' accordingly
         fmt::print(textfile_, "HETATM{:5d}{: >4s} {:3}X{:4d} "
                               "{:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}{: >2s}\n",
-                   i, name, "", i, pos[0], pos[1], pos[2], 0.0, 0.0, name);
+                   i, element, "", i, pos[0], pos[1], pos[2], 0.0, 0.0, element);
     }
 
     auto connect = std::vector<std::vector<size_t>>(frame.natoms());

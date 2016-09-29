@@ -38,7 +38,7 @@ public:
     };
 
     //! Create an element from its `element`
-    Atom(std::string element);
+    //Atom(std::string element);
     //! Create an element from its `element` and its label
     Atom(std::string element, std::string label = "");
     //! Create an element from its `element`and its type
