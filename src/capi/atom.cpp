@@ -16,10 +16,10 @@
 #include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
-CHFL_ATOM* chfl_atom(const char* name) {
+CHFL_ATOM* chfl_atom(const char* element) {
     CHFL_ATOM* atom = nullptr;
     CHFL_ERROR_GOTO(
-        atom = new Atom(std::string(name));
+        atom = new Atom(std::string(element));
     )
     return atom;
 error:
@@ -89,30 +89,30 @@ chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, float charge) {
     )
 }
 
-chfl_status chfl_atom_name(const CHFL_ATOM* const atom, char* const name, size_t buffsize) {
+chfl_status chfl_atom_element(const CHFL_ATOM* const atom, char* const element, size_t buffsize) {
     assert(atom != nullptr);
-    assert(name != nullptr);
+    assert(element != nullptr);
     CHFL_ERROR_CATCH(
-        strncpy(name, atom->name().c_str(), buffsize - 1);
-        name[buffsize - 1] = '\0';
+        strncpy(element, atom->element().c_str(), buffsize - 1);
+        element[buffsize - 1] = '\0';
     )
 }
 
-chfl_status chfl_atom_set_name(CHFL_ATOM* const atom, const char* name) {
+chfl_status chfl_atom_set_element(CHFL_ATOM* const atom, const char* element) {
     assert(atom != nullptr);
-    assert(name != nullptr);
+    assert(element != nullptr);
     CHFL_ERROR_CATCH(
-        atom->set_name(std::string(name));
+        atom->set_element(std::string(element));
     )
 }
 
 
-chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* const name, size_t buffsize) {
+chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* const element, size_t buffsize) {
     assert(atom != nullptr);
-    assert(name != nullptr);
+    assert(element != nullptr);
     CHFL_ERROR_CATCH(
-        strncpy(name, atom->full_name().c_str(), buffsize - 1);
-        name[buffsize - 1] = '\0';
+        strncpy(element, atom->full_name().c_str(), buffsize - 1);
+        element[buffsize - 1] = '\0';
     )
 }
 

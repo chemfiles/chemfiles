@@ -975,7 +975,7 @@ CHFL_EXPORT chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, float charge
 * @param buffsize The size of the string buffer
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_name(const CHFL_ATOM* const atom,
+CHFL_EXPORT chfl_status chfl_atom_element(const CHFL_ATOM* const atom,
                                        char* const element,
                                        size_t buffsize);
 
@@ -985,7 +985,7 @@ CHFL_EXPORT chfl_status chfl_atom_name(const CHFL_ATOM* const atom,
 * @param element A null terminated string containing the new element
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_set_name(CHFL_ATOM* const atom, const char* element);
+CHFL_EXPORT chfl_status chfl_atom_set_element(CHFL_ATOM* const atom, const char* element);
 
 /*!
 * @brief Try to get the full name of an atom from the element
