@@ -38,12 +38,12 @@ TEST_CASE("Atoms selections", "[selection]") {
         CHECK(sel.list(frame) == res);
     }
 
-    SECTION("name") {
-        auto sel = Selection("name O");
+    SECTION("element") {
+        auto sel = Selection("element O");
         auto res = std::vector<size_t>{1, 2};
         CHECK(sel.list(frame) == res);
 
-        sel = Selection("name != O");
+        sel = Selection("element != O");
         res = std::vector<size_t>{0, 3};
         CHECK(sel.list(frame) == res);
     }
@@ -81,7 +81,7 @@ TEST_CASE("Atoms selections", "[selection]") {
         auto res = std::vector<size_t>{2};
         CHECK(sel.list(frame) == res);
 
-        sel = Selection("index > 1 and name H");
+        sel = Selection("index > 1 and element H");
         res = std::vector<size_t>{3};
         CHECK(sel.list(frame) == res);
     }
@@ -91,7 +91,7 @@ TEST_CASE("Atoms selections", "[selection]") {
         auto res = std::vector<size_t>{0, 3};
         CHECK(sel.list(frame) == res);
 
-        sel = Selection("index == 1 or name H");
+        sel = Selection("index == 1 or element H");
         res = std::vector<size_t>{0, 1, 3};
         CHECK(sel.list(frame) == res);
     }
@@ -101,7 +101,7 @@ TEST_CASE("Atoms selections", "[selection]") {
         auto res = std::vector<size_t>{0, 1, 2};
         CHECK(sel.list(frame) == res);
 
-        sel = Selection("not name H");
+        sel = Selection("not element H");
         res = std::vector<size_t>{1, 2};
         CHECK(sel.list(frame) == res);
     }
@@ -115,7 +115,7 @@ TEST_CASE("Atoms selections", "[selection]") {
         res = std::vector<size_t>{};
         CHECK(sel.list(frame) == res);
 
-        sel = Selection("atoms :not name H");
+        sel = Selection("atoms :not element H");
         res = std::vector<size_t>{1, 2};
         CHECK(sel.list(frame) == res);
 
