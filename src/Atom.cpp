@@ -35,8 +35,10 @@ static bool is_element(const std::string& element) {
     return false;
 
 }
-/*
-Atom::Atom(std::string element) : element_(std::move(element)), mass_(0), charge_(0) {
+
+Atom::Atom(std::string element, std::string label)
+	: element_(std::move(element)), label_(std::move(label)), mass_(0),
+	charge_(0) {
     if (is_element(element_)) {
         type_ = ELEMENT;
     } else {
@@ -47,21 +49,10 @@ Atom::Atom(std::string element) : element_(std::move(element)), mass_(0), charge
         mass_ = PERIODIC_INFORMATION.at(element_).mass;
     }
 }
-*/
-Atom::Atom(std::string element, std::string label) : element_(std::move(element)), label_(std::move(label)), mass_(0), charge_(0) {
-    if (is_element(element_)) {
-        type_ = ELEMENT;
-    } else {
-        type_ = COARSE_GRAINED;
-    }
 
-    if (PERIODIC_INFORMATION.find(element_) != PERIODIC_INFORMATION.end()) {
-        mass_ = PERIODIC_INFORMATION.at(element_).mass;
-    }
-}
-
-Atom::Atom(AtomType type, std::string element)
-    : element_(std::move(element)), mass_(0), charge_(0), type_(type) {}
+Atom::Atom(AtomType type, std::string element, std::string label)
+    : element_(std::move(element)), label_(std::move(label)), mass_(0),
+	charge_(0), type_(type) {}
 
 Atom::Atom() : Atom(UNDEFINED) {}
 

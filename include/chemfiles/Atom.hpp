@@ -19,8 +19,8 @@ namespace chemfiles {
  * @class Atom Atom.hpp Atom.cpp
  *
  * An Atom is a particle in the current Frame. It can be used to store and
- * retrieve informations about a particle, such as mass, element, atomic number,
- * etc.
+ * retrieve informations about a particle, such as mass, element name, atomic
+ * number, etc.
  */
 class CHFL_EXPORT Atom {
 public:
@@ -37,12 +37,10 @@ public:
         UNDEFINED = 3,
     };
 
-    //! Create an element from its `element`
-    //Atom(std::string element);
     //! Create an element from its `element` and its label
     Atom(std::string element, std::string label = "");
     //! Create an element from its `element`and its type
-    Atom(AtomType type, std::string element = "");
+    Atom(AtomType type, std::string element = "", std::string label = "");
     //! Default is to create an UNDEFINED atom type with no element or label
     Atom();
 
@@ -51,7 +49,7 @@ public:
     Atom(const Atom&) = default;
     Atom& operator=(const Atom&) = default;
 
-    //! Get a const (non-modifiable) reference to the atom element
+    //! Get a const (non-modifiable) reference to the atom element name
     const std::string& element() const { return element_; }
     //! Get a const (non-modifiable) reference to the atom label
     const std::string& label() const { return label_; }
@@ -62,7 +60,7 @@ public:
     //! Get the atom type
     AtomType type() const { return type_; }
 
-    //! Set the atom element
+    //! Set the atom element name
     void set_element(const std::string& element) { element_ = element; }
     //! Set the atom label
     void set_label(const std::string& label) { label_ = label; }

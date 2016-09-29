@@ -36,7 +36,7 @@ int main() {
     assert(!chfl_atom_element(a, element, sizeof(element)));
     assert(strcmp(element, "Zn") == 0);
 
-    assert(!chfl_atom_full_element(a, element, sizeof(element)));
+    assert(!chfl_atom_full_name(a, element, sizeof(element)));
     assert(strcmp(element, "Zinc") == 0);
 
     double radius=0;
