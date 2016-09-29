@@ -12,7 +12,7 @@ static bool find_match(const chfl_match_t* matches, size_t n_matches, chfl_match
 int main() {
     silent_crash_handlers();
     CHFL_FRAME* frame = testing_frame();
-    CHFL_SELECTION* selection = chfl_selection("name O");
+    CHFL_SELECTION* selection = chfl_selection("element O");
 
     assert(frame != NULL);
     assert(selection != NULL);
