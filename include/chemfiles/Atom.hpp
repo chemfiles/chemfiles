@@ -95,7 +95,7 @@ private:
 };
 
 inline bool operator==(const Atom& lhs, const Atom& rhs) {
-    return (lhs.element() == rhs.element() && lhs.label() == rhs.label()
+    return (lhs.element() == rhs.element() && lhs.label() == rhs.label() &&
             lhs.mass() == rhs.mass() && lhs.charge() == rhs.charge() &&
             lhs.type() == rhs.type());
 }

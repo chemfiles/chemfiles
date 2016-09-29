@@ -30,7 +30,6 @@ static bool is_element(const std::string& element) {
     for (auto& each_element : ALL_ELEMENTS) {
         if (element == each_element) {
             return true;
-            ret
         }
     }
     return false;
@@ -49,8 +48,7 @@ Atom::Atom(std::string element) : element_(std::move(element)), mass_(0), charge
     }
 }
 
-Atom::Atom(std::string element, std::string label = "") :
-element_(std::move(element)), label_(std::move(label)), mass_(0), charge_(0) {
+Atom::Atom(std::string element, std::string label = "") : element_(std::move(element)), label_(std::move(label)), mass_(0), charge_(0) {
     if (is_element(element_)) {
         type_ = ELEMENT;
     } else {
