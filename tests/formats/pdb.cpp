@@ -41,8 +41,8 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
 
         CHECK(topology.natoms() == 65);
 
-        CHECK(topology[0].name() == "ZN");
-        CHECK(topology[1].name() == "O");
+        CHECK(topology[0].label() == "ZN");
+        CHECK(topology[1].label() == "O");
 
         CHECK(topology.bonds().size() == 68);
 
