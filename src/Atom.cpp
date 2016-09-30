@@ -37,7 +37,7 @@ static bool is_element(const std::string& element) {
 }
 
 Atom::Atom(std::string element)
-	: element_(std::move(element)), label_(std::move(element)), mass_(0),
+	: element_(element), label_(std::move(element)), mass_(0),
 	charge_(0) {
     if (is_element(element_)) {
         type_ = ELEMENT;
