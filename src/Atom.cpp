@@ -1,4 +1,4 @@
-/* Chemfiles, an efficient IO library for chemistry file formats
+	/* Chemfiles, an efficient IO library for chemistry file formats
  * Copyright (C) 2015 Guillaume Fraux
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,6 +34,20 @@ static bool is_element(const std::string& element) {
     }
     return false;
 
+}
+
+Atom::Atom(std::string element)
+	: element_(std::move(element)), label_(std::move(element)), mass_(0),
+	charge_(0) {
+    if (is_element(element_)) {
+        type_ = ELEMENT;
+    } else {
+        type_ = COARSE_GRAINED;
+    }
+
+    if (PERIODIC_INFORMATION.find(element_) != PERIODIC_INFORMATION.end()) {
+        mass_ = PERIODIC_INFORMATION.at(element_).mass;
+    }
 }
 
 Atom::Atom(std::string element, std::string label)

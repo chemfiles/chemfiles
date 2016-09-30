@@ -37,9 +37,11 @@ public:
         UNDEFINED = 3,
     };
 
-    //! Create an element from its `element` and its label
-    Atom(std::string element, std::string label = "");
-    //! Create an element from its `element`and its type
+	//! Create an atom from its 'element' with 'label'='element'
+    Atom(std::string element);
+    //! Create an atom from its 'element' and its label
+    Atom(std::string element, std::string label);
+    //! Create an atom from its 'element' and its type
     Atom(AtomType type, std::string element = "", std::string label = "");
     //! Default is to create an UNDEFINED atom type with no element or label
     Atom();
