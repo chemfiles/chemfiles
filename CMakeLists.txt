@@ -17,15 +17,15 @@ string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" CHEMFILES_VERSION_MINOR "${CHE
 string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CHEMFILES_VERSION_PATCH "${CHEMFILES_VERSION}")
 set(CHEMFILES_VERSION_SHORT "${CHEMFILES_VERSION_MAJOR}.${CHEMFILES_VERSION_MINOR}.${CHEMFILES_VERSION_PATCH}")
 
-option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" ON)
+option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
 
-option(CHFL_BUILD_TESTS "Build unit tests." ON)
-option(CHFL_BUILD_DOCUMENTATION "Build the documentation." ON)
-option(CHFL_CODE_COVERAGE "Enable code coverage" ON)
-option(CHFL_ENABLE_NETCDF "Enable AMBER NetCDF format." ON)
-option(CHFL_USE_WARNINGS "Compile the code with warnings (default in debug mode)" ON)
-option(CHFL_USE_SANITIZERS "Compile the code with sanitizers" ON)
-option(CHFL_DEBUG_GLIBCXX "Use the debug version of GNU libstdcxx" ON)
+option(CHFL_BUILD_TESTS "Build unit tests." OFF)
+option(CHFL_BUILD_DOCUMENTATION "Build the documentation." OFF)
+option(CHFL_CODE_COVERAGE "Enable code coverage" OFF)
+option(CHFL_ENABLE_NETCDF "Enable AMBER NetCDF format." OFF)
+option(CHFL_USE_WARNINGS "Compile the code with warnings (default in debug mode)" OFF)
+option(CHFL_USE_SANITIZERS "Compile the code with sanitizers" OFF)
+option(CHFL_DEBUG_GLIBCXX "Use the debug version of GNU libstdcxx" OFF)
 
 include(CompilerFlags)
 
