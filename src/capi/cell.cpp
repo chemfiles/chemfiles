@@ -106,18 +106,18 @@ chfl_status chfl_cell_matrix(const CHFL_CELL* const cell, double (*matrix)[3]) {
     )
 }
 
-chfl_status chfl_cell_type(const CHFL_CELL* const cell, chfl_cell_type_t* const type) {
+chfl_status chfl_cell_shape(const CHFL_CELL* const cell, chfl_cell_shape_t* const shape) {
     assert(cell != nullptr);
-    assert(type != nullptr);
+    assert(shape != nullptr);
     CHFL_ERROR_CATCH(
-        *type = static_cast<chfl_cell_type_t>(cell->type());
+        *shape = static_cast<chfl_cell_shape_t>(cell->shape());
     )
 }
 
-chfl_status chfl_cell_set_type(CHFL_CELL* const cell, chfl_cell_type_t type) {
+chfl_status chfl_cell_set_shape(CHFL_CELL* const cell, chfl_cell_shape_t shape) {
     assert(cell != nullptr);
     CHFL_ERROR_CATCH(
-        cell->type(static_cast<UnitCell::CellType>(type));
+        cell->shape(static_cast<UnitCell::CellShape>(shape));
     )
 }
 

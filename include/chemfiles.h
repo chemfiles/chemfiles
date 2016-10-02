@@ -561,33 +561,33 @@ CHFL_EXPORT chfl_status chfl_cell_set_angles(CHFL_CELL* const cell,
 CHFL_EXPORT chfl_status chfl_cell_matrix(const CHFL_CELL* const cell,
                                          double (*matrix)[3]);
 
-//! Available cell types in chemfiles
-typedef enum CHFL_CELL_TYPES {
+//! Available cell shapes in chemfiles
+typedef enum CHFL_CELL_SHAPE {
     //! The three angles are 90°
     CHFL_CELL_ORTHORHOMBIC = 0,
     //! The three angles may not be 90°
     CHFL_CELL_TRICLINIC = 1,
     //! Cell type when there is no periodic boundary conditions
     CHFL_CELL_INFINITE = 2,
-} chfl_cell_type_t;
+} chfl_cell_shape_t;
 
 /*!
-* @brief Get the cell type
+* @brief Get the cell shape
 * @param cell the unit cell to read
-* @param type the type of the cell
+* @param shape the shape of the cell
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_cell_type(const CHFL_CELL* const cell,
-                                       chfl_cell_type_t* const type);
+CHFL_EXPORT chfl_status chfl_cell_shape(const CHFL_CELL* const cell,
+                                       chfl_cell_shape_t* const shape);
 
 /*!
-* @brief Set the cell type
+* @brief Set the cell shape
 * @param cell the cell to modify
-* @param type the new type of the cell
+* @param shape the new shape of the cell
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_cell_set_type(CHFL_CELL* const cell,
-                                           chfl_cell_type_t type);
+CHFL_EXPORT chfl_status chfl_cell_set_shape(CHFL_CELL* const cell,
+                                           chfl_cell_shape_t shape);
 
 /*!
 * @brief Destroy an unit cell, and free the associated memory

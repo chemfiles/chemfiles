@@ -17,10 +17,10 @@ Function manipulating ``CHFL_CELL``
 
 .. doxygenfunction:: chfl_cell_matrix
 
-.. doxygenenum:: CHFL_CELL_TYPES
+.. doxygenenum:: CHFL_CELL_SHAPE
 
-.. doxygenfunction:: chfl_cell_type
+.. doxygenfunction:: chfl_cell_shape
 
-.. doxygenfunction:: chfl_cell_set_type
+.. doxygenfunction:: chfl_cell_set_shape
 
 .. doxygenfunction:: chfl_cell_free

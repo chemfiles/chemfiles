@@ -34,12 +34,11 @@ namespace chemfiles {
  * 				| a_x   b_x   c_x |
  * 				|  0    b_y   c_y |
  * 				|  0     0    c_z |
- *
- * An unit cell also have a cell type, represented by the `CellType` enum.
  */
 class CHFL_EXPORT UnitCell {
 public:
-    enum CellType {
+    /// Possible shapes for the unit cell
+    enum CellShape {
         //! Orthorhombic cell, with the three angles equals to 90°
         ORTHORHOMBIC = 0,
         //! Triclinic cell, with any values for the angles.
@@ -65,18 +64,14 @@ public:
     //! angles `alpha`, `beta`, `gamma`
     UnitCell(double a, double b, double c, double alpha, double beta, double gamma);
     //! Construct a cell of type `type`, with all lenghts set to 0 and all
-    //! angles
-    //! set to 90°
-    UnitCell(CellType type);
+    //! angles set to 90°
+    UnitCell(CellShape shape);
     //! Construct a cell of type `type`, with all lenghts set to `a` and all
-    //! angles
-    //! set to 90°
-    UnitCell(CellType type, double a);
+    //! angles set to 90°
+    UnitCell(CellShape shape, double a);
     //! Construct a cell of type `type`, with lenghts set to `a` ,`b`, `d`,
     //! and all angles set to 90°
-    UnitCell(CellType type, double a, double b, double c);
-
-    ~UnitCell() = default;
+    UnitCell(CellShape shape, double a, double b, double c);
 
     //! Get a matricial representation of the cell.
     Matrix3D matricial() const {
@@ -86,10 +81,10 @@ public:
     //! have a 3 x 3 size.
     void raw_matricial(double[3][3]) const;
 
-    //! Get the cell type
-    CellType type() const { return type_; }
-    //! Set the cell type to `type`
-    void type(CellType type);
+    //! Get the cell shape
+    CellShape shape() const { return shape_; }
+    //! Set the cell shape to `shape`
+    void shape(CellShape shape);
 
     //! Get the first lenght (a) of the cell
     double a() const { return a_; }
@@ -141,11 +136,11 @@ private:
     //! Cell angles
     double alpha_, beta_, gamma_;
     //! Cell type
-    CellType type_;
+    CellShape shape_;
 };
 
 inline bool operator==(const UnitCell& rhs, const UnitCell& lhs) {
-    if (lhs.type() != rhs.type())
+    if (lhs.shape() != rhs.shape())
         return false;
 
     return rhs.a() == lhs.a() &&

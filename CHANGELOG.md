@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Add missing `chfl_topology_resize` function to C API.
 * Add "Frame::add_atom" function to add an atom and the corresponding position
   (and velocity) data to a frame, and the C API `chfl_frame_add_atom` function.
+* Rename `UnitCell::type` to `UnitCell::shape`. This also affect
+  `chfl_cell_shape_t`, `chfl_cell_shape`, and `chfl_cell_set_shape`.
 
 ## 0.6 (1 July 2016)
 

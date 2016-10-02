@@ -17,9 +17,11 @@ constexpr double pi = 3.141592653589793238463;
 inline double deg2rad(double x) {
     return x * pi / 180.0;
 }
+
 inline double cosd(double theta) {
     return cos(deg2rad(theta));
 }
+
 inline double sind(double theta) {
     return sin(deg2rad(theta));
 }
@@ -34,24 +36,24 @@ UnitCell::UnitCell(double a, double b, double c,
                    double alpha, double beta, double gamma)
 : a_(a), b_(b), c_(c), alpha_(alpha), beta_(beta), gamma_(gamma){
     if (alpha_ == 90 && beta_ == 90 && gamma_ == 90) {
-        type_ = ORTHORHOMBIC;
+        shape_ = ORTHORHOMBIC;
     } else {
-        type_ = TRICLINIC;
+        shape_ = TRICLINIC;
     }
     update_matrix();
 }
 
-UnitCell::UnitCell(CellType type) : UnitCell(type, 0) {}
+UnitCell::UnitCell(CellShape shape) : UnitCell(shape, 0) {}
 
-UnitCell::UnitCell(CellType type, double a) : UnitCell(type, a, a, a) {}
+UnitCell::UnitCell(CellShape shape, double a) : UnitCell(shape, a, a, a) {}
 
-UnitCell::UnitCell(CellType type, double a, double b, double c)
-    : a_(a), b_(b), c_(c), alpha_(90), beta_(90), gamma_(90), type_(type) {
+UnitCell::UnitCell(CellShape shape, double a, double b, double c)
+    : a_(a), b_(b), c_(c), alpha_(90), beta_(90), gamma_(90), shape_(shape) {
     update_matrix();
 }
 
 double UnitCell::volume() const {
-    switch (type_) {
+    switch (shape_) {
     case INFINITE:
         return 0;
     case ORTHORHOMBIC:
@@ -98,18 +100,18 @@ void UnitCell::raw_matricial(double matrix[3][3]) const {
     std::copy(&h_[0][0], &h_[0][0] + 9, &matrix[0][0]);
 }
 
-void UnitCell::type(CellType type) {
-    if (type == ORTHORHOMBIC) {
+void UnitCell::shape(CellShape shape) {
+    if (shape == ORTHORHOMBIC) {
         if (!(alpha_ == 90 && beta_ == 90 && gamma_ == 90)) {
             throw Error("UnitCell type can not be set to ORTHOROMBIC : some"
                         " angles are not 90°");
         }
     }
-    type_ = type;
+    shape_ = shape;
 }
 
 void UnitCell::set_a(double val) {
-    if (type_ == INFINITE) {
+    if (shape_ == INFINITE) {
         throw Error("Can not set 'a' on infinite cell");
     }
     a_ = val;
@@ -117,7 +119,7 @@ void UnitCell::set_a(double val) {
 }
 
 void UnitCell::set_b(double val) {
-    if (type_ == INFINITE) {
+    if (shape_ == INFINITE) {
         throw Error("Can not set 'b' on infinite cell");
     }
     b_ = val;
@@ -125,7 +127,7 @@ void UnitCell::set_b(double val) {
 }
 
 void UnitCell::set_c(double val) {
-    if (type_ == INFINITE) {
+    if (shape_ == INFINITE) {
         throw Error("Can not set 'c' on infinite cell");
     }
     c_ = val;
@@ -133,7 +135,7 @@ void UnitCell::set_c(double val) {
 }
 
 void UnitCell::set_alpha(double val) {
-    if (type_ != TRICLINIC) {
+    if (shape_ != TRICLINIC) {
         throw Error("Can not set 'alpha' on non triclinic cell");
     }
     alpha_ = val;
@@ -141,7 +143,7 @@ void UnitCell::set_alpha(double val) {
 }
 
 void UnitCell::set_beta(double val) {
-    if (type_ != TRICLINIC) {
+    if (shape_ != TRICLINIC) {
         throw Error("Can not set 'beta' on non triclinic cell");
     }
     beta_ = val;
@@ -149,7 +151,7 @@ void UnitCell::set_beta(double val) {
 }
 
 void UnitCell::set_gamma(double val) {
-    if (type_ != TRICLINIC) {
+    if (shape_ != TRICLINIC) {
         throw Error("Can not set 'gamma' on non triclinic cell");
     }
     gamma_ = val;
@@ -175,7 +177,7 @@ Vector3D UnitCell::wrap_triclinic(const Vector3D& vect) const {
 }
 
 Vector3D UnitCell::wrap(const Vector3D& vect) const {
-    switch (type_) {
+    switch (shape_) {
         case INFINITE:
             return vect;
         case ORTHORHOMBIC:

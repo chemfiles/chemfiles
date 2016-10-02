@@ -77,9 +77,9 @@ TEST_CASE("Frame class usage", "[Frame]"){
 
     SECTION("Unit Cell"){
         auto frame = Frame();
-        CHECK(frame.cell().type() == UnitCell::INFINITE);
+        CHECK(frame.cell().shape() == UnitCell::INFINITE);
         frame.set_cell(UnitCell(10));
-        CHECK(frame.cell().type() == UnitCell::ORTHORHOMBIC);
+        CHECK(frame.cell().shape() == UnitCell::ORTHORHOMBIC);
     }
 
     SECTION("Topology"){

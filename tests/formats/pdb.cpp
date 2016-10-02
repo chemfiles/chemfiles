@@ -21,7 +21,7 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
         CHECK(roughly(positions[296], vector3d(6.664f, 11.6148f, 12.961f), 1e-3));
 
         auto cell = frame.cell();
-        CHECK(cell.type() == UnitCell::ORTHORHOMBIC);
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(fabs(cell.a() - 15.0) < 1e-5);
 
         file.read(); // Skip a frame

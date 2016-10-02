@@ -12,7 +12,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
 
     SECTION("Constructors"){
         UnitCell infinite{};
-        CHECK(infinite.type() == UnitCell::INFINITE);
+        CHECK(infinite.shape() == UnitCell::INFINITE);
         CHECK(infinite.a() == 0);
         CHECK(infinite.b() == 0);
         CHECK(infinite.c() == 0);
@@ -22,7 +22,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(infinite.volume() == 0);
 
         UnitCell ortho1(10);
-        CHECK(ortho1.type() == UnitCell::ORTHORHOMBIC);
+        CHECK(ortho1.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(ortho1.a() == 10);
         CHECK(ortho1.b() == 10);
         CHECK(ortho1.c() == 10);
@@ -31,7 +31,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(ortho1.gamma() == 90);
 
         UnitCell ortho2(10, 11, 12);
-        CHECK(ortho2.type() == UnitCell::ORTHORHOMBIC);
+        CHECK(ortho2.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(ortho2.a() == 10);
         CHECK(ortho2.b() == 11);
         CHECK(ortho2.c() == 12);
@@ -41,7 +41,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(ortho2.volume() == 10*11*12);
 
         UnitCell triclinic(10, 11, 12, 90, 80, 120);
-        CHECK(triclinic.type() == UnitCell::TRICLINIC);
+        CHECK(triclinic.shape() == UnitCell::TRICLINIC);
         CHECK(triclinic.a() == 10);
         CHECK(triclinic.b() == 11);
         CHECK(triclinic.c() == 12);
@@ -51,7 +51,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(triclinic.volume() == 1119.9375925598192);
 
         UnitCell infinite2(UnitCell::INFINITE);
-        CHECK(infinite2.type() == UnitCell::INFINITE);
+        CHECK(infinite2.shape() == UnitCell::INFINITE);
         CHECK(infinite2.a() == 0);
         CHECK(infinite2.b() == 0);
         CHECK(infinite2.c() == 0);
@@ -60,7 +60,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(infinite2.gamma() == 90);
 
         UnitCell triclinic2(UnitCell::TRICLINIC, 10);
-        CHECK(triclinic2.type() == UnitCell::TRICLINIC);
+        CHECK(triclinic2.shape() == UnitCell::TRICLINIC);
         CHECK(triclinic2.a() == 10);
         CHECK(triclinic2.b() == 10);
         CHECK(triclinic2.c() == 10);
@@ -69,7 +69,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(triclinic2.gamma() == 90);
 
         UnitCell triclinic3(UnitCell::TRICLINIC, 10, 11, 12);
-        CHECK(triclinic3.type() == UnitCell::TRICLINIC);
+        CHECK(triclinic3.shape() == UnitCell::TRICLINIC);
         CHECK(triclinic3.a() == 10);
         CHECK(triclinic3.b() == 11);
         CHECK(triclinic3.c() == 12);
@@ -81,8 +81,8 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
     SECTION("Set the values"){
         UnitCell cell{};
 
-        cell.type(UnitCell::ORTHORHOMBIC);
-        CHECK(cell.type() == UnitCell::ORTHORHOMBIC);
+        cell.shape(UnitCell::ORTHORHOMBIC);
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
 
         cell.set_a(10);
         CHECK(cell.a() == 10);
@@ -91,8 +91,8 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         cell.set_c(20);
         CHECK(cell.c() == 20);
 
-        cell.type(UnitCell::TRICLINIC);
-        CHECK(cell.type() == UnitCell::TRICLINIC);
+        cell.shape(UnitCell::TRICLINIC);
+        CHECK(cell.shape() == UnitCell::TRICLINIC);
 
         cell.set_alpha(80);
         CHECK(cell.alpha() == 80);

@@ -52,12 +52,12 @@ int main() {
     assert(!chfl_cell_matrix(cell, matrix));
     assert(roughly(expected_matrix, matrix));
 
-    chfl_cell_type_t type;
-    assert(!chfl_cell_type(cell, &type));
+    chfl_cell_shape_t type;
+    assert(!chfl_cell_shape(cell, &type));
     assert(type == CHFL_CELL_ORTHORHOMBIC);
 
-    assert(!chfl_cell_set_type(cell, CHFL_CELL_TRICLINIC));
-    assert(!chfl_cell_type(cell, &type));
+    assert(!chfl_cell_set_shape(cell, CHFL_CELL_TRICLINIC));
+    assert(!chfl_cell_shape(cell, &type));
     assert(type == CHFL_CELL_TRICLINIC);
 
     assert(!chfl_cell_set_angles(cell, 80, 89, 100));
