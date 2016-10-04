@@ -910,11 +910,11 @@ CHFL_EXPORT chfl_status chfl_residue_free(CHFL_RESIDUE* residue);
 /******************************************************************************/
 
 /*!
-* @brief Create an atom from an atomic name
-* @param name The new atom name
+* @brief Create an atom from an element name
+* @param element The new atom element
 * @return A pointer to the new atom, or NULL in case of error
 */
-CHFL_EXPORT CHFL_ATOM* chfl_atom(const char* name);
+CHFL_EXPORT CHFL_ATOM* chfl_atom(const char* element);
 
 /*!
 * @brief Get a specific atom from a frame
@@ -969,37 +969,56 @@ CHFL_EXPORT chfl_status chfl_atom_charge(const CHFL_ATOM* const atom, float* cha
 CHFL_EXPORT chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, float charge);
 
 /*!
-* @brief Get the name of an atom
+* @brief Get the element name of an atom
 * @param atom The atom
-* @param name A string buffer to be filled with the name
+* @param element A string buffer to be filled with the element name
 * @param buffsize The size of the string buffer
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_name(const CHFL_ATOM* const atom,
-                                       char* const name,
+CHFL_EXPORT chfl_status chfl_atom_element(const CHFL_ATOM* const atom,
+                                       char* const element,
                                        size_t buffsize);
 
 /*!
-* @brief Set the name of an atom
+* @brief Set the element name of an atom
 * @param atom The atom
-* @param name A null terminated string containing the new name
+* @param element A null terminated string containing the new element name
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_set_name(CHFL_ATOM* const atom, const char* name);
+CHFL_EXPORT chfl_status chfl_atom_set_element(CHFL_ATOM* const atom, const char* element);
 
 /*!
-* @brief Try to get the full name of an atom from the short name
+* @brief Get the label name of an atom
 * @param atom The atom
-* @param name A string buffer to be filled with the name
+* @param label A string buffer to be filled with the label
+* @param buffsize The size of the string buffer
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_atom_label(const CHFL_ATOM* const atom,
+                                       char* const label,
+                                       size_t buffsize);
+
+/*!
+* @brief Set the label of an atom
+* @param atom The atom
+* @param label A null terminated string containing the new label
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_atom_set_label(CHFL_ATOM* const atom, const char* label);
+
+/*!
+* @brief Try to get the full name of an atom from the element name
+* @param atom The atom
+* @param element A string buffer to be filled with the element name
 * @param buffsize The size of the string buffer
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom,
-                                            char* const name,
+                                            char* const element,
                                             size_t buffsize);
 
 /*!
-* @brief Try to get the Van der Waals radius of an atom from the short name
+* @brief Try to get the Van der Waals radius of an atom from the element name
 * @param atom The atom
 * @param radius The Van der Waals radius of the atom or -1 if no value could be
 * found.
@@ -1009,7 +1028,7 @@ CHFL_EXPORT chfl_status chfl_atom_vdw_radius(const CHFL_ATOM* const atom,
                                              double* radius);
 
 /*!
-* @brief Try to get the covalent radius of an atom from the short name
+* @brief Try to get the covalent radius of an atom from the element name
 * @param atom The atom
 * @param radius The covalent radius of the atom or -1 if no value could be
 * found.
@@ -1019,7 +1038,7 @@ CHFL_EXPORT chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* const atom,
                                                   double* radius);
 
 /*!
-* @brief Try to get the atomic number of an atom from the short name
+* @brief Try to get the atomic number of an atom from the element name
 * @param atom The atom
 * @param number The atomic number, or -1 if no value could be found.
 * @return The status code

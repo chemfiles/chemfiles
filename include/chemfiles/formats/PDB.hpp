@@ -44,7 +44,7 @@ public:
 private:
     // Read CRYST1 record
     void read_CRYST1(Frame& frame, const std::string& line);
-    // Read ATOM an HETATM records
+    // Read ATOM and HETATM records
     void read_ATOM(Frame& frame, const std::string& line);
     // Read CONECT record
     void read_CONECT(Frame& frame, const std::string& line);

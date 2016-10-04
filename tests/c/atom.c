@@ -20,9 +20,13 @@ int main() {
     assert(!chfl_atom_charge(a, &charge));
     assert(fabs(charge) < 1e-6);
 
-    char name[32];
-    assert(!chfl_atom_name(a, name, sizeof(name)));
-    assert(strcmp(name, "He") == 0);
+    char element[32];
+    assert(!chfl_atom_element(a, element, sizeof(element)));
+    assert(strcmp(element, "He") == 0);
+
+    char label[32];
+    assert(!chfl_atom_label(a, label, sizeof(label)));
+    assert(strcmp(label, "He") == 0);
 
     assert(!chfl_atom_set_mass(a, 678));
     assert(!chfl_atom_mass(a, &mass));
@@ -32,12 +36,16 @@ int main() {
     assert(!chfl_atom_charge(a, &charge));
     assert(fabs(charge + 1.5) < 1e-6);
 
-    assert(!chfl_atom_set_name(a, "Zn"));
-    assert(!chfl_atom_name(a, name, sizeof(name)));
-    assert(strcmp(name, "Zn") == 0);
+    assert(!chfl_atom_set_element(a, "Zn"));
+    assert(!chfl_atom_element(a, element, sizeof(element)));
+    assert(strcmp(element, "Zn") == 0);
 
-    assert(!chfl_atom_full_name(a, name, sizeof(name)));
-    assert(strcmp(name, "Zinc") == 0);
+    assert(!chfl_atom_set_label(a, "HB2"));
+    assert(!chfl_atom_label(a, label, sizeof(label)));
+    assert(strcmp(label, "HB2") == 0);
+
+    assert(!chfl_atom_full_name(a, element, sizeof(element)));
+    assert(strcmp(element, "Zinc") == 0);
 
     double radius=0;
     assert(!chfl_atom_vdw_radius(a, &radius));

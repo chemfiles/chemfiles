@@ -24,7 +24,7 @@ struct function_info_t {
 };
 
 static std::map<std::string, function_info_t> FUNCTIONS = {
-    {"name", {1, true}},
+    {"element", {1, true}},
     {"mass", {1, true}},
     {"index", {1, true}},
     {"x", {1, false}},
@@ -46,15 +46,15 @@ static bool is_function(const Token& token) {
  * This convert infix expressions into an AST-like expression, while checking
  * parentheses.
  * The following input:
- *       name == bar and x <= 56
+ *       element == bar and x <= 56
  * is converted to:
- *       and == bar name <= 56 x
+ *       and == bar element <= 56 x
  * which is the AST for
  *             and
  *         /          \
  *        ==          <=
  *       /  \        /  \
- *    name   bar    x    56
+ *    element   bar    x    56
  */
 static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t end) {
     std::stack<Token> operators;
@@ -129,8 +129,8 @@ static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t
 /* Rewrite the token stream to convert short form for the expressions to the
  * long one.
  *
- * Short forms are expressions like `name foo` or `index 3`, which are
- * equivalent to `name == foo` and `index == 3`.
+ * Short forms are expressions like `element foo` or `index 3`, which are
+ * equivalent to `element == foo` and `index == 3`.
  */
 static std::vector<Token> add_missing_equals(std::vector<Token> stream) {
     auto out = std::vector<Token>();
@@ -183,8 +183,8 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
         }
 
         auto ident = begin[2].ident();
-        if (ident == "name") {
-            return parse<NameExpr>(begin, end);
+        if (ident == "element") {
+            return parse<ElementExpr>(begin, end);
         } else if (ident == "index") {
             return parse<IndexExpr>(begin, end);
         } else if (ident == "mass") {

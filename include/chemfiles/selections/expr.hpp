@@ -119,19 +119,19 @@ protected:
     const unsigned argument_;
 };
 
-//! @class NameExpr selections/expr.hpp selections/expr.cpp
-//! @brief Select atoms using their name.
+//! @class ElementExpr selections/expr.hpp selections/expr.cpp
+//! @brief Select atoms using their element.
 //!
-//! Only `==` and `!=` operators are allowed. The short form `name <value>` is
-//! equivalent to `name == <value>`
-class NameExpr final: public SingleSelector {
+//! Only `==` and `!=` operators are allowed. The short form `element <value>` is
+//! equivalent to `element == <value>`
+class ElementExpr final: public SingleSelector {
 public:
-    NameExpr(unsigned argument, std::string name, bool equals)
-        : SingleSelector(argument), name_(name), equals_(equals) {}
+    ElementExpr(unsigned argument, std::string element, bool equals)
+        : SingleSelector(argument), element_(element), equals_(equals) {}
     std::string print(unsigned delta) const override;
     std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
 private:
-    std::string name_;
+    std::string element_;
     bool equals_;
 };
 

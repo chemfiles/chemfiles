@@ -95,40 +95,40 @@ Ast parse<NoneExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 }
 
 /****************************************************************************************/
-std::string NameExpr::print(unsigned /*unused*/) const {
+std::string ElementExpr::print(unsigned /*unused*/) const {
     auto op = equals_ ? "==" : "!=";
-    return "name($" + std::to_string(argument_ + 1) + ") " + op + " " + name_;
+    return "element($" + std::to_string(argument_ + 1) + ") " + op + " " + element_;
 }
 
-std::vector<bool> NameExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
+std::vector<bool> ElementExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
     auto res = std::vector<bool>(matches.size(), false);
     auto topology = frame.topology();
     for (size_t i = 0; i < matches.size(); i++) {
         auto idx = matches[i][argument_];
-        res[i] = ((topology[idx].name() == name_) == equals_);
+        res[i] = ((topology[idx].element() == element_) == equals_);
     }
     return res;
 }
 
 template <>
-Ast parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+Ast parse<ElementExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(end - begin >= 3);
     assert(begin[2].is_ident());
-    assert(begin[2].ident() == "name");
+    assert(begin[2].ident() == "element");
     if (!begin[1].is_ident() ||
         !(begin[0].type() == Token::EQ || begin[0].type() == Token::NEQ)) {
-        throw SelectionError("Name selection must follow the pattern: 'name == "
-                             "{name} | name != {name}'");
+        throw SelectionError("Element selection must follow the pattern: 'element == "
+                             "{element} | element != {element}'");
     }
     auto equals = (begin[0].type() == Token::EQ);
-    auto name = begin[1].ident();
+    auto element = begin[1].ident();
     if (end - begin >= 4 && begin[3].is_variable()) {
         auto argument = begin[3].variable() - 1;
         begin += 4;
-        return Ast(new NameExpr(argument, name, equals));
+        return Ast(new ElementExpr(argument, element, equals));
     } else {
         begin += 3;
-        return Ast(new NameExpr(0, name, equals));
+        return Ast(new ElementExpr(0, element, equals));
     }
 }
 

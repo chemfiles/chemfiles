@@ -19,8 +19,8 @@ namespace chemfiles {
  * @class Atom Atom.hpp Atom.cpp
  *
  * An Atom is a particle in the current Frame. It can be used to store and
- * retrieve informations about a particle, such as mass, name, atomic number,
- * etc.
+ * retrieve informations about a particle, such as mass, element name, atomic
+ * number, etc.
  */
 class CHFL_EXPORT Atom {
 public:
@@ -37,11 +37,13 @@ public:
         UNDEFINED = 3,
     };
 
-    //! Create an element from its `name`
-    Atom(std::string name);
-    //! Create an element from its `name` and its type
-    Atom(AtomType type, std::string name = "");
-    //! Default is to create an UNDEFINED atom type with no name
+	//! Create an atom from its 'element' with 'label'='element'
+    Atom(std::string element);
+    //! Create an atom from its 'element' and its label
+    Atom(std::string element, std::string label);
+    //! Create an atom from its 'element' and its type
+    Atom(AtomType type, std::string element = "", std::string label = "");
+    //! Default is to create an UNDEFINED atom type with no element or label
     Atom();
 
     Atom(Atom&&) = default;
@@ -49,8 +51,10 @@ public:
     Atom(const Atom&) = default;
     Atom& operator=(const Atom&) = default;
 
-    //! Get a const (non-modifiable) reference to the atom name
-    const std::string& name() const { return name_; }
+    //! Get a const (non-modifiable) reference to the atom element name
+    const std::string& element() const { return element_; }
+    //! Get a const (non-modifiable) reference to the atom label
+    const std::string& label() const { return label_; }
     //! Get the atom mass
     float mass() const { return mass_; }
     //! Get the atom charge
@@ -58,8 +62,10 @@ public:
     //! Get the atom type
     AtomType type() const { return type_; }
 
-    //! Set the atom name
-    void set_name(const std::string& name) { name_ = name; }
+    //! Set the atom element name
+    void set_element(const std::string& element) { element_ = element; }
+    //! Set the atom label
+    void set_label(const std::string& label) { label_ = label; }
     //! Set the atom mass
     void set_mass(float mass) { mass_ = mass; }
     //! Set the atom charge
@@ -81,15 +87,17 @@ public:
     int atomic_number() const;
 
 private:
-    std::string name_;
+    std::string element_;
+    std::string label_;
     float mass_;
     float charge_;
     AtomType type_;
 };
 
 inline bool operator==(const Atom& lhs, const Atom& rhs) {
-    return (lhs.name() == rhs.name() && lhs.mass() == rhs.mass() &&
-            lhs.charge() == rhs.charge() && lhs.type() == rhs.type());
+    return (lhs.element() == rhs.element() && lhs.label() == rhs.label() &&
+            lhs.mass() == rhs.mass() && lhs.charge() == rhs.charge() &&
+            lhs.type() == rhs.type());
 }
 
 } // namespace chemfiles

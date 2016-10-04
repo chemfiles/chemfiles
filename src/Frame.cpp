@@ -78,13 +78,13 @@ void Frame::guess_topology() {
         float irad = topology_[i].vdw_radius();
         if (irad == -1) {
             throw Error("Missing Van der Waals radius for the atom " +
-                        topology_[i].name());
+                        topology_[i].element());
         }
         for (size_t j = i + 1; j < natoms(); j++) {
             float jrad = topology_[j].vdw_radius();
             if (jrad == -1) {
                 throw Error("Missing Van der Waals radius for the atom " +
-                            topology_[j].name());
+                            topology_[j].element());
             }
             double d = norm(cell_.wrap(positions_[i] - positions_[j]));
             if (0.03 < d && d < 0.6 * (irad + jrad) && d < cutoff) {
@@ -99,10 +99,10 @@ void Frame::guess_topology() {
     // once
     for (auto& bond : bonds) {
         auto i = bond[0], j = bond[1];
-        if (topology_[i].name() != "H") {
+        if (topology_[i].element() != "H") {
             continue;
         }
-        if (topology_[j].name() != "H") {
+        if (topology_[j].element() != "H") {
             continue;
         }
 
