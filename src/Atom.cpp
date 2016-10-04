@@ -1,4 +1,4 @@
-	/* Chemfiles, an efficient IO library for chemistry file formats
+/* Chemfiles, an efficient IO library for chemistry file formats
  * Copyright (C) 2015 Guillaume Fraux
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -37,8 +37,7 @@ static bool is_element(const std::string& element) {
 }
 
 Atom::Atom(std::string element)
-	: element_(element), label_(std::move(element)), mass_(0),
-	charge_(0) {
+: element_(element), label_(std::move(element)), mass_(0), charge_(0) {
     if (is_element(element_)) {
         type_ = ELEMENT;
     } else {
@@ -51,8 +50,7 @@ Atom::Atom(std::string element)
 }
 
 Atom::Atom(std::string element, std::string label)
-	: element_(std::move(element)), label_(std::move(label)), mass_(0),
-	charge_(0) {
+    : element_(std::move(element)), label_(std::move(label)), mass_(0), charge_(0) {
     if (is_element(element_)) {
         type_ = ELEMENT;
     } else {
@@ -64,9 +62,12 @@ Atom::Atom(std::string element, std::string label)
     }
 }
 
-Atom::Atom(AtomType type, std::string element, std::string label)
-    : element_(std::move(element)), label_(std::move(label)), mass_(0),
-	charge_(0), type_(type) {}
+Atom::Atom(AtomType type, std::string element, std::string label):
+    element_(std::move(element)),
+    label_(std::move(label)),
+    mass_(0),
+    charge_(0),
+    type_(type) {}
 
 Atom::Atom() : Atom(UNDEFINED) {}
 

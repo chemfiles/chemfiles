@@ -26,11 +26,12 @@ namespace chemfiles {
  * topology, the positions, and the velocities of the particles in the system.
  * If some information is missing (topology or velocity or unit cell), the
  * corresponding data is filled with a default value. Specifically:
- * 	- `velocities` is the `nullopt` version of `optional<Array3D>`. Here,
+ * 
+ * - `velocities` is the `nullopt` version of `optional<Array3D>`. Here,
  *    `optional<T>` refers to the optional template as defined in
  *    [std::experimental::optional][optional]
- * 	- `cell` is an infinite unit cell;
- * 	- `topology` is empty, and contains no data.
+ * - `cell` is an infinite unit cell;
+ * - `topology` is empty, and contains no data.
  *
  * [optional]: http://en.cppreference.com/w/cpp/experimental/optional
  */

@@ -37,7 +37,7 @@ public:
         UNDEFINED = 3,
     };
 
-	//! Create an atom from its 'element' with 'label'='element'
+    //! Create an atom from its 'element' with 'label'='element'
     Atom(std::string element);
     //! Create an atom from its 'element' and its label
     Atom(std::string element, std::string label);

@@ -21,10 +21,10 @@ namespace selections {
  *
  * Various tokens are alowed here:
  *
- * 	- binary comparison operators (== != < <= > >=);
- * 	- boolean operators (and not or);
- * 	- numbers, the scientific notation is alowed;
- * 	- identifiers, obeing to the ([a-Z][a-Z_1-9]+) regular expression
+ * - binary comparison operators (== != < <= > >=);
+ * - boolean operators (and not or);
+ * - numbers, the scientific notation is alowed;
+ * - identifiers, obeing to the ([a-Z][a-Z_1-9]+) regular expression
  */
 class CHFL_EXPORT Token {
 public:

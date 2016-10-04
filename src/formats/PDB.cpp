@@ -280,7 +280,7 @@ void PDBFormat::write(const Frame& frame) {
 
     for (size_t i = 0; i < frame.natoms(); i++) {
         auto& element = frame.topology()[i].element();
-		auto& label = frame.topology()[i].label();
+        auto& label = frame.topology()[i].label();
         auto& pos = frame.positions()[i];
         // Print all atoms as HETATM, because there is no way we can know if we
         // are handling a biomolecule or not.

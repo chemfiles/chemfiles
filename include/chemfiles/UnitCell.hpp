@@ -31,9 +31,9 @@ namespace chemfiles {
  * vector into an orthonormal base. We choose to represent such matrix as an
  * upper triangular matrix:
  *
- * 				| a_x   b_x   c_x |
- * 				|  0    b_y   c_y |
- * 				|  0     0    c_z |
+ *                 | a_x   b_x   c_x |
+ *                 |  0    b_y   c_y |
+ *                 |  0     0    c_z |
  */
 class CHFL_EXPORT UnitCell {
 public:
