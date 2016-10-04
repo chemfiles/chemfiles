@@ -38,11 +38,11 @@ public:
     };
 
     //! Create an atom from its 'element' with 'label'='element'
-    Atom(std::string element);
+    explicit Atom(std::string element);
     //! Create an atom from its 'element' and its label
     Atom(std::string element, std::string label);
     //! Create an atom from its 'element' and its type
-    Atom(AtomType type, std::string element = "", std::string label = "");
+    Atom(AtomType type, std::string element, std::string label = "");
     //! Default is to create an UNDEFINED atom type with no element or label
     Atom();
 
@@ -89,8 +89,8 @@ public:
 private:
     std::string element_;
     std::string label_;
-    float mass_;
-    float charge_;
+    float mass_ = 0;
+    float charge_ = 0;
     AtomType type_;
 };
 
