@@ -119,7 +119,7 @@ chfl_status chfl_atom_set_label(CHFL_ATOM* const atom, const char* label) {
     assert(atom != nullptr);
     assert(label != nullptr);
     CHFL_ERROR_CATCH(
-        atom->set_element(std::string(label));
+        atom->set_label(std::string(label));
     )
 }
 
