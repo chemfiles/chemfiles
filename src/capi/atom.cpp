@@ -106,6 +106,22 @@ chfl_status chfl_atom_set_element(CHFL_ATOM* const atom, const char* element) {
     )
 }
 
+chfl_status chfl_atom_label(const CHFL_ATOM* const atom, char* const label, size_t buffsize) {
+    assert(atom != nullptr);
+    assert(label != nullptr);
+    CHFL_ERROR_CATCH(
+        strncpy(label, atom->label().c_str(), buffsize - 1);
+        label[buffsize - 1] = '\0';
+    )
+}
+
+chfl_status chfl_atom_set_label(CHFL_ATOM* const atom, const char* label) {
+    assert(atom != nullptr);
+    assert(label != nullptr);
+    CHFL_ERROR_CATCH(
+        atom->set_element(std::string(label));
+    )
+}
 
 chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* const element, size_t buffsize) {
     assert(atom != nullptr);
