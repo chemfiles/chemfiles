@@ -37,24 +37,27 @@ static bool is_element(const std::string& element) {
 }
 
 Atom::Atom(std::string element)
-: element_(element), label_(std::move(element)), mass_(0), charge_(0) {
-    if (is_element(element_)) {
-        type_ = ELEMENT;
-    } else {
-        type_ = COARSE_GRAINED;
-    }
-
-    if (PERIODIC_INFORMATION.find(element_) != PERIODIC_INFORMATION.end()) {
-        mass_ = PERIODIC_INFORMATION.at(element_).mass;
-    }
-}
+    : Atom(UNDEFINED, element, std::move(element)) {}
 
 Atom::Atom(std::string element, std::string label)
-    : element_(std::move(element)), label_(std::move(label)), mass_(0), charge_(0) {
-    if (is_element(element_)) {
-        type_ = ELEMENT;
-    } else {
-        type_ = COARSE_GRAINED;
+    : Atom(UNDEFINED, std::move(element), std::move(label)) {}
+
+Atom::Atom(AtomType type, std::string element, std::string label):
+    element_(std::move(element)), label_(std::move(label)), type_(type) {
+    // Use the same value for label and element if one is empty and the other
+    // is not.
+    if (element_ == "" && label_ != "") {
+        element_ = label_;
+    } else if (label_ == "" && element_ != "") {
+        label_ = element_;
+    }
+
+    if (type_ == UNDEFINED && element_ != "") {
+        if (is_element(element_)) {
+            type_ = ELEMENT;
+        } else {
+            type_ = COARSE_GRAINED;
+        }
     }
 
     if (PERIODIC_INFORMATION.find(element_) != PERIODIC_INFORMATION.end()) {
@@ -62,14 +65,7 @@ Atom::Atom(std::string element, std::string label)
     }
 }
 
-Atom::Atom(AtomType type, std::string element, std::string label):
-    element_(std::move(element)),
-    label_(std::move(label)),
-    mass_(0),
-    charge_(0),
-    type_(type) {}
-
-Atom::Atom() : Atom(UNDEFINED) {}
+Atom::Atom(): Atom(UNDEFINED, "", "") {}
 
 std::string Atom::full_name() const {
     if (PERIODIC_INFORMATION.find(element_) != PERIODIC_INFORMATION.end()) {

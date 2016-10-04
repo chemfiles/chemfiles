@@ -11,20 +11,25 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
     Atom a3(Atom::COARSE_GRAINED, "CH4");
     Atom a4("W");
     Atom a5("C", "CB");
+    Atom a6("", "Label only");
+    Atom a7("", "Na");
 
     SECTION("Check constructors"){
         CHECK(a1.element() == "H");
+        CHECK(a1.label() == "H");
         CHECK(a1.mass() == 1.008f);
         CHECK(a1.type() == Atom::ELEMENT);
         CHECK(a1.charge() == 0);
 
         CHECK(a2.type() == Atom::UNDEFINED);
         CHECK(a2.element() == "");
+        CHECK(a2.label() == "");
         CHECK(a2.mass() == 0);
         CHECK(a2.charge() == 0);
 
         CHECK(a3.type() == Atom::COARSE_GRAINED);
         CHECK(a3.element() == "CH4");
+        CHECK(a3.label() == "CH4");
         CHECK(a3.mass() == 0);
         CHECK(a3.charge() == 0);
 
@@ -33,6 +38,18 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
         CHECK(a5.label() == "CB");
         CHECK(a5.mass() == 12.011f);
         CHECK(a5.charge() == 0);
+
+        CHECK(a6.type() == Atom::COARSE_GRAINED);
+        CHECK(a6.element() == "Label only");
+        CHECK(a6.label() == "Label only");
+        CHECK(a6.mass() == 0);
+        CHECK(a6.charge() == 0);
+
+        CHECK(a7.type() == Atom::ELEMENT);
+        CHECK(a7.element() == "Na");
+        CHECK(a7.label() == "Na");
+        CHECK(a7.mass() == 22.98976928f);
+        CHECK(a7.charge() == 0);
     }
 
     SECTION("Set and get properties"){

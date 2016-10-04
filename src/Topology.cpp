@@ -20,7 +20,7 @@ void Topology::resize(size_t natoms) {
                 "-" + std::to_string(bond[1]) + ".");
         }
     }
-    atoms_.resize(natoms, Atom(Atom::UNDEFINED));
+    atoms_.resize(natoms, Atom());
 }
 
 void Topology::append(Atom atom) {
