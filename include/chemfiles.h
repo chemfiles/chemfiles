@@ -988,6 +988,25 @@ CHFL_EXPORT chfl_status chfl_atom_element(const CHFL_ATOM* const atom,
 CHFL_EXPORT chfl_status chfl_atom_set_element(CHFL_ATOM* const atom, const char* element);
 
 /*!
+* @brief Get the label name of an atom
+* @param atom The atom
+* @param label A string buffer to be filled with the label
+* @param buffsize The size of the string buffer
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_atom_label(const CHFL_ATOM* const atom,
+                                       char* const label,
+                                       size_t buffsize);
+
+/*!
+* @brief Set the label of an atom
+* @param atom The atom
+* @param label A null terminated string containing the new label
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_atom_set_label(CHFL_ATOM* const atom, const char* label);
+
+/*!
 * @brief Try to get the full name of an atom from the element name
 * @param atom The atom
 * @param element A string buffer to be filled with the element name
