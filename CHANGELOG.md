@@ -16,6 +16,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   (and velocity) data to a frame, and the C API `chfl_frame_add_atom` function.
 * Rename `UnitCell::type` to `UnitCell::shape`. This also affect
   `chfl_cell_shape_t`, `chfl_cell_shape`, and `chfl_cell_set_shape`.
+* Add the atomic label in addition to the atomic element. This introduces the
+  `Atom::{label,element}` method and remove the `Atom::name` method. This also
+  remove `chfl_atom_{name,set_name}` and add `chfl_atom_{element,set_element}`
+  and `chfl_atom_{label,set_label}`.
 
 ## 0.6 (1 July 2016)
 
