@@ -282,6 +282,18 @@ TEST_CASE("Parsing", "[selection]") {
         CHECK_THROWS_AS(parse(tokenize("element == 45")), SelectionError);
     }
 
+    SECTION("name") {
+        CHECK(parse(tokenize("name == goo"))->print() == "name($1) == goo");
+        CHECK(parse(tokenize("name($1) == goo"))->print() == "name($1) == goo");
+        CHECK(parse(tokenize("name goo"))->print() == "name($1) == goo");
+        CHECK(parse(tokenize("name($3) goo"))->print() == "name($3) == goo");
+        CHECK(parse(tokenize("name != goo"))->print() == "name($1) != goo");
+
+        CHECK_THROWS_AS(parse(tokenize("name < bar")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("name >= bar")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("name == 45")), SelectionError);
+    }
+
     SECTION("Index") {
         CHECK(parse(tokenize("index == 4"))->print() == "index($1) == 4");
         CHECK(parse(tokenize("index($1) == 4"))->print() == "index($1) == 4");

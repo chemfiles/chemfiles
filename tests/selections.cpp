@@ -48,6 +48,20 @@ TEST_CASE("Atoms selections", "[selection]") {
         CHECK(sel.list(frame) == res);
     }
 
+    SECTION("element") {
+        auto sel = Selection("name O");
+        auto res = std::vector<size_t>{1, 2};
+        CHECK(sel.list(frame) == res);
+
+        sel = Selection("name != O");
+        res = std::vector<size_t>{0, 3};
+        CHECK(sel.list(frame) == res);
+
+        sel = Selection("name H1");
+        res = std::vector<size_t>{0};
+        CHECK(sel.list(frame) == res);
+    }
+
     SECTION("positions") {
         auto sel = Selection("x < 2");
         auto res = std::vector<size_t>{0, 1};
@@ -170,7 +184,7 @@ TEST_CASE("Multiple selections", "[selection]") {
 
 Frame testing_frame() {
     auto topology = Topology();
-    topology.append(Atom("H"));
+    topology.append(Atom("H", "H1"));
     topology.append(Atom("O"));
     topology.append(Atom("O"));
     topology.append(Atom("H"));
