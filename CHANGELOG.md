@@ -20,6 +20,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   `Atom::{label,element}` method and remove the `Atom::name` method. This also
   remove `chfl_atom_{name,set_name}` and add `chfl_atom_{element,set_element}`
   and `chfl_atom_{label,set_label}`.
+* The `name` selector now select atoms based on the atomic label. To select on
+  the element, use the new `element` selector.
 
 ## 0.6 (1 July 2016)
 
