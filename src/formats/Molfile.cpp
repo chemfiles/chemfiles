@@ -192,12 +192,23 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
 
     topology_ = Topology();
 
+    auto residues = std::map<size_t, Residue>();
+    size_t atom_id = 0;
     for (auto& vmd_atom : atoms) {
-        Atom atom(vmd_atom.name);
+        Atom atom(vmd_atom.type, vmd_atom.name);
         if (optflags & MOLFILE_MASS) {
             atom.set_mass(vmd_atom.mass);
         }
+
         topology_->append(atom);
+
+        if (vmd_atom.resname != std::string("")) {
+            auto resid = static_cast<size_t>(vmd_atom.resid);
+            auto residue = Residue(vmd_atom.resname, resid);
+            auto inserted = residues.insert({resid, std::move(residue)});
+            inserted.first->second.add_atom(atom_id);
+        }
+        atom_id++;
     }
 
     if (plugin_->read_bonds == nullptr) {
