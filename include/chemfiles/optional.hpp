@@ -116,8 +116,8 @@ namespace experimental{
 # elif defined TR2_OPTIONAL_DISABLE_EMULATION_OF_TYPE_TRAITS
     // leave it: the user doesn't want it
 # else
-	template <typename T>
-	using is_trivially_destructible = std::has_trivial_destructor<T>;
+    template <typename T>
+    using is_trivially_destructible = std::has_trivial_destructor<T>;
 # endif
 // END workaround for missing is_trivially_destructible
 
@@ -537,7 +537,7 @@ public:
 
   OPTIONAL_MUTABLE_CONSTEXPR T&& value() && {
     if (!initialized()) throw bad_optional_access("bad optional access");
-	return std::move(contained_val());
+    return std::move(contained_val());
   }
 
 # else
@@ -1045,11 +1045,11 @@ namespace std
 # undef TR2_OPTIONAL_ASSERTED_EXPRESSION
 
 namespace chemfiles {
-	using std::experimental::optional;
-	using std::experimental::make_optional;
+    using std::experimental::optional;
+    using std::experimental::make_optional;
 
-	using nullopt_t = std::experimental::nullopt_t;
-	constexpr nullopt_t nullopt{nullopt_t::init()};
+    using nullopt_t = std::experimental::nullopt_t;
+    constexpr nullopt_t nullopt{nullopt_t::init()};
 }
 
 # endif //CHEMFILES_OPTIONAL_HPP
