@@ -149,7 +149,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line) {
         element = "";
     }
 
-    auto atom = Atom(element, line.substr(12, 4));
+    auto atom = Atom(element, trim(line.substr(12, 4)));
     try {
         auto x = std::stof(line.substr(31, 8));
         auto y = std::stof(line.substr(38, 8));
