@@ -282,17 +282,29 @@ void PDBFormat::write(const Frame& frame) {
         auto& element = frame.topology()[i].element();
         auto& label = frame.topology()[i].label();
         auto& pos = frame.positions()[i];
+        std::string resname;
+        size_t resid;
+        if (auto resopt = frame.topology().residue(i)) {
+            resname = resopt->name();
+            resid = resopt->id();
+        }
+        else {
+            resname = "RES";
+            resid = i;
+        }
         // Print all atoms as HETATM, because there is no way we can know if we
         // are handling a biomolecule or not.
         //
-        // We ignore the 'altLoc', 'resName' and 'iCode' fields, as we do not
+        // We ignore the 'altLoc' and 'iCode' fields, as we do not
         // know them.
         //
-        // 'chainID' is set to be 'X', and 'resSeq' to be the atomic number.
+        // 'chainID' is set to be 'X', and if there is no residue information
+        // 'resSeq' to be the atomic number.
         // TODO: get molecules informations, and set 'resSeq' accordingly
-        fmt::print(textfile_, "HETATM{:5d}{: >4s} {:3}X{:4d} "
-                              "{:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}{: >2s}\n",
-                   i, label, "", i, pos[0], pos[1], pos[2], 0.0, 0.0, element);
+        fmt::print(textfile_, "HETATM{:5d} {: >4s} {:3} X{:4d}    "
+                              "{:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}"
+                              "          {: >2s}\n",
+                   i, label, resname, resid, pos[0], pos[1], pos[2], 0.0, 0.0, element);
     }
 
     auto connect = std::vector<std::vector<size_t>>(frame.natoms());
