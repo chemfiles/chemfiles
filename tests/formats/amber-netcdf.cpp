@@ -18,10 +18,9 @@ bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
         && (fabs(a[2] - b[2]) < eps);
 }
 
-TEST_CASE("Read files in NetCDF format", "[Amber NetCDF]"){
-    Trajectory file(NCDIR "water.nc");
-
-    SECTION("Read one frame"){
+TEST_CASE("Read files in NetCDF format", "[Amber NetCDF]") {
+    SECTION("Read one frame") {
+        Trajectory file(NCDIR "water.nc");
         auto frame = file.read();
         CHECK(frame.natoms() == 297);
         // Check positions
@@ -30,7 +29,8 @@ TEST_CASE("Read files in NetCDF format", "[Amber NetCDF]"){
         CHECK(roughly(positions[296], vector3d(6.664049f, 11.61418f, 12.96149f), 1e-4));
     }
 
-    SECTION("Read more than one frame"){
+    SECTION("Read more than one frame") {
+        Trajectory file(NCDIR "water.nc");
         auto frame = file.read();
         frame = file.read();
         frame = file.read();
@@ -47,10 +47,17 @@ TEST_CASE("Read files in NetCDF format", "[Amber NetCDF]"){
         CHECK(roughly(positions[0], vector3d(0.3185586f, 8.776042f, 11.8927f), 1e-4));
         CHECK(roughly(positions[296], vector3d(7.089802f, 10.35007f, 12.8159f), 1e-4));
     }
+
+    SECTION("Missing unit cell") {
+        Trajectory file(NCDIR "no-cell.nc");
+        auto frame = file.read();
+        CHECK(frame.natoms() == 1989);
+        CHECK(frame.cell() == UnitCell());
+    }
 }
 
 
-TEST_CASE("Write files in NetCDF format", "[Amber NetCDF]"){
+TEST_CASE("Write files in NetCDF format", "[Amber NetCDF]") {
     SECTION("Write the file") {
         Trajectory file("tmp.nc", 'w');
         Frame frame(4);
