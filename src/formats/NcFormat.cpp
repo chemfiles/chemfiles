@@ -91,15 +91,14 @@ void NCFormat::read(Frame& frame) {
 }
 
 UnitCell NCFormat::read_cell() const {
-    if (ncfile_.dimension("cell_spatial") != 3 ||
-        ncfile_.dimension("cell_angular") != 3) {
-            return UnitCell(); // No UnitCell information
-    }
-
-
     if (!ncfile_.variable_exists("cell_lengths") ||
         !ncfile_.variable_exists("cell_angles")) {
         return UnitCell(); // No UnitCell information
+    }
+
+    if (ncfile_.optional_dimension("cell_spatial", 0) != 3 ||
+        ncfile_.optional_dimension("cell_angular", 0) != 3) {
+            return UnitCell(); // No UnitCell information
     }
 
     auto length_var = ncfile_.variable<float>("cell_lengths");

@@ -109,9 +109,20 @@ void NcFile::add_global_attribute(const std::string& name, const std::string& va
 }
 
 size_t NcFile::dimension(const std::string& name) const {
+    auto size = optional_dimension(name, static_cast<size_t>(-1));
+    if (size == static_cast<size_t>(-1)) {
+        throw FileError("Missing dimmension '" + name + "'");
+    }
+    return size;
+}
+
+size_t NcFile::optional_dimension(const std::string& name, size_t value) const {
     // Get the dimmension id
     auto dim_id = nc::netcdf_id_t(-1);
     auto status = nc_inq_dimid(file_id_, name.c_str(), &dim_id);
+    if (dim_id == nc::netcdf_id_t(-1)) {
+        return value;
+    }
     nc::check(status, "Can not read dimmension '" + name + "'");
 
     // Get dimmension size

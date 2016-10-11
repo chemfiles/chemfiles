@@ -132,6 +132,10 @@ public:
 
     //! Get the value of a specific dimmension
     size_t dimension(const std::string& name) const;
+    //! Get the value of an optional dimmension, or the default `value` if the
+    //! dimmension is not in the file
+    size_t optional_dimension(const std::string& name, size_t value) const;
+
     //! Create a dimmension with the specified value. If `value == NC_UNLIMITED`,
     //! then the dimension is infinite.
     void add_dimension(const std::string& name, size_t value =  NC_UNLIMITED);
