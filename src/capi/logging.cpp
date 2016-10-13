@@ -14,6 +14,9 @@
 #include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
+static_assert(sizeof(chfl_status) == sizeof(int), "Wrong size for chfl_status enum");
+static_assert(sizeof(chfl_log_level_t) == sizeof(int), "Wrong size for chfl_log_level_t enum");
+
 const std::map<chfl_status, std::string> ERROR_MESSAGES = {
     {CHFL_SUCCESS, "operation was sucessfull"},
     {CHFL_MEMORY_ERROR, "memory allocation error."},

@@ -13,6 +13,8 @@
 #include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
+static_assert(sizeof(chfl_cell_shape_t) == sizeof(int), "Wrong size for chfl_cell_shape_t enum");
+
 CHFL_CELL* chfl_cell(const chfl_vector_t lenghts) {
     assert(lenghts != nullptr);
     CHFL_CELL* cell = nullptr;
