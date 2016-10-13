@@ -22,6 +22,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   and `chfl_atom_{label,set_label}`.
 * The `name` selector now select atoms based on the atomic label. To select on
   the element, use the new `element` selector.
+* All the floating point data uses doubles instead of floats. This concerns
+  atomic data, positions and velocities.
+* C API functions taking three lenghts/angles now take a `double[3]` parameter
+  instead.
 
 ## 0.6 (1 July 2016)
 
