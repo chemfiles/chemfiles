@@ -57,7 +57,7 @@ struct VMDFunctions {
 template <MolfileFormat F>
 class Molfile final: public Format {
 public:
-    Molfile(File& file);
+    Molfile(const std::string& path, File::Mode mode);
     ~Molfile() noexcept;
 
      void read(Frame& frame) override;
@@ -72,16 +72,16 @@ private:
     /// Read topological information in the current file, if any.
     void read_topology();
 
+    /// Path of the underlying file
+    std::string path_;
     /// VMD plugin functions
     VMDFunctions<F> functions_;
     /// VMD molfile plugin
     molfile_plugin_t* plugin_;
-
     /// The file handler
     void* file_handler_;
     /// The number of atoms in the last trajectory read
     int natoms_;
-
     /// Store optional topological information
     optional<Topology> topology_;
 };

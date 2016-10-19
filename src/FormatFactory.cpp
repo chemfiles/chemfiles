@@ -5,7 +5,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
-#include "chemfiles/TrajectoryFactory.hpp"
+#include "chemfiles/FormatFactory.hpp"
 #include "chemfiles/Error.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/formats/Molfile.hpp"
@@ -18,7 +18,7 @@ using namespace chemfiles;
 
 template <typename T>
 void registration(trajectory_map_t& formats, trajectory_map_t& extensions) {
-    auto creator = trajectory_builder_t{new_format<T>, new_file<typename T::file_t>};
+    auto creator = new_format<T>;
 
     auto ext = std::string(T::extension());
     if (ext != "") {
@@ -39,7 +39,7 @@ void registration(trajectory_map_t& formats, trajectory_map_t& extensions) {
     }
 }
 
-TrajectoryFactory::TrajectoryFactory() : formats_(), extensions_() {
+FormatFactory::FormatFactory() : formats_(), extensions_() {
     registration<XYZFormat>(formats_, extensions_);
     registration<PDBFormat>(formats_, extensions_);
 
@@ -56,19 +56,19 @@ TrajectoryFactory::TrajectoryFactory() : formats_(), extensions_() {
     registration<Molfile<LAMMPS>>(formats_, extensions_);
 }
 
-TrajectoryFactory& TrajectoryFactory::get() {
-    static auto instance = TrajectoryFactory();
+FormatFactory& FormatFactory::get() {
+    static auto instance = FormatFactory();
     return instance;
 }
 
-trajectory_builder_t TrajectoryFactory::format(const std::string& name) {
+format_creator_t FormatFactory::format(const std::string& name) {
     if (formats_.find(name) == formats_.end()) {
         throw FormatError("Can not find the format \"" + name + "\".");
     }
     return formats_[name];
 }
 
-trajectory_builder_t TrajectoryFactory::by_extension(const std::string& ext) {
+format_creator_t FormatFactory::by_extension(const std::string& ext) {
     if (extensions_.find(ext) == extensions_.end()) {
         throw FormatError("Can not find a format associated with the \"" + ext +
                           "\" extension.");
@@ -76,20 +76,20 @@ trajectory_builder_t TrajectoryFactory::by_extension(const std::string& ext) {
     return extensions_[ext];
 }
 
-void TrajectoryFactory::register_format(const std::string& name,
-                                        trajectory_builder_t tb) {
+void FormatFactory::register_format(const std::string& name,
+                                        format_creator_t creator) {
     if (formats_.find(name) != formats_.end()) {
         throw FormatError("The name \"" + name +
                           "\" is already associated with a format.");
     }
-    formats_.emplace(name, tb);
+    formats_.emplace(name, creator);
 }
 
-void TrajectoryFactory::register_extension(const std::string& ext,
-                                           trajectory_builder_t tb) {
+void FormatFactory::register_extension(const std::string& ext,
+                                           format_creator_t creator) {
     if (extensions_.find(ext) != extensions_.end()) {
         throw FormatError("The extension \"" + ext +
                           "\" is already associated with a format.");
     }
-    extensions_.emplace(ext, tb);
+    extensions_.emplace(ext, creator);
 }

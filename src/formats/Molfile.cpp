@@ -56,12 +56,18 @@ template <MolfileFormat F> static int register_plugin(void* v, vmdplugin_t* p) {
 /******************************************************************************/
 
 template <MolfileFormat F>
-Molfile<F>::Molfile(File& file)
-    : Format(file), plugin_(nullptr), file_handler_(nullptr), natoms_(0) {
+Molfile<F>::Molfile(const std::string& path, File::Mode mode)
+    : path_(path), plugin_(nullptr), file_handler_(nullptr), natoms_(0) {
+    if (mode != File::READ) {
+        throw FormatError(
+            "Molfiles reader for " + molfile_plugins[F].format +
+            " can only open files in read mode."
+        );
+    }
 
     if (functions_.init()) {
         throw FormatError("Could not initialize the " +
-                          molfile_plugins[F].format + " plugin_.");
+                          molfile_plugins[F].format + " plugin.");
     }
 
     plugin_reginfo_t reginfo;
@@ -69,7 +75,7 @@ Molfile<F>::Molfile(File& file)
     // register_plugin ...
     if (functions_.registration(&reginfo, register_plugin<F>)) {
         throw FormatError("Could not register the " +
-                          molfile_plugins[F].format + " plugin_.");
+                          molfile_plugins[F].format + " plugin.");
     }
     plugin_ = reginfo.plugin;
 
@@ -84,11 +90,11 @@ Molfile<F>::Molfile(File& file)
                           " plugin_ does not have read capacities");
     }
 
-    file_handler_ = plugin_->open_file_read(file.filename().c_str(),
+    file_handler_ = plugin_->open_file_read(path.c_str(),
                                             plugin_->name, &natoms_);
 
     if (file_handler_ == nullptr) {
-        throw FileError("Could not open the file: " + file.filename() +
+        throw FileError("Could not open the file: " + path +
                         " with VMD molfile");
     }
 
@@ -120,7 +126,7 @@ template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
 
     int status = plugin_->read_next_timestep(file_handler_, natoms_, &timestep);
     if (status != MOLFILE_SUCCESS) {
-        throw FormatError("Error while reading the file " + file_.filename() +
+        throw FormatError("Error while reading the file " + path_ +
                           " using Molfile format " + molfile_plugins[F].format);
     }
 
@@ -146,7 +152,7 @@ template <MolfileFormat F> size_t Molfile<F>::nsteps() {
     plugin_->close_file_read(file_handler_);
     int tmp = 0;
     file_handler_ =
-        plugin_->open_file_read(file_.filename().c_str(), plugin_->name, &tmp);
+        plugin_->open_file_read(path_.c_str(), plugin_->name, &tmp);
     read_topology();
 
     return n;

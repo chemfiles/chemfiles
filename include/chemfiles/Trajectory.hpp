@@ -18,7 +18,6 @@
 
 namespace chemfiles {
 
-class File;
 class Format;
 
 /*!
@@ -83,14 +82,16 @@ public:
     bool done() const;
 
 private:
+    //! Path of the associated file
+    std::string path_;
+    //! Opening mode of the associated file
+    char mode_;
     //! Current step
     size_t step_;
     //! Number of steps in the file, if available
     size_t nsteps_;
-    //! Format used to read the file
+    //! Format used to read the associated file
     std::unique_ptr<Format> format_;
-    //! The file we are reading from
-    std::unique_ptr<File> file_;
     //! Topology to use for reading/writing files when no topological data is
     //! present
     optional<Topology> custom_topology_;

@@ -14,7 +14,7 @@
 
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Residue.hpp"
-#include "chemfiles/TrajectoryFactory.hpp"
+#include "chemfiles/FormatFactory.hpp"
 
 namespace chemfiles {
 
@@ -30,13 +30,13 @@ namespace chemfiles {
  */
 class PDBFormat final: public Format {
 public:
-    PDBFormat(File& file);
+    PDBFormat(const std::string& path, File::Mode mode);
 
-     void read_step(size_t step, Frame& frame) override;
-     void read(Frame& frame) override;
-     void write(const Frame& frame) override;
-     std::string description() const override;
-     size_t nsteps() override;
+    void read_step(size_t step, Frame& frame) override;
+    void read(Frame& frame) override;
+    void write(const Frame& frame) override;
+    std::string description() const override;
+    size_t nsteps() override;
 
     // Register the PDB format with the ".pdb" extension and the "PDB" description.
     FORMAT_NAME(PDB)
@@ -49,7 +49,7 @@ private:
     // Read CONECT record
     void read_CONECT(Frame& frame, const std::string& line);
 
-    TextFile& textfile_;
+    std::unique_ptr<TextFile> file_;
     /// Map of residues, indexed by residue id.
     std::unordered_map<size_t, Residue> residues_;
 };

@@ -10,7 +10,7 @@
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Error.hpp"
-#include "chemfiles/TrajectoryFactory.hpp"
+#include "chemfiles/FormatFactory.hpp"
 
 using namespace chemfiles;
 
@@ -43,21 +43,19 @@ static File::Mode char_to_file_mode(char mode) {
     }
 }
 
-Trajectory::Trajectory(const std::string& filename, char mode, const std::string& format)
-    : step_(0), nsteps_(0), format_(nullptr), file_(nullptr),
-      custom_topology_(), custom_cell_() {
-    trajectory_builder_t builder;
+Trajectory::Trajectory(const std::string& path, char mode, const std::string& format)
+    : path_(path), mode_(mode), step_(0), nsteps_(0), format_(nullptr), custom_topology_(), custom_cell_() {
+    format_creator_t format_creator;
     if (format == "") {
         // try to guess the format by extension
-        auto ext = extension(filename);
-        builder = TrajectoryFactory::get().by_extension(ext);
+        auto ext = extension(path);
+        format_creator = FormatFactory::get().by_extension(ext);
     } else {
-        builder = TrajectoryFactory::get().format(format);
+        format_creator = FormatFactory::get().format(format);
     }
 
     auto filemode = char_to_file_mode(mode);
-    file_ = builder.file_creator(filename, filemode);
-    format_ = builder.format_creator(*file_);
+    format_ = format_creator(path, filemode);
 
     if (mode == 'r' || mode == 'a') {
         nsteps_ = format_->nsteps();
@@ -71,12 +69,12 @@ Trajectory& Trajectory::operator=(Trajectory&&) = default;
 Frame Trajectory::read() {
     if (step_ >= nsteps_) {
         throw FileError(
-            "Can not read file '" + file_->filename() + "' past end."
+            "Can not read file '" + path_ + "' past end."
         );
     }
-    if (!(file_->mode() == File::READ || file_->mode() == File::APPEND)) {
+    if (!(mode_ == File::READ || mode_ == File::APPEND)) {
         throw FileError(
-            "File '" + file_->filename() + "' was not openened in read or append mode."
+            "File '" + path_ + "' was not openened in read or append mode."
         );
     }
 
@@ -97,14 +95,14 @@ Frame Trajectory::read() {
 Frame Trajectory::read_step(const size_t step) {
     if (step >= nsteps_) {
         throw FileError(
-            "Can not read file '" + file_->filename() + "' at step " +
+            "Can not read file '" + path_ + "' at step " +
             std::to_string(step) + ". Max step is " + std::to_string(nsteps_) + "."
         );
     }
 
-    if (!(file_->mode() == File::READ || file_->mode() == File::APPEND)) {
+    if (!(mode_ == File::READ || mode_ == File::APPEND)) {
         throw FileError(
-            "File '" + file_->filename() + "' was not openened in read or append mode."
+            "File '" + path_ + "' was not openened in read or append mode."
         );
     }
 
@@ -123,9 +121,9 @@ Frame Trajectory::read_step(const size_t step) {
 }
 
 void Trajectory::write(const Frame& frame) {
-    if (!(file_->mode() == File::WRITE || file_->mode() == File::APPEND)) {
+    if (!(mode_ == File::WRITE || mode_ == File::APPEND)) {
         throw FileError(
-            "File '" + file_->filename() + "' was not openened in write or append mode."
+            "File '" + path_ + "' was not openened in write or append mode."
         );
     }
 

@@ -14,13 +14,13 @@
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/TrajectoryFactory.hpp"
+#include "chemfiles/files/NcFile.hpp"
+#include "chemfiles/FormatFactory.hpp"
 
 namespace chemfiles {
 
 class UnitCell;
 class Topology;
-class NcFile;
 
 /*!
  * @class NCFormat formats/NcFormat.hpp formats/NcFormat.cpp
@@ -30,7 +30,7 @@ class NcFile;
  */
 class NCFormat final: public Format {
 public:
-    NCFormat(File& file);
+    NCFormat(const std::string& path, File::Mode mode);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;
@@ -39,27 +39,25 @@ public:
     size_t nsteps() override;
     std::string description() const override;
 
-    using file_t = NcFile;
-
     // Register the Amber NetCDF format with the ".nc" extension and the
     // "AmberNetCDF" description.
     FORMAT_NAME(AmberNetCDF)
     FORMAT_EXTENSION(.nc)
 private:
     //! Read the unit cell at the current internal step, the file is assumed to be valid.
-    UnitCell read_cell() const;
+    UnitCell read_cell();
     //! Generic function to read an Array3D at the current internal step,
     //! the file is assumed to be valid.
-    void read_array3D(Span3D array, const std::string& name) const;
+    void read_array3D(Span3D array, const std::string& name);
 
     //! Write an Array3D to the file, as a variable with the name `name`, at
     //! the current internal step.
-    void write_array3D(const Array3D& array, const std::string& name) const;
+    void write_array3D(const Array3D& array, const std::string& name);
     //! Write an UnitCell to the file, at the current internal step
-    void write_cell(const UnitCell& cell) const;
+    void write_cell(const UnitCell& cell);
 
-    //! Reference to the associated file.
-    NcFile& ncfile_;
+    //! Associated NetCDF file.
+    NcFile file_;
     //! Last read step
     size_t step_;
     //! Was the associated file validated?

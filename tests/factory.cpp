@@ -6,7 +6,7 @@
 #include <catch.hpp>
 
 #include "chemfiles.hpp"
-#include "chemfiles/TrajectoryFactory.hpp"
+#include "chemfiles/FormatFactory.hpp"
 #include "chemfiles/Error.hpp"
 #include "chemfiles/formats/XYZ.hpp"
 
@@ -16,68 +16,53 @@ using namespace chemfiles;
 // Dummy format clase
 class DummyFormat : public Format {
 public:
-    DummyFormat(File& file) : Format(file){}
+    DummyFormat(const std::string&, File::Mode){}
     std::string description() const override {return "";}
     size_t nsteps() override {return 42;}
-};
-
-// Dummy file clase
-class DummyFile : public BinaryFile {
-public:
-    DummyFile(const std::string&, File::Mode) : BinaryFile("", File::READ) {}
-    bool is_open() override {return true;}
-};
-class DummyFormat2 : public Format {
-public:
-    DummyFormat2(File& file) : Format(file){}
-    std::string description() const override {return "";}
-    size_t nsteps() override {return 42;}
-    using file_t = DummyFile;
 };
 
 TEST_CASE("Registering a new format", "[Trajectory factory]"){
-    TrajectoryFactory::get().register_extension(".testing", {nullptr, nullptr});
+    FormatFactory::get().register_extension(".testing", nullptr);
     // We can not register the same format twice
     CHECK_THROWS_AS(
-        TrajectoryFactory::get().register_extension(".testing", {nullptr, nullptr}),
+        FormatFactory::get().register_extension(".testing", nullptr),
         FormatError
     );
 
-    TrajectoryFactory::get().register_format("Testing", {nullptr, nullptr});
+    FormatFactory::get().register_format("Testing", nullptr);
     // We can not register the same format twice
     CHECK_THROWS_AS(
-        TrajectoryFactory::get().register_format("Testing", {nullptr, nullptr}),
+        FormatFactory::get().register_format("Testing", nullptr),
         FormatError
     );
 }
 
 TEST_CASE("Geting registered format", "[Trajectory factory]"){
-    TrajectoryFactory::get().register_extension(".dummy", {new_format<DummyFormat>, new_file<typename DummyFormat::file_t>});
-    TrajectoryFactory::get().register_format("Dummy", {new_format<DummyFormat>, new_file<typename DummyFormat::file_t>});
+    FormatFactory::get().register_extension(".dummy", new_format<DummyFormat>);
+    FormatFactory::get().register_format("Dummy", new_format<DummyFormat>);
 
-    BasicFile file("tmp.dat", File::WRITE);
-
-    DummyFormat dummy(file);
-    auto format = TrajectoryFactory::get().by_extension(".dummy").format_creator(file);
+    DummyFormat dummy("", File::READ);
+    auto format = FormatFactory::get().by_extension(".dummy")("", File::READ);
     CHECK(typeid(dummy) == typeid(*format));
-    format = TrajectoryFactory::get().format("Dummy").format_creator(file);
+    format = FormatFactory::get().format("Dummy")("", File::READ);
     CHECK(typeid(dummy) == typeid(*format));
 
-    XYZFormat XYZ(file);
-    format = TrajectoryFactory::get().by_extension(".xyz").format_creator(file);
+    {
+        // create a file on the filesystem
+        std::ofstream file("tmp.dat");
+    }
+
+
+    XYZFormat XYZ("tmp.dat", File::READ);
+    format = FormatFactory::get().by_extension(".xyz")("tmp.dat", File::READ);
     CHECK(typeid(XYZ) == typeid(*format));
-    format = TrajectoryFactory::get().format("XYZ").format_creator(file);
+    format = FormatFactory::get().format("XYZ")("tmp.dat", File::READ);
     CHECK(typeid(XYZ) == typeid(*format));
 
-    CHECK_THROWS_AS(TrajectoryFactory::get().format("UNKOWN"), FormatError);
-    CHECK_THROWS_AS(TrajectoryFactory::get().by_extension(".UNKOWN"), FormatError);
-}
+    remove("tmp.dat");
 
-TEST_CASE("Geting file type associated to a format", "[Trajectory factory]"){
-    TrajectoryFactory::get().register_extension(".dummy2", {new_format<DummyFormat2>, new_file<typename DummyFormat2::file_t>});
-    DummyFile dummy("", File::READ);
-    auto file = TrajectoryFactory::get().by_extension(".dummy2").file_creator;
-    CHECK(typeid(dummy) == typeid(*file("", File::READ)));
+    CHECK_THROWS_AS(FormatFactory::get().format("UNKOWN"), FormatError);
+    CHECK_THROWS_AS(FormatFactory::get().by_extension(".UNKOWN"), FormatError);
 }
 
 TEST_CASE("Check error throwing in formats", "[Format errors]"){

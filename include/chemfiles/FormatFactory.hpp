@@ -10,6 +10,7 @@
 #define CHEMFILES_FORMAT_FACTORY_HPP
 
 #include <memory>
+#include <functional>
 #include <unordered_map>
 
 #include "chemfiles/File.hpp"
@@ -17,16 +18,12 @@
 
 namespace chemfiles {
 
-//! Function to create a file
-template <class file_t>
-std::unique_ptr<File> new_file(const std::string& path, File::Mode mode) {
-    return std::unique_ptr<File>(new file_t(path, mode));
+//! Function to create a format
+template <class format_t> std::unique_ptr<Format> new_format(const std::string& path, File::Mode mode) {
+    return std::unique_ptr<Format>(new format_t(path, mode));
 }
 
-//! Function to create a format
-template <class format_t> std::unique_ptr<Format> new_format(File& file) {
-    return std::unique_ptr<Format>(new format_t(file));
-}
+typedef std::function<std::unique_ptr<Format>(const std::string& path, File::Mode mode)> format_creator_t;
 
 #define FORMAT_EXTENSION(x)                                                    \
     static const char* extension() {                                           \
@@ -39,19 +36,9 @@ template <class format_t> std::unique_ptr<Format> new_format(File& file) {
         return val;                                                            \
     }
 
-/*!
-* @class trajectory_builder_t TrajectoryFactory.hpp
-* @brief Structure associating format and file classes builder functions.
-*/
-struct trajectory_builder_t {
-    //! Function to create the `Format`
-    std::unique_ptr<Format> (*format_creator)(File& file);
-    //! Function to create the `File`
-    std::unique_ptr<File> (*file_creator)(const std::string& path, File::Mode mode);
-};
 
 //! Files extensions to trajectory builder associations
-using trajectory_map_t = std::unordered_map<std::string, trajectory_builder_t>;
+using trajectory_map_t = std::unordered_map<std::string, format_creator_t>;
 
 /*!
 * @class TrajectoryFactory TrajectoryFactory.hpp
@@ -63,38 +50,38 @@ using trajectory_map_t = std::unordered_map<std::string, trajectory_builder_t>;
 * and can
 * be registered by an extension, or by a Format name.
 */
-class TrajectoryFactory {
+class FormatFactory {
 private:
-    TrajectoryFactory();
+    FormatFactory();
 
 public:
     //! Get the instance of the TrajectoryFactory
-    static TrajectoryFactory& get();
+    static FormatFactory& get();
 
     /*!
-     * @brief Get a trajectory_builder from a format type name.
+     * @brief Get a `format_creator_t` from a format type name.
      * @param name the format name
      * @return A trajectory_builder corresponding to the format, if the format
      *         name is found in the list of registered formats.
      *
      * Throws an error if the format can not be found
      */
-    trajectory_builder_t format(const std::string& name);
+    format_creator_t format(const std::string& name);
 
     /*!
-     * @brief Get a trajectory_builder from a format `extention`.
+     * @brief Get a `format_creator_t` from a format extention.
      * @param ext the format extention
      * @return A trajectory_builder corresponding to the format, if the format
      *         extension is found in the list of registered extensions.
      *
      * Throws an error if the format can not be found
      */
-    trajectory_builder_t by_extension(const std::string& ext);
+    format_creator_t by_extension(const std::string& ext);
 
     //! Register a trajectory_builder in the internal format names list.
-    void register_format(const std::string& name, trajectory_builder_t tb);
+    void register_format(const std::string& name, format_creator_t creator);
     //! Register an trajectory_builder in the internal extensions list.
-    void register_extension(const std::string& ext, trajectory_builder_t tb);
+    void register_extension(const std::string& ext, format_creator_t creator);
 
 private:
     //! Trajectory map associating format descriptions and readers

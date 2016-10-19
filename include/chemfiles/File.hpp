@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace chemfiles {
 
@@ -54,6 +55,9 @@ private:
 //! etc.
 class TextFile : public File, public std::iostream {
 public:
+    //! Open the more adaptated text file class for the given `path` and `mode`
+    static std::unique_ptr<TextFile> create(const std::string& path, File::Mode mode);
+
     virtual ~TextFile() noexcept {}
 
     //! Read a line from the file

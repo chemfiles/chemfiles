@@ -24,10 +24,7 @@ class Frame;
  */
 class Format {
 public:
-    //! Constructor associating a file to this Format instance. The file should
-    //! have the
-    //! file_t class.
-    Format(File& file) : file_(file) {}
+    Format() = default;
     virtual ~Format() noexcept = default;
     Format& operator=(const Format&) = delete;
     Format(const Format&) = delete;
@@ -64,14 +61,6 @@ public:
 
     //! A short string describing the format.
     virtual std::string description() const = 0;
-
-    //! File class to use with this Format. This is for registration in the
-    //! Factory.
-    using file_t = BasicFile;
-
-protected:
-    //! File associated with this Format instance.
-    File& file_;
 };
 
 } // namespace chemfiles

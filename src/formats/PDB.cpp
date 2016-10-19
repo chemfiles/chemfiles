@@ -45,27 +45,27 @@ enum class Record {
 // Get the record type for a line.
 static Record get_record(const std::string& line);
 
-PDBFormat::PDBFormat(File& file)
-    : Format(file), textfile_(dynamic_cast<TextFile&>(file)) {}
+PDBFormat::PDBFormat(const std::string& path, File::Mode mode)
+    : file_(TextFile::create(path, mode)) {}
 
 size_t PDBFormat::nsteps() {
-    textfile_.rewind();
+    file_->rewind();
     size_t n = 0;
     while (true) {
-        forward(textfile_, 1);
-        if (textfile_.eof()) {
+        forward(*file_, 1);
+        if (file_->eof()) {
             break;
         } else {
             n++;
         }
     }
-    textfile_.rewind();
+    file_->rewind();
     return n;
 }
 
 void PDBFormat::read_step(const size_t step, Frame& frame) {
-    textfile_.rewind();
-    forward(textfile_, step);
+    file_->rewind();
+    forward(*file_, step);
     read(frame);
 }
 
@@ -73,8 +73,8 @@ void PDBFormat::read(Frame& frame) {
     frame.resize(0);
     residues_.clear();
 
-    while (!textfile_.eof()) {
-        auto line = textfile_.getline();
+    while (!file_->eof()) {
+        auto line = file_->getline();
         auto record = get_record(line);
         switch (record) {
         case Record::CRYST1:
@@ -128,7 +128,7 @@ void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
         auto space_group = trim(line.substr(55, 10));
         if (space_group != "P 1" && space_group != "P1") {
             Logger::warn("Space group is not P1 (got '", space_group, "') in '",
-                         file_.filename(), "', ignored.");
+                         file_->filename(), "', ignored.");
         }
     }
 }
@@ -272,7 +272,7 @@ Record get_record(const std::string& line) {
 void PDBFormat::write(const Frame& frame) {
     auto& cell = frame.cell();
     fmt::print(
-        textfile_,
+        *file_,
         // Do not try to guess the space group and the z value, just use the
         // default one.
         "CRYST1{:9.3f}{:9.3f}{:9.3f}{:7.2f}{:7.2f}{:7.2f} P 1           1\n",
@@ -301,9 +301,9 @@ void PDBFormat::write(const Frame& frame) {
         // 'chainID' is set to be 'X', and if there is no residue information
         // 'resSeq' to be the atomic number.
         // TODO: get molecules informations, and set 'resSeq' accordingly
-        fmt::print(textfile_, "HETATM{:5d} {: >4s} {:3} X{:4d}    "
-                              "{:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}"
-                              "          {: >2s}\n",
+        fmt::print(*file_, "HETATM{:5d} {: >4s} {:3} X{:4d}    "
+                           "{:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}"
+                           "          {: >2s}\n",
                    i, label, resname, resid, pos[0], pos[1], pos[2], 0.0, 0.0, element);
     }
 
@@ -324,13 +324,13 @@ void PDBFormat::write(const Frame& frame) {
             );
         }
 
-        fmt::print(textfile_, "CONECT{:5d}", i);
+        fmt::print(*file_, "CONECT{:5d}", i);
         auto last = std::min(connections, size_t(4));
         for (size_t j = 0; j < last; j++) {
-            fmt::print(textfile_, "{:5d}", connect[i][j]);
+            fmt::print(*file_, "{:5d}", connect[i][j]);
         }
-        fmt::print(textfile_, "\n");
+        fmt::print(*file_, "\n");
     }
 
-    fmt::print(textfile_, "END\n");
+    fmt::print(*file_, "END\n");
 }

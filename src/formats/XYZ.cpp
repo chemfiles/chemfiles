@@ -17,8 +17,8 @@
 
 using namespace chemfiles;
 
-XYZFormat::XYZFormat(File& file)
-    : Format(file), textfile_(dynamic_cast<TextFile&>(file)), step_cursor_(0) {}
+XYZFormat::XYZFormat(const std::string& path, File::Mode mode)
+    : file_(TextFile::create(path, mode)), step_cursor_(0) {}
 
 std::string XYZFormat::description() const {
     return "XYZ file format.";
@@ -31,16 +31,16 @@ bool XYZFormat::forward(size_t nsteps) {
     std::string line;
     while (i < nsteps) {
         try {
-            line = textfile_.getline();
+            line = file_->getline();
             auto natoms = std::stoul(line);
-            textfile_.readlines(natoms + 1);
+            file_->readlines(natoms + 1);
             step_cursor_++;
         } catch (const std::invalid_argument&) {
             // We could not read an integer, so give up here
             return false;
         } catch (const FileError&) {
             // We could not read the lines from the file
-            throw FormatError("Not enough lines in '" + textfile_.filename() +
+            throw FormatError("Not enough lines in '" + file_->filename() +
                               "' for XYZ format at step " + std::to_string(i));
         }
         i++;
@@ -49,19 +49,19 @@ bool XYZFormat::forward(size_t nsteps) {
 }
 
 size_t XYZFormat::nsteps() {
-    textfile_.rewind();
+    file_->rewind();
     size_t n = 0;
-    while (!textfile_.eof()) {
+    while (!file_->eof()) {
         if (forward(1)) {
             n++;
         }
     }
-    textfile_.rewind();
+    file_->rewind();
     return n;
 }
 
 void XYZFormat::read_step(const size_t step, Frame& frame) {
-    textfile_.rewind();
+    file_->rewind();
     forward(step);
     read(frame);
 }
@@ -69,15 +69,15 @@ void XYZFormat::read_step(const size_t step, Frame& frame) {
 void XYZFormat::read(Frame& frame) {
     size_t natoms = 0;
     try {
-        natoms = std::stoul(textfile_.getline());
-        textfile_.getline(); // XYZ comment line;
+        natoms = std::stoul(file_->getline());
+        file_->getline(); // XYZ comment line;
     } catch (const std::exception& e) {
         throw FormatError("Can not read next step: " + std::string(e.what()));
     }
 
     std::vector<std::string> lines;
     try {
-        lines = textfile_.readlines(natoms);
+        lines = file_->readlines(natoms);
     } catch (const FileError& e) {
         throw FormatError("Can not read file: " + std::string(e.what()));
     }
@@ -102,15 +102,15 @@ void XYZFormat::write(const Frame& frame) {
     auto& positions = frame.positions();
     assert(frame.natoms() == topology.natoms());
 
-    textfile_ << frame.natoms() << "\n";
-    textfile_ << "Written by the chemfiles library\n";
+    *file_ << frame.natoms() << "\n";
+    *file_ << "Written by the chemfiles library\n";
 
     for (size_t i = 0; i < frame.natoms(); i++) {
         auto element = topology[i].element();
         if (element == "") {element = "X";}
-        textfile_ << element << " "
-                  << positions[i][0] << " "
-                  << positions[i][1] << " "
-                  << positions[i][2] << "\n";
+        *file_ << element << " "
+               << positions[i][0] << " "
+               << positions[i][1] << " "
+               << positions[i][2] << "\n";
     }
 }
