@@ -76,7 +76,7 @@ namespace nc {
 
         //! Put multiple strings of data in this variable
         template<typename T = NcType, typename unused = enable_if_same<T, char>>
-        void add(std::vector<const char*> data);
+        void add(std::vector<std::string> data);
 
         //! Get the dimensions size for this variable
         std::vector<size_t> dimmensions() const;
@@ -248,15 +248,16 @@ namespace nc {
     }
 
     template<> template<typename T, typename U>
-    void NcVariable<char>::add(std::vector<const char*> data) {
+    void NcVariable<char>::add(std::vector<std::string> data) {
         size_t i = 0;
         for (auto string: data) {
+            string.resize(STRING_MAXLEN, '\0');
             size_t start[] = {i, 0};
             size_t count[] = {1, STRING_MAXLEN};
             int status = nc_put_vara_text(
                 file_.netcdf_id(), var_id_,
                 start, count,
-                string
+                string.c_str()
             );
             nc::check(status, "Could not put vector text data in variable");
             i++;
