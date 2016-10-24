@@ -21,11 +21,11 @@
 
 Chemfiles is a modern and high-quality library for reading and writing
 trajectory files created by simulations program. These trajectories are created
-by computational chemistry softwares, and contains atomic positions, velocities,
+by computational chemistry software, and contains atomic positions, velocities,
 names, topology and sometimes more.
 
 Running simulations produce enormous amounts of data, which has to be
-post-processed in order to extract physical informations about the simulated
+post-processed in order to extract physical information about the simulated
 system. Chemfiles provides an interface to access this information which is
 - **unified**: the same code will work with all the supported formats;
 - **simple**: the interface is easy to use and extensively documented.
@@ -46,7 +46,7 @@ Chemfiles is free and open source, and your
 - [Getting started](#getting-started)
 - [Contributing](#contributions-welcome)
 - [Full documentation](http://chemfiles.github.io/chemfiles/)
-- Documentation for using chemfile from various language:
+- Documentation for using Chemfiles from various language:
     - [Python 2 and 3](http://chemfiles.github.io/chemfiles.py/)
     - [Fortran](http://chemfiles.github.io/chemfiles.f03/)
     - [C and C++](http://chemfiles.github.io/chemfiles/)
@@ -78,22 +78,23 @@ You should give a try to chemfiles if one of theses sentence is true for you:
 
 If you find other uses for chemfiles, let us know! The main author is using it
 for both analysis algorithm in [cfiles](https://github.com/chemfiles/cfiles),
-and for IO in two simulation softwares.
+and for IO in two simulation software.
 
 ## File formats
 
-The following formats provide both reading and writing capacities:
+Chelfiles can read and write files in the following formats:
 - XYZ;
 - PDB;
 - Amber NetCDF.
 
-The following formats only provide read capacities:
+Chelfiles can also read (it can not write yet) files in the following formats:
 - LAMMPS trajectory;
+- TNG;
 - Gromacs formats: .gro; .xtc; .trj; .trr;
 - CHARMM DCD files
 
-Any format supported by VMD is easy to add. If you need one, just open a new
-issue.
+Any other format supported by VMD is easy to add. If you need one, just open a
+new issue.
 
 See the [issue list](https://github.com/chemfiles/chemfiles/labels/New%20Format)
 for additional planned formats. If you want a new format to be added to

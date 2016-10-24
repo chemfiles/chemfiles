@@ -24,8 +24,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   the element, use the new `element` selector.
 * All the floating point data uses doubles instead of floats. This concerns
   atomic data, positions and velocities.
-* C API functions taking three lenghts/angles now take a `double[3]` parameter
+* C API functions taking three lengths/angles now take a `double[3]` parameter
   instead.
+* Add read support for TNG files, an new portable and compressed binary format
+  used by Gromacs.
 
 ## 0.6 (1 July 2016)
 
@@ -105,7 +107,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Julia binding
 * Initial Windows support, with both MSVC and mingw
 * Add a binary frontend called `chrp`, implementing some analysis algorithms.
-  For more informations, see the [specific repository](https://github.com/Luthaf/chrp).
+  For more information, see the [specific repository](https://github.com/Luthaf/chrp).
 
 ## 0.2 (31 May 2015)
 

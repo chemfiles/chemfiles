@@ -23,6 +23,8 @@ specify which format to use.
 +-------------------+------------+-------------------+---------+---------+
 | `Amber NetCDF`_   | .nc        | |no|              | |yes|   | |yes|   |
 +-------------------+------------+-------------------+---------+---------+
+| `TNG`_            | .tng       | |yes|             | |yes|   | |no|    |
++-------------------+------------+-------------------+---------+---------+
 | LAMMPS            | .lammpstrj | |no|              | |yes|   | |no|    |
 +-------------------+------------+-------------------+---------+---------+
 | `GRO`_            | .gro       | |yes| Atom names  | |yes|   | |no|    |
@@ -39,6 +41,7 @@ specify which format to use.
 .. _XYZ: http://openbabel.org/wiki/XYZ
 .. _PDB: http://www.rcsb.org/pdb/static.do?p=file_formats/pdb/index.html
 .. _Amber NetCDF: http://ambermd.org/netcdf/nctraj.xhtml
+.. _TNG: http://doi.wiley.com/10.1002/jcc.23495
 
 .. _GRO: http://manual.gromacs.org/current/online/gro.html
 .. _XTC: http://manual.gromacs.org/current/online/xtc.html
