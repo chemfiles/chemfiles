@@ -28,6 +28,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   instead.
 * Add read support for TNG files, an new portable and compressed binary format
   used by Gromacs.
+* All the integers at C boundary have a fixed size, most of the time using
+  `uint64_t`.
 
 ## 0.6 (1 July 2016)
 

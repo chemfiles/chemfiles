@@ -12,7 +12,7 @@
 #include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
-CHFL_FRAME* chfl_frame(size_t natoms) {
+CHFL_FRAME* chfl_frame(uint64_t natoms) {
     CHFL_FRAME* frame = nullptr;
     CHFL_ERROR_GOTO(
         frame = new Frame(natoms);
@@ -23,7 +23,7 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame, size_t *natoms) {
+chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame, uint64_t *natoms) {
     assert(frame != nullptr);
     assert(natoms != nullptr);
     CHFL_ERROR_CATCH(
@@ -31,7 +31,7 @@ chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame, size_t *natoms
     )
 }
 
-chfl_status chfl_frame_positions(CHFL_FRAME* const frame, chfl_vector_t** data, size_t* size) {
+chfl_status chfl_frame_positions(CHFL_FRAME* const frame, chfl_vector_t** data, uint64_t* size) {
     assert(frame != nullptr);
     assert(data != nullptr);
     assert(size != nullptr);
@@ -46,7 +46,7 @@ chfl_status chfl_frame_positions(CHFL_FRAME* const frame, chfl_vector_t** data, 
     )
 }
 
-chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vector_t** data, size_t* size) {
+chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vector_t** data, uint64_t* size) {
     assert(frame != nullptr);
     assert(data != nullptr);
     assert(size != nullptr);
@@ -80,7 +80,7 @@ chfl_status chfl_frame_add_atom(CHFL_FRAME* const frame, const CHFL_ATOM* const 
     )
 }
 
-chfl_status chfl_frame_resize(CHFL_FRAME* const frame, size_t natoms) {
+chfl_status chfl_frame_resize(CHFL_FRAME* const frame, uint64_t natoms) {
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
         frame->resize(natoms);
@@ -118,7 +118,7 @@ chfl_status chfl_frame_set_topology(CHFL_FRAME* const frame, const CHFL_TOPOLOGY
     )
 }
 
-chfl_status chfl_frame_step(const CHFL_FRAME* const frame, size_t* step) {
+chfl_status chfl_frame_step(const CHFL_FRAME* const frame, uint64_t* step) {
     assert(frame != nullptr);
     assert(step != nullptr);
     CHFL_ERROR_CATCH(
@@ -126,7 +126,7 @@ chfl_status chfl_frame_step(const CHFL_FRAME* const frame, size_t* step) {
     )
 }
 
-chfl_status chfl_frame_set_step(CHFL_FRAME* const frame, size_t step) {
+chfl_status chfl_frame_set_step(CHFL_FRAME* const frame, uint64_t step) {
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
         frame->set_step(step);

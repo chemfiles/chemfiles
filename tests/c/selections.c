@@ -7,7 +7,7 @@
 #include "helpers.h"
 
 static CHFL_FRAME* testing_frame();
-static bool find_match(const chfl_match_t* matches, size_t n_matches, chfl_match_t match);
+static bool find_match(const chfl_match_t* matches, uint64_t n_matches, chfl_match_t match);
 
 int main() {
     silent_crash_handlers();
@@ -17,11 +17,11 @@ int main() {
     assert(frame != NULL);
     assert(selection != NULL);
 
-    size_t size = 0;
+    uint64_t size = 0;
     assert(!chfl_selection_size(selection, &size));
     assert(size == 1);
 
-    size_t n_matches = 0;
+    uint64_t n_matches = 0;
     assert(!chfl_selection_evalutate(selection, frame, &n_matches));
     assert(n_matches == 2);
 
@@ -34,7 +34,7 @@ int main() {
     assert(matches[1].atoms[0] == 2);
 
     // Check "out of bound" values
-    assert(matches[1].atoms[3] == (size_t)-1);
+    assert(matches[1].atoms[3] == (uint64_t)-1);
 
     free(matches);
     assert(!chfl_selection_free(selection));
@@ -71,9 +71,9 @@ int main() {
     assert(!chfl_selection_matches(selection, matches, n_matches));
     assert(matches[0].size == 3);
     assert(matches[1].size == 3);
-    chfl_match_t match_1 = {.size=3, .atoms={0, 1, 2, (size_t)-1}};
+    chfl_match_t match_1 = {.size=3, .atoms={0, 1, 2, (uint64_t)-1}};
     assert(find_match(matches, n_matches, match_1));
-    chfl_match_t match_2 = {.size=3, .atoms={1, 2, 3, (size_t)-1}};
+    chfl_match_t match_2 = {.size=3, .atoms={1, 2, 3, (uint64_t)-1}};
     assert(find_match(matches, n_matches, match_2));
 
     free(matches);
@@ -109,9 +109,9 @@ static CHFL_FRAME* testing_frame() {
     return frame;
 }
 
-static bool find_match(const chfl_match_t* matches, size_t n_matches, chfl_match_t match) {
+static bool find_match(const chfl_match_t* matches, uint64_t n_matches, chfl_match_t match) {
     assert(matches != NULL);
-    for (size_t i=0; i<n_matches; i++) {
+    for (uint64_t i=0; i<n_matches; i++) {
         assert(matches[i].size == match.size);
         if (matches[i].atoms[0] == match.atoms[0] &&
             matches[i].atoms[1] == match.atoms[1] &&

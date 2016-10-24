@@ -25,7 +25,7 @@ static void test_bonds() {
     CHFL_TOPOLOGY* topology = chfl_topology();
     assert(topology != NULL);
 
-    size_t natoms=100, n=0;
+    uint64_t natoms=100, n=0;
     assert(!chfl_topology_atoms_count(topology, &natoms));
     assert(natoms == 0);
 
@@ -75,8 +75,8 @@ static void test_bonds() {
     assert(!chfl_topology_isdihedral(topology, 0, 1, 3, 2, &res));
     assert(res == false);
 
-    size_t top_bonds[3][2] = {{2, 3}, {1, 2}, {0, 1}};
-    size_t bonds[3][2];
+    uint64_t top_bonds[3][2] = {{2, 3}, {1, 2}, {0, 1}};
+    uint64_t bonds[3][2];
     assert(!chfl_topology_bonds(topology, bonds, 3));
     for (unsigned i=0; i<3; i++) {
         for (unsigned j=0; j<2; j++) {
@@ -84,8 +84,8 @@ static void test_bonds() {
         }
     }
 
-    size_t top_angles[2][3] = {{0, 1, 2}, {1, 2, 3}};
-    size_t angles[2][3];
+    uint64_t top_angles[2][3] = {{0, 1, 2}, {1, 2, 3}};
+    uint64_t angles[2][3];
     assert(!chfl_topology_angles(topology, angles, 2));
     for (unsigned i=0; i<2; i++) {
         for (unsigned j=0; j<3; j++) {
@@ -93,8 +93,8 @@ static void test_bonds() {
         }
     }
 
-    size_t top_dihedrals[1][4] = {{0, 1, 2, 3}};
-    size_t dihedrals[1][4];
+    uint64_t top_dihedrals[1][4] = {{0, 1, 2, 3}};
+    uint64_t dihedrals[1][4];
     assert(!chfl_topology_dihedrals(topology, dihedrals, 1));
     for (unsigned j=0; j<4; j++) {
         assert(dihedrals[0][j] == top_dihedrals[0][j]);
@@ -119,7 +119,7 @@ static void test_size() {
     CHFL_TOPOLOGY* topology = chfl_topology();
     assert(topology != NULL);
 
-    size_t natoms = 100;
+    uint64_t natoms = 100;
     assert(!chfl_topology_atoms_count(topology, &natoms));
     assert(natoms == 0);
 
@@ -135,16 +135,16 @@ static void test_residues() {
     assert(topology != NULL);
 
     CHFL_ATOM* atom = chfl_atom("X");
-    for (size_t i=0; i<10; i++) {
+    for (uint64_t i=0; i<10; i++) {
         assert(!chfl_topology_append(topology, atom));
     }
     chfl_atom_free(atom);
 
-    size_t residues[3][3] = {{2, 3, 6}, {0, 1, 9}, {4, 5, 8}};
-    for (size_t i=0; i<3; i++) {
-        CHFL_RESIDUE* residue = chfl_residue("X", (size_t)-1);
+    uint64_t residues[3][3] = {{2, 3, 6}, {0, 1, 9}, {4, 5, 8}};
+    for (uint64_t i=0; i<3; i++) {
+        CHFL_RESIDUE* residue = chfl_residue("X", (uint64_t)-1);
         assert(residue != NULL);
-        for (size_t j=0; j<3; j++) {
+        for (uint64_t j=0; j<3; j++) {
             assert(!chfl_residue_add_atom(residue, residues[i][j]));
         }
 
@@ -152,7 +152,7 @@ static void test_residues() {
         chfl_residue_free(residue);
     }
 
-    size_t count = 0;
+    uint64_t count = 0;
     assert(!chfl_topology_residues_count(topology, &count));
     assert(count == 3);
 

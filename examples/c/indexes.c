@@ -13,7 +13,7 @@ int main(void) {
 
     if (chfl_trajectory_read(file, frame) != CHFL_SUCCESS) {/*Handle error*/}
 
-    size_t natoms = 0;
+    uint64_t natoms = 0;
     chfl_vector_t* positions = NULL;
     chfl_frame_positions(frame, &positions, &natoms);
     indexes = malloc(natoms * sizeof(unsigned));

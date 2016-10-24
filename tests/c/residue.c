@@ -17,11 +17,11 @@ int main() {
     assert(!chfl_residue_name(residue, name, 32));
     assert(strcmp(name, "Foo") == 0);
 
-    size_t resid = 0;
+    uint64_t resid = 0;
     assert(!chfl_residue_id(residue, &resid));
     assert(resid == 56);
 
-    size_t size = 10;
+    uint64_t size = 10;
     assert(!chfl_residue_atoms_count(residue, &size));
     assert(size == 0);
 

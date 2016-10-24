@@ -29,14 +29,14 @@ static void test_read() {
     assert(frame != NULL);
     assert(file != NULL);
 
-    size_t nsteps = 0;
+    uint64_t nsteps = 0;
     assert(!chfl_trajectory_nsteps(file, &nsteps));
     assert(nsteps == 100);
 
     // Read the first frame
     assert(!chfl_trajectory_read(file, frame));
 
-    size_t natoms = 0;
+    uint64_t natoms = 0;
     assert(!chfl_frame_atoms_count(frame, &natoms));
     assert(natoms == 297);
 
@@ -59,7 +59,7 @@ static void test_read() {
     CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
     assert(!chfl_topology_atoms_count(topology, &natoms));
     assert(natoms == 297);
-    size_t n = 0;
+    uint64_t n = 0;
     assert(!chfl_topology_bonds_count(topology, &n));
     assert(n == 0);
 
@@ -192,7 +192,7 @@ static void test_write() {
     assert(frame != NULL);
 
     chfl_vector_t* positions = NULL;
-    size_t natoms = 0;
+    uint64_t natoms = 0;
     assert(!chfl_frame_positions(frame, &positions, &natoms));
     assert(natoms == 4);
 

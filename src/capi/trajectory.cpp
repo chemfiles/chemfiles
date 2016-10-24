@@ -37,7 +37,7 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY* const file, size_t step, CHFL_FRAME* const frame) {
+chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY* const file, uint64_t step, CHFL_FRAME* const frame) {
     assert(file != nullptr);
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
@@ -94,7 +94,7 @@ chfl_status chfl_trajectory_set_cell(CHFL_TRAJECTORY* const file, const CHFL_CEL
     )
 }
 
-chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const file, size_t* nsteps) {
+chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const file, uint64_t* nsteps) {
     assert(file != nullptr);
     assert(nsteps != nullptr);
     CHFL_ERROR_CATCH(

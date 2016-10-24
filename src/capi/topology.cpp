@@ -37,7 +37,7 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const topology, size_t *natoms) {
+chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const topology, uint64_t *natoms) {
     assert(topology != nullptr);
     assert(natoms != nullptr);
     CHFL_ERROR_CATCH(
@@ -45,7 +45,7 @@ chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const topology, size_
     )
 }
 
-chfl_status chfl_topology_resize(CHFL_TOPOLOGY* const topology, size_t natoms) {
+chfl_status chfl_topology_resize(CHFL_TOPOLOGY* const topology, uint64_t natoms) {
     assert(topology != nullptr);
     CHFL_ERROR_CATCH(
         topology->resize(natoms);
@@ -60,14 +60,14 @@ chfl_status chfl_topology_append(CHFL_TOPOLOGY* const topology, const CHFL_ATOM*
     )
 }
 
-chfl_status chfl_topology_remove(CHFL_TOPOLOGY* const topology, size_t i) {
+chfl_status chfl_topology_remove(CHFL_TOPOLOGY* const topology, uint64_t i) {
     assert(topology != nullptr);
     CHFL_ERROR_CATCH(
         topology->remove(i);
     )
 }
 
-chfl_status chfl_topology_isbond(const CHFL_TOPOLOGY* const topology, size_t i, size_t j, bool* result) {
+chfl_status chfl_topology_isbond(const CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, bool* result) {
     assert(topology != nullptr);
     assert(result != nullptr);
     CHFL_ERROR_CATCH(
@@ -75,7 +75,7 @@ chfl_status chfl_topology_isbond(const CHFL_TOPOLOGY* const topology, size_t i, 
     )
 }
 
-chfl_status chfl_topology_isangle(const CHFL_TOPOLOGY* const topology, size_t i, size_t j, size_t k, bool* result) {
+chfl_status chfl_topology_isangle(const CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, uint64_t k, bool* result) {
     assert(topology != nullptr);
     assert(result != nullptr);
     CHFL_ERROR_CATCH(
@@ -83,7 +83,7 @@ chfl_status chfl_topology_isangle(const CHFL_TOPOLOGY* const topology, size_t i,
     )
 }
 
-chfl_status chfl_topology_isdihedral(const CHFL_TOPOLOGY* const topology, size_t i, size_t j, size_t k, size_t m, bool* result) {
+chfl_status chfl_topology_isdihedral(const CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, uint64_t k, uint64_t m, bool* result) {
     assert(topology != nullptr);
     assert(result != nullptr);
     CHFL_ERROR_CATCH(
@@ -91,7 +91,7 @@ chfl_status chfl_topology_isdihedral(const CHFL_TOPOLOGY* const topology, size_t
     )
 }
 
-chfl_status chfl_topology_bonds_count(const CHFL_TOPOLOGY* const topology, size_t* nbonds) {
+chfl_status chfl_topology_bonds_count(const CHFL_TOPOLOGY* const topology, uint64_t* nbonds) {
     assert(topology != nullptr);
     assert(nbonds != nullptr);
     CHFL_ERROR_CATCH(
@@ -99,7 +99,7 @@ chfl_status chfl_topology_bonds_count(const CHFL_TOPOLOGY* const topology, size_
     )
 }
 
-chfl_status chfl_topology_angles_count(const CHFL_TOPOLOGY* const topology, size_t* nangles) {
+chfl_status chfl_topology_angles_count(const CHFL_TOPOLOGY* const topology, uint64_t* nangles) {
     assert(topology != nullptr);
     assert(nangles != nullptr);
     CHFL_ERROR_CATCH(
@@ -107,7 +107,7 @@ chfl_status chfl_topology_angles_count(const CHFL_TOPOLOGY* const topology, size
     )
 }
 
-chfl_status chfl_topology_dihedrals_count(const CHFL_TOPOLOGY* const topology, size_t* ndihedrals) {
+chfl_status chfl_topology_dihedrals_count(const CHFL_TOPOLOGY* const topology, uint64_t* ndihedrals) {
     assert(topology != nullptr);
     assert(ndihedrals != nullptr);
     CHFL_ERROR_CATCH(
@@ -115,7 +115,7 @@ chfl_status chfl_topology_dihedrals_count(const CHFL_TOPOLOGY* const topology, s
     )
 }
 
-chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, size_t (*data)[2], size_t nbonds) {
+chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[2], uint64_t nbonds) {
     assert(topology != nullptr);
     assert(data != nullptr);
     if (nbonds != topology->bonds().size()) {
@@ -125,14 +125,14 @@ chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, size_t (*da
 
     auto bonds = topology->bonds();
     CHFL_ERROR_CATCH(
-        for (size_t i = 0; i<nbonds; i++) {
+        for (uint64_t i = 0; i<nbonds; i++) {
             data[i][0] = bonds[i][0];
             data[i][1] = bonds[i][1];
         }
     )
 }
 
-chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology, size_t (*data)[3], size_t nangles) {
+chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[3], uint64_t nangles) {
     assert(topology != nullptr);
     assert(data != nullptr);
     if (nangles != topology->angles().size()) {
@@ -142,7 +142,7 @@ chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology, size_t (*d
 
     auto angles = topology->angles();
     CHFL_ERROR_CATCH(
-        for (size_t i = 0; i<nangles; i++) {
+        for (uint64_t i = 0; i<nangles; i++) {
             data[i][0] = angles[i][0];
             data[i][1] = angles[i][1];
             data[i][2] = angles[i][2];
@@ -150,7 +150,7 @@ chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology, size_t (*d
     )
 }
 
-chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topology, size_t (*data)[4], size_t ndihedrals) {
+chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t ndihedrals) {
     assert(topology != nullptr);
     assert(data != nullptr);
     if (ndihedrals != topology->dihedrals().size()) {
@@ -160,7 +160,7 @@ chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topology, size_t 
 
     auto dihedrals = topology->dihedrals();
     CHFL_ERROR_CATCH(
-        for (size_t i = 0; i<ndihedrals; i++) {
+        for (uint64_t i = 0; i<ndihedrals; i++) {
             data[i][0] = dihedrals[i][0];
             data[i][1] = dihedrals[i][1];
             data[i][2] = dihedrals[i][2];
@@ -169,21 +169,21 @@ chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topology, size_t 
     )
 }
 
-chfl_status chfl_topology_add_bond(CHFL_TOPOLOGY* const topology, size_t i, size_t j) {
+chfl_status chfl_topology_add_bond(CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j) {
     assert(topology != nullptr);
     CHFL_ERROR_CATCH(
         topology->add_bond(i, j);
     )
 }
 
-chfl_status chfl_topology_remove_bond(CHFL_TOPOLOGY* const topology, size_t i, size_t j) {
+chfl_status chfl_topology_remove_bond(CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j) {
     assert(topology != nullptr);
     CHFL_ERROR_CATCH(
         topology->remove_bond(i, j);
     )
 }
 
-chfl_status chfl_topology_residues_count(const CHFL_TOPOLOGY* const topology, size_t* residues) {
+chfl_status chfl_topology_residues_count(const CHFL_TOPOLOGY* const topology, uint64_t* residues) {
     assert(topology != nullptr);
     assert(residues != nullptr);
     CHFL_ERROR_CATCH(

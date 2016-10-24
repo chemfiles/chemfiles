@@ -9,7 +9,7 @@
 
 int main(void) {
     CHFL_TRAJECTORY* file = chfl_trajectory_open("filename.nc", 'r');
-    size_t nsteps = 0;
+    uint64_t nsteps = 0;
     chfl_trajectory_nsteps(file, &nsteps);
 
     double* distances = malloc(sizeof(double) * nsteps);
@@ -18,10 +18,10 @@ int main(void) {
     CHFL_FRAME* frame = chfl_frame(0);
     // Accumulate the distances to the origin of the 10th atom throughtout the
     // trajectory
-    for (size_t i=0; i<nsteps; i++) {
+    for (uint64_t i=0; i<nsteps; i++) {
         if(!chfl_trajectory_read(file, frame)) {/*Handle error*/}
 
-        size_t natoms = 0;
+        uint64_t natoms = 0;
         chfl_vector_t* positions = NULL;
 
         // Get a pointer to the positions in `positions`. The array `positions`
@@ -39,13 +39,13 @@ int main(void) {
     }
 
     double mean = 0;
-    for (size_t i=0; i<nsteps; i++) {
+    for (uint64_t i=0; i<nsteps; i++) {
         mean += distances[i];
     }
     mean /= (double)nsteps;
 
     double rmsd = 0.0;
-    for (size_t i=0; i<nsteps; i++) {
+    for (uint64_t i=0; i<nsteps; i++) {
         rmsd += (mean - distances[i])*(mean - distances[i]);
     }
     rmsd /= (double)nsteps;

@@ -53,7 +53,7 @@ int main() {
     assert(!chfl_atom_covalent_radius(a, &radius));
     assert(fabs(radius - 1.31) < 1e-6);
 
-    int number = 0;
+    int64_t number = 0;
     assert(!chfl_atom_atomic_number(a, &number));
     assert(number == 30);
 

@@ -6,20 +6,14 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-/*! @file chemfiles.h
-* Chemfiles C interface header.
-*
-* This file contains all the function definitions for the C API of chemfiles,
-* and
-* should be self-documented enough.
-*/
-
 #ifndef CHEMFILES_CAPI_H
 #define CHEMFILES_CAPI_H
 
 #define CHEMFILES_PUBLIC
 #include "chemfiles/config.hpp"
 #undef CHEMFILES_PUBLIC
+
+#include <stdint.h>
 
 // clang-format off
 #ifdef __cplusplus
@@ -213,7 +207,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_read(CHFL_TRAJECTORY*const file,
 * @return The status code.
 */
 CHFL_EXPORT chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY* const file,
-                                                  size_t step,
+                                                  uint64_t step,
                                                   CHFL_FRAME* const frame);
 
 /*!
@@ -286,7 +280,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_set_cell(CHFL_TRAJECTORY* const file,
 * @return The status code.
 */
 CHFL_EXPORT chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const file,
-                                               size_t* nsteps);
+                                               uint64_t* nsteps);
 
 /*!
 * @brief Close a trajectory file, and free the associated memory
@@ -302,7 +296,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_close(CHFL_TRAJECTORY* file);
 * @param natoms the size of the wanted frame
 * @return A pointer to the frame, or NULL in case of error
 */
-CHFL_EXPORT CHFL_FRAME* chfl_frame(size_t natoms);
+CHFL_EXPORT CHFL_FRAME* chfl_frame(uint64_t natoms);
 
 /*!
 * @brief Get the current number of atoms in the frame.
@@ -311,7 +305,7 @@ CHFL_EXPORT CHFL_FRAME* chfl_frame(size_t natoms);
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame,
-                                               size_t* natoms);
+                                               uint64_t* natoms);
 
 /*!
 * @brief Get a pointer to the positions array from a frame.
@@ -329,7 +323,7 @@ CHFL_EXPORT chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame,
 */
 CHFL_EXPORT chfl_status chfl_frame_positions(CHFL_FRAME* const frame,
                                              chfl_vector_t** data,
-                                             size_t* size);
+                                             uint64_t* size);
 
 /*!
 * @brief Get a pointer to the velocities array from a frame.
@@ -351,7 +345,7 @@ CHFL_EXPORT chfl_status chfl_frame_positions(CHFL_FRAME* const frame,
 */
 CHFL_EXPORT chfl_status chfl_frame_velocities(CHFL_FRAME* const frame,
                                               chfl_vector_t** data,
-                                              size_t* size);
+                                              uint64_t* size);
 
 /*!
 * @brief Add an atom and the corresponding position (and velocity) data to a
@@ -382,7 +376,7 @@ CHFL_EXPORT chfl_status chfl_frame_add_atom(CHFL_FRAME* const frame,
 * @param natoms The new number of atoms.
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_resize(CHFL_FRAME* const frame, size_t natoms);
+CHFL_EXPORT chfl_status chfl_frame_resize(CHFL_FRAME* const frame, uint64_t natoms);
 
 /*!
 * @brief Add velocity storage to this frame.
@@ -429,7 +423,7 @@ CHFL_EXPORT chfl_status chfl_frame_set_topology(CHFL_FRAME* const frame,
 * @param step This will contains the step number
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_step(const CHFL_FRAME* const frame, size_t* step);
+CHFL_EXPORT chfl_status chfl_frame_step(const CHFL_FRAME* const frame, uint64_t* step);
 
 /*!
 * @brief Set the Frame step.
@@ -437,7 +431,7 @@ CHFL_EXPORT chfl_status chfl_frame_step(const CHFL_FRAME* const frame, size_t* s
 * @param step The new frame step
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_set_step(CHFL_FRAME* const frame, size_t step);
+CHFL_EXPORT chfl_status chfl_frame_set_step(CHFL_FRAME* const frame, uint64_t step);
 
 /*!
 * @brief  Guess the bonds, angles and dihedrals in the system.
@@ -596,7 +590,7 @@ CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* const fram
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const topology,
-                                                  size_t* natoms);
+                                                  uint64_t* natoms);
 
 /*!
 * @brief Resize the topology to hold `natoms` atoms, adding `CHFL_ATOM_UNDEFINED`
@@ -606,7 +600,7 @@ CHFL_EXPORT chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const top
 * @param natoms The new number of atoms.
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_resize(CHFL_TOPOLOGY* const topology, size_t natoms);
+CHFL_EXPORT chfl_status chfl_topology_resize(CHFL_TOPOLOGY* const topology, uint64_t natoms);
 
 /*!
 * @brief Add an atom at the end of a topology
@@ -624,7 +618,7 @@ CHFL_EXPORT chfl_status chfl_topology_append(CHFL_TOPOLOGY* const topology,
 * @param i The atomic index
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_remove(CHFL_TOPOLOGY* const topology, size_t i);
+CHFL_EXPORT chfl_status chfl_topology_remove(CHFL_TOPOLOGY* const topology, uint64_t i);
 
 /*!
 * @brief Tell if the atoms `i` and `j` are bonded together
@@ -635,8 +629,8 @@ CHFL_EXPORT chfl_status chfl_topology_remove(CHFL_TOPOLOGY* const topology, size
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_topology_isbond(const CHFL_TOPOLOGY* const topology,
-                                            size_t i,
-                                            size_t j,
+                                            uint64_t i,
+                                            uint64_t j,
                                             bool* result);
 
 /*!
@@ -649,9 +643,9 @@ CHFL_EXPORT chfl_status chfl_topology_isbond(const CHFL_TOPOLOGY* const topology
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_topology_isangle(const CHFL_TOPOLOGY* const topology,
-                                              size_t i,
-                                              size_t j,
-                                              size_t k,
+                                              uint64_t i,
+                                              uint64_t j,
+                                              uint64_t k,
                                               bool* result);
 
 /*!
@@ -665,10 +659,10 @@ CHFL_EXPORT chfl_status chfl_topology_isangle(const CHFL_TOPOLOGY* const topolog
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_topology_isdihedral(const CHFL_TOPOLOGY* const topology,
-                                                 size_t i,
-                                                 size_t j,
-                                                 size_t k,
-                                                 size_t m,
+                                                 uint64_t i,
+                                                 uint64_t j,
+                                                 uint64_t k,
+                                                 uint64_t m,
                                                  bool* result);
 
 /*!
@@ -678,7 +672,7 @@ CHFL_EXPORT chfl_status chfl_topology_isdihedral(const CHFL_TOPOLOGY* const topo
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_topology_bonds_count(const CHFL_TOPOLOGY* const topology,
-                                                  size_t* nbonds);
+                                                  uint64_t* nbonds);
 
 /*!
 * @brief Get the number of angles in the system
@@ -687,7 +681,7 @@ CHFL_EXPORT chfl_status chfl_topology_bonds_count(const CHFL_TOPOLOGY* const top
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_topology_angles_count(const CHFL_TOPOLOGY* const topology,
-                                                   size_t* nangles);
+                                                   uint64_t* nangles);
 
 /*!
 * @brief Get the number of dihedral angles in the system
@@ -697,7 +691,7 @@ CHFL_EXPORT chfl_status chfl_topology_angles_count(const CHFL_TOPOLOGY* const to
 */
 CHFL_EXPORT chfl_status chfl_topology_dihedrals_count(
                                             const CHFL_TOPOLOGY* const topology,
-                                            size_t* ndihedrals);
+                                            uint64_t* ndihedrals);
 
 /*!
 * @brief Get the list of bonds in the system
@@ -708,8 +702,8 @@ CHFL_EXPORT chfl_status chfl_topology_dihedrals_count(
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology,
-                                            size_t (*data)[2],
-                                            size_t nbonds);
+                                            uint64_t (*data)[2],
+                                            uint64_t nbonds);
 
 /*!
 * @brief Get the list of angles in the system
@@ -720,8 +714,8 @@ CHFL_EXPORT chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology,
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology,
-                                             size_t (*data)[3],
-                                             size_t nangles);
+                                             uint64_t (*data)[3],
+                                             uint64_t nangles);
 
 /*!
 * @brief Get the list of dihedral angles in the system
@@ -733,8 +727,8 @@ CHFL_EXPORT chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topology,
-                                                size_t (*data)[4],
-                                                size_t ndihedrals);
+                                                uint64_t (*data)[4],
+                                                uint64_t ndihedrals);
 
 /*!
 * @brief Add a bond between the atoms `i` and `j` in the system
@@ -744,8 +738,8 @@ CHFL_EXPORT chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topol
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_topology_add_bond(CHFL_TOPOLOGY* const topology,
-                                               size_t i,
-                                               size_t j);
+                                               uint64_t i,
+                                               uint64_t j);
 
 /*!
 * @brief Remove any existing bond between the atoms `i` and `j` in the system
@@ -755,8 +749,8 @@ CHFL_EXPORT chfl_status chfl_topology_add_bond(CHFL_TOPOLOGY* const topology,
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_topology_remove_bond(CHFL_TOPOLOGY* const topology,
-                                                  size_t i,
-                                                  size_t j);
+                                                  uint64_t i,
+                                                  uint64_t j);
 
 /*!
 * @brief Get the number of residues in the system
@@ -765,7 +759,7 @@ CHFL_EXPORT chfl_status chfl_topology_remove_bond(CHFL_TOPOLOGY* const topology,
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_topology_residues_count(const CHFL_TOPOLOGY* const topology,
-                                                     size_t* residues);
+                                                     uint64_t* residues);
 
 /*!
 * @brief Add a residue to this topology
@@ -802,11 +796,11 @@ CHFL_EXPORT chfl_status chfl_topology_free(CHFL_TOPOLOGY* topology);
 /*!
 * @brief Create a new residue
 * @param name The residue name
-* @param resid The residue identifier, or `size_t(-1)` if the residue do not
+* @param resid The residue identifier, or `uint64_t(-1)` if the residue do not
 *              have an identifier
 * @return The status code
 */
-CHFL_EXPORT CHFL_RESIDUE* chfl_residue(const char* name, size_t resid);
+CHFL_EXPORT CHFL_RESIDUE* chfl_residue(const char* name, uint64_t resid);
 
 /*!
 * @brief Get a residue from a topology
@@ -817,7 +811,7 @@ CHFL_EXPORT CHFL_RESIDUE* chfl_residue(const char* name, size_t resid);
 * @return The status code
 */
 CHFL_EXPORT CHFL_RESIDUE* chfl_residue_from_topology(const CHFL_TOPOLOGY* const topology,
-                                                     size_t i);
+                                                     uint64_t i);
 
 /*!
 * @brief Get a the residue containing a given atom, or NULL if the atom is not
@@ -827,7 +821,7 @@ CHFL_EXPORT CHFL_RESIDUE* chfl_residue_from_topology(const CHFL_TOPOLOGY* const 
 * @return The status code
 */
 CHFL_EXPORT CHFL_RESIDUE* chfl_residue_for_atom(const CHFL_TOPOLOGY* const topology,
-                                                size_t i);
+                                                uint64_t i);
 
 /*!
 * @brief Get the number of atoms in a residue
@@ -836,7 +830,7 @@ CHFL_EXPORT CHFL_RESIDUE* chfl_residue_for_atom(const CHFL_TOPOLOGY* const topol
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_residue_atoms_count(const CHFL_RESIDUE* const residue,
-                                                 size_t* size);
+                                                 uint64_t* size);
 
 /*!
 * @brief Get the identifier of a residue in the initial topology file
@@ -845,7 +839,7 @@ CHFL_EXPORT chfl_status chfl_residue_atoms_count(const CHFL_RESIDUE* const resid
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_residue_id(const CHFL_RESIDUE* const residue,
-                                        size_t* id);
+                                        uint64_t* id);
 
 /*!
 * @brief Get the name of a residue
@@ -856,7 +850,7 @@ CHFL_EXPORT chfl_status chfl_residue_id(const CHFL_RESIDUE* const residue,
 */
 CHFL_EXPORT chfl_status chfl_residue_name(const CHFL_RESIDUE* const residue,
                                           char* name,
-                                          size_t buffsize);
+                                          uint64_t buffsize);
 
 /*!
 * @brief Add the atom at index `i` in the residue
@@ -865,7 +859,7 @@ CHFL_EXPORT chfl_status chfl_residue_name(const CHFL_RESIDUE* const residue,
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_residue_add_atom(CHFL_RESIDUE* const residue,
-                                              size_t i);
+                                              uint64_t i);
 
 /*!
 * @brief Check if the atom at index `i` is in the residue
@@ -875,7 +869,7 @@ CHFL_EXPORT chfl_status chfl_residue_add_atom(CHFL_RESIDUE* const residue,
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_residue_contains(const CHFL_RESIDUE* const residue,
-                                              size_t i,
+                                              uint64_t i,
                                               bool* result);
 
 /*!
@@ -902,7 +896,7 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom(const char* element);
 *         is out of bounds
 */
 CHFL_EXPORT CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame,
-                                            size_t idx);
+                                            uint64_t idx);
 
 /*!
 * @brief Get a specific atom from a topology
@@ -912,7 +906,7 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame,
 *         is out of bounds
 */
 CHFL_EXPORT CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* const topology,
-                                               size_t idx);
+                                               uint64_t idx);
 
 /*!
 * @brief Get the mass of an atom, in atomic mass units
@@ -955,7 +949,7 @@ CHFL_EXPORT chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, double charg
 */
 CHFL_EXPORT chfl_status chfl_atom_element(const CHFL_ATOM* const atom,
                                        char* const element,
-                                       size_t buffsize);
+                                       uint64_t buffsize);
 
 /*!
 * @brief Set the element name of an atom
@@ -974,7 +968,7 @@ CHFL_EXPORT chfl_status chfl_atom_set_element(CHFL_ATOM* const atom, const char*
 */
 CHFL_EXPORT chfl_status chfl_atom_label(const CHFL_ATOM* const atom,
                                        char* const label,
-                                       size_t buffsize);
+                                       uint64_t buffsize);
 
 /*!
 * @brief Set the label of an atom
@@ -993,7 +987,7 @@ CHFL_EXPORT chfl_status chfl_atom_set_label(CHFL_ATOM* const atom, const char* l
 */
 CHFL_EXPORT chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom,
                                             char* const element,
-                                            size_t buffsize);
+                                            uint64_t buffsize);
 
 /*!
 * @brief Try to get the Van der Waals radius of an atom from the element name
@@ -1022,7 +1016,7 @@ CHFL_EXPORT chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* const atom,
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom,
-                                                int* number);
+                                                int64_t* number);
 
 //! Available types of atoms
 typedef enum CHFL_ATOM_TYPES {
@@ -1083,7 +1077,7 @@ CHFL_EXPORT CHFL_SELECTION* chfl_selection(const char* selection);
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_selection_size(const CHFL_SELECTION* const selection,
-                                            size_t* size);
+                                            uint64_t* size);
 
 /*!
 * @brief Evaluate a selection for a given frame.
@@ -1097,7 +1091,7 @@ CHFL_EXPORT chfl_status chfl_selection_size(const CHFL_SELECTION* const selectio
 */
 CHFL_EXPORT chfl_status chfl_selection_evalutate(CHFL_SELECTION* const selection,
                                                  const CHFL_FRAME* const frame,
-                                                 size_t* n_matches);
+                                                 uint64_t* n_matches);
 
 //! Maximal size for a selection match
 #define CHFL_MAX_SELECTION_SIZE 4
@@ -1108,10 +1102,10 @@ CHFL_EXPORT chfl_status chfl_selection_evalutate(CHFL_SELECTION* const selection
 /// a match depends on the associated selection, and can vary from 1 to 4.
 typedef struct {
     //! The actual size of the match. Elements in `atoms` are significant up
-    //! to this value, and filled with `(size_t)-1` for all the other values.
-    size_t size;
+    //! to this value, and filled with `(uint64_t)-1` for all the other values.
+    uint64_t size;
     //! Indexes matching the associated selection
-    size_t atoms[CHFL_MAX_SELECTION_SIZE];
+    uint64_t atoms[CHFL_MAX_SELECTION_SIZE];
 } chfl_match_t;
 
 /*!
@@ -1124,7 +1118,7 @@ typedef struct {
 */
 CHFL_EXPORT chfl_status chfl_selection_matches(const CHFL_SELECTION* const selection,
                                                chfl_match_t matches[],
-                                               size_t n_matches);
+                                               uint64_t n_matches);
 
 /*!
 * @brief Destroy a selection, and free the associated memory

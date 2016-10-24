@@ -29,7 +29,7 @@ error:
     return nullptr;
 }
 
-CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame, size_t idx) {
+CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame, uint64_t idx) {
     assert(frame != nullptr);
     CHFL_ATOM* atom = nullptr;
     CHFL_ERROR_GOTO(
@@ -45,7 +45,7 @@ error:
     return nullptr;
 }
 
-CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* const topology, size_t idx) {
+CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* const topology, uint64_t idx) {
     assert(topology != nullptr);
     CHFL_ATOM* atom = nullptr;
     CHFL_ERROR_GOTO(
@@ -91,7 +91,7 @@ chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, double charge) {
     )
 }
 
-chfl_status chfl_atom_element(const CHFL_ATOM* const atom, char* const element, size_t buffsize) {
+chfl_status chfl_atom_element(const CHFL_ATOM* const atom, char* const element, uint64_t buffsize) {
     assert(atom != nullptr);
     assert(element != nullptr);
     CHFL_ERROR_CATCH(
@@ -108,7 +108,7 @@ chfl_status chfl_atom_set_element(CHFL_ATOM* const atom, const char* element) {
     )
 }
 
-chfl_status chfl_atom_label(const CHFL_ATOM* const atom, char* const label, size_t buffsize) {
+chfl_status chfl_atom_label(const CHFL_ATOM* const atom, char* const label, uint64_t buffsize) {
     assert(atom != nullptr);
     assert(label != nullptr);
     CHFL_ERROR_CATCH(
@@ -125,7 +125,7 @@ chfl_status chfl_atom_set_label(CHFL_ATOM* const atom, const char* label) {
     )
 }
 
-chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* const element, size_t buffsize) {
+chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* const element, uint64_t buffsize) {
     assert(atom != nullptr);
     assert(element != nullptr);
     CHFL_ERROR_CATCH(
@@ -150,7 +150,7 @@ chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* const atom, double* radiu
     )
 }
 
-chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom, int* number) {
+chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom, int64_t* number) {
     assert(atom != nullptr);
     assert(number != nullptr);
     CHFL_ERROR_CATCH(

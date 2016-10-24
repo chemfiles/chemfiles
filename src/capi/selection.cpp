@@ -34,14 +34,14 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_selection_size(const CHFL_SELECTION* const selection, size_t* size) {
+chfl_status chfl_selection_size(const CHFL_SELECTION* const selection, uint64_t* size) {
     assert(selection != nullptr);
     CHFL_ERROR_CATCH(
         *size = selection->selection.size();
     )
 }
 
-chfl_status chfl_selection_evalutate(CHFL_SELECTION* const selection, const CHFL_FRAME* const frame, size_t* n_matches) {
+chfl_status chfl_selection_evalutate(CHFL_SELECTION* const selection, const CHFL_FRAME* const frame, uint64_t* n_matches) {
     assert(selection != nullptr);
     CHFL_ERROR_CATCH(
         selection->matches = selection->selection.evaluate(*frame);
@@ -49,19 +49,19 @@ chfl_status chfl_selection_evalutate(CHFL_SELECTION* const selection, const CHFL
     )
 }
 
-chfl_status chfl_selection_matches(const CHFL_SELECTION* const selection, chfl_match_t* const matches, size_t n_matches) {
+chfl_status chfl_selection_matches(const CHFL_SELECTION* const selection, chfl_match_t* const matches, uint64_t n_matches) {
     assert(selection != nullptr);
     assert(n_matches == selection->matches.size());
     CHFL_ERROR_CATCH(
         auto size = selection->selection.size();
-        for (size_t i=0; i<n_matches; i++) {
+        for (uint64_t i=0; i<n_matches; i++) {
             matches[i].size = size;
-            for (size_t j=0; j<size; j++) {
+            for (uint64_t j=0; j<size; j++) {
                 matches[i].atoms[j] = selection->matches[i][j];
             }
 
-            for (size_t j=size; j<CHFL_MAX_SELECTION_SIZE; j++) {
-                matches[i].atoms[j] = static_cast<size_t>(-1);
+            for (uint64_t j=size; j<CHFL_MAX_SELECTION_SIZE; j++) {
+                matches[i].atoms[j] = static_cast<uint64_t>(-1);
             }
         }
     )

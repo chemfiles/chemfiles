@@ -30,12 +30,12 @@ int main(void) {
     chfl_atom_free(O);
     chfl_atom_free(H);
 
-    size_t nsteps = 0;
+    uint64_t nsteps = 0;
     chfl_trajectory_nsteps(input, &nsteps);
 
     CHFL_TRAJECTORY* output = chfl_trajectory_open("water.pdb", 'w');
     CHFL_FRAME* frame = chfl_frame(0);
-    for (size_t i=0; i<nsteps; i++) {
+    for (uint64_t i=0; i<nsteps; i++) {
         // The unit cell and the topology are automatically set when reading a
         // frame.
         chfl_trajectory_read(input, frame);
