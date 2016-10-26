@@ -8,9 +8,9 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT_HASH}")
         "https://github.com/chemfiles/tests-data/archive/${TESTS_DATA_GIT_HASH}.tar.gz"
         "${CMAKE_CURRENT_BINARY_DIR}/${TESTS_DATA_GIT_HASH}.tar.gz"
         SHOW_PROGRESS
-        TIMEOUT 30
         EXPECTED_HASH SHA1=f16520453515f21ca838c508eea9d38ac4877443
     )
+
     message(STATUS "Unpacking test data files")
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E tar xf ${TESTS_DATA_GIT_HASH}.tar.gz
