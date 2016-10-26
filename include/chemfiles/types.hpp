@@ -9,6 +9,7 @@
 #ifndef CHEMFILES_TYPES_HPP
 #define CHEMFILES_TYPES_HPP
 
+#include <type_traits>
 #include <array>
 #include <cassert>
 #include <cmath>
@@ -80,6 +81,7 @@ inline Vector3D operator/(const Vector3D& lhs, double rhs) {
 // As `std::array<double, 3>` (i.e. Vector3D) is POD, its memory layout is
 // equivalent to a `double[3]` array. So the pointer return by `Array3D::data`
 // is compatible with the C type `(*double)[3] == chfl_vector_t`.
+static_assert(std::is_pod<Vector3D>::value, "Vector3D must be POD");
 
 //! A vector of `Vector3D`, used as a list of positions or velocities in a
 //! system.
