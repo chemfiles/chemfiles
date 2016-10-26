@@ -2,7 +2,6 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-#define PDBDIR SRCDIR "/data/pdb/"
 
 bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
     return (fabs(a[0] - b[0]) < eps)
@@ -12,7 +11,7 @@ bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
 
 TEST_CASE("Read files in PDB format", "[Molfile]"){
     SECTION("Read trajectory") {
-        Trajectory file(PDBDIR"water.pdb");
+        Trajectory file("data/pdb/water.pdb");
         Frame frame = file.read();
 
         CHECK(frame.natoms() == 297);
@@ -34,7 +33,7 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
     }
 
     SECTION("Read bonds") {
-        Trajectory file(PDBDIR"MOF-5.pdb");
+        Trajectory file("data/pdb/MOF-5.pdb");
         Frame frame = file.read();
 
         auto topology = frame.topology();
@@ -62,12 +61,12 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
     }
 
     SECTION("Support short records") {
-        Trajectory file(PDBDIR "cryst1.pdb");
+        Trajectory file("data/pdb/cryst1.pdb");
         Frame frame = file.read();
     }
 
     SECTION("Read residue information") {
-        Trajectory file(PDBDIR "water.pdb");
+        Trajectory file("data/pdb/water.pdb");
         Frame frame = file.read();
 
         CHECK(frame.topology().residues().size() == 99);
@@ -79,7 +78,7 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
         CHECK(residue.contains(1));
         CHECK(residue.contains(2));
 
-        file = Trajectory(PDBDIR "MOF-5.pdb");
+        file = Trajectory("data/pdb/MOF-5.pdb");
         frame = file.read();
 
         CHECK(frame.topology().residues().size() == 1);

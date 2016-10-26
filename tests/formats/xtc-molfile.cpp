@@ -2,7 +2,6 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-#define XTCDIR SRCDIR "/data/xtc/"
 
 bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
     return (fabs(a[0] - b[0]) < eps)
@@ -11,7 +10,7 @@ bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
 }
 
 TEST_CASE("Read files in Gromacs .gro format using Molfile", "[Molfile]"){
-    Trajectory file(XTCDIR"ubiquitin.xtc");
+    Trajectory file("data/xtc/ubiquitin.xtc");
     Frame frame = file.read();
     double eps = 1e-2;
 

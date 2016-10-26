@@ -9,36 +9,22 @@ using namespace chemfiles;
 #include <boost/filesystem.hpp>
 namespace fs=boost::filesystem;
 
-#define XYZDIR SRCDIR "/data/xyz/"
 
 TEST_CASE("Read files in XYZ format", "[XYZ]"){
     SECTION("Check nsteps"){
-        Trajectory file1(XYZDIR "trajectory.xyz");
+        Trajectory file1("data/xyz/trajectory.xyz");
         CHECK(file1.nsteps() == 2);
 
-        Trajectory file2(XYZDIR "helium.xyz");
+        Trajectory file2("data/xyz/helium.xyz");
         CHECK(file2.nsteps() == 397);
 
-        Trajectory file3(XYZDIR "topology.xyz");
+        Trajectory file3("data/xyz/topology.xyz");
         CHECK(file3.nsteps() == 1);
     }
 
-    Trajectory file(XYZDIR "helium.xyz");
-
-    SECTION("Stream style reading"){
-        auto frame = file.read();
-        CHECK(frame.natoms() == 125);
-        // Check positions
-        auto positions = frame.positions();
-        CHECK(positions[0] == vector3d(0.49053, 8.41351, 0.0777257));
-        CHECK(positions[124] == vector3d(8.57951, 8.65712, 8.06678));
-        // Check topology
-        auto topology = frame.topology();
-        CHECK(topology.natoms() == 125);
-        CHECK(topology[0] == Atom("He"));
-    }
 
     SECTION("Method style reading"){
+        Trajectory file("data/xyz/helium.xyz");
         auto frame = file.read();
         CHECK(frame.natoms() == 125);
         // Check positions
@@ -52,6 +38,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
     }
 
     SECTION("Read a specific step"){
+        Trajectory file("data/xyz/helium.xyz");
         // Read frame at a specific positions
         auto frame = file.read_step(42);
         auto positions = frame.positions();
@@ -68,6 +55,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
     }
 
     SECTION("Read the whole file"){
+        Trajectory file("data/xyz/helium.xyz");
         CHECK(file.nsteps() == 397);
 
         Frame frame;
@@ -80,7 +68,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
     }
 
     SECTION("Read various files formatting"){
-        file = Trajectory(XYZDIR "spaces.xyz");
+        Trajectory file("data/xyz/spaces.xyz");
 
         auto frame = file.read();
         auto positions = frame.positions();
@@ -100,7 +88,7 @@ struct directory_files_iterator {
 };
 
 TEST_CASE("Errors in XYZ format", "[XYZ]"){
-    for (auto entry : directory_files_iterator(XYZDIR"bad/")){
+    for (auto entry : directory_files_iterator("data/xyz/bad/")){
         CHECK_THROWS_AS(
             // We can throw either when creating the trajectory, or when reading
             // the frame, depending on the type of error

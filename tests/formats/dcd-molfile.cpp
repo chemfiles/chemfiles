@@ -2,7 +2,6 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-#define DCDDIR SRCDIR "/data/dcd/"
 
 bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
     return (fabs(a[0] - b[0]) < eps)
@@ -12,7 +11,7 @@ bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
 
 TEST_CASE("Read files in DCD format using Molfile", "[Molfile]"){
     double eps = 1e-4;
-    Trajectory file(DCDDIR "water.dcd");
+    Trajectory file("data/dcd/water.dcd");
 
     auto frame = file.read();
     CHECK(frame.natoms() == 297);

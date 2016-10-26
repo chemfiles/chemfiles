@@ -2,7 +2,6 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-#define LAMMPSDIR SRCDIR "/data/lammps/"
 
 bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
     return (fabs(a[0] - b[0]) < eps)
@@ -11,7 +10,7 @@ bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
 }
 
 TEST_CASE("Read files in LAMMPS .lammpstrj format using Molfile", "[Molfile]"){
-    Trajectory file(LAMMPSDIR "polymer.lammpstrj");
+    Trajectory file("data/lammps/polymer.lammpstrj");
     Frame frame = file.read();
     double eps = 1e-3;
 

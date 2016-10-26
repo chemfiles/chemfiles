@@ -8,10 +8,9 @@
 #include "chemfiles/files/BasicFile.hpp"
 using namespace chemfiles;
 
-#define FILESDIR SRCDIR "/data/"
 
 TEST_CASE("Read a text file", "[Files]"){
-    BasicFile file(FILESDIR "xyz/helium.xyz", File::READ);
+    BasicFile file("data/xyz/helium.xyz", File::READ);
 
     CHECK(file.nlines() == 50419);
 

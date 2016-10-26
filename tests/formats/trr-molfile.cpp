@@ -2,7 +2,6 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-#define TRRDIR SRCDIR "/data/trr/"
 
 bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
     return (fabs(a[0] - b[0]) < eps)
@@ -13,7 +12,7 @@ bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
 TEST_CASE("Read files in Gromacs .trr format using Molfile", "[Molfile]"){
     double eps = 1e-4;
     SECTION("Ubiquitin"){
-        Trajectory file(TRRDIR"ubiquitin.trr");
+        Trajectory file("data/trr/ubiquitin.trr");
         auto frame = file.read();
 
         CHECK(frame.natoms() == 20455);
@@ -24,7 +23,7 @@ TEST_CASE("Read files in Gromacs .trr format using Molfile", "[Molfile]"){
     }
 
     SECTION("Water"){
-        Trajectory file(TRRDIR "water.trr");
+        Trajectory file("data/trr/water.trr");
         auto frame = file.read();
         CHECK(frame.natoms() == 297);
 

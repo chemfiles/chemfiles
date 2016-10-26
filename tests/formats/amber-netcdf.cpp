@@ -10,7 +10,6 @@ using namespace chemfiles;
 #include <boost/filesystem.hpp>
 namespace fs=boost::filesystem;
 
-#define NCDIR SRCDIR "/data/netcdf/"
 
 bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
     return (fabs(a[0] - b[0]) < eps)
@@ -20,7 +19,7 @@ bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
 
 TEST_CASE("Read files in NetCDF format", "[Amber NetCDF]") {
     SECTION("Read one frame") {
-        Trajectory file(NCDIR "water.nc");
+        Trajectory file("data/netcdf/water.nc");
         auto frame = file.read();
         CHECK(frame.natoms() == 297);
         // Check positions
@@ -30,7 +29,7 @@ TEST_CASE("Read files in NetCDF format", "[Amber NetCDF]") {
     }
 
     SECTION("Read more than one frame") {
-        Trajectory file(NCDIR "water.nc");
+        Trajectory file("data/netcdf/water.nc");
         auto frame = file.read();
         frame = file.read();
         frame = file.read();
@@ -49,7 +48,7 @@ TEST_CASE("Read files in NetCDF format", "[Amber NetCDF]") {
     }
 
     SECTION("Missing unit cell") {
-        Trajectory file(NCDIR "no-cell.nc");
+        Trajectory file("data/netcdf/no-cell.nc");
         auto frame = file.read();
         CHECK(frame.natoms() == 1989);
         CHECK(frame.cell() == UnitCell());

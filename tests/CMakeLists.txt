@@ -1,5 +1,31 @@
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/data/README.md")
-    message(SEND_ERROR "Missing data files for tests. Please run `git submodule update --init` from ${chemfiles_SOURCE_DIR}.")
+
+# Update this value if you need to update the data file set
+set(TESTS_DATA_GIT_HASH "27d89caa55e1f42cdbbed5a322b51c702066d871")
+
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT_HASH}")
+    message(STATUS "Downloading test data files")
+    file(DOWNLOAD
+        "https://github.com/chemfiles/tests-data/archive/${TESTS_DATA_GIT_HASH}.tar.gz"
+        "${CMAKE_CURRENT_BINARY_DIR}/${TESTS_DATA_GIT_HASH}.tar.gz"
+        SHOW_PROGRESS
+        TIMEOUT 30
+        EXPECTED_HASH SHA1=f16520453515f21ca838c508eea9d38ac4877443
+    )
+    message(STATUS "Unpacking test data files")
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E tar xf ${TESTS_DATA_GIT_HASH}.tar.gz
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E rename tests-data-${TESTS_DATA_GIT_HASH} data
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E touch data/${TESTS_DATA_GIT_HASH}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
 endif()
 
 set(CHFL_TEST_RUNNER "none" CACHE STRING "External runner for the tests")
@@ -49,8 +75,6 @@ file(GLOB all_test_files
     ${CMAKE_CURRENT_SOURCE_DIR}/formats/*.cpp
 )
 
-add_definitions("-DSRCDIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
-add_definitions("-DBINDIR=\"${CMAKE_CURRENT_BINARY_DIR}\"")
 add_definitions("-DBOOST_ALL_NO_LIB")
 
 foreach(test_file IN LISTS all_test_files)
@@ -62,6 +86,7 @@ function(chfl_c_test _file_)
     set(_name_ "c-${_name_}")
     add_executable(${_name_} ${_file_})
     target_link_libraries(${_name_} chemfiles helpers)
+    target_compile_definitions(${_name_} PRIVATE "-DSRCDIR=\"${PROJECT_SOURCE_DIR}\"")
     add_test(NAME ${_name_}
         COMMAND ${RUNNER_COMMAND} ./${_name_}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

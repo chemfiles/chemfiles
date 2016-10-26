@@ -6,12 +6,10 @@ using namespace chemfiles;
 #include <boost/filesystem.hpp>
 namespace fs=boost::filesystem;
 
-#define DATADIR SRCDIR "/data/"
-
 TEST_CASE("Opening TNG files", "[Files]"){
     SECTION("Read") {
         // Just checking constructor and destructor
-        TNGFile file(DATADIR "tng/example.tng", File::READ);
+        TNGFile file("data/tng/example.tng", File::READ);
     }
 
     auto TESTFILE = "testing.tng";
@@ -39,7 +37,7 @@ TEST_CASE("Opening TNG files", "[Files]"){
     }
 
     SECTION("Append") {
-        fs::copy_file(DATADIR "tng/example.tng", TESTFILE);
+        fs::copy_file("data/tng/example.tng", TESTFILE);
         // Just checking constructor and destructor
         TNGFile file(TESTFILE, File::APPEND);
     }

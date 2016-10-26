@@ -2,7 +2,6 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-#define GRODIR SRCDIR "/data/gro/"
 
 bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
     return (fabs(a[0] - b[0]) < eps)
@@ -11,7 +10,7 @@ bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
 }
 
 TEST_CASE("Read files in Gromacs .gro format using Molfile", "[Molfile]"){
-    Trajectory file(GRODIR"ubiquitin.gro");
+    Trajectory file("data/gro/ubiquitin.gro");
     Frame frame = file.read();
 
     CHECK(frame.natoms() == 1405);

@@ -9,8 +9,6 @@
 #include "chemfiles.h"
 #include "helpers.h"
 
-#define DATADIR SRCDIR "/data/xyz/"
-
 static void test_read();
 static void test_write();
 
@@ -25,7 +23,7 @@ int main() {
 
 static void test_read() {
     CHFL_FRAME* frame = chfl_frame(0);
-    CHFL_TRAJECTORY* file = chfl_trajectory_open(DATADIR "water.xyz", 'r');
+    CHFL_TRAJECTORY* file = chfl_trajectory_open("data/xyz/water.xyz", 'r');
     assert(frame != NULL);
     assert(file != NULL);
 
@@ -132,17 +130,17 @@ static void test_read() {
     assert(!chfl_atom_free(atom));
 
     assert(!chfl_trajectory_close(file));
-    file = chfl_trajectory_open(DATADIR "trajectory.xyz", 'r');
+    file = chfl_trajectory_open("data/xyz/trajectory.xyz", 'r');
 
     // Set the topology associated with a trajectory from a file
-    assert(!chfl_trajectory_set_topology_with_format(file, DATADIR "topology.xyz.topology", "XYZ"));
+    assert(!chfl_trajectory_set_topology_with_format(file, "data/xyz/topology.xyz.topology", "XYZ"));
     assert(!chfl_trajectory_read(file, frame));
     atom = chfl_atom_from_frame(frame, 0);
     assert(!chfl_atom_element(atom, element, sizeof(element)));
     assert(strcmp(element, "Zn") == 0);
     assert(!chfl_atom_free(atom));
 
-    assert(!chfl_trajectory_set_topology_file(file, DATADIR "topology.xyz"));
+    assert(!chfl_trajectory_set_topology_file(file, "data/xyz/topology.xyz"));
     assert(!chfl_trajectory_read(file, frame));
     atom = chfl_atom_from_frame(frame, 0);
     assert(!chfl_atom_element(atom, element, sizeof(element)));
@@ -151,7 +149,7 @@ static void test_read() {
 
     assert(!chfl_trajectory_close(file));
 
-    file = chfl_trajectory_with_format(DATADIR "helium.xyz.but.not.really", 'r', "XYZ");
+    file = chfl_trajectory_with_format("data/xyz/helium.xyz.but.not.really", 'r', "XYZ");
     assert(!chfl_trajectory_read(file, frame));
     assert(!chfl_frame_atoms_count(frame, &natoms));
     assert(natoms == 125);

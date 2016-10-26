@@ -5,16 +5,14 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-#define XYZDIR SRCDIR "/data/xyz/"
 
 // This file only perform basic testing of the trajectory class. All the differents
 // formats are tested in the formats folder
 TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
     SECTION("Reading"){
-        Trajectory file(XYZDIR "trajectory.xyz");
-
         SECTION("From a file"){
-            file.set_topology(XYZDIR "topology.xyz.topology", "XYZ");
+            Trajectory file("data/xyz/trajectory.xyz");
+            file.set_topology("data/xyz/topology.xyz.topology", "XYZ");
             auto frame = file.read();
 
             CHECK(frame.natoms() == 9);
@@ -26,15 +24,18 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
         }
 
         SECTION("Directely"){
-            Topology top;
-            for (size_t i=0; i<9; i++)
-                top.append(Atom("Fe"));
+            Trajectory file("data/xyz/trajectory.xyz");
 
-            file.set_topology(top);
+            Topology topology;
+            for (size_t i=0; i<9; i++) {
+                topology.append(Atom("Fe"));
+            }
+
+            file.set_topology(topology);
             auto frame = file.read();
 
             CHECK(frame.natoms() == 9);
-            auto topology = frame.topology();
+            topology = frame.topology();
             CHECK(topology.natoms() == 9);
             CHECK(topology[0] == Atom("Fe"));
             CHECK(topology[1] == Atom("Fe"));
@@ -82,7 +83,7 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
 
 TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]"){
     SECTION("Reading"){
-        Trajectory file(XYZDIR "trajectory.xyz");
+        Trajectory file("data/xyz/trajectory.xyz");
         file.set_cell(UnitCell(25, 32, 94));
         auto frame = file.read();
 
@@ -122,7 +123,7 @@ TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]"){
 }
 
 TEST_CASE("Specify a format parameter", "[Trajectory]"){
-    Trajectory file(XYZDIR "helium.xyz.but.not.really", 'r', "XYZ");
+    Trajectory file("data/xyz/helium.xyz.but.not.really", 'r', "XYZ");
     auto frame = file.read();
     CHECK(frame.natoms() == 125);
 }
@@ -139,12 +140,12 @@ TEST_CASE("Errors", "[Trajectory]"){
         remove("tmp.pdb");
 
         // Try to write a read-only file
-        file = Trajectory(XYZDIR "trajectory.xyz", 'r');
+        file = Trajectory("data/xyz/trajectory.xyz", 'r');
         CHECK_THROWS_AS(file.write(Frame()), FileError);
     }
 
     SECTION("Read file past end") {
-        Trajectory file(XYZDIR "trajectory.xyz", 'r');
+        Trajectory file("data/xyz/trajectory.xyz", 'r');
         CHECK_THROWS_AS(file.read_step(5), FileError);
 
         file.read();

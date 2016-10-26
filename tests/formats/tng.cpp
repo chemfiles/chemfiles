@@ -2,7 +2,6 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-#define TNGDIR SRCDIR "/data/tng/"
 
 bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
     return (fabs(a[0] - b[0]) < eps)
@@ -12,7 +11,7 @@ bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
 
 TEST_CASE("Read files in TNG format", "[TNG]"){
     SECTION("Read trajectory") {
-        auto file = Trajectory(TNGDIR "example.tng");
+        auto file = Trajectory("data/tng/example.tng");
         auto frame = file.read();
 
         CHECK(frame.natoms() == 15);
@@ -33,7 +32,7 @@ TEST_CASE("Read files in TNG format", "[TNG]"){
     }
 
     SECTION("Read cell") {
-        auto file = Trajectory(TNGDIR "water.tng");
+        auto file = Trajectory("data/tng/water.tng");
         auto frame = file.read();
 
         CHECK(frame.natoms() == 29700);
@@ -46,7 +45,7 @@ TEST_CASE("Read files in TNG format", "[TNG]"){
     }
 
     SECTION("Read topology") {
-        auto file = Trajectory(TNGDIR "example.tng");
+        auto file = Trajectory("data/tng/example.tng");
         auto topology = file.read().topology();
 
         CHECK(topology.natoms() == 15);

@@ -1,5 +1,3 @@
-#ifndef WIN32
-
 #include <iostream>
 #include <cstdio>
 
@@ -11,10 +9,9 @@
 #include "chemfiles/files/NcFile.hpp"
 using namespace chemfiles;
 
-#define DATADIR SRCDIR "/data/"
 
 TEST_CASE("Read a NetCDF file", "[Files]"){
-    NcFile file(DATADIR "netcdf/water.nc", File::READ);
+    NcFile file("data/netcdf/water.nc", File::READ);
 
     CHECK(file.global_attribute("Conventions") == "AMBER");
     // Usual dimmensions
@@ -39,7 +36,7 @@ TEST_CASE("Read a NetCDF file", "[Files]"){
 }
 
 TEST_CASE("Errors in NetCDF files", "[Files]"){
-    NcFile file(DATADIR "netcdf/water.nc", File::READ);
+    NcFile file("data/netcdf/water.nc", File::READ);
 
     CHECK_THROWS_AS(file.global_attribute("FOO"), FileError);
     CHECK_THROWS_AS(file.dimension("FOO"), FileError);
@@ -70,4 +67,3 @@ TEST_CASE("Write NetCDF files", "[Files]"){
 }
 
 #endif // HAVE_NETCDF
-#endif // WIN32

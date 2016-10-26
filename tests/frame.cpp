@@ -83,7 +83,7 @@ TEST_CASE("Frame class usage", "[Frame]"){
     }
 
     SECTION("Topology"){
-        auto frame = Trajectory(SRCDIR "/data/xyz/methane.xyz").read();
+        auto frame = Trajectory("data/xyz/methane.xyz").read();
         frame.guess_topology();
 
         auto topology = frame.topology();

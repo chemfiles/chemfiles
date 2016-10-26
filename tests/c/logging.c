@@ -63,7 +63,7 @@ int main() {
     assert(!chfl_clear_errors());
     assert(strcmp(chfl_last_error(), "") == 0);
 
-    char* version = read_whole_file(SRCDIR "/../VERSION");
+    char* version = read_whole_file(SRCDIR "/VERSION");
     assert(version != NULL);
     // Remove the trailing \n
     version[strlen(version) - 1] = 0;
