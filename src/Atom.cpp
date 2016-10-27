@@ -11,61 +11,14 @@
 
 using namespace chemfiles;
 
-// Check if the string `element` is an element
-static bool is_element(const std::string& element) {
-    // clang-format off
-    const auto ALL_ELEMENTS = {
-    "H" ,                                                                                                 "He",
-    "Li", "Be",                                                             "B" , "C" , "N" , "O" , "F" , "Ne",
-    "Na", "Mg",                                                             "Al", "Si", "P" , "S" , "Cl", "Ar",
-    "K" , "Ca", "Sc", "Ti", "V" , "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr",
-    "Rb", "Sr", "Y" , "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ar", "Cd", "In", "Sn", "Sb", "Te", "I" , "Xe",
-    "Cs", "Ba", "La", "Hf", "Ta", "W" , "Re", "Os", "Ir", "Pt", "Au", "Hg", "Ti", "Pb", "Bi", "Po", "At", "Rn",
-    "Fr", "Ra", "Ac", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn",
+Atom::Atom(std::string label): Atom(label, label) {}
 
-    "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu",
-    "Th", "Pa", "U" , "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr"
-    };
-    // clang-format on
-    for (auto& each_element : ALL_ELEMENTS) {
-        if (element == each_element) {
-            return true;
-        }
-    }
-    return false;
-
-}
-
-Atom::Atom(std::string element)
-    : Atom(UNDEFINED, element, std::move(element)) {}
-
-Atom::Atom(std::string element, std::string label)
-    : Atom(UNDEFINED, std::move(element), std::move(label)) {}
-
-Atom::Atom(AtomType type, std::string element, std::string label):
-    element_(std::move(element)), label_(std::move(label)), type_(type) {
-    // Use the same value for label and element if one is empty and the other
-    // is not.
-    if (element_ == "" && label_ != "") {
-        element_ = label_;
-    } else if (label_ == "" && element_ != "") {
-        label_ = element_;
-    }
-
-    if (type_ == UNDEFINED && element_ != "") {
-        if (is_element(element_)) {
-            type_ = ELEMENT;
-        } else {
-            type_ = COARSE_GRAINED;
-        }
-    }
-
+Atom::Atom(std::string element, std::string label):
+    label_(std::move(label)), element_(std::move(element)) {
     if (PERIODIC_INFORMATION.find(element_) != PERIODIC_INFORMATION.end()) {
         mass_ = PERIODIC_INFORMATION.at(element_).mass;
     }
 }
-
-Atom::Atom(): Atom(UNDEFINED, "", "") {}
 
 std::string Atom::full_name() const {
     if (PERIODIC_INFORMATION.find(element_) != PERIODIC_INFORMATION.end()) {

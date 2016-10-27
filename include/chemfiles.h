@@ -539,7 +539,7 @@ typedef enum CHFL_CELL_SHAPE {
     CHFL_CELL_ORTHORHOMBIC = 0,
     //! The three angles may not be 90°
     CHFL_CELL_TRICLINIC = 1,
-    //! Cell type when there is no periodic boundary conditions
+    //! Cell shape when there is no periodic boundary conditions
     CHFL_CELL_INFINITE = 2,
 } chfl_cell_shape_t;
 
@@ -1017,37 +1017,6 @@ CHFL_EXPORT chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* const atom,
 */
 CHFL_EXPORT chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom,
                                                 int64_t* number);
-
-//! Available types of atoms
-typedef enum CHFL_ATOM_TYPES {
-    //! Element from the periodic table of elements
-    CHFL_ATOM_ELEMENT = 0,
-    //! Coarse-grained atom are composed of more than one element: CH3 groups,
-    //! amino-acids are coarse-grained atoms.
-    CHFL_ATOM_COARSE_GRAINED = 1,
-    //! Dummy site, with no physical reality
-    CHFL_ATOM_DUMMY = 2,
-    //! Undefined atom type
-    CHFL_ATOM_UNDEFINED = 3,
-} chfl_atom_type_t;
-
-/*!
-* @brief Get the atom type
-* @param atom the atom to read
-* @param type the type of the atom
-* @return The status code
-*/
-CHFL_EXPORT chfl_status chfl_atom_type(const CHFL_ATOM* const atom,
-                                       chfl_atom_type_t* const type);
-
-/*!
-* @brief Set the atom type
-* @param atom the atom to modify
-* @param type the new type of the atom
-* @return The status code
-*/
-CHFL_EXPORT chfl_status chfl_atom_set_type(CHFL_ATOM* const atom,
-                                           chfl_atom_type_t type);
 
 /*!
 * @brief Destroy an atom, and free the associated memory

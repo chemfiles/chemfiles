@@ -7,12 +7,10 @@ TEST_CASE("Use the Topology class", "[Topology]") {
     auto topology = Topology();
 
     topology.append(Atom("H"));
-    CHECK(topology[0].type() == Atom::ELEMENT);
     CHECK(topology[0].element() == "H");
 
     topology.append(Atom("H"));
-    CHECK(topology[0].type() == Atom::ELEMENT);
-    CHECK(topology[0].element() == "H");
+    CHECK(topology[1].element() == "H");
 
     topology.add_bond(0, 1);
     CHECK(topology.bonds().size() == 1);

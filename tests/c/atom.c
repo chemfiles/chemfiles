@@ -57,14 +57,6 @@ int main() {
     assert(!chfl_atom_atomic_number(a, &number));
     assert(number == 30);
 
-    chfl_atom_type_t type;
-    assert(!chfl_atom_type(a, &type));
-    assert(type == CHFL_ATOM_ELEMENT);
-
-    assert(!chfl_atom_set_type(a, CHFL_ATOM_DUMMY));
-    assert(!chfl_atom_type(a, &type));
-    assert(type == CHFL_ATOM_DUMMY);
-
     assert(!chfl_atom_free(a));
 
     return EXIT_SUCCESS;

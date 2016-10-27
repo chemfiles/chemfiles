@@ -30,6 +30,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   used by Gromacs.
 * All the integers at C boundary have a fixed size, most of the time using
   `uint64_t`.
+* Remove the `Atom::type` value from C and C++ API.
 
 ## 0.6 (1 July 2016)
 

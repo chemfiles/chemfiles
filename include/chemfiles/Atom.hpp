@@ -24,27 +24,11 @@ namespace chemfiles {
  */
 class CHFL_EXPORT Atom {
 public:
-    //! An Atom can be of various kind. This is encoded by a value in this enum.
-    enum AtomType {
-        //! Element from the periodic table of elements
-        ELEMENT = 0,
-        //! Coarse-grained atom are composed of more than one element: CH3
-        //! groups, amino-acids are coarse-grained atoms.
-        COARSE_GRAINED = 1,
-        //! Dummy site, with no physical reality
-        DUMMY = 2,
-        //! Undefined atom-type
-        UNDEFINED = 3,
-    };
-
-    //! Create an atom from its 'element' with 'label'='element'
-    explicit Atom(std::string element);
-    //! Create an atom from its 'element' and its label
+    //! Create an atom with the given `label` and set `element` to be the same
+    //! as label.
+    explicit Atom(std::string label = "");
+    //! Create an atom from the given `label` and `element`
     Atom(std::string element, std::string label);
-    //! Create an atom from its 'element' and its type
-    Atom(AtomType type, std::string element, std::string label = "");
-    //! Default is to create an UNDEFINED atom type with no element or label
-    Atom();
 
     Atom(Atom&&) = default;
     Atom& operator=(Atom&&) = default;
@@ -59,8 +43,6 @@ public:
     double mass() const { return mass_; }
     //! Get the atom charge
     double charge() const { return charge_; }
-    //! Get the atom type
-    AtomType type() const { return type_; }
 
     //! Set the atom element name
     void set_element(const std::string& element) { element_ = element; }
@@ -70,8 +52,6 @@ public:
     void set_mass(double mass) { mass_ = mass; }
     //! Set the atom charge
     void set_charge(double charge) { charge_ = charge; }
-    //! Set the atom type
-    void set_type(AtomType type) { type_ = type; }
 
     //! Try to get the full element name, return and empty string if this is
     //! impossible
@@ -87,17 +67,15 @@ public:
     int atomic_number() const;
 
 private:
-    std::string element_;
     std::string label_;
+    std::string element_;
     double mass_ = 0;
     double charge_ = 0;
-    AtomType type_;
 };
 
 inline bool operator==(const Atom& lhs, const Atom& rhs) {
     return (lhs.element() == rhs.element() && lhs.label() == rhs.label() &&
-            lhs.mass() == rhs.mass() && lhs.charge() == rhs.charge() &&
-            lhs.type() == rhs.type());
+            lhs.mass() == rhs.mass() && lhs.charge() == rhs.charge());
 }
 
 } // namespace chemfiles

@@ -16,8 +16,6 @@
 #include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
-static_assert(sizeof(chfl_atom_type_t) == sizeof(int), "Wrong size for chfl_atom_type_t enum");
-
 CHFL_ATOM* chfl_atom(const char* element) {
     CHFL_ATOM* atom = nullptr;
     CHFL_ERROR_GOTO(
@@ -155,21 +153,6 @@ chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom, int64_t* number
     assert(number != nullptr);
     CHFL_ERROR_CATCH(
         *number = atom->atomic_number();
-    )
-}
-
-chfl_status chfl_atom_type(const CHFL_ATOM* const atom, chfl_atom_type_t* const type) {
-    assert(atom != nullptr);
-    assert(type != nullptr);
-    CHFL_ERROR_CATCH(
-        *type = static_cast<chfl_atom_type_t>(atom->type());
-    )
-}
-
-chfl_status chfl_atom_set_type(CHFL_ATOM* const atom, chfl_atom_type_t type) {
-    assert(atom != nullptr);
-    CHFL_ERROR_CATCH(
-        atom->set_type(static_cast<Atom::AtomType>(type));
     )
 }
 
