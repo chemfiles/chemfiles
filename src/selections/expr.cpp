@@ -217,6 +217,56 @@ Ast parse<ResnameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 }
 
 /****************************************************************************************/
+std::string ResidExpr::print(unsigned /*unused*/) const {
+    return "resid($" + std::to_string(argument_ + 1) + ") " + binop_str(op_) +
+           " " + std::to_string(id_);
+}
+
+std::vector<bool> ResidExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
+    auto res = std::vector<bool>(matches.size(), false);
+    auto compare = binop_comparison<size_t>(op_);
+    auto topology = frame.topology();
+    for (size_t i = 0; i < matches.size(); i++) {
+        auto idx = matches[i][argument_];
+        auto residue = topology.residue(idx);
+        if (residue && residue->id() != static_cast<size_t>(-1)) {
+            res[i] = compare(residue->id(), id_);
+        } else {
+            // No residue or residue id for this atom
+            res[i] = false;
+        }
+    }
+    return res;
+}
+
+template <>
+Ast parse<ResidExpr>(token_iterator_t& begin, const token_iterator_t& end) {
+    assert(end - begin >= 3);
+    assert(begin[2].is_ident());
+    assert(begin[2].ident() == "resid");
+    assert(begin->is_binary_op());
+
+    auto op = BinOp(begin[0].type());
+    if (begin[1].is_number()) {
+        auto num = begin[1].number();
+        if (ceil(num) != num) {
+            throw SelectionError("Residue index selection should contain an integer");
+        }
+    } else {
+        throw SelectionError("Residue index selection should contain an integer");
+    }
+    auto val = static_cast<std::size_t>(begin[1].number());
+    if (end - begin >= 4 && begin[3].is_variable()) {
+        auto argument = begin[3].variable() - 1;
+        begin += 4;
+        return Ast(new ResidExpr(argument, op, val));
+    } else {
+        begin += 3;
+        return Ast(new ResidExpr(0, op, val));
+    }
+}
+
+/****************************************************************************************/
 std::string PositionExpr::print(unsigned /*unused*/) const {
     return coord_.to_string() + "($" + std::to_string(argument_ + 1) + ") " +
            binop_str(op_) + " " + std::to_string(val_);
@@ -314,7 +364,6 @@ std::string IndexExpr::print(unsigned /*unused*/) const {
     return "index($" + std::to_string(argument_ + 1) + ") " + binop_str(op_) +
            " " + std::to_string(val_);
 }
-
 
 std::vector<bool> IndexExpr::evaluate(const Frame& /*unused*/, const std::vector<Match>& matches) const {
     auto res = std::vector<bool>(matches.size(), false);

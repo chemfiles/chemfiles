@@ -180,6 +180,21 @@ private:
     bool equals_;
 };
 
+//! @class ResidExpr selections/expr.hpp selections/expr.cpp
+//! @brief Select atoms using their residue name
+//!
+//! Only `==` and `!=` operators are allowed. The short form `resname <value>`
+//! is equivalent to `resname == <value>`
+class ResidExpr final: public SingleSelector {
+public:
+    ResidExpr(unsigned argument, BinOp op, size_t id)
+        : SingleSelector(argument), op_(op), id_(id) {}
+    std::string print(unsigned delta) const override;
+    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+private:
+    BinOp op_;
+    size_t id_;
+};
 
 //! @class PositionExpr selections/expr.hpp selections/expr.cpp
 //! @brief Select atoms using their position in space. The selection can be

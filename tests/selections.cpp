@@ -74,6 +74,19 @@ TEST_CASE("Atoms selections", "[selection]") {
         CHECK(sel.list(frame).empty());
     }
 
+    SECTION("resid") {
+        auto sel = Selection("resid 3");
+        auto res = std::vector<size_t>{2, 3};
+        CHECK(sel.list(frame) == res);
+
+        sel = Selection("resid < 5");
+        res = std::vector<size_t>{2, 3};
+        CHECK(sel.list(frame) == res);
+
+        sel = Selection("resid != 3");
+        CHECK(sel.list(frame).empty());
+    }
+
     SECTION("positions") {
         auto sel = Selection("x < 2");
         auto res = std::vector<size_t>{0, 1};

@@ -300,7 +300,7 @@ TEST_CASE("Parsing", "[selection]") {
         CHECK_THROWS_AS(parse(tokenize("name == 45")), SelectionError);
     }
 
-    SECTION("Index") {
+    SECTION("index") {
         CHECK(parse(tokenize("index == 4"))->print() == "index($1) == 4");
         CHECK(parse(tokenize("index($1) == 4"))->print() == "index($1) == 4");
         CHECK(parse(tokenize("index 5"))->print() == "index($1) == 5");
@@ -325,7 +325,20 @@ TEST_CASE("Parsing", "[selection]") {
         CHECK_THROWS_AS(parse(tokenize("resname == 45")), SelectionError);
     }
 
-    SECTION("Mass") {
+    SECTION("resid") {
+        CHECK(parse(tokenize("resid == 4"))->print() == "resid($1) == 4");
+        CHECK(parse(tokenize("resid($1) == 4"))->print() == "resid($1) == 4");
+        CHECK(parse(tokenize("resid 5"))->print() == "resid($1) == 5");
+        CHECK(parse(tokenize("resid($2) 5"))->print() == "resid($2) == 5");
+
+        CHECK(parse(tokenize("resid <= 42"))->print() == "resid($1) <= 42");
+        CHECK(parse(tokenize("resid != 12"))->print() == "resid($1) != 12");
+
+        CHECK_THROWS_AS(parse(tokenize("resid == bar")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("resid >= 42.3")), SelectionError);
+    }
+
+    SECTION("mass") {
         CHECK(parse(tokenize("mass == 4"))->print() == "mass($1) == 4.000000");
         CHECK(parse(tokenize("mass($1) == 4"))->print() == "mass($1) == 4.000000");
         CHECK(parse(tokenize("mass 5"))->print() == "mass($1) == 5.000000");
