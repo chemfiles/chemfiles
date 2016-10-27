@@ -16,12 +16,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   (and velocity) data to a frame, and the C API `chfl_frame_add_atom` function.
 * Rename `UnitCell::type` to `UnitCell::shape`. This also affect
   `chfl_cell_shape_t`, `chfl_cell_shape`, and `chfl_cell_set_shape`.
-* Add the atomic label in addition to the atomic element. This introduces the
-  `Atom::{label,element}` method and remove the `Atom::name` method. This also
-  remove `chfl_atom_{name,set_name}` and add `chfl_atom_{element,set_element}`
-  and `chfl_atom_{label,set_label}`.
-* The `name` selector now select atoms based on the atomic label. To select on
-  the element, use the new `element` selector.
+* Account for the difference between the atom name and atom type in some
+  formats (PDB, TNG, ...). This introduces the `Atom::type` member function
+  and the `chfl_atom_type` C API function.
+* Add the `type` selector, to select atoms based on their type.
 * All the floating point data uses doubles instead of floats. This concerns
   atomic data, positions and velocities.
 * C API functions taking three lengths/angles now take a `double[3]` parameter

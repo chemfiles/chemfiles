@@ -38,17 +38,17 @@ TEST_CASE("Atoms selections", "[selection]") {
         CHECK(sel.list(frame) == res);
     }
 
-    SECTION("element") {
-        auto sel = Selection("element O");
+    SECTION("type") {
+        auto sel = Selection("type O");
         auto res = std::vector<size_t>{1, 2};
         CHECK(sel.list(frame) == res);
 
-        sel = Selection("element != O");
+        sel = Selection("type != O");
         res = std::vector<size_t>{0, 3};
         CHECK(sel.list(frame) == res);
     }
 
-    SECTION("element") {
+    SECTION("Name") {
         auto sel = Selection("name O");
         auto res = std::vector<size_t>{1, 2};
         CHECK(sel.list(frame) == res);
@@ -95,7 +95,7 @@ TEST_CASE("Atoms selections", "[selection]") {
         auto res = std::vector<size_t>{2};
         CHECK(sel.list(frame) == res);
 
-        sel = Selection("index > 1 and element H");
+        sel = Selection("index > 1 and type H");
         res = std::vector<size_t>{3};
         CHECK(sel.list(frame) == res);
     }
@@ -105,7 +105,7 @@ TEST_CASE("Atoms selections", "[selection]") {
         auto res = std::vector<size_t>{0, 3};
         CHECK(sel.list(frame) == res);
 
-        sel = Selection("index == 1 or element H");
+        sel = Selection("index == 1 or type H");
         res = std::vector<size_t>{0, 1, 3};
         CHECK(sel.list(frame) == res);
     }
@@ -115,7 +115,7 @@ TEST_CASE("Atoms selections", "[selection]") {
         auto res = std::vector<size_t>{0, 1, 2};
         CHECK(sel.list(frame) == res);
 
-        sel = Selection("not element H");
+        sel = Selection("not type H");
         res = std::vector<size_t>{1, 2};
         CHECK(sel.list(frame) == res);
     }
@@ -129,7 +129,7 @@ TEST_CASE("Atoms selections", "[selection]") {
         res = std::vector<size_t>{};
         CHECK(sel.list(frame) == res);
 
-        sel = Selection("atoms :not element H");
+        sel = Selection("atoms :not type H");
         res = std::vector<size_t>{1, 2};
         CHECK(sel.list(frame) == res);
 
@@ -184,7 +184,7 @@ TEST_CASE("Multiple selections", "[selection]") {
 
 Frame testing_frame() {
     auto topology = Topology();
-    topology.append(Atom("H", "H1"));
+    topology.append(Atom("H1", "H"));
     topology.append(Atom("O"));
     topology.append(Atom("O"));
     topology.append(Atom("H"));

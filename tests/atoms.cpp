@@ -8,27 +8,27 @@ using namespace chemfiles;
 TEST_CASE("Use the Atom type", "[Atoms]"){
     Atom a("H");
     Atom b;
-    Atom c("C", "C1");
-    Atom d("", "Label only");
+    Atom c("C1", "C");
+    Atom d("name only", "");
 
     SECTION("Constructors") {
-        CHECK(a.label() == "H");
-        CHECK(a.element() == "H");
+        CHECK(a.name() == "H");
+        CHECK(a.type() == "H");
         CHECK(a.mass() == 1.008);
         CHECK(a.charge() == 0);
 
-        CHECK(b.label() == "");
-        CHECK(b.element() == "");
+        CHECK(b.name() == "");
+        CHECK(b.type() == "");
         CHECK(b.mass() == 0);
         CHECK(b.charge() == 0);
 
-        CHECK(c.label() == "C1");
-        CHECK(c.element() == "C");
+        CHECK(c.name() == "C1");
+        CHECK(c.type() == "C");
         CHECK(c.mass() == 12.011);
         CHECK(c.charge() == 0);
 
-        CHECK(d.label() == "Label only");
-        CHECK(d.element() == "");
+        CHECK(d.name() == "name only");
+        CHECK(d.type() == "");
         CHECK(d.mass() == 0);
         CHECK(d.charge() == 0);
     }
@@ -44,13 +44,13 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
         atom.set_charge(-2);
         CHECK(atom.charge() == -2);
 
-        CHECK(atom.label() == "");
-        atom.set_label("HE22");
-        CHECK(atom.label() == "HE22");
+        CHECK(atom.name() == "");
+        atom.set_name("HE22");
+        CHECK(atom.name() == "HE22");
 
-        CHECK(atom.element() == "");
-        atom.set_element("foo");
-        CHECK(atom.element() == "foo");
+        CHECK(atom.type() == "");
+        atom.set_type("foo");
+        CHECK(atom.type() == "foo");
     }
 
     SECTION("Elements properties") {

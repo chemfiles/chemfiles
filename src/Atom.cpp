@@ -11,39 +11,48 @@
 
 using namespace chemfiles;
 
-Atom::Atom(std::string label): Atom(label, label) {}
+Atom::Atom(std::string name): Atom(name, name) {}
 
-Atom::Atom(std::string element, std::string label):
-    label_(std::move(label)), element_(std::move(element)) {
-    if (PERIODIC_INFORMATION.find(element_) != PERIODIC_INFORMATION.end()) {
-        mass_ = PERIODIC_INFORMATION.at(element_).mass;
+Atom::Atom(std::string name, std::string type):
+    name_(std::move(name)), type_(std::move(type)) {
+    auto periodic = PERIODIC_INFORMATION.find(type_);
+    if (periodic != PERIODIC_INFORMATION.end()) {
+        mass_ = periodic->second.mass;
     }
 }
 
 std::string Atom::full_name() const {
-    if (PERIODIC_INFORMATION.find(element_) != PERIODIC_INFORMATION.end()) {
-        return std::string(PERIODIC_INFORMATION.at(element_).name);
+    auto periodic = PERIODIC_INFORMATION.find(type_);
+    if (periodic != PERIODIC_INFORMATION.end()) {
+        return periodic->second.name;
+    } else {
+        return "";
     }
-    return "";
 }
 
 double Atom::vdw_radius() const {
-    if (PERIODIC_INFORMATION.find(element_) != PERIODIC_INFORMATION.end()) {
-        return PERIODIC_INFORMATION.at(element_).vdw_radius;
+    auto periodic = PERIODIC_INFORMATION.find(type_);
+    if (periodic != PERIODIC_INFORMATION.end()) {
+        return periodic->second.vdw_radius;
+    } else {
+        return -1;
     }
-    return -1;
 }
 
 double Atom::covalent_radius() const {
-    if (PERIODIC_INFORMATION.find(element_) != PERIODIC_INFORMATION.end()) {
-        return PERIODIC_INFORMATION.at(element_).colvalent_radius;
+    auto periodic = PERIODIC_INFORMATION.find(type_);
+    if (periodic != PERIODIC_INFORMATION.end()) {
+        return periodic->second.colvalent_radius;
+    } else {
+        return -1;
     }
-    return -1;
 }
 
 int Atom::atomic_number() const {
-    if (PERIODIC_INFORMATION.find(element_) != PERIODIC_INFORMATION.end()) {
-        return PERIODIC_INFORMATION.at(element_).number;
+    auto periodic = PERIODIC_INFORMATION.find(type_);
+    if (periodic != PERIODIC_INFORMATION.end()) {
+        return periodic->second.number;
+    } else {
+        return -1;
     }
-    return -1;
 }

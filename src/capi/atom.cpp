@@ -16,10 +16,10 @@
 #include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
-CHFL_ATOM* chfl_atom(const char* element) {
+CHFL_ATOM* chfl_atom(const char* name) {
     CHFL_ATOM* atom = nullptr;
     CHFL_ERROR_GOTO(
-        atom = new Atom(std::string(element));
+        atom = new Atom(name);
     )
     return atom;
 error:
@@ -89,46 +89,46 @@ chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, double charge) {
     )
 }
 
-chfl_status chfl_atom_element(const CHFL_ATOM* const atom, char* const element, uint64_t buffsize) {
+chfl_status chfl_atom_type(const CHFL_ATOM* const atom, char* const type, uint64_t buffsize) {
     assert(atom != nullptr);
-    assert(element != nullptr);
+    assert(type != nullptr);
     CHFL_ERROR_CATCH(
-        strncpy(element, atom->element().c_str(), buffsize - 1);
-        element[buffsize - 1] = '\0';
+        strncpy(type, atom->type().c_str(), buffsize - 1);
+        type[buffsize - 1] = '\0';
     )
 }
 
-chfl_status chfl_atom_set_element(CHFL_ATOM* const atom, const char* element) {
+chfl_status chfl_atom_set_type(CHFL_ATOM* const atom, const char* type) {
     assert(atom != nullptr);
-    assert(element != nullptr);
+    assert(type != nullptr);
     CHFL_ERROR_CATCH(
-        atom->set_element(std::string(element));
+        atom->set_type(type);
     )
 }
 
-chfl_status chfl_atom_label(const CHFL_ATOM* const atom, char* const label, uint64_t buffsize) {
+chfl_status chfl_atom_name(const CHFL_ATOM* const atom, char* const name, uint64_t buffsize) {
     assert(atom != nullptr);
-    assert(label != nullptr);
+    assert(name != nullptr);
     CHFL_ERROR_CATCH(
-        strncpy(label, atom->label().c_str(), buffsize - 1);
-        label[buffsize - 1] = '\0';
+        strncpy(name, atom->name().c_str(), buffsize - 1);
+        name[buffsize - 1] = '\0';
     )
 }
 
-chfl_status chfl_atom_set_label(CHFL_ATOM* const atom, const char* label) {
+chfl_status chfl_atom_set_name(CHFL_ATOM* const atom, const char* name) {
     assert(atom != nullptr);
-    assert(label != nullptr);
+    assert(name != nullptr);
     CHFL_ERROR_CATCH(
-        atom->set_label(std::string(label));
+        atom->set_name(name);
     )
 }
 
-chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* const element, uint64_t buffsize) {
+chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* const name, uint64_t buffsize) {
     assert(atom != nullptr);
-    assert(element != nullptr);
+    assert(name != nullptr);
     CHFL_ERROR_CATCH(
-        strncpy(element, atom->full_name().c_str(), buffsize - 1);
-        element[buffsize - 1] = '\0';
+        strncpy(name, atom->full_name().c_str(), buffsize - 1);
+        name[buffsize - 1] = '\0';
     )
 }
 

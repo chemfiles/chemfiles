@@ -593,8 +593,7 @@ CHFL_EXPORT chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const top
                                                   uint64_t* natoms);
 
 /*!
-* @brief Resize the topology to hold `natoms` atoms, adding `CHFL_ATOM_UNDEFINED`
-*        atoms as needed.
+* @brief Resize the topology to hold `natoms` atoms.
 *
 * @param topology The topology
 * @param natoms The new number of atoms.
@@ -882,11 +881,11 @@ CHFL_EXPORT chfl_status chfl_residue_free(CHFL_RESIDUE* residue);
 /******************************************************************************/
 
 /*!
-* @brief Create an atom from an element name
-* @param element The new atom element
+* @brief Create an atom from a name
+* @param name The new atom name
 * @return A pointer to the new atom, or NULL in case of error
 */
-CHFL_EXPORT CHFL_ATOM* chfl_atom(const char* element);
+CHFL_EXPORT CHFL_ATOM* chfl_atom(const char* name);
 
 /*!
 * @brief Get a specific atom from a frame
@@ -941,56 +940,56 @@ CHFL_EXPORT chfl_status chfl_atom_charge(const CHFL_ATOM* const atom, double* ch
 CHFL_EXPORT chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, double charge);
 
 /*!
-* @brief Get the element name of an atom
+* @brief Get the type of an atom
 * @param atom The atom
-* @param element A string buffer to be filled with the element name
+* @param type A string buffer to be filled with the atom type
 * @param buffsize The size of the string buffer
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_element(const CHFL_ATOM* const atom,
-                                       char* const element,
+CHFL_EXPORT chfl_status chfl_atom_type(const CHFL_ATOM* const atom,
+                                       char* const type,
                                        uint64_t buffsize);
 
 /*!
-* @brief Set the element name of an atom
+* @brief Set the type of an atom
 * @param atom The atom
-* @param element A null terminated string containing the new element name
+* @param type A null terminated string containing the new atom type
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_set_element(CHFL_ATOM* const atom, const char* element);
+CHFL_EXPORT chfl_status chfl_atom_set_type(CHFL_ATOM* const atom, const char* type);
 
 /*!
-* @brief Get the label name of an atom
+* @brief Get the name of an atom
 * @param atom The atom
-* @param label A string buffer to be filled with the label
+* @param name A string buffer to be filled with the atom name
 * @param buffsize The size of the string buffer
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_label(const CHFL_ATOM* const atom,
-                                       char* const label,
+CHFL_EXPORT chfl_status chfl_atom_name(const CHFL_ATOM* const atom,
+                                       char* const name,
                                        uint64_t buffsize);
 
 /*!
-* @brief Set the label of an atom
+* @brief Set the name of an atom
 * @param atom The atom
-* @param label A null terminated string containing the new label
+* @param name A null terminated string containing the new atom name
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_set_label(CHFL_ATOM* const atom, const char* label);
+CHFL_EXPORT chfl_status chfl_atom_set_name(CHFL_ATOM* const atom, const char* name);
 
 /*!
-* @brief Try to get the full name of an atom from the element name
+* @brief Try to get the full name of an atom from the atom type
 * @param atom The atom
-* @param element A string buffer to be filled with the element name
+* @param name A string buffer to be filled with the full name
 * @param buffsize The size of the string buffer
 * @return The status code
 */
 CHFL_EXPORT chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom,
-                                            char* const element,
+                                            char* const name,
                                             uint64_t buffsize);
 
 /*!
-* @brief Try to get the Van der Waals radius of an atom from the element name
+* @brief Try to get the Van der Waals radius of an atom from the atom type
 * @param atom The atom
 * @param radius The Van der Waals radius of the atom or -1 if no value could be
 * found.
@@ -1000,7 +999,7 @@ CHFL_EXPORT chfl_status chfl_atom_vdw_radius(const CHFL_ATOM* const atom,
                                              double* radius);
 
 /*!
-* @brief Try to get the covalent radius of an atom from the element name
+* @brief Try to get the covalent radius of an atom from the atom type
 * @param atom The atom
 * @param radius The covalent radius of the atom or -1 if no value could be
 * found.
@@ -1010,7 +1009,7 @@ CHFL_EXPORT chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* const atom,
                                                   double* radius);
 
 /*!
-* @brief Try to get the atomic number of an atom from the element name
+* @brief Try to get the atomic number of an atom from the atom type
 * @param atom The atom
 * @param number The atomic number, or -1 if no value could be found.
 * @return The status code

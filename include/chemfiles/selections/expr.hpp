@@ -119,27 +119,27 @@ protected:
     const unsigned argument_;
 };
 
-//! @class ElementExpr selections/expr.hpp selections/expr.cpp
-//! @brief Select atoms using their element name.
+//! @class TypeExpr selections/expr.hpp selections/expr.cpp
+//! @brief Select atoms using their type
 //!
-//! Only `==` and `!=` operators are allowed. The short form `element <value>` is
-//! equivalent to `element == <value>`
-class ElementExpr final: public SingleSelector {
+//! Only `==` and `!=` operators are allowed. The short form `type <value>` is
+//! equivalent to `type == <value>`
+class TypeExpr final: public SingleSelector {
 public:
-    ElementExpr(unsigned argument, std::string element, bool equals)
-        : SingleSelector(argument), element_(element), equals_(equals) {}
+    TypeExpr(unsigned argument, std::string type, bool equals)
+        : SingleSelector(argument), type_(type), equals_(equals) {}
     std::string print(unsigned delta) const override;
     std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
 private:
-    std::string element_;
+    std::string type_;
     bool equals_;
 };
 
-//! @class ElementExpr selections/expr.hpp selections/expr.cpp
-//! @brief Select atoms using their label.
+//! @class NameExpr selections/expr.hpp selections/expr.cpp
+//! @brief Select atoms using their name.
 //!
-//! Only `==` and `!=` operators are allowed. The short form `element <value>` is
-//! equivalent to `element == <value>`
+//! Only `==` and `!=` operators are allowed. The short form `name <value>` is
+//! equivalent to `name == <value>`
 class NameExpr final: public SingleSelector {
 public:
     NameExpr(unsigned argument, std::string name, bool equals)

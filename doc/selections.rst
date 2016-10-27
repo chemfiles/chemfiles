@@ -55,9 +55,9 @@ The following selectors are implemented in chemfiles:
 
 - ``all``: select all the atoms;
 - ``none``: select none of the atoms;
-- ``element``: select atoms based on their element;
+- ``type``: select atoms based on their type;
 - ``name``: select atoms based on their name. Some formats store both an atomic
-  name (H3) and an atom element (H), this is why you can use two different
+  name (H3) and an atom type (H), this is why you can use two different
   selectors depending on the actual data;
 - ``index``: select atoms based on their index in the frame;
 - ``mass``: select atoms based on their mass;

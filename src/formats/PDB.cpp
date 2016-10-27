@@ -144,7 +144,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line) {
 
     auto atom = Atom(trim(line.substr(12, 4)));
     if (line.length() >= 78) {
-        atom.set_element(trim(line.substr(76, 2)));
+        atom.set_type(trim(line.substr(76, 2)));
     }
 
     try {
@@ -276,8 +276,8 @@ void PDBFormat::write(const Frame& frame) {
         cell.a(), cell.b(), cell.c(), cell.alpha(), cell.beta(), cell.gamma());
 
     for (size_t i = 0; i < frame.natoms(); i++) {
-        auto& element = frame.topology()[i].element();
-        auto& label = frame.topology()[i].label();
+        auto& name = frame.topology()[i].name();
+        auto& type = frame.topology()[i].type();
         auto& pos = frame.positions()[i];
 
         std::string resname;
@@ -303,7 +303,7 @@ void PDBFormat::write(const Frame& frame) {
         fmt::print(*file_, "HETATM{:5d} {: >4s} {:3} X{:4d}    "
                            "{:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}"
                            "          {: >2s}\n",
-                   i, label, resname, resid, pos[0], pos[1], pos[2], 0.0, 0.0, element);
+                   i, name, resname, resid, pos[0], pos[1], pos[2], 0.0, 0.0, type);
     }
 
     auto connect = std::vector<std::vector<size_t>>(frame.natoms());

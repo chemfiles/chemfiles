@@ -249,39 +249,39 @@ TEST_CASE("Parsing", "[selection]") {
         ast = "and -> index($1) == 1\n    -> or -> index($1) == 1\n          -> index($1) == 1";
         CHECK(parse(tokenize("index == 1 and (index == 1 or index == 1)"))->print() == ast);
 
-        CHECK_THROWS_AS(parse(tokenize("element H and")), SelectionError);
-        CHECK_THROWS_AS(parse(tokenize("element <= 4 and")), SelectionError);
-        CHECK_THROWS_AS(parse(tokenize("and element H")), SelectionError);
-        CHECK_THROWS_AS(parse(tokenize("and element <= 4")), SelectionError);
-        CHECK_THROWS_AS(parse(tokenize("element <= 4 or")), SelectionError);
-        CHECK_THROWS_AS(parse(tokenize("or element <= 4")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("name H and")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("name <= 4 and")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("and name H")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("and name <= 4")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("name <= 4 or")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("or name <= 4")), SelectionError);
         CHECK_THROWS_AS(parse(tokenize("not")), SelectionError);
-        CHECK_THROWS_AS(parse(tokenize("not element <= 4")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("not name <= 4")), SelectionError);
     }
 
     SECTION("all & none") {
         CHECK(parse(tokenize("all"))->print() == "all");
         CHECK(parse(tokenize("none"))->print() == "none");
 
-        auto ast = "or -> all\n   -> element($1) == H";
-        CHECK(parse(tokenize("all or element H"))->print() == ast);
+        auto ast = "or -> all\n   -> name($1) == H";
+        CHECK(parse(tokenize("all or name H"))->print() == ast);
 
-        ast = "or -> element($1) == H\n   -> none";
-        CHECK(parse(tokenize("element H or none"))->print() == ast);
+        ast = "or -> name($1) == H\n   -> none";
+        CHECK(parse(tokenize("name H or none"))->print() == ast);
 
         CHECK(parse(tokenize("not all"))->print() == "not all");
     }
 
-    SECTION("element") {
-        CHECK(parse(tokenize("element == goo"))->print() == "element($1) == goo");
-        CHECK(parse(tokenize("element($1) == goo"))->print() == "element($1) == goo");
-        CHECK(parse(tokenize("element goo"))->print() == "element($1) == goo");
-        CHECK(parse(tokenize("element($3) goo"))->print() == "element($3) == goo");
-        CHECK(parse(tokenize("element != goo"))->print() == "element($1) != goo");
+    SECTION("type") {
+        CHECK(parse(tokenize("type == goo"))->print() == "type($1) == goo");
+        CHECK(parse(tokenize("type($1) == goo"))->print() == "type($1) == goo");
+        CHECK(parse(tokenize("type goo"))->print() == "type($1) == goo");
+        CHECK(parse(tokenize("type($3) goo"))->print() == "type($3) == goo");
+        CHECK(parse(tokenize("type != goo"))->print() == "type($1) != goo");
 
-        CHECK_THROWS_AS(parse(tokenize("element < bar")), SelectionError);
-        CHECK_THROWS_AS(parse(tokenize("element >= bar")), SelectionError);
-        CHECK_THROWS_AS(parse(tokenize("element == 45")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("type < bar")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("type >= bar")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("type == 45")), SelectionError);
     }
 
     SECTION("name") {
@@ -338,12 +338,12 @@ TEST_CASE("Parsing", "[selection]") {
     }
 
     SECTION("Multiple selections") {
-        auto ast = "and -> mass($1) < 4.000000\n    -> element($3) == O";
-        CHECK(parse(tokenize("mass($1) < 4 and element($3) O"))->print() == ast);
-        ast = "element($4) != Cs";
-        CHECK(parse(tokenize("element($4) != Cs"))->print() == ast);
-        ast = "or -> index($1) < 4\n   -> element($2) == H";
-        CHECK(parse(tokenize("index($1) < 4 or element($2) H"))->print() == ast);
+        auto ast = "and -> mass($1) < 4.000000\n    -> name($3) == O";
+        CHECK(parse(tokenize("mass($1) < 4 and name($3) O"))->print() == ast);
+        ast = "name($4) != Cs";
+        CHECK(parse(tokenize("name($4) != Cs"))->print() == ast);
+        ast = "or -> index($1) < 4\n   -> name($2) == H";
+        CHECK(parse(tokenize("index($1) < 4 or name($2) H"))->print() == ast);
     }
 
     SECTION("Parsing errors") {
@@ -352,7 +352,7 @@ TEST_CASE("Parsing", "[selection]") {
             "index == 23 6",
             "index == 23 njzk",
             "index == 23 !=",
-            "index == 23 element == 1",
+            "index == 23 name == 1",
             /* Bad usage of the boolean operators */
             "index == 23 and ",
             "and index == 23",
@@ -361,12 +361,18 @@ TEST_CASE("Parsing", "[selection]") {
             "or index == 23",
             "not or index == 23",
             "index == 23 not index == 1",
-            /* element name expressions */
-            "element == <",
-            "element == 56",
-            "element < foo",
-            "element 56",
-            "element >=",
+            /* name expressions */
+            "name == <",
+            "name == 56",
+            "name < foo",
+            "name 56",
+            "name >=",
+            /* type expressions */
+            "type == <",
+            "type == 56",
+            "type < foo",
+            "type 56",
+            "type >=",
             /* index expressions */
             "index == <",
             "index == bar",

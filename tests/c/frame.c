@@ -99,9 +99,9 @@ int main() {
 
     topology = chfl_topology_from_frame(frame);
     CHFL_ATOM* atom = chfl_atom_from_topology(topology, 0);
-    char element[32];
-    assert(!chfl_atom_element(atom, element, sizeof(element)));
-    assert(strcmp(element, "Zn") == 0);
+    char type[32];
+    assert(!chfl_atom_type(atom, type, sizeof(type)));
+    assert(strcmp(type, "Zn") == 0);
     assert(!chfl_atom_free(atom));
 
     atom = chfl_atom_from_topology(topology, 10000);
@@ -109,8 +109,8 @@ int main() {
     assert(!chfl_topology_free(topology));
 
     atom = chfl_atom_from_frame(frame, 1);
-    assert(!chfl_atom_element(atom, element, sizeof(element)));
-    assert(strcmp(element, "Ar") == 0);
+    assert(!chfl_atom_type(atom, type, sizeof(type)));
+    assert(strcmp(type, "Ar") == 0);
     assert(!chfl_atom_free(atom));
 
     atom = chfl_atom_from_frame(frame, 10000);

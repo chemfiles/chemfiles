@@ -62,9 +62,9 @@ static void test_read() {
     assert(n == 0);
 
     CHFL_ATOM* atom = chfl_atom_from_topology(topology, 0);
-    char element[32];
-    assert(!chfl_atom_element(atom, element, sizeof(element)));
-    assert(strcmp(element, "O") == 0);
+    char type[32];
+    assert(!chfl_atom_type(atom, type, sizeof(type)));
+    assert(strcmp(type, "O") == 0);
     assert(!chfl_atom_free(atom));
     assert(!chfl_topology_free(topology));
 
@@ -98,8 +98,8 @@ static void test_read() {
 
     // Get the atom from a frame
     atom = chfl_atom_from_frame(frame, 1);
-    assert(!chfl_atom_element(atom, element, sizeof(element)));
-    assert(strcmp(element, "H") == 0);
+    assert(!chfl_atom_type(atom, type, sizeof(type)));
+    assert(strcmp(type, "H") == 0);
     assert(!chfl_atom_free(atom));
 
     // Guess the system topology
@@ -125,8 +125,8 @@ static void test_read() {
     assert(!chfl_trajectory_read_step(file, 10, frame));
 
     atom = chfl_atom_from_frame(frame, 1);
-    assert(!chfl_atom_element(atom, element, sizeof(element)));
-    assert(strcmp(element, "Cs") == 0);
+    assert(!chfl_atom_type(atom, type, sizeof(type)));
+    assert(strcmp(type, "Cs") == 0);
     assert(!chfl_atom_free(atom));
 
     assert(!chfl_trajectory_close(file));
@@ -136,15 +136,15 @@ static void test_read() {
     assert(!chfl_trajectory_set_topology_with_format(file, "data/xyz/topology.xyz.topology", "XYZ"));
     assert(!chfl_trajectory_read(file, frame));
     atom = chfl_atom_from_frame(frame, 0);
-    assert(!chfl_atom_element(atom, element, sizeof(element)));
-    assert(strcmp(element, "Zn") == 0);
+    assert(!chfl_atom_type(atom, type, sizeof(type)));
+    assert(strcmp(type, "Zn") == 0);
     assert(!chfl_atom_free(atom));
 
     assert(!chfl_trajectory_set_topology_file(file, "data/xyz/topology.xyz"));
     assert(!chfl_trajectory_read(file, frame));
     atom = chfl_atom_from_frame(frame, 0);
-    assert(!chfl_atom_element(atom, element, sizeof(element)));
-    assert(strcmp(element, "Zn") == 0);
+    assert(!chfl_atom_type(atom, type, sizeof(type)));
+    assert(strcmp(type, "Zn") == 0);
     assert(!chfl_atom_free(atom));
 
     assert(!chfl_trajectory_close(file));

@@ -49,12 +49,12 @@ TEST_CASE("Read files in TNG format", "[TNG]"){
         auto topology = file.read().topology();
 
         CHECK(topology.natoms() == 15);
-        CHECK(topology[0].label() == "O");
-        CHECK(topology[0].element() == "O");
-        CHECK(topology[1].label() == "HO1");
-        CHECK(topology[1].element() == "H");
-        CHECK(topology[2].label() == "HO2");
-        CHECK(topology[2].element() == "H");
+        CHECK(topology[0].name() == "O");
+        CHECK(topology[0].type() == "O");
+        CHECK(topology[1].name() == "HO1");
+        CHECK(topology[1].type() == "H");
+        CHECK(topology[2].name() == "HO2");
+        CHECK(topology[2].type() == "H");
 
         CHECK(topology.residues().size() == 5);
         auto residue = topology.residues()[0];
