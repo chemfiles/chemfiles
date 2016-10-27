@@ -60,6 +60,10 @@ The following selectors are implemented in chemfiles:
   name (H3) and an atom type (H), this is why you can use two different
   selectors depending on the actual data;
 - ``index``: select atoms based on their index in the frame;
+- ``resname``: select atoms based on their residue name. An atom without residue
+  information will never be selected.
+- ``resid``: select atoms based on their residue name. An atom without residue
+  information will never be selected.
 - ``mass``: select atoms based on their mass;
 - ``x``, ``y`` and ``z``: select atoms based on their position cartesian components;
 - ``vx``, ``vy`` and ``vz``: select atoms based on their velocity cartesian components;
