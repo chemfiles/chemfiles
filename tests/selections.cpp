@@ -48,7 +48,7 @@ TEST_CASE("Atoms selections", "[selection]") {
         CHECK(sel.list(frame) == res);
     }
 
-    SECTION("Name") {
+    SECTION("name") {
         auto sel = Selection("name O");
         auto res = std::vector<size_t>{1, 2};
         CHECK(sel.list(frame) == res);
@@ -60,6 +60,18 @@ TEST_CASE("Atoms selections", "[selection]") {
         sel = Selection("name H1");
         res = std::vector<size_t>{0};
         CHECK(sel.list(frame) == res);
+    }
+
+    SECTION("resname") {
+        auto sel = Selection("resname resime");
+        auto res = std::vector<size_t>{2, 3};
+        CHECK(sel.list(frame) == res);
+
+        sel = Selection("resname != resime");
+        CHECK(sel.list(frame).empty());
+
+        sel = Selection("resname == water");
+        CHECK(sel.list(frame).empty());
     }
 
     SECTION("positions") {
@@ -192,6 +204,11 @@ Frame testing_frame() {
     topology.add_bond(0, 1);
     topology.add_bond(1, 2);
     topology.add_bond(2, 3);
+
+    auto res = Residue("resime", 3);
+    res.add_atom(2);
+    res.add_atom(3);
+    topology.add_residue(res);
 
     auto frame = Frame(topology);
     int i = 0;

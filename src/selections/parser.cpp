@@ -26,8 +26,9 @@ struct function_info_t {
 static std::map<std::string, function_info_t> FUNCTIONS = {
     {"name", {1, true}},
     {"type", {1, true}},
-    {"mass", {1, true}},
+    {"resname", {1, true}},
     {"index", {1, true}},
+    {"mass", {1, true}},
     {"x", {1, false}},
     {"y", {1, false}},
     {"z", {1, false}},
@@ -190,6 +191,8 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
             return parse<NameExpr>(begin, end);
         } else if (ident == "index") {
             return parse<IndexExpr>(begin, end);
+        } else if (ident == "resname") {
+            return parse<ResnameExpr>(begin, end);
         } else if (ident == "mass") {
             return parse<MassExpr>(begin, end);
         } else if (ident == "x" || ident == "y" || ident == "z") {

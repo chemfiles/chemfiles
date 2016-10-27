@@ -212,6 +212,10 @@ TEST_CASE("Lexing", "[selection]") {
             "è",
             "à",
             "ü",
+            "∀",
+            "ζ",
+            "Ｒ", // weird full width UTF-8 character
+            "形",
             "/",
             "^",
             "`",
@@ -307,6 +311,18 @@ TEST_CASE("Parsing", "[selection]") {
 
         CHECK_THROWS_AS(parse(tokenize("index == bar")), SelectionError);
         CHECK_THROWS_AS(parse(tokenize("index >= 42.3")), SelectionError);
+    }
+
+    SECTION("resname") {
+        CHECK(parse(tokenize("resname == goo"))->print() == "resname($1) == goo");
+        CHECK(parse(tokenize("resname($1) == goo"))->print() == "resname($1) == goo");
+        CHECK(parse(tokenize("resname goo"))->print() == "resname($1) == goo");
+        CHECK(parse(tokenize("resname($3) goo"))->print() == "resname($3) == goo");
+        CHECK(parse(tokenize("resname != goo"))->print() == "resname($1) != goo");
+
+        CHECK_THROWS_AS(parse(tokenize("resname < bar")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("resname >= bar")), SelectionError);
+        CHECK_THROWS_AS(parse(tokenize("resname == 45")), SelectionError);
     }
 
     SECTION("Mass") {

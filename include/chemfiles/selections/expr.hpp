@@ -164,6 +164,22 @@ private:
     std::size_t val_;
 };
 
+//! @class ResnameExpr selections/expr.hpp selections/expr.cpp
+//! @brief Select atoms using their residue name
+//!
+//! Only `==` and `!=` operators are allowed. The short form `resname <value>`
+//! is equivalent to `resname == <value>`
+class ResnameExpr final: public SingleSelector {
+public:
+    ResnameExpr(unsigned argument, std::string name, bool equals)
+        : SingleSelector(argument), name_(name), equals_(equals) {}
+    std::string print(unsigned delta) const override;
+    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+private:
+    std::string name_;
+    bool equals_;
+};
+
 
 //! @class PositionExpr selections/expr.hpp selections/expr.cpp
 //! @brief Select atoms using their position in space. The selection can be
