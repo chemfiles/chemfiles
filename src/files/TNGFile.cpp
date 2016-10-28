@@ -44,8 +44,8 @@ TNGFile::TNGFile(std::string filename, File::Mode mode): BinaryFile(filename, mo
     }
 }
 
-TNGFile::~TNGFile() {
-    CHECK(tng_util_trajectory_close(&handle_));
+TNGFile::~TNGFile() noexcept {
+    tng_util_trajectory_close(&handle_);
 }
 
 void chemfiles::check_tng_error(tng_function_status status, std::string function) {

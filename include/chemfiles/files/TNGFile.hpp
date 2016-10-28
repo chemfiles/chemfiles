@@ -19,7 +19,7 @@ namespace chemfiles {
 class TNGFile final: public BinaryFile {
 public:
     TNGFile(std::string filename, File::Mode mode);
-    ~TNGFile();
+    ~TNGFile() noexcept;
 
     TNGFile(TNGFile&&) = default;
     TNGFile& operator=(TNGFile&&) = default;
