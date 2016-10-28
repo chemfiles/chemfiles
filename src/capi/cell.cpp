@@ -15,7 +15,7 @@ using namespace chemfiles;
 
 static_assert(sizeof(chfl_cell_shape_t) == sizeof(int), "Wrong size for chfl_cell_shape_t enum");
 
-CHFL_CELL* chfl_cell(const chfl_vector_t lenghts) {
+extern "C" CHFL_CELL* chfl_cell(const chfl_vector_t lenghts) {
     assert(lenghts != nullptr);
     CHFL_CELL* cell = nullptr;
     CHFL_ERROR_GOTO(
@@ -27,7 +27,7 @@ error:
     return nullptr;
 }
 
-CHFL_CELL* chfl_cell_triclinic(const chfl_vector_t lenghts, const chfl_vector_t angles) {
+extern "C" CHFL_CELL* chfl_cell_triclinic(const chfl_vector_t lenghts, const chfl_vector_t angles) {
     assert(lenghts != nullptr);
     assert(angles != nullptr);
     CHFL_CELL* cell = nullptr;
@@ -44,7 +44,7 @@ error:
 }
 
 
-CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* const frame) {
+extern "C" CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* const frame) {
     assert(frame != nullptr);
     CHFL_CELL* cell = nullptr;
     CHFL_ERROR_GOTO(
@@ -56,7 +56,7 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_cell_volume(const CHFL_CELL* const cell, double* volume) {
+extern "C" chfl_status chfl_cell_volume(const CHFL_CELL* const cell, double* volume) {
     assert(cell != nullptr);
     assert(volume != nullptr);
     CHFL_ERROR_CATCH(
@@ -64,7 +64,7 @@ chfl_status chfl_cell_volume(const CHFL_CELL* const cell, double* volume) {
     )
 }
 
-chfl_status chfl_cell_lengths(const CHFL_CELL* const cell, chfl_vector_t lenghts) {
+extern "C" chfl_status chfl_cell_lengths(const CHFL_CELL* const cell, chfl_vector_t lenghts) {
     assert(cell != nullptr);
     assert(lenghts != nullptr);
     CHFL_ERROR_CATCH(
@@ -74,7 +74,7 @@ chfl_status chfl_cell_lengths(const CHFL_CELL* const cell, chfl_vector_t lenghts
     )
 }
 
-chfl_status chfl_cell_set_lengths(CHFL_CELL* const cell, const chfl_vector_t lenghts) {
+extern "C" chfl_status chfl_cell_set_lengths(CHFL_CELL* const cell, const chfl_vector_t lenghts) {
     assert(cell != nullptr);
     assert(lenghts != nullptr);
     CHFL_ERROR_CATCH(
@@ -84,7 +84,7 @@ chfl_status chfl_cell_set_lengths(CHFL_CELL* const cell, const chfl_vector_t len
     )
 }
 
-chfl_status chfl_cell_angles(const CHFL_CELL* const cell, chfl_vector_t angles) {
+extern "C" chfl_status chfl_cell_angles(const CHFL_CELL* const cell, chfl_vector_t angles) {
     assert(cell != nullptr);
     assert(angles != nullptr);
     CHFL_ERROR_CATCH(
@@ -94,7 +94,7 @@ chfl_status chfl_cell_angles(const CHFL_CELL* const cell, chfl_vector_t angles) 
     )
 }
 
-chfl_status chfl_cell_set_angles(CHFL_CELL* const cell, const chfl_vector_t angles) {
+extern "C" chfl_status chfl_cell_set_angles(CHFL_CELL* const cell, const chfl_vector_t angles) {
     assert(cell != nullptr);
     CHFL_ERROR_CATCH(
         cell->set_alpha(angles[0]);
@@ -103,7 +103,7 @@ chfl_status chfl_cell_set_angles(CHFL_CELL* const cell, const chfl_vector_t angl
     )
 }
 
-chfl_status chfl_cell_matrix(const CHFL_CELL* const cell, chfl_vector_t matrix[3]) {
+extern "C" chfl_status chfl_cell_matrix(const CHFL_CELL* const cell, chfl_vector_t matrix[3]) {
     assert(cell != nullptr);
     assert(matrix != nullptr);
     CHFL_ERROR_CATCH(
@@ -111,7 +111,7 @@ chfl_status chfl_cell_matrix(const CHFL_CELL* const cell, chfl_vector_t matrix[3
     )
 }
 
-chfl_status chfl_cell_shape(const CHFL_CELL* const cell, chfl_cell_shape_t* const shape) {
+extern "C" chfl_status chfl_cell_shape(const CHFL_CELL* const cell, chfl_cell_shape_t* const shape) {
     assert(cell != nullptr);
     assert(shape != nullptr);
     CHFL_ERROR_CATCH(
@@ -119,14 +119,14 @@ chfl_status chfl_cell_shape(const CHFL_CELL* const cell, chfl_cell_shape_t* cons
     )
 }
 
-chfl_status chfl_cell_set_shape(CHFL_CELL* const cell, chfl_cell_shape_t shape) {
+extern "C" chfl_status chfl_cell_set_shape(CHFL_CELL* const cell, chfl_cell_shape_t shape) {
     assert(cell != nullptr);
     CHFL_ERROR_CATCH(
         cell->shape(static_cast<UnitCell::CellShape>(shape));
     )
 }
 
-chfl_status chfl_cell_free(CHFL_CELL* cell) {
+extern "C" chfl_status chfl_cell_free(CHFL_CELL* cell) {
     delete cell;
     cell = nullptr;
     return CHFL_SUCCESS;

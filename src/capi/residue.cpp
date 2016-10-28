@@ -15,7 +15,7 @@
 #include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
-CHFL_RESIDUE* chfl_residue(const char* name, uint64_t resid) {
+extern "C" CHFL_RESIDUE* chfl_residue(const char* name, uint64_t resid) {
     assert(name != nullptr);
     CHFL_RESIDUE* residue = nullptr;
     CHFL_ERROR_GOTO(
@@ -27,7 +27,7 @@ error:
     return nullptr;
 }
 
-CHFL_RESIDUE* chfl_residue_from_topology(const CHFL_TOPOLOGY* const topology, uint64_t i) {
+extern "C" CHFL_RESIDUE* chfl_residue_from_topology(const CHFL_TOPOLOGY* const topology, uint64_t i) {
     assert(topology != nullptr);
     CHFL_RESIDUE* residue = nullptr;
     CHFL_ERROR_GOTO(
@@ -43,7 +43,7 @@ error:
     return nullptr;
 }
 
-CHFL_RESIDUE* chfl_residue_for_atom(const CHFL_TOPOLOGY* const topology, uint64_t i) {
+extern "C" CHFL_RESIDUE* chfl_residue_for_atom(const CHFL_TOPOLOGY* const topology, uint64_t i) {
     assert(topology != nullptr);
     CHFL_RESIDUE* residue = nullptr;
     CHFL_ERROR_GOTO(
@@ -58,7 +58,7 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_residue_atoms_count(const CHFL_RESIDUE* const residue, uint64_t* size) {
+extern "C" chfl_status chfl_residue_atoms_count(const CHFL_RESIDUE* const residue, uint64_t* size) {
     assert(residue != nullptr);
     assert(size != nullptr);
     CHFL_ERROR_CATCH(
@@ -67,7 +67,7 @@ chfl_status chfl_residue_atoms_count(const CHFL_RESIDUE* const residue, uint64_t
 }
 
 
-chfl_status chfl_residue_id(const CHFL_RESIDUE* const residue, uint64_t* id) {
+extern "C" chfl_status chfl_residue_id(const CHFL_RESIDUE* const residue, uint64_t* id) {
     assert(residue != nullptr);
     assert(id != nullptr);
     CHFL_ERROR_CATCH(
@@ -75,7 +75,7 @@ chfl_status chfl_residue_id(const CHFL_RESIDUE* const residue, uint64_t* id) {
     )
 }
 
-chfl_status chfl_residue_name(const CHFL_RESIDUE* const residue, char* name, uint64_t buffsize) {
+extern "C" chfl_status chfl_residue_name(const CHFL_RESIDUE* const residue, char* name, uint64_t buffsize) {
     assert(residue != nullptr);
     assert(name != nullptr);
     CHFL_ERROR_CATCH(
@@ -84,14 +84,14 @@ chfl_status chfl_residue_name(const CHFL_RESIDUE* const residue, char* name, uin
     )
 }
 
-chfl_status chfl_residue_add_atom(CHFL_RESIDUE* const residue, uint64_t i) {
+extern "C" chfl_status chfl_residue_add_atom(CHFL_RESIDUE* const residue, uint64_t i) {
     assert(residue != nullptr);
     CHFL_ERROR_CATCH(
         residue->add_atom(i);
     )
 }
 
-chfl_status chfl_residue_contains(const CHFL_RESIDUE* const residue, uint64_t i, bool* result) {
+extern "C" chfl_status chfl_residue_contains(const CHFL_RESIDUE* const residue, uint64_t i, bool* result) {
     assert(residue != nullptr);
     assert(result != nullptr);
     CHFL_ERROR_CATCH(
@@ -99,7 +99,7 @@ chfl_status chfl_residue_contains(const CHFL_RESIDUE* const residue, uint64_t i,
     )
 }
 
-chfl_status chfl_residue_free(CHFL_RESIDUE* residue) {
+extern "C" chfl_status chfl_residue_free(CHFL_RESIDUE* residue) {
     delete residue;
     residue = nullptr;
     return CHFL_SUCCESS;

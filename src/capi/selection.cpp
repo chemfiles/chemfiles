@@ -17,13 +17,13 @@ static_assert(
     "CHFL_MAX_SELECTION_SIZE should match Match::MAX_MATCH_SIZE"
 );
 
-struct CAPISelection {
+extern "C" struct CAPISelection {
     CAPISelection(Selection&& select): selection(std::move(select)), matches() {}
     Selection selection;
     std::vector<Match> matches;
 };
 
-CHFL_SELECTION* chfl_selection(const char* selection) {
+extern "C" CHFL_SELECTION* chfl_selection(const char* selection) {
     CHFL_SELECTION* c_selection = nullptr;
     CHFL_ERROR_GOTO(
         c_selection = new CAPISelection(Selection(std::string(selection)));
@@ -34,14 +34,14 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_selection_size(const CHFL_SELECTION* const selection, uint64_t* size) {
+extern "C" chfl_status chfl_selection_size(const CHFL_SELECTION* const selection, uint64_t* size) {
     assert(selection != nullptr);
     CHFL_ERROR_CATCH(
         *size = selection->selection.size();
     )
 }
 
-chfl_status chfl_selection_evalutate(CHFL_SELECTION* const selection, const CHFL_FRAME* const frame, uint64_t* n_matches) {
+extern "C" chfl_status chfl_selection_evalutate(CHFL_SELECTION* const selection, const CHFL_FRAME* const frame, uint64_t* n_matches) {
     assert(selection != nullptr);
     CHFL_ERROR_CATCH(
         selection->matches = selection->selection.evaluate(*frame);
@@ -49,7 +49,7 @@ chfl_status chfl_selection_evalutate(CHFL_SELECTION* const selection, const CHFL
     )
 }
 
-chfl_status chfl_selection_matches(const CHFL_SELECTION* const selection, chfl_match_t* const matches, uint64_t n_matches) {
+extern "C" chfl_status chfl_selection_matches(const CHFL_SELECTION* const selection, chfl_match_t* const matches, uint64_t n_matches) {
     assert(selection != nullptr);
     assert(n_matches == selection->matches.size());
     CHFL_ERROR_CATCH(
@@ -67,7 +67,7 @@ chfl_status chfl_selection_matches(const CHFL_SELECTION* const selection, chfl_m
     )
 }
 
-chfl_status chfl_selection_free(CHFL_SELECTION* selection) {
+extern "C" chfl_status chfl_selection_free(CHFL_SELECTION* selection) {
     delete selection;
     selection = nullptr;
     return CHFL_SUCCESS;

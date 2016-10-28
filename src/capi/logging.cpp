@@ -29,11 +29,11 @@ const std::map<chfl_status, std::string> ERROR_MESSAGES = {
 
 std::string chemfiles::CAPI_LAST_ERROR = "";
 
-const char* chfl_version(void) {
+extern "C" const char* chfl_version(void) {
     return CHEMFILES_VERSION;
 }
 
-const char* chfl_strerror(chfl_status code) {
+extern "C" const char* chfl_strerror(chfl_status code) {
     auto message = ERROR_MESSAGES.find(code);
     if (message != ERROR_MESSAGES.end()) {
         return message->second.c_str();
@@ -42,55 +42,55 @@ const char* chfl_strerror(chfl_status code) {
     }
 }
 
-const char* chfl_last_error(void) {
+extern "C" const char* chfl_last_error(void) {
     return CAPI_LAST_ERROR.c_str();
 }
 
-chfl_status chfl_clear_errors(void) {
+extern "C" chfl_status chfl_clear_errors(void) {
     CHFL_ERROR_CATCH(
         CAPI_LAST_ERROR = "";
     )
 }
 
-chfl_status chfl_loglevel(chfl_log_level_t* const level) {
+extern "C" chfl_status chfl_loglevel(chfl_log_level_t* const level) {
     assert(level != nullptr);
     CHFL_ERROR_CATCH(
         *level = static_cast<chfl_log_level_t>(Logger::level());
     )
 }
 
-chfl_status chfl_set_loglevel(chfl_log_level_t level) {
+extern "C" chfl_status chfl_set_loglevel(chfl_log_level_t level) {
     CHFL_ERROR_CATCH(
         Logger::set_level(static_cast<LogLevel>(level));
     )
 }
 
-chfl_status chfl_logfile(const char* file) {
+extern "C" chfl_status chfl_logfile(const char* file) {
     assert(file != nullptr);
     CHFL_ERROR_CATCH(
         Logger::to_file(std::string(file));
     )
 }
 
-chfl_status chfl_log_stdout(void) {
+extern "C" chfl_status chfl_log_stdout(void) {
     CHFL_ERROR_CATCH(
         Logger::to_stdout();
     )
 }
 
-chfl_status chfl_log_stderr(void) {
+extern "C" chfl_status chfl_log_stderr(void) {
     CHFL_ERROR_CATCH(
         Logger::to_stderr();
     )
 }
 
-chfl_status chfl_log_silent(void) {
+extern "C" chfl_status chfl_log_silent(void) {
     CHFL_ERROR_CATCH(
         Logger::silent();
     )
 }
 
-chfl_status chfl_log_callback(chfl_logging_cb callback) {
+extern "C" chfl_status chfl_log_callback(chfl_logging_cb callback) {
     CHFL_ERROR_CATCH(
         Logger::callback([callback](LogLevel level, const std::string& message) {
             callback(static_cast<chfl_log_level_t>(level), message.c_str());

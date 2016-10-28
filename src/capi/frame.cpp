@@ -12,7 +12,7 @@
 #include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
-CHFL_FRAME* chfl_frame(uint64_t natoms) {
+extern "C" CHFL_FRAME* chfl_frame(uint64_t natoms) {
     CHFL_FRAME* frame = nullptr;
     CHFL_ERROR_GOTO(
         frame = new Frame(natoms);
@@ -23,7 +23,7 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame, uint64_t *natoms) {
+extern "C" chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame, uint64_t *natoms) {
     assert(frame != nullptr);
     assert(natoms != nullptr);
     CHFL_ERROR_CATCH(
@@ -31,7 +31,7 @@ chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame, uint64_t *nato
     )
 }
 
-chfl_status chfl_frame_positions(CHFL_FRAME* const frame, chfl_vector_t** data, uint64_t* size) {
+extern "C" chfl_status chfl_frame_positions(CHFL_FRAME* const frame, chfl_vector_t** data, uint64_t* size) {
     assert(frame != nullptr);
     assert(data != nullptr);
     assert(size != nullptr);
@@ -46,7 +46,7 @@ chfl_status chfl_frame_positions(CHFL_FRAME* const frame, chfl_vector_t** data, 
     )
 }
 
-chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vector_t** data, uint64_t* size) {
+extern "C" chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vector_t** data, uint64_t* size) {
     assert(frame != nullptr);
     assert(data != nullptr);
     assert(size != nullptr);
@@ -65,7 +65,7 @@ chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vector_t** data,
     )
 }
 
-chfl_status chfl_frame_add_atom(CHFL_FRAME* const frame, const CHFL_ATOM* const atom, chfl_vector_t position, chfl_vector_t velocity) {
+extern "C" chfl_status chfl_frame_add_atom(CHFL_FRAME* const frame, const CHFL_ATOM* const atom, chfl_vector_t position, chfl_vector_t velocity) {
     assert(frame != nullptr);
     assert(atom != nullptr);
     assert(position != nullptr);
@@ -80,21 +80,21 @@ chfl_status chfl_frame_add_atom(CHFL_FRAME* const frame, const CHFL_ATOM* const 
     )
 }
 
-chfl_status chfl_frame_resize(CHFL_FRAME* const frame, uint64_t natoms) {
+extern "C" chfl_status chfl_frame_resize(CHFL_FRAME* const frame, uint64_t natoms) {
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
         frame->resize(natoms);
     )
 }
 
-chfl_status chfl_frame_add_velocities(CHFL_FRAME* const frame) {
+extern "C" chfl_status chfl_frame_add_velocities(CHFL_FRAME* const frame) {
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
         frame->add_velocities();
     )
 }
 
-chfl_status chfl_frame_has_velocities(const CHFL_FRAME* const frame, bool* has_velocities) {
+extern "C" chfl_status chfl_frame_has_velocities(const CHFL_FRAME* const frame, bool* has_velocities) {
     assert(frame != nullptr);
     assert(has_velocities != nullptr);
     CHFL_ERROR_CATCH(
@@ -102,7 +102,7 @@ chfl_status chfl_frame_has_velocities(const CHFL_FRAME* const frame, bool* has_v
     )
 }
 
-chfl_status chfl_frame_set_cell(CHFL_FRAME* const frame, const CHFL_CELL* const cell) {
+extern "C" chfl_status chfl_frame_set_cell(CHFL_FRAME* const frame, const CHFL_CELL* const cell) {
     assert(frame != nullptr);
     assert(cell != nullptr);
     CHFL_ERROR_CATCH(
@@ -110,7 +110,7 @@ chfl_status chfl_frame_set_cell(CHFL_FRAME* const frame, const CHFL_CELL* const 
     )
 }
 
-chfl_status chfl_frame_set_topology(CHFL_FRAME* const frame, const CHFL_TOPOLOGY* const topology) {
+extern "C" chfl_status chfl_frame_set_topology(CHFL_FRAME* const frame, const CHFL_TOPOLOGY* const topology) {
     assert(frame != nullptr);
     assert(topology != nullptr);
     CHFL_ERROR_CATCH(
@@ -118,7 +118,7 @@ chfl_status chfl_frame_set_topology(CHFL_FRAME* const frame, const CHFL_TOPOLOGY
     )
 }
 
-chfl_status chfl_frame_step(const CHFL_FRAME* const frame, uint64_t* step) {
+extern "C" chfl_status chfl_frame_step(const CHFL_FRAME* const frame, uint64_t* step) {
     assert(frame != nullptr);
     assert(step != nullptr);
     CHFL_ERROR_CATCH(
@@ -126,21 +126,21 @@ chfl_status chfl_frame_step(const CHFL_FRAME* const frame, uint64_t* step) {
     )
 }
 
-chfl_status chfl_frame_set_step(CHFL_FRAME* const frame, uint64_t step) {
+extern "C" chfl_status chfl_frame_set_step(CHFL_FRAME* const frame, uint64_t step) {
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
         frame->set_step(step);
     )
 }
 
-chfl_status chfl_frame_guess_topology(CHFL_FRAME* const frame) {
+extern "C" chfl_status chfl_frame_guess_topology(CHFL_FRAME* const frame) {
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
         frame->guess_topology();
     )
 }
 
-chfl_status chfl_frame_free(CHFL_FRAME* frame) {
+extern "C" chfl_status chfl_frame_free(CHFL_FRAME* frame) {
     delete frame;
     frame = nullptr;
     return CHFL_SUCCESS;

@@ -8,14 +8,14 @@
 #include <windows.h>
 #endif
 
-void silent_crash_handlers() {
+extern "C" void silent_crash_handlers() {
 #if defined(WIN32) || defined(WIN64)
     SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
     _set_abort_behavior(0, _WRITE_ABORT_MSG);
 #endif
 }
 
-char* read_whole_file(const char* path) {
+extern "C" char* read_whole_file(const char* path) {
     std::ifstream file(path);
     std::stringstream stream;
     stream << file.rdbuf();

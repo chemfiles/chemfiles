@@ -12,7 +12,7 @@
 #include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
-CHFL_TRAJECTORY* chfl_trajectory_open(const char* filename, char mode) {
+extern "C" CHFL_TRAJECTORY* chfl_trajectory_open(const char* filename, char mode) {
     assert(filename != nullptr);
     CHFL_TRAJECTORY* trajectory = nullptr;
     CHFL_ERROR_GOTO(
@@ -24,7 +24,7 @@ error:
     return nullptr;
 }
 
-CHFL_TRAJECTORY* chfl_trajectory_with_format(const char* filename, char mode, const char* format) {
+extern "C" CHFL_TRAJECTORY* chfl_trajectory_with_format(const char* filename, char mode, const char* format) {
     assert(filename != nullptr);
     assert(format != nullptr);
     CHFL_TRAJECTORY* trajectory = nullptr;
@@ -37,7 +37,7 @@ error:
     return nullptr;
 }
 
-chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY* const file, uint64_t step, CHFL_FRAME* const frame) {
+extern "C" chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY* const file, uint64_t step, CHFL_FRAME* const frame) {
     assert(file != nullptr);
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
@@ -45,7 +45,7 @@ chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY* const file, uint64_t step
     )
 }
 
-chfl_status chfl_trajectory_read(CHFL_TRAJECTORY* const file, CHFL_FRAME* const frame) {
+extern "C" chfl_status chfl_trajectory_read(CHFL_TRAJECTORY* const file, CHFL_FRAME* const frame) {
     assert(file != nullptr);
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
@@ -53,7 +53,7 @@ chfl_status chfl_trajectory_read(CHFL_TRAJECTORY* const file, CHFL_FRAME* const 
     )
 }
 
-chfl_status chfl_trajectory_write(CHFL_TRAJECTORY* const file, const CHFL_FRAME* const frame) {
+extern "C" chfl_status chfl_trajectory_write(CHFL_TRAJECTORY* const file, const CHFL_FRAME* const frame) {
     assert(file != nullptr);
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
@@ -61,7 +61,7 @@ chfl_status chfl_trajectory_write(CHFL_TRAJECTORY* const file, const CHFL_FRAME*
     )
 }
 
-chfl_status chfl_trajectory_set_topology(CHFL_TRAJECTORY* const file, const CHFL_TOPOLOGY* const topology) {
+extern "C" chfl_status chfl_trajectory_set_topology(CHFL_TRAJECTORY* const file, const CHFL_TOPOLOGY* const topology) {
     assert(file != nullptr);
     assert(topology != nullptr);
     CHFL_ERROR_CATCH(
@@ -69,7 +69,7 @@ chfl_status chfl_trajectory_set_topology(CHFL_TRAJECTORY* const file, const CHFL
     )
 }
 
-chfl_status chfl_trajectory_set_topology_file(CHFL_TRAJECTORY* const file, const char* filename) {
+extern "C" chfl_status chfl_trajectory_set_topology_file(CHFL_TRAJECTORY* const file, const char* filename) {
     assert(file != nullptr);
     assert(filename != nullptr);
     CHFL_ERROR_CATCH(
@@ -77,7 +77,7 @@ chfl_status chfl_trajectory_set_topology_file(CHFL_TRAJECTORY* const file, const
     )
 }
 
-chfl_status chfl_trajectory_set_topology_with_format(CHFL_TRAJECTORY* const file, const char* filename, const char* format) {
+extern "C" chfl_status chfl_trajectory_set_topology_with_format(CHFL_TRAJECTORY* const file, const char* filename, const char* format) {
     assert(file != nullptr);
     assert(filename != nullptr);
     assert(format != nullptr);
@@ -86,7 +86,7 @@ chfl_status chfl_trajectory_set_topology_with_format(CHFL_TRAJECTORY* const file
     )
 }
 
-chfl_status chfl_trajectory_set_cell(CHFL_TRAJECTORY* const file, const CHFL_CELL* const cell) {
+extern "C" chfl_status chfl_trajectory_set_cell(CHFL_TRAJECTORY* const file, const CHFL_CELL* const cell) {
     assert(file != nullptr);
     assert(cell != nullptr);
     CHFL_ERROR_CATCH(
@@ -94,7 +94,7 @@ chfl_status chfl_trajectory_set_cell(CHFL_TRAJECTORY* const file, const CHFL_CEL
     )
 }
 
-chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const file, uint64_t* nsteps) {
+extern "C" chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const file, uint64_t* nsteps) {
     assert(file != nullptr);
     assert(nsteps != nullptr);
     CHFL_ERROR_CATCH(
@@ -102,7 +102,7 @@ chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const file, uint64_t* nsteps
     )
 }
 
-chfl_status chfl_trajectory_close(CHFL_TRAJECTORY* file) {
+extern "C" chfl_status chfl_trajectory_close(CHFL_TRAJECTORY* file) {
     delete file;
     file = nullptr;
     return CHFL_SUCCESS;
