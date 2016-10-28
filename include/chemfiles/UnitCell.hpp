@@ -9,12 +9,13 @@
 #ifndef CHEMFILES_UNIT_CELL_HPP
 #define CHEMFILES_UNIT_CELL_HPP
 
-#ifdef WIN32
-#undef INFINITE
-#endif
-
 #include "chemfiles/types.hpp"
 #include "chemfiles/exports.hpp"
+#include "chemfiles/config.hpp"
+
+#ifdef CHEMFILES_WINDOWS
+#undef INFINITE
+#endif
 
 namespace chemfiles {
 

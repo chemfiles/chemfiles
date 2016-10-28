@@ -16,10 +16,6 @@
 #ifndef CHEMFILES_HPP
 #define CHEMFILES_HPP
 
-// This will be used as a protection to prevent internal macro from being
-// exported
-#define CHEMFILES_PUBLIC
-
 #include "chemfiles/config.hpp"
 
 #include "chemfiles/Error.hpp"
@@ -33,7 +29,5 @@
 #include "chemfiles/UnitCell.hpp"
 
 #include "chemfiles/Selections.hpp"
-
-#undef CHEMFILES_PUBLIC
 
 #endif // CHEMFILES_HPP

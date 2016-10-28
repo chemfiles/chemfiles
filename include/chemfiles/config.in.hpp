@@ -22,18 +22,7 @@
 // Include the export definitions
 #include "chemfiles/exports.hpp"
 
-// The CHEMFILES_PUBLIC macro should be defined when including this file to
-// prevent unwanted macros from being exported.
-#ifndef CHEMFILES_PUBLIC
-// Are we compiling for Windows ?
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) ||                 \
-    defined(__CYGWIN__) || defined(WIN64) || defined(_WIN64) ||                \
-    defined(__WIN64__)
-#define CHEMFILES_WINDOWS
-#endif
-
-#define HAVE_NETCDF @HAVE_NETCDF@
-#endif // CHEMFILES_PUBLIC
+#define CHEMFILES_NETCDF @HAVE_NETCDF@
 // clang-format on
 
 #endif

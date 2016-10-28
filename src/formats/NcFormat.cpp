@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 #include "chemfiles/config.hpp"
-#if HAVE_NETCDF
+#if CHEMFILES_NETCDF
 
 #include "chemfiles/formats/NcFormat.hpp"
 
@@ -227,4 +227,4 @@ void NCFormat::write_cell(const UnitCell& cell) {
     angles.add(start, count, angles_data);
 }
 
-#endif // HAVE_NETCDF
+#endif // CHEMFILES_NETCDF

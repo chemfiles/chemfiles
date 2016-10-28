@@ -43,8 +43,8 @@ if(CHFL_USE_SANITIZERS)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CHEMFILES_C_SANITIZERS}")
 endif()
 
-if(WINDOWS)
-    add_definitions("-DWINDOWS")
+if(WIN32)
+    add_definitions("-DCHEMFILES_WINDOWS")
 endif()
 
 if(MSVC)

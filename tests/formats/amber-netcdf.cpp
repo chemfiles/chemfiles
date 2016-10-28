@@ -2,7 +2,7 @@
 
 #include "catch.hpp"
 #include "chemfiles/config.hpp"
-#if HAVE_NETCDF
+#if CHEMFILES_NETCDF
 
 #include "chemfiles.hpp"
 using namespace chemfiles;
@@ -80,4 +80,4 @@ TEST_CASE("Write files in NetCDF format", "[Amber NetCDF]") {
     }
 }
 
-#endif // HAVE_NETCDF
+#endif // CHEMFILES_NETCDF

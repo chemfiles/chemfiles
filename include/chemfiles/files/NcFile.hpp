@@ -7,7 +7,7 @@
 */
 
 #include "chemfiles/config.hpp"
-#if HAVE_NETCDF
+#if CHEMFILES_NETCDF
 
 #ifndef CHEMFILES_NCFILE_HPP
 #define CHEMFILES_NCFILE_HPP
@@ -287,4 +287,4 @@ namespace nc {
 } // namespace chemfiles
 
 #endif
-#endif // HAVE_NETCDF
+#endif // CHEMFILES_NETCDF

@@ -3,7 +3,7 @@
 
 #include "catch.hpp"
 #include "chemfiles/config.hpp"
-#if HAVE_NETCDF
+#if CHEMFILES_NETCDF
 
 #include "chemfiles.hpp"
 #include "chemfiles/files/NcFile.hpp"
@@ -66,4 +66,4 @@ TEST_CASE("Write NetCDF files", "[Files]"){
     remove("tmp.nc");
 }
 
-#endif // HAVE_NETCDF
+#endif // CHEMFILES_NETCDF

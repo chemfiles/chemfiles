@@ -7,7 +7,7 @@
 */
 
 #include "chemfiles/config.hpp"
-#if HAVE_NETCDF
+#if CHEMFILES_NETCDF
 
 #ifndef CHEMFILES_FORMAT_NC_HPP
 #define CHEMFILES_FORMAT_NC_HPP
@@ -68,4 +68,4 @@ private:
 
 #endif
 
-#endif // HAVE_NETCDF
+#endif // CHEMFILES_NETCDF

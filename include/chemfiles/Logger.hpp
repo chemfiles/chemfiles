@@ -15,8 +15,9 @@
 #include <string>
 
 #include "chemfiles/exports.hpp"
+#include "chemfiles/config.hpp"
 
-#ifdef WIN32
+#ifdef CHEMFILES_WINDOWS
 #undef ERROR
 #undef CALLBACK
 #endif

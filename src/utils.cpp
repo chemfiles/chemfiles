@@ -6,7 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 
-#ifdef WIN32
+#include "chemfiles/utils.hpp"
+#include "chemfiles/config.hpp"
+
+#ifdef CHEMFILES_WINDOWS
 #include <windows.h>
 #include <lmcons.h>
 #else
@@ -14,10 +17,10 @@
 #include <pwd.h>
 #endif
 
-#include "chemfiles/utils.hpp"
+
 
 std::string user_name() {
-#ifdef WIN32
+#ifdef CHEMFILES_WINDOWS
     char name[UNLEN + 1];
     DWORD size = sizeof(name);
     if (!GetUserName(name, &size)) {
@@ -31,7 +34,7 @@ std::string user_name() {
 }
 
 std::string hostname() {
-#ifdef WIN32
+#ifdef CHEMFILES_WINDOWS
     char name[MAX_COMPUTERNAME_LENGTH + 1];
     DWORD size = sizeof(name);
     if (!GetComputerName(name, &size)) {

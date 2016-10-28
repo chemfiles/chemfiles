@@ -6,7 +6,7 @@
 * file_, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 #include "chemfiles/config.hpp"
-#if HAVE_NETCDF
+#if CHEMFILES_NETCDF
 
 #include "chemfiles/Error.hpp"
 #include "chemfiles/Logger.hpp"
@@ -147,4 +147,4 @@ bool NcFile::variable_exists(const std::string& name) const {
     return status == NC_NOERR;
 }
 
-#endif // HAVE_NETCDF
+#endif // CHEMFILES_NETCDF

@@ -9,11 +9,8 @@
 #ifndef CHEMFILES_CAPI_H
 #define CHEMFILES_CAPI_H
 
-#define CHEMFILES_PUBLIC
-#include "chemfiles/config.hpp"
-#undef CHEMFILES_PUBLIC
-
 #include <stdint.h>
+#include "chemfiles/config.hpp"
 
 // clang-format off
 #ifdef __cplusplus

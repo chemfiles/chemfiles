@@ -46,7 +46,7 @@ FormatFactory::FormatFactory() : formats_(), extensions_() {
     registration<PDBFormat>(formats_, extensions_);
     registration<TNGFormat>(formats_, extensions_);
 
-#if HAVE_NETCDF
+#if CHEMFILES_NETCDF
     registration<NCFormat>(formats_, extensions_);
 #endif
 
