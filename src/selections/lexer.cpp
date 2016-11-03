@@ -180,7 +180,9 @@ std::vector<Token> selections::tokenize(const std::string& input) {
             try {
                 int data = std::stoi(word);
                 if (data > UINT8_MAX) {
-                    data = UINT8_MAX;
+                    throw SelectionError(
+                        "Variable index is too big: " + std::to_string(data)
+                    );
                 }
                 tokens.emplace_back(Token::variable(static_cast<uint8_t>(data)));
                 continue;

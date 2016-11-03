@@ -185,11 +185,13 @@ TEST_CASE("Lexing", "[selection]") {
     SECTION("Functions") {
         CHECK(tokenize("$9")[0].type() == Token::VARIABLE);
         CHECK(tokenize("$ 9")[0].type() == Token::VARIABLE);
+        CHECK(tokenize("$255")[0].type() == Token::VARIABLE);
 
         CHECK_THROWS_AS(tokenize("$ gabo"), SelectionError);
         CHECK_THROWS_AS(tokenize("$"), SelectionError);
         CHECK_THROWS_AS(tokenize("78 $"), SelectionError);
         CHECK_THROWS_AS(tokenize("bhics $"), SelectionError);
+        CHECK_THROWS_AS(tokenize("$256"), SelectionError);
 
         CHECK(tokenize(",")[0].type() == Token::COMMA);
         auto toks = tokenize(",bagyu");
