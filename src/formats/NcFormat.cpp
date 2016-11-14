@@ -93,7 +93,7 @@ void NCFormat::read(Frame& frame) {
 }
 
 UnitCell NCFormat::read_cell() const {
-    if (ncfile_.dimension("cell_spatial") != 3 or
+    if (ncfile_.dimension("cell_spatial") != 3 ||
         ncfile_.dimension("cell_angular") != 3)
         return UnitCell(); // No UnitCell information
 
@@ -102,8 +102,8 @@ UnitCell NCFormat::read_cell() const {
         return UnitCell(); // No UnitCell information
     }
 
-    auto length_var = ncfile_.variable<float>("cell_lengths");
-    auto angles_var = ncfile_.variable<float>("cell_angles");
+    auto length_var = ncfile_.variable<nc::NcFloat>("cell_lengths");
+    auto angles_var = ncfile_.variable<nc::NcFloat>("cell_angles");
 
     std::vector<size_t> start{step_, 0};
     std::vector<size_t> count{1, 3};
@@ -119,7 +119,7 @@ UnitCell NCFormat::read_cell() const {
 }
 
 void NCFormat::read_array3D(Span3D array, const std::string& name) const {
-    auto array_var = ncfile_.variable<float>(name);
+    auto array_var = ncfile_.variable<nc::NcFloat>(name);
     auto natoms = ncfile_.dimension("atom");
     assert(array.size() == natoms);
 
@@ -150,26 +150,26 @@ static void initialize(NcFile& file, size_t natoms, bool with_velocities) {
     file.add_dimension("cell_angular", 3);
     file.add_dimension("label", nc::STRING_MAXLEN);
 
-    auto spatial = file.add_variable<char>("spatial", "spatial");
-    auto cell_spatial = file.add_variable<char>("cell_spatial", "cell_spatial");
+    auto spatial = file.add_variable<nc::NcChar>("spatial", "spatial");
+    auto cell_spatial = file.add_variable<nc::NcChar>("cell_spatial", "cell_spatial");
     auto cell_angular =
-        file.add_variable<char>("cell_angular", "cell_angular", "label");
+        file.add_variable<nc::NcChar>("cell_angular", "cell_angular", "label");
 
     auto coordinates =
-        file.add_variable<float>("coordinates", "frame", "atom", "spatial");
+        file.add_variable<nc::NcFloat>("coordinates", "frame", "atom", "spatial");
     coordinates.add_attribute("units", "angstrom");
 
     auto cell_lenght =
-        file.add_variable<float>("cell_lengths", "frame", "cell_spatial");
+        file.add_variable<nc::NcFloat>("cell_lengths", "frame", "cell_spatial");
     cell_lenght.add_attribute("units", "angstrom");
 
     auto cell_angles =
-        file.add_variable<float>("cell_angles", "frame", "cell_angular");
+        file.add_variable<nc::NcFloat>("cell_angles", "frame", "cell_angular");
     cell_angles.add_attribute("units", "degree");
 
     if (with_velocities) {
         auto velocities =
-            file.add_variable<float>("velocities", "frame", "atom", "spatial");
+            file.add_variable<nc::NcFloat>("velocities", "frame", "atom", "spatial");
         velocities.add_attribute("units", "angstrom/picosecond");
     }
     file.set_nc_mode(NcFile::DATA);
@@ -198,7 +198,7 @@ void NCFormat::write(const Frame& frame) {
 }
 
 void NCFormat::write_array3D(const Array3D& arr, const std::string& name) const {
-    auto var = ncfile_.variable<float>(name);
+    auto var = ncfile_.variable<nc::NcFloat>(name);
     auto natoms = arr.size();
     std::vector<size_t> start{step_, 0, 0};
     std::vector<size_t> count{1, natoms, 3};
@@ -213,8 +213,8 @@ void NCFormat::write_array3D(const Array3D& arr, const std::string& name) const 
 }
 
 void NCFormat::write_cell(const UnitCell& cell) const {
-    auto length = ncfile_.variable<float>("cell_lengths");
-    auto angles = ncfile_.variable<float>("cell_angles");
+    auto length = ncfile_.variable<nc::NcFloat>("cell_lengths");
+    auto angles = ncfile_.variable<nc::NcFloat>("cell_angles");
 
     auto length_data = std::vector<float>{static_cast<float>(cell.a()),
                                           static_cast<float>(cell.b()),
