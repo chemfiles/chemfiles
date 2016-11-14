@@ -19,9 +19,9 @@ TEST_CASE("Read a NetCDF file", "[Files]"){
     // Unlimited dimension
     CHECK(file.dimension("frame") == 100);
 
-    CHECK(file.variable<float>("cell_lengths").attribute("units") == "Angstrom");
+    CHECK(file.variable<nc::NcFloat>("cell_lengths").attribute("units") == "Angstrom");
 
-    auto var = file.variable<float>("coordinates");
+    auto var = file.variable<nc::NcFloat>("coordinates");
     auto dims = var.dimmensions();
     CHECK(dims.size() == 3);
     CHECK(dims[0] == 100);
@@ -40,8 +40,8 @@ TEST_CASE("Errors in NetCDF files", "[Files]"){
 
     CHECK_THROWS_AS(file.global_attribute("FOO"), FileError);
     CHECK_THROWS_AS(file.dimension("FOO"), FileError);
-    CHECK_THROWS_AS(file.variable<float>("cell_lengths").attribute("Bar"), FileError);
-    CHECK_THROWS_AS(file.variable<float>("FOO"), FileError);
+    CHECK_THROWS_AS(file.variable<nc::NcFloat>("cell_lengths").attribute("Bar"), FileError);
+    CHECK_THROWS_AS(file.variable<nc::NcFloat>("FOO"), FileError);
 }
 
 TEST_CASE("Write NetCDF files", "[Files]"){
@@ -51,7 +51,7 @@ TEST_CASE("Write NetCDF files", "[Files]"){
         file.add_global_attribute("global", "global.value");
         file.add_dimension("infinite");
         file.add_dimension("finite", 42);
-        auto variable = file.add_variable<float>("variable", "infinite", "finite");
+        auto variable = file.add_variable<nc::NcFloat>("variable", "infinite", "finite");
         variable.add_attribute("attribute", "hello");
     }
 
@@ -61,7 +61,7 @@ TEST_CASE("Write NetCDF files", "[Files]"){
     CHECK(file.dimension("finite") == 42);
     CHECK(file.variable_exists("variable"));
     CHECK_FALSE(file.variable_exists("bar"));
-    CHECK(file.variable<float>("variable").attribute("attribute") == "hello");
+    CHECK(file.variable<nc::NcFloat>("variable").attribute("attribute") == "hello");
 
     remove("tmp.nc");
 }
