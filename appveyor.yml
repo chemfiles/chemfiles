@@ -28,12 +28,26 @@ install:
   # git bash conflicts with MinGW makefiles
   - if "%generator%"=="MinGW Makefiles" (set "PATH=%PATH:C:\Program Files\Git\usr\bin;=%")
   - if not "%CXX_PATH%"=="" (set "PATH=%PATH%;%CXX_PATH%")
+  - set CMAKE_ARGUMENTS="-DCHFL_BUILD_TESTS=ON -G %generator% -DCMAKE_BUILD_TYPE=%configuration%"
+  - ps: |
+        if ($env:generator -eq "Visual Studio 14 2015") {
+            C:\Miniconda35\Scripts\conda install --quiet --yes libnetcdf
+            $env:CMAKE_ARGUMENTS += " -DCHFL_ENABLE_NETCDF=ON"
+            $env:CMAKE_ARGUMENTS += " -DNETCDF_INCLUDES=C:\Miniconda35\Library\include"
+            $env:PATH += ";C:\Miniconda35\Library\bin"
+        } elseif ($env:generator -eq "Visual Studio 14 2015 Win64") {
+            C:\Miniconda35-x64\Scripts\conda install --quiet --yes libnetcdf
+            $env:CMAKE_ARGUMENTS += " -DCHFL_ENABLE_NETCDF=ON"
+            $env:CMAKE_ARGUMENTS += " -DNETCDF_INCLUDES=C:\Miniconda35-x64\Library\include"
+            $env:CMAKE_ARGUMENTS += " -DNETCDF_LIBRARIES=C:\Miniconda35-x64\Library\lib\netcdf.lib"
+            $env:PATH += ";C:\Miniconda35-x64\Library\bin"
+        }
 
 build_script:
   - cd C:\Chemharp
   - mkdir build
   - cd build
-  - cmake -DCHFL_BUILD_TESTS=ON -G "%generator%" -DCMAKE_BUILD_TYPE="%configuration%" ..
+  - cmake %CMAKE_ARGUMENTS% ..
   - cmake --build . --config "%configuration%"
 
 test_script:
