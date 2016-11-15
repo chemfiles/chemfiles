@@ -11,9 +11,6 @@ configuration:
   - Debug
   - Release
 
-build:
-    verbosity: quiet
-
 clone_depth: 10
 clone_folder: c:\Chemharp
 
@@ -34,6 +31,7 @@ install:
             C:\Miniconda35\Scripts\conda install --quiet --yes libnetcdf
             $env:CMAKE_ARGUMENTS += " -DCHFL_ENABLE_NETCDF=ON"
             $env:CMAKE_ARGUMENTS += " -DNETCDF_INCLUDES=C:\Miniconda35\Library\include"
+            $env:CMAKE_ARGUMENTS += " -DNETCDF_LIBRARIES=C:\Miniconda35\Library\lib\netcdf.lib"
             $env:PATH += ";C:\Miniconda35\Library\bin"
         } elseif ($env:generator -eq "Visual Studio 14 2015 Win64") {
             C:\Miniconda35-x64\Scripts\conda install --quiet --yes libnetcdf
@@ -48,7 +46,13 @@ build_script:
   - mkdir build
   - cd build
   - cmake %CMAKE_ARGUMENTS% ..
-  - cmake --build . --config "%configuration%"
+  - ps: |
+        if ($env:generator -Match "Visual Studio") {
+            $env:BUILD_ARGUMENTS="/verbosity:minimal"
+        } else {
+            $env:BUILD_ARGUMENTS=""
+        }
+  - cmake --build . --config "%configuration%" -- %BUILD_ARGUMENTS%
 
 test_script:
   - ctest --build-config "%configuration%" --timeout 300 --output-on-failure -E dcd-molfile
