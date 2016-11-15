@@ -7,7 +7,7 @@
 
 #include "chemfiles.h"
 
-int main() {
+int main(void) {
     CHFL_TRAJECTORY* file = chfl_trajectory_open("filename.xyz", 'r');
     CHFL_FRAME* frame = chfl_frame(0);
     if(!chfl_trajectory_read(file, frame)) {/*Handle error*/}
