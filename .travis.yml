@@ -1,74 +1,76 @@
 language: cpp
 sudo: false
-# Build matrix
-os:
-  - linux
-  - osx
-compiler:
-  - gcc
-  - clang
-env:
-  matrix:
-    - SHARED_LIBS=ON
-    - SHARED_LIBS=OFF
-  global:
-    secure: "DituZnehFQWFs6o3h9+sqGDxlHIPTImWxBvzHjV0w7dmvKcl6rakf6fNsTjcM9lrk2Q9owxwzT7EWxhI/1E28ivtNwxWod6jMuwmrw+6jz7dQG0JTs3icTeCO6z1dnRaLRDHlVpiVob9Cz6ZYPCB86XzOeVlvh7693WXoHpZ944="
+
 matrix:
   fast_finish: true
-
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    - kalakris-cmake
-    packages:
-    - g++-4.8
-    - libnetcdf-dev
-    - cmake
-    - doxygen
-    - valgrind
+  include:
+    - os: linux
+      compiler: clang
+      env: SHARED_LIBS=ON
+      addons: &linux64
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          - kalakris-cmake
+          packages:
+          - g++-4.8
+          - cmake
+          - doxygen
+          - valgrind
+          - libnetcdf-dev
+    - os: linux
+      compiler: clang
+      env: SHARED_LIBS=OFF
+      addons: *linux64
+    - os: linux
+      compiler: gcc
+      env: SHARED_LIBS=ON
+      addons: *linux64
+    - os: linux
+      compiler: gcc
+      env: SHARED_LIBS=OFF
+      addons: *linux64
+    - os: linux
+      compiler: gcc
+      env: SHARED_LIBS=ON ARCH="x86"
+      addons: &linux32
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          - kalakris-cmake
+          packages:
+          - g++-4.8
+          - cmake
+          - doxygen
+          - valgrind
+          - g++-4.8-multilib
+          - linux-libc-dev:i386
+          - libc6-dev-i386
+    - os: linux
+      compiler: gcc
+      env: SHARED_LIBS=ON ARCH="x86"
+      addons: *linux32
+    - os: osx
+      compiler: clang
+      env: SHARED_LIBS=ON
+    - os: osx
+      compiler: clang
+      env: SHARED_LIBS=OFF
+    - os: osx
+      compiler: gcc
+      env: SHARED_LIBS=ON
+    - os: osx
+      compiler: gcc
+      env: SHARED_LIBS=OFF
 
 before_install:
   # Setting environement
-  - export C_COMPILER="$CC"
-  - |
-    export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug \
-                       -DCHFL_BUILD_TESTS=ON \
-                       -DCHFL_ENABLE_NETCDF=ON \
-                       -DBUILD_SHARED_LIBS=${SHARED_LIBS}"
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "gcc" && "$SHARED_LIBS" == "ON" ]]; then
-        export EXTRA_WORK=true
-        export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_CODE_COVERAGE=ON"
-        pip install --user codecov
-    else
-        export EXTRA_WORK=false
-    fi
-  # Install Linux stuff
-  - |
-    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-        if test "${CC}" == "gcc"; then
-            export CC=gcc-4.8
-            export CXX=g++-4.8
-        fi
-        export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_TEST_RUNNER=valgrind"
-    fi
-  # Install OS X stuff
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        brew tap homebrew/science
-        brew update
-        brew rm gcc
-        brew install gcc netcdf
-        if test "${CC}" == "gcc"; then
-            export CC=gcc-6
-            export CXX=g++-6
-        fi
-    fi
+  - cd $TRAVIS_BUILD_DIR
+  - source scripts/ci/setup-travis.sh
 
 script:
-  - cd ${TRAVIS_BUILD_DIR}
-  - mkdir -p build
+  - cd $TRAVIS_BUILD_DIR
+  - mkdir build
   - cd build
   - cmake $CMAKE_ARGS ..
   - make
@@ -78,7 +80,15 @@ after_script:
   - |
     if ${EXTRA_WORK}; then
         codecov --gcov-exec=gcov-4.8
-        cd ${TRAVIS_BUILD_DIR}
+        cd $TRAVIS_BUILD_DIR
         git clone https://${GH_TOKEN}@github.com/chemfiles/chemfiles gh-pages
-        ./scripts/deploy-docs.sh
+        ./scripts/ci/deploy-docs.sh
     fi
+
+cache:
+  directories:
+    - $HOME/netcdf
+
+env:
+  global:
+    secure: "DituZnehFQWFs6o3h9+sqGDxlHIPTImWxBvzHjV0w7dmvKcl6rakf6fNsTjcM9lrk2Q9owxwzT7EWxhI/1E28ivtNwxWod6jMuwmrw+6jz7dQG0JTs3icTeCO6z1dnRaLRDHlVpiVob9Cz6ZYPCB86XzOeVlvh7693WXoHpZ944="
