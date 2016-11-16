@@ -6,10 +6,10 @@
 #include "chemfiles.h"
 #include "helpers.h"
 
-static CHFL_FRAME* testing_frame();
+static CHFL_FRAME* testing_frame(void);
 static bool find_match(const chfl_match_t* matches, uint64_t n_matches, chfl_match_t match);
 
-int main() {
+int main(void) {
     silent_crash_handlers();
     CHFL_FRAME* frame = testing_frame();
     CHFL_SELECTION* selection = chfl_selection("name O");
@@ -83,7 +83,7 @@ int main() {
     return EXIT_SUCCESS;
 }
 
-static CHFL_FRAME* testing_frame() {
+static CHFL_FRAME* testing_frame(void) {
     CHFL_TOPOLOGY* topology = chfl_topology();
     CHFL_ATOM* O = chfl_atom("O");
     CHFL_ATOM* H = chfl_atom("H");

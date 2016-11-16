@@ -1,16 +1,7 @@
 #include <cmath>
 #include <catch.hpp>
 #include "chemfiles.hpp"
-
 using namespace chemfiles;
-
-bool operator==(const Matrix3D& lhs, const Matrix3D& rhs) {
-    return lhs[0][0] == rhs[0][0] && lhs[1][0] == rhs[1][0] && lhs[2][0] == rhs[2][0] &&
-           lhs[0][1] == rhs[0][1] && lhs[1][1] == rhs[1][1] && lhs[2][1] == rhs[2][1] &&
-           lhs[0][2] == rhs[0][2] && lhs[1][2] == rhs[1][2] && lhs[2][2] == rhs[2][2];
-
-}
-
 
 TEST_CASE("Vector3d", "[types]"){
     auto u = vector3d(1.0, 1.0, 1.0);

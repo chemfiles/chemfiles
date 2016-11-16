@@ -9,17 +9,17 @@
 #include "helpers.h"
 
 // Global variables for access from callback and main
-char* buffer;
-chfl_log_level_t last_level;
+static char* buffer;
+static chfl_log_level_t last_level;
 
-void callback(chfl_log_level_t level, const char* message) {
+static void callback(chfl_log_level_t level, const char* message) {
     size_t size = strlen(message) + 1;
     buffer = malloc(sizeof(char)*size);
     strcpy(buffer, message);
     last_level = level;
 }
 
-int main() {
+int main(void) {
     silent_crash_handlers();
     assert(strcmp(chfl_strerror(CHFL_SUCCESS), "operation was sucessfull") == 0);
     assert(strcmp(chfl_last_error(), "") == 0);

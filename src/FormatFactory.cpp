@@ -18,6 +18,15 @@
 #include "chemfiles/files/TNGFile.hpp"
 using namespace chemfiles;
 
+namespace chemfiles {
+    extern template class Molfile<DCD>;
+    extern template class Molfile<GRO>;
+    extern template class Molfile<TRR>;
+    extern template class Molfile<XTC>;
+    extern template class Molfile<TRJ>;
+    extern template class Molfile<LAMMPS>;
+}
+
 template <typename T>
 void registration(trajectory_map_t& formats, trajectory_map_t& extensions) {
     auto creator = new_format<T>;

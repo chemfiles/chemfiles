@@ -9,7 +9,7 @@
 #include "chemfiles.h"
 #include "helpers.h"
 
-int main() {
+int main(void) {
     silent_crash_handlers();
     CHFL_FRAME* frame = chfl_frame(5);
     assert(frame != NULL);

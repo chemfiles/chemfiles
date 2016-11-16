@@ -16,9 +16,6 @@
 namespace chemfiles {
 namespace selections {
 
-template<typename T>
-Ast parse(token_iterator_t& begin, const token_iterator_t& end);
-
 // Existing binary operators
 enum class BinOp {
     EQ = Token::EQ,     //! "=="
@@ -276,6 +273,29 @@ public:
 private:
     Ast ast_;
 };
+
+
+template<typename T>
+Ast parse(token_iterator_t& begin, const token_iterator_t& end);
+
+#define PARSE_EXISTS(T) \
+template<> Ast parse<T>(token_iterator_t& begin, const token_iterator_t& end)
+
+PARSE_EXISTS(AllExpr);
+PARSE_EXISTS(NoneExpr);
+PARSE_EXISTS(TypeExpr);
+PARSE_EXISTS(NameExpr);
+PARSE_EXISTS(IndexExpr);
+PARSE_EXISTS(ResnameExpr);
+PARSE_EXISTS(ResidExpr);
+PARSE_EXISTS(PositionExpr);
+PARSE_EXISTS(VelocityExpr);
+PARSE_EXISTS(MassExpr);
+PARSE_EXISTS(AndExpr);
+PARSE_EXISTS(OrExpr);
+PARSE_EXISTS(NotExpr);
+
+#undef PARSE_EXISTS
 
 }} // namespace chemfiles && namespace selections
 

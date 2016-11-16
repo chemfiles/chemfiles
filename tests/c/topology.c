@@ -9,11 +9,11 @@
 #include "chemfiles.h"
 #include "helpers.h"
 
-static void test_bonds();
-static void test_size();
-static void test_residues();
+static void test_bonds(void);
+static void test_size(void);
+static void test_residues(void);
 
-int main() {
+int main(void) {
     silent_crash_handlers();
     test_size();
     test_bonds();
@@ -21,7 +21,7 @@ int main() {
     return EXIT_SUCCESS;
 }
 
-static void test_bonds() {
+static void test_bonds(void) {
     CHFL_TOPOLOGY* topology = chfl_topology();
     assert(topology != NULL);
 
@@ -115,7 +115,7 @@ static void test_bonds() {
     assert(!chfl_topology_free(topology));
 }
 
-static void test_size() {
+static void test_size(void) {
     CHFL_TOPOLOGY* topology = chfl_topology();
     assert(topology != NULL);
 
@@ -130,7 +130,7 @@ static void test_size() {
     assert(!chfl_topology_free(topology));
 }
 
-static void test_residues() {
+static void test_residues(void) {
     CHFL_TOPOLOGY* topology = chfl_topology();
     assert(topology != NULL);
 

@@ -9,10 +9,10 @@
 #include "chemfiles.h"
 #include "helpers.h"
 
-static void test_read();
-static void test_write();
+static void test_read(void);
+static void test_write(void);
 
-int main() {
+int main(void) {
     silent_crash_handlers();
     test_read();
     test_write();
@@ -21,7 +21,7 @@ int main() {
 
 /******************************************************************************/
 
-static void test_read() {
+static void test_read(void) {
     CHFL_FRAME* frame = chfl_frame(0);
     CHFL_TRAJECTORY* file = chfl_trajectory_open("data/xyz/water.xyz", 'r');
     assert(frame != NULL);
@@ -160,7 +160,7 @@ static void test_read() {
 
 /******************************************************************************/
 
-const char* expected_content =
+static const char* expected_content =
 "4\n"
 "Written by the chemfiles library\n"
 "He 1 2 3\n"
@@ -177,7 +177,7 @@ const char* expected_content =
 "He 4 5 6\n";
 
 
-static void test_write() {
+static void test_write(void) {
     CHFL_TOPOLOGY* top = chfl_topology();
     CHFL_ATOM* atom = chfl_atom("He");
     assert(top != NULL);

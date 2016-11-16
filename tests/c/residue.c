@@ -7,7 +7,7 @@
 #include "chemfiles.h"
 #include "helpers.h"
 
-int main() {
+int main(void) {
     silent_crash_handlers();
 
     CHFL_RESIDUE* residue = chfl_residue("Foo", 56);

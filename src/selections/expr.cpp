@@ -15,11 +15,6 @@
 namespace chemfiles {
 namespace selections {
 
-std::ostream& operator<<(std::ostream& out, const std::unique_ptr<Expr>& expr) {
-    out << expr->print();
-    return out;
-}
-
 //! Get the associated string to a binary operator
 static std::string binop_str(BinOp op) {
     switch (op) {
