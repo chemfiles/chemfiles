@@ -1,13 +1,7 @@
 #include "catch.hpp"
+#include "helpers.hpp"
 #include "chemfiles.hpp"
 using namespace chemfiles;
-
-
-bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
-    return (fabs(a[0] - b[0]) < eps)
-        && (fabs(a[1] - b[1]) < eps)
-        && (fabs(a[2] - b[2]) < eps);
-}
 
 TEST_CASE("Read files in TNG format", "[TNG]"){
     SECTION("Read trajectory") {
@@ -16,8 +10,8 @@ TEST_CASE("Read files in TNG format", "[TNG]"){
 
         CHECK(frame.natoms() == 15);
         auto positions = frame.positions();
-        CHECK(roughly(positions[0], vector3d(1.0f, 1.0f, 1.0f), 1e-6));
-        CHECK(roughly(positions[11], vector3d(8.5f, 33.0f, 34.0f), 1e-6));
+        CHECK(approx_eq(positions[0], vector3d(1.0f, 1.0f, 1.0f), 1e-6));
+        CHECK(approx_eq(positions[11], vector3d(8.5f, 33.0f, 34.0f), 1e-6));
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::INFINITE);
@@ -27,8 +21,8 @@ TEST_CASE("Read files in TNG format", "[TNG]"){
 
         CHECK(frame.natoms() == 15);
         positions = frame.positions();
-        CHECK(roughly(positions[0], vector3d(1.01562f, 1.02344f, 1.03125f), 1e-4));
-        CHECK(roughly(positions[11], vector3d(8.5f, 33.0f, 34.0f), 1e-6));
+        CHECK(approx_eq(positions[0], vector3d(1.01562f, 1.02344f, 1.03125f), 1e-4));
+        CHECK(approx_eq(positions[11], vector3d(8.5f, 33.0f, 34.0f), 1e-6));
     }
 
     SECTION("Read cell") {

@@ -3,6 +3,8 @@
 #include <cstring>
 
 #include "helpers.h"
+#include "helpers.hpp"
+#include "chemfiles.hpp"
 
 #if defined(WIN32) || defined(WIN64)
 #include <windows.h>
@@ -31,4 +33,10 @@ extern "C" char* read_whole_file(const char* path) {
     char* result = static_cast<char*>(malloc(sizeof(char) * buffer.length() + 1));
     std::strcpy(result, buffer.c_str());
     return result;
+}
+
+bool approx_eq(const chemfiles::Vector3D& a, const chemfiles::Vector3D& b, double tolerance) {
+    return (fabs(a[0] - b[0]) < tolerance)
+        && (fabs(a[1] - b[1]) < tolerance)
+        && (fabs(a[2] - b[2]) < tolerance);
 }

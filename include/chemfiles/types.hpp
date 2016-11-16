@@ -19,7 +19,7 @@
 
 namespace chemfiles {
 
-typedef std::array<double, 3> Vector3D;
+using Vector3D = std::array<double, 3>;
 
 /// Create a Vector3D from the three components `x`, `y`, and `z`.
 inline Vector3D vector3d(double x, double y, double z) {

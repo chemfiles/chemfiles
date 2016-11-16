@@ -52,6 +52,7 @@ endif()
 add_subdirectory(external)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_BINARY_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/helpers)
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/catch)
 include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR}/external/boost/include)

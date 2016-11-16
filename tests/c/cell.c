@@ -9,7 +9,7 @@
 #include "chemfiles.h"
 #include "helpers.h"
 
-bool roughly(double A[3][3], double B[3][3]) {
+static bool approx_eq(double A[3][3], double B[3][3]) {
     double eps = 1e-10;
     return
         (fabs(A[0][0] - B[0][0]) < eps) && (fabs(A[0][1] - B[0][1]) < eps) && (fabs(A[0][2] - B[0][2]) < eps) &&
@@ -51,7 +51,7 @@ int main() {
     chfl_vector_t expected[3] = {{10, 0, 0}, {0, 20, 0}, {0, 0, 30}};
     chfl_vector_t matrix[3];
     assert(!chfl_cell_matrix(cell, matrix));
-    assert(roughly(expected, matrix));
+    assert(approx_eq(expected, matrix));
 
     chfl_cell_shape_t type;
     assert(!chfl_cell_shape(cell, &type));

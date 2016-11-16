@@ -1,12 +1,8 @@
 #include <cmath>
 #include <catch.hpp>
+#include "helpers.hpp"
 #include "chemfiles.hpp"
-#include "chemfiles/UnitCell.hpp"
 using namespace chemfiles;
-
-bool roughly(const Vector3D& u, const Vector3D& v, double eps = 1e-9) {
-    return (fabs(u[0] - v[0]) < eps) && (fabs(u[1] - v[1]) < eps) && (fabs(u[2] - v[2]) < eps);
-}
 
 TEST_CASE("Use the UnitCell type", "[UnitCell]"){
 
@@ -134,9 +130,9 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         auto v = vector3d(22.0, -15.0, 5.8);
 
         CHECK(infinite.wrap(v) == v);
-        CHECK(roughly(ortho.wrap(v), vector3d(2.0, -4.0, 5.8), 1e-5));
-        CHECK(roughly(ortho.wrap(v), triclinic_algo.wrap(v), 1e-5));
-        CHECK(roughly(triclinic.wrap(v), vector3d(3.91013, -4.16711, 5.8), 1e-5));
-        CHECK(roughly(tilted.wrap(vector3d(6, 8, -7)), vector3d(4.26352, -0.08481, -1.37679), 1e-5));
+        CHECK(approx_eq(ortho.wrap(v), vector3d(2.0, -4.0, 5.8), 1e-5));
+        CHECK(approx_eq(ortho.wrap(v), triclinic_algo.wrap(v), 1e-5));
+        CHECK(approx_eq(triclinic.wrap(v), vector3d(3.91013, -4.16711, 5.8), 1e-5));
+        CHECK(approx_eq(tilted.wrap(vector3d(6, 8, -7)), vector3d(4.26352, -0.08481, -1.37679), 1e-5));
     }
 }

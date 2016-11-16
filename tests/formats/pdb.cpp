@@ -1,13 +1,7 @@
 #include "catch.hpp"
+#include "helpers.hpp"
 #include "chemfiles.hpp"
 using namespace chemfiles;
-
-
-bool roughly(const Vector3D& a, const Vector3D& b, const double eps){
-    return (fabs(a[0] - b[0]) < eps)
-        && (fabs(a[1] - b[1]) < eps)
-        && (fabs(a[2] - b[2]) < eps);
-}
 
 TEST_CASE("Read files in PDB format", "[Molfile]"){
     SECTION("Read trajectory") {
@@ -16,8 +10,8 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
 
         CHECK(frame.natoms() == 297);
         auto positions = frame.positions();
-        CHECK(roughly(positions[0], vector3d(0.417, 8.303, 11.737), 1e-3));
-        CHECK(roughly(positions[296], vector3d(6.664, 11.6148, 12.961), 1e-3));
+        CHECK(approx_eq(positions[0], vector3d(0.417, 8.303, 11.737), 1e-3));
+        CHECK(approx_eq(positions[296], vector3d(6.664, 11.6148, 12.961), 1e-3));
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
@@ -28,8 +22,8 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
 
         CHECK(frame.natoms() == 297);
         positions = frame.positions();
-        CHECK(roughly(positions[0], vector3d(0.299, 8.310, 11.721), 1e-4));
-        CHECK(roughly(positions[296], vector3d(6.798, 11.509, 12.704), 1e-4));
+        CHECK(approx_eq(positions[0], vector3d(0.299, 8.310, 11.721), 1e-4));
+        CHECK(approx_eq(positions[296], vector3d(6.798, 11.509, 12.704), 1e-4));
     }
 
     SECTION("Read bonds") {
