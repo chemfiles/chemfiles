@@ -41,7 +41,7 @@ extern "C" chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY* const file, ui
     assert(file != nullptr);
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
-        *frame = file->read_step(step);
+        *frame = file->read_step(checked_cast(step));
     )
 }
 

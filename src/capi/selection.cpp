@@ -54,9 +54,9 @@ extern "C" chfl_status chfl_selection_matches(const CHFL_SELECTION* const select
     assert(n_matches == selection->matches.size());
     CHFL_ERROR_CATCH(
         auto size = selection->selection.size();
-        for (uint64_t i=0; i<n_matches; i++) {
+        for (size_t i=0; i<n_matches; i++) {
             matches[i].size = size;
-            for (uint64_t j=0; j<size; j++) {
+            for (size_t j=0; j<size; j++) {
                 matches[i].atoms[j] = selection->matches[i][j];
             }
 

@@ -12,7 +12,7 @@ int main(void) {
     uint64_t nsteps = 0;
     chfl_trajectory_nsteps(file, &nsteps);
 
-    double* distances = malloc(sizeof(double) * nsteps);
+    double* distances = malloc((size_t)nsteps * sizeof(double));
     if (distances == NULL) {/*Handle error*/}
 
     CHFL_FRAME* frame = chfl_frame(0);

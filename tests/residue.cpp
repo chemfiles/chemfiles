@@ -9,7 +9,7 @@ TEST_CASE("Residue class usage", "[Residue]"){
 
     residue = Residue("GUA");
     CHECK(residue.name() == "GUA");
-    CHECK(residue.id() == static_cast<size_t>(-1));
+    CHECK(residue.id() == static_cast<uint64_t>(-1));
 
     CHECK(residue.size() == 0);
     residue.add_atom(0);

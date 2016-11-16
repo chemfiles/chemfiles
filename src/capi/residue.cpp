@@ -33,7 +33,7 @@ extern "C" CHFL_RESIDUE* chfl_residue_from_topology(const CHFL_TOPOLOGY* const t
     CHFL_ERROR_GOTO(
         // Return NULL if the index is out of bounds
         if (i < topology->residues().size()) {
-            residue = new Residue(topology->residues()[i]);
+            residue = new Residue(topology->residues()[checked_cast(i)]);
         }
 
     )
@@ -47,7 +47,7 @@ extern "C" CHFL_RESIDUE* chfl_residue_for_atom(const CHFL_TOPOLOGY* const topolo
     assert(topology != nullptr);
     CHFL_RESIDUE* residue = nullptr;
     CHFL_ERROR_GOTO(
-        auto res = topology->residue(i);
+        auto res = topology->residue(checked_cast(i));
         if (res) {
             residue = new Residue(*res);
         }
@@ -79,7 +79,7 @@ extern "C" chfl_status chfl_residue_name(const CHFL_RESIDUE* const residue, char
     assert(residue != nullptr);
     assert(name != nullptr);
     CHFL_ERROR_CATCH(
-        strncpy(name, residue->name().c_str(), buffsize - 1);
+        strncpy(name, residue->name().c_str(), checked_cast(buffsize) - 1);
         name[buffsize - 1] = '\0';
     )
 }
@@ -87,7 +87,7 @@ extern "C" chfl_status chfl_residue_name(const CHFL_RESIDUE* const residue, char
 extern "C" chfl_status chfl_residue_add_atom(CHFL_RESIDUE* const residue, uint64_t i) {
     assert(residue != nullptr);
     CHFL_ERROR_CATCH(
-        residue->add_atom(i);
+        residue->add_atom(checked_cast(i));
     )
 }
 
@@ -95,7 +95,7 @@ extern "C" chfl_status chfl_residue_contains(const CHFL_RESIDUE* const residue, 
     assert(residue != nullptr);
     assert(result != nullptr);
     CHFL_ERROR_CATCH(
-        *result = residue->contains(i);
+        *result = residue->contains(checked_cast(i));
     )
 }
 

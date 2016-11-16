@@ -17,9 +17,17 @@
 #include <map>
 #include <string>
 #include <cassert>
+#include <cstdint>
 
 namespace chemfiles {
     extern std::string CAPI_LAST_ERROR;
+}
+
+inline size_t checked_cast(uint64_t value) {
+    if (static_cast<uint64_t>(value) > static_cast<uint64_t>(SIZE_MAX)) {
+        throw chemfiles::Error("Got a value too big to be represented by a size_t on this system");
+    }
+    return static_cast<size_t>(value);
 }
 
 #define CATCH_AND_RETURN(exception, retval)                                    \

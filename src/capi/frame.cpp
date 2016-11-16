@@ -15,7 +15,7 @@ using namespace chemfiles;
 extern "C" CHFL_FRAME* chfl_frame(uint64_t natoms) {
     CHFL_FRAME* frame = nullptr;
     CHFL_ERROR_GOTO(
-        frame = new Frame(natoms);
+        frame = new Frame(checked_cast(natoms));
     )
     return frame;
 error:
@@ -83,7 +83,7 @@ extern "C" chfl_status chfl_frame_add_atom(CHFL_FRAME* const frame, const CHFL_A
 extern "C" chfl_status chfl_frame_resize(CHFL_FRAME* const frame, uint64_t natoms) {
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
-        frame->resize(natoms);
+        frame->resize(checked_cast(natoms));
     )
 }
 
@@ -129,7 +129,7 @@ extern "C" chfl_status chfl_frame_step(const CHFL_FRAME* const frame, uint64_t* 
 extern "C" chfl_status chfl_frame_set_step(CHFL_FRAME* const frame, uint64_t step) {
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(
-        frame->set_step(step);
+        frame->set_step(checked_cast(step));
     )
 }
 

@@ -34,7 +34,7 @@ extern "C" CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame, uint64
         // Return NULL if the index is out of bounds
         if (idx < frame->natoms()) {
             atom = new Atom("");
-            *atom = frame->topology()[idx];
+            *atom = frame->topology()[checked_cast(idx)];
         }
     )
     return atom;
@@ -50,7 +50,7 @@ extern "C" CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* const topolog
         // Return NULL if the index is out of bounds
         if (idx < topology->natoms()) {
             atom = new Atom("");
-            *atom = (*topology)[idx];
+            *atom = (*topology)[checked_cast(idx)];
         }
     )
     return atom;
@@ -93,7 +93,7 @@ extern "C" chfl_status chfl_atom_type(const CHFL_ATOM* const atom, char* const t
     assert(atom != nullptr);
     assert(type != nullptr);
     CHFL_ERROR_CATCH(
-        strncpy(type, atom->type().c_str(), buffsize - 1);
+        strncpy(type, atom->type().c_str(), checked_cast(buffsize) - 1);
         type[buffsize - 1] = '\0';
     )
 }
@@ -110,7 +110,7 @@ extern "C" chfl_status chfl_atom_name(const CHFL_ATOM* const atom, char* const n
     assert(atom != nullptr);
     assert(name != nullptr);
     CHFL_ERROR_CATCH(
-        strncpy(name, atom->name().c_str(), buffsize - 1);
+        strncpy(name, atom->name().c_str(), checked_cast(buffsize) - 1);
         name[buffsize - 1] = '\0';
     )
 }
@@ -127,7 +127,7 @@ extern "C" chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* co
     assert(atom != nullptr);
     assert(name != nullptr);
     CHFL_ERROR_CATCH(
-        strncpy(name, atom->full_name().c_str(), buffsize - 1);
+        strncpy(name, atom->full_name().c_str(), checked_cast(buffsize) - 1);
         name[buffsize - 1] = '\0';
     )
 }

@@ -16,7 +16,7 @@ int main(void) {
     uint64_t natoms = 0;
     chfl_vector_t* positions = NULL;
     chfl_frame_positions(frame, &positions, &natoms);
-    indexes = malloc(natoms * sizeof(unsigned));
+    indexes = malloc((size_t)natoms * sizeof(unsigned));
     if (indexes == NULL) {/*Handle error*/}
 
     for (unsigned i=0; i<natoms; i++) {

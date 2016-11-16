@@ -184,13 +184,13 @@ private:
 //! is equivalent to `resname == <value>`
 class ResidExpr final: public SingleSelector {
 public:
-    ResidExpr(unsigned argument, BinOp op, size_t id)
+    ResidExpr(unsigned argument, BinOp op, uint64_t id)
         : SingleSelector(argument), op_(op), id_(id) {}
     std::string print(unsigned delta) const override;
     std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
 private:
     BinOp op_;
-    size_t id_;
+    uint64_t id_;
 };
 
 //! @class PositionExpr selections/expr.hpp selections/expr.cpp

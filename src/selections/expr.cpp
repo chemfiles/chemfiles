@@ -219,7 +219,7 @@ std::string ResidExpr::print(unsigned /*unused*/) const {
 
 std::vector<bool> ResidExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
     auto res = std::vector<bool>(matches.size(), false);
-    auto compare = binop_comparison<size_t>(op_);
+    auto compare = binop_comparison<uint64_t>(op_);
     auto topology = frame.topology();
     for (size_t i = 0; i < matches.size(); i++) {
         auto idx = matches[i][argument_];

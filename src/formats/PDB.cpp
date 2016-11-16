@@ -281,7 +281,7 @@ void PDBFormat::write(const Frame& frame) {
         auto& pos = frame.positions()[i];
 
         std::string resname;
-        size_t resid;
+        uint64_t resid;
         auto residue = frame.topology().residue(i);
         if (residue) {
             resname = residue->name();

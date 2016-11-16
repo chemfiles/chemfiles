@@ -2,7 +2,7 @@
 
 using namespace chemfiles;
 
-Residue::Residue(std::string name, size_t resid):
+Residue::Residue(std::string name, uint64_t resid):
     name_(std::move(name)), id_(resid) {}
 
 void Residue::add_atom(size_t i) {

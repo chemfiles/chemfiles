@@ -64,7 +64,7 @@ void chemfiles::check_tng_error(tng_function_status status, std::string function
     default:
         throw chemfiles::FileError(
             "Unknown status code from TNG library: "
-            + std::to_string(status)
+            + std::to_string(static_cast<unsigned>(status))
         );
         break;
     }

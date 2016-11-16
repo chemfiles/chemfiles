@@ -30,7 +30,7 @@ namespace chemfiles {
 class CHFL_EXPORT Residue final {
 public:
     /// Create a new residue with a given `name` and residue id `resid`.
-    explicit Residue(std::string name, size_t resid = static_cast<size_t>(-1));
+    explicit Residue(std::string name, uint64_t resid = static_cast<uint64_t>(-1));
 
     Residue(const Residue&) = default;
     Residue& operator=(const Residue&) = default;
@@ -42,8 +42,8 @@ public:
         return name_;
     }
     /// Get the index of the residue in the initial topology file. If the
-    /// residue has no index, `static_cast<size_t>(-1)` is returned.
-    size_t id() const {
+    /// residue has no index, `static_cast<uint64_t>(-1)` is returned.
+    uint64_t id() const {
         return id_;
     }
     /// Get the size of the residue, i.e. the number of atoms in this residue.
@@ -67,7 +67,7 @@ private:
     /// Name of the residue
     std::string name_;
     /// Index of the residue in the initial topology file
-    size_t id_ = static_cast<size_t>(-1);
+    uint64_t id_ = static_cast<uint64_t>(-1);
     /// Indexes of the atoms in this residue. These indexes refers to the
     /// associated topology.
     sorted_set<size_t> atoms_;
