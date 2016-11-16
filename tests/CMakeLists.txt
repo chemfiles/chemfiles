@@ -94,7 +94,7 @@ function(chfl_c_test _file_)
     )
 endfunction()
 
-file(GLOB c_test_files ${CMAKE_CURRENT_SOURCE_DIR}/c/*.c)
+file(GLOB c_test_files ${CMAKE_CURRENT_SOURCE_DIR}/capi/*.c)
 foreach(test_file IN LISTS c_test_files)
     chfl_c_test(${test_file})
 endforeach(test_file)
