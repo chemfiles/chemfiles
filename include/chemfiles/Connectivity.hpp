@@ -14,6 +14,7 @@
 #include <unordered_set>
 
 #include "chemfiles/exports.hpp"
+#include "chemfiles/Error.hpp"
 
 namespace chemfiles {
 
@@ -21,10 +22,14 @@ namespace chemfiles {
 //! i and j, with i<j
 struct CHFL_EXPORT Bond {
     Bond(size_t first, size_t second) {
-        assert(first != second);
+        if (first == second) {
+            throw Error("Can not have a bond between an atom and itself");
+        }
+
         data_[0] = std::min(first, second);
         data_[1] = std::max(first, second);
     }
+
     //! Indexing operator
     const size_t& operator[](size_t i) const { return data_[i]; }
     //! Comparison operator
@@ -45,12 +50,15 @@ private:
 //! atoms i, j and k, with i < k
 struct CHFL_EXPORT Angle {
     Angle(size_t first, size_t midle, size_t last) {
-        assert(first != last);
-        assert(first != midle);
+        if (first == midle || first == last || midle == last) {
+            throw Error("Can not have the same atom twice in an angle");
+        }
+
         data_[0] = std::min(first, last);
         data_[1] = midle;
         data_[2] = std::max(first, last);
     }
+
     //! Indexing operator
     const size_t& operator[](size_t i) const { return data_[i]; }
     //! Comparison operator
@@ -72,9 +80,13 @@ private:
 //! between the atoms i, j, k and m, with max(i, j) < max(k, m))
 struct CHFL_EXPORT Dihedral {
     Dihedral(size_t first, size_t second, size_t third, size_t fourth) {
-        assert(first != second);
-        assert(second != third);
-        assert(third != fourth);
+        if (first == second || second == third || third == fourth) {
+            throw Error("Can not have an atom linked to itself in a dihedral angle");
+        }
+
+        if (first == third || second == fourth || first == fourth) {
+            throw Error("Can not have an atom twice in a dihedral angle");
+        }
 
         if (std::max(first, second) < std::max(third, fourth)) {
             data_[0] = first;
@@ -88,6 +100,7 @@ struct CHFL_EXPORT Dihedral {
             data_[3] = first;
         }
     }
+
     //! Indexing operator
     const size_t& operator[](size_t i) const { return data_[i]; }
     //! Comparison operator
