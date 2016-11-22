@@ -7,6 +7,8 @@
 */
 // clang-format off
 
+#include <cstring>
+
 #include "chemfiles.h"
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/Frame.hpp"
@@ -118,16 +120,17 @@ extern "C" chfl_status chfl_topology_dihedrals_count(const CHFL_TOPOLOGY* const 
 extern "C" chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[2], uint64_t nbonds) {
     assert(topology != nullptr);
     assert(data != nullptr);
-    if (nbonds != topology->bonds().size()) {
-        CAPI_LAST_ERROR = "Wrong data size in function 'chfl_topology_bonds'.";
-        return CHFL_MEMORY_ERROR;
-    }
 
-    auto bonds = topology->bonds();
     CHFL_ERROR_CATCH(
-        for (size_t i = 0; i<nbonds; i++) {
-            data[i][0] = bonds[i][0];
-            data[i][1] = bonds[i][1];
+        if (nbonds != topology->bonds().size()) {
+            CAPI_LAST_ERROR = "Wrong data size in function 'chfl_topology_bonds'.";
+            return CHFL_MEMORY_ERROR;
+        }
+
+        auto& bonds = topology->bonds();
+        for (size_t i=0; i<nbonds; i++) {
+            data[i][0] = static_cast<uint64_t>(bonds[i][0]);
+            data[i][1] = static_cast<uint64_t>(bonds[i][1]);
         }
     )
 }
@@ -135,17 +138,18 @@ extern "C" chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, 
 extern "C" chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[3], uint64_t nangles) {
     assert(topology != nullptr);
     assert(data != nullptr);
-    if (nangles != topology->angles().size()) {
-        CAPI_LAST_ERROR = "Wrong data size in function 'chfl_topology_angles'.";
-        return CHFL_MEMORY_ERROR;
-    }
 
-    auto angles = topology->angles();
     CHFL_ERROR_CATCH(
-        for (size_t i = 0; i<nangles; i++) {
-            data[i][0] = angles[i][0];
-            data[i][1] = angles[i][1];
-            data[i][2] = angles[i][2];
+        if (nangles != topology->angles().size()) {
+            CAPI_LAST_ERROR = "Wrong data size in function 'chfl_topology_angles'.";
+            return CHFL_MEMORY_ERROR;
+        }
+
+        auto& angles = topology->angles();
+        for (size_t i=0; i<nangles; i++) {
+            data[i][0] = static_cast<uint64_t>(angles[i][0]);
+            data[i][1] = static_cast<uint64_t>(angles[i][1]);
+            data[i][2] = static_cast<uint64_t>(angles[i][2]);
         }
     )
 }
@@ -153,18 +157,19 @@ extern "C" chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology,
 extern "C" chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t ndihedrals) {
     assert(topology != nullptr);
     assert(data != nullptr);
-    if (ndihedrals != topology->dihedrals().size()) {
-        CAPI_LAST_ERROR = "Wrong data size in function 'chfl_topology_bonds'.";
-        return CHFL_MEMORY_ERROR;
-    }
 
-    auto dihedrals = topology->dihedrals();
     CHFL_ERROR_CATCH(
-        for (size_t i = 0; i<ndihedrals; i++) {
-            data[i][0] = dihedrals[i][0];
-            data[i][1] = dihedrals[i][1];
-            data[i][2] = dihedrals[i][2];
-            data[i][3] = dihedrals[i][3];
+        if (ndihedrals != topology->dihedrals().size()) {
+            CAPI_LAST_ERROR = "Wrong data size in function 'chfl_topology_bonds'.";
+            return CHFL_MEMORY_ERROR;
+        }
+
+        auto& dihedrals = topology->dihedrals();
+        for (size_t i=0; i<ndihedrals; i++) {
+            data[i][0] = static_cast<uint64_t>(dihedrals[i][0]);
+            data[i][1] = static_cast<uint64_t>(dihedrals[i][1]);
+            data[i][2] = static_cast<uint64_t>(dihedrals[i][2]);
+            data[i][3] = static_cast<uint64_t>(dihedrals[i][3]);
         }
     )
 }

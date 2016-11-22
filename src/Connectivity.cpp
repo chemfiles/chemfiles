@@ -45,11 +45,9 @@ void Connectivity::recalculate() const {
                 }
 
                 if (angle1[2] == bond3[0] && angle1[1] != bond3[1]) {
-                    dihedrals_.emplace(angle1[0], angle1[1], angle1[2],
-                                       bond3[1]);
+                    dihedrals_.emplace(angle1[0], angle1[1], angle1[2], bond3[1]);
                 } else if (angle1[0] == bond3[1] && angle1[1] != bond3[0]) {
-                    dihedrals_.emplace(bond3[0], angle1[0], angle1[1],
-                                       angle1[2]);
+                    dihedrals_.emplace(bond3[0], angle1[0], angle1[1], angle1[2]);
                 } else if (angle1[2] == bond3[0] || angle1[2] == bond3[1]) {
                     // TODO this is an improper dihedral
                 }
@@ -59,21 +57,21 @@ void Connectivity::recalculate() const {
     uptodate = true;
 }
 
-const std::unordered_set<Bond>& Connectivity::bonds() const {
+const sorted_set<Bond>& Connectivity::bonds() const {
     if (!uptodate) {
         recalculate();
     }
     return bonds_;
 }
 
-const std::unordered_set<Angle>& Connectivity::angles() const {
+const sorted_set<Angle>& Connectivity::angles() const {
     if (!uptodate) {
         recalculate();
     }
     return angles_;
 }
 
-const std::unordered_set<Dihedral>& Connectivity::dihedrals() const {
+const sorted_set<Dihedral>& Connectivity::dihedrals() const {
     if (!uptodate) {
         recalculate();
     }

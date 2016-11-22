@@ -75,8 +75,8 @@ static void test_bonds(void) {
     assert(!chfl_topology_isdihedral(topology, 0, 1, 3, 2, &res));
     assert(res == false);
 
-    uint64_t top_bonds[3][2] = {{2, 3}, {1, 2}, {0, 1}};
-    uint64_t bonds[3][2];
+    uint64_t top_bonds[3][2] = {{0, 1}, {1, 2}, {2, 3}};
+    uint64_t bonds[3][2] = {{0}};
     assert(!chfl_topology_bonds(topology, bonds, 3));
     for (unsigned i=0; i<3; i++) {
         for (unsigned j=0; j<2; j++) {
@@ -85,7 +85,7 @@ static void test_bonds(void) {
     }
 
     uint64_t top_angles[2][3] = {{0, 1, 2}, {1, 2, 3}};
-    uint64_t angles[2][3];
+    uint64_t angles[2][3] = {{0}};
     assert(!chfl_topology_angles(topology, angles, 2));
     for (unsigned i=0; i<2; i++) {
         for (unsigned j=0; j<3; j++) {
@@ -94,7 +94,7 @@ static void test_bonds(void) {
     }
 
     uint64_t top_dihedrals[1][4] = {{0, 1, 2, 3}};
-    uint64_t dihedrals[1][4];
+    uint64_t dihedrals[1][4] = {{0}};
     assert(!chfl_topology_dihedrals(topology, dihedrals, 1));
     for (unsigned j=0; j<4; j++) {
         assert(dihedrals[0][j] == top_dihedrals[0][j]);

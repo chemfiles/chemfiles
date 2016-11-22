@@ -12,6 +12,14 @@ TEST_CASE("Connectivity elements", "[Topology]") {
         CHECK(bond[1] == 45);
 
         CHECK_THROWS_AS(Bond(2, 2), Error);
+
+        CHECK(Bond(1, 3) < Bond(2, 3));
+        CHECK(Bond(1, 2) < Bond(1, 3));
+        CHECK_FALSE(Bond(1, 2) < Bond(1, 2));
+
+        CHECK(Bond(2, 3) > Bond(1, 3));
+        CHECK(Bond(1, 3) > Bond(1, 2));
+        CHECK_FALSE(Bond(1, 2) > Bond(1, 2));
     }
 
     SECTION("Angles") {
@@ -25,6 +33,16 @@ TEST_CASE("Connectivity elements", "[Topology]") {
         CHECK_THROWS_AS(Angle(2, 2, 3), Error);
         CHECK_THROWS_AS(Angle(2, 3, 2), Error);
         CHECK_THROWS_AS(Angle(3, 2, 2), Error);
+
+        CHECK(Angle(1, 3, 4) < Angle(2, 3, 4));
+        CHECK(Angle(1, 2, 4) < Angle(1, 3, 4));
+        CHECK(Angle(1, 2, 3) < Angle(1, 2, 4));
+        CHECK_FALSE(Angle(1, 2, 3) < Angle(1, 2, 3));
+
+        CHECK(Angle(2, 3, 4) > Angle(1, 3, 4));
+        CHECK(Angle(1, 3, 4) > Angle(1, 2, 4));
+        CHECK(Angle(1, 2, 4) > Angle(1, 2, 3));
+        CHECK_FALSE(Angle(1, 2, 3) > Angle(1, 2, 3));
     }
 
     SECTION("Dihedral") {
@@ -42,6 +60,18 @@ TEST_CASE("Connectivity elements", "[Topology]") {
         CHECK_THROWS_AS(Dihedral(2, 3, 2, 4), Error);
         CHECK_THROWS_AS(Dihedral(1, 2, 3, 2), Error);
         CHECK_THROWS_AS(Dihedral(1, 2, 3, 1), Error);
+
+        CHECK(Dihedral(1, 3, 4, 5) < Dihedral(2, 3, 4, 5));
+        CHECK(Dihedral(1, 2, 4, 5) < Dihedral(1, 3, 4, 5));
+        CHECK(Dihedral(1, 2, 3, 5) < Dihedral(1, 2, 4, 5));
+        CHECK(Dihedral(1, 2, 3, 4) < Dihedral(1, 2, 3, 5));
+        CHECK_FALSE(Dihedral(1, 2, 3, 4) < Dihedral(1, 2, 3, 4));
+
+        CHECK(Dihedral(2, 3, 4, 5) > Dihedral(1, 3, 4, 5));
+        CHECK(Dihedral(1, 3, 4, 5) > Dihedral(1, 2, 4, 5));
+        CHECK(Dihedral(1, 2, 4, 5) > Dihedral(1, 2, 3, 5));
+        CHECK(Dihedral(1, 2, 3, 5) > Dihedral(1, 2, 3, 4));
+        CHECK_FALSE(Dihedral(1, 2, 3, 4) > Dihedral(1, 2, 3, 4));
     }
 }
 

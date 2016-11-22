@@ -11,8 +11,8 @@
 
 #include <array>
 #include <cassert>
-#include <unordered_set>
 
+#include "chemfiles/sorted_set.hpp"
 #include "chemfiles/exports.hpp"
 #include "chemfiles/Error.hpp"
 
@@ -32,10 +32,6 @@ struct CHFL_EXPORT Bond {
 
     //! Indexing operator
     const size_t& operator[](size_t i) const { return data_[i]; }
-    //! Comparison operator
-    bool operator==(const Bond& other) const {
-        return data_[0] == other[0] && data_[1] == other[1];
-    }
 
     Bond(Bond&&) = default;
     Bond& operator=(Bond&&) = default;
@@ -45,6 +41,24 @@ struct CHFL_EXPORT Bond {
 private:
     std::array<size_t, 2> data_;
 };
+
+inline bool operator==(const Bond& lhs, const Bond& rhs) {
+    return lhs[0] == rhs[0] && lhs[1] == rhs[1];
+}
+
+inline bool operator!=(const Bond& lhs, const Bond& rhs) {
+    return lhs[0] != rhs[0] || lhs[1] != rhs[1];
+}
+
+// Lexicographic comparison
+inline bool operator<(const Bond& lhs, const Bond& rhs) {
+    return lhs[0] < rhs[0] || (lhs[0] == rhs[0] && lhs[1] < rhs[1]);
+}
+
+// Lexicographic comparison
+inline bool operator>(const Bond& lhs, const Bond& rhs) {
+    return lhs[0] > rhs[0] || (lhs[0] == rhs[0] && lhs[1] > rhs[1]);
+}
 
 //! The angle struct ensure a canonical representation of an angle between the
 //! atoms i, j and k, with i < k
@@ -61,11 +75,6 @@ struct CHFL_EXPORT Angle {
 
     //! Indexing operator
     const size_t& operator[](size_t i) const { return data_[i]; }
-    //! Comparison operator
-    bool operator==(const Angle& other) const {
-        return data_[0] == other[0] && data_[1] == other[1] &&
-               data_[2] == other[2];
-    }
 
     Angle(Angle&&) = default;
     Angle& operator=(Angle&&) = default;
@@ -75,6 +84,28 @@ struct CHFL_EXPORT Angle {
 private:
     std::array<size_t, 3> data_;
 };
+
+inline bool operator==(const Angle& lhs, const Angle& rhs) {
+    return lhs[0] == rhs[0] && lhs[1] == rhs[1] && lhs[2] == rhs[2];
+}
+
+inline bool operator!=(const Angle& lhs, const Angle& rhs) {
+    return lhs[0] != rhs[0] || lhs[1] != rhs[1] || lhs[2] != rhs[2];
+}
+
+// Lexicographic comparison
+inline bool operator<(const Angle& lhs, const Angle& rhs) {
+    return lhs[0] < rhs[0] || (lhs[0] == rhs[0] && (
+        lhs[1] < rhs[1] || (lhs[1] == rhs[1] && (lhs[2] < rhs[2]))
+    ));
+}
+
+// Lexicographic comparison
+inline bool operator>(const Angle& lhs, const Angle& rhs) {
+    return lhs[0] > rhs[0] || (lhs[0] == rhs[0] && (
+        lhs[1] > rhs[1] || (lhs[1] == rhs[1] && (lhs[2] > rhs[2]))
+    ));
+}
 
 //! The dihedral struct ensure a canonical representation of a dihedral angle
 //! between the atoms i, j, k and m, with max(i, j) < max(k, m))
@@ -103,11 +134,6 @@ struct CHFL_EXPORT Dihedral {
 
     //! Indexing operator
     const size_t& operator[](size_t i) const { return data_[i]; }
-    //! Comparison operator
-    bool operator==(const Dihedral& other) const {
-        return data_[0] == other[0] && data_[1] == other[1] &&
-               data_[2] == other[2] && data_[3] == other[3];
-    }
 
     Dihedral(Dihedral&&) = default;
     Dihedral& operator=(Dihedral&&) = default;
@@ -118,24 +144,32 @@ private:
     std::array<size_t, 4> data_;
 };
 
-} // namespace chemfiles
+inline bool operator==(const Dihedral& lhs, const Dihedral& rhs) {
+    return lhs[0] == rhs[0] && lhs[1] == rhs[1] && lhs[2] == rhs[2] && lhs[3] == rhs[3];
+}
 
-namespace std {
-    // We need a hashing function for the std::unordered_set, but it will not
-    // be used. We will use the operator== instead to ensure the element
-    // unicity in the sets.
-    template <> struct hash<chemfiles::Bond> {
-        size_t operator()(chemfiles::Bond const&) const { return 42; }
-    };
-    template <> struct hash<chemfiles::Angle> {
-        size_t operator()(chemfiles::Angle const&) const { return 42; }
-    };
-    template <> struct hash<chemfiles::Dihedral> {
-        size_t operator()(chemfiles::Dihedral const&) const { return 42; }
-    };
-} // namespace std
+inline bool operator!=(const Dihedral& lhs, const Dihedral& rhs) {
+    return lhs[0] != rhs[0] || lhs[1] != rhs[1] || lhs[2] != rhs[2] || lhs[3] != rhs[3];
+}
 
-namespace chemfiles {
+// Lexicographic comparison
+inline bool operator<(const Dihedral& lhs, const Dihedral& rhs) {
+    return lhs[0] < rhs[0] || (lhs[0] == rhs[0] && (
+        lhs[1] < rhs[1] || (lhs[1] == rhs[1] && (
+            lhs[2] < rhs[2] || (lhs[2] == rhs[2] && (lhs[3] < rhs[3]))
+        ))
+    ));
+}
+
+// Lexicographic comparison
+inline bool operator>(const Dihedral& lhs, const Dihedral& rhs) {
+    return lhs[0] > rhs[0] || (lhs[0] == rhs[0] && (
+        lhs[1] > rhs[1] || (lhs[1] == rhs[1] && (
+            lhs[2] > rhs[2] || (lhs[2] == rhs[2] && (lhs[3] > rhs[3]))
+        ))
+    ));
+}
+
 
 /*!
  * @class connectivity Topology.hpp Topology.cpp
@@ -151,9 +185,9 @@ public:
     //! Recalculate the angles and the dihedrals from the bond list
     void recalculate() const;
     //! Access the underlying data
-    const std::unordered_set<Bond>& bonds() const;
-    const std::unordered_set<Angle>& angles() const;
-    const std::unordered_set<Dihedral>& dihedrals() const;
+    const sorted_set<Bond>& bonds() const;
+    const sorted_set<Angle>& angles() const;
+    const sorted_set<Dihedral>& dihedrals() const;
     //! Add a bond between the atoms `i` and `j`
     void add_bond(size_t i, size_t j);
     //! Remove any bond between the atoms `i` and `j`
@@ -161,11 +195,11 @@ public:
 
 private:
     //! Bonds in the system
-    std::unordered_set<Bond> bonds_;
+    sorted_set<Bond> bonds_;
     //! Angles in the system
-    mutable std::unordered_set<Angle> angles_;
+    mutable sorted_set<Angle> angles_;
     //! Dihedral angles in the system
-    mutable std::unordered_set<Dihedral> dihedrals_;
+    mutable sorted_set<Dihedral> dihedrals_;
     //! Is the cached content up to date ?
     mutable bool uptodate = false;
 };

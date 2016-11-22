@@ -88,11 +88,11 @@ public:
     bool isdihedral(size_t i, size_t j, size_t k, size_t m) const;
 
     //! Get the bonds in the system
-    std::vector<Bond> bonds() const;
+    const std::vector<Bond>& bonds() const;
     //! Get the angles in the system
-    std::vector<Angle> angles() const;
+    const std::vector<Angle>& angles() const;
     //! Get the dihedral angles in the system
-    std::vector<Dihedral> dihedrals() const;
+    const std::vector<Dihedral>& dihedrals() const;
 
     //! Remove all bonding information in the topology (bonds, angles and
     //! dihedrals)

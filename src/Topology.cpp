@@ -41,22 +41,16 @@ void Topology::remove(size_t idx) {
     }
 }
 
-std::vector<Bond> Topology::bonds() const {
-    std::vector<Bond> res;
-    res.insert(res.begin(), connect_.bonds().begin(), connect_.bonds().end());
-    return res;
+const std::vector<Bond>& Topology::bonds() const {
+    return connect_.bonds().as_vec();
 }
 
-std::vector<Angle> Topology::angles() const {
-    std::vector<Angle> res;
-    res.insert(res.begin(), connect_.angles().begin(), connect_.angles().end());
-    return res;
+const std::vector<Angle>& Topology::angles() const {
+    return connect_.angles().as_vec();
 }
 
-std::vector<Dihedral> Topology::dihedrals() const {
-    std::vector<Dihedral> res;
-    res.insert(res.begin(), connect_.dihedrals().begin(), connect_.dihedrals().end());
-    return res;
+const std::vector<Dihedral>& Topology::dihedrals() const {
+    return connect_.dihedrals().as_vec();
 }
 
 bool Topology::isbond(size_t i, size_t j) const {

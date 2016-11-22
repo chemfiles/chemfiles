@@ -50,7 +50,7 @@ public:
         auto it = std::lower_bound(super::begin(), super::end(), value);
         if (it == super::end() || *it != value) {
             it = super::insert(it, value);
-            return std::pair<iterator, bool>(it, false);
+            return std::pair<iterator, bool>(it, true);
         } else {
             // Do nothing, we found the value
             return std::pair<iterator, bool>(it, false);
@@ -61,7 +61,7 @@ public:
         auto it = std::lower_bound(super::begin(), super::end(), value);
         if (it == super::end() || *it != value) {
             it = super::insert(it, std::move(value));
-            return std::pair<iterator, bool>(it, false);
+            return std::pair<iterator, bool>(it, true);
         } else {
             // Do nothing, we found the value
             return std::pair<iterator, bool>(it, false);
@@ -70,7 +70,7 @@ public:
 
     template<class... Args>
     std::pair<iterator, bool> emplace(Args&&... args) {
-        return insert(std::move(T(std::forward<Args...>(args...))));
+        return insert(std::move(T(std::forward<Args>(args)...)));
     }
 
     iterator find(const T& value) const {
@@ -80,6 +80,19 @@ public:
         } else {
             return it;
         }
+    }
+
+    iterator erase(const_iterator pos) {
+        // Converting a super::const_iterator to a super::iterator (removing the
+        // const part), because GCC 4.8 do not provide the
+        // std::vector<T>::erase(const_iterator) overload.
+        auto it = super::begin() + (pos - super::cbegin());
+        return super::erase(it);
+    }
+
+    /// Get the underlying vector data wihtout a copy
+    const super& as_vec() const {
+        return *this;
     }
 };
 
