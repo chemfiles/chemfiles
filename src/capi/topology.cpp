@@ -117,6 +117,7 @@ extern "C" chfl_status chfl_topology_dihedrals_count(const CHFL_TOPOLOGY* const 
     )
 }
 
+#pragma intel optimization_level 2  /* Using -O3 with icc lead to partial copy of the bonds */
 extern "C" chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[2], uint64_t nbonds) {
     assert(topology != nullptr);
     assert(data != nullptr);
@@ -135,6 +136,7 @@ extern "C" chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, 
     )
 }
 
+#pragma intel optimization_level 2 /* Using -O3 with icc lead to partial copy of the angles */
 extern "C" chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[3], uint64_t nangles) {
     assert(topology != nullptr);
     assert(data != nullptr);
@@ -154,6 +156,7 @@ extern "C" chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology,
     )
 }
 
+#pragma intel optimization_level 2 /* Using -O3 with icc lead to partial copy of the dihedrals */
 extern "C" chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t ndihedrals) {
     assert(topology != nullptr);
     assert(data != nullptr);
