@@ -5,32 +5,43 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+### New features
+
 * Add a public `Residue` class to C++ and C API to represent residue data.
   Residues are groups of atoms bonded together, which may or may not correspond
   to molecules; and are often used for bio-molecules.
 * Add the `resname` and `resid` selector, to select atoms based on their
   residue.
-* Remove the `Trajectory::sync` and the `chfl_trajectory_sync` functions.
-  To ensure that all content of a file is written to the disk, the user need to
-  close it.
-* Add missing `chfl_topology_resize` function to C API.
+* Account for the difference between the atom name ("H1") and atom type ("H")
+  in some formats (PDB, TNG, ...). This introduces the `Atom::type` member
+  function and the `chfl_atom_type` C API function.
+* Add the `type` selector, to select atoms based on their type.
 * Add "Frame::add_atom" function to add an atom and the corresponding position
   (and velocity) data to a frame, and the C API `chfl_frame_add_atom` function.
 * Rename `UnitCell::type` to `UnitCell::shape`. This also affect
   `chfl_cell_shape_t`, `chfl_cell_shape`, and `chfl_cell_set_shape`.
-* Account for the difference between the atom name and atom type in some
-  formats (PDB, TNG, ...). This introduces the `Atom::type` member function
-  and the `chfl_atom_type` C API function.
-* Add the `type` selector, to select atoms based on their type.
 * All the floating point data uses doubles instead of floats. This concerns
   atomic data, positions and velocities.
-* C API functions taking three lengths/angles now take a `double[3]` parameter
-  instead.
+
+### Changes in supported formats
+
 * Add read support for TNG files, an new portable and compressed binary format
-  used by Gromacs.
+  used by GROMACS.
+
+### C API changes
+
 * All the integers at C boundary have a fixed size, most of the time using
   `uint64_t`.
-* Remove the `Atom::type` value from C and C++ API.
+* Add missing `chfl_topology_resize` function to C API.
+* C API functions taking three lengths/angles now take a `double[3]` parameter
+  instead.
+
+### Deprecation and removals
+
+* Remove the `Atom::type` enum from C and C++ API.
+* Remove the `Trajectory::sync` and the `chfl_trajectory_sync` functions.
+  To ensure that all content of a file is written to the disk, the user need to
+  close it.
 
 ## 0.6 (1 July 2016)
 
@@ -45,7 +56,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
       `chfl_selection_matches` and `chfl_selection_free` functions, and the
       `chfl_match_t` helper struct.
 * Add the `chfl_clear_errors` function, to cleanup the error state of the C API.
-* Molfiles plugins are now incorporated in the chemfiles library, and no longer
+* Molfiles plugins are now incorporated in the Chemfiles library, and no longer
   distributed as shared libraries. The `CHEMFILES_PLUGINS` environment variable
   is a no-op.
 * The caching of angles and dihedrals is now an implementation detail. That
@@ -76,7 +87,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Add a small selection language *a la* VMD, allowing to select atoms matching
   a selection string like `"name H and x > 4"`. This is exposed to C++ with the
   public `Selection` class, and to C with the `chfl_frame_selection` function.
-* Remove the periodicity handling from UnitCell. It was not implemented in
+* Remove the periodicity handling from `UnitCell`. It was not implemented in
   boundaries conditions. The corresponding function where removed from the C
   API.
 * Rename all setter function from `void xxx(const XXX& value)` to
@@ -102,8 +113,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
       - [Julia](https://github.com/Luthaf/Chemharp.jl)
       - [Rust](https://github.com/Luthaf/Chemharp.rs)
 * The library is now continuously tested on Visual Studio
-* Various bugfixes and code improvements
-* Renamed the library to chemfiles.
+* Various bug fixes and code improvements
+* Renamed the library to Chemfiles.
 
 ## 0.3 (3 Aug 2015)
 
@@ -115,13 +126,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## 0.2 (31 May 2015)
 
 * Add basic geometrical operations on vectors and implement basic periodic boundaries condition with the `UnitCell::wrap` function;
-* Use VMD molfile plugins as a format provider to read trajectories. The following formats are
-added through Molfile:
+* Use VMD Molfiles plugins as a format provider to read trajectories. The following formats are
+added through Molfiles:
     * PDB;
-    * Gromacs gro;
-    * Gromacs xtc;
-    * Gromacs trj;
-    * Gromacs trr;
+    * GROMACS gro;
+    * GROMACS xtc;
+    * GROMACS trj;
+    * GROMACS trr;
     * CHARMM dcd;
 
 ## 0.1 (16 May 2015)
