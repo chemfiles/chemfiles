@@ -90,7 +90,7 @@ void UnitCell::update_matrix() {
 
     // Do not try to invert a cell with a 0 volume
     if (volume() == 0.0) {
-        h_inv_ = Matrix3D{{{{0, 0, 0}}, {{0, 0, 0}}, {{0, 0, 0}}}};
+        h_inv_ = matrix3d();
     } else {
         h_inv_ = invert(h_);
     }

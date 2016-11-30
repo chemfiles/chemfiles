@@ -76,14 +76,14 @@ void Frame::guess_topology() {
 
     for (size_t i = 0; i < natoms(); i++) {
         auto irad = topology_[i].vdw_radius();
-        if (irad == -1) {
+        if (irad <= 0) {
             throw Error(
                 "Missing Van der Waals radius for '" + topology_[i].type() + "'"
             );
         }
         for (size_t j = i + 1; j < natoms(); j++) {
             auto jrad = topology_[j].vdw_radius();
-            if (jrad == -1) {
+            if (jrad <= 0) {
                 throw Error(
                     "Missing Van der Waals radius for '" + topology_[j].type() + "'"
                 );

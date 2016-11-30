@@ -37,9 +37,7 @@ TNGFile::TNGFile(std::string filename, File::Mode mode): BinaryFile(filename, mo
             CHECK(tng_first_computer_name_set(handle_, host.c_str()));
             // TODO: first pgp signature?
         }
-    }
 
-    if (mode == File::WRITE || mode == File::APPEND) {
         CHECK(tng_file_headers_write(handle_, TNG_USE_HASH));
     }
 }
