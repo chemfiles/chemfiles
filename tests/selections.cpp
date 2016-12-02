@@ -20,6 +20,8 @@ TEST_CASE("Atoms selections", "[selection]") {
         sel = Selection("index != 2 and all");
         res = std::vector<size_t>{0, 1, 3};
         CHECK(sel.list(frame) == res);
+
+        CHECK(sel.string() == "index != 2 and all");
     }
 
     SECTION("index") {

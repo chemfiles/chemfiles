@@ -6,6 +6,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/
 */
 // clang-format off
+#include <cstring>
 
 #include "chemfiles.h"
 #include "chemfiles/Selections.hpp"
@@ -38,6 +39,15 @@ extern "C" chfl_status chfl_selection_size(const CHFL_SELECTION* const selection
     assert(selection != nullptr);
     CHFL_ERROR_CATCH(
         *size = selection->selection.size();
+    )
+}
+
+extern "C" chfl_status chfl_selection_string(const CHFL_SELECTION* const selection, char* const string, uint64_t buffsize) {
+    assert(selection != nullptr);
+    assert(string != nullptr);
+    CHFL_ERROR_CATCH(
+        strncpy(string, selection->selection.string().c_str(), checked_cast(buffsize) - 1);
+        string[buffsize - 1] = '\0';
     )
 }
 

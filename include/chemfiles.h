@@ -1045,6 +1045,17 @@ CHFL_EXPORT chfl_status chfl_selection_size(const CHFL_SELECTION* const selectio
                                             uint64_t* size);
 
 /*!
+* @brief Get the selection string used to create a given selection.
+* @param selection The selection
+* @param string A string buffer to be filled with the selection string
+* @param buffsize The size of the string buffer
+* @return The status code
+*/
+CHFL_EXPORT chfl_status chfl_selection_string(const CHFL_SELECTION* const selection,
+                                              char* const string,
+                                              uint64_t buffsize);
+
+/*!
 * @brief Evaluate a selection for a given frame.
 *
 * Use the `chfl_selection_get` function to get the matches for this selection.

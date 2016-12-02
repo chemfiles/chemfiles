@@ -118,6 +118,11 @@ public:
     /// Size of the matches for this selection
     size_t size() const;
 
+    /// Get the string used to build this selection
+    std::string string() const {
+        return selection_;
+    }
+
 private:
     //! Generate all possible (unconstrained) matches for this selection and
     //! the given `frame`.

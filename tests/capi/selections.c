@@ -2,6 +2,7 @@
 #undef NDEBUG
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "chemfiles.h"
 #include "helpers.h"
@@ -20,6 +21,10 @@ int main(void) {
     uint64_t size = 0;
     assert(!chfl_selection_size(selection, &size));
     assert(size == 1);
+
+    char buffer[30] = {0};
+    assert(!chfl_selection_string(selection, buffer, 30));
+    assert(strcmp(buffer, "name O") == 0);
 
     uint64_t n_matches = 0;
     assert(!chfl_selection_evalutate(selection, frame, &n_matches));
@@ -45,6 +50,9 @@ int main(void) {
     assert(!chfl_selection_size(selection, &size));
     assert(size == 1);
 
+    assert(!chfl_selection_string(selection, buffer, 30));
+    assert(strcmp(buffer, "not index <= 2") == 0);
+
     assert(!chfl_selection_evalutate(selection, frame, &n_matches));
     assert(n_matches == 1);
 
@@ -62,6 +70,9 @@ int main(void) {
 
     assert(!chfl_selection_size(selection, &size));
     assert(size == 3);
+
+    assert(!chfl_selection_string(selection, buffer, 30));
+    assert(strcmp(buffer, "angles: all") == 0);
 
     assert(!chfl_selection_evalutate(selection, frame, &n_matches));
     assert(n_matches == 2);
