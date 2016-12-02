@@ -14,7 +14,7 @@ static chfl_log_level_t last_level;
 
 static void callback(chfl_log_level_t level, const char* message) {
     size_t size = strlen(message) + 1;
-    buffer = malloc(sizeof(char)*size);
+    buffer = (char*)malloc(sizeof(char)*size);
     strcpy(buffer, message);
     last_level = level;
 }

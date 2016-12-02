@@ -30,7 +30,7 @@ int main(void) {
     assert(!chfl_selection_evalutate(selection, frame, &n_matches));
     assert(n_matches == 2);
 
-    chfl_match_t *matches = malloc((size_t)n_matches * sizeof(chfl_match_t));
+    chfl_match_t* matches = (chfl_match_t*)malloc((size_t)n_matches * sizeof(chfl_match_t));
     assert(matches);
     assert(!chfl_selection_matches(selection, matches, n_matches));
     assert(matches[0].size == 1);
@@ -56,7 +56,7 @@ int main(void) {
     assert(!chfl_selection_evalutate(selection, frame, &n_matches));
     assert(n_matches == 1);
 
-    matches = malloc((size_t)n_matches * sizeof(chfl_match_t));
+    matches = (chfl_match_t*)malloc((size_t)n_matches * sizeof(chfl_match_t));
     assert(matches);
     assert(!chfl_selection_matches(selection, matches, n_matches));
     assert(matches[0].atoms[0] == 3);
@@ -77,7 +77,7 @@ int main(void) {
     assert(!chfl_selection_evalutate(selection, frame, &n_matches));
     assert(n_matches == 2);
 
-    matches = malloc((size_t)n_matches * sizeof(chfl_match_t));
+    matches = (chfl_match_t*)malloc((size_t)n_matches * sizeof(chfl_match_t));
     assert(matches);
     assert(!chfl_selection_matches(selection, matches, n_matches));
     assert(matches[0].size == 3);

@@ -59,8 +59,7 @@ include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR}/external/boost/include)
 add_library(catch STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/catch/catch.cpp)
 add_library(helpers STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/helpers/helpers.cpp)
 
-function(chfl_cpp_test _file_)
-    get_filename_component(_name_ ${_file_} NAME_WE)
+function(chfl_test _name_ _file_)
     add_executable(${_name_} ${_file_})
     target_link_libraries(${_name_} chemfiles boost_filesystem catch helpers)
     set_property(TARGET ${_name_} PROPERTY CXX_STANDARD 11)
@@ -68,6 +67,11 @@ function(chfl_cpp_test _file_)
         COMMAND ${RUNNER_COMMAND} ./${_name_}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
+endfunction()
+
+function(chfl_cpp_test _file_)
+    get_filename_component(_name_ ${_file_} NAME_WE)
+    chfl_test(${_name_} ${_file_})
 endfunction()
 
 file(GLOB all_test_files
@@ -82,19 +86,14 @@ foreach(test_file IN LISTS all_test_files)
     chfl_cpp_test(${test_file})
 endforeach(test_file)
 
-function(chfl_c_test _file_)
+function(chfl_capi_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     set(_name_ "c-${_name_}")
-    add_executable(${_name_} ${_file_})
-    target_link_libraries(${_name_} chemfiles helpers)
+    chfl_test(${_name_} ${_file_})
     target_compile_definitions(${_name_} PRIVATE "-DSRCDIR=\"${PROJECT_SOURCE_DIR}\"")
-    add_test(NAME ${_name_}
-        COMMAND ${RUNNER_COMMAND} ./${_name_}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
 endfunction()
 
-file(GLOB c_test_files ${CMAKE_CURRENT_SOURCE_DIR}/capi/*.c)
-foreach(test_file IN LISTS c_test_files)
-    chfl_c_test(${test_file})
+file(GLOB capi_test_files ${CMAKE_CURRENT_SOURCE_DIR}/capi/*.cpp)
+foreach(test_file IN LISTS capi_test_files)
+    chfl_capi_test(${test_file})
 endforeach(test_file)
