@@ -1,76 +1,99 @@
-// Force NDEBUG to be undefined
-#undef NDEBUG
-#include <assert.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <fstream>
+#include <sstream>
+#include <cstring>
 
+#include "catch.hpp"
+#include "helpers.hpp"
 #include "chemfiles.h"
-#include "helpers.h"
+
+static std::string generate_chemfiles_error() {
+    // Generate a log event
+    CHECK(chfl_trajectory_open("noformat", 'r') == NULL);
+    return "Can not find a format associated with the \"\" extension.";
+}
+
+TEST_CASE("Errors", "[CAPI]") {
+    CHECK(chfl_strerror(CHFL_SUCCESS) == std::string("operation was sucessfull"));
+    CHECK(chfl_last_error() == std::string(""));
+
+    CHECK_STATUS(chfl_log_silent());
+    generate_chemfiles_error();
+    CHECK_STATUS(chfl_log_stderr());
+
+    CHECK(chfl_last_error() != std::string(""));
+    CHECK_STATUS(chfl_clear_errors());
+    CHECK(chfl_last_error() == std::string(""));
+}
 
 // Global variables for access from callback and main
-static char* buffer;
+static char* buffer = NULL;
 static chfl_log_level_t last_level;
 
 static void callback(chfl_log_level_t level, const char* message) {
     size_t size = strlen(message) + 1;
-    buffer = (char*)malloc(sizeof(char)*size);
+    REQUIRE(buffer == NULL);
+    buffer = static_cast<char*>(malloc(sizeof(char) * size));
     strcpy(buffer, message);
     last_level = level;
 }
 
-int main(void) {
-    silent_crash_handlers();
-    assert(strcmp(chfl_strerror(CHFL_SUCCESS), "operation was sucessfull") == 0);
-    assert(strcmp(chfl_last_error(), "") == 0);
+TEST_CASE("Logging", "[CAPI]") {
+    // Just checking return values
+    CHECK_STATUS(chfl_log_stdout());
+    CHECK_STATUS(chfl_log_silent());
+    CHECK_STATUS(chfl_log_stderr());
 
-    chfl_log_level_t level;
-    assert(!chfl_loglevel(&level));
-    assert(level == CHFL_LOG_WARNING);
+    SECTION("Log level") {
+        chfl_log_level_t level;
+        CHECK_STATUS(chfl_loglevel(&level));
+        CHECK(level == CHFL_LOG_WARNING);
 
-    assert(!chfl_set_loglevel(CHFL_LOG_DEBUG));
-    assert(!chfl_loglevel(&level));
-    assert(level == CHFL_LOG_DEBUG);
+        CHECK_STATUS(chfl_set_loglevel(CHFL_LOG_DEBUG));
+        CHECK_STATUS(chfl_loglevel(&level));
+        CHECK(level == CHFL_LOG_DEBUG);
 
-    assert(!chfl_logfile("test.log"));
+        CHECK_STATUS(chfl_set_loglevel(CHFL_LOG_WARNING));
+    }
 
-    // Check for file existence (it must be opened in binary mode for the
-    // good behaviour of read_whole_file on Windows)
-    FILE* file = fopen("test.log","rb");
-    assert(file != NULL);
+    SECTION("logfile") {
+        const char* filename = "test.log";
+        CHECK_STATUS(chfl_logfile(filename));
 
-    assert(chfl_trajectory_open("noformat", 'r') == NULL);
-    assert(!chfl_log_stderr());
+        std::string message = generate_chemfiles_error();
 
-    char* content = read_whole_file("test.log");
-    assert(strcmp(content, "Chemfiles error: Can not find a format associated with the \"\" extension.\n") == 0);
+        std::ifstream file(filename);
+        REQUIRE(file.is_open());
+        std::stringstream content;
+        content << file.rdbuf();
+        file.close();
 
-    free(content);
-    fclose(file);
+        CHECK(content.str() == "Chemfiles error: " + message + "\n");
 
-    // Test callback-based logging
-    assert(!chfl_log_callback(callback));
-    assert(chfl_trajectory_open("noformat", 'r') == NULL);
-    assert(strcmp(buffer, "Can not find a format associated with the \"\" extension.") == 0);
-    assert(last_level == CHFL_LOG_ERROR);
-    free(buffer);
+        remove(filename);
+        CHECK_STATUS(chfl_log_stderr());
+    }
 
-    remove("test.log");
+    SECTION("Callback") {
+        CHECK_STATUS(chfl_log_callback(callback));
 
-    assert(!chfl_log_stdout());
+        std::string message = generate_chemfiles_error();
 
-    assert(strcmp(chfl_last_error(), "") != 0);
-    assert(!chfl_clear_errors());
-    assert(strcmp(chfl_last_error(), "") == 0);
+        CHECK(buffer == message);
+        CHECK(last_level == CHFL_LOG_ERROR);
+        free(buffer);
 
-    char* version = read_whole_file(SRCDIR "/VERSION");
-    assert(version != NULL);
-    // Remove the trailing \n
-    version[strlen(version) - 1] = 0;
+        CHECK_STATUS(chfl_log_stderr());
+    }
+}
 
-    assert(strstr(chfl_version(), version) != NULL);
+TEST_CASE("Version", "[CAPI]") {
+    std::ifstream file(SRCDIR "/VERSION");
+    REQUIRE(file.is_open());
+    std::stringstream content;
+    content << file.rdbuf();
+    file.close();
 
-    free(version);
-
-    return EXIT_SUCCESS;
+    // Remove trailling \n
+    std::string version = content.str().substr(0, content.str().length() - 1);
+    CHECK(chfl_version() == version);
 }

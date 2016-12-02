@@ -1,63 +1,97 @@
-// Force NDEBUG to be undefined
-#undef NDEBUG
-#include <assert.h>
-#include <math.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-
+#include "catch.hpp"
+#include "helpers.hpp"
 #include "chemfiles.h"
-#include "helpers.h"
 
-int main(void) {
-    silent_crash_handlers();
-    CHFL_ATOM* a = chfl_atom("He");
-    assert(a != NULL);
+TEST_CASE("Atom", "[CAPI]") {
+    SECTION("Name") {
+        CHFL_ATOM* atom = chfl_atom("He");
+        REQUIRE(atom != NULL);
 
-    double mass=0, charge=0;
-    assert(!chfl_atom_mass(a, &mass));
-    assert(fabs(mass - 4.002602) < 1e-6);
-    assert(!chfl_atom_charge(a, &charge));
-    assert(fabs(charge) < 1e-6);
+        char name[32];
+        CHECK_STATUS(chfl_atom_name(atom, name, sizeof(name)));
+        CHECK(name == std::string("He"));
 
-    char type[32];
-    assert(!chfl_atom_type(a, type, sizeof(type)));
-    assert(strcmp(type, "He") == 0);
+        CHECK_STATUS(chfl_atom_set_name(atom, "H5"));
+        CHECK_STATUS(chfl_atom_name(atom, name, sizeof(name)));
+        CHECK(name == std::string("H5"));
 
-    char name[32];
-    assert(!chfl_atom_name(a, name, sizeof(name)));
-    assert(strcmp(name, "He") == 0);
+        CHECK_STATUS(chfl_atom_free(atom));
+    }
 
-    assert(!chfl_atom_set_mass(a, 678));
-    assert(!chfl_atom_mass(a, &mass));
-    assert(fabs(mass - 678) < 1e-6);
+    SECTION("Type") {
+        CHFL_ATOM* atom = chfl_atom("He");
+        REQUIRE(atom != NULL);
 
-    assert(!chfl_atom_set_charge(a, -1.5));
-    assert(!chfl_atom_charge(a, &charge));
-    assert(fabs(charge + 1.5) < 1e-6);
+        char type[32];
+        CHECK_STATUS(chfl_atom_type(atom, type, sizeof(type)));
+        CHECK(type == std::string("He"));
 
-    assert(!chfl_atom_set_type(a, "Zn"));
-    assert(!chfl_atom_type(a, type, sizeof(type)));
-    assert(strcmp(type, "Zn") == 0);
+        char name[32];
+        CHECK_STATUS(chfl_atom_full_name(atom, name, sizeof(name)));
+        CHECK(name == std::string("Helium"));
 
-    assert(!chfl_atom_set_name(a, "HB2"));
-    assert(!chfl_atom_name(a, name, sizeof(name)));
-    assert(strcmp(name, "HB2") == 0);
+        CHECK_STATUS(chfl_atom_set_type(atom, "Zn"));
+        CHECK_STATUS(chfl_atom_type(atom, type, sizeof(type)));
+        CHECK(type == std::string("Zn"));
 
-    assert(!chfl_atom_full_name(a, name, sizeof(name)));
-    assert(strcmp(name, "Zinc") == 0);
+        CHECK_STATUS(chfl_atom_full_name(atom, name, sizeof(name)));
+        CHECK(name == std::string("Zinc"));
 
-    double radius=0;
-    assert(!chfl_atom_vdw_radius(a, &radius));
-    assert(fabs(radius - 2.1) < 1e-6);
-    assert(!chfl_atom_covalent_radius(a, &radius));
-    assert(fabs(radius - 1.31) < 1e-6);
+        CHECK_STATUS(chfl_atom_free(atom));
+    }
 
-    int64_t number = 0;
-    assert(!chfl_atom_atomic_number(a, &number));
-    assert(number == 30);
+    SECTION("Mass") {
+        CHFL_ATOM* atom = chfl_atom("He");
+        REQUIRE(atom != NULL);
 
-    assert(!chfl_atom_free(a));
+        double mass = 0;
+        CHECK_STATUS(chfl_atom_mass(atom, &mass));
+        CHECK(mass == 4.002602);
 
-    return EXIT_SUCCESS;
+        CHECK_STATUS(chfl_atom_set_mass(atom, 678));
+        CHECK_STATUS(chfl_atom_mass(atom, &mass));
+        CHECK(mass == 678);
+
+        CHECK_STATUS(chfl_atom_free(atom));
+    }
+
+    SECTION("Charge") {
+        CHFL_ATOM* atom = chfl_atom("He");
+        REQUIRE(atom != NULL);
+
+        double charge = 0;
+        CHECK_STATUS(chfl_atom_charge(atom, &charge));
+        CHECK(charge == 0.0);
+
+        CHECK_STATUS(chfl_atom_set_charge(atom, -1.8));
+        CHECK_STATUS(chfl_atom_charge(atom, &charge));
+        CHECK(charge == -1.8);
+
+        CHECK_STATUS(chfl_atom_free(atom));
+    }
+
+    SECTION("Radius") {
+        CHFL_ATOM* atom = chfl_atom("Zn");
+        REQUIRE(atom != NULL);
+
+        double radius = 0;
+        CHECK_STATUS(chfl_atom_vdw_radius(atom, &radius));
+        CHECK(radius == 2.1);
+
+        CHECK_STATUS(chfl_atom_covalent_radius(atom, &radius));
+        CHECK(radius == 1.31);
+
+        CHECK_STATUS(chfl_atom_free(atom));
+    }
+
+    SECTION("Number") {
+        CHFL_ATOM* atom = chfl_atom("Zn");
+        REQUIRE(atom != NULL);
+
+        int64_t number = 0;
+        CHECK_STATUS(chfl_atom_atomic_number(atom, &number));
+        CHECK(number == 30);
+
+        CHECK_STATUS(chfl_atom_free(atom));
+    }
 }

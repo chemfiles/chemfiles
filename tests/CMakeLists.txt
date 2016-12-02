@@ -53,15 +53,13 @@ add_subdirectory(external)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${PROJECT_BINARY_DIR}/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/helpers)
-include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/catch)
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external)
 include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR}/external/boost/include)
-add_library(catch STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/catch/catch.cpp)
-add_library(helpers STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/helpers/helpers.cpp)
+add_library(test_helpers STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/helpers.cpp)
 
 function(chfl_test _name_ _file_)
     add_executable(${_name_} ${_file_})
-    target_link_libraries(${_name_} chemfiles boost_filesystem catch helpers)
+    target_link_libraries(${_name_} chemfiles boost_filesystem test_helpers)
     set_property(TARGET ${_name_} PROPERTY CXX_STANDARD 11)
     add_test(NAME ${_name_}
         COMMAND ${RUNNER_COMMAND} ./${_name_}

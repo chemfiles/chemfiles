@@ -1,13 +1,6 @@
-// Force NDEBUG to be undefined
-#undef NDEBUG
-#include <assert.h>
-#include <math.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-
+#include "catch.hpp"
+#include "helpers.hpp"
 #include "chemfiles.h"
-#include "helpers.h"
 
 static bool approx_eq(double A[3][3], double B[3][3]) {
     double eps = 1e-10;
@@ -17,72 +10,134 @@ static bool approx_eq(double A[3][3], double B[3][3]) {
         (fabs(A[2][0] - B[2][0]) < eps) && (fabs(A[2][1] - B[2][1]) < eps) && (fabs(A[2][2] - B[2][2]) < eps);
 }
 
-int main(void) {
-    silent_crash_handlers();
-    CHFL_CELL* cell = chfl_cell((chfl_vector_t){2, 3, 4});
-    assert(cell != NULL);
+TEST_CASE("Atom", "[CAPI]") {
+    SECTION("Constructors") {
+        chfl_vector_t lengths = {2, 3, 4};
+        CHFL_CELL* cell = chfl_cell(lengths);
+        REQUIRE(cell != NULL);
 
-    chfl_vector_t data = {0};
-    assert(!chfl_cell_lengths(cell, data));
-    assert(fabs(data[0] - 2) < 1e-10);
-    assert(fabs(data[1] - 3) < 1e-10);
-    assert(fabs(data[2] - 4) < 1e-10);
+        chfl_vector_t data = {0};
+        CHECK_STATUS(chfl_cell_lengths(cell, data));
+        CHECK(data[0] == 2);
+        CHECK(data[1] == 3);
+        CHECK(data[2] == 4);
 
-    assert(!chfl_cell_angles(cell, data));
-    assert(fabs(data[0] - 90) < 1e-10);
-    assert(fabs(data[1] - 90) < 1e-10);
-    assert(fabs(data[2] - 90) < 1e-10);
+        CHECK_STATUS(chfl_cell_angles(cell, data));
+        CHECK(data[0] == 90);
+        CHECK(data[1] == 90);
+        CHECK(data[2] == 90);
 
-    double volume = 0;
-    assert(!chfl_cell_volume(cell, &volume));
-    assert(fabs(volume - 2*3*4) < 1e-10);
+        CHECK_STATUS(chfl_cell_free(cell));
 
-    assert(!chfl_cell_set_lengths(cell, (chfl_vector_t){10, 20, 30}));
-    assert(!chfl_cell_lengths(cell, data));
-    assert(fabs(data[0] - 10) < 1e-10);
-    assert(fabs(data[1] - 20) < 1e-10);
-    assert(fabs(data[2] - 30) < 1e-10);
+        lengths[0] = 20; lengths[1] = 21; lengths[2] = 22;
+        chfl_vector_t angles = {90, 100, 120};
+        cell = chfl_cell_triclinic(lengths, angles);
+        REQUIRE(cell != NULL);
 
-    chfl_log_silent();
-    // This should be an error
-    assert(chfl_cell_set_angles(cell, (chfl_vector_t){80, 89, 100}));
-    chfl_log_stderr();
+        CHECK_STATUS(chfl_cell_lengths(cell, data));
+        CHECK(data[0] == 20);
+        CHECK(data[1] == 21);
+        CHECK(data[2] == 22);
 
-    chfl_vector_t expected[3] = {{10, 0, 0}, {0, 20, 0}, {0, 0, 30}};
-    chfl_vector_t matrix[3];
-    assert(!chfl_cell_matrix(cell, matrix));
-    assert(approx_eq(expected, matrix));
+        CHECK_STATUS(chfl_cell_angles(cell, data));
+        CHECK(data[0] == 90);
+        CHECK(data[1] == 100);
+        CHECK(data[2] == 120);
 
-    chfl_cell_shape_t type;
-    assert(!chfl_cell_shape(cell, &type));
-    assert(type == CHFL_CELL_ORTHORHOMBIC);
+        CHECK_STATUS(chfl_cell_free(cell));
+    }
 
-    assert(!chfl_cell_set_shape(cell, CHFL_CELL_TRICLINIC));
-    assert(!chfl_cell_shape(cell, &type));
-    assert(type == CHFL_CELL_TRICLINIC);
+    SECTION("Length") {
+        chfl_vector_t lengths = {2, 3, 4};
+        CHFL_CELL* cell = chfl_cell(lengths);
+        REQUIRE(cell != NULL);
 
-    assert(!chfl_cell_set_angles(cell, (chfl_vector_t){80, 89, 100}));
-    assert(!chfl_cell_angles(cell, data));
-    assert(fabs(data[0] - 80) < 1e-10);
-    assert(fabs(data[1] - 89) < 1e-10);
-    assert(fabs(data[2] - 100) < 1e-10);
+        chfl_vector_t data = {0};
+        CHECK_STATUS(chfl_cell_lengths(cell, data));
+        CHECK(data[0] == 2);
+        CHECK(data[1] == 3);
+        CHECK(data[2] == 4);
 
-    assert(!chfl_cell_free(cell));
-    cell = NULL;
-    cell = chfl_cell_triclinic((chfl_vector_t){20, 21, 22}, (chfl_vector_t){90, 100, 120});
-    assert(cell != NULL);
+        lengths[0] = 10; lengths[1] = 20; lengths[2] = 30;
+        CHECK_STATUS(chfl_cell_set_lengths(cell, lengths));
+        CHECK_STATUS(chfl_cell_lengths(cell, data));
+        CHECK(data[0] == 10);
+        CHECK(data[1] == 20);
+        CHECK(data[2] == 30);
 
-    assert(!chfl_cell_lengths(cell, data));
-    assert(fabs(data[0] - 20) < 1e-10);
-    assert(fabs(data[1] - 21) < 1e-10);
-    assert(fabs(data[2] - 22) < 1e-10);
+        CHECK_STATUS(chfl_cell_free(cell));
+    }
 
-    assert(!chfl_cell_angles(cell, data));
-    assert(fabs(data[0] - 90) < 1e-10);
-    assert(fabs(data[1] - 100) < 1e-10);
-    assert(fabs(data[2] - 120) < 1e-10);
+    SECTION("Angles") {
+        chfl_vector_t lengths = {2, 3, 4};
+        CHFL_CELL* cell = chfl_cell(lengths);
+        REQUIRE(cell != NULL);
 
-    assert(!chfl_cell_free(cell));
+        chfl_vector_t data = {0};
+        CHECK_STATUS(chfl_cell_angles(cell, data));
+        CHECK(data[0] == 90);
+        CHECK(data[1] == 90);
+        CHECK(data[2] == 90);
 
-    return EXIT_SUCCESS;
+        chfl_vector_t angles = {80, 89, 100};
+        chfl_log_silent();
+        // Setting an orthorhombic cell angles is an error
+        CHECK(chfl_cell_set_angles(cell, angles) != CHFL_SUCCESS);
+        chfl_log_stderr();
+
+        CHECK_STATUS(chfl_cell_set_shape(cell, CHFL_CELL_TRICLINIC));
+
+        CHECK_STATUS(chfl_cell_set_angles(cell, angles));
+        CHECK_STATUS(chfl_cell_angles(cell, data));
+        CHECK(data[0] == 80);
+        CHECK(data[1] == 89);
+        CHECK(data[2] == 100);
+
+        CHECK_STATUS(chfl_cell_free(cell));
+    }
+
+    SECTION("Volume") {
+        chfl_vector_t lengths = {2, 3, 4};
+        CHFL_CELL* cell = chfl_cell(lengths);
+        REQUIRE(cell != NULL);
+
+        double volume = 0;
+        CHECK_STATUS(chfl_cell_volume(cell, &volume));
+        CHECK(volume == 2 * 3 * 4);
+
+        CHECK_STATUS(chfl_cell_free(cell));
+    }
+
+    SECTION("Matrix") {
+        chfl_vector_t lengths = {10, 20, 30};
+        CHFL_CELL* cell = chfl_cell(lengths);
+        REQUIRE(cell != NULL);
+
+        chfl_vector_t expected[3] = {{10, 0, 0}, {0, 20, 0}, {0, 0, 30}};
+        chfl_vector_t matrix[3];
+        CHECK_STATUS(chfl_cell_matrix(cell, matrix));
+        CHECK(approx_eq(expected, matrix));
+
+        CHECK_STATUS(chfl_cell_free(cell));
+    }
+
+    SECTION("Shape") {
+        chfl_vector_t lengths = {2, 3, 4};
+        CHFL_CELL* cell = chfl_cell(lengths);
+        REQUIRE(cell != NULL);
+
+        chfl_cell_shape_t shape;
+        CHECK_STATUS(chfl_cell_shape(cell, &shape));
+        CHECK(shape == CHFL_CELL_ORTHORHOMBIC);
+
+        CHECK_STATUS(chfl_cell_set_shape(cell, CHFL_CELL_TRICLINIC));
+        CHECK_STATUS(chfl_cell_shape(cell, &shape));
+        CHECK(shape == CHFL_CELL_TRICLINIC);
+
+        CHECK_STATUS(chfl_cell_set_shape(cell, CHFL_CELL_INFINITE));
+        CHECK_STATUS(chfl_cell_shape(cell, &shape));
+        CHECK(shape == CHFL_CELL_INFINITE);
+
+        CHECK_STATUS(chfl_cell_free(cell));
+    }
 }

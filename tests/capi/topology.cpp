@@ -1,178 +1,208 @@
-// Force NDEBUG to be undefined
-#undef NDEBUG
-#include <assert.h>
-#include <math.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-
+#include "catch.hpp"
+#include "helpers.hpp"
 #include "chemfiles.h"
-#include "helpers.h"
 
-static void test_bonds(void);
-static void test_size(void);
-static void test_residues(void);
+static CHFL_TOPOLOGY* testing_topology();
 
-int main(void) {
-    silent_crash_handlers();
-    test_size();
-    test_bonds();
-    test_residues();
-    return EXIT_SUCCESS;
+TEST_CASE("Residue", "[CAPI]") {
+    SECTION("Size") {
+        CHFL_TOPOLOGY* topology = chfl_topology();
+        REQUIRE(topology != NULL);
+
+        uint64_t natoms = 100;
+        CHECK_STATUS(chfl_topology_atoms_count(topology, &natoms));
+        CHECK(natoms == 0);
+
+        CHECK_STATUS(chfl_topology_resize(topology, 42));
+        CHECK_STATUS(chfl_topology_atoms_count(topology, &natoms));
+        CHECK(natoms == 42);
+
+        CHECK_STATUS(chfl_topology_free(topology));
+    }
+
+    SECTION("Atoms") {
+        CHFL_TOPOLOGY* topology = testing_topology();
+        REQUIRE(topology != NULL);
+
+        uint64_t natoms = 0;
+        CHECK_STATUS(chfl_topology_atoms_count(topology, &natoms));
+        CHECK(natoms == 4);
+
+        CHECK_STATUS(chfl_topology_remove(topology, 3));
+        CHECK_STATUS(chfl_topology_atoms_count(topology, &natoms));
+        CHECK(natoms == 3);
+
+        CHFL_ATOM* atom = chfl_atom_from_topology(topology, 0);
+        REQUIRE(atom != NULL);
+
+        char name[32];
+        CHECK_STATUS(chfl_atom_type(atom, name, sizeof(name)));
+        CHECK(name == std::string("H"));
+        CHECK_STATUS(chfl_atom_free(atom));
+
+        // Out of bound access
+        atom = chfl_atom_from_topology(topology, 10000);
+        CHECK(atom == NULL);
+
+        CHECK_STATUS(chfl_topology_free(topology));
+    }
+
+    SECTION("Bonds") {
+        CHFL_TOPOLOGY* topology = testing_topology();
+        REQUIRE(topology != NULL);
+
+        uint64_t n = 0;
+        CHECK_STATUS(chfl_topology_bonds_count(topology, &n));
+        CHECK(n == 3);
+
+        bool isbond = false;
+        CHECK_STATUS(chfl_topology_isbond(topology, 0, 1, &isbond));
+        CHECK(isbond == true);
+        CHECK_STATUS(chfl_topology_isbond(topology, 0, 3, &isbond));
+        CHECK(isbond == false);
+
+        uint64_t expected[3][2] = {{0, 1}, {1, 2}, {2, 3}};
+        uint64_t bonds[3][2] = {{0}};
+        CHECK_STATUS(chfl_topology_bonds(topology, bonds, 3));
+        for (unsigned i=0; i<3; i++) {
+            for (unsigned j=0; j<2; j++) {
+                CHECK(bonds[i][j] == expected[i][j]);
+            }
+        }
+
+        CHECK_STATUS(chfl_topology_remove_bond(topology, 2, 3));
+        CHECK_STATUS(chfl_topology_bonds_count(topology, &n));
+        CHECK(n == 2);
+
+        CHECK_STATUS(chfl_topology_free(topology));
+    }
+
+    SECTION("Angles") {
+        CHFL_TOPOLOGY* topology = testing_topology();
+        REQUIRE(topology != NULL);
+
+        uint64_t n = 0;
+        CHECK_STATUS(chfl_topology_angles_count(topology, &n));
+        CHECK(n == 2);
+
+        bool isangle = false;
+        CHECK_STATUS(chfl_topology_isangle(topology, 0, 1, 2, &isangle));
+        CHECK(isangle == true);
+        CHECK_STATUS(chfl_topology_isangle(topology, 0, 1, 3, &isangle));
+        CHECK(isangle == false);
+
+        uint64_t expected[2][3] = {{0, 1, 2}, {1, 2, 3}};
+        uint64_t angles[2][3] = {{0}};
+        CHECK_STATUS(chfl_topology_angles(topology, angles, 2));
+        for (unsigned i=0; i<2; i++) {
+            for (unsigned j=0; j<3; j++) {
+                CHECK(angles[i][j] == expected[i][j]);
+            }
+        }
+
+        CHECK_STATUS(chfl_topology_remove_bond(topology, 2, 3));
+        CHECK_STATUS(chfl_topology_angles_count(topology, &n));
+        CHECK(n == 1);
+
+        CHECK_STATUS(chfl_topology_free(topology));
+    }
+
+    SECTION("Dihedrals") {
+        CHFL_TOPOLOGY* topology = testing_topology();
+        REQUIRE(topology != NULL);
+
+        uint64_t n = 0;
+        CHECK_STATUS(chfl_topology_dihedrals_count(topology, &n));
+        CHECK(n == 1);
+
+        bool isdihedral = false;
+        CHECK_STATUS(chfl_topology_isdihedral(topology, 0, 1, 2, 3, &isdihedral));
+        CHECK(isdihedral == true);
+        CHECK_STATUS(chfl_topology_isdihedral(topology, 0, 1, 3, 2, &isdihedral));
+        CHECK(isdihedral == false);
+
+        uint64_t expected[1][4] = {{0, 1, 2, 3}};
+        uint64_t dihedrals[1][4] = {{0}};
+        CHECK_STATUS(chfl_topology_dihedrals(topology, dihedrals, 1));
+        for (unsigned j=0; j<4; j++) {
+            CHECK(dihedrals[0][j] == expected[0][j]);
+        }
+
+        CHECK_STATUS(chfl_topology_remove_bond(topology, 2, 3));
+        CHECK_STATUS(chfl_topology_dihedrals_count(topology, &n));
+        CHECK(n == 0);
+
+        CHECK_STATUS(chfl_topology_free(topology));
+    }
+
+    SECTION("Residues") {
+        CHFL_TOPOLOGY* topology = chfl_topology();
+        REQUIRE(topology != NULL);
+
+        CHFL_ATOM* atom = chfl_atom("X");
+        for (uint64_t i=0; i<10; i++) {
+            CHECK_STATUS(chfl_topology_append(topology, atom));
+        }
+        CHECK_STATUS(chfl_atom_free(atom));
+
+        uint64_t residues[3][3] = {{2, 3, 6}, {0, 1, 9}, {4, 5, 8}};
+        for (uint64_t i=0; i<3; i++) {
+            CHFL_RESIDUE* residue = chfl_residue("X", 0);
+            REQUIRE(residue != NULL);
+            for (uint64_t j=0; j<3; j++) {
+                CHECK_STATUS(chfl_residue_add_atom(residue, residues[i][j]));
+            }
+
+            CHECK_STATUS(chfl_topology_add_residue(topology, residue));
+            CHECK_STATUS(chfl_residue_free(residue));
+        }
+
+        uint64_t count = 0;
+        CHECK_STATUS(chfl_topology_residues_count(topology, &count));
+        CHECK(count == 3);
+
+        CHFL_RESIDUE* first = chfl_residue_for_atom(topology, 2);
+        CHFL_RESIDUE* second = chfl_residue_for_atom(topology, 0);
+        REQUIRE(first != NULL);
+        REQUIRE(second != NULL);
+
+        CHFL_RESIDUE* out_of_bounds = chfl_residue_for_atom(topology, 7);
+        CHECK(out_of_bounds == NULL);
+
+        bool linked = true;
+        CHECK_STATUS(chfl_topology_are_linked(topology, first, second, &linked));
+        CHECK(linked == false);
+
+        CHECK_STATUS(chfl_topology_add_bond(topology, 6, 9));
+        CHECK_STATUS(chfl_topology_are_linked(topology, first, second, &linked));
+        CHECK(linked == true);
+
+        CHECK_STATUS(chfl_residue_free(first));
+        CHECK_STATUS(chfl_residue_free(second));
+        CHECK_STATUS(chfl_topology_free(topology));
+    }
 }
 
-static void test_bonds(void) {
+static CHFL_TOPOLOGY* testing_topology() {
     CHFL_TOPOLOGY* topology = chfl_topology();
-    assert(topology != NULL);
+    REQUIRE(topology != NULL);
 
-    uint64_t natoms=100, n=0;
-    assert(!chfl_topology_atoms_count(topology, &natoms));
-    assert(natoms == 0);
-
-    // Creating some H2O2
     CHFL_ATOM* O = chfl_atom("O");
     CHFL_ATOM* H = chfl_atom("H");
-    assert(!chfl_topology_append(topology, H));
-    assert(!chfl_topology_append(topology, O));
-    assert(!chfl_topology_append(topology, O));
-    assert(!chfl_topology_append(topology, H));
-    assert(!chfl_topology_atoms_count(topology, &natoms));
-    assert(natoms == 4);
-    assert(!chfl_atom_free(O));
-    assert(!chfl_atom_free(H));
+    REQUIRE(O != NULL);
+    REQUIRE(H != NULL);
 
-    assert(!chfl_topology_bonds_count(topology, &n));
-    assert(n == 0);
-    assert(!chfl_topology_angles_count(topology, &n));
-    assert(n == 0);
-    assert(!chfl_topology_dihedrals_count(topology, &n));
-    assert(n == 0);
+    CHECK_STATUS(chfl_topology_append(topology, H));
+    CHECK_STATUS(chfl_topology_append(topology, O));
+    CHECK_STATUS(chfl_topology_append(topology, O));
+    CHECK_STATUS(chfl_topology_append(topology, H));
 
-    assert(!chfl_topology_add_bond(topology, 0, 1));
-    assert(!chfl_topology_add_bond(topology, 1, 2));
-    assert(!chfl_topology_add_bond(topology, 2, 3));
+    CHECK_STATUS(chfl_atom_free(O));
+    CHECK_STATUS(chfl_atom_free(H));
 
-    assert(!chfl_topology_bonds_count(topology, &n));
-    assert(n == 3);
-    assert(!chfl_topology_angles_count(topology, &n));
-    assert(n == 2);
-    assert(!chfl_topology_dihedrals_count(topology, &n));
-    assert(n == 1);
+    CHECK_STATUS(chfl_topology_add_bond(topology, 0, 1));
+    CHECK_STATUS(chfl_topology_add_bond(topology, 1, 2));
+    CHECK_STATUS(chfl_topology_add_bond(topology, 2, 3));
 
-    bool res = false;
-    assert(!chfl_topology_isbond(topology, 0, 1, &res));
-    assert(res == true);
-    assert(!chfl_topology_isbond(topology, 0, 3, &res));
-    assert(res == false);
-
-    assert(!chfl_topology_isangle(topology, 0, 1, 2, &res));
-    assert(res == true);
-    assert(!chfl_topology_isangle(topology, 0, 1, 3, &res));
-    assert(res == false);
-
-    assert(!chfl_topology_isdihedral(topology, 0, 1, 2, 3, &res));
-    assert(res == true);
-    assert(!chfl_topology_isdihedral(topology, 0, 1, 3, 2, &res));
-    assert(res == false);
-
-    uint64_t top_bonds[3][2] = {{0, 1}, {1, 2}, {2, 3}};
-    uint64_t bonds[3][2] = {{0}};
-    assert(!chfl_topology_bonds(topology, bonds, 3));
-    for (unsigned i=0; i<3; i++) {
-        for (unsigned j=0; j<2; j++) {
-            assert(bonds[i][j] == top_bonds[i][j]);
-        }
-    }
-
-    uint64_t top_angles[2][3] = {{0, 1, 2}, {1, 2, 3}};
-    uint64_t angles[2][3] = {{0}};
-    assert(!chfl_topology_angles(topology, angles, 2));
-    for (unsigned i=0; i<2; i++) {
-        for (unsigned j=0; j<3; j++) {
-            assert(angles[i][j] == top_angles[i][j]);
-        }
-    }
-
-    uint64_t top_dihedrals[1][4] = {{0, 1, 2, 3}};
-    uint64_t dihedrals[1][4] = {{0}};
-    assert(!chfl_topology_dihedrals(topology, dihedrals, 1));
-    for (unsigned j=0; j<4; j++) {
-        assert(dihedrals[0][j] == top_dihedrals[0][j]);
-    }
-
-    assert(!chfl_topology_remove_bond(topology, 2, 3));
-    assert(!chfl_topology_bonds_count(topology, &n));
-    assert(n == 2);
-    assert(!chfl_topology_angles_count(topology, &n));
-    assert(n == 1);
-    assert(!chfl_topology_dihedrals_count(topology, &n));
-    assert(n == 0);
-
-    assert(!chfl_topology_remove(topology, 3));
-    assert(!chfl_topology_atoms_count(topology, &natoms));
-    assert(natoms == 3);
-
-    assert(!chfl_topology_free(topology));
-}
-
-static void test_size(void) {
-    CHFL_TOPOLOGY* topology = chfl_topology();
-    assert(topology != NULL);
-
-    uint64_t natoms = 100;
-    assert(!chfl_topology_atoms_count(topology, &natoms));
-    assert(natoms == 0);
-
-    assert(!chfl_topology_resize(topology, 42));
-    assert(!chfl_topology_atoms_count(topology, &natoms));
-    assert(natoms == 42);
-
-    assert(!chfl_topology_free(topology));
-}
-
-static void test_residues(void) {
-    CHFL_TOPOLOGY* topology = chfl_topology();
-    assert(topology != NULL);
-
-    CHFL_ATOM* atom = chfl_atom("X");
-    for (uint64_t i=0; i<10; i++) {
-        assert(!chfl_topology_append(topology, atom));
-    }
-    chfl_atom_free(atom);
-
-    uint64_t residues[3][3] = {{2, 3, 6}, {0, 1, 9}, {4, 5, 8}};
-    for (uint64_t i=0; i<3; i++) {
-        CHFL_RESIDUE* residue = chfl_residue("X", (uint64_t)-1);
-        assert(residue != NULL);
-        for (uint64_t j=0; j<3; j++) {
-            assert(!chfl_residue_add_atom(residue, residues[i][j]));
-        }
-
-        assert(!chfl_topology_add_residue(topology, residue));
-        chfl_residue_free(residue);
-    }
-
-    uint64_t count = 0;
-    assert(!chfl_topology_residues_count(topology, &count));
-    assert(count == 3);
-
-    CHFL_RESIDUE* residue_1 = chfl_residue_for_atom(topology, 2);
-    CHFL_RESIDUE* residue_2 = chfl_residue_for_atom(topology, 0);
-    assert(residue_1 != NULL);
-    assert(residue_2 != NULL);
-
-    CHFL_RESIDUE* residue_3 = chfl_residue_for_atom(topology, 7);
-    assert(residue_3 == NULL);
-
-    bool result = true;
-    assert(!chfl_topology_are_linked(topology, residue_1, residue_2, &result));
-    assert(result == false);
-
-    assert(!chfl_topology_add_bond(topology, 6, 9));
-    assert(!chfl_topology_are_linked(topology, residue_1, residue_2, &result));
-    assert(result == true);
-
-    assert(!chfl_residue_free(residue_1));
-    assert(!chfl_residue_free(residue_2));
-    assert(!chfl_topology_free(topology));
+    return topology;
 }

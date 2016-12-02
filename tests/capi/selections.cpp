@@ -1,129 +1,128 @@
-// Force NDEBUG to be undefined
-#undef NDEBUG
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include "catch.hpp"
+#include "helpers.hpp"
 #include "chemfiles.h"
-#include "helpers.h"
 
 static CHFL_FRAME* testing_frame(void);
 static bool find_match(const chfl_match_t* matches, uint64_t n_matches, chfl_match_t match);
 
-int main(void) {
-    silent_crash_handlers();
-    CHFL_FRAME* frame = testing_frame();
-    CHFL_SELECTION* selection = chfl_selection("name O");
+TEST_CASE("Selections", "[CAPI]") {
+    SECTION("Selection string") {
+        CHFL_SELECTION* selection = chfl_selection("name O");
+        REQUIRE(selection != NULL);
 
-    assert(frame != NULL);
-    assert(selection != NULL);
+        char buffer[32] = {0};
+        CHECK_STATUS(chfl_selection_string(selection, buffer, sizeof(buffer)));
+        CHECK(buffer == std::string("name O"));
 
-    uint64_t size = 0;
-    assert(!chfl_selection_size(selection, &size));
-    assert(size == 1);
+        CHECK_STATUS(chfl_selection_free(selection));
 
-    char buffer[30] = {0};
-    assert(!chfl_selection_string(selection, buffer, 30));
-    assert(strcmp(buffer, "name O") == 0);
+        selection = chfl_selection("angles: all");
+        REQUIRE(selection != NULL);
 
-    uint64_t n_matches = 0;
-    assert(!chfl_selection_evalutate(selection, frame, &n_matches));
-    assert(n_matches == 2);
+        CHECK_STATUS(chfl_selection_string(selection, buffer, sizeof(buffer)));
+        CHECK(buffer == std::string("angles: all"));
 
-    chfl_match_t* matches = (chfl_match_t*)malloc((size_t)n_matches * sizeof(chfl_match_t));
-    assert(matches);
-    assert(!chfl_selection_matches(selection, matches, n_matches));
-    assert(matches[0].size == 1);
-    assert(matches[1].size == 1);
-    assert(matches[0].atoms[0] == 1);
-    assert(matches[1].atoms[0] == 2);
+        CHECK_STATUS(chfl_selection_free(selection));
+    }
 
-    // Check "out of bound" values
-    assert(matches[1].atoms[3] == (uint64_t)-1);
+    SECTION("Size") {
+        CHFL_SELECTION* selection = chfl_selection("name O");
+        REQUIRE(selection != NULL);
 
-    free(matches);
-    assert(!chfl_selection_free(selection));
-    selection = NULL;
-    selection = chfl_selection("not index <= 2");
-    assert(selection != NULL);
+        uint64_t size = 0;
+        CHECK_STATUS(chfl_selection_size(selection, &size));
+        CHECK(size == 1);
 
-    assert(!chfl_selection_size(selection, &size));
-    assert(size == 1);
+        CHECK_STATUS(chfl_selection_free(selection));
 
-    assert(!chfl_selection_string(selection, buffer, 30));
-    assert(strcmp(buffer, "not index <= 2") == 0);
+        selection = chfl_selection("angles: all");
+        REQUIRE(selection != NULL);
 
-    assert(!chfl_selection_evalutate(selection, frame, &n_matches));
-    assert(n_matches == 1);
+        CHECK_STATUS(chfl_selection_size(selection, &size));
+        CHECK(size == 3);
 
-    matches = (chfl_match_t*)malloc((size_t)n_matches * sizeof(chfl_match_t));
-    assert(matches);
-    assert(!chfl_selection_matches(selection, matches, n_matches));
-    assert(matches[0].atoms[0] == 3);
+        CHECK_STATUS(chfl_selection_free(selection));
+    }
 
-    free(matches);
-    assert(!chfl_selection_free(selection));
+    SECTION("Evaluate") {
+        CHFL_SELECTION* selection = chfl_selection("name O");
+        REQUIRE(selection != NULL);
 
-    selection = NULL;
-    selection = chfl_selection("angles: all");
-    assert(selection != NULL);
+        CHFL_FRAME* frame = testing_frame();
+        REQUIRE(frame != NULL);
 
-    assert(!chfl_selection_size(selection, &size));
-    assert(size == 3);
+        uint64_t matches_count = 0;
+        CHECK_STATUS(chfl_selection_evalutate(selection, frame, &matches_count));
+        CHECK(matches_count == 2);
 
-    assert(!chfl_selection_string(selection, buffer, 30));
-    assert(strcmp(buffer, "angles: all") == 0);
+        chfl_match_t* matches = new chfl_match_t[matches_count];
 
-    assert(!chfl_selection_evalutate(selection, frame, &n_matches));
-    assert(n_matches == 2);
+        REQUIRE(matches != 0);
+        CHECK_STATUS(chfl_selection_matches(selection, matches, matches_count));
+        CHECK(matches[0].size == 1);
+        CHECK(matches[1].size == 1);
+        CHECK(matches[0].atoms[0] == 1);
+        CHECK(matches[1].atoms[0] == 2);
 
-    matches = (chfl_match_t*)malloc((size_t)n_matches * sizeof(chfl_match_t));
-    assert(matches);
-    assert(!chfl_selection_matches(selection, matches, n_matches));
-    assert(matches[0].size == 3);
-    assert(matches[1].size == 3);
-    chfl_match_t match_1 = {.size=3, .atoms={0, 1, 2, (uint64_t)-1}};
-    assert(find_match(matches, n_matches, match_1));
-    chfl_match_t match_2 = {.size=3, .atoms={1, 2, 3, (uint64_t)-1}};
-    assert(find_match(matches, n_matches, match_2));
+        // Check "out of bound" values
+        CHECK(matches[1].atoms[3] == static_cast<uint64_t>(-1));
+        delete[] matches;
 
-    free(matches);
-    assert(!chfl_selection_free(selection));
+        CHECK_STATUS(chfl_selection_free(selection));
 
-    assert(!chfl_frame_free(frame));
-    return EXIT_SUCCESS;
+        selection = chfl_selection("angles: all");
+        REQUIRE(selection != NULL);
+
+        CHECK_STATUS(chfl_selection_evalutate(selection, frame, &matches_count));
+        CHECK(matches_count == 2);
+
+        matches = new chfl_match_t[matches_count];
+        REQUIRE(matches != NULL);
+
+        CHECK_STATUS(chfl_selection_matches(selection, matches, matches_count));
+        CHECK(matches[0].size == 3);
+        CHECK(matches[1].size == 3);
+        chfl_match_t match_1 = {3, {0, 1, 2, static_cast<uint64_t>(-1)}};
+        CHECK(find_match(matches, matches_count, match_1));
+        chfl_match_t match_2 = {3, {1, 2, 3, static_cast<uint64_t>(-1)}};
+        CHECK(find_match(matches, matches_count, match_2));
+        delete[] matches;
+
+        CHECK_STATUS(chfl_selection_free(selection));
+        CHECK_STATUS(chfl_frame_free(frame));
+    }
 }
 
 static CHFL_FRAME* testing_frame(void) {
     CHFL_TOPOLOGY* topology = chfl_topology();
     CHFL_ATOM* O = chfl_atom("O");
     CHFL_ATOM* H = chfl_atom("H");
-    assert(topology != NULL);
-    assert(H != NULL);
-    assert(O != NULL);
+    REQUIRE(topology != NULL);
+    REQUIRE(H != NULL);
+    REQUIRE(O != NULL);
 
-    assert(!chfl_topology_append(topology, H));
-    assert(!chfl_topology_append(topology, O));
-    assert(!chfl_topology_append(topology, O));
-    assert(!chfl_topology_append(topology, H));
-    assert(!chfl_atom_free(O));
-    assert(!chfl_atom_free(H));
+    CHECK_STATUS(chfl_topology_append(topology, H));
+    CHECK_STATUS(chfl_topology_append(topology, O));
+    CHECK_STATUS(chfl_topology_append(topology, O));
+    CHECK_STATUS(chfl_topology_append(topology, H));
+    CHECK_STATUS(chfl_atom_free(O));
+    CHECK_STATUS(chfl_atom_free(H));
 
-    assert(!chfl_topology_add_bond(topology, 0, 1));
-    assert(!chfl_topology_add_bond(topology, 1, 2));
-    assert(!chfl_topology_add_bond(topology, 2, 3));
+    CHECK_STATUS(chfl_topology_add_bond(topology, 0, 1));
+    CHECK_STATUS(chfl_topology_add_bond(topology, 1, 2));
+    CHECK_STATUS(chfl_topology_add_bond(topology, 2, 3));
 
     CHFL_FRAME* frame = chfl_frame(4);
-    assert(frame != NULL);
-    assert(!chfl_frame_set_topology(frame, topology));
-    assert(!chfl_topology_free(topology));
+    REQUIRE(frame != NULL);
+    CHECK_STATUS(chfl_frame_set_topology(frame, topology));
+    CHECK_STATUS(chfl_topology_free(topology));
     return frame;
 }
 
 static bool find_match(const chfl_match_t* matches, uint64_t n_matches, chfl_match_t match) {
-    assert(matches != NULL);
+    REQUIRE(matches != NULL);
     for (uint64_t i=0; i<n_matches; i++) {
-        assert(matches[i].size == match.size);
+        CHECK(matches[i].size == match.size);
         if (matches[i].atoms[0] == match.atoms[0] &&
             matches[i].atoms[1] == match.atoms[1] &&
             matches[i].atoms[2] == match.atoms[2] &&

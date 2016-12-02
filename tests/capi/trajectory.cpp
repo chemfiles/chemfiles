@@ -1,198 +1,271 @@
-// Force NDEBUG to be undefined
-#undef NDEBUG
-#include <assert.h>
-#include <math.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <fstream>
+#include <sstream>
 
+#include "catch.hpp"
+#include "helpers.hpp"
 #include "chemfiles.h"
-#include "helpers.h"
 
-static void test_read(void);
-static void test_write(void);
+static CHFL_FRAME* testing_frame();
 
-int main(void) {
-    silent_crash_handlers();
-    test_read();
-    test_write();
-    return EXIT_SUCCESS;
+TEST_CASE("Read trajectory", "[CAPI]") {
+    SECTION("Number of steps") {
+        CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
+        REQUIRE(trajectory != NULL);
+
+        uint64_t nsteps = 0;
+        CHECK_STATUS(chfl_trajectory_nsteps(trajectory, &nsteps));
+        CHECK(nsteps == 100);
+
+        CHECK_STATUS(chfl_trajectory_close(trajectory));
+    }
+
+    SECTION("Open with format") {
+        CHFL_TRAJECTORY* trajectory = chfl_trajectory_with_format("data/xyz/helium.xyz.but.not.really", 'r', "XYZ");
+        CHFL_FRAME* frame = chfl_frame(0);
+        REQUIRE(trajectory != NULL);
+        REQUIRE(frame != NULL);
+
+        CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
+
+        uint64_t natoms = 0;
+        CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
+        CHECK(natoms == 125);
+
+        CHECK_STATUS(chfl_frame_free(frame));
+        CHECK_STATUS(chfl_trajectory_close(trajectory));
+    }
+
+    SECTION("Read next step") {
+        CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
+        CHFL_FRAME* frame = chfl_frame(0);
+        REQUIRE(trajectory != NULL);
+        REQUIRE(frame != NULL);
+
+        CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
+
+        uint64_t natoms = 0;
+        CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
+        CHECK(natoms == 297);
+
+        chfl_vector_t* data = NULL;
+        // Check for the error when requesting non-existent velocities
+        CHECK(chfl_frame_velocities(frame, &data, &natoms) != CHFL_SUCCESS);
+
+        chfl_vector_t positions_0 = {0.417219, 8.303366, 11.737172};
+        chfl_vector_t positions_124 = {5.099554, -0.045104, 14.153846};
+
+        // Check positions in the first frame
+        CHECK_STATUS(chfl_frame_positions(frame, &data, &natoms));
+        CHECK(natoms == 297);
+        for (unsigned i=0; i<3; i++){
+            CHECK(data[0][i] == positions_0[i]);
+            CHECK(data[124][i] == positions_124[i]);
+        }
+
+        CHECK_STATUS(chfl_frame_free(frame));
+        CHECK_STATUS(chfl_trajectory_close(trajectory));
+    }
+
+    SECTION("Read specific step") {
+        CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
+        CHFL_FRAME* frame = chfl_frame(0);
+        REQUIRE(trajectory != NULL);
+        REQUIRE(frame != NULL);
+
+        CHECK_STATUS(chfl_trajectory_read_step(trajectory, 41, frame));
+
+        uint64_t natoms = 0;
+        CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
+        CHECK(natoms == 297);
+
+        chfl_vector_t positions_0 = {0.761277, 8.106125, 10.622949};
+        chfl_vector_t positions_124 = {5.13242, 0.079862, 14.194161};
+
+        chfl_vector_t* positions = NULL;
+        CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
+        CHECK(natoms == 297);
+        for (unsigned i=0; i<3; i++){
+            CHECK(positions[0][i] == positions_0[i]);
+            CHECK(positions[124][i] == positions_124[i]);
+        }
+
+        CHECK_STATUS(chfl_frame_free(frame));
+        CHECK_STATUS(chfl_trajectory_close(trajectory));
+    }
+
+    SECTION("Get topology") {
+        CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
+        CHFL_FRAME* frame = chfl_frame(0);
+        REQUIRE(trajectory != NULL);
+        REQUIRE(frame != NULL);
+
+        CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
+
+        CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
+        REQUIRE(topology != NULL);
+
+        uint64_t natoms = 0;
+        CHECK_STATUS(chfl_topology_atoms_count(topology, &natoms));
+        CHECK(natoms == 297);
+
+        uint64_t n = 10;
+        CHECK_STATUS(chfl_topology_bonds_count(topology, &n));
+        CHECK(n == 0);
+
+        CHFL_ATOM* atom = chfl_atom_from_topology(topology, 0);
+        REQUIRE(atom != NULL);
+
+        char name[32];
+        CHECK_STATUS(chfl_atom_name(atom, name, sizeof(name)));
+        CHECK(name == std::string("O"));
+
+        CHECK_STATUS(chfl_atom_free(atom));
+        CHECK_STATUS(chfl_topology_free(topology));
+        CHECK_STATUS(chfl_frame_free(frame));
+        CHECK_STATUS(chfl_trajectory_close(trajectory));
+    }
+
+    SECTION("Set cell") {
+        CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
+        REQUIRE(trajectory != NULL);
+
+        chfl_vector_t lengths = {30, 30, 30};
+        CHFL_CELL* cell = chfl_cell(lengths);
+        CHECK_STATUS(chfl_trajectory_set_cell(trajectory, cell));
+        CHECK_STATUS(chfl_cell_free(cell));
+
+        CHFL_FRAME* frame = chfl_frame(0);
+        REQUIRE(frame != NULL);
+
+        CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
+        cell = chfl_cell_from_frame(frame);
+        REQUIRE(cell != NULL);
+
+        chfl_vector_t data = {0};
+        CHECK_STATUS(chfl_cell_lengths(cell, data));
+        CHECK(data[0] == 30.0);
+        CHECK(data[1] == 30.0);
+        CHECK(data[2] == 30.0);
+
+        CHECK_STATUS(chfl_cell_free(cell));
+        CHECK_STATUS(chfl_frame_free(frame));
+        CHECK_STATUS(chfl_trajectory_close(trajectory));
+    }
+
+    SECTION("Set topology") {
+        CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/trajectory.xyz", 'r');
+        REQUIRE(trajectory != NULL);
+
+        CHFL_TOPOLOGY* topology = chfl_topology();
+        REQUIRE(topology != NULL);
+        CHFL_ATOM* atom = chfl_atom("Cs");
+        REQUIRE(atom != NULL);
+
+        for (size_t i=0; i<9; i++) {
+            CHECK_STATUS(chfl_topology_append(topology, atom));
+        }
+
+        CHECK_STATUS(chfl_trajectory_set_topology(trajectory, topology));
+
+        CHECK_STATUS(chfl_atom_free(atom));
+        CHECK_STATUS(chfl_topology_free(topology));
+
+        CHFL_FRAME* frame = chfl_frame(0);
+        REQUIRE(frame != NULL);
+        CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
+
+        atom = chfl_atom_from_frame(frame, 1);
+        char name[32];
+        CHECK_STATUS(chfl_atom_name(atom, name, sizeof(name)));
+        CHECK(name == std::string("Cs"));
+
+        CHECK_STATUS(chfl_atom_free(atom));
+        CHECK_STATUS(chfl_frame_free(frame));
+        CHECK_STATUS(chfl_trajectory_close(trajectory));
+    }
+
+    SECTION("Set topology from file") {
+        CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/trajectory.xyz", 'r');
+        REQUIRE(trajectory != NULL);
+
+        CHECK_STATUS(chfl_trajectory_set_topology_file(trajectory, "data/xyz/topology.xyz"));
+
+        CHFL_FRAME* frame = chfl_frame(0);
+        REQUIRE(frame != NULL);
+        CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
+
+        CHFL_ATOM* atom = chfl_atom_from_frame(frame, 0);
+        char name[32];
+        CHECK_STATUS(chfl_atom_name(atom, name, sizeof(name)));
+        CHECK(name == std::string("Zn"));
+        CHECK_STATUS(chfl_atom_free(atom));
+
+        CHECK_STATUS(chfl_trajectory_set_topology_with_format(trajectory, "data/xyz/topology.xyz.topology", "XYZ"));
+        CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
+
+        atom = chfl_atom_from_frame(frame, 0);
+        CHECK_STATUS(chfl_atom_name(atom, name, sizeof(name)));
+        CHECK(name == std::string("Zn"));
+        CHECK_STATUS(chfl_atom_free(atom));
+
+        CHECK_STATUS(chfl_frame_free(frame));
+        CHECK_STATUS(chfl_trajectory_close(trajectory));
+    }
 }
 
-/******************************************************************************/
+TEST_CASE("Write trajectory", "[CAPI]") {
+    const char* filename = "test-tmp.xyz";
+    const char* EXPECTED_CONTENT =
+    "4\n"
+    "Written by the chemfiles library\n"
+    "He 1 2 3\n"
+    "He 1 2 3\n"
+    "He 1 2 3\n"
+    "He 1 2 3\n";
 
-static void test_read(void) {
-    CHFL_FRAME* frame = chfl_frame(0);
-    CHFL_TRAJECTORY* file = chfl_trajectory_open("data/xyz/water.xyz", 'r');
-    assert(frame != NULL);
-    assert(file != NULL);
+    CHFL_TRAJECTORY* trajectory = chfl_trajectory_open(filename, 'w');
+    REQUIRE(trajectory != NULL);
 
-    uint64_t nsteps = 0;
-    assert(!chfl_trajectory_nsteps(file, &nsteps));
-    assert(nsteps == 100);
+    CHFL_FRAME* frame = testing_frame();
+    REQUIRE(frame != NULL);
 
-    // Read the first frame
-    assert(!chfl_trajectory_read(file, frame));
+    CHECK_STATUS(chfl_trajectory_write(trajectory, frame));
 
-    uint64_t natoms = 0;
-    assert(!chfl_frame_atoms_count(frame, &natoms));
-    assert(natoms == 297);
+    CHECK_STATUS(chfl_frame_free(frame));
+    CHECK_STATUS(chfl_trajectory_close(trajectory));
 
-    chfl_vector_t positions_0 = {0.417219, 8.303366, 11.737172};
-    chfl_vector_t positions_124 = {5.099554, -0.045104, 14.153846};
-    chfl_vector_t* positions = NULL;
+    std::ifstream file(filename);
+    REQUIRE(file.is_open());
+    std::stringstream content;
+    content << file.rdbuf();
+    file.close();
 
-    // Check for the error when requesting non-existent velocities
-    assert(chfl_frame_velocities(frame, &positions, &natoms) != CHFL_SUCCESS);
+    CHECK(content.str() == EXPECTED_CONTENT);
 
-    // Check positions in the first frame
-    assert(!chfl_frame_positions(frame, &positions, &natoms));
-    assert(natoms == 297);
-    for (unsigned i=0; i<3; i++){
-        assert(positions[0][i] == positions_0[i]);
-        assert(positions[124][i] == positions_124[i]);
-    }
-
-    // Check topology in the first frame
-    CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
-    assert(!chfl_topology_atoms_count(topology, &natoms));
-    assert(natoms == 297);
-    uint64_t n = 0;
-    assert(!chfl_topology_bonds_count(topology, &n));
-    assert(n == 0);
-
-    CHFL_ATOM* atom = chfl_atom_from_topology(topology, 0);
-    char type[32];
-    assert(!chfl_atom_type(atom, type, sizeof(type)));
-    assert(strcmp(type, "O") == 0);
-    assert(!chfl_atom_free(atom));
-    assert(!chfl_topology_free(topology));
-
-    // Set the cell associated with a trajectory
-    CHFL_CELL* cell = chfl_cell((chfl_vector_t){30, 30, 30});
-    assert(!chfl_trajectory_set_cell(file, cell));
-    assert(!chfl_cell_free(cell));
-
-    // Check reading a specific step
-    assert(!chfl_trajectory_read_step(file, 41, frame));
-
-    // Check that the cell was set
-    cell = chfl_cell_from_frame(frame);
-    chfl_vector_t lengths = {0};
-    assert(!chfl_cell_lengths(cell, lengths));
-    assert(lengths[0] == 30.0);
-    assert(lengths[1] == 30.0);
-    assert(lengths[2] == 30.0);
-    assert(!chfl_cell_free(cell));
-
-    positions_0[0] = 0.761277;  positions_0[1] = 8.106125;   positions_0[2] = 10.622949;
-    positions_124[0] = 5.13242; positions_124[1] = 0.079862; positions_124[2] = 14.194161;
-
-    assert(!chfl_frame_positions(frame, &positions, &natoms));
-    assert(natoms == 297);
-    for (unsigned i=0; i<3; i++){
-        assert(positions[0][i] == positions_0[i]);
-        assert(positions[124][i] == positions_124[i]);
-    }
-
-
-    // Get the atom from a frame
-    atom = chfl_atom_from_frame(frame, 1);
-    assert(!chfl_atom_type(atom, type, sizeof(type)));
-    assert(strcmp(type, "H") == 0);
-    assert(!chfl_atom_free(atom));
-
-    // Guess the system topology
-    assert(!chfl_frame_guess_topology(frame));
-    topology = chfl_topology_from_frame(frame);
-    assert(!chfl_topology_bonds_count(topology, &n));
-    assert(n == 181);
-    assert(!chfl_topology_angles_count(topology, &n));
-    assert(n == 87);
-    assert(!chfl_topology_free(topology));
-
-    // Set the topology associated with a trajectory by hand
-    topology = chfl_topology();
-    atom = chfl_atom("Cs");
-    for (unsigned i=0; i<297; i++) {
-        assert(!chfl_topology_append(topology, atom));
-    }
-    assert(!chfl_atom_free(atom));
-
-    assert(!chfl_trajectory_set_topology(file, topology));
-    assert(!chfl_topology_free(topology));
-
-    assert(!chfl_trajectory_read_step(file, 10, frame));
-
-    atom = chfl_atom_from_frame(frame, 1);
-    assert(!chfl_atom_type(atom, type, sizeof(type)));
-    assert(strcmp(type, "Cs") == 0);
-    assert(!chfl_atom_free(atom));
-
-    assert(!chfl_trajectory_close(file));
-    file = chfl_trajectory_open("data/xyz/trajectory.xyz", 'r');
-
-    // Set the topology associated with a trajectory from a file
-    assert(!chfl_trajectory_set_topology_with_format(file, "data/xyz/topology.xyz.topology", "XYZ"));
-    assert(!chfl_trajectory_read(file, frame));
-    atom = chfl_atom_from_frame(frame, 0);
-    assert(!chfl_atom_type(atom, type, sizeof(type)));
-    assert(strcmp(type, "Zn") == 0);
-    assert(!chfl_atom_free(atom));
-
-    assert(!chfl_trajectory_set_topology_file(file, "data/xyz/topology.xyz"));
-    assert(!chfl_trajectory_read(file, frame));
-    atom = chfl_atom_from_frame(frame, 0);
-    assert(!chfl_atom_type(atom, type, sizeof(type)));
-    assert(strcmp(type, "Zn") == 0);
-    assert(!chfl_atom_free(atom));
-
-    assert(!chfl_trajectory_close(file));
-
-    file = chfl_trajectory_with_format("data/xyz/helium.xyz.but.not.really", 'r', "XYZ");
-    assert(!chfl_trajectory_read(file, frame));
-    assert(!chfl_frame_atoms_count(frame, &natoms));
-    assert(natoms == 125);
-
-    assert(!chfl_frame_free(frame));
-    assert(!chfl_trajectory_close(file));
+    remove(filename);
 }
 
-/******************************************************************************/
-
-static const char* expected_content =
-"4\n"
-"Written by the chemfiles library\n"
-"He 1 2 3\n"
-"He 1 2 3\n"
-"He 1 2 3\n"
-"He 1 2 3\n"
-"6\n"
-"Written by the chemfiles library\n"
-"He 4 5 6\n"
-"He 4 5 6\n"
-"He 4 5 6\n"
-"He 4 5 6\n"
-"He 4 5 6\n"
-"He 4 5 6\n";
-
-
-static void test_write(void) {
-    CHFL_TOPOLOGY* top = chfl_topology();
+static CHFL_FRAME* testing_frame() {
+    CHFL_TOPOLOGY* topology = chfl_topology();
     CHFL_ATOM* atom = chfl_atom("He");
-    assert(top != NULL);
-    assert(atom != NULL);
+    REQUIRE(topology != NULL);
+    REQUIRE(atom != NULL);
 
-    for (unsigned i=0; i<4; i++)
-        assert(!chfl_topology_append(top, atom));
+    for (unsigned i=0; i<4; i++) {
+        CHECK_STATUS(chfl_topology_append(topology, atom));
+    }
+    CHECK_STATUS(chfl_atom_free(atom));
 
     CHFL_FRAME* frame = chfl_frame(4);
-    assert(frame != NULL);
+    REQUIRE(frame != NULL);
+
+    CHECK_STATUS(chfl_frame_set_topology(frame, topology));
+    CHECK_STATUS(chfl_topology_free(topology));
 
     chfl_vector_t* positions = NULL;
     uint64_t natoms = 0;
-    assert(!chfl_frame_positions(frame, &positions, &natoms));
-    assert(natoms == 4);
+    CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
+    CHECK(natoms == 4);
 
     for (unsigned i=0; i<4; i++) {
         for (unsigned j=0; j<3; j++) {
@@ -200,35 +273,5 @@ static void test_write(void) {
         }
     }
 
-    assert(!chfl_frame_set_topology(frame, top));
-
-    CHFL_TRAJECTORY* file = chfl_trajectory_open("test-tmp.xyz", 'w');
-    assert(file != NULL);
-    assert(!chfl_trajectory_write(file, frame));
-
-    assert(!chfl_frame_resize(frame, 6));
-    assert(!chfl_frame_positions(frame, &positions, &natoms));
-    assert(natoms == 6);
-    for (unsigned i=0; i<6; i++) {
-        for (unsigned j=0; j<3; j++) {
-            positions[i][j] = j + 4.0;
-        }
-    }
-    assert(!chfl_topology_append(top, atom));
-    assert(!chfl_topology_append(top, atom));
-
-    assert(!chfl_frame_set_topology(frame, top));
-
-    assert(!chfl_atom_free(atom));
-    assert(!chfl_topology_free(top));
-
-    assert(!chfl_trajectory_write(file, frame));
-    assert(!chfl_trajectory_close(file));
-    assert(!chfl_frame_free(frame));
-
-    char* content = read_whole_file("test-tmp.xyz");
-    assert(strcmp(content, expected_content) == 0);
-    free(content);
-
-    remove("test-tmp.xyz");
+    return frame;
 }

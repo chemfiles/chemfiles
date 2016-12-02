@@ -1,73 +1,97 @@
-// Force NDEBUG to be undefined
-#undef NDEBUG
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include "catch.hpp"
+#include "helpers.hpp"
 #include "chemfiles.h"
-#include "helpers.h"
 
-int main(void) {
-    silent_crash_handlers();
 
-    CHFL_RESIDUE* residue = chfl_residue("Foo", 56);
-    assert(residue != NULL);
+TEST_CASE("Residue", "[CAPI]") {
+    SECTION("Name") {
+        CHFL_RESIDUE* residue = chfl_residue("Foo", 0);
+        REQUIRE(residue != NULL);
 
-    char name[32] = {0};
-    assert(!chfl_residue_name(residue, name, 32));
-    assert(strcmp(name, "Foo") == 0);
+        char name[32] = {0};
+        CHECK_STATUS(chfl_residue_name(residue, name, sizeof(name)));
+        CHECK(name == std::string("Foo"));
 
-    uint64_t resid = 0;
-    assert(!chfl_residue_id(residue, &resid));
-    assert(resid == 56);
+        CHECK_STATUS(chfl_residue_free(residue));
+    }
 
-    uint64_t size = 10;
-    assert(!chfl_residue_atoms_count(residue, &size));
-    assert(size == 0);
+    SECTION("Id") {
+        CHFL_RESIDUE* residue = chfl_residue("", 5426);
+        REQUIRE(residue != NULL);
 
-    assert(!chfl_residue_add_atom(residue, 0));
-    assert(!chfl_residue_add_atom(residue, 1));
-    assert(!chfl_residue_add_atom(residue, 2));
+        uint64_t resid = 0;
+        CHECK_STATUS(chfl_residue_id(residue, &resid));
+        CHECK(resid == 5426);
 
-    assert(!chfl_residue_atoms_count(residue, &size));
-    assert(size == 3);
+        CHECK_STATUS(chfl_residue_free(residue));
+    }
 
-    bool contains = false;
-    assert(!chfl_residue_contains(residue, 1, &contains));
-    assert(contains == true);
-    assert(!chfl_residue_contains(residue, 16, &contains));
-    assert(contains == false);
+    SECTION("Atoms") {
+        CHFL_RESIDUE* residue = chfl_residue("", 0);
+        REQUIRE(residue != NULL);
 
-    CHFL_TOPOLOGY* topology = chfl_topology();
+        uint64_t size = 10;
+        CHECK_STATUS(chfl_residue_atoms_count(residue, &size));
+        CHECK(size == 0);
 
-    assert(!chfl_topology_residues_count(topology, &size));
-    assert(size == 0);
+        CHECK_STATUS(chfl_residue_add_atom(residue, 0));
+        CHECK_STATUS(chfl_residue_add_atom(residue, 1));
+        CHECK_STATUS(chfl_residue_add_atom(residue, 20));
 
-    assert(!chfl_topology_add_residue(topology, residue));
-    assert(!chfl_residue_free(residue));
+        CHECK_STATUS(chfl_residue_atoms_count(residue, &size));
+        CHECK(size == 3);
 
-    assert(!chfl_topology_residues_count(topology, &size));
-    assert(size == 1);
+        bool contains = false;
+        CHECK_STATUS(chfl_residue_contains(residue, 1, &contains));
+        CHECK(contains == true);
+        CHECK_STATUS(chfl_residue_contains(residue, 16, &contains));
+        CHECK(contains == false);
 
-    residue = chfl_residue_from_topology(topology, 0);
-    resid = 0;
-    assert(!chfl_residue_id(residue, &resid));
-    assert(resid == 56);
-    assert(!chfl_residue_free(residue));
+        CHECK_STATUS(chfl_residue_free(residue));
+    }
 
-    residue = chfl_residue_from_topology(topology, 10);
-    assert(residue == NULL);
+    SECTION("Topology") {
+        CHFL_RESIDUE* residue = chfl_residue("", 56);
+        REQUIRE(residue != NULL);
+        CHECK_STATUS(chfl_residue_add_atom(residue, 0));
+        CHECK_STATUS(chfl_residue_add_atom(residue, 1));
+        CHECK_STATUS(chfl_residue_add_atom(residue, 2));
 
-    residue = chfl_residue_for_atom(topology, 2);
-    resid = 0;
-    assert(!chfl_residue_id(residue, &resid));
-    assert(resid == 56);
-    assert(!chfl_residue_free(residue));
+        CHFL_TOPOLOGY* topology = chfl_topology();
+        REQUIRE(topology != NULL);
 
-    residue = chfl_residue_for_atom(topology, 10);
-    assert(residue == NULL);
+        uint64_t size = 10;
+        CHECK_STATUS(chfl_topology_residues_count(topology, &size));
+        CHECK(size == 0);
 
-    assert(!chfl_topology_free(topology));
+        CHECK_STATUS(chfl_topology_add_residue(topology, residue));
+        CHECK_STATUS(chfl_residue_free(residue));
 
-    return EXIT_SUCCESS;
+        CHECK_STATUS(chfl_topology_residues_count(topology, &size));
+        CHECK(size == 1);
+
+        residue = chfl_residue_from_topology(topology, 0);
+        REQUIRE(residue != NULL);
+        uint64_t resid = 0;
+        CHECK_STATUS(chfl_residue_id(residue, &resid));
+        CHECK(resid == 56);
+        CHECK_STATUS(chfl_residue_free(residue));
+
+        residue = chfl_residue_from_topology(topology, 10);
+        CHECK(residue == NULL);
+
+        residue = chfl_residue_for_atom(topology, 2);
+        REQUIRE(residue != NULL);
+
+        resid = 0;
+        CHECK_STATUS(chfl_residue_id(residue, &resid));
+        CHECK(resid == 56);
+        CHECK_STATUS(chfl_residue_free(residue));
+
+        residue = chfl_residue_for_atom(topology, 10);
+        REQUIRE(residue == NULL);
+
+        CHECK_STATUS(chfl_topology_free(topology));
+        CHECK_STATUS(chfl_residue_free(residue));
+    }
 }
