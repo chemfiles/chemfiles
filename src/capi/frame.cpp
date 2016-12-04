@@ -140,8 +140,7 @@ extern "C" chfl_status chfl_frame_guess_topology(CHFL_FRAME* const frame) {
     )
 }
 
-extern "C" chfl_status chfl_frame_free(CHFL_FRAME* frame) {
+extern "C" chfl_status chfl_frame_free(CHFL_FRAME* const frame) {
     delete frame;
-    frame = nullptr;
     return CHFL_SUCCESS;
 }

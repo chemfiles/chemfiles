@@ -126,8 +126,7 @@ extern "C" chfl_status chfl_cell_set_shape(CHFL_CELL* const cell, chfl_cell_shap
     )
 }
 
-extern "C" chfl_status chfl_cell_free(CHFL_CELL* cell) {
+extern "C" chfl_status chfl_cell_free(CHFL_CELL* const cell) {
     delete cell;
-    cell = nullptr;
     return CHFL_SUCCESS;
 }

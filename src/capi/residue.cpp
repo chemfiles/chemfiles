@@ -99,8 +99,7 @@ extern "C" chfl_status chfl_residue_contains(const CHFL_RESIDUE* const residue, 
     )
 }
 
-extern "C" chfl_status chfl_residue_free(CHFL_RESIDUE* residue) {
+extern "C" chfl_status chfl_residue_free(CHFL_RESIDUE* const residue) {
     delete residue;
-    residue = nullptr;
     return CHFL_SUCCESS;
 }

@@ -104,6 +104,5 @@ extern "C" chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const file, uint6
 
 extern "C" chfl_status chfl_trajectory_close(CHFL_TRAJECTORY* file) {
     delete file;
-    file = nullptr;
     return CHFL_SUCCESS;
 }

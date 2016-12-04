@@ -446,7 +446,7 @@ CHFL_EXPORT chfl_status chfl_frame_guess_topology(CHFL_FRAME* const frame);
 * @param frame The frame to destroy
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_frame_free(CHFL_FRAME* frame);
+CHFL_EXPORT chfl_status chfl_frame_free(CHFL_FRAME* const frame);
 
 /******************************************************************************/
 /*!
@@ -563,7 +563,7 @@ CHFL_EXPORT chfl_status chfl_cell_set_shape(CHFL_CELL* const cell,
 * @param cell The cell to destroy
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_cell_free(CHFL_CELL* cell);
+CHFL_EXPORT chfl_status chfl_cell_free(CHFL_CELL* const cell);
 
 /******************************************************************************/
 
@@ -785,7 +785,7 @@ CHFL_EXPORT chfl_status chfl_topology_are_linked(CHFL_TOPOLOGY* const topology,
 * @param topology The topology to destroy
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_topology_free(CHFL_TOPOLOGY* topology);
+CHFL_EXPORT chfl_status chfl_topology_free(CHFL_TOPOLOGY* const topology);
 
 /******************************************************************************/
 
@@ -873,7 +873,7 @@ CHFL_EXPORT chfl_status chfl_residue_contains(const CHFL_RESIDUE* const residue,
 * @param residue The residue to destroy
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_residue_free(CHFL_RESIDUE* residue);
+CHFL_EXPORT chfl_status chfl_residue_free(CHFL_RESIDUE* const residue);
 
 /******************************************************************************/
 
@@ -1019,7 +1019,7 @@ CHFL_EXPORT chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom,
 * @param atom The atom to destroy
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_atom_free(CHFL_ATOM* atom);
+CHFL_EXPORT chfl_status chfl_atom_free(CHFL_ATOM* const atom);
 
 /******************************************************************************/
 

@@ -156,8 +156,7 @@ extern "C" chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom, int6
     )
 }
 
-extern "C" chfl_status chfl_atom_free(CHFL_ATOM* atom) {
+extern "C" chfl_status chfl_atom_free(CHFL_ATOM* const atom) {
     delete atom;
-    atom = nullptr;
     return CHFL_SUCCESS;
 }

@@ -220,8 +220,7 @@ extern "C" chfl_status chfl_topology_are_linked(
 }
 
 
-extern "C" chfl_status chfl_topology_free(CHFL_TOPOLOGY* topology) {
+extern "C" chfl_status chfl_topology_free(CHFL_TOPOLOGY* const topology) {
     delete topology;
-    topology = nullptr;
     return CHFL_SUCCESS;
 }
