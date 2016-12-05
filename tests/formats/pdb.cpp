@@ -93,7 +93,7 @@ TEST_CASE("Write files in PDB format", "[PDB]"){
     "CONECT    2    1\n"
     "END\n"
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
-    "HETATM    1    A RES X   1       4.000   5.000   6.000  0.00  0.00           A\n"
+    "HETATM    1    A RES X   4       4.000   5.000   6.000  0.00  0.00           A\n"
     "HETATM    2    B foo X   3       4.000   5.000   6.000  0.00  0.00           B\n"
     "HETATM    3    C foo X   3       4.000   5.000   6.000  0.00  0.00           C\n"
     "HETATM    4    D bar X  -1       4.000   5.000   6.000  0.00  0.00           D\n"

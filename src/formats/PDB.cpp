@@ -286,6 +286,16 @@ void PDBFormat::write(const Frame& frame) {
         "CRYST1{:9.3f}{:9.3f}{:9.3f}{:7.2f}{:7.2f}{:7.2f} P 1           1\n",
         cell.a(), cell.b(), cell.c(), cell.alpha(), cell.beta(), cell.gamma());
 
+    // Only use numbers bigger than the biggest residue id as "resSeq" for
+    // atoms without associated residue.
+    uint64_t max_resid = 0;
+    for (const auto& residue: frame.topology().residues()) {
+        auto resid = residue.id();
+        if (resid < 10000 && resid > max_resid) {
+            max_resid = resid;
+        }
+    }
+
     for (size_t i = 0; i < frame.natoms(); i++) {
         auto& name = frame.topology()[i].name();
         auto& type = frame.topology()[i].type();
@@ -310,7 +320,7 @@ void PDBFormat::write(const Frame& frame) {
         }
         else {
             resname = "RES";
-            resid = to_pdb_index(i);
+            resid = to_pdb_index(max_resid++);
         }
 
         assert(resname.length() <= 3);
