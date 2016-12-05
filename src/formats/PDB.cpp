@@ -266,8 +266,15 @@ Record get_record(const std::string& line) {
     }
 }
 
-static size_t to_pdb_index(size_t i) {
-    return i + 1;
+static std::string to_pdb_index(uint64_t i) {
+    auto id = i + 1;
+
+    if (id >= 100000) {
+        Logger::warn("Too many atoms for PDB format, removing atomic id");
+        return "*****";
+    } else {
+        return std::to_string(i + 1);
+    }
 }
 
 void PDBFormat::write(const Frame& frame) {
@@ -285,16 +292,29 @@ void PDBFormat::write(const Frame& frame) {
         auto& pos = frame.positions()[i];
 
         std::string resname;
-        uint64_t resid;
+        std::string resid;
         auto residue = frame.topology().residue(i);
         if (residue) {
             resname = residue->name();
-            resid = residue->id();
+            if (resname.length() > 3) {
+                Logger::warn("Residue '", resname, "' has a name too long for PDB format, it will be truncated.");
+                resname = resname.substr(0, 3);
+            }
+
+            if (residue->id() >= 10000) {
+                Logger::warn("Too many residues for PDB format, removing residue id");
+                resid = "  -1";
+            } else {
+                resid = std::to_string(residue->id());
+            }
         }
         else {
             resname = "RES";
             resid = to_pdb_index(i);
         }
+
+        assert(resname.length() <= 3);
+
         // Print all atoms as HETATM, because there is no way we can know if we
         // are handling a biomolecule or not.
         //
@@ -305,7 +325,7 @@ void PDBFormat::write(const Frame& frame) {
         // 'resSeq' to be the atomic number.
         fmt::print(
             *file_,
-            "HETATM{:5d} {: >4s} {:3} X{:4d}    {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
+            "HETATM{: >5} {: >4s} {:3} X{: >4s}    {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
             to_pdb_index(i), name, resname, resid, pos[0], pos[1], pos[2], 0.0, 0.0, type
         );
     }
@@ -327,10 +347,10 @@ void PDBFormat::write(const Frame& frame) {
             );
         }
 
-        fmt::print(*file_, "CONECT{:5d}", to_pdb_index(i));
+        fmt::print(*file_, "CONECT{: >5}", to_pdb_index(i));
         auto last = std::min(connections, size_t(4));
         for (size_t j = 0; j < last; j++) {
-            fmt::print(*file_, "{:5d}", to_pdb_index(connect[i][j]));
+            fmt::print(*file_, "{: >5}", to_pdb_index(connect[i][j]));
         }
         fmt::print(*file_, "\n");
     }
