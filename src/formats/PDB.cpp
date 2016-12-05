@@ -336,7 +336,7 @@ void PDBFormat::write(const Frame& frame) {
         fmt::print(
             *file_,
             "HETATM{: >5} {: >4s} {:3} X{: >4s}    {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
-            to_pdb_index(i), name, resname, resid, pos[0], pos[1], pos[2], 0.0, 0.0, type
+            to_pdb_index(i), name, resname, resid, pos[0], pos[1], pos[2], 1.0, 0.0, type
         );
     }
 
