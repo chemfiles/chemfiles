@@ -93,9 +93,9 @@ TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]"){
     SECTION("Writing"){
         const auto EXPECTED_CONTENT =
         "CRYST1    3.000    4.000    5.000  90.00  90.00  90.00 P 1           1\n"
-        "HETATM    0      RES X   0       1.000   2.000   3.000  0.00  0.00            \n"
         "HETATM    1      RES X   1       1.000   2.000   3.000  0.00  0.00            \n"
         "HETATM    2      RES X   2       1.000   2.000   3.000  0.00  0.00            \n"
+        "HETATM    3      RES X   3       1.000   2.000   3.000  0.00  0.00            \n"
         "END\n";
 
         Frame frame(3);
