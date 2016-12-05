@@ -266,6 +266,10 @@ Record get_record(const std::string& line) {
     }
 }
 
+static size_t to_pdb_index(size_t i) {
+    return i + 1;
+}
+
 void PDBFormat::write(const Frame& frame) {
     auto& cell = frame.cell();
     fmt::print(
@@ -289,7 +293,7 @@ void PDBFormat::write(const Frame& frame) {
         }
         else {
             resname = "RES";
-            resid = i;
+            resid = to_pdb_index(i);
         }
         // Print all atoms as HETATM, because there is no way we can know if we
         // are handling a biomolecule or not.
@@ -299,11 +303,11 @@ void PDBFormat::write(const Frame& frame) {
         //
         // 'chainID' is set to be 'X', and if there is no residue information
         // 'resSeq' to be the atomic number.
-        // TODO: get molecules informations, and set 'resSeq' accordingly
-        fmt::print(*file_, "HETATM{:5d} {: >4s} {:3} X{:4d}    "
-                           "{:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}"
-                           "          {: >2s}\n",
-                   i, name, resname, resid, pos[0], pos[1], pos[2], 0.0, 0.0, type);
+        fmt::print(
+            *file_,
+            "HETATM{:5d} {: >4s} {:3} X{:4d}    {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
+            to_pdb_index(i), name, resname, resid, pos[0], pos[1], pos[2], 0.0, 0.0, type
+        );
     }
 
     auto connect = std::vector<std::vector<size_t>>(frame.natoms());
@@ -323,10 +327,10 @@ void PDBFormat::write(const Frame& frame) {
             );
         }
 
-        fmt::print(*file_, "CONECT{:5d}", i);
+        fmt::print(*file_, "CONECT{:5d}", to_pdb_index(i));
         auto last = std::min(connections, size_t(4));
         for (size_t j = 0; j < last; j++) {
-            fmt::print(*file_, "{:5d}", connect[i][j]);
+            fmt::print(*file_, "{:5d}", to_pdb_index(connect[i][j]));
         }
         fmt::print(*file_, "\n");
     }
