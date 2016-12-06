@@ -1,4 +1,4 @@
-# Chemfiles, an efficient IO library for chemistry files
+# Chemfiles, a modern library for chemistry file reading and writing
 
 <div align="center">
 <a href="http://chemfiles.github.io/chemfiles/">

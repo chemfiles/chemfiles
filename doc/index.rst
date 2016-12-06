@@ -1,5 +1,5 @@
-Chemfiles, an efficient IO library for chemistry file formats
-=============================================================
+Chemfiles, a modern library for chemistry file reading and writing
+==================================================================
 
 Chemfiles is a multi-language library written in modern C++ for reading and
 writing from and to molecular trajectory files. These files are created by your
