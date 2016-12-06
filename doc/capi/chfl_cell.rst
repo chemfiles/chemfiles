@@ -5,7 +5,11 @@ Function manipulating ``CHFL_CELL``
 
 .. doxygenfunction:: chfl_cell
 
+.. doxygenfunction:: chfl_cell_triclinic
+
 .. doxygenfunction:: chfl_cell_from_frame
+
+.. doxygenfunction:: chfl_cell_volume
 
 .. doxygenfunction:: chfl_cell_lengths
 

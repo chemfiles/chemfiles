@@ -9,6 +9,8 @@ Function manipulating ``CHFL_FRAME``
 
 .. doxygenfunction:: chfl_frame_resize
 
+.. doxygenfunction:: chfl_frame_add_atom
+
 .. doxygenfunction:: chfl_frame_positions
 
 .. doxygenfunction:: chfl_frame_velocities

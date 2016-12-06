@@ -21,6 +21,10 @@ Function manipulating ``CHFL_ATOM``
 
 .. doxygenfunction:: chfl_atom_set_name
 
+.. doxygenfunction:: chfl_atom_type
+
+.. doxygenfunction:: chfl_atom_set_type
+
 .. doxygenfunction:: chfl_atom_full_name
 
 .. doxygenfunction:: chfl_atom_vdw_radius
@@ -28,11 +32,5 @@ Function manipulating ``CHFL_ATOM``
 .. doxygenfunction:: chfl_atom_covalent_radius
 
 .. doxygenfunction:: chfl_atom_atomic_number
-
-.. doxygenenum:: CHFL_ATOM_TYPES
-
-.. doxygenfunction:: chfl_atom_type
-
-.. doxygenfunction:: chfl_atom_set_type
 
 .. doxygenfunction:: chfl_atom_free

@@ -47,9 +47,6 @@ nicely with any exisiting C++ error handling.
 .. doxygenstruct:: chemfiles::FormatError
     :members:
 
-.. doxygenstruct:: chemfiles::PluginError
-    :members:
-
 .. doxygenstruct:: chemfiles::SelectionError
     :members:
 

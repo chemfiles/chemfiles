@@ -57,6 +57,7 @@ def version():
         version += "-dev"
     return (version, release)
 
+
 version, release = version()
 
 # List of patterns, relative to source directory, that match files and

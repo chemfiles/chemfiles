@@ -34,9 +34,9 @@ with parsing data from the file.
    file
    format
 
-Every ``Format`` class is associated to a ``File`` class, and the associations
-are managed by the ``TrajectoryFactory`` class. New file and formats should be
-registered with this class.
+Every ``Format`` class can be associated to an extension and a format name, the
+associations are managed by the ``FormatFactory`` class. New file and formats
+should be registered with this class.
 
-.. doxygenclass:: chemfiles::TrajectoryFactory
+.. doxygenclass:: chemfiles::FormatFactory
     :members:

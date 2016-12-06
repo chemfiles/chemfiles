@@ -9,6 +9,8 @@ Function manipulating ``CHFL_TOPOLOGY``
 
 .. doxygenfunction:: chfl_topology_atoms_count
 
+.. doxygenfunction:: chfl_topology_resize
+
 .. doxygenfunction:: chfl_topology_append
 
 .. doxygenfunction:: chfl_topology_remove
@@ -38,5 +40,7 @@ Function manipulating ``CHFL_TOPOLOGY``
 .. doxygenfunction:: chfl_topology_add_residue
 
 .. doxygenfunction:: chfl_topology_residues_count
+
+.. doxygenfunction:: chfl_topology_are_linked
 
 .. doxygenfunction:: chfl_topology_free

@@ -61,7 +61,7 @@ public:
     /*!
      * @brief Get a `format_creator_t` from a format type name.
      * @param name the format name
-     * @return A trajectory_builder corresponding to the format, if the format
+     * @return A `format_creator_t` corresponding to the format, if the format
      *         name is found in the list of registered formats.
      *
      * Throws an error if the format can not be found
@@ -71,16 +71,16 @@ public:
     /*!
      * @brief Get a `format_creator_t` from a format extention.
      * @param ext the format extention
-     * @return A trajectory_builder corresponding to the format, if the format
+     * @return A `format_creator_t` corresponding to the format, if the format
      *         extension is found in the list of registered extensions.
      *
      * Throws an error if the format can not be found
      */
     format_creator_t by_extension(const std::string& ext);
 
-    //! Register a trajectory_builder in the internal format names list.
+    //! Register a `format_creator_t` in the internal format names list.
     void register_format(const std::string& name, format_creator_t creator);
-    //! Register an trajectory_builder in the internal extensions list.
+    //! Register a `format_creator_t` in the internal extensions list.
     void register_extension(const std::string& ext, format_creator_t creator);
 
 private:
