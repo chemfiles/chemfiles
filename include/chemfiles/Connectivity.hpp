@@ -17,8 +17,8 @@
 
 namespace chemfiles {
 
-//! The bond struct ensure a canonical representation of a bond between atoms
-//! i and j, with i<j
+/// The bond struct ensure a canonical representation of a bond between atoms
+/// i and j, with i<j
 struct CHFL_EXPORT Bond {
     Bond(size_t first, size_t second) {
         if (first == second) {
@@ -29,7 +29,7 @@ struct CHFL_EXPORT Bond {
         data_[1] = std::max(first, second);
     }
 
-    //! Indexing operator
+    /// Indexing operator
     const size_t& operator[](size_t i) const { return data_[i]; }
 
     Bond(Bond&&) = default;
@@ -59,8 +59,8 @@ inline bool operator>(const Bond& lhs, const Bond& rhs) {
     return lhs[0] > rhs[0] || (lhs[0] == rhs[0] && lhs[1] > rhs[1]);
 }
 
-//! The angle struct ensure a canonical representation of an angle between the
-//! atoms i, j and k, with i < k
+/// The angle struct ensure a canonical representation of an angle between the
+/// atoms i, j and k, with i < k
 struct CHFL_EXPORT Angle {
     Angle(size_t first, size_t midle, size_t last) {
         if (first == midle || first == last || midle == last) {
@@ -72,7 +72,7 @@ struct CHFL_EXPORT Angle {
         data_[2] = std::max(first, last);
     }
 
-    //! Indexing operator
+    /// Indexing operator
     const size_t& operator[](size_t i) const { return data_[i]; }
 
     Angle(Angle&&) = default;
@@ -106,8 +106,8 @@ inline bool operator>(const Angle& lhs, const Angle& rhs) {
     ));
 }
 
-//! The dihedral struct ensure a canonical representation of a dihedral angle
-//! between the atoms i, j, k and m, with max(i, j) < max(k, m))
+/// The dihedral struct ensure a canonical representation of a dihedral angle
+/// between the atoms i, j, k and m, with max(i, j) < max(k, m))
 struct CHFL_EXPORT Dihedral {
     Dihedral(size_t first, size_t second, size_t third, size_t fourth) {
         if (first == second || second == third || third == fourth) {
@@ -131,7 +131,7 @@ struct CHFL_EXPORT Dihedral {
         }
     }
 
-    //! Indexing operator
+    /// Indexing operator
     const size_t& operator[](size_t i) const { return data_[i]; }
 
     Dihedral(Dihedral&&) = default;
@@ -169,37 +169,32 @@ inline bool operator>(const Dihedral& lhs, const Dihedral& rhs) {
     ));
 }
 
-
-/*!
- * @class connectivity Topology.hpp Topology.cpp
- *
- * The connectivity struct store a cache of the bonds, angles and dihedrals
- * in the system. The `recalculate` function should be called when bonds are
- * added or removed. The `bonds` set is the main source of information, all the
- * other data are cached from it.
- */
+/// The connectivity struct store a cache of the bonds, angles and dihedrals
+/// in the system. The `recalculate` function should be called when bonds are
+/// added or removed. The `bonds` set is the main source of information, all the
+/// other data are cached from it.
 class Connectivity {
 public:
     Connectivity() = default;
-    //! Recalculate the angles and the dihedrals from the bond list
+    /// Recalculate the angles and the dihedrals from the bond list
     void recalculate() const;
-    //! Access the underlying data
+    /// Access the underlying data
     const sorted_set<Bond>& bonds() const;
     const sorted_set<Angle>& angles() const;
     const sorted_set<Dihedral>& dihedrals() const;
-    //! Add a bond between the atoms `i` and `j`
+    /// Add a bond between the atoms `i` and `j`
     void add_bond(size_t i, size_t j);
-    //! Remove any bond between the atoms `i` and `j`
+    /// Remove any bond between the atoms `i` and `j`
     void remove_bond(size_t i, size_t j);
 
 private:
-    //! Bonds in the system
+    /// Bonds in the system
     sorted_set<Bond> bonds_;
-    //! Angles in the system
+    /// Angles in the system
     mutable sorted_set<Angle> angles_;
-    //! Dihedral angles in the system
+    /// Dihedral angles in the system
     mutable sorted_set<Dihedral> dihedrals_;
-    //! Is the cached content up to date ?
+    /// Is the cached content up to date ?
     mutable bool uptodate = false;
 };
 

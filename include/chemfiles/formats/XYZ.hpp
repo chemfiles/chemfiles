@@ -15,12 +15,9 @@
 
 namespace chemfiles {
 
-/*!
- * @class XYZFormat formats/XYZ.hpp formats/XYZ.cpp
- * @brief XYZ file format reader and writer.
- *
- * The format is described at http://openbabel.org/wiki/XYZ
- */
+/// [XYZ] file format reader and writer.
+///
+/// [XYZ]: http://openbabel.org/wiki/XYZ
 class XYZFormat final: public Format {
 public:
     XYZFormat(const std::string& path, File::Mode mode);
@@ -35,12 +32,12 @@ public:
     FORMAT_NAME(XYZ)
     FORMAT_EXTENSION(.xyz)
 private:
-    //! Quick forward the file for `nsteps`, returning `false` if the file does
-    //! not seems to contain `nsteps` more steps.
+    /// Quick forward the file for `nsteps`, returning `false` if the file does
+    /// not seems to contain `nsteps` more steps.
     bool forward(size_t nsteps);
-    //! Text file where we read from
+    /// Text file where we read from
     std::unique_ptr<TextFile> file_;
-    //! Newt step we will read.
+    /// Newt step we will read.
     size_t step_cursor_ = 0;
 };
 

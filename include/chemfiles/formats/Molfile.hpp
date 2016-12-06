@@ -23,10 +23,9 @@ namespace chemfiles {
 
 class Topology;
 
-/*!
- * List all the VMD molfile plugins enabled. For more documentation about VMD molfile
- * plugins, please see: http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/
- */
+/// List all the VMD molfile plugins enabled. For more documentation about VMD
+/// molfile plugins, please see:
+/// http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/
 enum MolfileFormat {
     DCD, ///< DCD binary file format
     GRO, ///< Gromacs .gro file format
@@ -36,7 +35,7 @@ enum MolfileFormat {
     LAMMPS, ///< Lammps trajectory files
 };
 
-//! A thin wrapper around the vmd plugin functions
+/// A thin wrapper around the vmd plugin functions
 template <MolfileFormat F>
 struct VMDFunctions {
     /// Initialize the plugin
@@ -47,12 +46,8 @@ struct VMDFunctions {
     int fini();
 };
 
-/*!
- * @class Molfile formats/Molfile.hpp formats/Molfile.cpp
- *
- * Use of VMD Molfile plugins as format reader/writer. This class is templated by a value
- * in the MolfileFormat enum.
- */
+/// Use of VMD Molfile plugins as format reader. This class is templated by a
+/// value in the `MolfileFormat` enum.
 template <MolfileFormat F>
 class Molfile final: public Format {
 public:

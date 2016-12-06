@@ -13,17 +13,13 @@
 
 namespace chemfiles {
 
-/*!
- * @class BasicFile BasicFile.hpp BasicFile.cpp
- *
- * Basic text file, only a thin wrapper on top of standard C++ fstreams.
- */
+/// Basic text file, only a thin wrapper on top of standard C++ fstreams.
 class BasicFile final: public TextFile {
 public:
-    //! Open a text file with name `filename` and mode `mode`.
-    //!
-    //! An `FileError` exception is thrown if the file does not exists in
-    //! `'r'` or `'a'` mode.
+    /// Open a text file with name `filename` and mode `mode`.
+    ///
+    /// An `FileError` exception is thrown if the file does not exists in
+    /// `'r'` or `'a'` mode.
     explicit BasicFile(const std::string& filename, File::Mode mode);
 
     ~BasicFile() noexcept {}

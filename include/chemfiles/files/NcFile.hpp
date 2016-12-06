@@ -23,25 +23,25 @@ namespace chemfiles {
 class NcFile;
 
 namespace nc {
-    //! Maximum lenght for strings in variables
+    /// Maximum lenght for strings in variables
     const size_t STRING_MAXLEN = 10;
 
-    //! NetCDF id type definition
+    /// NetCDF id type definition
     using netcdf_id_t = int;
 
-    //! Count for variable stride and starting point
+    /// Count for variable stride and starting point
     using count_t = std::vector<size_t>;
-    //! Get the number of elements in a NetCDF hyperslab with `count` elements.
+    /// Get the number of elements in a NetCDF hyperslab with `count` elements.
     size_t hyperslab_size(const count_t& count);
 
-    //! Check for netcdf return `status`. This will throw a `FileError` with the
-    //! given `message` in case of error.
+    /// Check for netcdf return `status`. This will throw a `FileError` with the
+    /// given `message` in case of error.
     void check(int status, const std::string& message);
 
-    //! Wrapper around NetCDF variable
+    /// Wrapper around NetCDF variable
     class NcVariable {
     public:
-        //! Create a new variable from `file` with id `var`.
+        /// Create a new variable from `file` with id `var`.
         NcVariable(NcFile& file, netcdf_id_t var);
         virtual ~NcVariable() = default;
         NcVariable(const NcVariable&) = default;
@@ -49,12 +49,12 @@ namespace nc {
         NcVariable(NcVariable&&) = default;
         NcVariable& operator=(NcVariable&&) = default;
 
-        //! Get the dimensions size for this variable
+        /// Get the dimensions size for this variable
         std::vector<size_t> dimmensions() const;
 
-        //! Get the attribute `name`.
+        /// Get the attribute `name`.
         std::string attribute(const std::string& name) const;
-        //! Add an attribute with the given `value` and `name`.
+        /// Add an attribute with the given `value` and `name`.
         void add_attribute(const std::string& name, const std::string& value);
     protected:
         NcFile& file_;
@@ -64,18 +64,18 @@ namespace nc {
     class NcFloat: public NcVariable {
     public:
         NcFloat(NcFile& file, netcdf_id_t var) : NcVariable(file, var) {}
-        //! Get `count` values starting at `start` from this variable
+        /// Get `count` values starting at `start` from this variable
         std::vector<float> get(count_t start, count_t count) const;
-        //! Add `cout` values from `data` starting at `start` in this variable
+        /// Add `cout` values from `data` starting at `start` in this variable
         void add(count_t start, count_t count, std::vector<float> data);
     };
 
     class NcChar: public NcVariable {
     public:
         NcChar(NcFile& file, netcdf_id_t var) : NcVariable(file, var) {}
-        //! Put a single string of data in this variable
+        /// Put a single string of data in this variable
         void add(std::string data);
-        //! Put multiple strings of data in this variable
+        /// Put multiple strings of data in this variable
         void add(std::vector<std::string> data);
     };
 
@@ -84,57 +84,54 @@ namespace nc {
     template<> struct nc_type<NcChar> {constexpr static auto value = NC_CHAR;};
 } // namespace nc
 
-/*!
- * @class NcFile NcFile.hpp NcFile.cpp
- * @brief RAII wrapper around NetCDF 3 binary files
- *
- * This interface only provide basic functionalities needed by the Amber NetCDF
- * format. All the operation are guaranteed to return a valid value or throw an
- * error.
- *
- * The template functions are manually specialized for float and char data types.
- */
+/// RAII wrapper around NetCDF 3 binary files
+///
+/// This interface only provide basic functionalities needed by the Amber NetCDF
+/// format. All the operation are guaranteed to return a valid value or throw an
+/// error.
+///
+/// The template functions are manually specialized for float and char data types.
 class NcFile final: public BinaryFile {
 public:
     NcFile(const std::string& filename, File::Mode mode);
     ~NcFile() noexcept;
 
-    //! Possible file mode. By default, files are in the DATA mode.
+    /// Possible file mode. By default, files are in the DATA mode.
     enum NcMode {
-        //! Files in DEFINE mode can have there attributes, dimmensions and variables
-        //! modified, but no data can be read or written using NcVariable.
+        /// Files in DEFINE mode can have there attributes, dimmensions and variables
+        /// modified, but no data can be read or written using NcVariable.
         DEFINE,
-        //! Files in data mode acces read and write access to NcVariables.
+        /// Files in data mode acces read and write access to NcVariables.
         DATA,
     };
-    //! Set the file mode for this file
+    /// Set the file mode for this file
     void set_nc_mode(NcMode mode);
-    //! Get the file mode for this file
+    /// Get the file mode for this file
     NcMode nc_mode() const;
 
-    //! Get the NetCDF id of this file.
+    /// Get the NetCDF id of this file.
     nc::netcdf_id_t netcdf_id() const {
         return file_id_;
     }
 
-    //! Get a global string attribut from the file
+    /// Get a global string attribut from the file
     std::string global_attribute(const std::string& name) const;
-    //! Create a global attribut in the file_
+    /// Create a global attribut in the file_
     void add_global_attribute(const std::string& name, const std::string& value);
 
-    //! Get the value of a specific dimmension
+    /// Get the value of a specific dimmension
     size_t dimension(const std::string& name) const;
-    //! Get the value of an optional dimmension, or the default `value` if the
-    //! dimmension is not in the file
+    /// Get the value of an optional dimmension, or the default `value` if the
+    /// dimmension is not in the file
     size_t optional_dimension(const std::string& name, size_t value) const;
 
-    //! Create a dimmension with the specified value. If `value == NC_UNLIMITED`,
-    //! then the dimension is infinite.
+    /// Create a dimmension with the specified value. If `value == NC_UNLIMITED`,
+    /// then the dimension is infinite.
     void add_dimension(const std::string& name, size_t value =  NC_UNLIMITED);
 
-    //! Check if a variable exists
+    /// Check if a variable exists
     bool variable_exists(const std::string& name) const;
-    //! Get a NetCDF variable
+    /// Get a NetCDF variable
     template <typename NcType>
     NcType variable(const std::string& name) {
         auto var_id = nc::netcdf_id_t(-1);
@@ -143,8 +140,8 @@ public:
         return NcType(*this, var_id);
     }
 
-    //! Create a new variable of type `NcType` with name `name` along the dimensions in
-    //! `dims`. `dims` must be string or string-like values.
+    /// Create a new variable of type `NcType` with name `name` along the dimensions in
+    /// `dims`. `dims` must be string or string-like values.
     template <typename NcType, typename ...Dims>
     NcType add_variable(const std::string& name, Dims... dims) {
         assert(nc_mode() == DEFINE && "File must be in define mode to add variable");

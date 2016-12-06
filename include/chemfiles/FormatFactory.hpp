@@ -17,7 +17,7 @@
 
 namespace chemfiles {
 
-//! Function to create a format
+/// Function to create a format
 template <class format_t> std::unique_ptr<Format> new_format(const std::string& path, File::Mode mode) {
     return std::unique_ptr<Format>(new format_t(path, mode));
 }
@@ -36,56 +36,43 @@ typedef std::function<std::unique_ptr<Format>(const std::string& path, File::Mod
     }
 
 
-//! Files extensions to trajectory builder associations
+/// Files extensions to trajectory builder associations
 using trajectory_map_t = std::unordered_map<std::string, format_creator_t>;
 
-/*!
-* @class TrajectoryFactory TrajectoryFactory.hpp
-*
-* This class allow to register at compile time various Format and the associated
-* File class, giving at runtime the good format when asked politely.
-*
-* Each couple (File, Format) is represented by a trajectory_builder_t instance,
-* and can
-* be registered by an extension, or by a Format name.
-*/
+/// This class allow to register Format with names and file extensions
 class FormatFactory {
 private:
     FormatFactory();
 
 public:
-    //! Get the instance of the TrajectoryFactory
+    /// Get the instance of the TrajectoryFactory
     static FormatFactory& get();
 
-    /*!
-     * @brief Get a `format_creator_t` from a format type name.
-     * @param name the format name
-     * @return A `format_creator_t` corresponding to the format, if the format
-     *         name is found in the list of registered formats.
-     *
-     * Throws an error if the format can not be found
-     */
+    /// @brief Get a `format_creator_t` from a format type name.
+    /// @param name the format name
+    /// @return A `format_creator_t` corresponding to the format, if the format
+    ///         name is found in the list of registered formats.
+    ///
+    /// Throws an error if the format can not be found
     format_creator_t format(const std::string& name);
 
-    /*!
-     * @brief Get a `format_creator_t` from a format extention.
-     * @param ext the format extention
-     * @return A `format_creator_t` corresponding to the format, if the format
-     *         extension is found in the list of registered extensions.
-     *
-     * Throws an error if the format can not be found
-     */
+    /// @brief Get a `format_creator_t` from a format extention.
+    /// @param ext the format extention
+    /// @return A `format_creator_t` corresponding to the format, if the format
+    ///         extension is found in the list of registered extensions.
+    ///
+    /// Throws an error if the format can not be found
     format_creator_t by_extension(const std::string& ext);
 
-    //! Register a `format_creator_t` in the internal format names list.
+    /// Register a `format_creator_t` in the internal format names list.
     void register_format(const std::string& name, format_creator_t creator);
-    //! Register a `format_creator_t` in the internal extensions list.
+    /// Register a `format_creator_t` in the internal extensions list.
     void register_extension(const std::string& ext, format_creator_t creator);
 
 private:
-    //! Trajectory map associating format descriptions and readers
+    /// Trajectory map associating format descriptions and readers
     trajectory_map_t formats_;
-    //! Trajectory map associating format descriptions and readers
+    /// Trajectory map associating format descriptions and readers
     trajectory_map_t extensions_;
 };
 

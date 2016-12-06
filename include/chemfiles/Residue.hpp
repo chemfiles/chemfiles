@@ -15,17 +15,14 @@
 
 namespace chemfiles {
 
-/*!
- * @class Residue Residue.hpp Residue.cpp
- * @brief A groupement of atoms in the same logical unit.
- *
- * A `Residue` is a group of atoms belonging to the same logical unit. They
- * can be small molecules, amino-acids in a protein, monomers in polymers,
- * etc.
- *
- * Iterating over a `Residue` gives the indexes of the atoms in the
- * associated `Topology`.
- */
+/// A groupement of atoms in the same logical unit.
+///
+/// A `Residue` is a group of atoms belonging to the same logical unit. They
+/// can be small molecules, amino-acids in a protein, monomers in polymers,
+/// etc.
+///
+/// Iterating over a `Residue` gives the indexes of the atoms in the
+/// associated `Topology`.
 class CHFL_EXPORT Residue final {
 public:
     /// Create a new residue with a given `name` and residue id `resid`.

@@ -15,16 +15,16 @@
 
 namespace chemfiles {
 
-//!  Abstract base class for file representation.
+///  Abstract base class for file representation.
 class File {
 public:
-    //! Possible modes for opening a file
+    /// Possible modes for opening a file
     enum Mode: char {
-        //! Open in read-only mode
+        /// Open in read-only mode
         READ = 'r',
-        //! Open in read-write mode, and replace the file if it is already present
+        /// Open in read-write mode, and replace the file if it is already present
         WRITE = 'w',
-        //! Open in read-write mode, and append new data at the end of the file
+        /// Open in read-write mode, and append new data at the end of the file
         APPEND = 'a',
     };
 
@@ -34,9 +34,9 @@ public:
     File(File const&) = delete;
     File& operator=(File const&) = delete;
 
-    //! File name, i.e. complete path to this file on disk.
+    /// File name, i.e. complete path to this file on disk.
     const std::string& filename() const { return filename_; }
-    //! File opening mode.
+    /// File opening mode.
     Mode mode() const { return mode_; }
 
 protected:
@@ -47,42 +47,42 @@ private:
     Mode mode_;
 };
 
-//! Abstract base class representing a text file. This class is inteded to be
-//! inherited by any form of text files: compressed files, memory-mapped files,
-//! etc.
+/// Abstract base class representing a text file. This class is inteded to be
+/// inherited by any form of text files: compressed files, memory-mapped files,
+/// etc.
 class TextFile : public File, public std::iostream {
 public:
-    //! Open the more adaptated text file class for the given `path` and `mode`
+    /// Open the more adaptated text file class for the given `path` and `mode`
     static std::unique_ptr<TextFile> create(const std::string& path, File::Mode mode);
 
     virtual ~TextFile() noexcept {}
 
-    //! Read a line from the file
+    /// Read a line from the file
     virtual const std::string& getline() = 0;
-    //! Read a line from the file, stream version
+    /// Read a line from the file, stream version
     virtual TextFile& operator>>(std::string& line) = 0;
-    //! Read `n` lines from the file
+    /// Read `n` lines from the file
     virtual const std::vector<std::string>& readlines(size_t n) = 0;
-    //! Reset the file cursor
+    /// Reset the file cursor
     virtual void rewind() = 0;
-    //! Number of lines in the file
+    /// Number of lines in the file
     virtual size_t nlines() = 0;
-    //! Are we at the end of the file ?
+    /// Are we at the end of the file ?
     virtual bool eof() = 0;
 
-    //! Write any data to the file in stream version
+    /// Write any data to the file in stream version
     using std::ostream::operator<<;
-    //! Write a string to the file
+    /// Write a string to the file
     virtual void writeline(const std::string&) = 0;
-    //! Write a vector of lines to the file
+    /// Write a vector of lines to the file
     virtual void writelines(const std::vector<std::string>&) = 0;
 
-    //! Set the underlying buffer. This is needed in order to make operator<<
-    //! work.
+    /// Set the underlying buffer. This is needed in order to make operator<<
+    /// work.
     using std::ostream::rdbuf;
 
-    //! Needed for resolving the overload ambiguity when using const char[] or
-    //! const char* arguments.
+    /// Needed for resolving the overload ambiguity when using const char[] or
+    /// const char* arguments.
     TextFile& operator<<(const char* val) {
         *this << std::string(val);
         return *this;
@@ -93,12 +93,12 @@ protected:
         : File(path, mode), std::iostream(nullptr) {}
 };
 
-//! Abstract base class for binary files representation
-//!
-//! Because the binary formats can be everything, this class does not provides
-//! any of the usual methods for working with streams, and is not intended to
-//! be instanciated, but rather to serve as a base class for all the binary
-//! file classes.
+/// Abstract base class for binary files representation
+///
+/// Because the binary formats can be everything, this class does not provides
+/// any of the usual methods for working with streams, and is not intended to
+/// be instanciated, but rather to serve as a base class for all the binary
+/// file classes.
 class BinaryFile : public File {
 public:
     virtual ~BinaryFile() noexcept {}

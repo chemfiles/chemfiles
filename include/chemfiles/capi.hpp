@@ -43,8 +43,8 @@ inline size_t checked_cast(uint64_t value) {
         goto error;                                                            \
     }
 
-//! Wrap `instructions` in a try/catch bloc automatically, and return a status
-//! code
+/// Wrap `instructions` in a try/catch bloc automatically, and return a status
+/// code
 #define CHFL_ERROR_CATCH(instructions)                                         \
     try {                                                                      \
         instructions                                                           \
@@ -60,8 +60,8 @@ inline size_t checked_cast(uint64_t value) {
     }                                                                          \
     return CHFL_SUCCESS;
 
-//! Wrap `instructions` in a try/catch bloc automatically, and goto the
-//! `error` label in case of error.
+/// Wrap `instructions` in a try/catch bloc automatically, and goto the
+/// `error` label in case of error.
 #define CHFL_ERROR_GOTO(instructions)                                          \
     try {                                                                      \
         instructions                                                           \

@@ -14,20 +14,20 @@
 namespace chemfiles {
 namespace selections {
 
-//! Parse and create an AST from a stream of tokens
-//!
-//! @throws SelectionError if the token stream does not correspond to an AST
+/// Parse and create an AST from a stream of tokens
+///
+/// @throws SelectionError if the token stream does not correspond to an AST
 CHFL_EXPORT Ast parse(std::vector<Token> token_stream);
 
-//! @class Expr parser.hpp
-//! @brief Abstract base class for expressions in the selection AST
+/// @class Expr parser.hpp
+/// @brief Abstract base class for expressions in the selection AST
 class Expr {
 public:
-    //! Pretty-printing of this expression. The expression should use a shift
-    //! of `delta` spaces in case of multilines output.
+    /// Pretty-printing of this expression. The expression should use a shift
+    /// of `delta` spaces in case of multilines output.
     virtual std::string print(unsigned delta = 0) const = 0;
-    //! For each potential match in the `matches` vector this function returns
-    //! `true` if the match is valid in the given `frame`.
+    /// For each potential match in the `matches` vector this function returns
+    /// `true` if the match is valid in the given `frame`.
     virtual std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const = 0;
 
     Expr() = default;
@@ -41,8 +41,8 @@ public:
 };
 
 using token_iterator_t = std::vector<Token>::const_iterator;
-//! Dispatch to subexpressions for parsing, from the current value of `begin`
-//! This is an internal detail of the parsing algorithm.
+/// Dispatch to subexpressions for parsing, from the current value of `begin`
+/// This is an internal detail of the parsing algorithm.
 Ast dispatch_parsing(token_iterator_t& begin, const token_iterator_t& end);
 
 }} // namespace chemfiles && namespace selections

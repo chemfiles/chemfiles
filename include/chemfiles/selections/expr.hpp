@@ -17,16 +17,22 @@ namespace selections {
 
 // Existing binary operators
 enum class BinOp {
-    EQ = Token::EQ,     //! "=="
-    NEQ = Token::NEQ,   //! "!="
-    LT = Token::LT,     //! "<"
-    LE = Token::LE,     //! "<="
-    GT = Token::GT,     //! ">"
-    GE = Token::GE,     //! ">="
+    /// "=="
+    EQ = Token::EQ,
+    /// "!="
+    NEQ = Token::NEQ,
+    /// "<"
+    LT = Token::LT,
+    /// "<="
+    LE = Token::LE,
+    /// ">"
+    GT = Token::GT,
+    /// ">="
+    GE = Token::GE,
 };
 
-//! Helper class representing a specific component of a 3D vector. This class
-//! can take three values: X, Y or Z.
+/// Helper class representing a specific component of a 3D vector. This class
+/// can take three values: X, Y or Z.
 class Coordinate {
 public:
     Coordinate(const Coordinate& other) = default;
@@ -34,8 +40,8 @@ public:
     Coordinate& operator=(const Coordinate& other) = default;
     Coordinate& operator=(Coordinate&& other) = default;
 
-    //! Create a coordinate from a string. `"x"` maps to X, `"y"` to Y and
-    //! `"z"` to Z. Any other string is an error.
+    /// Create a coordinate from a string. `"x"` maps to X, `"y"` to Y and
+    /// `"z"` to Z. Any other string is an error.
     explicit Coordinate(const std::string& name) {
         if (name == "x") {
             coord_ = X;
@@ -48,8 +54,8 @@ public:
         }
     }
 
-    //! Convert the coordinate to the corresponding index: 0 for X, 1 for Y and
-    //! 2 for Z.
+    /// Convert the coordinate to the corresponding index: 0 for X, 1 for Y and
+    /// 2 for Z.
     size_t as_index() const {
         switch (coord_) {
         case X:
@@ -62,7 +68,7 @@ public:
         unreachable();
     }
 
-    //! Convert the coordinate to the corresponding string
+    /// Convert the coordinate to the corresponding string
     std::string to_string() const {
         switch (coord_) {
         case X:
@@ -83,8 +89,8 @@ private:
     } coord_;
 };
 
-//! @class AllExpr selections/expr.hpp selections/expr.cpp
-//! @brief Selection matching all atoms
+/// @class AllExpr selections/expr.hpp selections/expr.cpp
+/// @brief Selection matching all atoms
 class AllExpr final: public Expr {
 public:
     AllExpr(): Expr() {}
@@ -92,8 +98,8 @@ public:
     std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
 };
 
-//! @class NoneExpr selections/expr.hpp selections/expr.cpp
-//! @brief Selection matching no atoms
+/// @class NoneExpr selections/expr.hpp selections/expr.cpp
+/// @brief Selection matching no atoms
 class NoneExpr final: public Expr {
 public:
     NoneExpr(): Expr() {}
@@ -101,8 +107,8 @@ public:
     std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
 };
 
-//! @class SingleExpr expr.hpp
-//! @brief Abstract base class for selector taking a single argument
+/// @class SingleExpr expr.hpp
+/// @brief Abstract base class for selector taking a single argument
 class SingleSelector: public Expr {
 public:
     SingleSelector(unsigned argument): argument_(argument) {
@@ -111,15 +117,15 @@ public:
     virtual ~SingleSelector() noexcept = default;
 
 protected:
-    //! Index of the argument to apply the selector to
+    /// Index of the argument to apply the selector to
     const unsigned argument_;
 };
 
-//! @class TypeExpr selections/expr.hpp selections/expr.cpp
-//! @brief Select atoms using their type
-//!
-//! Only `==` and `!=` operators are allowed. The short form `type <value>` is
-//! equivalent to `type == <value>`
+/// @class TypeExpr selections/expr.hpp selections/expr.cpp
+/// @brief Select atoms using their type
+///
+/// Only `==` and `!=` operators are allowed. The short form `type <value>` is
+/// equivalent to `type == <value>`
 class TypeExpr final: public SingleSelector {
 public:
     TypeExpr(unsigned argument, std::string type, bool equals)
@@ -131,11 +137,11 @@ private:
     bool equals_;
 };
 
-//! @class NameExpr selections/expr.hpp selections/expr.cpp
-//! @brief Select atoms using their name.
-//!
-//! Only `==` and `!=` operators are allowed. The short form `name <value>` is
-//! equivalent to `name == <value>`
+/// @class NameExpr selections/expr.hpp selections/expr.cpp
+/// @brief Select atoms using their name.
+///
+/// Only `==` and `!=` operators are allowed. The short form `name <value>` is
+/// equivalent to `name == <value>`
 class NameExpr final: public SingleSelector {
 public:
     NameExpr(unsigned argument, std::string name, bool equals)
@@ -147,8 +153,8 @@ private:
     bool equals_;
 };
 
-//! @class IndexExpr selections/expr.hpp selections/expr.cpp
-//! @brief Select atoms using their index in the frame.
+/// @class IndexExpr selections/expr.hpp selections/expr.cpp
+/// @brief Select atoms using their index in the frame.
 class IndexExpr final: public SingleSelector {
 public:
     IndexExpr(unsigned argument, BinOp op, std::size_t val)
@@ -160,11 +166,11 @@ private:
     std::size_t val_;
 };
 
-//! @class ResnameExpr selections/expr.hpp selections/expr.cpp
-//! @brief Select atoms using their residue name
-//!
-//! Only `==` and `!=` operators are allowed. The short form `resname <value>`
-//! is equivalent to `resname == <value>`
+/// @class ResnameExpr selections/expr.hpp selections/expr.cpp
+/// @brief Select atoms using their residue name
+///
+/// Only `==` and `!=` operators are allowed. The short form `resname <value>`
+/// is equivalent to `resname == <value>`
 class ResnameExpr final: public SingleSelector {
 public:
     ResnameExpr(unsigned argument, std::string name, bool equals)
@@ -176,11 +182,11 @@ private:
     bool equals_;
 };
 
-//! @class ResidExpr selections/expr.hpp selections/expr.cpp
-//! @brief Select atoms using their residue name
-//!
-//! Only `==` and `!=` operators are allowed. The short form `resname <value>`
-//! is equivalent to `resname == <value>`
+/// @class ResidExpr selections/expr.hpp selections/expr.cpp
+/// @brief Select atoms using their residue name
+///
+/// Only `==` and `!=` operators are allowed. The short form `resname <value>`
+/// is equivalent to `resname == <value>`
 class ResidExpr final: public SingleSelector {
 public:
     ResidExpr(unsigned argument, BinOp op, uint64_t id)
@@ -192,10 +198,10 @@ private:
     uint64_t id_;
 };
 
-//! @class PositionExpr selections/expr.hpp selections/expr.cpp
-//! @brief Select atoms using their position in space. The selection can be
-//! created by `x <op> <val>`, `y <op> <val>` or `z <op> <val>`, depending on
-//! the component of the position to use.
+/// @class PositionExpr selections/expr.hpp selections/expr.cpp
+/// @brief Select atoms using their position in space. The selection can be
+/// created by `x <op> <val>`, `y <op> <val>` or `z <op> <val>`, depending on
+/// the component of the position to use.
 class PositionExpr final: public SingleSelector {
 public:
     PositionExpr(unsigned argument, Coordinate coord, BinOp op, double val)
@@ -208,10 +214,10 @@ private:
     double val_;
 };
 
-//! @class VelocityExpr selections/expr.hpp selections/expr.cpp
-//! @brief Select atoms using their velocity. The selection can be created by
-//! `vx <op> <val>`, `vy <op> <val>` or `vz <op> <val>`, depending on the
-//! component of the velocity to use.
+/// @class VelocityExpr selections/expr.hpp selections/expr.cpp
+/// @brief Select atoms using their velocity. The selection can be created by
+/// `vx <op> <val>`, `vy <op> <val>` or `vz <op> <val>`, depending on the
+/// component of the velocity to use.
 class VelocityExpr final: public SingleSelector {
 public:
     VelocityExpr(unsigned argument, Coordinate coord, BinOp op, double val)
@@ -224,8 +230,8 @@ private:
     double val_;
 };
 
-//! @class MassExpr selections/expr.hpp selections/expr.cpp
-//! @brief Select atoms using their mass, in atomic mass unit.
+/// @class MassExpr selections/expr.hpp selections/expr.cpp
+/// @brief Select atoms using their mass, in atomic mass unit.
 class MassExpr final: public SingleSelector {
 public:
     MassExpr(unsigned argument, BinOp op, double val): SingleSelector(argument), op_(op), val_(val) {}
@@ -238,8 +244,8 @@ private:
 
 /****************************************************************************************/
 
-//! @class AndExpr selections/expr.hpp selections/expr.cpp
-//! @brief Combine selections by using a logical `and` operation
+/// @class AndExpr selections/expr.hpp selections/expr.cpp
+/// @brief Combine selections by using a logical `and` operation
 class AndExpr final: public Expr {
 public:
     AndExpr(Ast&& lhs, Ast&& rhs): Expr(), lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
@@ -250,8 +256,8 @@ private:
     Ast rhs_;
 };
 
-//! @class OrExpr selections/expr.hpp selections/expr.cpp
-//! @brief Combine selections by using a logical `or` operation
+/// @class OrExpr selections/expr.hpp selections/expr.cpp
+/// @brief Combine selections by using a logical `or` operation
 class OrExpr final: public Expr {
 public:
     OrExpr(Ast&& lhs, Ast&& rhs): Expr(), lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
@@ -262,8 +268,8 @@ private:
     Ast rhs_;
 };
 
-//! @class NotExpr selections/expr.hpp selections/expr.cpp
-//! @brief Unary negation of a selection
+/// @class NotExpr selections/expr.hpp selections/expr.cpp
+/// @brief Unary negation of a selection
 class NotExpr final: public Expr {
 public:
     explicit NotExpr(Ast&& ast): Expr(), ast_(std::move(ast)) {}

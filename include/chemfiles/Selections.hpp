@@ -63,38 +63,35 @@ inline bool operator==(const Match& lhs, const Match& rhs) {
     return true;
 }
 
-//! Selection context, i.e. what we are matching
+/// Selection context, i.e. what we are matching
 enum class Context {
-    //! Matching a single atom
+    /// Matching a single atom
     ATOM,
-    //! Matching a pair of atoms
+    /// Matching a pair of atoms
     PAIR,
-    //! Matching three atoms
+    /// Matching three atoms
     THREE,
-    //! Matching four atoms
+    /// Matching four atoms
     FOUR,
-    //! Matching a bond
+    /// Matching a bond
     BOND,
-    //! Matching an angle
+    /// Matching an angle
     ANGLE,
-    //! Matching a dihedral angle
+    /// Matching a dihedral angle
     DIHEDRAL
 };
 
-/*!
-* @class Selection Selections.hpp Selections.cpp
-* @brief This class allow to select atoms in a `Frame`, from a selection language.
-*
-* The selection language is built by combining basic operations. Each basic
-* operation follows the `<selector>[(<variable>)] <operator> <value>` structure,
-* where `<operator>` is a comparison operator in `== != < <= > >=`. Refer to
-* the full documentation to know the allowed selectors and how to use them.
-*/
+/// This class allow to select atoms in a `Frame`, from a selection language.
+///
+/// The selection language is built by combining basic operations. Each basic
+/// operation follows the `<selector>[(<variable>)] <operator> <value>` structure,
+/// where `<operator>` is a comparison operator in `== != < <= > >=`. Refer to
+/// the full documentation to know the allowed selectors and how to use them.
 class CHFL_EXPORT Selection {
 public:
-    //! Create a selection using the given string.
-    //!
-    //! @throws SelectionError if there is a error in the selection string
+    /// Create a selection using the given string.
+    ///
+    /// @throws SelectionError if there is a error in the selection string
     explicit Selection(const std::string& selection);
 
     ~Selection();
@@ -123,15 +120,15 @@ public:
     }
 
 private:
-    //! Generate all possible (unconstrained) matches for this selection and
-    //! the given `frame`.
+    /// Generate all possible (unconstrained) matches for this selection and
+    /// the given `frame`.
     std::vector<Match> generate_matches(const Frame& frame) const;
 
-    //! Store the selection string that generated this selection
+    /// Store the selection string that generated this selection
     std::string selection_;
-    //! Selection kind
+    /// Selection kind
     Context context_;
-    //! AST for evaluation of the selection
+    /// AST for evaluation of the selection
     selections::Ast ast_;
 };
 }

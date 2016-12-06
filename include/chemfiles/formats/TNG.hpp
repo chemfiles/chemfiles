@@ -14,12 +14,9 @@
 
 namespace chemfiles {
 
-/*!
- * @class TNGFormat formats/TNGFormat.hpp formats/TNGFormat.cpp
- * @brief TNG file format reader.
- *
- * http://dx.doi.org/10.1007/s00894-010-0948-5
- */
+/// [TNG][TNG] file format reader.
+///
+/// [TNG]: http://dx.doi.org/10.1007/s00894-010-0948-5
 class TNGFormat final: public Format {
 public:
     TNGFormat(const std::string& path, File::Mode mode);
@@ -39,11 +36,11 @@ private:
     void read_cell(Frame& frame);
     void read_topology(Frame& frame);
 
-    //! Reference to the associated file
+    /// Reference to the associated file
     TNGFile tng_;
-    //! The next step to read
+    /// The next step to read
     int64_t step_ = 0;
-    //! The number of atoms in the current frame
+    /// The number of atoms in the current frame
     int64_t natoms_ = 0;
 };
 

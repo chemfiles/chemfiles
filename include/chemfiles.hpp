@@ -5,13 +5,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
-/*! @file chemfiles.hpp
-* Chemfiles main C++ API header.
-*
-* This file includes the public API headers for chemfiles, and should be the
-* only one included by client applications.
-*/
-
 #ifndef CHEMFILES_HPP
 #define CHEMFILES_HPP
 

@@ -21,12 +21,9 @@ namespace chemfiles {
 class UnitCell;
 class Topology;
 
-/*!
- * @class NCFormat formats/NcFormat.hpp formats/NcFormat.cpp
- * @brief Amber NetCDF file format reader.
- *
- * http://ambermd.org/netcdf/nctraj.xhtml
- */
+/// [Amber NetCDF][NetCDF] file format reader.
+///
+/// [NetCDF]: http://ambermd.org/netcdf/nctraj.xhtml
 class NCFormat final: public Format {
 public:
     NCFormat(const std::string& path, File::Mode mode);
@@ -43,23 +40,23 @@ public:
     FORMAT_NAME(AmberNetCDF)
     FORMAT_EXTENSION(.nc)
 private:
-    //! Read the unit cell at the current internal step, the file is assumed to be valid.
+    /// Read the unit cell at the current internal step, the file is assumed to be valid.
     UnitCell read_cell();
-    //! Generic function to read an Array3D at the current internal step,
-    //! the file is assumed to be valid.
+    /// Generic function to read an Array3D at the current internal step,
+    /// the file is assumed to be valid.
     void read_array3D(Span3D array, const std::string& name);
 
-    //! Write an Array3D to the file, as a variable with the name `name`, at
-    //! the current internal step.
+    /// Write an Array3D to the file, as a variable with the name `name`, at
+    /// the current internal step.
     void write_array3D(const Array3D& array, const std::string& name);
-    //! Write an UnitCell to the file, at the current internal step
+    /// Write an UnitCell to the file, at the current internal step
     void write_cell(const UnitCell& cell);
 
-    //! Associated NetCDF file.
+    /// Associated NetCDF file.
     NcFile file_;
-    //! Last read step
+    /// Last read step
     size_t step_;
-    //! Was the associated file validated?
+    /// Was the associated file validated?
     bool validated_;
 };
 

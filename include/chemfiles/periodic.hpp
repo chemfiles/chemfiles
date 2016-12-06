@@ -18,17 +18,17 @@
 
 namespace chemfiles {
 
-//! Storing basic elemental data: mass, colvalent and Van der Waals radii
+/// Storing basic elemental data: mass, colvalent and Van der Waals radii
 struct ElementData {
-    //! Atomic number
+    /// Atomic number
     const int number;
-    //! Full name
+    /// Full name
     const char* name;
-    //! Mass in atomic units
+    /// Mass in atomic units
     const double mass;
-    //! Covalent radius in Angstrom
+    /// Covalent radius in Angstrom
     const double colvalent_radius;
-    //! Van der Waals radius in Angstrom
+    /// Van der Waals radius in Angstrom
     const double vdw_radius;
 };
 
