@@ -95,3 +95,34 @@ file(GLOB capi_test_files ${CMAKE_CURRENT_SOURCE_DIR}/capi/*.cpp)
 foreach(test_file IN LISTS capi_test_files)
     chfl_capi_test(${test_file})
 endforeach(test_file)
+
+set(CHEMFILES_TESTS_IGNORE "")
+function(chfl_doctest _file_)
+    get_filename_component(_name_ ${_file_} NAME_WE)
+    get_filename_component(_root_ ${_file_} PATH)
+    get_filename_component(_root_ ${_root_} NAME)
+    if(${_root_} MATCHES "chfl_")
+        set(_name_ "${_root_}_${_name_}")
+    endif()
+
+    file(STRINGS ${_file_} _FILE_CONTENT_)
+    foreach(_line_ ${_FILE_CONTENT_})
+        if("${_line_}" MATCHES "\\[no-run\\]")
+            set(CHEMFILES_TESTS_IGNORE "${CHEMFILES_TESTS_IGNORE}\n${_name_}" PARENT_SCOPE)
+        endif()
+    endforeach()
+
+    chfl_test(${_name_} ${_file_})
+
+    set_target_properties(${_name_} PROPERTIES COMPILE_FLAGS "-UNDEBUG")
+endfunction()
+
+file(GLOB_RECURSE capi_doctest_files ${CMAKE_CURRENT_SOURCE_DIR}/capi/doc/**.c)
+foreach(test_file IN LISTS capi_doctest_files)
+    chfl_doctest(${test_file})
+endforeach(test_file)
+
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/CTestCustom.in.cmake
+    ${CMAKE_BINARY_DIR}/CTestCustom.cmake
+)

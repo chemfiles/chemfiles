@@ -13,107 +13,128 @@
 extern "C" {
 #endif
 
-/// @brief Open a trajectory file.
-/// @param filename The path to the trajectory file
-/// @param mode The opening mode: 'r' for read, 'w' for write and 'a' for append.
-/// @return A pointer to the file, or NULL in case of error
-CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_open(const char* filename,
-                                                  char mode);
-
-/// @brief Open a trajectory file using a specific file format.
+/// Open the file at the given `path` using the given `mode`.
 ///
-/// This can be needed when the file format does not match the extension, or
-/// when there is not standard extension for this format.
+/// Valid modes are `'r'` for read, `'w'` for write and `'a'` for append.
 ///
-/// @param filename The path to the trajectory file
-/// @param mode The opening mode: 'r' for read, 'w' for write and 'a' for append.
-/// @param format The file format to use. An empty string means that the format
-///               should be guessed from the extension.
-/// @return A pointer to the file, or NULL in case of error
-CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_with_format(const char* filename,
-                                                         char mode,
-                                                         const char* format);
+/// The caller of this function should free the allocated memory using
+/// `chfl_trajectory_close`.
+///
+/// @example{tests/capi/doc/chfl_trajectory/open.c}
+/// @return A pointer to the trajectory, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
+CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_open(const char* path, char mode);
 
-/// @brief Read the next step of the trajectory into a frame
-/// @param file A pointer to the trajectory
-/// @param frame A frame to fill with the data
-/// @return The status code.
-CHFL_EXPORT chfl_status chfl_trajectory_read(CHFL_TRAJECTORY*const file,
-                                             CHFL_FRAME* const frame);
+/// Open the file at the given `path` using a specific file `format` and the
+/// given `mode`.
+///
+/// This is be needed when the file format does not match the extension, or
+/// when there is not standard extension for this format. Valid modes are
+/// `'r'` for read, `'w'` for write and `'a'` for append. If `format` is an
+/// empty string, the format will be guessed from the extension.
+///
+/// The caller of this function should free the allocated memory using
+/// `chfl_trajectory_close`.
+///
+/// @example{tests/capi/doc/chfl_trajectory/with_format.c}
+/// @return A pointer to the trajectory, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
+CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_with_format(
+    const char* path, char mode, const char* format
+);
 
-/// @brief Read a specific step of the trajectory in a frame
-/// @param file A pointer to the trajectory
-/// @param step The step to read
-/// @param frame A frame to fill with the data
-/// @return The status code.
-CHFL_EXPORT chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY* const file,
-                                                  uint64_t step,
-                                                  CHFL_FRAME* const frame);
+/// Read the next step of the `trajectory` into a `frame`.
+///
+/// @example{tests/capi/doc/chfl_trajectory/read.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_trajectory_read(
+    CHFL_TRAJECTORY* const trajectory, CHFL_FRAME* const frame
+);
 
-/// @brief Write a frame to the trajectory.
-/// @param file The trajectory to write
-/// @param frame the frame which will be writen to the file
-/// @return The status code.
-CHFL_EXPORT chfl_status chfl_trajectory_write(CHFL_TRAJECTORY* const file,
-                                              const CHFL_FRAME* const frame);
+/// Read a specific `step` of the `trajectory` into a `frame`
+///
+/// @example{tests/capi/doc/chfl_trajectory/read_step.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_trajectory_read_step(
+    CHFL_TRAJECTORY* const trajectory, uint64_t step, CHFL_FRAME* const frame
+);
 
-/// @brief Set the topology associated with a trajectory. This topology will be
-///        used when reading and writing the files, replacing any topology in the
-///        frames or files.
-/// @param file A pointer to the trajectory
-/// @param topology The new topology to use
-/// @return The status code.
+/// Write a single `frame` to the `trajectory`.
+///
+/// @example{tests/capi/doc/chfl_trajectory/write.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_trajectory_write(
+    CHFL_TRAJECTORY* const trajectory, const CHFL_FRAME* const frame
+);
+
+/// Set the `topology` associated with a `trajectory`. This topology will be
+/// used when reading and writing the files, replacing any topology in the
+/// frames or files.
+///
+/// @example{tests/capi/doc/chfl_trajectory/set_topology.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_trajectory_set_topology(
-                                                CHFL_TRAJECTORY* const file,
-                                                const CHFL_TOPOLOGY* const topology);
+    CHFL_TRAJECTORY* const trajectory, const CHFL_TOPOLOGY* const topology
+);
 
-/// @brief Set the topology associated with a trajectory by reading the first
-///        frame of `filename`; and extracting the topology of this frame.
-/// @param file A pointer to the trajectory
-/// @param filename The file to read in order to get the new topology
-/// @return The status code.
+/// Set the topology associated with a `trajectory` by reading the first frame of
+/// the file at the given `path`; and extracting the topology of this frame.
+///
+/// @example{tests/capi/doc/chfl_trajectory/set_topology_file.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_trajectory_set_topology_file(
-                                                CHFL_TRAJECTORY* const file,
-                                                const char* filename);
+    CHFL_TRAJECTORY* const trajectory, const char* path
+);
 
-/// @brief Set the topology associated with a trajectory by reading the first
-///        frame of `filename` using the file format in `format`; and
-///        extracting the topology of this frame.
+/// Set the topology associated with a trajectory by reading the first frame of
+/// the file at the given `path` using the file format in `format`; and
+/// extracting the topology of this frame.
 ///
-/// This can be needed when the topology file format does not match the extension, or
-/// when there is not standard extension for this format.
+/// This is needed when the topology file format does not match the extension,
+/// or when there is not standard extension for this format. If `format` is an
+/// empty string, the format will be guessed from the extension.
 ///
-/// @param file A pointer to the trajectory
-/// @param filename The file to read in order to get the new topology
-/// @param format The name of the file format to use for reading the topology. An
-///               empty string means that the format should be guessed from the
-///               extension.
-/// @return The status code.
+/// @example{tests/capi/doc/chfl_trajectory/set_topology_with_format.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_trajectory_set_topology_with_format(
-                                                CHFL_TRAJECTORY* const file,
-                                                const char* filename,
-                                                const char* format);
+    CHFL_TRAJECTORY* const trajectory, const char* path, const char* format
+);
 
-/// @brief Set the unit cell associated with a trajectory. This cell will be
-///        used when reading and writing the files, replacing any unit cell in the
-///        frames or files.
-/// @param file A pointer to the trajectory
-/// @param cell The new cell to use
-/// @return The status code.
-CHFL_EXPORT chfl_status chfl_trajectory_set_cell(CHFL_TRAJECTORY* const file,
-                                                 const CHFL_CELL* const cell);
+/// Set the unit `cell` associated with a `trajectory`. This cell will be used
+/// when reading and writing the files, replacing any pre-existing unit cell.
+///
+/// @example{tests/capi/doc/chfl_trajectory/set_cell.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_trajectory_set_cell(
+    CHFL_TRAJECTORY* const trajectory, const CHFL_CELL* const cell
+);
 
-/// @brief Get the number of steps (the number of frames) in a trajectory.
-/// @param file A pointer to the trajectory
-/// @param nsteps This will contain the number of steps
-/// @return The status code.
-CHFL_EXPORT chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const file,
-                                               uint64_t* nsteps);
+/// Store the number of steps (the number of frames) from the `trajectory` in
+/// `nsteps`.
+///
+/// @example{tests/capi/doc/chfl_trajectory/nsteps.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_trajectory_nsteps(
+    CHFL_TRAJECTORY* const trajectory, uint64_t* nsteps
+);
 
-/// @brief Close a trajectory file, and free the associated memory
-/// @param file A pointer to the file
-/// @return The status code
-CHFL_EXPORT chfl_status chfl_trajectory_close(CHFL_TRAJECTORY* file);
+/// Close a trajectory file, and free the associated memory.
+///
+/// Closing a file will synchronize all changes made to the file with the
+/// storage (hard drive, network, ...) used for this file.
+///
+/// @example{tests/capi/doc/chfl_trajectory/open.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_trajectory_close(CHFL_TRAJECTORY* trajectory);
 
 #ifdef __cplusplus
 }

@@ -4,11 +4,13 @@ find_package(Doxygen REQUIRED)
 configure_file(${PROJECT_SOURCE_DIR}/Doxyfile ${PROJECT_BINARY_DIR}/Doxyfile @ONLY)
 configure_file(${PROJECT_SOURCE_DIR}/doc/conf.cmake.py ${PROJECT_BINARY_DIR}/doc/conf.py)
 
-file(GLOB_RECURSE ALL_HEADERS ${PROJECT_SOURCE_DIR}/include/**.h*)
+file(GLOB_RECURSE HEADERS ${PROJECT_SOURCE_DIR}/include/**.h*)
+file(GLOB_RECURSE C_EXAMPLES ${PROJECT_SOURCE_DIR}/examples/c/doc/**.c)
+file(GLOB_RECURSE CXX_EXAMPLES ${PROJECT_SOURCE_DIR}/examples/cpp/doc/**.cpp)
 
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/doxygen/xml/index.xml
     COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
-    DEPENDS ${ALL_HEADERS}
+    DEPENDS ${HEADERS} ${C_EXAMPLES} ${CXX_EXAMPLES} ${PROJECT_BINARY_DIR}/Doxyfile
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
     COMMENT "Generating API documentation with Doxygen"
 )

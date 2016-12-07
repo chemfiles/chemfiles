@@ -3,9 +3,7 @@
 Function manipulating ``CHFL_TRAJECTORY``
 -----------------------------------------
 
-The Trajectory type is the main entry point when using chemfiles. A trajectory
-behave a bit like a ``FILE*`` pointer, and the ``chfl_close`` free the memory
-associated with the file.
+.. doxygentypedef:: CHFL_TRAJECTORY
 
 .. doxygenfunction:: chfl_trajectory_open
 
@@ -16,6 +14,8 @@ associated with the file.
 .. doxygenfunction:: chfl_trajectory_read_step
 
 .. doxygenfunction:: chfl_trajectory_write
+
+.. doxygenfunction:: chfl_trajectory_set_cell
 
 .. doxygenfunction:: chfl_trajectory_set_topology
 

@@ -31,19 +31,29 @@ typedef chemfiles::Topology CHFL_TOPOLOGY;
 typedef chemfiles::Residue CHFL_RESIDUE;
 typedef CAPISelection CHFL_SELECTION;
 #else
-/// Opaque type handling trajectories files
+/// An opaque type handling trajectories files.
+///
+/// The `CHFL_TRAJECTORY` type is the main entry point when using chemfiles. A
+/// `CHFL_TRAJECTORY*` behave a bit like a `FILE*` pointer, allowing to read
+/// and/or write `CHFL_FRAME*` to a file.
 typedef struct CHFL_TRAJECTORY CHFL_TRAJECTORY;
-/// Opaque type handling frames, *i.e* data from a step
+
+/// An opaque type handling frames, *i.e* data from a step.
 typedef struct CHFL_FRAME CHFL_FRAME;
-/// Opaque type handling an atom
+
+/// An opaque type handling an atom.
 typedef struct CHFL_ATOM CHFL_ATOM;
-/// Opaque type handling an unit cell
+
+/// An opaque type handling an unit cell.
 typedef struct CHFL_CELL CHFL_CELL;
-/// Opaque type handling a topology
+
+/// An opaque type handling a topology.
 typedef struct CHFL_TOPOLOGY CHFL_TOPOLOGY;
-/// Opaque type handling a residue
+
+/// An opaque type handling a residue.
 typedef struct CHFL_RESIDUE CHFL_RESIDUE;
-/// Opaque type handling a selection
+
+/// An opaque type handling a selection.
 typedef struct CHFL_SELECTION CHFL_SELECTION;
 #endif
 
