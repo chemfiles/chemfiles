@@ -7,10 +7,11 @@
 
 #include <cstring>
 
-#include "chemfiles.h"
+#include "chemfiles/capi/residue.h"
+#include "chemfiles/capi.hpp"
+
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/Topology.hpp"
-#include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
 extern "C" CHFL_RESIDUE* chfl_residue(const char* name, uint64_t resid) {

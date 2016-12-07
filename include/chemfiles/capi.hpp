@@ -8,15 +8,9 @@
 #ifndef CHEMFILES_CAPI_ERRORS_H
 #define CHEMFILES_CAPI_ERRORS_H
 
-#include "chemfiles.h"
-
+#include "chemfiles/capi/types.h"
 #include "chemfiles/Error.hpp"
 #include "chemfiles/warnings.hpp"
-
-#include <map>
-#include <string>
-#include <cassert>
-#include <cstdint>
 
 namespace chemfiles {
     extern std::string CAPI_LAST_ERROR;

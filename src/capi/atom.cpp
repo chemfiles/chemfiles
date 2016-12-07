@@ -7,11 +7,12 @@
 
 #include <cstring>
 
-#include "chemfiles.h"
+#include "chemfiles/capi/atom.h"
+#include "chemfiles/capi.hpp"
+
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Topology.hpp"
-#include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
 extern "C" CHFL_ATOM* chfl_atom(const char* name) {

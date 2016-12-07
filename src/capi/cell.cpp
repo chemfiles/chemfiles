@@ -5,10 +5,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
-#include "chemfiles.h"
+#include "chemfiles/capi/cell.h"
+#include "chemfiles/capi.hpp"
+
 #include "chemfiles/UnitCell.hpp"
 #include "chemfiles/Frame.hpp"
-#include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
 static_assert(sizeof(chfl_cell_shape_t) == sizeof(int), "Wrong size for chfl_cell_shape_t enum");

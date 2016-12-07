@@ -7,9 +7,10 @@
 
 #include <cstring>
 
-#include "chemfiles.h"
-#include "chemfiles/Selections.hpp"
+#include "chemfiles/capi/selection.h"
 #include "chemfiles/capi.hpp"
+
+#include "chemfiles/Selections.hpp"
 using namespace chemfiles;
 
 static_assert(

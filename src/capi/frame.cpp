@@ -5,9 +5,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
-#include "chemfiles.h"
-#include "chemfiles/Frame.hpp"
+#include "chemfiles/capi/frame.h"
 #include "chemfiles/capi.hpp"
+
+#include "chemfiles/Frame.hpp"
 using namespace chemfiles;
 
 extern "C" CHFL_FRAME* chfl_frame(uint64_t natoms) {

@@ -7,10 +7,11 @@
 
 #include <cstring>
 
-#include "chemfiles.h"
+#include "chemfiles/capi/topology.h"
+#include "chemfiles/capi.hpp"
+
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/Frame.hpp"
-#include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
 extern "C" CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* const frame) {
