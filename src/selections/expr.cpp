@@ -92,7 +92,7 @@ Ast parse<NoneExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 /****************************************************************************************/
 std::string TypeExpr::print(unsigned /*unused*/) const {
     auto op = equals_ ? "==" : "!=";
-    return "type($" + std::to_string(argument_ + 1) + ") " + op + " " + type_;
+    return "type(#" + std::to_string(argument_ + 1) + ") " + op + " " + type_;
 }
 
 std::vector<bool> TypeExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
@@ -131,7 +131,7 @@ Ast parse<TypeExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 /****************************************************************************************/
 std::string NameExpr::print(unsigned /*unused*/) const {
     auto op = equals_ ? "==" : "!=";
-    return "name($" + std::to_string(argument_ + 1) + ") " + op + " " + name_;
+    return "name(#" + std::to_string(argument_ + 1) + ") " + op + " " + name_;
 }
 
 std::vector<bool> NameExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
@@ -169,7 +169,7 @@ Ast parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 /****************************************************************************************/
 std::string ResnameExpr::print(unsigned /*unused*/) const {
     auto op = equals_ ? "==" : "!=";
-    return "resname($" + std::to_string(argument_ + 1) + ") " + op + " " + name_;
+    return "resname(#" + std::to_string(argument_ + 1) + ") " + op + " " + name_;
 }
 
 std::vector<bool> ResnameExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
@@ -213,7 +213,7 @@ Ast parse<ResnameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 
 /****************************************************************************************/
 std::string ResidExpr::print(unsigned /*unused*/) const {
-    return "resid($" + std::to_string(argument_ + 1) + ") " + binop_str(op_) +
+    return "resid(#" + std::to_string(argument_ + 1) + ") " + binop_str(op_) +
            " " + std::to_string(id_);
 }
 
@@ -263,7 +263,7 @@ Ast parse<ResidExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 
 /****************************************************************************************/
 std::string PositionExpr::print(unsigned /*unused*/) const {
-    return coord_.to_string() + "($" + std::to_string(argument_ + 1) + ") " +
+    return coord_.to_string() + "(#" + std::to_string(argument_ + 1) + ") " +
            binop_str(op_) + " " + std::to_string(val_);
 }
 
@@ -307,7 +307,7 @@ Ast parse<PositionExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 
 /****************************************************************************************/
 std::string VelocityExpr::print(unsigned /*unused*/) const {
-    return "v" + coord_.to_string() + "($" + std::to_string(argument_ + 1) +
+    return "v" + coord_.to_string() + "(#" + std::to_string(argument_ + 1) +
             ") " + binop_str(op_) + " " + std::to_string(val_);
 }
 
@@ -356,7 +356,7 @@ Ast parse<VelocityExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 
 /****************************************************************************************/
 std::string IndexExpr::print(unsigned /*unused*/) const {
-    return "index($" + std::to_string(argument_ + 1) + ") " + binop_str(op_) +
+    return "index(#" + std::to_string(argument_ + 1) + ") " + binop_str(op_) +
            " " + std::to_string(val_);
 }
 
@@ -399,7 +399,7 @@ Ast parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t& end) {
 
 /****************************************************************************************/
 std::string MassExpr::print(unsigned /*unused*/) const {
-    return "mass($" + std::to_string(argument_ + 1) + ") " + binop_str(op_) +
+    return "mass(#" + std::to_string(argument_ + 1) + ") " + binop_str(op_) +
            " " + std::to_string(val_);
 }
 

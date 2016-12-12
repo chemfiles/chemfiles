@@ -147,7 +147,7 @@ static std::vector<Token> add_missing_equals(std::vector<Token> stream) {
                     continue;
                 }
             } else {
-                // Skip the following possible tokens: '(' - '$x' - ')'
+                // Skip the following possible tokens: '(' - '#x' - ')'
                 next = it + 4;
                 if (next < stream.cend() && !next->is_operator() &&
                     it[1].type() == Token::LPAREN && it[2].is_variable() &&
