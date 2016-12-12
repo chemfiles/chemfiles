@@ -42,6 +42,18 @@ typedef struct CHFL_TRAJECTORY CHFL_TRAJECTORY;
 typedef struct CHFL_FRAME CHFL_FRAME;
 
 /// An opaque type handling an atom.
+///
+/// A `CHFL_ATOM` is a particle in the current `CHFL_FRAME`. It stores the
+/// following atomic properties:
+///
+/// - atom name;
+/// - atom type;
+/// - atom mass;
+/// - atom charge.
+///
+/// The atom name is usually an unique identifier (`"H1"`, `"C_a"`) while the
+/// atom type will be shared between all particles of the same type: `"H"`,
+/// `"Ow"`, `"CH3"`.
 typedef struct CHFL_ATOM CHFL_ATOM;
 
 /// An opaque type handling an unit cell.

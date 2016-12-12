@@ -3,6 +3,8 @@
 Function manipulating ``CHFL_ATOM``
 -----------------------------------
 
+.. doxygentypedef:: CHFL_ATOM
+
 .. doxygenfunction:: chfl_atom
 
 .. doxygenfunction:: chfl_atom_from_frame
