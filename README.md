@@ -82,12 +82,12 @@ and for IO in two simulation software.
 
 ## File formats
 
-Chelfiles can read and write files in the following formats:
+Chemfiles can read and write files in the following formats:
 - XYZ;
 - PDB;
 - Amber NetCDF.
 
-Chelfiles can also read (it can not write yet) files in the following formats:
+Chemfiles can also read (it can not write yet) files in the following formats:
 - LAMMPS trajectory;
 - TNG;
 - Gromacs formats: .gro; .xtc; .trj; .trr;
@@ -106,13 +106,29 @@ This is the way to get started with the C++ and C interface. If you want to use
 chemfiles from another language, please refer to the corresponding
 documentation.
 
-The [installation documentation][install] contains more information about
-pre-built version of the library, and more configuration options.
+### Compiled packages
 
+We use OpenSUSE build service to provide compiled packages of the latest release
+for some Linux distributions. You can use your package manager to download them
+[here](https://software.opensuse.org/download.html?project=home%3ALuthaf&package=chemfiles).
+
+We also provide conda packages in the `conda-forge` community channel for Linux
+and Os X. This package contains provides the C++, C and Python interfaces. You
+can install the conda package by running:
+
+```
+conda install -c conda-forge chemfiles
+```
+
+You can find more information about packages in the [documentation][install].
+
+[OSB]: https://build.opensuse.org/package/show/home:Luthaf/chemfiles
 [install]: http://chemfiles.github.io/chemfiles/latest/installation.html
 
-You will need [cmake](http://cmake.org/) and a C++11 compiler: GCC 4.8, clang
-3.3 and Intel 14 are known to work.
+### Build from source
+
+You will need [cmake](http://cmake.org/) and a C++11 compiler like GCC>=4.8,
+clang>=3.3, Intel>=14 or MSVC>=15.
 
 ```bash
 git clone https://github.com/chemfiles/chemfiles

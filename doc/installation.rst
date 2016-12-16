@@ -4,16 +4,39 @@ Installation
 Pre-compiled binaries
 ^^^^^^^^^^^^^^^^^^^^^
 
-A precompiled version of the latest release is provided through the `conda`_
-cross-plateform package manager, in the ``conda-forge`` community channel. This
-version provides the C++, C and Python interfaces for OS X and Linux. To install
-them, you can use:
+
+We provide compiled packages of the latest release for muliple Linux
+distributions using the `OpenSUSE build service`_.
+
+.. raw:: html
+    <p>You can download them directly below:</p>
+
+    <iframe
+        src="http://software.opensuse.org/download/package.iframe?project=home%3ALuthaf&package=chemfiles"
+        width="100%" height="400px" frameborder="0"
+    ></iframe>
+
+We also provide three `conda`_ packages in the `conda-forge` community channel for
+Linux and Os X.
+
+- `chemfiles <https://github.com/conda-forge/chemfiles-feedstock>`_ package
+  contains both the C++ and Python libraries. This is the one you want most of
+  the time.
+- `chemfiles-lib <https://github.com/conda-forge/chemfiles-lib-feedstock>`_
+  package contains the C++ library alone;
+- `chemfiles-python <https://github.com/conda-forge/chemfiles-feedstock>`_
+  package contains the Python binding to Chemfiles alone.
 
 .. code-block:: bash
 
+    # Get all the packages
     conda install -c conda-forge chemfiles
 
+    # Get the C++ and C library
+    conda install -c conda-forge chemfiles-lib
+
 .. _conda: http://conda.pydata.org/docs/
+.. _OpenSUSE build service: https://software.opensuse.org/download.html?project=home%3ALuthaf&package=chemfiles
 
 Building from sources
 ^^^^^^^^^^^^^^^^^^^^^
