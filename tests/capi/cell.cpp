@@ -80,10 +80,8 @@ TEST_CASE("Atom", "[CAPI]") {
         CHECK(data[2] == 90);
 
         chfl_vector_t angles = {80, 89, 100};
-        chfl_log_silent();
         // Setting an orthorhombic cell angles is an error
         CHECK(chfl_cell_set_angles(cell, angles) != CHFL_SUCCESS);
-        chfl_log_stderr();
 
         CHECK_STATUS(chfl_cell_set_shape(cell, CHFL_CELL_TRICLINIC));
 

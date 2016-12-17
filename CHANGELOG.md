@@ -44,6 +44,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Remove the `Trajectory::sync` and the `chfl_trajectory_sync` functions.
   To ensure that all content of a file is written to the disk, the user need to
   close it.
+* Remove the `Logger` and all the `chfl_log*` functions. Instead, the users can
+  use `chemfiles::set_warning_callback` or `chfl_set_warning_callback` to set a
+  global callback to call on warnings events.
 
 ## 0.6 (1 July 2016)
 

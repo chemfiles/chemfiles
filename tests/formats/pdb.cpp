@@ -1,3 +1,5 @@
+#include <fstream>
+
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"

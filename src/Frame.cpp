@@ -9,7 +9,6 @@
 
 #include "chemfiles/Error.hpp"
 #include "chemfiles/Frame.hpp"
-#include "chemfiles/Logger.hpp"
 using namespace chemfiles;
 
 Frame::Frame() : Frame(0) {}

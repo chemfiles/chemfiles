@@ -10,12 +10,10 @@
 #include <cassert>
 
 #include "chemfiles.h"
-#include "chemfiles/Logger.hpp"
 #include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
 static_assert(sizeof(chfl_status) == sizeof(int), "Wrong size for chfl_status enum");
-static_assert(sizeof(chfl_log_level_t) == sizeof(int), "Wrong size for chfl_log_level_t enum");
 
 const std::map<chfl_status, std::string> ERROR_MESSAGES = {
     {CHFL_SUCCESS, "operation was sucessfull"},
@@ -52,48 +50,10 @@ extern "C" chfl_status chfl_clear_errors(void) {
     )
 }
 
-extern "C" chfl_status chfl_loglevel(chfl_log_level_t* const level) {
-    assert(level != nullptr);
+extern "C" chfl_status chfl_set_warning_callback(chfl_warning_callback callback) {
     CHFL_ERROR_CATCH(
-        *level = static_cast<chfl_log_level_t>(Logger::level());
-    )
-}
-
-extern "C" chfl_status chfl_set_loglevel(chfl_log_level_t level) {
-    CHFL_ERROR_CATCH(
-        Logger::set_level(static_cast<LogLevel>(level));
-    )
-}
-
-extern "C" chfl_status chfl_logfile(const char* file) {
-    assert(file != nullptr);
-    CHFL_ERROR_CATCH(
-        Logger::to_file(std::string(file));
-    )
-}
-
-extern "C" chfl_status chfl_log_stdout(void) {
-    CHFL_ERROR_CATCH(
-        Logger::to_stdout();
-    )
-}
-
-extern "C" chfl_status chfl_log_stderr(void) {
-    CHFL_ERROR_CATCH(
-        Logger::to_stderr();
-    )
-}
-
-extern "C" chfl_status chfl_log_silent(void) {
-    CHFL_ERROR_CATCH(
-        Logger::silent();
-    )
-}
-
-extern "C" chfl_status chfl_log_callback(chfl_logging_cb callback) {
-    CHFL_ERROR_CATCH(
-        Logger::callback([callback](LogLevel level, const std::string& message) {
-            callback(static_cast<chfl_log_level_t>(level), message.c_str());
+        set_warning_callback([callback](std::string message) {
+            callback(message.c_str());
         });
     )
 }

@@ -8,7 +8,6 @@
 #include <algorithm>
 
 #include "chemfiles/files/BasicFile.hpp"
-#include "chemfiles/Logger.hpp"
 #include "chemfiles/Error.hpp"
 using namespace chemfiles;
 
@@ -27,9 +26,7 @@ BasicFile::BasicFile(const std::string& filename, File::Mode mode)
         openmode = std::ios_base::out | std::ios_base::trunc;
         break;
     default:
-        Logger::error(std::string("Got a bad file mode: ") + static_cast<char>(mode));
-        abort();
-        break;
+        throw FileError(std::string("Got a bad file mode: ") + static_cast<char>(mode));
     }
 
     stream_.open(filename, openmode);

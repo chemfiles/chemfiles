@@ -1,9 +1,12 @@
-Errors and exceptions
-=====================
+Errors and warnings
+===================
 
-In chemfiles, the errors are handled by using exceptions. So any program using
-chemfiles should wrap the call between a ``try ... catch`` statment, and handle the
-errors in any pertinent way.
+Errors
+------
+
+In chemfiles, any error will throw an exception. Any program using chemfiles
+should thus wrap any call in a ``try ... catch`` block, and handle the errors in
+any pertinent way.
 
 .. code-block:: cpp
 
@@ -18,7 +21,7 @@ errors in any pertinent way.
             auto positions = frame.positions();
             // Do something here
         } catch (const chemfiles::Error& e) {
-            // Basic error handling by just logging error to stdout
+            // Basic error handling logging error to stdout
             std::cout << "Error in chemfiles:" << e.what() << std::endl;
             return -1;
         }
@@ -26,10 +29,11 @@ errors in any pertinent way.
         return 0;
     }
 
-All the exceptions derives from ``chemfiles::Error``, so catching only
-``chemfiles::Error`` is OK. You also can catch any other error if you need finer
-grain control. ``chemfiles::Error`` derives from ``std::runtime_error``, and thus
-should play nicely with any exisiting C++ error handling.
+Any exceptions thown by chemfiles will derive from ``chemfiles::Error``.
+Catching  ``chemfiles::Error`` will then catch any exception thown by chemfiles.
+You also can catch any other error if you need finer grain control.
+``chemfiles::Error`` derives from ``std::runtime_error``, so it should play
+nicely with any exisiting C++ error handling.
 
 .. doxygenstruct:: chemfiles::Error
     :members:
@@ -48,3 +52,14 @@ should play nicely with any exisiting C++ error handling.
 
 .. doxygenstruct:: chemfiles::SelectionError
     :members:
+
+Warnings
+--------
+
+Chemfiles also send warnings on some malformed files. You can use the
+`set_warning_callback` function to register a global callback to use when
+sending a warning.
+
+.. doxygenfunction:: chemfiles::set_warning_callback
+
+.. doxygentypedef:: chemfiles::warning_callback

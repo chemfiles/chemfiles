@@ -98,60 +98,8 @@ CHFL_EXPORT const char* chfl_last_error(void);
 */
 CHFL_EXPORT chfl_status chfl_clear_errors(void);
 
-//! Available logging level
-typedef enum CHFL_LOG_LEVEL {
-    //! Only log on errors
-    CHFL_LOG_ERROR = 0,
-    //! Log warnings and erors
-    CHFL_LOG_WARNING = 1,
-    //! Log infos, warnings and errors
-    CHFL_LOG_INFO = 2,
-    //! Log everything
-    CHFL_LOG_DEBUG = 3
-} chfl_log_level_t;
 
-/*!
-* @brief Get the current maximal logging level
-* @param level The logging level
-* @return The status code
-*/
-CHFL_EXPORT chfl_status chfl_loglevel(chfl_log_level_t* const level);
-
-/*!
-* @brief Set the current maximal logging level to `level`
-* @param level The new logging level
-* @return The status code
-*/
-CHFL_EXPORT chfl_status chfl_set_loglevel(chfl_log_level_t level);
-
-/*!
-* @brief Redirect the logs to `file`, overwriting the file if it exists
-* @param file The filename for the new log file.
-* @return The status code
-*/
-CHFL_EXPORT chfl_status chfl_logfile(const char* file);
-
-/*!
-* @brief Redirect the logs to the standard output.
-* @return The status code
-*/
-CHFL_EXPORT chfl_status chfl_log_stdout(void);
-
-/*!
-* @brief Redirect the logs to the standard error output. This is enabled by
-*        default.
-* @return The status code
-*/
-CHFL_EXPORT chfl_status chfl_log_stderr(void);
-
-/*!
-* @brief Remove all logging output
-* @return The status code
-*/
-CHFL_EXPORT chfl_status chfl_log_silent(void);
-
-//! Callback function type for user-provided logging
-typedef void (*chfl_logging_cb)(chfl_log_level_t level, const char* message);
+typedef void (*chfl_warning_callback)(const char* message);
 
 /*!
 * @brief Redirect all logging to user-provided logging. The `callback` function
@@ -159,7 +107,7 @@ typedef void (*chfl_logging_cb)(chfl_log_level_t level, const char* message);
 * the message itself.
 * @return The status code
 */
-CHFL_EXPORT chfl_status chfl_log_callback(chfl_logging_cb callback);
+CHFL_EXPORT chfl_status chfl_set_warning_callback(chfl_warning_callback callback);
 
 /******************************************************************************/
 /*!

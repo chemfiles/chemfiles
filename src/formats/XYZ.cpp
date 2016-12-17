@@ -13,7 +13,6 @@
 #include "chemfiles/Error.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Frame.hpp"
-#include "chemfiles/Logger.hpp"
 
 using namespace chemfiles;
 

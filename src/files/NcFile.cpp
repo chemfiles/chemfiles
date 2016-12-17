@@ -9,7 +9,6 @@
 #if CHEMFILES_NETCDF
 
 #include "chemfiles/Error.hpp"
-#include "chemfiles/Logger.hpp"
 #include "chemfiles/files/NcFile.hpp"
 using namespace chemfiles;
 
@@ -131,9 +130,7 @@ NcFile::NcFile(const std::string& filename, File::Mode mode)
         nc_enddef(file_id_);
         break;
     default:
-        Logger::error(std::string("Got a bad file mode: ") + static_cast<char>(mode));
-        abort();
-        break;
+        throw FileError(std::string("Got a bad file mode: ") + static_cast<char>(mode));
     }
 
     nc::check(status, "Could not open the file '" + filename + "'");

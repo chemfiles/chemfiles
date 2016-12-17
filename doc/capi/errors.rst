@@ -12,15 +12,9 @@ allow for error handling from the C side.
 
 .. doxygenfunction:: chfl_clear_errors
 
-.. doxygenenum:: CHFL_LOG_LEVEL
+.. doxygentypedef:: chfl_warning_callback
 
-.. doxygenfunction:: chfl_loglevel
-
-.. doxygenfunction:: chfl_set_loglevel
-
-.. doxygenfunction:: chfl_logfile
-
-.. doxygenfunction:: chfl_log_stderr
+.. doxygenfunction:: chfl_set_warning_callback
 
 The return values for this status code correspond to the following enum:
 

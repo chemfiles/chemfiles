@@ -8,7 +8,6 @@
 #include "chemfiles/files/TNGFile.hpp"
 
 #include "chemfiles/Error.hpp"
-#include "chemfiles/Logger.hpp"
 #include "chemfiles/utils.hpp"
 using namespace chemfiles;
 
@@ -18,6 +17,7 @@ using namespace chemfiles;
 
 TNGFile::TNGFile(std::string filename, File::Mode mode): BinaryFile(filename, mode), handle_(nullptr) {
     CHECK(tng_util_trajectory_open(filename.c_str(), mode, &handle_));
+    assert(mode == File::READ || mode == File::WRITE || mode == File::APPEND);
 
     if (mode == File::READ) {
         CHECK(tng_file_headers_read(handle_, TNG_USE_HASH));

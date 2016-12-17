@@ -9,8 +9,8 @@
 #include <functional>
 
 #include "chemfiles/Error.hpp"
-#include "chemfiles/Logger.hpp"
 #include "chemfiles/selections/expr.hpp"
+#include "chemfiles/warnings.hpp"
 
 namespace chemfiles {
 namespace selections {
@@ -324,7 +324,7 @@ std::vector<bool> VelocityExpr::evaluate(const Frame& frame, const std::vector<M
             res[i] = compare(velocity, val_);
         }
     } else {
-        Logger::warn("No velocities in frame while evaluating " + print(0));
+        warning("No velocities in frame while evaluating {}", print(0));
     }
     return res;
 }

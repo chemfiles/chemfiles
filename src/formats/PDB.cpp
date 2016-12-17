@@ -11,10 +11,10 @@
 #include "chemfiles/formats/PDB.hpp"
 
 #include "chemfiles/Error.hpp"
-#include "chemfiles/Logger.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/utils.hpp"
+#include "chemfiles/warnings.hpp"
 
 using namespace chemfiles;
 
@@ -92,13 +92,13 @@ void PDBFormat::read(Frame& frame) {
         case Record::IGNORED_:
             break; // Nothing to do
         case Record::UNKNOWN_:
-            Logger::warn("Unknown PDB record: ", line);
+            warning("Unknown PDB record: {}", line);
             break;
         }
     }
 
     // If we are here, we got EOF before an END record
-    Logger::warn("Missing END record in PDB file");
+    warning("Missing END record in PDB file");
 end:
     for (auto& residue: residues_) {
         frame.topology().add_residue(residue.second);
@@ -127,8 +127,10 @@ void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
     if (line.length() >= 55) {
         auto space_group = trim(line.substr(55, 10));
         if (space_group != "P 1" && space_group != "P1") {
-            Logger::warn("Space group is not P1 (got '", space_group, "') in '",
-                         file_->filename(), "', ignored.");
+            warning(
+                "Space group which is not P1 ({}) ignored in '{}'",
+                space_group, file_->filename()
+            );
         }
     }
 }
@@ -170,7 +172,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line) {
             residues_.at(resid).add_atom(atom_id);
         }
     } catch (std::invalid_argument&) {
-        Logger::debug("No residue information in record '", line, "'");
+        // No residue information
     }
 
 }
@@ -182,7 +184,7 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
     // Helper lambdas
     auto add_bond = [&frame, &line](size_t i, size_t j) {
         if (i >= frame.natoms() || j >= frame.natoms()) {
-            Logger::warn("Bad atomic numbers in CONECT, ignored. (", line, ")");
+            warning("Bad atomic numbers in CONECT record, ignored. ({})", line);
             return;
         }
         frame.topology().add_bond(i, j);
@@ -270,7 +272,7 @@ static std::string to_pdb_index(uint64_t i) {
     auto id = i + 1;
 
     if (id >= 100000) {
-        Logger::warn("Too many atoms for PDB format, removing atomic id");
+        warning("Too many atoms for PDB format, removing atomic id");
         return "*****";
     } else {
         return std::to_string(i + 1);
@@ -307,12 +309,15 @@ void PDBFormat::write(const Frame& frame) {
         if (residue) {
             resname = residue->name();
             if (resname.length() > 3) {
-                Logger::warn("Residue '", resname, "' has a name too long for PDB format, it will be truncated.");
+                warning(
+                    "Residue '{}' has a name too long for PDB format, it will be truncated.",
+                    resname
+                );
                 resname = resname.substr(0, 3);
             }
 
             if (residue->id() >= 10000) {
-                Logger::warn("Too many residues for PDB format, removing residue id");
+                warning("Too many residues for PDB format, removing residue id");
                 resid = "  -1";
             } else {
                 resid = std::to_string(residue->id());
@@ -351,9 +356,9 @@ void PDBFormat::write(const Frame& frame) {
         if (connections == 0) {
             continue;
         } else if (connections > 4) {
-            Logger::warn(
-                "PDB 'CONNECT' record can not handle more than 4 bonds, got ",
-                connections, " around atom ", i, "."
+            warning(
+                "PDB 'CONNECT' record can not handle more than 4 bonds, got {} around atom {}.",
+                connections, i
             );
         }
 

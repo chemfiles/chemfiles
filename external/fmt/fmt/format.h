@@ -110,7 +110,7 @@ typedef __int64          intmax_t;
 # pragma clang diagnostic ignored "-Wundefined-func-template"
 #endif
 
-#if defined(FMT_MSC_VER)
+#if FMT_MSC_VER
 # pragma warning(push, 1)
 #endif
 

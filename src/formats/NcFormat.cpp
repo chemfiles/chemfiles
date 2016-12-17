@@ -12,7 +12,7 @@
 
 #include "chemfiles/Error.hpp"
 #include "chemfiles/Frame.hpp"
-#include "chemfiles/Logger.hpp"
+#include "chemfiles/warnings.hpp"
 using namespace chemfiles;
 
 std::string NCFormat::description() const {
@@ -25,31 +25,31 @@ static bool is_valid(const NcFile& file_, size_t natoms) {
 
     if (file_.global_attribute("Conventions") != "AMBER") {
         if (!writing) {
-            Logger::error("We can only read AMBER convention NetCDF files.");
+            warning("We can only read AMBER convention NetCDF files.");
         }
         return false;
     }
 
     if (file_.global_attribute("ConventionVersion") != "1.0") {
         if (!writing) {
-            Logger::error("We can only read version 1.0 of AMBER convention "
-                          "NetCDF files.");
+            warning("We can only read version 1.0 of AMBER convention NetCDF files.");
         }
         return false;
     }
 
     if (file_.dimension("spatial") != 3) {
         if (!writing) {
-            Logger::error("Wrong size for spatial dimension. Should be 3, is ",
-                          file_.dimension("spatial"), ".");
+            warning("Wrong size for spatial dimension. Should be 3, is {}.", file_.dimension("spatial"));
         }
         return false;
     }
 
     if (writing) {
         if (file_.dimension("atom") != natoms) {
-            Logger::error("Wrong size for atoms dimension. Should be ", natoms, ", is ",
-                          file_.dimension("atom"), ".");
+            warning(
+                "Wrong size for atoms dimension. Should be {}, is {}.",
+                natoms, file_.dimension("atom")
+            );
             return false;
         }
     }

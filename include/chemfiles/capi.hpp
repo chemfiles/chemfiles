@@ -12,7 +12,7 @@
 #include "chemfiles.h"
 
 #include "chemfiles/Error.hpp"
-#include "chemfiles/Logger.hpp"
+#include "chemfiles/warnings.hpp"
 
 #include <map>
 #include <string>
@@ -33,14 +33,14 @@ inline size_t checked_cast(uint64_t value) {
 #define CATCH_AND_RETURN(exception, retval)                                    \
     catch (const chemfiles::exception& e) {                                    \
         CAPI_LAST_ERROR = std::string(e.what());                               \
-        chemfiles::Logger::error(e.what());                                    \
+        chemfiles::warning(e.what());                                          \
         return retval;                                                         \
     }
 
 #define CATCH_AND_GOTO(exception)                                              \
     catch (const chemfiles::exception& e) {                                    \
         CAPI_LAST_ERROR = std::string(e.what());                               \
-        chemfiles::Logger::error(e.what());                                    \
+        chemfiles::warning(e.what());                                          \
         goto error;                                                            \
     }
 

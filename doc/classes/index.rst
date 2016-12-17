@@ -19,7 +19,6 @@ begining of your program in order to bring all the class in the main namespace.
    unitcell
    selection
    residue
-   logger
    errors
 
 .. _exported-macro:
