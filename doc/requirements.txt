@@ -1,2 +1,3 @@
+sphinx >=1.4,<1.5
 breathe
 sphinx_bootstrap_theme
