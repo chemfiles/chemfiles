@@ -3,10 +3,9 @@
 C interface reference
 =====================
 
-The C interface is define in the ``chemfiles.h`` header, which should be
-included in all the programs using chemfiles. All the functions and enums have a
-``chfl_`` prefix indicating the provenance of the functions. The types are
-defined as opaque pointer types, in all caps. The following types are defined:
+The C interface is define in the ``chemfiles.h``, in which all the functions and
+enums have a ``chfl_`` prefix for namespacing. Main chemfiles types are the
+following opaque pointer types:
 
 * :ref:`CHFL_TRAJECTORY <capi-trajectory>` maps to the :ref:`Trajectory <class-Trajectory>` class;
 * :ref:`CHFL_FRAME <capi-frame>` maps to the :ref:`Frame <class-Frame>` class;
@@ -21,9 +20,11 @@ Constructors functions (functions returning pointers to types defined above)
 return freshly allocated memory, and calling the ``chfl_*_free`` functions
 return the corresponding memory to the operating system.
 
-In addition to the functions below, the :ref:`same macro <exported-macro>` as in
-the C++ interface are defined, and the ``chfl_version`` function allow to access
-the version of the Chemfiles library.
+.. doxygentypedef:: chfl_vector_t
+
+``chemfiles.h`` also exports the :ref:`same macro <exported-macro>` as in the
+C++ interface, and the ``chfl_version`` function allow to access the version of
+the Chemfiles library.
 
 .. doxygenfunction:: chfl_version
 

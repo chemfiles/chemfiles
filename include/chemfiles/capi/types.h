@@ -38,7 +38,12 @@ typedef CAPISelection CHFL_SELECTION;
 /// and/or write `CHFL_FRAME*` to a file.
 typedef struct CHFL_TRAJECTORY CHFL_TRAJECTORY;
 
-/// An opaque type handling frames, *i.e* data from a step.
+/// An opaque type handling frames.
+///
+/// A `CHFL_FRAME` contains data from one simulation step: the current unit
+/// cell, the topology, the positions, and the velocities of the particles in
+/// the system. If some information is missing (topology or velocity or unit
+/// cell), the corresponding data is filled with a default value. Specifically:
 typedef struct CHFL_FRAME CHFL_FRAME;
 
 /// An opaque type handling an atom.
@@ -57,38 +62,74 @@ typedef struct CHFL_FRAME CHFL_FRAME;
 typedef struct CHFL_ATOM CHFL_ATOM;
 
 /// An opaque type handling an unit cell.
+///
+/// A `CHFL_CELL` represent the box containing the atoms, and its periodicity
+///
+/// A unit cell is fully represented by three lenghts (a, b, c); and three angles
+/// (alpha, beta, gamma). The angles are stored in degrees, and the lenghts in
+/// Angstroms.
+///
+/// A cell also has a matricial representation, by projecting the three base
+/// vector into an orthonormal base. We choose to represent such matrix as an
+/// upper triangular matrix:
+///
+/// ```
+/// | a_x   b_x   c_x |
+/// |  0    b_y   c_y |
+/// |  0     0    c_z |
+/// ```
 typedef struct CHFL_CELL CHFL_CELL;
 
 /// An opaque type handling a topology.
+///
+/// A `CHFL_TOPOLOGY` contains the definition of all the atoms in the system,
+/// and the liaisons between the particles (bonds, angles, dihedrals, ...).
 typedef struct CHFL_TOPOLOGY CHFL_TOPOLOGY;
 
 /// An opaque type handling a residue.
+///
+/// A `CHFL_RESIDUE` is a group of atoms belonging to the same logical unit.
+/// They can be small molecules, amino-acids in a protein, monomers in polymers,
+/// etc.
 typedef struct CHFL_RESIDUE CHFL_RESIDUE;
 
 /// An opaque type handling a selection.
+///
+/// `CHFL_SELECTION` allow to select atoms in a `CHFL_FRAME`, from a selection
+/// language. The selection language is built by combining basic operations.
+/// Each basic operation follows the `<selector>[(<variable>)] <operator>
+/// <value>` structure, where `<operator>` is a comparison operator in
+/// `== != < <= > >=`.
 typedef struct CHFL_SELECTION CHFL_SELECTION;
 #endif
 
+/// `chfl_status` list the possible values for the return status code of
+/// chemfiles functions.
 typedef enum {
-    /// Status code for success
+    /// The operation was successful.
     CHFL_SUCCESS = 0,
-    /// Memory error: out of memory, wrong size for arrays parameters, ...
+    /// Status code for error concerning memory: out of memory, wrong size for
+    /// pre-allocated buffers, *etc.*
     CHFL_MEMORY_ERROR = 1,
-    /// File error: file do not exist, you do not have rights to open it, ...
+    /// Status code for error concerning files: the file do not exist, the user
+    /// does not have rights to open it, *etc.*
     CHFL_FILE_ERROR = 2,
-    /// Error in file formating
+    /// Status code for error in file formating, i.e. for invalid files.
     CHFL_FORMAT_ERROR = 3,
-    /// Error in selection parsing
+    /// Status code when selection strings are invalid.
     CHFL_SELECTION_ERROR = 4,
-    /// Any other error from Chemfiles
+    /// Status code for any other error from Chemfiles.
     CHFL_GENERIC_ERROR = 5,
-    /// Error in the C++ standard library
+    /// Status code for error in the C++ standard library.
     CHFL_CXX_ERROR = 6
 } chfl_status;
 
+/// A 3-dimmensional vector for the chemfiles interface
 typedef double chfl_vector_t[3];
 
-/// @brief Get the version of the chemfiles library
+/// Get the version of the chemfiles library.
+///
+/// @example{tests/capi/doc/chfl_version.c}
 /// @return A null-terminated string containing the version of Chemfiles.
 CHFL_EXPORT const char* chfl_version(void);
 
