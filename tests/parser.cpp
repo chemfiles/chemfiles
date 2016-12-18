@@ -183,15 +183,15 @@ TEST_CASE("Lexing", "[selection]") {
     }
 
     SECTION("Functions") {
-        CHECK(tokenize("$9")[0].type() == Token::VARIABLE);
-        CHECK(tokenize("$ 9")[0].type() == Token::VARIABLE);
-        CHECK(tokenize("$255")[0].type() == Token::VARIABLE);
+        CHECK(tokenize("#9")[0].type() == Token::VARIABLE);
+        CHECK(tokenize("# 9")[0].type() == Token::VARIABLE);
+        CHECK(tokenize("#255")[0].type() == Token::VARIABLE);
 
-        CHECK_THROWS_AS(tokenize("$ gabo"), SelectionError);
-        CHECK_THROWS_AS(tokenize("$"), SelectionError);
-        CHECK_THROWS_AS(tokenize("78 $"), SelectionError);
-        CHECK_THROWS_AS(tokenize("bhics $"), SelectionError);
-        CHECK_THROWS_AS(tokenize("$256"), SelectionError);
+        CHECK_THROWS_AS(tokenize("# gabo"), SelectionError);
+        CHECK_THROWS_AS(tokenize("#"), SelectionError);
+        CHECK_THROWS_AS(tokenize("78 #"), SelectionError);
+        CHECK_THROWS_AS(tokenize("bhics #"), SelectionError);
+        CHECK_THROWS_AS(tokenize("#256"), SelectionError);
 
         CHECK(tokenize(",")[0].type() == Token::COMMA);
         auto toks = tokenize(",bagyu");
@@ -235,22 +235,22 @@ TEST_CASE("Lexing", "[selection]") {
 TEST_CASE("Parsing", "[selection]") {
     // This section uses the pretty-printing of AST to check the parsing
     SECTION("Operators") {
-        auto ast = "and -> index($1) == 1\n    -> index($1) == 1";
+        auto ast = "and -> index(#1) == 1\n    -> index(#1) == 1";
         CHECK(parse(tokenize("index == 1 and index == 1"))->print() == ast);
 
-        ast = "or -> index($1) == 1\n   -> index($1) == 1";
+        ast = "or -> index(#1) == 1\n   -> index(#1) == 1";
         CHECK(parse(tokenize("index == 1 or index == 1"))->print() == ast);
 
-        ast = "not index($1) == 1";
+        ast = "not index(#1) == 1";
         CHECK(parse(tokenize("not index == 1"))->print() == ast);
 
-        ast = "and -> index($1) == 1\n    -> not index($1) == 1";
+        ast = "and -> index(#1) == 1\n    -> not index(#1) == 1";
         CHECK(parse(tokenize("index == 1 and not index == 1"))->print() == ast);
 
-        ast = "or -> and -> index($1) == 1\n          -> index($1) == 1\n   -> index($1) == 1";
+        ast = "or -> and -> index(#1) == 1\n          -> index(#1) == 1\n   -> index(#1) == 1";
         CHECK(parse(tokenize("index == 1 and index == 1 or index == 1"))->print() == ast);
 
-        ast = "and -> index($1) == 1\n    -> or -> index($1) == 1\n          -> index($1) == 1";
+        ast = "and -> index(#1) == 1\n    -> or -> index(#1) == 1\n          -> index(#1) == 1";
         CHECK(parse(tokenize("index == 1 and (index == 1 or index == 1)"))->print() == ast);
 
         CHECK_THROWS_AS(parse(tokenize("name H and")), SelectionError);
@@ -267,21 +267,21 @@ TEST_CASE("Parsing", "[selection]") {
         CHECK(parse(tokenize("all"))->print() == "all");
         CHECK(parse(tokenize("none"))->print() == "none");
 
-        auto ast = "or -> all\n   -> name($1) == H";
+        auto ast = "or -> all\n   -> name(#1) == H";
         CHECK(parse(tokenize("all or name H"))->print() == ast);
 
-        ast = "or -> name($1) == H\n   -> none";
+        ast = "or -> name(#1) == H\n   -> none";
         CHECK(parse(tokenize("name H or none"))->print() == ast);
 
         CHECK(parse(tokenize("not all"))->print() == "not all");
     }
 
     SECTION("type") {
-        CHECK(parse(tokenize("type == goo"))->print() == "type($1) == goo");
-        CHECK(parse(tokenize("type($1) == goo"))->print() == "type($1) == goo");
-        CHECK(parse(tokenize("type goo"))->print() == "type($1) == goo");
-        CHECK(parse(tokenize("type($3) goo"))->print() == "type($3) == goo");
-        CHECK(parse(tokenize("type != goo"))->print() == "type($1) != goo");
+        CHECK(parse(tokenize("type == goo"))->print() == "type(#1) == goo");
+        CHECK(parse(tokenize("type(#1) == goo"))->print() == "type(#1) == goo");
+        CHECK(parse(tokenize("type goo"))->print() == "type(#1) == goo");
+        CHECK(parse(tokenize("type(#3) goo"))->print() == "type(#3) == goo");
+        CHECK(parse(tokenize("type != goo"))->print() == "type(#1) != goo");
 
         CHECK_THROWS_AS(parse(tokenize("type < bar")), SelectionError);
         CHECK_THROWS_AS(parse(tokenize("type >= bar")), SelectionError);
@@ -289,11 +289,11 @@ TEST_CASE("Parsing", "[selection]") {
     }
 
     SECTION("name") {
-        CHECK(parse(tokenize("name == goo"))->print() == "name($1) == goo");
-        CHECK(parse(tokenize("name($1) == goo"))->print() == "name($1) == goo");
-        CHECK(parse(tokenize("name goo"))->print() == "name($1) == goo");
-        CHECK(parse(tokenize("name($3) goo"))->print() == "name($3) == goo");
-        CHECK(parse(tokenize("name != goo"))->print() == "name($1) != goo");
+        CHECK(parse(tokenize("name == goo"))->print() == "name(#1) == goo");
+        CHECK(parse(tokenize("name(#1) == goo"))->print() == "name(#1) == goo");
+        CHECK(parse(tokenize("name goo"))->print() == "name(#1) == goo");
+        CHECK(parse(tokenize("name(#3) goo"))->print() == "name(#3) == goo");
+        CHECK(parse(tokenize("name != goo"))->print() == "name(#1) != goo");
 
         CHECK_THROWS_AS(parse(tokenize("name < bar")), SelectionError);
         CHECK_THROWS_AS(parse(tokenize("name >= bar")), SelectionError);
@@ -301,24 +301,24 @@ TEST_CASE("Parsing", "[selection]") {
     }
 
     SECTION("index") {
-        CHECK(parse(tokenize("index == 4"))->print() == "index($1) == 4");
-        CHECK(parse(tokenize("index($1) == 4"))->print() == "index($1) == 4");
-        CHECK(parse(tokenize("index 5"))->print() == "index($1) == 5");
-        CHECK(parse(tokenize("index($2) 5"))->print() == "index($2) == 5");
+        CHECK(parse(tokenize("index == 4"))->print() == "index(#1) == 4");
+        CHECK(parse(tokenize("index(#1) == 4"))->print() == "index(#1) == 4");
+        CHECK(parse(tokenize("index 5"))->print() == "index(#1) == 5");
+        CHECK(parse(tokenize("index(#2) 5"))->print() == "index(#2) == 5");
 
-        CHECK(parse(tokenize("index <= 42"))->print() == "index($1) <= 42");
-        CHECK(parse(tokenize("index != 12"))->print() == "index($1) != 12");
+        CHECK(parse(tokenize("index <= 42"))->print() == "index(#1) <= 42");
+        CHECK(parse(tokenize("index != 12"))->print() == "index(#1) != 12");
 
         CHECK_THROWS_AS(parse(tokenize("index == bar")), SelectionError);
         CHECK_THROWS_AS(parse(tokenize("index >= 42.3")), SelectionError);
     }
 
     SECTION("resname") {
-        CHECK(parse(tokenize("resname == goo"))->print() == "resname($1) == goo");
-        CHECK(parse(tokenize("resname($1) == goo"))->print() == "resname($1) == goo");
-        CHECK(parse(tokenize("resname goo"))->print() == "resname($1) == goo");
-        CHECK(parse(tokenize("resname($3) goo"))->print() == "resname($3) == goo");
-        CHECK(parse(tokenize("resname != goo"))->print() == "resname($1) != goo");
+        CHECK(parse(tokenize("resname == goo"))->print() == "resname(#1) == goo");
+        CHECK(parse(tokenize("resname(#1) == goo"))->print() == "resname(#1) == goo");
+        CHECK(parse(tokenize("resname goo"))->print() == "resname(#1) == goo");
+        CHECK(parse(tokenize("resname(#3) goo"))->print() == "resname(#3) == goo");
+        CHECK(parse(tokenize("resname != goo"))->print() == "resname(#1) != goo");
 
         CHECK_THROWS_AS(parse(tokenize("resname < bar")), SelectionError);
         CHECK_THROWS_AS(parse(tokenize("resname >= bar")), SelectionError);
@@ -326,39 +326,39 @@ TEST_CASE("Parsing", "[selection]") {
     }
 
     SECTION("resid") {
-        CHECK(parse(tokenize("resid == 4"))->print() == "resid($1) == 4");
-        CHECK(parse(tokenize("resid($1) == 4"))->print() == "resid($1) == 4");
-        CHECK(parse(tokenize("resid 5"))->print() == "resid($1) == 5");
-        CHECK(parse(tokenize("resid($2) 5"))->print() == "resid($2) == 5");
+        CHECK(parse(tokenize("resid == 4"))->print() == "resid(#1) == 4");
+        CHECK(parse(tokenize("resid(#1) == 4"))->print() == "resid(#1) == 4");
+        CHECK(parse(tokenize("resid 5"))->print() == "resid(#1) == 5");
+        CHECK(parse(tokenize("resid(#2) 5"))->print() == "resid(#2) == 5");
 
-        CHECK(parse(tokenize("resid <= 42"))->print() == "resid($1) <= 42");
-        CHECK(parse(tokenize("resid != 12"))->print() == "resid($1) != 12");
+        CHECK(parse(tokenize("resid <= 42"))->print() == "resid(#1) <= 42");
+        CHECK(parse(tokenize("resid != 12"))->print() == "resid(#1) != 12");
 
         CHECK_THROWS_AS(parse(tokenize("resid == bar")), SelectionError);
         CHECK_THROWS_AS(parse(tokenize("resid >= 42.3")), SelectionError);
     }
 
     SECTION("mass") {
-        CHECK(parse(tokenize("mass == 4"))->print() == "mass($1) == 4.000000");
-        CHECK(parse(tokenize("mass($1) == 4"))->print() == "mass($1) == 4.000000");
-        CHECK(parse(tokenize("mass 5"))->print() == "mass($1) == 5.000000");
-        CHECK(parse(tokenize("mass($2) 5"))->print() == "mass($2) == 5.000000");
+        CHECK(parse(tokenize("mass == 4"))->print() == "mass(#1) == 4.000000");
+        CHECK(parse(tokenize("mass(#1) == 4"))->print() == "mass(#1) == 4.000000");
+        CHECK(parse(tokenize("mass 5"))->print() == "mass(#1) == 5.000000");
+        CHECK(parse(tokenize("mass(#2) 5"))->print() == "mass(#2) == 5.000000");
 
-        CHECK(parse(tokenize("mass <= 42"))->print() == "mass($1) <= 42.000000");
-        CHECK(parse(tokenize("mass != 12"))->print() == "mass($1) != 12.000000");
+        CHECK(parse(tokenize("mass <= 42"))->print() == "mass(#1) <= 42.000000");
+        CHECK(parse(tokenize("mass != 12"))->print() == "mass(#1) != 12.000000");
 
         CHECK_THROWS_AS(parse(tokenize("mass <= bar")), SelectionError);
     }
 
     SECTION("Position & velocity") {
-        CHECK(parse(tokenize("x == 4"))->print() == "x($1) == 4.000000");
-        CHECK(parse(tokenize("x($1) == 4"))->print() == "x($1) == 4.000000");
-        CHECK(parse(tokenize("y < 4"))->print() == "y($1) < 4.000000");
-        CHECK(parse(tokenize("z >= 4"))->print() == "z($1) >= 4.000000");
+        CHECK(parse(tokenize("x == 4"))->print() == "x(#1) == 4.000000");
+        CHECK(parse(tokenize("x(#1) == 4"))->print() == "x(#1) == 4.000000");
+        CHECK(parse(tokenize("y < 4"))->print() == "y(#1) < 4.000000");
+        CHECK(parse(tokenize("z >= 4"))->print() == "z(#1) >= 4.000000");
 
-        CHECK(parse(tokenize("vx == 4"))->print() == "vx($1) == 4.000000");
-        CHECK(parse(tokenize("vy < 4"))->print() == "vy($1) < 4.000000");
-        CHECK(parse(tokenize("vz >= 4"))->print() == "vz($1) >= 4.000000");
+        CHECK(parse(tokenize("vx == 4"))->print() == "vx(#1) == 4.000000");
+        CHECK(parse(tokenize("vy < 4"))->print() == "vy(#1) < 4.000000");
+        CHECK(parse(tokenize("vz >= 4"))->print() == "vz(#1) >= 4.000000");
 
         CHECK_THROWS_AS(parse(tokenize("x <= bar")), SelectionError);
         CHECK_THROWS_AS(parse(tokenize("vy > bar")), SelectionError);
@@ -367,12 +367,12 @@ TEST_CASE("Parsing", "[selection]") {
     }
 
     SECTION("Multiple selections") {
-        auto ast = "and -> mass($1) < 4.000000\n    -> name($3) == O";
-        CHECK(parse(tokenize("mass($1) < 4 and name($3) O"))->print() == ast);
-        ast = "name($4) != Cs";
-        CHECK(parse(tokenize("name($4) != Cs"))->print() == ast);
-        ast = "or -> index($1) < 4\n   -> name($2) == H";
-        CHECK(parse(tokenize("index($1) < 4 or name($2) H"))->print() == ast);
+        auto ast = "and -> mass(#1) < 4.000000\n    -> name(#3) == O";
+        CHECK(parse(tokenize("mass(#1) < 4 and name(#3) O"))->print() == ast);
+        ast = "name(#4) != Cs";
+        CHECK(parse(tokenize("name(#4) != Cs"))->print() == ast);
+        ast = "or -> index(#1) < 4\n   -> name(#2) == H";
+        CHECK(parse(tokenize("index(#1) < 4 or name(#2) H"))->print() == ast);
     }
 
     SECTION("Parsing errors") {

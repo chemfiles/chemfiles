@@ -20,7 +20,7 @@ one, two, three or four independent atoms; and ``bonds``, ``angles`` and
 
 A selection is built using a context and a set of constraints separated by a
 colon. For example, ``atoms: name == H`` will select all atoms whose name is
-``H``. ``angles: name($2) == O and distance($1, $3) < 1.5`` will select all sets
+``H``. ``angles: name(#2) == O and distance(#1, #3) < 1.5`` will select all sets
 of three bonded atoms forming an angle such that the name of the second atom is
 ``O`` and the distance between the first and the third atom is less than 1.5.
 
@@ -29,19 +29,19 @@ which can be applied to one or more atoms. The ``name``, ``mass`` and ``z``
 selectors are applied to one atom and give the name, the mass and the z
 coordinate of this atom. Other selectors can be applied to two or more atoms,
 like ``distance`` or ``angle``. When using a selection with more than one atom,
-selectors refers to the different atoms with the ``$1``, ``$2``, ``$3`` or
-``$4`` variables: ``name($3)`` will give the name of the third atom, and so on.
+selectors refers to the different atoms with the ``#1``, ``#2``, ``#3`` or
+``#4`` variables: ``name(#3)`` will give the name of the third atom, and so on.
 Then we compare the selector result for a given atom with a value, either from
-another selector --- ``name($1) != name($2)`` --- or a literal value ---
-``mass($2) < 4``. The comparison operators are ``==`` (equals); ``!=`` (not
+another selector --- ``name(#1) != name(#2)`` --- or a literal value ---
+``mass(#2) < 4``. The comparison operators are ``==`` (equals); ``!=`` (not
 equals); ``<`` (less than), ``<=`` (less or equals); ``>`` (more than); and ``>=``
 (more or equals).
 
 Finally, constraints are combined with boolean operators. The ``and`` operator
 is true if both side of the expression are true; the ``or`` operator is true if
 either side of the expression is true; and the ``not`` operator reverse true to
-false and false to true. ``name($1) == H and not x($1) < 5.0`` and ``(z($2) < 45
-and name($4) == O) or name($1) == C`` are complex selections using booleans
+false and false to true. ``name(#1) == H and not x(#1) < 5.0`` and ``(z(#2) < 45
+and name(#4) == O) or name(#1) == C`` are complex selections using booleans
 operators.
 
 In order to remove ambiguity when using multiple boolean operations, selections
@@ -77,7 +77,7 @@ Elisions
 
 This multiple selection language can be a bit verbose for simpler cases, so it
 is sometimes allowed to remove parts of the selection. First, in the ``atom``
-context, the ``$1`` variable is optional, and ``atom: name($1) == H`` is
+context, the ``#1`` variable is optional, and ``atom: name(#1) == H`` is
 equivalent to ``atom: name == H``.
 
 Then, if no context is given, the ``atom`` context is used. This make ``atom:
@@ -86,6 +86,6 @@ name == H`` equivalent to ``name == H``.
 And finally, the ``==`` comparison operator is the default one if no operator is
 precised. This means that we can write ``name H`` instead of ``name == H``.
 
-At the end, using all these elisions rules, ``atom: name($1) == H or name($1) ==
-O`` is equivalent to ``name H or name O``; and ``bond: name($1) == C and
-mass($2) == 4.5`` is equivalent to ``bond: name($1) C and mass($2) 4.5``.
+At the end, using all these elisions rules, ``atom: name(#1) == H or name(#1) ==
+O`` is equivalent to ``name H or name O``; and ``bond: name(#1) == C and
+mass(#2) == 4.5`` is equivalent to ``bond: name(#1) C and mass(#2) 4.5``.

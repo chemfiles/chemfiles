@@ -24,6 +24,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   atomic data, positions and velocities.
 * Add "Selection::string" function and the corresponding `chfl_selection_string`
   to get the string used to build a selection.
+* Selection variables uses the `#3` syntax instead of the `$3` syntax to allow
+  passing selection string as shell arguments.
 
 ### Changes in supported formats
 

@@ -39,7 +39,7 @@ std::string Token::str() const {
     case Token::COMMA:
         return ",";
     case Token::VARIABLE:
-        return "$" + std::to_string(variable_);
+        return "#" + std::to_string(variable_);
     case Token::EQ:
         return "==";
     case Token::NEQ:
@@ -98,7 +98,7 @@ static std::vector<std::string> split(const std::string& data) {
     std::string token;
     std::vector<std::string> tokens;
     for (auto c : data) {
-        if (c == '(' || c == ')' || c == '$' || c == ',') {
+        if (c == '(' || c == ')' || c == '#' || c == ',') {
             // Handle some tokens that may not be separated from the others
             // tokens by spaces, by splitting them manually.
             if (token.length() != 0) {
@@ -171,9 +171,9 @@ std::vector<Token> selections::tokenize(const std::string& input) {
         } else if (word == ">=") {
             tokens.emplace_back(Token(Token::GE));
             continue;
-        } else if (word == "$") {
+        } else if (word == "#") {
             if (i == splited.size() - 1) {
-                throw SelectionError("Missing value after '$'");
+                throw SelectionError("Missing value after '#'");
             }
             // Get the next word and try to parse a number out of it
             word = splited[++i];

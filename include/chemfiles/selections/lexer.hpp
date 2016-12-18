@@ -44,7 +44,7 @@ public:
         OR,        //! "or" token
         IDENT,     //! Generic identifier
         NUMBER,    //! Number
-        VARIABLE,  //! "$(\d)" token
+        VARIABLE,  //! "#(\d+)" token
     };
 
     //! Basic copy and move constructors
