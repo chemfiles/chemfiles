@@ -13,29 +13,33 @@
 extern "C" {
 #endif
 
-/// @brief Get the error message corresponding to an error code.
-/// @param code The status code
-/// @return A null-terminated string encoding the textual representation of the
-///         status.
-CHFL_EXPORT const char* chfl_strerror(chfl_status code);
+/// Get the error message corresponding to a given `status`.
+///
+/// @example{tests/capi/doc/chfl_strerror.c}
+/// @return A null-terminated string containing the error message.
+CHFL_EXPORT const char* chfl_strerror(chfl_status status);
 
-/// @brief Get the last error message.
-/// @return A null-terminated string encoding the textual representation of the
-///         last error.
+/// Get the last error message.
+///
+/// @example{tests/capi/doc/chfl_last_error.c}
+/// @return A null-terminated string containing the last error message
 CHFL_EXPORT const char* chfl_last_error(void);
 
-/// @brief Clear the last error message.
-/// @return The status code
+/// Clear the last error message.
+///
+/// @example{tests/capi/doc/chfl_clear_errors.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_clear_errors(void);
 
 /// Callback type that can be used to process warning events.
 typedef void (*chfl_warning_callback)(const char* message);
 
-
-/// @brief Redirect all logging to user-provided logging. The `callback` function
-/// will be called at each loggin operation with the level of the message, and
-/// the message itself.
-/// @return The status code
+/// Set the global warning `callback` to be used for each warning event.
+///
+/// @example{tests/capi/doc/chfl_set_warning_callback.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_set_warning_callback(chfl_warning_callback callback);
 
 #ifdef __cplusplus

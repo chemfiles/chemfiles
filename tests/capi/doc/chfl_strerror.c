@@ -5,8 +5,8 @@
 
 int main() {
     // [example]
-    const char* version = chfl_version();
-    assert(strcmp(version, CHEMFILES_VERSION) == 0);
+    const char* message = chfl_strerror(CHFL_SUCCESS);
+    assert(strcmp(message, "operation was sucessfull") == 0);
     // [example]
     return 0;
 }
