@@ -13,147 +13,168 @@
 extern "C" {
 #endif
 
-/// @brief Create an empty frame with initial capacity of `natoms`. It will be
-///        resized by the library as needed.
-/// @param natoms the size of the wanted frame
-/// @return A pointer to the frame, or NULL in case of error
+/// Create an empty frame with initial capacity of `natoms`.
+///
+/// The caller of this function should free the allocated memory using
+/// `chfl_frame_free`.
+///
+/// @example{tests/capi/doc/chfl_frame/chfl_frame.c}
+/// @return A pointer to the frame, or NULL in case of error. You can use
+///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_FRAME* chfl_frame(uint64_t natoms);
 
-/// @brief Get the current number of atoms in the frame.
-/// @param frame The frame to analyse
-/// @param natoms the number of atoms in the frame
-/// @return The status code
+/// Get the current number of atoms in a `frame` in the integer pointed to by
+/// `natoms`
+///
+/// @example{tests/capi/doc/chfl_frame/atoms_count.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_atoms_count(
     const CHFL_FRAME* const frame, uint64_t* natoms
 );
 
-/// @brief Get a pointer to the positions array from a frame.
+/// Get a pointer to the positions array from a `frame`.
 ///
-/// The positions are stored as a N x 3 array, this function set a pointer to
-/// point to the first element of this array, and give the value of N. If the
-/// frame is resized (by writing to it, or calling `chfl_frame_resize`), the
-/// pointer is invalidated.
+/// Positions are stored as a `natoms x 3` array, this function set the pointer
+/// pointed to by `positions` point to the first element of this array, and give
+/// the number of atoms in the integer pointed to by `size`.
 ///
-/// @param frame The frame
-/// @param data A pointer to a `chfl_vector_t` array, which will be set to point
-///             to the positions data.
-/// @param size A pointer to the an integer to be filled with the array size
-/// @return The status code
+/// If the frame is resized (by writing to it, or calling `chfl_frame_resize`),
+/// the pointer is invalidated. If the frame is freed using `chfl_frame_free`,
+/// the pointer is freed too. There is then no need to free the `*positions`
+/// pointer for the caller of this function.
+///
+/// @example{tests/capi/doc/chfl_frame/positions.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_positions(
-    CHFL_FRAME* const frame, chfl_vector_t** data, uint64_t* size
+    CHFL_FRAME* const frame, chfl_vector_t** positions, uint64_t* size
 );
 
-/// @brief Get a pointer to the velocities array from a frame.
+/// Get a pointer to the velocities array from a `frame`.
 ///
-/// The velocities are stored as a `N x 3` array, this function set a pointer
-/// to point to the first element of this array, and give the value of N. If the
-/// frame is resized (by writing to it, or calling `chfl_frame_resize`), the
-/// pointer is invalidated.
+/// Velocities are stored as a `natoms x 3` array, this function set the pointer
+/// pointed to by `positions` point to the first element of this array, and give
+/// the number of atoms in the integer pointed to by `size`.
+///
+/// If the frame is resized (by writing to it, or calling `chfl_frame_resize`),
+/// the pointer is invalidated. If the frame is freed using `chfl_frame_free`,
+/// the pointer is freed too. There is then no need to free the `*velocity`
+/// pointer for the caller of this function.
 ///
 /// If the frame do not have velocity, this will return an error. Use
 /// `chfl_frame_add_velocities` to add velocities to a frame before calling
 /// this function.
 ///
-/// @param frame The frame
-/// @param data A pointer to a `chfl_vector_t` array, which will be set to point
-///             to the velocity data.
-/// @param size A pointer to the an integer to be filled with the array size
-/// @return The status code
+/// @example{tests/capi/doc/chfl_frame/velocities.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_velocities(
-    CHFL_FRAME* const frame, chfl_vector_t** data, uint64_t* size
+    CHFL_FRAME* const frame, chfl_vector_t** velocities, uint64_t* size
 );
 
-/// @brief Add an atom and the corresponding position (and velocity) data to a
-///        frame.
+/// Add an `atom` and the corresponding `position` and `velocity` data to a
+/// `frame`.
 ///
-/// @param frame The frame
-/// @param atom The atom to add
-/// @param position The position of the atom
-/// @param velocity The velocity of the atom. This parameter can be `NULL` if no
-///                 velocity is associated with the atom.
-/// @return The status code
+/// `velocity` can be `NULL` if no velocity is associated with the atom.
+///
+/// @example{tests/capi/doc/chfl_frame/add_atom.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_add_atom(
     CHFL_FRAME* const frame, const CHFL_ATOM* const atom,
     chfl_vector_t position, chfl_vector_t velocity
 );
 
-/// @brief Resize the positions and the velocities in frame, to make space for
-///        `natoms` atoms.
+/// Resize the positions and the velocities in frame, to have space for `natoms`
+/// atoms.
 ///
-/// This function may invalidate any pointer to the positions or the
-/// velocities if the new size is bigger than the old one. In all the cases,
-/// previous data is conserved. This function conserve the presence of absence of
-/// velocities.
+/// This function may invalidate any pointer to the positions or the velocities
+/// if the new size is bigger than the old one. In all the cases, previous data
+/// is conserved. This function conserve the presence or absence of velocities.
 ///
-/// @param frame The frame
-/// @param natoms The new number of atoms.
-/// @return The status code
+/// @example{tests/capi/doc/chfl_frame/resize.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_resize(
     CHFL_FRAME* const frame, uint64_t natoms
 );
 
-/// @brief Add velocity storage to this frame.
+/// Add velocity data to this `frame`.
 ///
-/// The storage is initialized with the result of `chfl_frame_atoms_count` as
-/// number of atoms. If the frame already have velocities, this does nothing.
+/// The velocities ar initialized to `(chfl_vector_t){0, 0, 0}`. If the frame
+/// already have velocities, this does nothing.
 ///
-/// @param frame The frame
-/// @return The status code
+/// @example{tests/capi/doc/chfl_frame/add_velocities.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_add_velocities(CHFL_FRAME* const frame);
 
-/// @brief Ask wether this frame contains velocity data or not.
-/// @param frame The frame
-/// @param has_velocities A boolean, will be true if the frame have velocities,
-///                       false otherwise.
-/// @return The status code
+/// Check if this `frame` contains velocity, and store the result in
+/// `has_velocities`
+///
+/// @example{tests/capi/doc/chfl_frame/has_velocities.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_has_velocities(
     const CHFL_FRAME* const frame, bool* has_velocities
 );
 
-/// @brief Set the unit cell of a Frame.
-/// @param frame The frame
-/// @param cell The new cell
-/// @return The status code
+/// Set the unit cell of a `frame` to `cell`.
+///
+/// @example{tests/capi/doc/chfl_frame/set_cell.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_set_cell(
     CHFL_FRAME* const frame, const CHFL_CELL* const cell
 );
 
-/// @brief Set the Topology of a Frame.
-/// @param frame The frame
-/// @param topology The new topology
-/// @return The status code
+/// Set the topology of a `frame` to `topology`.
+///
+/// Calling this function with a topology that does not contain the right
+/// number of atom will return an error.
+///
+/// @example{tests/capi/doc/chfl_frame/set_topology.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_set_topology(
     CHFL_FRAME* const frame, const CHFL_TOPOLOGY* const topology
 );
 
-/// @brief Get the Frame step, i.e. the frame number in the trajectory
-/// @param frame The frame
-/// @param step This will contains the step number
-/// @return The status code
+/// Get a `frame` step, *i.e.* the frame number in the trajectory in the integer
+/// pointed to by `step`.
+///
+/// @example{tests/capi/doc/chfl_frame/step.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_step(
     const CHFL_FRAME* const frame, uint64_t* step
 );
 
-/// @brief Set the Frame step.
-/// @param frame The frame
-/// @param step The new frame step
-/// @return The status code
+/// Set a `frame` step, *i.e.* the frame number in the trajectory to `step`.
+///
+/// @example{tests/capi/doc/chfl_frame/set_step.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_set_step(
     CHFL_FRAME* const frame, uint64_t step
 );
 
-/// @brief  Guess the bonds, angles and dihedrals in the system.
+/// Guess the bonds, angles and dihedrals in a `frame`.
 ///
 /// The bonds are guessed using a distance-based algorithm, and then angles and
 /// dihedrals are guessed from the bonds.
 ///
-/// @param frame The Frame to analyse
-/// @return The status code
+/// @example{tests/capi/doc/chfl_frame/guess_topology.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_guess_topology(CHFL_FRAME* const frame);
 
-/// @brief Destroy a frame, and free the associated memory
-/// @param frame The frame to destroy
-/// @return The status code
+/// Free the memory associated with a `frame`.
+///
+/// @example{tests/capi/doc/chfl_frame/chfl_frame.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_free(CHFL_FRAME* const frame);
 
 #ifdef __cplusplus

@@ -45,6 +45,9 @@ CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_with_format(
 
 /// Read the next step of the `trajectory` into a `frame`.
 ///
+/// If the number of atoms in frame does not correspond to the number of atom
+/// in the next step, the frame is resized.
+///
 /// @example{tests/capi/doc/chfl_trajectory/read.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
@@ -52,7 +55,10 @@ CHFL_EXPORT chfl_status chfl_trajectory_read(
     CHFL_TRAJECTORY* const trajectory, CHFL_FRAME* const frame
 );
 
-/// Read a specific `step` of the `trajectory` into a `frame`
+/// Read a specific `step` of the `trajectory` into a `frame`.
+///
+/// If the number of atoms in frame does not correspond to the number of atom
+/// in the step, the frame is resized.
 ///
 /// @example{tests/capi/doc/chfl_trajectory/read_step.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
