@@ -45,6 +45,18 @@ TEST_CASE("Atom", "[CAPI]") {
         CHECK(data[2] == 120);
 
         CHECK_STATUS(chfl_cell_free(cell));
+
+        // Check that a call to chfl_cell_triclinic always gives a triclinic
+        // cell, even with all angles equal to 90°
+        angles[0] = 90; angles[1] = 90; angles[2] = 90;
+        cell = chfl_cell_triclinic(lengths, angles);
+        REQUIRE(cell != NULL);
+
+        chfl_cell_shape_t shape;
+        CHECK_STATUS(chfl_cell_shape(cell, &shape));
+        CHECK(shape == CHFL_CELL_TRICLINIC);
+
+        CHECK_STATUS(chfl_cell_free(cell));
     }
 
     SECTION("Length") {

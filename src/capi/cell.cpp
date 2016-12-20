@@ -35,6 +35,9 @@ extern "C" CHFL_CELL* chfl_cell_triclinic(const chfl_vector_t lenghts, const chf
             lenghts[0], lenghts[1], lenghts[2],
             angles[0], angles[1], angles[2]
         );
+        // ensure that the unit cell shape is always TRICLINIC, even if the
+        // three angles are 90°.
+        cell->shape(UnitCell::TRICLINIC);
     )
     return cell;
 error:
