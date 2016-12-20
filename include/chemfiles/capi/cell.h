@@ -14,7 +14,7 @@ extern "C" {
 #endif
 
 /// Available cell shapes in chemfiles
-typedef enum CHFL_CELL_SHAPE {
+typedef enum {
     /// The three angles are 90°
     CHFL_CELL_ORTHORHOMBIC = 0,
     /// The three angles may not be 90°
@@ -23,96 +23,131 @@ typedef enum CHFL_CELL_SHAPE {
     CHFL_CELL_INFINITE = 2,
 } chfl_cell_shape_t;
 
-/// @brief Create an ORTHORHOMBIC unit cell from the three lenghts
-/// @param lenghts the three lenght of the cell (in Angstroms)
-/// @return A pointer to the unit cell, or NULL in case of error
+/// Create an unit cell from three `lenghts`. The unit cell shape is
+/// `CHFL_CELL_ORTHORHOMBIC`.
+///
+/// The cell lenghts should be in Angstroms.
+///
+/// @example{tests/capi/doc/chfl_cell/chfl_cell.c}
+/// @return A pointer to the unit cell, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_CELL* chfl_cell(const chfl_vector_t lenghts);
 
-/// @brief Create a TRICLINIC unit cell from the three lenghts and the three angles
-/// @param lenghts the three lenght of the cell (in Angstroms)
-/// @param angles the three angles of the cell (in degree)
-/// @return A pointer to the unit cell, or NULL in case of error
+/// Create an unit cell from three `lenghts` and three `angles`. The unit cell
+/// shape is `CHFL_CELL_TRICLINIC`.
 ///
-/// The cell angles are defined like this: alpha is the angles between the cell
+/// The cell lenghts should be in Angstroms, and the angles in degree.
+///
+/// The cell angles are defined as follow: alpha is the angles between the cell
 /// vector `b` and `c`; beta as the angle between `a` and `c`; and gamma as the
 /// angle between `a` and `b`.
+///
+/// @example{tests/capi/doc/chfl_cell/triclinic.c}
+/// @return A pointer to the unit cell, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_CELL* chfl_cell_triclinic(
     const chfl_vector_t lenghts, const chfl_vector_t angles
 );
 
-/// @brief Get the unit cell from a frame
-/// @param frame the frame
-/// @return A pointer to the unit cell, or NULL in case of error
+/// Get a copy of the unit cell of a `frame`.
+///
+/// @example{tests/capi/doc/chfl_cell/from_frame.c}
+/// @return A pointer to the unit cell, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* const frame);
 
-/// @brief Get the cell volume.
-/// @param cell the unit cell to read
-/// @param volume the volume
-/// @return The status code
+/// Get the unit cell volume of `cell` in the double pointed to by `volume`.
+///
+/// @example{tests/capi/doc/chfl_cell/volume.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_volume(
     const CHFL_CELL* const cell, double* volume
 );
 
-/// @brief Get the cell lenghts.
-/// @param cell the unit cell to read
-/// @param lenghts the three lenght of the cell (in Angstroms)
-/// @return The status code
+/// Get the unit cell lenghts in `lengths`. The cell lengths are in Angstroms.
+///
+/// @example{tests/capi/doc/chfl_cell/lengths.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_lengths(
-    const CHFL_CELL* const cell, chfl_vector_t lenghts
+    const CHFL_CELL* const cell, chfl_vector_t lengths
 );
 
-/// @brief Set the unit cell lenghts.
-/// @param cell the unit cell to modify
-/// @param lenghts the three lenght of the cell (in Angstroms)
-/// @return The status code
+/// Set the unit cell lenghts to `lenghts`.
+///
+/// The cell lenghts should be in Angstroms.
+///
+/// @example{tests/capi/doc/chfl_cell/set_lengths.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_set_lengths(
     CHFL_CELL* const cell, const chfl_vector_t lenghts
 );
 
-/// @brief Get the cell angles, in degrees.
-/// @param cell the cell to read
-/// @param angles the three angles of the cell (in degree)
-/// @return The status code
+/// Get the cell angles in `angles`. The cell angles are in degrees.
+///
+/// @example{tests/capi/doc/chfl_cell/angles.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_angles(
     const CHFL_CELL* const cell, chfl_vector_t angles
 );
 
-/// @brief Set the cell angles, in degrees. This is only possible for TRICLINIC
-/// cells.
-/// @param cell the unit cell to modify
-/// @param angles the three angles of the cell (in degree)
-/// @return The status code
+/// Set the cell angles to `angles`.
+///
+/// The cell lenghts should be in degree. Trying to set cell angles on a cell
+/// which is not triclinic (does not have the `CHFL_CELL_TRICLINIC` shape) is
+/// an error.
+///
+/// @example{tests/capi/doc/chfl_cell/set_angles.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_set_angles(
     CHFL_CELL* const cell, const chfl_vector_t angles
 );
 
-/// @brief Get the unit cell matricial representation.
-/// @param cell the unit cell to use
-/// @param matrix the matrix to fill. It should be a 3x3 matrix.
-/// @return The status code
+/// Get the unit `cell` matricial representation in `matrix`.
+///
+/// The unit cell representation is obtained by aligning the a vector along the
+/// *x* axis and putting the b vector in the *xy* plane. This make the matrix
+/// an upper triangular matrix:
+/// ```
+/// | a_x   b_x   c_x |
+/// |  0    b_y   c_y |
+/// |  0     0    c_z |
+/// ```
+///
+/// @example{tests/capi/doc/chfl_cell/matrix.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_matrix(
     const CHFL_CELL* const cell, chfl_vector_t matrix[3]
 );
 
-/// @brief Get the cell shape
-/// @param cell the unit cell to read
-/// @param shape the shape of the cell
-/// @return The status code
+/// Get the unit `cell` shape in `shape`.
+///
+/// @example{tests/capi/doc/chfl_cell/shape.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_shape(
     const CHFL_CELL* const cell, chfl_cell_shape_t* const shape
 );
 
-/// @brief Set the cell shape
-/// @param cell the cell to modify
-/// @param shape the new shape of the cell
-/// @return The status code
+/// Set the unit `cell` shape to `shape`.
+///
+/// @example{tests/capi/doc/chfl_cell/set_shape.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_set_shape(
     CHFL_CELL* const cell, chfl_cell_shape_t shape
 );
 
-/// @brief Destroy an unit cell, and free the associated memory
-/// @param cell The cell to destroy
-/// @return The status code
+/// Free the memory associated with a `cell`.
+///
+/// @example{tests/capi/doc/chfl_cell/chfl_cell.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_free(CHFL_CELL* const cell);
 
 #ifdef __cplusplus
