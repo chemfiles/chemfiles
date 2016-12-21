@@ -3,6 +3,8 @@
 Function manipulating ``CHFL_TOPOLOGY``
 ---------------------------------------
 
+.. doxygentypedef:: CHFL_TOPOLOGY
+
 .. doxygenfunction:: chfl_topology
 
 .. doxygenfunction:: chfl_topology_from_frame
@@ -14,6 +16,10 @@ Function manipulating ``CHFL_TOPOLOGY``
 .. doxygenfunction:: chfl_topology_append
 
 .. doxygenfunction:: chfl_topology_remove
+
+.. doxygenfunction:: chfl_topology_add_bond
+
+.. doxygenfunction:: chfl_topology_remove_bond
 
 .. doxygenfunction:: chfl_topology_isbond
 
@@ -32,10 +38,6 @@ Function manipulating ``CHFL_TOPOLOGY``
 .. doxygenfunction:: chfl_topology_angles
 
 .. doxygenfunction:: chfl_topology_dihedrals
-
-.. doxygenfunction:: chfl_topology_add_bond
-
-.. doxygenfunction:: chfl_topology_remove_bond
 
 .. doxygenfunction:: chfl_topology_add_residue
 
