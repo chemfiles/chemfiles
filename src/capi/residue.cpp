@@ -34,7 +34,6 @@ extern "C" CHFL_RESIDUE* chfl_residue_from_topology(const CHFL_TOPOLOGY* const t
         if (i < topology->residues().size()) {
             residue = new Residue(topology->residues()[checked_cast(i)]);
         }
-
     )
     return residue;
 error:

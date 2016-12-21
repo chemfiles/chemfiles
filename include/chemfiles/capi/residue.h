@@ -13,77 +13,98 @@
 extern "C" {
 #endif
 
-/// @brief Create a new residue
-/// @param name The residue name
-/// @param resid The residue identifier, or `uint64_t(-1)` if the residue do not
-///              have an identifier
-/// @return The status code
+/// Create a new residue with the given `name` and residue index `resid`.
+/// If the residue has no index, the special value of `uint64_t(-1)` should be
+/// used.
+///
+/// @example{tests/capi/doc/chfl_residue/chfl_residue.c}
+/// @return A pointer to the residue, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_RESIDUE* chfl_residue(const char* name, uint64_t resid);
 
-/// @brief Get a residue from a topology
-/// @param topology The topology
-/// @param i The residue index in the topology. This is not always the same as
-///          the `resid`. This value should be between 0 and the result of
-///          `chfl_topology_residues_count`.
-/// @return The status code
+/// Get the residue at index `i` from a `topology`.
+///
+/// If `i` is bigger than the result of `chfl_topology_residues_count`, this
+/// function will return `NULL`.
+///
+/// The residue index in the topology is not always the same as the residue
+/// `id`.
+///
+/// @example{tests/capi/doc/chfl_residue/from_topology.c}
+/// @return A pointer to the residue, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_RESIDUE* chfl_residue_from_topology(
     const CHFL_TOPOLOGY* const topology, uint64_t i
 );
 
-/// @brief Get a the residue containing a given atom, or NULL if the atom is not
-///        in a residue.
-/// @param topology The topology
-/// @param i The atom index
-/// @return The status code
+/// Get a copy of the residue containing the atom at index `i` in the
+/// `topology`.
+///
+/// This function will return `NULL` if the atom is not in a residue, or if the
+/// index `i` is bigger than `chfl_topology_atoms_count`.
+///
+/// @example{tests/capi/doc/chfl_residue/for_atom.c}
+/// @return A pointer to the residue, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_RESIDUE* chfl_residue_for_atom(
     const CHFL_TOPOLOGY* const topology, uint64_t i
 );
 
-/// @brief Get the number of atoms in a residue
-/// @param residue The residue
-/// @param size The size of the residue
-/// @return The status code
+/// Get the number of atoms in a `residue` in the integer pointed to by `size`.
+///
+/// @example{tests/capi/doc/chfl_residue/atoms_count.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_atoms_count(
     const CHFL_RESIDUE* const residue, uint64_t* size
 );
 
-/// @brief Get the identifier of a residue in the initial topology file
-/// @param residue The residue
-/// @param id The id of the residue
-/// @return The status code
+/// Get the index of a `residue` in the initial topology file in the integer
+/// pointed to by `id`.
+///
+/// @example{tests/capi/doc/chfl_residue/id.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_id(
     const CHFL_RESIDUE* const residue, uint64_t* id
 );
 
-/// @brief Get the name of a residue
-/// @param residue The residue
-/// @param name A string buffer to be filled with the name
-/// @param buffsize The size of the string buffer
-/// @return The status code
+/// Get the name of a `residue` in the string buffer `name`.
+///
+/// The buffer size must be passed in `buffsize`. This function will truncate
+/// the residue name to fit in the buffer.
+///
+/// @example{tests/capi/doc/chfl_residue/name.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_name(
     const CHFL_RESIDUE* const residue, char* name, uint64_t buffsize
 );
 
-/// @brief Add the atom at index `i` in the residue
-/// @param residue The residue
-/// @param i The atomic index
-/// @return The status code
+/// Add the atom at index `i` in the `residue`.
+///
+/// @example{tests/capi/doc/chfl_residue/add_atom.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_add_atom(
     CHFL_RESIDUE* const residue, uint64_t i
 );
 
-/// @brief Check if the atom at index `i` is in the residue
-/// @param residue The residue
-/// @param i The atomic index
-/// @param result true if the atom is in the residue, false otherwise
-/// @return The status code
+/// Check if the atom at index `i` is in the `residue`, and store the result in
+/// `result`.
+///
+/// @example{tests/capi/doc/chfl_residue/contains.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_contains(
     const CHFL_RESIDUE* const residue, uint64_t i, bool* result
 );
 
-/// @brief Destroy a residue, and free the associated memory
-/// @param residue The residue to destroy
-/// @return The status code
+/// Free the memory associated with a `residue`.
+///
+/// @example{tests/capi/doc/chfl_residue/chfl_residue.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_free(CHFL_RESIDUE* const residue);
 
 #ifdef __cplusplus
