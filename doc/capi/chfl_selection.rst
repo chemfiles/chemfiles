@@ -3,6 +3,8 @@
 Function manipulating ``CHFL_SELECTION``
 ----------------------------------------
 
+.. doxygentypedef:: CHFL_SELECTION
+
 .. doxygenfunction:: chfl_selection
 
 .. doxygenfunction:: chfl_selection_size
