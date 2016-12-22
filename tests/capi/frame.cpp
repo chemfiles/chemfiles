@@ -192,10 +192,10 @@ TEST_CASE("Frame", "[CAPI]") {
         CHFL_ATOM* Ar = chfl_atom("Ar");
         REQUIRE(Ar != NULL);
 
-        CHECK_STATUS(chfl_topology_append(topology, Zn));
-        CHECK_STATUS(chfl_topology_append(topology, Ar));
-        CHECK_STATUS(chfl_topology_append(topology, Zn));
-        CHECK_STATUS(chfl_topology_append(topology, Ar));
+        CHECK_STATUS(chfl_topology_add_atom(topology, Zn));
+        CHECK_STATUS(chfl_topology_add_atom(topology, Ar));
+        CHECK_STATUS(chfl_topology_add_atom(topology, Zn));
+        CHECK_STATUS(chfl_topology_add_atom(topology, Ar));
         CHECK_STATUS(chfl_atom_free(Zn));
         CHECK_STATUS(chfl_atom_free(Ar));
 

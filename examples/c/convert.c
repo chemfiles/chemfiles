@@ -18,9 +18,9 @@ int main(void) {
     CHFL_ATOM* O = chfl_atom("O");
     CHFL_ATOM* H = chfl_atom("H");
     CHFL_TOPOLOGY* water = chfl_topology();
-    chfl_topology_append(water, O);
-    chfl_topology_append(water, H);
-    chfl_topology_append(water, H);
+    chfl_topology_add_atom(water, O);
+    chfl_topology_add_atom(water, H);
+    chfl_topology_add_atom(water, H);
     chfl_topology_add_bond(water, 0, 1);
     chfl_topology_add_bond(water, 0, 2);
 

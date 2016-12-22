@@ -162,7 +162,7 @@ TEST_CASE("Read trajectory", "[CAPI]") {
         REQUIRE(atom != NULL);
 
         for (size_t i=0; i<9; i++) {
-            CHECK_STATUS(chfl_topology_append(topology, atom));
+            CHECK_STATUS(chfl_topology_add_atom(topology, atom));
         }
 
         CHECK_STATUS(chfl_trajectory_set_topology(trajectory, topology));
@@ -252,7 +252,7 @@ static CHFL_FRAME* testing_frame() {
     REQUIRE(atom != NULL);
 
     for (unsigned i=0; i<4; i++) {
-        CHECK_STATUS(chfl_topology_append(topology, atom));
+        CHECK_STATUS(chfl_topology_add_atom(topology, atom));
     }
     CHECK_STATUS(chfl_atom_free(atom));
 

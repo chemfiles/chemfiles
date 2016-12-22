@@ -101,10 +101,10 @@ static CHFL_FRAME* testing_frame(void) {
     REQUIRE(H != NULL);
     REQUIRE(O != NULL);
 
-    CHECK_STATUS(chfl_topology_append(topology, H));
-    CHECK_STATUS(chfl_topology_append(topology, O));
-    CHECK_STATUS(chfl_topology_append(topology, O));
-    CHECK_STATUS(chfl_topology_append(topology, H));
+    CHECK_STATUS(chfl_topology_add_atom(topology, H));
+    CHECK_STATUS(chfl_topology_add_atom(topology, O));
+    CHECK_STATUS(chfl_topology_add_atom(topology, O));
+    CHECK_STATUS(chfl_topology_add_atom(topology, H));
     CHECK_STATUS(chfl_atom_free(O));
     CHECK_STATUS(chfl_atom_free(H));
 

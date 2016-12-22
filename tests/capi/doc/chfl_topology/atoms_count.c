@@ -7,9 +7,9 @@ int main() {
     CHFL_TOPOLOGY* topology = chfl_topology();
 
     CHFL_ATOM* atom = chfl_atom("F");
-    chfl_topology_append(topology, atom);
-    chfl_topology_append(topology, atom);
-    chfl_topology_append(topology, atom);
+    chfl_topology_add_atom(topology, atom);
+    chfl_topology_add_atom(topology, atom);
+    chfl_topology_add_atom(topology, atom);
     chfl_atom_free(atom);
 
     uint64_t atoms = 0;

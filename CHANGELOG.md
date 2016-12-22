@@ -40,6 +40,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * C API functions taking three lengths/angles now take a `double[3]` parameter
   instead.
 * Rename `chfl_topology_are_linked` to `chfl_topology_residues_linked`.
+* Rename `chfl_topology_append` to `chfl_topology_add_atom`.
 
 ### Deprecation and removals
 

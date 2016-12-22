@@ -52,10 +52,10 @@ CHFL_EXPORT chfl_status chfl_topology_resize(
 
 /// Add a copy of an `atom` at the end of a `topology`.
 ///
-/// @example{tests/capi/doc/chfl_topology/append.c}
+/// @example{tests/capi/doc/chfl_topology/add_atom.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_topology_append(
+CHFL_EXPORT chfl_status chfl_topology_add_atom(
     CHFL_TOPOLOGY* const topology, const CHFL_ATOM* const atom
 );
 

@@ -12,9 +12,9 @@ int main() {
         CHFL_ATOM* O = chfl_atom("O");
         CHFL_ATOM* H = chfl_atom("H");
 
-        chfl_topology_append(topology, O);
-        chfl_topology_append(topology, H);
-        chfl_topology_append(topology, H);
+        chfl_topology_add_atom(topology, O);
+        chfl_topology_add_atom(topology, H);
+        chfl_topology_add_atom(topology, H);
 
         chfl_atom_free(O);
         chfl_atom_free(H);

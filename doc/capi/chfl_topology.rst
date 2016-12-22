@@ -13,7 +13,7 @@ Function manipulating ``CHFL_TOPOLOGY``
 
 .. doxygenfunction:: chfl_topology_resize
 
-.. doxygenfunction:: chfl_topology_append
+.. doxygenfunction:: chfl_topology_add_atom
 
 .. doxygenfunction:: chfl_topology_remove
 

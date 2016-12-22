@@ -141,7 +141,7 @@ TEST_CASE("Residue", "[CAPI]") {
 
         CHFL_ATOM* atom = chfl_atom("X");
         for (uint64_t i=0; i<10; i++) {
-            CHECK_STATUS(chfl_topology_append(topology, atom));
+            CHECK_STATUS(chfl_topology_add_atom(topology, atom));
         }
         CHECK_STATUS(chfl_atom_free(atom));
 
@@ -192,10 +192,10 @@ static CHFL_TOPOLOGY* testing_topology() {
     REQUIRE(O != NULL);
     REQUIRE(H != NULL);
 
-    CHECK_STATUS(chfl_topology_append(topology, H));
-    CHECK_STATUS(chfl_topology_append(topology, O));
-    CHECK_STATUS(chfl_topology_append(topology, O));
-    CHECK_STATUS(chfl_topology_append(topology, H));
+    CHECK_STATUS(chfl_topology_add_atom(topology, H));
+    CHECK_STATUS(chfl_topology_add_atom(topology, O));
+    CHECK_STATUS(chfl_topology_add_atom(topology, O));
+    CHECK_STATUS(chfl_topology_add_atom(topology, H));
 
     CHECK_STATUS(chfl_atom_free(O));
     CHECK_STATUS(chfl_atom_free(H));

@@ -53,7 +53,7 @@ extern "C" chfl_status chfl_topology_resize(CHFL_TOPOLOGY* const topology, uint6
     )
 }
 
-extern "C" chfl_status chfl_topology_append(CHFL_TOPOLOGY* const topology, const CHFL_ATOM* const atom) {
+extern "C" chfl_status chfl_topology_add_atom(CHFL_TOPOLOGY* const topology, const CHFL_ATOM* const atom) {
     assert(topology != nullptr);
     assert(atom != nullptr);
     CHFL_ERROR_CATCH(
