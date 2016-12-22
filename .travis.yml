@@ -75,6 +75,11 @@ script:
   - cmake $CMAKE_ARGS ..
   - make
   - ctest --output-on-failure
+  - |
+    if ${EXTRA_WORK}; then
+        cd $TRAVIS_BUILD_DIR
+        ./scripts/ci/check-docs.py
+    fi
 
 after_script:
   - |
