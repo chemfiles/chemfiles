@@ -220,10 +220,10 @@ CHFL_EXPORT chfl_status chfl_topology_add_residue(
 /// linked together, *i.e.* if there is a bond between one atom in the first
 /// residue and one atom in the second one, and store the result in `result.`
 ///
-/// @example{tests/capi/doc/chfl_topology/are_linked.c}
+/// @example{tests/capi/doc/chfl_topology/residues_linked.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_topology_are_linked(
+CHFL_EXPORT chfl_status chfl_topology_residues_linked(
     CHFL_TOPOLOGY* const topology,
     const CHFL_RESIDUE* const first,
     const CHFL_RESIDUE* const second,

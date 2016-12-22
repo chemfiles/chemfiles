@@ -170,11 +170,11 @@ TEST_CASE("Residue", "[CAPI]") {
         CHECK(out_of_bounds == NULL);
 
         bool linked = true;
-        CHECK_STATUS(chfl_topology_are_linked(topology, first, second, &linked));
+        CHECK_STATUS(chfl_topology_residues_linked(topology, first, second, &linked));
         CHECK(linked == false);
 
         CHECK_STATUS(chfl_topology_add_bond(topology, 6, 9));
-        CHECK_STATUS(chfl_topology_are_linked(topology, first, second, &linked));
+        CHECK_STATUS(chfl_topology_residues_linked(topology, first, second, &linked));
         CHECK(linked == true);
 
         CHECK_STATUS(chfl_residue_free(first));

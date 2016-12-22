@@ -12,7 +12,7 @@ int main() {
     CHFL_RESIDUE* second = chfl_residue_from_topology(topology, 1);
 
     bool linked = false;
-    chfl_topology_are_linked(topology, first, second, &linked);
+    chfl_topology_residues_linked(topology, first, second, &linked);
 
     chfl_residue_free(first);
     chfl_residue_free(second);

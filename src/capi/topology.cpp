@@ -206,7 +206,7 @@ extern "C" chfl_status chfl_topology_add_residue(CHFL_TOPOLOGY* const topology, 
     )
 }
 
-extern "C" chfl_status chfl_topology_are_linked(
+extern "C" chfl_status chfl_topology_residues_linked(
     CHFL_TOPOLOGY* const topology, const CHFL_RESIDUE* const res_1,
     const CHFL_RESIDUE* const res_2, bool* result) {
     assert(topology != nullptr);
