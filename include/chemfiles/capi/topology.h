@@ -29,6 +29,16 @@ CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_from_frame(
     const CHFL_FRAME* const frame
 );
 
+/// Get a copy of a `topology`.
+///
+/// The caller of this function should free the associated memory using
+/// `chfl_topology_free`.
+///
+/// @example{tests/capi/doc/chfl_topology/copy.c}
+/// @return A pointer to the new topology, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
+CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_copy(const CHFL_TOPOLOGY* const topology);
+
 /// Get the number of atoms in the `topology` in the integer pointed to by
 /// `natoms`.
 ///

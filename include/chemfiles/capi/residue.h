@@ -50,6 +50,16 @@ CHFL_EXPORT CHFL_RESIDUE* chfl_residue_for_atom(
     const CHFL_TOPOLOGY* const topology, uint64_t i
 );
 
+/// Get a copy of a `residue`.
+///
+/// The caller of this function should free the associated memory using
+/// `chfl_residue_free`.
+///
+/// @example{tests/capi/doc/chfl_residue/copy.c}
+/// @return A pointer to the new residue, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
+CHFL_EXPORT CHFL_RESIDUE* chfl_residue_copy(const CHFL_RESIDUE* const residue);
+
 /// Get the number of atoms in a `residue` in the integer pointed to by `size`.
 ///
 /// @example{tests/capi/doc/chfl_residue/atoms_count.c}

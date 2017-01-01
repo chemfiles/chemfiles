@@ -35,6 +35,17 @@ error:
     return nullptr;
 }
 
+extern "C" CHFL_SELECTION* chfl_selection_copy(const CHFL_SELECTION* const selection) {
+    CHFL_SELECTION* new_selection = nullptr;
+    CHFL_ERROR_GOTO(
+        new_selection = new CAPISelection(Selection(selection->selection.string()));
+    )
+    return new_selection;
+error:
+    delete new_selection;
+    return nullptr;
+}
+
 extern "C" chfl_status chfl_selection_size(const CHFL_SELECTION* const selection, uint64_t* size) {
     assert(selection != nullptr);
     CHFL_ERROR_CATCH(

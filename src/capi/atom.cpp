@@ -26,6 +26,17 @@ error:
     return nullptr;
 }
 
+extern "C" CHFL_ATOM* chfl_atom_copy(const CHFL_ATOM* const atom) {
+    CHFL_ATOM* new_atom = nullptr;
+    CHFL_ERROR_GOTO(
+        new_atom = new Atom(*atom);
+    )
+    return new_atom;
+error:
+    delete new_atom;
+    return nullptr;
+}
+
 extern "C" CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame, uint64_t idx) {
     assert(frame != nullptr);
     CHFL_ATOM* atom = nullptr;

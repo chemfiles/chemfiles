@@ -23,6 +23,16 @@ extern "C" {
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_FRAME* chfl_frame(uint64_t natoms);
 
+/// Get a copy of a `frame`.
+///
+/// The caller of this function should free the associated memory using
+/// `chfl_frame_free`.
+///
+/// @example{tests/capi/doc/chfl_frame/copy.c}
+/// @return A pointer to the new frame, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
+CHFL_EXPORT CHFL_FRAME* chfl_frame_copy(const CHFL_FRAME* const frame);
+
 /// Get the current number of atoms in a `frame` in the integer pointed to by
 /// `natoms`
 ///

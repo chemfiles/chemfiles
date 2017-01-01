@@ -56,6 +56,17 @@ error:
     return nullptr;
 }
 
+extern "C" CHFL_RESIDUE* chfl_residue_copy(const CHFL_RESIDUE* const residue) {
+    CHFL_RESIDUE* new_residue = nullptr;
+    CHFL_ERROR_GOTO(
+        new_residue = new Residue(*residue);
+    )
+    return new_residue;
+error:
+    delete new_residue;
+    return nullptr;
+}
+
 extern "C" chfl_status chfl_residue_atoms_count(const CHFL_RESIDUE* const residue, uint64_t* size) {
     assert(residue != nullptr);
     assert(size != nullptr);

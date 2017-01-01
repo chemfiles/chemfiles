@@ -9,6 +9,8 @@ Function manipulating ``CHFL_TOPOLOGY``
 
 .. doxygenfunction:: chfl_topology_from_frame
 
+.. doxygenfunction:: chfl_topology_copy
+
 .. doxygenfunction:: chfl_topology_atoms_count
 
 .. doxygenfunction:: chfl_topology_resize

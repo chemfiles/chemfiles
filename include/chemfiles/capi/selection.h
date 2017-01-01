@@ -20,6 +20,19 @@ extern "C" {
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_SELECTION* chfl_selection(const char* selection);
 
+/// Get a copy of a `selection`.
+///
+/// The copy does not contains any state, and `chfl_selection_evalutate` must be
+/// called again before using `chfl_selection_matches`.
+///
+/// The caller of this function should free the associated memory using
+/// `chfl_selection_free`.
+///
+/// @example{tests/capi/doc/chfl_selection/copy.c}
+/// @return A pointer to the new selection, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
+CHFL_EXPORT CHFL_SELECTION* chfl_selection_copy(const CHFL_SELECTION* const selection);
+
 /// Get the size of a `selection` in `size`.
 ///
 /// The size of a selection is the number of atoms we are selecting together.

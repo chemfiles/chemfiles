@@ -38,6 +38,17 @@ error:
     return nullptr;
 }
 
+extern "C" CHFL_TOPOLOGY* chfl_topology_copy(const CHFL_TOPOLOGY* const topology) {
+    CHFL_TOPOLOGY* new_topology = nullptr;
+    CHFL_ERROR_GOTO(
+        new_topology = new Topology(*topology);
+    )
+    return new_topology;
+error:
+    delete new_topology;
+    return nullptr;
+}
+
 extern "C" chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const topology, uint64_t *natoms) {
     assert(topology != nullptr);
     assert(natoms != nullptr);

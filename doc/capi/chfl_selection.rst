@@ -7,6 +7,8 @@ Function manipulating ``CHFL_SELECTION``
 
 .. doxygenfunction:: chfl_selection
 
+.. doxygenfunction:: chfl_selection_copy
+
 .. doxygenfunction:: chfl_selection_size
 
 .. doxygenfunction:: chfl_selection_string

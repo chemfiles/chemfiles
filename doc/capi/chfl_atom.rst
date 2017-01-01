@@ -11,6 +11,8 @@ Function manipulating ``CHFL_ATOM``
 
 .. doxygenfunction:: chfl_atom_from_topology
 
+.. doxygenfunction:: chfl_atom_copy
+
 .. doxygenfunction:: chfl_atom_mass
 
 .. doxygenfunction:: chfl_atom_set_mass

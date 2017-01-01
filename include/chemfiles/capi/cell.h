@@ -56,6 +56,16 @@ CHFL_EXPORT CHFL_CELL* chfl_cell_triclinic(
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* const frame);
 
+/// Get a copy of a `cell`.
+///
+/// The caller of this function should free the associated memory using
+/// `chfl_cell_free`.
+///
+/// @example{tests/capi/doc/chfl_cell/copy.c}
+/// @return A pointer to the new cell, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
+CHFL_EXPORT CHFL_CELL* chfl_cell_copy(const CHFL_CELL* const cell);
+
 /// Get the unit cell volume of `cell` in the double pointed to by `volume`.
 ///
 /// @example{tests/capi/doc/chfl_cell/volume.c}

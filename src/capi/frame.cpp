@@ -22,6 +22,17 @@ error:
     return nullptr;
 }
 
+extern "C" CHFL_FRAME* chfl_frame_copy(const CHFL_FRAME* const frame) {
+    CHFL_FRAME* new_frame = nullptr;
+    CHFL_ERROR_GOTO(
+        new_frame = new Frame(frame->clone());
+    )
+    return new_frame;
+error:
+    delete new_frame;
+    return nullptr;
+}
+
 extern "C" chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame, uint64_t *natoms) {
     assert(frame != nullptr);
     assert(natoms != nullptr);

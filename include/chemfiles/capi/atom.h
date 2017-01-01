@@ -23,6 +23,16 @@ extern "C" {
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_ATOM* chfl_atom(const char* name);
 
+/// Get a copy of an `atom`.
+///
+/// The caller of this function should free the associated memory using
+/// `chfl_atom_free`.
+///
+/// @example{tests/capi/doc/chfl_atom/copy.c}
+/// @return A pointer to the new atom, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
+CHFL_EXPORT CHFL_ATOM* chfl_atom_copy(const CHFL_ATOM* const atom);
+
 /// Get a copy of the atom at index `i` from a `frame`
 ///
 /// The caller of this function should free the associated memory using

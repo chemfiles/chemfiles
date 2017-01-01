@@ -58,6 +58,17 @@ error:
     return nullptr;
 }
 
+extern "C" CHFL_CELL* chfl_cell_copy(const CHFL_CELL* const cell) {
+    CHFL_CELL* new_cell = nullptr;
+    CHFL_ERROR_GOTO(
+        new_cell = new UnitCell(*cell);
+    )
+    return new_cell;
+error:
+    delete new_cell;
+    return nullptr;
+}
+
 extern "C" chfl_status chfl_cell_volume(const CHFL_CELL* const cell, double* volume) {
     assert(cell != nullptr);
     assert(volume != nullptr);

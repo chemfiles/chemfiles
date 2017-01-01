@@ -7,6 +7,8 @@ Function manipulating ``CHFL_FRAME``
 
 .. doxygenfunction:: chfl_frame
 
+.. doxygenfunction:: chfl_frame_copy
+
 .. doxygenfunction:: chfl_frame_atoms_count
 
 .. doxygenfunction:: chfl_frame_resize

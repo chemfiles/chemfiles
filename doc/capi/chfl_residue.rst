@@ -11,6 +11,8 @@ Function manipulating ``CHFL_RESIDUE``
 
 .. doxygenfunction:: chfl_residue_from_topology
 
+.. doxygenfunction:: chfl_residue_copy
+
 .. doxygenfunction:: chfl_residue_name
 
 .. doxygenfunction:: chfl_residue_id
