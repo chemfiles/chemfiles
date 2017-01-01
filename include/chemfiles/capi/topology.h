@@ -233,8 +233,7 @@ CHFL_EXPORT chfl_status chfl_topology_residues_linked(
 /// Free the memory associated with a `topology`.
 ///
 /// @example{tests/capi/doc/chfl_topology/chfl_topology.c}
-/// @return The operation status code. You can use `chfl_last_error` to learn
-///         about the error if the status code is not `CHFL_SUCCESS`.
+/// @return `CHFL_SUCCESS`
 CHFL_EXPORT chfl_status chfl_topology_free(CHFL_TOPOLOGY* const topology);
 
 #ifdef __cplusplus

@@ -89,8 +89,7 @@ CHFL_EXPORT chfl_status chfl_selection_matches(
 /// Free the memory associated with a `selection`.
 ///
 /// @example{tests/capi/doc/chfl_selection/chfl_selection.c}
-/// @return The operation status code. You can use `chfl_last_error` to learn
-///         about the error if the status code is not `CHFL_SUCCESS`.
+/// @return `CHFL_SUCCESS`
 CHFL_EXPORT chfl_status chfl_selection_free(CHFL_SELECTION* selection);
 
 #ifdef __cplusplus

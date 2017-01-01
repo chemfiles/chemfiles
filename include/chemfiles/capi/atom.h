@@ -186,8 +186,7 @@ CHFL_EXPORT chfl_status chfl_atom_atomic_number(
 /// Free the memory associated with an `atom`.
 ///
 /// @example{tests/capi/doc/chfl_atom/chfl_atom.c}
-/// @return The operation status code. You can use `chfl_last_error` to learn
-///         about the error if the status code is not `CHFL_SUCCESS`.
+/// @return `CHFL_SUCCESS`
 CHFL_EXPORT chfl_status chfl_atom_free(CHFL_ATOM* const atom);
 
 #ifdef __cplusplus

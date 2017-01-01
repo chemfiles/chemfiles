@@ -38,8 +38,7 @@ typedef void (*chfl_warning_callback)(const char* message);
 /// Set the global warning `callback` to be used for each warning event.
 ///
 /// @example{tests/capi/doc/chfl_set_warning_callback.c}
-/// @return The operation status code. You can use `chfl_last_error` to learn
-///         about the error if the status code is not `CHFL_SUCCESS`.
+/// @return `CHFL_SUCCESS`
 CHFL_EXPORT chfl_status chfl_set_warning_callback(chfl_warning_callback callback);
 
 #ifdef __cplusplus

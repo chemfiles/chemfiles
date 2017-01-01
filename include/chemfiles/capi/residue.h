@@ -103,8 +103,7 @@ CHFL_EXPORT chfl_status chfl_residue_contains(
 /// Free the memory associated with a `residue`.
 ///
 /// @example{tests/capi/doc/chfl_residue/chfl_residue.c}
-/// @return The operation status code. You can use `chfl_last_error` to learn
-///         about the error if the status code is not `CHFL_SUCCESS`.
+/// @return `CHFL_SUCCESS`
 CHFL_EXPORT chfl_status chfl_residue_free(CHFL_RESIDUE* const residue);
 
 #ifdef __cplusplus

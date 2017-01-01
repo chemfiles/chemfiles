@@ -146,8 +146,7 @@ CHFL_EXPORT chfl_status chfl_cell_set_shape(
 /// Free the memory associated with a `cell`.
 ///
 /// @example{tests/capi/doc/chfl_cell/chfl_cell.c}
-/// @return The operation status code. You can use `chfl_last_error` to learn
-///         about the error if the status code is not `CHFL_SUCCESS`.
+/// @return `CHFL_SUCCESS`
 CHFL_EXPORT chfl_status chfl_cell_free(CHFL_CELL* const cell);
 
 #ifdef __cplusplus

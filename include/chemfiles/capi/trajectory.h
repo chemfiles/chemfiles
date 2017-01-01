@@ -138,8 +138,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_nsteps(
 /// storage (hard drive, network, ...) used for this file.
 ///
 /// @example{tests/capi/doc/chfl_trajectory/open.c}
-/// @return The operation status code. You can use `chfl_last_error` to learn
-///         about the error if the status code is not `CHFL_SUCCESS`.
+/// @return `CHFL_SUCCESS`
 CHFL_EXPORT chfl_status chfl_trajectory_close(CHFL_TRAJECTORY* trajectory);
 
 #ifdef __cplusplus
