@@ -122,18 +122,9 @@ target_include_directories(chemfiles PUBLIC ${PROJECT_BINARY_DIR}/include)
 # Installation configuration
 #----------------------------------------------------------------------------------------#
 
-file(GLOB_RECURSE CHFL_HEADERS
-    include/chemfiles/*.hpp
-    ${PROJECT_BINARY_DIR}/include/chemfiles/*.hpp
-)
-
-# All headers
-install(FILES ${CHFL_HEADERS} DESTINATION include/chemfiles/)
-# C++ main headers
-install(FILES include/chemfiles.hpp DESTINATION include)
-# C main header
-install(FILES include/chemfiles.h DESTINATION include)
-# Libraries
+# Header files
+install(DIRECTORY include/ DESTINATION include)
+# Library
 install(TARGETS chemfiles DESTINATION lib)
 
 # uninstall target
