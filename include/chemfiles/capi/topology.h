@@ -234,7 +234,7 @@ CHFL_EXPORT chfl_status chfl_topology_add_residue(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_residues_linked(
-    CHFL_TOPOLOGY* const topology,
+    const CHFL_TOPOLOGY* const topology,
     const CHFL_RESIDUE* const first,
     const CHFL_RESIDUE* const second,
     bool* result

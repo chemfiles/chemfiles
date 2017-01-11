@@ -93,7 +93,7 @@ CHFL_EXPORT chfl_status chfl_frame_velocities(
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_add_atom(
     CHFL_FRAME* const frame, const CHFL_ATOM* const atom,
-    chfl_vector_t position, chfl_vector_t velocity
+    const chfl_vector_t position, const chfl_vector_t velocity
 );
 
 /// Resize the positions and the velocities in frame, to have space for `natoms`

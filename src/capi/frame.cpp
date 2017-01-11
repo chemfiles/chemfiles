@@ -75,7 +75,9 @@ extern "C" chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vecto
     )
 }
 
-extern "C" chfl_status chfl_frame_add_atom(CHFL_FRAME* const frame, const CHFL_ATOM* const atom, chfl_vector_t position, chfl_vector_t velocity) {
+extern "C" chfl_status chfl_frame_add_atom(
+    CHFL_FRAME* const frame, const CHFL_ATOM* const atom,
+    const chfl_vector_t position, const chfl_vector_t velocity) {
     assert(frame != nullptr);
     assert(atom != nullptr);
     assert(position != nullptr);

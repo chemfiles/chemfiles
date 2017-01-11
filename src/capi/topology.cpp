@@ -218,14 +218,14 @@ extern "C" chfl_status chfl_topology_add_residue(CHFL_TOPOLOGY* const topology, 
 }
 
 extern "C" chfl_status chfl_topology_residues_linked(
-    CHFL_TOPOLOGY* const topology, const CHFL_RESIDUE* const res_1,
-    const CHFL_RESIDUE* const res_2, bool* result) {
+    const CHFL_TOPOLOGY* const topology, const CHFL_RESIDUE* const first,
+    const CHFL_RESIDUE* const second, bool* result) {
     assert(topology != nullptr);
-    assert(res_1 != nullptr);
-    assert(res_2 != nullptr);
+    assert(first != nullptr);
+    assert(second != nullptr);
     assert(result != nullptr);
     CHFL_ERROR_CATCH(
-        *result = topology->are_linked(*res_1, *res_2);
+        *result = topology->are_linked(*first, *second);
     )
 }
 
