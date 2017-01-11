@@ -111,15 +111,23 @@ TEST_CASE("Add and remove items in the topology", "[Topology]") {
     CHECK(topo.isbond(2, 5));
     CHECK(topo.isbond(3, 5));
 
+    CHECK_FALSE(topo.isbond(0, 0));
+
     CHECK(topo.angles().size() == 2);
     CHECK(topo.isangle(0, 4, 1));
     CHECK(topo.isangle(2, 5, 3));
+
+    CHECK_FALSE(topo.isangle(0, 0, 1));
 
     topo.append(Atom("O"));
     topo.add_bond(3, 6);
     CHECK(topo.bonds().size() == 5);
     CHECK(topo.dihedrals().size() == 1);
     CHECK(topo.isdihedral(2, 5, 3, 6));
+
+    CHECK_FALSE(topo.isdihedral(0, 0, 1, 2));
+    CHECK_FALSE(topo.isdihedral(0, 1, 1, 2));
+    CHECK_FALSE(topo.isdihedral(0, 1, 2, 2));
 
     topo.remove(6);
     CHECK(topo.natoms() == 6);

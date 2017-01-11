@@ -53,18 +53,27 @@ const std::vector<Dihedral>& Topology::dihedrals() const {
 }
 
 bool Topology::isbond(size_t i, size_t j) const {
+    if (i == j) {
+        return false;
+    }
     auto bonds = connect_.bonds();
     auto pos = bonds.find(Bond(i, j));
     return pos != bonds.end();
 }
 
 bool Topology::isangle(size_t i, size_t j, size_t k) const {
+    if (i == j || j == k || i == k) {
+        return false;
+    }
     auto angles = connect_.angles();
     auto pos = angles.find(Angle(i, j, k));
     return pos != angles.end();
 }
 
 bool Topology::isdihedral(size_t i, size_t j, size_t k, size_t m) const {
+    if (i == j || j == k || k == m || i == k || j == m || i == m) {
+        return false;
+    }
     auto dihedrals = connect_.dihedrals();
     auto pos = dihedrals.find(Dihedral(i, j, k, m));
     return pos != dihedrals.end();
