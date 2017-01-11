@@ -97,9 +97,12 @@ void Topology::add_residue(Residue residue) {
     }
 }
 
-bool Topology::are_linked(const Residue& res_1, const Residue& res_2) const {
-    for (auto i: res_1) {
-        for (auto j: res_2) {
+bool Topology::are_linked(const Residue& first, const Residue& second) const {
+    if (first == second) {
+        return true;
+    }
+    for (auto i: first) {
+        for (auto j: second) {
             if (isbond(i, j)) {
                 return true;
             }

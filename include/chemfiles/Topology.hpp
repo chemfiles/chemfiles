@@ -102,8 +102,10 @@ public:
     /// topology is not modified.
     void add_residue(Residue residue);
     /// Check if two residues are linked together, i.e. if there is a bond
-    /// between one atom in the first residue and one atom in the second one.
-    bool are_linked(const Residue& res_1, const Residue& res_2) const;
+    /// between one atom in the `first` residue and one atom in the `second` one.
+    ///
+    /// If `first == second`, this function returns `true`.
+    bool are_linked(const Residue& first, const Residue& second) const;
     /// Get the residue containing the `atom` at the given index.
     optional<const Residue&> residue(size_t atom) const;
     /// Get all the residues in the topology

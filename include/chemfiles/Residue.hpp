@@ -9,6 +9,7 @@
 #define CHEMFILES_RESIDUE_HPP
 
 #include <string>
+#include <algorithm>
 
 #include "chemfiles/exports.hpp"
 #include "chemfiles/sorted_set.hpp"
@@ -68,6 +69,13 @@ private:
     /// associated topology.
     sorted_set<size_t> atoms_;
 };
+
+inline bool operator==(const Residue& lhs, const Residue& rhs) {
+    return lhs.id() == rhs.id() && lhs.name() == rhs.name() &&
+           lhs.size() == rhs.size() && std::equal(
+                lhs.begin(), lhs.end(), rhs.begin()
+           );
+}
 
 } // namespace chemfiles
 

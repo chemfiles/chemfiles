@@ -165,14 +165,18 @@ TEST_CASE("Residues in topologies", "[Topology]") {
     residue.add_atom(2);
     CHECK_THROWS_AS(topo.add_residue(residue), Error);
 
-    auto res_1 = topo.residue(2);
-    CHECK(res_1);
-    auto res_2 = topo.residue(0);
-    CHECK(res_2);
+    auto first = topo.residue(0);
+    CHECK(first);
+    auto second = topo.residue(2);
+    CHECK(second);
 
     CHECK_FALSE(topo.residue(7));
 
-    CHECK_FALSE(topo.are_linked(*res_1, *res_2));
+    CHECK_FALSE(topo.are_linked(*first, *second));
     topo.add_bond(6, 9);
-    CHECK(topo.are_linked(*res_1, *res_2));
+    CHECK(topo.are_linked(*first, *second));
+
+    // A residue is linked to itself
+    second = topo.residue(0);
+    CHECK(topo.are_linked(*first, *second));
 }
