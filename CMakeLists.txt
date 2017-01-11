@@ -124,6 +124,7 @@ target_include_directories(chemfiles PUBLIC ${PROJECT_BINARY_DIR}/include)
 
 # Header files
 install(DIRECTORY include/ DESTINATION include)
+install(DIRECTORY ${PROJECT_BINARY_DIR}/include/ DESTINATION include)
 # Library
 install(TARGETS chemfiles DESTINATION lib)
 
