@@ -42,10 +42,13 @@ extern "C" CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame, uint64
     CHFL_ATOM* atom = nullptr;
     CHFL_ERROR_GOTO(
         // Return NULL if the index is out of bounds
-        if (idx < frame->natoms()) {
-            atom = new Atom("");
-            *atom = frame->topology()[checked_cast(idx)];
+        if (idx >= frame->natoms()) {
+            throw MemoryError(
+                "Out of bounds atomic index " + std::to_string(idx) +
+                ". Last atom is " + std::to_string(frame->natoms()) + "."
+            );
         }
+        atom = new Atom(frame->topology()[checked_cast(idx)]);
     )
     return atom;
 error:
@@ -58,10 +61,13 @@ extern "C" CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* const topolog
     CHFL_ATOM* atom = nullptr;
     CHFL_ERROR_GOTO(
         // Return NULL if the index is out of bounds
-        if (idx < topology->natoms()) {
-            atom = new Atom("");
-            *atom = (*topology)[checked_cast(idx)];
+        if (idx >= topology->natoms()) {
+            throw MemoryError(
+                "Out of bounds atomic index " + std::to_string(idx) +
+                ". Last atom is " + std::to_string(topology->natoms()) + "."
+            );
         }
+        atom = new Atom((*topology)[checked_cast(idx)]);
     )
     return atom;
 error:

@@ -31,9 +31,13 @@ extern "C" CHFL_RESIDUE* chfl_residue_from_topology(const CHFL_TOPOLOGY* const t
     CHFL_RESIDUE* residue = nullptr;
     CHFL_ERROR_GOTO(
         // Return NULL if the index is out of bounds
-        if (i < topology->residues().size()) {
-            residue = new Residue(topology->residues()[checked_cast(i)]);
+        if (i >= topology->residues().size()) {
+            throw MemoryError(
+                "Out of bounds residue index " + std::to_string(i) +
+                ". Last residue is " + std::to_string(topology->residues().size()) + "."
+            );
         }
+        residue = new Residue(topology->residues()[checked_cast(i)]);
     )
     return residue;
 error:
