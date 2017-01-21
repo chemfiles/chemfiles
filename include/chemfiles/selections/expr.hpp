@@ -95,7 +95,7 @@ class AllExpr final: public Expr {
 public:
     AllExpr(): Expr() {}
     std::string print(unsigned delta) const override;
-    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
 };
 
 /// @class NoneExpr selections/expr.hpp selections/expr.cpp
@@ -104,7 +104,7 @@ class NoneExpr final: public Expr {
 public:
     NoneExpr(): Expr() {}
     std::string print(unsigned delta) const override;
-    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
 };
 
 /// @class SingleExpr expr.hpp
@@ -131,7 +131,7 @@ public:
     TypeExpr(unsigned argument, std::string type, bool equals)
         : SingleSelector(argument), type_(type), equals_(equals) {}
     std::string print(unsigned delta) const override;
-    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
 private:
     std::string type_;
     bool equals_;
@@ -147,7 +147,7 @@ public:
     NameExpr(unsigned argument, std::string name, bool equals)
         : SingleSelector(argument), name_(name), equals_(equals) {}
     std::string print(unsigned delta) const override;
-    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
 private:
     std::string name_;
     bool equals_;
@@ -160,7 +160,7 @@ public:
     IndexExpr(unsigned argument, BinOp op, std::size_t val)
         : SingleSelector(argument), op_(op), val_(val) {}
     std::string print(unsigned delta) const override;
-    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
 private:
     BinOp op_;
     std::size_t val_;
@@ -176,7 +176,7 @@ public:
     ResnameExpr(unsigned argument, std::string name, bool equals)
         : SingleSelector(argument), name_(name), equals_(equals) {}
     std::string print(unsigned delta) const override;
-    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
 private:
     std::string name_;
     bool equals_;
@@ -192,7 +192,7 @@ public:
     ResidExpr(unsigned argument, BinOp op, uint64_t id)
         : SingleSelector(argument), op_(op), id_(id) {}
     std::string print(unsigned delta) const override;
-    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
 private:
     BinOp op_;
     uint64_t id_;
@@ -207,7 +207,7 @@ public:
     PositionExpr(unsigned argument, Coordinate coord, BinOp op, double val)
         : SingleSelector(argument), coord_(coord), op_(op), val_(val) {}
     std::string print(unsigned delta) const override;
-    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
 private:
     Coordinate coord_;
     BinOp op_;
@@ -223,7 +223,7 @@ public:
     VelocityExpr(unsigned argument, Coordinate coord, BinOp op, double val)
         : SingleSelector(argument), coord_(coord), op_(op), val_(val) {}
     std::string print(unsigned delta) const override;
-    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
 private:
     Coordinate coord_;
     BinOp op_;
@@ -236,7 +236,7 @@ class MassExpr final: public SingleSelector {
 public:
     MassExpr(unsigned argument, BinOp op, double val): SingleSelector(argument), op_(op), val_(val) {}
     std::string print(unsigned delta) const override;
-    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
 private:
     BinOp op_;
     double val_;
@@ -250,7 +250,7 @@ class AndExpr final: public Expr {
 public:
     AndExpr(Ast&& lhs, Ast&& rhs): Expr(), lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
     std::string print(unsigned delta) const override;
-    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
 private:
     Ast lhs_;
     Ast rhs_;
@@ -262,7 +262,7 @@ class OrExpr final: public Expr {
 public:
     OrExpr(Ast&& lhs, Ast&& rhs): Expr(), lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
     std::string print(unsigned delta) const override;
-    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
 private:
     Ast lhs_;
     Ast rhs_;
@@ -274,7 +274,7 @@ class NotExpr final: public Expr {
 public:
     explicit NotExpr(Ast&& ast): Expr(), ast_(std::move(ast)) {}
     std::string print(unsigned delta) const override;
-    std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
 private:
     Ast ast_;
 };

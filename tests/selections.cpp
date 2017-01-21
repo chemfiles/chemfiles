@@ -1,6 +1,8 @@
 #include <catch.hpp>
 #include "chemfiles.hpp"
 
+#include <iostream>
+
 using namespace chemfiles;
 
 Frame testing_frame();
@@ -172,8 +174,14 @@ TEST_CASE("Multiple selections", "[selection]") {
 
     SECTION("Pairs & two") {
         auto sel = Selection("pairs: all");
-        std::vector<Match> res{{0ul, 1ul}, {0ul, 2ul}, {0ul, 3ul}, {1ul, 2ul}, {1ul, 3ul}, {2ul, 3ul}};
+        std::vector<Match> res{
+            {0ul, 1ul}, {0ul, 2ul}, {0ul, 3ul},
+            {1ul, 0ul}, {1ul, 2ul}, {1ul, 3ul},
+            {2ul, 0ul}, {2ul, 1ul}, {2ul, 3ul},
+            {3ul, 0ul}, {3ul, 1ul}, {3ul, 2ul}};
         CHECK(sel.evaluate(frame) == res);
+        auto natoms = frame.natoms();
+        CHECK(res.size() == natoms * (natoms - 1));
 
         sel = Selection("two: none");
         res = std::vector<Match>();
@@ -182,14 +190,34 @@ TEST_CASE("Multiple selections", "[selection]") {
 
     SECTION("Three") {
         auto sel = Selection("three: all");
-        std::vector<Match> res{{0ul, 1ul, 2ul}, {0ul, 1ul, 3ul}, {0ul, 2ul, 3ul}, {1ul, 2ul, 3ul}};
+        std::vector<Match> res{
+            {0ul, 1ul, 2ul}, {0ul, 1ul, 3ul}, {0ul, 2ul, 1ul}, {0ul, 2ul, 3ul},
+            {0ul, 3ul, 1ul}, {0ul, 3ul, 2ul}, {1ul, 0ul, 2ul}, {1ul, 0ul, 3ul},
+            {1ul, 2ul, 0ul}, {1ul, 2ul, 3ul}, {1ul, 3ul, 0ul}, {1ul, 3ul, 2ul},
+            {2ul, 0ul, 1ul}, {2ul, 0ul, 3ul}, {2ul, 1ul, 0ul}, {2ul, 1ul, 3ul},
+            {2ul, 3ul, 0ul}, {2ul, 3ul, 1ul}, {3ul, 0ul, 1ul}, {3ul, 0ul, 2ul},
+            {3ul, 1ul, 0ul}, {3ul, 1ul, 2ul}, {3ul, 2ul, 0ul}, {3ul, 2ul, 1ul}
+        };
         CHECK(sel.evaluate(frame) == res);
+        auto natoms = frame.natoms();
+        CHECK(res.size() == natoms * (natoms - 1) * (natoms - 2));
     }
 
     SECTION("Four") {
         auto sel = Selection("four: all");
-        auto res = std::vector<Match>{{0ul, 1ul, 2ul, 3ul}};
+        auto res = std::vector<Match>{
+            {0ul, 1ul, 2ul, 3ul}, {0ul, 1ul, 3ul, 2ul}, {0ul, 2ul, 1ul, 3ul},
+            {0ul, 2ul, 3ul, 1ul}, {0ul, 3ul, 1ul, 2ul}, {0ul, 3ul, 2ul, 1ul},
+            {1ul, 0ul, 2ul, 3ul}, {1ul, 0ul, 3ul, 2ul}, {1ul, 2ul, 0ul, 3ul},
+            {1ul, 2ul, 3ul, 0ul}, {1ul, 3ul, 0ul, 2ul}, {1ul, 3ul, 2ul, 0ul},
+            {2ul, 0ul, 1ul, 3ul}, {2ul, 0ul, 3ul, 1ul}, {2ul, 1ul, 0ul, 3ul},
+            {2ul, 1ul, 3ul, 0ul}, {2ul, 3ul, 0ul, 1ul}, {2ul, 3ul, 1ul, 0ul},
+            {3ul, 0ul, 1ul, 2ul}, {3ul, 0ul, 2ul, 1ul}, {3ul, 1ul, 0ul, 2ul},
+            {3ul, 1ul, 2ul, 0ul}, {3ul, 2ul, 0ul, 1ul}, {3ul, 2ul, 1ul, 0ul},
+        };
         CHECK(sel.evaluate(frame) == res);
+        auto natoms = frame.natoms();
+        CHECK(res.size() == natoms * (natoms - 1) * (natoms - 2) * (natoms - 3));
     }
 
     SECTION("Angles") {

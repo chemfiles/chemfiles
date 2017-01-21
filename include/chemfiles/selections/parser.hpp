@@ -26,9 +26,8 @@ public:
     /// Pretty-printing of this expression. The expression should use a shift
     /// of `delta` spaces in case of multilines output.
     virtual std::string print(unsigned delta = 0) const = 0;
-    /// For each potential match in the `matches` vector this function returns
-    /// `true` if the match is valid in the given `frame`.
-    virtual std::vector<bool> evaluate(const Frame& frame, const std::vector<Match>& matches) const = 0;
+    /// Check if the `match` is valid in the given `frame`.
+    virtual bool is_match(const Frame& frame, const Match& match) const = 0;
 
     Expr() = default;
     virtual ~Expr() = default;

@@ -58,8 +58,8 @@ std::string AllExpr::print(unsigned /*unused*/) const {
     return "all";
 }
 
-std::vector<bool> AllExpr::evaluate(const Frame& /*unused*/, const std::vector<Match>& matches) const {
-    return std::vector<bool>(matches.size(), true);
+bool AllExpr::is_match(const Frame& /*unused*/, const Match& /*unused*/) const {
+    return true;
 }
 
 template <>
@@ -76,8 +76,8 @@ std::string NoneExpr::print(unsigned /*unused*/) const {
     return "none";
 }
 
-std::vector<bool> NoneExpr::evaluate(const Frame& /*unused*/, const std::vector<Match>& matches) const {
-    return std::vector<bool>(matches.size(), false);
+bool NoneExpr::is_match(const Frame& /*unused*/, const Match& /*unused*/) const {
+    return false;
 }
 
 template <>
@@ -95,14 +95,9 @@ std::string TypeExpr::print(unsigned /*unused*/) const {
     return "type(#" + std::to_string(argument_ + 1) + ") " + op + " " + type_;
 }
 
-std::vector<bool> TypeExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
-    auto res = std::vector<bool>(matches.size(), false);
-    auto topology = frame.topology();
-    for (size_t i = 0; i < matches.size(); i++) {
-        auto idx = matches[i][argument_];
-        res[i] = ((topology[idx].type() == type_) == equals_);
-    }
-    return res;
+bool TypeExpr::is_match(const Frame& frame, const Match& match) const {
+    auto index = match[argument_];
+    return (frame.topology()[index].type() == type_) == equals_;
 }
 
 template <>
@@ -134,14 +129,9 @@ std::string NameExpr::print(unsigned /*unused*/) const {
     return "name(#" + std::to_string(argument_ + 1) + ") " + op + " " + name_;
 }
 
-std::vector<bool> NameExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
-    auto res = std::vector<bool>(matches.size(), false);
-    auto topology = frame.topology();
-    for (size_t i = 0; i < matches.size(); i++) {
-        auto idx = matches[i][argument_];
-        res[i] = ((topology[idx].name() == name_) == equals_);
-    }
-    return res;
+bool NameExpr::is_match(const Frame& frame, const Match& match) const {
+    auto index = match[argument_];
+    return (frame.topology()[index].name() == name_) == equals_;
 }
 
 template <>
@@ -172,20 +162,15 @@ std::string ResnameExpr::print(unsigned /*unused*/) const {
     return "resname(#" + std::to_string(argument_ + 1) + ") " + op + " " + name_;
 }
 
-std::vector<bool> ResnameExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
-    auto res = std::vector<bool>(matches.size(), false);
-    auto topology = frame.topology();
-    for (size_t i = 0; i < matches.size(); i++) {
-        auto idx = matches[i][argument_];
-        auto residue = topology.residue(idx);
-        if (residue) {
-            res[i] = ((residue->name() == name_) == equals_);
-        } else {
-            // No residue for this atom
-            res[i] = false;
-        }
+bool ResnameExpr::is_match(const Frame& frame, const Match& match) const {
+    auto index = match[argument_];
+    auto residue = frame.topology().residue(index);
+    if (residue) {
+        return (residue->name() == name_) == equals_;
+    } else {
+        // No residue for this atom
+        return false;
     }
-    return res;
 }
 
 template <>
@@ -217,21 +202,16 @@ std::string ResidExpr::print(unsigned /*unused*/) const {
            " " + std::to_string(id_);
 }
 
-std::vector<bool> ResidExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
-    auto res = std::vector<bool>(matches.size(), false);
+bool ResidExpr::is_match(const Frame& frame, const Match& match) const {
     auto compare = binop_comparison<uint64_t>(op_);
-    auto topology = frame.topology();
-    for (size_t i = 0; i < matches.size(); i++) {
-        auto idx = matches[i][argument_];
-        auto residue = topology.residue(idx);
-        if (residue && residue->id() != static_cast<size_t>(-1)) {
-            res[i] = compare(residue->id(), id_);
-        } else {
-            // No residue or residue id for this atom
-            res[i] = false;
-        }
+    auto index = match[argument_];
+    auto residue = frame.topology().residue(index);
+    if (residue && residue->id() != static_cast<size_t>(-1)) {
+        return compare(residue->id(), id_);
+    } else {
+        // No residue or residue id for this atom
+        return false;
     }
-    return res;
 }
 
 template <>
@@ -267,17 +247,11 @@ std::string PositionExpr::print(unsigned /*unused*/) const {
            binop_str(op_) + " " + std::to_string(val_);
 }
 
-std::vector<bool> PositionExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
-    auto res = std::vector<bool>(matches.size(), false);
+bool PositionExpr::is_match(const Frame& frame, const Match& match) const {
     auto compare = binop_comparison<double>(op_);
+    auto i = match[argument_];
     auto j = coord_.as_index();
-    auto& positions = frame.positions();
-    for (size_t i = 0; i < matches.size(); i++) {
-        auto idx = matches[i][argument_];
-        auto position = positions[idx][j];
-        res[i] = compare(position, val_);
-    }
-    return res;
+    return compare(frame.positions()[i][j], val_);
 }
 
 template <>
@@ -311,22 +285,16 @@ std::string VelocityExpr::print(unsigned /*unused*/) const {
             ") " + binop_str(op_) + " " + std::to_string(val_);
 }
 
-std::vector<bool> VelocityExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
-    auto res = std::vector<bool>(matches.size(), false);
-
+bool VelocityExpr::is_match(const Frame& frame, const Match& match) const {
     if (frame.velocities()) {
-        auto velocities = *frame.velocities();
         auto compare = binop_comparison<double>(op_);
+        auto i = match[argument_];
         auto j = coord_.as_index();
-        for (size_t i = 0; i < matches.size(); i++) {
-            auto idx = matches[i][argument_];
-            auto velocity = velocities[idx][j];
-            res[i] = compare(velocity, val_);
-        }
+        auto& velocities = *frame.velocities();
+        return compare(velocities[i][j], val_);
     } else {
-        warning("No velocities in frame while evaluating {}", print(0));
+        return false;
     }
-    return res;
 }
 
 template <>
@@ -360,14 +328,9 @@ std::string IndexExpr::print(unsigned /*unused*/) const {
            " " + std::to_string(val_);
 }
 
-std::vector<bool> IndexExpr::evaluate(const Frame& /*unused*/, const std::vector<Match>& matches) const {
-    auto res = std::vector<bool>(matches.size(), false);
+bool IndexExpr::is_match(const Frame& /*unused*/, const Match& match) const {
     auto compare = binop_comparison<size_t>(op_);
-    for (size_t i = 0; i < matches.size(); i++) {
-        auto idx = matches[i][argument_];
-        res[i] = compare(idx, val_);
-    }
-    return res;
+    return compare(match[argument_], val_);
 }
 
 template <>
@@ -403,15 +366,10 @@ std::string MassExpr::print(unsigned /*unused*/) const {
            " " + std::to_string(val_);
 }
 
-std::vector<bool> MassExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
-    auto res = std::vector<bool>(matches.size(), false);
+bool MassExpr::is_match(const Frame& frame, const Match& match) const {
     auto compare = binop_comparison<double>(op_);
-    auto topology = frame.topology();
-    for (size_t i = 0; i < matches.size(); i++) {
-        auto idx = matches[i][argument_];
-        res[i] = compare(topology[idx].mass(), val_);
-    }
-    return res;
+    auto index = match[argument_];
+    return compare(frame.topology()[index].mass(), val_);
 }
 
 template <>
@@ -444,15 +402,8 @@ std::string AndExpr::print(unsigned delta) const {
     return "and -> " + lhs + "\n" + std::string(delta, ' ') + "    -> " + rhs;
 }
 
-std::vector<bool> AndExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
-    auto lhs = lhs_->evaluate(frame, matches);
-    auto rhs = rhs_->evaluate(frame, matches);
-    assert(lhs.size() == rhs.size());
-    assert(lhs.size() == matches.size());
-    for (size_t i = 0; i < matches.size(); i++) {
-        lhs[i] = lhs[i] && rhs[i];
-    }
-    return lhs;
+bool AndExpr::is_match(const Frame& frame, const Match& match) const {
+    return lhs_->is_match(frame, match) && rhs_->is_match(frame, match);
 }
 
 template <>
@@ -494,15 +445,8 @@ std::string OrExpr::print(unsigned delta) const {
     return "or -> " + lhs + "\n" + std::string(delta, ' ') + "   -> " + rhs;
 }
 
-std::vector<bool> OrExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
-    auto lhs = lhs_->evaluate(frame, matches);
-    auto rhs = rhs_->evaluate(frame, matches);
-    assert(lhs.size() == rhs.size());
-    assert(lhs.size() == matches.size());
-    for (size_t i = 0; i < matches.size(); i++) {
-        lhs[i] = lhs[i] || rhs[i];
-    }
-    return lhs;
+bool OrExpr::is_match(const Frame& frame, const Match& match) const {
+    return lhs_->is_match(frame, match) || rhs_->is_match(frame, match);
 }
 
 template <>
@@ -544,13 +488,8 @@ std::string NotExpr::print(unsigned /*unused*/) const {
     return "not " + ast;
 }
 
-std::vector<bool> NotExpr::evaluate(const Frame& frame, const std::vector<Match>& matches) const {
-    auto res = ast_->evaluate(frame, matches);
-    assert(res.size() == matches.size());
-    for (size_t i = 0; i < matches.size(); i++) {
-        res[i] = !res[i];
-    }
-    return res;
+bool NotExpr::is_match(const Frame& frame, const Match& match) const {
+    return !ast_->is_match(frame, match);
 }
 
 template <>

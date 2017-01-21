@@ -120,10 +120,6 @@ public:
     }
 
 private:
-    /// Generate all possible (unconstrained) matches for this selection and
-    /// the given `frame`.
-    std::vector<Match> generate_matches(const Frame& frame) const;
-
     /// Store the selection string that generated this selection
     std::string selection_;
     /// Selection kind
