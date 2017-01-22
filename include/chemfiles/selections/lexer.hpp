@@ -9,6 +9,7 @@
 #define CHEMFILES_SELECTION_LEXER_HPP
 
 #include <string>
+#include <sstream>
 #include <vector>
 #include <cassert>
 #include <chemfiles/exports.hpp>
@@ -73,7 +74,9 @@ public:
 
     /// Create a number token with `data` value
     static Token number(double data) {
-        return Token(NUMBER, "", data, 0);
+        std::stringstream sstream;
+        sstream << data;
+        return Token(NUMBER, sstream.str(), data, 0);
     }
 
     /// Create a variable token with `data` value
@@ -102,9 +105,12 @@ public:
     }
 
     /// Get the identifier name associated with this token.
-    /// \pre type() must be `IDENT`.
+    /// \pre type() must be `IDENT` or `NUMBER`.
     const std::string& ident() const {
-        assert(type_ == IDENT && "Can only get identifiers from IDENT token");
+        assert(
+            (type_ == IDENT || type_ == NUMBER) &&
+            "Can only get identifiers from IDENT or NUMBER token"
+        );
         return ident_;
     }
 
@@ -137,7 +143,7 @@ public:
 
     /// Check whether this token is an identifier
     bool is_ident() const {
-        return type_ == IDENT;
+        return (type_ == IDENT || type_ == NUMBER);
     }
 
     /// Check whether this token is a number

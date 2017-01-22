@@ -1,8 +1,6 @@
 #include <catch.hpp>
 #include "chemfiles.hpp"
 
-#include <iostream>
-
 using namespace chemfiles;
 
 Frame testing_frame();
