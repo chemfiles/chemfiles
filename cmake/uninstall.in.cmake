@@ -1,10 +1,10 @@
 # This file provide an uninstall target for Makefiles
 
-if(NOT EXISTS "@CMAKE_CURRENT_BINARY_DIR@/install_manifest.txt")
-  message(FATAL_ERROR "Cannot find install manifest: @CMAKE_CURRENT_BINARY_DIR@/install_manifest.txt")
-endif(NOT EXISTS "@CMAKE_CURRENT_BINARY_DIR@/install_manifest.txt")
+if(NOT EXISTS "@PROJECT_BINARY_DIR@/install_manifest.txt")
+  message(FATAL_ERROR "Cannot find install manifest: @PROJECT_BINARY_DIR@/install_manifest.txt")
+endif(NOT EXISTS "@PROJECT_BINARY_DIR@/install_manifest.txt")
 
-file(READ "@CMAKE_CURRENT_BINARY_DIR@/install_manifest.txt" files)
+file(READ "@PROJECT_BINARY_DIR@/install_manifest.txt" files)
 string(REGEX REPLACE "\n" ";" files "${files}")
 foreach(file ${files})
   message(STATUS "Uninstalling $ENV{DESTDIR}${file}")
