@@ -107,6 +107,7 @@ typedef __int64          intmax_t;
 # pragma clang diagnostic push
 # pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
 # pragma clang diagnostic ignored "-Wpadded"
+# pragma clang diagnostic ignored "-Wunknown-pragmas"
 # pragma clang diagnostic ignored "-Wundefined-func-template"
 #endif
 
