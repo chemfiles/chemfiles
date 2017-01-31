@@ -13,12 +13,6 @@
 extern "C" {
 #endif
 
-/// Get the error message corresponding to a given `status`.
-///
-/// @example{tests/capi/doc/chfl_strerror.c}
-/// @return A null-terminated string containing the error message.
-CHFL_EXPORT const char* chfl_strerror(chfl_status status);
-
 /// Get the last error message.
 ///
 /// @example{tests/capi/doc/chfl_last_error.c}

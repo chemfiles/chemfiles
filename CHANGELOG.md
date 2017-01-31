@@ -42,6 +42,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   instead.
 * Rename `chfl_topology_are_linked` to `chfl_topology_residues_linked`.
 * Rename `chfl_topology_append` to `chfl_topology_add_atom`.
+* Remove `chfl_strerror`, as it is redundant with `chfl_last_error`.
 
 ### Deprecation and removals
 

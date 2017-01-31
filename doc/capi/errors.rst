@@ -9,8 +9,6 @@ chemfiles types); all the functions return a status code from the
 
 The following function allow to handle errors:
 
-.. doxygenfunction:: chfl_strerror
-
 .. doxygenfunction:: chfl_last_error
 
 .. doxygenfunction:: chfl_clear_errors

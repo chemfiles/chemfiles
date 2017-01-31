@@ -13,7 +13,6 @@ static std::string generate_chemfiles_error() {
 }
 
 TEST_CASE("Errors", "[CAPI]") {
-    CHECK(chfl_strerror(CHFL_SUCCESS) == std::string("operation was sucessfull"));
     CHECK(chfl_last_error() == std::string(""));
 
     generate_chemfiles_error();
