@@ -39,6 +39,11 @@ TEST_CASE("Frame class usage", "[Frame]"){
         CHECK(frame.velocities()->size() == 3);
         CHECK((*frame.velocities())[2] == vector3d(4, 5, 6));
 
+        frame.remove(0);
+        CHECK(frame.natoms() == 2);
+        CHECK(frame.positions().size() == 2);
+        CHECK(frame.velocities()->size() == 2);
+
     }
 
     SECTION("Positions and velocities"){
@@ -99,6 +104,13 @@ TEST_CASE("Frame class usage", "[Frame]"){
         CHECK(topology.isangle(2, 0, 4));
 
         CHECK(topology.bonds().size() == 4);
+        CHECK(topology.angles().size() == 6);
+        CHECK(topology.dihedrals().size() == 0);
+
+        frame.remove(1);
+        topology = frame.topology();
+        CHECK(topology.bonds().size() == 3);
+        CHECK(topology.angles().size() == 3);
 
         // Wrong topology size
         frame = Frame(5);

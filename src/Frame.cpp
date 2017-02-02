@@ -141,3 +141,13 @@ void Frame::add_atom(Atom atom, Vector3D position, Vector3D velocity) {
     }
     assert(natoms() == topology_.natoms());
 }
+
+void Frame::remove(size_t i) {
+    assert(i < natoms() && "Can not remove out of bounds atom");
+    topology_.remove(i);
+    positions_.erase(positions_.begin() + static_cast<std::ptrdiff_t>(i));
+    if (velocities_) {
+        velocities_->erase(velocities_->begin() + static_cast<std::ptrdiff_t>(i));
+    }
+    assert(natoms() == topology_.natoms());
+}

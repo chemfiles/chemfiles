@@ -68,9 +68,6 @@ public:
     /// this functions does nothing.
     void add_velocities();
 
-    /// Get the number of particles in the system
-    size_t natoms() const;
-
     /// Get a modifiable reference to the internal topology
     Topology& topology() { return topology_; }
     /// Get a const (non-modifiable) reference to the internal topology
@@ -99,6 +96,13 @@ public:
     /// `velocity`. The `velocity` value will only be used if this frame
     /// contains velocity data.
     void add_atom(Atom atom, Vector3D position, Vector3D velocity = Vector3D());
+
+    /// Get the number of atoms in the system
+    size_t natoms() const;
+
+    /// Remove the atom at index `i` in the system. `i` must be lower than
+    /// `natoms()`.
+    void remove(size_t i);
 
     /// Get the current simulation step
     size_t step() const { return step_; }

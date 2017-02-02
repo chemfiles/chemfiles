@@ -54,8 +54,9 @@ public:
 
     /// Add an atom in the system
     void append(Atom atom);
-    /// Delete an atom in the system. If `idx` is out of bounds, do nothing.
-    void remove(size_t idx);
+    /// Delete the atom at index `i` in the system. `i` must be lower than
+    /// `natoms()`.
+    void remove(size_t i);
     /// Add a bond in the system, between the atoms at index `atom_i` and
     /// `atom_j`
     void add_bond(size_t atom_i, size_t atom_j) {
