@@ -26,6 +26,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   to get the string used to build a selection.
 * Selection variables uses the `#3` syntax instead of the `$3` syntax to allow
   passing selection string as shell arguments.
+* Add `Frame::remove` and `chfl_frame_remove` to remove an atom in a frame.
 
 ### Changes in supported formats
 
