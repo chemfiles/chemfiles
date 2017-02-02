@@ -15,6 +15,8 @@ Function manipulating ``CHFL_FRAME``
 
 .. doxygenfunction:: chfl_frame_add_atom
 
+.. doxygenfunction:: chfl_frame_remove
+
 .. doxygenfunction:: chfl_frame_positions
 
 .. doxygenfunction:: chfl_frame_velocities

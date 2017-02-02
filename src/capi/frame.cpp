@@ -92,6 +92,13 @@ extern "C" chfl_status chfl_frame_add_atom(
     )
 }
 
+extern "C" chfl_status chfl_frame_remove(CHFL_FRAME* const frame, uint64_t i) {
+    assert(frame != nullptr);
+    CHFL_ERROR_CATCH(
+        frame->remove(i);
+    )
+}
+
 extern "C" chfl_status chfl_frame_resize(CHFL_FRAME* const frame, uint64_t natoms) {
     assert(frame != nullptr);
     CHFL_ERROR_CATCH(

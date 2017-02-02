@@ -15,6 +15,10 @@ TEST_CASE("Frame", "[CAPI]") {
         CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
         CHECK(natoms == 4);
 
+        CHECK_STATUS(chfl_frame_remove(frame, 0));
+        CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
+        CHECK(natoms == 3);
+
         CHECK_STATUS(chfl_frame_free(frame));
     }
 

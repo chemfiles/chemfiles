@@ -96,6 +96,16 @@ CHFL_EXPORT chfl_status chfl_frame_add_atom(
     const chfl_vector_t position, const chfl_vector_t velocity
 );
 
+/// Remove the atom at index `i` in the frame.
+///
+/// This modify all the atoms indexes after `i`, and invalidate any pointer
+/// obtained using `chfl_frame_positions` or `chfl_frame_velocities`.
+///
+/// @example{tests/capi/doc/chfl_frame/remove.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_frame_remove(CHFL_FRAME* const frame, uint64_t i);
+
 /// Resize the positions and the velocities in frame, to have space for `natoms`
 /// atoms.
 ///

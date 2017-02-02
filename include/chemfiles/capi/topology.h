@@ -69,8 +69,9 @@ CHFL_EXPORT chfl_status chfl_topology_add_atom(
     CHFL_TOPOLOGY* const topology, const CHFL_ATOM* const atom
 );
 
-/// Remove an atom from a `topology` by its index `i`. This modify all the
-/// atoms indexes after `i`.
+/// Remove the atom at index `i` from a `topology`.
+///
+/// This modify all the atoms indexes after `i`.
 ///
 /// @example{tests/capi/doc/chfl_topology/remove.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
