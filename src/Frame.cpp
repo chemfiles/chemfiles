@@ -29,18 +29,6 @@ size_t Frame::natoms() const {
     return positions_.size();
 }
 
-Frame Frame::clone() const {
-    Frame cloned;
-
-    cloned.topology_ = topology_;
-    cloned.cell_ = cell_;
-    cloned.positions_ = positions_;
-    cloned.velocities_ = velocities_;
-    cloned.step_ = step_;
-
-    return cloned;
-}
-
 void Frame::resize(size_t natoms) {
     topology_.resize(natoms);
     positions_.resize(natoms, vector3d(0.0, 0.0, 0.0));

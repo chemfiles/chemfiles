@@ -43,14 +43,13 @@ public:
     Frame(Frame&&) = default;
     Frame& operator=(Frame&&) = default;
 
-    Frame(const Frame&) = delete;
-    Frame& operator=(const Frame&) = delete;
-
     /// Get a clone (exact copy) of this frame.
     ///
     /// This replace the implicit copy constructor (which is disabled) to
     /// make an explicit copy of the frame.
-    Frame clone() const;
+    Frame clone() const {
+        return *this;
+    }
 
     /// Get a modifiable reference to the positions
     Span3D positions() { return positions_; }
@@ -115,6 +114,9 @@ public:
     void guess_topology();
 
 private:
+    Frame(const Frame&) = default;
+    Frame& operator=(const Frame&) = default;
+
     /// Current simulation step
     size_t step_;
     /// Positions of the particles
