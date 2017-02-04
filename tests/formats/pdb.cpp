@@ -160,3 +160,15 @@ TEST_CASE("Write files in PDB format", "[PDB]"){
     CHECK(content == EXPECTED_CONTENT);
     remove("test-tmp.pdb");
 }
+
+TEST_CASE("PDB files with big values", "[PDB]"){
+    auto frame = Frame(1);
+    frame.set_cell(UnitCell(1234567890));
+    CHECK_THROWS_AS(Trajectory("test-tmp.pdb", 'w').write(frame), FormatError);
+
+    frame.set_cell(UnitCell(12));
+    frame.positions()[0] = vector3d(123456789, 2, 3);
+    CHECK_THROWS_AS(Trajectory("test-tmp.pdb", 'w').write(frame), FormatError);
+
+    remove("test-tmp.pdb");
+}

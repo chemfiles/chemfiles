@@ -18,6 +18,8 @@
 
 using namespace chemfiles;
 
+static void check_values_size(const Vector3D& values, unsigned width, const std::string& context);
+
 std::string PDBFormat::description() const {
     return "PDB file format.";
 }
@@ -281,6 +283,7 @@ static std::string to_pdb_index(uint64_t i) {
 
 void PDBFormat::write(const Frame& frame) {
     auto& cell = frame.cell();
+    check_values_size({{cell.a(), cell.b(), cell.c()}}, 9, "cell lengths");
     fmt::print(
         *file_,
         // Do not try to guess the space group and the z value, just use the
@@ -329,6 +332,7 @@ void PDBFormat::write(const Frame& frame) {
         }
 
         assert(resname.length() <= 3);
+        check_values_size(pos, 8, "atomic position");
 
         // Print all atoms as HETATM, because there is no way we can know if we
         // are handling a biomolecule or not.
@@ -371,4 +375,15 @@ void PDBFormat::write(const Frame& frame) {
     }
 
     fmt::print(*file_, "END\n");
+}
+
+void check_values_size(const Vector3D& values, unsigned width, const std::string& context) {
+    double max_pos = std::pow(10.0, width) - 1;
+    double max_neg = -std::pow(10.0, width - 1) + 1;
+    if (values[0] > max_pos || values[1] > max_pos || values[2] > max_pos ||
+        values[0] < max_neg || values[1] < max_neg || values[2] < max_neg) {
+        throw FormatError(
+            "Value in " + context + " is too big for representation in PDB format"
+        );
+    }
 }
