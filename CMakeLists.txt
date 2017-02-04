@@ -4,6 +4,12 @@ project(chemfiles C CXX)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 cmake_policy(VERSION 2.8.11)
 
+if(CMAKE_VERSION VERSION_LESS 2.8.12)
+    set(INCLUDE_INSTALL_DIR "${CMAKE_PREFIX}/include")
+else()
+    set(INCLUDE_INSTALL_DIR "include")
+endif()
+
 #----------------------------------------------------------------------------------------#
 set(CMAKE_CXX_STANDARD 11)
 set(CXX_STANDARD_REQUIRED ON)
@@ -88,7 +94,7 @@ set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
 target_include_directories(chemfiles PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
 )
 
 target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/molfiles/include)
