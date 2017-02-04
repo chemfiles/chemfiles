@@ -126,17 +126,19 @@ void Trajectory::write(const Frame& frame) {
         );
     }
 
-    // Maybe that is not the better way to do this, performance-wise. I'll have
-    // to benchmark this part.
-    Frame frame_copy = frame.clone();
-    if (custom_topology_) {
-        frame_copy.set_topology(*custom_topology_);
-    }
-    if (custom_cell_) {
-        frame_copy.set_cell(*custom_cell_);
+    if (custom_topology_ || custom_cell_) {
+        Frame copy = frame.clone();
+        if (custom_topology_) {
+            copy.set_topology(*custom_topology_);
+        }
+        if (custom_cell_) {
+            copy.set_cell(*custom_cell_);
+        }
+        format_->write(copy);
+    } else {
+        format_->write(frame);
     }
 
-    format_->write(frame_copy);
     step_++;
     nsteps_++;
 }
