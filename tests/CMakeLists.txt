@@ -53,7 +53,9 @@ add_subdirectory(external)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${PROJECT_BINARY_DIR}/include)
-include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external)
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/)
+include_directories(SYSTEM ${PROJECT_BINARY_DIR}/external/tng_io/include)
+include_directories(SYSTEM ${PROJECT_BINARY_DIR}/external/molfiles/include)
 include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR}/external/boost/include)
 add_library(test_helpers STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/helpers.cpp)
 

@@ -2,9 +2,7 @@ cmake_minimum_required(VERSION 2.8.11)
 project(chemfiles C CXX)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-if(${CMAKE_VERSION} VERSION_GREATER 3.0.0)
-    cmake_policy(SET CMP0042 NEW)
-endif()
+cmake_policy(VERSION 2.8.11)
 
 #----------------------------------------------------------------------------------------#
 set(CMAKE_CXX_STANDARD 11)
@@ -87,10 +85,15 @@ add_library(
 set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
 set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
 
-target_include_directories(chemfiles PUBLIC include)
-target_include_directories(chemfiles PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/external/molfiles/include)
-target_include_directories(chemfiles PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/external/tng_io/include)
-target_include_directories(chemfiles PUBLIC external/fmt)
+target_include_directories(chemfiles PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
+
+target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/molfiles/include)
+target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/tng_io/include)
+target_include_directories(chemfiles PRIVATE external/fmt)
 
 if(${CHFL_ENABLE_NETCDF})
     find_package(NetCDF REQUIRED)
@@ -116,17 +119,34 @@ generate_export_header(chemfiles
     EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/chemfiles/exports.hpp
 )
 
-target_include_directories(chemfiles PUBLIC ${PROJECT_BINARY_DIR}/include)
-
 #----------------------------------------------------------------------------------------#
 # Installation configuration
 #----------------------------------------------------------------------------------------#
-
-# Header files
+install(TARGETS chemfiles EXPORT chemfiles-targets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)
 install(DIRECTORY include/ DESTINATION include)
 install(DIRECTORY ${PROJECT_BINARY_DIR}/include/ DESTINATION include)
-# Library
-install(TARGETS chemfiles DESTINATION lib)
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/chemfiles-config-version.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/chemfiles-config-version.cmake"
+    @ONLY
+)
+
+# Install package files
+set(PACKAGE_LOCATION lib/cmake/chemfiles)
+install(EXPORT chemfiles-targets
+  FILE chemfiles-targets.cmake
+  DESTINATION ${PACKAGE_LOCATION}
+)
+install(FILES
+    cmake/chemfiles-config.cmake
+    "${CMAKE_CURRENT_BINARY_DIR}/chemfiles-config-version.cmake"
+    DESTINATION ${PACKAGE_LOCATION}
+    COMPONENT Devel
+)
 
 # uninstall target
 configure_file(
@@ -134,8 +154,9 @@ configure_file(
     "${PROJECT_BINARY_DIR}/uninstall.cmake"
     @ONLY
 )
-
-add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${PROJECT_BINARY_DIR}/uninstall.cmake)
+add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${PROJECT_BINARY_DIR}/uninstall.cmake
+)
 
 if(CHFL_BUILD_DOCUMENTATION)
     add_subdirectory(doc)
