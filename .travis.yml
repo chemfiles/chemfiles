@@ -78,21 +78,13 @@ script:
   - |
     if ${EXTRA_WORK}; then
         cd $TRAVIS_BUILD_DIR
-        ./scripts/ci/check-docs.py
-    fi
-
-after_script:
-  - |
-    if ${EXTRA_WORK}; then
+        # Generate and upload coverage
         codecov --gcov-exec=gcov-4.8
-        cd $TRAVIS_BUILD_DIR
+        # Check and generate documentation
+        ./scripts/ci/check-docs.py
         git clone https://${GH_TOKEN}@github.com/chemfiles/chemfiles gh-pages
         ./scripts/ci/deploy-docs.sh
     fi
-
-cache:
-  directories:
-    - $HOME/netcdf
 
 env:
   global:
