@@ -81,7 +81,7 @@ script:
         # Generate and upload coverage
         codecov --gcov-exec=gcov-4.8
         # Check and generate documentation
-        ./scripts/ci/check-docs.py
+        ./scripts/ci/check-capi.py
         git clone https://${GH_TOKEN}@github.com/chemfiles/chemfiles gh-pages
         ./scripts/ci/deploy-docs.sh
     fi

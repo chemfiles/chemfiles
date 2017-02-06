@@ -68,19 +68,13 @@ extern "C" chfl_status chfl_trajectory_set_topology(CHFL_TRAJECTORY* const file,
     )
 }
 
-extern "C" chfl_status chfl_trajectory_set_topology_file(CHFL_TRAJECTORY* const file, const char* filename) {
+extern "C" chfl_status chfl_trajectory_topology_file(CHFL_TRAJECTORY* const file, const char* filename, const char* format) {
     assert(file != nullptr);
     assert(filename != nullptr);
     CHFL_ERROR_CATCH(
-        file->set_topology(std::string(filename));
-    )
-}
-
-extern "C" chfl_status chfl_trajectory_set_topology_with_format(CHFL_TRAJECTORY* const file, const char* filename, const char* format) {
-    assert(file != nullptr);
-    assert(filename != nullptr);
-    assert(format != nullptr);
-    CHFL_ERROR_CATCH(
+        if (format == nullptr) {
+            format = "";
+        }
         file->set_topology(std::string(filename), std::string(format));
     )
 }

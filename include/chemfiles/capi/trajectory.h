@@ -87,28 +87,18 @@ CHFL_EXPORT chfl_status chfl_trajectory_set_topology(
     CHFL_TRAJECTORY* const trajectory, const CHFL_TOPOLOGY* const topology
 );
 
-/// Set the topology associated with a `trajectory` by reading the first frame of
-/// the file at the given `path`; and extracting the topology of this frame.
-///
-/// @example{tests/capi/doc/chfl_trajectory/set_topology_file.c}
-/// @return The operation status code. You can use `chfl_last_error` to learn
-///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_trajectory_set_topology_file(
-    CHFL_TRAJECTORY* const trajectory, const char* path
-);
-
 /// Set the topology associated with a trajectory by reading the first frame of
 /// the file at the given `path` using the file format in `format`; and
 /// extracting the topology of this frame.
 ///
 /// This is needed when the topology file format does not match the extension,
 /// or when there is not standard extension for this format. If `format` is an
-/// empty string, the format will be guessed from the extension.
+/// empty string or `NULL`, the format will be guessed from the extension.
 ///
-/// @example{tests/capi/doc/chfl_trajectory/set_topology_with_format.c}
+/// @example{tests/capi/doc/chfl_trajectory/topology_file.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_trajectory_set_topology_with_format(
+CHFL_EXPORT chfl_status chfl_trajectory_topology_file(
     CHFL_TRAJECTORY* const trajectory, const char* path, const char* format
 );
 

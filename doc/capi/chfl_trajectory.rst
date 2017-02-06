@@ -19,9 +19,7 @@ Function manipulating ``CHFL_TRAJECTORY``
 
 .. doxygenfunction:: chfl_trajectory_set_topology
 
-.. doxygenfunction:: chfl_trajectory_set_topology_file
-
-.. doxygenfunction:: chfl_trajectory_set_topology_with_format
+.. doxygenfunction:: chfl_trajectory_topology_file
 
 .. doxygenfunction:: chfl_trajectory_nsteps
 

@@ -188,7 +188,7 @@ TEST_CASE("Read trajectory", "[CAPI]") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/trajectory.xyz", 'r');
         REQUIRE(trajectory != NULL);
 
-        CHECK_STATUS(chfl_trajectory_set_topology_file(trajectory, "data/xyz/topology.xyz"));
+        CHECK_STATUS(chfl_trajectory_topology_file(trajectory, "data/xyz/topology.xyz", ""));
 
         CHFL_FRAME* frame = chfl_frame(0);
         REQUIRE(frame != NULL);
@@ -200,7 +200,7 @@ TEST_CASE("Read trajectory", "[CAPI]") {
         CHECK(name == std::string("Zn"));
         CHECK_STATUS(chfl_atom_free(atom));
 
-        CHECK_STATUS(chfl_trajectory_set_topology_with_format(trajectory, "data/xyz/topology.xyz.topology", "XYZ"));
+        CHECK_STATUS(chfl_trajectory_topology_file(trajectory, "data/xyz/topology.xyz.topology", "XYZ"));
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
 
         atom = chfl_atom_from_frame(frame, 0);

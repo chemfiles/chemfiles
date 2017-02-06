@@ -78,3 +78,8 @@ if __name__ == '__main__':
         if function not in docs:
             raise RuntimeError("Missing documentation for {}".format(function))
     check_examples()
+
+    # C and fortran standard only allow extern names up to 31 characters
+    for function in all_functions():
+        if len(function) > 31:
+            raise RuntimeError("Function name {} is too long".format(function))
