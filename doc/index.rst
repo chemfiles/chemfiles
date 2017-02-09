@@ -40,12 +40,12 @@ interfaces to chemfiles are accessibles at the following places:
 * `Julia interface`_, for `Julia`_ 0.4+;
 * `Rust interface`_, for the `Rust`_ language;
 
-.. _Python interface: http://chemfiles.github.io/chemfiles.py/latest/
-.. _Fortran interface: http://chemfiles.github.io/chemfiles.f03/latest/
-.. _Julia interface: http://chemfiles.github.io/Chemfiles.jl/latest/
-.. _Rust interface: http://chemfiles.github.io/chemfiles.rs/latest/
+.. _Python interface: https://chemfiles.github.io/chemfiles.py/latest/
+.. _Fortran interface: https://chemfiles.github.io/chemfiles.f03/latest/
+.. _Julia interface: https://chemfiles.github.io/Chemfiles.jl/latest/
+.. _Rust interface: https://chemfiles.github.io/chemfiles.rs/latest/
 .. _Julia: http://julialang.org/
-.. _Rust: http://rust-lang.org/
+.. _Rust: https://www.rust-lang.org/
 
 User manual
 -----------

@@ -38,7 +38,7 @@ specify which format to use.
 | `DCD`_            | .dcd       | |no|              | |yes|   | |no|    |
 +-------------------+------------+-------------------+---------+---------+
 
-.. _XYZ: http://openbabel.org/wiki/XYZ
+.. _XYZ: https://openbabel.org/wiki/XYZ
 .. _PDB: http://www.rcsb.org/pdb/static.do?p=file_formats/pdb/index.html
 .. _Amber NetCDF: http://ambermd.org/netcdf/nctraj.xhtml
 .. _TNG: http://doi.wiley.com/10.1002/jcc.23495

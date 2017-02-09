@@ -51,12 +51,12 @@ projects are needed.
   these tests each time the code is pushed to the repository.
 
 
-.. _git: http://git-scm.com/
+.. _git: https://git-scm.com/
 .. _github: https://github.com/about/
-.. _sphinx: http://sphinx-doc.org/
-.. _Doxygen: http://www.stack.nl/~dimitri/doxygen/
-.. _breathe: http://breathe.readthedocs.org/
-.. _cmake: http://cmake.org/
+.. _sphinx: http://www.sphinx-doc.org/
+.. _Doxygen: http://doxygen.org/
+.. _breathe: https://breathe.readthedocs.io/
+.. _cmake: https://cmake.org/
 .. _CATCH: https://github.com/philsquared/Catch/
 .. _travis: https://travis-ci.org/chemfiles/chemfiles/
 

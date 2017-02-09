@@ -12,7 +12,7 @@ distributions using the `OpenSUSE build service`_.
     <p>You can download them directly below:</p>
 
     <iframe
-        src="http://software.opensuse.org/download/package.iframe?project=home%3ALuthaf&package=chemfiles"
+        src="https://software.opensuse.org/download/package.iframe?project=home%3ALuthaf&package=chemfiles"
         width="100%" height="400px" frameborder="0"
     ></iframe>
 
@@ -35,7 +35,7 @@ Linux and Os X.
     # Get the C++ and C library
     conda install -c conda-forge chemfiles-lib
 
-.. _conda: http://conda.pydata.org/docs/
+.. _conda: https://conda.pydata.org/docs/
 .. _OpenSUSE build service: https://software.opensuse.org/download.html?project=home%3ALuthaf&package=chemfiles
 
 Building from sources
@@ -83,8 +83,8 @@ All these dependencies can be installed in one command:
     brew tap homebrew/science
     brew install cmake netcdf
 
-.. _NetCDF: http://www.unidata.ucar.edu/software/netcdf/
-.. _CMake: http://cmake.org/
+.. _NetCDF: https://www.unidata.ucar.edu/software/netcdf/
+.. _CMake: https://cmake.org/
 
 On Windows
 """"""""""
@@ -102,10 +102,10 @@ steps, you can run the following to install a recent C++ compiler:
     # On 32-bits windows
     pacman -S mingw32/mingw-w64-i686-gcc
 
-You will also need to install cmake, which can be found `here <http://www.cmake.org/download/>`_.
+You will also need to install cmake, which can be found `here <https://www.cmake.org/download/>`_.
 
-.. _mingw-w64: http://mingw-w64.org/doku.php
-.. _MSYS2: http://msys2.github.io/
+.. _mingw-w64: https://mingw-w64.org/doku.php
+.. _MSYS2: https://msys2.github.io/
 
 Build steps
 -----------

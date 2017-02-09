@@ -28,7 +28,7 @@ Majors differencies
 OpenBabel
 ---------
 
-`OpenBabel <http://openbabel.org/wiki/Main_Page>`_ is the swiss army knife for
+`OpenBabel <https://openbabel.org/wiki/Main_Page>`_ is the swiss army knife for
 converting trajectories from one format to another. It support over 110 file format.
 
 The library is written in C++, and provide Perl, Python, Java and Ruby bindings. It

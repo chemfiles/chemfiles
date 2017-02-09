@@ -1,7 +1,7 @@
 Usage examples
 ==============
 
-All the code here is under the `CC-0 Universal Licence <http://creativecommons.org/publicdomain/zero/1.0/>`_
+All the code here is under the `CC-0 Universal Licence <https://creativecommons.org/publicdomain/zero/1.0/>`_
 which means that you are free to do whatever you want with it (*i.e.* it is Public
 Domain code)
 
