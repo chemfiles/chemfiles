@@ -15,8 +15,8 @@
 using namespace chemfiles;
 
 extern "C" CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* const frame) {
-    assert(frame != nullptr);
     CHFL_TOPOLOGY* topology = nullptr;
+    CHECK_POINTER_GOTO(frame);
     CHFL_ERROR_GOTO(
         topology = new Topology();
         *topology = frame->topology();
@@ -50,78 +50,78 @@ error:
 }
 
 extern "C" chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const topology, uint64_t *natoms) {
-    assert(topology != nullptr);
-    assert(natoms != nullptr);
+    CHECK_POINTER(topology);
+    CHECK_POINTER(natoms);
     CHFL_ERROR_CATCH(
         *natoms = topology->natoms();
     )
 }
 
 extern "C" chfl_status chfl_topology_resize(CHFL_TOPOLOGY* const topology, uint64_t natoms) {
-    assert(topology != nullptr);
+    CHECK_POINTER(topology);
     CHFL_ERROR_CATCH(
         topology->resize(checked_cast(natoms));
     )
 }
 
 extern "C" chfl_status chfl_topology_add_atom(CHFL_TOPOLOGY* const topology, const CHFL_ATOM* const atom) {
-    assert(topology != nullptr);
-    assert(atom != nullptr);
+    CHECK_POINTER(topology);
+    CHECK_POINTER(atom);
     CHFL_ERROR_CATCH(
         topology->append(*atom);
     )
 }
 
 extern "C" chfl_status chfl_topology_remove(CHFL_TOPOLOGY* const topology, uint64_t i) {
-    assert(topology != nullptr);
+    CHECK_POINTER(topology);
     CHFL_ERROR_CATCH(
         topology->remove(checked_cast(i));
     )
 }
 
 extern "C" chfl_status chfl_topology_isbond(const CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, bool* result) {
-    assert(topology != nullptr);
-    assert(result != nullptr);
+    CHECK_POINTER(topology);
+    CHECK_POINTER(result);
     CHFL_ERROR_CATCH(
         *result = topology->isbond(checked_cast(i), checked_cast(j));
     )
 }
 
 extern "C" chfl_status chfl_topology_isangle(const CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, uint64_t k, bool* result) {
-    assert(topology != nullptr);
-    assert(result != nullptr);
+    CHECK_POINTER(topology);
+    CHECK_POINTER(result);
     CHFL_ERROR_CATCH(
         *result = topology->isangle(checked_cast(i), checked_cast(j), checked_cast(k));
     )
 }
 
 extern "C" chfl_status chfl_topology_isdihedral(const CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, uint64_t k, uint64_t m, bool* result) {
-    assert(topology != nullptr);
-    assert(result != nullptr);
+    CHECK_POINTER(topology);
+    CHECK_POINTER(result);
     CHFL_ERROR_CATCH(
         *result = topology->isdihedral(checked_cast(i), checked_cast(j), checked_cast(k), checked_cast(m));
     )
 }
 
 extern "C" chfl_status chfl_topology_bonds_count(const CHFL_TOPOLOGY* const topology, uint64_t* nbonds) {
-    assert(topology != nullptr);
-    assert(nbonds != nullptr);
+    CHECK_POINTER(topology);
+    CHECK_POINTER(nbonds);
     CHFL_ERROR_CATCH(
         *nbonds = topology->bonds().size();
     )
 }
 
 extern "C" chfl_status chfl_topology_angles_count(const CHFL_TOPOLOGY* const topology, uint64_t* nangles) {
-    assert(topology != nullptr);
-    assert(nangles != nullptr);
+    CHECK_POINTER(topology);
+    CHECK_POINTER(nangles);
     CHFL_ERROR_CATCH(
         *nangles = topology->angles().size();
     )
 }
 
 extern "C" chfl_status chfl_topology_dihedrals_count(const CHFL_TOPOLOGY* const topology, uint64_t* ndihedrals) {
-    assert(topology != nullptr);
-    assert(ndihedrals != nullptr);
+    CHECK_POINTER(topology);
+    CHECK_POINTER(ndihedrals);
     CHFL_ERROR_CATCH(
         *ndihedrals = topology->dihedrals().size();
     )
@@ -129,8 +129,8 @@ extern "C" chfl_status chfl_topology_dihedrals_count(const CHFL_TOPOLOGY* const 
 
 #pragma intel optimization_level 2  /* Using -O3 with icc lead to partial copy of the bonds */
 extern "C" chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[2], uint64_t nbonds) {
-    assert(topology != nullptr);
-    assert(data != nullptr);
+    CHECK_POINTER(topology);
+    CHECK_POINTER(data);
 
     CHFL_ERROR_CATCH(
         if (nbonds != topology->bonds().size()) {
@@ -148,8 +148,8 @@ extern "C" chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, 
 
 #pragma intel optimization_level 2 /* Using -O3 with icc lead to partial copy of the angles */
 extern "C" chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[3], uint64_t nangles) {
-    assert(topology != nullptr);
-    assert(data != nullptr);
+    CHECK_POINTER(topology);
+    CHECK_POINTER(data);
 
     CHFL_ERROR_CATCH(
         if (nangles != topology->angles().size()) {
@@ -168,8 +168,8 @@ extern "C" chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology,
 
 #pragma intel optimization_level 2 /* Using -O3 with icc lead to partial copy of the dihedrals */
 extern "C" chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t ndihedrals) {
-    assert(topology != nullptr);
-    assert(data != nullptr);
+    CHECK_POINTER(topology);
+    CHECK_POINTER(data);
 
     CHFL_ERROR_CATCH(
         if (ndihedrals != topology->dihedrals().size()) {
@@ -188,30 +188,30 @@ extern "C" chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topolo
 }
 
 extern "C" chfl_status chfl_topology_add_bond(CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j) {
-    assert(topology != nullptr);
+    CHECK_POINTER(topology);
     CHFL_ERROR_CATCH(
         topology->add_bond(checked_cast(i), checked_cast(j));
     )
 }
 
 extern "C" chfl_status chfl_topology_remove_bond(CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j) {
-    assert(topology != nullptr);
+    CHECK_POINTER(topology);
     CHFL_ERROR_CATCH(
         topology->remove_bond(checked_cast(i), checked_cast(j));
     )
 }
 
 extern "C" chfl_status chfl_topology_residues_count(const CHFL_TOPOLOGY* const topology, uint64_t* residues) {
-    assert(topology != nullptr);
-    assert(residues != nullptr);
+    CHECK_POINTER(topology);
+    CHECK_POINTER(residues);
     CHFL_ERROR_CATCH(
         *residues = topology->residues().size();
     )
 }
 
 extern "C" chfl_status chfl_topology_add_residue(CHFL_TOPOLOGY* const topology, const CHFL_RESIDUE* const residue) {
-    assert(topology != nullptr);
-    assert(residue != nullptr);
+    CHECK_POINTER(topology);
+    CHECK_POINTER(residue);
     CHFL_ERROR_CATCH(
         topology->add_residue(*residue);
     )
@@ -220,10 +220,10 @@ extern "C" chfl_status chfl_topology_add_residue(CHFL_TOPOLOGY* const topology, 
 extern "C" chfl_status chfl_topology_residues_linked(
     const CHFL_TOPOLOGY* const topology, const CHFL_RESIDUE* const first,
     const CHFL_RESIDUE* const second, bool* result) {
-    assert(topology != nullptr);
-    assert(first != nullptr);
-    assert(second != nullptr);
-    assert(result != nullptr);
+    CHECK_POINTER(topology);
+    CHECK_POINTER(first);
+    CHECK_POINTER(second);
+    CHECK_POINTER(result);
     CHFL_ERROR_CATCH(
         *result = topology->are_linked(*first, *second);
     )

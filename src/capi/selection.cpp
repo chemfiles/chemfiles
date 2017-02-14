@@ -47,15 +47,15 @@ error:
 }
 
 extern "C" chfl_status chfl_selection_size(const CHFL_SELECTION* const selection, uint64_t* size) {
-    assert(selection != nullptr);
+    CHECK_POINTER(selection);
     CHFL_ERROR_CATCH(
         *size = selection->selection.size();
     )
 }
 
 extern "C" chfl_status chfl_selection_string(const CHFL_SELECTION* const selection, char* const string, uint64_t buffsize) {
-    assert(selection != nullptr);
-    assert(string != nullptr);
+    CHECK_POINTER(selection);
+    CHECK_POINTER(string);
     CHFL_ERROR_CATCH(
         strncpy(string, selection->selection.string().c_str(), checked_cast(buffsize) - 1);
         string[buffsize - 1] = '\0';
@@ -63,7 +63,7 @@ extern "C" chfl_status chfl_selection_string(const CHFL_SELECTION* const selecti
 }
 
 extern "C" chfl_status chfl_selection_evalutate(CHFL_SELECTION* const selection, const CHFL_FRAME* const frame, uint64_t* n_matches) {
-    assert(selection != nullptr);
+    CHECK_POINTER(selection);
     CHFL_ERROR_CATCH(
         selection->matches = selection->selection.evaluate(*frame);
         *n_matches = selection->matches.size();
@@ -71,8 +71,11 @@ extern "C" chfl_status chfl_selection_evalutate(CHFL_SELECTION* const selection,
 }
 
 extern "C" chfl_status chfl_selection_matches(const CHFL_SELECTION* const selection, chfl_match_t* const matches, uint64_t n_matches) {
-    assert(selection != nullptr);
-    assert(n_matches == selection->matches.size());
+    CHECK_POINTER(selection);
+    if (n_matches != selection->matches.size()) {
+        CAPI_LAST_ERROR = "Wrong data size in function 'chfl_selection_matches'.";
+        return CHFL_MEMORY_ERROR;
+    }
     CHFL_ERROR_CATCH(
         auto size = selection->selection.size();
         for (size_t i=0; i<n_matches; i++) {

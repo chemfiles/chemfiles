@@ -37,6 +37,27 @@ inline size_t checked_cast(uint64_t value) {
         goto error;                                                            \
     }
 
+#define CHECK_POINTER(ptr)                                                     \
+    do {                                                                       \
+        if (ptr == nullptr) {                                                  \
+            std::string message = "Parameter " + std::string(#ptr) + "cannot be NULL"; \
+            CAPI_LAST_ERROR = message;                                         \
+            chemfiles::warning(message);                                       \
+            return CHFL_MEMORY_ERROR;                                          \
+        }                                                                      \
+    } while (false)
+
+#define CHECK_POINTER_GOTO(ptr)                                                \
+    do {                                                                       \
+        if (ptr == nullptr) {                                                  \
+            std::string message = "Parameter " + std::string(#ptr) + "cannot be NULL"; \
+            CAPI_LAST_ERROR = message;                                         \
+            chemfiles::warning(message);                                       \
+            goto error;                                                        \
+        }                                                                      \
+    } while (false)
+
+
 /// Wrap `instructions` in a try/catch bloc automatically, and return a status
 /// code
 #define CHFL_ERROR_CATCH(instructions)                                         \

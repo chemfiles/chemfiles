@@ -34,17 +34,17 @@ error:
 }
 
 extern "C" chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame, uint64_t *natoms) {
-    assert(frame != nullptr);
-    assert(natoms != nullptr);
+    CHECK_POINTER(frame);
+    CHECK_POINTER(natoms);
     CHFL_ERROR_CATCH(
         *natoms = frame->natoms();
     )
 }
 
 extern "C" chfl_status chfl_frame_positions(CHFL_FRAME* const frame, chfl_vector_t** data, uint64_t* size) {
-    assert(frame != nullptr);
-    assert(data != nullptr);
-    assert(size != nullptr);
+    CHECK_POINTER(frame);
+    CHECK_POINTER(data);
+    CHECK_POINTER(size);
     static_assert(
         sizeof(chfl_vector_t) == sizeof(Vector3D),
         "Wrong size for chfl_vector_t. It should match Vector3D."
@@ -57,9 +57,9 @@ extern "C" chfl_status chfl_frame_positions(CHFL_FRAME* const frame, chfl_vector
 }
 
 extern "C" chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vector_t** data, uint64_t* size) {
-    assert(frame != nullptr);
-    assert(data != nullptr);
-    assert(size != nullptr);
+    CHECK_POINTER(frame);
+    CHECK_POINTER(data);
+    CHECK_POINTER(size);
     static_assert(
         sizeof(chfl_vector_t) == sizeof(Vector3D),
         "Wrong size for chfl_vector_t. It should match Vector3D."
@@ -78,9 +78,9 @@ extern "C" chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vecto
 extern "C" chfl_status chfl_frame_add_atom(
     CHFL_FRAME* const frame, const CHFL_ATOM* const atom,
     const chfl_vector_t position, const chfl_vector_t velocity) {
-    assert(frame != nullptr);
-    assert(atom != nullptr);
-    assert(position != nullptr);
+    CHECK_POINTER(frame);
+    CHECK_POINTER(atom);
+    CHECK_POINTER(position);
     CHFL_ERROR_CATCH(
         auto pos = vector3d(position[0], position[1], position[2]);
         if (velocity != nullptr) {
@@ -93,67 +93,67 @@ extern "C" chfl_status chfl_frame_add_atom(
 }
 
 extern "C" chfl_status chfl_frame_remove(CHFL_FRAME* const frame, uint64_t i) {
-    assert(frame != nullptr);
+    CHECK_POINTER(frame);
     CHFL_ERROR_CATCH(
-        frame->remove(i);
+        frame->remove(static_cast<size_t>(i));
     )
 }
 
 extern "C" chfl_status chfl_frame_resize(CHFL_FRAME* const frame, uint64_t natoms) {
-    assert(frame != nullptr);
+    CHECK_POINTER(frame);
     CHFL_ERROR_CATCH(
         frame->resize(checked_cast(natoms));
     )
 }
 
 extern "C" chfl_status chfl_frame_add_velocities(CHFL_FRAME* const frame) {
-    assert(frame != nullptr);
+    CHECK_POINTER(frame);
     CHFL_ERROR_CATCH(
         frame->add_velocities();
     )
 }
 
 extern "C" chfl_status chfl_frame_has_velocities(const CHFL_FRAME* const frame, bool* has_velocities) {
-    assert(frame != nullptr);
-    assert(has_velocities != nullptr);
+    CHECK_POINTER(frame);
+    CHECK_POINTER(has_velocities);
     CHFL_ERROR_CATCH(
         *has_velocities = bool(frame->velocities());
     )
 }
 
 extern "C" chfl_status chfl_frame_set_cell(CHFL_FRAME* const frame, const CHFL_CELL* const cell) {
-    assert(frame != nullptr);
-    assert(cell != nullptr);
+    CHECK_POINTER(frame);
+    CHECK_POINTER(cell);
     CHFL_ERROR_CATCH(
         frame->set_cell(*cell);
     )
 }
 
 extern "C" chfl_status chfl_frame_set_topology(CHFL_FRAME* const frame, const CHFL_TOPOLOGY* const topology) {
-    assert(frame != nullptr);
-    assert(topology != nullptr);
+    CHECK_POINTER(frame);
+    CHECK_POINTER(topology);
     CHFL_ERROR_CATCH(
         frame->set_topology(*topology);
     )
 }
 
 extern "C" chfl_status chfl_frame_step(const CHFL_FRAME* const frame, uint64_t* step) {
-    assert(frame != nullptr);
-    assert(step != nullptr);
+    CHECK_POINTER(frame);
+    CHECK_POINTER(step);
     CHFL_ERROR_CATCH(
         *step = frame->step();
     )
 }
 
 extern "C" chfl_status chfl_frame_set_step(CHFL_FRAME* const frame, uint64_t step) {
-    assert(frame != nullptr);
+    CHECK_POINTER(frame);
     CHFL_ERROR_CATCH(
         frame->set_step(checked_cast(step));
     )
 }
 
 extern "C" chfl_status chfl_frame_guess_topology(CHFL_FRAME* const frame) {
-    assert(frame != nullptr);
+    CHECK_POINTER(frame);
     CHFL_ERROR_CATCH(
         frame->guess_topology();
     )

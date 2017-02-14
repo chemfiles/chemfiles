@@ -38,8 +38,8 @@ error:
 }
 
 extern "C" CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame, uint64_t idx) {
-    assert(frame != nullptr);
     CHFL_ATOM* atom = nullptr;
+    CHECK_POINTER_GOTO(frame);
     CHFL_ERROR_GOTO(
         // Return NULL if the index is out of bounds
         if (idx >= frame->natoms()) {
@@ -57,8 +57,8 @@ error:
 }
 
 extern "C" CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* const topology, uint64_t idx) {
-    assert(topology != nullptr);
     CHFL_ATOM* atom = nullptr;
+    CHECK_POINTER_GOTO(topology);
     CHFL_ERROR_GOTO(
         // Return NULL if the index is out of bounds
         if (idx >= topology->natoms()) {
@@ -76,38 +76,38 @@ error:
 }
 
 extern "C" chfl_status chfl_atom_mass(const CHFL_ATOM* const atom, double* mass) {
-    assert(atom != nullptr);
-    assert(mass != nullptr);
+    CHECK_POINTER(atom);
+    CHECK_POINTER(mass);
     CHFL_ERROR_CATCH(
         *mass = atom->mass();
     )
 }
 
 extern "C" chfl_status chfl_atom_set_mass(CHFL_ATOM* const atom, double mass) {
-    assert(atom != nullptr);
+    CHECK_POINTER(atom);
     CHFL_ERROR_CATCH(
         atom->set_mass(mass);
     )
 }
 
 extern "C" chfl_status chfl_atom_charge(const CHFL_ATOM* const atom, double* charge) {
-    assert(atom != nullptr);
-    assert(charge != nullptr);
+    CHECK_POINTER(atom);
+    CHECK_POINTER(charge);
     CHFL_ERROR_CATCH(
         *charge = atom->charge();
     )
 }
 
 extern "C" chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, double charge) {
-    assert(atom != nullptr);
+    CHECK_POINTER(atom);
     CHFL_ERROR_CATCH(
         atom->set_charge(charge);
     )
 }
 
 extern "C" chfl_status chfl_atom_type(const CHFL_ATOM* const atom, char* const type, uint64_t buffsize) {
-    assert(atom != nullptr);
-    assert(type != nullptr);
+    CHECK_POINTER(atom);
+    CHECK_POINTER(type);
     CHFL_ERROR_CATCH(
         strncpy(type, atom->type().c_str(), checked_cast(buffsize) - 1);
         type[buffsize - 1] = '\0';
@@ -115,16 +115,16 @@ extern "C" chfl_status chfl_atom_type(const CHFL_ATOM* const atom, char* const t
 }
 
 extern "C" chfl_status chfl_atom_set_type(CHFL_ATOM* const atom, const char* type) {
-    assert(atom != nullptr);
-    assert(type != nullptr);
+    CHECK_POINTER(atom);
+    CHECK_POINTER(type);
     CHFL_ERROR_CATCH(
         atom->set_type(type);
     )
 }
 
 extern "C" chfl_status chfl_atom_name(const CHFL_ATOM* const atom, char* const name, uint64_t buffsize) {
-    assert(atom != nullptr);
-    assert(name != nullptr);
+    CHECK_POINTER(atom);
+    CHECK_POINTER(name);
     CHFL_ERROR_CATCH(
         strncpy(name, atom->name().c_str(), checked_cast(buffsize) - 1);
         name[buffsize - 1] = '\0';
@@ -132,16 +132,16 @@ extern "C" chfl_status chfl_atom_name(const CHFL_ATOM* const atom, char* const n
 }
 
 extern "C" chfl_status chfl_atom_set_name(CHFL_ATOM* const atom, const char* name) {
-    assert(atom != nullptr);
-    assert(name != nullptr);
+    CHECK_POINTER(atom);
+    CHECK_POINTER(name);
     CHFL_ERROR_CATCH(
         atom->set_name(name);
     )
 }
 
 extern "C" chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* const name, uint64_t buffsize) {
-    assert(atom != nullptr);
-    assert(name != nullptr);
+    CHECK_POINTER(atom);
+    CHECK_POINTER(name);
     CHFL_ERROR_CATCH(
         strncpy(name, atom->full_name().c_str(), checked_cast(buffsize) - 1);
         name[buffsize - 1] = '\0';
@@ -149,24 +149,24 @@ extern "C" chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* co
 }
 
 extern "C" chfl_status chfl_atom_vdw_radius(const CHFL_ATOM* const atom, double* radius) {
-    assert(atom != nullptr);
-    assert(radius != nullptr);
+    CHECK_POINTER(atom);
+    CHECK_POINTER(radius);
     CHFL_ERROR_CATCH(
         *radius = atom->vdw_radius();
     )
 }
 
 extern "C" chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* const atom, double* radius) {
-    assert(atom != nullptr);
-    assert(radius != nullptr);
+    CHECK_POINTER(atom);
+    CHECK_POINTER(radius);
     CHFL_ERROR_CATCH(
         *radius = atom->covalent_radius();
     )
 }
 
 extern "C" chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom, int64_t* number) {
-    assert(atom != nullptr);
-    assert(number != nullptr);
+    CHECK_POINTER(atom);
+    CHECK_POINTER(number);
     CHFL_ERROR_CATCH(
         *number = atom->atomic_number();
     )

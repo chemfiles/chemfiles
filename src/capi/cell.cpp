@@ -15,8 +15,8 @@ using namespace chemfiles;
 static_assert(sizeof(chfl_cell_shape_t) == sizeof(int), "Wrong size for chfl_cell_shape_t enum");
 
 extern "C" CHFL_CELL* chfl_cell(const chfl_vector_t lenghts) {
-    assert(lenghts != nullptr);
     CHFL_CELL* cell = nullptr;
+    CHECK_POINTER_GOTO(lenghts);
     CHFL_ERROR_GOTO(
         cell = new UnitCell(lenghts[0], lenghts[1], lenghts[2]);
     )
@@ -27,9 +27,9 @@ error:
 }
 
 extern "C" CHFL_CELL* chfl_cell_triclinic(const chfl_vector_t lenghts, const chfl_vector_t angles) {
-    assert(lenghts != nullptr);
-    assert(angles != nullptr);
     CHFL_CELL* cell = nullptr;
+    CHECK_POINTER_GOTO(lenghts);
+    CHECK_POINTER_GOTO(angles);
     CHFL_ERROR_GOTO(
         cell = new UnitCell(
             lenghts[0], lenghts[1], lenghts[2],
@@ -47,8 +47,8 @@ error:
 
 
 extern "C" CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* const frame) {
-    assert(frame != nullptr);
     CHFL_CELL* cell = nullptr;
+    CHECK_POINTER_GOTO(frame);
     CHFL_ERROR_GOTO(
         cell = new UnitCell(frame->cell());
     )
@@ -70,16 +70,16 @@ error:
 }
 
 extern "C" chfl_status chfl_cell_volume(const CHFL_CELL* const cell, double* volume) {
-    assert(cell != nullptr);
-    assert(volume != nullptr);
+    CHECK_POINTER(cell);
+    CHECK_POINTER(volume);
     CHFL_ERROR_CATCH(
         *volume = cell->volume();
     )
 }
 
 extern "C" chfl_status chfl_cell_lengths(const CHFL_CELL* const cell, chfl_vector_t lenghts) {
-    assert(cell != nullptr);
-    assert(lenghts != nullptr);
+    CHECK_POINTER(cell);
+    CHECK_POINTER(lenghts);
     CHFL_ERROR_CATCH(
         lenghts[0] = cell->a();
         lenghts[1] = cell->b();
@@ -88,8 +88,8 @@ extern "C" chfl_status chfl_cell_lengths(const CHFL_CELL* const cell, chfl_vecto
 }
 
 extern "C" chfl_status chfl_cell_set_lengths(CHFL_CELL* const cell, const chfl_vector_t lenghts) {
-    assert(cell != nullptr);
-    assert(lenghts != nullptr);
+    CHECK_POINTER(cell);
+    CHECK_POINTER(lenghts);
     CHFL_ERROR_CATCH(
         cell->set_a(lenghts[0]);
         cell->set_b(lenghts[1]);
@@ -98,8 +98,8 @@ extern "C" chfl_status chfl_cell_set_lengths(CHFL_CELL* const cell, const chfl_v
 }
 
 extern "C" chfl_status chfl_cell_angles(const CHFL_CELL* const cell, chfl_vector_t angles) {
-    assert(cell != nullptr);
-    assert(angles != nullptr);
+    CHECK_POINTER(cell);
+    CHECK_POINTER(angles);
     CHFL_ERROR_CATCH(
         angles[0] = cell->alpha();
         angles[1] = cell->beta();
@@ -108,7 +108,7 @@ extern "C" chfl_status chfl_cell_angles(const CHFL_CELL* const cell, chfl_vector
 }
 
 extern "C" chfl_status chfl_cell_set_angles(CHFL_CELL* const cell, const chfl_vector_t angles) {
-    assert(cell != nullptr);
+    CHECK_POINTER(cell);
     CHFL_ERROR_CATCH(
         cell->set_alpha(angles[0]);
         cell->set_beta(angles[1]);
@@ -117,23 +117,23 @@ extern "C" chfl_status chfl_cell_set_angles(CHFL_CELL* const cell, const chfl_ve
 }
 
 extern "C" chfl_status chfl_cell_matrix(const CHFL_CELL* const cell, chfl_vector_t matrix[3]) {
-    assert(cell != nullptr);
-    assert(matrix != nullptr);
+    CHECK_POINTER(cell);
+    CHECK_POINTER(matrix);
     CHFL_ERROR_CATCH(
         cell->raw_matricial(matrix);
     )
 }
 
 extern "C" chfl_status chfl_cell_shape(const CHFL_CELL* const cell, chfl_cell_shape_t* const shape) {
-    assert(cell != nullptr);
-    assert(shape != nullptr);
+    CHECK_POINTER(cell);
+    CHECK_POINTER(shape);
     CHFL_ERROR_CATCH(
         *shape = static_cast<chfl_cell_shape_t>(cell->shape());
     )
 }
 
 extern "C" chfl_status chfl_cell_set_shape(CHFL_CELL* const cell, chfl_cell_shape_t shape) {
-    assert(cell != nullptr);
+    CHECK_POINTER(cell);
     CHFL_ERROR_CATCH(
         cell->shape(static_cast<UnitCell::CellShape>(shape));
     )
