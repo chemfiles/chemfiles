@@ -79,7 +79,7 @@ Molfile<F>::Molfile(const std::string& path, File::Mode mode)
     }
     plugin_ = reginfo.plugin;
 
-    // Check the ABI version of the loaded plugin_
+    // Check the ABI version of the plugin
     assert(plugin_->abiversion == vmdplugin_ABIVERSION);
 
     // Check that needed functions are here

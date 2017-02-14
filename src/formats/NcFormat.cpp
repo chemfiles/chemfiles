@@ -111,8 +111,7 @@ UnitCell NCFormat::read_cell() {
     assert(length.size() == 3);
     assert(angles.size() == 3);
 
-    return UnitCell(length[0], length[1], length[2], angles[0], angles[1],
-                    angles[2]);
+    return UnitCell(length[0], length[1], length[2], angles[0], angles[1], angles[2]);
 }
 
 void NCFormat::read_array3D(Span3D array, const std::string& name) {
