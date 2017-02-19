@@ -91,9 +91,8 @@ CHFL_EXPORT chfl_status chfl_trajectory_set_topology(
 /// the file at the given `path` using the file format in `format`; and
 /// extracting the topology of this frame.
 ///
-/// This is needed when the topology file format does not match the extension,
-/// or when there is not standard extension for this format. If `format` is an
-/// empty string or `NULL`, the format will be guessed from the extension.
+/// If `format` is an empty string or `NULL`, the format will be guessed from
+/// the path extension.
 ///
 /// @example{tests/capi/doc/chfl_trajectory/topology_file.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn

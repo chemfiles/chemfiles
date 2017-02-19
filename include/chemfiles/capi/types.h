@@ -43,7 +43,7 @@ typedef struct CHFL_TRAJECTORY CHFL_TRAJECTORY;
 /// A `CHFL_FRAME` contains data from one simulation step: the current unit
 /// cell, the topology, the positions, and the velocities of the particles in
 /// the system. If some information is missing (topology or velocity or unit
-/// cell), the corresponding data is filled with a default value. Specifically:
+/// cell), the corresponding data is filled with a default value.
 typedef struct CHFL_FRAME CHFL_FRAME;
 
 /// An opaque type handling an atom.
