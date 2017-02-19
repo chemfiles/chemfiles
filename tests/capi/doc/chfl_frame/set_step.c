@@ -4,7 +4,7 @@
 
 int main() {
     // [example]
-    CHFL_FRAME* frame = chfl_frame(42);
+    CHFL_FRAME* frame = chfl_frame();
 
     chfl_frame_set_step(frame, 678);
 

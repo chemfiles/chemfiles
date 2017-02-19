@@ -11,10 +11,10 @@
 #include "chemfiles/Frame.hpp"
 using namespace chemfiles;
 
-extern "C" CHFL_FRAME* chfl_frame(uint64_t natoms) {
+extern "C" CHFL_FRAME* chfl_frame(void) {
     CHFL_FRAME* frame = nullptr;
     CHFL_ERROR_GOTO(
-        frame = new Frame(checked_cast(natoms));
+        frame = new Frame();
     )
     return frame;
 error:

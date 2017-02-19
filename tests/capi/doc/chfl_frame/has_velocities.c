@@ -4,7 +4,7 @@
 
 int main() {
     // [example]
-    CHFL_FRAME* frame = chfl_frame(42);
+    CHFL_FRAME* frame = chfl_frame();
 
     bool velocities = true;
     chfl_frame_has_velocities(frame, &velocities);

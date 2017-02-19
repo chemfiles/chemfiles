@@ -3,7 +3,7 @@
 
 int main() {
     // [example]
-    CHFL_FRAME* frame = chfl_frame(10);
+    CHFL_FRAME* frame = chfl_frame();
     CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
 
     if (topology == NULL) {

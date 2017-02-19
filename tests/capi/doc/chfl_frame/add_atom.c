@@ -3,7 +3,7 @@
 
 int main() {
     // [example]
-    CHFL_FRAME* frame = chfl_frame(0);
+    CHFL_FRAME* frame = chfl_frame();
     CHFL_ATOM* atom = chfl_atom("C");
 
     chfl_frame_add_atom(frame, atom, (chfl_vector_t){1, 2, 3}, NULL);

@@ -3,8 +3,9 @@
 
 int main() {
     // [example]
-    CHFL_FRAME* frame = chfl_frame(10);
+    CHFL_FRAME* frame = chfl_frame();
     /* Update the frame, or read it from a file */
+    chfl_frame_resize(frame, 5);
 
     CHFL_ATOM* atom = chfl_atom_from_frame(frame, 4);
 

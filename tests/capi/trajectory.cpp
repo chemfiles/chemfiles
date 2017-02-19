@@ -21,7 +21,7 @@ TEST_CASE("Read trajectory", "[CAPI]") {
 
     SECTION("Open with format") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_with_format("data/xyz/helium.xyz.but.not.really", 'r', "XYZ");
-        CHFL_FRAME* frame = chfl_frame(0);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(trajectory != NULL);
         REQUIRE(frame != NULL);
 
@@ -37,7 +37,7 @@ TEST_CASE("Read trajectory", "[CAPI]") {
 
     SECTION("Read next step") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
-        CHFL_FRAME* frame = chfl_frame(0);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(trajectory != NULL);
         REQUIRE(frame != NULL);
 
@@ -68,7 +68,7 @@ TEST_CASE("Read trajectory", "[CAPI]") {
 
     SECTION("Read specific step") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
-        CHFL_FRAME* frame = chfl_frame(0);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(trajectory != NULL);
         REQUIRE(frame != NULL);
 
@@ -95,7 +95,7 @@ TEST_CASE("Read trajectory", "[CAPI]") {
 
     SECTION("Get topology") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
-        CHFL_FRAME* frame = chfl_frame(0);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(trajectory != NULL);
         REQUIRE(frame != NULL);
 
@@ -134,7 +134,7 @@ TEST_CASE("Read trajectory", "[CAPI]") {
         CHECK_STATUS(chfl_trajectory_set_cell(trajectory, cell));
         CHECK_STATUS(chfl_cell_free(cell));
 
-        CHFL_FRAME* frame = chfl_frame(0);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame != NULL);
 
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
@@ -170,7 +170,7 @@ TEST_CASE("Read trajectory", "[CAPI]") {
         CHECK_STATUS(chfl_atom_free(atom));
         CHECK_STATUS(chfl_topology_free(topology));
 
-        CHFL_FRAME* frame = chfl_frame(0);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame != NULL);
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
 
@@ -190,7 +190,7 @@ TEST_CASE("Read trajectory", "[CAPI]") {
 
         CHECK_STATUS(chfl_trajectory_topology_file(trajectory, "data/xyz/topology.xyz", ""));
 
-        CHFL_FRAME* frame = chfl_frame(0);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame != NULL);
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
 
@@ -256,8 +256,9 @@ static CHFL_FRAME* testing_frame() {
     }
     CHECK_STATUS(chfl_atom_free(atom));
 
-    CHFL_FRAME* frame = chfl_frame(4);
+    CHFL_FRAME* frame = chfl_frame();
     REQUIRE(frame != NULL);
+    CHECK_STATUS(chfl_frame_resize(frame, 4));
 
     CHECK_STATUS(chfl_frame_set_topology(frame, topology));
     CHECK_STATUS(chfl_topology_free(topology));

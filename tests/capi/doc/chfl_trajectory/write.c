@@ -3,7 +3,7 @@
 
 int main() {
     // [example]
-    CHFL_FRAME* frame = chfl_frame(0);
+    CHFL_FRAME* frame = chfl_frame();
     /* Add atoms to the frame */
 
     CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("water.xyz", 'w');

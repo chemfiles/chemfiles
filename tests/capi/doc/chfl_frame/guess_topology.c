@@ -5,7 +5,7 @@
 int main() {
     // [example]
     // Building a frame containing a Cl2 molecule
-    CHFL_FRAME* frame = chfl_frame(0);
+    CHFL_FRAME* frame = chfl_frame();
 
     CHFL_ATOM* Cl = chfl_atom("Cl");
     chfl_frame_add_atom(frame, Cl, (chfl_vector_t){0, 0, 0}, NULL);

@@ -4,12 +4,12 @@
 
 TEST_CASE("Frame", "[CAPI]") {
     SECTION("Size") {
-        CHFL_FRAME* frame = chfl_frame(5);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame != NULL);
 
-        uint64_t natoms = 0;
+        uint64_t natoms = 10;
         CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
-        CHECK(natoms == 5);
+        CHECK(natoms == 0);
 
         CHECK_STATUS(chfl_frame_resize(frame, 4));
         CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
@@ -23,7 +23,7 @@ TEST_CASE("Frame", "[CAPI]") {
     }
 
     SECTION("Step") {
-        CHFL_FRAME* frame = chfl_frame(0);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame != NULL);
 
         uint64_t step = 0;
@@ -38,8 +38,9 @@ TEST_CASE("Frame", "[CAPI]") {
     }
 
     SECTION("Positions") {
-        CHFL_FRAME* frame = chfl_frame(4);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame != NULL);
+        CHECK_STATUS(chfl_frame_resize(frame, 4));
 
         uint64_t natoms = 0;
         chfl_vector_t* positions = NULL;
@@ -64,8 +65,9 @@ TEST_CASE("Frame", "[CAPI]") {
     }
 
     SECTION("Velocities") {
-        CHFL_FRAME* frame = chfl_frame(4);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame != NULL);
+        CHECK_STATUS(chfl_frame_resize(frame, 4));
 
         bool has_velocities = true;
         CHECK_STATUS(chfl_frame_has_velocities(frame, &has_velocities));
@@ -97,7 +99,7 @@ TEST_CASE("Frame", "[CAPI]") {
     }
 
     SECTION("Unit cell") {
-        CHFL_FRAME* frame = chfl_frame(0);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame != NULL);
 
         // Initial cell
@@ -139,7 +141,7 @@ TEST_CASE("Frame", "[CAPI]") {
     }
 
     SECTION("Add atoms") {
-        CHFL_FRAME* frame = chfl_frame(0);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame != NULL);
 
         uint64_t natoms = 1000;
@@ -185,8 +187,9 @@ TEST_CASE("Frame", "[CAPI]") {
     }
 
     SECTION("Topology") {
-        CHFL_FRAME* frame = chfl_frame(4);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame != NULL);
+        CHECK_STATUS(chfl_frame_resize(frame, 4));
 
         CHFL_TOPOLOGY* topology = chfl_topology();
         REQUIRE(topology != NULL);
@@ -226,8 +229,9 @@ TEST_CASE("Frame", "[CAPI]") {
     }
 
     SECTION("Get atoms") {
-        CHFL_FRAME* frame = chfl_frame(10);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame != NULL);
+        CHECK_STATUS(chfl_frame_resize(frame, 10));
 
         CHFL_ATOM* atom = chfl_atom_from_frame(frame, 1);
         REQUIRE(atom != NULL);
@@ -253,7 +257,7 @@ TEST_CASE("Frame", "[CAPI]") {
         CHECK_STATUS(chfl_trajectory_set_cell(trajectory, cell));
         CHECK_STATUS(chfl_cell_free(cell));
 
-        CHFL_FRAME* frame = chfl_frame(0);
+        CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame != NULL);
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
 

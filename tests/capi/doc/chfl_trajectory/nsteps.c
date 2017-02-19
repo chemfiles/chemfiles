@@ -8,7 +8,7 @@ int main() {
     chfl_trajectory_nsteps(trajectory, &nsteps);
 
     /* Read all steps in the trajectory */
-    CHFL_FRAME* frame = chfl_frame(0);
+    CHFL_FRAME* frame = chfl_frame();
     for (uint64_t i=0; i<nsteps; i++) {
         chfl_trajectory_read(trajectory, frame);
         /* Do stuff with the frame */

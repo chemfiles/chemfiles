@@ -4,7 +4,7 @@
 
 int main() {
     // [example]
-    CHFL_FRAME* frame = chfl_frame(42);
+    CHFL_FRAME* frame = chfl_frame();
 
     uint64_t step = 3;
     chfl_frame_step(frame, &step);

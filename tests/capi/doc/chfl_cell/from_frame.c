@@ -3,7 +3,7 @@
 
 int main() {
     // [example]
-    CHFL_FRAME* frame = chfl_frame(10);
+    CHFL_FRAME* frame = chfl_frame();
     CHFL_CELL* cell = chfl_cell_from_frame(frame);
 
     if (cell == NULL) {

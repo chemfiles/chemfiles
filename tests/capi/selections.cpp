@@ -112,8 +112,9 @@ static CHFL_FRAME* testing_frame(void) {
     CHECK_STATUS(chfl_topology_add_bond(topology, 1, 2));
     CHECK_STATUS(chfl_topology_add_bond(topology, 2, 3));
 
-    CHFL_FRAME* frame = chfl_frame(4);
+    CHFL_FRAME* frame = chfl_frame();
     REQUIRE(frame != NULL);
+    CHECK_STATUS(chfl_frame_resize(frame, 4));
     CHECK_STATUS(chfl_frame_set_topology(frame, topology));
     CHECK_STATUS(chfl_topology_free(topology));
     return frame;

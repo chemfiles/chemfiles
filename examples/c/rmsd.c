@@ -15,7 +15,7 @@ int main(void) {
     double* distances = malloc((size_t)nsteps * sizeof(double));
     if (distances == NULL) {/*Handle error*/}
 
-    CHFL_FRAME* frame = chfl_frame(0);
+    CHFL_FRAME* frame = chfl_frame();
     // Accumulate the distances to the origin of the 10th atom throughtout the
     // trajectory
     for (uint64_t i=0; i<nsteps; i++) {

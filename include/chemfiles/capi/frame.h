@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-/// Create an empty frame with initial capacity of `natoms`.
+/// Create a new empty frame.
 ///
 /// The caller of this function should free the allocated memory using
 /// `chfl_frame_free`.
@@ -21,7 +21,7 @@ extern "C" {
 /// @example{tests/capi/doc/chfl_frame/chfl_frame.c}
 /// @return A pointer to the frame, or NULL in case of error. You can use
 ///         `chfl_last_error` to learn about the error.
-CHFL_EXPORT CHFL_FRAME* chfl_frame(uint64_t natoms);
+CHFL_EXPORT CHFL_FRAME* chfl_frame(void);
 
 /// Get a copy of a `frame`.
 ///

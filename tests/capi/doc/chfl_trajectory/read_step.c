@@ -3,7 +3,7 @@
 int main() {
     // [example] [no-run]
     CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("water.xyz", 'r');
-    CHFL_FRAME* frame = chfl_frame(0);
+    CHFL_FRAME* frame = chfl_frame();
 
     chfl_trajectory_read_step(trajectory, 42, frame);
 

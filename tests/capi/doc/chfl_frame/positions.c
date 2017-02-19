@@ -3,7 +3,7 @@
 
 int main() {
     // [example]
-    CHFL_FRAME* frame = chfl_frame(42);
+    CHFL_FRAME* frame = chfl_frame();
 
     chfl_vector_t* positions = NULL;
     uint64_t natoms = 0;

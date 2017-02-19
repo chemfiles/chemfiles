@@ -3,7 +3,7 @@
 
 int main() {
     // [example]
-    CHFL_FRAME* frame = chfl_frame(42);
+    CHFL_FRAME* frame = chfl_frame();
     CHFL_FRAME* copy = chfl_frame_copy(frame);
 
     if (copy == NULL) {

@@ -8,7 +8,7 @@
 
 int main(void) {
     CHFL_TRAJECTORY* file = chfl_trajectory_open("tests/files/xyz/helium.xyz", 'r');
-    CHFL_FRAME* frame = chfl_frame(0);
+    CHFL_FRAME* frame = chfl_frame();
     unsigned* indexes = NULL;
 
     if (chfl_trajectory_read(file, frame) != CHFL_SUCCESS) {/*Handle error*/}

@@ -46,6 +46,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Remove `chfl_strerror`, as it is redundant with `chfl_last_error`.
 * Merge `chfl_trajectory_set_topology_file` and `chfl_trajectory_set_topology_with_format`
   into `chfl_trajectory_topology_file`.
+* The `chfl_frame` function no longer take the frame size as argument. It always
+  creates an empty frame, that you can resize using `chfl_frame_resize`.
 
 ### Deprecation and removals
 
