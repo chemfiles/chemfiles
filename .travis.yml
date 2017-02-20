@@ -1,23 +1,41 @@
 language: cpp
 sudo: false
 
+linux64_addons:
+    addons: &linux64
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - kalakris-cmake
+        packages:
+        - g++-4.8
+        - cmake
+        - doxygen
+        - valgrind
+        - libnetcdf-dev
+
+linux32_addons:
+    addons: &linux32
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - kalakris-cmake
+        packages:
+        - g++-4.8
+        - cmake
+        - doxygen
+        - valgrind
+        - g++-4.8-multilib
+        - linux-libc-dev:i386
+        - libc6-dev-i386
+
 matrix:
   fast_finish: true
   include:
     - os: linux
       compiler: clang
       env: SHARED_LIBS=ON
-      addons: &linux64
-        apt:
-          sources:
-          - ubuntu-toolchain-r-test
-          - kalakris-cmake
-          packages:
-          - g++-4.8
-          - cmake
-          - doxygen
-          - valgrind
-          - libnetcdf-dev
+      addons: *linux64
     - os: linux
       compiler: clang
       env: SHARED_LIBS=OFF
@@ -33,22 +51,10 @@ matrix:
     - os: linux
       compiler: gcc
       env: SHARED_LIBS=ON ARCH="x86"
-      addons: &linux32
-        apt:
-          sources:
-          - ubuntu-toolchain-r-test
-          - kalakris-cmake
-          packages:
-          - g++-4.8
-          - cmake
-          - doxygen
-          - valgrind
-          - g++-4.8-multilib
-          - linux-libc-dev:i386
-          - libc6-dev-i386
+      addons: *linux32
     - os: linux
       compiler: gcc
-      env: SHARED_LIBS=ON ARCH="x86"
+      env: SHARED_LIBS=OFF ARCH="x86"
       addons: *linux32
     - os: osx
       compiler: clang
