@@ -48,6 +48,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   into `chfl_trajectory_topology_file`.
 * The `chfl_frame` function no longer take the frame size as argument. It always
   creates an empty frame, that you can resize using `chfl_frame_resize`.
+* `chfl_selection_evalutate` was a typo, it is renamed to `chfl_selection_evaluate`.
 
 ### Deprecation and removals
 

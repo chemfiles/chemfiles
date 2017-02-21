@@ -13,7 +13,7 @@ Function manipulating ``CHFL_SELECTION``
 
 .. doxygenfunction:: chfl_selection_string
 
-.. doxygenfunction:: chfl_selection_evalutate
+.. doxygenfunction:: chfl_selection_evaluate
 
 .. doxygenfunction:: chfl_selection_matches
 

@@ -52,7 +52,7 @@ TEST_CASE("Selections", "[CAPI]") {
         REQUIRE(frame != NULL);
 
         uint64_t matches_count = 0;
-        CHECK_STATUS(chfl_selection_evalutate(selection, frame, &matches_count));
+        CHECK_STATUS(chfl_selection_evaluate(selection, frame, &matches_count));
         CHECK(matches_count == 2);
 
         chfl_match_t* matches = new chfl_match_t[matches_count];
@@ -73,7 +73,7 @@ TEST_CASE("Selections", "[CAPI]") {
         selection = chfl_selection("angles: all");
         REQUIRE(selection != NULL);
 
-        CHECK_STATUS(chfl_selection_evalutate(selection, frame, &matches_count));
+        CHECK_STATUS(chfl_selection_evaluate(selection, frame, &matches_count));
         CHECK(matches_count == 2);
 
         matches = new chfl_match_t[matches_count];

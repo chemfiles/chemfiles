@@ -17,7 +17,7 @@ int main() {
     CHFL_SELECTION* selection = chfl_selection("name H");
 
     uint64_t size = 0;
-    chfl_selection_evalutate(selection, frame, &size);
+    chfl_selection_evaluate(selection, frame, &size);
     assert(size == 2);
 
     chfl_match_t matches[2];

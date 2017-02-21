@@ -22,7 +22,7 @@ CHFL_EXPORT CHFL_SELECTION* chfl_selection(const char* selection);
 
 /// Get a copy of a `selection`.
 ///
-/// The copy does not contains any state, and `chfl_selection_evalutate` must be
+/// The copy does not contains any state, and `chfl_selection_evaluate` must be
 /// called again before using `chfl_selection_matches`.
 ///
 /// The caller of this function should free the associated memory using
@@ -69,7 +69,7 @@ CHFL_EXPORT chfl_status chfl_selection_string(
 /// @example{tests/capi/doc/chfl_selection/evaluate.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_selection_evalutate(
+CHFL_EXPORT chfl_status chfl_selection_evaluate(
     CHFL_SELECTION* const selection, const CHFL_FRAME* const frame, uint64_t* nmatches
 );
 
@@ -87,7 +87,7 @@ typedef struct {
     uint64_t atoms[CHFL_MAX_SELECTION_SIZE];
 } chfl_match_t;
 
-/// Get the matches for a `selection` after a call to `chfl_selection_evalutate`,
+/// Get the matches for a `selection` after a call to `chfl_selection_evaluate`,
 /// in `matches`.
 ///
 /// The size of the `matches` array must be passed in `nmatches`.

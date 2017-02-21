@@ -62,7 +62,7 @@ extern "C" chfl_status chfl_selection_string(const CHFL_SELECTION* const selecti
     )
 }
 
-extern "C" chfl_status chfl_selection_evalutate(CHFL_SELECTION* const selection, const CHFL_FRAME* const frame, uint64_t* n_matches) {
+extern "C" chfl_status chfl_selection_evaluate(CHFL_SELECTION* const selection, const CHFL_FRAME* const frame, uint64_t* n_matches) {
     CHECK_POINTER(selection);
     CHFL_ERROR_CATCH(
         selection->matches = selection->selection.evaluate(*frame);
