@@ -46,8 +46,8 @@ CHFL_EXPORT chfl_status chfl_frame_atoms_count(
 /// Get a pointer to the positions array from a `frame`.
 ///
 /// Positions are stored as a `natoms x 3` array, this function set the pointer
-/// pointed to by `positions` point to the first element of this array, and give
-/// the number of atoms in the integer pointed to by `size`.
+/// pointed to by `positions` to point to the first element of this array, and
+/// give the number of atoms in the integer pointed to by `size`.
 ///
 /// If the frame is resized (by writing to it, or calling `chfl_frame_resize`),
 /// the pointer is invalidated. If the frame is freed using `chfl_frame_free`,
@@ -64,8 +64,8 @@ CHFL_EXPORT chfl_status chfl_frame_positions(
 /// Get a pointer to the velocities array from a `frame`.
 ///
 /// Velocities are stored as a `natoms x 3` array, this function set the pointer
-/// pointed to by `positions` point to the first element of this array, and give
-/// the number of atoms in the integer pointed to by `size`.
+/// pointed to by `positions` to point to the first element of this array, and
+/// give the number of atoms in the integer pointed to by `size`.
 ///
 /// If the frame is resized (by writing to it, or calling `chfl_frame_resize`),
 /// the pointer is invalidated. If the frame is freed using `chfl_frame_free`,
@@ -106,8 +106,8 @@ CHFL_EXPORT chfl_status chfl_frame_add_atom(
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_remove(CHFL_FRAME* const frame, uint64_t i);
 
-/// Resize the positions and the velocities in frame, to have space for `natoms`
-/// atoms.
+/// Resize the positions, velocities  and topology in the `frame`, to have space
+/// for `natoms` atoms.
 ///
 /// This function may invalidate any pointer to the positions or the velocities
 /// if the new size is bigger than the old one. In all the cases, previous data
@@ -123,14 +123,14 @@ CHFL_EXPORT chfl_status chfl_frame_resize(
 /// Add velocity data to this `frame`.
 ///
 /// The velocities ar initialized to `(chfl_vector_t){0, 0, 0}`. If the frame
-/// already have velocities, this does nothing.
+/// already has velocities, this does nothing.
 ///
 /// @example{tests/capi/doc/chfl_frame/add_velocities.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_add_velocities(CHFL_FRAME* const frame);
 
-/// Check if this `frame` contains velocity, and store the result in
+/// Check if this `frame` contains velocity data, and store the result in
 /// `has_velocities`
 ///
 /// @example{tests/capi/doc/chfl_frame/has_velocities.c}

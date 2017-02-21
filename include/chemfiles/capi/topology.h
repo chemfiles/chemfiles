@@ -15,12 +15,18 @@ extern "C" {
 
 /// Create a new empty topology.
 ///
+/// The caller of this function should free the associated memory using
+/// `chfl_topology_free`.
+///
 /// @example{tests/capi/doc/chfl_topology/chfl_topology.c}
 /// @return A pointer to the topology, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology(void);
 
 /// Get a copy of the topology of a `frame`.
+///
+/// The caller of this function should free the associated memory using
+/// `chfl_topology_free`.
 ///
 /// @example{tests/capi/doc/chfl_topology/from_frame.c}
 /// @return A pointer to the topology, or NULL in case of error.
@@ -51,7 +57,8 @@ CHFL_EXPORT chfl_status chfl_topology_atoms_count(
 
 /// Resize the `topology` to hold `natoms` atoms. If the new number of atoms is
 /// bigger than the current number, new atoms will be created with an empty name
-/// and type.
+/// and type. If it is lower than the current number of atoms, the last atoms
+/// will be removed, together with the associated bonds, angles and dihedrals.
 ///
 /// @example{tests/capi/doc/chfl_topology/resize.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
@@ -71,7 +78,7 @@ CHFL_EXPORT chfl_status chfl_topology_add_atom(
 
 /// Remove the atom at index `i` from a `topology`.
 ///
-/// This modify all the atoms indexes after `i`.
+/// This shifts all the atoms indexes after `i` by 1 (n becomes n-1).
 ///
 /// @example{tests/capi/doc/chfl_topology/remove.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
@@ -104,8 +111,8 @@ CHFL_EXPORT chfl_status chfl_topology_isangle(
     bool* result
 );
 
-/// Check if the atoms at indexes `i`, `j` and `k` form a dihedral angle, and
-/// store the result in `result`.
+/// Check if the atoms at indexes `i`, `j`, `k` and `m` form a dihedral angle,
+/// and store the result in `result`.
 ///
 /// @example{tests/capi/doc/chfl_topology/isdihedral.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
@@ -194,7 +201,8 @@ CHFL_EXPORT chfl_status chfl_topology_add_bond(
     CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j
 );
 
-/// Remove any existing bond between the atoms `i` and `j` in the `topology`.
+/// Remove any existing bond between the atoms at indexes `i` and `j` in the
+/// `topology`.
 ///
 /// This function does nothing if there is no bond between `i` and `j`.
 ///
@@ -215,7 +223,7 @@ CHFL_EXPORT chfl_status chfl_topology_residues_count(
     const CHFL_TOPOLOGY* const topology, uint64_t* nresidues
 );
 
-/// Add a `residue` to this `topology`.
+/// Add a copy of `residue` to this `topology`.
 ///
 /// The residue id must not already be in the topology, and the residue must
 /// contain only atoms that are not already in another residue.

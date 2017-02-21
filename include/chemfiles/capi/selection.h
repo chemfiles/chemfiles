@@ -15,6 +15,9 @@ extern "C" {
 
 /// Create a new selection from the given `selection` string.
 ///
+/// The caller of this function should free the associated memory using
+/// `chfl_selection_free`.
+///
 /// @example{tests/capi/doc/chfl_selection/chfl_selection.c}
 /// @return A pointer to the selection, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.

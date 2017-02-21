@@ -81,7 +81,7 @@ CHFL_EXPORT chfl_status chfl_atom_set_mass(
 
 /// Get the charge of an `atom`, in the double pointed to by `charge`.
 ///
-/// The charge in number of the electron charge *e*.
+/// The charge is in number of the electron charge *e*.
 ///
 /// @example{tests/capi/doc/chfl_atom/charge.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
@@ -157,7 +157,7 @@ CHFL_EXPORT chfl_status chfl_atom_full_name(
     const CHFL_ATOM* const atom, char* const name, uint64_t buffsize
 );
 
-/// Get the Van der Waals radius of an atom from the atom type, in the double
+/// Get the Van der Waals radius of an `atom` from the atom type, in the double
 /// pointed to by `radius`.
 ///
 /// If the radius in unknown, this function set `radius` to -1.
@@ -169,7 +169,7 @@ CHFL_EXPORT chfl_status chfl_atom_vdw_radius(
     const CHFL_ATOM* const atom, double* radius
 );
 
-/// Get the covalent radius of an atom from the atom type, in the double
+/// Get the covalent radius of an `atom` from the atom type, in the double
 /// pointed to by `radius`.
 ///
 /// If the radius in unknown, this function set `radius` to -1.
@@ -181,7 +181,7 @@ CHFL_EXPORT chfl_status chfl_atom_covalent_radius(
     const CHFL_ATOM* const atom, double* radius
 );
 
-/// Get the atomic number of an atom from the atom type, in the integer
+/// Get the atomic number of an `atom` from the atom type, in the integer
 /// pointed to by `number`.
 ///
 /// If the atomic number in unknown, this function set `number` to -1.

@@ -63,9 +63,9 @@ typedef struct CHFL_ATOM CHFL_ATOM;
 
 /// An opaque type handling an unit cell.
 ///
-/// A `CHFL_CELL` represent the box containing the atoms, and its periodicity
+/// A `CHFL_CELL` represent the box containing the atoms, and its periodicity.
 ///
-/// A unit cell is fully represented by three lenghts (a, b, c); and three angles
+/// An unit cell is fully represented by three lenghts (a, b, c); and three angles
 /// (alpha, beta, gamma). The angles are stored in degrees, and the lenghts in
 /// Angstroms.
 ///
@@ -83,14 +83,15 @@ typedef struct CHFL_CELL CHFL_CELL;
 /// An opaque type handling a topology.
 ///
 /// A `CHFL_TOPOLOGY` contains the definition of all the atoms in the system,
-/// and the liaisons between the particles (bonds, angles, dihedrals, ...).
+/// and the liaisons between the atoms (bonds, angles, dihedrals, ...). It will
+/// also contain all the residues information if it is available.
 typedef struct CHFL_TOPOLOGY CHFL_TOPOLOGY;
 
 /// An opaque type handling a residue.
 ///
 /// A `CHFL_RESIDUE` is a group of atoms belonging to the same logical unit.
 /// They can be small molecules, amino-acids in a protein, monomers in polymers,
-/// etc.
+/// *etc.*
 typedef struct CHFL_RESIDUE CHFL_RESIDUE;
 
 /// An opaque type handling a selection.
@@ -106,7 +107,7 @@ typedef struct CHFL_SELECTION CHFL_SELECTION;
 /// `chfl_status` list the possible values for the return status code of
 /// chemfiles functions.
 typedef enum {
-    /// The operation was successful.
+    /// Status code for successful operations.
     CHFL_SUCCESS = 0,
     /// Status code for error concerning memory: out of memory, wrong size for
     /// pre-allocated buffers, *etc.*
@@ -116,7 +117,7 @@ typedef enum {
     CHFL_FILE_ERROR = 2,
     /// Status code for error in file formating, i.e. for invalid files.
     CHFL_FORMAT_ERROR = 3,
-    /// Status code when selection strings are invalid.
+    /// Status code for invalid selection strings.
     CHFL_SELECTION_ERROR = 4,
     /// Status code for any other error from Chemfiles.
     CHFL_GENERIC_ERROR = 5,

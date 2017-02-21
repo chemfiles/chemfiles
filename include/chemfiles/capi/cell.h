@@ -28,6 +28,9 @@ typedef enum {
 ///
 /// The cell lenghts should be in Angstroms.
 ///
+/// The caller of this function should free the associated memory using
+/// `chfl_cell_free`.
+///
 /// @example{tests/capi/doc/chfl_cell/chfl_cell.c}
 /// @return A pointer to the unit cell, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
@@ -42,6 +45,9 @@ CHFL_EXPORT CHFL_CELL* chfl_cell(const chfl_vector_t lenghts);
 /// vector `b` and `c`; beta as the angle between `a` and `c`; and gamma as the
 /// angle between `a` and `b`.
 ///
+/// The caller of this function should free the associated memory using
+/// `chfl_cell_free`.
+///
 /// @example{tests/capi/doc/chfl_cell/triclinic.c}
 /// @return A pointer to the unit cell, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
@@ -50,6 +56,9 @@ CHFL_EXPORT CHFL_CELL* chfl_cell_triclinic(
 );
 
 /// Get a copy of the unit cell of a `frame`.
+///
+/// The caller of this function should free the associated memory using
+/// `chfl_cell_free`.
 ///
 /// @example{tests/capi/doc/chfl_cell/from_frame.c}
 /// @return A pointer to the unit cell, or NULL in case of error.
