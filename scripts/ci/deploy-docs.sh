@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 
 # Exit early if we don't want to deploy the docs
-if [[ "$TRAVIS_BRANCH" != "master" && "$TRAVIS_TAG" == "" ]]; then
+if [[ "$TRAVIS_BRANCH" != "master" || "$TRAVIS_TAG" == "" || "${TRAVIS_PULL_REQUEST}" == "true" ]]; then
     exit 0
 fi
 
