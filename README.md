@@ -1,23 +1,10 @@
 # Chemfiles, a modern library for chemistry file reading and writing
 
-<div align="center">
-<a href="http://chemfiles.github.io/chemfiles/">
-    <img alt="Documentation"
-    src="https://img.shields.io/badge/docs-latest-brightgreen.svg" />
-</a>
-<a href="https://travis-ci.org/chemfiles/chemfiles">
-    <img alt="Build Status"
-    src="https://img.shields.io/travis/chemfiles/chemfiles/master.svg" />
-</a>
-<a href="https://ci.appveyor.com/project/Luthaf/chemfiles/branch/master">
-    <img alt="Build Status -- Windows"
-    src="https://ci.appveyor.com/api/projects/status/dvn6nr3lsssd23lo/branch/master?svg=true" />
-</a>
-<a href="http://codecov.io/github/chemfiles/chemfiles?branch=master">
-    <img alt="Code Coverage"
-    src="http://codecov.io/github/chemfiles/chemfiles/coverage.svg?branch=master"/>
-</a>
-</div>
+[![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](http://chemfiles.github.io/chemfiles/)
+[![Build Status -- Linux & OSX](https://img.shields.io/travis/chemfiles/chemfiles/master.svg)](https://travis-ci.org/chemfiles/chemfiles)
+[![Build Status -- Windows](https://ci.appveyor.com/api/projects/status/dvn6nr3lsssd23lo/branch/master?svg=true)](https://ci.appveyor.com/project/Luthaf/chemfiles/branch/master)
+[![Code Coverage](http://codecov.io/github/chemfiles/chemfiles/coverage.svg?branch=master)](http://codecov.io/github/chemfiles/chemfiles?branch=master)
+[![Gitter](https://badges.gitter.im/chemfiles/chemfiles.svg)](https://gitter.im/chemfiles/chemfiles)
 
 Chemfiles is a modern and high-quality library for reading and writing
 trajectory files created by computational chemistry simulations program. These
@@ -38,6 +25,11 @@ also use Chemfiles from other languages, see the
 
 Chemfiles is free and open source, and your
 [contributions](#contributions-welcome) are always welcome!
+
+If you have questions, suggestions or if you need help with chemfiles, do not
+hesitate to open an issue or join us on our [Gitter][Gitter] chat room.
+
+[Gitter]: https://gitter.im/chemfiles/chemfiles
 
 ## Quick links
 
