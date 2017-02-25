@@ -20,20 +20,14 @@ public:
     ///
     /// An `FileError` exception is thrown if the file does not exists in
     /// `'r'` or `'a'` mode.
-    explicit BasicFile(const std::string& filename, File::Mode mode);
-
+    BasicFile(const std::string& filename, File::Mode mode);
     ~BasicFile() noexcept {}
 
-    const std::string& getline() override;
-    BasicFile& operator>>(std::string& line) override;
+    const std::string& readline() override;
     const std::vector<std::string>& readlines(size_t n) override;
 
     void rewind() override;
-    size_t nlines() override;
     bool eof() override;
-
-     void writeline(const std::string&) override;
-     void writelines(const std::vector<std::string>&) override;
 private:
     std::fstream stream_;
     // Caching a vector of strings

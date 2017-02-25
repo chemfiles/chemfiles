@@ -1,20 +1,11 @@
-#ifndef WIN32
-
-#include <iostream>
-
 #include "catch.hpp"
-
-#include "chemfiles.hpp"
 #include "chemfiles/files/BasicFile.hpp"
 using namespace chemfiles;
-
 
 TEST_CASE("Read a text file", "[Files]"){
     BasicFile file("data/xyz/helium.xyz", File::READ);
 
-    CHECK(file.nlines() == 50419);
-
-    std::string line = file.getline();
+    std::string line = file.readline();
     CHECK(line == "125");
 
     auto lines = file.readlines(42);
@@ -22,37 +13,20 @@ TEST_CASE("Read a text file", "[Files]"){
     CHECK(lines[0] == "Helium as a Lennard-Jone fluid");
     CHECK(lines[1] == "He 0.49053 8.41351 0.0777257");
 
-    // Geting line count after some operations
-    CHECK(file.nlines() == 50419);
-
     file.rewind();
-    line = file.getline();
+    line = file.readline();
     CHECK(line == "125");
-
-    // State is preserved by the nlines function
-    file.nlines();
-    line = file.getline();
+    line = file.readline();
     CHECK(line == "Helium as a Lennard-Jone fluid");
-
-    // Check stream version
-    file.rewind();
-    file >> line;
-    CHECK(line == "125");
 }
 
 TEST_CASE("Write a text file", "[Files]"){
-    BasicFile file("tmp.dat", File::WRITE);
 
-    file << "Test" << "\n";
-
-    file.writeline("Test again\n");
-
-    std::vector<std::string> lines;
-    lines.push_back("Hello\n");
-    lines.push_back("world\n");
-    file.writelines(lines);
-
-    file.sync();
+    {
+        BasicFile file("tmp.dat", File::WRITE);
+        file << "Test" << std::endl;
+        file << 5467 << std::endl;
+    }
 
     std::ifstream verification("tmp.dat");
     REQUIRE(verification.is_open());
@@ -62,20 +36,8 @@ TEST_CASE("Write a text file", "[Files]"){
     CHECK(line == "Test");
 
     std::getline(verification, line);
-    CHECK(line == "Test again");
-
-    std::getline(verification, line);
-    CHECK(line == "Hello");
-    std::getline(verification, line);
-    CHECK(line == "world");
-
+    CHECK(line == "5467");
     verification.close();
 
     remove("tmp.dat");
 }
-
-TEST_CASE("Errors in text files", "[Files]"){
-    // TODO
-}
-
-#endif

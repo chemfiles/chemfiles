@@ -38,8 +38,8 @@ BasicFile::BasicFile(const std::string& filename, File::Mode mode)
     rewind();
 }
 
-const std::string& BasicFile::getline() {
-    *this >> lines_[0];
+const std::string& BasicFile::readline() {
+    std::getline(stream_, lines_[0]);
     return lines_[0];
 }
 
@@ -50,11 +50,6 @@ void BasicFile::rewind() {
 
 bool BasicFile::eof() {
     return stream_.eof();
-}
-
-BasicFile& BasicFile::operator>>(std::string& line) {
-    std::getline(stream_, line);
-    return *this;
 }
 
 const std::vector<std::string>& BasicFile::readlines(size_t n) {
@@ -70,25 +65,4 @@ const std::vector<std::string>& BasicFile::readlines(size_t n) {
     }
 
     return lines_;
-}
-
-size_t BasicFile::nlines() {
-    auto position = stream_.tellg();
-    rewind();
-    size_t n =
-        static_cast<size_t>(std::count(std::istreambuf_iterator<char>(stream_),
-                                       std::istreambuf_iterator<char>(), '\n'));
-    n += 1; // The 1 is here because of the 0-based indexing in C++
-    stream_.seekg(position);
-    return n;
-}
-
-void BasicFile::writeline(const std::string& line) {
-    *this << line;
-}
-
-void BasicFile::writelines(const std::vector<std::string>& _lines) {
-    for (auto& line : _lines) {
-        *this << line;
-    }
 }

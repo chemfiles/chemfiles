@@ -50,7 +50,7 @@ private:
 /// Abstract base class representing a text file. This class is inteded to be
 /// inherited by any form of text files: compressed files, memory-mapped files,
 /// etc.
-class TextFile : public File, public std::iostream {
+class TextFile: public File, public std::iostream {
 public:
     /// Open the more adaptated text file class for the given `path` and `mode`
     static std::unique_ptr<TextFile> create(const std::string& path, File::Mode mode);
@@ -58,29 +58,19 @@ public:
     virtual ~TextFile() noexcept {}
 
     /// Read a line from the file
-    virtual const std::string& getline() = 0;
-    /// Read a line from the file, stream version
-    virtual TextFile& operator>>(std::string& line) = 0;
+    virtual const std::string& readline() = 0;
     /// Read `n` lines from the file
     virtual const std::vector<std::string>& readlines(size_t n) = 0;
     /// Reset the file cursor
     virtual void rewind() = 0;
-    /// Number of lines in the file
-    virtual size_t nlines() = 0;
     /// Are we at the end of the file ?
     virtual bool eof() = 0;
 
     /// Write any data to the file in stream version
     using std::ostream::operator<<;
-    /// Write a string to the file
-    virtual void writeline(const std::string&) = 0;
-    /// Write a vector of lines to the file
-    virtual void writelines(const std::vector<std::string>&) = 0;
-
     /// Set the underlying buffer. This is needed in order to make operator<<
     /// work.
     using std::ostream::rdbuf;
-
     /// Needed for resolving the overload ambiguity when using const char[] or
     /// const char* arguments.
     TextFile& operator<<(const char* val) {
@@ -89,8 +79,8 @@ public:
     }
 
 protected:
-    explicit TextFile(const std::string& path, File::Mode mode)
-        : File(path, mode), std::iostream(nullptr) {}
+    TextFile(const std::string& path, File::Mode mode):
+        File(path, mode), std::iostream(nullptr) {}
 };
 
 } // namespace chemfiles

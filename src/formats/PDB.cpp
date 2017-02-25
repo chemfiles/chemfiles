@@ -76,7 +76,7 @@ void PDBFormat::read(Frame& frame) {
     residues_.clear();
 
     while (!file_->eof()) {
-        auto line = file_->getline();
+        auto line = file_->readline();
         auto record = get_record(line);
         switch (record) {
         case Record::CRYST1:
@@ -240,7 +240,7 @@ void forward(TextFile& file, size_t nsteps) {
     // atoms may not be constant
     std::string line;
     while (i < nsteps && !file.eof()) {
-        line = file.getline();
+        line = file.readline();
         if (line.substr(0, 3) == "END") {
             i++;
         }

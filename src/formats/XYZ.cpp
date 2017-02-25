@@ -30,7 +30,7 @@ bool XYZFormat::forward(size_t nsteps) {
     std::string line;
     while (i < nsteps) {
         try {
-            line = file_->getline();
+            line = file_->readline();
             auto natoms = std::stoul(line);
             file_->readlines(natoms + 1);
             step_cursor_++;
@@ -68,8 +68,8 @@ void XYZFormat::read_step(const size_t step, Frame& frame) {
 void XYZFormat::read(Frame& frame) {
     size_t natoms = 0;
     try {
-        natoms = std::stoul(file_->getline());
-        file_->getline(); // XYZ comment line;
+        natoms = std::stoul(file_->readline());
+        file_->readline(); // XYZ comment line;
     } catch (const std::exception& e) {
         throw FormatError("Can not read next step: " + std::string(e.what()));
     }
