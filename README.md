@@ -173,24 +173,6 @@ for feature requests.
 
 [issue]: https://github.com/chemfiles/chemfiles/issues/new
 
-## Compilers, architecture and OS support
-
-New changes are automatically tested at every change on the following platforms:
-
-- Linux (64 & 32 bit)
-    - GCC 4.8.5
-    - Clang 3.6
-- OS X (64 bit)
-    - GCC 6.0
-    - Clang 3.5
-- Windows (32 & 64 bit)
-    - Visual Studio 2015
-    - MinGW64 with GCC 5.3
-
-Chemfiles is known to also work with the Intel compilers on both OS X and Linux.
-If you manage to build Chemfiles on any other OS/compiler/architecture
-combination, please let us know so that we can add it to this list.
-
 ## High quality
 
 The quality of a project can be defined in various ways. Here is what we mean
@@ -207,6 +189,9 @@ to check that most of the code paths are tested.
 
 ## Contributors and license
 
-Chemfiles is written by Guillaume Fraux, and put to your disposition under the
-terms of the Mozilla Public License v2.0. By contributing to Chemfiles, you
-agree to distribute your contributions under the same license.
+Chemfiles was created and is maintained by Guillaume Fraux, and put to your
+disposition under the terms of the Mozilla Public License v2.0. By contributing
+to Chemfiles, you agree to distribute your contributions under the same license.
+
+All the contributors to chemfiles are listed in the [AUTHORS](AUTHORS) file.
+Many thanks to all of them!
