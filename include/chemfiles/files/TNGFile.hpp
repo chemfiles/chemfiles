@@ -15,7 +15,7 @@ namespace chemfiles {
 
 /// Simple RAII capsule for `tng_trajectory_t`, handling the creation and
 /// destruction of the file as needed.
-class TNGFile final: public BinaryFile {
+class TNGFile final: public File {
 public:
     TNGFile(std::string filename, File::Mode mode);
     ~TNGFile() noexcept;

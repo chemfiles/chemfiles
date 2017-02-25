@@ -91,7 +91,7 @@ namespace nc {
 /// error.
 ///
 /// The template functions are manually specialized for float and char data types.
-class NcFile final: public BinaryFile {
+class NcFile final: public File {
 public:
     NcFile(const std::string& filename, File::Mode mode);
     ~NcFile() noexcept;

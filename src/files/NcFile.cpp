@@ -113,7 +113,7 @@ void nc::NcChar::add(std::vector<std::string> data) {
 /******************************************************************************/
 
 NcFile::NcFile(const std::string& filename, File::Mode mode)
-    : BinaryFile(filename, mode), file_id_(-1), nc_mode_(DATA) {
+    : File(filename, mode), file_id_(-1), nc_mode_(DATA) {
     auto status = NC_NOERR;
 
     switch (mode) {

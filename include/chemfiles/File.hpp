@@ -15,7 +15,7 @@
 
 namespace chemfiles {
 
-///  Abstract base class for file representation.
+/// Abstract base class for file representation.
 class File {
 public:
     /// Possible modes for opening a file
@@ -91,20 +91,6 @@ public:
 protected:
     explicit TextFile(const std::string& path, File::Mode mode)
         : File(path, mode), std::iostream(nullptr) {}
-};
-
-/// Abstract base class for binary files representation
-///
-/// Because the binary formats can be everything, this class does not provides
-/// any of the usual methods for working with streams, and is not intended to
-/// be instanciated, but rather to serve as a base class for all the binary
-/// file classes.
-class BinaryFile : public File {
-public:
-    virtual ~BinaryFile() noexcept {}
-
-protected:
-    explicit BinaryFile(const std::string& path, File::Mode mode): File(path, mode) {}
 };
 
 } // namespace chemfiles
