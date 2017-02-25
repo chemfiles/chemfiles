@@ -3,11 +3,8 @@
 ``Format`` classes
 ==================
 
-Abstract class
---------------
-
-This classe define the ``Format`` interface, which has to be implemented in
-formats.
+Interface for formats
+---------------------
 
 .. doxygenclass:: chemfiles::Format
     :members:
@@ -15,17 +12,16 @@ formats.
 Implemented formats
 -------------------
 
-These classes implement the interface defined previously.
+These classes implement the format interface defined previously.
 
 .. doxygenclass:: chemfiles::XYZFormat
-    :members:
+
+.. doxygenclass:: chemfiles::PDBFormat
 
 .. doxygenclass:: chemfiles::NCFormat
-    :members:
+
+.. doxygenclass:: chemfiles::TNGFormat
 
 .. doxygenclass:: chemfiles::Molfile
-    :members:
 
 .. doxygenenum:: chemfiles::MolfileFormat
-
-.. TODO:: adding a new format
