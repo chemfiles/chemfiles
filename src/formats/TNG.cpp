@@ -64,9 +64,6 @@ void TNGFormat::read(Frame& frame) {
     read_positions(frame);
     read_velocities(frame);
     read_cell(frame);
-
-    // TODO: only read the topology again if the frame contains
-    // a varying number of atoms
     read_topology(frame);
 
     step_++;
