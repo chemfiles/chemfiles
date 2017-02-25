@@ -25,21 +25,21 @@ Usage from C++
 Read a single frame (indexes.cpp)
 ---------------------------------
 
-.. literalinclude:: ../examples/cpp/indexes.cpp
+.. literalinclude:: ../../examples/cpp/indexes.cpp
    :language: cpp
    :lines: 4-
 
 Read Multiple frames (rmsd.cpp)
 -------------------------------
 
-.. literalinclude:: ../examples/cpp/rmsd.cpp
+.. literalinclude:: ../../examples/cpp/rmsd.cpp
    :language: cpp
    :lines: 4-
 
 Write frames (convert.cpp)
 --------------------------
 
-.. literalinclude:: ../examples/cpp/convert.cpp
+.. literalinclude:: ../../examples/cpp/convert.cpp
    :language: cpp
    :lines: 4-
 
@@ -49,20 +49,20 @@ Usage from C
 Read a single frame (indexes.c)
 -------------------------------
 
-.. literalinclude:: ../examples/c/indexes.c
+.. literalinclude:: ../../examples/c/indexes.c
    :language: c
    :lines: 4-
 
 Read Multiple frames (rmsd.c)
 -----------------------------
 
-.. literalinclude:: ../examples/c/rmsd.c
+.. literalinclude:: ../../examples/c/rmsd.c
    :language: c
    :lines: 4-
 
 Write frames (convert.c)
 ------------------------
 
-.. literalinclude:: ../examples/c/convert.c
+.. literalinclude:: ../../examples/c/convert.c
    :language: c
    :lines: 4-

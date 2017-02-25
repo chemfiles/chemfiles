@@ -11,7 +11,7 @@ and ``Selection``. All of these are described in this section.
 They are various way of interacting with these classes, all of them being
 described in the :ref:`classes-reference` section for the C++ interface.
 
-.. image:: /static/img/classes.*
+.. image:: static/img/classes.*
     :align: center
 
 A ``Trajectory`` is the main entry point of chemfiles. It reads one or many

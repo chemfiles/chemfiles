@@ -1,8 +1,16 @@
 find_package(Sphinx REQUIRED)
 find_package(Doxygen REQUIRED)
 
-configure_file(${PROJECT_SOURCE_DIR}/Doxyfile ${PROJECT_BINARY_DIR}/Doxyfile @ONLY)
-configure_file(${PROJECT_SOURCE_DIR}/doc/conf.cmake.py ${PROJECT_BINARY_DIR}/doc/conf.py)
+configure_file(
+    ${PROJECT_SOURCE_DIR}/Doxyfile.in
+    ${PROJECT_BINARY_DIR}/Doxyfile
+    @ONLY
+)
+configure_file(
+    ${PROJECT_SOURCE_DIR}/doc/conf.py.in
+    ${PROJECT_BINARY_DIR}/doc/conf.py
+    @ONLY
+)
 
 file(GLOB_RECURSE HEADERS ${PROJECT_SOURCE_DIR}/include/**.h*)
 file(GLOB_RECURSE C_EXAMPLES ${PROJECT_SOURCE_DIR}/examples/c/doc/**.c)
@@ -20,7 +28,7 @@ add_custom_target(doxygen ALL
 )
 
 set(SPHINX_CONF_DIR ${PROJECT_BINARY_DIR}/doc)
-set(SPHINX_INPUT_DIR ${PROJECT_SOURCE_DIR}/doc)
+set(SPHINX_INPUT_DIR ${PROJECT_SOURCE_DIR}/doc/src)
 set(SPHINX_DESTINATION ${PROJECT_BINARY_DIR}/doc)
 set(SPHINX_DEPENDENCIES doxygen)
 
