@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+## 0.7 (25 Feb 2017)
+
 ### New features
 
 * Add a public `Residue` class to C++ and C API to represent residue data.
