@@ -25,7 +25,7 @@ extern "C" {
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_RESIDUE* chfl_residue(const char* name, uint64_t resid);
 
-/// Get the residue at index `i` from a `topology`.
+/// Get a copy of the residue at index `i` from a `topology`.
 ///
 /// If `i` is bigger than the result of `chfl_topology_residues_count`, this
 /// function will return `NULL`.
