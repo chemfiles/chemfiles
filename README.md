@@ -23,20 +23,17 @@ project provides ready to use programs for analysis of trajectories. You can
 also use Chemfiles from other languages, see the
 [chemfiles.<xxx>](https://github.com/chemfiles/) repositories.
 
-Chemfiles is free and open source, and your
-[contributions](#contributions-welcome) are always welcome!
+Chemfiles is free and open source, and your [contributions](Contributing.md) are
+always welcome!
 
 If you have questions, suggestions or if you need help with chemfiles, do not
-hesitate to open an issue or join us on our [Gitter][Gitter] chat room.
-
-[Gitter]: https://gitter.im/chemfiles/chemfiles
+hesitate to open an [issue] or join us on our [Gitter] chat room.
 
 ## Quick links
 
 - [Features](#features)
 - [Supported file formats](#supported-formats)
 - [Getting started](#getting-started)
-- [Contributing](#contributions-welcome)
 - [Full documentation](http://chemfiles.github.io/chemfiles/)
 - Documentation for using Chemfiles from other languages:
     - [Python 2 and 3](http://chemfiles.github.io/chemfiles.py/)
@@ -97,9 +94,9 @@ documentation.
 
 ### Installation of compiled packages
 
-We use OpenSUSE build service to provide compiled packages of the latest release
-for some Linux distributions. You can use your package manager to download them
-[here](https://software.opensuse.org/download.html?project=home%3ALuthaf&package=chemfiles).
+We use [OpenSUSE build][OpenSuseBuild] service to provide compiled packages of
+the latest release for some Linux distributions. You can use your package
+manager to download them [here][OSB-download].
 
 We also provide conda packages in the `conda-forge` community channel for Linux
 and Os X. This package contains provides the C++, C and Python interfaces. You
@@ -110,9 +107,6 @@ conda install -c conda-forge chemfiles
 ```
 
 You can find more information about packages in the [documentation][install].
-
-[OSB]: https://build.opensuse.org/package/show/home:Luthaf/chemfiles
-[install]: http://chemfiles.github.io/chemfiles/latest/installation.html
 
 ### Building from source
 
@@ -149,36 +143,6 @@ int main() {
 }
 ```
 
-## Contributions welcome
-
-If this library does something that's surprising, confusing, or just plain weird
-you're probably not the only person affected. Please file an issue, even if
-you're not sure it's a bug.
-
-This goes for documentation too. If you think "I wish it had told me that," that
-counts as a documentation issue. New users are especially helpful because your
-feedback is the only way we can make the interface easy to learn.
-
-Clean-up, commenting, and missing test cases are always welcome. Try to respect
-the overall coding style as much as you can. Do not hesitate to open an [issue]
-for feature requests.
-
-[issue]: https://github.com/chemfiles/chemfiles/issues/new
-
-## High quality
-
-The quality of a project can be defined in various ways. Here is what we mean
-when speaking about quality.
-
-1. Documentation: always up-to-date, detailed as much as possible, both for API
-and user documentations.
-2. Unit tests: each functions, each class is unit tested. No new code should be
-added without a unit test.
-3. Continuous Integration: each set of changes must compile and must not
-introduce a regression on all build targets.
-4. High code coverage: unit tests and continuous integration are used together
-to check that most of the code paths are tested.
-
 ## Contributors and license
 
 Chemfiles was created and is maintained by Guillaume Fraux, and put to your
@@ -187,3 +151,9 @@ to Chemfiles, you agree to distribute your contributions under the same license.
 
 All the contributors to chemfiles are listed in the [AUTHORS](AUTHORS) file.
 Many thanks to all of them!
+
+[Gitter]: https://gitter.im/chemfiles/chemfiles
+[issue]: https://github.com/chemfiles/chemfiles/issues/new
+[install]: http://chemfiles.github.io/chemfiles/latest/installation.html
+[OpenSuseBuild]: https://build.opensuse.org/package/show/home:Luthaf/chemfiles
+[OSB-download]: https://software.opensuse.org/download.html?project=home%3ALuthaf&package=chemfiles
