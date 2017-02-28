@@ -129,8 +129,8 @@ generate_export_header(chemfiles
 # Installation configuration
 #----------------------------------------------------------------------------------------#
 install(TARGETS chemfiles EXPORT chemfiles-targets
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib${LIB_SUFFIX}
+    ARCHIVE DESTINATION lib${LIB_SUFFIX}
 )
 install(DIRECTORY include/ DESTINATION include)
 install(DIRECTORY ${PROJECT_BINARY_DIR}/include/ DESTINATION include)
@@ -142,7 +142,7 @@ configure_file(
 )
 
 # Install package files
-set(PACKAGE_LOCATION lib/cmake/chemfiles)
+set(PACKAGE_LOCATION lib${LIB_SUFFIX}/cmake/chemfiles)
 install(EXPORT chemfiles-targets
   FILE chemfiles-targets.cmake
   DESTINATION ${PACKAGE_LOCATION}
