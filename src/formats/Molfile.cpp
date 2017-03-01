@@ -5,13 +5,21 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
-#include "chemfiles/formats/Molfile.hpp"
-
-#include <cstdlib>
 #include <map>
+
+// From vmdconio.h
+#define VMDCON_ALL       0
+#define VMDCON_INFO      1
+#define VMDCON_WARN      2
+#define VMDCON_ERROR     3
+#define VMDCON_ALWAYS    4
+#define VMDCON_LOG       5
+
+#include "chemfiles/formats/Molfile.hpp"
 
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Error.hpp"
+#include "chemfiles/warnings.hpp"
 #include "chemfiles/Topology.hpp"
 using namespace chemfiles;
 
@@ -53,6 +61,13 @@ template <MolfileFormat F> static int register_plugin(void* v, vmdplugin_t* p) {
     return VMDPLUGIN_SUCCESS;
 }
 
+static int molfiles_to_chemfiles_warning(int level, const char* message) {
+    if (level == VMDCON_ERROR || level == VMDCON_WARN) {
+        warning(message);
+    }
+    return 0;
+}
+
 /******************************************************************************/
 
 template <MolfileFormat F>
@@ -81,6 +96,8 @@ Molfile<F>::Molfile(const std::string& path, File::Mode mode)
 
     // Check the ABI version of the plugin
     assert(plugin_->abiversion == vmdplugin_ABIVERSION);
+    // Redirect console output to chemfiles warnings
+    plugin_->cons_fputs = molfiles_to_chemfiles_warning;
 
     // Check that needed functions are here
     if ((plugin_->open_file_read == nullptr) ||
