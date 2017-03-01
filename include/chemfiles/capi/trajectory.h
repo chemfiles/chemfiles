@@ -28,10 +28,11 @@ CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_open(const char* path, char mode);
 /// Open the file at the given `path` using a specific file `format` and the
 /// given `mode`.
 ///
-/// This is be needed when the file format does not match the extension, or
-/// when there is not standard extension for this format. Valid modes are
-/// `'r'` for read, `'w'` for write and `'a'` for append. If `format` is an
-/// empty string, the format will be guessed from the extension.
+/// Valid modes are `'r'` for read, `'w'` for write and `'a'` for append.
+///
+/// The `format` parameter is needed when the file format does not match the
+/// extension, or when there is not standard extension for this format. If
+/// `format` is an empty string, the format will be guessed from the extension.
 ///
 /// The caller of this function should free the allocated memory using
 /// `chfl_trajectory_close`.

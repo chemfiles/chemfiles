@@ -49,10 +49,11 @@ CHFL_EXPORT chfl_status chfl_frame_atoms_count(
 /// pointed to by `positions` to point to the first element of this array, and
 /// give the number of atoms in the integer pointed to by `size`.
 ///
-/// If the frame is resized (by writing to it, or calling `chfl_frame_resize`),
-/// the pointer is invalidated. If the frame is freed using `chfl_frame_free`,
-/// the pointer is freed too. There is then no need to free the `*positions`
-/// pointer for the caller of this function.
+/// If the frame is resized (by writing to it, or calling `chfl_frame_resize`,
+/// `chfl_frame_remove` or `chfl_frame_add_atom`), the pointer is invalidated.
+/// If the frame is freed using `chfl_frame_free`, the pointer is freed too.
+/// There is then no need to free the `*positions` pointer for the caller of
+/// this function.
 ///
 /// @example{tests/capi/doc/chfl_frame/positions.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
@@ -67,10 +68,11 @@ CHFL_EXPORT chfl_status chfl_frame_positions(
 /// pointed to by `positions` to point to the first element of this array, and
 /// give the number of atoms in the integer pointed to by `size`.
 ///
-/// If the frame is resized (by writing to it, or calling `chfl_frame_resize`),
-/// the pointer is invalidated. If the frame is freed using `chfl_frame_free`,
-/// the pointer is freed too. There is then no need to free the `*velocity`
-/// pointer for the caller of this function.
+/// If the frame is resized (by writing to it, or calling `chfl_frame_resize`,
+/// `chfl_frame_remove` or `chfl_frame_add_atom`), the pointer is invalidated.
+/// If the frame is freed using `chfl_frame_free`, the pointer is freed too.
+/// There is then no need to free the `*velocity` pointer for the caller of this
+/// function.
 ///
 /// If the frame do not have velocity, this will return an error. Use
 /// `chfl_frame_add_velocities` to add velocities to a frame before calling
@@ -96,7 +98,7 @@ CHFL_EXPORT chfl_status chfl_frame_add_atom(
     const chfl_vector_t position, const chfl_vector_t velocity
 );
 
-/// Remove the atom at index `i` in the frame.
+/// Remove the atom at index `i` in the `frame`.
 ///
 /// This modify all the atoms indexes after `i`, and invalidate any pointer
 /// obtained using `chfl_frame_positions` or `chfl_frame_velocities`.
@@ -122,7 +124,7 @@ CHFL_EXPORT chfl_status chfl_frame_resize(
 
 /// Add velocity data to this `frame`.
 ///
-/// The velocities ar initialized to `(chfl_vector_t){0, 0, 0}`. If the frame
+/// The velocities are initialized to `(chfl_vector_t){0, 0, 0}`. If the frame
 /// already has velocities, this does nothing.
 ///
 /// @example{tests/capi/doc/chfl_frame/add_velocities.c}
