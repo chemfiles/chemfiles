@@ -43,11 +43,17 @@ void Connectivity::recalculate() const {
                     continue;
                 }
 
-                if (angle1[2] == bond3[0] && angle1[1] != bond3[1]) {
-                    dihedrals_.emplace(angle1[0], angle1[1], angle1[2], bond3[1]);
+                if (angle1[0] == bond3[0] && angle1[1] != bond3[1]) {
+                    dihedrals_.emplace(bond3[1], angle1[0], angle1[1], angle1[2]);
                 } else if (angle1[0] == bond3[1] && angle1[1] != bond3[0]) {
                     dihedrals_.emplace(bond3[0], angle1[0], angle1[1], angle1[2]);
-                } else if (angle1[2] == bond3[0] || angle1[2] == bond3[1]) {
+                } else if (angle1[2] == bond3[0] && angle1[1] != bond3[1]) {
+                    dihedrals_.emplace(angle1[0], angle1[1], angle1[2], bond3[1]);
+                } else if (angle1[2] == bond3[1] && angle1[1] != bond3[0]) {
+                    dihedrals_.emplace(angle1[0], angle1[1], angle1[2], bond3[0]);
+                } else if (angle1[1] == bond3[0] && angle1[0] != bond3[1] && angle1[2] != bond3[1]) {
+                    // TODO this is an improper dihedral
+                } else if (angle1[1] == bond3[1] && angle1[0] != bond3[0] && angle1[2] != bond3[0]) {
                     // TODO this is an improper dihedral
                 }
             }

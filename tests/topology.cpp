@@ -91,6 +91,44 @@ TEST_CASE("Use the Topology class", "[Topology]") {
     CHECK(topology.bonds()[0] == Bond(0, 1));
 }
 
+TEST_CASE("Angles and dihedral detection", "[Topology]") {
+
+    SECTION("Angles detection") {
+        auto topology = Topology();
+        CHECK(topology.angles().size() == 0);
+
+        topology.add_bond(0, 1);
+        topology.add_bond(1, 2);
+        auto angles = std::vector<Angle>{{0, 1, 2}};
+        CHECK(topology.angles() == angles);
+
+        topology.add_bond(17, 13);
+        topology.add_bond(19, 17);
+        angles.push_back({13, 17, 19});
+        topology.add_bond(22, 21);
+        topology.add_bond(26, 21);
+        angles.push_back({22, 21, 26});
+        CHECK(topology.angles() == angles);
+    }
+
+    SECTION("Dihedral angles") {
+        auto topology = Topology();
+        CHECK(topology.dihedrals().size() == 0);
+
+        topology.add_bond(0, 1);
+        topology.add_bond(1, 2);
+        topology.add_bond(2, 3);
+        auto dihedrals = std::vector<Dihedral>{{0, 1, 2, 3}};
+        CHECK(topology.dihedrals() == dihedrals);
+
+        topology.add_bond(12, 19);
+        topology.add_bond(19, 18);
+        topology.add_bond(16, 18);
+        dihedrals.push_back({12, 19, 18, 16});
+        CHECK(topology.dihedrals() == dihedrals);
+    }
+}
+
 TEST_CASE("Add and remove items in the topology", "[Topology]") {
     auto topo = Topology();
 
