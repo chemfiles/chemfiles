@@ -53,39 +53,39 @@ void Connectivity::recalculate() const {
             }
         }
     }
-    uptodate = true;
+    uptodate_ = true;
 }
 
 const sorted_set<Bond>& Connectivity::bonds() const {
-    if (!uptodate) {
+    if (!uptodate_) {
         recalculate();
     }
     return bonds_;
 }
 
 const sorted_set<Angle>& Connectivity::angles() const {
-    if (!uptodate) {
+    if (!uptodate_) {
         recalculate();
     }
     return angles_;
 }
 
 const sorted_set<Dihedral>& Connectivity::dihedrals() const {
-    if (!uptodate) {
+    if (!uptodate_) {
         recalculate();
     }
     return dihedrals_;
 }
 
 void Connectivity::add_bond(size_t i, size_t j) {
-    uptodate = false;
+    uptodate_ = false;
     bonds_.emplace(i, j);
 }
 
 void Connectivity::remove_bond(size_t i, size_t j) {
     auto pos = bonds_.find(Bond(i, j));
     if (pos != bonds_.end()) {
-        uptodate = false;
+        uptodate_ = false;
         bonds_.erase(pos);
     }
 }

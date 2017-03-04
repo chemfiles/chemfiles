@@ -195,7 +195,7 @@ private:
     /// Dihedral angles in the system
     mutable sorted_set<Dihedral> dihedrals_;
     /// Is the cached content up to date ?
-    mutable bool uptodate = false;
+    mutable bool uptodate_ = false;
 };
 
 
