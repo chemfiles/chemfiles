@@ -9,6 +9,10 @@
 
 using namespace chemfiles;
 
+static inline bool not_in_angle(const Angle& angle, size_t index) {
+    return angle[0] != index && angle[1] != index && angle[2] != index;
+}
+
 void Connectivity::recalculate() const {
     angles_.clear();
     dihedrals_.clear();
@@ -19,20 +23,21 @@ void Connectivity::recalculate() const {
                 continue;
             }
             // Initializing angle to an invalid value
-            Angle angle1(static_cast<size_t>(-1), static_cast<size_t>(-2),
-                         static_cast<size_t>(-3));
+            auto angle = Angle(
+                static_cast<size_t>(-1), static_cast<size_t>(-2), static_cast<size_t>(-3)
+            );
             if (bond1[0] == bond2[1]) {
-                angle1 = Angle(bond2[0], bond2[1], bond1[1]);
-                angles_.insert(angle1);
+                angle = Angle(bond2[0], bond2[1], bond1[1]);
+                angles_.insert(angle);
             } else if (bond1[1] == bond2[0]) {
-                angle1 = Angle(bond1[0], bond1[1], bond2[1]);
-                angles_.insert(angle1);
+                angle = Angle(bond1[0], bond1[1], bond2[1]);
+                angles_.insert(angle);
             } else if (bond1[1] == bond2[1]) {
-                angle1 = Angle(bond1[0], bond1[1], bond2[0]);
-                angles_.insert(angle1);
+                angle = Angle(bond1[0], bond1[1], bond2[0]);
+                angles_.insert(angle);
             } else if (bond1[0] == bond2[0]) {
-                angle1 = Angle(bond1[1], bond1[0], bond2[1]);
-                angles_.insert(angle1);
+                angle = Angle(bond1[1], bond1[0], bond2[1]);
+                angles_.insert(angle);
             } else {
                 // We will not find any dihedral angle from these bonds
                 continue;
@@ -43,17 +48,17 @@ void Connectivity::recalculate() const {
                     continue;
                 }
 
-                if (angle1[0] == bond3[0] && angle1[1] != bond3[1]) {
-                    dihedrals_.emplace(bond3[1], angle1[0], angle1[1], angle1[2]);
-                } else if (angle1[0] == bond3[1] && angle1[1] != bond3[0]) {
-                    dihedrals_.emplace(bond3[0], angle1[0], angle1[1], angle1[2]);
-                } else if (angle1[2] == bond3[0] && angle1[1] != bond3[1]) {
-                    dihedrals_.emplace(angle1[0], angle1[1], angle1[2], bond3[1]);
-                } else if (angle1[2] == bond3[1] && angle1[1] != bond3[0]) {
-                    dihedrals_.emplace(angle1[0], angle1[1], angle1[2], bond3[0]);
-                } else if (angle1[1] == bond3[0] && angle1[0] != bond3[1] && angle1[2] != bond3[1]) {
+                if (angle[0] == bond3[0] && not_in_angle(angle, bond3[1])) {
+                    dihedrals_.emplace(bond3[1], angle[0], angle[1], angle[2]);
+                } else if (angle[0] == bond3[1] && not_in_angle(angle, bond3[0])) {
+                    dihedrals_.emplace(bond3[0], angle[0], angle[1], angle[2]);
+                } else if (angle[2] == bond3[0] && not_in_angle(angle, bond3[1])) {
+                    dihedrals_.emplace(angle[0], angle[1], angle[2], bond3[1]);
+                } else if (angle[2] == bond3[1] && not_in_angle(angle, bond3[0])) {
+                    dihedrals_.emplace(angle[0], angle[1], angle[2], bond3[0]);
+                } else if (angle[1] == bond3[0] && not_in_angle(angle, bond3[1])) {
                     // TODO this is an improper dihedral
-                } else if (angle1[1] == bond3[1] && angle1[0] != bond3[0] && angle1[2] != bond3[0]) {
+                } else if (angle[1] == bond3[1] && not_in_angle(angle, bond3[0])) {
                     // TODO this is an improper dihedral
                 }
             }

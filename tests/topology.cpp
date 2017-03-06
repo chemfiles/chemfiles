@@ -92,7 +92,6 @@ TEST_CASE("Use the Topology class", "[Topology]") {
 }
 
 TEST_CASE("Angles and dihedral detection", "[Topology]") {
-
     SECTION("Angles detection") {
         auto topology = Topology();
         CHECK(topology.angles().size() == 0);
