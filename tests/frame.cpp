@@ -87,7 +87,7 @@ TEST_CASE("Frame class usage", "[Frame]"){
         CHECK(frame.cell().shape() == UnitCell::ORTHORHOMBIC);
     }
 
-    SECTION("Topology"){
+    SECTION("Topology") {
         auto frame = Trajectory("data/xyz/methane.xyz").read();
         frame.guess_topology();
 
@@ -115,5 +115,21 @@ TEST_CASE("Frame class usage", "[Frame]"){
         // Wrong topology size
         frame = Frame(5);
         CHECK_THROWS_AS(frame.set_topology(Topology()), Error);
+    }
+
+    SECTION("Guess topology") {
+        auto frame = Frame();
+        frame.add_atom(Atom("H"), {{0, 1, 0}});
+        frame.add_atom(Atom("O"), {{0, 0, 0}});
+        frame.add_atom(Atom("O"), {{1.5, 0, 0}});
+        frame.add_atom(Atom("H"), {{1.5, 1, 0}});
+        frame.guess_topology();
+
+        auto bonds = std::vector<Bond>{{0, 1}, {1, 2}, {2, 3}};
+        auto angles = std::vector<Angle>{{0, 1, 2}, {1, 2, 3}};
+        auto dihedrals = std::vector<Dihedral>{{0, 1, 2, 3}};
+        CHECK(frame.topology().bonds() == bonds);
+        CHECK(frame.topology().angles() == angles);
+        CHECK(frame.topology().dihedrals() == dihedrals);
     }
 }
