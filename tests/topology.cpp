@@ -169,14 +169,20 @@ TEST_CASE("Add and remove items in the topology", "[Topology]") {
     CHECK(topo.natoms() == 6);
     CHECK(topo.bonds().size() == 4);
 
-    topo.remove_bond(0, 4);
-    topo.remove_bond(1, 4);
+    // we can not resize while there are bonds betweena atoms to remove
+    CHECK_THROWS_AS(topo.resize(5), Error);
+
+    topo.remove_bond(2, 5);
+    topo.remove_bond(3, 5);
     CHECK(topo.natoms() == 6);
     CHECK(topo.bonds().size() == 2);
 
-    CHECK_FALSE(topo.isbond(0, 4));
-    CHECK_FALSE(topo.isbond(1, 4));
-    CHECK_FALSE(topo.isangle(0, 4, 1));
+    CHECK_FALSE(topo.isbond(2, 5));
+    CHECK_FALSE(topo.isbond(3, 5));
+    CHECK_FALSE(topo.isangle(2, 5, 3));
+
+    // Now that the bonds are gone, we can resize
+    topo.resize(5);
 }
 
 TEST_CASE("Residues in topologies", "[Topology]") {

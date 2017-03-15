@@ -4,7 +4,6 @@
 using namespace chemfiles;
 
 TEST_CASE("Use the UnitCell type", "[UnitCell]"){
-
     SECTION("Constructors"){
         UnitCell infinite{};
         CHECK(infinite.shape() == UnitCell::INFINITE);
@@ -74,7 +73,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
     }
 
     SECTION("Set the values"){
-        UnitCell cell{};
+        UnitCell cell;
 
         cell.shape(UnitCell::ORTHORHOMBIC);
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
@@ -121,7 +120,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
     }
 
     SECTION("Wraping vectors"){
-        UnitCell infinite{};
+        UnitCell infinite;
         UnitCell ortho(10, 11, 12);
         UnitCell triclinic_algo(UnitCell::TRICLINIC, 10, 11, 12);
         UnitCell triclinic(10, 11, 12, 90, 90, 80);
@@ -133,5 +132,30 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(approx_eq(ortho.wrap(v), triclinic_algo.wrap(v), 1e-5));
         CHECK(approx_eq(triclinic.wrap(v), vector3d(3.91013, -4.16711, 5.8), 1e-5));
         CHECK(approx_eq(tilted.wrap(vector3d(6, 8, -7)), vector3d(4.26352, -0.08481, -1.37679), 1e-5));
+    }
+
+    SECTION("UnitCell errors"){
+        UnitCell cell;
+
+        // Atempt to set values of an infinite unit cell
+        CHECK_THROWS_AS(cell.set_a(10), Error);
+        CHECK_THROWS_AS(cell.set_b(10), Error);
+        CHECK_THROWS_AS(cell.set_c(10), Error);
+
+        CHECK_THROWS_AS(cell.set_alpha(100), Error);
+        CHECK_THROWS_AS(cell.set_beta(100), Error);
+        CHECK_THROWS_AS(cell.set_gamma(100), Error);
+
+        cell.shape(UnitCell::ORTHORHOMBIC);
+        CHECK_THROWS_AS(cell.set_alpha(100), Error);
+        CHECK_THROWS_AS(cell.set_beta(100), Error);
+        CHECK_THROWS_AS(cell.set_gamma(100), Error);
+
+        cell.shape(UnitCell::TRICLINIC);
+        cell.set_alpha(80);
+        cell.set_beta(120);
+        cell.set_gamma(60);
+
+        CHECK_THROWS_AS(cell.shape(UnitCell::ORTHORHOMBIC), Error);
     }
 }

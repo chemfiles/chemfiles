@@ -135,7 +135,8 @@ TEST_CASE("Errors", "[Trajectory]"){
         // Try to read a write-only file
         Trajectory file("tmp.xyz", 'w');
         CHECK_THROWS_AS(file.read(), FileError);
-        remove("tmp.pdb");
+        CHECK_THROWS_AS(file.read_step(5), FileError);
+        remove("tmp.xyz");
 
         // Try to write a read-only file
         file = Trajectory("data/xyz/trajectory.xyz", 'r');
