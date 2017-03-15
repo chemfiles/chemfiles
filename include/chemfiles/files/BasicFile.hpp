@@ -23,15 +23,12 @@ public:
     BasicFile(const std::string& filename, File::Mode mode);
     ~BasicFile() noexcept {}
 
-    const std::string& readline() override;
-    const std::vector<std::string>& readlines(size_t n) override;
-
+    std::string readline() override;
+    std::vector<std::string> readlines(size_t n) override;
     void rewind() override;
     bool eof() override;
 private:
     std::fstream stream_;
-    // Caching a vector of strings
-    std::vector<std::string> lines_;
 };
 
 } // namespace chemfiles

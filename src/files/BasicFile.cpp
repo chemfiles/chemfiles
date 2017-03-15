@@ -34,13 +34,13 @@ BasicFile::BasicFile(const std::string& filename, File::Mode mode)
         throw FileError("Could not open the file " + filename);
     }
     TextFile::rdbuf(stream_.rdbuf());
-    lines_.resize(1);
     rewind();
 }
 
-const std::string& BasicFile::readline() {
-    std::getline(stream_, lines_[0]);
-    return lines_[0];
+std::string BasicFile::readline() {
+    std::string line;
+    std::getline(stream_, line);
+    return line;
 }
 
 void BasicFile::rewind() {
@@ -52,17 +52,13 @@ bool BasicFile::eof() {
     return stream_.eof();
 }
 
-const std::vector<std::string>& BasicFile::readlines(size_t n) {
-    lines_.resize(n);
-    std::string line;
+std::vector<std::string> BasicFile::readlines(size_t n) {
+    auto lines = std::vector<std::string>(n);
     for (size_t i = 0; i < n; i++) {
-        std::getline(stream_, line);
-        lines_[i] = line;
+        std::getline(stream_, lines[i]);
+        if (!stream_) {
+            throw FileError("Error while reading file " + filename());
+        }
     }
-
-    if (!stream_) {
-        throw FileError("Error while reading file " + filename());
-    }
-
-    return lines_;
+    return lines;
 }
