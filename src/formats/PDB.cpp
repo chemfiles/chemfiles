@@ -18,15 +18,17 @@
 
 using namespace chemfiles;
 
+/// Check the number of digits before the decimal separator to be sure than
+/// we can represen them. In case of error, use the given `context` in the error
+/// message
 static void check_values_size(const Vector3D& values, unsigned width, const std::string& context);
+/// Fast-forward the file for one step, returning `false` if the file does
+/// not contain one more step.
+static bool forward(TextFile& file);
 
 std::string PDBFormat::description() const {
     return "PDB file format.";
 }
-
-// Fast-forward the file for `nsteps`. If the files has less than `nsteps`, the
-// file cursor will be at EOF.
-static void forward(TextFile& file, size_t nsteps);
 
 // PDB record handled by chemfiles. Any record not in this enum are not yet
 // implemented.
@@ -47,27 +49,26 @@ enum class Record {
 // Get the record type for a line.
 static Record get_record(const std::string& line);
 
-PDBFormat::PDBFormat(const std::string& path, File::Mode mode)
-    : file_(TextFile::create(path, mode)) {}
-
-size_t PDBFormat::nsteps() {
-    file_->rewind();
-    size_t n = 0;
-    while (true) {
-        forward(*file_, 1);
-        if (file_->eof()) {
-            break;
-        } else {
-            n++;
+PDBFormat::PDBFormat(const std::string& path, File::Mode mode): file_(TextFile::create(path, mode)) {
+    while (!file_->eof()) {
+        auto position = file_->tellg();
+        if (!file_ || position == std::streampos(-1)) {
+            throw FormatError("Error while reading '" + path + "' as PDB");
+        }
+        if (forward(*file_)) {
+            steps_positions_.push_back(position);
         }
     }
     file_->rewind();
-    return n;
+}
+
+size_t PDBFormat::nsteps() {
+    return steps_positions_.size();
 }
 
 void PDBFormat::read_step(const size_t step, Frame& frame) {
-    file_->rewind();
-    forward(*file_, step);
+    assert(step < steps_positions_.size());
+    file_->seekg(steps_positions_[step]);
     read(frame);
 }
 
@@ -234,17 +235,14 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
     }
 }
 
-void forward(TextFile& file, size_t nsteps) {
-    size_t i = 0;
-    // Move the file pointer to the good position step by step, as the number of
-    // atoms may not be constant
-    std::string line;
-    while (i < nsteps && !file.eof()) {
-        line = file.readline();
+bool forward(TextFile& file) {
+    while (!file.eof()) {
+        auto line = file.readline();
         if (line.substr(0, 3) == "END") {
-            i++;
+            return true;
         }
     }
+    return false;
 }
 
 Record get_record(const std::string& line) {
@@ -375,6 +373,7 @@ void PDBFormat::write(const Frame& frame) {
     }
 
     fmt::print(*file_, "END\n");
+    steps_positions_.push_back(file_->tellg());
 }
 
 void check_values_size(const Vector3D& values, unsigned width, const std::string& context) {

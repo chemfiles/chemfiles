@@ -32,13 +32,11 @@ public:
     FORMAT_NAME(XYZ)
     FORMAT_EXTENSION(.xyz)
 private:
-    /// Quick forward the file for `nsteps`, returning `false` if the file does
-    /// not seems to contain `nsteps` more steps.
-    bool forward(size_t nsteps);
     /// Text file where we read from
     std::unique_ptr<TextFile> file_;
-    /// Newt step we will read.
-    size_t step_cursor_ = 0;
+    /// Storing the positions of all the steps in the file, so that we can
+    /// just `seekg` them instead of reading the whole step.
+    std::vector<std::streampos> steps_positions_;
 };
 
 } // namespace chemfiles

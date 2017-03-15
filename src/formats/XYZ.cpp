@@ -16,52 +16,34 @@
 
 using namespace chemfiles;
 
-XYZFormat::XYZFormat(const std::string& path, File::Mode mode)
-    : file_(TextFile::create(path, mode)), step_cursor_(0) {}
+/// Quick forward the file for one step, returning `false` if the file does
+/// not contain one more step.
+static bool forward(TextFile& file);
+
+XYZFormat::XYZFormat(const std::string& path, File::Mode mode): file_(TextFile::create(path, mode)), steps_positions_() {
+    while (!file_->eof()) {
+        auto position = file_->tellg();
+        if (!file_ || position == std::streampos(-1)) {
+            throw FormatError("Error while reading '" + path + "' as XYZ");
+        }
+        if (forward(*file_)) {
+            steps_positions_.push_back(position);
+        }
+    }
+    file_->rewind();
+}
 
 std::string XYZFormat::description() const {
     return "XYZ file format.";
 }
 
-bool XYZFormat::forward(size_t nsteps) {
-    size_t i = 0;
-    // Move the file pointer to the good position step by step, as the number of
-    // atoms may not be constant
-    std::string line;
-    while (i < nsteps) {
-        try {
-            line = file_->readline();
-            auto natoms = std::stoul(line);
-            file_->readlines(natoms + 1);
-            step_cursor_++;
-        } catch (const std::invalid_argument&) {
-            // We could not read an integer, so give up here
-            return false;
-        } catch (const FileError&) {
-            // We could not read the lines from the file
-            throw FormatError("Not enough lines in '" + file_->filename() +
-                              "' for XYZ format at step " + std::to_string(i));
-        }
-        i++;
-    }
-    return true;
-}
-
 size_t XYZFormat::nsteps() {
-    file_->rewind();
-    size_t n = 0;
-    while (!file_->eof()) {
-        if (forward(1)) {
-            n++;
-        }
-    }
-    file_->rewind();
-    return n;
+    return steps_positions_.size();
 }
 
 void XYZFormat::read_step(const size_t step, Frame& frame) {
-    file_->rewind();
-    forward(step);
+    assert(step < steps_positions_.size());
+    file_->seekg(steps_positions_[step]);
     read(frame);
 }
 
@@ -112,4 +94,26 @@ void XYZFormat::write(const Frame& frame) {
                << positions[i][1] << " "
                << positions[i][2] << "\n";
     }
+
+    steps_positions_.push_back(file_->tellg());
+}
+
+bool forward(TextFile& file) {
+    size_t i = 0;
+    // Move the file pointer to the good position step by step, as the number of
+    // atoms may not be constant
+    std::string line;
+    try {
+        line = file.readline();
+        auto natoms = std::stoul(line);
+        file.readlines(natoms + 1);
+    } catch (const std::invalid_argument&) {
+        // We could not read an integer, so give up here
+        return false;
+    } catch (const FileError&) {
+        // We could not read the lines from the file
+        throw FormatError("Not enough lines in '" + file.filename() +
+                          "' for XYZ format at step " + std::to_string(i));
+    }
+    return true;
 }

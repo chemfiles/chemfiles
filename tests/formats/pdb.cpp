@@ -6,7 +6,7 @@
 using namespace chemfiles;
 
 TEST_CASE("Read files in PDB format", "[Molfile]"){
-    SECTION("Read trajectory") {
+    SECTION("Read next step") {
         Trajectory file("data/pdb/water.pdb");
         Frame frame = file.read();
 
@@ -26,6 +26,26 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
         positions = frame.positions();
         CHECK(approx_eq(positions[0], vector3d(0.299, 8.310, 11.721), 1e-4));
         CHECK(approx_eq(positions[296], vector3d(6.798, 11.509, 12.704), 1e-4));
+    }
+
+    SECTION("Read a specific step"){
+        Trajectory file("data/pdb/water.pdb");
+
+        auto frame = file.read_step(2);
+        CHECK(frame.natoms() == 297);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], vector3d(0.299, 8.310, 11.721), 1e-4));
+        CHECK(approx_eq(positions[296], vector3d(6.798, 11.509, 12.704), 1e-4));
+
+        frame = file.read_step(0);
+        CHECK(frame.natoms() == 297);
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], vector3d(0.417, 8.303, 11.737), 1e-3));
+        CHECK(approx_eq(positions[296], vector3d(6.664, 11.6148, 12.961), 1e-3));
+
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(fabs(cell.a() - 15.0) < 1e-5);
     }
 
     SECTION("Read bonds") {
