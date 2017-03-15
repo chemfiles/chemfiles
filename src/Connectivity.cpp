@@ -44,7 +44,7 @@ void Connectivity::recalculate() const {
             }
             // Find dihedral angles
             for (auto const& bond3 : bonds_) {
-                if (bond2 == bond3) {
+                if (bond2 == bond3 || bond1 == bond3) {
                     continue;
                 }
 
