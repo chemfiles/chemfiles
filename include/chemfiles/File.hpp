@@ -58,9 +58,9 @@ public:
     virtual ~TextFile() noexcept {}
 
     /// Read a line from the file
-    virtual const std::string& readline() = 0;
+    virtual std::string readline() = 0;
     /// Read `n` lines from the file
-    virtual const std::vector<std::string>& readlines(size_t n) = 0;
+    virtual std::vector<std::string> readlines(size_t n) = 0;
     /// Reset the file cursor
     virtual void rewind() = 0;
     /// Are we at the end of the file ?
