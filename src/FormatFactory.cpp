@@ -28,44 +28,36 @@ namespace chemfiles {
 }
 
 template <typename T>
-void registration(trajectory_map_t& formats, trajectory_map_t& extensions) {
+void registration(FormatFactory& factory) {
     auto creator = new_format<T>;
 
-    auto ext = std::string(T::extension());
-    if (ext != "") {
-        if (extensions.find(ext) != extensions.end()) {
-            throw FormatError("The extension \"" + ext +
-                              "\" is already associated with a format.");
-        }
-        extensions.emplace(ext, creator);
+    auto extension = std::string(T::extension());
+    if (extension != "") {
+        factory.register_extension(extension, creator);
     }
 
     auto name = std::string(T::name());
     if (name != "") {
-        if (formats.find(name) != formats.end()) {
-            throw FormatError("The name \"" + name +
-                              "\" is already associated with a format.");
-        }
-        formats.emplace(name, creator);
+        factory.register_format(name, creator);
     }
 }
 
 FormatFactory::FormatFactory() : formats_(), extensions_() {
-    registration<XYZFormat>(formats_, extensions_);
-    registration<PDBFormat>(formats_, extensions_);
-    registration<TNGFormat>(formats_, extensions_);
+    registration<XYZFormat>(*this);
+    registration<PDBFormat>(*this);
+    registration<TNGFormat>(*this);
 
 #if CHEMFILES_NETCDF
-    registration<NCFormat>(formats_, extensions_);
+    registration<NCFormat>(*this);
 #endif
 
     // Molfile-based formats
-    registration<Molfile<DCD>>(formats_, extensions_);
-    registration<Molfile<GRO>>(formats_, extensions_);
-    registration<Molfile<TRR>>(formats_, extensions_);
-    registration<Molfile<XTC>>(formats_, extensions_);
-    registration<Molfile<TRJ>>(formats_, extensions_);
-    registration<Molfile<LAMMPS>>(formats_, extensions_);
+    registration<Molfile<DCD>>(*this);
+    registration<Molfile<GRO>>(*this);
+    registration<Molfile<TRR>>(*this);
+    registration<Molfile<XTC>>(*this);
+    registration<Molfile<TRJ>>(*this);
+    registration<Molfile<LAMMPS>>(*this);
 }
 
 FormatFactory& FormatFactory::get() {
