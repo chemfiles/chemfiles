@@ -137,17 +137,13 @@ private:
     CellShape shape_;
 };
 
-inline bool operator==(const UnitCell& rhs, const UnitCell& lhs) {
-    if (lhs.shape() != rhs.shape())
-        return false;
-
-    return rhs.a() == lhs.a() &&
-           rhs.b() == lhs.b() &&
-           rhs.c() == lhs.c() &&
-           rhs.alpha() == lhs.alpha() &&
-           rhs.beta() == lhs.beta() &&
-           rhs.gamma() == lhs.gamma();
-}
+/// Exact comparison of unit cells.
+///
+/// This performs an exact comparison of the two unit cells, using floating
+/// point equality. This means that the two cells have to be exactly identical,
+/// not only very close.
+bool operator==(const UnitCell& rhs, const UnitCell& lhs);
+bool operator!=(const UnitCell& rhs, const UnitCell& lhs);
 
 } // namespace chemfiles
 

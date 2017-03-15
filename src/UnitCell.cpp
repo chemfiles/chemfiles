@@ -187,3 +187,22 @@ Vector3D UnitCell::wrap(const Vector3D& vect) const {
     }
     unreachable();
 }
+
+namespace chemfiles {
+    bool operator==(const UnitCell& rhs, const UnitCell& lhs) {
+        if (lhs.shape() != rhs.shape()) {
+            return false;
+        }
+
+        return rhs.a() == lhs.a() &&
+               rhs.b() == lhs.b() &&
+               rhs.c() == lhs.c() &&
+               rhs.alpha() == lhs.alpha() &&
+               rhs.beta() == lhs.beta() &&
+               rhs.gamma() == lhs.gamma();
+    }
+
+    bool operator!=(const UnitCell& rhs, const UnitCell& lhs) {
+        return !(rhs == lhs);
+    }
+}
