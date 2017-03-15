@@ -14,8 +14,8 @@ void Topology::resize(size_t natoms) {
     for (auto bond : bonds()) {
         if (bond[0] >= natoms || bond[1] >= natoms) {
             throw Error(
-                "Can not resize the topology to " + std::to_string(natoms) +
-                " as there is a bond between atoms " + std::to_string(bond[0]) +
+                "Can not resize the topology to contains " + std::to_string(natoms) +
+                " atoms as there is a bond between atoms " + std::to_string(bond[0]) +
                 "-" + std::to_string(bond[1]) + ".");
         }
     }

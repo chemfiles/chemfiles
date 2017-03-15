@@ -184,6 +184,8 @@ TEST_CASE("Multiple selections", "[selection]") {
         sel = Selection("two: none");
         res = std::vector<Match>();
         CHECK(sel.evaluate(frame) == res);
+
+        CHECK_THROWS_AS(sel.list(frame), SelectionError);
     }
 
     SECTION("Three") {
@@ -199,6 +201,8 @@ TEST_CASE("Multiple selections", "[selection]") {
         CHECK(sel.evaluate(frame) == res);
         auto natoms = frame.natoms();
         CHECK(res.size() == natoms * (natoms - 1) * (natoms - 2));
+
+        CHECK_THROWS_AS(sel.list(frame), SelectionError);
     }
 
     SECTION("Four") {
@@ -216,6 +220,20 @@ TEST_CASE("Multiple selections", "[selection]") {
         CHECK(sel.evaluate(frame) == res);
         auto natoms = frame.natoms();
         CHECK(res.size() == natoms * (natoms - 1) * (natoms - 2) * (natoms - 3));
+
+        CHECK_THROWS_AS(sel.list(frame), SelectionError);
+    }
+
+    SECTION("Bonds") {
+        auto sel = Selection("bonds: all");
+        std::vector<Match> res{{0ul, 1ul}, {1ul, 2ul}, {2ul, 3ul}};
+        auto eval = sel.evaluate(frame);
+        CHECK(res.size() == eval.size());
+        for (auto& match: res) {
+            CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
+        }
+
+        CHECK_THROWS_AS(sel.list(frame), SelectionError);
     }
 
     SECTION("Angles") {
@@ -226,12 +244,16 @@ TEST_CASE("Multiple selections", "[selection]") {
         for (auto& match: res) {
             CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
         }
+
+        CHECK_THROWS_AS(sel.list(frame), SelectionError);
     }
 
     SECTION("Dihedrals") {
         auto sel = Selection("dihedrals: all");
         std::vector<Match> res{{0ul, 1ul, 2ul, 3ul}};
         CHECK(sel.evaluate(frame) == res);
+
+        CHECK_THROWS_AS(sel.list(frame), SelectionError);
     }
 }
 
