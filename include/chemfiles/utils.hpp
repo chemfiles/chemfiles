@@ -13,6 +13,8 @@
 #include <cctype>
 #include <algorithm>
 
+namespace chemfiles {
+
 inline std::vector<std::string> split(const std::string &s, char delim) {
     std::stringstream ss(s);
     std::string item;
@@ -54,5 +56,7 @@ inline std::string trim(const std::string& str) {
 std::string hostname();
 /// Get the user name
 std::string user_name();
+
+}
 
 #endif
