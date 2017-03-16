@@ -142,8 +142,8 @@ private:
 /// This performs an exact comparison of the two unit cells, using floating
 /// point equality. This means that the two cells have to be exactly identical,
 /// not only very close.
-bool operator==(const UnitCell& rhs, const UnitCell& lhs);
-bool operator!=(const UnitCell& rhs, const UnitCell& lhs);
+CHFL_EXPORT bool operator==(const UnitCell& rhs, const UnitCell& lhs);
+CHFL_EXPORT bool operator!=(const UnitCell& rhs, const UnitCell& lhs);
 
 } // namespace chemfiles
 

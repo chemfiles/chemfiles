@@ -12,6 +12,7 @@
 #include <functional>
 #include <unordered_map>
 
+#include "chemfiles/exports.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 
@@ -40,7 +41,7 @@ typedef std::function<std::unique_ptr<Format>(const std::string& path, File::Mod
 using trajectory_map_t = std::unordered_map<std::string, format_creator_t>;
 
 /// This class allow to register Format with names and file extensions
-class FormatFactory {
+class CHFL_EXPORT FormatFactory {
 private:
     FormatFactory();
 

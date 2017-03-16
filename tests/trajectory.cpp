@@ -1,6 +1,4 @@
-#include <streambuf>
 #include <fstream>
-#include <cstdio>
 #include <catch.hpp>
 #include "chemfiles.hpp"
 using namespace chemfiles;

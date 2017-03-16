@@ -3,14 +3,11 @@
 #endif
 
 #include <string>
+#include <fstream>
 #include <catch.hpp>
 
 #include "chemfiles.hpp"
 #include "chemfiles/FormatFactory.hpp"
-#include "chemfiles/Error.hpp"
-#include "chemfiles/formats/XYZ.hpp"
-
-#include "chemfiles/Frame.hpp"
 using namespace chemfiles;
 
 // Dummy format clase
@@ -46,20 +43,6 @@ TEST_CASE("Geting registered format", "[Trajectory factory]"){
     CHECK(typeid(dummy) == typeid(*format));
     format = FormatFactory::get().format("Dummy")("", File::READ);
     CHECK(typeid(dummy) == typeid(*format));
-
-    {
-        // create a file on the filesystem
-        std::ofstream file("tmp.dat");
-    }
-
-
-    XYZFormat XYZ("tmp.dat", File::READ);
-    format = FormatFactory::get().by_extension(".xyz")("tmp.dat", File::READ);
-    CHECK(typeid(XYZ) == typeid(*format));
-    format = FormatFactory::get().format("XYZ")("tmp.dat", File::READ);
-    CHECK(typeid(XYZ) == typeid(*format));
-
-    remove("tmp.dat");
 
     CHECK_THROWS_AS(FormatFactory::get().format("UNKOWN"), FormatError);
     CHECK_THROWS_AS(FormatFactory::get().by_extension(".UNKOWN"), FormatError);

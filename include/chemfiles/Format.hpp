@@ -11,7 +11,7 @@
 #include <memory>
 #include <string>
 
-#include "chemfiles/files/BasicFile.hpp"
+#include "chemfiles/exports.hpp"
 
 namespace chemfiles {
 class Frame;
@@ -20,7 +20,7 @@ class Frame;
 /// format to chemfiles. It is possible to implement only one of `Format::read`;
 /// `Format::read_step` or `Format::write`. In that case, only the corresponding
 /// operations will be available from the corresponding `chemfiles::Trajectory`.
-class Format {
+class CHFL_EXPORT Format {
 public:
     Format() = default;
     virtual ~Format() noexcept = default;

@@ -1,9 +1,6 @@
 #include <catch.hpp>
-
 #include "chemfiles.hpp"
-#include "chemfiles/Atom.hpp"
 using namespace chemfiles;
-
 
 TEST_CASE("Use the Atom type", "[Atoms]"){
     Atom a("H");
