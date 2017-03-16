@@ -59,14 +59,10 @@ public:
     void remove(size_t i);
     /// Add a bond in the system, between the atoms at index `atom_i` and
     /// `atom_j`
-    void add_bond(size_t atom_i, size_t atom_j) {
-        connect_.add_bond(atom_i, atom_j);
-    }
+    void add_bond(size_t atom_i, size_t atom_j);
     /// Remove a bond in the system, between the atoms at index `atom_i` and
     /// `atom_j`
-    void remove_bond(size_t atom_i, size_t atom_j) {
-        connect_.remove_bond(atom_i, atom_j);
-    }
+    void remove_bond(size_t atom_i, size_t atom_j);
 
     /// Get the number of atoms in the topology
     size_t natoms() const { return atoms_.size(); }

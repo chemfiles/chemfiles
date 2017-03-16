@@ -30,6 +30,15 @@ void Topology::reserve(size_t natoms) {
     atoms_.reserve(natoms);
 }
 
+void Topology::add_bond(size_t atom_i, size_t atom_j) {
+    connect_.add_bond(atom_i, atom_j);
+}
+
+void Topology::remove_bond(size_t atom_i, size_t atom_j) {
+    connect_.remove_bond(atom_i, atom_j);
+}
+
+
 void Topology::remove(size_t idx) {
     assert(idx < natoms() && "Can not remove out of bounds atom");
     atoms_.erase(atoms_.begin() + static_cast<std::ptrdiff_t>(idx));

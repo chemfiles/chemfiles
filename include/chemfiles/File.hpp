@@ -13,10 +13,12 @@
 #include <vector>
 #include <memory>
 
+#include "chemfiles/exports.hpp"
+
 namespace chemfiles {
 
 /// Abstract base class for file representation.
-class File {
+class CHFL_EXPORT File {
 public:
     /// Possible modes for opening a file
     enum Mode: char {
@@ -50,7 +52,7 @@ private:
 /// Abstract base class representing a text file. This class is inteded to be
 /// inherited by any form of text files: compressed files, memory-mapped files,
 /// etc.
-class TextFile: public File, public std::iostream {
+class CHFL_EXPORT TextFile: public File, public std::iostream {
 public:
     /// Open the more adaptated text file class for the given `path` and `mode`
     static std::unique_ptr<TextFile> create(const std::string& path, File::Mode mode);

@@ -1,5 +1,4 @@
 #include <catch.hpp>
-
 #include "chemfiles.hpp"
 using namespace chemfiles;
 

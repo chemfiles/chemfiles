@@ -17,11 +17,10 @@ extern "C" {
 
 #include "chemfiles/optional.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/File.hpp"
 #include "chemfiles/Topology.hpp"
 
 namespace chemfiles {
-
-class Topology;
 
 /// List all the VMD molfile plugins enabled. For more documentation about VMD
 /// molfile plugins, please see:
