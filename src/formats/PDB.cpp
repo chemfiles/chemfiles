@@ -236,13 +236,17 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
 }
 
 bool forward(TextFile& file) {
-    while (!file.eof()) {
-        auto line = file.readline();
-        if (line.substr(0, 3) == "END") {
-            return true;
+    if (!file) {return false;}
+    while (true) {
+        try {
+            auto line = file.readline();
+            if (line.substr(0, 3) == "END") {
+                return true;
+            }
+        } catch (const FileError&) {
+            return false;
         }
     }
-    return false;
 }
 
 Record get_record(const std::string& line) {

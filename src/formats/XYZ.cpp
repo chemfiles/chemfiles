@@ -16,7 +16,7 @@
 
 using namespace chemfiles;
 
-/// Quick forward the file for one step, returning `false` if the file does
+/// Fast-forward the file for one step, returning `false` if the file does
 /// not contain one more step.
 static bool forward(TextFile& file);
 
@@ -99,21 +99,37 @@ void XYZFormat::write(const Frame& frame) {
 }
 
 bool forward(TextFile& file) {
-    size_t i = 0;
-    // Move the file pointer to the good position step by step, as the number of
-    // atoms may not be constant
+    if (!file) {return false;}
+
     std::string line;
     try {
         line = file.readline();
-        auto natoms = std::stoul(line);
-        file.readlines(natoms + 1);
+    } catch (const FileError&) {
+        // No more line left in the file
+        return false;
+    }
+
+    long long natoms = 0;
+    try {
+        natoms = std::stoll(line);
     } catch (const std::invalid_argument&) {
         // We could not read an integer, so give up here
         return false;
+    }
+
+    if (natoms < 0) {
+        throw FormatError(
+            "Number of atoms can not be negative in '" + file.filename()
+        );
+    }
+
+    try {
+        file.readlines(static_cast<size_t>(natoms) + 1);
     } catch (const FileError&) {
         // We could not read the lines from the file
-        throw FormatError("Not enough lines in '" + file.filename() +
-                          "' for XYZ format at step " + std::to_string(i));
+        throw FormatError(
+            "Not enough lines in '" + file.filename() + "' for XYZ format"
+        );
     }
     return true;
 }

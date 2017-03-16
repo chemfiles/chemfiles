@@ -50,6 +50,9 @@ private:
 /// Abstract base class representing a text file. This class is inteded to be
 /// inherited by any form of text files: compressed files, memory-mapped files,
 /// etc.
+///
+/// All failling operations should throw a `FileError` instead of waiting for
+/// the user of the class to the current state.
 class TextFile: public File, public std::iostream {
 public:
     /// Open the more adaptated text file class for the given `path` and `mode`

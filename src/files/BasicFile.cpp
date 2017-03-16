@@ -35,11 +35,18 @@ BasicFile::BasicFile(const std::string& filename, File::Mode mode)
     }
     TextFile::rdbuf(stream_.rdbuf());
     rewind();
+    stream_.clear();
+    // Throw exceptions on errors
+    stream_.exceptions(std::fstream::badbit | std::fstream::failbit);
 }
 
 std::string BasicFile::readline() {
     std::string line;
-    std::getline(stream_, line);
+    try {
+        std::getline(stream_, line);
+    } catch (const std::ios_base::failure&) {
+        throw FileError("Could not read a line in " + filename());
+    }
     return line;
 }
 
@@ -55,9 +62,10 @@ bool BasicFile::eof() {
 std::vector<std::string> BasicFile::readlines(size_t n) {
     auto lines = std::vector<std::string>(n);
     for (size_t i = 0; i < n; i++) {
-        std::getline(stream_, lines[i]);
-        if (!stream_) {
-            throw FileError("Error while reading file " + filename());
+        try {
+            std::getline(stream_, lines[i]);
+        } catch (const std::ios_base::failure&) {
+            throw FileError("Could not read lines in " + filename());
         }
     }
     return lines;
