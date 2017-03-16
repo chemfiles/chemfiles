@@ -94,7 +94,7 @@ unsigned Token::precedence() const {
     unreachable();
 }
 
-static std::vector<std::string> split(const std::string& data) {
+static std::vector<std::string> split_selection(const std::string& data) {
     std::string token;
     std::vector<std::string> tokens;
     for (auto c : data) {
@@ -141,7 +141,7 @@ static bool is_number(const std::string& token) {
 
 std::vector<Token> selections::tokenize(const std::string& input) {
     auto tokens = std::vector<Token>();
-    auto splited = split(input);
+    auto splited = split_selection(input);
     for (size_t i=0; i<splited.size(); i++) {
         auto& word = splited[i];
         if (word == "(") {

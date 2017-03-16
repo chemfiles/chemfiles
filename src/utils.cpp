@@ -16,9 +16,7 @@
 #include <pwd.h>
 #endif
 
-
-
-std::string user_name() {
+std::string chemfiles::user_name() {
 #ifdef CHEMFILES_WINDOWS
     char name[UNLEN + 1];
     DWORD size = sizeof(name);
@@ -32,7 +30,7 @@ std::string user_name() {
 #endif
 }
 
-std::string hostname() {
+std::string chemfiles::hostname() {
 #ifdef CHEMFILES_WINDOWS
     char name[MAX_COMPUTERNAME_LENGTH + 1];
     DWORD size = sizeof(name);

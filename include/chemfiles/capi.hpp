@@ -14,7 +14,6 @@
 
 namespace chemfiles {
     extern std::string CAPI_LAST_ERROR;
-}
 
 inline size_t checked_cast(uint64_t value) {
     if (static_cast<uint64_t>(value) > static_cast<uint64_t>(SIZE_MAX)) {
@@ -90,5 +89,7 @@ inline size_t checked_cast(uint64_t value) {
         CAPI_LAST_ERROR = std::string(e.what());                               \
         goto error;                                                            \
     }
+
+}
 
 #endif
