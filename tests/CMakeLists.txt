@@ -1,29 +1,29 @@
 
 # Update this value if you need to update the data file set
-set(TESTS_DATA_GIT_HASH "27d89caa55e1f42cdbbed5a322b51c702066d871")
+set(TESTS_DATA_GIT "27d89caa55e1f42cdbbed5a322b51c702066d871")
 
-if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT_HASH}")
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT}")
     message(STATUS "Downloading test data files")
     file(DOWNLOAD
-        "https://github.com/chemfiles/tests-data/archive/${TESTS_DATA_GIT_HASH}.tar.gz"
-        "${CMAKE_CURRENT_BINARY_DIR}/${TESTS_DATA_GIT_HASH}.tar.gz"
+        "https://github.com/chemfiles/tests-data/archive/${TESTS_DATA_GIT}.tar.gz"
+        "${CMAKE_CURRENT_BINARY_DIR}/${TESTS_DATA_GIT}.tar.gz"
         SHOW_PROGRESS
         EXPECTED_HASH SHA1=f16520453515f21ca838c508eea9d38ac4877443
     )
 
     message(STATUS "Unpacking test data files")
     execute_process(
-        COMMAND ${CMAKE_COMMAND} -E tar xf ${TESTS_DATA_GIT_HASH}.tar.gz
+        COMMAND ${CMAKE_COMMAND} -E tar xf ${TESTS_DATA_GIT}.tar.gz
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 
     execute_process(
-        COMMAND ${CMAKE_COMMAND} -E rename tests-data-${TESTS_DATA_GIT_HASH} data
+        COMMAND ${CMAKE_COMMAND} -E rename tests-data-${TESTS_DATA_GIT} data
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 
     execute_process(
-        COMMAND ${CMAKE_COMMAND} -E touch data/${TESTS_DATA_GIT_HASH}
+        COMMAND ${CMAKE_COMMAND} -E touch data/${TESTS_DATA_GIT}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 endif()
@@ -59,8 +59,24 @@ include_directories(SYSTEM ${PROJECT_BINARY_DIR}/external/molfiles/include)
 include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR}/external/boost/include)
 add_library(test_helpers STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/helpers.cpp)
 
+function(check_dll_export_tests _name_ _result_)
+    set(NON_DLL_EXPORT_TESTS tng-file basic-file ncfile)
+    list(FIND NON_DLL_EXPORT_TESTS ${_name_} _index_)
+    if (${_index_} GREATER -1)
+        set(${_result_} TRUE PARENT_SCOPE)
+    else()
+        set(${_result_} FALSE PARENT_SCOPE)
+    endif()
+endfunction()
+
 function(chfl_test _name_ _file_)
-    add_executable(${_name_} ${_file_})
+    check_dll_export_tests(${_name_} _is_not_dll_exported_)
+    if(${_is_not_dll_exported_})
+        add_executable(${_name_} ${_file_} $<TARGET_OBJECTS:files_impl>)
+    else()
+        add_executable(${_name_} ${_file_})
+    endif()
+
     target_link_libraries(${_name_} chemfiles boost_filesystem test_helpers)
     set_property(TARGET ${_name_} PROPERTY CXX_STANDARD 11)
     add_test(NAME ${_name_}

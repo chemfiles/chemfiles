@@ -15,3 +15,10 @@ std::unique_ptr<TextFile> TextFile::create(const std::string& path, File::Mode m
     // by only modifying this function.
     return std::unique_ptr<TextFile>(new BasicFile(path, mode));
 }
+
+// We need to define this destructor here because of the way we build the
+// chemfiles library to allow testing of non-dll-exported classes (see the
+// files_impl target in CMakeLists.txt)
+//
+// If we define it in the header file, we get a duplicated symbol error.
+TextFile::~TextFile() noexcept {}
