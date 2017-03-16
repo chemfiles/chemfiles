@@ -3,6 +3,7 @@ if ("$env:CXX_PATH" -ne "") {
 }
 
 $env:CMAKE_ARGUMENTS = "-G `"$env:generator`""
+$env:CMAKE_ARGUMENTS += " -DBUILD_SHARED_LIBS=$env:SHARED_LIBS"
 $env:CMAKE_ARGUMENTS += " -DCMAKE_BUILD_TYPE=$env:configuration"
 $env:CMAKE_ARGUMENTS += " -DCHFL_BUILD_TESTS=ON"
 
