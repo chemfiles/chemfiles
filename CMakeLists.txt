@@ -85,9 +85,28 @@ endif()
 
 add_subdirectory(external)
 
+# We need to use a separated library for non-dll-exported classes that have an
+# unit test. The files_impl OBJECT library contains the code for files
+# implementation and is linked into both the main chemfiles library and the
+# unit tests.
+file(GLOB files_impl_sources src/files/*.cpp src/utils.cpp)
+add_library(files_impl OBJECT ${files_impl_sources})
+target_include_directories(files_impl PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+)
+target_include_directories(files_impl PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/tng_io/include)
+target_compile_definitions(files_impl PRIVATE chemfiles_EXPORTS)
+if(${BUILD_SHARED_LIBS})
+    set_target_properties(files_impl PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+endif()
+
+# Add the main chemfiles library
 file(GLOB_RECURSE sources src/**.cpp)
+list(REMOVE_ITEM sources ${files_impl_sources})
 add_library(
     chemfiles ${sources}
+    $<TARGET_OBJECTS:files_impl>
     $<TARGET_OBJECTS:molfiles>
     $<TARGET_OBJECTS:fmt>
     $<TARGET_OBJECTS:tng_io>
@@ -109,6 +128,7 @@ target_include_directories(chemfiles PRIVATE external/fmt)
 if(${CHFL_ENABLE_NETCDF})
     find_package(NetCDF REQUIRED)
     target_include_directories(chemfiles PUBLIC ${NETCDF_INCLUDES})
+    target_include_directories(files_impl PRIVATE ${NETCDF_INCLUDES})
     target_link_libraries(chemfiles ${NETCDF_LIBRARIES})
     set(HAVE_NETCDF 1)
 else()

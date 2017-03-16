@@ -60,8 +60,7 @@ public:
     /// Open the more adaptated text file class for the given `path` and `mode`
     static std::unique_ptr<TextFile> create(const std::string& path, File::Mode mode);
 
-    virtual ~TextFile() noexcept {}
-
+    virtual ~TextFile() noexcept;
     /// Read a line from the file
     virtual std::string readline() = 0;
     /// Read `n` lines from the file
