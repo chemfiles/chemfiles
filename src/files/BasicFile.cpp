@@ -83,6 +83,21 @@ std::string BasicFile::readline() {
     } catch (const std::ios_base::failure&) {
         throw FileError("Could not read a line in " + filename());
     }
+#if defined(__GNUC__) && (__GNUC__ == 5 || __GNUC__ == 6)
+        // GCC 5 and 6 throw the wrong exception type for std::ios_base::failure
+        // They still throw this exception using the C++03 ABI, while the above
+        // is catching it using the C++11 ABI. So we manually check the exception
+        // type here.
+        //
+        // See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145.
+        catch(const std::exception& e) {
+            if (std::string(typeid(e).name()) == "NSt8ios_base7failureE") {
+                throw FileError("Could not read a line in " + filename());
+            } else {
+                throw e;
+            }
+        }
+#endif
     return line;
 }
 
@@ -103,6 +118,21 @@ std::vector<std::string> BasicFile::readlines(size_t n) {
         } catch (const std::ios_base::failure&) {
             throw FileError("Could not read lines in " + filename());
         }
+#if defined(__GNUC__) && (__GNUC__ == 5 || __GNUC__ == 6)
+        // GCC 5 and 6 throw the wrong exception type for std::ios_base::failure
+        // They still throw this exception using the C++03 ABI, while the above
+        // is catching it using the C++11 ABI. So we manually check the exception
+        // type here.
+        //
+        // See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145.
+        catch(const std::exception& e) {
+            if (std::string(typeid(e).name()) == "NSt8ios_base7failureE") {
+                throw FileError("Could not read lines in " + filename());
+            } else {
+                throw e;
+            }
+        }
+#endif
     }
     return lines;
 }
