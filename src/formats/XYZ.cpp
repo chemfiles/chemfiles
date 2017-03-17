@@ -8,6 +8,9 @@
 #include <cassert>
 #include <sstream>
 
+#include "fmt/format.h"
+#include "fmt/ostream.h"
+
 #include "chemfiles/formats/XYZ.hpp"
 
 #include "chemfiles/Error.hpp"
@@ -83,16 +86,16 @@ void XYZFormat::write(const Frame& frame) {
     auto& positions = frame.positions();
     assert(frame.natoms() == topology.natoms());
 
-    *file_ << frame.natoms() << "\n";
-    *file_ << "Written by the chemfiles library\n";
+    fmt::print(*file_, "{}\n", frame.natoms());
+    fmt::print(*file_, "Written by the chemfiles library\n", frame.natoms());
 
     for (size_t i = 0; i < frame.natoms(); i++) {
         auto type = topology[i].type();
         if (type == "") {type = "X";}
-        *file_ << type << " "
-               << positions[i][0] << " "
-               << positions[i][1] << " "
-               << positions[i][2] << "\n";
+        fmt::print(
+            *file_, "{} {} {} {}\n",
+            type, positions[i][0], positions[i][1], positions[i][2]
+        );
     }
 
     steps_positions_.push_back(file_->tellg());

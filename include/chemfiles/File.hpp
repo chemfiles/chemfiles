@@ -57,7 +57,7 @@ private:
 /// the user of the class to the current state.
 class CHFL_EXPORT TextFile: public File, public std::iostream {
 public:
-    /// Open the more adaptated text file class for the given `path` and `mode`
+    /// Open the most adaptated text file class for the given `path` and `mode`
     static std::unique_ptr<TextFile> create(const std::string& path, File::Mode mode);
 
     virtual ~TextFile() noexcept;
@@ -69,19 +69,6 @@ public:
     virtual void rewind() = 0;
     /// Are we at the end of the file ?
     virtual bool eof() = 0;
-
-    /// Write any data to the file in stream version
-    using std::ostream::operator<<;
-    /// Set the underlying buffer. This is needed in order to make operator<<
-    /// work.
-    using std::ostream::rdbuf;
-    /// Needed for resolving the overload ambiguity when using const char[] or
-    /// const char* arguments.
-    TextFile& operator<<(const char* val) {
-        *this << std::string(val);
-        return *this;
-    }
-
 protected:
     TextFile(const std::string& path, File::Mode mode):
         File(path, mode), std::iostream(nullptr) {}
