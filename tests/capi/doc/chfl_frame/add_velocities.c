@@ -10,7 +10,7 @@ int main() {
 
     bool velocities = false;
     chfl_frame_has_velocities(frame, &velocities);
-    assert(velocities = true);
+    assert(velocities == true);
 
     chfl_frame_free(frame);
     // [example]

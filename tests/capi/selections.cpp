@@ -55,7 +55,7 @@ TEST_CASE("Selections", "[CAPI]") {
         CHECK_STATUS(chfl_selection_evaluate(selection, frame, &matches_count));
         CHECK(matches_count == 2);
 
-        chfl_match_t* matches = new chfl_match_t[matches_count];
+        chfl_match_t* matches = new chfl_match_t[static_cast<size_t>(matches_count)];
 
         REQUIRE(matches != 0);
         CHECK_STATUS(chfl_selection_matches(selection, matches, matches_count));
@@ -76,7 +76,7 @@ TEST_CASE("Selections", "[CAPI]") {
         CHECK_STATUS(chfl_selection_evaluate(selection, frame, &matches_count));
         CHECK(matches_count == 2);
 
-        matches = new chfl_match_t[matches_count];
+        matches = new chfl_match_t[static_cast<size_t>(matches_count)];
         REQUIRE(matches != NULL);
 
         CHECK_STATUS(chfl_selection_matches(selection, matches, matches_count));
