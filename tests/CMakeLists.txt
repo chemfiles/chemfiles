@@ -83,6 +83,14 @@ function(chfl_test _name_ _file_)
         COMMAND ${RUNNER_COMMAND} ./${_name_}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
+    # We need to set the path to allow access to chemfiles.dll (and any other
+    # DLL)
+    if(WIN32)
+        STRING(REPLACE ";" "\\;" PATH_STRING "$ENV{PATH}")
+        set_tests_properties(${_name_}
+            PROPERTIES ENVIRONMENT "PATH=${PATH_STRING}\;$<TARGET_FILE_DIR:chemfiles>"
+        )
+    endif()
 endfunction()
 
 function(chfl_cpp_test _file_)
@@ -141,6 +149,7 @@ foreach(test_file IN LISTS capi_doctest_files)
 endforeach(test_file)
 
 configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/CTestCustom.in.cmake
+    ${CMAKE_CURRENT_SOURCE_DIR}/CTestCustom.cmake.in
     ${CMAKE_BINARY_DIR}/CTestCustom.cmake
+    @ONLY
 )
