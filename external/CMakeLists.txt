@@ -8,7 +8,7 @@ else()
     set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -w")
 endif()
 
-if(${BUILD_SHARED_LIBS})
+if(${BUILD_SHARED_LIBS} AND NOT WIN32)
     set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -fPIC")
 endif()
 

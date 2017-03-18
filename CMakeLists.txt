@@ -4,8 +4,7 @@ project(chemfiles C CXX)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 cmake_policy(VERSION 2.8.11)
 if (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
-    # OSX RPATH handling
-    cmake_policy(SET CMP0042 OLD)
+    cmake_policy(SET CMP0042 OLD) # OSX RPATH handling
 endif()
 
 
