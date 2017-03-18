@@ -49,17 +49,24 @@ static inline std::istream& get_line(std::istream& istream, std::string& string)
 
 BasicFile::BasicFile(const std::string& filename, File::Mode mode)
     : TextFile(filename, mode) {
-    std::ios_base::openmode openmode;
+    // We need to use binary mode when opening the file because we are storing
+    // positions in the files relative to line ending positions. Using text
+    // mode make the MSVC runtime convert lines ending and then all the values
+    // return by tellg are wrong.
+    //
+    // We can do this because we are dealing with line ending ourself in the
+    // `get_line` function.
+    std::ios_base::openmode openmode = std::ios_base::binary;
 
     switch (mode) {
     case File::READ:
-        openmode = std::ios_base::in;
+        openmode |= std::ios_base::in;
         break;
     case File::APPEND:
-        openmode = std::ios_base::out | std::ios_base::app;
+        openmode |= std::ios_base::out | std::ios_base::app;
         break;
     case File::WRITE:
-        openmode = std::ios_base::out | std::ios_base::trunc;
+        openmode |= std::ios_base::out | std::ios_base::trunc;
         break;
     default:
         throw FileError(std::string("Got a bad file mode: ") + static_cast<char>(mode));
