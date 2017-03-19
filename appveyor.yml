@@ -38,6 +38,15 @@ notifications:
     on_build_failure: true
     on_build_status_changed: true
 
+
+# Uncomment the following lines to enable remote desktop access to Appveyor
+# after a failed build.
+
+# init:
+#   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+# on_failure:
+#   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 install:
   - ps: . .\scripts\ci\setup-appveyor.ps1
 
