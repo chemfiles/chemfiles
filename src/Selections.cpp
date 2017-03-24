@@ -129,6 +129,14 @@ std::vector<Match> evaluate_bonds(const Frame& frame, match_checker is_match) {
         auto match = Match(bond[0], bond[1]);
         if (is_match(frame, match)) {
             matches.emplace_back(std::move(match));
+        } else {
+            // We need to check the reverse bond (j, i); but only if
+            // (i, j) is not a match. This allow to get all bonds, but
+            // only once.
+            match = Match(bond[1], bond[0]);
+            if (is_match(frame, match)) {
+                matches.emplace_back(std::move(match));
+            }
         }
     }
     return matches;
@@ -159,6 +167,14 @@ std::vector<Match> evaluate_angles(const Frame& frame, match_checker is_match) {
         auto match = Match(angle[0], angle[1], angle[2]);
         if (is_match(frame, match)) {
             matches.emplace_back(std::move(match));
+        } else {
+            // We need to check the reverse angle (k, j, i); but only if
+            // (i, j, k) is not a match. This allow to get all angles, but
+            // only once.
+            match = Match(angle[2], angle[1], angle[0]);
+            if (is_match(frame, match)) {
+                matches.emplace_back(std::move(match));
+            }
         }
     }
     return matches;
@@ -192,6 +208,14 @@ std::vector<Match> evaluate_dihedrals(const Frame& frame, match_checker is_match
         auto match = Match(dihedral[0], dihedral[1], dihedral[2], dihedral[3]);
         if (is_match(frame, match)) {
             matches.emplace_back(std::move(match));
+        } else {
+            // We need to check the reverse dihedral (m, k, j, i); but only if
+            // (i, j, k, m) is not a match. This allow to get all dihedrals, but
+            // only once.
+            match = Match(dihedral[3], dihedral[2], dihedral[1], dihedral[0]);
+            if (is_match(frame, match)) {
+                matches.emplace_back(std::move(match));
+            }
         }
     }
     return matches;

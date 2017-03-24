@@ -232,6 +232,14 @@ TEST_CASE("Multiple selections", "[selection]") {
             CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
         }
 
+        sel = Selection("bonds: name(#1) O and type(#2) H");
+        res = std::vector<Match>{{1ul, 0ul}, {2ul, 3ul}};
+        eval = sel.evaluate(frame);
+        CHECK(res.size() == eval.size());
+        for (auto& match: res) {
+            CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
+        }
+
         CHECK_THROWS_AS(sel.list(frame), SelectionError);
     }
 
@@ -239,6 +247,14 @@ TEST_CASE("Multiple selections", "[selection]") {
         auto sel = Selection("angles: all");
         std::vector<Match> res{{0ul, 1ul, 2ul}, {1ul, 2ul, 3ul}};
         auto eval = sel.evaluate(frame);
+        CHECK(res.size() == eval.size());
+        for (auto& match: res) {
+            CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
+        }
+
+        sel = Selection("angles: name(#1) O and name(#2) O and type(#3) H");
+        res = std::vector<Match>{{2ul, 1ul, 0ul}, {1ul, 2ul, 3ul}};
+        eval = sel.evaluate(frame);
         CHECK(res.size() == eval.size());
         for (auto& match: res) {
             CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
