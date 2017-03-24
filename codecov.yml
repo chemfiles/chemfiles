@@ -6,5 +6,6 @@ coverage:
     project:
       default:
         target: 83%
+    patch: off
 
 comment: off
