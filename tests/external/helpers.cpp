@@ -1,3 +1,6 @@
+// Chemfiles, a modern library for chemistry file reading and writing
+// Copyright (C) Guillaume Fraux and contributors -- BSD license
+
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 #include "helpers.hpp"

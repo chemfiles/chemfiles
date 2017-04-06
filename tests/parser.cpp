@@ -1,5 +1,7 @@
-#include <catch.hpp>
+// Chemfiles, a modern library for chemistry file reading and writing
+// Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <catch.hpp>
 #include "chemfiles.hpp"
 #include "chemfiles/selections/lexer.hpp"
 #include "chemfiles/selections/parser.hpp"

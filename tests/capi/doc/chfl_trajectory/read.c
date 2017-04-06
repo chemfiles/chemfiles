@@ -1,4 +1,6 @@
-#undef NDEBUG
+// Chemfiles, a modern library for chemistry file reading and writing
+// Copyright (C) Guillaume Fraux and contributors -- BSD license
+
 #include <assert.h>
 #include <stdlib.h>
 

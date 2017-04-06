@@ -1,3 +1,6 @@
+// Chemfiles, a modern library for chemistry file reading and writing
+// Copyright (C) Guillaume Fraux and contributors -- BSD license
+
 #ifndef CHEMFILES_TESTS_HELPERS_HPP
 #define CHEMFILES_TESTS_HELPERS_HPP
 

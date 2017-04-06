@@ -1,8 +1,11 @@
+// Chemfiles, a modern library for chemistry file reading and writing
+// Copyright (C) Guillaume Fraux and contributors -- BSD license
+
 #include <catch.hpp>
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-Frame testing_frame();
+static Frame testing_frame();
 
 TEST_CASE("Atoms selections", "[selection]") {
     auto frame = testing_frame();

@@ -1,3 +1,6 @@
+// Chemfiles, a modern library for chemistry file reading and writing
+// Copyright (C) Guillaume Fraux and contributors -- BSD license
+
 #include <cmath>
 #include <catch.hpp>
 #include "chemfiles.hpp"
