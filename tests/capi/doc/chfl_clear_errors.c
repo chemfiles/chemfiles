@@ -1,5 +1,7 @@
-#include <chemfiles.h>
+// Chemfiles, a modern library for chemistry file reading and writing
+// Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <chemfiles.h>
 #include <string.h>
 #include <assert.h>
 

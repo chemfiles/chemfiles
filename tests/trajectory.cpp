@@ -1,8 +1,10 @@
+// Chemfiles, a modern library for chemistry file reading and writing
+// Copyright (C) Guillaume Fraux and contributors -- BSD license
+
 #include <fstream>
 #include <catch.hpp>
 #include "chemfiles.hpp"
 using namespace chemfiles;
-
 
 // This file only perform basic testing of the trajectory class. All the differents
 // formats are tested in the formats folder

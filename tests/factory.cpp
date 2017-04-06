@@ -1,3 +1,6 @@
+// Chemfiles, a modern library for chemistry file reading and writing
+// Copyright (C) Guillaume Fraux and contributors -- BSD license
+
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wpotentially-evaluated-expression"
 #endif
