@@ -50,7 +50,7 @@ hesitate to open an [issue] or join us on our [Gitter] chat room.
 - Set custom `UnitCell` or `Topology` when reading/writing;
 - Easy to use programming interface in Python, C++, C, Fortran 95, Julia and Rust;
 - Cross-platform, usable from Linux, OS X and Windows.
-- Open-source and freely available (Mozilla Public License);
+- Open-source and freely available (3-clauses BSD license);
 
 ### Is chemfiles for you?
 
@@ -146,7 +146,7 @@ int main() {
 ## Contributors and license
 
 Chemfiles was created and is maintained by Guillaume Fraux, and put to your
-disposition under the terms of the Mozilla Public License v2.0. By contributing
+disposition under the terms of the [3 clauses BSD license](LICENSE). By contributing
 to Chemfiles, you agree to distribute your contributions under the same license.
 
 All the contributors to chemfiles are listed in the [AUTHORS](AUTHORS) file.

@@ -5,8 +5,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+### New features
+
+* Change the license to the 3-clauses BSD license.
+
+### Changes in supported formats
+
 * Amber NetCDF format is now activated by default, by embedding the netcdf
   library in chemfiles.
+
+### C API changes
+
+### Deprecation and removals
+
 
 ## 0.7 (25 Feb 2017)
 
