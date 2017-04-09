@@ -21,7 +21,6 @@
 // Include the export definitions
 #include "chemfiles/exports.hpp"
 
-#define CHEMFILES_NETCDF @HAVE_NETCDF@
 // clang-format on
 
 #endif

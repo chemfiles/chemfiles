@@ -46,10 +46,7 @@ FormatFactory::FormatFactory() : formats_(), extensions_() {
     registration<XYZFormat>(*this);
     registration<PDBFormat>(*this);
     registration<TNGFormat>(*this);
-
-#if CHEMFILES_NETCDF
     registration<NCFormat>(*this);
-#endif
 
     // Molfile-based formats
     registration<Molfile<DCD>>(*this);

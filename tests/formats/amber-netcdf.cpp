@@ -1,10 +1,5 @@
-#include <cstdio>
-
 #include "catch.hpp"
 #include "helpers.hpp"
-#include "chemfiles/config.hpp"
-#if CHEMFILES_NETCDF
-
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
@@ -74,5 +69,3 @@ TEST_CASE("Write files in NetCDF format", "[Amber NetCDF]") {
         remove("tmp.nc");
     }
 }
-
-#endif // CHEMFILES_NETCDF

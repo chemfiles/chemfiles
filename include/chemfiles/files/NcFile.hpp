@@ -4,10 +4,6 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
-
-#include "chemfiles/config.hpp"
-#if CHEMFILES_NETCDF
-
 #ifndef CHEMFILES_NCFILE_HPP
 #define CHEMFILES_NCFILE_HPP
 
@@ -184,4 +180,3 @@ private:
 } // namespace chemfiles
 
 #endif
-#endif // CHEMFILES_NETCDF

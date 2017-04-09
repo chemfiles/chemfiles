@@ -2,7 +2,7 @@
 
 export C_COMPILER="$CC"
 
-export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DCHFL_BUILD_TESTS=ON -DCHFL_ENABLE_NETCDF=ON -DBUILD_SHARED_LIBS=${SHARED_LIBS}"
+export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DCHFL_BUILD_TESTS=ON -DBUILD_SHARED_LIBS=${SHARED_LIBS}"
 
 if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "gcc" && "$SHARED_LIBS" == "ON" ]]; then
     export EXTRA_WORK=true
@@ -39,9 +39,5 @@ fi
 
 
 if [[ "$ARCH" == "x86" ]]; then
-    cd $TRAVIS_BUILD_DIR
-    ./scripts/ci/install-netcdf.sh
     export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_C_FLAGS=-m32"
-    export CMAKE_ARGS="$CMAKE_ARGS -DNETCDF_INCLUDES=$HOME/netcdf/include"
-    export CMAKE_ARGS="$CMAKE_ARGS -DNETCDF_LIBRARIES=$HOME/netcdf/lib/libnetcdf.a"
 fi
