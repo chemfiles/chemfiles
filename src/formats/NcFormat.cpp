@@ -5,9 +5,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
-#include "chemfiles/config.hpp"
-#if CHEMFILES_NETCDF
-
 #include "chemfiles/formats/NcFormat.hpp"
 
 #include "chemfiles/Error.hpp"
@@ -225,5 +222,3 @@ void NCFormat::write_cell(const UnitCell& cell) {
     length.add(start, count, length_data);
     angles.add(start, count, angles_data);
 }
-
-#endif // CHEMFILES_NETCDF

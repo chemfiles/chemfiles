@@ -157,8 +157,8 @@ most important options:
 +---------------------------------------+---------------------+------------------------------+
 | ``-DCHFL_BUILD_TESTS=ON|OFF``         | ``OFF``             | Build the test suite.        |
 +---------------------------------------+---------------------+------------------------------+
-| ``-DCHFL_ENABLE_NETCDF=ON|OFF``       | ``OFF``             | Enable the Amber NetCDF      |
-|                                       |                     | format                       |
+| ``-DCHFL_SYSTEM_NETCDF=ON|OFF``       | ``OFF``             | Use the system-provided      |
+|                                       |                     | netcdf library.              |
 +---------------------------------------+---------------------+------------------------------+
 
 For instance, to install to :file:`$HOME/local`, use:

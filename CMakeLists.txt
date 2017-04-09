@@ -31,7 +31,6 @@ option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
 option(CHFL_BUILD_TESTS "Build unit tests." OFF)
 option(CHFL_BUILD_DOCUMENTATION "Build the documentation." OFF)
 option(CHFL_CODE_COVERAGE "Enable code coverage" OFF)
-option(CHFL_ENABLE_NETCDF "Enable AMBER NetCDF format." OFF)
 option(CHFL_USE_WARNINGS "Compile the code with warnings (default in debug mode)" OFF)
 option(CHFL_DEBUG_GLIBCXX "Use the debug version of GNU libstdcxx" OFF)
 
@@ -113,6 +112,9 @@ add_library(
     $<TARGET_OBJECTS:fmt>
     $<TARGET_OBJECTS:tng_io>
     $<TARGET_OBJECTS:tng_io_zlib>
+    $<TARGET_OBJECTS:netcdf3-chemfiles>
+    $<TARGET_OBJECTS:netcdf3>
+    $<TARGET_OBJECTS:dispatch>
 )
 
 set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
@@ -127,20 +129,6 @@ target_include_directories(chemfiles PUBLIC
 target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/molfiles/include)
 target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/tng/include)
 target_include_directories(chemfiles PRIVATE external/fmt)
-
-if(${CHFL_ENABLE_NETCDF})
-    find_package(NetCDF REQUIRED)
-    target_include_directories(chemfiles PUBLIC ${NETCDF_INCLUDES})
-    target_include_directories(files_impl PRIVATE ${NETCDF_INCLUDES})
-    target_link_libraries(chemfiles ${NETCDF_LIBRARIES})
-    set(HAVE_NETCDF 1)
-else()
-    find_package(NetCDF)
-    if(${NetCDF_FOUND})
-        message(STATUS "Found NetCDF library. Consider activating the associated format with -DCHFL_ENABLE_NETCDF=ON")
-    endif()
-    set(HAVE_NETCDF 0)
-endif()
 
 configure_file (
   "${PROJECT_SOURCE_DIR}/include/chemfiles/config.in.hpp"

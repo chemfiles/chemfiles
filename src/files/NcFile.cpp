@@ -4,10 +4,6 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
-
-#include "chemfiles/config.hpp"
-#if CHEMFILES_NETCDF
-
 #include "chemfiles/Error.hpp"
 #include "chemfiles/files/NcFile.hpp"
 using namespace chemfiles;
@@ -228,5 +224,3 @@ bool NcFile::variable_exists(const std::string& name) const {
     auto status = nc_inq_varid(file_id_, name.c_str(), &id);
     return status == NC_NOERR;
 }
-
-#endif // CHEMFILES_NETCDF
