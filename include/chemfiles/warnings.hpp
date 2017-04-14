@@ -9,13 +9,13 @@
 #define CHEMFILES_WARNINGS_H
 
 #include <string>
-#include "fmt/format.h"
+#include <fmt/format.h>
 #include "chemfiles/exports.hpp"
 
 namespace chemfiles {
 
 /// Send a warning with the given message
-void CHFL_EXPORT warning(std::string message);
+void warning(std::string message);
 
 /// Create a message using the given `format` and `arguments`, and send a
 /// warning with this message.
@@ -24,7 +24,7 @@ void CHFL_EXPORT warning(std::string message);
 ///
 /// [fmtlib]: https://github.com/fmtlib/fmt
 template<typename... Args>
-void CHFL_EXPORT warning(const char* format, Args const&... arguments) {
+void warning(const char* format, Args const&... arguments) {
     warning(fmt::format(format, arguments...));
 }
 
