@@ -20,13 +20,22 @@ endif()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTERNAL_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTERNAL_FLAGS}")
 
-# ============================================================================ #
+function(unpack_external_library _name_)
+    if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${_name_}/CMakeLists.txt")
+        message(STATUS "Unpacking ${_name_} sources")
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_SOURCE_DIR}/${_name_}.tar.gz
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        )
+    endif()
+endfunction()
 
-# cppformat library
-include_directories(fmt)
-file(GLOB FMT_SOURCES fmt/fmt/*.cc)
-add_library(fmt OBJECT ${FMT_SOURCES})
-set_target_properties(fmt PROPERTIES COMPILE_FLAGS ${EXTERNAL_FLAGS})
+# ============================================================================ #
+unpack_external_library(fmt)
+add_subdirectory(
+    ${CMAKE_CURRENT_BINARY_DIR}/fmt
+    ${CMAKE_CURRENT_BINARY_DIR}/fmt
+)
 
 # ============================================================================ #
 

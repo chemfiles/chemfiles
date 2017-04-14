@@ -128,7 +128,7 @@ target_include_directories(chemfiles PUBLIC
 target_include_directories(chemfiles PRIVATE ${NETCDF_INCLUDES})
 target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/molfiles/include)
 target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/tng/include)
-target_include_directories(chemfiles PRIVATE external/fmt)
+target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/fmt)
 
 target_link_libraries(chemfiles ${NETCDF_LIBRARIES})
 

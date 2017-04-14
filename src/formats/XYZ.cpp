@@ -8,8 +8,8 @@
 #include <cassert>
 #include <sstream>
 
-#include "fmt/format.h"
-#include "fmt/ostream.h"
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 
 #include "chemfiles/formats/XYZ.hpp"
 
