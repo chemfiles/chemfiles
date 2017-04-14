@@ -53,6 +53,7 @@ add_subdirectory(external)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${PROJECT_BINARY_DIR}/include)
+include_directories(SYSTEM BEFORE ${NETCDF_INCLUDES})
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/)
 include_directories(SYSTEM ${PROJECT_BINARY_DIR}/external/tng/include)
 include_directories(SYSTEM ${PROJECT_BINARY_DIR}/external/molfiles/include)
