@@ -34,7 +34,7 @@ matrix:
   include:
     - os: linux
       compiler: clang
-      env: SHARED_LIBS=ON
+      env: SHARED_LIBS=ON CMAKE_EXTRA=-DCHFL_SYSTEM_NETCDF=ON
       addons: *linux64
     - os: linux
       compiler: clang
@@ -50,11 +50,11 @@ matrix:
       addons: *linux64
     - os: linux
       compiler: gcc
-      env: SHARED_LIBS=ON ARCH="x86"
+      env: SHARED_LIBS=ON ARCH="x86" CMAKE_EXTRA=-DHAVE_LIBM=/lib32/libm.so.6
       addons: *linux32
     - os: linux
       compiler: gcc
-      env: SHARED_LIBS=OFF ARCH="x86"
+      env: SHARED_LIBS=OFF ARCH="x86" CMAKE_EXTRA=-DHAVE_LIBM=/lib32/libm.so.6
       addons: *linux32
     - os: osx
       compiler: clang
@@ -78,7 +78,7 @@ script:
   - cd $TRAVIS_BUILD_DIR
   - mkdir build
   - cd build
-  - cmake $CMAKE_ARGS ..
+  - cmake $CMAKE_ARGS $CMAKE_EXTRA ..
   - make
   - ctest --output-on-failure
   - |

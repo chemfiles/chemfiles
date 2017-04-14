@@ -33,6 +33,7 @@ option(CHFL_BUILD_DOCUMENTATION "Build the documentation." OFF)
 option(CHFL_CODE_COVERAGE "Enable code coverage" OFF)
 option(CHFL_USE_WARNINGS "Compile the code with warnings (default in debug mode)" OFF)
 option(CHFL_DEBUG_GLIBCXX "Use the debug version of GNU libstdcxx" OFF)
+option(CHFL_SYSTEM_NETCDF "Use the system NetCDF instead of the internal one" OFF)
 
 include(CompilerFlags)
 
@@ -96,6 +97,7 @@ target_include_directories(files_impl PUBLIC
 )
 target_include_directories(files_impl PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}/external/tng/include
+    ${NETCDF_INCLUDES}
 )
 target_compile_definitions(files_impl PRIVATE chemfiles_EXPORTS)
 if(${BUILD_SHARED_LIBS})
@@ -112,9 +114,7 @@ add_library(
     $<TARGET_OBJECTS:fmt>
     $<TARGET_OBJECTS:tng_io>
     $<TARGET_OBJECTS:tng_io_zlib>
-    $<TARGET_OBJECTS:netcdf3-chemfiles>
-    $<TARGET_OBJECTS:netcdf3>
-    $<TARGET_OBJECTS:dispatch>
+    ${NETCDF_OBJECTS}
 )
 
 set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
@@ -126,9 +126,12 @@ target_include_directories(chemfiles PUBLIC
     $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
 )
 
+target_include_directories(chemfiles PRIVATE ${NETCDF_INCLUDES})
 target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/molfiles/include)
 target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/tng/include)
 target_include_directories(chemfiles PRIVATE external/fmt)
+
+target_link_libraries(chemfiles ${NETCDF_LIBRARIES})
 
 configure_file (
   "${PROJECT_SOURCE_DIR}/include/chemfiles/config.in.hpp"
