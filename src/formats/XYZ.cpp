@@ -90,11 +90,11 @@ void XYZFormat::write(const Frame& frame) {
     fmt::print(*file_, "Written by the chemfiles library\n", frame.natoms());
 
     for (size_t i = 0; i < frame.natoms(); i++) {
-        auto type = topology[i].type();
-        if (type == "") {type = "X";}
+        auto name = topology[i].name();
+        if (name == "") {name = "X";}
         fmt::print(
             *file_, "{} {} {} {}\n",
-            type, positions[i][0], positions[i][1], positions[i][2]
+            name, positions[i][0], positions[i][1], positions[i][2]
         );
     }
 
