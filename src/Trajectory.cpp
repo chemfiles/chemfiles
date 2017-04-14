@@ -6,6 +6,7 @@
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Error.hpp"
 #include "chemfiles/FormatFactory.hpp"
+#include "chemfiles/Configuration.hpp"
 
 using namespace chemfiles;
 
@@ -84,6 +85,14 @@ Frame Trajectory::read() {
     if (custom_cell_) {
         frame.set_cell(*custom_cell_);
     }
+
+    auto configuration = Configuration::get();
+    for (auto& atom: frame.topology()) {
+        if (configuration.find(atom.name())) {
+            atom.set_type(configuration.type(atom.name()));
+        }
+    }
+
     return frame;
 }
 
@@ -112,6 +121,14 @@ Frame Trajectory::read_step(const size_t step) {
     if (custom_cell_) {
         frame.set_cell(*custom_cell_);
     }
+
+    auto configuration = Configuration::get();
+    for (auto& atom: frame.topology()) {
+        if (configuration.find(atom.name())) {
+            atom.set_type(configuration.type(atom.name()));
+        }
+    }
+
     return frame;
 }
 

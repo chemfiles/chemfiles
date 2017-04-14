@@ -8,29 +8,31 @@
 #ifndef CHEMFILES_CONFIGURATION_HPP
 #define CHEMFILES_CONFIGURATION_HPP
 
-#include <memory>
 #include <string>
-
+#include <unordered_map>
 #include "chemfiles/exports.hpp"
 
 namespace chemfiles {
 
 class CHFL_EXPORT Configuration {
 public:
-    std::unordered_map configuration;
-
     Configuration() = default;
-    Configuration& operator=(const Configuration&) = default;
-    Configuration(const Configuration&) = default;
-
-    /// Checks if there is a configuration file
-    static bool has_configuration();
+    Configuration& operator=(const Configuration&) = delete;
+    Configuration(const Configuration&) = delete;
+    Configuration(Configuration&&) = default;
+    Configuration& operator=(Configuration&&) = default;
 
     /// Reads the configuration file
-    Configuration read_configuration();
+    static Configuration get();
+
+    /// Returns true is name is in the map
+    bool find(std::string name);
 
     /// Returns the type
-    const std::string type(std::string name) { return configuration[name]; }
+    const std::string type(std::string name) { return rename_[name]; }
+
+private:
+    std::unordered_map<std::string, std::string> rename_;
 };
 
 } // namespace chemfiles

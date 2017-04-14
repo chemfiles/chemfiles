@@ -38,6 +38,11 @@ endfunction()
 set(EXTERNAL_INCLUDES "")
 
 # ==========
+# cpptoml:
+# ==========
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR})
+
+# ==========
 # fmtlib: https://github.com/chemfiles/fmt
 # ==========
 external_library(fmt)
