@@ -95,7 +95,9 @@ target_include_directories(files_impl PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
 )
-target_include_directories(files_impl PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/tng_io/include)
+target_include_directories(files_impl PRIVATE
+    ${CMAKE_CURRENT_BINARY_DIR}/external/tng/include
+)
 target_compile_definitions(files_impl PRIVATE chemfiles_EXPORTS)
 if(${BUILD_SHARED_LIBS})
     set_target_properties(files_impl PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
@@ -110,6 +112,7 @@ add_library(
     $<TARGET_OBJECTS:molfiles>
     $<TARGET_OBJECTS:fmt>
     $<TARGET_OBJECTS:tng_io>
+    $<TARGET_OBJECTS:tng_io_zlib>
 )
 
 set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
@@ -122,7 +125,7 @@ target_include_directories(chemfiles PUBLIC
 )
 
 target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/molfiles/include)
-target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/tng_io/include)
+target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/tng/include)
 target_include_directories(chemfiles PRIVATE external/fmt)
 
 if(${CHFL_ENABLE_NETCDF})
