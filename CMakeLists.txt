@@ -88,27 +88,29 @@ add_subdirectory(external)
 # unit test. The files_impl OBJECT library contains the code for files
 # implementation and is linked into both the main chemfiles library and the
 # unit tests.
-file(GLOB files_impl_sources src/files/*.cpp src/utils.cpp)
-add_library(files_impl OBJECT ${files_impl_sources})
-target_include_directories(files_impl PUBLIC
+file(GLOB chemfiles_files_sources src/files/*.cpp src/utils.cpp)
+add_library(chemfiles_files OBJECT ${chemfiles_files_sources})
+target_include_directories(chemfiles_files PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
 )
-target_include_directories(files_impl PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR}/external/tng/include
-    ${NETCDF_INCLUDES}
-)
-target_compile_definitions(files_impl PRIVATE chemfiles_EXPORTS)
+if (NOT CMAKE_VERSION VERSION_LESS 2.8.12)
+    target_include_directories(chemfiles_files SYSTEM BEFORE PRIVATE ${EXTERNAL_INCLUDES})
+else()
+    target_include_directories(chemfiles_files BEFORE PRIVATE ${EXTERNAL_INCLUDES})
+endif()
+
+target_compile_definitions(chemfiles_files PRIVATE chemfiles_EXPORTS)
 if(${BUILD_SHARED_LIBS})
-    set_target_properties(files_impl PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+    set_target_properties(chemfiles_files PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 endif()
 
 # Add the main chemfiles library
 file(GLOB_RECURSE sources src/**.cpp)
-list(REMOVE_ITEM sources ${files_impl_sources})
+list(REMOVE_ITEM sources ${chemfiles_files_sources})
 add_library(
     chemfiles ${sources}
-    $<TARGET_OBJECTS:files_impl>
+    $<TARGET_OBJECTS:chemfiles_files>
     $<TARGET_OBJECTS:molfiles>
     $<TARGET_OBJECTS:fmt>
     $<TARGET_OBJECTS:tng_io>
@@ -125,11 +127,11 @@ target_include_directories(chemfiles PUBLIC
     $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
 )
 
-target_include_directories(chemfiles PRIVATE ${NETCDF_INCLUDES})
-target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/molfiles/include)
-target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/tng/include)
-target_include_directories(chemfiles PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/fmt)
-
+if (NOT CMAKE_VERSION VERSION_LESS 2.8.12)
+    target_include_directories(chemfiles SYSTEM BEFORE PRIVATE ${EXTERNAL_INCLUDES})
+else()
+    target_include_directories(chemfiles BEFORE PRIVATE ${EXTERNAL_INCLUDES})
+endif()
 target_link_libraries(chemfiles ${NETCDF_LIBRARIES})
 
 configure_file (

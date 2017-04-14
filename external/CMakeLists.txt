@@ -13,14 +13,13 @@ if(${BUILD_SHARED_LIBS} AND NOT WIN32)
 endif()
 
 if(WIN32)
-    set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS}
-set(WIN32")
+    set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -DWIN32")
 endif()
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTERNAL_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTERNAL_FLAGS}")
 
-function(unpack_external_library _name_)
+function(external_library _name_)
     if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${_name_}/CMakeLists.txt")
         message(STATUS "Unpacking ${_name_} sources")
         execute_process(
@@ -28,34 +27,30 @@ function(unpack_external_library _name_)
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
     endif()
-endfunction()
-
-# ============================================================================ #
-unpack_external_library(fmt)
-add_subdirectory(
-    ${CMAKE_CURRENT_BINARY_DIR}/fmt
-    ${CMAKE_CURRENT_BINARY_DIR}/fmt
-)
-
-# ============================================================================ #
-
-if(CHFL_SYSTEM_NETCDF)
-    find_package(NetCDF REQUIRED)
-    set(NETCDF_OBJECTS "")
-else()
-    # Build internal NetCDF library
-    if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/netcdf/CMakeLists.txt")
-        message(STATUS "Unpacking NetCDF sources")
-        execute_process(
-            COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_SOURCE_DIR}/netcdf3-4.4.1.1.tar.gz
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        )
-    endif()
 
     add_subdirectory(
-        ${CMAKE_CURRENT_BINARY_DIR}/netcdf
-        ${CMAKE_CURRENT_BINARY_DIR}/netcdf
+        ${CMAKE_CURRENT_BINARY_DIR}/${_name_}
+        ${CMAKE_CURRENT_BINARY_DIR}/${_name_}
     )
+endfunction()
+
+# Include directories for the dependencies
+set(EXTERNAL_INCLUDES "")
+
+# ==========
+# fmtlib: https://github.com/chemfiles/fmt
+# ==========
+external_library(fmt)
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/fmt)
+
+# ==========
+# netcdf: https://github.com/chemfiles/netcdf-c
+# ==========
+if(CHFL_SYSTEM_NETCDF)
+    find_package(NetCDF REQUIRED)
+    set(NETCDF_OBJECTS "" PARENT_SCOPE)
+else()
+    external_library(netcdf)
 
     add_library(netcdf3-chemfiles OBJECT
         ${CMAKE_CURRENT_BINARY_DIR}/netcdf/liblib/nc_initialize.c
@@ -83,8 +78,7 @@ else()
 
     set(NETCDF_INCLUDES
         ${CMAKE_CURRENT_BINARY_DIR}/netcdf/include
-        ${CMAKE_CURRENT_BINARY_DIR}/netcdf/
-        PARENT_SCOPE
+        ${CMAKE_CURRENT_BINARY_DIR}/netcdf
     )
     set(NETCDF_OBJECTS
         $<TARGET_OBJECTS:netcdf3-chemfiles>
@@ -92,24 +86,16 @@ else()
         $<TARGET_OBJECTS:dispatch>
         PARENT_SCOPE
     )
-    set(NETCDF_LIBRARIES "")
+    set(NETCDF_LIBRARIES "" PARENT_SCOPE)
 endif()
 
-# ============================================================================ #
+list(APPEND EXTERNAL_INCLUDES ${NETCDF_INCLUDES})
 
-# TNG library
-if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/tng/CMakeLists.txt")
-    message(STATUS "Unpacking TNG sources")
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_SOURCE_DIR}/tng.tar.gz
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-endif()
-
-add_subdirectory(
-    ${CMAKE_CURRENT_BINARY_DIR}/tng
-    ${CMAKE_CURRENT_BINARY_DIR}/tng
-)
+# ==========
+# TNG io: https://github.com/chemfiles/tng
+# ==========
+external_library(tng)
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/tng/include)
 
 # Hide TNG variables from CMake GUI
 mark_as_advanced(FORCE
@@ -120,40 +106,37 @@ mark_as_advanced(FORCE
     TNG_BUILD_TEST
 )
 
-# ============================================================================ #
-
+# ==========
+# VMD molfile: https://github.com/chemfiles/molfiles
+# ==========
 set(VMD_MOLFILE_PLUGINS
-    dcdplugin gromacsplugin
-    pdbplugin lammpsplugin
+    dcdplugin gromacsplugin lammpsplugin
 )
 
-if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/molfiles/CMakeLists.txt")
-    message(STATUS "Unpacking molfiles sources")
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_SOURCE_DIR}/molfiles.tar.gz
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-endif()
-
-add_subdirectory(
-    ${CMAKE_CURRENT_BINARY_DIR}/molfiles
-    ${CMAKE_CURRENT_BINARY_DIR}/molfiles
-)
+external_library(molfiles)
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/molfiles/include)
 
 # ==========
 # Plugins not yet enabled but that should compile without issue:
 # ==========
+
 #     abinitplugin avsplugin babelplugin basissetplugin bgfplugin binposplugin
 #     biomoccaplugin brixplugin carplugin ccp4plugin cifplugin corplugin
 #     cpmdplugin crdplugin cubeplugin dlpolyplugin dsn6plugin dtrplugin dxplugin
 #     edmplugin fs4plugin gamessplugin graspplugin grdplugin gridplugin jsplugin
 #     maeffplugin mapplugin mdfplugin mol2plugin moldenplugin molemeshplugin
 #     msmsplugin namdbinplugin netcdfplugin offplugin parm7plugin parmplugin
-#     pbeqplugin phiplugin pltplugin pqrplugin psfplugin raster3dplugin rst7plugin
-#     situsplugin spiderplugin stlplugin tinkerplugin uhbdplugin
+#     pbeqplugin phiplugin pltplugin pqrplugin psfplugin raster3dplugin
+#     rst7plugin situsplugin spiderplugin stlplugin tinkerplugin uhbdplugin
 #     vasp5xdatcarplugin vaspchgcarplugin vaspoutcarplugin vaspparchgplugin
 #     vaspposcarplugin vaspxdatcarplugin vaspxmlplugin vtfplugin xbgfplugin
-#     xsfplugin xyzplugin
+#     xsfplugin
+
+
+# ==========
+# Plugins with a chemfiles specific implementation
+# ==========
+#     xyzplugin pdbplugin tngplugin
 
 # ==========
 # These plugins do not compile or link
@@ -168,7 +151,7 @@ add_subdirectory(
 #       hoomdplugin
 # The code is not yet written ...
 #       mmcif
-# Needs to link the TNGio library
-#       tngplugin
 # Needs to link to TCL interpreter
 #       webpdbplugin
+
+set(EXTERNAL_INCLUDES ${EXTERNAL_INCLUDES} PARENT_SCOPE)
