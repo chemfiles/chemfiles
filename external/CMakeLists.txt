@@ -95,7 +95,6 @@ else()
     set(NETCDF_LIBRARIES "")
 endif()
 
-
 # ============================================================================ #
 
 # TNG library
@@ -123,8 +122,12 @@ mark_as_advanced(FORCE
 
 # ============================================================================ #
 
-# VMD Molfile plugins
-if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/molfiles/LICENSE")
+set(VMD_MOLFILE_PLUGINS
+    dcdplugin gromacsplugin
+    pdbplugin lammpsplugin
+)
+
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/molfiles/CMakeLists.txt")
     message(STATUS "Unpacking molfiles sources")
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_SOURCE_DIR}/molfiles.tar.gz
@@ -132,101 +135,40 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/molfiles/LICENSE")
     )
 endif()
 
-set(VMD_MOLFILE_PLUGINS_ENABLED
-    molfiles/src/dcdplugin.c
-    molfiles/src/gromacsplugin.cxx
-    molfiles/src/pdbplugin.c
-    molfiles/src/lammpsplugin.c
+add_subdirectory(
+    ${CMAKE_CURRENT_BINARY_DIR}/molfiles
+    ${CMAKE_CURRENT_BINARY_DIR}/molfiles
 )
 
-# These plugins are not yet activated, but can be compiled into chemfiles easily
-set(VMD_MOLFILE_PLUGINS_DISABLED
-    molfiles/src/abinitplugin.c
-    molfiles/src/avsplugin.cxx
-    molfiles/src/babelplugin.c
-    molfiles/src/basissetplugin.c
-    molfiles/src/bgfplugin.cxx
-    molfiles/src/binposplugin.c
-    molfiles/src/biomoccaplugin.cxx
-    molfiles/src/brixplugin.cxx
-    molfiles/src/carplugin.c
-    molfiles/src/ccp4plugin.cxx
-    molfiles/src/cifplugin.cxx
-    molfiles/src/corplugin.c
-    molfiles/src/cpmdplugin.c
-    molfiles/src/crdplugin.c
-    molfiles/src/cubeplugin.cxx
-    molfiles/src/dlpolyplugin.c
-    molfiles/src/dsn6plugin.cxx
-    molfiles/src/dtrplugin.cxx
-    molfiles/src/dxplugin.cxx
-    molfiles/src/edmplugin.cxx
-    molfiles/src/fs4plugin.cxx
-    molfiles/src/gamessplugin.c
-    molfiles/src/graspplugin.cxx
-    molfiles/src/grdplugin.cxx
-    molfiles/src/gridplugin.cxx
-    molfiles/src/jsplugin.c
-    molfiles/src/maeffplugin.cxx
-    molfiles/src/mapplugin.cxx
-    molfiles/src/mdfplugin.cxx
-    molfiles/src/mol2plugin.cxx
-    molfiles/src/moldenplugin.c
-    molfiles/src/molemeshplugin.cxx
-    molfiles/src/msmsplugin.cxx
-    molfiles/src/namdbinplugin.c
-    molfiles/src/netcdfplugin.c
-    molfiles/src/offplugin.cxx
-    molfiles/src/parm7plugin.cxx
-    molfiles/src/parmplugin.cxx
-    molfiles/src/pbeqplugin.cxx
-    molfiles/src/phiplugin.cxx
-    molfiles/src/pltplugin.cxx
-    molfiles/src/pqrplugin.c
-    molfiles/src/psfplugin.c
-    molfiles/src/raster3dplugin.cxx
-    molfiles/src/rst7plugin.c
-    molfiles/src/situsplugin.cxx
-    molfiles/src/spiderplugin.cxx
-    molfiles/src/stlplugin.cxx
-    molfiles/src/tinkerplugin.c
-    molfiles/src/uhbdplugin.cxx
-    molfiles/src/vasp5xdatcarplugin.c
-    molfiles/src/vaspchgcarplugin.c
-    molfiles/src/vaspoutcarplugin.c
-    molfiles/src/vaspparchgplugin.c
-    molfiles/src/vaspposcarplugin.c
-    molfiles/src/vaspxdatcarplugin.c
-    molfiles/src/vaspxmlplugin.c
-    molfiles/src/vtfplugin.c
-    molfiles/src/xbgfplugin.cxx
-    molfiles/src/xsfplugin.cxx
-    molfiles/src/xyzplugin.c
-)
+# ==========
+# Plugins not yet enabled but that should compile without issue:
+# ==========
+#     abinitplugin avsplugin babelplugin basissetplugin bgfplugin binposplugin
+#     biomoccaplugin brixplugin carplugin ccp4plugin cifplugin corplugin
+#     cpmdplugin crdplugin cubeplugin dlpolyplugin dsn6plugin dtrplugin dxplugin
+#     edmplugin fs4plugin gamessplugin graspplugin grdplugin gridplugin jsplugin
+#     maeffplugin mapplugin mdfplugin mol2plugin moldenplugin molemeshplugin
+#     msmsplugin namdbinplugin netcdfplugin offplugin parm7plugin parmplugin
+#     pbeqplugin phiplugin pltplugin pqrplugin psfplugin raster3dplugin rst7plugin
+#     situsplugin spiderplugin stlplugin tinkerplugin uhbdplugin
+#     vasp5xdatcarplugin vaspchgcarplugin vaspoutcarplugin vaspparchgplugin
+#     vaspposcarplugin vaspxdatcarplugin vaspxmlplugin vtfplugin xbgfplugin
+#     xsfplugin xyzplugin
 
+# ==========
 # These plugins do not compile or link
-set(VMD_MOLFILE_PLUGINS_FAILED
-    # error: no member named 'have_esp' in 'molfile_qm_metadata_t'
-    molfiles/src/cpmdlogplugin.c
-    # Needs to link the sqlite3 library
-    molfiles/src/dmsplugin.cxx
-    # error: no member named 'have_esp' in 'molfile_qm_metadata_t'
-    molfiles/src/gaussianplugin.c
-    # Needs to link to some XML parser
-    molfiles/src/hoomdplugin.c
-    # The code is not yet written ...
-    molfiles/src/mmcif.cxx
-    # Needs to link the TNGio library
-    molfiles/src/tngplugin.cxx
-    # Needs to link to TCL interpreter
-    molfiles/src/webpdbplugin.c
-)
-
-set(MOLFILE_FLAGS "-DSTATIC_PLUGIN ${EXTERNAL_FLAGS}")
-foreach(file IN ITEMS ${VMD_MOLFILE_PLUGINS_ENABLED})
-    get_filename_component(plugin ${file} NAME_WE)
-    set_source_files_properties(${file} PROPERTIES COMPILE_FLAGS "-DVMDPLUGIN=${plugin} ${MOLFILE_FLAGS}")
-endforeach()
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/molfiles/include)
-add_library(molfiles OBJECT ${VMD_MOLFILE_PLUGINS_ENABLED})
+# ==========
+# error: no member named 'have_esp' in 'molfile_qm_metadata_t'
+#       cpmdlogplugin
+# Needs to link the sqlite3 library
+#       dmsplugin
+# error: no member named 'have_esp' in 'molfile_qm_metadata_t'
+#       gaussianplugin
+# Needs to link to some XML parser
+#       hoomdplugin
+# The code is not yet written ...
+#       mmcif
+# Needs to link the TNGio library
+#       tngplugin
+# Needs to link to TCL interpreter
+#       webpdbplugin
