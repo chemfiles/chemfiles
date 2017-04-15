@@ -149,6 +149,7 @@ generate_export_header(chemfiles
 # Installation configuration
 #----------------------------------------------------------------------------------------#
 install(TARGETS chemfiles EXPORT chemfiles-targets
+    RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib${LIB_SUFFIX}
     ARCHIVE DESTINATION lib${LIB_SUFFIX}
 )
