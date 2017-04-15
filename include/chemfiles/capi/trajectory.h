@@ -88,8 +88,8 @@ CHFL_EXPORT chfl_status chfl_trajectory_set_topology(
     CHFL_TRAJECTORY* const trajectory, const CHFL_TOPOLOGY* const topology
 );
 
-/// Set the topology associated with a trajectory by reading the first frame of
-/// the file at the given `path` using the file format in `format`; and
+/// Set the topology associated with a `trajectory` by reading the first frame
+/// of the file at the given `path` using the file format in `format`; and
 /// extracting the topology of this frame.
 ///
 /// If `format` is an empty string or `NULL`, the format will be guessed from
