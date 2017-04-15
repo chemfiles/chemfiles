@@ -60,6 +60,12 @@ else()
         ${CMAKE_CURRENT_BINARY_DIR}/netcdf/
     )
 
+    if(WINDOWS)
+        target_compile_definitions(netcdf3-chemfiles PRIVATE "-DDLL_NETCDF -DDLL_EXPORT")
+        target_compile_definitions(netcdf3 PRIVATE "-DDLL_NETCDF -DDLL_EXPORT")
+        target_compile_definitions(dispatch PRIVATE "-DDLL_NETCDF -DDLL_EXPORT")
+    endif()
+
     # Hide NetCDF variables from CMake GUI
     mark_as_advanced(FORCE
         BUILDNAME BUILDNAME_PREFIX BUILDNAME_SUFFIX BUILD_TESTING BUILD_UTILITIES
