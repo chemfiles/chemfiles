@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+* Amber NetCDF format is now activated by default, by embedding the netcdf
+  library in chemfiles.
+
 ## 0.7 (25 Feb 2017)
 
 ### New features
