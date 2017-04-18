@@ -40,7 +40,7 @@ set(EXTERNAL_INCLUDES "")
 # ==========
 # cpptoml:
 # ==========
-list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR})
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR})
 
 # ==========
 # fmtlib: https://github.com/chemfiles/fmt
