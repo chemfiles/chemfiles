@@ -121,7 +121,7 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
         positions[i] = vector3d(1, 2, 3);
 
     Topology topology;
-    topology.append(Atom("A"));
+    topology.append(Atom("A","O"));
     topology.append(Atom("B"));
     topology.append(Atom("C"));
     topology.append(Atom("D"));
