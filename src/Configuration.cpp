@@ -20,10 +20,19 @@ Configuration Configuration::get() {
         try {
             auto toml = cpptoml::parse_file(PATH);
 
-            for (auto& entry: *toml) {
+            auto types = toml->get_table("types");
+            if (!types) {
+                return configuration;
+            }
+            for (auto& entry: *types) {
                 auto name = entry.first;
-                auto type = entry.second->as<std::string>()->get();
-                configuration.rename_.insert({name, type});
+                auto type_val = entry.second->as<std::string>();
+                if (type_val) {
+                    auto type = type_val->get();
+                    configuration.rename_.insert({name, type});
+                } else {
+                    throw ConfigurationError("Invalid entry: type must be a string.");
+                }
             }
         } catch (const cpptoml::parse_exception& e) {
             throw ConfigurationError("Failed to parse " + std::string(PATH) + ": " + e.what());
