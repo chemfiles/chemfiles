@@ -43,6 +43,16 @@ set(EXTERNAL_INCLUDES "")
 external_library(fmt)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/fmt)
 
+# Hide FMT variables from CMake GUI
+mark_as_advanced(FORCE
+    FMT_CPPFORMAT
+    FMT_DOC
+    FMT_INSTALL
+    FMT_PEDANTIC
+    FMT_USE_CPP11
+    FMT_TEST
+)
+
 # ==========
 # netcdf: https://github.com/chemfiles/netcdf-c
 # ==========
