@@ -10,12 +10,20 @@
 #include "cpptoml/cpptoml.h"
 #include <fstream>
 #include <unordered_map>
+#include <cstdlib>
 using namespace chemfiles;
 
-const char PATH[] = "~/.chemfilesrc";
+static std::string find_file() {
+    std::string PATH;
+    if (const char* env_home = std::getenv("HOME")) {
+        PATH = std::string(env_home) + "/.chemfilesrc";
+    }
+    return PATH;
+}
 
 Configuration Configuration::get() {
     Configuration configuration;
+    std::string PATH = find_file();
     if (std::ifstream(PATH)) {
         try {
             auto toml = cpptoml::parse_file(PATH);
