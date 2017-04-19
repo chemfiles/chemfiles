@@ -76,7 +76,7 @@ function(chfl_test _name_ _file_)
         add_executable(${_name_} ${_file_})
     endif()
 
-    target_link_libraries(${_name_} chemfiles boost_filesystem test_helpers)
+    target_link_libraries(${_name_} test_helpers chemfiles boost_filesystem)
     set_property(TARGET ${_name_} PROPERTY CXX_STANDARD 11)
     add_test(NAME ${_name_}
         COMMAND ${RUNNER_COMMAND} ./${_name_}

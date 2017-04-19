@@ -50,8 +50,10 @@ TEST_CASE("Read files in NetCDF format", "[Amber NetCDF]") {
 
 
 TEST_CASE("Write files in NetCDF format", "[Amber NetCDF]") {
-    SECTION("Write the file") {
-        Trajectory file("tmp.nc", 'w');
+    auto tmpfile = NamedTempPath(".nc");
+
+    {
+        Trajectory file(tmpfile, 'w');
         Frame frame(4);
         auto positions = frame.positions();
         for(size_t i=0; i<4; i++) {
@@ -61,14 +63,13 @@ TEST_CASE("Write files in NetCDF format", "[Amber NetCDF]") {
         file.write(frame);
     }
 
-    SECTION("Check the file") {
-        Trajectory check("tmp.nc", 'r');
+    {
+        Trajectory check(tmpfile, 'r');
         auto frame = check.read();
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], vector3d(1, 2, 3), 1e-4));
         CHECK(approx_eq(positions[1], vector3d(1, 2, 3), 1e-4));
         CHECK(approx_eq(positions[2], vector3d(1, 2, 3), 1e-4));
         CHECK(approx_eq(positions[3], vector3d(1, 2, 3), 1e-4));
-        remove("tmp.nc");
     }
 }

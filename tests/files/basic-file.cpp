@@ -2,6 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include "catch.hpp"
+#include "helpers.hpp"
 #include "chemfiles/files/BasicFile.hpp"
 using namespace chemfiles;
 
@@ -24,23 +25,23 @@ TEST_CASE("Read a text file", "[Files]"){
 }
 
 TEST_CASE("Write a text file", "[Files]"){
+    auto filename = NamedTempPath(".dat");
 
     {
-        BasicFile file("tmp.dat", File::WRITE);
+        BasicFile file(filename, File::WRITE);
         file << "Test" << std::endl;
         file << 5467 << std::endl;
     }
 
-    std::ifstream verification("tmp.dat");
-    REQUIRE(verification.is_open());
+    {
+        std::ifstream verification(filename);
+        REQUIRE(verification.is_open());
 
-    std::string line;
-    std::getline(verification, line);
-    CHECK(line == "Test");
+        std::string line;
+        std::getline(verification, line);
+        CHECK(line == "Test");
 
-    std::getline(verification, line);
-    CHECK(line == "5467");
-    verification.close();
-
-    remove("tmp.dat");
+        std::getline(verification, line);
+        CHECK(line == "5467");
+    }
 }

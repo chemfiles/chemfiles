@@ -2,6 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include "catch.hpp"
+#include "helpers.hpp"
 #include "chemfiles.hpp"
 #include "chemfiles/files/NcFile.hpp"
 using namespace chemfiles;
@@ -42,8 +43,10 @@ TEST_CASE("Errors in NetCDF files", "[Files]"){
 }
 
 TEST_CASE("Write NetCDF files", "[Files]"){
+    auto tmpfile = NamedTempPath(".nc");
+
     {
-        NcFile file("tmp.nc", File::WRITE);
+        NcFile file(tmpfile, File::WRITE);
         file.set_nc_mode(NcFile::DEFINE);
         file.add_global_attribute("global", "global.value");
         file.add_dimension("infinite");
@@ -52,13 +55,13 @@ TEST_CASE("Write NetCDF files", "[Files]"){
         variable.add_attribute("attribute", "hello");
     }
 
-    NcFile file("tmp.nc", File::READ);
-    CHECK(file.global_attribute("global") == "global.value");
-    CHECK(file.dimension("infinite") == 0);
-    CHECK(file.dimension("finite") == 42);
-    CHECK(file.variable_exists("variable"));
-    CHECK_FALSE(file.variable_exists("bar"));
-    CHECK(file.variable<nc::NcFloat>("variable").attribute("attribute") == "hello");
-
-    remove("tmp.nc");
+    {
+        NcFile file(tmpfile, File::READ);
+        CHECK(file.global_attribute("global") == "global.value");
+        CHECK(file.dimension("infinite") == 0);
+        CHECK(file.dimension("finite") == 42);
+        CHECK(file.variable_exists("variable"));
+        CHECK_FALSE(file.variable_exists("bar"));
+        CHECK(file.variable<nc::NcFloat>("variable").attribute("attribute") == "hello");
+    }
 }

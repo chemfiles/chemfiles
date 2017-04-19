@@ -3,9 +3,9 @@
 
 #include <streambuf>
 #include <fstream>
-#include <cstdio>
 
 #include "catch.hpp"
+#include "helpers.hpp"
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
@@ -101,7 +101,8 @@ TEST_CASE("Errors in XYZ format", "[XYZ]"){
     }
 }
 
-TEST_CASE("Write files in XYZ format", "[XYZ]"){
+TEST_CASE("Write files in XYZ format", "[XYZ]") {
+    auto tmpfile = NamedTempPath(".xyz");
     const auto expected_content =
     "4\n"
     "Written by the chemfiles library\n"
@@ -131,7 +132,7 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
     frame.set_topology(topology);
 
     {
-        auto file = Trajectory("test-tmp.xyz", 'w');
+        auto file = Trajectory(tmpfile, 'w');
         file.write(frame);
     }
 
@@ -146,16 +147,12 @@ TEST_CASE("Write files in XYZ format", "[XYZ]"){
     frame.set_topology(topology);
 
     {
-        auto file = Trajectory("test-tmp.xyz", 'a');
+        auto file = Trajectory(tmpfile, 'a');
         file.write(frame);
     }
 
-    std::ifstream checking("test-tmp.xyz");
+    std::ifstream checking(tmpfile);
     std::string content((std::istreambuf_iterator<char>(checking)),
                          std::istreambuf_iterator<char>());
-    checking.close();
-
     CHECK(content == expected_content);
-
-    remove("test-tmp.xyz");
 }

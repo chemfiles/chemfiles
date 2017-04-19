@@ -11,6 +11,26 @@ namespace chemfiles {
 
 bool approx_eq(const chemfiles::Vector3D& a, const chemfiles::Vector3D& b, double tolerance=1e-15);
 
+/// A temporary file path with an user specified extension, automatically
+/// deleted at scope exit.
+class NamedTempPath {
+public:
+    NamedTempPath(std::string extension);
+    ~NamedTempPath();
+
+    NamedTempPath(NamedTempPath&&) = default;
+    NamedTempPath& operator=(NamedTempPath&&) = default;
+
+    // Convert the path to a std::string
+    operator std::string() const {return path_;}
+
+    // Convert the path to a const char*
+    const char* c_str() const {return path_.c_str();}
+
+private:
+    std::string path_;
+};
+
 // On Windows, disable the "Application error" dialog box, because it
 // requires an human intervention, and there is no one on Appveyor.
 //

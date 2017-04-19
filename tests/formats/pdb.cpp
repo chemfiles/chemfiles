@@ -106,7 +106,8 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
     }
 }
 
-TEST_CASE("Write files in PDB format", "[PDB]"){
+TEST_CASE("Write files in PDB format", "[PDB]") {
+    auto tmpfile = NamedTempPath(".pdb");
     const auto EXPECTED_CONTENT =
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
     "HETATM    1    A RES X   1       1.000   2.000   3.000  1.00  0.00           A\n"
@@ -150,7 +151,7 @@ TEST_CASE("Write files in PDB format", "[PDB]"){
     }
 
     {
-        auto file = Trajectory("test-tmp.pdb", 'w');
+        auto file = Trajectory(tmpfile, 'w');
         file.write(frame);
     }
 
@@ -182,27 +183,25 @@ TEST_CASE("Write files in PDB format", "[PDB]"){
     frame.set_topology(topology);
 
     {
-        auto file = Trajectory("test-tmp.pdb", 'a');
+        auto file = Trajectory(tmpfile, 'a');
         file.write(frame);
     }
 
-    std::ifstream checking("test-tmp.pdb");
+    std::ifstream checking(tmpfile);
     std::string content((std::istreambuf_iterator<char>(checking)),
                          std::istreambuf_iterator<char>());
-    checking.close();
-
     CHECK(content == EXPECTED_CONTENT);
-    remove("test-tmp.pdb");
 }
 
-TEST_CASE("PDB files with big values", "[PDB]"){
+TEST_CASE("PDB files with big values", "[PDB]") {
+    auto tmpfile = NamedTempPath(".pdb");
+    auto trajectory = Trajectory(tmpfile, 'w');
+
     auto frame = Frame(1);
     frame.set_cell(UnitCell(1234567890));
-    CHECK_THROWS_AS(Trajectory("test-tmp.pdb", 'w').write(frame), FormatError);
+    CHECK_THROWS_AS(trajectory.write(frame), FormatError);
 
     frame.set_cell(UnitCell(12));
     frame.positions()[0] = vector3d(123456789, 2, 3);
-    CHECK_THROWS_AS(Trajectory("test-tmp.pdb", 'w').write(frame), FormatError);
-
-    remove("test-tmp.pdb");
+    CHECK_THROWS_AS(trajectory.write(frame), FormatError);
 }

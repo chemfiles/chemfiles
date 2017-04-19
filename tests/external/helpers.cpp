@@ -6,6 +6,9 @@
 #include "helpers.hpp"
 #include "chemfiles.hpp"
 
+#include <boost/filesystem.hpp>
+namespace fs=boost::filesystem;
+
 #ifdef CHEMFILES_WINDOWS
 #include <windows.h>
 #endif
@@ -28,4 +31,18 @@ bool approx_eq(const chemfiles::Vector3D& a, const chemfiles::Vector3D& b, doubl
     return (fabs(a[0] - b[0]) < tolerance)
         && (fabs(a[1] - b[1]) < tolerance)
         && (fabs(a[2] - b[2]) < tolerance);
+}
+
+NamedTempPath::NamedTempPath(std::string extension) {
+    // Maybe operator overloading have been too far?
+    auto path = fs::temp_directory_path() / fs::unique_path();
+    // Convert std::wstring to std::string, needed on windows. This is fine
+    // because we are only using this class internally, with characters in the
+    // ASCII range.
+    path_ = std::string(path.native().begin(), path.native().end());
+    path_ += extension;
+}
+
+NamedTempPath::~NamedTempPath() {
+    remove(path_.c_str());
 }

@@ -3,6 +3,8 @@
 
 #include <fstream>
 #include <catch.hpp>
+
+#include "helpers.hpp"
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
@@ -43,7 +45,8 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
         }
     }
 
-    SECTION("Writing"){
+    SECTION("Writing") {
+        auto tmpfile = NamedTempPath(".xyz");
         const auto EXPECTED_CONTENT =
         "5\n"
         "Written by the chemfiles library\n"
@@ -64,25 +67,22 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
             top.append(Atom("Fe"));
 
         {
-            Trajectory file("tmp.xyz", 'w');
+            Trajectory file(tmpfile, 'w');
             file.set_topology(top);
             file.write(frame);
         }
 
-        std::ifstream checking("tmp.xyz");
+        std::ifstream checking(tmpfile);
         std::string content{
             std::istreambuf_iterator<char>(checking),
             std::istreambuf_iterator<char>()
         };
-        checking.close();
-
         CHECK(content == EXPECTED_CONTENT);
-        remove("tmp.xyz");
     }
 }
 
-TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]"){
-    SECTION("Reading"){
+TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]") {
+    SECTION("Reading") {
         Trajectory file("data/xyz/trajectory.xyz");
         file.set_cell(UnitCell(25, 32, 94));
         auto frame = file.read();
@@ -90,7 +90,8 @@ TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]"){
         CHECK(frame.cell() == UnitCell(25, 32, 94));
     }
 
-    SECTION("Writing"){
+    SECTION("Writing") {
+        auto tmpfile = NamedTempPath(".pdb");
         const auto EXPECTED_CONTENT =
         "CRYST1    3.000    4.000    5.000  90.00  90.00  90.00 P 1           1\n"
         "HETATM    1      RES X   1       1.000   2.000   3.000  1.00  0.00            \n"
@@ -105,20 +106,17 @@ TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]"){
         }
 
         {
-            Trajectory file("tmp.pdb", 'w');
+            Trajectory file(tmpfile, 'w');
             file.set_cell(UnitCell(3, 4, 5));
             file.write(frame);
         }
 
-        std::ifstream checking("tmp.pdb");
+        std::ifstream checking(tmpfile);
         std::string content{
             std::istreambuf_iterator<char>(checking),
             std::istreambuf_iterator<char>()
         };
-        checking.close();
-
         CHECK(content == EXPECTED_CONTENT);
-        remove("tmp.pdb");
     }
 }
 
@@ -134,11 +132,11 @@ TEST_CASE("Errors", "[Trajectory]"){
     }
 
     SECTION("Bad opening mode") {
+        auto tmpfile = NamedTempPath(".xyz");
         // Try to read a write-only file
-        Trajectory file("tmp.xyz", 'w');
+        Trajectory file(tmpfile, 'w');
         CHECK_THROWS_AS(file.read(), FileError);
         CHECK_THROWS_AS(file.read_step(5), FileError);
-        remove("tmp.xyz");
 
         // Try to write a read-only file
         file = Trajectory("data/xyz/trajectory.xyz", 'r');

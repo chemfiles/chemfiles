@@ -217,7 +217,7 @@ TEST_CASE("Read trajectory", "[CAPI]") {
 }
 
 TEST_CASE("Write trajectory", "[CAPI]") {
-    const char* filename = "test-tmp.xyz";
+    auto filename = NamedTempPath(".xyz");
     const char* EXPECTED_CONTENT =
     "4\n"
     "Written by the chemfiles library\n"
@@ -226,7 +226,7 @@ TEST_CASE("Write trajectory", "[CAPI]") {
     "He 1 2 3\n"
     "He 1 2 3\n";
 
-    CHFL_TRAJECTORY* trajectory = chfl_trajectory_open(filename, 'w');
+    CHFL_TRAJECTORY* trajectory = chfl_trajectory_open(filename.c_str(), 'w');
     REQUIRE(trajectory != NULL);
 
     CHFL_FRAME* frame = testing_frame();
@@ -244,8 +244,6 @@ TEST_CASE("Write trajectory", "[CAPI]") {
     file.close();
 
     CHECK(content.str() == EXPECTED_CONTENT);
-
-    remove(filename);
 }
 
 static CHFL_FRAME* testing_frame() {
