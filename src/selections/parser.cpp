@@ -55,19 +55,19 @@ static bool is_function(const Token& token) {
  *       /  \        /  \
  *    name   bar    x    56
  */
-static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t end) {
+static std::vector<Token> shunting_yard(std::vector<Token> tokens) {
     std::stack<Token> operators;
     std::vector<Token> output;
-    while (token != end) {
-        if (token->is_number() || token->is_variable()) {
-            output.push_back(*token);
-        } else if (token->is_ident()) {
-            if (is_function(*token)) {
-                operators.push(*token);
+    for (auto token: tokens) {
+        if (token.is_number() || token.is_variable()) {
+            output.emplace_back(std::move(token));
+        } else if (token.is_ident()) {
+            if (is_function(token)) {
+                operators.emplace(std::move(token));
             } else {
-                output.push_back(*token);
+                output.emplace_back(std::move(token));
             }
-        } else if (token->type() == Token::COMMA) {
+        } else if (token.type() == Token::COMMA) {
             while (operators.top().type() != Token::LPAREN) {
                 output.push_back(operators.top());
                 operators.pop();
@@ -77,22 +77,21 @@ static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t
                     );
                 }
             }
-        } else if (token->is_operator()) {
+        } else if (token.is_operator()) {
             while (!operators.empty()) {
                 // All the operators are left-associative
-                if (token->precedence() <= operators.top().precedence()) {
+                if (token.precedence() <= operators.top().precedence()) {
                     output.push_back(operators.top());
                     operators.pop();
                 } else {
                     break;
                 }
             }
-            operators.push(*token);
-        } else if (token->type() == Token::LPAREN) {
-            operators.push(*token);
-        } else if (token->type() == Token::RPAREN) {
-            while (!operators.empty() &&
-                   operators.top().type() != Token::LPAREN) {
+            operators.emplace(std::move(token));
+        } else if (token.type() == Token::LPAREN) {
+            operators.emplace(std::move(token));
+        } else if (token.type() == Token::RPAREN) {
+            while (!operators.empty() && operators.top().type() != Token::LPAREN) {
                 output.push_back(operators.top());
                 operators.pop();
             }
@@ -108,7 +107,6 @@ static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t
                 operators.pop();
             }
         }
-        token++;
     }
     while (!operators.empty()) {
         if (operators.top().type() == Token::LPAREN ||
@@ -215,16 +213,17 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
     }
 }
 
-Ast selections::parse(std::vector<Token> token_stream) {
-    token_stream = add_missing_equals(token_stream);
-    auto rpn = shunting_yard(std::begin(token_stream), std::end(token_stream));
+Ast selections::parse(std::vector<Token> tokens) {
+    tokens = add_missing_equals(std::move(tokens));
+    tokens = shunting_yard(std::move(tokens));
 
-    auto begin = rpn.cbegin();
-    const auto end = rpn.cend();
+    auto begin = tokens.cbegin();
+    const auto end = tokens.cend();
     auto ast = dispatch_parsing(begin, end);
 
     if (begin != end) {
         throw SelectionError("Could not parse the end of the selection.");
     }
+
     return ast;
 }
