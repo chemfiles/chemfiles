@@ -101,7 +101,7 @@ static std::vector<Token> shunting_yard(token_iterator_t token, token_iterator_t
                 operators.pop();
             }
 
-            if (is_function(operators.top())) {
+            if (!operators.empty() && is_function(operators.top())) {
                 output.push_back(operators.top());
                 operators.pop();
             }

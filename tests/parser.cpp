@@ -417,6 +417,8 @@ TEST_CASE("Parsing", "[selection]") {
             "vy == bar",
             "vx <=",
             "vz bar",
+            // https://github.com/chemfiles/chemfiles/issues/79
+            "type(#1) Al and type(#2) O and type(#3) H )",
         };
 
         for (auto& failure: parse_fail) {
