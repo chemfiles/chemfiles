@@ -10,15 +10,13 @@
 #include "cpptoml/cpptoml.h"
 #include <fstream>
 #include <unordered_map>
-#include <cstdlib>
+#include "chemfiles/utils.hpp"
+
 using namespace chemfiles;
 
 static std::string find_file() {
-    std::string PATH;
-    if (const char* env_home = std::getenv("HOME")) {
-        PATH = std::string(env_home) + "/.chemfilesrc";
-    }
-    return PATH;
+    auto HOME = home_path();
+    return HOME+"/.chemfilesrc";
 }
 
 Configuration Configuration::get() {
