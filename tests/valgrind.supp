@@ -5,3 +5,12 @@
    fun:getpwuid
    ...
 }
+
+{
+   wcscmp
+   Memcheck:Addr8
+   fun:wcscmp
+   ...
+   fun:exit
+   ...
+}
