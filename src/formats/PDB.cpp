@@ -358,7 +358,7 @@ void PDBFormat::write(const Frame& frame) {
         auto lines = std::ceil(connections/4.0);
         if (connections == 0) {
             continue;
-        };
+        }
 
         for (size_t conect_line = 0; conect_line < lines; conect_line++) {
             fmt::print(*file_, "CONECT{: >5}", to_pdb_index(i));
