@@ -123,10 +123,15 @@ TEST_CASE("Write files in PDB format", "[PDB]"){
     "HETATM    4    D bar X  -1       4.000   5.000   6.000  1.00  0.00           D\n"
     "HETATM    5    E RES X   5       4.000   5.000   6.000  1.00  0.00           E\n"
     "HETATM    6    F RES X   6       4.000   5.000   6.000  1.00  0.00           F\n"
-    "CONECT    1    2\n"
-    "CONECT    2    1\n"
-    "CONECT    5    6\n"
-    "CONECT    6    5\n"
+    "HETATM    7    G RES X   7       4.000   5.000   6.000  1.00  0.00           G\n"
+    "CONECT    1    2    7\n"
+    "CONECT    2    1    7\n"
+    "CONECT    3    7\n"
+    "CONECT    4    7\n"
+    "CONECT    5    6    7\n"
+    "CONECT    6    5    7\n"
+    "CONECT    7    1    2    3    4\n"
+    "CONECT    7    5    6\n"
     "END\n";
 
     Topology topology;
@@ -149,14 +154,21 @@ TEST_CASE("Write files in PDB format", "[PDB]"){
         file.write(frame);
     }
 
-    frame.resize(6);
+    frame.resize(7);
     positions = frame.positions();
-    for(size_t i=0; i<6; i++)
+    for(size_t i=0; i<7; i++)
         positions[i] = vector3d(4, 5, 6);
 
     topology.append(Atom("E"));
     topology.append(Atom("F"));
+    topology.append(Atom("G"));
     topology.add_bond(4, 5);
+    topology.add_bond(0, 6);
+    topology.add_bond(1, 6);
+    topology.add_bond(2, 6);
+    topology.add_bond(3, 6);
+    topology.add_bond(4, 6);
+    topology.add_bond(5, 6);
 
     Residue residue("foo", 3);
     residue.add_atom(1);
