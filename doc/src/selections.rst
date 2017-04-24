@@ -20,9 +20,9 @@ one, two, three or four independent atoms; and ``bonds``, ``angles`` and
 
 A selection is built using a context and a set of constraints separated by a
 colon. For example, ``atoms: name == H`` will select all atoms whose name is
-``H``. ``angles: name(#2) == O and distance(#1, #3) < 1.5`` will select all sets
+``H``. ``angles: name(#2) == O and mass(#3) < 1.5`` will select all sets
 of three bonded atoms forming an angle such that the name of the second atom is
-``O`` and the distance between the first and the third atom is less than 1.5.
+``O`` and the mass of the third atom is less than 1.5.
 
 These constraints are created using *selectors*. Selectors are small functions
 which can be applied to one or more atoms. The ``name``, ``mass`` and ``z``
@@ -76,11 +76,11 @@ Elisions
 --------
 
 This multiple selection language can be a bit verbose for simpler cases, so it
-is sometimes allowed to remove parts of the selection. First, in the ``atom``
-context, the ``#1`` variable is optional, and ``atom: name(#1) == H`` is
-equivalent to ``atom: name == H``.
+is sometimes allowed to remove parts of the selection. First, in the ``atoms``
+context, the ``#1`` variable is optional, and ``atoms: name(#1) == H`` is
+equivalent to ``atoms: name == H``.
 
-Then, if no context is given, the ``atom`` context is used. This make ``atom:
+Then, if no context is given, the ``atoms`` context is used. This make ``atoms:
 name == H`` equivalent to ``name == H``.
 
 And finally, the ``==`` comparison operator is the default one if no operator is
