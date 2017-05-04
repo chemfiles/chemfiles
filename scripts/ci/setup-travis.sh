@@ -31,9 +31,9 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew install netcdf
     if test "${CC}" == "gcc"; then
         brew rm gcc
-        brew install gcc
-        export CC=gcc-6
-        export CXX=g++-6
+        brew install gcc@5
+        export CC=gcc-5
+        export CXX=g++-5
     fi
 fi
 
