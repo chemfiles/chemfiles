@@ -38,7 +38,7 @@ matrix:
       addons: *linux64
     - os: linux
       compiler: clang
-      env: SHARED_LIBS=OFF
+      env: SHARED_LIBS=OFF DEPLOY_DOCS=ON
       addons: *linux64
     - os: linux
       compiler: gcc
@@ -76,22 +76,31 @@ before_install:
 
 script:
   - cd $TRAVIS_BUILD_DIR
-  - mkdir build
-  - cd build
+  - mkdir build && cd build
   - cmake $CMAKE_ARGS $CMAKE_EXTRA ..
   - make
   - ctest --output-on-failure
+  - cd $TRAVIS_BUILD_DIR
+  # Check C API documentation
+  - ./scripts/ci/check-capi.py
+  # Build docs
   - |
-    if ${EXTRA_WORK}; then
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        ./scripts/ci/build-docs.sh
+    fi
+  # Generate and upload coverage
+  - |
+    if ${DO_COVERAGE_ON_TRAVIS}; then
         cd $TRAVIS_BUILD_DIR
-        # Generate and upload coverage
         codecov --gcov-exec=gcov-4.8
-        # Check and generate documentation
-        ./scripts/ci/check-capi.py
-        git clone https://${GH_TOKEN}@github.com/chemfiles/chemfiles gh-pages
-        ./scripts/ci/deploy-docs.sh
     fi
 
-env:
-  global:
-    secure: "DituZnehFQWFs6o3h9+sqGDxlHIPTImWxBvzHjV0w7dmvKcl6rakf6fNsTjcM9lrk2Q9owxwzT7EWxhI/1E28ivtNwxWod6jMuwmrw+6jz7dQG0JTs3icTeCO6z1dnRaLRDHlVpiVob9Cz6ZYPCB86XzOeVlvh7693WXoHpZ944="
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GH_TOKEN
+  local_dir: build/gh-pages
+  on:
+    branch: master
+    tags: true
+    condition: $DEPLOY_DOCS == ON
