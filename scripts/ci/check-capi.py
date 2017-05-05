@@ -5,13 +5,21 @@ A small script checking that all the C API functions are documented, and have
 an example.
 """
 import os
+import sys
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
+ERRORS = 0
+
+
+def error(message):
+    global ERRORS
+    ERRORS += 1
+    print(message)
 
 
 def documented_functions():
     functions = []
-    DOCS = os.path.join(ROOT, "doc", "capi")
+    DOCS = os.path.join(ROOT, "doc", "src", "capi")
     for (root, _, paths) in os.walk(DOCS):
         for path in paths:
             with open(os.path.join(root, path)) as fd:
@@ -30,9 +38,7 @@ def function_name(line):
     elif splitted[3].startswith("chfl_"):
         name = splitted[3].split('(')[0]
     else:
-        raise RuntimeError(
-            "Could not get function name in '" + line + "'"
-        )
+        raise RuntimeError("Could not get function name in '" + line + "'")
     return name
 
 
@@ -66,9 +72,7 @@ def check_examples():
                         in_doc = False
                         if not example_found:
                             name = function_name(line)
-                            raise RuntimeError(
-                                "Missing example for {}".format(name)
-                            )
+                            error("Missing example for {}".format(name))
                         example_found = False
 
 
@@ -76,10 +80,13 @@ if __name__ == '__main__':
     docs = documented_functions()
     for function in all_functions():
         if function not in docs:
-            raise RuntimeError("Missing documentation for {}".format(function))
+            error("Missing documentation for {}".format(function))
     check_examples()
 
     # C and fortran standard only allow extern names up to 31 characters
     for function in all_functions():
         if len(function) > 31:
-            raise RuntimeError("Function name {} is too long".format(function))
+            error("Function name {} is too long".format(function))
+
+    if ERRORS != 0:
+        sys.exit(1)
