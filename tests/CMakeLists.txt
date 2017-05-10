@@ -71,7 +71,10 @@ endfunction()
 function(chfl_test _name_ _file_)
     check_dll_export_tests(${_name_} _is_not_dll_exported_)
     if(${_is_not_dll_exported_})
-        add_executable(${_name_} ${_file_} $<TARGET_OBJECTS:chemfiles_files>)
+        add_executable(${_name_} ${_file_}
+            $<TARGET_OBJECTS:chemfiles_files>
+            ${NETCDF_OBJECTS}
+        )
     else()
         add_executable(${_name_} ${_file_})
     endif()
