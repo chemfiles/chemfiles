@@ -36,6 +36,29 @@ if(MSVC)
     set(CMAKE_SHARED_LINKER_FLAGS "/SUBSYSTEM:CONSOLE")
 endif()
 
+if(EMSCRIPTEN)
+    if(BUILD_SHARED_LIBS)
+        # Shared libs where not tested and a lot of changes to the build system
+        # for emscripten support disable things that are needed for shared libs
+        # on Windows.
+        message(WARNING "Shared libs are not supported with emscripten")
+    endif()
+
+    set(EMCC_FLAGS "")
+    set(EMCC_FLAGS "${EMCC_FLAGS} -s DISABLE_EXCEPTION_CATCHING=0")
+    set(EMCC_FLAGS "${EMCC_FLAGS} -s LINKABLE=1")
+    set(EMCC_FLAGS "${EMCC_FLAGS} -s ERROR_ON_UNDEFINED_SYMBOLS=1")
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EMCC_FLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EMCC_FLAGS}")
+
+    string(TOLOWER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
+    if(NOT CHFL_WARNED_EMSCRIPTEN_DEBUG AND (${BUILD_TYPE} STREQUAL "debug" OR ${BUILD_TYPE} STREQUAL "relwithdebinfo"))
+        message(WARNING "Debug info might crash emscripten with a 'Referencing global in another module' error")
+        set(CHFL_WARNED_EMSCRIPTEN_DEBUG ON CACHE INTERNAL "" FORCE)
+    endif()
+endif()
+
 macro(add_warning_flag _flag_)
     CHECK_CXX_COMPILER_FLAG("${_flag_}" CXX_SUPPORTS${_flag_})
     CHECK_C_COMPILER_FLAG("${_flag_}" CC_SUPPORTS${_flag_})

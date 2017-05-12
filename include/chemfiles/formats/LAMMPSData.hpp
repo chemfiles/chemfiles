@@ -16,8 +16,8 @@ struct atom_data {
     double x = 0;
     double y = 0;
     double z = 0;
-    double charge = std::numeric_limits<double>::signaling_NaN();
-    double mass = std::numeric_limits<double>::signaling_NaN();
+    double charge = std::numeric_limits<double>::quiet_NaN();
+    double mass = std::numeric_limits<double>::quiet_NaN();
     size_t index = 0;
     size_t type = 0;
     size_t molid = static_cast<size_t>(-1);

@@ -34,7 +34,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT}")
 endif()
 
 set(CHFL_TEST_RUNNER "none" CACHE STRING "External runner for the tests")
-set_property(CACHE CHFL_TEST_RUNNER PROPERTY STRINGS none valgrind wine)
+set_property(CACHE CHFL_TEST_RUNNER PROPERTY STRINGS none valgrind wine node)
 
 if(${CHFL_TEST_RUNNER} STREQUAL "valgrind")
     set(
@@ -45,6 +45,8 @@ if(${CHFL_TEST_RUNNER} STREQUAL "valgrind")
     )
 elseif(${CHFL_TEST_RUNNER} STREQUAL "wine")
     set(RUNNER_COMMAND "wine")
+elseif(${CHFL_TEST_RUNNER} STREQUAL "node")
+    set(RUNNER_COMMAND "node")
 else()
     set(RUNNER_COMMAND "")
 endif()
@@ -67,8 +69,7 @@ function(chfl_test _name_ _file_)
     add_executable(${_name_} ${_file_} ${CHEMFILES_OBJECTS})
     # We need to pretend we are inside the DLL to access all functions
     target_compile_definitions(${_name_} PRIVATE chemfiles_EXPORTS)
-
-    target_link_libraries(${_name_} test_helpers boost_filesystem ${NETCDF_LIBRARIES})
+    target_link_libraries(${_name_} ${NETCDF_LIBRARIES})
     set_property(TARGET ${_name_} PROPERTY CXX_STANDARD 11)
     add_test(NAME ${_name_}
         COMMAND ${RUNNER_COMMAND} ./${_name_}
@@ -91,6 +92,7 @@ endfunction()
 function(chfl_cpp_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     chfl_test(${_name_} ${_file_})
+    target_link_libraries(${_name_} test_helpers boost_filesystem)
 endfunction()
 
 file(GLOB all_test_files
@@ -109,6 +111,7 @@ function(chfl_capi_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     set(_name_ "c-${_name_}")
     chfl_test(${_name_} ${_file_})
+    target_link_libraries(${_name_} test_helpers boost_filesystem)
 endfunction()
 
 file(GLOB capi_test_files ${CMAKE_CURRENT_SOURCE_DIR}/capi/*.cpp)
@@ -136,7 +139,6 @@ function(chfl_doctest _file_)
     endforeach()
 
     chfl_test(${_name_} ${_file_})
-
     set_target_properties(${_name_} PROPERTIES COMPILE_FLAGS "-UNDEBUG")
 endfunction()
 
@@ -150,7 +152,6 @@ configure_file(
     ${CMAKE_BINARY_DIR}/CTestCustom.cmake
     @ONLY
 )
-
 
 # Write sample configuration files for tests
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/../.chemfilesrc
