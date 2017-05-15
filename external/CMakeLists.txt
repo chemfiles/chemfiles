@@ -23,7 +23,7 @@ endif()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTERNAL_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTERNAL_FLAGS}")
 
-function(external_library _name_)
+function(unpack_library _name_)
     if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${_name_}/CMakeLists.txt")
         message(STATUS "Unpacking ${_name_} sources")
         execute_process(
@@ -31,7 +31,10 @@ function(external_library _name_)
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
     endif()
+endfunction()
 
+function(external_library _name_)
+    unpack_library(${_name_})
     add_subdirectory(
         ${CMAKE_CURRENT_BINARY_DIR}/${_name_}
         ${CMAKE_CURRENT_BINARY_DIR}/${_name_}
@@ -56,6 +59,12 @@ mark_as_advanced(FORCE
     FMT_USE_CPP11
     FMT_TEST
 )
+
+# ==========
+# toml11
+# ==========
+unpack_library(toml11)
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/toml11)
 
 # ==========
 # netcdf: https://github.com/chemfiles/netcdf-c
