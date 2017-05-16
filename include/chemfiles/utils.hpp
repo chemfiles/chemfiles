@@ -32,6 +32,13 @@ inline std::string trim(const std::string& str) {
     return (back <= front ? std::string() : std::string(front, back));
 }
 
+/// Get the name of the computer used
+std::string hostname();
+/// Get the user name
+std::string user_name();
+/// Get the process current directory
+std::string current_directory();
+
 #ifndef __has_builtin
   #define __has_builtin(x) 0
 #endif
@@ -47,14 +54,6 @@ inline std::string trim(const std::string& str) {
         throw Error("Entered unreachable code");   \
     } while (false)
 #endif
-
-
-/// Get the name of the computer used
-std::string hostname();
-/// Get the user name
-std::string user_name();
-/// Get the process current directory
-std::string current_directory();
 }
 
 #endif

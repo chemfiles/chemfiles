@@ -22,11 +22,14 @@ INCLUDES=(
     static_assert.hpp utility.hpp checked_delete.hpp iterator.hpp range.hpp
     scoped_array.hpp throw_exception.hpp version.hpp shared_ptr.hpp limits.hpp
     predef.h type_traits.hpp functional.hpp config.hpp exception_ptr.hpp
-    iterator  range config detail exception functional predef system type_traits
-    core io utility filesystem mpl preprocessor smart_ptr
+    operators.hpp asio.hpp is_placeholder.hpp regex_fwd.hpp
+
+    iterator range config detail exception functional predef system type_traits
+    core io utility filesystem mpl preprocessor smart_ptr asio date_time bind
+    regex
 )
 
-TMPDIR=`mktemp -d -t boost`
+TMPDIR=`mktemp -d -t boost-XXXX-XXXX`
 OUT=$TMPDIR/boost
 mkdir -p $OUT/src
 mkdir -p $OUT/include/boost
