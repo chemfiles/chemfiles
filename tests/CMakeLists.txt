@@ -59,7 +59,7 @@ include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR}/external/boost/include)
 add_library(test_helpers STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/helpers.cpp)
 
 function(check_dll_export_tests _name_ _result_)
-    set(NON_DLL_EXPORT_TESTS tng-file basic-file ncfile)
+    set(NON_DLL_EXPORT_TESTS tng-file basic-file ncfile utils)
     list(FIND NON_DLL_EXPORT_TESTS ${_name_} _index_)
     if (${_index_} GREATER -1)
         set(${_result_} TRUE PARENT_SCOPE)
@@ -85,13 +85,17 @@ function(chfl_test _name_ _file_)
         COMMAND ${RUNNER_COMMAND} ./${_name_}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
-    # We need to set the path to allow access to chemfiles.dll (and any other
-    # DLL)
+
     if(WIN32)
+        # We need to set the path to allow access to chemfiles.dll
+        # (and any other DLL)
         STRING(REPLACE ";" "\\;" PATH_STRING "$ENV{PATH}")
         set_tests_properties(${_name_}
             PROPERTIES ENVIRONMENT "PATH=${PATH_STRING}\;$<TARGET_FILE_DIR:chemfiles>"
         )
+
+        # Link to the websoket library for the hostname test
+        target_link_libraries(${_name_} ws2_32)
     endif()
 endfunction()
 
