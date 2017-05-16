@@ -44,7 +44,7 @@ inline std::string trim(const std::string& str) {
     #define unreachable() __assume(false)
 #else
     #define unreachable() do {                     \
-        throw Error("Entered unreachable code");  \
+        throw Error("Entered unreachable code");   \
     } while (false)
 #endif
 
@@ -53,7 +53,8 @@ inline std::string trim(const std::string& str) {
 std::string hostname();
 /// Get the user name
 std::string user_name();
-
+/// Get the process current directory
+std::string current_directory();
 }
 
 #endif
