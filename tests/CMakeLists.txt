@@ -59,7 +59,7 @@ include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR}/external/boost/include)
 add_library(test_helpers STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/helpers.cpp)
 
 function(check_dll_export_tests _name_ _result_)
-    set(NON_DLL_EXPORT_TESTS tng-file basic-file ncfile utils)
+    set(NON_DLL_EXPORT_TESTS tng-file basic-file ncfile utils configuration)
     list(FIND NON_DLL_EXPORT_TESTS ${_name_} _index_)
     if (${_index_} GREATER -1)
         set(${_result_} TRUE PARENT_SCOPE)
@@ -72,7 +72,7 @@ function(chfl_test _name_ _file_)
     check_dll_export_tests(${_name_} _is_not_dll_exported_)
     if(${_is_not_dll_exported_})
         add_executable(${_name_} ${_file_}
-            $<TARGET_OBJECTS:chemfiles_files>
+            $<TARGET_OBJECTS:chemfiles_objects>
             ${NETCDF_OBJECTS}
         )
     else()
@@ -159,3 +159,18 @@ configure_file(
     ${CMAKE_BINARY_DIR}/CTestCustom.cmake
     @ONLY
 )
+
+
+# Write sample configuration files for tests
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/../.chemfilesrc
+"[rename]
+Oh = \"O\"
+Oz = \"O\"
+N2 = \"N\"
+")
+
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/.chemfilesrc
+"[rename]
+# This override the root .chemfilesrc file
+N2 = \"N4\"
+")
