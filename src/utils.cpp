@@ -3,10 +3,15 @@
 
 #include "chemfiles/utils.hpp"
 #include "chemfiles/config.hpp"
+#include "chemfiles/warnings.hpp"
+
+#include <algorithm>
 
 #ifdef CHEMFILES_WINDOWS
 #include <windows.h>
 #include <lmcons.h>
+#include <direct.h>
+#define getcwd _getcwd
 #else
 #include <unistd.h>
 #include <pwd.h>
@@ -49,4 +54,24 @@ std::string chemfiles::hostname() {
     }
     return name;
 #endif
+}
+
+std::string chemfiles::current_directory() {
+    // loop util buffer large enough
+    for (size_t size = 128;; size *=2) {
+        std::vector<char> buffer(size, '\0');
+        auto result = getcwd(buffer.data(), size);
+        if (result == nullptr) {
+            if (errno == ERANGE) {
+                continue;
+            } else {
+                // We got an error from getcwd
+                warning("Could not get the current working directory");
+                return std::string("");
+            }
+        }
+        // Get the first null character, and stop the copy there
+        auto end = std::find(buffer.begin(), buffer.end(), '\0');
+        return std::string(buffer.begin(), end);
+    }
 }
