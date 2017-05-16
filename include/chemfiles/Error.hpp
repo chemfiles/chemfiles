@@ -44,6 +44,11 @@ struct CHFL_EXPORT SelectionError : public Error {
     SelectionError(const std::string& err) : Error(err) {}
 };
 
+/// @brief Exception for errors in configuration files
+struct CHFL_EXPORT ConfigurationError : public Error {
+    ConfigurationError(const std::string& err) : Error(err) {}
+};
+
 } // namespace chemfiles
 
 #endif

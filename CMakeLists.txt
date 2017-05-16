@@ -86,32 +86,37 @@ endif()
 add_subdirectory(external)
 
 # We need to use a separated library for non-dll-exported classes that have an
-# unit test. The files_impl OBJECT library contains the code for files
+# unit test. The chemfiles_objects OBJECT library contains the code for files
 # implementation and is linked into both the main chemfiles library and the
 # unit tests.
-file(GLOB chemfiles_files_sources src/files/*.cpp src/utils.cpp)
-add_library(chemfiles_files OBJECT ${chemfiles_files_sources})
-target_include_directories(chemfiles_files PUBLIC
+file(GLOB chemfiles_objects_sources
+    src/files/*.cpp
+    src/utils.cpp
+    src/warnings.cpp
+    src/Configuration.cpp
+)
+add_library(chemfiles_objects OBJECT ${chemfiles_objects_sources})
+target_include_directories(chemfiles_objects PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
 )
 if (NOT CMAKE_VERSION VERSION_LESS 2.8.12)
-    target_include_directories(chemfiles_files SYSTEM BEFORE PRIVATE ${EXTERNAL_INCLUDES})
+    target_include_directories(chemfiles_objects SYSTEM BEFORE PRIVATE ${EXTERNAL_INCLUDES})
 else()
-    target_include_directories(chemfiles_files BEFORE PRIVATE ${EXTERNAL_INCLUDES})
+    target_include_directories(chemfiles_objects BEFORE PRIVATE ${EXTERNAL_INCLUDES})
 endif()
 
-target_compile_definitions(chemfiles_files PRIVATE chemfiles_EXPORTS)
+target_compile_definitions(chemfiles_objects PRIVATE chemfiles_EXPORTS)
 if(${BUILD_SHARED_LIBS})
-    set_target_properties(chemfiles_files PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+    set_target_properties(chemfiles_objects PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 endif()
 
 # Add the main chemfiles library
 file(GLOB_RECURSE sources src/**.cpp)
-list(REMOVE_ITEM sources ${chemfiles_files_sources})
+list(REMOVE_ITEM sources ${chemfiles_objects_sources})
 add_library(
     chemfiles ${sources}
-    $<TARGET_OBJECTS:chemfiles_files>
+    $<TARGET_OBJECTS:chemfiles_objects>
     $<TARGET_OBJECTS:molfiles>
     $<TARGET_OBJECTS:fmt>
     $<TARGET_OBJECTS:tng_io>
