@@ -124,6 +124,9 @@ target_compile_definitions(c-misc PRIVATE "-DVERSION_FILE_PATH=\"${VERSION_FILE_
 
 set(CHEMFILES_TESTS_IGNORE "")
 function(chfl_doctest _file_)
+    if(NOT CHFL_BUILD_DOCTESTS)
+        return()
+    endif()
     get_filename_component(_name_ ${_file_} NAME_WE)
     get_filename_component(_root_ ${_file_} PATH)
     get_filename_component(_root_ ${_root_} NAME)

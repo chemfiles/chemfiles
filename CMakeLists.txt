@@ -33,6 +33,9 @@ option(CHFL_USE_WARNINGS "Compile the code with warnings (default in debug mode)
 option(CHFL_DEBUG_GLIBCXX "Use the debug version of GNU libstdcxx" OFF)
 option(CHFL_SYSTEM_NETCDF "Use the system NetCDF instead of the internal one" OFF)
 
+option(CHFL_BUILD_DOCTESTS "Build documentation tests as well as unit tests." ON)
+mark_as_advanced(CHFL_BUILD_DOCTESTS)
+
 include(CompilerFlags)
 
 if(CHFL_USE_WARNINGS)
