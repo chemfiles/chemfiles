@@ -7,7 +7,6 @@ if (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
     cmake_policy(SET CMP0042 OLD) # OSX RPATH handling
 endif()
 
-
 if(CMAKE_VERSION VERSION_LESS 2.8.12)
     set(INCLUDE_INSTALL_DIR "${CMAKE_PREFIX}/include")
 else()

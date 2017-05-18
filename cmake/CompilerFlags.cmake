@@ -20,6 +20,11 @@ else()
     endif()
 endif()
 
+if(COMPILER_HAS_HIDDEN_VISIBILITY)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
+endif()
+
 CHECK_C_COMPILER_FLAG("-std=c99" COMPILER_SUPPORTS_C99)
 if(COMPILER_SUPPORTS_C99)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
