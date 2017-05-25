@@ -92,7 +92,6 @@ add_subdirectory(external)
 file(GLOB chemfiles_objects_sources
     src/files/*.cpp
     src/utils.cpp
-    src/warnings.cpp
     src/Configuration.cpp
 )
 add_library(chemfiles_objects OBJECT ${chemfiles_objects_sources})
@@ -110,6 +109,12 @@ target_compile_definitions(chemfiles_objects PRIVATE chemfiles_EXPORTS)
 if(${BUILD_SHARED_LIBS})
     set_target_properties(chemfiles_objects PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 endif()
+
+set(CHEMFILES_TESTS_OBJECTS
+    $<TARGET_OBJECTS:chemfiles_objects>
+    $<TARGET_OBJECTS:fmt>
+    ${NETCDF_OBJECTS}
+)
 
 # Add the main chemfiles library
 file(GLOB_RECURSE sources src/**.cpp)

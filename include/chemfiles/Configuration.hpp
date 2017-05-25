@@ -38,6 +38,15 @@ public:
         }
     }
 
+    /// Read configuration from the file at `path`. If the same configuration
+    /// data is already present in a previouly read configuration file, the
+    /// data is replaced by the one in this file.
+    ///
+    /// If the file at `path` can not be opened, a `ConfigurationError` is
+    /// thrown. This function is not protected against data-race: calling it
+    /// while using the configuration from other thread is undefined.
+    static void add_configuration(const std::string& path);
+
 private:
     Configuration();
     Configuration& operator=(const Configuration&) = delete;
@@ -49,7 +58,7 @@ private:
     void read_configuration(std::string path);
     /// Get a lazyly-created Configuration. The configuration will be
     /// initialized on the first call to this function.
-    static const Configuration& instance();
+    static Configuration& instance();
 
     /// Map for old-type => new-type renaming
     std::unordered_map<std::string, std::string> types_rename_;
