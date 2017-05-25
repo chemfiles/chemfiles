@@ -6,6 +6,7 @@
 
 #include "chemfiles/config.hpp"
 
+#include "chemfiles/generic.hpp"
 #include "chemfiles/Error.hpp"
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"

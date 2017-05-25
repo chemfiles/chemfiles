@@ -65,8 +65,6 @@ std::string chemfiles::current_directory() {
             if (errno == ERANGE) {
                 continue;
             } else {
-                // We got an error from getcwd
-                warning("Could not get the current working directory");
                 return std::string("");
             }
         }

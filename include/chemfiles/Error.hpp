@@ -4,20 +4,11 @@
 #ifndef CHEMFILES_ERROR_HPP
 #define CHEMFILES_ERROR_HPP
 
-#include <functional>
 #include <stdexcept>
 #include <string>
-
 #include "chemfiles/exports.hpp"
 
 namespace chemfiles {
-
-/// Callback type used to process a warning event
-typedef std::function<void(std::string message)> warning_callback;
-
-/// Set the global callback for warning events. The default is to print them
-/// on the standard error stream.
-void CHFL_EXPORT set_warning_callback(warning_callback callback);
 
 /// @brief Base exception class for chemfiles library
 struct CHFL_EXPORT Error : public std::runtime_error {

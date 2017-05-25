@@ -71,10 +71,7 @@ endfunction()
 function(chfl_test _name_ _file_)
     check_dll_export_tests(${_name_} _is_not_dll_exported_)
     if(${_is_not_dll_exported_})
-        add_executable(${_name_} ${_file_}
-            $<TARGET_OBJECTS:chemfiles_objects>
-            ${NETCDF_OBJECTS}
-        )
+        add_executable(${_name_} ${_file_} ${CHEMFILES_TESTS_OBJECTS})
     else()
         add_executable(${_name_} ${_file_})
     endif()
@@ -173,4 +170,9 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/.chemfilesrc
 "[rename]
 # This override the root .chemfilesrc file
 N2 = \"N4\"
+")
+
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/another_config
+"[rename]
+Oz = \"F\"
 ")

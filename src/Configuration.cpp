@@ -7,6 +7,7 @@
 #include "chemfiles/Configuration.hpp"
 #include "chemfiles/Error.hpp"
 #include "chemfiles/utils.hpp"
+#include "chemfiles/generic.hpp"
 using namespace chemfiles;
 
 /// Get the list of directories up to `leaf`. For example, if `leaf` is
@@ -14,7 +15,7 @@ using namespace chemfiles;
 /// C:\foo\bar\baz\}`.
 static std::vector<std::string> list_directories(std::string leaf);
 
-const Configuration& Configuration::instance() {
+Configuration& Configuration::instance() {
     static Configuration instance_;
     return instance_;
 };
@@ -51,6 +52,14 @@ void Configuration::read_configuration(std::string path) {
             auto new_name = toml::get<std::string>(entry.second);
             types_rename_[std::move(old_name)] = std::move(new_name);
         }
+    }
+}
+
+void Configuration::add_configuration(const std::string& path) {
+    if (std::ifstream(path)) {
+        instance().read_configuration(path);
+    } else {
+        throw ConfigurationError("Can not open configuration file " + path);
     }
 }
 
