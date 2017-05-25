@@ -24,10 +24,20 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTERNAL_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTERNAL_FLAGS}")
 
 function(unpack_library _name_)
-    if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${_name_}/CMakeLists.txt")
+    set(_archive_ ${CMAKE_CURRENT_SOURCE_DIR}/${_name_}.tar.gz)
+    file(SHA256 ${_archive_} _shasum_)
+    if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${_name_}/${_shasum_}")
         message(STATUS "Unpacking ${_name_} sources")
         execute_process(
-            COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_SOURCE_DIR}/${_name_}.tar.gz
+            COMMAND ${CMAKE_COMMAND} -E remove_directory ${_name_}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        )
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E tar xf ${_archive_}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        )
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E touch ${_name_}/${_shasum_}
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
     endif()
