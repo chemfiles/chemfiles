@@ -5,6 +5,8 @@
 [![Build Status -- Windows](https://ci.appveyor.com/api/projects/status/dvn6nr3lsssd23lo/branch/master?svg=true)](https://ci.appveyor.com/project/Luthaf/chemfiles/branch/master)
 [![Code Coverage](http://codecov.io/github/chemfiles/chemfiles/coverage.svg?branch=master)](http://codecov.io/github/chemfiles/chemfiles?branch=master)
 [![Gitter](https://badges.gitter.im/chemfiles/chemfiles.svg)](https://gitter.im/chemfiles/chemfiles)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.800663.svg)](https://doi.org/10.5281/zenodo.800663)
+
 
 Chemfiles is a modern and high-quality library for reading and writing
 trajectory files created by computational chemistry simulations program. These
@@ -144,6 +146,9 @@ int main() {
 ```
 
 ## Contributors and license
+
+If you are using chemfiles in a published scientific study, please cite us using
+the following DOI: https://doi.org/10.5281/zenodo.800663.
 
 Chemfiles was created and is maintained by Guillaume Fraux, and put to your
 disposition under the terms of the [3 clauses BSD license](LICENSE). By contributing
