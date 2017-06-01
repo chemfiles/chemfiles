@@ -53,7 +53,8 @@ inline std::string trim(const std::string& str) {
 std::string hostname();
 /// Get the user name
 std::string user_name();
-
+/// Get the home path
+std::string home_path();
 }
 
 #endif
