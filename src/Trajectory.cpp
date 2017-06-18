@@ -61,57 +61,48 @@ Trajectory::~Trajectory() = default;
 Trajectory::Trajectory(Trajectory&&) = default;
 Trajectory& Trajectory::operator=(Trajectory&&) = default;
 
-Frame Trajectory::read() {
-    if (step_ >= nsteps_) {
-        throw FileError(
-            "Can not read file '" + path_ + "' past end."
-        );
-    }
-    if (!(mode_ == File::READ || mode_ == File::APPEND)) {
-        throw FileError(
-            "File '" + path_ + "' was not openened in read or append mode."
-        );
-    }
-
-    Frame frame;
-    format_->read(frame);
-    step_++;
-
-    // Set the frame topology and/or cell if needed
-    if (custom_topology_) {
-        frame.set_topology(*custom_topology_);
-    }
-    if (custom_cell_) {
-        frame.set_cell(*custom_cell_);
-    }
-    return frame;
-}
-
-Frame Trajectory::read_step(const size_t step) {
+void Trajectory::pre_read(size_t step) {
     if (step >= nsteps_) {
         throw FileError(
             "Can not read file '" + path_ + "' at step " +
             std::to_string(step) + ". Max step is " + std::to_string(nsteps_) + "."
         );
     }
-
     if (!(mode_ == File::READ || mode_ == File::APPEND)) {
         throw FileError(
             "File '" + path_ + "' was not openened in read or append mode."
         );
     }
+}
 
-    Frame frame;
-    step_ = step;
-    format_->read_step(step_, frame);
-
-    // Set the frame topology and/or cell if needed
+void Trajectory::post_read(Frame& frame) {
     if (custom_topology_) {
         frame.set_topology(*custom_topology_);
     }
     if (custom_cell_) {
         frame.set_cell(*custom_cell_);
     }
+}
+
+Frame Trajectory::read() {
+    pre_read(step_);
+
+    Frame frame;
+    format_->read(frame);
+    step_++;
+
+    post_read(frame);
+    return frame;
+}
+
+Frame Trajectory::read_step(const size_t step) {
+    pre_read(step);
+
+    Frame frame;
+    step_ = step;
+    format_->read_step(step_, frame);
+
+    post_read(frame);
     return frame;
 }
 

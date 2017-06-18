@@ -48,7 +48,7 @@ public:
     /// Read the next frame in the trajectory
     Frame read();
     /// Read a single frame at specific step from the trajectory
-    Frame read_step(const size_t);
+    Frame read_step(size_t step);
 
     /// Write a single frame to the trajectory
     void write(const Frame& frame);
@@ -74,6 +74,11 @@ public:
     bool done() const;
 
 private:
+    /// Perform a few checks before reading a frame
+    void pre_read(size_t step);
+    /// Set the frame topology and/or cell after reading it
+    void post_read(Frame& frame);
+
     /// Path of the associated file
     std::string path_;
     /// Opening mode of the associated file
