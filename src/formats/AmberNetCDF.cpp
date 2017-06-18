@@ -1,14 +1,14 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include "chemfiles/formats/NcFormat.hpp"
+#include "chemfiles/formats/AmberNetCDF.hpp"
 
 #include "chemfiles/Error.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/warnings.hpp"
 using namespace chemfiles;
 
-std::string NCFormat::description() const {
+std::string AmberNetCDFFormat::description() const {
     return "Amber NetCDF file format.";
 }
 
@@ -49,7 +49,7 @@ static bool is_valid(const NcFile& file_, size_t natoms) {
     return true;
 }
 
-NCFormat::NCFormat(const std::string& path, File::Mode mode)
+AmberNetCDFFormat::AmberNetCDFFormat(const std::string& path, File::Mode mode)
     : file_(path, mode), step_(0), validated_(false) {
     if (file_.mode() == File::READ || file_.mode() == File::APPEND) {
         if (!is_valid(file_, static_cast<size_t>(-1))) {
@@ -59,11 +59,11 @@ NCFormat::NCFormat(const std::string& path, File::Mode mode)
     }
 }
 
-size_t NCFormat::nsteps() {
+size_t AmberNetCDFFormat::nsteps() {
     return static_cast<size_t>(file_.dimension("frame"));
 }
 
-void NCFormat::read_step(const size_t step, Frame& frame) {
+void AmberNetCDFFormat::read_step(const size_t step, Frame& frame) {
     // Set the internal step_ before further reading
     step_ = step;
     frame.set_cell(read_cell());
@@ -76,12 +76,12 @@ void NCFormat::read_step(const size_t step, Frame& frame) {
     }
 }
 
-void NCFormat::read(Frame& frame) {
+void AmberNetCDFFormat::read(Frame& frame) {
     read_step(step_, frame);
     step_++;
 }
 
-UnitCell NCFormat::read_cell() {
+UnitCell AmberNetCDFFormat::read_cell() {
     if (!file_.variable_exists("cell_lengths") ||
         !file_.variable_exists("cell_angles")) {
         return UnitCell(); // No UnitCell information
@@ -107,7 +107,7 @@ UnitCell NCFormat::read_cell() {
     return UnitCell(length[0], length[1], length[2], angles[0], angles[1], angles[2]);
 }
 
-void NCFormat::read_array3D(Span3D array, const std::string& name) {
+void AmberNetCDFFormat::read_array3D(Span3D array, const std::string& name) {
     auto array_var = file_.variable<nc::NcFloat>(name);
     auto natoms = file_.dimension("atom");
     assert(array.size() == natoms);
@@ -168,7 +168,7 @@ static void initialize(NcFile& file, size_t natoms, bool with_velocities) {
     cell_angular.add({"alpha", "beta", "gamma"});
 }
 
-void NCFormat::write(const Frame& frame) {
+void AmberNetCDFFormat::write(const Frame& frame) {
     auto natoms = frame.natoms();
     // If we created the file, let's initialize it.
     if (!validated_) {
@@ -186,7 +186,7 @@ void NCFormat::write(const Frame& frame) {
     step_++;
 }
 
-void NCFormat::write_array3D(const Array3D& array, const std::string& name) {
+void AmberNetCDFFormat::write_array3D(const Array3D& array, const std::string& name) {
     auto var = file_.variable<nc::NcFloat>(name);
     auto natoms = array.size();
     std::vector<size_t> start{step_, 0, 0};
@@ -201,7 +201,7 @@ void NCFormat::write_array3D(const Array3D& array, const std::string& name) {
     var.add(start, count, data);
 }
 
-void NCFormat::write_cell(const UnitCell& cell) {
+void AmberNetCDFFormat::write_cell(const UnitCell& cell) {
     auto length = file_.variable<nc::NcFloat>("cell_lengths");
     auto angles = file_.variable<nc::NcFloat>("cell_angles");
 

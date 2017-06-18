@@ -17,9 +17,9 @@ class Topology;
 /// [Amber NetCDF][NetCDF] file format reader.
 ///
 /// [NetCDF]: http://ambermd.org/netcdf/nctraj.xhtml
-class NCFormat final: public Format {
+class AmberNetCDFFormat final: public Format {
 public:
-    NCFormat(const std::string& path, File::Mode mode);
+    AmberNetCDFFormat(const std::string& path, File::Mode mode);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;
