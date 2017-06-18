@@ -1,8 +1,8 @@
-Errors and warnings
-===================
+Miscelaneous classes and functions
+==================================
 
-Errors
-------
+Errors handling
+---------------
 
 In chemfiles, any error will throw an exception. Any program using chemfiles
 should thus wrap any call in a ``try ... catch`` block, and handle the errors in
@@ -50,13 +50,26 @@ nicely with any exisiting C++ error handling.
 .. doxygenstruct:: chemfiles::SelectionError
     :members:
 
+.. doxygenstruct:: chemfiles::ConfigurationError
+    :members:
+
 Warnings
 --------
 
-Chemfiles also send warnings on some malformed files. You can use the
-`set_warning_callback` function to register a global callback to use when
-sending a warning.
+Chemfiles send warnings when it encounters malformed files, or any other
+condition that the user might want to know about. By default, these warnings are
+printed to the standard error stream. :cpp:func:`chemfiles::set_warning_callback`
+allow to redirect these warning by giving it a callback function to be called on
+each warning event.
 
 .. doxygenfunction:: chemfiles::set_warning_callback
 
 .. doxygentypedef:: chemfiles::warning_callback
+
+Configuration files
+-------------------
+
+You can add more :ref:`configuration <configuration>` file to chemfiles with
+:cpp:func:`chemfiles::add_configuration`.
+
+.. doxygenfunction:: chemfiles::add_configuration

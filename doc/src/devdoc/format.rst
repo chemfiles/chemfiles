@@ -18,7 +18,7 @@ These classes implement the format interface defined previously.
 
 .. doxygenclass:: chemfiles::PDBFormat
 
-.. doxygenclass:: chemfiles::NCFormat
+.. doxygenclass:: chemfiles::AmberNetCDFFormat
 
 .. doxygenclass:: chemfiles::TNGFormat
 

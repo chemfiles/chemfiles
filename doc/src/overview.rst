@@ -1,5 +1,3 @@
-.. _overview:
-
 Chemfiles classes overview
 ===========================
 

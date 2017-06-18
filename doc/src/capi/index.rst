@@ -31,11 +31,11 @@ the Chemfiles library.
 .. toctree::
     :maxdepth: 2
 
-    errors
     chfl_trajectory
     chfl_frame
-    chfl_atom
-    chfl_cell
     chfl_topology
     chfl_residue
+    chfl_atom
+    chfl_cell
     chfl_selection
+    misc
