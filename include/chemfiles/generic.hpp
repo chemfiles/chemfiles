@@ -14,7 +14,7 @@
 namespace chemfiles {
 
 /// Callback type used to process a warning event
-using warning_callback = std::function<void(std::string message)>;
+typedef std::function<void(std::string message)> warning_callback;
 
 /// Set the global callback for warning events. The default is to print them
 /// on the standard error stream.
