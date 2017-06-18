@@ -58,25 +58,12 @@ include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/)
 include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR}/external/boost/include)
 add_library(test_helpers STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/helpers.cpp)
 
-function(check_dll_export_tests _name_ _result_)
-    set(NON_DLL_EXPORT_TESTS tng-file basic-file ncfile utils configuration)
-    list(FIND NON_DLL_EXPORT_TESTS ${_name_} _index_)
-    if (${_index_} GREATER -1)
-        set(${_result_} TRUE PARENT_SCOPE)
-    else()
-        set(${_result_} FALSE PARENT_SCOPE)
-    endif()
-endfunction()
-
 function(chfl_test _name_ _file_)
-    check_dll_export_tests(${_name_} _is_not_dll_exported_)
-    if(${_is_not_dll_exported_})
-        add_executable(${_name_} ${_file_} ${CHEMFILES_TESTS_OBJECTS})
-    else()
-        add_executable(${_name_} ${_file_})
-    endif()
+    add_executable(${_name_} ${_file_} ${CHEMFILES_OBJECTS})
+    # We need to pretend we are inside the DLL to access all functions
+    target_compile_definitions(${_name_} PRIVATE chemfiles_EXPORTS)
 
-    target_link_libraries(${_name_} test_helpers chemfiles boost_filesystem)
+    target_link_libraries(${_name_} test_helpers boost_filesystem ${NETCDF_LIBRARIES})
     set_property(TARGET ${_name_} PROPERTY CXX_STANDARD 11)
     add_test(NAME ${_name_}
         COMMAND ${RUNNER_COMMAND} ./${_name_}

@@ -89,11 +89,7 @@ add_subdirectory(external)
 # unit test. The chemfiles_objects OBJECT library contains the code for files
 # implementation and is linked into both the main chemfiles library and the
 # unit tests.
-file(GLOB chemfiles_objects_sources
-    src/files/*.cpp
-    src/utils.cpp
-    src/Configuration.cpp
-)
+file(GLOB_RECURSE chemfiles_objects_sources src/**.cpp)
 add_library(chemfiles_objects OBJECT ${chemfiles_objects_sources})
 target_include_directories(chemfiles_objects PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -110,17 +106,7 @@ if(${BUILD_SHARED_LIBS})
     set_target_properties(chemfiles_objects PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 endif()
 
-set(CHEMFILES_TESTS_OBJECTS
-    $<TARGET_OBJECTS:chemfiles_objects>
-    $<TARGET_OBJECTS:fmt>
-    ${NETCDF_OBJECTS}
-)
-
-# Add the main chemfiles library
-file(GLOB_RECURSE sources src/**.cpp)
-list(REMOVE_ITEM sources ${chemfiles_objects_sources})
-add_library(
-    chemfiles ${sources}
+set(CHEMFILES_OBJECTS
     $<TARGET_OBJECTS:chemfiles_objects>
     $<TARGET_OBJECTS:molfiles>
     $<TARGET_OBJECTS:fmt>
@@ -128,6 +114,10 @@ add_library(
     $<TARGET_OBJECTS:tng_io_zlib>
     ${NETCDF_OBJECTS}
 )
+
+# Add the main chemfiles library
+file(GLOB_RECURSE sources src/**.cpp)
+add_library(chemfiles ${CHEMFILES_OBJECTS})
 
 set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
 set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
