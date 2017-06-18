@@ -63,6 +63,7 @@ inline size_t checked_cast(uint64_t value) {
     CATCH_AND_RETURN(MemoryError, CHFL_MEMORY_ERROR)                           \
     CATCH_AND_RETURN(FormatError, CHFL_FORMAT_ERROR)                           \
     CATCH_AND_RETURN(SelectionError, CHFL_SELECTION_ERROR)                     \
+    CATCH_AND_RETURN(ConfigurationError, CHFL_CONFIGURATION_ERROR)             \
     CATCH_AND_RETURN(Error, CHFL_GENERIC_ERROR)                                \
     catch (const std::exception& e) {                                          \
         CAPI_LAST_ERROR = std::string(e.what());                               \
@@ -80,6 +81,7 @@ inline size_t checked_cast(uint64_t value) {
     CATCH_AND_GOTO(MemoryError)                                                \
     CATCH_AND_GOTO(FormatError)                                                \
     CATCH_AND_GOTO(SelectionError)                                             \
+    CATCH_AND_GOTO(ConfigurationError)                                         \
     CATCH_AND_GOTO(Error)                                                      \
     catch (const std::exception& e) {                                          \
         CAPI_LAST_ERROR = std::string(e.what());                               \
