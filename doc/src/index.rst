@@ -37,8 +37,8 @@ interfaces to chemfiles are accessibles at the following places:
 
     Chemfiles follow `semantic versionning <http://semver.org/>`_. This means
     that all 0.x.y versions are compatible for all y, but 0.x and 0.(x+1) are
-    not compatible. This also means that when chemfiles will reach 1.0.0, all
-    code using 1.0.0 will be compatible with 1.x.y for all x and y.
+    not compatible. This also means that when chemfiles reaches 1.0.0, all code
+    using 1.0.0 will be compatible with 1.x.y for any x and y.
 
 .. _Python interface: https://chemfiles.github.io/chemfiles.py/latest/
 .. _Fortran interface: https://chemfiles.github.io/chemfiles.f03/latest/
@@ -64,6 +64,7 @@ in our `Gitter chat room <https://gitter.im/chemfiles/chemfiles>`_.
     example
     formats
     selections
+    configuration
     others
 
 .. _classes-reference:
