@@ -5,7 +5,7 @@
 #include "chemfiles/Error.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/formats/Molfile.hpp"
-#include "chemfiles/formats/NcFormat.hpp"
+#include "chemfiles/formats/AmberNetCDF.hpp"
 #include "chemfiles/formats/PDB.hpp"
 #include "chemfiles/formats/XYZ.hpp"
 #include "chemfiles/formats/TNG.hpp"
@@ -42,7 +42,7 @@ FormatFactory::FormatFactory() : formats_(), extensions_() {
     registration<XYZFormat>(*this);
     registration<PDBFormat>(*this);
     registration<TNGFormat>(*this);
-    registration<NCFormat>(*this);
+    registration<AmberNetCDFFormat>(*this);
 
     // Molfile-based formats
     registration<Molfile<DCD>>(*this);
