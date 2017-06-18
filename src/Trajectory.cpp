@@ -5,6 +5,7 @@
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Error.hpp"
+#include "chemfiles/Configuration.hpp"
 #include "chemfiles/FormatFactory.hpp"
 
 using namespace chemfiles;
@@ -78,6 +79,10 @@ void Trajectory::pre_read(size_t step) {
 void Trajectory::post_read(Frame& frame) {
     if (custom_topology_) {
         frame.set_topology(*custom_topology_);
+    } else {
+        for (Atom& atom: frame.topology()) {
+            atom.set_type(Configuration::rename(atom.type()));
+        }
     }
     if (custom_cell_) {
         frame.set_cell(*custom_cell_);
