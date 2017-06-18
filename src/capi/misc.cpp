@@ -2,7 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include "chemfiles/generic.hpp"
-#include "chemfiles/capi/errors.h"
+#include "chemfiles/capi/misc.h"
 #include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
@@ -29,5 +29,11 @@ extern "C" chfl_status chfl_set_warning_callback(chfl_warning_callback callback)
         set_warning_callback([callback](std::string message) {
             callback(message.c_str());
         });
+    )
+}
+
+extern "C" chfl_status chfl_add_configuration(const char* path) {
+    CHFL_ERROR_CATCH(
+        add_configuration(path);
     )
 }
