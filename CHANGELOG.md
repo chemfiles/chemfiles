@@ -8,6 +8,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### New features
 
 * Change the license to the 3-clauses BSD license.
+* Chemfiles will now read configuration files (by default in `.chemfilesrc`),
+  and use the configuration data to rename atomic types to make sure they
+  match element names. The `chemfiles::add_configuration` function can be used
+  to add additional configuration files.
 
 ### Changes in supported formats
 
@@ -15,6 +19,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   library in chemfiles.
 
 ### C API changes
+
+* Added `chfl_add_configuration` to add more configuration files.
 
 ### Deprecation and removals
 
