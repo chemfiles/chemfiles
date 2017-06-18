@@ -115,10 +115,12 @@ typedef enum {
     CHFL_FORMAT_ERROR = 3,
     /// Status code for invalid selection strings.
     CHFL_SELECTION_ERROR = 4,
+    /// Status code for configuration files errors.
+    CHFL_CONFIGURATION_ERROR = 5,
     /// Status code for any other error from Chemfiles.
-    CHFL_GENERIC_ERROR = 5,
+    CHFL_GENERIC_ERROR = 254,
     /// Status code for error in the C++ standard library.
-    CHFL_CXX_ERROR = 6
+    CHFL_CXX_ERROR = 255,
 } chfl_status;
 
 /// A 3-dimmensional vector for the chemfiles interface
