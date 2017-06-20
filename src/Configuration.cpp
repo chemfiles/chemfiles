@@ -40,13 +40,13 @@ void Configuration::read_configuration(std::string path) {
         );
     }
 
-    if (data.find("rename") != data.end() && data.at("rename").type() == toml::value_t::Table) {
-        auto rename = toml::get<toml::Table>(data.at("rename"));
+    if (data.find("types") != data.end() && data.at("types").type() == toml::value_t::Table) {
+        auto rename = toml::get<toml::Table>(data.at("types"));
         for (auto& entry: rename) {
             auto old_name = entry.first;
             if (entry.second.type() != toml::value_t::String) {
                 throw ConfigurationError(
-                    "renaming data for " + old_name + " must be a string"
+                    "type for " + old_name + " must be a string"
                 );
             }
             auto new_name = toml::get<std::string>(entry.second);

@@ -34,22 +34,22 @@ sections.
 .. _TOML: https://github.com/toml-lang/toml
 
 
-``[rename]``: atomic type renaming
-----------------------------------
+``[types]``: atomic type renaming
+---------------------------------
 
-The ``[rename]`` section of the configuration file allow to change atomic types
+The ``[types]`` section of the configuration file allow to change atomic types
 to make sure they match element name. For example, in a simulatiion where water
-molecules are names ``Hw-Ow-Hw``, one may use this section of the input file
+molecules are named ``Hw-Ow-Hw``, one may use this section of the input file
 like this:
 
 .. code-block:: text
 
-    [rename]
+    [types]
     Ow = "O"
     Hw = "H"
 
 Renaming atomic type allow to ensure that bonds will be guessed right, and that
 the right atomic data can be accessed.
 
-The ``[rename]`` section contains multiple key wich are the old atom type,
+The ``[types]`` section contains multiple key wich are the old atom type,
 associated with string values wich are the new atom type.
