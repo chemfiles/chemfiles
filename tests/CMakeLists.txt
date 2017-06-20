@@ -147,19 +147,19 @@ configure_file(
 
 # Write sample configuration files for tests
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/../.chemfilesrc
-"[rename]
+"[types]
 Oh = \"O\"
 Oz = \"O\"
 N2 = \"N\"
 ")
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/.chemfilesrc
-"[rename]
+"[types]
 # This override the root .chemfilesrc file
 N2 = \"N4\"
 ")
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/another_config
-"[rename]
+"[types]
 Oz = \"F\"
 ")

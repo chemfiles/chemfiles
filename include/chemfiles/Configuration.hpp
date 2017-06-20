@@ -14,11 +14,11 @@ namespace chemfiles {
 /// The configuration is stored in TOML files, that are accessed and read on the
 /// first access to the global Configuration instance.
 ///
-/// The configuration contains type renaming information in the `[rename]` toml
+/// The configuration contains type renaming information in the `[types]` toml
 /// table. For example,
 ///
 /// ```toml
-/// [rename]
+/// [types]
 /// Ow = "O"
 /// Ht = "H"
 /// ```
