@@ -14,7 +14,7 @@ rm -rf gh-pages/.git
 
 # Build new documentation
 cmake -DCHFL_BUILD_DOCUMENTATION=ON .
-cmake --build .
+cmake --build . --target doc_html
 rm -rf doc/html/.doctrees/ doc/html/.buildinfo
 rm -rf doc/html/_static/bootswatch-* doc/html/_static/bootstrap-2.3.2/
 
