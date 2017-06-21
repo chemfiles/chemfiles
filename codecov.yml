@@ -1,7 +1,7 @@
 coverage:
   ignore:
     - tests/.*
-    - external/.*
+    - build/external/.*
   status:
     project:
       default:
