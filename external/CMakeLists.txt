@@ -85,14 +85,6 @@ if(CHFL_SYSTEM_NETCDF)
 else()
     external_library(netcdf)
 
-    add_library(netcdf3-chemfiles OBJECT
-        ${CMAKE_CURRENT_BINARY_DIR}/netcdf/liblib/nc_initialize.c
-    )
-    target_include_directories(netcdf3-chemfiles PRIVATE
-        ${CMAKE_CURRENT_BINARY_DIR}/netcdf/include
-        ${CMAKE_CURRENT_BINARY_DIR}/netcdf/
-    )
-
     if(WINDOWS)
         target_compile_definitions(netcdf PRIVATE "-DDLL_NETCDF -DDLL_EXPORT")
     endif()
