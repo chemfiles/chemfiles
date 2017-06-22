@@ -26,7 +26,7 @@ environment:
       SHARED_LIBS: ON
 
 configuration:
-  - Release
+  - Debug
 
 clone_depth: 10
 clone_folder: c:\chemfiles
