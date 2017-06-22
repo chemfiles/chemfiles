@@ -92,7 +92,10 @@ script:
   - |
     if ${DO_COVERAGE_ON_TRAVIS}; then
         cd $TRAVIS_BUILD_DIR
-        codecov --gcov-exec=gcov-4.8
+        find . -type f -name '*.gcno' -exec gcov-4.8 -pb {} +
+        rm -f \#usr\#*.gcov
+        rm -f *\#external\#*.gcov
+        codecov -X gcov
     fi
 
 deploy:
