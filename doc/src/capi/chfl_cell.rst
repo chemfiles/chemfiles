@@ -31,4 +31,6 @@ Function manipulating ``CHFL_CELL``
 
 .. doxygenfunction:: chfl_cell_set_shape
 
+.. doxygenfunction:: chfl_cell_wrap
+
 .. doxygenfunction:: chfl_cell_free

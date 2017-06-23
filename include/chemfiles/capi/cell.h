@@ -164,6 +164,15 @@ CHFL_EXPORT chfl_status chfl_cell_set_shape(
 /// @return `CHFL_SUCCESS`
 CHFL_EXPORT chfl_status chfl_cell_free(CHFL_CELL* const cell);
 
+/// Wrap a `vector` in the unit `cell`.
+///
+/// @example{tests/capi/doc/chfl_cell/wrap.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_cell_wrap(
+    const CHFL_CELL* const cell, chfl_vector3d vector
+);
+
 #ifdef __cplusplus
 }
 #endif

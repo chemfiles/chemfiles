@@ -13,7 +13,7 @@ static bool approx_eq(double A[3][3], double B[3][3]) {
         (fabs(A[2][0] - B[2][0]) < eps) && (fabs(A[2][1] - B[2][1]) < eps) && (fabs(A[2][2] - B[2][2]) < eps);
 }
 
-TEST_CASE("Atom") {
+TEST_CASE("Unit Cell") {
     SECTION("Constructors") {
         chfl_vector3d lengths = {2, 3, 4};
         CHFL_CELL* cell = chfl_cell(lengths);
@@ -150,6 +150,20 @@ TEST_CASE("Atom") {
         CHECK_STATUS(chfl_cell_set_shape(cell, CHFL_CELL_INFINITE));
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
         CHECK(shape == CHFL_CELL_INFINITE);
+
+        CHECK_STATUS(chfl_cell_free(cell));
+    }
+
+    SECTION("Wrap") {
+        chfl_vector3d lengths = {2, 3, 4};
+        CHFL_CELL* cell = chfl_cell(lengths);
+        REQUIRE(cell != NULL);
+
+        chfl_vector3d vector = {0.8, 1.7, -6};
+        CHECK_STATUS(chfl_cell_wrap(cell, vector));
+        CHECK(vector[0] == 0.8);
+        CHECK(vector[1] == -1.3);
+        CHECK(vector[2] == 2);
 
         CHECK_STATUS(chfl_cell_free(cell));
     }
