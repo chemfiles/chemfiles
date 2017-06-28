@@ -200,13 +200,8 @@ std::vector<Token> selections::tokenize(const std::string& input) {
             tokens.emplace_back(Token::ident(word));
             continue;
         } else if (is_number(word)) {
-            try {
-                double data = std::stod(word);
-                tokens.emplace_back(Token::number(data));
-                continue;
-            } catch (const std::exception&) {
-                throw SelectionError("Could not parse number in: '" + word + "'");
-            }
+            tokens.emplace_back(Token::number(string2double(word)));
+            continue;
         } else {
             throw SelectionError("Could not parse '" + word + "' in: '" + input + "'");
         }

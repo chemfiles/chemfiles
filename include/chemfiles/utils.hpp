@@ -10,6 +10,8 @@
 #include <cctype>
 #include <algorithm>
 
+#include "chemfiles/Error.hpp"
+
 namespace chemfiles {
 
 inline std::vector<std::string> split(const std::string &s, char delim) {
@@ -38,6 +40,40 @@ std::string hostname();
 std::string user_name();
 /// Get the process current directory
 std::string current_directory();
+
+/// Convert a string to double, throwing a `chemfiles::Error` if the string is
+/// not a valid double.
+inline double string2double(const std::string& string) {
+    try {
+        size_t length = 0;
+        double value = std::stod(string, &length);
+        if (length != string.length()) {
+            throw chemfiles::Error("Can not convert '" + string + "' to number");
+        }
+        return value;
+    } catch (const std::invalid_argument&) {
+        throw chemfiles::Error("Can not convert '" + string + "' to number");
+    } catch (const std::out_of_range&) {
+        throw chemfiles::Error("'" + string + "' is out of range for double type");
+    }
+}
+
+/// Convert a string to long long integer, throwing a `chemfiles::Error` if the
+/// string is not a valid long long int.
+inline long long int string2longlong(const std::string& string) {
+    try {
+        size_t length = 0;
+        long long int value = std::stoll(string, &length);
+        if (length != string.length()) {
+            throw chemfiles::Error("Can not convert '" + string + "' to number");
+        }
+        return value;
+    } catch (const std::invalid_argument&) {
+        throw chemfiles::Error("Can not convert '" + string + "' to number");
+    } catch (const std::out_of_range&) {
+        throw chemfiles::Error("'" + string + "' is out of range for long long int type");
+    }
+}
 
 #ifndef __has_builtin
   #define __has_builtin(x) 0

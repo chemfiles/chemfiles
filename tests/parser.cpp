@@ -213,7 +213,6 @@ TEST_CASE("Lexing", "[selection]") {
         std::vector<std::string> lex_fail = {
             "_not_an_id",
             "3not_an_id",
-            "3e456782", // Number is too big for the double type
             "§", // Not accepted characters
             "è",
             "à",

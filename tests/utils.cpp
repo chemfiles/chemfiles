@@ -7,6 +7,7 @@ namespace fs=boost::filesystem;
 namespace ip = boost::asio::ip;
 
 #include "chemfiles/utils.hpp"
+#include "chemfiles/Error.hpp"
 
 TEST_CASE("hostname") {
     auto hostname = ip::host_name();
@@ -36,4 +37,18 @@ TEST_CASE("split") {
 
     expected = std::vector<std::string>{"", "", "bla  bla", " jk:fiuks"};
     CHECK(chemfiles::split(",,bla  bla, jk:fiuks", ',') == expected);
+}
+
+TEST_CASE("String to double") {
+    CHECK(chemfiles::string2double("12.5") == 12.5);
+    CHECK(chemfiles::string2longlong("125") == 125);
+    CHECK(chemfiles::string2longlong("-32") == -32);
+
+    CHECK_THROWS_AS(chemfiles::string2double("foo"), chemfiles::Error);
+    CHECK_THROWS_AS(chemfiles::string2double("1,2"), chemfiles::Error);
+    CHECK_THROWS_AS(chemfiles::string2double("3e456782"), chemfiles::Error);
+
+    CHECK_THROWS_AS(chemfiles::string2longlong("foo"), chemfiles::Error);
+    CHECK_THROWS_AS(chemfiles::string2longlong("2.5"), chemfiles::Error);
+    CHECK_THROWS_AS(chemfiles::string2longlong("9223372036854775808"), chemfiles::Error);
 }
