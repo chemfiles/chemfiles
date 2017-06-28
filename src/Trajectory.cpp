@@ -77,6 +77,8 @@ void Trajectory::pre_read(size_t step) {
 }
 
 void Trajectory::post_read(Frame& frame) {
+    frame.set_step(step_);
+
     if (custom_topology_) {
         frame.set_topology(*custom_topology_);
     } else {
@@ -94,9 +96,9 @@ Frame Trajectory::read() {
 
     Frame frame;
     format_->read(frame);
-    step_++;
-
     post_read(frame);
+
+    step_++;
     return frame;
 }
 

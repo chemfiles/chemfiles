@@ -81,6 +81,20 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
     }
 }
 
+
+TEST_CASE("Setting frame step", "[Trajectory]"){
+    Trajectory file("data/xyz/helium.xyz");
+    auto frame = file.read();
+    CHECK(frame.step() == 0);
+
+    frame = file.read();
+    CHECK(frame.step() == 1);
+
+    frame = file.read_step(10);
+    CHECK(frame.step() == 10);
+}
+
+
 TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]") {
     SECTION("Reading") {
         Trajectory file("data/xyz/trajectory.xyz");
@@ -145,7 +159,7 @@ TEST_CASE("Errors", "[Trajectory]"){
 
     SECTION("Read file past end") {
         Trajectory file("data/xyz/trajectory.xyz", 'r');
-        CHECK_THROWS_AS(file.read_step(5), FileError);
+        CHECK_THROWS_AS(file.read_step(2), FileError);
 
         file.read();
         file.read();

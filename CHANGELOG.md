@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   and use the configuration data to rename atomic types to make sure they
   match element names. The `chemfiles::add_configuration` function can be used
   to add additional configuration files.
+* Reading a `Frame` (with `Trajectory::read` or `Trajectory::read_step`) will
+  now set the frame step.
 
 ### Changes in supported formats
 

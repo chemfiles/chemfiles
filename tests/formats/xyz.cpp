@@ -13,8 +13,8 @@ using namespace chemfiles;
 namespace fs=boost::filesystem;
 
 
-TEST_CASE("Read files in XYZ format", "[XYZ]"){
-    SECTION("Check nsteps"){
+TEST_CASE("Read files in XYZ format", "[XYZ]") {
+    SECTION("Check nsteps") {
         Trajectory file1("data/xyz/trajectory.xyz");
         CHECK(file1.nsteps() == 2);
 
@@ -26,7 +26,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
     }
 
 
-    SECTION("Method style reading"){
+    SECTION("Read next step") {
         Trajectory file("data/xyz/helium.xyz");
         auto frame = file.read();
         CHECK(frame.natoms() == 125);
@@ -40,10 +40,11 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         CHECK(topology[0] == Atom("He"));
     }
 
-    SECTION("Read a specific step"){
+    SECTION("Read a specific step") {
         Trajectory file("data/xyz/helium.xyz");
         // Read frame at a specific positions
         auto frame = file.read_step(42);
+        CHECK(frame.step() == 42);
         auto positions = frame.positions();
         CHECK(positions[0] == vector3d(-0.145821, 8.540648, 1.090281));
         CHECK(positions[124] == vector3d(8.446093, 8.168162, 9.350953));
@@ -52,17 +53,18 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         CHECK(topology[0] == Atom("He"));
 
         frame = file.read_step(0);
+        CHECK(frame.step() == 0);
         positions = frame.positions();
         CHECK(positions[0] == vector3d(0.49053, 8.41351, 0.0777257));
         CHECK(positions[124] == vector3d(8.57951, 8.65712, 8.06678));
     }
 
-    SECTION("Read the whole file"){
+    SECTION("Read the whole file") {
         Trajectory file("data/xyz/helium.xyz");
         CHECK(file.nsteps() == 397);
 
         Frame frame;
-        while (!file.done()){
+        while (!file.done()) {
             frame = file.read();
         }
         auto positions = frame.positions();
@@ -70,7 +72,7 @@ TEST_CASE("Read files in XYZ format", "[XYZ]"){
         CHECK(positions[124] == vector3d(5.208778, 12.707273, 10.940157));
     }
 
-    SECTION("Read various files formatting"){
+    SECTION("Read various files formatting") {
         Trajectory file("data/xyz/spaces.xyz");
 
         auto frame = file.read();
@@ -90,8 +92,8 @@ struct directory_files_iterator {
     fs::path p_;
 };
 
-TEST_CASE("Errors in XYZ format", "[XYZ]"){
-    for (auto entry : directory_files_iterator("data/xyz/bad/")){
+TEST_CASE("Errors in XYZ format", "[XYZ]") {
+    for (auto entry : directory_files_iterator("data/xyz/bad/")) {
         CHECK_THROWS_AS(
             // We can throw either when creating the trajectory, or when reading
             // the frame, depending on the type of error
