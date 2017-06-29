@@ -28,7 +28,6 @@ using namespace chemfiles;
         std::string format() const {return #FORMAT;}                           \
         std::string plugin_name() const {return #PLUGIN;}                      \
         std::string reader() const {return #READER;}                           \
-        std::string extension() const {return std::string(".") + #READER;}     \
         bool have_velocities() const {return false;}                           \
     }
 
@@ -266,14 +265,6 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
         topology_->add_bond(static_cast<size_t>(from[i] - 1),
                             static_cast<size_t>(to[i]) - 1);
     }
-}
-
-template <MolfileFormat F> const char* Molfile<F>::name() {
-    return MolfilePluginData<F>().format().c_str();
-}
-
-template <MolfileFormat F> const char* Molfile<F>::extension() {
-    return MolfilePluginData<F>().extension().c_str();
 }
 
 // Instanciate all the templates

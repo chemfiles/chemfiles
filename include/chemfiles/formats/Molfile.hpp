@@ -40,8 +40,6 @@ struct MolfilePluginData {
 
     /// Plugin format
     std::string format() const;
-    /// Plugin file extension
-    std::string extension() const;
     /// Plugin name
     std::string plugin_name() const;
     /// Plugin reader, when a given plugin manages different formats
@@ -61,9 +59,6 @@ public:
     void read(Frame& frame) override;
     std::string description() const override;
     size_t nsteps() override;
-
-    static const char* name();
-    static const char* extension();
 private:
     /// Convert a molfile timestep to a chemfiles frame
     void molfile_to_frame(const molfile_timestep_t& timestep, Frame& frame);

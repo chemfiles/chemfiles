@@ -11,7 +11,7 @@ int main() {
     chfl_trajectory_open("noformat", 'r');
 
     const char* error = chfl_last_error();
-    assert(strcmp(error, "Can not find a format associated with the \"\" extension.") == 0);
+    assert(strcmp(error, "Can not find a format associated with the '' extension.") == 0);
     // [example]
     return 0;
 }

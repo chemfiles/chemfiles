@@ -7,7 +7,6 @@
 #include "chemfiles/types.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/files/NcFile.hpp"
-#include "chemfiles/FormatFactory.hpp"
 
 namespace chemfiles {
 
@@ -27,11 +26,6 @@ public:
 
     size_t nsteps() override;
     std::string description() const override;
-
-    // Register the Amber NetCDF format with the ".nc" extension and the
-    // "AmberNetCDF" description.
-    FORMAT_NAME(AmberNetCDF)
-    FORMAT_EXTENSION(.nc)
 private:
     /// Read the unit cell at the current internal step, the file is assumed to be valid.
     UnitCell read_cell();

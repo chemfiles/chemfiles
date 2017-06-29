@@ -12,7 +12,7 @@
 static std::string generate_chemfiles_error() {
     // Generate a log event
     CHECK(chfl_trajectory_open("noformat", 'r') == NULL);
-    return "Can not find a format associated with the \"\" extension.";
+    return "Can not find a format associated with the '' extension.";
 }
 
 TEST_CASE("Errors", "[CAPI]") {

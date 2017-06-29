@@ -14,7 +14,7 @@
 using namespace chemfiles;
 
 // Dummy format clase
-class DummyFormat : public Format {
+class DummyFormat: public Format {
 public:
     DummyFormat(const std::string&, File::Mode){}
     std::string description() const override {return "";}
@@ -22,33 +22,33 @@ public:
 };
 
 TEST_CASE("Registering a new format", "[Trajectory factory]"){
-    FormatFactory::get().register_extension(".testing", nullptr);
+    FormatFactory::get().register_extension<DummyFormat>(".testing");
     // We can not register the same format twice
     CHECK_THROWS_AS(
-        FormatFactory::get().register_extension(".testing", nullptr),
+        FormatFactory::get().register_extension<DummyFormat>(".testing"),
         FormatError
     );
 
-    FormatFactory::get().register_format("Testing", nullptr);
+    FormatFactory::get().register_name<DummyFormat>("Testing");
     // We can not register the same format twice
     CHECK_THROWS_AS(
-        FormatFactory::get().register_format("Testing", nullptr),
+        FormatFactory::get().register_name<DummyFormat>("Testing"),
         FormatError
     );
 }
 
 TEST_CASE("Geting registered format", "[Trajectory factory]"){
-    FormatFactory::get().register_extension(".dummy", new_format<DummyFormat>);
-    FormatFactory::get().register_format("Dummy", new_format<DummyFormat>);
+    FormatFactory::get().register_extension<DummyFormat>(".dummy");
+    FormatFactory::get().register_name<DummyFormat>("Dummy");
 
     DummyFormat dummy("", File::READ);
-    auto format = FormatFactory::get().by_extension(".dummy")("", File::READ);
+    auto format = FormatFactory::get().extension(".dummy")("", File::READ);
     CHECK(typeid(dummy) == typeid(*format));
-    format = FormatFactory::get().format("Dummy")("", File::READ);
+    format = FormatFactory::get().name("Dummy")("", File::READ);
     CHECK(typeid(dummy) == typeid(*format));
 
-    CHECK_THROWS_AS(FormatFactory::get().format("UNKOWN"), FormatError);
-    CHECK_THROWS_AS(FormatFactory::get().by_extension(".UNKOWN"), FormatError);
+    CHECK_THROWS_AS(FormatFactory::get().name("UNKOWN"), FormatError);
+    CHECK_THROWS_AS(FormatFactory::get().extension(".UNKOWN"), FormatError);
 }
 
 TEST_CASE("Check error throwing in formats", "[Format errors]"){

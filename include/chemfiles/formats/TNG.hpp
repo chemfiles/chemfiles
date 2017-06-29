@@ -5,7 +5,6 @@
 #define CHEMFILES_TNG_FORMAT_HPP
 
 #include "chemfiles/Format.hpp"
-#include "chemfiles/FormatFactory.hpp"
 #include "chemfiles/files/TNGFile.hpp"
 
 namespace chemfiles {
@@ -21,11 +20,6 @@ public:
     void read(Frame& frame) override;
     size_t nsteps() override;
     std::string description() const override;
-
-    // Register the TNG format with the ".tng" extension and the "TNG"
-    // description.
-    FORMAT_NAME(TNG)
-    FORMAT_EXTENSION(.tng)
 private:
     void read_positions(Frame& frame);
     void read_velocities(Frame& frame);

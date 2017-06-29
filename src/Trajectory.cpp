@@ -43,11 +43,9 @@ Trajectory::Trajectory(const std::string& path, char mode, const std::string& fo
     : path_(path), mode_(mode), step_(0), nsteps_(0), format_(nullptr), custom_topology_(), custom_cell_() {
     format_creator_t format_creator;
     if (format == "") {
-        // try to guess the format by extension
-        auto ext = extension(path);
-        format_creator = FormatFactory::get().by_extension(ext);
+        format_creator = FormatFactory::get().extension(extension(path));
     } else {
-        format_creator = FormatFactory::get().format(format);
+        format_creator = FormatFactory::get().name(format);
     }
 
     auto filemode = char_to_file_mode(mode);

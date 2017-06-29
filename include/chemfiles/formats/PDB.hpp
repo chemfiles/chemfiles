@@ -4,12 +4,11 @@
 #ifndef CHEMFILES_FORMAT_PDB_HPP
 #define CHEMFILES_FORMAT_PDB_HPP
 
-#include <string>
 #include <unordered_map>
 
 #include "chemfiles/Format.hpp"
+#include "chemfiles/File.hpp"
 #include "chemfiles/Residue.hpp"
-#include "chemfiles/FormatFactory.hpp"
 
 namespace chemfiles {
 
@@ -28,10 +27,6 @@ public:
     void write(const Frame& frame) override;
     std::string description() const override;
     size_t nsteps() override;
-
-    // Register the PDB format with the ".pdb" extension and the "PDB" description.
-    FORMAT_NAME(PDB)
-    FORMAT_EXTENSION(.pdb)
 private:
     // Read CRYST1 record
     void read_CRYST1(Frame& frame, const std::string& line);

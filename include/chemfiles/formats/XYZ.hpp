@@ -4,10 +4,8 @@
 #ifndef CHEMFILES_FORMAT_XYZ_HPP
 #define CHEMFILES_FORMAT_XYZ_HPP
 
-#include <string>
-
 #include "chemfiles/Format.hpp"
-#include "chemfiles/FormatFactory.hpp"
+#include "chemfiles/File.hpp"
 
 namespace chemfiles {
 
@@ -23,10 +21,6 @@ public:
     void write(const Frame& frame) override;
     std::string description() const override;
     size_t nsteps() override;
-
-    // Register the xyz format with the ".xyz" extension and the "XYZ" description.
-    FORMAT_NAME(XYZ)
-    FORMAT_EXTENSION(.xyz)
 private:
     /// Text file where we read from
     std::unique_ptr<TextFile> file_;
