@@ -4,8 +4,6 @@
 #ifndef CHEMFILES_FORMAT_MOLFILE_HPP
 #define CHEMFILES_FORMAT_MOLFILE_HPP
 
-#include <memory>
-
 extern "C" {
 #include "vmdplugin.h"
 #include "molfile_plugin.h"
@@ -32,13 +30,24 @@ enum MolfileFormat {
 
 /// A thin wrapper around the vmd plugin functions
 template <MolfileFormat F>
-struct VMDFunctions {
-    /// Initialize the plugin
+struct MolfilePluginData {
+    /// Function to initialize the plugin
     int init();
-    /// Register the plugin.
+    /// Function to register the plugin.
     int registration(void* data, vmdplugin_register_cb callback);
-    /// Unload the plugin
+    /// Function to unload the plugin
     int fini();
+
+    /// Plugin format
+    std::string format() const;
+    /// Plugin file extension
+    std::string extension() const;
+    /// Plugin name
+    std::string plugin_name() const;
+    /// Plugin reader, when a given plugin manages different formats
+    std::string reader() const;
+    /// Does this plugin have velocity data
+    bool have_velocities() const;
 };
 
 /// Use of VMD Molfile plugins as format reader. This class is templated by a
@@ -49,9 +58,9 @@ public:
     Molfile(const std::string& path, File::Mode mode);
     ~Molfile() noexcept;
 
-     void read(Frame& frame) override;
-     std::string description() const override;
-     size_t nsteps() override;
+    void read(Frame& frame) override;
+    std::string description() const override;
+    size_t nsteps() override;
 
     static const char* name();
     static const char* extension();
@@ -63,12 +72,12 @@ private:
 
     /// Path of the underlying file
     std::string path_;
-    /// VMD plugin functions
-    VMDFunctions<F> functions_;
+    /// VMD plugin data
+    MolfilePluginData<F> plugin_data_;
     /// VMD molfile plugin
-    molfile_plugin_t* plugin_;
+    molfile_plugin_t* plugin_handle_;
     /// The file handler
-    void* file_handler_;
+    void* file_handle_;
     /// The number of atoms in the last trajectory read
     int natoms_;
     /// Store optional topological information

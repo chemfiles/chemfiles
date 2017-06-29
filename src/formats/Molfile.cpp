@@ -1,8 +1,3 @@
-// Chemfiles, a modern library for chemistry file reading and writing
-// Copyright (C) Guillaume Fraux and contributors -- BSD license
-
-#include <map>
-
 // From vmdconio.h
 #define VMDCON_ALL       0
 #define VMDCON_INFO      1
@@ -20,23 +15,34 @@
 using namespace chemfiles;
 
 /******************************************************************************/
+#define PLUGINS_DATA(FORMAT, PLUGIN, READER, VELOCITIES)                       \
+    extern "C" int PLUGIN##_register(void*, vmdplugin_register_cb);            \
+    extern "C" int PLUGIN##_fini(void);                                        \
+    extern "C" int PLUGIN##_init(void);                                        \
+    template <> struct MolfilePluginData<FORMAT> {                             \
+        int init() { return PLUGIN##_init(); }                                 \
+        int registration(void* data, vmdplugin_register_cb callback) {         \
+            return PLUGIN##_register(data, callback);                          \
+        }                                                                      \
+        int fini() { return PLUGIN##_fini(); }                                 \
+        std::string format() const {return #FORMAT;}                           \
+        std::string plugin_name() const {return #PLUGIN;}                      \
+        std::string reader() const {return #READER;}                           \
+        std::string extension() const {return std::string(".") + #READER;}     \
+        bool have_velocities() const {return false;}                           \
+    }
 
-struct plugin_data_t {
-    std::string format;
-    std::string plugin;
-    std::string reader;
-    std::string extension;
-    bool have_velocities;
-};
+namespace chemfiles {
+    PLUGINS_DATA(DCD,    dcdplugin,     dcd,       false);
+    PLUGINS_DATA(GRO,    gromacsplugin, gro,       false);
+    PLUGINS_DATA(TRR,    gromacsplugin, trr,       true);
+    PLUGINS_DATA(XTC,    gromacsplugin, xtc,       false);
+    PLUGINS_DATA(TRJ,    gromacsplugin, trj,       true);
+    PLUGINS_DATA(LAMMPS, lammpsplugin,  lammpstrj, false);
+}
 
-static std::map<MolfileFormat, plugin_data_t> molfile_plugins{
-    {DCD, {"DCD", "dcdplugin", "dcd", ".dcd", false}},
-    {GRO, {"GRO", "gromacsplugin", "gro", ".gro", false}},
-    {TRR, {"TRR", "gromacsplugin", "trr", ".trr", true}},
-    {XTC, {"XTC", "gromacsplugin", "xtc", ".xtc", false}},
-    {TRJ, {"TRJ", "gromacsplugin", "trj", ".trj", true}},
-    {LAMMPS, {"LAMMPS", "lammpsplugin", "lammpstrj", ".lammpstrj", false}},
-};
+#undef PLUGINS_FUNCTIONS
+/******************************************************************************/
 
 struct plugin_reginfo_t {
     plugin_reginfo_t() : plugin(nullptr) {}
@@ -48,7 +54,7 @@ template <MolfileFormat F> static int register_plugin(void* v, vmdplugin_t* p) {
     assert(std::string(MOLFILE_PLUGIN_TYPE) == std::string(p->type));
 
     auto plugin = reinterpret_cast<molfile_plugin_t*>(p);
-    if (molfile_plugins[F].reader == plugin->name) {
+    if (MolfilePluginData<F>().reader() == plugin->name) {
         // When this callback is called multiple times with more
         // than one plugin, only register the one whe want
         reginfo->plugin = plugin;
@@ -68,62 +74,65 @@ static int molfiles_to_chemfiles_warning(int level, const char* message) {
 
 template <MolfileFormat F>
 Molfile<F>::Molfile(const std::string& path, File::Mode mode)
-    : path_(path), plugin_(nullptr), file_handler_(nullptr), natoms_(0) {
+    : path_(path), plugin_handle_(nullptr), file_handle_(nullptr), natoms_(0) {
     if (mode != File::READ) {
         throw FormatError(
-            "Molfiles reader for " + molfile_plugins[F].format +
-            " can only open files in read mode."
+            "VMD Molfile plugin is only available in read mode."
         );
     }
 
-    if (functions_.init()) {
-        throw FormatError("Could not initialize the " +
-                          molfile_plugins[F].format + " plugin.");
+    if (plugin_data_.init()) {
+        throw FormatError(
+            "Could not initialize the " + plugin_data_.format() + " plugin."
+        );
     }
 
     plugin_reginfo_t reginfo;
     // The first argument in 'register_fun' is passed as the first argument to
     // register_plugin ...
-    if (functions_.registration(&reginfo, register_plugin<F>)) {
-        throw FormatError("Could not register the " +
-                          molfile_plugins[F].format + " plugin.");
+    if (plugin_data_.registration(&reginfo, register_plugin<F>)) {
+        throw FormatError(
+            "Could not register the " + plugin_data_.format() + " plugin."
+        );
     }
-    plugin_ = reginfo.plugin;
+    plugin_handle_ = reginfo.plugin;
 
     // Check the ABI version of the plugin
-    assert(plugin_->abiversion == vmdplugin_ABIVERSION);
+    assert(plugin_handle_->abiversion == vmdplugin_ABIVERSION);
     // Redirect console output to chemfiles warnings
-    plugin_->cons_fputs = molfiles_to_chemfiles_warning;
+    plugin_handle_->cons_fputs = molfiles_to_chemfiles_warning;
 
     // Check that needed functions are here
-    if ((plugin_->open_file_read == nullptr) ||
-        (plugin_->read_next_timestep == nullptr) ||
-        (plugin_->close_file_read == nullptr)) {
-        throw FormatError("The " + molfile_plugins[F].format +
-                          " plugin_ does not have read capacities");
+    if ((plugin_handle_->open_file_read == nullptr) ||
+        (plugin_handle_->read_next_timestep == nullptr) ||
+        (plugin_handle_->close_file_read == nullptr)) {
+        throw FormatError(
+            "The " + plugin_data_.format() + " plugin does not have read capacities"
+        );
     }
 
-    file_handler_ = plugin_->open_file_read(path.c_str(),
-                                            plugin_->name, &natoms_);
+    file_handle_ = plugin_handle_->open_file_read(
+        path.c_str(), plugin_handle_->name, &natoms_
+    );
 
-    if (file_handler_ == nullptr) {
-        throw FileError("Could not open the file: " + path +
-                        " with VMD molfile");
+    if (file_handle_ == nullptr) {
+        throw FileError(
+            "Could not open the file: " + path + " with VMD molfile"
+        );
     }
 
     read_topology();
 }
 
 template <MolfileFormat F> Molfile<F>::~Molfile() noexcept {
-    if (file_handler_) {
-        plugin_->close_file_read(file_handler_);
+    if (file_handle_) {
+        plugin_handle_->close_file_read(file_handle_);
     }
-    functions_.fini();
+    plugin_data_.fini();
 }
 
 template <MolfileFormat F> std::string Molfile<F>::description() const {
-    return "Molfile-based reader for the " + molfile_plugins[F].format +
-           "format";
+    return "VMD molfile based reader for the " + plugin_data_.format() + "format";
 }
 
 template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
@@ -132,15 +141,17 @@ template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
 
     molfile_timestep_t timestep{nullptr, nullptr, 0, 0, 0, 0, 0, 0, 0};
     timestep.coords = coords.data();
-    if (molfile_plugins[F].have_velocities) {
+    if (plugin_data_.have_velocities()) {
         velocities.resize(3 * static_cast<size_t>(natoms_));
         timestep.velocities = velocities.data();
     }
 
-    int status = plugin_->read_next_timestep(file_handler_, natoms_, &timestep);
+    int status = plugin_handle_->read_next_timestep(file_handle_, natoms_, &timestep);
     if (status != MOLFILE_SUCCESS) {
-        throw FormatError("Error while reading the file " + path_ +
-                          " using Molfile format " + molfile_plugins[F].format);
+        throw FormatError(
+            "Error while reading the file " + path_ + " with VMD molfile " +
+            plugin_data_.format() + " reader"
+        );
     }
 
     if (topology_) {
@@ -154,7 +165,7 @@ template <MolfileFormat F> size_t Molfile<F>::nsteps() {
     size_t n = 0;
     int status = MOLFILE_SUCCESS;
     while (true) {
-        status = plugin_->read_next_timestep(file_handler_, natoms_, nullptr);
+        status = plugin_handle_->read_next_timestep(file_handle_, natoms_, nullptr);
         if (status == MOLFILE_SUCCESS) {
             n++;
         } else {
@@ -162,10 +173,10 @@ template <MolfileFormat F> size_t Molfile<F>::nsteps() {
         }
     }
     // We need to close and re-open the file
-    plugin_->close_file_read(file_handler_);
+    plugin_handle_->close_file_read(file_handle_);
     int tmp = 0;
-    file_handler_ =
-        plugin_->open_file_read(path_.c_str(), plugin_->name, &tmp);
+    file_handle_ =
+        plugin_handle_->open_file_read(path_.c_str(), plugin_handle_->name, &tmp);
     read_topology();
 
     return n;
@@ -186,7 +197,7 @@ void Molfile<F>::molfile_to_frame(const molfile_timestep_t& timestep,
         positions[i][2] = timestep.coords[3 * i + 2];
     }
 
-    if (molfile_plugins[F].have_velocities) {
+    if (plugin_data_.have_velocities()) {
         frame.add_velocities();
         auto velocities = frame.velocities();
         for (size_t i = 0; i < static_cast<size_t>(natoms_); i++) {
@@ -198,20 +209,20 @@ void Molfile<F>::molfile_to_frame(const molfile_timestep_t& timestep,
 }
 
 template <MolfileFormat F> void Molfile<F>::read_topology() {
-    if (plugin_->read_structure == nullptr) {
+    if (plugin_handle_->read_structure == nullptr) {
         return;
     }
 
     std::vector<molfile_atom_t> atoms(static_cast<size_t>(natoms_));
     int optflags = 0;
-    int status = plugin_->read_structure(file_handler_, &optflags, atoms.data());
+    int status = plugin_handle_->read_structure(file_handle_, &optflags, atoms.data());
     if (status != MOLFILE_SUCCESS) {
         throw FormatError("Error while reading atomic names.");
     }
 
     topology_ = Topology();
 
-    auto residues = std::map<size_t, Residue>();
+    auto residues = std::unordered_map<size_t, Residue>();
     size_t atom_id = 0;
     for (auto& vmd_atom : atoms) {
         Atom atom(vmd_atom.type, vmd_atom.name);
@@ -230,19 +241,22 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
         atom_id++;
     }
 
-    if (plugin_->read_bonds == nullptr) {
+    if (plugin_handle_->read_bonds == nullptr) {
         return;
     }
 
-    int nbonds = 0, nbondtypes = 0;
+    int nbonds = 0;
     int* from = nullptr;
     int* to = nullptr;
-    float* bondorder = nullptr;
-    int* bondtype = nullptr;
-    char** bondtypename = nullptr;
 
-    status = plugin_->read_bonds(file_handler_, &nbonds, &from, &to, &bondorder,
-                              &bondtype, &nbondtypes, &bondtypename);
+    int dummy = 0;
+    float* _float = nullptr;
+    int* _int = nullptr;
+    char** _char = nullptr;
+
+    status = plugin_handle_->read_bonds(
+        file_handle_, &nbonds, &from, &to, &_float, &_int, &dummy, &_char
+    );
     if (status != MOLFILE_SUCCESS) {
         throw FormatError("Error while reading bonds.");
     }
@@ -255,41 +269,14 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
 }
 
 template <MolfileFormat F> const char* Molfile<F>::name() {
-    static const char* val = molfile_plugins[F].format.c_str();
-    return val;
+    return MolfilePluginData<F>().format().c_str();
 }
 
 template <MolfileFormat F> const char* Molfile<F>::extension() {
-    static const char* val = molfile_plugins[F].extension.c_str();
-    return val;
+    return MolfilePluginData<F>().extension().c_str();
 }
 
-/******************************************************************************/
 // Instanciate all the templates
-
-#define PLUGINS_FUNCTIONS(PLUGIN, FORMAT)                                      \
-    extern "C" int PLUGIN##_register(void*, vmdplugin_register_cb);            \
-    extern "C" int PLUGIN##_fini(void);                                        \
-    extern "C" int PLUGIN##_init(void);                                        \
-    template <> struct VMDFunctions<FORMAT> {                                  \
-        int init() { return PLUGIN##_init(); }                                 \
-        int registration(void* data, vmdplugin_register_cb callback) {         \
-            return PLUGIN##_register(data, callback);                          \
-        }                                                                      \
-        int fini() { return PLUGIN##_fini(); }                                 \
-    }
-
-namespace chemfiles {
-PLUGINS_FUNCTIONS(dcdplugin, DCD);
-PLUGINS_FUNCTIONS(gromacsplugin, GRO);
-PLUGINS_FUNCTIONS(gromacsplugin, TRR);
-PLUGINS_FUNCTIONS(gromacsplugin, XTC);
-PLUGINS_FUNCTIONS(gromacsplugin, TRJ);
-PLUGINS_FUNCTIONS(lammpsplugin, LAMMPS);
-}
-
-#undef PLUGINS_FUNCTIONS
-
 template class chemfiles::Molfile<DCD>;
 template class chemfiles::Molfile<GRO>;
 template class chemfiles::Molfile<TRR>;
