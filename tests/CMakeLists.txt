@@ -104,13 +104,15 @@ function(chfl_capi_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     set(_name_ "c-${_name_}")
     chfl_test(${_name_} ${_file_})
-    target_compile_definitions(${_name_} PRIVATE "-DSRCDIR=\"${PROJECT_SOURCE_DIR}\"")
 endfunction()
 
 file(GLOB capi_test_files ${CMAKE_CURRENT_SOURCE_DIR}/capi/*.cpp)
 foreach(test_file IN LISTS capi_test_files)
     chfl_capi_test(${test_file})
 endforeach(test_file)
+
+file(RELATIVE_PATH VERSION_FILE_PATH ${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/VERSION)
+target_compile_definitions(c-misc PRIVATE "-DVERSION_FILE_PATH=\"${VERSION_FILE_PATH}\"")
 
 set(CHEMFILES_TESTS_IGNORE "")
 function(chfl_doctest _file_)

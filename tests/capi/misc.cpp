@@ -31,7 +31,7 @@ TEST_CASE("Configuration", "[CAPI]") {
 }
 
 TEST_CASE("Version", "[CAPI]") {
-    std::ifstream file(SRCDIR "/VERSION");
+    std::ifstream file(VERSION_FILE_PATH);
     REQUIRE(file.is_open());
     std::stringstream content;
     content << file.rdbuf();
