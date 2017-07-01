@@ -5,6 +5,7 @@
 
 #include "chemfiles/formats/Molfile.hpp"
 #include "chemfiles/formats/AmberNetCDF.hpp"
+#include "chemfiles/formats/LAMMPSData.hpp"
 #include "chemfiles/formats/PDB.hpp"
 #include "chemfiles/formats/XYZ.hpp"
 #include "chemfiles/formats/TNG.hpp"
@@ -33,6 +34,9 @@ FormatFactory::FormatFactory() : formats_(), extensions_() {
     this->register_name<AmberNetCDFFormat>("Amber NetCDF");
     this->register_extension<AmberNetCDFFormat>(".nc");
 
+    this->register_name<LAMMPSDataFormat>("LAMMPS Data");
+
+    // VMD molfile plugins
     this->register_name<Molfile<DCD>>("DCD");
     this->register_extension<Molfile<DCD>>(".dcd");
 
