@@ -59,8 +59,10 @@ TEST_CASE("Selections", "[CAPI]") {
         CHECK(matches_count == 2);
 
         chfl_match_t* matches = new chfl_match_t[static_cast<size_t>(matches_count)];
-
         REQUIRE(matches != 0);
+
+        CHECK(chfl_selection_matches(selection, matches, 1) == CHFL_MEMORY_ERROR);
+
         CHECK_STATUS(chfl_selection_matches(selection, matches, matches_count));
         CHECK(matches[0].size == 1);
         CHECK(matches[1].size == 1);

@@ -59,6 +59,10 @@ inline bool operator==(const Match& lhs, const Match& rhs) {
     return true;
 }
 
+inline bool operator!=(const Match& lhs, const Match& rhs) {
+    return !(lhs == rhs);
+}
+
 /// Selection context, i.e. what we are matching
 enum class Context {
     /// Matching a single atom

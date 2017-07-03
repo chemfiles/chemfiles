@@ -7,6 +7,15 @@ using namespace chemfiles;
 
 static Frame testing_frame();
 
+TEST_CASE("Match class", "[selection]") {
+    auto match = Match(1ul, 2ul, 3ul);
+    CHECK(match.size() == 3);
+
+    CHECK(match != Match(1ul, 2ul));
+    CHECK(match != Match(1ul, 2ul, 4ul));
+    CHECK(match == Match(1ul, 2ul, 3ul));
+}
+
 TEST_CASE("Atoms selections", "[selection]") {
     auto frame = testing_frame();
 
@@ -168,6 +177,7 @@ TEST_CASE("Atoms selections", "[selection]") {
         CHECK_THROWS_AS(Selection("atoms: pairs: atoms"), SelectionError);
         // Variable index is too big
         CHECK_THROWS_AS(Selection("pairs: name(#3) O"), SelectionError);
+        CHECK_THROWS_AS(Selection("name(#2) O"), SelectionError);
     }
 }
 
@@ -272,6 +282,15 @@ TEST_CASE("Multiple selections", "[selection]") {
         auto sel = Selection("dihedrals: all");
         std::vector<Match> res{{0ul, 1ul, 2ul, 3ul}};
         CHECK(sel.evaluate(frame) == res);
+
+        sel = Selection("dihedrals: name(#3) O and name(#4) H1");
+        res = std::vector<Match>{{3ul, 2ul, 1ul, 0ul}};
+        auto eval = sel.evaluate(frame);
+
+        CHECK(res.size() == eval.size());
+        for (auto& match: res) {
+            CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
+        }
 
         CHECK_THROWS_AS(sel.list(frame), SelectionError);
     }

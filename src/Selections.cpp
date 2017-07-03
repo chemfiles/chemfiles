@@ -44,7 +44,7 @@ static Context get_context(const std::string& string, std::string& selection) {
         }
     } else {
         throw SelectionError(
-            "Can not read selection context in \"" + string + "\", too much ':'"
+            "Can not get selection context in \"" + string + "\", too many ':'"
         );
     }
 }
