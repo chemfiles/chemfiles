@@ -24,13 +24,12 @@ TEST_CASE("Atom type renaming") {
     SECTION("Same name and type") {
         auto tmpfile = NamedTempPath(".xyz");
 
-        {
-            std::ofstream file(tmpfile);
-            file << "3" << std::endl << std::endl;
-            file << "Oh 1 2 3" << std::endl;
-            file << "Oz 3 2 1" << std::endl;
-            file << "N  0 3 9" << std::endl;
-        }
+        std::ofstream file(tmpfile);
+        file << "3" << std::endl << std::endl;
+        file << "Oh 1 2 3" << std::endl;
+        file << "Oz 3 2 1" << std::endl;
+        file << "N  0 3 9" << std::endl;
+        file.close();
 
         auto frame = Trajectory(tmpfile).read();
         CHECK(frame.natoms() == 3);
@@ -48,16 +47,14 @@ TEST_CASE("Atom type renaming") {
     SECTION("Different name and type") {
         auto tmpfile = NamedTempPath(".pdb");
 
-        {
-            std::ofstream file(tmpfile);
-            auto content =
+        std::ofstream file(tmpfile);
+        file <<
 "ATOM      1 Oh   LIG     1       1.000   0.000   0.000  1.00  0.00          Oh\n"
 "ATOM      1 Oh   LIG     1       2.000   0.000   0.000  1.00  0.00          F \n"
 "ATOM      1  N   LIG     1       3.000   0.000   0.000  1.00  0.00          N \n"
 "ATOM      1  N   LIG     1       4.000   0.000   0.000  1.00  0.00          Zn\n"
-"END\n";
-            file << content << std::endl;
-        }
+"END\n" << std::endl;
+        file.close();
 
         auto frame = Trajectory(tmpfile).read();
         CHECK(frame.natoms() == 4);
@@ -73,5 +70,31 @@ TEST_CASE("Atom type renaming") {
 
         CHECK(topology[3].name() == "N");
         CHECK(topology[3].type() == "Zn");
+    }
+}
+
+TEST_CASE("Configuration errors") {
+    auto tmpfile = NamedTempPath(".toml");
+
+    SECTION("Invalid TOML") {
+        // Invalid toml
+        std::ofstream file(tmpfile);
+        file << "[types]\nfoo: 'bar'\n" << std::endl;
+        file.close();
+
+        CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
+    }
+
+    SECTION("Invalid types data") {
+        // Invalid toml
+        std::ofstream file(tmpfile);
+        file << "[types]\nfoo: 4\n" << std::endl;
+        file.close();
+
+        CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
+    }
+
+    SECTION("Could not read file") {
+        CHECK_THROWS_AS(chemfiles::add_configuration("nope"), ConfigurationError);
     }
 }
