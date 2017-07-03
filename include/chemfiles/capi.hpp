@@ -25,7 +25,7 @@ inline size_t checked_cast(uint64_t value) {
         return retval;                                                         \
     }
 
-#define CATCH_AND_GOTO(exception)                                              \
+#define CATCH_AND_GOTO_ERROR(exception)                                        \
     catch (const chemfiles::exception& e) {                                    \
         CAPI_LAST_ERROR = std::string(e.what());                               \
         chemfiles::warning(e.what());                                          \
@@ -35,7 +35,7 @@ inline size_t checked_cast(uint64_t value) {
 #define CHECK_POINTER(ptr)                                                     \
     do {                                                                       \
         if (ptr == nullptr) {                                                  \
-            std::string message = "Parameter " + std::string(#ptr) + "cannot be NULL"; \
+            std::string message = "Parameter " + std::string(#ptr) + " cannot be NULL"; \
             CAPI_LAST_ERROR = message;                                         \
             chemfiles::warning(message);                                       \
             return CHFL_MEMORY_ERROR;                                          \
@@ -45,7 +45,7 @@ inline size_t checked_cast(uint64_t value) {
 #define CHECK_POINTER_GOTO(ptr)                                                \
     do {                                                                       \
         if (ptr == nullptr) {                                                  \
-            std::string message = "Parameter " + std::string(#ptr) + "cannot be NULL"; \
+            std::string message = "Parameter " + std::string(#ptr) + " cannot be NULL"; \
             CAPI_LAST_ERROR = message;                                         \
             chemfiles::warning(message);                                       \
             goto error;                                                        \
@@ -77,12 +77,12 @@ inline size_t checked_cast(uint64_t value) {
     try {                                                                      \
         instructions                                                           \
     }                                                                          \
-    CATCH_AND_GOTO(FileError)                                                  \
-    CATCH_AND_GOTO(MemoryError)                                                \
-    CATCH_AND_GOTO(FormatError)                                                \
-    CATCH_AND_GOTO(SelectionError)                                             \
-    CATCH_AND_GOTO(ConfigurationError)                                         \
-    CATCH_AND_GOTO(Error)                                                      \
+    CATCH_AND_GOTO_ERROR(FileError)                                            \
+    CATCH_AND_GOTO_ERROR(MemoryError)                                          \
+    CATCH_AND_GOTO_ERROR(FormatError)                                          \
+    CATCH_AND_GOTO_ERROR(SelectionError)                                       \
+    CATCH_AND_GOTO_ERROR(ConfigurationError)                                   \
+    CATCH_AND_GOTO_ERROR(Error)                                                \
     catch (const std::exception& e) {                                          \
         CAPI_LAST_ERROR = std::string(e.what());                               \
         goto error;                                                            \
