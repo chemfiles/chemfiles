@@ -7,7 +7,7 @@
 using namespace chemfiles;
 
 void Topology::resize(size_t natoms) {
-    for (auto bond : bonds()) {
+    for (auto& bond: connect_.bonds()) {
         if (bond[0] >= natoms || bond[1] >= natoms) {
             throw Error(
                 "Can not resize the topology to contains " + std::to_string(natoms) +

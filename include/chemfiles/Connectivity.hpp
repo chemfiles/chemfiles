@@ -184,6 +184,8 @@ public:
     void remove_bond(size_t i, size_t j);
 
 private:
+    /// Biggest index within the atoms we know about
+    size_t biggest_atom_ = 0;
     /// Bonds in the system
     sorted_set<Bond> bonds_;
     /// Angles in the system

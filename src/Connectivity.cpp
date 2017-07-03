@@ -5,61 +5,56 @@
 
 using namespace chemfiles;
 
-static inline bool not_in_angle(const Angle& angle, size_t index) {
-    return angle[0] != index && angle[1] != index && angle[2] != index;
-}
-
 void Connectivity::recalculate() const {
     angles_.clear();
     dihedrals_.clear();
-    for (auto const& bond1 : bonds_) {
-        // Find angles
-        for (auto const& bond2 : bonds_) {
-            if (bond1 == bond2) {
-                continue;
-            }
-            // Initializing angle to an invalid value
-            auto angle = Angle(
-                static_cast<size_t>(-1), static_cast<size_t>(-2), static_cast<size_t>(-3)
-            );
-            if (bond1[0] == bond2[1]) {
-                angle = Angle(bond2[0], bond2[1], bond1[1]);
-                angles_.insert(angle);
-            } else if (bond1[1] == bond2[0]) {
-                angle = Angle(bond1[0], bond1[1], bond2[1]);
-                angles_.insert(angle);
-            } else if (bond1[1] == bond2[1]) {
-                angle = Angle(bond1[0], bond1[1], bond2[0]);
-                angles_.insert(angle);
-            } else if (bond1[0] == bond2[0]) {
-                angle = Angle(bond1[1], bond1[0], bond2[1]);
-                angles_.insert(angle);
-            } else {
-                // We will not find any dihedral angle from these bonds
-                continue;
-            }
-            // Find dihedral angles
-            for (auto const& bond3 : bonds_) {
-                if (bond2 == bond3 || bond1 == bond3) {
-                    continue;
-                }
 
-                if (angle[0] == bond3[0] && not_in_angle(angle, bond3[1])) {
-                    dihedrals_.emplace(bond3[1], angle[0], angle[1], angle[2]);
-                } else if (angle[0] == bond3[1] && not_in_angle(angle, bond3[0])) {
-                    dihedrals_.emplace(bond3[0], angle[0], angle[1], angle[2]);
-                } else if (angle[2] == bond3[0] && not_in_angle(angle, bond3[1])) {
-                    dihedrals_.emplace(angle[0], angle[1], angle[2], bond3[1]);
-                } else if (angle[2] == bond3[1] && not_in_angle(angle, bond3[0])) {
-                    dihedrals_.emplace(angle[0], angle[1], angle[2], bond3[0]);
-                } else if (angle[1] == bond3[0] && not_in_angle(angle, bond3[1])) {
-                    // TODO this is an improper dihedral
-                } else if (angle[1] == bond3[1] && not_in_angle(angle, bond3[0])) {
-                    // TODO this is an improper dihedral
-                }
+    // Generate the list of which atom is bonded to which one
+    auto bonded_to = std::vector<std::vector<size_t>>(biggest_atom_ + 1);
+    for (auto const& bond: bonds_) {
+        assert(bond[0] < bonded_to.size());
+        assert(bond[1] < bonded_to.size());
+        bonded_to[bond[0]].push_back(bond[1]);
+        bonded_to[bond[1]].push_back(bond[0]);
+    }
+
+    // Generate the list of angles
+    for (auto const& bond: bonds_) {
+        auto i = bond[0];
+        auto j = bond[1];
+        for (auto k: bonded_to[i]) {
+            if (k != j) {
+                angles_.insert(Angle(k, i, j));
+            }
+        }
+
+        for (auto k: bonded_to[j]) {
+            if (k != i) {
+                angles_.insert(Angle(i, j, k));
             }
         }
     }
+
+    // Generate the list of dihedrals
+    for (auto const& angle: angles_) {
+        auto i = angle[0];
+        auto j = angle[1];
+        auto k = angle[2];
+        for (auto m: bonded_to[i]) {
+            if (m != j && m != k) {
+                dihedrals_.insert(Dihedral(m, i, j, k));
+            }
+        }
+
+        for (auto m: bonded_to[k]) {
+            if (m != i && m != j) {
+                dihedrals_.insert(Dihedral(i, j, k, m));
+            }
+        }
+    }
+
+    // TODO: generate the impropers
+
     uptodate_ = true;
 }
 
@@ -87,6 +82,8 @@ const sorted_set<Dihedral>& Connectivity::dihedrals() const {
 void Connectivity::add_bond(size_t i, size_t j) {
     uptodate_ = false;
     bonds_.emplace(i, j);
+    if (i > biggest_atom_) {biggest_atom_ = i;}
+    if (j > biggest_atom_) {biggest_atom_ = j;}
 }
 
 void Connectivity::remove_bond(size_t i, size_t j) {
