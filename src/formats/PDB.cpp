@@ -355,15 +355,13 @@ void PDBFormat::write(const Frame& frame) {
 
     for (size_t i = 0; i < frame.natoms(); i++) {
         auto connections = connect[i].size();
-        auto lines = std::ceil(connections/4.0);
-        if (connections == 0) {
-            continue;
-        }
+        auto lines = connections / 4 + 1;
+        if (connections == 0) {continue;}
 
         for (size_t conect_line = 0; conect_line < lines; conect_line++) {
             fmt::print(*file_, "CONECT{: >5}", to_pdb_index(i));
-            auto last = std::min(connections, size_t(4*(conect_line+1)));
-            for (size_t j = 4*conect_line; j < last; j++) {
+            auto last = std::min(connections, 4 * (conect_line + 1));
+            for (size_t j = 4 * conect_line; j < last; j++) {
                 fmt::print(*file_, "{: >5}", to_pdb_index(connect[i][j]));
             }
             fmt::print(*file_, "\n");

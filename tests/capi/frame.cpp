@@ -52,7 +52,7 @@ TEST_CASE("Frame", "[CAPI]") {
 
         for (size_t i=0; i<natoms; i++) {
             for (size_t j=0; j<3; j++) {
-                positions[i][j] = i * j;
+                positions[i][j] = static_cast<double>(i * j);
             }
         }
 
@@ -86,7 +86,7 @@ TEST_CASE("Frame", "[CAPI]") {
 
         for (size_t i=0; i<natoms; i++) {
             for (size_t j=0; j<3; j++) {
-                velocities[i][j] = i * j + 1;
+                velocities[i][j] = static_cast<double>(i * j + 1);
             }
         }
 

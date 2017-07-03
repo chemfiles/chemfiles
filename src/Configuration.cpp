@@ -18,7 +18,7 @@ static std::vector<std::string> list_directories(std::string leaf);
 Configuration& Configuration::instance() {
     static Configuration instance_;
     return instance_;
-};
+}
 
 Configuration::Configuration() {
     auto directories = list_directories(current_directory());
