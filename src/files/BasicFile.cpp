@@ -28,8 +28,9 @@ static inline std::istream& get_line(std::istream& istream, std::string& string)
         case '\n':
             return istream;
         case '\r':
-            if(buffer->sgetc() == '\n')
+            if(buffer->sgetc() == '\n') {
                 buffer->sbumpc();
+            }
             return istream;
         case EOF:
             // Also handle the case when the last line has no line ending
@@ -64,16 +65,13 @@ BasicFile::BasicFile(const std::string& filename, File::Mode mode)
     case File::WRITE:
         openmode |= std::ios_base::out | std::ios_base::trunc;
         break;
-    default:
-        throw FileError(std::string("Got a bad file mode: ") + static_cast<char>(mode));
     }
 
     stream_.open(filename, openmode);
-    if (!stream_.is_open()) {
-        throw FileError("Could not open the file " + filename);
+    if (!stream_) {
+        throw FileError("Could not open the file at" + filename);
     }
     TextFile::rdbuf(stream_.rdbuf());
-    rewind();
     stream_.clear();
     // Throw exceptions on errors
     stream_.exceptions(std::fstream::badbit | std::fstream::failbit);

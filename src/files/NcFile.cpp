@@ -122,8 +122,6 @@ NcFile::NcFile(const std::string& filename, File::Mode mode)
         // check later.
         nc_enddef(file_id_);
         break;
-    default:
-        throw FileError(std::string("Got a bad file mode: ") + static_cast<char>(mode));
     }
 
     nc::check(status, "Could not open the file '" + filename + "'");

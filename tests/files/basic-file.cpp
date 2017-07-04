@@ -24,6 +24,21 @@ TEST_CASE("Read a text file", "[Files]"){
     CHECK(line == "Helium as a Lennard-Jone fluid");
 }
 
+TEST_CASE("Various line endinds", "[Files]"){
+    auto tmpfile = NamedTempPath(".dat");
+
+    std::ofstream file(tmpfile, std::ios_base::binary);
+    file << "line one\nline two\rline three\r\nno eol";
+    file.close();
+
+    BasicFile basic_file(tmpfile, File::READ);
+    CHECK(basic_file.readline() == "line one");
+    CHECK(basic_file.readline() == "line two");
+    CHECK(basic_file.readline() == "line three");
+    CHECK(basic_file.readline() == "no eol");
+}
+
+
 TEST_CASE("Write a text file", "[Files]"){
     auto filename = NamedTempPath(".dat");
 
@@ -33,15 +48,13 @@ TEST_CASE("Write a text file", "[Files]"){
         file << 5467 << std::endl;
     }
 
-    {
-        std::ifstream verification(filename);
-        REQUIRE(verification.is_open());
+    std::ifstream verification(filename);
+    REQUIRE(verification.is_open());
 
-        std::string line;
-        std::getline(verification, line);
-        CHECK(line == "Test");
+    std::string line;
+    std::getline(verification, line);
+    CHECK(line == "Test");
 
-        std::getline(verification, line);
-        CHECK(line == "5467");
-    }
+    std::getline(verification, line);
+    CHECK(line == "5467");
 }
