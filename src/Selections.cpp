@@ -49,6 +49,22 @@ static Context get_context(const std::string& string, std::string& selection) {
     }
 }
 
+static unsigned max_variable(Context context) {
+    switch (context) {
+    case Context::ATOM:
+        return 1;
+    case Context::PAIR:
+    case Context::BOND:
+        return 2;
+    case Context::ANGLE:
+    case Context::THREE:
+        return 3;
+    case Context::DIHEDRAL:
+    case Context::FOUR:
+        return 4;
+    }
+}
+
 Selection::~Selection() = default;
 Selection::Selection(Selection&&) = default;
 Selection& Selection::operator=(Selection&&) = default;
@@ -58,6 +74,16 @@ Selection::Selection(const std::string& selection)
     std::string selection_string;
     context_ = get_context(selection, selection_string);
     auto tokens = selections::tokenize(selection_string);
+    for (auto& token: tokens) {
+        if (token.type() == selections::Token::VARIABLE) {
+            if (token.variable() > max_variable(context_)) {
+                throw SelectionError(
+                    "Variable index " + std::to_string(token.variable()) +
+                    "is too big for the current context"
+                );
+            }
+        }
+    }
     ast_ = selections::parse(tokens);
 }
 
@@ -218,8 +244,8 @@ std::vector<Match> evaluate_dihedrals(const Frame& frame, match_checker is_match
 }
 
 std::vector<Match> Selection::evaluate(const Frame& frame) const {
-    auto is_match = [this](const Frame& frame, const Match& match) {
-        return ast_->is_match(frame, match);
+    auto is_match = [this](const Frame& f, const Match& match) {
+        return ast_->is_match(f, match);
     };
 
     switch (context_) {

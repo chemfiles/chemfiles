@@ -166,6 +166,8 @@ TEST_CASE("Atoms selections", "[selection]") {
         CHECK_THROWS_AS(Selection("kind: all"), SelectionError);
         // Too much colons
         CHECK_THROWS_AS(Selection("atoms: pairs: atoms"), SelectionError);
+        // Variable index is too big
+        CHECK_THROWS_AS(Selection("pairs: name(#3) O"), SelectionError);
     }
 }
 
