@@ -6,8 +6,8 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-TEST_CASE("Use the UnitCell type", "[UnitCell]"){
-    SECTION("Constructors"){
+TEST_CASE("Use the UnitCell type", "[UnitCell]") {
+    SECTION("Constructors") {
         UnitCell infinite{};
         CHECK(infinite.shape() == UnitCell::INFINITE);
         CHECK(infinite.a() == 0);
@@ -75,7 +75,14 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(triclinic3.gamma() == 90);
     }
 
-    SECTION("Set the values"){
+    SECTION("Operators") {
+        auto cell = UnitCell(10);
+        CHECK(cell == UnitCell(10, 10, 10));
+        CHECK(cell != UnitCell(11, 10, 10));
+        CHECK(cell != UnitCell(UnitCell::TRICLINIC, 10, 10, 10));
+    }
+
+    SECTION("Set the values") {
         UnitCell cell;
 
         cell.shape(UnitCell::ORTHORHOMBIC);
@@ -99,7 +106,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(cell.gamma() == 60);
     }
 
-    SECTION("Matricial representation"){
+    SECTION("Matricial representation") {
         UnitCell triclinic(10, 11, 12, 90, 60, 120);
         auto H = triclinic.matricial();
         double a = 0, b = 0, c = 0;
@@ -122,7 +129,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         }
     }
 
-    SECTION("Wraping vectors"){
+    SECTION("Wraping vectors") {
         UnitCell infinite;
         UnitCell ortho(10, 11, 12);
         UnitCell triclinic_algo(UnitCell::TRICLINIC, 10, 11, 12);
@@ -137,7 +144,7 @@ TEST_CASE("Use the UnitCell type", "[UnitCell]"){
         CHECK(approx_eq(tilted.wrap(vector3d(6, 8, -7)), vector3d(4.26352, -0.08481, -1.37679), 1e-5));
     }
 
-    SECTION("UnitCell errors"){
+    SECTION("UnitCell errors") {
         UnitCell cell;
 
         // Atempt to set values of an infinite unit cell
