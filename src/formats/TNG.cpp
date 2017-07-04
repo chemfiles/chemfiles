@@ -33,10 +33,6 @@ private:
 #define STRING(x) STRING_0(x)
 #define CHECK(x) check_tng_error((x), (STRING(x)))
 
-std::string TNGFormat::description() const {
-    return "TNG file format.";
-}
-
 TNGFormat::TNGFormat(const std::string& path, File::Mode mode)
     : tng_(path, mode) {}
 

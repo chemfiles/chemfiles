@@ -19,7 +19,6 @@ public:
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;
     size_t nsteps() override;
-    std::string description() const override;
 private:
     void read_positions(Frame& frame);
     void read_velocities(Frame& frame);

@@ -25,7 +25,6 @@ public:
     void write(const Frame& frame) override;
 
     size_t nsteps() override;
-    std::string description() const override;
 private:
     /// Read the unit cell at the current internal step, the file is assumed to be valid.
     UnitCell read_cell();

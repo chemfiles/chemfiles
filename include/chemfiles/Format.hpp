@@ -51,9 +51,6 @@ public:
     /// @brief Get the number of frames in the associated file
     /// @return The number of frames
     virtual size_t nsteps() = 0;
-
-    /// Get a short description of the format.
-    virtual std::string description() const = 0;
 };
 
 } // namespace chemfiles

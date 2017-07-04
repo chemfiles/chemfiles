@@ -8,10 +8,6 @@
 #include "chemfiles/warnings.hpp"
 using namespace chemfiles;
 
-std::string AmberNetCDFFormat::description() const {
-    return "Amber NetCDF file format.";
-}
-
 //! Check the validity of a NetCDF file
 static bool is_valid(const NcFile& file_, size_t natoms) {
     bool writing = (natoms != static_cast<size_t>(-1));

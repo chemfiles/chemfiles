@@ -19,7 +19,6 @@ public:
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;
     void write(const Frame& frame) override;
-    std::string description() const override;
     size_t nsteps() override;
 private:
     /// Text file where we read from

@@ -32,10 +32,6 @@ XYZFormat::XYZFormat(const std::string& path, File::Mode mode): file_(TextFile::
     file_->rewind();
 }
 
-std::string XYZFormat::description() const {
-    return "XYZ file format.";
-}
-
 size_t XYZFormat::nsteps() {
     return steps_positions_.size();
 }

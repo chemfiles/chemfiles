@@ -57,7 +57,6 @@ public:
     ~Molfile() noexcept;
 
     void read(Frame& frame) override;
-    std::string description() const override;
     size_t nsteps() override;
 private:
     /// Convert a molfile timestep to a chemfiles frame

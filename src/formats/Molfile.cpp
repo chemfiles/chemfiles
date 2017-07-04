@@ -130,10 +130,6 @@ template <MolfileFormat F> Molfile<F>::~Molfile() noexcept {
     plugin_data_.fini();
 }
 
-template <MolfileFormat F> std::string Molfile<F>::description() const {
-    return "VMD molfile based reader for the " + plugin_data_.format() + "format";
-}
-
 template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
     std::vector<float> coords(3 * static_cast<size_t>(natoms_));
     std::vector<float> velocities(0);

@@ -5,10 +5,10 @@
 #pragma clang diagnostic ignored "-Wpotentially-evaluated-expression"
 #endif
 
-#include <string>
 #include <fstream>
 #include <catch.hpp>
 
+#include "helpers.hpp"
 #include "chemfiles.hpp"
 #include "chemfiles/FormatFactory.hpp"
 using namespace chemfiles;
@@ -17,7 +17,6 @@ using namespace chemfiles;
 class DummyFormat: public Format {
 public:
     DummyFormat(const std::string&, File::Mode){}
-    std::string description() const override {return "";}
     size_t nsteps() override {return 42;}
 };
 
@@ -52,17 +51,15 @@ TEST_CASE("Geting registered format", "[Trajectory factory]"){
 }
 
 TEST_CASE("Check error throwing in formats", "[Format errors]"){
-    // Create a dummy file
-    std::string filename = "test-file.dummy";
-    std::ofstream out(filename);
+    auto tmpfile = NamedTempPath(".dummy");
+    std::ofstream out(tmpfile);
     out << "hey !" << std::endl;
     out.close();
 
     Frame frame;
-    Trajectory traj(filename, 'a');
-    CHECK_THROWS_AS(traj.read(), FormatError);
-    CHECK_THROWS_AS(traj.read_step(2), FormatError);
-    CHECK_THROWS_AS(traj.write(frame), FormatError);
+    Trajectory trajectory(tmpfile, 'a');
+    CHECK_THROWS_AS(trajectory.read(), FormatError);
+    CHECK_THROWS_AS(trajectory.read_step(2), FormatError);
+    CHECK_THROWS_AS(trajectory.write(frame), FormatError);
 
-    remove(filename.c_str());
 }
