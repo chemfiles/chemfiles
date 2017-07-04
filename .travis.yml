@@ -78,8 +78,8 @@ script:
   - cd $TRAVIS_BUILD_DIR
   - mkdir build && cd build
   - cmake $CMAKE_ARGS $CMAKE_EXTRA ..
-  - make
-  - ctest --output-on-failure
+  - make -j2
+  - ctest -j2 --output-on-failure
   - cd $TRAVIS_BUILD_DIR
   # Check C API documentation
   - ./scripts/ci/check-capi.py
