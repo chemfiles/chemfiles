@@ -14,3 +14,21 @@
    fun:exit
    ...
 }
+
+{
+   objc runtime
+   Memcheck:Param
+   msg->desc.port.name
+   ...
+   fun:libSystem_initializer
+   ...
+}
+
+{
+   objc runtime
+   Memcheck:Leak
+   ...
+   fun:libdispatch_init
+   fun:libSystem_initializer
+   ...
+}
