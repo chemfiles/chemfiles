@@ -78,6 +78,7 @@ Chemfiles can read and write files in the following formats:
 
 Chemfiles can also read (it can not write yet) files in the following formats:
 - TNG;
+- LAMMPS data files;
 - LAMMPS trajectory;
 - GROMACS formats: .gro; .xtc; .trj; .trr;
 - CHARMM DCD files

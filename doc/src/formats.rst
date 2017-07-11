@@ -25,6 +25,8 @@ specify which format to use.
 +-------------------+------------+-------------------+---------+---------+
 | `TNG`_            | .tng       | |yes|             | |yes|   | |no|    |
 +-------------------+------------+-------------------+---------+---------+
+| LAMMPS Data       |            | |yes|             | |yes|   | |no|    |
++-------------------+------------+-------------------+---------+---------+
 | LAMMPS            | .lammpstrj | |no|              | |yes|   | |no|    |
 +-------------------+------------+-------------------+---------+---------+
 | `GRO`_            | .gro       | |yes| Atom names  | |yes|   | |no|    |
@@ -37,6 +39,11 @@ specify which format to use.
 +-------------------+------------+-------------------+---------+---------+
 | `DCD`_            | .dcd       | |no|              | |yes|   | |no|    |
 +-------------------+------------+-------------------+---------+---------+
+
+"LAMMPS" format correspond to trajectory files written by the LAMMPS
+`dump <http://lammps.sandia.gov/doc/dump.html>`_ command. "LAMMPS Data"
+correspond to LAMMPS data files, as read by the LAMMPS
+`read_data <http://lammps.sandia.gov/doc/read_data.html>`_ command.
 
 .. _XYZ: https://openbabel.org/wiki/XYZ
 .. _PDB: http://www.rcsb.org/pdb/static.do?p=file_formats/pdb/index.html
@@ -63,29 +70,15 @@ Asking for a new format
 -----------------------
 
 If you want to use chemfiles with a format which is not yet implemented, you may
-easily add it by yourself if you know some C++. Just see the :file:`src/formats/XYZ.cpp`
-file for example.
+easily add it by yourself if you know some C++. See the ``src/formats/XYZ.cpp``
+file for example. The list of planned formats can be found `here
+<gh-new-format_>`_. If you can not find your favorite format in this list, you
+can `open an issue <gh-new-issue_>`_ with a description of the format, or even
+better a link to the format specification. If your format is in the `list of
+formats <vmd-formats_>`_ supported by VMD, then you are lucky! It will be easy
+to add support for this format. Please `open an issue <gh-new-issue_>`_ on and
+provide a file example to test the plugin against it.
 
-The list of planned formats can be found `here
-<https://github.com/chemfiles/chemfiles/labels/New%20Format>`_. If and only if you
-can not find your format in this list, you can also add another format request at
-`Github <https://github.com/chemfiles/chemfiles/issues/new>`_. In that case,
-please use the following header at the top of your message, and complete everything
-between square braces.
-
-.. code-block:: text
-
-    File Type                  | [text / binary]
-    ---------------------------|---------------
-    Topological information    | [Yes / No]
-    Positions                  | [Yes / No]
-    Velocities                 | [Yes / No]
-
-    Format specification: [link to the specification]
-    File example: [link to a file example]
-
-If your format is in the `list of formats`_ supported by VMD, then you are lucky ! It
-will be easy to add support for this format. Just provide a file example to test the
-plugin against it.
-
-.. _list of formats: http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/
+.. _gh-new-format: https://github.com/chemfiles/chemfiles/labels/A-formats
+.. _gh-new-issue: https://github.com/chemfiles/chemfiles/issues/new
+.. _vmd-formats: http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/
