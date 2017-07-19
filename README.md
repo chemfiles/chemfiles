@@ -1,4 +1,4 @@
-# Chemfiles, a modern library for chemistry file reading and writing
+## Chemfiles: a library for reading and writing chemistry files
 
 [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](http://chemfiles.github.io/chemfiles/)
 [![Build Status -- Linux & OSX](https://img.shields.io/travis/chemfiles/chemfiles/master.svg)](https://travis-ci.org/chemfiles/chemfiles)
@@ -9,33 +9,42 @@
 
 
 Chemfiles is a modern and high-quality library for reading and writing
-trajectory files created by computational chemistry simulations program. These
-trajectories contains atomic positions, velocities, names, topology and
-sometimes more.
-
-Running simulations produce enormous amounts of data, which has to be
-post-processed to extract physical information about the simulated system.
-Chemfiles provides an interface to access this information which is
-- **unified**: the same code will work with all the supported formats;
+trajectory files created by computational chemistry simulations programs. To help you access information (atomic positions, velocities, names, topology, etc.) about these files, Chemfiles provides an interface that is
+- **unified**: the same code will work with all supported formats;
 - **simple**: the interface is easy to use and extensively documented.
 
-This repository contains the core of the library which is a programmer
-interface, written in C++11. the [cfiles](https://github.com/chemfiles/cfiles)
-project provides ready to use programs for analysis of trajectories. You can
-also use Chemfiles from other languages, see the
-[chemfiles.<xxx>](https://github.com/chemfiles/) repositories.
+Use Chemfiles to conduct post-processing and then extract physical information about the systems you're simulating.
 
-Chemfiles is free and open source, and your [contributions](Contributing.md) are
+This repository contains the core of the Chemfiles library—a programmer
+interface written in C++11. Use it with the [cfiles](https://github.com/chemfiles/cfiles)
+project, which provides ready-to-use programs for analyzing trajectories. You can
+also use Chemfiles with other languages; [go here](https://github.com/chemfiles/) to view all related repositories.
+
+## Is Chemfiles for You?
+
+We created Chemfiles to analyze algorithms in [cfiles](https://github.com/chemfiles/cfiles) and for
+input/output capacities in two molecular simulation engines. You might use it too, if any of these apply to your use case:
+
+- you don't want to spend time writing and debugging a file parser;
+- you use binary formats because they are faster and take up less disk space;
+- you write analysis algorithms and want to read more than one trajectory
+  format;
+- you write simulation software and want to use more than one format for input or output.
+
+## Contact/Contribute
+
+Chemfiles is free and open source. Your [contributions](Contributing.md) are
 always welcome!
 
-If you have questions, suggestions or if you need help with chemfiles, do not
-hesitate to open an [issue] or join us on our [Gitter] chat room.
+If you have questions or suggestions, or need help, please open an [issue] or join us on our [Gitter] chat room.
 
-## Quick links
+If you are using Chemfiles in a published scientific study, please cite us using the following DOI: https://doi.org/10.5281/zenodo.800663. And if you find other uses for Chemfiles, drop us a line.
 
-- [Features](#features)
-- [Supported file formats](#supported-formats)
-- [Getting started](#getting-started)
+## Quick Links
+
+- [Features](#chemfiles-features)
+- [Supported File Formats](#supported-file-formats)
+- [Getting Started](#getting-started)
 - [Full documentation](http://chemfiles.github.io/chemfiles/)
 - Documentation for using Chemfiles from other languages:
     - [Python 2 and 3](http://chemfiles.github.io/chemfiles.py/)
@@ -44,39 +53,24 @@ hesitate to open an [issue] or join us on our [Gitter] chat room.
     - [Julia](http://chemfiles.github.io/Chemfiles.jl/)
     - [Rust](http://chemfiles.github.io/chemfiles.rs/)
 
-## Features
+### Chemfiles Features
 
-- Read both text (XYZ, PDB, ...) and binary (NetCDF, TNG, ...) file formats;
-- Filter atoms with a rich selection language;
-- Support a varying number of atoms in trajectories;
-- Set custom `UnitCell` or `Topology` when reading/writing;
-- Easy to use programming interface in Python, C++, C, Fortran 95, Julia and Rust;
-- Cross-platform, usable from Linux, OS X and Windows.
-- Open-source and freely available (3-clauses BSD license);
+- Reads both text (XYZ, PDB, ...) and binary (NetCDF, TNG, ...) file formats;
+- Filters atoms with a rich selection language;
+- Supports different numbers of atoms in trajectories;
+- Sets custom `UnitCell` or `Topology` when reading/writing;
+- Easy-to-use programming interface in Python, C++, C, Fortran 95, Julia and Rust;
+- Cross-platform and usable from Linux, OS X and Windows;
+- Open source and freely available (3-clauses BSD license);
 
-### Is chemfiles for you?
-
-You should give a try to chemfiles if one of theses sentence is true for you:
-
-- you do no want to spend time writing and debugging a file parser;
-- you use binary formats, because they are faster and take less disk space;
-- you write analysis algorithm, and want to read more than one trajectory
-  format;
-- you write a simulation software, and want to be able to use more than one
-  format for input or output.
-
-If you find other uses for chemfiles, let us know! The main author is using it
-both for analysis algorithm in [cfiles](https://github.com/chemfiles/cfiles),
-and for input/output capacities in two molecular simulation engines.
-
-## File formats
+### Supported File Formats
 
 Chemfiles can read and write files in the following formats:
 - XYZ;
 - PDB;
-- Amber NetCDF.
+- Amber NetCDF
 
-Chemfiles can also read (it can not write yet) files in the following formats:
+Chemfiles can also read (but not yet write) files in the following formats:
 - TNG;
 - LAMMPS data files;
 - LAMMPS trajectory;
@@ -84,37 +78,34 @@ Chemfiles can also read (it can not write yet) files in the following formats:
 - CHARMM DCD files
 
 See the [issue list](https://github.com/chemfiles/chemfiles/labels/New%20Format)
-for planned formats. Any other format supported by VMD is easy to add; if you
-need one, please open a new issue. If you want a new format in chemfiles, open a
-new issue with a link to the format definition, or better, write the code and
-[contribute](#contributions-welcome)!
+for planned formats. Any other format supported by VMD is easy to add: simply open a new issue with a link to the format definition, or—even better—write the code and [contribute](Contributing.md) it!
+new issue !
 
-## Getting started
+### Getting Started
 
-This is the way to get started with the C++ and C interface. If you want to use
-chemfiles from another language, please refer to the corresponding
+We'll help you get started with the C++ and C interface. If you want to use
+Chemfiles with another language, please refer to the corresponding
 documentation.
 
-### Installation of compiled packages
+### Installing Compiled Packages
 
-We use [OpenSUSE build][OpenSuseBuild] service to provide compiled packages of
-the latest release for some Linux distributions. You can use your package
+We use the [OpenSUSE build][OpenSuseBuild] service to provide compiled packages of
+the latest Chemfiles release for Linux distributions. You can use your package
 manager to download them [here][OSB-download].
 
 We also provide conda packages in the `conda-forge` community channel for Linux
-and Os X. This package contains provides the C++, C and Python interfaces. You
-can install the conda package by running:
+and OS X. This package provides the C++, C and Python interfaces. Install the conda package by running:
 
 ```
 conda install -c conda-forge chemfiles
 ```
 
-You can find more information about packages in the [documentation][install].
+Find more information about packages in the [documentation][install].
 
-### Building from source
+### Building from Source
 
 You will need [cmake](http://cmake.org/) and a C++11 compiler like GCC>=4.8,
-clang>=3.3, Intel>=14 or MSVC>=15.
+clang>=3.3, Intel>=14 or MSVC>=15:
 
 ```bash
 git clone https://github.com/chemfiles/chemfiles
@@ -126,9 +117,9 @@ make
 make install
 ```
 
-### Usage examples
+## Usage Examples
 
-This is how the interface looks like in C++
+This is what the interface looks like in C++:
 
 ```cpp
 // C++ version
@@ -146,16 +137,12 @@ int main() {
 }
 ```
 
-## Contributors and license
+## License
 
-If you are using chemfiles in a published scientific study, please cite us using
-the following DOI: https://doi.org/10.5281/zenodo.800663.
-
-Chemfiles was created and is maintained by Guillaume Fraux, and put to your
-disposition under the terms of the [3 clauses BSD license](LICENSE). By contributing
+Guillaume Fraux created and maintains Chemfiles, which applies the [3 clauses BSD license](LICENSE). By contributing
 to Chemfiles, you agree to distribute your contributions under the same license.
 
-All the contributors to chemfiles are listed in the [AUTHORS](AUTHORS) file.
+The [AUTHORS](AUTHORS) file lists all past contributors to Chemfiles.
 Many thanks to all of them!
 
 [Gitter]: https://gitter.im/chemfiles/chemfiles
