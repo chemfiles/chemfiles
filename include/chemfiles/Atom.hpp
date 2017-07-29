@@ -66,6 +66,16 @@ public:
     /// found.
     int atomic_number() const;
 
+    /// Try to get the Default Red(from RGB) element colors for viewers, if defined. Returns -1.0f if it can not be
+    /// found.
+    float color_r() const;
+    /// Try to get the Default Green(from RGB) element colors for viewers, if defined. Returns -1.0f if it can not be
+    /// found.
+    float color_g() const;
+    /// Try to get the Default Blue(from RGB) element colors for viewers, if defined. Returns -1.0f if it can not be
+    /// found.
+    float color_b() const;
+
 private:
     std::string name_;
     std::string type_;
