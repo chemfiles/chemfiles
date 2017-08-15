@@ -14,17 +14,21 @@ from xml.etree import ElementTree as ET
 
 
 class Atom:
-    def __init__(self, symbol, name, number, mass, cov, VdW):
+    def __init__(self, symbol, name, number, mass, cov, VdW, r, g, b):
         self.symbol = symbol
         self.name = name
         self.number = number
         self.mass = mass
         self.cov = cov
         self.VdW = VdW
+        self.elementColor_r = r
+        self.elementColor_g = g
+        self.elementColor_b = b
+
 
     def __str__(self):
-        return '{{"{}", ElementData{{{}, "{}", {}, {}, {}}} }}'.format(
-            self.symbol, self.number, self.name, self.mass, self.cov, self.VdW)
+        return '{{"{}", ElementData{{{}, "{}", {}, {}, {},{},{},{}}} }}'.format(
+            self.symbol, self.number, self.name, self.mass, self.cov, self.VdW, self.elementColor_r, self.elementColor_g, self.elementColor_b)
 
 
 def read_elements(path):
@@ -48,7 +52,11 @@ def read_elements(path):
             if prop.get("dictRef") == "bo:radiusVDW":
                 assert prop.get("units") == "units:ang"
                 VdW = float(prop.text)
-        atoms.append(Atom(symbol, name, number, mass, cov, VdW))
+            if prop.get("dictRef") == "bo:elementColor":
+                rgb_list = []
+                reader = prop.text
+                rgb_list = [float(x) for x in reader.split()]
+        atoms.append(Atom(symbol, name, number, mass, cov, VdW, rgb_list[0], rgb_list[1], rgb_list[2] ))
 
     return atoms
 
@@ -70,7 +78,7 @@ namespace chemfiles {
 """
 
 STRUCT = """
-//! Storing basic elemental data: mass, colvalent and Van der Waals radii
+//! Storing basic elemental data: mass, colvalent and Van der Waals radii, and default element colors for viewers
 struct ElementData {
     //! Atomic number
     const int number;
@@ -82,6 +90,10 @@ struct ElementData {
     const double colvalent_radius;
     //! Van der Waals radius in Angstrom
     const double vdw_radius;
+    //! Default element colors for viewers
+    const float elementColor_r;
+    const float elementColor_g;
+    const float elementColor_b;
 };
 """
 

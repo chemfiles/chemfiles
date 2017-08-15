@@ -51,3 +51,30 @@ int Atom::atomic_number() const {
         return -1;
     }
 }
+
+float  Atom::color_r() const{
+  auto periodic = PERIODIC_INFORMATION.find(type_);
+  if (periodic != PERIODIC_INFORMATION.end()) {
+      return periodic->second.elementColor_r;
+  } else {
+      return -1.0f;
+  }
+}
+
+float  Atom::color_g() const{
+  auto periodic = PERIODIC_INFORMATION.find(type_);
+  if (periodic != PERIODIC_INFORMATION.end()) {
+      return periodic->second.elementColor_g;
+  } else {
+      return -1.0f;
+  }
+}
+
+float  Atom::color_b() const{
+  auto periodic = PERIODIC_INFORMATION.find(type_);
+  if (periodic != PERIODIC_INFORMATION.end()) {
+      return periodic->second.elementColor_b;
+  } else {
+      return -1.0f;
+  }
+}
