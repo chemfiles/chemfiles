@@ -7,6 +7,11 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
+template <typename T>
+static bool contains(const std::vector<T> haystack, const T& needle) {
+    return std::find(haystack.begin(), haystack.end(), needle) != haystack.end();
+}
+
 TEST_CASE("Read files in PDB format", "[Molfile]"){
     SECTION("Read next step") {
         Trajectory file("data/pdb/water.pdb");
@@ -66,16 +71,16 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
 
         CHECK(topology.bonds().size() == 68);
 
-        CHECK(topology.isbond(9, 38));
-        CHECK(topology.isbond(58, 62));
-        CHECK(topology.isbond(37, 24));
-        CHECK(topology.isbond(27, 31));
+        CHECK(contains(topology.bonds(), Bond(9, 38)));
+        CHECK(contains(topology.bonds(), Bond(58, 62)));
+        CHECK(contains(topology.bonds(), Bond(37, 24)));
+        CHECK(contains(topology.bonds(), Bond(27, 31)));
 
-        CHECK(topology.isangle(20, 21, 23));
-        CHECK(topology.isangle(9, 38, 44));
+        CHECK(contains(topology.angles(), Angle(20, 21, 23)));
+        CHECK(contains(topology.angles(), Angle(9, 38, 44)));
 
-        CHECK(topology.isdihedral(64, 62, 58, 53));
-        CHECK(topology.isdihedral(22, 21, 23, 33));
+        CHECK(contains(topology.dihedrals(), Dihedral(64, 62, 58, 53)));
+        CHECK(contains(topology.dihedrals(), Dihedral(22, 21, 23, 33)));
     }
 
     SECTION("Support short records") {

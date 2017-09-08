@@ -83,45 +83,6 @@ CHFL_EXPORT chfl_status chfl_topology_remove(
     CHFL_TOPOLOGY* const topology, uint64_t i
 );
 
-/// Check if the atoms at indexes `i` and `j` are bonded together, and store
-/// the result in `result`.
-///
-/// @example{tests/capi/doc/chfl_topology/isbond.c}
-/// @return The operation status code. You can use `chfl_last_error` to learn
-///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_topology_isbond(
-    const CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, bool* result
-);
-
-/// Check if the atoms at indexes `i`, `j` and `k` form an angle, and store the
-/// result in `result`.
-///
-/// @example{tests/capi/doc/chfl_topology/isangle.c}
-/// @return The operation status code. You can use `chfl_last_error` to learn
-///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_topology_isangle(
-    const CHFL_TOPOLOGY* const topology,
-    uint64_t i,
-    uint64_t j,
-    uint64_t k,
-    bool* result
-);
-
-/// Check if the atoms at indexes `i`, `j`, `k` and `m` form a dihedral angle,
-/// and store the result in `result`.
-///
-/// @example{tests/capi/doc/chfl_topology/isdihedral.c}
-/// @return The operation status code. You can use `chfl_last_error` to learn
-///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_topology_isdihedral(
-    const CHFL_TOPOLOGY* const topology,
-    uint64_t i,
-    uint64_t j,
-    uint64_t k,
-    uint64_t m,
-    bool* result
-);
-
 /// Get the number of bonds in the `topology` in `nbonds`.
 ///
 /// @example{tests/capi/doc/chfl_topology/bonds_count.c}
@@ -153,7 +114,7 @@ CHFL_EXPORT chfl_status chfl_topology_dihedrals_count(
 /// of size `nbonds`.
 ///
 /// `data` size must be passed in the `nbonds` parameter, and be equal to the
-/// result of `chfl_topology_bonds_count`.
+/// result of `chfl_topology_bonds_count`. The bonds are sorted in the array.
 ///
 /// @example{tests/capi/doc/chfl_topology/bonds.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
@@ -166,7 +127,7 @@ CHFL_EXPORT chfl_status chfl_topology_bonds(
 /// of size `nangles`.
 ///
 /// `data` size must be passed in the `nangles` parameter, and be equal to the
-/// result of `chfl_topology_angles_count`.
+/// result of `chfl_topology_angles_count`. The angles are sorted in the array.
 ///
 /// @example{tests/capi/doc/chfl_topology/angles.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
@@ -179,7 +140,8 @@ CHFL_EXPORT chfl_status chfl_topology_angles(
 /// `data` of size `ndihedrals`.
 ///
 /// `data` size must be passed in the `ndihedrals` parameter, and be equal to
-/// the result of `chfl_topology_dihedrals_count`.
+/// the result of `chfl_topology_dihedrals_count`. The dihedrals are sorted in
+/// the array.
 ///
 /// @example{tests/capi/doc/chfl_topology/dihedrals.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn

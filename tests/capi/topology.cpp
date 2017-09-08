@@ -58,12 +58,6 @@ TEST_CASE("Residue", "[CAPI]") {
         CHECK_STATUS(chfl_topology_bonds_count(topology, &n));
         CHECK(n == 3);
 
-        bool isbond = false;
-        CHECK_STATUS(chfl_topology_isbond(topology, 0, 1, &isbond));
-        CHECK(isbond == true);
-        CHECK_STATUS(chfl_topology_isbond(topology, 0, 3, &isbond));
-        CHECK(isbond == false);
-
         uint64_t expected[3][2] = {{0, 1}, {1, 2}, {2, 3}};
         uint64_t bonds[3][2] = {{0}};
         CHECK_STATUS(chfl_topology_bonds(topology, bonds, 3));
@@ -88,12 +82,6 @@ TEST_CASE("Residue", "[CAPI]") {
         CHECK_STATUS(chfl_topology_angles_count(topology, &n));
         CHECK(n == 2);
 
-        bool isangle = false;
-        CHECK_STATUS(chfl_topology_isangle(topology, 0, 1, 2, &isangle));
-        CHECK(isangle == true);
-        CHECK_STATUS(chfl_topology_isangle(topology, 0, 1, 3, &isangle));
-        CHECK(isangle == false);
-
         uint64_t expected[2][3] = {{0, 1, 2}, {1, 2, 3}};
         uint64_t angles[2][3] = {{0}};
         CHECK_STATUS(chfl_topology_angles(topology, angles, 2));
@@ -117,12 +105,6 @@ TEST_CASE("Residue", "[CAPI]") {
         uint64_t n = 0;
         CHECK_STATUS(chfl_topology_dihedrals_count(topology, &n));
         CHECK(n == 1);
-
-        bool isdihedral = false;
-        CHECK_STATUS(chfl_topology_isdihedral(topology, 0, 1, 2, 3, &isdihedral));
-        CHECK(isdihedral == true);
-        CHECK_STATUS(chfl_topology_isdihedral(topology, 0, 1, 3, 2, &isdihedral));
-        CHECK(isdihedral == false);
 
         uint64_t expected[1][4] = {{0, 1, 2, 3}};
         uint64_t dihedrals[1][4] = {{0}};

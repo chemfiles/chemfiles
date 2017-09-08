@@ -29,6 +29,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Deprecation and removals
 
+* `Topology::isbond`, `Topology::isangle`, `Topology::isdihedral`, and the
+  corresponding C functions `chfl_topology_isbond`, `chfl_topology_isangle`
+  `chfl_topology_isdihedral` are removed.
+
 
 ## 0.7 (25 Feb 2017)
 

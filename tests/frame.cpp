@@ -110,16 +110,10 @@ TEST_CASE("Guess topology", "[Frame]") {
         frame.guess_topology();
 
         auto topology = frame.topology();
-        for (size_t i=1; i<5; i++){
-            CHECK(topology.isbond(0, i));
-        }
-
-        CHECK_FALSE(topology.isbond(2, 4));
-        CHECK_FALSE(topology.isbond(1, 2));
-
-        CHECK(topology.isangle(1, 0, 2));
-        CHECK(topology.isangle(3, 0, 2));
-        CHECK(topology.isangle(2, 0, 4));
+        CHECK(topology.bonds() == (std::vector<Bond>{{0, 1}, {0, 2}, {0, 3}, {0, 4}}));
+        CHECK(topology.angles() == (std::vector<Angle>{
+            {1, 0, 2}, {1, 0, 3}, {1, 0, 4}, {2, 0, 3}, {2, 0, 4}, {3, 0, 4},
+        }));
 
         CHECK(topology.bonds().size() == 4);
         CHECK(topology.angles().size() == 6);
@@ -142,9 +136,7 @@ TEST_CASE("Guess topology", "[Frame]") {
         frame.add_atom(Atom("H"), {{-0.2, 0.8, 0}});
 
         frame.guess_topology();
-        CHECK(frame.topology().bonds().size() == 2);
-        CHECK(frame.topology().isbond(0, 1));
-        CHECK(frame.topology().isbond(0, 2));
+        CHECK(frame.topology().bonds() == (std::vector<Bond>{{0, 1}, {0, 2}}));
     }
 
     // Weird geometries
@@ -155,17 +147,9 @@ TEST_CASE("Guess topology", "[Frame]") {
         frame.add_atom(Atom("C"), {{-0.5, 0, 0}});
 
         frame.guess_topology();
-        CHECK(frame.topology().bonds().size() == 3);
-        CHECK(frame.topology().isbond(0, 1));
-        CHECK(frame.topology().isbond(0, 2));
-        CHECK(frame.topology().isbond(1, 2));
-
-        CHECK(frame.topology().angles().size() == 3);
-        CHECK(frame.topology().isangle(0, 1, 2));
-        CHECK(frame.topology().isangle(0, 2, 1));
-        CHECK(frame.topology().isangle(1, 0, 2));
-
-        CHECK(frame.topology().dihedrals().size() == 0);
+        CHECK(frame.topology().bonds() == (std::vector<Bond>{{0, 1}, {0, 2}, {1, 2}}));
+        CHECK(frame.topology().angles() == (std::vector<Angle>{{0, 1, 2}, {0, 2, 1}, {1, 0, 2}}));
+        CHECK(frame.topology().dihedrals() == (std::vector<Dihedral>{}));
     }
 
     // Weird geometries
@@ -177,22 +161,8 @@ TEST_CASE("Guess topology", "[Frame]") {
         frame.add_atom(Atom("C"), {{0, 1.5, 0}});
 
         frame.guess_topology();
-        CHECK(frame.topology().bonds().size() == 4);
-        CHECK(frame.topology().isbond(0, 1));
-        CHECK(frame.topology().isbond(1, 2));
-        CHECK(frame.topology().isbond(2, 3));
-        CHECK(frame.topology().isbond(0, 3));
-
-        CHECK(frame.topology().angles().size() == 4);
-        CHECK(frame.topology().isangle(0, 1, 2));
-        CHECK(frame.topology().isangle(1, 2, 3));
-        CHECK(frame.topology().isangle(2, 3, 0));
-        CHECK(frame.topology().isangle(3, 0, 1));
-
-        CHECK(frame.topology().dihedrals().size() == 4);
-        CHECK(frame.topology().isdihedral(0, 1, 2, 3));
-        CHECK(frame.topology().isdihedral(1, 2, 3, 0));
-        CHECK(frame.topology().isdihedral(2, 3, 0, 1));
-        CHECK(frame.topology().isdihedral(3, 0, 1, 2));
+        CHECK(frame.topology().bonds() == (std::vector<Bond>{{0, 1}, {0, 3}, {1, 2}, {2, 3}}));
+        CHECK(frame.topology().angles() == (std::vector<Angle>{{0, 1, 2}, {0, 3, 2}, {1, 0, 3}, {1, 2, 3}}));
+        CHECK(frame.topology().dihedrals() == (std::vector<Dihedral>{{0, 1, 2, 3}, {1, 0, 3, 2}, {1, 2, 3, 0}, {2, 1, 0, 3}}));
     }
 }
