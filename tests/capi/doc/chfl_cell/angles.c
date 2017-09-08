@@ -7,9 +7,9 @@
 
 int main() {
     // [example]
-    CHFL_CELL* cell = chfl_cell((chfl_vector_t){10, 10, 10});
+    CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 10, 10});
 
-    chfl_vector_t angles = {0, 0, 0};
+    chfl_vector3d angles = {0, 0, 0};
     chfl_cell_angles(cell, angles);
     assert(angles[0] == 90);
     assert(angles[1] == 90);

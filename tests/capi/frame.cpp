@@ -46,7 +46,7 @@ TEST_CASE("Frame", "[CAPI]") {
         CHECK_STATUS(chfl_frame_resize(frame, 4));
 
         uint64_t natoms = 0;
-        chfl_vector_t* positions = NULL;
+        chfl_vector3d* positions = NULL;
         CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
         CHECK(natoms == 4);
 
@@ -80,7 +80,7 @@ TEST_CASE("Frame", "[CAPI]") {
         CHECK(has_velocities == true);
 
         uint64_t natoms = 0;
-        chfl_vector_t* velocities = NULL;
+        chfl_vector3d* velocities = NULL;
         CHECK_STATUS(chfl_frame_velocities(frame, &velocities, &natoms));
         CHECK(natoms == 4);
 
@@ -109,13 +109,13 @@ TEST_CASE("Frame", "[CAPI]") {
         CHFL_CELL* cell = chfl_cell_from_frame(frame);
         REQUIRE(cell != NULL);
 
-        chfl_vector_t lengths = {0};
+        chfl_vector3d lengths = {0};
         CHECK_STATUS(chfl_cell_lengths(cell, lengths));
         CHECK(lengths[0] == 0.0);
         CHECK(lengths[1] == 0.0);
         CHECK(lengths[2] == 0.0);
 
-        chfl_cell_shape_t shape;
+        chfl_cellshape shape;
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
         CHECK(shape == CHFL_CELL_INFINITE);
 
@@ -154,16 +154,16 @@ TEST_CASE("Frame", "[CAPI]") {
         CHECK_STATUS(chfl_frame_add_velocities(frame));
 
         CHFL_ATOM* atom = chfl_atom("U");
-        chfl_vector_t position = {2, 3, 4};
+        chfl_vector3d position = {2, 3, 4};
         CHECK_STATUS(chfl_frame_add_atom(frame, atom, position, NULL));
-        chfl_vector_t velocity = {1, 2, 1};
+        chfl_vector3d velocity = {1, 2, 1};
         CHECK_STATUS(chfl_frame_add_atom(frame, atom, position, velocity));
         CHECK_STATUS(chfl_atom_free(atom));
 
         CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
         CHECK(natoms == 2);
 
-        chfl_vector_t* positions = NULL;
+        chfl_vector3d* positions = NULL;
         CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
         CHECK(natoms == 2);
         CHECK(positions[0][0] == 2);
@@ -174,7 +174,7 @@ TEST_CASE("Frame", "[CAPI]") {
         CHECK(positions[1][1] == 3);
         CHECK(positions[1][2] == 4);
 
-        chfl_vector_t* velocities = NULL;
+        chfl_vector3d* velocities = NULL;
         CHECK_STATUS(chfl_frame_velocities(frame, &velocities, &natoms));
         CHECK(natoms == 2);
 
@@ -255,7 +255,7 @@ TEST_CASE("Frame", "[CAPI]") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
         REQUIRE(trajectory != NULL);
 
-        chfl_vector_t lengths = {30, 30, 30};
+        chfl_vector3d lengths = {30, 30, 30};
         CHFL_CELL* cell = chfl_cell(lengths);
         CHECK_STATUS(chfl_trajectory_set_cell(trajectory, cell));
         CHECK_STATUS(chfl_cell_free(cell));

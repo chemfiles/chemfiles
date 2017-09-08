@@ -15,11 +15,11 @@ static bool approx_eq(double A[3][3], double B[3][3]) {
 
 TEST_CASE("Atom", "[CAPI]") {
     SECTION("Constructors") {
-        chfl_vector_t lengths = {2, 3, 4};
+        chfl_vector3d lengths = {2, 3, 4};
         CHFL_CELL* cell = chfl_cell(lengths);
         REQUIRE(cell != NULL);
 
-        chfl_vector_t data = {0};
+        chfl_vector3d data = {0};
         CHECK_STATUS(chfl_cell_lengths(cell, data));
         CHECK(data[0] == 2);
         CHECK(data[1] == 3);
@@ -33,7 +33,7 @@ TEST_CASE("Atom", "[CAPI]") {
         CHECK_STATUS(chfl_cell_free(cell));
 
         lengths[0] = 20; lengths[1] = 21; lengths[2] = 22;
-        chfl_vector_t angles = {90, 100, 120};
+        chfl_vector3d angles = {90, 100, 120};
         cell = chfl_cell_triclinic(lengths, angles);
         REQUIRE(cell != NULL);
 
@@ -55,7 +55,7 @@ TEST_CASE("Atom", "[CAPI]") {
         cell = chfl_cell_triclinic(lengths, angles);
         REQUIRE(cell != NULL);
 
-        chfl_cell_shape_t shape;
+        chfl_cellshape shape;
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
         CHECK(shape == CHFL_CELL_TRICLINIC);
 
@@ -63,11 +63,11 @@ TEST_CASE("Atom", "[CAPI]") {
     }
 
     SECTION("Length") {
-        chfl_vector_t lengths = {2, 3, 4};
+        chfl_vector3d lengths = {2, 3, 4};
         CHFL_CELL* cell = chfl_cell(lengths);
         REQUIRE(cell != NULL);
 
-        chfl_vector_t data = {0};
+        chfl_vector3d data = {0};
         CHECK_STATUS(chfl_cell_lengths(cell, data));
         CHECK(data[0] == 2);
         CHECK(data[1] == 3);
@@ -84,17 +84,17 @@ TEST_CASE("Atom", "[CAPI]") {
     }
 
     SECTION("Angles") {
-        chfl_vector_t lengths = {2, 3, 4};
+        chfl_vector3d lengths = {2, 3, 4};
         CHFL_CELL* cell = chfl_cell(lengths);
         REQUIRE(cell != NULL);
 
-        chfl_vector_t data = {0};
+        chfl_vector3d data = {0};
         CHECK_STATUS(chfl_cell_angles(cell, data));
         CHECK(data[0] == 90);
         CHECK(data[1] == 90);
         CHECK(data[2] == 90);
 
-        chfl_vector_t angles = {80, 89, 100};
+        chfl_vector3d angles = {80, 89, 100};
         // Setting an orthorhombic cell angles is an error
         CHECK(chfl_cell_set_angles(cell, angles) != CHFL_SUCCESS);
 
@@ -110,7 +110,7 @@ TEST_CASE("Atom", "[CAPI]") {
     }
 
     SECTION("Volume") {
-        chfl_vector_t lengths = {2, 3, 4};
+        chfl_vector3d lengths = {2, 3, 4};
         CHFL_CELL* cell = chfl_cell(lengths);
         REQUIRE(cell != NULL);
 
@@ -122,12 +122,12 @@ TEST_CASE("Atom", "[CAPI]") {
     }
 
     SECTION("Matrix") {
-        chfl_vector_t lengths = {10, 20, 30};
+        chfl_vector3d lengths = {10, 20, 30};
         CHFL_CELL* cell = chfl_cell(lengths);
         REQUIRE(cell != NULL);
 
-        chfl_vector_t expected[3] = {{10, 0, 0}, {0, 20, 0}, {0, 0, 30}};
-        chfl_vector_t matrix[3];
+        chfl_vector3d expected[3] = {{10, 0, 0}, {0, 20, 0}, {0, 0, 30}};
+        chfl_vector3d matrix[3];
         CHECK_STATUS(chfl_cell_matrix(cell, matrix));
         CHECK(approx_eq(expected, matrix));
 
@@ -135,11 +135,11 @@ TEST_CASE("Atom", "[CAPI]") {
     }
 
     SECTION("Shape") {
-        chfl_vector_t lengths = {2, 3, 4};
+        chfl_vector3d lengths = {2, 3, 4};
         CHFL_CELL* cell = chfl_cell(lengths);
         REQUIRE(cell != NULL);
 
-        chfl_cell_shape_t shape;
+        chfl_cellshape shape;
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
         CHECK(shape == CHFL_CELL_ORTHORHOMBIC);
 

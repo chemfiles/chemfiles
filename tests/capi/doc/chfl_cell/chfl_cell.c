@@ -6,7 +6,7 @@
 
 int main() {
     // [example]
-    CHFL_CELL* cell = chfl_cell((chfl_vector_t){10, 10, 10});
+    CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 10, 10});
 
     if (cell == NULL) {
         /* handle error */

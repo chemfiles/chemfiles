@@ -7,9 +7,9 @@
 
 int main() {
     // [example]
-    CHFL_CELL* cell = chfl_cell((chfl_vector_t){10, 10, 10});
+    CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 10, 10});
 
-    chfl_cell_shape_t shape;
+    chfl_cellshape shape;
     chfl_cell_shape(cell, &shape);
     assert(shape == CHFL_CELL_ORTHORHOMBIC);
 

@@ -17,7 +17,7 @@ typedef enum {
     CHFL_CELL_TRICLINIC = 1,
     /// Cell shape when there is no periodic boundary conditions
     CHFL_CELL_INFINITE = 2,
-} chfl_cell_shape_t;
+} chfl_cellshape;
 
 /// Create an unit cell from three `lenghts`. The unit cell shape is
 /// `CHFL_CELL_ORTHORHOMBIC`.
@@ -30,7 +30,7 @@ typedef enum {
 /// @example{tests/capi/doc/chfl_cell/chfl_cell.c}
 /// @return A pointer to the unit cell, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
-CHFL_EXPORT CHFL_CELL* chfl_cell(const chfl_vector_t lenghts);
+CHFL_EXPORT CHFL_CELL* chfl_cell(const chfl_vector3d lenghts);
 
 /// Create an unit cell from three `lenghts` and three `angles`. The unit cell
 /// shape is `CHFL_CELL_TRICLINIC`.
@@ -48,7 +48,7 @@ CHFL_EXPORT CHFL_CELL* chfl_cell(const chfl_vector_t lenghts);
 /// @return A pointer to the unit cell, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_CELL* chfl_cell_triclinic(
-    const chfl_vector_t lenghts, const chfl_vector_t angles
+    const chfl_vector3d lenghts, const chfl_vector3d angles
 );
 
 /// Get a copy of the unit cell of a `frame`.
@@ -86,7 +86,7 @@ CHFL_EXPORT chfl_status chfl_cell_volume(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_lengths(
-    const CHFL_CELL* const cell, chfl_vector_t lengths
+    const CHFL_CELL* const cell, chfl_vector3d lengths
 );
 
 /// Set the unit cell lenghts to `lenghts`.
@@ -97,7 +97,7 @@ CHFL_EXPORT chfl_status chfl_cell_lengths(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_set_lengths(
-    CHFL_CELL* const cell, const chfl_vector_t lenghts
+    CHFL_CELL* const cell, const chfl_vector3d lenghts
 );
 
 /// Get the cell angles in `angles`. The cell angles are in degrees.
@@ -106,7 +106,7 @@ CHFL_EXPORT chfl_status chfl_cell_set_lengths(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_angles(
-    const CHFL_CELL* const cell, chfl_vector_t angles
+    const CHFL_CELL* const cell, chfl_vector3d angles
 );
 
 /// Set the cell angles to `angles`.
@@ -119,7 +119,7 @@ CHFL_EXPORT chfl_status chfl_cell_angles(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_set_angles(
-    CHFL_CELL* const cell, const chfl_vector_t angles
+    CHFL_CELL* const cell, const chfl_vector3d angles
 );
 
 /// Get the unit `cell` matricial representation in `matrix`.
@@ -137,7 +137,7 @@ CHFL_EXPORT chfl_status chfl_cell_set_angles(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_matrix(
-    const CHFL_CELL* const cell, chfl_vector_t matrix[3]
+    const CHFL_CELL* const cell, chfl_vector3d matrix[3]
 );
 
 /// Get the unit `cell` shape in `shape`.
@@ -146,7 +146,7 @@ CHFL_EXPORT chfl_status chfl_cell_matrix(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_shape(
-    const CHFL_CELL* const cell, chfl_cell_shape_t* const shape
+    const CHFL_CELL* const cell, chfl_cellshape* const shape
 );
 
 /// Set the unit `cell` shape to `shape`.
@@ -155,7 +155,7 @@ CHFL_EXPORT chfl_status chfl_cell_shape(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_set_shape(
-    CHFL_CELL* const cell, chfl_cell_shape_t shape
+    CHFL_CELL* const cell, chfl_cellshape shape
 );
 
 /// Free the memory associated with a `cell`.

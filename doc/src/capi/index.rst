@@ -20,7 +20,7 @@ Constructors functions (functions returning pointers to types defined above)
 return freshly allocated memory, and calling the ``chfl_*_free`` functions
 return the corresponding memory to the operating system.
 
-.. doxygentypedef:: chfl_vector_t
+.. doxygentypedef:: chfl_vector3d
 
 ``chemfiles.h`` also exports the :ref:`same macro <exported-macro>` as in the
 C++ interface, and the ``chfl_version`` function allow to access the version of

@@ -7,9 +7,9 @@
 
 int main() {
     // [example]
-    CHFL_CELL* cell = chfl_cell((chfl_vector_t){10, 11, 12});
+    CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 11, 12});
 
-    chfl_vector_t matrix[3];
+    chfl_vector3d matrix[3];
     chfl_cell_matrix(cell, matrix);
     assert(matrix[0][0] == 10);
     assert(matrix[1][1] == 11);

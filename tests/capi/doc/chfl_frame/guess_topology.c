@@ -11,8 +11,8 @@ int main() {
     CHFL_FRAME* frame = chfl_frame();
 
     CHFL_ATOM* Cl = chfl_atom("Cl");
-    chfl_frame_add_atom(frame, Cl, (chfl_vector_t){0, 0, 0}, NULL);
-    chfl_frame_add_atom(frame, Cl, (chfl_vector_t){2, 0, 0}, NULL);
+    chfl_frame_add_atom(frame, Cl, (chfl_vector3d){0, 0, 0}, NULL);
+    chfl_frame_add_atom(frame, Cl, (chfl_vector3d){2, 0, 0}, NULL);
     chfl_atom_free(Cl);
 
     // Check that the topology does not contain any bond

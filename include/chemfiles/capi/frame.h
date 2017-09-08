@@ -55,7 +55,7 @@ CHFL_EXPORT chfl_status chfl_frame_atoms_count(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_positions(
-    CHFL_FRAME* const frame, chfl_vector_t** positions, uint64_t* size
+    CHFL_FRAME* const frame, chfl_vector3d** positions, uint64_t* size
 );
 
 /// Get a pointer to the velocities array from a `frame`.
@@ -78,7 +78,7 @@ CHFL_EXPORT chfl_status chfl_frame_positions(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_velocities(
-    CHFL_FRAME* const frame, chfl_vector_t** velocities, uint64_t* size
+    CHFL_FRAME* const frame, chfl_vector3d** velocities, uint64_t* size
 );
 
 /// Add an `atom` and the corresponding `position` and `velocity` data to a
@@ -91,7 +91,7 @@ CHFL_EXPORT chfl_status chfl_frame_velocities(
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_add_atom(
     CHFL_FRAME* const frame, const CHFL_ATOM* const atom,
-    const chfl_vector_t position, const chfl_vector_t velocity
+    const chfl_vector3d position, const chfl_vector3d velocity
 );
 
 /// Remove the atom at index `i` in the `frame`.
@@ -120,7 +120,7 @@ CHFL_EXPORT chfl_status chfl_frame_resize(
 
 /// Add velocity data to this `frame`.
 ///
-/// The velocities are initialized to `(chfl_vector_t){0, 0, 0}`. If the frame
+/// The velocities are initialized to `(chfl_vector3d){0, 0, 0}`. If the frame
 /// already has velocities, this does nothing.
 ///
 /// @example{tests/capi/doc/chfl_frame/add_velocities.c}

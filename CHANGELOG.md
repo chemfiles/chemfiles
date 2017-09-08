@@ -26,6 +26,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### C API changes
 
 * Added `chfl_add_configuration` to add more configuration files.
+* Renamed `chfl_vector_t` to `chfl_vector3d`; and `chfl_cell_shape_t` to
+  `chfl_cellshape`.
 
 ### Deprecation and removals
 

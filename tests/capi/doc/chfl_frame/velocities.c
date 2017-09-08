@@ -9,7 +9,7 @@ int main() {
     CHFL_FRAME* frame = chfl_frame();
     chfl_frame_add_velocities(frame);
 
-    chfl_vector_t* velocities = NULL;
+    chfl_vector3d* velocities = NULL;
     uint64_t natoms = 0;
     chfl_frame_positions(frame, &velocities, &natoms);
 

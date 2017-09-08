@@ -25,7 +25,7 @@ Function manipulating ``CHFL_CELL``
 
 .. doxygenfunction:: chfl_cell_matrix
 
-.. doxygenenum:: chfl_cell_shape_t
+.. doxygenenum:: chfl_cellshape
 
 .. doxygenfunction:: chfl_cell_shape
 
