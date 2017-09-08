@@ -6,36 +6,34 @@
 using namespace chemfiles;
 
 TEST_CASE("Use the Atom type", "[Atoms]"){
-    Atom a("H");
-    Atom b;
-    Atom c("C1", "C");
-    Atom d("name only", "");
-
     SECTION("Constructors") {
-        CHECK(a.name() == "H");
-        CHECK(a.type() == "H");
-        CHECK(a.mass() == 1.008);
-        CHECK(a.charge() == 0);
+        auto atom = Atom("H");
+        CHECK(atom.name() == "H");
+        CHECK(atom.type() == "H");
+        CHECK(atom.mass() == 1.008);
+        CHECK(atom.charge() == 0);
 
-        CHECK(b.name() == "");
-        CHECK(b.type() == "");
-        CHECK(b.mass() == 0);
-        CHECK(b.charge() == 0);
+        atom = Atom();
+        CHECK(atom.name() == "");
+        CHECK(atom.type() == "");
+        CHECK(atom.mass() == 0);
+        CHECK(atom.charge() == 0);
 
-        CHECK(c.name() == "C1");
-        CHECK(c.type() == "C");
-        CHECK(c.mass() == 12.011);
-        CHECK(c.charge() == 0);
+        atom = Atom("C1", "C");
+        CHECK(atom.name() == "C1");
+        CHECK(atom.type() == "C");
+        CHECK(atom.mass() == 12.011);
+        CHECK(atom.charge() == 0);
 
-        CHECK(d.name() == "name only");
-        CHECK(d.type() == "");
-        CHECK(d.mass() == 0);
-        CHECK(d.charge() == 0);
+        atom = Atom("name only", "");
+        CHECK(atom.name() == "name only");
+        CHECK(atom.type() == "");
+        CHECK(atom.mass() == 0);
+        CHECK(atom.charge() == 0);
     }
 
     SECTION("Set and get properties") {
         Atom atom;
-
         CHECK(atom.mass() == 0);
         atom.set_mass(14.789);
         CHECK(atom.mass() == 14.789);
@@ -54,19 +52,46 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
     }
 
     SECTION("Elements properties") {
-        CHECK(a.atomic_number().value() == 1);
-        CHECK(a.full_name().value() == "Hydrogen");
-        CHECK(a.covalent_radius() == 0.37);
-        CHECK(a.vdw_radius() == 1.2);
+        auto atom = Atom("H");
+        CHECK(atom.atomic_number().value() == 1);
+        CHECK(atom.full_name().value() == "Hydrogen");
+        CHECK(atom.covalent_radius() == 0.37);
+        CHECK(atom.vdw_radius() == 1.2);
 
-        CHECK_FALSE(b.atomic_number());
-        CHECK_FALSE(b.full_name());
-        CHECK_FALSE(b.covalent_radius());
-        CHECK_FALSE(b.vdw_radius());
+        atom = Atom();
+        CHECK_FALSE(atom.atomic_number());
+        CHECK_FALSE(atom.full_name());
+        CHECK_FALSE(atom.covalent_radius());
+        CHECK_FALSE(atom.vdw_radius());
 
-        CHECK_FALSE(d.atomic_number());
-        CHECK_FALSE(d.full_name());
-        CHECK_FALSE(d.covalent_radius());
-        CHECK_FALSE(d.vdw_radius());
+        atom = Atom("C2");
+        CHECK_FALSE(atom.atomic_number());
+        CHECK_FALSE(atom.full_name());
+        CHECK_FALSE(atom.covalent_radius());
+        CHECK_FALSE(atom.vdw_radius());
+
+        atom = Atom("name only", "");
+        CHECK_FALSE(atom.atomic_number());
+        CHECK_FALSE(atom.full_name());
+        CHECK_FALSE(atom.covalent_radius());
+        CHECK_FALSE(atom.vdw_radius());
+
+        atom = Atom("ZN");
+        CHECK(atom.atomic_number().value() == 30);
+        CHECK(atom.full_name().value() == "Zinc");
+        CHECK(atom.covalent_radius().value() == 1.31);
+        CHECK(atom.vdw_radius().value() == 2.1);
+
+        atom = Atom("zn");
+        CHECK(atom.atomic_number().value() == 30);
+        CHECK(atom.full_name().value() == "Zinc");
+        CHECK(atom.covalent_radius().value() == 1.31);
+        CHECK(atom.vdw_radius().value() == 2.1);
+
+        atom = Atom("zN");
+        CHECK(atom.atomic_number().value() == 30);
+        CHECK(atom.full_name().value() == "Zinc");
+        CHECK(atom.covalent_radius().value() == 1.31);
+        CHECK(atom.vdw_radius().value() == 2.1);
     }
 }

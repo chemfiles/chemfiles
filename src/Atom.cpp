@@ -1,13 +1,32 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <cctype>
+
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/periodic.hpp"
 
 using namespace chemfiles;
 
+static char to_upper(char c) {
+    return static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+}
+
+static char to_lower(char c) {
+    return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+}
+
 static optional<const ElementData&> find_element(const std::string& name) {
-    auto periodic = PERIODIC_INFORMATION.find(name);
+    std::map<std::string, ElementData>::const_iterator periodic;
+    if (name.length() == 2) {
+        auto normalized = name;
+        normalized[0] = to_upper(normalized[0]);
+        normalized[1] = to_lower(normalized[1]);
+
+        periodic = PERIODIC_INFORMATION.find(normalized);
+    } else {
+        periodic = PERIODIC_INFORMATION.find(name);
+    }
     if (periodic != PERIODIC_INFORMATION.end()) {
         return periodic->second;
     } else {
