@@ -52,27 +52,28 @@ void Frame::guess_topology() {
     // This bond guessing algorithm comes from VMD
     auto cutoff = 0.833;
     for (size_t i = 0; i < natoms(); i++) {
-        auto rad = topology_[i].vdw_radius();
-        cutoff = fmax(cutoff, rad);
+        auto rad = topology_[i].vdw_radius().value_or(0);
+        cutoff = std::max(cutoff, rad);
     }
     cutoff = 1.2 * cutoff;
 
     for (size_t i = 0; i < natoms(); i++) {
-        auto irad = topology_[i].vdw_radius();
-        if (irad <= 0) {
+        auto i_radius = topology_[i].vdw_radius();
+        if (!i_radius) {
             throw Error(
                 "Missing Van der Waals radius for '" + topology_[i].type() + "'"
             );
         }
         for (size_t j = i + 1; j < natoms(); j++) {
-            auto jrad = topology_[j].vdw_radius();
-            if (jrad <= 0) {
+            auto j_radius = topology_[j].vdw_radius();
+            if (!j_radius) {
                 throw Error(
                     "Missing Van der Waals radius for '" + topology_[j].type() + "'"
                 );
             }
             auto d = norm(cell_.wrap(positions_[i] - positions_[j]));
-            if (0.03 < d && d < 0.6 * (irad + jrad) && d < cutoff) {
+            auto radii = i_radius.value() + j_radius.value();
+            if (0.03 < d && d < 0.6 * radii && d < cutoff) {
                 topology_.add_bond(i, j);
             }
         }

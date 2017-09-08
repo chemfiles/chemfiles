@@ -6,48 +6,57 @@
 
 using namespace chemfiles;
 
+static optional<const ElementData&> find_element(const std::string& name) {
+    auto periodic = PERIODIC_INFORMATION.find(name);
+    if (periodic != PERIODIC_INFORMATION.end()) {
+        return periodic->second;
+    } else {
+        return nullopt;
+    }
+}
+
 Atom::Atom(std::string name): Atom(name, name) {}
 
 Atom::Atom(std::string name, std::string type):
     name_(std::move(name)), type_(std::move(type)) {
-    auto periodic = PERIODIC_INFORMATION.find(type_);
-    if (periodic != PERIODIC_INFORMATION.end()) {
-        mass_ = periodic->second.mass;
+    auto element = find_element(type_);
+    if (element) {
+        mass_ = element->mass;
     }
 }
 
-std::string Atom::full_name() const {
-    auto periodic = PERIODIC_INFORMATION.find(type_);
-    if (periodic != PERIODIC_INFORMATION.end()) {
-        return periodic->second.name;
+optional<std::string> Atom::full_name() const {
+    auto element = find_element(type_);
+    if (element) {
+        return element->name;
     } else {
-        return "";
+        return nullopt;
     }
 }
 
-double Atom::vdw_radius() const {
-    auto periodic = PERIODIC_INFORMATION.find(type_);
-    if (periodic != PERIODIC_INFORMATION.end()) {
-        return periodic->second.vdw_radius;
+optional<double> Atom::vdw_radius() const {
+    auto element = find_element(type_);
+    if (element) {
+        return element->vdw_radius;
     } else {
-        return -1;
+        return nullopt;
     }
 }
 
-double Atom::covalent_radius() const {
-    auto periodic = PERIODIC_INFORMATION.find(type_);
-    if (periodic != PERIODIC_INFORMATION.end()) {
-        return periodic->second.colvalent_radius;
+optional<double> Atom::covalent_radius() const {
+    auto element = find_element(type_);
+    if (element) {
+        return element->covalent_radius;
     } else {
-        return -1;
+        return nullopt;
     }
 }
 
-int Atom::atomic_number() const {
-    auto periodic = PERIODIC_INFORMATION.find(type_);
-    if (periodic != PERIODIC_INFORMATION.end()) {
-        return periodic->second.number;
+optional<uint64_t> Atom::atomic_number() const {
+    auto element = find_element(type_);
+    if (element) {
+        return element->number;
     } else {
-        return -1;
+        return nullopt;
     }
 }

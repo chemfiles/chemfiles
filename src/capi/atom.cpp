@@ -138,8 +138,13 @@ extern "C" chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* co
     CHECK_POINTER(atom);
     CHECK_POINTER(name);
     CHFL_ERROR_CATCH(
-        strncpy(name, atom->full_name().c_str(), checked_cast(buffsize) - 1);
-        name[buffsize - 1] = '\0';
+        auto full_name = atom->full_name();
+        if (full_name) {
+            std::strncpy(name, full_name.value().c_str(), checked_cast(buffsize) - 1);
+            name[buffsize - 1] = '\0';
+        } else {
+            std::memset(name, 0, checked_cast(buffsize));
+        }
     )
 }
 
@@ -147,7 +152,7 @@ extern "C" chfl_status chfl_atom_vdw_radius(const CHFL_ATOM* const atom, double*
     CHECK_POINTER(atom);
     CHECK_POINTER(radius);
     CHFL_ERROR_CATCH(
-        *radius = atom->vdw_radius();
+        *radius = atom->vdw_radius().value_or(0);
     )
 }
 
@@ -155,15 +160,15 @@ extern "C" chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* const atom, do
     CHECK_POINTER(atom);
     CHECK_POINTER(radius);
     CHFL_ERROR_CATCH(
-        *radius = atom->covalent_radius();
+        *radius = atom->covalent_radius().value_or(0);
     )
 }
 
-extern "C" chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom, int64_t* number) {
+extern "C" chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom, uint64_t* number) {
     CHECK_POINTER(atom);
     CHECK_POINTER(number);
     CHFL_ERROR_CATCH(
-        *number = atom->atomic_number();
+        *number = atom->atomic_number().value_or(UINT64_MAX);
     )
 }
 

@@ -54,19 +54,19 @@ TEST_CASE("Use the Atom type", "[Atoms]"){
     }
 
     SECTION("Elements properties") {
-        CHECK(a.atomic_number() == 1);
-        CHECK(a.full_name() == "Hydrogen");
+        CHECK(a.atomic_number().value() == 1);
+        CHECK(a.full_name().value() == "Hydrogen");
         CHECK(a.covalent_radius() == 0.37);
         CHECK(a.vdw_radius() == 1.2);
 
-        CHECK(b.atomic_number() == -1);
-        CHECK(b.full_name() == "");
-        CHECK(b.covalent_radius() == -1.0);
-        CHECK(b.vdw_radius() == -1.0);
+        CHECK_FALSE(b.atomic_number());
+        CHECK_FALSE(b.full_name());
+        CHECK_FALSE(b.covalent_radius());
+        CHECK_FALSE(b.vdw_radius());
 
-        CHECK(d.atomic_number() == -1);
-        CHECK(d.full_name() == "");
-        CHECK(d.covalent_radius() == -1.0);
-        CHECK(d.vdw_radius() == -1.0);
+        CHECK_FALSE(d.atomic_number());
+        CHECK_FALSE(d.full_name());
+        CHECK_FALSE(d.covalent_radius());
+        CHECK_FALSE(d.vdw_radius());
     }
 }

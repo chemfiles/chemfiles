@@ -7,6 +7,7 @@
 #include <string>
 
 #include "chemfiles/exports.hpp"
+#include "chemfiles/optional.hpp"
 
 namespace chemfiles {
 
@@ -53,18 +54,14 @@ public:
     /// Set the atom charge
     void set_charge(double charge) { charge_ = charge; }
 
-    /// Try to get the full atomic name, return and empty string if this is
-    /// impossible
-    std::string full_name() const;
-    /// Try to get the Van der Waals of the atom. Returns -1 if it can not be
-    /// found.
-    double vdw_radius() const;
-    /// Try to get the covalent radius of the atom. Returns -1 if it can not be
-    /// found.
-    double covalent_radius() const;
-    /// Try to get the atomic number, if defined. Returns -1 if it can not be
-    /// found.
-    int atomic_number() const;
+    /// Try to get the full atomic name
+    optional<std::string> full_name() const;
+    /// Try to get the Van der Waals of the atom.
+    optional<double> vdw_radius() const;
+    /// Try to get the covalent radius of the atom.
+    optional<double> covalent_radius() const;
+    /// Try to get the atomic number of the atom.
+    optional<uint64_t> atomic_number() const;
 
 private:
     std::string name_;
