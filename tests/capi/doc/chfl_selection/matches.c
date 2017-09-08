@@ -11,9 +11,9 @@ int main() {
 
     CHFL_ATOM* O = chfl_atom("O");
     CHFL_ATOM* H = chfl_atom("H");
-    chfl_frame_add_atom(frame, O, (chfl_vector_t){0, 0, 0}, NULL);
-    chfl_frame_add_atom(frame, H, (chfl_vector_t){1, 0, 0}, NULL);
-    chfl_frame_add_atom(frame, H, (chfl_vector_t){0, 1, 0}, NULL);
+    chfl_frame_add_atom(frame, O, (chfl_vector3d){0, 0, 0}, NULL);
+    chfl_frame_add_atom(frame, H, (chfl_vector3d){1, 0, 0}, NULL);
+    chfl_frame_add_atom(frame, H, (chfl_vector3d){0, 1, 0}, NULL);
     chfl_atom_free(O);
     chfl_atom_free(H);
 

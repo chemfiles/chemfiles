@@ -124,7 +124,7 @@ typedef enum {
 } chfl_status;
 
 /// A 3-dimmensional vector for the chemfiles interface
-typedef double chfl_vector_t[3];
+typedef double chfl_vector3d[3];
 
 /// Get the version of the chemfiles library.
 ///

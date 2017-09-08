@@ -22,7 +22,7 @@ int main(void) {
         if(!chfl_trajectory_read(file, frame)) {/*Handle error*/}
 
         uint64_t natoms = 0;
-        chfl_vector_t* positions = NULL;
+        chfl_vector3d* positions = NULL;
 
         // Get a pointer to the positions in `positions`. The array `positions`
         // contains natoms entries.

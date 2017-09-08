@@ -6,7 +6,7 @@
 
 int main() {
     // [example]
-    CHFL_CELL* cell = chfl_cell_triclinic((chfl_vector_t){10, 10, 10}, (chfl_vector_t){122, 97, 97});
+    CHFL_CELL* cell = chfl_cell_triclinic((chfl_vector3d){10, 10, 10}, (chfl_vector3d){122, 97, 97});
 
     if (cell == NULL) {
         /* handle error */

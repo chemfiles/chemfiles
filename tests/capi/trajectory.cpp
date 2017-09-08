@@ -50,12 +50,12 @@ TEST_CASE("Read trajectory", "[CAPI]") {
         CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
         CHECK(natoms == 297);
 
-        chfl_vector_t* data = NULL;
+        chfl_vector3d* data = NULL;
         // Check for the error when requesting non-existent velocities
         CHECK(chfl_frame_velocities(frame, &data, &natoms) != CHFL_SUCCESS);
 
-        chfl_vector_t positions_0 = {0.417219, 8.303366, 11.737172};
-        chfl_vector_t positions_124 = {5.099554, -0.045104, 14.153846};
+        chfl_vector3d positions_0 = {0.417219, 8.303366, 11.737172};
+        chfl_vector3d positions_124 = {5.099554, -0.045104, 14.153846};
 
         // Check positions in the first frame
         CHECK_STATUS(chfl_frame_positions(frame, &data, &natoms));
@@ -81,10 +81,10 @@ TEST_CASE("Read trajectory", "[CAPI]") {
         CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
         CHECK(natoms == 297);
 
-        chfl_vector_t positions_0 = {0.761277, 8.106125, 10.622949};
-        chfl_vector_t positions_124 = {5.13242, 0.079862, 14.194161};
+        chfl_vector3d positions_0 = {0.761277, 8.106125, 10.622949};
+        chfl_vector3d positions_124 = {5.13242, 0.079862, 14.194161};
 
-        chfl_vector_t* positions = NULL;
+        chfl_vector3d* positions = NULL;
         CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
         CHECK(natoms == 297);
         for (unsigned i=0; i<3; i++){
@@ -132,7 +132,7 @@ TEST_CASE("Read trajectory", "[CAPI]") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
         REQUIRE(trajectory != NULL);
 
-        chfl_vector_t lengths = {30, 30, 30};
+        chfl_vector3d lengths = {30, 30, 30};
         CHFL_CELL* cell = chfl_cell(lengths);
         CHECK_STATUS(chfl_trajectory_set_cell(trajectory, cell));
         CHECK_STATUS(chfl_cell_free(cell));
@@ -144,7 +144,7 @@ TEST_CASE("Read trajectory", "[CAPI]") {
         cell = chfl_cell_from_frame(frame);
         REQUIRE(cell != NULL);
 
-        chfl_vector_t data = {0};
+        chfl_vector3d data = {0};
         CHECK_STATUS(chfl_cell_lengths(cell, data));
         CHECK(data[0] == 30.0);
         CHECK(data[1] == 30.0);
@@ -264,7 +264,7 @@ static CHFL_FRAME* testing_frame() {
     CHECK_STATUS(chfl_frame_set_topology(frame, topology));
     CHECK_STATUS(chfl_topology_free(topology));
 
-    chfl_vector_t* positions = NULL;
+    chfl_vector3d* positions = NULL;
     uint64_t natoms = 0;
     CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
     CHECK(natoms == 4);

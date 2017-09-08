@@ -37,28 +37,28 @@ extern "C" chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame, uin
     )
 }
 
-extern "C" chfl_status chfl_frame_positions(CHFL_FRAME* const frame, chfl_vector_t** data, uint64_t* size) {
+extern "C" chfl_status chfl_frame_positions(CHFL_FRAME* const frame, chfl_vector3d** data, uint64_t* size) {
     CHECK_POINTER(frame);
     CHECK_POINTER(data);
     CHECK_POINTER(size);
     static_assert(
-        sizeof(chfl_vector_t) == sizeof(Vector3D),
-        "Wrong size for chfl_vector_t. It should match Vector3D."
+        sizeof(chfl_vector3d) == sizeof(Vector3D),
+        "Wrong size for chfl_vector3d. It should match Vector3D."
     );
     CHFL_ERROR_CATCH(
         auto positions = frame->positions();
         *size = positions.size();
-        *data = reinterpret_cast<chfl_vector_t*>(positions.data());
+        *data = reinterpret_cast<chfl_vector3d*>(positions.data());
     )
 }
 
-extern "C" chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vector_t** data, uint64_t* size) {
+extern "C" chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vector3d** data, uint64_t* size) {
     CHECK_POINTER(frame);
     CHECK_POINTER(data);
     CHECK_POINTER(size);
     static_assert(
-        sizeof(chfl_vector_t) == sizeof(Vector3D),
-        "Wrong size for chfl_vector_t. It should match Vector3D."
+        sizeof(chfl_vector3d) == sizeof(Vector3D),
+        "Wrong size for chfl_vector3d. It should match Vector3D."
     );
     if (!frame->velocities()) {
         chemfiles::CAPI_LAST_ERROR = "No velocities in this frame!";
@@ -67,13 +67,13 @@ extern "C" chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vecto
     CHFL_ERROR_CATCH(
         auto velocities = frame->velocities();
         *size = velocities->size();
-        *data = reinterpret_cast<chfl_vector_t*>(velocities->data());
+        *data = reinterpret_cast<chfl_vector3d*>(velocities->data());
     )
 }
 
 extern "C" chfl_status chfl_frame_add_atom(
     CHFL_FRAME* const frame, const CHFL_ATOM* const atom,
-    const chfl_vector_t position, const chfl_vector_t velocity) {
+    const chfl_vector3d position, const chfl_vector3d velocity) {
     CHECK_POINTER(frame);
     CHECK_POINTER(atom);
     CHECK_POINTER(position);
