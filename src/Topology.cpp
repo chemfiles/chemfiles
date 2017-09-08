@@ -67,24 +67,6 @@ bool Topology::isbond(size_t i, size_t j) const {
     return pos != bonds.end();
 }
 
-bool Topology::isangle(size_t i, size_t j, size_t k) const {
-    if (i == j || j == k || i == k) {
-        return false;
-    }
-    auto angles = connect_.angles();
-    auto pos = angles.find(Angle(i, j, k));
-    return pos != angles.end();
-}
-
-bool Topology::isdihedral(size_t i, size_t j, size_t k, size_t m) const {
-    if (i == j || j == k || k == m || i == k || j == m || i == m) {
-        return false;
-    }
-    auto dihedrals = connect_.dihedrals();
-    auto pos = dihedrals.find(Dihedral(i, j, k, m));
-    return pos != dihedrals.end();
-}
-
 void Topology::add_residue(Residue residue) {
     for (auto i: residue) {
         auto it = residue_mapping_.find(i);

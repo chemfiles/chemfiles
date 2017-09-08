@@ -75,30 +75,6 @@ extern "C" chfl_status chfl_topology_remove(CHFL_TOPOLOGY* const topology, uint6
     )
 }
 
-extern "C" chfl_status chfl_topology_isbond(const CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, bool* result) {
-    CHECK_POINTER(topology);
-    CHECK_POINTER(result);
-    CHFL_ERROR_CATCH(
-        *result = topology->isbond(checked_cast(i), checked_cast(j));
-    )
-}
-
-extern "C" chfl_status chfl_topology_isangle(const CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, uint64_t k, bool* result) {
-    CHECK_POINTER(topology);
-    CHECK_POINTER(result);
-    CHFL_ERROR_CATCH(
-        *result = topology->isangle(checked_cast(i), checked_cast(j), checked_cast(k));
-    )
-}
-
-extern "C" chfl_status chfl_topology_isdihedral(const CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, uint64_t k, uint64_t m, bool* result) {
-    CHECK_POINTER(topology);
-    CHECK_POINTER(result);
-    CHFL_ERROR_CATCH(
-        *result = topology->isdihedral(checked_cast(i), checked_cast(j), checked_cast(k), checked_cast(m));
-    )
-}
-
 extern "C" chfl_status chfl_topology_bonds_count(const CHFL_TOPOLOGY* const topology, uint64_t* nbonds) {
     CHECK_POINTER(topology);
     CHECK_POINTER(nbonds);

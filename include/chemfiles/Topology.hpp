@@ -68,20 +68,11 @@ public:
     /// Reserve size in the topology to store data for `natoms` atoms.
     void reserve(size_t natoms);
 
-    /// Check wether the atoms at indexes `i` and `j` are bonded or not
-    bool isbond(size_t i, size_t j) const;
-    /// Check wether the atoms at indexes `i`, `j` and `k` constitues an
-    /// angle
-    bool isangle(size_t i, size_t j, size_t k) const;
-    /// Check wether the atoms at indexes `i` `j`, `k` and `m` constitues a
-    /// dihedral angle
-    bool isdihedral(size_t i, size_t j, size_t k, size_t m) const;
-
-    /// Get the bonds in the system
+    /// Get the bonds in the system, in a sorted vector
     const std::vector<Bond>& bonds() const;
-    /// Get the angles in the system
+    /// Get the angles in the system, in a sorted vector
     const std::vector<Angle>& angles() const;
-    /// Get the dihedral angles in the system
+    /// Get the dihedral angles in the system, in a sorted vector
     const std::vector<Dihedral>& dihedrals() const;
 
     /// Remove all bonding information in the topology (bonds, angles and
@@ -107,6 +98,9 @@ public:
     }
 
 private:
+    /// Check wether the atoms at indexes `i` and `j` are bonded or not
+    bool isbond(size_t i, size_t j) const;
+
     /// Atoms in the system.
     std::vector<Atom> atoms_;
     /// Connectivity of the system. All the indexes refers to the positions in

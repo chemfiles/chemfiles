@@ -144,29 +144,14 @@ TEST_CASE("Add and remove items in the topology", "[Topology]") {
     topo.add_bond(2, 5);
     topo.add_bond(3, 5);
 
-    CHECK(topo.bonds().size() == 4);
-    CHECK(topo.isbond(0, 4));
-    CHECK(topo.isbond(1, 4));
-    CHECK(topo.isbond(2, 5));
-    CHECK(topo.isbond(3, 5));
-
-    CHECK_FALSE(topo.isbond(0, 0));
-
-    CHECK(topo.angles().size() == 2);
-    CHECK(topo.isangle(0, 4, 1));
-    CHECK(topo.isangle(2, 5, 3));
-
-    CHECK_FALSE(topo.isangle(0, 0, 1));
+    CHECK(topo.bonds() == (std::vector<Bond>{{0, 4}, {1, 4}, {2, 5}, {3, 5}}));
+    CHECK(topo.angles() == (std::vector<Angle>{{0, 4, 1}, {2, 5, 3}}));
+    CHECK(topo.dihedrals() == (std::vector<Dihedral>{}));
 
     topo.append(Atom("O"));
     topo.add_bond(3, 6);
     CHECK(topo.bonds().size() == 5);
-    CHECK(topo.dihedrals().size() == 1);
-    CHECK(topo.isdihedral(2, 5, 3, 6));
-
-    CHECK_FALSE(topo.isdihedral(0, 0, 1, 2));
-    CHECK_FALSE(topo.isdihedral(0, 1, 1, 2));
-    CHECK_FALSE(topo.isdihedral(0, 1, 2, 2));
+    CHECK(topo.dihedrals()[0] == Dihedral(2, 5, 3, 6));
 
     topo.remove(6);
     CHECK(topo.natoms() == 6);
@@ -179,10 +164,6 @@ TEST_CASE("Add and remove items in the topology", "[Topology]") {
     topo.remove_bond(3, 5);
     CHECK(topo.natoms() == 6);
     CHECK(topo.bonds().size() == 2);
-
-    CHECK_FALSE(topo.isbond(2, 5));
-    CHECK_FALSE(topo.isbond(3, 5));
-    CHECK_FALSE(topo.isangle(2, 5, 3));
 
     // Now that the bonds are gone, we can resize
     topo.resize(5);
