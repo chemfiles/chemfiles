@@ -9,7 +9,7 @@ int main() {
     // [example]
     CHFL_ATOM* atom = chfl_atom("Na");
 
-    int64_t number = 0;
+    uint64_t number = 0;
     chfl_atom_atomic_number(atom, &number);
     assert(number == 11);
 

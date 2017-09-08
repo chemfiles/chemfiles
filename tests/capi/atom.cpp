@@ -91,7 +91,7 @@ TEST_CASE("Atom", "[CAPI]") {
         CHFL_ATOM* atom = chfl_atom("Zn");
         REQUIRE(atom != NULL);
 
-        int64_t number = 0;
+        uint64_t number = 0;
         CHECK_STATUS(chfl_atom_atomic_number(atom, &number));
         CHECK(number == 30);
 

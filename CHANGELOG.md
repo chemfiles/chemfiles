@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   to add additional configuration files.
 * Reading a `Frame` (with `Trajectory::read` or `Trajectory::read_step`) will
   now set the frame step.
+* The `Atom` faillible methods (`atomic_number`, `vdw_radius`,
+  `covalent_radius` and `full_name`) returns `optional<T>` instead of `T`.
 
 ### Changes in supported formats
 
@@ -28,6 +30,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added `chfl_add_configuration` to add more configuration files.
 * Renamed `chfl_vector_t` to `chfl_vector3d`; and `chfl_cell_shape_t` to
   `chfl_cellshape`.
+* `chfl_atom_atomic_number`, `chfl_atom_vdw_radius` and
+  `chfl_atom_covalent_radius` all returns 0 instead of -1 if the atom does not
+  have a known value for this property. This allow `chfl_atom_atomic_number`
+  to take a `uint64_t*` parameter instead of an `int64_t*`, following all the
+  other functions in the C API.
 
 ### Deprecation and removals
 

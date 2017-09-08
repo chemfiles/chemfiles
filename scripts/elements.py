@@ -65,6 +65,7 @@ HEADER = """// Chemfiles, a modern library for chemistry file reading and writin
 
 #include <map>
 #include <string>
+#include <cstdint>
 
 namespace chemfiles {
 """
@@ -73,13 +74,13 @@ STRUCT = """
 //! Storing basic elemental data: mass, colvalent and Van der Waals radii
 struct ElementData {
     //! Atomic number
-    const int number;
+    const uint64_t number;
     //! Full name
-    const char* name;
+    const std::string name;
     //! Mass in atomic units
     const double mass;
     //! Covalent radius in Angstrom
-    const double colvalent_radius;
+    const double covalent_radius;
     //! Van der Waals radius in Angstrom
     const double vdw_radius;
 };
@@ -104,6 +105,7 @@ def write_elements(path, elements):
 
 def usage():
     print(sys.argv[0] + " path/to/elements.xml periodic.hpp")
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:

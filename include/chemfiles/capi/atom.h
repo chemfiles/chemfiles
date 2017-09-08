@@ -156,7 +156,7 @@ CHFL_EXPORT chfl_status chfl_atom_full_name(
 /// Get the Van der Waals radius of an `atom` from the atom type, in the double
 /// pointed to by `radius`.
 ///
-/// If the radius in unknown, this function set `radius` to -1.
+/// If the radius in unknown, this function set `radius` to 0.
 ///
 /// @example{tests/capi/doc/chfl_atom/vdw_radius.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
@@ -168,7 +168,7 @@ CHFL_EXPORT chfl_status chfl_atom_vdw_radius(
 /// Get the covalent radius of an `atom` from the atom type, in the double
 /// pointed to by `radius`.
 ///
-/// If the radius in unknown, this function set `radius` to -1.
+/// If the radius in unknown, this function set `radius` to 0.
 ///
 /// @example{tests/capi/doc/chfl_atom/covalent_radius.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
@@ -180,13 +180,13 @@ CHFL_EXPORT chfl_status chfl_atom_covalent_radius(
 /// Get the atomic number of an `atom` from the atom type, in the integer
 /// pointed to by `number`.
 ///
-/// If the atomic number in unknown, this function set `number` to -1.
+/// If the atomic number in unknown, this function set `number` to UINT64_MAX.
 ///
 /// @example{tests/capi/doc/chfl_atom/atomic_number.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_atomic_number(
-    const CHFL_ATOM* const atom, int64_t* number
+    const CHFL_ATOM* const atom, uint64_t* number
 );
 
 /// Free the memory associated with an `atom`.
