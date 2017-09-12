@@ -57,7 +57,6 @@ if(MSVC)
 endif()
 
 if(CHFL_CODE_COVERAGE)
-    set(CHFL_BUILD_TESTS ON)
     message(STATUS "Code coverage enabled")
     if(NOT CMAKE_COMPILER_IS_GNUCXX)
         message(FATAL_ERROR "Code coverage can only be used with GCC")
