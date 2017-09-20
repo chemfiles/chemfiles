@@ -141,3 +141,52 @@ void Frame::remove(size_t i) {
     }
     assert(natoms() == topology_.natoms());
 }
+
+double Frame::distance(size_t i, size_t j) const {
+    if (i >= natoms() || j >= natoms()) {
+        throw OutOfBounds(
+            "out of bounds atomic index in `Frame::distance`: we have " +
+            std::to_string(natoms()) + " atoms, but the indexes are " +
+            std::to_string(i) + " and " + std::to_string(j)
+        );
+    }
+
+    auto rij = positions_[i] - positions_[j];
+    return norm(cell_.wrap(rij));
+}
+
+double Frame::angle(size_t i, size_t j, size_t k) const {
+    if (i >= natoms() || j >= natoms() || k >= natoms()) {
+        throw OutOfBounds(
+            "out of bounds atomic index in `Frame::angle`: we have " +
+            std::to_string(natoms()) + " atoms, but the indexes are " +
+            std::to_string(i) + ", " + std::to_string(j) + " and " + std::to_string(k)
+        );
+    }
+
+    auto rij = cell_.wrap(positions_[i] - positions_[j]);
+    auto rkj = cell_.wrap(positions_[k] - positions_[j]);
+
+    auto cos = dot(rij, rkj) / (norm(rij) * norm(rkj));
+    cos = std::max(-1.0, std::min(1.0, cos));
+    return acos(cos);
+}
+
+double Frame::dihedral(size_t i, size_t j, size_t k, size_t m) const {
+    if (i >= natoms() || j >= natoms() || k >= natoms() || m >= natoms()) {
+        throw OutOfBounds(
+            "out of bounds atomic index in `Frame::dihedral`: we have " +
+            std::to_string(natoms()) + " atoms, but the indexes are " +
+            std::to_string(i) + ", " + std::to_string(j) + ", " + std::to_string(k) +
+            " and " + std::to_string(m)
+        );
+    }
+
+    auto rij = cell_.wrap(positions_[i] - positions_[j]);
+    auto rjk = cell_.wrap(positions_[j] - positions_[k]);
+    auto rkm = cell_.wrap(positions_[k] - positions_[m]);
+
+    auto a = cross(rij, rjk);
+    auto b = cross(rjk, rkm);
+    return atan2(norm(rjk) * dot(b, rij), dot(a, b));
+}

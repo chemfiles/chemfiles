@@ -110,6 +110,24 @@ public:
     /// are guessed from the bonds.
     void guess_topology();
 
+    /// Get the distance between the atoms at indexes `i` and `j`, accounting
+    /// for periodic boundary conditions.
+    ///
+    /// @throws chemfiles::OutOfBounds if `i` or `j` are not in bounds
+    double distance(size_t i, size_t j) const;
+
+    /// Get the angle formed by the atoms at indexes `i`, `j` and `k`,
+    /// accounting for periodic boundary conditions.
+    ///
+    /// @throws chemfiles::OutOfBounds if `i`, `j` or `k` are not in bounds
+    double angle(size_t i, size_t j, size_t k) const;
+
+    /// Get the dihedral angle formed by the atoms at indexes `i`, `j`, `k` and
+    /// `m`, accounting for periodic boundary conditions.
+    ///
+    /// @throws chemfiles::OutOfBounds if `i`, `j`, `k` or `m` are not in bounds
+    double dihedral(size_t i, size_t j, size_t k, size_t m) const;
+
 private:
     Frame(const Frame&) = default;
     Frame& operator=(const Frame&) = default;
