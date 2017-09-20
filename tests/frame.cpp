@@ -5,6 +5,12 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
+constexpr double PI = 3.141592653589793238463;
+
+static bool roughly(double a, double b) {
+    return fabs(a - b) < 1e-12;
+}
+
 TEST_CASE("Frame size") {
     auto frame = Frame(10);
     CHECK(frame.natoms() == 10);
@@ -166,5 +172,44 @@ TEST_CASE("Guess topology") {
         CHECK(frame.topology().bonds() == (std::vector<Bond>{{0, 1}, {0, 3}, {1, 2}, {2, 3}}));
         CHECK(frame.topology().angles() == (std::vector<Angle>{{0, 1, 2}, {0, 3, 2}, {1, 0, 3}, {1, 2, 3}}));
         CHECK(frame.topology().dihedrals() == (std::vector<Dihedral>{{0, 1, 2, 3}, {1, 0, 3, 2}, {1, 2, 3, 0}, {2, 1, 0, 3}}));
+    }
+}
+
+TEST_CASE("PBC functions") {
+    SECTION("Distance") {
+        auto frame = Frame();
+        frame.set_cell(UnitCell(3.0, 4.0, 5.0));
+        frame.add_atom(Atom(), vector3d(0, 0, 0));
+        frame.add_atom(Atom(), vector3d(1, 2, 6));
+
+        CHECK(frame.distance(0, 1) == sqrt(6.0));
+    }
+
+    SECTION("Angles") {
+        auto frame = Frame();
+        frame.add_atom(Atom(), vector3d(1, 0, 0));
+        frame.add_atom(Atom(), vector3d(0, 0, 0));
+        frame.add_atom(Atom(), vector3d(0, 1, 0));
+        CHECK(roughly(frame.angle(0, 1, 2), PI / 2.0));
+
+        frame.add_atom(Atom(), vector3d(cos(1.877), sin(1.877), 0));
+        CHECK(roughly(frame.angle(0, 1, 3), 1.877));
+    }
+
+    SECTION("Dihedrals") {
+        auto frame = Frame();
+        frame.add_atom(Atom(), vector3d(0, 0, 0));
+        frame.add_atom(Atom(), vector3d(1, 0, 0));
+        frame.add_atom(Atom(), vector3d(1, 1, 0));
+        frame.add_atom(Atom(), vector3d(2, 1, 0));
+
+        CHECK(roughly(frame.dihedral(0, 1, 2, 3), PI));
+
+        frame.add_atom(Atom(), vector3d(1.241, 0.444, 0.349));
+        frame.add_atom(Atom(), vector3d(-0.011, -0.441, 0.333));
+        frame.add_atom(Atom(), vector3d(-1.176, 0.296, -0.332));
+        frame.add_atom(Atom(), vector3d(-1.396, 1.211, 0.219));
+
+        CHECK(roughly(frame.dihedral(4, 5, 6, 7), 1.045378962606));
     }
 }
