@@ -8,7 +8,7 @@
 static CHFL_FRAME* testing_frame(void);
 static bool find_match(const chfl_match_t* matches, uint64_t n_matches, chfl_match_t match);
 
-TEST_CASE("Selections", "[CAPI]") {
+TEST_CASE("Selections") {
     SECTION("Selection string") {
         CHFL_SELECTION* selection = chfl_selection("name O");
         REQUIRE(selection != NULL);

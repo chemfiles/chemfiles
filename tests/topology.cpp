@@ -5,7 +5,7 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-TEST_CASE("Connectivity elements", "[Topology]") {
+TEST_CASE("Connectivity elements") {
     SECTION("Bonds") {
         CHECK(Bond(2, 3) == Bond(3, 2));
 
@@ -77,7 +77,7 @@ TEST_CASE("Connectivity elements", "[Topology]") {
     }
 }
 
-TEST_CASE("Use the Topology class", "[Topology]") {
+TEST_CASE("Use the Topology class") {
     auto topology = Topology();
 
     topology.append(Atom("H"));
@@ -93,7 +93,7 @@ TEST_CASE("Use the Topology class", "[Topology]") {
     CHECK(topology.bonds()[0] == Bond(0, 1));
 }
 
-TEST_CASE("Angles and dihedral detection", "[Topology]") {
+TEST_CASE("Angles and dihedral detection") {
     SECTION("Angles detection") {
         auto topology = Topology();
         CHECK(topology.angles().size() == 0);
@@ -130,7 +130,7 @@ TEST_CASE("Angles and dihedral detection", "[Topology]") {
     }
 }
 
-TEST_CASE("Add and remove items in the topology", "[Topology]") {
+TEST_CASE("Add and remove items in the topology") {
     auto topo = Topology();
 
     for (unsigned i=0; i<4; i++) {
@@ -169,7 +169,7 @@ TEST_CASE("Add and remove items in the topology", "[Topology]") {
     topo.resize(5);
 }
 
-TEST_CASE("Residues in topologies", "[Topology]") {
+TEST_CASE("Residues in topologies") {
     auto topo = Topology();
     for (unsigned i=0; i<10; i++) {
         topo.append(Atom("X"));

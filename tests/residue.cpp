@@ -5,7 +5,7 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-TEST_CASE("Residue class usage", "[Residue]"){
+TEST_CASE("Residue class usage"){
     auto residue = Residue("ALA", 4);
     CHECK(residue.name() == "ALA");
     CHECK(residue.id() == 4);

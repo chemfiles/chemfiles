@@ -15,7 +15,7 @@ static std::string generate_chemfiles_error() {
     return "Can not find a format associated with the '' extension.";
 }
 
-TEST_CASE("Errors", "[CAPI]") {
+TEST_CASE("Errors") {
     CHECK(chfl_last_error() == std::string(""));
 
     generate_chemfiles_error();
@@ -25,12 +25,12 @@ TEST_CASE("Errors", "[CAPI]") {
     CHECK(chfl_last_error() == std::string(""));
 }
 
-TEST_CASE("Configuration", "[CAPI]") {
+TEST_CASE("Configuration") {
     CHECK_STATUS(chfl_add_configuration("another_config"));
     CHECK(chfl_add_configuration("not-there") == CHFL_CONFIGURATION_ERROR);
 }
 
-TEST_CASE("Version", "[CAPI]") {
+TEST_CASE("Version") {
     std::ifstream file(VERSION_FILE_PATH);
     REQUIRE(file.is_open());
     std::stringstream content;
@@ -52,7 +52,7 @@ static void callback(const char* message) {
     strcpy(buffer, message);
 }
 
-TEST_CASE("Warnings", "[CAPI]") {
+TEST_CASE("Warnings") {
     CHECK_STATUS(chfl_set_warning_callback(callback));
 
     std::string message = generate_chemfiles_error();

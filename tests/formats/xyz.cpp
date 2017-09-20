@@ -13,7 +13,7 @@ using namespace chemfiles;
 namespace fs=boost::filesystem;
 
 
-TEST_CASE("Read files in XYZ format", "[XYZ]") {
+TEST_CASE("Read files in XYZ format") {
     SECTION("Check nsteps") {
         Trajectory file1("data/xyz/trajectory.xyz");
         CHECK(file1.nsteps() == 2);
@@ -92,7 +92,7 @@ struct directory_files_iterator {
     fs::path p_;
 };
 
-TEST_CASE("Errors in XYZ format", "[XYZ]") {
+TEST_CASE("Errors in XYZ format") {
     for (auto entry : directory_files_iterator("data/xyz/bad/")) {
         CHECK_THROWS_AS(
             // We can throw either when creating the trajectory, or when reading
@@ -103,7 +103,7 @@ TEST_CASE("Errors in XYZ format", "[XYZ]") {
     }
 }
 
-TEST_CASE("Write files in XYZ format", "[XYZ]") {
+TEST_CASE("Write files in XYZ format") {
     auto tmpfile = NamedTempPath(".xyz");
     const auto expected_content =
     "4\n"

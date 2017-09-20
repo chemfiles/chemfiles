@@ -12,7 +12,7 @@ static bool contains(const std::vector<T> haystack, const T& needle) {
     return std::find(haystack.begin(), haystack.end(), needle) != haystack.end();
 }
 
-TEST_CASE("Read files in PDB format", "[Molfile]"){
+TEST_CASE("Read files in PDB format"){
     SECTION("Read next step") {
         Trajectory file("data/pdb/water.pdb");
         Frame frame = file.read();
@@ -111,7 +111,7 @@ TEST_CASE("Read files in PDB format", "[Molfile]"){
     }
 }
 
-TEST_CASE("Write files in PDB format", "[PDB]") {
+TEST_CASE("Write files in PDB format") {
     auto tmpfile = NamedTempPath(".pdb");
     const auto EXPECTED_CONTENT =
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
@@ -198,7 +198,7 @@ TEST_CASE("Write files in PDB format", "[PDB]") {
     CHECK(content == EXPECTED_CONTENT);
 }
 
-TEST_CASE("PDB files with big values", "[PDB]") {
+TEST_CASE("PDB files with big values") {
     auto tmpfile = NamedTempPath(".pdb");
     auto trajectory = Trajectory(tmpfile, 'w');
 

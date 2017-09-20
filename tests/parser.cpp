@@ -9,7 +9,7 @@
 using namespace chemfiles;
 using namespace chemfiles::selections;
 
-TEST_CASE("Tokens", "[selection]") {
+TEST_CASE("Tokens") {
     SECTION("Operators") {
         CHECK(Token(Token::AND).is_boolean_op());
         CHECK(Token(Token::OR).is_boolean_op());
@@ -129,7 +129,7 @@ TEST_CASE("Tokens", "[selection]") {
     }
 }
 
-TEST_CASE("Lexing", "[selection]") {
+TEST_CASE("Lexing") {
     SECTION("Whitespaces") {
         for (auto& str: {"ident", "ident ", "  ident", " \tident   "}) {
             CHECK(tokenize(str).size() == 1);
@@ -237,7 +237,7 @@ TEST_CASE("Lexing", "[selection]") {
     }
 }
 
-TEST_CASE("Parsing", "[selection]") {
+TEST_CASE("Parsing") {
     // This section uses the pretty-printing of AST to check the parsing
     SECTION("Operators") {
         auto ast = "and -> index(#1) == 1\n    -> index(#1) == 1";

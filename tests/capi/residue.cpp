@@ -5,7 +5,7 @@
 #include "helpers.hpp"
 #include "chemfiles.h"
 
-TEST_CASE("Residue", "[CAPI]") {
+TEST_CASE("Residue") {
     SECTION("Name") {
         CHFL_RESIDUE* residue = chfl_residue("Foo", 0);
         REQUIRE(residue != NULL);

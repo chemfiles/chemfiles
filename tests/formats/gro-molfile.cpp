@@ -6,7 +6,7 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-TEST_CASE("Read files in Gromacs .gro format using Molfile", "[Molfile]"){
+TEST_CASE("Read files in Gromacs .gro format using Molfile"){
     Trajectory file("data/gro/ubiquitin.gro");
     Frame frame = file.read();
 

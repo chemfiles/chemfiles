@@ -13,7 +13,7 @@ static bool approx_eq(double A[3][3], double B[3][3]) {
         (fabs(A[2][0] - B[2][0]) < eps) && (fabs(A[2][1] - B[2][1]) < eps) && (fabs(A[2][2] - B[2][2]) < eps);
 }
 
-TEST_CASE("Atom", "[CAPI]") {
+TEST_CASE("Atom") {
     SECTION("Constructors") {
         chfl_vector3d lengths = {2, 3, 4};
         CHFL_CELL* cell = chfl_cell(lengths);

@@ -6,7 +6,7 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-TEST_CASE("Read files in DCD format using Molfile", "[Molfile]"){
+TEST_CASE("Read files in DCD format using Molfile"){
     double eps = 1e-4;
     Trajectory file("data/dcd/water.dcd");
 

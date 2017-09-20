@@ -5,7 +5,7 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-TEST_CASE("Frame size", "[Frame]") {
+TEST_CASE("Frame size") {
     auto frame = Frame(10);
     CHECK(frame.natoms() == 10);
     CHECK(frame.positions().size() == 10);
@@ -47,7 +47,7 @@ TEST_CASE("Frame size", "[Frame]") {
     CHECK(frame.velocities()->size() == 2);
 }
 
-TEST_CASE("Positions and velocities", "[Frame]") {
+TEST_CASE("Positions and velocities") {
     auto frame = Frame(15);
 
     frame.positions()[0] = vector3d(1, 2, 3);
@@ -74,21 +74,21 @@ TEST_CASE("Positions and velocities", "[Frame]") {
     }
 }
 
-TEST_CASE("Frame step", "[Frame]") {
+TEST_CASE("Frame step") {
     auto frame = Frame();
     CHECK(frame.step() == 0);
     frame.set_step(1000);
     CHECK(frame.step() == 1000);
 }
 
-TEST_CASE("Unit cell", "[Frame]") {
+TEST_CASE("Unit cell") {
     auto frame = Frame();
     CHECK(frame.cell().shape() == UnitCell::INFINITE);
     frame.set_cell(UnitCell(10));
     CHECK(frame.cell().shape() == UnitCell::ORTHORHOMBIC);
 }
 
-TEST_CASE("Guess topology", "[Frame]") {
+TEST_CASE("Guess topology") {
     SECTION("Simple case") {
         auto frame = Frame();
         frame.add_atom(Atom("H"), {{0, 1, 0}});

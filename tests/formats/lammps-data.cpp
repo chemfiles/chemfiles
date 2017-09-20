@@ -8,7 +8,7 @@ using namespace chemfiles;
 
 #include<iostream>
 
-TEST_CASE("Read files in LAMMPS data format", "[LAMMPS]") {
+TEST_CASE("Read files in LAMMPS data format") {
     SECTION("File created by VMD/Topotools") {
         Trajectory file("data/lammps-data/solvated.lmp", 'r', "LAMMPS Data");
         Frame frame = file.read();

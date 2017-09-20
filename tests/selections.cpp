@@ -7,7 +7,7 @@ using namespace chemfiles;
 
 static Frame testing_frame();
 
-TEST_CASE("Match class", "[selection]") {
+TEST_CASE("Match class") {
     auto match = Match(1ul, 2ul, 3ul);
     CHECK(match.size() == 3);
 
@@ -16,7 +16,7 @@ TEST_CASE("Match class", "[selection]") {
     CHECK(match == Match(1ul, 2ul, 3ul));
 }
 
-TEST_CASE("Atoms selections", "[selection]") {
+TEST_CASE("Atoms selections") {
     auto frame = testing_frame();
 
     SECTION("all & none") {
@@ -181,7 +181,7 @@ TEST_CASE("Atoms selections", "[selection]") {
     }
 }
 
-TEST_CASE("Multiple selections", "[selection]") {
+TEST_CASE("Multiple selections") {
     auto frame = testing_frame();
 
     SECTION("Pairs & two") {
