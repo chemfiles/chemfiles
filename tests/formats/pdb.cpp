@@ -141,10 +141,10 @@ TEST_CASE("Write files in PDB format") {
     "END\n";
 
     Topology topology;
-    topology.append(Atom("A"));
-    topology.append(Atom("B"));
-    topology.append(Atom("C"));
-    topology.append(Atom("D"));
+    topology.add_atom(Atom("A"));
+    topology.add_atom(Atom("B"));
+    topology.add_atom(Atom("C"));
+    topology.add_atom(Atom("D"));
     topology.add_bond(0, 1);
 
     Frame frame(topology);
@@ -165,9 +165,9 @@ TEST_CASE("Write files in PDB format") {
     for(size_t i=0; i<7; i++)
         positions[i] = vector3d(4, 5, 6);
 
-    topology.append(Atom("E"));
-    topology.append(Atom("F"));
-    topology.append(Atom("G"));
+    topology.add_atom(Atom("E"));
+    topology.add_atom(Atom("F"));
+    topology.add_atom(Atom("G"));
     topology.add_bond(4, 5);
     topology.add_bond(0, 6);
     topology.add_bond(1, 6);

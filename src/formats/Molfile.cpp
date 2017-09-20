@@ -225,7 +225,7 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
             atom.set_mass(vmd_atom.mass);
         }
 
-        topology_->append(atom);
+        topology_->add_atom(std::move(atom));
 
         if (vmd_atom.resname != std::string("")) {
             auto resid = static_cast<size_t>(vmd_atom.resid);

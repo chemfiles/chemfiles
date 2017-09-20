@@ -18,7 +18,7 @@ void Topology::resize(size_t natoms) {
     atoms_.resize(natoms, Atom());
 }
 
-void Topology::append(Atom atom) {
+void Topology::add_atom(Atom atom) {
     atoms_.emplace_back(std::move(atom));
 }
 

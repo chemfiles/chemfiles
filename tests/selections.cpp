@@ -298,10 +298,10 @@ TEST_CASE("Multiple selections") {
 
 Frame testing_frame() {
     auto topology = Topology();
-    topology.append(Atom("H1", "H"));
-    topology.append(Atom("O"));
-    topology.append(Atom("O"));
-    topology.append(Atom("H"));
+    topology.add_atom(Atom("H1", "H"));
+    topology.add_atom(Atom("O"));
+    topology.add_atom(Atom("O"));
+    topology.add_atom(Atom("H"));
 
     topology.add_bond(0, 1);
     topology.add_bond(1, 2);

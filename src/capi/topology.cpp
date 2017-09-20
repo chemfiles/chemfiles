@@ -64,7 +64,7 @@ extern "C" chfl_status chfl_topology_add_atom(CHFL_TOPOLOGY* const topology, con
     CHECK_POINTER(topology);
     CHECK_POINTER(atom);
     CHFL_ERROR_CATCH(
-        topology->append(*atom);
+        topology->add_atom(*atom);
     )
 }
 

@@ -86,11 +86,11 @@ TEST_CASE("Connectivity elements") {
 TEST_CASE("Use the Topology class") {
     auto topology = Topology();
 
-    topology.append(Atom("H"));
+    topology.add_atom(Atom("H"));
     CHECK(topology[0].name() == "H");
     CHECK(topology[0].type() == "H");
 
-    topology.append(Atom("H"));
+    topology.add_atom(Atom("H"));
     CHECK(topology[1].name() == "H");
     CHECK(topology[1].type() == "H");
 
@@ -103,7 +103,7 @@ TEST_CASE("Angles and dihedral detection") {
     SECTION("Angles detection") {
         auto topology = Topology();
         for (size_t i=0; i<30; i++) {
-            topology.append(Atom());
+            topology.add_atom(Atom());
         }
 
         CHECK(topology.angles().size() == 0);
@@ -125,7 +125,7 @@ TEST_CASE("Angles and dihedral detection") {
     SECTION("Dihedral angles") {
         auto topology = Topology();
         for (size_t i=0; i<30; i++) {
-            topology.append(Atom());
+            topology.add_atom(Atom());
         }
 
         CHECK(topology.dihedrals().size() == 0);
@@ -146,9 +146,9 @@ TEST_CASE("Angles and dihedral detection") {
 
 TEST_CASE("Out of bounds errors") {
     auto topology = Topology();
-    topology.append(Atom());
-    topology.append(Atom());
-    topology.append(Atom());
+    topology.add_atom(Atom());
+    topology.add_atom(Atom());
+    topology.add_atom(Atom());
 
     CHECK_THROWS_AS(topology[25], OutOfBounds);
 
@@ -162,48 +162,48 @@ TEST_CASE("Out of bounds errors") {
 }
 
 TEST_CASE("Add and remove items in the topology") {
-    auto topo = Topology();
+    auto topology = Topology();
 
     for (unsigned i=0; i<4; i++) {
-        topo.append(Atom("H"));
+        topology.add_atom(Atom("H"));
     }
-    topo.append(Atom("O"));
-    topo.append(Atom("O"));
+    topology.add_atom(Atom("O"));
+    topology.add_atom(Atom("O"));
 
-    topo.add_bond(0, 4);
-    topo.add_bond(1, 4);
-    topo.add_bond(2, 5);
-    topo.add_bond(3, 5);
+    topology.add_bond(0, 4);
+    topology.add_bond(1, 4);
+    topology.add_bond(2, 5);
+    topology.add_bond(3, 5);
 
-    CHECK(topo.bonds() == (std::vector<Bond>{{0, 4}, {1, 4}, {2, 5}, {3, 5}}));
-    CHECK(topo.angles() == (std::vector<Angle>{{0, 4, 1}, {2, 5, 3}}));
-    CHECK(topo.dihedrals() == (std::vector<Dihedral>{}));
+    CHECK(topology.bonds() == (std::vector<Bond>{{0, 4}, {1, 4}, {2, 5}, {3, 5}}));
+    CHECK(topology.angles() == (std::vector<Angle>{{0, 4, 1}, {2, 5, 3}}));
+    CHECK(topology.dihedrals() == (std::vector<Dihedral>{}));
 
-    topo.append(Atom("O"));
-    topo.add_bond(3, 6);
-    CHECK(topo.bonds().size() == 5);
-    CHECK(topo.dihedrals()[0] == Dihedral(2, 5, 3, 6));
+    topology.add_atom(Atom("O"));
+    topology.add_bond(3, 6);
+    CHECK(topology.bonds().size() == 5);
+    CHECK(topology.dihedrals()[0] == Dihedral(2, 5, 3, 6));
 
-    topo.remove(6);
-    CHECK(topo.natoms() == 6);
-    CHECK(topo.bonds().size() == 4);
+    topology.remove(6);
+    CHECK(topology.natoms() == 6);
+    CHECK(topology.bonds().size() == 4);
 
     // we can not resize while there are bonds betweena atoms to remove
-    CHECK_THROWS_AS(topo.resize(5), Error);
+    CHECK_THROWS_AS(topology.resize(5), Error);
 
-    topo.remove_bond(2, 5);
-    topo.remove_bond(3, 5);
-    CHECK(topo.natoms() == 6);
-    CHECK(topo.bonds().size() == 2);
+    topology.remove_bond(2, 5);
+    topology.remove_bond(3, 5);
+    CHECK(topology.natoms() == 6);
+    CHECK(topology.bonds().size() == 2);
 
     // Now that the bonds are gone, we can resize
-    topo.resize(5);
+    topology.resize(5);
 }
 
 TEST_CASE("Residues in topologies") {
-    auto topo = Topology();
+    auto topology = Topology();
     for (unsigned i=0; i<10; i++) {
-        topo.append(Atom("X"));
+        topology.add_atom(Atom("X"));
     }
 
     size_t residues[3][3] = {{2, 3, 6}, {0, 1, 9}, {4, 5, 8}};
@@ -212,28 +212,28 @@ TEST_CASE("Residues in topologies") {
         for (auto i: atoms) {
             residue.add_atom(i);
         }
-        topo.add_residue(std::move(residue));
+        topology.add_residue(std::move(residue));
     }
 
-    CHECK(topo.residues().size() == 3);
+    CHECK(topology.residues().size() == 3);
 
 
     auto residue = Residue("X");
     residue.add_atom(2);
-    CHECK_THROWS_AS(topo.add_residue(residue), Error);
+    CHECK_THROWS_AS(topology.add_residue(residue), Error);
 
-    auto first = topo.residue(0);
+    auto first = topology.residue(0);
     CHECK(first);
-    auto second = topo.residue(2);
+    auto second = topology.residue(2);
     CHECK(second);
 
-    CHECK_FALSE(topo.residue(7));
+    CHECK_FALSE(topology.residue(7));
 
-    CHECK_FALSE(topo.are_linked(*first, *second));
-    topo.add_bond(6, 9);
-    CHECK(topo.are_linked(*first, *second));
+    CHECK_FALSE(topology.are_linked(*first, *second));
+    topology.add_bond(6, 9);
+    CHECK(topology.are_linked(*first, *second));
 
     // A residue is linked to itself
-    second = topo.residue(0);
-    CHECK(topo.are_linked(*first, *second));
+    second = topology.residue(0);
+    CHECK(topology.are_linked(*first, *second));
 }

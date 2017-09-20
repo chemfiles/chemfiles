@@ -71,8 +71,8 @@ public:
     const_iterator end() const {return atoms_.end();}
     const_iterator cend() const {return atoms_.cend();}
 
-    /// Add an atom in the system
-    void append(Atom atom);
+    /// Add an `atom` at the end of this topology.
+    void add_atom(Atom atom);
 
     /// Delete the atom at index `i` in the system.
     ///
