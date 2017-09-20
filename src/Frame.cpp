@@ -128,7 +128,12 @@ void Frame::add_atom(Atom atom, Vector3D position, Vector3D velocity) {
 }
 
 void Frame::remove(size_t i) {
-    assert(i < natoms() && "Can not remove out of bounds atom");
+    if (i >= natoms()) {
+        throw OutOfBounds(
+            "out of bounds atomic index in `Frame::remove`: we have " +
+            std::to_string(natoms()) + " atoms, but the index is " + std::to_string(i)
+        );
+    }
     topology_.remove(i);
     positions_.erase(positions_.begin() + static_cast<std::ptrdiff_t>(i));
     if (velocities_) {

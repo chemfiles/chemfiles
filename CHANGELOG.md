@@ -16,6 +16,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   now set the frame step.
 * The `Atom` faillible methods (`atomic_number`, `vdw_radius`,
   `covalent_radius` and `full_name`) returns `optional<T>` instead of `T`.
+* Functions taking an atomic index parameter can now throw `OutOfBounds` errors
+  if the index is out of bounds.
 
 ### Changes in supported formats
 
@@ -35,6 +37,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   have a known value for this property. This allow `chfl_atom_atomic_number`
   to take a `uint64_t*` parameter instead of an `int64_t*`, following all the
   other functions in the C API.
+* Added `CHFL_OUT_OF_BOUNDS` variant to `chfl_status`
 
 ### Deprecation and removals
 

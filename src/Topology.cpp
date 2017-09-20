@@ -27,20 +27,39 @@ void Topology::reserve(size_t natoms) {
 }
 
 void Topology::add_bond(size_t atom_i, size_t atom_j) {
+    if (atom_i >= natoms() || atom_j >= natoms()) {
+        throw OutOfBounds(
+            "out of bounds atomic index in `Topology::add_bond`: we have " +
+            std::to_string(natoms()) + " atoms, but the bond indexes are " +
+            std::to_string(atom_i) + " and " + std::to_string(atom_j)
+        );
+    }
     connect_.add_bond(atom_i, atom_j);
 }
 
 void Topology::remove_bond(size_t atom_i, size_t atom_j) {
+    if (atom_i >= natoms() || atom_j >= natoms()) {
+        throw OutOfBounds(
+            "out of bounds atomic index in `Topology::remove_bond`: we have " +
+            std::to_string(natoms()) + " atoms, but the bond indexes are " +
+            std::to_string(atom_i) + " and " + std::to_string(atom_j)
+        );
+    }
     connect_.remove_bond(atom_i, atom_j);
 }
 
 
-void Topology::remove(size_t idx) {
-    assert(idx < natoms() && "Can not remove out of bounds atom");
-    atoms_.erase(atoms_.begin() + static_cast<std::ptrdiff_t>(idx));
+void Topology::remove(size_t i) {
+    if (i >= natoms()) {
+        throw OutOfBounds(
+            "out of bounds atomic index in `Topology::remove`: we have " +
+            std::to_string(natoms()) + " atoms, but the index is " + std::to_string(i)
+        );
+    }
+    atoms_.erase(atoms_.begin() + static_cast<std::ptrdiff_t>(i));
     auto bonds = connect_.bonds();
     for (auto& bond : bonds) {
-        if (bond[0] == idx || bond[1] == idx) {
+        if (bond[0] == i || bond[1] == i) {
             connect_.remove_bond(bond[0], bond[1]);
         }
     }
@@ -58,13 +77,12 @@ const std::vector<Dihedral>& Topology::dihedrals() const {
     return connect_.dihedrals().as_vec();
 }
 
-bool Topology::isbond(size_t i, size_t j) const {
+bool Topology::is_bond(size_t i, size_t j) const {
     if (i == j) {
         return false;
     }
     auto bonds = connect_.bonds();
-    auto pos = bonds.find(Bond(i, j));
-    return pos != bonds.end();
+    return bonds.find(Bond(i, j)) != bonds.end();
 }
 
 void Topology::add_residue(Residue residue) {
@@ -91,7 +109,7 @@ bool Topology::are_linked(const Residue& first, const Residue& second) const {
     }
     for (auto i: first) {
         for (auto j: second) {
-            if (isbond(i, j)) {
+            if (is_bond(i, j)) {
                 return true;
             }
         }

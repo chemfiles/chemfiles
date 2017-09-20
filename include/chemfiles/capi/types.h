@@ -117,6 +117,8 @@ typedef enum {
     CHFL_SELECTION_ERROR = 4,
     /// Status code for configuration files errors.
     CHFL_CONFIGURATION_ERROR = 5,
+    /// Status code for out of bounds errors.
+    CHFL_OUT_OF_BOUNDS = 6,
     /// Status code for any other error from Chemfiles.
     CHFL_GENERIC_ERROR = 254,
     /// Status code for error in the C++ standard library.

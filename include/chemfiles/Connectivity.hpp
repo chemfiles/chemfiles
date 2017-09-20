@@ -25,8 +25,15 @@ struct CHFL_EXPORT Bond {
         data_[1] = std::max(first, second);
     }
 
-    /// Indexing operator
-    const size_t& operator[](size_t i) const { return data_[i]; }
+    /// Get the index of the `i`th atom (`i == 0` or `i == 1`) in the bond.
+    ///
+    /// @throws OutOfBounds if `i` is not 0 or 1
+    const size_t& operator[](size_t i) const {
+        if (i >= 2) {
+            throw OutOfBounds("Can not access bond atom " + std::to_string(i));
+        }
+        return data_[i];
+    }
 
     Bond(Bond&&) = default;
     Bond& operator=(Bond&&) = default;
@@ -68,8 +75,16 @@ struct CHFL_EXPORT Angle {
         data_[2] = std::max(first, last);
     }
 
-    /// Indexing operator
-    const size_t& operator[](size_t i) const { return data_[i]; }
+    /// Get the index of the `i`th atom (`i == 0`, `i == 1` or `i == 2`) in the
+    /// angle.
+    ///
+    /// @throws OutOfBounds if `i` is not 0, 1 or 2
+    const size_t& operator[](size_t i) const {
+        if (i >= 3) {
+            throw OutOfBounds("Can not access angle atom " + std::to_string(i));
+        }
+        return data_[i];
+    }
 
     Angle(Angle&&) = default;
     Angle& operator=(Angle&&) = default;
@@ -127,8 +142,16 @@ struct CHFL_EXPORT Dihedral {
         }
     }
 
-    /// Indexing operator
-    const size_t& operator[](size_t i) const { return data_[i]; }
+    /// Get the index of the `i`th atom (`i` can be 0, 1, 2 or 3) in the
+    /// dihedral.
+    ///
+    /// @throws OutOfBounds if `i` is not 0, 1, 2 or 3.
+    const size_t& operator[](size_t i) const {
+        if (i >= 4) {
+            throw OutOfBounds("Can not access dihedral atom " + std::to_string(i));
+        }
+        return data_[i];
+    }
 
     Dihedral(Dihedral&&) = default;
     Dihedral& operator=(Dihedral&&) = default;
@@ -184,7 +207,8 @@ public:
     void remove_bond(size_t i, size_t j);
 
 private:
-    /// Biggest index within the atoms we know about
+    /// Biggest index within the atoms we know about. Used to pre-allocate
+    /// memory when recomputing bonds.
     size_t biggest_atom_ = 0;
     /// Bonds in the system
     sorted_set<Bond> bonds_;

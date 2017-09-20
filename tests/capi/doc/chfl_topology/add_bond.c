@@ -9,6 +9,11 @@ int main() {
     // [example]
     CHFL_TOPOLOGY* topology = chfl_topology();
 
+    CHFL_ATOM* atom = chfl_atom("F");
+    chfl_topology_add_atom(topology, atom);
+    chfl_topology_add_atom(topology, atom);
+    chfl_atom_free(atom);
+
     chfl_topology_add_bond(topology, 0, 1);
 
     uint64_t bonds = 0;

@@ -95,8 +95,9 @@ public:
     /// Get the number of atoms in the system
     size_t natoms() const;
 
-    /// Remove the atom at index `i` in the system. `i` must be lower than
-    /// `natoms()`.
+    /// Remove the atom at index `i` in the system.
+    ///
+    /// @throws chemfiles::OutOfBounds if `i` is not in bounds
     void remove(size_t i);
 
     /// Get the current simulation step

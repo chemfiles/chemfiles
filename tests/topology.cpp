@@ -22,6 +22,8 @@ TEST_CASE("Connectivity elements") {
         CHECK(Bond(2, 3) > Bond(1, 3));
         CHECK(Bond(1, 3) > Bond(1, 2));
         CHECK_FALSE(Bond(1, 2) > Bond(1, 2));
+
+        CHECK_THROWS_AS(Bond(2, 1)[2], OutOfBounds);
     }
 
     SECTION("Angles") {
@@ -45,6 +47,8 @@ TEST_CASE("Connectivity elements") {
         CHECK(Angle(1, 3, 4) > Angle(1, 2, 4));
         CHECK(Angle(1, 2, 4) > Angle(1, 2, 3));
         CHECK_FALSE(Angle(1, 2, 3) > Angle(1, 2, 3));
+
+        CHECK_THROWS_AS(Angle(3, 2, 1)[3], OutOfBounds);
     }
 
     SECTION("Dihedral") {
@@ -74,6 +78,8 @@ TEST_CASE("Connectivity elements") {
         CHECK(Dihedral(1, 2, 4, 5) > Dihedral(1, 2, 3, 5));
         CHECK(Dihedral(1, 2, 3, 5) > Dihedral(1, 2, 3, 4));
         CHECK_FALSE(Dihedral(1, 2, 3, 4) > Dihedral(1, 2, 3, 4));
+
+        CHECK_THROWS_AS(Dihedral(2, 1, 4, 6)[4], OutOfBounds);
     }
 }
 
@@ -96,6 +102,10 @@ TEST_CASE("Use the Topology class") {
 TEST_CASE("Angles and dihedral detection") {
     SECTION("Angles detection") {
         auto topology = Topology();
+        for (size_t i=0; i<30; i++) {
+            topology.append(Atom());
+        }
+
         CHECK(topology.angles().size() == 0);
 
         topology.add_bond(0, 1);
@@ -114,6 +124,10 @@ TEST_CASE("Angles and dihedral detection") {
 
     SECTION("Dihedral angles") {
         auto topology = Topology();
+        for (size_t i=0; i<30; i++) {
+            topology.append(Atom());
+        }
+
         CHECK(topology.dihedrals().size() == 0);
 
         topology.add_bond(0, 1);
@@ -128,6 +142,23 @@ TEST_CASE("Angles and dihedral detection") {
         dihedrals.push_back({12, 19, 18, 16});
         CHECK(topology.dihedrals() == dihedrals);
     }
+}
+
+TEST_CASE("Out of bounds errors") {
+    auto topology = Topology();
+    topology.append(Atom());
+    topology.append(Atom());
+    topology.append(Atom());
+
+    CHECK_THROWS_AS(topology[25], OutOfBounds);
+
+    CHECK_THROWS_AS(topology.add_bond(0, 25), OutOfBounds);
+    CHECK_THROWS_AS(topology.add_bond(25, 0), OutOfBounds);
+
+    CHECK_THROWS_AS(topology.remove_bond(0, 25), OutOfBounds);
+    CHECK_THROWS_AS(topology.remove_bond(25, 0), OutOfBounds);
+
+    CHECK_THROWS_AS(topology.remove(25), OutOfBounds);
 }
 
 TEST_CASE("Add and remove items in the topology") {

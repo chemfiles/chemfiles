@@ -45,6 +45,8 @@ TEST_CASE("Frame size") {
     CHECK(frame.natoms() == 2);
     CHECK(frame.positions().size() == 2);
     CHECK(frame.velocities()->size() == 2);
+
+    CHECK_THROWS_AS(frame.remove(15), OutOfBounds);
 }
 
 TEST_CASE("Positions and velocities") {

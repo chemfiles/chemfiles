@@ -9,6 +9,12 @@ int main() {
     // [example]
     CHFL_TOPOLOGY* topology = chfl_topology();
 
+    CHFL_ATOM* atom = chfl_atom("F");
+    for (size_t i=0; i<5; i++) {
+        chfl_topology_add_atom(topology, atom);
+    }
+    chfl_atom_free(atom);
+
     // We have one dihedral angle: 0-1-2-3
     chfl_topology_add_bond(topology, 0, 1);
     chfl_topology_add_bond(topology, 1, 2);
