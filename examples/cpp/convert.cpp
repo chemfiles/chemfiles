@@ -12,9 +12,9 @@ int main() {
 
     // Create a water molecule topology
     chemfiles::Topology water;
-    water.append(chemfiles::Atom("O"));
-    water.append(chemfiles::Atom("H"));
-    water.append(chemfiles::Atom("H"));
+    water.add_atom(chemfiles::Atom("O"));
+    water.add_atom(chemfiles::Atom("H"));
+    water.add_atom(chemfiles::Atom("H"));
     water.add_bond(0, 1);
     water.add_bond(0, 2);
     input.set_topology(water);

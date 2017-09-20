@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   `covalent_radius` and `full_name`) returns `optional<T>` instead of `T`.
 * Functions taking an atomic index parameter can now throw `OutOfBounds` errors
   if the index is out of bounds.
+* `Topology::append` is now called `Topology::add_atom`
 
 ### Changes in supported formats
 

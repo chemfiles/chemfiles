@@ -127,10 +127,10 @@ TEST_CASE("Write files in XYZ format") {
         positions[i] = vector3d(1, 2, 3);
 
     Topology topology;
-    topology.append(Atom("A","O"));
-    topology.append(Atom("B"));
-    topology.append(Atom("C"));
-    topology.append(Atom("D"));
+    topology.add_atom(Atom("A","O"));
+    topology.add_atom(Atom("B"));
+    topology.add_atom(Atom("C"));
+    topology.add_atom(Atom("D"));
     frame.set_topology(topology);
 
     {
@@ -144,8 +144,8 @@ TEST_CASE("Write files in XYZ format") {
     for(size_t i=0; i<6; i++)
         positions[i] = vector3d(4, 5, 6);
 
-    topology.append(Atom("E"));
-    topology.append(Atom("F"));
+    topology.add_atom(Atom("E"));
+    topology.add_atom(Atom("F"));
     frame.set_topology(topology);
 
     {

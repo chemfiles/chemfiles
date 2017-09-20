@@ -30,7 +30,7 @@ TEST_CASE("Associate a topology and a trajectory"){
 
             Topology topology;
             for (size_t i=0; i<9; i++) {
-                topology.append(Atom("Fe"));
+                topology.add_atom(Atom("Fe"));
             }
 
             file.set_topology(topology);
@@ -62,13 +62,13 @@ TEST_CASE("Associate a topology and a trajectory"){
             positions[i] = vector3d(1, 2, 3);
         }
 
-        Topology top;
+        Topology topology;
         for (size_t i=0; i<5; i++)
-            top.append(Atom("Fe"));
+            topology.add_atom(Atom("Fe"));
 
         {
             Trajectory file(tmpfile, 'w');
-            file.set_topology(top);
+            file.set_topology(topology);
             file.write(frame);
         }
 
