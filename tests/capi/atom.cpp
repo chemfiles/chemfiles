@@ -5,7 +5,7 @@
 #include "helpers.hpp"
 #include "chemfiles.h"
 
-TEST_CASE("Atom", "[CAPI]") {
+TEST_CASE("Atom") {
     SECTION("Name") {
         CHFL_ATOM* atom = chfl_atom("He");
         REQUIRE(atom != NULL);

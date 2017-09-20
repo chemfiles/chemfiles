@@ -10,7 +10,7 @@
 
 static CHFL_FRAME* testing_frame();
 
-TEST_CASE("Read trajectory", "[CAPI]") {
+TEST_CASE("Read trajectory") {
     SECTION("Number of steps") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
         REQUIRE(trajectory != NULL);
@@ -216,7 +216,7 @@ TEST_CASE("Read trajectory", "[CAPI]") {
     }
 }
 
-TEST_CASE("Write trajectory", "[CAPI]") {
+TEST_CASE("Write trajectory") {
     auto filename = NamedTempPath(".xyz");
     const char* EXPECTED_CONTENT =
     "4\n"

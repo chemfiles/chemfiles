@@ -7,7 +7,7 @@
 using namespace chemfiles;
 
 
-TEST_CASE("Read files in Gromacs .trr format using Molfile", "[Molfile]"){
+TEST_CASE("Read files in Gromacs .trr format using Molfile"){
     double eps = 1e-4;
     SECTION("Ubiquitin"){
         Trajectory file("data/trr/ubiquitin.trr");

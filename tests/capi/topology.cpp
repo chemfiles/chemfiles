@@ -7,7 +7,7 @@
 
 static CHFL_TOPOLOGY* testing_topology();
 
-TEST_CASE("Residue", "[CAPI]") {
+TEST_CASE("Residue") {
     SECTION("Size") {
         CHFL_TOPOLOGY* topology = chfl_topology();
         REQUIRE(topology != NULL);

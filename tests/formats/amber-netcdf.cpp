@@ -10,7 +10,7 @@ using namespace chemfiles;
 namespace fs=boost::filesystem;
 
 
-TEST_CASE("Read files in NetCDF format", "[Amber NetCDF]") {
+TEST_CASE("Read files in NetCDF format") {
     SECTION("Read one frame") {
         Trajectory file("data/netcdf/water.nc");
         auto frame = file.read();
@@ -49,7 +49,7 @@ TEST_CASE("Read files in NetCDF format", "[Amber NetCDF]") {
 }
 
 
-TEST_CASE("Write files in NetCDF format", "[Amber NetCDF]") {
+TEST_CASE("Write files in NetCDF format") {
     auto tmpfile = NamedTempPath(".nc");
 
     {

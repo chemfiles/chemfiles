@@ -6,7 +6,7 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-TEST_CASE("Read files in LAMMPS .lammpstrj format using Molfile", "[Molfile]"){
+TEST_CASE("Read files in LAMMPS .lammpstrj format using Molfile"){
     Trajectory file("data/lammps/polymer.lammpstrj");
     Frame frame = file.read();
     double eps = 1e-3;

@@ -5,7 +5,7 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-TEST_CASE("Use the Atom type", "[Atoms]"){
+TEST_CASE("Use the Atom type"){
     SECTION("Constructors") {
         auto atom = Atom("H");
         CHECK(atom.name() == "H");

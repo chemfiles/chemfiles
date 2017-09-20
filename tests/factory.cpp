@@ -20,7 +20,7 @@ public:
     size_t nsteps() override {return 42;}
 };
 
-TEST_CASE("Registering a new format", "[Trajectory factory]"){
+TEST_CASE("Registering a new format"){
     FormatFactory::get().register_extension<DummyFormat>(".testing");
     // We can not register the same format twice
     CHECK_THROWS_AS(
@@ -36,7 +36,7 @@ TEST_CASE("Registering a new format", "[Trajectory factory]"){
     );
 }
 
-TEST_CASE("Geting registered format", "[Trajectory factory]"){
+TEST_CASE("Geting registered format"){
     FormatFactory::get().register_extension<DummyFormat>(".dummy");
     FormatFactory::get().register_name<DummyFormat>("Dummy");
 
@@ -50,7 +50,7 @@ TEST_CASE("Geting registered format", "[Trajectory factory]"){
     CHECK_THROWS_AS(FormatFactory::get().extension(".UNKOWN"), FormatError);
 }
 
-TEST_CASE("Check error throwing in formats", "[Format errors]"){
+TEST_CASE("Check error throwing in formats"){
     auto tmpfile = NamedTempPath(".dummy");
     std::ofstream out(tmpfile);
     out << "hey !" << std::endl;

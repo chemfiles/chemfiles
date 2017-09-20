@@ -10,7 +10,7 @@ using namespace chemfiles;
 
 // This file only perform basic testing of the trajectory class. All the differents
 // formats are tested in the formats folder
-TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
+TEST_CASE("Associate a topology and a trajectory"){
     SECTION("Reading"){
         SECTION("From a file"){
             Trajectory file("data/xyz/trajectory.xyz");
@@ -82,7 +82,7 @@ TEST_CASE("Associate a topology and a trajectory", "[Trajectory]"){
 }
 
 
-TEST_CASE("Setting frame step", "[Trajectory]"){
+TEST_CASE("Setting frame step"){
     Trajectory file("data/xyz/helium.xyz");
     auto frame = file.read();
     CHECK(frame.step() == 0);
@@ -95,7 +95,7 @@ TEST_CASE("Setting frame step", "[Trajectory]"){
 }
 
 
-TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]") {
+TEST_CASE("Associate an unit cell and a trajectory") {
     SECTION("Reading") {
         Trajectory file("data/xyz/trajectory.xyz");
         file.set_cell(UnitCell(25, 32, 94));
@@ -134,13 +134,13 @@ TEST_CASE("Associate an unit cell and a trajectory", "[Trajectory]") {
     }
 }
 
-TEST_CASE("Specify a format parameter", "[Trajectory]"){
+TEST_CASE("Specify a format parameter"){
     Trajectory file("data/xyz/helium.xyz.but.not.really", 'r', "XYZ");
     auto frame = file.read();
     CHECK(frame.natoms() == 125);
 }
 
-TEST_CASE("Errors", "[Trajectory]"){
+TEST_CASE("Errors"){
     SECTION("Unknow opening mode") {
         CHECK_THROWS_AS(Trajectory("trajectory.xyz", 'z'), FileError);
     }

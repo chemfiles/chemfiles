@@ -6,7 +6,7 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-TEST_CASE("Use the UnitCell type", "[UnitCell]") {
+TEST_CASE("Use the UnitCell type") {
     SECTION("Constructors") {
         UnitCell infinite{};
         CHECK(infinite.shape() == UnitCell::INFINITE);

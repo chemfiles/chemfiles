@@ -5,7 +5,7 @@
 #include "helpers.hpp"
 #include "chemfiles.h"
 
-TEST_CASE("Frame", "[CAPI]") {
+TEST_CASE("Frame") {
     SECTION("Size") {
         CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame != NULL);

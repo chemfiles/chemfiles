@@ -6,7 +6,7 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-TEST_CASE("Vector3d", "[types]"){
+TEST_CASE("Vector3d"){
     auto u = vector3d(1.0, 1.0, 1.0);
     auto v = vector3d(-21.0, 15.0, 23.5);
 
@@ -19,7 +19,7 @@ TEST_CASE("Vector3d", "[types]"){
     CHECK((v * 4.75) == (4.75 * v));
 }
 
-TEST_CASE("Geometry", "[types]"){
+TEST_CASE("Geometry"){
     auto v = vector3d(1.0, 1.0, 1.0);
 
     CHECK(norm(v) == sqrt(3.0));
@@ -36,7 +36,7 @@ TEST_CASE("Geometry", "[types]"){
     CHECK(dot(cross(w, k), w) == 0.0);
 }
 
-TEST_CASE("Matrix3", "[types]"){
+TEST_CASE("Matrix3"){
     SECTION("Constructors") {
         auto A = matrix3d();
         for (size_t i=0; i<3; i++) {

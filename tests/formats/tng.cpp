@@ -6,7 +6,7 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-TEST_CASE("Read files in TNG format", "[TNG]"){
+TEST_CASE("Read files in TNG format"){
     SECTION("Read trajectory") {
         auto file = Trajectory("data/tng/example.tng");
         auto frame = file.read();
