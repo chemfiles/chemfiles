@@ -53,6 +53,9 @@ nicely with any exisiting C++ error handling.
 .. doxygenstruct:: chemfiles::ConfigurationError
     :members:
 
+.. doxygenstruct:: chemfiles::OutOfBounds
+    :members:
+
 Warnings
 --------
 

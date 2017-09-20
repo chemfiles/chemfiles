@@ -35,11 +35,34 @@ public:
     Topology(Topology&&) = default;
     Topology& operator=(Topology&&) = default;
 
-    /// Get a reference to the atom at the position `index`
-    Atom& operator[](size_t index) { return atoms_[index]; }
+    /// Get a reference to the atom at the position `index`.
+    ///
+    /// @throws OutOfBounds if `index` is greater than `natoms()`
+    Atom& operator[](size_t index) {
+        if (index >= natoms()) {
+            throw OutOfBounds(
+                "Atomic index out of bounds in topology: we have "
+                + std::to_string(natoms()) + " atoms, but the index is "
+                + std::to_string(index)
+            );
+        }
+        return atoms_[index];
+    }
+
     /// Get a const (non-modifiable) reference to the atom at the position
-    /// `index`
-    const Atom& operator[](size_t index) const { return atoms_[index]; }
+    /// `index`.
+    ///
+    /// @throws OutOfBounds if `index` is greater than `natoms()`
+    const Atom& operator[](size_t index) const {
+        if (index >= natoms()) {
+            throw OutOfBounds(
+                "Atomic index out of bounds in topology: we have "
+                + std::to_string(natoms()) + " atoms, but the index is "
+                + std::to_string(index)
+            );
+        }
+        return atoms_[index];
+    }
 
     iterator begin() {return atoms_.begin();}
     const_iterator begin() const {return atoms_.begin();}
@@ -50,21 +73,31 @@ public:
 
     /// Add an atom in the system
     void append(Atom atom);
-    /// Delete the atom at index `i` in the system. `i` must be lower than
-    /// `natoms()`.
+
+    /// Delete the atom at index `i` in the system.
+    ///
+    /// @throws OutOfBounds if `i` is greater than natoms()
     void remove(size_t i);
+
     /// Add a bond in the system, between the atoms at index `atom_i` and
-    /// `atom_j`
+    /// `atom_j`.
+    ///
+    /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `natoms()`
     void add_bond(size_t atom_i, size_t atom_j);
+
     /// Remove a bond in the system, between the atoms at index `atom_i` and
-    /// `atom_j`
+    /// `atom_j`.
+    ///
+    /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `natoms()`
     void remove_bond(size_t atom_i, size_t atom_j);
 
     /// Get the number of atoms in the topology
     size_t natoms() const { return atoms_.size(); }
+
     /// Resize the topology to hold `natoms` atoms, adding `UNDEFINED` atoms
     /// as needed.
     void resize(size_t natoms);
+
     /// Reserve size in the topology to store data for `natoms` atoms.
     void reserve(size_t natoms);
 
@@ -85,13 +118,17 @@ public:
     /// is already in another residue in this topology. In that case, the
     /// topology is not modified.
     void add_residue(Residue residue);
+
     /// Check if two residues are linked together, i.e. if there is a bond
-    /// between one atom in the `first` residue and one atom in the `second` one.
+    /// between one atom in the `first` residue and one atom in the `second`
+    /// one. Both residues should be in this topology.
     ///
     /// If `first == second`, this function returns `true`.
     bool are_linked(const Residue& first, const Residue& second) const;
+
     /// Get the residue containing the `atom` at the given index.
     optional<const Residue&> residue(size_t atom) const;
+
     /// Get all the residues in the topology
     const std::vector<Residue>& residues() const {
         return residues_;
@@ -99,7 +136,7 @@ public:
 
 private:
     /// Check wether the atoms at indexes `i` and `j` are bonded or not
-    bool isbond(size_t i, size_t j) const;
+    bool is_bond(size_t i, size_t j) const;
 
     /// Atoms in the system.
     std::vector<Atom> atoms_;
