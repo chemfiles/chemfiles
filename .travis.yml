@@ -6,12 +6,11 @@ linux64_addons:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - kalakris-cmake
         packages:
         - g++-4.8
-        - cmake
         - doxygen
         - valgrind
+        # Used for CHFL_EXTERNAL_NETCDF
         - libnetcdf-dev
 
 linux32_addons:
@@ -19,10 +18,8 @@ linux32_addons:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - kalakris-cmake
         packages:
         - g++-4.8
-        - cmake
         - doxygen
         - valgrind
         - g++-4.8-multilib
