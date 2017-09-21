@@ -188,6 +188,39 @@ CHFL_EXPORT chfl_status chfl_frame_set_step(
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_guess_topology(CHFL_FRAME* const frame);
 
+/// Get the distance between the atoms at indexes `i` and `j` in the `frame`,
+/// accounting for periodic boundary conditions. The result is placed in
+/// `distance`, and expressed in angstroms.
+///
+/// @example{tests/capi/doc/chfl_frame/distance.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_frame_distance(
+    const CHFL_FRAME* const frame, uint64_t i, uint64_t j, double* distance
+);
+
+/// Get the angle formed by the atoms at indexes `i`, `j` and `k` in the
+/// `frame`, accounting for periodic boundary conditions. The result is placed
+/// in `angle`, and expressed in radians.
+///
+/// @example{tests/capi/doc/chfl_frame/angle.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_frame_angle(
+    const CHFL_FRAME* const frame, uint64_t i, uint64_t j, uint64_t k, double* angle
+);
+
+/// Get the angle formed by the atoms at indexes `i`, `j`, `k` and `m` in the
+/// `frame`, accounting for periodic boundary conditions. The result is placed
+/// in `dihedral`, and expressed in radians.
+///
+/// @example{tests/capi/doc/chfl_frame/dihedral.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_frame_dihedral(
+    const CHFL_FRAME* const frame, uint64_t i, uint64_t j, uint64_t k, uint64_t m, double* dihedral
+);
+
 /// Free the memory associated with a `frame`.
 ///
 /// @example{tests/capi/doc/chfl_frame/chfl_frame.c}

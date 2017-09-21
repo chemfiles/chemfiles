@@ -155,6 +155,30 @@ extern "C" chfl_status chfl_frame_guess_topology(CHFL_FRAME* const frame) {
     )
 }
 
+extern "C" chfl_status chfl_frame_distance(const CHFL_FRAME* const frame, uint64_t i, uint64_t j, double* distance) {
+    CHECK_POINTER(frame);
+    CHECK_POINTER(distance);
+    CHFL_ERROR_CATCH(
+        *distance = frame->distance(checked_cast(i), checked_cast(j));
+    )
+}
+
+extern "C" chfl_status chfl_frame_angle(const CHFL_FRAME* const frame, uint64_t i, uint64_t j, uint64_t k, double* angle) {
+    CHECK_POINTER(frame);
+    CHECK_POINTER(angle);
+    CHFL_ERROR_CATCH(
+        *angle = frame->angle(checked_cast(i), checked_cast(j), checked_cast(k));
+    )
+}
+
+extern "C" chfl_status chfl_frame_dihedral(const CHFL_FRAME* const frame, uint64_t i, uint64_t j, uint64_t k, uint64_t m, double* dihedral) {
+    CHECK_POINTER(frame);
+    CHECK_POINTER(dihedral);
+    CHFL_ERROR_CATCH(
+        *dihedral = frame->dihedral(checked_cast(i), checked_cast(j), checked_cast(k), checked_cast(m));
+    )
+}
+
 extern "C" chfl_status chfl_frame_free(CHFL_FRAME* const frame) {
     delete frame;
     return CHFL_SUCCESS;

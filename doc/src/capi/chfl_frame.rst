@@ -35,4 +35,10 @@ Function manipulating ``CHFL_FRAME``
 
 .. doxygenfunction:: chfl_frame_guess_topology
 
+.. doxygenfunction:: chfl_frame_distance
+
+.. doxygenfunction:: chfl_frame_angle
+
+.. doxygenfunction:: chfl_frame_dihedral
+
 .. doxygenfunction:: chfl_frame_free
