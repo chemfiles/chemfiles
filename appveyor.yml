@@ -4,6 +4,22 @@ os: Visual Studio 2015
 
 environment:
   matrix:
+    - generator: MinGW Makefiles
+      CXX_PATH: 'C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin'
+      ARCH: x64
+      SHARED_LIBS: OFF
+    - generator: MinGW Makefiles
+      CXX_PATH: 'C:\mingw-w64\i686-6.3.0-posix-dwarf-rt_v5-rev1\mingw32\bin'
+      ARCH: x86
+      SHARED_LIBS: OFF
+    - generator: MinGW Makefiles
+      CXX_PATH: 'C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin'
+      ARCH: x64
+      SHARED_LIBS: ON
+    - generator: MinGW Makefiles
+      CXX_PATH: 'C:\mingw-w64\i686-6.3.0-posix-dwarf-rt_v5-rev1\mingw32\bin'
+      ARCH: x86
+      SHARED_LIBS: ON
     - generator: Visual Studio 14 2015 Win64
       ARCH: x64
       SHARED_LIBS: OFF
@@ -16,14 +32,6 @@ environment:
     - generator: Visual Studio 14 2015
       ARCH: x86
       SHARED_LIBS: ON
-    - generator: MinGW Makefiles
-      CXX_PATH: 'C:\mingw-w64\i686-5.3.0-posix-dwarf-rt_v4-rev0\mingw32\bin'
-      ARCH: x86
-      SHARED_LIBS: ON
-    - generator: MinGW Makefiles
-      CXX_PATH: 'C:\mingw-w64\i686-5.3.0-posix-dwarf-rt_v4-rev0\mingw32\bin'
-      ARCH: x86
-      SHARED_LIBS: OFF
 
 configuration:
   - Debug
