@@ -1,7 +1,7 @@
 .. _class-Topology:
 
-Topology
-========
+Topology class
+==============
 
 .. doxygenclass:: chemfiles::Topology
     :members:

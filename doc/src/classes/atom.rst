@@ -1,7 +1,7 @@
 .. _class-Atom:
 
-Atoms
-=====
+Atom class
+==========
 
 .. doxygenclass:: chemfiles::Atom
     :members:

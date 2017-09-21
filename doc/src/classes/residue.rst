@@ -1,7 +1,7 @@
 .. _class-Residue:
 
-Residues
-========
+Residue class
+=============
 
 .. doxygenclass:: chemfiles::Residue
     :members:
