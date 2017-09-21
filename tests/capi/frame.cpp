@@ -5,6 +5,8 @@
 #include "helpers.hpp"
 #include "chemfiles.h"
 
+constexpr double PI = 3.14159265358979323846;
+
 TEST_CASE("Frame") {
     SECTION("Size") {
         CHFL_FRAME* frame = chfl_frame();
@@ -281,5 +283,41 @@ TEST_CASE("Frame") {
         CHECK_STATUS(chfl_topology_free(topology));
         CHECK_STATUS(chfl_frame_free(frame));
         CHECK_STATUS(chfl_trajectory_close(trajectory));
+    }
+
+    SECTION("PBC distance, angles and dihedrals") {
+        CHFL_FRAME* frame = chfl_frame();
+        CHFL_ATOM* atom = chfl_atom("");
+        REQUIRE(frame != NULL);
+        REQUIRE(atom != NULL);
+
+        chfl_vector3d position_1 = {1, 0, 0};
+        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_1, NULL));
+        chfl_vector3d position_2 = {0, 0, 0};
+        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_2, NULL));
+        chfl_vector3d position_3 = {0, 1, 0};
+        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_3, NULL));
+        chfl_vector3d position_4 = {0, 1, 1};
+        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_4, NULL));
+
+        double distance = 0;
+        CHECK_STATUS(chfl_frame_distance(frame, 0, 2, &distance));
+        CHECK(distance == sqrt(2));
+
+        double angle = 0;
+        CHECK_STATUS(chfl_frame_angle(frame, 0, 1, 2, &angle));
+        CHECK(fabs(angle - PI / 2) < 1e-12);
+
+        double dihedral = 0;
+        CHECK_STATUS(chfl_frame_dihedral(frame, 0, 1, 2, 3, &dihedral));
+        CHECK(fabs(dihedral - PI / 2) < 1e-12);
+
+        // out of bounds errors
+        CHECK(chfl_frame_distance(frame, 0, 6, &distance) == CHFL_OUT_OF_BOUNDS);
+        CHECK(chfl_frame_angle(frame, 0, 6, 2, &distance) == CHFL_OUT_OF_BOUNDS);
+        CHECK(chfl_frame_dihedral(frame, 0, 6, 2, 3, &distance) == CHFL_OUT_OF_BOUNDS);
+
+        CHECK_STATUS(chfl_atom_free(atom));
+        CHECK_STATUS(chfl_frame_free(frame));
     }
 }

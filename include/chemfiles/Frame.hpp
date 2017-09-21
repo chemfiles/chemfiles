@@ -111,19 +111,21 @@ public:
     void guess_topology();
 
     /// Get the distance between the atoms at indexes `i` and `j`, accounting
-    /// for periodic boundary conditions.
+    /// for periodic boundary conditions. The distance is expressed in angstroms.
     ///
     /// @throws chemfiles::OutOfBounds if `i` or `j` are not in bounds
     double distance(size_t i, size_t j) const;
 
     /// Get the angle formed by the atoms at indexes `i`, `j` and `k`,
-    /// accounting for periodic boundary conditions.
+    /// accounting for periodic boundary conditions. The angle is expressed in
+    /// radians.
     ///
     /// @throws chemfiles::OutOfBounds if `i`, `j` or `k` are not in bounds
     double angle(size_t i, size_t j, size_t k) const;
 
     /// Get the dihedral angle formed by the atoms at indexes `i`, `j`, `k` and
-    /// `m`, accounting for periodic boundary conditions.
+    /// `m`, accounting for periodic boundary conditions. The angle is expressed
+    /// in radians.
     ///
     /// @throws chemfiles::OutOfBounds if `i`, `j`, `k` or `m` are not in bounds
     double dihedral(size_t i, size_t j, size_t k, size_t m) const;
