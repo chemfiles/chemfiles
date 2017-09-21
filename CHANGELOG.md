@@ -19,6 +19,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Functions taking an atomic index parameter can now throw `OutOfBounds` errors
   if the index is out of bounds.
 * `Topology::append` is now called `Topology::add_atom`
+* Added `Frame::distance`, `Frame::angle` and `Frame::dihedral` to get
+  geometric information on the system, accounting for periodic boundary
+  conditions.  
 
 ### Changes in supported formats
 
@@ -39,6 +42,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   to take a `uint64_t*` parameter instead of an `int64_t*`, following all the
   other functions in the C API.
 * Added `CHFL_OUT_OF_BOUNDS` variant to `chfl_status`
+* Added `chfl_frame_distance`, `chfl_frame_angle`, `chfl_frame_dihedral` and
+  `chfl_cell_wrap` to work with periodic boundary conditions. 
 
 ### Deprecation and removals
 
