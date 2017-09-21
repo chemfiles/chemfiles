@@ -17,15 +17,16 @@ class Format;
 
 /// A `Trajectory` is a chemistry file on the hard drive. It is the entry point
 /// of the chemfiles library.
-///
-/// A `Trajectory` is made with a `File` and a `Format`. The `File` implements
-/// all the physical operations, while the `Format` provides a way to interpret
-/// the file.
 class CHFL_EXPORT Trajectory final {
 public:
-
-    /// Open a file, automatically gessing the file format and type from the
-    /// extension.
+    /// Open a file, automatically gessing the file format from the extension.
+    ///
+    /// The format can either be guessed from the extention (".xyz" is XYZ,
+    /// ".gro" is GROMACS, *etc.*), or specified as the third parameter. The
+    /// format names are given in the corresponding [documentation section](
+    /// http://chemfiles.org/chemfiles/latest/formats.html#list-of-supported-formats)
+    ///
+    /// @example{tests/doc/trajectory/trajectory.cpp}
     ///
     /// @param filename The file path. In `w` or `a` modes, the file is
     ///                 created if it does not exist yet. In `r` mode, an
@@ -37,40 +38,133 @@ public:
     /// @param format Specific format to use. Needed when there is no way to
     ///               guess the format from the extension of the file, or when
     ///               this guess would be wrong.
+    ///
+    /// @throws FileError for all errors concerning the physical file: can not
+    ///                   open it, can not read/write it, *etc.*
+    /// @throws FormatError if the file is not valid for the used format.
     Trajectory(const std::string& filename, char mode = 'r', const std::string& format = "");
+
+    /// The `Trajectory` destructor sync any remaining data with the physical
+    /// storage of the file.
+    ~Trajectory();
+
     Trajectory(Trajectory&&);
     Trajectory& operator=(Trajectory&&);
-    ~Trajectory();
 
     Trajectory(const Trajectory&) = delete;
     Trajectory& operator=(const Trajectory&) = delete;
 
-    /// Read the next frame in the trajectory
+    /// Read the next frame in the trajectory.
+    ///
+    /// The trajectory must have been opened in read (`'r'`) or append (`'a'`)
+    /// mode, and the underlying format must support reading.
+    ///
+    /// This function throws a `FileError` if there are no more frames to read
+    /// in the trajectory.
+    ///
+    /// @example{tests/doc/trajectory/read.cpp}
+    ///
+    /// @throws FileError for all errors concerning the physical file: can not
+    ///                   open it, can not read/write it, *etc.*
+    /// @throws FormatError if the file is not valid for the used format, or if
+    ///                     the format does not support reading.
     Frame read();
-    /// Read a single frame at specific step from the trajectory
+
+    /// Read a single frame at specified `step` from the trajectory.
+    ///
+    /// The trajectory must have been opened in read (`'r'`) or append (`'a'`)
+    /// mode, and the underlying format must support reading.
+    ///
+    /// This function throws a `FileError` if the step is bigger than the
+    /// number of steps in the trajectory.
+    ///
+    /// @example{tests/doc/trajectory/read_step.cpp}
+    ///
+    /// @param step step to read from the trajectory
+    ///
+    /// @throws FileError for all errors concerning the physical file: can not
+    ///                   open it, can not read/write it, *etc.*
+    /// @throws FormatError if the file is not valid for the used format, or if
+    ///                     the format does not support reading.
     Frame read_step(size_t step);
 
-    /// Write a single frame to the trajectory
+    /// Write a single frame to the trajectory.
+    ///
+    /// The trajectory must have been opened in write (`'w'`) or append (`'a'`)
+    /// mode, and the underlying format must support writing.
+    ///
+    /// @example{tests/doc/trajectory/write.cpp}
+    ///
+    /// @param frame frame to write to this trajectory
+    ///
+    /// @throws FileError for all errors concerning the physical file: can not
+    ///                   open it, can not read/write it, *etc.*
+    /// @throws FormatError if the format does not support writing.
     void write(const Frame& frame);
 
-    /// Set the Topology of all the Frame read or written to `topology`. This
-    /// replace any topology in the file being read, or in the Frame being
-    /// written.
-    void set_topology(const Topology&);
-    /// Use the Topology of the first Frame of the following file as Topology
-    /// for all the Frame read or written. This replace any topology in the
-    /// file being read, or in the Frame being written. The optional parameter
-    /// `format` can be used to specify the topology file format.
+    /// Use the given `topology` instead of any pre-existing `Topology` when
+    /// reading or writing.
+    ///
+    /// This replace any topology in the file being read, or in the `Frame`
+    /// being written.
+    ///
+    /// This is mainly usefull when a format does not define topological
+    /// information, as it can be the case with some molecular dynamic formats.
+    ///
+    /// @example{tests/doc/trajectory/set_topology.cpp}
+    ///
+    /// @param topology the topology to use with this frame
+    ///
+    /// @throws Error if the topology does not contain the right number of
+    ///               atoms at any step.
+    void set_topology(const Topology& topology);
+
+    /// Use the `Topology` from the first `Frame` of the `Trajectory` at
+    /// `filename` instead any pre-existing `Topology` when reading or writing.
+    ///
+    /// This replace any topology in the file being read, or in the `Frame`
+    /// being written.
+    ///
+    /// This is mainly usefull when a format does not define topological
+    /// information, as it can be the case with some molecular dynamic formats.
+    ///
+    /// @example{tests/doc/trajectory/set_topology.cpp}
+    ///
+    /// @param filename trajectory file path.
+    /// @param format Specific format to use. Needed when there is no way to
+    ///               guess the format from the extension of the file, or when
+    ///               this guess would be wrong.
+    ///
+    /// @throws FileError for all errors concerning the physical file: can not
+    ///                   open it, can not read it, *etc.*
+    /// @throws FormatError if the file is not valid for the used format.
+    /// @throws Error if the topology does not contain the right number of
+    ///               atoms at any step.
     void set_topology(const std::string& filename, const std::string& format = "");
 
-    /// Set the unit cell of all the Frame read or written to `cell`. This
-    /// replace any cell in the file being read, or in the Frame being
-    /// written.
-    void set_cell(const UnitCell&);
+    /// Use the given `cell` instead of any pre-existing `UnitCell` when
+    /// reading or writing.
+    ///
+    /// This replace any unit cell in the file being read, or in the `Frame`
+    /// being written.
+    ///
+    /// This is mainly usefull when a format does not define unti cell
+    /// information.
+    ///
+    /// @param cell the unit cell to use with this frame
+    ///
+    /// @example{tests/doc/trajectory/set_cell.cpp}
+    void set_cell(const UnitCell& cell);
 
-    /// Get the number of steps (the number of Frames) in this trajectory
+    /// Get the number of steps (the number of frames) in this trajectory.
+    ///
+    /// @example{tests/doc/trajectory/nsteps.cpp}
     size_t nsteps() const { return nsteps_; }
-    /// Have we read all the Frames in this file ?
+
+    /// Check if all the frames in this trajectory have been read, *i.e.* if
+    /// the last read frame is the last frame of the trajectory.
+    ///
+    /// @example{tests/doc/trajectory/done.cpp}
     bool done() const;
 
 private:
