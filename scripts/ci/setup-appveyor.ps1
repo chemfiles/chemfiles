@@ -35,9 +35,9 @@ $env:CMAKE_ARGUMENTS += " -DCMAKE_BUILD_TYPE=$env:configuration"
 $env:CMAKE_ARGUMENTS += " -DCHFL_BUILD_TESTS=ON"
 
 if ($env:generator -Match "Visual Studio") {
-    $env:BUILD_ARGUMENTS="/verbosity:minimal"
+    $env:BUILD_ARGUMENTS="/verbosity:minimal /m"
 } else {
-    $env:BUILD_ARGUMENTS=""
+    $env:BUILD_ARGUMENTS="-j"
 }
 
 if ($env:generator -eq "MinGW Makefiles") {
