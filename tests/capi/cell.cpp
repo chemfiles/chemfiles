@@ -13,11 +13,11 @@ static bool approx_eq(double A[3][3], double B[3][3]) {
         (fabs(A[2][0] - B[2][0]) < eps) && (fabs(A[2][1] - B[2][1]) < eps) && (fabs(A[2][2] - B[2][2]) < eps);
 }
 
-TEST_CASE("Unit Cell") {
+TEST_CASE("chfl_cell") {
     SECTION("Constructors") {
         chfl_vector3d lengths = {2, 3, 4};
         CHFL_CELL* cell = chfl_cell(lengths);
-        REQUIRE(cell != NULL);
+        REQUIRE(cell);
 
         chfl_vector3d data = {0};
         CHECK_STATUS(chfl_cell_lengths(cell, data));
@@ -35,7 +35,7 @@ TEST_CASE("Unit Cell") {
         lengths[0] = 20; lengths[1] = 21; lengths[2] = 22;
         chfl_vector3d angles = {90, 100, 120};
         cell = chfl_cell_triclinic(lengths, angles);
-        REQUIRE(cell != NULL);
+        REQUIRE(cell);
 
         CHECK_STATUS(chfl_cell_lengths(cell, data));
         CHECK(data[0] == 20);
@@ -53,7 +53,7 @@ TEST_CASE("Unit Cell") {
         // cell, even with all angles equal to 90°
         angles[0] = 90; angles[1] = 90; angles[2] = 90;
         cell = chfl_cell_triclinic(lengths, angles);
-        REQUIRE(cell != NULL);
+        REQUIRE(cell);
 
         chfl_cellshape shape;
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
@@ -65,7 +65,7 @@ TEST_CASE("Unit Cell") {
     SECTION("Length") {
         chfl_vector3d lengths = {2, 3, 4};
         CHFL_CELL* cell = chfl_cell(lengths);
-        REQUIRE(cell != NULL);
+        REQUIRE(cell);
 
         chfl_vector3d data = {0};
         CHECK_STATUS(chfl_cell_lengths(cell, data));
@@ -86,7 +86,7 @@ TEST_CASE("Unit Cell") {
     SECTION("Angles") {
         chfl_vector3d lengths = {2, 3, 4};
         CHFL_CELL* cell = chfl_cell(lengths);
-        REQUIRE(cell != NULL);
+        REQUIRE(cell);
 
         chfl_vector3d data = {0};
         CHECK_STATUS(chfl_cell_angles(cell, data));
@@ -112,7 +112,7 @@ TEST_CASE("Unit Cell") {
     SECTION("Volume") {
         chfl_vector3d lengths = {2, 3, 4};
         CHFL_CELL* cell = chfl_cell(lengths);
-        REQUIRE(cell != NULL);
+        REQUIRE(cell);
 
         double volume = 0;
         CHECK_STATUS(chfl_cell_volume(cell, &volume));
@@ -124,7 +124,7 @@ TEST_CASE("Unit Cell") {
     SECTION("Matrix") {
         chfl_vector3d lengths = {10, 20, 30};
         CHFL_CELL* cell = chfl_cell(lengths);
-        REQUIRE(cell != NULL);
+        REQUIRE(cell);
 
         chfl_vector3d expected[3] = {{10, 0, 0}, {0, 20, 0}, {0, 0, 30}};
         chfl_vector3d matrix[3];
@@ -137,7 +137,7 @@ TEST_CASE("Unit Cell") {
     SECTION("Shape") {
         chfl_vector3d lengths = {2, 3, 4};
         CHFL_CELL* cell = chfl_cell(lengths);
-        REQUIRE(cell != NULL);
+        REQUIRE(cell);
 
         chfl_cellshape shape;
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
@@ -157,7 +157,7 @@ TEST_CASE("Unit Cell") {
     SECTION("Wrap") {
         chfl_vector3d lengths = {2, 3, 4};
         CHFL_CELL* cell = chfl_cell(lengths);
-        REQUIRE(cell != NULL);
+        REQUIRE(cell);
 
         chfl_vector3d vector = {0.8, 1.7, -6};
         CHECK_STATUS(chfl_cell_wrap(cell, vector));

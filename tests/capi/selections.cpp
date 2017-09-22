@@ -8,10 +8,10 @@
 static CHFL_FRAME* testing_frame(void);
 static bool find_match(const chfl_match_t* matches, uint64_t n_matches, chfl_match_t match);
 
-TEST_CASE("Selections") {
+TEST_CASE("chfl_selection") {
     SECTION("Selection string") {
         CHFL_SELECTION* selection = chfl_selection("name O");
-        REQUIRE(selection != NULL);
+        REQUIRE(selection);
 
         char buffer[32] = {0};
         CHECK_STATUS(chfl_selection_string(selection, buffer, sizeof(buffer)));
@@ -20,7 +20,7 @@ TEST_CASE("Selections") {
         CHECK_STATUS(chfl_selection_free(selection));
 
         selection = chfl_selection("angles: all");
-        REQUIRE(selection != NULL);
+        REQUIRE(selection);
 
         CHECK_STATUS(chfl_selection_string(selection, buffer, sizeof(buffer)));
         CHECK(buffer == std::string("angles: all"));
@@ -30,7 +30,7 @@ TEST_CASE("Selections") {
 
     SECTION("Size") {
         CHFL_SELECTION* selection = chfl_selection("name O");
-        REQUIRE(selection != NULL);
+        REQUIRE(selection);
 
         uint64_t size = 0;
         CHECK_STATUS(chfl_selection_size(selection, &size));
@@ -39,7 +39,7 @@ TEST_CASE("Selections") {
         CHECK_STATUS(chfl_selection_free(selection));
 
         selection = chfl_selection("angles: all");
-        REQUIRE(selection != NULL);
+        REQUIRE(selection);
 
         CHECK_STATUS(chfl_selection_size(selection, &size));
         CHECK(size == 3);
@@ -49,10 +49,10 @@ TEST_CASE("Selections") {
 
     SECTION("Evaluate") {
         CHFL_SELECTION* selection = chfl_selection("name O");
-        REQUIRE(selection != NULL);
+        REQUIRE(selection);
 
         CHFL_FRAME* frame = testing_frame();
-        REQUIRE(frame != NULL);
+        REQUIRE(frame);
 
         uint64_t matches_count = 0;
         CHECK_STATUS(chfl_selection_evaluate(selection, frame, &matches_count));
@@ -76,13 +76,13 @@ TEST_CASE("Selections") {
         CHECK_STATUS(chfl_selection_free(selection));
 
         selection = chfl_selection("angles: all");
-        REQUIRE(selection != NULL);
+        REQUIRE(selection);
 
         CHECK_STATUS(chfl_selection_evaluate(selection, frame, &matches_count));
         CHECK(matches_count == 2);
 
         matches = new chfl_match_t[static_cast<size_t>(matches_count)];
-        REQUIRE(matches != NULL);
+        REQUIRE(matches);
 
         CHECK_STATUS(chfl_selection_matches(selection, matches, matches_count));
         CHECK(matches[0].size == 3);
@@ -102,9 +102,9 @@ static CHFL_FRAME* testing_frame(void) {
     CHFL_TOPOLOGY* topology = chfl_topology();
     CHFL_ATOM* O = chfl_atom("O");
     CHFL_ATOM* H = chfl_atom("H");
-    REQUIRE(topology != NULL);
-    REQUIRE(H != NULL);
-    REQUIRE(O != NULL);
+    REQUIRE(topology);
+    REQUIRE(H);
+    REQUIRE(O);
 
     CHECK_STATUS(chfl_topology_add_atom(topology, H));
     CHECK_STATUS(chfl_topology_add_atom(topology, O));
@@ -118,7 +118,7 @@ static CHFL_FRAME* testing_frame(void) {
     CHECK_STATUS(chfl_topology_add_bond(topology, 2, 3));
 
     CHFL_FRAME* frame = chfl_frame();
-    REQUIRE(frame != NULL);
+    REQUIRE(frame);
     CHECK_STATUS(chfl_frame_resize(frame, 4));
     CHECK_STATUS(chfl_frame_set_topology(frame, topology));
     CHECK_STATUS(chfl_topology_free(topology));
@@ -126,7 +126,7 @@ static CHFL_FRAME* testing_frame(void) {
 }
 
 static bool find_match(const chfl_match_t* matches, uint64_t n_matches, chfl_match_t match) {
-    REQUIRE(matches != NULL);
+    REQUIRE(matches);
     for (uint64_t i=0; i<n_matches; i++) {
         CHECK(matches[i].size == match.size);
         if (matches[i].atoms[0] == match.atoms[0] &&

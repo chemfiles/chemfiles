@@ -5,10 +5,10 @@
 #include "helpers.hpp"
 #include "chemfiles.h"
 
-TEST_CASE("Residue") {
+TEST_CASE("chfl_residue") {
     SECTION("Name") {
         CHFL_RESIDUE* residue = chfl_residue("Foo", 0);
-        REQUIRE(residue != NULL);
+        REQUIRE(residue);
 
         char name[32] = {0};
         CHECK_STATUS(chfl_residue_name(residue, name, sizeof(name)));
@@ -19,7 +19,7 @@ TEST_CASE("Residue") {
 
     SECTION("Id") {
         CHFL_RESIDUE* residue = chfl_residue("", 5426);
-        REQUIRE(residue != NULL);
+        REQUIRE(residue);
 
         uint64_t resid = 0;
         CHECK_STATUS(chfl_residue_id(residue, &resid));
@@ -30,7 +30,7 @@ TEST_CASE("Residue") {
 
     SECTION("Atoms") {
         CHFL_RESIDUE* residue = chfl_residue("", 0);
-        REQUIRE(residue != NULL);
+        REQUIRE(residue);
 
         uint64_t size = 10;
         CHECK_STATUS(chfl_residue_atoms_count(residue, &size));
@@ -54,13 +54,13 @@ TEST_CASE("Residue") {
 
     SECTION("Topology") {
         CHFL_RESIDUE* residue = chfl_residue("", 56);
-        REQUIRE(residue != NULL);
+        REQUIRE(residue);
         CHECK_STATUS(chfl_residue_add_atom(residue, 0));
         CHECK_STATUS(chfl_residue_add_atom(residue, 1));
         CHECK_STATUS(chfl_residue_add_atom(residue, 2));
 
         CHFL_TOPOLOGY* topology = chfl_topology();
-        REQUIRE(topology != NULL);
+        REQUIRE(topology);
 
         uint64_t size = 10;
         CHECK_STATUS(chfl_topology_residues_count(topology, &size));
@@ -73,17 +73,17 @@ TEST_CASE("Residue") {
         CHECK(size == 1);
 
         residue = chfl_residue_from_topology(topology, 0);
-        REQUIRE(residue != NULL);
+        REQUIRE(residue);
         uint64_t resid = 0;
         CHECK_STATUS(chfl_residue_id(residue, &resid));
         CHECK(resid == 56);
         CHECK_STATUS(chfl_residue_free(residue));
 
         residue = chfl_residue_from_topology(topology, 10);
-        CHECK(residue == NULL);
+        CHECK_FALSE(residue);
 
         residue = chfl_residue_for_atom(topology, 2);
-        REQUIRE(residue != NULL);
+        REQUIRE(residue);
 
         resid = 0;
         CHECK_STATUS(chfl_residue_id(residue, &resid));
@@ -91,7 +91,7 @@ TEST_CASE("Residue") {
         CHECK_STATUS(chfl_residue_free(residue));
 
         residue = chfl_residue_for_atom(topology, 10);
-        REQUIRE(residue == NULL);
+        CHECK_FALSE(residue);
 
         CHECK_STATUS(chfl_topology_free(topology));
         CHECK_STATUS(chfl_residue_free(residue));

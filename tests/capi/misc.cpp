@@ -11,7 +11,7 @@
 
 static std::string generate_chemfiles_error() {
     // Generate a log event
-    CHECK(chfl_trajectory_open("noformat", 'r') == NULL);
+    CHECK_FALSE(chfl_trajectory_open("noformat", 'r'));
     return "Can not find a format associated with the '' extension.";
 }
 
@@ -47,7 +47,7 @@ static char* buffer = NULL;
 
 static void callback(const char* message) {
     size_t size = strlen(message) + 1;
-    REQUIRE(buffer == NULL);
+    CHECK_FALSE(buffer);
     buffer = static_cast<char*>(malloc(sizeof(char) * size));
     strcpy(buffer, message);
 }
