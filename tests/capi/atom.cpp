@@ -5,10 +5,10 @@
 #include "helpers.hpp"
 #include "chemfiles.h"
 
-TEST_CASE("Atom") {
+TEST_CASE("chfl_atom") {
     SECTION("Name") {
         CHFL_ATOM* atom = chfl_atom("He");
-        REQUIRE(atom != NULL);
+        REQUIRE(atom);
 
         char name[32];
         CHECK_STATUS(chfl_atom_name(atom, name, sizeof(name)));
@@ -23,7 +23,7 @@ TEST_CASE("Atom") {
 
     SECTION("Type") {
         CHFL_ATOM* atom = chfl_atom("He");
-        REQUIRE(atom != NULL);
+        REQUIRE(atom);
 
         char type[32];
         CHECK_STATUS(chfl_atom_type(atom, type, sizeof(type)));
@@ -45,7 +45,7 @@ TEST_CASE("Atom") {
 
     SECTION("Mass") {
         CHFL_ATOM* atom = chfl_atom("He");
-        REQUIRE(atom != NULL);
+        REQUIRE(atom);
 
         double mass = 0;
         CHECK_STATUS(chfl_atom_mass(atom, &mass));
@@ -60,7 +60,7 @@ TEST_CASE("Atom") {
 
     SECTION("Charge") {
         CHFL_ATOM* atom = chfl_atom("He");
-        REQUIRE(atom != NULL);
+        REQUIRE(atom);
 
         double charge = 0;
         CHECK_STATUS(chfl_atom_charge(atom, &charge));
@@ -75,7 +75,7 @@ TEST_CASE("Atom") {
 
     SECTION("Radius") {
         CHFL_ATOM* atom = chfl_atom("Zn");
-        REQUIRE(atom != NULL);
+        REQUIRE(atom);
 
         double radius = 0;
         CHECK_STATUS(chfl_atom_vdw_radius(atom, &radius));
@@ -89,7 +89,7 @@ TEST_CASE("Atom") {
 
     SECTION("Number") {
         CHFL_ATOM* atom = chfl_atom("Zn");
-        REQUIRE(atom != NULL);
+        REQUIRE(atom);
 
         uint64_t number = 0;
         CHECK_STATUS(chfl_atom_atomic_number(atom, &number));

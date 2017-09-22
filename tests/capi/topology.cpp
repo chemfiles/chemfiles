@@ -7,10 +7,10 @@
 
 static CHFL_TOPOLOGY* testing_topology();
 
-TEST_CASE("Residue") {
+TEST_CASE("chfl_topology") {
     SECTION("Size") {
         CHFL_TOPOLOGY* topology = chfl_topology();
-        REQUIRE(topology != NULL);
+        REQUIRE(topology);
 
         uint64_t natoms = 100;
         CHECK_STATUS(chfl_topology_atoms_count(topology, &natoms));
@@ -25,7 +25,7 @@ TEST_CASE("Residue") {
 
     SECTION("Atoms") {
         CHFL_TOPOLOGY* topology = testing_topology();
-        REQUIRE(topology != NULL);
+        REQUIRE(topology);
 
         uint64_t natoms = 0;
         CHECK_STATUS(chfl_topology_atoms_count(topology, &natoms));
@@ -36,7 +36,7 @@ TEST_CASE("Residue") {
         CHECK(natoms == 3);
 
         CHFL_ATOM* atom = chfl_atom_from_topology(topology, 0);
-        REQUIRE(atom != NULL);
+        REQUIRE(atom);
 
         char name[32];
         CHECK_STATUS(chfl_atom_type(atom, name, sizeof(name)));
@@ -45,14 +45,14 @@ TEST_CASE("Residue") {
 
         // Out of bound access
         atom = chfl_atom_from_topology(topology, 10000);
-        CHECK(atom == NULL);
+        CHECK_FALSE(atom);
 
         CHECK_STATUS(chfl_topology_free(topology));
     }
 
     SECTION("Bonds") {
         CHFL_TOPOLOGY* topology = testing_topology();
-        REQUIRE(topology != NULL);
+        REQUIRE(topology);
 
         uint64_t n = 0;
         CHECK_STATUS(chfl_topology_bonds_count(topology, &n));
@@ -76,7 +76,7 @@ TEST_CASE("Residue") {
 
     SECTION("Angles") {
         CHFL_TOPOLOGY* topology = testing_topology();
-        REQUIRE(topology != NULL);
+        REQUIRE(topology);
 
         uint64_t n = 0;
         CHECK_STATUS(chfl_topology_angles_count(topology, &n));
@@ -100,7 +100,7 @@ TEST_CASE("Residue") {
 
     SECTION("Dihedrals") {
         CHFL_TOPOLOGY* topology = testing_topology();
-        REQUIRE(topology != NULL);
+        REQUIRE(topology);
 
         uint64_t n = 0;
         CHECK_STATUS(chfl_topology_dihedrals_count(topology, &n));
@@ -122,7 +122,7 @@ TEST_CASE("Residue") {
 
     SECTION("Residues") {
         CHFL_TOPOLOGY* topology = chfl_topology();
-        REQUIRE(topology != NULL);
+        REQUIRE(topology);
 
         CHFL_ATOM* atom = chfl_atom("X");
         for (uint64_t i=0; i<10; i++) {
@@ -133,7 +133,7 @@ TEST_CASE("Residue") {
         uint64_t residues[3][3] = {{2, 3, 6}, {0, 1, 9}, {4, 5, 8}};
         for (uint64_t i=0; i<3; i++) {
             CHFL_RESIDUE* residue = chfl_residue("X", 0);
-            REQUIRE(residue != NULL);
+            REQUIRE(residue);
             for (uint64_t j=0; j<3; j++) {
                 CHECK_STATUS(chfl_residue_add_atom(residue, residues[i][j]));
             }
@@ -148,11 +148,11 @@ TEST_CASE("Residue") {
 
         CHFL_RESIDUE* first = chfl_residue_for_atom(topology, 2);
         CHFL_RESIDUE* second = chfl_residue_for_atom(topology, 0);
-        REQUIRE(first != NULL);
-        REQUIRE(second != NULL);
+        REQUIRE(first);
+        REQUIRE(second);
 
         CHFL_RESIDUE* out_of_bounds = chfl_residue_for_atom(topology, 7);
-        CHECK(out_of_bounds == NULL);
+        CHECK_FALSE(out_of_bounds);
 
         bool linked = true;
         CHECK_STATUS(chfl_topology_residues_linked(topology, first, second, &linked));
@@ -170,12 +170,12 @@ TEST_CASE("Residue") {
 
 static CHFL_TOPOLOGY* testing_topology() {
     CHFL_TOPOLOGY* topology = chfl_topology();
-    REQUIRE(topology != NULL);
+    REQUIRE(topology);
 
     CHFL_ATOM* O = chfl_atom("O");
     CHFL_ATOM* H = chfl_atom("H");
-    REQUIRE(O != NULL);
-    REQUIRE(H != NULL);
+    REQUIRE(O);
+    REQUIRE(H);
 
     CHECK_STATUS(chfl_topology_add_atom(topology, H));
     CHECK_STATUS(chfl_topology_add_atom(topology, O));

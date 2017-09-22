@@ -13,7 +13,7 @@ static CHFL_FRAME* testing_frame();
 TEST_CASE("Read trajectory") {
     SECTION("Number of steps") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
-        REQUIRE(trajectory != NULL);
+        REQUIRE(trajectory);
 
         uint64_t nsteps = 0;
         CHECK_STATUS(chfl_trajectory_nsteps(trajectory, &nsteps));
@@ -25,8 +25,8 @@ TEST_CASE("Read trajectory") {
     SECTION("Open with format") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_with_format("data/xyz/helium.xyz.but.not.really", 'r', "XYZ");
         CHFL_FRAME* frame = chfl_frame();
-        REQUIRE(trajectory != NULL);
-        REQUIRE(frame != NULL);
+        REQUIRE(trajectory);
+        REQUIRE(frame);
 
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
 
@@ -41,8 +41,8 @@ TEST_CASE("Read trajectory") {
     SECTION("Read next step") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
         CHFL_FRAME* frame = chfl_frame();
-        REQUIRE(trajectory != NULL);
-        REQUIRE(frame != NULL);
+        REQUIRE(trajectory);
+        REQUIRE(frame);
 
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
 
@@ -72,8 +72,8 @@ TEST_CASE("Read trajectory") {
     SECTION("Read specific step") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
         CHFL_FRAME* frame = chfl_frame();
-        REQUIRE(trajectory != NULL);
-        REQUIRE(frame != NULL);
+        REQUIRE(trajectory);
+        REQUIRE(frame);
 
         CHECK_STATUS(chfl_trajectory_read_step(trajectory, 41, frame));
 
@@ -99,13 +99,13 @@ TEST_CASE("Read trajectory") {
     SECTION("Get topology") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
         CHFL_FRAME* frame = chfl_frame();
-        REQUIRE(trajectory != NULL);
-        REQUIRE(frame != NULL);
+        REQUIRE(trajectory);
+        REQUIRE(frame);
 
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
 
         CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
-        REQUIRE(topology != NULL);
+        REQUIRE(topology);
 
         uint64_t natoms = 0;
         CHECK_STATUS(chfl_topology_atoms_count(topology, &natoms));
@@ -116,7 +116,7 @@ TEST_CASE("Read trajectory") {
         CHECK(n == 0);
 
         CHFL_ATOM* atom = chfl_atom_from_topology(topology, 0);
-        REQUIRE(atom != NULL);
+        REQUIRE(atom);
 
         char name[32];
         CHECK_STATUS(chfl_atom_name(atom, name, sizeof(name)));
@@ -130,7 +130,7 @@ TEST_CASE("Read trajectory") {
 
     SECTION("Set cell") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
-        REQUIRE(trajectory != NULL);
+        REQUIRE(trajectory);
 
         chfl_vector3d lengths = {30, 30, 30};
         CHFL_CELL* cell = chfl_cell(lengths);
@@ -138,11 +138,11 @@ TEST_CASE("Read trajectory") {
         CHECK_STATUS(chfl_cell_free(cell));
 
         CHFL_FRAME* frame = chfl_frame();
-        REQUIRE(frame != NULL);
+        REQUIRE(frame);
 
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
         cell = chfl_cell_from_frame(frame);
-        REQUIRE(cell != NULL);
+        REQUIRE(cell);
 
         chfl_vector3d data = {0};
         CHECK_STATUS(chfl_cell_lengths(cell, data));
@@ -157,12 +157,12 @@ TEST_CASE("Read trajectory") {
 
     SECTION("Set topology") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/trajectory.xyz", 'r');
-        REQUIRE(trajectory != NULL);
+        REQUIRE(trajectory);
 
         CHFL_TOPOLOGY* topology = chfl_topology();
-        REQUIRE(topology != NULL);
+        REQUIRE(topology);
         CHFL_ATOM* atom = chfl_atom("Cs");
-        REQUIRE(atom != NULL);
+        REQUIRE(atom);
 
         for (size_t i=0; i<9; i++) {
             CHECK_STATUS(chfl_topology_add_atom(topology, atom));
@@ -174,7 +174,7 @@ TEST_CASE("Read trajectory") {
         CHECK_STATUS(chfl_topology_free(topology));
 
         CHFL_FRAME* frame = chfl_frame();
-        REQUIRE(frame != NULL);
+        REQUIRE(frame);
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
 
         atom = chfl_atom_from_frame(frame, 1);
@@ -189,12 +189,12 @@ TEST_CASE("Read trajectory") {
 
     SECTION("Set topology from file") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/trajectory.xyz", 'r');
-        REQUIRE(trajectory != NULL);
+        REQUIRE(trajectory);
 
         CHECK_STATUS(chfl_trajectory_topology_file(trajectory, "data/xyz/topology.xyz", ""));
 
         CHFL_FRAME* frame = chfl_frame();
-        REQUIRE(frame != NULL);
+        REQUIRE(frame);
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
 
         CHFL_ATOM* atom = chfl_atom_from_frame(frame, 0);
@@ -227,10 +227,10 @@ TEST_CASE("Write trajectory") {
     "He 1 2 3\n";
 
     CHFL_TRAJECTORY* trajectory = chfl_trajectory_open(filename.c_str(), 'w');
-    REQUIRE(trajectory != NULL);
+    REQUIRE(trajectory);
 
     CHFL_FRAME* frame = testing_frame();
-    REQUIRE(frame != NULL);
+    REQUIRE(frame);
 
     CHECK_STATUS(chfl_trajectory_write(trajectory, frame));
 
@@ -249,8 +249,8 @@ TEST_CASE("Write trajectory") {
 static CHFL_FRAME* testing_frame() {
     CHFL_TOPOLOGY* topology = chfl_topology();
     CHFL_ATOM* atom = chfl_atom("He");
-    REQUIRE(topology != NULL);
-    REQUIRE(atom != NULL);
+    REQUIRE(topology);
+    REQUIRE(atom);
 
     for (unsigned i=0; i<4; i++) {
         CHECK_STATUS(chfl_topology_add_atom(topology, atom));
@@ -258,7 +258,7 @@ static CHFL_FRAME* testing_frame() {
     CHECK_STATUS(chfl_atom_free(atom));
 
     CHFL_FRAME* frame = chfl_frame();
-    REQUIRE(frame != NULL);
+    REQUIRE(frame);
     CHECK_STATUS(chfl_frame_resize(frame, 4));
 
     CHECK_STATUS(chfl_frame_set_topology(frame, topology));
