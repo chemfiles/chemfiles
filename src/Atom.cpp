@@ -37,7 +37,7 @@ static optional<const ElementData&> find_element(const std::string& name) {
 Atom::Atom(std::string name): Atom(name, name) {}
 
 Atom::Atom(std::string name, std::string type):
-    name_(std::move(name)), type_(std::move(type)) {
+    name_(std::move(name)), type_(std::move(type)), properties_() {
     auto element = find_element(type_);
     if (element) {
         mass_ = element->mass;
@@ -78,4 +78,12 @@ optional<uint64_t> Atom::atomic_number() const {
     } else {
         return nullopt;
     }
+}
+
+void Atom::set(std::string name, Property value) {
+    properties_.set(std::move(name), std::move(value));
+}
+
+optional<const Property&> Atom::get(const std::string& name) const {
+    return properties_.get(name);
 }

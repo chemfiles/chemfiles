@@ -5,9 +5,12 @@
 #define CHEMFILES_PROPERTY_HPP
 
 #include <string>
+#include <unordered_map>
 
 #include "chemfiles/exports.hpp"
+#include "chemfiles/optional.hpp"
 #include "chemfiles/types.hpp"
+#include "chemfiles/utils.hpp"
 #include "chemfiles/Error.hpp"
 
 namespace chemfiles {
@@ -140,7 +143,48 @@ private:
         double double_;
         Vector3D vector3d_;
     };
+
+    friend bool operator==(const Property&, const Property&);
 };
+
+inline bool operator==(const Property& lhs, const Property& rhs) {
+    if (lhs.kind_ != rhs.kind_) {
+        return false;
+    }
+    switch (lhs.kind_) {
+    case Property::BOOL:
+        return lhs.bool_ == rhs.bool_;
+    case Property::STRING:
+        return lhs.string_ == rhs.string_;
+    case Property::DOUBLE:
+        return lhs.double_ == rhs.double_;
+    case Property::VECTOR3D:
+        return lhs.vector3d_ == rhs.vector3d_;
+    }
+    unreachable();
+}
+
+/// A property map for inclusion in a Frame or an Atom.
+class property_map final {
+public:
+    property_map(): data_() {}
+
+    /// Set an arbitrary property with the given `name` and `value`. If a
+    /// property with this name already exist, it is replaced with the new
+    /// value.
+    void set(std::string name, Property value);
+
+    /// Get the property with the given `name` if it exists.
+    optional<const Property&> get(const std::string& name) const;
+
+private:
+    std::unordered_map<std::string, Property> data_;
+    friend bool operator==(const property_map&, const property_map&);
+};
+
+inline bool operator==(const property_map& lhs, const property_map& rhs) {
+    return lhs.data_ == rhs.data_;
+}
 
 } // namespace chemfiles
 

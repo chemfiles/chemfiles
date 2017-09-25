@@ -58,3 +58,22 @@ std::string Property::kind_as_string() const {
     }
     unreachable();
 }
+
+
+void property_map::set(std::string name, Property value) {
+    // We can not move value here, because we might need it later. C++17 solves
+    // this with insert_or_assign.
+    auto inserted = data_.emplace(std::move(name), value);
+    if (!inserted.second) {
+        inserted.first->second = std::move(value);
+    }
+}
+
+optional<const Property&> property_map::get(const std::string& name) const {
+    auto property = data_.find(name);
+    if (property != data_.end()) {
+        return property->second;
+    } else {
+        return nullopt;
+    }
+}
