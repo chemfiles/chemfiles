@@ -221,6 +221,32 @@ CHFL_EXPORT chfl_status chfl_frame_dihedral(
     const CHFL_FRAME* const frame, uint64_t i, uint64_t j, uint64_t k, uint64_t m, double* dihedral
 );
 
+/// Add a new `property` with the given `name` to this `frame`.
+///
+/// If a property with the same name already exists, this function override the
+/// existing property with the new one.
+///
+/// @example{tests/capi/doc/chfl_frame/property.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_frame_set_property(
+    CHFL_FRAME* const frame, const char* name, const CHFL_PROPERTY* const property
+);
+
+/// Get a property with the given `name` in this `frame`.
+///
+/// This function returns `NULL` is no property exist with the given name.
+///
+/// The user of this function is responsible to deallocate memory using the
+/// `chfl_property_free` function.
+///
+/// @example{tests/capi/doc/chfl_frame/property.c}
+/// @return A pointer to the property, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
+CHFL_EXPORT CHFL_PROPERTY* chfl_frame_get_property(
+    const CHFL_FRAME* const frame, const char* name
+);
+
 /// Free the memory associated with a `frame`.
 ///
 /// @example{tests/capi/doc/chfl_frame/chfl_frame.c}

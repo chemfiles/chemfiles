@@ -189,6 +189,32 @@ CHFL_EXPORT chfl_status chfl_atom_atomic_number(
     const CHFL_ATOM* const atom, uint64_t* number
 );
 
+/// Add a new `property` with the given `name` to this `atom`.
+///
+/// If a property with the same name already exists, this function override the
+/// existing property with the new one.
+///
+/// @example{tests/capi/doc/chfl_atom/property.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_atom_set_property(
+    CHFL_ATOM* const atom, const char* name, const CHFL_PROPERTY* const property
+);
+
+/// Get a property with the given `name` in this `atom`.
+///
+/// This function returns `NULL` is no property exist with the given name.
+///
+/// The user of this function is responsible to deallocate memory using the
+/// `chfl_property_free` function.
+///
+/// @example{tests/capi/doc/chfl_atom/property.c}
+/// @return A pointer to the property, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
+CHFL_EXPORT CHFL_PROPERTY* chfl_atom_get_property(
+    const CHFL_ATOM* const atom, const char* name
+);
+
 /// Free the memory associated with an `atom`.
 ///
 /// @example{tests/capi/doc/chfl_atom/chfl_atom.c}

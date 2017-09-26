@@ -172,6 +172,31 @@ extern "C" chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom, uint
     )
 }
 
+extern "C" chfl_status chfl_atom_set_property(CHFL_ATOM* const atom, const char* name, const CHFL_PROPERTY* const property) {
+    CHECK_POINTER(atom);
+    CHECK_POINTER(name);
+    CHECK_POINTER(property);
+    CHFL_ERROR_CATCH(
+        atom->set(name, *property);
+    )
+}
+
+extern "C" CHFL_PROPERTY* chfl_atom_get_property(const CHFL_ATOM* const atom, const char* name) {
+    CHFL_PROPERTY* property = nullptr;
+    CHECK_POINTER_GOTO(atom);
+    CHECK_POINTER_GOTO(name);
+    CHFL_ERROR_GOTO(
+        auto atom_property = atom->get(name);
+        if (atom_property) {
+            property = new Property(*atom_property);
+        }
+    )
+    return property;
+error:
+    delete property;
+    return nullptr;
+}
+
 extern "C" chfl_status chfl_atom_free(CHFL_ATOM* const atom) {
     delete atom;
     return CHFL_SUCCESS;

@@ -97,4 +97,26 @@ TEST_CASE("chfl_atom") {
 
         CHECK_STATUS(chfl_atom_free(atom));
     }
+
+    SECTION("Property") {
+        CHFL_ATOM* atom = chfl_atom("Zn");
+        REQUIRE(atom);
+
+        CHFL_PROPERTY* property = chfl_property_double(-23);
+        REQUIRE(property);
+
+        CHECK_STATUS(chfl_atom_set_property(atom, "this", property));
+        CHECK_STATUS(chfl_property_free(property));
+        property = nullptr;
+
+        property = chfl_atom_get_property(atom, "this");
+        double value = 0;
+        CHECK_STATUS(chfl_property_get_double(property, &value));
+        CHECK(value == -23);
+
+        CHECK_FALSE(chfl_atom_get_property(atom, "that"));
+
+        CHECK_STATUS(chfl_property_free(property));
+        CHECK_STATUS(chfl_atom_free(atom));
+    }
 }
