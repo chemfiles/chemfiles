@@ -14,6 +14,7 @@ following opaque pointer types:
 * :ref:`CHFL_TOPOLOGY <capi-topology>` maps to the :ref:`Topology <class-Topology>` class.
 * :ref:`CHFL_RESIDUE <capi-residue>` maps to the :ref:`Residue <class-Residue>` class.
 * :ref:`CHFL_SELECTION <capi-selection>` maps to the :ref:`Selection <class-Selection>` class.
+* :ref:`CHFL_PROPERTY <capi-property>` maps to the :ref:`Property <class-Property>` class.
 
 The user is reponsible for memory management when using these types.
 Constructors functions (functions returning pointers to types defined above)
@@ -38,4 +39,5 @@ the Chemfiles library.
     chfl_atom
     chfl_cell
     chfl_selection
+    chfl_property
     misc

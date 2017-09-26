@@ -19,6 +19,7 @@ begining of your program in order to bring all the class in the main namespace.
    atom
    unitcell
    selection
+   property
    misc
 
 .. _exported-macro:

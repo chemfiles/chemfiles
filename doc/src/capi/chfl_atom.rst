@@ -37,4 +37,8 @@ Function manipulating ``CHFL_ATOM``
 
 .. doxygenfunction:: chfl_atom_atomic_number
 
+.. doxygenfunction:: chfl_atom_set_property
+
+.. doxygenfunction:: chfl_atom_get_property
+
 .. doxygenfunction:: chfl_atom_free
