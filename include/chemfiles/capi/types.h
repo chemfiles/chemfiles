@@ -17,6 +17,7 @@ namespace chemfiles {
     class UnitCell;
     class Topology;
     class Residue;
+    class Property;
 }
 struct CAPISelection;
 typedef chemfiles::Trajectory CHFL_TRAJECTORY;
@@ -26,6 +27,7 @@ typedef chemfiles::UnitCell CHFL_CELL;
 typedef chemfiles::Topology CHFL_TOPOLOGY;
 typedef chemfiles::Residue CHFL_RESIDUE;
 typedef CAPISelection CHFL_SELECTION;
+typedef chemfiles::Property CHFL_PROPERTY;
 #else
 /// An opaque type handling trajectories files.
 ///
@@ -98,6 +100,11 @@ typedef struct CHFL_RESIDUE CHFL_RESIDUE;
 /// <value>` structure, where `<operator>` is a comparison operator in
 /// `== != < <= > >=`.
 typedef struct CHFL_SELECTION CHFL_SELECTION;
+
+/// This class holds the data used in properties in `CHFL_FRAME` and
+/// `CHFL_ATOM`. A property can have various types: bool, double, string or
+/// `chfl_vector3d`.
+typedef struct CHFL_PROPERTY CHFL_PROPERTY;
 #endif
 
 /// `chfl_status` list the possible values for the return status code of
