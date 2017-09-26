@@ -18,13 +18,13 @@ int main(void) {
 
     // Get the number of matching atoms from the frame
     chfl_selection_evaluate(selection, frame, &matching);
-    printf("We have %"PRIu64" zinc in the frame\n", matching);
+    printf("We have %d zinc in the frame\n", matching);
     chfl_match_t* matches = malloc((size_t)matching * sizeof(chfl_match_t));
 
     // Get the matching atoms
     chfl_selection_matches(selection, matches, matching);
     for (uint64_t i=0; i<matching; i++) {
-        printf("%"PRIu64" is a zinc\n", matches[i].atoms[0]);
+        printf("%d is a zinc\n", matches[i].atoms[0]);
     }
 
     chfl_selection_free(selection);
@@ -33,14 +33,14 @@ int main(void) {
     // Create a selection for multiple atoms
     selection = chfl_selection("angles: name($1) H and name($2) O and name($3) H");
     chfl_selection_evaluate(selection, frame, &matching);
-    printf("We have %"PRIu64" water in the frame\n", matching);
+    printf("We have %d water in the frame\n", matching);
     matches = malloc((size_t)matching * sizeof(chfl_match_t));
 
     // Get the matching atoms
     chfl_selection_matches(selection, matches, matching);
     for (uint64_t i=0; i<matching; i++) {
         printf(
-            "%"PRIu64" - %"PRIu64" - %"PRIu64" is a water\n",
+            "%d - %d - %d is a water\n",
             matches[i].atoms[0], matches[i].atoms[1], matches[i].atoms[2]
         );
     }
