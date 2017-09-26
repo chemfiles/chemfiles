@@ -63,6 +63,7 @@ static unsigned max_variable(Context context) {
     case Context::FOUR:
         return 4;
     }
+    unreachable();
 }
 
 Selection::~Selection() = default;
