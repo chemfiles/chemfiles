@@ -71,7 +71,7 @@ public:
 
     /// Get the property with the given `name` for this atom if it exists.
     optional<const Property&> get(const std::string& name) const;
-    
+
 private:
     /// the atom name
     std::string name_;
@@ -91,6 +91,10 @@ inline bool operator==(const Atom& lhs, const Atom& rhs) {
     return (lhs.name() == rhs.name() && lhs.type() == rhs.type() &&
             lhs.mass() == rhs.mass() && lhs.charge() == rhs.charge() &&
             lhs.properties_ == rhs.properties_);
+}
+
+inline bool operator!=(const Atom& lhs, const Atom& rhs) {
+    return !(lhs == rhs);
 }
 
 } // namespace chemfiles

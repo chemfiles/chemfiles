@@ -164,6 +164,10 @@ inline bool operator==(const Property& lhs, const Property& rhs) {
     unreachable();
 }
 
+inline bool operator!=(const Property& lhs, const Property& rhs) {
+    return !(lhs == rhs);
+}
+
 /// A property map for inclusion in a Frame or an Atom.
 class property_map final {
 public:
@@ -184,6 +188,10 @@ private:
 
 inline bool operator==(const property_map& lhs, const property_map& rhs) {
     return lhs.data_ == rhs.data_;
+}
+
+inline bool operator!=(const property_map& lhs, const property_map& rhs) {
+    return !(lhs == rhs);
 }
 
 } // namespace chemfiles

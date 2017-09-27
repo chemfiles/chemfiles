@@ -29,6 +29,10 @@ inline bool operator==(const Vector3D& lhs, const Vector3D& rhs) {
     return lhs[0] == rhs[0] && lhs[1] == rhs[1] && lhs[2] == rhs[2];
 }
 
+inline bool operator!=(const Vector3D& lhs, const Vector3D& rhs) {
+    return !(lhs == rhs);
+}
+
 /// Compute the dot product of the vectors `lhs` and `rhs`.
 inline double dot(const Vector3D& lhs, const Vector3D& rhs) {
     return lhs[0] * rhs[0] + lhs[1] * rhs[1] + lhs[2] * rhs[2];
@@ -98,10 +102,14 @@ using Matrix3D = std::array<std::array<double, 3>, 3>;
 ///
 /// This function uses float equality, and thus will only return true if the
 /// two matrix are exactly the same.
-inline bool operator==(const chemfiles::Matrix3D& lhs, const chemfiles::Matrix3D& rhs) {
+inline bool operator==(const Matrix3D& lhs, const Matrix3D& rhs) {
     return lhs[0][0] == rhs[0][0] && lhs[1][0] == rhs[1][0] && lhs[2][0] == rhs[2][0] &&
            lhs[0][1] == rhs[0][1] && lhs[1][1] == rhs[1][1] && lhs[2][1] == rhs[2][1] &&
            lhs[0][2] == rhs[0][2] && lhs[1][2] == rhs[1][2] && lhs[2][2] == rhs[2][2];
+}
+
+inline bool operator!=(const Matrix3D& lhs, const Matrix3D& rhs) {
+    return !(lhs == rhs);
 }
 
 /// Create a diagonal Matrix3D with the three diagonal elements `a`, `b` and `c`
