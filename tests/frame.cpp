@@ -213,3 +213,16 @@ TEST_CASE("PBC functions") {
         CHECK(roughly(frame.dihedral(4, 5, 6, 7), 1.045378962606));
     }
 }
+
+TEST_CASE("Property map") {
+    auto frame = Frame();
+    frame.set("foo", 35);
+    frame.set("bar", false);
+
+    CHECK(frame.get("foo")->as_double() == 35.0);
+    CHECK(frame.get("bar")->as_bool() == false);
+
+    frame.set("foo", "test");
+    CHECK(frame.get("foo")->as_string() == "test");
+    CHECK_FALSE(frame.get("not here"));
+}

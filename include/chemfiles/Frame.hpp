@@ -130,6 +130,14 @@ public:
     /// @throws chemfiles::OutOfBounds if `i`, `j`, `k` or `m` are not in bounds
     double dihedral(size_t i, size_t j, size_t k, size_t m) const;
 
+    /// Set an arbitrary property for this frame with the given `name` and
+    /// `value`. If a property with this name already exist, it is replaced
+    /// with the new value.
+    void set(std::string name, Property value);
+
+    /// Get the property with the given `name` for this frame if it exists.
+    optional<const Property&> get(const std::string& name) const;
+
 private:
     Frame(const Frame&) = default;
     Frame& operator=(const Frame&) = default;
@@ -144,6 +152,8 @@ private:
     Topology topology_;
     /// Unit cell of the system
     UnitCell cell_;
+    /// Properties stored in this frame
+    property_map properties_;
 };
 
 } // namespace chemfiles

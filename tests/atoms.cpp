@@ -94,4 +94,17 @@ TEST_CASE("Use the Atom type"){
         CHECK(atom.covalent_radius().value() == 1.31);
         CHECK(atom.vdw_radius().value() == 2.1);
     }
+
+    SECTION("Property map") {
+        auto atom = Atom("H");
+        atom.set("foo", 35);
+        atom.set("bar", false);
+
+        CHECK(atom.get("foo")->as_double() == 35.0);
+        CHECK(atom.get("bar")->as_bool() == false);
+
+        atom.set("foo", "test");
+        CHECK(atom.get("foo")->as_string() == "test");
+        CHECK_FALSE(atom.get("not here"));
+    }
 }

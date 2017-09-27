@@ -65,6 +65,7 @@ inline size_t checked_cast(uint64_t value) {
     CATCH_AND_RETURN(SelectionError, CHFL_SELECTION_ERROR)                     \
     CATCH_AND_RETURN(ConfigurationError, CHFL_CONFIGURATION_ERROR)             \
     CATCH_AND_RETURN(OutOfBounds, CHFL_OUT_OF_BOUNDS)                          \
+    CATCH_AND_RETURN(PropertyError, CHFL_PROPERTY_ERROR)                       \
     CATCH_AND_RETURN(Error, CHFL_GENERIC_ERROR)                                \
     catch (const std::exception& e) {                                          \
         CAPI_LAST_ERROR = std::string(e.what());                               \
@@ -84,6 +85,7 @@ inline size_t checked_cast(uint64_t value) {
     CATCH_AND_GOTO_ERROR(SelectionError)                                       \
     CATCH_AND_GOTO_ERROR(ConfigurationError)                                   \
     CATCH_AND_GOTO_ERROR(OutOfBounds)                                          \
+    CATCH_AND_GOTO_ERROR(PropertyError)                                        \
     CATCH_AND_GOTO_ERROR(Error)                                                \
     catch (const std::exception& e) {                                          \
         CAPI_LAST_ERROR = std::string(e.what());                               \

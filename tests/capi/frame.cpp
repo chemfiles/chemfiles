@@ -320,4 +320,26 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_atom_free(atom));
         CHECK_STATUS(chfl_frame_free(frame));
     }
+
+    SECTION("Property") {
+        CHFL_FRAME* frame = chfl_frame();
+        REQUIRE(frame);
+
+        CHFL_PROPERTY* property = chfl_property_double(-23);
+        REQUIRE(property);
+
+        CHECK_STATUS(chfl_frame_set_property(frame, "this", property));
+        CHECK_STATUS(chfl_property_free(property));
+        property = nullptr;
+
+        property = chfl_frame_get_property(frame, "this");
+        double value = 0;
+        CHECK_STATUS(chfl_property_get_double(property, &value));
+        CHECK(value == -23);
+
+        CHECK_FALSE(chfl_frame_get_property(frame, "that"));
+
+        CHECK_STATUS(chfl_property_free(property));
+        CHECK_STATUS(chfl_frame_free(frame));
+    }
 }

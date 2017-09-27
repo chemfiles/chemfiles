@@ -45,6 +45,11 @@ struct CHFL_EXPORT OutOfBounds: public Error {
     OutOfBounds(const std::string& err): Error(err) {}
 };
 
+/// Exception for errors related to frame and atomic properties
+struct CHFL_EXPORT PropertyError: public Error {
+    PropertyError(const std::string& err): Error(err) {}
+};
+
 } // namespace chemfiles
 
 #endif

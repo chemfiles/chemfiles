@@ -190,3 +190,11 @@ double Frame::dihedral(size_t i, size_t j, size_t k, size_t m) const {
     auto b = cross(rjk, rkm);
     return atan2(norm(rjk) * dot(b, rij), dot(a, b));
 }
+
+void Frame::set(std::string name, Property value) {
+    properties_.set(std::move(name), std::move(value));
+}
+
+optional<const Property&> Frame::get(const std::string& name) const {
+    return properties_.get(name);
+}

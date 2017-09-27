@@ -6,6 +6,7 @@
 
 #include "chemfiles/capi/types.h"
 #include "chemfiles/capi/misc.h"
+#include "chemfiles/capi/property.h"
 #include "chemfiles/capi/atom.h"
 #include "chemfiles/capi/residue.h"
 #include "chemfiles/capi/topology.h"

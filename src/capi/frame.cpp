@@ -179,6 +179,31 @@ extern "C" chfl_status chfl_frame_dihedral(const CHFL_FRAME* const frame, uint64
     )
 }
 
+extern "C" chfl_status chfl_frame_set_property(CHFL_FRAME* const frame, const char* name, const CHFL_PROPERTY* const property) {
+    CHECK_POINTER(frame);
+    CHECK_POINTER(name);
+    CHECK_POINTER(property);
+    CHFL_ERROR_CATCH(
+        frame->set(name, *property);
+    )
+}
+
+extern "C" CHFL_PROPERTY* chfl_frame_get_property(const CHFL_FRAME* const frame, const char* name) {
+    CHFL_PROPERTY* property = nullptr;
+    CHECK_POINTER_GOTO(frame);
+    CHECK_POINTER_GOTO(name);
+    CHFL_ERROR_GOTO(
+        auto atom_property = frame->get(name);
+        if (atom_property) {
+            property = new Property(*atom_property);
+        }
+    )
+    return property;
+error:
+    delete property;
+    return nullptr;
+}
+
 extern "C" chfl_status chfl_frame_free(CHFL_FRAME* const frame) {
     delete frame;
     return CHFL_SUCCESS;

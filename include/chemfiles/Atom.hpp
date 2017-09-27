@@ -8,6 +8,7 @@
 
 #include "chemfiles/exports.hpp"
 #include "chemfiles/optional.hpp"
+#include "chemfiles/Property.hpp"
 
 namespace chemfiles {
 
@@ -63,16 +64,33 @@ public:
     /// Try to get the atomic number of the atom.
     optional<uint64_t> atomic_number() const;
 
+    /// Set an arbitrary property for this atom with the given `name` and
+    /// `value`. If a property with this name already exist, it is replaced
+    /// with the new value.
+    void set(std::string name, Property value);
+
+    /// Get the property with the given `name` for this atom if it exists.
+    optional<const Property&> get(const std::string& name) const;
+    
 private:
+    /// the atom name
     std::string name_;
+    /// the atom type
     std::string type_;
+    /// the atom mass
     double mass_ = 0;
+    /// the atom charge
     double charge_ = 0;
+    /// Additional properties of this atom
+    property_map properties_;
+
+    friend bool operator==(const Atom&, const Atom&);
 };
 
 inline bool operator==(const Atom& lhs, const Atom& rhs) {
     return (lhs.name() == rhs.name() && lhs.type() == rhs.type() &&
-            lhs.mass() == rhs.mass() && lhs.charge() == rhs.charge());
+            lhs.mass() == rhs.mass() && lhs.charge() == rhs.charge() &&
+            lhs.properties_ == rhs.properties_);
 }
 
 } // namespace chemfiles
