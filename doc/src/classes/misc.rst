@@ -11,7 +11,7 @@ any pertinent way.
 .. code-block:: cpp
 
     #include <iostream>
-    #include "chemfiles.cpp"
+    #include <chemfiles.hpp>
 
     int main() {
         try {
@@ -54,6 +54,9 @@ nicely with any exisiting C++ error handling.
     :members:
 
 .. doxygenstruct:: chemfiles::OutOfBounds
+    :members:
+
+.. doxygenstruct:: chemfiles::PropertyError
     :members:
 
 Warnings

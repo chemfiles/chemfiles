@@ -18,6 +18,10 @@ typedef std::function<void(std::string message)> warning_callback;
 
 /// Set the global callback for warning events. The default is to print them
 /// on the standard error stream.
+///
+/// @example{tests/doc/set_warning_callback.cpp}
+///
+/// @param callback callback function that will be called on each warning
 void CHFL_EXPORT set_warning_callback(warning_callback callback);
 
 /// Read configuration from the file at `path`. If the same configuration data
@@ -26,6 +30,13 @@ void CHFL_EXPORT set_warning_callback(warning_callback callback);
 ///
 /// If the file at `path` can not be opened, or if the configuration file is
 /// invalid, a `ConfigurationError` is thrown.
+///
+/// @example{tests/doc/add_configuration.cpp}
+///
+/// @param path path to the configuration file to add
+///
+/// @throws ConfigurationError if the file at `path` can not be read, or if it
+///                            is invalid.
 void CHFL_EXPORT add_configuration(const std::string& path);
 
 } // namespace chemfiles
