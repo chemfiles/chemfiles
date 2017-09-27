@@ -24,7 +24,7 @@ void warning_callback(const char* message);
         // Generate a warning event
         chfl_trajectory_open("noformat", 'r');
 
-        assert(strcmp(LAST_WARNING, "Can not find a format associated with the '' extension.") == 0);
+        assert(strcmp(LAST_WARNING, "file at 'noformat' do not have an extension, provide a format name to read it") == 0);
         return 0;
     }
 

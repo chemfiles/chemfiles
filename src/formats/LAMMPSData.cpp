@@ -6,7 +6,7 @@
 
 #include "chemfiles/formats/LAMMPSData.hpp"
 
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/utils.hpp"
@@ -76,7 +76,7 @@ atom_style::atom_style(const std::string& name): name_(name) {
         style_ = HYBRID;
         expected_ = 5;
     } else {
-        throw FormatError("Unknown atom style " + name);
+        throw format_error("unknown atom style '{}'", name);
     }
     assert(expected_ != 0);
 }
@@ -215,7 +215,7 @@ atom_data atom_style::read_line(const std::string& line) const {
     }
 
     if (assigned != expected_) {
-        throw FormatError("invalid line for this atom style " + name_ + " '" + line + "'");
+        throw format_error("invalid line for atom style {}: {}", name_, line);
     }
 
     // LAMMPS uses 1-based indexing
@@ -282,7 +282,6 @@ void LAMMPSDataFormat::read(Frame& frame) {
             break;
         case NOT_A_SECTION:
             unreachable();
-            break;
         }
     }
 
@@ -314,8 +313,8 @@ void LAMMPSDataFormat::read_header(Frame& frame) {
         } else if (content.find("zlo zhi") != std::string::npos) {
             c = read_header_box_bounds(content, "zlo zhi");
         } else if (content.find("xy xz yz") != std::string::npos) {
-            throw FormatError(
-                "Triclinic cells are not yet implemented with LAMMPS data format"
+            throw format_error(
+                "triclinic cells are not yet implemented with LAMMPS data format"
             );
         } else {
             // End of the header, get the section and break
@@ -329,8 +328,8 @@ void LAMMPSDataFormat::read_header(Frame& frame) {
 size_t LAMMPSDataFormat::read_header_integer(const std::string& line, const std::string& context) {
     auto splitted = split(trim(line), ' ');
     if (splitted.size() < 2) {
-        throw FormatError(
-            "Invalid value: expected '<n> " + context + "', got '" + line + "'"
+        throw format_error(
+            "invalid header value: expected '<n> {}', got '{}'", context, line
         );
     }
     return checked_cast(string2longlong(splitted[0]));
@@ -339,8 +338,8 @@ size_t LAMMPSDataFormat::read_header_integer(const std::string& line, const std:
 double LAMMPSDataFormat::read_header_box_bounds(const std::string& line, const std::string& context) {
     auto splitted = split(trim(line), ' ');
     if (splitted.size() < 4) {
-        throw FormatError(
-            "Invalid value: expected '<lo> <hi> " + context + "', got '" + line + "'"
+        throw format_error(
+            "invalid header value: expected '<lo> <hi> {}', got '{}'", context, line
         );
     }
     auto low = string2double(splitted[0]);
@@ -354,7 +353,7 @@ void LAMMPSDataFormat::get_next_section() {
         if (!line.empty()) {
             auto section = get_section(line);
             if (section == NOT_A_SECTION) {
-                throw FormatError("Expected section name, got " + line);
+                throw format_error("expected section name, got '{}'", line);
             } else {
                 current_section_ = section;
                 break;
@@ -381,7 +380,7 @@ void LAMMPSDataFormat::skip_to_next_section() {
 void LAMMPSDataFormat::read_atoms(Frame& frame) {
     assert(current_section_ == ATOMS);
     if (natoms_ == 0) {
-        throw FormatError("missing atoms count in header");
+        throw format_error("missing atoms count in header");
     }
 
     if (atom_style_name_ == "") {
@@ -404,9 +403,9 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
 
         auto data = style_.read_line(line);
         if (data.index > natoms_) {
-            throw FormatError(
-                "Too many atoms in Atoms section: expected " + std::to_string(natoms_) +
-                " atoms, got atom at index " + std::to_string(data.index)
+            throw format_error(
+                "too many atoms in [Atoms] section: expected {} atoms, got atom with index {}",
+                natoms_, data.index
             );
         }
 
@@ -449,7 +448,7 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
 void LAMMPSDataFormat::read_masses() {
     assert(current_section_ == MASSES);
     if (natom_types_ == 0) {
-        throw FormatError("missing atom types count in header");
+        throw format_error("missing atom types count in header");
     }
     size_t n = 0;
     while (n < natom_types_ && !file_->eof()) {
@@ -459,7 +458,7 @@ void LAMMPSDataFormat::read_masses() {
 
         auto splitted = split(trim(line), ' ');
         if (splitted.size() != 2) {
-            throw FormatError("bad mass specification '" + line + "'");
+            throw format_error("bad mass specification '{}'", line);
         }
 
         auto type = splitted[0];
@@ -474,7 +473,7 @@ void LAMMPSDataFormat::read_masses() {
 void LAMMPSDataFormat::read_bonds(Frame& frame) {
     assert(current_section_ == BONDS);
     if (nbonds_ == 0) {
-        throw FormatError("missing bonds count in header");
+        throw format_error("missing bonds count in header");
     }
     size_t n = 0;
     auto& topology = frame.topology();
@@ -485,7 +484,7 @@ void LAMMPSDataFormat::read_bonds(Frame& frame) {
 
         auto splitted = split(trim(line), ' ');
         if (splitted.size() != 4) {
-            throw FormatError("bad bonds specification '" + line + "'");
+            throw format_error("bad bond specification '{}'", line);
         }
         // LAMMPS use 1-based indexing
         auto i = checked_cast(string2longlong(splitted[2]) - 1);
@@ -495,7 +494,7 @@ void LAMMPSDataFormat::read_bonds(Frame& frame) {
     }
 
     if (file_->eof() && n < nbonds_) {
-        throw FormatError("end of file found before getting all bonds");
+        throw format_error("end of file found before getting all bonds");
     }
 
     get_next_section();
@@ -504,7 +503,7 @@ void LAMMPSDataFormat::read_bonds(Frame& frame) {
 void LAMMPSDataFormat::read_velocities(Frame& frame) {
     assert(current_section_ == VELOCITIES);
     if (natoms_ == 0) {
-        throw FormatError("missing atoms count in header");
+        throw format_error("missing atoms count in header");
     }
     size_t n = 0;
     frame.add_velocities();
@@ -516,7 +515,7 @@ void LAMMPSDataFormat::read_velocities(Frame& frame) {
 
         auto splitted = split(trim(line), ' ');
         if (splitted.size() < 4) {
-            throw FormatError("bad velocity specification '" + line + "'");
+            throw format_error("bad velocity specification '{}'", line);
         }
         // LAMMPS use 1-based indexing
         auto id = checked_cast(string2longlong(splitted[0]) - 1);
@@ -528,7 +527,7 @@ void LAMMPSDataFormat::read_velocities(Frame& frame) {
     }
 
     if (file_->eof() && n < nbonds_) {
-        throw FormatError("end of file found before getting all velocities");
+        throw format_error("end of file found before getting all velocities");
     }
 
     get_next_section();
@@ -632,10 +631,10 @@ bool is_unused_header(const std::string& line) {
 
 size_t checked_cast(long long int value) {
     if (value < 0) {
-        throw FormatError("invalid integer: should be positive, is " + std::to_string(value));
+        throw format_error("invalid integer: should be positive, is {}", value);
     } else if (sizeof(long long) < sizeof(size_t) && value > static_cast<long long>(SIZE_MAX)) {
-        throw FormatError(
-            "invalid integer: " + std::to_string(value) + " is bigger than the available size_t"
+        throw format_error(
+            "invalid integer: {} is bigger than the available size_t", value
         );
     } else {
         return static_cast<size_t>(value);

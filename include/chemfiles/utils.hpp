@@ -87,7 +87,7 @@ inline long long int string2longlong(const std::string& string) {
     #define unreachable() __assume(false)
 #else
     #define unreachable() do {                     \
-        throw Error("Entered unreachable code");   \
+        throw Error("entered unreachable code");   \
     } while (false)
 #endif
 }

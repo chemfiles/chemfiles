@@ -1,7 +1,7 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Topology.hpp"
 
 using namespace chemfiles;
@@ -9,10 +9,11 @@ using namespace chemfiles;
 void Topology::resize(size_t natoms) {
     for (auto& bond: connect_.bonds()) {
         if (bond[0] >= natoms || bond[1] >= natoms) {
-            throw Error(
-                "Can not resize the topology to contains " + std::to_string(natoms) +
-                " atoms as there is a bond between atoms " + std::to_string(bond[0]) +
-                "-" + std::to_string(bond[1]) + ".");
+            throw error(
+                "can not resize the topology to contains {} atoms as there "
+                "is a bond between atoms {} - {}",
+                natoms, bond[0], bond[1]
+            );
         }
     }
     atoms_.resize(natoms, Atom());
@@ -28,10 +29,10 @@ void Topology::reserve(size_t natoms) {
 
 void Topology::add_bond(size_t atom_i, size_t atom_j) {
     if (atom_i >= natoms() || atom_j >= natoms()) {
-        throw OutOfBounds(
-            "out of bounds atomic index in `Topology::add_bond`: we have " +
-            std::to_string(natoms()) + " atoms, but the bond indexes are " +
-            std::to_string(atom_i) + " and " + std::to_string(atom_j)
+        throw out_of_bounds(
+            "out of bounds atomic index in `Topology::add_bond`: "
+            "we have {} atoms, but the bond indexes are {} and {}",
+            natoms(), atom_i, atom_j
         );
     }
     connect_.add_bond(atom_i, atom_j);
@@ -39,10 +40,10 @@ void Topology::add_bond(size_t atom_i, size_t atom_j) {
 
 void Topology::remove_bond(size_t atom_i, size_t atom_j) {
     if (atom_i >= natoms() || atom_j >= natoms()) {
-        throw OutOfBounds(
-            "out of bounds atomic index in `Topology::remove_bond`: we have " +
-            std::to_string(natoms()) + " atoms, but the bond indexes are " +
-            std::to_string(atom_i) + " and " + std::to_string(atom_j)
+        throw out_of_bounds(
+            "out of bounds atomic index in `Topology::remove_bond`: "
+            "we have {} atoms, but the bond indexes are {} and {}",
+            natoms(), atom_i, atom_j
         );
     }
     connect_.remove_bond(atom_i, atom_j);
@@ -51,9 +52,10 @@ void Topology::remove_bond(size_t atom_i, size_t atom_j) {
 
 void Topology::remove(size_t i) {
     if (i >= natoms()) {
-        throw OutOfBounds(
-            "out of bounds atomic index in `Topology::remove`: we have " +
-            std::to_string(natoms()) + " atoms, but the index is " + std::to_string(i)
+        throw out_of_bounds(
+            "out of bounds atomic index in `Topology::remove`: we have {} atoms, "
+            "but the indexe is {}",
+            natoms(), i
         );
     }
     atoms_.erase(atoms_.begin() + static_cast<std::ptrdiff_t>(i));
@@ -90,9 +92,10 @@ void Topology::add_residue(Residue residue) {
         auto it = residue_mapping_.find(i);
         if (it != residue_mapping_.end()) {
             auto resid = residues_[it->second].id();
-            throw Error(
-                "Can not add this residue: atom " + std::to_string(i) +
-                " is already in the residue " + std::to_string(resid)
+            throw error(
+                "can not add this residue: atom {} is already in another "
+                "residue (with resid {})",
+                i, resid
             );
         }
     }

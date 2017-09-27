@@ -4,7 +4,7 @@
 #include <algorithm>
 
 #include "chemfiles/files/BasicFile.hpp"
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 using namespace chemfiles;
 
 /// Read a single line from `stream` in `string`, handling all possible end of
@@ -69,7 +69,7 @@ BasicFile::BasicFile(const std::string& filename, File::Mode mode)
 
     stream_.open(filename, openmode);
     if (!stream_) {
-        throw FileError("Could not open the file at" + filename);
+        throw file_error("could not open the file at {}", filename);
     }
     TextFile::rdbuf(stream_.rdbuf());
     stream_.clear();
@@ -81,8 +81,8 @@ std::string BasicFile::readline() {
     std::string line;
     try {
         get_line(stream_, line);
-    } catch (const std::ios_base::failure&) {
-        throw FileError("Could not read a line in " + filename());
+    } catch (const std::ios_base::failure& e) {
+        throw file_error("could not read a line in {}: {}", filename(), e.what());
     }
 #if defined(__GNUC__) && (__GNUC__ == 5 || __GNUC__ == 6)
         // GCC 5 and 6 throw the wrong exception type for std::ios_base::failure
@@ -93,7 +93,7 @@ std::string BasicFile::readline() {
         // See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145.
         catch(const std::exception& e) {
             if (std::string(typeid(e).name()) == "NSt8ios_base7failureE") {
-                throw FileError("Could not read a line in " + filename());
+                throw file_error("could not read a line in {}: {}", filename(), e.what());
             } else {
                 throw e;
             }
@@ -116,8 +116,8 @@ std::vector<std::string> BasicFile::readlines(size_t n) {
     for (size_t i = 0; i < n; i++) {
         try {
             get_line(stream_, lines[i]);
-        } catch (const std::ios_base::failure&) {
-            throw FileError("Could not read lines in " + filename());
+        } catch (const std::ios_base::failure& e) {
+            throw file_error("could not read a line in {}: {}", filename(), e.what());
         }
 #if defined(__GNUC__) && (__GNUC__ == 5 || __GNUC__ == 6)
         // GCC 5 and 6 throw the wrong exception type for std::ios_base::failure
@@ -128,7 +128,7 @@ std::vector<std::string> BasicFile::readlines(size_t n) {
         // See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145.
         catch(const std::exception& e) {
             if (std::string(typeid(e).name()) == "NSt8ios_base7failureE") {
-                throw FileError("Could not read lines in " + filename());
+                throw file_error("could not read a line in {}: {}", filename(), e.what());
             } else {
                 throw e;
             }

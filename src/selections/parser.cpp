@@ -5,7 +5,7 @@
 #include <stack>
 #include <map>
 
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/selections/expr.hpp"
 #include "chemfiles/selections/parser.hpp"
 
@@ -72,8 +72,8 @@ static std::vector<Token> shunting_yard(std::vector<Token> tokens) {
                 output.push_back(operators.top());
                 operators.pop();
                 if (operators.empty()) {
-                    throw SelectionError(
-                        "Mismatched paretheses or additional comma found"
+                    throw selection_error(
+                        "mismatched paretheses or additional comma found"
                     );
                 }
             }
@@ -102,7 +102,7 @@ static std::vector<Token> shunting_yard(std::vector<Token> tokens) {
             }
 
             if (operators.empty() || operators.top().type() != Token::LPAREN) {
-                throw SelectionError("Mismatched parentheses");
+                throw selection_error("mismatched parentheses");
             } else {
                 operators.pop();
             }
@@ -111,7 +111,7 @@ static std::vector<Token> shunting_yard(std::vector<Token> tokens) {
     while (!operators.empty()) {
         if (operators.top().type() == Token::LPAREN ||
             operators.top().type() == Token::RPAREN) {
-            throw SelectionError("Mismatched parentheses");
+            throw selection_error("mismatched parentheses");
         } else {
             output.push_back(operators.top());
             operators.pop();
@@ -172,11 +172,11 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
         case Token::NOT:
             return parse<NotExpr>(begin, end);
         default:
-            throw SelectionError("Unknown boolean operator. This is a bug.");
+            unreachable();
         }
     } else if (begin->is_binary_op()) {
         if ((end - begin) < 3 || begin[2].type() != Token::IDENT) {
-            throw SelectionError("Bad binary operation around " + begin->str());
+            throw selection_error("bad binary operation around {}", begin->str());
         }
 
         auto ident = begin[2].ident();
@@ -197,7 +197,7 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
         } else if (ident == "vx" || ident == "vy" || ident == "vz") {
             return parse<VelocityExpr>(begin, end);
         } else {
-            throw SelectionError("Unknown operation: " + ident);
+            throw selection_error("unknown operation '{}'", ident);
         }
     } else if (begin->is_ident()) {
         auto ident = begin->ident();
@@ -206,10 +206,10 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
         } else if (ident == "none") {
             return parse<NoneExpr>(begin, end);
         } else {
-            throw SelectionError("Unknown operation: " + ident);
+            throw selection_error("unknown operation '{}'", ident);
         }
     } else {
-        throw SelectionError("Could not parse the selection");
+        throw selection_error("could not parse the selection");
     }
 }
 
@@ -222,7 +222,7 @@ Ast selections::parse(std::vector<Token> tokens) {
     auto ast = dispatch_parsing(begin, end);
 
     if (begin != end) {
-        throw SelectionError("Could not parse the end of the selection.");
+        throw selection_error("could not parse the end of the selection");
     }
 
     return ast;

@@ -6,16 +6,26 @@
 
 #include <vector>
 #include <string>
-#include <cassert>
 
 #include <netcdf.h>
+
 #include "chemfiles/File.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 
 namespace chemfiles {
 
 class NcFile;
 
 namespace nc {
+    /// Check for netcdf return `status`. This will throw a `FileError` with the
+    /// given `message` in case of error.
+    template <typename... Args>
+    inline void check(int status, const char *format, const Args & ... arguments) {
+        if (status != NC_NOERR) {
+            throw file_error("{}: {}", fmt::format(format, arguments...), nc_strerror(status));
+        }
+    }
+
     /// Maximum lenght for strings in variables
     const size_t STRING_MAXLEN = 10;
 
@@ -26,10 +36,6 @@ namespace nc {
     using count_t = std::vector<size_t>;
     /// Get the number of elements in a NetCDF hyperslab with `count` elements.
     size_t hyperslab_size(const count_t& count);
-
-    /// Check for netcdf return `status`. This will throw a `FileError` with the
-    /// given `message` in case of error.
-    void check(int status, const std::string& message);
 
     /// Wrapper around NetCDF variable
     class NcVariable {
@@ -129,7 +135,7 @@ public:
     NcType variable(const std::string& name) {
         auto var_id = nc::netcdf_id_t(-1);
         auto status = nc_inq_varid(file_id_, name.c_str(), &var_id);
-        nc::check(status, "Can not read variable '" + name + "'");
+        nc::check(status, "can not get variable id for '{}", name);
         return NcType(*this, var_id);
     }
 
@@ -151,7 +157,7 @@ public:
             sizeof...(dims), dim_ids.data(),
             &var_id
         );
-        nc::check(status, "Can not add variable '" + name + "'");
+        nc::check(status, "can not add variable '{}'", name);
 
         return NcType(*this, var_id);
     }
@@ -164,7 +170,7 @@ private:
         for (auto& name: dimmensions) {
             auto dim_id = nc::netcdf_id_t(-1);
             auto status = nc_inq_dimid(file_id_, name.c_str(), &dim_id);
-            nc::check(status, "Can not get dimmension '" + name + "'");
+            nc::check(status, "can not get dimmension id for '{}'", name);
             dim_ids.push_back(dim_id);
         }
         return dim_ids;

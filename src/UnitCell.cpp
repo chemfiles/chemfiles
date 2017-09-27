@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/UnitCell.hpp"
 using namespace chemfiles;
@@ -99,8 +99,9 @@ void UnitCell::raw_matricial(double matrix[3][3]) const {
 void UnitCell::shape(CellShape shape) {
     if (shape == ORTHORHOMBIC) {
         if (!(alpha_ == 90 && beta_ == 90 && gamma_ == 90)) {
-            throw Error("UnitCell type can not be set to ORTHOROMBIC : some"
-                        " angles are not 90°");
+            throw error(
+                "can not be set shape to ORTHOROMBIC: some angles are not 90°"
+            );
         }
     }
     shape_ = shape;
@@ -108,7 +109,7 @@ void UnitCell::shape(CellShape shape) {
 
 void UnitCell::set_a(double val) {
     if (shape_ == INFINITE) {
-        throw Error("Can not set 'a' on infinite cell");
+        throw error("can not set 'a' on infinite cell");
     }
     a_ = val;
     update_matrix();
@@ -116,7 +117,7 @@ void UnitCell::set_a(double val) {
 
 void UnitCell::set_b(double val) {
     if (shape_ == INFINITE) {
-        throw Error("Can not set 'b' on infinite cell");
+        throw error("can not set 'b' on infinite cell");
     }
     b_ = val;
     update_matrix();
@@ -124,7 +125,7 @@ void UnitCell::set_b(double val) {
 
 void UnitCell::set_c(double val) {
     if (shape_ == INFINITE) {
-        throw Error("Can not set 'c' on infinite cell");
+        throw error("can not set 'c' on infinite cell");
     }
     c_ = val;
     update_matrix();
@@ -132,7 +133,7 @@ void UnitCell::set_c(double val) {
 
 void UnitCell::set_alpha(double val) {
     if (shape_ != TRICLINIC) {
-        throw Error("Can not set 'alpha' on non triclinic cell");
+        throw error("can not set 'alpha' on non triclinic cell");
     }
     alpha_ = val;
     update_matrix();
@@ -140,7 +141,7 @@ void UnitCell::set_alpha(double val) {
 
 void UnitCell::set_beta(double val) {
     if (shape_ != TRICLINIC) {
-        throw Error("Can not set 'beta' on non triclinic cell");
+        throw error("can not set 'beta' on non triclinic cell");
     }
     beta_ = val;
     update_matrix();
@@ -148,7 +149,7 @@ void UnitCell::set_beta(double val) {
 
 void UnitCell::set_gamma(double val) {
     if (shape_ != TRICLINIC) {
-        throw Error("Can not set 'gamma' on non triclinic cell");
+        throw error("can not set 'gamma' on non triclinic cell");
     }
     gamma_ = val;
     update_matrix();

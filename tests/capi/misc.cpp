@@ -12,7 +12,7 @@
 static std::string generate_chemfiles_error() {
     // Generate a log event
     CHECK_FALSE(chfl_trajectory_open("noformat", 'r'));
-    return "Can not find a format associated with the '' extension.";
+    return "file at 'noformat' do not have an extension, provide a format name to read it";
 }
 
 TEST_CASE("Errors") {

@@ -6,7 +6,7 @@
 
 #include "chemfiles/formats/PDB.hpp"
 
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/utils.hpp"
@@ -46,7 +46,7 @@ PDBFormat::PDBFormat(const std::string& path, File::Mode mode): file_(TextFile::
     while (!file_->eof()) {
         auto position = file_->tellg();
         if (!file_ || position == std::streampos(-1)) {
-            throw FormatError("Error while reading '" + path + "' as PDB");
+            throw format_error("IO error while reading '{}' as PDB", path);
         }
         if (forward(*file_)) {
             steps_positions_.push_back(position);
@@ -104,7 +104,7 @@ end:
 void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
     assert(line.substr(0, 6) == "CRYST1");
     if (line.length() < 54) {
-        throw FormatError("CRYST1 record is too small: '" + line + "'");
+        throw format_error("CRYST1 record '{}' is too small", line);
     }
     try {
         auto a = std::stof(line.substr(6, 9));
@@ -117,7 +117,7 @@ void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
 
         frame.set_cell(cell);
     } catch (std::invalid_argument&) {
-        throw FormatError("Could not read CRYST1 record: '" + line + "'");
+        throw format_error("could not read CRYST1 record '{}'", line);
     }
 
     if (line.length() >= 55) {
@@ -135,8 +135,8 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line) {
     assert(line.substr(0, 6) == "ATOM  " || line.substr(0, 6) == "HETATM");
 
     if (line.length() < 54) {
-        throw FormatError(
-            line.substr(0, 6) + " record is too small: '" + line + "'"
+        throw format_error(
+            "{} record is too small: '{}'", line.substr(0, 6), line
         );
     }
 
@@ -152,7 +152,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line) {
 
         frame.add_atom(std::move(atom), {{x, y, z}});
     } catch (std::invalid_argument&) {
-        throw FormatError("Could not read positions in record: '" + line + "'");
+        throw format_error("could not read positions in '{}'", line);
     }
 
     auto atom_id = frame.natoms() - 1;
@@ -191,9 +191,7 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
             // PDB indexing is 1-based, and chemfiles is 0-based
             return std::stoul(line.substr(initial, 5)) - 1;
         } catch (std::invalid_argument&) {
-            throw FormatError(
-                "Could not read atomic number at index " + std::to_string(initial) + " in : '" + trim(line) + "'"
-            );
+            throw format_error("could not read atomic number in '{}'", line);
         }
     };
 
@@ -374,8 +372,8 @@ void check_values_size(const Vector3D& values, unsigned width, const std::string
     double max_neg = -std::pow(10.0, width - 1) + 1;
     if (values[0] > max_pos || values[1] > max_pos || values[2] > max_pos ||
         values[0] < max_neg || values[1] < max_neg || values[2] < max_neg) {
-        throw FormatError(
-            "Value in " + context + " is too big for representation in PDB format"
+        throw format_error(
+            "value in {} is too big for representation in PDB format", context
         );
     }
 }

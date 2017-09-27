@@ -6,6 +6,7 @@
 #include "chemfiles/capi/residue.h"
 #include "chemfiles/capi.hpp"
 
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/Topology.hpp"
 using namespace chemfiles;
@@ -28,9 +29,9 @@ extern "C" CHFL_RESIDUE* chfl_residue_from_topology(const CHFL_TOPOLOGY* const t
     CHFL_ERROR_GOTO(
         // Return NULL if the index is out of bounds
         if (i >= topology->residues().size()) {
-            throw MemoryError(
-                "Out of bounds residue index " + std::to_string(i) +
-                ". Last residue is " + std::to_string(topology->residues().size()) + "."
+            throw out_of_bounds(
+                "out of bounds residue index in `chfl_residue_from_topology`: we have {} residues, but the index is {}",
+                topology->residues().size(), i
             );
         }
         residue = new Residue(topology->residues()[checked_cast(i)]);
