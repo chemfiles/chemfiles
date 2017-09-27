@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <numeric>
 
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/utils.hpp"
 using namespace chemfiles;
 
@@ -38,13 +38,13 @@ static Context get_context(const std::string& string, std::string& selection) {
         } else if (context == "dihedrals") {
             return Context::DIHEDRAL;
         } else {
-            throw SelectionError(
-                "Unknown selection context '" + context + "' in \"" + string + "\""
+            throw selection_error(
+                "unknown selection context '{}' in '{}'", context, string
             );
         }
     } else {
-        throw SelectionError(
-            "Can not get selection context in \"" + string + "\", too many ':'"
+        throw selection_error(
+            "can not get selection context in '{}': too many ':'", string
         );
     }
 }
@@ -63,6 +63,7 @@ static unsigned max_variable(Context context) {
     case Context::FOUR:
         return 4;
     }
+    unreachable();
 }
 
 Selection::~Selection() = default;
@@ -77,9 +78,9 @@ Selection::Selection(const std::string& selection)
     for (auto& token: tokens) {
         if (token.type() == selections::Token::VARIABLE) {
             if (token.variable() > max_variable(context_)) {
-                throw SelectionError(
-                    "Variable index " + std::to_string(token.variable()) +
-                    "is too big for the current context"
+                throw selection_error(
+                    "variable index {} is too big for the is too big for the current context",
+                    token.variable()
                 );
             }
         }
@@ -106,7 +107,7 @@ size_t Selection::size() const {
 
 std::vector<size_t> Selection::list(const Frame& frame) const {
     if (size() != 1) {
-        throw SelectionError("Can not call `list` on a multiple selection");
+        throw selection_error("can not call `Selection::list` on a multiple selection");
     }
     auto matches = evaluate(frame);
     auto res = std::vector<size_t>(matches.size());

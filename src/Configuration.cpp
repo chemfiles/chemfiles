@@ -5,7 +5,7 @@
 #include <toml.hpp>
 
 #include "chemfiles/Configuration.hpp"
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/generic.hpp"
 using namespace chemfiles;
@@ -35,8 +35,8 @@ void Configuration::read_configuration(std::string path) {
     try {
         data = toml::parse(path);
     } catch (const toml::exception& e) {
-        throw ConfigurationError(
-            "configuration file is invalid TOML: " + std::string(e.what())
+        throw configuration_error(
+            "configuration file at '{}' is invalid TOML: {}", path, e.what()
         );
     }
 
@@ -45,8 +45,9 @@ void Configuration::read_configuration(std::string path) {
         for (auto& entry: rename) {
             auto old_name = entry.first;
             if (entry.second.type() != toml::value_t::String) {
-                throw ConfigurationError(
-                    "type for " + old_name + " must be a string"
+                throw configuration_error(
+                    "invalid configuration file at '{}': type for {} must be a string",
+                    path, old_name
                 );
             }
             auto new_name = toml::get<std::string>(entry.second);
@@ -59,7 +60,7 @@ void Configuration::add_configuration(const std::string& path) {
     if (std::ifstream(path)) {
         instance().read_configuration(path);
     } else {
-        throw ConfigurationError("Can not open configuration file " + path);
+        throw configuration_error("Can not open configuration file at {}", path);
     }
 }
 

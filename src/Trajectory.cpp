@@ -4,20 +4,23 @@
 #include "chemfiles/Trajectory.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Configuration.hpp"
 #include "chemfiles/FormatFactory.hpp"
 
 using namespace chemfiles;
 
-//! Get the extension part of a filename. Filename is assumed to be valid here.
+//! Get the extension part of a filename.
 static std::string extension(const std::string& filename) {
     auto idx = filename.rfind('.');
 
     if (idx != std::string::npos) {
         return filename.substr(idx);
     } else {
-        return "";
+        throw file_error(
+            "file at '{}' do not have an extension, provide a format name to read it",
+            filename
+        );
     }
 }
 
@@ -33,9 +36,7 @@ static File::Mode char_to_file_mode(char mode) {
     case 'W':
         return File::WRITE;
     default:
-        throw FileError(
-            "Got an unknown file mode '" + std::to_string(mode) + "'"
-        );
+        throw file_error("unknown file mode '{}'", mode);
     }
 }
 
@@ -62,14 +63,14 @@ Trajectory& Trajectory::operator=(Trajectory&&) = default;
 
 void Trajectory::pre_read(size_t step) {
     if (step >= nsteps_) {
-        throw FileError(
-            "Can not read file '" + path_ + "' at step " +
-            std::to_string(step) + ". Max step is " + std::to_string(nsteps_) + "."
+        throw file_error(
+            "can not read file '{}' at step {}: maximal step is {}",
+            path_, step, nsteps_
         );
     }
     if (!(mode_ == File::READ || mode_ == File::APPEND)) {
-        throw FileError(
-            "File '" + path_ + "' was not openened in read or append mode."
+        throw file_error(
+            "the file at '{}' was not openened in read or append mode", path_
         );
     }
 }
@@ -113,8 +114,8 @@ Frame Trajectory::read_step(const size_t step) {
 
 void Trajectory::write(const Frame& frame) {
     if (!(mode_ == File::WRITE || mode_ == File::APPEND)) {
-        throw FileError(
-            "File '" + path_ + "' was not openened in write or append mode."
+        throw file_error(
+            "the file at '{}' was not openened in write or append mode", path_
         );
     }
 

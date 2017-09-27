@@ -16,9 +16,10 @@ void warning(std::string message);
 /// Create a message using the given `format` and `arguments`, and send a
 /// warning with this message.
 ///
-/// `format` and `arguments` will be used to construct a string using [fmtlib].
+/// `format` and `arguments` will be used to construct a string using the [fmt]
+/// library.
 ///
-/// [fmtlib]: https://github.com/fmtlib/fmt
+/// [fmt]: https://github.com/fmtlib/fmt
 template<typename... Args>
 void warning(const char* format, Args const&... arguments) {
     warning(fmt::format(format, arguments...));

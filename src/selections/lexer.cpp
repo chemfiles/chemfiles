@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/selections/lexer.hpp"
 
@@ -85,7 +85,7 @@ unsigned Token::precedence() const {
     case NUMBER:
     case VARIABLE:
     case COMMA:
-        throw SelectionError("Invalid case in Token::precedence");
+        throw selection_error("invalid case in Token::precedence");
     }
     unreachable();
 }
@@ -169,21 +169,19 @@ std::vector<Token> selections::tokenize(const std::string& input) {
             continue;
         } else if (word == "#") {
             if (i == splited.size() - 1) {
-                throw SelectionError("Missing value after '#'");
+                throw selection_error("missing value after '#'");
             }
             // Get the next word and try to parse a number out of it
             word = splited[++i];
             try {
                 int data = std::stoi(word);
                 if (data > UINT8_MAX) {
-                    throw SelectionError(
-                        "Variable index is too big: " + std::to_string(data)
-                    );
+                    throw selection_error("variable index #{} is too big for uint8_t", data);
                 }
                 tokens.emplace_back(Token::variable(static_cast<uint8_t>(data)));
                 continue;
             } catch (const std::exception&) {
-                throw SelectionError("Could not parse number in: '" + word + "'");
+                throw selection_error("could not parse number in '{}'", word);
             }
         } else if (is_identifier(word)) {
             if (word == "or") {
@@ -203,7 +201,7 @@ std::vector<Token> selections::tokenize(const std::string& input) {
             tokens.emplace_back(Token::number(string2double(word)));
             continue;
         } else {
-            throw SelectionError("Could not parse '" + word + "' in: '" + input + "'");
+            throw selection_error("could not parse '{}' in '{}'", word, input);
         }
     }
     return tokens;

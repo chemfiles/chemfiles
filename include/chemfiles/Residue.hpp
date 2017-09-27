@@ -73,6 +73,10 @@ inline bool operator==(const Residue& lhs, const Residue& rhs) {
            );
 }
 
+inline bool operator!=(const Residue& lhs, const Residue& rhs) {
+    return !(lhs == rhs);
+}
+
 } // namespace chemfiles
 
 #endif

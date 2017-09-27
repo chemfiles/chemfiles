@@ -2,6 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include "chemfiles/FormatFactory.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 
 #include "chemfiles/formats/Molfile.hpp"
 #include "chemfiles/formats/AmberNetCDF.hpp"
@@ -63,15 +64,15 @@ FormatFactory& FormatFactory::get() {
 
 format_creator_t FormatFactory::name(const std::string& name) {
     if (formats_.find(name) == formats_.end()) {
-        throw FormatError("Can not find the " + name + " format.");
+        throw format_error("can not find a format named '{}'", name);
     }
     return formats_.at(name);
 }
 
 format_creator_t FormatFactory::extension(const std::string& extension) {
     if (extensions_.find(extension) == extensions_.end()) {
-        throw FormatError(
-            "Can not find a format associated with the '" + extension + "' extension."
+        throw format_error(
+            "can not find a format associated with the '{}' extension.", extension
         );
     }
     return extensions_.at(extension);

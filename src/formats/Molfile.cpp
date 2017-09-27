@@ -9,7 +9,7 @@
 #include "chemfiles/formats/Molfile.hpp"
 
 #include "chemfiles/Frame.hpp"
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/warnings.hpp"
 #include "chemfiles/Topology.hpp"
 using namespace chemfiles;
@@ -75,14 +75,14 @@ template <MolfileFormat F>
 Molfile<F>::Molfile(const std::string& path, File::Mode mode)
     : path_(path), plugin_handle_(nullptr), file_handle_(nullptr), natoms_(0) {
     if (mode != File::READ) {
-        throw FormatError(
-            "VMD Molfile plugin is only available in read mode."
+        throw format_error(
+            "molfiles based format {} is only available in read mode", plugin_data_.format()
         );
     }
 
     if (plugin_data_.init()) {
-        throw FormatError(
-            "Could not initialize the " + plugin_data_.format() + " plugin."
+        throw format_error(
+            "could not initialize the {} plugin", plugin_data_.format()
         );
     }
 
@@ -90,8 +90,8 @@ Molfile<F>::Molfile(const std::string& path, File::Mode mode)
     // The first argument in 'register_fun' is passed as the first argument to
     // register_plugin ...
     if (plugin_data_.registration(&reginfo, register_plugin<F>)) {
-        throw FormatError(
-            "Could not register the " + plugin_data_.format() + " plugin."
+        throw format_error(
+            "could not register the {} plugin", plugin_data_.format()
         );
     }
     plugin_handle_ = reginfo.plugin;
@@ -105,8 +105,8 @@ Molfile<F>::Molfile(const std::string& path, File::Mode mode)
     if ((plugin_handle_->open_file_read == nullptr) ||
         (plugin_handle_->read_next_timestep == nullptr) ||
         (plugin_handle_->close_file_read == nullptr)) {
-        throw FormatError(
-            "The " + plugin_data_.format() + " plugin does not have read capacities"
+        throw format_error(
+            "the {} plugin does not have read capacities", plugin_data_.format()
         );
     }
 
@@ -115,8 +115,8 @@ Molfile<F>::Molfile(const std::string& path, File::Mode mode)
     );
 
     if (file_handle_ == nullptr) {
-        throw FileError(
-            "Could not open the file: " + path + " with VMD molfile"
+        throw format_error(
+            "could not open the file at '{}' with {} plugin", path, plugin_data_.format()
         );
     }
 
@@ -143,9 +143,9 @@ template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
 
     int status = plugin_handle_->read_next_timestep(file_handle_, natoms_, &timestep);
     if (status != MOLFILE_SUCCESS) {
-        throw FormatError(
-            "Error while reading the file " + path_ + " with VMD molfile " +
-            plugin_data_.format() + " reader"
+        throw format_error(
+            "error while reading the file at '{}' with {} plugin",
+            path_, plugin_data_.format()
         );
     }
 
@@ -212,7 +212,9 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
     int optflags = 0;
     int status = plugin_handle_->read_structure(file_handle_, &optflags, atoms.data());
     if (status != MOLFILE_SUCCESS) {
-        throw FormatError("Error while reading atomic names.");
+        throw format_error(
+            "could not read atomic names with {} plugin", plugin_data_.format()
+        );
     }
 
     topology_ = Topology();
@@ -253,7 +255,9 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
         file_handle_, &nbonds, &from, &to, &_float, &_int, &dummy, &_char
     );
     if (status != MOLFILE_SUCCESS) {
-        throw FormatError("Error while reading bonds.");
+        throw format_error(
+            "could not read bonds with {} plugin", plugin_data_.format()
+        );
     }
 
     for (size_t i = 0; i < static_cast<size_t>(nbonds); i++) {

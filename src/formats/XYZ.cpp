@@ -9,7 +9,7 @@
 
 #include "chemfiles/formats/XYZ.hpp"
 
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Frame.hpp"
 
@@ -23,7 +23,7 @@ XYZFormat::XYZFormat(const std::string& path, File::Mode mode): file_(TextFile::
     while (!file_->eof()) {
         auto position = file_->tellg();
         if (!file_ || position == std::streampos(-1)) {
-            throw FormatError("Error while reading '" + path + "' as XYZ");
+            throw format_error("IO error while reading '{}' as XYZ", path);
         }
         if (forward(*file_)) {
             steps_positions_.push_back(position);
@@ -48,14 +48,14 @@ void XYZFormat::read(Frame& frame) {
         natoms = std::stoul(file_->readline());
         file_->readline(); // XYZ comment line;
     } catch (const std::exception& e) {
-        throw FormatError("Can not read next step: " + std::string(e.what()));
+        throw format_error("can not read next step as XYZ: {}", e.what());
     }
 
     std::vector<std::string> lines;
     try {
         lines = file_->readlines(natoms);
     } catch (const FileError& e) {
-        throw FormatError("Can not read file: " + std::string(e.what()));
+        throw format_error("can not read file: {}", e.what());
     }
 
     frame.reserve(natoms);
@@ -113,8 +113,8 @@ bool forward(TextFile& file) {
     }
 
     if (natoms < 0) {
-        throw FormatError(
-            "Number of atoms can not be negative in '" + file.filename()
+        throw format_error(
+            "Number of atoms can not be negative in '{}'", file.filename()
         );
     }
 
@@ -122,8 +122,8 @@ bool forward(TextFile& file) {
         file.readlines(static_cast<size_t>(natoms) + 1);
     } catch (const FileError&) {
         // We could not read the lines from the file
-        throw FormatError(
-            "Not enough lines in '" + file.filename() + "' for XYZ format"
+        throw format_error(
+            "Not enough lines in '{}' for XYZ format", file.filename()
         );
     }
     return true;

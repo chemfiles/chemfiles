@@ -4,7 +4,7 @@
 #include <cmath>
 #include <functional>
 
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/selections/expr.hpp"
 #include "chemfiles/warnings.hpp"
 
@@ -103,8 +103,8 @@ Ast parse<TypeExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin[2].ident() == "type");
     if (!begin[1].is_ident() ||
         !(begin[0].type() == Token::EQ || begin[0].type() == Token::NEQ)) {
-        throw SelectionError(
-            "Atomic type selection must follow the pattern: 'type == {type} | type != {type}'"
+        throw selection_error(
+            "atomic type selection must follow the pattern: 'type == <type> | type != <type>'"
         );
     }
     auto equals = (begin[0].type() == Token::EQ);
@@ -137,8 +137,9 @@ Ast parse<NameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin[2].ident() == "name");
     if (!begin[1].is_ident() ||
         !(begin[0].type() == Token::EQ || begin[0].type() == Token::NEQ)) {
-        throw SelectionError("Name selection must follow the pattern: 'name == "
-                             "{name} | name != {name}'");
+        throw selection_error(
+            "name selection must follow the pattern: 'name == <name> | name != <name>'"
+        );
     }
     auto equals = (begin[0].type() == Token::EQ);
     auto element = begin[1].ident();
@@ -176,8 +177,8 @@ Ast parse<ResnameExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin[2].ident() == "resname");
     if (!begin[1].is_ident() ||
         !(begin[0].type() == Token::EQ || begin[0].type() == Token::NEQ)) {
-        throw SelectionError(
-            "Residue name selection must follow the pattern: 'resname == {name} | resname != {name}'"
+        throw selection_error(
+            "residue name selection must follow the pattern: 'resname == <name> | resname != <name>'"
         );
     }
     auto equals = (begin[0].type() == Token::EQ);
@@ -221,10 +222,10 @@ Ast parse<ResidExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     if (begin[1].is_number()) {
         auto num = begin[1].number();
         if (ceil(num) != num) {
-            throw SelectionError("Residue index selection should contain an integer");
+            throw selection_error("residue index selection should contain an integer");
         }
     } else {
-        throw SelectionError("Residue index selection should contain an integer");
+        throw selection_error("residue index selection should contain an integer");
     }
     auto val = static_cast<std::size_t>(begin[1].number());
     if (end - begin >= 4 && begin[3].is_variable()) {
@@ -261,8 +262,8 @@ Ast parse<PositionExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     auto coord = Coordinate(begin[2].ident());
     auto op = BinOp(begin[0].type());
     if (!begin[1].is_number()) {
-        throw SelectionError(
-            "Position selection can only contain number as criterium.");
+        throw selection_error(
+            "position selection can only contain number as criterium.");
     }
     auto val = begin[1].number();
     if (end - begin >= 4 && begin[3].is_variable()) {
@@ -304,8 +305,8 @@ Ast parse<VelocityExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     auto coord = Coordinate(begin[2].ident().substr(1));
     auto op = BinOp(begin[0].type());
     if (!begin[1].is_number()) {
-        throw SelectionError(
-            "Veclocity selection can only contain number as criterium.");
+        throw selection_error(
+            "veclocity selection can only contain number as criterium.");
     }
     auto val = begin[1].number();
     if (end - begin >= 4 && begin[3].is_variable()) {
@@ -340,10 +341,10 @@ Ast parse<IndexExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     if (begin[1].is_number()) {
         auto num = begin[1].number();
         if (ceil(num) != num) {
-            throw SelectionError("Index selection should contain an integer");
+            throw selection_error("index selection should contain an integer");
         }
     } else {
-        throw SelectionError("Index selection should contain an integer");
+        throw selection_error("index selection should contain an integer");
     }
     auto val = static_cast<std::size_t>(begin[1].number());
     if (end - begin >= 4 && begin[3].is_variable()) {
@@ -376,7 +377,7 @@ Ast parse<MassExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin[0].is_binary_op());
 
     if (!begin[1].is_number()) {
-        throw SelectionError("Mass selection should contain a number");
+        throw selection_error("mass selection should contain a number");
     }
 
     auto op = BinOp(begin[0].type());
@@ -407,30 +408,14 @@ Ast parse<AndExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin[0].type() == Token::AND);
     begin += 1;
     if (begin == end) {
-        throw SelectionError("Missing right-hand side operand to 'and'");
+        throw selection_error("missing right-hand side operand to 'and'");
     }
-
-    Ast rhs = nullptr;
-    try {
-        rhs = dispatch_parsing(begin, end);
-    } catch (const SelectionError& e) {
-        throw SelectionError(
-            std::string("Error in right-hand side operand to 'and': ") +
-            e.what());
-    }
+    auto rhs = dispatch_parsing(begin, end);
 
     if (begin == end) {
-        throw SelectionError("Missing left-hand side operand to 'and'");
+        throw selection_error("missing left-hand side operand to 'and'");
     }
-
-    Ast lhs = nullptr;
-    try {
-        lhs = dispatch_parsing(begin, end);
-    } catch (const SelectionError& e) {
-        throw SelectionError(
-            std::string("Error in left-hand side operand to 'and': ") +
-            e.what());
-    }
+    auto lhs = dispatch_parsing(begin, end);
     return Ast(new AndExpr(std::move(lhs), std::move(rhs)));
 }
 
@@ -450,31 +435,14 @@ Ast parse<OrExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin[0].type() == Token::OR);
     begin += 1;
     if (begin == end) {
-        throw SelectionError("Missing right-hand side operand to 'or'");
+        throw selection_error("missing right-hand side operand to 'or'");
     }
-
-    Ast rhs = nullptr;
-    try {
-        rhs = dispatch_parsing(begin, end);
-    } catch (const SelectionError& e) {
-        throw SelectionError(
-            std::string("Error in right-hand side operand to 'or': ") +
-            e.what());
-    }
+    auto rhs = dispatch_parsing(begin, end);
 
     if (begin == end) {
-        throw SelectionError("Missing left-hand side operand to 'or'");
+        throw selection_error("missing left-hand side operand to 'or'");
     }
-
-    Ast lhs = nullptr;
-    try {
-        lhs = dispatch_parsing(begin, end);
-    } catch (const SelectionError& e) {
-        throw SelectionError(
-            std::string("Error in left-hand side operand to 'or': ") +
-            e.what()
-        );
-    }
+    auto lhs = dispatch_parsing(begin, end);
     return Ast(new OrExpr(std::move(lhs), std::move(rhs)));
 }
 
@@ -493,18 +461,9 @@ Ast parse<NotExpr>(token_iterator_t& begin, const token_iterator_t& end) {
     assert(begin[0].type() == Token::NOT);
     begin += 1;
     if (begin == end) {
-        throw SelectionError("Missing operand to 'not'");
+        throw selection_error("missing operand to 'not'");
     }
-
-    Ast ast = nullptr;
-    try {
-        ast = dispatch_parsing(begin, end);
-    } catch (const SelectionError& e) {
-        throw SelectionError(
-            std::string("Error in operand of 'not': ") + e.what()
-        );
-    }
-
+    auto ast = dispatch_parsing(begin, end);
     return Ast(new NotExpr(std::move(ast)));
 }
 

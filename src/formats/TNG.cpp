@@ -5,7 +5,7 @@
 #include "chemfiles/files/TNGFile.hpp"
 
 #include "chemfiles/Frame.hpp"
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 using namespace chemfiles;
 
 /// A buffer for TNG allocated data. It will not allocate its own memory, but
@@ -91,8 +91,8 @@ void TNGFormat::read_velocities(Frame& frame) {
         // No velocity in this frame
         return;
     case TNG_CRITICAL:
-        throw FormatError(
-            "Fatal error in the TNG library while calling 'tng_util_vel_read_range'"
+        throw format_error(
+            "fatal error in the TNG library while calling 'tng_util_vel_read_range'"
         );
     }
 
@@ -122,8 +122,8 @@ void TNGFormat::read_cell(Frame& frame) {
         frame.set_cell(UnitCell());
         return;
     case TNG_CRITICAL:
-        throw FormatError(
-            "Fatal error in the TNG library while calling 'tng_util_box_shape_read_range'"
+        throw format_error(
+            "fatal error in the TNG library while calling 'tng_util_box_shape_read_range'"
         );
     }
 

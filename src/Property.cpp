@@ -2,6 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include "chemfiles/Property.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/utils.hpp"
 using namespace chemfiles;
 
@@ -9,8 +10,8 @@ bool Property::as_bool() const {
     if (kind_ == BOOL) {
         return bool_;
     } else {
-        throw PropertyError(
-            "Tried to use 'as_bool' on a " + kind_as_string() + " property"
+        throw property_error(
+            "can not call 'as_bool' on a {} property", kind_as_string()
         );
     }
 }
@@ -19,8 +20,8 @@ double Property::as_double() const {
     if (kind_ == DOUBLE) {
         return double_;
     } else {
-        throw PropertyError(
-            "Tried to use 'as_double' on a " + kind_as_string() + " property"
+        throw property_error(
+            "can not call 'as_double' on a {} property", kind_as_string()
         );
     }
 }
@@ -29,8 +30,8 @@ Vector3D Property::as_vector3d() const {
     if (kind_ == VECTOR3D) {
         return vector3d_;
     } else {
-        throw PropertyError(
-            "Tried to use 'as_vector3d' on a " + kind_as_string() + " property"
+        throw property_error(
+            "can not call 'as_vector3d' on a {} property", kind_as_string()
         );
     }
 }
@@ -39,8 +40,8 @@ const std::string& Property::as_string() const {
     if (kind_ == STRING) {
         return string_;
     } else {
-        throw PropertyError(
-            "Tried to use 'as_string' on a " + kind_as_string() + " property"
+        throw property_error(
+            "can not call 'as_string' on a {} property", kind_as_string()
         );
     }
 }

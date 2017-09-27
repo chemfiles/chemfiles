@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Frame.hpp"
 using namespace chemfiles;
 
@@ -60,15 +60,15 @@ void Frame::guess_topology() {
     for (size_t i = 0; i < natoms(); i++) {
         auto i_radius = topology_[i].vdw_radius();
         if (!i_radius) {
-            throw Error(
-                "Missing Van der Waals radius for '" + topology_[i].type() + "'"
+            throw error(
+                "Missing Van der Waals radius for '{}'", topology_[i].type()
             );
         }
         for (size_t j = i + 1; j < natoms(); j++) {
             auto j_radius = topology_[j].vdw_radius();
             if (!j_radius) {
-                throw Error(
-                    "Missing Van der Waals radius for '" + topology_[j].type() + "'"
+                throw error(
+                    "Missing Van der Waals radius for '{}'", topology_[j].type()
                 );
             }
             auto d = norm(cell_.wrap(positions_[i] - positions_[j]));
@@ -109,11 +109,11 @@ void Frame::guess_topology() {
 }
 
 void Frame::set_topology(const Topology& topology) {
-    if (topology.natoms() != positions_.size()) {
-        throw Error("the topology contains " +
-                    std::to_string(topology.natoms()) +
-                    " atoms, but the frame contains " +
-                    std::to_string(positions_.size()) + " atoms.");
+    if (topology.natoms() != natoms()) {
+        throw error(
+            "The topology contains {} atoms, but the frame contains {} atoms.",
+            topology.natoms(), natoms()
+        );
     }
     topology_ = topology;
 }
@@ -129,9 +129,9 @@ void Frame::add_atom(Atom atom, Vector3D position, Vector3D velocity) {
 
 void Frame::remove(size_t i) {
     if (i >= natoms()) {
-        throw OutOfBounds(
-            "out of bounds atomic index in `Frame::remove`: we have " +
-            std::to_string(natoms()) + " atoms, but the index is " + std::to_string(i)
+        throw out_of_bounds(
+            "out of bounds atomic index in `Frame::remove`: we have {} atoms, but the index is {}",
+            natoms(), i
         );
     }
     topology_.remove(i);
@@ -144,10 +144,9 @@ void Frame::remove(size_t i) {
 
 double Frame::distance(size_t i, size_t j) const {
     if (i >= natoms() || j >= natoms()) {
-        throw OutOfBounds(
-            "out of bounds atomic index in `Frame::distance`: we have " +
-            std::to_string(natoms()) + " atoms, but the indexes are " +
-            std::to_string(i) + " and " + std::to_string(j)
+        throw out_of_bounds(
+            "out of bounds atomic index in `Frame::distance`: we have {} atoms, but the index are {} and {}",
+            natoms(), i, j
         );
     }
 
@@ -157,10 +156,9 @@ double Frame::distance(size_t i, size_t j) const {
 
 double Frame::angle(size_t i, size_t j, size_t k) const {
     if (i >= natoms() || j >= natoms() || k >= natoms()) {
-        throw OutOfBounds(
-            "out of bounds atomic index in `Frame::angle`: we have " +
-            std::to_string(natoms()) + " atoms, but the indexes are " +
-            std::to_string(i) + ", " + std::to_string(j) + " and " + std::to_string(k)
+        throw out_of_bounds(
+            "out of bounds atomic index in `Frame::angle`: we have {} atoms, but the index are {}, {}, and {}",
+            natoms(), i, j, k
         );
     }
 
@@ -174,11 +172,9 @@ double Frame::angle(size_t i, size_t j, size_t k) const {
 
 double Frame::dihedral(size_t i, size_t j, size_t k, size_t m) const {
     if (i >= natoms() || j >= natoms() || k >= natoms() || m >= natoms()) {
-        throw OutOfBounds(
-            "out of bounds atomic index in `Frame::dihedral`: we have " +
-            std::to_string(natoms()) + " atoms, but the indexes are " +
-            std::to_string(i) + ", " + std::to_string(j) + ", " + std::to_string(k) +
-            " and " + std::to_string(m)
+        throw out_of_bounds(
+            "out of bounds atomic index in `Frame::dihedral`: we have {} atoms, but the index are {}, {}, {}, and {}",
+            natoms(), i, j, k, m
         );
     }
 

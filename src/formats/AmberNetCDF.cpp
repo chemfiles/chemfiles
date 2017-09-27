@@ -3,7 +3,7 @@
 
 #include "chemfiles/formats/AmberNetCDF.hpp"
 
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/warnings.hpp"
 using namespace chemfiles;
@@ -49,7 +49,7 @@ AmberNetCDFFormat::AmberNetCDFFormat(const std::string& path, File::Mode mode)
     : file_(path, mode), step_(0), validated_(false) {
     if (file_.mode() == File::READ || file_.mode() == File::APPEND) {
         if (!is_valid(file_, static_cast<size_t>(-1))) {
-            throw FormatError("Invalid AMBER NetCDF file " + file_.filename());
+            throw format_error("invalid AMBER NetCDF file at '{}'", file_.filename());
         }
         validated_ = true;
     }
