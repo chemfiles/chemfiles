@@ -14,9 +14,6 @@
 /// The full version of chemfiles, as a string
 #define CHEMFILES_VERSION "@CHEMFILES_VERSION@"
 
-// Include the export definitions
-#include "chemfiles/exports.hpp"
-
 // clang-format on
 
 #endif

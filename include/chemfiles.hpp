@@ -5,9 +5,11 @@
 #define CHEMFILES_HPP
 
 #include "chemfiles/config.hpp"
-
+#include "chemfiles/exports.hpp"
 #include "chemfiles/generic.hpp"
+
 #include "chemfiles/Error.hpp"
+#include "chemfiles/Property.hpp"
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Topology.hpp"
