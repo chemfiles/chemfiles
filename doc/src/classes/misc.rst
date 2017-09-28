@@ -1,6 +1,19 @@
 Miscelaneous classes and functions
 ==================================
 
+Basic types
+-----------
+
+.. doxygenclass:: chemfiles::Vector3D
+    :members:
+
+.. doxygenfunction:: chemfiles::dot
+
+.. doxygenfunction:: chemfiles::cross
+
+.. doxygenclass:: chemfiles::Matrix3D
+    :members:
+
 Errors handling
 ---------------
 
@@ -16,8 +29,7 @@ any pertinent way.
     int main() {
         try {
             chemfiles::Trajectory file("filename.xyz");
-            chemfiles::Frame frame;
-            file.read(frame);
+            auto frame = file.read();
             auto positions = frame.positions();
             // Do something here
         } catch (const chemfiles::Error& e) {

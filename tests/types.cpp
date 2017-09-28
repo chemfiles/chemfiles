@@ -120,5 +120,7 @@ TEST_CASE("Matrix3"){
 
         auto I = Matrix3D(1, 1, 1);
         CHECK((A * B) == I);
+
+        CHECK_THROWS_AS(Matrix3D().invert(), Error);
     }
 }
