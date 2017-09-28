@@ -18,10 +18,11 @@ information about the systems you're simulating, to convert files from one
 format to another, or to write trajectories with your own simulation software.
 
 This repository contains the core of the Chemfiles library — a programmer
-interface written in C++11. If you want a ready-to-use programs for trajectory
-analysis, use [cfiles](https://github.com/chemfiles/cfiles). You can also use
-Chemfiles from other languages; [go here](https://github.com/chemfiles/) to view
-all related repositories.
+interface written in C++11, with a C99 interface. If you want a ready-to-use 
+programs for trajectory analysis, use [cfiles](https://github.com/chemfiles/cfiles).
+You can also use Chemfiles from other languages: [Python 2&3](https://github.com/chemfiles/chemfiles.py),
+[Fortran](https://github.com/chemfiles/chemfiles.f03), [Rust](https://github.com/chemfiles/chemfiles.rs),
+and [Julia](https://github.com/chemfiles/chemfiles.jl).
 
 ## Is Chemfiles for You?
 
@@ -36,7 +37,6 @@ any of these apply to your use case:
 - you write analysis algorithms and want to read more than one trajectory
   format;
 - you write simulation software and want to use more than one format for input or output.
-- you need
 
 There are [other libraries](http://chemfiles.org/chemfiles/latest/others.html)
 doing the roughly the same job as Chemfiles, have a look at them if Chemfiles is
