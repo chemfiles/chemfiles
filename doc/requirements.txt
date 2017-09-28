@@ -1,3 +1,3 @@
 sphinx >1.6
-https://github.com/chemfiles/breathe/archive/v4.6.0-chemfiles.zip
+breathe >4.7
 sphinx_bootstrap_theme
