@@ -18,8 +18,14 @@ static char to_lower(char c) {
 
 static optional<const ElementData&> find_element(const std::string& name) {
     std::map<std::string, ElementData>::const_iterator periodic;
-    if (name.length() == 2) {
-        auto normalized = name;
+    std::string normalized;
+    if (name.length() == 1) {
+        normalized = name;
+        normalized[0] = to_upper(normalized[0]);
+
+        periodic = PERIODIC_INFORMATION.find(normalized);
+    } else if (name.length() == 2) {
+        normalized = name;
         normalized[0] = to_upper(normalized[0]);
         normalized[1] = to_lower(normalized[1]);
 
@@ -27,6 +33,7 @@ static optional<const ElementData&> find_element(const std::string& name) {
     } else {
         periodic = PERIODIC_INFORMATION.find(name);
     }
+
     if (periodic != PERIODIC_INFORMATION.end()) {
         return periodic->second;
     } else {

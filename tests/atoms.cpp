@@ -93,6 +93,12 @@ TEST_CASE("Use the Atom type"){
         CHECK(atom.full_name().value() == "Zinc");
         CHECK(atom.covalent_radius().value() == 1.31);
         CHECK(atom.vdw_radius().value() == 2.1);
+
+        atom = Atom("c");
+        CHECK(atom.atomic_number().value() == 6);
+        CHECK(atom.full_name().value() == "Carbon");
+        CHECK(atom.covalent_radius().value() == 0.77);
+        CHECK(atom.vdw_radius().value() == 1.7);
     }
 
     SECTION("Property map") {
