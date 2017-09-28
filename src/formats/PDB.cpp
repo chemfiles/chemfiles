@@ -150,7 +150,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line) {
         auto y = std::stof(line.substr(38, 8));
         auto z = std::stof(line.substr(46, 8));
 
-        frame.add_atom(std::move(atom), {{x, y, z}});
+        frame.add_atom(std::move(atom), Vector3D(x, y, z));
     } catch (std::invalid_argument&) {
         throw format_error("could not read positions in '{}'", line);
     }
@@ -276,7 +276,7 @@ static std::string to_pdb_index(uint64_t i) {
 
 void PDBFormat::write(const Frame& frame) {
     auto& cell = frame.cell();
-    check_values_size({{cell.a(), cell.b(), cell.c()}}, 9, "cell lengths");
+    check_values_size(Vector3D(cell.a(), cell.b(), cell.c()), 9, "cell lengths");
     fmt::print(
         *file_,
         // Do not try to guess the space group and the z value, just use the

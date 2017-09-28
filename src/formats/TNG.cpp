@@ -127,13 +127,13 @@ void TNGFormat::read_cell(Frame& frame) {
         );
     }
 
-    auto a = vector3d(buffer[0], buffer[1], buffer[2]);
-    auto b = vector3d(buffer[3], buffer[4], buffer[5]);
-    auto c = vector3d(buffer[6], buffer[7], buffer[8]);
+    auto a = Vector3D(buffer[0], buffer[1], buffer[2]);
+    auto b = Vector3D(buffer[3], buffer[4], buffer[5]);
+    auto c = Vector3D(buffer[6], buffer[7], buffer[8]);
 
     auto angle = [](const Vector3D& u, const Vector3D& v) {
         constexpr double PI = 3.141592653589793238463;
-        auto cos = dot(u, v) / (norm(u) * norm(v));
+        auto cos = dot(u, v) / (u.norm() * v.norm());
         cos = std::max(-1., std::min(1., cos));
         return acos(cos) * 180.0 / PI;
     };
@@ -144,7 +144,7 @@ void TNGFormat::read_cell(Frame& frame) {
 
     auto cell = UnitCell(
         // Factor 10 because the cell lengthes are in nm in the TNG format
-        norm(a) * 10, norm(b) * 10, norm(c) * 10, alpha, beta, gamma
+        a.norm() * 10, b.norm() * 10, c.norm() * 10, alpha, beta, gamma
     );
     frame.set_cell(std::move(cell));
 }

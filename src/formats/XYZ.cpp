@@ -69,7 +69,7 @@ void XYZFormat::read(Frame& frame) {
         string_stream.str(lines[i]);
         string_stream >> name >> x >> y >> z;
 
-        frame.add_atom(Atom(name), {{x, y, z}});
+        frame.add_atom(Atom(name), Vector3D(x, y, z));
     }
 }
 

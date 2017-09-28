@@ -39,13 +39,13 @@ TEST_CASE("Frame size") {
     REQUIRE(frame.velocities());
     CHECK(frame.velocities()->size() == 2);
 
-    frame.add_atom(Atom("H"), vector3d(1, 2, 3), vector3d(4, 5, 6));
+    frame.add_atom(Atom("H"), Vector3D(1, 2, 3), Vector3D(4, 5, 6));
     CHECK(frame.natoms() == 3);
     CHECK(frame.positions().size() == 3);
-    CHECK(frame.positions()[2] == vector3d(1, 2, 3));
+    CHECK(frame.positions()[2] == Vector3D(1, 2, 3));
     REQUIRE(frame.velocities());
     CHECK(frame.velocities()->size() == 3);
-    CHECK((*frame.velocities())[2] == vector3d(4, 5, 6));
+    CHECK((*frame.velocities())[2] == Vector3D(4, 5, 6));
 
     frame.remove(0);
     CHECK(frame.natoms() == 2);
@@ -58,27 +58,27 @@ TEST_CASE("Frame size") {
 TEST_CASE("Positions and velocities") {
     auto frame = Frame(15);
 
-    frame.positions()[0] = vector3d(1, 2, 3);
-    CHECK(frame.positions()[0] == vector3d(1, 2, 3));
+    frame.positions()[0] = Vector3D(1, 2, 3);
+    CHECK(frame.positions()[0] == Vector3D(1, 2, 3));
 
     frame.add_velocities();
-    (*frame.velocities())[0] = vector3d(5, 6, 7);
-    CHECK((*frame.velocities())[0] == vector3d(5, 6, 7));
+    (*frame.velocities())[0] = Vector3D(5, 6, 7);
+    CHECK((*frame.velocities())[0] == Vector3D(5, 6, 7));
 
     {
         auto positions = frame.positions();
         auto velocities = frame.velocities();
         for (size_t i=0; i<15; i++) {
-            positions[i] = vector3d(4.0, 3.4, 1.0);
-            (*velocities)[i] = vector3d(4.0, 3.4, 1.0);
+            positions[i] = Vector3D(4.0, 3.4, 1.0);
+            (*velocities)[i] = Vector3D(4.0, 3.4, 1.0);
         }
     }
 
     auto positions = frame.positions();
     auto velocities = frame.velocities();
     for (size_t i=0; i<10; i++){
-        CHECK(positions[i] == vector3d(4.0, 3.4, 1.0));
-        CHECK((*velocities)[i] == vector3d(4.0, 3.4, 1.0));
+        CHECK(positions[i] == Vector3D(4.0, 3.4, 1.0));
+        CHECK((*velocities)[i] == Vector3D(4.0, 3.4, 1.0));
     }
 }
 
@@ -99,10 +99,10 @@ TEST_CASE("Unit cell") {
 TEST_CASE("Guess topology") {
     SECTION("Simple case") {
         auto frame = Frame();
-        frame.add_atom(Atom("H"), {{0, 1, 0}});
-        frame.add_atom(Atom("O"), {{0, 0, 0}});
-        frame.add_atom(Atom("O"), {{1.5, 0, 0}});
-        frame.add_atom(Atom("H"), {{1.5, 1, 0}});
+        frame.add_atom(Atom("H"), {0, 1, 0});
+        frame.add_atom(Atom("O"), {0, 0, 0});
+        frame.add_atom(Atom("O"), {1.5, 0, 0});
+        frame.add_atom(Atom("H"), {1.5, 1, 0});
         frame.guess_topology();
 
         auto bonds = std::vector<Bond>{{0, 1}, {1, 2}, {2, 3}};
@@ -139,9 +139,9 @@ TEST_CASE("Guess topology") {
 
     SECTION("Cleanup supplementaty H-H bonds") {
         auto frame = Frame();
-        frame.add_atom(Atom("O"), {{0, 0, 0}});
-        frame.add_atom(Atom("H"), {{0.2, 0.8, 0}});
-        frame.add_atom(Atom("H"), {{-0.2, 0.8, 0}});
+        frame.add_atom(Atom("O"), {0, 0, 0});
+        frame.add_atom(Atom("H"), {0.2, 0.8, 0});
+        frame.add_atom(Atom("H"), {-0.2, 0.8, 0});
 
         frame.guess_topology();
         CHECK(frame.topology().bonds() == (std::vector<Bond>{{0, 1}, {0, 2}}));
@@ -150,9 +150,9 @@ TEST_CASE("Guess topology") {
     // Weird geometries
     SECTION("Triangle molecule") {
         auto frame = Frame();
-        frame.add_atom(Atom("C"), {{0, 1, 0}});
-        frame.add_atom(Atom("C"), {{0.5, 0, 0}});
-        frame.add_atom(Atom("C"), {{-0.5, 0, 0}});
+        frame.add_atom(Atom("C"), {0, 1, 0});
+        frame.add_atom(Atom("C"), {0.5, 0, 0});
+        frame.add_atom(Atom("C"), {-0.5, 0, 0});
 
         frame.guess_topology();
         CHECK(frame.topology().bonds() == (std::vector<Bond>{{0, 1}, {0, 2}, {1, 2}}));
@@ -163,10 +163,10 @@ TEST_CASE("Guess topology") {
     // Weird geometries
     SECTION("Square molecule") {
         auto frame = Frame();
-        frame.add_atom(Atom("C"), {{0, 0, 0}});
-        frame.add_atom(Atom("C"), {{1.5, 0, 0}});
-        frame.add_atom(Atom("C"), {{1.5, 1.5, 0}});
-        frame.add_atom(Atom("C"), {{0, 1.5, 0}});
+        frame.add_atom(Atom("C"), {0, 0, 0});
+        frame.add_atom(Atom("C"), {1.5, 0, 0});
+        frame.add_atom(Atom("C"), {1.5, 1.5, 0});
+        frame.add_atom(Atom("C"), {0, 1.5, 0});
 
         frame.guess_topology();
         CHECK(frame.topology().bonds() == (std::vector<Bond>{{0, 1}, {0, 3}, {1, 2}, {2, 3}}));
@@ -179,36 +179,36 @@ TEST_CASE("PBC functions") {
     SECTION("Distance") {
         auto frame = Frame();
         frame.set_cell(UnitCell(3.0, 4.0, 5.0));
-        frame.add_atom(Atom(), vector3d(0, 0, 0));
-        frame.add_atom(Atom(), vector3d(1, 2, 6));
+        frame.add_atom(Atom(), Vector3D(0, 0, 0));
+        frame.add_atom(Atom(), Vector3D(1, 2, 6));
 
         CHECK(frame.distance(0, 1) == sqrt(6.0));
     }
 
     SECTION("Angles") {
         auto frame = Frame();
-        frame.add_atom(Atom(), vector3d(1, 0, 0));
-        frame.add_atom(Atom(), vector3d(0, 0, 0));
-        frame.add_atom(Atom(), vector3d(0, 1, 0));
+        frame.add_atom(Atom(), Vector3D(1, 0, 0));
+        frame.add_atom(Atom(), Vector3D(0, 0, 0));
+        frame.add_atom(Atom(), Vector3D(0, 1, 0));
         CHECK(roughly(frame.angle(0, 1, 2), PI / 2.0));
 
-        frame.add_atom(Atom(), vector3d(cos(1.877), sin(1.877), 0));
+        frame.add_atom(Atom(), Vector3D(cos(1.877), sin(1.877), 0));
         CHECK(roughly(frame.angle(0, 1, 3), 1.877));
     }
 
     SECTION("Dihedrals") {
         auto frame = Frame();
-        frame.add_atom(Atom(), vector3d(0, 0, 0));
-        frame.add_atom(Atom(), vector3d(1, 0, 0));
-        frame.add_atom(Atom(), vector3d(1, 1, 0));
-        frame.add_atom(Atom(), vector3d(2, 1, 0));
+        frame.add_atom(Atom(), Vector3D(0, 0, 0));
+        frame.add_atom(Atom(), Vector3D(1, 0, 0));
+        frame.add_atom(Atom(), Vector3D(1, 1, 0));
+        frame.add_atom(Atom(), Vector3D(2, 1, 0));
 
         CHECK(roughly(frame.dihedral(0, 1, 2, 3), PI));
 
-        frame.add_atom(Atom(), vector3d(1.241, 0.444, 0.349));
-        frame.add_atom(Atom(), vector3d(-0.011, -0.441, 0.333));
-        frame.add_atom(Atom(), vector3d(-1.176, 0.296, -0.332));
-        frame.add_atom(Atom(), vector3d(-1.396, 1.211, 0.219));
+        frame.add_atom(Atom(), Vector3D(1.241, 0.444, 0.349));
+        frame.add_atom(Atom(), Vector3D(-0.011, -0.441, 0.333));
+        frame.add_atom(Atom(), Vector3D(-1.176, 0.296, -0.332));
+        frame.add_atom(Atom(), Vector3D(-1.396, 1.211, 0.219));
 
         CHECK(roughly(frame.dihedral(4, 5, 6, 7), 1.045378962606));
     }

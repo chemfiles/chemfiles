@@ -43,7 +43,7 @@ error:
 extern "C" CHFL_PROPERTY* chfl_property_vector3d(const chfl_vector3d value) {
     CHFL_PROPERTY* property = nullptr;
     CHFL_ERROR_GOTO(
-        property = new Property(vector3d(value[0], value[1], value[2]));
+        property = new Property(vector3d(value));
     )
     return property;
 error:

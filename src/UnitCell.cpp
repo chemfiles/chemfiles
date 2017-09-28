@@ -86,9 +86,9 @@ void UnitCell::update_matrix() {
 
     // Do not try to invert a cell with a 0 volume
     if (volume() == 0.0) {
-        h_inv_ = matrix3d();
+        h_inv_ = Matrix3D();
     } else {
-        h_inv_ = invert(h_);
+        h_inv_ = h_.invert();
     }
 }
 
@@ -157,11 +157,11 @@ void UnitCell::set_gamma(double val) {
 
 // Wrap a vector in an Orthorombic UnitCell
 Vector3D UnitCell::wrap_orthorombic(const Vector3D& vect) const {
-    return {{
+    return Vector3D(
         vect[0] - round(vect[0] / a_) * a_,
         vect[1] - round(vect[1] / b_) * b_,
         vect[2] - round(vect[2] / c_) * c_
-    }};
+    );
 }
 
 // Wrap a vector in an Orthorombic UnitCell

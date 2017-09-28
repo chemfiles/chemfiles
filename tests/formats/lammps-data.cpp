@@ -21,9 +21,9 @@ TEST_CASE("Read files in LAMMPS data format") {
         CHECK(frame.cell().c() == 163.03599500000001);
 
         auto positions = frame.positions();
-        CHECK(positions[0] == vector3d(4.253000, 12.759000, 63.506001));
-        CHECK(positions[364] == vector3d(8.134000, 2.322000, 82.219002));
-        CHECK(positions[653] == vector3d(6.184000, 8.134000, 104.334000));
+        CHECK(positions[0] == Vector3D(4.253000, 12.759000, 63.506001));
+        CHECK(positions[364] == Vector3D(8.134000, 2.322000, 82.219002));
+        CHECK(positions[653] == Vector3D(6.184000, 8.134000, 104.334000));
 
         auto& topology = frame.topology();
         CHECK(topology.bonds().size() == 6248);
@@ -38,9 +38,9 @@ TEST_CASE("Read files in LAMMPS data format") {
         // Check the read_step function
         frame = file.read_step(0);
         positions = frame.positions();
-        CHECK(positions[0] == vector3d(4.253000, 12.759000, 63.506001));
-        CHECK(positions[364] == vector3d(8.134000, 2.322000, 82.219002));
-        CHECK(positions[653] == vector3d(6.184000, 8.134000, 104.334000));
+        CHECK(positions[0] == Vector3D(4.253000, 12.759000, 63.506001));
+        CHECK(positions[364] == Vector3D(8.134000, 2.322000, 82.219002));
+        CHECK(positions[653] == Vector3D(6.184000, 8.134000, 104.334000));
     }
 
     SECTION("File created with LAMMPS") {
@@ -51,15 +51,15 @@ TEST_CASE("Read files in LAMMPS data format") {
         CHECK(frame.cell() == UnitCell(31.064449134, 31.064449134, 1.0));
 
         auto positions = frame.positions();
-        CHECK(positions[0] == vector3d(-15.5322, -15.5322, 0.0));
-        CHECK(positions[22] == vector3d(-9.31933, -9.31933, 0.0));
+        CHECK(positions[0] == Vector3D(-15.5322, -15.5322, 0.0));
+        CHECK(positions[22] == Vector3D(-9.31933, -9.31933, 0.0));
 
         REQUIRE(frame.velocities());
         auto velocities = *frame.velocities();
-        CHECK(velocities[5] == vector3d(1.14438145745, 4.42784814304, 1.75516442452));
-        CHECK(velocities[0] == vector3d(1.02255489961, 2.92322463726, 4.88805110017));
-        CHECK(velocities[1] == vector3d(0.111646059519, 0.474226666855, 0.68604865644));
-        CHECK(velocities[42] == vector3d(4.70147770939, 2.13317266836, 1.29333445263));
+        CHECK(velocities[5] == Vector3D(1.14438145745, 4.42784814304, 1.75516442452));
+        CHECK(velocities[0] == Vector3D(1.02255489961, 2.92322463726, 4.88805110017));
+        CHECK(velocities[1] == Vector3D(0.111646059519, 0.474226666855, 0.68604865644));
+        CHECK(velocities[42] == Vector3D(4.70147770939, 2.13317266836, 1.29333445263));
 
         auto& topology = frame.topology();
         CHECK(topology.bonds().size() == 0);

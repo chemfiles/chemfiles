@@ -65,10 +65,10 @@ void AmberNetCDFFormat::read_step(const size_t step, Frame& frame) {
     frame.set_cell(read_cell());
 
     frame.resize(file_.dimension("atom"));
-    read_array3D(frame.positions(), "coordinates");
+    read_array(frame.positions(), "coordinates");
     if (file_.variable_exists("velocities")) {
         frame.add_velocities();
-        read_array3D(*frame.velocities(), "velocities");
+        read_array(*frame.velocities(), "velocities");
     }
 }
 
@@ -103,7 +103,7 @@ UnitCell AmberNetCDFFormat::read_cell() {
     return UnitCell(length[0], length[1], length[2], angles[0], angles[1], angles[2]);
 }
 
-void AmberNetCDFFormat::read_array3D(Span3D array, const std::string& name) {
+void AmberNetCDFFormat::read_array(span<Vector3D> array, const std::string& name) {
     auto array_var = file_.variable<nc::NcFloat>(name);
     auto natoms = file_.dimension("atom");
     assert(array.size() == natoms);
@@ -173,16 +173,16 @@ void AmberNetCDFFormat::write(const Frame& frame) {
         validated_ = true;
     }
     write_cell(frame.cell());
-    write_array3D(frame.positions(), "coordinates");
+    write_array(frame.positions(), "coordinates");
     auto velocities = frame.velocities();
     if (velocities) {
-        write_array3D(*velocities, "velocities");
+        write_array(*velocities, "velocities");
     }
 
     step_++;
 }
 
-void AmberNetCDFFormat::write_array3D(const Array3D& array, const std::string& name) {
+void AmberNetCDFFormat::write_array(const std::vector<Vector3D>& array, const std::string& name) {
     auto var = file_.variable<nc::NcFloat>(name);
     auto natoms = array.size();
     std::vector<size_t> start{step_, 0, 0};
