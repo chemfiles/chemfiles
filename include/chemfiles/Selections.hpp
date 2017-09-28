@@ -18,7 +18,7 @@ namespace selections {
 
 /// A match is a set of atomic indexes matching a given selection. The size of
 /// a match depends on the associated selection, and can vary from 1 to 4.
-class Match {
+class Match final {
 public:
     /// Maximal number of atoms in a match
     static constexpr size_t MAX_MATCH_SIZE = 4;
@@ -87,7 +87,7 @@ enum class Context {
 /// operation follows the `<selector>[(<variable>)] <operator> <value>` structure,
 /// where `<operator>` is a comparison operator in `== != < <= > >=`. Refer to
 /// the full documentation to know the allowed selectors and how to use them.
-class CHFL_EXPORT Selection {
+class CHFL_EXPORT Selection final {
 public:
     /// Create a selection using the given string.
     ///

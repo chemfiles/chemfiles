@@ -32,7 +32,7 @@ enum MolfileFormat {
 
 /// A thin wrapper around the vmd plugin functions
 template <MolfileFormat F>
-struct MolfilePluginData {
+struct MolfilePluginData final {
     /// Function to initialize the plugin
     int init();
     /// Function to register the plugin.

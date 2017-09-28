@@ -23,7 +23,7 @@ namespace chemfiles {
 /// computed automaticaly.
 ///
 /// Iterating over a `Topology` will yield the atoms in the system.
-class CHFL_EXPORT Topology {
+class CHFL_EXPORT Topology final {
 public:
     using iterator = std::vector<Atom>::iterator;
     using const_iterator = std::vector<Atom>::const_iterator;

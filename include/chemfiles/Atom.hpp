@@ -24,7 +24,7 @@ namespace chemfiles {
 /// The atom name is usually an unique identifier ("H1", "C_a") while the atom
 /// type will be shared between all particles of the same type: "H", "Ow",
 /// "CH3".
-class CHFL_EXPORT Atom {
+class CHFL_EXPORT Atom final {
 public:
     /// Create an atom with the given `name` and set the atom `type` to be the
     /// same as `name`.

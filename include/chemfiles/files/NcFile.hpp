@@ -60,7 +60,7 @@ namespace nc {
         netcdf_id_t var_id_;
     };
 
-    class NcFloat: public NcVariable {
+    class NcFloat final: public NcVariable {
     public:
         NcFloat(NcFile& file, netcdf_id_t var) : NcVariable(file, var) {}
         /// Get `count` values starting at `start` from this variable
@@ -69,7 +69,7 @@ namespace nc {
         void add(count_t start, count_t count, std::vector<float> data);
     };
 
-    class NcChar: public NcVariable {
+    class NcChar final: public NcVariable {
     public:
         NcChar(NcFile& file, netcdf_id_t var) : NcVariable(file, var) {}
         /// Put a single string of data in this variable

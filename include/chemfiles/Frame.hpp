@@ -27,7 +27,7 @@ namespace chemfiles {
 /// * `topology` is empty, and contains no data.
 ///
 /// [std::optional]: http://en.cppreference.com/w/cpp/optional
-class CHFL_EXPORT Frame {
+class CHFL_EXPORT Frame final {
 public:
     /// Default constructor
     Frame();

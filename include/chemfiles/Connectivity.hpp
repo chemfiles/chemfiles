@@ -14,7 +14,7 @@ namespace chemfiles {
 
 /// The `Bond` struct ensure a canonical representation of a bond between atoms
 /// i and j, with i<j
-struct CHFL_EXPORT Bond {
+struct CHFL_EXPORT Bond final {
     Bond(size_t i, size_t j);
     Bond(Bond&&) = default;
     Bond& operator=(Bond&&) = default;
@@ -63,7 +63,7 @@ inline bool operator>=(const Bond& lhs, const Bond& rhs) {
 
 /// The `Angle` struct ensure a canonical representation of an angle between the
 /// atoms i, j and k, with i < k
-struct CHFL_EXPORT Angle {
+struct CHFL_EXPORT Angle final {
     Angle(size_t i, size_t j, size_t k);
     Angle(Angle&&) = default;
     Angle& operator=(Angle&&) = default;
@@ -113,7 +113,7 @@ inline bool operator>=(const Angle& lhs, const Angle& rhs) {
 
 /// The `Dihedral` struct ensure a canonical representation of a dihedral angle
 /// between the atoms i, j, k and m, with max(i, j) < max(k, m))
-struct CHFL_EXPORT Dihedral {
+struct CHFL_EXPORT Dihedral final {
     Dihedral(size_t i, size_t j, size_t k, size_t m);
     Dihedral(Dihedral&&) = default;
     Dihedral& operator=(Dihedral&&) = default;
@@ -164,7 +164,7 @@ inline bool operator>=(const Dihedral& lhs, const Dihedral& rhs) {
 /// The `Improper` struct ensure a canonical representation of an improper
 /// dihedral angle centered around the atom j, which is linked to i, k, and m.
 /// i, k, and m are sorted to ensure the canonical representation
-struct CHFL_EXPORT Improper {
+struct CHFL_EXPORT Improper final {
     Improper(size_t i, size_t j, size_t k, size_t m);
     Improper(Improper&&) = default;
     Improper& operator=(Improper&&) = default;
@@ -216,7 +216,7 @@ inline bool operator>=(const Improper& lhs, const Improper& rhs) {
 /// in the system. The `recalculate` function should be called when bonds are
 /// added or removed. The `bonds` set is the main source of information, all the
 /// other data are cached from it.
-class Connectivity {
+class Connectivity final {
 public:
     Connectivity() = default;
     /// Get the bonds in this connectivity

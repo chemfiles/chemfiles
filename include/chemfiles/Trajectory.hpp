@@ -21,7 +21,7 @@ class Format;
 /// A `Trajectory` is made with a `File` and a `Format`. The `File` implements
 /// all the physical operations, while the `Format` provides a way to interpret
 /// the file.
-class CHFL_EXPORT Trajectory {
+class CHFL_EXPORT Trajectory final {
 public:
 
     /// Open a file, automatically gessing the file format and type from the

@@ -29,7 +29,7 @@ namespace chemfiles {
 /// |  0    b_y   c_y |
 /// |  0     0    c_z |
 /// ```
-class CHFL_EXPORT UnitCell {
+class CHFL_EXPORT UnitCell final {
 public:
     /// Possible shapes for the unit cell
     enum CellShape {
