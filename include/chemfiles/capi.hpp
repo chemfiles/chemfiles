@@ -5,17 +5,24 @@
 #define CHEMFILES_CAPI_ERRORS_H
 
 #include "chemfiles/capi/types.h"
-#include "chemfiles/Error.hpp"
 #include "chemfiles/warnings.hpp"
+#include "chemfiles/types.hpp"
+
+#include "chemfiles/Error.hpp"
 
 namespace chemfiles {
-    extern std::string CAPI_LAST_ERROR;
+
+extern std::string CAPI_LAST_ERROR;
 
 inline size_t checked_cast(uint64_t value) {
     if (static_cast<uint64_t>(value) > static_cast<uint64_t>(SIZE_MAX)) {
         throw chemfiles::Error("Got a value too big to be represented by a size_t on this system");
     }
     return static_cast<size_t>(value);
+}
+
+inline Vector3D vector3d(const chfl_vector3d vector) {
+    return Vector3D(vector[0], vector[1], vector[2]);
 }
 
 #define CATCH_AND_RETURN(exception, retval)                                    \

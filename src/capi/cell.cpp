@@ -144,7 +144,7 @@ extern "C" chfl_status chfl_cell_wrap(const CHFL_CELL* const cell, chfl_vector3d
     CHECK_POINTER(cell);
     CHECK_POINTER(vector);
     CHFL_ERROR_CATCH(
-        auto result = cell->wrap(vector3d(vector[0], vector[1], vector[2]));
+        auto result = cell->wrap(vector3d(vector));
         vector[0] = result[0];
         vector[1] = result[1];
         vector[2] = result[2];

@@ -19,8 +19,8 @@ TEST_CASE("Read files in PDB format"){
 
         CHECK(frame.natoms() == 297);
         auto positions = frame.positions();
-        CHECK(approx_eq(positions[0], vector3d(0.417, 8.303, 11.737), 1e-3));
-        CHECK(approx_eq(positions[296], vector3d(6.664, 11.6148, 12.961), 1e-3));
+        CHECK(approx_eq(positions[0], Vector3D(0.417, 8.303, 11.737), 1e-3));
+        CHECK(approx_eq(positions[296], Vector3D(6.664, 11.6148, 12.961), 1e-3));
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
@@ -31,8 +31,8 @@ TEST_CASE("Read files in PDB format"){
 
         CHECK(frame.natoms() == 297);
         positions = frame.positions();
-        CHECK(approx_eq(positions[0], vector3d(0.299, 8.310, 11.721), 1e-4));
-        CHECK(approx_eq(positions[296], vector3d(6.798, 11.509, 12.704), 1e-4));
+        CHECK(approx_eq(positions[0], Vector3D(0.299, 8.310, 11.721), 1e-4));
+        CHECK(approx_eq(positions[296], Vector3D(6.798, 11.509, 12.704), 1e-4));
     }
 
     SECTION("Read a specific step"){
@@ -41,14 +41,14 @@ TEST_CASE("Read files in PDB format"){
         auto frame = file.read_step(2);
         CHECK(frame.natoms() == 297);
         auto positions = frame.positions();
-        CHECK(approx_eq(positions[0], vector3d(0.299, 8.310, 11.721), 1e-4));
-        CHECK(approx_eq(positions[296], vector3d(6.798, 11.509, 12.704), 1e-4));
+        CHECK(approx_eq(positions[0], Vector3D(0.299, 8.310, 11.721), 1e-4));
+        CHECK(approx_eq(positions[296], Vector3D(6.798, 11.509, 12.704), 1e-4));
 
         frame = file.read_step(0);
         CHECK(frame.natoms() == 297);
         positions = frame.positions();
-        CHECK(approx_eq(positions[0], vector3d(0.417, 8.303, 11.737), 1e-3));
-        CHECK(approx_eq(positions[296], vector3d(6.664, 11.6148, 12.961), 1e-3));
+        CHECK(approx_eq(positions[0], Vector3D(0.417, 8.303, 11.737), 1e-3));
+        CHECK(approx_eq(positions[296], Vector3D(6.664, 11.6148, 12.961), 1e-3));
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
@@ -152,7 +152,7 @@ TEST_CASE("Write files in PDB format") {
 
     auto positions = frame.positions();
     for(size_t i=0; i<4; i++) {
-        positions[i] = vector3d(1, 2, 3);
+        positions[i] = Vector3D(1, 2, 3);
     }
 
     {
@@ -163,7 +163,7 @@ TEST_CASE("Write files in PDB format") {
     frame.resize(7);
     positions = frame.positions();
     for(size_t i=0; i<7; i++)
-        positions[i] = vector3d(4, 5, 6);
+        positions[i] = Vector3D(4, 5, 6);
 
     topology.add_atom(Atom("E"));
     topology.add_atom(Atom("F"));
@@ -207,6 +207,6 @@ TEST_CASE("PDB files with big values") {
     CHECK_THROWS_AS(trajectory.write(frame), FormatError);
 
     frame.set_cell(UnitCell(12));
-    frame.positions()[0] = vector3d(123456789, 2, 3);
+    frame.positions()[0] = Vector3D(123456789, 2, 3);
     CHECK_THROWS_AS(trajectory.write(frame), FormatError);
 }

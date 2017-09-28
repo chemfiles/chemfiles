@@ -4,28 +4,29 @@
 #ifndef CHEMFILES_FRAME_HPP
 #define CHEMFILES_FRAME_HPP
 
+#include "chemfiles/exports.hpp"
+#include "chemfiles/optional.hpp"
 #include "chemfiles/types.hpp"
+#include "chemfiles/span.hpp"
+
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/UnitCell.hpp"
 
-#include "chemfiles/exports.hpp"
-#include "chemfiles/optional.hpp"
-
 namespace chemfiles {
 
-/// A frame contains data from one simulation step
-/// The Frame class holds data from one step of a simulation: the current
-/// topology, the positions, and the velocities of the particles in the system.
-/// If some information is missing (topology or velocity or unit cell), the
-/// corresponding data is filled with a default value. Specifically:
+/// A frame contains data from one simulation step The Frame class holds data
+/// from one step of a simulation: the current topology, the positions, and the
+/// velocities of the particles in the system.  If some information is missing
+/// (topology or velocity or unit cell), the corresponding data is filled with a
+/// default value. Specifically:
 ///
-/// - `velocities` is the `nullopt` version of `optional<Array3D>`. Here,
-///    `optional<T>` refers to the optional template as defined in
-///    [std::experimental::optional][optional]
-/// - `cell` is an infinite unit cell;
-/// - `topology` is empty, and contains no data.
+/// * `velocities` is the `nullopt` version of
+///   `optional<std::vector<Vector3D>>`. Here, `optional<T>` refers to the
+///   [std::optional] class as defined in C++17.
+/// * `cell` is an infinite unit cell;
+/// * `topology` is empty, and contains no data.
 ///
-/// [optional]: http://en.cppreference.com/w/cpp/experimental/optional
+/// [std::optional]: http://en.cppreference.com/w/cpp/optional
 class CHFL_EXPORT Frame {
 public:
     /// Default constructor
@@ -48,17 +49,17 @@ public:
     }
 
     /// Get a modifiable reference to the positions
-    Span3D positions() { return positions_; }
+    span<Vector3D> positions() { return positions_; }
     /// Get a const (non modifiable) reference to the positions
-    const Array3D& positions() const { return positions_; }
+    const std::vector<Vector3D>& positions() const { return positions_; }
 
     /// Get an optional modifiable reference to the velocities
-    optional<Span3D> velocities() {
-        return velocities_ ? optional<Span3D>(as_span(*velocities_))
-                           : optional<Span3D>(nullopt);
+    optional<span<Vector3D>> velocities() {
+        return velocities_ ? optional<span<Vector3D>>(as_span(*velocities_))
+                           : optional<span<Vector3D>>(nullopt);
     }
     /// Get an optional const (non modifiable) reference to the velocities
-    const optional<Array3D>& velocities() const { return velocities_; }
+    const optional<std::vector<Vector3D>>& velocities() const { return velocities_; }
     /// Add velocities to this frame. If velocities are already defined,
     /// this functions does nothing.
     void add_velocities();
@@ -145,9 +146,9 @@ private:
     /// Current simulation step
     size_t step_;
     /// Positions of the particles
-    Array3D positions_;
+    std::vector<Vector3D> positions_;
     /// Velocities of the particles
-    optional<Array3D> velocities_;
+    optional<std::vector<Vector3D>> velocities_;
     /// Topology of the described system
     Topology topology_;
     /// Unit cell of the system

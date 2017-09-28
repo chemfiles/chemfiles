@@ -522,7 +522,7 @@ void LAMMPSDataFormat::read_velocities(Frame& frame) {
         auto vx = string2double(splitted[1]);
         auto vy = string2double(splitted[2]);
         auto vz = string2double(splitted[3]);
-        velocities[id] = vector3d(vx, vy, vz);
+        velocities[id] = Vector3D(vx, vy, vz);
         n++;
     }
 

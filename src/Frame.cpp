@@ -27,9 +27,9 @@ size_t Frame::natoms() const {
 
 void Frame::resize(size_t natoms) {
     topology_.resize(natoms);
-    positions_.resize(natoms, vector3d(0.0, 0.0, 0.0));
+    positions_.resize(natoms);
     if (velocities_) {
-        velocities_->resize(natoms, vector3d(0.0, 0.0, 0.0));
+        velocities_->resize(natoms);
     }
 }
 
@@ -43,7 +43,7 @@ void Frame::reserve(size_t natoms) {
 
 void Frame::add_velocities() {
     if (!velocities_) {
-        velocities_ = Array3D(natoms(), vector3d(0.0, 0.0, 0.0));
+        velocities_ = std::vector<Vector3D>(natoms());
     }
 }
 
@@ -71,7 +71,7 @@ void Frame::guess_topology() {
                     "Missing Van der Waals radius for '{}'", topology_[j].type()
                 );
             }
-            auto d = norm(cell_.wrap(positions_[i] - positions_[j]));
+            auto d = distance(i, j);
             auto radii = i_radius.value() + j_radius.value();
             if (0.03 < d && d < 0.6 * radii && d < cutoff) {
                 topology_.add_bond(i, j);
@@ -151,7 +151,7 @@ double Frame::distance(size_t i, size_t j) const {
     }
 
     auto rij = positions_[i] - positions_[j];
-    return norm(cell_.wrap(rij));
+    return cell_.wrap(rij).norm();
 }
 
 double Frame::angle(size_t i, size_t j, size_t k) const {
@@ -165,7 +165,7 @@ double Frame::angle(size_t i, size_t j, size_t k) const {
     auto rij = cell_.wrap(positions_[i] - positions_[j]);
     auto rkj = cell_.wrap(positions_[k] - positions_[j]);
 
-    auto cos = dot(rij, rkj) / (norm(rij) * norm(rkj));
+    auto cos = dot(rij, rkj) / (rij.norm() * rkj.norm());
     cos = std::max(-1.0, std::min(1.0, cos));
     return acos(cos);
 }
@@ -184,7 +184,7 @@ double Frame::dihedral(size_t i, size_t j, size_t k, size_t m) const {
 
     auto a = cross(rij, rjk);
     auto b = cross(rjk, rkm);
-    return atan2(norm(rjk) * dot(b, rij), dot(a, b));
+    return atan2(rjk.norm() * dot(b, rij), dot(a, b));
 }
 
 void Frame::set(std::string name, Property value) {

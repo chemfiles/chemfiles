@@ -59,7 +59,7 @@ TEST_CASE("Associate a topology and a trajectory"){
         Frame frame(5);
         auto positions = frame.positions();
         for(size_t i=0; i<5; i++) {
-            positions[i] = vector3d(1, 2, 3);
+            positions[i] = Vector3D(1, 2, 3);
         }
 
         Topology topology;
@@ -116,7 +116,7 @@ TEST_CASE("Associate an unit cell and a trajectory") {
         Frame frame(3);
         auto positions = frame.positions();
         for(size_t i=0; i<3; i++) {
-            positions[i] = vector3d(1, 2, 3);
+            positions[i] = Vector3D(1, 2, 3);
         }
 
         {

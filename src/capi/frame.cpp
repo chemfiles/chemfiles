@@ -78,12 +78,10 @@ extern "C" chfl_status chfl_frame_add_atom(
     CHECK_POINTER(atom);
     CHECK_POINTER(position);
     CHFL_ERROR_CATCH(
-        auto pos = vector3d(position[0], position[1], position[2]);
         if (velocity != nullptr) {
-            auto vel = vector3d(velocity[0], velocity[1], velocity[2]);
-            frame->add_atom(*atom, pos, vel);
+            frame->add_atom(*atom, vector3d(position), vector3d(velocity));
         } else {
-            frame->add_atom(*atom, pos);
+            frame->add_atom(*atom, vector3d(position));
         }
     )
 }

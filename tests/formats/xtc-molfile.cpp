@@ -13,7 +13,7 @@ TEST_CASE("Read files in Gromacs .gro format using Molfile"){
 
     CHECK(frame.natoms() == 20455);
     auto positions = frame.positions();
-    CHECK(approx_eq(positions[0], vector3d(24.8277, 24.662, 18.8104), eps));
-    CHECK(approx_eq(positions[1], vector3d(25.5925, 24.9309, 18.208), eps));
-    CHECK(approx_eq(positions[678], vector3d(27.4324, 32.301, 37.6319), eps));
+    CHECK(approx_eq(positions[0], Vector3D(24.8277, 24.662, 18.8104), eps));
+    CHECK(approx_eq(positions[1], Vector3D(25.5925, 24.9309, 18.208), eps));
+    CHECK(approx_eq(positions[678], Vector3D(27.4324, 32.301, 37.6319), eps));
 }

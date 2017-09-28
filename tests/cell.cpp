@@ -135,13 +135,13 @@ TEST_CASE("Use the UnitCell type") {
         UnitCell triclinic_algo(UnitCell::TRICLINIC, 10, 11, 12);
         UnitCell triclinic(10, 11, 12, 90, 90, 80);
         UnitCell tilted(10, 10, 10, 140, 100, 100);
-        auto v = vector3d(22.0, -15.0, 5.8);
+        auto v = Vector3D(22.0, -15.0, 5.8);
 
         CHECK(infinite.wrap(v) == v);
-        CHECK(approx_eq(ortho.wrap(v), vector3d(2.0, -4.0, 5.8), 1e-5));
+        CHECK(approx_eq(ortho.wrap(v), Vector3D(2.0, -4.0, 5.8), 1e-5));
         CHECK(approx_eq(ortho.wrap(v), triclinic_algo.wrap(v), 1e-5));
-        CHECK(approx_eq(triclinic.wrap(v), vector3d(3.91013, -4.16711, 5.8), 1e-5));
-        CHECK(approx_eq(tilted.wrap(vector3d(6, 8, -7)), vector3d(4.26352, -0.08481, -1.37679), 1e-5));
+        CHECK(approx_eq(triclinic.wrap(v), Vector3D(3.91013, -4.16711, 5.8), 1e-5));
+        CHECK(approx_eq(tilted.wrap(Vector3D(6, 8, -7)), Vector3D(4.26352, -0.08481, -1.37679), 1e-5));
     }
 
     SECTION("UnitCell errors") {

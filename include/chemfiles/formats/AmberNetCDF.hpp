@@ -5,6 +5,7 @@
 #define CHEMFILES_FORMAT_NC_HPP
 
 #include "chemfiles/types.hpp"
+#include "chemfiles/span.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/files/NcFile.hpp"
 
@@ -26,15 +27,16 @@ public:
 
     size_t nsteps() override;
 private:
-    /// Read the unit cell at the current internal step, the file is assumed to be valid.
+    /// Read the unit cell at the current internal step, the file is assumed to
+    /// be valid.
     UnitCell read_cell();
-    /// Generic function to read an Array3D at the current internal step,
-    /// the file is assumed to be valid.
-    void read_array3D(Span3D array, const std::string& name);
+    /// Generic function to read an std::vector<Vector3D> at the current
+    /// internal step, the file is assumed to be valid.
+    void read_array(span<Vector3D> array, const std::string& name);
 
-    /// Write an Array3D to the file, as a variable with the name `name`, at
-    /// the current internal step.
-    void write_array3D(const Array3D& array, const std::string& name);
+    /// Write an std::vector<Vector3D> to the file, as a variable with the name
+    /// `name`, at the current internal step.
+    void write_array(const std::vector<Vector3D>& array, const std::string& name);
     /// Write an UnitCell to the file, at the current internal step
     void write_cell(const UnitCell& cell);
 

@@ -110,9 +110,9 @@ TEST_CASE("Property") {
     }
 
     SECTION("Vector3D") {
-        auto property = Property(vector3d(0.0, 1.1, 2.2));
+        auto property = Property(Vector3D(0.0, 1.1, 2.2));
 
-        CHECK(property.as_vector3d() == vector3d(0.0, 1.1, 2.2));
+        CHECK(property.as_vector3d() == Vector3D(0.0, 1.1, 2.2));
         CHECK_THROWS_AS(property.as_bool(), PropertyError);
         CHECK_THROWS_AS(property.as_string(), PropertyError);
         CHECK_THROWS_AS(property.as_double(), PropertyError);
