@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(chemfiles C CXX)
 
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
 cmake_policy(VERSION 2.8.11)
 if (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
     cmake_policy(SET CMP0042 OLD) # OSX RPATH handling
@@ -32,6 +32,9 @@ option(CHFL_CODE_COVERAGE "Enable code coverage" OFF)
 option(CHFL_USE_WARNINGS "Compile the code with warnings (default in debug mode)" OFF)
 option(CHFL_DEBUG_GLIBCXX "Use the debug version of GNU libstdcxx" OFF)
 option(CHFL_SYSTEM_NETCDF "Use the system NetCDF instead of the internal one" OFF)
+
+option(CHFL_BUILD_DOCTESTS "Build documentation tests as well as unit tests." ON)
+mark_as_advanced(CHFL_BUILD_DOCTESTS)
 
 include(CompilerFlags)
 
