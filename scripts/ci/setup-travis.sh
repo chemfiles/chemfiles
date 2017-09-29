@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DCHFL_BUILD_TESTS=ON -DBUILD_SHARED_LIBS=$SHARED_LIBS"
+export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DCHFL_USE_CCACHE=ON -DCHFL_BUILD_TESTS=ON -DBUILD_SHARED_LIBS=$SHARED_LIBS"
 
 if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "gcc" && "$SHARED_LIBS" == "ON" ]]; then
     export DO_COVERAGE_ON_TRAVIS=true
@@ -49,7 +49,7 @@ fi
 
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew update
-    brew install doxygen
+    brew install doxygen ccache
     if [[ "$CC" == "gcc" ]]; then
         brew rm gcc
         brew install gcc@5

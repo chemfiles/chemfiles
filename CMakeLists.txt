@@ -27,6 +27,7 @@ set(CHEMFILES_VERSION_SHORT "${CHEMFILES_VERSION_MAJOR}.${CHEMFILES_VERSION_MINO
 option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
 
 option(CHFL_BUILD_TESTS "Build unit tests." OFF)
+option(CHFL_USE_CCACHE "Use ccache to cache build artifacts." OFF)
 option(CHFL_BUILD_DOCUMENTATION "Build the documentation." OFF)
 option(CHFL_CODE_COVERAGE "Enable code coverage" OFF)
 option(CHFL_USE_WARNINGS "Compile the code with warnings (default in debug mode)" OFF)
@@ -35,6 +36,12 @@ option(CHFL_SYSTEM_NETCDF "Use the system NetCDF instead of the internal one" OF
 
 option(CHFL_BUILD_DOCTESTS "Build documentation tests as well as unit tests." ON)
 mark_as_advanced(CHFL_BUILD_DOCTESTS)
+
+if(CHFL_USE_CCACHE)
+    find_program(ccache REQUIRED)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+endif()
 
 include(CompilerFlags)
 
