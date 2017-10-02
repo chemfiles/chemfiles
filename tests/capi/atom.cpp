@@ -85,6 +85,18 @@ TEST_CASE("chfl_atom") {
         CHECK(radius == 1.31);
 
         CHECK_STATUS(chfl_atom_free(atom));
+
+        atom = chfl_atom("");
+        REQUIRE(atom);
+
+        CHECK_STATUS(chfl_atom_vdw_radius(atom, &radius));
+        CHECK(radius == 0.0);
+
+        radius = 10;
+        CHECK_STATUS(chfl_atom_covalent_radius(atom, &radius));
+        CHECK(radius == 0.0);
+
+        CHECK_STATUS(chfl_atom_free(atom));
     }
 
     SECTION("Number") {
@@ -94,6 +106,14 @@ TEST_CASE("chfl_atom") {
         uint64_t number = 0;
         CHECK_STATUS(chfl_atom_atomic_number(atom, &number));
         CHECK(number == 30);
+
+        CHECK_STATUS(chfl_atom_free(atom));
+
+        atom = chfl_atom("");
+        REQUIRE(atom);
+
+        CHECK_STATUS(chfl_atom_atomic_number(atom, &number));
+        CHECK(number == 0);
 
         CHECK_STATUS(chfl_atom_free(atom));
     }

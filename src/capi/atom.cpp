@@ -169,7 +169,7 @@ extern "C" chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom, uint
     CHECK_POINTER(atom);
     CHECK_POINTER(number);
     CHFL_ERROR_CATCH(
-        *number = atom->atomic_number().value_or(UINT64_MAX);
+        *number = atom->atomic_number().value_or(0ul);
     )
 }
 
