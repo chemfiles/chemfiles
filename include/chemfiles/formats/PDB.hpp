@@ -30,7 +30,7 @@ private:
     // Read CRYST1 record
     void read_CRYST1(Frame& frame, const std::string& line);
     // Read ATOM and HETATM records
-    void read_ATOM(Frame& frame, const std::string& line);
+    void read_ATOM(Frame& frame, const std::string& line, const bool is_hetatm);
     // Read CONECT record
     void read_CONECT(Frame& frame, const std::string& line);
 
