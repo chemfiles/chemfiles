@@ -325,7 +325,7 @@ void PDBFormat::write(const Frame& frame) {
             }
         }
         else {
-            resname = "RES";
+            resname = "X";
             resid = to_pdb_index(max_resid++);
         }
 
