@@ -190,6 +190,8 @@ extern "C" CHFL_PROPERTY* chfl_atom_get_property(const CHFL_ATOM* const atom, co
         auto atom_property = atom->get(name);
         if (atom_property) {
             property = new Property(*atom_property);
+        } else {
+            throw property_error("can not find a property named {} in this atom", name);
         }
     )
     return property;
