@@ -203,8 +203,8 @@ bool ResidExpr::is_match(const Frame& frame, const Match& match) const {
     auto compare = binop_comparison<uint64_t>(op_);
     auto index = match[argument_];
     auto residue = frame.topology().residue(index);
-    if (residue && residue->id() != static_cast<size_t>(-1)) {
-        return compare(residue->id(), id_);
+    if (residue && residue->id()) {
+        return compare(residue->id().value(), id_);
     } else {
         // No residue or residue id for this atom
         return false;

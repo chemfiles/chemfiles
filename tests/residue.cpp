@@ -8,11 +8,11 @@ using namespace chemfiles;
 TEST_CASE("Residue class usage"){
     auto residue = Residue("ALA", 4);
     CHECK(residue.name() == "ALA");
-    CHECK(residue.id() == 4);
+    CHECK(residue.id().value() == 4);
 
     residue = Residue("GUA");
     CHECK(residue.name() == "GUA");
-    CHECK(residue.id() == static_cast<uint64_t>(-1));
+    CHECK_FALSE(residue.id());
 
     CHECK(residue.size() == 0);
     residue.add_atom(0);

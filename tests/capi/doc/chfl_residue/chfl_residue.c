@@ -6,7 +6,7 @@
 
 int main() {
     // [example]
-    CHFL_RESIDUE* residue = chfl_residue("water", 3);
+    CHFL_RESIDUE* residue = chfl_residue("ALA");
 
     if (residue == NULL) {
         /* handle error */

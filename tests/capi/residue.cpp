@@ -7,7 +7,7 @@
 
 TEST_CASE("chfl_residue") {
     SECTION("Name") {
-        CHFL_RESIDUE* residue = chfl_residue("Foo", 0);
+        CHFL_RESIDUE* residue = chfl_residue("Foo");
         REQUIRE(residue);
 
         char name[32] = {0};
@@ -18,7 +18,7 @@ TEST_CASE("chfl_residue") {
     }
 
     SECTION("Id") {
-        CHFL_RESIDUE* residue = chfl_residue("", 5426);
+        CHFL_RESIDUE* residue = chfl_residue_with_id("", 5426);
         REQUIRE(residue);
 
         uint64_t resid = 0;
@@ -26,10 +26,17 @@ TEST_CASE("chfl_residue") {
         CHECK(resid == 5426);
 
         CHECK_STATUS(chfl_residue_free(residue));
+
+        residue = chfl_residue("");
+        REQUIRE(residue);
+
+        CHECK(chfl_residue_id(residue, &resid) == CHFL_GENERIC_ERROR);
+
+        CHECK_STATUS(chfl_residue_free(residue));
     }
 
     SECTION("Atoms") {
-        CHFL_RESIDUE* residue = chfl_residue("", 0);
+        CHFL_RESIDUE* residue = chfl_residue("");
         REQUIRE(residue);
 
         uint64_t size = 10;
@@ -53,7 +60,7 @@ TEST_CASE("chfl_residue") {
     }
 
     SECTION("Topology") {
-        CHFL_RESIDUE* residue = chfl_residue("", 56);
+        CHFL_RESIDUE* residue = chfl_residue_with_id("", 56);
         REQUIRE(residue);
         CHECK_STATUS(chfl_residue_add_atom(residue, 0));
         CHECK_STATUS(chfl_residue_add_atom(residue, 1));

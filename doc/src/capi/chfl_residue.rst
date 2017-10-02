@@ -7,6 +7,8 @@ Function manipulating ``CHFL_RESIDUE``
 
 .. doxygenfunction:: chfl_residue
 
+.. doxygenfunction:: chfl_residue_with_id
+
 .. doxygenfunction:: chfl_residue_for_atom
 
 .. doxygenfunction:: chfl_residue_from_topology
