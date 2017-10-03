@@ -134,7 +134,7 @@ void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
 }
 
 void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
-  const bool is_hetatm) {
+  bool is_hetatm) {
     assert(line.substr(0, 6) == "ATOM  " || line.substr(0, 6) == "HETATM");
 
     if (line.length() < 54) {
@@ -304,7 +304,7 @@ void PDBFormat::write(const Frame& frame) {
         auto& type = frame.topology()[i].type();
         auto& pos = frame.positions()[i];
 
-        std::string atom_hetatm;
+        std::string atom_hetatm = "HETATM";
         auto atom_property = frame.topology()[i].get("is_hetatm");
         if (atom_property) {
           try {
@@ -314,8 +314,9 @@ void PDBFormat::write(const Frame& frame) {
               atom_hetatm = "ATOM  ";
             }
           }
-          catch (...) {
-            atom_hetatm = "HETATM";
+          catch (const PropertyError &e) {
+            warning("\'is_hetatm\' property set to non-bool variable."
+            "Defaulting to HETATM");
           }
         }
 
@@ -357,7 +358,7 @@ void PDBFormat::write(const Frame& frame) {
         // 'resSeq' to be the atomic number.
         fmt::print(
             *file_,
-            "{: <5s} {: >5} {: <4s} {:3} X{: >4s}    {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
+            "{: <5s}{: >5} {: <4s} {:3} X{: >4s}    {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
             atom_hetatm, to_pdb_index(i), name, resname, resid, pos[0], pos[1], pos[2], 1.0, 0.0, type
         );
     }
