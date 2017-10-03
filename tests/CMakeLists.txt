@@ -1,6 +1,6 @@
 
 # Update this value if you need to update the data file set
-set(TESTS_DATA_GIT "881aca3b892cd1a81063ae74dec5a6b32bae07c9")
+set(TESTS_DATA_GIT "49c3b8e063dcc7a88da0a41bbfb91c49290aaf8a")
 
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT}")
     message(STATUS "Downloading test data files")

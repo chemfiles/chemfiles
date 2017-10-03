@@ -18,7 +18,7 @@ static std::string extension(const std::string& filename) {
         return filename.substr(idx);
     } else {
         throw file_error(
-            "file at '{}' do not have an extension, provide a format name to read it",
+            "file at '{}' does not have an extension, provide a format name to read it",
             filename
         );
     }
