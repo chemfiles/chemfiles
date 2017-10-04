@@ -304,7 +304,7 @@ void PDBFormat::write(const Frame& frame) {
         auto& type = frame.topology()[i].type();
         auto& pos = frame.positions()[i];
 
-        std::string atom_hetatm;
+        std::string atom_hetatm = "HETATM";
         auto atom_property = frame.topology()[i].get("is_hetatm");
         if (atom_property) {
           try {
@@ -317,7 +317,6 @@ void PDBFormat::write(const Frame& frame) {
           catch (const PropertyError &e) {
             warning("\'is_hetatm\' property set to non-bool variable."
             "Defaulting to HETATM");
-            atom_hetatm = "HETATM";
           }
         }
 
@@ -364,8 +363,8 @@ void PDBFormat::write(const Frame& frame) {
         // 'resSeq' to be the atomic number.
         fmt::print(
             *file_,
-            "HETATM{: >5} {: <4s} {:3} X{: >4s}    {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
-            to_pdb_index(i), name, resname, resid, pos[0], pos[1], pos[2], 1.0, 0.0, type
+            "{: <6}{: >5} {: <4s} {:3} X{: >4s}    {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
+            atom_hetatm, to_pdb_index(i), name, resname, resid, pos[0], pos[1], pos[2], 1.0, 0.0, type
         );
     }
 
