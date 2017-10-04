@@ -114,10 +114,12 @@ TEST_CASE("Read files in PDB format"){
       Trajectory file("data/pdb/hemo.pdb");
       Frame frame = file.read();
 
-      for (size_t i = 0; i < 73; i++)
+      for (size_t i = 0; i < 73; i++) {
         CHECK(frame.topology()[i].get("is_hetatm")->as_bool());
-      for (size_t i = 73; i < 522; i++)
+      }
+      for (size_t i = 73; i < 522; i++) {
         CHECK(frame.topology()[i].get("is_hetatm")->as_bool() == false);
+      }
 
     }
 }
