@@ -9,7 +9,7 @@ int main() {
     // [example]
     CHFL_TOPOLOGY* topology = chfl_topology();
 
-    CHFL_RESIDUE* residue = chfl_residue("res", 1);
+    CHFL_RESIDUE* residue = chfl_residue("res");
     chfl_topology_add_residue(topology, residue);
     chfl_residue_free(residue);
 

@@ -7,7 +7,7 @@
 
 int main() {
     // [example]
-    CHFL_RESIDUE* residue = chfl_residue("water", 3);
+    CHFL_RESIDUE* residue = chfl_residue_with_id("water", 3);
 
     uint64_t id = 0;
     chfl_residue_id(residue, &id);

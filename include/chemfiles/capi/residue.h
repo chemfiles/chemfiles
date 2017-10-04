@@ -9,9 +9,7 @@
 extern "C" {
 #endif
 
-/// Create a new residue with the given `name` and residue identifier `resid`.
-/// If the residue has no identifier, the special value of `uint64_t(-1)` should
-/// be used.
+/// Create a new residue with the given `name`.
 ///
 /// The caller of this function should free the allocated memory using
 /// `chfl_residue_free`.
@@ -19,7 +17,17 @@ extern "C" {
 /// @example{tests/capi/doc/chfl_residue/chfl_residue.c}
 /// @return A pointer to the residue, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
-CHFL_EXPORT CHFL_RESIDUE* chfl_residue(const char* name, uint64_t resid);
+CHFL_EXPORT CHFL_RESIDUE* chfl_residue(const char* name);
+
+/// Create a new residue with the given `name` and residue identifier `resid`.
+///
+/// The caller of this function should free the allocated memory using
+/// `chfl_residue_free`.
+///
+/// @example{tests/capi/doc/chfl_residue/with_id.c}
+/// @return A pointer to the residue, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
+CHFL_EXPORT CHFL_RESIDUE* chfl_residue_with_id(const char* name, uint64_t resid);
 
 /// Get a copy of the residue at index `i` from a `topology`.
 ///
@@ -76,6 +84,9 @@ CHFL_EXPORT chfl_status chfl_residue_atoms_count(
 
 /// Get the identifier of a `residue` in the initial topology file in the
 /// integer pointed to by `id`.
+///
+/// This function will return `CHFL_GENERIC_ERROR` if this residue does not
+/// have an associated identifier.
 ///
 /// @example{tests/capi/doc/chfl_residue/id.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn

@@ -5,6 +5,7 @@
 #include "chemfiles/capi.hpp"
 
 #include "chemfiles/Frame.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 using namespace chemfiles;
 
 extern "C" CHFL_FRAME* chfl_frame(void) {
@@ -194,6 +195,8 @@ extern "C" CHFL_PROPERTY* chfl_frame_get_property(const CHFL_FRAME* const frame,
         auto atom_property = frame->get(name);
         if (atom_property) {
             property = new Property(*atom_property);
+        } else {
+            throw property_error("can not find a property named {} in this frame", name);
         }
     )
     return property;

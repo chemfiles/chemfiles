@@ -289,8 +289,8 @@ void PDBFormat::write(const Frame& frame) {
     uint64_t max_resid = 0;
     for (const auto& residue: frame.topology().residues()) {
         auto resid = residue.id();
-        if (resid < 10000 && resid > max_resid) {
-            max_resid = resid;
+        if (resid && resid.value() > max_resid) {
+            max_resid = resid.value();
         }
     }
 
@@ -312,15 +312,20 @@ void PDBFormat::write(const Frame& frame) {
                 resname = resname.substr(0, 3);
             }
 
-            if (residue->id() >= 10000) {
-                warning("Too many residues for PDB format, removing residue id");
-                resid = "  -1";
+            if (residue->id()) {
+                auto value = residue->id().value();
+                if (value > 1000) {
+                    warning("Too many residues for PDB format, removing residue id");
+                    resid = "  -1";
+                } else {
+                    resid = std::to_string(residue->id().value());
+                }
             } else {
-                resid = std::to_string(residue->id());
+                resid = "  -1";
             }
         }
         else {
-            resname = "RES";
+            resname = "X";
             resid = to_pdb_index(max_resid++);
         }
 

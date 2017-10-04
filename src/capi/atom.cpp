@@ -169,7 +169,7 @@ extern "C" chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom, uint
     CHECK_POINTER(atom);
     CHECK_POINTER(number);
     CHFL_ERROR_CATCH(
-        *number = atom->atomic_number().value_or(UINT64_MAX);
+        *number = atom->atomic_number().value_or(0ul);
     )
 }
 
@@ -190,6 +190,8 @@ extern "C" CHFL_PROPERTY* chfl_atom_get_property(const CHFL_ATOM* const atom, co
         auto atom_property = atom->get(name);
         if (atom_property) {
             property = new Property(*atom_property);
+        } else {
+            throw property_error("can not find a property named {} in this atom", name);
         }
     )
     return property;

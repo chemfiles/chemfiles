@@ -7,7 +7,7 @@
 
 int main() {
     // [example]
-    CHFL_RESIDUE* residue = chfl_residue("water", 3);
+    CHFL_RESIDUE* residue = chfl_residue("water");
     chfl_residue_add_atom(residue, 0);
     chfl_residue_add_atom(residue, 32);
     chfl_residue_add_atom(residue, 28);

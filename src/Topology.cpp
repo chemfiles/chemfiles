@@ -91,11 +91,9 @@ void Topology::add_residue(Residue residue) {
     for (auto i: residue) {
         auto it = residue_mapping_.find(i);
         if (it != residue_mapping_.end()) {
-            auto resid = residues_[it->second].id();
             throw error(
-                "can not add this residue: atom {} is already in another "
-                "residue (with resid {})",
-                i, resid
+                "can not add this residue: atom {} is already in another residue",
+                i
             );
         }
     }

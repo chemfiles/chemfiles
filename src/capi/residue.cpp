@@ -11,7 +11,19 @@
 #include "chemfiles/Topology.hpp"
 using namespace chemfiles;
 
-extern "C" CHFL_RESIDUE* chfl_residue(const char* name, uint64_t resid) {
+extern "C" CHFL_RESIDUE* chfl_residue(const char* name) {
+    CHFL_RESIDUE* residue = nullptr;
+    CHECK_POINTER_GOTO(name);
+    CHFL_ERROR_GOTO(
+        residue = new Residue(std::string(name));
+    )
+    return residue;
+error:
+    delete residue;
+    return nullptr;
+}
+
+extern "C" CHFL_RESIDUE* chfl_residue_with_id(const char* name, uint64_t resid) {
     CHFL_RESIDUE* residue = nullptr;
     CHECK_POINTER_GOTO(name);
     CHFL_ERROR_GOTO(
@@ -81,7 +93,11 @@ extern "C" chfl_status chfl_residue_id(const CHFL_RESIDUE* const residue, uint64
     CHECK_POINTER(residue);
     CHECK_POINTER(id);
     CHFL_ERROR_CATCH(
-        *id = residue->id();
+        try {
+            *id = residue->id().value();
+        } catch (const bad_optional_access&) {
+            throw Error("TODO");
+        }
     )
 }
 

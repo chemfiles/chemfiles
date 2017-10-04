@@ -43,7 +43,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   other functions in the C API.
 * Added `CHFL_OUT_OF_BOUNDS` variant to `chfl_status`
 * Added `chfl_frame_distance`, `chfl_frame_angle`, `chfl_frame_dihedral` and
-  `chfl_cell_wrap` to work with periodic boundary conditions. 
+  `chfl_cell_wrap` to work with periodic boundary conditions.
+* `chfl_residue` does not take the optional residue id as parameter, instead you
+  should use `chfl_residue_with_id`.
 
 ### Deprecation and removals
 

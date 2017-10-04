@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "chemfiles/exports.hpp"
+#include "chemfiles/optional.hpp"
 #include "chemfiles/sorted_set.hpp"
 
 namespace chemfiles {
@@ -22,8 +23,11 @@ namespace chemfiles {
 /// associated `Topology`.
 class CHFL_EXPORT Residue final {
 public:
+    /// Create a new residue with a given `name`.
+    explicit Residue(std::string name);
+
     /// Create a new residue with a given `name` and residue id `resid`.
-    explicit Residue(std::string name, uint64_t resid = static_cast<uint64_t>(-1));
+    Residue(std::string name, uint64_t resid);
 
     Residue(const Residue&) = default;
     Residue& operator=(const Residue&) = default;
@@ -34,9 +38,9 @@ public:
     const std::string& name() const {
         return name_;
     }
-    /// Get the index of the residue in the initial topology file. If the
-    /// residue has no index, `static_cast<uint64_t>(-1)` is returned.
-    uint64_t id() const {
+
+    /// Get the residue identifier if it exists.
+    optional<uint64_t> id() const {
         return id_;
     }
     /// Get the size of the residue, i.e. the number of atoms in this residue.
@@ -60,7 +64,7 @@ private:
     /// Name of the residue
     std::string name_;
     /// Index of the residue in the initial topology file
-    uint64_t id_ = static_cast<uint64_t>(-1);
+    optional<uint64_t> id_;
     /// Indexes of the atoms in this residue. These indexes refers to the
     /// associated topology.
     sorted_set<size_t> atoms_;

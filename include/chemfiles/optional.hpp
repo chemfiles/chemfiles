@@ -1048,6 +1048,8 @@ namespace chemfiles {
     using std::experimental::optional;
     using std::experimental::make_optional;
 
+    using std::experimental::bad_optional_access;
+
     using nullopt_t = std::experimental::nullopt_t;
     constexpr nullopt_t nullopt{nullopt_t::init()};
 }

@@ -158,12 +158,6 @@ CHFL_EXPORT chfl_status chfl_cell_set_shape(
     CHFL_CELL* const cell, chfl_cellshape shape
 );
 
-/// Free the memory associated with a `cell`.
-///
-/// @example{tests/capi/doc/chfl_cell/chfl_cell.c}
-/// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_cell_free(CHFL_CELL* const cell);
-
 /// Wrap a `vector` in the unit `cell`.
 ///
 /// @example{tests/capi/doc/chfl_cell/wrap.c}
@@ -172,6 +166,12 @@ CHFL_EXPORT chfl_status chfl_cell_free(CHFL_CELL* const cell);
 CHFL_EXPORT chfl_status chfl_cell_wrap(
     const CHFL_CELL* const cell, chfl_vector3d vector
 );
+
+/// Free the memory associated with a `cell`.
+///
+/// @example{tests/capi/doc/chfl_cell/chfl_cell.c}
+/// @return `CHFL_SUCCESS`
+CHFL_EXPORT chfl_status chfl_cell_free(CHFL_CELL* const cell);
 
 #ifdef __cplusplus
 }

@@ -8,7 +8,7 @@
 
 int main() {
     // [example]
-    CHFL_RESIDUE* residue = chfl_residue("water", 3);
+    CHFL_RESIDUE* residue = chfl_residue("water");
 
     char name[32] = {0};
     chfl_residue_name(residue, name, sizeof(name));

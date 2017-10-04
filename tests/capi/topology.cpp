@@ -132,7 +132,7 @@ TEST_CASE("chfl_topology") {
 
         uint64_t residues[3][3] = {{2, 3, 6}, {0, 1, 9}, {4, 5, 8}};
         for (uint64_t i=0; i<3; i++) {
-            CHFL_RESIDUE* residue = chfl_residue("X", 0);
+            CHFL_RESIDUE* residue = chfl_residue("X");
             REQUIRE(residue);
             for (uint64_t j=0; j<3; j++) {
                 CHECK_STATUS(chfl_residue_add_atom(residue, residues[i][j]));
