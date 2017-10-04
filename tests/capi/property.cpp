@@ -21,6 +21,10 @@ TEST_CASE("Property") {
         chfl_vector3d dummy_vector = {0};
         CHECK(chfl_property_get_vector3d(property, dummy_vector) == CHFL_PROPERTY_ERROR);
 
+        chfl_property_kind kind;
+        CHECK_STATUS(chfl_property_get_kind(property, &kind));
+        CHECK(kind == CHFL_PROPERTY_BOOL);
+
         CHECK_STATUS(chfl_property_free(property));
     }
 
@@ -39,6 +43,10 @@ TEST_CASE("Property") {
         chfl_vector3d dummy_vector = {0};
         CHECK(chfl_property_get_vector3d(property, dummy_vector) == CHFL_PROPERTY_ERROR);
 
+        chfl_property_kind kind;
+        CHECK_STATUS(chfl_property_get_kind(property, &kind));
+        CHECK(kind == CHFL_PROPERTY_DOUBLE);
+
         CHECK_STATUS(chfl_property_free(property));
     }
 
@@ -56,6 +64,10 @@ TEST_CASE("Property") {
         CHECK(chfl_property_get_bool(property, &dummy_bool) == CHFL_PROPERTY_ERROR);
         chfl_vector3d dummy_vector = {0};
         CHECK(chfl_property_get_vector3d(property, dummy_vector) == CHFL_PROPERTY_ERROR);
+
+        chfl_property_kind kind;
+        CHECK_STATUS(chfl_property_get_kind(property, &kind));
+        CHECK(kind == CHFL_PROPERTY_STRING);
 
         CHECK_STATUS(chfl_property_free(property));
     }
@@ -77,6 +89,10 @@ TEST_CASE("Property") {
         CHECK(chfl_property_get_bool(property, &dummy_bool) == CHFL_PROPERTY_ERROR);
         double dummy_double = 0;
         CHECK(chfl_property_get_double(property, &dummy_double) == CHFL_PROPERTY_ERROR);
+
+        chfl_property_kind kind;
+        CHECK_STATUS(chfl_property_get_kind(property, &kind));
+        CHECK(kind == CHFL_PROPERTY_VECTOR3D);
 
         CHECK_STATUS(chfl_property_free(property));
     }

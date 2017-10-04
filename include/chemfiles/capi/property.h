@@ -9,6 +9,18 @@
 extern "C" {
 #endif
 
+/// Possible values holded by a CHFL_PROPERTY
+typedef enum {
+    /// Bool value
+    CHFL_PROPERTY_BOOL = 0,
+    /// Double value
+    CHFL_PROPERTY_DOUBLE = 1,
+    /// String value
+    CHFL_PROPERTY_STRING = 2,
+    /// chfl_vector3d value
+    CHFL_PROPERTY_VECTOR3D = 3,
+} chfl_property_kind;
+
 /// Create a new property holding a boolean `value`.
 ///
 /// The caller of this function should free the allocated memory using
@@ -48,6 +60,15 @@ CHFL_EXPORT CHFL_PROPERTY* chfl_property_string(const char* value);
 /// @return A pointer to the property, or NULL in case of error. You can use
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_PROPERTY* chfl_property_vector3d(const chfl_vector3d value);
+
+/// Get the type of value holded by this `property` in `kind`.
+///
+/// @example{tests/capi/doc/chfl_property/get_kind.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_property_get_kind(
+    const CHFL_PROPERTY* const property, chfl_property_kind* kind
+);
 
 /// Get the boolean value holded by this `property` in the location pointed to
 /// by `data`.

@@ -7,6 +7,8 @@
 #include "chemfiles/Property.hpp"
 using namespace chemfiles;
 
+static_assert(sizeof(chfl_property_kind) == sizeof(int), "Wrong size for chfl_property_kind enum");
+
 extern "C" CHFL_PROPERTY* chfl_property_bool(bool value) {
     CHFL_PROPERTY* property = nullptr;
     CHFL_ERROR_GOTO(
@@ -49,6 +51,14 @@ extern "C" CHFL_PROPERTY* chfl_property_vector3d(const chfl_vector3d value) {
 error:
     delete property;
     return nullptr;
+}
+
+extern "C" chfl_status chfl_property_get_kind(const CHFL_PROPERTY* const property, chfl_property_kind* kind) {
+    CHECK_POINTER(property);
+    CHECK_POINTER(kind);
+    CHFL_ERROR_CATCH(
+        *kind = static_cast<chfl_property_kind>(property->get_kind());
+    )
 }
 
 extern "C" chfl_status chfl_property_get_bool(const CHFL_PROPERTY* const property, bool* value) {
