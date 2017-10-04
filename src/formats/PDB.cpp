@@ -77,8 +77,10 @@ void PDBFormat::read(Frame& frame) {
             read_CRYST1(frame, line);
             break;
         case Record::ATOM:
+            read_ATOM(frame, line, false);
+            break;
         case Record::HETATM:
-            read_ATOM(frame, line);
+            read_ATOM(frame, line, true);
             break;
         case Record::CONECT:
             read_CONECT(frame, line);
@@ -131,7 +133,8 @@ void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
     }
 }
 
-void PDBFormat::read_ATOM(Frame& frame, const std::string& line) {
+void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
+    bool is_hetatm) {
     assert(line.substr(0, 6) == "ATOM  " || line.substr(0, 6) == "HETATM");
 
     if (line.length() < 54) {
@@ -144,6 +147,8 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line) {
     if (line.length() >= 78) {
         atom.set_type(trim(line.substr(76, 2)));
     }
+
+    atom.set("is_hetatm", is_hetatm);
 
     try {
         auto x = std::stof(line.substr(31, 8));
@@ -298,6 +303,23 @@ void PDBFormat::write(const Frame& frame) {
         auto& name = frame.topology()[i].name();
         auto& type = frame.topology()[i].type();
         auto& pos = frame.positions()[i];
+
+        std::string atom_hetatm;
+        auto atom_property = frame.topology()[i].get("is_hetatm");
+        if (atom_property) {
+          try {
+            if (atom_property->as_bool()) {
+              atom_hetatm = "HETATM";
+            } else{
+              atom_hetatm = "ATOM  ";
+            }
+          }
+          catch (const PropertyError &e) {
+            warning("\'is_hetatm\' property set to non-bool variable."
+            "Defaulting to HETATM");
+            atom_hetatm = "HETATM";
+          }
+        }
 
         std::string resname;
         std::string resid;
