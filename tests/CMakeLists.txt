@@ -8,7 +8,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT}")
         "https://github.com/chemfiles/tests-data/archive/${TESTS_DATA_GIT}.tar.gz"
         "${CMAKE_CURRENT_BINARY_DIR}/${TESTS_DATA_GIT}.tar.gz"
         SHOW_PROGRESS
-        EXPECTED_HASH SHA1=d97114cf746044097b3f8bd221cccd6bd2963283
+        EXPECTED_HASH SHA1=cea65d8c6d80d732c558b3cc0685d7d6758799dc
     )
 
     message(STATUS "Unpacking test data files")
