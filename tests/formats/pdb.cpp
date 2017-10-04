@@ -109,6 +109,17 @@ TEST_CASE("Read files in PDB format"){
         CHECK(residue.size() == frame.natoms());
         CHECK(residue.name() == "LIG");
     }
+
+    SECTION("Read ATOM/HETATM information") {
+      Trajectory file("data/pdb/hemo.pdb");
+      Frame frame = file.read();
+
+      for (size_t i = 0; i < 73; i++)
+        CHECK(frame.topology()[i].get("is_hetatm")->as_bool());
+      for (size_t i = 73; i < 522; i++)
+        CHECK(frame.topology()[i].get("is_hetatm")->as_bool() == false);
+
+    }
 }
 
 TEST_CASE("Write files in PDB format") {
