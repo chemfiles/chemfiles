@@ -65,7 +65,7 @@ public:
     optional<uint64_t> atomic_number() const;
 
     /// Set an arbitrary property for this atom with the given `name` and
-    /// `value`. If a property with this name already exist, it is replaced
+    /// `value`. If a property with this name already exists, it is replaced
     /// with the new value.
     void set(std::string name, Property value);
 

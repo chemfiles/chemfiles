@@ -70,7 +70,7 @@ CHFL_EXPORT chfl_status chfl_frame_positions(
 /// There is then no need to free the `*velocity` pointer for the caller of this
 /// function.
 ///
-/// If the frame do not have velocity, this will return an error. Use
+/// If the frame does not have velocity, this will return an error. Use
 /// `chfl_frame_add_velocities` to add velocities to a frame before calling
 /// this function.
 ///

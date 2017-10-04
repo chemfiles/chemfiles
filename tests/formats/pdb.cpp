@@ -109,27 +109,41 @@ TEST_CASE("Read files in PDB format"){
         CHECK(residue.size() == frame.natoms());
         CHECK(residue.name() == "LIG");
     }
+
+    SECTION("Read ATOM/HETATM information") {
+      Trajectory file("data/pdb/hemo.pdb");
+      Frame frame = file.read();
+
+      for (size_t i = 0; i < 73; i++) {
+        CHECK(frame.topology()[i].get("is_hetatm")->as_bool());
+      }
+      for (size_t i = 73; i < 522; i++) {
+        CHECK(frame.topology()[i].get("is_hetatm")->as_bool() == false);
+      }
+
+    }
 }
 
 TEST_CASE("Write files in PDB format") {
     auto tmpfile = NamedTempPath(".pdb");
     const auto EXPECTED_CONTENT =
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
-    "HETATM    1    A X   X   1       1.000   2.000   3.000  1.00  0.00           A\n"
-    "HETATM    2    B X   X   2       1.000   2.000   3.000  1.00  0.00           B\n"
-    "HETATM    3    C X   X   3       1.000   2.000   3.000  1.00  0.00           C\n"
-    "HETATM    4    D X   X   4       1.000   2.000   3.000  1.00  0.00           D\n"
+    "ATOM      1 A    XXX X   1       1.000   2.000   3.000  1.00  0.00           A\n"
+    "HETATM    2 B    XXX X   2       1.000   2.000   3.000  1.00  0.00           B\n"
+    "ATOM      3 C    XXX X   3       1.000   2.000   3.000  1.00  0.00           C\n"
+    "HETATM    4 D    XXX X   4       1.000   2.000   3.000  1.00  0.00           D\n"
     "CONECT    1    2\n"
     "CONECT    2    1\n"
     "END\n"
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
-    "HETATM    1    A X   X   4       4.000   5.000   6.000  1.00  0.00           A\n"
-    "HETATM    2    B foo X   3       4.000   5.000   6.000  1.00  0.00           B\n"
-    "HETATM    3    C foo X   3       4.000   5.000   6.000  1.00  0.00           C\n"
-    "HETATM    4    D bar X  -1       4.000   5.000   6.000  1.00  0.00           D\n"
-    "HETATM    5    E X   X   5       4.000   5.000   6.000  1.00  0.00           E\n"
-    "HETATM    6    F X   X   6       4.000   5.000   6.000  1.00  0.00           F\n"
-    "HETATM    7    G X   X   7       4.000   5.000   6.000  1.00  0.00           G\n"
+    "ATOM      1 A    XXX X   4       4.000   5.000   6.000  1.00  0.00           A\n"
+    "HETATM    2 B    foo X   3       4.000   5.000   6.000  1.00  0.00           B\n"
+    "ATOM      3 C    foo X   3       4.000   5.000   6.000  1.00  0.00           C\n"
+    "HETATM    4 D    bar X  -1       4.000   5.000   6.000  1.00  0.00           D\n"
+    "HETATM    5 E    XXX X   5       4.000   5.000   6.000  1.00  0.00           E\n"
+    "HETATM    6 F    XXX X   6       4.000   5.000   6.000  1.00  0.00           F\n"
+    "HETATM    7 G    XXX X   7       4.000   5.000   6.000  1.00  0.00           G\n"
+
     "CONECT    1    2    7\n"
     "CONECT    2    1    7\n"
     "CONECT    3    7\n"
@@ -146,6 +160,10 @@ TEST_CASE("Write files in PDB format") {
     topology.add_atom(Atom("C"));
     topology.add_atom(Atom("D"));
     topology.add_bond(0, 1);
+    topology[0].set("is_hetatm", false);
+    topology[1].set("is_hetatm", true);
+    topology[2].set("is_hetatm", false);
+    topology[3].set("is_hetatm", true);
 
     Frame frame(topology);
     frame.set_cell(UnitCell(22));

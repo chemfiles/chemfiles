@@ -11,7 +11,7 @@ int main() {
     chfl_trajectory_open("noformat", 'r');
 
     const char* error = chfl_last_error();
-    assert(strcmp(error, "file at 'noformat' do not have an extension, provide a format name to read it") == 0);
+    assert(strcmp(error, "file at 'noformat' does not have an extension, provide a format name to read it") == 0);
     // [example]
     return 0;
 }
