@@ -127,6 +127,7 @@ TEST_CASE("Read files in PDB format"){
 TEST_CASE("Write files in PDB format") {
     auto tmpfile = NamedTempPath(".pdb");
     const auto EXPECTED_CONTENT =
+    "MODEL    1\n"
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
     "ATOM      1 A    XXX X   1       1.000   2.000   3.000  1.00  0.00           A\n"
     "HETATM    2 B    XXX X   2       1.000   2.000   3.000  1.00  0.00           B\n"
@@ -134,7 +135,9 @@ TEST_CASE("Write files in PDB format") {
     "HETATM    4 D    XXX X   4       1.000   2.000   3.000  1.00  0.00           D\n"
     "CONECT    1    2\n"
     "CONECT    2    1\n"
+    "ENDMDL\n"
     "END\n"
+    "MODEL    1\n"
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
     "ATOM      1 A    XXX X   4       4.000   5.000   6.000  1.00  0.00           A\n"
     "HETATM    2 B    foo X   3       4.000   5.000   6.000  1.00  0.00           B\n"
@@ -152,6 +155,7 @@ TEST_CASE("Write files in PDB format") {
     "CONECT    6    5    7\n"
     "CONECT    7    1    2    3    4\n"
     "CONECT    7    5    6\n"
+    "ENDMDL\n"
     "END\n";
 
     Topology topology;

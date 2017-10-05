@@ -242,9 +242,15 @@ bool forward(TextFile& file) {
     while (true) {
         try {
             auto line = file.readline();
-            // Applies to 'END' and 'ENDMDL' records.
+
+            if (line.substr(0, 6) == "ENDMDL" &&
+            file.readline().substr(0, 3) == "END" ) {
+              return false;
+            }
+
             if (line.substr(0, 3) == "END") {
                 return true;
+
             }
         } catch (const FileError&) {
             return false;
@@ -270,7 +276,7 @@ Record get_record(const std::string& line) {
                rec == "CAVEAT" || rec == "COMPND" || rec == "EXPDTA" ||
                rec == "KEYWDS" || rec == "OBSLTE" || rec == "SOURCE" ||
                rec == "SPLIT " || rec == "SPRSDE" || rec == "TITLE " ||
-               rec == "JRNL  ") {
+               rec == "JRNL  " || rec == "TER   ") {
         return Record::IGNORED_;
     } else {
         return Record::UNKNOWN_;
