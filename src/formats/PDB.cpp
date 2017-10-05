@@ -42,7 +42,8 @@ enum class Record {
 // Get the record type for a line.
 static Record get_record(const std::string& line);
 
-PDBFormat::PDBFormat(const std::string& path, File::Mode mode): file_(TextFile::create(path, mode)) {
+PDBFormat::PDBFormat(const std::string& path, File::Mode mode)
+  : file_(TextFile::create(path, mode)), step_(0) {
     while (!file_->eof()) {
         auto position = file_->tellg();
         if (!file_ || position == std::streampos(-1)) {
@@ -101,6 +102,7 @@ end:
     for (auto& residue: residues_) {
         frame.topology().add_residue(residue.second);
     }
+    ++step_;
 }
 
 void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
@@ -236,6 +238,7 @@ bool forward(TextFile& file) {
     while (true) {
         try {
             auto line = file.readline();
+            // Applies to 'END' and 'ENDMDL' records.
             if (line.substr(0, 3) == "END") {
                 return true;
             }
@@ -261,7 +264,7 @@ Record get_record(const std::string& line) {
                rec == "CAVEAT" || rec == "COMPND" || rec == "EXPDTA" ||
                rec == "KEYWDS" || rec == "OBSLTE" || rec == "SOURCE" ||
                rec == "SPLIT " || rec == "SPRSDE" || rec == "TITLE " ||
-               rec == "JRNL  ") {
+               rec == "JRNL  " || rec.substr(0, 5) == "MODEL" ) {
         return Record::IGNORED_;
     } else {
         return Record::UNKNOWN_;
@@ -280,6 +283,8 @@ static std::string to_pdb_index(uint64_t i) {
 }
 
 void PDBFormat::write(const Frame& frame) {
+    fmt::print(*file_, "MODEL {:>4}\n", step_+1);
+
     auto& cell = frame.cell();
     check_values_size(Vector3D(cell.a(), cell.b(), cell.c()), 9, "cell lengths");
     fmt::print(
@@ -388,8 +393,10 @@ void PDBFormat::write(const Frame& frame) {
             fmt::print(*file_, "\n");
         }
     }
+    
+    fmt::print(*file_, "ENDMDL\n");
 
-    fmt::print(*file_, "END\n");
+    ++step_;
     steps_positions_.push_back(file_->tellg());
 }
 

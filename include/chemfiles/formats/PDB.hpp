@@ -41,6 +41,9 @@ private:
     /// Storing the positions of all the steps in the file, so that we can
     /// just `seekg` them instead of reading the whole step.
     std::vector<std::streampos> steps_positions_;
+    // Last red step.
+    size_t step_;
+
 };
 
 } // namespace chemfiles
