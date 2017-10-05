@@ -26,6 +26,8 @@ public:
     void read(Frame& frame) override;
     void write(const Frame& frame) override;
     size_t nsteps() override;
+    ~PDBFormat();
+    
 private:
     // Read CRYST1 record
     void read_CRYST1(Frame& frame, const std::string& line);
@@ -43,6 +45,8 @@ private:
     std::vector<std::streampos> steps_positions_;
     // Last red step.
     size_t step_;
+    // If the object is used to write a file set to true.
+    bool written_ = false;
 
 };
 

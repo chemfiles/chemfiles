@@ -295,6 +295,7 @@ static std::string to_pdb_index(uint64_t i) {
 }
 
 void PDBFormat::write(const Frame& frame) {
+    written_ = true;
     fmt::print(*file_, "MODEL {:>4}\n", step_+1);
 
     auto& cell = frame.cell();
@@ -421,4 +422,10 @@ void check_values_size(const Vector3D& values, unsigned width, const std::string
             "value in {} is too big for representation in PDB format", context
         );
     }
+}
+
+PDBFormat::~PDBFormat() {
+  if (written_) {
+    fmt::print(*file_, "END\n");
+  }
 }
