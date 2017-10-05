@@ -184,9 +184,9 @@ TEST_CASE("Write files in PDB format") {
 
     frame.resize(7);
     positions = frame.positions();
-    for(size_t i=0; i<7; i++)
+    for(size_t i=0; i<7; i++) {
         positions[i] = Vector3D(4, 5, 6);
-
+    }
     topology.add_atom(Atom("E"));
     topology.add_atom(Atom("F"));
     topology.add_atom(Atom("G"));

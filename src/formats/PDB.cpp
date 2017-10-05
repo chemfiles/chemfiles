@@ -245,6 +245,7 @@ bool forward(TextFile& file) {
 
             if (line.substr(0, 6) == "ENDMDL" &&
             file.readline().substr(0, 3) == "END" ) {
+              // An ENDMDL was followed and an END. This means `END`.
               return false;
             }
 
@@ -425,7 +426,7 @@ void check_values_size(const Vector3D& values, unsigned width, const std::string
 }
 
 PDBFormat::~PDBFormat() {
-  if (written_) {
-    fmt::print(*file_, "END\n");
-  }
+    if (written_) {
+      fmt::print(*file_, "END\n");
+    }
 }
