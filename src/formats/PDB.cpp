@@ -31,6 +31,8 @@ enum class Record {
     ATOM,
     HETATM,
     CONECT,
+    // Beggining of model.
+    MODEL,
     // End of file
     END,
     // Ignored records
@@ -86,6 +88,9 @@ void PDBFormat::read(Frame& frame) {
         case Record::CONECT:
             read_CONECT(frame, line);
             break;
+        case Record::MODEL:
+            ++step_;
+            break;
         case Record::END:
             goto end; // We have read a frame!
         case Record::IGNORED_:
@@ -102,7 +107,6 @@ end:
     for (auto& residue: residues_) {
         frame.topology().add_residue(residue.second);
     }
-    ++step_;
 }
 
 void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
@@ -250,7 +254,7 @@ bool forward(TextFile& file) {
 
 Record get_record(const std::string& line) {
     auto rec = line.substr(0, 6);
-    if (rec.substr(0, 3) == "END") { // Handle missing whitespaces in END
+    if(rec.substr(0, 3) == "END") { // Handle missing whitespaces in END
         return Record::END;
     } else if (rec == "CRYST1") {
         return Record::CRYST1;
@@ -260,11 +264,13 @@ Record get_record(const std::string& line) {
         return Record::HETATM;
     } else if (rec == "CONECT") {
         return Record::CONECT;
+    } else if (rec == "MODEL "){
+        return Record::MODEL;
     } else if (rec == "REMARK" || rec == "MASTER" || rec == "AUTHOR" ||
                rec == "CAVEAT" || rec == "COMPND" || rec == "EXPDTA" ||
                rec == "KEYWDS" || rec == "OBSLTE" || rec == "SOURCE" ||
                rec == "SPLIT " || rec == "SPRSDE" || rec == "TITLE " ||
-               rec == "JRNL  " || rec == "MODEL " ) {
+               rec == "JRNL  ") {
         return Record::IGNORED_;
     } else {
         return Record::UNKNOWN_;
