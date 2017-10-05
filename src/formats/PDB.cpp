@@ -264,7 +264,7 @@ Record get_record(const std::string& line) {
                rec == "CAVEAT" || rec == "COMPND" || rec == "EXPDTA" ||
                rec == "KEYWDS" || rec == "OBSLTE" || rec == "SOURCE" ||
                rec == "SPLIT " || rec == "SPRSDE" || rec == "TITLE " ||
-               rec == "JRNL  " || rec.substr(0, 5) == "MODEL" ) {
+               rec == "JRNL  " || rec == "MODEL " ) {
         return Record::IGNORED_;
     } else {
         return Record::UNKNOWN_;
@@ -393,7 +393,7 @@ void PDBFormat::write(const Frame& frame) {
             fmt::print(*file_, "\n");
         }
     }
-    
+
     fmt::print(*file_, "ENDMDL\n");
 
     ++step_;
