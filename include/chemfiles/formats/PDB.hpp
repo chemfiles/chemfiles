@@ -27,7 +27,7 @@ public:
     void write(const Frame& frame) override;
     size_t nsteps() override;
     ~PDBFormat();
-    
+
 private:
     // Read CRYST1 record
     void read_CRYST1(Frame& frame, const std::string& line);
@@ -43,9 +43,10 @@ private:
     /// Storing the positions of all the steps in the file, so that we can
     /// just `seekg` them instead of reading the whole step.
     std::vector<std::streampos> steps_positions_;
-    // Last red step.
-    size_t step_;
-    // If the object is used to write a file set to true.
+    /// Number of models written/read to the file.
+    size_t models_;
+    /// Did we wrote a frame to the file? This is used to check wheter we need
+    /// to write a final `END` record in the destructor
     bool written_ = false;
 
 };

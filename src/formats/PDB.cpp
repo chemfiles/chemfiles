@@ -45,7 +45,7 @@ enum class Record {
 static Record get_record(const std::string& line);
 
 PDBFormat::PDBFormat(const std::string& path, File::Mode mode)
-  : file_(TextFile::create(path, mode)), step_(0) {
+  : file_(TextFile::create(path, mode)), models_(0) {
     while (!file_->eof()) {
         auto position = file_->tellg();
         if (!file_ || position == std::streampos(-1)) {
@@ -89,7 +89,7 @@ void PDBFormat::read(Frame& frame) {
             read_CONECT(frame, line);
             break;
         case Record::MODEL:
-            ++step_;
+            models_++;
             break;
         case Record::END:
             goto end; // We have read a frame!
@@ -297,7 +297,7 @@ static std::string to_pdb_index(uint64_t i) {
 
 void PDBFormat::write(const Frame& frame) {
     written_ = true;
-    fmt::print(*file_, "MODEL {:>4}\n", step_+1);
+    fmt::print(*file_, "MODEL {:>4}\n", models_ + 1);
 
     auto& cell = frame.cell();
     check_values_size(Vector3D(cell.a(), cell.b(), cell.c()), 9, "cell lengths");
@@ -410,7 +410,7 @@ void PDBFormat::write(const Frame& frame) {
 
     fmt::print(*file_, "ENDMDL\n");
 
-    ++step_;
+    models_++;
     steps_positions_.push_back(file_->tellg());
 }
 
