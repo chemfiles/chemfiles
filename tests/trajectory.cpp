@@ -107,10 +107,12 @@ TEST_CASE("Associate an unit cell and a trajectory") {
     SECTION("Writing") {
         auto tmpfile = NamedTempPath(".pdb");
         const auto EXPECTED_CONTENT =
+        "MODEL    1\n"
         "CRYST1    3.000    4.000    5.000  90.00  90.00  90.00 P 1           1\n"
         "HETATM    1      XXX X   1       1.000   2.000   3.000  1.00  0.00            \n"
         "HETATM    2      XXX X   2       1.000   2.000   3.000  1.00  0.00            \n"
-        "HETATM    3      XXX X   3       1.000   2.000   3.000  1.00  0.00            \n"        
+        "HETATM    3      XXX X   3       1.000   2.000   3.000  1.00  0.00            \n"
+        "ENDMDL\n"
         "END\n";
 
         Frame frame(3);

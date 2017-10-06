@@ -12,7 +12,7 @@ static bool contains(const std::vector<T> haystack, const T& needle) {
     return std::find(haystack.begin(), haystack.end(), needle) != haystack.end();
 }
 
-TEST_CASE("Read files in PDB format"){
+TEST_CASE("Read files in PDB format") {
     SECTION("Read next step") {
         Trajectory file("data/pdb/water.pdb");
         Frame frame = file.read();
@@ -35,7 +35,7 @@ TEST_CASE("Read files in PDB format"){
         CHECK(approx_eq(positions[296], Vector3D(6.798, 11.509, 12.704), 1e-4));
     }
 
-    SECTION("Read a specific step"){
+    SECTION("Read a specific step") {
         Trajectory file("data/pdb/water.pdb");
 
         auto frame = file.read_step(2);
@@ -111,22 +111,34 @@ TEST_CASE("Read files in PDB format"){
     }
 
     SECTION("Read ATOM/HETATM information") {
-      Trajectory file("data/pdb/hemo.pdb");
-      Frame frame = file.read();
+        Trajectory file("data/pdb/hemo.pdb");
+        Frame frame = file.read();
 
-      for (size_t i = 0; i < 73; i++) {
-        CHECK(frame.topology()[i].get("is_hetatm")->as_bool());
-      }
-      for (size_t i = 73; i < 522; i++) {
-        CHECK(frame.topology()[i].get("is_hetatm")->as_bool() == false);
-      }
+        for (size_t i = 0; i < 73; i++) {
+            CHECK(frame.topology()[i].get("is_hetatm")->as_bool());
+        }
 
+        for (size_t i = 73; i < 522; i++) {
+            CHECK(frame.topology()[i].get("is_hetatm")->as_bool() == false);
+        }
+    }
+
+    SECTION("Handle multiple END records") {
+        Trajectory file("data/pdb/end-endmdl.pdb");
+        CHECK(file.nsteps() == 2);
+
+        auto frame = file.read();
+        CHECK(frame.natoms() == 4);
+
+        frame = file.read();
+        CHECK(frame.natoms() == 7);
     }
 }
 
 TEST_CASE("Write files in PDB format") {
     auto tmpfile = NamedTempPath(".pdb");
     const auto EXPECTED_CONTENT =
+    "MODEL    1\n"
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
     "ATOM      1 A    XXX X   1       1.000   2.000   3.000  1.00  0.00           A\n"
     "HETATM    2 B    XXX X   2       1.000   2.000   3.000  1.00  0.00           B\n"
@@ -134,7 +146,9 @@ TEST_CASE("Write files in PDB format") {
     "HETATM    4 D    XXX X   4       1.000   2.000   3.000  1.00  0.00           D\n"
     "CONECT    1    2\n"
     "CONECT    2    1\n"
+    "ENDMDL\n"
     "END\n"
+    "MODEL    1\n"
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
     "ATOM      1 A    XXX X   4       4.000   5.000   6.000  1.00  0.00           A\n"
     "HETATM    2 B    foo X   3       4.000   5.000   6.000  1.00  0.00           B\n"
@@ -152,6 +166,7 @@ TEST_CASE("Write files in PDB format") {
     "CONECT    6    5    7\n"
     "CONECT    7    1    2    3    4\n"
     "CONECT    7    5    6\n"
+    "ENDMDL\n"
     "END\n";
 
     Topology topology;
@@ -180,9 +195,9 @@ TEST_CASE("Write files in PDB format") {
 
     frame.resize(7);
     positions = frame.positions();
-    for(size_t i=0; i<7; i++)
+    for(size_t i=0; i<7; i++) {
         positions[i] = Vector3D(4, 5, 6);
-
+    }
     topology.add_atom(Atom("E"));
     topology.add_atom(Atom("F"));
     topology.add_atom(Atom("G"));

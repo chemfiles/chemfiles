@@ -31,6 +31,10 @@ enum class Record {
     ATOM,
     HETATM,
     CONECT,
+    // Beggining of model.
+    MODEL,
+    // End of model.
+    ENDMDL,
     // End of file
     END,
     // Ignored records
@@ -42,7 +46,8 @@ enum class Record {
 // Get the record type for a line.
 static Record get_record(const std::string& line);
 
-PDBFormat::PDBFormat(const std::string& path, File::Mode mode): file_(TextFile::create(path, mode)) {
+PDBFormat::PDBFormat(const std::string& path, File::Mode mode)
+  : file_(TextFile::create(path, mode)), models_(0) {
     while (!file_->eof()) {
         auto position = file_->tellg();
         if (!file_ || position == std::streampos(-1)) {
@@ -71,6 +76,7 @@ void PDBFormat::read(Frame& frame) {
 
     while (!file_->eof()) {
         auto line = file_->readline();
+        auto position = file_->tellg();
         auto record = get_record(line);
         switch (record) {
         case Record::CRYST1:
@@ -85,8 +91,25 @@ void PDBFormat::read(Frame& frame) {
         case Record::CONECT:
             read_CONECT(frame, line);
             break;
+        case Record::MODEL:
+            models_++;
+            break;
+        case Record::ENDMDL:
+            // Check if the next record is an `END` record
+            if (!file_->eof()) {
+                line = file_->readline();
+                file_->seekg(position);
+                record = get_record(line);
+                if (record == Record::END) {
+                    // If this is the case, wait for this next record
+                    break;
+                }
+            }
+            // Else we have read a frame
+            goto end;
         case Record::END:
-            goto end; // We have read a frame!
+            // We have read a frame!
+            goto end;
         case Record::IGNORED_:
             break; // Nothing to do
         case Record::UNKNOWN_:
@@ -236,8 +259,21 @@ bool forward(TextFile& file) {
     while (true) {
         try {
             auto line = file.readline();
+
+            if (line.substr(0, 6) == "ENDMDL") {
+                auto position = file.tellg();
+                line = file.readline();
+                file.seekg(position);
+                if (line.substr(0, 3) == "END") {
+                    // We found another record starting by END in the next line,
+                    // we skip this one and wait for the next one
+                    return false;
+                }
+            }
+
             if (line.substr(0, 3) == "END") {
                 return true;
+
             }
         } catch (const FileError&) {
             return false;
@@ -247,7 +283,10 @@ bool forward(TextFile& file) {
 
 Record get_record(const std::string& line) {
     auto rec = line.substr(0, 6);
-    if (rec.substr(0, 3) == "END") { // Handle missing whitespaces in END
+    if(rec == "ENDMDL") {
+        return Record::ENDMDL;
+    } else if(rec.substr(0, 3) == "END") {
+        // Handle missing whitespace in END record
         return Record::END;
     } else if (rec == "CRYST1") {
         return Record::CRYST1;
@@ -257,11 +296,13 @@ Record get_record(const std::string& line) {
         return Record::HETATM;
     } else if (rec == "CONECT") {
         return Record::CONECT;
+    } else if (rec == "MODEL "){
+        return Record::MODEL;
     } else if (rec == "REMARK" || rec == "MASTER" || rec == "AUTHOR" ||
                rec == "CAVEAT" || rec == "COMPND" || rec == "EXPDTA" ||
                rec == "KEYWDS" || rec == "OBSLTE" || rec == "SOURCE" ||
                rec == "SPLIT " || rec == "SPRSDE" || rec == "TITLE " ||
-               rec == "JRNL  ") {
+               rec == "JRNL  " || rec == "TER   ") {
         return Record::IGNORED_;
     } else {
         return Record::UNKNOWN_;
@@ -280,6 +321,9 @@ static std::string to_pdb_index(uint64_t i) {
 }
 
 void PDBFormat::write(const Frame& frame) {
+    written_ = true;
+    fmt::print(*file_, "MODEL {:>4}\n", models_ + 1);
+
     auto& cell = frame.cell();
     check_values_size(Vector3D(cell.a(), cell.b(), cell.c()), 9, "cell lengths");
     fmt::print(
@@ -389,7 +433,9 @@ void PDBFormat::write(const Frame& frame) {
         }
     }
 
-    fmt::print(*file_, "END\n");
+    fmt::print(*file_, "ENDMDL\n");
+
+    models_++;
     steps_positions_.push_back(file_->tellg());
 }
 
@@ -401,5 +447,11 @@ void check_values_size(const Vector3D& values, unsigned width, const std::string
         throw format_error(
             "value in {} is too big for representation in PDB format", context
         );
+    }
+}
+
+PDBFormat::~PDBFormat() {
+    if (written_) {
+      fmt::print(*file_, "END\n");
     }
 }
