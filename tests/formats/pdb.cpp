@@ -12,7 +12,7 @@ static bool contains(const std::vector<T> haystack, const T& needle) {
     return std::find(haystack.begin(), haystack.end(), needle) != haystack.end();
 }
 
-TEST_CASE("Read files in PDB format"){
+TEST_CASE("Read files in PDB format") {
     SECTION("Read next step") {
         Trajectory file("data/pdb/water.pdb");
         Frame frame = file.read();
@@ -35,7 +35,7 @@ TEST_CASE("Read files in PDB format"){
         CHECK(approx_eq(positions[296], Vector3D(6.798, 11.509, 12.704), 1e-4));
     }
 
-    SECTION("Read a specific step"){
+    SECTION("Read a specific step") {
         Trajectory file("data/pdb/water.pdb");
 
         auto frame = file.read_step(2);
@@ -111,16 +111,27 @@ TEST_CASE("Read files in PDB format"){
     }
 
     SECTION("Read ATOM/HETATM information") {
-      Trajectory file("data/pdb/hemo.pdb");
-      Frame frame = file.read();
+        Trajectory file("data/pdb/hemo.pdb");
+        Frame frame = file.read();
 
-      for (size_t i = 0; i < 73; i++) {
-        CHECK(frame.topology()[i].get("is_hetatm")->as_bool());
-      }
-      for (size_t i = 73; i < 522; i++) {
-        CHECK(frame.topology()[i].get("is_hetatm")->as_bool() == false);
-      }
+        for (size_t i = 0; i < 73; i++) {
+            CHECK(frame.topology()[i].get("is_hetatm")->as_bool());
+        }
 
+        for (size_t i = 73; i < 522; i++) {
+            CHECK(frame.topology()[i].get("is_hetatm")->as_bool() == false);
+        }
+    }
+
+    SECTION("Handle multiple END records") {
+        Trajectory file("data/pdb/end-endmdl.pdb");
+        CHECK(file.nsteps() == 2);
+
+        auto frame = file.read();
+        CHECK(frame.natoms() == 4);
+
+        frame = file.read();
+        CHECK(frame.natoms() == 7);
     }
 }
 

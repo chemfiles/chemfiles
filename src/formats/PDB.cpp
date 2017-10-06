@@ -33,6 +33,8 @@ enum class Record {
     CONECT,
     // Beggining of model.
     MODEL,
+    // End of model.
+    ENDMDL,
     // End of file
     END,
     // Ignored records
@@ -74,6 +76,7 @@ void PDBFormat::read(Frame& frame) {
 
     while (!file_->eof()) {
         auto line = file_->readline();
+        auto position = file_->tellg();
         auto record = get_record(line);
         switch (record) {
         case Record::CRYST1:
@@ -91,8 +94,22 @@ void PDBFormat::read(Frame& frame) {
         case Record::MODEL:
             models_++;
             break;
+        case Record::ENDMDL:
+            // Check if the next record is an `END` record
+            if (!file_->eof()) {
+                line = file_->readline();
+                file_->seekg(position);
+                record = get_record(line);
+                if (record == Record::END) {
+                    // If this is the case, wait for this next record
+                    break;
+                }
+            }
+            // Else we have read a frame
+            goto end;
         case Record::END:
-            goto end; // We have read a frame!
+            // We have read a frame!
+            goto end;
         case Record::IGNORED_:
             break; // Nothing to do
         case Record::UNKNOWN_:
@@ -243,10 +260,15 @@ bool forward(TextFile& file) {
         try {
             auto line = file.readline();
 
-            if (line.substr(0, 6) == "ENDMDL" &&
-            file.readline().substr(0, 3) == "END" ) {
-              // An ENDMDL was followed and an END. This means `END`.
-              return false;
+            if (line.substr(0, 6) == "ENDMDL") {
+                auto position = file.tellg();
+                line = file.readline();
+                file.seekg(position);
+                if (line.substr(0, 3) == "END") {
+                    // We found another record starting by END in the next line,
+                    // we skip this one and wait for the next one
+                    return false;
+                }
             }
 
             if (line.substr(0, 3) == "END") {
@@ -261,7 +283,10 @@ bool forward(TextFile& file) {
 
 Record get_record(const std::string& line) {
     auto rec = line.substr(0, 6);
-    if(rec.substr(0, 3) == "END") { // Handle missing whitespaces in END
+    if(rec == "ENDMDL") {
+        return Record::ENDMDL;
+    } else if(rec.substr(0, 3) == "END") {
+        // Handle missing whitespace in END record
         return Record::END;
     } else if (rec == "CRYST1") {
         return Record::CRYST1;
