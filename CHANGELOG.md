@@ -22,6 +22,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added `Frame::distance`, `Frame::angle` and `Frame::dihedral` to get
   geometric information on the system, accounting for periodic boundary
   conditions.  
+* Added a `Property` class to store arbitrary properties in `Frame` and `Atom`.
 
 ### Changes in supported formats
 
@@ -46,6 +47,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   `chfl_cell_wrap` to work with periodic boundary conditions.
 * `chfl_residue` does not take the optional residue id as parameter, instead you
   should use `chfl_residue_with_id`.
+* Added `CHFL_PROPERTY` and related functions.
 
 ### Deprecation and removals
 

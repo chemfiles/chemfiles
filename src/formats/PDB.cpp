@@ -305,19 +305,19 @@ void PDBFormat::write(const Frame& frame) {
         auto& pos = frame.positions()[i];
 
         std::string atom_hetatm = "HETATM";
-        auto atom_property = frame.topology()[i].get("is_hetatm");
-        if (atom_property) {
-          try {
-            if (atom_property->as_bool()) {
-              atom_hetatm = "HETATM";
-            } else{
-              atom_hetatm = "ATOM  ";
+        auto is_hetatm = frame.topology()[i].get("is_hetatm");
+        if (is_hetatm) {
+            if (is_hetatm->get_kind() == Property::BOOL) {
+                if (is_hetatm->as_bool()) {
+                    atom_hetatm = "HETATM";
+                } else {
+                    atom_hetatm = "ATOM  ";
+                }
+            } else {
+                warning(
+                    "\'is_hetatm\' property is not a boolean in PDB writer, using HETATM"
+                );
             }
-          }
-          catch (const PropertyError &e) {
-            warning("\'is_hetatm\' property set to non-bool variable."
-            "Defaulting to HETATM");
-          }
         }
 
         std::string resname;

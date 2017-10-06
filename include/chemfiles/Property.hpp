@@ -20,6 +20,14 @@ namespace chemfiles {
 /// `Vector3D`.
 class CHFL_EXPORT Property final {
 public:
+    /// Possible types holded by a property
+    enum kind {
+        BOOL = 0,
+        DOUBLE = 1,
+        STRING = 2,
+        VECTOR3D = 3,
+    };
+
     /// Create a property holding a boolean value.
     Property(bool value): kind_(BOOL), bool_(value) {}
     /// Create a property holding a double value.
@@ -106,6 +114,11 @@ public:
         }
     }
 
+    /// Get the kind of property, *i.e.* the type of the holded value
+    kind get_kind() const {
+        return this->kind_;
+    }
+
     /// Get the boolean value stored in this Property
     ///
     /// @throws PropertyError if this property does not hold a boolean value
@@ -130,13 +143,7 @@ private:
     /// Get the kind name as a string
     std::string kind_as_string() const;
 
-    enum {
-        BOOL,
-        STRING,
-        DOUBLE,
-        VECTOR3D,
-    } kind_;
-
+    kind kind_;
     union {
         bool bool_;
         std::string string_;
