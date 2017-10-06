@@ -96,7 +96,7 @@ extern "C" chfl_status chfl_residue_id(const CHFL_RESIDUE* const residue, uint64
         try {
             *id = residue->id().value();
         } catch (const bad_optional_access&) {
-            throw Error("TODO");
+            throw Error("this residue does not have a id");
         }
     )
 }
