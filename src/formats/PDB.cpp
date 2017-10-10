@@ -379,7 +379,7 @@ void PDBFormat::write(const Frame& frame) {
 
             if (residue->id()) {
                 auto value = residue->id().value();
-                if (value > 1000) {
+                if (value > 999) {
                     warning("Too many residues for PDB format, removing residue id");
                     resid = "  -1";
                 } else {
@@ -391,7 +391,12 @@ void PDBFormat::write(const Frame& frame) {
         }
         else {
             resname = "XXX";
-            resid = to_pdb_index(max_resid++);
+            auto value = max_resid++;
+            if (value < 999) {
+                resid = to_pdb_index(value);
+            } else {
+                resid = "  -1";
+            }
         }
 
         assert(resname.length() <= 3);
