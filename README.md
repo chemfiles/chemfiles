@@ -18,7 +18,7 @@ information about the systems you're simulating, to convert files from one
 format to another, or to write trajectories with your own simulation software.
 
 This repository contains the core of the Chemfiles library — a programmer
-interface written in C++11, with a C99 interface. If you want a ready-to-use 
+interface written in C++11, with a C99 interface. If you want a ready-to-use
 programs for trajectory analysis, use [cfiles](https://github.com/chemfiles/cfiles).
 You can also use Chemfiles from other languages: [Python 2&3](https://github.com/chemfiles/chemfiles.py),
 [Fortran](https://github.com/chemfiles/chemfiles.f03), [Rust](https://github.com/chemfiles/chemfiles.rs),
@@ -92,10 +92,10 @@ Chemfiles can read and write files in the following formats:
 - XYZ;
 - PDB;
 - Amber NetCDF
+- LAMMPS data files;
 
 Chemfiles can also read (but not yet write) files in the following formats:
 - TNG;
-- LAMMPS data files;
 - LAMMPS trajectory;
 - GROMACS formats: .gro; .xtc; .trj; .trr;
 - CHARMM DCD files
