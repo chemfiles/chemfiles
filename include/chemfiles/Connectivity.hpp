@@ -221,10 +221,14 @@ public:
     Connectivity() = default;
     /// Recalculate the angles and the dihedrals from the bond list
     void recalculate() const;
-    /// Access the underlying data
+    /// Get the bonds in this connectivity
     const sorted_set<Bond>& bonds() const;
+    /// Get the angles in this connectivity
     const sorted_set<Angle>& angles() const;
+    /// Get the dihedrals in this connectivity
     const sorted_set<Dihedral>& dihedrals() const;
+    /// Get the impropers in this connectivity
+    const sorted_set<Improper>& impropers() const;
     /// Add a bond between the atoms `i` and `j`
     void add_bond(size_t i, size_t j);
     /// Remove any bond between the atoms `i` and `j`
@@ -240,10 +244,11 @@ private:
     mutable sorted_set<Angle> angles_;
     /// Dihedral angles in the system
     mutable sorted_set<Dihedral> dihedrals_;
+    /// Improper dihedral angles in the system
+    mutable sorted_set<Improper> impropers_;
     /// Is the cached content up to date ?
     mutable bool uptodate_ = false;
 };
-
 
 } // namespace chemfiles
 

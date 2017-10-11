@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   geometric information on the system, accounting for periodic boundary
   conditions.  
 * Added a `Property` class to store arbitrary properties in `Frame` and `Atom`.
+* Added support for improper dihedral angles in `Topology`.
 
 ### Changes in supported formats
 

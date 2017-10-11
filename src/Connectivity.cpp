@@ -95,6 +95,7 @@ size_t Improper::operator[](size_t i) const {
 void Connectivity::recalculate() const {
     angles_.clear();
     dihedrals_.clear();
+    impropers_.clear();
 
     // Generate the list of which atom is bonded to which one
     auto bonded_to = std::vector<std::vector<size_t>>(biggest_atom_ + 1);
@@ -138,9 +139,13 @@ void Connectivity::recalculate() const {
                 dihedrals_.insert(Dihedral(i, j, k, m));
             }
         }
-    }
 
-    // TODO: generate the impropers
+        for (auto m: bonded_to[j]) {
+            if (m != i && m != k) {
+                impropers_.insert(Improper(i, j, k, m));
+            }
+        }
+    }
 
     uptodate_ = true;
 }
@@ -164,6 +169,13 @@ const sorted_set<Dihedral>& Connectivity::dihedrals() const {
         recalculate();
     }
     return dihedrals_;
+}
+
+const sorted_set<Improper>& Connectivity::impropers() const {
+    if (!uptodate_) {
+        recalculate();
+    }
+    return impropers_;
 }
 
 void Connectivity::add_bond(size_t i, size_t j) {

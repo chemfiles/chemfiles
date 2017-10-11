@@ -119,7 +119,7 @@ TEST_CASE("Use the Topology class") {
     CHECK(topology.bonds()[0] == Bond(0, 1));
 }
 
-TEST_CASE("Angles and dihedral detection") {
+TEST_CASE("Connectivity detection") {
     SECTION("Angles detection") {
         auto topology = Topology();
         for (size_t i=0; i<30; i++) {
@@ -161,6 +161,27 @@ TEST_CASE("Angles and dihedral detection") {
         topology.add_bond(16, 18);
         dihedrals.push_back({12, 19, 18, 16});
         CHECK(topology.dihedrals() == dihedrals);
+    }
+
+    SECTION("Improper angles") {
+        auto topology = Topology();
+        for (size_t i=0; i<30; i++) {
+            topology.add_atom(Atom());
+        }
+
+        CHECK(topology.impropers().size() == 0);
+
+        topology.add_bond(0, 1);
+        topology.add_bond(0, 2);
+        topology.add_bond(0, 3);
+        auto impropers = std::vector<Improper>{{1, 0, 2, 3}};
+        CHECK(topology.impropers() == impropers);
+
+        topology.add_bond(12, 19);
+        topology.add_bond(19, 18);
+        topology.add_bond(16, 19);
+        impropers.push_back({12, 19, 16, 18});
+        CHECK(topology.impropers() == impropers);
     }
 }
 

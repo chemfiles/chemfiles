@@ -79,6 +79,10 @@ const std::vector<Dihedral>& Topology::dihedrals() const {
     return connect_.dihedrals().as_vec();
 }
 
+const std::vector<Improper>& Topology::impropers() const {
+    return connect_.impropers().as_vec();
+}
+
 bool Topology::is_bond(size_t i, size_t j) const {
     if (i == j) {
         return false;
