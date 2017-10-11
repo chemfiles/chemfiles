@@ -19,7 +19,7 @@ int main(void) {
     // Get the number of matching atoms from the frame
     chfl_selection_evaluate(selection, frame, &matching);
     printf("We have %d zinc in the frame\n", matching);
-    chfl_match_t* matches = malloc((size_t)matching * sizeof(chfl_match_t));
+    chfl_match* matches = malloc((size_t)matching * sizeof(chfl_match));
 
     // Get the matching atoms
     chfl_selection_matches(selection, matches, matching);
@@ -34,7 +34,7 @@ int main(void) {
     selection = chfl_selection("angles: name($1) H and name($2) O and name($3) H");
     chfl_selection_evaluate(selection, frame, &matching);
     printf("We have %d water in the frame\n", matching);
-    matches = malloc((size_t)matching * sizeof(chfl_match_t));
+    matches = malloc((size_t)matching * sizeof(chfl_match));
 
     // Get the matching atoms
     chfl_selection_matches(selection, matches, matching);

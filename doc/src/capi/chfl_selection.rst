@@ -19,7 +19,7 @@ Function manipulating ``CHFL_SELECTION``
 
 .. doxygenfunction:: chfl_selection_free
 
-.. doxygenstruct:: chfl_match_t
+.. doxygenstruct:: chfl_match
     :members:
 
 .. doxygendefine:: CHFL_MAX_SELECTION_SIZE

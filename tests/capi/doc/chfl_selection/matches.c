@@ -23,7 +23,7 @@ int main() {
     chfl_selection_evaluate(selection, frame, &size);
     assert(size == 2);
 
-    chfl_match_t matches[2];
+    chfl_match matches[2];
     chfl_selection_matches(selection, matches, 2);
     assert(matches[0].atoms[0] == 1);
     assert(matches[1].atoms[0] == 2);
