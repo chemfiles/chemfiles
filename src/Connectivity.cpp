@@ -68,6 +68,30 @@ size_t Dihedral::operator[](size_t i) const {
     return data_[i];
 }
 
+Improper::Improper(size_t i, size_t j, size_t k, size_t m) {
+    if (j == i || j == k || j == m) {
+        throw error("can not have an atom linked to itself in an improper dihedral angle");
+    }
+
+    if (i == k || i == m || k == m) {
+        throw error("can not have an atom twice in an improper dihedral angle");
+    }
+
+    std::array<size_t, 3> others = {{i, k, m}};
+    std::sort(others.begin(), others.end());
+    data_[0] = others[0];
+    data_[1] = j;
+    data_[2] = others[1];
+    data_[3] = others[2];
+}
+
+size_t Improper::operator[](size_t i) const {
+    if (i >= 4) {
+        throw out_of_bounds("can not access atom n° {} in improper", i);
+    }
+    return data_[i];
+}
+
 void Connectivity::recalculate() const {
     angles_.clear();
     dihedrals_.clear();

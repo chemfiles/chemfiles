@@ -81,6 +81,26 @@ TEST_CASE("Connectivity elements") {
 
         CHECK_THROWS_AS(Dihedral(2, 1, 4, 6)[4], OutOfBounds);
     }
+
+    SECTION("Improper") {
+        CHECK(Improper(2, 3, 4, 5) == Improper(5, 3, 2, 4));
+        CHECK(Improper(2, 3, 4, 5) == Improper(2, 3, 5, 4));
+
+        auto improper = Improper(6, 7, 5, 8);
+        CHECK(improper[0] == 5);
+        CHECK(improper[1] == 7);
+        CHECK(improper[2] == 6);
+        CHECK(improper[3] == 8);
+
+        CHECK_THROWS_AS(Improper(2, 2, 3, 4), Error);
+        CHECK_THROWS_AS(Improper(1, 2, 2, 4), Error);
+        CHECK_THROWS_AS(Improper(1, 2, 3, 3), Error);
+        CHECK_THROWS_AS(Improper(2, 3, 2, 4), Error);
+        CHECK_THROWS_AS(Improper(1, 2, 3, 2), Error);
+        CHECK_THROWS_AS(Improper(1, 2, 3, 1), Error);
+
+        CHECK_THROWS_AS(Improper(2, 1, 4, 6)[4], OutOfBounds);
+    }
 }
 
 TEST_CASE("Use the Topology class") {

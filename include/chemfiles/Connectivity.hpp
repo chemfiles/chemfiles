@@ -12,7 +12,7 @@
 
 namespace chemfiles {
 
-/// The bond struct ensure a canonical representation of a bond between atoms
+/// The `Bond` struct ensure a canonical representation of a bond between atoms
 /// i and j, with i<j
 struct CHFL_EXPORT Bond {
     Bond(size_t i, size_t j);
@@ -61,7 +61,7 @@ inline bool operator>=(const Bond& lhs, const Bond& rhs) {
     return lhs.data_ >= rhs.data_;
 }
 
-/// The angle struct ensure a canonical representation of an angle between the
+/// The `Angle` struct ensure a canonical representation of an angle between the
 /// atoms i, j and k, with i < k
 struct CHFL_EXPORT Angle {
     Angle(size_t i, size_t j, size_t k);
@@ -111,7 +111,7 @@ inline bool operator>=(const Angle& lhs, const Angle& rhs) {
     return lhs.data_ > rhs.data_;
 }
 
-/// The dihedral struct ensure a canonical representation of a dihedral angle
+/// The `Dihedral` struct ensure a canonical representation of a dihedral angle
 /// between the atoms i, j, k and m, with max(i, j) < max(k, m))
 struct CHFL_EXPORT Dihedral {
     Dihedral(size_t i, size_t j, size_t k, size_t m);
@@ -158,6 +158,57 @@ inline bool operator>(const Dihedral& lhs, const Dihedral& rhs) {
 }
 
 inline bool operator>=(const Dihedral& lhs, const Dihedral& rhs) {
+    return lhs.data_ >= rhs.data_;
+}
+
+/// The `Improper` struct ensure a canonical representation of an improper
+/// dihedral angle centered around the atom j, which is linked to i, k, and m.
+/// i, k, and m are sorted to ensure the canonical representation
+struct CHFL_EXPORT Improper {
+    Improper(size_t i, size_t j, size_t k, size_t m);
+    Improper(Improper&&) = default;
+    Improper& operator=(Improper&&) = default;
+    Improper(const Improper&) = default;
+    Improper& operator=(const Improper&) = default;
+
+    /// Get the index of the `i`th atom (`i` can be 0, 1, 2 or 3) in the
+    /// improper.
+    ///
+    /// @throws OutOfBounds if `i` is not 0, 1, 2 or 3.
+    size_t operator[](size_t i) const;
+
+private:
+    std::array<size_t, 4> data_;
+
+    friend bool operator==(const Improper&, const Improper&);
+    friend bool operator!=(const Improper&, const Improper&);
+    friend bool operator<(const Improper&, const Improper&);
+    friend bool operator<=(const Improper&, const Improper&);
+    friend bool operator>(const Improper&, const Improper&);
+    friend bool operator>=(const Improper&, const Improper&);
+};
+
+inline bool operator==(const Improper& lhs, const Improper& rhs) {
+    return lhs.data_ == rhs.data_;
+}
+
+inline bool operator!=(const Improper& lhs, const Improper& rhs) {
+    return lhs.data_ != rhs.data_;
+}
+
+inline bool operator<(const Improper& lhs, const Improper& rhs) {
+    return lhs.data_ < rhs.data_;
+}
+
+inline bool operator<=(const Improper& lhs, const Improper& rhs) {
+    return lhs.data_ <= rhs.data_;
+}
+
+inline bool operator>(const Improper& lhs, const Improper& rhs) {
+    return lhs.data_ > rhs.data_;
+}
+
+inline bool operator>=(const Improper& lhs, const Improper& rhs) {
     return lhs.data_ >= rhs.data_;
 }
 
