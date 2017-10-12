@@ -2,9 +2,6 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <fstream>
-
-#include <iostream>
-
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
@@ -313,6 +310,6 @@ TEST_CASE("PDB files with big values") {
         CHECK(positions[9998] == Vector3D(4., 5., 6.));
         CHECK(positions[9999] == Vector3D(7., 8., 9.));
 
-        // remove("data/pdb/tmp.pdb");
+        remove("data/pdb/tmp.pdb");
     }
 }
