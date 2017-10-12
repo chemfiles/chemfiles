@@ -54,6 +54,11 @@ matrix:
       compiler: clang
     - os: osx
       compiler: gcc
+  allow_failures:
+    - os: linux
+      compiler: gcc
+      env: USE_ICC=ON
+      addons: *linux64
 
 before_install:
   # Setting environement
@@ -85,6 +90,10 @@ script:
         rm -f *\#external\#*.gcov
         codecov -X gcov
     fi
+
+after_script:
+  # cleanup intel compiler install
+  - '[[ ! -z "${INTEL_INSTALL_PATH}" ]] && uninstall_intel_software'
 
 deploy:
   provider: pages

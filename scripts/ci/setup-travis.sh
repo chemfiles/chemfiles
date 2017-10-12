@@ -49,6 +49,16 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     fi
 fi
 
+if [[ "$USE_ICC" == "ON" ]]; then
+    if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
+        echo "not runnning intel builder on Pull-Request"
+        exit
+    fi
+    /bin/sh $TRAVIS_BUILD_DIR/scripts/ci/install-icc.sh
+    source ~/.bashrc
+    export CC=icc
+    export CXX=icpc
+fi
 
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew update
