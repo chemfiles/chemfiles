@@ -6,7 +6,7 @@
 #include "chemfiles.h"
 
 static CHFL_FRAME* testing_frame(void);
-static bool find_match(const chfl_match_t* matches, uint64_t n_matches, chfl_match_t match);
+static bool find_match(const chfl_match matches[], uint64_t n, chfl_match match);
 
 TEST_CASE("chfl_selection") {
     SECTION("Selection string") {
@@ -58,7 +58,7 @@ TEST_CASE("chfl_selection") {
         CHECK_STATUS(chfl_selection_evaluate(selection, frame, &matches_count));
         CHECK(matches_count == 2);
 
-        chfl_match_t* matches = new chfl_match_t[static_cast<size_t>(matches_count)];
+        chfl_match* matches = new chfl_match[static_cast<size_t>(matches_count)];
         REQUIRE(matches != 0);
 
         CHECK(chfl_selection_matches(selection, matches, 1) == CHFL_MEMORY_ERROR);
@@ -81,15 +81,15 @@ TEST_CASE("chfl_selection") {
         CHECK_STATUS(chfl_selection_evaluate(selection, frame, &matches_count));
         CHECK(matches_count == 2);
 
-        matches = new chfl_match_t[static_cast<size_t>(matches_count)];
+        matches = new chfl_match[static_cast<size_t>(matches_count)];
         REQUIRE(matches);
 
         CHECK_STATUS(chfl_selection_matches(selection, matches, matches_count));
         CHECK(matches[0].size == 3);
         CHECK(matches[1].size == 3);
-        chfl_match_t match_1 = {3, {0, 1, 2, static_cast<uint64_t>(-1)}};
+        chfl_match match_1 = {3, {0, 1, 2, static_cast<uint64_t>(-1)}};
         CHECK(find_match(matches, matches_count, match_1));
-        chfl_match_t match_2 = {3, {1, 2, 3, static_cast<uint64_t>(-1)}};
+        chfl_match match_2 = {3, {1, 2, 3, static_cast<uint64_t>(-1)}};
         CHECK(find_match(matches, matches_count, match_2));
         delete[] matches;
 
@@ -125,9 +125,9 @@ static CHFL_FRAME* testing_frame(void) {
     return frame;
 }
 
-static bool find_match(const chfl_match_t* matches, uint64_t n_matches, chfl_match_t match) {
+static bool find_match(const chfl_match matches[], uint64_t n, chfl_match match) {
     REQUIRE(matches);
-    for (uint64_t i=0; i<n_matches; i++) {
+    for (uint64_t i=0; i<n; i++) {
         CHECK(matches[i].size == match.size);
         if (matches[i].atoms[0] == match.atoms[0] &&
             matches[i].atoms[1] == match.atoms[1] &&

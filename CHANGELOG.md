@@ -35,13 +35,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### C API changes
 
 * Added `chfl_add_configuration` to add more configuration files.
-* Renamed `chfl_vector_t` to `chfl_vector3d`; and `chfl_cell_shape_t` to
-  `chfl_cellshape`.
+* Renamed `chfl_vector_t` to `chfl_vector3d`, `chfl_match_t` to `cfl_match`; and
+  `chfl_cell_shape_t` to `chfl_cellshape`.
 * `chfl_atom_atomic_number`, `chfl_atom_vdw_radius` and
   `chfl_atom_covalent_radius` all returns 0 instead of -1 if the atom does not
-  have a known value for this property. This allow `chfl_atom_atomic_number`
-  to take a `uint64_t*` parameter instead of an `int64_t*`, following all the
-  other functions in the C API.
+  have a known value for this property. This allow `chfl_atom_atomic_number` to
+  take a `uint64_t*` parameter instead of an `int64_t*`, following all the other
+  functions in the C API.
 * Added `CHFL_OUT_OF_BOUNDS` variant to `chfl_status`
 * Added `chfl_frame_distance`, `chfl_frame_angle`, `chfl_frame_dihedral` and
   `chfl_cell_wrap` to work with periodic boundary conditions.

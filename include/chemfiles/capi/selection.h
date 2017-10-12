@@ -75,7 +75,7 @@ CHFL_EXPORT chfl_status chfl_selection_evaluate(
 /// Maximal size for a selection match
 #define CHFL_MAX_SELECTION_SIZE 4
 
-/// A `chfl_match_t` is a set of atomic indexes matching a given selection. The
+/// A `chfl_match` is a set of atomic indexes matching a given selection. The
 /// size of a match depends on the associated selection, and can vary from 1 to
 /// `CHFL_MAX_SELECTION_SIZE`.
 typedef struct {
@@ -84,7 +84,7 @@ typedef struct {
     uint64_t size;
     /// Atomic indexes matching the associated selection
     uint64_t atoms[CHFL_MAX_SELECTION_SIZE];
-} chfl_match_t;
+} chfl_match;
 
 /// Get the matches for a `selection` after a call to `chfl_selection_evaluate`,
 /// in `matches`.
@@ -95,7 +95,7 @@ typedef struct {
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_selection_matches(
-    const CHFL_SELECTION* const selection, chfl_match_t matches[], uint64_t nmatches
+    const CHFL_SELECTION* const selection, chfl_match matches[], uint64_t nmatches
 );
 
 /// Free the memory associated with a `selection`.
