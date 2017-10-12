@@ -41,6 +41,25 @@ done
 cp $BOOST_ROOT/libs/filesystem/src/* $OUT/src
 cp $BOOST_ROOT/libs/system/src/* $OUT/src
 
+patch -d $OUT -p0 << EOF
+--- src/operations.cpp	2017-06-12 15:34:23.000000000 +0200
++++ src/operations.cpp	2017-10-13 18:02:34.000000000 +0200
+@@ -2143,9 +2143,9 @@
+     return ok;
+   }
+
+-#if defined(__PGI) && defined(__USE_FILE_OFFSET64)
+-#define dirent dirent64
+-#endif
++// #if defined(__PGI) && defined(__USE_FILE_OFFSET64)
++// #define dirent dirent64
++// #endif
+
+   error_code dir_itr_first(void *& handle, void *& buffer,
+     const char* dir, string& target,
+
+EOF
+
 # Prevent OS X from creating ._(*) files in the archive
 export COPYFILE_DISABLE=1
 

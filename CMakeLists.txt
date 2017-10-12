@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 2.8.11)
+set(CMAKE_USER_MAKE_RULES_OVERRIDE "cmake/InitRules.cmake")
+
 project(chemfiles C CXX)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")

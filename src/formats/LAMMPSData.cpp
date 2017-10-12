@@ -837,9 +837,9 @@ void LAMMPSDataFormat::write_bonds(const Topology& topology) {
     for (auto bond: topology.bonds()) {
         auto type_i = types_.atom_type_id(topology[bond[0]]);
         auto type_j = types_.atom_type_id(topology[bond[1]]);
-        auto bond_type = types_.bond_type_id(type_i, type_j);
+        auto bond_type_id = types_.bond_type_id(type_i, type_j);
         fmt::print(*file_, "{} {} {} {}\n",
-            bond_id, bond_type + 1, bond[0] + 1, bond[1] + 1
+            bond_id, bond_type_id + 1, bond[0] + 1, bond[1] + 1
         );
         bond_id++;
     }
@@ -854,9 +854,9 @@ void LAMMPSDataFormat::write_angles(const Topology& topology) {
         auto type_i = types_.atom_type_id(topology[angle[0]]);
         auto type_j = types_.atom_type_id(topology[angle[1]]);
         auto type_k = types_.atom_type_id(topology[angle[2]]);
-        auto angle_type = types_.angle_type_id(type_i, type_j, type_k);
+        auto angle_type_id = types_.angle_type_id(type_i, type_j, type_k);
         fmt::print(*file_, "{} {} {} {} {}\n",
-            angle_id, angle_type + 1, angle[0] + 1, angle[1] + 1, angle[2] + 1
+            angle_id, angle_type_id + 1, angle[0] + 1, angle[1] + 1, angle[2] + 1
         );
         angle_id++;
     }
@@ -872,9 +872,9 @@ void LAMMPSDataFormat::write_dihedrals(const Topology& topology) {
         auto type_j = types_.atom_type_id(topology[dihedral[1]]);
         auto type_k = types_.atom_type_id(topology[dihedral[2]]);
         auto type_m = types_.atom_type_id(topology[dihedral[3]]);
-        auto dihedral_type = types_.dihedral_type_id(type_i, type_j, type_k, type_m);
+        auto dihedral_type_id = types_.dihedral_type_id(type_i, type_j, type_k, type_m);
         fmt::print(*file_, "{} {} {} {} {} {}\n",
-            dihedral_id, dihedral_type + 1,
+            dihedral_id, dihedral_type_id + 1,
             dihedral[0] + 1, dihedral[1] + 1, dihedral[2] + 1, dihedral[3] + 1
         );
         dihedral_id++;

@@ -60,6 +60,12 @@ if(EMSCRIPTEN)
     endif()
 endif()
 
+if(${CMAKE_CXX_COMPILER_ID} MATCHES "PGI")
+    # Remove IPA optimization, as it fails with 'unknown variable reference: &2&2821'
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Mnoipa")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Mnoipa")
+endif()
+
 macro(add_warning_flag _flag_)
     CHECK_CXX_COMPILER_FLAG("${_flag_}" CXX_SUPPORTS${_flag_})
     CHECK_C_COMPILER_FLAG("${_flag_}" CC_SUPPORTS${_flag_})
@@ -155,6 +161,9 @@ else()
     # Not everyone is as smart as clang for code reachability
     add_warning_flag("-Wno-covered-switch-default")
     add_warning_flag("-Wno-unreachable-code-break")
+
+    # Warnings for PGI compiler
+    add_warning_flag("-Minform=warn")
 
     if(${CMAKE_C_COMPILER} MATCHES "icc.*$")
         # Intel compiler is too strict in errors about 'explicit' keyword

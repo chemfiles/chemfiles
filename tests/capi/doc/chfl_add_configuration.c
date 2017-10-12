@@ -6,6 +6,7 @@
 #include <assert.h>
 
 int main() {
+    // [no-run]
     // [example]
     chfl_add_configuration("local-configuration-file.toml");
 
