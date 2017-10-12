@@ -44,7 +44,7 @@ matrix:
       addons: *linux64
     - os: linux
       compiler: gcc
-      env: DEPLOY_DOCS=ON
+      env: DEPLOY_DOCS=ON VALGRIND=ON
       addons: *linux64
     - os: linux
       compiler: gcc

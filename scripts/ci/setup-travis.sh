@@ -44,7 +44,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         export CXX=g++-4.8
     fi
 
-    if [[ "$ARCH" != "x86" ]]; then
+    if [[ "$VALGRIND" == "ON" ]]; then
         export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_TEST_RUNNER=valgrind"
     fi
 fi
