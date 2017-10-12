@@ -21,7 +21,6 @@ linux32_addons:
         packages:
         - g++-4.8
         - doxygen
-        - valgrind
         - g++-4.8-multilib
         - linux-libc-dev:i386
         - libc6-dev-i386
@@ -36,41 +35,25 @@ matrix:
           packages:
           - doxygen
     - os: linux
-      compiler: clang
-      env: SHARED_LIBS=ON CMAKE_EXTRA=-DCHFL_SYSTEM_NETCDF=ON
+      compiler: gcc
+      env: STATIC_LIBS=ON DO_COVERAGE=ON
       addons: *linux64
     - os: linux
       compiler: clang
-      env: SHARED_LIBS=OFF DEPLOY_DOCS=ON
+      env: CMAKE_EXTRA=-DCHFL_SYSTEM_NETCDF=ON
       addons: *linux64
     - os: linux
       compiler: gcc
-      env: SHARED_LIBS=ON
+      env: DEPLOY_DOCS=ON
       addons: *linux64
     - os: linux
       compiler: gcc
-      env: SHARED_LIBS=OFF
-      addons: *linux64
-    - os: linux
-      compiler: gcc
-      env: SHARED_LIBS=ON ARCH="x86" CMAKE_EXTRA=-DHAVE_LIBM=/lib32/libm.so.6
-      addons: *linux32
-    - os: linux
-      compiler: gcc
-      env: SHARED_LIBS=OFF ARCH="x86" CMAKE_EXTRA=-DHAVE_LIBM=/lib32/libm.so.6
+      env: ARCH=x86 CMAKE_EXTRA=-DHAVE_LIBM=/lib32/libm.so.6
       addons: *linux32
     - os: osx
       compiler: clang
-      env: SHARED_LIBS=ON
-    - os: osx
-      compiler: clang
-      env: SHARED_LIBS=OFF
     - os: osx
       compiler: gcc
-      env: SHARED_LIBS=ON
-    - os: osx
-      compiler: gcc
-      env: SHARED_LIBS=OFF
 
 before_install:
   # Setting environement
@@ -95,7 +78,7 @@ script:
     fi
   # Generate and upload coverage
   - |
-    if ${DO_COVERAGE_ON_TRAVIS}; then
+    if [[ "${DO_COVERAGE}" == "ON" ]]; then
         cd $TRAVIS_BUILD_DIR
         find . -type f -name '*.gcno' -exec gcov-4.8 -pb {} +
         rm -f \#usr\#*.gcov
