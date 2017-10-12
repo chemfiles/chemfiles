@@ -246,7 +246,7 @@ TEST_CASE("PDB files with big values") {
     }
 
     SECTION("Default residues") {
-        auto tmpfile = "data/pdb/tmp.pdb";
+        auto tmpfile = NamedTempPath(".pdb");
 
         Topology topology;
         for(size_t i=0; i<10001; i++) {
@@ -273,12 +273,10 @@ TEST_CASE("PDB files with big values") {
         CHECK(positions[998] == Vector3D(1., 2., 3.));
         CHECK(positions[9998] == Vector3D(4., 5., 6.));
         CHECK(positions[9999] == Vector3D(7., 8., 9.));
-
-        remove("data/pdb/tmp.pdb");
     }
 
     SECTION("User specified residues") {
-        auto tmpfile = "data/pdb/tmp.pdb";
+        auto tmpfile = NamedTempPath(".pdb");
 
         Topology topology;
         for(size_t i=0; i<10001; i++) {
@@ -309,7 +307,5 @@ TEST_CASE("PDB files with big values") {
         CHECK(positions[998] == Vector3D(1., 2., 3.));
         CHECK(positions[9998] == Vector3D(4., 5., 6.));
         CHECK(positions[9999] == Vector3D(7., 8., 9.));
-
-        remove("data/pdb/tmp.pdb");
     }
 }
