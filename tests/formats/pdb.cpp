@@ -2,6 +2,9 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <fstream>
+
+#include <iostream>
+
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
@@ -232,14 +235,84 @@ TEST_CASE("Write files in PDB format") {
 }
 
 TEST_CASE("PDB files with big values") {
-    auto tmpfile = NamedTempPath(".pdb");
-    auto trajectory = Trajectory(tmpfile, 'w');
+    SECTION("Unit cell and Coordinates") {
+        auto tmpfile = NamedTempPath(".pdb");
+        auto trajectory = Trajectory(tmpfile, 'w');
 
-    auto frame = Frame(1);
-    frame.set_cell(UnitCell(1234567890));
-    CHECK_THROWS_AS(trajectory.write(frame), FormatError);
+        auto frame = Frame(1);
+        frame.set_cell(UnitCell(1234567890));
+        CHECK_THROWS_AS(trajectory.write(frame), FormatError);
 
-    frame.set_cell(UnitCell(12));
-    frame.positions()[0] = Vector3D(123456789, 2, 3);
-    CHECK_THROWS_AS(trajectory.write(frame), FormatError);
+        frame.set_cell(UnitCell(12));
+        frame.positions()[0] = Vector3D(123456789, 2, 3);
+        CHECK_THROWS_AS(trajectory.write(frame), FormatError);
+    }
+
+    SECTION("Default residues") {
+        auto tmpfile = "data/pdb/tmp.pdb";
+
+        Topology topology;
+        for(size_t i=0; i<10001; i++) {
+            topology.add_atom(Atom("A"));
+        }
+        Frame frame(topology);
+        auto positions = frame.positions();
+        positions[998] = Vector3D(1., 2., 3.);
+        positions[9998] = Vector3D(4., 5., 6.);
+        positions[9999] = Vector3D(7., 8., 9.);
+
+        {
+            auto trajectory = Trajectory(tmpfile, 'w');
+            trajectory.write(frame);
+        }
+
+        auto in_trajectory = Trajectory(tmpfile, 'r');
+        auto in_frame = in_trajectory.read();
+        auto in_topology = in_frame.topology();
+        auto in_positions = in_frame.positions();
+
+        // If resSeq is has more than 4 characters, coordinates won't be read
+        // correctly
+        CHECK(positions[998] == Vector3D(1., 2., 3.));
+        CHECK(positions[9998] == Vector3D(4., 5., 6.));
+        CHECK(positions[9999] == Vector3D(7., 8., 9.));
+
+        remove("data/pdb/tmp.pdb");
+    }
+
+    SECTION("User specified residues") {
+        auto tmpfile = "data/pdb/tmp.pdb";
+
+        Topology topology;
+        for(size_t i=0; i<10001; i++) {
+            Atom atom("A");
+            topology.add_atom(atom);
+            Residue residue("ANA", i+1);
+            residue.add_atom(i);
+            topology.add_residue(residue);
+        }
+        Frame frame(topology);
+        auto positions = frame.positions();
+        positions[998] = Vector3D(1., 2., 3.);
+        positions[9998] = Vector3D(4., 5., 6.);
+        positions[9999] = Vector3D(7., 8., 9.);
+
+        {
+            auto trajectory = Trajectory(tmpfile, 'w');
+            trajectory.write(frame);
+        }
+
+        auto in_trajectory = Trajectory(tmpfile, 'r');
+        auto in_frame = in_trajectory.read();
+        auto in_topology = in_frame.topology();
+        auto in_positions = in_frame.positions();
+
+        // If resSeq is has more than 4 characters, coordinates won't be read
+        // correctly
+        CHECK(positions[998] == Vector3D(1., 2., 3.));
+        CHECK(positions[9998] == Vector3D(4., 5., 6.));
+        CHECK(positions[9999] == Vector3D(7., 8., 9.));
+
+        // remove("data/pdb/tmp.pdb");
+    }
 }
