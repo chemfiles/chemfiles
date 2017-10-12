@@ -85,6 +85,7 @@ script:
   - $CMAKE_CONFIGURE cmake $CMAKE_ARGS $CMAKE_EXTRA ..
   - make -j2
   - ctest -j2 --output-on-failure
+  - ccache -s
   - cd $TRAVIS_BUILD_DIR
   # Check C API documentation
   - ./scripts/ci/check-capi.py
@@ -112,3 +113,5 @@ deploy:
     branch: master
     tags: true
     condition: $DEPLOY_DOCS == ON
+
+cache: ccache
