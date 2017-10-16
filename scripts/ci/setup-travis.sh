@@ -60,6 +60,12 @@ if [[ "$USE_ICC" == "ON" ]]; then
     export CXX=icpc
 fi
 
+if [[ "$USE_PGI" == "ON" ]]; then
+    /bin/sh $TRAVIS_BUILD_DIR/scripts/ci/install-pgi.sh
+    export CC=pgcc
+    export CXX=pgc++
+fi
+
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew update
     brew install doxygen

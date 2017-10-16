@@ -59,6 +59,10 @@ matrix:
       compiler: gcc
       env: USE_ICC=ON
       addons: *linux64
+    - os: linux
+      compiler: gcc
+      env: USE_PGI=ON
+      addons: *linux64
 
 before_install:
   # Setting environement
