@@ -104,11 +104,17 @@ script:
     fi
 
 deploy:
-  provider: pages
-  skip_cleanup: true
-  github_token: $GH_TOKEN
-  local_dir: build/gh-pages
-  on:
-    branch: master
-    tags: true
-    condition: $DEPLOY_DOCS == ON
+  - provider: pages
+    skip_cleanup: true
+    github_token: $GH_TOKEN
+    local_dir: build/gh-pages
+    on:
+        branch: master
+        condition: $DEPLOY_DOCS == ON
+  - provider: pages
+    skip_cleanup: true
+    github_token: $GH_TOKEN
+    local_dir: build/gh-pages
+    on:
+        tags: true
+        condition: $DEPLOY_DOCS == ON

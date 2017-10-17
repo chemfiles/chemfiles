@@ -11,6 +11,7 @@ cd build
 # Get previous documentation
 git clone https://github.com/$TRAVIS_REPO_SLUG --branch gh-pages gh-pages
 rm -rf gh-pages/.git
+rm -rf gh-pages/deployed*
 
 # Build new documentation
 cmake -DCHFL_BUILD_DOCUMENTATION=ON .

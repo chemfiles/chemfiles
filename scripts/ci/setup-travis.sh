@@ -49,7 +49,6 @@ fi
 
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew update
-    brew install doxygen
     if [[ "$CC" == "gcc" ]]; then
         brew rm gcc
         brew install gcc@5
