@@ -120,6 +120,34 @@ TEST_CASE("chfl_topology") {
         CHECK_STATUS(chfl_topology_free(topology));
     }
 
+    SECTION("Impropers") {
+        CHFL_TOPOLOGY* topology = testing_topology();
+        REQUIRE(topology);
+
+        CHFL_ATOM* H = chfl_atom("H");
+        REQUIRE(H);
+        CHECK_STATUS(chfl_topology_add_atom(topology, H));
+        CHECK_STATUS(chfl_topology_add_bond(topology, 2, 4));
+        CHECK_STATUS(chfl_atom_free(H));
+
+        uint64_t n = 0;
+        CHECK_STATUS(chfl_topology_impropers_count(topology, &n));
+        CHECK(n == 1);
+
+        uint64_t expected[1][4] = {{1, 2, 3, 4}};
+        uint64_t impropers[1][4] = {{0}};
+        CHECK_STATUS(chfl_topology_impropers(topology, impropers, 1));
+        for (unsigned j=0; j<4; j++) {
+            CHECK(impropers[0][j] == expected[0][j]);
+        }
+
+        CHECK_STATUS(chfl_topology_remove_bond(topology, 2, 4));
+        CHECK_STATUS(chfl_topology_impropers_count(topology, &n));
+        CHECK(n == 0);
+
+        CHECK_STATUS(chfl_topology_free(topology));
+    }
+
     SECTION("Residues") {
         CHFL_TOPOLOGY* topology = chfl_topology();
         REQUIRE(topology);

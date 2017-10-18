@@ -29,11 +29,15 @@ Function manipulating ``CHFL_TOPOLOGY``
 
 .. doxygenfunction:: chfl_topology_dihedrals_count
 
+.. doxygenfunction:: chfl_topology_impropers_count
+
 .. doxygenfunction:: chfl_topology_bonds
 
 .. doxygenfunction:: chfl_topology_angles
 
 .. doxygenfunction:: chfl_topology_dihedrals
+
+.. doxygenfunction:: chfl_topology_impropers
 
 .. doxygenfunction:: chfl_topology_add_residue
 

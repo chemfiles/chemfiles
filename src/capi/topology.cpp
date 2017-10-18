@@ -99,6 +99,14 @@ extern "C" chfl_status chfl_topology_dihedrals_count(const CHFL_TOPOLOGY* const 
     )
 }
 
+extern "C" chfl_status chfl_topology_impropers_count(const CHFL_TOPOLOGY* const topology, uint64_t* nimpropers) {
+    CHECK_POINTER(topology);
+    CHECK_POINTER(nimpropers);
+    CHFL_ERROR_CATCH(
+        *nimpropers = topology->impropers().size();
+    )
+}
+
 #pragma intel optimization_level 2  /* Using -O3 with icc lead to partial copy of the bonds */
 extern "C" chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[2], uint64_t nbonds) {
     CHECK_POINTER(topology);
@@ -145,7 +153,7 @@ extern "C" chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topolo
 
     CHFL_ERROR_CATCH(
         if (ndihedrals != topology->dihedrals().size()) {
-            CAPI_LAST_ERROR = "Wrong data size in function 'chfl_topology_bonds'.";
+            CAPI_LAST_ERROR = "Wrong data size in function 'chfl_topology_dihedrals'.";
             return CHFL_MEMORY_ERROR;
         }
 
@@ -155,6 +163,27 @@ extern "C" chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topolo
             data[i][1] = static_cast<uint64_t>(dihedrals[i][1]);
             data[i][2] = static_cast<uint64_t>(dihedrals[i][2]);
             data[i][3] = static_cast<uint64_t>(dihedrals[i][3]);
+        }
+    )
+}
+
+#pragma intel optimization_level 2 /* Using -O3 with icc lead to partial copy of the dihedrals */
+extern "C" chfl_status chfl_topology_impropers(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t nimpropers) {
+    CHECK_POINTER(topology);
+    CHECK_POINTER(data);
+
+    CHFL_ERROR_CATCH(
+        if (nimpropers != topology->impropers().size()) {
+            CAPI_LAST_ERROR = "Wrong data size in function 'chfl_topology_impropers'.";
+            return CHFL_MEMORY_ERROR;
+        }
+
+        auto& impropers = topology->impropers();
+        for (size_t i=0; i<nimpropers; i++) {
+            data[i][0] = static_cast<uint64_t>(impropers[i][0]);
+            data[i][1] = static_cast<uint64_t>(impropers[i][1]);
+            data[i][2] = static_cast<uint64_t>(impropers[i][2]);
+            data[i][3] = static_cast<uint64_t>(impropers[i][3]);
         }
     )
 }
