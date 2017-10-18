@@ -26,8 +26,8 @@ std::string chemfiles::user_name() {
     }
     return name;
 #else
-    auto passwd = getpwuid(getuid());
-    return passwd ? passwd->pw_name : "";
+    auto user = getpwuid(getuid());
+    return user ? user->pw_name : "";
 #endif
 }
 

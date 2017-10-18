@@ -79,8 +79,8 @@ namespace nc {
     };
 
     template<typename NcType> struct nc_type;
-    template<> struct nc_type<NcFloat> {constexpr static auto value = NC_FLOAT;};
-    template<> struct nc_type<NcChar> {constexpr static auto value = NC_CHAR;};
+    template<> struct nc_type<NcFloat> {static constexpr auto value = NC_FLOAT;};
+    template<> struct nc_type<NcChar> {static constexpr auto value = NC_CHAR;};
 } // namespace nc
 
 /// RAII wrapper around NetCDF 3 binary files

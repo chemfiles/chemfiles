@@ -87,6 +87,10 @@ function(chfl_test _name_ _file_)
         # Link to the websoket library for the hostname test
         target_link_libraries(${_name_} ws2_32)
     endif()
+
+    if("${CMAKE_CXX_COMPILER_ID}" MATCHES "PGI" AND "${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+        target_link_libraries(${_name_} atomic)
+    endif()
 endfunction()
 
 function(chfl_cpp_test _file_)

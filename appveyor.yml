@@ -7,45 +7,16 @@ environment:
     - generator: MinGW Makefiles
       CXX_PATH: 'C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin'
       ARCH: x64
-      SHARED_LIBS: OFF
     - generator: MinGW Makefiles
       CXX_PATH: 'C:\mingw-w64\i686-6.3.0-posix-dwarf-rt_v5-rev1\mingw32\bin'
       ARCH: x86
-      SHARED_LIBS: OFF
-    - generator: MinGW Makefiles
-      CXX_PATH: 'C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin'
-      ARCH: x64
-      SHARED_LIBS: ON
-    - generator: MinGW Makefiles
-      CXX_PATH: 'C:\mingw-w64\i686-6.3.0-posix-dwarf-rt_v5-rev1\mingw32\bin'
-      ARCH: x86
-      SHARED_LIBS: ON
     - generator: Visual Studio 14 2015 Win64
       ARCH: x64
-      SHARED_LIBS: OFF
     - generator: Visual Studio 14 2015
       ARCH: x86
-      SHARED_LIBS: OFF
-    - generator: Visual Studio 14 2015 Win64
-      ARCH: x64
-      SHARED_LIBS: ON
-    - generator: Visual Studio 14 2015
-      ARCH: x86
-      SHARED_LIBS: ON
-
-configuration:
-  - Debug
 
 clone_depth: 10
 clone_folder: c:\chemfiles
-
-notifications:
-  - provider: Email
-    to: [luthaf@luthaf.fr]
-    on_build_success: false
-    on_build_failure: true
-    on_build_status_changed: true
-
 
 # Uncomment the following lines to enable remote desktop access to Appveyor
 # after a failed build.
@@ -64,7 +35,7 @@ build_script:
   - cd build
   - ps: echo $env:CMAKE_ARGUMENTS
   - cmake %CMAKE_ARGUMENTS% ..
-  - cmake --build . --config "%configuration%" -- %BUILD_ARGUMENTS%
+  - cmake --build . --config Debug -- %BUILD_ARGUMENTS%
 
 test_script:
-  - ctest --build-config "%configuration%" --timeout 300 --output-on-failure
+  - ctest --build-config Debug --timeout 300 --output-on-failure

@@ -326,8 +326,8 @@ Frame testing_frame() {
     // FIXME: writing the loop as (auto& vel: *frame.velocities()) gives a
     // segfault using gcc 5.3 on OS X with optimization level O2 and O3. No
     // idea why ...
-    auto span = frame.velocities();
-    for (auto& vel: *span) {
+    auto velocities = frame.velocities();
+    for (auto& vel: *velocities) {
         vel[0] = i + 1;
         vel[1] = i + 2;
         vel[2] = i + 0;

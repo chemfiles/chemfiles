@@ -1,13 +1,16 @@
 #!/bin/bash
 
-export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DCHFL_BUILD_TESTS=ON -DBUILD_SHARED_LIBS=$SHARED_LIBS"
+export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DCHFL_BUILD_TESTS=ON"
 
-if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "gcc" && "$SHARED_LIBS" == "ON" ]]; then
-    export DO_COVERAGE_ON_TRAVIS=true
+if [[ "${STATIC_LIBS}" == "ON" ]]; then
+    export CMAKE_ARGS="$CMAKE_ARGS -DBUILD_SHARED_LIBS=OFF"
+else
+    export CMAKE_ARGS="$CMAKE_ARGS -DBUILD_SHARED_LIBS=ON"
+fi
+
+if [[ "${DO_COVERAGE}" == "ON" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_CODE_COVERAGE=ON"
     pip install --user codecov
-else
-    export DO_COVERAGE_ON_TRAVIS=false
 fi
 
 cd $TRAVIS_BUILD_DIR
@@ -41,11 +44,27 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         export CXX=g++-4.8
     fi
 
-    if [[ "$ARCH" != "x86" ]]; then
+    if [[ "$VALGRIND" == "ON" ]]; then
         export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_TEST_RUNNER=valgrind"
     fi
 fi
 
+if [[ "$USE_ICC" == "ON" ]]; then
+    if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
+        echo "not runnning intel builder on Pull-Request"
+        exit
+    fi
+    /bin/sh $TRAVIS_BUILD_DIR/scripts/ci/install-icc.sh
+    source ~/.bashrc
+    export CC=icc
+    export CXX=icpc
+fi
+
+if [[ "$USE_PGI" == "ON" ]]; then
+    /bin/sh $TRAVIS_BUILD_DIR/scripts/ci/install-pgi.sh
+    export CC=pgcc
+    export CXX=pgc++
+fi
 
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew update
