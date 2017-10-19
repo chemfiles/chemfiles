@@ -10,6 +10,8 @@
 
 #include "chemfiles/Error.hpp"
 
+#include <fmt/format.h>
+
 namespace chemfiles {
 
 extern std::string CAPI_LAST_ERROR;
@@ -42,7 +44,9 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
 #define CHECK_POINTER(ptr)                                                     \
     do {                                                                       \
         if (ptr == nullptr) {                                                  \
-            std::string message = "Parameter " + std::string(#ptr) + " cannot be NULL"; \
+            std::string message = fmt::format(                                 \
+                "Parameter '{}' cannot be NULL in {}", #ptr, __func__          \
+            );                                                                 \
             CAPI_LAST_ERROR = message;                                         \
             chemfiles::warning(message);                                       \
             return CHFL_MEMORY_ERROR;                                          \
@@ -52,7 +56,9 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
 #define CHECK_POINTER_GOTO(ptr)                                                \
     do {                                                                       \
         if (ptr == nullptr) {                                                  \
-            std::string message = "Parameter " + std::string(#ptr) + " cannot be NULL"; \
+            std::string message = fmt::format(                                 \
+                "Parameter '{}' cannot be NULL in {}", #ptr, __func__          \
+            );                                                                 \
             CAPI_LAST_ERROR = message;                                         \
             chemfiles::warning(message);                                       \
             goto error;                                                        \
