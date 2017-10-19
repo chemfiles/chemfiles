@@ -23,6 +23,8 @@ Function manipulating ``CHFL_RESIDUE``
 
 .. doxygenfunction:: chfl_residue_atoms_count
 
+.. doxygenfunction:: chfl_residue_atoms
+
 .. doxygenfunction:: chfl_residue_contains
 
 .. doxygenfunction:: chfl_residue_free

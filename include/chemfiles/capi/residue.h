@@ -82,6 +82,20 @@ CHFL_EXPORT chfl_status chfl_residue_atoms_count(
     const CHFL_RESIDUE* const residue, uint64_t* size
 );
 
+/// Get the list of atoms in the `residue` in the pre-allocated array `atoms` of
+/// size `natoms`.
+///
+/// The `atoms` array size must be passed in the `nbonds` parameter, and be
+/// equal to the result of `chfl_residue_atoms_count`. The `atoms` array is
+/// sorted.
+///
+/// @example{tests/capi/doc/chfl_residue/atoms.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_residue_atoms(
+    const CHFL_RESIDUE* const residue, uint64_t atoms[], uint64_t natoms
+);
+
 /// Get the identifier of a `residue` in the initial topology file in the
 /// integer pointed to by `id`.
 ///

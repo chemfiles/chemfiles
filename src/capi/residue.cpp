@@ -88,6 +88,22 @@ extern "C" chfl_status chfl_residue_atoms_count(const CHFL_RESIDUE* const residu
     )
 }
 
+extern "C" chfl_status chfl_residue_atoms(const CHFL_RESIDUE* const residue, uint64_t atoms[], uint64_t natoms) {
+    CHECK_POINTER(residue);
+    CHECK_POINTER(atoms);
+    CHFL_ERROR_CATCH(
+        if (natoms != residue->size()) {
+            CAPI_LAST_ERROR = "Wrong data size in function 'chfl_residue_atoms'.";
+            return CHFL_MEMORY_ERROR;
+        }
+
+        size_t i = 0;
+        for (size_t index: *residue) {
+            atoms[i] = static_cast<uint64_t>(index);
+            i++;
+        }
+    )
+}
 
 extern "C" chfl_status chfl_residue_id(const CHFL_RESIDUE* const residue, uint64_t* id) {
     CHECK_POINTER(residue);
