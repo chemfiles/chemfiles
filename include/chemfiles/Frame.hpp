@@ -131,6 +131,16 @@ public:
     /// @throws chemfiles::OutOfBounds if `i`, `j`, `k` or `m` are not in bounds
     double dihedral(size_t i, size_t j, size_t k, size_t m) const;
 
+    /// Get the out of plane distance formed by the atoms at indexes `i`, `j`,
+    /// `k` and `m`, accounting for periodic boundary conditions. The distance
+    /// is expressed in angstroms.
+    ///
+    /// This is the distance betweent the atom j and the ikm plane. The j atom
+    /// is the center of the improper dihedral angle formed by i, j, k and m.
+    ///
+    /// @throws chemfiles::OutOfBounds if `i`, `j`, `k` or `m` are not in bounds
+    double out_of_plane(size_t i, size_t j, size_t k, size_t m) const;
+
     /// Set an arbitrary property for this frame with the given `name` and
     /// `value`. If a property with this name already exist, it is replaced
     /// with the new value.

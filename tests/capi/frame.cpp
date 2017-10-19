@@ -299,6 +299,8 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_3, NULL));
         chfl_vector3d position_4 = {0, 1, 1};
         CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_4, NULL));
+        chfl_vector3d position_5 = {0, 0, 2};
+        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_5, NULL));
 
         double distance = 0;
         CHECK_STATUS(chfl_frame_distance(frame, 0, 2, &distance));
@@ -312,10 +314,15 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_frame_dihedral(frame, 0, 1, 2, 3, &dihedral));
         CHECK(fabs(dihedral - PI / 2) < 1e-12);
 
+        double out_of_plane = 0;
+        CHECK_STATUS(chfl_frame_out_of_plane(frame, 1, 4, 0, 2, &out_of_plane));
+        CHECK(fabs(out_of_plane - 2) < 1e-12);
+
         // out of bounds errors
         CHECK(chfl_frame_distance(frame, 0, 6, &distance) == CHFL_OUT_OF_BOUNDS);
         CHECK(chfl_frame_angle(frame, 0, 6, 2, &distance) == CHFL_OUT_OF_BOUNDS);
         CHECK(chfl_frame_dihedral(frame, 0, 6, 2, 3, &distance) == CHFL_OUT_OF_BOUNDS);
+        CHECK(chfl_frame_out_of_plane(frame, 0, 6, 2, 3, &distance) == CHFL_OUT_OF_BOUNDS);
 
         CHECK_STATUS(chfl_atom_free(atom));
         CHECK_STATUS(chfl_frame_free(frame));

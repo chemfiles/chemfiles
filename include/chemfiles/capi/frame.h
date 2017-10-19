@@ -221,6 +221,20 @@ CHFL_EXPORT chfl_status chfl_frame_dihedral(
     const CHFL_FRAME* const frame, uint64_t i, uint64_t j, uint64_t k, uint64_t m, double* dihedral
 );
 
+/// Get the out of plane distance formed by the atoms at indexes `i`, `j`, `k`
+/// and `m` in the `frame`, accounting for periodic boundary conditions. The
+/// result is placed in `distance` and expressed in angstroms.
+///
+/// This is the distance betweent the atom j and the ikm plane. The j atom
+/// is the center of the improper dihedral angle formed by i, j, k and m.
+///
+/// @example{tests/capi/doc/chfl_frame/out_of_plane.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_frame_out_of_plane(
+    const CHFL_FRAME* const frame, uint64_t i, uint64_t j, uint64_t k, uint64_t m, double* distance
+);
+
 /// Add a new `property` with the given `name` to this `frame`.
 ///
 /// If a property with the same name already exists, this function override the
