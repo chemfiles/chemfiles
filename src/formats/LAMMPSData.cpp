@@ -634,6 +634,15 @@ static dihedral_type normalize_dihedral_type(size_t i, size_t j, size_t k, size_
     }
 }
 
+static improper_type normalize_improper_type(size_t i, size_t j, size_t k, size_t m) {
+    std::array<size_t, 3> others = {{i, k, m}};
+    std::sort(others.begin(), others.end());
+    i = others[0];
+    k = others[1];
+    m = others[2];
+    return std::make_tuple(i, j, k, m);
+}
+
 static atom_type make_atom_type(const Atom& atom) {
     return {atom.type(), atom.mass()};
 }
@@ -662,6 +671,14 @@ DataTypes::DataTypes(const Topology& topology) {
         auto k = atom_type_id(topology[dihedral[2]]);
         auto m = atom_type_id(topology[dihedral[3]]);
         dihedrals_.insert(normalize_dihedral_type(i, j, k, m));
+    }
+
+    for (auto& improper: topology.impropers()) {
+        auto i = atom_type_id(topology[improper[0]]);
+        auto j = atom_type_id(topology[improper[1]]);
+        auto k = atom_type_id(topology[improper[2]]);
+        auto m = atom_type_id(topology[improper[3]]);
+        impropers_.insert(normalize_improper_type(i, j, k, m));
     }
 }
 
@@ -701,6 +718,15 @@ size_t DataTypes::dihedral_type_id(size_t type_i, size_t type_j, size_t type_k, 
     }
 }
 
+size_t DataTypes::improper_type_id(size_t type_i, size_t type_j, size_t type_k, size_t type_m) const {
+    auto it = impropers_.find(normalize_improper_type(type_i, type_j, type_k, type_m));
+    if (it != impropers_.end()) {
+        return static_cast<size_t>(it - impropers_.begin());
+    } else {
+        throw error("invalid improper type passed to improper_type_id. this is a bug");
+    }
+}
+
 void LAMMPSDataFormat::write(const Frame& frame) {
     if (written_ || file_->mode() != File::Mode::WRITE) {
         throw format_error("LAMMPS data format does not support multiple frames");
@@ -717,6 +743,7 @@ void LAMMPSDataFormat::write(const Frame& frame) {
     write_bonds(topology);
     write_angles(topology);
     write_dihedrals(topology);
+    write_impropers(topology);
 }
 
 void LAMMPSDataFormat::write_header(const Frame& frame) {
@@ -729,15 +756,13 @@ void LAMMPSDataFormat::write_header(const Frame& frame) {
     fmt::print(*file_, "{} bonds\n", frame.topology().bonds().size());
     fmt::print(*file_, "{} angles\n", frame.topology().angles().size());
     fmt::print(*file_, "{} dihedrals\n", frame.topology().dihedrals().size());
-    // FIXME: change this when impropers are supported
-    fmt::print(*file_, "0 impropers\n");
+    fmt::print(*file_, "{} impropers\n", frame.topology().impropers().size());
 
     fmt::print(*file_, "{} atom types\n", types_.atoms().size());
     fmt::print(*file_, "{} bond types\n", types_.bonds().size());
     fmt::print(*file_, "{} angle types\n", types_.angles().size());
     fmt::print(*file_, "{} dihedral types\n", types_.dihedrals().size());
-    // FIXME: change this when impropers are supported
-    fmt::print(*file_, "0 improper types\n");
+    fmt::print(*file_, "{} improper types\n", types_.impropers().size());
 
     fmt::print(*file_, "0 {} xlo xhi\n", frame.cell().a());
     fmt::print(*file_, "0 {} ylo yhi\n", frame.cell().b());
@@ -779,7 +804,7 @@ void LAMMPSDataFormat::write_types() {
     }
 
     auto& dihedrals = types_.dihedrals().as_vec();
-    if (!angles.empty()) {
+    if (!dihedrals.empty()) {
         fmt::print(*file_, "\n# Dihedrals Coeffs\n");
         for (size_t i=0; i<dihedrals.size(); i++) {
             fmt::print(*file_, "# {} {}-{}-{}-{}\n", i + 1,
@@ -791,6 +816,18 @@ void LAMMPSDataFormat::write_types() {
         }
     }
 
+    auto& impropers = types_.impropers().as_vec();
+    if (!impropers.empty()) {
+        fmt::print(*file_, "\n# Impropers Coeffs\n");
+        for (size_t i=0; i<impropers.size(); i++) {
+            fmt::print(*file_, "# {} {}-{}-{}-{}\n", i + 1,
+                atoms[std::get<0>(impropers[i])].first,
+                atoms[std::get<1>(impropers[i])].first,
+                atoms[std::get<2>(impropers[i])].first,
+                atoms[std::get<3>(impropers[i])].first
+            );
+        }
+    }
 }
 
 void LAMMPSDataFormat::write_masses() {
@@ -878,6 +915,25 @@ void LAMMPSDataFormat::write_dihedrals(const Topology& topology) {
             dihedral[0] + 1, dihedral[1] + 1, dihedral[2] + 1, dihedral[3] + 1
         );
         dihedral_id++;
+    }
+}
+
+void LAMMPSDataFormat::write_impropers(const Topology& topology) {
+    if (topology.impropers().empty()) { return; }
+
+    fmt::print(*file_, "\nImpropers\n\n");
+    size_t improper_id = 1;
+    for (auto improper: topology.impropers()) {
+        auto type_i = types_.atom_type_id(topology[improper[0]]);
+        auto type_j = types_.atom_type_id(topology[improper[1]]);
+        auto type_k = types_.atom_type_id(topology[improper[2]]);
+        auto type_m = types_.atom_type_id(topology[improper[3]]);
+        auto improper_type_id = types_.improper_type_id(type_i, type_j, type_k, type_m);
+        fmt::print(*file_, "{} {} {} {} {} {}\n",
+            improper_id, improper_type_id + 1,
+            improper[0] + 1, improper[1] + 1, improper[2] + 1, improper[3] + 1
+        );
+        improper_id++;
     }
 }
 
