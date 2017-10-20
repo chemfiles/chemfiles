@@ -20,12 +20,12 @@ namespace chemfiles {
 /// molfile plugins, please see:
 /// http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/
 enum MolfileFormat {
-    DCD, ///< DCD binary file format
-    GRO, ///< Gromacs .gro file format
-    TRR, ///< Gromacs .trr file format
-    XTC, ///< Gromacs .xtc file format
-    TRJ, ///< Gromacs .trj file format
-    LAMMPS, ///< Lammps trajectory files
+    DCD,                ///< DCD binary file format
+    GRO,                ///< Gromacs .gro file format
+    TRR,                ///< Gromacs .trr file format
+    XTC,                ///< Gromacs .xtc file format
+    TRJ,                ///< Gromacs .trj file format
+    LAMMPS,             ///< Lammps trajectory files
 };
 
 /// A thin wrapper around the vmd plugin functions

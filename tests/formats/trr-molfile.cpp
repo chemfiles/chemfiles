@@ -41,4 +41,19 @@ TEST_CASE("Read files in Gromacs .trr format using Molfile"){
         CHECK(approx_eq(positions[0], Vector3D(0.2990952, 8.31003, 11.72146), eps));
         CHECK(approx_eq(positions[296], Vector3D(6.797599, 11.50882, 12.70423), eps));
     }
+
+    SECTION("1AKI"){
+        Trajectory file("data/trr/1aki.trr");
+        auto frame = file.read();
+        CHECK(frame.natoms() == 38376);
+
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[106], Vector3D(48.1473, 25.6153, 32.3827), eps));
+        CHECK(approx_eq(positions[2941], Vector3D(5.99960, 7.22088, 21.3499), eps));
+
+        // TODO: implement a TRR reader that also reads the velocities
+        // auto velocities = *frame.velocities();
+        // CHECK(approx_eq(velocities[450], Vector3D(-0.144889, 6.50066e-2, -0.764032), eps));
+        // CHECK(approx_eq(velocities[4653], Vector3D(-1.65949, -0.462240, -0.701133), eps));
+    }
 }

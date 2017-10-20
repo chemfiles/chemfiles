@@ -28,16 +28,16 @@ using namespace chemfiles;
         std::string format() const {return #FORMAT;}                           \
         std::string plugin_name() const {return #PLUGIN;}                      \
         std::string reader() const {return #READER;}                           \
-        bool have_velocities() const {return false;}                           \
+        bool have_velocities() const {return VELOCITIES;}                     \
     }
 
 namespace chemfiles {
-    PLUGINS_DATA(DCD,    dcdplugin,     dcd,       false);
-    PLUGINS_DATA(GRO,    gromacsplugin, gro,       false);
-    PLUGINS_DATA(TRR,    gromacsplugin, trr,       true);
-    PLUGINS_DATA(XTC,    gromacsplugin, xtc,       false);
-    PLUGINS_DATA(TRJ,    gromacsplugin, trj,       true);
-    PLUGINS_DATA(LAMMPS, lammpsplugin,  lammpstrj, false);
+    PLUGINS_DATA(DCD,               dcdplugin,          dcd,            false);
+    PLUGINS_DATA(GRO,               gromacsplugin,      gro,            false);
+    PLUGINS_DATA(TRR,               gromacsplugin,      trr,            false);
+    PLUGINS_DATA(XTC,               gromacsplugin,      xtc,            false);
+    PLUGINS_DATA(TRJ,               gromacsplugin,      trj,            false);
+    PLUGINS_DATA(LAMMPS,            lammpsplugin,       lammpstrj,      true);
 }
 
 #undef PLUGINS_FUNCTIONS
