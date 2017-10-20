@@ -52,6 +52,7 @@ using atom_type = std::pair<std::string, double>;
 using bond_type = std::tuple<size_t, size_t>;
 using angle_type = std::tuple<size_t, size_t, size_t>;
 using dihedral_type = std::tuple<size_t, size_t, size_t, size_t>;
+using improper_type = std::tuple<size_t, size_t, size_t, size_t>;
 
 class DataTypes {
 public:
@@ -66,6 +67,7 @@ public:
     const sorted_set<bond_type>& bonds() const {return bonds_;}
     const sorted_set<angle_type>& angles() const {return angles_;}
     const sorted_set<dihedral_type>& dihedrals() const {return dihedrals_;}
+    const sorted_set<improper_type>& impropers() const {return impropers_;}
 
     /// Get the atom type number for the given atom.
     ///
@@ -88,7 +90,7 @@ public:
     /// the vector backing the `sorted_set<angle_type>` returned by `angles()`.
     size_t angle_type_id(size_t type_i, size_t type_j, size_t type_k) const;
 
-    /// Get the dihedral type number for the angle type i-j-k.
+    /// Get the dihedral type number for the dihedral type i-j-k-m.
     ///
     /// The dihedral type must be in the topology used to construct this
     /// `DataTypes` instance. The index numbering starts at zero, and can be
@@ -96,11 +98,20 @@ public:
     /// returned by `dihedrals()`.
     size_t dihedral_type_id(size_t type_i, size_t type_j, size_t type_k, size_t type_m) const;
 
+    /// Get the improper type number for the improper type i-j-k-m.
+    ///
+    /// The improper type must be in the topology used to construct this
+    /// `DataTypes` instance. The index numbering starts at zero, and can be
+    /// used to index the vector backing the `sorted_set<improper_type>`
+    /// returned by `impropers()`.
+    size_t improper_type_id(size_t type_i, size_t type_j, size_t type_k, size_t type_m) const;
+
 private:
     sorted_set<atom_type> atoms_;
     sorted_set<bond_type> bonds_;
     sorted_set<angle_type> angles_;
     sorted_set<dihedral_type> dihedrals_;
+    sorted_set<improper_type> impropers_;
 };
 
 /// [LAMMPS Data] file format reader and writer.
@@ -182,6 +193,8 @@ private:
     void write_angles(const Topology& topology);
     /// Write the Dihedrals section
     void write_dihedrals(const Topology& topology);
+    /// Write the Impropers section
+    void write_impropers(const Topology& topology);
 
     /// Text file where we read from
     std::unique_ptr<TextFile> file_;

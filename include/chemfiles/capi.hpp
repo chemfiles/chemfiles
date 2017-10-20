@@ -10,13 +10,15 @@
 
 #include "chemfiles/Error.hpp"
 
+#include <fmt/format.h>
+
 namespace chemfiles {
 
 extern std::string CAPI_LAST_ERROR;
 
 inline size_t checked_cast(uint64_t value) {
     if (static_cast<uint64_t>(value) > static_cast<uint64_t>(SIZE_MAX)) {
-        throw chemfiles::Error("Got a value too big to be represented by a size_t on this system");
+        throw chemfiles::Error("got a value too big to be represented by a size_t on this system");
     }
     return static_cast<size_t>(value);
 }
@@ -42,7 +44,9 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
 #define CHECK_POINTER(ptr)                                                     \
     do {                                                                       \
         if (ptr == nullptr) {                                                  \
-            std::string message = "Parameter " + std::string(#ptr) + " cannot be NULL"; \
+            std::string message = fmt::format(                                 \
+                "Parameter '{}' cannot be NULL in {}", #ptr, __func__          \
+            );                                                                 \
             CAPI_LAST_ERROR = message;                                         \
             chemfiles::warning(message);                                       \
             return CHFL_MEMORY_ERROR;                                          \
@@ -52,7 +56,9 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
 #define CHECK_POINTER_GOTO(ptr)                                                \
     do {                                                                       \
         if (ptr == nullptr) {                                                  \
-            std::string message = "Parameter " + std::string(#ptr) + " cannot be NULL"; \
+            std::string message = fmt::format(                                 \
+                "Parameter '{}' cannot be NULL in {}", #ptr, __func__          \
+            );                                                                 \
             CAPI_LAST_ERROR = message;                                         \
             chemfiles::warning(message);                                       \
             goto error;                                                        \

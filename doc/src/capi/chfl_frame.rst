@@ -41,6 +41,8 @@ Function manipulating ``CHFL_FRAME``
 
 .. doxygenfunction:: chfl_frame_dihedral
 
+.. doxygenfunction:: chfl_frame_out_of_plane
+
 .. doxygenfunction:: chfl_frame_set_property
 
 .. doxygenfunction:: chfl_frame_get_property

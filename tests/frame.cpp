@@ -212,6 +212,16 @@ TEST_CASE("PBC functions") {
 
         CHECK(roughly(frame.dihedral(4, 5, 6, 7), 1.045378962606));
     }
+
+    SECTION("Out of plane") {
+        auto frame = Frame();
+        frame.add_atom(Atom(), Vector3D(0, 0, 0));
+        frame.add_atom(Atom(), Vector3D(0, 0, 2));
+        frame.add_atom(Atom(), Vector3D(1, 0, 0));
+        frame.add_atom(Atom(), Vector3D(0, 1, 0));
+
+        CHECK(frame.out_of_plane(0, 1, 2, 3) == 2);
+    }
 }
 
 TEST_CASE("Property map") {

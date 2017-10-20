@@ -130,7 +130,8 @@ void Frame::add_atom(Atom atom, Vector3D position, Vector3D velocity) {
 void Frame::remove(size_t i) {
     if (i >= natoms()) {
         throw out_of_bounds(
-            "out of bounds atomic index in `Frame::remove`: we have {} atoms, but the index is {}",
+            "out of bounds atomic index in `Frame::remove`: we have {} atoms, "
+            "but the index is {}",
             natoms(), i
         );
     }
@@ -145,7 +146,8 @@ void Frame::remove(size_t i) {
 double Frame::distance(size_t i, size_t j) const {
     if (i >= natoms() || j >= natoms()) {
         throw out_of_bounds(
-            "out of bounds atomic index in `Frame::distance`: we have {} atoms, but the index are {} and {}",
+            "out of bounds atomic index in `Frame::distance`: we have {} "
+            "atoms, but the index are {} and {}",
             natoms(), i, j
         );
     }
@@ -157,7 +159,8 @@ double Frame::distance(size_t i, size_t j) const {
 double Frame::angle(size_t i, size_t j, size_t k) const {
     if (i >= natoms() || j >= natoms() || k >= natoms()) {
         throw out_of_bounds(
-            "out of bounds atomic index in `Frame::angle`: we have {} atoms, but the index are {}, {}, and {}",
+            "out of bounds atomic index in `Frame::angle`: we have {} atoms, "
+            "but the index are {}, {}, and {}",
             natoms(), i, j, k
         );
     }
@@ -173,7 +176,8 @@ double Frame::angle(size_t i, size_t j, size_t k) const {
 double Frame::dihedral(size_t i, size_t j, size_t k, size_t m) const {
     if (i >= natoms() || j >= natoms() || k >= natoms() || m >= natoms()) {
         throw out_of_bounds(
-            "out of bounds atomic index in `Frame::dihedral`: we have {} atoms, but the index are {}, {}, {}, and {}",
+            "out of bounds atomic index in `Frame::dihedral`: we have {} "
+            "atoms, but the index are {}, {}, {}, and {}",
             natoms(), i, j, k, m
         );
     }
@@ -185,6 +189,23 @@ double Frame::dihedral(size_t i, size_t j, size_t k, size_t m) const {
     auto a = cross(rij, rjk);
     auto b = cross(rjk, rkm);
     return atan2(rjk.norm() * dot(b, rij), dot(a, b));
+}
+
+double Frame::out_of_plane(size_t i, size_t j, size_t k, size_t m) const {
+    if (i >= natoms() || j >= natoms() || k >= natoms() || m >= natoms()) {
+        throw out_of_bounds(
+            "out of bounds atomic index in `Frame::out_of_plane`: we have {} "
+            "atoms, but the index are {}, {}, {}, and {}",
+            natoms(), i, j, k, m
+        );
+    }
+
+    auto rji = cell_.wrap(positions_[j] - positions_[i]);
+    auto rik = cell_.wrap(positions_[i] - positions_[k]);
+    auto rim = cell_.wrap(positions_[i] - positions_[m]);
+
+    auto n = cross(rik, rim);
+    return dot(rji, n) / n.norm();
 }
 
 void Frame::set(std::string name, Property value) {

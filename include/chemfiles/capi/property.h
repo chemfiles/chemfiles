@@ -63,7 +63,7 @@ CHFL_EXPORT CHFL_PROPERTY* chfl_property_vector3d(const chfl_vector3d value);
 
 /// Get the type of value holded by this `property` in `kind`.
 ///
-/// @example{tests/capi/doc/chfl_property/get_kind.c}
+/// @example{tests/capi/doc/chfl_property/kind.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_property_get_kind(

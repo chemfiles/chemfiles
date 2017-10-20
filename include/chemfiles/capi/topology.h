@@ -110,6 +110,15 @@ CHFL_EXPORT chfl_status chfl_topology_dihedrals_count(
     const CHFL_TOPOLOGY* const topology, uint64_t* ndihedrals
 );
 
+/// Get the number of improper dihedral angles in the `topology` in `nimpropers`.
+///
+/// @example{tests/capi/doc/chfl_topology/impropers_count.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_topology_impropers_count(
+    const CHFL_TOPOLOGY* const topology, uint64_t* nimpropers
+);
+
 /// Get the list of bonds in the `topology` in the pre-allocated array `data`
 /// of size `nbonds`.
 ///
@@ -148,6 +157,20 @@ CHFL_EXPORT chfl_status chfl_topology_angles(
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_dihedrals(
     const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t ndihedrals
+);
+
+/// Get the list of improper dihedral angles in the `topology` in the
+/// pre-allocated array `data` of size `nimpropers`.
+///
+/// `data` size must be passed in the `nimpropers` parameter, and be equal to
+/// the result of `chfl_topology_impropers_count`. The impropers are sorted in
+/// the array.
+///
+/// @example{tests/capi/doc/chfl_topology/impropers.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_topology_impropers(
+    const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t nimpropers
 );
 
 /// Add a bond between the atoms at indexes `i` and `j` in the `topology`.

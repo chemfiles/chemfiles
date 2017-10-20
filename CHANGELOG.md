@@ -9,20 +9,21 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 * Change the license to the 3-clauses BSD license.
 * Chemfiles will now read configuration files (by default in `.chemfilesrc`),
-  and use the configuration data to rename atomic types to make sure they
-  match element names. The `chemfiles::add_configuration` function can be used
-  to add additional configuration files.
+  and use the configuration data to rename atomic types to make sure they match
+  element names. The `chemfiles::add_configuration` function can be used to add
+  additional configuration files.
 * Reading a `Frame` (with `Trajectory::read` or `Trajectory::read_step`) will
   now set the frame step.
-* The `Atom` faillible methods (`atomic_number`, `vdw_radius`,
-  `covalent_radius` and `full_name`) returns `optional<T>` instead of `T`.
+* The `Atom` faillible methods (`atomic_number`, `vdw_radius`, `covalent_radius`
+  and `full_name`) returns `optional<T>` instead of `T`.
 * Functions taking an atomic index parameter can now throw `OutOfBounds` errors
   if the index is out of bounds.
 * `Topology::append` is now called `Topology::add_atom`
-* Added `Frame::distance`, `Frame::angle` and `Frame::dihedral` to get
-  geometric information on the system, accounting for periodic boundary
-  conditions.  
+* Added `Frame::distance`, `Frame::angle`, `Frame::dihedral` and
+  `Frame::out_of_plane` to get geometric information on the system, accounting
+  for periodic boundary conditions.
 * Added a `Property` class to store arbitrary properties in `Frame` and `Atom`.
+* Added support for improper dihedral angles in `Topology`.
 
 ### Changes in supported formats
 
@@ -43,8 +44,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   take a `uint64_t*` parameter instead of an `int64_t*`, following all the other
   functions in the C API.
 * Added `CHFL_OUT_OF_BOUNDS` variant to `chfl_status`
-* Added `chfl_frame_distance`, `chfl_frame_angle`, `chfl_frame_dihedral` and
-  `chfl_cell_wrap` to work with periodic boundary conditions.
+* Added `chfl_frame_distance`, `chfl_frame_angle`, `chfl_frame_dihedral`,
+  `chfl_frame_out_of_plane` and `chfl_cell_wrap` to work with periodic boundary
+  conditions.
 * `chfl_residue` does not take the optional residue id as parameter, instead you
   should use `chfl_residue_with_id`.
 * Added `chfl_residue_atoms` to get the list of atoms in a residue.

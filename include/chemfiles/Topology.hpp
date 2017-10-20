@@ -107,6 +107,8 @@ public:
     const std::vector<Angle>& angles() const;
     /// Get the dihedral angles in the system, in a sorted vector
     const std::vector<Dihedral>& dihedrals() const;
+    /// Get the improper dihedral angles in the system, in a sorted vector
+    const std::vector<Improper>& impropers() const;
 
     /// Remove all bonding information in the topology (bonds, angles and
     /// dihedrals)
