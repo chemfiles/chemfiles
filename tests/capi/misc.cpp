@@ -26,7 +26,7 @@ TEST_CASE("Errors") {
 }
 
 TEST_CASE("Configuration") {
-    CHECK_STATUS(chfl_add_configuration("another_config"));
+    CHECK_STATUS(chfl_add_configuration("local-file.toml"));
     CHECK(chfl_add_configuration("not-there") == CHFL_CONFIGURATION_ERROR);
 }
 

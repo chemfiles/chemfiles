@@ -3,10 +3,9 @@
 
 #include <chemfiles.hpp>
 
-// [no-run]
 // [example]
     int main() {
-        chemfiles::add_configuration("some/local/file.toml");
+        chemfiles::add_configuration("local-file.toml");
 
         // Reading a trajectory will now use data from some/local/file.toml
 

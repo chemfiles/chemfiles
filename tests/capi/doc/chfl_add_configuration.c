@@ -6,12 +6,11 @@
 #include <assert.h>
 
 int main() {
-    // [no-run]
     // [example]
-    chfl_add_configuration("local-configuration-file.toml");
+    chfl_add_configuration("local-file.toml");
 
     // reading a frame will now use atom names from the configuration
     // ...
     // [example]
-    // return 0;
+    return 0;
 }

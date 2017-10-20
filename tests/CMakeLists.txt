@@ -126,20 +126,25 @@ endforeach(test_file)
 file(RELATIVE_PATH VERSION_FILE_PATH ${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/VERSION)
 target_compile_definitions(c-misc PRIVATE "-DVERSION_FILE_PATH=\"${VERSION_FILE_PATH}\"")
 
-set(CHEMFILES_TESTS_IGNORE "" CACHE INTERNAL "Ignored documentation tests")
 function(chfl_doctest _name_ _file_)
     if(NOT CHFL_BUILD_DOCTESTS)
         return()
     endif()
 
+    set(_no_run_ FALSE)
     file(STRINGS ${_file_} _FILE_CONTENT_)
     foreach(_line_ ${_FILE_CONTENT_})
         if("${_line_}" MATCHES "\\[no-run\\]")
-            set(CHEMFILES_TESTS_IGNORE "${CHEMFILES_TESTS_IGNORE} ${_name_}" CACHE INTERNAL "Ignored documentation tests" FORCE)
+            set(_no_run_ TRUE)
         endif()
     endforeach()
 
-    chfl_test(${_name_} ${_file_})
+    if(${_no_run_})
+        add_executable(${_name_} ${_file_} ${CHEMFILES_OBJECTS})
+        target_link_libraries(${_name_} ${NETCDF_LIBRARIES})
+    else()
+        chfl_test(${_name_} ${_file_})
+    endif()
     set_target_properties(${_name_} PROPERTIES COMPILE_FLAGS "-UNDEBUG")
 endfunction()
 
@@ -175,11 +180,9 @@ foreach(test_file IN LISTS capi_doctest_files)
     chfl_c_doctest(${test_file})
 endforeach(test_file)
 
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/CTestCustom.cmake.in
-    ${CMAKE_BINARY_DIR}/CTestCustom.cmake
-    @ONLY
-)
+foreach(test IN LISTS CHEMFILES_IGNORED_TESTS)
+    set_tests_properties(${test} PROPERTIES WILL_FAIL TRUE)
+endforeach(test)
 
 # Write sample configuration files for tests
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/../.chemfilesrc
@@ -195,7 +198,7 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/.chemfilesrc
 N2 = \"N4\"
 ")
 
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/another_config
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/local-file.toml
 "[types]
 Oz = \"F\"
 ")

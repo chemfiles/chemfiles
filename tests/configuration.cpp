@@ -16,7 +16,7 @@ TEST_CASE("Configuration") {
     CHECK(Configuration::rename("Oz") == "O");
     CHECK(Configuration::rename("N2") == "N4");
 
-    chemfiles::add_configuration("another_config");
+    chemfiles::add_configuration("local-file.toml");
     CHECK(Configuration::rename("Oz") == "F");
 }
 
