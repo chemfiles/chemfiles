@@ -56,6 +56,12 @@ TEST_CASE("chfl_residue") {
         CHECK_STATUS(chfl_residue_contains(residue, 16, &contains));
         CHECK(contains == false);
 
+        uint64_t atoms[3] = {0};
+        CHECK_STATUS(chfl_residue_atoms(residue, atoms, 3));
+        CHECK(atoms[0] == 0);
+        CHECK(atoms[1] == 1);
+        CHECK(atoms[2] == 20);
+
         CHECK_STATUS(chfl_residue_free(residue));
     }
 

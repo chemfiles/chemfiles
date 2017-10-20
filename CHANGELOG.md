@@ -47,6 +47,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   `chfl_cell_wrap` to work with periodic boundary conditions.
 * `chfl_residue` does not take the optional residue id as parameter, instead you
   should use `chfl_residue_with_id`.
+* Added `chfl_residue_atoms` to get the list of atoms in a residue.
 * Added `CHFL_PROPERTY` and related functions.
 
 ### Deprecation and removals
