@@ -28,6 +28,16 @@ TEST_CASE("Read files in TNG format"){
         CHECK(approx_eq(positions[11], Vector3D(8.5f, 33.0f, 34.0f), 1e-6));
     }
 
+    SECTION("Read velocities"){
+        Trajectory file("data/tng/1aki.tng");
+        auto frame = file.read();
+        CHECK(frame.natoms() == 38376);
+
+        auto velocities = *frame.velocities();
+        CHECK(approx_eq(velocities[450], Vector3D(-0.144889, 6.50066e-2, -0.764032), 1e-5));
+        CHECK(approx_eq(velocities[4653], Vector3D(-1.65949, -0.462240, -0.701133), 1e-5));
+    }
+
     SECTION("Read cell") {
         auto file = Trajectory("data/tng/water.tng");
         auto frame = file.read();
