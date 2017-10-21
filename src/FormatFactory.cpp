@@ -21,6 +21,7 @@ namespace chemfiles {
     extern template class Molfile<TRJ>;
     extern template class Molfile<LAMMPS>;
     extern template class Molfile<MOL2>;
+    extern template class Molfile<MOLDEN>;
 }
 
 FormatFactory::FormatFactory() : formats_(), extensions_() {
@@ -59,6 +60,9 @@ FormatFactory::FormatFactory() : formats_(), extensions_() {
 
     this->register_name<Molfile<MOL2>>("MOL2");
     this->register_extension<Molfile<MOL2>>(".mol2");
+
+    this->register_name<Molfile<MOLDEN>>("Molden");
+    this->register_extension<Molfile<MOLDEN>>(".molden");
 }
 
 FormatFactory& FormatFactory::get() {

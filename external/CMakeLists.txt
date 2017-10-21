@@ -127,7 +127,7 @@ mark_as_advanced(FORCE
 # VMD molfile: https://github.com/chemfiles/molfiles
 # ==========
 set(VMD_MOLFILE_PLUGINS
-    dcdplugin gromacsplugin lammpsplugin mol2plugin
+    dcdplugin gromacsplugin lammpsplugin mol2plugin moldenplugin
 )
 
 external_library(molfiles)
@@ -140,7 +140,7 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/molfiles/include)
 # abinitplugin carplugin cpmdplugin  gamessplugin mdfplugin msmsplugin
 # namdbinplugin parm7plugin parmplugin vasp5xdatcarplugin vaspchgcarplugin
 # vaspoutcarplugin vaspparchgplugin vaspposcarplugin vaspxdatcarplugin
-# vaspxmlplugin dlpolyplugin moldenplugin tinkerplugin
+# vaspxmlplugin dlpolyplugin tinkerplugin
 #
 # avsplugin babelplugin basissetplugin bgfplugin binposplugin biomoccaplugin
 # brixplugin ccp4plugin cifplugin corplugin crdplugin cubeplugin dsn6plugin
