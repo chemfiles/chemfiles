@@ -96,17 +96,13 @@ void XYZFormat::write(const Frame& frame) {
 bool forward(TextFile& file) {
     if (!file) {return false;}
 
-    std::string line;
+    long long natoms = 0;
     try {
-        line = file.readline();
+        auto line = file.readline();
+        natoms = std::stoll(line);
     } catch (const FileError&) {
         // No more line left in the file
         return false;
-    }
-
-    long long natoms = 0;
-    try {
-        natoms = std::stoll(line);
     } catch (const std::invalid_argument&) {
         // We could not read an integer, so give up here
         return false;
@@ -114,7 +110,7 @@ bool forward(TextFile& file) {
 
     if (natoms < 0) {
         throw format_error(
-            "Number of atoms can not be negative in '{}'", file.filename()
+            "number of atoms can not be negative in '{}'", file.filename()
         );
     }
 
@@ -123,7 +119,7 @@ bool forward(TextFile& file) {
     } catch (const FileError&) {
         // We could not read the lines from the file
         throw format_error(
-            "Not enough lines in '{}' for XYZ format", file.filename()
+            "not enough lines in '{}' for XYZ format", file.filename()
         );
     }
     return true;
