@@ -247,7 +247,7 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
     auto residues = std::unordered_map<size_t, Residue>();
     size_t atom_id = 0;
     for (auto& vmd_atom : atoms) {
-        Atom atom(vmd_atom.type, vmd_atom.name);
+        Atom atom(vmd_atom.name, vmd_atom.type);
         if (optflags & MOLFILE_MASS) {
             atom.set_mass(vmd_atom.mass);
         }

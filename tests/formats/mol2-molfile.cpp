@@ -29,11 +29,11 @@ TEST_CASE("Read files in mol2 format using Molfile") {
         CHECK(approx_eq(positions[33], Vector3D(4.5540, 11.1000, 22.5880), EPS));
 
         auto& topology = frame.topology();
-        CHECK(topology[0].name() == "N.am");
-        CHECK(topology[0].type() == "N1");
+        CHECK(topology[0].name() == "N1");
+        CHECK(topology[0].type() == "N.am");
         CHECK(approx_eq(topology[0].charge(), -0.8960, 1e-4));
-        CHECK(topology[33].name() == "H");
-        CHECK(topology[33].type() == "H131");
+        CHECK(topology[33].name() == "H131");
+        CHECK(topology[33].type() == "H");
         CHECK(approx_eq(topology[33].charge(), 0.0720, 1e-4));
 
         CHECK(topology.bonds().size() == 51);
@@ -52,13 +52,13 @@ TEST_CASE("Read files in mol2 format using Molfile") {
         CHECK(approx_eq(positions[61], Vector3D(-5.5050, -4.7850, -0.1660), EPS));
 
         auto& topology = frame.topology();
-        CHECK(topology[3].name() == "n");
-        // FIXME: this is weird. the plugin insist on using N4 as type, but the
+        // FIXME: this is weird. the plugin insist on using N4 as name, but the
         // file contains N2.
-        // CHECK(topology[3].type() == "N2");
+        CHECK(topology[3].name() == "N2");
+        CHECK(topology[3].type() == "n");
         CHECK(approx_eq(topology[3].charge(), -0.471100, 1e-5));
-        CHECK(topology[61].name() == "hc");
-        CHECK(topology[61].type() == "H24");
+        CHECK(topology[61].name() == "H24");
+        CHECK(topology[61].type() == "hc");
         CHECK(approx_eq(topology[61].charge(), 0.044367, 1e-5));
 
         CHECK(topology.bonds().size() == 72);
