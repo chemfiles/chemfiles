@@ -45,6 +45,10 @@ bool approx_eq(const chemfiles::Vector3D& a, const chemfiles::Vector3D& b, doubl
         && (fabs(a[2] - b[2]) < tolerance);
 }
 
+bool approx_eq(double a, double b, double tolerance) {
+    return (a - b) < tolerance;
+}
+
 NamedTempPath::NamedTempPath(std::string extension) {
     // Maybe operator overloading have been too far?
     auto path = fs::temp_directory_path() / fs::unique_path();

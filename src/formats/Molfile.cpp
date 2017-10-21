@@ -38,6 +38,7 @@ namespace chemfiles {
     PLUGINS_DATA(XTC,               gromacsplugin,      xtc,            false);
     PLUGINS_DATA(TRJ,               gromacsplugin,      trj,            false);
     PLUGINS_DATA(LAMMPS,            lammpsplugin,       lammpstrj,      true);
+    PLUGINS_DATA(MOL2,              mol2plugin,         mol2,           false);
 }
 
 #undef PLUGINS_FUNCTIONS
@@ -226,6 +227,9 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
         if (optflags & MOLFILE_MASS) {
             atom.set_mass(vmd_atom.mass);
         }
+        if (optflags & MOLFILE_CHARGE) {
+            atom.set_charge(vmd_atom.charge);
+        }
 
         topology_->add_atom(std::move(atom));
 
@@ -274,3 +278,4 @@ template class chemfiles::Molfile<TRR>;
 template class chemfiles::Molfile<XTC>;
 template class chemfiles::Molfile<TRJ>;
 template class chemfiles::Molfile<LAMMPS>;
+template class chemfiles::Molfile<MOL2>;

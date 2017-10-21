@@ -26,6 +26,7 @@ enum MolfileFormat {
     XTC,                ///< Gromacs .xtc file format
     TRJ,                ///< Gromacs .trj file format
     LAMMPS,             ///< Lammps trajectory files
+    MOL2,               ///< MOL2 file format
 };
 
 /// A thin wrapper around the vmd plugin functions

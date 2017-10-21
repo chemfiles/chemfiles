@@ -11,6 +11,7 @@ namespace chemfiles {
 }
 
 bool approx_eq(const chemfiles::Vector3D& a, const chemfiles::Vector3D& b, double tolerance=1e-15);
+bool approx_eq(double a, double b, double tolerance=1e-15);
 
 /// A temporary file path with an user specified extension, automatically
 /// deleted at scope exit.

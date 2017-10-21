@@ -29,6 +29,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Amber NetCDF format is now activated by default, by embedding the netcdf
   library in chemfiles.
 * Added `LAMMPS Data` format, reading and writing [LAMMPS data files].
+* Added mol2 file format using VMD molfiles plugin;
 
 [LAMMPS data files]: http://lammps.sandia.gov/doc/read_data.html
 
