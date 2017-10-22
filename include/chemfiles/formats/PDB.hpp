@@ -4,7 +4,7 @@
 #ifndef CHEMFILES_FORMAT_PDB_HPP
 #define CHEMFILES_FORMAT_PDB_HPP
 
-#include <unordered_map>
+#include <map>
 
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
@@ -39,7 +39,7 @@ private:
 
     std::unique_ptr<TextFile> file_;
     /// Map of residues, indexed by residue id.
-    std::unordered_map<size_t, Residue> residues_;
+    std::map<size_t, Residue> residues_;
     /// Storing the positions of all the steps in the file, so that we can
     /// just `seekg` them instead of reading the whole step.
     std::vector<std::streampos> steps_positions_;
