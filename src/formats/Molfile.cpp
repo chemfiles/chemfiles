@@ -28,16 +28,18 @@ using namespace chemfiles;
         std::string format() const {return #FORMAT;}                           \
         std::string plugin_name() const {return #PLUGIN;}                      \
         std::string reader() const {return #READER;}                           \
-        bool have_velocities() const {return false;}                           \
+        bool have_velocities() const {return VELOCITIES;}                     \
     }
 
 namespace chemfiles {
-    PLUGINS_DATA(DCD,    dcdplugin,     dcd,       false);
-    PLUGINS_DATA(GRO,    gromacsplugin, gro,       false);
-    PLUGINS_DATA(TRR,    gromacsplugin, trr,       true);
-    PLUGINS_DATA(XTC,    gromacsplugin, xtc,       false);
-    PLUGINS_DATA(TRJ,    gromacsplugin, trj,       true);
-    PLUGINS_DATA(LAMMPS, lammpsplugin,  lammpstrj, false);
+    PLUGINS_DATA(DCD,               dcdplugin,          dcd,            false);
+    PLUGINS_DATA(GRO,               gromacsplugin,      gro,            false);
+    PLUGINS_DATA(TRR,               gromacsplugin,      trr,            false);
+    PLUGINS_DATA(XTC,               gromacsplugin,      xtc,            false);
+    PLUGINS_DATA(TRJ,               gromacsplugin,      trj,            false);
+    PLUGINS_DATA(LAMMPS,            lammpsplugin,       lammpstrj,      true);
+    PLUGINS_DATA(MOL2,              mol2plugin,         mol2,           false);
+    PLUGINS_DATA(MOLDEN,            moldenplugin,       molden,         false);
 }
 
 #undef PLUGINS_FUNCTIONS
@@ -73,7 +75,7 @@ static int molfiles_to_chemfiles_warning(int level, const char* message) {
 
 template <MolfileFormat F>
 Molfile<F>::Molfile(const std::string& path, File::Mode mode)
-    : path_(path), plugin_handle_(nullptr), file_handle_(nullptr), natoms_(0) {
+    : path_(path), plugin_handle_(nullptr), data_(nullptr), natoms_(0) {
     if (mode != File::READ) {
         throw format_error(
             "molfiles based format {} is only available in read mode", plugin_data_.format()
@@ -102,19 +104,19 @@ Molfile<F>::Molfile(const std::string& path, File::Mode mode)
     plugin_handle_->cons_fputs = molfiles_to_chemfiles_warning;
 
     // Check that needed functions are here
-    if ((plugin_handle_->open_file_read == nullptr) ||
-        (plugin_handle_->read_next_timestep == nullptr) ||
-        (plugin_handle_->close_file_read == nullptr)) {
+    if (!plugin_handle_->open_file_read ||
+        (!plugin_handle_->read_next_timestep && !plugin_handle_->read_timestep) ||
+        (!plugin_handle_->close_file_read)) {
         throw format_error(
             "the {} plugin does not have read capacities", plugin_data_.format()
         );
     }
 
-    file_handle_ = plugin_handle_->open_file_read(
+    data_ = plugin_handle_->open_file_read(
         path.c_str(), plugin_handle_->name, &natoms_
     );
 
-    if (file_handle_ == nullptr) {
+    if (!data_) {
         throw format_error(
             "could not open the file at '{}' with {} plugin", path, plugin_data_.format()
         );
@@ -124,10 +126,27 @@ Molfile<F>::Molfile(const std::string& path, File::Mode mode)
 }
 
 template <MolfileFormat F> Molfile<F>::~Molfile() noexcept {
-    if (file_handle_) {
-        plugin_handle_->close_file_read(file_handle_);
+    if (data_) {
+        plugin_handle_->close_file_read(data_);
     }
     plugin_data_.fini();
+}
+
+template <MolfileFormat F> int Molfile<F>::read_next_timestep(molfile_timestep_t* timestep) {
+    if (plugin_handle_->read_next_timestep) {
+        // This function is provided by classical molecular simulation format.
+        return plugin_handle_->read_next_timestep(data_, natoms_, timestep);
+    } else if (plugin_handle_->read_timestep) {
+        // This function is provided by quantum molecular simulation format.
+        return plugin_handle_->read_timestep(
+            data_, natoms_, timestep, nullptr, nullptr
+        );
+    } else {
+        throw format_error(
+            "both read_next_timestep and read_timestep are missing in this "
+            "plugin. This is a bug"
+        );
+    }
 }
 
 template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
@@ -141,7 +160,7 @@ template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
         timestep.velocities = velocities.data();
     }
 
-    int status = plugin_handle_->read_next_timestep(file_handle_, natoms_, &timestep);
+    int status = read_next_timestep(&timestep);
     if (status != MOLFILE_SUCCESS) {
         throw format_error(
             "error while reading the file at '{}' with {} plugin",
@@ -157,10 +176,16 @@ template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
 }
 
 template <MolfileFormat F> size_t Molfile<F>::nsteps() {
+    if (!plugin_handle_->read_next_timestep) {
+        // FIXME: this is hacky, but the molden plugin does not respect a NULL
+        // argument for molfile_timestep_t, so for now we are only able to read
+        // a sinle step from all the QM format plugins.
+        return 1;
+    }
     size_t n = 0;
     int status = MOLFILE_SUCCESS;
     while (true) {
-        status = plugin_handle_->read_next_timestep(file_handle_, natoms_, nullptr);
+        status = read_next_timestep(nullptr);
         if (status == MOLFILE_SUCCESS) {
             n++;
         } else {
@@ -168,10 +193,9 @@ template <MolfileFormat F> size_t Molfile<F>::nsteps() {
         }
     }
     // We need to close and re-open the file
-    plugin_handle_->close_file_read(file_handle_);
+    plugin_handle_->close_file_read(data_);
     int tmp = 0;
-    file_handle_ =
-        plugin_handle_->open_file_read(path_.c_str(), plugin_handle_->name, &tmp);
+    data_ = plugin_handle_->open_file_read(path_.c_str(), plugin_handle_->name, &tmp);
     read_topology();
 
     return n;
@@ -210,10 +234,11 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
 
     std::vector<molfile_atom_t> atoms(static_cast<size_t>(natoms_));
     int optflags = 0;
-    int status = plugin_handle_->read_structure(file_handle_, &optflags, atoms.data());
+    int status = plugin_handle_->read_structure(data_, &optflags, atoms.data());
     if (status != MOLFILE_SUCCESS) {
         throw format_error(
-            "could not read atomic names with {} plugin", plugin_data_.format()
+            "could not read the molecule structure with {} plugin",
+            plugin_data_.format()
         );
     }
 
@@ -222,9 +247,12 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
     auto residues = std::unordered_map<size_t, Residue>();
     size_t atom_id = 0;
     for (auto& vmd_atom : atoms) {
-        Atom atom(vmd_atom.type, vmd_atom.name);
+        Atom atom(vmd_atom.name, vmd_atom.type);
         if (optflags & MOLFILE_MASS) {
             atom.set_mass(vmd_atom.mass);
+        }
+        if (optflags & MOLFILE_CHARGE) {
+            atom.set_charge(vmd_atom.charge);
         }
 
         topology_->add_atom(std::move(atom));
@@ -252,7 +280,7 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
     char** _char = nullptr;
 
     status = plugin_handle_->read_bonds(
-        file_handle_, &nbonds, &from, &to, &_float, &_int, &dummy, &_char
+        data_, &nbonds, &from, &to, &_float, &_int, &dummy, &_char
     );
     if (status != MOLFILE_SUCCESS) {
         throw format_error(
@@ -274,3 +302,5 @@ template class chemfiles::Molfile<TRR>;
 template class chemfiles::Molfile<XTC>;
 template class chemfiles::Molfile<TRJ>;
 template class chemfiles::Molfile<LAMMPS>;
+template class chemfiles::Molfile<MOL2>;
+template class chemfiles::Molfile<MOLDEN>;

@@ -39,6 +39,10 @@ specify which format to use.
 +-------------------+------------+-------------------+---------+---------+
 | `DCD`_            | .dcd       | |no|              | |yes|   | |no|    |
 +-------------------+------------+-------------------+---------+---------+
+| `MOL2`_           | .mol2      | |yes|             | |yes|   | |no|    |
++-------------------+------------+-------------------+---------+---------+
+| `Molden`_         | .molen     | |yes| Atom names  | |yes|   | |no|    |
++-------------------+------------+-------------------+---------+---------+
 
 "LAMMPS" format correspond to trajectory files written by the LAMMPS
 `dump <http://lammps.sandia.gov/doc/dump.html>`_ command. "LAMMPS Data"
@@ -55,6 +59,8 @@ correspond to LAMMPS data files, as read by the LAMMPS
 .. _TRJ: http://manual.gromacs.org/current/online/trj.html
 .. _TRR: http://manual.gromacs.org/current/online/trr.html
 .. _DCD: http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/dcdplugin.html
+.. _MOL2: http://chemyang.ccnu.edu.cn/ccb/server/AIMMS/mol2.pdf
+.. _Molden: http://www.cmbi.ru.nl/molden/molden_format.html
 
 .. |yes| image:: static/img/yes.png
           :alt: Yes

@@ -20,12 +20,14 @@ namespace chemfiles {
 /// molfile plugins, please see:
 /// http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/
 enum MolfileFormat {
-    DCD, ///< DCD binary file format
-    GRO, ///< Gromacs .gro file format
-    TRR, ///< Gromacs .trr file format
-    XTC, ///< Gromacs .xtc file format
-    TRJ, ///< Gromacs .trj file format
-    LAMMPS, ///< Lammps trajectory files
+    DCD,                ///< DCD binary file format
+    GRO,                ///< Gromacs .gro file format
+    TRR,                ///< Gromacs .trr file format
+    XTC,                ///< Gromacs .xtc file format
+    TRJ,                ///< Gromacs .trj file format
+    LAMMPS,             ///< Lammps trajectory files
+    MOL2,               ///< MOL2 file format
+    MOLDEN,             ///< Molden file format
 };
 
 /// A thin wrapper around the vmd plugin functions
@@ -64,15 +66,17 @@ private:
     /// Read topological information in the current file, if any.
     void read_topology();
 
+    int read_next_timestep(molfile_timestep_t* timestep);
+
     /// Path of the underlying file
     std::string path_;
     /// VMD plugin data
     MolfilePluginData<F> plugin_data_;
     /// VMD molfile plugin
     molfile_plugin_t* plugin_handle_;
-    /// The file handler
-    void* file_handle_;
-    /// The number of atoms in the last trajectory read
+    /// Data associated with the plugin, to be used by all the plugins callback
+    void* data_;
+    /// The number of atoms in this file
     int natoms_;
     /// Store optional topological information
     optional<Topology> topology_;

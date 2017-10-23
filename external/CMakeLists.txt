@@ -127,7 +127,7 @@ mark_as_advanced(FORCE
 # VMD molfile: https://github.com/chemfiles/molfiles
 # ==========
 set(VMD_MOLFILE_PLUGINS
-    dcdplugin gromacsplugin lammpsplugin
+    dcdplugin gromacsplugin lammpsplugin mol2plugin moldenplugin
 )
 
 external_library(molfiles)
@@ -137,23 +137,22 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/molfiles/include)
 # Plugins not yet enabled but that should compile without issue:
 # ==========
 
-#     abinitplugin avsplugin babelplugin basissetplugin bgfplugin binposplugin
-#     biomoccaplugin brixplugin carplugin ccp4plugin cifplugin corplugin
-#     cpmdplugin crdplugin cubeplugin dlpolyplugin dsn6plugin dtrplugin dxplugin
-#     edmplugin fs4plugin gamessplugin graspplugin grdplugin gridplugin jsplugin
-#     maeffplugin mapplugin mdfplugin mol2plugin moldenplugin molemeshplugin
-#     msmsplugin namdbinplugin netcdfplugin offplugin parm7plugin parmplugin
-#     pbeqplugin phiplugin pltplugin pqrplugin psfplugin raster3dplugin
-#     rst7plugin situsplugin spiderplugin stlplugin tinkerplugin uhbdplugin
-#     vasp5xdatcarplugin vaspchgcarplugin vaspoutcarplugin vaspparchgplugin
-#     vaspposcarplugin vaspxdatcarplugin vaspxmlplugin vtfplugin xbgfplugin
-#     xsfplugin
-
+# abinitplugin carplugin cpmdplugin  gamessplugin mdfplugin msmsplugin
+# namdbinplugin parm7plugin parmplugin vasp5xdatcarplugin vaspchgcarplugin
+# vaspoutcarplugin vaspparchgplugin vaspposcarplugin vaspxdatcarplugin
+# vaspxmlplugin dlpolyplugin tinkerplugin
+#
+# avsplugin babelplugin basissetplugin bgfplugin binposplugin biomoccaplugin
+# brixplugin ccp4plugin cifplugin corplugin crdplugin cubeplugin dsn6plugin
+# dtrplugin dxplugin edmplugin fs4plugin graspplugin grdplugin gridplugin
+# jsplugin maeffplugin mapplugin molemeshplugin offplugin pbeqplugin phiplugin
+# pltplugin pqrplugin psfplugin raster3dplugin rst7plugin situsplugin
+# spiderplugin stlplugin uhbdplugin vtfplugin xbgfplugin xsfplugin
 
 # ==========
 # Plugins with a chemfiles specific implementation
 # ==========
-#     xyzplugin pdbplugin tngplugin
+#     xyzplugin pdbplugin tngplugin netcdfplugin
 
 # ==========
 # These plugins do not compile or link
