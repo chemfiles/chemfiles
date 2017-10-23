@@ -10,7 +10,7 @@
 #include "chemfiles/exports.hpp"
 #include "chemfiles/optional.hpp"
 #include "chemfiles/types.hpp"
-#include "chemfiles/utils.hpp"
+#include "chemfiles/unreachable.hpp"
 #include "chemfiles/Error.hpp"
 
 namespace chemfiles {

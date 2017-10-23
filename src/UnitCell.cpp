@@ -4,7 +4,7 @@
 #include <cmath>
 
 #include "chemfiles/ErrorFmt.hpp"
-#include "chemfiles/utils.hpp"
+#include "chemfiles/unreachable.hpp"
 #include "chemfiles/UnitCell.hpp"
 using namespace chemfiles;
 
