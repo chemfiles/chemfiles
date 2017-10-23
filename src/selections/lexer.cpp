@@ -5,6 +5,7 @@
 
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/utils.hpp"
+#include "chemfiles/unreachable.hpp"
 #include "chemfiles/selections/lexer.hpp"
 
 using namespace chemfiles;

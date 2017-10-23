@@ -75,21 +75,6 @@ inline long long int string2longlong(const std::string& string) {
     }
 }
 
-#ifndef __has_builtin
-  #define __has_builtin(x) 0
-#endif
-
-#if __has_builtin(__builtin_unreachable)
-    #define unreachable() __builtin_unreachable()
-#elif GCC_VERSION >= 40500
-    #define unreachable() __builtin_unreachable()
-#elif defined(_MSC_VER)
-    #define unreachable() __assume(false)
-#else
-    #define unreachable() do {                     \
-        throw Error("entered unreachable code");   \
-    } while (false)
-#endif
 }
 
 #endif
