@@ -3,6 +3,9 @@
 
 #include <cassert>
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include "chemfiles/formats/Tinker.hpp"
 
 #include "chemfiles/ErrorFmt.hpp"
@@ -111,6 +114,53 @@ void TinkerFormat::read(Frame& frame) {
             frame.topology().add_bond(i, j);
         }
     }
+}
+
+void TinkerFormat::write(const Frame& frame) {
+    fmt::print(*file_, "{} written by the chemfiles library\n", frame.natoms());
+    fmt::print(*file_, "{} {} {} {} {} {}\n",
+        frame.cell().a(), frame.cell().b(), frame.cell().c(),
+        frame.cell().alpha(), frame.cell().beta(), frame.cell().gamma()
+    );
+
+    auto& topology = frame.topology();
+    // Build type index numbering. type_id will be searched for each atom type,
+    // and the position can be used a an unique integer identifier for the atom
+    // type.
+    auto types_id = sorted_set<std::string>();
+    for (auto& atom: topology) {
+        types_id.insert(atom.type());
+    }
+
+    // Build bonds index. It will contains all atoms bonded to the atom i in
+    // bonded_to[i].
+    auto bonded_to = std::vector<std::vector<size_t>>(frame.natoms());
+    for (auto& bond: topology.bonds()) {
+        bonded_to[bond[0]].push_back(bond[1]);
+        bonded_to[bond[1]].push_back(bond[0]);
+    }
+
+    auto& positions = frame.positions();
+    for (size_t i = 0; i < frame.natoms(); i++) {
+        auto name = topology[i].name();
+        if (name == "") {
+            name = "X";
+        }
+        auto it = types_id.find(topology[i].type());
+        assert(it != types_id.end());
+        auto type = (it - types_id.begin()) + 1;
+
+        fmt::print(
+            *file_, "{} {} {} {} {} {}",
+            i + 1, name, positions[i][0], positions[i][1], positions[i][2], type
+        );
+        for (size_t other: bonded_to[i]) {
+            fmt::print(*file_, " {}", other + 1);
+        }
+        fmt::print(*file_, "\n");
+    }
+
+    steps_positions_.push_back(file_->tellg());
 }
 
 bool forward(TextFile& file) {

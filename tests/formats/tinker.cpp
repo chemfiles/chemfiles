@@ -1,5 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
+#include <fstream>
 
 #include "catch.hpp"
 #include "helpers.hpp"
@@ -67,4 +68,65 @@ TEST_CASE("Read files in Tinker XYZ format using Molfile") {
 
         CHECK(frame.cell() == UnitCell(18.2736));
     }
+}
+
+TEST_CASE("Write files in Tinker XYZ format") {
+    auto tmpfile = NamedTempPath(".arc");
+    const auto expected_content =
+    "4 written by the chemfiles library\n"
+    "0 0 0 90 90 90\n"
+    "1 A 1 2 3 1 2 3\n"
+    "2 A 1 2 3 1 1\n"
+    "3 B 1 2 3 2 1\n"
+    "4 B 1 2 3 3\n"
+    "6 written by the chemfiles library\n"
+    "22 33 44 90 90 90\n"
+    "1 A 4 5 6 1 2 3\n"
+    "2 A 4 5 6 1 1\n"
+    "3 B 4 5 6 2 1\n"
+    "4 B 4 5 6 3\n"
+    "5 E 4 5 6 4\n"
+    "6 F 4 5 6 5\n";
+
+    Frame frame(4);
+    auto positions = frame.positions();
+    for(size_t i=0; i<4; i++) {
+        positions[i] = Vector3D(1, 2, 3);
+    }
+
+    Topology topology;
+    topology.add_atom(Atom("A"));
+    topology.add_atom(Atom("A"));
+    topology.add_atom(Atom("B"));
+    topology.add_atom(Atom("B", "C"));
+    topology.add_bond(0, 1);
+    topology.add_bond(0, 2);
+
+    frame.set_topology(topology);
+
+    {
+        auto file = Trajectory(tmpfile, 'w');
+        file.write(frame);
+    }
+
+    frame.resize(6);
+    positions = frame.positions();
+    for(size_t i=0; i<6; i++) {
+        positions[i] = Vector3D(4, 5, 6);
+    }
+
+    topology.add_atom(Atom("E"));
+    topology.add_atom(Atom("F"));
+    frame.set_topology(topology);
+    frame.set_cell(UnitCell(22, 33, 44));
+
+    {
+        auto file = Trajectory(tmpfile, 'a');
+        file.write(frame);
+    }
+
+    std::ifstream checking(tmpfile);
+    std::string content((std::istreambuf_iterator<char>(checking)),
+                         std::istreambuf_iterator<char>());
+    CHECK(content == expected_content);
 }
