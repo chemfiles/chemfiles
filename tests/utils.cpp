@@ -35,7 +35,7 @@ TEST_CASE("split") {
     auto expected = std::vector<std::string>{"bla", "bla  bla, jk", "fiuks"};
     CHECK(chemfiles::split("bla:bla  bla, jk:fiuks", ':') == expected);
 
-    expected = std::vector<std::string>{"", "", "bla  bla", " jk:fiuks"};
+    expected = std::vector<std::string>{"bla  bla", " jk:fiuks"};
     CHECK(chemfiles::split(",,bla  bla, jk:fiuks", ',') == expected);
 }
 
