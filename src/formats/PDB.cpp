@@ -262,9 +262,9 @@ bool forward(TextFile& file) {
 
             if (line.substr(0, 6) == "ENDMDL") {
                 auto position = file.tellg();
-                line = file.readline();
+                auto next = file.readline();
                 file.seekg(position);
-                if (line.substr(0, 3) == "END") {
+                if (next.substr(0, 3) == "END") {
                     // We found another record starting by END in the next line,
                     // we skip this one and wait for the next one
                     return false;
@@ -273,8 +273,8 @@ bool forward(TextFile& file) {
 
             if (line.substr(0, 3) == "END") {
                 return true;
-
             }
+
         } catch (const FileError&) {
             return false;
         }

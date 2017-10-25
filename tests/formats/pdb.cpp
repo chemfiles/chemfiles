@@ -133,6 +133,17 @@ TEST_CASE("Read files in PDB format") {
         frame = file.read();
         CHECK(frame.natoms() == 7);
     }
+
+    SECTION("Handle multiple MODEL without END") {
+        Trajectory file("data/pdb/model.pdb");
+        CHECK(file.nsteps() == 2);
+
+        auto frame = file.read();
+        CHECK(frame.natoms() == 2223);
+
+        frame = file.read();
+        CHECK(frame.natoms() == 2223);
+    }
 }
 
 TEST_CASE("Write files in PDB format") {
