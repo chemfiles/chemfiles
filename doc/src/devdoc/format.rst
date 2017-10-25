@@ -24,6 +24,8 @@ These classes implement the format interface defined previously.
 
 .. doxygenclass:: chemfiles::LAMMPSDataFormat
 
+.. doxygenclass:: chemfiles::TinkerFormat
+
 .. doxygenclass:: chemfiles::Molfile
 
 .. doxygenenum:: chemfiles::MolfileFormat
