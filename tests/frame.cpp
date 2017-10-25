@@ -96,6 +96,11 @@ TEST_CASE("Unit cell") {
     CHECK(frame.cell().shape() == UnitCell::ORTHORHOMBIC);
 }
 
+TEST_CASE("Frame errors") {
+    auto frame = Frame(5);
+    CHECK_THROWS_AS(frame.set_topology(Topology()), Error);
+}
+
 TEST_CASE("Guess topology") {
     SECTION("Simple case") {
         auto frame = Frame();
@@ -131,10 +136,7 @@ TEST_CASE("Guess topology") {
         topology = frame.topology();
         CHECK(topology.bonds().size() == 3);
         CHECK(topology.angles().size() == 3);
-
-        // Wrong topology size
-        frame = Frame(5);
-        CHECK_THROWS_AS(frame.set_topology(Topology()), Error);
+        CHECK(topology.bonds() == (std::vector<Bond>{{0, 1}, {0, 2}, {0, 3}}));
     }
 
     SECTION("Cleanup supplementaty H-H bonds") {

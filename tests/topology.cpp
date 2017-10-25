@@ -203,42 +203,72 @@ TEST_CASE("Out of bounds errors") {
 }
 
 TEST_CASE("Add and remove items in the topology") {
-    auto topology = Topology();
+    SECTION("Atoms") {
+        auto topology = Topology();
+        for (unsigned i=0; i<4; i++) {
+            topology.add_atom(Atom("H"));
+        }
+        topology.add_atom(Atom("O"));
+        topology.add_atom(Atom("O"));
 
-    for (unsigned i=0; i<4; i++) {
-        topology.add_atom(Atom("H"));
+        CHECK(topology.natoms() == 6);
+
+        topology.remove(4);
+        CHECK(topology.natoms() == 5);
     }
-    topology.add_atom(Atom("O"));
-    topology.add_atom(Atom("O"));
 
-    topology.add_bond(0, 4);
-    topology.add_bond(1, 4);
-    topology.add_bond(2, 5);
-    topology.add_bond(3, 5);
+    SECTION("Bonds") {
+        auto topology = Topology();
+        for (unsigned i=0; i<4; i++) {
+            topology.add_atom(Atom("H"));
+        }
+        topology.add_atom(Atom("O"));
+        topology.add_atom(Atom("O"));
 
-    CHECK(topology.bonds() == (std::vector<Bond>{{0, 4}, {1, 4}, {2, 5}, {3, 5}}));
-    CHECK(topology.angles() == (std::vector<Angle>{{0, 4, 1}, {2, 5, 3}}));
-    CHECK(topology.dihedrals() == (std::vector<Dihedral>{}));
+        topology.add_bond(0, 4);
+        topology.add_bond(1, 4);
+        topology.add_bond(2, 5);
+        topology.add_bond(3, 5);
 
-    topology.add_atom(Atom("O"));
-    topology.add_bond(3, 6);
-    CHECK(topology.bonds().size() == 5);
-    CHECK(topology.dihedrals()[0] == Dihedral(2, 5, 3, 6));
+        CHECK(topology.bonds() == (std::vector<Bond>{{0, 4}, {1, 4}, {2, 5}, {3, 5}}));
+        CHECK(topology.angles() == (std::vector<Angle>{{0, 4, 1}, {2, 5, 3}}));
+        CHECK(topology.dihedrals() == (std::vector<Dihedral>{}));
 
-    topology.remove(6);
-    CHECK(topology.natoms() == 6);
-    CHECK(topology.bonds().size() == 4);
+        topology.add_atom(Atom("O"));
+        topology.add_bond(3, 6);
+        CHECK(topology.bonds().size() == 5);
+        CHECK(topology.dihedrals()[0] == Dihedral(2, 5, 3, 6));
 
-    // we can not resize while there are bonds betweena atoms to remove
-    CHECK_THROWS_AS(topology.resize(5), Error);
+        topology.remove(6);
+        CHECK(topology.bonds().size() == 4);
 
-    topology.remove_bond(2, 5);
-    topology.remove_bond(3, 5);
-    CHECK(topology.natoms() == 6);
-    CHECK(topology.bonds().size() == 2);
+        // we can not resize while there are bonds betweena atoms to remove
+        CHECK_THROWS_AS(topology.resize(5), Error);
 
-    // Now that the bonds are gone, we can resize
-    topology.resize(5);
+        topology.remove_bond(2, 5);
+        topology.remove_bond(3, 5);
+        CHECK(topology.natoms() == 6);
+        CHECK(topology.bonds().size() == 2);
+
+        // Now that the bonds are gone, we can resize
+        topology.resize(5);
+    }
+
+    SECTION("Bonds and atoms") {
+        auto topology = Topology();
+        for (unsigned i=0; i<4; i++) {
+            topology.add_atom(Atom(""));
+        }
+
+        topology.add_bond(0, 2);
+        topology.add_bond(1, 3);
+
+        CHECK(topology.bonds() == (std::vector<Bond>{{0, 2}, {1, 3}}));
+
+        // Checking that the stored bonds indexes are updated
+        topology.remove(2);
+        CHECK(topology.bonds() == (std::vector<Bond>{{1, 2}}));
+    }
 }
 
 TEST_CASE("Residues in topologies") {

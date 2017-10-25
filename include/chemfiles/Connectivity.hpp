@@ -219,8 +219,6 @@ inline bool operator>=(const Improper& lhs, const Improper& rhs) {
 class Connectivity {
 public:
     Connectivity() = default;
-    /// Recalculate the angles and the dihedrals from the bond list
-    void recalculate() const;
     /// Get the bonds in this connectivity
     const sorted_set<Bond>& bonds() const;
     /// Get the angles in this connectivity
@@ -233,8 +231,15 @@ public:
     void add_bond(size_t i, size_t j);
     /// Remove any bond between the atoms `i` and `j`
     void remove_bond(size_t i, size_t j);
+    /// Update the indexes of the bonds after atom removal
+    /// This function shifts all indexes bigger than i in the bonds/angles/dihedrals/impropers
+    /// lists by -1.
+    void atom_removed(size_t i);
 
 private:
+    /// Recalculate the angles and the dihedrals from the bond list
+    void recalculate() const;
+
     /// Biggest index within the atoms we know about. Used to pre-allocate
     /// memory when recomputing bonds.
     size_t biggest_atom_ = 0;
