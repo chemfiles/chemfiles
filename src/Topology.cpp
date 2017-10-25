@@ -59,12 +59,15 @@ void Topology::remove(size_t i) {
         );
     }
     atoms_.erase(atoms_.begin() + static_cast<std::ptrdiff_t>(i));
+    // Remove all bonds with the removed atom
     auto bonds = connect_.bonds();
     for (auto& bond : bonds) {
         if (bond[0] == i || bond[1] == i) {
             connect_.remove_bond(bond[0], bond[1]);
         }
     }
+    // Shift all bonds indexes
+    connect_.atom_removed(i);
 }
 
 const std::vector<Bond>& Topology::bonds() const {
