@@ -269,15 +269,11 @@ TEST_CASE("PDB files with big values") {
         positions[9998] = Vector3D(4., 5., 6.);
         positions[9999] = Vector3D(7., 8., 9.);
 
-        {
-            auto trajectory = Trajectory(tmpfile, 'w');
-            trajectory.write(frame);
-        }
+        Trajectory(tmpfile, 'w').write(frame);
 
-        auto in_trajectory = Trajectory(tmpfile, 'r');
-        auto in_frame = in_trajectory.read();
-        auto in_topology = in_frame.topology();
-        auto in_positions = in_frame.positions();
+        // Re-read the file we just wrote
+        frame = Trajectory(tmpfile, 'r').read();
+        positions = frame.positions();
 
         // If resSeq is has more than 4 characters, coordinates won't be read
         // correctly
@@ -293,7 +289,7 @@ TEST_CASE("PDB files with big values") {
         for(size_t i=0; i<10001; i++) {
             Atom atom("A");
             topology.add_atom(atom);
-            Residue residue("ANA", i+1);
+            Residue residue("ANA", i + 1);
             residue.add_atom(i);
             topology.add_residue(residue);
         }
@@ -303,15 +299,11 @@ TEST_CASE("PDB files with big values") {
         positions[9998] = Vector3D(4., 5., 6.);
         positions[9999] = Vector3D(7., 8., 9.);
 
-        {
-            auto trajectory = Trajectory(tmpfile, 'w');
-            trajectory.write(frame);
-        }
+        Trajectory(tmpfile, 'w').write(frame);
 
-        auto in_trajectory = Trajectory(tmpfile, 'r');
-        auto in_frame = in_trajectory.read();
-        auto in_topology = in_frame.topology();
-        auto in_positions = in_frame.positions();
+        // Re-read the file we just wrote
+        frame = Trajectory(tmpfile, 'r').read();
+        positions = frame.positions();
 
         // If resSeq is has more than 4 characters, coordinates won't be read
         // correctly
