@@ -9,6 +9,7 @@
 #include <unordered_map>
 
 #include "chemfiles/exports.hpp"
+#include "chemfiles/mutex.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Error.hpp"
@@ -54,12 +55,13 @@ public:
     /// ```
     template <typename F>
     void register_name(const std::string& name) {
-        if (formats_.find(name) != formats_.end()) {
+        auto formats = formats_.lock();
+        if (formats->find(name) != formats->end()) {
             throw FormatError(
                 "The name '" + name + "' is already associated with a format."
             );
         }
-        formats_.emplace(name, [](const std::string& path, File::Mode mode) {
+        formats->emplace(name, [](const std::string& path, File::Mode mode) {
             return std::unique_ptr<Format>(new F(path, mode));
         });
     }
@@ -74,21 +76,22 @@ public:
     /// ```
     template <typename F>
     void register_extension(const std::string& extension) {
-        if (extensions_.find(extension) != extensions_.end()) {
+        auto extensions = extensions_.lock();
+        if (extensions->find(extension) != extensions->end()) {
             throw FormatError(
                 "The extension '" + extension + "' is already associated with a format."
             );
         }
-        extensions_.emplace(extension, [](const std::string& path, File::Mode mode) {
+        extensions->emplace(extension, [](const std::string& path, File::Mode mode) {
             return std::unique_ptr<Format>(new F(path, mode));
         });
     }
 
 private:
     /// Trajectory map associating format descriptions and readers
-    trajectory_map_t formats_;
+    mutex<trajectory_map_t> formats_;
     /// Trajectory map associating format descriptions and readers
-    trajectory_map_t extensions_;
+    mutex<trajectory_map_t> extensions_;
 };
 
 } // namespace chemfiles
