@@ -26,9 +26,6 @@ void CHFL_EXPORT set_warning_callback(warning_callback callback);
 ///
 /// If the file at `path` can not be opened, or if the configuration file is
 /// invalid, a `ConfigurationError` is thrown.
-///
-/// This function is not protected against data-race: calling it while using
-/// the configuration from other thread is undefined.
 void CHFL_EXPORT add_configuration(const std::string& path);
 
 } // namespace chemfiles

@@ -25,5 +25,5 @@ void chemfiles::warning(std::string message) {
 }
 
 void chemfiles::add_configuration(const std::string& path) {
-    Configuration::add_configuration(path);
+    Configuration::add(path);
 }

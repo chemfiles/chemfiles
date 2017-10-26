@@ -20,8 +20,16 @@ public:
         return data_;
     }
 
+    T* operator->() {
+        return &data_;
+    }
+
     const T& operator*() const {
         return data_;
+    }
+
+    const T* operator->() const {
+        return &data_;
     }
 
 private:
@@ -41,6 +49,8 @@ class mutex {
 public:
     /// Create a new mutex containing the given `data`
     mutex(T data): data_(std::move(data)), mutex_() {}
+    /// Create a new mutex containing a default constructed T
+    mutex(): mutex(T()) {}
 
     mutex(const mutex&) = delete;
     mutex& operator=(const mutex&) = delete;
