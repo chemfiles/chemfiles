@@ -24,6 +24,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   for periodic boundary conditions.
 * Added a `Property` class to store arbitrary properties in `Frame` and `Atom`.
 * Added support for improper dihedral angles in `Topology`.
+* `chemfiles::add_configuration` and `chemfiles::set_warning_callback` are now
+  thread safe, and will block upon concurrent usage.
 
 ### Changes in supported formats
 
@@ -54,13 +56,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   should use `chfl_residue_with_id`.
 * Added `chfl_residue_atoms` to get the list of atoms in a residue.
 * Added `CHFL_PROPERTY` and related functions.
+* `chfl_add_configuration` and `chfl_set_warning_callback` are now thread safe,
+  and will block upon concurrent usage.
 
 ### Deprecation and removals
 
 * `Topology::isbond`, `Topology::isangle`, `Topology::isdihedral`, and the
   corresponding C functions `chfl_topology_isbond`, `chfl_topology_isangle`
   `chfl_topology_isdihedral` are removed.
-
 
 ## 0.7 (25 Feb 2017)
 

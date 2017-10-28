@@ -10,9 +10,9 @@
 #include "chemfiles/generic.hpp"
 using namespace chemfiles;
 
-/// Get the list of directories up to `leaf`. For example, if `leaf` is
-/// `C:\foo\bar\baz\`, this function returns `{C:\, C:\foo\, C:\foo\bar\,
-/// C:\foo\bar\baz\}`.
+// Get the list of directories up to `leaf`. For example, if `leaf` is
+// `C:\foo\bar\baz\`, this function returns `{C:\, C:\foo\, C:\foo\bar\,
+// C:\foo\bar\baz\}`.
 static std::vector<std::string> list_directories(std::string leaf);
 
 Configuration& Configuration::instance() {
@@ -25,12 +25,12 @@ Configuration::Configuration() {
     for (auto& dir: directories) {
         auto path = dir + "/" + ".chemfilesrc";
         if (std::ifstream(path)) {
-            read_configuration(path);
+            read(path);
         }
     }
 }
 
-void Configuration::read_configuration(std::string path) {
+void Configuration::read(const std::string& path) {
     toml::Table data;
     try {
         data = toml::parse(path);
@@ -40,6 +40,7 @@ void Configuration::read_configuration(std::string path) {
         );
     }
 
+    auto types = types_.lock();
     if (data.find("types") != data.end() && data.at("types").type() == toml::value_t::Table) {
         auto rename = toml::get<toml::Table>(data.at("types"));
         for (auto& entry: rename) {
@@ -51,14 +52,14 @@ void Configuration::read_configuration(std::string path) {
                 );
             }
             auto new_name = toml::get<std::string>(entry.second);
-            types_rename_[std::move(old_name)] = std::move(new_name);
+            (*types)[std::move(old_name)] = std::move(new_name);
         }
     }
 }
 
-void Configuration::add_configuration(const std::string& path) {
+void Configuration::add(const std::string& path) {
     if (std::ifstream(path)) {
-        instance().read_configuration(path);
+        instance().read(path);
     } else {
         throw configuration_error("Can not open configuration file at {}", path);
     }

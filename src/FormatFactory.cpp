@@ -25,7 +25,7 @@ namespace chemfiles {
     extern template class Molfile<MOLDEN>;
 }
 
-FormatFactory::FormatFactory() : formats_(), extensions_() {
+FormatFactory::FormatFactory() {
     this->register_name<XYZFormat>("XYZ");
     this->register_extension<XYZFormat>(".xyz");
 
@@ -70,22 +70,24 @@ FormatFactory::FormatFactory() : formats_(), extensions_() {
 }
 
 FormatFactory& FormatFactory::get() {
-    static auto instance = FormatFactory();
-    return instance;
+    static FormatFactory instance_;
+    return instance_;
 }
 
 format_creator_t FormatFactory::name(const std::string& name) {
-    if (formats_.find(name) == formats_.end()) {
+    auto formats = formats_.lock();
+    if (formats->find(name) == formats->end()) {
         throw format_error("can not find a format named '{}'", name);
     }
-    return formats_.at(name);
+    return formats->at(name);
 }
 
 format_creator_t FormatFactory::extension(const std::string& extension) {
-    if (extensions_.find(extension) == extensions_.end()) {
+    auto extensions = extensions_.lock();
+    if (extensions->find(extension) == extensions->end()) {
         throw format_error(
             "can not find a format associated with the '{}' extension.", extension
         );
     }
-    return extensions_.at(extension);
+    return extensions->at(extension);
 }
