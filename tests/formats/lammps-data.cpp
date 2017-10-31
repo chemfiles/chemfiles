@@ -12,7 +12,7 @@ TEST_CASE("Read files in LAMMPS data format") {
         Trajectory file("data/lammps-data/solvated.lmp", 'r', "LAMMPS Data");
         Frame frame = file.read();
 
-        CHECK(frame.natoms() == 7772);
+        CHECK(frame.size() == 7772);
 
         CHECK(frame.cell().shape() == UnitCell::ORTHORHOMBIC);
         CHECK(frame.cell().a() == 34.023997999999999);
@@ -46,7 +46,7 @@ TEST_CASE("Read files in LAMMPS data format") {
         Trajectory file("data/lammps-data/data.body", 'r', "LAMMPS Data");
         Frame frame = file.read();
 
-        CHECK(frame.natoms() == 100);
+        CHECK(frame.size() == 100);
         CHECK(frame.cell() == UnitCell(31.064449134, 31.064449134, 1.0));
 
         auto positions = frame.positions();
@@ -183,7 +183,7 @@ TEST_CASE("Write files in LAMMPS data format") {
     frame.add_velocities();
     auto positions = frame.positions();
     auto velocities = *frame.velocities();
-    for(size_t i=0; i<frame.natoms(); i++) {
+    for(size_t i=0; i<frame.size(); i++) {
         positions[i] = Vector3D(1.1, 2.2, 3.3);
         velocities[i] = Vector3D(0.1, 0.2, 0.3);
     }

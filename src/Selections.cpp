@@ -121,7 +121,7 @@ std::vector<size_t> Selection::list(const Frame& frame) const {
 template <typename match_checker>
 std::vector<Match> evaluate_atoms(const Frame& frame, match_checker is_match) {
     auto matches = std::vector<Match>();
-    for (size_t i=0; i<frame.natoms(); i++) {
+    for (size_t i=0; i<frame.size(); i++) {
         auto match = Match(i);
         if (is_match(frame, match)) {
             matches.emplace_back(std::move(match));
@@ -133,8 +133,8 @@ std::vector<Match> evaluate_atoms(const Frame& frame, match_checker is_match) {
 template <typename match_checker>
 std::vector<Match> evaluate_pairs(const Frame& frame, match_checker is_match) {
     auto matches = std::vector<Match>();
-    for (size_t i=0; i<frame.natoms(); i++) {
-        for (size_t j=0; j<frame.natoms(); j++) {
+    for (size_t i=0; i<frame.size(); i++) {
+        for (size_t j=0; j<frame.size(); j++) {
             if (i == j) {continue;}
             auto match = Match(i, j);
             if (is_match(frame, match)) {
@@ -168,10 +168,10 @@ std::vector<Match> evaluate_bonds(const Frame& frame, match_checker is_match) {
 template <typename match_checker>
 std::vector<Match> evaluate_three(const Frame& frame, match_checker is_match) {
     auto matches = std::vector<Match>();
-    for (size_t i=0; i<frame.natoms(); i++) {
-        for (size_t j=0; j<frame.natoms(); j++) {
+    for (size_t i=0; i<frame.size(); i++) {
+        for (size_t j=0; j<frame.size(); j++) {
             if (i == j) {continue;}
-            for (size_t k=0; k<frame.natoms(); k++) {
+            for (size_t k=0; k<frame.size(); k++) {
                 if (i == k || j == k) {continue;}
                 auto match = Match(i, j, k);
                 if (is_match(frame, match)) {
@@ -206,12 +206,12 @@ std::vector<Match> evaluate_angles(const Frame& frame, match_checker is_match) {
 template <typename match_checker>
 std::vector<Match> evaluate_four(const Frame& frame, match_checker is_match) {
     auto matches = std::vector<Match>();
-    for (size_t i=0; i<frame.natoms(); i++) {
-        for (size_t j=0; j<frame.natoms(); j++) {
+    for (size_t i=0; i<frame.size(); i++) {
+        for (size_t j=0; j<frame.size(); j++) {
             if (i == j) {continue;}
-            for (size_t k=0; k<frame.natoms(); k++) {
+            for (size_t k=0; k<frame.size(); k++) {
                 if (i == k || j == k) {continue;}
-                for (size_t m=0; m<frame.natoms(); m++) {
+                for (size_t m=0; m<frame.size(); m++) {
                     if (i == m || j == m || k == m) {continue;}
                     auto match = Match(i, j, k, m);
                     if (is_match(frame, match)) {

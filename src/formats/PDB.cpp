@@ -183,7 +183,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
         throw format_error("could not read positions in '{}'", line);
     }
 
-    auto atom_id = frame.natoms() - 1;
+    auto atom_id = frame.size() - 1;
     try {
         auto resid = std::stoul(line.substr(22, 4));
         if (residues_.find(resid) == residues_.end()) {
@@ -207,7 +207,7 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
 
     // Helper lambdas
     auto add_bond = [&frame, &line](size_t i, size_t j) {
-        if (i >= frame.natoms() || j >= frame.natoms()) {
+        if (i >= frame.size() || j >= frame.size()) {
             warning("Bad atomic numbers in CONECT record, ignored. ({})", line);
             return;
         }
@@ -343,7 +343,7 @@ void PDBFormat::write(const Frame& frame) {
         }
     }
 
-    for (size_t i = 0; i < frame.natoms(); i++) {
+    for (size_t i = 0; i < frame.size(); i++) {
         auto& name = frame.topology()[i].name();
         auto& type = frame.topology()[i].type();
         auto& pos = frame.positions()[i];
@@ -417,13 +417,13 @@ void PDBFormat::write(const Frame& frame) {
         );
     }
 
-    auto connect = std::vector<std::vector<size_t>>(frame.natoms());
+    auto connect = std::vector<std::vector<size_t>>(frame.size());
     for (auto& bond : frame.topology().bonds()) {
         connect[bond[0]].push_back(bond[1]);
         connect[bond[1]].push_back(bond[0]);
     }
 
-    for (size_t i = 0; i < frame.natoms(); i++) {
+    for (size_t i = 0; i < frame.size(); i++) {
         auto connections = connect[i].size();
         auto lines = connections / 4 + 1;
         if (connections == 0) {continue;}

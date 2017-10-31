@@ -194,7 +194,7 @@ void TNGFormat::read_topology(Frame& frame) {
                     char type[32];
                     CHECK(tng_atom_type_get(tng_, tng_atom, type, 32));
 
-                    residue.add_atom(topology.natoms());
+                    residue.add_atom(topology.size());
                     topology.add_atom(Atom(name, type));
                 }
                 topology.add_residue(std::move(residue));

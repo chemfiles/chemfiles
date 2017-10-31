@@ -117,7 +117,7 @@ void TinkerFormat::read(Frame& frame) {
 }
 
 void TinkerFormat::write(const Frame& frame) {
-    fmt::print(*file_, "{} written by the chemfiles library\n", frame.natoms());
+    fmt::print(*file_, "{} written by the chemfiles library\n", frame.size());
     fmt::print(*file_, "{} {} {} {} {} {}\n",
         frame.cell().a(), frame.cell().b(), frame.cell().c(),
         frame.cell().alpha(), frame.cell().beta(), frame.cell().gamma()
@@ -134,14 +134,14 @@ void TinkerFormat::write(const Frame& frame) {
 
     // Build bonds index. It will contains all atoms bonded to the atom i in
     // bonded_to[i].
-    auto bonded_to = std::vector<std::vector<size_t>>(frame.natoms());
+    auto bonded_to = std::vector<std::vector<size_t>>(frame.size());
     for (auto& bond: topology.bonds()) {
         bonded_to[bond[0]].push_back(bond[1]);
         bonded_to[bond[1]].push_back(bond[0]);
     }
 
     auto& positions = frame.positions();
-    for (size_t i = 0; i < frame.natoms(); i++) {
+    for (size_t i = 0; i < frame.size(); i++) {
         auto name = topology[i].name();
         if (name == "") {
             name = "X";

@@ -211,10 +211,10 @@ TEST_CASE("Add and remove items in the topology") {
         topology.add_atom(Atom("O"));
         topology.add_atom(Atom("O"));
 
-        CHECK(topology.natoms() == 6);
+        CHECK(topology.size() == 6);
 
         topology.remove(4);
-        CHECK(topology.natoms() == 5);
+        CHECK(topology.size() == 5);
     }
 
     SECTION("Bonds") {
@@ -247,7 +247,7 @@ TEST_CASE("Add and remove items in the topology") {
 
         topology.remove_bond(2, 5);
         topology.remove_bond(3, 5);
-        CHECK(topology.natoms() == 6);
+        CHECK(topology.size() == 6);
         CHECK(topology.bonds().size() == 2);
 
         // Now that the bonds are gone, we can resize

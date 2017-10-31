@@ -29,14 +29,14 @@ TEST_CASE("Read files in XYZ format") {
     SECTION("Read next step") {
         Trajectory file("data/xyz/helium.xyz");
         auto frame = file.read();
-        CHECK(frame.natoms() == 125);
+        CHECK(frame.size() == 125);
         // Check positions
         auto positions = frame.positions();
         CHECK(positions[0] == Vector3D(0.49053, 8.41351, 0.0777257));
         CHECK(positions[124] == Vector3D(8.57951, 8.65712, 8.06678));
         // Check topology
         auto topology = frame.topology();
-        CHECK(topology.natoms() == 125);
+        CHECK(topology.size() == 125);
         CHECK(topology[0] == Atom("He"));
     }
 
@@ -49,7 +49,7 @@ TEST_CASE("Read files in XYZ format") {
         CHECK(positions[0] == Vector3D(-0.145821, 8.540648, 1.090281));
         CHECK(positions[124] == Vector3D(8.446093, 8.168162, 9.350953));
         auto topology = frame.topology();
-        CHECK(topology.natoms() == 125);
+        CHECK(topology.size() == 125);
         CHECK(topology[0] == Atom("He"));
 
         frame = file.read_step(0);

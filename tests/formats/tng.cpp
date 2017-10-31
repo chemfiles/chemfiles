@@ -11,7 +11,7 @@ TEST_CASE("Read files in TNG format"){
         auto file = Trajectory("data/tng/example.tng");
         auto frame = file.read();
 
-        CHECK(frame.natoms() == 15);
+        CHECK(frame.size() == 15);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(1.0f, 1.0f, 1.0f), 1e-6));
         CHECK(approx_eq(positions[11], Vector3D(8.5f, 33.0f, 34.0f), 1e-6));
@@ -22,7 +22,7 @@ TEST_CASE("Read files in TNG format"){
         file.read(); // Skip a frame
         frame = file.read();
 
-        CHECK(frame.natoms() == 15);
+        CHECK(frame.size() == 15);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(1.01562f, 1.02344f, 1.03125f), 1e-4));
         CHECK(approx_eq(positions[11], Vector3D(8.5f, 33.0f, 34.0f), 1e-6));
@@ -31,7 +31,7 @@ TEST_CASE("Read files in TNG format"){
     SECTION("Read velocities"){
         Trajectory file("data/tng/1aki.tng");
         auto frame = file.read();
-        CHECK(frame.natoms() == 38376);
+        CHECK(frame.size() == 38376);
 
         auto velocities = *frame.velocities();
         CHECK(approx_eq(velocities[450], Vector3D(-0.144889, 6.50066e-2, -0.764032), 1e-5));
@@ -42,7 +42,7 @@ TEST_CASE("Read files in TNG format"){
         auto file = Trajectory("data/tng/water.tng");
         auto frame = file.read();
 
-        CHECK(frame.natoms() == 29700);
+        CHECK(frame.size() == 29700);
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
@@ -55,7 +55,7 @@ TEST_CASE("Read files in TNG format"){
         auto file = Trajectory("data/tng/example.tng");
         auto topology = file.read().topology();
 
-        CHECK(topology.natoms() == 15);
+        CHECK(topology.size() == 15);
         CHECK(topology[0].name() == "O");
         CHECK(topology[0].type() == "O");
         CHECK(topology[1].name() == "HO1");

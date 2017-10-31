@@ -30,18 +30,18 @@ CHFL_EXPORT CHFL_FRAME* chfl_frame(void);
 CHFL_EXPORT CHFL_FRAME* chfl_frame_copy(const CHFL_FRAME* const frame);
 
 /// Get the current number of atoms in a `frame` in the integer pointed to by
-/// `natoms`
+/// `n`
 ///
 /// @example{tests/capi/doc/chfl_frame/atoms_count.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_atoms_count(
-    const CHFL_FRAME* const frame, uint64_t* natoms
+    const CHFL_FRAME* const frame, uint64_t* n
 );
 
 /// Get a pointer to the positions array from a `frame`.
 ///
-/// Positions are stored as a `natoms x 3` array, this function set the pointer
+/// Positions are stored as a `size x 3` array, this function set the pointer
 /// pointed to by `positions` to point to the first element of this array, and
 /// give the number of atoms in the integer pointed to by `size`.
 ///
@@ -60,7 +60,7 @@ CHFL_EXPORT chfl_status chfl_frame_positions(
 
 /// Get a pointer to the velocities array from a `frame`.
 ///
-/// Velocities are stored as a `natoms x 3` array, this function set the pointer
+/// Velocities are stored as a `size x 3` array, this function set the pointer
 /// pointed to by `positions` to point to the first element of this array, and
 /// give the number of atoms in the integer pointed to by `size`.
 ///
@@ -105,7 +105,7 @@ CHFL_EXPORT chfl_status chfl_frame_add_atom(
 CHFL_EXPORT chfl_status chfl_frame_remove(CHFL_FRAME* const frame, uint64_t i);
 
 /// Resize the positions, velocities  and topology in the `frame`, to have space
-/// for `natoms` atoms.
+/// for `size` atoms.
 ///
 /// This function may invalidate any pointer to the positions or the velocities
 /// if the new size is bigger than the old one. In all the cases, previous data
@@ -115,7 +115,7 @@ CHFL_EXPORT chfl_status chfl_frame_remove(CHFL_FRAME* const frame, uint64_t i);
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_resize(
-    CHFL_FRAME* const frame, uint64_t natoms
+    CHFL_FRAME* const frame, uint64_t size
 );
 
 /// Add velocity data to this `frame`.

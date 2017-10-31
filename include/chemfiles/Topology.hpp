@@ -37,12 +37,12 @@ public:
 
     /// Get a reference to the atom at the position `index`.
     ///
-    /// @throws OutOfBounds if `index` is greater than `natoms()`
+    /// @throws OutOfBounds if `index` is greater than `size()`
     Atom& operator[](size_t index) {
-        if (index >= natoms()) {
+        if (index >= size()) {
             throw OutOfBounds(
                 "Atomic index out of bounds in topology: we have "
-                + std::to_string(natoms()) + " atoms, but the index is "
+                + std::to_string(size()) + " atoms, but the index is "
                 + std::to_string(index)
             );
         }
@@ -52,12 +52,12 @@ public:
     /// Get a const (non-modifiable) reference to the atom at the position
     /// `index`.
     ///
-    /// @throws OutOfBounds if `index` is greater than `natoms()`
+    /// @throws OutOfBounds if `index` is greater than `size()`
     const Atom& operator[](size_t index) const {
-        if (index >= natoms()) {
+        if (index >= size()) {
             throw OutOfBounds(
                 "Atomic index out of bounds in topology: we have "
-                + std::to_string(natoms()) + " atoms, but the index is "
+                + std::to_string(size()) + " atoms, but the index is "
                 + std::to_string(index)
             );
         }
@@ -76,30 +76,30 @@ public:
 
     /// Delete the atom at index `i` in the system.
     ///
-    /// @throws OutOfBounds if `i` is greater than natoms()
+    /// @throws OutOfBounds if `i` is greater than size()
     void remove(size_t i);
 
     /// Add a bond in the system, between the atoms at index `atom_i` and
     /// `atom_j`.
     ///
-    /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `natoms()`
+    /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `size()`
     void add_bond(size_t atom_i, size_t atom_j);
 
     /// Remove a bond in the system, between the atoms at index `atom_i` and
     /// `atom_j`.
     ///
-    /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `natoms()`
+    /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `size()`
     void remove_bond(size_t atom_i, size_t atom_j);
 
     /// Get the number of atoms in the topology
-    size_t natoms() const { return atoms_.size(); }
+    size_t size() const { return atoms_.size(); }
 
-    /// Resize the topology to hold `natoms` atoms, adding `UNDEFINED` atoms
+    /// Resize the topology to hold `size` atoms, adding `UNDEFINED` atoms
     /// as needed.
-    void resize(size_t natoms);
+    void resize(size_t size);
 
-    /// Reserve size in the topology to store data for `natoms` atoms.
-    void reserve(size_t natoms);
+    /// Reserve size in the topology to store data for `size` atoms.
+    void reserve(size_t size);
 
     /// Get the bonds in the system, in a sorted vector
     const std::vector<Bond>& bonds() const;

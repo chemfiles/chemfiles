@@ -38,10 +38,10 @@ extern "C" CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame, uint64
     CHECK_POINTER_GOTO(frame);
     CHFL_ERROR_GOTO(
         // Return NULL if the index is out of bounds
-        if (idx >= frame->natoms()) {
+        if (idx >= frame->size()) {
             throw out_of_bounds(
                 "out of bounds atomic index in `chfl_atom_from_frame`: we have {} atoms, but the index is {}",
-                frame->natoms(), idx
+                frame->size(), idx
             );
         }
         atom = new Atom(frame->topology()[checked_cast(idx)]);
@@ -57,10 +57,10 @@ extern "C" CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* const topolog
     CHECK_POINTER_GOTO(topology);
     CHFL_ERROR_GOTO(
         // Return NULL if the index is out of bounds
-        if (idx >= topology->natoms()) {
+        if (idx >= topology->size()) {
             throw out_of_bounds(
                 "out of bounds atomic index in `chfl_atom_from_topology`: we have {} atoms, but the index is {}",
-                topology->natoms(), idx
+                topology->size(), idx
             );
         }
         atom = new Atom((*topology)[checked_cast(idx)]);

@@ -13,13 +13,13 @@ static bool roughly(double a, double b) {
 
 TEST_CASE("Frame size") {
     auto frame = Frame();
-    CHECK(frame.natoms() == 0);
+    CHECK(frame.size() == 0);
     CHECK(frame.positions().size() == 0);
     // No velocity data yet
     CHECK_FALSE(frame.velocities());
 
     frame.resize(15);
-    CHECK(frame.natoms() == 15);
+    CHECK(frame.size() == 15);
     CHECK(frame.positions().size() == 15);
     CHECK_FALSE(frame.velocities());
 
@@ -28,19 +28,19 @@ TEST_CASE("Frame size") {
     CHECK(frame.velocities()->size() == 15);
 
     frame.resize(30);
-    CHECK(frame.natoms() == 30);
+    CHECK(frame.size() == 30);
     CHECK(frame.positions().size() == 30);
     REQUIRE(frame.velocities());
     CHECK(frame.velocities()->size() == 30);
 
     frame.resize(2);
-    CHECK(frame.natoms() == 2);
+    CHECK(frame.size() == 2);
     CHECK(frame.positions().size() == 2);
     REQUIRE(frame.velocities());
     CHECK(frame.velocities()->size() == 2);
 
     frame.add_atom(Atom("H"), Vector3D(1, 2, 3), Vector3D(4, 5, 6));
-    CHECK(frame.natoms() == 3);
+    CHECK(frame.size() == 3);
     CHECK(frame.positions().size() == 3);
     CHECK(frame.positions()[2] == Vector3D(1, 2, 3));
     REQUIRE(frame.velocities());
@@ -48,7 +48,7 @@ TEST_CASE("Frame size") {
     CHECK((*frame.velocities())[2] == Vector3D(4, 5, 6));
 
     frame.remove(0);
-    CHECK(frame.natoms() == 2);
+    CHECK(frame.size() == 2);
     CHECK(frame.positions().size() == 2);
     CHECK(frame.velocities()->size() == 2);
 

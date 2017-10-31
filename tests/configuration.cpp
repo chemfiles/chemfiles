@@ -32,7 +32,7 @@ TEST_CASE("Atom type renaming") {
         file.close();
 
         auto frame = Trajectory(tmpfile).read();
-        CHECK(frame.natoms() == 3);
+        CHECK(frame.size() == 3);
         auto topology = frame.topology();
         CHECK(topology[0].name() == "Oh");
         CHECK(topology[0].type() == "O");
@@ -57,7 +57,7 @@ TEST_CASE("Atom type renaming") {
         file.close();
 
         auto frame = Trajectory(tmpfile).read();
-        CHECK(frame.natoms() == 4);
+        CHECK(frame.size() == 4);
         auto topology = frame.topology();
         CHECK(topology[0].name() == "Oh");
         CHECK(topology[0].type() == "O");
