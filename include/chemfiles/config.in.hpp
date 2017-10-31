@@ -7,11 +7,11 @@
 
 /// An integer containing the major (x.0.0) version number
 #define CHEMFILES_VERSION_MAJOR @CHEMFILES_VERSION_MAJOR@
-/// An integer containing the minor (0.x.0) version number
+/// An integer containing the minor (0.y.0) version number
 #define CHEMFILES_VERSION_MINOR @CHEMFILES_VERSION_MINOR@
-/// An integer containing the patch (0.0.x) version number
+/// An integer containing the patch (0.0.z) version number
 #define CHEMFILES_VERSION_PATCH @CHEMFILES_VERSION_PATCH@
-/// The full version of chemfiles, as a string
+/// The full version of chemfiles ("x.y.z"), as a string
 #define CHEMFILES_VERSION "@CHEMFILES_VERSION@"
 
 // clang-format on
