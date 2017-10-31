@@ -42,16 +42,16 @@ CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_from_frame(
 CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_copy(const CHFL_TOPOLOGY* const topology);
 
 /// Get the number of atoms in the `topology` in the integer pointed to by
-/// `natoms`.
+/// `size`.
 ///
 /// @example{tests/capi/doc/chfl_topology/atoms_count.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_atoms_count(
-    const CHFL_TOPOLOGY* const topology, uint64_t* natoms
+    const CHFL_TOPOLOGY* const topology, uint64_t* size
 );
 
-/// Resize the `topology` to hold `natoms` atoms. If the new number of atoms is
+/// Resize the `topology` to hold `n` atoms. If the new number of atoms is
 /// bigger than the current number, new atoms will be created with an empty name
 /// and type. If it is lower than the current number of atoms, the last atoms
 /// will be removed, together with the associated bonds, angles and dihedrals.
@@ -59,9 +59,7 @@ CHFL_EXPORT chfl_status chfl_topology_atoms_count(
 /// @example{tests/capi/doc/chfl_topology/resize.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_topology_resize(
-    CHFL_TOPOLOGY* const topology, uint64_t natoms
-);
+CHFL_EXPORT chfl_status chfl_topology_resize(CHFL_TOPOLOGY* const topology, uint64_t n);
 
 /// Add a copy of an `atom` at the end of a `topology`.
 ///

@@ -165,7 +165,7 @@ static void initialize(NcFile& file, size_t natoms, bool with_velocities) {
 }
 
 void AmberNetCDFFormat::write(const Frame& frame) {
-    auto natoms = frame.natoms();
+    auto natoms = frame.size();
     // If we created the file, let's initialize it.
     if (!validated_) {
         initialize(file_, natoms, bool(frame.velocities()));

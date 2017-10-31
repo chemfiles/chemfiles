@@ -22,7 +22,7 @@ TEST_CASE("Read files in Tinker XYZ format using Molfile") {
         CHECK(file.nsteps() == 1);
         auto frame = file.read();
 
-        CHECK(frame.natoms() == 12);
+        CHECK(frame.size() == 12);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-12.3637905407, 1.6985027871, 1.2163946648), 1e-6));
         CHECK(approx_eq(positions[10], Vector3D(-9.8283360322, 2.2477303421, 4.0053506840), 1e-6));
@@ -44,7 +44,7 @@ TEST_CASE("Read files in Tinker XYZ format using Molfile") {
         CHECK(file.nsteps() == 50);
         auto frame = file.read();
 
-        CHECK(frame.natoms() == 212);
+        CHECK(frame.size() == 212);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-2.941653, 3.480677, 3.562162), 1e-6));
         CHECK(approx_eq(positions[100], Vector3D(-3.328907, 4.080875, -4.559358), 1e-6));
@@ -56,12 +56,12 @@ TEST_CASE("Read files in Tinker XYZ format using Molfile") {
         CHECK(topology[154].name() == "N");
 
         CHECK(topology.bonds().size() == 106);
-        for (size_t i = 0; i < frame.natoms(); i += 2) {
+        for (size_t i = 0; i < frame.size(); i += 2) {
             CHECK(contains_bond(topology, {i, i + 1}));
         }
 
         frame = file.read_step(34);
-        CHECK(frame.natoms() == 212);
+        CHECK(frame.size() == 212);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-7.481173, 3.330502, 0.042802), 1e-6));
         CHECK(approx_eq(positions[67], Vector3D(-0.180228, -7.515172, -5.739137), 1e-6));

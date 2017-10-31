@@ -11,7 +11,7 @@ TEST_CASE("Read files in DCD format using Molfile"){
     Trajectory file("data/dcd/water.dcd");
 
     auto frame = file.read();
-    CHECK(frame.natoms() == 297);
+    CHECK(frame.size() == 297);
 
     auto positions = frame.positions();
     CHECK(approx_eq(positions[0], Vector3D(0.4172191, 8.303366, 11.73717), eps));
@@ -23,7 +23,7 @@ TEST_CASE("Read files in DCD format using Molfile"){
 
     file.read(); // Skip a frame
     frame = file.read();
-    CHECK(frame.natoms() == 297);
+    CHECK(frame.size() == 297);
 
     positions = frame.positions();
     CHECK(approx_eq(positions[0], Vector3D(0.2990952, 8.31003, 11.72146), eps));

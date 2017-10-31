@@ -6,44 +6,44 @@
 
 using namespace chemfiles;
 
-void Topology::resize(size_t natoms) {
+void Topology::resize(size_t size) {
     for (auto& bond: connect_.bonds()) {
-        if (bond[0] >= natoms || bond[1] >= natoms) {
+        if (bond[0] >= size || bond[1] >= size) {
             throw error(
                 "can not resize the topology to contains {} atoms as there "
                 "is a bond between atoms {} - {}",
-                natoms, bond[0], bond[1]
+                size, bond[0], bond[1]
             );
         }
     }
-    atoms_.resize(natoms, Atom());
+    atoms_.resize(size, Atom());
 }
 
 void Topology::add_atom(Atom atom) {
     atoms_.emplace_back(std::move(atom));
 }
 
-void Topology::reserve(size_t natoms) {
-    atoms_.reserve(natoms);
+void Topology::reserve(size_t size) {
+    atoms_.reserve(size);
 }
 
 void Topology::add_bond(size_t atom_i, size_t atom_j) {
-    if (atom_i >= natoms() || atom_j >= natoms()) {
+    if (atom_i >= size() || atom_j >= size()) {
         throw out_of_bounds(
             "out of bounds atomic index in `Topology::add_bond`: "
             "we have {} atoms, but the bond indexes are {} and {}",
-            natoms(), atom_i, atom_j
+            size(), atom_i, atom_j
         );
     }
     connect_.add_bond(atom_i, atom_j);
 }
 
 void Topology::remove_bond(size_t atom_i, size_t atom_j) {
-    if (atom_i >= natoms() || atom_j >= natoms()) {
+    if (atom_i >= size() || atom_j >= size()) {
         throw out_of_bounds(
             "out of bounds atomic index in `Topology::remove_bond`: "
             "we have {} atoms, but the bond indexes are {} and {}",
-            natoms(), atom_i, atom_j
+            size(), atom_i, atom_j
         );
     }
     connect_.remove_bond(atom_i, atom_j);
@@ -51,11 +51,11 @@ void Topology::remove_bond(size_t atom_i, size_t atom_j) {
 
 
 void Topology::remove(size_t i) {
-    if (i >= natoms()) {
+    if (i >= size()) {
         throw out_of_bounds(
             "out of bounds atomic index in `Topology::remove`: we have {} atoms, "
             "but the indexe is {}",
-            natoms(), i
+            size(), i
         );
     }
     atoms_.erase(atoms_.begin() + static_cast<std::ptrdiff_t>(i));

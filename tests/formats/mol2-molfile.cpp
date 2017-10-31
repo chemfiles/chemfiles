@@ -23,7 +23,7 @@ TEST_CASE("Read files in mol2 format using Molfile") {
         CHECK(file.nsteps() == 200);
 
         auto frame = file.read();
-        CHECK(frame.natoms() == 49);
+        CHECK(frame.size() == 49);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(6.8420, 9.9900, 22.7430), EPS));
         CHECK(approx_eq(positions[33], Vector3D(4.5540, 11.1000, 22.5880), EPS));
@@ -46,7 +46,7 @@ TEST_CASE("Read files in mol2 format using Molfile") {
         CHECK(file.nsteps() == 1);
 
         auto frame = file.read();
-        CHECK(frame.natoms() == 68);
+        CHECK(frame.size() == 68);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[3], Vector3D(-0.1070, -1.8330, -0.2330), EPS));
         CHECK(approx_eq(positions[61], Vector3D(-5.5050, -4.7850, -0.1660), EPS));
@@ -74,26 +74,26 @@ TEST_CASE("Read files in mol2 format using Molfile") {
         auto file = Trajectory("data/mol2/lysozyme-ligand-tripos.mol2");
         CHECK(file.nsteps() == 1);
         auto frame = file.read();
-        CHECK(frame.natoms() == 18);
+        CHECK(frame.size() == 18);
 
         file = Trajectory("data/mol2/zinc_856218.mol2");
         CHECK(file.nsteps() == 1);
         frame = file.read();
-        CHECK(frame.natoms() == 45);
+        CHECK(frame.size() == 45);
 
         file = Trajectory("data/mol2/adp.mol2");
         CHECK(file.nsteps() == 1);
         frame = file.read();
-        CHECK(frame.natoms() == 39);
+        CHECK(frame.size() == 39);
 
         file = Trajectory("data/mol2/li.mol2");
         CHECK(file.nsteps() == 1);
         frame = file.read();
-        CHECK(frame.natoms() == 1);
+        CHECK(frame.size() == 1);
 
         file = Trajectory("data/mol2/status-bits.mol2");
         CHECK(file.nsteps() == 1);
         frame = file.read();
-        CHECK(frame.natoms() == 18);
+        CHECK(frame.size() == 18);
     }
 }

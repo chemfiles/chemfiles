@@ -12,7 +12,7 @@ TEST_CASE("Read files in LAMMPS .lammpstrj format using Molfile"){
         Frame frame = file.read();
         double eps = 1e-3;
 
-        CHECK(frame.natoms() == 1714);
+        CHECK(frame.size() == 1714);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(51.8474, 100.348, 116.516), eps));
         // this one has a non zero image index (1 0 0)
@@ -23,7 +23,7 @@ TEST_CASE("Read files in LAMMPS .lammpstrj format using Molfile"){
         Trajectory file("data/lammps/nacl.lammpstrj");
         Frame frame = file.read();
 
-        CHECK(frame.natoms() == 512);
+        CHECK(frame.size() == 512);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.0, 0.0, 0.0), 1e-3));
         CHECK(approx_eq(positions[222], Vector3D(14.1005, 0.0, 8.4603), 1e-3));

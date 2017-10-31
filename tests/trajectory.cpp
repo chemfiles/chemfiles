@@ -17,9 +17,9 @@ TEST_CASE("Associate a topology and a trajectory"){
             file.set_topology("data/xyz/topology.xyz.topology", "XYZ");
             auto frame = file.read();
 
-            CHECK(frame.natoms() == 9);
+            CHECK(frame.size() == 9);
             auto topology = frame.topology();
-            CHECK(topology.natoms() == 9);
+            CHECK(topology.size() == 9);
             CHECK(topology[0] == Atom("Zn"));
             CHECK(topology[1] == Atom("Cs"));
             CHECK(topology[2] == Atom("Ar"));
@@ -36,9 +36,9 @@ TEST_CASE("Associate a topology and a trajectory"){
             file.set_topology(topology);
             auto frame = file.read();
 
-            CHECK(frame.natoms() == 9);
+            CHECK(frame.size() == 9);
             topology = frame.topology();
-            CHECK(topology.natoms() == 9);
+            CHECK(topology.size() == 9);
             CHECK(topology[0] == Atom("Fe"));
             CHECK(topology[1] == Atom("Fe"));
             CHECK(topology[8] == Atom("Fe"));
@@ -141,7 +141,7 @@ TEST_CASE("Associate an unit cell and a trajectory") {
 TEST_CASE("Specify a format parameter"){
     Trajectory file("data/xyz/helium.xyz.but.not.really", 'r', "XYZ");
     auto frame = file.read();
-    CHECK(frame.natoms() == 125);
+    CHECK(frame.size() == 125);
 }
 
 TEST_CASE("Errors"){

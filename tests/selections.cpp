@@ -192,7 +192,7 @@ TEST_CASE("Multiple selections") {
             {2ul, 0ul}, {2ul, 1ul}, {2ul, 3ul},
             {3ul, 0ul}, {3ul, 1ul}, {3ul, 2ul}};
         CHECK(sel.evaluate(frame) == res);
-        auto natoms = frame.natoms();
+        auto natoms = frame.size();
         CHECK(res.size() == natoms * (natoms - 1));
 
         sel = Selection("two: none");
@@ -213,7 +213,7 @@ TEST_CASE("Multiple selections") {
             {3ul, 1ul, 0ul}, {3ul, 1ul, 2ul}, {3ul, 2ul, 0ul}, {3ul, 2ul, 1ul}
         };
         CHECK(sel.evaluate(frame) == res);
-        auto natoms = frame.natoms();
+        auto natoms = frame.size();
         CHECK(res.size() == natoms * (natoms - 1) * (natoms - 2));
 
         CHECK_THROWS_AS(sel.list(frame), SelectionError);
@@ -232,7 +232,7 @@ TEST_CASE("Multiple selections") {
             {3ul, 1ul, 2ul, 0ul}, {3ul, 2ul, 0ul, 1ul}, {3ul, 2ul, 1ul, 0ul},
         };
         CHECK(sel.evaluate(frame) == res);
-        auto natoms = frame.natoms();
+        auto natoms = frame.size();
         CHECK(res.size() == natoms * (natoms - 1) * (natoms - 2) * (natoms - 3));
 
         CHECK_THROWS_AS(sel.list(frame), SelectionError);

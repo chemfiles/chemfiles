@@ -13,7 +13,7 @@ int main() {
     auto positions = frame.positions();
     std::vector<size_t> indexes;
 
-    for (size_t i=0; i<frame.natoms(); i++) {
+    for (size_t i=0; i<frame.size(); i++) {
         if (positions[i][0] < 5) {
             indexes.push_back(i);
         }

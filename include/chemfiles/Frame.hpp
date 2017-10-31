@@ -75,16 +75,15 @@ public:
     /// Set the unit cell fo the system
     void set_cell(const UnitCell& c) { cell_ = c; }
 
-    /// Resize the frame to store data for `natoms` atoms. If the new size is
-    /// bigger than the old one, missing data is initializd to 0. Pre-existing
-    /// values are conserved.
-    /// This function only resize the velocities if the data is present.
-    void resize(size_t natoms);
+    /// Resize the frame to store data for `n` atoms. If the new size is bigger
+    /// than the old one, missing data is initializd to 0. Pre-existing values
+    /// are conserved.  This function only resize the velocities if the data is
+    /// present.
+    void resize(size_t n);
 
-    /// Reserve size in the frame to store data for `natoms` atoms.
-    /// This function only reserve storage for the the velocities if the data
-    /// is present.
-    void reserve(size_t natoms);
+    /// Reserve size in the frame to store data for `n` atoms. This function
+    /// only reserve storage for the the velocities if the data is present.
+    void reserve(size_t n);
 
     /// Add an `atom` at the given `position` and optionally with the given
     /// `velocity`. The `velocity` value will only be used if this frame
@@ -92,7 +91,7 @@ public:
     void add_atom(Atom atom, Vector3D position, Vector3D velocity = Vector3D());
 
     /// Get the number of atoms in the system
-    size_t natoms() const;
+    size_t size() const;
 
     /// Remove the atom at index `i` in the system.
     ///

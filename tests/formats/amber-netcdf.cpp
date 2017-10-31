@@ -14,7 +14,7 @@ TEST_CASE("Read files in NetCDF format") {
     SECTION("Read one frame") {
         Trajectory file("data/netcdf/water.nc");
         auto frame = file.read();
-        CHECK(frame.natoms() == 297);
+        CHECK(frame.size() == 297);
         // Check positions
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.4172191, 8.303366, 11.73717), 1e-4));
@@ -26,7 +26,7 @@ TEST_CASE("Read files in NetCDF format") {
         auto frame = file.read();
         frame = file.read();
         frame = file.read();
-        CHECK(frame.natoms() == 297);
+        CHECK(frame.size() == 297);
 
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.2990952, 8.31003, 11.72146), 1e-4));
@@ -43,7 +43,7 @@ TEST_CASE("Read files in NetCDF format") {
     SECTION("Missing unit cell") {
         Trajectory file("data/netcdf/no-cell.nc");
         auto frame = file.read();
-        CHECK(frame.natoms() == 1989);
+        CHECK(frame.size() == 1989);
         CHECK(frame.cell() == UnitCell());
     }
 }

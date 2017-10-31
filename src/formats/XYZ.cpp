@@ -76,12 +76,12 @@ void XYZFormat::read(Frame& frame) {
 void XYZFormat::write(const Frame& frame) {
     auto& topology = frame.topology();
     auto& positions = frame.positions();
-    assert(frame.natoms() == topology.natoms());
+    assert(frame.size() == topology.size());
 
-    fmt::print(*file_, "{}\n", frame.natoms());
-    fmt::print(*file_, "Written by the chemfiles library\n", frame.natoms());
+    fmt::print(*file_, "{}\n", frame.size());
+    fmt::print(*file_, "Written by the chemfiles library\n", frame.size());
 
-    for (size_t i = 0; i < frame.natoms(); i++) {
+    for (size_t i = 0; i < frame.size(); i++) {
         auto name = topology[i].name();
         if (name == "") {name = "X";}
         fmt::print(

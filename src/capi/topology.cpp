@@ -45,11 +45,11 @@ error:
     return nullptr;
 }
 
-extern "C" chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const topology, uint64_t *natoms) {
+extern "C" chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const topology, uint64_t *size) {
     CHECK_POINTER(topology);
-    CHECK_POINTER(natoms);
+    CHECK_POINTER(size);
     CHFL_ERROR_CATCH(
-        *natoms = topology->natoms();
+        *size = topology->size();
     )
 }
 

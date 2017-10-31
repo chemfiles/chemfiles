@@ -17,7 +17,7 @@ TEST_CASE("Read files in PDB format") {
         Trajectory file("data/pdb/water.pdb");
         Frame frame = file.read();
 
-        CHECK(frame.natoms() == 297);
+        CHECK(frame.size() == 297);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.417, 8.303, 11.737), 1e-3));
         CHECK(approx_eq(positions[296], Vector3D(6.664, 11.6148, 12.961), 1e-3));
@@ -29,7 +29,7 @@ TEST_CASE("Read files in PDB format") {
         file.read(); // Skip a frame
         frame = file.read();
 
-        CHECK(frame.natoms() == 297);
+        CHECK(frame.size() == 297);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.299, 8.310, 11.721), 1e-4));
         CHECK(approx_eq(positions[296], Vector3D(6.798, 11.509, 12.704), 1e-4));
@@ -39,13 +39,13 @@ TEST_CASE("Read files in PDB format") {
         Trajectory file("data/pdb/water.pdb");
 
         auto frame = file.read_step(2);
-        CHECK(frame.natoms() == 297);
+        CHECK(frame.size() == 297);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.299, 8.310, 11.721), 1e-4));
         CHECK(approx_eq(positions[296], Vector3D(6.798, 11.509, 12.704), 1e-4));
 
         frame = file.read_step(0);
-        CHECK(frame.natoms() == 297);
+        CHECK(frame.size() == 297);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.417, 8.303, 11.737), 1e-3));
         CHECK(approx_eq(positions[296], Vector3D(6.664, 11.6148, 12.961), 1e-3));
@@ -61,7 +61,7 @@ TEST_CASE("Read files in PDB format") {
 
         auto topology = frame.topology();
 
-        CHECK(topology.natoms() == 65);
+        CHECK(topology.size() == 65);
 
         CHECK(topology[0].type() == "Zn");
         CHECK(topology[1].type() == "O");
@@ -106,7 +106,7 @@ TEST_CASE("Read files in PDB format") {
 
         CHECK(frame.topology().residues().size() == 1);
         residue = frame.topology().residues()[0];
-        CHECK(residue.size() == frame.natoms());
+        CHECK(residue.size() == frame.size());
         CHECK(residue.name() == "LIG");
     }
 
@@ -128,10 +128,10 @@ TEST_CASE("Read files in PDB format") {
         CHECK(file.nsteps() == 2);
 
         auto frame = file.read();
-        CHECK(frame.natoms() == 4);
+        CHECK(frame.size() == 4);
 
         frame = file.read();
-        CHECK(frame.natoms() == 7);
+        CHECK(frame.size() == 7);
     }
 
     SECTION("Handle multiple MODEL without END") {
@@ -139,10 +139,10 @@ TEST_CASE("Read files in PDB format") {
         CHECK(file.nsteps() == 2);
 
         auto frame = file.read();
-        CHECK(frame.natoms() == 2223);
+        CHECK(frame.size() == 2223);
 
         frame = file.read();
-        CHECK(frame.natoms() == 2223);
+        CHECK(frame.size() == 2223);
     }
 }
 

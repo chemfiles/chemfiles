@@ -12,36 +12,36 @@ Frame::Frame() : Frame(Topology()) {}
 Frame::Frame(Topology topology, UnitCell cell):
     step_(0), topology_(std::move(topology)), cell_(std::move(cell))
 {
-    resize(topology_.natoms());
+    resize(topology_.size());
 }
 
-size_t Frame::natoms() const {
-    assert(positions_.size() == topology_.natoms());
+size_t Frame::size() const {
+    assert(positions_.size() == topology_.size());
     if (velocities_) {
         assert(positions_.size() == velocities_->size());
     }
     return positions_.size();
 }
 
-void Frame::resize(size_t natoms) {
-    topology_.resize(natoms);
-    positions_.resize(natoms);
+void Frame::resize(size_t size) {
+    topology_.resize(size);
+    positions_.resize(size);
     if (velocities_) {
-        velocities_->resize(natoms);
+        velocities_->resize(size);
     }
 }
 
-void Frame::reserve(size_t natoms) {
-    topology_.reserve(natoms);
-    positions_.reserve(natoms);
+void Frame::reserve(size_t size) {
+    topology_.reserve(size);
+    positions_.reserve(size);
     if (velocities_) {
-        velocities_->reserve(natoms);
+        velocities_->reserve(size);
     }
 }
 
 void Frame::add_velocities() {
     if (!velocities_) {
-        velocities_ = std::vector<Vector3D>(natoms());
+        velocities_ = std::vector<Vector3D>(size());
     }
 }
 
@@ -49,20 +49,20 @@ void Frame::guess_topology() {
     topology_.clear_bonds();
     // This bond guessing algorithm comes from VMD
     auto cutoff = 0.833;
-    for (size_t i = 0; i < natoms(); i++) {
+    for (size_t i = 0; i < size(); i++) {
         auto rad = topology_[i].vdw_radius().value_or(0);
         cutoff = std::max(cutoff, rad);
     }
     cutoff = 1.2 * cutoff;
 
-    for (size_t i = 0; i < natoms(); i++) {
+    for (size_t i = 0; i < size(); i++) {
         auto i_radius = topology_[i].vdw_radius();
         if (!i_radius) {
             throw error(
                 "Missing Van der Waals radius for '{}'", topology_[i].type()
             );
         }
-        for (size_t j = i + 1; j < natoms(); j++) {
+        for (size_t j = i + 1; j < size(); j++) {
             auto j_radius = topology_[j].vdw_radius();
             if (!j_radius) {
                 throw error(
@@ -107,10 +107,10 @@ void Frame::guess_topology() {
 }
 
 void Frame::set_topology(const Topology& topology) {
-    if (topology.natoms() != natoms()) {
+    if (topology.size() != size()) {
         throw error(
             "The topology contains {} atoms, but the frame contains {} atoms.",
-            topology.natoms(), natoms()
+            topology.size(), size()
         );
     }
     topology_ = topology;
@@ -122,15 +122,15 @@ void Frame::add_atom(Atom atom, Vector3D position, Vector3D velocity) {
     if (velocities_) {
         velocities_->push_back(velocity);
     }
-    assert(natoms() == topology_.natoms());
+    assert(size() == topology_.size());
 }
 
 void Frame::remove(size_t i) {
-    if (i >= natoms()) {
+    if (i >= size()) {
         throw out_of_bounds(
             "out of bounds atomic index in `Frame::remove`: we have {} atoms, "
             "but the index is {}",
-            natoms(), i
+            size(), i
         );
     }
     topology_.remove(i);
@@ -138,15 +138,15 @@ void Frame::remove(size_t i) {
     if (velocities_) {
         velocities_->erase(velocities_->begin() + static_cast<std::ptrdiff_t>(i));
     }
-    assert(natoms() == topology_.natoms());
+    assert(size() == topology_.size());
 }
 
 double Frame::distance(size_t i, size_t j) const {
-    if (i >= natoms() || j >= natoms()) {
+    if (i >= size() || j >= size()) {
         throw out_of_bounds(
             "out of bounds atomic index in `Frame::distance`: we have {} "
             "atoms, but the index are {} and {}",
-            natoms(), i, j
+            size(), i, j
         );
     }
 
@@ -155,11 +155,11 @@ double Frame::distance(size_t i, size_t j) const {
 }
 
 double Frame::angle(size_t i, size_t j, size_t k) const {
-    if (i >= natoms() || j >= natoms() || k >= natoms()) {
+    if (i >= size() || j >= size() || k >= size()) {
         throw out_of_bounds(
             "out of bounds atomic index in `Frame::angle`: we have {} atoms, "
             "but the index are {}, {}, and {}",
-            natoms(), i, j, k
+            size(), i, j, k
         );
     }
 
@@ -172,11 +172,11 @@ double Frame::angle(size_t i, size_t j, size_t k) const {
 }
 
 double Frame::dihedral(size_t i, size_t j, size_t k, size_t m) const {
-    if (i >= natoms() || j >= natoms() || k >= natoms() || m >= natoms()) {
+    if (i >= size() || j >= size() || k >= size() || m >= size()) {
         throw out_of_bounds(
             "out of bounds atomic index in `Frame::dihedral`: we have {} "
             "atoms, but the index are {}, {}, {}, and {}",
-            natoms(), i, j, k, m
+            size(), i, j, k, m
         );
     }
 
@@ -190,11 +190,11 @@ double Frame::dihedral(size_t i, size_t j, size_t k, size_t m) const {
 }
 
 double Frame::out_of_plane(size_t i, size_t j, size_t k, size_t m) const {
-    if (i >= natoms() || j >= natoms() || k >= natoms() || m >= natoms()) {
+    if (i >= size() || j >= size() || k >= size() || m >= size()) {
         throw out_of_bounds(
             "out of bounds atomic index in `Frame::out_of_plane`: we have {} "
             "atoms, but the index are {}, {}, {}, and {}",
-            natoms(), i, j, k, m
+            size(), i, j, k, m
         );
     }
 

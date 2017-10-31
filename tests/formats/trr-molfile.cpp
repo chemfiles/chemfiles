@@ -13,7 +13,7 @@ TEST_CASE("Read files in Gromacs .trr format using Molfile"){
         Trajectory file("data/trr/ubiquitin.trr");
         auto frame = file.read();
 
-        CHECK(frame.natoms() == 20455);
+        CHECK(frame.size() == 20455);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(24.8277, 24.662, 18.8104), eps));
         CHECK(approx_eq(positions[1], Vector3D(25.5925, 24.9309, 18.208), eps));
@@ -23,7 +23,7 @@ TEST_CASE("Read files in Gromacs .trr format using Molfile"){
     SECTION("Water"){
         Trajectory file("data/trr/water.trr");
         auto frame = file.read();
-        CHECK(frame.natoms() == 297);
+        CHECK(frame.size() == 297);
 
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.4172191, 8.303366, 11.73717), eps));
@@ -35,7 +35,7 @@ TEST_CASE("Read files in Gromacs .trr format using Molfile"){
 
         file.read();
         frame = file.read();
-        CHECK(frame.natoms() == 297);
+        CHECK(frame.size() == 297);
 
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.2990952, 8.31003, 11.72146), eps));
@@ -45,7 +45,7 @@ TEST_CASE("Read files in Gromacs .trr format using Molfile"){
     SECTION("1AKI"){
         Trajectory file("data/trr/1aki.trr");
         auto frame = file.read();
-        CHECK(frame.natoms() == 38376);
+        CHECK(frame.size() == 38376);
 
         auto positions = frame.positions();
         CHECK(approx_eq(positions[106], Vector3D(48.1473, 25.6153, 32.3827), eps));
