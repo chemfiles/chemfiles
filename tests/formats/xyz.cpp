@@ -121,17 +121,17 @@ TEST_CASE("Write files in XYZ format") {
     "E 4 5 6\n"
     "F 4 5 6\n";
 
-    Frame frame(4);
-    auto positions = frame.positions();
-    for(size_t i=0; i<4; i++)
-        positions[i] = Vector3D(1, 2, 3);
-
-    Topology topology;
+    auto topology = Topology();
     topology.add_atom(Atom("A","O"));
     topology.add_atom(Atom("B"));
     topology.add_atom(Atom("C"));
     topology.add_atom(Atom("D"));
-    frame.set_topology(topology);
+
+    auto frame = Frame(topology);
+    auto positions = frame.positions();
+    for (size_t i=0; i<4; i++) {
+        positions[i] = Vector3D(1, 2, 3);
+    }
 
     {
         auto file = Trajectory(tmpfile, 'w');
@@ -141,8 +141,9 @@ TEST_CASE("Write files in XYZ format") {
 
     frame.resize(6);
     positions = frame.positions();
-    for(size_t i=0; i<6; i++)
+    for (size_t i=0; i<6; i++) {
         positions[i] = Vector3D(4, 5, 6);
+    }
 
     topology.add_atom(Atom("E"));
     topology.add_atom(Atom("F"));

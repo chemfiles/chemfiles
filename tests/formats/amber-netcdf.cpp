@@ -54,7 +54,8 @@ TEST_CASE("Write files in NetCDF format") {
 
     {
         Trajectory file(tmpfile, 'w');
-        Frame frame(4);
+        Frame frame;
+        frame.resize(4);
         auto positions = frame.positions();
         for(size_t i=0; i<4; i++) {
             positions[i] = Vector3D(1, 2, 3);

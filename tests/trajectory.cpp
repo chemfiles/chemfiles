@@ -56,15 +56,16 @@ TEST_CASE("Associate a topology and a trajectory"){
         "Fe 1 2 3\n"
         "Fe 1 2 3\n";
 
-        Frame frame(5);
+        auto topology = Topology();
+        for (size_t i=0; i<5; i++) {
+            topology.add_atom(Atom("Fe"));
+        }
+
+        auto frame = Frame(topology);
         auto positions = frame.positions();
         for(size_t i=0; i<5; i++) {
             positions[i] = Vector3D(1, 2, 3);
         }
-
-        Topology topology;
-        for (size_t i=0; i<5; i++)
-            topology.add_atom(Atom("Fe"));
 
         {
             Trajectory file(tmpfile, 'w');
@@ -115,7 +116,8 @@ TEST_CASE("Associate an unit cell and a trajectory") {
         "ENDMDL\n"
         "END\n";
 
-        Frame frame(3);
+        auto frame = Frame();
+        frame.resize(3);
         auto positions = frame.positions();
         for(size_t i=0; i<3; i++) {
             positions[i] = Vector3D(1, 2, 3);
