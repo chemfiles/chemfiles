@@ -12,9 +12,9 @@ static bool roughly(double a, double b) {
 }
 
 TEST_CASE("Frame size") {
-    auto frame = Frame(10);
-    CHECK(frame.natoms() == 10);
-    CHECK(frame.positions().size() == 10);
+    auto frame = Frame();
+    CHECK(frame.natoms() == 0);
+    CHECK(frame.positions().size() == 0);
     // No velocity data yet
     CHECK_FALSE(frame.velocities());
 
@@ -56,7 +56,8 @@ TEST_CASE("Frame size") {
 }
 
 TEST_CASE("Positions and velocities") {
-    auto frame = Frame(15);
+    auto frame = Frame();
+    frame.resize(15);
 
     frame.positions()[0] = Vector3D(1, 2, 3);
     CHECK(frame.positions()[0] == Vector3D(1, 2, 3));
@@ -97,7 +98,8 @@ TEST_CASE("Unit cell") {
 }
 
 TEST_CASE("Frame errors") {
-    auto frame = Frame(5);
+    auto frame = Frame();
+    frame.resize(5);
     CHECK_THROWS_AS(frame.set_topology(Topology()), Error);
 }
 

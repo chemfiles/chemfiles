@@ -88,13 +88,7 @@ TEST_CASE("Write files in Tinker XYZ format") {
     "5 E 4 5 6 4\n"
     "6 F 4 5 6 5\n";
 
-    Frame frame(4);
-    auto positions = frame.positions();
-    for(size_t i=0; i<4; i++) {
-        positions[i] = Vector3D(1, 2, 3);
-    }
-
-    Topology topology;
+    auto topology = Topology();
     topology.add_atom(Atom("A"));
     topology.add_atom(Atom("A"));
     topology.add_atom(Atom("B"));
@@ -102,7 +96,11 @@ TEST_CASE("Write files in Tinker XYZ format") {
     topology.add_bond(0, 1);
     topology.add_bond(0, 2);
 
-    frame.set_topology(topology);
+    auto frame = Frame(topology);
+    auto positions = frame.positions();
+    for(size_t i=0; i<4; i++) {
+        positions[i] = Vector3D(1, 2, 3);
+    }
 
     {
         auto file = Trajectory(tmpfile, 'w');

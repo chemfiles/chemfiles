@@ -247,7 +247,8 @@ TEST_CASE("PDB files with big values") {
         auto tmpfile = NamedTempPath(".pdb");
         auto trajectory = Trajectory(tmpfile, 'w');
 
-        auto frame = Frame(1);
+        auto frame = Frame();
+        frame.resize(1);
         frame.set_cell(UnitCell(1234567890));
         CHECK_THROWS_AS(trajectory.write(frame), FormatError);
 

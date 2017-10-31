@@ -7,13 +7,11 @@
 #include "chemfiles/Frame.hpp"
 using namespace chemfiles;
 
-Frame::Frame() : Frame(0) {}
-Frame::Frame(size_t natoms) : Frame(Topology()) {
-    resize(natoms);
-}
+Frame::Frame() : Frame(Topology()) {}
 
-Frame::Frame(Topology topology, UnitCell cell)
-    : step_(0), topology_(std::move(topology)), cell_(std::move(cell)) {
+Frame::Frame(Topology topology, UnitCell cell):
+    step_(0), topology_(std::move(topology)), cell_(std::move(cell))
+{
     resize(topology_.natoms());
 }
 
