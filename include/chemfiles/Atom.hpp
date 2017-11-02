@@ -101,13 +101,12 @@ public:
     /// with case-insensitive atom type: `Na`, `NA`, `nA` and `na` all get the
     /// `Na` full name.
     ///
-    /// The return value is a C++11 implementation of the C++17 `std::optional`
-    /// class. See [cppreference] for more information on the `std::optional`
-    /// class.
+    /// @verbatim embed:rst:leading-slashes
+    /// This function returna an :cpp:class:`chemfiles::optional` value that is
+    /// close to C++17 ``std::optional``.
+    /// @endverbatim
     ///
     /// @example{tests/doc/atom/full_name.cpp}
-    ///
-    /// [cppreference]: http://en.cppreference.com/w/cpp/utility/optional
     optional<std::string> full_name() const;
 
     /// Try to get the Van der Waals radius from the atom type.
@@ -118,13 +117,12 @@ public:
     /// executed with case-insensitive atom type: `Na`, `NA`, `nA` and `na` all
     /// get the `Na` radius.
     ///
-    /// The return value is a C++11 implementation of the C++17 `std::optional`
-    /// class. See [cppreference] for more information on the `std::optional`
-    /// class.
+    /// @verbatim embed:rst:leading-slashes
+    /// This function returna an :cpp:class:`chemfiles::optional` value that is
+    /// close to C++17 ``std::optional``.
+    /// @endverbatim
     ///
     /// @example{tests/doc/atom/vdw_radius.cpp}
-    ///
-    /// [cppreference]: http://en.cppreference.com/w/cpp/utility/optional
     optional<double> vdw_radius() const;
 
     /// Try to get the covalent radius from the atom type.
@@ -135,13 +133,12 @@ public:
     /// executed with case-insensitive atom type: `Na`, `NA`, `nA` and `na` all
     /// get the `Na` radius.
     ///
-    /// The return value is a C++11 implementation of the C++17 `std::optional`
-    /// class. See [cppreference] for more information on the `std::optional`
-    /// class.
+    /// @verbatim embed:rst:leading-slashes
+    /// This function returna an :cpp:class:`chemfiles::optional` value that is
+    /// close to C++17 ``std::optional``.
+    /// @endverbatim
     ///
     /// @example{tests/doc/atom/covalent_radius.cpp}
-    ///
-    /// [cppreference]: http://en.cppreference.com/w/cpp/utility/optional
     optional<double> covalent_radius() const;
 
     /// Try to get the atomic number from the atom type.
@@ -152,13 +149,12 @@ public:
     /// is executed with case-insensitive atom type: `Na`, `NA`, `nA` and `na`
     /// all get the `Na` atomic number.
     ///
-    /// The return value is a C++11 implementation of the C++17 `std::optional`
-    /// class. See [cppreference] for more information on the `std::optional`
-    /// class.
+    /// @verbatim embed:rst:leading-slashes
+    /// This function returna an :cpp:class:`chemfiles::optional` value that is
+    /// close to C++17 ``std::optional``.
+    /// @endverbatim
     ///
     /// @example{tests/doc/atom/atomic_number.cpp}
-    ///
-    /// [cppreference]: http://en.cppreference.com/w/cpp/utility/optional
     optional<uint64_t> atomic_number() const;
 
     /// Set an arbitrary `Property` for this atom with the given `name` and
@@ -173,13 +169,12 @@ public:
     /// If no property with the given `name` is found, this function returns
     /// `nullopt`.
     ///
-    /// The return value is a C++11 implementation of the C++17 `std::optional`
-    /// class. See [cppreference] for more information on the `std::optional`
-    /// class.
+    /// @verbatim embed:rst:leading-slashes
+    /// This function returna an :cpp:class:`chemfiles::optional` value that is
+    /// close to C++17 ``std::optional``.
+    /// @endverbatim
     ///
     /// @example{tests/doc/atom/property.cpp}
-    ///
-    /// [cppreference]: http://en.cppreference.com/w/cpp/utility/optional
     optional<const Property&> get(const std::string& name) const;
 
 private:
