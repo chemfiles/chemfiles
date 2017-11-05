@@ -106,14 +106,14 @@ void Frame::guess_topology() {
     }
 }
 
-void Frame::set_topology(const Topology& topology) {
+void Frame::set_topology(Topology topology) {
     if (topology.size() != size()) {
         throw error(
             "The topology contains {} atoms, but the frame contains {} atoms.",
             topology.size(), size()
         );
     }
-    topology_ = topology;
+    topology_ = std::move(topology);
 }
 
 void Frame::add_atom(Atom atom, Vector3D position, Vector3D velocity) {
