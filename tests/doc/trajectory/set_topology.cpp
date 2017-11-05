@@ -1,10 +1,14 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <catch.hpp>
 #include <chemfiles.hpp>
 using namespace chemfiles;
 
-int main() {
+#undef assert
+#define assert CHECK
+
+TEST_CASE() {
     // [no-run]
     // [example]
     // A water topology
@@ -29,5 +33,4 @@ int main() {
     trajectory.set_topology("water.mol", "XYZ");
 
     // [example]
-    return 0;
 }

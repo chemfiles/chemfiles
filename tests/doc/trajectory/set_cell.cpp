@@ -1,10 +1,14 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <catch.hpp>
 #include <chemfiles.hpp>
 using namespace chemfiles;
 
-int main() {
+#undef assert
+#define assert CHECK
+
+TEST_CASE() {
     // [no-run]
     // [example]
     auto trajectory = Trajectory("water.xyz");
@@ -15,5 +19,4 @@ int main() {
     // 11 A, 11 A and 22 A, regardless of what was defined in the file.
 
     // [example]
-    return 0;
 }

@@ -168,6 +168,7 @@ function(chfl_cpp_doctest _file_)
     endif()
 
     chfl_doctest(${_name_} ${_file_})
+    target_link_libraries(${_name_} test_helpers boost_filesystem)
 endfunction()
 
 file(GLOB_RECURSE doctest_files ${CMAKE_CURRENT_SOURCE_DIR}/doc/**.cpp)

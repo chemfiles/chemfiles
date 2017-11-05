@@ -1,9 +1,13 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
+#include <catch.hpp>
 #include <chemfiles.hpp>
 using namespace chemfiles;
 
-int main() {
+#undef assert
+#define assert CHECK
+
+TEST_CASE() {
     // [example]
     auto atom = Atom("C23a", "C");
 
@@ -23,5 +27,4 @@ int main() {
     assert(!number);
 
     // [example]
-    return 0;
 }

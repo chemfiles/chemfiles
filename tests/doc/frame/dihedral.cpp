@@ -1,5 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
+#include <catch.hpp>
 #include <chemfiles.hpp>
 using namespace chemfiles;
 
@@ -7,7 +8,10 @@ using namespace chemfiles;
 #define M_PI 3.14159265358979323846
 #endif
 
-int main() {
+#undef assert
+#define assert CHECK
+
+TEST_CASE() {
     // [example]
     auto frame = Frame();
     frame.add_atom(Atom(""), {1.0, 0.0, 0.0});
@@ -17,5 +21,4 @@ int main() {
 
     assert(fabs(frame.dihedral(0, 1, 2, 3) - M_PI / 2) < 1e-12);
     // [example]
-    return 0;
 }

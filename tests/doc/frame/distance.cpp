@@ -1,9 +1,13 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
+#include <catch.hpp>
 #include <chemfiles.hpp>
 using namespace chemfiles;
 
-int main() {
+#undef assert
+#define assert CHECK
+
+TEST_CASE() {
     // [example]
     auto frame = Frame();
     frame.add_atom(Atom(""), {0.0, 0.0, 0.0});
@@ -11,5 +15,4 @@ int main() {
 
     assert(frame.distance(0, 1) == sqrt(14));
     // [example]
-    return 0;
 }

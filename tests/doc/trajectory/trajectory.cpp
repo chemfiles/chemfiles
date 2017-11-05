@@ -1,10 +1,14 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <catch.hpp>
 #include <chemfiles.hpp>
 using namespace chemfiles;
 
-int main() {
+#undef assert
+#define assert CHECK
+
+TEST_CASE() {
     // [no-run]
     // [example]
     // Simplest case: open a file for reading it, the format is guessed from
@@ -17,5 +21,4 @@ int main() {
     // Specify the file format to use
     auto nanotube = Trajectory("nanotube.lmp", 'r', "LAMMPS Data");
     // [example]
-    return 0;
 }

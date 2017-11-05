@@ -1,9 +1,13 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
+#include <catch.hpp>
 #include <chemfiles.hpp>
 using namespace chemfiles;
 
-int main() {
+#undef assert
+#define assert CHECK
+
+TEST_CASE() {
     // [example]
     // equality and inequality
     assert(Matrix3D() == Matrix3D(0, 0, 0));
@@ -28,13 +32,11 @@ int main() {
     assert(M[2][2] == 33);
 
     // Matrix-vector multiplication
-    auto A = Matrix3D(1, 3, 2);
-    auto v = Vector3D(1, 1, 1);
-    assert(A * v == Vector3D(1, 3, 2));
+    auto mat_vec = Matrix3D(1, 3, 2) * Vector3D(1, 1, 1);
+    assert(mat_vec == Vector3D(1, 3, 2));
 
     // Matrix-Matrix multiplication
-    auto B = Matrix3D(0.5, 2, 1);
-    assert(A * B == Matrix3D(0.5, 6, 2));
+    auto mat_mat = Matrix3D(1, 3, 2) * Matrix3D(0.5, 2, 1);
+    assert(mat_mat == Matrix3D(0.5, 6, 2));
     // [example]
-    return 0;
 }
