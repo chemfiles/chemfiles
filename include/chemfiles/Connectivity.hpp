@@ -12,10 +12,18 @@
 
 namespace chemfiles {
 
-/// The `Bond` struct ensure a canonical representation of a bond between atoms
-/// i and j, with i<j
-struct CHFL_EXPORT Bond final {
+/// The `Bond` class ensure a canonical representation of a bond two atoms.
+///
+/// This class implements all the comparison operators, as well as indexing.
+///
+/// @example{tests/doc/connectivity/bond.cpp}
+class CHFL_EXPORT Bond final {
+public:
+    /// Create a new `Bond` containing the atoms `i` and `j`.
+    ///
+    /// @throw Error if `i == j`
     Bond(size_t i, size_t j);
+
     Bond(Bond&&) = default;
     Bond& operator=(Bond&&) = default;
     Bond(const Bond&) = default;
@@ -61,10 +69,25 @@ inline bool operator>=(const Bond& lhs, const Bond& rhs) {
     return lhs.data_ >= rhs.data_;
 }
 
-/// The `Angle` struct ensure a canonical representation of an angle between the
-/// atoms i, j and k, with i < k
-struct CHFL_EXPORT Angle final {
+/// The `Angle` class ensure a canonical representation of an angle between
+/// three atoms.
+///
+/// An angle is formed by two consecutive bonds:
+///
+///     i       k
+///       \   /
+///         j
+///
+/// This class implements all the comparison operators, as well as indexing.
+///
+/// @example{tests/doc/connectivity/angle.cpp}
+class CHFL_EXPORT Angle final {
+public:
+    /// Create a new `Angle` containing the atoms `i`, `j` and `k`.
+    ///
+    /// @throw Error if `i == j`, `j == k` or `i == k`
     Angle(size_t i, size_t j, size_t k);
+
     Angle(Angle&&) = default;
     Angle& operator=(Angle&&) = default;
     Angle(const Angle&) = default;
@@ -111,10 +134,25 @@ inline bool operator>=(const Angle& lhs, const Angle& rhs) {
     return lhs.data_ > rhs.data_;
 }
 
-/// The `Dihedral` struct ensure a canonical representation of a dihedral angle
-/// between the atoms i, j, k and m, with max(i, j) < max(k, m))
-struct CHFL_EXPORT Dihedral final {
+/// The `Dihedral` class ensure a canonical representation of a dihedral angle
+/// between four atoms.
+///
+/// A dihedral angle is formed by three consecutive bonds:
+///
+///     i       k
+///       \   /   \
+///         j      m
+///
+/// This class implements all the comparison operators, as well as indexing.
+///
+/// @example{tests/doc/connectivity/dihedral.cpp}
+class CHFL_EXPORT Dihedral final {
+public:
+    /// Create a new `Dihedral` containing the atoms `i`, `j`, `k` and `m`.
+    ///
+    /// @throw Error if any of `i`, `j`, `k`, `m` has the same value as another
     Dihedral(size_t i, size_t j, size_t k, size_t m);
+
     Dihedral(Dihedral&&) = default;
     Dihedral& operator=(Dihedral&&) = default;
     Dihedral(const Dihedral&) = default;
@@ -161,11 +199,30 @@ inline bool operator>=(const Dihedral& lhs, const Dihedral& rhs) {
     return lhs.data_ >= rhs.data_;
 }
 
-/// The `Improper` struct ensure a canonical representation of an improper
-/// dihedral angle centered around the atom j, which is linked to i, k, and m.
-/// i, k, and m are sorted to ensure the canonical representation
-struct CHFL_EXPORT Improper final {
+/// The `Improper` class ensure a canonical representation of an improper
+/// dihedral angle between four atoms.
+///
+/// An improper dihedral angle is formed by three bonds around a central atom:
+///
+///     i       k
+///       \   /
+///         j
+///         |
+///         m
+///
+/// This class implements all the comparison operators, as well as indexing.
+///
+/// The second atom of the improper is always the central atom.
+///
+/// @example{tests/doc/connectivity/improper.cpp}
+class CHFL_EXPORT Improper final {
+public:
+    /// Create a new `Improper` containing the atoms `i`, `j`, `k` and `m`. `j`
+    /// must be the central atom of the improper.
+    ///
+    /// @throw Error if any of `i`, `j`, `k`, `m` has the same value as another
     Improper(size_t i, size_t j, size_t k, size_t m);
+
     Improper(Improper&&) = default;
     Improper& operator=(Improper&&) = default;
     Improper(const Improper&) = default;

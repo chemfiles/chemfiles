@@ -6,14 +6,17 @@ Topology class
 .. doxygenclass:: chemfiles::Topology
     :members:
 
-.. doxygenstruct:: chemfiles::Bond
+Connectivity elements
+=====================
+
+.. doxygenclass:: chemfiles::Bond
     :members:
 
-.. doxygenstruct:: chemfiles::Angle
+.. doxygenclass:: chemfiles::Angle
     :members:
 
-.. doxygenstruct:: chemfiles::Dihedral
+.. doxygenclass:: chemfiles::Dihedral
     :members:
 
-.. doxygenstruct:: chemfiles::Improper
+.. doxygenclass:: chemfiles::Improper
     :members:
