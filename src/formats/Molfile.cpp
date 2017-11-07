@@ -306,33 +306,49 @@ template class chemfiles::Molfile<LAMMPS>;
 template class chemfiles::Molfile<MOLDEN>;
 
 template<> FormatInfo chemfiles::format_information<Molfile<DCD>>() {
-    return FormatInfo("DCD").with_extension(".dcd");
+    return FormatInfo("DCD").with_extension(".dcd").description(
+        "DCD binary format"
+    );
 }
 
 template<> FormatInfo chemfiles::format_information<Molfile<GRO>>() {
-    return FormatInfo("GRO").with_extension(".gro");
+    return FormatInfo("GRO").with_extension(".gro").description(
+        "GROMACS .gro text format"
+    );
 }
 
 template<> FormatInfo chemfiles::format_information<Molfile<TRR>>() {
-    return FormatInfo("TRR").with_extension(".trr");
+    return FormatInfo("TRR").with_extension(".trr").description(
+        "GROMACS .trr binary portable format"
+    );
 }
 
 template<> FormatInfo chemfiles::format_information<Molfile<TRJ>>() {
-    return FormatInfo("TRJ").with_extension(".trj");
+    return FormatInfo("TRJ").with_extension(".trj").description(
+        "GROMACS .xtc binary format"
+    );
 }
 
 template<> FormatInfo chemfiles::format_information<Molfile<XTC>>() {
-    return FormatInfo("XTC").with_extension(".xtc");
+    return FormatInfo("XTC").with_extension(".xtc").description(
+        "GROMACS .xtc binary compressed portable format"
+    );
 }
 
 template<> FormatInfo chemfiles::format_information<Molfile<MOL2>>() {
-    return FormatInfo("MOL2").with_extension(".mol2");
+    return FormatInfo("MOL2").with_extension(".mol2").description(
+        "TRIPOS mol2 text format"
+    );
 }
 
 template<> FormatInfo chemfiles::format_information<Molfile<LAMMPS>>() {
-    return FormatInfo("LAMMPS").with_extension(".lammpstrj");
+    return FormatInfo("LAMMPS").with_extension(".lammpstrj").description(
+        "LAMMPS text trajectory format"
+    );
 }
 
 template<> FormatInfo chemfiles::format_information<Molfile<MOLDEN>>() {
-    return FormatInfo("Molden").with_extension(".molden");
+    return FormatInfo("Molden").with_extension(".molden").description(
+        "Molden text format"
+    );
 }

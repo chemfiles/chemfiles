@@ -9,7 +9,9 @@
 using namespace chemfiles;
 
 template<> FormatInfo chemfiles::format_information<AmberNetCDFFormat>() {
-    return FormatInfo("Amber NetCDF").with_extension(".nc");
+    return FormatInfo("Amber NetCDF").with_extension(".nc").description(
+        "Amber convention for binary NetCDF molecular trajectories"
+    );
 }
 
 //! Check the validity of a NetCDF file

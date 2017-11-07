@@ -89,9 +89,21 @@ public:
         return extension_;
     }
 
+    /// Add a format description to this format
+    FormatInfo& description(std::string description) {
+        description_ = std::move(description);
+        return *this;
+    }
+
+    /// Get the format description.
+    const std::string& description() const {
+        return description_;
+    }
+
 private:
     std::string name_;
     std::string extension_;
+    std::string description_;
 };
 
 template<class Format>
