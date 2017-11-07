@@ -1,6 +1,12 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <sstream>
+#include <cctype>
+
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include "chemfiles/FormatFactory.hpp"
 #include "chemfiles/ErrorFmt.hpp"
 
@@ -13,6 +19,8 @@
 #include "chemfiles/formats/TNG.hpp"
 
 using namespace chemfiles;
+
+static unsigned edit_distance(const std::string& first, const std::string& second);
 
 namespace chemfiles {
     extern template class Molfile<DCD>;
@@ -77,7 +85,30 @@ FormatFactory& FormatFactory::get() {
 format_creator_t FormatFactory::name(const std::string& name) {
     auto formats = formats_.lock();
     if (formats->find(name) == formats->end()) {
-        throw format_error("can not find a format named '{}'", name);
+        auto suggestions = std::vector<std::string>();
+        for (auto& node: *formats) {
+            if (edit_distance(name, node.first) < 4) {
+                suggestions.push_back(node.first);
+            }
+        }
+
+        std::stringstream message;
+        fmt::print(message, "can not find a format named '{}'.", name);
+
+        if (!suggestions.empty()) {
+            fmt::print(message, " Did you mean");
+            bool first = true;
+            for (auto& suggestion: suggestions) {
+                if (!first) {
+                    fmt::print(message, " or");
+                }
+                fmt::print(message, " '{}'", suggestion);
+                first = false;
+            }
+            fmt::print(message, "?");
+        }
+
+        throw FormatError(message.str());
     }
     return formats->at(name);
 }
@@ -90,4 +121,37 @@ format_creator_t FormatFactory::extension(const std::string& extension) {
         );
     }
     return extensions->at(extension);
+}
+
+
+// Compute the edit distance between two strings using Wagner–Fischer algorithm
+unsigned edit_distance(const std::string& first, const std::string& second) {
+    auto m = first.length() + 1;
+    auto n = second.length() + 1;
+
+   auto distances = std::vector<std::vector<unsigned>>(m, std::vector<unsigned>(n, 0));
+
+   for (unsigned i=0; i<m; i++) {
+       distances[i][0] = i;
+   }
+
+   for (unsigned j=0; j<n; j++) {
+       distances[0][j] = j;
+   }
+
+   for (unsigned j=1; j<n; j++) {
+        for (unsigned i=1; i<m; i++) {
+            if (std::tolower(first[i - 1]) == std::tolower(second[j - 1])) {
+                distances[i][j] = distances[i - 1][j - 1];
+            } else {
+                distances[i][j] = std::min(std::min(
+                    distances[i - 1][j] + 1,
+                    distances[i][j - 1] + 1),
+                    distances[i - 1][j - 1] + 1
+                );
+            }
+        }
+   }
+
+   return distances[m - 1][n - 1];
 }

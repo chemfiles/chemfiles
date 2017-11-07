@@ -29,23 +29,20 @@ public:
     /// Get the instance of the TrajectoryFactory
     static FormatFactory& get();
 
-    /// @brief Get a `format_creator_t` from a format name.
-    /// @param name the format name
-    /// @return A `format_creator_t` corresponding to the format, if the format
-    ///         name is found in the list of registered formats.
+    /// Get a `format_creator_t` from a format name.
     ///
+    /// @param name the format name
     /// @throws FormatError if the format can not be found
     format_creator_t name(const std::string& name);
 
-    /// @brief Get a `format_creator_t` from a format extention.
-    /// @param extension the format extention
-    /// @return A `format_creator_t` corresponding to the format, if the format
-    ///         extension is found in the list of registered extensions.
+    /// Get a `format_creator_t` from a format extention.
     ///
+    /// @param extension the format extention
     /// @throws FormatError if the format can not be found
     format_creator_t extension(const std::string& extension);
 
-    /// @brief Register a format `F` with the given `name`
+    /// Register a format `F` with the given `name`
+    ///
     /// @param name the format name
     /// @throws FormatError if the name is already used by another format
     ///
@@ -66,7 +63,8 @@ public:
         });
     }
 
-    /// @brief Register a format `F` with the given `extension`
+    /// Register a format `F` with the given `extension`
+    ///
     /// @param extension the format extension
     /// @throws FormatError if the extension is already used by another format
     ///

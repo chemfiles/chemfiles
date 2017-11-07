@@ -48,6 +48,28 @@ TEST_CASE("Geting registered format"){
 
     CHECK_THROWS_AS(FormatFactory::get().name("UNKOWN"), FormatError);
     CHECK_THROWS_AS(FormatFactory::get().extension(".UNKOWN"), FormatError);
+
+    try {
+        FormatFactory::get().name("Dully");
+        CHECK(false);
+    } catch (const FormatError& e) {
+        CHECK(std::string(e.what()) == "can not find a format named 'Dully'. Did you mean 'Dummy'?");
+    }
+
+    try {
+        FormatFactory::get().name("DUMMY");
+        CHECK(false);
+    } catch (const FormatError& e) {
+        CHECK(std::string(e.what()) == "can not find a format named 'DUMMY'. Did you mean 'Dummy'?");
+    }
+
+    FormatFactory::get().register_name<DummyFormat>("Dunny");
+    try {
+        FormatFactory::get().name("Dully");
+        CHECK(false);
+    } catch (const FormatError& e) {
+        CHECK(std::string(e.what()) == "can not find a format named 'Dully'. Did you mean 'Dunny' or 'Dummy'?");
+    }
 }
 
 TEST_CASE("Check error throwing in formats"){
@@ -61,5 +83,4 @@ TEST_CASE("Check error throwing in formats"){
     CHECK_THROWS_AS(trajectory.read(), FormatError);
     CHECK_THROWS_AS(trajectory.read_step(2), FormatError);
     CHECK_THROWS_AS(trajectory.write(frame), FormatError);
-
 }
