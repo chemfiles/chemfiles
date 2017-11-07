@@ -28,6 +28,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added support for improper dihedral angles in `Topology`.
 * `chemfiles::add_configuration` and `chemfiles::set_warning_callback` are now
   thread safe, and will block upon concurrent usage.
+* `UnitCell::matricial` is renamed to `UnitCell::matrix`.
+* The `UnitCell::shape` setter is renamed to `UnitCell::set_shape`.
 
 ### Changes in supported formats
 

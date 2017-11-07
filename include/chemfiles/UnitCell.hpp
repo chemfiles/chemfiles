@@ -41,10 +41,8 @@ public:
         INFINITE = 2
     };
 
-    /// Copy constructor
     UnitCell(const UnitCell& other) = default;
     UnitCell& operator=(const UnitCell& other) = default;
-    /// Move constructor
     UnitCell(UnitCell&& other) = default;
     UnitCell& operator=(UnitCell&& other) = default;
 
@@ -57,28 +55,16 @@ public:
     /// Construct a TRICLINIC unit cell of side size `a`, `b`, `c`, and cell
     /// angles `alpha`, `beta`, `gamma`
     UnitCell(double a, double b, double c, double alpha, double beta, double gamma);
-    /// Construct a cell of type `type`, with all lenghts set to 0 and all
-    /// angles set to 90°
-    UnitCell(CellShape shape);
-    /// Construct a cell of type `type`, with all lenghts set to `a` and all
-    /// angles set to 90°
-    UnitCell(CellShape shape, double a);
-    /// Construct a cell of type `type`, with lenghts set to `a` ,`b`, `d`,
-    /// and all angles set to 90°
-    UnitCell(CellShape shape, double a, double b, double c);
 
     /// Get a matricial representation of the cell.
-    Matrix3D matricial() const {
+    Matrix3D matrix() const {
         return h_;
     }
-    /// Populate C-style matricial representation of the cell. The array should
-    /// have a 3 x 3 size.
-    void raw_matricial(double[3][3]) const;
 
     /// Get the cell shape
     CellShape shape() const { return shape_; }
     /// Set the cell shape to `shape`
-    void shape(CellShape shape);
+    void set_shape(CellShape shape);
 
     /// Get the first lenght (a) of the cell
     double a() const { return a_; }
