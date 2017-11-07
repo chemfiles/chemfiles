@@ -137,6 +137,15 @@ format_creator_t FormatFactory::extension(const std::string& extension) {
     return it->second;
 }
 
+std::vector<FormatInfo> FormatFactory::formats() {
+    auto formats = formats_.lock();
+    auto metadata = std::vector<FormatInfo>();
+    metadata.reserve(formats->size());
+    for (auto& pair: *formats) {
+        metadata.emplace_back(pair.first);
+    }
+    return metadata;
+}
 
 // Compute the edit distance between two strings using Wagner–Fischer algorithm
 unsigned edit_distance(const std::string& first, const std::string& second) {

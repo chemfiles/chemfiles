@@ -51,6 +51,9 @@ public:
         });
     }
 
+    /// Get the metadata for all registered formats 
+    std::vector<FormatInfo> formats();
+
 private:
     using formats_map_t = std::vector<std::pair<FormatInfo, format_creator_t>>;
     using iterator = formats_map_t::const_iterator;
