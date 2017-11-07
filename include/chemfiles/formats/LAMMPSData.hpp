@@ -221,6 +221,8 @@ private:
     DataTypes types_;
 };
 
+template<> FormatInfo format_information<LAMMPSDataFormat>();
+
 } // namespace chemfiles
 
 #endif

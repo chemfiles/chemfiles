@@ -22,11 +22,9 @@ typedef std::function<std::unique_ptr<Format>(const std::string& path, File::Mod
 class CHFL_EXPORT FormatFactory {
 private:
     FormatFactory();
-    /// Files extensions to trajectory builder associations
-    using trajectory_map_t = std::unordered_map<std::string, format_creator_t>;
 
 public:
-    /// Get the instance of the TrajectoryFactory
+    /// Get the instance of the `FormatFactory`
     static FormatFactory& get();
 
     /// Get a `format_creator_t` from a format name.
@@ -41,55 +39,29 @@ public:
     /// @throws FormatError if the format can not be found
     format_creator_t extension(const std::string& extension);
 
-    /// Register a format `F` with the given `name`
+    /// Register a given `Format` in the factory.
     ///
-    /// @param name the format name
-    /// @throws FormatError if the name is already used by another format
-    ///
-    /// Usage example:
-    /// ```
-    /// FormatFactory::get().register_name<MyFormat>("my name");
-    /// ```
-    template <typename F>
-    void register_name(const std::string& name) {
-        auto formats = formats_.lock();
-        if (formats->find(name) != formats->end()) {
-            throw FormatError(
-                "The name '" + name + "' is already associated with a format."
-            );
-        }
-        formats->emplace(name, [](const std::string& path, File::Mode mode) {
-            return std::unique_ptr<Format>(new F(path, mode));
-        });
-    }
-
-    /// Register a format `F` with the given `extension`
-    ///
-    /// @param extension the format extension
-    /// @throws FormatError if the extension is already used by another format
-    ///
-    /// Usage example:
-    /// ```
-    /// FormatFactory::get().register_extension<MyFormat>(".mft");
-    /// ```
-    template <typename F>
-    void register_extension(const std::string& extension) {
-        auto extensions = extensions_.lock();
-        if (extensions->find(extension) != extensions->end()) {
-            throw FormatError(
-                "The extension '" + extension + "' is already associated with a format."
-            );
-        }
-        extensions->emplace(extension, [](const std::string& path, File::Mode mode) {
-            return std::unique_ptr<Format>(new F(path, mode));
+    /// The format informations are taken from the specialization of the
+    /// template function `chemfiles::format_information` for this format.
+    template<class Format>
+    void add_format() {
+        auto info = format_information<Format>();
+        register_format(info, [](const std::string& path, File::Mode mode) {
+            return std::unique_ptr<Format>(new Format(path, mode));
         });
     }
 
 private:
-    /// Trajectory map associating format descriptions and readers
-    mutex<trajectory_map_t> formats_;
-    /// Trajectory map associating format descriptions and readers
-    mutex<trajectory_map_t> extensions_;
+    using formats_map_t = std::vector<std::pair<FormatInfo, format_creator_t>>;
+    using iterator = formats_map_t::const_iterator;
+
+    static iterator find_name(const formats_map_t& map, const std::string& name);
+    static iterator find_extension(const formats_map_t& map, const std::string& extension);
+
+    void register_format(FormatInfo info, format_creator_t creator);
+
+    /// Trajectory map associating format descriptions and creators
+    mutex<formats_map_t> formats_;
 };
 
 } // namespace chemfiles

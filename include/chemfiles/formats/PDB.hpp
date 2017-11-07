@@ -48,8 +48,9 @@ private:
     /// Did we wrote a frame to the file? This is used to check wheter we need
     /// to write a final `END` record in the destructor
     bool written_ = false;
-
 };
+
+template<> FormatInfo format_information<PDBFormat>();
 
 } // namespace chemfiles
 

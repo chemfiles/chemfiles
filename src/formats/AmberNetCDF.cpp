@@ -8,6 +8,10 @@
 #include "chemfiles/warnings.hpp"
 using namespace chemfiles;
 
+template<> FormatInfo chemfiles::format_information<AmberNetCDFFormat>() {
+    return FormatInfo("Amber NetCDF").with_extension(".nc");
+}
+
 //! Check the validity of a NetCDF file
 static bool is_valid(const NcFile& file_, size_t natoms) {
     bool writing = (natoms != static_cast<size_t>(-1));

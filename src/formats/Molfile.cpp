@@ -301,6 +301,38 @@ template class chemfiles::Molfile<GRO>;
 template class chemfiles::Molfile<TRR>;
 template class chemfiles::Molfile<XTC>;
 template class chemfiles::Molfile<TRJ>;
-template class chemfiles::Molfile<LAMMPS>;
 template class chemfiles::Molfile<MOL2>;
+template class chemfiles::Molfile<LAMMPS>;
 template class chemfiles::Molfile<MOLDEN>;
+
+template<> FormatInfo chemfiles::format_information<Molfile<DCD>>() {
+    return FormatInfo("DCD").with_extension(".dcd");
+}
+
+template<> FormatInfo chemfiles::format_information<Molfile<GRO>>() {
+    return FormatInfo("GRO").with_extension(".gro");
+}
+
+template<> FormatInfo chemfiles::format_information<Molfile<TRR>>() {
+    return FormatInfo("TRR").with_extension(".trr");
+}
+
+template<> FormatInfo chemfiles::format_information<Molfile<TRJ>>() {
+    return FormatInfo("TRJ").with_extension(".trj");
+}
+
+template<> FormatInfo chemfiles::format_information<Molfile<XTC>>() {
+    return FormatInfo("XTC").with_extension(".xtc");
+}
+
+template<> FormatInfo chemfiles::format_information<Molfile<MOL2>>() {
+    return FormatInfo("MOL2").with_extension(".mol2");
+}
+
+template<> FormatInfo chemfiles::format_information<Molfile<LAMMPS>>() {
+    return FormatInfo("LAMMPS").with_extension(".lammpstrj");
+}
+
+template<> FormatInfo chemfiles::format_information<Molfile<MOLDEN>>() {
+    return FormatInfo("Molden").with_extension(".molden");
+}

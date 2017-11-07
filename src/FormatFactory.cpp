@@ -20,8 +20,6 @@
 
 using namespace chemfiles;
 
-static unsigned edit_distance(const std::string& first, const std::string& second);
-
 namespace chemfiles {
     extern template class Molfile<DCD>;
     extern template class Molfile<GRO>;
@@ -33,48 +31,25 @@ namespace chemfiles {
     extern template class Molfile<MOLDEN>;
 }
 
+static unsigned edit_distance(const std::string& first, const std::string& second);
+
 FormatFactory::FormatFactory() {
-    this->register_name<XYZFormat>("XYZ");
-    this->register_extension<XYZFormat>(".xyz");
-
-    this->register_name<PDBFormat>("PDB");
-    this->register_extension<PDBFormat>(".pdb");
-
-    this->register_name<TNGFormat>("TNG");
-    this->register_extension<TNGFormat>(".tng");
-
-    this->register_name<AmberNetCDFFormat>("Amber NetCDF");
-    this->register_extension<AmberNetCDFFormat>(".nc");
-
-    this->register_name<TinkerFormat>("Tinker");
-    this->register_extension<TinkerFormat>(".arc");
-
-    this->register_name<LAMMPSDataFormat>("LAMMPS Data");
+    this->add_format<XYZFormat>();
+    this->add_format<PDBFormat>();
+    this->add_format<TNGFormat>();
+    this->add_format<AmberNetCDFFormat>();
+    this->add_format<TinkerFormat>();
+    this->add_format<LAMMPSDataFormat>();
 
     // VMD molfile plugins
-    this->register_name<Molfile<DCD>>("DCD");
-    this->register_extension<Molfile<DCD>>(".dcd");
-
-    this->register_name<Molfile<GRO>>("GRO");
-    this->register_extension<Molfile<GRO>>(".gro");
-
-    this->register_name<Molfile<TRR>>("TRR");
-    this->register_extension<Molfile<TRR>>(".trr");
-
-    this->register_name<Molfile<XTC>>("XTC");
-    this->register_extension<Molfile<XTC>>(".xtc");
-
-    this->register_name<Molfile<TRJ>>("TRJ");
-    this->register_extension<Molfile<TRJ>>(".trj");
-
-    this->register_name<Molfile<LAMMPS>>("LAMMPS");
-    this->register_extension<Molfile<LAMMPS>>(".lammpstrj");
-
-    this->register_name<Molfile<MOL2>>("MOL2");
-    this->register_extension<Molfile<MOL2>>(".mol2");
-
-    this->register_name<Molfile<MOLDEN>>("Molden");
-    this->register_extension<Molfile<MOLDEN>>(".molden");
+    this->add_format<Molfile<DCD>>();
+    this->add_format<Molfile<GRO>>();
+    this->add_format<Molfile<TRR>>();
+    this->add_format<Molfile<XTC>>();
+    this->add_format<Molfile<TRJ>>();
+    this->add_format<Molfile<MOL2>>();
+    this->add_format<Molfile<LAMMPS>>();
+    this->add_format<Molfile<MOLDEN>>();
 }
 
 FormatFactory& FormatFactory::get() {
@@ -82,13 +57,51 @@ FormatFactory& FormatFactory::get() {
     return instance_;
 }
 
+FormatFactory::iterator FormatFactory::find_name(const formats_map_t& formats, const std::string& name) {
+    for (auto it = formats.begin(); it != formats.end(); it++) {
+        if (it->first.name() == name) {
+            return it;
+        }
+    }
+    return formats.end();
+}
+
+FormatFactory::iterator FormatFactory::find_extension(const formats_map_t& formats, const std::string& extension) {
+    for (iterator it = formats.begin(); it != formats.end(); it++) {
+        if (it->first.extension() == extension) {
+            return it;
+        }
+    }
+    return formats.end();
+}
+
+void FormatFactory::register_format(FormatInfo info, format_creator_t creator) {
+    auto formats = formats_.lock();
+    if (info.name() == "" && info.extension() == "") {
+        throw format_error(
+            "can not register a format with no name and no extension"
+        );
+    } else if (info.name() != "" && find_name(*formats, info.name()) != formats->end()) {
+        throw format_error(
+            "the name '{}' is already associated with a format."
+        );
+    } else if (info.extension() != "" && find_extension(*formats, info.extension()) != formats->end()) {
+        throw format_error(
+            "the extension '{}' is already associated with a format."
+        );
+    } else {
+        formats->push_back({info, creator});
+    }
+}
+
 format_creator_t FormatFactory::name(const std::string& name) {
     auto formats = formats_.lock();
-    if (formats->find(name) == formats->end()) {
+    auto it = find_name(*formats, name);
+    if (it == formats->end()) {
         auto suggestions = std::vector<std::string>();
         for (auto& node: *formats) {
-            if (edit_distance(name, node.first) < 4) {
-                suggestions.push_back(node.first);
+            if (edit_distance(name, node.first.name()) < 4) {
+                suggestions.push_back(node.first.name());
             }
         }
 
@@ -110,17 +123,18 @@ format_creator_t FormatFactory::name(const std::string& name) {
 
         throw FormatError(message.str());
     }
-    return formats->at(name);
+    return it->second;
 }
 
 format_creator_t FormatFactory::extension(const std::string& extension) {
-    auto extensions = extensions_.lock();
-    if (extensions->find(extension) == extensions->end()) {
+    auto formats = formats_.lock();
+    auto it = find_extension(*formats, extension);
+    if (it == formats->end()) {
         throw format_error(
             "can not find a format associated with the '{}' extension.", extension
         );
     }
-    return extensions->at(extension);
+    return it->second;
 }
 
 

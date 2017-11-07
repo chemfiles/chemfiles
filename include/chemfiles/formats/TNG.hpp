@@ -33,6 +33,8 @@ private:
     int64_t natoms_ = 0;
 };
 
+template<> FormatInfo format_information<TNGFormat>();
+
 } // namespace chemfiles
 
 #endif

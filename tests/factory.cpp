@@ -13,32 +13,28 @@
 #include "chemfiles/FormatFactory.hpp"
 using namespace chemfiles;
 
-// Dummy format clase
-class DummyFormat: public Format {
-public:
-    DummyFormat(const std::string&, File::Mode){}
+struct DummyFormat: public Format {
+    DummyFormat(const std::string&, File::Mode) {}
     size_t nsteps() override {return 42;}
 };
 
-TEST_CASE("Registering a new format"){
-    FormatFactory::get().register_extension<DummyFormat>(".testing");
-    // We can not register the same format twice
-    CHECK_THROWS_AS(
-        FormatFactory::get().register_extension<DummyFormat>(".testing"),
-        FormatError
-    );
+struct DunnyFormat: public Format {
+    DunnyFormat(const std::string&, File::Mode) {}
+    size_t nsteps() override {return 0;}
+};
 
-    FormatFactory::get().register_name<DummyFormat>("Testing");
-    // We can not register the same format twice
-    CHECK_THROWS_AS(
-        FormatFactory::get().register_name<DummyFormat>("Testing"),
-        FormatError
-    );
+namespace chemfiles {
+    template<> FormatInfo format_information<DummyFormat>() {
+        return FormatInfo("Dummy").with_extension(".dummy");
+    }
+
+    template<> FormatInfo format_information<DunnyFormat>() {
+        return FormatInfo("Dunny");
+    }
 }
 
 TEST_CASE("Geting registered format"){
-    FormatFactory::get().register_extension<DummyFormat>(".dummy");
-    FormatFactory::get().register_name<DummyFormat>("Dummy");
+    FormatFactory::get().add_format<DummyFormat>();
 
     DummyFormat dummy("", File::READ);
     auto format = FormatFactory::get().extension(".dummy")("", File::READ);
@@ -63,12 +59,12 @@ TEST_CASE("Geting registered format"){
         CHECK(std::string(e.what()) == "can not find a format named 'DUMMY'. Did you mean 'Dummy'?");
     }
 
-    FormatFactory::get().register_name<DummyFormat>("Dunny");
+    FormatFactory::get().add_format<DunnyFormat>();
     try {
         FormatFactory::get().name("Dully");
         CHECK(false);
     } catch (const FormatError& e) {
-        CHECK(std::string(e.what()) == "can not find a format named 'Dully'. Did you mean 'Dunny' or 'Dummy'?");
+        CHECK(std::string(e.what()) == "can not find a format named 'Dully'. Did you mean 'Dummy' or 'Dunny'?");
     }
 }
 
