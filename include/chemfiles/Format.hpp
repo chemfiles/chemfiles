@@ -55,6 +55,16 @@ public:
     virtual size_t nsteps() = 0;
 };
 
+/// Metadata associated with a format.
+///
+/// This class uses the builder patern, chaining functions calls to set the
+/// class attributes:
+///
+/// ```cpp
+/// auto meta = FormatInfo("MyFormat").with_extension(".mft").description(
+///     "some description"
+/// );
+/// ```
 class CHFL_EXPORT FormatInfo {
 public:
     /// Create a `FormatInfo` with the given `name`.
@@ -106,6 +116,22 @@ private:
     std::string description_;
 };
 
+/// Get the metadata associated with `Format`.
+///
+/// In order to implement a new format, one should specialise this function
+/// with the corresponding format:
+///
+/// ```cpp
+/// class MyFormat: public Format {
+///     // ...
+/// };
+///
+/// namespace chemfiles {
+///     template<> FormatInfo format_information<MyFormat>() {
+///         return FormatInfo("MyFormat").with_extension(".mft");
+///     }
+/// }
+/// ```
 template<class Format>
 FormatInfo format_information() {
     throw Error("format_informations is unimplemented for this format");
