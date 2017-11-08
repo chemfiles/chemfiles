@@ -14,6 +14,12 @@
 
 using namespace chemfiles;
 
+template<> FormatInfo chemfiles::format_information<TinkerFormat>() {
+    return FormatInfo("Tinker").with_extension(".arc").description(
+        "Tinker XYZ text format"
+    );
+}
+
 /// Fast-forward the file for one step, returning `false` if the file does
 /// not contain one more step.
 static bool forward(TextFile& file);

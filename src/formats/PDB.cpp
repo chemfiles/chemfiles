@@ -14,6 +14,12 @@
 
 using namespace chemfiles;
 
+template<> FormatInfo chemfiles::format_information<PDBFormat>() {
+    return FormatInfo("PDB").with_extension(".pdb").description(
+        "PDB (RCSB Protein Data Bank) text format"
+    );
+}
+
 /// Check the number of digits before the decimal separator to be sure than
 /// we can represen them. In case of error, use the given `context` in the error
 /// message

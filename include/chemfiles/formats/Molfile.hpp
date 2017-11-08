@@ -82,6 +82,15 @@ private:
     optional<Topology> topology_;
 };
 
+template<> FormatInfo format_information<Molfile<DCD>>();
+template<> FormatInfo format_information<Molfile<GRO>>();
+template<> FormatInfo format_information<Molfile<TRR>>();
+template<> FormatInfo format_information<Molfile<XTC>>();
+template<> FormatInfo format_information<Molfile<TRJ>>();
+template<> FormatInfo format_information<Molfile<MOL2>>();
+template<> FormatInfo format_information<Molfile<LAMMPS>>();
+template<> FormatInfo format_information<Molfile<MOLDEN>>();
+
 } // namespace chemfiles
 
 #endif

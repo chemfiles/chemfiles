@@ -8,6 +8,12 @@
 #include "chemfiles/ErrorFmt.hpp"
 using namespace chemfiles;
 
+template<> FormatInfo chemfiles::format_information<TNGFormat>() {
+    return FormatInfo("TNG").with_extension(".tng").description(
+        "Trajectory New Generation binary format"
+    );
+}
+
 /// A buffer for TNG allocated data. It will not allocate its own memory, but
 /// will `free` the memory on destruction. It can be used in replacement of the
 /// pointer type in TNG API.

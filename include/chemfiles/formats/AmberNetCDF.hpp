@@ -48,6 +48,8 @@ private:
     bool validated_;
 };
 
+template<> FormatInfo format_information<AmberNetCDFFormat>();
+
 } // namespace chemfiles
 
 #endif

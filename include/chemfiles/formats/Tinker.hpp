@@ -33,6 +33,8 @@ private:
     std::vector<std::streampos> steps_positions_;
 };
 
+template<> FormatInfo format_information<TinkerFormat>();
+
 } // namespace chemfiles
 
 #endif

@@ -28,6 +28,8 @@ private:
     std::vector<std::streampos> steps_positions_;
 };
 
+template<> FormatInfo format_information<XYZFormat>();
+
 } // namespace chemfiles
 
 #endif

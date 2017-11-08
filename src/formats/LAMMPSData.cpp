@@ -17,6 +17,12 @@
 
 using namespace chemfiles;
 
+template<> FormatInfo chemfiles::format_information<LAMMPSDataFormat>() {
+    return FormatInfo("LAMMPS Data").description(
+        "LAMMPS text input data file"
+    );
+}
+
 atom_style::atom_style(const std::string& name): name_(name) {
     if (name == "angle") {
         style_ = ANGLE;
