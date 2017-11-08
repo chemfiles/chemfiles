@@ -4,8 +4,10 @@
 #include <cmath>
 #include <functional>
 
-#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/selections/expr.hpp"
+
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/warnings.hpp"
 
 namespace chemfiles {

@@ -3,10 +3,11 @@
 
 #include <algorithm>
 
+#include "chemfiles/selections/lexer.hpp"
+
+#include "chemfiles/unreachable.hpp"
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/utils.hpp"
-#include "chemfiles/unreachable.hpp"
-#include "chemfiles/selections/lexer.hpp"
 
 using namespace chemfiles;
 using namespace chemfiles::selections;
