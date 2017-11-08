@@ -48,6 +48,7 @@ function(external_library _name_)
     add_subdirectory(
         ${CMAKE_CURRENT_BINARY_DIR}/${_name_}
         ${CMAKE_CURRENT_BINARY_DIR}/${_name_}
+        EXCLUDE_FROM_ALL
     )
 endfunction()
 
@@ -62,12 +63,11 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/fmt)
 
 # Hide FMT variables from CMake GUI
 mark_as_advanced(FORCE
-    FMT_CPPFORMAT
     FMT_DOC
     FMT_INSTALL
     FMT_PEDANTIC
-    FMT_USE_CPP11
     FMT_TEST
+    FMT_USE_CPP11
 )
 
 # ==========
