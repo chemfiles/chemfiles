@@ -29,7 +29,7 @@ matrix:
   fast_finish: true
   include:
     - os: linux
-      env: SHARED_LIBS=OFF EMSCRIPTEN=ON
+      env: STATIC_LIBS=ON EMSCRIPTEN=ON
       addons:
         apt:
           packages:
