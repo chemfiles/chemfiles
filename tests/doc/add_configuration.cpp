@@ -1,14 +1,15 @@
-// Chemfiles, a modern library for chemistry file reading and writing
-// Copyright (C) Guillaume Fraux and contributors -- BSD license
-
+#include <catch.hpp>
 #include <chemfiles.hpp>
+using namespace chemfiles;
 
-// [example]
-    int main() {
-        chemfiles::add_configuration("local-file.toml");
+#undef assert
+#define assert CHECK
 
-        // Reading a trajectory will now use data from some/local/file.toml
+TEST_CASE() {
+    // [example]
+    chemfiles::add_configuration("local-file.toml");
 
-        return 0;
-    }
-// [example]
+    // Reading a trajectory will now use data from local-file.toml
+
+    // [example]
+}

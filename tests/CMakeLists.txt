@@ -65,12 +65,7 @@ include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/)
 include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR}/external/boost/include)
 add_library(test_helpers STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/helpers.cpp)
 
-function(chfl_test _name_ _file_)
-    add_executable(${_name_} ${_file_} ${CHEMFILES_OBJECTS})
-    # We need to pretend we are inside the DLL to access all functions
-    target_compile_definitions(${_name_} PRIVATE chemfiles_EXPORTS)
-    target_link_libraries(${_name_} ${NETCDF_LIBRARIES})
-    set_property(TARGET ${_name_} PROPERTY CXX_STANDARD 11)
+function(chfl_define_test _name_)
     add_test(NAME ${_name_}
         COMMAND ${RUNNER_COMMAND} ./${_name_}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
@@ -83,7 +78,17 @@ function(chfl_test _name_ _file_)
         set_tests_properties(${_name_}
             PROPERTIES ENVIRONMENT "PATH=${PATH_STRING}\;$<TARGET_FILE_DIR:chemfiles>"
         )
+    endif()
+endfunction()
 
+function(chfl_unit_test _name_ _file_)
+    add_executable(${_name_} ${_file_} ${CHEMFILES_OBJECTS})
+    # We need to pretend we are inside the DLL to access all functions
+    target_compile_definitions(${_name_} PRIVATE chemfiles_EXPORTS)
+    target_link_libraries(${_name_} ${NETCDF_LIBRARIES})
+    chfl_define_test(${_name_})
+
+    if(WIN32)
         # Link to the websoket library for the hostname test
         target_link_libraries(${_name_} ws2_32)
     endif()
@@ -95,7 +100,7 @@ endfunction()
 
 function(chfl_cpp_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
-    chfl_test(${_name_} ${_file_})
+    chfl_unit_test(${_name_} ${_file_})
     target_link_libraries(${_name_} test_helpers boost_filesystem)
 endfunction()
 
@@ -114,7 +119,7 @@ endforeach(test_file)
 function(chfl_capi_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     set(_name_ "c-${_name_}")
-    chfl_test(${_name_} ${_file_})
+    chfl_unit_test(${_name_} ${_file_})
     target_link_libraries(${_name_} test_helpers boost_filesystem)
 endfunction()
 
@@ -131,21 +136,21 @@ function(chfl_doctest _name_ _file_)
         return()
     endif()
 
-    set(_no_run_ FALSE)
+    set(_run_ TRUE)
     file(STRINGS ${_file_} _FILE_CONTENT_)
     foreach(_line_ ${_FILE_CONTENT_})
         if("${_line_}" MATCHES "\\[no-run\\]")
-            set(_no_run_ TRUE)
+            set(_run_ FALSE)
         endif()
     endforeach()
 
-    if(${_no_run_})
-        add_executable(${_name_} ${_file_} ${CHEMFILES_OBJECTS})
-        target_link_libraries(${_name_} ${NETCDF_LIBRARIES})
-    else()
-        chfl_test(${_name_} ${_file_})
-    endif()
+    add_executable(${_name_} ${_file_})
+    target_link_libraries(${_name_} chemfiles)
     set_target_properties(${_name_} PROPERTIES COMPILE_FLAGS "-UNDEBUG")
+
+    if(${_run_})
+        chfl_define_test(${_name_})
+    endif()
 endfunction()
 
 function(chfl_c_doctest _file_)
@@ -157,6 +162,10 @@ function(chfl_c_doctest _file_)
     endif()
 
     chfl_doctest(${_name_} ${_file_})
+
+    if(NOT MSVC)
+        target_link_libraries(${_name_} m)
+    endif()
 endfunction()
 
 function(chfl_cpp_doctest _file_)
