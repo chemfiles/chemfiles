@@ -38,6 +38,16 @@ option(CHFL_SYSTEM_NETCDF "Use the system NetCDF instead of the internal one" OF
 option(CHFL_BUILD_DOCTESTS "Build documentation tests as well as unit tests." ON)
 mark_as_advanced(CHFL_BUILD_DOCTESTS)
 
+# Set a default build type if none was specified
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    message(STATUS "Setting build type to 'release' as none was specified.")
+    set(CMAKE_BUILD_TYPE "release"
+        CACHE STRING
+        "Choose the type of build, options are: none(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) debug release relwithdebinfo minsizerel."
+    FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS release debug relwithdebuginfo minsizerel none)
+endif()
+
 include(CompilerFlags)
 
 if(CHFL_USE_WARNINGS)
@@ -70,20 +80,6 @@ if(CHFL_CODE_COVERAGE)
     set(CMAKE_BUILD_TYPE "debug" CACHE STRING "Type of build: release|debug|relwithdebuginfo" FORCE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
-endif()
-
-# Set a default build type if none was specified
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    message(STATUS "Setting build type to 'release' as none was specified.")
-    set(CMAKE_BUILD_TYPE "release"
-        CACHE STRING
-        "Choose the type of build, options are: none(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) debug release relwithdebinfo minsizerel."
-    FORCE)
-    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS release debug relwithdebuginfo minsizerel none)
-endif()
-
-if(${CHFL_DEBUG_GLIBCXX})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_DEBUG")
 endif()
 
 add_subdirectory(external)
