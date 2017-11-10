@@ -163,7 +163,7 @@ function(chfl_c_doctest _file_)
 
     chfl_doctest(${_name_} ${_file_})
 
-    if(NOT MSVC)
+    if(NOT MSVC AND CHFL_BUILD_DOCTESTS)
         target_link_libraries(${_name_} m)
     endif()
 endfunction()
@@ -177,7 +177,9 @@ function(chfl_cpp_doctest _file_)
     endif()
 
     chfl_doctest(${_name_} ${_file_})
-    target_link_libraries(${_name_} test_helpers boost_filesystem)
+    if(CHFL_BUILD_DOCTESTS)
+        target_link_libraries(${_name_} test_helpers boost_filesystem)
+    endif()
 endfunction()
 
 file(GLOB_RECURSE doctest_files ${CMAKE_CURRENT_SOURCE_DIR}/doc/**.cpp)
