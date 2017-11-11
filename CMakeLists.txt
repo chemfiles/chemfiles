@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.11)
-set(CMAKE_USER_MAKE_RULES_OVERRIDE "cmake/InitRules.cmake")
+set(CMAKE_USER_MAKE_RULES_OVERRIDE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/InitRules.cmake")
 
 project(chemfiles C CXX)
 
