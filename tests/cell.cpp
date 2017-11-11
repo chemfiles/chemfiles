@@ -46,46 +46,18 @@ TEST_CASE("Use the UnitCell type") {
         CHECK(triclinic.beta() == 80);
         CHECK(triclinic.gamma() == 120);
         CHECK(triclinic.volume() == 1119.9375925598192);
-
-        UnitCell infinite2(UnitCell::INFINITE);
-        CHECK(infinite2.shape() == UnitCell::INFINITE);
-        CHECK(infinite2.a() == 0);
-        CHECK(infinite2.b() == 0);
-        CHECK(infinite2.c() == 0);
-        CHECK(infinite2.alpha() == 90);
-        CHECK(infinite2.beta() == 90);
-        CHECK(infinite2.gamma() == 90);
-
-        UnitCell triclinic2(UnitCell::TRICLINIC, 10);
-        CHECK(triclinic2.shape() == UnitCell::TRICLINIC);
-        CHECK(triclinic2.a() == 10);
-        CHECK(triclinic2.b() == 10);
-        CHECK(triclinic2.c() == 10);
-        CHECK(triclinic2.alpha() == 90);
-        CHECK(triclinic2.beta() == 90);
-        CHECK(triclinic2.gamma() == 90);
-
-        UnitCell triclinic3(UnitCell::TRICLINIC, 10, 11, 12);
-        CHECK(triclinic3.shape() == UnitCell::TRICLINIC);
-        CHECK(triclinic3.a() == 10);
-        CHECK(triclinic3.b() == 11);
-        CHECK(triclinic3.c() == 12);
-        CHECK(triclinic3.alpha() == 90);
-        CHECK(triclinic3.beta() == 90);
-        CHECK(triclinic3.gamma() == 90);
     }
 
     SECTION("Operators") {
         auto cell = UnitCell(10);
         CHECK(cell == UnitCell(10, 10, 10));
         CHECK(cell != UnitCell(11, 10, 10));
-        CHECK(cell != UnitCell(UnitCell::TRICLINIC, 10, 10, 10));
     }
 
     SECTION("Set the values") {
         UnitCell cell;
 
-        cell.shape(UnitCell::ORTHORHOMBIC);
+        cell.set_shape(UnitCell::ORTHORHOMBIC);
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
 
         cell.set_a(10);
@@ -95,7 +67,7 @@ TEST_CASE("Use the UnitCell type") {
         cell.set_c(20);
         CHECK(cell.c() == 20);
 
-        cell.shape(UnitCell::TRICLINIC);
+        cell.set_shape(UnitCell::TRICLINIC);
         CHECK(cell.shape() == UnitCell::TRICLINIC);
 
         cell.set_alpha(80);
@@ -108,7 +80,7 @@ TEST_CASE("Use the UnitCell type") {
 
     SECTION("Matricial representation") {
         UnitCell triclinic(10, 11, 12, 90, 60, 120);
-        auto H = triclinic.matricial();
+        auto H = triclinic.matrix();
         double a = 0, b = 0, c = 0;
 
         a = H[0][0];
@@ -118,21 +90,13 @@ TEST_CASE("Use the UnitCell type") {
         CHECK(a == triclinic.a());
         CHECK(b == triclinic.b());
         CHECK(c == triclinic.c());
-
-        double c_matrix[3][3];
-        triclinic.raw_matricial(c_matrix);
-
-        for (size_t i=0; i<3; i++) {
-            for (size_t j=0; j<3; j++) {
-                CHECK(H[i][j] == c_matrix[i][j]);
-            }
-        }
     }
 
     SECTION("Wraping vectors") {
         UnitCell infinite;
         UnitCell ortho(10, 11, 12);
-        UnitCell triclinic_algo(UnitCell::TRICLINIC, 10, 11, 12);
+        UnitCell triclinic_algo(10, 11, 12);
+        triclinic_algo.set_shape(UnitCell::TRICLINIC);
         UnitCell triclinic(10, 11, 12, 90, 90, 80);
         UnitCell tilted(10, 10, 10, 140, 100, 100);
         auto v = Vector3D(22.0, -15.0, 5.8);
@@ -156,16 +120,24 @@ TEST_CASE("Use the UnitCell type") {
         CHECK_THROWS_AS(cell.set_beta(100), Error);
         CHECK_THROWS_AS(cell.set_gamma(100), Error);
 
-        cell.shape(UnitCell::ORTHORHOMBIC);
+        cell.set_shape(UnitCell::ORTHORHOMBIC);
         CHECK_THROWS_AS(cell.set_alpha(100), Error);
         CHECK_THROWS_AS(cell.set_beta(100), Error);
         CHECK_THROWS_AS(cell.set_gamma(100), Error);
 
-        cell.shape(UnitCell::TRICLINIC);
+        cell.set_shape(UnitCell::TRICLINIC);
         cell.set_alpha(80);
         cell.set_beta(120);
         cell.set_gamma(60);
+    }
 
-        CHECK_THROWS_AS(cell.shape(UnitCell::ORTHORHOMBIC), Error);
+    SECTION("Setting shape errors") {
+        auto cell = UnitCell(3, 4, 5, 60, 70, 80);
+        CHECK_THROWS_AS(cell.set_shape(UnitCell::ORTHORHOMBIC), Error);
+
+        cell = UnitCell(3, 4, 5, 60, 70, 80);
+        CHECK_THROWS_AS(cell.set_shape(UnitCell::INFINITE), Error);
+        cell = UnitCell(3, 4, 5);
+        CHECK_THROWS_AS(cell.set_shape(UnitCell::INFINITE), Error);
     }
 }

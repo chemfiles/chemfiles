@@ -8,7 +8,6 @@ linux64_addons:
         - ubuntu-toolchain-r-test
         packages:
         - g++-4.8
-        - doxygen
         - valgrind
         # Used for CHFL_EXTERNAL_NETCDF
         - libnetcdf-dev
@@ -20,7 +19,6 @@ linux32_addons:
         - ubuntu-toolchain-r-test
         packages:
         - g++-4.8
-        - doxygen
         - g++-4.8-multilib
         - linux-libc-dev:i386
         - libc6-dev-i386
@@ -29,7 +27,7 @@ matrix:
   fast_finish: true
   include:
     - os: linux
-      env: SHARED_LIBS=OFF EMSCRIPTEN=ON
+      env: STATIC_LIBS=ON EMSCRIPTEN=ON
       addons:
         apt:
           packages:

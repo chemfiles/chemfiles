@@ -27,7 +27,7 @@ namespace chemfiles {
 ///
 /// Will use `O` as type for all atoms with `Ow` type, and `H` for all atoms
 /// with `Ht`.
-class Configuration {
+class Configuration final {
 public:
     Configuration& operator=(const Configuration&) = delete;
     Configuration(const Configuration&) = delete;

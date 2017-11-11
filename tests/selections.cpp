@@ -14,6 +14,8 @@ TEST_CASE("Match class") {
     CHECK(match != Match(1ul, 2ul));
     CHECK(match != Match(1ul, 2ul, 4ul));
     CHECK(match == Match(1ul, 2ul, 3ul));
+
+    CHECK_THROWS_AS(Match(1ul, 2ul)[3], OutOfBounds);
 }
 
 TEST_CASE("Atoms selections") {

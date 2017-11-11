@@ -33,7 +33,7 @@ extern "C" CHFL_CELL* chfl_cell_triclinic(const chfl_vector3d lenghts, const chf
         );
         // ensure that the unit cell shape is always TRICLINIC, even if the
         // three angles are 90°.
-        cell->shape(UnitCell::TRICLINIC);
+        cell->set_shape(UnitCell::TRICLINIC);
     )
     return cell;
 error:
@@ -116,7 +116,8 @@ extern "C" chfl_status chfl_cell_matrix(const CHFL_CELL* const cell, chfl_vector
     CHECK_POINTER(cell);
     CHECK_POINTER(matrix);
     CHFL_ERROR_CATCH(
-        cell->raw_matricial(matrix);
+        auto cell_matrix = cell->matrix();
+        std::copy(&cell_matrix[0][0], &cell_matrix[0][0] + 9, &matrix[0][0]);
     )
 }
 
@@ -131,7 +132,7 @@ extern "C" chfl_status chfl_cell_shape(const CHFL_CELL* const cell, chfl_cellsha
 extern "C" chfl_status chfl_cell_set_shape(CHFL_CELL* const cell, chfl_cellshape shape) {
     CHECK_POINTER(cell);
     CHFL_ERROR_CATCH(
-        cell->shape(static_cast<UnitCell::CellShape>(shape));
+        cell->set_shape(static_cast<UnitCell::CellShape>(shape));
     )
 }
 

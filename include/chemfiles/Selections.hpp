@@ -7,18 +7,24 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <array>
 
-#include "chemfiles/Frame.hpp"
+#include "chemfiles/Error.hpp"
 
 namespace chemfiles {
+class Frame;
+
 namespace selections {
     class Expr;
     typedef std::unique_ptr<Expr> Ast;
 }
 
-/// A match is a set of atomic indexes matching a given selection. The size of
-/// a match depends on the associated selection, and can vary from 1 to 4.
-class Match {
+/// A match is a set of atomic indexes matching a given selection. The size of a
+/// match depends on the associated selection, and can vary from 1 to
+/// `MAX_MATCH_SIZE`.
+///
+/// @example{tests/doc/selection/match.cpp}
+class CHFL_EXPORT Match final {
 public:
     /// Maximal number of atoms in a match
     static constexpr size_t MAX_MATCH_SIZE = 4;
@@ -29,10 +35,13 @@ public:
         "`Match` size can not be bigger than MAX_MATCH_SIZE");
     }
 
-    /// Get the `i`th index in the match. `i` should be lower than the actual
-    /// `size()` of the match.
+    /// Get the `i`th atomic index in the match.
+    ///
+    /// @throw OutOfBounds if the index is bigger than the `size()` of the match
     const size_t& operator[](size_t i) const {
-        assert(i < size_ && "Out of bounds indexing of Match");
+        if (i >= size_) {
+            throw OutOfBounds("Out of bounds indexing of Match");
+        }
         return data_[i];
     }
 
@@ -84,12 +93,18 @@ enum class Context {
 /// This class allow to select atoms in a `Frame`, from a selection language.
 ///
 /// The selection language is built by combining basic operations. Each basic
-/// operation follows the `<selector>[(<variable>)] <operator> <value>` structure,
-/// where `<operator>` is a comparison operator in `== != < <= > >=`. Refer to
-/// the full documentation to know the allowed selectors and how to use them.
-class CHFL_EXPORT Selection {
+/// operation follows the `<selector>[(<variable>)] <operator> <value>`
+/// structure, where `<operator>` is a comparison operator in `== != < <= > >=`.
+///
+/// @verbatim embed:rst:leading-slashes
+/// Refer to the :ref:`selection-language` documentation to know the allowed
+/// selectors and how to use them.
+/// @endverbatim
+class CHFL_EXPORT Selection final {
 public:
     /// Create a selection using the given string.
+    ///
+    /// @example{tests/doc/selection/selection.cpp}
     ///
     /// @throws SelectionError if there is a error in the selection string
     explicit Selection(const std::string& selection);
@@ -103,18 +118,27 @@ public:
 
     /// Evaluates the selection on a given `frame`. This function returns the
     /// list of matches in the frame for this selection.
+    ///
+    /// @example{tests/doc/selection/evaluate.cpp}
     std::vector<Match> evaluate(const Frame& frame) const;
 
     /// Evaluates a selection of size 1 on a given `frame`. This function
     /// returns the list of atomic indexes in the frame matching this selection.
     ///
+    /// @example{tests/doc/selection/list.cpp}
+    ///
     /// @throw SelectionError if the selection size is not 1.
     std::vector<size_t> list(const Frame& frame) const;
 
-    /// Size of the matches for this selection
+    /// Get the size of the selection, *i.e.* the number of atoms selected
+    /// together.
+    ///
+    /// @example{tests/doc/selection/size.cpp}
     size_t size() const;
 
     /// Get the string used to build this selection
+    ///
+    /// @example{tests/doc/selection/string.cpp}
     std::string string() const {
         return selection_;
     }

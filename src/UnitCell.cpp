@@ -22,11 +22,13 @@ inline double sind(double theta) {
     return sin(deg2rad(theta));
 }
 
-UnitCell::UnitCell(): UnitCell(INFINITE) {}
+UnitCell::UnitCell(): UnitCell(0) {
+    shape_ = INFINITE;
+}
 
 UnitCell::UnitCell(double a): UnitCell(a, a, a) {}
 
-UnitCell::UnitCell(double a, double b, double c): UnitCell(ORTHORHOMBIC, a, b, c) {}
+UnitCell::UnitCell(double a, double b, double c): UnitCell(a, b, c, 90, 90, 90) {}
 
 UnitCell::UnitCell(double a, double b, double c,
                    double alpha, double beta, double gamma)
@@ -36,15 +38,6 @@ UnitCell::UnitCell(double a, double b, double c,
     } else {
         shape_ = TRICLINIC;
     }
-    update_matrix();
-}
-
-UnitCell::UnitCell(CellShape shape) : UnitCell(shape, 0) {}
-
-UnitCell::UnitCell(CellShape shape, double a) : UnitCell(shape, a, a, a) {}
-
-UnitCell::UnitCell(CellShape shape, double a, double b, double c)
-    : a_(a), b_(b), c_(c), alpha_(90), beta_(90), gamma_(90), shape_(shape) {
     update_matrix();
 }
 
@@ -92,18 +85,26 @@ void UnitCell::update_matrix() {
     }
 }
 
-void UnitCell::raw_matricial(double matrix[3][3]) const {
-    std::copy(&h_[0][0], &h_[0][0] + 9, &matrix[0][0]);
-}
-
-void UnitCell::shape(CellShape shape) {
+void UnitCell::set_shape(CellShape shape) {
     if (shape == ORTHORHOMBIC) {
         if (!(alpha_ == 90 && beta_ == 90 && gamma_ == 90)) {
             throw error(
-                "can not be set shape to ORTHOROMBIC: some angles are not 90°"
+                "can not be set cell shape to ORTHORHOMBIC: some angles are not 90°"
+            );
+        }
+    } else if (shape == INFINITE) {
+        if (!(alpha_ == 90 && beta_ == 90 && gamma_ == 90)) {
+            throw error(
+                "can not be set cell shape to INFINITE: some angles are not 90°"
+            );
+        }
+        if (!(a_ == 0.0 && b_ == 0.0 && c_ == 0.0)) {
+            throw error(
+                "can not be set cell shape to INFINITE: some lenghts are not 0"
             );
         }
     }
+
     shape_ = shape;
 }
 

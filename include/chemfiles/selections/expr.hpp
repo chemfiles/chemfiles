@@ -5,7 +5,7 @@
 #define CHEMFILES_SELECTION_EXPR_HPP
 
 #include "chemfiles/selections/parser.hpp"
-#include "chemfiles/utils.hpp"
+#include "chemfiles/unreachable.hpp"
 #include "chemfiles/Error.hpp"
 
 namespace chemfiles {

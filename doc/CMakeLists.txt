@@ -1,6 +1,19 @@
 find_package(Sphinx REQUIRED)
 find_package(Doxygen REQUIRED)
 
+execute_process(
+    COMMAND ${DOXYGEN_EXECUTABLE} --version
+    OUTPUT_VARIABLE DOXYGEN_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+if ("${DOXYGEN_VERSION}" VERSION_LESS 1.8.13)
+    message(WARNING
+        "Your version of doxygen is too old (${DOXYGEN_VERSION}).\n"
+        "Please upgrade to doxygen >= 1.8.13 for optimal output."
+    )
+endif()
+
 configure_file(
     ${PROJECT_SOURCE_DIR}/Doxyfile.in
     ${PROJECT_BINARY_DIR}/Doxyfile

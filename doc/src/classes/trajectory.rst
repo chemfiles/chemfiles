@@ -1,7 +1,7 @@
 .. _class-Trajectory:
 
-Trajectory
-==========
+Trajectory class
+================
 
 .. doxygenclass:: chemfiles::Trajectory
     :members:

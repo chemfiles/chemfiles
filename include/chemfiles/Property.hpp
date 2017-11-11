@@ -29,42 +29,59 @@ public:
     };
 
     /// Create a property holding a boolean value.
+    /// @example{tests/doc/property/bool.cpp}
     Property(bool value): kind_(BOOL), bool_(value) {}
+
     /// Create a property holding a double value.
+    /// @example{tests/doc/property/double.cpp}
     Property(double value): kind_(DOUBLE), double_(value) {}
+
     /// Create a property holding a `Vector3D` value.
+    /// @example{tests/doc/property/vector3d.cpp}
     Property(Vector3D value): kind_(VECTOR3D), vector3d_(value) {}
+
     /// Create a property holding a string value.
+    /// @example{tests/doc/property/string.cpp}
     Property(std::string value): kind_(STRING), string_(value) {}
 
     // ==== The following construtors are here to help with overloading
     // ==== resolution.
     /// Create a property holding a string value from a const char*.
+    /// @example{tests/doc/property/string.cpp}
     Property(const char* value): kind_(STRING), string_(value) {}
+
     /// Create a property holding a double value from an int.
+    /// @example{tests/doc/property/double.cpp}
     Property(int value): kind_(DOUBLE), double_(static_cast<double>(value)) {}
+
     /// Create a property holding a double value from a long.
+    /// @example{tests/doc/property/double.cpp}
     Property(long value): kind_(DOUBLE), double_(static_cast<double>(value)) {}
+
     /// Create a property holding a double value from a long long.
+    /// @example{tests/doc/property/double.cpp}
     Property(long long value): kind_(DOUBLE), double_(static_cast<double>(value)) {}
+
     /// Create a property holding a double value from an unsigned.
+    /// @example{tests/doc/property/double.cpp}
     Property(unsigned value): kind_(DOUBLE), double_(static_cast<double>(value)) {}
+
     /// Create a property holding a double value from an unsigned long.
+    /// @example{tests/doc/property/double.cpp}
     Property(unsigned long value): kind_(DOUBLE), double_(static_cast<double>(value)) {}
+
     /// Create a property holding a double value from an unsigned long long.
+    /// @example{tests/doc/property/double.cpp}
     Property(unsigned long long value): kind_(DOUBLE), double_(static_cast<double>(value)) {}
 
-    /// The copy constructor for Property
     Property(const Property& other): Property(false) {
         *this = other;
     }
 
-    /// The move constructor for Property
     Property(Property&& other): Property(false) {
         *this = std::move(other);
     }
 
-    /// The copy assignement operator for Property
     Property& operator=(const Property& other) {
         this->~Property();
         this->kind_ = other.kind_;
@@ -85,7 +102,6 @@ public:
         return *this;
     }
 
-    /// The move assignement operator for Property
     Property& operator=(Property&& other) {
         this->~Property();
         this->kind_ = other.kind_;
@@ -106,7 +122,6 @@ public:
         return *this;
     }
 
-    /// The destructor for Property
     ~Property() {
         if (kind_ == STRING) {
             using std::string;
@@ -115,26 +130,36 @@ public:
     }
 
     /// Get the kind of property, *i.e.* the type of the holded value
+    ///
+    /// @example{tests/doc/property/get_kind.cpp}
     kind get_kind() const {
         return this->kind_;
     }
 
     /// Get the boolean value stored in this Property
     ///
+    /// @example{tests/doc/property/as_bool.cpp}
+    ///
     /// @throws PropertyError if this property does not hold a boolean value
     bool as_bool() const;
 
     /// Get the double value stored in this Property
+    ///
+    /// @example{tests/doc/property/as_double.cpp}
     ///
     /// @throws PropertyError if this property does not hold a double value
     double as_double() const;
 
     /// Get the Vector3D value stored in this Property
     ///
+    /// @example{tests/doc/property/as_vector3d.cpp}
+    ///
     /// @throws PropertyError if this property does not hold a Vector3D value
     Vector3D as_vector3d() const;
 
     /// Get the string value stored in this Property
+    ///
+    /// @example{tests/doc/property/as_string.cpp}
     ///
     /// @throws PropertyError if this property does not hold a string value
     const std::string& as_string() const;

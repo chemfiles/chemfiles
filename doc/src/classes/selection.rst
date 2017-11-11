@@ -1,7 +1,7 @@
 .. _class-Selection:
 
-Selections
-==========
+Selection class
+===============
 
 .. doxygenclass:: chemfiles::Selection
     :members:

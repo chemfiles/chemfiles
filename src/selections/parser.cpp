@@ -6,6 +6,7 @@
 #include <map>
 
 #include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/unreachable.hpp"
 #include "chemfiles/selections/expr.hpp"
 #include "chemfiles/selections/parser.hpp"
 

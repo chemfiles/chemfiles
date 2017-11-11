@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "chemfiles/config.hpp"
+#include "chemfiles/exports.hpp"
 
 #ifdef __cplusplus
 extern "C" {

@@ -147,6 +147,8 @@ TEST_CASE("chfl_cell") {
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
         CHECK(shape == CHFL_CELL_TRICLINIC);
 
+        lengths[0] = 0; lengths[1] = 0; lengths[2] = 0;
+        CHECK_STATUS(chfl_cell_set_lengths(cell, lengths));
         CHECK_STATUS(chfl_cell_set_shape(cell, CHFL_CELL_INFINITE));
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
         CHECK(shape == CHFL_CELL_INFINITE);

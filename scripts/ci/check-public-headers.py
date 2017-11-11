@@ -18,7 +18,7 @@ WHITELIST = [
     # standard C++11 headers
     "iterator", "functional", "cstdint", "array", "utility", "cassert",
     "string", "memory", "exception", "limits", "algorithm", "stdexcept",
-    "vector", "cmath", "type_traits", "unordered_map",
+    "vector", "cmath", "type_traits", "unordered_map", "cfloat",
     # chemfiles helper headers
     "chemfiles/span.hpp",
     "chemfiles/optional.hpp",
