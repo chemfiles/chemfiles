@@ -52,13 +52,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   have a known value for this property. This allow `chfl_atom_atomic_number` to
   take a `uint64_t*` parameter instead of an `int64_t*`, following all the other
   functions in the C API.
-* Added `CHFL_OUT_OF_BOUNDS` variant to `chfl_status`
+* Added `CHFL_OUT_OF_BOUNDS` and `CHFL_PROPERTY_ERROR` variants to `chfl_status`
 * Added `chfl_frame_distance`, `chfl_frame_angle`, `chfl_frame_dihedral`,
   `chfl_frame_out_of_plane` and `chfl_cell_wrap` to work with periodic boundary
   conditions.
 * `chfl_residue` does not take the optional residue id as parameter, instead you
   should use `chfl_residue_with_id`.
 * Added `chfl_residue_atoms` to get the list of atoms in a residue.
+* Added `chfl_topology_impropers` and `chfl_topology_impropers_count` functions.
 * Added `CHFL_PROPERTY` and related functions.
 * `chfl_add_configuration` and `chfl_set_warning_callback` are now thread safe,
   and will block upon concurrent usage.
