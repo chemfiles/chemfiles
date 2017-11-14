@@ -93,7 +93,7 @@ extern "C" chfl_status chfl_residue_atoms(const CHFL_RESIDUE* const residue, uin
     CHECK_POINTER(atoms);
     CHFL_ERROR_CATCH(
         if (natoms != residue->size()) {
-            CAPI_LAST_ERROR = "Wrong data size in function 'chfl_residue_atoms'.";
+            set_last_error("wrong data size in function 'chfl_residue_atoms'.");
             return CHFL_MEMORY_ERROR;
         }
 

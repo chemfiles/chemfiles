@@ -69,7 +69,7 @@ extern "C" chfl_status chfl_selection_evaluate(CHFL_SELECTION* const selection, 
 extern "C" chfl_status chfl_selection_matches(const CHFL_SELECTION* const selection, chfl_match* const matches, uint64_t n_matches) {
     CHECK_POINTER(selection);
     if (n_matches != selection->matches.size()) {
-        CAPI_LAST_ERROR = "Wrong data size in function 'chfl_selection_matches'.";
+        set_last_error("wrong data size in function 'chfl_selection_matches'.");
         return CHFL_MEMORY_ERROR;
     }
     CHFL_ERROR_CATCH(

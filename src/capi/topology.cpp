@@ -114,7 +114,7 @@ extern "C" chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, 
 
     CHFL_ERROR_CATCH(
         if (nbonds != topology->bonds().size()) {
-            CAPI_LAST_ERROR = "Wrong data size in function 'chfl_topology_bonds'.";
+            set_last_error("wrong data size in function 'chfl_topology_bonds'.");
             return CHFL_MEMORY_ERROR;
         }
 
@@ -133,7 +133,7 @@ extern "C" chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology,
 
     CHFL_ERROR_CATCH(
         if (nangles != topology->angles().size()) {
-            CAPI_LAST_ERROR = "Wrong data size in function 'chfl_topology_angles'.";
+            set_last_error("wrong data size in function 'chfl_topology_angles'.");
             return CHFL_MEMORY_ERROR;
         }
 
@@ -153,7 +153,7 @@ extern "C" chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topolo
 
     CHFL_ERROR_CATCH(
         if (ndihedrals != topology->dihedrals().size()) {
-            CAPI_LAST_ERROR = "Wrong data size in function 'chfl_topology_dihedrals'.";
+            set_last_error("wrong data size in function 'chfl_topology_dihedrals'.");
             return CHFL_MEMORY_ERROR;
         }
 
@@ -174,7 +174,7 @@ extern "C" chfl_status chfl_topology_impropers(const CHFL_TOPOLOGY* const topolo
 
     CHFL_ERROR_CATCH(
         if (nimpropers != topology->impropers().size()) {
-            CAPI_LAST_ERROR = "Wrong data size in function 'chfl_topology_impropers'.";
+            set_last_error("wrong data size in function 'chfl_topology_impropers'.");
             return CHFL_MEMORY_ERROR;
         }
 

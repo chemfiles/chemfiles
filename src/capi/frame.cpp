@@ -62,7 +62,7 @@ extern "C" chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vecto
         "Wrong size for chfl_vector3d. It should match Vector3D."
     );
     if (!frame->velocities()) {
-        chemfiles::CAPI_LAST_ERROR = "No velocities in this frame!";
+        set_last_error("velocity data is not defined in this frame");
         return CHFL_MEMORY_ERROR;
     }
     CHFL_ERROR_CATCH(
