@@ -175,18 +175,13 @@ else()
 endif()
 
 set(CHFL_SANITIZER "none" CACHE STRING "Sanitizer (clang and gcc only) to use in the build")
-set_property(CACHE CHFL_SANITIZER PROPERTY STRINGS none all address memory undefined)
+set_property(CACHE CHFL_SANITIZER PROPERTY STRINGS none address memory undefined thread)
 
 set(CHEMFILES_SANITIZERS "")
 set(CHEMFILES_SANITIZERS "")
 
 if(${CHFL_SANITIZER} STREQUAL "none")
     # Nothing to do
-elseif(${CHFL_SANITIZER} STREQUAL "all")
-    set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -fsanitize=address")
-    set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -fsanitize=memory")
-    set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -fsanitize=undefined")
-    set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -fsanitize=integer")
 elseif(${CHFL_SANITIZER} STREQUAL "undefined")
     set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -fsanitize=undefined")
     set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -fsanitize=integer")
