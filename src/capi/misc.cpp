@@ -2,13 +2,14 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include "chemfiles/generic.hpp"
+#include "chemfiles/config.hpp"
 #include "chemfiles/capi/misc.h"
 #include "chemfiles/capi.hpp"
 using namespace chemfiles;
 
 static_assert(sizeof(chfl_status) == sizeof(int), "Wrong size for chfl_status enum");
 
-static thread_local std::string CAPI_LAST_ERROR = "";
+static CHFL_THREAD_LOCAL std::string CAPI_LAST_ERROR = "";
 
 void chemfiles::set_last_error(const std::string& message) {
     CAPI_LAST_ERROR = message;

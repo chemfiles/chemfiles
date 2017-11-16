@@ -197,3 +197,20 @@ endif()
 if(${CHFL_DEBUG_GLIBCXX})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_DEBUG")
 endif()
+
+try_compile(CHFL_HAS_THREAD_LOCAL
+    ${PROJECT_BINARY_DIR}
+    ${PROJECT_SOURCE_DIR}/cmake/thread_local.cpp
+)
+
+if(EMSCRIPTEN)
+    # emscripten manages to compile the code, but fails at runtime with 
+    # 'missing function: __cxa_thread_atexit'
+    set(CHFL_HAS_THREAD_LOCAL FALSE)
+endif()
+
+if(CHFL_HAS_THREAD_LOCAL)
+    set(CHFL_HAS_THREAD_LOCAL 1)
+else()
+    set(CHFL_HAS_THREAD_LOCAL 0)
+endif()

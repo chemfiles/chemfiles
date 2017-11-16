@@ -14,6 +14,13 @@
 /// The full version of chemfiles ("x.y.z"), as a string
 #define CHEMFILES_VERSION "@CHEMFILES_VERSION@"
 
+/// thread_local implementation
+#if @CHFL_HAS_THREAD_LOCAL@
+    #define CHFL_THREAD_LOCAL thread_local
+#else
+    #define CHFL_THREAD_LOCAL
+#endif
+
 // clang-format on
 
 #endif
