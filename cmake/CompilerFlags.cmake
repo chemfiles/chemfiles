@@ -175,18 +175,13 @@ else()
 endif()
 
 set(CHFL_SANITIZER "none" CACHE STRING "Sanitizer (clang and gcc only) to use in the build")
-set_property(CACHE CHFL_SANITIZER PROPERTY STRINGS none all address memory undefined)
+set_property(CACHE CHFL_SANITIZER PROPERTY STRINGS none address memory undefined thread)
 
 set(CHEMFILES_SANITIZERS "")
 set(CHEMFILES_SANITIZERS "")
 
 if(${CHFL_SANITIZER} STREQUAL "none")
     # Nothing to do
-elseif(${CHFL_SANITIZER} STREQUAL "all")
-    set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -fsanitize=address")
-    set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -fsanitize=memory")
-    set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -fsanitize=undefined")
-    set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -fsanitize=integer")
 elseif(${CHFL_SANITIZER} STREQUAL "undefined")
     set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -fsanitize=undefined")
     set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -fsanitize=integer")
@@ -201,4 +196,21 @@ endif()
 
 if(${CHFL_DEBUG_GLIBCXX})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_DEBUG")
+endif()
+
+try_compile(CHFL_HAS_THREAD_LOCAL
+    ${PROJECT_BINARY_DIR}
+    ${PROJECT_SOURCE_DIR}/cmake/thread_local.cpp
+)
+
+if(EMSCRIPTEN)
+    # emscripten manages to compile the code, but fails at runtime with 
+    # 'missing function: __cxa_thread_atexit'
+    set(CHFL_HAS_THREAD_LOCAL FALSE)
+endif()
+
+if(CHFL_HAS_THREAD_LOCAL)
+    set(CHFL_HAS_THREAD_LOCAL 1)
+else()
+    set(CHFL_HAS_THREAD_LOCAL 0)
 endif()

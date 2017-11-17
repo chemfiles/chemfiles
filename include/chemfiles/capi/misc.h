@@ -11,11 +11,17 @@ extern "C" {
 
 /// Get the last error message.
 ///
+/// The last error message is a thread local variable, so you need to call this
+/// function in the thread from where the error happened.
+///
 /// @example{tests/capi/doc/chfl_last_error.c}
 /// @return A null-terminated string containing the last error message
 CHFL_EXPORT const char* chfl_last_error(void);
 
-/// Clear the last error message.
+/// Clear the thread local last error message.
+///
+/// The last error message is a thread local variable, so this function will
+/// only clear it in the thread where it is called.
 ///
 /// @example{tests/capi/doc/chfl_clear_errors.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn

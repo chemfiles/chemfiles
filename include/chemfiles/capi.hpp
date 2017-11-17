@@ -14,7 +14,7 @@
 
 namespace chemfiles {
 
-extern std::string CAPI_LAST_ERROR;
+void set_last_error(const std::string& message);
 
 inline size_t checked_cast(uint64_t value) {
     if (static_cast<uint64_t>(value) > static_cast<uint64_t>(SIZE_MAX)) {
@@ -29,14 +29,14 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
 
 #define CATCH_AND_RETURN(exception, retval)                                    \
     catch (const chemfiles::exception& e) {                                    \
-        CAPI_LAST_ERROR = std::string(e.what());                               \
+        set_last_error(e.what());                                              \
         chemfiles::warning(e.what());                                          \
         return retval;                                                         \
     }
 
 #define CATCH_AND_GOTO_ERROR(exception)                                        \
     catch (const chemfiles::exception& e) {                                    \
-        CAPI_LAST_ERROR = std::string(e.what());                               \
+        set_last_error(e.what());                                              \
         chemfiles::warning(e.what());                                          \
         goto error;                                                            \
     }
@@ -47,7 +47,7 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
             std::string message = fmt::format(                                 \
                 "Parameter '{}' cannot be NULL in {}", #ptr, __func__          \
             );                                                                 \
-            CAPI_LAST_ERROR = message;                                         \
+            set_last_error(message);                                           \
             chemfiles::warning(message);                                       \
             return CHFL_MEMORY_ERROR;                                          \
         }                                                                      \
@@ -59,7 +59,7 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
             std::string message = fmt::format(                                 \
                 "Parameter '{}' cannot be NULL in {}", #ptr, __func__          \
             );                                                                 \
-            CAPI_LAST_ERROR = message;                                         \
+            set_last_error(message);                                           \
             chemfiles::warning(message);                                       \
             goto error;                                                        \
         }                                                                      \
@@ -81,7 +81,7 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
     CATCH_AND_RETURN(PropertyError, CHFL_PROPERTY_ERROR)                       \
     CATCH_AND_RETURN(Error, CHFL_GENERIC_ERROR)                                \
     catch (const std::exception& e) {                                          \
-        CAPI_LAST_ERROR = std::string(e.what());                               \
+        set_last_error(e.what());                                              \
         return CHFL_CXX_ERROR;                                                 \
     }                                                                          \
     return CHFL_SUCCESS;
@@ -101,7 +101,7 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
     CATCH_AND_GOTO_ERROR(PropertyError)                                        \
     CATCH_AND_GOTO_ERROR(Error)                                                \
     catch (const std::exception& e) {                                          \
-        CAPI_LAST_ERROR = std::string(e.what());                               \
+        set_last_error(e.what());                                              \
         goto error;                                                            \
     }
 
