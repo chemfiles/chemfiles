@@ -4,6 +4,7 @@
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.h"
+#include <cmath>
 
 constexpr double PI = 3.14159265358979323846;
 

@@ -94,12 +94,13 @@ struct directory_files_iterator {
 
 TEST_CASE("Errors in XYZ format") {
     for (auto entry : directory_files_iterator("data/xyz/bad/")) {
-        CHECK_THROWS_AS(
+        auto test = [=](){
             // We can throw either when creating the trajectory, or when reading
             // the frame, depending on the type of error
             auto file = Trajectory(entry.path().string());
-            file.read(),
-        FormatError);
+            file.read();
+        };
+        CHECK_THROWS_AS(test(), FormatError);
     }
 }
 

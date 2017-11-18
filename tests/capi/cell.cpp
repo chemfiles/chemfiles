@@ -4,6 +4,7 @@
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.h"
+#include <cmath>
 
 static bool approx_eq(double A[3][3], double B[3][3]) {
     double eps = 1e-10;
