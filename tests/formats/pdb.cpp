@@ -312,4 +312,19 @@ TEST_CASE("PDB files with big values") {
         CHECK(positions[9998] == Vector3D(4., 5., 6.));
         CHECK(positions[9999] == Vector3D(7., 8., 9.));
     }
+
+    SECTION("CONNECT with too many atoms") {
+        auto tmpfile = NamedTempPath(".pdb");
+
+        auto frame = Frame();
+        for(size_t i=0; i<110000; i++) {
+            frame.add_atom(Atom("A"), {0.0, 0.0, 0.0});
+        }
+        frame.topology().add_bond(101000, 101008);
+        Trajectory(tmpfile, 'w').write(frame);
+
+        // Re-read the file we just wrote
+        frame = Trajectory(tmpfile, 'r').read();
+        CHECK(frame.topology().bonds().empty());
+    }
 }
