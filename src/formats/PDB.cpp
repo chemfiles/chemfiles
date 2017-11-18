@@ -425,6 +425,10 @@ void PDBFormat::write(const Frame& frame) {
 
     auto connect = std::vector<std::vector<size_t>>(frame.size());
     for (auto& bond : frame.topology().bonds()) {
+        if (bond[0] > 99999 || bond[1] > 99999) {
+            warning("Atomic index is too big for CONNECT, removing the bond");
+            continue;
+        }
         connect[bond[0]].push_back(bond[1]);
         connect[bond[1]].push_back(bond[0]);
     }
