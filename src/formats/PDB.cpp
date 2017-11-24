@@ -308,7 +308,7 @@ Record get_record(const std::string& line) {
                rec == "CAVEAT" || rec == "COMPND" || rec == "EXPDTA" ||
                rec == "KEYWDS" || rec == "OBSLTE" || rec == "SOURCE" ||
                rec == "SPLIT " || rec == "SPRSDE" || rec == "TITLE " ||
-               rec == "JRNL  " || rec == "TER   ") {
+               rec == "JRNL  " || rec == "TER   " || rec == "HEADER") {
         return Record::IGNORED_;
     } else {
         return Record::UNKNOWN_;
