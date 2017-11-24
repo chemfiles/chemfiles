@@ -74,9 +74,9 @@ inline bool operator>=(const Bond& lhs, const Bond& rhs) {
 ///
 /// An angle is formed by two consecutive bonds:
 ///
-///     i       k
-///       \   /
-///         j
+///     |  i       k  |
+///     |    \   /    |
+///     |      j      |
 ///
 /// This class implements all the comparison operators, as well as indexing.
 ///
@@ -139,9 +139,9 @@ inline bool operator>=(const Angle& lhs, const Angle& rhs) {
 ///
 /// A dihedral angle is formed by three consecutive bonds:
 ///
-///     i       k
-///       \   /   \
-///         j      m
+///     |  i       k     |
+///     |    \   /   \   |
+///     |      j      m  |
 ///
 /// This class implements all the comparison operators, as well as indexing.
 ///
@@ -204,11 +204,11 @@ inline bool operator>=(const Dihedral& lhs, const Dihedral& rhs) {
 ///
 /// An improper dihedral angle is formed by three bonds around a central atom:
 ///
-///     i       k
-///       \   /
-///         j
-///         |
-///         m
+///     |  i       k  |
+///     |    \   /    |
+///     |      j      |
+///     |      |      |
+///     |      m      |
 ///
 /// This class implements all the comparison operators, as well as indexing.
 ///
