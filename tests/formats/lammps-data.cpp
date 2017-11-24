@@ -188,10 +188,7 @@ TEST_CASE("Write files in LAMMPS data format") {
         velocities[i] = Vector3D(0.1, 0.2, 0.3);
     }
 
-    {
-        auto file = Trajectory(tmpfile, 'w', "LAMMPS Data");
-        file.write(frame);
-    }
+    Trajectory(tmpfile, 'w', "LAMMPS Data").write(frame);
 
     std::ifstream checking(tmpfile);
     std::string content((std::istreambuf_iterator<char>(checking)),

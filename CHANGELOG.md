@@ -30,6 +30,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   thread safe, and will block upon concurrent usage.
 * `UnitCell::matricial` is renamed to `UnitCell::matrix`.
 * The `UnitCell::shape` setter is renamed to `UnitCell::set_shape`.
+* The `Trajectory::close` function can be used to close a trajectory and
+  synchronize any buffered content with the storage.
 
 ### Changes in supported formats
 

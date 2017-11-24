@@ -44,8 +44,6 @@ public:
     /// @throws FormatError if the file is not valid for the used format.
     Trajectory(const std::string& filename, char mode = 'r', const std::string& format = "");
 
-    /// The `Trajectory` destructor sync any remaining data with the physical
-    /// storage of the file.
     ~Trajectory();
 
     Trajectory(Trajectory&&);
@@ -159,7 +157,7 @@ public:
     /// Get the number of steps (the number of frames) in this trajectory.
     ///
     /// @example{tests/doc/trajectory/nsteps.cpp}
-    size_t nsteps() const { return nsteps_; }
+    size_t nsteps() const;
 
     /// Check if all the frames in this trajectory have been read, *i.e.* if
     /// the last read frame is the last frame of the trajectory.
@@ -167,11 +165,21 @@ public:
     /// @example{tests/doc/trajectory/done.cpp}
     bool done() const;
 
+    /// Close a trajectory, and synchronize all buffered content with the drive.
+    ///
+    /// Calling any function on a closed trajectory will throw a `FileError`.
+    ///
+    /// @example{tests/doc/trajectory/close.cpp}
+    void close();
+
 private:
     /// Perform a few checks before reading a frame
     void pre_read(size_t step);
     /// Set the frame topology and/or cell after reading it
     void post_read(Frame& frame);
+    /// Check that the trajectory is still open, and throw a `FileError` is it
+    /// has been closed.
+    void check_opened() const;
 
     /// Path of the associated file
     std::string path_;
@@ -181,7 +189,8 @@ private:
     size_t step_;
     /// Number of steps in the file, if available
     size_t nsteps_;
-    /// Format used to read the associated file
+    /// Format used to read the associated file. It will be `nullptr` is the
+    /// trajectory is closed
     std::unique_ptr<Format> format_;
     /// Topology to use for reading/writing files when no topological data is
     /// present
