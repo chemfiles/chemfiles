@@ -102,10 +102,8 @@ TEST_CASE("Write files in Tinker XYZ format") {
         positions[i] = Vector3D(1, 2, 3);
     }
 
-    {
-        auto file = Trajectory(tmpfile, 'w');
-        file.write(frame);
-    }
+    auto file = Trajectory(tmpfile, 'w');
+    file.write(frame);
 
     frame.resize(6);
     positions = frame.positions();
@@ -118,10 +116,8 @@ TEST_CASE("Write files in Tinker XYZ format") {
     frame.set_topology(topology);
     frame.set_cell(UnitCell(22, 33, 44));
 
-    {
-        auto file = Trajectory(tmpfile, 'a');
-        file.write(frame);
-    }
+    file.write(frame);
+    file.close();
 
     std::ifstream checking(tmpfile);
     std::string content((std::istreambuf_iterator<char>(checking)),

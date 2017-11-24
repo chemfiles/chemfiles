@@ -52,25 +52,22 @@ TEST_CASE("Read files in NetCDF format") {
 TEST_CASE("Write files in NetCDF format") {
     auto tmpfile = NamedTempPath(".nc");
 
-    {
-        Trajectory file(tmpfile, 'w');
-        Frame frame;
-        frame.resize(4);
-        auto positions = frame.positions();
-        for(size_t i=0; i<4; i++) {
-            positions[i] = Vector3D(1, 2, 3);
-        }
-
-        file.write(frame);
+    Trajectory file(tmpfile, 'w');
+    Frame frame;
+    frame.resize(4);
+    auto positions = frame.positions();
+    for(size_t i=0; i<4; i++) {
+        positions[i] = Vector3D(1, 2, 3);
     }
 
-    {
-        Trajectory check(tmpfile, 'r');
-        auto frame = check.read();
-        auto positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D(1, 2, 3), 1e-4));
-        CHECK(approx_eq(positions[1], Vector3D(1, 2, 3), 1e-4));
-        CHECK(approx_eq(positions[2], Vector3D(1, 2, 3), 1e-4));
-        CHECK(approx_eq(positions[3], Vector3D(1, 2, 3), 1e-4));
-    }
+    file.write(frame);
+    file.close();
+
+    Trajectory check(tmpfile, 'r');
+    frame = check.read();
+    positions = frame.positions();
+    CHECK(approx_eq(positions[0], Vector3D(1, 2, 3), 1e-4));
+    CHECK(approx_eq(positions[1], Vector3D(1, 2, 3), 1e-4));
+    CHECK(approx_eq(positions[2], Vector3D(1, 2, 3), 1e-4));
+    CHECK(approx_eq(positions[3], Vector3D(1, 2, 3), 1e-4));
 }

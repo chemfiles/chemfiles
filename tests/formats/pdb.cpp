@@ -158,8 +158,7 @@ TEST_CASE("Write files in PDB format") {
     "CONECT    1    2\n"
     "CONECT    2    1\n"
     "ENDMDL\n"
-    "END\n"
-    "MODEL    1\n"
+    "MODEL    2\n"
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
     "ATOM      1 A    XXX X   4       4.000   5.000   6.000  1.00  0.00           A\n"
     "HETATM    2 B    foo X   3       4.000   5.000   6.000  1.00  0.00           B\n"
@@ -168,7 +167,6 @@ TEST_CASE("Write files in PDB format") {
     "HETATM    5 E    XXX X   5       4.000   5.000   6.000  1.00  0.00           E\n"
     "HETATM    6 F    XXX X   6       4.000   5.000   6.000  1.00  0.00           F\n"
     "HETATM    7 G    XXX X   7       4.000   5.000   6.000  1.00  0.00           G\n"
-
     "CONECT    1    2    7\n"
     "CONECT    2    1    7\n"
     "CONECT    3    7\n"
@@ -199,10 +197,8 @@ TEST_CASE("Write files in PDB format") {
         positions[i] = Vector3D(1, 2, 3);
     }
 
-    {
-        auto file = Trajectory(tmpfile, 'w');
-        file.write(frame);
-    }
+    auto file = Trajectory(tmpfile, 'w');
+    file.write(frame);
 
     frame.resize(7);
     positions = frame.positions();
@@ -231,10 +227,8 @@ TEST_CASE("Write files in PDB format") {
 
     frame.set_topology(topology);
 
-    {
-        auto file = Trajectory(tmpfile, 'a');
-        file.write(frame);
-    }
+    file.write(frame);
+    file.close();
 
     std::ifstream checking(tmpfile);
     std::string content((std::istreambuf_iterator<char>(checking)),

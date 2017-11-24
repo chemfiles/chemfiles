@@ -90,7 +90,19 @@ void Trajectory::post_read(Frame& frame) {
     }
 }
 
+void Trajectory::check_opened() const {
+    if (!format_) {
+        throw file_error("can not use a closed trajectory");
+    }
+}
+
+size_t Trajectory::nsteps() const  {
+    check_opened();
+    return nsteps_;
+}
+
 Frame Trajectory::read() {
+    check_opened();
     pre_read(step_);
 
     Frame frame;
@@ -102,6 +114,7 @@ Frame Trajectory::read() {
 }
 
 Frame Trajectory::read_step(const size_t step) {
+    check_opened();
     pre_read(step);
 
     Frame frame;
@@ -113,6 +126,7 @@ Frame Trajectory::read_step(const size_t step) {
 }
 
 void Trajectory::write(const Frame& frame) {
+    check_opened();
     if (!(mode_ == File::WRITE || mode_ == File::APPEND)) {
         throw file_error(
             "the file at '{}' was not openened in write or append mode", path_
@@ -137,10 +151,12 @@ void Trajectory::write(const Frame& frame) {
 }
 
 void Trajectory::set_topology(const Topology& top) {
+    check_opened();
     custom_topology_ = top;
 }
 
 void Trajectory::set_topology(const std::string& filename, const std::string& format) {
+    check_opened();
     Trajectory topolgy_file(filename, 'r', format);
     assert(topolgy_file.nsteps() > 0);
 
@@ -149,9 +165,17 @@ void Trajectory::set_topology(const std::string& filename, const std::string& fo
 }
 
 void Trajectory::set_cell(const UnitCell& new_cell) {
+    check_opened();
     custom_cell_ = new_cell;
 }
 
 bool Trajectory::done() const {
+    check_opened();
     return step_ >= nsteps_;
+}
+
+void Trajectory::close() {
+    check_opened();
+    // delete the format and set the pointer to nullptr
+    format_.reset();
 }

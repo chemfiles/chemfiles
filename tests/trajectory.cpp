@@ -10,9 +10,9 @@ using namespace chemfiles;
 
 // This file only perform basic testing of the trajectory class. All the differents
 // formats are tested in the formats folder
-TEST_CASE("Associate a topology and a trajectory"){
-    SECTION("Reading"){
-        SECTION("From a file"){
+TEST_CASE("Associate a topology and a trajectory") {
+    SECTION("Reading") {
+        SECTION("From a file") {
             Trajectory file("data/xyz/trajectory.xyz");
             file.set_topology("data/xyz/topology.xyz.topology", "XYZ");
             auto frame = file.read();
@@ -25,7 +25,7 @@ TEST_CASE("Associate a topology and a trajectory"){
             CHECK(topology[2] == Atom("Ar"));
         }
 
-        SECTION("Directely"){
+        SECTION("Directely") {
             Trajectory file("data/xyz/trajectory.xyz");
 
             Topology topology;
@@ -83,7 +83,7 @@ TEST_CASE("Associate a topology and a trajectory"){
 }
 
 
-TEST_CASE("Setting frame step"){
+TEST_CASE("Setting frame step") {
     Trajectory file("data/xyz/helium.xyz");
     auto frame = file.read();
     CHECK(frame.step() == 0);
@@ -107,14 +107,6 @@ TEST_CASE("Associate an unit cell and a trajectory") {
 
     SECTION("Writing") {
         auto tmpfile = NamedTempPath(".pdb");
-        const auto EXPECTED_CONTENT =
-        "MODEL    1\n"
-        "CRYST1    3.000    4.000    5.000  90.00  90.00  90.00 P 1           1\n"
-        "HETATM    1      XXX X   1       1.000   2.000   3.000  1.00  0.00            \n"
-        "HETATM    2      XXX X   2       1.000   2.000   3.000  1.00  0.00            \n"
-        "HETATM    3      XXX X   3       1.000   2.000   3.000  1.00  0.00            \n"
-        "ENDMDL\n"
-        "END\n";
 
         auto frame = Frame();
         frame.resize(3);
@@ -123,28 +115,66 @@ TEST_CASE("Associate an unit cell and a trajectory") {
             positions[i] = Vector3D(1, 2, 3);
         }
 
-        {
-            Trajectory file(tmpfile, 'w');
-            file.set_cell(UnitCell(3, 4, 5));
-            file.write(frame);
+        Trajectory file(tmpfile, 'w');
+        file.set_cell(UnitCell(3, 4, 5));
+        file.write(frame);
+        file.close();
+
+        SECTION("Directly") {
+            const auto EXPECTED_CONTENT =
+            "MODEL    1\n"
+            "CRYST1    3.000    4.000    5.000  90.00  90.00  90.00 P 1           1\n"
+            "HETATM    1      XXX X   1       1.000   2.000   3.000  1.00  0.00            \n"
+            "HETATM    2      XXX X   2       1.000   2.000   3.000  1.00  0.00            \n"
+            "HETATM    3      XXX X   3       1.000   2.000   3.000  1.00  0.00            \n"
+            "ENDMDL\n"
+            "END\n";
+
+            std::ifstream checking(tmpfile);
+            std::string content{
+                std::istreambuf_iterator<char>(checking),
+                std::istreambuf_iterator<char>()
+            };
+            CHECK(content == EXPECTED_CONTENT);
         }
 
-        std::ifstream checking(tmpfile);
-        std::string content{
-            std::istreambuf_iterator<char>(checking),
-            std::istreambuf_iterator<char>()
-        };
-        CHECK(content == EXPECTED_CONTENT);
+        SECTION("Append") {
+            const auto EXPECTED_CONTENT =
+            "MODEL    1\n"
+            "CRYST1    3.000    4.000    5.000  90.00  90.00  90.00 P 1           1\n"
+            "HETATM    1      XXX X   1       1.000   2.000   3.000  1.00  0.00            \n"
+            "HETATM    2      XXX X   2       1.000   2.000   3.000  1.00  0.00            \n"
+            "HETATM    3      XXX X   3       1.000   2.000   3.000  1.00  0.00            \n"
+            "ENDMDL\n"
+            "END\n"
+            "MODEL    1\n"
+            "CRYST1    0.000    0.000    0.000  90.00  90.00  90.00 P 1           1\n"
+            "HETATM    1      XXX X   1       1.000   2.000   3.000  1.00  0.00            \n"
+            "ENDMDL\n"
+            "END\n";
+
+            frame.resize(1);
+            file = Trajectory(tmpfile, 'a');
+            file.write(frame);
+            file.close();
+
+            std::ifstream checking(tmpfile);
+            std::string content{
+                std::istreambuf_iterator<char>(checking),
+                std::istreambuf_iterator<char>()
+            };
+            CHECK(content == EXPECTED_CONTENT);
+        }
     }
 }
 
-TEST_CASE("Specify a format parameter"){
+TEST_CASE("Specify a format parameter") {
     Trajectory file("data/xyz/helium.xyz.but.not.really", 'r', "XYZ");
     auto frame = file.read();
     CHECK(frame.size() == 125);
 }
 
-TEST_CASE("Errors"){
+TEST_CASE("Errors") {
     SECTION("Unknow opening mode") {
         CHECK_THROWS_AS(Trajectory("trajectory.xyz", 'z'), FileError);
     }
@@ -168,5 +198,19 @@ TEST_CASE("Errors"){
         file.read();
         file.read();
         CHECK_THROWS_AS(file.read(), FileError);
+    }
+
+    SECTION("Closed file") {
+        Trajectory file("data/xyz/trajectory.xyz", 'r');
+        file.close();
+
+        CHECK_THROWS_AS(file.read(), FileError);
+        CHECK_THROWS_AS(file.read_step(0), FileError);
+        CHECK_THROWS_AS(file.write(Frame()), FileError);
+        CHECK_THROWS_AS(file.nsteps(), FileError);
+        CHECK_THROWS_AS(file.done(), FileError);
+        CHECK_THROWS_AS(file.set_cell(UnitCell()), FileError);
+        CHECK_THROWS_AS(file.set_topology(Topology()), FileError);
+        CHECK_THROWS_AS(file.set_topology("topology"), FileError);
     }
 }
