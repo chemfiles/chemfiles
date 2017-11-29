@@ -13,7 +13,7 @@ using namespace chemfiles;
 // Get the list of directories up to `leaf`. For example, if `leaf` is
 // `C:\foo\bar\baz\`, this function returns `{C:\, C:\foo\, C:\foo\bar\,
 // C:\foo\bar\baz\}`.
-static std::vector<std::string> list_directories(std::string leaf);
+static std::vector<std::string> list_directories(const std::string& leaf);
 
 Configuration& Configuration::instance() {
     static Configuration instance_;
@@ -65,7 +65,7 @@ void Configuration::add(const std::string& path) {
     }
 }
 
-std::vector<std::string> list_directories(std::string leaf) {
+std::vector<std::string> list_directories(const std::string& leaf) {
     std::vector<std::string> directories;
     auto slash = leaf.find_first_of("\\/");
     while (slash != std::string::npos) {

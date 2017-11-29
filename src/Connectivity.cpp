@@ -193,19 +193,19 @@ void Connectivity::remove_bond(size_t i, size_t j) {
     }
 }
 
-void Connectivity::atom_removed(size_t atom) {
+void Connectivity::atom_removed(size_t index) {
     auto to_remove = std::vector<Bond>();
     auto to_add = std::vector<Bond>();
     for (auto& bond: bonds_) {
-        if (bond[0] == atom || bond[1] == atom) {
+        if (bond[0] == index || bond[1] == index) {
             throw error("can not shift atomic indexes that still have a bond");
         }
-        if (bond[0] > atom || bond[1] > atom) {
+        if (bond[0] > index || bond[1] > index) {
             to_remove.push_back(bond);
 
-            auto i = bond[0] > atom ? bond[0] - 1 : bond[0];
-            auto j = bond[1] > atom ? bond[1] - 1 : bond[1];
-            to_add.push_back({i, j});
+            auto i = bond[0] > index ? bond[0] - 1 : bond[0];
+            auto j = bond[1] > index ? bond[1] - 1 : bond[1];
+            to_add.emplace_back(i, j);
         }
     }
 

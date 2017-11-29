@@ -30,7 +30,7 @@ CHFL_EXPORT CHFL_SELECTION* chfl_selection(const char* selection);
 /// @example{tests/capi/doc/chfl_selection/copy.c}
 /// @return A pointer to the new selection, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
-CHFL_EXPORT CHFL_SELECTION* chfl_selection_copy(const CHFL_SELECTION* const selection);
+CHFL_EXPORT CHFL_SELECTION* chfl_selection_copy(const CHFL_SELECTION* selection);
 
 /// Get the size of a `selection` in `size`.
 ///
@@ -43,7 +43,7 @@ CHFL_EXPORT CHFL_SELECTION* chfl_selection_copy(const CHFL_SELECTION* const sele
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_selection_size(
-    const CHFL_SELECTION* const selection, uint64_t* size
+    const CHFL_SELECTION* selection, uint64_t* size
 );
 
 /// Get the selection string used to create a given `selection` in the `string`
@@ -56,11 +56,11 @@ CHFL_EXPORT chfl_status chfl_selection_size(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_selection_string(
-    const CHFL_SELECTION* const selection, char* const string, uint64_t buffsize
+    const CHFL_SELECTION* selection, char* string, uint64_t buffsize
 );
 
 /// Evaluate a `selection` for a given `frame`, and store the number of matches
-/// in `nmatches`.
+/// in `n_matches`.
 ///
 /// Use the `chfl_selection_matches` function to get the matches for this
 /// selection.
@@ -69,7 +69,7 @@ CHFL_EXPORT chfl_status chfl_selection_string(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_selection_evaluate(
-    CHFL_SELECTION* const selection, const CHFL_FRAME* const frame, uint64_t* nmatches
+    CHFL_SELECTION* selection, const CHFL_FRAME* frame, uint64_t* n_matches
 );
 
 /// Maximal size for a selection match
@@ -78,7 +78,7 @@ CHFL_EXPORT chfl_status chfl_selection_evaluate(
 /// A `chfl_match` is a set of atomic indexes matching a given selection. The
 /// size of a match depends on the associated selection, and can vary from 1 to
 /// `CHFL_MAX_SELECTION_SIZE`.
-typedef struct {
+typedef struct {  // NOLINT: this is both a C and C++ file
     /// The actual size of the match. Elements in `atoms` are significant up
     /// to this value, and filled with `(uint64_t)-1` for all the other values.
     uint64_t size;
@@ -89,13 +89,13 @@ typedef struct {
 /// Get the matches for a `selection` after a call to `chfl_selection_evaluate`,
 /// in `matches`.
 ///
-/// The size of the `matches` array must be passed in `nmatches`.
+/// The size of the `matches` array must be passed in `n_matches`.
 ///
 /// @example{tests/capi/doc/chfl_selection/matches.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_selection_matches(
-    const CHFL_SELECTION* const selection, chfl_match matches[], uint64_t nmatches
+    const CHFL_SELECTION* selection, chfl_match matches[], uint64_t n_matches
 );
 
 /// Free the memory associated with a `selection`.

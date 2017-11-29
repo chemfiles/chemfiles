@@ -8,10 +8,10 @@
 #include <unordered_map>
 
 #include "chemfiles/exports.hpp"
-#include "chemfiles/optional.hpp"
 #include "chemfiles/types.hpp"
 #include "chemfiles/unreachable.hpp"
 #include "chemfiles/Error.hpp"
+#include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 
@@ -42,7 +42,7 @@ public:
 
     /// Create a property holding a string value.
     /// @example{tests/doc/property/string.cpp}
-    Property(std::string value): kind_(STRING), string_(value) {}
+    Property(std::string value): kind_(STRING), string_(std::move(value)) {}
 
     // ==== The following construtors are here to help with overloading
     // ==== resolution.
@@ -107,16 +107,16 @@ public:
         this->kind_ = other.kind_;
         switch (this->kind_) {
         case BOOL:
-            new(&this->bool_) bool(std::move(other.bool_));
+            new(&this->bool_) bool(other.bool_);
             break;
         case DOUBLE:
-            new (&this->double_) double(std::move(other.double_));
+            new (&this->double_) double(other.double_);
             break;
         case STRING:
             new (&this->string_) std::string(std::move(other.string_));
             break;
         case VECTOR3D:
-            new (&this->vector3d_) Vector3D(std::move(other.vector3d_));
+            new (&this->vector3d_) Vector3D(other.vector3d_);
             break;
         }
         return *this;
@@ -176,7 +176,7 @@ private:
         Vector3D vector3d_;
     };
 
-    friend bool operator==(const Property&, const Property&);
+    friend bool operator==(const Property& lhs, const Property& rhs);
 };
 
 inline bool operator==(const Property& lhs, const Property& rhs) {
@@ -203,7 +203,7 @@ inline bool operator!=(const Property& lhs, const Property& rhs) {
 /// A property map for inclusion in a Frame or an Atom.
 class property_map final {
 public:
-    property_map(): data_() {}
+    property_map() = default;
 
     /// Set an arbitrary property with the given `name` and `value`. If a
     /// property with this name already exist, it is replaced with the new
@@ -215,7 +215,7 @@ public:
 
 private:
     std::unordered_map<std::string, Property> data_;
-    friend bool operator==(const property_map&, const property_map&);
+    friend bool operator==(const property_map& lhs, const property_map& rhs);
 };
 
 inline bool operator==(const property_map& lhs, const property_map& rhs) {

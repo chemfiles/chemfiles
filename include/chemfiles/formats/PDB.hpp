@@ -22,11 +22,16 @@ class PDBFormat final: public Format {
 public:
     PDBFormat(const std::string& path, File::Mode mode);
 
+    ~PDBFormat() noexcept override;
+    PDBFormat(const PDBFormat&) = delete;
+    PDBFormat& operator=(const PDBFormat&) = delete;
+    PDBFormat(PDBFormat&&) = default;
+    PDBFormat& operator=(PDBFormat&&) = default;
+
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;
     void write(const Frame& frame) override;
     size_t nsteps() override;
-    ~PDBFormat();
 
 private:
     // Read CRYST1 record

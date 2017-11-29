@@ -125,8 +125,8 @@ bool Topology::are_linked(const Residue& first, const Residue& second) const {
     return false;
 }
 
-optional<const Residue&> Topology::residue(size_t atom) const {
-    auto it = residue_mapping_.find(atom);
+optional<const Residue&> Topology::residue(size_t index) const {
+    auto it = residue_mapping_.find(index);
     if (it == residue_mapping_.end()) {
         // This atom is not in a residue
         return nullopt;

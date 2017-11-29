@@ -81,7 +81,7 @@ extern "C" chfl_status chfl_property_get_string(const CHFL_PROPERTY* const prope
     CHECK_POINTER(property);
     CHECK_POINTER(buffer);
     CHFL_ERROR_CATCH(
-        auto string = property->as_string();
+        const auto& string = property->as_string();
         strncpy(buffer, string.c_str(), checked_cast(buffsize) - 1);
         buffer[buffsize - 1] = '\0';
     )

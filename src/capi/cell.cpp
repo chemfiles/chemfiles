@@ -10,11 +10,11 @@ using namespace chemfiles;
 
 static_assert(sizeof(chfl_cellshape) == sizeof(int), "Wrong size for chfl_cellshape enum");
 
-extern "C" CHFL_CELL* chfl_cell(const chfl_vector3d lenghts) {
+extern "C" CHFL_CELL* chfl_cell(const chfl_vector3d lengths) {
     CHFL_CELL* cell = nullptr;
-    CHECK_POINTER_GOTO(lenghts);
+    CHECK_POINTER_GOTO(lengths);
     CHFL_ERROR_GOTO(
-        cell = new UnitCell(lenghts[0], lenghts[1], lenghts[2]);
+        cell = new UnitCell(lengths[0], lengths[1], lengths[2]);
     )
     return cell;
 error:
@@ -22,13 +22,13 @@ error:
     return nullptr;
 }
 
-extern "C" CHFL_CELL* chfl_cell_triclinic(const chfl_vector3d lenghts, const chfl_vector3d angles) {
+extern "C" CHFL_CELL* chfl_cell_triclinic(const chfl_vector3d lengths, const chfl_vector3d angles) {
     CHFL_CELL* cell = nullptr;
-    CHECK_POINTER_GOTO(lenghts);
+    CHECK_POINTER_GOTO(lengths);
     CHECK_POINTER_GOTO(angles);
     CHFL_ERROR_GOTO(
         cell = new UnitCell(
-            lenghts[0], lenghts[1], lenghts[2],
+            lengths[0], lengths[1], lengths[2],
             angles[0], angles[1], angles[2]
         );
         // ensure that the unit cell shape is always TRICLINIC, even if the
@@ -73,23 +73,23 @@ extern "C" chfl_status chfl_cell_volume(const CHFL_CELL* const cell, double* vol
     )
 }
 
-extern "C" chfl_status chfl_cell_lengths(const CHFL_CELL* const cell, chfl_vector3d lenghts) {
+extern "C" chfl_status chfl_cell_lengths(const CHFL_CELL* const cell, chfl_vector3d lengths) {
     CHECK_POINTER(cell);
-    CHECK_POINTER(lenghts);
+    CHECK_POINTER(lengths);
     CHFL_ERROR_CATCH(
-        lenghts[0] = cell->a();
-        lenghts[1] = cell->b();
-        lenghts[2] = cell->c();
+        lengths[0] = cell->a();
+        lengths[1] = cell->b();
+        lengths[2] = cell->c();
     )
 }
 
-extern "C" chfl_status chfl_cell_set_lengths(CHFL_CELL* const cell, const chfl_vector3d lenghts) {
+extern "C" chfl_status chfl_cell_set_lengths(CHFL_CELL* const cell, const chfl_vector3d lengths) {
     CHECK_POINTER(cell);
-    CHECK_POINTER(lenghts);
+    CHECK_POINTER(lengths);
     CHFL_ERROR_CATCH(
-        cell->set_a(lenghts[0]);
-        cell->set_b(lenghts[1]);
-        cell->set_c(lenghts[2]);
+        cell->set_a(lengths[0]);
+        cell->set_b(lengths[1]);
+        cell->set_c(lengths[2]);
     )
 }
 

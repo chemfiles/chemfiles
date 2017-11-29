@@ -40,17 +40,17 @@ static File::Mode char_to_file_mode(char mode) {
     }
 }
 
-Trajectory::Trajectory(const std::string& path, char mode, const std::string& format)
-    : path_(path), mode_(mode), step_(0), nsteps_(0), format_(nullptr), custom_topology_(), custom_cell_() {
+Trajectory::Trajectory(std::string path, char mode, const std::string& format)
+    : path_(std::move(path)), mode_(mode), step_(0), nsteps_(0), format_(nullptr) {
     format_creator_t format_creator;
     if (format == "") {
-        format_creator = FormatFactory::get().extension(extension(path));
+        format_creator = FormatFactory::get().extension(extension(path_));
     } else {
         format_creator = FormatFactory::get().name(format);
     }
 
     auto filemode = char_to_file_mode(mode);
-    format_ = format_creator(path, filemode);
+    format_ = format_creator(path_, filemode);
 
     if (mode == 'r' || mode == 'a') {
         nsteps_ = format_->nsteps();
@@ -150,9 +150,9 @@ void Trajectory::write(const Frame& frame) {
     nsteps_++;
 }
 
-void Trajectory::set_topology(const Topology& top) {
+void Trajectory::set_topology(const Topology& topology) {
     check_opened();
-    custom_topology_ = top;
+    custom_topology_ = topology;
 }
 
 void Trajectory::set_topology(const std::string& filename, const std::string& format) {
@@ -164,9 +164,9 @@ void Trajectory::set_topology(const std::string& filename, const std::string& fo
     set_topology(frame.topology());
 }
 
-void Trajectory::set_cell(const UnitCell& new_cell) {
+void Trajectory::set_cell(const UnitCell& cell) {
     check_opened();
-    custom_cell_ = new_cell;
+    custom_cell_ = cell;
 }
 
 bool Trajectory::done() const {

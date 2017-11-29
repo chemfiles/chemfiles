@@ -21,7 +21,7 @@ namespace selections {
 /// - boolean operators (and not or);
 /// - numbers, the scientific notation is alowed;
 /// - identifiers, obeing to the ([a-Z][a-Z_1-9]+) regular expression
-class CHFL_EXPORT Token {
+class Token {
 public:
     /// Available token types
     enum Type {
@@ -57,15 +57,15 @@ public:
         VARIABLE,
     };
 
-    /// Basic copy and move constructors
+    ~Token() = default;
     Token(const Token&) = default;
     Token& operator=(const Token&) = default;
     Token(Token&&) = default;
     Token& operator=(Token&&) = default;
 
     /// Create an identifier token with `data` name
-    static Token ident(const std::string& data) {
-        return Token(IDENT, data, 0.0, 0);
+    static Token ident(std::string data) {
+        return Token(IDENT, std::move(data), 0.0, 0);
     }
 
     /// Create a number token with `data` value
@@ -160,8 +160,8 @@ public:
     /// Get the token type of this token
     Type type() const {return type_;}
 private:
-    Token(Type type, const std::string& ident, double number, uint8_t variable)
-        : type_(type), number_(number), ident_(ident), variable_(variable) {}
+    Token(Type type, std::string ident, double number, uint8_t variable)
+        : type_(type), number_(number), ident_(std::move(ident)), variable_(variable) {}
     /// Token type
     Type type_;
     /// Value of the number if the token is a NUMBER
@@ -175,7 +175,7 @@ private:
 /// Convert an `input` string to a stream of tokens
 ///
 /// @throws SelectionError if the input string can not be tokenized
-CHFL_EXPORT std::vector<Token> tokenize(const std::string& input);
+std::vector<Token> tokenize(const std::string& input);
 
 }} // namespace chemfiles && namespace selections
 

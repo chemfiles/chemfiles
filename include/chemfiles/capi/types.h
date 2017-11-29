@@ -4,8 +4,8 @@
 #ifndef CHEMFILES_CHFL_TYPES_H
 #define CHEMFILES_CHFL_TYPES_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <stdint.h>  // NOLINT: this is both a C and C++ file
+#include <stdbool.h>  // NOLINT: this is both a C and C++ file
 #include "chemfiles/config.hpp"
 #include "chemfiles/exports.hpp"
 
@@ -21,14 +21,14 @@ namespace chemfiles {
     class Property;
 }
 struct CAPISelection;
-typedef chemfiles::Trajectory CHFL_TRAJECTORY;
-typedef chemfiles::Frame CHFL_FRAME;
-typedef chemfiles::Atom CHFL_ATOM;
-typedef chemfiles::UnitCell CHFL_CELL;
-typedef chemfiles::Topology CHFL_TOPOLOGY;
-typedef chemfiles::Residue CHFL_RESIDUE;
-typedef CAPISelection CHFL_SELECTION;
-typedef chemfiles::Property CHFL_PROPERTY;
+using CHFL_TRAJECTORY = chemfiles::Trajectory;
+using CHFL_FRAME = chemfiles::Frame;
+using CHFL_ATOM = chemfiles::Atom;
+using CHFL_CELL = chemfiles::UnitCell;
+using CHFL_TOPOLOGY = chemfiles::Topology;
+using CHFL_RESIDUE = chemfiles::Residue;
+using CHFL_PROPERTY = chemfiles::Property;
+using CHFL_SELECTION = CAPISelection;
 #else
 /// An opaque type handling trajectories files.
 ///
@@ -64,8 +64,8 @@ typedef struct CHFL_ATOM CHFL_ATOM;
 ///
 /// A `CHFL_CELL` represent the box containing the atoms, and its periodicity.
 ///
-/// An unit cell is fully represented by three lenghts (a, b, c); and three angles
-/// (alpha, beta, gamma). The angles are stored in degrees, and the lenghts in
+/// An unit cell is fully represented by three lengths (a, b, c); and three angles
+/// (alpha, beta, gamma). The angles are stored in degrees, and the lengths in
 /// Angstroms.
 ///
 /// A cell also has a matricial representation, by projecting the three base
@@ -110,7 +110,7 @@ typedef struct CHFL_PROPERTY CHFL_PROPERTY;
 
 /// `chfl_status` list the possible values for the return status code of
 /// chemfiles functions.
-typedef enum {
+typedef enum {  // NOLINT: this is both a C and C++ file
     /// Status code for successful operations.
     CHFL_SUCCESS = 0,
     /// Status code for error concerning memory: out of memory, wrong size for
@@ -136,7 +136,7 @@ typedef enum {
 } chfl_status;
 
 /// A 3-dimmensional vector for the chemfiles interface
-typedef double chfl_vector3d[3];
+typedef double chfl_vector3d[3];  // NOLINT: this is both a C and C++ file
 
 /// Get the version of the chemfiles library.
 ///

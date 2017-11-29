@@ -41,10 +41,14 @@ static optional<const ElementData&> find_element(const std::string& name) {
     }
 }
 
-Atom::Atom(std::string name): Atom(name, name) {}
+Atom::Atom(std::string name): name_(std::move(name)), type_(name_) {
+    auto element = find_element(type_);
+    if (element) {
+        mass_ = element->mass;
+    }
+}
 
-Atom::Atom(std::string name, std::string type):
-    name_(std::move(name)), type_(std::move(type)), properties_() {
+Atom::Atom(std::string name, std::string type): name_(std::move(name)), type_(std::move(type)) {
     auto element = find_element(type_);
     if (element) {
         mass_ = element->mass;

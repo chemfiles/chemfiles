@@ -130,7 +130,7 @@ static std::vector<Token> shunting_yard(std::vector<Token> tokens) {
  * Short forms are expressions like `name foo` or `index 3`, which are
  * equivalent to `name == foo` and `index == 3`.
  */
-static std::vector<Token> add_missing_equals(std::vector<Token> stream) {
+static std::vector<Token> add_missing_equals(const std::vector<Token>& stream) {
     auto out = std::vector<Token>();
     for (auto it = stream.cbegin(); it != stream.cend(); it++) {
         if (is_function(*it) && FUNCTIONS[it->ident()].has_short_form) {
@@ -215,7 +215,7 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
 }
 
 Ast selections::parse(std::vector<Token> tokens) {
-    tokens = add_missing_equals(std::move(tokens));
+    tokens = add_missing_equals(tokens);
     tokens = shunting_yard(std::move(tokens));
 
     auto begin = tokens.cbegin();

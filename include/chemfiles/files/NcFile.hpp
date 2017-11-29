@@ -56,7 +56,7 @@ namespace nc {
         /// Add an attribute with the given `value` and `name`.
         void add_attribute(const std::string& name, const std::string& value);
     protected:
-        NcFile& file_;
+        netcdf_id_t file_id_;
         netcdf_id_t var_id_;
     };
 
@@ -73,9 +73,9 @@ namespace nc {
     public:
         NcChar(NcFile& file, netcdf_id_t var) : NcVariable(file, var) {}
         /// Put a single string of data in this variable
-        void add(std::string data);
+        void add(const std::string& data);
         /// Put multiple strings of data in this variable
-        void add(std::vector<std::string> data);
+        void add(const std::vector<std::string>& data);
     };
 
     template<typename NcType> struct nc_type;
@@ -93,7 +93,11 @@ namespace nc {
 class NcFile final: public File {
 public:
     NcFile(const std::string& filename, File::Mode mode);
-    ~NcFile() noexcept;
+    ~NcFile() noexcept override;
+    NcFile(NcFile&&) = default;
+    NcFile& operator=(NcFile&&) = delete;
+    NcFile(NcFile const&) = delete;
+    NcFile& operator=(NcFile const&) = delete;
 
     /// Possible file mode. By default, files are in the DATA mode.
     enum NcMode {

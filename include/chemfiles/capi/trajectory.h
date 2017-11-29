@@ -49,7 +49,7 @@ CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_with_format(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_trajectory_read(
-    CHFL_TRAJECTORY* const trajectory, CHFL_FRAME* const frame
+    CHFL_TRAJECTORY* trajectory, CHFL_FRAME* frame
 );
 
 /// Read a specific `step` of the `trajectory` into a `frame`.
@@ -61,7 +61,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_read(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_trajectory_read_step(
-    CHFL_TRAJECTORY* const trajectory, uint64_t step, CHFL_FRAME* const frame
+    CHFL_TRAJECTORY* trajectory, uint64_t step, CHFL_FRAME* frame
 );
 
 /// Write a single `frame` to the `trajectory`.
@@ -70,7 +70,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_read_step(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_trajectory_write(
-    CHFL_TRAJECTORY* const trajectory, const CHFL_FRAME* const frame
+    CHFL_TRAJECTORY* trajectory, const CHFL_FRAME* frame
 );
 
 /// Set the `topology` associated with a `trajectory`. This topology will be
@@ -81,7 +81,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_write(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_trajectory_set_topology(
-    CHFL_TRAJECTORY* const trajectory, const CHFL_TOPOLOGY* const topology
+    CHFL_TRAJECTORY* trajectory, const CHFL_TOPOLOGY* topology
 );
 
 /// Set the topology associated with a `trajectory` by reading the first frame
@@ -95,7 +95,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_set_topology(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_trajectory_topology_file(
-    CHFL_TRAJECTORY* const trajectory, const char* path, const char* format
+    CHFL_TRAJECTORY* trajectory, const char* path, const char* format
 );
 
 /// Set the unit `cell` associated with a `trajectory`. This cell will be used
@@ -105,7 +105,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_topology_file(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_trajectory_set_cell(
-    CHFL_TRAJECTORY* const trajectory, const CHFL_CELL* const cell
+    CHFL_TRAJECTORY* trajectory, const CHFL_CELL* cell
 );
 
 /// Store the number of steps (the number of frames) from the `trajectory` in
@@ -115,7 +115,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_set_cell(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_trajectory_nsteps(
-    CHFL_TRAJECTORY* const trajectory, uint64_t* nsteps
+    CHFL_TRAJECTORY* trajectory, uint64_t* nsteps
 );
 
 /// Close a trajectory file, and free the associated memory.

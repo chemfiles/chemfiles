@@ -20,7 +20,9 @@ template<> FormatInfo chemfiles::format_information<TNGFormat>() {
 template<class T> class TngBuffer {
 public:
     TngBuffer(): data_(nullptr) {}
-    ~TngBuffer() {free(data_);}
+    ~TngBuffer() {
+		free(data_); // NOLINT: this is an implementation of RAII
+	}
 
     TngBuffer(const TngBuffer&) = delete;
     TngBuffer& operator=(const TngBuffer&) = delete;
@@ -39,8 +41,7 @@ private:
 #define STRING(x) STRING_0(x)
 #define CHECK(x) check_tng_error((x), (STRING(x)))
 
-TNGFormat::TNGFormat(const std::string& path, File::Mode mode)
-    : tng_(path, mode) {}
+TNGFormat::TNGFormat(const std::string& path, File::Mode mode): tng_(path, mode) {}
 
 size_t TNGFormat::nsteps() {
     int64_t n_frames = 0;
@@ -148,11 +149,8 @@ void TNGFormat::read_cell(Frame& frame) {
     double beta = angle(a, c);
     double gamma = angle(a, b);
 
-    auto cell = UnitCell(
-        // Factor 10 because the cell lengthes are in nm in the TNG format
-        a.norm() * 10, b.norm() * 10, c.norm() * 10, alpha, beta, gamma
-    );
-    frame.set_cell(std::move(cell));
+    // Factor 10 because the cell lengthes are in nm in the TNG format
+    frame.set_cell({a.norm() * 10, b.norm() * 10, c.norm() * 10, alpha, beta, gamma});
 }
 
 void TNGFormat::read_topology(Frame& frame) {
@@ -162,7 +160,7 @@ void TNGFormat::read_topology(Frame& frame) {
     int64_t moltypes = 0;
     CHECK(tng_num_molecule_types_get(tng_, &moltypes));
 
-    int64_t* molecules_counts = 0;
+    int64_t* molecules_counts = nullptr;
     CHECK(tng_molecule_cnt_list_get(tng_, &molecules_counts));
 
     // Read all molecules types

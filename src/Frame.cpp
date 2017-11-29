@@ -10,7 +10,7 @@ using namespace chemfiles;
 Frame::Frame() : Frame(Topology()) {}
 
 Frame::Frame(Topology topology, UnitCell cell):
-    step_(0), topology_(std::move(topology)), cell_(std::move(cell))
+    topology_(std::move(topology)), cell_(cell)
 {
     resize(topology_.size());
 }

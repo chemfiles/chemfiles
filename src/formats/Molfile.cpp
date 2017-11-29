@@ -1,10 +1,6 @@
 // From vmdconio.h
-#define VMDCON_ALL       0
-#define VMDCON_INFO      1
 #define VMDCON_WARN      2
 #define VMDCON_ERROR     3
-#define VMDCON_ALWAYS    4
-#define VMDCON_LOG       5
 
 #include "chemfiles/formats/Molfile.hpp"
 
@@ -16,9 +12,9 @@ using namespace chemfiles;
 
 /******************************************************************************/
 #define PLUGINS_DATA(FORMAT, PLUGIN, READER, VELOCITIES)                       \
-    extern "C" int PLUGIN##_register(void*, vmdplugin_register_cb);            \
-    extern "C" int PLUGIN##_fini(void);                                        \
-    extern "C" int PLUGIN##_init(void);                                        \
+    extern "C" int PLUGIN##_register(void*, vmdplugin_register_cb); /*NOLINT*/ \
+    extern "C" int PLUGIN##_fini(void); /*NOLINT*/                             \
+    extern "C" int PLUGIN##_init(void); /*NOLINT*/                             \
     template <> struct MolfilePluginData<FORMAT> {                             \
         int init() { return PLUGIN##_init(); }                                 \
         int registration(void* data, vmdplugin_register_cb callback) {         \
@@ -45,20 +41,15 @@ namespace chemfiles {
 #undef PLUGINS_FUNCTIONS
 /******************************************************************************/
 
-struct plugin_reginfo_t {
-    plugin_reginfo_t() : plugin(nullptr) {}
-    molfile_plugin_t* plugin;
-};
+template <MolfileFormat F> static int register_plugin(void* user_data, vmdplugin_t* vmd_plugin) {
+    auto user_plugin = static_cast<molfile_plugin_t**>(user_data);
+    assert(std::string(MOLFILE_PLUGIN_TYPE) == std::string(vmd_plugin->type));
 
-template <MolfileFormat F> static int register_plugin(void* v, vmdplugin_t* p) {
-    plugin_reginfo_t* reginfo = static_cast<plugin_reginfo_t*>(v);
-    assert(std::string(MOLFILE_PLUGIN_TYPE) == std::string(p->type));
-
-    auto plugin = reinterpret_cast<molfile_plugin_t*>(p);
+    auto plugin = reinterpret_cast<molfile_plugin_t*>(vmd_plugin);
+    // When this callback is called multiple times with more than one plugin,
+    // only register the one whe want
     if (MolfilePluginData<F>().reader() == plugin->name) {
-        // When this callback is called multiple times with more
-        // than one plugin, only register the one whe want
-        reginfo->plugin = plugin;
+        *user_plugin = plugin;
     }
 
     return VMDPLUGIN_SUCCESS;
@@ -88,15 +79,11 @@ Molfile<F>::Molfile(const std::string& path, File::Mode mode)
         );
     }
 
-    plugin_reginfo_t reginfo;
-    // The first argument in 'register_fun' is passed as the first argument to
-    // register_plugin ...
-    if (plugin_data_.registration(&reginfo, register_plugin<F>)) {
+    if (plugin_data_.registration(&plugin_handle_, register_plugin<F>)) {
         throw format_error(
             "could not register the {} plugin", plugin_data_.format()
         );
     }
-    plugin_handle_ = reginfo.plugin;
 
     // Check the ABI version of the plugin
     assert(plugin_handle_->abiversion == vmdplugin_ABIVERSION);

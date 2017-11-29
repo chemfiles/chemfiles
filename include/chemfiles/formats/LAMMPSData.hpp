@@ -58,11 +58,6 @@ class DataTypes {
 public:
     DataTypes(const Topology& topology = Topology());
 
-    DataTypes(const DataTypes&) = delete;
-    DataTypes& operator=(const DataTypes&) = delete;
-    DataTypes(DataTypes&&) = default;
-    DataTypes& operator=(DataTypes&&) = default;
-
     const sorted_set<atom_type>& atoms() const {return atoms_;}
     const sorted_set<bond_type>& bonds() const {return bonds_;}
     const sorted_set<angle_type>& angles() const {return angles_;}

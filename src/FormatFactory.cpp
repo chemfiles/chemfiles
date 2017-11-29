@@ -67,7 +67,7 @@ FormatFactory::iterator FormatFactory::find_name(const formats_map_t& formats, c
 }
 
 FormatFactory::iterator FormatFactory::find_extension(const formats_map_t& formats, const std::string& extension) {
-    for (iterator it = formats.begin(); it != formats.end(); it++) {
+    for (auto it = formats.begin(); it != formats.end(); it++) {
         if (it->first.extension() == extension) {
             return it;
         }

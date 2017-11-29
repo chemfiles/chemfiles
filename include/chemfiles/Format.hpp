@@ -22,8 +22,10 @@ class CHFL_EXPORT Format {
 public:
     Format() = default;
     virtual ~Format() noexcept = default;
-    Format& operator=(const Format&) = delete;
     Format(const Format&) = delete;
+    Format& operator=(const Format&) = delete;
+    Format(Format&&) = default;
+    Format& operator=(Format&&) = default;
 
     /// @brief Read a specific step from the trajectory file.
     ///
@@ -70,7 +72,7 @@ public:
     /// Create a `FormatInfo` with the given `name`.
     ///
     /// @throws Error if the format name is the empty string
-    FormatInfo(std::string name): name_(std::move(name)), extension_() {
+    FormatInfo(std::string name): name_(std::move(name)) {
         if (name_ == "") {
             throw Error("a format name can not be an empty string");
         }

@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 /// Possible values holded by a CHFL_PROPERTY
-typedef enum {
+typedef enum {  // NOLINT: this is both a C and C++ file
     /// Bool value
     CHFL_PROPERTY_BOOL = 0,
     /// Double value
@@ -67,11 +67,11 @@ CHFL_EXPORT CHFL_PROPERTY* chfl_property_vector3d(const chfl_vector3d value);
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_property_get_kind(
-    const CHFL_PROPERTY* const property, chfl_property_kind* kind
+    const CHFL_PROPERTY* property, chfl_property_kind* kind
 );
 
 /// Get the boolean value holded by this `property` in the location pointed to
-/// by `data`.
+/// by `value`.
 ///
 /// This function returns CHFL_PROPERTY_ERROR if the property is not a boolean
 /// property.
@@ -80,11 +80,11 @@ CHFL_EXPORT chfl_status chfl_property_get_kind(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_property_get_bool(
-    const CHFL_PROPERTY* const property, bool* data
+    const CHFL_PROPERTY* property, bool* value
 );
 
 /// Get the double value holded by this `property` in the location pointed to
-/// by `data`.
+/// by `value`.
 ///
 /// This function returns CHFL_PROPERTY_ERROR if the property is not a double
 /// property.
@@ -93,7 +93,7 @@ CHFL_EXPORT chfl_status chfl_property_get_bool(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_property_get_double(
-    const CHFL_PROPERTY* const property, double* data
+    const CHFL_PROPERTY* property, double* value
 );
 
 /// Get the string value holded by this `property` in the given `buffer`.
@@ -108,11 +108,11 @@ CHFL_EXPORT chfl_status chfl_property_get_double(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_property_get_string(
-    const CHFL_PROPERTY* const property, char* const buffer, uint64_t buffsize
+    const CHFL_PROPERTY* property, char* buffer, uint64_t buffsize
 );
 
 /// Get the 3D vector value holded by this `property` in the location pointed to
-/// by `data`.
+/// by `value`.
 ///
 /// This function returns CHFL_PROPERTY_ERROR if the property is not a 3D vector
 /// property.
@@ -121,7 +121,7 @@ CHFL_EXPORT chfl_status chfl_property_get_string(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_property_get_vector3d(
-    const CHFL_PROPERTY* const property, chfl_vector3d data
+    const CHFL_PROPERTY* property, chfl_vector3d value
 );
 
 /// Free the memory associated with a `property`.

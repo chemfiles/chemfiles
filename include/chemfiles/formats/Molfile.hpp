@@ -9,10 +9,10 @@ extern "C" {
 #include "molfile_plugin.h"
 }
 
-#include "chemfiles/optional.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Topology.hpp"
+#include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 
@@ -56,7 +56,11 @@ template <MolfileFormat F>
 class Molfile final: public Format {
 public:
     Molfile(const std::string& path, File::Mode mode);
-    ~Molfile() noexcept;
+    ~Molfile() noexcept override;
+    Molfile(const Molfile&) = delete;
+    Molfile& operator=(const Molfile&) = delete;
+    Molfile(Molfile&&) = default;
+    Molfile& operator=(Molfile&&) = default;
 
     void read(Frame& frame) override;
     size_t nsteps() override;

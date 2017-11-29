@@ -23,8 +23,9 @@ inline size_t checked_cast(uint64_t value) {
     return static_cast<size_t>(value);
 }
 
+/// Convert a C chfl_vector3d to a C++ Vector3D
 inline Vector3D vector3d(const chfl_vector3d vector) {
-    return Vector3D(vector[0], vector[1], vector[2]);
+    return {vector[0], vector[1], vector[2]};
 }
 
 #define CATCH_AND_RETURN(exception, retval)                                    \
@@ -43,7 +44,7 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
 
 #define CHECK_POINTER(ptr)                                                     \
     do {                                                                       \
-        if (ptr == nullptr) {                                                  \
+        if ((((((((((ptr))))))))) == nullptr) {                                                  \
             std::string message = fmt::format(                                 \
                 "Parameter '{}' cannot be NULL in {}", #ptr, __func__          \
             );                                                                 \
@@ -55,7 +56,7 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
 
 #define CHECK_POINTER_GOTO(ptr)                                                \
     do {                                                                       \
-        if (ptr == nullptr) {                                                  \
+        if ((((((((((ptr))))))))) == nullptr) {                                                  \
             std::string message = fmt::format(                                 \
                 "Parameter '{}' cannot be NULL in {}", #ptr, __func__          \
             );                                                                 \

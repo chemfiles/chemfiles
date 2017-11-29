@@ -9,7 +9,7 @@
 
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/exports.hpp"
-#include "chemfiles/optional.hpp"
+#include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 
@@ -28,9 +28,9 @@ public:
     ///
     /// @example{tests/doc/trajectory/trajectory.cpp}
     ///
-    /// @param filename The file path. In `w` or `a` modes, the file is
-    ///                 created if it does not exist yet. In `r` mode, an
-    ///                 exception is thrown is the file does not exist yet.
+    /// @param path The file path. In `w` or `a` modes, the file is
+    ///             created if it does not exist yet. In `r` mode, an
+    ///             exception is thrown is the file does not exist yet.
     /// @param mode Opening mode for the file. Default mode is `r` for read.
     ///             Other supported modes depends on the underlying format and
     ///             are `w` for write, and `a` for append. `w` mode discard any
@@ -42,15 +42,15 @@ public:
     /// @throws FileError for all errors concerning the physical file: can not
     ///                   open it, can not read/write it, *etc.*
     /// @throws FormatError if the file is not valid for the used format.
-    Trajectory(const std::string& filename, char mode = 'r', const std::string& format = "");
+    Trajectory(std::string path, char mode = 'r', const std::string& format = "");
 
     ~Trajectory();
 
-    Trajectory(Trajectory&&);
-    Trajectory& operator=(Trajectory&&);
+    Trajectory(Trajectory&& other);
+    Trajectory& operator=(Trajectory&& other);
 
-    Trajectory(const Trajectory&) = delete;
-    Trajectory& operator=(const Trajectory&) = delete;
+    Trajectory(const Trajectory& other) = delete;
+    Trajectory& operator=(const Trajectory& other) = delete;
 
     /// Read the next frame in the trajectory.
     ///

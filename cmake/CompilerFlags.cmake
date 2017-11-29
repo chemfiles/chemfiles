@@ -204,7 +204,7 @@ try_compile(CHFL_HAS_THREAD_LOCAL
 )
 
 if(EMSCRIPTEN)
-    # emscripten manages to compile the code, but fails at runtime with 
+    # emscripten manages to compile the code, but fails at runtime with
     # 'missing function: __cxa_thread_atexit'
     set(CHFL_HAS_THREAD_LOCAL FALSE)
 endif()

@@ -8,8 +8,8 @@
 #include <algorithm>
 
 #include "chemfiles/exports.hpp"
-#include "chemfiles/optional.hpp"
 #include "chemfiles/sorted_set.hpp"
+#include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 
@@ -32,6 +32,7 @@ public:
     /// @example{tests/doc/residue/residue-2.cpp}
     Residue(std::string name, uint64_t resid);
 
+    ~Residue() = default;
     Residue(const Residue&) = default;
     Residue& operator=(const Residue&) = default;
     Residue(Residue&&) = default;

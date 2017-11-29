@@ -25,7 +25,9 @@ template<> FormatInfo chemfiles::format_information<TinkerFormat>() {
 static bool forward(TextFile& file);
 static bool is_unit_cell_line(const std::string& line);
 
-TinkerFormat::TinkerFormat(const std::string& path, File::Mode mode): file_(TextFile::create(path, mode)), steps_positions_() {
+TinkerFormat::TinkerFormat(const std::string& path, File::Mode mode)
+    : file_(TextFile::create(path, mode))
+{
     while (!file_->eof()) {
         auto position = file_->tellg();
         if (!file_ || position == std::streampos(-1)) {
