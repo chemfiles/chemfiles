@@ -38,6 +38,7 @@ public:
     /// @example{tests/doc/vector3d/vector3d-3.cpp}
     Vector3D(double x, double y, double z): super({{x, y, z}}) {}
 
+    ~Vector3D() = default;
     Vector3D(const Vector3D&) = default;
     Vector3D& operator=(const Vector3D&) = default;
     Vector3D(Vector3D&&) = default;
@@ -65,7 +66,7 @@ inline Vector3D cross(const Vector3D& lhs, const Vector3D& rhs) {
     auto x = lhs[1] * rhs[2] - lhs[2] * rhs[1];
     auto y = lhs[2] * rhs[0] - lhs[0] * rhs[2];
     auto z = lhs[0] * rhs[1] - lhs[1] * rhs[0];
-    return Vector3D(x, y, z);
+    return {x, y, z};
 }
 
 inline double Vector3D::norm() const {
@@ -84,27 +85,27 @@ inline bool operator!=(const Vector3D& lhs, const Vector3D& rhs) {
 
 /// Add two vectors
 inline Vector3D operator+(const Vector3D& lhs, const Vector3D& rhs) {
-    return Vector3D(lhs[0] + rhs[0], lhs[1] + rhs[1], lhs[2] + rhs[2]);
+    return {lhs[0] + rhs[0], lhs[1] + rhs[1], lhs[2] + rhs[2]};
 }
 
 /// Substract two vectors
 inline Vector3D operator-(const Vector3D& lhs, const Vector3D& rhs) {
-    return Vector3D(lhs[0] - rhs[0], lhs[1] - rhs[1], lhs[2] - rhs[2]);
+    return {lhs[0] - rhs[0], lhs[1] - rhs[1], lhs[2] - rhs[2]};
 }
 
 /// Multiply a vector by a scalar on the right
 inline Vector3D operator*(const Vector3D& lhs, double rhs) {
-    return Vector3D(lhs[0] * rhs, lhs[1] * rhs, lhs[2] * rhs);
+    return {lhs[0] * rhs, lhs[1] * rhs, lhs[2] * rhs};
 }
 
 /// Multiply a vector by a scalar on the left
 inline Vector3D operator*(double lhs, const Vector3D& rhs) {
-    return Vector3D(lhs * rhs[0], lhs * rhs[1], lhs * rhs[2]);
+    return {lhs * rhs[0], lhs * rhs[1], lhs * rhs[2]};
 }
 
 /// Divide a vector by a scalar
 inline Vector3D operator/(const Vector3D& lhs, double rhs) {
-    return Vector3D(lhs[0] / rhs, lhs[1] / rhs, lhs[2] / rhs);
+    return {lhs[0] / rhs, lhs[1] / rhs, lhs[2] / rhs};
 }
 
 // Vector3D needs to have a standard layout, equivalent to a `double[3]` array.
@@ -145,6 +146,7 @@ public:
              double m31, double m32, double m33):
         super({{ {{m11, m12, m13}}, {{m21, m22, m23}}, {{m31, m32, m33}} }}) {}
 
+    ~Matrix3D() = default;
     Matrix3D(const Matrix3D&) = default;
     Matrix3D& operator=(const Matrix3D&) = default;
     Matrix3D(Matrix3D&&) = default;
@@ -173,11 +175,11 @@ inline bool operator!=(const Matrix3D& lhs, const Matrix3D& rhs) {
 
 /// Multiplication of a vector by a matrix
 inline Vector3D operator*(const Matrix3D& lhs, const Vector3D& rhs) {
-    return Vector3D(
+    return {
         lhs[0][0] * rhs[0] + lhs[0][1] * rhs[1] + lhs[0][2] * rhs[2],
         lhs[1][0] * rhs[0] + lhs[1][1] * rhs[1] + lhs[1][2] * rhs[2],
         lhs[2][0] * rhs[0] + lhs[2][1] * rhs[1] + lhs[2][2] * rhs[2]
-    );
+    };
 }
 
 /// Multiplication of two matrix

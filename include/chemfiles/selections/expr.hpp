@@ -31,6 +31,7 @@ enum class BinOp {
 /// can take three values: X, Y or Z.
 class Coordinate {
 public:
+    ~Coordinate() = default;
     Coordinate(const Coordinate& other) = default;
     Coordinate(Coordinate&& other) = default;
     Coordinate& operator=(const Coordinate& other) = default;
@@ -89,7 +90,7 @@ private:
 /// @brief Selection matching all atoms
 class AllExpr final: public Expr {
 public:
-    AllExpr(): Expr() {}
+    AllExpr() = default;
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 };
@@ -98,7 +99,7 @@ public:
 /// @brief Selection matching no atoms
 class NoneExpr final: public Expr {
 public:
-    NoneExpr(): Expr() {}
+    NoneExpr() = default;
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 };
@@ -110,7 +111,6 @@ public:
     SingleSelector(unsigned argument): argument_(argument) {
         assert(argument <= 3 && "argument must be less than 3 in SingleSelector");
     }
-    virtual ~SingleSelector() noexcept = default;
 
 protected:
     /// Index of the argument to apply the selector to
@@ -125,7 +125,7 @@ protected:
 class TypeExpr final: public SingleSelector {
 public:
     TypeExpr(unsigned argument, std::string type, bool equals)
-        : SingleSelector(argument), type_(type), equals_(equals) {}
+        : SingleSelector(argument), type_(std::move(type)), equals_(equals) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:
@@ -141,7 +141,7 @@ private:
 class NameExpr final: public SingleSelector {
 public:
     NameExpr(unsigned argument, std::string name, bool equals)
-        : SingleSelector(argument), name_(name), equals_(equals) {}
+        : SingleSelector(argument), name_(std::move(name)), equals_(equals) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:
@@ -170,7 +170,7 @@ private:
 class ResnameExpr final: public SingleSelector {
 public:
     ResnameExpr(unsigned argument, std::string name, bool equals)
-        : SingleSelector(argument), name_(name), equals_(equals) {}
+        : SingleSelector(argument), name_(std::move(name)), equals_(equals) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:
@@ -244,7 +244,7 @@ private:
 /// @brief Combine selections by using a logical `and` operation
 class AndExpr final: public Expr {
 public:
-    AndExpr(Ast&& lhs, Ast&& rhs): Expr(), lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
+    AndExpr(Ast lhs, Ast rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:
@@ -256,7 +256,7 @@ private:
 /// @brief Combine selections by using a logical `or` operation
 class OrExpr final: public Expr {
 public:
-    OrExpr(Ast&& lhs, Ast&& rhs): Expr(), lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
+    OrExpr(Ast lhs, Ast rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:
@@ -268,7 +268,7 @@ private:
 /// @brief Unary negation of a selection
 class NotExpr final: public Expr {
 public:
-    explicit NotExpr(Ast&& ast): Expr(), ast_(std::move(ast)) {}
+    explicit NotExpr(Ast ast): ast_(std::move(ast)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:

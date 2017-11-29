@@ -48,7 +48,7 @@ template<class T>
 class mutex {
 public:
     /// Create a new mutex containing the given `data`
-    mutex(T data): data_(std::move(data)), mutex_() {}
+    mutex(T data): data_(std::move(data)) {}
     /// Create a new mutex containing a default constructed T
     mutex(): mutex(T()) {}
 

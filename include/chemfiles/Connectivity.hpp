@@ -24,6 +24,7 @@ public:
     /// @throw Error if `i == j`
     Bond(size_t i, size_t j);
 
+    ~Bond() = default;
     Bond(Bond&&) = default;
     Bond& operator=(Bond&&) = default;
     Bond(const Bond&) = default;
@@ -37,12 +38,12 @@ public:
 private:
     std::array<size_t, 2> data_;
 
-    friend bool operator==(const Bond&, const Bond&);
-    friend bool operator!=(const Bond&, const Bond&);
-    friend bool operator<(const Bond&, const Bond&);
-    friend bool operator<=(const Bond&, const Bond&);
-    friend bool operator>(const Bond&, const Bond&);
-    friend bool operator>=(const Bond&, const Bond&);
+    friend bool operator==(const Bond& lhs, const Bond& rhs);
+    friend bool operator!=(const Bond& lhs, const Bond& rhs);
+    friend bool operator<(const Bond& lhs, const Bond& rhs);
+    friend bool operator<=(const Bond& lhs, const Bond& rhs);
+    friend bool operator>(const Bond& lhs, const Bond& rhs);
+    friend bool operator>=(const Bond& lhs, const Bond& rhs);
 };
 
 inline bool operator==(const Bond& lhs, const Bond& rhs) {
@@ -88,6 +89,7 @@ public:
     /// @throw Error if `i == j`, `j == k` or `i == k`
     Angle(size_t i, size_t j, size_t k);
 
+    ~Angle() = default;
     Angle(Angle&&) = default;
     Angle& operator=(Angle&&) = default;
     Angle(const Angle&) = default;
@@ -102,12 +104,12 @@ public:
 private:
     std::array<size_t, 3> data_;
 
-    friend bool operator==(const Angle&, const Angle&);
-    friend bool operator!=(const Angle&, const Angle&);
-    friend bool operator<(const Angle&, const Angle&);
-    friend bool operator<=(const Angle&, const Angle&);
-    friend bool operator>(const Angle&, const Angle&);
-    friend bool operator>=(const Angle&, const Angle&);
+    friend bool operator==(const Angle& lhs, const Angle& rhs);
+    friend bool operator!=(const Angle& lhs, const Angle& rhs);
+    friend bool operator<(const Angle& lhs, const Angle& rhs);
+    friend bool operator<=(const Angle& lhs, const Angle& rhs);
+    friend bool operator>(const Angle& lhs, const Angle& rhs);
+    friend bool operator>=(const Angle& lhs, const Angle& rhs);
 };
 
 inline bool operator==(const Angle& lhs, const Angle& rhs) {
@@ -153,6 +155,7 @@ public:
     /// @throw Error if any of `i`, `j`, `k`, `m` has the same value as another
     Dihedral(size_t i, size_t j, size_t k, size_t m);
 
+    ~Dihedral() = default;
     Dihedral(Dihedral&&) = default;
     Dihedral& operator=(Dihedral&&) = default;
     Dihedral(const Dihedral&) = default;
@@ -167,12 +170,12 @@ public:
 private:
     std::array<size_t, 4> data_;
 
-    friend bool operator==(const Dihedral&, const Dihedral&);
-    friend bool operator!=(const Dihedral&, const Dihedral&);
-    friend bool operator<(const Dihedral&, const Dihedral&);
-    friend bool operator<=(const Dihedral&, const Dihedral&);
-    friend bool operator>(const Dihedral&, const Dihedral&);
-    friend bool operator>=(const Dihedral&, const Dihedral&);
+    friend bool operator==(const Dihedral& lhs, const Dihedral& rhs);
+    friend bool operator!=(const Dihedral& lhs, const Dihedral& rhs);
+    friend bool operator<(const Dihedral& lhs, const Dihedral& rhs);
+    friend bool operator<=(const Dihedral& lhs, const Dihedral& rhs);
+    friend bool operator>(const Dihedral& lhs, const Dihedral& rhs);
+    friend bool operator>=(const Dihedral& lhs, const Dihedral& rhs);
 };
 
 inline bool operator==(const Dihedral& lhs, const Dihedral& rhs) {
@@ -223,6 +226,7 @@ public:
     /// @throw Error if any of `i`, `j`, `k`, `m` has the same value as another
     Improper(size_t i, size_t j, size_t k, size_t m);
 
+    ~Improper() = default;
     Improper(Improper&&) = default;
     Improper& operator=(Improper&&) = default;
     Improper(const Improper&) = default;
@@ -237,12 +241,12 @@ public:
 private:
     std::array<size_t, 4> data_;
 
-    friend bool operator==(const Improper&, const Improper&);
-    friend bool operator!=(const Improper&, const Improper&);
-    friend bool operator<(const Improper&, const Improper&);
-    friend bool operator<=(const Improper&, const Improper&);
-    friend bool operator>(const Improper&, const Improper&);
-    friend bool operator>=(const Improper&, const Improper&);
+    friend bool operator==(const Improper& lhs, const Improper& rhs);
+    friend bool operator!=(const Improper& lhs, const Improper& rhs);
+    friend bool operator<(const Improper& lhs, const Improper& rhs);
+    friend bool operator<=(const Improper& lhs, const Improper& rhs);
+    friend bool operator>(const Improper& lhs, const Improper& rhs);
+    friend bool operator>=(const Improper& lhs, const Improper& rhs);
 };
 
 inline bool operator==(const Improper& lhs, const Improper& rhs) {
@@ -276,22 +280,30 @@ inline bool operator>=(const Improper& lhs, const Improper& rhs) {
 class Connectivity final {
 public:
     Connectivity() = default;
+
     /// Get the bonds in this connectivity
     const sorted_set<Bond>& bonds() const;
+
     /// Get the angles in this connectivity
     const sorted_set<Angle>& angles() const;
+
     /// Get the dihedrals in this connectivity
     const sorted_set<Dihedral>& dihedrals() const;
+
     /// Get the impropers in this connectivity
     const sorted_set<Improper>& impropers() const;
+
     /// Add a bond between the atoms `i` and `j`
     void add_bond(size_t i, size_t j);
+
     /// Remove any bond between the atoms `i` and `j`
     void remove_bond(size_t i, size_t j);
+
     /// Update the indexes of the bonds after atom removal
-    /// This function shifts all indexes bigger than i in the bonds/angles/dihedrals/impropers
-    /// lists by -1.
-    void atom_removed(size_t i);
+    ///
+    /// This function shifts all indexes bigger than `index` in the
+    /// bonds/angles/dihedrals/impropers lists by -1.
+    void atom_removed(size_t index);
 
 private:
     /// Recalculate the angles and the dihedrals from the bond list

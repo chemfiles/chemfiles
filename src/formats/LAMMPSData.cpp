@@ -945,7 +945,7 @@ void LAMMPSDataFormat::write_impropers(const Topology& topology) {
 
 std::string split_comment(std::string& line) {
     std::string comment;
-    auto position = line.find("#");
+    auto position = line.find('#');
     if (position != std::string::npos) {
         comment = line.substr(position + 1);
         line.erase(position);

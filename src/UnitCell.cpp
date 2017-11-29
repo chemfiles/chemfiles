@@ -100,7 +100,7 @@ void UnitCell::set_shape(CellShape shape) {
         }
         if (!(a_ == 0.0 && b_ == 0.0 && c_ == 0.0)) {
             throw error(
-                "can not be set cell shape to INFINITE: some lenghts are not 0"
+                "can not be set cell shape to INFINITE: some lengths are not 0"
             );
         }
     }
@@ -157,31 +157,31 @@ void UnitCell::set_gamma(double val) {
 }
 
 // Wrap a vector in an Orthorombic UnitCell
-Vector3D UnitCell::wrap_orthorombic(const Vector3D& vect) const {
-    return Vector3D(
-        vect[0] - round(vect[0] / a_) * a_,
-        vect[1] - round(vect[1] / b_) * b_,
-        vect[2] - round(vect[2] / c_) * c_
-    );
+Vector3D UnitCell::wrap_orthorombic(const Vector3D& vector) const {
+    return {
+        vector[0] - round(vector[0] / a_) * a_,
+        vector[1] - round(vector[1] / b_) * b_,
+        vector[2] - round(vector[2] / c_) * c_
+    };
 }
 
 // Wrap a vector in an Orthorombic UnitCell
-Vector3D UnitCell::wrap_triclinic(const Vector3D& vect) const {
-    auto fractional = h_inv_ * vect;
+Vector3D UnitCell::wrap_triclinic(const Vector3D& vector) const {
+    auto fractional = h_inv_ * vector;
     fractional[0] -= round(fractional[0]);
     fractional[1] -= round(fractional[1]);
     fractional[2] -= round(fractional[2]);
     return h_ * fractional;
 }
 
-Vector3D UnitCell::wrap(const Vector3D& vect) const {
+Vector3D UnitCell::wrap(const Vector3D& vector) const {
     switch (shape_) {
         case INFINITE:
-            return vect;
+            return vector;
         case ORTHORHOMBIC:
-            return wrap_orthorombic(vect);
+            return wrap_orthorombic(vector);
         case TRICLINIC:
-            return wrap_triclinic(vect);
+            return wrap_triclinic(vector);
     }
     unreachable();
 }

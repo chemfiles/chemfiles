@@ -10,18 +10,19 @@
 
 using namespace chemfiles;
 
-static mutex<warning_callback> CALLBACK = {[](std::string message){
+static mutex<warning_callback> CALLBACK = {[](const std::string& message){ // NOLINT
+    // NOLINT: we don't reference cerr before it is initialized because we are in a lambda
     std::cerr << "[chemfiles] " << message << std::endl;
 }};
 
 void chemfiles::set_warning_callback(warning_callback callback) {
     auto guard = CALLBACK.lock();
-    *guard = callback;
+    *guard = std::move(callback);
 }
 
-void chemfiles::warning(std::string message) {
-    auto guard = CALLBACK.lock();
-    (*guard)(std::move(message));
+void chemfiles::warning(const std::string& message) {
+    auto callback = CALLBACK.lock();
+    (*callback)(message);
 }
 
 void chemfiles::add_configuration(const std::string& path) {

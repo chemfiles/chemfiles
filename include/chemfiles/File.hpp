@@ -26,9 +26,9 @@ public:
         APPEND = 'a',
     };
 
-    virtual ~File() = default;
-
-    // Removing default copy constructors
+    virtual ~File() noexcept = default;
+    File(File&&) = default;
+    File& operator=(File&&) = delete;
     File(File const&) = delete;
     File& operator=(File const&) = delete;
 
@@ -38,7 +38,7 @@ public:
     Mode mode() const { return mode_; }
 
 protected:
-    File(const std::string& path, Mode mode): filename_(path), mode_(mode) {}
+    File(std::string path, Mode mode): filename_(std::move(path)), mode_(mode) {}
 
 private:
     const std::string filename_;
@@ -56,7 +56,6 @@ public:
     /// Open the most adaptated text file class for the given `path` and `mode`
     static std::unique_ptr<TextFile> create(const std::string& path, File::Mode mode);
 
-    virtual ~TextFile() noexcept;
     /// Read a line from the file
     virtual std::string readline() = 0;
     /// Read `n` lines from the file

@@ -12,7 +12,7 @@
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/exports.hpp"
 
-#include "chemfiles/optional.hpp"
+#include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 
@@ -37,6 +37,7 @@ public:
     /// @example{tests/doc/topology/topology.cpp}
     Topology() = default;
 
+    ~Topology() = default;
     Topology(const Topology&) = default;
     Topology& operator=(const Topology&) = default;
     Topology(Topology&&) = default;

@@ -12,21 +12,22 @@ size_t chemfiles::nc::hyperslab_size(const count_t& count) {
     return counted;
 }
 
-nc::NcVariable::NcVariable(NcFile& file, netcdf_id_t var): file_(file), var_id_(var) {}
+nc::NcVariable::NcVariable(NcFile& file, netcdf_id_t var):
+    file_id_(file.netcdf_id()), var_id_(var) {}
 
 std::vector<size_t> nc::NcVariable::dimmensions() const {
     int size = 0;
-    int status = nc_inq_varndims(file_.netcdf_id(), var_id_, &size);
+    int status = nc_inq_varndims(file_id_, var_id_, &size);
     nc::check(status, "could not get the number of dimmensions");
 
     auto dim_ids = std::vector<netcdf_id_t>(static_cast<size_t>(size), 0);
-    status = nc_inq_vardimid(file_.netcdf_id(), var_id_, dim_ids.data());
+    status = nc_inq_vardimid(file_id_, var_id_, dim_ids.data());
     nc::check(status, "could not get the dimmensions id");
 
     std::vector<size_t> result;
     for (auto dim_id: dim_ids) {
         size_t length = 0;
-        status = nc_inq_dimlen(file_.netcdf_id(), dim_id, &length);
+        status = nc_inq_dimlen(file_id_, dim_id, &length);
         check(status, "could not get the dimmensions size");
         result.push_back(length);
     }
@@ -36,19 +37,18 @@ std::vector<size_t> nc::NcVariable::dimmensions() const {
 
 std::string nc::NcVariable::attribute(const std::string& name) const {
     size_t size = 0;
-    int status = nc_inq_attlen(file_.netcdf_id(), var_id_, name.c_str(), &size);
+    int status = nc_inq_attlen(file_id_, var_id_, name.c_str(), &size);
     nc::check(status, "can not read attribute id for attribute '{}'", name);
 
     std::string value(size, ' ');
-    status = nc_get_att_text(file_.netcdf_id(), var_id_, name.c_str(), &value[0]);
+    status = nc_get_att_text(file_id_, var_id_, name.c_str(), &value[0]);
     nc::check(status, "can not read attribute text for attribute '{}'", name);
     return value;
 }
 
 
 void nc::NcVariable::add_attribute(const std::string& name, const std::string& value) {
-    assert(file_.nc_mode() == NcFile::DEFINE && "File must be in define mode to add attribute");
-    int status = nc_put_att_text(file_.netcdf_id(), var_id_, name.c_str(), value.size(), value.c_str());
+    int status = nc_put_att_text(file_id_, var_id_, name.c_str(), value.size(), value.c_str());
     nc::check(status, "can not set attribute '{}'", name);
 }
 
@@ -56,7 +56,7 @@ std::vector<float> nc::NcFloat::get(count_t start, count_t count) const {
     auto size = hyperslab_size(count);
     auto result = std::vector<float>(size, 0.0);
     int status = nc_get_vara_float(
-        file_.netcdf_id(), var_id_,
+        file_id_, var_id_,
         start.data(), count.data(),
         result.data()
     );
@@ -67,26 +67,26 @@ std::vector<float> nc::NcFloat::get(count_t start, count_t count) const {
 void nc::NcFloat::add(count_t start, count_t count, std::vector<float> data) {
     assert(data.size() == hyperslab_size(count));
     int status = nc_put_vara_float(
-        file_.netcdf_id(), var_id_,
+        file_id_, var_id_,
         start.data(), count.data(),
         data.data()
     );
     nc::check(status, "could not put data in variable");
 }
 
-void nc::NcChar::add(std::string data) {
-    int status = nc_put_var_text(file_.netcdf_id(), var_id_, data.c_str());
+void nc::NcChar::add(const std::string& data) {
+    int status = nc_put_var_text(file_id_, var_id_, data.c_str());
     nc::check(status, "could not put text data in variable");
 }
 
-void nc::NcChar::add(std::vector<std::string> data) {
+void nc::NcChar::add(const std::vector<std::string>& data) {
     size_t i = 0;
     for (auto string: data) {
         string.resize(STRING_MAXLEN, '\0');
         size_t start[] = {i, 0};
         size_t count[] = {1, STRING_MAXLEN};
         int status = nc_put_vara_text(
-            file_.netcdf_id(), var_id_,
+            file_id_, var_id_,
             start, count,
             string.c_str()
         );
@@ -95,10 +95,8 @@ void nc::NcChar::add(std::vector<std::string> data) {
     }
 }
 
-/******************************************************************************/
-
 NcFile::NcFile(const std::string& filename, File::Mode mode)
-    : File(filename, mode), file_id_(-1), nc_mode_(DATA) {
+    : File(filename, mode), nc_mode_(DATA) {
     auto status = NC_NOERR;
 
     switch (mode) {

@@ -5,9 +5,9 @@
 #define CHEMFILES_FRAME_HPP
 
 #include "chemfiles/exports.hpp"
-#include "chemfiles/optional.hpp"
 #include "chemfiles/types.hpp"
-#include "chemfiles/span.hpp"
+#include "chemfiles/external/span.hpp"
+#include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/UnitCell.hpp"
@@ -47,6 +47,7 @@ public:
     /// `INFINITE` unit cell.
     explicit Frame(Topology topology, UnitCell cell = UnitCell());
 
+    ~Frame() = default;
     Frame(Frame&&) = default;
     Frame& operator=(Frame&&) = default;
 
@@ -115,7 +116,7 @@ public:
     ///
     /// @example{tests/doc/frame/cell.cpp}
     void set_cell(UnitCell cell) {
-        cell_ = std::move(cell);
+        cell_ = cell;
     }
 
     /// Get the number of atoms in this frame
@@ -182,7 +183,7 @@ public:
         }
     }
 
-    /// Resize the frame to store data for `n` atoms.
+    /// Resize the frame to contain `size` atoms.
     ///
     /// If the new number of atoms is bigger than the old one, missing data is
     /// initializd to 0. Pre-existing values are conserved.
@@ -191,15 +192,15 @@ public:
     /// elements after the new size are removed.
     ///
     /// @example{tests/doc/frame/resize.cpp}
-    void resize(size_t n);
+    void resize(size_t size);
 
-    /// Allocate memory in the frame to be able to store data for `n` atoms.
+    /// Allocate memory in the frame to have enough size for `size` atoms.
     ///
     /// This function does not change the actual number of atoms in the frame,
     /// and should be used as an optimisation.
     ///
     /// @example{tests/doc/frame/reserve.cpp}
-    void reserve(size_t n);
+    void reserve(size_t size);
 
     /// Add an `atom` at the given `position` and optionally with the given
     /// `velocity`. The `velocity` value will only be used if this frame
@@ -309,7 +310,7 @@ private:
     Frame& operator=(const Frame&) = default;
 
     /// Current simulation step
-    size_t step_;
+    size_t step_ = 0;
     /// Positions of the particles
     std::vector<Vector3D> positions_;
     /// Velocities of the particles

@@ -5,9 +5,9 @@
 #define CHEMFILES_FORMAT_NC_HPP
 
 #include "chemfiles/types.hpp"
-#include "chemfiles/span.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/files/NcFile.hpp"
+#include "chemfiles/external/span.hpp"
 
 namespace chemfiles {
 

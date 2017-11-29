@@ -7,8 +7,8 @@
 #include <string>
 
 #include "chemfiles/exports.hpp"
-#include "chemfiles/optional.hpp"
 #include "chemfiles/Property.hpp"
+#include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 
@@ -48,6 +48,7 @@ public:
     /// @param type atomic type for the new atom
     Atom(std::string name, std::string type);
 
+    ~Atom() = default;
     Atom(Atom&&) = default;
     Atom& operator=(Atom&&) = default;
     Atom(const Atom&) = default;
@@ -189,7 +190,7 @@ private:
     /// Additional properties of this atom
     property_map properties_;
 
-    friend bool operator==(const Atom&, const Atom&);
+    friend bool operator==(const Atom& lhs, const Atom& rhs);
 };
 
 inline bool operator==(const Atom& lhs, const Atom& rhs) {

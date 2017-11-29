@@ -29,7 +29,7 @@ CHFL_EXPORT const char* chfl_last_error(void);
 CHFL_EXPORT chfl_status chfl_clear_errors(void);
 
 /// Callback type that can be used to process warning events.
-typedef void (*chfl_warning_callback)(const char* message);
+typedef void (*chfl_warning_callback)(const char* message);  // NOLINT: this is both a C and C++ file
 
 /// Set the global warning `callback` to be used for each warning event.
 ///

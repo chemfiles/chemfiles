@@ -14,8 +14,8 @@ static_assert(
     "CHFL_MAX_SELECTION_SIZE should match Match::MAX_MATCH_SIZE"
 );
 
-extern "C" struct CAPISelection {
-    CAPISelection(Selection&& select): selection(std::move(select)), matches() {}
+struct CAPISelection {
+    CAPISelection(Selection select): selection(std::move(select)) {}
     Selection selection;
     std::vector<Match> matches;
 };

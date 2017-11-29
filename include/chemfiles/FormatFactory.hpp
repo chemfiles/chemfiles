@@ -16,7 +16,7 @@
 
 namespace chemfiles {
 
-typedef std::function<std::unique_ptr<Format>(const std::string& path, File::Mode mode)> format_creator_t;
+using format_creator_t = std::function<std::unique_ptr<Format>(const std::string& path, File::Mode mode)>;
 
 /// This class allow to register Format with names and file extensions
 class CHFL_EXPORT FormatFactory final {
@@ -47,19 +47,19 @@ public:
     void add_format() {
         auto info = format_information<Format>();
         register_format(info, [](const std::string& path, File::Mode mode) {
-            return std::unique_ptr<Format>(new Format(path, mode));
+            return std::unique_ptr<Format>(new Format(path, mode));  // NOLINT no make_unique in C++11
         });
     }
 
-    /// Get the metadata for all registered formats 
+    /// Get the metadata for all registered formats
     std::vector<FormatInfo> formats();
 
 private:
     using formats_map_t = std::vector<std::pair<FormatInfo, format_creator_t>>;
     using iterator = formats_map_t::const_iterator;
 
-    static iterator find_name(const formats_map_t& map, const std::string& name);
-    static iterator find_extension(const formats_map_t& map, const std::string& extension);
+    static iterator find_name(const formats_map_t& formats, const std::string& name);
+    static iterator find_extension(const formats_map_t& formats, const std::string& extension);
 
     void register_format(FormatInfo info, format_creator_t creator);
 

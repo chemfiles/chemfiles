@@ -16,7 +16,7 @@ class Frame;
 
 namespace selections {
     class Expr;
-    typedef std::unique_ptr<Expr> Ast;
+    using Ast = std::unique_ptr<Expr>;
 }
 
 /// A match is a set of atomic indexes matching a given selection. The size of a

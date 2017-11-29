@@ -86,12 +86,12 @@ void AmberNetCDFFormat::read(Frame& frame) {
 UnitCell AmberNetCDFFormat::read_cell() {
     if (!file_.variable_exists("cell_lengths") ||
         !file_.variable_exists("cell_angles")) {
-        return UnitCell(); // No UnitCell information
+        return {}; // No UnitCell information
     }
 
     if (file_.optional_dimension("cell_spatial", 0) != 3 ||
         file_.optional_dimension("cell_angular", 0) != 3) {
-            return UnitCell(); // No UnitCell information
+            return {}; // No UnitCell information
     }
 
     auto length_var = file_.variable<nc::NcFloat>("cell_lengths");
@@ -106,7 +106,7 @@ UnitCell AmberNetCDFFormat::read_cell() {
     assert(length.size() == 3);
     assert(angles.size() == 3);
 
-    return UnitCell(length[0], length[1], length[2], angles[0], angles[1], angles[2]);
+    return {length[0], length[1], length[2], angles[0], angles[1], angles[2]};
 }
 
 void AmberNetCDFFormat::read_array(span<Vector3D> array, const std::string& name) {

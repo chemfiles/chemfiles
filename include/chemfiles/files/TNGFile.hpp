@@ -14,10 +14,11 @@ namespace chemfiles {
 class TNGFile final: public File {
 public:
     TNGFile(std::string filename, File::Mode mode);
-    ~TNGFile() noexcept;
-
+    ~TNGFile() noexcept override;
     TNGFile(TNGFile&&) = default;
-    TNGFile& operator=(TNGFile&&) = default;
+    TNGFile& operator=(TNGFile&&) = delete;
+    TNGFile(TNGFile const&) = delete;
+    TNGFile& operator=(TNGFile const&) = delete;
 
     operator tng_trajectory_t() {return handle_;}
 
@@ -28,7 +29,7 @@ private:
 
 /// Check a return code from a TNG function, and throw a `FileError` if the
 /// status is not TNG_SUCCESS.
-void check_tng_error(tng_function_status status, std::string function);
+void check_tng_error(tng_function_status status, const std::string& function);
 
 } // namespace chemfiles
 

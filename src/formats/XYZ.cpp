@@ -25,7 +25,9 @@ template<> FormatInfo chemfiles::format_information<XYZFormat>() {
 /// not contain one more step.
 static bool forward(TextFile& file);
 
-XYZFormat::XYZFormat(const std::string& path, File::Mode mode): file_(TextFile::create(path, mode)), steps_positions_() {
+XYZFormat::XYZFormat(const std::string& path, File::Mode mode)
+    : file_(TextFile::create(path, mode))
+{
     while (!file_->eof()) {
         auto position = file_->tellg();
         if (!file_ || position == std::streampos(-1)) {
@@ -67,14 +69,12 @@ void XYZFormat::read(Frame& frame) {
     frame.reserve(natoms);
     frame.resize(0);
 
-    for (size_t i = 0; i < lines.size(); i++) {
-        std::istringstream string_stream;
+    for (const auto& line: lines) {
         double x = 0, y = 0, z = 0;
         std::string name;
+        std::istringstream string_stream(line);
 
-        string_stream.str(lines[i]);
         string_stream >> name >> x >> y >> z;
-
         frame.add_atom(Atom(name), Vector3D(x, y, z));
     }
 }

@@ -38,24 +38,24 @@ extern "C" chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame, uin
     )
 }
 
-extern "C" chfl_status chfl_frame_positions(CHFL_FRAME* const frame, chfl_vector3d** data, uint64_t* size) {
+extern "C" chfl_status chfl_frame_positions(CHFL_FRAME* const frame, chfl_vector3d** positions, uint64_t* size) {
     CHECK_POINTER(frame);
-    CHECK_POINTER(data);
+    CHECK_POINTER(positions);
     CHECK_POINTER(size);
     static_assert(
         sizeof(chfl_vector3d) == sizeof(Vector3D),
         "Wrong size for chfl_vector3d. It should match Vector3D."
     );
     CHFL_ERROR_CATCH(
-        auto positions = frame->positions();
-        *size = positions.size();
-        *data = reinterpret_cast<chfl_vector3d*>(positions.data());
+        auto cpp_positions = frame->positions();
+        *size = cpp_positions.size();
+        *positions = reinterpret_cast<chfl_vector3d*>(cpp_positions.data());
     )
 }
 
-extern "C" chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vector3d** data, uint64_t* size) {
+extern "C" chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vector3d** velocities, uint64_t* size) {
     CHECK_POINTER(frame);
-    CHECK_POINTER(data);
+    CHECK_POINTER(velocities);
     CHECK_POINTER(size);
     static_assert(
         sizeof(chfl_vector3d) == sizeof(Vector3D),
@@ -66,15 +66,18 @@ extern "C" chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vecto
         return CHFL_MEMORY_ERROR;
     }
     CHFL_ERROR_CATCH(
-        auto velocities = frame->velocities();
-        *size = velocities->size();
-        *data = reinterpret_cast<chfl_vector3d*>(velocities->data());
+        auto cpp_velocities = frame->velocities();
+        *size = cpp_velocities->size();
+        *velocities = reinterpret_cast<chfl_vector3d*>(cpp_velocities->data());
     )
 }
 
 extern "C" chfl_status chfl_frame_add_atom(
-    CHFL_FRAME* const frame, const CHFL_ATOM* const atom,
-    const chfl_vector3d position, const chfl_vector3d velocity) {
+	CHFL_FRAME* const frame, 
+	const CHFL_ATOM* const atom, 
+	const chfl_vector3d position, 
+	const chfl_vector3d velocity
+) {
     CHECK_POINTER(frame);
     CHECK_POINTER(atom);
     CHECK_POINTER(position);
@@ -94,10 +97,10 @@ extern "C" chfl_status chfl_frame_remove(CHFL_FRAME* const frame, uint64_t i) {
     )
 }
 
-extern "C" chfl_status chfl_frame_resize(CHFL_FRAME* const frame, uint64_t natoms) {
+extern "C" chfl_status chfl_frame_resize(CHFL_FRAME* const frame, uint64_t size) {
     CHECK_POINTER(frame);
     CHFL_ERROR_CATCH(
-        frame->resize(checked_cast(natoms));
+        frame->resize(checked_cast(size));
     )
 }
 

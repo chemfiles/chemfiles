@@ -27,16 +27,16 @@ CHFL_EXPORT CHFL_FRAME* chfl_frame(void);
 /// @example{tests/capi/doc/chfl_frame/copy.c}
 /// @return A pointer to the new frame, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
-CHFL_EXPORT CHFL_FRAME* chfl_frame_copy(const CHFL_FRAME* const frame);
+CHFL_EXPORT CHFL_FRAME* chfl_frame_copy(const CHFL_FRAME* frame);
 
 /// Get the current number of atoms in a `frame` in the integer pointed to by
-/// `n`
+/// `size`
 ///
 /// @example{tests/capi/doc/chfl_frame/atoms_count.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_atoms_count(
-    const CHFL_FRAME* const frame, uint64_t* n
+    const CHFL_FRAME* frame, uint64_t* size
 );
 
 /// Get a pointer to the positions array from a `frame`.
@@ -55,7 +55,7 @@ CHFL_EXPORT chfl_status chfl_frame_atoms_count(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_positions(
-    CHFL_FRAME* const frame, chfl_vector3d** positions, uint64_t* size
+    CHFL_FRAME* frame, chfl_vector3d** positions, uint64_t* size
 );
 
 /// Get a pointer to the velocities array from a `frame`.
@@ -78,7 +78,7 @@ CHFL_EXPORT chfl_status chfl_frame_positions(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_velocities(
-    CHFL_FRAME* const frame, chfl_vector3d** velocities, uint64_t* size
+    CHFL_FRAME* frame, chfl_vector3d** velocities, uint64_t* size
 );
 
 /// Add an `atom` and the corresponding `position` and `velocity` data to a
@@ -90,7 +90,7 @@ CHFL_EXPORT chfl_status chfl_frame_velocities(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_add_atom(
-    CHFL_FRAME* const frame, const CHFL_ATOM* const atom,
+    CHFL_FRAME* frame, const CHFL_ATOM* atom,
     const chfl_vector3d position, const chfl_vector3d velocity
 );
 
@@ -102,7 +102,7 @@ CHFL_EXPORT chfl_status chfl_frame_add_atom(
 /// @example{tests/capi/doc/chfl_frame/remove.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_frame_remove(CHFL_FRAME* const frame, uint64_t i);
+CHFL_EXPORT chfl_status chfl_frame_remove(CHFL_FRAME* frame, uint64_t i);
 
 /// Resize the positions, velocities  and topology in the `frame`, to have space
 /// for `size` atoms.
@@ -115,7 +115,7 @@ CHFL_EXPORT chfl_status chfl_frame_remove(CHFL_FRAME* const frame, uint64_t i);
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_resize(
-    CHFL_FRAME* const frame, uint64_t size
+    CHFL_FRAME* frame, uint64_t size
 );
 
 /// Add velocity data to this `frame`.
@@ -126,7 +126,7 @@ CHFL_EXPORT chfl_status chfl_frame_resize(
 /// @example{tests/capi/doc/chfl_frame/add_velocities.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_frame_add_velocities(CHFL_FRAME* const frame);
+CHFL_EXPORT chfl_status chfl_frame_add_velocities(CHFL_FRAME* frame);
 
 /// Check if this `frame` contains velocity data, and store the result in
 /// `has_velocities`
@@ -135,7 +135,7 @@ CHFL_EXPORT chfl_status chfl_frame_add_velocities(CHFL_FRAME* const frame);
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_has_velocities(
-    const CHFL_FRAME* const frame, bool* has_velocities
+    const CHFL_FRAME* frame, bool* has_velocities
 );
 
 /// Set the unit cell of a `frame` to `cell`.
@@ -144,7 +144,7 @@ CHFL_EXPORT chfl_status chfl_frame_has_velocities(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_set_cell(
-    CHFL_FRAME* const frame, const CHFL_CELL* const cell
+    CHFL_FRAME* frame, const CHFL_CELL* cell
 );
 
 /// Set the topology of a `frame` to `topology`.
@@ -156,7 +156,7 @@ CHFL_EXPORT chfl_status chfl_frame_set_cell(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_set_topology(
-    CHFL_FRAME* const frame, const CHFL_TOPOLOGY* const topology
+    CHFL_FRAME* frame, const CHFL_TOPOLOGY* topology
 );
 
 /// Get a `frame` step, *i.e.* the frame number in the trajectory in the integer
@@ -166,7 +166,7 @@ CHFL_EXPORT chfl_status chfl_frame_set_topology(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_step(
-    const CHFL_FRAME* const frame, uint64_t* step
+    const CHFL_FRAME* frame, uint64_t* step
 );
 
 /// Set a `frame` step, *i.e.* the frame number in the trajectory to `step`.
@@ -175,7 +175,7 @@ CHFL_EXPORT chfl_status chfl_frame_step(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_set_step(
-    CHFL_FRAME* const frame, uint64_t step
+    CHFL_FRAME* frame, uint64_t step
 );
 
 /// Guess the bonds, angles and dihedrals in a `frame`.
@@ -186,7 +186,7 @@ CHFL_EXPORT chfl_status chfl_frame_set_step(
 /// @example{tests/capi/doc/chfl_frame/guess_topology.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_frame_guess_topology(CHFL_FRAME* const frame);
+CHFL_EXPORT chfl_status chfl_frame_guess_topology(CHFL_FRAME* frame);
 
 /// Get the distance between the atoms at indexes `i` and `j` in the `frame`,
 /// accounting for periodic boundary conditions. The result is placed in
@@ -196,7 +196,7 @@ CHFL_EXPORT chfl_status chfl_frame_guess_topology(CHFL_FRAME* const frame);
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_distance(
-    const CHFL_FRAME* const frame, uint64_t i, uint64_t j, double* distance
+    const CHFL_FRAME* frame, uint64_t i, uint64_t j, double* distance
 );
 
 /// Get the angle formed by the atoms at indexes `i`, `j` and `k` in the
@@ -207,7 +207,7 @@ CHFL_EXPORT chfl_status chfl_frame_distance(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_angle(
-    const CHFL_FRAME* const frame, uint64_t i, uint64_t j, uint64_t k, double* angle
+    const CHFL_FRAME* frame, uint64_t i, uint64_t j, uint64_t k, double* angle
 );
 
 /// Get the angle formed by the atoms at indexes `i`, `j`, `k` and `m` in the
@@ -218,7 +218,7 @@ CHFL_EXPORT chfl_status chfl_frame_angle(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_dihedral(
-    const CHFL_FRAME* const frame, uint64_t i, uint64_t j, uint64_t k, uint64_t m, double* dihedral
+    const CHFL_FRAME* frame, uint64_t i, uint64_t j, uint64_t k, uint64_t m, double* dihedral
 );
 
 /// Get the out of plane distance formed by the atoms at indexes `i`, `j`, `k`
@@ -232,7 +232,7 @@ CHFL_EXPORT chfl_status chfl_frame_dihedral(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_out_of_plane(
-    const CHFL_FRAME* const frame, uint64_t i, uint64_t j, uint64_t k, uint64_t m, double* distance
+    const CHFL_FRAME* frame, uint64_t i, uint64_t j, uint64_t k, uint64_t m, double* distance
 );
 
 /// Add a new `property` with the given `name` to this `frame`.
@@ -244,7 +244,7 @@ CHFL_EXPORT chfl_status chfl_frame_out_of_plane(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_set_property(
-    CHFL_FRAME* const frame, const char* name, const CHFL_PROPERTY* const property
+    CHFL_FRAME* frame, const char* name, const CHFL_PROPERTY* property
 );
 
 /// Get a property with the given `name` in this `frame`.
@@ -258,14 +258,14 @@ CHFL_EXPORT chfl_status chfl_frame_set_property(
 /// @return A pointer to the property, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_PROPERTY* chfl_frame_get_property(
-    const CHFL_FRAME* const frame, const char* name
+    const CHFL_FRAME* frame, const char* name
 );
 
 /// Free the memory associated with a `frame`.
 ///
 /// @example{tests/capi/doc/chfl_frame/chfl_frame.c}
 /// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_frame_free(CHFL_FRAME* const frame);
+CHFL_EXPORT chfl_status chfl_frame_free(CHFL_FRAME* frame);
 
 #ifdef __cplusplus
 }

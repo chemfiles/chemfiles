@@ -44,7 +44,7 @@ CHFL_EXPORT CHFL_RESIDUE* chfl_residue_with_id(const char* name, uint64_t resid)
 /// @return A pointer to the residue, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_RESIDUE* chfl_residue_from_topology(
-    const CHFL_TOPOLOGY* const topology, uint64_t i
+    const CHFL_TOPOLOGY* topology, uint64_t i
 );
 
 /// Get a copy of the residue containing the atom at index `i` in the
@@ -60,7 +60,7 @@ CHFL_EXPORT CHFL_RESIDUE* chfl_residue_from_topology(
 /// @return A pointer to the residue, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_RESIDUE* chfl_residue_for_atom(
-    const CHFL_TOPOLOGY* const topology, uint64_t i
+    const CHFL_TOPOLOGY* topology, uint64_t i
 );
 
 /// Get a copy of a `residue`.
@@ -71,7 +71,7 @@ CHFL_EXPORT CHFL_RESIDUE* chfl_residue_for_atom(
 /// @example{tests/capi/doc/chfl_residue/copy.c}
 /// @return A pointer to the new residue, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
-CHFL_EXPORT CHFL_RESIDUE* chfl_residue_copy(const CHFL_RESIDUE* const residue);
+CHFL_EXPORT CHFL_RESIDUE* chfl_residue_copy(const CHFL_RESIDUE* residue);
 
 /// Get the number of atoms in a `residue` in the integer pointed to by `size`.
 ///
@@ -79,13 +79,13 @@ CHFL_EXPORT CHFL_RESIDUE* chfl_residue_copy(const CHFL_RESIDUE* const residue);
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_atoms_count(
-    const CHFL_RESIDUE* const residue, uint64_t* size
+    const CHFL_RESIDUE* residue, uint64_t* size
 );
 
 /// Get the list of atoms in the `residue` in the pre-allocated array `atoms`
-/// of size `n`.
+/// of size `natoms`.
 ///
-/// The `atoms` array size must be passed in the `nbonds` parameter, and be
+/// The `atoms` array size must be passed in the `natoms` parameter, and be
 /// equal to the result of `chfl_residue_atoms_count`. The `atoms` array is
 /// sorted.
 ///
@@ -93,7 +93,7 @@ CHFL_EXPORT chfl_status chfl_residue_atoms_count(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_atoms(
-    const CHFL_RESIDUE* const residue, uint64_t atoms[], uint64_t n
+    const CHFL_RESIDUE* residue, uint64_t atoms[], uint64_t natoms
 );
 
 /// Get the identifier of a `residue` in the initial topology file in the
@@ -106,7 +106,7 @@ CHFL_EXPORT chfl_status chfl_residue_atoms(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_id(
-    const CHFL_RESIDUE* const residue, uint64_t* id
+    const CHFL_RESIDUE* residue, uint64_t* id
 );
 
 /// Get the name of a `residue` in the string buffer `name`.
@@ -118,7 +118,7 @@ CHFL_EXPORT chfl_status chfl_residue_id(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_name(
-    const CHFL_RESIDUE* const residue, char* name, uint64_t buffsize
+    const CHFL_RESIDUE* residue, char* name, uint64_t buffsize
 );
 
 /// Add the atom at index `i` in the `residue`.
@@ -127,7 +127,7 @@ CHFL_EXPORT chfl_status chfl_residue_name(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_add_atom(
-    CHFL_RESIDUE* const residue, uint64_t i
+    CHFL_RESIDUE* residue, uint64_t i
 );
 
 /// Check if the atom at index `i` is in the `residue`, and store the result in
@@ -137,14 +137,14 @@ CHFL_EXPORT chfl_status chfl_residue_add_atom(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_contains(
-    const CHFL_RESIDUE* const residue, uint64_t i, bool* result
+    const CHFL_RESIDUE* residue, uint64_t i, bool* result
 );
 
 /// Free the memory associated with a `residue`.
 ///
 /// @example{tests/capi/doc/chfl_residue/chfl_residue.c}
 /// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_residue_free(CHFL_RESIDUE* const residue);
+CHFL_EXPORT chfl_status chfl_residue_free(CHFL_RESIDUE* residue);
 
 #ifdef __cplusplus
 }

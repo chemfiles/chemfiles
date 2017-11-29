@@ -27,9 +27,7 @@ CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology(void);
 /// @example{tests/capi/doc/chfl_topology/from_frame.c}
 /// @return A pointer to the topology, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
-CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_from_frame(
-    const CHFL_FRAME* const frame
-);
+CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* frame);
 
 /// Get a copy of a `topology`.
 ///
@@ -39,7 +37,7 @@ CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_from_frame(
 /// @example{tests/capi/doc/chfl_topology/copy.c}
 /// @return A pointer to the new topology, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
-CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_copy(const CHFL_TOPOLOGY* const topology);
+CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_copy(const CHFL_TOPOLOGY* topology);
 
 /// Get the number of atoms in the `topology` in the integer pointed to by
 /// `size`.
@@ -48,10 +46,10 @@ CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_copy(const CHFL_TOPOLOGY* const topolog
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_atoms_count(
-    const CHFL_TOPOLOGY* const topology, uint64_t* size
+    const CHFL_TOPOLOGY* topology, uint64_t* size
 );
 
-/// Resize the `topology` to hold `n` atoms. If the new number of atoms is
+/// Resize the `topology` to hold `natoms` atoms. If the new number of atoms is
 /// bigger than the current number, new atoms will be created with an empty name
 /// and type. If it is lower than the current number of atoms, the last atoms
 /// will be removed, together with the associated bonds, angles and dihedrals.
@@ -59,7 +57,7 @@ CHFL_EXPORT chfl_status chfl_topology_atoms_count(
 /// @example{tests/capi/doc/chfl_topology/resize.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_topology_resize(CHFL_TOPOLOGY* const topology, uint64_t n);
+CHFL_EXPORT chfl_status chfl_topology_resize(CHFL_TOPOLOGY* topology, uint64_t natoms);
 
 /// Add a copy of an `atom` at the end of a `topology`.
 ///
@@ -67,7 +65,7 @@ CHFL_EXPORT chfl_status chfl_topology_resize(CHFL_TOPOLOGY* const topology, uint
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_add_atom(
-    CHFL_TOPOLOGY* const topology, const CHFL_ATOM* const atom
+    CHFL_TOPOLOGY* topology, const CHFL_ATOM* atom
 );
 
 /// Remove the atom at index `i` from a `topology`.
@@ -78,7 +76,7 @@ CHFL_EXPORT chfl_status chfl_topology_add_atom(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_remove(
-    CHFL_TOPOLOGY* const topology, uint64_t i
+    CHFL_TOPOLOGY* topology, uint64_t i
 );
 
 /// Get the number of bonds in the `topology` in `nbonds`.
@@ -87,7 +85,7 @@ CHFL_EXPORT chfl_status chfl_topology_remove(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_bonds_count(
-    const CHFL_TOPOLOGY* const topology, uint64_t* nbonds
+    const CHFL_TOPOLOGY* topology, uint64_t* nbonds
 );
 
 /// Get the number of angles in the `topology` in `nangles`.
@@ -96,7 +94,7 @@ CHFL_EXPORT chfl_status chfl_topology_bonds_count(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_angles_count(
-    const CHFL_TOPOLOGY* const topology, uint64_t* nangles
+    const CHFL_TOPOLOGY* topology, uint64_t* nangles
 );
 
 /// Get the number of dihedral angles in the `topology` in `ndihedrals`.
@@ -105,7 +103,7 @@ CHFL_EXPORT chfl_status chfl_topology_angles_count(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_dihedrals_count(
-    const CHFL_TOPOLOGY* const topology, uint64_t* ndihedrals
+    const CHFL_TOPOLOGY* topology, uint64_t* ndihedrals
 );
 
 /// Get the number of improper dihedral angles in the `topology` in `nimpropers`.
@@ -114,7 +112,7 @@ CHFL_EXPORT chfl_status chfl_topology_dihedrals_count(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_impropers_count(
-    const CHFL_TOPOLOGY* const topology, uint64_t* nimpropers
+    const CHFL_TOPOLOGY* topology, uint64_t* nimpropers
 );
 
 /// Get the list of bonds in the `topology` in the pre-allocated array `data`
@@ -127,7 +125,7 @@ CHFL_EXPORT chfl_status chfl_topology_impropers_count(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_bonds(
-    const CHFL_TOPOLOGY* const topology, uint64_t (*data)[2], uint64_t nbonds
+    const CHFL_TOPOLOGY* topology, uint64_t (*data)[2], uint64_t nbonds
 );
 
 /// Get the list of angles in the `topology` in the pre-allocated array `data`
@@ -140,7 +138,7 @@ CHFL_EXPORT chfl_status chfl_topology_bonds(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_angles(
-    const CHFL_TOPOLOGY* const topology, uint64_t (*data)[3], uint64_t nangles
+    const CHFL_TOPOLOGY* topology, uint64_t (*data)[3], uint64_t nangles
 );
 
 /// Get the list of dihedral angles in the `topology` in the pre-allocated array
@@ -154,7 +152,7 @@ CHFL_EXPORT chfl_status chfl_topology_angles(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_dihedrals(
-    const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t ndihedrals
+    const CHFL_TOPOLOGY* topology, uint64_t (*data)[4], uint64_t ndihedrals
 );
 
 /// Get the list of improper dihedral angles in the `topology` in the
@@ -168,7 +166,7 @@ CHFL_EXPORT chfl_status chfl_topology_dihedrals(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_impropers(
-    const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t nimpropers
+    const CHFL_TOPOLOGY* topology, uint64_t (*data)[4], uint64_t nimpropers
 );
 
 /// Add a bond between the atoms at indexes `i` and `j` in the `topology`.
@@ -177,7 +175,7 @@ CHFL_EXPORT chfl_status chfl_topology_impropers(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_add_bond(
-    CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j
+    CHFL_TOPOLOGY* topology, uint64_t i, uint64_t j
 );
 
 /// Remove any existing bond between the atoms at indexes `i` and `j` in the
@@ -189,17 +187,17 @@ CHFL_EXPORT chfl_status chfl_topology_add_bond(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_remove_bond(
-    CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j
+    CHFL_TOPOLOGY* topology, uint64_t i, uint64_t j
 );
 
 /// Get the number of residues in the `topology` in the integer pointed to by
-/// `nresidues`.
+/// `residues`.
 ///
 /// @example{tests/capi/doc/chfl_topology/residues_count.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_residues_count(
-    const CHFL_TOPOLOGY* const topology, uint64_t* nresidues
+    const CHFL_TOPOLOGY* topology, uint64_t* residues
 );
 
 /// Add a copy of `residue` to this `topology`.
@@ -211,7 +209,7 @@ CHFL_EXPORT chfl_status chfl_topology_residues_count(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_add_residue(
-    CHFL_TOPOLOGY* const topology, const CHFL_RESIDUE* const residue
+    CHFL_TOPOLOGY* topology, const CHFL_RESIDUE* residue
 );
 
 /// Check if the two residues `first` and `second` from the `topology` are
@@ -222,9 +220,9 @@ CHFL_EXPORT chfl_status chfl_topology_add_residue(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_residues_linked(
-    const CHFL_TOPOLOGY* const topology,
-    const CHFL_RESIDUE* const first,
-    const CHFL_RESIDUE* const second,
+    const CHFL_TOPOLOGY* topology,
+    const CHFL_RESIDUE* first,
+    const CHFL_RESIDUE* second,
     bool* result
 );
 
@@ -232,7 +230,7 @@ CHFL_EXPORT chfl_status chfl_topology_residues_linked(
 ///
 /// @example{tests/capi/doc/chfl_topology/chfl_topology.c}
 /// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_topology_free(CHFL_TOPOLOGY* const topology);
+CHFL_EXPORT chfl_status chfl_topology_free(CHFL_TOPOLOGY* topology);
 
 #ifdef __cplusplus
 }

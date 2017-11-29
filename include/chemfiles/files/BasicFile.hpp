@@ -17,7 +17,6 @@ public:
     /// An `FileError` exception is thrown if the file does not exists in
     /// `'r'` or `'a'` mode.
     BasicFile(const std::string& filename, File::Mode mode);
-    ~BasicFile() noexcept {}
 
     std::string readline() override;
     std::vector<std::string> readlines(size_t n) override;
