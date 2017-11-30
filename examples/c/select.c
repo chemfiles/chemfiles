@@ -1,54 +1,52 @@
-/* File select.c, example for the chemfiles library
+/* This file is an example for the chemfiles library
  * Any copyright is dedicated to the Public Domain.
  * http://creativecommons.org/publicdomain/zero/1.0/ */
-#include <stdio.h>
+#include <chemfiles.h>
 #include <stdlib.h>
-#include <inttypes.h>
 
-#include "chemfiles.h"
+static int compare_matches(const void* lhs, const void* rhs);
 
-int main(void) {
-    CHFL_TRAJECTORY* file = chfl_trajectory_open("filename.xyz", 'r');
+int main() {
+    CHFL_TRAJECTORY* input = chfl_trajectory_open("input.arc", 'r');
+    CHFL_TRAJECTORY* output = chfl_trajectory_open("output.pdb", 'w');
     CHFL_FRAME* frame = chfl_frame();
-    if(!chfl_trajectory_read(file, frame)) {/*Handle error*/}
+    CHFL_SELECTION* selection = chfl_selection("name Zn or name N");
 
-    // Create a selection for all atoms with "Zn" name
-    CHFL_SELECTION* selection = chfl_selection("name Zn");
-    uint64_t matching = 0;
+    uint64_t nsteps = 0;
+    chfl_trajectory_nsteps(input, &nsteps);
 
-    // Get the number of matching atoms from the frame
-    chfl_selection_evaluate(selection, frame, &matching);
-    printf("We have %d zinc in the frame\n", matching);
-    chfl_match* matches = malloc((size_t)matching * sizeof(chfl_match));
+    for (size_t step=0; step<nsteps; step++) {
+        chfl_trajectory_read(input, frame);
 
-    // Get the matching atoms
-    chfl_selection_matches(selection, matches, matching);
-    for (uint64_t i=0; i<matching; i++) {
-        printf("%d is a zinc\n", matches[i].atoms[0]);
+        uint64_t n_matches = 0;
+        chfl_selection_evaluate(selection, frame, &n_matches);
+        chfl_match* matches = malloc((size_t)n_matches * sizeof(chfl_match));
+        chfl_selection_matches(selection, matches, n_matches);
+
+        uint64_t* to_remove = malloc((size_t)n_matches * sizeof(uint64_t));
+        for (size_t i = 0; i<n_matches; i++) {
+            to_remove[i] = matches[i].atoms[0];
+        }
+
+        qsort(to_remove, (size_t)n_matches, sizeof(uint64_t), compare_matches);
+        for (size_t i = 0; i<n_matches; i++) {
+            chfl_frame_remove(frame, to_remove[i]);
+        }
+
+        chfl_trajectory_write(output, frame);
+
+        free(to_remove);
+        free(matches);
     }
 
-    chfl_selection_free(selection);
-    free(matches);
+    return 0;
+}
 
-    // Create a selection for multiple atoms
-    selection = chfl_selection("angles: name($1) H and name($2) O and name($3) H");
-    chfl_selection_evaluate(selection, frame, &matching);
-    printf("We have %d water in the frame\n", matching);
-    matches = malloc((size_t)matching * sizeof(chfl_match));
+int compare_matches(const void* lhs, const void* rhs) {
+    size_t left = *(const size_t*)lhs;
+    size_t right = *(const size_t*)rhs;
 
-    // Get the matching atoms
-    chfl_selection_matches(selection, matches, matching);
-    for (uint64_t i=0; i<matching; i++) {
-        printf(
-            "%d - %d - %d is a water\n",
-            matches[i].atoms[0], matches[i].atoms[1], matches[i].atoms[2]
-        );
-    }
-
-    free(matches);
-    chfl_selection_free(selection);
-    chfl_frame_free(frame);
-    chfl_trajectory_close(file);
-
+    if (left > right) return -1;
+    if (right < left) return 1;
     return 0;
 }
