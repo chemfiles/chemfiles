@@ -8,6 +8,7 @@ $env:CMAKE_ARGUMENTS = "-G `"$env:generator`""
 $env:CMAKE_ARGUMENTS += " -DBUILD_SHARED_LIBS=ON"
 $env:CMAKE_ARGUMENTS += " -DCMAKE_BUILD_TYPE=debug"
 $env:CMAKE_ARGUMENTS += " -DCHFL_BUILD_TESTS=ON"
+$env:CMAKE_ARGUMENTS += " -DCHFL_BUILD_DOCTESTS=OFF"
 
 if ($env:generator -Match "Visual Studio") {
     $env:BUILD_ARGUMENTS="/verbosity:minimal /m:2"
