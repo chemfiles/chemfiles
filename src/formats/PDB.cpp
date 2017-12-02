@@ -128,7 +128,7 @@ void PDBFormat::read(Frame& frame) {
     warning("Missing END record in PDB file");
 end:
     for (auto& residue: residues_) {
-        frame.topology().add_residue(residue.second);
+        frame.add_residue(residue.second);
     }
 }
 
@@ -217,7 +217,7 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
             warning("Bad atomic numbers in CONECT record, ignored. ({})", line);
             return;
         }
-        frame.topology().add_bond(i, j);
+        frame.add_bond(i, j);
     };
 
     auto read_index = [&line](size_t initial) -> size_t {

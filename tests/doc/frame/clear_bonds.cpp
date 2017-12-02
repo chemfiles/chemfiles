@@ -10,16 +10,18 @@ using namespace chemfiles;
 TEST_CASE() {
     // [example]
     auto frame = Frame();
-    frame.add_atom(Atom("H"), {1.2, 0.0, 0.0});
+    frame.add_atom(Atom("H"), {1.0, 0.0, 0.0});
     frame.add_atom(Atom("O"), {0.0, 0.0, 0.0});
-    frame.add_atom(Atom("H"), {0.0, 1.2, 0.0});
+    frame.add_atom(Atom("H"), {0.0, 1.0, 0.0});
 
     frame.add_bond(0, 1);
-    frame.add_bond(0, 2);
+    frame.add_bond(1, 2);
 
-    auto selection = Selection("pairs: name(#1) H and name(#2) O");
-    std::vector<Match> matches = selection.evaluate(frame);
-    assert(matches.size() == 2);
-    assert(matches == std::vector<Match>({{0u, 1u}, {2u, 1u}}));
+    assert(frame.topology().bonds().size() == 2);
+    assert(frame.topology().angles().size() == 1);
+
+    frame.clear_bonds();
+    assert(frame.topology().bonds().size() == 0);
+    assert(frame.topology().angles().size() == 0);
     // [example]
 }

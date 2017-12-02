@@ -33,6 +33,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * The `UnitCell::shape` setter is renamed to `UnitCell::set_shape`.
 * The `Trajectory::close` function can be used to close a trajectory and
   synchronize any buffered content with the storage.
+* Some of the topology functions are now accsible directly on the frame:
+  `Frame::add_bond`, `Frame::remove_bond`, `Frame::clear_bonds`,
+  `Frame::add_residue` and `operator[]`. The non const version of
+  `Frame::topology` is removed.
 
 ### Changes in supported formats
 

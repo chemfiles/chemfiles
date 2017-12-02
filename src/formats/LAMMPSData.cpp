@@ -401,7 +401,6 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
 
     frame.resize(natoms_);
     auto positions = frame.positions();
-    auto& topology = frame.topology();
     auto residues = std::vector<Residue>();
 
     size_t n = 0;
@@ -440,7 +439,7 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
             residues[data.molid].add_atom(data.index);
         }
 
-        topology[data.index] = atom;
+        frame[data.index] = atom;
         positions[data.index][0] = data.x;
         positions[data.index][1] = data.y;
         positions[data.index][2] = data.z;
@@ -448,7 +447,7 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
     }
 
     for (auto residue: residues) {
-        topology.add_residue(std::move(residue));
+        frame.add_residue(std::move(residue));
     }
 
     get_next_section();
@@ -485,7 +484,6 @@ void LAMMPSDataFormat::read_bonds(Frame& frame) {
         throw format_error("missing bonds count in header");
     }
     size_t n = 0;
-    auto& topology = frame.topology();
     while (n < nbonds_ && !file_->eof()) {
         auto line = file_->readline();
         split_comment(line);
@@ -498,7 +496,7 @@ void LAMMPSDataFormat::read_bonds(Frame& frame) {
         // LAMMPS use 1-based indexing
         auto i = checked_cast(string2longlong(splitted[2]) - 1);
         auto j = checked_cast(string2longlong(splitted[3]) - 1);
-        topology.add_bond(i, j);
+        frame.add_bond(i, j);
         n++;
     }
 
@@ -545,7 +543,7 @@ void LAMMPSDataFormat::read_velocities(Frame& frame) {
 
 void LAMMPSDataFormat::setup_masses(Frame& frame) const {
     if (masses_.empty()) {return;}
-    for (auto& atom: frame.topology()) {
+    for (auto& atom: frame) {
         auto it = masses_.find(atom.type());
         if (it != masses_.end()) {
             atom.set_mass(it->second);
@@ -557,13 +555,10 @@ void LAMMPSDataFormat::setup_names(Frame& frame) const {
     if (names_.empty()) {return;}
     assert(names_.size() == frame.size());
 
-    auto& topology = frame.topology();
     for (size_t i=0; i<frame.size(); i++) {
         if (names_[i] != "") {
-
-
-            topology[i].set_name(names_[i]);
-            topology[i].set_type(names_[i]);
+            frame[i].set_name(names_[i]);
+            frame[i].set_type(names_[i]);
         }
     }
 }

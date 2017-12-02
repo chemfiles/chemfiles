@@ -119,7 +119,7 @@ void TinkerFormat::read(Frame& frame) {
 
     for (size_t i = 0; i < natoms; i++) {
         for (size_t j: bonds[i]) {
-            frame.topology().add_bond(i, j);
+            frame.add_bond(i, j);
         }
     }
 }

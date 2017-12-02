@@ -314,7 +314,7 @@ TEST_CASE("PDB files with big values") {
         for(size_t i=0; i<110000; i++) {
             frame.add_atom(Atom("A"), {0.0, 0.0, 0.0});
         }
-        frame.topology().add_bond(101000, 101008);
+        frame.add_bond(101000, 101008);
         Trajectory(tmpfile, 'w').write(frame);
 
         // Re-read the file we just wrote

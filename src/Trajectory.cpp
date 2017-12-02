@@ -81,7 +81,7 @@ void Trajectory::post_read(Frame& frame) {
     if (custom_topology_) {
         frame.set_topology(*custom_topology_);
     } else {
-        for (Atom& atom: frame.topology()) {
+        for (auto& atom: frame) {
             atom.set_type(Configuration::rename(atom.type()));
         }
     }
