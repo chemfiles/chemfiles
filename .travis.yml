@@ -50,8 +50,10 @@ matrix:
       addons: *linux32
     - os: osx
       compiler: clang
+      osx_image: xcode7.3
     - os: osx
       compiler: gcc
+      osx_image: xcode7.3
   allow_failures:
     - os: linux
       compiler: gcc
