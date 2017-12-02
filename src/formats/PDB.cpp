@@ -372,7 +372,7 @@ void PDBFormat::write(const Frame& frame) {
 
         std::string resname;
         std::string resid;
-        auto residue = frame.topology().residue(i);
+        auto residue = frame.topology().residue_for_atom(i);
         if (residue) {
             resname = residue->name();
             if (resname.length() > 3) {

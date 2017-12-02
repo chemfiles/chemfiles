@@ -94,8 +94,8 @@ TEST_CASE("Read files in PDB format") {
 
         CHECK(frame.topology().residues().size() == 99);
 
-        REQUIRE(frame.topology().residue(1));
-        auto residue = (*frame.topology().residue(1));
+        REQUIRE(frame.topology().residue_for_atom(1));
+        auto residue = *frame.topology().residue_for_atom(1);
         CHECK(residue.size() == 3);
         CHECK(residue.contains(0));
         CHECK(residue.contains(1));

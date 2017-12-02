@@ -17,6 +17,10 @@ TEST_CASE() {
     first.add_atom(0);
     topology.add_residue(first);
 
-    assert(topology.residue(0).name() == "first");
+    assert(topology.residue_for_atom(0));
+    assert(topology.residue_for_atom(0)->name() == "first");
+
+    assert(!topology.residue_for_atom(1));
+    assert(topology.residue_for_atom(1) == nullopt);
     // [example]
 }

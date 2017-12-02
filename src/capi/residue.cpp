@@ -39,14 +39,7 @@ extern "C" CHFL_RESIDUE* chfl_residue_from_topology(const CHFL_TOPOLOGY* const t
     CHFL_RESIDUE* residue = nullptr;
     CHECK_POINTER_GOTO(topology);
     CHFL_ERROR_GOTO(
-        // Return NULL if the index is out of bounds
-        if (i >= topology->residues().size()) {
-            throw out_of_bounds(
-                "out of bounds residue index in `chfl_residue_from_topology`: we have {} residues, but the index is {}",
-                topology->residues().size(), i
-            );
-        }
-        residue = new Residue(topology->residues()[checked_cast(i)]);
+        residue = new Residue(topology->residue(checked_cast(i)));
     )
     return residue;
 error:
@@ -58,7 +51,7 @@ extern "C" CHFL_RESIDUE* chfl_residue_for_atom(const CHFL_TOPOLOGY* const topolo
     CHFL_RESIDUE* residue = nullptr;
     CHECK_POINTER_GOTO(topology);
     CHFL_ERROR_GOTO(
-        auto res = topology->residue(checked_cast(i));
+        auto res = topology->residue_for_atom(checked_cast(i));
         if (res) {
             residue = new Residue(*res);
         }

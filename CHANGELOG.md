@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * `Topology::append` is now called `Topology::add_atom`
 * `Topology::natoms` and `Frame::natoms` are now called `Topology::size` and
   `Frame::size`
+* `Topology::residue` is now called `Topology::residue_for_atom`
 * Added `Frame::distance`, `Frame::angle`, `Frame::dihedral` and
   `Frame::out_of_plane` to get geometric information on the system, accounting
   for periodic boundary conditions.

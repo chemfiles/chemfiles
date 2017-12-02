@@ -163,7 +163,7 @@ std::string ResnameExpr::print(unsigned /*unused*/) const {
 
 bool ResnameExpr::is_match(const Frame& frame, const Match& match) const {
     auto index = match[argument_];
-    auto residue = frame.topology().residue(index);
+    auto residue = frame.topology().residue_for_atom(index);
     if (residue) {
         return (residue->name() == name_) == equals_;
     } else {
@@ -204,7 +204,7 @@ std::string ResidExpr::print(unsigned /*unused*/) const {
 bool ResidExpr::is_match(const Frame& frame, const Match& match) const {
     auto compare = binop_comparison<uint64_t>(op_);
     auto index = match[argument_];
-    auto residue = frame.topology().residue(index);
+    auto residue = frame.topology().residue_for_atom(index);
     if (residue && residue->id()) {
         return compare(residue->id().value(), id_);
     } else {
