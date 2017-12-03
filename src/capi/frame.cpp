@@ -211,7 +211,7 @@ extern "C" CHFL_PROPERTY* chfl_frame_get_property(const CHFL_FRAME* const frame,
         if (atom_property) {
             property = new Property(*atom_property);
         } else {
-            throw property_error("can not find a property named {} in this frame", name);
+            throw property_error("can not find a property named '{}' in this frame", name);
         }
     )
     return property;
