@@ -220,6 +220,28 @@ error:
     return nullptr;
 }
 
+extern "C" chfl_status chfl_frame_add_bond(CHFL_FRAME* const frame, uint64_t i, uint64_t j) {
+    CHECK_POINTER(frame);
+    CHFL_ERROR_CATCH(
+        frame->add_bond(checked_cast(i), checked_cast(j));
+    )
+}
+
+extern "C" chfl_status chfl_frame_remove_bond(CHFL_FRAME* const frame, uint64_t i, uint64_t j) {
+    CHECK_POINTER(frame);
+    CHFL_ERROR_CATCH(
+        frame->remove_bond(checked_cast(i), checked_cast(j));
+    )
+}
+
+extern "C" chfl_status chfl_frame_add_residue(CHFL_FRAME* const frame, const CHFL_RESIDUE* const residue) {
+    CHECK_POINTER(frame);
+    CHECK_POINTER(residue);
+    CHFL_ERROR_CATCH(
+        frame->add_residue(*residue);
+    )
+}
+
 extern "C" chfl_status chfl_frame_free(CHFL_FRAME* const frame) {
     delete frame;
     return CHFL_SUCCESS;

@@ -350,4 +350,74 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_property_free(property));
         CHECK_STATUS(chfl_frame_free(frame));
     }
+
+    SECTION("Bonds") {
+        CHFL_FRAME* frame = chfl_frame();
+        REQUIRE(frame);
+
+        CHECK_STATUS(chfl_frame_resize(frame, 4));
+        CHECK_STATUS(chfl_frame_add_bond(frame, 0, 1));
+        CHECK_STATUS(chfl_frame_add_bond(frame, 0, 2));
+        CHECK_STATUS(chfl_frame_add_bond(frame, 0, 3));
+
+        CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
+        REQUIRE(topology);
+
+        uint64_t n = 0;
+        CHECK_STATUS(chfl_topology_bonds_count(topology, &n));
+        CHECK(n == 3);
+
+        uint64_t expected[3][2] = {{0, 1}, {0, 2}, {0, 3}};
+        uint64_t bonds[3][2] = {{0}};
+        CHECK_STATUS(chfl_topology_bonds(topology, bonds, 3));
+        for (unsigned i=0; i<3; i++) {
+            for (unsigned j=0; j<2; j++) {
+                CHECK(bonds[i][j] == expected[i][j]);
+            }
+        }
+
+        CHECK_STATUS(chfl_frame_remove_bond(frame, 0, 2));
+
+        // We need to get a new copy of the topology
+        CHECK_STATUS(chfl_topology_free(topology));
+        topology = chfl_topology_from_frame(frame);
+        REQUIRE(topology);
+
+        n = 0;
+        CHECK_STATUS(chfl_topology_bonds_count(topology, &n));
+        CHECK(n == 2);
+
+        uint64_t expected_2[3][2] = {{0, 1}, {0, 3}};
+        CHECK_STATUS(chfl_topology_bonds(topology, bonds, 2));
+        for (unsigned i=0; i<2; i++) {
+            for (unsigned j=0; j<2; j++) {
+                CHECK(bonds[i][j] == expected_2[i][j]);
+            }
+        }
+
+        CHECK_STATUS(chfl_topology_free(topology));
+        CHECK_STATUS(chfl_frame_free(frame));
+    }
+
+    SECTION("Residues") {
+        CHFL_FRAME* frame = chfl_frame();
+        REQUIRE(frame);
+
+        for (uint64_t i=0; i<3; i++) {
+            CHFL_RESIDUE* residue = chfl_residue("X");
+            REQUIRE(residue);
+            CHECK_STATUS(chfl_frame_add_residue(frame, residue));
+            CHECK_STATUS(chfl_residue_free(residue));
+        }
+
+        CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
+        REQUIRE(topology);
+
+        uint64_t count = 0;
+        CHECK_STATUS(chfl_topology_residues_count(topology, &count));
+        CHECK(count == 3);
+
+        CHECK_STATUS(chfl_topology_free(topology));
+        CHECK_STATUS(chfl_frame_free(frame));
+    }
 }

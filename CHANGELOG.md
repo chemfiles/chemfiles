@@ -70,6 +70,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added `CHFL_PROPERTY` and related functions.
 * `chfl_add_configuration` and `chfl_set_warning_callback` are now thread safe,
   and will block upon concurrent usage.
+* Added `chfl_frame_add_bond`, `chfl_frame_remove_bond`, and
+  `chfl_frame_add_residue`.
 
 ### Deprecation and removals
 

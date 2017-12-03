@@ -29,6 +29,12 @@ Function manipulating ``CHFL_FRAME``
 
 .. doxygenfunction:: chfl_frame_set_topology
 
+.. doxygenfunction:: chfl_frame_add_bond
+
+.. doxygenfunction:: chfl_frame_remove_bond
+
+.. doxygenfunction:: chfl_frame_add_residue
+
 .. doxygenfunction:: chfl_frame_step
 
 .. doxygenfunction:: chfl_frame_set_step
