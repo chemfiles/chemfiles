@@ -77,6 +77,10 @@ if(${CMAKE_CXX_COMPILER_ID} MATCHES "PGI")
     # Remove IPA optimization, as it fails with 'unknown variable reference: &2&2821'
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Mnoipa")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Mnoipa")
+    # When passed --c++11, pgc++ insist on defining __THROW on the command line
+    # and then fail because it is also defined in a source file. This does not
+    # happen with -std=c++11.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -U__THROW")
 endif()
 
 macro(add_warning_flag _flag_)
@@ -179,11 +183,16 @@ else()
     add_warning_flag("-Minform=warn")
 
     if(${CMAKE_C_COMPILER} MATCHES "icc.*$")
+        # external function definition with no prior declaration
+        set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 1418")
         # Intel compiler is too strict in errors about 'explicit' keyword
         set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 2304")
         set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 2305")
-        # 'parameter "args" was never referenced' => yes it was
+        # parameter "args" was never referenced in variadic templates
         set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 869")
+        # exception specification for implicitly declared virtual function ...
+        # This is an issue with compiler generated destructors and noexcept
+        set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 811")
     endif()
 endif()
 
