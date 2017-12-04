@@ -1,23 +1,12 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 2.8.12)
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/InitRules.cmake")
 
 project(chemfiles C CXX)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
-cmake_policy(VERSION 2.8.11)
-if (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
-    cmake_policy(SET CMP0042 OLD) # OSX RPATH handling
+if (POLICY CMP0042)
+    cmake_policy(SET CMP0042 NEW) # OSX RPATH handling
 endif()
-
-if(CMAKE_VERSION VERSION_LESS 2.8.12)
-    set(INCLUDE_INSTALL_DIR "${CMAKE_PREFIX}/include")
-else()
-    set(INCLUDE_INSTALL_DIR "include")
-endif()
-
-#----------------------------------------------------------------------------------------#
-set(CMAKE_CXX_STANDARD 11)
-set(CXX_STANDARD_REQUIRED ON)
 
 file(READ ${PROJECT_SOURCE_DIR}/VERSION CHEMFILES_VERSION)
 string(STRIP ${CHEMFILES_VERSION} CHEMFILES_VERSION)
@@ -94,11 +83,7 @@ target_include_directories(chemfiles_objects PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
 )
-if (NOT CMAKE_VERSION VERSION_LESS 2.8.12)
-    target_include_directories(chemfiles_objects SYSTEM BEFORE PRIVATE ${EXTERNAL_INCLUDES})
-else()
-    target_include_directories(chemfiles_objects BEFORE PRIVATE ${EXTERNAL_INCLUDES})
-endif()
+target_include_directories(chemfiles_objects SYSTEM BEFORE PRIVATE ${EXTERNAL_INCLUDES})
 
 target_compile_definitions(chemfiles_objects PRIVATE chemfiles_EXPORTS)
 if(${BUILD_SHARED_LIBS})
@@ -126,12 +111,7 @@ target_include_directories(chemfiles PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
 )
-
-if (NOT CMAKE_VERSION VERSION_LESS 2.8.12)
-    target_include_directories(chemfiles SYSTEM BEFORE PRIVATE ${EXTERNAL_INCLUDES})
-else()
-    target_include_directories(chemfiles BEFORE PRIVATE ${EXTERNAL_INCLUDES})
-endif()
+target_include_directories(chemfiles SYSTEM BEFORE PRIVATE ${EXTERNAL_INCLUDES})
 target_link_libraries(chemfiles ${NETCDF_LIBRARIES})
 
 configure_file (
@@ -148,6 +128,7 @@ generate_export_header(chemfiles
 #----------------------------------------------------------------------------------------#
 # Installation configuration
 #----------------------------------------------------------------------------------------#
+set(INCLUDE_INSTALL_DIR "include")
 install(TARGETS chemfiles EXPORT chemfiles-targets
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib${LIB_SUFFIX}

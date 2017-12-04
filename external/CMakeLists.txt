@@ -1,6 +1,11 @@
-# Do not set C standard for external code, as this make some
-# symbols (such as strdup) undefined.
-string(REPLACE "-std=c99" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+if (${CMAKE_VERSION} VERSION_GREATER 3.1)
+    unset(CMAKE_CXX_STANDARD)
+    unset(CMAKE_C_STANDARD)
+elseif()
+    # Do not set C standard for external code, as this make some
+    # symbols (such as strdup) undefined.
+    string(REPLACE "-std=c99" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+endif()
 
 set(EXTERNAL_FLAGS "")
 # Disable warnings about external code

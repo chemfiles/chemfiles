@@ -1,4 +1,3 @@
-
 # Update this value if you need to update the data file set
 set(TESTS_DATA_GIT "c26f254cd7bff7e476bf065403fbd0a6a47fea38")
 
@@ -58,13 +57,6 @@ endif()
 
 add_subdirectory(external)
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${PROJECT_BINARY_DIR}/include)
-include_directories(SYSTEM BEFORE ${EXTERNAL_INCLUDES})
-include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/)
-include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR}/external/boost/include)
-add_library(test_helpers STATIC ${CMAKE_CURRENT_SOURCE_DIR}/external/helpers.cpp)
-
 function(chfl_define_test _name_)
     add_test(NAME ${_name_}
         COMMAND ${RUNNER_COMMAND} ./${_name_}
@@ -85,9 +77,9 @@ function(chfl_unit_test _name_ _file_)
     add_executable(${_name_} ${_file_} ${CHEMFILES_OBJECTS})
     # We need to pretend we are inside the DLL to access all functions
     target_compile_definitions(${_name_} PRIVATE chemfiles_EXPORTS)
-    target_compile_definitions(${_name_} PRIVATE CATCH_CONFIG_FAST_COMPILE)
-    target_compile_definitions(${_name_} PRIVATE CATCH_CONFIG_DISABLE_MATCHERS)
     target_link_libraries(${_name_} ${NETCDF_LIBRARIES})
+    target_include_directories(${_name_} SYSTEM PRIVATE ${EXTERNAL_INCLUDES})
+
     chfl_define_test(${_name_})
 
     if(WIN32)
@@ -103,7 +95,7 @@ endfunction()
 function(chfl_cpp_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     chfl_unit_test(${_name_} ${_file_})
-    target_link_libraries(${_name_} test_helpers boost_filesystem)
+    target_link_libraries(${_name_} test_helpers)
 endfunction()
 
 file(GLOB all_test_files
@@ -111,8 +103,6 @@ file(GLOB all_test_files
     ${CMAKE_CURRENT_SOURCE_DIR}/files/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/formats/*.cpp
 )
-
-add_definitions("-DBOOST_ALL_NO_LIB")
 
 foreach(test_file IN LISTS all_test_files)
     chfl_cpp_test(${test_file})
@@ -122,7 +112,7 @@ function(chfl_capi_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     set(_name_ "c-${_name_}")
     chfl_unit_test(${_name_} ${_file_})
-    target_link_libraries(${_name_} test_helpers boost_filesystem)
+    target_link_libraries(${_name_} test_helpers)
 endfunction()
 
 file(GLOB capi_test_files ${CMAKE_CURRENT_SOURCE_DIR}/capi/*.cpp)
@@ -149,8 +139,7 @@ function(chfl_doctest _name_ _file_)
     add_executable(${_name_} ${_file_})
     target_link_libraries(${_name_} chemfiles)
     set_target_properties(${_name_} PROPERTIES COMPILE_FLAGS "-UNDEBUG")
-    target_compile_definitions(${_name_} PRIVATE CATCH_CONFIG_FAST_COMPILE)
-    target_compile_definitions(${_name_} PRIVATE CATCH_CONFIG_DISABLE_MATCHERS)
+    target_include_directories(${_name_} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/external)
 
     if(${_run_})
         chfl_define_test(${_name_})
@@ -182,7 +171,7 @@ function(chfl_cpp_doctest _file_)
 
     chfl_doctest(${_name_} ${_file_})
     if(CHFL_BUILD_DOCTESTS)
-        target_link_libraries(${_name_} test_helpers boost_filesystem)
+        target_link_libraries(${_name_} test_helpers)
     endif()
 endfunction()
 
