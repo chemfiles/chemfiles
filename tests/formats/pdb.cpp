@@ -230,6 +230,12 @@ TEST_CASE("Write files in PDB format") {
     file.write(frame);
     file.close();
 
+    auto check_pdb = Trajectory(tmpfile);
+    CHECK(check_pdb.nsteps() == 2);
+    CHECK(check_pdb.read().size() == 4);
+    CHECK(check_pdb.read().size() == 7);
+    check_pdb.close();
+
     std::ifstream checking(tmpfile);
     std::string content((std::istreambuf_iterator<char>(checking)),
                          std::istreambuf_iterator<char>());

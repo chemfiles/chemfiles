@@ -273,7 +273,7 @@ bool forward(TextFile& file) {
                 if (next.substr(0, 3) == "END") {
                     // We found another record starting by END in the next line,
                     // we skip this one and wait for the next one
-                    return false;
+                    continue;
                 }
             }
 
