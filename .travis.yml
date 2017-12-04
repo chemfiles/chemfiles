@@ -48,13 +48,6 @@ matrix:
       compiler: gcc
       env: ARCH=x86 CMAKE_EXTRA=-DHAVE_LIBM=/lib32/libm.so.6
       addons: *linux32
-    - os: osx
-      compiler: clang
-      osx_image: xcode7.3
-    - os: osx
-      compiler: gcc
-      osx_image: xcode7.3
-  allow_failures:
     - os: linux
       compiler: gcc
       env: USE_ICC=ON
@@ -63,6 +56,12 @@ matrix:
       compiler: gcc
       env: USE_PGI=ON
       addons: *linux64
+    - os: osx
+      compiler: clang
+      osx_image: xcode7.3
+    - os: osx
+      compiler: gcc
+      osx_image: xcode7.3    
 
 before_install:
   # Setting environement
