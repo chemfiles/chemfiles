@@ -45,7 +45,7 @@ TEST_CASE("Use the UnitCell type") {
         CHECK(triclinic.alpha() == 90);
         CHECK(triclinic.beta() == 80);
         CHECK(triclinic.gamma() == 120);
-        CHECK(triclinic.volume() == 1119.9375925598192);
+        CHECK(approx_eq(triclinic.volume(), 1119.9375925598192, 1e-12));
     }
 
     SECTION("Operators") {

@@ -8,9 +8,11 @@
 
 namespace chemfiles {
     class Vector3D;
+    class Matrix3D;
 }
 
-bool approx_eq(const chemfiles::Vector3D& a, const chemfiles::Vector3D& b, double tolerance=1e-15);
+bool approx_eq(const chemfiles::Vector3D& lhs, const chemfiles::Vector3D& rhs, double tolerance=1e-15);
+bool approx_eq(const chemfiles::Matrix3D& lhs, const chemfiles::Matrix3D& rhs, double tolerance=1e-15);
 bool approx_eq(double a, double b, double tolerance=1e-15);
 
 /// A temporary file path with an user specified extension, automatically

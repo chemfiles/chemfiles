@@ -39,10 +39,22 @@ void silent_crash_handlers() {
 #endif
 }
 
-bool approx_eq(const chemfiles::Vector3D& a, const chemfiles::Vector3D& b, double tolerance) {
-    return (fabs(a[0] - b[0]) < tolerance)
-        && (fabs(a[1] - b[1]) < tolerance)
-        && (fabs(a[2] - b[2]) < tolerance);
+bool approx_eq(const chemfiles::Vector3D& lhs, const chemfiles::Vector3D& rhs, double tolerance) {
+    return (fabs(lhs[0] - rhs[0]) < tolerance)
+        && (fabs(lhs[1] - rhs[1]) < tolerance)
+        && (fabs(lhs[2] - rhs[2]) < tolerance);
+}
+
+bool approx_eq(const chemfiles::Matrix3D& lhs, const chemfiles::Matrix3D& rhs, double tolerance) {
+    return (fabs(lhs[0][0] - rhs[0][0]) < tolerance)
+        && (fabs(lhs[0][1] - rhs[0][1]) < tolerance)
+        && (fabs(lhs[0][2] - rhs[0][2]) < tolerance)
+        && (fabs(lhs[1][0] - rhs[1][0]) < tolerance)
+        && (fabs(lhs[1][1] - rhs[1][1]) < tolerance)
+        && (fabs(lhs[1][2] - rhs[1][2]) < tolerance)
+        && (fabs(lhs[2][0] - rhs[2][0]) < tolerance)
+        && (fabs(lhs[2][1] - rhs[2][1]) < tolerance)
+        && (fabs(lhs[2][2] - rhs[2][2]) < tolerance);
 }
 
 bool approx_eq(double a, double b, double tolerance) {
