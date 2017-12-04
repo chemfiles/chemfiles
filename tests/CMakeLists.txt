@@ -144,6 +144,10 @@ function(chfl_doctest _name_ _file_)
     if(${_run_})
         chfl_define_test(${_name_})
     endif()
+
+    if("${CMAKE_CXX_COMPILER_ID}" MATCHES "PGI" AND "${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+        target_link_libraries(${_name_} atomic)
+    endif()
 endfunction()
 
 function(chfl_c_doctest _file_)
