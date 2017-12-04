@@ -261,6 +261,39 @@ CHFL_EXPORT CHFL_PROPERTY* chfl_frame_get_property(
     const CHFL_FRAME* frame, const char* name
 );
 
+/// Add a bond between the atoms at indexes `i` and `j` in the `frame`.
+///
+/// @example{tests/capi/doc/chfl_frame/add_bond.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_frame_add_bond(
+    CHFL_FRAME* frame, uint64_t i, uint64_t j
+);
+
+/// Remove any existing bond between the atoms at indexes `i` and `j` in the
+/// `frame`.
+///
+/// This function does nothing if there is no bond between `i` and `j`.
+///
+/// @example{tests/capi/doc/chfl_frame/remove_bond.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_frame_remove_bond(
+    CHFL_FRAME* frame, uint64_t i, uint64_t j
+);
+
+/// Add a copy of `residue` to this `frame`.
+///
+/// The residue id must not already be in this frame's topology, and the residue
+/// must contain only atoms that are not already in another residue.
+///
+/// @example{tests/capi/doc/chfl_frame/add_residue.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_frame_add_residue(
+    CHFL_FRAME* frame, const CHFL_RESIDUE* residue
+);
+
 /// Free the memory associated with a `frame`.
 ///
 /// @example{tests/capi/doc/chfl_frame/chfl_frame.c}

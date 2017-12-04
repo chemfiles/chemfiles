@@ -229,10 +229,26 @@ public:
     /// close to C++17 ``std::optional``.
     /// @endverbatim
     ///
-    /// @example{tests/doc/topology/residue.cpp}
-    optional<const Residue&> residue(size_t index) const;
+    /// @example{tests/doc/topology/residue_for_atom.cpp}
+    optional<const Residue&> residue_for_atom(size_t index) const;
 
-    /// Get all the residues in the topology
+    /// Get the residue at the given `index` in this topology
+    ///
+    /// There is no guarantee that this index matches the residue id.
+    ///
+    /// @example{tests/doc/topology/residue.cpp}
+    const Residue& residue(size_t index) const {
+        if (index >= residues_.size()) {
+            throw OutOfBounds(
+                "Residue index out of bounds in topology: we have "
+                + std::to_string(residues_.size()) + " residues, "
+                + "but the index is " + std::to_string(index)
+            );
+        }
+        return residues_[index];
+    }
+
+    /// Get all the residues in the topology as a vector
     ///
     /// @example{tests/doc/topology/residues.cpp}
     const std::vector<Residue>& residues() const {

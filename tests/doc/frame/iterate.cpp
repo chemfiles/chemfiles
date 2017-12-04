@@ -9,14 +9,13 @@ using namespace chemfiles;
 
 TEST_CASE() {
     // [example]
-    auto topology = Topology();
-    topology.add_atom(Atom("Zn"));
-    topology.add_atom(Atom("Fe"));
+    auto frame = Frame();
+    frame.add_atom(Atom("Fe"), {0.0, 0.0, 0.0});
+    frame.add_atom(Atom("Fe"), {1.0, 1.0, 1.0});
+    frame.add_atom(Atom("Fe"), {2.0, 2.0, 2.0});
 
-    auto first = Residue("first");
-    first.add_atom(0);
-    topology.add_residue(first);
-
-    assert(topology.residue(0).name() == "first");
+    for (Atom& atom: frame) {
+        assert(atom.name() == "Fe");
+    }
     // [example]
 }

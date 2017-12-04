@@ -14,8 +14,8 @@ TEST_CASE() {
     frame.add_atom(Atom("0"), {0.0, 0.0, 0.0});
     frame.add_atom(Atom("H"), {0.0, 1.2, 0.0});
 
-    frame.topology().add_bond(0, 1);
-    frame.topology().add_bond(0, 2);
+    frame.add_bond(0, 1);
+    frame.add_bond(0, 2);
 
     auto selection = Selection("name H");
     std::vector<size_t> matches = selection.list(frame);

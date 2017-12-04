@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * `Topology::append` is now called `Topology::add_atom`
 * `Topology::natoms` and `Frame::natoms` are now called `Topology::size` and
   `Frame::size`
+* `Topology::residue` is now called `Topology::residue_for_atom`
 * Added `Frame::distance`, `Frame::angle`, `Frame::dihedral` and
   `Frame::out_of_plane` to get geometric information on the system, accounting
   for periodic boundary conditions.
@@ -32,6 +33,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * The `UnitCell::shape` setter is renamed to `UnitCell::set_shape`.
 * The `Trajectory::close` function can be used to close a trajectory and
   synchronize any buffered content with the storage.
+* Some of the topology functions are now accsible directly on the frame:
+  `Frame::add_bond`, `Frame::remove_bond`, `Frame::clear_bonds`,
+  `Frame::add_residue` and `operator[]`. The non const version of
+  `Frame::topology` is removed.
 
 ### Changes in supported formats
 
@@ -65,6 +70,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added `CHFL_PROPERTY` and related functions.
 * `chfl_add_configuration` and `chfl_set_warning_callback` are now thread safe,
   and will block upon concurrent usage.
+* Added `chfl_frame_add_bond`, `chfl_frame_remove_bond`, and
+  `chfl_frame_add_residue`.
 
 ### Deprecation and removals
 

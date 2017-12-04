@@ -94,8 +94,8 @@ TEST_CASE("Read files in PDB format") {
 
         CHECK(frame.topology().residues().size() == 99);
 
-        REQUIRE(frame.topology().residue(1));
-        auto residue = (*frame.topology().residue(1));
+        REQUIRE(frame.topology().residue_for_atom(1));
+        auto residue = *frame.topology().residue_for_atom(1);
         CHECK(residue.size() == 3);
         CHECK(residue.contains(0));
         CHECK(residue.contains(1));
@@ -314,7 +314,7 @@ TEST_CASE("PDB files with big values") {
         for(size_t i=0; i<110000; i++) {
             frame.add_atom(Atom("A"), {0.0, 0.0, 0.0});
         }
-        frame.topology().add_bond(101000, 101008);
+        frame.add_bond(101000, 101008);
         Trajectory(tmpfile, 'w').write(frame);
 
         // Re-read the file we just wrote

@@ -27,6 +27,10 @@ namespace chemfiles {
 /// * ``velocities`` is the nullopt variant of :cpp:class:`chemfiles::optional`.
 ///
 /// @endverbatim
+///
+///Iterating over a `Frame` will yield all the atoms in the system.
+///
+/// @example{tests/doc/frame/iterate.cpp}
 class CHFL_EXPORT Frame final {
 public:
     /// Create an empty frame with no atoms and an infinite unit cell.
@@ -61,26 +65,13 @@ public:
         return *this;
     }
 
-    /// Get a modifiable reference to the topology of this frame.
-    ///
-    /// @verbatim embed:rst:leading-slashes
-    ///
-    /// .. warning::
-    ///
-    ///     Changing the size of the topology (by calling
-    ///     :cpp:func:`Topology::remove`, :cpp:func:`Topology::add_atom`, or
-    ///     :cpp:func:`Topology::resize`) while not updating the size of the
-    ///     frame itself is undefined. Use :cpp:func:`Frame::add_atom` instead
-    ///     to add new atoms to a frame.
-    ///
-    /// @endverbatim
-    ///
-    /// @example{tests/doc/frame/topology.cpp}
-    Topology& topology() {
-        return topology_;
-    }
-
     /// Get a const reference to the topology of this frame
+    ///
+    /// It is not possible to get a modifiable reference to the topology,
+    /// because it would then be possible to remove/add atoms without changing
+    /// the actual positions and velocity storage. Instead, all the mutating
+    /// functionalities of the topology are mirrored on the frame (adding and
+    /// removing bonds, adding residues, *etc.*)
     ///
     /// @example{tests/doc/frame/topology.cpp}
     const Topology& topology() const {
@@ -242,6 +233,81 @@ public:
     ///
     /// @example{tests/doc/frame/guess_topology.cpp}
     void guess_topology();
+
+    /// Remove all connectivity information in the frame's topology
+    ///
+    /// @example{tests/doc/frame/clear_bonds.cpp}
+    void clear_bonds() {
+        topology_.clear_bonds();
+    }
+
+    /// Add a `residue` to this frame's topology.
+    ///
+    /// @example{tests/doc/frame/add_residue.cpp}
+    ///
+    /// @param residue the residue to add to this topology
+    /// @throw chemfiles::Error if any atom in the `residue` is already in
+    ///        another residue in this topology. In that case, the topology is
+    ///        not modified.
+    void add_residue(Residue residue) {
+        topology_.add_residue(std::move(residue));
+    }
+
+    /// Add a bond in the system, between the atoms at index `atom_i` and
+    /// `atom_j`.
+    ///
+    /// @example{tests/doc/frame/add_bond.cpp}
+    ///
+    /// @param atom_i the index of the first atom in the bond
+    /// @param atom_j the index of the second atom in the bond
+    /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `size()`
+    /// @throws Error if `atom_i == atom_j`, as this is an invalid bond
+    void add_bond(size_t atom_i, size_t atom_j) {
+        topology_.add_bond(atom_i, atom_j);
+    }
+
+    /// Remove a bond in the system, between the atoms at index `atom_i` and
+    /// `atom_j`.
+    ///
+    /// If the bond does not exist, this does nothing.
+    ///
+    /// @example{tests/doc/frame/remove_bond.cpp}
+    ///
+    /// @param atom_i the index of the first atom in the bond
+    /// @param atom_j the index of the second atom in the bond
+    /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `size()`
+    void remove_bond(size_t atom_i, size_t atom_j) {
+        topology_.remove_bond(atom_i, atom_j);
+    }
+
+    /// Get a reference to the atom at the position `index`.
+    ///
+    /// @example{tests/doc/frame/index.cpp}
+    ///
+    /// @param index the atomic index
+    /// @throws OutOfBounds if `index` is greater than `size()`
+    Atom& operator[](size_t index) {
+        return topology_[index];
+    }
+
+    /// Get a const reference to the atom at the position `index`.
+    ///
+    /// @example{tests/doc/frame/index.cpp}
+    ///
+    /// @param index the atomic index
+    /// @throws OutOfBounds if `index` is greater than `size()`
+    const Atom& operator[](size_t index) const {
+        return topology_[index];
+    }
+
+    using iterator = Topology::iterator;
+    using const_iterator = Topology::const_iterator;
+    iterator begin() {return topology_.begin();}
+    const_iterator begin() const {return topology_.begin();}
+    const_iterator cbegin() const {return topology_.cbegin();}
+    iterator end() {return topology_.end();}
+    const_iterator end() const {return topology_.end();}
+    const_iterator cend() const {return topology_.cend();}
 
     /// Get the distance between the atoms at indexes `i` and `j`, accounting
     /// for periodic boundary conditions. The distance is expressed in angstroms.
