@@ -1,46 +1,37 @@
-/* File indexes.c, example for the chemfiles library
+/* This file is an example for the chemfiles library
  * Any copyright is dedicated to the Public Domain.
  * http://creativecommons.org/publicdomain/zero/1.0/ */
+#include <chemfiles.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "chemfiles.h"
-
-int main(void) {
-    CHFL_TRAJECTORY* file = chfl_trajectory_open("tests/files/xyz/helium.xyz", 'r');
+int main() {
+    CHFL_TRAJECTORY* file = chfl_trajectory_open("filename.xyz", 'r');
     CHFL_FRAME* frame = chfl_frame();
-    unsigned* indexes = NULL;
-
-    if (chfl_trajectory_read(file, frame) != CHFL_SUCCESS) {/*Handle error*/}
+    chfl_trajectory_read(file, frame);
 
     uint64_t natoms = 0;
     chfl_vector3d* positions = NULL;
     chfl_frame_positions(frame, &positions, &natoms);
-    indexes = malloc((size_t)natoms * sizeof(unsigned));
-    if (indexes == NULL) {/*Handle error*/}
 
-    for (unsigned i=0; i<natoms; i++) {
-        indexes[i] = (unsigned)-1;
-    }
+    size_t* less_than_five = malloc((size_t)natoms * sizeof(size_t));
 
-    unsigned last_index = 0;
-    for (unsigned i=0; i<natoms; i++) {
+    size_t matched = 0;
+    for (uint64_t i=0; i<natoms; i++) {
         if (positions[i][0] < 5) {
-            indexes[last_index] = i;
-            last_index++;
+            less_than_five[matched] = (size_t)i;
+            matched++;
         }
     }
 
     printf("Atoms with x < 5:\n");
-    unsigned i = 0;
-    while(indexes[i] != (unsigned)-1 && i < natoms) {
-        printf("  - %d\n", indexes[i]);
-        i++;
+    for (size_t i=0; i<matched; i++) {
+        printf("  - %lu", less_than_five[i]);
     }
-    printf("Number of atoms: %d\n", i);
 
-    chfl_trajectory_close(file);
+    free(less_than_five);
     chfl_frame_free(frame);
-    free(indexes);
-    return EXIT_SUCCESS;
+    chfl_trajectory_close(file);
+
+    return 0;
 }

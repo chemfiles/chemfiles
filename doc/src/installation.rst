@@ -4,7 +4,6 @@ Installation
 Pre-compiled binaries
 ^^^^^^^^^^^^^^^^^^^^^
 
-
 We provide compiled packages of the latest release for muliple Linux
 distributions using the `OpenSUSE build service`_.
 
@@ -169,3 +168,61 @@ For instance, to install to :file:`$HOME/local`, use:
 
 .. _doxygen: http://doxygen.org/
 .. _sphinx: http://sphinx-doc.org/
+
+
+Using chemfiles in your project
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There are multiple ways to use chemfiles in your own code:
+
+- adding the include path and library manually (in a Makefile, or a Visial Studio project);
+- using the CMake configuration file;
+- including chemfiles inside a CMake based-project.
+
+Manually setting include and library path
+-----------------------------------------
+
+After installing chemfiles on your computer, you can start using it with your
+own C or C++ program by passing the corresponding include path and library path
+to your compiler. For example, on \*nix (GNU/Linux or OS X) you can compile any
+code depending on chemfiles with the following command
+
+.. code-block:: bash
+
+    # change <PREFIX> to the location where you installed chemfiles
+    # (default is /usr/local)
+    g++ -I <PREFIX>/include my-code.cpp -o my-code -lchemfiles -L <PREFIX>/lib
+
+Here, ``-I <PREFIX>/include`` tells the compiler where to look for chemfiles
+headers, ``-lchemfiles`` tells it to link the chemfiles library in the final
+executable, and ``-L <PREFIX>/lib`` tells the compiler where to look for the
+chemfiles library.
+
+The same strategy should be possible to use with Visual Studio on Windows, or
+any other IDE. Refer to your IDE documentation about how to add external
+libraries.
+
+Using cmake and ``find_package``
+--------------------------------
+
+If your project is already using CMake, and you installed chemfiles on your
+computer, you can use the standard ``find_package`` to find the code and
+automatically set the right include and library path.
+
+.. code-block:: cmake
+
+    add_executable(my-code my-code.cpp)
+
+    find_package(chemfiles 0.8)
+    # chemfiles_FOUND will be TRUE if the code was found
+
+    target_link_library(my-code chemfiles)
+
+Including chemfiles as a CMake subproject
+-----------------------------------------
+
+If your project is already using CMake, but you don't want to require your users
+to install chemfiles separatedly, you can use cmake support for external
+projects or subdirectories to include chemfiles sources directly inside your own
+project. All CMake variables controling chemfiles behaviour are prefixed with
+``CHFL_`` to prevent variable pollution.

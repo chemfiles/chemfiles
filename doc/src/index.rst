@@ -61,10 +61,12 @@ in our `Gitter chat room <https://gitter.im/chemfiles/chemfiles>`_.
 
     installation
     overview
-    example
+    cxx-tutorials
+    c-tutorials
     formats
     selections
     configuration
+    properties
     others
 
 .. _classes-reference:
