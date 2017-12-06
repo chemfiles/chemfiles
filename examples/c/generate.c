@@ -28,7 +28,7 @@ int main() {
 
     positions[0][0] = 1.0; positions[0][1] = 0.0; positions[0][2] = 0.0;
     positions[1][0] = 0.0; positions[1][1] = 0.0; positions[1][2] = 0.0;
-    positions[3][0] = 0.0; positions[2][1] = 1.0; positions[3][2] = 0.0;
+    positions[2][0] = 0.0; positions[2][1] = 1.0; positions[2][2] = 0.0;
 
     chfl_frame_add_atom(frame, O, (chfl_vector3d){5, 0, 0}, NULL);
     chfl_frame_add_atom(frame, C, (chfl_vector3d){6, 0, 0}, NULL);
