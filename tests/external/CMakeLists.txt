@@ -1,5 +1,7 @@
 add_library(test_helpers STATIC helpers.cpp)
 target_include_directories(test_helpers PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+# We can not direcly link to chemfiles, but we still need it's headers
+target_include_directories(test_helpers PUBLIC $<TARGET_PROPERTY:chemfiles,INCLUDE_DIRECTORIES>)
 
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/boost/LICENSE_1_0.txt")
     message(STATUS "Unpacking Boost sources")
@@ -26,4 +28,4 @@ add_library(boost_filesystem STATIC ${boost_filesystem_src})
 target_include_directories(boost_filesystem SYSTEM BEFORE PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/boost/include)
 target_compile_definitions(boost_filesystem PUBLIC BOOST_ALL_NO_LIB)
 
-target_link_libraries(test_helpers boost_filesystem chemfiles)
+target_link_libraries(test_helpers boost_filesystem)
