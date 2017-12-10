@@ -1,3 +1,5 @@
+unset(CMAKE_CXX_STANDARD)
+unset(CMAKE_C_STANDARD)
 # Do not set C standard for external code, as this make some
 # symbols (such as strdup) undefined.
 string(REPLACE "-std=c99" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")

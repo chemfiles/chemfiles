@@ -3,7 +3,16 @@ include(CheckCCompilerFlag)
 
 set(CMAKE_REQUIRED_QUIET YES)
 
-# C++11 support.
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_EXTENSIONS OFF)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
+# Manually check for some flags, as some versions of CMake do not support
+# `CMAKE_CXX_STANDARD`
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
 if(COMPILER_SUPPORTS_CXX11)
@@ -20,14 +29,14 @@ else()
     endif()
 endif()
 
-if(COMPILER_HAS_HIDDEN_VISIBILITY)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
-endif()
-
 CHECK_C_COMPILER_FLAG("-std=c99" COMPILER_SUPPORTS_C99)
 if(COMPILER_SUPPORTS_C99)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+endif()
+
+if(COMPILER_HAS_HIDDEN_VISIBILITY)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
 endif()
 
 if(MSVC)
@@ -64,6 +73,10 @@ if(${CMAKE_CXX_COMPILER_ID} MATCHES "PGI")
     # Remove IPA optimization, as it fails with 'unknown variable reference: &2&2821'
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Mnoipa")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Mnoipa")
+    # When passed --c++11, pgc++ insist on defining __THROW on the command line
+    # and then fail because it is also defined in a source file. This does not
+    # happen with -std=c++11.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -U__THROW")
 endif()
 
 macro(add_warning_flag _flag_)
@@ -166,11 +179,16 @@ else()
     add_warning_flag("-Minform=warn")
 
     if(${CMAKE_C_COMPILER} MATCHES "icc.*$")
+        # external function definition with no prior declaration
+        set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 1418")
         # Intel compiler is too strict in errors about 'explicit' keyword
         set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 2304")
         set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 2305")
-        # 'parameter "args" was never referenced' => yes it was
+        # parameter "args" was never referenced in variadic templates
         set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 869")
+        # exception specification for implicitly declared virtual function ...
+        # This is an issue with compiler generated destructors and noexcept
+        set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 811")
     endif()
 endif()
 
