@@ -13,6 +13,6 @@ TEST_CASE() {
     frame.add_atom(Atom(""), {0.0, 0.0, 0.0});
     frame.add_atom(Atom(""), {1.0, 2.0, 3.0});
 
-    assert(frame.distance(0, 1) == sqrt(14));
+    assert(fabs(frame.distance(0, 1) - sqrt(14)) < 1e-15);
     // [example]
 }

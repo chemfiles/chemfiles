@@ -2,6 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <catch.hpp>
+#include "helpers.hpp"
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
@@ -186,7 +187,7 @@ TEST_CASE("PBC functions") {
         frame.add_atom(Atom(), Vector3D(0, 0, 0));
         frame.add_atom(Atom(), Vector3D(1, 2, 6));
 
-        CHECK(frame.distance(0, 1) == sqrt(6.0));
+        CHECK(approx_eq(frame.distance(0, 1), sqrt(6.0)));
     }
 
     SECTION("Angles") {
