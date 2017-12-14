@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+## 0.8 (14 Dec 2017)
+
 ### New features
 
 * Change the license to the 3-clauses BSD license.
