@@ -17,6 +17,10 @@
 
 using namespace chemfiles;
 
+//! Guess molecules id from the bonds. This function return a vector containing
+//! the molecule id for each atom in the frame
+static std::vector<size_t> guess_molecules(const Frame& frame);
+
 template<> FormatInfo chemfiles::format_information<LAMMPSDataFormat>() {
     return FormatInfo("LAMMPS Data").description(
         "LAMMPS text input data file"
@@ -842,15 +846,14 @@ void LAMMPSDataFormat::write_masses() {
 void LAMMPSDataFormat::write_atoms(const Frame& frame) {
     fmt::print(*file_, "\nAtoms # full\n\n");
     auto positions = frame.positions();
+    auto molids = guess_molecules(frame);
     for (size_t i=0; i<frame.size(); i++) {
         auto& atom = frame.topology()[i];
-        // TODO: get molecule id and name
-        auto molid = i;
-        auto molname = "";
-        fmt::print(*file_, "{} {} {} {} {} {} {} # {} {}\n",
+        auto molid = molids[i];
+        fmt::print(*file_, "{} {} {} {} {} {} {} # {}\n",
             i + 1, molid + 1, types_.atom_type_id(atom) + 1, atom.charge(),
             positions[i][0], positions[i][1], positions[i][2],
-            atom.type(), molname
+            atom.type()
         );
     }
 }
@@ -978,4 +981,49 @@ size_t checked_cast(long long int value) {
     } else {
         return static_cast<size_t>(value);
     }
+}
+
+
+std::vector<size_t> guess_molecules(const Frame& frame) {
+    // Initialize the molids vector with each atom in its own molecule
+    auto molids = std::vector<size_t>();
+    molids.reserve(frame.size());
+    for (size_t i=0; i<frame.size(); i++) {
+        molids.push_back(i);
+    }
+
+    for (auto bond: frame.topology().bonds()) {
+        auto i = bond[0];
+        auto j = bond[1];
+
+        // Merge the bigger molid in the smaller one
+        size_t new_id = molids[i];
+        size_t old_id = molids[j];
+        if (molids[i] > molids[j]) {
+            new_id = molids[j];
+            old_id = molids[i];
+        }
+
+        for (auto& molid: molids) {
+            if (molid == old_id) {
+                molid = new_id;
+            }
+        }
+    }
+
+    // Make sure the molids are consecutives
+    std::unordered_map<size_t, size_t> molids_mapping;
+    for (auto& molid: molids) {
+        auto it = molids_mapping.find(molid);
+        if (it != molids_mapping.end()) {
+            molid = it->second;
+        } else {
+            // We've not found this id yet
+            auto new_id = molids_mapping.size();
+            molids_mapping.insert({molid, new_id});
+            molid = new_id;
+        }
+    }
+
+    return molids;
 }
