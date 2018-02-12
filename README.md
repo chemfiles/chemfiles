@@ -102,6 +102,7 @@ Chemfiles can also read but not (yet) write files in the following formats:
 - CHARMM DCD files;
 - TRIPOS mol2 files;
 - Molden files;
+- MacroMolecular Transmission Format (MMTF) files;
 
 See the [issue list](https://github.com/chemfiles/chemfiles/labels/New%20Format)
 for planned formats. If you need another format, open a new issue with a link to
