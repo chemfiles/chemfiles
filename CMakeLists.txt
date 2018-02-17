@@ -96,6 +96,8 @@ set(CHEMFILES_OBJECTS
     $<TARGET_OBJECTS:fmt::object>
     $<TARGET_OBJECTS:tng_io>
     $<TARGET_OBJECTS:tng_io_zlib>
+    $<TARGET_OBJECTS:msgpackc-object>
+    $<TARGET_OBJECTS:mmtf-c>
     ${NETCDF_OBJECTS}
 )
 
@@ -112,7 +114,12 @@ target_include_directories(chemfiles PUBLIC
     $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
 )
 target_include_directories(chemfiles SYSTEM BEFORE PRIVATE ${EXTERNAL_INCLUDES})
-target_link_libraries(chemfiles ${NETCDF_LIBRARIES})
+
+if(WIN32)
+    target_link_libraries(chemfiles ${NETCDF_LIBRARIES} ws2_32)
+else()
+    target_link_libraries(chemfiles ${NETCDF_LIBRARIES})
+endif()
 
 configure_file (
   "${PROJECT_SOURCE_DIR}/include/chemfiles/config.in.hpp"

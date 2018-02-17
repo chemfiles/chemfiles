@@ -172,4 +172,27 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/molfiles/include)
 # Needs to link to TCL interpreter
 #       webpdbplugin
 
+# ==========
+# msgpack-c io: https://github.com/chemfiles/msgpack-c
+# ==========
+external_library(msgpack-c)
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/msgpack-c/include)
+
+mark_as_advanced(FORCE
+    MSGPACK_32BIT
+    MSGPACK_BOOST
+    MSGPACK_BUILD_EXAMPLES
+    MSGPACK_CXX11
+    MSGPACK_ENABLE_CXX
+    MSGPACK_ENABLE_SHARED
+)
+
+# ==========
+# mmtf-c format: https://github.com/rcsb/mmtf-c
+# ==========
+unpack_library(mmtf-c)
+add_library(mmtf-c OBJECT ${CMAKE_CURRENT_BINARY_DIR}/mmtf-c/src/mmtf_parser.c)
+target_include_directories(mmtf-c SYSTEM BEFORE PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/msgpack-c/include)
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-c/src)
+
 set(EXTERNAL_INCLUDES ${EXTERNAL_INCLUDES} PARENT_SCOPE)

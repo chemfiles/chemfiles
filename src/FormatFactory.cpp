@@ -17,6 +17,7 @@
 #include "chemfiles/formats/PDB.hpp"
 #include "chemfiles/formats/XYZ.hpp"
 #include "chemfiles/formats/TNG.hpp"
+#include "chemfiles/formats/MMTF.hpp"
 
 using namespace chemfiles;
 
@@ -50,6 +51,11 @@ FormatFactory::FormatFactory() {
     this->add_format<Molfile<MOL2>>();
     this->add_format<Molfile<LAMMPS>>();
     this->add_format<Molfile<MOLDEN>>();
+
+    // The MMTF format does not work well with asm.js
+    #ifndef __EMSCRIPTEN__
+        this->add_format<MMTFFormat>();
+    #endif
 }
 
 FormatFactory& FormatFactory::get() {
