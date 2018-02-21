@@ -14,6 +14,8 @@ the `chemfiles` branch.
 - molfiles: https://github.com/chemfiles/molfiles
 - TNG: https://github.com/chemfiles/tng
 - NetCDF: https://github.com/chemfiles/netcdf-c
+- mmtf-c: https://github.com/chemfiles/mmtf-c
+- msgpack-c: https://github.com/chemfiles/msgpack-c
 
 To update a library, update the corresponding repository, and then regenerate
 the archive to be included in this directory with
@@ -219,4 +221,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
