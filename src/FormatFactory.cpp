@@ -16,6 +16,7 @@
 #include "chemfiles/formats/Tinker.hpp"
 #include "chemfiles/formats/PDB.hpp"
 #include "chemfiles/formats/XYZ.hpp"
+#include "chemfiles/formats/SDF.hpp"
 #include "chemfiles/formats/TNG.hpp"
 #include "chemfiles/formats/MMTF.hpp"
 
@@ -41,6 +42,7 @@ FormatFactory::FormatFactory() {
     this->add_format<AmberNetCDFFormat>();
     this->add_format<TinkerFormat>();
     this->add_format<LAMMPSDataFormat>();
+    this->add_format<SDFFormat>();
 
     // VMD molfile plugins
     this->add_format<Molfile<DCD>>();
