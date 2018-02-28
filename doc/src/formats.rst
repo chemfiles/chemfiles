@@ -21,6 +21,8 @@ specify which format to use.
 +-------------------+------------+-------------------+---------+---------+
 | `PDB`_            | .pdb       | |yes|             | |yes|   | |yes|   |
 +-------------------+------------+-------------------+---------+---------+
+| `SDF`_            | .sdf       | |yes|             | |yes|   | |yes|   |
++-------------------+------------+-------------------+---------+---------+
 | `Amber NetCDF`_   | .nc        | |no|              | |yes|   | |yes|   |
 +-------------------+------------+-------------------+---------+---------+
 | `TNG`_            | .tng       | |yes|             | |yes|   | |no|    |
@@ -55,6 +57,7 @@ correspond to LAMMPS data files, as read by the LAMMPS
 
 .. _XYZ: https://openbabel.org/wiki/XYZ
 .. _PDB: http://www.rcsb.org/pdb/static.do?p=file_formats/pdb/index.html
+.. _SDF: http://accelrys.com/products/collaborative-science/biovia-draw/ctfile-no-fee.html
 .. _Amber NetCDF: http://ambermd.org/netcdf/nctraj.xhtml
 .. _TNG: http://doi.wiley.com/10.1002/jcc.23495
 
