@@ -5,6 +5,7 @@
 #include "chemfiles.hpp"
 #include "chemfiles/selections/lexer.hpp"
 #include "chemfiles/selections/parser.hpp"
+#include "chemfiles/selections/expr.hpp"
 
 using namespace chemfiles;
 using namespace chemfiles::selections;

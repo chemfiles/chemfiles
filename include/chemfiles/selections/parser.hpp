@@ -4,36 +4,37 @@
 #ifndef CHEMFILES_SELECTION_PARSER_HPP
 #define CHEMFILES_SELECTION_PARSER_HPP
 
-#include "chemfiles/Selections.hpp"
+#include "chemfiles/Selection.hpp"
 #include "chemfiles/selections/lexer.hpp"
 
 namespace chemfiles {
 namespace selections {
 
-/// Parse and create an AST from a stream of tokens
-///
-/// @throws SelectionError if the token stream does not correspond to an AST
-Ast parse(std::vector<Token> tokens);
-
-/// @class Expr parser.hpp
-/// @brief Abstract base class for expressions in the selection AST
-class Expr {
+/// Abstract base class for selectors in the selection AST
+class Selector {
 public:
-    /// Pretty-printing of this expression. The expression should use a shift
+    /// Pretty-printing of this selector. The output should use a shift
     /// of `delta` spaces in case of multilines output.
     virtual std::string print(unsigned delta = 0) const = 0;
     /// Check if the `match` is valid in the given `frame`.
     virtual bool is_match(const Frame& frame, const Match& match) const = 0;
 
-    Expr() = default;
-    virtual ~Expr() = default;
+    Selector() = default;
+    virtual ~Selector() = default;
 
-    Expr(Expr&&) = default;
-    Expr& operator=(Expr&&) = default;
+    Selector(Selector&&) = default;
+    Selector& operator=(Selector&&) = default;
 
-    Expr(const Expr&) = delete;
-    Expr& operator=(const Expr&) = delete;
+    Selector(const Selector&) = delete;
+    Selector& operator=(const Selector&) = delete;
 };
+
+using Ast = std::unique_ptr<Selector>;
+
+/// Parse and create an AST from a stream of tokens
+///
+/// @throws SelectionError if the token stream does not correspond to an AST
+Ast parse(std::vector<Token> tokens);
 
 using token_iterator_t = std::vector<Token>::const_iterator;
 /// Dispatch to subexpressions for parsing, from the current value of `begin`

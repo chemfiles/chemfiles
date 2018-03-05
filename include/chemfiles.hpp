@@ -16,6 +16,6 @@
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/Trajectory.hpp"
 #include "chemfiles/UnitCell.hpp"
-#include "chemfiles/Selections.hpp"
+#include "chemfiles/Selection.hpp"
 
 #endif // CHEMFILES_HPP

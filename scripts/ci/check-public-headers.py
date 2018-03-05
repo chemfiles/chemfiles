@@ -38,7 +38,7 @@ WHITELIST = [
     "chemfiles/Topology.hpp",
     "chemfiles/UnitCell.hpp",
     "chemfiles/Trajectory.hpp",
-    "chemfiles/Selections.hpp",
+    "chemfiles/Selection.hpp",
     "chemfiles/Connectivity.hpp",
     # chemfiles capi headers
     "chemfiles/capi/atom.h",

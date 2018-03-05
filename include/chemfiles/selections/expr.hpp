@@ -4,12 +4,48 @@
 #ifndef CHEMFILES_SELECTION_EXPR_HPP
 #define CHEMFILES_SELECTION_EXPR_HPP
 
+#include "chemfiles/selections/lexer.hpp"
 #include "chemfiles/selections/parser.hpp"
+
 #include "chemfiles/unreachable.hpp"
 #include "chemfiles/Error.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/Selection.hpp"
 
 namespace chemfiles {
 namespace selections {
+
+/// Combine selections by using a logical `and` operation
+class And final: public Selector {
+public:
+    And(Ast lhs, Ast rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+private:
+    Ast lhs_;
+    Ast rhs_;
+};
+
+/// Combine selections by using a logical `or` operation
+class Or final: public Selector {
+public:
+    Or(Ast lhs, Ast rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+private:
+    Ast lhs_;
+    Ast rhs_;
+};
+
+/// Unary negation of a selection
+class Not final: public Selector {
+public:
+    explicit Not(Ast ast): ast_(std::move(ast)) {}
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+private:
+    Ast ast_;
+};
 
 // Existing binary operators
 enum class BinOp {
@@ -25,6 +61,105 @@ enum class BinOp {
     GT = Token::GT,
     /// ">="
     GE = Token::GE,
+};
+
+/// Selection matching all atoms
+class All final: public Selector {
+public:
+    All() = default;
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+};
+
+/// Selection matching no atoms
+class None final: public Selector {
+public:
+    None() = default;
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+};
+
+/// Abstract base class for selector taking a single argument
+class SingleSelector: public Selector {
+public:
+    SingleSelector(unsigned argument): argument_(argument) {
+        assert(argument <= 3 && "argument must be less than 3 in SingleSelector");
+    }
+
+protected:
+    /// Index of the argument to apply the selector to
+    const unsigned argument_;
+};
+
+/// Select atoms using their type
+class Type final: public SingleSelector {
+public:
+    Type(unsigned argument, std::string type, bool equals)
+        : SingleSelector(argument), type_(std::move(type)), equals_(equals) {}
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+private:
+    std::string type_;
+    bool equals_;
+};
+
+/// Select atoms using their name.
+class Name final: public SingleSelector {
+public:
+    Name(unsigned argument, std::string name, bool equals)
+        : SingleSelector(argument), name_(std::move(name)), equals_(equals) {}
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+private:
+    std::string name_;
+    bool equals_;
+};
+
+/// Select atoms using their residue name
+class Resname final: public SingleSelector {
+public:
+    Resname(unsigned argument, std::string name, bool equals)
+        : SingleSelector(argument), name_(std::move(name)), equals_(equals) {}
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+private:
+    std::string name_;
+    bool equals_;
+};
+
+/// Select atoms using their index in the frame.
+class Index final: public SingleSelector {
+public:
+    Index(unsigned argument, BinOp op, std::size_t val)
+        : SingleSelector(argument), op_(op), val_(val) {}
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+private:
+    BinOp op_;
+    std::size_t val_;
+};
+
+/// Select atoms using their residue id (residue number)
+class Resid final: public SingleSelector {
+public:
+    Resid(unsigned argument, BinOp op, uint64_t id)
+        : SingleSelector(argument), op_(op), id_(id) {}
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+private:
+    BinOp op_;
+    uint64_t id_;
+};
+
+/// Select atoms using their mass.
+class Mass final: public SingleSelector {
+public:
+    Mass(unsigned argument, BinOp op, double val): SingleSelector(argument), op_(op), val_(val) {}
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+private:
+    BinOp op_;
+    double val_;
 };
 
 /// Helper class representing a specific component of a 3D vector. This class
@@ -86,121 +221,12 @@ private:
     } coord_;
 };
 
-/// @class AllExpr selections/expr.hpp selections/expr.cpp
-/// @brief Selection matching all atoms
-class AllExpr final: public Expr {
+/// Select atoms using their position in space. The selection can be created by
+/// `x <op> <val>`, `y <op> <val>` or `z <op> <val>`, depending on the component
+/// of the position to use.
+class Position final: public SingleSelector {
 public:
-    AllExpr() = default;
-    std::string print(unsigned delta) const override;
-    bool is_match(const Frame& frame, const Match& match) const override;
-};
-
-/// @class NoneExpr selections/expr.hpp selections/expr.cpp
-/// @brief Selection matching no atoms
-class NoneExpr final: public Expr {
-public:
-    NoneExpr() = default;
-    std::string print(unsigned delta) const override;
-    bool is_match(const Frame& frame, const Match& match) const override;
-};
-
-/// @class SingleExpr expr.hpp
-/// @brief Abstract base class for selector taking a single argument
-class SingleSelector: public Expr {
-public:
-    SingleSelector(unsigned argument): argument_(argument) {
-        assert(argument <= 3 && "argument must be less than 3 in SingleSelector");
-    }
-
-protected:
-    /// Index of the argument to apply the selector to
-    const unsigned argument_;
-};
-
-/// @class TypeExpr selections/expr.hpp selections/expr.cpp
-/// @brief Select atoms using their type
-///
-/// Only `==` and `!=` operators are allowed. The short form `type <value>` is
-/// equivalent to `type == <value>`
-class TypeExpr final: public SingleSelector {
-public:
-    TypeExpr(unsigned argument, std::string type, bool equals)
-        : SingleSelector(argument), type_(std::move(type)), equals_(equals) {}
-    std::string print(unsigned delta) const override;
-    bool is_match(const Frame& frame, const Match& match) const override;
-private:
-    std::string type_;
-    bool equals_;
-};
-
-/// @class NameExpr selections/expr.hpp selections/expr.cpp
-/// @brief Select atoms using their name.
-///
-/// Only `==` and `!=` operators are allowed. The short form `name <value>` is
-/// equivalent to `name == <value>`
-class NameExpr final: public SingleSelector {
-public:
-    NameExpr(unsigned argument, std::string name, bool equals)
-        : SingleSelector(argument), name_(std::move(name)), equals_(equals) {}
-    std::string print(unsigned delta) const override;
-    bool is_match(const Frame& frame, const Match& match) const override;
-private:
-    std::string name_;
-    bool equals_;
-};
-
-/// @class IndexExpr selections/expr.hpp selections/expr.cpp
-/// @brief Select atoms using their index in the frame.
-class IndexExpr final: public SingleSelector {
-public:
-    IndexExpr(unsigned argument, BinOp op, std::size_t val)
-        : SingleSelector(argument), op_(op), val_(val) {}
-    std::string print(unsigned delta) const override;
-    bool is_match(const Frame& frame, const Match& match) const override;
-private:
-    BinOp op_;
-    std::size_t val_;
-};
-
-/// @class ResnameExpr selections/expr.hpp selections/expr.cpp
-/// @brief Select atoms using their residue name
-///
-/// Only `==` and `!=` operators are allowed. The short form `resname <value>`
-/// is equivalent to `resname == <value>`
-class ResnameExpr final: public SingleSelector {
-public:
-    ResnameExpr(unsigned argument, std::string name, bool equals)
-        : SingleSelector(argument), name_(std::move(name)), equals_(equals) {}
-    std::string print(unsigned delta) const override;
-    bool is_match(const Frame& frame, const Match& match) const override;
-private:
-    std::string name_;
-    bool equals_;
-};
-
-/// @class ResidExpr selections/expr.hpp selections/expr.cpp
-/// @brief Select atoms using their residue name
-///
-/// Only `==` and `!=` operators are allowed. The short form `resname <value>`
-/// is equivalent to `resname == <value>`
-class ResidExpr final: public SingleSelector {
-public:
-    ResidExpr(unsigned argument, BinOp op, uint64_t id)
-        : SingleSelector(argument), op_(op), id_(id) {}
-    std::string print(unsigned delta) const override;
-    bool is_match(const Frame& frame, const Match& match) const override;
-private:
-    BinOp op_;
-    uint64_t id_;
-};
-
-/// @class PositionExpr selections/expr.hpp selections/expr.cpp
-/// @brief Select atoms using their position in space. The selection can be
-/// created by `x <op> <val>`, `y <op> <val>` or `z <op> <val>`, depending on
-/// the component of the position to use.
-class PositionExpr final: public SingleSelector {
-public:
-    PositionExpr(unsigned argument, Coordinate coord, BinOp op, double val)
+    Position(unsigned argument, Coordinate coord, BinOp op, double val)
         : SingleSelector(argument), coord_(coord), op_(op), val_(val) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
@@ -210,13 +236,12 @@ private:
     double val_;
 };
 
-/// @class VelocityExpr selections/expr.hpp selections/expr.cpp
-/// @brief Select atoms using their velocity. The selection can be created by
-/// `vx <op> <val>`, `vy <op> <val>` or `vz <op> <val>`, depending on the
-/// component of the velocity to use.
-class VelocityExpr final: public SingleSelector {
+/// Select atoms using their velocity. The selection can be created by `vx <op>
+/// <val>`, `vy <op> <val>` or `vz <op> <val>`, depending on the component of
+/// the velocity to use.
+class Velocity final: public SingleSelector {
 public:
-    VelocityExpr(unsigned argument, Coordinate coord, BinOp op, double val)
+    Velocity(unsigned argument, Coordinate coord, BinOp op, double val)
         : SingleSelector(argument), coord_(coord), op_(op), val_(val) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
@@ -225,56 +250,6 @@ private:
     BinOp op_;
     double val_;
 };
-
-/// @class MassExpr selections/expr.hpp selections/expr.cpp
-/// @brief Select atoms using their mass, in atomic mass unit.
-class MassExpr final: public SingleSelector {
-public:
-    MassExpr(unsigned argument, BinOp op, double val): SingleSelector(argument), op_(op), val_(val) {}
-    std::string print(unsigned delta) const override;
-    bool is_match(const Frame& frame, const Match& match) const override;
-private:
-    BinOp op_;
-    double val_;
-};
-
-/****************************************************************************************/
-
-/// @class AndExpr selections/expr.hpp selections/expr.cpp
-/// @brief Combine selections by using a logical `and` operation
-class AndExpr final: public Expr {
-public:
-    AndExpr(Ast lhs, Ast rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
-    std::string print(unsigned delta) const override;
-    bool is_match(const Frame& frame, const Match& match) const override;
-private:
-    Ast lhs_;
-    Ast rhs_;
-};
-
-/// @class OrExpr selections/expr.hpp selections/expr.cpp
-/// @brief Combine selections by using a logical `or` operation
-class OrExpr final: public Expr {
-public:
-    OrExpr(Ast lhs, Ast rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
-    std::string print(unsigned delta) const override;
-    bool is_match(const Frame& frame, const Match& match) const override;
-private:
-    Ast lhs_;
-    Ast rhs_;
-};
-
-/// @class NotExpr selections/expr.hpp selections/expr.cpp
-/// @brief Unary negation of a selection
-class NotExpr final: public Expr {
-public:
-    explicit NotExpr(Ast ast): ast_(std::move(ast)) {}
-    std::string print(unsigned delta) const override;
-    bool is_match(const Frame& frame, const Match& match) const override;
-private:
-    Ast ast_;
-};
-
 
 template<typename T>
 Ast parse(token_iterator_t& begin, const token_iterator_t& end);
@@ -282,19 +257,19 @@ Ast parse(token_iterator_t& begin, const token_iterator_t& end);
 #define PARSE_EXISTS(T) \
 template<> Ast parse<T>(token_iterator_t& begin, const token_iterator_t& end)
 
-PARSE_EXISTS(AllExpr);
-PARSE_EXISTS(NoneExpr);
-PARSE_EXISTS(TypeExpr);
-PARSE_EXISTS(NameExpr);
-PARSE_EXISTS(IndexExpr);
-PARSE_EXISTS(ResnameExpr);
-PARSE_EXISTS(ResidExpr);
-PARSE_EXISTS(PositionExpr);
-PARSE_EXISTS(VelocityExpr);
-PARSE_EXISTS(MassExpr);
-PARSE_EXISTS(AndExpr);
-PARSE_EXISTS(OrExpr);
-PARSE_EXISTS(NotExpr);
+PARSE_EXISTS(All);
+PARSE_EXISTS(None);
+PARSE_EXISTS(Type);
+PARSE_EXISTS(Name);
+PARSE_EXISTS(Index);
+PARSE_EXISTS(Resname);
+PARSE_EXISTS(Resid);
+PARSE_EXISTS(Position);
+PARSE_EXISTS(Velocity);
+PARSE_EXISTS(Mass);
+PARSE_EXISTS(And);
+PARSE_EXISTS(Or);
+PARSE_EXISTS(Not);
 
 #undef PARSE_EXISTS
 

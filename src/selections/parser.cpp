@@ -167,11 +167,11 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
     if (begin->is_boolean_op()) {
         switch (begin->type()) {
         case Token::AND:
-            return parse<AndExpr>(begin, end);
+            return parse<And>(begin, end);
         case Token::OR:
-            return parse<OrExpr>(begin, end);
+            return parse<Or>(begin, end);
         case Token::NOT:
-            return parse<NotExpr>(begin, end);
+            return parse<Not>(begin, end);
         default:
             unreachable();
         }
@@ -182,30 +182,30 @@ Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t
 
         auto ident = begin[2].ident();
         if (ident == "type") {
-            return parse<TypeExpr>(begin, end);
+            return parse<Type>(begin, end);
         } else if (ident == "name") {
-            return parse<NameExpr>(begin, end);
+            return parse<Name>(begin, end);
         } else if (ident == "index") {
-            return parse<IndexExpr>(begin, end);
+            return parse<Index>(begin, end);
         } else if (ident == "resname") {
-            return parse<ResnameExpr>(begin, end);
+            return parse<Resname>(begin, end);
         } else if (ident == "resid") {
-            return parse<ResidExpr>(begin, end);
+            return parse<Resid>(begin, end);
         } else if (ident == "mass") {
-            return parse<MassExpr>(begin, end);
+            return parse<Mass>(begin, end);
         } else if (ident == "x" || ident == "y" || ident == "z") {
-            return parse<PositionExpr>(begin, end);
+            return parse<Position>(begin, end);
         } else if (ident == "vx" || ident == "vy" || ident == "vz") {
-            return parse<VelocityExpr>(begin, end);
+            return parse<Velocity>(begin, end);
         } else {
             throw selection_error("unknown operation '{}'", ident);
         }
     } else if (begin->is_ident()) {
         auto ident = begin->ident();
         if (ident == "all") {
-            return parse<AllExpr>(begin, end);
+            return parse<All>(begin, end);
         } else if (ident == "none") {
-            return parse<NoneExpr>(begin, end);
+            return parse<None>(begin, end);
         } else {
             throw selection_error("unknown operation '{}'", ident);
         }
