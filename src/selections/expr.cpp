@@ -1,6 +1,8 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#if false
+
 #include <cmath>
 #include <functional>
 
@@ -470,3 +472,6 @@ Ast parse<Not>(token_iterator_t& begin, const token_iterator_t& end) {
 }
 
 }} // namespace chemfiles && namespace selections
+
+
+#endif

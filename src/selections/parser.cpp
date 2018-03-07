@@ -13,6 +13,13 @@
 using namespace chemfiles;
 using namespace selections;
 
+
+Ast selections::parse(std::vector<Token>) {
+    throw Error("unimplemented");
+}
+
+#if false
+
 struct function_info_t {
     /// Function arity, i.e. number of arguments
     unsigned arity;
@@ -228,3 +235,5 @@ Ast selections::parse(std::vector<Token> tokens) {
 
     return ast;
 }
+
+#endif

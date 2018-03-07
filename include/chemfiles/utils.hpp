@@ -50,11 +50,11 @@ inline double string2double(const std::string& string) {
         size_t length = 0;
         double value = std::stod(string, &length);
         if (length != string.length()) {
-            throw chemfiles::Error("Can not convert '" + string + "' to number");
+            throw chemfiles::Error("can not convert '" + string + "' to number");
         }
         return value;
     } catch (const std::invalid_argument&) {
-        throw chemfiles::Error("Can not convert '" + string + "' to number");
+        throw chemfiles::Error("can not convert '" + string + "' to number");
     } catch (const std::out_of_range&) {
         throw chemfiles::Error("'" + string + "' is out of range for double type");
     }
@@ -67,11 +67,11 @@ inline long long int string2longlong(const std::string& string) {
         size_t length = 0;
         long long int value = std::stoll(string, &length);
         if (length != string.length()) {
-            throw chemfiles::Error("Can not convert '" + string + "' to number");
+            throw chemfiles::Error("can not convert '" + string + "' to number");
         }
         return value;
     } catch (const std::invalid_argument&) {
-        throw chemfiles::Error("Can not convert '" + string + "' to number");
+        throw chemfiles::Error("can not convert '" + string + "' to number");
     } catch (const std::out_of_range&) {
         throw chemfiles::Error("'" + string + "' is out of range for long long int type");
     }

@@ -5,10 +5,10 @@
 #define CHEMFILES_SELECTION_LEXER_HPP
 
 #include <string>
-#include <sstream>
 #include <vector>
-#include <cassert>
+
 #include <chemfiles/exports.hpp>
+#include <chemfiles/Error.hpp>
 
 namespace chemfiles {
 namespace selections {
@@ -32,23 +32,33 @@ public:
         /// Comma
         COMMA,
         /// "==" token
-        EQ,
+        EQUAL,
         /// "!=" token
-        NEQ,
+        NOT_EQUAL,
         /// "<" token
-        LT,
+        LESS,
         /// "<=" token
-        LE,
+        LESS_EQUAL,
         /// ">" token
-        GT,
+        GREATER,
         /// ">=" token
-        GE,
-        /// "not" token
-        NOT,
+        GREATER_EQUAL,
+        /// "+" token
+        PLUS,
+        /// "-" token
+        MINUS,
+        /// "*" token
+        STAR,
+        /// "/" token
+        SLASH,
+        /// "^" token
+        HAT,
         /// "and" token
         AND,
         /// "or" token
         OR,
+        /// "not" token
+        NOT,
         /// Generic identifier
         IDENT,
         /// Number
@@ -70,9 +80,7 @@ public:
 
     /// Create a number token with `data` value
     static Token number(double data) {
-        std::stringstream sstream;
-        sstream << data;
-        return Token(NUMBER, sstream.str(), data, 0);
+        return Token(NUMBER, "", data, 0);
     }
 
     /// Create a variable token with `data` value
@@ -80,82 +88,43 @@ public:
         return Token(VARIABLE, "", 0.0, variable);
     }
 
-    /// Create a token with type `ttype`.
-    /// \pre `ttype` can not be NUM or IDENT.
-    /// \post `type()` is `ttype`.
-    Token(Type ttype): Token(ttype, "", 0.0, 0) {
-        assert(
-            ttype != IDENT && ttype != NUMBER && ttype != VARIABLE &&
-            "Can only use this constructor for token without associated data"
-        );
+    /// Create a token with the given `type`. The type can not be `NUMBER`,
+    /// `IDENT` or `VARIABLE`.
+    Token(Type type): Token(type, "", 0.0, 0) {
+        if (type == IDENT || type == NUMBER || type == VARIABLE) {
+            throw Error("invalid Token constructor called. This is a bug.");
+        }
     }
 
     /// Get the string which is at the origin of this token
     std::string str() const;
 
     /// Get the number value associated with this token.
-    /// \pre type() must be `NUMBER`.
+    /// The token type must be `NUMBER`.
     double number() const {
-        assert(type_ == NUMBER && "Can only get number from NUM token");
+        if (type_ != NUMBER) {
+            throw Error("can not get a number value out of this token. This is a bug.");
+        }
         return number_;
     }
 
     /// Get the identifier name associated with this token.
-    /// \pre type() must be `IDENT` or `NUMBER`.
+    /// The token type must be `IDENT`.
     const std::string& ident() const {
-        assert(
-            (type_ == IDENT || type_ == NUMBER) &&
-            "Can only get identifiers from IDENT or NUMBER token"
-        );
+        if (type_ != IDENT) {
+            throw Error("can not get an ident value out of this token. This is a bug.");
+        }
         return ident_;
     }
 
     /// Get the variable associated with this token.
-    /// \pre type() must be `VARIABLE`.
+    /// `type()` must be `VARIABLE`.
     unsigned variable() const {
-        assert(type_ == VARIABLE && "Can only get variable from VARIABLE token");
+        if (type_ != VARIABLE) {
+            throw Error("can not get a variable value out of this token. This is a bug.");
+        }
         return variable_;
     }
-
-    /// Check whether this token is a boolean operator,///i.e.* one of `and`,
-    /// `or` or `not`
-    bool is_boolean_op() const {
-        return (type() == AND || type() == OR || type() == NOT);
-    }
-
-    /// Check whether this token is a binary comparison operator,///i.e.* one
-    /// of `==`, `!=`, `<`, `<=`, `>` or `>=`.
-    bool is_binary_op() const {
-        return (type() == EQ || type() == NEQ ||
-                type() == LT || type() == LE  ||
-                type() == GT || type() == GE);
-    }
-
-    /// Check whether this token is an operator, either a binary comparison operator or a
-    /// boolean operator
-    bool is_operator() const {
-        return is_binary_op() || is_boolean_op();
-    }
-
-    /// Check whether this token is an identifier
-    bool is_ident() const {
-        return (type_ == IDENT || type_ == NUMBER);
-    }
-
-    /// Check whether this token is a number
-    bool is_number() const {
-        return type_ == NUMBER;
-    }
-
-    /// Check whether this token is a variable
-    bool is_variable() const {
-        return type_ == VARIABLE;
-    }
-
-    /// Get the precedence of this token. Parentheses have a precedence of 0, operators
-    /// are classified by precedence.
-    /// \pre This token must be an operator (`is_operator()` is `true`) or a parenthese.
-    unsigned precedence() const;
 
     /// Get the token type of this token
     Type type() const {return type_;}

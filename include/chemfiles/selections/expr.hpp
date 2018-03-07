@@ -1,6 +1,8 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#if false
+
 #ifndef CHEMFILES_SELECTION_EXPR_HPP
 #define CHEMFILES_SELECTION_EXPR_HPP
 
@@ -274,5 +276,7 @@ PARSE_EXISTS(Not);
 #undef PARSE_EXISTS
 
 }} // namespace chemfiles && namespace selections
+
+#endif
 
 #endif

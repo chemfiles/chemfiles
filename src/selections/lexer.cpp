@@ -13,8 +13,7 @@ using namespace chemfiles;
 using namespace chemfiles::selections;
 
 // This intentionally does not account for other encoding or locale. Selection
-// strings
-// should be given in ASCII or UTF-8 encoding.
+// strings should be given in ASCII or UTF-8 encoding.
 static bool is_alpha(char c) {
     return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'));
 }
@@ -38,18 +37,28 @@ std::string Token::str() const {
         return ",";
     case Token::VARIABLE:
         return "#" + std::to_string(variable_);
-    case Token::EQ:
+    case Token::EQUAL:
         return "==";
-    case Token::NEQ:
+    case Token::NOT_EQUAL:
         return "!=";
-    case Token::LT:
+    case Token::LESS:
         return "<";
-    case Token::LE:
+    case Token::LESS_EQUAL:
         return "<=";
-    case Token::GT:
+    case Token::GREATER:
         return ">";
-    case Token::GE:
+    case Token::GREATER_EQUAL:
         return ">=";
+    case Token::PLUS:
+        return "+";
+    case Token::MINUS:
+        return "-";
+    case Token::STAR:
+        return "*";
+    case Token::SLASH:
+        return "/";
+    case Token::HAT:
+        return "^";
     case Token::NOT:
         return "not";
     case Token::AND:
@@ -60,34 +69,6 @@ std::string Token::str() const {
         return ident();
     case Token::NUMBER:
         return std::to_string(number());
-    }
-    unreachable();
-}
-
-unsigned Token::precedence() const {
-    switch (type_) {
-    case IDENT:
-        return 40;
-    case LT:
-    case LE:
-    case GT:
-    case GE:
-    case EQ:
-    case NEQ:
-        return 30;
-    case NOT:
-        return 20;
-    case AND:
-        return 10;
-    case OR:
-        return 5;
-    case LPAREN:
-    case RPAREN:
-        return 0;
-    case NUMBER:
-    case VARIABLE:
-    case COMMA:
-        throw selection_error("invalid case in Token::precedence");
     }
     unreachable();
 }
@@ -152,22 +133,37 @@ std::vector<Token> selections::tokenize(const std::string& input) {
             tokens.emplace_back(Token(Token::COMMA));
             continue;
         } else if (word == "==") {
-            tokens.emplace_back(Token(Token::EQ));
+            tokens.emplace_back(Token(Token::EQUAL));
             continue;
         } else if (word == "!=") {
-            tokens.emplace_back(Token(Token::NEQ));
+            tokens.emplace_back(Token(Token::NOT_EQUAL));
             continue;
         } else if (word == "<") {
-            tokens.emplace_back(Token(Token::LT));
+            tokens.emplace_back(Token(Token::LESS));
             continue;
         } else if (word == "<=") {
-            tokens.emplace_back(Token(Token::LE));
+            tokens.emplace_back(Token(Token::LESS_EQUAL));
             continue;
         } else if (word == ">") {
-            tokens.emplace_back(Token(Token::GT));
+            tokens.emplace_back(Token(Token::GREATER));
             continue;
         } else if (word == ">=") {
-            tokens.emplace_back(Token(Token::GE));
+            tokens.emplace_back(Token(Token::GREATER_EQUAL));
+            continue;
+        } else if (word == "+") {
+            tokens.emplace_back(Token(Token::PLUS));
+            continue;
+        } else if (word == "-") {
+            tokens.emplace_back(Token(Token::MINUS));
+            continue;
+        } else if (word == "*") {
+            tokens.emplace_back(Token(Token::STAR));
+            continue;
+        } else if (word == "/") {
+            tokens.emplace_back(Token(Token::SLASH));
+            continue;
+        } else if (word == "^") {
+            tokens.emplace_back(Token(Token::HAT));
             continue;
         } else if (word == "#") {
             if (i == splited.size() - 1) {
@@ -200,7 +196,11 @@ std::vector<Token> selections::tokenize(const std::string& input) {
             tokens.emplace_back(Token::ident(word));
             continue;
         } else if (is_number(word)) {
-            tokens.emplace_back(Token::number(string2double(word)));
+            try {
+                tokens.emplace_back(Token::number(string2double(word)));
+            } catch (const Error& e) {
+                throw SelectionError(e.what());
+            }
             continue;
         } else {
             throw selection_error("could not parse '{}' in '{}'", word, input);
