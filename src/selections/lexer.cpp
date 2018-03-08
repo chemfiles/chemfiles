@@ -29,6 +29,8 @@ static bool is_space(char c) {
 
 std::string Token::str() const {
     switch (type_) {
+    case Token::END:
+        return "<end of selection>";
     case Token::LPAREN:
         return "(";
     case Token::RPAREN:
@@ -68,7 +70,11 @@ std::string Token::str() const {
     case Token::IDENT:
         return ident();
     case Token::NUMBER:
-        return std::to_string(number());
+        if (lround(number()) == number()) {
+            return std::to_string(lround(number()));
+        } else {
+            return std::to_string(number());
+        }
     }
     unreachable();
 }
@@ -206,5 +212,6 @@ std::vector<Token> selections::tokenize(const std::string& input) {
             throw selection_error("could not parse '{}' in '{}'", word, input);
         }
     }
+    tokens.push_back(Token(Token::END));
     return tokens;
 }

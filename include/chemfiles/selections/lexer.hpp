@@ -65,6 +65,8 @@ public:
         NUMBER,
         /// "#(\d+)" token
         VARIABLE,
+        /// End of selection
+        END,
     };
 
     ~Token() = default;

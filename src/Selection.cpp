@@ -87,7 +87,7 @@ Selection::Selection(const std::string& selection)
             }
         }
     }
-    ast_ = selections::parse(tokens);
+    ast_ = selections::Parser(tokens).parse();
 }
 
 size_t Selection::size() const {
