@@ -196,6 +196,10 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
             auto name = trim(line.substr(17, 3));
             Residue residue(std::move(name), resid);
             residue.add_atom(atom_id);
+
+            // This will be save as an int... on purpose
+            residue.set("chainid", line[21]);
+
             residues_.insert({resid, residue});
         } else {
             // Just add this atom to the residue
