@@ -34,12 +34,12 @@ static std::map<std::string, num_prop_creator_t> NUMERIC_PROPERTIES = {
 
 using num_functions_creator_t = std::function<MathAst(MathAst)>;
 static std::map<std::string, num_functions_creator_t> NUMERIC_FUNCTIONS = {
-    {"sin", [](MathAst ast){ return MathAst(new Function(sin, "sin", std::move(ast)));}},
-    {"cos", [](MathAst ast){ return MathAst(new Function(cos, "cos", std::move(ast)));}},
-    {"tan", [](MathAst ast){ return MathAst(new Function(tan, "tan", std::move(ast)));}},
-    {"asin", [](MathAst ast){ return MathAst(new Function(asin, "asin", std::move(ast)));}},
-    {"acos", [](MathAst ast){ return MathAst(new Function(acos, "acos", std::move(ast)));}},
-    {"sqrt", [](MathAst ast){ return MathAst(new Function(sqrt, "sqrt", std::move(ast)));}},
+    {"sin", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(sin), "sin", std::move(ast)));}},
+    {"cos", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(cos), "cos", std::move(ast)));}},
+    {"tan", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(tan), "tan", std::move(ast)));}},
+    {"asin", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(asin), "asin", std::move(ast)));}},
+    {"acos", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(acos), "acos", std::move(ast)));}},
+    {"sqrt", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(sqrt), "sqrt", std::move(ast)));}},
 };
 
 static bool is_string_property(const std::string& name) {
