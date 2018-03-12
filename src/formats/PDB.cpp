@@ -197,8 +197,8 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
             Residue residue(std::move(name), resid);
             residue.add_atom(atom_id);
 
-            // This will be save as an int... on purpose
-            residue.set("chainid", line[21]);
+            // This will be save as a string... on purpose to match MMTF
+            residue.set("chainid", line.substr(21,1));
 
             residues_.insert({resid, residue});
         } else {

@@ -101,7 +101,7 @@ TEST_CASE("Read files in PDB format") {
         CHECK(residue.contains(1));
         CHECK(residue.contains(2));
         CHECK(residue.get("chainid"));
-        CHECK(*(residue.get("chainid")) == 'X');
+        CHECK(residue.get("chainid")->as_string() == "X");
 
         file = Trajectory("data/pdb/MOF-5.pdb");
         frame = file.read();

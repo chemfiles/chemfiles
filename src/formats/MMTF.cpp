@@ -107,6 +107,16 @@ void MMTFFormat::read(Frame& frame) {
                 // TODO add bond information using group.bondOrderList[l]
             }
 
+            // This is a string in MMTF, differs from the name as then increments linearly
+            // For example, the fourth chainid in ( A B A B) would be D, not B (the chainname)
+            res.set("chainid", file_->chainIdList[chainIndex_]);
+
+            // An integer
+            res.set("chainindex", chainIndex_);
+
+            if (file_->chainNameList)
+                res.set("chainname", file_->chainNameList[chainIndex_]);
+
             frame.add_residue(res);
             groupIndex_++;
         }
