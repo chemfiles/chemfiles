@@ -163,9 +163,9 @@ TEST_CASE("Write files in PDB format") {
     "MODEL    2\n"
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
     "ATOM      1 A    XXX X   4       4.000   5.000   6.000  1.00  0.00           A\n"
-    "HETATM    2 B    foo X   3       4.000   5.000   6.000  1.00  0.00           B\n"
-    "ATOM      3 C    foo X   3       4.000   5.000   6.000  1.00  0.00           C\n"
-    "HETATM    4 D    bar X  -1       4.000   5.000   6.000  1.00  0.00           D\n"
+    "HETATM    2 B    foo A   3       4.000   5.000   6.000  1.00  0.00           B\n"
+    "ATOM      3 C    foo A   3       4.000   5.000   6.000  1.00  0.00           C\n"
+    "HETATM    4 D    bar C  -1       4.000   5.000   6.000  1.00  0.00           D\n"
     "HETATM    5 E    XXX X   5       4.000   5.000   6.000  1.00  0.00           E\n"
     "HETATM    6 F    XXX X   6       4.000   5.000   6.000  1.00  0.00           F\n"
     "HETATM    7 G    XXX X   7       4.000   5.000   6.000  1.00  0.00           G\n"
@@ -221,10 +221,12 @@ TEST_CASE("Write files in PDB format") {
     Residue residue("foo", 3);
     residue.add_atom(1);
     residue.add_atom(2);
+    residue.set("chainid", "A");
     topology.add_residue(residue);
 
     residue = Residue("barbar"); // This will be truncated in output
     residue.add_atom(3);
+    residue.set("chainid", "CB");
     topology.add_residue(residue);
 
     frame.set_topology(topology);
