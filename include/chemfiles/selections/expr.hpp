@@ -9,6 +9,8 @@
 #include <cassert>
 #include <functional>
 
+#include "chemfiles/external/optional.hpp"
+
 namespace chemfiles {
 
 class Frame;
@@ -24,6 +26,9 @@ public:
     virtual std::string print(unsigned delta = 0) const = 0;
     /// Check if the `match` is valid in the given `frame`.
     virtual bool is_match(const Frame& frame, const Match& match) const = 0;
+    /// Optimize the AST corresponding to this Selector. Currently, this only
+    /// perform constant propgations in mathematical expressions.
+    virtual void optimize() {}
 
     Selector() = default;
     virtual ~Selector() = default;
@@ -160,6 +165,7 @@ public:
     Math(Operator op, MathAst lhs, MathAst rhs): op_(op), lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
 
     bool is_match(const Frame& frame, const Match& match) const override;
+    void optimize() override;
     std::string print(unsigned delta) const override;
 
 private:
@@ -176,6 +182,11 @@ public:
 
     /// Evaluate the expression and get the value
     virtual double eval(const Frame& frame, const Match& match) const = 0;
+
+    /// Propagate all constants in this sub ast, and return the corresponding
+    /// value if possible.
+    virtual optional<double> optimize() = 0;
+
     /// Pretty-print the expression
     virtual std::string print() const = 0;
 };
@@ -186,6 +197,7 @@ public:
     Add(MathAst lhs, MathAst rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
 
     double eval(const Frame& frame, const Match& match) const override;
+    optional<double> optimize() override;
     std::string print() const override;
 private:
     MathAst lhs_;
@@ -198,6 +210,7 @@ public:
     Sub(MathAst lhs, MathAst rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
 
     double eval(const Frame& frame, const Match& match) const override;
+    optional<double> optimize() override;
     std::string print() const override;
 private:
     MathAst lhs_;
@@ -210,6 +223,7 @@ public:
     Mul(MathAst lhs, MathAst rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
 
     double eval(const Frame& frame, const Match& match) const override;
+    optional<double> optimize() override;
     std::string print() const override;
 private:
     MathAst lhs_;
@@ -222,6 +236,7 @@ public:
     Div(MathAst lhs, MathAst rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
 
     double eval(const Frame& frame, const Match& match) const override;
+    optional<double> optimize() override;
     std::string print() const override;
 private:
     MathAst lhs_;
@@ -234,6 +249,7 @@ public:
     Pow(MathAst lhs, MathAst rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
 
     double eval(const Frame& frame, const Match& match) const override;
+    optional<double> optimize() override;
     std::string print() const override;
 private:
     MathAst lhs_;
@@ -246,6 +262,7 @@ public:
     Neg(MathAst ast): ast_(std::move(ast)) {}
 
     double eval(const Frame& frame, const Match& match) const override;
+    optional<double> optimize() override;
     std::string print() const override;
 
 private:
@@ -260,6 +277,7 @@ public:
         fn_(std::move(fn)), name_(std::move(name)), ast_(std::move(ast)) {}
 
     double eval(const Frame& frame, const Match& match) const override;
+    optional<double> optimize() override;
     std::string print() const override;
 
 private:
@@ -274,6 +292,7 @@ public:
     Number(double value): value_(value) {}
 
     double eval(const Frame& frame, const Match& match) const override;
+    optional<double> optimize() override;
     std::string print() const override;
 
 private:
@@ -287,6 +306,7 @@ public:
     virtual ~NumericProperty() = default;
 
     double eval(const Frame& frame, const Match& match) const override final;
+    optional<double> optimize() override final;
     std::string print() const override final;
 
     /// Get the value of the property for the atom at index `i` in the `frame`

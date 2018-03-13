@@ -143,9 +143,33 @@ std::string Math::print(unsigned /*unused*/) const {
     return lhs_->print() + op + rhs_->print();
 }
 
+void Math::optimize() {
+    auto lhs_opt = lhs_->optimize();
+    if (lhs_opt) {
+        lhs_ = MathAst(new Number(lhs_opt.value()));
+    }
+
+    auto rhs_opt = rhs_->optimize();
+    if (rhs_opt) {
+        rhs_ = MathAst(new Number(rhs_opt.value()));
+    }
+}
 
 double Add::eval(const Frame& frame, const Match& match) const {
     return lhs_->eval(frame, match) + rhs_->eval(frame, match);
+}
+
+optional<double> Add::optimize() {
+    auto lhs_opt = lhs_->optimize();
+    auto rhs_opt = rhs_->optimize();
+    if (lhs_opt && lhs_opt) {
+        return lhs_opt.value() + rhs_opt.value();
+    } else if (lhs_opt) {
+        lhs_ = MathAst(new Number(lhs_opt.value()));
+    } else if (rhs_opt) {
+        rhs_ = MathAst(new Number(rhs_opt.value()));
+    }
+    return nullopt;
 }
 
 std::string Add::print() const {
@@ -156,12 +180,38 @@ double Sub::eval(const Frame& frame, const Match& match) const {
     return lhs_->eval(frame, match) - rhs_->eval(frame, match);
 }
 
+optional<double> Sub::optimize() {
+    auto lhs_opt = lhs_->optimize();
+    auto rhs_opt = rhs_->optimize();
+    if (lhs_opt && lhs_opt) {
+        return lhs_opt.value() - rhs_opt.value();
+    } else if (lhs_opt) {
+        lhs_ = MathAst(new Number(lhs_opt.value()));
+    } else if (rhs_opt) {
+        rhs_ = MathAst(new Number(rhs_opt.value()));
+    }
+    return nullopt;
+}
+
 std::string Sub::print() const {
     return "(" + lhs_->print() + " - " + rhs_->print() + ")";
 }
 
 double Mul::eval(const Frame& frame, const Match& match) const {
     return lhs_->eval(frame, match) * rhs_->eval(frame, match);
+}
+
+optional<double> Mul::optimize() {
+    auto lhs_opt = lhs_->optimize();
+    auto rhs_opt = rhs_->optimize();
+    if (lhs_opt && lhs_opt) {
+        return lhs_opt.value() * rhs_opt.value();
+    } else if (lhs_opt) {
+        lhs_ = MathAst(new Number(lhs_opt.value()));
+    } else if (rhs_opt) {
+        rhs_ = MathAst(new Number(rhs_opt.value()));
+    }
+    return nullopt;
 }
 
 std::string Mul::print() const {
@@ -172,12 +222,38 @@ double Div::eval(const Frame& frame, const Match& match) const {
     return lhs_->eval(frame, match) / rhs_->eval(frame, match);
 }
 
+optional<double> Div::optimize() {
+    auto lhs_opt = lhs_->optimize();
+    auto rhs_opt = rhs_->optimize();
+    if (lhs_opt && lhs_opt) {
+        return lhs_opt.value() / rhs_opt.value();
+    } else if (lhs_opt) {
+        lhs_ = MathAst(new Number(lhs_opt.value()));
+    } else if (rhs_opt) {
+        rhs_ = MathAst(new Number(rhs_opt.value()));
+    }
+    return nullopt;
+}
+
 std::string Div::print() const {
     return "(" + lhs_->print() + " / " + rhs_->print() + ")";
 }
 
 double Pow::eval(const Frame& frame, const Match& match) const {
     return pow(lhs_->eval(frame, match), rhs_->eval(frame, match));
+}
+
+optional<double> Pow::optimize() {
+    auto lhs_opt = lhs_->optimize();
+    auto rhs_opt = rhs_->optimize();
+    if (lhs_opt && lhs_opt) {
+        return pow(lhs_opt.value(), rhs_opt.value());
+    } else if (lhs_opt) {
+        lhs_ = MathAst(new Number(lhs_opt.value()));
+    } else if (rhs_opt) {
+        rhs_ = MathAst(new Number(rhs_opt.value()));
+    }
+    return nullopt;
 }
 
 std::string Pow::print() const {
@@ -188,6 +264,15 @@ double Neg::eval(const Frame& frame, const Match& match) const {
     return - ast_->eval(frame, match);
 }
 
+optional<double> Neg::optimize() {
+    auto optimized = ast_->optimize();
+    if (optimized) {
+        return - optimized.value();
+    } else {
+        return nullopt;
+    }
+}
+
 std::string Neg::print() const {
     return "(-" + ast_->print() + ")";
 }
@@ -196,11 +281,24 @@ double Function::eval(const Frame& frame, const Match& match) const {
     return fn_(ast_->eval(frame, match));
 }
 
+optional<double> Function::optimize() {
+    auto optimized = ast_->optimize();
+    if (optimized) {
+        return fn_(optimized.value());
+    } else {
+        return nullopt;
+    }
+}
+
 std::string Function::print() const {
     return name_ + "(" + ast_->print() + ")";
 }
 
 double Number::eval(const Frame& /*unused*/, const Match& /*unused*/) const {
+    return value_;
+}
+
+optional<double> Number::optimize() {
     return value_;
 }
 
@@ -214,6 +312,10 @@ std::string Number::print() const {
 
 double NumericProperty::eval(const Frame& frame, const Match& match) const {
     return this->value(frame, match[argument_]);
+}
+
+optional<double> NumericProperty::optimize() {
+    return nullopt;
 }
 
 std::string NumericProperty::print() const {

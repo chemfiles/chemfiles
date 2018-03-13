@@ -88,6 +88,7 @@ Selection::Selection(const std::string& selection)
         }
     }
     ast_ = selections::Parser(tokens).parse();
+    ast_->optimize();
 }
 
 size_t Selection::size() const {
