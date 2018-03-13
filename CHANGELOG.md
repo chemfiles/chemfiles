@@ -5,6 +5,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+* Properties are now supported in the `Residue` class. They are accessed using
+  `Residue::set` and `Residue::get`.
+
+### Changes in supported formats
+
+* Added `MarcoMolecule Transmission Format (MMTF)` support, reading via mmtf-c.
+* Added `Structure-Data File (SDF)` support, reading and writing.
+
+###  C API changes
+
+* Added `chfl_residue_get_property` and `chfl_residue_set_property` to provide
+  access to residue properties.
+
 ## 0.8 (14 Dec 2017)
 
 ### New features

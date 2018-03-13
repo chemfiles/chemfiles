@@ -10,6 +10,7 @@
 #include "chemfiles/exports.hpp"
 #include "chemfiles/sorted_set.hpp"
 #include "chemfiles/external/optional.hpp"
+#include "chemfiles/Property.hpp"
 
 namespace chemfiles {
 
@@ -83,6 +84,26 @@ public:
     const_iterator cbegin() const {return atoms_.cbegin();}
     const_iterator cend() const {return atoms_.cend();}
 
+    /// Set an arbitrary `Property` for this residue with the given `name` and
+    /// `value`. If a property with this name already exist, it is replaced with
+    /// the new value.
+    ///
+    /// @example{tests/doc/residue/property.cpp}
+    void set(std::string name, Property value);
+
+    /// Get the `Property` with the given `name` for this residue if it exists.
+    ///
+    /// If no property with the given `name` is found, this function returns
+    /// `nullopt`.
+    ///
+    /// @verbatim embed:rst:leading-slashes
+    /// This function returns an :cpp:class:`chemfiles::optional` value that is
+    /// close to C++17 ``std::optional``.
+    /// @endverbatim
+    ///
+    /// @example{tests/doc/residue/property.cpp}
+    optional<const Property&> get(const std::string& name) const;
+
 private:
     /// Name of the residue
     std::string name_;
@@ -91,13 +112,18 @@ private:
     /// Indexes of the atoms in this residue. These indexes refers to the
     /// associated topology.
     sorted_set<size_t> atoms_;
+    /// Additional properties of this residue
+    property_map properties_;
+
+    friend bool operator==(const Residue& lhs, const Residue& rhs);
 };
 
 inline bool operator==(const Residue& lhs, const Residue& rhs) {
     return lhs.id() == rhs.id() &&
            lhs.name() == rhs.name() &&
            lhs.size() == rhs.size() &&
-           std::equal(lhs.begin(), lhs.end(), rhs.begin());
+           std::equal(lhs.begin(), lhs.end(), rhs.begin()) &&
+           lhs.properties_ == rhs.properties_;
 }
 
 inline bool operator!=(const Residue& lhs, const Residue& rhs) {

@@ -51,7 +51,40 @@ TEST_CASE("Read files in MMTF format") {
         auto residue = *frame.topology().residue_for_atom(4557);
         CHECK(residue.size() == 43);
         CHECK(residue.name() == "HEM");
+
+        CHECK(residue.get("chainid"));
+        CHECK(residue.get("chainname"));
+        CHECK(residue.get("chainindex"));
+
+        CHECK(residue.get("chainid")->as_string() == "J");
+        CHECK(residue.get("chainname")->as_string() == "D");
+        CHECK(residue.get("chainindex")->as_double() == 9 );
+
         CHECK(residue.contains(4525));
+
+        auto water_res = *frame.topology().residue_for_atom(4558);
+        CHECK(water_res.size() == 1);
+        CHECK(water_res.name() == "HOH");
+
+        CHECK(water_res.get("chainid"));
+        CHECK(water_res.get("chainname"));
+        CHECK(water_res.get("chainindex"));
+
+        CHECK(water_res.get("chainid")->as_string() == "K");
+        CHECK(water_res.get("chainname")->as_string() == "A");
+        CHECK(water_res.get("chainindex")->as_double() == 10 );
+
+        auto water_res2 = *frame.topology().residue_for_atom(4614);
+        CHECK(water_res2.size() == 1);
+        CHECK(water_res2.name() == "HOH");
+
+        CHECK(water_res2.get("chainid"));
+        CHECK(water_res2.get("chainname"));
+        CHECK(water_res2.get("chainindex"));
+
+        CHECK(water_res2.get("chainid")->as_string() == "L");
+        CHECK(water_res2.get("chainname")->as_string() == "B");
+        CHECK(water_res2.get("chainindex")->as_double() == 11 );
     }
 
     SECTION("Skip steps") {

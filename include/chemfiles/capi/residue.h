@@ -140,6 +140,32 @@ CHFL_EXPORT chfl_status chfl_residue_contains(
     const CHFL_RESIDUE* residue, uint64_t i, bool* result
 );
 
+/// Add a new `property` with the given `name` to this `residue`.
+///
+/// If a property with the same name already exists, this function override the
+/// existing property with the new one.
+///
+/// @example{tests/capi/doc/chfl_residue/property.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_residue_set_property(
+    CHFL_RESIDUE* residue, const char* name, const CHFL_PROPERTY* property
+);
+
+/// Get a property with the given `name` in this `residue`.
+///
+/// This function returns `NULL` if no property exists with the given name.
+///
+/// The user of this function is responsible to deallocate memory using the
+/// `chfl_property_free` function.
+///
+/// @example{tests/capi/doc/chfl_residue/property.c}
+/// @return A pointer to the property, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
+CHFL_EXPORT CHFL_PROPERTY* chfl_residue_get_property(
+    const CHFL_RESIDUE* residue, const char* name
+);
+
 /// Free the memory associated with a `residue`.
 ///
 /// @example{tests/capi/doc/chfl_residue/chfl_residue.c}

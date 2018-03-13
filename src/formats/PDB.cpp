@@ -196,6 +196,10 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
             auto name = trim(line.substr(17, 3));
             Residue residue(std::move(name), resid);
             residue.add_atom(atom_id);
+
+            // This will be save as a string... on purpose to match MMTF
+            residue.set("chainid", line.substr(21,1));
+
             residues_.insert({resid, residue});
         } else {
             // Just add this atom to the residue
@@ -372,6 +376,7 @@ void PDBFormat::write(const Frame& frame) {
 
         std::string resname;
         std::string resid;
+        std::string chainid;
         auto residue = frame.topology().residue_for_atom(i);
         if (residue) {
             resname = residue->name();
@@ -394,9 +399,23 @@ void PDBFormat::write(const Frame& frame) {
             } else {
                 resid = "  -1";
             }
+
+            if (residue->get("chainid")) {
+                chainid = residue->get("chainid")->as_string();
+                if (chainid.length() > 1) {
+                    warning(
+                        "Residue '{}' has a chain id name too long for PDB format, it will be truncated.",
+                        chainid
+                    );
+                    chainid = chainid[0];
+                }
+            } else {
+                chainid = "X";
+            }
         }
         else {
             resname = "XXX";
+            chainid = "X";
             auto value = max_resid++;
             if (value < 9999) {
                 resid = to_pdb_index(value);
@@ -418,8 +437,8 @@ void PDBFormat::write(const Frame& frame) {
         // 'resSeq' to be the atomic number.
         fmt::print(
             *file_,
-            "{: <6}{: >5} {: <4s} {:3} X{: >4s}    {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
-            atom_hetatm, to_pdb_index(i), name, resname, resid, pos[0], pos[1], pos[2], 1.0, 0.0, type
+            "{: <6}{: >5} {: <4s} {:3} {:1}{: >4s}    {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
+            atom_hetatm, to_pdb_index(i), name, resname, chainid, resid, pos[0], pos[1], pos[2], 1.0, 0.0, type
         );
     }
 
