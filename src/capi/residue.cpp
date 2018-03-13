@@ -134,6 +134,33 @@ extern "C" chfl_status chfl_residue_contains(const CHFL_RESIDUE* const residue, 
     )
 }
 
+extern "C" chfl_status chfl_residue_set_property(CHFL_RESIDUE* const residue, const char* name, const CHFL_PROPERTY* const property) {
+    CHECK_POINTER(residue);
+    CHECK_POINTER(name);
+    CHECK_POINTER(property);
+    CHFL_ERROR_CATCH(
+        residue->set(name, *property);
+    )
+}
+
+extern "C" CHFL_PROPERTY* chfl_residue_get_property(const CHFL_RESIDUE* const residue, const char* name) {
+    CHFL_PROPERTY* property = nullptr;
+    CHECK_POINTER_GOTO(residue);
+    CHECK_POINTER_GOTO(name);
+    CHFL_ERROR_GOTO(
+        auto residue_property = residue->get(name);
+        if (residue_property) {
+            property = new Property(*residue_property);
+        } else {
+            throw property_error("can not find a property named '{}' in this residue", name);
+        }
+    )
+    return property;
+error:
+    delete property;
+    return nullptr;
+}
+
 extern "C" chfl_status chfl_residue_free(CHFL_RESIDUE* const residue) {
     delete residue;
     return CHFL_SUCCESS;

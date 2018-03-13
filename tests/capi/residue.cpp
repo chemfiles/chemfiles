@@ -109,4 +109,27 @@ TEST_CASE("chfl_residue") {
         CHECK_STATUS(chfl_topology_free(topology));
         CHECK_STATUS(chfl_residue_free(residue));
     }
+
+    SECTION("Property") {
+        CHFL_RESIDUE* residue = chfl_residue("ALA");
+        REQUIRE(residue);
+
+        CHFL_PROPERTY* property = chfl_property_double(-23);
+        REQUIRE(property);
+
+        CHECK_STATUS(chfl_residue_set_property(residue, "this", property));
+        CHECK_STATUS(chfl_property_free(property));
+        property = nullptr;
+
+        property = chfl_residue_get_property(residue, "this");
+        double value = 0;
+        CHECK_STATUS(chfl_property_get_double(property, &value));
+        CHECK(value == -23);
+
+        CHECK_FALSE(chfl_residue_get_property(residue, "that"));
+
+        CHECK_STATUS(chfl_property_free(property));
+        CHECK_STATUS(chfl_residue_free(residue));
+    }
+
 }
