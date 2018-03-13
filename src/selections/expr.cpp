@@ -184,6 +184,14 @@ std::string Pow::print() const {
     return lhs_->print() + " ^(" + rhs_->print() + ")";
 }
 
+double Neg::eval(const Frame& frame, const Match& match) const {
+    return - ast_->eval(frame, match);
+}
+
+std::string Neg::print() const {
+    return "(-" + ast_->print() + ")";
+}
+
 double Function::eval(const Frame& frame, const Match& match) const {
     return fn_(ast_->eval(frame, match));
 }

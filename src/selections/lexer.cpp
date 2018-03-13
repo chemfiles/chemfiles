@@ -2,6 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <algorithm>
+#include <functional>
 
 #include "chemfiles/selections/lexer.hpp"
 
@@ -25,6 +26,10 @@ static bool is_digit(char c) {
 static bool is_space(char c) {
     return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v' ||
             c == '\f');
+}
+
+static bool is_ident_component(char c) {
+    return is_alpha(c) || is_digit(c) || c == '_';
 }
 
 std::string Token::str() const {
@@ -79,137 +84,142 @@ std::string Token::str() const {
     unreachable();
 }
 
-static std::vector<std::string> split_selection(const std::string& data) {
-    std::string token;
-    std::vector<std::string> tokens;
-    for (auto c : data) {
-        if (c == '(' || c == ')' || c == '#' || c == ',') {
-            // Handle some tokens that may not be separated from the others
-            // tokens by spaces, by splitting them manually.
-            if (token.length() != 0) {
-                tokens.emplace_back(token);
-            }
-            token.clear();
-            tokens.push_back(std::string{c});
-        } else if (!is_space(c)) {
-            token += c;
-        } else {
-            if (token.length() != 0) {
-                tokens.emplace_back(token);
-            }
-            token.clear();
-        }
-    }
-    // Last token
-    if (token.length() != 0) {
-        tokens.emplace_back(token);
-    }
-    return tokens;
-}
-
-static bool is_identifier(const std::string& token) {
-    if (token.length() == 0 || !is_alpha(token[0])) {
-        return false;
-    }
-    auto it = std::find_if_not(std::begin(token), std::end(token), [](char c) {
-        return is_alpha(c) || is_digit(c) || c == '_';
-    });
-    return it == std::end(token);
-}
-
-static bool is_number(const std::string& token) {
-    auto it = std::find_if_not(std::begin(token), std::end(token), [&](char c) {
-        return is_digit(c) || c == '.' || c == 'e' || c == '-' || c == '+';
-    });
-    return it == std::end(token);
-}
 
 std::vector<Token> selections::tokenize(const std::string& input) {
     auto tokens = std::vector<Token>();
-    auto splited = split_selection(input);
-    for (size_t i=0; i<splited.size(); i++) {
-        auto& word = splited[i];
-        if (word == "(") {
+    for (size_t i=0; i<input.length(); i++) {
+        auto c = input[i];
+        if (is_space(c)) {
+            continue;
+        } else if (c == '(') {
             tokens.emplace_back(Token(Token::LPAREN));
             continue;
-        } else if (word == ")") {
+        } else if (c == ')') {
             tokens.emplace_back(Token(Token::RPAREN));
             continue;
-        } else if (word == ",") {
+        } else if (c == ',') {
             tokens.emplace_back(Token(Token::COMMA));
             continue;
-        } else if (word == "==") {
+        } else if (c == '=' && input[i + 1] == '=') {
+            i++;
             tokens.emplace_back(Token(Token::EQUAL));
             continue;
-        } else if (word == "!=") {
+        } else if (c == '!' && input[i + 1] == '=') {
+            i++;
             tokens.emplace_back(Token(Token::NOT_EQUAL));
             continue;
-        } else if (word == "<") {
-            tokens.emplace_back(Token(Token::LESS));
+        } else if (c == '<') {
+            if (i + 1 < input.length() && input[i + 1] == '=') {
+                i++;
+                tokens.emplace_back(Token(Token::LESS_EQUAL));
+            } else {
+                tokens.emplace_back(Token(Token::LESS));
+            }
             continue;
-        } else if (word == "<=") {
-            tokens.emplace_back(Token(Token::LESS_EQUAL));
+        } else if (c == '>') {
+            if (i + 1 < input.length() && input[i + 1] == '=') {
+                i++;
+                tokens.emplace_back(Token(Token::GREATER_EQUAL));
+            } else {
+                tokens.emplace_back(Token(Token::GREATER));
+            }
             continue;
-        } else if (word == ">") {
-            tokens.emplace_back(Token(Token::GREATER));
-            continue;
-        } else if (word == ">=") {
-            tokens.emplace_back(Token(Token::GREATER_EQUAL));
-            continue;
-        } else if (word == "+") {
+        } else if (c == '+') {
             tokens.emplace_back(Token(Token::PLUS));
             continue;
-        } else if (word == "-") {
+        } else if (c == '-') {
             tokens.emplace_back(Token(Token::MINUS));
             continue;
-        } else if (word == "*") {
+        } else if (c == '*') {
             tokens.emplace_back(Token(Token::STAR));
             continue;
-        } else if (word == "/") {
+        } else if (c == '/') {
             tokens.emplace_back(Token(Token::SLASH));
             continue;
-        } else if (word == "^") {
+        } else if (c == '^') {
             tokens.emplace_back(Token(Token::HAT));
             continue;
-        } else if (word == "#") {
-            if (i == splited.size() - 1) {
-                throw selection_error("missing value after '#'");
+        } else if (c == '#') {
+            // Get the variabel number
+            std::string number;
+            while (i + 1 < input.length() && is_digit(input[i + 1])) {
+                number += input[i + 1];
+                i++;
             }
-            // Get the next word and try to parse a number out of it
-            word = splited[++i];
+            int data = 0;
             try {
-                int data = std::stoi(word);
-                if (data > UINT8_MAX) {
-                    throw selection_error("variable index #{} is too big for uint8_t", data);
-                }
-                tokens.emplace_back(Token::variable(static_cast<uint8_t>(data)));
-                continue;
+                data = std::stoi(number);
             } catch (const std::exception&) {
-                throw selection_error("could not parse number in '{}'", word);
+                throw selection_error("could not parse number in '{}'", number);
             }
-        } else if (is_identifier(word)) {
-            if (word == "or") {
+            if (data > UINT8_MAX) {
+                throw selection_error("variable index #{} is too big for uint8_t", data);
+            }
+
+            tokens.emplace_back(Token::variable(static_cast<uint8_t>(data)));
+            continue;
+        } else if (is_alpha(c)) {
+            // Collect the full identifier
+            std::string ident;
+            ident += c;
+            while (i + 1 < input.length() && is_ident_component(input[i + 1])) {
+                ident += input[i + 1];
+                i++;
+            }
+            if (ident == "or") {
                 tokens.emplace_back(Token(Token::OR));
                 continue;
-            } else if (word == "and") {
+            } else if (ident == "and") {
                 tokens.emplace_back(Token(Token::AND));
                 continue;
-            } else if (word == "not") {
+            } else if (ident == "not") {
                 tokens.emplace_back(Token(Token::NOT));
                 continue;
             }
             // Default identifier. This will be resolved during parsing phase
-            tokens.emplace_back(Token::ident(word));
+            tokens.emplace_back(Token::ident(std::move(ident)));
             continue;
-        } else if (is_number(word)) {
+        } else if (is_digit(c)) {
+            std::string number;
+            number += c;
+            while (i + 1 < input.length() && (is_digit(input[i + 1]) || input[i + 1] == '.')) {
+                number += input[i + 1];
+                i++;
+            }
+
+            // Optional float exponent
+            if (i + 1 < input.length() && (input[i + 1] == 'e' || input[i + 1] == 'E')) {
+                number += input[i + 1];
+                i++;
+
+                if (i + 1 < input.length() && (input[i + 1] == '+' || input[i + 1] == '-')) {
+                    number += input[i + 1];
+                    i++;
+                }
+
+                while (i + 1 < input.length() && is_digit(input[i + 1])) {
+                    number += input[i + 1];
+                    i++;
+                }
+            }
+
+            // Require a separator between numbers and idents
+            if (i + 1 < input.length() && is_ident_component(input[i + 1])) {
+                while (i + 1 < input.length() && is_ident_component(input[i + 1])) {
+                    number += input[i + 1];
+                    i++;
+                }
+                throw selection_error("identifiers can not start with a digit: '{}'", number);
+            }
+
             try {
-                tokens.emplace_back(Token::number(string2double(word)));
+                tokens.emplace_back(Token::number(string2double(number)));
+                continue;
             } catch (const Error& e) {
                 throw SelectionError(e.what());
             }
-            continue;
         } else {
-            throw selection_error("could not parse '{}' in '{}'", word, input);
+            throw selection_error("unknown char '{}' in '{}'", c, input);
         }
     }
     tokens.push_back(Token(Token::END));

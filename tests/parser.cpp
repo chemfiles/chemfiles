@@ -7,6 +7,9 @@
 #include "chemfiles/selections/parser.hpp"
 #include "chemfiles/selections/expr.hpp"
 
+
+#include <iostream>
+
 using namespace chemfiles;
 using namespace chemfiles::selections;
 
@@ -54,46 +57,68 @@ TEST_CASE("Lexing") {
             CHECK(tokenize(str).size() == 2);
         }
         CHECK(tokenize("\t  bar \t    hkqs     ").size() == 3);
+
+        auto tokens = tokenize("3+#4(foo==not<");
+        CHECK(tokens.size() == 9);
+        CHECK(tokens[0].type() == Token::NUMBER);
+        CHECK(tokens[1].type() == Token::PLUS);
+        CHECK(tokens[2].type() == Token::VARIABLE);
+        CHECK(tokens[3].type() == Token::LPAREN);
+        CHECK(tokens[4].type() == Token::IDENT);
+        CHECK(tokens[5].type() == Token::EQUAL);
+        CHECK(tokens[6].type() == Token::NOT);
+        CHECK(tokens[7].type() == Token::LESS);
+        CHECK(tokens[8].type() == Token::END);
     }
 
     SECTION("Identifiers") {
         for (auto& id: {"ident", "id_3nt___", "iD_3BFAMC8T3Vt___"}) {
-            auto toks = tokenize(id);
-            CHECK(toks.size() == 2);
-            CHECK(toks[0].type() == Token::IDENT);
-            CHECK(toks[0].ident() == id);
-            CHECK(toks[1].type() == Token::END);
+            auto tokens = tokenize(id);
+            CHECK(tokens.size() == 2);
+            CHECK(tokens[0].type() == Token::IDENT);
+            CHECK(tokens[0].ident() == id);
+            CHECK(tokens[1].type() == Token::END);
         }
     }
 
     SECTION("Numbers") {
-        for (auto& str: {"4", "-12748255723", "+3", "567.34", "452.1e4", "4.6784e-56"}) {
-            auto toks = tokenize(str);
-            CHECK(toks.size() == 2);
-            CHECK(toks[0].type() == Token::NUMBER);
-            CHECK(toks[1].type() == Token::END);
+        for (auto& str: {"4", "567.34", "452.1E4", "4e+5", "4.6784e-56"}) {
+            auto tokens = tokenize(str);
+            CHECK(tokens.size() == 2);
+            CHECK(tokens[0].type() == Token::NUMBER);
+            CHECK(tokens[1].type() == Token::END);
         }
+
+        /// A bit of a weird case, but this should be handled too
+        auto tokens = tokenize("3e+5+6");
+        CHECK(tokens.size() == 4);
+        CHECK(tokens[0].type() == Token::NUMBER);
+        CHECK(tokens[0].number() == 3e+5);
+        CHECK(tokens[1].type() == Token::PLUS);
+        CHECK(tokens[2].type() == Token::NUMBER);
+        CHECK(tokens[2].number() == 6);
+        CHECK(tokens[3].type() == Token::END);
     }
 
     SECTION("Parentheses") {
         CHECK(tokenize("(")[0].type() == Token::LPAREN);
         CHECK(tokenize(")")[0].type() == Token::RPAREN);
 
-        auto toks = tokenize("(bagyu");
-        CHECK(toks.size() == 3);
-        CHECK(toks[0].type() == Token::LPAREN);
+        auto tokens = tokenize("(bagyu");
+        CHECK(tokens.size() == 3);
+        CHECK(tokens[0].type() == Token::LPAREN);
 
-        toks = tokenize(")qbisbszlh");
-        CHECK(toks.size() == 3);
-        CHECK(toks[0].type() == Token::RPAREN);
+        tokens = tokenize(")qbisbszlh");
+        CHECK(tokens.size() == 3);
+        CHECK(tokens[0].type() == Token::RPAREN);
 
-        toks = tokenize("jsqsb(");
-        CHECK(toks.size() == 3);
-        CHECK(toks[1].type() == Token::LPAREN);
+        tokens = tokenize("jsqsb(");
+        CHECK(tokens.size() == 3);
+        CHECK(tokens[1].type() == Token::LPAREN);
 
-        toks = tokenize("kjpqhiufn)");
-        CHECK(toks.size() == 3);
-        CHECK(toks[1].type() == Token::RPAREN);
+        tokens = tokenize("kjpqhiufn)");
+        CHECK(tokens.size() == 3);
+        CHECK(tokens[1].type() == Token::RPAREN);
     }
 
     SECTION("Operators") {
@@ -117,7 +142,6 @@ TEST_CASE("Lexing") {
 
     SECTION("Functions") {
         CHECK(tokenize("#9")[0].type() == Token::VARIABLE);
-        CHECK(tokenize("# 9")[0].type() == Token::VARIABLE);
         CHECK(tokenize("#255")[0].type() == Token::VARIABLE);
 
         CHECK_THROWS_AS(tokenize("# gabo"), SelectionError);
@@ -127,13 +151,13 @@ TEST_CASE("Lexing") {
         CHECK_THROWS_AS(tokenize("#256"), SelectionError);
 
         CHECK(tokenize(",")[0].type() == Token::COMMA);
-        auto toks = tokenize(",bagyu");
-        CHECK(toks.size() == 3);
-        CHECK(toks[0].type() == Token::COMMA);
+        auto tokens = tokenize(",bagyu");
+        CHECK(tokens.size() == 3);
+        CHECK(tokens[0].type() == Token::COMMA);
 
-        toks = tokenize("jsqsb,");
-        CHECK(toks.size() == 3);
-        CHECK(toks[1].type() == Token::COMMA);
+        tokens = tokenize("jsqsb,");
+        CHECK(tokens.size() == 3);
+        CHECK(tokens[1].type() == Token::COMMA);
     }
 
     SECTION("Lexing errors") {
@@ -154,11 +178,8 @@ TEST_CASE("Lexing") {
             "|",
             "#",
             "@",
-            // These are invalid for now, due to the requirement of spaces
-            // around operators. This should be lifted soon.
-            "42+53",
-            "4.2/name",
-            "+4.2-7",
+            "# 9",
+            "9.2.5",
         };
 
         for (auto& failure: lex_fail) {
@@ -313,23 +334,45 @@ TEST_CASE("Parsing") {
     }
 
     SECTION("Math selections") {
+        SECTION("Unary plus and minus") {
+            auto ast = "4 < 5";
+            CHECK(parse("+4 < 5")->print() == ast);
+
+            ast = "(-4) < 5";
+            CHECK(parse("- 4 < 5")->print() == ast);
+
+            ast = "((((3 - (-4)) + 5) + (-4)) - 8) < 5";
+            CHECK(parse("3 - - 4 + + 5 + - 4 - +8 < 5")->print() == ast);
+
+            ast = "(5 - (-(-(-(-(-(-(-4)))))))) < 5";
+            CHECK(parse("+++++++ 5 --------4 < 5")->print() == ast);
+
+            ast = "(5 + (-(-(-(-(-(-4))))))) < 5";
+            CHECK(parse("5 + - + - + - + - + - + -4 < 5")->print() == ast);
+        }
+
         SECTION("Sums") {
             auto ast = "(3 + 4) < 5";
             CHECK(parse("3 + 4 < 5")->print() == ast);
+            CHECK(parse("3+4 < 5")->print() == ast);
 
             ast = "(3 - 4) < 5";
             CHECK(parse("3 - 4 < 5")->print() == ast);
+            CHECK(parse("3-4 < 5")->print() == ast);
 
             ast = "((((3 - 4) + 5) + 4) - 8) < 5";
             CHECK(parse("3 - 4 + 5 + 4 - 8 < 5")->print() == ast);
+            CHECK(parse("3-4+5+4-8<5")->print() == ast);
         }
 
         SECTION("Products") {
             auto ast = "(3 * 4) < 5";
             CHECK(parse("3 * 4 < 5")->print() == ast);
+            CHECK(parse("3*4 < 5")->print() == ast);
 
             ast = "(3 / 4) < 5";
             CHECK(parse("3 / 4 < 5")->print() == ast);
+            CHECK(parse("3/4 < 5")->print() == ast);
 
             ast = "(((3 * 4) / (5 * 4)) * 8) < 5";
             CHECK(parse("3 * 4 / (5 * 4) * 8 < 5")->print() == ast);
@@ -338,6 +381,7 @@ TEST_CASE("Parsing") {
         SECTION("Power") {
             auto ast = "3 ^(4) < 5";
             CHECK(parse("3 ^ 4 < 5")->print() == ast);
+            CHECK(parse("3^4 < 5")->print() == ast);
 
             ast = "3 ^(4 ^(6)) < 5";
             CHECK(parse("3 ^ 4 ^ 6 < 5")->print() == ast);
@@ -354,8 +398,7 @@ TEST_CASE("Parsing") {
         SECTION("Complex expressions") {
             auto ast = "(x(#1) ^(2) + y(#1) ^(2)) < 10 ^(2)";
             CHECK(parse("x ^ 2 + y ^ 2 < 10 ^ 2")->print() == ast);
-            // TODO: this should parse with a lexer change
-            // CHECK(parse("x^2 + y^2 < 10^2")->print() == ast);
+            CHECK(parse("x^2 + y^2 < 10^2")->print() == ast);
 
             ast = "(3 - (4 * 2 ^(7))) < 5";
             CHECK(parse("3 - 4 * 2 ^ 7 < 5")->print() == ast);

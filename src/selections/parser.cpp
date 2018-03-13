@@ -265,6 +265,13 @@ MathAst Parser::math_value() {
         return ast;
     } else if (match(Token::NUMBER)) {
         return MathAst(new Number(previous().number()));
+    } else if (match(Token::PLUS)) {
+        // Unary plus, nothing to do
+        return math_value();
+    } else if (match(Token::MINUS)) {
+        // Unary minus
+        auto ast = math_value();
+        return MathAst(new Neg(std::move(ast)));
     } else {
         if (finished()) {
             throw selection_error("expected content after", previous().str());

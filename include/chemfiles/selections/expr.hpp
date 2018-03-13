@@ -240,6 +240,19 @@ private:
     MathAst rhs_;
 };
 
+/// Unary minus operator
+class Neg final: public MathExpr {
+public:
+    Neg(MathAst ast): ast_(std::move(ast)) {}
+
+    double eval(const Frame& frame, const Match& match) const override;
+    std::string print() const override;
+
+private:
+    MathAst ast_;
+};
+
+
 /// Function call
 class Function final: public MathExpr {
 public:
