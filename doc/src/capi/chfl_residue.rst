@@ -27,4 +27,8 @@ Function manipulating ``CHFL_RESIDUE``
 
 .. doxygenfunction:: chfl_residue_contains
 
+.. doxygenfunction:: chfl_residue_set_property
+
+.. doxygenfunction:: chfl_residue_get_property
+
 .. doxygenfunction:: chfl_residue_free
