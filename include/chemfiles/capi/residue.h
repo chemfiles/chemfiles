@@ -154,7 +154,7 @@ CHFL_EXPORT chfl_status chfl_residue_set_property(
 
 /// Get a property with the given `name` in this `residue`.
 ///
-/// This function returns `NULL` is no property exist with the given name.
+/// This function returns `NULL` if no property exists with the given name.
 ///
 /// The user of this function is responsible to deallocate memory using the
 /// `chfl_property_free` function.
