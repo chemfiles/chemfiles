@@ -12,6 +12,8 @@
 #include "chemfiles/utils.hpp"
 #include "chemfiles/warnings.hpp"
 
+#include "chemfiles/pdb_connectivity.hpp"
+
 using namespace chemfiles;
 
 template<> FormatInfo chemfiles::format_information<PDBFormat>() {
@@ -127,6 +129,7 @@ void PDBFormat::read(Frame& frame) {
     // If we are here, we got EOF before an END record
     warning("Missing END record in PDB file");
 end:
+    link_standard_residue_bonds(frame);
     for (auto& residue: residues_) {
         frame.add_residue(residue.second);
     }
@@ -261,6 +264,89 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
         add_bond(i, j);
     } else {
         return;
+    }
+}
+
+void PDBFormat::link_standard_residue_bonds(Frame& frame) {
+
+    bool link_previous_peptide = false;
+    bool link_previous_nucleic = false;
+    size_t previous_residue_id = 0;
+    size_t previous_carboxylic_id = 0;
+
+    for (auto& res : residues_) {
+
+        const auto& residue_table = PDB_CONNECTIVITY_INFORMATION.find(res.second.name());
+        if (residue_table == PDB_CONNECTIVITY_INFORMATION.end())
+            continue;
+
+        std::map<std::string, size_t> atom_name_to_index;
+        for (const auto& atom : res.second) {
+            atom_name_to_index[frame[atom].name()] =  atom;
+        }
+
+        const auto& amide_nitrogen = atom_name_to_index.find("N");
+        const auto& amide_carbon   = atom_name_to_index.find("O");
+
+        if (link_previous_peptide &&
+            amide_nitrogen != atom_name_to_index.end() &&
+            res.first == previous_residue_id + 1 )
+        {
+            link_previous_peptide = false;
+            frame.add_bond(previous_carboxylic_id, amide_nitrogen->second);
+        }
+
+        if (amide_carbon != atom_name_to_index.end() ) {
+            link_previous_peptide = true;
+            previous_carboxylic_id = amide_carbon->second;
+            previous_residue_id = res.first;
+        }
+
+        const auto& three_prime_oxygen = atom_name_to_index.find("O3'");
+        const auto& five_prime_phospho = atom_name_to_index.find("P");
+
+        if (link_previous_nucleic &&
+            five_prime_phospho != atom_name_to_index.end() &&
+            res.first == previous_residue_id + 1 )
+        {
+            link_previous_nucleic = false;
+            frame.add_bond(previous_carboxylic_id, three_prime_oxygen->second);
+        }
+
+        if (three_prime_oxygen != atom_name_to_index.end() ) {
+            link_previous_nucleic = true;
+            previous_carboxylic_id = three_prime_oxygen->second;
+            previous_residue_id = res.first;
+        }
+
+        // A special case missed by the standards committee????
+        if (atom_name_to_index.count("HO5'") != 0) {
+            frame.add_bond(atom_name_to_index["HO5'"], atom_name_to_index["O5'"]);
+        }
+
+        for (const auto& p : residue_table->second) {
+
+            const auto& first_atom = atom_name_to_index.find(p.first);
+            const auto& second_atom= atom_name_to_index.find(p.second);
+
+            if (first_atom == atom_name_to_index.end()) {
+                if (p.first[0] != 'H' && p.first != "OXT" &&
+                    p.first[0] != 'P' && p.first.substr(0,2) != "OP" ) {
+                    warning("{}_{} does not contain {}", res.second.name(), res.first, p.first);
+                }
+                continue;
+            }
+
+            if (second_atom == atom_name_to_index.end()) {
+                if (p.second[0] != 'H' && p.second != "OXT" &&
+                    p.second[0] != 'P' && p.second.substr(0,2) != "OP" ) {
+                    warning("{}_{} does not contain {}", res.second.name(), res.first, p.second);
+                }
+                continue;
+            }
+
+            frame.add_bond(first_atom->second, second_atom->second);
+        }
     }
 }
 

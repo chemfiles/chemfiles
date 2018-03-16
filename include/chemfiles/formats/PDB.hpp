@@ -42,6 +42,9 @@ private:
     // Read CONECT record
     void read_CONECT(Frame& frame, const std::string& line);
 
+    // Connect residues based on a predefined table
+    void link_standard_residue_bonds(Frame& frame);
+
     std::unique_ptr<TextFile> file_;
     /// Map of residues, indexed by residue id.
     std::map<size_t, Residue> residues_;
