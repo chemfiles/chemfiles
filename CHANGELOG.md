@@ -8,6 +8,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Properties are now supported in the `Residue` class. They are accessed using
   `Residue::set` and `Residue::get`.
 
+* The topology of residues is now automatically set using a lookup table for
+  the PDB format.
+
 ### Changes in supported formats
 
 * Added `MarcoMolecule Transmission Format (MMTF)` support, reading via mmtf-c.
