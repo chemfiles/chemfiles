@@ -146,6 +146,31 @@ TEST_CASE("Read files in PDB format") {
         frame = file.read();
         CHECK(frame.size() == 2223);
     }
+
+    SECTION("Read Protein Residues") {
+        auto frame = Trajectory("data/pdb/hemo.pdb").read();
+        auto topo = frame.topology();
+
+        CHECK(!topo.are_linked(topo.residue(2), topo.residue(3)));
+        CHECK( topo.are_linked(topo.residue(3), topo.residue(4)));
+        CHECK(!topo.are_linked(topo.residue(3), topo.residue(5)));
+        CHECK(topo.bonds().size() == 482);
+    }
+
+    SECTION("Read Nucleic Residues") {
+        auto frame = Trajectory("data/pdb/2hkb.pdb").read();
+        auto topo = frame.topology();
+
+        CHECK( topo.are_linked(topo.residue(3), topo.residue(4)));
+        CHECK(!topo.are_linked(topo.residue(3), topo.residue(5)));
+        CHECK(topo.bonds().size() == 815);
+
+        //frame.guess_topology();
+        //auto topo2 = frame.topology();
+        //CHECK( topo2.are_linked(topo2.residue(3), topo2.residue(4)));
+        //CHECK(!topo2.are_linked(topo2.residue(3), topo2.residue(5)));
+        //CHECK(topo2.bonds().size() == 815);
+    }
 }
 
 TEST_CASE("Write files in PDB format") {

@@ -52,6 +52,12 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(residue.size() == 43);
         CHECK(residue.name() == "HEM");
 
+        // Check residue connectivity
+        const auto& topo = frame.topology();
+        CHECK(topo.are_linked(topo.residue(0), topo.residue(1)));
+        CHECK(!topo.are_linked(topo.residue(0), topo.residue(2)));
+
+        // Chain information
         CHECK(residue.get("chainid"));
         CHECK(residue.get("chainname"));
         CHECK(residue.get("chainindex"));
@@ -96,13 +102,38 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
         CHECK(approx_eq(positions[1401], Vector3D(5.601, -22.571, -16.631), 1e-3));
 
+        const auto& topo = frame.topology();
+        CHECK(topo.are_linked(topo.residue(0), topo.residue(1)));
+        CHECK(!topo.are_linked(topo.residue(0), topo.residue(2)));
+
         frame = file.read_step(1);
         CHECK(frame.size() == 1402);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D( -9.134, 11.149, 6.990), 1e-3));
         CHECK(approx_eq(positions[1401], Vector3D(4.437, -13.250, -22.569), 1e-3));
+
+        const auto& topo2 = frame.topology();
+        CHECK(topo2.are_linked(topo.residue(0), topo2.residue(1)));
+        CHECK(!topo2.are_linked(topo.residue(0), topo2.residue(2)));
     }
 
+    SECTION("Successive steps") {
+        Trajectory file("data/mmtf/1J8K.mmtf");
+
+        auto frame = file.read();
+
+        const auto& topo = frame.topology();
+        CHECK(topo.are_linked(topo.residue(0), topo.residue(1)));
+        CHECK(!topo.are_linked(topo.residue(0), topo.residue(2)));
+
+        auto frame2= file.read();
+
+        const auto& topo2 = frame.topology();
+        CHECK(topo2.are_linked(topo.residue(0), topo2.residue(1)));
+        CHECK(!topo2.are_linked(topo.residue(0), topo2.residue(2)));
+
+        auto frame3= file.read();
+    }
 #endif
 
 }

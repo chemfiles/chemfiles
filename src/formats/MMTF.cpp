@@ -93,7 +93,7 @@ void MMTFFormat::read(Frame& frame) {
                 frame.add_atom(atom, Vector3D(file_->xCoordList[atomIndex_],
                                               file_->yCoordList[atomIndex_],
                                               file_->zCoordList[atomIndex_]));
-                res.add_atom(atomIndex_);
+                res.add_atom(atomIndex_ - atomSkip_);
                 atomIndex_++;
             }
 
@@ -125,6 +125,26 @@ void MMTFFormat::read(Frame& frame) {
     }
 
     modelIndex_++;
+
+    for (size_t i = 0; i < file_->bondAtomListCount / 2; i++) {
+        size_t atom1 = static_cast<size_t>(file_->bondAtomList[i * 2]);
+        size_t atom2 = static_cast<size_t>(file_->bondAtomList[i * 2 + 1]);
+
+        // We are below the atoms we care about
+        if (atom1 < atomSkip_ || atom2 < atomSkip_) {
+            continue;
+        }
+
+        // We are above the atoms we care about
+        if (atom1 > atomIndex_ || atom2 > atomIndex_) {
+            continue;
+        }
+
+        frame.add_bond(atom1 - atomSkip_,
+                       atom2 - atomSkip_);
+    }
+
+    atomSkip_ = atomIndex_;
 }
 
 MMTFFormat::~MMTFFormat() noexcept {
