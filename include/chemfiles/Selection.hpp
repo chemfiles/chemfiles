@@ -15,8 +15,8 @@ namespace chemfiles {
 class Frame;
 
 namespace selections {
-    class Expr;
-    using Ast = std::unique_ptr<Expr>;
+    class Selector;
+    using Ast = std::unique_ptr<Selector>;
 }
 
 /// A match is a set of atomic indexes matching a given selection. The size of a

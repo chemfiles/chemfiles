@@ -4,41 +4,84 @@
 #ifndef CHEMFILES_SELECTION_PARSER_HPP
 #define CHEMFILES_SELECTION_PARSER_HPP
 
-#include "chemfiles/Selections.hpp"
+#include <memory>
+
 #include "chemfiles/selections/lexer.hpp"
 
 namespace chemfiles {
+
+class Frame;
+class Match;
+
 namespace selections {
 
-/// Parse and create an AST from a stream of tokens
-///
-/// @throws SelectionError if the token stream does not correspond to an AST
-Ast parse(std::vector<Token> tokens);
+class Selector;
+using Ast = std::unique_ptr<Selector>;
 
-/// @class Expr parser.hpp
-/// @brief Abstract base class for expressions in the selection AST
-class Expr {
+class MathExpr;
+using MathAst = std::unique_ptr<MathExpr>;
+
+/// A recursive descent parser for chemfiles selection language. This parser
+/// does not handle selection context (`pairs: ...`) that should be striped
+/// before using it.
+class Parser {
 public:
-    /// Pretty-printing of this expression. The expression should use a shift
-    /// of `delta` spaces in case of multilines output.
-    virtual std::string print(unsigned delta = 0) const = 0;
-    /// Check if the `match` is valid in the given `frame`.
-    virtual bool is_match(const Frame& frame, const Match& match) const = 0;
+    /// Create a new parser for the given list of `tokens`
+    Parser(std::vector<Token> tokens): tokens_(std::move(tokens)) {}
 
-    Expr() = default;
-    virtual ~Expr() = default;
+    /// Parse the list of tokens and get the corresponding Ast.
+    Ast parse();
 
-    Expr(Expr&&) = default;
-    Expr& operator=(Expr&&) = default;
+private:
+    Ast expression();
+    Ast selector();
+    Ast string_selector();
+    Ast math_selector();
 
-    Expr(const Expr&) = delete;
-    Expr& operator=(const Expr&) = delete;
+    MathAst math_sum();
+    MathAst math_product();
+    MathAst math_power();
+    MathAst math_value();
+    MathAst math_function(const std::string& name);
+    MathAst math_property(const std::string& name);
+
+    unsigned variable();
+
+    bool match(Token::Type type) {
+        if (check(type)) {
+            advance();
+            return true;
+        }
+        return false;
+    }
+
+    bool finished() const {
+        return peek().type() == Token::END;
+    }
+
+    Token peek() const {
+        return tokens_[current_];
+    }
+
+    Token previous() const {
+        return tokens_[current_ - 1];
+    }
+
+    bool check(Token::Type type) const {
+        if (finished()) return false;
+        return peek().type() == type;
+    }
+
+    Token advance() {
+        if (!finished()) {
+            current_++;
+        }
+        return previous();
+    }
+
+    const std::vector<Token> tokens_;
+    size_t current_ = 0;
 };
-
-using token_iterator_t = std::vector<Token>::const_iterator;
-/// Dispatch to subexpressions for parsing, from the current value of `begin`
-/// This is an internal detail of the parsing algorithm.
-Ast dispatch_parsing(token_iterator_t& begin, const token_iterator_t& end);
 
 }} // namespace chemfiles && namespace selections
 

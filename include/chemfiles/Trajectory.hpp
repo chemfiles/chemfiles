@@ -42,7 +42,7 @@ public:
     /// @throws FileError for all errors concerning the physical file: can not
     ///                   open it, can not read/write it, *etc.*
     /// @throws FormatError if the file is not valid for the used format.
-    Trajectory(std::string path, char mode = 'r', const std::string& format = "");
+    explicit Trajectory(std::string path, char mode = 'r', const std::string& format = "");
 
     ~Trajectory();
 
@@ -54,8 +54,8 @@ public:
 
     /// Read the next frame in the trajectory.
     ///
-    /// The trajectory must have been opened in read (`'r'`) or append (`'a'`)
-    /// mode, and the underlying format must support reading.
+    /// The trajectory must have been opened in read or append mode, and the
+    /// underlying format must support reading.
     ///
     /// This function throws a `FileError` if there are no more frames to read
     /// in the trajectory.
@@ -70,8 +70,8 @@ public:
 
     /// Read a single frame at specified `step` from the trajectory.
     ///
-    /// The trajectory must have been opened in read (`'r'`) or append (`'a'`)
-    /// mode, and the underlying format must support reading.
+    /// The trajectory must have been opened in read or append mode, and the
+    /// underlying format must support reading.
     ///
     /// This function throws a `FileError` if the step is bigger than the
     /// number of steps in the trajectory.
@@ -88,8 +88,8 @@ public:
 
     /// Write a single frame to the trajectory.
     ///
-    /// The trajectory must have been opened in write (`'w'`) or append (`'a'`)
-    /// mode, and the underlying format must support writing.
+    /// The trajectory must have been opened in Write or append mode, and the
+    /// underlying format must support reading.
     ///
     /// @example{tests/doc/trajectory/write.cpp}
     ///

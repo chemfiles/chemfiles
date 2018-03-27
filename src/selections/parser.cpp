@@ -1,230 +1,316 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <algorithm>
-#include <stack>
+#include "chemfiles/selections/lexer.hpp"
+#include "chemfiles/selections/parser.hpp"
+#include "chemfiles/selections/expr.hpp"
+#include "chemfiles/ErrorFmt.hpp"
+
+#include <functional>
 #include <map>
 
-#include "chemfiles/ErrorFmt.hpp"
-#include "chemfiles/unreachable.hpp"
-#include "chemfiles/selections/expr.hpp"
-#include "chemfiles/selections/parser.hpp"
-
 using namespace chemfiles;
-using namespace selections;
+using namespace chemfiles::selections;
 
-struct function_info_t {
-    /// Function arity, i.e. number of arguments
-    unsigned arity;
-    /// Does the fucntion admit a short form
-    bool has_short_form;
+using string_prop_creator_t = std::function<Ast(std::string, bool, unsigned)>;
+static std::map<std::string, string_prop_creator_t> STRING_PROPERTIES = {
+    {"name", [](std::string value, bool equals, unsigned var){ return Ast(new Name(value, equals, var));}},
+    {"type", [](std::string value, bool equals, unsigned var){ return Ast(new Type(value, equals, var));}},
+    {"resname", [](std::string value, bool equals, unsigned var){ return Ast(new Resname(value, equals, var));}},
 };
 
-static std::map<std::string, function_info_t> FUNCTIONS = {
-    {"name", {1, true}},
-    {"type", {1, true}},
-    {"resname", {1, true}},
-    {"resid", {1, true}},
-    {"index", {1, true}},
-    {"mass", {1, true}},
-    {"x", {1, false}},
-    {"y", {1, false}},
-    {"z", {1, false}},
-    {"vx", {1, false}},
-    {"vy", {1, false}},
-    {"vz", {1, false}},
+using num_prop_creator_t = std::function<MathAst(unsigned)>;
+static std::map<std::string, num_prop_creator_t> NUMERIC_PROPERTIES = {
+    {"index", [](unsigned var){ return MathAst(new Index(var));}},
+    {"mass", [](unsigned var){ return MathAst(new Mass(var));}},
+    {"resid", [](unsigned var){ return MathAst(new Resid(var));}},
+    {"x", [](unsigned var){ return MathAst(new Position(var, Coordinate::X));}},
+    {"y", [](unsigned var){ return MathAst(new Position(var, Coordinate::Y));}},
+    {"z", [](unsigned var){ return MathAst(new Position(var, Coordinate::Z));}},
+    {"vx", [](unsigned var){ return MathAst(new Velocity(var, Coordinate::X));}},
+    {"vy", [](unsigned var){ return MathAst(new Velocity(var, Coordinate::Y));}},
+    {"vz", [](unsigned var){ return MathAst(new Velocity(var, Coordinate::Z));}},
 };
 
-/// Is this token a function token?
-static bool is_function(const Token& token) {
-    return token.is_ident() && FUNCTIONS.find(token.ident()) != FUNCTIONS.end();
+using num_functions_creator_t = std::function<MathAst(MathAst)>;
+static std::map<std::string, num_functions_creator_t> NUMERIC_FUNCTIONS = {
+    {"sin", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(sin), "sin", std::move(ast)));}},
+    {"cos", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(cos), "cos", std::move(ast)));}},
+    {"tan", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(tan), "tan", std::move(ast)));}},
+    {"asin", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(asin), "asin", std::move(ast)));}},
+    {"acos", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(acos), "acos", std::move(ast)));}},
+    {"sqrt", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(sqrt), "sqrt", std::move(ast)));}},
+};
+
+static bool is_string_property(const std::string& name) {
+    return STRING_PROPERTIES.find(name) != STRING_PROPERTIES.end();
 }
 
-/* Standard shunting-yard algorithm, as described in Wikipedia
- * https://en.wikipedia.org/wiki/Shunting-yard_algorithm
- *
- * This convert infix expressions into an AST-like expression, while checking
- * parentheses.
- * The following input:
- *       name == bar and x <= 56
- * is converted to:
- *       and == bar name <= 56 x
- * which is the AST for
- *             and
- *         /          \
- *        ==          <=
- *       /  \        /  \
- *    name   bar    x    56
- */
-static std::vector<Token> shunting_yard(std::vector<Token> tokens) {
-    std::stack<Token> operators;
-    std::vector<Token> output;
-    for (auto token: tokens) {
-        if (token.is_number() || token.is_variable()) {
-            output.emplace_back(std::move(token));
-        } else if (token.is_ident()) {
-            if (is_function(token)) {
-                operators.emplace(std::move(token));
-            } else {
-                output.emplace_back(std::move(token));
-            }
-        } else if (token.type() == Token::COMMA) {
-            while (operators.top().type() != Token::LPAREN) {
-                output.push_back(operators.top());
-                operators.pop();
-                if (operators.empty()) {
-                    throw selection_error(
-                        "mismatched paretheses or additional comma found"
-                    );
-                }
-            }
-        } else if (token.is_operator()) {
-            while (!operators.empty()) {
-                // All the operators are left-associative
-                if (token.precedence() <= operators.top().precedence()) {
-                    output.push_back(operators.top());
-                    operators.pop();
-                } else {
-                    break;
-                }
-            }
-            operators.emplace(std::move(token));
-        } else if (token.type() == Token::LPAREN) {
-            operators.emplace(std::move(token));
-        } else if (token.type() == Token::RPAREN) {
-            while (!operators.empty() && operators.top().type() != Token::LPAREN) {
-                output.push_back(operators.top());
-                operators.pop();
-            }
+static bool is_numeric_property(const std::string& name) {
+    return NUMERIC_PROPERTIES.find(name) != NUMERIC_PROPERTIES.end();
+}
 
-            if (!operators.empty() && is_function(operators.top())) {
-                output.push_back(operators.top());
-                operators.pop();
-            }
+static bool is_numeric_function(const std::string& name) {
+    return NUMERIC_FUNCTIONS.find(name) != NUMERIC_FUNCTIONS.end();
+}
 
-            if (operators.empty() || operators.top().type() != Token::LPAREN) {
-                throw selection_error("mismatched parentheses");
-            } else {
-                operators.pop();
-            }
+Ast Parser::parse() {
+    current_ = 0;
+    auto ast = expression();
+    if (!finished()) {
+        std::string extra;
+        while (!finished()) {
+            extra += " " + advance().str();
         }
+        throw selection_error("additional data after the end of the selection:{}", extra);
     }
-    while (!operators.empty()) {
-        if (operators.top().type() == Token::LPAREN ||
-            operators.top().type() == Token::RPAREN) {
-            throw selection_error("mismatched parentheses");
+    return ast;
+}
+
+Ast Parser::expression() {
+    auto ast = selector();
+    while (true) {
+        if (match(Token::AND)) {
+            auto rhs = selector();
+            ast = Ast(new And(std::move(ast), std::move(rhs)));
+        } else if (match(Token::OR)) {
+            auto rhs = selector();
+            ast = Ast(new Or(std::move(ast), std::move(rhs)));
         } else {
-            output.push_back(operators.top());
-            operators.pop();
+            break;
         }
     }
-    // AST come out as reverse polish notation, let's reverse it for easier
-    // parsing after
-    std::reverse(std::begin(output), std::end(output));
-    return output;
+    return ast;
 }
 
-/* Rewrite the token stream to convert short form for the expressions to the
- * long one.
- *
- * Short forms are expressions like `name foo` or `index 3`, which are
- * equivalent to `name == foo` and `index == 3`.
- */
-static std::vector<Token> add_missing_equals(const std::vector<Token>& stream) {
-    auto out = std::vector<Token>();
-    for (auto it = stream.cbegin(); it != stream.cend(); it++) {
-        if (is_function(*it) && FUNCTIONS[it->ident()].has_short_form) {
-            auto next = it + 1;
-            if (next->type() != Token::LPAREN) {
-                if (next < stream.cend() && !next->is_operator()) {
-                    out.emplace_back(*it);
-                    out.emplace_back(Token(Token::EQ));
-                    continue;
-                }
-            } else {
-                // Skip the following possible tokens: '(' - '#x' - ')'
-                next = it + 4;
-                if (next < stream.cend() && !next->is_operator() &&
-                    it[1].type() == Token::LPAREN && it[2].is_variable() &&
-                    it[3].type() == Token::RPAREN
-                    ) {
-                    out.emplace_back(it[0]);
-                    out.emplace_back(it[1]);
-                    out.emplace_back(it[2]);
-                    out.emplace_back(it[3]);
-                    out.emplace_back(Token(Token::EQ));
-                    it += 3;
-                    continue;
-                }
-            }
-        }
-        out.emplace_back(*it);
-    }
-    return out;
-}
-
-Ast selections::dispatch_parsing(token_iterator_t& begin, const token_iterator_t& end) {
-    if (begin->is_boolean_op()) {
-        switch (begin->type()) {
-        case Token::AND:
-            return parse<AndExpr>(begin, end);
-        case Token::OR:
-            return parse<OrExpr>(begin, end);
-        case Token::NOT:
-            return parse<NotExpr>(begin, end);
-        default:
-            unreachable();
-        }
-    } else if (begin->is_binary_op()) {
-        if ((end - begin) < 3 || begin[2].type() != Token::IDENT) {
-            throw selection_error("bad binary operation around {}", begin->str());
-        }
-
-        auto ident = begin[2].ident();
-        if (ident == "type") {
-            return parse<TypeExpr>(begin, end);
-        } else if (ident == "name") {
-            return parse<NameExpr>(begin, end);
-        } else if (ident == "index") {
-            return parse<IndexExpr>(begin, end);
-        } else if (ident == "resname") {
-            return parse<ResnameExpr>(begin, end);
-        } else if (ident == "resid") {
-            return parse<ResidExpr>(begin, end);
-        } else if (ident == "mass") {
-            return parse<MassExpr>(begin, end);
-        } else if (ident == "x" || ident == "y" || ident == "z") {
-            return parse<PositionExpr>(begin, end);
-        } else if (ident == "vx" || ident == "vy" || ident == "vz") {
-            return parse<VelocityExpr>(begin, end);
+Ast Parser::selector() {
+    if (match(Token::LPAREN)) {
+        auto ast = expression();
+        if (match(Token::RPAREN)) {
+            return ast;
         } else {
-            throw selection_error("unknown operation '{}'", ident);
+            throw SelectionError("mismatched parenthesis");
         }
-    } else if (begin->is_ident()) {
-        auto ident = begin->ident();
+    } else if (match(Token::NOT)) {
+        auto ast = expression();
+        return Ast(new Not(std::move(ast)));
+    } else if (check(Token::IDENT)) {
+        auto ident = peek().ident();
         if (ident == "all") {
-            return parse<AllExpr>(begin, end);
+            advance();
+            return Ast(new All());
         } else if (ident == "none") {
-            return parse<NoneExpr>(begin, end);
+            advance();
+            return Ast(new None());
+        } else if (is_string_property(ident)) {
+            return string_selector();
         } else {
-            throw selection_error("unknown operation '{}'", ident);
+            return math_selector();
         }
     } else {
-        throw selection_error("could not parse the selection");
+        // If everything else fails, try to parse it as mathematical expression
+        return math_selector();
     }
 }
 
-Ast selections::parse(std::vector<Token> tokens) {
-    tokens = add_missing_equals(tokens);
-    tokens = shunting_yard(std::move(tokens));
 
-    auto begin = tokens.cbegin();
-    const auto end = tokens.cend();
-    auto ast = dispatch_parsing(begin, end);
+Ast Parser::string_selector() {
+    auto property = advance();
+    assert(property.type() == Token::IDENT);
+    auto name = property.ident();
+    assert(is_string_property(name));
 
-    if (begin != end) {
-        throw selection_error("could not parse the end of the selection");
+    auto var = variable();
+    if (match(Token::IDENT) || match(Token::NUMBER)) {
+        // `name value` shortand, where value is a string or a number (e.g. type 42)
+        auto value = previous().str();
+        auto ast = STRING_PROPERTIES[name](std::move(value), true, var);
+        while (match(Token::IDENT) || match(Token::NUMBER)) {
+            // handle multiple values 'name H N C O'
+            value = previous().str();
+            auto rhs = STRING_PROPERTIES[name](std::move(value), true, var);
+            ast = Ast(new Or(std::move(ast), std::move(rhs)));
+        }
+        return ast;
+    } else if (match(Token::EQUAL)) {
+        if (match(Token::IDENT) || match(Token::NUMBER)) {
+            auto value = previous().str();
+            return STRING_PROPERTIES[name](std::move(value), true, var);
+        } else {
+            throw selection_error("expected a value after '{} ==', found {}", name, peek().str());
+        }
+    } else if (match(Token::NOT_EQUAL)) {
+        if (match(Token::IDENT) || match(Token::NUMBER)) {
+            auto value = previous().str();
+            return STRING_PROPERTIES[name](std::move(value), false, var);
+        } else {
+            throw selection_error("expected a value after '{} !=', found {}", name, peek().str());
+        }
+    } else {
+        throw selection_error("expected one of '!=', '==' or a value after {}, found {}", name, peek().str());
+    }
+}
+
+Ast Parser::math_selector()  {
+    auto index = current_;
+    if (match(Token::IDENT)) {
+        auto name = previous().ident();
+        if (is_numeric_property(name)) {
+            auto var = variable();
+            if (match(Token::NUMBER)) {
+                // `name value` shortand, where value is a number
+                auto value = previous().number();
+                auto math_lhs = NUMERIC_PROPERTIES[name](var);
+                auto math_rhs = MathAst(new Number(value));
+                auto ast = Ast(new Math(Math::Operator::EQUAL, std::move(math_lhs), std::move(math_rhs)));
+                while (match(Token::NUMBER)) {
+                    // handle multiple values 'index 7 8 9 11'
+                    value = previous().number();
+                    math_lhs = NUMERIC_PROPERTIES[name](var);
+                    math_rhs = MathAst(new Number(value));
+                    auto rhs = Ast(new Math(Math::Operator::EQUAL, std::move(math_lhs), std::move(math_rhs)));
+                    ast = Ast(new Or(std::move(ast), std::move(rhs)));
+                }
+                return ast;
+            } else {
+                // Reset state and continue
+                current_ = index;
+            }
+        } else {
+            // Reset state and continue
+            current_ = index;
+        }
     }
 
+    auto lhs = math_sum();
+
+    Math::Operator op;
+    if (match(Token::EQUAL)) {
+        op = Math::Operator::EQUAL;
+    } else if (match(Token::NOT_EQUAL)) {
+        op = Math::Operator::NOT_EQUAL;
+    } else if (match(Token::LESS)) {
+        op = Math::Operator::LESS;
+    } else if (match(Token::LESS_EQUAL)) {
+        op = Math::Operator::LESS_EQUAL;
+    } else if (match(Token::GREATER)) {
+        op = Math::Operator::GREATER;
+    } else if (match(Token::GREATER_EQUAL)) {
+        op = Math::Operator::GREATER_EQUAL;
+    } else {
+        throw selection_error("expected a binary operator (==, !=, <=, ...), got {}", peek().str());
+    }
+
+    auto rhs = math_sum();
+    return Ast(new Math(op, std::move(lhs), std::move(rhs)));
+}
+
+MathAst Parser::math_sum() {
+    auto ast = math_product();
+    while (true) {
+        if (match(Token::PLUS)) {
+            auto rhs = math_product();
+            ast = MathAst(new Add(std::move(ast), std::move(rhs)));
+        } else if (match(Token::MINUS)) {
+            auto rhs = math_product();
+            ast = MathAst(new Sub(std::move(ast), std::move(rhs)));
+        } else {
+            break;
+        }
+    }
     return ast;
+}
+
+MathAst Parser::math_product() {
+    auto ast = math_power();
+    while (true) {
+        if (match(Token::STAR)) {
+            auto rhs = math_power();
+            ast = MathAst(new Mul(std::move(ast), std::move(rhs)));
+        } else if (match(Token::SLASH)) {
+            auto rhs = math_power();
+            ast = MathAst(new Div(std::move(ast), std::move(rhs)));
+        } else {
+            break;
+        }
+    }
+    return ast;
+}
+
+MathAst Parser::math_power() {
+    auto lhs = math_value();
+    if (match(Token::HAT)) {
+        auto rhs = math_power();
+        return MathAst(new Pow(std::move(lhs), std::move(rhs)));
+    } else {
+        return lhs;
+    }
+}
+
+MathAst Parser::math_value() {
+    if (match(Token::IDENT)) {
+        auto name = previous().ident();
+        if (is_numeric_function(name)) {
+            return math_function(name);
+        } else if (is_numeric_property(name)) {
+            return math_property(name);
+        } else {
+            throw selection_error("unexpected identifier '{}'", name);
+        }
+    } else if (match(Token::LPAREN)) {
+        auto ast = math_sum();
+        if (!match(Token::RPAREN)) {
+            throw selection_error("mismatched parenthesis");
+        }
+        return ast;
+    } else if (match(Token::NUMBER)) {
+        return MathAst(new Number(previous().number()));
+    } else if (match(Token::PLUS)) {
+        // Unary plus, nothing to do
+        return math_value();
+    } else if (match(Token::MINUS)) {
+        // Unary minus
+        auto ast = math_value();
+        return MathAst(new Neg(std::move(ast)));
+    } else {
+        if (finished()) {
+            throw selection_error("expected content after", previous().str());
+        } else {
+            throw selection_error("I don't know what to do with {}", peek().str());
+        }
+    }
+}
+
+MathAst Parser::math_function(const std::string& name) {
+    assert(is_numeric_function(name));
+    if (!match(Token::LPAREN)) {
+        throw selection_error("missing parenthesis after {}", name);
+    }
+    auto ast = math_sum();
+    if (!match(Token::RPAREN)) {
+        throw selection_error("missing closing parenthesis in {} call", name);
+    }
+    return NUMERIC_FUNCTIONS[name](std::move(ast));
+}
+
+MathAst Parser::math_property(const std::string& name) {
+    assert(is_numeric_property(name));
+    auto var = variable();
+    return NUMERIC_PROPERTIES[name](var);
+}
+
+unsigned Parser::variable() {
+    unsigned var = 0;
+    if (match(Token::LPAREN)) {
+        if (match(Token::VARIABLE)) {
+            var = previous().variable() - 1;
+        } else {
+            throw selection_error("expected variable in parenthesis, got {}", peek().str());
+        }
+
+        if (!match(Token::RPAREN)) {
+            throw selection_error("expected closing parenthesis after variable, got {}", peek().str());
+        }
+    }
+    return var;
 }

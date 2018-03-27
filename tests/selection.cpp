@@ -83,7 +83,8 @@ TEST_CASE("Atoms selections") {
         CHECK(sel.list(frame) == res);
 
         sel = Selection("resname != resime");
-        CHECK(sel.list(frame).empty());
+        res = std::vector<size_t>{0, 1};
+        CHECK(sel.list(frame) == res);
 
         sel = Selection("resname == water");
         CHECK(sel.list(frame).empty());
@@ -95,11 +96,12 @@ TEST_CASE("Atoms selections") {
         CHECK(sel.list(frame) == res);
 
         sel = Selection("resid < 5");
-        res = std::vector<size_t>{2, 3};
+        res = std::vector<size_t>{0, 1, 2, 3};
         CHECK(sel.list(frame) == res);
 
         sel = Selection("resid != 3");
-        CHECK(sel.list(frame).empty());
+        res = std::vector<size_t>{0, 1};
+        CHECK(sel.list(frame) == res);
     }
 
     SECTION("positions") {

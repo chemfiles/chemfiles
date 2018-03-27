@@ -6,7 +6,7 @@
 #include "chemfiles/capi/selection.h"
 #include "chemfiles/capi.hpp"
 
-#include "chemfiles/Selections.hpp"
+#include "chemfiles/Selection.hpp"
 using namespace chemfiles;
 
 static_assert(

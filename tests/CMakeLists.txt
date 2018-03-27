@@ -103,6 +103,7 @@ file(GLOB all_test_files
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/files/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/formats/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/selections/*.cpp
 )
 
 foreach(test_file IN LISTS all_test_files)
