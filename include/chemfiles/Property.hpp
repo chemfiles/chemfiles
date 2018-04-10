@@ -213,6 +213,12 @@ public:
     /// Get the property with the given `name` if it exists.
     optional<const Property&> get(const std::string& name) const;
 
+    /// Get the constant beginning iterator for the properties.
+    optional<std::unordered_map<std::string, Property>::const_iterator> cbegin() const;
+
+    /// Get the constant end iterator for the properties.
+    optional<std::unordered_map<std::string, Property>::const_iterator> cend() const;
+
 private:
     std::unordered_map<std::string, Property> data_;
     friend bool operator==(const property_map& lhs, const property_map& rhs);

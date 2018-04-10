@@ -182,7 +182,7 @@ extern "C" chfl_status chfl_atom_set_property(CHFL_ATOM* const atom, const char*
     )
 }
 
-extern "C" CHFL_PROPERTY* chfl_atom_get_property(const CHFL_ATOM* const atom, const char* name) {
+extern "C" CHFL_PROPERTY* chfl_atom_get_property(const CHFL_ATOM* atom, const char* name) {
     CHFL_PROPERTY* property = nullptr;
     CHECK_POINTER_GOTO(atom);
     CHECK_POINTER_GOTO(name);
@@ -198,6 +198,44 @@ extern "C" CHFL_PROPERTY* chfl_atom_get_property(const CHFL_ATOM* const atom, co
 error:
     delete property;
     return nullptr;
+}
+
+extern "C" chfl_status chfl_atom_properties_count(const CHFL_ATOM *  atom, uint64_t* count) {
+    CHECK_POINTER(atom);
+    auto atom_properties_begin = atom->properties_begin();
+
+    if (atom_properties_begin) {
+        auto atom_properties_end = atom->properties_end();
+        CHFL_ERROR_CATCH(*count = (uint64_t) std::distance(atom_properties_begin.value(),
+            atom_properties_end.value()););
+    } else {
+        *count = 0;
+        return CHFL_SUCCESS;
+    }
+}
+
+extern "C" chfl_status chfl_atom_properties_names(const CHFL_ATOM* atom, uint64_t* count, char*** names) {
+    CHECK_POINTER(atom);
+    auto opt_atom_properties_begin = atom->properties_begin();
+
+    if (opt_atom_properties_begin) {
+        auto atom_properties_end = atom->properties_end().value();
+        auto atom_properties_begin = opt_atom_properties_begin.value();
+        CHFL_ERROR_CATCH(*count = (uint64_t) std::distance(atom_properties_begin,
+            atom_properties_end););
+        //
+        // names = new char[*count];
+        // for (size_t i = 0; i < count; i++) {
+        //     *names = atom_properties_begin.value();
+        //     ++atom_properties_begin;
+        // }
+
+    }
+    else {
+        *count = 0;
+        names = nullptr;
+        return CHFL_SUCCESS;
+    }
 }
 
 extern "C" chfl_status chfl_atom_free(CHFL_ATOM* const atom) {
