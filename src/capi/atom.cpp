@@ -200,36 +200,20 @@ error:
     return nullptr;
 }
 
-extern "C" chfl_status chfl_atom_properties_count(const CHFL_ATOM *  atom, uint64_t* count) {
-    CHECK_POINTER(atom);
-    auto atom_properties_begin = atom->properties_begin();
-
-    if (atom_properties_begin) {
-        auto atom_properties_end = atom->properties_end();
-        CHFL_ERROR_CATCH(*count = (uint64_t) std::distance(atom_properties_begin.value(),
-            atom_properties_end.value()););
-    } else {
-        *count = 0;
-        return CHFL_SUCCESS;
-    }
-}
-
-extern "C" chfl_status chfl_atom_properties_names(const CHFL_ATOM* atom, uint64_t* count, char*** names) {
+extern "C" chfl_status chfl_atom_properties_names(const CHFL_ATOM* atom, uint64_t* count, const char*** names) {
     CHECK_POINTER(atom);
     auto opt_atom_properties_begin = atom->properties_begin();
 
     if (opt_atom_properties_begin) {
-        auto atom_properties_end = atom->properties_end().value();
         auto atom_properties_begin = opt_atom_properties_begin.value();
+        auto atom_properties_end = atom->properties_end().value();
         CHFL_ERROR_CATCH(*count = (uint64_t) std::distance(atom_properties_begin,
             atom_properties_end););
-        //
-        // names = new char[*count];
-        // for (size_t i = 0; i < count; i++) {
-        //     *names = atom_properties_begin.value();
-        //     ++atom_properties_begin;
-        // }
 
+        for (size_t i = 0; i < *count; i++) {
+            (*names)[i] = atom_properties_begin->first.c_str();
+            ++atom_properties_begin;
+        }
     }
     else {
         *count = 0;

@@ -200,11 +200,8 @@ CHFL_EXPORT CHFL_PROPERTY* chfl_atom_get_property(
     const CHFL_ATOM* atom, const char* name
 );
 
-/// Get the number of properties available
-CHFL_EXPORT chfl_status chfl_atom_properties_count(const CHFL_ATOM * atom, uint64_t* count);
-
 // Get a pointer to the properties names
-CHFL_EXPORT chfl_status chfl_atom_properties_names(const CHFL_ATOM* atom, uint64_t* count, char*** names);
+CHFL_EXPORT chfl_status chfl_atom_properties_names(const CHFL_ATOM* atom, uint64_t* count, const char*** names);
 
 
 /// Free the memory associated with an `atom`.
