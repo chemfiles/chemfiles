@@ -4,6 +4,8 @@
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Selection.hpp"
 
+#include "fmt/format.h"
+
 #include "chemfiles/selections/expr.hpp"
 
 using namespace chemfiles;
@@ -12,7 +14,7 @@ using namespace chemfiles::selections;
 std::string And::print(unsigned delta) const {
     auto lhs = lhs_->print(7);
     auto rhs = rhs_->print(7);
-    return "and -> " + lhs + "\n" + std::string(delta, ' ') + "    -> " + rhs;
+    return fmt::format("and -> {}\n{:{}}    -> {}", lhs, "", delta, rhs);
 }
 
 bool And::is_match(const Frame& frame, const Match& match) const {
@@ -22,7 +24,7 @@ bool And::is_match(const Frame& frame, const Match& match) const {
 std::string Or::print(unsigned delta) const {
     auto lhs = lhs_->print(6);
     auto rhs = rhs_->print(6);
-    return "or -> " + lhs + "\n" + std::string(delta, ' ') + "   -> " + rhs;
+    return fmt::format("or -> {}\n{:{}}   -> {}", lhs, "", delta, rhs);
 }
 
 bool Or::is_match(const Frame& frame, const Match& match) const {
@@ -54,9 +56,8 @@ bool None::is_match(const Frame& /*unused*/, const Match& /*unused*/) const {
 }
 
 std::string StringSelector::print(unsigned /*unused*/) const {
-    auto name = this->name();
     auto op = equals_ ? "==" : "!=";
-    return name + "(#" + std::to_string(argument_ + 1) + ") " + op + " " + value_;
+    return fmt::format("{}(#{}) {} {}", name(), argument_ + 1, op, value_);
 }
 
 bool StringSelector::is_match(const Frame& frame, const Match& match) const {
@@ -93,7 +94,6 @@ const std::string& Resname::value(const Frame& frame, size_t i) const {
         return EMPTY_STRING;
     }
 }
-
 
 bool Math::is_match(const Frame& frame, const Match& match) const {
     auto lhs = lhs_->eval(frame, match);
@@ -173,7 +173,7 @@ optional<double> Add::optimize() {
 }
 
 std::string Add::print() const {
-    return "(" + lhs_->print() + " + " + rhs_->print() + ")";
+    return fmt::format("({} + {})", lhs_->print(), rhs_->print());
 }
 
 double Sub::eval(const Frame& frame, const Match& match) const {
@@ -194,7 +194,7 @@ optional<double> Sub::optimize() {
 }
 
 std::string Sub::print() const {
-    return "(" + lhs_->print() + " - " + rhs_->print() + ")";
+    return fmt::format("({} - {})", lhs_->print(), rhs_->print());
 }
 
 double Mul::eval(const Frame& frame, const Match& match) const {
@@ -215,7 +215,7 @@ optional<double> Mul::optimize() {
 }
 
 std::string Mul::print() const {
-    return "(" + lhs_->print() + " * " + rhs_->print() + ")";
+    return fmt::format("({} * {})", lhs_->print(), rhs_->print());
 }
 
 double Div::eval(const Frame& frame, const Match& match) const {
@@ -236,7 +236,7 @@ optional<double> Div::optimize() {
 }
 
 std::string Div::print() const {
-    return "(" + lhs_->print() + " / " + rhs_->print() + ")";
+    return fmt::format("({} / {})", lhs_->print(), rhs_->print());
 }
 
 double Pow::eval(const Frame& frame, const Match& match) const {
@@ -257,7 +257,7 @@ optional<double> Pow::optimize() {
 }
 
 std::string Pow::print() const {
-    return lhs_->print() + " ^(" + rhs_->print() + ")";
+    return fmt::format("{} ^({})", lhs_->print(), rhs_->print());
 }
 
 double Neg::eval(const Frame& frame, const Match& match) const {
@@ -274,7 +274,7 @@ optional<double> Neg::optimize() {
 }
 
 std::string Neg::print() const {
-    return "(-" + ast_->print() + ")";
+    return fmt::format("(-{})", ast_->print());
 }
 
 double Function::eval(const Frame& frame, const Match& match) const {
@@ -291,7 +291,7 @@ optional<double> Function::optimize() {
 }
 
 std::string Function::print() const {
-    return name_ + "(" + ast_->print() + ")";
+    return fmt::format("{}({})", name_, ast_->print());
 }
 
 double Number::eval(const Frame& /*unused*/, const Match& /*unused*/) const {
@@ -319,7 +319,7 @@ optional<double> NumericProperty::optimize() {
 }
 
 std::string NumericProperty::print() const {
-    return this->name() + "(#" + std::to_string(argument_ + 1) + ")";
+    return fmt::format("{}(#{})", name(), argument_ + 1);
 }
 
 std::string Index::name() const {
