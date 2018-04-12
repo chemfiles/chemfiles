@@ -63,6 +63,7 @@ public:
     Molfile& operator=(Molfile&&) = default;
 
     void read(Frame& frame) override;
+    void read_step(size_t step, Frame& frame) override;
     size_t nsteps() override;
 private:
     /// Convert a molfile timestep to a chemfiles frame
@@ -84,6 +85,10 @@ private:
     int natoms_;
     /// Store optional topological information
     optional<Topology> topology_;
+    /// Store pre-read steps to implement read-step
+    std::vector<Frame> frames_;
+    /// Current step
+    size_t step_ = 0;
 };
 
 template<> FormatInfo format_information<Molfile<DCD>>();

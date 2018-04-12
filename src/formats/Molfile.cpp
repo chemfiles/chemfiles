@@ -160,6 +160,20 @@ template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
         frame.set_topology(*topology_);
     }
     molfile_to_frame(timestep, frame);
+
+    frames_.emplace_back(std::move(frame.clone()));
+    step_++;
+}
+
+template <MolfileFormat F> void Molfile<F>::read_step(size_t step, Frame& frame) {
+    if (step >= frames_.size()) {
+        while (step_ != step) {
+            Frame new_frame;
+            this->read(new_frame);
+            frames_.emplace_back(std::move(new_frame));
+        }
+    }
+    frame = frames_[step].clone();
 }
 
 template <MolfileFormat F> size_t Molfile<F>::nsteps() {
