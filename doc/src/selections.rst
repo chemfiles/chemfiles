@@ -73,6 +73,8 @@ String properties
 Numeric properties
 ------------------
 
+Most of the numeric properties only apply to a single atom:
+
 - ``index``: gives the atomic index in the frame;
 - ``mass``: gives the atomic mass;
 - ``x``, ``y`` and ``z``: gives the atomic position  in cartesian coordinates;
@@ -80,10 +82,26 @@ Numeric properties
 - ``resid``: gives the atomic residue index. If an atom is not in a residue,
   this return -1;
 
-Supported functions in mathematical expressions are: ``sin``, ``cos``, ``tan``
-for the trigonometric functions; ``asin`` and ``acos`` inverse trigonometric
-functions and ``sqrt``. Adding new functions is easy, open an issue about the
-one you need on the chemfiles repository.
+But some properties apply to multiple atoms, and as such are only usable when
+selecting multiple atoms:
+
+- ``distance(#1, #2)``: gives the distance in Ångströms between atoms ``#1``
+  and ``#2``, accounting for periodic boundary conditions.
+- ``angle(#1, #2, #3)``: gives the angle between atoms ``#1``, ``#2`` and
+  ``#3`` in radians, accounting for periodic boundary conditions. The atoms do
+  not need to be bonded together.
+- ``dihedral(#1, #2, #3, #4)``: gives the dihedral angle between atoms ``#1``,
+  ``#2``, ``#3`` and ``#4`` in radians, accounting for periodic boundary
+  conditions. The atoms do not need to be bonded together.
+- ``out_of_plane(#1, #2, #3, #4)``: gives the distance in Ångströms between the
+  plane formed by the three atoms ``#1``, ``#3``, and ``#4``; and the atom
+  ``#2``, accounting for periodic boundary conditions.
+
+One can also use mathematical function to transform a number to another value.
+Currently supported functions are: ``sin``, ``cos``, ``tan`` for the
+trigonometric functions; ``asin`` and ``acos`` inverse trigonometric functions
+and ``sqrt``. Adding new functions is easy, open an issue about the one you need
+on the chemfiles repository.
 
 Elisions
 ^^^^^^^^

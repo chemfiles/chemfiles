@@ -42,6 +42,20 @@ static std::map<std::string, num_functions_creator_t> NUMERIC_FUNCTIONS = {
     {"sqrt", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(sqrt), "sqrt", std::move(ast)));}},
 };
 
+using num_var_functions_creator_t = std::function<MathAst(std::vector<unsigned>)>;
+struct NumericVarFunction {
+    unsigned arity;
+    num_var_functions_creator_t creator;
+};
+
+static std::map<std::string, NumericVarFunction> NUMERIC_VAR_FUNCTIONS = {
+    {"distance", {2, [](std::vector<unsigned> args){ return MathAst(new Distance(args[0], args[1])); }}},
+    {"angle", {3, [](std::vector<unsigned> args){ return MathAst(new Angle(args[0], args[1], args[2])); }}},
+    {"dihedral", {4, [](std::vector<unsigned> args){ return MathAst(new Dihedral(args[0], args[1], args[2], args[3])); }}},
+    {"out_of_plane", {4, [](std::vector<unsigned> args){ return MathAst(new OutOfPlane(args[0], args[1], args[2], args[3])); }}},
+};
+
+
 static bool is_string_property(const std::string& name) {
     return STRING_PROPERTIES.find(name) != STRING_PROPERTIES.end();
 }
@@ -52,6 +66,10 @@ static bool is_numeric_property(const std::string& name) {
 
 static bool is_numeric_function(const std::string& name) {
     return NUMERIC_FUNCTIONS.find(name) != NUMERIC_FUNCTIONS.end();
+}
+
+static bool is_numeric_var_function(const std::string& name) {
+    return NUMERIC_VAR_FUNCTIONS.find(name) != NUMERIC_VAR_FUNCTIONS.end();
 }
 
 Ast Parser::parse() {
@@ -254,6 +272,8 @@ MathAst Parser::math_value() {
             return math_function(name);
         } else if (is_numeric_property(name)) {
             return math_property(name);
+        } else if (is_numeric_var_function(name)) {
+            return math_var_function(name);
         } else {
             throw selection_error("unexpected identifier '{}'", name);
         }
@@ -293,6 +313,21 @@ MathAst Parser::math_function(const std::string& name) {
     return NUMERIC_FUNCTIONS[name](std::move(ast));
 }
 
+MathAst Parser::math_var_function(const std::string& name) {
+    assert(is_numeric_var_function(name));
+    auto& function = NUMERIC_VAR_FUNCTIONS[name];
+
+    assert(function.arity >= 1);
+    auto arguments = variables();
+    if (arguments.size() != function.arity) {
+        throw selection_error("expected {} arguments in call to {}, got {}",
+            arguments.size(), name, function.arity
+        );
+    }
+
+    return function.creator(arguments);
+}
+
 MathAst Parser::math_property(const std::string& name) {
     assert(is_numeric_property(name));
     auto var = variable();
@@ -313,4 +348,31 @@ unsigned Parser::variable() {
         }
     }
     return var;
+}
+
+std::vector<unsigned> Parser::variables() {
+    std::vector<unsigned> vars;
+    if (!match(Token::LPAREN)) {
+        throw selection_error("expected opening parenthesis, got {}", peek().str());
+    }
+
+    if (match(Token::VARIABLE)) {
+        vars.push_back(previous().variable() - 1);
+    } else {
+        throw selection_error("expected variable in parenthesis, got {}", peek().str());
+    }
+
+    while (match(Token::COMMA)) {
+        if (match(Token::VARIABLE)) {
+            vars.push_back(previous().variable() - 1);
+        } else {
+            throw selection_error("expected variable in parenthesis, got {}", peek().str());
+        }
+    }
+
+    if (!match(Token::RPAREN)) {
+        throw selection_error("expected closing parenthesis after variable, got {}", peek().str());
+    }
+
+    return vars;
 }

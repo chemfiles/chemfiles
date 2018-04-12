@@ -299,6 +299,75 @@ private:
     double value_;
 };
 
+/// Compute the distance between atoms
+class Distance final: public MathExpr {
+public:
+    Distance(unsigned i, unsigned j): i_(i), j_(j) {}
+
+    double eval(const Frame& frame, const Match& match) const override;
+    optional<double> optimize() override {
+        return nullopt;
+    }
+    std::string print() const override;
+
+private:
+    unsigned i_;
+    unsigned j_;
+};
+
+/// Compute the angle between three atoms
+class Angle final: public MathExpr {
+public:
+    Angle(unsigned i, unsigned j, unsigned k): i_(i), j_(j), k_(k) {}
+
+    double eval(const Frame& frame, const Match& match) const override;
+    optional<double> optimize() override {
+        return nullopt;
+    }
+    std::string print() const override;
+
+private:
+    unsigned i_;
+    unsigned j_;
+    unsigned k_;
+};
+
+/// Compute the dihedral angle between four atoms
+class Dihedral final: public MathExpr {
+public:
+    Dihedral(unsigned i, unsigned j, unsigned k, unsigned m): i_(i), j_(j), k_(k), m_(m) {}
+
+    double eval(const Frame& frame, const Match& match) const override;
+    optional<double> optimize() override {
+        return nullopt;
+    }
+    std::string print() const override;
+
+private:
+    unsigned i_;
+    unsigned j_;
+    unsigned k_;
+    unsigned m_;
+};
+
+/// Compute the out of plane distance between four atoms
+class OutOfPlane final: public MathExpr {
+public:
+    OutOfPlane(unsigned i, unsigned j, unsigned k, unsigned m): i_(i), j_(j), k_(k), m_(m) {}
+
+    double eval(const Frame& frame, const Match& match) const override;
+    optional<double> optimize() override {
+        return nullopt;
+    }
+    std::string print() const override;
+
+private:
+    unsigned i_;
+    unsigned j_;
+    unsigned k_;
+    unsigned m_;
+};
+
 /// Abstract base class for numeric properties
 class NumericProperty: public MathExpr {
 public:

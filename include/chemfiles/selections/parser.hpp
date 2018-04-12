@@ -42,9 +42,15 @@ private:
     MathAst math_product();
     MathAst math_power();
     MathAst math_value();
+    // mathematical functions (cos, sin, ...)
     MathAst math_function(const std::string& name);
+    // functions of atomic variables (distance(#1, #2), ...)
+    MathAst math_var_function(const std::string& name);
     MathAst math_property(const std::string& name);
 
+    // Match multiple variables and the surrounding parenthesis
+    std::vector<unsigned> variables();
+    // Match an optional single variable and the surrounding parenthesis
     unsigned variable();
 
     bool match(Token::Type type) {

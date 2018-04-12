@@ -310,6 +310,38 @@ std::string Number::print() const {
     }
 }
 
+double Distance::eval(const Frame& frame, const Match& match) const {
+    return frame.distance(match[i_], match[j_]);
+}
+
+std::string Distance::print() const {
+    return fmt::format("distance(#{}, #{})", i_ + 1, j_ + 1);
+}
+
+double selections::Angle::eval(const Frame& frame, const Match& match) const {
+    return frame.angle(match[i_], match[j_], match[k_]);
+}
+
+std::string selections::Angle::print() const {
+    return fmt::format("angle(#{}, #{}, #{})", i_ + 1, j_ + 1, k_ + 1);
+}
+
+double selections::Dihedral::eval(const Frame& frame, const Match& match) const {
+    return frame.dihedral(match[i_], match[j_], match[k_], match[m_]);
+}
+
+std::string selections::Dihedral::print() const {
+    return fmt::format("dihedral(#{}, #{}, #{}, #{})", i_ + 1, j_ + 1, k_ + 1, m_ + 1);
+}
+
+double OutOfPlane::eval(const Frame& frame, const Match& match) const {
+    return frame.out_of_plane(match[i_], match[j_], match[k_], match[m_]);
+}
+
+std::string OutOfPlane::print() const {
+    return fmt::format("out_of_plane(#{}, #{}, #{}, #{})", i_ + 1, j_ + 1, k_ + 1, m_ + 1);
+}
+
 double NumericProperty::eval(const Frame& frame, const Match& match) const {
     return this->value(frame, match[argument_]);
 }

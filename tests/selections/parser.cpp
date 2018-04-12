@@ -222,6 +222,20 @@ TEST_CASE("Parsing") {
             CHECK(parse("sin(3 - 4) < 5")->print() == ast);
         }
 
+        SECTION("Atomic functions") {
+            auto ast = "distance(#1, #2) < 5";
+            CHECK(parse("distance(#1, #2) < 5")->print() == ast);
+
+            ast = "angle(#1, #3, #2) < 5";
+            CHECK(parse("angle(#1, #3, #2) < 5")->print() == ast);
+
+            ast = "dihedral(#1, #3, #2, #3) < 5";
+            CHECK(parse("dihedral(#1, #3, #2, #3) < 5")->print() == ast);
+
+            ast = "out_of_plane(#1, #3, #2, #4) < 5";
+            CHECK(parse("out_of_plane(#1, #3, #2, #4) < 5")->print() == ast);
+        }
+
         SECTION("Complex expressions") {
             auto ast = "(x(#1) ^(2) + y(#1) ^(2)) < 10 ^(2)";
             CHECK(parse("x ^ 2 + y ^ 2 < 10 ^ 2")->print() == ast);
@@ -235,12 +249,12 @@ TEST_CASE("Parsing") {
 
 TEST_CASE("Parsing errors") {
     std::vector<std::string> PARSE_FAIL = {
-        /* Giberish at the end of the selection */
+        // Giberish at the end of the selection
         "index == 23 6",
         "index == 23 njzk",
         "index == 23 !=",
         "index == 23 name == 1",
-        /* Bad usage of the boolean operators */
+        // Bad usage of the boolean operators
         "index == 23 and ",
         "and index == 23",
         "not and index == 23",
@@ -248,20 +262,25 @@ TEST_CASE("Parsing errors") {
         "or index == 23",
         "not or index == 23",
         "index == 23 not index == 1",
-        /* string expressions with bad operators  */
+        // string expressions with bad operators
         "name == <",
         "name > foo",
         "name >= foo",
         "name < foo",
         "name <= foo",
         "name ==",
-        /* identifiers as mathematical values */
+        // identifiers as mathematical values
         "z == <",
         "y == bar",
         "x <= foo",
         "z bar",
         // https://github.com/chemfiles/chemfiles/issues/79
         "type(#1) Al and type(#2) O and type(#3) H )",
+        // functions arity and arguments
+        "distance(#1) < 5",
+        "distance(x) < 5",
+        "angle(#2, #3) < 5",
+        "dihedral(#2, #3) < 5",
     };
 
     for (auto& failure: PARSE_FAIL) {
