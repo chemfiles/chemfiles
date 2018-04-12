@@ -1,5 +1,3 @@
-powershell "c:\chemfiles\scripts\ci\install-cmake-3.8.ps1"
-
 if ("$env:CXX_PATH" -ne "") {
     $env:PATH += ";$env:CXX_PATH"
 }
