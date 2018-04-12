@@ -31,5 +31,11 @@ TEST_CASE("Read files in LAMMPS .lammpstrj format using Molfile"){
         auto velocities = *frame.velocities();
         CHECK(approx_eq(velocities[0], Vector3D(-0.00258494, 0.00270859, -0.00314039), 1e-7));
         CHECK(approx_eq(velocities[222], Vector3D(-0.00466812, -0.00196397, -0.000147051), 1e-7));
+
+        frame = file.read_step(5);
+        CHECK(frame.size() == 512);
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(0.0698752, 0.0774784, -0.146097), 1e-3));
+        CHECK(approx_eq(positions[222], Vector3D(14.0787, -0.0278016, 8.46684), 1e-3));
     }
 }

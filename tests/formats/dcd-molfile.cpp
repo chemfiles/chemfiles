@@ -21,8 +21,7 @@ TEST_CASE("Read files in DCD format using Molfile"){
     CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
     CHECK(fabs(cell.a() - 15.0) < eps);
 
-    file.read(); // Skip a frame
-    frame = file.read();
+    frame = file.read_step(3);
     CHECK(frame.size() == 297);
 
     positions = frame.positions();
