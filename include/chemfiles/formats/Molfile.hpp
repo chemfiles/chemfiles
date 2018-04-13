@@ -85,10 +85,8 @@ private:
     int natoms_;
     /// Store optional topological information
     optional<Topology> topology_;
-    /// Store pre-read steps to implement read-step
+    /// Store pre-read steps to implement read_step
     std::vector<Frame> frames_;
-    /// Current step
-    size_t step_ = 0;
 };
 
 template<> FormatInfo format_information<Molfile<DCD>>();

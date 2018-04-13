@@ -6,6 +6,9 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
+
+#include <iostream>
+
 TEST_CASE("Read files in LAMMPS .lammpstrj format using Molfile"){
     SECTION("Polymer") {
         Trajectory file("data/lammps/polymer.lammpstrj");
@@ -35,7 +38,38 @@ TEST_CASE("Read files in LAMMPS .lammpstrj format using Molfile"){
         frame = file.read_step(5);
         CHECK(frame.size() == 512);
         positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D(0.0698752, 0.0774784, -0.146097), 1e-3));
-        CHECK(approx_eq(positions[222], Vector3D(14.0787, -0.0278016, 8.46684), 1e-3));
+
+        CHECK(approx_eq(positions[0], Vector3D(0.095924, -0.0222584, -0.0152489), 1e-3));
+        CHECK(approx_eq(positions[222], Vector3D(14.0788, 0.0954186, 8.56453), 1e-3));
+    }
+
+    SECTION("Only use read_step") {
+        // This test is here to check that the molfile implementation of
+        // read_step is correct even in the absence of calls to read
+        Trajectory file("data/lammps/nacl.lammpstrj");
+        Frame frame = file.read_step(0);
+
+        CHECK(frame.size() == 512);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(0.0, 0.0, 0.0), 1e-3));
+        CHECK(approx_eq(positions[222], Vector3D(14.1005, 0.0, 8.4603), 1e-3));
+
+        auto velocities = *frame.velocities();
+        CHECK(approx_eq(velocities[0], Vector3D(-0.00258494, 0.00270859, -0.00314039), 1e-7));
+        CHECK(approx_eq(velocities[222], Vector3D(-0.00466812, -0.00196397, -0.000147051), 1e-7));
+
+        frame = file.read_step(5);
+        CHECK(frame.size() == 512);
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(0.095924, -0.0222584, -0.0152489), 1e-3));
+        CHECK(approx_eq(positions[222], Vector3D(14.0788, 0.0954186, 8.56453), 1e-3));
+
+        frame = file.read_step(0);
+        CHECK(frame.size() == 512);
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(0.0, 0.0, 0.0), 1e-3));
+        CHECK(approx_eq(positions[222], Vector3D(14.1005, 0.0, 8.4603), 1e-3));
+
+        CHECK_THROWS_AS(file.read_step(6), FileError);
     }
 }
