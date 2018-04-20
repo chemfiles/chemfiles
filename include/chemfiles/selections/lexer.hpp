@@ -6,12 +6,15 @@
 
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include <chemfiles/exports.hpp>
 #include <chemfiles/Error.hpp>
 
 namespace chemfiles {
 namespace selections {
+
+using Variable = uint8_t;
 
 /// A token in the selection stream
 ///
@@ -121,7 +124,7 @@ public:
 
     /// Get the variable associated with this token.
     /// `type()` must be `VARIABLE`.
-    unsigned variable() const {
+    Variable variable() const {
         if (type_ != VARIABLE) {
             throw Error("can not get a variable value out of this token. This is a bug.");
         }
@@ -140,7 +143,7 @@ private:
     /// Value of the identifier if the token is an IDENT
     std::string ident_;
     /// Value of the variable if the token is a VARIABLE
-    unsigned variable_;
+    Variable variable_;
 };
 
 /// Convert an `input` string to a stream of tokens

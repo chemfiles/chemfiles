@@ -14,24 +14,24 @@ constexpr double PI = 3.141592653589793238463;
 using namespace chemfiles;
 using namespace chemfiles::selections;
 
-using string_prop_creator_t = std::function<Ast(std::string, bool, unsigned)>;
+using string_prop_creator_t = std::function<Ast(std::string, bool, Variable)>;
 static std::map<std::string, string_prop_creator_t> STRING_PROPERTIES = {
-    {"name", [](std::string value, bool equals, unsigned var){ return Ast(new Name(value, equals, var));}},
-    {"type", [](std::string value, bool equals, unsigned var){ return Ast(new Type(value, equals, var));}},
-    {"resname", [](std::string value, bool equals, unsigned var){ return Ast(new Resname(value, equals, var));}},
+    {"name", [](std::string value, bool equals, Variable var){ return Ast(new Name(value, equals, var));}},
+    {"type", [](std::string value, bool equals, Variable var){ return Ast(new Type(value, equals, var));}},
+    {"resname", [](std::string value, bool equals, Variable var){ return Ast(new Resname(value, equals, var));}},
 };
 
-using num_prop_creator_t = std::function<MathAst(unsigned)>;
+using num_prop_creator_t = std::function<MathAst(Variable)>;
 static std::map<std::string, num_prop_creator_t> NUMERIC_PROPERTIES = {
-    {"index", [](unsigned var){ return MathAst(new Index(var));}},
-    {"mass", [](unsigned var){ return MathAst(new Mass(var));}},
-    {"resid", [](unsigned var){ return MathAst(new Resid(var));}},
-    {"x", [](unsigned var){ return MathAst(new Position(var, Coordinate::X));}},
-    {"y", [](unsigned var){ return MathAst(new Position(var, Coordinate::Y));}},
-    {"z", [](unsigned var){ return MathAst(new Position(var, Coordinate::Z));}},
-    {"vx", [](unsigned var){ return MathAst(new Velocity(var, Coordinate::X));}},
-    {"vy", [](unsigned var){ return MathAst(new Velocity(var, Coordinate::Y));}},
-    {"vz", [](unsigned var){ return MathAst(new Velocity(var, Coordinate::Z));}},
+    {"index", [](Variable var){ return MathAst(new Index(var));}},
+    {"mass", [](Variable var){ return MathAst(new Mass(var));}},
+    {"resid", [](Variable var){ return MathAst(new Resid(var));}},
+    {"x", [](Variable var){ return MathAst(new Position(var, Coordinate::X));}},
+    {"y", [](Variable var){ return MathAst(new Position(var, Coordinate::Y));}},
+    {"z", [](Variable var){ return MathAst(new Position(var, Coordinate::Z));}},
+    {"vx", [](Variable var){ return MathAst(new Velocity(var, Coordinate::X));}},
+    {"vy", [](Variable var){ return MathAst(new Velocity(var, Coordinate::Y));}},
+    {"vz", [](Variable var){ return MathAst(new Velocity(var, Coordinate::Z));}},
 };
 
 using num_functions_creator_t = std::function<MathAst(MathAst)>;
@@ -46,33 +46,33 @@ static std::map<std::string, num_functions_creator_t> NUMERIC_FUNCTIONS = {
     {"deg2rad", [](MathAst ast){ return MathAst(new Function([](double deg){ return deg * PI / 180; }, "deg2rad", std::move(ast)));}},
 };
 
-using num_var_functions_creator_t = std::function<MathAst(std::vector<unsigned>)>;
+using num_var_functions_creator_t = std::function<MathAst(std::vector<Variable>)>;
 struct NumericVarFunction {
     unsigned arity;
     num_var_functions_creator_t creator;
 };
 
 static std::map<std::string, NumericVarFunction> NUMERIC_VAR_FUNCTIONS = {
-    {"distance", {2, [](std::vector<unsigned> args){ return MathAst(new Distance(args[0], args[1])); }}},
-    {"angle", {3, [](std::vector<unsigned> args){ return MathAst(new Angle(args[0], args[1], args[2])); }}},
-    {"dihedral", {4, [](std::vector<unsigned> args){ return MathAst(new Dihedral(args[0], args[1], args[2], args[3])); }}},
-    {"out_of_plane", {4, [](std::vector<unsigned> args){ return MathAst(new OutOfPlane(args[0], args[1], args[2], args[3])); }}},
+    {"distance", {2, [](std::vector<Variable> args){ return MathAst(new Distance(args[0], args[1])); }}},
+    {"angle", {3, [](std::vector<Variable> args){ return MathAst(new Angle(args[0], args[1], args[2])); }}},
+    {"dihedral", {4, [](std::vector<Variable> args){ return MathAst(new Dihedral(args[0], args[1], args[2], args[3])); }}},
+    {"out_of_plane", {4, [](std::vector<Variable> args){ return MathAst(new OutOfPlane(args[0], args[1], args[2], args[3])); }}},
 };
 
 
-using bool_selector_creator_t = std::function<Ast(std::vector<unsigned>)>;
+using bool_selector_creator_t = std::function<Ast(std::vector<Variable>)>;
 struct BooleanFunction {
     unsigned arity;
     bool_selector_creator_t creator;
 };
 
 static std::map<std::string, BooleanFunction> BOOLEAN_SELECTORS = {
-    {"all", {0, [](std::vector<unsigned>){ return Ast(new All()); }}},
-    {"none", {0, [](std::vector<unsigned>){ return Ast(new None()); }}},
-    {"bonded", {2, [](std::vector<unsigned> args){ return Ast(new Bonded(args[0], args[1])); }}},
-    {"is_angle", {3, [](std::vector<unsigned> args){ return Ast(new IsAngle(args[0], args[1], args[2])); }}},
-    {"is_dihedral", {4, [](std::vector<unsigned> args){ return Ast(new IsDihedral(args[0], args[1], args[2], args[3])); }}},
-    {"is_improper", {4, [](std::vector<unsigned> args){ return Ast(new IsImproper(args[0], args[1], args[2], args[3])); }}},
+    {"all", {0, [](std::vector<Variable>){ return Ast(new All()); }}},
+    {"none", {0, [](std::vector<Variable>){ return Ast(new None()); }}},
+    {"bonded", {2, [](std::vector<Variable> args){ return Ast(new Bonded(args[0], args[1])); }}},
+    {"is_angle", {3, [](std::vector<Variable> args){ return Ast(new IsAngle(args[0], args[1], args[2])); }}},
+    {"is_dihedral", {4, [](std::vector<Variable> args){ return Ast(new IsDihedral(args[0], args[1], args[2], args[3])); }}},
+    {"is_improper", {4, [](std::vector<Variable> args){ return Ast(new IsImproper(args[0], args[1], args[2], args[3])); }}},
 };
 
 
@@ -372,8 +372,8 @@ MathAst Parser::math_property(const std::string& name) {
     return NUMERIC_PROPERTIES[name](var);
 }
 
-unsigned Parser::variable() {
-    unsigned var = 0;
+Variable Parser::variable() {
+    Variable var = 0;
     if (match(Token::LPAREN)) {
         if (match(Token::VARIABLE)) {
             var = previous().variable() - 1;
@@ -388,8 +388,8 @@ unsigned Parser::variable() {
     return var;
 }
 
-std::vector<unsigned> Parser::variables() {
-    std::vector<unsigned> vars;
+std::vector<Variable> Parser::variables() {
+    std::vector<Variable> vars;
     if (!match(Token::LPAREN)) {
         // No variables
         return vars;

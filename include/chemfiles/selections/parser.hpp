@@ -50,9 +50,9 @@ private:
     MathAst math_property(const std::string& name);
 
     // Match multiple variables and the surrounding parenthesis
-    std::vector<unsigned> variables();
+    std::vector<Variable> variables();
     // Match an optional single variable and the surrounding parenthesis
-    unsigned variable();
+    Variable variable();
 
     bool match(Token::Type type) {
         if (check(type)) {

@@ -18,6 +18,8 @@ class Match;
 
 namespace selections {
 
+using Variable = uint8_t;
+
 /// Abstract base class for selectors in the selection AST
 class Selector {
 public:
@@ -93,56 +95,56 @@ public:
 /// Checking if two atoms are bonded together
 class Bonded final: public Selector {
 public:
-    Bonded(unsigned i, unsigned j): i_(i), j_(j) {}
+    Bonded(Variable i, Variable j): i_(i), j_(j) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:
-    unsigned i_;
-    unsigned j_;
+    Variable i_;
+    Variable j_;
 };
 
 /// Checking if three atoms are bonded together to form an angle
 class IsAngle final: public Selector {
 public:
-    IsAngle(unsigned i, unsigned j, unsigned k): i_(i), j_(j), k_(k) {}
+    IsAngle(Variable i, Variable j, Variable k): i_(i), j_(j), k_(k) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:
-    unsigned i_;
-    unsigned j_;
-    unsigned k_;
+    Variable i_;
+    Variable j_;
+    Variable k_;
 };
 
 /// Checking if four atoms are bonded together to form a dihedral angle
 class IsDihedral final: public Selector {
 public:
-    IsDihedral(unsigned i, unsigned j, unsigned k, unsigned m): i_(i), j_(j), k_(k), m_(m) {}
+    IsDihedral(Variable i, Variable j, Variable k, Variable m): i_(i), j_(j), k_(k), m_(m) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:
-    unsigned i_;
-    unsigned j_;
-    unsigned k_;
-    unsigned m_;
+    Variable i_;
+    Variable j_;
+    Variable k_;
+    Variable m_;
 };
 
 /// Checking if four atoms are bonded together to form an improper dihedral angle
 class IsImproper final: public Selector {
 public:
-    IsImproper(unsigned i, unsigned j, unsigned k, unsigned m): i_(i), j_(j), k_(k), m_(m) {}
+    IsImproper(Variable i, Variable j, Variable k, Variable m): i_(i), j_(j), k_(k), m_(m) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:
-    unsigned i_;
-    unsigned j_;
-    unsigned k_;
-    unsigned m_;
+    Variable i_;
+    Variable j_;
+    Variable k_;
+    Variable m_;
 };
 
 /// Abstract base class for string selector
 class StringSelector: public Selector {
 public:
-    StringSelector(std::string value, bool equals, unsigned argument):
+    StringSelector(std::string value, bool equals, Variable argument):
         value_(std::move(value)), equals_(equals), argument_(argument)
     {
         assert(argument <= 3 && "argument must be less than 3 in SingleSelector");
@@ -163,13 +165,13 @@ private:
     /// Are we checking for equality or inequality?
     bool equals_;
     /// Which atom in the candidate match are we checking?
-    unsigned argument_;
+    Variable argument_;
 };
 
 /// Select atoms using their type
 class Type final: public StringSelector {
 public:
-    Type(std::string value, bool equals, unsigned argument):
+    Type(std::string value, bool equals, Variable argument):
         StringSelector(std::move(value), equals, argument) {}
 
     std::string name() const override;
@@ -179,7 +181,7 @@ public:
 /// Select atoms using their name
 class Name final: public StringSelector {
 public:
-    Name(std::string value, bool equals, unsigned argument):
+    Name(std::string value, bool equals, Variable argument):
         StringSelector(std::move(value), equals, argument) {}
 
     std::string name() const override;
@@ -189,7 +191,7 @@ public:
 /// Select atoms using their residue name
 class Resname final: public StringSelector {
 public:
-    Resname(std::string value, bool equals, unsigned argument):
+    Resname(std::string value, bool equals, Variable argument):
         StringSelector(std::move(value), equals, argument) {}
 
     std::string name() const override;
@@ -351,7 +353,7 @@ private:
 /// Compute the distance between atoms
 class Distance final: public MathExpr {
 public:
-    Distance(unsigned i, unsigned j): i_(i), j_(j) {}
+    Distance(Variable i, Variable j): i_(i), j_(j) {}
 
     double eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override {
@@ -360,14 +362,14 @@ public:
     std::string print() const override;
 
 private:
-    unsigned i_;
-    unsigned j_;
+    Variable i_;
+    Variable j_;
 };
 
 /// Compute the angle between three atoms
 class Angle final: public MathExpr {
 public:
-    Angle(unsigned i, unsigned j, unsigned k): i_(i), j_(j), k_(k) {}
+    Angle(Variable i, Variable j, Variable k): i_(i), j_(j), k_(k) {}
 
     double eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override {
@@ -376,15 +378,15 @@ public:
     std::string print() const override;
 
 private:
-    unsigned i_;
-    unsigned j_;
-    unsigned k_;
+    Variable i_;
+    Variable j_;
+    Variable k_;
 };
 
 /// Compute the dihedral angle between four atoms
 class Dihedral final: public MathExpr {
 public:
-    Dihedral(unsigned i, unsigned j, unsigned k, unsigned m): i_(i), j_(j), k_(k), m_(m) {}
+    Dihedral(Variable i, Variable j, Variable k, Variable m): i_(i), j_(j), k_(k), m_(m) {}
 
     double eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override {
@@ -393,16 +395,16 @@ public:
     std::string print() const override;
 
 private:
-    unsigned i_;
-    unsigned j_;
-    unsigned k_;
-    unsigned m_;
+    Variable i_;
+    Variable j_;
+    Variable k_;
+    Variable m_;
 };
 
 /// Compute the out of plane distance between four atoms
 class OutOfPlane final: public MathExpr {
 public:
-    OutOfPlane(unsigned i, unsigned j, unsigned k, unsigned m): i_(i), j_(j), k_(k), m_(m) {}
+    OutOfPlane(Variable i, Variable j, Variable k, Variable m): i_(i), j_(j), k_(k), m_(m) {}
 
     double eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override {
@@ -411,16 +413,16 @@ public:
     std::string print() const override;
 
 private:
-    unsigned i_;
-    unsigned j_;
-    unsigned k_;
-    unsigned m_;
+    Variable i_;
+    Variable j_;
+    Variable k_;
+    Variable m_;
 };
 
 /// Abstract base class for numeric properties
 class NumericProperty: public MathExpr {
 public:
-    NumericProperty(unsigned argument): argument_(argument) {}
+    NumericProperty(Variable argument): argument_(argument) {}
     virtual ~NumericProperty() = default;
 
     double eval(const Frame& frame, const Match& match) const override final;
@@ -433,13 +435,13 @@ public:
     virtual std::string name() const = 0;
 private:
     /// Which atom in the candidate match are we checking?
-    unsigned argument_;
+    Variable argument_;
 };
 
 /// Select atoms using their index in the frame.
 class Index final: public NumericProperty {
 public:
-    Index(unsigned argument): NumericProperty(argument) {}
+    Index(Variable argument): NumericProperty(argument) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
 };
@@ -447,7 +449,7 @@ public:
 /// Select atoms using their residue id (residue number)
 class Resid final: public NumericProperty {
 public:
-    Resid(unsigned argument): NumericProperty(argument) {}
+    Resid(Variable argument): NumericProperty(argument) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
 };
@@ -455,7 +457,7 @@ public:
 /// Select atoms using their mass.
 class Mass final: public NumericProperty {
 public:
-    Mass(unsigned argument): NumericProperty(argument) {}
+    Mass(Variable argument): NumericProperty(argument) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
 };
@@ -471,7 +473,7 @@ enum class Coordinate {
 /// of the position to use.
 class Position final: public NumericProperty {
 public:
-    Position(unsigned argument, Coordinate coordinate): NumericProperty(argument), coordinate_(coordinate) {}
+    Position(Variable argument, Coordinate coordinate): NumericProperty(argument), coordinate_(coordinate) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
 private:
@@ -483,7 +485,7 @@ private:
 /// the velocity to use.
 class Velocity final: public NumericProperty {
 public:
-    Velocity(unsigned argument, Coordinate coordinate): NumericProperty(argument), coordinate_(coordinate) {}
+    Velocity(Variable argument, Coordinate coordinate): NumericProperty(argument), coordinate_(coordinate) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
 private:
