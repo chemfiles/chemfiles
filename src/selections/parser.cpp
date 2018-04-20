@@ -9,6 +9,8 @@
 #include <functional>
 #include <map>
 
+constexpr double PI = 3.141592653589793238463;
+
 using namespace chemfiles;
 using namespace chemfiles::selections;
 
@@ -40,6 +42,8 @@ static std::map<std::string, num_functions_creator_t> NUMERIC_FUNCTIONS = {
     {"asin", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(asin), "asin", std::move(ast)));}},
     {"acos", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(acos), "acos", std::move(ast)));}},
     {"sqrt", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(sqrt), "sqrt", std::move(ast)));}},
+    {"rad2deg", [](MathAst ast){ return MathAst(new Function([](double rad){ return rad * 180 / PI; }, "rad2deg", std::move(ast)));}},
+    {"deg2rad", [](MathAst ast){ return MathAst(new Function([](double deg){ return deg * PI / 180; }, "deg2rad", std::move(ast)));}},
 };
 
 using num_var_functions_creator_t = std::function<MathAst(std::vector<unsigned>)>;

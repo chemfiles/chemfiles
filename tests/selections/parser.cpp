@@ -220,6 +220,27 @@ TEST_CASE("Parsing") {
 
             ast = "sin((3 - 4)) < 5";
             CHECK(parse("sin(3 - 4) < 5")->print() == ast);
+
+            ast = "cos(1) < 5";
+            CHECK(parse("cos(1) < 5")->print() == ast);
+
+            ast = "tan(1) < 5";
+            CHECK(parse("tan(1) < 5")->print() == ast);
+
+            ast = "asin(1) < 5";
+            CHECK(parse("asin(1) < 5")->print() == ast);
+
+            ast = "acos(1) < 5";
+            CHECK(parse("acos(1) < 5")->print() == ast);
+
+            ast = "sqrt(1) < 5";
+            CHECK(parse("sqrt(1) < 5")->print() == ast);
+
+            ast = "rad2deg(1) < 5";
+            CHECK(parse("rad2deg(1) < 5")->print() == ast);
+
+            ast = "deg2rad(1) < 5";
+            CHECK(parse("deg2rad(1) < 5")->print() == ast);
         }
 
         SECTION("Atomic functions") {

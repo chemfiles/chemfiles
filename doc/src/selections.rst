@@ -98,10 +98,11 @@ selecting multiple atoms:
   ``#2``, accounting for periodic boundary conditions.
 
 One can also use mathematical function to transform a number to another value.
-Currently supported functions are: ``sin``, ``cos``, ``tan`` for the
-trigonometric functions; ``asin`` and ``acos`` inverse trigonometric functions
-and ``sqrt``. Adding new functions is easy, open an issue about the one you need
-on the chemfiles repository.
+Currently supported functions are: ``deg2rad`` and ``rad2deg`` functions for
+transforming radians to degrees and respectively; ``sin``, ``cos``, ``tan`` for
+the trigonometric functions; ``asin`` and ``acos`` inverse trigonometric
+functions and ``sqrt``. Adding new functions is easy, open an issue about the
+one you need on the chemfiles repository.
 
 Elisions
 ^^^^^^^^
