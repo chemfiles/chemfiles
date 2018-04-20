@@ -90,6 +90,55 @@ public:
     bool is_match(const Frame& frame, const Match& match) const override;
 };
 
+/// Checking if two atoms are bonded together
+class Bonded final: public Selector {
+public:
+    Bonded(unsigned i, unsigned j): i_(i), j_(j) {}
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+private:
+    unsigned i_;
+    unsigned j_;
+};
+
+/// Checking if three atoms are bonded together to form an angle
+class IsAngle final: public Selector {
+public:
+    IsAngle(unsigned i, unsigned j, unsigned k): i_(i), j_(j), k_(k) {}
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+private:
+    unsigned i_;
+    unsigned j_;
+    unsigned k_;
+};
+
+/// Checking if four atoms are bonded together to form a dihedral angle
+class IsDihedral final: public Selector {
+public:
+    IsDihedral(unsigned i, unsigned j, unsigned k, unsigned m): i_(i), j_(j), k_(k), m_(m) {}
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+private:
+    unsigned i_;
+    unsigned j_;
+    unsigned k_;
+    unsigned m_;
+};
+
+/// Checking if four atoms are bonded together to form an improper dihedral angle
+class IsImproper final: public Selector {
+public:
+    IsImproper(unsigned i, unsigned j, unsigned k, unsigned m): i_(i), j_(j), k_(k), m_(m) {}
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+private:
+    unsigned i_;
+    unsigned j_;
+    unsigned k_;
+    unsigned m_;
+};
+
 /// Abstract base class for string selector
 class StringSelector: public Selector {
 public:

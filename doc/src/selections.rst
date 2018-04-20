@@ -28,8 +28,7 @@ These constraints are created using *selectors*. Selectors are small functions
 that are evaluated for each atom, and return either ``true`` if the atom
 matches, or ``false`` if it does not. There are three kinds of selectors:
 
-- global selectors are ``all`` that match all atoms; and ``none`` that match no
-  atom;
+- boolean selectors returns either ``true`` or ``false`` for a given set of atoms;
 - string selectors compare string values with one of ``==`` (equal) or ``!=``
   (not equal). One can either compare two atomic properties (``name(#1) ==
   type(#2)``) or atomic properties to literal strings (``name(#1) != He``);
@@ -54,11 +53,31 @@ false and false to true. ``name(#1) == H and not x(#1) < 5.0`` and ``(z(#2) < 45
 and name(#4) == O) or name(#1) == C`` are complex selections using booleans
 operators.
 
-List of implemented properties
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+List of implemented selectors
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Here is the list of currently implemented properties (either string or numeric
-properties). Additional properties ideas are welcome!
+Here is the list of currently implemented selectors. Additional ideas are welcome!
+
+Boolean selectors
+-----------------
+
+- ``all``: always matches the atom and return ``true``;
+- ``none``: that matches no atom and always return ``false``;
+- ``bonded(#1, #2)``: check if atoms ``#1`` and ``#2`` are bonded together. If
+  ``#1`` and ``#2`` refers to the same atom, this returns false;
+- ``is_angle(#1, #2, #3)``: check if atoms ``#1``, ``#2`` and ``#3`` are bonded
+  together to form an angle, *i.e.* that ``#1`` is bonded to ``#2`` and ``#2``
+  is bonded to ``#3``. If any of ``#1``, ``#2`` or ``#3`` refer to the same
+  atom, this returns false;
+- ``is_dihedral(#1, #2, #3, #4)``: check if atoms ``#1``, ``#2``, ``#3`` and
+  ``#4`` are bonded together to form a dihedral angle, *i.e.* that ``#1`` is
+  bonded to  ``#2``, ``#2`` is bonded to ``#3``, and ``#3`` is bonded to ``#4``.
+  If any of ``#1``, ``#2``, ``#3`` or ``#4`` refer to the same atom, this
+  returns false;
+- ``is_improper(#1, #2, #3, #4)``: check if atoms ``#1``, ``#2``, ``#3`` and
+  ``#4`` are bonded together to form a dihedral angle, *i.e.* that all of
+  ``#1``, ``#3``, and ``#4`` are bonded to ``#2``. If any of ``#1``, ``#2``,
+  ``#3`` or ``#4`` refer to the same atom, this returns false;
 
 String properties
 -----------------

@@ -5,7 +5,6 @@
 #include "chemfiles/selections/parser.hpp"
 #include "chemfiles/selections/expr.hpp"
 
-
 using namespace chemfiles;
 using namespace chemfiles::selections;
 
@@ -59,6 +58,20 @@ TEST_CASE("Parsing") {
         CHECK(parse("name H or none")->print() == ast);
 
         CHECK(parse("not all")->print() == "not all");
+    }
+
+    SECTION("boolean selectors") {
+        auto ast = "bonded(#1, #3)";
+        CHECK(parse("bonded(#1, #3)")->print() == ast);
+
+        ast = "is_angle(#1, #3, #2)";
+        CHECK(parse("is_angle(#1, #3, #2)")->print() == ast);
+
+        ast = "is_dihedral(#1, #3, #2, #4)";
+        CHECK(parse("is_dihedral(#1, #3, #2, #4)")->print() == ast);
+
+        ast = "is_improper(#1, #3, #2, #2)";
+        CHECK(parse("is_improper(#1, #3, #2, #2)")->print() == ast);
     }
 
     SECTION("type") {
@@ -302,6 +315,12 @@ TEST_CASE("Parsing errors") {
         "distance(x) < 5",
         "angle(#2, #3) < 5",
         "dihedral(#2, #3) < 5",
+        "none(#2, #3)",
+        "all(#2, #3)",
+        "bonded(#2)",
+        "is_angle(#2)",
+        "is_dihedral(#2)",
+        "is_improper(#2)",
     };
 
     for (auto& failure: PARSE_FAIL) {

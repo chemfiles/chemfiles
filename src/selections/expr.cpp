@@ -55,6 +55,85 @@ bool None::is_match(const Frame& /*unused*/, const Match& /*unused*/) const {
     return false;
 }
 
+
+std::string Bonded::print(unsigned /*unused*/) const {
+    return fmt::format("bonded(#{}, #{})", i_ + 1, j_ + 1);
+}
+
+bool Bonded::is_match(const Frame& frame, const Match& match) const {
+    auto& bonds = frame.topology().bonds();
+    if (match[i_] == match[j_]) {
+        // This is not a valid bond
+        return false;
+    }
+    auto candidate = chemfiles::Bond(match[i_], match[j_]);
+    auto it = std::lower_bound(bonds.begin(), bonds.end(), candidate);
+    if (it != bonds.end() && *it == candidate) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+std::string IsAngle::print(unsigned /*unused*/) const {
+    return fmt::format("is_angle(#{}, #{}, #{})", i_ + 1, j_ + 1, k_ + 1);
+}
+
+bool IsAngle::is_match(const Frame& frame, const Match& match) const {
+    auto& angles = frame.topology().angles();
+    if (match[i_] == match[j_] || match[j_] == match[k_] || match[i_] == match[k_]) {
+        // This is not a valid angle
+        return false;
+    }
+    auto candidate = chemfiles::Angle(match[i_], match[j_], match[k_]);
+    auto it = std::lower_bound(angles.begin(), angles.end(), candidate);
+    if (it != angles.end() && *it == candidate) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+std::string IsDihedral::print(unsigned /*unused*/) const {
+    return fmt::format("is_dihedral(#{}, #{}, #{}, #{})", i_ + 1, j_ + 1, k_ + 1, m_ + 1);
+}
+
+bool IsDihedral::is_match(const Frame& frame, const Match& match) const {
+    auto& dihedrals = frame.topology().dihedrals();
+    if (match[i_] == match[j_] || match[j_] == match[k_] || match[k_] == match[m_] ||
+        match[i_] == match[k_] || match[j_] == match[m_] || match[i_] == match[m_]) {
+        // This is not a valid dihedral
+        return false;
+    }
+    auto candidate = chemfiles::Dihedral(match[i_], match[j_], match[k_], match[m_]);
+    auto it = std::lower_bound(dihedrals.begin(), dihedrals.end(), candidate);
+    if (it != dihedrals.end() && *it == candidate) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+std::string IsImproper::print(unsigned /*unused*/) const {
+    return fmt::format("is_improper(#{}, #{}, #{}, #{})", i_ + 1, j_ + 1, k_ + 1, m_ + 1);
+}
+
+bool IsImproper::is_match(const Frame& frame, const Match& match) const {
+    auto& impropers = frame.topology().impropers();
+    if (match[i_] == match[j_] || match[j_] == match[k_] || match[j_] == match[m_] ||
+        match[i_] == match[k_] || match[i_] == match[m_] || match[k_] == match[m_]) {
+        // This is not a valid improper
+        return false;
+    }
+    auto candidate = chemfiles::Improper(match[i_], match[j_], match[k_], match[m_]);
+    auto it = std::lower_bound(impropers.begin(), impropers.end(), candidate);
+    if (it != impropers.end() && *it == candidate) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 std::string StringSelector::print(unsigned /*unused*/) const {
     auto op = equals_ ? "==" : "!=";
     return fmt::format("{}(#{}) {} {}", name(), argument_ + 1, op, value_);

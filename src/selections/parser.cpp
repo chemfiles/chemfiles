@@ -60,6 +60,22 @@ static std::map<std::string, NumericVarFunction> NUMERIC_VAR_FUNCTIONS = {
 };
 
 
+using bool_selector_creator_t = std::function<Ast(std::vector<unsigned>)>;
+struct BooleanFunction {
+    unsigned arity;
+    bool_selector_creator_t creator;
+};
+
+static std::map<std::string, BooleanFunction> BOOLEAN_SELECTORS = {
+    {"all", {0, [](std::vector<unsigned>){ return Ast(new All()); }}},
+    {"none", {0, [](std::vector<unsigned>){ return Ast(new None()); }}},
+    {"bonded", {2, [](std::vector<unsigned> args){ return Ast(new Bonded(args[0], args[1])); }}},
+    {"is_angle", {3, [](std::vector<unsigned> args){ return Ast(new IsAngle(args[0], args[1], args[2])); }}},
+    {"is_dihedral", {4, [](std::vector<unsigned> args){ return Ast(new IsDihedral(args[0], args[1], args[2], args[3])); }}},
+    {"is_improper", {4, [](std::vector<unsigned> args){ return Ast(new IsImproper(args[0], args[1], args[2], args[3])); }}},
+};
+
+
 static bool is_string_property(const std::string& name) {
     return STRING_PROPERTIES.find(name) != STRING_PROPERTIES.end();
 }
@@ -74,6 +90,10 @@ static bool is_numeric_function(const std::string& name) {
 
 static bool is_numeric_var_function(const std::string& name) {
     return NUMERIC_VAR_FUNCTIONS.find(name) != NUMERIC_VAR_FUNCTIONS.end();
+}
+
+static bool is_boolean_selector(const std::string& name) {
+    return BOOLEAN_SELECTORS.find(name) != BOOLEAN_SELECTORS.end();
 }
 
 Ast Parser::parse() {
@@ -118,12 +138,8 @@ Ast Parser::selector() {
         return Ast(new Not(std::move(ast)));
     } else if (check(Token::IDENT)) {
         auto ident = peek().ident();
-        if (ident == "all") {
-            advance();
-            return Ast(new All());
-        } else if (ident == "none") {
-            advance();
-            return Ast(new None());
+        if (is_boolean_selector(ident)) {
+            return bool_selector();
         } else if (is_string_property(ident)) {
             return string_selector();
         } else {
@@ -133,6 +149,24 @@ Ast Parser::selector() {
         // If everything else fails, try to parse it as mathematical expression
         return math_selector();
     }
+}
+
+Ast Parser::bool_selector() {
+    auto token = advance();
+    assert(token.type() == Token::IDENT);
+    auto name = token.ident();
+    assert(is_boolean_selector(name));
+
+    auto selector = BOOLEAN_SELECTORS[name];
+
+    auto arguments = variables();
+    if (arguments.size() != selector.arity) {
+        throw selection_error("expected {} arguments in call to {}, got {}",
+            arguments.size(), name, selector.arity
+        );
+    }
+
+    return selector.creator(std::move(arguments));
 }
 
 
@@ -357,7 +391,8 @@ unsigned Parser::variable() {
 std::vector<unsigned> Parser::variables() {
     std::vector<unsigned> vars;
     if (!match(Token::LPAREN)) {
-        throw selection_error("expected opening parenthesis, got {}", peek().str());
+        // No variables
+        return vars;
     }
 
     if (match(Token::VARIABLE)) {

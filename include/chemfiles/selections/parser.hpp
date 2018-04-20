@@ -35,6 +35,7 @@ public:
 private:
     Ast expression();
     Ast selector();
+    Ast bool_selector();
     Ast string_selector();
     Ast math_selector();
 
