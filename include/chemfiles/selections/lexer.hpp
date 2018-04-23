@@ -146,10 +146,80 @@ private:
     Variable variable_;
 };
 
-/// Convert an `input` string to a stream of tokens
-///
-/// @throws SelectionError if the input string can not be tokenized
-std::vector<Token> tokenize(const std::string& input);
+/// Tokenizer for selections
+class Tokenizer {
+public:
+    /// Create a new Tokenizer from the given `input`
+    Tokenizer(std::string input): input_(std::move(input)) {}
+
+    /// Convert the `input` string to a stream of tokens
+    ///
+    /// @throws SelectionError if the input string can not be tokenized
+    std::vector<Token> tokenize();
+
+private:
+    std::string input_;
+    size_t current_ = 0;
+
+    Token variable();
+    Token ident();
+    Token number();
+
+    bool match(char c) {
+        if (check(c)) {
+            advance();
+            return true;
+        }
+        return false;
+    }
+
+    using matcher_t = bool(*)(char);
+
+    bool match(matcher_t matcher) {
+        if (check(matcher)) {
+            advance();
+            return true;
+        }
+        return false;
+    }
+
+    bool finished() const {
+        return current_ >= input_.size();
+    }
+
+    char peek() const {
+        if (finished()) {
+            return '\0';
+        } else {
+            return input_[current_];
+        }
+    }
+
+    char previous() const {
+        if (current_ == 0) {
+            return '\0';
+        } else {
+            return input_[current_ - 1];
+        }
+    }
+
+    bool check(char c) const {
+        if (finished()) return false;
+        return peek() == c;
+    }
+
+    bool check(matcher_t matcher) const {
+        if (finished()) return false;
+        return matcher(peek());
+    }
+
+    char advance() {
+        if (!finished()) {
+            current_++;
+        }
+        return previous();
+    }
+};
 
 }} // namespace chemfiles && namespace selections
 

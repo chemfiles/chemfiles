@@ -7,6 +7,10 @@
 using namespace chemfiles;
 using namespace chemfiles::selections;
 
+static std::vector<Token> tokenize(std::string selection) {
+    return Tokenizer(selection).tokenize();
+}
+
 TEST_CASE("Tokens") {
     SECTION("Operators") {
         auto token = Token(Token::LESS_EQUAL);

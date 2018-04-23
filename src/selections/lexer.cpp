@@ -84,144 +84,162 @@ std::string Token::str() const {
     unreachable();
 }
 
-
-std::vector<Token> selections::tokenize(const std::string& input) {
+std::vector<Token> Tokenizer::tokenize() {
     auto tokens = std::vector<Token>();
-    for (size_t i=0; i<input.length(); i++) {
-        auto c = input[i];
-        if (is_space(c)) {
+    while (!finished()) {
+        if (match(is_space)) {
             continue;
-        } else if (c == '(') {
+        } else if (match('(')) {
             tokens.emplace_back(Token(Token::LPAREN));
             continue;
-        } else if (c == ')') {
+        } else if (match(')')) {
             tokens.emplace_back(Token(Token::RPAREN));
             continue;
-        } else if (c == ',') {
+        } else if (match(',')) {
             tokens.emplace_back(Token(Token::COMMA));
             continue;
-        } else if (c == '=' && input[i + 1] == '=') {
-            i++;
+        } else if (match('=') && match('=')) {
             tokens.emplace_back(Token(Token::EQUAL));
             continue;
-        } else if (c == '!' && input[i + 1] == '=') {
-            i++;
+        } else if (match('!') && match('=')) {
             tokens.emplace_back(Token(Token::NOT_EQUAL));
             continue;
-        } else if (c == '<') {
-            if (i + 1 < input.length() && input[i + 1] == '=') {
-                i++;
+        } else if (match('<')) {
+            if (match('=')) {
                 tokens.emplace_back(Token(Token::LESS_EQUAL));
             } else {
                 tokens.emplace_back(Token(Token::LESS));
             }
             continue;
-        } else if (c == '>') {
-            if (i + 1 < input.length() && input[i + 1] == '=') {
-                i++;
+        } else if (match('>')) {
+            if (match('=')) {
                 tokens.emplace_back(Token(Token::GREATER_EQUAL));
             } else {
                 tokens.emplace_back(Token(Token::GREATER));
             }
             continue;
-        } else if (c == '+') {
+        } else if (match('+')) {
             tokens.emplace_back(Token(Token::PLUS));
             continue;
-        } else if (c == '-') {
+        } else if (match('-')) {
             tokens.emplace_back(Token(Token::MINUS));
             continue;
-        } else if (c == '*') {
+        } else if (match('*')) {
             tokens.emplace_back(Token(Token::STAR));
             continue;
-        } else if (c == '/') {
+        } else if (match('/')) {
             tokens.emplace_back(Token(Token::SLASH));
             continue;
-        } else if (c == '^') {
+        } else if (match('^')) {
             tokens.emplace_back(Token(Token::HAT));
             continue;
-        } else if (c == '#') {
-            // Get the variabel number
-            std::string number;
-            while (i + 1 < input.length() && is_digit(input[i + 1])) {
-                number += input[i + 1];
-                i++;
-            }
-            int data = 0;
-            try {
-                data = std::stoi(number);
-            } catch (const std::exception&) {
-                throw selection_error("could not parse number in '{}'", number);
-            }
-            if (data > UINT8_MAX) {
-                throw selection_error("variable index #{} is too big for uint8_t", data);
-            }
-
-            tokens.emplace_back(Token::variable(static_cast<uint8_t>(data)));
+        } else if (match('#')) {
+            tokens.emplace_back(variable());
             continue;
-        } else if (is_alpha(c)) {
-            // Collect the full identifier
-            std::string ident;
-            ident += c;
-            while (i + 1 < input.length() && is_ident_component(input[i + 1])) {
-                ident += input[i + 1];
-                i++;
-            }
-            if (ident == "or") {
-                tokens.emplace_back(Token(Token::OR));
-                continue;
-            } else if (ident == "and") {
-                tokens.emplace_back(Token(Token::AND));
-                continue;
-            } else if (ident == "not") {
-                tokens.emplace_back(Token(Token::NOT));
-                continue;
-            }
-            // Default identifier. This will be resolved during parsing phase
-            tokens.emplace_back(Token::ident(std::move(ident)));
+        } else if (check(is_alpha)) {
+            tokens.emplace_back(ident());
             continue;
-        } else if (is_digit(c)) {
-            std::string number;
-            number += c;
-            while (i + 1 < input.length() && (is_digit(input[i + 1]) || input[i + 1] == '.')) {
-                number += input[i + 1];
-                i++;
-            }
-
-            // Optional float exponent
-            if (i + 1 < input.length() && (input[i + 1] == 'e' || input[i + 1] == 'E')) {
-                number += input[i + 1];
-                i++;
-
-                if (i + 1 < input.length() && (input[i + 1] == '+' || input[i + 1] == '-')) {
-                    number += input[i + 1];
-                    i++;
-                }
-
-                while (i + 1 < input.length() && is_digit(input[i + 1])) {
-                    number += input[i + 1];
-                    i++;
-                }
-            }
-
-            // Require a separator between numbers and idents
-            if (i + 1 < input.length() && is_ident_component(input[i + 1])) {
-                while (i + 1 < input.length() && is_ident_component(input[i + 1])) {
-                    number += input[i + 1];
-                    i++;
-                }
-                throw selection_error("identifiers can not start with a digit: '{}'", number);
-            }
-
-            try {
-                tokens.emplace_back(Token::number(string2double(number)));
-                continue;
-            } catch (const Error& e) {
-                throw SelectionError(e.what());
-            }
+        } else if (check(is_digit)) {
+            tokens.emplace_back(number());
+            continue;
         } else {
-            throw selection_error("unknown char '{}' in '{}'", c, input);
+            throw selection_error("unknown char '{}' in '{}'", peek(), input_);
         }
     }
     tokens.push_back(Token(Token::END));
     return tokens;
+}
+
+Token Tokenizer::variable() {
+    size_t start = current_;
+    size_t count = 0;
+    while (!finished()) {
+        if (match(is_digit)) {
+            count += 1;
+        } else {
+            break;
+        }
+    }
+    int data = 0;
+    auto number = input_.substr(start, count);
+    try {
+        data = std::stoi(number);
+    } catch (const std::exception&) {
+        throw selection_error("could not parse number in '{}'", number);
+    }
+    if (data > UINT8_MAX) {
+        throw selection_error("variable index #{} is too big for uint8_t", data);
+    }
+    return Token::variable(static_cast<uint8_t>(data));
+}
+
+Token Tokenizer::ident() {
+    size_t start = current_;
+    size_t count = 0;
+    while (!finished()) {
+        if (match(is_ident_component)) {
+            count += 1;
+        } else {
+            break;
+        }
+    }
+
+    auto ident = input_.substr(start, count);
+    if (ident == "or") {
+        return Token(Token::OR);
+    } else if (ident == "and") {
+        return Token(Token::AND);
+    } else if (ident == "not") {
+        return Token(Token::NOT);
+    }
+    // Default identifier. This will be resolved during parsing phase
+    return Token::ident(std::move(ident));
+}
+
+Token Tokenizer::number() {
+    size_t start = current_;
+    size_t count = 0;
+    while (!finished()) {
+        if (match(is_digit) || match('.')) {
+            count += 1;
+        } else {
+            break;
+        }
+    }
+
+    // Optional float exponent
+    if (match('e') || match('E')) {
+        count += 1;
+        if (match('+') || match('-')) {
+            count += 1;
+        }
+        while (!finished()) {
+            if (match(is_digit)) {
+                count += 1;
+            } else {
+                break;
+            }
+        }
+    }
+
+    // Require a separator between numbers and idents
+    if (match(is_ident_component)) {
+        count += 1;
+        while (!finished()) {
+            if (match(is_ident_component)) {
+                count += 1;
+            } else {
+                break;
+            }
+        }
+        throw selection_error("identifiers can not start with a digit: '{}'", input_.substr(start, count));
+    }
+
+    double value = 0;
+    try {
+        value = string2double(input_.substr(start, count));
+    } catch (const Error& e) {
+        throw SelectionError(e.what());
+    }
+    return Token::number(value);
 }

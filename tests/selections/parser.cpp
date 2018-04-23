@@ -9,11 +9,11 @@ using namespace chemfiles;
 using namespace chemfiles::selections;
 
 static Ast parse(std::string selection) {
-    return Parser(tokenize(selection)).parse();
+    return Parser(Tokenizer(selection).tokenize()).parse();
 }
 
 static Ast parse_and_opt(std::string selection) {
-    auto ast = Parser(tokenize(selection)).parse();
+    auto ast = Parser(Tokenizer(selection).tokenize()).parse();
     ast->optimize();
     return ast;
 }

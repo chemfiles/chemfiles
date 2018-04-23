@@ -75,7 +75,7 @@ Selection& Selection::operator=(Selection&&) = default;
 Selection::Selection(std::string selection): selection_(std::move(selection)), ast_(nullptr) {
     std::string selection_string;
     context_ = get_context(selection_, selection_string);
-    auto tokens = selections::tokenize(selection_string);
+    auto tokens = selections::Tokenizer(selection_string).tokenize();
     for (auto& token: tokens) {
         if (token.type() == selections::Token::VARIABLE) {
             if (token.variable() > max_variable(context_)) {
