@@ -200,27 +200,27 @@ Ast Parser::string_selector() {
     assert(is_string_property(name));
 
     auto var = variable();
-    if (match(Token::IDENT) || match(Token::NUMBER)) {
-        // `name value` shortand, where value is a string or a number (e.g. type 42)
-        auto value = previous().str();
+    if (match(Token::IDENT) || match(Token::RAW_IDENT)) {
+        // `name value` shortand, where value is a string (e.g. type H, name "42")
+        auto value = previous().ident();
         auto ast = STRING_PROPERTIES[name](std::move(value), true, var);
-        while (match(Token::IDENT) || match(Token::NUMBER)) {
+        while (match(Token::IDENT) || match(Token::RAW_IDENT)) {
             // handle multiple values 'name H N C O'
-            value = previous().str();
+            value = previous().ident();
             auto rhs = STRING_PROPERTIES[name](std::move(value), true, var);
             ast = Ast(new Or(std::move(ast), std::move(rhs)));
         }
         return ast;
     } else if (match(Token::EQUAL)) {
-        if (match(Token::IDENT) || match(Token::NUMBER)) {
-            auto value = previous().str();
+        if (match(Token::IDENT) || match(Token::RAW_IDENT)) {
+            auto value = previous().ident();
             return STRING_PROPERTIES[name](std::move(value), true, var);
         } else {
             throw selection_error("expected a value after '{} ==', found {}", name, peek().str());
         }
     } else if (match(Token::NOT_EQUAL)) {
-        if (match(Token::IDENT) || match(Token::NUMBER)) {
-            auto value = previous().str();
+        if (match(Token::IDENT) || match(Token::RAW_IDENT)) {
+            auto value = previous().ident();
             return STRING_PROPERTIES[name](std::move(value), false, var);
         } else {
             throw selection_error("expected a value after '{} !=', found {}", name, peek().str());

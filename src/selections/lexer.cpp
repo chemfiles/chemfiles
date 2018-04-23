@@ -74,6 +74,8 @@ std::string Token::str() const {
         return "or";
     case Token::IDENT:
         return ident();
+    case Token::RAW_IDENT:
+        return '"' + ident() + '"';
     case Token::NUMBER:
         if (lround(number()) == number()) {
             return std::to_string(lround(number()));
@@ -136,6 +138,9 @@ std::vector<Token> Tokenizer::tokenize() {
         } else if (match('#')) {
             tokens.emplace_back(variable());
             continue;
+        } else if (match('"')) {
+            tokens.emplace_back(raw_ident());
+            continue;
         } else if (check(is_alpha)) {
             tokens.emplace_back(ident());
             continue;
@@ -171,6 +176,30 @@ Token Tokenizer::variable() {
         throw selection_error("variable index #{} is too big for uint8_t", data);
     }
     return Token::variable(static_cast<uint8_t>(data));
+}
+
+Token Tokenizer::raw_ident() {
+    // assert(previous() == '"');
+
+    size_t start = current_;
+    size_t count = 0;
+    bool got_quote = false;
+
+    while (!finished()) {
+        if (match('"')) {
+            got_quote = true;
+            break;
+        } else {
+            advance();
+            count += 1;
+        }
+    }
+
+    if (!got_quote) {
+        throw selection_error("missing \" after '{}'", input_.substr(start, count));
+    }
+
+    return Token::raw_ident(input_.substr(start, count));
 }
 
 Token Tokenizer::ident() {

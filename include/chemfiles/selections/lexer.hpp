@@ -64,6 +64,8 @@ public:
         NOT,
         /// Generic identifier
         IDENT,
+        /// Generic identifier, inside double quotes
+        RAW_IDENT,
         /// Number
         NUMBER,
         /// "#(\d+)" token
@@ -83,6 +85,11 @@ public:
         return Token(IDENT, std::move(data), 0.0, 0);
     }
 
+    /// Create a raw identifier token with `data` name
+    static Token raw_ident(std::string data) {
+        return Token(RAW_IDENT, std::move(data), 0.0, 0);
+    }
+
     /// Create a number token with `data` value
     static Token number(double data) {
         return Token(NUMBER, "", data, 0);
@@ -96,7 +103,7 @@ public:
     /// Create a token with the given `type`. The type can not be `NUMBER`,
     /// `IDENT` or `VARIABLE`.
     Token(Type type): Token(type, "", 0.0, 0) {
-        if (type == IDENT || type == NUMBER || type == VARIABLE) {
+        if (type == IDENT || type == RAW_IDENT || type == NUMBER || type == VARIABLE) {
             throw Error("invalid Token constructor called. This is a bug.");
         }
     }
@@ -116,14 +123,14 @@ public:
     /// Get the identifier name associated with this token.
     /// The token type must be `IDENT`.
     const std::string& ident() const {
-        if (type_ != IDENT) {
+        if (type_ != IDENT && type_ != RAW_IDENT) {
             throw Error("can not get an ident value out of this token. This is a bug.");
         }
         return ident_;
     }
 
     /// Get the variable associated with this token.
-    /// `type()` must be `VARIABLE`.
+    /// The token type must be `VARIABLE`.
     Variable variable() const {
         if (type_ != VARIABLE) {
             throw Error("can not get a variable value out of this token. This is a bug.");
@@ -163,6 +170,7 @@ private:
 
     Token variable();
     Token ident();
+    Token raw_ident();
     Token number();
 
     bool match(char c) {

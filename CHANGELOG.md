@@ -22,6 +22,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
     * the topology constrains support sub-selections: instead of checking is
       `#1` and `#2` are bonded, one can check if `#1` is bonded to any atom
       matching a selection, for example `name O` with `bonded(#1, name O)`.
+    * When using numbers as atomic names/types, they must now be inside double
+      quotes (`name "45"`). This also allow for more exotic atomic names
+      (`name "名"`).
 
 ### Changes in supported formats
 

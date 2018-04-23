@@ -86,7 +86,7 @@ TEST_CASE("Parsing") {
         CHECK(parse("type goo")->print() == "type(#1) == goo");
         CHECK(parse("type(#3) goo")->print() == "type(#3) == goo");
         CHECK(parse("type != goo")->print() == "type(#1) != goo");
-        CHECK(parse("type == 45")->print() == "type(#1) == 45");
+        CHECK(parse("type == \"45\"")->print() == "type(#1) == 45");
 
         CHECK_THROWS_AS(parse("type < bar"), SelectionError);
         CHECK_THROWS_AS(parse("type >= bar"), SelectionError);
@@ -98,7 +98,8 @@ TEST_CASE("Parsing") {
         CHECK(parse("name goo")->print() == "name(#1) == goo");
         CHECK(parse("name(#3) goo")->print() == "name(#3) == goo");
         CHECK(parse("name != goo")->print() == "name(#1) != goo");
-        CHECK(parse("name 45")->print() == "name(#1) == 45");
+        CHECK(parse("name \"45\"")->print() == "name(#1) == 45");
+        CHECK(parse("name \"名\"")->print() == "name(#1) == 名");
 
         CHECK_THROWS_AS(parse("name < bar"), SelectionError);
         CHECK_THROWS_AS(parse("name >= bar"), SelectionError);
@@ -123,7 +124,7 @@ TEST_CASE("Parsing") {
         CHECK(parse("resname goo")->print() == "resname(#1) == goo");
         CHECK(parse("resname(#3) goo")->print() == "resname(#3) == goo");
         CHECK(parse("resname != goo")->print() == "resname(#1) != goo");
-        CHECK(parse("resname 45")->print() == "resname(#1) == 45");
+        CHECK(parse("resname \"45\"")->print() == "resname(#1) == 45");
 
         CHECK_THROWS_AS(parse("resname < bar"), SelectionError);
         CHECK_THROWS_AS(parse("resname >= bar"), SelectionError);
