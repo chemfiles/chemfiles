@@ -72,6 +72,12 @@ TEST_CASE("Parsing") {
 
         ast = "is_improper(#1, #3, #2, #2)";
         CHECK(parse("is_improper(#1, #3, #2, #2)")->print() == ast);
+
+        ast = "bonded(#1, name O)";
+        CHECK(parse("bonded(#1, name O)")->print() == ast);
+
+        ast = "is_angle(name H, #2, name O)";
+        CHECK(parse("is_angle(name H, #2, name O)")->print() == ast);
     }
 
     SECTION("type") {
@@ -321,6 +327,9 @@ TEST_CASE("Parsing errors") {
         "is_angle(#2)",
         "is_dihedral(#2)",
         "is_improper(#2)",
+        // Sub-selection
+        "bonded(#2, name(#3) Zn)",
+        "bonded(name N, name Zn)",
     };
 
     for (auto& failure: PARSE_FAIL) {

@@ -10,12 +10,9 @@
 #include <functional>
 
 #include "chemfiles/external/optional.hpp"
+#include "chemfiles/Selection.hpp"
 
 namespace chemfiles {
-
-class Frame;
-class Match;
-
 namespace selections {
 
 using Variable = uint8_t;
@@ -92,53 +89,80 @@ public:
     bool is_match(const Frame& frame, const Match& match) const override;
 };
 
+/// A sub-selection for use in boolean selectors
+class SubSelection {
+public:
+    /// Create a sub-selection from a variable
+    SubSelection(Variable variable);
+    /// Create a sub-selection from an AST
+    SubSelection(std::string selection);
+
+    /// Evaluate the sub-selection and return the list of matching atoms
+    std::vector<size_t> eval(const Frame& frame, const Match& match) const;
+    /// Pretty-print the sub-selection
+    std::string print() const;
+
+    bool is_variable() const {
+        return selection_.get() == nullptr;
+    }
+
+private:
+    /// Possible selection. If this is nullptr, then the variable_ is set.
+    std::unique_ptr<Selection> selection_;
+    /// Variable to use if selection_ is nullptr
+    Variable variable_;
+};
+
 /// Checking if two atoms are bonded together
 class Bonded final: public Selector {
 public:
-    Bonded(Variable i, Variable j): i_(i), j_(j) {}
+    Bonded(SubSelection i, SubSelection j): i_(std::move(i)), j_(std::move(j)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:
-    Variable i_;
-    Variable j_;
+    SubSelection i_;
+    SubSelection j_;
 };
 
 /// Checking if three atoms are bonded together to form an angle
 class IsAngle final: public Selector {
 public:
-    IsAngle(Variable i, Variable j, Variable k): i_(i), j_(j), k_(k) {}
+    IsAngle(SubSelection i, SubSelection j, SubSelection k):
+        i_(std::move(i)), j_(std::move(j)), k_(std::move(k)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:
-    Variable i_;
-    Variable j_;
-    Variable k_;
+    SubSelection i_;
+    SubSelection j_;
+    SubSelection k_;
 };
 
 /// Checking if four atoms are bonded together to form a dihedral angle
 class IsDihedral final: public Selector {
 public:
-    IsDihedral(Variable i, Variable j, Variable k, Variable m): i_(i), j_(j), k_(k), m_(m) {}
+    IsDihedral(SubSelection i, SubSelection j, SubSelection k, SubSelection m):
+        i_(std::move(i)), j_(std::move(j)), k_(std::move(k)), m_(std::move(m)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:
-    Variable i_;
-    Variable j_;
-    Variable k_;
-    Variable m_;
+    SubSelection i_;
+    SubSelection j_;
+    SubSelection k_;
+    SubSelection m_;
 };
 
 /// Checking if four atoms are bonded together to form an improper dihedral angle
 class IsImproper final: public Selector {
 public:
-    IsImproper(Variable i, Variable j, Variable k, Variable m): i_(i), j_(j), k_(k), m_(m) {}
+    IsImproper(SubSelection i, SubSelection j, SubSelection k, SubSelection m):
+        i_(std::move(i)), j_(std::move(j)), k_(std::move(k)), m_(std::move(m)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:
-    Variable i_;
-    Variable j_;
-    Variable k_;
-    Variable m_;
+    SubSelection i_;
+    SubSelection j_;
+    SubSelection k_;
+    SubSelection m_;
 };
 
 /// Abstract base class for string selector

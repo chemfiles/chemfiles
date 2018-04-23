@@ -7,19 +7,10 @@
 #include <memory>
 
 #include "chemfiles/selections/lexer.hpp"
+#include "chemfiles/selections/expr.hpp"
 
 namespace chemfiles {
-
-class Frame;
-class Match;
-
 namespace selections {
-
-class Selector;
-using Ast = std::unique_ptr<Selector>;
-
-class MathExpr;
-using MathAst = std::unique_ptr<MathExpr>;
 
 /// A recursive descent parser for chemfiles selection language. This parser
 /// does not handle selection context (`pairs: ...`) that should be striped
@@ -51,6 +42,8 @@ private:
 
     // Match multiple variables and the surrounding parenthesis
     std::vector<Variable> variables();
+    // Match multiple variables or sub-selections
+    std::vector<SubSelection> sub_selection();
     // Match an optional single variable and the surrounding parenthesis
     Variable variable();
 

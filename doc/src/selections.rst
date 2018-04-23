@@ -63,21 +63,26 @@ Boolean selectors
 
 - ``all``: always matches the atom and return ``true``;
 - ``none``: that matches no atom and always return ``false``;
-- ``bonded(#1, #2)``: check if atoms ``#1`` and ``#2`` are bonded together. If
-  ``#1`` and ``#2`` refers to the same atom, this returns false;
-- ``is_angle(#1, #2, #3)``: check if atoms ``#1``, ``#2`` and ``#3`` are bonded
-  together to form an angle, *i.e.* that ``#1`` is bonded to ``#2`` and ``#2``
-  is bonded to ``#3``. If any of ``#1``, ``#2`` or ``#3`` refer to the same
-  atom, this returns false;
-- ``is_dihedral(#1, #2, #3, #4)``: check if atoms ``#1``, ``#2``, ``#3`` and
-  ``#4`` are bonded together to form a dihedral angle, *i.e.* that ``#1`` is
-  bonded to  ``#2``, ``#2`` is bonded to ``#3``, and ``#3`` is bonded to ``#4``.
-  If any of ``#1``, ``#2``, ``#3`` or ``#4`` refer to the same atom, this
-  returns false;
-- ``is_improper(#1, #2, #3, #4)``: check if atoms ``#1``, ``#2``, ``#3`` and
-  ``#4`` are bonded together to form a dihedral angle, *i.e.* that all of
-  ``#1``, ``#3``, and ``#4`` are bonded to ``#2``. If any of ``#1``, ``#2``,
-  ``#3`` or ``#4`` refer to the same atom, this returns false;
+- ``bonded(i, j)``: check if atoms i and j are bonded together. If i and j
+  refers to the same atom, this returns false;
+- ``is_angle(i, j, k)``: check if atoms i, j and k are bonded together to form
+  an angle, *i.e.* that i is bonded to j and j is bonded to k. If any of i, j or
+  k refer to the same atom, this returns false;
+- ``is_dihedral(i, j, k, m)``: check if atoms i, j, k and m are bonded together
+  to form a dihedral angle, *i.e.* that i is bonded to  j, j is bonded to k, and
+  k is bonded to m.  If any of i, j, k or m refer to the same atom, this returns
+  false;
+- ``is_improper(i, j, k, m)``: check if atoms i, j, k and m are bonded together
+  to form a dihedral angle, *i.e.* that all of i, k, and m are bonded to j. If
+  any of i, j, k or m refer to the same atom, this returns false;
+
+  For boolean selectors taking arguments, ``i/j/k/m`` can either be one of the
+  atoms currently being matched (``#1 / #2 / #3 / #4``) or another selection
+  (called sub-selection). In the latter case, all the atoms in the sub-selection
+  are checked to see if any of them verify the selection. This makes
+  ``bonded(#1, name O)`` select all atoms bonded to an oxygen; and
+  ``is_angle(type C, #1, name O)`` select all atoms in the midle of a C-X-O
+  angle.
 
 String properties
 -----------------
@@ -104,17 +109,17 @@ Most of the numeric properties only apply to a single atom:
 But some properties apply to multiple atoms, and as such are only usable when
 selecting multiple atoms:
 
-- ``distance(#1, #2)``: gives the distance in Ångströms between atoms ``#1``
-  and ``#2``, accounting for periodic boundary conditions.
-- ``angle(#1, #2, #3)``: gives the angle between atoms ``#1``, ``#2`` and
-  ``#3`` in radians, accounting for periodic boundary conditions. The atoms do
-  not need to be bonded together.
-- ``dihedral(#1, #2, #3, #4)``: gives the dihedral angle between atoms ``#1``,
-  ``#2``, ``#3`` and ``#4`` in radians, accounting for periodic boundary
-  conditions. The atoms do not need to be bonded together.
-- ``out_of_plane(#1, #2, #3, #4)``: gives the distance in Ångströms between the
-  plane formed by the three atoms ``#1``, ``#3``, and ``#4``; and the atom
-  ``#2``, accounting for periodic boundary conditions.
+- ``distance(i, j)``: gives the distance in Ångströms between atoms i and j,
+  accounting for periodic boundary conditions.
+- ``angle(i, j, k)``: gives the angle between atoms i, j and k in radians,
+  accounting for periodic boundary conditions. The atoms do not need to be
+  bonded together.
+- ``dihedral(i, j, k, m)``: gives the dihedral angle between atoms i, j, k and m
+  in radians, accounting for periodic boundary conditions. The atoms do not need
+  to be bonded together.
+- ``out_of_plane(i, j, k, m)``: gives the distance in Ångströms between the
+  plane formed by the three atoms i, k, and m; and the atom j, accounting for
+  periodic boundary conditions.
 
 One can also use mathematical function to transform a number to another value.
 Currently supported functions are: ``deg2rad`` and ``rad2deg`` functions for

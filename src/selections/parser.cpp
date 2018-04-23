@@ -4,6 +4,7 @@
 #include "chemfiles/selections/lexer.hpp"
 #include "chemfiles/selections/parser.hpp"
 #include "chemfiles/selections/expr.hpp"
+#include "chemfiles/utils.hpp"
 #include "chemfiles/ErrorFmt.hpp"
 
 #include <functional>
@@ -60,19 +61,30 @@ static std::map<std::string, NumericVarFunction> NUMERIC_VAR_FUNCTIONS = {
 };
 
 
-using bool_selector_creator_t = std::function<Ast(std::vector<Variable>)>;
+using bool_selector_creator_t = std::function<Ast(std::vector<SubSelection>)>;
 struct BooleanFunction {
     unsigned arity;
     bool_selector_creator_t creator;
 };
 
 static std::map<std::string, BooleanFunction> BOOLEAN_SELECTORS = {
-    {"all", {0, [](std::vector<Variable>){ return Ast(new All()); }}},
-    {"none", {0, [](std::vector<Variable>){ return Ast(new None()); }}},
-    {"bonded", {2, [](std::vector<Variable> args){ return Ast(new Bonded(args[0], args[1])); }}},
-    {"is_angle", {3, [](std::vector<Variable> args){ return Ast(new IsAngle(args[0], args[1], args[2])); }}},
-    {"is_dihedral", {4, [](std::vector<Variable> args){ return Ast(new IsDihedral(args[0], args[1], args[2], args[3])); }}},
-    {"is_improper", {4, [](std::vector<Variable> args){ return Ast(new IsImproper(args[0], args[1], args[2], args[3])); }}},
+    {"all", {0, [](std::vector<SubSelection>){ return Ast(new All()); }}},
+    {"none", {0, [](std::vector<SubSelection>){ return Ast(new None()); }}},
+    {"bonded", {2, [](std::vector<SubSelection> args){
+        return Ast(new Bonded(std::move(args[0]), std::move(args[1])));
+    }}},
+    {"is_angle", {3, [](std::vector<SubSelection> args) {
+        assert(args.size() == 3);
+        return Ast(new IsAngle(std::move(args[0]), std::move(args[1]), std::move(args[2])));
+    }}},
+    {"is_dihedral", {4, [](std::vector<SubSelection> args) {
+        assert(args.size() == 4);
+        return Ast(new IsDihedral(std::move(args[0]), std::move(args[1]), std::move(args[2]), std::move(args[3])));
+    }}},
+    {"is_improper", {4, [](std::vector<SubSelection> args) {
+        assert(args.size() == 4);
+        return Ast(new IsImproper(std::move(args[0]), std::move(args[1]), std::move(args[2]), std::move(args[3])));
+    }}},
 };
 
 
@@ -159,11 +171,22 @@ Ast Parser::bool_selector() {
 
     auto selector = BOOLEAN_SELECTORS[name];
 
-    auto arguments = variables();
+    auto arguments = sub_selection();
     if (arguments.size() != selector.arity) {
         throw selection_error("expected {} arguments in call to {}, got {}",
             arguments.size(), name, selector.arity
         );
+    }
+
+    // Check that at least one of the argument is a variable. Else, selections
+    // like `bonded(name H, name O)` are equivalent to either all or none
+    // depending on the system.
+    bool at_least_one_variable = false;
+    for (auto& arg: arguments) {
+        at_least_one_variable = at_least_one_variable || arg.is_variable();
+    }
+    if (!arguments.empty() && !at_least_one_variable) {
+        throw selection_error("expected at least one variable (#1/#2/#3/#4) in call to {}", name);
     }
 
     return selector.creator(std::move(arguments));
@@ -391,8 +414,7 @@ Variable Parser::variable() {
 std::vector<Variable> Parser::variables() {
     std::vector<Variable> vars;
     if (!match(Token::LPAREN)) {
-        // No variables
-        return vars;
+        throw selection_error("expected opening parenthesis, got {}", peek().str());
     }
 
     if (match(Token::VARIABLE)) {
@@ -406,6 +428,50 @@ std::vector<Variable> Parser::variables() {
             vars.push_back(previous().variable() - 1);
         } else {
             throw selection_error("expected variable in parenthesis, got {}", peek().str());
+        }
+    }
+
+    if (!match(Token::RPAREN)) {
+        throw selection_error("expected closing parenthesis after variable, got {}", peek().str());
+    }
+
+    return vars;
+}
+
+std::vector<SubSelection> Parser::sub_selection() {
+    std::vector<SubSelection> vars;
+    if (!match(Token::LPAREN)) {
+        // no arguments
+        return vars;
+    }
+
+    if (match(Token::VARIABLE)) {
+        vars.push_back(previous().variable() - 1);
+    } else {
+        // HACK: We can not (yet) build a selection directly from AST, because
+        // we need to validate the variables and get the context. So we eat all
+        // tokens that would make for a selection, turn them back into a string
+        // and create a selection from this.
+        auto before = current_;
+        auto _ast = expression();
+        std::string selection;
+        for (size_t i=before; i<current_; i++) {
+            selection += " " + tokens_[i].str();
+        }
+        vars.emplace_back(trim(selection));
+    }
+
+    while (match(Token::COMMA)) {
+        if (match(Token::VARIABLE)) {
+            vars.push_back(previous().variable() - 1);
+        } else {
+            auto before = current_;
+            auto _ast = expression();
+            std::string selection;
+            for (size_t i=before; i<current_; i++) {
+                selection += " " + tokens_[i].str();
+            }
+            vars.emplace_back(trim(selection));
         }
     }
 
