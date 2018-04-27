@@ -80,7 +80,7 @@ function(chfl_unit_test _name_ _file_)
     add_executable(${_name_} ${_file_} ${CHEMFILES_OBJECTS})
     # We need to pretend we are inside the DLL to access all functions
     target_compile_definitions(${_name_} PRIVATE chemfiles_EXPORTS)
-    target_link_libraries(${_name_} ${NETCDF_LIBRARIES})
+    target_link_libraries(${_name_} ${NETCDF_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBLZMA_LIBRARY})
     set_target_properties(${_name_} PROPERTIES LINKER_LANGUAGE CXX)
     target_include_directories(${_name_} SYSTEM PRIVATE ${EXTERNAL_INCLUDES})
 
@@ -143,9 +143,10 @@ function(chfl_doctest _name_ _file_)
 
     add_executable(${_name_} ${_file_})
     target_link_libraries(${_name_} chemfiles)
+    target_link_libraries(${_name_} ${NETCDF_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBLZMA_LIBRARY})
     set_target_properties(${_name_} PROPERTIES LINKER_LANGUAGE CXX)
     set_target_properties(${_name_} PROPERTIES COMPILE_FLAGS "-UNDEBUG")
-    target_include_directories(${_name_} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/external)
+    target_include_directories(${_name_} SYSTEM PRIVATE ${EXTERNAL_INCLUDES})
 
     if(${_run_})
         chfl_define_test(${_name_})
