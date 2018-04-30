@@ -18,12 +18,8 @@ public:
     /// `'r'` or `'a'` mode.
     BasicFile(const std::string& filename, File::Mode mode);
 
-    std::string readline() override;
-    std::vector<std::string> readlines(size_t n) override;
-    void rewind() override;
-    bool eof() override;
 private:
-    std::fstream stream_;
+    std::filebuf buffer_;
 };
 
 } // namespace chemfiles

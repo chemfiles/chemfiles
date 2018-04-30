@@ -6,7 +6,7 @@
 #include "chemfiles/files/BasicFile.hpp"
 using namespace chemfiles;
 
-TEST_CASE("Read a text file"){
+TEST_CASE("Read a text file") {
     BasicFile file("data/xyz/helium.xyz", File::READ);
 
     std::string line = file.readline();
@@ -24,7 +24,7 @@ TEST_CASE("Read a text file"){
     CHECK(line == "Helium as a Lennard-Jone fluid");
 }
 
-TEST_CASE("Various line endinds"){
+TEST_CASE("Various line endinds") {
     auto tmpfile = NamedTempPath(".dat");
 
     std::ofstream file(tmpfile, std::ios_base::binary);
@@ -39,7 +39,7 @@ TEST_CASE("Various line endinds"){
 }
 
 
-TEST_CASE("Write a text file"){
+TEST_CASE("Write a text file") {
     auto filename = NamedTempPath(".dat");
 
     {

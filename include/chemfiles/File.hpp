@@ -51,22 +51,28 @@ private:
 ///
 /// All failling operations should throw a `FileError` instead of waiting for
 /// the user of the class to the current state.
+///
+/// Child classes should call `TextFile::rdbuf` in their constructor to set the
+/// right buffer.
 class CHFL_EXPORT TextFile: public File, public std::iostream {
 public:
     /// Open the most adaptated text file class for the given `path` and `mode`
     static std::unique_ptr<TextFile> create(const std::string& path, File::Mode mode);
 
     /// Read a line from the file
-    virtual std::string readline() = 0;
+    std::string readline();
     /// Read `n` lines from the file
-    virtual std::vector<std::string> readlines(size_t n) = 0;
+    std::vector<std::string> readlines(size_t n);
     /// Reset the file cursor
-    virtual void rewind() = 0;
+    void rewind();
     /// Are we at the end of the file ?
-    virtual bool eof() = 0;
+    bool eof();
+
 protected:
-    TextFile(const std::string& path, File::Mode mode):
-        File(path, mode), std::iostream(nullptr) {}
+    TextFile(const std::string& path, File::Mode mode, std::streambuf* buffer);
+
+private:
+    void get_line(std::string& string);
 };
 
 } // namespace chemfiles
