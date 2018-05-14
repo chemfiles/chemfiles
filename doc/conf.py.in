@@ -20,6 +20,10 @@ def version():
     return (version, release)
 
 
+def setup(app):
+    app.add_stylesheet("chemfiles.css")
+
+
 # -- General configuration ------------------------------------------------
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = '1.4'
@@ -66,6 +70,8 @@ html_theme_options = {
     'navbar_pagenav_name': "Content",
     'navbar_site_name': "Navigation",
     'source_link_position': None,
+    'bootswatch_theme': "flatly",
+    'bootstrap_version': "3",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

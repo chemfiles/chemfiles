@@ -30,7 +30,7 @@ interfaces to chemfiles are accessibles at the following places:
 
 * `Python interface`_, usable with Python 2 and 3;
 * `Fortran interface`_, for Fortran 2003;
-* `Julia interface`_, for `Julia`_ 0.4+;
+* `Julia interface`_, for `Julia`_ 0.6+;
 * `Rust interface`_, for the `Rust`_ language;
 
 .. note::
