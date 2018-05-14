@@ -132,16 +132,16 @@ TEST_CASE("Atoms selections") {
         CHECK(selection.list(frame) == expected);
     }
 
-    SECTION("bonded") {
-        auto selection = Selection("two: name(#1) H1 and bonded(#1, #2)");
+    SECTION("is_bonded") {
+        auto selection = Selection("two: name(#1) H1 and is_bonded(#1, #2)");
         auto expected = std::vector<Match>{{0ul, 1ul}};
         CHECK(selection.evaluate(frame) == expected);
 
-        selection = Selection("bonded(#1, name H1)");
+        selection = Selection("is_bonded(#1, name H1)");
         expected = std::vector<Match>{{1ul}};
         CHECK(selection.evaluate(frame) == expected);
 
-        auto first = Selection("two: type(#1) H and name(#2) O and bonded(#1, #2)");
+        auto first = Selection("two: type(#1) H and name(#2) O and is_bonded(#1, #2)");
         auto second = Selection("bonds: type(#1) H and name(#2) O");
         CHECK(first.evaluate(frame) == second.evaluate(frame));
     }

@@ -61,8 +61,8 @@ TEST_CASE("Parsing") {
     }
 
     SECTION("boolean selectors") {
-        auto ast = "bonded(#1, #3)";
-        CHECK(parse("bonded(#1, #3)")->print() == ast);
+        auto ast = "is_bonded(#1, #3)";
+        CHECK(parse("is_bonded(#1, #3)")->print() == ast);
 
         ast = "is_angle(#1, #3, #2)";
         CHECK(parse("is_angle(#1, #3, #2)")->print() == ast);
@@ -73,8 +73,8 @@ TEST_CASE("Parsing") {
         ast = "is_improper(#1, #3, #2, #2)";
         CHECK(parse("is_improper(#1, #3, #2, #2)")->print() == ast);
 
-        ast = "bonded(#1, name O)";
-        CHECK(parse("bonded(#1, name O)")->print() == ast);
+        ast = "is_bonded(#1, name O)";
+        CHECK(parse("is_bonded(#1, name O)")->print() == ast);
 
         ast = "is_angle(name H, #2, name O)";
         CHECK(parse("is_angle(name H, #2, name O)")->print() == ast);

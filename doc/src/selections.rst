@@ -61,9 +61,9 @@ Here is the list of currently implemented selectors. Additional ideas are welcom
 Boolean selectors
 -----------------
 
-- ``all``: always matches the atom and return ``true``;
-- ``none``: that matches no atom and always return ``false``;
-- ``bonded(i, j)``: check if atoms i and j are bonded together. If i and j
+- ``all``: always matches any atom and returns ``true``;
+- ``none``: never matches an atom and returns ``false``;
+- ``is_bonded(i, j)``: check if atoms i and j are bonded together. If i and j
   refers to the same atom, this returns false;
 - ``is_angle(i, j, k)``: check if atoms i, j and k are bonded together to form
   an angle, *i.e.* that i is bonded to j and j is bonded to k. If any of i, j or
@@ -76,13 +76,12 @@ Boolean selectors
   to form a dihedral angle, *i.e.* that all of i, k, and m are bonded to j. If
   any of i, j, k or m refer to the same atom, this returns false;
 
-  For boolean selectors taking arguments, ``i/j/k/m`` can either be one of the
-  atoms currently being matched (``#1 / #2 / #3 / #4``) or another selection
-  (called sub-selection). In the latter case, all the atoms in the sub-selection
-  are checked to see if any of them verify the selection. This makes
-  ``bonded(#1, name O)`` select all atoms bonded to an oxygen; and
-  ``is_angle(type C, #1, name O)`` select all atoms in the midle of a C-X-O
-  angle.
+For boolean selectors taking arguments, ``i/j/k/m`` can either be one of the
+atoms currently being matched (``#1 / #2 / #3 / #4``) or another selection
+(called sub-selection). In the latter case, all the atoms in the sub-selection
+are checked to see if any of them verify the selection. This makes
+``is_bonded(#1, name O)`` select all atoms bonded to an oxygen; and
+``is_angle(type C, #1, name O)`` select all atoms in the midle of a C-X-O angle.
 
 String properties
 -----------------
@@ -120,6 +119,13 @@ selecting multiple atoms:
 - ``out_of_plane(i, j, k, m)``: gives the distance in Ångströms between the
   plane formed by the three atoms i, k, and m; and the atom j, accounting for
   periodic boundary conditions.
+
+.. note::
+
+    The ``angle`` and ``dihedral`` selectors are different from the ``is_angle``
+    and ``is_dihedral`` selectors. The firsts returns a number that can then be
+    used in mathematical expressions, while the second returns directly ``true``
+    or ``false``.
 
 One can also use mathematical function to transform a number to another value.
 Currently supported functions are: ``deg2rad`` and ``rad2deg`` functions for

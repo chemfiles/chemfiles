@@ -70,8 +70,8 @@ struct BooleanFunction {
 static std::map<std::string, BooleanFunction> BOOLEAN_SELECTORS = {
     {"all", {0, [](std::vector<SubSelection>){ return Ast(new All()); }}},
     {"none", {0, [](std::vector<SubSelection>){ return Ast(new None()); }}},
-    {"bonded", {2, [](std::vector<SubSelection> args){
-        return Ast(new Bonded(std::move(args[0]), std::move(args[1])));
+    {"is_bonded", {2, [](std::vector<SubSelection> args){
+        return Ast(new IsBonded(std::move(args[0]), std::move(args[1])));
     }}},
     {"is_angle", {3, [](std::vector<SubSelection> args) {
         assert(args.size() == 3);

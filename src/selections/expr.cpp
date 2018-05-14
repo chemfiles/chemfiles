@@ -81,11 +81,11 @@ bool None::is_match(const Frame& /*unused*/, const Match& /*unused*/) const {
 }
 
 
-std::string Bonded::print(unsigned /*unused*/) const {
-    return fmt::format("bonded({}, {})", i_.print(), j_ .print());
+std::string IsBonded::print(unsigned /*unused*/) const {
+    return fmt::format("is_bonded({}, {})", i_.print(), j_ .print());
 }
 
-bool Bonded::is_match(const Frame& frame, const Match& match) const {
+bool IsBonded::is_match(const Frame& frame, const Match& match) const {
     auto& bonds = frame.topology().bonds();
     for (auto i: i_.eval(frame, match)) {
         for (auto j: j_.eval(frame, match)) {

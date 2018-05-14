@@ -114,9 +114,9 @@ private:
 };
 
 /// Checking if two atoms are bonded together
-class Bonded final: public Selector {
+class IsBonded final: public Selector {
 public:
-    Bonded(SubSelection i, SubSelection j): i_(std::move(i)), j_(std::move(j)) {}
+    IsBonded(SubSelection i, SubSelection j): i_(std::move(i)), j_(std::move(j)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
 private:
