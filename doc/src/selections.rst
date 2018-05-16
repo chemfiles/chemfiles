@@ -104,5 +104,5 @@ simpler selections:
 At the end, using all these elisions rules, ``atom: name(#1) == H or name(#1) ==
 O`` is equivalent to ``name H O``. A more complex example can be ``bonds:
 name(#1) O C and index(#2) 23 55 69``, which is equivalent to ``bonds:
-(index(#1) == O or name(#1) == C) and (index(#2) == 23 or index(#2) == 55 or
+(name(#1) == O or name(#1) == C) and (index(#2) == 23 or index(#2) == 55 or
 index(#2) == 69)``
