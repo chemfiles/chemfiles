@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <cctype>
+#include <cstdarg>
 #include <algorithm>
 
 #include "chemfiles/Error.hpp"
@@ -74,6 +75,33 @@ inline long long int string2longlong(const std::string& string) {
         throw chemfiles::Error("can not convert '" + string + "' to number");
     } catch (const std::out_of_range&) {
         throw chemfiles::Error("'" + string + "' is out of range for long long int type");
+    }
+}
+
+/// A checked version of sscanf: the return value of sscanf is checked to see if
+/// all the argument where matched.
+#ifdef __GNUC__
+__attribute__((format(scanf, 2, 3)))
+#endif
+inline void scan(const std::string& input, const char* format, ...) {
+    va_list vlist;
+    va_start(vlist, format);
+    int expected = 0;
+    char c = format[0];
+    for (size_t i = 0; c != 0; i++, c = format[i]) {
+        if (c == '%') {
+            // Do not count %n specifiers.
+            if (format[i + 1] == 'n') {
+                // We can access format[i + 1] safely, because we did not reach
+                // the null-terminator yet
+                continue;
+            }
+            expected += 1;
+        }
+    }
+    auto actual = std::vsscanf(input.c_str(), format, vlist);
+    if (actual != expected) {
+        throw chemfiles::Error("failed to read line '" + input + "' with format '" + std::string(format) + "'");
     }
 }
 

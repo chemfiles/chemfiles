@@ -11,6 +11,7 @@
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/utils.hpp"
+#include "chemfiles/warnings.hpp"
 
 using namespace chemfiles;
 
@@ -53,10 +54,8 @@ void TinkerFormat::read_step(const size_t step, Frame& frame) {
 void TinkerFormat::read(Frame& frame) {
     size_t natoms = 0;
     try {
-        // Get the number of atoms
-        *file_ >> natoms;
-        // and dismiss the rest of the line
-        file_->readline();
+        auto line = file_->readline();
+        scan(line, "%zu", &natoms);
     } catch (const FileError& e) {
         throw format_error(
             "can not read number of atoms in {}: {}", file_->filename(), e.what()
@@ -67,20 +66,11 @@ void TinkerFormat::read(Frame& frame) {
     try {
         auto line = file_->readline();
         if (is_unit_cell_line(line)) {
-            auto splitted = split(line, ' ');
-
             // Read the cell
-            if (splitted.size() != 6) {
-                throw format_error("bad unit cell specification '{}'", line);
-            }
-            auto cell = std::vector<double>(6);
-            std::transform(
-                splitted.begin(), splitted.end(), cell.begin(), string2double
-            );
-
-            frame.set_cell(UnitCell(
-                cell[0], cell[1], cell[2], cell[3], cell[4], cell[5]
-            ));
+            double a = 0, b = 0, c = 0;
+            double alpha = 0, beta = 0, gamma = 0;
+            scan(line, "%lf %lf %lf %lf %lf %lf", &a, &b, &c, &alpha, &beta, &gamma);
+            frame.set_cell(UnitCell(a, b, c, alpha, beta, gamma));
 
             // And get the atoms lines
             lines = file_->readlines(natoms);
@@ -99,21 +89,21 @@ void TinkerFormat::read(Frame& frame) {
     frame.reserve(natoms);
     frame.resize(0);
     for (size_t i = 0; i < natoms; i++) {
-        std::istringstream string_stream;
         double x = 0, y = 0, z = 0;
         int id = 0, atom_type = 0;
-        std::string name;
-
-        string_stream.str(lines[i]);
-        string_stream >> id >> name >> x >> y >> z >> atom_type;
+        char name[32];
+        int count = 0;
+        scan(lines[i], "%d %31s %lf %lf %lf %d %n", &id, &name[0], &x, &y, &z, &atom_type, &count);
 
         frame.add_atom(Atom(name), Vector3D(x, y, z));
-        while (string_stream) {
+        while (static_cast<size_t>(count) != lines[i].size()) {
             size_t bonded = 0;
-            string_stream >> bonded;
-            if (string_stream) {
-                bonds[i].push_back(bonded - 1);
-            }
+            int additional = 0;
+
+            scan(lines[i].substr(static_cast<size_t>(count)), "%zu%n", &bonded, &additional);
+            count += additional;
+
+            bonds[i].push_back(bonded - 1);
         }
     }
 
