@@ -12,6 +12,7 @@
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Frame.hpp"
+#include "chemfiles/utils.hpp"
 
 using namespace chemfiles;
 
@@ -51,30 +52,25 @@ void XYZFormat::read_step(const size_t step, Frame& frame) {
 }
 
 void XYZFormat::read(Frame& frame) {
-    size_t natoms = 0;
+    long long count = 0;
     try {
-        natoms = std::stoul(file_->readline());
+        count = string2longlong(file_->readline());
         file_->readline(); // XYZ comment line;
     } catch (const std::exception& e) {
         throw format_error("can not read next step as XYZ: {}", e.what());
     }
-
-    std::vector<std::string> lines;
-    try {
-        lines = file_->readlines(natoms);
-    } catch (const FileError& e) {
-        throw format_error("can not read file: {}", e.what());
+    if (count < 0) {
+        throw format_error("the number of atoms can not be negative in XYZ format");
     }
+    size_t natoms = static_cast<size_t>(count);
 
     frame.reserve(natoms);
     frame.resize(0);
 
-    for (const auto& line: lines) {
+    for (const auto& line: file_->readlines(natoms)) {
         double x = 0, y = 0, z = 0;
-        std::string name;
-        std::istringstream string_stream(line);
-
-        string_stream >> name >> x >> y >> z;
+        char name[32] = {0};
+        scan(line, "%31s %lf %lf %lf", &name[0], &x, &y, &z);
         frame.add_atom(Atom(name), Vector3D(x, y, z));
     }
 }

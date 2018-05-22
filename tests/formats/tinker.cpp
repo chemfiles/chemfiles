@@ -1,5 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
+
 #include <fstream>
 
 #include "catch.hpp"
@@ -73,20 +74,21 @@ TEST_CASE("Read files in Tinker XYZ format using Molfile") {
 TEST_CASE("Write files in Tinker XYZ format") {
     auto tmpfile = NamedTempPath(".arc");
     const auto expected_content =
-    "4 written by the chemfiles library\n"
-    "0 0 0 90 90 90\n"
-    "1 A 1 2 3 1 2 3\n"
-    "2 A 1 2 3 1 1\n"
-    "3 B 1 2 3 2 1\n"
-    "4 B 1 2 3 3\n"
-    "6 written by the chemfiles library\n"
-    "22 33 44 90 90 90\n"
-    "1 A 4 5 6 1 2 3\n"
-    "2 A 4 5 6 1 1\n"
-    "3 B 4 5 6 2 1\n"
-    "4 B 4 5 6 3\n"
-    "5 E 4 5 6 4\n"
-    "6 F 4 5 6 5\n";
+R"(4 written by the chemfiles library
+0 0 0 90 90 90
+1 A 1 2 3 1 2 3
+2 A 1 2 3 1 1
+3 B 1 2 3 2 1
+4 B 1 2 3 3
+6 written by the chemfiles library
+22 33 44 90 90 90
+1 A 4 5 6 1 2 3
+2 A 4 5 6 1 1
+3 B 4 5 6 2 1
+4 B 4 5 6 3
+5 E 4 5 6 4
+6 F 4 5 6 5
+)";
 
     auto topology = Topology();
     topology.add_atom(Atom("A"));

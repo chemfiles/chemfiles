@@ -1,7 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <streambuf>
 #include <fstream>
 
 #include "catch.hpp"
@@ -107,20 +106,21 @@ TEST_CASE("Errors in XYZ format") {
 TEST_CASE("Write files in XYZ format") {
     auto tmpfile = NamedTempPath(".xyz");
     const auto expected_content =
-    "4\n"
-    "Written by the chemfiles library\n"
-    "A 1 2 3\n"
-    "B 1 2 3\n"
-    "C 1 2 3\n"
-    "D 1 2 3\n"
-    "6\n"
-    "Written by the chemfiles library\n"
-    "A 4 5 6\n"
-    "B 4 5 6\n"
-    "C 4 5 6\n"
-    "D 4 5 6\n"
-    "E 4 5 6\n"
-    "F 4 5 6\n";
+R"(4
+Written by the chemfiles library
+A 1 2 3
+B 1 2 3
+C 1 2 3
+D 1 2 3
+6
+Written by the chemfiles library
+A 4 5 6
+B 4 5 6
+C 4 5 6
+D 4 5 6
+E 4 5 6
+F 4 5 6
+)";
 
     auto topology = Topology();
     topology.add_atom(Atom("A","O"));
