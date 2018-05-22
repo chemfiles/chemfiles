@@ -107,7 +107,7 @@ public:
     /// @example{tests/doc/selection/selection.cpp}
     ///
     /// @throws SelectionError if there is a error in the selection string
-    explicit Selection(const std::string& selection);
+    explicit Selection(std::string selection);
 
     ~Selection();
     Selection(Selection&& other);

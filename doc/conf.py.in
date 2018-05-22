@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function, absolute_import
 import sphinx_bootstrap_theme
 import os
 import sys
-sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@")
+sys.path.insert(0, os.path.join("@CMAKE_CURRENT_SOURCE_DIR@", "ext"))
 
 ROOT = os.path.join("@CMAKE_CURRENT_SOURCE_DIR@", "src")
 
@@ -20,6 +20,10 @@ def version():
     return (version, release)
 
 
+def setup(app):
+    app.add_stylesheet("chemfiles.css")
+
+
 # -- General configuration ------------------------------------------------
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = '1.4'
@@ -30,7 +34,9 @@ needs_sphinx = '1.4'
 extensions = [
     'sphinx.ext.mathjax',
     'breathe',
-    'htmlhidden'
+    # chemfiles specific extensions, in doc/ext
+    'htmlhidden',
+    'chfl_example',
 ]
 
 # The suffix of source filenames.
@@ -66,6 +72,8 @@ html_theme_options = {
     'navbar_pagenav_name': "Content",
     'navbar_site_name': "Navigation",
     'source_link_position': None,
+    'bootswatch_theme': "flatly",
+    'bootstrap_version': "3",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

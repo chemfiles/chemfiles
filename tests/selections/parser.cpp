@@ -5,16 +5,15 @@
 #include "chemfiles/selections/parser.hpp"
 #include "chemfiles/selections/expr.hpp"
 
-
 using namespace chemfiles;
 using namespace chemfiles::selections;
 
 static Ast parse(std::string selection) {
-    return Parser(tokenize(selection)).parse();
+    return Parser(Tokenizer(selection).tokenize()).parse();
 }
 
 static Ast parse_and_opt(std::string selection) {
-    auto ast = Parser(tokenize(selection)).parse();
+    auto ast = Parser(Tokenizer(selection).tokenize()).parse();
     ast->optimize();
     return ast;
 }
@@ -61,13 +60,33 @@ TEST_CASE("Parsing") {
         CHECK(parse("not all")->print() == "not all");
     }
 
+    SECTION("boolean selectors") {
+        auto ast = "is_bonded(#1, #3)";
+        CHECK(parse("is_bonded(#1, #3)")->print() == ast);
+
+        ast = "is_angle(#1, #3, #2)";
+        CHECK(parse("is_angle(#1, #3, #2)")->print() == ast);
+
+        ast = "is_dihedral(#1, #3, #2, #4)";
+        CHECK(parse("is_dihedral(#1, #3, #2, #4)")->print() == ast);
+
+        ast = "is_improper(#1, #3, #2, #2)";
+        CHECK(parse("is_improper(#1, #3, #2, #2)")->print() == ast);
+
+        ast = "is_bonded(#1, name O)";
+        CHECK(parse("is_bonded(#1, name O)")->print() == ast);
+
+        ast = "is_angle(name H, #2, name O)";
+        CHECK(parse("is_angle(name H, #2, name O)")->print() == ast);
+    }
+
     SECTION("type") {
         CHECK(parse("type == goo")->print() == "type(#1) == goo");
         CHECK(parse("type(#1) == goo")->print() == "type(#1) == goo");
         CHECK(parse("type goo")->print() == "type(#1) == goo");
         CHECK(parse("type(#3) goo")->print() == "type(#3) == goo");
         CHECK(parse("type != goo")->print() == "type(#1) != goo");
-        CHECK(parse("type == 45")->print() == "type(#1) == 45");
+        CHECK(parse("type == \"45\"")->print() == "type(#1) == 45");
 
         CHECK_THROWS_AS(parse("type < bar"), SelectionError);
         CHECK_THROWS_AS(parse("type >= bar"), SelectionError);
@@ -79,7 +98,8 @@ TEST_CASE("Parsing") {
         CHECK(parse("name goo")->print() == "name(#1) == goo");
         CHECK(parse("name(#3) goo")->print() == "name(#3) == goo");
         CHECK(parse("name != goo")->print() == "name(#1) != goo");
-        CHECK(parse("name 45")->print() == "name(#1) == 45");
+        CHECK(parse("name \"45\"")->print() == "name(#1) == 45");
+        CHECK(parse("name \"名\"")->print() == "name(#1) == 名");
 
         CHECK_THROWS_AS(parse("name < bar"), SelectionError);
         CHECK_THROWS_AS(parse("name >= bar"), SelectionError);
@@ -104,7 +124,7 @@ TEST_CASE("Parsing") {
         CHECK(parse("resname goo")->print() == "resname(#1) == goo");
         CHECK(parse("resname(#3) goo")->print() == "resname(#3) == goo");
         CHECK(parse("resname != goo")->print() == "resname(#1) != goo");
-        CHECK(parse("resname 45")->print() == "resname(#1) == 45");
+        CHECK(parse("resname \"45\"")->print() == "resname(#1) == 45");
 
         CHECK_THROWS_AS(parse("resname < bar"), SelectionError);
         CHECK_THROWS_AS(parse("resname >= bar"), SelectionError);
@@ -220,6 +240,41 @@ TEST_CASE("Parsing") {
 
             ast = "sin((3 - 4)) < 5";
             CHECK(parse("sin(3 - 4) < 5")->print() == ast);
+
+            ast = "cos(1) < 5";
+            CHECK(parse("cos(1) < 5")->print() == ast);
+
+            ast = "tan(1) < 5";
+            CHECK(parse("tan(1) < 5")->print() == ast);
+
+            ast = "asin(1) < 5";
+            CHECK(parse("asin(1) < 5")->print() == ast);
+
+            ast = "acos(1) < 5";
+            CHECK(parse("acos(1) < 5")->print() == ast);
+
+            ast = "sqrt(1) < 5";
+            CHECK(parse("sqrt(1) < 5")->print() == ast);
+
+            ast = "rad2deg(1) < 5";
+            CHECK(parse("rad2deg(1) < 5")->print() == ast);
+
+            ast = "deg2rad(1) < 5";
+            CHECK(parse("deg2rad(1) < 5")->print() == ast);
+        }
+
+        SECTION("Atomic functions") {
+            auto ast = "distance(#1, #2) < 5";
+            CHECK(parse("distance(#1, #2) < 5")->print() == ast);
+
+            ast = "angle(#1, #3, #2) < 5";
+            CHECK(parse("angle(#1, #3, #2) < 5")->print() == ast);
+
+            ast = "dihedral(#1, #3, #2, #3) < 5";
+            CHECK(parse("dihedral(#1, #3, #2, #3) < 5")->print() == ast);
+
+            ast = "out_of_plane(#1, #3, #2, #4) < 5";
+            CHECK(parse("out_of_plane(#1, #3, #2, #4) < 5")->print() == ast);
         }
 
         SECTION("Complex expressions") {
@@ -235,12 +290,12 @@ TEST_CASE("Parsing") {
 
 TEST_CASE("Parsing errors") {
     std::vector<std::string> PARSE_FAIL = {
-        /* Giberish at the end of the selection */
+        // Giberish at the end of the selection
         "index == 23 6",
         "index == 23 njzk",
         "index == 23 !=",
         "index == 23 name == 1",
-        /* Bad usage of the boolean operators */
+        // Bad usage of the boolean operators
         "index == 23 and ",
         "and index == 23",
         "not and index == 23",
@@ -248,20 +303,34 @@ TEST_CASE("Parsing errors") {
         "or index == 23",
         "not or index == 23",
         "index == 23 not index == 1",
-        /* string expressions with bad operators  */
+        // string expressions with bad operators
         "name == <",
         "name > foo",
         "name >= foo",
         "name < foo",
         "name <= foo",
         "name ==",
-        /* identifiers as mathematical values */
+        // identifiers as mathematical values
         "z == <",
         "y == bar",
         "x <= foo",
         "z bar",
         // https://github.com/chemfiles/chemfiles/issues/79
         "type(#1) Al and type(#2) O and type(#3) H )",
+        // functions arity and arguments
+        "distance(#1) < 5",
+        "distance(x) < 5",
+        "angle(#2, #3) < 5",
+        "dihedral(#2, #3) < 5",
+        "none(#2, #3)",
+        "all(#2, #3)",
+        "bonded(#2)",
+        "is_angle(#2)",
+        "is_dihedral(#2)",
+        "is_improper(#2)",
+        // Sub-selection
+        "bonded(#2, name(#3) Zn)",
+        "bonded(name N, name Zn)",
     };
 
     for (auto& failure: PARSE_FAIL) {

@@ -22,158 +22,197 @@ TEST_CASE("Atoms selections") {
     auto frame = testing_frame();
 
     SECTION("all & none") {
-        auto sel = Selection("all");
-        auto res = std::vector<size_t>{0, 1, 2, 3};
-        CHECK(sel.list(frame) == res);
+        auto selection = Selection("all");
+        auto expected = std::vector<size_t>{0, 1, 2, 3};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("none");
-        res = std::vector<size_t>{};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("none");
+        expected = std::vector<size_t>{};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("index != 2 and all");
-        res = std::vector<size_t>{0, 1, 3};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("index != 2 and all");
+        expected = std::vector<size_t>{0, 1, 3};
+        CHECK(selection.list(frame) == expected);
 
-        CHECK(sel.string() == "index != 2 and all");
+        CHECK(selection.string() == "index != 2 and all");
     }
 
     SECTION("index") {
-        auto sel = Selection("index == 2");
-        auto res = std::vector<size_t>{2};
-        CHECK(sel.list(frame) == res);
+        auto selection = Selection("index == 2");
+        auto expected = std::vector<size_t>{2};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("index != 2");
-        res = std::vector<size_t>{0, 1, 3};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("index != 2");
+        expected = std::vector<size_t>{0, 1, 3};
+        CHECK(selection.list(frame) == expected);
     }
 
     SECTION("mass") {
-        auto sel = Selection("mass < 2");
-        auto res = std::vector<size_t>{0, 3};
-        CHECK(sel.list(frame) == res);
+        auto selection = Selection("mass < 2");
+        auto expected = std::vector<size_t>{0, 3};
+        CHECK(selection.list(frame) == expected);
     }
 
     SECTION("type") {
-        auto sel = Selection("type O");
-        auto res = std::vector<size_t>{1, 2};
-        CHECK(sel.list(frame) == res);
+        auto selection = Selection("type O");
+        auto expected = std::vector<size_t>{1, 2};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("type != O");
-        res = std::vector<size_t>{0, 3};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("type != O");
+        expected = std::vector<size_t>{0, 3};
+        CHECK(selection.list(frame) == expected);
     }
 
     SECTION("name") {
-        auto sel = Selection("name O");
-        auto res = std::vector<size_t>{1, 2};
-        CHECK(sel.list(frame) == res);
+        auto selection = Selection("name O");
+        auto expected = std::vector<size_t>{1, 2};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("name != O");
-        res = std::vector<size_t>{0, 3};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("name != O");
+        expected = std::vector<size_t>{0, 3};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("name H1");
-        res = std::vector<size_t>{0};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("name H1");
+        expected = std::vector<size_t>{0};
+        CHECK(selection.list(frame) == expected);
     }
 
     SECTION("resname") {
-        auto sel = Selection("resname resime");
-        auto res = std::vector<size_t>{2, 3};
-        CHECK(sel.list(frame) == res);
+        auto selection = Selection("resname resime");
+        auto expected = std::vector<size_t>{2, 3};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("resname != resime");
-        res = std::vector<size_t>{0, 1};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("resname != resime");
+        expected = std::vector<size_t>{0, 1};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("resname == water");
-        CHECK(sel.list(frame).empty());
+        selection = Selection("resname == water");
+        CHECK(selection.list(frame).empty());
     }
 
     SECTION("resid") {
-        auto sel = Selection("resid 3");
-        auto res = std::vector<size_t>{2, 3};
-        CHECK(sel.list(frame) == res);
+        auto selection = Selection("resid 3");
+        auto expected = std::vector<size_t>{2, 3};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("resid < 5");
-        res = std::vector<size_t>{0, 1, 2, 3};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("resid < 5");
+        expected = std::vector<size_t>{0, 1, 2, 3};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("resid != 3");
-        res = std::vector<size_t>{0, 1};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("resid != 3");
+        expected = std::vector<size_t>{0, 1};
+        CHECK(selection.list(frame) == expected);
     }
 
     SECTION("positions") {
-        auto sel = Selection("x < 2");
-        auto res = std::vector<size_t>{0, 1};
-        CHECK(sel.list(frame) == res);
+        auto selection = Selection("x < 2");
+        auto expected = std::vector<size_t>{0, 1};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("y != 2");
-        res = std::vector<size_t>{0, 2, 3};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("y != 2");
+        expected = std::vector<size_t>{0, 2, 3};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("z >= 10");
-        res = std::vector<size_t>{};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("z >= 10");
+        expected = std::vector<size_t>{};
+        CHECK(selection.list(frame) == expected);
     }
 
     SECTION("velocities") {
-        auto sel = Selection("vz < 2");
-        auto res = std::vector<size_t>{0, 1};
-        CHECK(sel.list(frame) == res);
+        auto selection = Selection("vz < 2");
+        auto expected = std::vector<size_t>{0, 1};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("vx != 2");
-        res = std::vector<size_t>{0, 2, 3};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("vx != 2");
+        expected = std::vector<size_t>{0, 2, 3};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("vy >= 10");
-        res = std::vector<size_t>{};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("vy >= 10");
+        expected = std::vector<size_t>{};
+        CHECK(selection.list(frame) == expected);
+    }
+
+    SECTION("is_bonded") {
+        auto selection = Selection("two: name(#1) H1 and is_bonded(#1, #2)");
+        auto expected = std::vector<Match>{{0ul, 1ul}};
+        CHECK(selection.evaluate(frame) == expected);
+
+        selection = Selection("is_bonded(#1, name H1)");
+        expected = std::vector<Match>{{1ul}};
+        CHECK(selection.evaluate(frame) == expected);
+
+        auto first = Selection("two: type(#1) H and name(#2) O and is_bonded(#1, #2)");
+        auto second = Selection("bonds: type(#1) H and name(#2) O");
+        CHECK(first.evaluate(frame) == second.evaluate(frame));
+    }
+
+    SECTION("is_angle") {
+        auto selection = Selection("three: name(#1) H1 and is_angle(#1, #3, #2)");
+        auto expected = std::vector<Match>{{0ul, 2ul, 1ul}};
+        CHECK(selection.evaluate(frame) == expected);
+
+        auto first = Selection("three: type(#1) H and name(#2) O and is_angle(#1, #2, #3)");
+        auto second = Selection("angles: type(#1) H and name(#2) O");
+        CHECK(first.evaluate(frame) == second.evaluate(frame));
+    }
+
+    SECTION("is_dihedral") {
+        auto selection = Selection("four: name(#1) H1 and is_dihedral(#3, #4, #2, #1)");
+        auto expected = std::vector<Match>{{0ul, 1ul, 3ul, 2ul}};
+        CHECK(selection.evaluate(frame) == expected);
+    }
+
+    SECTION("is_improper") {
+        frame.add_atom(Atom("C"), Vector3D(), Vector3D());
+        frame.add_bond(4, 1);
+
+        auto selection = Selection("four: name(#1) H1 and is_improper(#1, #2, #3, #4)");
+        auto expected = std::vector<Match>{{0ul, 1ul, 2ul, 4ul}, {0ul, 1ul, 4ul, 2ul}};
+        CHECK(selection.evaluate(frame) == expected);
     }
 
     SECTION("and") {
-        auto sel = Selection("index > 1 and index <= 2");
-        auto res = std::vector<size_t>{2};
-        CHECK(sel.list(frame) == res);
+        auto selection = Selection("index > 1 and index <= 2");
+        auto expected = std::vector<size_t>{2};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("index > 1 and type H");
-        res = std::vector<size_t>{3};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("index > 1 and type H");
+        expected = std::vector<size_t>{3};
+        CHECK(selection.list(frame) == expected);
     }
 
     SECTION("or") {
-        auto sel = Selection("index < 1 or index > 2");
-        auto res = std::vector<size_t>{0, 3};
-        CHECK(sel.list(frame) == res);
+        auto selection = Selection("index < 1 or index > 2");
+        auto expected = std::vector<size_t>{0, 3};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("index == 1 or type H");
-        res = std::vector<size_t>{0, 1, 3};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("index == 1 or type H");
+        expected = std::vector<size_t>{0, 1, 3};
+        CHECK(selection.list(frame) == expected);
     }
 
     SECTION("not") {
-        auto sel = Selection("not index > 2");
-        auto res = std::vector<size_t>{0, 1, 2};
-        CHECK(sel.list(frame) == res);
+        auto selection = Selection("not index > 2");
+        auto expected = std::vector<size_t>{0, 1, 2};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("not type H");
-        res = std::vector<size_t>{1, 2};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("not type H");
+        expected = std::vector<size_t>{1, 2};
+        CHECK(selection.list(frame) == expected);
     }
 
     SECTION("Selection context") {
-        auto sel = Selection("atoms: all");
-        auto res = std::vector<size_t>{0, 1, 2, 3};
-        CHECK(sel.list(frame) == res);
+        auto selection = Selection("atoms: all");
+        auto expected = std::vector<size_t>{0, 1, 2, 3};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("atoms : none");
-        res = std::vector<size_t>{};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("atoms : none");
+        expected = std::vector<size_t>{};
+        CHECK(selection.list(frame) == expected);
 
-        sel = Selection("atoms :not type H");
-        res = std::vector<size_t>{1, 2};
-        CHECK(sel.list(frame) == res);
+        selection = Selection("atoms :not type H");
+        expected = std::vector<size_t>{1, 2};
+        CHECK(selection.list(frame) == expected);
 
         // Unknown selection kind
         CHECK_THROWS_AS(Selection("kind: all"), SelectionError);
@@ -189,26 +228,26 @@ TEST_CASE("Multiple selections") {
     auto frame = testing_frame();
 
     SECTION("Pairs & two") {
-        auto sel = Selection("pairs: all");
-        std::vector<Match> res{
+        auto selection = Selection("pairs: all");
+        std::vector<Match> expected{
             {0ul, 1ul}, {0ul, 2ul}, {0ul, 3ul},
             {1ul, 0ul}, {1ul, 2ul}, {1ul, 3ul},
             {2ul, 0ul}, {2ul, 1ul}, {2ul, 3ul},
             {3ul, 0ul}, {3ul, 1ul}, {3ul, 2ul}};
-        CHECK(sel.evaluate(frame) == res);
+        CHECK(selection.evaluate(frame) == expected);
         auto natoms = frame.size();
-        CHECK(res.size() == natoms * (natoms - 1));
+        CHECK(expected.size() == natoms * (natoms - 1));
 
-        sel = Selection("two: none");
-        res = std::vector<Match>();
-        CHECK(sel.evaluate(frame) == res);
+        selection = Selection("two: none");
+        expected = std::vector<Match>();
+        CHECK(selection.evaluate(frame) == expected);
 
-        CHECK_THROWS_AS(sel.list(frame), SelectionError);
+        CHECK_THROWS_AS(selection.list(frame), SelectionError);
     }
 
     SECTION("Three") {
-        auto sel = Selection("three: all");
-        std::vector<Match> res{
+        auto selection = Selection("three: all");
+        std::vector<Match> expected{
             {0ul, 1ul, 2ul}, {0ul, 1ul, 3ul}, {0ul, 2ul, 1ul}, {0ul, 2ul, 3ul},
             {0ul, 3ul, 1ul}, {0ul, 3ul, 2ul}, {1ul, 0ul, 2ul}, {1ul, 0ul, 3ul},
             {1ul, 2ul, 0ul}, {1ul, 2ul, 3ul}, {1ul, 3ul, 0ul}, {1ul, 3ul, 2ul},
@@ -216,16 +255,16 @@ TEST_CASE("Multiple selections") {
             {2ul, 3ul, 0ul}, {2ul, 3ul, 1ul}, {3ul, 0ul, 1ul}, {3ul, 0ul, 2ul},
             {3ul, 1ul, 0ul}, {3ul, 1ul, 2ul}, {3ul, 2ul, 0ul}, {3ul, 2ul, 1ul}
         };
-        CHECK(sel.evaluate(frame) == res);
+        CHECK(selection.evaluate(frame) == expected);
         auto natoms = frame.size();
-        CHECK(res.size() == natoms * (natoms - 1) * (natoms - 2));
+        CHECK(expected.size() == natoms * (natoms - 1) * (natoms - 2));
 
-        CHECK_THROWS_AS(sel.list(frame), SelectionError);
+        CHECK_THROWS_AS(selection.list(frame), SelectionError);
     }
 
     SECTION("Four") {
-        auto sel = Selection("four: all");
-        auto res = std::vector<Match>{
+        auto selection = Selection("four: all");
+        auto expected = std::vector<Match>{
             {0ul, 1ul, 2ul, 3ul}, {0ul, 1ul, 3ul, 2ul}, {0ul, 2ul, 1ul, 3ul},
             {0ul, 2ul, 3ul, 1ul}, {0ul, 3ul, 1ul, 2ul}, {0ul, 3ul, 2ul, 1ul},
             {1ul, 0ul, 2ul, 3ul}, {1ul, 0ul, 3ul, 2ul}, {1ul, 2ul, 0ul, 3ul},
@@ -235,108 +274,87 @@ TEST_CASE("Multiple selections") {
             {3ul, 0ul, 1ul, 2ul}, {3ul, 0ul, 2ul, 1ul}, {3ul, 1ul, 0ul, 2ul},
             {3ul, 1ul, 2ul, 0ul}, {3ul, 2ul, 0ul, 1ul}, {3ul, 2ul, 1ul, 0ul},
         };
-        CHECK(sel.evaluate(frame) == res);
+        CHECK(selection.evaluate(frame) == expected);
         auto natoms = frame.size();
-        CHECK(res.size() == natoms * (natoms - 1) * (natoms - 2) * (natoms - 3));
+        CHECK(expected.size() == natoms * (natoms - 1) * (natoms - 2) * (natoms - 3));
 
-        CHECK_THROWS_AS(sel.list(frame), SelectionError);
+        CHECK_THROWS_AS(selection.list(frame), SelectionError);
     }
 
     SECTION("Bonds") {
-        auto sel = Selection("bonds: all");
-        std::vector<Match> res{{0ul, 1ul}, {1ul, 2ul}, {2ul, 3ul}};
-        auto eval = sel.evaluate(frame);
-        CHECK(res.size() == eval.size());
-        for (auto& match: res) {
+        auto selection = Selection("bonds: all");
+        std::vector<Match> expected{{0ul, 1ul}, {1ul, 2ul}, {2ul, 3ul}};
+        auto eval = selection.evaluate(frame);
+        CHECK(expected.size() == eval.size());
+        for (auto& match: expected) {
             CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
         }
 
-        sel = Selection("bonds: name(#1) O and type(#2) H");
-        res = std::vector<Match>{{1ul, 0ul}, {2ul, 3ul}};
-        eval = sel.evaluate(frame);
-        CHECK(res.size() == eval.size());
-        for (auto& match: res) {
+        selection = Selection("bonds: name(#1) O and type(#2) H");
+        expected = std::vector<Match>{{1ul, 0ul}, {2ul, 3ul}};
+        eval = selection.evaluate(frame);
+        CHECK(expected.size() == eval.size());
+        for (auto& match: expected) {
             CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
         }
 
-        CHECK_THROWS_AS(sel.list(frame), SelectionError);
+        CHECK_THROWS_AS(selection.list(frame), SelectionError);
     }
 
     SECTION("Angles") {
-        auto sel = Selection("angles: all");
-        std::vector<Match> res{{0ul, 1ul, 2ul}, {1ul, 2ul, 3ul}};
-        auto eval = sel.evaluate(frame);
-        CHECK(res.size() == eval.size());
-        for (auto& match: res) {
+        auto selection = Selection("angles: all");
+        std::vector<Match> expected{{0ul, 1ul, 2ul}, {1ul, 2ul, 3ul}};
+        auto eval = selection.evaluate(frame);
+        CHECK(expected.size() == eval.size());
+        for (auto& match: expected) {
             CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
         }
 
-        sel = Selection("angles: name(#1) O and name(#2) O and type(#3) H");
-        res = std::vector<Match>{{2ul, 1ul, 0ul}, {1ul, 2ul, 3ul}};
-        eval = sel.evaluate(frame);
-        CHECK(res.size() == eval.size());
-        for (auto& match: res) {
+        selection = Selection("angles: name(#1) O and name(#2) O and type(#3) H");
+        expected = std::vector<Match>{{2ul, 1ul, 0ul}, {1ul, 2ul, 3ul}};
+        eval = selection.evaluate(frame);
+        CHECK(expected.size() == eval.size());
+        for (auto& match: expected) {
             CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
         }
 
-        CHECK_THROWS_AS(sel.list(frame), SelectionError);
+        CHECK_THROWS_AS(selection.list(frame), SelectionError);
     }
 
     SECTION("Dihedrals") {
-        auto sel = Selection("dihedrals: all");
-        std::vector<Match> res{{0ul, 1ul, 2ul, 3ul}};
-        CHECK(sel.evaluate(frame) == res);
+        auto selection = Selection("dihedrals: all");
+        std::vector<Match> expected{{0ul, 1ul, 2ul, 3ul}};
+        CHECK(selection.evaluate(frame) == expected);
 
-        sel = Selection("dihedrals: name(#3) O and name(#4) H1");
-        res = std::vector<Match>{{3ul, 2ul, 1ul, 0ul}};
-        auto eval = sel.evaluate(frame);
+        selection = Selection("dihedrals: name(#3) O and name(#4) H1");
+        expected = std::vector<Match>{{3ul, 2ul, 1ul, 0ul}};
+        auto eval = selection.evaluate(frame);
 
-        CHECK(res.size() == eval.size());
-        for (auto& match: res) {
+        CHECK(expected.size() == eval.size());
+        for (auto& match: expected) {
             CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
         }
 
-        CHECK_THROWS_AS(sel.list(frame), SelectionError);
+        CHECK_THROWS_AS(selection.list(frame), SelectionError);
     }
 }
 
 Frame testing_frame() {
-    auto topology = Topology();
-    topology.add_atom(Atom("H1", "H"));
-    topology.add_atom(Atom("O"));
-    topology.add_atom(Atom("O"));
-    topology.add_atom(Atom("H"));
-
-    topology.add_bond(0, 1);
-    topology.add_bond(1, 2);
-    topology.add_bond(2, 3);
-
-    auto res = Residue("resime", 3);
-    res.add_atom(2);
-    res.add_atom(3);
-    topology.add_residue(res);
-
-    auto frame = Frame(topology);
-    int i = 0;
-    for (auto& pos: frame.positions()) {
-        pos[0] = i + 0;
-        pos[1] = i + 1;
-        pos[2] = i + 2;
-        i++;
-    }
-
+    auto frame = Frame();
     frame.add_velocities();
-    i = 0;
-    // FIXME: writing the loop as (auto& vel: *frame.velocities()) gives a
-    // segfault using gcc 5.3 on OS X with optimization level O2 and O3. No
-    // idea why ...
-    auto velocities = frame.velocities();
-    for (auto& vel: *velocities) {
-        vel[0] = i + 1;
-        vel[1] = i + 2;
-        vel[2] = i + 0;
-        i += 1;
-    }
+    frame.add_atom(Atom("H1", "H"), {0.0, 1.0, 2.0}, {1.0, 2.0, 0.0});
+    frame.add_atom(Atom("O"), {1.0, 2.0, 3.0}, {2.0, 3.0, 1.0});
+    frame.add_atom(Atom("O"), {2.0, 3.0, 4.0}, {3.0, 4.0, 2.0});
+    frame.add_atom(Atom("H"), {3.0, 4.0, 5.0}, {4.0, 5.0, 3.0});
+
+    frame.add_bond(0, 1);
+    frame.add_bond(1, 2);
+    frame.add_bond(2, 3);
+
+    auto residue = Residue("resime", 3);
+    residue.add_atom(2);
+    residue.add_atom(3);
+    frame.add_residue(residue);
 
     return frame;
 }

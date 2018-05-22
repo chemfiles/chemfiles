@@ -7,9 +7,24 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 * Properties are now supported in the `Residue` class. They are accessed using
   `Residue::set` and `Residue::get`.
-
-* The topology of residues is now automatically set using a lookup table for
-  the PDB format.
+* The topology of residues is now automatically set using a lookup table for the
+  PDB format.
+* The selection engine has been rewritten to add support for more complex
+  selections:
+    * it is now possible to use mathematical expressions in selections such as
+      `x^2 - y ^2 < sqrt(z^2 + 25)`;
+    * it is now possible to access geometrical properties in such mathematical
+      expressions: `distance(#1, #2)`, `angle(#1, #2, #3)`, `dihedral(#1, #2,
+      #3, #4)`, and `out_of_plane(#1, #2, #3, #4)` are supported;
+    * it is now possible to add constrains on the topology of the system:
+      `bonded(#1, #2)`, `is_angle(#1, #2, #3)`, `is_dihedral(#1, #2, #3, #4)`,
+      and `improper(#1, #2, #3, #4)` are supported;
+    * the topology constrains support sub-selections: instead of checking is
+      `#1` and `#2` are bonded, one can check if `#1` is bonded to any atom
+      matching a selection, for example `name O` with `bonded(#1, name O)`.
+    * When using numbers as atomic names/types, they must now be inside double
+      quotes (`name "45"`). This also allows for more exotic atomic names
+      (`name "名"`).
 
 ### Changes in supported formats
 
