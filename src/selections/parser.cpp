@@ -399,7 +399,7 @@ Variable Parser::variable() {
     Variable var = 0;
     if (match(Token::LPAREN)) {
         if (match(Token::VARIABLE)) {
-            var = previous().variable() - 1;
+            var = previous().variable();
         } else {
             throw selection_error("expected variable in parenthesis, got {}", peek().str());
         }
@@ -418,14 +418,14 @@ std::vector<Variable> Parser::variables() {
     }
 
     if (match(Token::VARIABLE)) {
-        vars.push_back(previous().variable() - 1);
+        vars.push_back(previous().variable());
     } else {
         throw selection_error("expected variable in parenthesis, got {}", peek().str());
     }
 
     while (match(Token::COMMA)) {
         if (match(Token::VARIABLE)) {
-            vars.push_back(previous().variable() - 1);
+            vars.push_back(previous().variable());
         } else {
             throw selection_error("expected variable in parenthesis, got {}", peek().str());
         }
@@ -446,7 +446,7 @@ std::vector<SubSelection> Parser::sub_selection() {
     }
 
     if (match(Token::VARIABLE)) {
-        vars.push_back(previous().variable() - 1);
+        vars.push_back(previous().variable());
     } else {
         // HACK: We can not (yet) build a selection directly from AST, because
         // we need to validate the variables and get the context. So we eat all
@@ -463,7 +463,7 @@ std::vector<SubSelection> Parser::sub_selection() {
 
     while (match(Token::COMMA)) {
         if (match(Token::VARIABLE)) {
-            vars.push_back(previous().variable() - 1);
+            vars.push_back(previous().variable());
         } else {
             auto before = current_;
             auto _ast = expression();
