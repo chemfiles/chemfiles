@@ -19,6 +19,7 @@
 #include "chemfiles/formats/SDF.hpp"
 #include "chemfiles/formats/TNG.hpp"
 #include "chemfiles/formats/MMTF.hpp"
+#include "chemfiles/formats/CSSR.hpp"
 
 using namespace chemfiles;
 
@@ -43,6 +44,7 @@ FormatFactory::FormatFactory() {
     this->add_format<TinkerFormat>();
     this->add_format<LAMMPSDataFormat>();
     this->add_format<SDFFormat>();
+    this->add_format<CSSRFormat>();
 
     // VMD molfile plugins
     this->add_format<Molfile<DCD>>();

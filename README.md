@@ -95,6 +95,7 @@ Chemfiles can read and write files in the following formats:
 - LAMMPS data files;
 - Tinker XYZ files (.arc files);
 - BIOVIA SDF files;
+- SERC Daresbury Laboratory CSSR files;
 
 Chemfiles can also read but not (yet) write files in the following formats:
 - TNG;

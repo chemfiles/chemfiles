@@ -49,6 +49,8 @@ specify which format to use.
 +-------------------+------------+-------------------+---------+---------+
 | `MMTF`_           | .mmtf      | |yes|             | |yes|   | |no|    |
 +-------------------+------------+-------------------+---------+---------+
+| `CSSR`_           | .cssr      | |yes|             | |yes|   | |yes|   |
++-------------------+------------+-------------------+---------+---------+
 
 "LAMMPS" format correspond to trajectory files written by the LAMMPS
 `dump <http://lammps.sandia.gov/doc/dump.html>`_ command. "LAMMPS Data"
@@ -60,6 +62,8 @@ correspond to LAMMPS data files, as read by the LAMMPS
 .. _SDF: http://accelrys.com/products/collaborative-science/biovia-draw/ctfile-no-fee.html
 .. _Amber NetCDF: http://ambermd.org/netcdf/nctraj.xhtml
 .. _TNG: http://doi.wiley.com/10.1002/jcc.23495
+.. _MMTF: https://mmtf.rcsb.org/
+.. _CSSR: http://www.chem.cmu.edu/courses/09-560/docs/msi/modenv/D_Files.html#944777
 
 .. _GRO: http://manual.gromacs.org/current/online/gro.html
 .. _XTC: http://manual.gromacs.org/current/online/xtc.html
@@ -69,7 +73,6 @@ correspond to LAMMPS data files, as read by the LAMMPS
 .. _MOL2: http://chemyang.ccnu.edu.cn/ccb/server/AIMMS/mol2.pdf
 .. _Molden: http://www.cmbi.ru.nl/molden/molden_format.html
 
-.. _MMTF: https://mmtf.rcsb.org/
 
 .. |yes| image:: static/img/yes.png
           :alt: Yes

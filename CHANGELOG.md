@@ -30,6 +30,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 * Added `MarcoMolecule Transmission Format (MMTF)` support, reading via mmtf-c.
 * Added `Structure-Data File (SDF)` support, reading and writing.
+* Added `Cambridge Structure Search and Retrieval (CSSR)` support, reading and writing.
 
 ###  C API changes
 

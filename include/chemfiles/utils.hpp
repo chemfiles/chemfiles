@@ -90,8 +90,8 @@ inline void scan(const std::string& input, const char* format, ...) {
     char c = format[0];
     for (size_t i = 0; c != 0; i++, c = format[i]) {
         if (c == '%') {
-            // Do not count %n specifiers.
-            if (format[i + 1] == 'n') {
+            // Do not count %n specifiers, or %* specifiers.
+            if (format[i + 1] == 'n' || format[i + 1] == '*') {
                 // We can access format[i + 1] safely, because we did not reach
                 // the null-terminator yet
                 continue;
@@ -101,7 +101,11 @@ inline void scan(const std::string& input, const char* format, ...) {
     }
     auto actual = std::vsscanf(input.c_str(), format, vlist);
     if (actual != expected) {
-        throw chemfiles::Error("failed to read line '" + input + "' with format '" + std::string(format) + "'");
+        throw chemfiles::Error(
+            "failed to read line '" + input + "' with format '" +
+            std::string(format) + "': " + std::to_string(actual) +
+            " matched out of " + std::to_string(expected)
+        );
     }
 }
 
