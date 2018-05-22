@@ -43,7 +43,7 @@ std::string Token::str() const {
     case Token::COMMA:
         return ",";
     case Token::VARIABLE:
-        return "#" + std::to_string(variable_);
+        return "#" + std::to_string(variable_ + 1);
     case Token::EQUAL:
         return "==";
     case Token::NOT_EQUAL:
@@ -174,8 +174,10 @@ Token Tokenizer::variable() {
     }
     if (data > UINT8_MAX) {
         throw selection_error("variable index #{} is too big for uint8_t", data);
+    } else if (data == 0) {
+        throw selection_error("invalid variable index #0");
     }
-    return Token::variable(static_cast<uint8_t>(data));
+    return Token::variable(static_cast<uint8_t>(data - 1));
 }
 
 Token Tokenizer::raw_ident() {

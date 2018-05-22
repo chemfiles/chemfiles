@@ -54,16 +54,16 @@ static Context get_context(const std::string& string, std::string& selection) {
 static unsigned max_variable(Context context) {
     switch (context) {
     case Context::ATOM:
-        return 1;
+        return 0;
     case Context::PAIR:
     case Context::BOND:
-        return 2;
+        return 1;
     case Context::ANGLE:
     case Context::THREE:
-        return 3;
+        return 2;
     case Context::DIHEDRAL:
     case Context::FOUR:
-        return 4;
+        return 3;
     }
     unreachable();
 }

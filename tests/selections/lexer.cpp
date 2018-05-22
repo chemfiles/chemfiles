@@ -78,6 +78,18 @@ TEST_CASE("Lexing") {
         CHECK(tokens[8].type() == Token::END);
     }
 
+    SECTION("variables") {
+        auto tokens = tokenize("#2 #78");
+        CHECK(tokens.size() == 3);
+        CHECK(tokens[0].type() == Token::VARIABLE);
+        CHECK(tokens[0].variable() == 1);
+        CHECK(tokens[1].type() == Token::VARIABLE);
+        CHECK(tokens[1].variable() == 77);
+        CHECK(tokens[2].type() == Token::END);
+
+        CHECK_THROWS_AS(tokenize("#0"), SelectionError);
+    }
+
     SECTION("Identifiers") {
         for (auto& id: {"ident", "id_3nt___", "iD_3BFAMC8T3Vt___"}) {
             auto tokens = tokenize(id);
