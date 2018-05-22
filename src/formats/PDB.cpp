@@ -268,17 +268,16 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
 }
 
 void PDBFormat::link_standard_residue_bonds(Frame& frame) {
-
     bool link_previous_peptide = false;
     bool link_previous_nucleic = false;
     size_t previous_residue_id = 0;
     size_t previous_carboxylic_id = 0;
 
     for (auto& res : residues_) {
-
         const auto& residue_table = PDB_CONNECTIVITY_INFORMATION.find(res.second.name());
-        if (residue_table == PDB_CONNECTIVITY_INFORMATION.end())
+        if (residue_table == PDB_CONNECTIVITY_INFORMATION.end()) {
             continue;
+        }
 
         std::map<std::string, size_t> atom_name_to_index;
         for (const auto& atom : res.second) {
@@ -439,10 +438,8 @@ void PDBFormat::write(const Frame& frame) {
         }
     }
 
+    auto& positions = frame.positions();
     for (size_t i = 0; i < frame.size(); i++) {
-        auto& name = frame.topology()[i].name();
-        auto& type = frame.topology()[i].type();
-        auto& pos = frame.positions()[i];
 
         std::string atom_hetatm = "HETATM";
         auto is_hetatm = frame.topology()[i].get("is_hetatm");
@@ -498,8 +495,7 @@ void PDBFormat::write(const Frame& frame) {
             } else {
                 chainid = "X";
             }
-        }
-        else {
+        } else {
             resname = "XXX";
             chainid = "X";
             auto value = max_resid++;
@@ -511,20 +507,17 @@ void PDBFormat::write(const Frame& frame) {
         }
 
         assert(resname.length() <= 3);
+        auto& pos = positions[i];
         check_values_size(pos, 8, "atomic position");
 
-        // Print all atoms as HETATM, because there is no way we can know if we
-        // are handling a biomolecule or not.
-        //
-        // We ignore the 'altLoc' and 'iCode' fields, as we do not
-        // know them.
+        // We ignore the 'altLoc' and 'iCode' fields, as we do not know them.
         //
         // 'chainID' is set to be 'X', and if there is no residue information
-        // 'resSeq' to be the atomic number.
+        // 'resSeq' is set to be the atomic number.
         fmt::print(
             *file_,
             "{: <6}{: >5} {: <4s} {:3} {:1}{: >4s}    {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
-            atom_hetatm, to_pdb_index(i), name, resname, chainid, resid, pos[0], pos[1], pos[2], 1.0, 0.0, type
+            atom_hetatm, to_pdb_index(i), frame[i].name(), resname, chainid, resid, pos[0], pos[1], pos[2], 1.0, 0.0, frame[i].type()
         );
     }
 
