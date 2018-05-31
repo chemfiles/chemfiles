@@ -61,7 +61,7 @@ set(EXTERNAL_INCLUDES "")
 # fmtlib: https://github.com/chemfiles/fmt
 # ==========
 external_library(fmt)
-list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/fmt)
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/fmt/include/)
 
 # Hide FMT variables from CMake GUI
 mark_as_advanced(FORCE
