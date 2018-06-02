@@ -20,12 +20,12 @@
 #include "chemfiles/formats/TNG.hpp"
 #include "chemfiles/formats/MMTF.hpp"
 #include "chemfiles/formats/CSSR.hpp"
+#include "chemfiles/formats/GRO.hpp"
 
 using namespace chemfiles;
 
 namespace chemfiles {
     extern template class Molfile<DCD>;
-    extern template class Molfile<GRO>;
     extern template class Molfile<TRR>;
     extern template class Molfile<XTC>;
     extern template class Molfile<TRJ>;
@@ -45,10 +45,10 @@ FormatFactory::FormatFactory() {
     this->add_format<LAMMPSDataFormat>();
     this->add_format<SDFFormat>();
     this->add_format<CSSRFormat>();
+    this->add_format<GROFormat>();
 
     // VMD molfile plugins
     this->add_format<Molfile<DCD>>();
-    this->add_format<Molfile<GRO>>();
     this->add_format<Molfile<TRR>>();
     this->add_format<Molfile<XTC>>();
     this->add_format<Molfile<TRJ>>();
