@@ -179,12 +179,10 @@ public:
     optional<const Property&> get(const std::string& name) const;
 
     /// Get the constant beginning iterator for the atom's properties.
-    optional<std::unordered_map<std::string, Property>::const_iterator> properties_begin() const {
-        return properties_.cbegin(); };
+    properties_iterator properties_begin() const { return properties_.cbegin(); }
 
     /// Get the constant end iterator for the atom's properties.
-    optional<std::unordered_map<std::string, Property>::const_iterator> properties_end() const {
-        return properties_.cend(); };
+    properties_iterator properties_end() const { return properties_.cend(); }
 
 private:
     /// the atom name

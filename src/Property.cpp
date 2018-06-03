@@ -60,7 +60,6 @@ std::string Property::kind_as_string() const {
     unreachable();
 }
 
-
 void property_map::set(std::string name, Property value) {
     // We can not move value here, because we might need it later. C++17 solves
     // this with insert_or_assign.
@@ -77,22 +76,4 @@ optional<const Property&> property_map::get(const std::string& name) const {
     } else {
         return nullopt;
     }
-}
-
-optional<std::unordered_map<std::string, Property>::const_iterator> property_map::cbegin() const {
-    auto cbegin = data_.cbegin();
-    if (cbegin != data_.end()) {
-        return cbegin;
-    } else {
-        return nullopt;
-    }
-}
-
-optional<std::unordered_map<std::string, Property>::const_iterator> property_map::cend() const {
-  auto cend = data_.cend();
-  if (cend != data_.cbegin()) {
-      return cend;
-  } else {
-      return nullopt;
-  }
 }
