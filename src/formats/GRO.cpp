@@ -117,6 +117,50 @@ void GROFormat::read(Frame& frame) {
 
     }
 
+    std::string box = file_->readline();
+    auto box_values = split(box, ' ');
+
+    if (box_values.size() == 3) {
+
+        auto a = std::stof(box_values[0]) * 10;
+        auto b = std::stof(box_values[1]) * 10;
+        auto c = std::stof(box_values[2]) * 10;
+
+        auto cell = UnitCell(a, b, c);
+        frame.set_cell(cell);
+    }
+
+    if (box_values.size() == 9) {
+        auto v1_x = std::stof(box_values[0]) * 10;
+        auto v2_y = std::stof(box_values[1]) * 10;
+        auto v3_z = std::stof(box_values[2]) * 10;
+
+        assert(std::stof(box_values[3]) == 0);
+        assert(std::stof(box_values[4]) == 0);
+
+        auto v2_x = std::stof(box_values[5]) * 10;
+
+        assert(std::stof(box_values[6]) == 0);
+
+        auto v3_x = std::stof(box_values[7]) * 10;
+        auto v3_y = std::stof(box_values[8]) * 10;
+
+        Vector3D v1(v1_x, 0, 0);
+        Vector3D v2(v2_x, v2_y, 0);
+        Vector3D v3(v3_x, v3_y, v3_z);
+
+        auto alpha = dot(v1, v3) * 180.0 / 3.141592653589793238463;
+        auto beta  = dot(v1, v3) * 180.0 / 3.141592653589793238463;
+        auto gamma = dot(v1, v2) * 180.0 / 3.141592653589793238463;
+
+        auto cell = UnitCell(
+            v1.norm(), v2.norm(), v3.norm(),
+            alpha, beta, gamma
+        );
+
+        frame.set_cell(cell);
+    }
+
     for (auto& residue: residues_) {
         frame.add_residue(residue.second);
     }
