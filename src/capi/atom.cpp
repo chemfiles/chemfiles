@@ -2,38 +2,39 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 #include <cstring>
 
-#include "chemfiles/capi/atom.h"
 #include "chemfiles/capi.hpp"
+#include "chemfiles/capi/atom.h"
 
-#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Atom.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Topology.hpp"
 using namespace chemfiles;
 
-extern "C" CHFL_ATOM* chfl_atom(const char* name) {
+extern "C" CHFL_ATOM* chfl_atom(const char* name)
+{
     CHFL_ATOM* atom = nullptr;
     CHFL_ERROR_GOTO(
-        atom = new Atom(name);
-    )
+        atom = new Atom(name);)
     return atom;
 error:
     delete atom;
     return nullptr;
 }
 
-extern "C" CHFL_ATOM* chfl_atom_copy(const CHFL_ATOM* const atom) {
+extern "C" CHFL_ATOM* chfl_atom_copy(const CHFL_ATOM* const atom)
+{
     CHFL_ATOM* new_atom = nullptr;
     CHFL_ERROR_GOTO(
-        new_atom = new Atom(*atom);
-    )
+        new_atom = new Atom(*atom);)
     return new_atom;
 error:
     delete new_atom;
     return nullptr;
 }
 
-extern "C" CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame, uint64_t index) {
+extern "C" CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame, uint64_t index)
+{
     CHFL_ATOM* atom = nullptr;
     CHECK_POINTER_GOTO(frame);
     CHFL_ERROR_GOTO(
@@ -41,18 +42,17 @@ extern "C" CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame, uint64
         if (index >= frame->size()) {
             throw out_of_bounds(
                 "out of bounds atomic index in `chfl_atom_from_frame`: we have {} atoms, but the index is {}",
-                frame->size(), index
-            );
-        }
-        atom = new Atom(frame->topology()[checked_cast(index)]);
-    )
+                frame->size(), index);
+        } atom
+        = new Atom(frame->topology()[checked_cast(index)]);)
     return atom;
 error:
     delete atom;
     return nullptr;
 }
 
-extern "C" CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* const topology, uint64_t index) {
+extern "C" CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* const topology, uint64_t index)
+{
     CHFL_ATOM* atom = nullptr;
     CHECK_POINTER_GOTO(topology);
     CHFL_ERROR_GOTO(
@@ -60,82 +60,79 @@ extern "C" CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* const topolog
         if (index >= topology->size()) {
             throw out_of_bounds(
                 "out of bounds atomic index in `chfl_atom_from_topology`: we have {} atoms, but the index is {}",
-                topology->size(), index
-            );
-        }
-        atom = new Atom((*topology)[checked_cast(index)]);
-    )
+                topology->size(), index);
+        } atom
+        = new Atom((*topology)[checked_cast(index)]);)
     return atom;
 error:
     delete atom;
     return nullptr;
 }
 
-extern "C" chfl_status chfl_atom_mass(const CHFL_ATOM* const atom, double* mass) {
+extern "C" chfl_status chfl_atom_mass(const CHFL_ATOM* const atom, double* mass)
+{
     CHECK_POINTER(atom);
     CHECK_POINTER(mass);
-    CHFL_ERROR_CATCH(
-        *mass = atom->mass();
-    )
+    CHFL_ERROR_CATCH(*mass = atom->mass();)
 }
 
-extern "C" chfl_status chfl_atom_set_mass(CHFL_ATOM* const atom, double mass) {
+extern "C" chfl_status chfl_atom_set_mass(CHFL_ATOM* const atom, double mass)
+{
     CHECK_POINTER(atom);
     CHFL_ERROR_CATCH(
-        atom->set_mass(mass);
-    )
+        atom->set_mass(mass);)
 }
 
-extern "C" chfl_status chfl_atom_charge(const CHFL_ATOM* const atom, double* charge) {
+extern "C" chfl_status chfl_atom_charge(const CHFL_ATOM* const atom, double* charge)
+{
     CHECK_POINTER(atom);
     CHECK_POINTER(charge);
-    CHFL_ERROR_CATCH(
-        *charge = atom->charge();
-    )
+    CHFL_ERROR_CATCH(*charge = atom->charge();)
 }
 
-extern "C" chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, double charge) {
+extern "C" chfl_status chfl_atom_set_charge(CHFL_ATOM* const atom, double charge)
+{
     CHECK_POINTER(atom);
     CHFL_ERROR_CATCH(
-        atom->set_charge(charge);
-    )
+        atom->set_charge(charge);)
 }
 
-extern "C" chfl_status chfl_atom_type(const CHFL_ATOM* const atom, char* const type, uint64_t buffsize) {
+extern "C" chfl_status chfl_atom_type(const CHFL_ATOM* const atom, char* const type, uint64_t buffsize)
+{
     CHECK_POINTER(atom);
     CHECK_POINTER(type);
     CHFL_ERROR_CATCH(
         strncpy(type, atom->type().c_str(), checked_cast(buffsize) - 1);
-        type[buffsize - 1] = '\0';
-    )
+        type[buffsize - 1] = '\0';)
 }
 
-extern "C" chfl_status chfl_atom_set_type(CHFL_ATOM* const atom, const char* type) {
+extern "C" chfl_status chfl_atom_set_type(CHFL_ATOM* const atom, const char* type)
+{
     CHECK_POINTER(atom);
     CHECK_POINTER(type);
     CHFL_ERROR_CATCH(
-        atom->set_type(type);
-    )
+        atom->set_type(type);)
 }
 
-extern "C" chfl_status chfl_atom_name(const CHFL_ATOM* const atom, char* const name, uint64_t buffsize) {
+extern "C" chfl_status chfl_atom_name(const CHFL_ATOM* const atom, char* const name, uint64_t buffsize)
+{
     CHECK_POINTER(atom);
     CHECK_POINTER(name);
     CHFL_ERROR_CATCH(
         strncpy(name, atom->name().c_str(), checked_cast(buffsize) - 1);
-        name[buffsize - 1] = '\0';
-    )
+        name[buffsize - 1] = '\0';)
 }
 
-extern "C" chfl_status chfl_atom_set_name(CHFL_ATOM* const atom, const char* name) {
+extern "C" chfl_status chfl_atom_set_name(CHFL_ATOM* const atom, const char* name)
+{
     CHECK_POINTER(atom);
     CHECK_POINTER(name);
     CHFL_ERROR_CATCH(
-        atom->set_name(name);
-    )
+        atom->set_name(name);)
 }
 
-extern "C" chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* const name, uint64_t buffsize) {
+extern "C" chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* const name, uint64_t buffsize)
+{
     CHECK_POINTER(atom);
     CHECK_POINTER(name);
     CHFL_ERROR_CATCH(
@@ -145,44 +142,41 @@ extern "C" chfl_status chfl_atom_full_name(const CHFL_ATOM* const atom, char* co
             name[buffsize - 1] = '\0';
         } else {
             std::memset(name, 0, checked_cast(buffsize));
-        }
-    )
+        })
 }
 
-extern "C" chfl_status chfl_atom_vdw_radius(const CHFL_ATOM* const atom, double* radius) {
+extern "C" chfl_status chfl_atom_vdw_radius(const CHFL_ATOM* const atom, double* radius)
+{
     CHECK_POINTER(atom);
     CHECK_POINTER(radius);
-    CHFL_ERROR_CATCH(
-        *radius = atom->vdw_radius().value_or(0);
-    )
+    CHFL_ERROR_CATCH(*radius = atom->vdw_radius().value_or(0);)
 }
 
-extern "C" chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* const atom, double* radius) {
+extern "C" chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* const atom, double* radius)
+{
     CHECK_POINTER(atom);
     CHECK_POINTER(radius);
-    CHFL_ERROR_CATCH(
-        *radius = atom->covalent_radius().value_or(0);
-    )
+    CHFL_ERROR_CATCH(*radius = atom->covalent_radius().value_or(0);)
 }
 
-extern "C" chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom, uint64_t* number) {
+extern "C" chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom, uint64_t* number)
+{
     CHECK_POINTER(atom);
     CHECK_POINTER(number);
-    CHFL_ERROR_CATCH(
-        *number = atom->atomic_number().value_or(0ul);
-    )
+    CHFL_ERROR_CATCH(*number = atom->atomic_number().value_or(0ul);)
 }
 
-extern "C" chfl_status chfl_atom_set_property(CHFL_ATOM* const atom, const char* name, const CHFL_PROPERTY* const property) {
+extern "C" chfl_status chfl_atom_set_property(CHFL_ATOM* const atom,
+    const char* name, const CHFL_PROPERTY* const property)
+{
     CHECK_POINTER(atom);
     CHECK_POINTER(name);
     CHECK_POINTER(property);
     CHFL_ERROR_CATCH(
-        atom->set(name, *property);
-    )
+        atom->set(name, *property);)
 }
 
-extern "C" CHFL_PROPERTY* chfl_atom_get_property(const CHFL_ATOM* const atom, const char* name) {
+extern "C" CHFL_PROPERTY* chfl_atom_get_property(const CHFL_ATOM* atom, const char* name) {
     CHFL_PROPERTY* property = nullptr;
     CHECK_POINTER_GOTO(atom);
     CHECK_POINTER_GOTO(name);
@@ -192,12 +186,38 @@ extern "C" CHFL_PROPERTY* chfl_atom_get_property(const CHFL_ATOM* const atom, co
             property = new Property(*atom_property);
         } else {
             throw property_error("can not find a property named '{}' in this atom", name);
-        }
-    )
+        })
     return property;
 error:
     delete property;
     return nullptr;
+}
+
+extern "C" chfl_status chfl_atom_properties_names(const CHFL_ATOM* const atom, uint64_t* count, char*** names) {
+    CHECK_POINTER(atom);
+    CHECK_POINTER(count);
+    CHECK_POINTER(names);
+
+    CHFL_ERROR_CATCH(
+        auto property = atom->properties_begin();
+        auto properties_end = atom->properties_end();
+        auto size = static_cast<size_t>(std::distance(property, properties_end));
+        if (size == 0) {
+            *count = 0;
+            *names = nullptr;
+            return CHFL_SUCCESS;
+        } else {
+            *count = size;
+            *names = (const char**) malloc(sizeof(char**) * size);
+            if (*names == nullptr) {
+                set_last_error(
+                    "nullputr in properties in function 'chfl_atom_properties_names'.");
+                return CHFL_MEMORY_ERROR;
+            }
+            for (size_t i = 0; property != properties_end; i++, property++) {
+                (*names)[i] = property->first.c_str();
+            }
+        })
 }
 
 extern "C" chfl_status chfl_atom_free(CHFL_ATOM* const atom) {
