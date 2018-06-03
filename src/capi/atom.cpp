@@ -193,26 +193,31 @@ error:
     return nullptr;
 }
 
-extern "C" chfl_status chfl_atom_properties_names(const CHFL_ATOM* atom, uint64_t* count, const char*** names) {
+extern "C" chfl_status chfl_atom_properties_names(const CHFL_ATOM* const atom, uint64_t* count, char*** names) {
     CHECK_POINTER(atom);
-    auto opt_atom_properties_begin = atom->properties_begin();
+    CHECK_POINTER(count);
+    CHECK_POINTER(names);
 
-    if (opt_atom_properties_begin) {
-        auto atom_properties_begin = opt_atom_properties_begin.value();
-        auto atom_properties_end = atom->properties_end().value();
-        CHFL_ERROR_CATCH(*count = (uint64_t) std::distance(atom_properties_begin,
-            atom_properties_end););
-
-        for (size_t i = 0; i < *count; i++) {
-            (*names)[i] = atom_properties_begin->first.c_str();
-            ++atom_properties_begin;
-        }
-    }
-    else {
-        *count = 0;
-        names = nullptr;
-        return CHFL_SUCCESS;
-    }
+    CHFL_ERROR_CATCH(
+        auto property = atom->properties_begin();
+        auto properties_end = atom->properties_end();
+        auto size = static_cast<size_t>(std::distance(property, properties_end));
+        if (size == 0) {
+            *count = 0;
+            *names = nullptr;
+            return CHFL_SUCCESS;
+        } else {
+            *count = size;
+            *names = (const char**) malloc(sizeof(char**) * size);
+            if (*names == nullptr) {
+                set_last_error(
+                    "nullputr in properties in function 'chfl_atom_properties_names'.");
+                return CHFL_MEMORY_ERROR;
+            }
+            for (size_t i = 0; property != properties_end; i++, property++) {
+                (*names)[i] = property->first.c_str();
+            }
+        })
 }
 
 extern "C" chfl_status chfl_atom_free(CHFL_ATOM* const atom) {
