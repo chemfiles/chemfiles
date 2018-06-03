@@ -77,3 +77,21 @@ optional<const Property&> property_map::get(const std::string& name) const {
         return nullopt;
     }
 }
+
+optional<std::unordered_map<std::string, Property>::const_iterator> property_map::cbegin() const {
+    auto cbegin = data_.cbegin();
+    if (cbegin != data_.end()) {
+        return cbegin;
+    } else {
+        return nullopt;
+    }
+}
+
+optional<std::unordered_map<std::string, Property>::const_iterator> property_map::cend() const {
+  auto cend = data_.cend();
+  if (cend != data_.cbegin()) {
+      return cend;
+  } else {
+      return nullopt;
+  }
+}
