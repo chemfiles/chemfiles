@@ -5,7 +5,6 @@
 #include "helpers.hpp"
 #include "chemfiles.hpp"
 #include <fstream>
-#include <iostream>
 using namespace chemfiles;
 
 TEST_CASE("Read files in Gromacs .gro format"){
@@ -257,9 +256,9 @@ TEST_CASE("GRO files with big values") {
 
         // If resSeq is has more than 5 characters, coordinates won't be read
         // correctly
-        CHECK(positions[9998] == Vector3D(1., 2., 3.));
-        CHECK(positions[99998] == Vector3D(4., 5., 6.));
-        CHECK(positions[99999] == Vector3D(7., 8., 9.));
+        CHECK(approx_eq(positions[9998], Vector3D(1., 2., 3.), 1e-5));
+        CHECK(approx_eq(positions[99998],Vector3D(4., 5., 6.), 1e-5));
+        CHECK(approx_eq(positions[99999],Vector3D(7., 8., 9.), 1e-5));
     }
 
     SECTION("User specified residues") {
@@ -287,8 +286,8 @@ TEST_CASE("GRO files with big values") {
 
         // If resSeq is has more than 5 characters, coordinates won't be read
         // correctly
-        CHECK(positions[9998] == Vector3D(1., 2., 3.));
-        CHECK(positions[99998] == Vector3D(4., 5., 6.));
-        CHECK(positions[99999] == Vector3D(7., 8., 9.));
+        CHECK(approx_eq(positions[9998], Vector3D(1., 2., 3.), 1e-5));
+        CHECK(approx_eq(positions[99998],Vector3D(4., 5., 6.), 1e-5));
+        CHECK(approx_eq(positions[99999],Vector3D(7., 8., 9.), 1e-5));
     }
 }
