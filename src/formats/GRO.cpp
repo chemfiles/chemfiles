@@ -61,11 +61,15 @@ void GROFormat::read(Frame& frame) {
     } catch (const std::exception& e) {
         throw format_error("can not read next step as GRO: {}", e.what());
     }
+
     if (count < 0) {
         throw format_error("the number of atoms can not be negative in GRO format");
     }
+
     size_t natoms = static_cast<size_t>(count);
 
+    residues_.clear();
+    frame.add_velocities();
     frame.reserve(natoms);
     frame.resize(0);
 
@@ -75,8 +79,6 @@ void GROFormat::read(Frame& frame) {
         std::string resname = line.substr(5, 5);
 
         std::string atomname= line.substr(10,5);
-
-        long atomid = std::stol(line.substr(15,5));
 
         // GRO files store atoms in NM, we need to convert to Angstroms
         auto x = std::stof(line.substr(20,8)) * 10;
@@ -97,8 +99,6 @@ void GROFormat::read(Frame& frame) {
                 Vector3D(x, y, z)
             );
         }
-
-        assert(frame.size() == static_cast<size_t>(atomid));
 
         auto cf_atomid = frame.size() - 1;
         try {
@@ -170,7 +170,7 @@ static std::string to_gro_index(uint64_t i) {
     auto id = i + 1;
 
     if (id >= 100000) {
-        warning("Too many atoms for PDB format, removing atomic id");
+        warning("Too many atoms for GRO format, removing atomic id");
         return "*****";
     } else {
         return std::to_string(i + 1);
@@ -178,8 +178,13 @@ static std::string to_gro_index(uint64_t i) {
 }
 
 void GROFormat::write(const Frame& frame) {
-    //fmt::print(*file_, "MODEL {:>4}\n", models_ + 1);
-    fmt::print(*file_, "{: > 5}", frame.size());
+    if (frame.get("name")) {
+        fmt::print(*file_, frame.get("name")->as_string() + "\n");
+    } else {
+        fmt::print(*file_, "GRO File produced by chemfiles\n");
+    }
+
+    fmt::print(*file_, "{: >5d}\n", frame.size());
 
     // Only use numbers bigger than the biggest residue id as "resSeq" for
     // atoms without associated residue.
@@ -215,8 +220,13 @@ void GROFormat::write(const Frame& frame) {
                 } else {
                     resid = std::to_string(residue->id().value());
                 }
-            } else {
-                resid = "  -1";
+            } else { // We need to assign a residue ID
+                auto value = max_resid++;
+                if (value < 99999) {
+                    resid = to_gro_index(value);
+                } else {
+                    resid = "  -1";
+                }
             }
         } else {
             resname = "XXXXX";
@@ -234,6 +244,7 @@ void GROFormat::write(const Frame& frame) {
 
         if (frame.velocities()) {
             auto vel = (*frame.velocities())[i] / 10;
+            check_values_size(vel, 8, "atomic velocity");
             fmt::print(
                 *file_,
                 "{: >5}{: <5}{: >5}{: >5}{:8.3f}{:8.3f}{:8.3f}{:8.4f}{:8.4f}{:8.4f}\n",
@@ -248,14 +259,27 @@ void GROFormat::write(const Frame& frame) {
         }
     }
 
-    /*auto& cell = frame.cell();
-    check_values_size(Vector3D(cell.a(), cell.b(), cell.c()), 9, "cell lengths");
-    fmt::print(
-        *file_,
-        // Do not try to guess the space group and the z value, just use the
-        // default one.
-        "CRYST1{:9.3f}{:9.3f}{:9.3f}{:7.2f}{:7.2f}{:7.2f} P 1           1\n",
-        cell.a(), cell.b(), cell.c(), cell.alpha(), cell.beta(), cell.gamma());*/
+    auto& cell = frame.cell();
+    const auto& matrix = cell.matrix(); // Remember to conver to NM!
+
+    // While this line is free form, we should try to print it in a pretty way that most gro parsers expect
+    // This means we cannot support incredibly large cell sizes, but these are likely not practical anyway
+    if (cell.shape() == UnitCell::ORTHORHOMBIC || cell.shape() == UnitCell::INFINITE) {
+        check_values_size(Vector3D(cell.a() / 10, cell.b() / 10, cell.c() / 10), 8, "Unit Cell");
+        fmt::print(
+            *file_,
+            // Will print zeros if infinite, line is still required
+            "  {:8.5f}  {:8.5f}  {:8.5f}\n",
+            cell.a() / 10, cell.b() / 10, cell.c() / 10);
+    } else { // Triclinic
+        check_values_size(Vector3D(matrix[0][0] / 10, matrix[1][1], matrix[2][2] / 10), 8, "Unit Cell");
+        check_values_size(Vector3D(matrix[0][1] / 10, matrix[0][2], matrix[1][2] / 10), 8, "Unit Cell");
+        fmt::print(
+            *file_,
+            "  {:8.5f}  {:8.5f}  {:8.5f} 0.0 0.0  {:8.5f} 0.0  {:8.5f}  {:8.5f}\n",
+            matrix[0][0] / 10, matrix[1][1] / 10, matrix[2][2] / 10, matrix[0][1] / 10, matrix[0][2] / 10, matrix[1][2] / 10
+        );
+    }
 
     steps_positions_.push_back(file_->tellg());
 }
@@ -276,6 +300,8 @@ bool forward(TextFile& file) {
 
     long long natoms = 0;
     try {
+        // Skip the comment line
+        file.readline();
         auto line = file.readline();
         natoms = std::stoll(line);
     } catch (const FileError&) {
