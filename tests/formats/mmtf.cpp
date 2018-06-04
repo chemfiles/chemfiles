@@ -13,9 +13,6 @@ using namespace chemfiles;
 
 TEST_CASE("Read files in MMTF format") {
 
-//MMTF is not supported on asm.js
-#ifndef __EMSCRIPTEN__
-
     SECTION("Read") {
         // Just checking constructor and destructor
         MMTFFile file("data/mmtf/4HHB.mmtf", File::READ);
@@ -134,6 +131,5 @@ TEST_CASE("Read files in MMTF format") {
 
         auto frame3= file.read();
     }
-#endif
 
 }

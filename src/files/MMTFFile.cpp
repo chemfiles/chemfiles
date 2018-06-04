@@ -6,18 +6,16 @@
 #include "chemfiles/utils.hpp"
 #include "chemfiles/files/MMTFFile.hpp"
 
+#include <mmtf.hpp>
+
 using namespace chemfiles;
 
 MMTFFile::MMTFFile(std::string filename, File::Mode mode):
-  File(std::move(filename), mode), handle_(MMTF_container_new()) {
-
-    if (handle_ == nullptr) {
-        throw memory_error("Could not allocate a MMTF container");
-    }
+  File(std::move(filename), mode), handle_() {
 
     if (mode == File::READ) {
-        bool result = MMTF_unpack_from_file(this->filename().c_str(), handle_);
-        if (!result) {
+        mmtf::decodeFromFile(handle_, this->filename());
+        if (!handle_.hasConsistentData()) {
             throw format_error("Issue with: {}. Please ensure it is valid MMTF", this->filename());
         }
     }
@@ -28,5 +26,4 @@ MMTFFile::MMTFFile(std::string filename, File::Mode mode):
 }
 
 MMTFFile::~MMTFFile() noexcept {
-    MMTF_container_free(handle_);
 }

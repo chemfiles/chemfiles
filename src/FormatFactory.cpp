@@ -48,6 +48,7 @@ FormatFactory::FormatFactory() {
     this->add_format<CSSRFormat>();
     this->add_format<GROFormat>();
     this->add_format<MOL2Format>();
+    this->add_format<MMTFFormat>();
 
     // VMD molfile plugins
     this->add_format<Molfile<DCD>>();
@@ -56,11 +57,6 @@ FormatFactory::FormatFactory() {
     this->add_format<Molfile<TRJ>>();
     this->add_format<Molfile<LAMMPS>>();
     this->add_format<Molfile<MOLDEN>>();
-
-    // The MMTF format does not work well with asm.js
-    #ifndef __EMSCRIPTEN__
-        this->add_format<MMTFFormat>();
-    #endif
 }
 
 FormatFactory& FormatFactory::get() {

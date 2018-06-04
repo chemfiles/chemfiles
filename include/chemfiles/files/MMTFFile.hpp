@@ -5,8 +5,7 @@
 #define CHEMFILES_MMTF_FILE_HPP
 
 #include "chemfiles/File.hpp"
-
-#include <mmtf_parser.h>
+#include <mmtf/structure_data.hpp>
 
 namespace chemfiles {
 
@@ -21,11 +20,11 @@ public:
     MMTFFile(MMTFFile const&) = delete;
     MMTFFile& operator=(MMTFFile const&) = delete;
 
-    MMTF_container *operator->() {return handle_;}
+    mmtf::StructureData *operator->() {return &handle_;}
 
 private:
     /// underlying pointer to the MMTF file
-    MMTF_container *handle_;
+    mmtf::StructureData handle_;
 };
 
 } // namespace chemfiles
