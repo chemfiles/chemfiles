@@ -96,8 +96,6 @@ set(CHEMFILES_OBJECTS
     $<TARGET_OBJECTS:fmt::object>
     $<TARGET_OBJECTS:tng_io>
     $<TARGET_OBJECTS:tng_io_zlib>
-    $<TARGET_OBJECTS:msgpackc-object>
-    $<TARGET_OBJECTS:mmtf-c>
     ${NETCDF_OBJECTS}
 )
 
