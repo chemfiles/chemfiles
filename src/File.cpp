@@ -4,15 +4,29 @@
 #include <algorithm>
 
 #include "chemfiles/files/BasicFile.hpp"
+#include "chemfiles/files/GzFile.hpp"
+#include "chemfiles/files/XzFile.hpp"
 #include "chemfiles/ErrorFmt.hpp"
 using namespace chemfiles;
 
+static std::string extension(const std::string& filename) {
+    auto idx = filename.rfind('.');
+    if (idx != std::string::npos) {
+        return filename.substr(idx);
+    } else {
+        return "";
+    }
+}
 
 std::unique_ptr<TextFile> TextFile::create(const std::string& path, File::Mode mode) {
-    // This function is currently creating only BasicFile. The idea here is to
-    // be able to use memory mapped files, files on the network or gziped files
-    // by only modifying this function.
-    return std::unique_ptr<TextFile>(new BasicFile(path, mode));
+    auto ext = extension(path);
+    if (ext == ".gz") {
+        return std::unique_ptr<TextFile>(new GzFile(path, mode));
+    } else if (ext == ".xz") {
+        return std::unique_ptr<TextFile>(new XzFile(path, mode));
+    } else {
+        return std::unique_ptr<TextFile>(new BasicFile(path, mode));
+    }
 }
 
 TextFile::TextFile(const std::string& path, File::Mode mode, std::streambuf* buffer):
@@ -55,7 +69,7 @@ void TextFile::get_line(std::string& string) {
             }
             return;
         default:
-            string += static_cast<char>(c);
+            string.push_back(static_cast<char>(c));
         }
     }
 }

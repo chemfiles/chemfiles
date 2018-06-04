@@ -40,7 +40,6 @@ SDFFormat::SDFFormat(const std::string& path, File::Mode mode)
         }
     }
     file_->rewind();
-
 }
 
 size_t SDFFormat::nsteps() {
@@ -122,7 +121,7 @@ void SDFFormat::read(Frame& frame) {
                 // Proper end of block
                 break;
             } // TODO: Add actual ATOM property parsing here.....
-        } catch (const FileError& e) {
+        } catch (const FileError&) {
             // Premature end of file, but we can safetly end here
             warning("Premature end of SDF File during atom property reading!");
             return;
@@ -161,7 +160,7 @@ void SDFFormat::read(Frame& frame) {
                 property_value += '\n';
                 property_value += line;
             }
-        } catch (const FileError& e) {
+        } catch (const FileError&) {
             warning("Premature end of SDF File during global property reading!");
             return;
         }

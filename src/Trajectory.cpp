@@ -10,12 +10,19 @@
 
 using namespace chemfiles;
 
-//! Get the extension part of a filename.
+/// Get the extension part of a filename.
 static std::string extension(const std::string& filename) {
-    auto idx = filename.rfind('.');
-
-    if (idx != std::string::npos) {
-        return filename.substr(idx);
+    auto idx1 = filename.rfind('.');
+    if (idx1 != std::string::npos) {
+        auto ext = filename.substr(idx1);
+        if (ext == ".gz" || ext == ".xz") {
+            // check for another extension
+            auto idx2 = filename.substr(0, idx1).rfind('.');
+            if (idx2 != std::string::npos) {
+                return filename.substr(0, idx1).substr(idx2);
+            }
+        }
+        return ext;
     } else {
         throw file_error(
             "file at '{}' does not have an extension, provide a format name to read it",

@@ -118,10 +118,10 @@ bool forward(TextFile& file) {
 
     try {
         file.readlines(static_cast<size_t>(natoms) + 1);
-    } catch (const FileError&) {
+    } catch (const FileError& e) {
         // We could not read the lines from the file
         throw format_error(
-            "not enough lines in '{}' for XYZ format", file.filename()
+            "not enough lines for XYZ format: {}", file.filename(), e.what()
         );
     }
     return true;
