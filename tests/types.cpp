@@ -18,6 +18,20 @@ TEST_CASE("Vector3d"){
     CHECK((u / 2.0) == Vector3D(0.5, 0.5, 0.5));
 
     CHECK((v * 4.75) == (4.75 * v));
+
+    CHECK((-v) == Vector3D(21.0, -15.0, -23.5));
+
+    CHECK((v += u) == Vector3D(-20.0, 16.0, 24.5));
+    CHECK(v == Vector3D(-20.0, 16.0, 24.5));
+
+    CHECK((v -= u) ==  Vector3D(-21.0, 15.0, 23.5));
+    CHECK(v ==  Vector3D(-21.0, 15.0, 23.5));
+
+    CHECK((u *= 3) == Vector3D(3.0, 3.0, 3.0));
+    CHECK(u == Vector3D(3.0, 3.0, 3.0));
+
+    CHECK((u /= 3) == Vector3D(1.0, 1.0, 1.0));
+    CHECK(u == Vector3D(1.0, 1.0, 1.0));
 }
 
 TEST_CASE("Geometry"){
@@ -54,6 +68,96 @@ TEST_CASE("Matrix3"){
                 }
             }
         }
+    }
+
+    SECTION("Negate Matrix") {
+        auto A = Matrix3D(
+            2, 4, 9,
+            1, -67, 8,
+            9, 78.9, 65
+        );
+
+        auto B = Matrix3D(
+            -2, -4, -9,
+            -1, 67, -8,
+            -9, -78.9, -65
+        );
+
+        CHECK(A == (-B));
+        CHECK(B == (-A));
+    }
+
+    SECTION("Matrix-Matrix Addition") {
+        auto A = Matrix3D(
+            2, 4, 9,
+            1, -67, 8,
+            9, 78.9, 65
+        );
+        auto Z = Matrix3D();
+        CHECK((A + Z) == A);
+        CHECK((Z + A) == A);
+        CHECK((A - Z) == A);
+        CHECK((Z - A) == (-A));
+
+        auto C = Matrix3D(
+            2, 4, 9,
+            1, -6, 8,
+            -3, 9, 5
+        );
+
+        auto D = Matrix3D(
+            4, 8, 18,
+            2, -73, 16,
+            6, 87.9, 70
+        );
+
+        auto E = Matrix3D(
+            0, 0, 0,
+            0, -61, 0,
+            12, 69.9, 60
+        );
+
+        CHECK((A + C) == D);
+        CHECK((C + A) == D);
+        CHECK((A - C) == E);
+        CHECK((C - A) == (-E));
+
+        CHECK((A += C) == D);
+        CHECK(A == D);
+        CHECK((A -= (C + C)) == E);
+        CHECK(A == E);
+    }
+
+    SECTION("Matrix-Scalar Multiplication and Division") {
+        auto A = Matrix3D(
+            2, 4, 9,
+            1, -67, 8,
+            9, 78.9, 65
+        );
+        CHECK(A * 1 == A);
+        CHECK(1 * A == A);
+        CHECK(A / 1 == A);
+
+        auto C = Matrix3D(
+            4, 8, 18,
+            2, -134, 16,
+            18, 157.8, 130
+        );
+
+        auto D = Matrix3D(
+            1, 2, 4.5,
+            0.5, -33.5, 4,
+            4.5, 39.45, 32.5
+        );
+
+        CHECK(A * 2 == C);
+        CHECK(2 * A == C);
+        CHECK(A / 2 == D);
+
+        CHECK((A *= 2) == C);
+        CHECK(A == C);
+        CHECK((A /= 4) == D);
+        CHECK(A == D);
     }
 
     SECTION("Matrix-Matrix Multiplications") {
