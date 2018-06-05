@@ -145,18 +145,12 @@ void GROFormat::read(Frame& frame) {
         auto v3_x = std::stof(box_values[7]) * 10;
         auto v3_y = std::stof(box_values[8]) * 10;
 
-        Vector3D v1(v1_x, 0, 0);
-        Vector3D v2(v2_x, v2_y, 0);
-        Vector3D v3(v3_x, v3_y, v3_z);
+        auto H = Matrix3D(
+            v1_x, v2_x, v3_x,
+            0.00, v2_y, v3_y,
+            0.00, 0.00, v3_z);
 
-        auto alpha = dot(v1, v3) * 180.0 / 3.141592653589793238463;
-        auto beta  = dot(v1, v3) * 180.0 / 3.141592653589793238463;
-        auto gamma = dot(v1, v2) * 180.0 / 3.141592653589793238463;
-
-        auto cell = UnitCell(
-            v1.norm(), v2.norm(), v3.norm(),
-            alpha, beta, gamma
-        );
+        auto cell = UnitCell(H);
 
         frame.set_cell(cell);
     }
@@ -260,7 +254,6 @@ void GROFormat::write(const Frame& frame) {
     }
 
     auto& cell = frame.cell();
-    const auto& matrix = cell.matrix(); // Remember to conver to NM!
 
     // While this line is free form, we should try to print it in a pretty way that most gro parsers expect
     // This means we cannot support incredibly large cell sizes, but these are likely not practical anyway
@@ -272,12 +265,13 @@ void GROFormat::write(const Frame& frame) {
             "  {:8.5f}  {:8.5f}  {:8.5f}\n",
             cell.a() / 10, cell.b() / 10, cell.c() / 10);
     } else { // Triclinic
-        check_values_size(Vector3D(matrix[0][0] / 10, matrix[1][1], matrix[2][2] / 10), 8, "Unit Cell");
-        check_values_size(Vector3D(matrix[0][1] / 10, matrix[0][2], matrix[1][2] / 10), 8, "Unit Cell");
+        const auto& matrix = cell.matrix() / 10;
+        check_values_size(Vector3D(matrix[0][0], matrix[1][1], matrix[2][2]), 8, "Unit Cell");
+        check_values_size(Vector3D(matrix[0][1], matrix[0][2], matrix[1][2]), 8, "Unit Cell");
         fmt::print(
             *file_,
             "  {:8.5f}  {:8.5f}  {:8.5f} 0.0 0.0  {:8.5f} 0.0  {:8.5f}  {:8.5f}\n",
-            matrix[0][0] / 10, matrix[1][1] / 10, matrix[2][2] / 10, matrix[0][1] / 10, matrix[0][2] / 10, matrix[1][2] / 10
+            matrix[0][0], matrix[1][1], matrix[2][2], matrix[0][1], matrix[0][2], matrix[1][2]
         );
     }
 
