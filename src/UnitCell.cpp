@@ -14,6 +14,10 @@ inline double deg2rad(double x) {
     return x * pi / 180.0;
 }
 
+inline double rad2deg(double x) {
+    return x * 180.0 / pi;
+}
+
 inline double cosd(double theta) {
     return cos(deg2rad(theta));
 }
@@ -39,6 +43,62 @@ UnitCell::UnitCell(double a, double b, double c,
         shape_ = TRICLINIC;
     }
     update_matrix();
+}
+
+UnitCell::UnitCell(const Matrix3D& matrix) {
+    if (matrix[1][0] != 0 || matrix[2][0] != 0 || matrix[2][1] != 0) {
+        throw error("Matrix supplied to UnitCell is not an upper triangular matrix");
+    }
+
+    if (matrix[0][0] == 0 && matrix[1][1] == 0 && matrix[2][2] == 0 &&
+        matrix[0][1] == 0 && matrix[0][2] == 0 && matrix[1][2] == 0) {
+
+        shape_ = INFINITE;
+        a_ = b_ = c_ = 0;
+        alpha_ = beta_ = gamma_ = 90.0;
+
+        return;
+    }
+
+    if (matrix[0][1] == 0 && matrix[0][2] == 0 && matrix[1][2] == 0) {
+        shape_ = ORTHORHOMBIC;
+
+        a_ = matrix[0][0];
+        b_ = matrix[1][1];
+        c_ = matrix[2][2];
+
+        alpha_ = beta_ = gamma_ = 90.0;
+
+        return;
+    }
+
+    shape_ = TRICLINIC;
+
+    Vector3D v1 = {matrix[0][0], matrix[1][0], matrix[2][0]};
+    Vector3D v2 = {matrix[0][1], matrix[1][1], matrix[2][1]};
+    Vector3D v3 = {matrix[0][2], matrix[1][2], matrix[2][2]};
+
+    a_ = v1.norm();
+    b_ = v2.norm();
+    c_ = v3.norm();
+
+    alpha_ = rad2deg(acos(dot(v2, v3) / (b_ * c_)));
+    beta_  = rad2deg(acos(dot(v1, v3) / (a_ * c_)));
+    gamma_ = rad2deg(acos(dot(v1, v2) / (a_ * b_)));
+
+    update_matrix();
+
+    assert(fabs(h_[0][0] - matrix[0][0]) < 1e-5);
+    assert(fabs(h_[1][0] - matrix[1][0]) < 1e-5);
+    assert(fabs(h_[2][0] - matrix[2][0]) < 1e-5);
+
+    assert(fabs(h_[0][1] - matrix[0][1]) < 1e-5);
+    assert(fabs(h_[1][1] - matrix[1][1]) < 1e-5);
+    assert(fabs(h_[2][1] - matrix[2][1]) < 1e-5);
+
+    assert(fabs(h_[0][2] - matrix[0][2]) < 1e-5);
+    assert(fabs(h_[1][2] - matrix[1][2]) < 1e-5);
+    assert(fabs(h_[2][2] - matrix[2][2]) < 1e-5);
 }
 
 double UnitCell::volume() const {

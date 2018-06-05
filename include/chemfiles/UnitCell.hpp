@@ -62,7 +62,7 @@ public:
     /// @example{tests/doc/cell/cell-3.cpp}
     UnitCell(double a, double b, double c);
 
-    /// Construct an unit cell of side size `a`, `b`, `c`, and cell angles
+    /// Construct a unit cell of side size `a`, `b`, `c`, and cell angles
     /// `alpha`, `beta`, `gamma`.
     ///
     /// If all of `alpha`, `beta` and `gamma` are 90.0, then the cell is
@@ -70,6 +70,17 @@ public:
     ///
     /// @example{tests/doc/cell/cell-6.cpp}
     UnitCell(double a, double b, double c, double alpha, double beta, double gamma);
+
+    /// Construct a unit cell via from an upper triangular matrix.
+    ///
+    /// If a matrix of all zeros is given, then an infinite cell is 
+    /// created.
+    ///
+    /// If only the diagonal of the matrix is non-zero, then the cell is
+    /// `ORTHOROMBIC`. Else a `TRICLINIC` cell is created.
+    ///
+    /// @example{tests/doc/cell/matrix.cpp}
+    UnitCell(const Matrix3D& matrix);
 
     /// Get the cell matrix, defined as the upper triangular matrix
     ///

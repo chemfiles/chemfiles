@@ -46,6 +46,55 @@ TEST_CASE("Use the UnitCell type") {
         CHECK(triclinic.beta() == 80);
         CHECK(triclinic.gamma() == 120);
         CHECK(approx_eq(triclinic.volume(), 1119.9375925598192, 1e-12));
+
+        auto zero_matrix = Matrix3D();
+        UnitCell infinite2(zero_matrix);
+        CHECK(infinite2 == infinite);
+
+        auto ortho_matrix = Matrix3D(10, 11, 12);
+        UnitCell ortho3(ortho_matrix);
+        CHECK(ortho3.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(ortho3.a() == 10);
+        CHECK(ortho3.b() == 11);
+        CHECK(ortho3.c() == 12);
+        CHECK(ortho3.alpha() == 90);
+        CHECK(ortho3.beta() == 90);
+        CHECK(ortho3.gamma() == 90);
+        CHECK(ortho3.volume() == 10*11*12);
+
+        // These need to be approximate due to acos used in this constructor
+        UnitCell triclinic2(triclinic.matrix());
+        CHECK(triclinic2.shape() == UnitCell::TRICLINIC);
+        CHECK(approx_eq(triclinic2.a(), 10.0, 1e-12));
+        CHECK(approx_eq(triclinic2.b(), 11.0, 1e-12));
+        CHECK(approx_eq(triclinic2.c(), 12.0, 1e-12));
+        CHECK(approx_eq(triclinic2.alpha(), 90.0, 1e-12));
+        CHECK(approx_eq(triclinic2.beta(), 80.0, 1e-12));
+        CHECK(approx_eq(triclinic2.gamma(), 120.0, 1e-12));
+        CHECK(approx_eq(triclinic2.volume(), 1119.9375925598192, 1e-12));
+
+        auto wrong_matrix = Matrix3D(
+            1.0, 2.0, 3.0,
+            4.0, 5.0, 6.0,
+            7.0, 8.0, 9.0
+        );
+
+        CHECK_THROWS_AS(UnitCell(wrong_matrix), Error);
+
+        auto triclinic_matrix = Matrix3D(
+            26.2553,  0.0000, -4.4843,
+             0.0000, 11.3176,  0.0000,
+             0.0000,  0.0000,  11.011
+        );
+
+        UnitCell triclinic3(triclinic_matrix);
+        CHECK(triclinic3.shape() == UnitCell::TRICLINIC);
+        CHECK(approx_eq(triclinic3.a(), 26.2553, 1e-4));
+        CHECK(approx_eq(triclinic3.b(), 11.3176, 1e-4));
+        CHECK(approx_eq(triclinic3.c(), 11.8892, 1e-4));
+        CHECK(approx_eq(triclinic3.alpha(), 90.0, 1e-4));
+        CHECK(approx_eq(triclinic3.beta(), 112.159, 1e-4));
+        CHECK(approx_eq(triclinic3.gamma(), 90.0, 1e-4));
     }
 
     SECTION("Operators") {

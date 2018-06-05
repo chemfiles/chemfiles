@@ -23,5 +23,16 @@ TEST_CASE() {
     assert(matrix[1][0] == 0);
     assert(matrix[2][0] == 0);
     assert(matrix[2][1] == 0);
+
+    auto cell2 = UnitCell(matrix);
+
+    assert(cell2.a() == 11);
+    assert(cell2.b() == 22);
+    assert(cell2.c() == 33);
+
+    assert(cell2.alpha() == 90);
+    assert(cell2.beta()  == 90);
+    assert(cell2.gamma() == 90);
+
     // [example]
 }
