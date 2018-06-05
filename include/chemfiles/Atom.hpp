@@ -178,6 +178,22 @@ public:
     /// @example{tests/doc/atom/property.cpp}
     optional<const Property&> get(const std::string& name) const;
 
+    /// Get the constant beginning iterator for the atom's properties.
+    ///
+    /// If there are no properties, the beggining and end iterators will point
+    /// to the same address
+    ///
+    /// @example{tests/doc/atom/property.cpp}
+    properties_iterator properties_begin() const { return properties_.cbegin(); }
+
+    /// Get the constant end iterator for the atom's properties.
+    ///
+    /// If there are no properties, the beggining and end iterators will point
+    /// to the same address
+    ///
+    /// @example{tests/doc/atom/property.cpp}
+    properties_iterator properties_end() const { return properties_.cend(); }
+
 private:
     /// the atom name
     std::string name_;

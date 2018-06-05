@@ -200,6 +200,8 @@ inline bool operator!=(const Property& lhs, const Property& rhs) {
     return !(lhs == rhs);
 }
 
+using properties_iterator = std::unordered_map<std::string, Property>::const_iterator;
+
 /// A property map for inclusion in a Frame or an Atom.
 class property_map final {
 public:
@@ -212,6 +214,12 @@ public:
 
     /// Get the property with the given `name` if it exists.
     optional<const Property&> get(const std::string& name) const;
+
+    /// Get the constant beginning iterator for the properties.
+    properties_iterator cbegin() const { return data_.cbegin(); }
+
+    /// Get the constant end iterator for the properties.
+    properties_iterator cend() const { return data_.cend(); }
 
 private:
     std::unordered_map<std::string, Property> data_;
