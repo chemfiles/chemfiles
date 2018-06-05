@@ -50,6 +50,18 @@ public:
     ///
     /// @example{tests/doc/vector3d/norm.cpp}
     double norm() const;
+
+    /// Compound addition of two vectors
+    Vector3D& operator+=(const Vector3D& rhs);
+
+    /// Compound subtraction of two vectors
+    Vector3D& operator-=(const Vector3D& rhs);
+
+    /// Compound multiplication of a vector and a scalar
+    Vector3D& operator*=(double rhs);
+
+    /// Compound division of a vector by a scalar
+    Vector3D& operator/=(double rhs);
 };
 
 /// Compute the dot product of the vectors `lhs` and `rhs`.
@@ -113,6 +125,40 @@ inline Vector3D operator/(const Vector3D& lhs, double rhs) {
     return {lhs[0] / rhs, lhs[1] / rhs, lhs[2] / rhs};
 }
 
+// Compound operators:
+
+inline Vector3D& Vector3D::operator+=(const Vector3D& rhs) {
+    (*this)[0] += rhs[0];
+    (*this)[1] += rhs[1];
+    (*this)[2] += rhs[2];
+
+    return *this;
+}
+
+inline Vector3D& Vector3D::operator-=(const Vector3D& rhs) {
+    (*this)[0] -= rhs[0];
+    (*this)[1] -= rhs[1];
+    (*this)[2] -= rhs[2];
+
+    return *this;
+}
+
+inline Vector3D& Vector3D::operator*=(double rhs) {
+    (*this)[0] *= rhs;
+    (*this)[1] *= rhs;
+    (*this)[2] *= rhs;
+
+    return *this;
+}
+
+inline Vector3D& Vector3D::operator/=(double rhs) {
+    (*this)[0] /= rhs;
+    (*this)[1] /= rhs;
+    (*this)[2] /= rhs;
+
+    return *this;
+}
+
 // Vector3D needs to have a standard layout, equivalent to a `double[3]` array.
 // This means that the pointer return by `std::vector<Vector3D>::data` is
 // compatible with the `chfl_vector3d` type (`double[3]`).
@@ -164,6 +210,18 @@ public:
     /// @throw Error if the matrix is not inversible
     /// @example{tests/doc/matrix3d/invert.cpp}
     Matrix3D invert() const;
+
+    /// Compound addition of two matrices
+    Matrix3D& operator+=(const Matrix3D& rhs);
+
+    /// Compound subtraction of two matrices
+    Matrix3D& operator-=(const Matrix3D& rhs);
+
+    /// Compound multiplication of a matrix and a scalar
+    Matrix3D& operator*=(double rhs);
+
+    /// Compound division of a matrix by a scalar
+    Matrix3D& operator/=(double rhs);
 };
 
 /// Compare two matrix for equality using float equality on all components
@@ -195,7 +253,7 @@ inline Matrix3D operator-(const Matrix3D& lhs) {
     return res;
 }
 
-/// Addition of two matrix
+/// Addition of two matrices
 inline Matrix3D operator+(const Matrix3D& lhs, const Matrix3D& rhs) {
     Matrix3D res;
     res[0][0] = lhs[0][0] + rhs[0][0];
@@ -212,7 +270,7 @@ inline Matrix3D operator+(const Matrix3D& lhs, const Matrix3D& rhs) {
     return res;
 }
 
-/// Subtraction of two matrix
+/// Subtraction of two matrices
 inline Matrix3D operator-(const Matrix3D& lhs, const Matrix3D& rhs) {
     Matrix3D res;
     res[0][0] = lhs[0][0] - rhs[0][0];
@@ -238,7 +296,7 @@ inline Vector3D operator*(const Matrix3D& lhs, const Vector3D& rhs) {
     };
 }
 
-/// Multiplication of two matrix
+/// Multiplication of two matrices
 inline Matrix3D operator*(const Matrix3D& lhs, const Matrix3D& rhs) {
     Matrix3D res;
     res[0][0] = lhs[0][0] * rhs[0][0] + lhs[0][1] * rhs[1][0] + lhs[0][2] * rhs[2][0];
@@ -327,6 +385,70 @@ inline Matrix3D Matrix3D::invert() const {
     res[2][1] = ((*this)[2][0] * (*this)[0][1] - (*this)[0][0] * (*this)[2][1]) * invdet;
     res[2][2] = ((*this)[0][0] * (*this)[1][1] - (*this)[1][0] * (*this)[0][1]) * invdet;
     return res;
+}
+
+inline Matrix3D& Matrix3D::operator+=(const Matrix3D& rhs) {
+    (*this)[0][0] += rhs[0][0];
+    (*this)[1][0] += rhs[1][0];
+    (*this)[2][0] += rhs[2][0];
+
+    (*this)[0][1] += rhs[0][1];
+    (*this)[1][1] += rhs[1][1];
+    (*this)[2][1] += rhs[2][1];
+
+    (*this)[0][2] += rhs[0][2];
+    (*this)[1][2] += rhs[1][2];
+    (*this)[2][2] += rhs[2][2];
+
+    return *this;
+}
+
+inline Matrix3D& Matrix3D::operator-=(const Matrix3D& rhs) {
+    (*this)[0][0] -= rhs[0][0];
+    (*this)[1][0] -= rhs[1][0];
+    (*this)[2][0] -= rhs[2][0];
+
+    (*this)[0][1] -= rhs[0][1];
+    (*this)[1][1] -= rhs[1][1];
+    (*this)[2][1] -= rhs[2][1];
+
+    (*this)[0][2] -= rhs[0][2];
+    (*this)[1][2] -= rhs[1][2];
+    (*this)[2][2] -= rhs[2][2];
+
+    return *this;
+}
+
+inline Matrix3D& Matrix3D::operator*=(double rhs) {
+    (*this)[0][0] *= rhs;
+    (*this)[1][0] *= rhs;
+    (*this)[2][0] *= rhs;
+
+    (*this)[0][1] *= rhs;
+    (*this)[1][1] *= rhs;
+    (*this)[2][1] *= rhs;
+
+    (*this)[0][2] *= rhs;
+    (*this)[1][2] *= rhs;
+    (*this)[2][2] *= rhs;
+
+    return *this;
+}
+
+inline Matrix3D& Matrix3D::operator/=(double rhs) {
+    (*this)[0][0] /= rhs;
+    (*this)[1][0] /= rhs;
+    (*this)[2][0] /= rhs;
+
+    (*this)[0][1] /= rhs;
+    (*this)[1][1] /= rhs;
+    (*this)[2][1] /= rhs;
+
+    (*this)[0][2] /= rhs;
+    (*this)[1][2] /= rhs;
+    (*this)[2][2] /= rhs;
+
+    return *this;
 }
 
 } // namespace chemfiles

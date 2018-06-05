@@ -20,6 +20,18 @@ TEST_CASE("Vector3d"){
     CHECK((v * 4.75) == (4.75 * v));
 
     CHECK((-v) == Vector3D(21.0, -15.0, -23.5));
+
+    CHECK((v += u) == Vector3D(-20.0, 16.0, 24.5));
+    CHECK(v == Vector3D(-20.0, 16.0, 24.5));
+
+    CHECK((v -= u) ==  Vector3D(-21.0, 15.0, 23.5));
+    CHECK(v ==  Vector3D(-21.0, 15.0, 23.5));
+
+    CHECK((u *= 3) == Vector3D(3.0, 3.0, 3.0));
+    CHECK(u == Vector3D(3.0, 3.0, 3.0));
+
+    CHECK((u /= 3) == Vector3D(1.0, 1.0, 1.0));
+    CHECK(u == Vector3D(1.0, 1.0, 1.0));
 }
 
 TEST_CASE("Geometry"){
@@ -109,6 +121,11 @@ TEST_CASE("Matrix3"){
         CHECK((C + A) == D);
         CHECK((A - C) == E);
         CHECK((C - A) == (-E));
+
+        CHECK((A += C) == D);
+        CHECK(A == D);
+        CHECK((A -= (C + C)) == E);
+        CHECK(A == E);
     }
 
     SECTION("Matrix-Scalar Multiplication and Division") {
@@ -136,6 +153,11 @@ TEST_CASE("Matrix3"){
         CHECK(A * 2 == C);
         CHECK(2 * A == C);
         CHECK(A / 2 == D);
+
+        CHECK((A *= 2) == C);
+        CHECK(A == C);
+        CHECK((A /= 4) == D);
+        CHECK(A == D);
     }
 
     SECTION("Matrix-Matrix Multiplications") {
