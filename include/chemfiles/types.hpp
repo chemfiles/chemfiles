@@ -83,6 +83,11 @@ inline bool operator!=(const Vector3D& lhs, const Vector3D& rhs) {
     return !(lhs == rhs);
 }
 
+/// Negate vector
+inline Vector3D operator-(const Vector3D& lhs) {
+    return {-lhs[0], -lhs[1], -lhs[2]};
+}
+
 /// Add two vectors
 inline Vector3D operator+(const Vector3D& lhs, const Vector3D& rhs) {
     return {lhs[0] + rhs[0], lhs[1] + rhs[1], lhs[2] + rhs[2]};
@@ -173,6 +178,57 @@ inline bool operator!=(const Matrix3D& lhs, const Matrix3D& rhs) {
     return !(lhs == rhs);
 }
 
+/// Negate matrix
+inline Matrix3D operator-(const Matrix3D& lhs) {
+    Matrix3D res;
+    res[0][0] = -lhs[0][0];
+    res[1][0] = -lhs[1][0];
+    res[2][0] = -lhs[2][0];
+
+    res[0][1] = -lhs[0][1];
+    res[1][1] = -lhs[1][1];
+    res[2][1] = -lhs[2][1];
+
+    res[0][2] = -lhs[0][2];
+    res[1][2] = -lhs[1][2];
+    res[2][2] = -lhs[2][2];
+    return res;
+}
+
+/// Addition of two matrix
+inline Matrix3D operator+(const Matrix3D& lhs, const Matrix3D& rhs) {
+    Matrix3D res;
+    res[0][0] = lhs[0][0] + rhs[0][0];
+    res[1][0] = lhs[1][0] + rhs[1][0];
+    res[2][0] = lhs[2][0] + rhs[2][0];
+
+    res[0][1] = lhs[0][1] + rhs[0][1];
+    res[1][1] = lhs[1][1] + rhs[1][1];
+    res[2][1] = lhs[2][1] + rhs[2][1];
+
+    res[0][2] = lhs[0][2] + rhs[0][2];
+    res[1][2] = lhs[1][2] + rhs[1][2];
+    res[2][2] = lhs[2][2] + rhs[2][2];
+    return res;
+}
+
+/// Subtraction of two matrix
+inline Matrix3D operator-(const Matrix3D& lhs, const Matrix3D& rhs) {
+    Matrix3D res;
+    res[0][0] = lhs[0][0] - rhs[0][0];
+    res[1][0] = lhs[1][0] - rhs[1][0];
+    res[2][0] = lhs[2][0] - rhs[2][0];
+
+    res[0][1] = lhs[0][1] - rhs[0][1];
+    res[1][1] = lhs[1][1] - rhs[1][1];
+    res[2][1] = lhs[2][1] - rhs[2][1];
+
+    res[0][2] = lhs[0][2] - rhs[0][2];
+    res[1][2] = lhs[1][2] - rhs[1][2];
+    res[2][2] = lhs[2][2] - rhs[2][2];
+    return res;
+}
+
 /// Multiplication of a vector by a matrix
 inline Vector3D operator*(const Matrix3D& lhs, const Vector3D& rhs) {
     return {
@@ -196,6 +252,57 @@ inline Matrix3D operator*(const Matrix3D& lhs, const Matrix3D& rhs) {
     res[0][2] = lhs[0][0] * rhs[0][2] + lhs[0][1] * rhs[1][2] + lhs[0][2] * rhs[2][2];
     res[1][2] = lhs[1][0] * rhs[0][2] + lhs[1][1] * rhs[1][2] + lhs[1][2] * rhs[2][2];
     res[2][2] = lhs[2][0] * rhs[0][2] + lhs[2][1] * rhs[1][2] + lhs[2][2] * rhs[2][2];
+    return res;
+}
+
+/// Multiplication of a matrix and a scalar on the left
+inline Matrix3D operator*(const Matrix3D& lhs, double rhs) {
+    Matrix3D res;
+    res[0][0] = lhs[0][0] * rhs;
+    res[1][0] = lhs[1][0] * rhs;
+    res[2][0] = lhs[2][0] * rhs;
+
+    res[0][1] = lhs[0][1] * rhs;
+    res[1][1] = lhs[1][1] * rhs;
+    res[2][1] = lhs[2][1] * rhs;
+
+    res[0][2] = lhs[0][2] * rhs;
+    res[1][2] = lhs[1][2] * rhs;
+    res[2][2] = lhs[2][2] * rhs;
+    return res;
+}
+
+/// Multiplication of a matrix and a scalar on the right
+inline Matrix3D operator*(double lhs, const Matrix3D& rhs) {
+    Matrix3D res;
+    res[0][0] = rhs[0][0] * lhs;
+    res[1][0] = rhs[1][0] * lhs;
+    res[2][0] = rhs[2][0] * lhs;
+
+    res[0][1] = rhs[0][1] * lhs;
+    res[1][1] = rhs[1][1] * lhs;
+    res[2][1] = rhs[2][1] * lhs;
+
+    res[0][2] = rhs[0][2] * lhs;
+    res[1][2] = rhs[1][2] * lhs;
+    res[2][2] = rhs[2][2] * lhs;
+    return res;
+}
+
+/// Division of a matrix and a scalar
+inline Matrix3D operator/(const Matrix3D& lhs, double rhs) {
+    Matrix3D res;
+    res[0][0] = lhs[0][0] / rhs;
+    res[1][0] = lhs[1][0] / rhs;
+    res[2][0] = lhs[2][0] / rhs;
+
+    res[0][1] = lhs[0][1] / rhs;
+    res[1][1] = lhs[1][1] / rhs;
+    res[2][1] = lhs[2][1] / rhs;
+
+    res[0][2] = lhs[0][2] / rhs;
+    res[1][2] = lhs[1][2] / rhs;
+    res[2][2] = lhs[2][2] / rhs;
     return res;
 }
 
