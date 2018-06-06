@@ -63,6 +63,10 @@ function(chfl_define_test _name_)
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 
+    set_tests_properties(${_name_}
+        PROPERTIES ENVIRONMENT "CHFL_TEST_RUNNER=${CHFL_TEST_RUNNER}"
+    )
+
     if(WIN32)
         # We need to set the path to allow access to chemfiles.dll
         # (and any other DLL)

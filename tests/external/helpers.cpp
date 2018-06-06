@@ -61,6 +61,12 @@ bool approx_eq(double a, double b, double tolerance) {
     return (a - b) < tolerance;
 }
 
+bool is_valgrind_and_travis() {
+    auto travis = std::getenv("TRAVIS");
+    auto test_runner = std::getenv("CHFL_TEST_RUNNER");
+    return (travis && test_runner && std::string(test_runner) == "valgrind");
+}
+
 NamedTempPath::NamedTempPath(std::string extension) {
     // Maybe operator overloading have been too far?
     auto path = fs::temp_directory_path() / fs::unique_path();
