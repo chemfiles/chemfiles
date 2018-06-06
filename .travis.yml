@@ -1,6 +1,11 @@
 language: cpp
 sudo: false
 
+branches:
+  only:
+    - master
+    - /^release-.*$/
+
 linux64_addons:
     addons: &linux64
       apt:
