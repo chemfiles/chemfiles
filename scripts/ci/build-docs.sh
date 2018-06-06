@@ -22,7 +22,9 @@ rm -rf gh-pages/deployed*
 cmake -DCHFL_BUILD_DOCUMENTATION=ON .
 cmake --build . --target doc_html
 rm -rf doc/html/.doctrees/ doc/html/.buildinfo
-rm -rf doc/html/_static/bootswatch-* doc/html/_static/bootstrap-2.3.2/
+rm -rf doc/html/_static/bootswatch-2.3.2/ doc/html/_static/bootstrap-2.3.2/
+shopt -s extglob
+cd doc/html/_static/bootswatch-* && rm -rf !(flatly) && cd -
 
 # Copy documentation to the right place
 if [[ "$TRAVIS_TAG" != "" ]]; then
