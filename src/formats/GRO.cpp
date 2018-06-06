@@ -74,6 +74,13 @@ void GROFormat::read(Frame& frame) {
     frame.resize(0);
 
     for (const auto& line: file_->readlines(natoms)) {
+
+        if (line.length() < 44) {
+            throw format_error(
+                "GRO Atom line is too small: '{}'", line
+            );
+        }
+
         auto resid = std::stoul(line.substr(0,5));
 
         std::string resname = line.substr(5, 5);
@@ -81,14 +88,14 @@ void GROFormat::read(Frame& frame) {
         std::string atomname= line.substr(10,5);
 
         // GRO files store atoms in NM, we need to convert to Angstroms
-        auto x = std::stof(line.substr(20,8)) * 10;
-        auto y = std::stof(line.substr(28,8)) * 10;
-        auto z = std::stof(line.substr(36,8)) * 10;
+        auto x = string2double(line.substr(20,8)) * 10;
+        auto y = string2double(line.substr(28,8)) * 10;
+        auto z = string2double(line.substr(36,8)) * 10;
 
-        if (line.length() > 44) {
-            auto vx = std::stof(line.substr(44,8)) * 10;
-            auto vy = std::stof(line.substr(52,8)) * 10;
-            auto vz = std::stof(line.substr(60,8)) * 10;
+        if (line.length() >= 68) {
+            auto vx = string2double(line.substr(44,8)) * 10;
+            auto vy = string2double(line.substr(52,8)) * 10;
+            auto vz = string2double(line.substr(60,8)) * 10;
 
             frame.add_atom(Atom(trim(atomname)),
                 Vector3D(x, y, z),
@@ -122,28 +129,26 @@ void GROFormat::read(Frame& frame) {
 
     if (box_values.size() == 3) {
 
-        auto a = std::stof(box_values[0]) * 10;
-        auto b = std::stof(box_values[1]) * 10;
-        auto c = std::stof(box_values[2]) * 10;
+        auto a = string2double(box_values[0]) * 10;
+        auto b = string2double(box_values[1]) * 10;
+        auto c = string2double(box_values[2]) * 10;
 
         auto cell = UnitCell(a, b, c);
         frame.set_cell(cell);
-    }
+    } else if (box_values.size() == 9) {
+        auto v1_x = string2double(box_values[0]) * 10;
+        auto v2_y = string2double(box_values[1]) * 10;
+        auto v3_z = string2double(box_values[2]) * 10;
 
-    if (box_values.size() == 9) {
-        auto v1_x = std::stof(box_values[0]) * 10;
-        auto v2_y = std::stof(box_values[1]) * 10;
-        auto v3_z = std::stof(box_values[2]) * 10;
+        assert(string2double(box_values[3]) == 0);
+        assert(string2double(box_values[4]) == 0);
 
-        assert(std::stof(box_values[3]) == 0);
-        assert(std::stof(box_values[4]) == 0);
+        auto v2_x = string2double(box_values[5]) * 10;
 
-        auto v2_x = std::stof(box_values[5]) * 10;
+        assert(string2double(box_values[6]) == 0);
 
-        assert(std::stof(box_values[6]) == 0);
-
-        auto v3_x = std::stof(box_values[7]) * 10;
-        auto v3_y = std::stof(box_values[8]) * 10;
+        auto v3_x = string2double(box_values[7]) * 10;
+        auto v3_y = string2double(box_values[8]) * 10;
 
         auto H = Matrix3D(
             v1_x, v2_x, v3_x,
@@ -161,9 +166,7 @@ void GROFormat::read(Frame& frame) {
 }
 
 static std::string to_gro_index(uint64_t i) {
-    auto id = i + 1;
-
-    if (id >= 100000) {
+    if (i + 1 >= 100000) {
         warning("Too many atoms for GRO format, removing atomic id");
         return "*****";
     } else {
@@ -172,7 +175,7 @@ static std::string to_gro_index(uint64_t i) {
 }
 
 void GROFormat::write(const Frame& frame) {
-    if (frame.get("name")) {
+    if (frame.get("name") && frame.get("name")->get_kind() == Property::STRING) {
         fmt::print(*file_, frame.get("name")->as_string() + "\n");
     } else {
         fmt::print(*file_, "GRO File produced by chemfiles\n");
@@ -297,7 +300,7 @@ bool forward(TextFile& file) {
         // Skip the comment line
         file.readline();
         auto line = file.readline();
-        natoms = std::stoll(line);
+        natoms = string2longlong(line);
     } catch (const FileError&) {
         // No more line left in the file
         return false;

@@ -122,7 +122,17 @@ TEST_CASE("Read files in Gromacs .gro format"){
         CHECK(residue.contains(1));
         CHECK(residue.contains(2));
     }
+/* I will finish this in a different PR that may address more errors than these
+    SECTION("Error checking") {
+        Trajectory file("data/gro/length_errors.gro");
+        CHECK_THROWS_AS(file.read(), FormatError);
 
+        auto frame = file.read_step(1);
+        auto velocities = *frame.velocities();
+        CHECK(approx_eq(velocities[0], Vector3D(-0.161, -1.380, -3.884)));
+        CHECK(approx_eq(velocities[1], Vector3D(0, 0, 0)));
+    }
+*/
 }
 
 TEST_CASE("Write files in GRO format") {
