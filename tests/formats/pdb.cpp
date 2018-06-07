@@ -2,6 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <fstream>
+#include <cstdlib>
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
@@ -161,15 +162,9 @@ TEST_CASE("Read files in PDB format") {
         auto frame = Trajectory("data/pdb/2hkb.pdb").read();
         auto topo = frame.topology();
 
-        CHECK( topo.are_linked(topo.residue(3), topo.residue(4)));
+        CHECK(topo.are_linked(topo.residue(3), topo.residue(4)));
         CHECK(!topo.are_linked(topo.residue(3), topo.residue(5)));
         CHECK(topo.bonds().size() == 815);
-
-        //frame.guess_topology();
-        //auto topo2 = frame.topology();
-        //CHECK( topo2.are_linked(topo2.residue(3), topo2.residue(4)));
-        //CHECK(!topo2.are_linked(topo2.residue(3), topo2.residue(5)));
-        //CHECK(topo2.bonds().size() == 815);
     }
 }
 
@@ -343,17 +338,19 @@ TEST_CASE("PDB files with big values") {
     }
 
     SECTION("CONNECT with too many atoms") {
-        auto tmpfile = NamedTempPath(".pdb");
+        if (!is_valgrind_and_travis()) {
+            auto tmpfile = NamedTempPath(".pdb");
 
-        auto frame = Frame();
-        for(size_t i=0; i<110000; i++) {
-            frame.add_atom(Atom("A"), {0.0, 0.0, 0.0});
+            auto frame = Frame();
+            for(size_t i=0; i<110000; i++) {
+                frame.add_atom(Atom("A"), {0.0, 0.0, 0.0});
+            }
+            frame.add_bond(101000, 101008);
+            Trajectory(tmpfile, 'w').write(frame);
+
+            // Re-read the file we just wrote
+            frame = Trajectory(tmpfile, 'r').read();
+            CHECK(frame.topology().bonds().empty());
         }
-        frame.add_bond(101000, 101008);
-        Trajectory(tmpfile, 'w').write(frame);
-
-        // Re-read the file we just wrote
-        frame = Trajectory(tmpfile, 'r').read();
-        CHECK(frame.topology().bonds().empty());
     }
 }

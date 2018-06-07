@@ -38,8 +38,7 @@ set_property(CACHE CHFL_TEST_RUNNER PROPERTY STRINGS none valgrind wine node)
 if(${CHFL_TEST_RUNNER} STREQUAL "valgrind")
     set(
         RUNNER_COMMAND
-        "valgrind" "--leak-check=full" "--dsymutil=yes" "--track-origins=yes"
-        "--error-exitcode=125"
+        "valgrind" "--leak-check=full" "--dsymutil=yes" "--error-exitcode=125"
         "--suppressions=${CMAKE_CURRENT_SOURCE_DIR}/valgrind.supp"
     )
 elseif(${CHFL_TEST_RUNNER} STREQUAL "wine")
@@ -61,6 +60,10 @@ function(chfl_define_test _name_)
     add_test(NAME ${_name_}
         COMMAND ${RUNNER_COMMAND} ./${_name_}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+
+    set_tests_properties(${_name_}
+        PROPERTIES ENVIRONMENT "CHFL_TEST_RUNNER=${CHFL_TEST_RUNNER}"
     )
 
     if(WIN32)

@@ -224,7 +224,7 @@ TEST_CASE("GRO files with big values") {
         frame.resize(1);
         frame.set_cell(UnitCell(1234567890));
         CHECK_THROWS_AS(trajectory.write(frame), FormatError);
-        
+
         frame.set_cell(UnitCell(12,12,12345678900, 120, 90, 90));
         CHECK_THROWS_AS(trajectory.write(frame), FormatError);
     }
@@ -246,58 +246,62 @@ TEST_CASE("GRO files with big values") {
     }
 
     SECTION("Atom counts") {
-        auto tmpfile = NamedTempPath(".gro");
+        if (!is_valgrind_and_travis()) {
+            auto tmpfile = NamedTempPath(".gro");
 
-        Topology topology;
-        for(size_t i=0; i<100001; i++) {
-            topology.add_atom(Atom("A"));
+            Topology topology;
+            for(size_t i=0; i<100001; i++) {
+                topology.add_atom(Atom("A"));
+            }
+            Frame frame(topology);
+            auto positions = frame.positions();
+            positions[9998] = Vector3D(1., 2., 3.);
+            positions[99998] = Vector3D(4., 5., 6.);
+            positions[99999] = Vector3D(7., 8., 9.);
+
+            Trajectory(tmpfile, 'w').write(frame);
+
+            // Re-read the file we just wrote
+            frame = Trajectory(tmpfile, 'r').read();
+            positions = frame.positions();
+
+            // If resSeq is has more than 5 characters, coordinates won't be read
+            // correctly
+            CHECK(approx_eq(positions[9998], Vector3D(1., 2., 3.), 1e-5));
+            CHECK(approx_eq(positions[99998],Vector3D(4., 5., 6.), 1e-5));
+            CHECK(approx_eq(positions[99999],Vector3D(7., 8., 9.), 1e-5));
         }
-        Frame frame(topology);
-        auto positions = frame.positions();
-        positions[9998] = Vector3D(1., 2., 3.);
-        positions[99998] = Vector3D(4., 5., 6.);
-        positions[99999] = Vector3D(7., 8., 9.);
-
-        Trajectory(tmpfile, 'w').write(frame);
-
-        // Re-read the file we just wrote
-        frame = Trajectory(tmpfile, 'r').read();
-        positions = frame.positions();
-
-        // If resSeq is has more than 5 characters, coordinates won't be read
-        // correctly
-        CHECK(approx_eq(positions[9998], Vector3D(1., 2., 3.), 1e-5));
-        CHECK(approx_eq(positions[99998],Vector3D(4., 5., 6.), 1e-5));
-        CHECK(approx_eq(positions[99999],Vector3D(7., 8., 9.), 1e-5));
     }
 
     SECTION("User specified residues") {
-        auto tmpfile = NamedTempPath(".gro");
+        if (!is_valgrind_and_travis()) {
+            auto tmpfile = NamedTempPath(".gro");
 
-        Topology topology;
-        for(size_t i=0; i<100001; i++) {
-            Atom atom("A");
-            topology.add_atom(atom);
-            Residue residue("ANA", i + 1);
-            residue.add_atom(i);
-            topology.add_residue(residue);
+            Topology topology;
+            for(size_t i=0; i<100001; i++) {
+                Atom atom("A");
+                topology.add_atom(atom);
+                Residue residue("ANA", i + 1);
+                residue.add_atom(i);
+                topology.add_residue(residue);
+            }
+            Frame frame(topology);
+            auto positions = frame.positions();
+            positions[9998] = Vector3D(1., 2., 3.);
+            positions[99998] = Vector3D(4., 5., 6.);
+            positions[99999] = Vector3D(7., 8., 9.);
+
+            Trajectory(tmpfile, 'w').write(frame);
+
+            // Re-read the file we just wrote
+            frame = Trajectory(tmpfile, 'r').read();
+            positions = frame.positions();
+
+            // If resSeq is has more than 5 characters, coordinates won't be read
+            // correctly
+            CHECK(approx_eq(positions[9998], Vector3D(1., 2., 3.), 1e-5));
+            CHECK(approx_eq(positions[99998],Vector3D(4., 5., 6.), 1e-5));
+            CHECK(approx_eq(positions[99999],Vector3D(7., 8., 9.), 1e-5));
         }
-        Frame frame(topology);
-        auto positions = frame.positions();
-        positions[9998] = Vector3D(1., 2., 3.);
-        positions[99998] = Vector3D(4., 5., 6.);
-        positions[99999] = Vector3D(7., 8., 9.);
-
-        Trajectory(tmpfile, 'w').write(frame);
-
-        // Re-read the file we just wrote
-        frame = Trajectory(tmpfile, 'r').read();
-        positions = frame.positions();
-
-        // If resSeq is has more than 5 characters, coordinates won't be read
-        // correctly
-        CHECK(approx_eq(positions[9998], Vector3D(1., 2., 3.), 1e-5));
-        CHECK(approx_eq(positions[99998],Vector3D(4., 5., 6.), 1e-5));
-        CHECK(approx_eq(positions[99999],Vector3D(7., 8., 9.), 1e-5));
     }
 }

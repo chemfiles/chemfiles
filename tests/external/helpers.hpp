@@ -15,6 +15,9 @@ bool approx_eq(const chemfiles::Vector3D& lhs, const chemfiles::Vector3D& rhs, d
 bool approx_eq(const chemfiles::Matrix3D& lhs, const chemfiles::Matrix3D& rhs, double tolerance=1e-15);
 bool approx_eq(double a, double b, double tolerance=1e-15);
 
+// Check if the current test is running under both valgrind and Travis
+bool is_valgrind_and_travis();
+
 /// A temporary file path with an user specified extension, automatically
 /// deleted at scope exit.
 class NamedTempPath {
