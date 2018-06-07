@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include "chemfiles/files/BasicFile.hpp"
+#include "chemfiles/files/PlainFile.hpp"
 #include "chemfiles/files/GzFile.hpp"
 #include "chemfiles/files/XzFile.hpp"
 #include "chemfiles/ErrorFmt.hpp"
@@ -25,7 +25,7 @@ std::unique_ptr<TextFile> TextFile::create(const std::string& path, File::Mode m
     } else if (ext == ".xz") {
         return std::unique_ptr<TextFile>(new XzFile(path, mode));
     } else {
-        return std::unique_ptr<TextFile>(new BasicFile(path, mode));
+        return std::unique_ptr<TextFile>(new PlainFile(path, mode));
     }
 }
 

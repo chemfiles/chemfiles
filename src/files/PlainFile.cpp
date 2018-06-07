@@ -3,11 +3,11 @@
 
 #include <algorithm>
 
-#include "chemfiles/files/BasicFile.hpp"
+#include "chemfiles/files/PlainFile.hpp"
 #include "chemfiles/ErrorFmt.hpp"
 using namespace chemfiles;
 
-BasicFile::BasicFile(const std::string& filename, File::Mode mode)
+PlainFile::PlainFile(const std::string& filename, File::Mode mode)
     : TextFile(filename, mode, &buffer_), buffer_() {
     // We need to use binary mode when opening the file because we are storing
     // positions in the files relative to line ending positions. Using text
