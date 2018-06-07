@@ -154,7 +154,7 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/molfiles/include)
 # ==========
 # Plugins with a chemfiles specific implementation
 # ==========
-#     xyzplugin pdbplugin tngplugin netcdfplugin
+#     xyzplugin pdbplugin tngplugin netcdfplugin gromacsplugin (.gro only)
 
 # ==========
 # These plugins do not compile or link

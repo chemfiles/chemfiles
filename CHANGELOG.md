@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+* GROMACS .gro files now supported through custom implementation.
 * Properties are now supported in the `Residue` class. They are accessed using
   `Residue::set` and `Residue::get`.
 * The topology of residues is now automatically set using a lookup table for the

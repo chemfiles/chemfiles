@@ -29,7 +29,6 @@ using namespace chemfiles;
 
 namespace chemfiles {
     PLUGINS_DATA(DCD,               dcdplugin,          dcd,            false);
-    PLUGINS_DATA(GRO,               gromacsplugin,      gro,            false);
     PLUGINS_DATA(TRR,               gromacsplugin,      trr,            false);
     PLUGINS_DATA(XTC,               gromacsplugin,      xtc,            false);
     PLUGINS_DATA(TRJ,               gromacsplugin,      trj,            false);
@@ -294,7 +293,6 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
 
 // Instanciate all the templates
 template class chemfiles::Molfile<DCD>;
-template class chemfiles::Molfile<GRO>;
 template class chemfiles::Molfile<TRR>;
 template class chemfiles::Molfile<XTC>;
 template class chemfiles::Molfile<TRJ>;
@@ -305,12 +303,6 @@ template class chemfiles::Molfile<MOLDEN>;
 template<> FormatInfo chemfiles::format_information<Molfile<DCD>>() {
     return FormatInfo("DCD").with_extension(".dcd").description(
         "DCD binary format"
-    );
-}
-
-template<> FormatInfo chemfiles::format_information<Molfile<GRO>>() {
-    return FormatInfo("GRO").with_extension(".gro").description(
-        "GROMACS .gro text format"
     );
 }
 

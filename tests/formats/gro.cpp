@@ -1,0 +1,303 @@
+// Chemfiles, a modern library for chemistry file reading and writing
+// Copyright (C) Guillaume Fraux and contributors -- BSD license
+
+#include "catch.hpp"
+#include "helpers.hpp"
+#include "chemfiles.hpp"
+#include <fstream>
+using namespace chemfiles;
+
+TEST_CASE("Read files in Gromacs .gro format"){
+    SECTION("Simple GRO File") {
+        Trajectory file("data/gro/ubiquitin.gro");
+        CHECK(file.nsteps() == 1);
+        Frame frame = file.read();
+
+        CHECK(frame.size() == 1405);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(24.93, 24.95, 18.87), 1e-2));
+        CHECK(approx_eq(positions[1], Vector3D(25.66, 25.37, 18.33), 1e-2));
+        CHECK(approx_eq(positions[678], Vector3D(27.57, 32.25, 37.53), 1e-2));
+
+        CHECK(frame[0].name() == "N");
+        CHECK(frame[1].name() == "H1");
+        CHECK(frame[678].name() == "O");
+
+        CHECK(frame.topology().residues().size() == 134);
+        CHECK(frame.topology().residues()[0].name() == "MET");
+        CHECK(frame.topology().residues()[75].name() == "GLY");
+
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(approx_eq(cell.a(), 55.68, 1e-2));
+        CHECK(approx_eq(cell.b(), 58.87, 1e-2));
+        CHECK(approx_eq(cell.c(), 62.57, 1e-2));
+    }
+
+    SECTION("Triclinic Box") {
+        Trajectory file("data/gro/cod_4020641.gro");
+        Frame frame = file.read();
+
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::TRICLINIC);
+        CHECK(approx_eq(cell.a(), 26.2553, 1e-2));
+        CHECK(approx_eq(cell.b(), 11.3176, 1e-2));
+        CHECK(approx_eq(cell.c(), 11.8892, 1e-2));
+        CHECK(approx_eq(cell.alpha(), 90.0, 1e-2));
+        CHECK(approx_eq(cell.beta(), 112.159, 1e-2));
+        CHECK(approx_eq(cell.gamma(), 90.0, 1e-2));
+    }
+
+    SECTION("Read next step") {
+        Trajectory file("data/gro/lysozyme.gro");
+        CHECK(file.nsteps() == 3);
+        Frame frame = file.read();
+
+        CHECK(*frame.get("name") == "LYSOZYME in water NVT");
+        CHECK(frame.size() == 1960);
+        auto positions = frame.positions();
+        auto velocities = *frame.velocities();
+
+        CHECK(approx_eq(positions[0], Vector3D(42.68, 32.61, 22.84), 1e-3));
+        CHECK(approx_eq(velocities[0],Vector3D(-00.161,-01.380,-03.884), 1e-3));
+
+        CHECK(approx_eq(positions[1526], Vector3D(27.04, 40.31, 46.51), 1e-3));
+        CHECK(approx_eq(velocities[1526],Vector3D(-1.993, -0.378, -4.302), 1e-3));
+
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(fabs(cell.a() - 70.1008) < 1e-5);
+
+        file.read(); // Skip a frame
+        frame = file.read();
+
+        CHECK(*frame.get("name") == "LYSOZYME in water MD");
+        CHECK(frame.size() == 1960);
+        positions = frame.positions();
+        CHECK(frame.velocities());
+        velocities = *frame.velocities();
+
+        CHECK(approx_eq(positions[0], Vector3D(35.96, 29.87, 20.63), 1e-3));
+        CHECK(approx_eq(velocities[0],Vector3D(3.320, 2.849, -2.494), 1e-3));
+
+        CHECK(approx_eq(positions[1526], Vector3D(29.47, 40.51, 47.43), 1e-3));
+        CHECK(approx_eq(velocities[1526],Vector3D(2.073, -0.941, -2.931), 1e-3));
+
+        cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(fabs(cell.b() - 69.7308) < 1e-5);
+    }
+
+    SECTION("Read a specific step") {
+        Trajectory file("data/gro/lysozyme.gro");
+
+        auto frame = file.read_step(1);
+
+        CHECK(frame.size() == 1960);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(42.25, 32.32, 22.45), 1e-4));
+        CHECK(approx_eq(positions[1526], Vector3D(26.98, 39.97, 46.18), 1e-3));
+
+        frame = file.read_step(0);
+        CHECK(frame.size() == 1960);
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(42.68, 32.61, 22.84), 1e-3));
+        CHECK(approx_eq(positions[1526], Vector3D(27.04, 40.31, 46.51), 1e-3));
+
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(fabs(cell.c() - 70.1008) < 1e-5);
+    }
+
+    SECTION("Read residue information") {
+        Trajectory file("data/gro/ubiquitin.gro");
+        Frame frame = file.read();
+
+        CHECK(frame.topology().residues().size() == 134);
+
+        REQUIRE(frame.topology().residue_for_atom(1));
+        auto residue = *frame.topology().residue_for_atom(1);
+        CHECK(residue.size() == 19);
+        CHECK(residue.contains(0));
+        CHECK(residue.contains(1));
+        CHECK(residue.contains(2));
+    }
+/* I will finish this in a different PR that may address more errors than these
+    SECTION("Error checking") {
+        Trajectory file("data/gro/length_errors.gro");
+        CHECK_THROWS_AS(file.read(), FormatError);
+
+        auto frame = file.read_step(1);
+        auto velocities = *frame.velocities();
+        CHECK(approx_eq(velocities[0], Vector3D(-0.161, -1.380, -3.884)));
+        CHECK(approx_eq(velocities[1], Vector3D(0, 0, 0)));
+    }
+*/
+}
+
+TEST_CASE("Write files in GRO format") {
+    auto tmpfile = NamedTempPath(".gro");
+    const auto EXPECTED_CONTENT =
+    "GRO File produced by chemfiles\n"
+    "    4\n"
+    "    1XXXXX    A    1   0.100   0.200   0.300\n"
+    "    2XXXXX    B    2   0.100   0.200   0.300\n"
+    "    3XXXXX    C    3   0.100   0.200   0.300\n"
+    "    4XXXXX    D    4   0.100   0.200   0.300\n"
+    "   2.20000   2.20000   2.20000\n"
+    "Second test\n"
+    "    7\n"
+    "    4XXXXX    A    1   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
+    "    3foo      B    2   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
+    "    3foo      C    3   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
+    "    5barba    D    4   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
+    "    6XXXXX    E    5   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
+    "    7XXXXX    F    6   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
+    "    8XXXXX    G    7   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
+    "   2.20000   1.90526   4.40000 0.0 0.0  -1.10000 0.0   0.00000   0.00000\n";
+
+    Topology topology;
+    topology.add_atom(Atom("A"));
+    topology.add_atom(Atom("B"));
+    topology.add_atom(Atom("C"));
+    topology.add_atom(Atom("D"));
+
+    Frame frame(topology);
+    frame.set_cell(UnitCell(22));
+
+    auto positions = frame.positions();
+    for(size_t i=0; i<4; i++) {
+        positions[i] = Vector3D(1, 2, 3);
+    }
+
+    auto file = Trajectory(tmpfile, 'w');
+
+    file.write(frame);
+
+    frame.resize(7);
+    frame.set("name", "Second test");
+    frame.set_cell(UnitCell(22, 22, 44, 90, 90, 120));
+
+    frame.add_velocities();
+    positions = frame.positions();
+    auto velocities = *(frame.velocities());
+    for(size_t i=0; i<7; i++) {
+        positions[i] = Vector3D(4, 5, 6);
+        velocities[i]= Vector3D(9, 10, 11);
+    }
+    topology.add_atom(Atom("E"));
+    topology.add_atom(Atom("F"));
+    topology.add_atom(Atom("G"));
+
+    Residue residue("foo", 3);
+    residue.add_atom(1);
+    residue.add_atom(2);
+    topology.add_residue(residue);
+
+    residue = Residue("barbar"); // This will be truncated in output
+    residue.add_atom(3);
+    topology.add_residue(residue);
+
+    frame.set_topology(topology);
+
+    file.write(frame);
+    file.close();
+
+    auto check_gro = Trajectory(tmpfile);
+    CHECK(check_gro.nsteps() == 2);
+    CHECK(check_gro.read().size() == 4);
+    CHECK(check_gro.read().size() == 7);
+    check_gro.close();
+
+    std::ifstream checking(tmpfile);
+    std::string content((std::istreambuf_iterator<char>(checking)),
+                         std::istreambuf_iterator<char>());
+    CHECK(content == EXPECTED_CONTENT);
+}
+
+TEST_CASE("GRO files with big values") {
+    SECTION("Unit cell") {
+        auto tmpfile = NamedTempPath(".gro");
+        auto trajectory = Trajectory(tmpfile, 'w');
+
+        auto frame = Frame();
+        frame.resize(1);
+        frame.set_cell(UnitCell(1234567890));
+        CHECK_THROWS_AS(trajectory.write(frame), FormatError);
+        
+        frame.set_cell(UnitCell(12,12,12345678900, 120, 90, 90));
+        CHECK_THROWS_AS(trajectory.write(frame), FormatError);
+    }
+
+    SECTION("Coordinates and velocity") {
+        auto tmpfile = NamedTempPath(".gro");
+        auto trajectory = Trajectory(tmpfile, 'w');
+
+        auto frame = Frame();
+        frame.resize(1);
+        frame.set_cell(UnitCell(12));
+        frame.positions()[0] = Vector3D(1234567890, 2, 3);
+        CHECK_THROWS_AS(trajectory.write(frame), FormatError);
+
+        frame.positions()[0] = Vector3D(1, 2, 3);
+        frame.add_velocities();
+        (*frame.velocities())[0] = Vector3D(1234567890, 2, 3);
+        CHECK_THROWS_AS(trajectory.write(frame), FormatError);
+    }
+
+    SECTION("Atom counts") {
+        auto tmpfile = NamedTempPath(".gro");
+
+        Topology topology;
+        for(size_t i=0; i<100001; i++) {
+            topology.add_atom(Atom("A"));
+        }
+        Frame frame(topology);
+        auto positions = frame.positions();
+        positions[9998] = Vector3D(1., 2., 3.);
+        positions[99998] = Vector3D(4., 5., 6.);
+        positions[99999] = Vector3D(7., 8., 9.);
+
+        Trajectory(tmpfile, 'w').write(frame);
+
+        // Re-read the file we just wrote
+        frame = Trajectory(tmpfile, 'r').read();
+        positions = frame.positions();
+
+        // If resSeq is has more than 5 characters, coordinates won't be read
+        // correctly
+        CHECK(approx_eq(positions[9998], Vector3D(1., 2., 3.), 1e-5));
+        CHECK(approx_eq(positions[99998],Vector3D(4., 5., 6.), 1e-5));
+        CHECK(approx_eq(positions[99999],Vector3D(7., 8., 9.), 1e-5));
+    }
+
+    SECTION("User specified residues") {
+        auto tmpfile = NamedTempPath(".gro");
+
+        Topology topology;
+        for(size_t i=0; i<100001; i++) {
+            Atom atom("A");
+            topology.add_atom(atom);
+            Residue residue("ANA", i + 1);
+            residue.add_atom(i);
+            topology.add_residue(residue);
+        }
+        Frame frame(topology);
+        auto positions = frame.positions();
+        positions[9998] = Vector3D(1., 2., 3.);
+        positions[99998] = Vector3D(4., 5., 6.);
+        positions[99999] = Vector3D(7., 8., 9.);
+
+        Trajectory(tmpfile, 'w').write(frame);
+
+        // Re-read the file we just wrote
+        frame = Trajectory(tmpfile, 'r').read();
+        positions = frame.positions();
+
+        // If resSeq is has more than 5 characters, coordinates won't be read
+        // correctly
+        CHECK(approx_eq(positions[9998], Vector3D(1., 2., 3.), 1e-5));
+        CHECK(approx_eq(positions[99998],Vector3D(4., 5., 6.), 1e-5));
+        CHECK(approx_eq(positions[99999],Vector3D(7., 8., 9.), 1e-5));
+    }
+}
