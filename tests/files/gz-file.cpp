@@ -43,8 +43,12 @@ TEST_CASE("Write a gz file") {
 
     std::ifstream verification(filename, std::ios::binary);
     REQUIRE(verification.is_open());
+    verification.seekg(0, std::ios::end);
+    auto size = static_cast<size_t>(verification.tellg());
+    verification.seekg(0, std::ios::beg);
 
-    auto content = std::vector<uint8_t>(std::istreambuf_iterator<char>(verification), std::istreambuf_iterator<char>());
+    auto content = std::vector<uint8_t>(size);
+    verification.read(reinterpret_cast<char*>(content.data()), static_cast<std::streamsize>(size));
 
     auto expected = std::vector<uint8_t>{
         0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
