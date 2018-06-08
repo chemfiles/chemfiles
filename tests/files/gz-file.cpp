@@ -41,20 +41,8 @@ TEST_CASE("Write a gz file") {
         file << 5467 << std::endl;
     }
 
-    std::ifstream verification(filename, std::ios::binary);
-    REQUIRE(verification.is_open());
-    verification.seekg(0, std::ios::end);
-    auto size = static_cast<size_t>(verification.tellg());
-    verification.seekg(0, std::ios::beg);
-
-    auto content = std::vector<uint8_t>(size);
-    verification.read(reinterpret_cast<char*>(content.data()), static_cast<std::streamsize>(size));
-
-    auto expected = std::vector<uint8_t>{
-        0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x03, 0x0b, 0x49, 0x2d, 0x2e, 0xe1, 0x32,
-        0x35, 0x31, 0x33, 0xe7, 0x02, 0x00, 0x8a, 0x43,
-        0x5e, 0x98, 0x0a, 0x00, 0x00, 0x00
-    };
-    CHECK(content == expected);
+    // GZip's header is OS dependant, so let's decompress and compare
+    GzFile file(filename, File::READ);
+    CHECK(file.readline() == "Test");
+    CHECK(file.readline() == "5467");
 }
