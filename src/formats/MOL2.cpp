@@ -51,7 +51,8 @@ void MOL2Format::read_step(const size_t step, Frame& frame) {
 }
 
 void MOL2Format::read(Frame& frame) {
-    assert(file_->readline().substr(0, 17) == "@<TRIPOS>MOLECULE");
+    const auto& startline= file_->readline();
+    assert(startline.substr(0, 17) == "@<TRIPOS>MOLECULE");
 
     frame.set("name", trim(file_->readline()) );
     const auto& line = file_->readline();
@@ -69,7 +70,7 @@ void MOL2Format::read(Frame& frame) {
     frame.resize(0);
     frame.reserve(static_cast<size_t>(natoms));
 
-    file_->readline();
+    auto junk = file_->readline();
     bool charges = (trim(file_->readline()) != "NO_CHARGES");
 
     while (!file_->eof()) {
