@@ -215,6 +215,82 @@ std::streampos forward(TextFile& file) {
 }
 
 void MOL2Format::write(const Frame& frame) {
+    fmt::print(*file_, "@<TRIPOS>MOLECULE\n");
+
+    if (frame.get("name") && frame.get("name")->get_kind() == Property::STRING) {
+        fmt::print(*file_, frame.get("name")->as_string());
+    }
+    fmt::print(*file_, "\n");
+
+    // Only use numbers bigger than the biggest residue id as "resSeq" for
+    // atoms without associated residue.
+    uint64_t max_resid = 0;
+    for (const auto& residue: frame.topology().residues()) {
+        auto resid = residue.id();
+        if (resid && resid.value() > max_resid) {
+            max_resid = resid.value();
+        }
+    }
+
+    auto bonds = std::vector<std::pair<size_t, size_t>>();
+    for (auto& bond : frame.topology().bonds()) {
+        bonds.push_back({bond[0], bond[1]});
+    }
+
+    // Basic format taken from VMD Molfiles
+    fmt::print(*file_, "{:4d}  {:4d}    1    0    0\n",
+        frame.size(), bonds.size()
+    );
+
+    fmt::print(*file_, "SMALL\nUSER_CHARGES\n\n@<TRIPOS>ATOM\n");
+
+    auto& positions = frame.positions();
+    for (size_t i = 0; i < frame.size(); i++) {
+
+        std::string resname;
+        std::string resid;
+
+        auto residue = frame.topology().residue_for_atom(i);
+        if (residue) {
+            resname = residue->name();
+
+            if (residue->id()) {
+                resid = std::to_string(residue->id().value());
+            } else {
+                resid = std::to_string(++max_resid);
+            }
+        } else {
+            resname = "XXX";
+            resid = std::to_string(++max_resid);
+        }
+
+        fmt::print(
+            *file_,
+            "{:4d} {:4s}  {:.6f} {:.6f} {:.6f} {:s} {} {} {:.6f}\n",
+            i + 1, frame[i].name(), positions[i][0], positions[i][1], positions[i][2], frame[i].type(), resid, resname, frame[i].charge()
+        );
+    }
+
+    fmt::print(*file_, "@<TRIPOS>BOND\n");
+
+    // TODO: Implement bond orders
+    for (size_t i = 0; i < bonds.size(); i++) {
+        fmt::print(*file_, "{:4d}  {:4d}  {:4d}    1\n",
+            i + 1, bonds[i].first + 1, bonds[i].second + 1
+        );
+    }
+
+    auto cell = frame.cell();
+    if (cell.shape() != UnitCell::INFINITE) {
+        fmt::print(*file_, "@<TRIPOS>CRYSIN\n");
+        fmt::print(*file_, "   {:.4f}   {:.4f}   {:.4f}   {:.4f}   {:.4f}   {:.4f} 1 1\n",
+            cell.a(), cell.b(), cell.c(), cell.alpha(), cell.beta(), cell.gamma()
+        );
+    }
+
+    fmt::print(*file_,"@<TRIPOS>SUBSTRUCTURE\n");
+    fmt::print(*file_,"   1 ****        1 TEMP                        ");
+    fmt::print(*file_,"0 ****  **** 0 ROOT\n\n");
 }
 
 MOL2Format::~MOL2Format() noexcept {

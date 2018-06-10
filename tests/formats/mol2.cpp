@@ -1,9 +1,12 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <fstream>
+
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
+
 using namespace chemfiles;
 
 static bool contains_bond(const Topology& topology, Bond bond) {
@@ -146,4 +149,109 @@ TEST_CASE("Read files in mol2 format") {
         CHECK(contains_bond(topology, {7, 35}));
         CHECK(contains_bond(topology, {13, 15}));
     }
+}
+
+TEST_CASE("Write files in mol2 format") {
+    auto tmpfile = NamedTempPath(".mol2");
+    const auto EXPECTED_CONTENT =
+    "@<TRIPOS>MOLECULE\n"
+    "\n"
+    "   4     1    1    0    0\n"
+    "SMALL\n"
+    "USER_CHARGES\n\n"
+    "@<TRIPOS>ATOM\n"
+    "   1 CCH22  1.000000 2.000000 3.000000 CCH22 1 XXX 0.000000\n"
+    "   2 B     1.123456 2.123457 10000000.123456 B 2 XXX 0.000000\n"
+    "   3 C     1.000000 2.000000 3.000000 C 3 XXX 0.000000\n"
+    "   4 D     1.000000 2.000000 3.000000 D 4 XXX 0.000000\n"
+    "@<TRIPOS>BOND\n"
+    "   1     1     2    1\n"
+    "@<TRIPOS>SUBSTRUCTURE\n"
+    "   1 ****        1 TEMP                        0 ****  **** 0 ROOT\n\n"
+    "@<TRIPOS>MOLECULE\n"
+    "test\n"
+    "   7     8    1    0    0\n"
+    "SMALL\n"
+    "USER_CHARGES\n\n"
+    "@<TRIPOS>ATOM\n"
+    "   1 CCH22  4.000000 5.000000 6.000000 CCH22 4 XXX 0.000000\n"
+    "   2 B     4.000000 5.000000 6.000000 B 3 foo 0.000000\n"
+    "   3 C     4.000000 5.000000 6.000000 C 3 foo 0.000000\n"
+    "   4 D     4.000000 5.000000 6.000000 D 5 barbar 0.000000\n"
+    "   5 E     4.000000 5.000000 6.000000 E 6 XXX 0.000000\n"
+    "   6 F     4.000000 5.000000 6.000000 F 7 XXX 0.000000\n"
+    "   7 G     4.000000 5.000000 6.000000 G 8 XXX 0.000000\n"
+    "@<TRIPOS>BOND\n"
+    "   1     1     2    1\n"
+    "   2     1     7    1\n"
+    "   3     2     7    1\n"
+    "   4     3     7    1\n"
+    "   5     4     7    1\n"
+    "   6     5     6    1\n"
+    "   7     5     7    1\n"
+    "   8     6     7    1\n"
+    "@<TRIPOS>CRYSIN\n"
+    "   22.0000   22.0000   22.0000   90.0000   90.0000   90.0000 1 1\n"
+    "@<TRIPOS>SUBSTRUCTURE\n"
+    "   1 ****        1 TEMP                        0 ****  **** 0 ROOT\n\n";
+
+    Topology topology;
+    topology.add_atom(Atom("CCH22"));
+    topology.add_atom(Atom("B"));
+    topology.add_atom(Atom("C"));
+    topology.add_atom(Atom("D"));
+    topology.add_bond(0, 1);
+    Frame frame(topology);
+
+    auto positions = frame.positions();
+    for(size_t i=0; i<4; i++) {
+        positions[i] = Vector3D(1, 2, 3);
+    }
+    positions[1] = Vector3D(1.123456, 2.123456789, 10000000.123456);
+
+    auto file = Trajectory(tmpfile, 'w');
+    file.write(frame);
+
+    frame.resize(7);
+    frame.set_cell(UnitCell(22));
+    frame.set("name", "test");
+    positions = frame.positions();
+    for(size_t i=0; i<7; i++) {
+        positions[i] = Vector3D(4, 5, 6);
+    }
+    topology.add_atom(Atom("E"));
+    topology.add_atom(Atom("F"));
+    topology.add_atom(Atom("G"));
+    topology.add_bond(4, 5);
+    topology.add_bond(0, 6);
+    topology.add_bond(1, 6);
+    topology.add_bond(2, 6);
+    topology.add_bond(3, 6);
+    topology.add_bond(4, 6);
+    topology.add_bond(5, 6);
+
+    Residue residue("foo", 3);
+    residue.add_atom(1);
+    residue.add_atom(2);
+    topology.add_residue(residue);
+
+    residue = Residue("barbar"); // This will be truncated in output
+    residue.add_atom(3);
+    topology.add_residue(residue);
+
+    frame.set_topology(topology);
+
+    file.write(frame);
+    file.close();
+
+    auto check_pdb = Trajectory(tmpfile);
+    CHECK(check_pdb.nsteps() == 2);
+    CHECK(check_pdb.read().size() == 4);
+    CHECK(check_pdb.read().size() == 7);
+    check_pdb.close();
+
+    std::ifstream checking(tmpfile);
+    std::string content((std::istreambuf_iterator<char>(checking)),
+                         std::istreambuf_iterator<char>());
+    CHECK(content == EXPECTED_CONTENT);
 }
