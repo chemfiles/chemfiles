@@ -130,7 +130,7 @@ mark_as_advanced(FORCE
 # VMD molfile: https://github.com/chemfiles/molfiles
 # ==========
 set(VMD_MOLFILE_PLUGINS
-    dcdplugin gromacsplugin lammpsplugin mol2plugin moldenplugin
+    dcdplugin gromacsplugin lammpsplugin moldenplugin
 )
 
 external_library(molfiles)
@@ -155,7 +155,7 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/molfiles/include)
 # ==========
 # Plugins with a chemfiles specific implementation
 # ==========
-#     xyzplugin pdbplugin tngplugin netcdfplugin gromacsplugin (.gro only)
+#     xyzplugin pdbplugin tngplugin netcdfplugin mol2plugin gromacsplugin (.gro only)
 
 # ==========
 # These plugins do not compile or link
