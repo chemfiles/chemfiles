@@ -97,13 +97,13 @@ Chemfiles can read and write files in the following formats:
 - BIOVIA SDF files;
 - SERC Daresbury Laboratory CSSR files;
 - GROMACS formats: .gro;
+- TRIPOS mol2 files;
 
 Chemfiles can also read but not (yet) write files in the following formats:
 - TNG;
 - LAMMPS trajectory;
 - GROMACS formats: .xtc; .trj; .trr;
 - CHARMM DCD files;
-- TRIPOS mol2 files;
 - Molden files;
 - MacroMolecular Transmission Format (MMTF) files;
 

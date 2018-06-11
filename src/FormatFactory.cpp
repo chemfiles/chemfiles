@@ -21,6 +21,7 @@
 #include "chemfiles/formats/MMTF.hpp"
 #include "chemfiles/formats/CSSR.hpp"
 #include "chemfiles/formats/GRO.hpp"
+#include "chemfiles/formats/MOL2.hpp"
 
 using namespace chemfiles;
 
@@ -46,13 +47,13 @@ FormatFactory::FormatFactory() {
     this->add_format<SDFFormat>();
     this->add_format<CSSRFormat>();
     this->add_format<GROFormat>();
+    this->add_format<MOL2Format>();
 
     // VMD molfile plugins
     this->add_format<Molfile<DCD>>();
     this->add_format<Molfile<TRR>>();
     this->add_format<Molfile<XTC>>();
     this->add_format<Molfile<TRJ>>();
-    this->add_format<Molfile<MOL2>>();
     this->add_format<Molfile<LAMMPS>>();
     this->add_format<Molfile<MOLDEN>>();
 
