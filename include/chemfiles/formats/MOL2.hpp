@@ -4,7 +4,7 @@
 #ifndef CHEMFILES_FORMAT_MOL2_HPP
 #define CHEMFILES_FORMAT_MOL2_HPP
 
-#include <map>
+#include <unordered_map>
 
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
@@ -22,7 +22,6 @@ class MOL2Format final: public Format {
 public:
     MOL2Format(const std::string& path, File::Mode mode);
 
-    ~MOL2Format() noexcept override;
     MOL2Format(const MOL2Format&) = delete;
     MOL2Format& operator=(const MOL2Format&) = delete;
     MOL2Format(MOL2Format&&) = default;
@@ -42,7 +41,7 @@ private:
 
     std::unique_ptr<TextFile> file_;
     /// Map of residues, indexed by residue id.
-    std::map<size_t, Residue> residues_;
+    std::unordered_map<size_t, Residue> residues_;
     /// Storing the positions of all the steps in the file, so that we can
     /// just `seekg` them instead of reading the whole step.
     std::vector<std::streampos> steps_positions_;
