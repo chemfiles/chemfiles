@@ -39,7 +39,7 @@ Function manipulating ``CHFL_FRAME``
 
 .. doxygenfunction:: chfl_frame_set_step
 
-.. doxygenfunction:: chfl_frame_guess_topology
+.. doxygenfunction:: chfl_frame_guess_bonds
 
 .. doxygenfunction:: chfl_frame_distance
 

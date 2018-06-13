@@ -231,8 +231,8 @@ public:
     ///
     /// @throw Error if the Van der Waals radius in unknown for a given atom.
     ///
-    /// @example{tests/doc/frame/guess_topology.cpp}
-    void guess_topology();
+    /// @example{tests/doc/frame/guess_bonds.cpp}
+    void guess_bonds();
 
     /// Remove all connectivity information in the frame's topology
     ///

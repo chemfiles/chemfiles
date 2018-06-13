@@ -267,7 +267,7 @@ TEST_CASE("chfl_frame") {
         REQUIRE(frame);
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
 
-        CHECK_STATUS(chfl_frame_guess_topology(frame));
+        CHECK_STATUS(chfl_frame_guess_bonds(frame));
         CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
         REQUIRE(topology);
 

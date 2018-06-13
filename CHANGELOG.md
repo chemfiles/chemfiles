@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   `Residue::set` and `Residue::get`.
 * The topology of residues is now automatically set using a lookup table for the
   PDB format.
+* `Frame::guess_topology` was renamed to `Frame::guess_bonds`.
 * The selection engine has been rewritten to add support for more complex
   selections:
     * it is now possible to use mathematical expressions in selections such as
@@ -37,6 +38,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 * Added `chfl_residue_get_property` and `chfl_residue_set_property` to provide
   access to residue properties.
+* `chfl_frame_guess_topology` was renamed to `chfl_frame_guess_bonds`.
 
 ## 0.8 (14 Dec 2017)
 

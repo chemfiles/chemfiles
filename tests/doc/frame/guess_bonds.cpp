@@ -16,7 +16,7 @@ TEST_CASE() {
 
     assert(frame.topology().bonds().size() == 0);
 
-    frame.guess_topology();
+    frame.guess_bonds();
     assert(frame.topology().bonds().size() == 1);
     // [example]
 }
