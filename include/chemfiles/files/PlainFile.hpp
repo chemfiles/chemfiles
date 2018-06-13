@@ -14,9 +14,6 @@ namespace chemfiles {
 class PlainFile final: public TextFile {
 public:
     /// Open a text file with name `filename` and mode `mode`.
-    ///
-    /// An `FileError` exception is thrown if the file does not exists in
-    /// `'r'` or `'a'` mode.
     PlainFile(const std::string& filename, File::Mode mode);
 
 private:

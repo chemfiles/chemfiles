@@ -34,8 +34,8 @@ static void check(lzma_ret code) {
     }
 }
 
-xzstreambuf::xzstreambuf(const std::string& path, const std::string& mode, size_t buffer_size):
-    file_(fopen(path.c_str(), mode.c_str())),
+xzstreambuf::xzstreambuf(size_t buffer_size):
+    file_(nullptr),
     stream_(LZMA_STREAM_INIT),
     filters_({{{LZMA_VLI_UNKNOWN, NULL}}}),
     action_(LZMA_RUN),
@@ -44,40 +44,17 @@ xzstreambuf::xzstreambuf(const std::string& path, const std::string& mode, size_
     out_buffer_(buffer_size),
     decoded_position_(0),
     discard_amount_(0),
-    at_block_boundary_(true)
+    at_block_boundary_(true),
+    reading_(true)
 {
     stream_.next_in = nullptr;
     stream_.avail_in = 0;
-
-    if (!file_) {
-        stream_.next_out = nullptr;
-        stream_.avail_out = 0;
-        reading_ = true;
-        return;
-    }
-
-    if (mode == "wb") {
-        reading_ = false;
-        check(lzma_easy_encoder(&stream_, 6, LZMA_CHECK_CRC64));
-    } else if (mode == "rb") {
-        reading_ = true;
-        std::array<uint8_t, LZMA_STREAM_HEADER_SIZE> buffer = {{0}};
-        if (!std::fread(buffer.data(), buffer.size(), sizeof(uint8_t), file_)) {
-            throw file_error("error while reading lzma header: {}", strerror(errno));
-        }
-        lzma_stream_flags flags;
-        check(lzma_stream_header_decode(&flags, buffer.data()));
-        check_ = flags.check;
-    } else {
-        throw file_error("xzstreambuf: unrecognized open mode: '{}'", mode);
-    }
+    stream_.next_out = nullptr;
+    stream_.avail_out = 0;
 
     auto end = &out_buffer_.back() + 1;
     setg(end, end, end);
     setp(&in_buffer_.front(), &in_buffer_.back());
-
-    stream_.next_out = reinterpret_cast<uint8_t*>(out_buffer_.data());
-    stream_.avail_out = out_buffer_.size();
 
     block_.filters = filters_.data();
 }
@@ -100,6 +77,32 @@ xzstreambuf::~xzstreambuf() {
     if (file_) {
         fclose(file_);
     }
+}
+
+void xzstreambuf::open(const std::string& path, const std::string& mode) {
+    if (is_open()) {
+        throw file_error("can not open an xz file twice with the same xzstreambuf");
+    }
+    file_ = fopen(path.c_str(), mode.c_str());
+
+    if (mode == "wb") {
+        reading_ = false;
+        check(lzma_easy_encoder(&stream_, 6, LZMA_CHECK_CRC64));
+    } else if (mode == "rb") {
+        reading_ = true;
+        std::array<uint8_t, LZMA_STREAM_HEADER_SIZE> buffer = {{0}};
+        if (!std::fread(buffer.data(), buffer.size(), sizeof(uint8_t), file_)) {
+            throw file_error("error while reading lzma header: {}", strerror(errno));
+        }
+        lzma_stream_flags flags;
+        check(lzma_stream_header_decode(&flags, buffer.data()));
+        check_ = flags.check;
+    } else {
+        throw file_error("xzstreambuf: unrecognized open mode: '{}'", mode);
+    }
+
+    stream_.next_out = reinterpret_cast<uint8_t*>(out_buffer_.data());
+    stream_.avail_out = out_buffer_.size();
 }
 
 int xzstreambuf::overflow(int ch) {
@@ -373,11 +376,12 @@ bool xzstreambuf::is_open() const {
     return file_ != nullptr && !::ferror(file_);
 }
 
-XzFile::XzFile(const std::string &filename, File::Mode mode)
-    : TextFile(filename, mode, &buffer_),
-      buffer_(filename, (mode == File::WRITE ? "wb" : "rb"))
-{
-    if (mode == File::APPEND) {
+XzFile::XzFile(const std::string& filename, File::Mode mode): TextFile(filename, mode, &buffer_), buffer_() {
+    if (mode == File::READ) {
+        buffer_.open(filename, "rb");
+    } else if (mode == File::WRITE) {
+        buffer_.open(filename, "wb");
+    } else if (mode == File::APPEND) {
         throw file_error("appending (open mode 'a') is not supported with xz files");
     }
 

@@ -13,12 +13,15 @@
 
 namespace chemfiles {
 
+/// An implementation of std::streambuf for gziped files
 class gzstreambuf: public std::streambuf {
 public:
     gzstreambuf(size_t buffer_size = 512);
     ~gzstreambuf() override;
 
-    void open(const std::string& filename, const std::string& openmode);
+    /// Open the file at `path` with the given `mode`. The mode will be passed
+    /// down to gzopen. 
+    void open(const std::string& path, const std::string& mode);
 
     int_type underflow() override;
     int_type overflow(int_type ch) override;

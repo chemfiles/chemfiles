@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+* Direct reading and writing of compressed files. gzip and lzma (.xz) formats
+  are supported. 
 * GROMACS .gro files now supported through custom implementation.
 * Properties are now supported in the `Residue` class. They are accessed using
   `Residue::set` and `Residue::get`.

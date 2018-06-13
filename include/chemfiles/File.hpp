@@ -51,9 +51,6 @@ private:
 ///
 /// All failling operations should throw a `FileError` instead of waiting for
 /// the user of the class to the current state.
-///
-/// Child classes should call `TextFile::rdbuf` in their constructor to set the
-/// right buffer.
 class CHFL_EXPORT TextFile: public File, public std::iostream {
 public:
     /// Open the most adaptated text file class for the given `path` and `mode`
@@ -69,6 +66,8 @@ public:
     bool eof();
 
 protected:
+    /// Initialize the TextFile at the given `path` and `mode`. All read and
+    /// write operations will go through the provided `buffer`.
     TextFile(const std::string& path, File::Mode mode, std::streambuf* buffer);
 
 private:

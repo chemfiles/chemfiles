@@ -15,11 +15,15 @@
 
 namespace chemfiles {
 
+/// An implementation of std::streambuf for lzma/xz files
 class xzstreambuf : public std::streambuf {
 public:
-    xzstreambuf(const std::string& path, const std::string& mode, size_t buffer_size = 1024);
+    xzstreambuf(size_t buffer_size = 128 * 1024);
     virtual ~xzstreambuf() override;
 
+    /// Open the file at `path` with the given `mode`. The mode must be `rb` or
+    /// `wb`.
+    void open(const std::string& path, const std::string& mode);
     bool is_open() const;
 
 protected:

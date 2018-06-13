@@ -20,13 +20,11 @@ gzstreambuf::~gzstreambuf() {
     file_ = nullptr;
 }
 
-void gzstreambuf::open(const std::string& filename, const std::string& openmode) {
-    file_ = gzopen(filename.c_str(), openmode.c_str());
-    auto end = &buffer_.back() + 1;
-    setg(end, end, end);
-
-    auto begin = &buffer_.front();
-    setp(begin, end - 1);
+void gzstreambuf::open(const std::string& path, const std::string& mode) {
+    if (is_open()) {
+        throw file_error("can not open a gz file twice with the same gzstreambuf");
+    }
+    file_ = gzopen(path.c_str(), mode.c_str());
 }
 
 gzstreambuf::int_type gzstreambuf::underflow() {

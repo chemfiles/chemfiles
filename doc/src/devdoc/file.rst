@@ -12,17 +12,31 @@ Interface for files
 
 .. doxygenclass:: chemfiles::File
     :members:
+    :protected-members:
 
 .. doxygenclass:: chemfiles::TextFile
     :members:
+    :protected-members:
 
 Implemented classes
 -------------------
 
 These classes implement the ``File`` interface defined previously.
 
-.. doxygenclass:: chemfiles::BasicFile
+.. doxygenclass:: chemfiles::PlainFile
+    :members:
+
+.. doxygenclass:: chemfiles::GzFile
+    :members:
+
+.. doxygenclass:: chemfiles::XzFile
+    :members:
 
 .. doxygenclass:: chemfiles::NcFile
+    :members:
 
 .. doxygenclass:: chemfiles::TNGFile
+    :members:
+
+.. doxygenclass:: chemfiles::MMTFFile
+    :members:

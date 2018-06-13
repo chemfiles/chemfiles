@@ -23,8 +23,12 @@ public:
     ///
     /// The format can either be guessed from the extention (".xyz" is XYZ,
     /// ".gro" is GROMACS, *etc.*), or specified as the third parameter. The
-    /// format names are given in the corresponding [documentation section](
-    /// http://chemfiles.org/chemfiles/latest/formats.html#list-of-supported-formats)
+    /// format names are given in the corresponding [documentation
+    /// section][formats]
+    ///
+    /// If the file path ends with either `.gz` or `.xz` and no `format` is
+    /// given; the file will be treated as a compressed file and the next
+    /// extension is used to guess the format.
     ///
     /// @example{tests/doc/trajectory/trajectory.cpp}
     ///
@@ -42,6 +46,8 @@ public:
     /// @throws FileError for all errors concerning the physical file: can not
     ///                   open it, can not read/write it, *etc.*
     /// @throws FormatError if the file is not valid for the used format.
+    ///
+    /// [formats]: http://chemfiles.org/chemfiles/latest/formats.html#list-of-supported-formats
     explicit Trajectory(std::string path, char mode = 'r', const std::string& format = "");
 
     ~Trajectory();

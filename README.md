@@ -9,7 +9,9 @@
 
 
 Chemfiles is a modern and high-quality library for reading and writing
-trajectory files created by computational chemistry simulations programs. To help you access information (atomic positions, velocities, names, topology, etc.) about these files, Chemfiles provides an interface that is
+trajectory files created by computational chemistry simulations programs. To
+help you access information (atomic positions, velocities, names, topology,
+etc.) about these files, Chemfiles provides an interface that is
 - **unified**: the same code will work with all supported formats;
 - **simple**: the interface is easy to use and extensively documented.
 
@@ -36,7 +38,8 @@ any of these apply to your use case:
 - you use binary formats because they are faster and take up less disk space;
 - you write analysis algorithms and want to read more than one trajectory
   format;
-- you write simulation software and want to use more than one format for input or output.
+- you write simulation software and want to use more than one format for input
+  or output.
 
 There are [other libraries](http://chemfiles.org/chemfiles/latest/others.html)
 doing the roughly the same job as Chemfiles, have a look at them if Chemfiles is
@@ -60,9 +63,11 @@ new library.
 Chemfiles is free and open source. Your [contributions](Contributing.md) are
 always welcome!
 
-If you have questions or suggestions, or need help, please open an [issue] or join us on our [Gitter] chat room.
+If you have questions or suggestions, or need help, please open an [issue] or
+join us on our [Gitter] chat room.
 
-If you are using Chemfiles in a published scientific study, please cite us using the following DOI: https://doi.org/10.5281/zenodo.800663.
+If you are using Chemfiles in a published scientific study, please cite us using
+the following DOI: https://doi.org/10.5281/zenodo.800663.
 
 ## Quick Links
 
@@ -80,15 +85,18 @@ If you are using Chemfiles in a published scientific study, please cite us using
 ### Chemfiles Features
 
 - Reads both text (XYZ, PDB, ...) and binary (NetCDF, TNG, ...) file formats;
+- Transparently read and write compressed files (.gz and .xz compressions);
 - Filters atoms with a rich selection language;
 - Supports non-constant numbers of atoms in trajectories;
-- Easy-to-use programming interface in Python, C++, C, Fortran 95, Julia and Rust;
+- Easy-to-use programming interface in Python, C++, C, Fortran 95, Julia and
+  Rust;
 - Cross-platform and usable from Linux, OS X and Windows;
 - Open source and freely available (3-clauses BSD license);
 
 ### Supported File Formats
 
 Chemfiles can read and write files in the following formats:
+
 - XYZ;
 - PDB;
 - Amber NetCDF
@@ -99,7 +107,12 @@ Chemfiles can read and write files in the following formats:
 - GROMACS formats: .gro;
 - TRIPOS mol2 files;
 
+For text-based formats (XYZ, PDB, LAMMPS Data, Tinker, ...) Chemfiles will
+transparently read compressed files if the file extension matches the expected
+one (`file.arc.gz`, `trajectory.pdb.xz`).
+
 Chemfiles can also read but not (yet) write files in the following formats:
+
 - TNG;
 - LAMMPS trajectory;
 - GROMACS formats: .xtc; .trj; .trr;
