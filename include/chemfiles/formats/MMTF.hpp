@@ -6,8 +6,8 @@
 
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
-#include "chemfiles/Residue.hpp"
-#include "chemfiles/files/MMTFFile.hpp"
+
+#include <mmtf/structure_data.hpp>
 
 namespace chemfiles {
 
@@ -21,7 +21,7 @@ class MMTFFormat final: public Format {
 public:
     MMTFFormat(const std::string& path, File::Mode mode);
 
-    ~MMTFFormat() noexcept override;
+    ~MMTFFormat() = default;
     MMTFFormat(const MMTFFormat&) = delete;
     MMTFFormat& operator=(const MMTFFormat&) = delete;
     MMTFFormat(MMTFFormat&&) = default;
@@ -33,12 +33,13 @@ public:
 
 private:
 
-    MMTFFile file_;
-    size_t modelIndex_;
-    size_t chainIndex_;
-    size_t groupIndex_;
-    size_t atomIndex_;
-    size_t atomSkip_;
+    mmtf::StructureData structure_;
+
+    size_t modelIndex_ = 0;
+    size_t chainIndex_ = 0;
+    size_t groupIndex_ = 0;
+    size_t atomIndex_ = 0;
+    size_t atomSkip_ = 0;
 };
 
 template<> FormatInfo format_information<MMTFFormat>();

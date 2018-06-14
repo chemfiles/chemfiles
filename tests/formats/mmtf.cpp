@@ -7,17 +7,9 @@
 #include "helpers.hpp"
 #include "chemfiles.hpp"
 
-#include "chemfiles/files/MMTFFile.hpp"
-
 using namespace chemfiles;
 
 TEST_CASE("Read files in MMTF format") {
-
-    SECTION("Read") {
-        // Just checking constructor and destructor
-        MMTFFile file("data/mmtf/4HHB.mmtf", File::READ);
-    }
-
     SECTION("Read single step") {
         Trajectory file("data/mmtf/4HHB.mmtf");
         Frame frame = file.read();
