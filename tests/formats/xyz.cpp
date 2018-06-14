@@ -114,38 +114,25 @@ C 1 2 3
 D 1 2 3
 6
 Written by the chemfiles library
-A 4 5 6
-B 4 5 6
-C 4 5 6
-D 4 5 6
+A 1 2 3
+B 1 2 3
+C 1 2 3
+D 1 2 3
 E 4 5 6
 F 4 5 6
 )";
 
-    auto topology = Topology();
-    topology.add_atom(Atom("A","O"));
-    topology.add_atom(Atom("B"));
-    topology.add_atom(Atom("C"));
-    topology.add_atom(Atom("D"));
-
-    auto frame = Frame(topology);
-    auto positions = frame.positions();
-    for (size_t i=0; i<4; i++) {
-        positions[i] = Vector3D(1, 2, 3);
-    }
+    auto frame = Frame();
+    frame.add_atom(Atom("A","O"), {1, 2, 3});
+    frame.add_atom(Atom("B"), {1, 2, 3});
+    frame.add_atom(Atom("C"), {1, 2, 3});
+    frame.add_atom(Atom("D"), {1, 2, 3});
 
     auto file = Trajectory(tmpfile, 'w');
     file.write(frame);
 
-    frame.resize(6);
-    positions = frame.positions();
-    for (size_t i=0; i<6; i++) {
-        positions[i] = Vector3D(4, 5, 6);
-    }
-
-    topology.add_atom(Atom("E"));
-    topology.add_atom(Atom("F"));
-    frame.set_topology(topology);
+    frame.add_atom(Atom("E"), {4, 5, 6});
+    frame.add_atom(Atom("F"), {4, 5, 6});
 
     file.write(frame);
     file.close();

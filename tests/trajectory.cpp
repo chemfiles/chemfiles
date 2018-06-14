@@ -56,22 +56,17 @@ TEST_CASE("Associate a topology and a trajectory") {
         "Fe 1 2 3\n"
         "Fe 1 2 3\n";
 
+        auto frame = Frame();
         auto topology = Topology();
         for (size_t i=0; i<5; i++) {
             topology.add_atom(Atom("Fe"));
+            frame.add_atom(Atom("Ar"), {1, 2, 3});
         }
 
-        auto frame = Frame(topology);
-        auto positions = frame.positions();
-        for(size_t i=0; i<5; i++) {
-            positions[i] = Vector3D(1, 2, 3);
-        }
-
-        {
-            Trajectory file(tmpfile, 'w');
-            file.set_topology(topology);
-            file.write(frame);
-        }
+        Trajectory file(tmpfile, 'w');
+        file.set_topology(topology);
+        file.write(frame);
+        file.close();
 
         std::ifstream checking(tmpfile);
         std::string content{

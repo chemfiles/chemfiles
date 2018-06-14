@@ -159,34 +159,23 @@ TEST_CASE("Write files in LAMMPS data format") {
     "\n"
     "1 1 2 3 4 5\n";
 
-
-
     auto tmpfile = NamedTempPath(".lmp");
 
-    auto topology = Topology();
-    topology.add_atom(Atom("As"));
-    topology.add_atom(Atom("As"));
-    topology.add_atom(Atom("B"));
-    topology.add_atom(Atom("C"));
-    topology.add_atom(Atom("B"));
-    topology.add_atom(Atom("C"));
-    topology.add_bond(2, 1);
-    topology.add_bond(2, 3);
-    topology.add_bond(2, 4);
-    topology.add_bond(4, 5);
-
-    topology[0].set_mass(25);
-
-    auto frame = Frame(topology);
-    frame.set_cell(UnitCell(5, 7, 9));
-
+    auto frame = Frame(UnitCell(5, 7, 9));
     frame.add_velocities();
-    auto positions = frame.positions();
-    auto velocities = *frame.velocities();
-    for(size_t i=0; i<frame.size(); i++) {
-        positions[i] = Vector3D(1.1, 2.2, 3.3);
-        velocities[i] = Vector3D(0.1, 0.2, 0.3);
-    }
+    frame.add_atom(Atom("As"), {1.1, 2.2, 3.3}, {0.1, 0.2, 0.3});
+    frame.add_atom(Atom("As"), {1.1, 2.2, 3.3}, {0.1, 0.2, 0.3});
+    frame.add_atom(Atom("B"), {1.1, 2.2, 3.3}, {0.1, 0.2, 0.3});
+    frame.add_atom(Atom("C"), {1.1, 2.2, 3.3}, {0.1, 0.2, 0.3});
+    frame.add_atom(Atom("B"), {1.1, 2.2, 3.3}, {0.1, 0.2, 0.3});
+    frame.add_atom(Atom("C"), {1.1, 2.2, 3.3}, {0.1, 0.2, 0.3});
+    frame.add_bond(2, 1);
+    frame.add_bond(2, 3);
+    frame.add_bond(2, 4);
+    frame.add_bond(4, 5);
+
+    frame[0].set_mass(25);
+
 
     Trajectory(tmpfile, 'w', "LAMMPS Data").write(frame);
 

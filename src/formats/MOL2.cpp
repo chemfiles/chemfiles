@@ -63,7 +63,7 @@ void MOL2Format::read(Frame& frame) {
 
     long long natoms = string2longlong(counts[0]);
     long long nbonds = 0;
-    
+
     if (counts.size() >= 2) {
         nbonds = string2longlong(counts[1]);
     }
@@ -126,17 +126,16 @@ void MOL2Format::read_atoms(Frame& frame, size_t natoms, bool charges) {
             );
         }
 
-        Atom atom(atom_name, atom_type);
-        frame.add_atom(std::move(atom), Vector3D(x, y, z));
-        size_t current_atom = frame.size() - 1;
+        auto atom = Atom(atom_name, atom_type);
         if (charges) {
-            frame[current_atom].set_charge(charge);
+            atom.set_charge(charge);
         }
+        frame.add_atom(std::move(atom), {x, y, z});
 
+        size_t current_atom = frame.size() - 1;
         if (residues_.find(resid) == residues_.end()) {
             Residue residue(res_name, resid);
             residue.add_atom(current_atom);
-
             residues_.insert({resid, residue});
         } else {
             // Just add this atom to the residue

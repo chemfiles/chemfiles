@@ -182,10 +182,10 @@ TEST_CASE("Write files in PDB format") {
     "ENDMDL\n"
     "MODEL    2\n"
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
-    "ATOM      1 A    XXX X   4       4.000   5.000   6.000  1.00  0.00           A\n"
-    "HETATM    2 B    foo A   3       4.000   5.000   6.000  1.00  0.00           B\n"
-    "ATOM      3 C    foo A   3       4.000   5.000   6.000  1.00  0.00           C\n"
-    "HETATM    4 D    bar C  -1       4.000   5.000   6.000  1.00  0.00           D\n"
+    "ATOM      1 A    XXX X   4       1.000   2.000   3.000  1.00  0.00           A\n"
+    "HETATM    2 B    foo A   3       1.000   2.000   3.000  1.00  0.00           B\n"
+    "ATOM      3 C    foo A   3       1.000   2.000   3.000  1.00  0.00           C\n"
+    "HETATM    4 D    bar C  -1       1.000   2.000   3.000  1.00  0.00           D\n"
     "HETATM    5 E    XXX X   5       4.000   5.000   6.000  1.00  0.00           E\n"
     "HETATM    6 F    XXX X   6       4.000   5.000   6.000  1.00  0.00           F\n"
     "HETATM    7 G    XXX X   7       4.000   5.000   6.000  1.00  0.00           G\n"
@@ -200,56 +200,41 @@ TEST_CASE("Write files in PDB format") {
     "ENDMDL\n"
     "END\n";
 
-    Topology topology;
-    topology.add_atom(Atom("A"));
-    topology.add_atom(Atom("B"));
-    topology.add_atom(Atom("C"));
-    topology.add_atom(Atom("D"));
-    topology.add_bond(0, 1);
-    topology[0].set("is_hetatm", false);
-    topology[1].set("is_hetatm", true);
-    topology[2].set("is_hetatm", false);
-    topology[3].set("is_hetatm", true);
-
-    Frame frame(topology);
-    frame.set_cell(UnitCell(22));
-
-    auto positions = frame.positions();
-    for(size_t i=0; i<4; i++) {
-        positions[i] = Vector3D(1, 2, 3);
-    }
+    auto frame = Frame(UnitCell(22));
+    frame.add_atom(Atom("A"), {1, 2, 3});
+    frame.add_atom(Atom("B"), {1, 2, 3});
+    frame.add_atom(Atom("C"), {1, 2, 3});
+    frame.add_atom(Atom("D"), {1, 2, 3});
+    frame.add_bond(0, 1);
+    frame[0].set("is_hetatm", false);
+    frame[1].set("is_hetatm", true);
+    frame[2].set("is_hetatm", false);
+    frame[3].set("is_hetatm", true);
 
     auto file = Trajectory(tmpfile, 'w');
     file.write(frame);
 
-    frame.resize(7);
-    positions = frame.positions();
-    for(size_t i=0; i<7; i++) {
-        positions[i] = Vector3D(4, 5, 6);
-    }
-    topology.add_atom(Atom("E"));
-    topology.add_atom(Atom("F"));
-    topology.add_atom(Atom("G"));
-    topology.add_bond(4, 5);
-    topology.add_bond(0, 6);
-    topology.add_bond(1, 6);
-    topology.add_bond(2, 6);
-    topology.add_bond(3, 6);
-    topology.add_bond(4, 6);
-    topology.add_bond(5, 6);
+    frame.add_atom(Atom("E"), {4, 5, 6});
+    frame.add_atom(Atom("F"), {4, 5, 6});
+    frame.add_atom(Atom("G"), {4, 5, 6});
+    frame.add_bond(4, 5);
+    frame.add_bond(0, 6);
+    frame.add_bond(1, 6);
+    frame.add_bond(2, 6);
+    frame.add_bond(3, 6);
+    frame.add_bond(4, 6);
+    frame.add_bond(5, 6);
 
     Residue residue("foo", 3);
     residue.add_atom(1);
     residue.add_atom(2);
     residue.set("chainid", "A");
-    topology.add_residue(residue);
+    frame.add_residue(residue);
 
     residue = Residue("barbar"); // This will be truncated in output
     residue.add_atom(3);
     residue.set("chainid", "CB");
-    topology.add_residue(residue);
-
-    frame.set_topology(topology);
+    frame.add_residue(residue);
 
     file.write(frame);
     file.close();
@@ -284,11 +269,10 @@ TEST_CASE("PDB files with big values") {
     SECTION("Default residues") {
         auto tmpfile = NamedTempPath(".pdb");
 
-        Topology topology;
+        auto frame = Frame();
         for(size_t i=0; i<10001; i++) {
-            topology.add_atom(Atom("A"));
+            frame.add_atom(Atom("A"), {0, 0, 0});
         }
-        Frame frame(topology);
         auto positions = frame.positions();
         positions[998] = Vector3D(1., 2., 3.);
         positions[9998] = Vector3D(4., 5., 6.);
@@ -310,15 +294,13 @@ TEST_CASE("PDB files with big values") {
     SECTION("User specified residues") {
         auto tmpfile = NamedTempPath(".pdb");
 
-        Topology topology;
+        auto frame = Frame();
         for(size_t i=0; i<10001; i++) {
-            Atom atom("A");
-            topology.add_atom(atom);
+            frame.add_atom(Atom("A"), {0, 0, 0});
             Residue residue("ANA", i + 1);
             residue.add_atom(i);
-            topology.add_residue(residue);
+            frame.add_residue(std::move(residue));
         }
-        Frame frame(topology);
         auto positions = frame.positions();
         positions[998] = Vector3D(1., 2., 3.);
         positions[9998] = Vector3D(4., 5., 6.);

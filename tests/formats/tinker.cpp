@@ -82,40 +82,28 @@ R"(4 written by the chemfiles library
 4 B 1 2 3 3
 6 written by the chemfiles library
 22 33 44 90 90 90
-1 A 4 5 6 1 2 3
-2 A 4 5 6 1 1
-3 B 4 5 6 2 1
-4 B 4 5 6 3
+1 A 1 2 3 1 2 3
+2 A 1 2 3 1 1
+3 B 1 2 3 2 1
+4 B 1 2 3 3
 5 E 4 5 6 4
 6 F 4 5 6 5
 )";
 
-    auto topology = Topology();
-    topology.add_atom(Atom("A"));
-    topology.add_atom(Atom("A"));
-    topology.add_atom(Atom("B"));
-    topology.add_atom(Atom("B", "C"));
-    topology.add_bond(0, 1);
-    topology.add_bond(0, 2);
+    auto frame = Frame();
+    frame.add_atom(Atom("A"), {1, 2, 3});
+    frame.add_atom(Atom("A"), {1, 2, 3});
+    frame.add_atom(Atom("B"), {1, 2, 3});
+    frame.add_atom(Atom("B", "C"), {1, 2, 3});
+    frame.add_bond(0, 1);
+    frame.add_bond(0, 2);
 
-    auto frame = Frame(topology);
-    auto positions = frame.positions();
-    for(size_t i=0; i<4; i++) {
-        positions[i] = Vector3D(1, 2, 3);
-    }
 
     auto file = Trajectory(tmpfile, 'w');
     file.write(frame);
 
-    frame.resize(6);
-    positions = frame.positions();
-    for(size_t i=0; i<6; i++) {
-        positions[i] = Vector3D(4, 5, 6);
-    }
-
-    topology.add_atom(Atom("E"));
-    topology.add_atom(Atom("F"));
-    frame.set_topology(topology);
+    frame.add_atom(Atom("E"), {4, 5, 6});
+    frame.add_atom(Atom("F"), {4, 5, 6});
     frame.set_cell(UnitCell(22, 33, 44));
 
     file.write(frame);
