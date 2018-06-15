@@ -102,7 +102,7 @@ CHFL_EXPORT chfl_status chfl_selection_matches(
 ///
 /// @example{tests/capi/doc/chfl_selection/chfl_selection.c}
 /// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_selection_free(CHFL_SELECTION* selection);
+CHFL_EXPORT chfl_status chfl_selection_free(const CHFL_SELECTION* selection);
 
 #ifdef __cplusplus
 }

@@ -91,7 +91,7 @@ extern "C" chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const trajectory,
     )
 }
 
-extern "C" chfl_status chfl_trajectory_close(CHFL_TRAJECTORY* trajectory) {
+extern "C" chfl_status chfl_trajectory_close(const CHFL_TRAJECTORY* trajectory) {
     delete trajectory;
     return CHFL_SUCCESS;
 }

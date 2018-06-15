@@ -298,7 +298,7 @@ CHFL_EXPORT chfl_status chfl_frame_add_residue(
 ///
 /// @example{tests/capi/doc/chfl_frame/chfl_frame.c}
 /// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_frame_free(CHFL_FRAME* frame);
+CHFL_EXPORT chfl_status chfl_frame_free(const CHFL_FRAME* frame);
 
 #ifdef __cplusplus
 }

@@ -104,7 +104,7 @@ TEST_CASE("Read trajectory") {
 
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
 
-        CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
+        const CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
         REQUIRE(topology);
 
         uint64_t natoms = 0;
@@ -115,7 +115,7 @@ TEST_CASE("Read trajectory") {
         CHECK_STATUS(chfl_topology_bonds_count(topology, &n));
         CHECK(n == 0);
 
-        CHFL_ATOM* atom = chfl_atom_from_topology(topology, 0);
+        const CHFL_ATOM* atom = chfl_atom_from_frame(frame, 0);
         REQUIRE(atom);
 
         char name[32];

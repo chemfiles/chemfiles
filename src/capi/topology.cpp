@@ -5,17 +5,16 @@
 
 #include "chemfiles/capi/topology.h"
 #include "chemfiles/capi.hpp"
+#include "chemfiles/shared_allocator.hpp"
 
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/Frame.hpp"
 using namespace chemfiles;
 
-extern "C" CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* const frame) {
+extern "C" CHFL_TOPOLOGY* chfl_topology(void) {
     CHFL_TOPOLOGY* topology = nullptr;
-    CHECK_POINTER_GOTO(frame);
     CHFL_ERROR_GOTO(
-        topology = new Topology();
-        *topology = frame->topology();
+        topology = shared_allocator::make_shared<Topology>();
     )
     return topology;
 error:
@@ -23,10 +22,11 @@ error:
     return nullptr;
 }
 
-extern "C" CHFL_TOPOLOGY* chfl_topology(void) {
-    CHFL_TOPOLOGY* topology = nullptr;
+extern "C" const CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* const frame) {
+    const CHFL_TOPOLOGY* topology = nullptr;
+    CHECK_POINTER_GOTO(frame);
     CHFL_ERROR_GOTO(
-        topology = new Topology();
+        topology = shared_allocator::shared_ptr<Topology>(frame, &frame->topology());
     )
     return topology;
 error:
@@ -37,7 +37,7 @@ error:
 extern "C" CHFL_TOPOLOGY* chfl_topology_copy(const CHFL_TOPOLOGY* const topology) {
     CHFL_TOPOLOGY* new_topology = nullptr;
     CHFL_ERROR_GOTO(
-        new_topology = new Topology(*topology);
+        new_topology = shared_allocator::make_shared<Topology>(*topology);
     )
     return new_topology;
 error:
@@ -231,7 +231,12 @@ extern "C" chfl_status chfl_topology_residues_linked(
 }
 
 
-extern "C" chfl_status chfl_topology_free(CHFL_TOPOLOGY* const topology) {
-    delete topology;
-    return CHFL_SUCCESS;
+extern "C" chfl_status chfl_topology_free(const CHFL_TOPOLOGY* const topology) {
+    CHFL_ERROR_CATCH(
+        if (topology == nullptr) {
+            return CHFL_SUCCESS;
+        } else {
+            shared_allocator::free(topology);
+        }
+    )
 }

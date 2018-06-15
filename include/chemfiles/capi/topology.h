@@ -19,15 +19,19 @@ extern "C" {
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology(void);
 
-/// Get a copy of the topology of a `frame`.
+/// Get access to the topology of a `frame`.
 ///
-/// The caller of this function should free the associated memory using
-/// `chfl_topology_free`.
+/// The `frame` will be kept alive, even if `chfl_frame_free` is called,
+/// until `chfl_topology_free` is also called on the pointer returned by this
+/// function.
+///
+/// If `chfl_frame_set_topology` is called, this pointer will point to the new
+/// topology.
 ///
 /// @example{tests/capi/doc/chfl_topology/from_frame.c}
 /// @return A pointer to the topology, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
-CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* frame);
+CHFL_EXPORT const CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* frame);
 
 /// Get a copy of a `topology`.
 ///
@@ -230,7 +234,7 @@ CHFL_EXPORT chfl_status chfl_topology_residues_linked(
 ///
 /// @example{tests/capi/doc/chfl_topology/chfl_topology.c}
 /// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_topology_free(CHFL_TOPOLOGY* topology);
+CHFL_EXPORT chfl_status chfl_topology_free(const CHFL_TOPOLOGY* topology);
 
 #ifdef __cplusplus
 }

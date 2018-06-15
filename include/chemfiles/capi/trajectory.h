@@ -125,7 +125,7 @@ CHFL_EXPORT chfl_status chfl_trajectory_nsteps(
 ///
 /// @example{tests/capi/doc/chfl_trajectory/open.c}
 /// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_trajectory_close(CHFL_TRAJECTORY* trajectory);
+CHFL_EXPORT chfl_status chfl_trajectory_close(const CHFL_TRAJECTORY* trajectory);
 
 #ifdef __cplusplus
 }

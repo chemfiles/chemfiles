@@ -85,29 +85,29 @@ TEST_CASE("chfl_residue") {
         CHECK_STATUS(chfl_topology_residues_count(topology, &size));
         CHECK(size == 1);
 
-        residue = chfl_residue_from_topology(topology, 0);
-        REQUIRE(residue);
+        const CHFL_RESIDUE* checking_residue = chfl_residue_from_topology(topology, 0);
+        REQUIRE(checking_residue);
         uint64_t resid = 0;
-        CHECK_STATUS(chfl_residue_id(residue, &resid));
+        CHECK_STATUS(chfl_residue_id(checking_residue, &resid));
         CHECK(resid == 56);
-        CHECK_STATUS(chfl_residue_free(residue));
+        CHECK_STATUS(chfl_residue_free(checking_residue));
 
-        residue = chfl_residue_from_topology(topology, 10);
-        CHECK_FALSE(residue);
+        checking_residue = chfl_residue_from_topology(topology, 10);
+        CHECK_FALSE(checking_residue);
 
-        residue = chfl_residue_for_atom(topology, 2);
-        REQUIRE(residue);
+        checking_residue = chfl_residue_for_atom(topology, 2);
+        REQUIRE(checking_residue);
 
         resid = 0;
-        CHECK_STATUS(chfl_residue_id(residue, &resid));
+        CHECK_STATUS(chfl_residue_id(checking_residue, &resid));
         CHECK(resid == 56);
-        CHECK_STATUS(chfl_residue_free(residue));
+        CHECK_STATUS(chfl_residue_free(checking_residue));
 
-        residue = chfl_residue_for_atom(topology, 10);
-        CHECK_FALSE(residue);
+        checking_residue = chfl_residue_for_atom(topology, 10);
+        CHECK_FALSE(checking_residue);
 
         CHECK_STATUS(chfl_topology_free(topology));
-        CHECK_STATUS(chfl_residue_free(residue));
+        CHECK_STATUS(chfl_residue_free(checking_residue));
     }
 
     SECTION("Property") {

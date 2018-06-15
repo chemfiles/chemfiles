@@ -29,7 +29,7 @@ CHFL_EXPORT CHFL_RESIDUE* chfl_residue(const char* name);
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_RESIDUE* chfl_residue_with_id(const char* name, uint64_t resid);
 
-/// Get a copy of the residue at index `i` from a `topology`.
+/// Get access to the residue at index `i` in a `topology`.
 ///
 /// If `i` is bigger than the result of `chfl_topology_residues_count`, this
 /// function will return `NULL`.
@@ -37,29 +37,51 @@ CHFL_EXPORT CHFL_RESIDUE* chfl_residue_with_id(const char* name, uint64_t resid)
 /// The residue index in the topology is not always the same as the residue
 /// `id`.
 ///
-/// The caller of this function should free the allocated memory using
+/// The `topology` will be kept alive, even if `chfl_topology_free` is called,
+/// until `chfl_residue_free` is also called on the pointer returned by this
+/// function.
+///
+/// The pointer returned by this function points directly inside the topology,
+/// and will be invalidated if any of the following function is called on the
+/// topology:
+///
+/// - `chfl_topology_add_residue`
+///
+/// Calling any function on an invalidated pointer is undefined behavior.
+/// Even if the pointer if invalidated, it stills needs to be released with
 /// `chfl_residue_free`.
 ///
 /// @example{tests/capi/doc/chfl_residue/from_topology.c}
 /// @return A pointer to the residue, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
-CHFL_EXPORT CHFL_RESIDUE* chfl_residue_from_topology(
+CHFL_EXPORT const CHFL_RESIDUE* chfl_residue_from_topology(
     const CHFL_TOPOLOGY* topology, uint64_t i
 );
 
-/// Get a copy of the residue containing the atom at index `i` in the
+/// Get access to the residue containing the atom at index `i` in the
 /// `topology`.
 ///
 /// This function will return `NULL` if the atom is not in a residue, or if the
 /// index `i` is bigger than `chfl_topology_atoms_count`.
 ///
-/// The caller of this function should free the allocated memory using
+/// The `topology` will be kept alive, even if `chfl_topology_free` is called,
+/// until `chfl_residue_free` is also called on the pointer returned by this
+/// function.
+///
+/// The pointer returned by this function points directly inside the topology,
+/// and will be invalidated if any of the following function is called on the
+/// topology:
+///
+/// - `chfl_topology_add_residue`
+///
+/// Calling any function on an invalidated pointer is undefined behavior.
+/// Even if the pointer if invalidated, it stills needs to be released with
 /// `chfl_residue_free`.
 ///
 /// @example{tests/capi/doc/chfl_residue/for_atom.c}
 /// @return A pointer to the residue, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
-CHFL_EXPORT CHFL_RESIDUE* chfl_residue_for_atom(
+CHFL_EXPORT const CHFL_RESIDUE* chfl_residue_for_atom(
     const CHFL_TOPOLOGY* topology, uint64_t i
 );
 
@@ -170,7 +192,7 @@ CHFL_EXPORT CHFL_PROPERTY* chfl_residue_get_property(
 ///
 /// @example{tests/capi/doc/chfl_residue/chfl_residue.c}
 /// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_residue_free(CHFL_RESIDUE* residue);
+CHFL_EXPORT chfl_status chfl_residue_free(const CHFL_RESIDUE* residue);
 
 #ifdef __cplusplus
 }

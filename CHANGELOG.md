@@ -6,7 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## Next Release (current master)
 
 * Direct reading and writing of compressed files. gzip and lzma (.xz) formats
-  are supported. 
+  are supported.
 * GROMACS .gro files now supported through custom implementation.
 * Properties are now supported in the `Residue` class. They are accessed using
   `Residue::set` and `Residue::get`.
@@ -30,12 +30,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
       quotes (`name "45"`). This also allows for more exotic atomic names
       (`name "名"`).
 * There is only one constructor for the `Frame` class: `Frame(UnitCell cell =
-  UnitCell())`. The constructor taking a topology can be replaced with calls to 
+  UnitCell())`. The constructor taking a topology can be replaced with calls to
   `Frame::add_atom` and `Frame::add_bond`.
 
 ### Changes in supported formats
 
-* Added `MarcoMolecule Transmission Format (MMTF)` support, reading via mmtf-c.
+* Added `MarcoMolecule Transmission Format (MMTF)` support, reading via mmtf-cpp.
 * Added `Structure-Data File (SDF)` support, reading and writing.
 * Added `Cambridge Structure Search and Retrieval (CSSR)` support, reading and writing.
 
@@ -44,6 +44,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added `chfl_residue_get_property` and `chfl_residue_set_property` to provide
   access to residue properties.
 * `chfl_frame_guess_topology` was renamed to `chfl_frame_guess_bonds`.
+* Function accessing atoms/cell/residue/topology inside a frame/topology no
+  longer make a copy. This allows for direct reading and writing inside the
+  containing frame/topology.
 
 ## 0.8 (14 Dec 2017)
 
