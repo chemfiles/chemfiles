@@ -3,6 +3,7 @@
 
 #include "chemfiles/capi/cell.h"
 #include "chemfiles/capi.hpp"
+#include "chemfiles/shared_allocator.hpp"
 
 #include "chemfiles/UnitCell.hpp"
 #include "chemfiles/Frame.hpp"
@@ -14,7 +15,7 @@ extern "C" CHFL_CELL* chfl_cell(const chfl_vector3d lengths) {
     CHFL_CELL* cell = nullptr;
     CHECK_POINTER_GOTO(lengths);
     CHFL_ERROR_GOTO(
-        cell = new UnitCell(lengths[0], lengths[1], lengths[2]);
+        cell = shared_allocator::make_shared<UnitCell>(lengths[0], lengths[1], lengths[2]);
     )
     return cell;
 error:
@@ -27,7 +28,7 @@ extern "C" CHFL_CELL* chfl_cell_triclinic(const chfl_vector3d lengths, const chf
     CHECK_POINTER_GOTO(lengths);
     CHECK_POINTER_GOTO(angles);
     CHFL_ERROR_GOTO(
-        cell = new UnitCell(
+        cell = shared_allocator::make_shared<UnitCell>(
             lengths[0], lengths[1], lengths[2],
             angles[0], angles[1], angles[2]
         );
@@ -42,11 +43,11 @@ error:
 }
 
 
-extern "C" CHFL_CELL* chfl_cell_from_frame(const CHFL_FRAME* const frame) {
+extern "C" CHFL_CELL* chfl_cell_from_frame(CHFL_FRAME* const frame) {
     CHFL_CELL* cell = nullptr;
     CHECK_POINTER_GOTO(frame);
     CHFL_ERROR_GOTO(
-        cell = new UnitCell(frame->cell());
+        cell = shared_allocator::shared_ptr<UnitCell>(frame, &frame->cell());
     )
     return cell;
 error:
@@ -57,7 +58,7 @@ error:
 extern "C" CHFL_CELL* chfl_cell_copy(const CHFL_CELL* const cell) {
     CHFL_CELL* new_cell = nullptr;
     CHFL_ERROR_GOTO(
-        new_cell = new UnitCell(*cell);
+        new_cell = shared_allocator::make_shared<UnitCell>(*cell);
     )
     return new_cell;
 error:
@@ -147,7 +148,12 @@ extern "C" chfl_status chfl_cell_wrap(const CHFL_CELL* const cell, chfl_vector3d
     )
 }
 
-extern "C" chfl_status chfl_cell_free(CHFL_CELL* const cell) {
-    delete cell;
-    return CHFL_SUCCESS;
+extern "C" chfl_status chfl_cell_free(const CHFL_CELL* const cell) {
+    CHFL_ERROR_CATCH(
+        if (cell == nullptr) {
+            return CHFL_SUCCESS;
+        } else {
+            shared_allocator::free(cell);
+        }
+    )
 }

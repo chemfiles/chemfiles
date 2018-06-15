@@ -174,12 +174,12 @@ TEST_CASE("chfl_topology") {
         CHECK_STATUS(chfl_topology_residues_count(topology, &count));
         CHECK(count == 3);
 
-        CHFL_RESIDUE* first = chfl_residue_for_atom(topology, 2);
-        CHFL_RESIDUE* second = chfl_residue_for_atom(topology, 0);
+        const CHFL_RESIDUE* first = chfl_residue_for_atom(topology, 2);
+        const CHFL_RESIDUE* second = chfl_residue_for_atom(topology, 0);
         REQUIRE(first);
         REQUIRE(second);
 
-        CHFL_RESIDUE* out_of_bounds = chfl_residue_for_atom(topology, 7);
+        const CHFL_RESIDUE* out_of_bounds = chfl_residue_for_atom(topology, 7);
         CHECK_FALSE(out_of_bounds);
 
         bool linked = true;

@@ -11,8 +11,8 @@ int main() {
 
     // Build the topology ...
 
-    CHFL_RESIDUE* first = chfl_residue_from_topology(topology, 0);
-    CHFL_RESIDUE* second = chfl_residue_from_topology(topology, 1);
+    const CHFL_RESIDUE* first = chfl_residue_from_topology(topology, 0);
+    const CHFL_RESIDUE* second = chfl_residue_from_topology(topology, 1);
 
     bool linked = false;
     chfl_topology_residues_linked(topology, first, second, &linked);

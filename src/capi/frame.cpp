@@ -3,6 +3,7 @@
 
 #include "chemfiles/capi/frame.h"
 #include "chemfiles/capi.hpp"
+#include "chemfiles/shared_allocator.hpp"
 
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/ErrorFmt.hpp"
@@ -11,7 +12,7 @@ using namespace chemfiles;
 extern "C" CHFL_FRAME* chfl_frame(void) {
     CHFL_FRAME* frame = nullptr;
     CHFL_ERROR_GOTO(
-        frame = new Frame();
+        frame = shared_allocator::make_shared<Frame>();
     )
     return frame;
 error:
@@ -22,7 +23,7 @@ error:
 extern "C" CHFL_FRAME* chfl_frame_copy(const CHFL_FRAME* const frame) {
     CHFL_FRAME* new_frame = nullptr;
     CHFL_ERROR_GOTO(
-        new_frame = new Frame(frame->clone());
+        new_frame = shared_allocator::make_shared<Frame>(frame->clone());
     )
     return new_frame;
 error:
@@ -73,9 +74,9 @@ extern "C" chfl_status chfl_frame_velocities(CHFL_FRAME* const frame, chfl_vecto
 }
 
 extern "C" chfl_status chfl_frame_add_atom(
-	CHFL_FRAME* const frame, 
-	const CHFL_ATOM* const atom, 
-	const chfl_vector3d position, 
+	CHFL_FRAME* const frame,
+	const CHFL_ATOM* const atom,
+	const chfl_vector3d position,
 	const chfl_vector3d velocity
 ) {
     CHECK_POINTER(frame);
@@ -242,7 +243,12 @@ extern "C" chfl_status chfl_frame_add_residue(CHFL_FRAME* const frame, const CHF
     )
 }
 
-extern "C" chfl_status chfl_frame_free(CHFL_FRAME* const frame) {
-    delete frame;
-    return CHFL_SUCCESS;
+extern "C" chfl_status chfl_frame_free(const CHFL_FRAME* const frame) {
+    CHFL_ERROR_CATCH(
+        if (frame == nullptr) {
+            return CHFL_SUCCESS;
+        } else {
+            shared_allocator::free(frame);
+        }
+    )
 }

@@ -10,7 +10,7 @@ int main() {
 
     // Build topology ...
 
-    CHFL_RESIDUE* residue = chfl_residue_from_topology(topology, 3);
+    const CHFL_RESIDUE* residue = chfl_residue_from_topology(topology, 3);
 
     if (residue == NULL) {
         /* handle error */

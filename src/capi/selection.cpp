@@ -87,7 +87,7 @@ extern "C" chfl_status chfl_selection_matches(const CHFL_SELECTION* const select
     )
 }
 
-extern "C" chfl_status chfl_selection_free(CHFL_SELECTION* const selection) {
+extern "C" chfl_status chfl_selection_free(const CHFL_SELECTION* const selection) {
     delete selection;
     return CHFL_SUCCESS;
 }

@@ -128,7 +128,7 @@ CHFL_EXPORT chfl_status chfl_property_get_vector3d(
 ///
 /// @example{tests/capi/doc/chfl_property/bool.c}
 /// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_property_free(CHFL_PROPERTY* property);
+CHFL_EXPORT chfl_status chfl_property_free(const CHFL_PROPERTY* property);
 
 #ifdef __cplusplus
 }

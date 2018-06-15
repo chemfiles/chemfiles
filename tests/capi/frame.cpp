@@ -215,21 +215,42 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_frame_set_topology(frame, topology));
         CHECK_STATUS(chfl_topology_free(topology));
 
-        topology = chfl_topology_from_frame(frame);
-        REQUIRE(topology);
+        const CHFL_TOPOLOGY* check_topology = chfl_topology_from_frame(frame);
+        REQUIRE(check_topology);
 
         uint64_t natoms = 0;
-        CHECK_STATUS(chfl_topology_atoms_count(topology, &natoms));
+        CHECK_STATUS(chfl_topology_atoms_count(check_topology, &natoms));
         CHECK(natoms == 4);
 
-        CHFL_ATOM* atom = chfl_atom_from_topology(topology, 1);
-        REQUIRE(atom);
+        CHECK_STATUS(chfl_topology_free(check_topology));
+        CHECK_STATUS(chfl_frame_free(frame));
+    }
 
-        char name[32] = {0};
-        CHECK_STATUS(chfl_atom_name(atom, name, sizeof(name)));
-        CHECK(name == std::string("Ar"));
+    SECTION("Change topology") {
+        CHFL_FRAME* frame = chfl_frame();
+        REQUIRE(frame);
+        CHECK_STATUS(chfl_frame_resize(frame, 4));
 
-        CHECK_STATUS(chfl_atom_free(atom));
+        const CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
+        REQUIRE(topology);
+
+        uint64_t nbonds = 0;
+        CHECK_STATUS(chfl_topology_bonds_count(topology, &nbonds));
+        CHECK(nbonds == 0);
+
+        CHFL_TOPOLOGY* new_topology = chfl_topology();
+        REQUIRE(new_topology);
+        CHECK_STATUS(chfl_topology_resize(new_topology, 4));
+        CHECK_STATUS(chfl_topology_add_bond(new_topology, 1, 2));
+        CHECK_STATUS(chfl_topology_add_bond(new_topology, 3, 2));
+
+        CHECK_STATUS(chfl_frame_set_topology(frame, new_topology));
+        CHECK_STATUS(chfl_topology_free(new_topology));
+
+        // Topology changed
+        CHECK_STATUS(chfl_topology_bonds_count(topology, &nbonds));
+        CHECK(nbonds == 2);
+
         CHECK_STATUS(chfl_topology_free(topology));
         CHECK_STATUS(chfl_frame_free(frame));
     }
@@ -268,7 +289,7 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
 
         CHECK_STATUS(chfl_frame_guess_bonds(frame));
-        CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
+        const CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
         REQUIRE(topology);
 
         uint64_t n = 0;
@@ -360,7 +381,7 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_frame_add_bond(frame, 0, 2));
         CHECK_STATUS(chfl_frame_add_bond(frame, 0, 3));
 
-        CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
+        const CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
         REQUIRE(topology);
 
         uint64_t n = 0;
@@ -410,7 +431,7 @@ TEST_CASE("chfl_frame") {
             CHECK_STATUS(chfl_residue_free(residue));
         }
 
-        CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
+        const CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
         REQUIRE(topology);
 
         uint64_t count = 0;

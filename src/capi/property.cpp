@@ -98,7 +98,7 @@ extern "C" chfl_status chfl_property_get_vector3d(const CHFL_PROPERTY* const pro
     )
 }
 
-extern "C" chfl_status chfl_property_free(CHFL_PROPERTY* property) {
+extern "C" chfl_status chfl_property_free(const CHFL_PROPERTY* property) {
     delete property;
     return CHFL_SUCCESS;
 }

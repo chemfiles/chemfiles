@@ -4,6 +4,7 @@
 
 #include "chemfiles/capi/atom.h"
 #include "chemfiles/capi.hpp"
+#include "chemfiles/shared_allocator.hpp"
 
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Atom.hpp"
@@ -14,7 +15,7 @@ using namespace chemfiles;
 extern "C" CHFL_ATOM* chfl_atom(const char* name) {
     CHFL_ATOM* atom = nullptr;
     CHFL_ERROR_GOTO(
-        atom = new Atom(name);
+        atom = shared_allocator::make_shared<Atom>(name);
     )
     return atom;
 error:
@@ -25,7 +26,7 @@ error:
 extern "C" CHFL_ATOM* chfl_atom_copy(const CHFL_ATOM* const atom) {
     CHFL_ATOM* new_atom = nullptr;
     CHFL_ERROR_GOTO(
-        new_atom = new Atom(*atom);
+        new_atom = shared_allocator::make_shared<Atom>(*atom);
     )
     return new_atom;
 error:
@@ -33,7 +34,7 @@ error:
     return nullptr;
 }
 
-extern "C" CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame, uint64_t index) {
+extern "C" CHFL_ATOM* chfl_atom_from_frame(CHFL_FRAME* const frame, uint64_t index) {
     CHFL_ATOM* atom = nullptr;
     CHECK_POINTER_GOTO(frame);
     CHFL_ERROR_GOTO(
@@ -44,7 +45,7 @@ extern "C" CHFL_ATOM* chfl_atom_from_frame(const CHFL_FRAME* const frame, uint64
                 frame->size(), index
             );
         }
-        atom = new Atom(frame->topology()[checked_cast(index)]);
+        atom = shared_allocator::shared_ptr<Atom>(frame, &(*frame)[checked_cast(index)]);
     )
     return atom;
 error:
@@ -52,7 +53,7 @@ error:
     return nullptr;
 }
 
-extern "C" CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* const topology, uint64_t index) {
+extern "C" CHFL_ATOM* chfl_atom_from_topology(CHFL_TOPOLOGY* const topology, uint64_t index) {
     CHFL_ATOM* atom = nullptr;
     CHECK_POINTER_GOTO(topology);
     CHFL_ERROR_GOTO(
@@ -63,7 +64,7 @@ extern "C" CHFL_ATOM* chfl_atom_from_topology(const CHFL_TOPOLOGY* const topolog
                 topology->size(), index
             );
         }
-        atom = new Atom((*topology)[checked_cast(index)]);
+        atom = shared_allocator::shared_ptr<Atom>(topology, &(*topology)[checked_cast(index)]);
     )
     return atom;
 error:
@@ -200,7 +201,12 @@ error:
     return nullptr;
 }
 
-extern "C" chfl_status chfl_atom_free(CHFL_ATOM* const atom) {
-    delete atom;
-    return CHFL_SUCCESS;
+extern "C" chfl_status chfl_atom_free(const CHFL_ATOM* const atom) {
+    CHFL_ERROR_CATCH(
+        if (atom == nullptr) {
+            return CHFL_SUCCESS;
+        } else {
+            shared_allocator::free(atom);
+        }
+    )
 }

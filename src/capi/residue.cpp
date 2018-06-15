@@ -5,6 +5,7 @@
 
 #include "chemfiles/capi/residue.h"
 #include "chemfiles/capi.hpp"
+#include "chemfiles/shared_allocator.hpp"
 
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Residue.hpp"
@@ -15,7 +16,7 @@ extern "C" CHFL_RESIDUE* chfl_residue(const char* name) {
     CHFL_RESIDUE* residue = nullptr;
     CHECK_POINTER_GOTO(name);
     CHFL_ERROR_GOTO(
-        residue = new Residue(std::string(name));
+        residue = shared_allocator::make_shared<Residue>(std::string(name));
     )
     return residue;
 error:
@@ -27,7 +28,7 @@ extern "C" CHFL_RESIDUE* chfl_residue_with_id(const char* name, uint64_t resid) 
     CHFL_RESIDUE* residue = nullptr;
     CHECK_POINTER_GOTO(name);
     CHFL_ERROR_GOTO(
-        residue = new Residue(std::string(name), resid);
+        residue = shared_allocator::make_shared<Residue>(std::string(name), resid);
     )
     return residue;
 error:
@@ -35,11 +36,11 @@ error:
     return nullptr;
 }
 
-extern "C" CHFL_RESIDUE* chfl_residue_from_topology(const CHFL_TOPOLOGY* const topology, uint64_t i) {
-    CHFL_RESIDUE* residue = nullptr;
+extern "C" const CHFL_RESIDUE* chfl_residue_from_topology(const CHFL_TOPOLOGY* const topology, uint64_t i) {
+    const CHFL_RESIDUE* residue = nullptr;
     CHECK_POINTER_GOTO(topology);
     CHFL_ERROR_GOTO(
-        residue = new Residue(topology->residue(checked_cast(i)));
+        residue = shared_allocator::shared_ptr<Residue>(topology, &topology->residue(checked_cast(i)));
     )
     return residue;
 error:
@@ -47,13 +48,13 @@ error:
     return nullptr;
 }
 
-extern "C" CHFL_RESIDUE* chfl_residue_for_atom(const CHFL_TOPOLOGY* const topology, uint64_t i) {
-    CHFL_RESIDUE* residue = nullptr;
+extern "C" const CHFL_RESIDUE* chfl_residue_for_atom(const CHFL_TOPOLOGY* const topology, uint64_t i) {
+    const CHFL_RESIDUE* residue = nullptr;
     CHECK_POINTER_GOTO(topology);
     CHFL_ERROR_GOTO(
-        auto res = topology->residue_for_atom(checked_cast(i));
-        if (res) {
-            residue = new Residue(*res);
+        auto optional = topology->residue_for_atom(checked_cast(i));
+        if (optional) {
+            residue = shared_allocator::shared_ptr<Residue>(topology, &*optional);
         }
     )
     return residue;
@@ -65,7 +66,7 @@ error:
 extern "C" CHFL_RESIDUE* chfl_residue_copy(const CHFL_RESIDUE* const residue) {
     CHFL_RESIDUE* new_residue = nullptr;
     CHFL_ERROR_GOTO(
-        new_residue = new Residue(*residue);
+        new_residue = shared_allocator::make_shared<Residue>(*residue);
     )
     return new_residue;
 error:
@@ -161,7 +162,12 @@ error:
     return nullptr;
 }
 
-extern "C" chfl_status chfl_residue_free(CHFL_RESIDUE* const residue) {
-    delete residue;
-    return CHFL_SUCCESS;
+extern "C" chfl_status chfl_residue_free(const CHFL_RESIDUE* const residue) {
+    CHFL_ERROR_CATCH(
+        if (residue == nullptr) {
+            return CHFL_SUCCESS;
+        } else {
+            shared_allocator::free(residue);
+        }
+    )
 }

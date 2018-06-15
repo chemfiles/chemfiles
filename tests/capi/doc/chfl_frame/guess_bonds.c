@@ -16,7 +16,7 @@ int main() {
     chfl_atom_free(Cl);
 
     // Check that the topology does not contain any bond
-    CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
+    const CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
     uint64_t bonds = 0;
     chfl_topology_bonds_count(topology, &bonds);
     assert(bonds == 0);
