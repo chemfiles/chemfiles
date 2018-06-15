@@ -3,11 +3,11 @@
 
 #include "catch.hpp"
 #include "helpers.hpp"
-#include "chemfiles/files/BasicFile.hpp"
+#include "chemfiles/files/PlainFile.hpp"
 using namespace chemfiles;
 
-TEST_CASE("Read a text file"){
-    BasicFile file("data/xyz/helium.xyz", File::READ);
+TEST_CASE("Read a text file") {
+    PlainFile file("data/xyz/helium.xyz", File::READ);
 
     std::string line = file.readline();
     CHECK(line == "125");
@@ -24,14 +24,14 @@ TEST_CASE("Read a text file"){
     CHECK(line == "Helium as a Lennard-Jone fluid");
 }
 
-TEST_CASE("Various line endinds"){
+TEST_CASE("Various line endinds") {
     auto tmpfile = NamedTempPath(".dat");
 
     std::ofstream file(tmpfile, std::ios_base::binary);
     file << "line one\nline two\rline three\r\nno eol";
     file.close();
 
-    BasicFile basic_file(tmpfile, File::READ);
+    PlainFile basic_file(tmpfile, File::READ);
     CHECK(basic_file.readline() == "line one");
     CHECK(basic_file.readline() == "line two");
     CHECK(basic_file.readline() == "line three");
@@ -39,11 +39,11 @@ TEST_CASE("Various line endinds"){
 }
 
 
-TEST_CASE("Write a text file"){
+TEST_CASE("Write a text file") {
     auto filename = NamedTempPath(".dat");
 
     {
-        BasicFile file(filename, File::WRITE);
+        PlainFile file(filename, File::WRITE);
         file << "Test" << std::endl;
         file << 5467 << std::endl;
     }

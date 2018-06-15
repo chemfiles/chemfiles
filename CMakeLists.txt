@@ -23,6 +23,8 @@ option(CHFL_CODE_COVERAGE "Enable code coverage" OFF)
 option(CHFL_USE_WARNINGS "Compile the code with warnings (default in debug mode)" OFF)
 option(CHFL_DEBUG_GLIBCXX "Use the debug version of GNU libstdcxx" OFF)
 option(CHFL_SYSTEM_NETCDF "Use the system NetCDF instead of the internal one" OFF)
+option(CHFL_SYSTEM_ZLIB "Use the system zlib instead of the internal one" OFF)
+option(CHFL_SYSTEM_LZMA "Use the system lzma instead of the internal one" OFF)
 
 option(CHFL_BUILD_DOCTESTS "Build documentation tests as well as unit tests." ON)
 mark_as_advanced(CHFL_BUILD_DOCTESTS)
@@ -79,6 +81,10 @@ add_subdirectory(external)
 # unit tests.
 file(GLOB_RECURSE chemfiles_objects_sources src/**.cpp)
 add_library(chemfiles_objects OBJECT ${chemfiles_objects_sources})
+
+target_include_directories(chemfiles_objects SYSTEM BEFORE PRIVATE ${EXTERNAL_INCLUDES})
+target_include_directories(chemfiles_objects SYSTEM BEFORE PRIVATE ${ZLIB_INCLUDE_DIRS} ${LIBLZMA_INCLUDE_DIRS})
+
 target_include_directories(chemfiles_objects PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -95,7 +101,8 @@ set(CHEMFILES_OBJECTS
     $<TARGET_OBJECTS:molfiles>
     $<TARGET_OBJECTS:fmt::object>
     $<TARGET_OBJECTS:tng_io>
-    $<TARGET_OBJECTS:tng_io_zlib>
+    ${ZLIB_OBJECTS}
+    ${LZMA_OBJECTS}
     ${NETCDF_OBJECTS}
 )
 
@@ -111,12 +118,10 @@ target_include_directories(chemfiles PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
 )
-target_include_directories(chemfiles SYSTEM BEFORE PRIVATE ${EXTERNAL_INCLUDES})
 
+target_link_libraries(chemfiles ${NETCDF_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBLZMA_LIBRARY})
 if(WIN32)
-    target_link_libraries(chemfiles ${NETCDF_LIBRARIES} ws2_32)
-else()
-    target_link_libraries(chemfiles ${NETCDF_LIBRARIES})
+    target_link_libraries(chemfiles ws2_32)
 endif()
 
 configure_file (

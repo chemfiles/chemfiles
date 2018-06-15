@@ -57,16 +57,21 @@ public:
     static std::unique_ptr<TextFile> create(const std::string& path, File::Mode mode);
 
     /// Read a line from the file
-    virtual std::string readline() = 0;
+    std::string readline();
     /// Read `n` lines from the file
-    virtual std::vector<std::string> readlines(size_t n) = 0;
+    std::vector<std::string> readlines(size_t n);
     /// Reset the file cursor
-    virtual void rewind() = 0;
+    void rewind();
     /// Are we at the end of the file ?
-    virtual bool eof() = 0;
+    bool eof();
+
 protected:
-    TextFile(const std::string& path, File::Mode mode):
-        File(path, mode), std::iostream(nullptr) {}
+    /// Initialize the TextFile at the given `path` and `mode`. All read and
+    /// write operations will go through the provided `buffer`.
+    TextFile(const std::string& path, File::Mode mode, std::streambuf* buffer);
+
+private:
+    void get_line(std::string& string);
 };
 
 } // namespace chemfiles
