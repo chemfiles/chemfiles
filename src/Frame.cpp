@@ -45,7 +45,7 @@ void Frame::add_velocities() {
     }
 }
 
-void Frame::guess_topology() {
+void Frame::guess_bonds() {
     topology_.clear_bonds();
     // This bond guessing algorithm comes from VMD
     auto cutoff = 0.833;

@@ -22,7 +22,7 @@ int main() {
     assert(bonds == 0);
     chfl_topology_free(topology);
 
-    chfl_frame_guess_topology(frame);
+    chfl_frame_guess_bonds(frame);
 
     // Get a copie of the new topology
     topology = chfl_topology_from_frame(frame);

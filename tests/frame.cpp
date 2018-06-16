@@ -111,7 +111,7 @@ TEST_CASE("Guess topology") {
         frame.add_atom(Atom("O"), {0, 0, 0});
         frame.add_atom(Atom("O"), {1.5, 0, 0});
         frame.add_atom(Atom("H"), {1.5, 1, 0});
-        frame.guess_topology();
+        frame.guess_bonds();
 
         auto bonds = std::vector<Bond>{{0, 1}, {1, 2}, {2, 3}};
         auto angles = std::vector<Angle>{{0, 1, 2}, {1, 2, 3}};
@@ -123,7 +123,7 @@ TEST_CASE("Guess topology") {
 
     SECTION("Methane file") {
         auto frame = Trajectory("data/xyz/methane.xyz").read();
-        frame.guess_topology();
+        frame.guess_bonds();
 
         auto topology = frame.topology();
         CHECK(topology.bonds() == (std::vector<Bond>{{0, 1}, {0, 2}, {0, 3}, {0, 4}}));
@@ -148,7 +148,7 @@ TEST_CASE("Guess topology") {
         frame.add_atom(Atom("H"), {0.2, 0.8, 0});
         frame.add_atom(Atom("H"), {-0.2, 0.8, 0});
 
-        frame.guess_topology();
+        frame.guess_bonds();
         CHECK(frame.topology().bonds() == (std::vector<Bond>{{0, 1}, {0, 2}}));
     }
 
@@ -159,7 +159,7 @@ TEST_CASE("Guess topology") {
         frame.add_atom(Atom("C"), {0.5, 0, 0});
         frame.add_atom(Atom("C"), {-0.5, 0, 0});
 
-        frame.guess_topology();
+        frame.guess_bonds();
         CHECK(frame.topology().bonds() == (std::vector<Bond>{{0, 1}, {0, 2}, {1, 2}}));
         CHECK(frame.topology().angles() == (std::vector<Angle>{{0, 1, 2}, {0, 2, 1}, {1, 0, 2}}));
         CHECK(frame.topology().dihedrals() == (std::vector<Dihedral>{}));
@@ -173,7 +173,7 @@ TEST_CASE("Guess topology") {
         frame.add_atom(Atom("C"), {1.5, 1.5, 0});
         frame.add_atom(Atom("C"), {0, 1.5, 0});
 
-        frame.guess_topology();
+        frame.guess_bonds();
         CHECK(frame.topology().bonds() == (std::vector<Bond>{{0, 1}, {0, 3}, {1, 2}, {2, 3}}));
         CHECK(frame.topology().angles() == (std::vector<Angle>{{0, 1, 2}, {0, 3, 2}, {1, 0, 3}, {1, 2, 3}}));
         CHECK(frame.topology().dihedrals() == (std::vector<Dihedral>{{0, 1, 2, 3}, {1, 0, 3, 2}, {1, 2, 3, 0}, {2, 1, 0, 3}}));

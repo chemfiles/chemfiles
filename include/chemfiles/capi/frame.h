@@ -183,10 +183,10 @@ CHFL_EXPORT chfl_status chfl_frame_set_step(
 /// The bonds are guessed using a distance-based algorithm, and then angles and
 /// dihedrals are guessed from the bonds.
 ///
-/// @example{tests/capi/doc/chfl_frame/guess_topology.c}
+/// @example{tests/capi/doc/chfl_frame/guess_bonds.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_frame_guess_topology(CHFL_FRAME* frame);
+CHFL_EXPORT chfl_status chfl_frame_guess_bonds(CHFL_FRAME* frame);
 
 /// Get the distance between the atoms at indexes `i` and `j` in the `frame`,
 /// accounting for periodic boundary conditions. The result is placed in

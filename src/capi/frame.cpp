@@ -150,10 +150,10 @@ extern "C" chfl_status chfl_frame_set_step(CHFL_FRAME* const frame, uint64_t ste
     )
 }
 
-extern "C" chfl_status chfl_frame_guess_topology(CHFL_FRAME* const frame) {
+extern "C" chfl_status chfl_frame_guess_bonds(CHFL_FRAME* const frame) {
     CHECK_POINTER(frame);
     CHFL_ERROR_CATCH(
-        frame->guess_topology();
+        frame->guess_bonds();
     )
 }
 
