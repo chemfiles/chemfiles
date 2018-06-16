@@ -200,6 +200,15 @@ CHFL_EXPORT CHFL_PROPERTY* chfl_atom_get_property(
     const CHFL_ATOM* atom, const char* name
 );
 
+
+/// Get a pointer to an array of properties names and the number of properties.
+/// This function returns `nullptr` if there're no properties.
+///
+/// @example{tests/capi/doc/chfl_atom/property.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_atom_properties_names(const CHFL_ATOM* const atom, uint64_t* count, const char*** names);
+
 /// Free the memory associated with an `atom`.
 ///
 /// @example{tests/capi/doc/chfl_atom/chfl_atom.c}
