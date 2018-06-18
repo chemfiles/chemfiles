@@ -147,58 +147,41 @@ TEST_CASE("Write files in GRO format") {
     "   2.20000   2.20000   2.20000\n"
     "Second test\n"
     "    7\n"
-    "    4XXXXX    A    1   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
-    "    3foo      B    2   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
-    "    3foo      C    3   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
-    "    5barba    D    4   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
+    "    4XXXXX    A    1   0.100   0.200   0.300  0.0000  0.0000  0.0000\n"
+    "    3foo      B    2   0.100   0.200   0.300  0.0000  0.0000  0.0000\n"
+    "    3foo      C    3   0.100   0.200   0.300  0.0000  0.0000  0.0000\n"
+    "    5barba    D    4   0.100   0.200   0.300  0.0000  0.0000  0.0000\n"
     "    6XXXXX    E    5   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
     "    7XXXXX    F    6   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
     "    8XXXXX    G    7   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
     "   2.20000   1.90526   4.40000 0.0 0.0  -1.10000 0.0   0.00000   0.00000\n";
 
-    Topology topology;
-    topology.add_atom(Atom("A"));
-    topology.add_atom(Atom("B"));
-    topology.add_atom(Atom("C"));
-    topology.add_atom(Atom("D"));
+    auto frame = Frame(UnitCell(22));
+    frame.add_atom(Atom("A"), {1, 2, 3});
+    frame.add_atom(Atom("B"), {1, 2, 3});
+    frame.add_atom(Atom("C"), {1, 2, 3});
+    frame.add_atom(Atom("D"), {1, 2, 3});
 
-    Frame frame(topology);
-    frame.set_cell(UnitCell(22));
-
-    auto positions = frame.positions();
-    for(size_t i=0; i<4; i++) {
-        positions[i] = Vector3D(1, 2, 3);
-    }
 
     auto file = Trajectory(tmpfile, 'w');
-
     file.write(frame);
 
-    frame.resize(7);
     frame.set("name", "Second test");
     frame.set_cell(UnitCell(22, 22, 44, 90, 90, 120));
-
     frame.add_velocities();
-    positions = frame.positions();
-    auto velocities = *(frame.velocities());
-    for(size_t i=0; i<7; i++) {
-        positions[i] = Vector3D(4, 5, 6);
-        velocities[i]= Vector3D(9, 10, 11);
-    }
-    topology.add_atom(Atom("E"));
-    topology.add_atom(Atom("F"));
-    topology.add_atom(Atom("G"));
+
+    frame.add_atom(Atom("E"), {4, 5, 6}, {9, 10, 11});
+    frame.add_atom(Atom("F"), {4, 5, 6}, {9, 10, 11});
+    frame.add_atom(Atom("G"), {4, 5, 6}, {9, 10, 11});
 
     Residue residue("foo", 3);
     residue.add_atom(1);
     residue.add_atom(2);
-    topology.add_residue(residue);
+    frame.add_residue(residue);
 
     residue = Residue("barbar"); // This will be truncated in output
     residue.add_atom(3);
-    topology.add_residue(residue);
-
-    frame.set_topology(topology);
+    frame.add_residue(residue);
 
     file.write(frame);
     file.close();
@@ -249,11 +232,10 @@ TEST_CASE("GRO files with big values") {
         if (!is_valgrind_and_travis()) {
             auto tmpfile = NamedTempPath(".gro");
 
-            Topology topology;
+            auto frame = Frame();
             for(size_t i=0; i<100001; i++) {
-                topology.add_atom(Atom("A"));
+                frame.add_atom(Atom("A"), {0, 0, 0});
             }
-            Frame frame(topology);
             auto positions = frame.positions();
             positions[9998] = Vector3D(1., 2., 3.);
             positions[99998] = Vector3D(4., 5., 6.);
@@ -277,15 +259,13 @@ TEST_CASE("GRO files with big values") {
         if (!is_valgrind_and_travis()) {
             auto tmpfile = NamedTempPath(".gro");
 
-            Topology topology;
+            auto frame = Frame();
             for(size_t i=0; i<100001; i++) {
-                Atom atom("A");
-                topology.add_atom(atom);
+                frame.add_atom(Atom("A"), {0, 0, 0});
                 Residue residue("ANA", i + 1);
                 residue.add_atom(i);
-                topology.add_residue(residue);
+                frame.add_residue(std::move(residue));
             }
-            Frame frame(topology);
             auto positions = frame.positions();
             positions[9998] = Vector3D(1., 2., 3.);
             positions[99998] = Vector3D(4., 5., 6.);

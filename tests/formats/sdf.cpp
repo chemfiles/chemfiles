@@ -101,11 +101,11 @@ TEST_CASE("Write files in SDF format") {
     "$$$$\n"
     "TEST\n"
     " chemfiles-lib\n\n"
-    " 11  3  0     0  0  0  0  0  0999 V2000\n"
-    "    4.0000    5.0000    6.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    4.0000    5.0000    6.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    4.0000    5.0000    6.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    4.0000    5.0000    6.0000 F   0  0  0  0  0  0  0  0  0  0  0  0\n"
+    " 11  5  0     0  0  0  0  0  0999 V2000\n"
+    "    1.0000    2.0000    3.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n"
+    "    1.0000    2.0000    3.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n"
+    "    1.0000    2.0000    3.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
+    "    1.0000    2.0000    3.0000 F   0  0  0  0  0  0  0  0  0  0  0  0\n"
     "    4.0000    5.0000    6.0000 E   0  0  0  0  0  0  0  0  0  0  0  0\n"
     "    4.0000    5.0000    6.0000 D   0  0  0  0  0  0  0  0  0  0  0  0\n"
     "    0.0000    0.0000    0.0000 G   0  0  0  0  0  0  0  0  0  0  0  0\n"
@@ -113,50 +113,36 @@ TEST_CASE("Write files in SDF format") {
     "    0.0000    0.0000    0.0000 I   0  0  0  0  0  0  0  0  0  0  0  0\n"
     "    0.0000    0.0000    0.0000 J   0  0  0  0  0  0  0  0  0  0  0  0\n"
     "    0.0000    0.0000    0.0000 K   0  0  0  0  0  0  0  0  0  0  0  0\n"
+    "  1  3  1  0  0  0  0\n"
+    "  2  3  1  0  0  0  0\n"
     "  3  4  1  0  0  0  0\n"
     "  9 10  1  0  0  0  0\n"
     " 10 11  1  0  0  0  0\n"
     "M END\n"
     "$$$$\n";
 
-    auto topology = Topology();
-    topology.add_atom(Atom("A","O"));
-    topology.add_atom(Atom("B","N"));
-    topology.add_atom(Atom("C"));
-    topology.add_atom(Atom("F"));
-
-    auto frame = Frame(topology);
-    auto positions = frame.positions();
-    for (size_t i=0; i<4; i++) {
-        positions[i] = Vector3D(1, 2, 3);
-    }
-
-    frame.add_bond(0,2);
-    frame.add_bond(1,2);
-    frame.add_bond(2,3);
+    auto frame = Frame();
+    frame.add_atom(Atom("A","O"), {1, 2, 3});
+    frame.add_atom(Atom("B","N"), {1, 2, 3});
+    frame.add_atom(Atom("C"), {1, 2, 3});
+    frame.add_atom(Atom("F"), {1, 2, 3});
+    frame.add_bond(0, 2);
+    frame.add_bond(1, 2);
+    frame.add_bond(2, 3);
 
     auto file = Trajectory(tmpfile, 'w');
     file.write(frame);
 
-    frame.resize(11);
-    positions = frame.positions();
-    for (size_t i=0; i<6; i++) {
-        positions[i] = Vector3D(4, 5, 6);
-    }
+    frame.add_atom(Atom("E"), {4, 5, 6});
+    frame.add_atom(Atom("D"), {4, 5, 6});
+    frame.add_atom(Atom("G"), {0, 0, 0});
+    frame.add_atom(Atom("H"), {0, 0, 0});
+    frame.add_atom(Atom("I"), {0, 0, 0});
+    frame.add_atom(Atom("J"), {0, 0, 0});
+    frame.add_atom(Atom("K"), {0, 0, 0});
 
-    topology.add_atom(Atom("E"));
-    topology.add_atom(Atom("D"));
-    topology.add_atom(Atom("G"));
-    topology.add_atom(Atom("H"));
-    topology.add_atom(Atom("I"));
-    topology.add_atom(Atom("J"));
-    topology.add_atom(Atom("K"));
-
-    frame.set_topology(topology);
-
-    frame.add_bond(9,10);
-    frame.add_bond(8,9);
-    frame.add_bond(2,3);
+    frame.add_bond(9, 10);
+    frame.add_bond(8, 9);
 
     frame.set("name", Property("TEST"));
 

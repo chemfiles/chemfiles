@@ -33,23 +33,10 @@ namespace chemfiles {
 /// @example{tests/doc/frame/iterate.cpp}
 class CHFL_EXPORT Frame final {
 public:
-    /// Create an empty frame with no atoms and an infinite unit cell.
+    /// Create an empty frame with no atoms and the given cell.
     ///
-    /// @example{tests/doc/frame/frame-0.cpp}
-    Frame();
-
-    /// Create a frame containing the atoms in the `topology`, and the given
-    /// unit `cell`.
-    ///
-    /// The positions of each atom will be initiliazed to `(0, 0, 0)`, and the
-    /// frame will not contain any velocity.
-    ///
-    /// @example{tests/doc/frame/frame-2.cpp}
-    ///
-    /// @param topology `Topology` containing the atoms to use in this frame
-    /// @param cell `UnitCell` bounding the new frame. It default to an
-    /// `INFINITE` unit cell.
-    explicit Frame(Topology topology, UnitCell cell = UnitCell());
+    /// @example{tests/doc/frame/frame.cpp}
+    explicit Frame(UnitCell cell = UnitCell());
 
     ~Frame() = default;
     Frame(Frame&&) = default;

@@ -174,10 +174,10 @@ TEST_CASE("Write files in mol2 format") {
     "SMALL\n"
     "USER_CHARGES\n\n"
     "@<TRIPOS>ATOM\n"
-    "   1 CCH22  4.000000 5.000000 6.000000 CCH22 4 XXX 0.000000\n"
-    "   2 B     4.000000 5.000000 6.000000 B 3 foo 0.000000\n"
-    "   3 C     4.000000 5.000000 6.000000 C 3 foo 0.000000\n"
-    "   4 D     4.000000 5.000000 6.000000 D 5 barbar 0.000000\n"
+    "   1 CCH22  1.000000 2.000000 3.000000 CCH22 4 XXX 0.000000\n"
+    "   2 B     1.123456 2.123457 10000000.123456 B 3 foo 0.000000\n"
+    "   3 C     1.000000 2.000000 3.000000 C 3 foo 0.000000\n"
+    "   4 D     1.000000 2.000000 3.000000 D 5 barbar 0.000000\n"
     "   5 E     4.000000 5.000000 6.000000 E 6 XXX 0.000000\n"
     "   6 F     4.000000 5.000000 6.000000 F 7 XXX 0.000000\n"
     "   7 G     4.000000 5.000000 6.000000 G 8 XXX 0.000000\n"
@@ -195,51 +195,37 @@ TEST_CASE("Write files in mol2 format") {
     "@<TRIPOS>SUBSTRUCTURE\n"
     "   1 ****        1 TEMP                        0 ****  **** 0 ROOT\n\n";
 
-    Topology topology;
-    topology.add_atom(Atom("CCH22"));
-    topology.add_atom(Atom("B"));
-    topology.add_atom(Atom("C"));
-    topology.add_atom(Atom("D"));
-    topology.add_bond(0, 1);
-    Frame frame(topology);
-
-    auto positions = frame.positions();
-    for(size_t i=0; i<4; i++) {
-        positions[i] = Vector3D(1, 2, 3);
-    }
-    positions[1] = Vector3D(1.123456, 2.123456789, 10000000.123456);
+    auto frame = Frame();
+    frame.add_atom(Atom("CCH22"), {1, 2, 3});
+    frame.add_atom(Atom("B"), {1.123456, 2.123456789, 10000000.123456});
+    frame.add_atom(Atom("C"), {1, 2, 3});
+    frame.add_atom(Atom("D"), {1, 2, 3});
+    frame.add_bond(0, 1);
 
     auto file = Trajectory(tmpfile, 'w');
     file.write(frame);
 
-    frame.resize(7);
     frame.set_cell(UnitCell(22));
     frame.set("name", "test");
-    positions = frame.positions();
-    for(size_t i=0; i<7; i++) {
-        positions[i] = Vector3D(4, 5, 6);
-    }
-    topology.add_atom(Atom("E"));
-    topology.add_atom(Atom("F"));
-    topology.add_atom(Atom("G"));
-    topology.add_bond(4, 5);
-    topology.add_bond(0, 6);
-    topology.add_bond(1, 6);
-    topology.add_bond(2, 6);
-    topology.add_bond(3, 6);
-    topology.add_bond(4, 6);
-    topology.add_bond(5, 6);
+    frame.add_atom(Atom("E"), {4, 5, 6});
+    frame.add_atom(Atom("F"), {4, 5, 6});
+    frame.add_atom(Atom("G"), {4, 5, 6});
+    frame.add_bond(4, 5);
+    frame.add_bond(0, 6);
+    frame.add_bond(1, 6);
+    frame.add_bond(2, 6);
+    frame.add_bond(3, 6);
+    frame.add_bond(4, 6);
+    frame.add_bond(5, 6);
 
     Residue residue("foo", 3);
     residue.add_atom(1);
     residue.add_atom(2);
-    topology.add_residue(residue);
+    frame.add_residue(residue);
 
     residue = Residue("barbar"); // This will be truncated in output
     residue.add_atom(3);
-    topology.add_residue(residue);
-
-    frame.set_topology(topology);
+    frame.add_residue(residue);
 
     file.write(frame);
     file.close();

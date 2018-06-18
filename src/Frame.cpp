@@ -7,13 +7,7 @@
 #include "chemfiles/Frame.hpp"
 using namespace chemfiles;
 
-Frame::Frame() : Frame(Topology()) {}
-
-Frame::Frame(Topology topology, UnitCell cell):
-    topology_(std::move(topology)), cell_(cell)
-{
-    resize(topology_.size());
-}
+Frame::Frame(UnitCell cell): topology_(), cell_(std::move(cell)) {}
 
 size_t Frame::size() const {
     assert(positions_.size() == topology_.size());
