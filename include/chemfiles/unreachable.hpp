@@ -10,16 +10,18 @@
   #define __has_builtin(x) 0
 #endif
 
-#if __has_builtin(__builtin_unreachable)
-    #define unreachable() __builtin_unreachable()
-#elif GCC_VERSION >= 40500
-    #define unreachable() __builtin_unreachable()
+namespace chemfiles {
+
+[[noreturn]] inline void unreachable() {
+#if __has_builtin(__builtin_unreachable) || GCC_VERSION >= 40500
+    __builtin_unreachable();
 #elif defined(_MSC_VER)
-    #define unreachable() __assume(false)
+    __assume(false);
 #else
-    #define unreachable() do {                     \
-        throw Error("entered unreachable code");   \
-    } while (false)
+    throw Error("entered unreachable code");
 #endif
+}
+
+}
 
 #endif
