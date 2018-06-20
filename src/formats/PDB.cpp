@@ -82,53 +82,59 @@ void PDBFormat::read(Frame& frame) {
     frame.resize(0);
     residues_.clear();
 
-    while (!file_->eof()) {
+    std::streampos position;
+    bool got_end = false;
+    while (!got_end && !file_->eof()) {
         auto line = file_->readline();
-        auto position = file_->tellg();
         auto record = get_record(line);
         switch (record) {
         case Record::CRYST1:
             read_CRYST1(frame, line);
-            break;
+            continue;
         case Record::ATOM:
             read_ATOM(frame, line, false);
-            break;
+            continue;
         case Record::HETATM:
             read_ATOM(frame, line, true);
-            break;
+            continue;
         case Record::CONECT:
             read_CONECT(frame, line);
-            break;
+            continue;
         case Record::MODEL:
             models_++;
-            break;
+            continue;
         case Record::ENDMDL:
             // Check if the next record is an `END` record
             if (!file_->eof()) {
+                position = file_->tellg();
                 line = file_->readline();
                 file_->seekg(position);
-                record = get_record(line);
-                if (record == Record::END) {
+                if (get_record(line) == Record::END) {
                     // If this is the case, wait for this next record
-                    break;
+                    continue;
                 }
             }
             // Else we have read a frame
-            goto end;
+            got_end = true;
+            continue;
         case Record::END:
             // We have read a frame!
-            goto end;
+            got_end = true;
+            continue;
         case Record::IGNORED_:
-            break; // Nothing to do
+            continue; // Nothing to do
         case Record::UNKNOWN_:
-            warning("Unknown PDB record: {}", line);
-            break;
+            if (!file_->eof()) {
+                warning("Unknown PDB record: {}", line);
+            }
+            continue;
         }
     }
 
-    // If we are here, we got EOF before an END record
-    warning("Missing END record in PDB file");
-end:
+    if (!got_end) {
+        warning("Missing END record in PDB file");
+    }
+
     link_standard_residue_bonds(frame);
     for (auto& residue: residues_) {
         frame.add_residue(residue.second);
