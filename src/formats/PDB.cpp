@@ -408,7 +408,10 @@ static std::string to_pdb_index(uint64_t i) {
     auto id = i + 1;
 
     if (id >= 100000) {
-        warning("Too many atoms for PDB format, removing atomic id");
+        if (id == 100000) {
+            // Only warn once for this
+            warning("Too many atoms for PDB format, removing atomic id bigger than 100000");
+        }
         return "*****";
     } else {
         return std::to_string(i + 1);
@@ -474,7 +477,7 @@ void PDBFormat::write(const Frame& frame) {
             if (residue->id()) {
                 auto value = residue->id().value();
                 if (value > 9999) {
-                    warning("Too many residues for PDB format, removing residue id");
+                    warning("Too many residues for PDB format, removing residue id {}", value);
                     resid = "  -1";
                 } else {
                     resid = std::to_string(residue->id().value());
@@ -487,7 +490,7 @@ void PDBFormat::write(const Frame& frame) {
                 chainid = residue->get("chainid")->as_string();
                 if (chainid.length() > 1) {
                     warning(
-                        "Residue '{}' has a chain id name too long for PDB format, it will be truncated.",
+                        "Residue '{}' has a chain id too long for PDB format, it will be truncated.",
                         chainid
                     );
                     chainid = chainid[0];
@@ -524,7 +527,7 @@ void PDBFormat::write(const Frame& frame) {
     auto connect = std::vector<std::vector<size_t>>(frame.size());
     for (auto& bond : frame.topology().bonds()) {
         if (bond[0] > 99999 || bond[1] > 99999) {
-            warning("Atomic index is too big for CONNECT, removing the bond");
+            warning("Atomic index is too big for CONNECT, removing the bond between {} and {}", bond[0], bond[1]);
             continue;
         }
         connect[bond[0]].push_back(bond[1]);
