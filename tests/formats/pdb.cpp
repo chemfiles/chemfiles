@@ -16,6 +16,8 @@ static bool contains(const std::vector<T> haystack, const T& needle) {
 TEST_CASE("Read files in PDB format") {
     SECTION("Read next step") {
         Trajectory file("data/pdb/water.pdb");
+        CHECK(file.nsteps() == 100);
+
         Frame frame = file.read();
 
         CHECK(frame.size() == 297);

@@ -135,10 +135,10 @@ void PDBFormat::read(Frame& frame) {
         warning("Missing END record in PDB file");
     }
 
-    link_standard_residue_bonds(frame);
-    for (auto& residue: residues_) {
+    for (const auto& residue: residues_) {
         frame.add_residue(residue.second);
     }
+    link_standard_residue_bonds(frame);
 }
 
 void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
@@ -217,7 +217,6 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
     } catch (std::invalid_argument&) {
         // No residue information
     }
-
 }
 
 void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
@@ -276,26 +275,32 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
 void PDBFormat::link_standard_residue_bonds(Frame& frame) {
     bool link_previous_peptide = false;
     bool link_previous_nucleic = false;
-    size_t previous_residue_id = 0;
+    uint64_t previous_residue_id = 0;
     size_t previous_carboxylic_id = 0;
 
-    for (auto& res : residues_) {
-        const auto& residue_table = PDB_CONNECTIVITY_INFORMATION.find(res.second.name());
-        if (residue_table == PDB_CONNECTIVITY_INFORMATION.end()) {
+    for (const auto& residue: frame.topology().residues()) {
+        auto residue_table = PDBConnectivity::find(residue.name());
+        if (!residue_table) {
             continue;
         }
 
         std::map<std::string, size_t> atom_name_to_index;
-        for (const auto& atom : res.second) {
+        for (size_t atom : residue) {
             atom_name_to_index[frame[atom].name()] =  atom;
         }
 
         const auto& amide_nitrogen = atom_name_to_index.find("N");
-        const auto& amide_carbon   = atom_name_to_index.find("O");
+        const auto& amide_carbon = atom_name_to_index.find("O");
 
+        if (!residue.id()) {
+            warning("got a residues without id in PDB format. This should not happen");
+            continue;
+        }
+
+        auto resid = *residue.id();
         if (link_previous_peptide &&
             amide_nitrogen != atom_name_to_index.end() &&
-            res.first == previous_residue_id + 1 )
+            resid == previous_residue_id + 1 )
         {
             link_previous_peptide = false;
             frame.add_bond(previous_carboxylic_id, amide_nitrogen->second);
@@ -304,7 +309,7 @@ void PDBFormat::link_standard_residue_bonds(Frame& frame) {
         if (amide_carbon != atom_name_to_index.end() ) {
             link_previous_peptide = true;
             previous_carboxylic_id = amide_carbon->second;
-            previous_residue_id = res.first;
+            previous_residue_id = resid;
         }
 
         const auto& three_prime_oxygen = atom_name_to_index.find("O3'");
@@ -312,7 +317,7 @@ void PDBFormat::link_standard_residue_bonds(Frame& frame) {
 
         if (link_previous_nucleic &&
             five_prime_phospho != atom_name_to_index.end() &&
-            res.first == previous_residue_id + 1 )
+            resid == previous_residue_id + 1 )
         {
             link_previous_nucleic = false;
             frame.add_bond(previous_carboxylic_id, three_prime_oxygen->second);
@@ -321,7 +326,7 @@ void PDBFormat::link_standard_residue_bonds(Frame& frame) {
         if (three_prime_oxygen != atom_name_to_index.end() ) {
             link_previous_nucleic = true;
             previous_carboxylic_id = three_prime_oxygen->second;
-            previous_residue_id = res.first;
+            previous_residue_id = resid;
         }
 
         // A special case missed by the standards committee????
@@ -329,23 +334,24 @@ void PDBFormat::link_standard_residue_bonds(Frame& frame) {
             frame.add_bond(atom_name_to_index["HO5'"], atom_name_to_index["O5'"]);
         }
 
-        for (const auto& p : residue_table->second) {
-
-            const auto& first_atom = atom_name_to_index.find(p.first);
-            const auto& second_atom= atom_name_to_index.find(p.second);
+        for (const auto& link: *residue_table) {
+            const auto& first_atom = atom_name_to_index.find(link.first);
+            const auto& second_atom = atom_name_to_index.find(link.second);
 
             if (first_atom == atom_name_to_index.end()) {
-                if (p.first[0] != 'H' && p.first != "OXT" &&
-                    p.first[0] != 'P' && p.first.substr(0,2) != "OP" ) {
-                    warning("{}_{} does not contain {}", res.second.name(), res.first, p.first);
+                const auto& first_name = link.first.string();
+                if (first_name[0] != 'H' && first_name != "OXT" &&
+                    first_name[0] != 'P' && first_name.substr(0,2) != "OP" ) {
+                    warning("{}_{} does not contain {}", residue.name(), resid, first_name);
                 }
                 continue;
             }
 
             if (second_atom == atom_name_to_index.end()) {
-                if (p.second[0] != 'H' && p.second != "OXT" &&
-                    p.second[0] != 'P' && p.second.substr(0,2) != "OP" ) {
-                    warning("{}_{} does not contain {}", res.second.name(), res.first, p.second);
+                const auto& second_name = link.second.string();
+                if (second_name[0] != 'H' && second_name != "OXT" &&
+                    second_name[0] != 'P' && second_name.substr(0,2) != "OP" ) {
+                    warning("{}_{} does not contain {}", residue.name(), resid, second_name);
                 }
                 continue;
             }
