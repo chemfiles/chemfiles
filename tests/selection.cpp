@@ -1,6 +1,5 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-
 #include <catch.hpp>
 #include "chemfiles.hpp"
 using namespace chemfiles;
@@ -221,6 +220,58 @@ TEST_CASE("Atoms selections") {
         // Variable index is too big
         CHECK_THROWS_AS(Selection("pairs: name(#3) O"), SelectionError);
         CHECK_THROWS_AS(Selection("name(#2) O"), SelectionError);
+    }
+
+    SECTION("math") {
+        auto selection = Selection("x + 2 < 4");
+        auto expected = std::vector<size_t>{0, 1};
+        CHECK(selection.list(frame) == expected);
+
+        selection = Selection("x - 2 < 0");
+        CHECK(selection.list(frame) == expected);
+
+        selection = Selection("-x > -2");
+        CHECK(selection.list(frame) == expected);
+
+        selection = Selection("x^2 > 3");
+        expected = std::vector<size_t>{2, 3};
+        CHECK(selection.list(frame) == expected);
+
+        selection = Selection("sqrt(x^2) > sqrt(3)");
+        CHECK(selection.list(frame) == expected);
+
+        selection = Selection("y / 2 != 1");
+        expected = std::vector<size_t>{0, 2, 3};
+        CHECK(selection.list(frame) == expected);
+
+        selection = Selection("z * 5 >= 50");
+        expected = std::vector<size_t>{};
+        CHECK(selection.list(frame) == expected);
+    }
+
+    SECTION("functions") {
+        auto selection = Selection("four: distance(#1, #2) > 4");
+        auto expected = std::vector<Match>{
+            {0ul, 3ul, 1ul, 2ul}, {0ul, 3ul, 2ul, 1ul},
+            {3ul, 0ul, 1ul, 2ul}, {3ul, 0ul, 2ul, 1ul},
+        };
+        CHECK(selection.evaluate(frame) == expected);
+
+        selection = Selection("four: angle(#1, #2, #3) > deg2rad(120)");
+        expected = std::vector<Match>{
+            {0ul, 1ul, 2ul, 3ul}, {0ul, 1ul, 3ul, 2ul}, {0ul, 2ul, 3ul, 1ul},
+            {1ul, 2ul, 3ul, 0ul}, {2ul, 1ul, 0ul, 3ul}, {3ul, 1ul, 0ul, 2ul},
+            {3ul, 2ul, 0ul, 1ul}, {3ul, 2ul, 1ul, 0ul},
+        };
+        CHECK(selection.evaluate(frame) == expected);
+
+        selection = Selection("four: dihedral(#1, #2, #3, #4) > deg2rad(90)");
+        expected = std::vector<Match>{};
+        CHECK(selection.evaluate(frame) == expected);
+
+        selection = Selection("four: out_of_plane(#1, #2, #3, #4) > 1.1");
+        expected = std::vector<Match>{};
+        CHECK(selection.evaluate(frame) == expected);
     }
 }
 

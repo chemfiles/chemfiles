@@ -98,7 +98,7 @@ public:
             instance_.unused_counts_.emplace_back(it->second);
         } else if (references < 0) {
             throw chemfiles::error(
-                "internal errpr: negative reference count for {}", ptr
+                "internal error: negative reference count for {}", ptr
             );
         }
         instance_.map_.erase(it);
@@ -147,7 +147,9 @@ private:
         if (it != map_.end()) {
             return counts_.at(it->second);
         } else {
-            throw std::runtime_error("unknwon pointer");
+            throw chemfiles::error(
+                "internal error: unknwon pointer passed to shared_allocator::count"
+            );
         }
     }
 
@@ -162,7 +164,7 @@ private:
             // create a new one
             size_t id = counts_.size();
             counts_.emplace_back(0);
-            deleters_.emplace_back([](){ throw std::runtime_error("uninitialized deleter"); });
+            deleters_.emplace_back([](){ throw chemfiles::error("uninitialized deleter"); });
             return id;
         }
     }

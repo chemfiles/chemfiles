@@ -256,9 +256,6 @@ public:
     }
 
 private:
-    /// Check wether the atoms at indexes `i` and `j` are bonded or not
-    bool is_bond(size_t i, size_t j) const;
-
     /// Atoms in the system.
     std::vector<Atom> atoms_;
     /// Connectivity of the system.
