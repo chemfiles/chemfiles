@@ -55,6 +55,11 @@ TEST_CASE("Read files in CSSR format") {
         CHECK(frame[0].type() == "O");
         CHECK(frame[11].name() == "Si");
         CHECK(frame[11].type() == "Si");
+
+        frame = file.read_step(0);
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(1.31455, 0.0, 2.27555), 1e-5));
+        CHECK(approx_eq(positions[11], Vector3D(0.0, 5.07052, 5.65106), 1e-3));
     }
 }
 

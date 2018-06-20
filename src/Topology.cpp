@@ -86,14 +86,6 @@ const std::vector<Improper>& Topology::impropers() const {
     return connect_.impropers().as_vec();
 }
 
-bool Topology::is_bond(size_t i, size_t j) const {
-    if (i == j) {
-        return false;
-    }
-    auto bonds = connect_.bonds();
-    return bonds.find(Bond(i, j)) != bonds.end();
-}
-
 void Topology::add_residue(Residue residue) {
     for (auto i: residue) {
         auto it = residue_mapping_.find(i);
@@ -115,9 +107,10 @@ bool Topology::are_linked(const Residue& first, const Residue& second) const {
     if (first == second) {
         return true;
     }
+    auto bonds = connect_.bonds();
     for (auto i: first) {
         for (auto j: second) {
-            if (is_bond(i, j)) {
+            if (bonds.find({i, j}) != bonds.end()) {
                 return true;
             }
         }

@@ -192,6 +192,8 @@ TEST_CASE("Out of bounds errors") {
     topology.add_atom(Atom());
 
     CHECK_THROWS_AS(topology[25], OutOfBounds);
+    const auto& const_topology = topology;
+    CHECK_THROWS_AS(const_topology[25], OutOfBounds);
 
     CHECK_THROWS_AS(topology.add_bond(0, 25), OutOfBounds);
     CHECK_THROWS_AS(topology.add_bond(25, 0), OutOfBounds);

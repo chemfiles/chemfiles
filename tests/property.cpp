@@ -12,6 +12,10 @@ TEST_CASE("Property") {
 
         CHECK(property.as_bool() == false);
         CHECK(property.get_kind() == Property::BOOL);
+        CHECK(property == Property(false));
+
+        CHECK(property != Property(0));
+        CHECK(property != Property("false"));
 
         CHECK_THROWS_AS(property.as_double(), PropertyError);
         CHECK_THROWS_AS(property.as_string(), PropertyError);
@@ -92,6 +96,7 @@ TEST_CASE("Property") {
         CHECK_THROWS_AS(property.as_bool(), PropertyError);
         CHECK_THROWS_AS(property.as_string(), PropertyError);
         CHECK_THROWS_AS(property.as_vector3d(), PropertyError);
+        CHECK(property == Property(30.0));
     }
 
     SECTION("String") {
@@ -124,6 +129,7 @@ TEST_CASE("Property") {
         CHECK_THROWS_AS(property.as_bool(), PropertyError);
         CHECK_THROWS_AS(property.as_double(), PropertyError);
         CHECK_THROWS_AS(property.as_vector3d(), PropertyError);
+        CHECK(property == Property("empty"));
     }
 
     SECTION("Vector3D") {
@@ -134,5 +140,12 @@ TEST_CASE("Property") {
         CHECK_THROWS_AS(property.as_bool(), PropertyError);
         CHECK_THROWS_AS(property.as_string(), PropertyError);
         CHECK_THROWS_AS(property.as_double(), PropertyError);
+
+        // Checking copy and move constructors
+        property = Property(Vector3D(0, 0, 0));
+        CHECK(property.as_vector3d() == Vector3D(0, 0, 0));
+
+        auto new_prop = property;
+        CHECK(new_prop.as_vector3d() == Vector3D(0, 0, 0));
     }
 }
