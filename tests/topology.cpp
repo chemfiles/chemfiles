@@ -227,24 +227,35 @@ TEST_CASE("Add and remove items in the topology") {
         topology.add_atom(Atom("O"));
         topology.add_atom(Atom("O"));
 
-        topology.add_bond(0, 4);
-        topology.add_bond(1, 4);
-        topology.add_bond(2, 5);
+        topology.add_bond(0, 4, Bond::SINGLE);
+        topology.add_bond(1, 4, Bond::DOUBLE);
+        topology.add_bond(2, 5, Bond::TRIPLE);
         topology.add_bond(3, 5);
 
         CHECK(topology.bonds() == (std::vector<Bond>{{0, 4}, {1, 4}, {2, 5}, {3, 5}}));
         CHECK(topology.angles() == (std::vector<Angle>{{0, 4, 1}, {2, 5, 3}}));
         CHECK(topology.dihedrals() == (std::vector<Dihedral>{}));
 
+        CHECK(topology.bond_order(0, 4) == Bond::SINGLE);
+        CHECK_THROWS_AS(topology.bond_order(0, 5), Error);
+        CHECK_THROWS_AS(topology.bond_order(0, 6), OutOfBounds);
+
+        const auto& bo_s = topology.bond_orders();
+        CHECK(bo_s[0] == Bond::SINGLE);
+        CHECK(bo_s[1] == Bond::DOUBLE);
+        CHECK(bo_s[2] == Bond::TRIPLE);
+        CHECK(bo_s[3] == Bond::UNKNOWN);
+
         topology.add_atom(Atom("O"));
-        topology.add_bond(3, 6);
+        topology.add_bond(3, 6, Bond::AROMATIC);
         CHECK(topology.bonds().size() == 5);
         CHECK(topology.dihedrals()[0] == Dihedral(2, 5, 3, 6));
+        CHECK(bo_s[4] == Bond::AROMATIC);
 
         topology.remove(6);
         CHECK(topology.bonds().size() == 4);
 
-        // we can not resize while there are bonds betweena atoms to remove
+        // we can not resize while there are bonds between atoms to remove
         CHECK_THROWS_AS(topology.resize(5), Error);
 
         topology.remove_bond(2, 5);
@@ -262,14 +273,15 @@ TEST_CASE("Add and remove items in the topology") {
             topology.add_atom(Atom(""));
         }
 
-        topology.add_bond(0, 2);
-        topology.add_bond(1, 3);
+        topology.add_bond(0, 2, Bond::SINGLE);
+        topology.add_bond(1, 3, Bond::DOUBLE);
 
         CHECK(topology.bonds() == (std::vector<Bond>{{0, 2}, {1, 3}}));
 
         // Checking that the stored bonds indexes are updated
         topology.remove(2);
         CHECK(topology.bonds() == (std::vector<Bond>{{1, 2}}));
+        CHECK(topology.bond_orders()[0] == Bond::DOUBLE);
     }
 }
 

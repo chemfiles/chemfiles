@@ -379,7 +379,7 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_frame_resize(frame, 4));
         CHECK_STATUS(chfl_frame_add_bond(frame, 0, 1));
         CHECK_STATUS(chfl_frame_add_bond(frame, 0, 2));
-        CHECK_STATUS(chfl_frame_add_bond(frame, 0, 3));
+        CHECK_STATUS(chfl_frame_add_bond_w_order(frame, 0, 3, CHFL_BOND_TRIPLE));
 
         const CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
         REQUIRE(topology);
@@ -396,6 +396,10 @@ TEST_CASE("chfl_frame") {
                 CHECK(bonds[i][j] == expected[i][j]);
             }
         }
+
+        chfl_bond_order bond_order;
+        chfl_topology_bond_order(topology, 0, 3, &bond_order);
+        CHECK(bond_order == CHFL_BOND_TRIPLE);
 
         CHECK_STATUS(chfl_frame_remove_bond(frame, 0, 2));
 
@@ -415,6 +419,9 @@ TEST_CASE("chfl_frame") {
                 CHECK(bonds[i][j] == expected_2[i][j]);
             }
         }
+
+        chfl_topology_bond_order(topology, 0, 3, &bond_order);
+        CHECK(bond_order == CHFL_BOND_TRIPLE);
 
         CHECK_STATUS(chfl_topology_free(topology));
         CHECK_STATUS(chfl_frame_free(frame));

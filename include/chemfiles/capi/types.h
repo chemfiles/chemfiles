@@ -144,6 +144,26 @@ typedef double chfl_vector3d[3];  // NOLINT: this is both a C and C++ file
 /// @return A null-terminated string containing the version of Chemfiles.
 CHFL_EXPORT const char* chfl_version(void);
 
+/// Possible bond orders
+typedef enum {  // NOLINT: this is both a C and C++ file
+    /// Not specified
+    CHFL_BOND_UNKNOWN = 0,
+    /// Single bond
+    CHFL_BOND_SINGLE = 1,
+    /// Double bond
+    CHFL_BOND_DOUBLE = 2,
+    /// Triple bond
+    CHFL_BOND_TRIPLE = 3,
+    /// Quadruple bond (present in some metals)
+    CHFL_BOND_QUADRUPLE = 4,
+    /// Qintuplet bond (present in some metals)
+    CHFL_BOND_QINTUPLET = 5,
+    /// Amide bond (required by some file formats)
+    CHFL_BOND_AMIDE = 254,
+    /// Aromatic bond (required by some file formats)
+    CHFL_BOND_AROMATIC = 255,
+} chfl_bond_order;
+
 #ifdef __cplusplus
 }
 #endif

@@ -110,9 +110,10 @@ public:
     ///
     /// @param atom_i the index of the first atom in the bond
     /// @param atom_j the index of the second atom in the bond
+    /// @param bond_order the bond order for the bond added
     /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `size()`
     /// @throws Error if `atom_i == atom_j`, as this is an invalid bond
-    void add_bond(size_t atom_i, size_t atom_j);
+    void add_bond(size_t atom_i, size_t atom_j, Bond::BondOrder bond_order = Bond::UNKNOWN);
 
     /// Remove a bond in the system, between the atoms at index `atom_i` and
     /// `atom_j`.
@@ -125,6 +126,18 @@ public:
     /// @param atom_j the index of the second atom in the bond
     /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `size()`
     void remove_bond(size_t atom_i, size_t atom_j);
+
+    /// Get the bond order for the given bond
+    ///
+    /// If the bond does not exist, this will return a out_of_bonds error
+    ///
+    /// @example{tests/doc/topology/bond_order.cpp}
+    ///
+    /// @param atom_i the index of the first atom in the bond
+    /// @param atom_j the index of the second atom in the bond
+    /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `size()`
+    /// @throws Error if no bond between `atom_i` and `atom_j` exists.
+    Bond::BondOrder bond_order(size_t atom_i, size_t atom_j) const;
 
     /// Get the number of atoms in the topology
     ///
@@ -164,6 +177,16 @@ public:
     ///
     /// @example{tests/doc/topology/bonds.cpp}
     const std::vector<Bond>& bonds() const;
+
+    /// Get the bond orders in the system.
+    ///
+    /// The bond orders are sorted so that the index of each bond is the same as
+    /// its index in the array returned by `Topology::bonds`. This means that
+    /// the bond order for `Topology::bonds()[index]` would be given by
+    /// `bond_orders()[index]`.
+    ///
+    /// @example{tests/doc/topology/bond_order.cpp}
+    const std::vector<Bond::BondOrder>& bond_orders() const;
 
     /// Get the angles in the system
     ///

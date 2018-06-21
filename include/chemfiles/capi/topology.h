@@ -230,6 +230,43 @@ CHFL_EXPORT chfl_status chfl_topology_residues_linked(
     bool* result
 );
 
+/// Add a bond between the atoms at indexes `i` and `j`
+/// with bond order `bond_order` in the `topology`.
+///
+/// @example{tests/capi/doc/chfl_topology/bond_order.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_topology_add_bond_w_order(
+    CHFL_TOPOLOGY* topology, uint64_t i, uint64_t j, chfl_bond_order bond_order
+);
+
+/// Get the list of bond orders in the `topology` in the
+/// pre-allocated array `orders` of size `nbos`.
+///
+/// `orders` size must be passed in the `nbos` parameter, and be equal to
+/// the result of `chfl_topology_bond_count`. The bond orders are sorted so
+/// the bond order of `bond[i]` is `orders[i]`.
+///
+/// @example{tests/capi/doc/chfl_topology/bond_order.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_topology_bond_orders(
+    const CHFL_TOPOLOGY* const topology, chfl_bond_order orders[], uint64_t nbonds
+);
+
+/// Get a specific bond order in the `topology` in
+/// the chfl_bond_order pointed to by order 
+///
+/// `i` and `j` must be valid atom indexes in the topology and a bond
+/// must exist between these two atoms.
+///
+/// @example{tests/capi/doc/chfl_topology/bond_order.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_topology_bond_order(
+    const CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, chfl_bond_order* order
+);
+
 /// Free the memory associated with a `topology`.
 ///
 /// @example{tests/capi/doc/chfl_topology/chfl_topology.c}

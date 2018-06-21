@@ -19,6 +19,21 @@ namespace chemfiles {
 /// @example{tests/doc/connectivity/bond.cpp}
 class CHFL_EXPORT Bond final {
 public:
+
+    /// Stores the type of bond
+    enum BondOrder {
+        UNKNOWN = 0,
+        SINGLE = 1,
+        DOUBLE = 2,
+        TRIPLE = 3,
+        QUADRUPLE = 4,
+        QINTUPLET = 5,
+
+        // space for more bond types if needed
+        AMIDE = 254,
+        AROMATIC = 255,
+    };
+
     /// Create a new `Bond` containing the atoms `i` and `j`.
     ///
     /// @throw Error if `i == j`
@@ -284,6 +299,9 @@ public:
     /// Get the bonds in this connectivity
     const sorted_set<Bond>& bonds() const;
 
+    /// Get the bond orders in this connectivity
+    const std::vector<Bond::BondOrder>& bond_orders() const;
+
     /// Get the angles in this connectivity
     const sorted_set<Angle>& angles() const;
 
@@ -294,7 +312,7 @@ public:
     const sorted_set<Improper>& impropers() const;
 
     /// Add a bond between the atoms `i` and `j`
-    void add_bond(size_t i, size_t j);
+    void add_bond(size_t i, size_t j, Bond::BondOrder bond_order = Bond::UNKNOWN);
 
     /// Remove any bond between the atoms `i` and `j`
     void remove_bond(size_t i, size_t j);
@@ -305,6 +323,8 @@ public:
     /// bonds/angles/dihedrals/impropers lists by -1.
     void atom_removed(size_t index);
 
+    /// Get the bond order of the bond between i and j
+    Bond::BondOrder bond_order(size_t i, size_t j) const;
 private:
     /// Recalculate the angles and the dihedrals from the bond list
     void recalculate() const;
@@ -322,6 +342,8 @@ private:
     mutable sorted_set<Improper> impropers_;
     /// Is the cached content up to date ?
     mutable bool uptodate_ = false;
+    /// Store the bond orders
+    std::vector<Bond::BondOrder> bond_orders_;
 };
 
 } // namespace chemfiles

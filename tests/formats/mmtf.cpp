@@ -41,6 +41,12 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(residue.size() == 43);
         CHECK(residue.name() == "HEM");
 
+        // Nitrogen-Iron Bond
+        CHECK(frame.topology().bond_order(4557, 4556) == Bond::SINGLE);
+
+        // Random double bond in HEM group
+        CHECK(frame.topology().bond_order(4541, 4542) == Bond::DOUBLE);
+
         // Check residue connectivity
         const auto& topo = frame.topology();
         CHECK(topo.are_linked(topo.residue(0), topo.residue(1)));

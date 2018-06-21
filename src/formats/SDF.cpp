@@ -102,8 +102,30 @@ void SDFFormat::read(Frame& frame) {
     for (const auto& line: bond_lines) {
         size_t atom1 = std::stoul(line.substr(0,3));
         size_t atom2 = std::stoul(line.substr(3,3));
+        size_t bondo = std::stoul(line.substr(6,3));
 
-        frame.add_bond(atom1 - 1, atom2 - 1);
+        Bond::BondOrder bo;
+
+        switch (bondo) {
+            case 1:
+                bo = Bond::SINGLE;
+                break;
+            case 2:
+                bo = Bond::DOUBLE;
+                break;
+            case 3:
+                bo = Bond::TRIPLE;
+                break;
+            case 4:
+                bo = Bond::AROMATIC;
+                break;
+            case 8: // The 8 ispecifically means unspecified
+            default:
+                bo = Bond::UNKNOWN;
+                break;
+        }
+
+        frame.add_bond(atom1 - 1, atom2 - 1, bo);
     }
 
     // Parsing the file is more or less complete now, but atom properties can
@@ -195,9 +217,32 @@ void SDFFormat::write(const Frame& frame) {
     }
 
     for (const auto& bond : topology.bonds()) {
+
+        std::string bond_order;
+        auto bo = topology.bond_order(bond[0], bond[1]);
+
+        switch(bo) {
+            case Bond::SINGLE:
+                bond_order = "  1";
+                break;
+            case Bond::DOUBLE:
+                bond_order = "  2";
+                break;
+            case Bond::TRIPLE:
+                bond_order = "  3";
+                break;
+            case Bond::AROMATIC:
+                bond_order = "  4";
+                break;
+            case Bond::UNKNOWN:
+            default:
+                bond_order = "  8";
+                break;
+        }
+
         fmt::print(
-            *file_, "{:>3}{:>3}  1  0  0  0  0\n",
-            bond[0] + 1, bond[1] + 1
+            *file_, "{:>3}{:>3}{}  0  0  0  0\n",
+            bond[0] + 1, bond[1] + 1, bond_order
         );
     }
 

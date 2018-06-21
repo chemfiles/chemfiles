@@ -12,7 +12,9 @@ int main() {
 
     chfl_frame_add_atom(frame, atom, (chfl_vector3d){0, 0, 0}, NULL);
     chfl_frame_add_atom(frame, atom, (chfl_vector3d){0, 0, 1.2}, NULL);
+    chfl_frame_add_atom(frame, atom, (chfl_vector3d){0, 0, -1.0}, NULL);
     chfl_frame_add_bond(frame, 0, 1);
+    chfl_frame_add_bond_w_order(frame, 0, 2, CHFL_BOND_DOUBLE);
 
     chfl_atom_free(atom);
     chfl_frame_free(frame);
