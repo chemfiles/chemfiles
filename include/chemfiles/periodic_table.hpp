@@ -11,24 +11,39 @@
 #include <unordered_map>
 #include <string>
 #include <cstdint>
+#include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 
-//! Storing basic elemental data: mass, colvalent and Van der Waals radii
-struct ElementData {
+//! Storing basic atomic data
+struct AtomicData {
     //! Atomic number
-    const uint64_t number;
+    optional<uint64_t> number;
     //! Full name
-    const std::string name;
+    optional<std::string> full_name;
     //! Mass in atomic units
-    const double mass;
+    optional<double> mass;
+    //! Default charge in units of e
+    optional<double> charge;
     //! Covalent radius in Angstrom
-    const double covalent_radius;
+    optional<double> covalent_radius;
     //! Van der Waals radius in Angstrom
-    const double vdw_radius;
+    optional<double> vdw_radius;
 };
 
-extern const std::unordered_map<std::string, ElementData> PERIODIC_TABLE;
+using atomic_data_map = std::unordered_map<std::string, AtomicData>;
+
+/// Find the data for a given element with its `type`.
+///
+/// If the `type` string is one or two characters long, it is normalized to
+/// the standard element case (first character in upper case, second one in
+/// lower case).
+
+// This is implemented in Atom.cpp
+optional<const AtomicData&> find_in_periodic_table(const std::string& type);
+
+
+extern const atomic_data_map PERIODIC_TABLE;
 
 } // namespace chemfiles
 

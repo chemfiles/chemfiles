@@ -72,6 +72,22 @@ TEST_CASE("Atom type renaming") {
     }
 }
 
+TEST_CASE("Atomic data") {
+    auto ch3 = Atom("CH3");
+    CHECK(ch3.mass() == 15);
+    CHECK(ch3.charge() == 0);
+    CHECK(ch3.full_name().value() == "methyl");
+    CHECK(ch3.vdw_radius() == nullopt);
+    CHECK(ch3.covalent_radius() == nullopt);
+
+    auto zn = Atom("Zn");
+    CHECK(zn.mass() == 65.38);
+    CHECK(zn.charge() == 1.8);
+    CHECK(zn.full_name().value() == "Zinc");
+    CHECK(zn.vdw_radius().value() == 2.1);
+    CHECK(zn.covalent_radius().value() == 1.31);
+}
+
 TEST_CASE("Configuration errors") {
     auto tmpfile = NamedTempPath(".toml");
 
@@ -84,12 +100,38 @@ TEST_CASE("Configuration errors") {
         CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
     }
 
-    SECTION("Invalid types data") {
-        // Invalid toml
+    SECTION("Invalid 'types' data") {
         std::ofstream file(tmpfile);
-        file << "[types]\nfoo: 4\n" << std::endl;
+        file << "[types]\nfoo = 4\n" << std::endl;
         file.close();
 
+        CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
+    }
+
+    SECTION("Invalid 'atoms' data") {
+        std::ofstream file(tmpfile);
+        file << "[atoms.O]\nmass = '4'\n" << std::endl;
+        file.close();
+        CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
+
+        file.open(tmpfile, std::ios_base::out | std::ios_base::trunc);
+        file << "[atoms.O]\ncharge = '4'\n" << std::endl;
+        file.close();
+        CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
+
+        file.open(tmpfile, std::ios_base::out | std::ios_base::trunc);
+        file << "[atoms.O]\ncovalent_radius = '4'\n" << std::endl;
+        file.close();
+        CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
+
+        file.open(tmpfile, std::ios_base::out | std::ios_base::trunc);
+        file << "[atoms.O]\nvdw_radius = '4'\n" << std::endl;
+        file.close();
+        CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
+
+        file.open(tmpfile, std::ios_base::out | std::ios_base::trunc);
+        file << "[atoms.O]\nfull_name = false\n" << std::endl;
+        file.close();
         CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
     }
 

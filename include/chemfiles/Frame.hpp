@@ -214,7 +214,10 @@ public:
     /// Guess the bonds, angles, dihedrals and impropers angles in this frame.
     ///
     /// The bonds are guessed using a distance-based algorithm, and then angles,
-    /// dihedrals and impropers are guessed from the bonds.
+    /// dihedrals and impropers are guessed from the bonds. The distance
+    /// criterion uses the Van der Waals radii of the atoms. If this
+    /// information is missing for a specific atoms, one can use configuration
+    /// files to provide it.
     ///
     /// @throw Error if the Van der Waals radius in unknown for a given atom.
     ///
