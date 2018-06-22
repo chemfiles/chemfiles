@@ -206,6 +206,14 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/../.chemfiles.toml
 Oh = \"O\"
 Oz = \"O\"
 N2 = \"N\"
+
+[atoms.CH3]
+mass = 15.0
+charge = 0
+full_name = \"methyl\"
+
+[atoms.Zn]
+charge = 1.8
 ")
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/chemfiles.toml

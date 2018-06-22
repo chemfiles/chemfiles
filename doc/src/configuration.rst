@@ -53,3 +53,37 @@ the right atomic data can be accessed.
 
 The ``[types]`` section contains multiple key wich are the old atom type,
 associated with string values wich are the new atom type.
+
+``[atoms]``: Defining new atom types
+------------------------------------
+
+When working with particles outside of the periodic table (for example coarse
+grained particles), it can be usefull to define new atom types. This can be done
+in the ``[atom]`` section.
+
+.. code-block:: text
+
+    [atoms.CH3]
+    full_name = "methyl"
+    mass = 15.035
+    charge = 0
+    vdw_radius = 2.4
+    covalent_radius = 1.1
+
+    # One can also override element data
+    [atoms.Zn]
+    charge = 1.8
+
+    # TOML also supports inline tables
+    [atoms]
+    CH4 = {mass = 16.043, charge = 0, full_name = "methane"}
+    Ph = {mass = 77.106, full_name = "phenyl"}
+
+The ``[atoms]`` section contains multiple tables, one for each new atom type.
+These tables can contains the following key/values (all keys are optional):
+
+- ``full_name`` (string) : the full name of the atomic type;
+- ``mass`` (number) : the mass of the atomic type in atomic units;
+- ``charge`` (number) : the charge of the atomic type in multiples of *e*;
+- ``vdw_radius`` (number) : the Van der Waals radius of the atomic type in Angstrom;
+- ``covalent_radius`` (number) : the covalent radius of the atomic type in Angstrom;

@@ -23,7 +23,7 @@ class Atom:
         self.VdW = VdW
 
     def __str__(self):
-        return '{{"{}", {{{}, std::string("{}"), {}, {}, {}}}}}'.format(
+        return '{{"{}", {{{}, std::string("{}"), {}, nullopt, {}, {}}}}}'.format(
             self.symbol, self.number, self.name, self.mass, self.cov, self.VdW
         )
 
@@ -66,7 +66,7 @@ using namespace chemfiles;
 """
 
 ARRAY = """
-const std::unordered_map<std::string, ElementData> chemfiles::PERIODIC_TABLE = {
+const atomic_data_map chemfiles::PERIODIC_TABLE = {
 """
 
 
