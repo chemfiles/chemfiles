@@ -45,7 +45,7 @@ Function manipulating ``CHFL_TOPOLOGY``
 
 .. doxygenfunction:: chfl_topology_residues_linked
 
-.. doxygenfunction:: chfl_topology_add_bond_w_order
+.. doxygenfunction:: chfl_topology_bond_with_order
 
 .. doxygenfunction:: chfl_topology_bond_orders
 

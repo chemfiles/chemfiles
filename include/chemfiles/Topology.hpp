@@ -129,7 +129,7 @@ public:
 
     /// Get the bond order for the given bond
     ///
-    /// If the bond does not exist, this will return a out_of_bonds error
+    /// If the bond does not exist, this will thrown an Error.
     ///
     /// @example{tests/doc/topology/bond_order.cpp}
     ///

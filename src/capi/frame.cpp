@@ -228,7 +228,7 @@ extern "C" chfl_status chfl_frame_add_bond(CHFL_FRAME* const frame, uint64_t i, 
     )
 }
 
-extern "C" chfl_status chfl_frame_add_bond_w_order(CHFL_FRAME* const frame, uint64_t i, uint64_t j, chfl_bond_order bond_order) {
+extern "C" chfl_status chfl_frame_bond_with_order(CHFL_FRAME* const frame, uint64_t i, uint64_t j, chfl_bond_order bond_order) {
     CHECK_POINTER(frame);
     CHFL_ERROR_CATCH(
         frame->add_bond(checked_cast(i), checked_cast(j), static_cast<Bond::BondOrder>(bond_order));

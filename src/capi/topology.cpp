@@ -230,7 +230,7 @@ extern "C" chfl_status chfl_topology_residues_linked(
     )
 }
 
-extern "C" chfl_status chfl_topology_add_bond_w_order(CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, chfl_bond_order bond_order) {
+extern "C" chfl_status chfl_topology_bond_with_order(CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, chfl_bond_order bond_order) {
     CHECK_POINTER(topology);
     CHFL_ERROR_CATCH(
         topology->add_bond(checked_cast(i), checked_cast(j), static_cast<Bond::BondOrder>(bond_order));

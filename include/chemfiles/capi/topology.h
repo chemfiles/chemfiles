@@ -236,14 +236,14 @@ CHFL_EXPORT chfl_status chfl_topology_residues_linked(
 /// @example{tests/capi/doc/chfl_topology/bond_order.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_topology_add_bond_w_order(
+CHFL_EXPORT chfl_status chfl_topology_bond_with_order(
     CHFL_TOPOLOGY* topology, uint64_t i, uint64_t j, chfl_bond_order bond_order
 );
 
 /// Get the list of bond orders in the `topology` in the
-/// pre-allocated array `orders` of size `nbos`.
+/// pre-allocated array `orders` of size `nbonds`.
 ///
-/// `orders` size must be passed in the `nbos` parameter, and be equal to
+/// `orders` size must be passed in the `nbonds` parameter, and be equal to
 /// the result of `chfl_topology_bond_count`. The bond orders are sorted so
 /// the bond order of `bond[i]` is `orders[i]`.
 ///

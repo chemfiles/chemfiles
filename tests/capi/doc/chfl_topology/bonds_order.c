@@ -15,8 +15,8 @@ int main() {
     }
     chfl_atom_free(atom);
 
-    chfl_topology_add_bond_w_order(topology, 0, 1, CHFL_BOND_SINGLE);
-    chfl_topology_add_bond_w_order(topology, 2, 3, CHFL_BOND_DOUBLE);
+    chfl_topology_bond_with_order(topology, 0, 1, CHFL_BOND_SINGLE);
+    chfl_topology_bond_with_order(topology, 2, 3, CHFL_BOND_DOUBLE);
 
     chfl_bond_order bond_orders[2] = {0};
     chfl_topology_bond_orders(topology, bond_orders, 2);
