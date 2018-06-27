@@ -80,6 +80,9 @@ TEST_CASE("Read files in mol2 format") {
         CHECK(residue.contains(0));
         CHECK(residue.contains(1));
         CHECK(residue.contains(2));
+
+        CHECK(topology.bond_order(0, 20) == Bond::DOUBLE);
+        CHECK(topology.bond_order(5, 28) == Bond::AROMATIC);
     }
 
     SECTION("Molecules.mol2") {
@@ -184,12 +187,12 @@ TEST_CASE("Write files in mol2 format") {
     "@<TRIPOS>BOND\n"
     "   1     1     2    1\n"
     "   2     1     7    1\n"
-    "   3     2     7    1\n"
-    "   4     3     7    1\n"
-    "   5     4     7    1\n"
-    "   6     5     6    1\n"
-    "   7     5     7    1\n"
-    "   8     6     7    1\n"
+    "   3     2     7    2\n"
+    "   4     3     7    3\n"
+    "   5     4     7    ar\n"
+    "   6     5     6    am\n"
+    "   7     5     7    du\n"
+    "   8     6     7    du\n"
     "@<TRIPOS>CRYSIN\n"
     "   22.0000   22.0000   22.0000   90.0000   90.0000   90.0000 1 1\n"
     "@<TRIPOS>SUBSTRUCTURE\n"
@@ -200,7 +203,7 @@ TEST_CASE("Write files in mol2 format") {
     frame.add_atom(Atom("B"), {1.123456, 2.123456789, 10000000.123456});
     frame.add_atom(Atom("C"), {1, 2, 3});
     frame.add_atom(Atom("D"), {1, 2, 3});
-    frame.add_bond(0, 1);
+    frame.add_bond(0, 1, Bond::SINGLE);
 
     auto file = Trajectory(tmpfile, 'w');
     file.write(frame);
@@ -210,12 +213,12 @@ TEST_CASE("Write files in mol2 format") {
     frame.add_atom(Atom("E"), {4, 5, 6});
     frame.add_atom(Atom("F"), {4, 5, 6});
     frame.add_atom(Atom("G"), {4, 5, 6});
-    frame.add_bond(4, 5);
-    frame.add_bond(0, 6);
-    frame.add_bond(1, 6);
-    frame.add_bond(2, 6);
-    frame.add_bond(3, 6);
-    frame.add_bond(4, 6);
+    frame.add_bond(4, 5, Bond::AMIDE);
+    frame.add_bond(0, 6, Bond::SINGLE);
+    frame.add_bond(1, 6, Bond::DOUBLE);
+    frame.add_bond(2, 6, Bond::TRIPLE);
+    frame.add_bond(3, 6, Bond::AROMATIC);
+    frame.add_bond(4, 6, Bond::UNKNOWN);
     frame.add_bond(5, 6);
 
     Residue residue("foo", 3);

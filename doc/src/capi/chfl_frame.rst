@@ -31,6 +31,8 @@ Function manipulating ``CHFL_FRAME``
 
 .. doxygenfunction:: chfl_frame_add_bond
 
+.. doxygenfunction:: chfl_frame_bond_with_order
+
 .. doxygenfunction:: chfl_frame_remove_bond
 
 .. doxygenfunction:: chfl_frame_add_residue

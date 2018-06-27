@@ -150,8 +150,9 @@ void MOL2Format::read_bonds(Frame& frame, size_t nbonds) {
 
     for (const auto& line : lines) {
         unsigned long id, id_1, id_2;
+        char bond_order[32] = {0};
 
-        scan(line, " %lu %lu %lu", &id, &id_1, &id_2);
+        scan(line, " %lu %lu %lu %31s", &id, &id_1, &id_2, &bond_order[0]);
 
         // MOL2 is 1 index-based, not 0
         --id_1;
@@ -163,7 +164,26 @@ void MOL2Format::read_bonds(Frame& frame, size_t nbonds) {
             );
         }
 
-        frame.add_bond(id_1, id_2);
+        Bond::BondOrder bo;
+        std::string bond_order_str(bond_order);
+
+        if (bond_order_str == "1") {
+            bo = Bond::SINGLE;
+        } else if (bond_order_str == "2") {
+            bo = Bond::DOUBLE;
+        } else if (bond_order_str == "3") {
+            bo = Bond::TRIPLE;
+        } else if (bond_order_str == "ar"){
+            bo = Bond::AROMATIC;
+        } else if (bond_order_str == "am"){
+            bo = Bond::AMIDE;
+        } else if (bond_order_str == "du"){ // du is a dummy bond
+            bo = Bond::UNKNOWN;
+        } else {
+            bo = Bond::UNKNOWN;
+        }
+
+        frame.add_bond(id_1, id_2, bo);
     }
 }
 
@@ -278,10 +298,35 @@ void MOL2Format::write(const Frame& frame) {
 
     fmt::print(*file_, "@<TRIPOS>BOND\n");
 
-    // TODO: Implement bond orders
+    auto& bond_orders = frame.topology().bond_orders();
+
     for (size_t i = 0; i < bonds.size(); i++) {
-        fmt::print(*file_, "{:4d}  {:4d}  {:4d}    1\n",
-            i + 1, bonds[i][0] + 1, bonds[i][1] + 1
+
+        std::string bond_order;
+        switch (bond_orders[i]) {
+            case Bond::SINGLE:
+                bond_order = "1";
+                break;
+            case Bond::DOUBLE:
+                bond_order = "2";
+                break;
+            case Bond::TRIPLE:
+                bond_order = "3";
+                break;
+            case Bond::AROMATIC:
+                bond_order = "ar";
+                break;
+            case Bond::AMIDE:
+                bond_order = "am";
+                break;
+            case Bond::UNKNOWN:
+            default:
+                bond_order = "du";
+                break;
+        }
+
+        fmt::print(*file_, "{:4d}  {:4d}  {:4d}    {}\n",
+            i + 1, bonds[i][0] + 1, bonds[i][1] + 1, bond_order
         );
     }
 

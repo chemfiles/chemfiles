@@ -27,7 +27,7 @@ void Topology::reserve(size_t size) {
     atoms_.reserve(size);
 }
 
-void Topology::add_bond(size_t atom_i, size_t atom_j) {
+void Topology::add_bond(size_t atom_i, size_t atom_j, Bond::BondOrder bond_order) {
     if (atom_i >= size() || atom_j >= size()) {
         throw out_of_bounds(
             "out of bounds atomic index in `Topology::add_bond`: "
@@ -35,7 +35,7 @@ void Topology::add_bond(size_t atom_i, size_t atom_j) {
             size(), atom_i, atom_j
         );
     }
-    connect_.add_bond(atom_i, atom_j);
+    connect_.add_bond(atom_i, atom_j, bond_order);
 }
 
 void Topology::remove_bond(size_t atom_i, size_t atom_j) {
@@ -49,6 +49,17 @@ void Topology::remove_bond(size_t atom_i, size_t atom_j) {
     connect_.remove_bond(atom_i, atom_j);
 }
 
+Bond::BondOrder Topology::bond_order(size_t atom_i, size_t atom_j) const {
+    if (atom_i >= size() || atom_j >= size()) {
+        throw out_of_bounds(
+            "out of bounds atomic index in `Topology::bond_order`: "
+            "we have {} atoms, but the bond indexes are {} and {}",
+            size(), atom_i, atom_j
+        );
+    }
+
+    return connect_.bond_order(atom_i, atom_j);
+}
 
 void Topology::remove(size_t i) {
     if (i >= size()) {
@@ -72,6 +83,10 @@ void Topology::remove(size_t i) {
 
 const std::vector<Bond>& Topology::bonds() const {
     return connect_.bonds().as_vec();
+}
+
+const std::vector<Bond::BondOrder>& Topology::bond_orders() const {
+    return connect_.bond_orders();
 }
 
 const std::vector<Angle>& Topology::angles() const {

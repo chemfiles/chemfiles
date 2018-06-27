@@ -105,10 +105,30 @@ void MMTFFormat::read(Frame& frame) {
             for (size_t l = 0; l < group.bondOrderList.size(); l++) {
                 size_t atom1 = static_cast<size_t>(group.bondAtomList[l * 2]);
                 size_t atom2 = static_cast<size_t>(group.bondAtomList[l * 2 + 1]);
-                frame.add_bond(atomOffset + atom1,
-                               atomOffset + atom2);
 
-                // TODO add bond information using group.bondOrderList[l]
+                Bond::BondOrder bo;
+                switch(group.bondOrderList[l]) {
+                    case 1:
+                        bo = Bond::SINGLE;
+                        break;
+                    case 2:
+                        bo = Bond::DOUBLE;
+                        break;
+                    case 3:
+                        bo = Bond::TRIPLE;
+                        break;
+                    case 4:
+                        bo = Bond::QUADRUPLE;
+                        break;
+                    default:
+                        bo = Bond::UNKNOWN;
+                        break;
+                }
+
+                frame.add_bond(atomOffset + atom1,
+                               atomOffset + atom2,
+                               bo);
+
             }
 
             // This is a string in MMTF, differs from the name as then increments linearly
@@ -118,8 +138,9 @@ void MMTFFormat::read(Frame& frame) {
             // An integer
             residue.set("chainindex", chainIndex_);
 
-            if (!structure_.chainNameList.empty())
+            if (!structure_.chainNameList.empty()) {
                 residue.set("chainname", structure_.chainNameList[chainIndex_]);
+            }
 
             frame.add_residue(std::move(residue));
             groupIndex_++;
@@ -143,6 +164,7 @@ void MMTFFormat::read(Frame& frame) {
             continue;
         }
 
+        // TODO: Use Chemical linkage to store the type of bond here
         frame.add_bond(atom1 - atomSkip_, atom2 - atomSkip_);
     }
 

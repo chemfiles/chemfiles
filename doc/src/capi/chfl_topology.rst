@@ -45,4 +45,10 @@ Function manipulating ``CHFL_TOPOLOGY``
 
 .. doxygenfunction:: chfl_topology_residues_linked
 
+.. doxygenfunction:: chfl_topology_bond_with_order
+
+.. doxygenfunction:: chfl_topology_bond_orders
+
+.. doxygenfunction:: chfl_topology_bond_order
+
 .. doxygenfunction:: chfl_topology_free

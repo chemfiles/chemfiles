@@ -270,6 +270,16 @@ CHFL_EXPORT chfl_status chfl_frame_add_bond(
     CHFL_FRAME* frame, uint64_t i, uint64_t j
 );
 
+/// Add a bond between the atoms at indexes `i` and `j`
+/// with bond order `bond_order` in the `frame`.
+///
+/// @example{tests/capi/doc/chfl_frame/add_bond.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_frame_bond_with_order(
+    CHFL_FRAME* frame, uint64_t i, uint64_t j, chfl_bond_order bond_order
+);
+
 /// Remove any existing bond between the atoms at indexes `i` and `j` in the
 /// `frame`.
 ///

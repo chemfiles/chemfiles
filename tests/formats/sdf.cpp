@@ -95,8 +95,8 @@ TEST_CASE("Write files in SDF format") {
     "    1.0000    2.0000    3.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
     "    1.0000    2.0000    3.0000 F   0  0  0  0  0  0  0  0  0  0  0  0\n"
     "  1  3  1  0  0  0  0\n"
-    "  2  3  1  0  0  0  0\n"
-    "  3  4  1  0  0  0  0\n"
+    "  2  3  2  0  0  0  0\n"
+    "  3  4  3  0  0  0  0\n"
     "M END\n"
     "$$$$\n"
     "TEST\n"
@@ -114,10 +114,10 @@ TEST_CASE("Write files in SDF format") {
     "    0.0000    0.0000    0.0000 J   0  0  0  0  0  0  0  0  0  0  0  0\n"
     "    0.0000    0.0000    0.0000 K   0  0  0  0  0  0  0  0  0  0  0  0\n"
     "  1  3  1  0  0  0  0\n"
-    "  2  3  1  0  0  0  0\n"
-    "  3  4  1  0  0  0  0\n"
-    "  9 10  1  0  0  0  0\n"
-    " 10 11  1  0  0  0  0\n"
+    "  2  3  2  0  0  0  0\n"
+    "  3  4  3  0  0  0  0\n"
+    "  9 10  8  0  0  0  0\n"
+    " 10 11  4  0  0  0  0\n"
     "M END\n"
     "$$$$\n";
 
@@ -126,9 +126,9 @@ TEST_CASE("Write files in SDF format") {
     frame.add_atom(Atom("B","N"), {1, 2, 3});
     frame.add_atom(Atom("C"), {1, 2, 3});
     frame.add_atom(Atom("F"), {1, 2, 3});
-    frame.add_bond(0, 2);
-    frame.add_bond(1, 2);
-    frame.add_bond(2, 3);
+    frame.add_bond(0, 2, Bond::SINGLE);
+    frame.add_bond(1, 2, Bond::DOUBLE);
+    frame.add_bond(2, 3, Bond::TRIPLE);
 
     auto file = Trajectory(tmpfile, 'w');
     file.write(frame);
@@ -141,8 +141,8 @@ TEST_CASE("Write files in SDF format") {
     frame.add_atom(Atom("J"), {0, 0, 0});
     frame.add_atom(Atom("K"), {0, 0, 0});
 
-    frame.add_bond(9, 10);
-    frame.add_bond(8, 9);
+    frame.add_bond(9, 10, Bond::AROMATIC);
+    frame.add_bond(8, 9, Bond::UNKNOWN);
 
     frame.set("name", Property("TEST"));
 

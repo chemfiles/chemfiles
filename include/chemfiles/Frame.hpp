@@ -247,10 +247,11 @@ public:
     ///
     /// @param atom_i the index of the first atom in the bond
     /// @param atom_j the index of the second atom in the bond
+    /// @param bond_order the bond order of the new bond
     /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `size()`
     /// @throws Error if `atom_i == atom_j`, as this is an invalid bond
-    void add_bond(size_t atom_i, size_t atom_j) {
-        topology_.add_bond(atom_i, atom_j);
+    void add_bond(size_t atom_i, size_t atom_j, Bond::BondOrder bond_order = Bond::UNKNOWN) {
+        topology_.add_bond(atom_i, atom_j, bond_order);
     }
 
     /// Remove a bond in the system, between the atoms at index `atom_i` and

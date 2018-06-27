@@ -230,6 +230,39 @@ extern "C" chfl_status chfl_topology_residues_linked(
     )
 }
 
+extern "C" chfl_status chfl_topology_bond_with_order(CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, chfl_bond_order bond_order) {
+    CHECK_POINTER(topology);
+    CHFL_ERROR_CATCH(
+        topology->add_bond(checked_cast(i), checked_cast(j), static_cast<Bond::BondOrder>(bond_order));
+    )
+}
+
+#pragma intel optimization_level 2  /* Using -O3 with icc lead to partial copy of the bonds */
+extern "C" chfl_status chfl_topology_bond_orders(const CHFL_TOPOLOGY* const topology, chfl_bond_order orders[], uint64_t nbonds) {
+    CHECK_POINTER(topology);
+    CHECK_POINTER(orders);
+
+    CHFL_ERROR_CATCH(
+        if (nbonds != topology->bond_orders().size()) {
+            set_last_error("wrong data size in function 'chfl_topology_bond_orders'.");
+            return CHFL_MEMORY_ERROR;
+        }
+
+        auto& bond_orders = topology->bond_orders();
+        for (size_t i=0; i<nbonds; i++) {
+            orders[i] = static_cast<chfl_bond_order>(bond_orders[i]);
+        }
+    )
+}
+
+extern "C" chfl_status chfl_topology_bond_order( const CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, chfl_bond_order* order) {
+    CHECK_POINTER(topology);
+    CHECK_POINTER(order);
+
+    CHFL_ERROR_CATCH(
+        *order = static_cast<chfl_bond_order>(topology->bond_order(i, j));
+    )
+}
 
 extern "C" chfl_status chfl_topology_free(const CHFL_TOPOLOGY* const topology) {
     CHFL_ERROR_CATCH(
