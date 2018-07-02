@@ -120,6 +120,7 @@ void MMTFFormat::read(Frame& frame) {
             for (size_t l = 0; l < groupSize; l++) {
                 auto atom = Atom(group.atomNameList[l]);
                 atom.set_type(group.elementList[l]);
+                atom.set_charge(group.formalChargeList[l]);
                 auto position = Vector3D(
                     structure_.xCoordList[atomIndex_],
                     structure_.yCoordList[atomIndex_],
