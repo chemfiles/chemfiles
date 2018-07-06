@@ -104,6 +104,21 @@ void MMTFFormat::read(Frame& frame) {
     for (size_t j = 0; j < modelChainCount; j++) {
         auto chainGroupCount = static_cast<size_t>(structure_.groupsPerChain[chainIndex_]);
 
+        // Unfortunetly we must loop through the assembly lists to find which one our
+        // current chain belongs to. Forunetly, these lists are fairly short in the 
+        // vast majority of cases.
+        std::string current_assembly;
+        for (const auto& assembly : structure_.bioAssemblyList) {
+            for (const auto& transform : assembly.transformList) {
+                for (auto id : transform.chainIndexList) {
+                    if (id == chainIndex_) {
+                        current_assembly += "bio";
+                        current_assembly += assembly.name;
+                    }
+                }
+            }
+        }
+
         // A group is like a residue or other molecule in a PDB file.
         for (size_t k = 0; k < chainGroupCount; k++) {
             auto groupType = static_cast<size_t>(structure_.groupTypeList[groupIndex_]);
@@ -155,10 +170,17 @@ void MMTFFormat::read(Frame& frame) {
                         break;
                 }
 
-                frame.add_bond(atomOffset + atom1,
-                               atomOffset + atom2,
-                               bo);
+                frame.add_bond(
+                    atomOffset + atom1,
+                    atomOffset + atom2,
+                    bo
+                );
+            }
 
+            // If the name of the current assembly is defined in the MMTF file.
+            // Bioassemblies are optional, however.
+            if (!current_assembly.empty()) {
+                residue.set("assembly", current_assembly);
             }
 
             // This is a string in MMTF, differs from the name as then increments linearly
