@@ -39,9 +39,10 @@ CHFL_EXPORT chfl_status chfl_set_warning_callback(chfl_warning_callback callback
 
 /// Read configuration data from the file at `path`.
 ///
-/// By default, chemfiles reads configuration from any file name `.chemfilesrc`
-/// in the current directory or any parent directory. This function can be used
-/// to add data from another configuration file.
+/// By default, chemfiles reads configuration from any file named
+/// `.chemfiles.toml` or `chemfiles.toml` in the current directory or any parent
+/// directory. This function can be used to add data from another configuration
+/// file.
 ///
 /// This function will fail if there is no file at `path`, or if the file is
 /// incorectly formatted. Data from the new configuration file will overwrite
