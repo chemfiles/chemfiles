@@ -24,12 +24,16 @@ typedef std::function<void(const std::string& message)> warning_callback;
 /// @param callback callback function that will be called on each warning
 void CHFL_EXPORT set_warning_callback(warning_callback callback);
 
-/// Read configuration from the file at `path`. If the same configuration data
-/// is already present in a previouly read configuration file, the data is
-/// replaced by the one in this file.
+/// Read configuration data from the file at `path`.
 ///
-/// If the file at `path` can not be opened, or if the configuration file is
-/// invalid, a `ConfigurationError` is thrown.
+/// By default, chemfiles reads configuration from any file named
+/// `.chemfiles.toml` or `chemfiles.toml` in the current directory or any parent
+/// directory. This function can be used to add data from another configuration
+/// file.
+///
+/// This function will throw a `ConfigurationError` if there is no file at
+/// `path`, or if the file is incorectly formatted. Data from the new
+/// configuration file will overwrite any existing data.
 ///
 /// @example{tests/doc/add_configuration.cpp}
 ///

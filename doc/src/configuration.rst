@@ -4,22 +4,22 @@ Configuration files
 ===================
 
 Chemfiles can be configured using `TOML`_ configuration files. By default,
-chemfiles will read configuration from any file named ``.chemfilesrc`` in the
-current directory or any parent directory. Data from directories higher in the
-filesystem will be used instead of the one lower in the filesystem. For example,
-with the following filesystem:
+chemfiles will read configuration from any file named ``.chemfiles.toml`` or
+``chemfiles.toml`` in the current directory or any parent directory. Data from
+directories higher in the filesystem will be used instead of the one lower in
+the filesystem. For example, with the following filesystem:
 
 .. code-block:: bash
 
     $HOME
-    ├── .chemfilesrc (1)
+    ├── .chemfiles.toml (1)
     └── work
-        ├── .chemfilesrc (2)
+        ├── chemfiles.toml (2)
         ├── test-1
         │   ├── trajectory.xyz
         │   └── ...
         └── test-2
-            ├── .chemfilesrc (3)
+            ├── .chemfiles.toml (3)
             ├── trajectory.nc
             └── ...
 

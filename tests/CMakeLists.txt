@@ -201,16 +201,16 @@ foreach(test IN LISTS CHEMFILES_IGNORED_TESTS)
 endforeach(test)
 
 # Write sample configuration files for tests
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/../.chemfilesrc
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/../.chemfiles.toml
 "[types]
 Oh = \"O\"
 Oz = \"O\"
 N2 = \"N\"
 ")
 
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/.chemfilesrc
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/chemfiles.toml
 "[types]
-# This override the root .chemfilesrc file
+# This override the root .chemfiles.toml file
 N2 = \"N4\"
 ")
 

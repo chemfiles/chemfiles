@@ -7,6 +7,7 @@
 #include "chemfiles/Configuration.hpp"
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/utils.hpp"
+#include "chemfiles/warnings.hpp"
 #include "chemfiles/generic.hpp"
 using namespace chemfiles;
 
@@ -25,7 +26,17 @@ Configuration::Configuration() {
     for (auto& dir: directories) {
         auto path = dir + "/" + ".chemfilesrc";
         if (std::ifstream(path)) {
+            warning("found deprecated configuration file at '{}'. Please rename it to .chemfiles.toml", path);
+        }
+        path = dir + "/" + ".chemfiles.toml";
+        if (std::ifstream(path)) {
             read(path);
+            continue;
+        }
+        path = dir + "/" + "chemfiles.toml";
+        if (std::ifstream(path)) {
+            read(path);
+            continue;
         }
     }
 }

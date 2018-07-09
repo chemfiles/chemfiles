@@ -32,6 +32,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * There is only one constructor for the `Frame` class: `Frame(UnitCell cell =
   UnitCell())`. The constructor taking a topology can be replaced with calls to
   `Frame::add_atom` and `Frame::add_bond`.
+* Chemfiles will now read configuration from `.chemfiles.toml` or
+  `chemfiles.toml` instead of `.chemfilesrc`
 
 ### Changes in supported formats
 
