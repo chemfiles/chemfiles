@@ -210,7 +210,7 @@ double toml_get_number(const toml::value& value) {
     if (value.type() == toml::value_t::Float) {
         return toml::get<double>(value);
     } else if (value.type() == toml::value_t::Integer) {
-        return toml::get<long long>(value);
+        return static_cast<double>(toml::get<long long>(value));
     }
     return 0;
 }
