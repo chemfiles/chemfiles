@@ -107,7 +107,6 @@ extern "C" chfl_status chfl_topology_impropers_count(const CHFL_TOPOLOGY* const 
     )
 }
 
-#pragma intel optimization_level 2  /* Using -O3 with icc lead to partial copy of the bonds */
 extern "C" chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[2], uint64_t nbonds) {
     CHECK_POINTER(topology);
     CHECK_POINTER(data);
@@ -126,7 +125,6 @@ extern "C" chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, 
     )
 }
 
-#pragma intel optimization_level 2 /* Using -O3 with icc lead to partial copy of the angles */
 extern "C" chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[3], uint64_t nangles) {
     CHECK_POINTER(topology);
     CHECK_POINTER(data);
@@ -146,7 +144,6 @@ extern "C" chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology,
     )
 }
 
-#pragma intel optimization_level 2 /* Using -O3 with icc lead to partial copy of the dihedrals */
 extern "C" chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t ndihedrals) {
     CHECK_POINTER(topology);
     CHECK_POINTER(data);
@@ -167,7 +164,6 @@ extern "C" chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topolo
     )
 }
 
-#pragma intel optimization_level 2 /* Using -O3 with icc lead to partial copy of the dihedrals */
 extern "C" chfl_status chfl_topology_impropers(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t nimpropers) {
     CHECK_POINTER(topology);
     CHECK_POINTER(data);
@@ -237,7 +233,6 @@ extern "C" chfl_status chfl_topology_bond_with_order(CHFL_TOPOLOGY* const topolo
     )
 }
 
-#pragma intel optimization_level 2  /* Using -O3 with icc lead to partial copy of the bonds */
 extern "C" chfl_status chfl_topology_bond_orders(const CHFL_TOPOLOGY* const topology, chfl_bond_order orders[], uint64_t nbonds) {
     CHECK_POINTER(topology);
     CHECK_POINTER(orders);
