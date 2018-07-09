@@ -6,7 +6,6 @@
 
 #include "helpers.hpp"
 #include "chemfiles/Configuration.hpp"
-#include "chemfiles/generic.hpp"
 #include "chemfiles.hpp"
 using namespace chemfiles;
 

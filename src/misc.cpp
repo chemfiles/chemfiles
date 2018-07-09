@@ -5,7 +5,7 @@
 
 #include "chemfiles/warnings.hpp"
 #include "chemfiles/Configuration.hpp"
-#include "chemfiles/generic.hpp"
+#include "chemfiles/misc.hpp"
 #include "chemfiles/mutex.hpp"
 
 using namespace chemfiles;
