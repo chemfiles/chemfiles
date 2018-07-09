@@ -106,47 +106,36 @@ chemfiles header:
    :language: c
    :lines: 4
 
-Everything starts with a :cpp:type:`CHFL_TOPOLOGY`. This is the type that
-defines the atoms and the connectivity in a system. Here, we add three
-:cpp:type:`CHFL_ATOM` and two bonds to create a water molecule.
+We can then create a :cpp:type:`CHFL_FRAME` and the two :cpp:type:`CHFL_ATOM` we
+will need.
 
 .. literalinclude:: ../../examples/c/generate.c
    :language: c
-   :lines: 8-18
+   :lines: 8-10
    :dedent: 4
 
-We can then create a :cpp:type:`CHFL_FRAME` and set its topology. We free the
-topology right after, because we no longer need it.
+We can now add the atoms to the frame, with their respective positions. The
+third argument to :cpp:func:`chfl_frame_add_atom` is set to ``NULL`` as we don't
+need the velocities.
 
 .. literalinclude:: ../../examples/c/generate.c
    :language: c
-   :lines: 20-23
+   :lines: 12-14
    :dedent: 4
 
-Once we set the topology, we can set the positions
+We can then add bonds between the atoms to fully define the topology
 
 .. literalinclude:: ../../examples/c/generate.c
    :language: c
-   :lines: 25-31
-   :dedent: 4
-
-Another possibility is to directly add atoms and bonds to the frame. Here we
-define a second molecule representing carbon dioxyde.
-:cpp:func:`chfl_frame_add_atom` takes three arguments: the atom, the position
-and the velocity of the atom. Here we use ``NULL`` for the velocity, because we
-are not interested in it.
-
-.. literalinclude:: ../../examples/c/generate.c
-   :language: c
-   :lines: 33-37
+   :lines: 16-17
    :dedent: 4
 
 Finally, we can set the :cpp:type:`CHFL_CELL` associated with this frame. We
-also free the cell memory, as it is no longer needed.
+also free the cell memory right away, as it is no longer needed.
 
 .. literalinclude:: ../../examples/c/generate.c
    :language: c
-   :lines: 39-41
+   :lines: 19-21
    :dedent: 4
 
 Now that our frame is constructed, it is time to write it to a file. For that,
@@ -154,14 +143,14 @@ we open a trajectory in write (``'w'``) mode, and write to it.
 
 .. literalinclude:: ../../examples/c/generate.c
    :language: c
-   :lines: 43-45
+   :lines: 23-25
    :dedent: 4
 
 And free all remaining memory with the right function.
 
 .. literalinclude:: ../../examples/c/generate.c
    :language: c
-   :lines: 47-50
+   :lines: 27-29
    :dedent: 4
 
 .. htmlhidden::

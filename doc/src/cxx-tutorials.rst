@@ -84,41 +84,22 @@ chemfiles header:
 
 .. literalinclude:: ../../examples/cpp/generate.cpp
    :language: cpp
-   :lines: 4-5
+   :lines: 4
 
-Everything starts in a :cpp:class:`chemfiles::Topology`. This is the class that
-defines the atoms and the connectivity in a system. Here, we add three
-:cpp:class:`chemfiles::Atom` and two bonds to create a water molecule.
+We start with a :cpp:type:`chemfiles::Frame` that we construct by giving it the
+:cpp:type:`chemfiles::UnitCell` that defines the periodic boundary conditions.
 
 .. literalinclude:: ../../examples/cpp/generate.cpp
    :language: cpp
-   :lines: 7-13
+   :lines: 7
    :dedent: 4
 
-We can then create a :cpp:class:`chemfiles::Frame` corresponding to this
-:cpp:class:`chemfiles::Topology` and set the atomic positions.
+We can then add three :cpp:class:`chemfiles::Atom` to this frame with their
+positions; and set the bonds between them to define a water molecule.
 
 .. literalinclude:: ../../examples/cpp/generate.cpp
    :language: cpp
-   :lines: 15-20
-   :dedent: 4
-
-Another possibility is to directly add atoms to the frame. Here we define a
-second molecule representing carbon dioxyde.
-:cpp:func:`chemfiles::Frame::add_atom` takes two arguments: the atom, and the
-position of the atom as a :cpp:class:`chemfiles::Vector3D`.
-
-.. literalinclude:: ../../examples/cpp/generate.cpp
-   :language: cpp
-   :lines: 22-26
-   :dedent: 4
-
-Finally, we can set the :cpp:class:`chemfiles::UnitCell` associated with this
-frame.
-
-.. literalinclude:: ../../examples/cpp/generate.cpp
-   :language: cpp
-   :lines: 28
+   :lines: 9-14
    :dedent: 4
 
 Now that our frame is constructed, it is time to write it to a file. For that,
@@ -126,7 +107,7 @@ we open a trajectory in write (``'w'``) mode, and write to it.
 
 .. literalinclude:: ../../examples/cpp/generate.cpp
    :language: cpp
-   :lines: 30-31
+   :lines: 16-17
    :dedent: 4
 
 .. htmlhidden::
