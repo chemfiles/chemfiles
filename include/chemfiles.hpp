@@ -6,7 +6,7 @@
 
 #include "chemfiles/config.hpp"
 #include "chemfiles/exports.hpp"
-#include "chemfiles/generic.hpp"
+#include "chemfiles/misc.hpp"
 
 #include "chemfiles/Error.hpp"
 #include "chemfiles/Property.hpp"

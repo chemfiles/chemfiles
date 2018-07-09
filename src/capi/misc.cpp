@@ -1,7 +1,7 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include "chemfiles/generic.hpp"
+#include "chemfiles/misc.hpp"
 #include "chemfiles/config.hpp"
 #include "chemfiles/capi/misc.h"
 #include "chemfiles/capi.hpp"

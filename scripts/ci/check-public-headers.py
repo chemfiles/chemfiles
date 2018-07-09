@@ -28,7 +28,7 @@ WHITELIST = [
     "chemfiles/sorted_set.hpp",
     "chemfiles/unreachable.hpp",
     # chemfiles main headers
-    "chemfiles/generic.hpp",
+    "chemfiles/misc.hpp",
     "chemfiles/types.hpp",
     "chemfiles/Atom.hpp",
     "chemfiles/Frame.hpp",

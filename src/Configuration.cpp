@@ -8,7 +8,7 @@
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/warnings.hpp"
-#include "chemfiles/generic.hpp"
+#include "chemfiles/misc.hpp"
 using namespace chemfiles;
 
 // Get the list of directories up to `leaf`. For example, if `leaf` is
