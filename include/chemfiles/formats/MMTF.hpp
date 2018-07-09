@@ -21,7 +21,7 @@ class MMTFFormat final: public Format {
 public:
     MMTFFormat(std::string path, File::Mode mode, File::Compression compression);
 
-    ~MMTFFormat() = default;
+    ~MMTFFormat() override = default;
     MMTFFormat(const MMTFFormat&) = delete;
     MMTFFormat& operator=(const MMTFFormat&) = delete;
     MMTFFormat(MMTFFormat&&) = default;

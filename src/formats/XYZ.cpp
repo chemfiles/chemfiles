@@ -62,7 +62,7 @@ void XYZFormat::read(Frame& frame) {
     if (count < 0) {
         throw format_error("the number of atoms can not be negative in XYZ format");
     }
-    size_t natoms = static_cast<size_t>(count);
+    auto natoms = static_cast<size_t>(count);
 
     frame.reserve(natoms);
     frame.resize(0);

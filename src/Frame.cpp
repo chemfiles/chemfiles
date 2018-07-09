@@ -7,7 +7,7 @@
 #include "chemfiles/Frame.hpp"
 using namespace chemfiles;
 
-Frame::Frame(UnitCell cell): topology_(), cell_(std::move(cell)) {}
+Frame::Frame(UnitCell cell): cell_(cell) {}
 
 size_t Frame::size() const {
     assert(positions_.size() == topology_.size());

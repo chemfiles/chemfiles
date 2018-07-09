@@ -35,17 +35,8 @@ static void check(lzma_ret code) {
 }
 
 xzstreambuf::xzstreambuf(size_t buffer_size):
-    file_(nullptr),
-    stream_(LZMA_STREAM_INIT),
-    filters_({{{LZMA_VLI_UNKNOWN, NULL}}}),
-    action_(LZMA_RUN),
-    index_(nullptr),
     in_buffer_(buffer_size),
-    out_buffer_(buffer_size),
-    decoded_position_(0),
-    discard_amount_(0),
-    at_block_boundary_(true),
-    reading_(true)
+    out_buffer_(buffer_size)
 {
     stream_.next_in = nullptr;
     stream_.avail_in = 0;
@@ -70,7 +61,7 @@ xzstreambuf::~xzstreambuf() {
     }
 
     for (size_t i = 0; i < LZMA_FILTERS_MAX; ++i) {
-        free(filters_[i].options);
+        free(filters_[i].options); // NOLINT: working with a C library
     }
 
     lzma_end(&stream_);
@@ -191,7 +182,7 @@ int xzstreambuf::underflow() {
                 // `free` directly because no allocator is passed to any lzma
                 // calls
                 for (size_t i = 0; i < LZMA_FILTERS_MAX; ++i) {
-                    free(filters_[i].options);
+                    free(filters_[i].options); // NOLINT: working with a C library
                 }
 
                 block_.version = 0;
@@ -276,7 +267,7 @@ xzstreambuf::pos_type xzstreambuf::seekoff(std::streambuf::off_type offset,
     } else if (way == std::ios::end) {
         if (!index_) {
             if (!init_index()) {
-                return pos_type(off_type(-1));
+                return EOF;
             }
         }
 
@@ -296,13 +287,13 @@ xzstreambuf::pos_type xzstreambuf::seekoff(std::streambuf::off_type offset,
 
 xzstreambuf::pos_type xzstreambuf::seekpos(std::streambuf::pos_type position,
                                            std::ios_base::openmode /*which*/) {
-    if (file_ == 0 || sync()) {
-        return pos_type(off_type(-1));
+    if (file_ == nullptr || sync()) {
+        return EOF;
     }
 
     if (!index_) {
         if (!init_index()) {
-            return pos_type(off_type(-1));
+            return EOF;
         }
     }
 
@@ -311,7 +302,7 @@ xzstreambuf::pos_type xzstreambuf::seekpos(std::streambuf::pos_type position,
 
     // Returns true on failure.
     if (lzma_index_iter_locate(&iter, static_cast<uint64_t>(off_type(position)))) {
-        return pos_type(off_type(-1));
+        return EOF;
     }
 
     long seek_amount = 0;
@@ -321,7 +312,7 @@ xzstreambuf::pos_type xzstreambuf::seekpos(std::streambuf::pos_type position,
         seek_amount = static_cast<long>(iter.block.compressed_file_offset);
     }
     if (fseek(file_, seek_amount, SEEK_SET)) {
-        return pos_type(off_type(-1));
+        return EOF;
     }
 
     decoded_position_ = iter.block.uncompressed_file_offset;
@@ -365,11 +356,8 @@ bool xzstreambuf::init_index() {
     uint64_t memlimit = UINT64_MAX;
     size_t in_pos = 0;
     auto res = lzma_index_buffer_decode(&index_, &memlimit, nullptr, index_buf.data(), &in_pos, index_buf.size());
-    if (res != LZMA_OK) {
-        return false;
-    }
 
-    return true;
+    return res == LZMA_OK;
 }
 
 bool xzstreambuf::is_open() const {

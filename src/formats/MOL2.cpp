@@ -199,7 +199,9 @@ std::streampos read_until(TextFile& file, const std::string& tag) {
 }
 
 std::streampos forward(TextFile& file) {
-    if (!file) {return std::streampos(-1);}
+    if (!file) {
+        return {-1};
+    }
     while (!file.eof()) {
         try {
             std::streampos pos = read_until(file, "@<TRIPOS>MOLECULE");
@@ -235,11 +237,11 @@ std::streampos forward(TextFile& file) {
 
             return pos;
         } catch (const FileError&) {
-            return std::streampos(-1);
+            return {-1};
         }
     }
 
-    return std::streampos(-1);
+    return {-1};
 }
 
 void MOL2Format::write(const Frame& frame) {

@@ -68,7 +68,9 @@ private:
     }
 
     bool check(Token::Type type) const {
-        if (finished()) return false;
+        if (finished()) {
+            return false;
+        }
         return peek().type() == type;
     }
 

@@ -17,9 +17,15 @@ using namespace chemfiles::selections;
 
 using string_prop_creator_t = std::function<Ast(std::string, bool, Variable)>;
 static std::map<std::string, string_prop_creator_t> STRING_PROPERTIES = {
-    {"name", [](std::string value, bool equals, Variable var){ return Ast(new Name(value, equals, var));}},
-    {"type", [](std::string value, bool equals, Variable var){ return Ast(new Type(value, equals, var));}},
-    {"resname", [](std::string value, bool equals, Variable var){ return Ast(new Resname(value, equals, var));}},
+    {"name", [](std::string value, bool equals, Variable var) {
+        return Ast(new Name(std::move(value), equals, var));
+    }},
+    {"type", [](std::string value, bool equals, Variable var) {
+        return Ast(new Type(std::move(value), equals, var));
+    }},
+    {"resname", [](std::string value, bool equals, Variable var) {
+        return Ast(new Resname(std::move(value), equals, var));
+    }},
 };
 
 using num_prop_creator_t = std::function<MathAst(Variable)>;
@@ -68,8 +74,12 @@ struct BooleanFunction {
 };
 
 static std::map<std::string, BooleanFunction> BOOLEAN_SELECTORS = {
-    {"all", {0, [](std::vector<SubSelection>){ return Ast(new All()); }}},
-    {"none", {0, [](std::vector<SubSelection>){ return Ast(new None()); }}},
+    {"all", {0, [](std::vector<SubSelection> /*unused*/) {
+        return Ast(new All());
+    }}},
+    {"none", {0, [](std::vector<SubSelection> /*unused*/) {
+        return Ast(new None());
+    }}},
     {"is_bonded", {2, [](std::vector<SubSelection> args){
         return Ast(new IsBonded(std::move(args[0]), std::move(args[1])));
     }}},
@@ -166,7 +176,7 @@ Ast Parser::selector() {
 Ast Parser::bool_selector() {
     auto token = advance();
     assert(token.type() == Token::IDENT);
-    auto name = token.ident();
+    const auto& name = token.ident();
     assert(is_boolean_selector(name));
 
     auto selector = BOOLEAN_SELECTORS[name];
@@ -196,7 +206,7 @@ Ast Parser::bool_selector() {
 Ast Parser::string_selector() {
     auto property = advance();
     assert(property.type() == Token::IDENT);
-    auto name = property.ident();
+    const auto& name = property.ident();
     assert(is_string_property(name));
 
     auto var = variable();
@@ -446,7 +456,7 @@ std::vector<SubSelection> Parser::sub_selection() {
     }
 
     if (match(Token::VARIABLE)) {
-        vars.push_back(previous().variable());
+        vars.emplace_back(previous().variable());
     } else {
         // HACK: We can not (yet) build a selection directly from AST, because
         // we need to validate the variables and get the context. So we eat all
@@ -463,7 +473,7 @@ std::vector<SubSelection> Parser::sub_selection() {
 
     while (match(Token::COMMA)) {
         if (match(Token::VARIABLE)) {
-            vars.push_back(previous().variable());
+            vars.emplace_back(previous().variable());
         } else {
             auto before = current_;
             auto _ast = expression();
