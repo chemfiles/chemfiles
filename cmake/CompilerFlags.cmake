@@ -45,6 +45,12 @@ if(MSVC)
     set(CMAKE_SHARED_LINKER_FLAGS "/SUBSYSTEM:CONSOLE")
 endif()
 
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+    # Some version of intel compiler (icc 14 at least) have only partial support
+    # for C++11 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMSGPACK_USE_CPP03")
+endif()
+
 if(EMSCRIPTEN)
     if(BUILD_SHARED_LIBS)
         # Shared libs where not tested and a lot of changes to the build system
@@ -97,6 +103,10 @@ set(CHEMFILES_C_WARNINGS "")
 macro(remove_msvc_warning _warn_)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd${_warn_}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd${_warn_}")
+endmacro()
+
+macro(remove_intel_warning _warn_)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -diag-disable ${_warn_}")
 endmacro()
 
 if(MSVC)
@@ -178,17 +188,18 @@ else()
     # Warnings for PGI compiler
     add_warning_flag("-Minform=warn")
 
-    if(${CMAKE_C_COMPILER} MATCHES "icc.*$")
+    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
         # external function definition with no prior declaration
-        set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 1418")
+        remove_intel_warning(1418)
         # Intel compiler is too strict in errors about 'explicit' keyword
-        set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 2304")
-        set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 2305")
+        remove_intel_warning(2304)
+        remove_intel_warning(2305)
         # parameter "args" was never referenced in variadic templates
-        set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 869")
+        remove_intel_warning(869)
         # exception specification for implicitly declared virtual function ...
         # This is an issue with compiler generated destructors and noexcept
-        set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} -diag-disable 811")
+        remove_intel_warning(811)
+        remove_intel_warning(809)
     endif()
 endif()
 
