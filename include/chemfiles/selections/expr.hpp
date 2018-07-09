@@ -103,7 +103,7 @@ public:
     std::string print() const;
 
     bool is_variable() const {
-        return selection_.get() == nullptr;
+        return selection_ == nullptr;
     }
 
 private:
@@ -173,15 +173,21 @@ public:
     {
         assert(argument <= 3 && "argument must be less than 3 in SingleSelector");
     }
-    virtual ~StringSelector() = default;
+    ~StringSelector() override = default;
+
+    StringSelector(StringSelector&&) = default;
+    StringSelector& operator=(StringSelector&&) = default;
+
+    StringSelector(const StringSelector&) = delete;
+    StringSelector& operator=(const StringSelector&) = delete;
 
     /// Get the value for the atom at index `i` in the `frame`
     virtual const std::string& value(const Frame& frame, size_t i) const = 0;
     /// Get the property name
     virtual std::string name() const = 0;
 
-    bool is_match(const Frame& frame, const Match& match) const override final;
-    std::string print(unsigned delta) const override final;
+    bool is_match(const Frame& frame, const Match& match) const final;
+    std::string print(unsigned delta) const final;
 
 private:
     /// The value to check against
@@ -254,6 +260,12 @@ class MathExpr {
 public:
     MathExpr() = default;
     virtual ~MathExpr() = default;
+
+    MathExpr(MathExpr&&) = default;
+    MathExpr& operator=(MathExpr&&) = default;
+
+    MathExpr(const MathExpr&) = delete;
+    MathExpr& operator=(const MathExpr&) = delete;
 
     /// Evaluate the expression and get the value
     virtual double eval(const Frame& frame, const Match& match) const = 0;
@@ -447,11 +459,17 @@ private:
 class NumericProperty: public MathExpr {
 public:
     NumericProperty(Variable argument): argument_(argument) {}
-    virtual ~NumericProperty() = default;
+    ~NumericProperty() override = default;
 
-    double eval(const Frame& frame, const Match& match) const override final;
-    optional<double> optimize() override final;
-    std::string print() const override final;
+    NumericProperty(NumericProperty&&) = default;
+    NumericProperty& operator=(NumericProperty&&) = default;
+
+    NumericProperty(const NumericProperty&) = delete;
+    NumericProperty& operator=(const NumericProperty&) = delete;
+
+    double eval(const Frame& frame, const Match& match) const final;
+    optional<double> optimize() final;
+    std::string print() const final;
 
     /// Get the value of the property for the atom at index `i` in the `frame`
     virtual double value(const Frame& frame, size_t i) const = 0;

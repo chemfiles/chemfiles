@@ -6,7 +6,7 @@
 using namespace chemfiles;
 
 
-gzstreambuf::gzstreambuf(size_t buffer_size): buffer_(buffer_size), file_(nullptr) {
+gzstreambuf::gzstreambuf(size_t buffer_size): buffer_(buffer_size) {
     auto end = &buffer_.back() + 1;
     setg(end, end, end);
 
@@ -47,7 +47,7 @@ gzstreambuf::int_type gzstreambuf::underflow() {
     return traits_type::to_int_type(*gptr());
 }
 
-gzstreambuf::int_type gzstreambuf::overflow(int_type ch) {
+int gzstreambuf::overflow(int ch) {
     if (ch != traits_type::eof()) {
         *pptr() = traits_type::to_char_type(ch);
         pbump(1);
@@ -77,7 +77,7 @@ bool gzstreambuf::is_open() const {
 
 std::streampos gzstreambuf::seekoff(std::streamoff offset, std::ios_base::seekdir way, std::ios_base::openmode mode) {
     if (sync() == EOF) {
-        return std::streampos(EOF);
+        return {EOF};
     }
 
     // fast return path for tellg
@@ -112,7 +112,7 @@ std::streampos gzstreambuf::seekoff(std::streamoff offset, std::ios_base::seekdi
 GzFile::GzFile(std::string path, File::Mode mode)
     : TextFile(std::move(path), mode, File::GZIP, &buffer_), buffer_() {
 
-    std::string openmode = "";
+    std::string openmode;
     switch (mode) {
     case File::READ:
         openmode = "rb";

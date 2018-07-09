@@ -251,11 +251,11 @@ CHFL_EXPORT chfl_status chfl_topology_bond_with_order(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_bond_orders(
-    const CHFL_TOPOLOGY* const topology, chfl_bond_order orders[], uint64_t nbonds
+    const CHFL_TOPOLOGY* topology, chfl_bond_order orders[], uint64_t nbonds
 );
 
 /// Get a specific bond order in the `topology` in
-/// the chfl_bond_order pointed to by order 
+/// the chfl_bond_order pointed to by order
 ///
 /// `i` and `j` must be valid atom indexes in the topology and a bond
 /// must exist between these two atoms.
@@ -264,7 +264,7 @@ CHFL_EXPORT chfl_status chfl_topology_bond_orders(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_topology_bond_order(
-    const CHFL_TOPOLOGY* const topology, uint64_t i, uint64_t j, chfl_bond_order* order
+    const CHFL_TOPOLOGY* topology, uint64_t i, uint64_t j, chfl_bond_order* order
 );
 
 /// Free the memory associated with a `topology`.

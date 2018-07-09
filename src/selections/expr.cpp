@@ -212,13 +212,12 @@ std::string Resname::name() const {
     return "resname";
 }
 
-static const std::string EMPTY_STRING = "";
-
 const std::string& Resname::value(const Frame& frame, size_t i) const {
     auto residue = frame.topology().residue_for_atom(i);
     if (residue) {
         return residue->name();
     } else {
+        static const std::string EMPTY_STRING;
         return EMPTY_STRING;
     }
 }

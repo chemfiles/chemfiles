@@ -293,7 +293,9 @@ bool forward(TextFile& file) {
 
     // Search for ending character, updating the position in the file only
     while (!file.eof()) {
-        if (file.readline() == "$$$$") break;
+        if (file.readline() == "$$$$") {
+            break;
+        }
     }
 
     // We have enough data to parse an entire molecule.

@@ -145,8 +145,8 @@ void MMTFFormat::read(Frame& frame) {
             }
 
             for (size_t l = 0; l < group.bondOrderList.size(); l++) {
-                size_t atom1 = static_cast<size_t>(group.bondAtomList[l * 2]);
-                size_t atom2 = static_cast<size_t>(group.bondAtomList[l * 2 + 1]);
+                auto atom1 = static_cast<size_t>(group.bondAtomList[l * 2]);
+                auto atom2 = static_cast<size_t>(group.bondAtomList[l * 2 + 1]);
 
                 Bond::BondOrder bo;
                 switch(group.bondOrderList[l]) {

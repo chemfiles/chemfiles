@@ -65,7 +65,7 @@ void CSSRFormat::read(Frame& frame) {
     frame.reserve(natoms);
 
     std::vector<std::vector<size_t>> connectivity(natoms);
-    for (auto line: file_->readlines(natoms)) {
+    for (const auto& line: file_->readlines(natoms)) {
         unsigned atom_id = 0;
         char name[5] = {0};
         double x = 0, y = 0, z = 0;
@@ -97,9 +97,9 @@ void CSSRFormat::read(Frame& frame) {
         atom.set_charge(charge);
         frame.add_atom(std::move(atom), position);
 
-        for (int i=0; i<8; i++) {
-            if (bonds[i] != 0) {
-                connectivity[atom_id - 1].push_back(bonds[i] - 1);
+        for (auto bond: bonds) {
+            if (bond != 0) {
+                connectivity[atom_id - 1].push_back(bond - 1);
             }
         }
     }

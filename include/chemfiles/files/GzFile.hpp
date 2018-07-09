@@ -14,30 +14,35 @@
 namespace chemfiles {
 
 /// An implementation of std::streambuf for gziped files
-class gzstreambuf: public std::streambuf {
+class gzstreambuf final: public std::streambuf {
 public:
     gzstreambuf(size_t buffer_size = 512);
     ~gzstreambuf() override;
+
+    gzstreambuf(const gzstreambuf&) = delete;
+    gzstreambuf& operator=(const gzstreambuf&) = delete;
+    gzstreambuf(gzstreambuf&&) = delete;
+    gzstreambuf& operator=(gzstreambuf&&) = delete;
 
     /// Open the file at `path` with the given `mode`. The mode will be passed
     /// down to gzopen.
     void open(const std::string& path, const std::string& mode);
 
-    int_type underflow() override;
-    int_type overflow(int_type ch) override;
+    int underflow() override;
+    int overflow(int ch) override;
 
     int sync() override;
     bool is_open() const;
 
-    std::streampos seekpos(std::streampos offset, std::ios_base::openmode which) override {
-        return pubseekoff(offset, std::ios_base::beg, which);
+    std::streampos seekpos(std::streampos offset, std::ios_base::openmode mode) override {
+        return pubseekoff(offset, std::ios_base::beg, mode);
     }
 
-    std::streampos seekoff(std::streamoff offset, std::ios_base::seekdir way, std::ios_base::openmode which) override;
+    std::streampos seekoff(std::streamoff offset, std::ios_base::seekdir way, std::ios_base::openmode mode) override;
 
 private:
     std::vector<char> buffer_;
-    gzFile file_;
+    gzFile file_ = nullptr;
 };
 
 

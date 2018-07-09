@@ -151,7 +151,7 @@ std::vector<Token> Tokenizer::tokenize() {
             throw selection_error("unknown char '{}' in '{}'", peek(), input_);
         }
     }
-    tokens.push_back(Token(Token::END));
+    tokens.emplace_back(Token(Token::END));
     return tokens;
 }
 

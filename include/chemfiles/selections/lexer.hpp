@@ -212,12 +212,16 @@ private:
     }
 
     bool check(char c) const {
-        if (finished()) return false;
+        if (finished()) {
+            return false;
+        }
         return peek() == c;
     }
 
     bool check(matcher_t matcher) const {
-        if (finished()) return false;
+        if (finished()) {
+            return false;
+        }
         return matcher(peek());
     }
 
