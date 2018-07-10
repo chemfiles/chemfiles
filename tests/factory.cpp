@@ -14,12 +14,12 @@
 using namespace chemfiles;
 
 struct DummyFormat: public Format {
-    DummyFormat(const std::string&, File::Mode) {}
+    DummyFormat(const std::string&, File::Mode, File::Compression) {}
     size_t nsteps() override {return 42;}
 };
 
 struct DunnyFormat: public Format {
-    DunnyFormat(const std::string&, File::Mode) {}
+    DunnyFormat(const std::string&, File::Mode, File::Compression) {}
     size_t nsteps() override {return 0;}
 };
 
@@ -36,10 +36,10 @@ namespace chemfiles {
 TEST_CASE("Geting registered format"){
     FormatFactory::get().add_format<DummyFormat>();
 
-    DummyFormat dummy("", File::READ);
-    auto format = FormatFactory::get().extension(".dummy")("", File::READ);
+    DummyFormat dummy("", File::READ, File::DEFAULT);
+    auto format = FormatFactory::get().extension(".dummy")("", File::READ, File::DEFAULT);
     CHECK(typeid(dummy) == typeid(*format));
-    format = FormatFactory::get().name("Dummy")("", File::READ);
+    format = FormatFactory::get().name("Dummy")("", File::READ, File::DEFAULT);
     CHECK(typeid(dummy) == typeid(*format));
 
     CHECK_THROWS_AS(FormatFactory::get().name("UNKOWN"), FormatError);

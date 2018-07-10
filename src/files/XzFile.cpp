@@ -376,7 +376,7 @@ bool xzstreambuf::is_open() const {
     return file_ != nullptr && !::ferror(file_);
 }
 
-XzFile::XzFile(std::string path, File::Mode mode): TextFile(std::move(path), mode, &buffer_), buffer_() {
+XzFile::XzFile(std::string path, File::Mode mode): TextFile(std::move(path), mode, File::LZMA, &buffer_), buffer_() {
     if (mode == File::READ) {
         buffer_.open(this->path(), "rb");
     } else if (mode == File::WRITE) {

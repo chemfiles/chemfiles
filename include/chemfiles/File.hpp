@@ -26,6 +26,16 @@ public:
         APPEND = 'a',
     };
 
+    /// Possible compression methods for opening a file
+    enum Compression {
+        /// Default method: plain text or binary formats
+        DEFAULT,
+        /// gzip compression
+        GZIP,
+        /// lzma compression (.xz)
+        LZMA,
+    };
+
     virtual ~File() noexcept = default;
     File(File&&) = default;
     File& operator=(File&&) = default;
@@ -38,12 +48,17 @@ public:
     /// Get the mode used to open this file.
     Mode mode() const { return mode_; }
 
+    /// Get the compression used to open this file.
+    Compression compression() const { return compression_; }
+
 protected:
-    File(std::string path, Mode mode): path_(std::move(path)), mode_(mode) {}
+    File(std::string path, Mode mode, Compression compression):
+        path_(std::move(path)), mode_(mode), compression_(compression) {}
 
 private:
     std::string path_;
     Mode mode_;
+    Compression compression_;
 };
 
 /// Abstract base class representing a text file. This class is inteded to be
@@ -54,8 +69,9 @@ private:
 /// the user of the class to the current state.
 class CHFL_EXPORT TextFile: public File, public std::iostream {
 public:
-    /// Open the most adaptated text file class for the given `path` and `mode`
-    static std::unique_ptr<TextFile> open(std::string path, File::Mode mode);
+    /// Open the file at the given `path` with the requested `mode` and
+    /// `compression` method using the most adapted child class of `TextFile`.
+    static std::unique_ptr<TextFile> open(std::string path, File::Mode mode, File::Compression compression);
 
     /// Read a line from the file
     std::string readline();
@@ -67,9 +83,10 @@ public:
     bool eof();
 
 protected:
-    /// Initialize the TextFile at the given `path` and `mode`. All read and
-    /// write operations will go through the provided `buffer`.
-    TextFile(std::string path, File::Mode mode, std::streambuf* buffer);
+    /// Initialize the TextFile at the given `path` and `mode`, with the
+    /// specified 'compression' method. All read and write operations will go
+    /// through the provided `buffer`.
+    TextFile(std::string path, File::Mode mode, File::Compression compression, std::streambuf* buffer);
 
 private:
     void get_line(std::string& string);

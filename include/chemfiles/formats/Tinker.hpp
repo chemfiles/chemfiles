@@ -19,7 +19,7 @@ namespace chemfiles {
 /// extension, which is used for the standard XYZ format.
 class TinkerFormat final: public Format {
 public:
-    TinkerFormat(std::string path, File::Mode mode);
+    TinkerFormat(std::string path, File::Mode mode, File::Compression compression);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;

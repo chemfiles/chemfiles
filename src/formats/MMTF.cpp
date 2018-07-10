@@ -19,26 +19,15 @@ template<> FormatInfo chemfiles::format_information<MMTFFormat>() {
     );
 }
 
-static std::string extension(const std::string& filename) {
-    auto idx = filename.rfind('.');
-    if (idx != std::string::npos) {
-        return filename.substr(idx);
-    } else {
-        return "";
-    }
-}
-
-MMTFFormat::MMTFFormat(std::string path, File::Mode mode) {
-    auto ext = extension(path);
-
+MMTFFormat::MMTFFormat(std::string path, File::Mode mode, File::Compression compression) {
     if (mode == File::READ) {
-        if (ext == ".gz") {
+        if (compression == File::GZIP) {
             gzstreambuf gz_buff;
             gz_buff.open(path, "rb");
             std::stringstream buffer;
             buffer << &gz_buff;
             mmtf::decodeFromBuffer(structure_, buffer.str().data(), buffer.str().size());
-        } else if (ext == ".xz") {
+        } else if (compression == File::LZMA) {
             xzstreambuf xz_buff;
             xz_buff.open(path, "rb");
             std::stringstream buffer;

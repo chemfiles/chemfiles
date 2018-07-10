@@ -54,8 +54,8 @@ enum class Record {
 // Get the record type for a line.
 static Record get_record(const std::string& line);
 
-PDBFormat::PDBFormat(std::string path, File::Mode mode)
-  : file_(TextFile::open(std::move(path), mode)), models_(0) {
+PDBFormat::PDBFormat(std::string path, File::Mode mode, File::Compression compression)
+  : file_(TextFile::open(std::move(path), mode, compression)), models_(0) {
     while (!file_->eof()) {
         auto position = file_->tellg();
         if (!file_ || position == std::streampos(-1)) {

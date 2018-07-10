@@ -16,7 +16,7 @@
 
 namespace chemfiles {
 
-using format_creator_t = std::function<std::unique_ptr<Format>(std::string path, File::Mode mode)>;
+using format_creator_t = std::function<std::unique_ptr<Format>(std::string path, File::Mode mode, File::Compression compression)>;
 
 /// This class allow to register Format with names and file extensions
 class CHFL_EXPORT FormatFactory final {
@@ -46,8 +46,8 @@ public:
     template<class Format>
     void add_format() {
         auto info = format_information<Format>();
-        register_format(info, [](const std::string& path, File::Mode mode) {
-            return std::unique_ptr<Format>(new Format(path, mode));  // NOLINT no make_unique in C++11
+        register_format(info, [](const std::string& path, File::Mode mode, File::Compression compression) {
+            return std::unique_ptr<Format>(new Format(path, mode, compression));  // NOLINT no make_unique in C++11
         });
     }
 

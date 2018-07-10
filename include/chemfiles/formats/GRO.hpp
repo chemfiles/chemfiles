@@ -17,7 +17,7 @@ namespace chemfiles {
 /// [GRO]: http://manual.gromacs.org/current/online/gro.html
 class GROFormat final: public Format {
 public:
-    GROFormat(std::string path, File::Mode mode);
+    GROFormat(std::string path, File::Mode mode, File::Compression compression);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;

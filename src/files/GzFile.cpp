@@ -110,7 +110,7 @@ std::streampos gzstreambuf::seekoff(std::streamoff offset, std::ios_base::seekdi
 
 
 GzFile::GzFile(std::string path, File::Mode mode)
-    : TextFile(std::move(path), mode, &buffer_), buffer_() {
+    : TextFile(std::move(path), mode, File::GZIP, &buffer_), buffer_() {
 
     std::string openmode = "";
     switch (mode) {

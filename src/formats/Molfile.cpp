@@ -63,11 +63,17 @@ static int molfiles_to_chemfiles_warning(int level, const char* message) {
 /******************************************************************************/
 
 template <MolfileFormat F>
-Molfile<F>::Molfile(std::string path, File::Mode mode)
+Molfile<F>::Molfile(std::string path, File::Mode mode, File::Compression compression)
     : path_(std::move(path)), plugin_handle_(nullptr), data_(nullptr), natoms_(0) {
     if (mode != File::READ) {
         throw format_error(
             "molfiles based format {} is only available in read mode", plugin_data_.format()
+        );
+    }
+
+    if (compression != File::DEFAULT) {
+        throw format_error(
+            "molfiles based format {} do not support compression", plugin_data_.format()
         );
     }
 

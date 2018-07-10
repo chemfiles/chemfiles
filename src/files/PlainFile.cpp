@@ -8,7 +8,7 @@
 using namespace chemfiles;
 
 PlainFile::PlainFile(std::string path, File::Mode mode)
-    : TextFile(std::move(path), mode, &buffer_), buffer_() {
+    : TextFile(std::move(path), mode, File::DEFAULT, &buffer_), buffer_() {
     // We need to use binary mode when opening the file because we are storing
     // positions in the files relative to line ending positions. Using text
     // mode make the MSVC runtime convert lines ending and then all the values

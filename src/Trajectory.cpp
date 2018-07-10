@@ -5,30 +5,60 @@
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/utils.hpp"
 #include "chemfiles/Configuration.hpp"
 #include "chemfiles/FormatFactory.hpp"
 
 using namespace chemfiles;
 
-/// Get the extension part of a filename.
-static std::string extension(const std::string& filename) {
-    auto idx1 = filename.rfind('.');
-    if (idx1 != std::string::npos) {
-        auto ext = filename.substr(idx1);
-        if (ext == ".gz" || ext == ".xz") {
-            // check for another extension
-            auto idx2 = filename.substr(0, idx1).rfind('.');
-            if (idx2 != std::string::npos) {
-                return filename.substr(0, idx1).substr(idx2);
+struct file_open_info {
+    static file_open_info parse(const std::string& path, const std::string& format);
+    std::string format;
+    std::string extension;
+    File::Compression compression;
+};
+
+file_open_info file_open_info::parse(const std::string& path, const std::string& format) {
+    auto info = file_open_info {"", "", File::DEFAULT};
+
+    auto slash = format.find('/');
+    if (slash != std::string::npos) {
+        const auto& compression = trim(format.substr(slash + 1));
+        if (compression == "GZ") {
+            info.compression = File::GZIP;
+        } else if (compression == "XZ") {
+            info.compression = File::LZMA;
+        } else {
+            throw file_error("unknown compression method '{}'", compression);
+        }
+    }
+
+    info.format = trim(format.substr(0, slash));
+
+    auto dot1 = path.rfind('.');
+    if (dot1 != std::string::npos) {
+        info.extension = path.substr(dot1);
+        if (info.compression == File::DEFAULT) {
+            bool new_extension = false;
+            // check file extension for compressed file extension
+            if (info.extension == ".gz") {
+                new_extension = true;
+                info.compression = File::GZIP;
+            } else if (info.extension == ".xz") {
+                new_extension = true;
+                info.compression = File::LZMA;
+            }
+
+            if (new_extension) {
+                auto dot2 = path.substr(0, dot1).rfind('.');
+                if (dot2 != std::string::npos) {
+                    info.extension = path.substr(0, dot1).substr(dot2);
+                }
             }
         }
-        return ext;
-    } else {
-        throw file_error(
-            "file at '{}' does not have an extension, provide a format name to read it",
-            filename
-        );
     }
+
+    return info;
 }
 
 static File::Mode char_to_file_mode(char mode) {
@@ -49,15 +79,21 @@ static File::Mode char_to_file_mode(char mode) {
 
 Trajectory::Trajectory(std::string path, char mode, const std::string& format)
     : path_(std::move(path)), mode_(mode), step_(0), nsteps_(0), format_(nullptr) {
+
+    auto info = file_open_info::parse(path_, format);
     format_creator_t format_creator;
-    if (format == "") {
-        format_creator = FormatFactory::get().extension(extension(path_));
+    if (info.format != "") {
+        format_creator = FormatFactory::get().name(info.format);
+    } else if (info.extension != "") {
+        format_creator = FormatFactory::get().extension(info.extension);
     } else {
-        format_creator = FormatFactory::get().name(format);
+        throw file_error(
+            "file at '{}' does not have an extension, provide a format name to read it",
+            path_
+        );
     }
 
-    auto filemode = char_to_file_mode(mode);
-    format_ = format_creator(path_, filemode);
+    format_ = format_creator(path_, char_to_file_mode(mode), info.compression);
 
     if (mode == 'r' || mode == 'a') {
         nsteps_ = format_->nsteps();

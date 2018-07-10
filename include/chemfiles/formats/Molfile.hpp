@@ -55,7 +55,7 @@ struct MolfilePluginData final {
 template <MolfileFormat F>
 class Molfile final: public Format {
 public:
-    Molfile(std::string path, File::Mode mode);
+    Molfile(std::string path, File::Mode mode, File::Compression compression);
     ~Molfile() noexcept override;
     Molfile(const Molfile&) = delete;
     Molfile& operator=(const Molfile&) = delete;

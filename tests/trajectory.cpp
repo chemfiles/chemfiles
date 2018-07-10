@@ -167,11 +167,45 @@ TEST_CASE("Specify a format parameter") {
     Trajectory file("data/xyz/helium.xyz.but.not.really", 'r', "XYZ");
     auto frame = file.read();
     CHECK(frame.size() == 125);
+
+    auto tmpfile = NamedTempPath(".xyz");
+    file = Trajectory(tmpfile, 'w', "XYZ / GZ");
+    frame = Frame();
+    frame.add_atom(Atom("Fe"), {0, 1, 2});
+    file.write(frame);
+    file.close();
+
+    // Full format specification
+    frame = Trajectory(tmpfile, 'r', "XYZ / GZ").read();
+    CHECK(frame.size() == 1);
+    CHECK(frame[0].name() == "Fe");
+
+    frame = Trajectory(tmpfile, 'r', "XYZ/ GZ").read();
+    CHECK(frame.size() == 1);
+    CHECK(frame[0].name() == "Fe");
+
+    frame = Trajectory(tmpfile, 'r', "XYZ/GZ").read();
+    CHECK(frame.size() == 1);
+    CHECK(frame[0].name() == "Fe");
+
+    frame = Trajectory(tmpfile, 'r', "XYZ /GZ").read();
+    CHECK(frame.size() == 1);
+    CHECK(frame[0].name() == "Fe");
+
+    // only the compression method, the format will be guessed from extension
+    frame = Trajectory(tmpfile, 'r', "/ GZ").read();
+    CHECK(frame.size() == 1);
+    CHECK(frame[0].name() == "Fe");
 }
 
 TEST_CASE("Errors") {
     SECTION("Unknow opening mode") {
         CHECK_THROWS_AS(Trajectory("trajectory.xyz", 'z'), FileError);
+    }
+
+    SECTION("Unknow compression method") {
+        CHECK_THROWS_AS(Trajectory("trajectory.xyz", 'r', "XYZ / FOOzip"), FileError);
+        CHECK_THROWS_AS(Trajectory("trajectory.xyz", 'r', "XYZ /"), FileError);
     }
 
     SECTION("Bad opening mode") {

@@ -20,7 +20,7 @@ namespace chemfiles {
 /// [MOL2]:
 class MOL2Format final: public Format {
 public:
-    MOL2Format(std::string path, File::Mode mode);
+    MOL2Format(std::string path, File::Mode mode, File::Compression compression);
 
     MOL2Format(const MOL2Format&) = delete;
     MOL2Format& operator=(const MOL2Format&) = delete;

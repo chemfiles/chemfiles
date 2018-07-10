@@ -19,7 +19,7 @@ class Topology;
 /// [NetCDF]: http://ambermd.org/netcdf/nctraj.xhtml
 class AmberNetCDFFormat final: public Format {
 public:
-    AmberNetCDFFormat(std::string path, File::Mode mode);
+    AmberNetCDFFormat(std::string path, File::Mode mode, File::Compression compression);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;
