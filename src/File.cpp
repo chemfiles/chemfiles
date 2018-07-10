@@ -7,30 +7,23 @@
 #include "chemfiles/files/GzFile.hpp"
 #include "chemfiles/files/XzFile.hpp"
 #include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/unreachable.hpp"
 using namespace chemfiles;
 
-static std::string extension(const std::string& filename) {
-    auto idx = filename.rfind('.');
-    if (idx != std::string::npos) {
-        return filename.substr(idx);
-    } else {
-        return "";
-    }
-}
-
-std::unique_ptr<TextFile> TextFile::open(std::string path, File::Mode mode) {
-    auto ext = extension(path);
-    if (ext == ".gz") {
-        return std::unique_ptr<TextFile>(new GzFile(std::move(path), mode));
-    } else if (ext == ".xz") {
-        return std::unique_ptr<TextFile>(new XzFile(std::move(path), mode));
-    } else {
+std::unique_ptr<TextFile> TextFile::open(std::string path, File::Mode mode, File::Compression compression) {
+    switch (compression) {
+    case File::DEFAULT:
         return std::unique_ptr<TextFile>(new PlainFile(std::move(path), mode));
+    case File::GZIP:
+        return std::unique_ptr<TextFile>(new GzFile(std::move(path), mode));
+    case File::LZMA:
+        return std::unique_ptr<TextFile>(new XzFile(std::move(path), mode));
     }
+    unreachable();
 }
 
-TextFile::TextFile(std::string path, File::Mode mode, std::streambuf* buffer):
-    File(std::move(path), mode), std::iostream(buffer)
+TextFile::TextFile(std::string path, File::Mode mode, File::Compression compression, std::streambuf* buffer):
+    File(std::move(path), mode, compression), std::iostream(buffer)
 {
     std::iostream::clear();
     // Throw exceptions on errors

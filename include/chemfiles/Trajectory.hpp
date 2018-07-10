@@ -21,14 +21,23 @@ class CHFL_EXPORT Trajectory final {
 public:
     /// Open a file, automatically gessing the file format from the extension.
     ///
-    /// The format can either be guessed from the extention (".xyz" is XYZ,
-    /// ".gro" is GROMACS, *etc.*), or specified as the third parameter. The
-    /// format names are given in the corresponding [documentation
-    /// section][formats]
+    /// The `format` parameter should be a string formatted as `"<format>"`,
+    /// `"<format>/<compression>"` or `"/<compression>"`. `<format>` should be
+    /// the format name (see the corresponding [documentation section][formats]
+    /// for the names) or an empty string. `<compression>` should be `GZ` for
+    /// gzip files, or `XZ` for lzma/.xz files. If `<compression>` is present,
+    /// it will determine which compression method is used to read/write the
+    /// file. For example, `format = "XYZ"` will force usage of XYZ format
+    /// regardless of the file extension; `format = "XYZ / GZ"` will
+    /// additionally use gzip compression; and `format = "/ GZ"` will use the
+    /// gzip compression, and the file extension to guess the format. 
     ///
-    /// If the file path ends with either `.gz` or `.xz` and no `format` is
-    /// given; the file will be treated as a compressed file and the next
-    /// extension is used to guess the format.
+    /// If the `<format>` is an empty string, the file extension will be used
+    /// to guess the format. If `<compression>` is NOT presentand the file path
+    /// ends with either `.gz` or `.xz` the file will be treated as a
+    /// compressed file and the next extension is used to guess the format. For
+    /// example `Trajectory("file.xyz.gz")` will open the file for reading
+    /// using the XYZ format and the gzip compression method.
     ///
     /// @example{tests/doc/trajectory/trajectory.cpp}
     ///

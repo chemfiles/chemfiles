@@ -26,8 +26,8 @@ template<> FormatInfo chemfiles::format_information<TinkerFormat>() {
 static bool forward(TextFile& file);
 static bool is_unit_cell_line(const std::string& line);
 
-TinkerFormat::TinkerFormat(std::string path, File::Mode mode)
-    : file_(TextFile::open(std::move(path), mode))
+TinkerFormat::TinkerFormat(std::string path, File::Mode mode, File::Compression compression)
+    : file_(TextFile::open(std::move(path), mode, compression))
 {
     while (!file_->eof()) {
         auto position = file_->tellg();

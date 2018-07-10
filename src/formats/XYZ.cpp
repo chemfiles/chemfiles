@@ -26,8 +26,8 @@ template<> FormatInfo chemfiles::format_information<XYZFormat>() {
 /// not contain one more step.
 static bool forward(TextFile& file);
 
-XYZFormat::XYZFormat(std::string path, File::Mode mode)
-    : file_(TextFile::open(std::move(path), mode))
+XYZFormat::XYZFormat(std::string path, File::Mode mode, File::Compression compression)
+    : file_(TextFile::open(std::move(path), mode, compression))
 {
     while (!file_->eof()) {
         auto position = file_->tellg();

@@ -25,8 +25,8 @@ static std::streampos read_until(TextFile& file, const std::string& tag);
 /// contain one more step or -1 if it does not.
 static std::streampos forward(TextFile& file);
 
-MOL2Format::MOL2Format(std::string path, File::Mode mode)
-  : file_(TextFile::open(std::move(path), mode)) {
+MOL2Format::MOL2Format(std::string path, File::Mode mode, File::Compression compression)
+  : file_(TextFile::open(std::move(path), mode, compression)) {
     while (!file_->eof()) {
         auto position = forward(*file_);
         if (position == std::streampos(-1)) {

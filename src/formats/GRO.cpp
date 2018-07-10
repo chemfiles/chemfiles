@@ -28,8 +28,8 @@ static void check_values_size(const Vector3D& values, unsigned width, const std:
 /// not contain one more step.
 static bool forward(TextFile& file);
 
-GROFormat::GROFormat(std::string path, File::Mode mode)
-    : file_(TextFile::open(std::move(path), mode))
+GROFormat::GROFormat(std::string path, File::Mode mode, File::Compression compression)
+    : file_(TextFile::open(std::move(path), mode, compression))
 {
     while (!file_->eof()) {
         auto position = file_->tellg();

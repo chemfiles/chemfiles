@@ -96,7 +96,7 @@ void nc::NcChar::add(const std::vector<std::string>& data) {
 }
 
 NcFile::NcFile(std::string path, File::Mode mode)
-    : File(std::move(path), mode), nc_mode_(DATA) {
+    : File(std::move(path), mode, File::DEFAULT), nc_mode_(DATA) {
     auto status = NC_NOERR;
 
     switch (mode) {

@@ -14,7 +14,7 @@ namespace chemfiles {
 /// [SDF]: http://accelrys.com/products/collaborative-science/biovia-draw/ctfile-no-fee.html
 class SDFFormat final: public Format {
 public:
-    SDFFormat(std::string path, File::Mode mode);
+    SDFFormat(std::string path, File::Mode mode, File::Compression compression);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;

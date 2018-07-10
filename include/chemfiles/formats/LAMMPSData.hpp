@@ -127,7 +127,7 @@ private:
 /// [LAMMPS Data]: http://lammps.sandia.gov/doc/read_data.html
 class LAMMPSDataFormat final: public Format {
 public:
-    LAMMPSDataFormat(std::string path, File::Mode mode);
+    LAMMPSDataFormat(std::string path, File::Mode mode, File::Compression compression);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;
