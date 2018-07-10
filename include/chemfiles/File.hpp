@@ -28,20 +28,21 @@ public:
 
     virtual ~File() noexcept = default;
     File(File&&) = default;
-    File& operator=(File&&) = delete;
+    File& operator=(File&&) = default;
     File(File const&) = delete;
     File& operator=(File const&) = delete;
 
-    /// File name, i.e. complete path to this file on disk.
-    const std::string& filename() const { return filename_; }
-    /// File opening mode.
+    /// Get the file path used to open this file.
+    const std::string& path() const { return path_; }
+
+    /// Get the mode used to open this file.
     Mode mode() const { return mode_; }
 
 protected:
-    File(std::string path, Mode mode): filename_(std::move(path)), mode_(mode) {}
+    File(std::string path, Mode mode): path_(std::move(path)), mode_(mode) {}
 
 private:
-    const std::string filename_;
+    std::string path_;
     Mode mode_;
 };
 
@@ -54,7 +55,7 @@ private:
 class CHFL_EXPORT TextFile: public File, public std::iostream {
 public:
     /// Open the most adaptated text file class for the given `path` and `mode`
-    static std::unique_ptr<TextFile> create(const std::string& path, File::Mode mode);
+    static std::unique_ptr<TextFile> open(std::string path, File::Mode mode);
 
     /// Read a line from the file
     std::string readline();
@@ -68,7 +69,7 @@ public:
 protected:
     /// Initialize the TextFile at the given `path` and `mode`. All read and
     /// write operations will go through the provided `buffer`.
-    TextFile(const std::string& path, File::Mode mode, std::streambuf* buffer);
+    TextFile(std::string path, File::Mode mode, std::streambuf* buffer);
 
 private:
     void get_line(std::string& string);

@@ -19,7 +19,7 @@ namespace chemfiles {
 /// [MMTF]: https://mmtf.rcsb.org/
 class MMTFFormat final: public Format {
 public:
-    MMTFFormat(const std::string& path, File::Mode mode);
+    MMTFFormat(std::string path, File::Mode mode);
 
     ~MMTFFormat() = default;
     MMTFFormat(const MMTFFormat&) = delete;

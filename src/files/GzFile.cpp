@@ -109,8 +109,8 @@ std::streampos gzstreambuf::seekoff(std::streamoff offset, std::ios_base::seekdi
 }
 
 
-GzFile::GzFile(const std::string& filename, File::Mode mode)
-    : TextFile(filename, mode, &buffer_), buffer_() {
+GzFile::GzFile(std::string path, File::Mode mode)
+    : TextFile(std::move(path), mode, &buffer_), buffer_() {
 
     std::string openmode = "";
     switch (mode) {
@@ -124,8 +124,8 @@ GzFile::GzFile(const std::string& filename, File::Mode mode)
         throw file_error("appending (open mode 'a') is not supported with gziped files");
     }
 
-    buffer_.open(filename, openmode);
+    buffer_.open(this->path(), openmode);
     if (!buffer_.is_open()) {
-        throw file_error("could not open the file at {}", filename);
+        throw file_error("could not open the file at {}", this->path());
     }
 }

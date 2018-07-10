@@ -27,8 +27,8 @@ template<> FormatInfo chemfiles::format_information<SDFFormat>() {
 /// not contain one more step.
 static bool forward(TextFile& file);
 
-SDFFormat::SDFFormat(const std::string& path, File::Mode mode)
-    : file_(TextFile::create(path, mode))
+SDFFormat::SDFFormat(std::string path, File::Mode mode)
+    : file_(TextFile::open(std::move(path), mode))
 {
     while (!file_->eof()) {
         auto position = file_->tellg();
@@ -278,7 +278,7 @@ bool forward(TextFile& file) {
 
     if (natoms < 0 || nbonds < 0) {
         throw format_error(
-            "number of atoms and bonds can not be negative in '{}'", file.filename()
+            "number of atoms and bonds can not be negative in '{}'", file.path()
         );
     }
 
@@ -287,7 +287,7 @@ bool forward(TextFile& file) {
     } catch (const FileError&) {
         // We could not read the lines from the file
         throw format_error(
-            "not enough lines in '{}' for SDF format", file.filename()
+            "not enough lines in '{}' for SDF format", file.path()
         );
     }
 

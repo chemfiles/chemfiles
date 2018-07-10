@@ -15,7 +15,7 @@ namespace chemfiles {
 /// [CSSR]: http://www.chem.cmu.edu/courses/09-560/docs/msi/modenv/D_Files.html#944777
 class CSSRFormat final: public Format {
 public:
-    CSSRFormat(const std::string& path, File::Mode mode);
+    CSSRFormat(std::string path, File::Mode mode);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;

@@ -28,7 +28,7 @@ static std::string extension(const std::string& filename) {
     }
 }
 
-MMTFFormat::MMTFFormat(const std::string& path, File::Mode mode) {
+MMTFFormat::MMTFFormat(std::string path, File::Mode mode) {
     auto ext = extension(path);
 
     if (mode == File::READ) {
@@ -104,14 +104,14 @@ void MMTFFormat::read(Frame& frame) {
     for (size_t j = 0; j < modelChainCount; j++) {
         auto chainGroupCount = static_cast<size_t>(structure_.groupsPerChain[chainIndex_]);
 
-        // Unfortunetly we must loop through the assembly lists to find which one our
-        // current chain belongs to. Forunetly, these lists are fairly short in the 
-        // vast majority of cases.
+        // Unfortunetly we must loop through the assembly lists to find which
+        // one our current chain belongs to. Forunetly, these lists are fairly
+        // short in the vast majority of cases.
         std::string current_assembly;
         for (const auto& assembly : structure_.bioAssemblyList) {
             for (const auto& transform : assembly.transformList) {
                 for (auto id : transform.chainIndexList) {
-                    if (id == chainIndex_) {
+                    if (static_cast<size_t>(id) == chainIndex_) {
                         current_assembly += "bio";
                         current_assembly += assembly.name;
                     }

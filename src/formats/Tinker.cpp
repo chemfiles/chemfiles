@@ -26,8 +26,8 @@ template<> FormatInfo chemfiles::format_information<TinkerFormat>() {
 static bool forward(TextFile& file);
 static bool is_unit_cell_line(const std::string& line);
 
-TinkerFormat::TinkerFormat(const std::string& path, File::Mode mode)
-    : file_(TextFile::create(path, mode))
+TinkerFormat::TinkerFormat(std::string path, File::Mode mode)
+    : file_(TextFile::open(std::move(path), mode))
 {
     while (!file_->eof()) {
         auto position = file_->tellg();
@@ -58,7 +58,7 @@ void TinkerFormat::read(Frame& frame) {
         scan(line, "%zu", &natoms);
     } catch (const FileError& e) {
         throw format_error(
-            "can not read number of atoms in {}: {}", file_->filename(), e.what()
+            "can not read number of atoms in {}: {}", file_->path(), e.what()
         );
     }
 
@@ -81,7 +81,7 @@ void TinkerFormat::read(Frame& frame) {
 
     } catch (const FileError& e) {
         throw format_error(
-            "can not read atomic data in {}: {}", file_->filename(), e.what()
+            "can not read atomic data in {}: {}", file_->path(), e.what()
         );
     }
 
@@ -184,7 +184,7 @@ bool forward(TextFile& file) {
 
     if (natoms < 0) {
         throw format_error(
-            "number of atoms can not be negative in '{}'", file.filename()
+            "number of atoms can not be negative in '{}'", file.path()
         );
     }
 
@@ -203,7 +203,7 @@ bool forward(TextFile& file) {
     } catch (const FileError&) {
         // We could not read the lines from the file
         throw format_error(
-            "not enough lines in '{}' for Tinker XYZ format", file.filename()
+            "not enough lines in '{}' for Tinker XYZ format", file.path()
         );
     }
     return true;

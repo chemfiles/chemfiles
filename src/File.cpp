@@ -18,19 +18,19 @@ static std::string extension(const std::string& filename) {
     }
 }
 
-std::unique_ptr<TextFile> TextFile::create(const std::string& path, File::Mode mode) {
+std::unique_ptr<TextFile> TextFile::open(std::string path, File::Mode mode) {
     auto ext = extension(path);
     if (ext == ".gz") {
-        return std::unique_ptr<TextFile>(new GzFile(path, mode));
+        return std::unique_ptr<TextFile>(new GzFile(std::move(path), mode));
     } else if (ext == ".xz") {
-        return std::unique_ptr<TextFile>(new XzFile(path, mode));
+        return std::unique_ptr<TextFile>(new XzFile(std::move(path), mode));
     } else {
-        return std::unique_ptr<TextFile>(new PlainFile(path, mode));
+        return std::unique_ptr<TextFile>(new PlainFile(std::move(path), mode));
     }
 }
 
-TextFile::TextFile(const std::string& path, File::Mode mode, std::streambuf* buffer):
-    File(path, mode), std::iostream(buffer)
+TextFile::TextFile(std::string path, File::Mode mode, std::streambuf* buffer):
+    File(std::move(path), mode), std::iostream(buffer)
 {
     std::iostream::clear();
     // Throw exceptions on errors
@@ -79,7 +79,7 @@ std::string TextFile::readline() {
     try {
         get_line(line);
     } catch (const std::ios_base::failure& e) {
-        throw file_error("could not read a line in {}: {}", filename(), e.what());
+        throw file_error("could not read a line in {}: {}", this->path(), e.what());
     }
 #if defined(__GNUC__) && (__GNUC__ == 5 || __GNUC__ == 6)
         // GCC 5 and 6 throw the wrong exception type for std::ios_base::failure
@@ -90,7 +90,7 @@ std::string TextFile::readline() {
         // See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145.
         catch(const std::exception& e) {
             if (std::string(typeid(e).name()) == "NSt8ios_base7failureE") {
-                throw file_error("could not read a line in {}: {}", filename(), e.what());
+                throw file_error("could not read a line in {}: {}", this->path(), e.what());
             } else {
                 throw e;
             }
@@ -114,7 +114,7 @@ std::vector<std::string> TextFile::readlines(size_t n) {
         try {
             get_line(lines[i]);
         } catch (const std::ios_base::failure& e) {
-            throw file_error("could not read a line in {}: {}", filename(), e.what());
+            throw file_error("could not read a line in {}: {}", this->path(), e.what());
         }
 #if defined(__GNUC__) && (__GNUC__ == 5 || __GNUC__ == 6)
         // GCC 5 and 6 throw the wrong exception type for std::ios_base::failure
@@ -125,7 +125,7 @@ std::vector<std::string> TextFile::readlines(size_t n) {
         // See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145.
         catch(const std::exception& e) {
             if (std::string(typeid(e).name()) == "NSt8ios_base7failureE") {
-                throw file_error("could not read a line in {}: {}", filename(), e.what());
+                throw file_error("could not read a line in {}: {}", this->path(), e.what());
             } else {
                 throw e;
             }

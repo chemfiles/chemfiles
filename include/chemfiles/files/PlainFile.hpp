@@ -14,7 +14,7 @@ namespace chemfiles {
 class PlainFile final: public TextFile {
 public:
     /// Open a text file with name `filename` and mode `mode`.
-    PlainFile(const std::string& filename, File::Mode mode);
+    PlainFile(std::string path, File::Mode mode);
 
 private:
     std::filebuf buffer_;

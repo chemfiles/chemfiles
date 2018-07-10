@@ -7,8 +7,8 @@
 #include "chemfiles/ErrorFmt.hpp"
 using namespace chemfiles;
 
-PlainFile::PlainFile(const std::string& filename, File::Mode mode)
-    : TextFile(filename, mode, &buffer_), buffer_() {
+PlainFile::PlainFile(std::string path, File::Mode mode)
+    : TextFile(std::move(path), mode, &buffer_), buffer_() {
     // We need to use binary mode when opening the file because we are storing
     // positions in the files relative to line ending positions. Using text
     // mode make the MSVC runtime convert lines ending and then all the values
@@ -30,8 +30,8 @@ PlainFile::PlainFile(const std::string& filename, File::Mode mode)
         break;
     }
 
-    buffer_.open(filename, openmode);
+    buffer_.open(this->path(), openmode);
     if (!buffer_.is_open()) {
-        throw file_error("could not open the file at {}", filename);
+        throw file_error("could not open the file at {}", this->path());
     }
 }

@@ -14,7 +14,7 @@ namespace chemfiles {
 /// [XYZ]: http://openbabel.org/wiki/XYZ
 class XYZFormat final: public Format {
 public:
-    XYZFormat(const std::string& path, File::Mode mode);
+    XYZFormat(std::string path, File::Mode mode);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;

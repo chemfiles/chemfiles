@@ -41,7 +41,7 @@ private:
 #define STRING(x) STRING_0(x)
 #define CHECK(x) check_tng_error((x), (STRING(x)))
 
-TNGFormat::TNGFormat(const std::string& path, File::Mode mode): tng_(path, mode) {}
+TNGFormat::TNGFormat(std::string path, File::Mode mode): tng_(std::move(path), mode) {}
 
 size_t TNGFormat::nsteps() {
     int64_t n_frames = 0;

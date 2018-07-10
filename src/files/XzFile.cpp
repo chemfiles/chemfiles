@@ -376,16 +376,16 @@ bool xzstreambuf::is_open() const {
     return file_ != nullptr && !::ferror(file_);
 }
 
-XzFile::XzFile(const std::string& filename, File::Mode mode): TextFile(filename, mode, &buffer_), buffer_() {
+XzFile::XzFile(std::string path, File::Mode mode): TextFile(std::move(path), mode, &buffer_), buffer_() {
     if (mode == File::READ) {
-        buffer_.open(filename, "rb");
+        buffer_.open(this->path(), "rb");
     } else if (mode == File::WRITE) {
-        buffer_.open(filename, "wb");
+        buffer_.open(this->path(), "wb");
     } else if (mode == File::APPEND) {
         throw file_error("appending (open mode 'a') is not supported with xz files");
     }
 
     if (!buffer_.is_open()) {
-        throw file_error("could not open the file at {}", filename);
+        throw file_error("could not open the file at {}", this->path());
     }
 }

@@ -20,7 +20,7 @@ public:
     ~gzstreambuf() override;
 
     /// Open the file at `path` with the given `mode`. The mode will be passed
-    /// down to gzopen. 
+    /// down to gzopen.
     void open(const std::string& path, const std::string& mode);
 
     int_type underflow() override;
@@ -44,8 +44,8 @@ private:
 /// A gziped text file
 class GzFile final: public TextFile {
 public:
-    /// Open the file with the given `filename` using the specified `mode`
-    GzFile(const std::string& filename, File::Mode mode);
+    /// Open the file at the given `path` using the specified `mode`
+    GzFile(std::string path, File::Mode mode);
 
 private:
     gzstreambuf buffer_;

@@ -63,8 +63,8 @@ static int molfiles_to_chemfiles_warning(int level, const char* message) {
 /******************************************************************************/
 
 template <MolfileFormat F>
-Molfile<F>::Molfile(const std::string& path, File::Mode mode)
-    : path_(path), plugin_handle_(nullptr), data_(nullptr), natoms_(0) {
+Molfile<F>::Molfile(std::string path, File::Mode mode)
+    : path_(std::move(path)), plugin_handle_(nullptr), data_(nullptr), natoms_(0) {
     if (mode != File::READ) {
         throw format_error(
             "molfiles based format {} is only available in read mode", plugin_data_.format()
@@ -98,12 +98,12 @@ Molfile<F>::Molfile(const std::string& path, File::Mode mode)
     }
 
     data_ = plugin_handle_->open_file_read(
-        path.c_str(), plugin_handle_->name, &natoms_
+        path_.c_str(), plugin_handle_->name, &natoms_
     );
 
     if (!data_) {
         throw format_error(
-            "could not open the file at '{}' with {} plugin", path, plugin_data_.format()
+            "could not open the file at '{}' with {} plugin", path_, plugin_data_.format()
         );
     }
 

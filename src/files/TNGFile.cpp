@@ -11,8 +11,8 @@ using namespace chemfiles;
 #define STRING(x) STRING_0(x)
 #define CHECK(x) check_tng_error((x), (STRING(x)))
 
-TNGFile::TNGFile(std::string filename, File::Mode mode): File(std::move(filename), mode), handle_(nullptr) {
-    CHECK(tng_util_trajectory_open(this->filename().c_str(), mode, &handle_));
+TNGFile::TNGFile(std::string path, File::Mode mode): File(std::move(path), mode), handle_(nullptr) {
+    CHECK(tng_util_trajectory_open(this->path().c_str(), mode, &handle_));
 
     if (mode == File::READ) {
         CHECK(tng_file_headers_read(handle_, TNG_USE_HASH));

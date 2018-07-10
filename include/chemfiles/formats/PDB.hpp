@@ -20,7 +20,7 @@ namespace chemfiles {
 /// [PDB]: ftp://ftp.wwpdb.org/pub/pdb/doc/format_descriptions/Format_v33_A4.pdf
 class PDBFormat final: public Format {
 public:
-    PDBFormat(const std::string& path, File::Mode mode);
+    PDBFormat(std::string path, File::Mode mode);
 
     ~PDBFormat() noexcept override;
     PDBFormat(const PDBFormat&) = delete;
