@@ -51,11 +51,11 @@ static bool is_valid(const NcFile& file_, size_t natoms) {
     return true;
 }
 
-AmberNetCDFFormat::AmberNetCDFFormat(const std::string& path, File::Mode mode)
-    : file_(path, mode), step_(0), validated_(false) {
+AmberNetCDFFormat::AmberNetCDFFormat(std::string path, File::Mode mode)
+    : file_(std::move(path), mode), step_(0), validated_(false) {
     if (file_.mode() == File::READ || file_.mode() == File::APPEND) {
         if (!is_valid(file_, static_cast<size_t>(-1))) {
-            throw format_error("invalid AMBER NetCDF file at '{}'", file_.filename());
+            throw format_error("invalid AMBER NetCDF file at '{}'", file_.path());
         }
         validated_ = true;
     }

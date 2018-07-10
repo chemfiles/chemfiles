@@ -25,8 +25,8 @@ static std::streampos read_until(TextFile& file, const std::string& tag);
 /// contain one more step or -1 if it does not.
 static std::streampos forward(TextFile& file);
 
-MOL2Format::MOL2Format(const std::string& path, File::Mode mode)
-  : file_(TextFile::create(path, mode)) {
+MOL2Format::MOL2Format(std::string path, File::Mode mode)
+  : file_(TextFile::open(std::move(path), mode)) {
     while (!file_->eof()) {
         auto position = forward(*file_);
         if (position == std::streampos(-1)) {
@@ -213,7 +213,7 @@ std::streampos forward(TextFile& file) {
 
             if (natoms < 0) {
                 throw format_error(
-                    "number of atoms can not be negative in '{}'", file.filename()
+                    "number of atoms can not be negative in '{}'", file.path()
                 );
             }
 
@@ -226,7 +226,7 @@ std::streampos forward(TextFile& file) {
 
             if (nbonds < 0) {
                 throw format_error(
-                    "number of bonds can not be negative in '{}'", file.filename()
+                    "number of bonds can not be negative in '{}'", file.path()
                 );
             }
 

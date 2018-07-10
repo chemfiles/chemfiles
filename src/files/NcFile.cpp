@@ -95,26 +95,26 @@ void nc::NcChar::add(const std::vector<std::string>& data) {
     }
 }
 
-NcFile::NcFile(const std::string& filename, File::Mode mode)
-    : File(filename, mode), nc_mode_(DATA) {
+NcFile::NcFile(std::string path, File::Mode mode)
+    : File(std::move(path), mode), nc_mode_(DATA) {
     auto status = NC_NOERR;
 
     switch (mode) {
     case File::READ:
-        status = nc_open(filename.c_str(), NC_NOWRITE, &file_id_);
+        status = nc_open(this->path().c_str(), NC_NOWRITE, &file_id_);
         break;
     case File::APPEND:
-        status = nc_open(filename.c_str(), NC_WRITE, &file_id_);
+        status = nc_open(this->path().c_str(), NC_WRITE, &file_id_);
         break;
     case File::WRITE:
-        status = nc_create(filename.c_str(), NC_64BIT_OFFSET | NC_CLASSIC_MODEL, &file_id_);
+        status = nc_create(this->path().c_str(), NC_64BIT_OFFSET | NC_CLASSIC_MODEL, &file_id_);
         // Put the file in DATA mode. This can only fail for bad id, which we
         // check later.
         nc_enddef(file_id_);
         break;
     }
 
-    nc::check(status, "could not open the file '{}'", filename);
+    nc::check(status, "could not open the file '{}'", this->path());
 }
 
 NcFile::~NcFile() noexcept {

@@ -13,7 +13,7 @@ namespace chemfiles {
 /// destruction of the file as needed.
 class TNGFile final: public File {
 public:
-    TNGFile(std::string filename, File::Mode mode);
+    TNGFile(std::string path, File::Mode mode);
     ~TNGFile() noexcept override;
     TNGFile(TNGFile&&) = default;
     TNGFile& operator=(TNGFile&&) = delete;

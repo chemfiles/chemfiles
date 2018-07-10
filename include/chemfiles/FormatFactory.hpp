@@ -16,7 +16,7 @@
 
 namespace chemfiles {
 
-using format_creator_t = std::function<std::unique_ptr<Format>(const std::string& path, File::Mode mode)>;
+using format_creator_t = std::function<std::unique_ptr<Format>(std::string path, File::Mode mode)>;
 
 /// This class allow to register Format with names and file extensions
 class CHFL_EXPORT FormatFactory final {

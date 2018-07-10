@@ -14,7 +14,7 @@ namespace chemfiles {
 /// [TNG]: http://dx.doi.org/10.1007/s00894-010-0948-5
 class TNGFormat final: public Format {
 public:
-    TNGFormat(const std::string& path, File::Mode mode);
+    TNGFormat(std::string path, File::Mode mode);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;

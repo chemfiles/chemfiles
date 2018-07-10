@@ -27,8 +27,8 @@ template<> FormatInfo chemfiles::format_information<CSSRFormat>() {
 }
 
 
-CSSRFormat::CSSRFormat(const std::string& path, File::Mode mode)
-    : file_(TextFile::create(path, mode))
+CSSRFormat::CSSRFormat(std::string path, File::Mode mode)
+    : file_(TextFile::open(std::move(path), mode))
 {
     if (mode == File::APPEND) {
         throw format_error("append mode ('a') is not supported with CSSR format");

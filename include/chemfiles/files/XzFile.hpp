@@ -67,8 +67,8 @@ private:
 /// A xz-compressed text file
 class XzFile final: public TextFile {
 public:
-    /// Open the file with the given `filename` using the specified `mode`
-    XzFile(const std::string& filename, File::Mode mode);
+    /// Open the file at the given `path` using the specified `mode`
+    XzFile(std::string path, File::Mode mode);
 
 private:
     xzstreambuf buffer_;

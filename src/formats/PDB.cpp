@@ -54,8 +54,8 @@ enum class Record {
 // Get the record type for a line.
 static Record get_record(const std::string& line);
 
-PDBFormat::PDBFormat(const std::string& path, File::Mode mode)
-  : file_(TextFile::create(path, mode)), models_(0) {
+PDBFormat::PDBFormat(std::string path, File::Mode mode)
+  : file_(TextFile::open(std::move(path), mode)), models_(0) {
     while (!file_->eof()) {
         auto position = file_->tellg();
         if (!file_ || position == std::streampos(-1)) {
@@ -165,7 +165,7 @@ void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
         if (space_group != "P 1" && space_group != "P1") {
             warning(
                 "Space group which is not P1 ({}) ignored in '{}'",
-                space_group, file_->filename()
+                space_group, file_->path()
             );
         }
     }

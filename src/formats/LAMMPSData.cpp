@@ -249,8 +249,8 @@ static bool is_unused_header(const std::string& line);
 /// in a size_t
 static size_t checked_cast(long long int value);
 
-LAMMPSDataFormat::LAMMPSDataFormat(const std::string& path, File::Mode mode):
-    current_section_(HEADER), file_(TextFile::create(path, mode)), style_("full") {}
+LAMMPSDataFormat::LAMMPSDataFormat(std::string path, File::Mode mode):
+    current_section_(HEADER), file_(TextFile::open(std::move(path), mode)), style_("full") {}
 
 size_t LAMMPSDataFormat::nsteps() {
     return 1;
