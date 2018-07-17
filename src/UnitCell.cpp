@@ -34,9 +34,16 @@ UnitCell::UnitCell(double a): UnitCell(a, a, a) {}
 
 UnitCell::UnitCell(double a, double b, double c): UnitCell(a, b, c, 90, 90, 90) {}
 
-UnitCell::UnitCell(double a, double b, double c,
-                   double alpha, double beta, double gamma)
-: a_(a), b_(b), c_(c), alpha_(alpha), beta_(beta), gamma_(gamma){
+UnitCell::UnitCell(double a, double b, double c, double alpha, double beta, double gamma):
+    h_(Matrix3D::unit()),
+    h_inv_(Matrix3D::unit()),
+    a_(a),
+    b_(b),
+    c_(c),
+    alpha_(alpha),
+    beta_(beta),
+    gamma_(gamma)
+{
     if (alpha_ == 90 && beta_ == 90 && gamma_ == 90) {
         shape_ = ORTHORHOMBIC;
     } else {
@@ -45,7 +52,7 @@ UnitCell::UnitCell(double a, double b, double c,
     update_matrix();
 }
 
-UnitCell::UnitCell(const Matrix3D& matrix) {
+UnitCell::UnitCell(const Matrix3D& matrix): h_(Matrix3D::unit()), h_inv_(Matrix3D::unit()) {
     if (matrix[1][0] != 0 || matrix[2][0] != 0 || matrix[2][1] != 0) {
         throw error("Matrix supplied to UnitCell is not an upper triangular matrix");
     }
@@ -139,7 +146,7 @@ void UnitCell::update_matrix() {
 
     // Do not try to invert a cell with a 0 volume
     if (volume() == 0.0) {
-        h_inv_ = Matrix3D();
+        h_inv_ = Matrix3D::unit();
     } else {
         h_inv_ = h_.invert();
     }

@@ -9,6 +9,15 @@ using namespace chemfiles;
 
 TEST_CASE() {
     // [example]
-    assert(Matrix3D(3, 2, 1).invert() == Matrix3D(1.0/3.0, 1.0/2.0, 1.0));
+    auto A = Matrix3D(
+        3, 0, 0,
+        0, 2, 0,
+        0, 0, 1
+    );
+    auto inverse = Matrix3D(
+        1.0/3.0,    0,    0,
+          0,     1.0/2.0, 0,
+          0,       0,     1.0);
+    assert(A.invert() == inverse);
     // [example]
 }

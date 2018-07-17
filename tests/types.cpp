@@ -50,26 +50,6 @@ TEST_CASE("Geometry"){
 }
 
 TEST_CASE("Matrix3"){
-    SECTION("Constructors") {
-        auto A = Matrix3D();
-        for (size_t i=0; i<3; i++) {
-            for (size_t j=0; j<3; j++) {
-                CHECK(A[i][j] == 0);
-            }
-        }
-
-        A = Matrix3D(1, 2, 3);
-        for (size_t i=0; i<3; i++) {
-            for (size_t j=0; j<3; j++) {
-                if (i != j) {
-                    CHECK(A[i][j] == 0);
-                } else {
-                    CHECK(A[i][j] == i + 1);
-                }
-            }
-        }
-    }
-
     SECTION("Negate Matrix") {
         auto A = Matrix3D(
             2, 4, 9,
@@ -93,7 +73,7 @@ TEST_CASE("Matrix3"){
             1, -67, 8,
             9, 78.9, 65
         );
-        auto Z = Matrix3D();
+        auto Z = Matrix3D::zero();
         CHECK((A + Z) == A);
         CHECK((Z + A) == A);
         CHECK((A - Z) == A);
@@ -166,7 +146,7 @@ TEST_CASE("Matrix3"){
             1, -67, 8,
             9, 78.9, 65
         );
-        auto I = Matrix3D(1, 1, 1);
+        auto I = Matrix3D::unit();
         CHECK((A * I) == A);
         CHECK((I * A) == A);
 
@@ -202,7 +182,7 @@ TEST_CASE("Matrix3"){
             1, -6, 8,
             -3, 9, 5
         );
-        auto I = Matrix3D(1, 1, 1);
+        auto I = Matrix3D::unit();
         auto v = Vector3D(7, -9, 2);
 
         CHECK((I * v) == v);
@@ -210,22 +190,24 @@ TEST_CASE("Matrix3"){
     }
 
     SECTION("Inversion") {
-        auto A = Matrix3D(10, 12, 16);
-        auto B = A.invert();
-        for (size_t i=0; i<3; i++) {
-            for (size_t j=0; j<3; j++) {
-                if (i != j) {
-                    CHECK(A[i][j] == 0);
-                }
-            }
-        }
-        CHECK(B[0][0] == 1.0/10);
-        CHECK(B[1][1] == 1.0/12);
-        CHECK(B[2][2] == 1.0/16);
+        auto A = Matrix3D(
+            10,  2,  5,
+            -1, 12,  8,
+           0.2,  8, 16
+        );
 
-        auto I = Matrix3D(1, 1, 1);
+        auto B = A.invert();
+
+
+        CHECK(approx_eq(B, Matrix3D(
+             0.10132995566814439,  0.00633312222925902, -0.03483217226092463,
+             0.01393286890436985,  0.12587080430652312, -0.06728942368587713,
+            -0.00823305889803673, -0.063014566181127288, 0.09658011399620011
+        ), 1e-9));
+
+        auto I = Matrix3D::unit();
         CHECK(approx_eq((A * B), I, 1e-12));
 
-        CHECK_THROWS_AS(Matrix3D().invert(), Error);
+        CHECK_THROWS_AS(Matrix3D::zero().invert(), Error);
     }
 }
