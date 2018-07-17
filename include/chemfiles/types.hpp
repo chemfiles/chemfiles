@@ -223,6 +223,11 @@ public:
     /// @example{tests/doc/matrix3d/invert.cpp}
     Matrix3D invert() const;
 
+    /// Transpose the matrix.
+    ///
+    /// @example{tests/doc/matrix3d/transpose.cpp}
+    Matrix3D transpose() const;
+
     /// Compound addition of two matrices
     Matrix3D& operator+=(const Matrix3D& rhs);
 
@@ -357,6 +362,14 @@ inline Matrix3D Matrix3D::invert() const {
         xx, xy, xz,
         yx, yy, yz,
         zx, zy, zz,
+    };
+}
+
+inline Matrix3D Matrix3D::transpose() const {
+    return {
+        (*this)[0][0], (*this)[1][0], (*this)[2][0],
+        (*this)[0][1], (*this)[1][1], (*this)[2][1],
+        (*this)[0][2], (*this)[1][2], (*this)[2][2],
     };
 }
 
