@@ -210,4 +210,18 @@ TEST_CASE("Matrix3"){
 
         CHECK_THROWS_AS(Matrix3D::zero().invert(), Error);
     }
+
+    SECTION("Transposition") {
+        auto A = Matrix3D(
+            3, 0, 5,
+            1, 2, 6,
+            2, 0, 1
+        );
+        auto transposed = Matrix3D(
+            3, 1, 2,
+            0, 2, 0,
+            5, 6, 1
+        );
+        CHECK(A.transpose() == transposed);
+    }
 }
