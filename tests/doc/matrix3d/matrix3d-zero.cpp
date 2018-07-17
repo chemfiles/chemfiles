@@ -9,7 +9,7 @@ using namespace chemfiles;
 
 TEST_CASE() {
     // [example]
-    auto C = Matrix3D();
+    auto C = Matrix3D::zero();
     assert(C[0][0] == 0);
     assert(C[0][1] == 0);
     assert(C[0][2] == 0);

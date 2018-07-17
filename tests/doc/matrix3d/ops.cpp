@@ -10,8 +10,8 @@ using namespace chemfiles;
 TEST_CASE() {
     // [example]
     // equality and inequality
-    assert(Matrix3D() == Matrix3D(0, 0, 0));
-    assert(Matrix3D(1, 2, 3) != Matrix3D(0, 0, 0));
+    assert(Matrix3D::zero() == Matrix3D(0, 0, 0, 0, 0, 0, 0, 0, 0));
+    assert(Matrix3D::unit() != Matrix3D::zero());
 
     // Indexing
     auto M = Matrix3D(
@@ -32,11 +32,20 @@ TEST_CASE() {
     assert(M[2][2] == 33);
 
     // Matrix-vector multiplication
-    auto mat_vec = Matrix3D(1, 3, 2) * Vector3D(1, 1, 1);
+    auto mat_vec = Matrix3D::unit() * Vector3D(1, 3, 2);
     assert(mat_vec == Vector3D(1, 3, 2));
 
     // Matrix-Matrix multiplication
-    auto mat_mat = Matrix3D(1, 3, 2) * Matrix3D(0.5, 2, 1);
-    assert(mat_mat == Matrix3D(0.5, 6, 2));
+    auto A = Matrix3D(
+        0.5, 0, 0,
+          0, 2, 0,
+          0, 0, 1
+    );
+    auto mat_mat = Matrix3D::unit() * A;
+    assert(mat_mat == Matrix3D(0.5, 0, 0, 0, 2, 0, 0, 0, 1));
+
+    // Scalar-Matrix multiplication
+    assert(2 * A == Matrix3D(1.0, 0, 0, 0, 4, 0, 0, 0, 2));
+    assert(A * 2 == Matrix3D(1.0, 0, 0, 0, 4, 0, 0, 0, 2));
     // [example]
 }

@@ -47,11 +47,10 @@ TEST_CASE("Use the UnitCell type") {
         CHECK(triclinic.gamma() == 120);
         CHECK(approx_eq(triclinic.volume(), 1119.9375925598192, 1e-12));
 
-        auto zero_matrix = Matrix3D();
-        UnitCell infinite2(zero_matrix);
+        UnitCell infinite2(Matrix3D::zero());
         CHECK(infinite2 == infinite);
 
-        auto ortho_matrix = Matrix3D(10, 11, 12);
+        auto ortho_matrix = Matrix3D(10, 0, 0, 0, 11, 0, 0, 0, 12);
         UnitCell ortho3(ortho_matrix);
         CHECK(ortho3.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(ortho3.a() == 10);

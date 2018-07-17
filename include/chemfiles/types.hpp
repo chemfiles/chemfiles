@@ -177,25 +177,37 @@ static_assert(std::is_standard_layout<Vector3D>::value, "Vector3D must have a st
 class Matrix3D final: private std::array<std::array<double, 3>, 3> {
     using super = std::array<std::array<double, 3>, 3>;
 public:
-    /// Create a Matrix3D with all components equal to 0
-    ///
-    /// @example{tests/doc/matrix3d/matrix3d-0.cpp}
-    Matrix3D(): Matrix3D(0, 0, 0) {}
-
-    /// Create a diagonal Matrix3D with the three diagonal elements `a`, `b` and
-    /// `c`.
-    ///
-    /// @example{tests/doc/matrix3d/matrix3d-3.cpp}
-    Matrix3D(double a, double b, double c): Matrix3D(a, 0, 0, 0, b, 0, 0, 0, c) {}
-
     /// Create a `Matrix3D` by explicitly specifying all the `m_ij` components
     /// of the matrix.
     ///
-    /// @example{tests/doc/matrix3d/matrix3d-9.cpp}
+    /// @example{tests/doc/matrix3d/matrix3d.cpp}
     Matrix3D(double m11, double m12, double m13,
              double m21, double m22, double m23,
              double m31, double m32, double m33):
         super({{ {{m11, m12, m13}}, {{m21, m22, m23}}, {{m31, m32, m33}} }}) {}
+
+    /// Create a `Matrix3D` with all components set to zero.
+    ///
+    /// @example{tests/doc/matrix3d/matrix3d-zero.cpp}
+    static Matrix3D zero() {
+        return {
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0
+        };
+    }
+
+    /// Create an unit `Matrix3D` (a diagonal matrix with all diagonal values
+    /// set to 1).
+    ///
+    /// @example{tests/doc/matrix3d/matrix3d-unit.cpp}
+    static Matrix3D unit() {
+        return {
+            1.0, 0.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 0.0, 1.0
+        };
+    }
 
     ~Matrix3D() = default;
     Matrix3D(const Matrix3D&) = default;
@@ -238,53 +250,29 @@ inline bool operator!=(const Matrix3D& lhs, const Matrix3D& rhs) {
 
 /// Negate matrix
 inline Matrix3D operator-(const Matrix3D& lhs) {
-    Matrix3D res;
-    res[0][0] = -lhs[0][0];
-    res[1][0] = -lhs[1][0];
-    res[2][0] = -lhs[2][0];
-
-    res[0][1] = -lhs[0][1];
-    res[1][1] = -lhs[1][1];
-    res[2][1] = -lhs[2][1];
-
-    res[0][2] = -lhs[0][2];
-    res[1][2] = -lhs[1][2];
-    res[2][2] = -lhs[2][2];
-    return res;
+    return {
+        -lhs[0][0], -lhs[0][1], -lhs[0][2],
+        -lhs[1][0], -lhs[1][1], -lhs[1][2],
+        -lhs[2][0], -lhs[2][1], -lhs[2][2],
+    };
 }
 
 /// Addition of two matrices
 inline Matrix3D operator+(const Matrix3D& lhs, const Matrix3D& rhs) {
-    Matrix3D res;
-    res[0][0] = lhs[0][0] + rhs[0][0];
-    res[1][0] = lhs[1][0] + rhs[1][0];
-    res[2][0] = lhs[2][0] + rhs[2][0];
-
-    res[0][1] = lhs[0][1] + rhs[0][1];
-    res[1][1] = lhs[1][1] + rhs[1][1];
-    res[2][1] = lhs[2][1] + rhs[2][1];
-
-    res[0][2] = lhs[0][2] + rhs[0][2];
-    res[1][2] = lhs[1][2] + rhs[1][2];
-    res[2][2] = lhs[2][2] + rhs[2][2];
-    return res;
+    return {
+        lhs[0][0] + rhs[0][0], lhs[0][1] + rhs[0][1], lhs[0][2] + rhs[0][2],
+        lhs[1][0] + rhs[1][0], lhs[1][1] + rhs[1][1], lhs[1][2] + rhs[1][2],
+        lhs[2][0] + rhs[2][0], lhs[2][1] + rhs[2][1], lhs[2][2] + rhs[2][2],
+    };
 }
 
 /// Subtraction of two matrices
 inline Matrix3D operator-(const Matrix3D& lhs, const Matrix3D& rhs) {
-    Matrix3D res;
-    res[0][0] = lhs[0][0] - rhs[0][0];
-    res[1][0] = lhs[1][0] - rhs[1][0];
-    res[2][0] = lhs[2][0] - rhs[2][0];
-
-    res[0][1] = lhs[0][1] - rhs[0][1];
-    res[1][1] = lhs[1][1] - rhs[1][1];
-    res[2][1] = lhs[2][1] - rhs[2][1];
-
-    res[0][2] = lhs[0][2] - rhs[0][2];
-    res[1][2] = lhs[1][2] - rhs[1][2];
-    res[2][2] = lhs[2][2] - rhs[2][2];
-    return res;
+    return {
+        lhs[0][0] - rhs[0][0], lhs[0][1] - rhs[0][1], lhs[0][2] - rhs[0][2],
+        lhs[1][0] - rhs[1][0], lhs[1][1] - rhs[1][1], lhs[1][2] - rhs[1][2],
+        lhs[2][0] - rhs[2][0], lhs[2][1] - rhs[2][1], lhs[2][2] - rhs[2][2],
+    };
 }
 
 /// Multiplication of a vector by a matrix
@@ -298,70 +286,49 @@ inline Vector3D operator*(const Matrix3D& lhs, const Vector3D& rhs) {
 
 /// Multiplication of two matrices
 inline Matrix3D operator*(const Matrix3D& lhs, const Matrix3D& rhs) {
-    Matrix3D res;
-    res[0][0] = lhs[0][0] * rhs[0][0] + lhs[0][1] * rhs[1][0] + lhs[0][2] * rhs[2][0];
-    res[1][0] = lhs[1][0] * rhs[0][0] + lhs[1][1] * rhs[1][0] + lhs[1][2] * rhs[2][0];
-    res[2][0] = lhs[2][0] * rhs[0][0] + lhs[2][1] * rhs[1][0] + lhs[2][2] * rhs[2][0];
+    double xx = lhs[0][0] * rhs[0][0] + lhs[0][1] * rhs[1][0] + lhs[0][2] * rhs[2][0];
+    double xy = lhs[0][0] * rhs[0][1] + lhs[0][1] * rhs[1][1] + lhs[0][2] * rhs[2][1];
+    double xz = lhs[0][0] * rhs[0][2] + lhs[0][1] * rhs[1][2] + lhs[0][2] * rhs[2][2];
 
-    res[0][1] = lhs[0][0] * rhs[0][1] + lhs[0][1] * rhs[1][1] + lhs[0][2] * rhs[2][1];
-    res[1][1] = lhs[1][0] * rhs[0][1] + lhs[1][1] * rhs[1][1] + lhs[1][2] * rhs[2][1];
-    res[2][1] = lhs[2][0] * rhs[0][1] + lhs[2][1] * rhs[1][1] + lhs[2][2] * rhs[2][1];
+    double yx = lhs[1][0] * rhs[0][0] + lhs[1][1] * rhs[1][0] + lhs[1][2] * rhs[2][0];
+    double yy = lhs[1][0] * rhs[0][1] + lhs[1][1] * rhs[1][1] + lhs[1][2] * rhs[2][1];
+    double yz = lhs[1][0] * rhs[0][2] + lhs[1][1] * rhs[1][2] + lhs[1][2] * rhs[2][2];
 
-    res[0][2] = lhs[0][0] * rhs[0][2] + lhs[0][1] * rhs[1][2] + lhs[0][2] * rhs[2][2];
-    res[1][2] = lhs[1][0] * rhs[0][2] + lhs[1][1] * rhs[1][2] + lhs[1][2] * rhs[2][2];
-    res[2][2] = lhs[2][0] * rhs[0][2] + lhs[2][1] * rhs[1][2] + lhs[2][2] * rhs[2][2];
-    return res;
+    double zx = lhs[2][0] * rhs[0][0] + lhs[2][1] * rhs[1][0] + lhs[2][2] * rhs[2][0];
+    double zy = lhs[2][0] * rhs[0][1] + lhs[2][1] * rhs[1][1] + lhs[2][2] * rhs[2][1];
+    double zz = lhs[2][0] * rhs[0][2] + lhs[2][1] * rhs[1][2] + lhs[2][2] * rhs[2][2];
+    return {
+        xx, xy, xz,
+        yx, yy, yz,
+        zx, zy, zz,
+    };
 }
 
 /// Multiplication of a matrix and a scalar on the left
 inline Matrix3D operator*(const Matrix3D& lhs, double rhs) {
-    Matrix3D res;
-    res[0][0] = lhs[0][0] * rhs;
-    res[1][0] = lhs[1][0] * rhs;
-    res[2][0] = lhs[2][0] * rhs;
-
-    res[0][1] = lhs[0][1] * rhs;
-    res[1][1] = lhs[1][1] * rhs;
-    res[2][1] = lhs[2][1] * rhs;
-
-    res[0][2] = lhs[0][2] * rhs;
-    res[1][2] = lhs[1][2] * rhs;
-    res[2][2] = lhs[2][2] * rhs;
-    return res;
+    return {
+        lhs[0][0] * rhs, lhs[0][1] * rhs, lhs[0][2] * rhs,
+        lhs[1][0] * rhs, lhs[1][1] * rhs, lhs[1][2] * rhs,
+        lhs[2][0] * rhs, lhs[2][1] * rhs, lhs[2][2] * rhs,
+    };
 }
 
 /// Multiplication of a matrix and a scalar on the right
 inline Matrix3D operator*(double lhs, const Matrix3D& rhs) {
-    Matrix3D res;
-    res[0][0] = rhs[0][0] * lhs;
-    res[1][0] = rhs[1][0] * lhs;
-    res[2][0] = rhs[2][0] * lhs;
-
-    res[0][1] = rhs[0][1] * lhs;
-    res[1][1] = rhs[1][1] * lhs;
-    res[2][1] = rhs[2][1] * lhs;
-
-    res[0][2] = rhs[0][2] * lhs;
-    res[1][2] = rhs[1][2] * lhs;
-    res[2][2] = rhs[2][2] * lhs;
-    return res;
+    return {
+        lhs * rhs[0][0], lhs * rhs[0][1], lhs * rhs[0][2],
+        lhs * rhs[1][0], lhs * rhs[1][1], lhs * rhs[1][2],
+        lhs * rhs[2][0], lhs * rhs[2][1], lhs * rhs[2][2],
+    };
 }
 
 /// Division of a matrix and a scalar
 inline Matrix3D operator/(const Matrix3D& lhs, double rhs) {
-    Matrix3D res;
-    res[0][0] = lhs[0][0] / rhs;
-    res[1][0] = lhs[1][0] / rhs;
-    res[2][0] = lhs[2][0] / rhs;
-
-    res[0][1] = lhs[0][1] / rhs;
-    res[1][1] = lhs[1][1] / rhs;
-    res[2][1] = lhs[2][1] / rhs;
-
-    res[0][2] = lhs[0][2] / rhs;
-    res[1][2] = lhs[1][2] / rhs;
-    res[2][2] = lhs[2][2] / rhs;
-    return res;
+    return {
+        lhs[0][0] / rhs, lhs[0][1] / rhs, lhs[0][2] / rhs,
+        lhs[1][0] / rhs, lhs[1][1] / rhs, lhs[1][2] / rhs,
+        lhs[2][0] / rhs, lhs[2][1] / rhs, lhs[2][2] / rhs,
+    };
 }
 
 inline Matrix3D Matrix3D::invert() const {
@@ -374,17 +341,23 @@ inline Matrix3D Matrix3D::invert() const {
         throw Error("can not call invert on this matrix. This is likely to be a bug");
     }
     auto invdet = 1.0 / determinant;
-    Matrix3D res;
-    res[0][0] = ((*this)[1][1] * (*this)[2][2] - (*this)[2][1] * (*this)[1][2]) * invdet;
-    res[0][1] = ((*this)[0][2] * (*this)[2][1] - (*this)[0][1] * (*this)[2][2]) * invdet;
-    res[0][2] = ((*this)[0][1] * (*this)[1][2] - (*this)[0][2] * (*this)[1][1]) * invdet;
-    res[1][0] = ((*this)[1][2] * (*this)[2][0] - (*this)[1][0] * (*this)[2][2]) * invdet;
-    res[1][1] = ((*this)[0][0] * (*this)[2][2] - (*this)[0][2] * (*this)[2][0]) * invdet;
-    res[1][2] = ((*this)[1][0] * (*this)[0][2] - (*this)[0][0] * (*this)[1][2]) * invdet;
-    res[2][0] = ((*this)[1][0] * (*this)[2][1] - (*this)[2][0] * (*this)[1][1]) * invdet;
-    res[2][1] = ((*this)[2][0] * (*this)[0][1] - (*this)[0][0] * (*this)[2][1]) * invdet;
-    res[2][2] = ((*this)[0][0] * (*this)[1][1] - (*this)[1][0] * (*this)[0][1]) * invdet;
-    return res;
+    double xx = ((*this)[1][1] * (*this)[2][2] - (*this)[2][1] * (*this)[1][2]) * invdet;
+    double xy = ((*this)[0][2] * (*this)[2][1] - (*this)[0][1] * (*this)[2][2]) * invdet;
+    double xz = ((*this)[0][1] * (*this)[1][2] - (*this)[0][2] * (*this)[1][1]) * invdet;
+
+    double yx = ((*this)[1][2] * (*this)[2][0] - (*this)[1][0] * (*this)[2][2]) * invdet;
+    double yy = ((*this)[0][0] * (*this)[2][2] - (*this)[0][2] * (*this)[2][0]) * invdet;
+    double yz = ((*this)[1][0] * (*this)[0][2] - (*this)[0][0] * (*this)[1][2]) * invdet;
+
+    double zx = ((*this)[1][0] * (*this)[2][1] - (*this)[2][0] * (*this)[1][1]) * invdet;
+    double zy = ((*this)[2][0] * (*this)[0][1] - (*this)[0][0] * (*this)[2][1]) * invdet;
+    double zz = ((*this)[0][0] * (*this)[1][1] - (*this)[1][0] * (*this)[0][1]) * invdet;
+
+    return {
+        xx, xy, xz,
+        yx, yy, yz,
+        zx, zy, zz,
+    };
 }
 
 inline Matrix3D& Matrix3D::operator+=(const Matrix3D& rhs) {
