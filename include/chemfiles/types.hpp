@@ -217,9 +217,15 @@ public:
 
     using super::operator[];
 
+    /// Compute the determinant of this matrix.
+    ///
+    /// @example{tests/doc/matrix3d/determinant.cpp}
+    double determinant() const;
+
     /// Compute the inverse of this matrix.
     ///
-    /// @throw Error if the matrix is not inversible
+    /// @throw Error if the matrix is not inversible (i.e. if the determinant
+    ///              is zero)
     /// @example{tests/doc/matrix3d/invert.cpp}
     Matrix3D invert() const;
 
@@ -336,15 +342,20 @@ inline Matrix3D operator/(const Matrix3D& lhs, double rhs) {
     };
 }
 
-inline Matrix3D Matrix3D::invert() const {
+inline double Matrix3D::determinant() const {
     double determinant = 0.0;
     determinant += (*this)[0][0] * ((*this)[1][1] * (*this)[2][2] - (*this)[2][1] * (*this)[1][2]);
     determinant -= (*this)[0][1] * ((*this)[1][0] * (*this)[2][2] - (*this)[1][2] * (*this)[2][0]);
-    determinant += (*this)[0][2] * ((*this)[1][0] * (*this)[2][1] - (*this)[1][1] * (*this)[2][0]);;
+    determinant += (*this)[0][2] * ((*this)[1][0] * (*this)[2][1] - (*this)[1][1] * (*this)[2][0]);
+    return determinant;
+}
 
+inline Matrix3D Matrix3D::invert() const {
+    auto determinant = this->determinant();
     if (determinant <= DBL_EPSILON) {
-        throw Error("can not call invert on this matrix. This is likely to be a bug");
+        throw Error("This matrix is not invertible");
     }
+
     auto invdet = 1.0 / determinant;
     double xx = ((*this)[1][1] * (*this)[2][2] - (*this)[2][1] * (*this)[1][2]) * invdet;
     double xy = ((*this)[0][2] * (*this)[2][1] - (*this)[0][1] * (*this)[2][2]) * invdet;
