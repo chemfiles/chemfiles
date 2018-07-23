@@ -34,6 +34,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   `Frame::add_atom` and `Frame::add_bond`.
 * Chemfiles will now read configuration from `.chemfiles.toml` or
   `chemfiles.toml` instead of `.chemfilesrc`
+* Added `Trajectory::path` to get the file path used to create a trajectory
 
 ### Changes in supported formats
 
@@ -49,6 +50,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Function accessing atoms/cell/residue/topology inside a frame/topology no
   longer make a copy. This allows for direct reading and writing inside the
   containing frame/topology.
+* Added `chfl_trajectory_path` to get the file path used to create a trajectory
 
 ## 0.8 (14 Dec 2017)
 

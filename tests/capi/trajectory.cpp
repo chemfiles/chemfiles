@@ -11,6 +11,17 @@
 static CHFL_FRAME* testing_frame();
 
 TEST_CASE("Read trajectory") {
+    SECTION("Path") {
+        CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
+        REQUIRE(trajectory);
+
+        const char* path = nullptr;
+        CHECK_STATUS(chfl_trajectory_path(trajectory, &path));
+        CHECK(std::string(path) == "data/xyz/water.xyz");
+
+        CHECK_STATUS(chfl_trajectory_close(trajectory));
+    }
+
     SECTION("Number of steps") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
         REQUIRE(trajectory);
