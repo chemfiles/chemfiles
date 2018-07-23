@@ -32,6 +32,14 @@ error:
     return nullptr;
 }
 
+extern "C" chfl_status chfl_trajectory_path(const CHFL_TRAJECTORY* const trajectory, const char** const path) {
+    CHECK_POINTER(trajectory);
+    CHECK_POINTER(path);
+    CHFL_ERROR_CATCH(
+        *path = trajectory->path().c_str();
+    )
+}
+
 extern "C" chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY* const trajectory, uint64_t step, CHFL_FRAME* const frame) {
     CHECK_POINTER(trajectory);
     CHECK_POINTER(frame);

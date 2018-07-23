@@ -9,6 +9,8 @@ Function manipulating ``CHFL_TRAJECTORY``
 
 .. doxygenfunction:: chfl_trajectory_with_format
 
+.. doxygenfunction:: chfl_trajectory_path
+
 .. doxygenfunction:: chfl_trajectory_read
 
 .. doxygenfunction:: chfl_trajectory_read_step

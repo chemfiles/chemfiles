@@ -30,7 +30,7 @@ public:
     /// file. For example, `format = "XYZ"` will force usage of XYZ format
     /// regardless of the file extension; `format = "XYZ / GZ"` will
     /// additionally use gzip compression; and `format = "/ GZ"` will use the
-    /// gzip compression, and the file extension to guess the format. 
+    /// gzip compression, and the file extension to guess the format.
     ///
     /// If the `<format>` is an empty string, the file extension will be used
     /// to guess the format. If `<compression>` is NOT presentand the file path
@@ -186,6 +186,13 @@ public:
     ///
     /// @example{tests/doc/trajectory/close.cpp}
     void close();
+
+    /// Get the path used to open the trajectory
+    ///
+    /// @example{tests/doc/trajectory/path.cpp}
+    const std::string& path() const {
+        return path_;
+    }
 
 private:
     /// Perform a few checks before reading a frame

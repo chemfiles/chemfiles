@@ -40,6 +40,19 @@ CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_with_format(
     const char* path, char mode, const char* format
 );
 
+/// Get the path used to open the `trajectory` in `path`.
+///
+/// The `path` will point to memory allocated inside the `trajectory`, and it is
+/// only valid until the trajectory is closed (`chfl_trajectory_close`). There
+/// is no need to `free` the corresponding memory
+///
+/// @example{tests/capi/doc/chfl_trajectory/path.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_trajectory_path(
+    const CHFL_TRAJECTORY* trajectory, const char** path
+);
+
 /// Read the next step of the `trajectory` into a `frame`.
 ///
 /// If the number of atoms in frame does not correspond to the number of atom
