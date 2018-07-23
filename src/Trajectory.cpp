@@ -108,7 +108,7 @@ void Trajectory::pre_read(size_t step) {
     if (step >= nsteps_) {
         throw file_error(
             "can not read file '{}' at step {}: maximal step is {}",
-            path_, step, nsteps_
+            path_, step, nsteps_ - 1
         );
     }
     if (!(mode_ == File::READ || mode_ == File::APPEND)) {
