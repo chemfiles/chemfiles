@@ -134,6 +134,29 @@ TEST_CASE("Read files in MMTF format") {
         auto frame3= file.read();
     }
 
+    SECTION("Alternative locations") {
+        Trajectory file("data/mmtf/5A1I.mmtf");
+
+        auto frame = file.read();
+        const auto residues = frame.topology().residues();
+        CHECK(!frame[0].get("altloc")); // no alt loc
+
+        const auto& sam = residues[387];
+        CHECK(sam.name() == "SAM");
+        REQUIRE(frame[*sam.begin()].get("altloc"));
+        CHECK(frame[*sam.begin()].get("altloc")->as_string() == "A");
+
+        const auto& adn = residues[388];
+        CHECK(adn.name() == "ADN");
+        REQUIRE(frame[*adn.begin()].get("altloc"));
+        CHECK(frame[*adn.begin()].get("altloc")->as_string() == "C");
+
+        const auto& edo = residues[390];
+        CHECK(edo.name() == "EDO");
+        REQUIRE(frame[*edo.begin()].get("altloc"));
+        CHECK(frame[*edo.begin()].get("altloc")->as_string() == "B");
+    }
+
     SECTION("GZ Files") {
         Trajectory file("data/mmtf/1J8K.mmtf.gz");
 

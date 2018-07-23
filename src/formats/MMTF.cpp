@@ -123,6 +123,14 @@ void MMTFFormat::read(Frame& frame) {
             auto groupSize = group.atomNameList.size();
             for (size_t l = 0; l < groupSize; l++) {
                 auto atom = Atom(group.atomNameList[l]);
+
+                const auto& altLocList = structure_.altLocList;
+                if (!mmtf::isDefaultValue(altLocList) && !(
+                    altLocList[atomIndex_] == ' ' ||
+                    altLocList[atomIndex_] == 0x00)) {
+                    atom.set("altloc", std::string(1, altLocList[atomIndex_]));
+                }
+
                 atom.set_type(group.elementList[l]);
                 atom.set_charge(group.formalChargeList[l]);
                 auto position = Vector3D(
