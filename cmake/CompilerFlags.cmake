@@ -124,8 +124,10 @@ if(MSVC)
 
     # Disable other warnings
     remove_msvc_warning(4061) # enumerator in switch of enum is not explicitly handled by a case label
+    remove_msvc_warning(4127) # conditional expression is constant
     remove_msvc_warning(4275) # non-dll-export interface as base class of dll-export class
     remove_msvc_warning(4251) # class <> needs to be dll-export
+    remove_msvc_warning(4503) # mangled name too long was truncated
     remove_msvc_warning(4514) # unreferenced inline function has been removed
     remove_msvc_warning(4582) # constructor is not implicitly called
     remove_msvc_warning(4583) # destructor is not implicitly called
