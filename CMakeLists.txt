@@ -99,8 +99,8 @@ endif()
 set(CHEMFILES_OBJECTS
     $<TARGET_OBJECTS:chemfiles_objects>
     $<TARGET_OBJECTS:molfiles>
-    $<TARGET_OBJECTS:fmt::object>
     $<TARGET_OBJECTS:tng_io>
+    $<TARGET_OBJECTS:fmt>
     ${ZLIB_OBJECTS}
     ${LZMA_OBJECTS}
     ${NETCDF_OBJECTS}
