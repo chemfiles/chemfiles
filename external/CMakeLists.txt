@@ -60,7 +60,6 @@ set(EXTERNAL_INCLUDES "")
 # ==========
 # fmtlib: https://github.com/chemfiles/fmt
 # ==========
-set(FMT_USE_CPP14 OFF CACHE bool "Enable the addition of C++14 compiler flags.")
 external_library(fmt)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/fmt/include/)
 
@@ -70,7 +69,7 @@ mark_as_advanced(FORCE
     FMT_INSTALL
     FMT_PEDANTIC
     FMT_TEST
-    FMT_USE_CPP11
+    FMT_WERROR
 )
 
 # ==========
