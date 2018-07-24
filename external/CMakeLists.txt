@@ -91,6 +91,12 @@ else()
     endif()
     external_library(netcdf)
 
+    # Hide NetCDF variables from CMake GUI
+    mark_as_advanced(FORCE
+        NETCDF_ENABLE_FFIO
+        NETCDF_ENABLE_STDIO
+    )
+
     if(WINDOWS)
         target_compile_definitions(netcdf PRIVATE "-DDLL_NETCDF -DDLL_EXPORT")
     endif()
