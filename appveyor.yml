@@ -10,14 +10,21 @@ environment:
   matrix:
     - generator: MinGW Makefiles
       CXX_PATH: 'C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin'
+      BUILD_SHARED_LIBS: ON
       ARCH: x64
     - generator: MinGW Makefiles
       CXX_PATH: 'C:\mingw-w64\i686-6.3.0-posix-dwarf-rt_v5-rev1\mingw32\bin'
+      BUILD_SHARED_LIBS: ON
       ARCH: x86
     - generator: Visual Studio 14 2015 Win64
+      BUILD_SHARED_LIBS: ON
       ARCH: x64
     - generator: Visual Studio 14 2015
+      BUILD_SHARED_LIBS: ON
       ARCH: x86
+    - generator: Visual Studio 14 2015 Win64
+      BUILD_SHARED_LIBS: OFF
+      ARCH: x64
 
 clone_depth: 10
 clone_folder: c:\chemfiles
