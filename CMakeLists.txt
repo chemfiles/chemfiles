@@ -62,6 +62,10 @@ if(MSVC)
     add_definitions("-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS")
 endif()
 
+if(NOT CHFL_SYSTEM_LZMA)
+    add_definitions("-DLZMA_API_STATIC")
+endif()
+
 if(CHFL_CODE_COVERAGE)
     message(STATUS "Code coverage enabled")
     if(NOT CMAKE_COMPILER_IS_GNUCXX)
