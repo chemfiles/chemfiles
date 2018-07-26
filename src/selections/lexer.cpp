@@ -77,8 +77,8 @@ std::string Token::str() const {
     case Token::RAW_IDENT:
         return '"' + ident() + '"';
     case Token::NUMBER:
-        if (lround(number()) == number()) {
-            return std::to_string(lround(number()));
+        if (std::round(number()) == number()) {
+            return std::to_string(std::lround(number()));
         } else {
             return std::to_string(number());
         }

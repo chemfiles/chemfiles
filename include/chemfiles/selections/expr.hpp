@@ -186,8 +186,8 @@ public:
     /// Get the property name
     virtual std::string name() const = 0;
 
-    bool is_match(const Frame& frame, const Match& match) const final;
-    std::string print(unsigned delta) const final;
+    bool is_match(const Frame& frame, const Match& match) const override final;
+    std::string print(unsigned delta) const override final;
 
 private:
     /// The value to check against
@@ -467,9 +467,9 @@ public:
     NumericProperty(const NumericProperty&) = delete;
     NumericProperty& operator=(const NumericProperty&) = delete;
 
-    double eval(const Frame& frame, const Match& match) const final;
-    optional<double> optimize() final;
-    std::string print() const final;
+    double eval(const Frame& frame, const Match& match) const override final;
+    optional<double> optimize() override final;
+    std::string print() const override final;
 
     /// Get the value of the property for the atom at index `i` in the `frame`
     virtual double value(const Frame& frame, size_t i) const = 0;

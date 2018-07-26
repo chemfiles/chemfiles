@@ -430,8 +430,8 @@ optional<double> Number::optimize() {
 }
 
 std::string Number::print() const {
-    if (lround(value_) == value_) {
-        return std::to_string(lround(value_));
+    if (std::round(value_) == value_) {
+        return std::to_string(std::lround(value_));
     } else {
         return std::to_string(value_);
     }
