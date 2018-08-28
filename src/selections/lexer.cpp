@@ -32,7 +32,16 @@ static bool is_ident_component(char c) {
     return is_alpha(c) || is_digit(c) || c == '_';
 }
 
-std::string Token::str() const {
+Token Token::ident(std::string data) {
+    assert(!data.empty());
+    assert(is_alpha(data[0]));
+    for (auto c: data) {
+        assert(is_ident_component(c));
+    }
+    return Token(IDENT, std::move(data), 0.0, 0);
+}
+
+std::string Token::as_str() const {
     switch (type_) {
     case Token::END:
         return "<end of selection>";
@@ -74,8 +83,8 @@ std::string Token::str() const {
         return "or";
     case Token::IDENT:
         return ident();
-    case Token::RAW_IDENT:
-        return '"' + ident() + '"';
+    case Token::STRING:
+        return '"' + string() + '"';
     case Token::NUMBER:
         if (std::round(number()) == number()) {
             return std::to_string(std::lround(number()));
@@ -139,7 +148,7 @@ std::vector<Token> Tokenizer::tokenize() {
             tokens.emplace_back(variable());
             continue;
         } else if (match('"')) {
-            tokens.emplace_back(raw_ident());
+            tokens.emplace_back(string());
             continue;
         } else if (check(is_alpha)) {
             tokens.emplace_back(ident());
@@ -180,8 +189,8 @@ Token Tokenizer::variable() {
     return Token::variable(static_cast<uint8_t>(data - 1));
 }
 
-Token Tokenizer::raw_ident() {
-    // assert(previous() == '"');
+Token Tokenizer::string() {
+    assert(previous() == '"');
 
     size_t start = current_;
     size_t count = 0;
@@ -201,7 +210,7 @@ Token Tokenizer::raw_ident() {
         throw selection_error("missing \" after '{}'", input_.substr(start, count));
     }
 
-    return Token::raw_ident(input_.substr(start, count));
+    return Token::string(input_.substr(start, count));
 }
 
 Token Tokenizer::ident() {

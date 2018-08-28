@@ -25,15 +25,17 @@ TEST_CASE("Tokens") {
         auto token = Token::ident("blabla");
         REQUIRE(token.type() == Token::IDENT);
         CHECK(token.ident() == "blabla");
-        CHECK(token.str() == "blabla");
+        CHECK(token.as_str() == "blabla");
 
         CHECK_THROWS_AS(token.number(), Error);
         CHECK_THROWS_AS(token.variable(), Error);
+    }
 
-        token = Token::raw_ident("blabla");
-        REQUIRE(token.type() == Token::RAW_IDENT);
-        CHECK(token.ident() == "blabla");
-        CHECK(token.str() == "\"blabla\"");
+    SECTION("Strings") {
+        auto token = Token::string("blabla");
+        REQUIRE(token.type() == Token::STRING);
+        CHECK(token.string() == "blabla");
+        CHECK(token.as_str() == "\"blabla\"");
 
         CHECK_THROWS_AS(token.number(), Error);
         CHECK_THROWS_AS(token.variable(), Error);
@@ -102,8 +104,8 @@ TEST_CASE("Lexing") {
         for (std::string id: {"\"\"", "\"id_3nt___\"", "\"and\"", "\"3.2\""}) {
             auto tokens = tokenize(id);
             CHECK(tokens.size() == 2);
-            CHECK(tokens[0].type() == Token::RAW_IDENT);
-            CHECK(tokens[0].ident() == id.substr(1, id.size() - 2));
+            CHECK(tokens[0].type() == Token::STRING);
+            CHECK(tokens[0].string() == id.substr(1, id.size() - 2));
             CHECK(tokens[1].type() == Token::END);
         }
     }

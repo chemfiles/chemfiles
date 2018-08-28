@@ -124,7 +124,7 @@ Ast Parser::parse() {
     if (!finished()) {
         std::string extra;
         while (!finished()) {
-            extra += " " + advance().str();
+            extra += " " + advance().as_str();
         }
         throw selection_error("additional data after the end of the selection:{}", extra);
     }
@@ -210,33 +210,33 @@ Ast Parser::string_selector() {
     assert(is_string_property(name));
 
     auto var = variable();
-    if (match(Token::IDENT) || match(Token::RAW_IDENT)) {
+    if (match(Token::IDENT) || match(Token::STRING)) {
         // `name value` shortand, where value is a string (e.g. type H, name "42")
-        auto value = previous().ident();
+        auto value = previous().string();
         auto ast = STRING_PROPERTIES[name](std::move(value), true, var);
-        while (match(Token::IDENT) || match(Token::RAW_IDENT)) {
+        while (match(Token::IDENT) || match(Token::STRING)) {
             // handle multiple values 'name H N C O'
-            value = previous().ident();
+            value = previous().string();
             auto rhs = STRING_PROPERTIES[name](std::move(value), true, var);
             ast = Ast(new Or(std::move(ast), std::move(rhs)));
         }
         return ast;
     } else if (match(Token::EQUAL)) {
-        if (match(Token::IDENT) || match(Token::RAW_IDENT)) {
-            auto value = previous().ident();
+        if (match(Token::IDENT) || match(Token::STRING)) {
+            auto value = previous().string();
             return STRING_PROPERTIES[name](std::move(value), true, var);
         } else {
-            throw selection_error("expected a value after '{} ==', found {}", name, peek().str());
+            throw selection_error("expected a value after '{} ==', found {}", name, peek().as_str());
         }
     } else if (match(Token::NOT_EQUAL)) {
-        if (match(Token::IDENT) || match(Token::RAW_IDENT)) {
-            auto value = previous().ident();
+        if (match(Token::IDENT) || match(Token::STRING)) {
+            auto value = previous().string();
             return STRING_PROPERTIES[name](std::move(value), false, var);
         } else {
-            throw selection_error("expected a value after '{} !=', found {}", name, peek().str());
+            throw selection_error("expected a value after '{} !=', found {}", name, peek().as_str());
         }
     } else {
-        throw selection_error("expected one of '!=', '==' or a value after {}, found {}", name, peek().str());
+        throw selection_error("expected one of '!=', '==' or a value after {}, found {}", name, peek().as_str());
     }
 }
 
@@ -287,7 +287,7 @@ Ast Parser::math_selector()  {
     } else if (match(Token::GREATER_EQUAL)) {
         op = Math::Operator::GREATER_EQUAL;
     } else {
-        throw selection_error("expected a binary operator (==, !=, <=, ...), got {}", peek().str());
+        throw selection_error("expected a binary operator (==, !=, <=, ...), got {}", peek().as_str());
     }
 
     auto rhs = math_sum();
@@ -365,9 +365,9 @@ MathAst Parser::math_value() {
         return MathAst(new Neg(std::move(ast)));
     } else {
         if (finished()) {
-            throw selection_error("expected content after", previous().str());
+            throw selection_error("expected content after", previous().as_str());
         } else {
-            throw selection_error("I don't know what to do with {}", peek().str());
+            throw selection_error("I don't know what to do with {}", peek().as_str());
         }
     }
 }
@@ -411,11 +411,11 @@ Variable Parser::variable() {
         if (match(Token::VARIABLE)) {
             var = previous().variable();
         } else {
-            throw selection_error("expected variable in parenthesis, got {}", peek().str());
+            throw selection_error("expected variable in parenthesis, got {}", peek().as_str());
         }
 
         if (!match(Token::RPAREN)) {
-            throw selection_error("expected closing parenthesis after variable, got {}", peek().str());
+            throw selection_error("expected closing parenthesis after variable, got {}", peek().as_str());
         }
     }
     return var;
@@ -424,25 +424,25 @@ Variable Parser::variable() {
 std::vector<Variable> Parser::variables() {
     std::vector<Variable> vars;
     if (!match(Token::LPAREN)) {
-        throw selection_error("expected opening parenthesis, got {}", peek().str());
+        throw selection_error("expected opening parenthesis, got {}", peek().as_str());
     }
 
     if (match(Token::VARIABLE)) {
         vars.push_back(previous().variable());
     } else {
-        throw selection_error("expected variable in parenthesis, got {}", peek().str());
+        throw selection_error("expected variable in parenthesis, got {}", peek().as_str());
     }
 
     while (match(Token::COMMA)) {
         if (match(Token::VARIABLE)) {
             vars.push_back(previous().variable());
         } else {
-            throw selection_error("expected variable in parenthesis, got {}", peek().str());
+            throw selection_error("expected variable in parenthesis, got {}", peek().as_str());
         }
     }
 
     if (!match(Token::RPAREN)) {
-        throw selection_error("expected closing parenthesis after variable, got {}", peek().str());
+        throw selection_error("expected closing parenthesis after variable, got {}", peek().as_str());
     }
 
     return vars;
@@ -466,7 +466,7 @@ std::vector<SubSelection> Parser::sub_selection() {
         auto _ast = expression();
         std::string selection;
         for (size_t i=before; i<current_; i++) {
-            selection += " " + tokens_[i].str();
+            selection += " " + tokens_[i].as_str();
         }
         vars.emplace_back(trim(selection));
     }
@@ -479,14 +479,14 @@ std::vector<SubSelection> Parser::sub_selection() {
             auto _ast = expression();
             std::string selection;
             for (size_t i=before; i<current_; i++) {
-                selection += " " + tokens_[i].str();
+                selection += " " + tokens_[i].as_str();
             }
             vars.emplace_back(trim(selection));
         }
     }
 
     if (!match(Token::RPAREN)) {
-        throw selection_error("expected closing parenthesis after variable, got {}", peek().str());
+        throw selection_error("expected closing parenthesis after variable, got {}", peek().as_str());
     }
 
     return vars;
