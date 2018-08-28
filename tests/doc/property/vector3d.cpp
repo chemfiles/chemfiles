@@ -11,7 +11,7 @@ TEST_CASE() {
     // [example]
     auto property = Property(Vector3D(11, 22, 33));
 
-    assert(property.get_kind() == Property::VECTOR3D);
+    assert(property.kind() == Property::VECTOR3D);
     assert(property.as_vector3d() == Vector3D(11, 22, 33));
     // [example]
 }

@@ -21,7 +21,7 @@ namespace chemfiles {
 class CHFL_EXPORT Property final {
 public:
     /// Possible types holded by a property
-    enum kind {
+    enum Kind {
         BOOL = 0,
         DOUBLE = 1,
         STRING = 2,
@@ -132,7 +132,7 @@ public:
     /// Get the kind of property, *i.e.* the type of the holded value
     ///
     /// @example{tests/doc/property/get_kind.cpp}
-    kind get_kind() const {
+    Kind kind() const {
         return this->kind_;
     }
 
@@ -168,7 +168,7 @@ private:
     /// Get the kind name as a string
     std::string kind_as_string() const;
 
-    kind kind_;
+    Kind kind_;
     union {
         bool bool_;
         std::string string_;

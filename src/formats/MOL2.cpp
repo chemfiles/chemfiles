@@ -248,7 +248,7 @@ void MOL2Format::write(const Frame& frame) {
     fmt::print(*file_, "@<TRIPOS>MOLECULE\n");
 
     const auto& frame_name = frame.get("name");
-    if (frame_name && frame_name->get_kind() == Property::STRING) {
+    if (frame_name && frame_name->kind() == Property::STRING) {
         fmt::print(*file_, frame_name->as_string());
     }
     fmt::print(*file_, "\n");

@@ -174,7 +174,7 @@ static std::string to_gro_index(uint64_t i) {
 }
 
 void GROFormat::write(const Frame& frame) {
-    if (frame.get("name") && frame.get("name")->get_kind() == Property::STRING) {
+    if (frame.get("name") && frame.get("name")->kind() == Property::STRING) {
         fmt::print(*file_, frame.get("name")->as_string() + "\n");
     } else {
         fmt::print(*file_, "GRO File produced by chemfiles\n");

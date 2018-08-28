@@ -461,7 +461,7 @@ void PDBFormat::write(const Frame& frame) {
         std::string atom_hetatm = "HETATM";
         auto is_hetatm = frame.topology()[i].get("is_hetatm");
         if (is_hetatm) {
-            if (is_hetatm->get_kind() == Property::BOOL) {
+            if (is_hetatm->kind() == Property::BOOL) {
                 if (is_hetatm->as_bool()) {
                     atom_hetatm = "HETATM";
                 } else {
