@@ -57,7 +57,7 @@ extern "C" chfl_status chfl_property_get_kind(const CHFL_PROPERTY* const propert
     CHECK_POINTER(property);
     CHECK_POINTER(kind);
     CHFL_ERROR_CATCH(
-        *kind = static_cast<chfl_property_kind>(property->get_kind());
+        *kind = static_cast<chfl_property_kind>(property->kind());
     )
 }
 

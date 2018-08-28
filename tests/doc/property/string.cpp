@@ -12,13 +12,13 @@ TEST_CASE() {
     // from a std::string
     auto property = Property(std::string("foo"));
 
-    assert(property.get_kind() == Property::STRING);
+    assert(property.kind() == Property::STRING);
     assert(property.as_string() == "foo");
 
     // from a const char*
     property = Property("bar");
 
-    assert(property.get_kind() == Property::STRING);
+    assert(property.kind() == Property::STRING);
     assert(property.as_string() == "bar");
     // [example]
 }

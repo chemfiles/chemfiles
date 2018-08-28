@@ -35,6 +35,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Chemfiles will now read configuration from `.chemfiles.toml` or
   `chemfiles.toml` instead of `.chemfilesrc`
 * Added `Trajectory::path` to get the file path used to create a trajectory
+* Renamed `Property::get_kind` to `Property::kind`
 
 ### Changes in supported formats
 

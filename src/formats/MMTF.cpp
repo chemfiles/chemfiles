@@ -226,7 +226,6 @@ void MMTFFormat::read(Frame& frame) {
 }
 
 void MMTFFormat::write(const Frame& frame) {
-    
     // Used to add bonds  bonds
     auto writeAtomLoc = static_cast<size_t>(structure_.numAtoms);
 
@@ -235,7 +234,7 @@ void MMTFFormat::write(const Frame& frame) {
 
     std::string prev_chainId;
     std::string prev_chainName;
-    const chemfiles::Residue* prev_residue = 0;
+    const chemfiles::Residue* prev_residue = nullptr;
 
     auto& topology = frame.topology();
     auto& positions = frame.positions();
@@ -266,13 +265,11 @@ void MMTFFormat::write(const Frame& frame) {
         std::string current_chainId;
         std::string current_chainName;
 
-        if (current_chainId_opt &&
-            current_chainId_opt->get_kind() == Property::STRING) {
+        if (current_chainId_opt && current_chainId_opt->kind() == Property::STRING) {
             current_chainId = current_chainId_opt->as_string();
         }
 
-        if (current_chainName_opt &&
-            current_chainName_opt->get_kind() == Property::STRING) {
+        if (current_chainName_opt && current_chainName_opt->kind() == Property::STRING) {
             current_chainName = current_chainName_opt->as_string();
         }
 

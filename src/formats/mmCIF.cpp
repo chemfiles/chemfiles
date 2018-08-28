@@ -230,7 +230,7 @@ void mmCIFFormat::read(Frame& frame) {
     auto line = file_->readline();
 
     size_t last_position = 0;
-    
+
     if (model_position != atom_site_map_.end()) {
         last_position = std::stoul(split(line, ' ')[model_position->second]);
     }
@@ -250,7 +250,7 @@ void mmCIFFormat::read(Frame& frame) {
         }
 
         size_t current_position = 0;
-        
+
         if (model_position != atom_site_map_.end()) {
             current_position = std::stoul(line_split[model_position->second]);
         }
@@ -270,7 +270,7 @@ void mmCIFFormat::read(Frame& frame) {
             line_split[label_alt_id->second] != ".") {
             atom.set("altloc", line_split[label_alt_id->second]);
         }
-        
+
         if (formal_charge != atom_site_map_.end()) {
             atom.set_charge(cif_to_double(line_split[formal_charge->second]));
         }
@@ -400,23 +400,20 @@ void mmCIFFormat::write(const Frame& frame) {
                 seq_id = "?";
             }
 
-            if (residue->get("chainid") &&
-                residue->get("chainid")->get_kind() == Property::STRING) {
+            if (residue->get("chainid") && residue->get("chainid")->kind() == Property::STRING) {
                 asymid = residue->get("chainid")->as_string();
             } else {
                 asymid = "?";
             }
 
-            if (residue->get("chainname") &&
-                residue->get("chainname")->get_kind() == Property::STRING) {
+            if (residue->get("chainname") && residue->get("chainname")->kind() == Property::STRING) {
                 auth_asymid = residue->get("chainname")->as_string();
             }
         }
 
         const auto& atom = frame[i];
 
-        if (atom.get("is_hetatm") &&
-            atom.get("is_hetatm")->get_kind() == Property::BOOL &&
+        if (atom.get("is_hetatm") && atom.get("is_hetatm")->kind() == Property::BOOL &&
             atom.get("is_hetatm")->as_bool()) {
             pdbgroup = "HETATM";
         }

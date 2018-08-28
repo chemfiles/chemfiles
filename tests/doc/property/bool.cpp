@@ -11,7 +11,7 @@ TEST_CASE() {
     // [example]
     auto property = Property(false);
 
-    assert(property.get_kind() == Property::BOOL);
+    assert(property.kind() == Property::BOOL);
     assert(property.as_bool() == false);
     // [example]
 }
