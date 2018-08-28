@@ -15,8 +15,8 @@ constexpr double PI = 3.141592653589793238463;
 using namespace chemfiles;
 using namespace chemfiles::selections;
 
-using string_prop_creator_t = std::function<Ast(std::string, bool, Variable)>;
-static std::map<std::string, string_prop_creator_t> STRING_PROPERTIES = {
+using string_selector_creator_t = std::function<Ast(std::string, bool, Variable)>;
+static std::map<std::string, string_selector_creator_t> STRING_SELECTORS = {
     {"name", [](std::string value, bool equals, Variable var) {
         return Ast(new Name(std::move(value), equals, var));
     }},
@@ -28,8 +28,8 @@ static std::map<std::string, string_prop_creator_t> STRING_PROPERTIES = {
     }},
 };
 
-using num_prop_creator_t = std::function<MathAst(Variable)>;
-static std::map<std::string, num_prop_creator_t> NUMERIC_PROPERTIES = {
+using numeric_selector_creator_t = std::function<MathAst(Variable)>;
+static std::map<std::string, numeric_selector_creator_t> NUMERIC_SELECTORS = {
     {"index", [](Variable var){ return MathAst(new Index(var));}},
     {"mass", [](Variable var){ return MathAst(new Mass(var));}},
     {"resid", [](Variable var){ return MathAst(new Resid(var));}},
@@ -41,8 +41,8 @@ static std::map<std::string, num_prop_creator_t> NUMERIC_PROPERTIES = {
     {"vz", [](Variable var){ return MathAst(new Velocity(var, Coordinate::Z));}},
 };
 
-using num_functions_creator_t = std::function<MathAst(MathAst)>;
-static std::map<std::string, num_functions_creator_t> NUMERIC_FUNCTIONS = {
+using numeric_functions_creator_t = std::function<MathAst(MathAst)>;
+static std::map<std::string, numeric_functions_creator_t> NUMERIC_FUNCTIONS = {
     {"sin", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(sin), "sin", std::move(ast)));}},
     {"cos", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(cos), "cos", std::move(ast)));}},
     {"tan", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(tan), "tan", std::move(ast)));}},
@@ -53,13 +53,13 @@ static std::map<std::string, num_functions_creator_t> NUMERIC_FUNCTIONS = {
     {"deg2rad", [](MathAst ast){ return MathAst(new Function([](double deg){ return deg * PI / 180; }, "deg2rad", std::move(ast)));}},
 };
 
-using num_var_functions_creator_t = std::function<MathAst(std::vector<Variable>)>;
-struct NumericVarFunction {
+using numeric_variable_functions_creator_t = std::function<MathAst(std::vector<Variable>)>;
+struct NumericVariableFunction {
     unsigned arity;
-    num_var_functions_creator_t creator;
+    numeric_variable_functions_creator_t creator;
 };
 
-static std::map<std::string, NumericVarFunction> NUMERIC_VAR_FUNCTIONS = {
+static std::map<std::string, NumericVariableFunction> NUMERIC_VAR_FUNCTIONS = {
     {"distance", {2, [](std::vector<Variable> args){ return MathAst(new Distance(args[0], args[1])); }}},
     {"angle", {3, [](std::vector<Variable> args){ return MathAst(new Angle(args[0], args[1], args[2])); }}},
     {"dihedral", {4, [](std::vector<Variable> args){ return MathAst(new Dihedral(args[0], args[1], args[2], args[3])); }}},
@@ -98,12 +98,12 @@ static std::map<std::string, BooleanFunction> BOOLEAN_SELECTORS = {
 };
 
 
-static bool is_string_property(const std::string& name) {
-    return STRING_PROPERTIES.find(name) != STRING_PROPERTIES.end();
+static bool is_string_selector(const std::string& name) {
+    return STRING_SELECTORS.find(name) != STRING_SELECTORS.end();
 }
 
-static bool is_numeric_property(const std::string& name) {
-    return NUMERIC_PROPERTIES.find(name) != NUMERIC_PROPERTIES.end();
+static bool is_numeric_selector(const std::string& name) {
+    return NUMERIC_SELECTORS.find(name) != NUMERIC_SELECTORS.end();
 }
 
 static bool is_numeric_function(const std::string& name) {
@@ -162,7 +162,7 @@ Ast Parser::selector() {
         auto ident = peek().ident();
         if (is_boolean_selector(ident)) {
             return bool_selector();
-        } else if (is_string_property(ident)) {
+        } else if (is_string_selector(ident)) {
             return string_selector();
         } else {
             return math_selector();
@@ -207,31 +207,31 @@ Ast Parser::string_selector() {
     auto property = advance();
     assert(property.type() == Token::IDENT);
     const auto& name = property.ident();
-    assert(is_string_property(name));
+    assert(is_string_selector(name));
 
     auto var = variable();
     if (match(Token::IDENT) || match(Token::STRING)) {
         // `name value` shortand, where value is a string (e.g. type H, name "42")
         auto value = previous().string();
-        auto ast = STRING_PROPERTIES[name](std::move(value), true, var);
+        auto ast = STRING_SELECTORS[name](std::move(value), true, var);
         while (match(Token::IDENT) || match(Token::STRING)) {
             // handle multiple values 'name H N C O'
             value = previous().string();
-            auto rhs = STRING_PROPERTIES[name](std::move(value), true, var);
+            auto rhs = STRING_SELECTORS[name](std::move(value), true, var);
             ast = Ast(new Or(std::move(ast), std::move(rhs)));
         }
         return ast;
     } else if (match(Token::EQUAL)) {
         if (match(Token::IDENT) || match(Token::STRING)) {
             auto value = previous().string();
-            return STRING_PROPERTIES[name](std::move(value), true, var);
+            return STRING_SELECTORS[name](std::move(value), true, var);
         } else {
             throw selection_error("expected a value after '{} ==', found {}", name, peek().as_str());
         }
     } else if (match(Token::NOT_EQUAL)) {
         if (match(Token::IDENT) || match(Token::STRING)) {
             auto value = previous().string();
-            return STRING_PROPERTIES[name](std::move(value), false, var);
+            return STRING_SELECTORS[name](std::move(value), false, var);
         } else {
             throw selection_error("expected a value after '{} !=', found {}", name, peek().as_str());
         }
@@ -244,18 +244,18 @@ Ast Parser::math_selector()  {
     auto index = current_;
     if (match(Token::IDENT)) {
         auto name = previous().ident();
-        if (is_numeric_property(name)) {
+        if (is_numeric_selector(name)) {
             auto var = variable();
             if (match(Token::NUMBER)) {
                 // `name value` shortand, where value is a number
                 auto value = previous().number();
-                auto math_lhs = NUMERIC_PROPERTIES[name](var);
+                auto math_lhs = NUMERIC_SELECTORS[name](var);
                 auto math_rhs = MathAst(new Number(value));
                 auto ast = Ast(new Math(Math::Operator::EQUAL, std::move(math_lhs), std::move(math_rhs)));
                 while (match(Token::NUMBER)) {
                     // handle multiple values 'index 7 8 9 11'
                     value = previous().number();
-                    math_lhs = NUMERIC_PROPERTIES[name](var);
+                    math_lhs = NUMERIC_SELECTORS[name](var);
                     math_rhs = MathAst(new Number(value));
                     auto rhs = Ast(new Math(Math::Operator::EQUAL, std::move(math_lhs), std::move(math_rhs)));
                     ast = Ast(new Or(std::move(ast), std::move(rhs)));
@@ -341,8 +341,9 @@ MathAst Parser::math_value() {
         auto name = previous().ident();
         if (is_numeric_function(name)) {
             return math_function(name);
-        } else if (is_numeric_property(name)) {
-            return math_property(name);
+        } else if (is_numeric_selector(name)) {
+            auto var = variable();
+            return NUMERIC_SELECTORS[name](var);
         } else if (is_numeric_var_function(name)) {
             return math_var_function(name);
         } else {
@@ -397,12 +398,6 @@ MathAst Parser::math_var_function(const std::string& name) {
     }
 
     return function.creator(arguments);
-}
-
-MathAst Parser::math_property(const std::string& name) {
-    assert(is_numeric_property(name));
-    auto var = variable();
-    return NUMERIC_PROPERTIES[name](var);
 }
 
 Variable Parser::variable() {

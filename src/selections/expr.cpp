@@ -469,15 +469,15 @@ std::string OutOfPlane::print() const {
     return fmt::format("out_of_plane(#{}, #{}, #{}, #{})", i_ + 1, j_ + 1, k_ + 1, m_ + 1);
 }
 
-double NumericProperty::eval(const Frame& frame, const Match& match) const {
+double NumericSelector::eval(const Frame& frame, const Match& match) const {
     return this->value(frame, match[argument_]);
 }
 
-optional<double> NumericProperty::optimize() {
+optional<double> NumericSelector::optimize() {
     return nullopt;
 }
 
-std::string NumericProperty::print() const {
+std::string NumericSelector::print() const {
     return fmt::format("{}(#{})", name(), argument_ + 1);
 }
 

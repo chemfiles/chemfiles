@@ -455,17 +455,17 @@ private:
     Variable m_;
 };
 
-/// Abstract base class for numeric properties
-class NumericProperty: public MathExpr {
+/// Abstract base class for numeric selectors
+class NumericSelector: public MathExpr {
 public:
-    NumericProperty(Variable argument): argument_(argument) {}
-    ~NumericProperty() override = default;
+    NumericSelector(Variable argument): argument_(argument) {}
+    ~NumericSelector() override = default;
 
-    NumericProperty(NumericProperty&&) = default;
-    NumericProperty& operator=(NumericProperty&&) = default;
+    NumericSelector(NumericSelector&&) = default;
+    NumericSelector& operator=(NumericSelector&&) = default;
 
-    NumericProperty(const NumericProperty&) = delete;
-    NumericProperty& operator=(const NumericProperty&) = delete;
+    NumericSelector(const NumericSelector&) = delete;
+    NumericSelector& operator=(const NumericSelector&) = delete;
 
     double eval(const Frame& frame, const Match& match) const override final;
     optional<double> optimize() override final;
@@ -481,25 +481,25 @@ private:
 };
 
 /// Select atoms using their index in the frame.
-class Index final: public NumericProperty {
+class Index final: public NumericSelector {
 public:
-    Index(Variable argument): NumericProperty(argument) {}
+    Index(Variable argument): NumericSelector(argument) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
 };
 
 /// Select atoms using their residue id (residue number)
-class Resid final: public NumericProperty {
+class Resid final: public NumericSelector {
 public:
-    Resid(Variable argument): NumericProperty(argument) {}
+    Resid(Variable argument): NumericSelector(argument) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
 };
 
 /// Select atoms using their mass.
-class Mass final: public NumericProperty {
+class Mass final: public NumericSelector {
 public:
-    Mass(Variable argument): NumericProperty(argument) {}
+    Mass(Variable argument): NumericSelector(argument) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
 };
@@ -513,9 +513,9 @@ enum class Coordinate {
 /// Select atoms using their position in space. The selection can be created by
 /// `x <op> <val>`, `y <op> <val>` or `z <op> <val>`, depending on the component
 /// of the position to use.
-class Position final: public NumericProperty {
+class Position final: public NumericSelector {
 public:
-    Position(Variable argument, Coordinate coordinate): NumericProperty(argument), coordinate_(coordinate) {}
+    Position(Variable argument, Coordinate coordinate): NumericSelector(argument), coordinate_(coordinate) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
 private:
@@ -525,9 +525,9 @@ private:
 /// Select atoms using their velocity. The selection can be created by `vx <op>
 /// <val>`, `vy <op> <val>` or `vz <op> <val>`, depending on the component of
 /// the velocity to use.
-class Velocity final: public NumericProperty {
+class Velocity final: public NumericSelector {
 public:
-    Velocity(Variable argument, Coordinate coordinate): NumericProperty(argument), coordinate_(coordinate) {}
+    Velocity(Variable argument, Coordinate coordinate): NumericSelector(argument), coordinate_(coordinate) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
 private:
