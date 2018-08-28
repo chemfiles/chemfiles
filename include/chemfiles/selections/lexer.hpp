@@ -17,13 +17,6 @@ namespace selections {
 using Variable = uint8_t;
 
 /// A token in the selection stream
-///
-/// Various tokens are alowed here:
-///
-/// - binary comparison operators (== != < <= > >=);
-/// - boolean operators (and not or);
-/// - numbers, the scientific notation is alowed;
-/// - identifiers, obeing to the ([a-Z][a-Z_1-9]+) regular expression
 class Token {
 public:
     /// Available token types
@@ -62,10 +55,10 @@ public:
         OR,
         /// "not" token
         NOT,
-        /// Generic identifier
+        /// Identifier, described by the '[a-Z][a-Z_1-9]+' regex
         IDENT,
-        /// Generic identifier, inside double quotes
-        RAW_IDENT,
+        /// Arbitrary string inside double quotes, might contain spaces
+        STRING,
         /// Number
         NUMBER,
         /// "#(\d+)" token
@@ -81,13 +74,11 @@ public:
     Token& operator=(Token&&) = default;
 
     /// Create an identifier token with `data` name
-    static Token ident(std::string data) {
-        return Token(IDENT, std::move(data), 0.0, 0);
-    }
+    static Token ident(std::string data);
 
-    /// Create a raw identifier token with `data` name
-    static Token raw_ident(std::string data) {
-        return Token(RAW_IDENT, std::move(data), 0.0, 0);
+    /// Create a string with some `data` inside
+    static Token string(std::string data) {
+        return Token(STRING, std::move(data), 0.0, 0);
     }
 
     /// Create a number token with `data` value
@@ -103,13 +94,13 @@ public:
     /// Create a token with the given `type`. The type can not be `NUMBER`,
     /// `IDENT` or `VARIABLE`.
     Token(Type type): Token(type, "", 0.0, 0) {
-        if (type == IDENT || type == RAW_IDENT || type == NUMBER || type == VARIABLE) {
+        if (type == IDENT || type == STRING || type == NUMBER || type == VARIABLE) {
             throw Error("invalid Token constructor called. This is a bug.");
         }
     }
 
     /// Get the string which is at the origin of this token
-    std::string str() const;
+    std::string as_str() const;
 
     /// Get the number value associated with this token.
     /// The token type must be `NUMBER`.
@@ -123,8 +114,17 @@ public:
     /// Get the identifier name associated with this token.
     /// The token type must be `IDENT`.
     const std::string& ident() const {
-        if (type_ != IDENT && type_ != RAW_IDENT) {
-            throw Error("can not get an ident value out of this token. This is a bug.");
+        if (type_ != IDENT) {
+            throw Error("can not get an identifier out of this token. This is a bug.");
+        }
+        return ident_;
+    }
+
+    /// Get the identifier name associated with this token.
+    /// The token type must be `IDENT` or `RAW_STRING`.
+    const std::string& string() const {
+        if (type_ != IDENT && type_ != STRING) {
+            throw Error("can not get an string value out of this token. This is a bug.");
         }
         return ident_;
     }
@@ -139,7 +139,10 @@ public:
     }
 
     /// Get the token type of this token
-    Type type() const {return type_;}
+    Type type() const {
+        return type_;
+    }
+
 private:
     Token(Type type, std::string ident, double number, uint8_t variable)
         : type_(type), number_(number), ident_(std::move(ident)), variable_(variable) {}
@@ -170,7 +173,7 @@ private:
 
     Token variable();
     Token ident();
-    Token raw_ident();
+    Token string();
     Token number();
 
     bool match(char c) {
