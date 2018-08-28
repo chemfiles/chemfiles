@@ -38,7 +38,6 @@ private:
     MathAst math_function(const std::string& name);
     // functions of atomic variables (distance(#1, #2), ...)
     MathAst math_var_function(const std::string& name);
-    MathAst math_property(const std::string& name);
 
     // Match multiple variables and the surrounding parenthesis
     std::vector<Variable> variables();
