@@ -25,10 +25,14 @@ class Token {
 public:
     /// Available token types
     enum Type {
-        /// Left parenthesis
+        /// Left parenthesis '('
         LPAREN,
-        /// Right parenthesis
+        /// Right parenthesis ')'
         RPAREN,
+        /// Left bracket '['
+        LBRACKET,
+        /// Right bracket ']'
+        RBRACKET,
         /// Comma
         COMMA,
         /// "==" token

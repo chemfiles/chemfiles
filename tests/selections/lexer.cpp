@@ -4,6 +4,8 @@
 #include <catch.hpp>
 #include "chemfiles/selections/lexer.hpp"
 
+#include <iostream>
+
 using namespace chemfiles;
 using namespace chemfiles::selections;
 
@@ -150,6 +152,27 @@ TEST_CASE("Lexing") {
         CHECK(tokens[1].type() == Token::RPAREN);
     }
 
+    SECTION("Brackets") {
+        CHECK(tokenize("[")[0].type() == Token::LBRACKET);
+        CHECK(tokenize("]")[0].type() == Token::RBRACKET);
+
+        auto tokens = tokenize("[bagyu");
+        CHECK(tokens.size() == 3);
+        CHECK(tokens[0].type() == Token::LBRACKET);
+
+        tokens = tokenize("]qbisbszlh");
+        CHECK(tokens.size() == 3);
+        CHECK(tokens[0].type() == Token::RBRACKET);
+
+        tokens = tokenize("jsqsb[");
+        CHECK(tokens.size() == 3);
+        CHECK(tokens[1].type() == Token::LBRACKET);
+
+        tokens = tokenize("kjpqhiufn]");
+        CHECK(tokens.size() == 3);
+        CHECK(tokens[1].type() == Token::RBRACKET);
+    }
+
     SECTION("Operators") {
         CHECK(tokenize("and")[0].type() == Token::AND);
         CHECK(tokenize("or")[0].type() == Token::OR);
@@ -195,6 +218,18 @@ TEST_CASE("Lexing errors") {
         "_not_an_id",
         "3not_an_id",
         "§", // Not accepted characters
+        "`",
+        "!",
+        "&",
+        "|",
+        "@",
+        "#",
+        "~",
+        "{",
+        "}",
+        "_",
+        "\\",
+        "=",
         "è",
         "à",
         "ü",
@@ -202,12 +237,6 @@ TEST_CASE("Lexing errors") {
         "ζ",
         "Ｒ", // weird full width UTF-8 character
         "形",
-        "`",
-        "!",
-        "&",
-        "|",
-        "#",
-        "@",
         "# 9",
         "9.2.5",
     };

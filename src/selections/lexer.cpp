@@ -55,6 +55,10 @@ std::string Token::as_str() const {
         return "(";
     case Token::RPAREN:
         return ")";
+    case Token::LBRACKET:
+        return "[";
+    case Token::RBRACKET:
+        return "]";
     case Token::COMMA:
         return ",";
     case Token::VARIABLE:
@@ -111,6 +115,12 @@ std::vector<Token> Tokenizer::tokenize() {
             continue;
         } else if (match(')')) {
             tokens.emplace_back(Token(Token::RPAREN));
+            continue;
+        } else if (match('[')) {
+            tokens.emplace_back(Token(Token::LBRACKET));
+            continue;
+        } else if (match(']')) {
+            tokens.emplace_back(Token(Token::RBRACKET));
             continue;
         } else if (match(',')) {
             tokens.emplace_back(Token(Token::COMMA));
