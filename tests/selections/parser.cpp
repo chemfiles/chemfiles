@@ -86,7 +86,7 @@ TEST_CASE("Parsing") {
         CHECK(parse("type goo")->print() == "type(#1) == goo");
         CHECK(parse("type(#3) goo")->print() == "type(#3) == goo");
         CHECK(parse("type != goo")->print() == "type(#1) != goo");
-        CHECK(parse("type == \"45\"")->print() == "type(#1) == 45");
+        CHECK(parse("type == \"45\"")->print() == "type(#1) == \"45\"");
 
         CHECK(parse("type goo")->print() == "type(#1) == goo");
         auto ast = "or -> type(#1) == goo\n   -> type(#1) == foo";
@@ -102,8 +102,8 @@ TEST_CASE("Parsing") {
         CHECK(parse("name goo")->print() == "name(#1) == goo");
         CHECK(parse("name(#3) goo")->print() == "name(#3) == goo");
         CHECK(parse("name != goo")->print() == "name(#1) != goo");
-        CHECK(parse("name \"45\"")->print() == "name(#1) == 45");
-        CHECK(parse("name \"名\"")->print() == "name(#1) == 名");
+        CHECK(parse("name \"45\"")->print() == "name(#1) == \"45\"");
+        CHECK(parse("name \"名\"")->print() == "name(#1) == \"名\"");
 
         CHECK(parse("name goo")->print() == "name(#1) == goo");
         auto ast = "or -> name(#1) == goo\n   -> name(#1) == foo";
@@ -136,7 +136,7 @@ TEST_CASE("Parsing") {
         CHECK(parse("resname goo")->print() == "resname(#1) == goo");
         CHECK(parse("resname(#3) goo")->print() == "resname(#3) == goo");
         CHECK(parse("resname != goo")->print() == "resname(#1) != goo");
-        CHECK(parse("resname \"45\"")->print() == "resname(#1) == 45");
+        CHECK(parse("resname \"45\"")->print() == "resname(#1) == \"45\"");
 
         CHECK(parse("resname goo")->print() == "resname(#1) == goo");
         auto ast = "or -> resname(#1) == goo\n   -> resname(#1) == foo";

@@ -6,6 +6,7 @@
 #include "chemfiles/ErrorFmt.hpp"
 
 #include "chemfiles/selections/expr.hpp"
+#include "chemfiles/selections/lexer.hpp"
 
 using namespace chemfiles;
 using namespace chemfiles::selections;
@@ -185,7 +186,11 @@ bool IsImproper::is_match(const Frame& frame, const Match& match) const {
 
 std::string StringSelector::print(unsigned /*unused*/) const {
     auto op = equals_ ? "==" : "!=";
-    return fmt::format("{}(#{}) {} {}", name(), argument_ + 1, op, value_);
+    if (is_ident(value_)) {
+        return fmt::format("{}(#{}) {} {}", name(), argument_ + 1, op, value_);
+    } else {
+        return fmt::format("{}(#{}) {} \"{}\"", name(), argument_ + 1, op, value_);
+    }
 }
 
 bool StringSelector::is_match(const Frame& frame, const Match& match) const {

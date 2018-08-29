@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <cassert>
 
 #include <chemfiles/exports.hpp>
 #include <chemfiles/Error.hpp>
@@ -15,6 +16,9 @@ namespace chemfiles {
 namespace selections {
 
 using Variable = uint8_t;
+
+/// Check that a given string is a valid identifier
+bool is_ident(const std::string& string);
 
 /// A token in the selection stream
 class Token {
@@ -74,7 +78,10 @@ public:
     Token& operator=(Token&&) = default;
 
     /// Create an identifier token with `data` name
-    static Token ident(std::string data);
+    static Token ident(std::string data) {
+        assert(is_ident(data));
+        return Token(IDENT, std::move(data), 0.0, 0);
+    }
 
     /// Create a string with some `data` inside
     static Token string(std::string data) {
