@@ -199,6 +199,65 @@ TEST_CASE("Parsing") {
         CHECK_THROWS_AS(parse("vx == bar"), SelectionError);
     }
 
+    SECTION("Properties") {
+        SECTION("Boolean") {
+            CHECK(parse("[foo]")->print() == "[foo](#1)");
+            CHECK(parse("[foo](#2)")->print() == "[foo](#2)");
+
+            CHECK(parse("[\"foo\"]")->print() == "[foo](#1)");
+            CHECK(parse("[\"foo bar\"]")->print() == "[\"foo bar\"](#1)");
+
+            auto ast = "or -> [foo](#1)\n   -> [bar](#1)";
+            CHECK(parse("[foo] or [bar]")->print() == ast);
+
+            ast = "and -> [foo](#1)\n    -> [bar](#1)";
+            CHECK(parse("[foo] and [bar]")->print() == ast);
+
+            ast = "not [foo](#1)";
+            CHECK(parse("not [foo]")->print() == ast);
+        }
+
+        SECTION("String") {
+            CHECK(parse("[foo] == bar")->print() == "[foo](#1) == bar");
+            CHECK(parse("[foo] != bar")->print() == "[foo](#1) != bar");
+            CHECK(parse("[foo](#3) == bar")->print() == "[foo](#3) == bar");
+
+            CHECK(parse("[foo] bar")->print() == "[foo](#1) == bar");
+            auto ast = "or -> [foo](#1) == bar\n   -> [foo](#1) == \"fizz foo\"";
+            CHECK(parse("[foo] bar \"fizz foo\"")->print() == ast);
+        }
+
+        SECTION("Numeric") {
+            CHECK(parse("[foo] < 6")->print() == "[foo](#1) < 6");
+            CHECK(parse("[foo] <= 6")->print() == "[foo](#1) <= 6");
+            CHECK(parse("[foo] > 6")->print() == "[foo](#1) > 6");
+            CHECK(parse("[foo] >= 6")->print() == "[foo](#1) >= 6");
+            CHECK(parse("[foo] != 6")->print() == "[foo](#1) != 6");
+            CHECK(parse("[foo] == 4")->print() == "[foo](#1) == 4");
+
+            CHECK(parse("5 - [foo] == 4")->print() == "(5 - [foo](#1)) == 4");
+            CHECK(parse("[foo] + 3 == 4")->print() == "([foo](#1) + 3) == 4");
+
+            CHECK(parse("[foo](#3) == 4")->print() == "[foo](#3) == 4");
+            CHECK(parse("[foo](#4) + 3 == 4")->print() == "([foo](#4) + 3) == 4");
+        }
+
+        SECTION("Error") {
+            CHECK_THROWS_AS(parse("[3] == bar"), SelectionError);
+            CHECK_THROWS_AS(parse("[3 + 5] == bar"), SelectionError);
+            CHECK_THROWS_AS(parse("[] == bar"), SelectionError);
+            CHECK_THROWS_AS(parse("[foo == bar"), SelectionError);
+            CHECK_THROWS_AS(parse("foo] == bar"), SelectionError);
+            CHECK_THROWS_AS(parse("[foo(#1)] == bar"), SelectionError);
+            CHECK_THROWS_AS(parse("[\"foo bar\"(#1)] == bar"), SelectionError);
+
+            CHECK_THROWS_AS(parse("[foo] < bar"), SelectionError);
+            CHECK_THROWS_AS(parse("[foo] <= bar"), SelectionError);
+            CHECK_THROWS_AS(parse("[foo] > bar"), SelectionError);
+            CHECK_THROWS_AS(parse("[foo] >= bar"), SelectionError);
+        }
+    }
+
     SECTION("Multiple selections") {
         auto ast = "and -> mass(#1) < 4\n    -> name(#3) == O";
         CHECK(parse("mass(#1) < 4 and name(#3) O")->print() == ast);

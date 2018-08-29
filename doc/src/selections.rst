@@ -75,6 +75,9 @@ Boolean selectors
 - ``is_improper(i, j, k, m)``: check if atoms i, j, k and m are bonded together
   to form a dihedral angle, *i.e.* that all of i, k, and m are bonded to j. If
   any of i, j, k or m refer to the same atom, this returns false;
+- ``[<property>]``: check if atoms have a boolean property named `'property'`
+  set, and that this property is true. This will return false if the property
+  is not set;
 
 For boolean selectors taking arguments, ``i/j/k/m`` can either be one of the
 atoms currently being matched (``#1 / #2 / #3 / #4``) or another selection
@@ -92,6 +95,9 @@ String properties
   depending on the actual data;
 - ``resname``: gives the residue name. If an atom is not in a residue, this
   return the empty string;
+- ``[<property>]``: gives the value of the string property named `'property'`
+  for the atom. This will return an empty string (`""`) if the property is not
+  set;
 
 Numeric properties
 ------------------
@@ -104,6 +110,8 @@ Most of the numeric properties only apply to a single atom:
 - ``vx``, ``vy`` and ``vz``: gives the atomic velocity in cartesian coordinates;
 - ``resid``: gives the atomic residue index. If an atom is not in a residue,
   this return -1;
+- ``[<property>]``: gives the value of the numeric property named `'property'`
+  for the atom. This will return 0 if the property is not set;
 
 But some properties apply to multiple atoms, and as such are only usable when
 selecting multiple atoms:

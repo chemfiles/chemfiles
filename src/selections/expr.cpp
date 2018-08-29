@@ -11,6 +11,22 @@
 using namespace chemfiles;
 using namespace chemfiles::selections;
 
+static const std::string EMPTY_STRING;
+
+static std::string kind_as_string(Property::Kind kind) {
+    switch (kind) {
+    case Property::BOOL:
+        return "bool";
+    case Property::DOUBLE:
+        return "double";
+    case Property::STRING:
+        return "string";
+    case Property::VECTOR3D:
+        return "Vector3D";
+    }
+    unreachable();
+}
+
 SubSelection::SubSelection(Variable variable): selection_(nullptr), variable_(variable) {}
 
 SubSelection::SubSelection(std::string selection):
@@ -81,6 +97,30 @@ bool None::is_match(const Frame& /*unused*/, const Match& /*unused*/) const {
     return false;
 }
 
+std::string BoolProperty::print(unsigned /*unused*/) const {
+    if (is_ident(property_)) {
+        return fmt::format("[{}](#{})", property_, argument_ + 1);
+    } else {
+        return fmt::format("[\"{}\"](#{})", property_, argument_ + 1);
+    }
+}
+
+bool BoolProperty::is_match(const Frame& frame, const Match& match) const {
+    const auto& property = frame[match[argument_]].get(property_);
+    if (property) {
+        if (property->kind() == Property::BOOL) {
+            return property->as_bool();
+        } else {
+            throw selection_error(
+                "invalid type for property [{}]: expected bool, got {}",
+                property_, kind_as_string(property->kind())
+            );
+        }
+    } else {
+        // No property with the given name
+        return false;
+    }
+}
 
 std::string IsBonded::print(unsigned /*unused*/) const {
     return fmt::format("is_bonded({}, {})", i_.print(), j_ .print());
@@ -197,6 +237,31 @@ bool StringSelector::is_match(const Frame& frame, const Match& match) const {
     return (this->value(frame, match[argument_]) == value_) == equals_;
 }
 
+std::string StringProperty::name() const {
+    if (is_ident(property_)) {
+        return "[" + property_ + "]";
+    } else {
+        return "[\"" + property_ + "\"]";
+    }
+}
+
+const std::string& StringProperty::value(const Frame& frame, size_t i) const {
+    const auto& property = frame[i].get(property_);
+    if (property) {
+        if (property->kind() == Property::STRING) {
+            return property->as_string();
+        } else {
+            throw selection_error(
+                "invalid type for property [{}]: expected string, got {}",
+                property_, kind_as_string(property->kind())
+            );
+        }
+    } else {
+        // No property with the given name
+        return EMPTY_STRING;
+    }
+}
+
 std::string Type::name() const {
     return "type";
 }
@@ -222,7 +287,6 @@ const std::string& Resname::value(const Frame& frame, size_t i) const {
     if (residue) {
         return residue->name();
     } else {
-        static const std::string EMPTY_STRING;
         return EMPTY_STRING;
     }
 }
@@ -484,6 +548,32 @@ optional<double> NumericSelector::optimize() {
 
 std::string NumericSelector::print() const {
     return fmt::format("{}(#{})", name(), argument_ + 1);
+}
+
+std::string NumericProperty::name() const {
+    if (is_ident(property_)) {
+        return "[" + property_ + "]";
+    } else {
+        return "[\"" + property_ + "\"]";
+    }
+}
+
+double NumericProperty::value(const Frame& frame, size_t i) const {
+    const auto& property = frame[i].get(property_);
+    if (property) {
+        if (property->kind() == Property::DOUBLE) {
+            return property->as_double();
+        } else {
+            throw selection_error(
+                "invalid type for property [{}]: expected double, got {}",
+                property_, kind_as_string(property->kind())
+            );
+        }
+    } else {
+        // No property with the given name
+        // return nan so that all comparaison down the line evaluate to false
+        return nan("0");
+    }
 }
 
 std::string Index::name() const {

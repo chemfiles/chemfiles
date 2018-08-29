@@ -153,11 +153,19 @@ Ast Parser::selector() {
         if (match(Token::RPAREN)) {
             return ast;
         } else {
-            throw SelectionError("mismatched parenthesis");
+            throw selection_error("mismatched parenthesis");
         }
     } else if (match(Token::NOT)) {
         auto ast = expression();
         return Ast(new Not(std::move(ast)));
+    } else if (match(Token::LBRACKET)) {
+        auto index = current_ - 1;
+        auto ast = bool_or_string_property();
+        if (ast != nullptr) {
+            return ast;
+        }
+        // Reset state and try to parse it as a numeric property
+        current_ = index;
     } else if (check(Token::IDENT)) {
         auto ident = peek().ident();
         if (is_boolean_selector(ident)) {
@@ -167,9 +175,53 @@ Ast Parser::selector() {
         } else {
             return math_selector();
         }
+    }
+    // If everything else fails, try to parse it as mathematical expression
+    return math_selector();
+}
+
+Ast Parser::bool_or_string_property() {
+    assert(previous().type() == Token::LBRACKET);
+
+    std::string property;
+    if (check(Token::IDENT) || check(Token::STRING)) {
+        property = advance().string();
+        if (!match(Token::RBRACKET)) {
+            throw selection_error("expected brackets after [{}, got {}", property, peek().as_str());
+        }
+    }
+
+    auto var = variable();
+    if (match(Token::IDENT) || match(Token::STRING)) {
+        // `[name] value` shortand, where value is a string
+        auto value = previous().string();
+        auto ast = Ast(new StringProperty(property, std::move(value), true, var));
+        while (match(Token::IDENT) || match(Token::STRING)) {
+            // handle multiple values '[name] H N C O'
+            value = previous().string();
+            auto rhs = Ast(new StringProperty(property, std::move(value), true, var));
+            ast = Ast(new Or(std::move(ast), std::move(rhs)));
+        }
+        return ast;
+    } else if (match(Token::EQUAL)) {
+        if (match(Token::IDENT) || match(Token::STRING)) {
+            auto value = previous().string();
+            return Ast(new StringProperty(property, std::move(value), true, var));
+        } else {
+            return nullptr;
+        }
+    } else if (match(Token::NOT_EQUAL)) {
+        if (match(Token::IDENT) || match(Token::STRING)) {
+            auto value = previous().string();
+            return Ast(new StringProperty(property, std::move(value), false, var));
+        } else {
+            return nullptr;
+        }
+    } else if (finished() || check(Token::AND) || check(Token::OR)) {
+        // Use it as a bool property
+        return Ast(new BoolProperty(property, var));
     } else {
-        // If everything else fails, try to parse it as mathematical expression
-        return math_selector();
+        return nullptr;
     }
 }
 
@@ -347,7 +399,18 @@ MathAst Parser::math_value() {
         } else if (is_numeric_var_function(name)) {
             return math_var_function(name);
         } else {
-            throw selection_error("unexpected identifier '{}'", name);
+            throw selection_error("unexpected identifier '{}' in mathematical expression", name);
+        }
+    } else if (match(Token::LBRACKET)) {
+        if (check(Token::IDENT) || check(Token::STRING)) {
+            auto property = advance().string();
+            if (!match(Token::RBRACKET)) {
+                throw selection_error("expected brackets after [{}, got {}", property, peek().as_str());
+            }
+            auto var = variable();
+            return MathAst(new NumericProperty(std::move(property), var));
+        } else {
+            throw selection_error("expected property name after [, got {}", peek().as_str());
         }
     } else if (match(Token::LPAREN)) {
         auto ast = math_sum();
