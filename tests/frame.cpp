@@ -229,7 +229,7 @@ TEST_CASE("PBC functions") {
     }
 }
 
-TEST_CASE("Property map") {
+TEST_CASE("Properties") {
     auto frame = Frame();
     frame.set("foo", 35);
     frame.set("bar", false);
@@ -240,4 +240,22 @@ TEST_CASE("Property map") {
     frame.set("foo", "test");
     CHECK(frame.get("foo")->as_string() == "test");
     CHECK_FALSE(frame.get("not here"));
+
+    // Iterate over all properties
+    frame.set("buzz", 22);
+    frame.set("fizz", Vector3D(1, 2, 3));
+    for(auto it: frame.properties()) {
+        auto name = it.first;
+        if (name == "bar") {
+            CHECK(it.second.as_bool() == false);
+        } else if (name == "foo") {
+            CHECK(it.second.as_string() == "test");
+        } else if (name == "buzz") {
+            CHECK(it.second.as_double() == 22);
+        } else if (name == "fizz") {
+            CHECK(it.second.as_vector3d() == Vector3D(1, 2, 3));
+        } else {
+            CHECK(false);  // all case should have been covered
+        }
+    }
 }

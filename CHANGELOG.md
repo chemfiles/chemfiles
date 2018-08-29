@@ -39,6 +39,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   `chemfiles.toml` instead of `.chemfilesrc`
 * Added `Trajectory::path` to get the file path used to create a trajectory
 * Renamed `Property::get_kind` to `Property::kind`
+* Added `Atom::properties`; `Frame::properties`; and `Residue::properties` to
+  allow iteration over all the properties in an Atom/Frame/Residue.
 
 ### Changes in supported formats
 
