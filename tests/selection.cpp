@@ -388,6 +388,28 @@ TEST_CASE("Multiple selections") {
 
         CHECK_THROWS_AS(selection.list(frame), SelectionError);
     }
+
+    SECTION("Properties") {
+        auto selection = Selection("[numeric] == 3");
+        CHECK(selection.list(frame) == std::vector<size_t>{0ul});
+
+        selection = Selection("[bool] and all");
+        CHECK(selection.list(frame) == std::vector<size_t>{1ul});
+
+        // No distinction between missing value and false value
+        selection = Selection("not [bool]");
+        CHECK(selection.list(frame) == (std::vector<size_t>{0ul, 2ul, 3ul}));
+
+        selection = Selection("[string] == foo");
+        CHECK(selection.list(frame) == std::vector<size_t>{2ul});
+
+        // No distinction between missing value and false value
+        selection = Selection("[string] != foo");
+        CHECK(selection.list(frame) == (std::vector<size_t>{0ul, 1ul, 3ul}));
+
+        selection = Selection("[\"string space\"] == \"foo bar\"");
+        CHECK(selection.list(frame) == std::vector<size_t>{3ul});
+    }
 }
 
 Frame testing_frame() {
@@ -401,6 +423,13 @@ Frame testing_frame() {
     frame.add_bond(0, 1);
     frame.add_bond(1, 2);
     frame.add_bond(2, 3);
+
+    frame[0].set("numeric", 3);
+    frame[1].set("bool", true);
+    frame[2].set("bool", false);
+    frame[2].set("string", "foo");
+    frame[3].set("string", "bar");
+    frame[3].set("string space", "foo bar");
 
     auto residue = Residue("resime", 3);
     residue.add_atom(2);

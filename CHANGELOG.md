@@ -29,6 +29,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
     * When using numbers as atomic names/types, they must now be inside double
       quotes (`name "45"`). This also allows for more exotic atomic names
       (`name "名"`).
+    * Atomic properties can be checked, using the `[property] == Ow` syntax for
+      string properties, `[property] == 2.3` for numeric properties and
+      `[property]` for boolean properties.
 * There is only one constructor for the `Frame` class: `Frame(UnitCell cell =
   UnitCell())`. The constructor taking a topology can be replaced with calls to
   `Frame::add_atom` and `Frame::add_bond`.

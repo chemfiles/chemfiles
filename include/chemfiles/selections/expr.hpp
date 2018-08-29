@@ -89,6 +89,20 @@ public:
     bool is_match(const Frame& frame, const Match& match) const override;
 };
 
+/// Selection based on boolean properties
+class BoolProperty final: public Selector {
+public:
+    BoolProperty(std::string property, Variable argument):
+        property_(std::move(property)), argument_(argument) {}
+    std::string print(unsigned delta) const override;
+    bool is_match(const Frame& frame, const Match& match) const override;
+
+private:
+    std::string property_;
+    /// Which atom in the candidate match are we checking?
+    Variable argument_;
+};
+
 /// A sub-selection for use in boolean selectors
 class SubSelection {
 public:
@@ -196,6 +210,20 @@ private:
     bool equals_;
     /// Which atom in the candidate match are we checking?
     Variable argument_;
+};
+
+/// Selection based on string properties
+class StringProperty final: public StringSelector {
+public:
+    StringProperty(std::string property, std::string value, bool equals, Variable argument):
+        StringSelector(std::move(value), equals, argument),
+        property_(std::move(property)) {}
+
+    const std::string& value(const Frame& frame, size_t i) const override;
+    std::string name() const override;
+
+private:
+    std::string property_;
 };
 
 /// Select atoms using their type
@@ -479,6 +507,18 @@ private:
     /// Which atom in the candidate match are we checking?
     Variable argument_;
 };
+
+/// Select atoms using a given double property in the frame.
+class NumericProperty final: public NumericSelector {
+public:
+    NumericProperty(std::string property, Variable argument): NumericSelector(argument), property_(std::move(property)) {}
+    std::string name() const override;
+    double value(const Frame& frame, size_t i) const override;
+
+private:
+    std::string property_;
+};
+
 
 /// Select atoms using their index in the frame.
 class Index final: public NumericSelector {

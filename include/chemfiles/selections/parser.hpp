@@ -30,6 +30,11 @@ private:
     Ast string_selector();
     Ast math_selector();
 
+    /// Parse Boolean and string properties, returning nullptr if none of these
+    /// can not be parsed, so that they can be parsed as a mathematical
+    /// expression later
+    Ast bool_or_string_property();
+
     MathAst math_sum();
     MathAst math_product();
     MathAst math_power();
