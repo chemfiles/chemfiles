@@ -32,13 +32,19 @@ static bool is_ident_component(char c) {
     return is_alpha(c) || is_digit(c) || c == '_';
 }
 
-Token Token::ident(std::string data) {
-    assert(!data.empty());
-    assert(is_alpha(data[0]));
-    for (auto c: data) {
-        assert(is_ident_component(c));
+bool chemfiles::selections::is_ident(const std::string& string) {
+    if (string.empty()) {
+        return false;
     }
-    return Token(IDENT, std::move(data), 0.0, 0);
+    if (!is_alpha(string[0])) {
+        return false;
+    }
+    for (auto c: string) {
+        if (!is_ident_component(c)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 std::string Token::as_str() const {
