@@ -84,6 +84,15 @@ public:
     const_iterator cbegin() const {return atoms_.cbegin();}
     const_iterator cend() const {return atoms_.cend();}
 
+    /// Get the map of properties asociated with this residue. This map might be
+    /// iterated over to list the properties of the residue, or directly
+    /// accessed.
+    ///
+    /// @example{tests/doc/frame/properties.cpp}
+    const property_map& properties() const {
+        return properties_;
+    }
+
     /// Set an arbitrary `Property` for this residue with the given `name` and
     /// `value`. If a property with this name already exist, it is replaced with
     /// the new value.

@@ -201,8 +201,10 @@ inline bool operator!=(const Property& lhs, const Property& rhs) {
 }
 
 /// A property map for inclusion in a Frame or an Atom.
-class property_map final {
+class CHFL_EXPORT property_map final {
 public:
+    using iterator = std::unordered_map<std::string, Property>::const_iterator;
+
     property_map() = default;
 
     /// Set an arbitrary property with the given `name` and `value`. If a
@@ -212,6 +214,16 @@ public:
 
     /// Get the property with the given `name` if it exists.
     optional<const Property&> get(const std::string& name) const;
+
+    /// Get an iterator to the first property in the property map
+    iterator begin() const {
+        return data_.begin();
+    }
+
+    /// Get an iterator to the end of properties
+    iterator end() const {
+        return data_.end();
+    }
 
 private:
     std::unordered_map<std::string, Property> data_;

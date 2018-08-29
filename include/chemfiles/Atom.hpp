@@ -169,6 +169,14 @@ public:
     /// @example{tests/doc/atom/atomic_number.cpp}
     optional<uint64_t> atomic_number() const;
 
+    /// Get the map of properties asociated with this atom. This map might be
+    /// iterated over to list the properties of the atom, or directly accessed.
+    ///
+    /// @example{tests/doc/atom/properties.cpp}
+    const property_map& properties() const {
+        return properties_;
+    }
+
     /// Set an arbitrary `Property` for this atom with the given `name` and
     /// `value`. If a property with this name already exist, it is replaced with
     /// the new value.

@@ -342,6 +342,14 @@ public:
     /// @example{tests/doc/frame/out_of_plane.cpp}
     double out_of_plane(size_t i, size_t j, size_t k, size_t m) const;
 
+    /// Get the map of properties asociated with this frame. This map might be
+    /// iterated over to list the properties of the frame, or directly accessed.
+    ///
+    /// @example{tests/doc/frame/properties.cpp}
+    const property_map& properties() const {
+        return properties_;
+    }
+
     /// Set an arbitrary property for this frame with the given `name` and
     /// `value`. If a property with this name already exist, it is silently
     /// replaced with the new value.
