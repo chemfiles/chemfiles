@@ -88,6 +88,10 @@ TEST_CASE("Parsing") {
         CHECK(parse("type != goo")->print() == "type(#1) != goo");
         CHECK(parse("type == \"45\"")->print() == "type(#1) == 45");
 
+        CHECK(parse("type goo")->print() == "type(#1) == goo");
+        auto ast = "or -> type(#1) == goo\n   -> type(#1) == foo";
+        CHECK(parse("type goo foo")->print() == ast);
+
         CHECK_THROWS_AS(parse("type < bar"), SelectionError);
         CHECK_THROWS_AS(parse("type >= bar"), SelectionError);
     }
@@ -100,6 +104,10 @@ TEST_CASE("Parsing") {
         CHECK(parse("name != goo")->print() == "name(#1) != goo");
         CHECK(parse("name \"45\"")->print() == "name(#1) == 45");
         CHECK(parse("name \"名\"")->print() == "name(#1) == 名");
+
+        CHECK(parse("name goo")->print() == "name(#1) == goo");
+        auto ast = "or -> name(#1) == goo\n   -> name(#1) == foo";
+        CHECK(parse("name goo foo")->print() == ast);
 
         CHECK_THROWS_AS(parse("name < bar"), SelectionError);
         CHECK_THROWS_AS(parse("name >= bar"), SelectionError);
@@ -115,6 +123,10 @@ TEST_CASE("Parsing") {
         CHECK(parse("index != 12")->print() == "index(#1) != 12");
         CHECK(parse("index >= 42.3")->print() == "index(#1) >= 42.300000");
 
+        CHECK(parse("index 4")->print() == "index(#1) == 4");
+        auto ast = "or -> index(#1) == 4\n   -> index(#1) == 3";
+        CHECK(parse("index 4 3")->print() == ast);
+
         CHECK_THROWS_AS(parse("index == bar"), SelectionError);
     }
 
@@ -125,6 +137,10 @@ TEST_CASE("Parsing") {
         CHECK(parse("resname(#3) goo")->print() == "resname(#3) == goo");
         CHECK(parse("resname != goo")->print() == "resname(#1) != goo");
         CHECK(parse("resname \"45\"")->print() == "resname(#1) == 45");
+
+        CHECK(parse("resname goo")->print() == "resname(#1) == goo");
+        auto ast = "or -> resname(#1) == goo\n   -> resname(#1) == foo";
+        CHECK(parse("resname goo foo")->print() == ast);
 
         CHECK_THROWS_AS(parse("resname < bar"), SelectionError);
         CHECK_THROWS_AS(parse("resname >= bar"), SelectionError);
@@ -140,6 +156,10 @@ TEST_CASE("Parsing") {
         CHECK(parse("resid != 12")->print() == "resid(#1) != 12");
         CHECK(parse("resid >= 42.3")->print() == "resid(#1) >= 42.300000");
 
+        CHECK(parse("resid 4")->print() == "resid(#1) == 4");
+        auto ast = "or -> resid(#1) == 4\n   -> resid(#1) == 3";
+        CHECK(parse("resid 4 3")->print() == ast);
+
         CHECK_THROWS_AS(parse("resid == bar"), SelectionError);
     }
 
@@ -151,6 +171,10 @@ TEST_CASE("Parsing") {
 
         CHECK(parse("mass <= 42")->print() == "mass(#1) <= 42");
         CHECK(parse("mass != 12")->print() == "mass(#1) != 12");
+
+        CHECK(parse("mass 4")->print() == "mass(#1) == 4");
+        auto ast = "or -> mass(#1) == 4\n   -> mass(#1) == 3";
+        CHECK(parse("mass 4 3")->print() == ast);
 
         CHECK_THROWS_AS(parse("mass <= bar"), SelectionError);
     }
@@ -164,6 +188,10 @@ TEST_CASE("Parsing") {
         CHECK(parse("vx == 4")->print() == "vx(#1) == 4");
         CHECK(parse("vy < 4")->print() == "vy(#1) < 4");
         CHECK(parse("vz >= 4")->print() == "vz(#1) >= 4");
+
+        CHECK(parse("x 4")->print() == "x(#1) == 4");
+        auto ast = "or -> x(#1) == 4\n   -> x(#1) == 3";
+        CHECK(parse("x 4 3")->print() == ast);
 
         CHECK_THROWS_AS(parse("x <= bar"), SelectionError);
         CHECK_THROWS_AS(parse("vy > bar"), SelectionError);

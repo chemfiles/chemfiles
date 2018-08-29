@@ -226,17 +226,17 @@ Ast Parser::string_selector() {
             auto value = previous().string();
             return STRING_SELECTORS[name](std::move(value), true, var);
         } else {
-            throw selection_error("expected a value after '{} ==', found {}", name, peek().as_str());
+            throw selection_error("expected a string value after '{} ==', found {}", name, peek().as_str());
         }
     } else if (match(Token::NOT_EQUAL)) {
         if (match(Token::IDENT) || match(Token::STRING)) {
             auto value = previous().string();
             return STRING_SELECTORS[name](std::move(value), false, var);
         } else {
-            throw selection_error("expected a value after '{} !=', found {}", name, peek().as_str());
+            throw selection_error("expected a string value after '{} !=', found {}", name, peek().as_str());
         }
     } else {
-        throw selection_error("expected one of '!=', '==' or a value after {}, found {}", name, peek().as_str());
+        throw selection_error("expected one of '!=', '==' or a string value after {}, found {}", name, peek().as_str());
     }
 }
 
