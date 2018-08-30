@@ -30,6 +30,19 @@ def documented_functions():
     return functions
 
 
+def functions_in_outline():
+    functions = ["chfl_last_error", "chfl_clear_errors", "chfl_version"]
+    DOCS = os.path.join(ROOT, "doc", "src", "capi")
+    for (root, _, paths) in os.walk(DOCS):
+        for path in paths:
+            with open(os.path.join(root, path)) as fd:
+                for line in fd:
+                    if ":cpp:func:" in line:
+                        name = line.split("`")[1]
+                        functions.append(name)
+    return functions
+
+
 def function_name(line):
     assert(line.startswith("CHFL_EXPORT"))
     splitted = line.split()
@@ -65,6 +78,9 @@ def check_examples():
                 for line in fd:
                     if "@example" in line and in_doc:
                         example_found = True
+                        path = line.split('{')[1].split('}')[0]
+                        if not os.path.exists(os.path.join(ROOT, path)):
+                            error("Missing example file at {}".format(path))
 
                     if line.startswith("///"):
                         in_doc = True
@@ -78,9 +94,12 @@ def check_examples():
 
 if __name__ == '__main__':
     docs = documented_functions()
+    outline = functions_in_outline()
     for function in all_functions():
         if function not in docs:
             error("Missing documentation for {}".format(function))
+        if function not in outline:
+            error("Missing outline for {}".format(function))
     check_examples()
 
     # C and fortran standard only allow extern names up to 31 characters

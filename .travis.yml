@@ -96,7 +96,7 @@ script:
   - ctest -j2 --output-on-failure
   - cd $TRAVIS_BUILD_DIR
   # Run various additional checks
-  - ./scripts/ci/check-capi.py
+  - ./scripts/ci/check-capi-docs.py
   - ./scripts/ci/check-public-headers.py
   # Build docs
   - |

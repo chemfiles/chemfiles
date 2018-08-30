@@ -18,3 +18,8 @@ code {
     color: inherit;
     background-color: rgba(0, 0, 0, 0.15);
 }
+
+hr.docutils {
+    border: 1px solid;
+    width: 50%
+}

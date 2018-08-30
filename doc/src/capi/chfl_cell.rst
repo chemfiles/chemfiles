@@ -5,6 +5,27 @@
 
 .. doxygentypedef:: CHFL_CELL
 
+.. only:: html
+
+    Here is the full list of functions acting on :cpp:type:`CHFL_CELL`:
+
+    - :cpp:func:`chfl_cell`
+    - :cpp:func:`chfl_cell_triclinic`
+    - :cpp:func:`chfl_cell_from_frame`
+    - :cpp:func:`chfl_cell_copy`
+    - :cpp:func:`chfl_cell_volume`
+    - :cpp:func:`chfl_cell_lengths`
+    - :cpp:func:`chfl_cell_set_lengths`
+    - :cpp:func:`chfl_cell_angles`
+    - :cpp:func:`chfl_cell_set_angles`
+    - :cpp:func:`chfl_cell_matrix`
+    - :cpp:func:`chfl_cell_shape`
+    - :cpp:func:`chfl_cell_set_shape`
+    - :cpp:func:`chfl_cell_wrap`
+    - :cpp:func:`chfl_cell_free`
+
+    --------------------------------------------------------------------
+
 .. doxygenfunction:: chfl_cell
 
 .. doxygenfunction:: chfl_cell_triclinic
