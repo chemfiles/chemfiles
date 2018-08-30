@@ -174,6 +174,32 @@ extern "C" chfl_status chfl_atom_atomic_number(const CHFL_ATOM* const atom, uint
     )
 }
 
+extern "C" chfl_status chfl_atom_properties_count(const CHFL_ATOM* const atom, uint64_t* const count) {
+    CHECK_POINTER(atom);
+    CHECK_POINTER(count);
+    CHFL_ERROR_CATCH(
+        *count = static_cast<uint64_t>(atom->properties().size());
+    )
+}
+
+extern "C" chfl_status chfl_atom_list_properties(const CHFL_ATOM* const atom, const char* names[], uint64_t count) {
+    CHECK_POINTER(atom);
+    CHECK_POINTER(names);
+    CHFL_ERROR_CATCH(
+        auto& properties = atom->properties();
+        if (checked_cast(count) != properties.size()) {
+            set_last_error("wrong data size in function 'chfl_atom_list_properties'.");
+            return CHFL_MEMORY_ERROR;
+        }
+
+        size_t i = 0;
+        for (auto& it: properties) {
+            names[i] = it.first.c_str();
+            i++;
+        }
+    )
+}
+
 extern "C" chfl_status chfl_atom_set_property(CHFL_ATOM* const atom, const char* name, const CHFL_PROPERTY* const property) {
     CHECK_POINTER(atom);
     CHECK_POINTER(name);

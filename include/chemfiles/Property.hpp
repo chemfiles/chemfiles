@@ -215,6 +215,11 @@ public:
     /// Get the property with the given `name` if it exists.
     optional<const Property&> get(const std::string& name) const;
 
+    /// Get the number of properties in this property map
+    size_t size() const {
+        return data_.size();
+    }
+
     /// Get an iterator to the first property in the property map
     iterator begin() const {
         return data_.begin();

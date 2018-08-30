@@ -55,4 +55,8 @@
 
 .. doxygenfunction:: chfl_frame_get_property
 
+.. doxygenfunction:: chfl_frame_properties_count
+
+.. doxygenfunction:: chfl_frame_list_properties
+
 .. doxygenfunction:: chfl_frame_free

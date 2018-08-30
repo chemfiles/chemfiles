@@ -194,6 +194,32 @@ extern "C" chfl_status chfl_frame_out_of_plane(const CHFL_FRAME* const frame, ui
     )
 }
 
+extern "C" chfl_status chfl_frame_properties_count(const CHFL_FRAME* const frame, uint64_t* const count) {
+    CHECK_POINTER(frame);
+    CHECK_POINTER(count);
+    CHFL_ERROR_CATCH(
+        *count = static_cast<uint64_t>(frame->properties().size());
+    )
+}
+
+extern "C" chfl_status chfl_frame_list_properties(const CHFL_FRAME* const frame, const char* names[], uint64_t count) {
+    CHECK_POINTER(frame);
+    CHECK_POINTER(names);
+    CHFL_ERROR_CATCH(
+        auto& properties = frame->properties();
+        if (checked_cast(count) != properties.size()) {
+            set_last_error("wrong data size in function 'chfl_frame_list_properties'.");
+            return CHFL_MEMORY_ERROR;
+        }
+
+        size_t i = 0;
+        for (auto& it: properties) {
+            names[i] = it.first.c_str();
+            i++;
+        }
+    )
+}
+
 extern "C" chfl_status chfl_frame_set_property(CHFL_FRAME* const frame, const char* name, const CHFL_PROPERTY* const property) {
     CHECK_POINTER(frame);
     CHECK_POINTER(name);

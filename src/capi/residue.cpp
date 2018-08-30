@@ -135,6 +135,32 @@ extern "C" chfl_status chfl_residue_contains(const CHFL_RESIDUE* const residue, 
     )
 }
 
+extern "C" chfl_status chfl_residue_properties_count(const CHFL_RESIDUE* const residue, uint64_t* const count) {
+    CHECK_POINTER(residue);
+    CHECK_POINTER(count);
+    CHFL_ERROR_CATCH(
+        *count = static_cast<uint64_t>(residue->properties().size());
+    )
+}
+
+extern "C" chfl_status chfl_residue_list_properties(const CHFL_RESIDUE* const residue, const char* names[], uint64_t count) {
+    CHECK_POINTER(residue);
+    CHECK_POINTER(names);
+    CHFL_ERROR_CATCH(
+        auto& properties = residue->properties();
+        if (checked_cast(count) != properties.size()) {
+            set_last_error("wrong data size in function 'chfl_frame_list_properties'.");
+            return CHFL_MEMORY_ERROR;
+        }
+
+        size_t i = 0;
+        for (auto& it: properties) {
+            names[i] = it.first.c_str();
+            i++;
+        }
+    )
+}
+
 extern "C" chfl_status chfl_residue_set_property(CHFL_RESIDUE* const residue, const char* name, const CHFL_PROPERTY* const property) {
     CHECK_POINTER(residue);
     CHECK_POINTER(name);

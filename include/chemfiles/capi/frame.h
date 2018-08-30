@@ -235,6 +235,31 @@ CHFL_EXPORT chfl_status chfl_frame_out_of_plane(
     const CHFL_FRAME* frame, uint64_t i, uint64_t j, uint64_t k, uint64_t m, double* distance
 );
 
+/// Get the number of properties associated with this `frame` in `count`.
+///
+/// @example{tests/capi/doc/chfl_frame/properties_count.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_frame_properties_count(
+    const CHFL_FRAME* frame, uint64_t* count
+);
+
+/// Get the names of all properties of this `frame` in the pre-allocated array
+/// `names` of size `count`.
+///
+/// `names` size must be passed in the `count` parameter, and be equal to the
+/// result of `chfl_frame_properties_count`.
+///
+/// The pointers in `names` are only valid until a new property is added to the
+/// frame with `chfl_frame_set_property`.
+///
+/// @example{tests/capi/doc/chfl_frame/list_properties.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_frame_list_properties(
+    const CHFL_FRAME* frame, const char* names[], uint64_t count
+);
+
 /// Add a new `property` with the given `name` to this `frame`.
 ///
 /// If a property with the same name already exists, this function override the
