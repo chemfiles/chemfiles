@@ -95,13 +95,13 @@ CHFL_EXPORT const CHFL_RESIDUE* chfl_residue_for_atom(
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_RESIDUE* chfl_residue_copy(const CHFL_RESIDUE* residue);
 
-/// Get the number of atoms in a `residue` in the integer pointed to by `size`.
+/// Get the number of atoms in a `residue` in the integer pointed to by `count`.
 ///
 /// @example{tests/capi/doc/chfl_residue/atoms_count.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_atoms_count(
-    const CHFL_RESIDUE* residue, uint64_t* size
+    const CHFL_RESIDUE* residue, uint64_t* count
 );
 
 /// Get the list of atoms in the `residue` in the pre-allocated array `atoms`

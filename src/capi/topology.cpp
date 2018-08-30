@@ -45,11 +45,11 @@ error:
     return nullptr;
 }
 
-extern "C" chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const topology, uint64_t *size) {
+extern "C" chfl_status chfl_topology_atoms_count(const CHFL_TOPOLOGY* const topology, uint64_t* const count) {
     CHECK_POINTER(topology);
-    CHECK_POINTER(size);
+    CHECK_POINTER(count);
     CHFL_ERROR_CATCH(
-        *size = topology->size();
+        *count = static_cast<uint64_t>(topology->size());
     )
 }
 
@@ -75,68 +75,68 @@ extern "C" chfl_status chfl_topology_remove(CHFL_TOPOLOGY* const topology, uint6
     )
 }
 
-extern "C" chfl_status chfl_topology_bonds_count(const CHFL_TOPOLOGY* const topology, uint64_t* nbonds) {
+extern "C" chfl_status chfl_topology_bonds_count(const CHFL_TOPOLOGY* const topology, uint64_t* const count) {
     CHECK_POINTER(topology);
-    CHECK_POINTER(nbonds);
+    CHECK_POINTER(count);
     CHFL_ERROR_CATCH(
-        *nbonds = topology->bonds().size();
+        *count = static_cast<uint64_t>(topology->bonds().size());
     )
 }
 
-extern "C" chfl_status chfl_topology_angles_count(const CHFL_TOPOLOGY* const topology, uint64_t* nangles) {
+extern "C" chfl_status chfl_topology_angles_count(const CHFL_TOPOLOGY* const topology, uint64_t* const count) {
     CHECK_POINTER(topology);
-    CHECK_POINTER(nangles);
+    CHECK_POINTER(count);
     CHFL_ERROR_CATCH(
-        *nangles = topology->angles().size();
+        *count = static_cast<uint64_t>(topology->angles().size());
     )
 }
 
-extern "C" chfl_status chfl_topology_dihedrals_count(const CHFL_TOPOLOGY* const topology, uint64_t* ndihedrals) {
+extern "C" chfl_status chfl_topology_dihedrals_count(const CHFL_TOPOLOGY* const topology, uint64_t* const count) {
     CHECK_POINTER(topology);
-    CHECK_POINTER(ndihedrals);
+    CHECK_POINTER(count);
     CHFL_ERROR_CATCH(
-        *ndihedrals = topology->dihedrals().size();
+        *count = static_cast<uint64_t>(topology->dihedrals().size());
     )
 }
 
-extern "C" chfl_status chfl_topology_impropers_count(const CHFL_TOPOLOGY* const topology, uint64_t* nimpropers) {
+extern "C" chfl_status chfl_topology_impropers_count(const CHFL_TOPOLOGY* const topology, uint64_t* const count) {
     CHECK_POINTER(topology);
-    CHECK_POINTER(nimpropers);
+    CHECK_POINTER(count);
     CHFL_ERROR_CATCH(
-        *nimpropers = topology->impropers().size();
+        *count = static_cast<uint64_t>(topology->impropers().size());
     )
 }
 
-extern "C" chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[2], uint64_t nbonds) {
+extern "C" chfl_status chfl_topology_bonds(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[2], uint64_t count) {
     CHECK_POINTER(topology);
     CHECK_POINTER(data);
 
     CHFL_ERROR_CATCH(
-        if (nbonds != topology->bonds().size()) {
+        auto& bonds = topology->bonds();
+        if (checked_cast(count) != bonds.size()) {
             set_last_error("wrong data size in function 'chfl_topology_bonds'.");
             return CHFL_MEMORY_ERROR;
         }
 
-        auto& bonds = topology->bonds();
-        for (size_t i=0; i<nbonds; i++) {
+        for (size_t i=0; i<bonds.size(); i++) {
             data[i][0] = static_cast<uint64_t>(bonds[i][0]);
             data[i][1] = static_cast<uint64_t>(bonds[i][1]);
         }
     )
 }
 
-extern "C" chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[3], uint64_t nangles) {
+extern "C" chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[3], uint64_t count) {
     CHECK_POINTER(topology);
     CHECK_POINTER(data);
 
     CHFL_ERROR_CATCH(
-        if (nangles != topology->angles().size()) {
+        auto& angles = topology->angles();
+        if (checked_cast(count) != angles.size()) {
             set_last_error("wrong data size in function 'chfl_topology_angles'.");
             return CHFL_MEMORY_ERROR;
         }
 
-        auto& angles = topology->angles();
-        for (size_t i=0; i<nangles; i++) {
+        for (size_t i=0; i<angles.size(); i++) {
             data[i][0] = static_cast<uint64_t>(angles[i][0]);
             data[i][1] = static_cast<uint64_t>(angles[i][1]);
             data[i][2] = static_cast<uint64_t>(angles[i][2]);
@@ -144,18 +144,18 @@ extern "C" chfl_status chfl_topology_angles(const CHFL_TOPOLOGY* const topology,
     )
 }
 
-extern "C" chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t ndihedrals) {
+extern "C" chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t count) {
     CHECK_POINTER(topology);
     CHECK_POINTER(data);
 
     CHFL_ERROR_CATCH(
-        if (ndihedrals != topology->dihedrals().size()) {
+        auto& dihedrals = topology->dihedrals();
+        if (checked_cast(count) != dihedrals.size()) {
             set_last_error("wrong data size in function 'chfl_topology_dihedrals'.");
             return CHFL_MEMORY_ERROR;
         }
 
-        auto& dihedrals = topology->dihedrals();
-        for (size_t i=0; i<ndihedrals; i++) {
+        for (size_t i=0; i<dihedrals.size(); i++) {
             data[i][0] = static_cast<uint64_t>(dihedrals[i][0]);
             data[i][1] = static_cast<uint64_t>(dihedrals[i][1]);
             data[i][2] = static_cast<uint64_t>(dihedrals[i][2]);
@@ -164,18 +164,18 @@ extern "C" chfl_status chfl_topology_dihedrals(const CHFL_TOPOLOGY* const topolo
     )
 }
 
-extern "C" chfl_status chfl_topology_impropers(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t nimpropers) {
+extern "C" chfl_status chfl_topology_impropers(const CHFL_TOPOLOGY* const topology, uint64_t (*data)[4], uint64_t count) {
     CHECK_POINTER(topology);
     CHECK_POINTER(data);
 
     CHFL_ERROR_CATCH(
-        if (nimpropers != topology->impropers().size()) {
+        auto& impropers = topology->impropers();
+        if (checked_cast(count) != impropers.size()) {
             set_last_error("wrong data size in function 'chfl_topology_impropers'.");
             return CHFL_MEMORY_ERROR;
         }
 
-        auto& impropers = topology->impropers();
-        for (size_t i=0; i<nimpropers; i++) {
+        for (size_t i=0; i<impropers.size(); i++) {
             data[i][0] = static_cast<uint64_t>(impropers[i][0]);
             data[i][1] = static_cast<uint64_t>(impropers[i][1]);
             data[i][2] = static_cast<uint64_t>(impropers[i][2]);
@@ -198,11 +198,11 @@ extern "C" chfl_status chfl_topology_remove_bond(CHFL_TOPOLOGY* const topology, 
     )
 }
 
-extern "C" chfl_status chfl_topology_residues_count(const CHFL_TOPOLOGY* const topology, uint64_t* residues) {
+extern "C" chfl_status chfl_topology_residues_count(const CHFL_TOPOLOGY* const topology, uint64_t* const count) {
     CHECK_POINTER(topology);
-    CHECK_POINTER(residues);
+    CHECK_POINTER(count);
     CHFL_ERROR_CATCH(
-        *residues = topology->residues().size();
+        *count = static_cast<uint64_t>(topology->residues().size());
     )
 }
 

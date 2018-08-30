@@ -17,7 +17,9 @@ namespace chemfiles {
 void set_last_error(const std::string& message);
 
 inline size_t checked_cast(uint64_t value) {
-    if (static_cast<uint64_t>(value) > static_cast<uint64_t>(SIZE_MAX)) {
+    // Cast SIZE_MAX to uint64_t to be able to do the comparaison, even on
+    // 32-bits systems
+    if (value > static_cast<uint64_t>(SIZE_MAX)) {
         throw chemfiles::Error("got a value too big to be represented by a size_t on this system");
     }
     return static_cast<size_t>(value);
@@ -44,7 +46,7 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
 
 #define CHECK_POINTER(ptr)                                                     \
     do {                                                                       \
-        if ((((((((((ptr))))))))) == nullptr) {                                                  \
+        if (ptr == nullptr) {                                                  \
             std::string message = fmt::format(                                 \
                 "Parameter '{}' cannot be NULL in {}", #ptr, __func__          \
             );                                                                 \
@@ -56,7 +58,7 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
 
 #define CHECK_POINTER_GOTO(ptr)                                                \
     do {                                                                       \
-        if ((((((((((ptr))))))))) == nullptr) {                                                  \
+        if (ptr == nullptr) {                                                  \
             std::string message = fmt::format(                                 \
                 "Parameter '{}' cannot be NULL in {}", #ptr, __func__          \
             );                                                                 \

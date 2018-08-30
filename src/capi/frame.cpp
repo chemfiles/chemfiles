@@ -31,11 +31,11 @@ error:
     return nullptr;
 }
 
-extern "C" chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame, uint64_t *size) {
+extern "C" chfl_status chfl_frame_atoms_count(const CHFL_FRAME* const frame, uint64_t* const count) {
     CHECK_POINTER(frame);
-    CHECK_POINTER(size);
+    CHECK_POINTER(count);
     CHFL_ERROR_CATCH(
-        *size = frame->size();
+        *count = static_cast<uint64_t>(frame->size());
     )
 }
 
