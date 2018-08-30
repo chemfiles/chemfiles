@@ -74,19 +74,19 @@ error:
     return nullptr;
 }
 
-extern "C" chfl_status chfl_residue_atoms_count(const CHFL_RESIDUE* const residue, uint64_t* size) {
+extern "C" chfl_status chfl_residue_atoms_count(const CHFL_RESIDUE* const residue, uint64_t* const count) {
     CHECK_POINTER(residue);
-    CHECK_POINTER(size);
+    CHECK_POINTER(count);
     CHFL_ERROR_CATCH(
-        *size = residue->size();
+        *count = static_cast<uint64_t>(residue->size());
     )
 }
 
-extern "C" chfl_status chfl_residue_atoms(const CHFL_RESIDUE* const residue, uint64_t atoms[], uint64_t natoms) {
+extern "C" chfl_status chfl_residue_atoms(const CHFL_RESIDUE* const residue, uint64_t atoms[], uint64_t count) {
     CHECK_POINTER(residue);
     CHECK_POINTER(atoms);
     CHFL_ERROR_CATCH(
-        if (natoms != residue->size()) {
+        if (checked_cast(count) != residue->size()) {
             set_last_error("wrong data size in function 'chfl_residue_atoms'.");
             return CHFL_MEMORY_ERROR;
         }

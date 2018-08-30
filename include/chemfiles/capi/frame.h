@@ -30,13 +30,13 @@ CHFL_EXPORT CHFL_FRAME* chfl_frame(void);
 CHFL_EXPORT CHFL_FRAME* chfl_frame_copy(const CHFL_FRAME* frame);
 
 /// Get the current number of atoms in a `frame` in the integer pointed to by
-/// `size`
+/// `count`
 ///
 /// @example{tests/capi/doc/chfl_frame/atoms_count.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_frame_atoms_count(
-    const CHFL_FRAME* frame, uint64_t* size
+    const CHFL_FRAME* frame, uint64_t* count
 );
 
 /// Get a pointer to the positions array from a `frame`.
