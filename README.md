@@ -120,7 +120,7 @@ Chemfiles can also read but not (yet) write files in the following formats:
 - Molden files;
 - MacroMolecular Transmission Format (MMTF) files;
 
-See the [issue list](https://github.com/chemfiles/chemfiles/labels/New%20Format)
+See the [issue list](https://github.com/chemfiles/chemfiles/labels/A-formats)
 for planned formats. If you need another format, open a new issue with a link to
 the format definition, or — even better — write the code and
 [contribute](Contributing.md) it!

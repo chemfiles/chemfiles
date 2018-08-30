@@ -1,4 +1,12 @@
-# Area of contributions
+# Contributing to chemfiles
+
+:+1::tada: First off, thanks for taking the time to contribute to chemfiles! :tada::+1:
+
+If you want to contribute but feel a bit lost, do not hesitate to
+[contact][Gitter] us and ask your questions! We will happily mentor you through
+your first contributions.
+
+## Area of contributions
 
 The first and best way to contribute to chemfiles is to use it and advertise it
 to other potential users. Other than that, you can help with:
@@ -15,10 +23,10 @@ Github pull request (have a look [here][PR] for Github model of pull request);
 or you can send patches by email at luthaf@luthaf.fr.
 
 If you want to work on the code and pick something easy to get started, have a
-look at the [easy level issues][L-Easy].
+look at the [easy issues][easy-issues].
 
 
-# Bug reports and feature requests
+## Bug reports and feature requests
 
 Bug and feature requests should be reported as [Github issue][issue]. For bugs,
 you should provide information so that we can reproduce it: what did you try?
@@ -28,7 +36,7 @@ snippet or input file with your bug report.
 If you want to add a new feature to chemfiles, please create an [issue] so that
 we can discuss it, and you have more chances to see your changes incorporated.
 
-## Contribution check-list
+### Code contribution check-list
 
 Every item in this list is explained in the next section
 
@@ -44,7 +52,7 @@ Every item in this list is explained in the next section
 - [ ] Have your code merged in chemfiles
 - [ ] Celebrate! :tada: :cake: :tada:
 
-## Contribution tutorial
+### Contribution tutorial
 
 In this small tutorial, you should replace `<angle brackets>` as needed. If
 anything is unclear, please [ask][Gitter] for clarifications! There are no dumb
@@ -91,6 +99,6 @@ git push -u origin <new-branch>
 
 [Gitter]: https://gitter.im/chemfiles/chemfiles
 [PR]: https://help.github.com/articles/using-pull-requests/
-[L-Easy]: https://github.com/chemfiles/chemfiles/labels/L-Easy
+[easy-issues]: https://github.com/chemfiles/chemfiles/labels/Help%20wanted
 [fork]: https://help.github.com/articles/fork-a-repo/
 [issue]: https://github.com/chemfiles/chemfiles/issues/new
