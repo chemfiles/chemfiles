@@ -31,4 +31,8 @@
 
 .. doxygenfunction:: chfl_residue_get_property
 
+.. doxygenfunction:: chfl_residue_properties_count
+
+.. doxygenfunction:: chfl_residue_list_properties
+
 .. doxygenfunction:: chfl_residue_free

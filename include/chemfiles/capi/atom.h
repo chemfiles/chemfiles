@@ -202,6 +202,31 @@ CHFL_EXPORT chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* atom, double*
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_atomic_number(const CHFL_ATOM* atom, uint64_t* number);
 
+/// Get the number of properties associated with this `atom` in `count`.
+///
+/// @example{tests/capi/doc/chfl_atom/properties_count.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_atom_properties_count(
+    const CHFL_ATOM* atom, uint64_t* count
+);
+
+/// Get the names of all properties of this `atom` in the pre-allocated array
+/// `names` of size `count`.
+///
+/// `names` size must be passed in the `count` parameter, and be equal to the
+/// result of `chfl_atom_properties_count`.
+///
+/// The pointers in `names` are only valid until a new property is added to the
+/// atom with `chfl_atom_set_property`.
+///
+/// @example{tests/capi/doc/chfl_atom/list_properties.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_atom_list_properties(
+    const CHFL_ATOM* atom, const char* names[], uint64_t count
+);
+
 /// Add a new `property` with the given `name` to this `atom`.
 ///
 /// If a property with the same name already exists, this function override the

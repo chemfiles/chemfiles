@@ -41,4 +41,8 @@
 
 .. doxygenfunction:: chfl_atom_get_property
 
+.. doxygenfunction:: chfl_atom_properties_count
+
+.. doxygenfunction:: chfl_atom_list_properties
+
 .. doxygenfunction:: chfl_atom_free

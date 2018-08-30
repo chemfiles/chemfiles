@@ -162,6 +162,31 @@ CHFL_EXPORT chfl_status chfl_residue_contains(
     const CHFL_RESIDUE* residue, uint64_t i, bool* result
 );
 
+/// Get the number of properties associated with this `residue` in `count`.
+///
+/// @example{tests/capi/doc/chfl_residue/properties_count.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_residue_properties_count(
+    const CHFL_RESIDUE* residue, uint64_t* count
+);
+
+/// Get the names of all properties of this `residue` in the pre-allocated array
+/// `names` of size `count`.
+///
+/// `names` size must be passed in the `count` parameter, and be equal to the
+/// result of `chfl_residue_properties_count`.
+///
+/// The pointers in `names` are only valid until a new property is added to the
+/// residue with `chfl_residue_set_property`.
+///
+/// @example{tests/capi/doc/chfl_residue/list_properties.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_residue_list_properties(
+    const CHFL_RESIDUE* residue, const char* names[], uint64_t count
+);
+
 /// Add a new `property` with the given `name` to this `residue`.
 ///
 /// If a property with the same name already exists, this function override the

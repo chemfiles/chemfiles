@@ -57,6 +57,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   longer make a copy. This allows for direct reading and writing inside the
   containing frame/topology.
 * Added `chfl_trajectory_path` to get the file path used to create a trajectory
+* Added `chfl_{atom,frame,residue}_properties_count` and
+  `chfl_{atom,frame,residue}_list_properties` to list all properties in an
+  Atom/Frame/Residue
 
 ## 0.8 (14 Dec 2017)
 

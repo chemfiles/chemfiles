@@ -133,10 +133,31 @@ TEST_CASE("chfl_atom") {
         double value = 0;
         CHECK_STATUS(chfl_property_get_double(property, &value));
         CHECK(value == -23);
+        CHECK_STATUS(chfl_property_free(property));
+        property = nullptr;
 
         CHECK_FALSE(chfl_atom_get_property(atom, "that"));
 
+        property = chfl_property_bool(false);
+        REQUIRE(property);
+
+        CHECK_STATUS(chfl_atom_set_property(atom, "that", property));
         CHECK_STATUS(chfl_property_free(property));
+
+        uint64_t count = 0;
+        CHECK_STATUS(chfl_atom_properties_count(atom, &count));
+        CHECK(count == 2);
+
+        const char* names[2] = {nullptr};
+        CHECK_STATUS(chfl_atom_list_properties(atom, names, count));
+        // There are no guarantee of ordering
+        if (names[0] == std::string("this")) {
+            CHECK(names[1] == std::string("that"));
+        } else {
+            CHECK(names[0] == std::string("that"));
+            CHECK(names[1] == std::string("this"));
+        }
+
         CHECK_STATUS(chfl_atom_free(atom));
     }
 }
