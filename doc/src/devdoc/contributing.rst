@@ -17,16 +17,16 @@ hello and ask any question you can have!
 Improving the code
 ^^^^^^^^^^^^^^^^^^
 
-You can pick any `issue`_ in the list. `E-Easy`_ issues are specially directed
-at first time contributors, and comes with step by step explanation of how to
-solve the issue.
+You can pick any `issue`_ in the list. `Help wanted`_ issues are specially
+directed at first time contributors, and comes with step by step explanation of
+how to solve the issue.
 
 If you plan to add a new feature which is not in the issue list, please open a
-new one so that every one knows you are working on it, and so that the
+new issue so that every one knows you are working on it, and so that the
 implementation strategy can be discussed!
 
 .. _issue: https://github.com/chemfiles/chemfiles/issues
-.. _E-Easy: https://github.com/chemfiles/chemfiles/issues?q=is%3Aissue+is%3Aopen+label%3AE-easy
+.. _Help wanted: https://github.com/chemfiles/chemfiles/labels/Help%20wanted
 
 Improve documentation
 ^^^^^^^^^^^^^^^^^^^^^
