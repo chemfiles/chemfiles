@@ -106,6 +106,7 @@ Chemfiles can read and write files in the following formats:
 - SERC Daresbury Laboratory CSSR files;
 - GROMACS formats: .gro;
 - TRIPOS mol2 files;
+- MacroMolecular Transmission Format (MMTF) files;
 
 For text-based formats (XYZ, PDB, LAMMPS Data, Tinker, ...) Chemfiles will
 transparently read compressed files if the file extension matches the expected
@@ -118,7 +119,6 @@ Chemfiles can also read but not (yet) write files in the following formats:
 - GROMACS formats: .xtc; .trj; .trr;
 - CHARMM DCD files;
 - Molden files;
-- MacroMolecular Transmission Format (MMTF) files;
 
 See the [issue list](https://github.com/chemfiles/chemfiles/labels/New%20Format)
 for planned formats. If you need another format, open a new issue with a link to

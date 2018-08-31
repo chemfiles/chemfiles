@@ -21,7 +21,7 @@ class MMTFFormat final: public Format {
 public:
     MMTFFormat(std::string path, File::Mode mode, File::Compression compression);
 
-    ~MMTFFormat() override = default;
+    ~MMTFFormat() override;
     MMTFFormat(const MMTFFormat&) = delete;
     MMTFFormat& operator=(const MMTFFormat&) = delete;
     MMTFFormat(MMTFFormat&&) = default;
@@ -29,11 +29,15 @@ public:
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;
+    void write(const Frame& frame) override;
     size_t nsteps() override;
 
 private:
 
     mmtf::StructureData structure_;
+
+    std::string filename_;
+    size_t writeAtomLoc_ = 0;
 
     size_t modelIndex_ = 0;
     size_t chainIndex_ = 0;

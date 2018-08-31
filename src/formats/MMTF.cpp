@@ -2,6 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <mmtf.hpp>
+#include <mmtf/export_helpers.hpp>
 
 #include "chemfiles/formats/MMTF.hpp"
 
@@ -37,10 +38,12 @@ MMTFFormat::MMTFFormat(std::string path, File::Mode mode, File::Compression comp
             mmtf::decodeFromFile(structure_, path);
         }
         if (!structure_.hasConsistentData()) {
-            throw format_error("Issue with: {}. Please ensure it is valid MMTF", path);
+            throw format_error("Issue with: {}. Please ensure it is valid MMTF file", path);
         }
-    } else if (mode == File::WRITE || mode == File::APPEND) {
-        throw file_error("Writting an MMTF File is not currently implemented");
+    } else if (mode == File::WRITE) {
+        filename_ = path; // We really don't need to do anything, yet
+    } else if (mode == File::APPEND) {
+        throw file_error("append mode ('a') is not supported for the MMTF format");
     }
 }
 
@@ -220,4 +223,123 @@ void MMTFFormat::read(Frame& frame) {
     }
 
     atomSkip_ = atomIndex_;
+}
+
+void MMTFFormat::write(const Frame& frame) {
+    structure_.numModels++;
+    structure_.chainsPerModel.emplace_back(0);
+
+    std::string prev_chainId;
+    std::string prev_chainName;
+    const chemfiles::Residue* prev_residue = 0;
+
+    auto& topology = frame.topology();
+    auto& positions = frame.positions();
+    for (size_t i = 0; i<frame.size(); i++) {
+        structure_.numAtoms++;
+        structure_.xCoordList.emplace_back(positions[i][0]);
+        structure_.yCoordList.emplace_back(positions[i][1]);
+        structure_.zCoordList.emplace_back(positions[i][2]);
+
+        auto res_opt = topology.residue_for_atom(i);
+
+        if (!res_opt) {
+            continue;
+        }
+
+        // We've got a new resiude!
+        if (prev_residue == &(*res_opt)) {
+            auto& group = structure_.groupList.back();
+            group.formalChargeList.emplace_back(frame[i].charge());
+            group.atomNameList.emplace_back(frame[i].name());
+            group.elementList.emplace_back(frame[i].type());
+
+            continue;
+        }
+
+        const auto& current_chainId_opt = res_opt->get("chainid");
+        const auto& current_chainName_opt = res_opt->get("chainname");
+        std::string current_chainId;
+        std::string current_chainName;
+
+        if (current_chainId_opt &&
+            current_chainId_opt->get_kind() == Property::STRING) {
+            current_chainId = current_chainId_opt->as_string();
+        }
+
+        if (current_chainName_opt &&
+            current_chainName_opt->get_kind() == Property::STRING) {
+            current_chainName = current_chainName_opt->as_string();
+        }
+
+        if (current_chainName != prev_chainName ||
+            current_chainId != prev_chainId) {
+
+            structure_.numChains++;
+            structure_.chainsPerModel.back()++;
+
+            // No residues... yet
+            structure_.groupsPerChain.emplace_back(0);
+
+            structure_.chainIdList.emplace_back(current_chainId);
+            structure_.chainNameList.emplace_back(current_chainName);
+
+            prev_chainId = current_chainId;
+            prev_chainName = current_chainName;
+        }
+
+        structure_.numGroups++;
+        prev_residue = &(*res_opt);
+
+        structure_.groupsPerChain.back() += 1;
+
+        auto groupType = static_cast<int32_t>(structure_.groupList.size());
+        structure_.groupTypeList.emplace_back(groupType);
+
+        auto groupId = res_opt->id();
+        structure_.groupIdList.emplace_back(groupId ? *groupId : 0);
+        structure_.groupList.emplace_back();
+        structure_.groupList.back().groupName = prev_residue->name();
+
+        auto& group = structure_.groupList.back();
+        group.formalChargeList.emplace_back(frame[i].charge());
+        group.atomNameList.emplace_back(frame[i].name());
+        group.elementList.emplace_back(frame[i].type());
+    }
+
+    mmtf::BondAdder bondadd(structure_);
+    auto& bonds = topology.bonds();
+    auto& bond_orders = topology.bond_orders();
+    for (size_t i = 0; i < bonds.size(); ++i) {
+
+        int32_t bo;
+        switch(bond_orders[i]) {
+            case Bond::BondOrder::SINGLE:
+                bo = 1;
+                break;
+            case Bond::BondOrder::DOUBLE:
+                bo = 2;
+                break;
+            case Bond::BondOrder::TRIPLE:
+                bo = 3;
+                break;
+            case Bond::BondOrder::QUADRUPLE:
+                bo = 4;
+                break;
+            default:
+                bo = 1;
+                break;
+        }
+
+        bondadd(bonds[i][0] + writeAtomLoc_, bonds[i][1] + writeAtomLoc_, bo);
+    }
+
+    writeAtomLoc_ = frame.size();
+}
+
+MMTFFormat::~MMTFFormat() {
+    if (writeAtomLoc_) {
+        mmtf::compressGroupList(structure_);
+        encodeToFile(structure_, filename_);
+    }
 }
