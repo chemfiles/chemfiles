@@ -226,6 +226,10 @@ void MMTFFormat::read(Frame& frame) {
 }
 
 void MMTFFormat::write(const Frame& frame) {
+    
+    // Used to add bonds  bonds
+    auto writeAtomLoc = static_cast<size_t>(structure_.numAtoms);
+
     structure_.numModels++;
     structure_.chainsPerModel.emplace_back(0);
 
@@ -312,7 +316,7 @@ void MMTFFormat::write(const Frame& frame) {
     auto& bond_orders = topology.bond_orders();
     for (size_t i = 0; i < bonds.size(); ++i) {
 
-        int32_t bo;
+        int8_t bo;
         switch(bond_orders[i]) {
             case Bond::BondOrder::SINGLE:
                 bo = 1;
@@ -331,14 +335,14 @@ void MMTFFormat::write(const Frame& frame) {
                 break;
         }
 
-        bondadd(bonds[i][0] + writeAtomLoc_, bonds[i][1] + writeAtomLoc_, bo);
+        auto atom1 = static_cast<int32_t>(bonds[i][0] + writeAtomLoc);
+        auto atom2 = static_cast<int32_t>(bonds[i][1] + writeAtomLoc);
+        bondadd(atom1, atom2, bo);
     }
-
-    writeAtomLoc_ = frame.size();
 }
 
 MMTFFormat::~MMTFFormat() {
-    if (writeAtomLoc_) {
+    if (!filename_.empty()) {
         mmtf::compressGroupList(structure_);
         encodeToFile(structure_, filename_);
     }

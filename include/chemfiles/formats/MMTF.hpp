@@ -34,15 +34,27 @@ public:
 
 private:
 
+    /// MMTF-CPP object holding all MacroMolecular information.
+    /// This can be read and modified.
     mmtf::StructureData structure_;
 
+    /// Location of MMTF file on disk. Only used if opened in write mode.
     std::string filename_;
-    size_t writeAtomLoc_ = 0;
 
+    /// Current model being read. Ranges from [0, structure.numModels)
     size_t modelIndex_ = 0;
+
+    /// Current chain being read. Ranges from [0, structure.numChains)
     size_t chainIndex_ = 0;
+
+    /// Current group (residue) being read. Ranges from [0, structure.numGroups)
     size_t groupIndex_ = 0;
+
+    /// Current atom being read. Ranges from [0, structure.numAtoms)
     size_t atomIndex_ = 0;
+
+    /// Number of atoms read before the current model being read.
+    /// Used as an offset for adding bonds when reading models.
     size_t atomSkip_ = 0;
 };
 
