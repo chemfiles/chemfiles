@@ -183,3 +183,57 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(!topo.are_linked(topo.residue(0), topo.residue(2)));
     }
 }
+
+TEST_CASE("Write files in MMTF format") {
+    SECTION("Single model") {
+        Trajectory file_r("data/mmtf/4HHB.mmtf");
+        Frame frame = file_r.read();
+
+        auto tmpfile = NamedTempPath(".mmtf");
+        auto file = Trajectory(tmpfile, 'w');
+        file.write(frame);
+        file.close();
+
+        Trajectory file_r2(tmpfile);
+        Frame frame2 = file_r2.read();
+
+        CHECK(frame.size() == 4779);
+
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(6.204, 16.869, 4.854), 1e-3));
+        CHECK(approx_eq(positions[296], Vector3D(10.167, -7.889, -16.138 ), 1e-3));
+        CHECK(approx_eq(positions[4778], Vector3D(-1.263, -2.837, -21.251 ), 1e-3));
+    }
+
+    SECTION("Multiple models") {
+        Trajectory file_r("data/mmtf/1J8K.mmtf");
+
+        auto tmpfile = NamedTempPath(".mmtf");
+        auto file = Trajectory(tmpfile, 'w');
+
+        Frame frame = file_r.read();
+        file.write(frame);
+        frame = file_r.read();
+        file.write(frame);
+        frame = file_r.read();
+        file.write(frame);
+        frame = file_r.read();
+        file.write(frame);
+
+        file.close();
+
+        Trajectory file_r2(tmpfile);
+        CHECK(file_r2.nsteps() == 4);
+
+        frame = file_r2.read_step(1);
+        CHECK(frame.size() == 1402);
+        const auto& positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D( -9.134, 11.149, 6.990), 1e-3));
+        CHECK(approx_eq(positions[1401], Vector3D(4.437, -13.250, -22.569), 1e-3));
+
+        // Check to be sure bonds are copied properly
+        const auto& topo = frame.topology();
+        CHECK(topo.are_linked(topo.residue(0), topo.residue(1)));
+        CHECK(!topo.are_linked(topo.residue(0), topo.residue(2)));
+    }
+}
