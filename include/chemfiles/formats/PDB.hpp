@@ -33,6 +33,9 @@ public:
     void write(const Frame& frame) override;
     size_t nsteps() override;
 
+    // Connect residues based on a predefined table
+    static void link_standard_residue_bonds(Frame& frame);
+
 private:
     // Read CRYST1 record
     void read_CRYST1(Frame& frame, const std::string& line);
@@ -41,9 +44,6 @@ private:
 
     // Read CONECT record
     void read_CONECT(Frame& frame, const std::string& line);
-
-    // Connect residues based on a predefined table
-    void link_standard_residue_bonds(Frame& frame);
 
     std::unique_ptr<TextFile> file_;
     /// Map of residues, indexed by residue id.

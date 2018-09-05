@@ -37,6 +37,14 @@ inline std::string trim(const std::string& str) {
     return (back <= front ? std::string() : std::string(front, back));
 }
 
+inline void tolower(std::string& input) {
+    std::transform(input.begin(), input.end(), input.begin(),
+        [](std::string::value_type c) {
+            return std::tolower(c);
+        }
+    );
+}
+
 /// Get the name of the computer used
 std::string hostname();
 /// Get the user name
@@ -108,7 +116,6 @@ inline void scan(const std::string& input, const char* format, ...) {
         );
     }
 }
-
 }
 
 #endif
