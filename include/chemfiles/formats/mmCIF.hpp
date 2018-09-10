@@ -1,8 +1,8 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#ifndef CHEMFILES_FORMAT_CIF_HPP
-#define CHEMFILES_FORMAT_CIF_HPP
+#ifndef CHEMFILES_FORMAT_MMCIF_HPP
+#define CHEMFILES_FORMAT_MMCIF_HPP
 
 #include <map>
 
@@ -13,13 +13,12 @@
 
 namespace chemfiles {
 
-/// [CIF] (Crystallographic Information Framework) format reader and writer.
+/// [mmCIF] (Crystallographic Information Framework) for MacroMolecules
 ///
-/// [CIF]: https://www.iucr.org/resources/cif
-class CIFFormat final: public Format {
+/// [mmCIF]: http://mmcif.wwpdb.org/
+class mmCIFFormat final: public Format {
 public:
-    CIFFormat(std::string path, File::Mode mode, File::Compression compression);
-    ~CIFFormat() noexcept;
+    mmCIFFormat(std::string path, File::Mode mode, File::Compression compression);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;
@@ -39,14 +38,13 @@ private:
     std::vector<std::streampos> steps_positions_;
     /// The cell for all frames
     UnitCell cell_;
-    /// Number of models written/read to the file.
+    /// Number of models written to the file.
     size_t models_;
-    /// Did we wrote a frame to the file? This is used to check wheter we need
-    /// to write a final `END` record in the destructor
-    bool written_ = false;
+    /// Number of atoms written to the file.
+    size_t atoms_;
 };
 
-template<> FormatInfo format_information<CIFFormat>();
+template<> FormatInfo format_information<mmCIFFormat>();
 
 } // namespace chemfiles
 
