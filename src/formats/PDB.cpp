@@ -208,7 +208,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
 
             // This will be save as a string... on purpose to match MMTF
             residue.set("chainid", line.substr(21,1));
-            // This fromat makes not distinction between chainid and chainname
+            // This format makes no distinction between chainid and chainname
             residue.set("chainname", line.substr(21,1));
 
             residues_.insert({resid, residue});

@@ -93,10 +93,7 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
 
         if (in_loop && line_split[0].find("_atom_site") != std::string::npos) {
             auto atom_label = line_split[0].substr(11);
-
-            std::transform(atom_label.begin(), atom_label.end(),
-                atom_label.begin(), std::tolower);
-
+            tolower(atom_label);
             atom_site_map_[atom_label] = current_index++;
             break;
         }
@@ -115,10 +112,7 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
 
         if (line.find("_atom_site") != std::string::npos) {
             auto atom_label = trim(line).substr(11);
-
-            std::transform(atom_label.begin(), atom_label.end(),
-                atom_label.begin(), std::tolower);
-
+            tolower(atom_label);
             atom_site_map_[atom_label] = current_index++;
 
             position = file_->tellg();
