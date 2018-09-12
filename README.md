@@ -106,6 +106,7 @@ Chemfiles can read and write files in the following formats:
 - SERC Daresbury Laboratory CSSR files;
 - GROMACS formats: .gro;
 - TRIPOS mol2 files;
+- MacroMolecular Crystallographic Information Framework (CIF) files;
 - MacroMolecular Transmission Format (MMTF) files;
 
 For text-based formats (XYZ, PDB, LAMMPS Data, Tinker, ...) Chemfiles will
