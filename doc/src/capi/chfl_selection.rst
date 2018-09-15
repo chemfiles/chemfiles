@@ -1,7 +1,7 @@
 .. _capi-selection:
 
-Function manipulating ``CHFL_SELECTION``
-----------------------------------------
+``CHFL_SELECTION``
+------------------
 
 .. doxygentypedef:: CHFL_SELECTION
 

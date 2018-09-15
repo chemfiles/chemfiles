@@ -1,5 +1,5 @@
-Chemfiles classes overview
-===========================
+Overview
+========
 
 This figure represents how the basic classes of chemfiles are organised and how
 they interact together. The only classes a chemfiles user should worry about are

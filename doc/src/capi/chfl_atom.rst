@@ -1,7 +1,7 @@
 .. _capi-atom:
 
-Function manipulating ``CHFL_ATOM``
------------------------------------
+``CHFL_ATOM``
+-------------
 
 .. doxygentypedef:: CHFL_ATOM
 

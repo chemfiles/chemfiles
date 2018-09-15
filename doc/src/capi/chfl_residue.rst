@@ -1,7 +1,7 @@
 .. _capi-residue:
 
-Function manipulating ``CHFL_RESIDUE``
---------------------------------------
+``CHFL_RESIDUE``
+----------------
 
 .. doxygentypedef:: CHFL_RESIDUE
 

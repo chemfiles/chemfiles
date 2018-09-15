@@ -1,7 +1,7 @@
 .. _capi-frame:
 
-Function manipulating ``CHFL_FRAME``
-------------------------------------
+``CHFL_FRAME``
+--------------
 
 .. doxygentypedef:: CHFL_FRAME
 

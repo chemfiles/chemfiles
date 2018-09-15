@@ -1,7 +1,7 @@
 .. _capi-cell:
 
-Function manipulating ``CHFL_CELL``
------------------------------------
+``CHFL_CELL``
+-------------
 
 .. doxygentypedef:: CHFL_CELL
 
