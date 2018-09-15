@@ -71,8 +71,8 @@ in our `Gitter chat room <https://gitter.im/chemfiles/chemfiles>`_.
 
 .. _classes-reference:
 
-Classes and functions reference
--------------------------------
+API reference
+-------------
 
 All the public classes (for the C++ interface) and functions (for the C
 interface) are extensively documented here.

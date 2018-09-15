@@ -57,7 +57,7 @@ breathe_projects = {
 breathe_default_project = "chemfiles"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = [os.path.join(ROOT, "templates")]
+templates_path = [os.path.join(ROOT, "..", "templates")]
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
@@ -69,11 +69,15 @@ html_theme = 'bootstrap'
 html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 html_theme_options = {
-    'navbar_pagenav_name': "Content",
     'navbar_site_name': "Navigation",
+    'navbar_pagenav': False,
     'source_link_position': None,
     'bootswatch_theme': "flatly",
     'bootstrap_version': "3",
+}
+
+html_sidebars = {
+    '**': ['sidebar-toc.html', 'searchbox.html']
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

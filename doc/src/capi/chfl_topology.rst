@@ -1,7 +1,7 @@
 .. _capi-topology:
 
-Function manipulating ``CHFL_TOPOLOGY``
----------------------------------------
+``CHFL_TOPOLOGY``
+-----------------
 
 .. doxygentypedef:: CHFL_TOPOLOGY
 

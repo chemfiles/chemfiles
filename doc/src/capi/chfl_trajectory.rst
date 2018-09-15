@@ -1,7 +1,7 @@
 .. _capi-trajectory:
 
-Function manipulating ``CHFL_TRAJECTORY``
------------------------------------------
+``CHFL_TRAJECTORY``
+-------------------
 
 .. doxygentypedef:: CHFL_TRAJECTORY
 

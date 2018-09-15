@@ -1,7 +1,7 @@
 .. _capi-property:
 
-Function manipulating ``CHFL_PROPERTY``
----------------------------------------
+``CHFL_PROPERTY``
+-----------------
 
 .. doxygentypedef:: CHFL_PROPERTY
 
