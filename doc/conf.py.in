@@ -2,11 +2,42 @@
 from __future__ import unicode_literals, print_function, absolute_import
 import sphinx_bootstrap_theme
 import os
+import toml
+import csv
 import sys
 sys.path.insert(0, os.path.join("@CMAKE_CURRENT_SOURCE_DIR@", "ext"))
 
 ROOT = os.path.join("@CMAKE_CURRENT_SOURCE_DIR@", "src")
 
+def generate_properties_csv():
+    for path in ["atom", "residue", "frame"]:
+        data = toml.load(os.path.join(ROOT, "properties/{}.toml".format(path)))
+
+        output = os.path.join(ROOT, "properties/{}.csv".format(path))
+        csvfile = open(output, 'w')
+        writer = csv.writer(csvfile)
+        writer.writerow(['Name', 'Type', 'Format', 'Description'])
+        for property, value in data.iteritems():
+            rows = []
+            first = True
+            for format, description in value.iteritems():
+                if format == "type":
+                    continue
+                if first:
+                    row = (property, value["type"])
+                    first = False
+                else:
+                    row = ("", "")
+                row = row + (format, description)
+                rows.append(row)
+
+            for row in rows:
+                writer.writerow(row)
+
+        csvfile.close()
+
+
+generate_properties_csv()
 
 def version():
     with open(os.path.join("@PROJECT_SOURCE_DIR@", "VERSION")) as f:

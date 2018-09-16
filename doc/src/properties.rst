@@ -21,28 +21,29 @@ This section documents which format set and use properties.
 Atomic properties
 -----------------
 
-- **is_hetatm** (boolean): set and used by the PDB format. On reading, this
-  property is set to ``true`` when an atom is defined with a ``HETATM`` record,
-  and ``false`` when the atom is defined with an ``ATOM`` record. On writing,
-  this property is used to determine whether to emit an ``HETATM`` or an
-  ``ATOM`` record. If the property is not set, ``HETATM`` is used.
+.. the csv files at properties/*.csv are generated from the corresponding toml
+.. files.
 
-- **altloc** (string): set and used by the PDB and MMTF formats. On reading,
-  this property is set the the alternative location character stored in both
-  of these formats. On writing, this character is stored with the ``ATOM``
-  or ``HETATM`` record. If the property is not set, a ' ' character is used.
+.. csv-table::
+   :file: properties/atom.csv
+   :widths: 10, 10, 10, 70
+   :header-rows: 1
 
 Residue properties
------------------
+------------------
 
-- **insertion_code** (string): set and used by the PDB format. On reading, this
-  property is set to the insertion code of the residue. This code is stored as
-  a single character in the PDB file after the residue id. If this character is
-  a ' ', the property is not set. On writing, this character is stored with the
-  ``ATOM`` or ``HETATM`` record. If the property is not set, a ' ' character is
-  used.
+.. csv-table::
+   :file: properties/residue.csv
+   :widths: 10, 10, 10, 70
+   :header-rows: 1
 
 Frame properties
 -----------------
 
-No property on frame is used by the format reader and writers yet.
+.. csv-table::
+   :file: properties/frame.csv
+   :widths: 10, 10, 10, 70
+   :header-rows: 1
+
+Additionally, the SDF format reads any property formated as ``> <...>``, using
+the value inside the angle brackets (``...`` here) as the property name.

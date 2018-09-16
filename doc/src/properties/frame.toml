@@ -1,0 +1,6 @@
+[name]
+type = "string"
+
+GRO = "The first line of a GRO file is used as the frame **name** when reading."
+SFD = "The first line of a SDF file is used as the frame **name** when reading."
+MOL2 = "The first line after ``@<TRIPOS>MOLECULE`` is used as the frame **name** when reading."
