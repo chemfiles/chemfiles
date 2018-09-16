@@ -1,0 +1,42 @@
+[chainname]
+type = "string"
+
+PDB = "**TODO**"
+
+mmCIF = "**TODO**"
+
+MMTF = "**TODO**"
+
+[chainid]
+type = "number"
+
+PDB = "**TODO**"
+
+mmCIF = "**TODO**"
+
+MMTF = "**TODO**"
+
+[chainindex]
+type = "number"
+
+MMTF = "**TODO**: how is this different from chainid?"
+
+[composition_type]
+type = "**TODO**"
+
+mmCIF = "**TODO**"
+
+[assembly]
+type = "**TODO**"
+
+MMTF = "**TODO**"
+
+
+[insertion_code]
+type = "string"
+
+PDB = """On reading, this insertion_code is set to the insertion code of the
+residue. This code is stored as a single character in the PDB file after the
+residue id. If this character is a space character, the property is not set. On
+writing, this character is stored with the ``ATOM`` or ``HETATM`` record. If the
+property is not set, a space character is used."""
