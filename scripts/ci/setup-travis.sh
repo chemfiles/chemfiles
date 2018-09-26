@@ -9,7 +9,7 @@ else
 fi
 
 if [[ "${DO_COVERAGE}" == "ON" ]]; then
-    export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_CODE_COVERAGE=ON"
+    export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_C_FLAGS=\"--coverage\" -DCMAKE_CXX_FLAGS=\"--coverage\""
     pip install --user codecov
 fi
 
