@@ -30,13 +30,15 @@ option(CHFL_BUILD_DOCTESTS "Build documentation tests as well as unit tests." ON
 mark_as_advanced(CHFL_BUILD_DOCTESTS)
 
 # Set a default build type if none was specified
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    message(STATUS "Setting build type to 'release' as none was specified.")
-    set(CMAKE_BUILD_TYPE "release"
-        CACHE STRING
-        "Choose the type of build, options are: none(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) debug release relwithdebinfo minsizerel."
-    FORCE)
-    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS release debug relwithdebuginfo minsizerel none)
+if (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
+    if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+        message(STATUS "Setting build type to 'release' as none was specified.")
+        set(CMAKE_BUILD_TYPE "release"
+            CACHE STRING
+            "Choose the type of build, options are: none(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) debug release relwithdebinfo minsizerel."
+        FORCE)
+        set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS release debug relwithdebuginfo minsizerel none)
+    endif()
 endif()
 
 include(CompilerFlags)
