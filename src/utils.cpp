@@ -60,7 +60,11 @@ std::string chemfiles::current_directory() {
     // loop util buffer large enough
     for (size_t size = 128;; size *=2) {
         std::vector<char> buffer(size, '\0');
+#ifdef CHEMFILES_WINDOWS
+        auto result = getcwd(buffer.data(), static_cast<int>(size));
+#else
         auto result = getcwd(buffer.data(), size);
+#endif
         if (result == nullptr) {
             if (errno == ERANGE) {
                 continue;
