@@ -19,9 +19,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
 
 option(CHFL_BUILD_TESTS "Build unit tests." OFF)
 option(CHFL_BUILD_DOCUMENTATION "Build the documentation." OFF)
-option(CHFL_CODE_COVERAGE "Enable code coverage" OFF)
 option(CHFL_USE_WARNINGS "Compile the code with warnings (default in debug mode)" OFF)
-option(CHFL_DEBUG_GLIBCXX "Use the debug version of GNU libstdcxx" OFF)
 option(CHFL_SYSTEM_NETCDF "Use the system NetCDF instead of the internal one" OFF)
 option(CHFL_SYSTEM_ZLIB "Use the system zlib instead of the internal one" OFF)
 option(CHFL_SYSTEM_LZMA "Use the system lzma instead of the internal one" OFF)
@@ -66,17 +64,6 @@ endif()
 
 if(NOT CHFL_SYSTEM_LZMA)
     add_definitions("-DLZMA_API_STATIC")
-endif()
-
-if(CHFL_CODE_COVERAGE)
-    message(STATUS "Code coverage enabled")
-    if(NOT CMAKE_COMPILER_IS_GNUCXX)
-        message(FATAL_ERROR "Code coverage can only be used with GCC")
-    endif()
-    # Code coverage should use gcc
-    set(CMAKE_BUILD_TYPE "debug" CACHE STRING "Type of build: release|debug|relwithdebuginfo" FORCE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
 endif()
 
 add_subdirectory(external)

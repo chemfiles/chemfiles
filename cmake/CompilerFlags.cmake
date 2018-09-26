@@ -47,7 +47,7 @@ endif()
 
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     # Some version of intel compiler (icc 14 at least) have only partial support
-    # for C++11 
+    # for C++11
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMSGPACK_USE_CPP03")
 endif()
 
@@ -223,10 +223,6 @@ endif()
 if(NOT ${CHFL_SANITIZER} STREQUAL "none")
     set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -fno-omit-frame-pointer")
     set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -g")
-endif()
-
-if(${CHFL_DEBUG_GLIBCXX})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_DEBUG")
 endif()
 
 try_compile(CHFL_HAS_THREAD_LOCAL
