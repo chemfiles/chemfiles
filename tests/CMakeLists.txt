@@ -129,7 +129,7 @@ file(RELATIVE_PATH VERSION_FILE_PATH ${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURC
 target_compile_definitions(c-misc PRIVATE "-DVERSION_FILE_PATH=\"${VERSION_FILE_PATH}\"")
 
 function(chfl_doctest _name_ _file_)
-    if(NOT CHFL_BUILD_DOCTESTS)
+    if(NOT ${CHFL_BUILD_DOCTESTS})
         return()
     endif()
 
@@ -181,7 +181,7 @@ function(chfl_cpp_doctest _file_)
     endif()
 
     chfl_doctest(${_name_} ${_file_})
-    if(CHFL_BUILD_DOCTESTS)
+    if(${CHFL_BUILD_DOCTESTS})
         target_link_libraries(${_name_} test_helpers)
     endif()
 endfunction()

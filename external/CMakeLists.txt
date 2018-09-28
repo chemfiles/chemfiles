@@ -81,11 +81,11 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/toml11)
 # ==========
 # netcdf: https://github.com/chemfiles/netcdf-c
 # ==========
-if(CHFL_SYSTEM_NETCDF)
+if(${CHFL_SYSTEM_NETCDF})
     find_package(NetCDF REQUIRED)
     set(NETCDF_OBJECTS "" PARENT_SCOPE)
 else()
-    if(EMSCRIPTEN)
+    if(${EMSCRIPTEN})
         # Detection of _filelengthi64 does not seems to work with emscripten
         set(HAVE_FILE_LENGTH_I64 OFF)
     endif()
@@ -97,7 +97,7 @@ else()
         NETCDF_ENABLE_STDIO
     )
 
-    if(WINDOWS)
+    if(WIN32)
         target_compile_definitions(netcdf PRIVATE "-DDLL_NETCDF -DDLL_EXPORT")
     endif()
 
@@ -107,10 +107,10 @@ else()
     )
     set(NETCDF_OBJECTS $<TARGET_OBJECTS:netcdf> PARENT_SCOPE)
     set(NETCDF_LIBRARIES "" PARENT_SCOPE)
-    if(NOT EMSCRIPTEN)
-        set(NETCDF_OBJECTS_TESTS ${NETCDF_OBJECTS} PARENT_SCOPE)
-    else()
+    if(${EMSCRIPTEN})
         set(NETCDF_OBJECTS_TESTS "" PARENT_SCOPE)
+    else()
+        set(NETCDF_OBJECTS_TESTS ${NETCDF_OBJECTS} PARENT_SCOPE)
     endif()
 endif()
 
@@ -190,7 +190,7 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/msgpack-c/inc
 # zlib: https://github.com/chemfiles/zlib
 # ==========
 
-if(CHFL_SYSTEM_ZLIB)
+if(${CHFL_SYSTEM_ZLIB})
     find_package(ZLIB REQUIRED)
     set(ZLIB_LIBRARIES ${ZLIB_LIBRARIES} PARENT_SCOPE)
     set(ZLIB_OBJECTS "" PARENT_SCOPE)
@@ -206,7 +206,7 @@ list(APPEND EXTERNAL_INCLUDES ${ZLIB_INCLUDE_DIRS})
 # ==========
 # lzma: https://github.com/chemfiles/lzma
 # ==========
-if(CHFL_SYSTEM_LZMA)
+if(${CHFL_SYSTEM_LZMA})
     find_package(LibLZMA REQUIRED)
     set(LZMA_OBJECTS "" PARENT_SCOPE)
 else()

@@ -28,6 +28,6 @@ foreach(example IN LISTS c_examples)
 endforeach()
 
 CHECK_C_COMPILER_FLAG("-Wno-format" CC_SUPPORTS_WNO_FORMAT)
-if(CC_SUPPORTS_WNO_FORMAT)
+if(${CC_SUPPORTS_WNO_FORMAT})
     target_compile_options(example-c-select PRIVATE "-Wno-format")
 endif()
