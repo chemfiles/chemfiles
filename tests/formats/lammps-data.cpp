@@ -69,6 +69,30 @@ TEST_CASE("Read files in LAMMPS data format") {
         CHECK(topology[12].name() == "1");
         CHECK(topology[12].type() == "1");
     }
+
+    SECTION("Triclinic cells") {
+        Trajectory file("data/lammps-data/triclinic-1.lmp", 'r', "LAMMPS Data");
+        auto cell = file.read().cell();
+
+        CHECK(cell.a() == 34);
+        CHECK(cell.b() == 34);
+        CHECK(cell.c() == 34);
+        CHECK(cell.alpha() == 90);
+        CHECK(cell.beta() == 90);
+        CHECK(cell.gamma() == 90);
+        CHECK(cell.shape() == UnitCell::TRICLINIC);
+
+        file = Trajectory("data/lammps-data/triclinic-2.lmp", 'r', "LAMMPS Data");
+        cell = file.read().cell();
+
+        CHECK(fabs(cell.a() - 34) < 1e-9);
+        CHECK(fabs(cell.b() - 34.3656805549) < 1e-9);
+        CHECK(fabs(cell.c() - 35.0570962859) < 1e-9);
+        CHECK(fabs(cell.alpha() - 87.0501134427) < 1e-9);
+        CHECK(fabs(cell.beta() - 103.1910720469) < 1e-9);
+        CHECK(fabs(cell.gamma() - 81.634113876) < 1e-9);
+        CHECK(cell.shape() == UnitCell::TRICLINIC);
+    }
 }
 
 TEST_CASE("Write files in LAMMPS data format") {
@@ -85,8 +109,9 @@ TEST_CASE("Write files in LAMMPS data format") {
     "2 dihedral types\n"
     "1 improper types\n"
     "0 5 xlo xhi\n"
-    "0 7 ylo yhi\n"
+    "0 6.06218 ylo yhi\n"
     "0 9 zlo zhi\n"
+    "1.5 0 0 xy xz yz\n"
     "\n"
     "# Pair Coeffs\n"
     "# 1 As\n"
@@ -161,7 +186,7 @@ TEST_CASE("Write files in LAMMPS data format") {
 
     auto tmpfile = NamedTempPath(".lmp");
 
-    auto frame = Frame(UnitCell(5, 7, 9));
+    auto frame = Frame(UnitCell(5, 7, 9, 90, 90, 120));
     frame.add_velocities();
     frame.add_atom(Atom("As"), {1.1, 2.2, 3.3}, {0.1, 0.2, 0.3});
     frame.add_atom(Atom("As"), {1.1, 2.2, 3.3}, {0.1, 0.2, 0.3});
@@ -175,7 +200,6 @@ TEST_CASE("Write files in LAMMPS data format") {
     frame.add_bond(4, 5);
 
     frame[0].set_mass(25);
-
 
     Trajectory(tmpfile, 'w', "LAMMPS Data").write(frame);
 

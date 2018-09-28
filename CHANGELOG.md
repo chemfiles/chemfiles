@@ -47,6 +47,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added `MarcoMolecule Transmission Format (MMTF)` support, reading via mmtf-cpp.
 * Added `Structure-Data File (SDF)` support, reading and writing.
 * Added `Cambridge Structure Search and Retrieval (CSSR)` support, reading and writing.
+* `LAMMPS Data` format now support triclinic unit cells.
 
 ###  C API changes
 
