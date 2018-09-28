@@ -15,26 +15,24 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 # `CMAKE_CXX_STANDARD`
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
+if(${COMPILER_SUPPORTS_CXX11})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif(COMPILER_SUPPORTS_CXXOX)
+elseif(${COMPILER_SUPPORTS_CXXOX})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-else()
-    if(MSVC)
-        if(MSVC_VERSION LESS 1900)
-            message(SEND_ERROR "MSVC < 14.0 is not supported. Please update your compiler or use mingw")
-        endif()
-    else()
-        message(SEND_ERROR "The ${CMAKE_CXX_COMPILER} compiler lacks C++11 support. Use another compiler.")
+elseif(MSVC)
+    if(${MSVC_VERSION} LESS 1900)
+        message(SEND_ERROR "MSVC < 14.0 is not supported. Please update your compiler or use mingw")
     endif()
+else()
+    message(SEND_ERROR "The ${CMAKE_CXX_COMPILER} compiler lacks C++11 support. Use another compiler.")
 endif()
 
 CHECK_C_COMPILER_FLAG("-std=c99" COMPILER_SUPPORTS_C99)
-if(COMPILER_SUPPORTS_C99)
+if(${COMPILER_SUPPORTS_C99})
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 endif()
 
-if(COMPILER_HAS_HIDDEN_VISIBILITY)
+if(${COMPILER_HAS_HIDDEN_VISIBILITY})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
 endif()
@@ -51,8 +49,8 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMSGPACK_USE_CPP03")
 endif()
 
-if(EMSCRIPTEN)
-    if(BUILD_SHARED_LIBS)
+if(${EMSCRIPTEN})
+    if(${BUILD_SHARED_LIBS})
         # Shared libs where not tested and a lot of changes to the build system
         # for emscripten support disable things that are needed for shared libs
         # on Windows.
@@ -69,7 +67,7 @@ if(EMSCRIPTEN)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EMCC_FLAGS}")
 
     string(TOLOWER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
-    if(NOT CHFL_WARNED_EMSCRIPTEN_DEBUG AND (${BUILD_TYPE} STREQUAL "debug" OR ${BUILD_TYPE} STREQUAL "relwithdebinfo"))
+    if(NOT "${CHFL_WARNED_EMSCRIPTEN_DEBUG}" AND (${BUILD_TYPE} STREQUAL "debug" OR ${BUILD_TYPE} STREQUAL "relwithdebinfo"))
         message(WARNING "Debug info might crash emscripten with a 'Referencing global in another module' error")
         set(CHFL_WARNED_EMSCRIPTEN_DEBUG ON CACHE INTERNAL "" FORCE)
     endif()
@@ -110,13 +108,13 @@ macro(remove_intel_warning _warn_)
 endmacro()
 
 if(MSVC)
-    if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+    if(${CMAKE_CXX_FLAGS} MATCHES "/W[0-4]")
         string(REGEX REPLACE "/W[0-4]" "/Wall" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     else()
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall")
     endif()
 
-    if(CMAKE_C_FLAGS MATCHES "/W[0-4]")
+    if(${CMAKE_C_FLAGS} MATCHES "/W[0-4]")
         string(REGEX REPLACE "/W[0-4]" "/Wall" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
     else()
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Wall")
@@ -230,13 +228,14 @@ try_compile(CHFL_HAS_THREAD_LOCAL
     ${PROJECT_SOURCE_DIR}/cmake/thread_local.cpp
 )
 
-if(EMSCRIPTEN)
+if(${EMSCRIPTEN})
     # emscripten manages to compile the code, but fails at runtime with
     # 'missing function: __cxa_thread_atexit'
     set(CHFL_HAS_THREAD_LOCAL FALSE)
 endif()
 
-if(CHFL_HAS_THREAD_LOCAL)
+# Transform from ON/OFF to 0/1
+if(${CHFL_HAS_THREAD_LOCAL})
     set(CHFL_HAS_THREAD_LOCAL 1)
 else()
     set(CHFL_HAS_THREAD_LOCAL 0)

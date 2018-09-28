@@ -29,7 +29,7 @@ mark_as_advanced(CHFL_BUILD_DOCTESTS)
 
 # Set a default build type if none was specified
 if (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
-    if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    if("${CMAKE_BUILD_TYPE}" STREQUAL "" AND "${CMAKE_CONFIGURATION_TYPES}" STREQUAL "")
         message(STATUS "Setting build type to 'release' as none was specified.")
         set(CMAKE_BUILD_TYPE "release"
             CACHE STRING
@@ -41,7 +41,7 @@ endif()
 
 include(CompilerFlags)
 
-if(CHFL_USE_WARNINGS)
+if(${CHFL_USE_WARNINGS})
     # Make sure to have asserts compiled
     add_definitions("-UNDEBUG")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CHEMFILES_CXX_WARNINGS}")
@@ -62,7 +62,7 @@ if(MSVC)
     add_definitions("-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS")
 endif()
 
-if(NOT CHFL_SYSTEM_LZMA)
+if(NOT ${CHFL_SYSTEM_LZMA})
     add_definitions("-DLZMA_API_STATIC")
 endif()
 
@@ -169,12 +169,12 @@ add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${PROJECT_BINARY_DIR}/uninstall.cmake
 )
 
-if(CHFL_BUILD_DOCUMENTATION)
+if(${CHFL_BUILD_DOCUMENTATION})
     add_subdirectory(doc)
 endif()
 
 enable_testing()
-if(CHFL_BUILD_TESTS)
+if(${CHFL_BUILD_TESTS})
     add_subdirectory(tests)
     add_subdirectory(examples)
 endif()
