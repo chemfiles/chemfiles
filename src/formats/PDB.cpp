@@ -188,6 +188,11 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
 
     atom.set("is_hetatm", is_hetatm);
 
+    auto altloc = line.substr(16,1);
+    if (altloc != " ") {
+        atom.set("altloc", altloc);
+    }
+
     try {
         auto x = std::stof(line.substr(31, 8));
         auto y = std::stof(line.substr(38, 8));
@@ -205,6 +210,11 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
             auto name = trim(line.substr(17, 3));
             Residue residue(std::move(name), resid);
             residue.add_atom(atom_id);
+
+            auto inscode = line.substr(26,1);
+            if (inscode != " ") {
+                atom.set("insertion_code", inscode);
+            }
 
             // This will be save as a string... on purpose to match MMTF
             residue.set("chainid", line.substr(21,1));
@@ -474,9 +484,26 @@ void PDBFormat::write(const Frame& frame) {
             }
         }
 
+        std::string altloc = " ";
+        auto altloc_prop = frame.topology()[i].get("altloc");
+        if (altloc_prop) {
+            if (altloc_prop->kind() == Property::STRING) {
+                altloc = altloc_prop->as_string();
+            } // Silently ignore other types
+        }        
+
+        if (altloc.length() > 1) {
+            warning(
+                "Altloc '{}' is too long for PDB format, it will be truncated.",
+                altloc
+            );
+            altloc = altloc[0];
+        }
+
         std::string resname;
         std::string resid;
         std::string chainid;
+        std::string inscode;
         auto residue = frame.topology().residue_for_atom(i);
         if (residue) {
             resname = residue->name();
@@ -500,7 +527,8 @@ void PDBFormat::write(const Frame& frame) {
                 resid = "  -1";
             }
 
-            if (residue->get("chainid")) {
+            if (residue->get("chainid") &&
+                residue->get("chainid")->kind() == Property::STRING) {
                 chainid = residue->get("chainid")->as_string();
                 if (chainid.length() > 1) {
                     warning(
@@ -511,6 +539,20 @@ void PDBFormat::write(const Frame& frame) {
                 }
             } else {
                 chainid = "X";
+            }
+
+            if (residue->get("insertion_code") &&
+                residue->get("insertion_code")->kind() == Property::STRING) {
+                inscode = residue->get("insertion_code")->as_string();
+                if (inscode.length() > 1) {
+                    warning(
+                        "Residue '{}' has an insertion code too long for PDB format, it will be truncated.",
+                        inscode
+                    );
+                    inscode = inscode[0];
+                }
+            } else {
+                inscode = " ";
             }
         } else {
             resname = "XXX";
@@ -533,8 +575,8 @@ void PDBFormat::write(const Frame& frame) {
         // 'resSeq' is set to be the atomic number.
         fmt::print(
             *file_,
-            "{: <6}{: >5} {: <4s} {:3} {:1}{: >4s}    {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
-            atom_hetatm, to_pdb_index(i), frame[i].name(), resname, chainid, resid, pos[0], pos[1], pos[2], 1.0, 0.0, frame[i].type()
+            "{: <6}{: >5} {: <4s}{:1}{:3} {:1}{: >4s}{:1}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
+            atom_hetatm, to_pdb_index(i), frame[i].name(), altloc, resname, chainid, resid, inscode, pos[0], pos[1], pos[2], 1.0, 0.0, frame[i].type()
         );
     }
 

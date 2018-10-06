@@ -27,6 +27,20 @@ Atomic properties
   this property is used to determine whether to emit an ``HETATM`` or an
   ``ATOM`` record. If the property is not set, ``HETATM`` is used.
 
+- **altloc** (string): set and used by the PDB and MMTF formats. On reading,
+  this property is set the the alternative location character stored in both
+  of these formats. On writing, this character is stored with the ``ATOM``
+  or ``HETATM`` record. If the property is not set, a ' ' character is used.
+
+Residue properties
+-----------------
+
+- **insertion_code** (string): set and used by the PDB format. On reading, this
+  property is set to the insertion code of the residue. This code is stored as
+  a single character in the PDB file after the residue id. If this character is
+  a ' ', the property is not set. On writing, this character is stored with the
+  ``ATOM`` or ``HETATM`` record. If the property is not set, a ' ' character is
+  used.
 
 Frame properties
 -----------------
