@@ -175,8 +175,8 @@ TEST_CASE("Write files in PDB format") {
     const auto EXPECTED_CONTENT =
     "MODEL    1\n"
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
-    "ATOM      1 A    XXX X   1       1.000   2.000   3.000  1.00  0.00           A\n"
-    "HETATM    2 B    XXX X   2       1.000   2.000   3.000  1.00  0.00           B\n"
+    "ATOM      1 A   AXXX X   1       1.000   2.000   3.000  1.00  0.00           A\n"
+    "HETATM    2 B   BXXX X   2       1.000   2.000   3.000  1.00  0.00           B\n"
     "ATOM      3 C    XXX X   3       1.000   2.000   3.000  1.00  0.00           C\n"
     "HETATM    4 D    XXX X   4       1.000   2.000   3.000  1.00  0.00           D\n"
     "CONECT    1    2\n"
@@ -184,10 +184,10 @@ TEST_CASE("Write files in PDB format") {
     "ENDMDL\n"
     "MODEL    2\n"
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
-    "ATOM      1 A    XXX X   4       1.000   2.000   3.000  1.00  0.00           A\n"
-    "HETATM    2 B    foo A   3       1.000   2.000   3.000  1.00  0.00           B\n"
+    "ATOM      1 A   AXXX X   4       1.000   2.000   3.000  1.00  0.00           A\n"
+    "HETATM    2 B   Bfoo A   3       1.000   2.000   3.000  1.00  0.00           B\n"
     "ATOM      3 C    foo A   3       1.000   2.000   3.000  1.00  0.00           C\n"
-    "HETATM    4 D    bar C  -1       1.000   2.000   3.000  1.00  0.00           D\n"
+    "HETATM    4 D    bar C  -1B      1.000   2.000   3.000  1.00  0.00           D\n"
     "HETATM    5 E    XXX X   5       4.000   5.000   6.000  1.00  0.00           E\n"
     "HETATM    6 F    XXX X   6       4.000   5.000   6.000  1.00  0.00           F\n"
     "HETATM    7 G    XXX X   7       4.000   5.000   6.000  1.00  0.00           G\n"
@@ -212,6 +212,8 @@ TEST_CASE("Write files in PDB format") {
     frame[1].set("is_hetatm", true);
     frame[2].set("is_hetatm", false);
     frame[3].set("is_hetatm", true);
+    frame[0].set("altloc", "A");
+    frame[1].set("altloc", "BB");
 
     auto file = Trajectory(tmpfile, 'w');
     file.write(frame);
@@ -236,6 +238,7 @@ TEST_CASE("Write files in PDB format") {
     residue = Residue("barbar"); // This will be truncated in output
     residue.add_atom(3);
     residue.set("chainid", "CB");
+    residue.set("insertion_code", "BB");
     frame.add_residue(residue);
 
     file.write(frame);
@@ -243,7 +246,10 @@ TEST_CASE("Write files in PDB format") {
 
     auto check_pdb = Trajectory(tmpfile);
     CHECK(check_pdb.nsteps() == 2);
-    CHECK(check_pdb.read().size() == 4);
+    auto frame1 = check_pdb.read();
+    CHECK(frame1.size() == 4);
+    CHECK(frame1[0].get("altloc")->as_string() == "A");
+    CHECK(frame1[1].get("altloc")->as_string() == "B");
     CHECK(check_pdb.read().size() == 7);
     check_pdb.close();
 
