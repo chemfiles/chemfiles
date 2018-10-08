@@ -9,6 +9,8 @@
 
 #include "chemfiles/ErrorFmt.hpp"
 
+namespace chemfiles {
+
 /// An atomic counter, for reference counted pointers
 class atomic_count {
 public:
@@ -48,6 +50,16 @@ private:
 };
 
 
+struct shared_metadata {
+    shared_metadata(long count_, std::function<void(void)> deleter_):
+        count(count_), deleter(std::move(deleter_)) {}
+
+    /// Number of pointer sharing this reference
+    atomic_count count;
+    /// How to delete the pointer when we are done with it
+    std::function<void(void)> deleter;
+};
+
 /// An allocator with shared_ptr like semantics, working with raw pointers.
 ///
 /// This is used in the C API to ensure that when taking pointers to
@@ -78,8 +90,6 @@ public:
     template<class T, class U>
     static T* shared_ptr(U* ptr, T* element) {
         instance_.insert_shared(ptr, element);
-        auto& count = instance_.count(ptr);
-        count.increase();
         return element;
     }
 
@@ -91,11 +101,15 @@ public:
     /// Decrease the reference count of `ptr`, and delete it if needed.
     static void free(const void* ptr) {
         auto it = instance_.map_.find(ptr);
-        auto& count = instance_.counts_.at(it->second);
-        auto references = count.decrease();
+        if (it == instance_.map_.end()) {
+            throw chemfiles::error(
+                "unknown pointer passed to shared_allocator::free: {}", ptr
+            );
+        }
+        auto references = instance_.metadata_.at(it->second).count.decrease();
         if (references == 0) {
-            instance_.deleters_.at(it->second)();
-            instance_.unused_counts_.emplace_back(it->second);
+            instance_.metadata_.at(it->second).deleter();
+            instance_.unused_.emplace_back(it->second);
         } else if (references < 0) {
             throw chemfiles::error(
                 "internal error: negative reference count for {}", ptr
@@ -107,9 +121,8 @@ public:
 private:
     template<class T>
     void insert_new(T* ptr) {
-        size_t id = get_unused_count();
-        counts_[id] = atomic_count(1);
-        deleters_[id] = [ptr](){ delete ptr; };
+        size_t id = get_unused_metadata();
+        metadata_[id] = shared_metadata{1, [ptr](){ delete ptr; }};
         auto inserted = map_.emplace(ptr, id);
         if (!inserted.second) {
             throw chemfiles::error(
@@ -122,66 +135,60 @@ private:
     void insert_shared(const void* ptr, void* element) {
         auto it = map_.find(ptr);
         if (it == map_.end()) {
+            // the main pointer is not a shared pointer
             throw chemfiles::error(
                 "internal error: pointer at {} is not managed by "
                 "shared_allocator", ptr
             );
         }
         auto inserted = map_.emplace(element, it->second);
-        if (!inserted.second) {
-            if (inserted.first->second == it->second) {
-                // We already have a shared pointer to this element, just
-                // increase the reference count
-                counts_.at(it->second).increase();
-            } else {
-                throw chemfiles::error(
-                    "internal error: pointer at {} is already managed by "
-                    "shared_allocator", ptr
-                );
-            }
+        if (!inserted.second && (inserted.first->second != it->second)) {
+            // the element pointer is already registered, but with a different
+            // main pointer
+            throw chemfiles::error(
+                "internal error: element pointer at {} is already managed by "
+                "shared_allocator (associated with {})", element, ptr
+            );
         }
+        metadata_.at(it->second).count.increase();
     }
 
-    atomic_count& count(const void* ptr) {
+    shared_metadata& metadata(const void* ptr) {
         auto it = map_.find(ptr);
         if (it != map_.end()) {
-            return counts_.at(it->second);
+            return metadata_.at(it->second);
         } else {
             throw chemfiles::error(
-                "internal error: unknwon pointer passed to shared_allocator::count"
+                "internal error: unknwon pointer passed to shared_allocator::metadata"
             );
         }
     }
 
-    size_t get_unused_count() {
-        assert(counts_.size() == deleters_.size());
-        if (!unused_counts_.empty()) {
+    size_t get_unused_metadata() {
+        if (!unused_.empty()) {
             // Get an existing one
-            size_t id = unused_counts_.back();
-            unused_counts_.pop_back();
+            size_t id = unused_.back();
+            unused_.pop_back();
             return id;
         } else {
             // create a new one
-            size_t id = counts_.size();
-            counts_.emplace_back(0);
-            deleters_.emplace_back([](){ throw chemfiles::error("uninitialized deleter"); });
-            return id;
+            metadata_.emplace_back(0, [](){ throw chemfiles::error("uninitialized deleter");});
+            return metadata_.size() - 1;
         }
     }
 
-    /// A map of pointer adresses -> indexes of reference count in counts_ and
-    /// deleter function in deleters_
+    /// A map of pointer adresses -> indexes of metadata in metadatas_
     std::unordered_map<const void*, size_t> map_;
-    /// References counts
-    std::vector<atomic_count> counts_;
-    /// Deleter functions
-    std::vector<std::function<void(void)>> deleters_;
-    /// unused indexes in counts_/deleters_ that can be re-used. This is set by
+    /// Metadata for all known pointers
+    std::vector<shared_metadata> metadata_;
+    /// unused indexes in metadatas_ that can be re-used. This is set by
     /// free and used by get_unused_count.
-    std::vector<size_t> unused_counts_;
+    std::vector<size_t> unused_;
 
     /// Global instance of the allocator
     static shared_allocator instance_;
 };
+
+}
 
 #endif
