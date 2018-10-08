@@ -4,59 +4,20 @@
 #include <unordered_map>
 #include <functional>
 #include <cassert>
-#include <cstdlib>
 #include <vector>
-#include <atomic>
 
 #include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/mutex.hpp"
 
 namespace chemfiles {
-
-/// An atomic counter, for reference counted pointers
-class atomic_count {
-public:
-    explicit atomic_count(long value): value_(static_cast<std::int_least32_t>(value)) {}
-    ~atomic_count() = default;
-
-    atomic_count(const atomic_count&) = delete;
-    atomic_count& operator=(const atomic_count&) = delete;
-
-    atomic_count(atomic_count&& other): value_(static_cast<std::int_least32_t>(other.load())) {
-        other.value_ = 0;
-    }
-
-    atomic_count& operator=(atomic_count&& other) {
-        value_ = static_cast<std::int_least32_t>(other.load());
-        other.value_ = 0;
-        return *this;
-    }
-
-    // Increase counter by one and return the resulting value
-    long increase() {
-        return value_.fetch_add(1, std::memory_order_acq_rel) + 1;
-    }
-
-    // Decrease the counter by one and return the resulting value
-    long decrease() {
-        return value_.fetch_sub(1, std::memory_order_acq_rel) - 1;
-    }
-
-    // Get the current counter value
-    long load() const {
-        return value_.load(std::memory_order_acquire);
-    }
-
-private:
-    std::atomic_int_least32_t value_;
-};
-
 
 struct shared_metadata {
     shared_metadata(long count_, std::function<void(void)> deleter_):
         count(count_), deleter(std::move(deleter_)) {}
 
-    /// Number of pointer sharing this reference
-    atomic_count count;
+    /// Number of pointer sharing this reference. No need to use atomic
+    /// references counting, as the allocator is protected by a mutex
+    long count;
     /// How to delete the pointer when we are done with it
     std::function<void(void)> deleter;
 };
@@ -71,15 +32,15 @@ public:
     shared_allocator() = default;
     shared_allocator(const shared_allocator&) = delete;
     shared_allocator& operator=(const shared_allocator&) = delete;
-    shared_allocator(shared_allocator&&) = delete;
-    shared_allocator& operator=(shared_allocator&&) = delete;
+    shared_allocator(shared_allocator&&) = default;
+    shared_allocator& operator=(shared_allocator&&) = default;
 
     /// Like std::make_shared: create a new shared pointer by constructing a
     /// value of type T with the given arguments.
     template<class T, typename ... Args>
     static T* make_shared(Args&& ... args) {
         auto ptr = new T{std::forward<Args>(args)...};
-        instance_.insert_new(ptr);
+        instance_.lock()->insert_new(ptr);
         return ptr;
     }
 
@@ -90,7 +51,7 @@ public:
     /// `ptr` must have been allocated with make_shared.
     template<class T, class U>
     static T* shared_ptr(U* ptr, T* element) {
-        instance_.insert_shared(ptr, element);
+        instance_.lock()->insert_shared(ptr, element);
         return element;
     }
 
@@ -101,28 +62,30 @@ public:
 
     /// Decrease the reference count of `ptr`, and delete it if needed.
     static void free(const void* ptr) {
-        auto it = instance_.map_.find(ptr);
-        if (it == instance_.map_.end()) {
+        auto instance = instance_.lock();
+        auto it = instance->map_.find(ptr);
+        if (it == instance->map_.end()) {
             throw chemfiles::error(
                 "unknown pointer passed to shared_allocator::free: {}", ptr
             );
         }
-        auto references = instance_.metadata_.at(it->second).count.decrease();
-        if (references == 0) {
-            instance_.metadata_.at(it->second).deleter();
-            instance_.unused_.emplace_back(it->second);
+        auto& count = instance->metadata_.at(it->second).count;
+        count--;
+        if (count == 0) {
+            instance->metadata_.at(it->second).deleter();
+            instance->unused_.emplace_back(it->second);
 
             // Remove any pointer that was using the same metadata block
             auto to_remove = std::vector<const void*>();
-            for (const auto& registered: instance_.map_) {
+            for (const auto& registered: instance->map_) {
                 if (registered.second == it->second) {
                     to_remove.emplace_back(registered.first);
                 }
             }
             for (auto remove: to_remove) {
-                instance_.map_.erase(remove);
+                instance->map_.erase(remove);
             }
-        } else if (references < 0) {
+        } else if (count < 0) {
             throw chemfiles::error(
                 "internal error: negative reference count for {}", ptr
             );
@@ -161,7 +124,7 @@ private:
                 "shared_allocator (associated with {})", element, ptr
             );
         }
-        metadata_.at(it->second).count.increase();
+        metadata_.at(it->second).count++;
     }
 
     shared_metadata& metadata(const void* ptr) {
@@ -197,7 +160,7 @@ private:
     std::vector<size_t> unused_;
 
     /// Global instance of the allocator
-    static shared_allocator instance_;
+    static mutex<shared_allocator> instance_;
 };
 
 }
