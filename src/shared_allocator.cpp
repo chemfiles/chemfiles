@@ -3,4 +3,4 @@
 #include "chemfiles/shared_allocator.hpp"
 
 // define the global allocator instance
-shared_allocator shared_allocator::instance_;
+chemfiles::shared_allocator chemfiles::shared_allocator::instance_;
