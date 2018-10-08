@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <functional>
 #include <cassert>
+#include <cstdlib>
 #include <vector>
 #include <atomic>
 
@@ -110,12 +111,22 @@ public:
         if (references == 0) {
             instance_.metadata_.at(it->second).deleter();
             instance_.unused_.emplace_back(it->second);
+
+            // Remove any pointer that was using the same metadata block
+            auto to_remove = std::vector<const void*>();
+            for (const auto& registered: instance_.map_) {
+                if (registered.second == it->second) {
+                    to_remove.emplace_back(registered.first);
+                }
+            }
+            for (auto remove: to_remove) {
+                instance_.map_.erase(remove);
+            }
         } else if (references < 0) {
             throw chemfiles::error(
                 "internal error: negative reference count for {}", ptr
             );
         }
-        instance_.map_.erase(it);
     }
 
 private:

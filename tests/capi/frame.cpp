@@ -268,6 +268,14 @@ TEST_CASE("chfl_frame") {
         CHECK(name == std::string(""));
         CHECK_STATUS(chfl_atom_free(atom));
 
+        // Get the same atom twice
+        CHFL_ATOM* first = chfl_atom_from_frame(frame, 1);
+        CHFL_ATOM* second = chfl_atom_from_frame(frame, 1);
+        REQUIRE(first);
+        REQUIRE(second);
+        CHECK_STATUS(chfl_atom_free(first));
+        CHECK_STATUS(chfl_atom_free(second));
+
         // Out of bounds access
         atom = chfl_atom_from_frame(frame, 10000);
         CHECK_FALSE(atom);
