@@ -24,7 +24,7 @@ int main() {
 
     chfl_frame_guess_bonds(frame);
 
-    // Get a copie of the new topology
+    // Get the new topology
     topology = chfl_topology_from_frame(frame);
     chfl_topology_bonds_count(topology, &bonds);
     assert(bonds == 1);
