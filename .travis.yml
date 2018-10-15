@@ -34,47 +34,49 @@ env:
 matrix:
   fast_finish: true
   include:
-    # Emscripten builder
-    - os: linux
+    - name: Emscripten
+      os: linux
       env: STATIC_LIBS=ON EMSCRIPTEN=ON
       addons:
         apt:
           packages:
           - doxygen
-    # Static libs + docs + coverage
-    - os: linux
+    - name: static + doc + coverage
+      os: linux
       compiler: gcc
       env: STATIC_LIBS=ON DO_COVERAGE=ON DEPLOY_DOCS=ON
       addons: *linux64
-    # Using system libs
-    - os: linux
+    - name: system libs
+      os: linux
       compiler: clang
       env: CMAKE_EXTRA="-DCHFL_SYSTEM_NETCDF=ON -DCHFL_SYSTEM_ZLIB=ON -DCHFL_SYSTEM_LZMA=ON"
       addons: *linux64
-    # Run tests under valgrind
-    - os: linux
+    - name: valgrind
+      os: linux
       compiler: gcc
       env: VALGRIND=ON
       addons: *linux64
-    # 32-bits build
-    - os: linux
+    - name: 32-bits
+      os: linux
       compiler: gcc
       env: ARCH=x86 CMAKE_EXTRA=-DHAVE_LIBM=/lib32/libm.so.6
       addons: *linux32
-    # Build with intel compiler
-    - os: linux
+    - name: Intel compilers
+      os: linux
       compiler: gcc
       env: USE_ICC=ON
       addons: *linux64
-    # Build with PGI compiler
-    - os: linux
+    - name: PGI compilers
+      os: linux
       compiler: gcc
       env: USE_PGI=ON
       addons: *linux64
-    - os: osx
+    - name: osx clang
+      os: osx
       compiler: clang
       osx_image: xcode7.3
-    - os: osx
+    - name: osx gcc 
+      os: osx
       compiler: gcc
       osx_image: xcode7.3
   allow_failures:
