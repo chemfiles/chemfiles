@@ -28,19 +28,12 @@ linux32_addons:
         - linux-libc-dev:i386
         - libc6-dev-i386
 
-# Set empty values for allow_failures to work
-env:
-
 matrix:
   fast_finish: true
   include:
-    - name: Emscripten
+    - name: emscripten
       os: linux
       env: STATIC_LIBS=ON EMSCRIPTEN=ON
-      addons:
-        apt:
-          packages:
-          - doxygen
     - name: static + doc + coverage
       os: linux
       compiler: gcc
@@ -61,27 +54,14 @@ matrix:
       compiler: gcc
       env: ARCH=x86 CMAKE_EXTRA=-DHAVE_LIBM=/lib32/libm.so.6
       addons: *linux32
-    - name: Intel compilers
-      os: linux
-      compiler: gcc
-      env: USE_ICC=ON
-      addons: *linux64
-    - name: PGI compilers
-      os: linux
-      compiler: gcc
-      env: USE_PGI=ON
-      addons: *linux64
     - name: osx clang
       os: osx
       compiler: clang
       osx_image: xcode7.3
-    - name: osx gcc 
+    - name: osx gcc
       os: osx
       compiler: gcc
       osx_image: xcode7.3
-  allow_failures:
-    - env: USE_ICC=ON
-    - env: USE_PGI=ON
 
 before_install:
   # Setting environement
