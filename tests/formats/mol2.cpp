@@ -65,7 +65,7 @@ TEST_CASE("Read files in mol2 format") {
         CHECK(topology[3].type() == "n");
         CHECK(approx_eq(topology[3].charge(), -0.471100, 1e-5));
         CHECK(topology[61].name() == "H24");
-        CHECK(topology[61].type() == "hc");
+        CHECK(topology[61].type() == "H");
         CHECK(approx_eq(topology[61].charge(), 0.044367, 1e-5));
 
         CHECK(topology.bonds().size() == 72);
@@ -97,7 +97,8 @@ TEST_CASE("Read files in mol2 format") {
 
         auto& topology = frame.topology();
         CHECK(topology[0].name() == "N1");
-        CHECK(topology[0].type() == "N.am");
+        CHECK(topology[0].type() == "N");
+        CHECK(topology[0].get("sybyl")->as_string() == "N.am");
         CHECK(approx_eq(topology[0].charge(), -0.8960, 1e-4));
         CHECK(topology[33].name() == "H131");
         CHECK(topology[33].type() == "H");
@@ -120,8 +121,10 @@ TEST_CASE("Read files in mol2 format") {
 
         auto& topology = frame.topology();
         CHECK(topology[0].name() == "N1");
-        CHECK(topology[0].type() == "N.am");
+        CHECK(topology[0].type() == "N");
+        CHECK(topology[0].get("sybyl")->as_string() == "N.am");
         CHECK(approx_eq(topology[0].charge(), -0.8960, 1e-4));
+
         CHECK(topology[33].name() == "H131");
         CHECK(topology[33].type() == "H");
         CHECK(approx_eq(topology[33].charge(), 0.0720, 1e-4));
@@ -142,7 +145,9 @@ TEST_CASE("Read files in mol2 format") {
 
         auto& topology = frame.topology();
         CHECK(topology[0].name() == "N1");
-        CHECK(topology[0].type() == "N.am");
+        CHECK(topology[0].type() == "N");
+        CHECK(topology[0].get("sybyl")->as_string() == "N.am");
+
         CHECK(approx_eq(topology[0].charge(), -0.8960, 1e-4));
         CHECK(topology[33].name() == "H131");
         CHECK(topology[33].type() == "H");
@@ -163,7 +168,7 @@ TEST_CASE("Write files in mol2 format") {
     "SMALL\n"
     "USER_CHARGES\n\n"
     "@<TRIPOS>ATOM\n"
-    "   1 CCH22  1.000000 2.000000 3.000000 CCH22 1 XXX 0.000000\n"
+    "   1 C     1.000000 2.000000 3.000000 C.2 1 XXX 0.000000\n"
     "   2 B     1.123456 2.123457 10000000.123456 B 2 XXX 0.000000\n"
     "   3 C     1.000000 2.000000 3.000000 C 3 XXX 0.000000\n"
     "   4 D     1.000000 2.000000 3.000000 D 4 XXX 0.000000\n"
@@ -177,7 +182,7 @@ TEST_CASE("Write files in mol2 format") {
     "SMALL\n"
     "USER_CHARGES\n\n"
     "@<TRIPOS>ATOM\n"
-    "   1 CCH22  1.000000 2.000000 3.000000 CCH22 4 XXX 0.000000\n"
+    "   1 C     1.000000 2.000000 3.000000 C.2 4 XXX 0.000000\n"
     "   2 B     1.123456 2.123457 10000000.123456 B 3 foo 0.000000\n"
     "   3 C     1.000000 2.000000 3.000000 C 3 foo 0.000000\n"
     "   4 D     1.000000 2.000000 3.000000 D 5 barbar 0.000000\n"
@@ -199,7 +204,8 @@ TEST_CASE("Write files in mol2 format") {
     "   1 ****        1 TEMP                        0 ****  **** 0 ROOT\n\n";
 
     auto frame = Frame();
-    frame.add_atom(Atom("CCH22"), {1, 2, 3});
+    frame.add_atom(Atom("C"), {1, 2, 3});
+    frame[0].set("sybyl", "C.2");
     frame.add_atom(Atom("B"), {1.123456, 2.123456789, 10000000.123456});
     frame.add_atom(Atom("C"), {1, 2, 3});
     frame.add_atom(Atom("D"), {1, 2, 3});

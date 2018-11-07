@@ -10,6 +10,8 @@
 #include "chemfiles/File.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/utils.hpp"
+#include "chemfiles/periodic_table.hpp"
+
 #include "chemfiles/warnings.hpp"
 
 using namespace chemfiles;
@@ -112,23 +114,44 @@ void MOL2Format::read_atoms(Frame& frame, size_t natoms, bool charges) {
 
     for (const auto& line : lines) {
         unsigned long id, resid;
-        char atom_name[32], atom_type[32], res_name[32];
+        char atom_name[32], sybyl_type[32], res_name[32];
         double x, y, z;
         double charge = 0;
 
         if (charges) {
             scan(line, " %lu %31s %lf %lf %lf %31s %lu %31s %lf",
-                &id, &atom_name[0], &x, &y, &z, &atom_type[0], &resid, &res_name[0], &charge
+                &id, &atom_name[0], &x, &y, &z, &sybyl_type[0], &resid, &res_name[0], &charge
             );
         } else {
             scan(line, " %lu %31s %lf %lf %lf %31s %lu %31s",
-                &id, &atom_name[0], &x, &y, &z, &atom_type[0], &resid, &res_name[0]
+                &id, &atom_name[0], &x, &y, &z, &sybyl_type[0], &resid, &res_name[0]
             );
+        }
+
+        std::string atom_type;
+        bool is_sybyl;
+    
+        if (std::string(sybyl_type).find('.') != std::string::npos || find_in_periodic_table(sybyl_type)) {
+            auto my_split = split(sybyl_type, '.');
+            atom_type = my_split[0];
+            is_sybyl = true;
+        } else {
+            is_sybyl = false;
+            for (auto a : atom_name) {
+                if (!std::isalpha(a) || !find_in_periodic_table(atom_type + a)) {
+                    break;
+                }
+                atom_type += a;
+            }
+            warning("Invalid sybyl type: '{}'. Guessing '{}' from '{}'", sybyl_type, atom_type, atom_name);
         }
 
         auto atom = Atom(atom_name, atom_type);
         if (charges) {
             atom.set_charge(charge);
+        }
+        if (is_sybyl) {
+            atom.set("sybyl", sybyl_type);
         }
         frame.add_atom(std::move(atom), {x, y, z});
 
@@ -286,10 +309,23 @@ void MOL2Format::write(const Frame& frame) {
             resid = std::to_string(++max_resid);
         }
 
+        std::string sybyl;
+        bool has_sybyl = true;
+        if (frame[i].get("sybyl") && frame[i].get("sybyl")->kind() == Property::STRING) {
+            sybyl = frame[i].get("sybyl")->as_string();
+        } else {
+            has_sybyl = false;
+            sybyl = frame[i].type();
+        }
+
+        if (!has_sybyl) {
+            warning("Sybyl type not set. Using element type instead");
+        }
+
         fmt::print(
             *file_,
             "{:4d} {:4s}  {:.6f} {:.6f} {:.6f} {:s} {} {} {:.6f}\n",
-            i + 1, frame[i].name(), positions[i][0], positions[i][1], positions[i][2], frame[i].type(), resid, resname, frame[i].charge()
+            i + 1, frame[i].name(), positions[i][0], positions[i][1], positions[i][2], sybyl, resid, resname, frame[i].charge()
         );
     }
 

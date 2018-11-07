@@ -29,3 +29,16 @@ mmCIF = """On reading, this property is set the the alternative location
 character stored in both of these formats. On writing, this character is stored
 with the ``ATOM`` or ``HETATM`` record. If the property is not set, a space
 character is used."""
+
+[sybyl]
+type = "string"
+
+MOL2 = """The **sybyl** atom type is typically stored in a MOL2 file in a column
+between the Z coordinate and the residue id. These types typically consist of
+an element ID, a period, then a hybridization state (eg ``C.2`` or ``O.3``).
+When reading, if the sybyl type column contains a period or is a valid element
+ID, this property is set to the value in the column. Otherwise, the property is
+not set and the atom type is guessed from the atom name. When writing, if this
+propery is set, then this value is written between the Z coordinate and the
+residue number. Otherwise, the atom's type is used to replace the **sybyl**
+type."""
