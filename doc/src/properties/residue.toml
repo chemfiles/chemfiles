@@ -18,7 +18,7 @@ unique to a given biological assembly, however."""
 [chainid]
 type = "string"
 
-PDB = "For ``PDB`` files, the **chainid** is Identical to **chainname**"
+PDB = "For ``PDB`` files, the **chainid** is identical to **chainname**"
 
 mmCIF = """The **chainname** defines the name assigned to a protein chain by
 biologists. It is is a single character used to group residues which are linked
