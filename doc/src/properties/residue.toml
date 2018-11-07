@@ -1,41 +1,71 @@
 [chainname]
 type = "string"
 
-PDB = "**TODO**"
+PDB = """The **chainname** defines the name assigned to a protein chain by
+biologists. It is is a single character used to group residues which are linked
+together in a crystallographic file where it may not be unique."""
 
-mmCIF = "**TODO**"
+mmCIF = """The **chainname** defines the name assigned to a protein chain by
+biologists. It is is a single character used to group residues which are linked
+together in a crystallographic file where it may *not* be unique. This name *is*
+unique to a given biological assembly, however."""
 
-MMTF = "**TODO**"
+MMTF = """The **chainname** defines the name assigned to a protein chain by
+biologists. It is is a single character used to group residues which are linked
+together in a crystallographic file where it may *not* be unique. This name *is*
+unique to a given biological assembly, however."""
 
 [chainid]
-type = "number"
+type = "string"
 
-PDB = "**TODO**"
+PDB = "For ``PDB`` files, the **chainid** is Identical to **chainname**"
 
-mmCIF = "**TODO**"
+mmCIF = """The **chainname** defines the name assigned to a protein chain by
+biologists. It is is a single character used to group residues which are linked
+together in a biologic assembly. It is unique to both the biologic assembly and
+the crystal structure."""
 
-MMTF = "**TODO**"
+MMTF = """The **chainname** defines the name assigned to a protein chain by
+biologists. It is is a single character used to group residues which are linked
+together in a biologic assembly. It is unique to both the biologic assembly and
+the crystal structure."""
 
 [chainindex]
 type = "number"
 
-MMTF = "**TODO**: how is this different from chainid?"
+MMTF = """The **chainindex** is a numeric representation of the **chainindex**
+and it may be removed in a future release."""
 
 [composition_type]
-type = "**TODO**"
+type = "string"
 
-mmCIF = "**TODO**"
+MMTF = """The **composition_type** defines how residues are chemically bonded.
+For example, the majority of proteins consist of ``L-peptide linking``
+residues, RNAs consist of ``L-RNA linking``, DNAs consist of ``L-DNA linking``,
+and saccharides consist of ``D-saccharide``. See ``chemCompType`` in the mmCIF
+dictionary for more details. Since this is a required group property, ``other``
+is used when writing unless specified."""
+
+mmCIF = """The **composition_type** defines how residues are chemically bonded.
+For example, the majority of proteins consist of ``L-peptide linking``
+residues, RNAs consist of ``L-RNA linking``, DNAs consist of ``L-DNA linking``,
+and saccharides consist of ``D-saccharide``. See ``chemCompType`` in the mmCIF
+dictionary for more details."""
 
 [assembly]
-type = "**TODO**"
+type = "string"
 
-MMTF = "**TODO**"
-
+MMTF = """The **assembly** property defines the assignment of biologically
+relevent groupings of residues in a crystal structure. For example, the PDBID
+``4XUF`` contains two biologically identical copies of the protein FLT3, labled
+``bioA`` and ``bioB``, as this protein does not function as a homodimer. The
+PDBID ``3OGF``, however, is a homodimer and therefore only contains one
+biological assembly with two chains. This property is not used for writing."""
 
 [insertion_code]
 type = "string"
 
-PDB = """On reading, this insertion_code is set to the insertion code of the
+PDB = """On reading, this **insertion_code** is set to the insertion code of the
 residue. This code is stored as a single character in the PDB file after the
 residue id. If this character is a space character, the property is not set. On
 writing, this character is stored with the ``ATOM`` or ``HETATM`` record. If the
