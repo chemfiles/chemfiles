@@ -301,6 +301,11 @@ void MMTFFormat::write(const Frame& frame) {
         structure_.groupIdList.emplace_back(groupId ? *groupId : 0);
         structure_.groupList.emplace_back();
         structure_.groupList.back().groupName = prev_residue->name();
+        structure_.groupList.back().chemCompType = 
+            prev_residue->get("composition_type") &&
+            prev_residue->get("composition_type")->kind() == Property::STRING ?
+            prev_residue->get("composition_type")->as_string() :
+            "other";
 
         auto& group = structure_.groupList.back();
         group.formalChargeList.emplace_back(frame[i].charge());
