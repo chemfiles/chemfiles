@@ -130,5 +130,26 @@ TEST_CASE("Use the Atom type") {
                 CHECK(false);  // all case should have been covered
             }
         }
+
+        // Typed access to properties
+        CHECK(atom.get<Property::BOOL>("bar").value() == false);
+        CHECK_FALSE(atom.get<Property::STRING>("bar"));
+        CHECK_FALSE(atom.get<Property::DOUBLE>("bar"));
+        CHECK_FALSE(atom.get<Property::VECTOR3D>("bar"));
+
+        CHECK(atom.get<Property::STRING>("foo").value() == "test");
+        CHECK_FALSE(atom.get<Property::BOOL>("foo"));
+        CHECK_FALSE(atom.get<Property::DOUBLE>("foo"));
+        CHECK_FALSE(atom.get<Property::VECTOR3D>("foo"));
+
+        CHECK(atom.get<Property::DOUBLE>("buzz").value() == 22);
+        CHECK_FALSE(atom.get<Property::BOOL>("buzz"));
+        CHECK_FALSE(atom.get<Property::STRING>("buzz"));
+        CHECK_FALSE(atom.get<Property::VECTOR3D>("buzz"));
+
+        CHECK(atom.get<Property::VECTOR3D>("fizz").value() == Vector3D(1, 2, 3));
+        CHECK_FALSE(atom.get<Property::BOOL>("fizz"));
+        CHECK_FALSE(atom.get<Property::STRING>("fizz"));
+        CHECK_FALSE(atom.get<Property::DOUBLE>("fizz"));
     }
 }

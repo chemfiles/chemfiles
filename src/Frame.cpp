@@ -199,11 +199,3 @@ double Frame::out_of_plane(size_t i, size_t j, size_t k, size_t m) const {
     auto n = cross(rik, rim);
     return dot(rji, n) / n.norm();
 }
-
-void Frame::set(std::string name, Property value) {
-    properties_.set(std::move(name), std::move(value));
-}
-
-optional<const Property&> Frame::get(const std::string& name) const {
-    return properties_.get(name);
-}

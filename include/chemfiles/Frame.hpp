@@ -355,20 +355,44 @@ public:
     /// replaced with the new value.
     ///
     /// @example{tests/doc/frame/set.cpp}
-    void set(std::string name, Property value);
+    void set(std::string name, Property value) {
+        properties_.set(std::move(name), std::move(value));
+    }
 
-    /// Get the property with the given `name` for this frame if it exists.
+    /// Get the `Property` with the given `name` for this frame if it exists.
     ///
     /// If no property with the given `name` is found, this function returns
     /// `nullopt`.
     ///
     /// @verbatim embed:rst:leading-slashes
-    /// This function returna an :cpp:class:`chemfiles::optional` value that is
+    /// This function returns an :cpp:class:`chemfiles::optional` value that is
     /// close to C++17 ``std::optional``.
     /// @endverbatim
     ///
     /// @example{tests/doc/frame/get.cpp}
-    optional<const Property&> get(const std::string& name) const;
+    optional<const Property&> get(const std::string& name) const {
+        return properties_.get(name);
+    }
+
+    /// Get the `Property` with the given `name` for this frame if it exists,
+    /// and check that it has the required `kind`.
+    ///
+    /// If no property with the given `name` is found, this function returns
+    /// `nullopt`.
+    ///
+    /// If a property with the given `name` is found, but has a different kind,
+    /// this function emits a warning and returns `nullopt`.
+    ///
+    /// @verbatim embed:rst:leading-slashes
+    /// This function returns an :cpp:class:`chemfiles::optional` value that is
+    /// close to C++17 ``std::optional``.
+    /// @endverbatim
+    ///
+    /// @example{tests/doc/frame/get.cpp}
+    template<Property::Kind kind>
+    optional<typename property_metadata<kind>::type> get(const std::string& name) const {
+        return properties_.get<kind>(name);
+    }
 
 private:
     Frame(const Frame&) = default;

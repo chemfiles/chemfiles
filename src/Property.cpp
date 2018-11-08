@@ -3,6 +3,7 @@
 
 #include "chemfiles/Property.hpp"
 #include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/warnings.hpp"
 #include "chemfiles/utils.hpp"
 using namespace chemfiles;
 
@@ -11,7 +12,7 @@ bool Property::as_bool() const {
         return bool_;
     } else {
         throw property_error(
-            "can not call 'as_bool' on a {} property", kind_as_string()
+            "can not call 'as_bool' on a {} property", kind_as_string(kind_)
         );
     }
 }
@@ -21,7 +22,7 @@ double Property::as_double() const {
         return double_;
     } else {
         throw property_error(
-            "can not call 'as_double' on a {} property", kind_as_string()
+            "can not call 'as_double' on a {} property", kind_as_string(kind_)
         );
     }
 }
@@ -31,7 +32,7 @@ Vector3D Property::as_vector3d() const {
         return vector3d_;
     } else {
         throw property_error(
-            "can not call 'as_vector3d' on a {} property", kind_as_string()
+            "can not call 'as_vector3d' on a {} property", kind_as_string(kind_)
         );
     }
 }
@@ -41,13 +42,13 @@ const std::string& Property::as_string() const {
         return string_;
     } else {
         throw property_error(
-            "can not call 'as_string' on a {} property", kind_as_string()
+            "can not call 'as_string' on a {} property", kind_as_string(kind_)
         );
     }
 }
 
-std::string Property::kind_as_string() const {
-    switch (this->kind_) {
+std::string Property::kind_as_string(Kind kind) {
+    switch (kind) {
     case BOOL:
         return "bool";
     case DOUBLE:
@@ -78,3 +79,27 @@ optional<const Property&> property_map::get(const std::string& name) const {
         return nullopt;
     }
 }
+
+template<Property::Kind kind>
+optional<typename property_metadata<kind>::type> property_map::get(const std::string& name) const {
+    auto property = this->get(name);
+    if (property) {
+        if (property->kind() == kind) {
+            return property_metadata<kind>::extract(*property);
+        } else {
+            warning(
+                "expected '{}' property to be a {}, got a {} instead",
+                name, Property::kind_as_string(kind), Property::kind_as_string(property->kind())
+            );
+            return nullopt;
+        }
+    } else {
+        return nullopt;
+    }
+}
+
+// Explicit template instanciation
+template optional<bool> property_map::get<Property::BOOL>(const std::string& name) const;
+template optional<double> property_map::get<Property::DOUBLE>(const std::string& name) const;
+template optional<const std::string&> property_map::get<Property::STRING>(const std::string& name) const;
+template optional<Vector3D> property_map::get<Property::VECTOR3D>(const std::string& name) const;
