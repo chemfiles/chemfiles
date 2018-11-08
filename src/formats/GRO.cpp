@@ -174,12 +174,7 @@ static std::string to_gro_index(uint64_t i) {
 }
 
 void GROFormat::write(const Frame& frame) {
-    if (frame.get("name") && frame.get("name")->kind() == Property::STRING) {
-        fmt::print(*file_, frame.get("name")->as_string() + "\n");
-    } else {
-        fmt::print(*file_, "GRO File produced by chemfiles\n");
-    }
-
+    fmt::print(*file_, "{}\n", frame.get<Property::STRING>("name").value_or("GRO File produced by chemfiles"));
     fmt::print(*file_, "{: >5d}\n", frame.size());
 
     // Only use numbers bigger than the biggest residue id as "resSeq" for
