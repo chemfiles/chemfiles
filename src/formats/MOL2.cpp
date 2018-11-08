@@ -246,12 +246,7 @@ std::streampos forward(TextFile& file) {
 
 void MOL2Format::write(const Frame& frame) {
     fmt::print(*file_, "@<TRIPOS>MOLECULE\n");
-
-    const auto& frame_name = frame.get("name");
-    if (frame_name && frame_name->kind() == Property::STRING) {
-        fmt::print(*file_, frame_name->as_string());
-    }
-    fmt::print(*file_, "\n");
+    fmt::print(*file_, "{}\n", frame.get<Property::STRING>("name").value_or(""));
 
     // Start after the maximal residue id for atoms without associated residue
     uint64_t max_resid = 0;

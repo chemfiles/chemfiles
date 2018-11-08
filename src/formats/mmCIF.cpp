@@ -380,17 +380,17 @@ void mmCIFFormat::write(const Frame& frame) {
 
     models_++;
 
-    const auto& topo = frame.topology();
+    const auto& topology = frame.topology();
+    const auto positions = frame.positions();
     for (size_t i = 0; i < frame.size(); ++i) {
         ++atoms_;
 
-        std::string pdbgroup = "ATOM  ";
         std::string compid = ".";
         std::string asymid = ".";
         std::string seq_id = ".";
         std::string auth_asymid = ".";
 
-        const auto& residue = topo.residue_for_atom(i);
+        const auto& residue = topology.residue_for_atom(i);
         if (residue) {
             compid = residue->name();
 
@@ -400,29 +400,20 @@ void mmCIFFormat::write(const Frame& frame) {
                 seq_id = "?";
             }
 
-            if (residue->get("chainid") && residue->get("chainid")->kind() == Property::STRING) {
-                asymid = residue->get("chainid")->as_string();
-            } else {
-                asymid = "?";
-            }
-
-            if (residue->get("chainname") && residue->get("chainname")->kind() == Property::STRING) {
-                auth_asymid = residue->get("chainname")->as_string();
-            }
+            asymid = residue->get<Property::STRING>("chainid").value_or("?");
+            auth_asymid = residue->get<Property::STRING>("chainname").value_or(".");
         }
 
         const auto& atom = frame[i];
-
-        if (atom.get("is_hetatm") && atom.get("is_hetatm")->kind() == Property::BOOL &&
-            atom.get("is_hetatm")->as_bool()) {
+        std::string pdbgroup = "ATOM  ";
+        if (atom.get<Property::BOOL>("is_hetatm").value_or(false)) {
             pdbgroup = "HETATM";
         }
 
-        const auto& pos = frame.positions()[i];
         fmt::print(*file_, "{} {: <5} {: <2} {: <4} {} {: >3} {} {: >4} {:8.3f} {:8.3f} {:8.3f} {} {} {}\n",
-                pdbgroup, atoms_,frame[i].type(), frame[i].name(), ".", compid, asymid, seq_id, pos[0], pos[1],
-                pos[2], atom.charge(), auth_asymid, models_
-
+                pdbgroup, atoms_, atom.type(), atom.name(), ".", compid,
+                asymid, seq_id, positions[i][0], positions[i][1], positions[i][2],
+                atom.charge(), auth_asymid, models_
         );
     }
 

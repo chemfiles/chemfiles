@@ -195,11 +195,7 @@ void SDFFormat::write(const Frame& frame) {
     auto& positions = frame.positions();
     assert(frame.size() == topology.size());
 
-    if (frame.get("name")) {
-        fmt::print(*file_, "{}\n", frame.get("name")->as_string());
-    } else {
-        fmt::print(*file_, "NONAME\n");
-    }
+    fmt::print(*file_, "{}\n", frame.get<Property::STRING>("name").value_or("NONAME"));
     fmt::print(*file_, " chemfiles-lib\n\n");
     fmt::print(*file_, "{:>3}{:>3}  0     0  0  0  0  0  0999 V2000\n", frame.size(), topology.bonds().size());
 

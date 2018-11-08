@@ -469,32 +469,16 @@ void PDBFormat::write(const Frame& frame) {
     for (size_t i = 0; i < frame.size(); i++) {
 
         std::string atom_hetatm = "HETATM";
-        auto is_hetatm = frame.topology()[i].get("is_hetatm");
-        if (is_hetatm) {
-            if (is_hetatm->kind() == Property::BOOL) {
-                if (is_hetatm->as_bool()) {
-                    atom_hetatm = "HETATM";
-                } else {
-                    atom_hetatm = "ATOM  ";
-                }
-            } else {
-                warning(
-                    "\'is_hetatm\' property is not a boolean in PDB writer, using HETATM"
-                );
-            }
+        auto is_hetatm = frame[i].get<Property::BOOL>("is_hetatm");
+        if (is_hetatm && !is_hetatm.value()) {
+            // only use ATOM is is_hetatm is SET and FALSE.
+            atom_hetatm = "ATOM  ";
         }
 
-        std::string altloc = " ";
-        auto altloc_prop = frame.topology()[i].get("altloc");
-        if (altloc_prop) {
-            if (altloc_prop->kind() == Property::STRING) {
-                altloc = altloc_prop->as_string();
-            } // Silently ignore other types
-        }        
-
+        auto altloc = frame[i].get<Property::STRING>("altloc").value_or(" ");
         if (altloc.length() > 1) {
             warning(
-                "Altloc '{}' is too long for PDB format, it will be truncated.",
+                "altloc '{}' too long for PDB format, it will be truncated.",
                 altloc
             );
             altloc = altloc[0];
