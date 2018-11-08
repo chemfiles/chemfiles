@@ -17,6 +17,10 @@ TEST_CASE() {
     assert(atom.get("second")->as_double() == 42.5);
     assert(atom.get("first")->as_string() == "this is a carbon");
 
+    // Typed access to properties
+    assert(atom.get<Property::STRING>("first").value() == "this is a carbon");
+    assert(!atom.get<Property::BOOL>("first"));
+
     assert(!atom.get("non-existant property"));
 
     // Override the "first" property

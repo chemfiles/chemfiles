@@ -16,11 +16,3 @@ void Residue::add_atom(size_t i) {
 bool Residue::contains(size_t i) const {
     return atoms_.find(i) != atoms_.end();
 }
-
-void Residue::set(std::string name, Property value) {
-    properties_.set(std::move(name), std::move(value));
-}
-
-optional<const Property&> Residue::get(const std::string& name) const {
-    return properties_.get(name);
-}

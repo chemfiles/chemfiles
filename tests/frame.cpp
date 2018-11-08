@@ -258,4 +258,25 @@ TEST_CASE("Properties") {
             CHECK(false);  // all case should have been covered
         }
     }
+
+    // Typed access to properties
+    CHECK(frame.get<Property::BOOL>("bar").value() == false);
+    CHECK_FALSE(frame.get<Property::STRING>("bar"));
+    CHECK_FALSE(frame.get<Property::DOUBLE>("bar"));
+    CHECK_FALSE(frame.get<Property::VECTOR3D>("bar"));
+
+    CHECK(frame.get<Property::STRING>("foo").value() == "test");
+    CHECK_FALSE(frame.get<Property::BOOL>("foo"));
+    CHECK_FALSE(frame.get<Property::DOUBLE>("foo"));
+    CHECK_FALSE(frame.get<Property::VECTOR3D>("foo"));
+
+    CHECK(frame.get<Property::DOUBLE>("buzz").value() == 22);
+    CHECK_FALSE(frame.get<Property::BOOL>("buzz"));
+    CHECK_FALSE(frame.get<Property::STRING>("buzz"));
+    CHECK_FALSE(frame.get<Property::VECTOR3D>("buzz"));
+
+    CHECK(frame.get<Property::VECTOR3D>("fizz").value() == Vector3D(1, 2, 3));
+    CHECK_FALSE(frame.get<Property::BOOL>("fizz"));
+    CHECK_FALSE(frame.get<Property::STRING>("fizz"));
+    CHECK_FALSE(frame.get<Property::DOUBLE>("fizz"));
 }

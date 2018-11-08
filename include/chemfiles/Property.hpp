@@ -164,10 +164,10 @@ public:
     /// @throws PropertyError if this property does not hold a string value
     const std::string& as_string() const;
 
-private:
-    /// Get the kind name as a string
-    std::string kind_as_string() const;
+    /// Get the given kind name as a string
+    static std::string kind_as_string(Kind kind);
 
+private:
     Kind kind_;
     union {
         bool bool_;
@@ -200,6 +200,47 @@ inline bool operator!=(const Property& lhs, const Property& rhs) {
     return !(lhs == rhs);
 }
 
+/// Various metadata associated with a given kind, accessible at compile time
+template<Property::Kind kind>
+struct property_metadata {
+    /// Type of the property
+    using type = void;
+    /// Extract the value of the property
+    static type extract(const Property&);
+};
+
+template<>
+struct property_metadata<Property::BOOL> {
+    using type = bool;
+    static type extract(const Property& property) {
+        return property.as_bool();
+    }
+};
+
+template<>
+struct property_metadata<Property::DOUBLE> {
+    using type = double;
+    static type extract(const Property& property) {
+        return property.as_double();
+    }
+};
+
+template<>
+struct property_metadata<Property::STRING> {
+    using type = const std::string&;
+    static type extract(const Property& property) {
+        return property.as_string();
+    }
+};
+
+template<>
+struct property_metadata<Property::VECTOR3D> {
+    using type = Vector3D;
+    static type extract(const Property& property) {
+        return property.as_vector3d();
+    }
+};
+
 /// A property map for inclusion in a Frame or an Atom.
 class CHFL_EXPORT property_map final {
 public:
@@ -214,6 +255,9 @@ public:
 
     /// Get the property with the given `name` if it exists.
     optional<const Property&> get(const std::string& name) const;
+
+    template<Property::Kind kind>
+    optional<typename property_metadata<kind>::type> get(const std::string& name) const;
 
     /// Get the number of properties in this property map
     size_t size() const {
@@ -242,6 +286,12 @@ inline bool operator==(const property_map& lhs, const property_map& rhs) {
 inline bool operator!=(const property_map& lhs, const property_map& rhs) {
     return !(lhs == rhs);
 }
+
+// Declare instantiations of the typed `property_map::get` template
+extern template optional<bool> property_map::get<Property::BOOL>(const std::string& name) const;
+extern template optional<double> property_map::get<Property::DOUBLE>(const std::string& name) const;
+extern template optional<const std::string&> property_map::get<Property::STRING>(const std::string& name) const;
+extern template optional<Vector3D> property_map::get<Property::VECTOR3D>(const std::string& name) const;
 
 } // namespace chemfiles
 

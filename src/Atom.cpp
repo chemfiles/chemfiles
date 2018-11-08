@@ -97,11 +97,3 @@ optional<uint64_t> Atom::atomic_number() const {
         return nullopt;
     }
 }
-
-void Atom::set(std::string name, Property value) {
-    properties_.set(std::move(name), std::move(value));
-}
-
-optional<const Property&> Atom::get(const std::string& name) const {
-    return properties_.get(name);
-}

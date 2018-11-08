@@ -15,6 +15,9 @@ TEST_CASE() {
     assert(frame.get("foo"));
     assert(frame.get("foo")->as_double() == 23);
 
+    assert(frame.get<Property::DOUBLE>("foo").value() == 23);
+    assert(!frame.get<Property::STRING>("foo"));
+
     assert(!frame.get("bar"));
     // [example]
 }

@@ -70,5 +70,26 @@ TEST_CASE("Residue class usage") {
                 CHECK(false);  // all case should have been covered
             }
         }
+
+        // Typed access to properties
+        CHECK(residue.get<Property::BOOL>("bar").value() == false);
+        CHECK_FALSE(residue.get<Property::STRING>("bar"));
+        CHECK_FALSE(residue.get<Property::DOUBLE>("bar"));
+        CHECK_FALSE(residue.get<Property::VECTOR3D>("bar"));
+
+        CHECK(residue.get<Property::STRING>("foo").value() == "test");
+        CHECK_FALSE(residue.get<Property::BOOL>("foo"));
+        CHECK_FALSE(residue.get<Property::DOUBLE>("foo"));
+        CHECK_FALSE(residue.get<Property::VECTOR3D>("foo"));
+
+        CHECK(residue.get<Property::DOUBLE>("buzz").value() == 22);
+        CHECK_FALSE(residue.get<Property::BOOL>("buzz"));
+        CHECK_FALSE(residue.get<Property::STRING>("buzz"));
+        CHECK_FALSE(residue.get<Property::VECTOR3D>("buzz"));
+
+        CHECK(residue.get<Property::VECTOR3D>("fizz").value() == Vector3D(1, 2, 3));
+        CHECK_FALSE(residue.get<Property::BOOL>("fizz"));
+        CHECK_FALSE(residue.get<Property::STRING>("fizz"));
+        CHECK_FALSE(residue.get<Property::DOUBLE>("fizz"));
     }
 }

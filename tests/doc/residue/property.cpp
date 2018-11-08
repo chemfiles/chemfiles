@@ -17,6 +17,10 @@ TEST_CASE() {
     assert(residue.get("second")->as_double() == 42.5);
     assert(residue.get("first")->as_string() == "this is an alanine group");
 
+    // Typed access to properties
+    assert(residue.get<Property::STRING>("first").value() == "this is an alanine group");
+    assert(!residue.get<Property::BOOL>("first"));
+
     assert(!residue.get("non-existant property"));
 
     // Override the "first" property
