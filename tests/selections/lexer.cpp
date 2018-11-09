@@ -190,6 +190,7 @@ TEST_CASE("Lexing") {
         CHECK(tokenize("*")[0].type() == Token::STAR);
         CHECK(tokenize("/")[0].type() == Token::SLASH);
         CHECK(tokenize("^")[0].type() == Token::HAT);
+        CHECK(tokenize("%")[0].type() == Token::PERCENT);
     }
 
     SECTION("Functions") {
