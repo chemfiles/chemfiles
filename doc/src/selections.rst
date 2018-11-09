@@ -39,8 +39,9 @@ matches, or ``false`` if it does not. There are three kinds of selectors:
 Numeric values are produced by numeric selectors (``x``; ``mass``, ...) or
 literal values (``5.2``, ``22.21e-2``). They can also be combined together using
 mathematical operations: the usual ``+``, ``-``, ``*`` and ``/`` operators are
-supported, as well as ``^`` for exponentiation. These operations follow the
-usual priority rules: ``1 + 2 * 3`` is 7, not 9.
+supported, as well as ``^`` for exponentiation and ``%`` for modulo (remainder
+of Euclidean division). These operations follow the usual priority rules:
+``1 + 2 * 3`` is 7, not 9.
 
 When using a selection with more than one atom, selectors must refer to the
 different atoms with ``#1``, ``#2``, ``#3`` or ``#4`` variables: ``name(#3)``

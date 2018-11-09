@@ -371,6 +371,9 @@ MathAst Parser::math_product() {
         } else if (match(Token::SLASH)) {
             auto rhs = math_power();
             ast = MathAst(new Div(std::move(ast), std::move(rhs)));
+        } else if (match(Token::PERCENT)) {
+            auto rhs = math_power();
+            ast = MathAst(new Mod(std::move(ast), std::move(rhs)));
         } else {
             break;
         }

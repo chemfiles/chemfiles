@@ -473,6 +473,27 @@ std::string Neg::print() const {
     return fmt::format("(-{})", ast_->print());
 }
 
+double Mod::eval(const Frame& frame, const Match& match) const {
+    return fmod(lhs_->eval(frame, match), rhs_->eval(frame, match));
+}
+
+optional<double> Mod::optimize() {
+    auto lhs_opt = lhs_->optimize();
+    auto rhs_opt = rhs_->optimize();
+    if (lhs_opt && lhs_opt) {
+        return fmod(lhs_opt.value(), rhs_opt.value());
+    } else if (lhs_opt) {
+        lhs_ = MathAst(new Number(lhs_opt.value()));
+    } else if (rhs_opt) {
+        rhs_ = MathAst(new Number(rhs_opt.value()));
+    }
+    return nullopt;
+}
+
+std::string Mod::print() const {
+    return fmt::format("({} % {})", lhs_->print(), rhs_->print());
+}
+
 double Function::eval(const Frame& frame, const Match& match) const {
     return fn_(ast_->eval(frame, match));
 }
