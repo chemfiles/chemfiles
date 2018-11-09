@@ -384,6 +384,18 @@ private:
     MathAst ast_;
 };
 
+/// Modulo (remainder of Euclidean division) operation
+class Mod final: public MathExpr {
+public:
+    Mod(MathAst lhs, MathAst rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
+
+    double eval(const Frame& frame, const Match& match) const override;
+    optional<double> optimize() override;
+    std::string print() const override;
+private:
+    MathAst lhs_;
+    MathAst rhs_;
+};
 
 /// Function call
 class Function final: public MathExpr {

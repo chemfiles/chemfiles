@@ -247,6 +247,10 @@ TEST_CASE("Atoms selections") {
         selection = Selection("z * 5 >= 50");
         expected = std::vector<size_t>{};
         CHECK(selection.list(frame) == expected);
+
+        selection = Selection("index % 2 == 0");
+        expected = std::vector<size_t>{0, 2};
+        CHECK(selection.list(frame) == expected);
     }
 
     SECTION("functions") {

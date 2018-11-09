@@ -321,6 +321,14 @@ TEST_CASE("Parsing") {
             CHECK(parse("3 ^ 4 ^ 6 < 5")->print() == ast);
         }
 
+        SECTION("Modulo") {
+            CHECK(parse("3 % 2 == 0")->print() == "(3 % 2) == 0");
+
+            // Checking operators precedence
+            CHECK(parse("1 + 3 % 2 == 0")->print() == "(1 + (3 % 2)) == 0");
+            CHECK(parse("5 * 3 % 2 == 0")->print() == "((5 * 3) % 2) == 0");
+        }
+
         SECTION("Functions") {
             auto ast = "sin(3) < 5";
             CHECK(parse("sin(3) < 5")->print() == ast);
@@ -427,58 +435,24 @@ TEST_CASE("Parsing errors") {
 
 TEST_CASE("Optimizations") {
     SECTION("Doing something") {
-        // unary plus/minus
-        auto ast = "-4 == 5";
-        CHECK(parse_and_opt("-4 == +5")->print() == ast);
-
-        // Add
-        ast = "7 == 5";
-        CHECK(parse_and_opt("3 + 4 == 3 + 2")->print() == ast);
-
-        // Sub
-        ast = "7 == 5";
-        CHECK(parse_and_opt("9 - 2 == 15 - 10")->print() == ast);
-
-        // Mul
-        ast = "12 == 6";
-        CHECK(parse_and_opt("3 * 4 == 2 * 3")->print() == ast);
-
-        // Div
-        ast = "12 == 6";
-        CHECK(parse_and_opt("24 / 2 == 24 / 4")->print() == ast);
-
-        ast = "9 == 32";
-        CHECK(parse_and_opt("3^2 == 2^5")->print() == ast);
-
-        ast = "3 == 0.500000";
-        CHECK(parse_and_opt("sqrt(9) == sin(asin(0.5))")->print() == ast);
+        CHECK(parse_and_opt("-4 == +5")->print() == "-4 == 5");
+        CHECK(parse_and_opt("3 + 4 == 3 + 2")->print() == "7 == 5");
+        CHECK(parse_and_opt("9 - 2 == 15 - 10")->print() == "7 == 5");
+        CHECK(parse_and_opt("3 * 4 == 2 * 3")->print() == "12 == 6");
+        CHECK(parse_and_opt("24 / 2 == 24 / 4")->print() == "12 == 6");
+        CHECK(parse_and_opt("3^2 == 2^5")->print() == "9 == 32");
+        CHECK(parse_and_opt("8 % 3 == 17 % 2")->print() == "2 == 1");
+        CHECK(parse_and_opt("sqrt(9) == sin(asin(0.5))")->print() == "3 == 0.500000");
     }
 
     SECTION("No optimization") {
-        // unary plus/minus
-        auto ast = "(-index(#1)) == 5";
-        CHECK(parse_and_opt("-index == +5")->print() == ast);
-
-        // Add
-        ast = "(index(#1) + 2) == 5";
-        CHECK(parse_and_opt("index + 2 == 5")->print() == ast);
-
-        // Sub
-        ast = "(index(#1) - 2) == 5";
-        CHECK(parse_and_opt("index - 2 == 5")->print() == ast);
-
-        // Mul
-        ast = "(index(#1) * 2) == 5";
-        CHECK(parse_and_opt("index * 2 == 5")->print() == ast);
-
-        // Div
-        ast = "(index(#1) / 2) == 5";
-        CHECK(parse_and_opt("index / 2 == 5")->print() == ast);
-
-        ast = "index(#1) ^(2) == 5";
-        CHECK(parse_and_opt("index ^ 2 == 5")->print() == ast);
-
-        ast = "sqrt(index(#1)) == 5";
-        CHECK(parse_and_opt("sqrt(index) == 5")->print() == ast);
+        CHECK(parse_and_opt("-index == +5")->print() == "(-index(#1)) == 5");
+        CHECK(parse_and_opt("index + 2 == 5")->print() == "(index(#1) + 2) == 5");
+        CHECK(parse_and_opt("index - 2 == 5")->print() == "(index(#1) - 2) == 5");
+        CHECK(parse_and_opt("index * 2 == 5")->print() == "(index(#1) * 2) == 5");
+        CHECK(parse_and_opt("index / 2 == 5")->print() == "(index(#1) / 2) == 5");
+        CHECK(parse_and_opt("index % 2 == 5")->print() == "(index(#1) % 2) == 5");
+        CHECK(parse_and_opt("index ^ 2 == 5")->print() == "index(#1) ^(2) == 5");
+        CHECK(parse_and_opt("sqrt(index) == 5")->print() == "sqrt(index(#1)) == 5");
     }
 }
