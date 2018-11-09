@@ -20,7 +20,7 @@ static Ast parse_and_opt(std::string selection) {
 
 TEST_CASE("Parsing") {
     // This section uses the pretty-printing of AST to check the parsing
-    SECTION("Operators") {
+    SECTION("Boolean operators") {
         auto ast = "and -> index(#1) == 1\n    -> index(#1) == 1";
         CHECK(parse("index == 1 and index == 1")->print() == ast);
 
@@ -377,9 +377,49 @@ TEST_CASE("Parsing") {
             CHECK(parse("x ^ 2 + y ^ 2 < 10 ^ 2")->print() == ast);
             CHECK(parse("x^2 + y^2 < 10^2")->print() == ast);
 
-            ast = "(3 - (4 * 2 ^(7))) < 5";
-            CHECK(parse("3 - 4 * 2 ^ 7 < 5")->print() == ast);
+            ast = "(1 + (2 * 3)) == 0";
+            CHECK(parse("1 + 2 * 3 == 0")->print() == ast);
+            ast = "(1 - (2 * 3)) == 0";
+            CHECK(parse("1 - 2 * 3 == 0")->print() == ast);
+
+            ast = "(1 + (2 / 3)) == 0";
+            CHECK(parse("1 + 2 / 3 == 0")->print() == ast);
+            ast = "(1 - (2 / 3)) == 0";
+            CHECK(parse("1 - 2 / 3 == 0")->print() == ast);
+
+            ast = "(1 + (2 % 3)) == 0";
+            CHECK(parse("1 + 2 % 3 == 0")->print() == ast);
+            ast = "(1 - (2 % 3)) == 0";
+            CHECK(parse("1 - 2 % 3 == 0")->print() == ast);
+
+            ast = "(1 + 2 ^(3)) == 0";
+            CHECK(parse("1 + 2 ^ 3 == 0")->print() == ast);
+            ast = "(1 - 2 ^(3)) == 0";
+            CHECK(parse("1 - 2 ^ 3 == 0")->print() == ast);
+            ast = "(1 * 2 ^(3)) == 0";
+            CHECK(parse("1 * 2 ^ 3 == 0")->print() == ast);
+            ast = "(1 / 2 ^(3)) == 0";
+            CHECK(parse("1 / 2 ^ 3 == 0")->print() == ast);
+            ast = "(1 % 2 ^(3)) == 0";
+            CHECK(parse("1 % 2 ^ 3 == 0")->print() == ast);
+
+            // Change order of evaluation with parenthesis
+            ast = "((1 + 2) * 3) == 0";
+            CHECK(parse("(1 + 2) * 3 == 0")->print() == ast);
+
+            ast = "(1 + 2) ^(3) == 0";
+            CHECK(parse("(1 + 2) ^ 3 == 0")->print() == ast);
+
+            ast = "(1 + 2) ^((3 + 2)) == 0";
+            CHECK(parse("(1 + 2) ^ (3 + 2) == 0")->print() == ast);
         }
+    }
+
+    SECTION("Parenthesis") {
+        auto ast = "or -> and -> (2 + 3) < 3\n          -> name(#1) == Zn\n   -> name(#1) == H";
+        CHECK(parse("((2 +3) < 3 and name Zn) or name H")->print() == ast);
+        ast = "and -> name(#1) == F\n    -> (3 + 4) < 67";
+        CHECK(parse("name F and ((((3 + 4)))) < 67")->print() == ast);
     }
 }
 
