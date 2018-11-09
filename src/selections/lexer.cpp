@@ -85,6 +85,8 @@ std::string Token::as_str() const {
         return "/";
     case Token::HAT:
         return "^";
+    case Token::PERCENT:
+        return "%";
     case Token::NOT:
         return "not";
     case Token::AND:
@@ -159,6 +161,9 @@ std::vector<Token> Tokenizer::tokenize() {
             continue;
         } else if (match('^')) {
             tokens.emplace_back(Token(Token::HAT));
+            continue;
+        } else if (match('%')) {
+            tokens.emplace_back(Token(Token::PERCENT));
             continue;
         } else if (match('#')) {
             tokens.emplace_back(variable());

@@ -57,6 +57,8 @@ public:
         SLASH,
         /// "^" token
         HAT,
+        /// "%" token
+        PERCENT,
         /// "and" token
         AND,
         /// "or" token
