@@ -149,7 +149,19 @@ Ast Parser::expression() {
 
 Ast Parser::selector() {
     if (match(Token::LPAREN)) {
-        auto ast = expression();
+        // There is an ambiguity in the grammar: an opening parenthesis can
+        // either delimit a logical block "(foo or bar) and baz"; or a
+        // mathematical expression "(3 + 5) * 2 < 3". So here we first try to
+        // parse a logical expression, and if it fails we backtrack (in the
+        // catch block) and try to parse a mathematical expression instead.
+        auto index = current_ - 1;
+        Ast ast = nullptr;
+        try {
+            ast = expression();
+        } catch (const SelectionError&) {
+            current_ = index;
+            return math_selector();
+        }
         if (match(Token::RPAREN)) {
             return ast;
         } else {
