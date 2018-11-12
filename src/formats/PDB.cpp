@@ -43,6 +43,8 @@ enum class Record {
     MODEL,
     // End of model.
     ENDMDL,
+    // End of chain. May increase atom count
+    TER,
     // End of file
     END,
     // Ignored records
@@ -81,6 +83,7 @@ void PDBFormat::read_step(const size_t step, Frame& frame) {
 void PDBFormat::read(Frame& frame) {
     frame.resize(0);
     residues_.clear();
+    atom_offsets_.clear();
 
     std::streampos position;
     bool got_end = false;
@@ -116,6 +119,13 @@ void PDBFormat::read(Frame& frame) {
             }
             // Else we have read a frame
             got_end = true;
+            continue;
+        case Record::TER:
+            if (line.size() >= 12) {
+                try {
+                    atom_offsets_.push_back(std::stoul(line.substr(6,5)));
+                } catch(std::invalid_argument&) {} // Do nothing
+            }
             continue;
         case Record::END:
             // We have read a frame!
@@ -181,6 +191,18 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
         );
     }
 
+    if (atom_offsets_.size() == 0) {
+        try {
+            auto initial_offset = std::stoul(line.substr(6,5));
+            if (initial_offset == 0) {
+                throw format_error("0 is not a valid atom id.");
+            }
+            atom_offsets_.push_back(initial_offset - 1);
+        } catch(std::invalid_argument&) {
+            throw format_error("{} is not a valid atom id.", line.substr(6,5));
+        }
+    }
+
     auto atom = Atom(trim(line.substr(12, 4)));
     if (line.length() >= 78) {
         atom.set_type(trim(line.substr(76, 2)));
@@ -244,10 +266,13 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
         frame.add_bond(i, j);
     };
 
-    auto read_index = [&line](size_t initial) -> size_t {
+    auto read_index = [&line,this](size_t initial) -> size_t {
         try {
-            // PDB indexing is 1-based, and chemfiles is 0-based
-            return std::stoul(line.substr(initial, 5)) - 1;
+            auto pdb_atom_id = std::stoul(line.substr(initial, 5));
+            auto lower = std::lower_bound(atom_offsets_.begin(),
+                                          atom_offsets_.end(), pdb_atom_id);
+            pdb_atom_id -= static_cast<size_t>(lower - atom_offsets_.begin());
+            return pdb_atom_id;
         } catch (std::invalid_argument&) {
             throw format_error("could not read atomic number in '{}'", line);
         }
@@ -415,13 +440,15 @@ Record get_record(const std::string& line) {
         return Record::HETATM;
     } else if (rec == "CONECT") {
         return Record::CONECT;
-    } else if (rec == "MODEL "){
+    } else if (rec == "MODEL ") {
         return Record::MODEL;
+    } else if (rec == "TER   ") {
+        return Record::TER;
     } else if (rec == "REMARK" || rec == "MASTER" || rec == "AUTHOR" ||
                rec == "CAVEAT" || rec == "COMPND" || rec == "EXPDTA" ||
                rec == "KEYWDS" || rec == "OBSLTE" || rec == "SOURCE" ||
                rec == "SPLIT " || rec == "SPRSDE" || rec == "TITLE " ||
-               rec == "JRNL  " || rec == "TER   " || rec == "HEADER") {
+               rec == "JRNL  " || rec == "HEADER") {
         return Record::IGNORED_;
     } else {
         return Record::UNKNOWN_;

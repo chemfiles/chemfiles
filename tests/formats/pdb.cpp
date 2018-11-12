@@ -128,6 +128,18 @@ TEST_CASE("Read files in PDB format") {
         }
     }
 
+    SECTION("Handle multiple TER records") {
+        Trajectory file("data/pdb/4hhb.pdb");
+        auto frame = file.read();
+
+        CHECK(frame[4556].name() == "ND");
+        CHECK(frame[4557].name() == "FE");
+        CHECK(frame.topology().bond_order(4556, 4557) == 0);
+
+        // The original behavior stored this, it is incorrect
+        CHECK_THROWS(frame.topology().bond_order(4561, 4560));
+    }
+
     SECTION("Handle multiple END records") {
         Trajectory file("data/pdb/end-endmdl.pdb");
         CHECK(file.nsteps() == 2);

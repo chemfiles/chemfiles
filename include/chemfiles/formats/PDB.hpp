@@ -5,6 +5,7 @@
 #define CHEMFILES_FORMAT_PDB_HPP
 
 #include <map>
+#include <vector>
 
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
@@ -53,6 +54,9 @@ private:
     std::vector<std::streampos> steps_positions_;
     /// Number of models written/read to the file.
     size_t models_;
+    /// List of all atom offsets. This maybe pushed in read_ATOM or if a TER
+    /// record is found. It is reset every time a frame is read.
+    std::vector<size_t> atom_offsets_;
     /// Did we wrote a frame to the file? This is used to check wheter we need
     /// to write a final `END` record in the destructor
     bool written_ = false;
