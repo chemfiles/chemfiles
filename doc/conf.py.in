@@ -17,10 +17,10 @@ def generate_properties_csv():
         csvfile = open(output, 'w')
         writer = csv.writer(csvfile)
         writer.writerow(['Name', 'Type', 'Format', 'Description'])
-        for property, value in data.iteritems():
+        for property, value in data.items():
             rows = []
             first = True
-            for format, description in value.iteritems():
+            for format, description in value.items():
                 if format == "type":
                     continue
                 if first:
