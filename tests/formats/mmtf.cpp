@@ -14,6 +14,13 @@ TEST_CASE("Read files in MMTF format") {
         Trajectory file("data/mmtf/4HHB.mmtf");
         Frame frame = file.read();
 
+        // Check frame properties
+        CHECK(frame.get("name")->as_string() ==
+              "THE CRYSTAL STRUCTURE OF HUMAN DEOXYHAEMOGLOBIN AT 1.74 "
+              "ANGSTROMS RESOLUTION");
+        CHECK(frame.get("deposition_date")->as_string() == "1984-03-07");
+        CHECK(frame.get("pdb_idcode")->as_string() == "4HHB");
+
         // If comparing to the RCSB-PDB file,
         // remember that TER increases the number of atoms
         CHECK(frame.size() == 4779);
