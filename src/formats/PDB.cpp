@@ -272,6 +272,7 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
             auto lower = std::lower_bound(atom_offsets_.begin(),
                                           atom_offsets_.end(), pdb_atom_id);
             pdb_atom_id -= static_cast<size_t>(lower - atom_offsets_.begin());
+            pdb_atom_id -= atom_offsets_.front();
             return pdb_atom_id;
         } catch (std::invalid_argument&) {
             throw format_error("could not read atomic number in '{}'", line);

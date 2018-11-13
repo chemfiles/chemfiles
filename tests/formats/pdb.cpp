@@ -140,6 +140,17 @@ TEST_CASE("Read files in PDB format") {
         CHECK_THROWS(frame.topology().bond_order(4561, 4560));
     }
 
+    SECTION("Handle odd PDB numbering") {
+        Trajectory file("data/pdb/odd-start.pdb");
+        auto frame = file.read();
+
+        CHECK(frame.size() == 20);
+        CHECK(frame[0].name() == "C1");
+        CHECK(frame[19].name() == "C18");
+        CHECK(frame.topology().bond_order(0, 1) == 0);
+        CHECK(frame.topology().bond_order(19, 13) == 0);
+    }
+
     SECTION("Handle multiple END records") {
         Trajectory file("data/pdb/end-endmdl.pdb");
         CHECK(file.nsteps() == 2);
