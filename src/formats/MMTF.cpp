@@ -92,6 +92,18 @@ void MMTFFormat::read(Frame& frame) {
         ));
     }
 
+    if (!mmtf::isDefaultValue(structure_.title)) {
+        frame.set("name", structure_.title);
+    }
+
+    if (!mmtf::isDefaultValue(structure_.structureId)) {
+        frame.set("pdb_idcode", structure_.structureId);
+    }
+
+    if (!mmtf::isDefaultValue(structure_.depositionDate)) {
+        frame.set("deposition_date", structure_.depositionDate);
+    }
+
     auto modelChainCount = static_cast<size_t>(structure_.chainsPerModel[modelIndex_]);
     for (size_t j = 0; j < modelChainCount; j++) {
         auto chainGroupCount = static_cast<size_t>(structure_.groupsPerChain[chainIndex_]);
