@@ -30,10 +30,12 @@ static void check_values_size(const Vector3D& values, unsigned width, const std:
 /// not contain one more step.
 static bool forward(TextFile& file);
 
-
 // PDB record handled by chemfiles. Any record not in this enum are not yet
 // implemented.
 enum class Record {
+    // Records containing summary data
+    HEADER,
+    TITLE,
     // Records containing usefull data
     CRYST1,
     ATOM,
@@ -91,6 +93,17 @@ void PDBFormat::read(Frame& frame) {
         auto line = file_->readline();
         auto record = get_record(line);
         switch (record) {
+        case Record::HEADER:
+            if (line.size() < 66) {continue;}
+            frame.set("classification", trim(line.substr(10, 40)));
+            frame.set("deposition_date", trim(line.substr(50, 9)));
+            frame.set("pdb_idcode", trim(line.substr(62, 4)));
+            continue;
+        case Record::TITLE:
+            frame.set("name", trim(
+                      frame.get<Property::STRING>("name").value_or("") +
+                      line.substr(10, 70)));
+            continue;
         case Record::CRYST1:
             read_CRYST1(frame, line);
             continue;
@@ -445,11 +458,14 @@ Record get_record(const std::string& line) {
         return Record::MODEL;
     } else if (rec == "TER   ") {
         return Record::TER;
+    } else if (rec == "HEADER") { // These appear the least, so check last
+        return Record::HEADER;
+    } else if (rec == "TITLE ") {
+        return Record::TITLE;
     } else if (rec == "REMARK" || rec == "MASTER" || rec == "AUTHOR" ||
                rec == "CAVEAT" || rec == "COMPND" || rec == "EXPDTA" ||
                rec == "KEYWDS" || rec == "OBSLTE" || rec == "SOURCE" ||
-               rec == "SPLIT " || rec == "SPRSDE" || rec == "TITLE " ||
-               rec == "JRNL  " || rec == "HEADER") {
+               rec == "SPLIT " || rec == "SPRSDE" || rec == "JRNL  " ) {
         return Record::IGNORED_;
     } else {
         return Record::UNKNOWN_;

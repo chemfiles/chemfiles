@@ -91,6 +91,24 @@ TEST_CASE("Read files in PDB format") {
         Frame frame = file.read();
     }
 
+    SECTION("Read frame properties") {
+        Trajectory file1("data/pdb/2hkb.pdb");
+        auto frame = file1.read();
+        CHECK(frame.get("classification")->as_string() == "DNA");
+        CHECK(frame.get("deposition_date")->as_string() == "03-JUL-06");
+        CHECK(frame.get("pdb_idcode")->as_string() == "2HKB");
+        CHECK(frame.get("name")->as_string() ==
+              "NMR STRUCTURE OF THE B-DNA DODECAMER CTCGGCGCCATC");
+
+        Trajectory file2("data/pdb/4hhb.pdb");
+        frame = file2.read();
+        CHECK(frame.get("classification")->as_string() == "OXYGEN TRANSPORT");
+        CHECK(frame.get("deposition_date")->as_string() == "07-MAR-84");
+        CHECK(frame.get("pdb_idcode")->as_string() == "4HHB");
+        CHECK(frame.get("name")->as_string() ==
+              "THE CRYSTAL STRUCTURE OF HUMAN DEOXYHAEMOGLOBIN AT 1.74 ANGSTROMS RESOLUTION");
+    }
+
     SECTION("Read residue information") {
         Trajectory file("data/pdb/water.pdb");
         Frame frame = file.read();

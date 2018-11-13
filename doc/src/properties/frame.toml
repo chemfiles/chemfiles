@@ -1,6 +1,22 @@
 [name]
 type = "string"
 
+PDB = "The text described by the ``TITLE `` record is used as the frame **name** when reading."
 GRO = "The first line of a GRO file is used as the frame **name** when reading."
 SDF = "The first line of an SDF file is used as the frame **name** when reading."
 MOL2 = "The first line after ``@<TRIPOS>MOLECULE`` is used as the frame **name** when reading."
+
+[classification]
+type = "string"
+
+PDB = "The classification of a structure assigned by the PDB. Read from the ``HEADER`` record."
+
+[pdb_idcode]
+type = "string"
+
+PDB = "Four letter code for structures deposited in the PDB. Read from the ``HEADER`` record."
+
+[deposition_date]
+type = "string"
+
+PDB = "Date (DD-MMM-YY format) of the deposition in the PDB. Read from the ``HEADER`` record."
