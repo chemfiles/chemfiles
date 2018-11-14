@@ -6,6 +6,7 @@ GRO = "The first line of a GRO file is used as the frame **name** when reading."
 SDF = "The first line of an SDF file is used as the frame **name** when reading."
 MOL2 = "The first line after ``@<TRIPOS>MOLECULE`` is used as the frame **name** when reading."
 MMTF = "The text in the ``title`` field is used as the frame **name** when reading."
+mmCIF = "The text in the ``_struct.title`` field is used as the frame **name** when reading."
 
 [classification]
 type = "string"
@@ -17,6 +18,7 @@ type = "string"
 
 PDB = "Four letter code for structures deposited in the PDB. Read from the ``HEADER`` record."
 MMTF = "Four letter code for structures deposited in the PDB. Read from the ``structuresId`` field."
+mmCIF = "Four letter code for structures deposited in the PDB. Read from the ``_entry.id`` field."
 
 [deposition_date]
 type = "string"

@@ -133,6 +133,10 @@ TEST_CASE("Read files in mmCIF format") {
         Trajectory file("data/cif/1j8k.cif", 'r', "mmCIF");
         auto frame = file.read();
 
+        CHECK(frame.get("name")->as_string() ==
+              "NMR STRUCTURE OF THE FIBRONECTIN EDA DOMAIN, NMR, 20 STRUCTURES");
+        CHECK(frame.get("pdb_idcode")->as_string() == "1J8K");
+
         size_t count = 1;
         while (!file.done()) {
             frame = file.read();
