@@ -48,7 +48,7 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(residue.size() == 43);
         CHECK(residue.name() == "HEM");
         CHECK(residue.get("composition_type")->as_string() == "NON-POLYMER");
-        CHECK(frame[4557].get("is_hetatm")->as_bool()); // Should be a hetatm
+        CHECK(!residue.get("is_standard_pdb")->as_bool()); // Should be a hetatm
 
         // Nitrogen-Iron Bond
         CHECK(frame.topology().bond_order(4557, 4556) == Bond::SINGLE);
@@ -105,11 +105,13 @@ TEST_CASE("Read files in MMTF format") {
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
         CHECK(approx_eq(positions[1401], Vector3D(5.601, -22.571, -16.631), 1e-3));
-        CHECK(!frame[0].get("is_hetatm")->as_bool());
 
         const auto& topo = frame.topology();
         CHECK(topo.are_linked(topo.residue(0), topo.residue(1)));
         CHECK(!topo.are_linked(topo.residue(0), topo.residue(2)));
+        CHECK(topo.residue(0).get("is_standard_pdb")->as_bool());
+        CHECK(topo.residue(1).get("is_standard_pdb")->as_bool());
+        CHECK(topo.residue(2).get("is_standard_pdb")->as_bool());
 
         frame = file.read_step(1);
         CHECK(frame.size() == 1402);

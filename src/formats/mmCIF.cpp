@@ -282,10 +282,6 @@ void mmCIFFormat::read(Frame& frame) {
         Atom atom(line_split[label_atom_id->second],
                   line_split[type_symbol->second]);
 
-        if (group_pdb != atom_site_map_.end()) {
-            atom.set("is_hetatm", line_split[group_pdb->second] != "ATOM");
-        }
-
         if (label_alt_id != atom_site_map_.end() &&
             line_split[label_alt_id->second] != ".") {
             atom.set("altloc", line_split[label_alt_id->second]);
@@ -349,6 +345,10 @@ void mmCIFFormat::read(Frame& frame) {
                 residue.set("chainname", line_split[auth_asym_id->second]);
             }
 
+            if (group_pdb != atom_site_map_.end()) {
+                residue.set("is_standard_pdb", line_split[group_pdb->second] == "ATOM");
+            }
+
             residues_.insert({{chainid, resid}, std::move(residue)});
         } else {
             // Just add this atom to the residue
@@ -409,6 +409,7 @@ void mmCIFFormat::write(const Frame& frame) {
         std::string asymid = ".";
         std::string seq_id = ".";
         std::string auth_asymid = ".";
+        std::string pdbgroup = "HETATM";
 
         const auto& residue = topology.residue_for_atom(i);
         if (residue) {
@@ -422,13 +423,12 @@ void mmCIFFormat::write(const Frame& frame) {
 
             asymid = residue->get<Property::STRING>("chainid").value_or("?");
             auth_asymid = residue->get<Property::STRING>("chainname").value_or(".");
+            if (residue->get<Property::BOOL>("is_standard_pdb").value_or(false)) {
+                pdbgroup = "ATOM  ";
+            }
         }
 
         const auto& atom = frame[i];
-        std::string pdbgroup = "ATOM  ";
-        if (atom.get<Property::BOOL>("is_hetatm").value_or(false)) {
-            pdbgroup = "HETATM";
-        }
 
         fmt::print(*file_, "{} {: <5} {: <2} {: <4} {} {: >3} {} {: >4} {:8.3f} {:8.3f} {:8.3f} {} {} {}\n",
                 pdbgroup, atoms_, atom.type(), atom.name(), ".", compid,

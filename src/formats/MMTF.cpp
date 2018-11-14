@@ -131,6 +131,7 @@ void MMTFFormat::read(Frame& frame) {
             auto groupId = static_cast<size_t>(structure_.groupIdList[groupIndex_]);
             auto residue = Residue(group.groupName, groupId);
             residue.set("composition_type", group.chemCompType);
+            residue.set("is_standard_pdb", !mmtf::is_hetatm(group.chemCompType.c_str()));
 
             // Save the offset before we go changing it
             size_t atomOffset = atomIndex_ - atomSkip_;
@@ -153,7 +154,6 @@ void MMTFFormat::read(Frame& frame) {
                     structure_.yCoordList[atomIndex_],
                     structure_.zCoordList[atomIndex_]
                 );
-                atom.set("is_hetatm", mmtf::is_hetatm(group.chemCompType.c_str()));
                 frame.add_atom(atom, position);
                 residue.add_atom(atomIndex_ - atomSkip_);
                 atomIndex_++;
