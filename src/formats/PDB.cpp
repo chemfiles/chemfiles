@@ -70,6 +70,11 @@ PDBFormat::PDBFormat(std::string path, File::Mode mode, File::Compression compre
         }
     }
     file_->rewind();
+
+    // Needed in case there's no end records 
+    if (steps_positions_.empty()) {
+        steps_positions_.push_back(file_->tellg());
+    }
 }
 
 size_t PDBFormat::nsteps() {

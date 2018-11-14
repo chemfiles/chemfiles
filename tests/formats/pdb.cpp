@@ -211,6 +211,12 @@ TEST_CASE("Read files in PDB format") {
     }
 }
 
+TEST_CASE("Problematic PDB files") {
+    auto file = Trajectory("data/pdb/bad/atomid.pdb");
+    CHECK(file.nsteps() == 1);
+    CHECK_THROWS(file.read());
+}
+
 TEST_CASE("Write files in PDB format") {
     auto tmpfile = NamedTempPath(".pdb");
     const auto EXPECTED_CONTENT =
