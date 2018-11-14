@@ -214,7 +214,8 @@ TEST_CASE("Read files in PDB format") {
 TEST_CASE("Problematic PDB files") {
     auto file = Trajectory("data/pdb/bad/atomid.pdb");
     CHECK(file.nsteps() == 1);
-    CHECK_THROWS(file.read());
+    auto frame = file.read();
+    CHECK(frame.size() == 2);
 }
 
 TEST_CASE("Write files in PDB format") {

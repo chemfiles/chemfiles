@@ -209,15 +209,19 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
         );
     }
 
-    if (atom_offsets_.size() == 0) {
+    if (atom_offsets_.empty()) {
         try {
-            auto initial_offset = std::stoul(line.substr(6,5));
-            if (initial_offset == 0) {
-                throw format_error("0 is not a valid atom id.");
+            auto initial_offset = std::stol(line.substr(6,5));
+            // We need to handle negative numbers ourselves: https://ideone.com/RdINqa
+            if (initial_offset <= 0) {
+                warning("{} is too small, assuming id is '1'", initial_offset);
+                atom_offsets_.push_back(0);
+            } else {
+                atom_offsets_.push_back(static_cast<size_t>(initial_offset) - 1);
             }
-            atom_offsets_.push_back(initial_offset - 1);
         } catch(std::invalid_argument&) {
-            throw format_error("{} is not a valid atom id.", line.substr(6,5));
+            warning("{} is not a valid atom id, assuming '1'", line.substr(6,5));
+			atom_offsets_.push_back(0);
         }
     }
 

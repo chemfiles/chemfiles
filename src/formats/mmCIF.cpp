@@ -99,8 +99,8 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
 
         if (line_split[0] == "_struct.title") {
             auto temp_name = trim(line.substr(13));
-            std::copy(temp_name.begin() + 1, temp_name.end() - 1,
-                std::back_inserter(name_));
+            name_ = temp_name.size() > 2 ?
+                    temp_name.substr(1, temp_name.size() - 2) : "";
         }
 
         if (in_loop && line_split[0].find("_atom_site") != std::string::npos) {
@@ -202,11 +202,11 @@ void mmCIFFormat::read(Frame& frame) {
     frame.resize(0);
     residues_.clear();
 
-    if (name_.size()) {
+    if (name_ != "") {
         frame.set("name", name_);
     }
 
-    if (pdb_idcode_.size()) {
+    if (pdb_idcode_ != "") {
         frame.set("pdb_idcode", pdb_idcode_);
     }
 
