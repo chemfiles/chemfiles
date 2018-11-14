@@ -189,6 +189,37 @@ void MMTFFormat::read(Frame& frame) {
                 );
             }
 
+            if (groupIndex_ < structure_.secStructList.size()) {
+                switch(structure_.secStructList[groupIndex_]) {
+                    case 0:
+                        residue.set("secondary_structure", "pi helix");
+                        break;
+                    case 1:
+                        residue.set("secondary_structure", "bend");
+                        break;
+                    case 2:
+                        residue.set("secondary_structure", "alpha helix");
+                        break;
+                    case 3:
+                        residue.set("secondary_structure", "extended");
+                        break;
+                    case 4:
+                        residue.set("secondary_structure", "3-10 helix");
+                        break;
+                    case 5:
+                        residue.set("secondary_structure", "bridge");
+                        break;
+                    case 6:
+                        residue.set("secondary_structure", "turn");
+                        break;
+                    case 7:
+                        residue.set("secondary_structure", "coil");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             // If the name of the current assembly is defined in the MMTF file.
             // Bioassemblies are optional, however.
             if (!current_assembly.empty()) {

@@ -49,6 +49,7 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(residue.name() == "HEM");
         CHECK(residue.get("composition_type")->as_string() == "NON-POLYMER");
         CHECK(!residue.get("is_standard_pdb")->as_bool()); // Should be a hetatm
+        CHECK(residue.get("secondary_structure") == nullopt);
 
         // Nitrogen-Iron Bond
         CHECK(frame.topology().bond_order(4557, 4556) == Bond::SINGLE);
@@ -95,6 +96,13 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(water_res2.get("chainid")->as_string() == "L");
         CHECK(water_res2.get("chainname")->as_string() == "B");
         CHECK(water_res2.get("chainindex")->as_double() == 11 );
+
+        // Check the secondary structure
+        CHECK(topo.residue(05).get("secondary_structure")->as_string() == "alpha helix");
+        CHECK(topo.residue(18).get("secondary_structure")->as_string() == "turn");
+        CHECK(topo.residue(36).get("secondary_structure")->as_string() == "3-10 helix");
+        CHECK(topo.residue(45).get("secondary_structure")->as_string() == "bend");
+        CHECK(topo.residue(143).get("secondary_structure")->as_string() == "coil");
     }
 
     SECTION("Skip steps") {
@@ -123,6 +131,9 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(topo2.are_linked(topo.residue(0), topo2.residue(1)));
         CHECK(!topo2.are_linked(topo.residue(0), topo2.residue(2)));
         CHECK(topo.residue(0).get("composition_type")->as_string() == "L-PEPTIDE LINKING");
+
+        // Check secondary structure
+        CHECK(topo.residue(10).get("secondary_structure")->as_string() == "extended");
     }
 
     SECTION("Successive steps") {
