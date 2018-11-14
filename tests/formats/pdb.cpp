@@ -135,14 +135,13 @@ TEST_CASE("Read files in PDB format") {
 
     SECTION("Read ATOM/HETATM information") {
         Trajectory file("data/pdb/hemo.pdb");
-        Frame frame = file.read();
+        auto residues = file.read().topology().residues();
 
-        for (size_t i = 0; i < 73; i++) {
-            CHECK(frame.topology()[i].get("is_hetatm")->as_bool());
-        }
+        // HEME group is first
+        CHECK(residues[0].get("is_standard_pdb")->as_bool() == false);
 
-        for (size_t i = 73; i < 522; i++) {
-            CHECK(frame.topology()[i].get("is_hetatm")->as_bool() == false);
+        for (size_t i = 1; i < residues.size(); i++) {
+            CHECK(residues[i].get("is_standard_pdb")->as_bool());
         }
     }
 
@@ -223,17 +222,17 @@ TEST_CASE("Write files in PDB format") {
     const auto EXPECTED_CONTENT =
     "MODEL    1\n"
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
-    "ATOM      1 A   AXXX X   1       1.000   2.000   3.000  1.00  0.00           A\n"
+    "HETATM    1 A   AXXX X   1       1.000   2.000   3.000  1.00  0.00           A\n"
     "HETATM    2 B   BXXX X   2       1.000   2.000   3.000  1.00  0.00           B\n"
-    "ATOM      3 C    XXX X   3       1.000   2.000   3.000  1.00  0.00           C\n"
+    "HETATM    3 C    XXX X   3       1.000   2.000   3.000  1.00  0.00           C\n"
     "HETATM    4 D    XXX X   4       1.000   2.000   3.000  1.00  0.00           D\n"
     "CONECT    1    2\n"
     "CONECT    2    1\n"
     "ENDMDL\n"
     "MODEL    2\n"
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
-    "ATOM      1 A   AXXX X   4       1.000   2.000   3.000  1.00  0.00           A\n"
-    "HETATM    2 B   Bfoo A   3       1.000   2.000   3.000  1.00  0.00           B\n"
+    "HETATM    1 A   AXXX X   4       1.000   2.000   3.000  1.00  0.00           A\n"
+    "ATOM      2 B   Bfoo A   3       1.000   2.000   3.000  1.00  0.00           B\n"
     "ATOM      3 C    foo A   3       1.000   2.000   3.000  1.00  0.00           C\n"
     "HETATM    4 D    bar C  -1B      1.000   2.000   3.000  1.00  0.00           D\n"
     "HETATM    5 E    XXX X   5       4.000   5.000   6.000  1.00  0.00           E\n"
@@ -256,10 +255,6 @@ TEST_CASE("Write files in PDB format") {
     frame.add_atom(Atom("C"), {1, 2, 3});
     frame.add_atom(Atom("D"), {1, 2, 3});
     frame.add_bond(0, 1);
-    frame[0].set("is_hetatm", false);
-    frame[1].set("is_hetatm", true);
-    frame[2].set("is_hetatm", false);
-    frame[3].set("is_hetatm", true);
     frame[0].set("altloc", "A");
     frame[1].set("altloc", "BB");
 
@@ -281,6 +276,7 @@ TEST_CASE("Write files in PDB format") {
     residue.add_atom(1);
     residue.add_atom(2);
     residue.set("chainid", "A");
+    residue.set("is_standard_pdb", true);
     frame.add_residue(residue);
 
     residue = Residue("barbar"); // This will be truncated in output

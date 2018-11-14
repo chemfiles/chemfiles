@@ -230,8 +230,6 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
         atom.set_type(trim(line.substr(76, 2)));
     }
 
-    atom.set("is_hetatm", is_hetatm);
-
     auto altloc = line.substr(16,1);
     if (altloc != " ") {
         atom.set("altloc", altloc);
@@ -260,6 +258,8 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
                 atom.set("insertion_code", inscode);
             }
 
+            // Set whether or not the residue is standardized
+            residue.set("is_standard_pdb", !is_hetatm);
             // This will be save as a string... on purpose to match MMTF
             residue.set("chainid", line.substr(21,1));
             // This format makes no distinction between chainid and chainname
@@ -521,13 +521,6 @@ void PDBFormat::write(const Frame& frame) {
     auto& positions = frame.positions();
     for (size_t i = 0; i < frame.size(); i++) {
 
-        std::string atom_hetatm = "HETATM";
-        auto is_hetatm = frame[i].get<Property::BOOL>("is_hetatm");
-        if (is_hetatm && !is_hetatm.value()) {
-            // only use ATOM is is_hetatm is SET and FALSE.
-            atom_hetatm = "ATOM  ";
-        }
-
         auto altloc = frame[i].get<Property::STRING>("altloc").value_or(" ");
         if (altloc.length() > 1) {
             warning(
@@ -537,6 +530,7 @@ void PDBFormat::write(const Frame& frame) {
             altloc = altloc[0];
         }
 
+        std::string atom_hetatm = "HETATM";
         std::string resname;
         std::string resid;
         std::string chainid;
@@ -544,6 +538,11 @@ void PDBFormat::write(const Frame& frame) {
         auto residue = frame.topology().residue_for_atom(i);
         if (residue) {
             resname = residue->name();
+            if (residue->get<Property::BOOL>("is_standard_pdb").value_or(false)) {
+                // only use ATOM if the residue is standardized
+                atom_hetatm = "ATOM  ";
+            }
+
             if (resname.length() > 3) {
                 warning(
                     "Residue '{}' has a name too long for PDB format, it will be truncated.",

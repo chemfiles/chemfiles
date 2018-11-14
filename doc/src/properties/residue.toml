@@ -1,3 +1,23 @@
+[is_standard_pdb]
+type = "bool"
+
+PDB = """When reading, **is_standard_pdb** is set to ``true`` for residues 
+defined with a ``ATOM`` record, and ``false`` for atoms defined with an
+``HETATM`` record. When writing, **is_standard_pdb** is used to determine
+whether to emit an ``HETATM`` or an ``ATOM`` record. If the property is not set,
+``HETATM`` is used."""
+
+MMTF = """When reading, **is_standard_pdb** is set to ``false`` when the
+``composition_type`` for the group is related to peptide or nucleotide
+linkage. See the ``composition_type`` property for residues for more
+information. This property is ignored while writing."""
+
+mmCIF = """When reading, **is_standard_pdb** is set to ``true`` when
+``_atom_site.group_PDB`` is ``ATOM``, ``false`` when it is ``HETATM``, and is
+unset in the absense of this field. When writing, **is_standard_pdb** is used
+to determine whether to use ``ATOM`` or ``HETATM`` for ``_atom_site.group_PDB``.
+If the property is not set, ``HETATM`` is used."""
+
 [chainname]
 type = "string"
 

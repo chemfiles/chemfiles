@@ -46,7 +46,7 @@ TEST_CASE("Read files in mmCIF format") {
         auto residue = *frame.topology().residue_for_atom(4557);
         CHECK(residue.size() == 43);
         CHECK(residue.name() == "HEM");
-        CHECK(frame[4557].get("is_hetatm")->as_bool()); // Should be a hetatm
+        CHECK(residue.get("is_standard_pdb")->as_bool() == false);
 
         // Check residue connectivity
         const auto& topo = frame.topology();
@@ -119,7 +119,7 @@ TEST_CASE("Read files in mmCIF format") {
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
         CHECK(approx_eq(positions[1401], Vector3D(5.601, -22.571, -16.631), 1e-3));
-        CHECK(!frame[0].get("is_hetatm")->as_bool());
+        CHECK(frame.topology().residue(0).get("is_standard_pdb")->as_bool());
 
         // Rewind
         frame = file.read_step(1);
@@ -191,11 +191,11 @@ TEST_CASE("Write mmCIF file") {
     "HETATM 1     A  A    .   . .    .    1.000    2.000    3.000 0 . 1\n"
     "ATOM   2     B  B    . foo ?    2    1.000    2.000    3.000 0 . 1\n"
     "ATOM   3     C  C    . foo ?    2    1.000    2.000    3.000 0 . 1\n"
-    "ATOM   4     D  D    . bar G    ?    1.000    2.000    3.000 0 A 1\n"
+    "HETATM 4     D  D    . bar G    ?    1.000    2.000    3.000 0 A 1\n"
     "HETATM 5     A  A    .   . .    .    4.000    5.000    6.000 0 . 2\n"
     "ATOM   6     B  B    . foo ?    2    1.000    2.000    3.000 0 . 2\n"
     "ATOM   7     C  C    . foo ?    2    1.000    2.000    3.000 0 . 2\n"
-    "ATOM   8     D  D    . bar G    ?    1.000    2.000    3.000 0 A 2\n";
+    "HETATM 8     D  D    . bar G    ?    1.000    2.000    3.000 0 A 2\n";
 
 
     auto frame = Frame(UnitCell(22));
@@ -204,11 +204,10 @@ TEST_CASE("Write mmCIF file") {
     frame.add_atom(Atom("C"), {1, 2, 3});
     frame.add_atom(Atom("D"), {1, 2, 3});
 
-    frame[0].set("is_hetatm", true);
-
     auto res = Residue("foo",2);
     res.add_atom(1);
     res.add_atom(2);
+    res.set("is_standard_pdb", true);
     frame.add_residue(std::move(res));
 
     res = Residue("bar");
