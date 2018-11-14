@@ -1,6 +1,8 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <algorithm>
+
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
@@ -89,6 +91,16 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
 
         if (line_split[0] == "_cell_angle_gamma") {
             gamma = cif_to_double(line_split[1]);
+        }
+
+        if (line_split[0] == "_entry.id") {
+            pdb_idcode_ = line_split[1];
+        }
+
+        if (line_split[0] == "_struct.title") {
+            auto temp_name = trim(line.substr(13));
+            std::copy(temp_name.begin() + 1, temp_name.end() - 1,
+                std::back_inserter(name_));
         }
 
         if (in_loop && line_split[0].find("_atom_site") != std::string::npos) {
@@ -189,6 +201,14 @@ void mmCIFFormat::read_step(const size_t step, Frame& frame) {
 void mmCIFFormat::read(Frame& frame) {
     frame.resize(0);
     residues_.clear();
+
+    if (name_.size()) {
+        frame.set("name", name_);
+    }
+
+    if (pdb_idcode_.size()) {
+        frame.set("pdb_idcode", pdb_idcode_);
+    }
 
     // The following map operations can be moved to the constructor
     // and stored with optional. I don't know which solution is better.

@@ -42,6 +42,9 @@ private:
     size_t models_;
     /// Number of atoms written to the file.
     size_t atoms_;
+    /// Frame properties need to be stored
+    std::string name_;
+    std::string pdb_idcode_;
 };
 
 template<> FormatInfo format_information<mmCIFFormat>();
