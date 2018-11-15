@@ -6,6 +6,7 @@
 
 #include <map>
 #include <vector>
+#include <tuple>
 
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
@@ -42,13 +43,14 @@ private:
     void read_CRYST1(Frame& frame, const std::string& line);
     // Read ATOM and HETATM records
     void read_ATOM(Frame& frame, const std::string& line, bool is_hetatm);
-
+    // Read HELIX records
+    void read_HELIX(const std::string& line);
     // Read CONECT record
     void read_CONECT(Frame& frame, const std::string& line);
 
     std::unique_ptr<TextFile> file_;
-    /// Map of residues, indexed by residue id.
-    std::map<size_t, Residue> residues_;
+    /// Map of residues, indexed by residue id and chainid.
+    std::map<std::pair<char, size_t>, Residue> residues_;
     /// Storing the positions of all the steps in the file, so that we can
     /// just `seekg` them instead of reading the whole step.
     std::vector<std::streampos> steps_positions_;
@@ -60,6 +62,8 @@ private:
     /// Did we wrote a frame to the file? This is used to check wheter we need
     /// to write a final `END` record in the destructor
     bool written_ = false;
+    /// Store secondary structure information
+    std::vector<std::tuple<char, size_t, size_t, std::string>> secinfo_;
 };
 
 template<> FormatInfo format_information<PDBFormat>();
