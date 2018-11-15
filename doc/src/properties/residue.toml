@@ -90,3 +90,20 @@ residue. This code is stored as a single character in the PDB file after the
 residue id. If this character is a space character, the property is not set. On
 writing, this character is stored with the ``ATOM`` or ``HETATM`` record. If the
 property is not set, a space character is used."""
+
+[secondary_structure]
+type = "string"
+
+PDB = """On reading, the **secondary_structure** is assigned via ``HELIX``,
+``SHEET``, and ``TURN`` records. If a residue is listed in a ``SHEET`` record,
+then the **secondary_structure** is set to ``extended``. Similarly, the ``TURN``
+record will set residues as ``turn``. The ``HELIX`` record is more complex as
+the `PDB` standard allows for multiple types of helicies include ``alpha``,
+``pi``, and ``3-10`` helicies. This property is not used for writing."""
+
+MMTF = """On reading, the **secondary_structure** is assigned via the
+``secStructList`` field in the ``MMTF`` standard. The values assigned match the
+descriptions by the *Define Secondary Strucutre of Proteins (DSSP)* algorithm.
+Examples include ``extended``, ``alpha helix``, ``pi helix``, ``turn`` and
+``coil``. This property is not set for undefined secondary structures and is not
+used for writing.

@@ -155,6 +155,11 @@ TEST_CASE("Read files in PDB format") {
 
         // The original behavior stored this, it is incorrect
         CHECK_THROWS(frame.topology().bond_order(4561, 4560));
+
+        // Check secondary structure
+        auto& topo = frame.topology();
+        CHECK(topo.residue(05).get("secondary_structure")->as_string() == "alpha helix");
+        CHECK(topo.residue(36).get("secondary_structure")->as_string() == "alpha helix");
     }
 
     SECTION("Handle odd PDB numbering") {

@@ -49,6 +49,10 @@ enum class Record {
     TER,
     // End of file
     END,
+    // Secondary structure
+    HELIX,
+    SHEET,
+    TURN,
     // Ignored records
     IGNORED_,
     // Unknown record type
@@ -138,6 +142,17 @@ void PDBFormat::read(Frame& frame) {
             // Else we have read a frame
             got_end = true;
             continue;
+        case Record::HELIX:
+            read_HELIX(line);
+            continue;
+        case Record::SHEET:
+            secinfo_.emplace_back(std::make_tuple(line[21], std::stoul(line.substr(22, 4)),
+                                                  std::stoul(line.substr(33, 4)), "extended"));
+            continue;
+        case Record::TURN:
+            secinfo_.emplace_back(std::make_tuple(line[19], std::stoul(line.substr(20, 4)),
+                                                  std::stoul(line.substr(31, 4)), "turn"));
+            continue;
         case Record::TER:
             if (line.size() >= 12) {
                 try {
@@ -161,6 +176,16 @@ void PDBFormat::read(Frame& frame) {
 
     if (!got_end) {
         warning("Missing END record in PDB file");
+    }
+
+    for (const auto& secinfo: secinfo_) {
+        auto chain = std::get<0>(secinfo);
+        for (auto i = std::get<1>(secinfo); i < std::get<2>(secinfo); ++i) {
+            auto residue = residues_.find({chain, i});
+            if (residue != residues_.end()) {
+                residue->second.set("secondary_structure", std::get<3>(secinfo));
+            }
+        }
     }
 
     for (const auto& residue: residues_) {
@@ -196,6 +221,35 @@ void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
                 space_group, file_->path()
             );
         }
+    }
+}
+
+void PDBFormat::read_HELIX(const std::string& line) {
+    auto chain = line[19];
+    auto start = std::stoul(line.substr(21,4));
+    auto end = std::stoul(line.substr(33,4));
+
+    switch (line[39] - '0') {
+    case 1:
+    case 6:
+        secinfo_.emplace_back(std::make_tuple(chain, start, end, "alpha helix"));
+        break;
+    case 2:
+    case 7:
+        secinfo_.emplace_back(std::make_tuple(chain, start, end, "omega helix"));
+        break;
+    case 3:
+        secinfo_.emplace_back(std::make_tuple(chain, start, end, "pi helix"));
+        break;
+    case 4:
+    case 8:
+        secinfo_.emplace_back(std::make_tuple(chain, start, end, "gamma helix"));
+        break;
+    case 5:
+        secinfo_.emplace_back(std::make_tuple(chain, start, end, "3-10 helix"));
+        break;
+    default:
+        break;
     }
 }
 
@@ -248,7 +302,8 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
     auto atom_id = frame.size() - 1;
     try {
         auto resid = std::stoul(line.substr(22, 4));
-        if (residues_.find(resid) == residues_.end()) {
+        auto chain = line[21];
+        if (residues_.find({chain,resid}) == residues_.end()) {
             auto name = trim(line.substr(17, 3));
             Residue residue(std::move(name), resid);
             residue.add_atom(atom_id);
@@ -264,11 +319,10 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
             residue.set("chainid", line.substr(21,1));
             // This format makes no distinction between chainid and chainname
             residue.set("chainname", line.substr(21,1));
-
-            residues_.insert({resid, residue});
+            residues_.insert({{chain,resid}, residue});
         } else {
             // Just add this atom to the residue
-            residues_.at(resid).add_atom(atom_id);
+            residues_.at({chain,resid}).add_atom(atom_id);
         }
     } catch (std::invalid_argument&) {
         // No residue information
@@ -467,6 +521,12 @@ Record get_record(const std::string& line) {
         return Record::MODEL;
     } else if (rec == "TER   ") {
         return Record::TER;
+    } else if (rec == "HELIX ") {
+        return Record::HELIX;
+    } else if (rec == "SHEET ") {
+        return Record::SHEET;
+    } else if (rec == "TURN  ") {
+        return Record::TURN;
     } else if (rec == "HEADER") { // These appear the least, so check last
         return Record::HEADER;
     } else if (rec == "TITLE ") {
@@ -474,7 +534,8 @@ Record get_record(const std::string& line) {
     } else if (rec == "REMARK" || rec == "MASTER" || rec == "AUTHOR" ||
                rec == "CAVEAT" || rec == "COMPND" || rec == "EXPDTA" ||
                rec == "KEYWDS" || rec == "OBSLTE" || rec == "SOURCE" ||
-               rec == "SPLIT " || rec == "SPRSDE" || rec == "JRNL  " ) {
+               rec == "SPLIT " || rec == "SPRSDE" || rec == "JRNL  " ||
+               rec == "SEQRES" || rec == "HET   " || rec == "REVDAT" ) {
         return Record::IGNORED_;
     } else {
         return Record::UNKNOWN_;
