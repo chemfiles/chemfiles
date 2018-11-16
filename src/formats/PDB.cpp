@@ -109,6 +109,7 @@ void PDBFormat::read(Frame& frame) {
             frame.set("pdb_idcode", trim(line.substr(62, 4)));
             continue;
         case Record::TITLE:
+            if (line.size() < 11) {continue;}
             frame.set("name", trim(
                       frame.get<Property::STRING>("name").value_or("") +
                       line.substr(10, 70)));
@@ -146,18 +147,18 @@ void PDBFormat::read(Frame& frame) {
             read_HELIX(line);
             continue;
         case Record::SHEET:
-            secinfo_.emplace_back(std::make_tuple(line[21], std::stoul(line.substr(22, 4)),
-                                                  std::stoul(line.substr(33, 4)), "extended"));
+            read_secondary(line, 21, 32, "extended");
             continue;
         case Record::TURN:
-            secinfo_.emplace_back(std::make_tuple(line[19], std::stoul(line.substr(20, 4)),
-                                                  std::stoul(line.substr(31, 4)), "turn"));
+            read_secondary(line, 19, 30, "turn");
             continue;
         case Record::TER:
             if (line.size() >= 12) {
                 try {
                     atom_offsets_.push_back(std::stoul(line.substr(6,5)));
-                } catch(std::invalid_argument&) {} // Do nothing
+                } catch(std::invalid_argument&) {
+                    warning("TER record not numeric: {}", line);
+                }
             }
             continue;
         case Record::END:
@@ -225,32 +226,82 @@ void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
 }
 
 void PDBFormat::read_HELIX(const std::string& line) {
-    auto chain = line[19];
-    auto start = std::stoul(line.substr(21,4));
-    auto end = std::stoul(line.substr(33,4));
+    if (line.length() < 33 + 5) {
+        warning("HELIX record too short: '{}'", line);
+        return;
+    }
 
+    auto chain1 = line[19];
+    auto chain2 = line[31];
+    size_t start, end;
+
+    try {
+        start = std::stoul(line.substr(21,4));
+        end = std::stoul(line.substr(33,4));
+    } catch (std::invalid_argument&) {
+        warning("HELIX record too short: '{}'", line);
+    }
+
+    if (chain1 != chain2) {
+        warning("HELIX chain {} and {} are not the same.", chain1, chain2);
+        return;
+    }
+
+    // Convert the code as a character to its numeric meaning.
+    // See http://www.wwpdb.org/documentation/file-format-content/format23/sect5.html
+    // for definitions of these numbers
     switch (line[39] - '0') {
-    case 1:
+    case 1: // Treat right and left handed helixes the same.
     case 6:
-        secinfo_.emplace_back(std::make_tuple(chain, start, end, "alpha helix"));
+        secinfo_.emplace_back(std::make_tuple(chain1, start, end, "alpha helix"));
         break;
     case 2:
     case 7:
-        secinfo_.emplace_back(std::make_tuple(chain, start, end, "omega helix"));
+        secinfo_.emplace_back(std::make_tuple(chain1, start, end, "omega helix"));
         break;
     case 3:
-        secinfo_.emplace_back(std::make_tuple(chain, start, end, "pi helix"));
+        secinfo_.emplace_back(std::make_tuple(chain1, start, end, "pi helix"));
         break;
     case 4:
     case 8:
-        secinfo_.emplace_back(std::make_tuple(chain, start, end, "gamma helix"));
+        secinfo_.emplace_back(std::make_tuple(chain1, start, end, "gamma helix"));
         break;
     case 5:
-        secinfo_.emplace_back(std::make_tuple(chain, start, end, "3-10 helix"));
+        secinfo_.emplace_back(std::make_tuple(chain1, start, end, "3-10 helix"));
         break;
     default:
         break;
     }
+}
+
+void PDBFormat::read_secondary(const std::string& line, size_t i1, size_t i2,
+                               const std::string& sec) {
+
+    if (line.length() < i2 + 5) {
+        warning("Secondary structure record too short: '{}'", line);
+        return;
+    }
+
+    auto chain1 = line[i1];
+    auto chain2 = line[i2];
+
+    if (chain1 != chain2) {
+        warning("{} chain {} and {} are not the same.", sec, chain1, chain2);
+        return;
+    }
+
+    size_t resid1, resid2;
+
+    try {
+        auto resid1 = std::stoul(line.substr(i1 + 1, 4));
+        auto resid2 = std::stoul(line.substr(i2 + 1, 4));
+    } catch (std::invalid_argument&) {
+        warning("Error parsing line: '{}', check {} and {}", line,
+                line.substr(i1 + 1, 4), line.substr(i2 + 1, 4));
+        return;
+    }
+
+    secinfo_.emplace_back(std::make_tuple(chain1, resid1, resid2, "extended"));
 }
 
 void PDBFormat::read_ATOM(Frame& frame, const std::string& line,

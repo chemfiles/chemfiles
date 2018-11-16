@@ -190,6 +190,8 @@ void MMTFFormat::read(Frame& frame) {
             }
 
             if (groupIndex_ < structure_.secStructList.size()) {
+                // We use the raw values here to directly match the MMTF spec
+                // See https://github.com/rcsb/mmtf/blob/master/spec.md#secstructlist
                 switch(structure_.secStructList[groupIndex_]) {
                     case 0:
                         residue.set("secondary_structure", "pi helix");

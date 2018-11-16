@@ -1,8 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <algorithm>
-
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
