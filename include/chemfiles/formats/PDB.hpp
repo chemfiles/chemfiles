@@ -43,8 +43,11 @@ private:
     void read_CRYST1(Frame& frame, const std::string& line);
     // Read ATOM and HETATM records
     void read_ATOM(Frame& frame, const std::string& line, bool is_hetatm);
-    // Read HELIX records
+    // Read secondary structure records. All push secinfo_ vector if line is valid
     void read_HELIX(const std::string& line);
+    // reads SHEET and TURN records. i1 and i2 are the indicies of the chain ids
+    void read_secondary(const std::string& line, size_t i1, size_t i2,
+                        const std::string& sec);
     // Read CONECT record
     void read_CONECT(Frame& frame, const std::string& line);
 
@@ -62,7 +65,8 @@ private:
     /// Did we wrote a frame to the file? This is used to check wheter we need
     /// to write a final `END` record in the destructor
     bool written_ = false;
-    /// Store secondary structure information
+    /// Store secondary structure information. First field is the chainid,
+    /// followed by the first and last residue id in the secondary structure.
     std::vector<std::tuple<char, size_t, size_t, std::string>> secinfo_;
 };
 
