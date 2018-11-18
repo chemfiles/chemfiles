@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+## 0.9.0 (18 Nov 2018)
+
 * Direct reading and writing of compressed files. gzip and lzma (.xz) formats
   are supported.
 * GROMACS .gro files now supported through custom implementation.
