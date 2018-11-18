@@ -14,68 +14,69 @@ If your file does not have this extension, you can also use the string in the
 *Format* column as a parameter to the ``Trajectory`` constructor to manually
 specify which format to use.
 
-+-------------------+------------+-------------------+---------+---------+
-|  Format           | Extension  | Topology ?        | Read ?  | Write ? |
-+===================+============+===================+=========+=========+
-| `XYZ`_            | .xyz       | |yes| Atom names  | |yes|   | |yes|   |
-+-------------------+------------+-------------------+---------+---------+
-| `PDB`_            | .pdb       | |yes|             | |yes|   | |yes|   |
-+-------------------+------------+-------------------+---------+---------+
-| `SDF`_            | .sdf       | |yes|             | |yes|   | |yes|   |
-+-------------------+------------+-------------------+---------+---------+
-| `Amber NetCDF`_   | .nc        | |no|              | |yes|   | |yes|   |
-+-------------------+------------+-------------------+---------+---------+
-| `TNG`_            | .tng       | |yes|             | |yes|   | |no|    |
-+-------------------+------------+-------------------+---------+---------+
-| LAMMPS Data       |            | |yes|             | |yes|   | |yes|   |
-+-------------------+------------+-------------------+---------+---------+
-| Tinker            | .arc       | |yes|             | |yes|   | |yes|   |
-+-------------------+------------+-------------------+---------+---------+
-| LAMMPS            | .lammpstrj | |no|              | |yes|   | |no|    |
-+-------------------+------------+-------------------+---------+---------+
-| `GRO`_            | .gro       | |yes| Atom names  | |yes|   | |yes|   |
-+-------------------+------------+-------------------+---------+---------+
-| `XTC`_            | .xtc       | |no|              | |yes|   | |no|    |
-+-------------------+------------+-------------------+---------+---------+
-| `TRJ`_            | .trj       | |no|              | |yes|   | |no|    |
-+-------------------+------------+-------------------+---------+---------+
-| `TRR`_            | .trr       | |no|              | |yes|   | |no|    |
-+-------------------+------------+-------------------+---------+---------+
-| `DCD`_            | .dcd       | |no|              | |yes|   | |no|    |
-+-------------------+------------+-------------------+---------+---------+
-| `MOL2`_           | .mol2      | |yes|             | |yes|   | |yes|   |
-+-------------------+------------+-------------------+---------+---------+
-| `Molden`_         | .molen     | |yes| Atom names  | |yes|   | |no|    |
-+-------------------+------------+-------------------+---------+---------+
-| `MMTF`_           | .mmtf      | |yes|             | |yes|   | |yes|   |
-+-------------------+------------+-------------------+---------+---------+
-| `CSSR`_           | .cssr      | |yes|             | |yes|   | |yes|   |
-+-------------------+------------+-------------------+---------+---------+
-| `mmCIF`_          | .mmcif     | |yes| Atom names  | |yes|   | |yes|   |
-+-------------------+------------+-------------------+---------+---------+
++-------------------+------------+-------+-------+--------------+-------+
+|  Format           | Extension  | Read  | Write | Atomic names | Bonds |
++===================+============+=======+=======+==============+=======+
+| `Amber NetCDF`_   | .nc        | |yes| | |yes| | |no|         | |no|  |
++-------------------+------------+-------+-------+--------------+-------+
+| `CSSR`_           | .cssr      | |yes| | |yes| | |yes|        | |yes| |
++-------------------+------------+-------+-------+--------------+-------+
+| `DCD`_            | .dcd       | |yes| | |no|  | |no|         | |no|  |
++-------------------+------------+-------+-------+--------------+-------+
+| `GRO`_            | .gro       | |yes| | |yes| | |yes|        | |no|  |
++-------------------+------------+-------+-------+--------------+-------+
+| `LAMMPS Data`_    |            | |yes| | |yes| | |yes|        | |yes| |
++-------------------+------------+-------+-------+--------------+-------+
+| `LAMMPS`_         | .lammpstrj | |yes| | |no|  | |no|         | |no|  |
++-------------------+------------+-------+-------+--------------+-------+
+| `mmCIF`_          | .mmcif     | |yes| | |yes| | |yes|        | |no|  |
++-------------------+------------+-------+-------+--------------+-------+
+| `MMTF`_           | .mmtf      | |yes| | |yes| | |yes|        | |yes| |
++-------------------+------------+-------+-------+--------------+-------+
+| `MOL2`_           | .mol2      | |yes| | |yes| | |yes|        | |yes| |
++-------------------+------------+-------+-------+--------------+-------+
+| `Molden`_         | .molen     | |yes| | |no|  | |yes|        | |no|  |
++-------------------+------------+-------+-------+--------------+-------+
+| `PDB`_            | .pdb       | |yes| | |yes| | |yes|        | |yes| |
++-------------------+------------+-------+-------+--------------+-------+
+| `SDF`_            | .sdf       | |yes| | |yes| | |yes|        | |yes| |
++-------------------+------------+-------+-------+--------------+-------+
+| `TNG`_            | .tng       | |yes| | |no|  | |yes|        | |yes| |
++-------------------+------------+-------+-------+--------------+-------+
+| `TRJ`_            | .trj       | |yes| | |no|  | |no|         | |no|  |
++-------------------+------------+-------+-------+--------------+-------+
+| `TRR`_            | .trr       | |yes| | |no|  | |no|         | |no|  |
++-------------------+------------+-------+-------+--------------+-------+
+| `Tinker`_         | .arc       | |yes| | |yes| | |yes|        | |yes| |
++-------------------+------------+-------+-------+--------------+-------+
+| `XTC`_            | .xtc       | |yes| | |no|  | |no|         | |no|  |
++-------------------+------------+-------+-------+--------------+-------+
+| `XYZ`_            | .xyz       | |yes| | |yes| | |yes|        | |no|  |
++-------------------+------------+-------+-------+--------------+-------+
 
 "LAMMPS" format correspond to trajectory files written by the LAMMPS
 `dump <http://lammps.sandia.gov/doc/dump.html>`_ command. "LAMMPS Data"
 correspond to LAMMPS data files, as read by the LAMMPS
 `read_data <http://lammps.sandia.gov/doc/read_data.html>`_ command.
 
-.. _XYZ: https://openbabel.org/wiki/XYZ
-.. _PDB: http://www.rcsb.org/pdb/static.do?p=file_formats/pdb/index.html
-.. _SDF: http://accelrys.com/products/collaborative-science/biovia-draw/ctfile-no-fee.html
 .. _Amber NetCDF: http://ambermd.org/netcdf/nctraj.xhtml
-.. _TNG: http://doi.wiley.com/10.1002/jcc.23495
-.. _MMTF: https://mmtf.rcsb.org/
 .. _CSSR: http://www.chem.cmu.edu/courses/09-560/docs/msi/modenv/D_Files.html#944777
-.. _mmCIF: http://mmcif.wwpdb.org/
-
-.. _GRO: http://manual.gromacs.org/current/online/gro.html
-.. _XTC: http://manual.gromacs.org/current/online/xtc.html
-.. _TRJ: http://manual.gromacs.org/current/online/trj.html
-.. _TRR: http://manual.gromacs.org/current/online/trr.html
 .. _DCD: http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/dcdplugin.html
+.. _GRO: http://manual.gromacs.org/current/online/gro.html
+.. _LAMMPS Data: http://lammps.sandia.gov/doc/read_data.html
+.. _LAMMPS: https://lammps.sandia.gov/doc/dump.html
+.. _mmCIF: http://mmcif.wwpdb.org/
+.. _MMTF: https://mmtf.rcsb.org/
 .. _MOL2: http://chemyang.ccnu.edu.cn/ccb/server/AIMMS/mol2.pdf
 .. _Molden: http://www.cmbi.ru.nl/molden/molden_format.html
-
+.. _PDB: http://www.rcsb.org/pdb/static.do?p=file_formats/pdb/index.html
+.. _SDF: http://accelrys.com/products/collaborative-science/biovia-draw/ctfile-no-fee.html
+.. _TNG: http://doi.wiley.com/10.1002/jcc.23495
+.. _TRJ: http://manual.gromacs.org/current/online/trj.html
+.. _TRR: http://manual.gromacs.org/current/online/trr.html
+.. _Tinker: http://chembytes.wikidot.com/tnk-tut00#toc2
+.. _XTC: http://manual.gromacs.org/current/online/xtc.html
+.. _XYZ: https://openbabel.org/wiki/XYZ
 
 .. |yes| image:: static/img/yes.png
           :alt: Yes
