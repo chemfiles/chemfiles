@@ -67,7 +67,6 @@ in our `Gitter chat room <https://gitter.im/chemfiles/chemfiles>`_.
     selections
     configuration
     properties
-    others
 
 .. _classes-reference:
 
