@@ -90,5 +90,3 @@ Developer documentation
 
    devdoc/contributing
    devdoc/internals
-   devdoc/file
-   devdoc/format

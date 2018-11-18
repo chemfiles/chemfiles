@@ -1,6 +1,12 @@
 Chemfiles internals
 ===================
 
+.. toctree::
+   :maxdepth: 2
+
+   file
+   format
+
 Sources organisation
 --------------------
 
