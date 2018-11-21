@@ -288,10 +288,10 @@ inline bool operator!=(const property_map& lhs, const property_map& rhs) {
 }
 
 // Declare instantiations of the typed `property_map::get` template
-extern template optional<bool> property_map::get<Property::BOOL>(const std::string& name) const;
-extern template optional<double> property_map::get<Property::DOUBLE>(const std::string& name) const;
-extern template optional<const std::string&> property_map::get<Property::STRING>(const std::string& name) const;
-extern template optional<Vector3D> property_map::get<Property::VECTOR3D>(const std::string& name) const;
+extern template CHFL_EXPORT optional<bool> property_map::get<Property::BOOL>(const std::string& name) const;
+extern template CHFL_EXPORT optional<double> property_map::get<Property::DOUBLE>(const std::string& name) const;
+extern template CHFL_EXPORT optional<const std::string&> property_map::get<Property::STRING>(const std::string& name) const;
+extern template CHFL_EXPORT optional<Vector3D> property_map::get<Property::VECTOR3D>(const std::string& name) const;
 
 } // namespace chemfiles
 
