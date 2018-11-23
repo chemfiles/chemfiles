@@ -205,25 +205,30 @@ template <MolfileFormat F> size_t Molfile<F>::nsteps() {
 template <MolfileFormat F>
 void Molfile<F>::molfile_to_frame(const molfile_timestep_t& timestep,
                                   Frame& frame) {
-    auto cell = UnitCell(timestep.A, timestep.B, timestep.C, timestep.alpha,
-                         timestep.beta, timestep.gamma);
-    frame.set_cell(cell);
+    frame.set_cell({
+        static_cast<double>(timestep.A), 
+        static_cast<double>(timestep.B), 
+        static_cast<double>(timestep.C), 
+        static_cast<double>(timestep.alpha),
+        static_cast<double>(timestep.beta),
+        static_cast<double>(timestep.gamma)
+    });
 
     frame.resize(static_cast<size_t>(natoms_));
     auto positions = frame.positions();
     for (size_t i = 0; i < static_cast<size_t>(natoms_); i++) {
-        positions[i][0] = timestep.coords[3 * i];
-        positions[i][1] = timestep.coords[3 * i + 1];
-        positions[i][2] = timestep.coords[3 * i + 2];
+        positions[i][0] = static_cast<double>(timestep.coords[3 * i + 0]);
+        positions[i][1] = static_cast<double>(timestep.coords[3 * i + 1]);
+        positions[i][2] = static_cast<double>(timestep.coords[3 * i + 2]);
     }
 
     if (plugin_data_.have_velocities()) {
         frame.add_velocities();
         auto velocities = frame.velocities();
         for (size_t i = 0; i < static_cast<size_t>(natoms_); i++) {
-            (*velocities)[i][0] = timestep.velocities[3 * i];
-            (*velocities)[i][1] = timestep.velocities[3 * i + 1];
-            (*velocities)[i][2] = timestep.velocities[3 * i + 2];
+            (*velocities)[i][0] = static_cast<double>(timestep.velocities[3 * i + 0]);
+            (*velocities)[i][1] = static_cast<double>(timestep.velocities[3 * i + 1]);
+            (*velocities)[i][2] = static_cast<double>(timestep.velocities[3 * i + 2]);
         }
     }
 }
@@ -247,20 +252,20 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
 
     auto residues = std::unordered_map<size_t, Residue>();
     size_t atom_id = 0;
-    for (auto& vmd_atom : atoms) {
-        Atom atom(vmd_atom.name, vmd_atom.type);
+    for (auto& molfile_atom : atoms) {
+        Atom atom(molfile_atom.name, molfile_atom.type);
         if (optflags & MOLFILE_MASS) {
-            atom.set_mass(vmd_atom.mass);
+            atom.set_mass(static_cast<double>(molfile_atom.mass));
         }
         if (optflags & MOLFILE_CHARGE) {
-            atom.set_charge(vmd_atom.charge);
+            atom.set_charge(static_cast<double>(molfile_atom.charge));
         }
 
         topology_->add_atom(std::move(atom));
 
-        if (vmd_atom.resname != std::string("")) {
-            auto resid = static_cast<size_t>(vmd_atom.resid);
-            auto residue = Residue(vmd_atom.resname, resid);
+        if (molfile_atom.resname != std::string("")) {
+            auto resid = static_cast<size_t>(molfile_atom.resid);
+            auto residue = Residue(molfile_atom.resname, resid);
             auto inserted = residues.insert({resid, std::move(residue)});
             inserted.first->second.add_atom(atom_id);
         }

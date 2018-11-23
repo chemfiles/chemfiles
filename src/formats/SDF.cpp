@@ -67,8 +67,8 @@ void SDFFormat::read(Frame& frame) {
         file_->readline(); // Comment line - skip it
 
         counts_line = file_->readline();
-        natoms = std::stoul(counts_line.substr(0,3));
-        nbonds = std::stoul(counts_line.substr(3,3));
+        natoms = std::stoul(counts_line.substr(0, 3));
+        nbonds = std::stoul(counts_line.substr(3, 3));
     } catch (const std::exception& e) {
         throw format_error("can not read next step as SDF: {}", e.what());
     }
@@ -84,10 +84,10 @@ void SDFFormat::read(Frame& frame) {
     frame.resize(0);
 
     for (const auto& line: atom_lines) {
-        double x = std::stof(line.substr(0,10));
-        double y = std::stof(line.substr(10,10));
-        double z = std::stof(line.substr(20,10));
-        std::string name = trim(line.substr(31,3));
+        double x = std::stod(line.substr(0, 10));
+        double y = std::stod(line.substr(10, 10));
+        double z = std::stod(line.substr(20, 10));
+        std::string name = trim(line.substr(31, 3));
 
         frame.add_atom(Atom(name), Vector3D(x, y, z));
     }
@@ -100,9 +100,9 @@ void SDFFormat::read(Frame& frame) {
     }
 
     for (const auto& line: bond_lines) {
-        size_t atom1 = std::stoul(line.substr(0,3));
-        size_t atom2 = std::stoul(line.substr(3,3));
-        size_t bondo = std::stoul(line.substr(6,3));
+        size_t atom1 = std::stoul(line.substr(0, 3));
+        size_t atom2 = std::stoul(line.substr(3, 3));
+        size_t bondo = std::stoul(line.substr(6, 3));
 
         Bond::BondOrder bo;
 
@@ -136,7 +136,7 @@ void SDFFormat::read(Frame& frame) {
             const auto& line = file_->readline();
             if (line == "") {
                 continue;
-            } else if (line.substr(0,4) == "$$$$") {
+            } else if (line.substr(0, 4) == "$$$$") {
                 // Ending block, technically wrong - but we can exit safetly
                 return;
             } else if (line.substr(0, 6) == "M  END") {
@@ -166,10 +166,10 @@ void SDFFormat::read(Frame& frame) {
                     continue;
                 }
                 frame.set(property_name, Property(property_value));
-            } else if (line.substr(0,4) == "$$$$") {
+            } else if (line.substr(0, 4) == "$$$$") {
                 // Molecule ending block
                 return;
-            } else if (line.substr(0,3) == "> <") {
+            } else if (line.substr(0, 3) == "> <") {
                 // Get the property name
                 // It is formated like:
                 //> <NAMEGOESHERE>
