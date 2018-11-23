@@ -163,19 +163,26 @@ else()
     add_warning_flag("-Wmissing-prototypes")
     add_warning_flag("-Wmissing-variable-declarations")
 
-    # Disable some strong warning with clang that are OK here
+    # Disable some strong warning that are OK here
     add_warning_flag("-Wno-unknown-pragmas")
+    add_warning_flag("-Wno-overlength-strings")
+
+    # Disable some warning implied by -Weverything
+    # -Weverything is not activated by default, but adding these flags help
+    # when adding it manually to check for new warnings 
+    add_warning_flag("-Wno-c++98-compat")
+    add_warning_flag("-Wno-c++98-compat-pedantic")
     add_warning_flag("-Wno-weak-vtables")
     add_warning_flag("-Wno-weak-template-vtables")
-    add_warning_flag("-Wno-switch-enum")
-    # We are not doing C here
     add_warning_flag("-Wno-padded")
-    # Sometime this OK
     add_warning_flag("-Wno-float-equal")
-    add_warning_flag("-Wno-double-promotion")
-    # Yes, chemfiles uses globals
+    add_warning_flag("-Wno-switch-enum")
+    add_warning_flag("-Wno-documentation-unknown-command")
     add_warning_flag("-Wno-exit-time-destructors")
     add_warning_flag("-Wno-global-constructors")
+    # This warning trigger when compiling for 64-bit,
+    # but the code is relevant for 32-bit
+    add_warning_flag("-Wno-tautological-type-limit-compare")
     # Not everyone is as smart as clang for code reachability
     add_warning_flag("-Wno-covered-switch-default")
     add_warning_flag("-Wno-unreachable-code-break")

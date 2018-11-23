@@ -80,9 +80,9 @@ void TNGFormat::read_positions(Frame& frame) {
 
     auto positions = frame.positions();
     for (size_t i=0; i<static_cast<size_t>(natoms_); i++) {
-        positions[i][0] = buffer[3*i + 0];
-        positions[i][1] = buffer[3*i + 1];
-        positions[i][2] = buffer[3*i + 2];
+        positions[i][0] = static_cast<double>(buffer[3 * i + 0]);
+        positions[i][1] = static_cast<double>(buffer[3 * i + 1]);
+        positions[i][2] = static_cast<double>(buffer[3 * i + 2]);
     }
 }
 
@@ -110,9 +110,9 @@ void TNGFormat::read_velocities(Frame& frame) {
     frame.add_velocities();
     auto velocities = *frame.velocities();
     for (size_t i=0; i<static_cast<size_t>(natoms_); i++) {
-        velocities[i][0] = buffer[3*i + 0];
-        velocities[i][1] = buffer[3*i + 1];
-        velocities[i][2] = buffer[3*i + 2];
+        velocities[i][0] = static_cast<double>(buffer[3 * i + 0]);
+        velocities[i][1] = static_cast<double>(buffer[3 * i + 1]);
+        velocities[i][2] = static_cast<double>(buffer[3 * i + 2]);
     }
 }
 
@@ -138,9 +138,9 @@ void TNGFormat::read_cell(Frame& frame) {
         );
     }
 
-    auto a = Vector3D(buffer[0], buffer[1], buffer[2]);
-    auto b = Vector3D(buffer[3], buffer[4], buffer[5]);
-    auto c = Vector3D(buffer[6], buffer[7], buffer[8]);
+    auto a = Vector3D(static_cast<double>(buffer[0]), static_cast<double>(buffer[1]), static_cast<double>(buffer[2]));
+    auto b = Vector3D(static_cast<double>(buffer[3]), static_cast<double>(buffer[4]), static_cast<double>(buffer[5]));
+    auto c = Vector3D(static_cast<double>(buffer[6]), static_cast<double>(buffer[7]), static_cast<double>(buffer[8]));
 
     auto angle = [](const Vector3D& u, const Vector3D& v) {
         constexpr double PI = 3.141592653589793238463;

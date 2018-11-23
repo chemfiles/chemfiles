@@ -109,7 +109,14 @@ UnitCell AmberNetCDFFormat::read_cell() {
     assert(length.size() == 3);
     assert(angles.size() == 3);
 
-    return {length[0], length[1], length[2], angles[0], angles[1], angles[2]};
+    return {
+        static_cast<double>(length[0]),
+        static_cast<double>(length[1]),
+        static_cast<double>(length[2]),
+        static_cast<double>(angles[0]),
+        static_cast<double>(angles[1]),
+        static_cast<double>(angles[2])
+    };
 }
 
 void AmberNetCDFFormat::read_array(span<Vector3D> array, const std::string& name) {
@@ -122,9 +129,9 @@ void AmberNetCDFFormat::read_array(span<Vector3D> array, const std::string& name
     auto data = array_var.get(start, count);
 
     for (size_t i = 0; i < natoms; i++) {
-        array[i][0] = data[3 * i + 0];
-        array[i][1] = data[3 * i + 1];
-        array[i][2] = data[3 * i + 2];
+        array[i][0] = static_cast<double>(data[3 * i + 0]);
+        array[i][1] = static_cast<double>(data[3 * i + 1]);
+        array[i][2] = static_cast<double>(data[3 * i + 2]);
     }
 }
 
