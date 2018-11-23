@@ -75,7 +75,7 @@ PDBFormat::PDBFormat(std::string path, File::Mode mode, File::Compression compre
     }
     file_->rewind();
 
-    // Needed in case there's no end records 
+    // Needed in case there's no end records
     if (steps_positions_.empty()) {
         steps_positions_.push_back(file_->tellg());
     }
@@ -290,11 +290,11 @@ void PDBFormat::read_secondary(const std::string& line, size_t i1, size_t i2,
         return;
     }
 
-    size_t resid1, resid2;
-
+    size_t resid1 = 0;
+    size_t resid2 = 0;
     try {
-        auto resid1 = std::stoul(line.substr(i1 + 1, 4));
-        auto resid2 = std::stoul(line.substr(i2 + 1, 4));
+        resid1 = std::stoul(line.substr(i1 + 1, 4));
+        resid2 = std::stoul(line.substr(i2 + 1, 4));
     } catch (std::invalid_argument&) {
         warning("Error parsing line: '{}', check {} and {}", line,
                 line.substr(i1 + 1, 4), line.substr(i2 + 1, 4));
