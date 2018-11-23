@@ -12,8 +12,6 @@ using namespace chemfiles;
 #include <boost/filesystem.hpp>
 namespace fs=boost::filesystem;
 
-#include <iostream>
-
 TEST_CASE("Read files in SDF format") {
     SECTION("Check nsteps") {
         Trajectory file1("data/sdf/aspirin.sdf");
@@ -23,7 +21,6 @@ TEST_CASE("Read files in SDF format") {
         CHECK(file2.nsteps() == 6);
     }
 
-
     SECTION("Read next step") {
         Trajectory file("data/sdf/kinases.sdf");
         auto frame = file.read();
@@ -31,8 +28,8 @@ TEST_CASE("Read files in SDF format") {
 
         // Check positions
         auto positions = frame.positions();
-        CHECK(approx_eq(positions[0]  == Vector3D(4.9955, -2.6277, 0.2047), 1e-3));
-        CHECK(approx_eq(positions[46] == Vector3D(-8.5180, 0.2962, 2.1406), 1e-3));
+        CHECK(approx_eq(positions[0], Vector3D(4.9955, -2.6277, 0.2047), 1e-3));
+        CHECK(approx_eq(positions[46], Vector3D(-8.5180, 0.2962, 2.1406), 1e-3));
 
         // Check topology
         auto topology = frame.topology();
@@ -46,8 +43,8 @@ TEST_CASE("Read files in SDF format") {
         auto frame = file.read_step(3);
         CHECK(frame.step() == 3);
         auto positions = frame.positions();
-        CHECK(approx_eq(positions[0]  == Vector3D(-0.8276, 0.2486, -1.0418), 1e-3));
-        CHECK(approx_eq(positions[67] == Vector3D(-1.1356, 5.2260, 1.3726), 1e-3));
+        CHECK(approx_eq(positions[0], Vector3D(-0.8276, 0.2486, -1.0418), 1e-3));
+        CHECK(approx_eq(positions[67], Vector3D(-1.1356, 5.2260, 1.3726), 1e-3));
         auto topology = frame.topology();
         CHECK(topology.size() == 68);
         CHECK(topology[0] == Atom("O"));
@@ -55,8 +52,8 @@ TEST_CASE("Read files in SDF format") {
         frame = file.read_step(0);
         CHECK(frame.step() == 0);
         positions = frame.positions();
-        CHECK(approx_eq(positions[0]  == Vector3D(4.9955, -2.6277, 0.2047), 1e-3));
-        CHECK(approx_eq(positions[46] == Vector3D(-8.5180, 0.2962, 2.1406), 1e-3));
+        CHECK(approx_eq(positions[0], Vector3D(4.9955, -2.6277, 0.2047), 1e-3));
+        CHECK(approx_eq(positions[46], Vector3D(-8.5180, 0.2962, 2.1406), 1e-3));
     }
 
     SECTION("Read the whole file") {
@@ -68,8 +65,8 @@ TEST_CASE("Read files in SDF format") {
             frame = file.read();
         }
         auto positions = frame.positions();
-        CHECK(approx_eq(positions[0]  == Vector3D(3.1149, -1.1207, 3.0606), 1e-3));
-        CHECK(approx_eq(positions[49] == Vector3D(-7.4890, -0.0147, -2.1114), 1e-3));
+        CHECK(approx_eq(positions[0], Vector3D(3.1149, -1.1207, 3.0606), 1e-3));
+        CHECK(approx_eq(positions[49], Vector3D(-7.4890, -0.0147, -2.1114), 1e-3));
     }
 
     SECTION("Read various file properties") {
