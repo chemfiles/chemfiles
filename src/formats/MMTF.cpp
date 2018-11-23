@@ -86,10 +86,14 @@ void MMTFFormat::read(Frame& frame) {
     frame.resize(0);
 
     if (structure_.unitCell.size() == 6) {
-        frame.set_cell(UnitCell(
-            structure_.unitCell[0], structure_.unitCell[1], structure_.unitCell[2],
-            structure_.unitCell[3], structure_.unitCell[4], structure_.unitCell[5]
-        ));
+        frame.set_cell({
+            static_cast<double>(structure_.unitCell[0]),
+            static_cast<double>(structure_.unitCell[1]),
+            static_cast<double>(structure_.unitCell[2]),
+            static_cast<double>(structure_.unitCell[3]),
+            static_cast<double>(structure_.unitCell[4]),
+            static_cast<double>(structure_.unitCell[5])
+        });
     }
 
     if (!mmtf::isDefaultValue(structure_.title)) {
@@ -148,11 +152,11 @@ void MMTFFormat::read(Frame& frame) {
                 }
 
                 atom.set_type(group.elementList[l]);
-                atom.set_charge(group.formalChargeList[l]);
+                atom.set_charge(static_cast<double>(group.formalChargeList[l]));
                 auto position = Vector3D(
-                    structure_.xCoordList[atomIndex_],
-                    structure_.yCoordList[atomIndex_],
-                    structure_.zCoordList[atomIndex_]
+                    static_cast<double>(structure_.xCoordList[atomIndex_]),
+                    static_cast<double>(structure_.yCoordList[atomIndex_]),
+                    static_cast<double>(structure_.zCoordList[atomIndex_])
                 );
                 frame.add_atom(atom, position);
                 residue.add_atom(atomIndex_ - atomSkip_);
@@ -346,7 +350,7 @@ void MMTFFormat::write(const Frame& frame) {
         structure_.groupIdList.emplace_back(groupId ? *groupId : 0);
         structure_.groupList.emplace_back();
         structure_.groupList.back().groupName = prev_residue->name();
-        structure_.groupList.back().chemCompType = 
+        structure_.groupList.back().chemCompType =
             prev_residue->get("composition_type") &&
             prev_residue->get("composition_type")->kind() == Property::STRING ?
             prev_residue->get("composition_type")->as_string() :

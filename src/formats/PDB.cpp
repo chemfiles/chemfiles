@@ -201,12 +201,12 @@ void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
         throw format_error("CRYST1 record '{}' is too small", line);
     }
     try {
-        auto a = std::stof(line.substr(6, 9));
-        auto b = std::stof(line.substr(15, 9));
-        auto c = std::stof(line.substr(24, 9));
-        auto alpha = std::stof(line.substr(33, 7));
-        auto beta = std::stof(line.substr(40, 7));
-        auto gamma = std::stof(line.substr(47, 7));
+        auto a = std::stod(line.substr(6, 9));
+        auto b = std::stod(line.substr(15, 9));
+        auto c = std::stod(line.substr(24, 9));
+        auto alpha = std::stod(line.substr(33, 7));
+        auto beta = std::stod(line.substr(40, 7));
+        auto gamma = std::stod(line.substr(47, 7));
         auto cell = UnitCell(a, b, c, alpha, beta, gamma);
 
         frame.set_cell(cell);
@@ -233,13 +233,15 @@ void PDBFormat::read_HELIX(const std::string& line) {
 
     auto chain1 = line[19];
     auto chain2 = line[31];
-    size_t start, end;
+    size_t start = 0;
+    size_t end = 0;
 
     try {
         start = std::stoul(line.substr(21,4));
         end = std::stoul(line.substr(33,4));
     } catch (std::invalid_argument&) {
-        warning("HELIX record too short: '{}'", line);
+        warning("HELIX record contains invalid numbers: '{}'", line);
+        return;
     }
 
     if (chain1 != chain2) {
@@ -341,9 +343,9 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
     }
 
     try {
-        auto x = std::stof(line.substr(31, 8));
-        auto y = std::stof(line.substr(38, 8));
-        auto z = std::stof(line.substr(46, 8));
+        auto x = std::stod(line.substr(31, 8));
+        auto y = std::stod(line.substr(38, 8));
+        auto z = std::stod(line.substr(46, 8));
 
         frame.add_atom(std::move(atom), Vector3D(x, y, z));
     } catch (std::invalid_argument&) {
