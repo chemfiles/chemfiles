@@ -1266,6 +1266,11 @@ namespace Catch {
 }
 #endif // CATCH_CONFIG_ENABLE_VARIANT_STRINGMAKER
 
+namespace chemfiles {
+    class Vector3D;
+    class Matrix3D;
+}
+
 namespace Catch {
     struct not_this_one {}; // Tag type for detecting which begin/ end are being selected
 
@@ -1289,6 +1294,19 @@ namespace Catch {
         static const bool value = false;
     };
 #endif
+
+    // Prevent catch from trying to access private begin/end on
+    // chemfiles::Matrix3D & chemfiles::Vector3D. This is a workaround for a
+    // bug in GCC 4.8.5 where using functions from a private base class fails
+    // to trigger SFINAE and remove the above specification.
+    template<>
+    struct is_range<chemfiles::Matrix3D> {
+        static const bool value = false;
+    };
+    template<>
+    struct is_range<chemfiles::Vector3D> {
+        static const bool value = false;
+    };
 
     template<typename Range>
     std::string rangeToString( Range const& range ) {
@@ -14072,4 +14090,3 @@ using Catch::Detail::Approx;
 // end catch_reenable_warnings.h
 // end catch.hpp
 #endif // TWOBLUECUBES_SINGLE_INCLUDE_CATCH_HPP_INCLUDED
-
