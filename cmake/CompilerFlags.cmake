@@ -69,13 +69,9 @@ if(${EMSCRIPTEN})
 endif()
 
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "PGI")
-    # Remove IPA optimization, as it fails with 'unknown variable reference: &2&2821'
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Mnoipa")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Mnoipa")
-    # When passed --c++11, pgc++ insist on defining __THROW on the command line
-    # and then fail because it is also defined in a source file. This does not
-    # happen with -std=c++11.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -U__THROW")
+    if(${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 18)
+        message(WARNING "Only PGI >= 18 was tested to be able to compile chemfiles")
+    endif()
 endif()
 
 macro(add_warning_flag _flag_)

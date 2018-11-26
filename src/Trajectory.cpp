@@ -13,13 +13,13 @@ using namespace chemfiles;
 
 struct file_open_info {
     static file_open_info parse(const std::string& path, const std::string& format);
-    std::string format;
-    std::string extension;
-    File::Compression compression;
+    std::string format = "";
+    std::string extension = "";
+    File::Compression compression = File::DEFAULT;
 };
 
 file_open_info file_open_info::parse(const std::string& path, const std::string& format) {
-    auto info = file_open_info {"", "", File::DEFAULT};
+    file_open_info info;
 
     auto slash = format.find('/');
     if (slash != std::string::npos) {
