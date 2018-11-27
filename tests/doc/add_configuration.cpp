@@ -2,9 +2,6 @@
 #include <chemfiles.hpp>
 using namespace chemfiles;
 
-#undef assert
-#define assert CHECK
-
 TEST_CASE() {
     // [example]
     chemfiles::add_configuration("local-file.toml");

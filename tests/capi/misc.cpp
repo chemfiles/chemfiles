@@ -43,7 +43,7 @@ TEST_CASE("Version") {
 }
 
 // Global variables for access from callback and main
-static char* buffer = NULL;
+static char* buffer = nullptr;
 
 static void callback(const char* message) {
     size_t size = strlen(message) + 1;

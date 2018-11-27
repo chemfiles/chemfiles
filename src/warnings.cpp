@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include "chemfiles/warnings.hpp"
-#include "chemfiles/Configuration.hpp"
 #include "chemfiles/misc.hpp"
 #include "chemfiles/mutex.hpp"
 
@@ -23,8 +22,4 @@ void chemfiles::set_warning_callback(warning_callback callback) {
 void chemfiles::warning(const std::string& message) {
     auto callback = CALLBACK.lock();
     (*callback)(message);
-}
-
-void chemfiles::add_configuration(const std::string& path) {
-    Configuration::add(path);
 }
