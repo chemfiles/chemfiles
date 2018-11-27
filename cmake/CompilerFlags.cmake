@@ -54,18 +54,12 @@ if(${EMSCRIPTEN})
 
     set(EMCC_FLAGS "")
     set(EMCC_FLAGS "${EMCC_FLAGS} -s DISABLE_EXCEPTION_CATCHING=0")
-    set(EMCC_FLAGS "${EMCC_FLAGS} -s LINKABLE=1")
     set(EMCC_FLAGS "${EMCC_FLAGS} -s ERROR_ON_UNDEFINED_SYMBOLS=1")
-    set(EMCC_FLAGS "${EMCC_FLAGS} -s ALLOW_MEMORY_GROWTH=1 -Wno-almost-asm")
+    set(EMCC_FLAGS "${EMCC_FLAGS} -s ALLOW_MEMORY_GROWTH=1")
+    set(EMCC_FLAGS "${EMCC_FLAGS} -s ASSERTIONS=1")
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EMCC_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EMCC_FLAGS}")
-
-    string(TOLOWER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
-    if(NOT "${CHFL_WARNED_EMSCRIPTEN_DEBUG}" AND (${BUILD_TYPE} STREQUAL "debug" OR ${BUILD_TYPE} STREQUAL "relwithdebinfo"))
-        message(WARNING "Debug info might crash emscripten with a 'Referencing global in another module' error")
-        set(CHFL_WARNED_EMSCRIPTEN_DEBUG ON CACHE INTERNAL "" FORCE)
-    endif()
 endif()
 
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "PGI")

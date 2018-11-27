@@ -59,7 +59,7 @@ TEST_CASE("chfl_selection") {
         CHECK(matches_count == 2);
 
         chfl_match* matches = new chfl_match[static_cast<size_t>(matches_count)];
-        REQUIRE(matches != 0);
+        REQUIRE(matches);
 
         CHECK(chfl_selection_matches(selection, matches, 1) == CHFL_MEMORY_ERROR);
 

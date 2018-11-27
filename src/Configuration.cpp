@@ -214,3 +214,7 @@ double toml_get_number(const toml::value& value) {
     }
     return 0;
 }
+
+void chemfiles::add_configuration(const std::string& path) {
+    Configuration::add(path);
+}
