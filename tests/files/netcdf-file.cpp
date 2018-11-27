@@ -26,11 +26,11 @@ TEST_CASE("Read a NetCDF file") {
     CHECK(dims[1] == 297);
     CHECK(dims[2] == 3);
 
-    auto EPS = 1e-5;
+    auto EPS = 1e-5f;
     auto positions = var.get({0, 0, 0}, {1, 297, 3});
-    CHECK(fabs(positions[0] - 0.4172191) < EPS);
-    CHECK(fabs(positions[1] - 8.303366) < EPS);
-    CHECK(fabs(positions[2] - 11.73717) < EPS);
+    CHECK(std::abs(positions[0] - 0.4172191f) < EPS);
+    CHECK(std::abs(positions[1] - 8.303366f) < EPS);
+    CHECK(std::abs(positions[2] - 11.73717f) < EPS);
 }
 
 TEST_CASE("Errors in NetCDF files") {

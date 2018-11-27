@@ -49,7 +49,7 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_frame_resize(frame, 4));
 
         uint64_t natoms = 0;
-        chfl_vector3d* positions = NULL;
+        chfl_vector3d* positions = nullptr;
         CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
         CHECK(natoms == 4);
 
@@ -59,7 +59,7 @@ TEST_CASE("chfl_frame") {
             }
         }
 
-        positions = NULL;
+        positions = nullptr;
         CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
         for (size_t i=0; i<natoms; i++) {
             for (size_t j=0; j<3; j++) {
@@ -83,7 +83,7 @@ TEST_CASE("chfl_frame") {
         CHECK(has_velocities == true);
 
         uint64_t natoms = 0;
-        chfl_vector3d* velocities = NULL;
+        chfl_vector3d* velocities = nullptr;
         CHECK_STATUS(chfl_frame_velocities(frame, &velocities, &natoms));
         CHECK(natoms == 4);
 
@@ -93,7 +93,7 @@ TEST_CASE("chfl_frame") {
             }
         }
 
-        velocities = NULL;
+        velocities = nullptr;
         CHECK_STATUS(chfl_frame_velocities(frame, &velocities, &natoms));
         for (size_t i=0; i<natoms; i++) {
             for (size_t j=0; j<3; j++) {
@@ -158,7 +158,7 @@ TEST_CASE("chfl_frame") {
 
         CHFL_ATOM* atom = chfl_atom("U");
         chfl_vector3d position = {2, 3, 4};
-        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position, NULL));
+        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position, nullptr));
         chfl_vector3d velocity = {1, 2, 1};
         CHECK_STATUS(chfl_frame_add_atom(frame, atom, position, velocity));
         CHECK_STATUS(chfl_atom_free(atom));
@@ -166,7 +166,7 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
         CHECK(natoms == 2);
 
-        chfl_vector3d* positions = NULL;
+        chfl_vector3d* positions = nullptr;
         CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
         CHECK(natoms == 2);
         CHECK(positions[0][0] == 2);
@@ -177,7 +177,7 @@ TEST_CASE("chfl_frame") {
         CHECK(positions[1][1] == 3);
         CHECK(positions[1][2] == 4);
 
-        chfl_vector3d* velocities = NULL;
+        chfl_vector3d* velocities = nullptr;
         CHECK_STATUS(chfl_frame_velocities(frame, &velocities, &natoms));
         CHECK(natoms == 2);
 
@@ -322,15 +322,15 @@ TEST_CASE("chfl_frame") {
         REQUIRE(atom);
 
         chfl_vector3d position_1 = {1, 0, 0};
-        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_1, NULL));
+        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_1, nullptr));
         chfl_vector3d position_2 = {0, 0, 0};
-        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_2, NULL));
+        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_2, nullptr));
         chfl_vector3d position_3 = {0, 1, 0};
-        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_3, NULL));
+        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_3, nullptr));
         chfl_vector3d position_4 = {0, 1, 1};
-        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_4, NULL));
+        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_4, nullptr));
         chfl_vector3d position_5 = {0, 0, 2};
-        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_5, NULL));
+        CHECK_STATUS(chfl_frame_add_atom(frame, atom, position_5, nullptr));
 
         double distance = 0;
         CHECK_STATUS(chfl_frame_distance(frame, 0, 2, &distance));

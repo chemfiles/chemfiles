@@ -61,7 +61,7 @@ TEST_CASE("Read trajectory") {
         CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
         CHECK(natoms == 297);
 
-        chfl_vector3d* data = NULL;
+        chfl_vector3d* data = nullptr;
         // Check for the error when requesting non-existent velocities
         CHECK(chfl_frame_velocities(frame, &data, &natoms) != CHFL_SUCCESS);
 
@@ -95,7 +95,7 @@ TEST_CASE("Read trajectory") {
         chfl_vector3d positions_0 = {0.761277, 8.106125, 10.622949};
         chfl_vector3d positions_124 = {5.13242, 0.079862, 14.194161};
 
-        chfl_vector3d* positions = NULL;
+        chfl_vector3d* positions = nullptr;
         CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
         CHECK(natoms == 297);
         for (unsigned i=0; i<3; i++) {
@@ -209,7 +209,7 @@ TEST_CASE("Read trajectory") {
         CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
 
         CHFL_ATOM* atom = chfl_atom_from_frame(frame, 0);
-        char name[32];
+        char name[32] = {0};
         CHECK_STATUS(chfl_atom_name(atom, name, sizeof(name)));
         CHECK(name == std::string("Zn"));
         CHECK_STATUS(chfl_atom_free(atom));
@@ -275,7 +275,7 @@ static CHFL_FRAME* testing_frame() {
     CHECK_STATUS(chfl_frame_set_topology(frame, topology));
     CHECK_STATUS(chfl_topology_free(topology));
 
-    chfl_vector3d* positions = NULL;
+    chfl_vector3d* positions = nullptr;
     uint64_t natoms = 0;
     CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
     CHECK(natoms == 4);

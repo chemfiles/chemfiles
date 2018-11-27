@@ -5,9 +5,6 @@
 #include <chemfiles.hpp>
 using namespace chemfiles;
 
-#undef assert
-#define assert CHECK
-
 TEST_CASE() {
     // [no-run]
     // [example]

@@ -5,9 +5,6 @@
 #include <chemfiles.hpp>
 using namespace chemfiles;
 
-#undef assert
-#define assert CHECK
-
 static void os_display_notification(int, const char*) {}
 constexpr int OS_WARNING = 1;
 void work_with_warning(const std::string&);

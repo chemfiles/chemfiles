@@ -32,13 +32,6 @@ TEST_CASE("Property") {
         CHECK_THROWS_AS(property.as_string(), PropertyError);
         CHECK_THROWS_AS(property.as_vector3d(), PropertyError);
 
-        property = Property(23.0f);
-        CHECK(property.as_double() == 23.0);
-        CHECK(property.kind() == Property::DOUBLE);
-        CHECK_THROWS_AS(property.as_bool(), PropertyError);
-        CHECK_THROWS_AS(property.as_string(), PropertyError);
-        CHECK_THROWS_AS(property.as_vector3d(), PropertyError);
-
         property = Property(23);
         CHECK(property.as_double() == 23.0);
         CHECK(property.kind() == Property::DOUBLE);
