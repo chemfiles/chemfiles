@@ -7,7 +7,7 @@
 #include <fstream>
 using namespace chemfiles;
 
-TEST_CASE("Read files in Gromacs .gro format"){
+TEST_CASE("Read files in Gromacs .gro format") {
     SECTION("Simple GRO File") {
         Trajectory file("data/gro/ubiquitin.gro");
         CHECK(file.nsteps() == 1);

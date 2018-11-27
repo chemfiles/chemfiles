@@ -196,11 +196,11 @@ void MOL2Format::read_bonds(Frame& frame, size_t nbonds) {
             bo = Bond::DOUBLE;
         } else if (bond_order_str == "3") {
             bo = Bond::TRIPLE;
-        } else if (bond_order_str == "ar"){
+        } else if (bond_order_str == "ar") {
             bo = Bond::AROMATIC;
-        } else if (bond_order_str == "am"){
+        } else if (bond_order_str == "am") {
             bo = Bond::AMIDE;
-        } else if (bond_order_str == "du"){ // du is a dummy bond
+        } else if (bond_order_str == "du") { // du is a dummy bond
             bo = Bond::UNKNOWN;
         } else {
             bo = Bond::UNKNOWN;

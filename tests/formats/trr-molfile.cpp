@@ -1,15 +1,13 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-
-TEST_CASE("Read files in Gromacs .trr format using Molfile"){
+TEST_CASE("Read files in Gromacs .trr format using Molfile") {
     double eps = 1e-4;
-    SECTION("Ubiquitin"){
+    SECTION("Ubiquitin") {
         Trajectory file("data/trr/ubiquitin.trr");
         auto frame = file.read();
 
@@ -20,7 +18,7 @@ TEST_CASE("Read files in Gromacs .trr format using Molfile"){
         CHECK(approx_eq(positions[678], Vector3D(27.4324, 32.301, 37.6319), eps));
     }
 
-    SECTION("Water"){
+    SECTION("Water") {
         Trajectory file("data/trr/water.trr");
         auto frame = file.read();
         CHECK(frame.size() == 297);
@@ -42,7 +40,7 @@ TEST_CASE("Read files in Gromacs .trr format using Molfile"){
         CHECK(approx_eq(positions[296], Vector3D(6.797599, 11.50882, 12.70423), eps));
     }
 
-    SECTION("1AKI"){
+    SECTION("1AKI") {
         Trajectory file("data/trr/1aki.trr");
         auto frame = file.read();
         CHECK(frame.size() == 38376);
