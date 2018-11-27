@@ -131,7 +131,7 @@ void SDFFormat::read(Frame& frame) {
     // Parsing the file is more or less complete now, but atom properties can
     // still be read (until 'M  END' is reached).
     // This loop breaks when the property block ends or returns on an error
-    while(true){
+    while(true) {
         try {
             const auto& line = file_->readline();
             if (line == "") {

@@ -6,7 +6,7 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-TEST_CASE("Read files in TNG format"){
+TEST_CASE("Read files in TNG format") {
     SECTION("Read trajectory") {
         auto file = Trajectory("data/tng/example.tng");
         auto frame = file.read();
@@ -28,7 +28,7 @@ TEST_CASE("Read files in TNG format"){
         CHECK(approx_eq(positions[11], Vector3D(8.5f, 33.0f, 34.0f), 1e-6));
     }
 
-    SECTION("Read velocities"){
+    SECTION("Read velocities") {
         Trajectory file("data/tng/1aki.tng");
         auto frame = file.read();
         CHECK(frame.size() == 38376);

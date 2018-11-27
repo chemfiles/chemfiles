@@ -33,7 +33,7 @@ namespace chemfiles {
     }
 }
 
-TEST_CASE("Geting registered format"){
+TEST_CASE("Geting registered format") {
     FormatFactory::get().add_format<DummyFormat>();
 
     DummyFormat dummy("", File::READ, File::DEFAULT);
@@ -70,7 +70,7 @@ TEST_CASE("Geting registered format"){
     CHECK(FormatFactory::get().formats().back().name() == "Dunny");
 }
 
-TEST_CASE("Check error throwing in formats"){
+TEST_CASE("Check error throwing in formats") {
     auto tmpfile = NamedTempPath(".dummy");
     std::ofstream out(tmpfile);
     out << "hey !" << std::endl;
