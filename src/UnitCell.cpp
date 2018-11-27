@@ -44,8 +44,17 @@ UnitCell::UnitCell(double a, double b, double c, double alpha, double beta, doub
     beta_(beta),
     gamma_(gamma)
 {
-    if (alpha_ == 90 && beta_ == 90 && gamma_ == 90) {
+    auto is_90 = [](double angle) {
+        // We think that 89.999° is close enough to 90°
+        return fabs(angle - 90.0) < 1e-3;
+    };
+    if (is_90(alpha_) && is_90(beta_) && is_90(gamma_)) {
         shape_ = ORTHORHOMBIC;
+        // Make sure alpha/beta/gamma are actually 90°, so that the matrix
+        // update below does not create a non diagonal matrix.
+        alpha_ = 90;
+        beta_ = 90;
+        gamma_ = 90;
     } else {
         shape_ = TRICLINIC;
     }
