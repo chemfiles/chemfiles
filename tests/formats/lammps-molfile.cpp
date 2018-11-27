@@ -9,7 +9,7 @@ using namespace chemfiles;
 
 #include <iostream>
 
-TEST_CASE("Read files in LAMMPS .lammpstrj format using Molfile"){
+TEST_CASE("Read files in LAMMPS .lammpstrj format using Molfile") {
     SECTION("Polymer") {
         Trajectory file("data/lammps/polymer.lammpstrj");
         Frame frame = file.read();

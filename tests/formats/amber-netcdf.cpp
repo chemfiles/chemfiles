@@ -32,7 +32,7 @@ TEST_CASE("Read files in NetCDF format") {
         CHECK(approx_eq(positions[0], Vector3D(0.2990952, 8.31003, 11.72146), 1e-4));
         CHECK(approx_eq(positions[296], Vector3D(6.797599, 11.50882, 12.70423), 1e-4));
 
-        while (!file.done()){
+        while (!file.done()) {
             frame = file.read();
         }
         positions = frame.positions();

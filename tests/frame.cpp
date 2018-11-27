@@ -78,7 +78,7 @@ TEST_CASE("Positions and velocities") {
 
     auto positions = frame.positions();
     auto velocities = frame.velocities();
-    for (size_t i=0; i<10; i++){
+    for (size_t i=0; i<10; i++) {
         CHECK(positions[i] == Vector3D(4.0, 3.4, 1.0));
         CHECK((*velocities)[i] == Vector3D(4.0, 3.4, 1.0));
     }

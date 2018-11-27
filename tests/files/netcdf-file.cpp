@@ -8,7 +8,7 @@
 using namespace chemfiles;
 
 
-TEST_CASE("Read a NetCDF file"){
+TEST_CASE("Read a NetCDF file") {
     NcFile file("data/netcdf/water.nc", File::READ);
 
     CHECK(file.global_attribute("Conventions") == "AMBER");
@@ -33,7 +33,7 @@ TEST_CASE("Read a NetCDF file"){
     CHECK(fabs(positions[2] - 11.73717) < EPS);
 }
 
-TEST_CASE("Errors in NetCDF files"){
+TEST_CASE("Errors in NetCDF files") {
     NcFile file("data/netcdf/water.nc", File::READ);
 
     CHECK_THROWS_AS(file.global_attribute("FOO"), FileError);
@@ -42,7 +42,7 @@ TEST_CASE("Errors in NetCDF files"){
     CHECK_THROWS_AS(file.variable<nc::NcFloat>("FOO"), FileError);
 }
 
-TEST_CASE("Write NetCDF files"){
+TEST_CASE("Write NetCDF files") {
     auto tmpfile = NamedTempPath(".nc");
 
     {
