@@ -9,7 +9,7 @@ using namespace chemfiles;
 #include <boost/filesystem.hpp>
 namespace fs=boost::filesystem;
 
-TEST_CASE("Opening TNG files"){
+TEST_CASE("Opening TNG files") {
     SECTION("Read") {
         // Just checking constructor and destructor
         TNGFile file("data/tng/example.tng", File::READ);

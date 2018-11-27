@@ -71,7 +71,7 @@ TEST_CASE("Read trajectory") {
         // Check positions in the first frame
         CHECK_STATUS(chfl_frame_positions(frame, &data, &natoms));
         CHECK(natoms == 297);
-        for (unsigned i=0; i<3; i++){
+        for (unsigned i=0; i<3; i++) {
             CHECK(data[0][i] == positions_0[i]);
             CHECK(data[124][i] == positions_124[i]);
         }
@@ -98,7 +98,7 @@ TEST_CASE("Read trajectory") {
         chfl_vector3d* positions = NULL;
         CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
         CHECK(natoms == 297);
-        for (unsigned i=0; i<3; i++){
+        for (unsigned i=0; i<3; i++) {
             CHECK(positions[0][i] == positions_0[i]);
             CHECK(positions[124][i] == positions_124[i]);
         }
