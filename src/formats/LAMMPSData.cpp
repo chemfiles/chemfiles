@@ -98,7 +98,7 @@ atom_style::atom_style(const std::string& name): name_(name) {
     assert(expected_ != 0);
 }
 
-atom_data atom_style::read_line(const std::string& line) const {
+atom_data atom_style::read_line(const std::string& line, size_t index) const {
     atom_data data;
     int assigned = 0;
     switch (style_) {
@@ -235,10 +235,13 @@ atom_data atom_style::read_line(const std::string& line) const {
         throw format_error("invalid line for atom style {}: {}", name_, line);
     }
 
-    // LAMMPS uses 1-based indexing
-    data.index -= 1;
-    if (data.molid != static_cast<size_t>(-1)) {
-        data.molid -= 1;
+    if (data.index == 0) {
+        // 0 means the user do not care about indexes, but we still need one.
+        // So we use the index provided by the caller of this function
+        data.index = index;
+    } else {
+        // LAMMPS uses 1 based indexes, convert it to 0-based
+        data.index -= 1;
     }
 
     return data;
@@ -419,7 +422,7 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
 
     frame.resize(natoms_);
     auto positions = frame.positions();
-    auto residues = std::vector<Residue>();
+    auto residues = std::unordered_map<size_t, Residue>();
 
     size_t n = 0;
     while (n < natoms_ && !file_->eof()) {
@@ -427,8 +430,8 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
         auto comment = split_comment(line);
         if (line.empty()) {continue;}
 
-        auto data = style_.read_line(line);
-        if (data.index > natoms_) {
+        auto data = style_.read_line(line, n);
+        if (data.index >= natoms_) {
             throw format_error(
                 "too many atoms in [Atoms] section: expected {} atoms, got atom with index {}",
                 natoms_, data.index
@@ -452,9 +455,15 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
             atom.set_mass(data.mass);
         }
 
-        if (data.molid != static_cast<size_t>(-1)) {
-            residues.resize(data.molid + 1, Residue(""));
-            residues[data.molid].add_atom(data.index);
+        if (data.molid != 0) {
+            auto residue_iter = residues.find(data.molid);
+            if (residue_iter != residues.end()) {
+                residue_iter->second.add_atom(data.index);
+            } else {
+                auto residue = Residue("", data.molid);
+                residue.add_atom(data.index);
+                residues.emplace(data.molid, std::move(residue));
+            }
         }
 
         frame[data.index] = atom;
@@ -464,8 +473,8 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
         n++;
     }
 
-    for (auto residue: residues) {
-        frame.add_residue(std::move(residue));
+    for (auto it: std::move(residues)) {
+        frame.add_residue(std::move(it.second));
     }
 
     get_next_section();
