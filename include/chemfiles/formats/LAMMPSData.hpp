@@ -22,7 +22,7 @@ struct atom_data final {
     double mass = std::numeric_limits<double>::quiet_NaN();
     size_t index = 0;
     size_t type = 0;
-    size_t molid = static_cast<size_t>(-1);
+    size_t molid = 0;
 };
 
 /// Possible LAMMPS atom style
@@ -44,7 +44,7 @@ private:
 public:
     atom_style(const std::string& name);
     /// Read a single line with this atom style
-    atom_data read_line(const std::string& line) const;
+    atom_data read_line(const std::string& line, size_t index) const;
 };
 
 // atom types are defined by the type string and the mass of the atom

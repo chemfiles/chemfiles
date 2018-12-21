@@ -93,6 +93,31 @@ TEST_CASE("Read files in LAMMPS data format") {
         CHECK(fabs(cell.gamma() - 81.634113876) < 1e-9);
         CHECK(cell.shape() == UnitCell::TRICLINIC);
     }
+
+    SECTION("Molecule ids") {
+        auto file = Trajectory("data/lammps-data/molid.lmp", 'r', "LAMMPS Data");
+        auto frame = file.read();
+
+        CHECK(frame.size() == 12);
+        CHECK(frame.topology().residues().size() == 3);
+
+        auto& topology = frame.topology();
+        CHECK_FALSE(topology.residue_for_atom(0));
+        CHECK_FALSE(topology.residue_for_atom(1));
+        CHECK_FALSE(topology.residue_for_atom(2));
+
+        CHECK(topology.residue_for_atom(3)->contains(4));
+        CHECK(topology.residue_for_atom(3)->contains(5));
+        CHECK(topology.residue_for_atom(3)->id().value() == 1);
+
+        CHECK(topology.residue_for_atom(6)->contains(7));
+        CHECK(topology.residue_for_atom(6)->contains(8));
+        CHECK(topology.residue_for_atom(6)->id().value() == 2);
+
+        CHECK(topology.residue_for_atom(9)->contains(10));
+        CHECK(topology.residue_for_atom(9)->contains(11));
+        CHECK(topology.residue_for_atom(9)->id().value() == 3);
+    }
 }
 
 TEST_CASE("Write files in LAMMPS data format") {
