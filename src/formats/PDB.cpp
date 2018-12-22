@@ -155,8 +155,8 @@ void PDBFormat::read(Frame& frame) {
         case Record::TER:
             if (line.size() >= 12) {
                 try {
-                    atom_offsets_.push_back(std::stoul(line.substr(6,5)));
-                } catch(std::invalid_argument&) {
+                    atom_offsets_.push_back(parse<size_t>(line.substr(6, 5)));
+                } catch (const Error&) {
                     warning("TER record not numeric: {}", line);
                 }
             }
@@ -201,16 +201,16 @@ void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
         throw format_error("CRYST1 record '{}' is too small", line);
     }
     try {
-        auto a = std::stod(line.substr(6, 9));
-        auto b = std::stod(line.substr(15, 9));
-        auto c = std::stod(line.substr(24, 9));
-        auto alpha = std::stod(line.substr(33, 7));
-        auto beta = std::stod(line.substr(40, 7));
-        auto gamma = std::stod(line.substr(47, 7));
+        auto a = parse<double>(line.substr(6, 9));
+        auto b = parse<double>(line.substr(15, 9));
+        auto c = parse<double>(line.substr(24, 9));
+        auto alpha = parse<double>(line.substr(33, 7));
+        auto beta = parse<double>(line.substr(40, 7));
+        auto gamma = parse<double>(line.substr(47, 7));
         auto cell = UnitCell(a, b, c, alpha, beta, gamma);
 
         frame.set_cell(cell);
-    } catch (std::invalid_argument&) {
+    } catch (const Error&) {
         throw format_error("could not read CRYST1 record '{}'", line);
     }
 
@@ -237,9 +237,9 @@ void PDBFormat::read_HELIX(const std::string& line) {
     size_t end = 0;
 
     try {
-        start = std::stoul(line.substr(21,4));
-        end = std::stoul(line.substr(33,4));
-    } catch (std::invalid_argument&) {
+        start = parse<size_t>(line.substr(21, 4));
+        end = parse<size_t>(line.substr(33, 4));
+    } catch (const Error&) {
         warning("HELIX record contains invalid numbers: '{}'", line);
         return;
     }
@@ -295,11 +295,13 @@ void PDBFormat::read_secondary(const std::string& line, size_t i1, size_t i2,
     size_t resid1 = 0;
     size_t resid2 = 0;
     try {
-        resid1 = std::stoul(line.substr(i1 + 1, 4));
-        resid2 = std::stoul(line.substr(i2 + 1, 4));
-    } catch (std::invalid_argument&) {
-        warning("Error parsing line: '{}', check {} and {}", line,
-                line.substr(i1 + 1, 4), line.substr(i2 + 1, 4));
+        resid1 = parse<size_t>(line.substr(i1 + 1, 4));
+        resid2 = parse<size_t>(line.substr(i2 + 1, 4));
+    } catch (const Error&) {
+        warning(
+            "Error parsing line: '{}', check {} and {}",
+            line, line.substr(i1 + 1, 4), line.substr(i2 + 1, 4)
+        );
         return;
     }
 
@@ -318,7 +320,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
 
     if (atom_offsets_.empty()) {
         try {
-            auto initial_offset = std::stol(line.substr(6,5));
+            auto initial_offset = parse<long long>(line.substr(6, 5));
             // We need to handle negative numbers ourselves: https://ideone.com/RdINqa
             if (initial_offset <= 0) {
                 warning("{} is too small, assuming id is '1'", initial_offset);
@@ -326,8 +328,8 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
             } else {
                 atom_offsets_.push_back(static_cast<size_t>(initial_offset) - 1);
             }
-        } catch(std::invalid_argument&) {
-            warning("{} is not a valid atom id, assuming '1'", line.substr(6,5));
+        } catch(const Error&) {
+            warning("{} is not a valid atom id, assuming '1'", line.substr(6, 5));
 			atom_offsets_.push_back(0);
         }
     }
@@ -337,31 +339,31 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
         atom.set_type(trim(line.substr(76, 2)));
     }
 
-    auto altloc = line.substr(16,1);
+    auto altloc = line.substr(16, 1);
     if (altloc != " ") {
         atom.set("altloc", altloc);
     }
 
     try {
-        auto x = std::stod(line.substr(31, 8));
-        auto y = std::stod(line.substr(38, 8));
-        auto z = std::stod(line.substr(46, 8));
+        auto x = parse<double>(trim(line.substr(31, 8)));
+        auto y = parse<double>(trim(line.substr(38, 8)));
+        auto z = parse<double>(trim(line.substr(46, 8)));
 
         frame.add_atom(std::move(atom), Vector3D(x, y, z));
-    } catch (std::invalid_argument&) {
+    } catch (const Error&) {
         throw format_error("could not read positions in '{}'", line);
     }
 
     auto atom_id = frame.size() - 1;
     try {
-        auto resid = std::stoul(line.substr(22, 4));
+        auto resid = parse<size_t>(line.substr(22, 4));
         auto chain = line[21];
         if (residues_.find({chain,resid}) == residues_.end()) {
             auto name = trim(line.substr(17, 3));
             Residue residue(std::move(name), resid);
             residue.add_atom(atom_id);
 
-            auto inscode = line.substr(26,1);
+            auto inscode = line.substr(26, 1);
             if (inscode != " ") {
                 atom.set("insertion_code", inscode);
             }
@@ -369,15 +371,15 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
             // Set whether or not the residue is standardized
             residue.set("is_standard_pdb", !is_hetatm);
             // This will be save as a string... on purpose to match MMTF
-            residue.set("chainid", line.substr(21,1));
-            // This format makes no distinction between chainid and chainname
-            residue.set("chainname", line.substr(21,1));
+            residue.set("chainid", line.substr(21, 1));
+            // PDB format makes no distinction between chainid and chainname
+            residue.set("chainname", line.substr(21, 1));
             residues_.insert({{chain,resid}, residue});
         } else {
             // Just add this atom to the residue
             residues_.at({chain,resid}).add_atom(atom_id);
         }
-    } catch (std::invalid_argument&) {
+    } catch (const Error&) {
         // No residue information
     }
 }
@@ -397,13 +399,13 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
 
     auto read_index = [&line,this](size_t initial) -> size_t {
         try {
-            auto pdb_atom_id = std::stoul(line.substr(initial, 5));
+            auto pdb_atom_id = parse<size_t>(line.substr(initial, 5));
             auto lower = std::lower_bound(atom_offsets_.begin(),
                                           atom_offsets_.end(), pdb_atom_id);
             pdb_atom_id -= static_cast<size_t>(lower - atom_offsets_.begin());
             pdb_atom_id -= atom_offsets_.front();
             return pdb_atom_id;
-        } catch (std::invalid_argument&) {
+        } catch (const Error&) {
             throw format_error("could not read atomic number in '{}'", line);
         }
     };
@@ -508,7 +510,7 @@ void PDBFormat::link_standard_residue_bonds(Frame& frame) {
             if (first_atom == atom_name_to_index.end()) {
                 const auto& first_name = link.first.string();
                 if (first_name[0] != 'H' && first_name != "OXT" &&
-                    first_name[0] != 'P' && first_name.substr(0,2) != "OP" ) {
+                    first_name[0] != 'P' && first_name.substr(0, 2) != "OP" ) {
                     warning("{}_{} does not contain {}", residue.name(), resid, first_name);
                 }
                 continue;
@@ -517,7 +519,7 @@ void PDBFormat::link_standard_residue_bonds(Frame& frame) {
             if (second_atom == atom_name_to_index.end()) {
                 const auto& second_name = link.second.string();
                 if (second_name[0] != 'H' && second_name != "OXT" &&
-                    second_name[0] != 'P' && second_name.substr(0,2) != "OP" ) {
+                    second_name[0] != 'P' && second_name.substr(0, 2) != "OP" ) {
                     warning("{}_{} does not contain {}", residue.name(), resid, second_name);
                 }
                 continue;

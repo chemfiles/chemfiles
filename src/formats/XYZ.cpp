@@ -52,17 +52,13 @@ void XYZFormat::read_step(const size_t step, Frame& frame) {
 }
 
 void XYZFormat::read(Frame& frame) {
-    long long count = 0;
+    size_t natoms = 0;
     try {
-        count = string2longlong(file_->readline());
+        natoms = parse<size_t>(file_->readline());
         file_->readline(); // XYZ comment line;
     } catch (const std::exception& e) {
         throw format_error("can not read next step as XYZ: {}", e.what());
     }
-    if (count < 0) {
-        throw format_error("the number of atoms can not be negative in XYZ format");
-    }
-    auto natoms = static_cast<size_t>(count);
 
     frame.reserve(natoms);
     frame.resize(0);
@@ -98,26 +94,19 @@ void XYZFormat::write(const Frame& frame) {
 bool forward(TextFile& file) {
     if (!file) {return false;}
 
-    long long natoms = 0;
+    size_t natoms = 0;
     try {
-        auto line = file.readline();
-        natoms = std::stoll(line);
+        natoms = parse<size_t>(file.readline());
     } catch (const FileError&) {
         // No more line left in the file
         return false;
-    } catch (const std::invalid_argument&) {
+    } catch (const Error&) {
         // We could not read an integer, so give up here
         return false;
     }
 
-    if (natoms < 0) {
-        throw format_error(
-            "number of atoms can not be negative in '{}'", file.path()
-        );
-    }
-
     try {
-        file.readlines(static_cast<size_t>(natoms) + 1);
+        file.readlines(natoms + 1);
     } catch (const FileError& e) {
         // We could not read the lines from the file
         throw format_error(
