@@ -163,7 +163,7 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
     }
 
     // Ok, let's look at the sites now to note where models start
-    size_t last_position = std::stoul(split(line, ' ')[model_position->second]);
+    auto last_position = parse<size_t>(split(line, ' ')[model_position->second]);
 
     do {
         position = file_->tellg();
@@ -175,7 +175,7 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
         }
 
         auto line_split = split(line, ' ');
-        size_t current_position = std::stoul(line_split[model_position->second]);
+        size_t current_position = parse<size_t>(line_split[model_position->second]);
 
         if (current_position != last_position) {
             steps_positions_.push_back(position);
@@ -248,9 +248,8 @@ void mmCIFFormat::read(Frame& frame) {
     auto line = file_->readline();
 
     size_t last_position = 0;
-
     if (model_position != atom_site_map_.end()) {
-        last_position = std::stoul(split(line, ' ')[model_position->second]);
+        last_position = parse<size_t>(split(line, ' ')[model_position->second]);
     }
 
     while (!file_->eof()) {
@@ -268,9 +267,8 @@ void mmCIFFormat::read(Frame& frame) {
         }
 
         size_t current_position = 0;
-
         if (model_position != atom_site_map_.end()) {
-            current_position = std::stoul(line_split[model_position->second]);
+            current_position = parse<size_t>(line_split[model_position->second]);
         }
 
         if (current_position != last_position) {
@@ -313,16 +311,16 @@ void mmCIFFormat::read(Frame& frame) {
         }
 
         auto atom_id = frame.size() - 1;
-        size_t resid;
+        size_t resid = 0;
         auto resid_text = line_split[label_seq_id->second];
 
         try {
             if (resid_text == ".") { // In this case, we need to use the entity id
-                resid = std::stoul(line_split[label_entity_id->second]);
+                resid = parse<size_t>(line_split[label_entity_id->second]);
             } else {
-                resid = std::stoul(line_split[label_seq_id->second]);
+                resid = parse<size_t>(line_split[label_seq_id->second]);
             }
-        } catch (std::invalid_argument& e) {
+        } catch (const Error& e) {
             throw format_error("Invalid CIF residue or entity numeric: {}", e.what());
         }
 
@@ -440,5 +438,5 @@ void mmCIFFormat::write(const Frame& frame) {
 double cif_to_double(std::string line) {
     line.erase(std::remove(line.begin(), line.end(), '('), line.end());
     line.erase(std::remove(line.begin(), line.end(), ')'), line.end());
-    return std::stod(line);
+    return parse<double>(line);
 }

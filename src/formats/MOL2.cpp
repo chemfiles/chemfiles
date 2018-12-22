@@ -63,11 +63,11 @@ void MOL2Format::read(Frame& frame) {
 
     const auto counts = split(line, ' ');
 
-    long long natoms = string2longlong(counts[0]);
-    long long nbonds = 0;
+    size_t natoms = parse<size_t>(counts[0]);
+    size_t nbonds = 0;
 
     if (counts.size() >= 2) {
-        nbonds = string2longlong(counts[1]);
+        nbonds = parse<size_t>(counts[1]);
     }
 
     residues_.clear();
@@ -130,7 +130,7 @@ void MOL2Format::read_atoms(Frame& frame, size_t natoms, bool charges) {
 
         std::string atom_type;
         bool is_sybyl;
-    
+
         if (std::string(sybyl_type).find('.') != std::string::npos || find_in_periodic_table(sybyl_type)) {
             auto my_split = split(sybyl_type, '.');
             atom_type = my_split[0];
@@ -232,18 +232,10 @@ std::streampos forward(TextFile& file) {
             auto line = file.readline();
 
             const auto counts = split(line, ' ');
-
-            long long natoms, nbonds = 0;
-            natoms = string2longlong(counts[0]);
-
-            if (natoms < 0) {
-                throw format_error(
-                    "number of atoms can not be negative in '{}'", file.path()
-                );
-            }
-
+            auto natoms = parse<size_t>(counts[0]);
+            size_t nbonds = 0;
             if (counts.size() >= 2) {
-                nbonds = string2longlong(counts[1]);
+                nbonds = parse<size_t>(counts[1]);
             }
 
             read_until(file, "@<TRIPOS>ATOM");
@@ -259,7 +251,7 @@ std::streampos forward(TextFile& file) {
             file.readlines(static_cast<size_t>(nbonds));
 
             return pos;
-        } catch (const FileError&) {
+        } catch (const Error&) {
             return {-1};
         }
     }
