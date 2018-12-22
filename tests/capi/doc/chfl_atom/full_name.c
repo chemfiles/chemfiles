@@ -13,7 +13,7 @@ int main() {
     chfl_atom_full_name(atom, name, sizeof(name));
     assert(strcmp(name, "Sodium") == 0);
 
-    chfl_atom_free(atom);
+    chfl_free(atom);
     // [example]
     return 0;
 }

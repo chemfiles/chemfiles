@@ -15,7 +15,7 @@ int main() {
     }
 
     chfl_trajectory_close(trajectory);
-    chfl_frame_free(frame);
+    chfl_free(frame);
     // [example]
 
     remove("water.xyz");

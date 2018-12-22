@@ -25,7 +25,7 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
         CHECK(natoms == 3);
 
-        CHECK_STATUS(chfl_frame_free(frame));
+        chfl_free(frame);
     }
 
     SECTION("Step") {
@@ -40,7 +40,7 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_frame_step(frame, &step));
         CHECK(step == 42);
 
-        CHECK_STATUS(chfl_frame_free(frame));
+        chfl_free(frame);
     }
 
     SECTION("Positions") {
@@ -67,7 +67,7 @@ TEST_CASE("chfl_frame") {
             }
         }
 
-        CHECK_STATUS(chfl_frame_free(frame));
+        chfl_free(frame);
     }
 
     SECTION("Velocities") {
@@ -101,7 +101,7 @@ TEST_CASE("chfl_frame") {
             }
         }
 
-        CHECK_STATUS(chfl_frame_free(frame));
+        chfl_free(frame);
     }
 
     SECTION("Unit cell") {
@@ -122,14 +122,14 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
         CHECK(shape == CHFL_CELL_INFINITE);
 
-        CHECK_STATUS(chfl_cell_free(cell));
+        chfl_free(cell);
 
         // Setting an unit cell
         lengths[0] = 3; lengths[1] = 4; lengths[2] = 5;
         cell = chfl_cell(lengths);
         REQUIRE(cell);
         CHECK_STATUS(chfl_frame_set_cell(frame, cell));
-        CHECK_STATUS(chfl_cell_free(cell));
+        chfl_free(cell);
 
         cell = chfl_cell_from_frame(frame);
         REQUIRE(cell);
@@ -142,8 +142,8 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
         CHECK(shape == CHFL_CELL_ORTHORHOMBIC);
 
-        CHECK_STATUS(chfl_cell_free(cell));
-        CHECK_STATUS(chfl_frame_free(frame));
+        chfl_free(cell);
+        chfl_free(frame);
     }
 
     SECTION("Add atoms") {
@@ -161,7 +161,7 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_frame_add_atom(frame, atom, position, nullptr));
         chfl_vector3d velocity = {1, 2, 1};
         CHECK_STATUS(chfl_frame_add_atom(frame, atom, position, velocity));
-        CHECK_STATUS(chfl_atom_free(atom));
+        chfl_free(atom);
 
         CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
         CHECK(natoms == 2);
@@ -189,7 +189,7 @@ TEST_CASE("chfl_frame") {
         CHECK(velocities[1][1] == 2);
         CHECK(velocities[1][2] == 1);
 
-        CHECK_STATUS(chfl_frame_free(frame));
+        chfl_free(frame);
     }
 
     SECTION("Topology") {
@@ -209,11 +209,11 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_topology_add_atom(topology, Ar));
         CHECK_STATUS(chfl_topology_add_atom(topology, Zn));
         CHECK_STATUS(chfl_topology_add_atom(topology, Ar));
-        CHECK_STATUS(chfl_atom_free(Zn));
-        CHECK_STATUS(chfl_atom_free(Ar));
+        chfl_free(Zn);
+        chfl_free(Ar);
 
         CHECK_STATUS(chfl_frame_set_topology(frame, topology));
-        CHECK_STATUS(chfl_topology_free(topology));
+        chfl_free(topology);
 
         const CHFL_TOPOLOGY* check_topology = chfl_topology_from_frame(frame);
         REQUIRE(check_topology);
@@ -222,8 +222,8 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_topology_atoms_count(check_topology, &natoms));
         CHECK(natoms == 4);
 
-        CHECK_STATUS(chfl_topology_free(check_topology));
-        CHECK_STATUS(chfl_frame_free(frame));
+        chfl_free(check_topology);
+        chfl_free(frame);
     }
 
     SECTION("Change topology") {
@@ -245,14 +245,14 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_topology_add_bond(new_topology, 3, 2));
 
         CHECK_STATUS(chfl_frame_set_topology(frame, new_topology));
-        CHECK_STATUS(chfl_topology_free(new_topology));
+        chfl_free(new_topology);
 
         // Topology changed
         CHECK_STATUS(chfl_topology_bonds_count(topology, &nbonds));
         CHECK(nbonds == 2);
 
-        CHECK_STATUS(chfl_topology_free(topology));
-        CHECK_STATUS(chfl_frame_free(frame));
+        chfl_free(topology);
+        chfl_free(frame);
     }
 
     SECTION("Get atoms") {
@@ -266,21 +266,21 @@ TEST_CASE("chfl_frame") {
         char name[32] = {0};
         CHECK_STATUS(chfl_atom_name(atom, name, sizeof(name)));
         CHECK(name == std::string(""));
-        CHECK_STATUS(chfl_atom_free(atom));
+        chfl_free(atom);
 
         // Get the same atom twice
         CHFL_ATOM* first = chfl_atom_from_frame(frame, 1);
         CHFL_ATOM* second = chfl_atom_from_frame(frame, 1);
         REQUIRE(first);
         REQUIRE(second);
-        CHECK_STATUS(chfl_atom_free(first));
-        CHECK_STATUS(chfl_atom_free(second));
+        chfl_free(first);
+        chfl_free(second);
 
         // Out of bounds access
         atom = chfl_atom_from_frame(frame, 10000);
         CHECK_FALSE(atom);
 
-        CHECK_STATUS(chfl_frame_free(frame));
+        chfl_free(frame);
     }
 
     SECTION("Guess topology") {
@@ -290,7 +290,7 @@ TEST_CASE("chfl_frame") {
         chfl_vector3d lengths = {30, 30, 30};
         CHFL_CELL* cell = chfl_cell(lengths);
         CHECK_STATUS(chfl_trajectory_set_cell(trajectory, cell));
-        CHECK_STATUS(chfl_cell_free(cell));
+        chfl_free(cell);
 
         CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame);
@@ -310,9 +310,9 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_topology_dihedrals_count(topology, &n));
         CHECK(n == 0);
 
-        CHECK_STATUS(chfl_topology_free(topology));
-        CHECK_STATUS(chfl_frame_free(frame));
-        CHECK_STATUS(chfl_trajectory_close(trajectory));
+        chfl_free(topology);
+        chfl_free(frame);
+        chfl_trajectory_close(trajectory);
     }
 
     SECTION("PBC distance, angles and dihedrals") {
@@ -354,8 +354,8 @@ TEST_CASE("chfl_frame") {
         CHECK(chfl_frame_dihedral(frame, 0, 6, 2, 3, &distance) == CHFL_OUT_OF_BOUNDS);
         CHECK(chfl_frame_out_of_plane(frame, 0, 6, 2, 3, &distance) == CHFL_OUT_OF_BOUNDS);
 
-        CHECK_STATUS(chfl_atom_free(atom));
-        CHECK_STATUS(chfl_frame_free(frame));
+        chfl_free(atom);
+        chfl_free(frame);
     }
 
     SECTION("Property") {
@@ -366,14 +366,14 @@ TEST_CASE("chfl_frame") {
         REQUIRE(property);
 
         CHECK_STATUS(chfl_frame_set_property(frame, "this", property));
-        CHECK_STATUS(chfl_property_free(property));
+        chfl_free(property);
         property = nullptr;
 
         property = chfl_frame_get_property(frame, "this");
         double value = 0;
         CHECK_STATUS(chfl_property_get_double(property, &value));
         CHECK(value == -23);
-        CHECK_STATUS(chfl_property_free(property));
+        chfl_free(property);
 
         CHECK_FALSE(chfl_frame_get_property(frame, "that"));
 
@@ -381,7 +381,7 @@ TEST_CASE("chfl_frame") {
         REQUIRE(property);
 
         CHECK_STATUS(chfl_frame_set_property(frame, "that", property));
-        CHECK_STATUS(chfl_property_free(property));
+        chfl_free(property);
 
         uint64_t count = 0;
         CHECK_STATUS(chfl_frame_properties_count(frame, &count));
@@ -397,7 +397,7 @@ TEST_CASE("chfl_frame") {
             CHECK(names[1] == std::string("this"));
         }
 
-        CHECK_STATUS(chfl_frame_free(frame));
+        chfl_free(frame);
     }
 
     SECTION("Bonds") {
@@ -432,7 +432,7 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_frame_remove_bond(frame, 0, 2));
 
         // We need to get a new copy of the topology
-        CHECK_STATUS(chfl_topology_free(topology));
+        chfl_free(topology);
         topology = chfl_topology_from_frame(frame);
         REQUIRE(topology);
 
@@ -451,8 +451,8 @@ TEST_CASE("chfl_frame") {
         chfl_topology_bond_order(topology, 0, 3, &bond_order);
         CHECK(bond_order == CHFL_BOND_TRIPLE);
 
-        CHECK_STATUS(chfl_topology_free(topology));
-        CHECK_STATUS(chfl_frame_free(frame));
+        chfl_free(topology);
+        chfl_free(frame);
     }
 
     SECTION("Residues") {
@@ -463,7 +463,7 @@ TEST_CASE("chfl_frame") {
             CHFL_RESIDUE* residue = chfl_residue("X");
             REQUIRE(residue);
             CHECK_STATUS(chfl_frame_add_residue(frame, residue));
-            CHECK_STATUS(chfl_residue_free(residue));
+            chfl_free(residue);
         }
 
         const CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
@@ -473,7 +473,7 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_topology_residues_count(topology, &count));
         CHECK(count == 3);
 
-        CHECK_STATUS(chfl_topology_free(topology));
-        CHECK_STATUS(chfl_frame_free(frame));
+        chfl_free(topology);
+        chfl_free(frame);
     }
 }

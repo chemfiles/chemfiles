@@ -19,7 +19,7 @@ extern "C" CHFL_ATOM* chfl_atom(const char* name) {
     )
     return atom;
 error:
-    delete atom;
+    chfl_free(atom);
     return nullptr;
 }
 
@@ -30,7 +30,7 @@ extern "C" CHFL_ATOM* chfl_atom_copy(const CHFL_ATOM* const atom) {
     )
     return new_atom;
 error:
-    delete new_atom;
+    chfl_free(new_atom);
     return nullptr;
 }
 
@@ -49,7 +49,7 @@ extern "C" CHFL_ATOM* chfl_atom_from_frame(CHFL_FRAME* const frame, uint64_t ind
     )
     return atom;
 error:
-    delete atom;
+    chfl_free(atom);
     return nullptr;
 }
 
@@ -68,7 +68,7 @@ extern "C" CHFL_ATOM* chfl_atom_from_topology(CHFL_TOPOLOGY* const topology, uin
     )
     return atom;
 error:
-    delete atom;
+    chfl_free(atom);
     return nullptr;
 }
 
@@ -216,23 +216,13 @@ extern "C" CHFL_PROPERTY* chfl_atom_get_property(const CHFL_ATOM* const atom, co
     CHFL_ERROR_GOTO(
         auto atom_property = atom->get(name);
         if (atom_property) {
-            property = new Property(*atom_property);
+            property = shared_allocator::make_shared<Property>(*atom_property);
         } else {
             throw property_error("can not find a property named '{}' in this atom", name);
         }
     )
     return property;
 error:
-    delete property;
+    chfl_free(property);
     return nullptr;
-}
-
-extern "C" chfl_status chfl_atom_free(const CHFL_ATOM* const atom) {
-    CHFL_ERROR_CATCH(
-        if (atom == nullptr) {
-            return CHFL_SUCCESS;
-        } else {
-            shared_allocator::free(atom);
-        }
-    )
 }

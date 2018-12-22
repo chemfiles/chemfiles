@@ -16,8 +16,8 @@ int main() {
         /* handle error */
     }
 
-    chfl_atom_free(atom);
-    chfl_frame_free(frame);
+    chfl_free(atom);
+    chfl_free(frame);
     // [example]
     return 0;
 }

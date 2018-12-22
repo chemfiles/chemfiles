@@ -13,7 +13,7 @@ int main() {
     chfl_atom_type(atom, type, sizeof(type));
     assert(strcmp(type, "Na") == 0);
 
-    chfl_atom_free(atom);
+    chfl_free(atom);
     // [example]
     return 0;
 }

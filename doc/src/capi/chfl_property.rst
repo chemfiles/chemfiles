@@ -18,7 +18,6 @@
     - :cpp:func:`chfl_property_get_double`
     - :cpp:func:`chfl_property_get_string`
     - :cpp:func:`chfl_property_get_vector3d`
-    - :cpp:func:`chfl_property_free`
 
     --------------------------------------------------------------------
 
@@ -39,5 +38,3 @@
 .. doxygenfunction:: chfl_property_get_string
 
 .. doxygenfunction:: chfl_property_get_vector3d
-
-.. doxygenfunction:: chfl_property_free

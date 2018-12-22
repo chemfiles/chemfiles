@@ -13,8 +13,8 @@ int main() {
         /* handle error */
     }
 
-    chfl_selection_free(copy);
-    chfl_selection_free(selection);
+    chfl_free(copy);
+    chfl_free(selection);
     // [example]
     return 0;
 }

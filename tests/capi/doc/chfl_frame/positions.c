@@ -16,7 +16,7 @@ int main() {
         // use positions[i] here
     }
 
-    chfl_frame_free(frame);
+    chfl_free(frame);
     // [example]
     return 0;
 }

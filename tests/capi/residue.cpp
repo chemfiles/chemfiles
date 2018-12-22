@@ -14,7 +14,7 @@ TEST_CASE("chfl_residue") {
         CHECK_STATUS(chfl_residue_name(residue, name, sizeof(name)));
         CHECK(name == std::string("Foo"));
 
-        CHECK_STATUS(chfl_residue_free(residue));
+        chfl_free(residue);
     }
 
     SECTION("Id") {
@@ -25,14 +25,14 @@ TEST_CASE("chfl_residue") {
         CHECK_STATUS(chfl_residue_id(residue, &resid));
         CHECK(resid == 5426);
 
-        CHECK_STATUS(chfl_residue_free(residue));
+        chfl_free(residue);
 
         residue = chfl_residue("");
         REQUIRE(residue);
 
         CHECK(chfl_residue_id(residue, &resid) == CHFL_GENERIC_ERROR);
 
-        CHECK_STATUS(chfl_residue_free(residue));
+        chfl_free(residue);
     }
 
     SECTION("Atoms") {
@@ -62,7 +62,7 @@ TEST_CASE("chfl_residue") {
         CHECK(atoms[1] == 1);
         CHECK(atoms[2] == 20);
 
-        CHECK_STATUS(chfl_residue_free(residue));
+        chfl_free(residue);
     }
 
     SECTION("Topology") {
@@ -80,7 +80,7 @@ TEST_CASE("chfl_residue") {
         CHECK(size == 0);
 
         CHECK_STATUS(chfl_topology_add_residue(topology, residue));
-        CHECK_STATUS(chfl_residue_free(residue));
+        chfl_free(residue);
 
         CHECK_STATUS(chfl_topology_residues_count(topology, &size));
         CHECK(size == 1);
@@ -90,7 +90,7 @@ TEST_CASE("chfl_residue") {
         uint64_t resid = 0;
         CHECK_STATUS(chfl_residue_id(checking_residue, &resid));
         CHECK(resid == 56);
-        CHECK_STATUS(chfl_residue_free(checking_residue));
+        chfl_free(checking_residue);
 
         checking_residue = chfl_residue_from_topology(topology, 10);
         CHECK_FALSE(checking_residue);
@@ -101,13 +101,13 @@ TEST_CASE("chfl_residue") {
         resid = 0;
         CHECK_STATUS(chfl_residue_id(checking_residue, &resid));
         CHECK(resid == 56);
-        CHECK_STATUS(chfl_residue_free(checking_residue));
+        chfl_free(checking_residue);
 
         checking_residue = chfl_residue_for_atom(topology, 10);
         CHECK_FALSE(checking_residue);
 
-        CHECK_STATUS(chfl_topology_free(topology));
-        CHECK_STATUS(chfl_residue_free(checking_residue));
+        chfl_free(topology);
+        chfl_free(checking_residue);
     }
 
     SECTION("Property") {
@@ -118,14 +118,14 @@ TEST_CASE("chfl_residue") {
         REQUIRE(property);
 
         CHECK_STATUS(chfl_residue_set_property(residue, "this", property));
-        CHECK_STATUS(chfl_property_free(property));
+        chfl_free(property);
         property = nullptr;
 
         property = chfl_residue_get_property(residue, "this");
         double value = 0;
         CHECK_STATUS(chfl_property_get_double(property, &value));
         CHECK(value == -23);
-        CHECK_STATUS(chfl_property_free(property));
+        chfl_free(property);
 
         CHECK_FALSE(chfl_residue_get_property(residue, "that"));
 
@@ -133,7 +133,7 @@ TEST_CASE("chfl_residue") {
         REQUIRE(property);
 
         CHECK_STATUS(chfl_residue_set_property(residue, "that", property));
-        CHECK_STATUS(chfl_property_free(property));
+        chfl_free(property);
 
         uint64_t count = 0;
         CHECK_STATUS(chfl_residue_properties_count(residue, &count));
@@ -149,7 +149,7 @@ TEST_CASE("chfl_residue") {
             CHECK(names[1] == std::string("this"));
         }
 
-        CHECK_STATUS(chfl_residue_free(residue));
+        chfl_free(residue);
     }
 
 }

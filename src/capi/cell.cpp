@@ -19,7 +19,7 @@ extern "C" CHFL_CELL* chfl_cell(const chfl_vector3d lengths) {
     )
     return cell;
 error:
-    delete cell;
+    chfl_free(cell);
     return nullptr;
 }
 
@@ -38,7 +38,7 @@ extern "C" CHFL_CELL* chfl_cell_triclinic(const chfl_vector3d lengths, const chf
     )
     return cell;
 error:
-    delete cell;
+    chfl_free(cell);
     return nullptr;
 }
 
@@ -51,7 +51,7 @@ extern "C" CHFL_CELL* chfl_cell_from_frame(CHFL_FRAME* const frame) {
     )
     return cell;
 error:
-    delete cell;
+    chfl_free(cell);
     return nullptr;
 }
 
@@ -62,7 +62,7 @@ extern "C" CHFL_CELL* chfl_cell_copy(const CHFL_CELL* const cell) {
     )
     return new_cell;
 error:
-    delete new_cell;
+    chfl_free(new_cell);
     return nullptr;
 }
 
@@ -145,15 +145,5 @@ extern "C" chfl_status chfl_cell_wrap(const CHFL_CELL* const cell, chfl_vector3d
         vector[0] = result[0];
         vector[1] = result[1];
         vector[2] = result[2];
-    )
-}
-
-extern "C" chfl_status chfl_cell_free(const CHFL_CELL* const cell) {
-    CHFL_ERROR_CATCH(
-        if (cell == nullptr) {
-            return CHFL_SUCCESS;
-        } else {
-            shared_allocator::free(cell);
-        }
     )
 }

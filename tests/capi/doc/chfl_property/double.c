@@ -12,7 +12,7 @@ int main() {
     chfl_property_get_double(property, &value);
     assert(value == 256);
 
-    chfl_property_free(property);
+    chfl_free(property);
     // [example]
     return 0;
 }

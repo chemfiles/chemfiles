@@ -18,15 +18,15 @@ int main() {
 
     CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 10, 10});
     chfl_frame_set_cell(frame, cell);
-    chfl_cell_free(cell);
+    chfl_free(cell);
 
     CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("water.pdb", 'w');
     chfl_trajectory_write(trajectory, frame);
     chfl_trajectory_close(trajectory);
 
-    chfl_frame_free(frame);
-    chfl_atom_free(H);
-    chfl_atom_free(O);
+    chfl_free(frame);
+    chfl_free(H);
+    chfl_free(O);
 
     return 0;
 }

@@ -13,14 +13,14 @@ int main() {
     CHFL_ATOM* Cl = chfl_atom("Cl");
     chfl_frame_add_atom(frame, Cl, (chfl_vector3d){0, 0, 0}, NULL);
     chfl_frame_add_atom(frame, Cl, (chfl_vector3d){2, 0, 0}, NULL);
-    chfl_atom_free(Cl);
+    chfl_free(Cl);
 
     // Check that the topology does not contain any bond
     const CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);
     uint64_t bonds = 0;
     chfl_topology_bonds_count(topology, &bonds);
     assert(bonds == 0);
-    chfl_topology_free(topology);
+    chfl_free(topology);
 
     chfl_frame_guess_bonds(frame);
 
@@ -29,8 +29,8 @@ int main() {
     chfl_topology_bonds_count(topology, &bonds);
     assert(bonds == 1);
 
-    chfl_topology_free(topology);
-    chfl_frame_free(frame);
+    chfl_free(topology);
+    chfl_free(frame);
     // [example]
     return 0;
 }

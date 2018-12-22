@@ -13,7 +13,7 @@ int main() {
     chfl_selection_size(selection, &size);
     assert(size == 2);
 
-    chfl_selection_free(selection);
+    chfl_free(selection);
     // [example]
     return 0;
 }

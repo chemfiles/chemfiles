@@ -17,7 +17,7 @@ TEST_CASE("chfl_selection") {
         CHECK_STATUS(chfl_selection_string(selection, buffer, sizeof(buffer)));
         CHECK(buffer == std::string("name O"));
 
-        CHECK_STATUS(chfl_selection_free(selection));
+        chfl_free(selection);
 
         selection = chfl_selection("angles: all");
         REQUIRE(selection);
@@ -25,7 +25,7 @@ TEST_CASE("chfl_selection") {
         CHECK_STATUS(chfl_selection_string(selection, buffer, sizeof(buffer)));
         CHECK(buffer == std::string("angles: all"));
 
-        CHECK_STATUS(chfl_selection_free(selection));
+        chfl_free(selection);
     }
 
     SECTION("Size") {
@@ -36,7 +36,7 @@ TEST_CASE("chfl_selection") {
         CHECK_STATUS(chfl_selection_size(selection, &size));
         CHECK(size == 1);
 
-        CHECK_STATUS(chfl_selection_free(selection));
+        chfl_free(selection);
 
         selection = chfl_selection("angles: all");
         REQUIRE(selection);
@@ -44,7 +44,7 @@ TEST_CASE("chfl_selection") {
         CHECK_STATUS(chfl_selection_size(selection, &size));
         CHECK(size == 3);
 
-        CHECK_STATUS(chfl_selection_free(selection));
+        chfl_free(selection);
     }
 
     SECTION("Evaluate") {
@@ -73,7 +73,7 @@ TEST_CASE("chfl_selection") {
         CHECK(matches[1].atoms[3] == static_cast<uint64_t>(-1));
         delete[] matches;
 
-        CHECK_STATUS(chfl_selection_free(selection));
+        chfl_free(selection);
 
         selection = chfl_selection("angles: all");
         REQUIRE(selection);
@@ -93,8 +93,8 @@ TEST_CASE("chfl_selection") {
         CHECK(find_match(matches, matches_count, match_2));
         delete[] matches;
 
-        CHECK_STATUS(chfl_selection_free(selection));
-        CHECK_STATUS(chfl_frame_free(frame));
+        chfl_free(selection);
+        chfl_free(frame);
     }
 }
 
@@ -110,8 +110,8 @@ static CHFL_FRAME* testing_frame(void) {
     CHECK_STATUS(chfl_topology_add_atom(topology, O));
     CHECK_STATUS(chfl_topology_add_atom(topology, O));
     CHECK_STATUS(chfl_topology_add_atom(topology, H));
-    CHECK_STATUS(chfl_atom_free(O));
-    CHECK_STATUS(chfl_atom_free(H));
+    chfl_free(O);
+    chfl_free(H);
 
     CHECK_STATUS(chfl_topology_add_bond(topology, 0, 1));
     CHECK_STATUS(chfl_topology_add_bond(topology, 1, 2));
@@ -121,7 +121,7 @@ static CHFL_FRAME* testing_frame(void) {
     REQUIRE(frame);
     CHECK_STATUS(chfl_frame_resize(frame, 4));
     CHECK_STATUS(chfl_frame_set_topology(frame, topology));
-    CHECK_STATUS(chfl_topology_free(topology));
+    chfl_free(topology);
     return frame;
 }
 

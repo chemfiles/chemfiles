@@ -16,8 +16,8 @@ int main() {
         /* handle error */
     }
 
-    chfl_residue_free(residue);
-    chfl_topology_free(topology);
+    chfl_free(residue);
+    chfl_free(topology);
     // [example]
     return 0;
 }

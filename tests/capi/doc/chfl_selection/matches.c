@@ -14,8 +14,8 @@ int main() {
     chfl_frame_add_atom(frame, O, (chfl_vector3d){0, 0, 0}, NULL);
     chfl_frame_add_atom(frame, H, (chfl_vector3d){1, 0, 0}, NULL);
     chfl_frame_add_atom(frame, H, (chfl_vector3d){0, 1, 0}, NULL);
-    chfl_atom_free(O);
-    chfl_atom_free(H);
+    chfl_free(O);
+    chfl_free(H);
 
     CHFL_SELECTION* selection = chfl_selection("name H");
 
@@ -28,8 +28,8 @@ int main() {
     assert(matches[0].atoms[0] == 1);
     assert(matches[1].atoms[0] == 2);
 
-    chfl_selection_free(selection);
-    chfl_frame_free(frame);
+    chfl_free(selection);
+    chfl_free(frame);
     // [example]
     return 0;
 }

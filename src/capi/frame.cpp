@@ -1,9 +1,9 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include "chemfiles/shared_allocator.hpp"
 #include "chemfiles/capi/frame.h"
 #include "chemfiles/capi.hpp"
-#include "chemfiles/shared_allocator.hpp"
 
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/ErrorFmt.hpp"
@@ -16,7 +16,7 @@ extern "C" CHFL_FRAME* chfl_frame(void) {
     )
     return frame;
 error:
-    delete frame;
+    chfl_free(frame);
     return nullptr;
 }
 
@@ -27,7 +27,7 @@ extern "C" CHFL_FRAME* chfl_frame_copy(const CHFL_FRAME* const frame) {
     )
     return new_frame;
 error:
-    delete new_frame;
+    chfl_free(new_frame);
     return nullptr;
 }
 
@@ -236,14 +236,14 @@ extern "C" CHFL_PROPERTY* chfl_frame_get_property(const CHFL_FRAME* const frame,
     CHFL_ERROR_GOTO(
         auto atom_property = frame->get(name);
         if (atom_property) {
-            property = new Property(*atom_property);
+            property = shared_allocator::make_shared<Property>(*atom_property);
         } else {
             throw property_error("can not find a property named '{}' in this frame", name);
         }
     )
     return property;
 error:
-    delete property;
+    chfl_free(property);
     return nullptr;
 }
 
@@ -273,15 +273,5 @@ extern "C" chfl_status chfl_frame_add_residue(CHFL_FRAME* const frame, const CHF
     CHECK_POINTER(residue);
     CHFL_ERROR_CATCH(
         frame->add_residue(*residue);
-    )
-}
-
-extern "C" chfl_status chfl_frame_free(const CHFL_FRAME* const frame) {
-    CHFL_ERROR_CATCH(
-        if (frame == nullptr) {
-            return CHFL_SUCCESS;
-        } else {
-            shared_allocator::free(frame);
-        }
     )
 }

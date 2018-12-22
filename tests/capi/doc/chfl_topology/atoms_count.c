@@ -13,13 +13,13 @@ int main() {
     chfl_topology_add_atom(topology, atom);
     chfl_topology_add_atom(topology, atom);
     chfl_topology_add_atom(topology, atom);
-    chfl_atom_free(atom);
+    chfl_free(atom);
 
     uint64_t atoms = 0;
     chfl_topology_atoms_count(topology, &atoms);
     assert(atoms == 3);
 
-    chfl_topology_free(topology);
+    chfl_free(topology);
     // [example]
     return 0;
 }

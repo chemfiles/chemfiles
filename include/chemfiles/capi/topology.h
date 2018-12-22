@@ -12,7 +12,7 @@ extern "C" {
 /// Create a new empty topology.
 ///
 /// The caller of this function should free the associated memory using
-/// `chfl_topology_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_topology/chfl_topology.c}
 /// @return A pointer to the topology, or NULL in case of error.
@@ -21,8 +21,8 @@ CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology(void);
 
 /// Get access to the topology of a `frame`.
 ///
-/// The `frame` will be kept alive, even if `chfl_frame_free` is called,
-/// until `chfl_topology_free` is also called on the pointer returned by this
+/// The `frame` will be kept alive, even if `chfl_free` is called,
+/// until `chfl_free` is also called on the pointer returned by this
 /// function.
 ///
 /// If `chfl_frame_set_topology` is called, this pointer will point to the new
@@ -36,7 +36,7 @@ CHFL_EXPORT const CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* fram
 /// Get a copy of a `topology`.
 ///
 /// The caller of this function should free the associated memory using
-/// `chfl_topology_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_topology/copy.c}
 /// @return A pointer to the new topology, or NULL in case of error.
@@ -266,12 +266,6 @@ CHFL_EXPORT chfl_status chfl_topology_bond_orders(
 CHFL_EXPORT chfl_status chfl_topology_bond_order(
     const CHFL_TOPOLOGY* topology, uint64_t i, uint64_t j, chfl_bond_order* order
 );
-
-/// Free the memory associated with a `topology`.
-///
-/// @example{tests/capi/doc/chfl_topology/chfl_topology.c}
-/// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_topology_free(const CHFL_TOPOLOGY* topology);
 
 #ifdef __cplusplus
 }

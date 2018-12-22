@@ -13,7 +13,7 @@ int main() {
     chfl_residue_id(residue, &id);
     assert(id == 3);
 
-    chfl_residue_free(residue);
+    chfl_free(residue);
     // [example]
     return 0;
 }

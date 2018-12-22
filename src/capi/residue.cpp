@@ -3,9 +3,9 @@
 
 #include <cstring>
 
+#include "chemfiles/shared_allocator.hpp"
 #include "chemfiles/capi/residue.h"
 #include "chemfiles/capi.hpp"
-#include "chemfiles/shared_allocator.hpp"
 
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Residue.hpp"
@@ -20,7 +20,7 @@ extern "C" CHFL_RESIDUE* chfl_residue(const char* name) {
     )
     return residue;
 error:
-    delete residue;
+    chfl_free(residue);
     return nullptr;
 }
 
@@ -32,7 +32,7 @@ extern "C" CHFL_RESIDUE* chfl_residue_with_id(const char* name, uint64_t resid) 
     )
     return residue;
 error:
-    delete residue;
+    chfl_free(residue);
     return nullptr;
 }
 
@@ -44,7 +44,7 @@ extern "C" const CHFL_RESIDUE* chfl_residue_from_topology(const CHFL_TOPOLOGY* c
     )
     return residue;
 error:
-    delete residue;
+    chfl_free(residue);
     return nullptr;
 }
 
@@ -59,7 +59,7 @@ extern "C" const CHFL_RESIDUE* chfl_residue_for_atom(const CHFL_TOPOLOGY* const 
     )
     return residue;
 error:
-    delete residue;
+    chfl_free(residue);
     return nullptr;
 }
 
@@ -70,7 +70,7 @@ extern "C" CHFL_RESIDUE* chfl_residue_copy(const CHFL_RESIDUE* const residue) {
     )
     return new_residue;
 error:
-    delete new_residue;
+    chfl_free(new_residue);
     return nullptr;
 }
 
@@ -177,23 +177,13 @@ extern "C" CHFL_PROPERTY* chfl_residue_get_property(const CHFL_RESIDUE* const re
     CHFL_ERROR_GOTO(
         auto residue_property = residue->get(name);
         if (residue_property) {
-            property = new Property(*residue_property);
+            property = shared_allocator::make_shared<Property>(*residue_property);
         } else {
             throw property_error("can not find a property named '{}' in this residue", name);
         }
     )
     return property;
 error:
-    delete property;
+    chfl_free(property);
     return nullptr;
-}
-
-extern "C" chfl_status chfl_residue_free(const CHFL_RESIDUE* const residue) {
-    CHFL_ERROR_CATCH(
-        if (residue == nullptr) {
-            return CHFL_SUCCESS;
-        } else {
-            shared_allocator::free(residue);
-        }
-    )
 }

@@ -12,7 +12,7 @@ extern "C" {
 /// Create a new empty frame.
 ///
 /// The caller of this function should free the allocated memory using
-/// `chfl_frame_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_frame/chfl_frame.c}
 /// @return A pointer to the frame, or NULL in case of error. You can use
@@ -22,11 +22,11 @@ CHFL_EXPORT CHFL_FRAME* chfl_frame(void);
 /// Get a copy of a `frame`.
 ///
 /// The caller of this function should free the associated memory using
-/// `chfl_frame_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_frame/copy.c}
-/// @return A pointer to the new frame, or NULL in case of error.
-///         You can use `chfl_last_error` to learn about the error.
+/// @return A pointer to the new frame, or NULL in case of error. You can use
+///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_FRAME* chfl_frame_copy(const CHFL_FRAME* frame);
 
 /// Get the current number of atoms in a `frame` in the integer pointed to by
@@ -47,9 +47,9 @@ CHFL_EXPORT chfl_status chfl_frame_atoms_count(
 ///
 /// If the frame is resized (by writing to it, or calling `chfl_frame_resize`,
 /// `chfl_frame_remove` or `chfl_frame_add_atom`), the pointer is invalidated.
-/// If the frame is freed using `chfl_frame_free`, the pointer is freed too.
-/// There is then no need to free the `*positions` pointer for the caller of
-/// this function.
+///
+/// If the frame memory is released using `chfl_free`, the memory behind the
+/// `*positions` pointer is released too.
 ///
 /// @example{tests/capi/doc/chfl_frame/positions.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
@@ -61,18 +61,18 @@ CHFL_EXPORT chfl_status chfl_frame_positions(
 /// Get a pointer to the velocities array from a `frame`.
 ///
 /// Velocities are stored as a `size x 3` array, this function set the pointer
-/// pointed to by `positions` to point to the first element of this array, and
+/// pointed to by `velocities` to point to the first element of this array, and
 /// give the number of atoms in the integer pointed to by `size`.
 ///
 /// If the frame is resized (by writing to it, or calling `chfl_frame_resize`,
 /// `chfl_frame_remove` or `chfl_frame_add_atom`), the pointer is invalidated.
-/// If the frame is freed using `chfl_frame_free`, the pointer is freed too.
-/// There is then no need to free the `*velocity` pointer for the caller of this
-/// function.
 ///
-/// If the frame does not have velocity, this will return an error. Use
-/// `chfl_frame_add_velocities` to add velocities to a frame before calling
-/// this function.
+/// If the frame memory is released using `chfl_free`, the memory behind the
+/// `*velocities` pointer is released too.
+///
+/// If the frame does not have velocity, this will return an error. You can use
+/// `chfl_frame_add_velocities` to ensure that a frame contains velocity data
+/// before calling this function.
 ///
 /// @example{tests/capi/doc/chfl_frame/velocities.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
@@ -277,7 +277,7 @@ CHFL_EXPORT chfl_status chfl_frame_set_property(
 /// This function returns `NULL` if no property exists with the given name.
 ///
 /// The user of this function is responsible to deallocate memory using the
-/// `chfl_property_free` function.
+/// `chfl_free` function.
 ///
 /// @example{tests/capi/doc/chfl_frame/property.c}
 /// @return A pointer to the property, or NULL in case of error.
@@ -328,12 +328,6 @@ CHFL_EXPORT chfl_status chfl_frame_remove_bond(
 CHFL_EXPORT chfl_status chfl_frame_add_residue(
     CHFL_FRAME* frame, const CHFL_RESIDUE* residue
 );
-
-/// Free the memory associated with a `frame`.
-///
-/// @example{tests/capi/doc/chfl_frame/chfl_frame.c}
-/// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_frame_free(const CHFL_FRAME* frame);
 
 #ifdef __cplusplus
 }

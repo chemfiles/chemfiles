@@ -18,8 +18,8 @@ int main() {
     chfl_frame_distance(frame, 0, 1, &distance);
     assert(distance == sqrt(14));
 
-    chfl_atom_free(atom);
-    chfl_frame_free(frame);
+    chfl_free(atom);
+    chfl_free(frame);
     // [example]
     return 0;
 }

@@ -12,7 +12,7 @@ extern "C" {
 /// Create a new selection from the given `selection` string.
 ///
 /// The caller of this function should free the associated memory using
-/// `chfl_selection_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_selection/chfl_selection.c}
 /// @return A pointer to the selection, or NULL in case of error.
@@ -25,7 +25,7 @@ CHFL_EXPORT CHFL_SELECTION* chfl_selection(const char* selection);
 /// called again before using `chfl_selection_matches`.
 ///
 /// The caller of this function should free the associated memory using
-/// `chfl_selection_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_selection/copy.c}
 /// @return A pointer to the new selection, or NULL in case of error.
@@ -97,12 +97,6 @@ typedef struct {  // NOLINT: this is both a C and C++ file
 CHFL_EXPORT chfl_status chfl_selection_matches(
     const CHFL_SELECTION* selection, chfl_match matches[], uint64_t n_matches
 );
-
-/// Free the memory associated with a `selection`.
-///
-/// @example{tests/capi/doc/chfl_selection/chfl_selection.c}
-/// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_selection_free(const CHFL_SELECTION* selection);
 
 #ifdef __cplusplus
 }

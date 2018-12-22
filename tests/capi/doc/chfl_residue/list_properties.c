@@ -13,7 +13,7 @@ int main() {
 
     chfl_residue_set_property(residue, "this", property);
     chfl_residue_set_property(residue, "that", property);
-    chfl_property_free(property);
+    chfl_free(property);
 
     uint64_t count = 0;
     chfl_residue_properties_count(residue, &count);
@@ -26,7 +26,7 @@ int main() {
     assert(strcmp(names[0], "this") == 0 || strcmp(names[0], "that") == 0);
     assert(strcmp(names[1], "this") == 0 || strcmp(names[1], "that") == 0);
 
-    chfl_residue_free(residue);
+    chfl_free(residue);
     // [example]
     return 0;
 }

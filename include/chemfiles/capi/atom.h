@@ -12,55 +12,52 @@ extern "C" {
 /// Create an atom with the given `name`, and set the atom type to `name`.
 ///
 /// The caller of this function should free the associated memory using
-/// `chfl_atom_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_atom/chfl_atom.c}
-/// @return A pointer to the atom, or NULL in case of error.
-///         You can use `chfl_last_error` to learn about the error.
+/// @return A pointer to the atom, or NULL in case of error. You can use
+///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_ATOM* chfl_atom(const char* name);
 
 /// Get a copy of an `atom`.
 ///
 /// The caller of this function should free the associated memory using
-/// `chfl_atom_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_atom/copy.c}
-/// @return A pointer to the new atom, or NULL in case of error.
-///         You can use `chfl_last_error` to learn about the error.
+/// @return A pointer to the new atom, or NULL in case of error. You can use
+///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_ATOM* chfl_atom_copy(const CHFL_ATOM* atom);
 
 /// Get access to the atom at the given `index` from a `frame`.
 ///
 /// Any modification to the atom will be reflected in the `frame`. The `frame`
-/// will be kept alive, even if `chfl_frame_free` is called, until
-/// `chfl_atom_free` is also called on the pointer returned by this function.
+/// will be kept alive, even if `chfl_free` is called, until `chfl_free` is also
+/// called on the pointer returned by this function.
 ///
 /// The pointer returned by this function points directly inside the frame, and
-/// will be invalidated if any of the following function is called on the
-/// frame:
+/// will be invalidated if any of the following function is called on the frame:
 ///
 /// - `chfl_frame_resize`
 /// - `chfl_frame_add_atom`
 /// - `chfl_frame_remove`
 /// - `chfl_frame_set_topology`
 ///
-/// Calling any function on an invalidated pointer is undefined behavior.
-/// Even if the pointer if invalidated, it stills needs to be released with
-/// `chfl_atom_free`.
+/// Calling any function on an invalidated pointer is undefined behavior. Even
+/// if the pointer if invalidated, it stills needs to be released with
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_atom/from_frame.c}
 ///
-/// @return A pointer to the atom, or NULL in case of error or if `index` is
-///         out of bounds. You can use `chfl_last_error` to learn about the
-///         error.
+/// @return A pointer to the atom, or NULL in case of error or if `index` is out
+///         of bounds. You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_ATOM* chfl_atom_from_frame(CHFL_FRAME* frame, uint64_t index);
 
 /// Get access to the atom at the given `index` from a `topology`
 ///
 /// Any modification to the atom will be reflected in the `topology`. The
-/// `topology` will be kept alive, even if `chfl_topology_free` is called,
-/// until `chfl_atom_free` is also called on the pointer returned by this
-/// function.
+/// `topology` will be kept alive, even if `chfl_free` is called, until
+/// `chfl_free` is also called on the pointer returned by this function.
 ///
 /// The pointer returned by this function points directly inside the topology,
 /// and will be invalidated if any of the following function is called on the
@@ -70,14 +67,13 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom_from_frame(CHFL_FRAME* frame, uint64_t index);
 /// - `chfl_topology_add_atom`
 /// - `chfl_topology_remove`
 ///
-/// Calling any function on an invalidated pointer is undefined behavior.
-/// Even if the pointer if invalidated, it stills needs to be released with
-/// `chfl_atom_free`.
+/// Calling any function on an invalidated pointer is undefined behavior. Even
+/// if the pointer if invalidated, it stills needs to be released with
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_atom/from_topology.c}
-/// @return A pointer to the atom, or NULL in case of error or if `index` is
-///         out of bounds. You can use `chfl_last_error` to learn about the
-///         error.
+/// @return A pointer to the atom, or NULL in case of error or if `index` is out
+///         of bounds. You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_ATOM* chfl_atom_from_topology(
     CHFL_TOPOLOGY* topology, uint64_t index
 );
@@ -244,20 +240,14 @@ CHFL_EXPORT chfl_status chfl_atom_set_property(
 /// This function returns `NULL` if no property exists with the given name.
 ///
 /// The user of this function is responsible to deallocate memory using the
-/// `chfl_property_free` function.
+/// `chfl_free` function.
 ///
 /// @example{tests/capi/doc/chfl_atom/property.c}
-/// @return A pointer to the property, or NULL in case of error.
-///         You can use `chfl_last_error` to learn about the error.
+/// @return A pointer to the property, or NULL in case of error. You can use
+///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_PROPERTY* chfl_atom_get_property(
     const CHFL_ATOM* atom, const char* name
 );
-
-/// Free the memory associated with an `atom`.
-///
-/// @example{tests/capi/doc/chfl_atom/chfl_atom.c}
-/// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_atom_free(const CHFL_ATOM* atom);
 
 #ifdef __cplusplus
 }

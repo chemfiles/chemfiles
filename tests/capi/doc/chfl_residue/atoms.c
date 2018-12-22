@@ -18,7 +18,7 @@ int main() {
     assert(atoms[1] == 28);
     assert(atoms[2] == 32);
 
-    chfl_residue_free(residue);
+    chfl_free(residue);
     // [example]
     return 0;
 }

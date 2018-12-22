@@ -15,7 +15,7 @@ int main() {
     chfl_topology_atoms_count(topology, &atoms);
     assert(atoms == 67);
 
-    chfl_topology_free(topology);
+    chfl_free(topology);
     // [example]
     return 0;
 }

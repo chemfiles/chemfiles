@@ -16,7 +16,7 @@ int main() {
     chfl_atom_charge(atom, &charge);
     assert(fabs(charge - 0.82) < 1e-15);
 
-    chfl_atom_free(atom);
+    chfl_free(atom);
     // [example]
     return 0;
 }

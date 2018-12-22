@@ -13,7 +13,7 @@ int main() {
     for (size_t i=0; i<5; i++) {
         chfl_topology_add_atom(topology, atom);
     }
-    chfl_atom_free(atom);
+    chfl_free(atom);
 
     // We have two angles: 0-1-2 and 1-2-3
     chfl_topology_add_bond(topology, 0, 1);
@@ -24,7 +24,7 @@ int main() {
     chfl_topology_angles_count(topology, &angles);
     assert(angles == 2);
 
-    chfl_topology_free(topology);
+    chfl_free(topology);
     // [example]
     return 0;
 }

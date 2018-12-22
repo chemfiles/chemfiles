@@ -5,6 +5,7 @@
 #include "chemfiles/config.hpp"
 #include "chemfiles/capi/misc.h"
 #include "chemfiles/capi.hpp"
+#include "chemfiles/shared_allocator.hpp"
 using namespace chemfiles;
 
 static_assert(sizeof(chfl_status) == sizeof(int), "Wrong size for chfl_status enum");
@@ -13,6 +14,10 @@ static CHFL_THREAD_LOCAL std::string CAPI_LAST_ERROR;
 
 void chemfiles::set_last_error(const std::string& message) {
     CAPI_LAST_ERROR = message;
+}
+
+extern "C" void chfl_free(const void* const object) {
+    shared_allocator::free(object); // NOLINT: we can use shared_allocator::free to implement chfl_free
 }
 
 extern "C" const char* chfl_version(void) {
