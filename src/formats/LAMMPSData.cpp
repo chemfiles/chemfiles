@@ -252,9 +252,6 @@ atom_data atom_style::read_line(const std::string& line, size_t index) const {
 static std::string split_comment(std::string& line);
 /// Check if the line is an unused header value
 static bool is_unused_header(const std::string& line);
-/// Cast a long long value to a size_t, while checking that the value does fit
-/// in a size_t
-static size_t checked_cast(long long int value);
 
 LAMMPSDataFormat::LAMMPSDataFormat(std::string path, File::Mode mode, File::Compression compression):
     current_section_(HEADER), file_(TextFile::open(std::move(path), mode, compression)), style_("full") {}
@@ -339,9 +336,9 @@ void LAMMPSDataFormat::read_header(Frame& frame) {
                     "invalid header value: expected '<xy> <xz> <yz> xy xz yz', got '{}'", content
                 );
             }
-            matrix[0][1] = string2double(splitted[0]);
-            matrix[0][2] = string2double(splitted[1]);
-            matrix[1][2] = string2double(splitted[2]);
+            matrix[0][1] = parse<double>(splitted[0]);
+            matrix[0][2] = parse<double>(splitted[1]);
+            matrix[1][2] = parse<double>(splitted[2]);
             // Even if all parameters are 0, set shape to TRICLINIC
             shape = UnitCell::TRICLINIC;
         } else {
@@ -362,7 +359,7 @@ size_t LAMMPSDataFormat::read_header_integer(const std::string& line, const std:
             "invalid header value: expected '<n> {}', got '{}'", context, line
         );
     }
-    return checked_cast(string2longlong(splitted[0]));
+    return parse<size_t>(splitted[0]);
 }
 
 double LAMMPSDataFormat::read_header_box_bounds(const std::string& line, const std::string& context) {
@@ -372,8 +369,8 @@ double LAMMPSDataFormat::read_header_box_bounds(const std::string& line, const s
             "invalid header value: expected '<lo> <hi> {}', got '{}'", context, line
         );
     }
-    auto low = string2double(splitted[0]);
-    auto high = string2double(splitted[1]);
+    auto low = parse<double>(splitted[0]);
+    auto high = parse<double>(splitted[1]);
     return high - low;
 }
 
@@ -497,7 +494,7 @@ void LAMMPSDataFormat::read_masses() {
         }
 
         auto type = splitted[0];
-        auto mass = string2double(splitted[1]);
+        auto mass = parse<double>(splitted[1]);
         masses_.emplace(std::move(type), mass);
         n++;
     }
@@ -521,8 +518,8 @@ void LAMMPSDataFormat::read_bonds(Frame& frame) {
             throw format_error("bad bond specification '{}'", line);
         }
         // LAMMPS use 1-based indexing
-        auto i = checked_cast(string2longlong(splitted[2]) - 1);
-        auto j = checked_cast(string2longlong(splitted[3]) - 1);
+        auto i = parse<size_t>(splitted[2]) - 1;
+        auto j = parse<size_t>(splitted[3]) - 1;
         frame.add_bond(i, j);
         n++;
     }
@@ -552,10 +549,10 @@ void LAMMPSDataFormat::read_velocities(Frame& frame) {
             throw format_error("bad velocity specification '{}'", line);
         }
         // LAMMPS use 1-based indexing
-        auto id = checked_cast(string2longlong(splitted[0]) - 1);
-        auto vx = string2double(splitted[1]);
-        auto vy = string2double(splitted[2]);
-        auto vz = string2double(splitted[3]);
+        auto id = parse<size_t>(splitted[0]) - 1;
+        auto vx = parse<double>(splitted[1]);
+        auto vy = parse<double>(splitted[2]);
+        auto vz = parse<double>(splitted[3]);
         velocities[id] = Vector3D(vx, vy, vz);
         n++;
     }
@@ -999,20 +996,6 @@ bool is_unused_header(const std::string& line) {
            (line.find("triangles") != std::string::npos) ||
            (line.find("bodies") != std::string::npos);
 }
-
-
-size_t checked_cast(long long int value) {
-    if (value < 0) {
-        throw format_error("invalid integer: should be positive, is {}", value);
-    } else if (sizeof(long long) < sizeof(size_t) && value > static_cast<long long>(SIZE_MAX)) {
-        throw format_error(
-            "invalid integer: {} is bigger than the available size_t", value
-        );
-    } else {
-        return static_cast<size_t>(value);
-    }
-}
-
 
 std::vector<size_t> guess_molecules(const Frame& frame) {
     // Initialize the molids vector with each atom in its own molecule

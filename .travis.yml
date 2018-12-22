@@ -80,6 +80,7 @@ script:
   # Run various additional checks
   - ./scripts/ci/check-capi-docs.py
   - ./scripts/ci/check-public-headers.py
+  - ./scripts/ci/lint-code.py
   # Build docs
   - |
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then

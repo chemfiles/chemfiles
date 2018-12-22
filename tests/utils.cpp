@@ -39,16 +39,32 @@ TEST_CASE("split") {
     CHECK(chemfiles::split(",,bla  bla, jk:fiuks", ',') == expected);
 }
 
-TEST_CASE("String to double") {
-    CHECK(chemfiles::string2double("12.5") == 12.5);
-    CHECK(chemfiles::string2longlong("125") == 125);
-    CHECK(chemfiles::string2longlong("-32") == -32);
+TEST_CASE("String parsing") {
+    SECTION("Double") {
+        CHECK(chemfiles::parse<double>("12.5") == 12.5);
+        CHECK(chemfiles::parse<double>("125") == 125);
+        CHECK(chemfiles::parse<double>("-32") == -32);
 
-    CHECK_THROWS_AS(chemfiles::string2double("foo"), chemfiles::Error);
-    CHECK_THROWS_AS(chemfiles::string2double("1,2"), chemfiles::Error);
-    CHECK_THROWS_AS(chemfiles::string2double("3e456782"), chemfiles::Error);
+        CHECK_THROWS_AS(chemfiles::parse<double>("foo"), chemfiles::Error);
+        CHECK_THROWS_AS(chemfiles::parse<double>("1,2"), chemfiles::Error);
+        CHECK_THROWS_AS(chemfiles::parse<double>("3e456782"), chemfiles::Error);
+    }
 
-    CHECK_THROWS_AS(chemfiles::string2longlong("foo"), chemfiles::Error);
-    CHECK_THROWS_AS(chemfiles::string2longlong("2.5"), chemfiles::Error);
-    CHECK_THROWS_AS(chemfiles::string2longlong("9223372036854775808"), chemfiles::Error);
+    SECTION("long long") {
+        CHECK(chemfiles::parse<long long>("125") == 125);
+        CHECK(chemfiles::parse<long long>("-32") == -32);
+
+        CHECK_THROWS_AS(chemfiles::parse<long long>("foo"), chemfiles::Error);
+        CHECK_THROWS_AS(chemfiles::parse<long long>("2.5"), chemfiles::Error);
+        CHECK_THROWS_AS(chemfiles::parse<long long>("9223372036854775808"), chemfiles::Error);
+    }
+
+    SECTION("size_t") {
+        CHECK(chemfiles::parse<size_t>("125") == 125);
+
+        CHECK_THROWS_AS(chemfiles::parse<size_t>("-32"), chemfiles::Error);
+        CHECK_THROWS_AS(chemfiles::parse<size_t>("foo"), chemfiles::Error);
+        CHECK_THROWS_AS(chemfiles::parse<size_t>("2.5"), chemfiles::Error);
+        CHECK_THROWS_AS(chemfiles::parse<size_t>("9223372036854775808"), chemfiles::Error);
+    }
 }
