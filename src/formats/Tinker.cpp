@@ -164,7 +164,7 @@ void TinkerFormat::write(const Frame& frame) {
 bool forward(TextFile& file) {
     if (!file) {return false;}
 
-    long long natoms = 0;
+    size_t natoms = 0;
     try {
         auto line = file.readline();
         if (trim(line) == "") {
@@ -172,26 +172,20 @@ bool forward(TextFile& file) {
             return false;
         } else {
             // Get the number of atoms in the line
-            natoms = std::stoll(split(trim(line), ' ')[0]);
+            natoms = parse<size_t>(split(trim(line), ' ')[0]);
         }
     } catch (const FileError&) {
         // No more line left in the file
         return false;
-    } catch (const std::invalid_argument&) {
+    } catch (const Error&) {
         // We could not read an integer, so give up here
         return false;
-    }
-
-    if (natoms < 0) {
-        throw format_error(
-            "number of atoms can not be negative in '{}'", file.path()
-        );
     }
 
     try {
         auto line = file.readline();
         // Minus one because we just read a line.
-        size_t lines_to_skip = static_cast<size_t>(natoms) - 1;
+        size_t lines_to_skip = natoms - 1;
 
         // This is how tinker does it to check if there is unit cell information
         // in the file, so let's follow them here.

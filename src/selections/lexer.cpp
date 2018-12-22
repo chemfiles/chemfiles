@@ -195,14 +195,14 @@ Token Tokenizer::variable() {
             break;
         }
     }
-    int data = 0;
+    size_t data = 0;
     auto number = input_.substr(start, count);
     try {
-        data = std::stoi(number);
+        data = parse<size_t>(number);
     } catch (const std::exception&) {
         throw selection_error("could not parse number in '{}'", number);
     }
-    if (data > UINT8_MAX) {
+    if (data > static_cast<size_t>(UINT8_MAX)) {
         throw selection_error("variable index #{} is too big for uint8_t", data);
     } else if (data == 0) {
         throw selection_error("invalid variable index #0");
@@ -298,7 +298,7 @@ Token Tokenizer::number() {
 
     double value = 0;
     try {
-        value = string2double(input_.substr(start, count));
+        value = parse<double>(input_.substr(start, count));
     } catch (const Error& e) {
         throw SelectionError(e.what());
     }

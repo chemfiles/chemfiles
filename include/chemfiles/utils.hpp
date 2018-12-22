@@ -11,7 +11,7 @@
 #include <cstdarg>
 #include <algorithm>
 
-#include "chemfiles/Error.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 
 namespace chemfiles {
 
@@ -52,37 +52,48 @@ std::string user_name();
 /// Get the process current directory
 std::string current_directory();
 
-/// Convert a string to double, throwing a `chemfiles::Error` if the string is
-/// not a valid double.
-inline double string2double(const std::string& string) {
+/// Convert a string to `T`, throwing a `chemfiles::Error` if the string is not
+/// a valid `T`.
+template<typename T> inline T parse(const std::string& string);
+
+template<> inline double parse(const std::string& string) {
     try {
         size_t length = 0;
         double value = std::stod(string, &length);
         if (length != string.length()) {
-            throw chemfiles::Error("can not convert '" + string + "' to number");
+            throw error("can not convert '{}' to a double", string);
         }
         return value;
     } catch (const std::invalid_argument&) {
-        throw chemfiles::Error("can not convert '" + string + "' to number");
+        throw error("can not convert '{}' to a double", string);
     } catch (const std::out_of_range&) {
-        throw chemfiles::Error("'" + string + "' is out of range for double type");
+        throw error("{} is out of range for double type", string);
     }
 }
 
-/// Convert a string to long long integer, throwing a `chemfiles::Error` if the
-/// string is not a valid long long int.
-inline long long int string2longlong(const std::string& string) {
+template<> inline long long parse(const std::string& string) {
     try {
         size_t length = 0;
         long long int value = std::stoll(string, &length);
         if (length != string.length()) {
-            throw chemfiles::Error("can not convert '" + string + "' to number");
+            throw error("can not convert '{}' to an integer", string);
         }
         return value;
     } catch (const std::invalid_argument&) {
-        throw chemfiles::Error("can not convert '" + string + "' to number");
+        throw error("can not convert '{}' to an integer", string);
     } catch (const std::out_of_range&) {
-        throw chemfiles::Error("'" + string + "' is out of range for long long int type");
+        throw error("{} is out of range for long long type", string);
+    }
+}
+
+template<> inline size_t parse(const std::string& string) {
+    long long value = parse<long long>(string);
+    if (value < 0) {
+        throw error("invalid integer: should be positive, is {}", value);
+    } else if (sizeof(long long) < sizeof(size_t) && value > static_cast<long long>(SIZE_MAX)) {
+        throw error("{} is out of range for size_t type", value);
+    } else {
+        return static_cast<size_t>(value);
     }
 }
 

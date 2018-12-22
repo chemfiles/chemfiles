@@ -58,7 +58,6 @@ void SDFFormat::read(Frame& frame) {
     std::string counts_line;
     size_t natoms = 0;
     size_t nbonds = 0;
-
     try {
         std::string molecule_name = file_->readline();
         frame.set("name", molecule_name);
@@ -67,8 +66,8 @@ void SDFFormat::read(Frame& frame) {
         file_->readline(); // Comment line - skip it
 
         counts_line = file_->readline();
-        natoms = std::stoul(counts_line.substr(0, 3));
-        nbonds = std::stoul(counts_line.substr(3, 3));
+        natoms = parse<size_t>(counts_line.substr(0, 3));
+        nbonds = parse<size_t>(counts_line.substr(3, 3));
     } catch (const std::exception& e) {
         throw format_error("can not read next step as SDF: {}", e.what());
     }
@@ -84,10 +83,10 @@ void SDFFormat::read(Frame& frame) {
     frame.resize(0);
 
     for (const auto& line: atom_lines) {
-        double x = std::stod(line.substr(0, 10));
-        double y = std::stod(line.substr(10, 10));
-        double z = std::stod(line.substr(20, 10));
-        std::string name = trim(line.substr(31, 3));
+        auto x = parse<double>(line.substr(0, 10));
+        auto y = parse<double>(line.substr(10, 10));
+        auto z = parse<double>(line.substr(20, 10));
+        auto name = trim(line.substr(31, 3));
 
         frame.add_atom(Atom(name), Vector3D(x, y, z));
     }
@@ -100,9 +99,9 @@ void SDFFormat::read(Frame& frame) {
     }
 
     for (const auto& line: bond_lines) {
-        size_t atom1 = std::stoul(line.substr(0, 3));
-        size_t atom2 = std::stoul(line.substr(3, 3));
-        size_t bondo = std::stoul(line.substr(6, 3));
+        auto atom1 = parse<size_t>(line.substr(0, 3));
+        auto atom2 = parse<size_t>(line.substr(3, 3));
+        auto bondo = parse<size_t>(line.substr(6, 3));
 
         Bond::BondOrder bo;
 
@@ -249,8 +248,8 @@ void SDFFormat::write(const Frame& frame) {
 bool forward(TextFile& file) {
     if (!file) {return false;}
 
-    long long natoms = 0;
-    long long nbonds = 0;
+    size_t natoms = 0;
+    size_t nbonds = 0;
     try {
         // Ignore junk lines
         file.readline();
@@ -262,24 +261,18 @@ bool forward(TextFile& file) {
             throw format_error("Counts line must have at least 10 digits, it has {}", counts_line.length());
         }
 
-        natoms = std::stoll(counts_line.substr(0,3));
-        nbonds = std::stoll(counts_line.substr(3,3));
+        natoms = parse<size_t>(counts_line.substr(0,3));
+        nbonds = parse<size_t>(counts_line.substr(3,3));
     } catch (const FileError&) {
         // No more line left in the file
         return false;
-    } catch (const std::invalid_argument&) {
+    } catch (const Error&) {
         // We could not read an integer, so give up here
         return false;
     }
 
-    if (natoms < 0 || nbonds < 0) {
-        throw format_error(
-            "number of atoms and bonds can not be negative in '{}'", file.path()
-        );
-    }
-
     try {
-        file.readlines(static_cast<size_t>(natoms) + static_cast<size_t>(nbonds));
+        file.readlines(natoms + nbonds);
     } catch (const FileError&) {
         // We could not read the lines from the file
         throw format_error(
