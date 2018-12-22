@@ -16,7 +16,7 @@ int main() {
     chfl_residue_atoms_count(residue, &atoms);
     assert(atoms == 3);
 
-    chfl_residue_free(residue);
+    chfl_free(residue);
     // [example]
     return 0;
 }

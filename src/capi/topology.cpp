@@ -18,7 +18,7 @@ extern "C" CHFL_TOPOLOGY* chfl_topology(void) {
     )
     return topology;
 error:
-    delete topology;
+    chfl_free(topology);
     return nullptr;
 }
 
@@ -30,7 +30,7 @@ extern "C" const CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* const
     )
     return topology;
 error:
-    delete topology;
+    chfl_free(topology);
     return nullptr;
 }
 
@@ -41,7 +41,7 @@ extern "C" CHFL_TOPOLOGY* chfl_topology_copy(const CHFL_TOPOLOGY* const topology
     )
     return new_topology;
 error:
-    delete new_topology;
+    chfl_free(new_topology);
     return nullptr;
 }
 
@@ -258,15 +258,5 @@ extern "C" chfl_status chfl_topology_bond_order( const CHFL_TOPOLOGY* const topo
         *order = static_cast<chfl_bond_order>(
             topology->bond_order(checked_cast(i), checked_cast(j))
         );
-    )
-}
-
-extern "C" chfl_status chfl_topology_free(const CHFL_TOPOLOGY* const topology) {
-    CHFL_ERROR_CATCH(
-        if (topology == nullptr) {
-            return CHFL_SUCCESS;
-        } else {
-            shared_allocator::free(topology);
-        }
     )
 }

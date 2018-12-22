@@ -12,7 +12,7 @@ int main() {
     chfl_topology_add_atom(topology, atom);
     chfl_topology_add_atom(topology, atom);
     chfl_topology_add_atom(topology, atom);
-    chfl_atom_free(atom);
+    chfl_free(atom);
 
     CHFL_TOPOLOGY* copy = chfl_topology_copy(topology);
 
@@ -20,8 +20,8 @@ int main() {
         /* handle error */
     }
 
-    chfl_topology_free(copy);
-    chfl_topology_free(topology);
+    chfl_free(copy);
+    chfl_free(topology);
     // [example]
     return 0;
 }

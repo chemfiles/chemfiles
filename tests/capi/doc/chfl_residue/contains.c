@@ -20,7 +20,7 @@ int main() {
     chfl_residue_contains(residue, 11, &contained);
     assert(contained == false);
 
-    chfl_residue_free(residue);
+    chfl_free(residue);
     // [example]
     return 0;
 }

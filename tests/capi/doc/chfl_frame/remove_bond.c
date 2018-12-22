@@ -23,8 +23,8 @@ int main() {
     // Removing non-existing bond
     chfl_frame_remove_bond(frame, 2, 3);
 
-    chfl_atom_free(atom);
-    chfl_frame_free(frame);
+    chfl_free(atom);
+    chfl_free(frame);
     // [example]
     return 0;
 }

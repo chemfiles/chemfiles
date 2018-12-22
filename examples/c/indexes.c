@@ -30,7 +30,7 @@ int main() {
     }
 
     free(less_than_five);
-    chfl_frame_free(frame);
+    chfl_free(frame);
     chfl_trajectory_close(file);
 
     return 0;

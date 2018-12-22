@@ -24,7 +24,7 @@ typedef enum {  // NOLINT: this is both a C and C++ file
 /// Create a new property holding a boolean `value`.
 ///
 /// The caller of this function should free the allocated memory using
-/// `chfl_property_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_property/bool.c}
 /// @return A pointer to the property, or NULL in case of error. You can use
@@ -34,7 +34,7 @@ CHFL_EXPORT CHFL_PROPERTY* chfl_property_bool(bool value);
 /// Create a new property holding a double `value`.
 ///
 /// The caller of this function should free the allocated memory using
-/// `chfl_property_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_property/double.c}
 /// @return A pointer to the property, or NULL in case of error. You can use
@@ -44,7 +44,7 @@ CHFL_EXPORT CHFL_PROPERTY* chfl_property_double(double value);
 /// Create a new property holding a string `value`.
 ///
 /// The caller of this function should free the allocated memory using
-/// `chfl_property_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_property/string.c}
 /// @return A pointer to the property, or NULL in case of error. You can use
@@ -54,7 +54,7 @@ CHFL_EXPORT CHFL_PROPERTY* chfl_property_string(const char* value);
 /// Create a new property holding a 3D vector `value`.
 ///
 /// The caller of this function should free the allocated memory using
-/// `chfl_property_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_property/vector3d.c}
 /// @return A pointer to the property, or NULL in case of error. You can use
@@ -123,12 +123,6 @@ CHFL_EXPORT chfl_status chfl_property_get_string(
 CHFL_EXPORT chfl_status chfl_property_get_vector3d(
     const CHFL_PROPERTY* property, chfl_vector3d value
 );
-
-/// Free the memory associated with a `property`.
-///
-/// @example{tests/capi/doc/chfl_property/bool.c}
-/// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_property_free(const CHFL_PROPERTY* property);
 
 #ifdef __cplusplus
 }

@@ -12,13 +12,13 @@ int main() {
 
     chfl_residue_set_property(residue, "this", property);
     chfl_residue_set_property(residue, "that", property);
-    chfl_property_free(property);
+    chfl_free(property);
 
     uint64_t count = 0;
     chfl_residue_properties_count(residue, &count);
     assert(count == 2);
 
-    chfl_residue_free(residue);
+    chfl_free(residue);
     // [example]
     return 0;
 }

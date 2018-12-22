@@ -12,7 +12,7 @@ int main() {
         /* handle error */
     }
 
-    chfl_cell_free(cell);
+    chfl_free(cell);
     // [example]
     return 0;
 }

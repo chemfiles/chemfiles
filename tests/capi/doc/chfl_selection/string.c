@@ -14,7 +14,7 @@ int main() {
     chfl_selection_string(selection, string, sizeof(string));
     assert(strcmp(string, "pairs: name(#1) O and name(#2) H") == 0);
 
-    chfl_selection_free(selection);
+    chfl_free(selection);
     // [example]
     return 0;
 }

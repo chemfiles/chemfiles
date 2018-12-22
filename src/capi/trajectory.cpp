@@ -1,7 +1,9 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include "chemfiles/shared_allocator.hpp"
 #include "chemfiles/capi/trajectory.h"
+#include "chemfiles/capi/misc.h"
 #include "chemfiles/capi.hpp"
 
 #include "chemfiles/Trajectory.hpp"
@@ -11,11 +13,11 @@ extern "C" CHFL_TRAJECTORY* chfl_trajectory_open(const char* path, char mode) {
     CHFL_TRAJECTORY* trajectory = nullptr;
     CHECK_POINTER_GOTO(path);
     CHFL_ERROR_GOTO(
-        trajectory = new Trajectory(path, mode);
+        trajectory = shared_allocator::make_shared<Trajectory>(path, mode);
     )
     return trajectory;
 error:
-    delete trajectory;
+    chfl_trajectory_close(trajectory);
     return nullptr;
 }
 
@@ -24,11 +26,11 @@ extern "C" CHFL_TRAJECTORY* chfl_trajectory_with_format(const char* path, char m
     CHECK_POINTER_GOTO(path);
     CHECK_POINTER_GOTO(format);
     CHFL_ERROR_GOTO(
-        trajectory = new Trajectory(path, mode, format);
+        trajectory = shared_allocator::make_shared<Trajectory>(path, mode, format);
     )
     return trajectory;
 error:
-    delete trajectory;
+    chfl_trajectory_close(trajectory);
     return nullptr;
 }
 
@@ -99,7 +101,6 @@ extern "C" chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const trajectory,
     )
 }
 
-extern "C" chfl_status chfl_trajectory_close(const CHFL_TRAJECTORY* trajectory) {
-    delete trajectory;
-    return CHFL_SUCCESS;
+extern "C" void chfl_trajectory_close(const CHFL_TRAJECTORY* trajectory) {
+    chfl_free(trajectory);
 }

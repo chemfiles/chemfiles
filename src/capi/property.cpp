@@ -1,6 +1,7 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include "chemfiles/shared_allocator.hpp"
 #include "chemfiles/capi/property.h"
 #include "chemfiles/capi.hpp"
 
@@ -12,44 +13,44 @@ static_assert(sizeof(chfl_property_kind) == sizeof(int), "Wrong size for chfl_pr
 extern "C" CHFL_PROPERTY* chfl_property_bool(bool value) {
     CHFL_PROPERTY* property = nullptr;
     CHFL_ERROR_GOTO(
-        property = new Property(value);
+        property = shared_allocator::make_shared<Property>(value);
     )
     return property;
 error:
-    delete property;
+    chfl_free(property);
     return nullptr;
 }
 
 extern "C" CHFL_PROPERTY* chfl_property_double(double value) {
     CHFL_PROPERTY* property = nullptr;
     CHFL_ERROR_GOTO(
-        property = new Property(value);
+        property = shared_allocator::make_shared<Property>(value);
     )
     return property;
 error:
-    delete property;
+    chfl_free(property);
     return nullptr;
 }
 
 extern "C" CHFL_PROPERTY* chfl_property_string(const char* value) {
     CHFL_PROPERTY* property = nullptr;
     CHFL_ERROR_GOTO(
-        property = new Property(value);
+        property = shared_allocator::make_shared<Property>(value);
     )
     return property;
 error:
-    delete property;
+    chfl_free(property);
     return nullptr;
 }
 
 extern "C" CHFL_PROPERTY* chfl_property_vector3d(const chfl_vector3d value) {
     CHFL_PROPERTY* property = nullptr;
     CHFL_ERROR_GOTO(
-        property = new Property(vector3d(value));
+        property = shared_allocator::make_shared<Property>(vector3d(value));
     )
     return property;
 error:
-    delete property;
+    chfl_free(property);
     return nullptr;
 }
 
@@ -96,9 +97,4 @@ extern "C" chfl_status chfl_property_get_vector3d(const CHFL_PROPERTY* const pro
         value[1] = vector[1];
         value[2] = vector[2];
     )
-}
-
-extern "C" chfl_status chfl_property_free(const CHFL_PROPERTY* property) {
-    delete property;
-    return CHFL_SUCCESS;
 }

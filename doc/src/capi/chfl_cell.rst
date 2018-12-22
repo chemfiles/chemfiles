@@ -22,7 +22,6 @@
     - :cpp:func:`chfl_cell_shape`
     - :cpp:func:`chfl_cell_set_shape`
     - :cpp:func:`chfl_cell_wrap`
-    - :cpp:func:`chfl_cell_free`
 
     --------------------------------------------------------------------
 
@@ -53,5 +52,3 @@
 .. doxygenfunction:: chfl_cell_set_shape
 
 .. doxygenfunction:: chfl_cell_wrap
-
-.. doxygenfunction:: chfl_cell_free

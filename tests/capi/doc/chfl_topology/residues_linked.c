@@ -17,10 +17,10 @@ int main() {
     bool linked = false;
     chfl_topology_residues_linked(topology, first, second, &linked);
 
-    chfl_residue_free(first);
-    chfl_residue_free(second);
+    chfl_free(first);
+    chfl_free(second);
 
-    chfl_topology_free(topology);
+    chfl_free(topology);
     // [example]
     return 0;
 }

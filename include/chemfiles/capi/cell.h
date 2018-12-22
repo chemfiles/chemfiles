@@ -25,11 +25,11 @@ typedef enum {  // NOLINT: this is both a C and C++ file
 /// The cell lengths should be in Angstroms.
 ///
 /// The caller of this function should free the associated memory using
-/// `chfl_cell_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_cell/chfl_cell.c}
-/// @return A pointer to the unit cell, or NULL in case of error.
-///         You can use `chfl_last_error` to learn about the error.
+/// @return A pointer to the unit cell, or NULL in case of error. You can use
+///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_CELL* chfl_cell(const chfl_vector3d lengths);
 
 /// Create an unit cell from three `lengths` and three `angles`. The unit cell
@@ -42,45 +42,43 @@ CHFL_EXPORT CHFL_CELL* chfl_cell(const chfl_vector3d lengths);
 /// angle between `a` and `b`.
 ///
 /// The caller of this function should free the associated memory using
-/// `chfl_cell_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_cell/triclinic.c}
-/// @return A pointer to the unit cell, or NULL in case of error.
-///         You can use `chfl_last_error` to learn about the error.
+/// @return A pointer to the unit cell, or NULL in case of error. You can use
+///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_CELL* chfl_cell_triclinic(
     const chfl_vector3d lengths, const chfl_vector3d angles
 );
 
 /// Get access to the cell of a `frame`
 ///
-/// Any modification to the cell will be reflected in the `frame`. The
-/// `frame` will be kept alive, even if `chfl_frame_free` is called,
-/// until `chfl_cell_free` is also called on the pointer returned by this
-/// function.
+/// Any modification to the cell will be reflected in the `frame`. The `frame`
+/// will be kept alive, even if `chfl_free` is called, until `chfl_free` is also
+/// called on the pointer returned by this function.
 ///
-/// The pointer returned by this function points directly inside the frame,
-/// and will be invalidated if any of the following function is called on the
-/// frame:
+/// The pointer returned by this function points directly inside the frame, and
+/// will be invalidated if any of the following function is called on the frame:
 ///
 /// - `chfl_frame_set_cell`
 ///
-/// Calling any function on an invalidated pointer is undefined behavior.
-/// Even if the pointer if invalidated, it stills needs to be released with
-/// `chfl_cell_free`.
+/// Calling any function on an invalidated pointer is undefined behavior. Even
+/// if the pointer if invalidated, it stills needs to be released with
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_cell/from_frame.c}
-/// @return A pointer to the unit cell, or NULL in case of error.
-///         You can use `chfl_last_error` to learn about the error.
+/// @return A pointer to the unit cell, or NULL in case of error. You can use
+///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_CELL* chfl_cell_from_frame(CHFL_FRAME* frame);
 
 /// Get a copy of a `cell`.
 ///
 /// The caller of this function should free the associated memory using
-/// `chfl_cell_free`.
+/// `chfl_free`.
 ///
 /// @example{tests/capi/doc/chfl_cell/copy.c}
-/// @return A pointer to the new cell, or NULL in case of error.
-///         You can use `chfl_last_error` to learn about the error.
+/// @return A pointer to the new cell, or NULL in case of error. You can use
+///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_CELL* chfl_cell_copy(const CHFL_CELL* cell);
 
 /// Get the unit cell volume of `cell` in the double pointed to by `volume`.
@@ -178,12 +176,6 @@ CHFL_EXPORT chfl_status chfl_cell_set_shape(
 CHFL_EXPORT chfl_status chfl_cell_wrap(
     const CHFL_CELL* cell, chfl_vector3d vector
 );
-
-/// Free the memory associated with a `cell`.
-///
-/// @example{tests/capi/doc/chfl_cell/chfl_cell.c}
-/// @return `CHFL_SUCCESS`
-CHFL_EXPORT chfl_status chfl_cell_free(const CHFL_CELL* cell);
 
 #ifdef __cplusplus
 }

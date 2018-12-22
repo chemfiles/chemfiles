@@ -15,7 +15,7 @@ int main() {
     assert(lengths[1] == 11);
     assert(lengths[2] == 12);
 
-    chfl_cell_free(cell);
+    chfl_free(cell);
     // [example]
     return 0;
 }

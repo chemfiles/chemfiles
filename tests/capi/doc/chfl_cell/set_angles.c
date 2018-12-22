@@ -17,7 +17,7 @@ int main() {
     assert(angles[1] == 110);
     assert(angles[2] == 100);
 
-    chfl_cell_free(cell);
+    chfl_free(cell);
     // [example]
     return 0;
 }
