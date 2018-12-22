@@ -31,7 +31,7 @@ TEST_CASE("chfl_cell") {
         CHECK(data[1] == 90);
         CHECK(data[2] == 90);
 
-        CHECK_STATUS(chfl_cell_free(cell));
+        chfl_free(cell);
 
         lengths[0] = 20; lengths[1] = 21; lengths[2] = 22;
         chfl_vector3d angles = {90, 100, 120};
@@ -48,7 +48,7 @@ TEST_CASE("chfl_cell") {
         CHECK(data[1] == 100);
         CHECK(data[2] == 120);
 
-        CHECK_STATUS(chfl_cell_free(cell));
+        chfl_free(cell);
 
         // Check that a call to chfl_cell_triclinic always gives a triclinic
         // cell, even with all angles equal to 90°
@@ -60,7 +60,7 @@ TEST_CASE("chfl_cell") {
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
         CHECK(shape == CHFL_CELL_TRICLINIC);
 
-        CHECK_STATUS(chfl_cell_free(cell));
+        chfl_free(cell);
     }
 
     SECTION("Length") {
@@ -81,7 +81,7 @@ TEST_CASE("chfl_cell") {
         CHECK(data[1] == 20);
         CHECK(data[2] == 30);
 
-        CHECK_STATUS(chfl_cell_free(cell));
+        chfl_free(cell);
     }
 
     SECTION("Angles") {
@@ -107,7 +107,7 @@ TEST_CASE("chfl_cell") {
         CHECK(data[1] == 89);
         CHECK(data[2] == 100);
 
-        CHECK_STATUS(chfl_cell_free(cell));
+        chfl_free(cell);
     }
 
     SECTION("Volume") {
@@ -119,7 +119,7 @@ TEST_CASE("chfl_cell") {
         CHECK_STATUS(chfl_cell_volume(cell, &volume));
         CHECK(volume == 2 * 3 * 4);
 
-        CHECK_STATUS(chfl_cell_free(cell));
+        chfl_free(cell);
     }
 
     SECTION("Matrix") {
@@ -132,7 +132,7 @@ TEST_CASE("chfl_cell") {
         CHECK_STATUS(chfl_cell_matrix(cell, matrix));
         CHECK(approx_eq(expected, matrix));
 
-        CHECK_STATUS(chfl_cell_free(cell));
+        chfl_free(cell);
     }
 
     SECTION("Shape") {
@@ -154,7 +154,7 @@ TEST_CASE("chfl_cell") {
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
         CHECK(shape == CHFL_CELL_INFINITE);
 
-        CHECK_STATUS(chfl_cell_free(cell));
+        chfl_free(cell);
     }
 
     SECTION("Wrap") {
@@ -168,6 +168,6 @@ TEST_CASE("chfl_cell") {
         CHECK(vector[1] == -1.3);
         CHECK(vector[2] == 2);
 
-        CHECK_STATUS(chfl_cell_free(cell));
+        chfl_free(cell);
     }
 }

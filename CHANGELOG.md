@@ -63,6 +63,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added `chfl_{atom,frame,residue}_properties_count` and
   `chfl_{atom,frame,residue}_list_properties` to list all properties in an
   Atom/Frame/Residue
+* Replaced `chfl_*_free` by an unique `chfl_free` function
 
 ## 0.8 (14 Dec 2017)
 

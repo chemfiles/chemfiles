@@ -18,8 +18,10 @@ following opaque pointer types:
 
 The user is reponsible for memory management when using these types.
 Constructors functions (functions returning pointers to types defined above)
-return freshly allocated memory, and calling the ``chfl_*_free`` functions
+return freshly allocated memory, and calling the :cpp:func:`chfl_free` function
 return the corresponding memory to the operating system.
+
+.. doxygenfunction:: chfl_free
 
 .. doxygentypedef:: chfl_vector3d
 

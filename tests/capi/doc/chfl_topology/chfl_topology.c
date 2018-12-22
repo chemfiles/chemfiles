@@ -12,7 +12,7 @@ int main() {
         /* handle error */
     }
 
-    chfl_topology_free(topology);
+    chfl_free(topology);
     // [example]
     return 0;
 }

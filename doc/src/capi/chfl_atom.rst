@@ -29,7 +29,6 @@
     - :cpp:func:`chfl_atom_get_property`
     - :cpp:func:`chfl_atom_properties_count`
     - :cpp:func:`chfl_atom_list_properties`
-    - :cpp:func:`chfl_atom_free`
 
     --------------------------------------------------------------------
 
@@ -73,5 +72,3 @@
 .. doxygenfunction:: chfl_atom_properties_count
 
 .. doxygenfunction:: chfl_atom_list_properties
-
-.. doxygenfunction:: chfl_atom_free

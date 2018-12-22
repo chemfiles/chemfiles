@@ -13,7 +13,7 @@ int main() {
     for (size_t i=0; i<5; i++) {
         chfl_topology_add_atom(topology, atom);
     }
-    chfl_atom_free(atom);
+    chfl_free(atom);
 
     // We have one dihedral angle: 0-1-2-3
     chfl_topology_add_bond(topology, 0, 1);
@@ -24,7 +24,7 @@ int main() {
     chfl_topology_dihedrals_count(topology, &dihedrals);
     assert(dihedrals == 1);
 
-    chfl_topology_free(topology);
+    chfl_free(topology);
     // [example]
     return 0;
 }

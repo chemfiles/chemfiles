@@ -13,7 +13,7 @@ int main() {
     chfl_cell_shape(cell, &shape);
     assert(shape == CHFL_CELL_ORTHORHOMBIC);
 
-    chfl_cell_free(cell);
+    chfl_free(cell);
     // [example]
     return 0;
 }

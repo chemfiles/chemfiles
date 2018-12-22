@@ -13,7 +13,7 @@ int main() {
 
     /* Reading from the trajectory use the topology we built */
 
-    chfl_topology_free(topology);
+    chfl_free(topology);
     chfl_trajectory_close(trajectory);
     // [example]
     return 0;

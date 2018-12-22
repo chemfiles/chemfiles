@@ -16,10 +16,10 @@ int main() {
     chfl_topology_add_atom(topology, H);
     chfl_topology_add_atom(topology, H);
 
-    chfl_atom_free(O);
-    chfl_atom_free(H);
+    chfl_free(O);
+    chfl_free(H);
 
-    chfl_topology_free(topology);
+    chfl_free(topology);
     // [example]
     return 0;
 }

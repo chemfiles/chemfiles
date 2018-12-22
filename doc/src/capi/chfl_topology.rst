@@ -32,7 +32,6 @@
     - :cpp:func:`chfl_topology_bond_with_order`
     - :cpp:func:`chfl_topology_bond_orders`
     - :cpp:func:`chfl_topology_bond_order`
-    - :cpp:func:`chfl_topology_free`
 
     --------------------------------------------------------------------
 
@@ -81,5 +80,3 @@
 .. doxygenfunction:: chfl_topology_bond_orders
 
 .. doxygenfunction:: chfl_topology_bond_order
-
-.. doxygenfunction:: chfl_topology_free

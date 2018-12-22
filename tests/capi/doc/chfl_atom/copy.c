@@ -13,8 +13,8 @@ int main() {
         /* handle error */
     }
 
-    chfl_atom_free(copy);
-    chfl_atom_free(atom);
+    chfl_free(copy);
+    chfl_free(atom);
     // [example]
     return 0;
 }

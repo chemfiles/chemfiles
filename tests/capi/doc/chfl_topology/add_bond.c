@@ -12,7 +12,7 @@ int main() {
     CHFL_ATOM* atom = chfl_atom("F");
     chfl_topology_add_atom(topology, atom);
     chfl_topology_add_atom(topology, atom);
-    chfl_atom_free(atom);
+    chfl_free(atom);
 
     chfl_topology_add_bond(topology, 0, 1);
 
@@ -20,7 +20,7 @@ int main() {
     chfl_topology_bonds_count(topology, &bonds);
     assert(bonds == 1);
 
-    chfl_topology_free(topology);
+    chfl_free(topology);
     // [example]
     return 0;
 }

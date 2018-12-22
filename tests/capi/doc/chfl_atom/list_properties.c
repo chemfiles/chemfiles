@@ -13,7 +13,7 @@ int main() {
 
     chfl_atom_set_property(atom, "this", property);
     chfl_atom_set_property(atom, "that", property);
-    chfl_property_free(property);
+    chfl_free(property);
 
     uint64_t count = 0;
     chfl_atom_properties_count(atom, &count);
@@ -26,7 +26,7 @@ int main() {
     assert(strcmp(names[0], "this") == 0 || strcmp(names[0], "that") == 0);
     assert(strcmp(names[1], "this") == 0 || strcmp(names[1], "that") == 0);
 
-    chfl_atom_free(atom);
+    chfl_free(atom);
     // [example]
     return 0;
 }

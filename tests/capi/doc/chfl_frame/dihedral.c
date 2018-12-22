@@ -24,8 +24,8 @@ int main() {
     chfl_frame_dihedral(frame, 0, 1, 2, 3, &dihedral);
     assert(fabs(dihedral - M_PI / 2) < 1e-12);
 
-    chfl_atom_free(atom);
-    chfl_frame_free(frame);
+    chfl_free(atom);
+    chfl_free(frame);
     // [example]
     return 0;
 }

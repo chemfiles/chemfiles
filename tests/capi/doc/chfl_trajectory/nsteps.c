@@ -17,7 +17,7 @@ int main() {
         /* Do stuff with the frame */
     }
 
-    chfl_frame_free(frame);
+    chfl_free(frame);
     chfl_trajectory_close(trajectory);
     // [example]
     return 0;

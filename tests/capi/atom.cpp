@@ -18,7 +18,7 @@ TEST_CASE("chfl_atom") {
         CHECK_STATUS(chfl_atom_name(atom, name, sizeof(name)));
         CHECK(name == std::string("H5"));
 
-        CHECK_STATUS(chfl_atom_free(atom));
+        chfl_free(atom);
     }
 
     SECTION("Type") {
@@ -40,7 +40,7 @@ TEST_CASE("chfl_atom") {
         CHECK_STATUS(chfl_atom_full_name(atom, name, sizeof(name)));
         CHECK(name == std::string("Zinc"));
 
-        CHECK_STATUS(chfl_atom_free(atom));
+        chfl_free(atom);
     }
 
     SECTION("Mass") {
@@ -55,7 +55,7 @@ TEST_CASE("chfl_atom") {
         CHECK_STATUS(chfl_atom_mass(atom, &mass));
         CHECK(mass == 678);
 
-        CHECK_STATUS(chfl_atom_free(atom));
+        chfl_free(atom);
     }
 
     SECTION("Charge") {
@@ -70,7 +70,7 @@ TEST_CASE("chfl_atom") {
         CHECK_STATUS(chfl_atom_charge(atom, &charge));
         CHECK(charge == -1.8);
 
-        CHECK_STATUS(chfl_atom_free(atom));
+        chfl_free(atom);
     }
 
     SECTION("Radius") {
@@ -84,7 +84,7 @@ TEST_CASE("chfl_atom") {
         CHECK_STATUS(chfl_atom_covalent_radius(atom, &radius));
         CHECK(radius == 1.31);
 
-        CHECK_STATUS(chfl_atom_free(atom));
+        chfl_free(atom);
 
         atom = chfl_atom("");
         REQUIRE(atom);
@@ -96,7 +96,7 @@ TEST_CASE("chfl_atom") {
         CHECK_STATUS(chfl_atom_covalent_radius(atom, &radius));
         CHECK(radius == 0.0);
 
-        CHECK_STATUS(chfl_atom_free(atom));
+        chfl_free(atom);
     }
 
     SECTION("Number") {
@@ -107,7 +107,7 @@ TEST_CASE("chfl_atom") {
         CHECK_STATUS(chfl_atom_atomic_number(atom, &number));
         CHECK(number == 30);
 
-        CHECK_STATUS(chfl_atom_free(atom));
+        chfl_free(atom);
 
         atom = chfl_atom("");
         REQUIRE(atom);
@@ -115,7 +115,7 @@ TEST_CASE("chfl_atom") {
         CHECK_STATUS(chfl_atom_atomic_number(atom, &number));
         CHECK(number == 0);
 
-        CHECK_STATUS(chfl_atom_free(atom));
+        chfl_free(atom);
     }
 
     SECTION("Property") {
@@ -126,14 +126,14 @@ TEST_CASE("chfl_atom") {
         REQUIRE(property);
 
         CHECK_STATUS(chfl_atom_set_property(atom, "this", property));
-        CHECK_STATUS(chfl_property_free(property));
+        chfl_free(property);
         property = nullptr;
 
         property = chfl_atom_get_property(atom, "this");
         double value = 0;
         CHECK_STATUS(chfl_property_get_double(property, &value));
         CHECK(value == -23);
-        CHECK_STATUS(chfl_property_free(property));
+        chfl_free(property);
         property = nullptr;
 
         CHECK_FALSE(chfl_atom_get_property(atom, "that"));
@@ -142,7 +142,7 @@ TEST_CASE("chfl_atom") {
         REQUIRE(property);
 
         CHECK_STATUS(chfl_atom_set_property(atom, "that", property));
-        CHECK_STATUS(chfl_property_free(property));
+        chfl_free(property);
 
         uint64_t count = 0;
         CHECK_STATUS(chfl_atom_properties_count(atom, &count));
@@ -158,6 +158,6 @@ TEST_CASE("chfl_atom") {
             CHECK(names[1] == std::string("this"));
         }
 
-        CHECK_STATUS(chfl_atom_free(atom));
+        chfl_free(atom);
     }
 }

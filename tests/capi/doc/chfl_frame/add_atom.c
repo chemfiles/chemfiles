@@ -11,8 +11,8 @@ int main() {
 
     chfl_frame_add_atom(frame, atom, (chfl_vector3d){1, 2, 3}, NULL);
 
-    chfl_atom_free(atom);
-    chfl_frame_free(frame);
+    chfl_free(atom);
+    chfl_free(frame);
     // [example]
     return 0;
 }

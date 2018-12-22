@@ -16,8 +16,8 @@ int main() {
     chfl_topology_add_atom(topology, H);
     chfl_topology_add_atom(topology, H);
     chfl_topology_add_atom(topology, O);
-    chfl_atom_free(O);
-    chfl_atom_free(H);
+    chfl_free(O);
+    chfl_free(H);
 
     uint64_t atoms = 0;
     chfl_topology_atoms_count(topology, &atoms);
@@ -28,7 +28,7 @@ int main() {
     chfl_topology_atoms_count(topology, &atoms);
     assert(atoms == 3);
 
-    chfl_topology_free(topology);
+    chfl_free(topology);
     // [example]
     return 0;
 }

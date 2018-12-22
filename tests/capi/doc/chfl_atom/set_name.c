@@ -15,7 +15,7 @@ int main() {
     chfl_atom_name(atom, name, sizeof(name));
     assert(strcmp(name, "Cs") == 0);
 
-    chfl_atom_free(atom);
+    chfl_free(atom);
     // [example]
     return 0;
 }

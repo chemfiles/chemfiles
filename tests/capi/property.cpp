@@ -25,7 +25,7 @@ TEST_CASE("Property") {
         CHECK_STATUS(chfl_property_get_kind(property, &kind));
         CHECK(kind == CHFL_PROPERTY_BOOL);
 
-        CHECK_STATUS(chfl_property_free(property));
+        chfl_free(property);
     }
 
     SECTION("Double") {
@@ -47,7 +47,7 @@ TEST_CASE("Property") {
         CHECK_STATUS(chfl_property_get_kind(property, &kind));
         CHECK(kind == CHFL_PROPERTY_DOUBLE);
 
-        CHECK_STATUS(chfl_property_free(property));
+        chfl_free(property);
     }
 
     SECTION("String") {
@@ -69,7 +69,7 @@ TEST_CASE("Property") {
         CHECK_STATUS(chfl_property_get_kind(property, &kind));
         CHECK(kind == CHFL_PROPERTY_STRING);
 
-        CHECK_STATUS(chfl_property_free(property));
+        chfl_free(property);
     }
 
     SECTION("Vector3D") {
@@ -94,6 +94,6 @@ TEST_CASE("Property") {
         CHECK_STATUS(chfl_property_get_kind(property, &kind));
         CHECK(kind == CHFL_PROPERTY_VECTOR3D);
 
-        CHECK_STATUS(chfl_property_free(property));
+        chfl_free(property);
     }
 }

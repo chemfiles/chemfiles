@@ -17,7 +17,7 @@ int main() {
     chfl_trajectory_read(trajectory, frame);
     /* We can use the second frame here */
 
-    chfl_frame_free(frame);
+    chfl_free(frame);
     chfl_trajectory_close(trajectory);
     // [example]
     return 0;
