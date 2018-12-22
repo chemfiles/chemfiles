@@ -12,8 +12,8 @@ int main() {
 
     chfl_frame_add_residue(frame, residue);
 
-    chfl_residue_free(residue);
-    chfl_frame_free(frame);
+    chfl_free(residue);
+    chfl_free(frame);
     // [example]
     return 0;
 }

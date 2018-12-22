@@ -15,7 +15,7 @@ int main() {
     chfl_frame_step(frame, &step);
     assert(step == 678);
 
-    chfl_frame_free(frame);
+    chfl_free(frame);
     // [example]
     return 0;
 }

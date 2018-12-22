@@ -164,6 +164,15 @@ typedef enum {  // NOLINT: this is both a C and C++ file
     CHFL_BOND_AROMATIC = 255,
 } chfl_bond_order;
 
+/// Free the memory associated with a chemfiles object.
+///
+/// This function is NOT equivalent to the standard C function `free`, as memory
+/// is acquired and released for all chemfiles objects using a references
+/// counter to allow direct modification of C++ objects.
+///
+/// @example{tests/capi/doc/chfl_atom/chfl_atom.c}
+CHFL_EXPORT void chfl_free(const void* objet);
+
 #ifdef __cplusplus
 }
 #endif

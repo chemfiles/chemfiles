@@ -8,7 +8,7 @@
 .. only:: html
 
     Here is the full list of functions acting on :cpp:type:`CHFL_FRAME`:
-    
+
     - :cpp:func:`chfl_frame`
     - :cpp:func:`chfl_frame_copy`
     - :cpp:func:`chfl_frame_atoms_count`
@@ -36,7 +36,6 @@
     - :cpp:func:`chfl_frame_get_property`
     - :cpp:func:`chfl_frame_properties_count`
     - :cpp:func:`chfl_frame_list_properties`
-    - :cpp:func:`chfl_frame_free`
 
     --------------------------------------------------------------------
 
@@ -93,5 +92,3 @@
 .. doxygenfunction:: chfl_frame_properties_count
 
 .. doxygenfunction:: chfl_frame_list_properties
-
-.. doxygenfunction:: chfl_frame_free

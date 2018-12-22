@@ -16,7 +16,7 @@ int main() {
     assert(position[1] == 2);
     assert(position[2] == 2);
 
-    chfl_cell_free(cell);
+    chfl_free(cell);
     // [example]
     return 0;
 }

@@ -11,7 +11,7 @@ int main() {
     CHFL_PROPERTY* property = chfl_property_double(-23);
 
     chfl_frame_set_property(frame, "this", property);
-    chfl_property_free(property);
+    chfl_free(property);
 
     property = chfl_frame_get_property(frame, "this");
 
@@ -19,8 +19,8 @@ int main() {
     chfl_property_get_double(property, &value);
     assert(value == -23);
 
-    chfl_property_free(property);
-    chfl_frame_free(frame);
+    chfl_free(property);
+    chfl_free(frame);
     // [example]
     return 0;
 }

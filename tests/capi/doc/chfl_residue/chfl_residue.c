@@ -12,7 +12,7 @@ int main() {
         /* handle error */
     }
 
-    chfl_residue_free(residue);
+    chfl_free(residue);
     // [example]
     return 0;
 }

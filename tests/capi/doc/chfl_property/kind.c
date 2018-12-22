@@ -12,7 +12,7 @@ int main() {
     chfl_property_get_kind(property, &kind);
     assert(kind == CHFL_PROPERTY_DOUBLE);
 
-    chfl_property_free(property);
+    chfl_free(property);
     // [example]
     return 0;
 }

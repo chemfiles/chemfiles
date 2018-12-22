@@ -13,7 +13,7 @@ int main() {
     chfl_residue_add_atom(residue, 32);
     chfl_residue_add_atom(residue, 28);
 
-    chfl_residue_free(residue);
+    chfl_free(residue);
     // [example]
     return 0;
 }

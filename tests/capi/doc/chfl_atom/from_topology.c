@@ -15,8 +15,8 @@ int main() {
         /* handle error */
     }
 
-    chfl_atom_free(atom);
-    chfl_topology_free(topology);
+    chfl_free(atom);
+    chfl_free(topology);
     // [example]
     return 0;
 }

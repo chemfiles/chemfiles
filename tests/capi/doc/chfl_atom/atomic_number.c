@@ -13,7 +13,7 @@ int main() {
     chfl_atom_atomic_number(atom, &number);
     assert(number == 11);
 
-    chfl_atom_free(atom);
+    chfl_free(atom);
     // [example]
     return 0;
 }

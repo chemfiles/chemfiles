@@ -11,8 +11,8 @@ int main() {
 
     chfl_frame_set_cell(frame, cell);
 
-    chfl_cell_free(cell);
-    chfl_frame_free(frame);
+    chfl_free(cell);
+    chfl_free(frame);
     // [example]
     return 0;
 }

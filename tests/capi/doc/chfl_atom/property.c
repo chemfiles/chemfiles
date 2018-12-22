@@ -11,7 +11,7 @@ int main() {
     CHFL_PROPERTY* property = chfl_property_double(-23);
 
     chfl_atom_set_property(atom, "this", property);
-    chfl_property_free(property);
+    chfl_free(property);
 
     property = chfl_atom_get_property(atom, "this");
 
@@ -19,8 +19,8 @@ int main() {
     chfl_property_get_double(property, &value);
     assert(value == -23);
 
-    chfl_property_free(property);
-    chfl_atom_free(atom);
+    chfl_free(property);
+    chfl_free(atom);
     // [example]
     return 0;
 }

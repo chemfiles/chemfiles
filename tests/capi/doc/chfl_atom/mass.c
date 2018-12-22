@@ -14,7 +14,7 @@ int main() {
     chfl_atom_mass(atom, &mass);
     assert(fabs(mass - 22.98976928) < 1e-15);
 
-    chfl_atom_free(atom);
+    chfl_free(atom);
     // [example]
     return 0;
 }

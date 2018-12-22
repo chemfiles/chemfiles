@@ -13,7 +13,7 @@ int main() {
     for (size_t i=0; i<5; i++) {
         chfl_topology_add_atom(topology, atom);
     }
-    chfl_atom_free(atom);
+    chfl_free(atom);
 
     chfl_topology_add_bond(topology, 0, 1);
     chfl_topology_add_bond(topology, 1, 2);
@@ -29,7 +29,7 @@ int main() {
     assert(angles[1][1] == 2);
     assert(angles[1][2] == 3);
 
-    chfl_topology_free(topology);
+    chfl_free(topology);
     // [example]
     return 0;
 }

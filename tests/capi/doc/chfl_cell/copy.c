@@ -13,8 +13,8 @@ int main() {
         /* handle error */
     }
 
-    chfl_cell_free(copy);
-    chfl_cell_free(cell);
+    chfl_free(copy);
+    chfl_free(cell);
     // [example]
     return 0;
 }

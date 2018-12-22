@@ -16,8 +16,8 @@ int main() {
     chfl_frame_add_bond(frame, 0, 1);
     chfl_frame_bond_with_order(frame, 0, 2, CHFL_BOND_DOUBLE);
 
-    chfl_atom_free(atom);
-    chfl_frame_free(frame);
+    chfl_free(atom);
+    chfl_free(frame);
     // [example]
     return 0;
 }

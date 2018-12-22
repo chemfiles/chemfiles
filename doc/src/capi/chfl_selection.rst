@@ -15,7 +15,6 @@
     - :cpp:func:`chfl_selection_string`
     - :cpp:func:`chfl_selection_evaluate`
     - :cpp:func:`chfl_selection_matches`
-    - :cpp:func:`chfl_selection_free`
 
     --------------------------------------------------------------------
 
@@ -31,7 +30,6 @@
 
 .. doxygenfunction:: chfl_selection_matches
 
-.. doxygenfunction:: chfl_selection_free
 
 .. doxygenstruct:: chfl_match
     :members:

@@ -12,7 +12,7 @@ int main() {
 
     /* We can use the 42nd frame here */
 
-    chfl_frame_free(frame);
+    chfl_free(frame);
     chfl_trajectory_close(trajectory);
     // [example]
     return 0;

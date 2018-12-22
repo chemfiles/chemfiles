@@ -14,7 +14,7 @@ int main() {
     chfl_atom_vdw_radius(atom, &radius);
     assert(fabs(radius - 2.4) < 1e-15);
 
-    chfl_atom_free(atom);
+    chfl_free(atom);
     // [example]
     return 0;
 }

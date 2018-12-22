@@ -13,8 +13,8 @@ int main() {
         /* handle error */
     }
 
-    chfl_topology_free(topology);
-    chfl_frame_free(frame);
+    chfl_free(topology);
+    chfl_free(frame);
     // [example]
     return 0;
 }

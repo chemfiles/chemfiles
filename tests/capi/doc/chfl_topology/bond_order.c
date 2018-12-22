@@ -13,7 +13,7 @@ int main() {
     for (size_t i=0; i<5; i++) {
         chfl_topology_add_atom(topology, atom);
     }
-    chfl_atom_free(atom);
+    chfl_free(atom);
 
     chfl_topology_bond_with_order(topology, 0, 1, CHFL_BOND_SINGLE);
     chfl_topology_bond_with_order(topology, 2, 3, CHFL_BOND_DOUBLE);
@@ -26,7 +26,7 @@ int main() {
     chfl_topology_bond_order(topology, 2, 3, &order);
     assert(order == CHFL_BOND_DOUBLE);
 
-    chfl_topology_free(topology);
+    chfl_free(topology);
     // [example]
     return 0;
 }

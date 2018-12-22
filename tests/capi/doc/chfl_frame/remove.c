@@ -21,7 +21,7 @@ int main() {
     chfl_frame_atoms_count(frame, &atoms);
     assert(atoms == 39);
 
-    chfl_frame_free(frame);
+    chfl_free(frame);
     // [example]
     return 0;
 }

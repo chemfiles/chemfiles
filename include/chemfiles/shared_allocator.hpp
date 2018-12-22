@@ -26,7 +26,7 @@ struct shared_metadata {
 ///
 /// This is used in the C API to ensure that when taking pointers to
 /// atoms/residues/cell inside a frame/topology, the frame/topology is keept
-/// alive even if the user call chfl_xxx_free.
+/// alive even if the user calls chfl_free.
 class shared_allocator {
 public:
     shared_allocator() = default;
@@ -62,6 +62,9 @@ public:
 
     /// Decrease the reference count of `ptr`, and delete it if needed.
     static void free(const void* ptr) {
+        if (ptr == nullptr) {
+            return;
+        }
         auto instance = instance_.lock();
         auto it = instance->map_.find(ptr);
         if (it == instance->map_.end()) {

@@ -12,7 +12,7 @@ int main() {
 
     /* Reading from the trajectory use the cell */
 
-    chfl_cell_free(cell);
+    chfl_free(cell);
     chfl_trajectory_close(trajectory);
     // [example]
     return 0;

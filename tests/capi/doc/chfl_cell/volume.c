@@ -13,7 +13,7 @@ int main() {
     chfl_cell_volume(cell, &volume);
     assert(volume == 1000);
 
-    chfl_cell_free(cell);
+    chfl_free(cell);
     // [example]
     return 0;
 }

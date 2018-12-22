@@ -39,6 +39,11 @@ int main() {
         free(matches);
     }
 
+    chfl_free(frame);
+    chfl_free(selection);
+    chfl_trajectory_close(input);
+    chfl_trajectory_close(output);
+
     return 0;
 }
 

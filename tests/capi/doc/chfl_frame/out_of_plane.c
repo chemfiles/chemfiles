@@ -20,8 +20,8 @@ int main() {
     chfl_frame_out_of_plane(frame, 0, 1, 2, 3, &distance);
     assert(fabs(distance - 2) < 1e-12);
 
-    chfl_atom_free(atom);
-    chfl_frame_free(frame);
+    chfl_free(atom);
+    chfl_free(frame);
     // [example]
     return 0;
 }

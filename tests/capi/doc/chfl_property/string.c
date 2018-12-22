@@ -13,7 +13,7 @@ int main() {
     chfl_property_get_string(property, value, sizeof(value));
     assert(strcmp(value, "a great property") == 0);
 
-    chfl_property_free(property);
+    chfl_free(property);
     // [example]
     return 0;
 }

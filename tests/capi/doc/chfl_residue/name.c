@@ -14,7 +14,7 @@ int main() {
     chfl_residue_name(residue, name, sizeof(name));
     assert(strcmp(name, "water") == 0);
 
-    chfl_residue_free(residue);
+    chfl_free(residue);
     // [example]
     return 0;
 }

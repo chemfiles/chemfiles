@@ -18,7 +18,7 @@ int main() {
     // Out of diagonal terms are zero
     assert(matrix[2][1] == 0);
 
-    chfl_cell_free(cell);
+    chfl_free(cell);
     // [example]
     return 0;
 }
