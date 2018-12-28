@@ -94,7 +94,7 @@ extern "C" chfl_status chfl_frame_add_atom(
 extern "C" chfl_status chfl_frame_remove(CHFL_FRAME* const frame, uint64_t i) {
     CHECK_POINTER(frame);
     CHFL_ERROR_CATCH(
-        frame->remove(static_cast<size_t>(i));
+        frame->remove(checked_cast(i));
     )
 }
 
