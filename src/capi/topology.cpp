@@ -255,10 +255,9 @@ extern "C" chfl_status chfl_topology_bond_order( const CHFL_TOPOLOGY* const topo
     CHECK_POINTER(order);
 
     CHFL_ERROR_CATCH(
-        *order = static_cast<chfl_bond_order>(topology->bond_order(
-            static_cast<size_t>(i),
-            static_cast<size_t>(j)
-        ));
+        *order = static_cast<chfl_bond_order>(
+            topology->bond_order(checked_cast(i), checked_cast(j))
+        );
     )
 }
 
