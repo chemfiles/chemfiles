@@ -11,7 +11,7 @@ from glob import glob
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 ERRORS = 0
 
-FUNCTIONS = {
+PARSING_FUNCTIONS = {
     'stof': 'parse<double>',
     'stod': 'parse<double>',
     'stold': 'parse<double>',
@@ -22,6 +22,10 @@ FUNCTIONS = {
     'stoull': 'parse<size_t>',
 }
 
+CAPI_FUNCTIONS = {
+    'static_cast<size_t>': 'checked_cast'
+}
+
 
 def error(message):
     global ERRORS
@@ -29,10 +33,10 @@ def error(message):
     print(message)
 
 
-def check_code(path):
+def check_code(path, replacements):
     with open(path) as fd:
         for i, line in enumerate(fd):
-            for bad, replacement in FUNCTIONS.items():
+            for bad, replacement in replacements.items():
                 if bad in line:
                     error("Please replace '{}' by '{}' at {}:{}".format(
                         bad, replacement, os.path.relpath(path), i
@@ -43,16 +47,19 @@ if __name__ == '__main__':
     for file in glob(os.path.join(ROOT, "include", "chemfiles", "*.hpp")):
         if file.endswith("utils.hpp"):
             continue
-        check_code(file)
+        check_code(file, PARSING_FUNCTIONS)
 
     for file in glob(os.path.join(ROOT, "include", "chemfiles", "*", "*.hpp")):
-        check_code(file)
+        check_code(file, PARSING_FUNCTIONS)
 
     for file in glob(os.path.join(ROOT, "src", "*.cpp")):
-        check_code(file)
+        check_code(file, PARSING_FUNCTIONS)
 
     for file in glob(os.path.join(ROOT, "src", "*", "*.cpp")):
-        check_code(file)
+        check_code(file, PARSING_FUNCTIONS)
+
+    for file in glob(os.path.join(ROOT, "src", "capi", "*.cpp")):
+        check_code(file, CAPI_FUNCTIONS)
 
     if ERRORS != 0:
         sys.exit(1)
