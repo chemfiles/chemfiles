@@ -63,7 +63,7 @@ void MOL2Format::read(Frame& frame) {
 
     const auto counts = split(line, ' ');
 
-    size_t natoms = parse<size_t>(counts[0]);
+    auto natoms = parse<size_t>(counts[0]);
     size_t nbonds = 0;
 
     if (counts.size() >= 2) {
@@ -72,7 +72,7 @@ void MOL2Format::read(Frame& frame) {
 
     residues_.clear();
     frame.resize(0);
-    frame.reserve(static_cast<size_t>(natoms));
+    frame.reserve(natoms);
 
     // Skip a line
     file_->readline();
@@ -85,9 +85,9 @@ void MOL2Format::read(Frame& frame) {
         line = trim(file_->readline());
 
         if (line == "@<TRIPOS>ATOM") {
-            read_atoms(frame, static_cast<size_t>(natoms), charges);
+            read_atoms(frame, natoms, charges);
         } else if (line == "@<TRIPOS>BOND") {
-            read_bonds(frame, static_cast<size_t>(nbonds));
+            read_bonds(frame, nbonds);
         } else if (line == "@<TRIPOS>CRYSIN") {
             auto cryst = file_->readline();
 
@@ -239,16 +239,10 @@ std::streampos forward(TextFile& file) {
             }
 
             read_until(file, "@<TRIPOS>ATOM");
-            file.readlines(static_cast<size_t>(natoms));
-
-            if (nbonds < 0) {
-                throw format_error(
-                    "number of bonds can not be negative in '{}'", file.path()
-                );
-            }
+            file.readlines(natoms);
 
             read_until(file, "@<TRIPOS>BOND");
-            file.readlines(static_cast<size_t>(nbonds));
+            file.readlines(nbonds);
 
             return pos;
         } catch (const Error&) {
