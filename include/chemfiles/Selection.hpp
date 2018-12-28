@@ -104,9 +104,9 @@ class CHFL_EXPORT Selection final {
 public:
     /// Create a selection using the given string.
     ///
-    /// @example{tests/doc/selection/selection.cpp}
-    ///
     /// @throws SelectionError if there is a error in the selection string
+    ///
+    /// @example{tests/doc/selection/selection.cpp}
     explicit Selection(std::string selection);
 
     ~Selection();
@@ -125,9 +125,9 @@ public:
     /// Evaluates a selection of size 1 on a given `frame`. This function
     /// returns the list of atomic indexes in the frame matching this selection.
     ///
-    /// @example{tests/doc/selection/list.cpp}
-    ///
     /// @throw SelectionError if the selection size is not 1.
+    ///
+    /// @example{tests/doc/selection/list.cpp}
     std::vector<size_t> list(const Frame& frame) const;
 
     /// Get the size of the selection, *i.e.* the number of atoms selected
