@@ -32,8 +32,8 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom_copy(const CHFL_ATOM* atom);
 /// Get access to the atom at the given `index` from a `frame`.
 ///
 /// Any modification to the atom will be reflected in the `frame`. The `frame`
-/// will be kept alive, even if `chfl_free` is called, until `chfl_free` is also
-/// called on the pointer returned by this function.
+/// will be kept alive, even if `chfl_free(frame)` is called, until `chfl_free`
+/// is also called on the pointer returned by this function.
 ///
 /// The pointer returned by this function points directly inside the frame, and
 /// will be invalidated if any of the following function is called on the frame:
@@ -50,14 +50,14 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom_copy(const CHFL_ATOM* atom);
 /// @example{tests/capi/doc/chfl_atom/from_frame.c}
 ///
 /// @return A pointer to the atom, or NULL in case of error or if `index` is out
-///         of bounds. You can use `chfl_last_error` to learn about the error.
+/// of bounds. You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_ATOM* chfl_atom_from_frame(CHFL_FRAME* frame, uint64_t index);
 
 /// Get access to the atom at the given `index` from a `topology`
 ///
 /// Any modification to the atom will be reflected in the `topology`. The
-/// `topology` will be kept alive, even if `chfl_free` is called, until
-/// `chfl_free` is also called on the pointer returned by this function.
+/// `topology` will be kept alive, even if `chfl_free(topology)` is called,
+/// until `chfl_free` is also called on the pointer returned by this function.
 ///
 /// The pointer returned by this function points directly inside the topology,
 /// and will be invalidated if any of the following function is called on the
@@ -71,9 +71,9 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom_from_frame(CHFL_FRAME* frame, uint64_t index);
 /// if the pointer if invalidated, it stills needs to be released with
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_atom/from_topology.c}
-/// @return A pointer to the atom, or NULL in case of error or if `index` is out
-///         of bounds. You can use `chfl_last_error` to learn about the error.
+/// @example{tests/capi/doc/chfl_atom/from_topology.c} @return A pointer to the
+/// atom, or NULL in case of error or if `index` is out of bounds. You can use
+/// `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_ATOM* chfl_atom_from_topology(
     CHFL_TOPOLOGY* topology, uint64_t index
 );

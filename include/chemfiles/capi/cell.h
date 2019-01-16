@@ -54,21 +54,14 @@ CHFL_EXPORT CHFL_CELL* chfl_cell_triclinic(
 /// Get access to the cell of a `frame`
 ///
 /// Any modification to the cell will be reflected in the `frame`. The `frame`
-/// will be kept alive, even if `chfl_free` is called, until `chfl_free` is also
-/// called on the pointer returned by this function.
+/// will be kept alive, even if `chfl_free(frame)` is called, until `chfl_free`
+/// is also called on the pointer returned by this function.
 ///
-/// The pointer returned by this function points directly inside the frame, and
-/// will be invalidated if any of the following function is called on the frame:
+/// If `chfl_frame_set_cell` is called, this pointer will point to the new cell.
 ///
-/// - `chfl_frame_set_cell`
-///
-/// Calling any function on an invalidated pointer is undefined behavior. Even
-/// if the pointer if invalidated, it stills needs to be released with
-/// `chfl_free`.
-///
-/// @example{tests/capi/doc/chfl_cell/from_frame.c}
-/// @return A pointer to the unit cell, or NULL in case of error. You can use
-///         `chfl_last_error` to learn about the error.
+/// @example{tests/capi/doc/chfl_cell/from_frame.c} @return A pointer to the
+/// unit cell, or NULL in case of error. You can use `chfl_last_error` to learn
+/// about the error.
 CHFL_EXPORT CHFL_CELL* chfl_cell_from_frame(CHFL_FRAME* frame);
 
 /// Get a copy of a `cell`.

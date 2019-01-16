@@ -21,16 +21,15 @@ CHFL_EXPORT CHFL_TOPOLOGY* chfl_topology(void);
 
 /// Get access to the topology of a `frame`.
 ///
-/// The `frame` will be kept alive, even if `chfl_free` is called,
-/// until `chfl_free` is also called on the pointer returned by this
-/// function.
+/// The `frame` will be kept alive, even if `chfl_free(frame)` is called, until
+/// `chfl_free` is also called on the pointer returned by this function.
 ///
 /// If `chfl_frame_set_topology` is called, this pointer will point to the new
 /// topology.
 ///
-/// @example{tests/capi/doc/chfl_topology/from_frame.c}
-/// @return A pointer to the topology, or NULL in case of error.
-///         You can use `chfl_last_error` to learn about the error.
+/// @example{tests/capi/doc/chfl_topology/from_frame.c} @return A pointer to the
+/// topology, or NULL in case of error.  You can use `chfl_last_error` to learn
+/// about the error.
 CHFL_EXPORT const CHFL_TOPOLOGY* chfl_topology_from_frame(const CHFL_FRAME* frame);
 
 /// Get a copy of a `topology`.
