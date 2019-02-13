@@ -590,7 +590,12 @@ Record get_record(const std::string& line) {
                rec == "CAVEAT" || rec == "COMPND" || rec == "EXPDTA" ||
                rec == "KEYWDS" || rec == "OBSLTE" || rec == "SOURCE" ||
                rec == "SPLIT " || rec == "SPRSDE" || rec == "JRNL  " ||
-               rec == "SEQRES" || rec == "HET   " || rec == "REVDAT" ) {
+               rec == "SEQRES" || rec == "HET   " || rec == "REVDAT" ||
+               rec == "SCALE1" || rec == "SCALE2" || rec == "SCALE3" ||
+               rec == "ORIGX1" || rec == "ORIGX2" || rec == "ORIGX3" ||
+               rec == "SCALE1" || rec == "SCALE2" || rec == "SCALE3" ||
+               rec == "ANISOU" || rec == "SITE  " || rec == "FORMUL" ||
+               rec == "DBREF " || rec == "HETNAM" || rec == "HETSYN") {
         return Record::IGNORED_;
     } else {
         return Record::UNKNOWN_;
@@ -640,7 +645,7 @@ void PDBFormat::write(const Frame& frame) {
         auto altloc = frame[i].get<Property::STRING>("altloc").value_or(" ");
         if (altloc.length() > 1) {
             warning(
-                "altloc '{}' too long for PDB format, it will be truncated.",
+                "altloc '{}' is too long for PDB format, it will be truncated.",
                 altloc
             );
             altloc = altloc[0];
