@@ -69,13 +69,14 @@ if(${CMAKE_CXX_COMPILER_ID} MATCHES "PGI")
 endif()
 
 macro(add_warning_flag _flag_)
-    CHECK_CXX_COMPILER_FLAG("${_flag_}" CXX_SUPPORTS${_flag_})
-    CHECK_C_COMPILER_FLAG("${_flag_}" CC_SUPPORTS${_flag_})
-    if(CXX_SUPPORTS${_flag_})
+    string(REPLACE "++" "xx" _cleaned_flag_ ${_flag_})
+    CHECK_CXX_COMPILER_FLAG("${_flag_}" CXX_SUPPORTS${_cleaned_flag_})
+    CHECK_C_COMPILER_FLAG("${_flag_}" CC_SUPPORTS${_cleaned_flag_})
+    if(CXX_SUPPORTS${_cleaned_flag_})
         set(CHEMFILES_CXX_WARNINGS "${CHEMFILES_CXX_WARNINGS} ${_flag_}")
     endif()
 
-    if(CC_SUPPORTS${_flag_})
+    if(CC_SUPPORTS${_cleaned_flag_})
         set(CHEMFILES_C_WARNINGS "${CHEMFILES_C_WARNINGS} ${_flag_}")
     endif()
 endmacro()
@@ -159,7 +160,7 @@ else()
 
     # Disable some warning implied by -Weverything
     # -Weverything is not activated by default, but adding these flags help
-    # when adding it manually to check for new warnings 
+    # when adding it manually to check for new warnings
     add_warning_flag("-Wno-c++98-compat")
     add_warning_flag("-Wno-c++98-compat-pedantic")
     add_warning_flag("-Wno-weak-vtables")
