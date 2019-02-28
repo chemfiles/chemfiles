@@ -22,6 +22,12 @@ struct shared_metadata {
     std::function<void(void)> deleter;
 };
 
+namespace {
+    [[noreturn]] inline void UNINITIALIZED_DELETER() {
+        throw chemfiles::error("internal error: uninitialized deleter called");
+    }
+}
+
 /// An allocator with shared_ptr like semantics, working with raw pointers.
 ///
 /// This is used in the C API to ensure that when taking pointers to
@@ -39,8 +45,9 @@ public:
     /// value of type T with the given arguments.
     template<class T, typename ... Args>
     static T* make_shared(Args&& ... args) {
+        auto instance = instance_.lock();
         auto ptr = new T{std::forward<Args>(args)...};
-        instance_.lock()->insert_new(ptr);
+        instance->insert_new(ptr);
         return ptr;
     }
 
@@ -57,6 +64,8 @@ public:
 
     template<class T, class U>
     static const T* shared_ptr(U* ptr, const T* element) {
+        // const_cast is OK here, since we return a const T* anyway, and only
+        // use the adress of the pointer to create a new shared_ptr
         return shared_ptr(ptr, const_cast<T*>(element));
     }
 
@@ -66,8 +75,8 @@ public:
             return;
         }
         auto instance = instance_.lock();
-        auto it = instance->map_.find(ptr);
-        if (it == instance->map_.end()) {
+        auto it = instance->pointers_.find(ptr);
+        if (it == instance->pointers_.end()) {
             throw chemfiles::error(
                 "unknown pointer passed to shared_allocator::free: {}", ptr
             );
@@ -76,17 +85,18 @@ public:
         count--;
         if (count == 0) {
             instance->metadata_.at(it->second).deleter();
+            instance->metadata_.at(it->second).deleter = UNINITIALIZED_DELETER;
             instance->unused_.emplace_back(it->second);
 
             // Remove any pointer that was using the same metadata block
             auto to_remove = std::vector<const void*>();
-            for (const auto& registered: instance->map_) {
+            for (const auto& registered: instance->pointers_) {
                 if (registered.second == it->second) {
                     to_remove.emplace_back(registered.first);
                 }
             }
             for (auto remove: to_remove) {
-                instance->map_.erase(remove);
+                instance->pointers_.erase(remove);
             }
         } else if (count < 0) {
             throw chemfiles::error(
@@ -100,7 +110,7 @@ private:
     void insert_new(T* ptr) {
         size_t id = get_unused_metadata();
         metadata_[id] = shared_metadata{1, [ptr](){ delete ptr; }};
-        auto inserted = map_.emplace(ptr, id);
+        auto inserted = pointers_.emplace(ptr, id);
         if (!inserted.second) {
             throw chemfiles::error(
                 "internal error: pointer at {} is already managed by "
@@ -110,15 +120,15 @@ private:
     }
 
     void insert_shared(const void* ptr, void* element) {
-        auto it = map_.find(ptr);
-        if (it == map_.end()) {
+        auto it = pointers_.find(ptr);
+        if (it == pointers_.end()) {
             // the main pointer is not a shared pointer
             throw chemfiles::error(
                 "internal error: pointer at {} is not managed by "
                 "shared_allocator", ptr
             );
         }
-        auto inserted = map_.emplace(element, it->second);
+        auto inserted = pointers_.emplace(element, it->second);
         if (!inserted.second && (inserted.first->second != it->second)) {
             // the element pointer is already registered, but with a different
             // main pointer
@@ -131,8 +141,8 @@ private:
     }
 
     shared_metadata& metadata(const void* ptr) {
-        auto it = map_.find(ptr);
-        if (it != map_.end()) {
+        auto it = pointers_.find(ptr);
+        if (it != pointers_.end()) {
             return metadata_.at(it->second);
         } else {
             throw chemfiles::error(
@@ -149,16 +159,16 @@ private:
             return id;
         } else {
             // create a new one
-            metadata_.emplace_back(0, [](){ throw chemfiles::error("uninitialized deleter");});
+            metadata_.emplace_back(0, UNINITIALIZED_DELETER);
             return metadata_.size() - 1;
         }
     }
 
-    /// A map of pointer adresses -> indexes of metadata in metadatas_
-    std::unordered_map<const void*, size_t> map_;
+    /// A map of pointer adresses -> indexes of metadata in metadata_
+    std::unordered_map<const void*, size_t> pointers_;
     /// Metadata for all known pointers
     std::vector<shared_metadata> metadata_;
-    /// unused indexes in metadatas_ that can be re-used. This is set by
+    /// unused indexes in metadata_ that can be re-used. This is set by
     /// free and used by get_unused_count.
     std::vector<size_t> unused_;
 
