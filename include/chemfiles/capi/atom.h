@@ -42,6 +42,8 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom_copy(const CHFL_ATOM* atom);
 /// - `chfl_frame_add_atom`
 /// - `chfl_frame_remove`
 /// - `chfl_frame_set_topology`
+/// - `chfl_trajectory_read`
+/// - `chfl_trajectory_read_step`
 ///
 /// Calling any function on an invalidated pointer is undefined behavior. Even
 /// if the pointer if invalidated, it stills needs to be released with
