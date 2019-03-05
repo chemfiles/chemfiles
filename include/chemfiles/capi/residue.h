@@ -42,9 +42,15 @@ CHFL_EXPORT CHFL_RESIDUE* chfl_residue_with_id(const char* name, uint64_t resid)
 /// unless the pointer returned by this function is `NULL`.
 ///
 /// The pointer returned by this function points directly inside the topology,
-/// and will be invalidated if `chfl_topology_add_residue` is called. Calling
-/// any function on an invalidated pointer is undefined behavior. Even if the
-/// pointer if invalidated, it stills needs to be released with `chfl_free`.
+/// and will be invalidated if any of the following function is called on the
+/// topology or the frame containing the topology:
+///
+/// -  `chfl_frame_add_residue`
+/// -  `chfl_topology_add_residue`
+///
+/// Calling any function on an invalidated pointer is undefined behavior. Even
+/// if the pointer if invalidated, it stills needs to be released with
+/// `chfl_free`.
 ///
 /// @example{capi/chfl_residue/from_topology.c}
 /// @return A pointer to the residue, or NULL in case of error. You can use
@@ -63,9 +69,15 @@ CHFL_EXPORT const CHFL_RESIDUE* chfl_residue_from_topology(
 /// until `chfl_free` is also called on the pointer returned by this function.
 ///
 /// The pointer returned by this function points directly inside the topology,
-/// and will be invalidated if `chfl_topology_add_residue` is called. Calling
-/// any function on an invalidated pointer is undefined behavior. Even if the
-/// pointer if invalidated, it stills needs to be released with `chfl_free`.
+/// and will be invalidated if any of the following function is called on the
+/// topology or the frame containing the topology:
+///
+/// -  `chfl_frame_add_residue`
+/// -  `chfl_topology_add_residue`
+///
+/// Calling any function on an invalidated pointer is undefined behavior. Even
+/// if the pointer if invalidated, it stills needs to be released with
+/// `chfl_free`.
 ///
 /// @example{capi/chfl_residue/for_atom.c}
 /// @return A pointer to the residue, or NULL in case of error. You can use
