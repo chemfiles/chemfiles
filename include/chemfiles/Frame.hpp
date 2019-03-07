@@ -94,7 +94,7 @@ public:
     ///
     /// @example{tests/doc/frame/cell.cpp}
     void set_cell(UnitCell cell) {
-        cell_ = cell;
+        cell_ = std::move(cell);
     }
 
     /// Get the number of atoms in this frame
