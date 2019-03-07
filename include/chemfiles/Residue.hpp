@@ -20,17 +20,17 @@ namespace chemfiles {
 /// Iterating over a `Residue` gives the indexes of the atoms in the associated
 /// `Topology`.
 ///
-/// @example{tests/doc/residue/iterate.cpp}
+/// @example{residue/iterate.cpp}
 class CHFL_EXPORT Residue final {
 public:
     /// Create a new residue with a given `name` and no residue id.
     ///
-    /// @example{tests/doc/residue/residue-1.cpp}
+    /// @example{residue/residue-1.cpp}
     explicit Residue(std::string name);
 
     /// Create a new residue with a given `name` and residue id `resid`.
     ///
-    /// @example{tests/doc/residue/residue-2.cpp}
+    /// @example{residue/residue-2.cpp}
     Residue(std::string name, uint64_t resid);
 
     ~Residue() = default;
@@ -41,7 +41,7 @@ public:
 
     /// Get the name of the residue
     ///
-    /// @example{tests/doc/residue/name.cpp}
+    /// @example{residue/name.cpp}
     const std::string& name() const {
         return name_;
     }
@@ -53,14 +53,14 @@ public:
     /// close to C++17 ``std::optional``.
     /// @endverbatim
     ///
-    /// @example{tests/doc/residue/id.cpp}
+    /// @example{residue/id.cpp}
     optional<uint64_t> id() const {
         return id_;
     }
 
     /// Get the size of the residue, i.e. the number of atoms in this residue.
     ///
-    /// @example{tests/doc/residue/size.cpp}
+    /// @example{residue/size.cpp}
     size_t size() const {
         return atoms_.size();
     }
@@ -69,12 +69,12 @@ public:
     ///
     /// If the atom is already in the residue, this does nothing.
     ///
-    /// @example{tests/doc/residue/add_atom.cpp}
+    /// @example{residue/add_atom.cpp}
     void add_atom(size_t i);
 
     /// Check if the residue contains a given atom with index `i`
     ///
-    /// @example{tests/doc/residue/contains.cpp}
+    /// @example{residue/contains.cpp}
     bool contains(size_t i) const;
 
     using const_iterator = sorted_set<size_t>::const_iterator;
@@ -88,7 +88,7 @@ public:
     /// iterated over to list the properties of the residue, or directly
     /// accessed.
     ///
-    /// @example{tests/doc/frame/properties.cpp}
+    /// @example{frame/properties.cpp}
     const property_map& properties() const {
         return properties_;
     }
@@ -97,7 +97,7 @@ public:
     /// `value`. If a property with this name already exist, it is replaced with
     /// the new value.
     ///
-    /// @example{tests/doc/residue/property.cpp}
+    /// @example{residue/property.cpp}
     void set(std::string name, Property value) {
         properties_.set(std::move(name), std::move(value));
     }
@@ -112,7 +112,7 @@ public:
     /// close to C++17 ``std::optional``.
     /// @endverbatim
     ///
-    /// @example{tests/doc/residue/property.cpp}
+    /// @example{residue/property.cpp}
     optional<const Property&> get(const std::string& name) const {
         return properties_.get(name);
     }
@@ -131,7 +131,7 @@ public:
     /// close to C++17 ``std::optional``.
     /// @endverbatim
     ///
-    /// @example{tests/doc/residue/property.cpp}
+    /// @example{residue/property.cpp}
     template<Property::Kind kind>
     optional<typename property_metadata<kind>::type> get(const std::string& name) const {
         return properties_.get<kind>(name);

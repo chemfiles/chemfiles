@@ -27,7 +27,7 @@ typedef enum {  // NOLINT: this is both a C and C++ file
 /// The caller of this function should free the associated memory using
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_cell/chfl_cell.c}
+/// @example{capi/chfl_cell/chfl_cell.c}
 /// @return A pointer to the unit cell, or NULL in case of error. You can use
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_CELL* chfl_cell(const chfl_vector3d lengths);
@@ -44,7 +44,7 @@ CHFL_EXPORT CHFL_CELL* chfl_cell(const chfl_vector3d lengths);
 /// The caller of this function should free the associated memory using
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_cell/triclinic.c}
+/// @example{capi/chfl_cell/triclinic.c}
 /// @return A pointer to the unit cell, or NULL in case of error. You can use
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_CELL* chfl_cell_triclinic(
@@ -59,7 +59,7 @@ CHFL_EXPORT CHFL_CELL* chfl_cell_triclinic(
 ///
 /// If `chfl_frame_set_cell` is called, this pointer will point to the new cell.
 ///
-/// @example{tests/capi/doc/chfl_cell/from_frame.c} @return A pointer to the
+/// @example{capi/chfl_cell/from_frame.c} @return A pointer to the
 /// unit cell, or NULL in case of error. You can use `chfl_last_error` to learn
 /// about the error.
 CHFL_EXPORT CHFL_CELL* chfl_cell_from_frame(CHFL_FRAME* frame);
@@ -69,14 +69,14 @@ CHFL_EXPORT CHFL_CELL* chfl_cell_from_frame(CHFL_FRAME* frame);
 /// The caller of this function should free the associated memory using
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_cell/copy.c}
+/// @example{capi/chfl_cell/copy.c}
 /// @return A pointer to the new cell, or NULL in case of error. You can use
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_CELL* chfl_cell_copy(const CHFL_CELL* cell);
 
 /// Get the unit cell volume of `cell` in the double pointed to by `volume`.
 ///
-/// @example{tests/capi/doc/chfl_cell/volume.c}
+/// @example{capi/chfl_cell/volume.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_volume(
@@ -85,7 +85,7 @@ CHFL_EXPORT chfl_status chfl_cell_volume(
 
 /// Get the unit cell lengths in `lengths`. The cell lengths are in Angstroms.
 ///
-/// @example{tests/capi/doc/chfl_cell/lengths.c}
+/// @example{capi/chfl_cell/lengths.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_lengths(
@@ -96,7 +96,7 @@ CHFL_EXPORT chfl_status chfl_cell_lengths(
 ///
 /// The cell lengths should be in Angstroms.
 ///
-/// @example{tests/capi/doc/chfl_cell/set_lengths.c}
+/// @example{capi/chfl_cell/set_lengths.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_set_lengths(
@@ -105,7 +105,7 @@ CHFL_EXPORT chfl_status chfl_cell_set_lengths(
 
 /// Get the cell angles in `angles`. The cell angles are in degrees.
 ///
-/// @example{tests/capi/doc/chfl_cell/angles.c}
+/// @example{capi/chfl_cell/angles.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_angles(
@@ -118,7 +118,7 @@ CHFL_EXPORT chfl_status chfl_cell_angles(
 /// which is not triclinic (does not have the `CHFL_CELL_TRICLINIC` shape) is
 /// an error.
 ///
-/// @example{tests/capi/doc/chfl_cell/set_angles.c}
+/// @example{capi/chfl_cell/set_angles.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_set_angles(
@@ -136,7 +136,7 @@ CHFL_EXPORT chfl_status chfl_cell_set_angles(
 /// |  0     0    c_z |
 /// ```
 ///
-/// @example{tests/capi/doc/chfl_cell/matrix.c}
+/// @example{capi/chfl_cell/matrix.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_matrix(
@@ -145,7 +145,7 @@ CHFL_EXPORT chfl_status chfl_cell_matrix(
 
 /// Get the unit `cell` shape in `shape`.
 ///
-/// @example{tests/capi/doc/chfl_cell/shape.c}
+/// @example{capi/chfl_cell/shape.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_shape(
@@ -154,7 +154,7 @@ CHFL_EXPORT chfl_status chfl_cell_shape(
 
 /// Set the unit `cell` shape to `shape`.
 ///
-/// @example{tests/capi/doc/chfl_cell/set_shape.c}
+/// @example{capi/chfl_cell/set_shape.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_set_shape(
@@ -163,7 +163,7 @@ CHFL_EXPORT chfl_status chfl_cell_set_shape(
 
 /// Wrap a `vector` in the unit `cell`.
 ///
-/// @example{tests/capi/doc/chfl_cell/wrap.c}
+/// @example{capi/chfl_cell/wrap.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_cell_wrap(
