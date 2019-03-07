@@ -191,14 +191,10 @@ foreach(test_file IN LISTS doctest_files)
     chfl_cpp_doctest(${test_file})
 endforeach(test_file)
 
-file(GLOB_RECURSE capi_doctest_files ${CMAKE_CURRENT_SOURCE_DIR}/capi/doc/**.c)
+file(GLOB_RECURSE capi_doctest_files ${CMAKE_CURRENT_SOURCE_DIR}/doc/capi/**.c)
 foreach(test_file IN LISTS capi_doctest_files)
     chfl_c_doctest(${test_file})
 endforeach(test_file)
-
-foreach(test IN LISTS CHEMFILES_IGNORED_TESTS)
-    set_tests_properties(${test} PROPERTIES WILL_FAIL TRUE)
-endforeach(test)
 
 # Write sample configuration files for tests
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/../.chemfiles.toml

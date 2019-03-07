@@ -23,7 +23,7 @@ namespace selections {
 /// match depends on the associated selection, and can vary from 1 to
 /// `MAX_MATCH_SIZE`.
 ///
-/// @example{tests/doc/selection/match.cpp}
+/// @example{selection/match.cpp}
 class CHFL_EXPORT Match final {
 public:
     /// Maximal number of atoms in a match
@@ -106,7 +106,11 @@ public:
     ///
     /// @throws SelectionError if there is a error in the selection string
     ///
-    /// @example{tests/doc/selection/selection.cpp}
+    /// @verbatim embed:rst:leading-slashes
+    /// .. chfl_example:: /../../tests/doc/selection/selection.cpp
+    /// @endverbatim
+    ///
+    /// @example{selection/selection.cpp}
     explicit Selection(std::string selection);
 
     ~Selection();
@@ -119,7 +123,7 @@ public:
     /// Evaluates the selection on a given `frame`. This function returns the
     /// list of matches in the frame for this selection.
     ///
-    /// @example{tests/doc/selection/evaluate.cpp}
+    /// @example{selection/evaluate.cpp}
     std::vector<Match> evaluate(const Frame& frame) const;
 
     /// Evaluates a selection of size 1 on a given `frame`. This function
@@ -127,18 +131,18 @@ public:
     ///
     /// @throw SelectionError if the selection size is not 1.
     ///
-    /// @example{tests/doc/selection/list.cpp}
+    /// @example{selection/list.cpp}
     std::vector<size_t> list(const Frame& frame) const;
 
     /// Get the size of the selection, *i.e.* the number of atoms selected
     /// together.
     ///
-    /// @example{tests/doc/selection/size.cpp}
+    /// @example{selection/size.cpp}
     size_t size() const;
 
     /// Get the string used to build this selection
     ///
-    /// @example{tests/doc/selection/string.cpp}
+    /// @example{selection/string.cpp}
     std::string string() const {
         return selection_;
     }

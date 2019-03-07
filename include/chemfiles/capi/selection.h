@@ -14,7 +14,7 @@ extern "C" {
 /// The caller of this function should free the associated memory using
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_selection/chfl_selection.c}
+/// @example{capi/chfl_selection/chfl_selection.c}
 /// @return A pointer to the selection, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_SELECTION* chfl_selection(const char* selection);
@@ -27,7 +27,7 @@ CHFL_EXPORT CHFL_SELECTION* chfl_selection(const char* selection);
 /// The caller of this function should free the associated memory using
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_selection/copy.c}
+/// @example{capi/chfl_selection/copy.c}
 /// @return A pointer to the new selection, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_SELECTION* chfl_selection_copy(const CHFL_SELECTION* selection);
@@ -39,7 +39,7 @@ CHFL_EXPORT CHFL_SELECTION* chfl_selection_copy(const CHFL_SELECTION* selection)
 /// 3 for the 'three' and 'angles' contextes and 4 for the 'four' and 'dihedral'
 /// contextes.
 ///
-/// @example{tests/capi/doc/chfl_selection/size.c}
+/// @example{capi/chfl_selection/size.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_selection_size(
@@ -52,7 +52,7 @@ CHFL_EXPORT chfl_status chfl_selection_size(
 /// The buffer size must be passed in `buffsize`. This function will truncate
 /// the selection string to fit in the buffer.
 ///
-/// @example{tests/capi/doc/chfl_selection/string.c}
+/// @example{capi/chfl_selection/string.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_selection_string(
@@ -65,7 +65,7 @@ CHFL_EXPORT chfl_status chfl_selection_string(
 /// Use the `chfl_selection_matches` function to get the matches for this
 /// selection.
 ///
-/// @example{tests/capi/doc/chfl_selection/evaluate.c}
+/// @example{capi/chfl_selection/evaluate.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_selection_evaluate(
@@ -91,7 +91,7 @@ typedef struct {  // NOLINT: this is both a C and C++ file
 ///
 /// The size of the `matches` array must be passed in `n_matches`.
 ///
-/// @example{tests/capi/doc/chfl_selection/matches.c}
+/// @example{capi/chfl_selection/matches.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_selection_matches(

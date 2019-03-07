@@ -14,7 +14,7 @@ extern "C" {
 /// The caller of this function should free the associated memory using
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_atom/chfl_atom.c}
+/// @example{capi/chfl_atom/chfl_atom.c}
 /// @return A pointer to the atom, or NULL in case of error. You can use
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_ATOM* chfl_atom(const char* name);
@@ -24,7 +24,7 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom(const char* name);
 /// The caller of this function should free the associated memory using
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_atom/copy.c}
+/// @example{capi/chfl_atom/copy.c}
 /// @return A pointer to the new atom, or NULL in case of error. You can use
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_ATOM* chfl_atom_copy(const CHFL_ATOM* atom);
@@ -47,7 +47,7 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom_copy(const CHFL_ATOM* atom);
 /// if the pointer if invalidated, it stills needs to be released with
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_atom/from_frame.c}
+/// @example{capi/chfl_atom/from_frame.c}
 ///
 /// @return A pointer to the atom, or NULL in case of error or if `index` is out
 /// of bounds. You can use `chfl_last_error` to learn about the error.
@@ -71,7 +71,7 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom_from_frame(CHFL_FRAME* frame, uint64_t index);
 /// if the pointer if invalidated, it stills needs to be released with
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_atom/from_topology.c} @return A pointer to the
+/// @example{capi/chfl_atom/from_topology.c} @return A pointer to the
 /// atom, or NULL in case of error or if `index` is out of bounds. You can use
 /// `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_ATOM* chfl_atom_from_topology(
@@ -82,7 +82,7 @@ CHFL_EXPORT CHFL_ATOM* chfl_atom_from_topology(
 ///
 /// The mass is given in atomic mass units.
 ///
-/// @example{tests/capi/doc/chfl_atom/mass.c}
+/// @example{capi/chfl_atom/mass.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_mass(const CHFL_ATOM* atom, double* mass);
@@ -91,7 +91,7 @@ CHFL_EXPORT chfl_status chfl_atom_mass(const CHFL_ATOM* atom, double* mass);
 ///
 /// The mass must be in atomic mass units.
 ///
-/// @example{tests/capi/doc/chfl_atom/set_mass.c}
+/// @example{capi/chfl_atom/set_mass.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_set_mass(CHFL_ATOM* atom, double mass);
@@ -100,7 +100,7 @@ CHFL_EXPORT chfl_status chfl_atom_set_mass(CHFL_ATOM* atom, double mass);
 ///
 /// The charge is in number of the electron charge *e*.
 ///
-/// @example{tests/capi/doc/chfl_atom/charge.c}
+/// @example{capi/chfl_atom/charge.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_charge(const CHFL_ATOM* atom, double* charge);
@@ -109,7 +109,7 @@ CHFL_EXPORT chfl_status chfl_atom_charge(const CHFL_ATOM* atom, double* charge);
 ///
 /// The charge must be in number of the electron charge *e*.
 ///
-/// @example{tests/capi/doc/chfl_atom/set_charge.c}
+/// @example{capi/chfl_atom/set_charge.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_set_charge(CHFL_ATOM* atom, double charge);
@@ -119,7 +119,7 @@ CHFL_EXPORT chfl_status chfl_atom_set_charge(CHFL_ATOM* atom, double charge);
 /// The buffer size must be passed in `buffsize`. This function will truncate
 /// the atomic type to fit in the buffer.
 ///
-/// @example{tests/capi/doc/chfl_atom/type.c}
+/// @example{capi/chfl_atom/type.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_type(
@@ -130,7 +130,7 @@ CHFL_EXPORT chfl_status chfl_atom_type(
 ///
 /// `type` must be a null terminated string.
 ///
-/// @example{tests/capi/doc/chfl_atom/set_type.c}
+/// @example{capi/chfl_atom/set_type.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_set_type(CHFL_ATOM* atom, const char* type);
@@ -140,7 +140,7 @@ CHFL_EXPORT chfl_status chfl_atom_set_type(CHFL_ATOM* atom, const char* type);
 /// The buffer size must be passed in `buffsize`. This function will truncate
 /// the name to fit in the buffer.
 ///
-/// @example{tests/capi/doc/chfl_atom/name.c}
+/// @example{capi/chfl_atom/name.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_name(
@@ -151,7 +151,7 @@ CHFL_EXPORT chfl_status chfl_atom_name(
 ///
 /// `name` must be a null terminated string.
 ///
-/// @example{tests/capi/doc/chfl_atom/set_name.c}
+/// @example{capi/chfl_atom/set_name.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_set_name(CHFL_ATOM* atom, const char* name);
@@ -161,7 +161,7 @@ CHFL_EXPORT chfl_status chfl_atom_set_name(CHFL_ATOM* atom, const char* name);
 /// The buffer size must be passed in `buffsize`. This function will truncate
 /// the name to fit in the buffer.
 ///
-/// @example{tests/capi/doc/chfl_atom/full_name.c}
+/// @example{capi/chfl_atom/full_name.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_full_name(
@@ -173,7 +173,7 @@ CHFL_EXPORT chfl_status chfl_atom_full_name(
 ///
 /// If the radius in unknown, this function set `radius` to 0.
 ///
-/// @example{tests/capi/doc/chfl_atom/vdw_radius.c}
+/// @example{capi/chfl_atom/vdw_radius.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_vdw_radius(const CHFL_ATOM* atom, double* radius);
@@ -183,7 +183,7 @@ CHFL_EXPORT chfl_status chfl_atom_vdw_radius(const CHFL_ATOM* atom, double* radi
 ///
 /// If the radius in unknown, this function set `radius` to 0.
 ///
-/// @example{tests/capi/doc/chfl_atom/covalent_radius.c}
+/// @example{capi/chfl_atom/covalent_radius.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* atom, double* radius);
@@ -193,14 +193,14 @@ CHFL_EXPORT chfl_status chfl_atom_covalent_radius(const CHFL_ATOM* atom, double*
 ///
 /// If the atomic number in unknown, this function set `number` to 0.
 ///
-/// @example{tests/capi/doc/chfl_atom/atomic_number.c}
+/// @example{capi/chfl_atom/atomic_number.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_atomic_number(const CHFL_ATOM* atom, uint64_t* number);
 
 /// Get the number of properties associated with this `atom` in `count`.
 ///
-/// @example{tests/capi/doc/chfl_atom/properties_count.c}
+/// @example{capi/chfl_atom/properties_count.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_properties_count(
@@ -216,7 +216,7 @@ CHFL_EXPORT chfl_status chfl_atom_properties_count(
 /// The pointers in `names` are only valid until a new property is added to the
 /// atom with `chfl_atom_set_property`.
 ///
-/// @example{tests/capi/doc/chfl_atom/list_properties.c}
+/// @example{capi/chfl_atom/list_properties.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_list_properties(
@@ -228,7 +228,7 @@ CHFL_EXPORT chfl_status chfl_atom_list_properties(
 /// If a property with the same name already exists, this function override the
 /// existing property with the new one.
 ///
-/// @example{tests/capi/doc/chfl_atom/property.c}
+/// @example{capi/chfl_atom/property.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_atom_set_property(
@@ -242,7 +242,7 @@ CHFL_EXPORT chfl_status chfl_atom_set_property(
 /// The user of this function is responsible to deallocate memory using the
 /// `chfl_free` function.
 ///
-/// @example{tests/capi/doc/chfl_atom/property.c}
+/// @example{capi/chfl_atom/property.c}
 /// @return A pointer to the property, or NULL in case of error. You can use
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_PROPERTY* chfl_atom_get_property(

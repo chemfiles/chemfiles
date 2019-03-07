@@ -31,7 +31,7 @@ public:
     /// the matching value. This check is executed with case-insensitive atom
     /// type: `Na`, `NA`, `nA` and `na` all get the `Na` mass.
     ///
-    /// @example{tests/doc/atom/atom.cpp}
+    /// @example{atom/atom.cpp}
     ///
     /// @param name atomic name for the new atom
     explicit Atom(std::string name = "");
@@ -42,7 +42,7 @@ public:
     /// the matching value. This check is executed with case-insensitive atom
     /// type: `Na`, `NA`, `nA` and `na` all get the `Na` mass.
     ///
-    /// @example{tests/doc/atom/atom.cpp}
+    /// @example{atom/atom.cpp}
     ///
     /// @param name atomic name for the new atom
     /// @param type atomic type for the new atom
@@ -56,12 +56,12 @@ public:
 
     /// Get the atom name.
     ///
-    /// @example{tests/doc/atom/name.cpp}
+    /// @example{atom/name.cpp}
     const std::string& name() const { return name_; }
 
     /// Get the atom type.
     ///
-    /// @example{tests/doc/atom/type.cpp}
+    /// @example{atom/type.cpp}
     const std::string& type() const { return type_; }
 
     /// Get the atom mass.
@@ -70,7 +70,7 @@ public:
     /// To change the default value for a given type, you can use configuration
     /// files.
     ///
-    /// @example{tests/doc/atom/mass.cpp}
+    /// @example{atom/mass.cpp}
     double mass() const { return mass_; }
 
     /// Get the atom charge.
@@ -79,27 +79,27 @@ public:
     /// type (usually to 0). To change the default value for a given type, you
     /// can use configuration files.
     ///
-    /// @example{tests/doc/atom/charge.cpp}
+    /// @example{atom/charge.cpp}
     double charge() const { return charge_; }
 
     /// Set the atom name to `name`.
     ///
-    /// @example{tests/doc/atom/name.cpp}
+    /// @example{atom/name.cpp}
     void set_name(std::string name) { name_ = std::move(name); }
 
     /// Set the atom type to `type`.
     ///
-    /// @example{tests/doc/atom/type.cpp}
+    /// @example{atom/type.cpp}
     void set_type(std::string type) { type_ = std::move(type); }
 
     /// Set the atom mass to `mass`.
     ///
-    /// @example{tests/doc/atom/mass.cpp}
+    /// @example{atom/mass.cpp}
     void set_mass(double mass) { mass_ = mass; }
 
     /// Set the atom charge to `charge`.
     ///
-    /// @example{tests/doc/atom/mass.cpp}
+    /// @example{atom/mass.cpp}
     void set_charge(double charge) { charge_ = charge; }
 
     /// Try to get the full atomic name from the atom type.
@@ -115,7 +115,7 @@ public:
     /// :cpp:class:`chemfiles::optional` value that is close to C++17
     /// ``std::optional``.  @endverbatim
     ///
-    /// @example{tests/doc/atom/full_name.cpp}
+    /// @example{atom/full_name.cpp}
     optional<std::string> full_name() const;
 
     /// Try to get the Van der Waals radius from the atom type.
@@ -132,7 +132,7 @@ public:
     /// close to C++17 ``std::optional``.
     /// @endverbatim
     ///
-    /// @example{tests/doc/atom/vdw_radius.cpp}
+    /// @example{atom/vdw_radius.cpp}
     optional<double> vdw_radius() const;
 
     /// Try to get the covalent radius from the atom type.
@@ -149,7 +149,7 @@ public:
     /// close to C++17 ``std::optional``.
     /// @endverbatim
     ///
-    /// @example{tests/doc/atom/covalent_radius.cpp}
+    /// @example{atom/covalent_radius.cpp}
     optional<double> covalent_radius() const;
 
     /// Try to get the atomic number from the atom type.
@@ -166,13 +166,13 @@ public:
     /// close to C++17 ``std::optional``.
     /// @endverbatim
     ///
-    /// @example{tests/doc/atom/atomic_number.cpp}
+    /// @example{atom/atomic_number.cpp}
     optional<uint64_t> atomic_number() const;
 
     /// Get the map of properties asociated with this atom. This map might be
     /// iterated over to list the properties of the atom, or directly accessed.
     ///
-    /// @example{tests/doc/atom/properties.cpp}
+    /// @example{atom/properties.cpp}
     const property_map& properties() const {
         return properties_;
     }
@@ -181,7 +181,7 @@ public:
     /// `value`. If a property with this name already exist, it is replaced with
     /// the new value.
     ///
-    /// @example{tests/doc/atom/property.cpp}
+    /// @example{atom/property.cpp}
     void set(std::string name, Property value) {
         properties_.set(std::move(name), std::move(value));
     }
@@ -196,7 +196,7 @@ public:
     /// close to C++17 ``std::optional``.
     /// @endverbatim
     ///
-    /// @example{tests/doc/atom/property.cpp}
+    /// @example{atom/property.cpp}
     optional<const Property&> get(const std::string& name) const {
         return properties_.get(name);
     }
@@ -215,7 +215,7 @@ public:
     /// close to C++17 ``std::optional``.
     /// @endverbatim
     ///
-    /// @example{tests/doc/atom/property.cpp}
+    /// @example{atom/property.cpp}
     template<Property::Kind kind>
     optional<typename property_metadata<kind>::type> get(const std::string& name) const {
         return properties_.get<kind>(name);
