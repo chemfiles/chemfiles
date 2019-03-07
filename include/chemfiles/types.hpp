@@ -24,18 +24,18 @@ namespace chemfiles {
 ///   Multiplication with `*` is also defined for multiplication by a
 ///   `Matrix3D`.
 ///
-/// @example{tests/doc/vector3d/ops.cpp}
+/// @example{vector3d/ops.cpp}
 class Vector3D final: private std::array<double, 3> {
     using super = std::array<double, 3>;
 public:
     /// Create a Vector3D with all components equal to 0.
     ///
-    /// @example{tests/doc/vector3d/vector3d-0.cpp}
+    /// @example{vector3d/vector3d-0.cpp}
     Vector3D(): Vector3D(0, 0, 0) {}
 
     /// Create a Vector3D from the three components `x`, `y`, and `z`.
     ///
-    /// @example{tests/doc/vector3d/vector3d-3.cpp}
+    /// @example{vector3d/vector3d-3.cpp}
     Vector3D(double x, double y, double z): super({{x, y, z}}) {}
 
     ~Vector3D() = default;
@@ -48,7 +48,7 @@ public:
 
     /// Compute the euclidean norm of this Vector3D.
     ///
-    /// @example{tests/doc/vector3d/norm.cpp}
+    /// @example{vector3d/norm.cpp}
     double norm() const;
 
     /// Compound addition of two vectors
@@ -66,14 +66,14 @@ public:
 
 /// Compute the dot product of the vectors `lhs` and `rhs`.
 ///
-/// @example{tests/doc/vector3d/dot.cpp}
+/// @example{vector3d/dot.cpp}
 inline double dot(const Vector3D& lhs, const Vector3D& rhs) {
     return lhs[0] * rhs[0] + lhs[1] * rhs[1] + lhs[2] * rhs[2];
 }
 
 /// Compute the cross product of the vectors `lhs` and `rhs`.
 ///
-/// @example{tests/doc/vector3d/cross.cpp}
+/// @example{vector3d/cross.cpp}
 inline Vector3D cross(const Vector3D& lhs, const Vector3D& rhs) {
     auto x = lhs[1] * rhs[2] - lhs[2] * rhs[1];
     auto y = lhs[2] * rhs[0] - lhs[0] * rhs[2];
@@ -173,14 +173,14 @@ static_assert(std::is_standard_layout<Vector3D>::value, "Vector3D must have a st
 /// * Mathematical operators: only mulitplication between matrixes and between
 ///   matrix and vector are defined, using the `*` operator.
 ///
-/// @example{tests/doc/matrix3d/ops.cpp}
+/// @example{matrix3d/ops.cpp}
 class Matrix3D final: private std::array<std::array<double, 3>, 3> {
     using super = std::array<std::array<double, 3>, 3>;
 public:
     /// Create a `Matrix3D` by explicitly specifying all the `m_ij` components
     /// of the matrix.
     ///
-    /// @example{tests/doc/matrix3d/matrix3d.cpp}
+    /// @example{matrix3d/matrix3d.cpp}
     Matrix3D(double m11, double m12, double m13,
              double m21, double m22, double m23,
              double m31, double m32, double m33):
@@ -188,7 +188,7 @@ public:
 
     /// Create a `Matrix3D` with all components set to zero.
     ///
-    /// @example{tests/doc/matrix3d/matrix3d-zero.cpp}
+    /// @example{matrix3d/matrix3d-zero.cpp}
     static Matrix3D zero() {
         return {
             0.0, 0.0, 0.0,
@@ -200,7 +200,7 @@ public:
     /// Create an unit `Matrix3D` (a diagonal matrix with all diagonal values
     /// set to 1).
     ///
-    /// @example{tests/doc/matrix3d/matrix3d-unit.cpp}
+    /// @example{matrix3d/matrix3d-unit.cpp}
     static Matrix3D unit() {
         return {
             1.0, 0.0, 0.0,
@@ -219,19 +219,19 @@ public:
 
     /// Compute the determinant of this matrix.
     ///
-    /// @example{tests/doc/matrix3d/determinant.cpp}
+    /// @example{matrix3d/determinant.cpp}
     double determinant() const;
 
     /// Compute the inverse of this matrix.
     ///
     /// @throw Error if the matrix is not inversible (i.e. if the determinant
     ///              is zero)
-    /// @example{tests/doc/matrix3d/invert.cpp}
+    /// @example{matrix3d/invert.cpp}
     Matrix3D invert() const;
 
     /// Transpose the matrix.
     ///
-    /// @example{tests/doc/matrix3d/transpose.cpp}
+    /// @example{matrix3d/transpose.cpp}
     Matrix3D transpose() const;
 
     /// Compound addition of two matrices

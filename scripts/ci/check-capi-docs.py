@@ -79,7 +79,7 @@ def check_examples():
                     if "@example" in line and in_doc:
                         example_found = True
                         path = line.split('{')[1].split('}')[0]
-                        if not os.path.exists(os.path.join(ROOT, path)):
+                        if not os.path.exists(os.path.join(ROOT, "tests", "doc", path)):
                             error("Missing example file at {}".format(path))
 
                     if line.startswith("///"):

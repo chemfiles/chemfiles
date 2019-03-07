@@ -26,7 +26,7 @@ typedef enum {  // NOLINT: this is both a C and C++ file
 /// The caller of this function should free the allocated memory using
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_property/bool.c}
+/// @example{capi/chfl_property/bool.c}
 /// @return A pointer to the property, or NULL in case of error. You can use
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_PROPERTY* chfl_property_bool(bool value);
@@ -36,7 +36,7 @@ CHFL_EXPORT CHFL_PROPERTY* chfl_property_bool(bool value);
 /// The caller of this function should free the allocated memory using
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_property/double.c}
+/// @example{capi/chfl_property/double.c}
 /// @return A pointer to the property, or NULL in case of error. You can use
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_PROPERTY* chfl_property_double(double value);
@@ -46,7 +46,7 @@ CHFL_EXPORT CHFL_PROPERTY* chfl_property_double(double value);
 /// The caller of this function should free the allocated memory using
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_property/string.c}
+/// @example{capi/chfl_property/string.c}
 /// @return A pointer to the property, or NULL in case of error. You can use
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_PROPERTY* chfl_property_string(const char* value);
@@ -56,14 +56,14 @@ CHFL_EXPORT CHFL_PROPERTY* chfl_property_string(const char* value);
 /// The caller of this function should free the allocated memory using
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_property/vector3d.c}
+/// @example{capi/chfl_property/vector3d.c}
 /// @return A pointer to the property, or NULL in case of error. You can use
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_PROPERTY* chfl_property_vector3d(const chfl_vector3d value);
 
 /// Get the type of value holded by this `property` in `kind`.
 ///
-/// @example{tests/capi/doc/chfl_property/kind.c}
+/// @example{capi/chfl_property/kind.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_property_get_kind(
@@ -76,7 +76,7 @@ CHFL_EXPORT chfl_status chfl_property_get_kind(
 /// This function returns CHFL_PROPERTY_ERROR if the property is not a boolean
 /// property.
 ///
-/// @example{tests/capi/doc/chfl_property/bool.c}
+/// @example{capi/chfl_property/bool.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_property_get_bool(
@@ -89,7 +89,7 @@ CHFL_EXPORT chfl_status chfl_property_get_bool(
 /// This function returns CHFL_PROPERTY_ERROR if the property is not a double
 /// property.
 ///
-/// @example{tests/capi/doc/chfl_property/double.c}
+/// @example{capi/chfl_property/double.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_property_get_double(
@@ -104,7 +104,7 @@ CHFL_EXPORT chfl_status chfl_property_get_double(
 /// The buffer size must be passed in `buffsize`. This function will truncate
 /// the property to fit in the buffer.
 ///
-/// @example{tests/capi/doc/chfl_property/string.c}
+/// @example{capi/chfl_property/string.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_property_get_string(
@@ -117,7 +117,7 @@ CHFL_EXPORT chfl_status chfl_property_get_string(
 /// This function returns CHFL_PROPERTY_ERROR if the property is not a 3D vector
 /// property.
 ///
-/// @example{tests/capi/doc/chfl_property/vector3d.c}
+/// @example{capi/chfl_property/vector3d.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_property_get_vector3d(

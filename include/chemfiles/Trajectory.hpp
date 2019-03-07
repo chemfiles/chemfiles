@@ -39,7 +39,7 @@ public:
     /// example `Trajectory("file.xyz.gz")` will open the file for reading
     /// using the XYZ format and the gzip compression method.
     ///
-    /// @example{tests/doc/trajectory/trajectory.cpp}
+    /// @example{trajectory/trajectory.cpp}
     ///
     /// @param path The file path. In `w` or `a` modes, the file is
     ///             created if it does not exist yet. In `r` mode, an
@@ -75,7 +75,7 @@ public:
     /// This function throws a `FileError` if there are no more frames to read
     /// in the trajectory.
     ///
-    /// @example{tests/doc/trajectory/read.cpp}
+    /// @example{trajectory/read.cpp}
     ///
     /// @throws FileError for all errors concerning the physical file: can not
     ///                   open it, can not read/write it, *etc.*
@@ -91,7 +91,7 @@ public:
     /// This function throws a `FileError` if the step is bigger than the
     /// number of steps in the trajectory.
     ///
-    /// @example{tests/doc/trajectory/read_step.cpp}
+    /// @example{trajectory/read_step.cpp}
     ///
     /// @param step step to read from the trajectory
     ///
@@ -106,7 +106,7 @@ public:
     /// The trajectory must have been opened in Write or append mode, and the
     /// underlying format must support reading.
     ///
-    /// @example{tests/doc/trajectory/write.cpp}
+    /// @example{trajectory/write.cpp}
     ///
     /// @param frame frame to write to this trajectory
     ///
@@ -124,7 +124,7 @@ public:
     /// This is mainly usefull when a format does not define topological
     /// information, as it can be the case with some molecular dynamic formats.
     ///
-    /// @example{tests/doc/trajectory/set_topology.cpp}
+    /// @example{trajectory/set_topology.cpp}
     ///
     /// @param topology the topology to use with this frame
     ///
@@ -141,7 +141,7 @@ public:
     /// This is mainly usefull when a format does not define topological
     /// information, as it can be the case with some molecular dynamic formats.
     ///
-    /// @example{tests/doc/trajectory/set_topology.cpp}
+    /// @example{trajectory/set_topology.cpp}
     ///
     /// @param filename trajectory file path.
     /// @param format Specific format to use. Needed when there is no way to
@@ -166,30 +166,30 @@ public:
     ///
     /// @param cell the unit cell to use with this frame
     ///
-    /// @example{tests/doc/trajectory/set_cell.cpp}
+    /// @example{trajectory/set_cell.cpp}
     void set_cell(const UnitCell& cell);
 
     /// Get the number of steps (the number of frames) in this trajectory.
     ///
-    /// @example{tests/doc/trajectory/nsteps.cpp}
+    /// @example{trajectory/nsteps.cpp}
     size_t nsteps() const;
 
     /// Check if all the frames in this trajectory have been read, *i.e.* if
     /// the last read frame is the last frame of the trajectory.
     ///
-    /// @example{tests/doc/trajectory/done.cpp}
+    /// @example{trajectory/done.cpp}
     bool done() const;
 
     /// Close a trajectory, and synchronize all buffered content with the drive.
     ///
     /// Calling any function on a closed trajectory will throw a `FileError`.
     ///
-    /// @example{tests/doc/trajectory/close.cpp}
+    /// @example{trajectory/close.cpp}
     void close();
 
     /// Get the path used to open the trajectory
     ///
-    /// @example{tests/doc/trajectory/path.cpp}
+    /// @example{trajectory/path.cpp}
     const std::string& path() const {
         return path_;
     }

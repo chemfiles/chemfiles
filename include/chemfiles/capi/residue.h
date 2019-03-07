@@ -14,7 +14,7 @@ extern "C" {
 /// The caller of this function should free the allocated memory using
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_residue/chfl_residue.c}
+/// @example{capi/chfl_residue/chfl_residue.c}
 /// @return A pointer to the residue, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_RESIDUE* chfl_residue(const char* name);
@@ -24,7 +24,7 @@ CHFL_EXPORT CHFL_RESIDUE* chfl_residue(const char* name);
 /// The caller of this function should free the allocated memory using
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_residue/with_id.c}
+/// @example{capi/chfl_residue/with_id.c}
 /// @return A pointer to the residue, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_RESIDUE* chfl_residue_with_id(const char* name, uint64_t resid);
@@ -46,7 +46,7 @@ CHFL_EXPORT CHFL_RESIDUE* chfl_residue_with_id(const char* name, uint64_t resid)
 /// any function on an invalidated pointer is undefined behavior. Even if the
 /// pointer if invalidated, it stills needs to be released with `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_residue/from_topology.c}
+/// @example{capi/chfl_residue/from_topology.c}
 /// @return A pointer to the residue, or NULL in case of error. You can use
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT const CHFL_RESIDUE* chfl_residue_from_topology(
@@ -67,7 +67,7 @@ CHFL_EXPORT const CHFL_RESIDUE* chfl_residue_from_topology(
 /// any function on an invalidated pointer is undefined behavior. Even if the
 /// pointer if invalidated, it stills needs to be released with `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_residue/for_atom.c}
+/// @example{capi/chfl_residue/for_atom.c}
 /// @return A pointer to the residue, or NULL in case of error. You can use
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT const CHFL_RESIDUE* chfl_residue_for_atom(
@@ -79,14 +79,14 @@ CHFL_EXPORT const CHFL_RESIDUE* chfl_residue_for_atom(
 /// The caller of this function should free the associated memory using
 /// `chfl_free`.
 ///
-/// @example{tests/capi/doc/chfl_residue/copy.c}
+/// @example{capi/chfl_residue/copy.c}
 /// @return A pointer to the new residue, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_RESIDUE* chfl_residue_copy(const CHFL_RESIDUE* residue);
 
 /// Get the number of atoms in a `residue` in the integer pointed to by `count`.
 ///
-/// @example{tests/capi/doc/chfl_residue/atoms_count.c}
+/// @example{capi/chfl_residue/atoms_count.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_atoms_count(
@@ -100,7 +100,7 @@ CHFL_EXPORT chfl_status chfl_residue_atoms_count(
 /// equal to the result of `chfl_residue_atoms_count`. The `atoms` array is
 /// sorted.
 ///
-/// @example{tests/capi/doc/chfl_residue/atoms.c}
+/// @example{capi/chfl_residue/atoms.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_atoms(
@@ -113,7 +113,7 @@ CHFL_EXPORT chfl_status chfl_residue_atoms(
 /// This function will return `CHFL_GENERIC_ERROR` if this residue does not
 /// have an associated identifier.
 ///
-/// @example{tests/capi/doc/chfl_residue/id.c}
+/// @example{capi/chfl_residue/id.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_id(
@@ -125,7 +125,7 @@ CHFL_EXPORT chfl_status chfl_residue_id(
 /// The buffer size must be passed in `buffsize`. This function will truncate
 /// the residue name to fit in the buffer.
 ///
-/// @example{tests/capi/doc/chfl_residue/name.c}
+/// @example{capi/chfl_residue/name.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_name(
@@ -134,7 +134,7 @@ CHFL_EXPORT chfl_status chfl_residue_name(
 
 /// Add the atom at index `i` in the `residue`.
 ///
-/// @example{tests/capi/doc/chfl_residue/add_atom.c}
+/// @example{capi/chfl_residue/add_atom.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_add_atom(
@@ -144,7 +144,7 @@ CHFL_EXPORT chfl_status chfl_residue_add_atom(
 /// Check if the atom at index `i` is in the `residue`, and store the result in
 /// `result`.
 ///
-/// @example{tests/capi/doc/chfl_residue/contains.c}
+/// @example{capi/chfl_residue/contains.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_contains(
@@ -153,7 +153,7 @@ CHFL_EXPORT chfl_status chfl_residue_contains(
 
 /// Get the number of properties associated with this `residue` in `count`.
 ///
-/// @example{tests/capi/doc/chfl_residue/properties_count.c}
+/// @example{capi/chfl_residue/properties_count.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_properties_count(
@@ -169,7 +169,7 @@ CHFL_EXPORT chfl_status chfl_residue_properties_count(
 /// The pointers in `names` are only valid until a new property is added to the
 /// residue with `chfl_residue_set_property`.
 ///
-/// @example{tests/capi/doc/chfl_residue/list_properties.c}
+/// @example{capi/chfl_residue/list_properties.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_list_properties(
@@ -181,7 +181,7 @@ CHFL_EXPORT chfl_status chfl_residue_list_properties(
 /// If a property with the same name already exists, this function override the
 /// existing property with the new one.
 ///
-/// @example{tests/capi/doc/chfl_residue/property.c}
+/// @example{capi/chfl_residue/property.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_set_property(
@@ -195,7 +195,7 @@ CHFL_EXPORT chfl_status chfl_residue_set_property(
 /// The user of this function is responsible to deallocate memory using the
 /// `chfl_free` function.
 ///
-/// @example{tests/capi/doc/chfl_residue/property.c}
+/// @example{capi/chfl_residue/property.c}
 /// @return A pointer to the property, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_PROPERTY* chfl_residue_get_property(
