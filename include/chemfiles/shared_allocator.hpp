@@ -12,9 +12,6 @@
 namespace chemfiles {
 
 struct shared_metadata {
-    shared_metadata(long count_, std::function<void(void)> deleter_):
-        count(count_), deleter(std::move(deleter_)) {}
-
     /// Number of pointer sharing this reference. No need to use atomic
     /// references counting, as the allocator is protected by a mutex
     long count;
@@ -75,48 +72,21 @@ public:
             return;
         }
         auto instance = instance_.lock();
-        auto it = instance->pointers_.find(ptr);
-        if (it == instance->pointers_.end()) {
-            throw chemfiles::error(
-                "unknown pointer passed to shared_allocator::free: {}", ptr
-            );
-        }
-        auto& count = instance->metadata_.at(it->second).count;
-        count--;
-        if (count == 0) {
-            instance->metadata_.at(it->second).deleter();
-            instance->metadata_.at(it->second).deleter = UNINITIALIZED_DELETER;
-            instance->unused_.emplace_back(it->second);
-
-            // Remove any pointer that was using the same metadata block
-            auto to_remove = std::vector<const void*>();
-            for (const auto& registered: instance->pointers_) {
-                if (registered.second == it->second) {
-                    to_remove.emplace_back(registered.first);
-                }
-            }
-            for (auto remove: to_remove) {
-                instance->pointers_.erase(remove);
-            }
-        } else if (count < 0) {
-            throw chemfiles::error(
-                "internal error: negative reference count for {}", ptr
-            );
-        }
+        instance->release(ptr);
     }
 
 private:
     template<class T>
     void insert_new(T* ptr) {
-        size_t id = get_unused_metadata();
-        metadata_[id] = shared_metadata{1, [ptr](){ delete ptr; }};
-        auto inserted = pointers_.emplace(ptr, id);
-        if (!inserted.second) {
+        if (pointers_.count(ptr) != 0) {
             throw chemfiles::error(
                 "internal error: pointer at {} is already managed by "
                 "shared_allocator", static_cast<void*>(ptr)
             );
         }
+        size_t id = get_unused_metadata();
+        metadata_[id] = shared_metadata{1, [ptr](){ delete ptr; }};
+        pointers_.emplace(ptr, id);
     }
 
     void insert_shared(const void* ptr, void* element) {
@@ -128,16 +98,59 @@ private:
                 "shared_allocator", ptr
             );
         }
-        auto inserted = pointers_.emplace(element, it->second);
-        if (!inserted.second && (inserted.first->second != it->second)) {
-            // the element pointer is already registered, but with a different
-            // main pointer
+
+        if (pointers_.count(element) != 0) {
+            // Make sure all instances of element in the multi map share the
+            // same main pointer & metadata block
+            auto id = pointers_.find(element)->second;
+            if (id != it->second) {
+                // the element pointer is already registered, but with a
+                // different main pointer
+                throw chemfiles::error(
+                    "internal error: element pointer at {} is already managed by "
+                    "shared_allocator (associated with {})", element, ptr
+                );
+            }
+        }
+
+        // Insert the new shared pointer
+        pointers_.emplace(element, it->second);
+        metadata_.at(it->second).count++;
+    }
+
+    void release(const void* ptr) {
+        auto it = pointers_.find(ptr);
+        if (it == pointers_.end()) {
             throw chemfiles::error(
-                "internal error: element pointer at {} is already managed by "
-                "shared_allocator (associated with {})", element, ptr
+                "unknown pointer passed to shared_allocator::free: {}", ptr
             );
         }
-        metadata_.at(it->second).count++;
+
+        // Extract the metadat id. We can not just use it->second everywhere,
+        // as it can become invalid after the call to `pointers_.erase` below.
+        auto id = it->second;
+        if (id >= metadata_.size()) {
+            throw chemfiles::error(
+                "internal error: metadata index is too big: {} >= {}", id, metadata_.size()
+            );
+        }
+
+        // Decrease refcount
+        metadata_[id].count--;
+        // Delete the pointer from the pointers map, do not run destructor yet
+        pointers_.erase(it);
+
+        if (metadata_[id].count == 0) {
+            // Run the destructor and release memory
+            metadata_[id].deleter();
+            // Mark the metadata block for reuse.
+            metadata_[id].deleter = UNINITIALIZED_DELETER;
+            unused_.emplace_back(id);
+        } else if (metadata_[id].count < 0) {
+            throw chemfiles::error(
+                "internal error: negative reference count for {}", ptr
+            );
+        }
     }
 
     shared_metadata& metadata(const void* ptr) {
@@ -159,13 +172,13 @@ private:
             return id;
         } else {
             // create a new one
-            metadata_.emplace_back(0, UNINITIALIZED_DELETER);
+            metadata_.push_back({0, UNINITIALIZED_DELETER});
             return metadata_.size() - 1;
         }
     }
 
     /// A map of pointer adresses -> indexes of metadata in metadata_
-    std::unordered_map<const void*, size_t> pointers_;
+    std::unordered_multimap<const void*, size_t> pointers_;
     /// Metadata for all known pointers
     std::vector<shared_metadata> metadata_;
     /// unused indexes in metadata_ that can be re-used. This is set by
