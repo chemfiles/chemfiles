@@ -14,7 +14,7 @@ extern "C" {
 /// The last error message is a thread local variable, so you need to call this
 /// function in the thread from where the error happened.
 ///
-/// @example{tests/capi/doc/chfl_last_error.c}
+/// @example{capi/chfl_last_error.c}
 /// @return A null-terminated string containing the last error message
 CHFL_EXPORT const char* chfl_last_error(void);
 
@@ -23,7 +23,7 @@ CHFL_EXPORT const char* chfl_last_error(void);
 /// The last error message is a thread local variable, so this function will
 /// only clear it in the thread where it is called.
 ///
-/// @example{tests/capi/doc/chfl_clear_errors.c}
+/// @example{capi/chfl_clear_errors.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_clear_errors(void);
@@ -33,7 +33,7 @@ typedef void (*chfl_warning_callback)(const char* message);  // NOLINT: this is 
 
 /// Set the global warning `callback` to be used for each warning event.
 ///
-/// @example{tests/capi/doc/chfl_set_warning_callback.c}
+/// @example{capi/chfl_set_warning_callback.c}
 /// @return `CHFL_SUCCESS`
 CHFL_EXPORT chfl_status chfl_set_warning_callback(chfl_warning_callback callback);
 
@@ -48,7 +48,7 @@ CHFL_EXPORT chfl_status chfl_set_warning_callback(chfl_warning_callback callback
 /// incorectly formatted. Data from the new configuration file will overwrite
 /// any existing data.
 ///
-/// @example{tests/capi/doc/chfl_add_configuration.c}
+/// @example{capi/chfl_add_configuration.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_add_configuration(const char* path);

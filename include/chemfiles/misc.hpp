@@ -19,7 +19,7 @@ typedef std::function<void(const std::string& message)> warning_callback; // NOL
 /// Set the global callback for warning events. The default is to print them
 /// on the standard error stream.
 ///
-/// @example{tests/doc/set_warning_callback.cpp}
+/// @example{set_warning_callback.cpp}
 ///
 /// @param callback callback function that will be called on each warning
 void CHFL_EXPORT set_warning_callback(warning_callback callback);
@@ -35,7 +35,7 @@ void CHFL_EXPORT set_warning_callback(warning_callback callback);
 /// `path`, or if the file is incorectly formatted. Data from the new
 /// configuration file will overwrite any existing data.
 ///
-/// @example{tests/doc/add_configuration.cpp}
+/// @example{add_configuration.cpp}
 ///
 /// @param path path to the configuration file to add
 ///

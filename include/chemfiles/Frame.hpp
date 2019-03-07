@@ -30,12 +30,12 @@ namespace chemfiles {
 ///
 ///Iterating over a `Frame` will yield all the atoms in the system.
 ///
-/// @example{tests/doc/frame/iterate.cpp}
+/// @example{frame/iterate.cpp}
 class CHFL_EXPORT Frame final {
 public:
     /// Create an empty frame with no atoms and the given cell.
     ///
-    /// @example{tests/doc/frame/frame.cpp}
+    /// @example{frame/frame.cpp}
     explicit Frame(UnitCell cell = UnitCell());
 
     ~Frame() = default;
@@ -47,7 +47,7 @@ public:
     /// This replace the implicit copy constructor (which is private) to
     /// make an explicit copy of the frame.
     ///
-    /// @example{tests/doc/frame/clone.cpp}
+    /// @example{frame/clone.cpp}
     Frame clone() const {
         return *this;
     }
@@ -60,7 +60,7 @@ public:
     /// functionalities of the topology are mirrored on the frame (adding and
     /// removing bonds, adding residues, *etc.*)
     ///
-    /// @example{tests/doc/frame/topology.cpp}
+    /// @example{frame/topology.cpp}
     const Topology& topology() const {
         return topology_;
     }
@@ -71,19 +71,19 @@ public:
     ///
     /// @throw Error if the topology size does not match the size of this frame
     ///
-    /// @example{tests/doc/frame/topology.cpp}
+    /// @example{frame/topology.cpp}
     void set_topology(Topology topology);
 
     /// Get a const reference to the unit cell of this frame
     ///
-    /// @example{tests/doc/frame/cell.cpp}
+    /// @example{frame/cell.cpp}
     const UnitCell& cell() const {
         return cell_;
     }
 
     /// Get a reference to the unit cell of this frame
     ///
-    /// @example{tests/doc/frame/cell.cpp}
+    /// @example{frame/cell.cpp}
     UnitCell& cell() {
         return cell_;
     }
@@ -92,14 +92,14 @@ public:
     ///
     /// @param cell the new UnitCell to use for this frame
     ///
-    /// @example{tests/doc/frame/cell.cpp}
+    /// @example{frame/cell.cpp}
     void set_cell(UnitCell cell) {
         cell_ = std::move(cell);
     }
 
     /// Get the number of atoms in this frame
     ///
-    /// @example{tests/doc/frame/size.cpp}
+    /// @example{frame/size.cpp}
     size_t size() const;
 
     /// Get the positions of the atoms in this frame.
@@ -109,14 +109,14 @@ public:
     /// mutation of the values, but no memory allocation.
     /// @endverbatim
     ///
-    /// @example{tests/doc/frame/positions.cpp}
+    /// @example{frame/positions.cpp}
     span<Vector3D> positions() {
         return positions_;
     }
 
     /// Get the positions in this frame as a const reference
     ///
-    /// @example{tests/doc/frame/positions.cpp}
+    /// @example{frame/positions.cpp}
     const std::vector<Vector3D>& positions() const {
         return positions_;
     }
@@ -126,7 +126,7 @@ public:
     /// If velocities are already defined, this functions does nothing. The new
     /// velocities are initialized to 0.
     ///
-    /// @example{tests/doc/frame/add_velocities.cpp}
+    /// @example{frame/add_velocities.cpp}
     void add_velocities();
 
     /// Get an velocities of the atoms in this frame, if this frame contains
@@ -140,7 +140,7 @@ public:
     /// mutation of the values, but no memory allocation.
     /// @endverbatim
     ///
-    /// @example{tests/doc/frame/velocities.cpp}
+    /// @example{frame/velocities.cpp}
     optional<span<Vector3D>> velocities() {
         if (velocities_) {
             return {*velocities_};
@@ -152,7 +152,7 @@ public:
     /// Get an velocities of the atoms in this frame as a const reference, if
     /// this frame contains velocity data.
     ///
-    /// @example{tests/doc/frame/velocities.cpp}
+    /// @example{frame/velocities.cpp}
     optional<const std::vector<Vector3D>&> velocities() const {
         if (velocities_) {
             return {*velocities_};
@@ -169,7 +169,7 @@ public:
     /// If the new size if smaller than the old one, all atoms and connectivity
     /// elements after the new size are removed.
     ///
-    /// @example{tests/doc/frame/resize.cpp}
+    /// @example{frame/resize.cpp}
     void resize(size_t size);
 
     /// Allocate memory in the frame to have enough size for `size` atoms.
@@ -177,14 +177,14 @@ public:
     /// This function does not change the actual number of atoms in the frame,
     /// and should be used as an optimisation.
     ///
-    /// @example{tests/doc/frame/reserve.cpp}
+    /// @example{frame/reserve.cpp}
     void reserve(size_t size);
 
     /// Add an `atom` at the given `position` and optionally with the given
     /// `velocity`. The `velocity` value will only be used if this frame
     /// contains velocity data.
     ///
-    /// @example{tests/doc/frame/add_atom.cpp}
+    /// @example{frame/add_atom.cpp}
     void add_atom(Atom atom, Vector3D position, Vector3D velocity = Vector3D());
 
     /// Remove the atom at index `i` in the system.
@@ -192,21 +192,21 @@ public:
     /// @throws chemfiles::OutOfBounds if `i` is bigger than the number of atoms
     ///         in this frame
     ///
-    /// @example{tests/doc/frame/remove.cpp}
+    /// @example{frame/remove.cpp}
     void remove(size_t i);
 
     /// Get the current simulation step.
     ///
     /// The step is set by the `Trajectory` when reading a frame.
     ///
-    /// @example{tests/doc/frame/step.cpp}
+    /// @example{frame/step.cpp}
     size_t step() const {
         return step_;
     }
 
     /// Set the current simulation step to `step`
     ///
-    /// @example{tests/doc/frame/step.cpp}
+    /// @example{frame/step.cpp}
     void set_step(size_t step) {
         step_ = step;
     }
@@ -221,19 +221,19 @@ public:
     ///
     /// @throw Error if the Van der Waals radius in unknown for a given atom.
     ///
-    /// @example{tests/doc/frame/guess_bonds.cpp}
+    /// @example{frame/guess_bonds.cpp}
     void guess_bonds();
 
     /// Remove all connectivity information in the frame's topology
     ///
-    /// @example{tests/doc/frame/clear_bonds.cpp}
+    /// @example{frame/clear_bonds.cpp}
     void clear_bonds() {
         topology_.clear_bonds();
     }
 
     /// Add a `residue` to this frame's topology.
     ///
-    /// @example{tests/doc/frame/add_residue.cpp}
+    /// @example{frame/add_residue.cpp}
     ///
     /// @param residue the residue to add to this topology
     /// @throw chemfiles::Error if any atom in the `residue` is already in
@@ -246,7 +246,7 @@ public:
     /// Add a bond in the system, between the atoms at index `atom_i` and
     /// `atom_j`.
     ///
-    /// @example{tests/doc/frame/add_bond.cpp}
+    /// @example{frame/add_bond.cpp}
     ///
     /// @param atom_i the index of the first atom in the bond
     /// @param atom_j the index of the second atom in the bond
@@ -262,7 +262,7 @@ public:
     ///
     /// If the bond does not exist, this does nothing.
     ///
-    /// @example{tests/doc/frame/remove_bond.cpp}
+    /// @example{frame/remove_bond.cpp}
     ///
     /// @param atom_i the index of the first atom in the bond
     /// @param atom_j the index of the second atom in the bond
@@ -273,7 +273,7 @@ public:
 
     /// Get a reference to the atom at the position `index`.
     ///
-    /// @example{tests/doc/frame/index.cpp}
+    /// @example{frame/index.cpp}
     ///
     /// @param index the atomic index
     /// @throws OutOfBounds if `index` is greater than `size()`
@@ -283,7 +283,7 @@ public:
 
     /// Get a const reference to the atom at the position `index`.
     ///
-    /// @example{tests/doc/frame/index.cpp}
+    /// @example{frame/index.cpp}
     ///
     /// @param index the atomic index
     /// @throws OutOfBounds if `index` is greater than `size()`
@@ -306,7 +306,7 @@ public:
     /// @throws chemfiles::OutOfBounds if `i` or `j` are bigger than the number
     ///         of atoms in this frame
     ///
-    /// @example{tests/doc/frame/distance.cpp}
+    /// @example{frame/distance.cpp}
     double distance(size_t i, size_t j) const;
 
     /// Get the angle formed by the atoms at indexes `i`, `j` and `k`,
@@ -316,7 +316,7 @@ public:
     /// @throws chemfiles::OutOfBounds if `i`, `j` or `k` are bigger than the
     ///         number of atoms in this frame
     ///
-    /// @example{tests/doc/frame/angle.cpp}
+    /// @example{frame/angle.cpp}
     double angle(size_t i, size_t j, size_t k) const;
 
     /// Get the dihedral angle formed by the atoms at indexes `i`, `j`, `k` and
@@ -326,7 +326,7 @@ public:
     /// @throws chemfiles::OutOfBounds if `i`, `j`, `k` or `m` are bigger than
     ///         the number of atoms in this frame
     ///
-    /// @example{tests/doc/frame/dihedral.cpp}
+    /// @example{frame/dihedral.cpp}
     double dihedral(size_t i, size_t j, size_t k, size_t m) const;
 
     /// Get the out of plane distance formed by the atoms at indexes `i`, `j`,
@@ -339,13 +339,13 @@ public:
     /// @throws chemfiles::OutOfBounds if `i`, `j`, `k` or `m` are bigger than
     ///         the number of atoms in this frame
     ///
-    /// @example{tests/doc/frame/out_of_plane.cpp}
+    /// @example{frame/out_of_plane.cpp}
     double out_of_plane(size_t i, size_t j, size_t k, size_t m) const;
 
     /// Get the map of properties asociated with this frame. This map might be
     /// iterated over to list the properties of the frame, or directly accessed.
     ///
-    /// @example{tests/doc/frame/properties.cpp}
+    /// @example{frame/properties.cpp}
     const property_map& properties() const {
         return properties_;
     }
@@ -354,7 +354,7 @@ public:
     /// `value`. If a property with this name already exist, it is silently
     /// replaced with the new value.
     ///
-    /// @example{tests/doc/frame/set.cpp}
+    /// @example{frame/set.cpp}
     void set(std::string name, Property value) {
         properties_.set(std::move(name), std::move(value));
     }
@@ -369,7 +369,7 @@ public:
     /// close to C++17 ``std::optional``.
     /// @endverbatim
     ///
-    /// @example{tests/doc/frame/get.cpp}
+    /// @example{frame/get.cpp}
     optional<const Property&> get(const std::string& name) const {
         return properties_.get(name);
     }
@@ -388,7 +388,7 @@ public:
     /// close to C++17 ``std::optional``.
     /// @endverbatim
     ///
-    /// @example{tests/doc/frame/get.cpp}
+    /// @example{frame/get.cpp}
     template<Property::Kind kind>
     optional<typename property_metadata<kind>::type> get(const std::string& name) const {
         return properties_.get<kind>(name);

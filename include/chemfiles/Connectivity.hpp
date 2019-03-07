@@ -16,7 +16,7 @@ namespace chemfiles {
 ///
 /// This class implements all the comparison operators, as well as indexing.
 ///
-/// @example{tests/doc/connectivity/bond.cpp}
+/// @example{connectivity/bond.cpp}
 class CHFL_EXPORT Bond final {
 public:
 
@@ -96,7 +96,7 @@ inline bool operator>=(const Bond& lhs, const Bond& rhs) {
 ///
 /// This class implements all the comparison operators, as well as indexing.
 ///
-/// @example{tests/doc/connectivity/angle.cpp}
+/// @example{connectivity/angle.cpp}
 class CHFL_EXPORT Angle final {
 public:
     /// Create a new `Angle` containing the atoms `i`, `j` and `k`.
@@ -162,7 +162,7 @@ inline bool operator>=(const Angle& lhs, const Angle& rhs) {
 ///
 /// This class implements all the comparison operators, as well as indexing.
 ///
-/// @example{tests/doc/connectivity/dihedral.cpp}
+/// @example{connectivity/dihedral.cpp}
 class CHFL_EXPORT Dihedral final {
 public:
     /// Create a new `Dihedral` containing the atoms `i`, `j`, `k` and `m`.
@@ -232,7 +232,7 @@ inline bool operator>=(const Dihedral& lhs, const Dihedral& rhs) {
 ///
 /// The second atom of the improper is always the central atom.
 ///
-/// @example{tests/doc/connectivity/improper.cpp}
+/// @example{connectivity/improper.cpp}
 class CHFL_EXPORT Improper final {
 public:
     /// Create a new `Improper` containing the atoms `i`, `j`, `k` and `m`. `j`

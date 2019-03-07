@@ -140,7 +140,7 @@ typedef double chfl_vector3d[3];  // NOLINT: this is both a C and C++ file
 
 /// Get the version of the chemfiles library.
 ///
-/// @example{tests/capi/doc/chfl_version.c}
+/// @example{capi/chfl_version.c}
 /// @return A null-terminated string containing the version of Chemfiles.
 CHFL_EXPORT const char* chfl_version(void);
 
@@ -170,7 +170,7 @@ typedef enum {  // NOLINT: this is both a C and C++ file
 /// is acquired and released for all chemfiles objects using a references
 /// counter to allow direct modification of C++ objects.
 ///
-/// @example{tests/capi/doc/chfl_atom/chfl_atom.c}
+/// @example{capi/chfl_atom/chfl_atom.c}
 CHFL_EXPORT void chfl_free(const void* objet);
 
 #ifdef __cplusplus
