@@ -23,7 +23,9 @@ TEST_CASE() {
 
     auto dihedrals = topology.dihedrals();
     // perform a binary search in the dihedrals
-    auto it = std::lower_bound(dihedrals.begin(), dihedrals.end(), Dihedral(0, 1, 2, 3));
+    auto it = std::lower_bound(
+        dihedrals.begin(), dihedrals.end(), Dihedral(0, 1, 2, 3)
+    );
     assert(it != dihedrals.end());
     assert(*it == Dihedral(0, 1, 2, 3));
     // [example]

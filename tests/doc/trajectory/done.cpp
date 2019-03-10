@@ -17,7 +17,8 @@ TEST_CASE() {
         auto frame = trajectory.read();
     }
 
-    /// When using read_step, done() return a value based on the last read frame
+    // When using `read_step`, `done()` returns `true` if the most recent call
+    // was used to read the last step (`nsteps() - 1`).
     auto frame = trajectory.read_step(0);
     assert(!trajectory.done());
 
