@@ -6,6 +6,10 @@ a {
     color: #3da48e;
 }
 
+.note a {
+    color: #b0f9e9;
+}
+
 pre {
     color: black;
 }
@@ -25,33 +29,4 @@ on the page anymore. */
 hr.docutils {
     border: 1px solid;
     width: 50%
-}
-
-.green {
-    color: green;
-}
-
-.red {
-    color: red;
-}
-
-.alternating-table tbody .row-even {
-    background: #d5d5d5;
-}
-
-.admonition {
-    border: none;
-    color: #2c3e50;
-}
-
-.alert-info {
-    background-color: #c2e0f4;
-}
-
-.alert-warning {
-    background-color: #f9cd88;
-}
-
-.alert-danger {
-    background-color: #f5b7b1;
 }
