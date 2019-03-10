@@ -15,7 +15,7 @@ TEST_CASE() {
 
     frame.add_velocities();
     // add atom with velocities
-    frame.add_atom(Atom("O"), Vector3D(0.0, 0.0, 0.0), Vector3D(1.0, 2.0, 0.0));
+    frame.add_atom(Atom("O"), {0.0, 0.0, 0.0}, {1.0, 2.0, 0.0});
 
     auto velocities = *frame.velocities();
     assert(velocities[0] == Vector3D(0.0, 0.0, 0.0));

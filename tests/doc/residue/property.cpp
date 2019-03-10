@@ -11,14 +11,14 @@ TEST_CASE() {
     // [example]
     auto residue = Residue("ALA");
 
-    residue.set("first", "this is an alanine group");
+    residue.set("first", "alanine group");
     residue.set("second", 42.5);
 
     assert(residue.get("second")->as_double() == 42.5);
-    assert(residue.get("first")->as_string() == "this is an alanine group");
+    assert(residue.get("first")->as_string() == "alanine group");
 
     // Typed access to properties
-    assert(residue.get<Property::STRING>("first").value() == "this is an alanine group");
+    assert(residue.get<Property::STRING>("first").value() == "alanine group");
     assert(!residue.get<Property::BOOL>("first"));
 
     assert(!residue.get("non-existant property"));

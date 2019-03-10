@@ -10,7 +10,7 @@ using namespace chemfiles;
 TEST_CASE() {
     // [example]
     assert(Selection("type H and index > 254").size() == 1);
-    assert(Selection("pairs: name(#1) H and type(#2) Ow").size() == 2);
-    assert(Selection("four: (name(#1) H and type(#2) Ow) or (name(#3) Ow and type(#4) H)").size() == 4);
+    assert(Selection("two: name(#1) H and type(#2) Ow").size() == 2);
+    assert(Selection("dihedrals: name(#1) H and name(#3) O").size() == 4);
     // [example]
 }

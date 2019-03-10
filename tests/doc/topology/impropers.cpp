@@ -23,7 +23,9 @@ TEST_CASE() {
 
     auto impropers = topology.impropers();
     // perform a binary search in the impropers
-    auto it = std::lower_bound(impropers.begin(), impropers.end(), Improper(1, 0, 2, 3));
+    auto it = std::lower_bound(
+        impropers.begin(), impropers.end(), Improper(1, 0, 2, 3)
+    );
     assert(it != impropers.end());
     assert(*it == Improper(1, 0, 2, 3));
     // [example]
