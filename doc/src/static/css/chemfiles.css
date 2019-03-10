@@ -19,6 +19,13 @@ code {
     background-color: rgba(0, 0, 0, 0.15);
 }
 
+/* Breathe creates class description with both breathe-sectiondef and container
+classes. This make the class description use the container width, and not fit
+on the page anymore. */
+.breathe-sectiondef {
+    width: inherit;
+}
+
 hr.docutils {
     border: 1px solid;
     width: 50%

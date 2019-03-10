@@ -22,7 +22,7 @@ TEST_CASE() {
     atom = Atom("O23", "Ow");
     assert(atom.name() == "O23");
     assert(atom.type() == "Ow");
-    // The atom mass is not automatically set, "Ow" is not in the periodic table
+    // The atom mass is not set, as "Ow" is not in the periodic table
     assert(atom.mass() == 0.0);
 
     // [example]
