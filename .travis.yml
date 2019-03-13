@@ -39,7 +39,7 @@ matrix:
       compiler: gcc
       env: STATIC_LIBS=ON DO_COVERAGE=ON DEPLOY_DOCS=ON
       addons: *linux64
-    - name: system libs
+    - name: clang + system libs
       os: linux
       compiler: clang
       env: CMAKE_EXTRA="-DCHFL_SYSTEM_NETCDF=ON -DCHFL_SYSTEM_ZLIB=ON -DCHFL_SYSTEM_LZMA=ON"
@@ -62,6 +62,8 @@ matrix:
       os: osx
       compiler: gcc
       osx_image: xcode7.3
+    - name: windows
+      os: windows
 
 before_install:
   # Setting environement
@@ -74,7 +76,7 @@ script:
   - cd $TRAVIS_BUILD_DIR
   - mkdir build && cd build
   - $CMAKE_CONFIGURE cmake $CMAKE_ARGS $CMAKE_EXTRA ..
-  - make -j2
+  - cmake --build . -- -j2
   - ctest -j2 --output-on-failure
   - cd $TRAVIS_BUILD_DIR
   # Run various additional checks
@@ -95,10 +97,6 @@ script:
         rm -f *\#external\#*.gcov
         codecov -X gcov
     fi
-
-after_script:
-  # cleanup intel compiler install
-  - '[[ ! -z "${INTEL_INSTALL_PATH}" ]] && uninstall_intel_software'
 
 deploy:
   - provider: pages

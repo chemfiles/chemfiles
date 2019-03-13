@@ -49,23 +49,6 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     fi
 fi
 
-if [[ "$USE_ICC" == "ON" ]]; then
-    if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
-        echo "not runnning intel builder on Pull-Request"
-        exit
-    fi
-    /bin/sh $TRAVIS_BUILD_DIR/scripts/ci/install-icc.sh
-    source ~/.bashrc
-    export CC=icc
-    export CXX=icpc
-fi
-
-if [[ "$USE_PGI" == "ON" ]]; then
-    /bin/sh $TRAVIS_BUILD_DIR/scripts/ci/install-pgi.sh
-    export CC=pgcc
-    export CXX=pgc++
-fi
-
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew update
     if [[ "$CC" == "gcc" ]]; then
@@ -73,6 +56,10 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         export CC=gcc-5
         export CXX=g++-5
     fi
+fi
+
+if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+    export PATH="/c/Program Files/CMake/bin":$PATH
 fi
 
 
