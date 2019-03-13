@@ -7,6 +7,10 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
 if (POLICY CMP0042)
     cmake_policy(SET CMP0042 NEW) # OSX RPATH handling
 endif()
+if (POLICY CMP0054)
+    # Only interpret ``if()`` arguments as variables or keywords when unquoted.
+    cmake_policy(SET CMP0054 NEW)
+endif()
 if (POLICY CMP0063)
     # Use of `CXX_VISIBILITY_PRESET` and `VISIBILITY_INLINES_HIDDEN` in OBJECT
     # libraries
