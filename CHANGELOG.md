@@ -5,6 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+## 0.9.1 (13 Mar 2019)
+
+* Fix a bug with memory allocation in the C API. The allocator did not remove
+  pointers as soon as `chfl_free` was called, which leaded to an error when the
+  system allocator re-used the pointers.
+
 ## 0.9.0 (18 Nov 2018)
 
 * Direct reading and writing of compressed files. gzip and lzma (.xz) formats
