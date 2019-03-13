@@ -1,6 +1,13 @@
 #!/bin/bash
 
-export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DCHFL_BUILD_TESTS=ON"
+cd $TRAVIS_BUILD_DIR
+export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DCHFL_BUILD_TESTS=ON $CMAKE_EXTRA"
+export BUILD_ARGS="-j2"
+export CMAKE_BUILD_TYPE="Debug"
+
+if [[ "$CMAKE_GENERATOR" == "" ]]; then
+    export CMAKE_GENERATOR="Unix Makefiles"
+fi
 
 if [[ "${STATIC_LIBS}" == "ON" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DBUILD_SHARED_LIBS=OFF"
@@ -13,9 +20,6 @@ if [[ "${DO_COVERAGE}" == "ON" ]]; then
     pip install --user codecov
 fi
 
-cd $TRAVIS_BUILD_DIR
-pip install --user -r doc/requirements.txt
-
 if [[ "$EMSCRIPTEN" == "ON" ]]; then
     # Install a Travis compatible emscripten SDK
     wget https://github.com/chemfiles/emscripten-sdk/archive/master.tar.gz
@@ -25,6 +29,7 @@ if [[ "$EMSCRIPTEN" == "ON" ]]; then
 
     export CMAKE_CONFIGURE='emcmake'
     export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_TEST_RUNNER=node -DCMAKE_BUILD_TYPE=release -DCHFL_BUILD_DOCTESTS=OFF"
+    export CMAKE_BUILD_TYPE="Release"
 
     # Install a modern cmake
     cd $HOME
@@ -39,6 +44,7 @@ if [[ "$EMSCRIPTEN" == "ON" ]]; then
 fi
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    pip install --user -r doc/requirements.txt
     if [[ "$CC" == "gcc" ]]; then
         export CC=gcc-4.8
         export CXX=g++-4.8
@@ -47,23 +53,6 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     if [[ "$VALGRIND" == "ON" ]]; then
         export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_TEST_RUNNER=valgrind"
     fi
-fi
-
-if [[ "$USE_ICC" == "ON" ]]; then
-    if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
-        echo "not runnning intel builder on Pull-Request"
-        exit
-    fi
-    /bin/sh $TRAVIS_BUILD_DIR/scripts/ci/install-icc.sh
-    source ~/.bashrc
-    export CC=icc
-    export CXX=icpc
-fi
-
-if [[ "$USE_PGI" == "ON" ]]; then
-    /bin/sh $TRAVIS_BUILD_DIR/scripts/ci/install-pgi.sh
-    export CC=pgcc
-    export CXX=pgc++
 fi
 
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
@@ -75,6 +64,33 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     fi
 fi
 
+if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+    export PATH="/c/Program Files/CMake/bin":$PATH
+    export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_BUILD_DOCTESTS=OFF"
+
+    if [[ "${CMAKE_GENERATOR}" == "Visual Studio"* ]]; then
+        choco install -y vcbuildtools
+        export PATH=$PATH:"/c/Program Files (x86)/Microsoft Visual Studio/2015/BuildTools/MSBuild/14.0/Bin"
+        export BUILD_ARGS="-verbosity:minimal -m:2"
+    fi
+
+    if [[ "${CMAKE_GENERATOR}" == "MinGW Makefiles" ]]; then
+        export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_SH=CMAKE_SH-NOTFOUND"
+        export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_BUILD_TYPE=release"
+        export CMAKE_BUILD_TYPE="Release"
+
+        # Remove sh.exe from git in the PATH for MinGW generator
+        # 1) add extra ':' to allow the REMOVE below to work
+        TMP_PATH=:$PATH:
+        # 2) remove sh.exe from the PATH
+        REMOVE='/c/Program Files/Git/usr/bin'
+        TMP_PATH=${TMP_PATH/:$REMOVE:/:}
+        # 3) remove extra ':'
+        TMP_PATH=${TMP_PATH%:}
+        TMP_PATH=${TMP_PATH#:}
+        export PATH=$TMP_PATH
+    fi
+fi
 
 if [[ "$ARCH" == "x86" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_C_FLAGS=-m32"
