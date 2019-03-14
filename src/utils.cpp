@@ -8,9 +8,8 @@
 #include <algorithm>
 
 #ifdef CHEMFILES_WINDOWS
-#include <windows.h>
-#include <lmcons.h>
-#include <direct.h>
+#include <windows.h>  // GetUserName & GetComputerNameEx
+#include <direct.h>  // _getcwd
 #define getcwd _getcwd
 #else
 #include <unistd.h>
@@ -19,8 +18,8 @@
 
 std::string chemfiles::user_name() {
 #ifdef CHEMFILES_WINDOWS
-    char name[UNLEN + 1];
-    DWORD size = sizeof(name);
+    char name[1024] = {0};
+    DWORD size = 1024;
     if (!GetUserName(name, &size)) {
         return "";
     }
@@ -33,9 +32,9 @@ std::string chemfiles::user_name() {
 
 std::string chemfiles::hostname() {
 #ifdef CHEMFILES_WINDOWS
-    char name[MAX_COMPUTERNAME_LENGTH + 1];
-    DWORD size = sizeof(name);
-    if (!GetComputerName(name, &size)) {
+    char name[1024] = {0};
+    DWORD size = 1024;
+    if (!GetComputerNameEx(ComputerNameDnsHostname, name, &size)) {
         return "";
     }
     return name;
@@ -69,11 +68,10 @@ std::string chemfiles::current_directory() {
             if (errno == ERANGE) {
                 continue;
             } else {
-                return std::string("");
+                return "";
             }
         }
-        // Get the first null character, and stop the copy there
-        auto end = std::find(buffer.begin(), buffer.end(), '\0');
-        return std::string(buffer.begin(), end);
+        // Remove additional '\0' from the string
+        return std::string(buffer.data());
     }
 }
