@@ -69,10 +69,6 @@ if(MSVC)
     add_definitions("-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS")
 endif()
 
-if(NOT ${CHFL_SYSTEM_LZMA})
-    add_definitions("-DLZMA_API_STATIC")
-endif()
-
 add_subdirectory(external)
 
 # We need to use a separated library for non-dll-exported classes that have an
@@ -92,6 +88,10 @@ target_include_directories(chemfiles_objects PUBLIC
 target_include_directories(chemfiles_objects SYSTEM BEFORE PRIVATE ${EXTERNAL_INCLUDES})
 
 target_compile_definitions(chemfiles_objects PRIVATE chemfiles_EXPORTS)
+if(NOT ${CHFL_SYSTEM_LZMA})
+    target_compile_definitions(chemfiles_objects PRIVATE LZMA_API_STATIC)
+endif()
+
 if(${BUILD_SHARED_LIBS})
     set_target_properties(chemfiles_objects PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 endif()
