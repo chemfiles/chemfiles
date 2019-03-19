@@ -47,7 +47,7 @@ matrix:
     - name: valgrind
       os: linux
       compiler: gcc
-      env: VALGRIND=ON
+      env: VALGRIND=ON CHECK_EXPORTS=ON
       addons: *linux64
     - name: 32-bits
       os: linux
@@ -97,9 +97,14 @@ script:
   - ./scripts/ci/check-capi-docs.py
   - ./scripts/ci/check-public-headers.py
   - ./scripts/ci/lint-code.py
+  # Check exported symbols in shared library
+  - |
+    if [[ "${CHECK_EXPORTS}" == "ON" ]]; then
+        ./scripts/ci/check-exported-symbols.py build/libchemfiles.so
+    fi
   # Build docs
   - |
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    if [[ "${DEPLOY_DOCS}" == "ON" ]]; then
         ./scripts/ci/build-docs.sh
     fi
   # Generate and upload coverage
