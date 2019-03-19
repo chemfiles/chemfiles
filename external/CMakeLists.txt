@@ -58,6 +58,38 @@ endfunction()
 set(EXTERNAL_INCLUDES "")
 
 # ==========
+# zlib: https://github.com/chemfiles/zlib
+# ==========
+
+if(${CHFL_SYSTEM_ZLIB})
+    find_package(ZLIB REQUIRED)
+    set(ZLIB_LIBRARIES ${ZLIB_LIBRARIES} PARENT_SCOPE)
+    set(ZLIB_OBJECTS "" PARENT_SCOPE)
+else()
+    external_library(zlib)
+    set(ZLIB_OBJECTS $<TARGET_OBJECTS:zlib> PARENT_SCOPE)
+    set(ZLIB_LIBRARIES "" PARENT_SCOPE)
+    set(ZLIB_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/zlib)
+    set(ZLIB_INCLUDE_DIRS ${ZLIB_INCLUDE_DIRS} PARENT_SCOPE)
+endif()
+list(APPEND EXTERNAL_INCLUDES ${ZLIB_INCLUDE_DIRS})
+
+# ==========
+# lzma: https://github.com/chemfiles/lzma
+# ==========
+if(${CHFL_SYSTEM_LZMA})
+    find_package(LibLZMA REQUIRED)
+    set(LZMA_OBJECTS "" PARENT_SCOPE)
+else()
+    external_library(lzma)
+    set(LZMA_OBJECTS $<TARGET_OBJECTS:lzma> PARENT_SCOPE)
+    set(LIBLZMA_LIBRARY "" PARENT_SCOPE)
+    set(LIBLZMA_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/lzma/liblzma/api ${CMAKE_CURRENT_BINARY_DIR}/lzma)
+    set(LIBLZMA_INCLUDE_DIRS ${LIBLZMA_INCLUDE_DIRS} PARENT_SCOPE)
+endif()
+list(APPEND EXTERNAL_INCLUDES ${LIBLZMA_INCLUDE_DIRS})
+
+# ==========
 # fmtlib: https://github.com/chemfiles/fmt
 # ==========
 external_library(fmt)
@@ -91,16 +123,6 @@ else()
     endif()
     external_library(netcdf)
 
-    # Hide NetCDF variables from CMake GUI
-    mark_as_advanced(FORCE
-        NETCDF_ENABLE_FFIO
-        NETCDF_ENABLE_STDIO
-    )
-
-    if(WIN32)
-        target_compile_definitions(netcdf PRIVATE "-DDLL_NETCDF -DDLL_EXPORT")
-    endif()
-
     set(NETCDF_INCLUDES
         ${CMAKE_CURRENT_BINARY_DIR}/netcdf/include
         ${CMAKE_CURRENT_BINARY_DIR}/netcdf
@@ -120,8 +142,8 @@ list(APPEND EXTERNAL_INCLUDES ${NETCDF_INCLUDES})
 # TNG io: https://github.com/chemfiles/tng
 # ==========
 external_library(tng)
-set(TNG_BUILD_OWN_ZLIB OFF)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/tng/include)
+target_include_directories(tng_io PUBLIC ${ZLIB_INCLUDE_DIRS})
 
 # Hide TNG variables from CMake GUI
 mark_as_advanced(FORCE
@@ -185,37 +207,5 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/molfiles/include)
 unpack_library(mmtf-cpp)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/include )
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/msgpack-c/include )
-
-# ==========
-# zlib: https://github.com/chemfiles/zlib
-# ==========
-
-if(${CHFL_SYSTEM_ZLIB})
-    find_package(ZLIB REQUIRED)
-    set(ZLIB_LIBRARIES ${ZLIB_LIBRARIES} PARENT_SCOPE)
-    set(ZLIB_OBJECTS "" PARENT_SCOPE)
-else()
-    external_library(zlib)
-    set(ZLIB_OBJECTS $<TARGET_OBJECTS:zlib> PARENT_SCOPE)
-    set(ZLIB_LIBRARIES "" PARENT_SCOPE)
-    set(ZLIB_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/zlib)
-    set(ZLIB_INCLUDE_DIRS ${ZLIB_INCLUDE_DIRS} PARENT_SCOPE)
-endif()
-list(APPEND EXTERNAL_INCLUDES ${ZLIB_INCLUDE_DIRS})
-
-# ==========
-# lzma: https://github.com/chemfiles/lzma
-# ==========
-if(${CHFL_SYSTEM_LZMA})
-    find_package(LibLZMA REQUIRED)
-    set(LZMA_OBJECTS "" PARENT_SCOPE)
-else()
-    external_library(lzma)
-    set(LZMA_OBJECTS $<TARGET_OBJECTS:lzma> PARENT_SCOPE)
-    set(LIBLZMA_LIBRARY "" PARENT_SCOPE)
-    set(LIBLZMA_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/lzma/liblzma/api ${CMAKE_CURRENT_BINARY_DIR}/lzma)
-    set(LIBLZMA_INCLUDE_DIRS ${LIBLZMA_INCLUDE_DIRS} PARENT_SCOPE)
-endif()
-list(APPEND EXTERNAL_INCLUDES ${LIBLZMA_INCLUDE_DIRS})
 
 set(EXTERNAL_INCLUDES ${EXTERNAL_INCLUDES} PARENT_SCOPE)
