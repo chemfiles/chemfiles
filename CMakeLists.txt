@@ -8,8 +8,7 @@ if (POLICY CMP0042)
     cmake_policy(SET CMP0042 NEW) # OSX RPATH handling
 endif()
 if (POLICY CMP0063)
-    # Use of `CXX_VISIBILITY_PRESET` and `VISIBILITY_INLINES_HIDDEN` in OBJECT
-    # libraries
+    # Use of `<LANG>_VISIBILITY_PRESET` in OBJECT libraries
     cmake_policy(SET CMP0063 NEW)
 endif()
 
@@ -45,6 +44,7 @@ if (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
 endif()
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 include(CompilerFlags)
 
@@ -107,7 +107,6 @@ set(CHEMFILES_OBJECTS
 )
 
 # Add the main chemfiles library
-file(GLOB_RECURSE sources src/**.cpp)
 add_library(chemfiles ${CHEMFILES_OBJECTS})
 
 set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
