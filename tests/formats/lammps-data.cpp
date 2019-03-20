@@ -133,10 +133,10 @@ TEST_CASE("Write files in LAMMPS data format") {
     "3 angle types\n"
     "2 dihedral types\n"
     "1 improper types\n"
-    "0 5 xlo xhi\n"
-    "0 6.06218 ylo yhi\n"
-    "0 9 zlo zhi\n"
-    "1.5 0 0 xy xz yz\n"
+    "0 5.0 xlo xhi\n"
+    "0 6.062177826491071 ylo yhi\n"
+    "0 9.0 zlo zhi\n"
+    "1.5000000000000018 0.0 0.0 xy xz yz\n"
     "\n"
     "# Pair Coeffs\n"
     "# 1 As\n"
@@ -163,19 +163,19 @@ TEST_CASE("Write files in LAMMPS data format") {
     "\n"
     "Masses\n"
     "\n"
-    "1 25 # As\n"
+    "1 25.0 # As\n"
     "2 74.9216 # As\n"
     "3 10.81 # B\n"
     "4 12.011 # C\n"
     "\n"
     "Atoms # full\n"
     "\n"
-    "1 1 1 0 1.1 2.2 3.3 # As\n"
-    "2 2 2 0 1.1 2.2 3.3 # As\n"
-    "3 2 3 0 1.1 2.2 3.3 # B\n"
-    "4 2 4 0 1.1 2.2 3.3 # C\n"
-    "5 2 3 0 1.1 2.2 3.3 # B\n"
-    "6 2 4 0 1.1 2.2 3.3 # C\n"
+    "1 1 1 0.0 1.1 2.2 3.3 # As\n"
+    "2 2 2 0.0 1.1 2.2 3.3 # As\n"
+    "3 2 3 -2.4 1.1 2.2 3.3 # B\n"
+    "4 2 4 0.0 1.1 2.2 3.3 # C\n"
+    "5 2 3 0.0 1.1 2.2 3.3 # B\n"
+    "6 2 4 0.0 1.1 2.2 3.3 # C\n"
     "\n"
     "Velocities\n"
     "\n"
@@ -225,6 +225,7 @@ TEST_CASE("Write files in LAMMPS data format") {
     frame.add_bond(4, 5);
 
     frame[0].set_mass(25);
+    frame[2].set_charge(-2.4);
 
     Trajectory(tmpfile, 'w', "LAMMPS Data").write(frame);
 
