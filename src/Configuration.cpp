@@ -2,7 +2,8 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <fstream>
-#include <toml.hpp>
+#include <toml/parser.hpp>
+#include <toml/get.hpp>
 
 #include "chemfiles/Configuration.hpp"
 #include "chemfiles/ErrorFmt.hpp"
