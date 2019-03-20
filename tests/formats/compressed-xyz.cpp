@@ -68,10 +68,10 @@ static void check_write_file(std::string path) {
     auto lines = checking.readlines(6);
     CHECK(lines[0] == "4");
     CHECK(lines[1] == "Written by the chemfiles library");
-    CHECK(lines[2] == "A 1 2 3");
-    CHECK(lines[3] == "B 1 2 4");
-    CHECK(lines[4] == "C 1 2 5");
-    CHECK(lines[5] == "D 1 2 6");
+    CHECK(lines[2] == "A 1.0 2.0 3.0");
+    CHECK(lines[3] == "B 1.0 2.0 4.0");
+    CHECK(lines[4] == "C 1.0 2.0 5.0");
+    CHECK(lines[5] == "D 1.0 2.0 6.0");
 }
 
 

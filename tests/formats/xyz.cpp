@@ -108,18 +108,18 @@ TEST_CASE("Write files in XYZ format") {
     const auto expected_content =
 R"(4
 Written by the chemfiles library
-A 1 2 3
-B 1 2 3
-C 1 2 3
-D 1 2 3
+A 1.0 2.0 3.0
+B 1.0 2.0 3.0
+C 1.0 2.0 3.0
+D 1.0 2.0 3.0
 6
 Written by the chemfiles library
-A 1 2 3
-B 1 2 3
-C 1 2 3
-D 1 2 3
-E 4 5 6
-F 4 5 6
+A 1.0 2.0 3.0
+B 1.0 2.0 3.0
+C 1.0 2.0 3.0
+D 1.0 2.0 3.0
+E 4.0 5.0 6.0
+F 4.0 5.0 6.0
 )";
 
     auto frame = Frame();
