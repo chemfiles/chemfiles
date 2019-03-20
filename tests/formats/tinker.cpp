@@ -75,19 +75,19 @@ TEST_CASE("Write files in Tinker XYZ format") {
     auto tmpfile = NamedTempPath(".arc");
     const auto expected_content =
 R"(4 written by the chemfiles library
-0 0 0 90 90 90
-1 A 1 2 3 1 2 3
-2 A 1 2 3 1 1
-3 B 1 2 3 2 1
-4 B 1 2 3 3
+0.0 0.0 0.0 90.0 90.0 90.0
+1 A 1.0 2.0 3.0 1 2 3
+2 A 1.0 2.0 3.0 1 1
+3 B 1.0 2.0 3.0 2 1
+4 B 1.0 2.0 3.0 3
 6 written by the chemfiles library
-22 33 44 90 90 90
-1 A 1 2 3 1 2 3
-2 A 1 2 3 1 1
-3 B 1 2 3 2 1
-4 B 1 2 3 3
-5 E 4 5 6 4
-6 F 4 5 6 5
+22.0 33.0 44.0 90.0 90.0 90.0
+1 A 1.0 2.0 3.0 1 2 3
+2 A 1.0 2.0 3.0 1 1
+3 B 1.0 2.0 3.0 2 1
+4 B 1.0 2.0 3.0 3
+5 E 4.0 5.0 6.0 4
+6 F 4.0 5.0 6.0 5
 )";
 
     auto frame = Frame();
