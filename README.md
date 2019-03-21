@@ -1,8 +1,7 @@
 ## Chemfiles: a library for reading and writing chemistry files
 
 [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](http://chemfiles.org/chemfiles/)
-[![Build Status -- Linux & OSX](https://img.shields.io/travis/chemfiles/chemfiles/master.svg)](https://travis-ci.org/chemfiles/chemfiles)
-[![Build Status -- Windows](https://ci.appveyor.com/api/projects/status/dvn6nr3lsssd23lo/branch/master?svg=true)](https://ci.appveyor.com/project/Luthaf/chemfiles/branch/master)
+[![Build Status](https://img.shields.io/travis/chemfiles/chemfiles/master.svg)](https://travis-ci.org/chemfiles/chemfiles)
 [![Code Coverage](http://codecov.io/github/chemfiles/chemfiles/coverage.svg?branch=master)](http://codecov.io/github/chemfiles/chemfiles?branch=master)
 [![Gitter](https://badges.gitter.im/chemfiles/chemfiles.svg)](https://gitter.im/chemfiles/chemfiles)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.800663.svg)](https://doi.org/10.5281/zenodo.800663)
