@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -xe
+
 cd $TRAVIS_BUILD_DIR
 export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DCHFL_BUILD_TESTS=ON $CMAKE_EXTRA"
 export BUILD_ARGS="-j2"
