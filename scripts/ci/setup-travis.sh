@@ -97,3 +97,5 @@ fi
 if [[ "$ARCH" == "x86" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_C_FLAGS=-m32"
 fi
+
+set +x
