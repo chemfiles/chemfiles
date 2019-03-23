@@ -366,9 +366,9 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
             Residue residue(std::move(name), resid);
             residue.add_atom(atom_id);
 
-            auto inscode = line.substr(26, 1);
-            if (inscode != " ") {
-                atom.set("insertion_code", inscode);
+            auto insertion_code = line.substr(26, 1);
+            if (insertion_code != " ") {
+                frame[atom_id].set("insertion_code", insertion_code);
             }
 
             // Set whether or not the residue is standardized
