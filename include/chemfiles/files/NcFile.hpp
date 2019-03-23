@@ -93,9 +93,9 @@ namespace nc {
 class NcFile final: public File {
 public:
     NcFile(std::string path, File::Mode mode);
-    ~NcFile() noexcept override;
-    NcFile(NcFile&&) = default;
-    NcFile& operator=(NcFile&&) = delete;
+    ~NcFile() override;
+    NcFile(NcFile&&) noexcept = default;
+    NcFile& operator=(NcFile&&) = default;
     NcFile(NcFile const&) = delete;
     NcFile& operator=(NcFile const&) = delete;
 

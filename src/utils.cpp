@@ -26,7 +26,11 @@ std::string chemfiles::user_name() {
     return name;
 #else
     auto user = getpwuid(getuid());
-    return user ? user->pw_name : "";
+    if (user != nullptr) {
+        return user->pw_name;
+    } else {
+        return "";
+    }
 #endif
 }
 
@@ -48,7 +52,7 @@ std::string chemfiles::hostname() {
     #endif
 
     char name[BUFFSIZE];
-    if (gethostname(name, sizeof(name))) {
+    if (gethostname(name, sizeof(name)) != 0) {
         return "";
     }
     return name;

@@ -8,7 +8,7 @@
 
 using namespace chemfiles;
 
-Bond::Bond(size_t i, size_t j) {
+Bond::Bond(size_t i, size_t j): data_({{0}}) {
     if (i == j) {
         throw error("can not have a bond between an atom and itself");
     }
@@ -24,7 +24,7 @@ size_t Bond::operator[](size_t i) const {
     return data_[i];
 }
 
-Angle::Angle(size_t i, size_t j, size_t k) {
+Angle::Angle(size_t i, size_t j, size_t k): data_({{0}}) {
     if (i == j || i == k || j == k) {
         throw error("can not have the same atom twice in an angle");
     }
@@ -41,7 +41,7 @@ size_t Angle::operator[](size_t i) const {
     return data_[i];
 }
 
-Dihedral::Dihedral(size_t i, size_t j, size_t k, size_t m) {
+Dihedral::Dihedral(size_t i, size_t j, size_t k, size_t m): data_({{0}}) {
     if (i == j || j == k || k == m) {
         throw error("can not have an atom linked to itself in a dihedral angle");
     }
@@ -70,7 +70,7 @@ size_t Dihedral::operator[](size_t i) const {
     return data_[i];
 }
 
-Improper::Improper(size_t i, size_t j, size_t k, size_t m) {
+Improper::Improper(size_t i, size_t j, size_t k, size_t m): data_({{0}}) {
     if (j == i || j == k || j == m) {
         throw error("can not have an atom linked to itself in an improper dihedral angle");
     }

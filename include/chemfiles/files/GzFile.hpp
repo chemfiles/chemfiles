@@ -21,8 +21,8 @@ public:
 
     gzstreambuf(const gzstreambuf&) = delete;
     gzstreambuf& operator=(const gzstreambuf&) = delete;
-    gzstreambuf(gzstreambuf&&) = delete;
-    gzstreambuf& operator=(gzstreambuf&&) = delete;
+    gzstreambuf(gzstreambuf&&) noexcept = delete;
+    gzstreambuf& operator=(gzstreambuf&&) noexcept = delete;
 
     /// Open the file at `path` with the given `mode`. The mode will be passed
     /// down to gzopen.

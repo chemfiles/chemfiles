@@ -142,3 +142,21 @@ TEST_CASE("Property") {
         CHECK(new_prop.as_vector3d() == Vector3D(0, 0, 0));
     }
 }
+
+TEST_CASE("Property map") {
+    auto map = property_map();
+    map.set("foo", 33);
+    map.set("bar", "barbar");
+
+    auto property = map.get("foo");
+    CHECK(property);
+    CHECK(property->kind() == Property::DOUBLE);
+    CHECK(property->as_double() == 33.0);
+
+    CHECK(map.get<Property::DOUBLE>("foo").value() == 33.0);
+    CHECK(map.get<Property::STRING>("bar").value() == "barbar");
+
+    CHECK_FALSE(map.get<Property::BOOL>("bar"));
+    CHECK_FALSE(map.get<Property::DOUBLE>("bar"));
+    CHECK_FALSE(map.get<Property::VECTOR3D>("bar"));
+}

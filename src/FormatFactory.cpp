@@ -88,15 +88,15 @@ FormatFactory::iterator FormatFactory::find_extension(const formats_map_t& forma
 
 void FormatFactory::register_format(FormatInfo info, format_creator_t creator) {
     auto formats = formats_.lock();
-    if (info.name() == "" && info.extension() == "") {
+    if (info.name().empty() && info.extension().empty()) {
         throw format_error(
             "can not register a format with no name and no extension"
         );
-    } else if (info.name() != "" && find_name(*formats, info.name()) != formats->end()) {
+    } else if (!info.name().empty() && find_name(*formats, info.name()) != formats->end()) {
         throw format_error(
             "the name '{}' is already associated with a format."
         );
-    } else if (info.extension() != "" && find_extension(*formats, info.extension()) != formats->end()) {
+    } else if (!info.extension().empty() && find_extension(*formats, info.extension()) != formats->end()) {
         throw format_error(
             "the extension '{}' is already associated with a format."
         );

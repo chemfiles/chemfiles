@@ -53,7 +53,11 @@ xzstreambuf::xzstreambuf(size_t buffer_size):
 xzstreambuf::~xzstreambuf() {
     if (!reading_) {
         action_ = LZMA_FINISH;
-        sync();
+        try {
+            sync();
+        } catch (...) {
+            // ignore exceptions in destructor
+        }
     }
 
     if (index_) {
@@ -66,7 +70,7 @@ xzstreambuf::~xzstreambuf() {
 
     lzma_end(&stream_);
     if (file_) {
-        fclose(file_);
+        std::fclose(file_);
     }
 }
 
@@ -74,7 +78,7 @@ void xzstreambuf::open(const std::string& path, const std::string& mode) {
     if (is_open()) {
         throw file_error("can not open an xz file twice with the same xzstreambuf");
     }
-    file_ = fopen(path.c_str(), mode.c_str());
+    file_ = std::fopen(path.c_str(), mode.c_str());
 
     if (mode == "wb") {
         reading_ = false;
@@ -311,7 +315,7 @@ xzstreambuf::pos_type xzstreambuf::seekpos(std::streambuf::pos_type position,
     } else {
         seek_amount = static_cast<long>(iter.block.compressed_file_offset);
     }
-    if (fseek(file_, seek_amount, SEEK_SET)) {
+    if (std::fseek(file_, seek_amount, SEEK_SET)) {
         return EOF;
     }
 
@@ -338,7 +342,7 @@ bool xzstreambuf::init_index() {
     }
 
     std::array<uint8_t, LZMA_STREAM_HEADER_SIZE> buffer = {{0}};
-    if (fseek(file_, -12, SEEK_END) || !std::fread(buffer.data(), 12, 1, file_)) {
+    if (std::fseek(file_, -12, SEEK_END) || !std::fread(buffer.data(), 12, 1, file_)) {
         return false;
     }
 
@@ -349,7 +353,7 @@ bool xzstreambuf::init_index() {
 
     std::vector<uint8_t> index_buf(static_cast<size_t>(footer_flags.backward_size));
     auto size = -static_cast<long>(footer_flags.backward_size + 12);
-    if (fseek(file_, size, SEEK_END) || !std::fread(index_buf.data(), index_buf.size(), 1, file_)) {
+    if (std::fseek(file_, size, SEEK_END) || !std::fread(index_buf.data(), index_buf.size(), 1, file_)) {
         return false;
     }
 
@@ -361,7 +365,7 @@ bool xzstreambuf::init_index() {
 }
 
 bool xzstreambuf::is_open() const {
-    return file_ != nullptr && !::ferror(file_);
+    return file_ != nullptr && !std::ferror(file_);
 }
 
 XzFile::XzFile(std::string path, File::Mode mode): TextFile(std::move(path), mode, File::LZMA, &buffer_), buffer_() {

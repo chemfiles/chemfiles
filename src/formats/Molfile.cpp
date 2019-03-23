@@ -95,9 +95,9 @@ Molfile<F>::Molfile(std::string path, File::Mode mode, File::Compression compres
     plugin_handle_->cons_fputs = molfiles_to_chemfiles_warning;
 
     // Check that needed functions are here
-    if (!plugin_handle_->open_file_read ||
-        (!plugin_handle_->read_next_timestep && !plugin_handle_->read_timestep) ||
-        (!plugin_handle_->close_file_read)) {
+    if (plugin_handle_->open_file_read == nullptr ||
+        (plugin_handle_->read_next_timestep == nullptr && plugin_handle_->read_timestep == nullptr ) ||
+        (plugin_handle_->close_file_read == nullptr )) {
         throw format_error(
             "the {} plugin does not have read capacities", plugin_data_.format()
         );
@@ -107,7 +107,7 @@ Molfile<F>::Molfile(std::string path, File::Mode mode, File::Compression compres
         path_.c_str(), plugin_handle_->name, &natoms_
     );
 
-    if (!data_) {
+    if (data_ == nullptr) {
         throw format_error(
             "could not open the file at '{}' with {} plugin", path_, plugin_data_.format()
         );
@@ -116,7 +116,7 @@ Molfile<F>::Molfile(std::string path, File::Mode mode, File::Compression compres
     read_topology();
 }
 
-template <MolfileFormat F> Molfile<F>::~Molfile() noexcept {
+template <MolfileFormat F> Molfile<F>::~Molfile() {
     if (data_) {
         plugin_handle_->close_file_read(data_);
     }
@@ -124,10 +124,10 @@ template <MolfileFormat F> Molfile<F>::~Molfile() noexcept {
 }
 
 template <MolfileFormat F> int Molfile<F>::read_next_timestep(molfile_timestep_t* timestep) {
-    if (plugin_handle_->read_next_timestep) {
+    if (plugin_handle_->read_next_timestep != nullptr) {
         // This function is provided by classical molecular simulation format.
         return plugin_handle_->read_next_timestep(data_, natoms_, timestep);
-    } else if (plugin_handle_->read_timestep) {
+    } else if (plugin_handle_->read_timestep != nullptr) {
         // This function is provided by quantum molecular simulation format.
         return plugin_handle_->read_timestep(
             data_, natoms_, timestep, nullptr, nullptr
@@ -177,7 +177,7 @@ template <MolfileFormat F> void Molfile<F>::read_step(size_t step, Frame& frame)
 }
 
 template <MolfileFormat F> size_t Molfile<F>::nsteps() {
-    if (!plugin_handle_->read_next_timestep) {
+    if (plugin_handle_->read_next_timestep == nullptr) {
         // FIXME: this is hacky, but the molden plugin does not respect a NULL
         // argument for molfile_timestep_t, so for now we are only able to read
         // a sinle step from all the QM format plugins.
@@ -206,9 +206,9 @@ template <MolfileFormat F>
 void Molfile<F>::molfile_to_frame(const molfile_timestep_t& timestep,
                                   Frame& frame) {
     frame.set_cell({
-        static_cast<double>(timestep.A), 
-        static_cast<double>(timestep.B), 
-        static_cast<double>(timestep.C), 
+        static_cast<double>(timestep.A),
+        static_cast<double>(timestep.B),
+        static_cast<double>(timestep.C),
         static_cast<double>(timestep.alpha),
         static_cast<double>(timestep.beta),
         static_cast<double>(timestep.gamma)
@@ -254,10 +254,10 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
     size_t atom_id = 0;
     for (auto& molfile_atom : atoms) {
         Atom atom(molfile_atom.name, molfile_atom.type);
-        if (optflags & MOLFILE_MASS) {
+        if ((optflags & MOLFILE_MASS) != 0) {
             atom.set_mass(static_cast<double>(molfile_atom.mass));
         }
-        if (optflags & MOLFILE_CHARGE) {
+        if ((optflags & MOLFILE_CHARGE) != 0) {
             atom.set_charge(static_cast<double>(molfile_atom.charge));
         }
 

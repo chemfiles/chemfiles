@@ -24,11 +24,7 @@ class PDBFormat final: public Format {
 public:
     PDBFormat(std::string path, File::Mode mode, File::Compression compression);
 
-    ~PDBFormat() noexcept override;
-    PDBFormat(const PDBFormat&) = delete;
-    PDBFormat& operator=(const PDBFormat&) = delete;
-    PDBFormat(PDBFormat&&) = default;
-    PDBFormat& operator=(PDBFormat&&) = default;
+    ~PDBFormat() override;
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;

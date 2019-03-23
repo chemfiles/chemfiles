@@ -50,13 +50,13 @@ private:
     lzma_stream stream_ = LZMA_STREAM_INIT;
     /// Current block (used when reading). This must be a class member, as a
     /// pointer to this will be saved in stream_
-    lzma_block block_;
+    lzma_block block_ = {};
     /// Buffer for storing lzma_filter in the block_
     std::array<lzma_filter, LZMA_FILTERS_MAX + 1> filters_ = {{{LZMA_VLI_UNKNOWN, nullptr}}};
     /// Action for sync. Only used when writing
     lzma_action action_ = LZMA_RUN;
     /// Check used by the stream for decoding
-    lzma_check check_;
+    lzma_check check_ = LZMA_CHECK_NONE;
     /// Optional index for seekoff/seekpos
     lzma_index* index_ = nullptr;
 

@@ -14,9 +14,9 @@ namespace chemfiles {
 class TNGFile final: public File {
 public:
     TNGFile(std::string path, File::Mode mode);
-    ~TNGFile() noexcept override;
-    TNGFile(TNGFile&&) = default;
-    TNGFile& operator=(TNGFile&&) = delete;
+    ~TNGFile() override;
+    TNGFile(TNGFile&&) noexcept = default;
+    TNGFile& operator=(TNGFile&&) = default;
     TNGFile(TNGFile const&) = delete;
     TNGFile& operator=(TNGFile const&) = delete;
 

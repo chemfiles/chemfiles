@@ -81,7 +81,9 @@ void XYZFormat::write(const Frame& frame) {
 
     for (size_t i = 0; i < frame.size(); i++) {
         auto name = topology[i].name();
-        if (name == "") {name = "X";}
+        if (name.empty()) {
+            name = "X";
+        }
         fmt::print(
             *file_, "{} {} {} {}\n",
             name, positions[i][0], positions[i][1], positions[i][2]

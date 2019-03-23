@@ -78,13 +78,13 @@ static File::Mode char_to_file_mode(char mode) {
 }
 
 Trajectory::Trajectory(std::string path, char mode, const std::string& format)
-    : path_(std::move(path)), mode_(mode), step_(0), nsteps_(0), format_(nullptr) {
+    : path_(std::move(path)), mode_(mode), format_(nullptr) {
 
     auto info = file_open_info::parse(path_, format);
     format_creator_t format_creator;
-    if (info.format != "") {
+    if (!info.format.empty()) {
         format_creator = FormatFactory::get().name(info.format);
-    } else if (info.extension != "") {
+    } else if (!info.extension.empty()) {
         format_creator = FormatFactory::get().extension(info.extension);
     } else {
         throw file_error(

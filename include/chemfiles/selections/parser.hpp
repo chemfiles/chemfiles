@@ -20,6 +20,12 @@ public:
     /// Create a new parser for the given list of `tokens`
     Parser(std::vector<Token> tokens): tokens_(std::move(tokens)) {}
 
+    ~Parser() = default;
+    Parser(const Parser&) = default;
+    Parser& operator=(const Parser&) = default;
+    Parser(Parser&&) noexcept = default;
+    Parser& operator=(Parser&&) = default;
+
     /// Parse the list of tokens and get the corresponding Ast.
     Ast parse();
 
@@ -85,7 +91,7 @@ private:
         return previous();
     }
 
-    const std::vector<Token> tokens_;
+    std::vector<Token> tokens_;
     size_t current_ = 0;
 };
 

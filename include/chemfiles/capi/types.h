@@ -171,7 +171,7 @@ typedef enum {  // NOLINT: this is both a C and C++ file
 /// counter to allow direct modification of C++ objects.
 ///
 /// @example{capi/chfl_atom/chfl_atom.c}
-CHFL_EXPORT void chfl_free(const void* objet);
+CHFL_EXPORT void chfl_free(const void* object);
 
 #ifdef __cplusplus
 }

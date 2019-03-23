@@ -781,7 +781,7 @@ void check_values_size(const Vector3D& values, unsigned width, const std::string
     }
 }
 
-PDBFormat::~PDBFormat() noexcept {
+PDBFormat::~PDBFormat() {
     if (written_) {
       fmt::print(*file_, "END\n");
     }

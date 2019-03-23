@@ -17,7 +17,7 @@ namespace chemfiles {
 class CMLFormat final: public Format {
 public:
     CMLFormat(std::string path, File::Mode mode, File::Compression compression);
-    ~CMLFormat();
+    ~CMLFormat() override;
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;

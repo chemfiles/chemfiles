@@ -377,7 +377,7 @@ void CMLFormat::read(Frame& frame) {
 
 void CMLFormat::read_step(size_t step, Frame& frame) {
     current_ = root_.children("molecule").begin();
-    std::advance(current_, step);
+    std::advance(current_, static_cast<ptrdiff_t>(step));
     read(frame);
 }
 

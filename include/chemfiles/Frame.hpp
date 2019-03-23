@@ -94,7 +94,7 @@ public:
     ///
     /// @example{frame/cell.cpp}
     void set_cell(UnitCell cell) {
-        cell_ = std::move(cell);
+        cell_ = std::move(cell);  // NOLINT: std::move for trivially copiable type
     }
 
     /// Get the number of atoms in this frame

@@ -37,7 +37,7 @@ TNGFile::TNGFile(std::string path, File::Mode mode): File(std::move(path), mode,
     }
 }
 
-TNGFile::~TNGFile() noexcept {
+TNGFile::~TNGFile() {
     tng_util_trajectory_close(&handle_);
 }
 

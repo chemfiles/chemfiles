@@ -206,11 +206,11 @@ private:
     /// Path of the associated file
     std::string path_;
     /// Opening mode of the associated file
-    char mode_;
+    char mode_ = '\0';
     /// Current step
-    size_t step_;
+    size_t step_ = 0;
     /// Number of steps in the file, if available
-    size_t nsteps_;
+    size_t nsteps_ = 0;
     /// Format used to read the associated file. It will be `nullptr` is the
     /// trajectory is closed
     std::unique_ptr<Format> format_;

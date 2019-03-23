@@ -22,11 +22,6 @@ class MOL2Format final: public Format {
 public:
     MOL2Format(std::string path, File::Mode mode, File::Compression compression);
 
-    MOL2Format(const MOL2Format&) = delete;
-    MOL2Format& operator=(const MOL2Format&) = delete;
-    MOL2Format(MOL2Format&&) = default;
-    MOL2Format& operator=(MOL2Format&&) = default;
-
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;
     void write(const Frame& frame) override;
