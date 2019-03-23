@@ -225,6 +225,15 @@ TEST_CASE("Read files in PDB format") {
         CHECK(!topo.are_linked(topo.residue(3), topo.residue(5)));
         CHECK(topo.bonds().size() == 815);
     }
+
+    SECTION("Read atomic insertion codes") {
+        auto frame = Trajectory("data/pdb/insertion-code.pdb").read();
+
+        CHECK(frame[0].get<Property::STRING>("insertion_code").value() == "a");
+        CHECK(frame[1].get<Property::STRING>("insertion_code").value() == "c");
+        CHECK(frame[2].get<Property::STRING>("insertion_code").value() == "x");
+        CHECK_FALSE(frame[3].get("insertion_code"));
+    }
 }
 
 TEST_CASE("Problematic PDB files") {
