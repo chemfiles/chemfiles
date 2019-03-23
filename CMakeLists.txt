@@ -28,6 +28,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
 option(CHFL_BUILD_TESTS "Build unit tests." OFF)
 option(CHFL_BUILD_DOCUMENTATION "Build the documentation." OFF)
 option(CHFL_USE_WARNINGS "Compile the code with warnings (default in debug mode)" OFF)
+option(CHFL_USE_CLANG_TIDY "Compile the code with clang-tidy warnings" OFF)
 option(CHFL_SYSTEM_NETCDF "Use the system NetCDF instead of the internal one" OFF)
 option(CHFL_SYSTEM_ZLIB "Use the system zlib instead of the internal one" OFF)
 option(CHFL_SYSTEM_LZMA "Use the system lzma instead of the internal one" OFF)
@@ -47,10 +48,8 @@ if (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     endif()
 endif()
 
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_C_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 include(CompilerFlags)
+include(ClangTidy)
 
 if(${CHFL_USE_WARNINGS})
     # Make sure to have asserts compiled
@@ -99,6 +98,8 @@ endif()
 if(${BUILD_SHARED_LIBS})
     set_target_properties(chemfiles_objects PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 endif()
+
+target_use_clang_tidy(chemfiles_objects)
 
 set(CHEMFILES_OBJECTS
     $<TARGET_OBJECTS:chemfiles_objects>
