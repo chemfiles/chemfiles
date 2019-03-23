@@ -20,7 +20,7 @@ inline std::vector<std::string> split(const std::string &s, char delim) {
     std::string item;
     std::vector<std::string> elems;
     while (std::getline(ss, item, delim)) {
-        if (item != "") {
+        if (!item.empty()) {
             elems.push_back(item);
         }
     }

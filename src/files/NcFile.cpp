@@ -117,7 +117,7 @@ NcFile::NcFile(std::string path, File::Mode mode)
     nc::check(status, "could not open the file '{}'", this->path());
 }
 
-NcFile::~NcFile() noexcept {
+NcFile::~NcFile() {
     auto status = nc_close(file_id_);
     assert(status == NC_NOERR);
 }

@@ -8,6 +8,7 @@
 
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Frame.hpp"
+#include "chemfiles/warnings.hpp"
 
 #include "chemfiles/files/GzFile.hpp"
 #include "chemfiles/files/XzFile.hpp"
@@ -41,7 +42,7 @@ MMTFFormat::MMTFFormat(std::string path, File::Mode mode, File::Compression comp
             throw format_error("Issue with: {}. Please ensure it is valid MMTF file", path);
         }
     } else if (mode == File::WRITE) {
-        filename_ = path; // We really don't need to do anything, yet
+        filename_ = std::move(path); // We really don't need to do anything, yet
     } else if (mode == File::APPEND) {
         throw file_error("append mode ('a') is not supported for the MMTF format");
     }
@@ -394,7 +395,13 @@ void MMTFFormat::write(const Frame& frame) {
 
 MMTFFormat::~MMTFFormat() {
     if (!filename_.empty()) {
-        mmtf::compressGroupList(structure_);
-        encodeToFile(structure_, filename_);
+        try {
+            mmtf::compressGroupList(structure_);
+            encodeToFile(structure_, filename_);
+        } catch (const std::exception& e) {
+            warning("error while finishing writing to {}: {}", filename_, e.what());
+        } catch (...) {
+            // ignore exceptions in destructor
+        }
     }
 }

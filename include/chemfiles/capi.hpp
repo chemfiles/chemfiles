@@ -41,12 +41,12 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
     catch (const chemfiles::exception& e) {                                    \
         set_last_error(e.what());                                              \
         chemfiles::warning(e.what());                                          \
-        goto error;                                                            \
+        goto error;  /* NOLINT: goto is OK here */                             \
     }
 
 #define CHECK_POINTER(ptr)                                                     \
     do {                                                                       \
-        if (ptr == nullptr) {                                                  \
+        if ((ptr) == nullptr) {                                                \
             std::string message = fmt::format(                                 \
                 "Parameter '{}' cannot be NULL in {}", #ptr, __func__          \
             );                                                                 \
@@ -58,13 +58,13 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
 
 #define CHECK_POINTER_GOTO(ptr)                                                \
     do {                                                                       \
-        if (ptr == nullptr) {                                                  \
+        if ((ptr) == nullptr) {                                                \
             std::string message = fmt::format(                                 \
                 "Parameter '{}' cannot be NULL in {}", #ptr, __func__          \
             );                                                                 \
             set_last_error(message);                                           \
             chemfiles::warning(message);                                       \
-            goto error;                                                        \
+            goto error;  /* NOLINT: goto is OK here */                         \
         }                                                                      \
     } while (false)
 
@@ -105,7 +105,7 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
     CATCH_AND_GOTO_ERROR(Error)                                                \
     catch (const std::exception& e) {                                          \
         set_last_error(e.what());                                              \
-        goto error;                                                            \
+        goto error;  /* NOLINT: goto is OK here */                             \
     }
 
 }

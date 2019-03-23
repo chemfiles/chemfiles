@@ -29,7 +29,7 @@ private:
     /// Map of STAR records to their index
     std::map<std::string, size_t> atom_site_map_;
     /// Map of residues, indexed by residue id and chainid.
-    std::map< std::pair<std::string, size_t>, Residue> residues_;
+    std::map<std::pair<std::string, size_t>, Residue> residues_;
     /// Set to true if the file is based on fractional coordinates.
     /// Set to false if the file is based on cartn coordinates.
     bool uses_fract_;

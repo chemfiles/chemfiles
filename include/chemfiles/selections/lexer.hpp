@@ -80,7 +80,7 @@ public:
     ~Token() = default;
     Token(const Token&) = default;
     Token& operator=(const Token&) = default;
-    Token(Token&&) = default;
+    Token(Token&&) noexcept = default;
     Token& operator=(Token&&) = default;
 
     /// Create an identifier token with `data` name
@@ -174,6 +174,12 @@ class Tokenizer {
 public:
     /// Create a new Tokenizer from the given `input`
     Tokenizer(std::string input): input_(std::move(input)) {}
+
+    ~Tokenizer() = default;
+    Tokenizer(const Tokenizer&) = default;
+    Tokenizer& operator=(const Tokenizer&) = default;
+    Tokenizer(Tokenizer&&) noexcept = default;
+    Tokenizer& operator=(Tokenizer&&) = default;
 
     /// Convert the `input` string to a stream of tokens
     ///

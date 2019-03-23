@@ -63,7 +63,7 @@ inline bool operator==(const Match& lhs, const Match& rhs) {
     for (size_t i = 0; i<lhs.size(); i++) {
         if (lhs[i] != rhs[i]) {
             return false;
-        };
+        }
     }
     return true;
 }
@@ -150,8 +150,8 @@ public:
 private:
     /// Store the selection string that generated this selection
     std::string selection_;
-    /// Selection kind
-    Context context_;
+    /// Selection context
+    Context context_ = Context::ATOM;
     /// AST for evaluation of the selection
     selections::Ast ast_;
 };

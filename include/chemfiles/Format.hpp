@@ -21,11 +21,14 @@ class Frame;
 class CHFL_EXPORT Format {
 public:
     Format() = default;
-    virtual ~Format() noexcept = default;
+    virtual ~Format() = default;
+
+    // Delete all move and copy constructors.
+    // Format should only be used behind an std::unique_ptr
     Format(const Format&) = delete;
     Format& operator=(const Format&) = delete;
-    Format(Format&&) = default;
-    Format& operator=(Format&&) = default;
+    Format(Format&&) = delete;
+    Format& operator=(Format&&) = delete;
 
     /// @brief Read a specific step from the trajectory file.
     ///
@@ -73,7 +76,7 @@ public:
     ///
     /// @throws Error if the format name is the empty string
     FormatInfo(std::string name): name_(std::move(name)) {
-        if (name_ == "") {
+        if (name_.empty()) {
             throw Error("a format name can not be an empty string");
         }
     }

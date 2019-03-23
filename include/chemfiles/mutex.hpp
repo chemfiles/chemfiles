@@ -54,8 +54,8 @@ public:
 
     mutex(const mutex&) = delete;
     mutex& operator=(const mutex&) = delete;
-    mutex(mutex&&) = default;
-    mutex& operator=(mutex&&) = default;
+    mutex(mutex&&) = delete;
+    mutex& operator=(mutex&&) = delete;
 
     ~mutex() {
         // deadlock if someone is trying to destroy this `chemfiles::mutex`

@@ -54,7 +54,7 @@ static std::map<std::string, numeric_functions_creator_t> NUMERIC_FUNCTIONS = {
 };
 
 using numeric_variable_functions_creator_t = std::function<MathAst(std::vector<Variable>)>;
-struct NumericVariableFunction {
+struct NumericVariableFunction {  // NOLINT: constructor does not initialize these fields: arity
     unsigned arity;
     numeric_variable_functions_creator_t creator;
 };
@@ -68,16 +68,16 @@ static std::map<std::string, NumericVariableFunction> NUMERIC_VAR_FUNCTIONS = {
 
 
 using bool_selector_creator_t = std::function<Ast(std::vector<SubSelection>)>;
-struct BooleanFunction {
+struct BooleanFunction {  // NOLINT: constructor does not initialize these fields: arity
     unsigned arity;
     bool_selector_creator_t creator;
 };
 
 static std::map<std::string, BooleanFunction> BOOLEAN_SELECTORS = {
-    {"all", {0, [](std::vector<SubSelection> /*unused*/) {
+    {"all", {0, [](std::vector<SubSelection> /*unused*/) {  // NOLINT: can not make std::vector<SubSelection> a const reference
         return Ast(new All());
     }}},
-    {"none", {0, [](std::vector<SubSelection> /*unused*/) {
+    {"none", {0, [](std::vector<SubSelection> /*unused*/) {  // NOLINT: can not make std::vector<SubSelection> a const reference
         return Ast(new None());
     }}},
     {"is_bonded", {2, [](std::vector<SubSelection> args){

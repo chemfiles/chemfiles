@@ -56,11 +56,7 @@ template <MolfileFormat F>
 class Molfile final: public Format {
 public:
     Molfile(std::string path, File::Mode mode, File::Compression compression);
-    ~Molfile() noexcept override;
-    Molfile(const Molfile&) = delete;
-    Molfile& operator=(const Molfile&) = delete;
-    Molfile(Molfile&&) = default;
-    Molfile& operator=(Molfile&&) = default;
+    ~Molfile() override;
 
     void read(Frame& frame) override;
     void read_step(size_t step, Frame& frame) override;

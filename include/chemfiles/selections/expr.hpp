@@ -35,9 +35,10 @@ public:
     Selector() = default;
     virtual ~Selector() = default;
 
-    Selector(Selector&&) = default;
-    Selector& operator=(Selector&&) = default;
-
+    // Delete all move and copy constructors.
+    // Selector should only be used behind an std::unique_ptr
+    Selector(Selector&&) = delete;
+    Selector& operator=(Selector&&) = delete;
     Selector(const Selector&) = delete;
     Selector& operator=(const Selector&) = delete;
 };
@@ -208,19 +209,13 @@ public:
     }
     ~StringSelector() override = default;
 
-    StringSelector(StringSelector&&) = default;
-    StringSelector& operator=(StringSelector&&) = default;
-
-    StringSelector(const StringSelector&) = delete;
-    StringSelector& operator=(const StringSelector&) = delete;
-
     /// Get the value for the atom at index `i` in the `frame`
     virtual const std::string& value(const Frame& frame, size_t i) const = 0;
     /// Get the property name
     virtual std::string name() const = 0;
 
-    bool is_match(const Frame& frame, const Match& match) const override final;
-    std::string print(unsigned delta) const override final;
+    bool is_match(const Frame& frame, const Match& match) const final;
+    std::string print(unsigned delta) const final;
 
 private:
     /// The value to check against
@@ -313,9 +308,10 @@ public:
     MathExpr() = default;
     virtual ~MathExpr() = default;
 
-    MathExpr(MathExpr&&) = default;
-    MathExpr& operator=(MathExpr&&) = default;
-
+    // Delete all move and copy constructors.
+    // MathExpr should only be used behind an std::unique_ptr
+    MathExpr(MathExpr&&) = delete;
+    MathExpr& operator=(MathExpr&&) = delete;
     MathExpr(const MathExpr&) = delete;
     MathExpr& operator=(const MathExpr&) = delete;
 
@@ -547,15 +543,9 @@ public:
     NumericSelector(Variable argument): argument_(argument) {}
     ~NumericSelector() override = default;
 
-    NumericSelector(NumericSelector&&) = default;
-    NumericSelector& operator=(NumericSelector&&) = default;
-
-    NumericSelector(const NumericSelector&) = delete;
-    NumericSelector& operator=(const NumericSelector&) = delete;
-
-    double eval(const Frame& frame, const Match& match) const override final;
-    optional<double> optimize() override final;
-    std::string print() const override final;
+    double eval(const Frame& frame, const Match& match) const final;
+    optional<double> optimize() final;
+    std::string print() const final;
 
     /// Get the value for the atom at index `i` in the `frame`
     virtual double value(const Frame& frame, size_t i) const = 0;

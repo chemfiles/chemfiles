@@ -22,10 +22,6 @@ public:
     MMTFFormat(std::string path, File::Mode mode, File::Compression compression);
 
     ~MMTFFormat() override;
-    MMTFFormat(const MMTFFormat&) = delete;
-    MMTFFormat& operator=(const MMTFFormat&) = delete;
-    MMTFFormat(MMTFFormat&&) = default;
-    MMTFFormat& operator=(MMTFFormat&&) = default;
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;

@@ -141,7 +141,7 @@ void TinkerFormat::write(const Frame& frame) {
     auto& positions = frame.positions();
     for (size_t i = 0; i < frame.size(); i++) {
         auto name = topology[i].name();
-        if (name == "") {
+        if (name.empty()) {
             name = "X";
         }
         auto it = types_id.find(topology[i].type());
@@ -167,7 +167,7 @@ bool forward(TextFile& file) {
     size_t natoms = 0;
     try {
         auto line = file.readline();
-        if (trim(line) == "") {
+        if (trim(line).empty()) {
             // We just read an empty line, we give up here
             return false;
         } else {

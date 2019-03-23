@@ -410,7 +410,7 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
         throw format_error("missing atoms count in header");
     }
 
-    if (atom_style_name_ == "") {
+    if (atom_style_name_.empty()) {
         warning("Unknown LAMMPS atom style, defaulting to full.");
         warning("You can give the atom style like this: Atoms  # <style>");
         atom_style_name_ = "full";
@@ -580,7 +580,7 @@ void LAMMPSDataFormat::setup_names(Frame& frame) const {
     assert(names_.size() == frame.size());
 
     for (size_t i=0; i<frame.size(); i++) {
-        if (names_[i] != "") {
+        if (!names_[i].empty()) {
             frame[i].set_name(names_[i]);
             frame[i].set_type(names_[i]);
         }

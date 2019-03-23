@@ -133,7 +133,7 @@ void SDFFormat::read(Frame& frame) {
     while(true) {
         try {
             const auto& line = file_->readline();
-            if (line == "") {
+            if (line.empty()) {
                 continue;
             } else if (line.substr(0, 4) == "$$$$") {
                 // Ending block, technically wrong - but we can exit safetly
@@ -151,16 +151,14 @@ void SDFFormat::read(Frame& frame) {
 
     // This portion of the file is for molecule wide properties.
     // We're done parsing, so just quit if any errors occur
-
     std::string property_name;
     std::string property_value;
-
     while(true) {
         try {
             const auto& line = file_->readline();
-            if (line == "") {
+            if (line.empty()) {
                 // This breaks a property group - so store now
-                if (property_name == "") {
+                if (property_name.empty()) {
                     warning("Missing property name!");
                     continue;
                 }
@@ -201,7 +199,7 @@ void SDFFormat::write(const Frame& frame) {
     for (size_t i = 0; i < frame.size(); i++) {
         std::string type = topology[i].type();
 
-        if (type == "" || type.length() > 3) {
+        if (type.empty() || type.length() > 3) {
             type = "Xxx";
         }
 

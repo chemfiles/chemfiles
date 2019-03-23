@@ -44,8 +44,8 @@ public:
     ~UnitCell() = default;
     UnitCell(const UnitCell& other) = default;
     UnitCell& operator=(const UnitCell& other) = default;
-    UnitCell(UnitCell&& other) = default;
-    UnitCell& operator=(UnitCell&& other) = default;
+    UnitCell(UnitCell&& other) noexcept = default;
+    UnitCell& operator=(UnitCell&& other) noexcept = default;
 
     /// Construct an `INFINITE` unit cell, with all lengths set to 0
     ///
@@ -73,7 +73,7 @@ public:
 
     /// Construct a unit cell via from an upper triangular matrix.
     ///
-    /// If a matrix of all zeros is given, then an infinite cell is 
+    /// If a matrix of all zeros is given, then an infinite cell is
     /// created.
     ///
     /// If only the diagonal of the matrix is non-zero, then the cell is

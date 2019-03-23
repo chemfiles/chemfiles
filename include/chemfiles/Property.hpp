@@ -30,55 +30,55 @@ public:
 
     /// Create a property holding a boolean value.
     /// @example{property/bool.cpp}
-    Property(bool value): kind_(BOOL), bool_(value) {}
+    Property(bool value): kind_(BOOL), bool_(value) {} // NOLINT: not all members are initialized
 
     /// Create a property holding a double value.
     /// @example{property/double.cpp}
-    Property(double value): kind_(DOUBLE), double_(value) {}
+    Property(double value): kind_(DOUBLE), double_(value) {} // NOLINT: not all members are initialized
 
     /// Create a property holding a `Vector3D` value.
     /// @example{property/vector3d.cpp}
-    Property(Vector3D value): kind_(VECTOR3D), vector3d_(value) {}
+    Property(Vector3D value): kind_(VECTOR3D), vector3d_(value) {} // NOLINT: not all members are initialized
 
     /// Create a property holding a string value.
     /// @example{property/string.cpp}
-    Property(std::string value): kind_(STRING), string_(std::move(value)) {}
+    Property(std::string value): kind_(STRING), string_(std::move(value)) {} // NOLINT: not all members are initialized
 
     // ==== The following construtors are here to help with overloading
     // ==== resolution.
     /// Create a property holding a string value from a const char*.
     /// @example{property/string.cpp}
-    Property(const char* value): kind_(STRING), string_(value) {}
+    Property(const char* value): kind_(STRING), string_(value) {} // NOLINT: not all members are initialized
 
     /// Create a property holding a double value from an int.
     /// @example{property/double.cpp}
-    Property(int value): kind_(DOUBLE), double_(static_cast<double>(value)) {}
+    Property(int value): kind_(DOUBLE), double_(static_cast<double>(value)) {} // NOLINT: not all members are initialized
 
     /// Create a property holding a double value from a long.
     /// @example{property/double.cpp}
-    Property(long value): kind_(DOUBLE), double_(static_cast<double>(value)) {}
+    Property(long value): kind_(DOUBLE), double_(static_cast<double>(value)) {} // NOLINT: not all members are initialized
 
     /// Create a property holding a double value from a long long.
     /// @example{property/double.cpp}
-    Property(long long value): kind_(DOUBLE), double_(static_cast<double>(value)) {}
+    Property(long long value): kind_(DOUBLE), double_(static_cast<double>(value)) {} // NOLINT: not all members are initialized
 
     /// Create a property holding a double value from an unsigned.
     /// @example{property/double.cpp}
-    Property(unsigned value): kind_(DOUBLE), double_(static_cast<double>(value)) {}
+    Property(unsigned value): kind_(DOUBLE), double_(static_cast<double>(value)) {} // NOLINT: not all members are initialized
 
     /// Create a property holding a double value from an unsigned long.
     /// @example{property/double.cpp}
-    Property(unsigned long value): kind_(DOUBLE), double_(static_cast<double>(value)) {}
+    Property(unsigned long value): kind_(DOUBLE), double_(static_cast<double>(value)) {} // NOLINT: not all members are initialized
 
     /// Create a property holding a double value from an unsigned long long.
     /// @example{property/double.cpp}
-    Property(unsigned long long value): kind_(DOUBLE), double_(static_cast<double>(value)) {}
+    Property(unsigned long long value): kind_(DOUBLE), double_(static_cast<double>(value)) {} // NOLINT: not all members are initialized
 
     Property(const Property& other): Property(false) {
         *this = other;
     }
 
-    Property(Property&& other): Property(false) {
+    Property(Property&& other) noexcept: Property(false) {
         *this = std::move(other);
     }
 
@@ -102,7 +102,7 @@ public:
         return *this;
     }
 
-    Property& operator=(Property&& other) {
+    Property& operator=(Property&& other) noexcept {
         this->~Property();
         this->kind_ = other.kind_;
         switch (this->kind_) {
@@ -247,6 +247,10 @@ public:
     using iterator = std::unordered_map<std::string, Property>::const_iterator;
 
     property_map() = default;
+    property_map(property_map&&) = default;
+    property_map& operator=(property_map&&) = default;
+    property_map(const property_map&) = default;
+    property_map& operator=(const property_map&) = default;
 
     /// Set an arbitrary property with the given `name` and `value`. If a
     /// property with this name already exist, it is replaced with the new

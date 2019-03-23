@@ -28,7 +28,7 @@ void gzstreambuf::open(const std::string& path, const std::string& mode) {
 }
 
 gzstreambuf::int_type gzstreambuf::underflow() {
-    if (gptr() && (gptr() < egptr())) {
+    if (gptr() != nullptr && (gptr() < egptr())) {
         return traits_type::to_int_type(*gptr());
     }
 
@@ -97,11 +97,11 @@ std::streampos gzstreambuf::seekoff(std::streamoff offset, std::ios_base::seekdi
     auto position = gzseek(file_, static_cast<z_off_t>(offset), dir);
     if (position == -1) {
         throw file_error("internal error in gzseek");
-    };
+    }
 
-    if (mode & std::ios_base::in) {
+    if ((mode & std::ios_base::in) != 0) {
         setg(&buffer_.back() + 1, &buffer_.back() + 1, &buffer_.back() + 1);
-    } else if (mode & std::ios_base::out) {
+    } else if ((mode & std::ios_base::out) != 0) {
         setp(&buffer_.front(), &buffer_.back());
     }
 
