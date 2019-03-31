@@ -5,6 +5,8 @@ branches:
   only:
     - master
     - /^release-.*$/
+    # Also build tags
+    - /^\d+\.\d+(\.\d+)?(-\S*)?$/.
 
 linux64_addons:
     addons: &linux64
