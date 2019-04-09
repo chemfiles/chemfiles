@@ -121,7 +121,7 @@ public:
     SubSelection(std::string selection);
 
     /// Evaluate the sub-selection and return the list of matching atoms
-    std::vector<size_t> eval(const Frame& frame, const Match& match) const;
+    const std::vector<size_t>& eval(const Frame& frame, const Match& match) const;
     /// Pretty-print the sub-selection
     std::string print() const;
     /// Clear cached data
@@ -136,6 +136,10 @@ private:
     std::unique_ptr<Selection> selection_;
     /// Variable to use if selection_ is nullptr
     Variable variable_;
+    /// Cache matches for the selection on the first call to eval
+    mutable std::vector<size_t> matches_;
+    /// Did we update the cached matches ?
+    mutable bool updated_ = false;
 };
 
 /// Checking if two atoms are bonded together
