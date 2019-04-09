@@ -27,7 +27,9 @@ static std::string kind_as_string(Property::Kind kind) {
     unreachable();
 }
 
-SubSelection::SubSelection(Variable variable): selection_(nullptr), variable_(variable) {}
+SubSelection::SubSelection(Variable variable): selection_(nullptr), variable_(variable) {
+    matches_.resize(1);
+}
 
 SubSelection::SubSelection(std::string selection):
     selection_(new Selection(std::move(selection))), variable_(UINT8_MAX)
@@ -37,12 +39,16 @@ SubSelection::SubSelection(std::string selection):
     }
 }
 
-std::vector<size_t> SubSelection::eval(const Frame& frame, const Match& match) const {
+const std::vector<size_t>& SubSelection::eval(const Frame& frame, const Match& match) const {
     if (is_variable()) {
-        return {match[variable_]};
+        matches_[0] = match[variable_];
     } else {
-        return selection_->list(frame);
+        if (!updated_) {
+            matches_ = selection_->list(frame);
+            updated_ = true;
+        }
     }
+    return matches_;
 }
 
 std::string SubSelection::print() const {
@@ -54,7 +60,10 @@ std::string SubSelection::print() const {
 }
 
 void SubSelection::clear() {
-    // TODO
+    if (!is_variable()) {
+        matches_.clear();
+        updated_ = false;
+    }
 }
 
 std::string And::print(unsigned delta) const {
