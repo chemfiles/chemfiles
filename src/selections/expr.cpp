@@ -53,6 +53,10 @@ std::string SubSelection::print() const {
     }
 }
 
+void SubSelection::clear() {
+    // TODO
+}
+
 std::string And::print(unsigned delta) const {
     auto lhs = lhs_->print(7);
     auto rhs = rhs_->print(7);
@@ -61,6 +65,11 @@ std::string And::print(unsigned delta) const {
 
 bool And::is_match(const Frame& frame, const Match& match) const {
     return lhs_->is_match(frame, match) && rhs_->is_match(frame, match);
+}
+
+void And::clear() {
+    lhs_->clear();
+    rhs_->clear();
 }
 
 std::string Or::print(unsigned delta) const {
@@ -73,12 +82,21 @@ bool Or::is_match(const Frame& frame, const Match& match) const {
     return lhs_->is_match(frame, match) || rhs_->is_match(frame, match);
 }
 
+void Or::clear() {
+    lhs_->clear();
+    rhs_->clear();
+}
+
 std::string Not::print(unsigned /*unused*/) const {
     return "not " + ast_->print(4);
 }
 
 bool Not::is_match(const Frame& frame, const Match& match) const {
     return !ast_->is_match(frame, match);
+}
+
+void Not::clear() {
+    ast_->clear();
 }
 
 std::string All::print(unsigned /*unused*/) const {
@@ -145,6 +163,11 @@ bool IsBonded::is_match(const Frame& frame, const Match& match) const {
     return false;
 }
 
+void IsBonded::clear() {
+    i_.clear();
+    j_.clear();
+}
+
 std::string IsAngle::print(unsigned /*unused*/) const {
     return fmt::format("is_angle({}, {}, {})", i_.print(), j_.print(), k_.print());
 }
@@ -168,6 +191,12 @@ bool IsAngle::is_match(const Frame& frame, const Match& match) const {
         }
     }
     return false;
+}
+
+void IsAngle::clear() {
+    i_.clear();
+    j_.clear();
+    k_.clear();
 }
 
 std::string IsDihedral::print(unsigned /*unused*/) const {
@@ -197,6 +226,13 @@ bool IsDihedral::is_match(const Frame& frame, const Match& match) const {
     return false;
 }
 
+void IsDihedral::clear() {
+    i_.clear();
+    j_.clear();
+    k_.clear();
+    m_.clear();
+}
+
 std::string IsImproper::print(unsigned /*unused*/) const {
     return fmt::format("is_improper({}, {}, {}, {})", i_.print(), j_.print(), k_.print(), m_.print());
 }
@@ -222,6 +258,13 @@ bool IsImproper::is_match(const Frame& frame, const Match& match) const {
         }
     }
     return false;
+}
+
+void IsImproper::clear() {
+    i_.clear();
+    j_.clear();
+    k_.clear();
+    m_.clear();
 }
 
 std::string StringSelector::print(unsigned /*unused*/) const {
@@ -351,6 +394,11 @@ void Math::optimize() {
     }
 }
 
+void Math::clear() {
+    lhs_->clear();
+    rhs_->clear();
+}
+
 double Add::eval(const Frame& frame, const Match& match) const {
     return lhs_->eval(frame, match) + rhs_->eval(frame, match);
 }
@@ -370,6 +418,11 @@ optional<double> Add::optimize() {
 
 std::string Add::print() const {
     return fmt::format("({} + {})", lhs_->print(), rhs_->print());
+}
+
+void Add::clear() {
+    lhs_->clear();
+    rhs_->clear();
 }
 
 double Sub::eval(const Frame& frame, const Match& match) const {
@@ -393,6 +446,11 @@ std::string Sub::print() const {
     return fmt::format("({} - {})", lhs_->print(), rhs_->print());
 }
 
+void Sub::clear() {
+    lhs_->clear();
+    rhs_->clear();
+}
+
 double Mul::eval(const Frame& frame, const Match& match) const {
     return lhs_->eval(frame, match) * rhs_->eval(frame, match);
 }
@@ -412,6 +470,11 @@ optional<double> Mul::optimize() {
 
 std::string Mul::print() const {
     return fmt::format("({} * {})", lhs_->print(), rhs_->print());
+}
+
+void Mul::clear() {
+    lhs_->clear();
+    rhs_->clear();
 }
 
 double Div::eval(const Frame& frame, const Match& match) const {
@@ -435,6 +498,11 @@ std::string Div::print() const {
     return fmt::format("({} / {})", lhs_->print(), rhs_->print());
 }
 
+void Div::clear() {
+    lhs_->clear();
+    rhs_->clear();
+}
+
 double Pow::eval(const Frame& frame, const Match& match) const {
     return pow(lhs_->eval(frame, match), rhs_->eval(frame, match));
 }
@@ -456,6 +524,11 @@ std::string Pow::print() const {
     return fmt::format("{} ^({})", lhs_->print(), rhs_->print());
 }
 
+void Pow::clear() {
+    lhs_->clear();
+    rhs_->clear();
+}
+
 double Neg::eval(const Frame& frame, const Match& match) const {
     return - ast_->eval(frame, match);
 }
@@ -471,6 +544,10 @@ optional<double> Neg::optimize() {
 
 std::string Neg::print() const {
     return fmt::format("(-{})", ast_->print());
+}
+
+void Neg::clear() {
+    ast_->clear();
 }
 
 double Mod::eval(const Frame& frame, const Match& match) const {
@@ -494,6 +571,11 @@ std::string Mod::print() const {
     return fmt::format("({} % {})", lhs_->print(), rhs_->print());
 }
 
+void Mod::clear() {
+    lhs_->clear();
+    rhs_->clear();
+}
+
 double Function::eval(const Frame& frame, const Match& match) const {
     return fn_(ast_->eval(frame, match));
 }
@@ -509,6 +591,10 @@ optional<double> Function::optimize() {
 
 std::string Function::print() const {
     return fmt::format("{}({})", name_, ast_->print());
+}
+
+void Function::clear() {
+    ast_->clear();
 }
 
 double Number::eval(const Frame& /*unused*/, const Match& /*unused*/) const {

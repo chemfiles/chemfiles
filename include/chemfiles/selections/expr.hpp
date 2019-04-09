@@ -25,6 +25,9 @@ public:
     virtual std::string print(unsigned delta = 0) const = 0;
     /// Check if the `match` is valid in the given `frame`.
     virtual bool is_match(const Frame& frame, const Match& match) const = 0;
+    /// Clear any cached data. This must be called before using the selection
+    /// with a new frame
+    virtual void clear() = 0;
     /// Optimize the AST corresponding to this Selector. Currently, this only
     /// perform constant propgations in mathematical expressions.
     virtual void optimize() {}
@@ -47,6 +50,7 @@ public:
     And(Ast lhs, Ast rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
+    void clear() override;
 private:
     Ast lhs_;
     Ast rhs_;
@@ -58,6 +62,7 @@ public:
     Or(Ast lhs, Ast rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
+    void clear() override;
 private:
     Ast lhs_;
     Ast rhs_;
@@ -69,6 +74,7 @@ public:
     explicit Not(Ast ast): ast_(std::move(ast)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
+    void clear() override;
 private:
     Ast ast_;
 };
@@ -79,6 +85,7 @@ public:
     All() = default;
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
+    void clear() override {}
 };
 
 /// Selection matching no atoms
@@ -87,6 +94,7 @@ public:
     None() = default;
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
+    void clear() override {}
 };
 
 /// Selection based on boolean properties
@@ -96,6 +104,7 @@ public:
         property_(std::move(property)), argument_(argument) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
+    void clear() override {}
 
 private:
     std::string property_;
@@ -115,6 +124,8 @@ public:
     std::vector<size_t> eval(const Frame& frame, const Match& match) const;
     /// Pretty-print the sub-selection
     std::string print() const;
+    /// Clear cached data
+    void clear();
 
     bool is_variable() const {
         return selection_ == nullptr;
@@ -133,6 +144,7 @@ public:
     IsBonded(SubSelection i, SubSelection j): i_(std::move(i)), j_(std::move(j)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
+    void clear() override;
 private:
     SubSelection i_;
     SubSelection j_;
@@ -145,6 +157,7 @@ public:
         i_(std::move(i)), j_(std::move(j)), k_(std::move(k)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
+    void clear() override;
 private:
     SubSelection i_;
     SubSelection j_;
@@ -158,6 +171,7 @@ public:
         i_(std::move(i)), j_(std::move(j)), k_(std::move(k)), m_(std::move(m)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
+    void clear() override;
 private:
     SubSelection i_;
     SubSelection j_;
@@ -172,6 +186,7 @@ public:
         i_(std::move(i)), j_(std::move(j)), k_(std::move(k)), m_(std::move(m)) {}
     std::string print(unsigned delta) const override;
     bool is_match(const Frame& frame, const Match& match) const override;
+    void clear() override;
 private:
     SubSelection i_;
     SubSelection j_;
@@ -221,6 +236,7 @@ public:
 
     const std::string& value(const Frame& frame, size_t i) const override;
     std::string name() const override;
+    void clear() override {}
 
 private:
     std::string property_;
@@ -234,6 +250,7 @@ public:
 
     std::string name() const override;
     const std::string& value(const Frame& frame, size_t i) const override;
+    void clear() override {}
 };
 
 /// Select atoms using their name
@@ -244,6 +261,7 @@ public:
 
     std::string name() const override;
     const std::string& value(const Frame& frame, size_t i) const override;
+    void clear() override {}
 };
 
 /// Select atoms using their residue name
@@ -254,6 +272,7 @@ public:
 
     std::string name() const override;
     const std::string& value(const Frame& frame, size_t i) const override;
+    void clear() override {}
 };
 
 class MathExpr;
@@ -276,6 +295,7 @@ public:
     bool is_match(const Frame& frame, const Match& match) const override;
     void optimize() override;
     std::string print(unsigned delta) const override;
+    void clear() override;
 
 private:
     Operator op_;
@@ -302,6 +322,9 @@ public:
     /// value if possible.
     virtual optional<double> optimize() = 0;
 
+    /// Clear any cached data
+    virtual void clear() = 0;
+
     /// Pretty-print the expression
     virtual std::string print() const = 0;
 };
@@ -314,6 +337,8 @@ public:
     double eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
+    void clear() override;
+
 private:
     MathAst lhs_;
     MathAst rhs_;
@@ -327,6 +352,8 @@ public:
     double eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
+    void clear() override;
+
 private:
     MathAst lhs_;
     MathAst rhs_;
@@ -340,6 +367,8 @@ public:
     double eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
+    void clear() override;
+
 private:
     MathAst lhs_;
     MathAst rhs_;
@@ -353,6 +382,8 @@ public:
     double eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
+    void clear() override;
+
 private:
     MathAst lhs_;
     MathAst rhs_;
@@ -366,6 +397,8 @@ public:
     double eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
+    void clear() override;
+
 private:
     MathAst lhs_;
     MathAst rhs_;
@@ -379,6 +412,7 @@ public:
     double eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
+    void clear() override;
 
 private:
     MathAst ast_;
@@ -392,6 +426,8 @@ public:
     double eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
+    void clear() override;
+
 private:
     MathAst lhs_;
     MathAst rhs_;
@@ -406,6 +442,7 @@ public:
     double eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
+    void clear() override;
 
 private:
     std::function<double(double)> fn_;
@@ -421,6 +458,7 @@ public:
     double eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
+    void clear() override {}
 
 private:
     double value_;
@@ -436,6 +474,7 @@ public:
         return nullopt;
     }
     std::string print() const override;
+    void clear() override {}
 
 private:
     Variable i_;
@@ -452,6 +491,7 @@ public:
         return nullopt;
     }
     std::string print() const override;
+    void clear() override {}
 
 private:
     Variable i_;
@@ -469,6 +509,7 @@ public:
         return nullopt;
     }
     std::string print() const override;
+    void clear() override {}
 
 private:
     Variable i_;
@@ -487,6 +528,7 @@ public:
         return nullopt;
     }
     std::string print() const override;
+    void clear() override {}
 
 private:
     Variable i_;
@@ -511,10 +553,11 @@ public:
     optional<double> optimize() override final;
     std::string print() const override final;
 
-    /// Get the value of the property for the atom at index `i` in the `frame`
+    /// Get the value for the atom at index `i` in the `frame`
     virtual double value(const Frame& frame, size_t i) const = 0;
-    /// Get the name of the property
+    /// Get the name of the selector
     virtual std::string name() const = 0;
+
 private:
     /// Which atom in the candidate match are we checking?
     Variable argument_;
@@ -526,6 +569,7 @@ public:
     NumericProperty(std::string property, Variable argument): NumericSelector(argument), property_(std::move(property)) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
+    void clear() override {}
 
 private:
     std::string property_;
@@ -538,6 +582,7 @@ public:
     Index(Variable argument): NumericSelector(argument) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
+    void clear() override {}
 };
 
 /// Select atoms using their residue id (residue number)
@@ -546,6 +591,7 @@ public:
     Resid(Variable argument): NumericSelector(argument) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
+    void clear() override {}
 };
 
 /// Select atoms using their mass.
@@ -554,6 +600,7 @@ public:
     Mass(Variable argument): NumericSelector(argument) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
+    void clear() override {}
 };
 
 enum class Coordinate {
@@ -570,6 +617,8 @@ public:
     Position(Variable argument, Coordinate coordinate): NumericSelector(argument), coordinate_(coordinate) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
+    void clear() override {}
+
 private:
     Coordinate coordinate_;
 };
@@ -582,6 +631,8 @@ public:
     Velocity(Variable argument, Coordinate coordinate): NumericSelector(argument), coordinate_(coordinate) {}
     std::string name() const override;
     double value(const Frame& frame, size_t i) const override;
+    void clear() override {}
+
 private:
     Coordinate coordinate_;
 };

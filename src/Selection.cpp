@@ -251,6 +251,7 @@ std::vector<Match> Selection::evaluate(const Frame& frame) const {
         return ast_->is_match(f, match);
     };
 
+    ast_->clear();
     switch (context_) {
         case Context::ATOM:
             return evaluate_atoms(frame, is_match);
