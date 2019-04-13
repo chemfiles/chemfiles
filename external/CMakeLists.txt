@@ -208,4 +208,10 @@ unpack_library(mmtf-cpp)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/include )
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/msgpack-c/include )
 
+# ==========
+# pugixml: http://github.com/chemfiles/pugixml
+# ==========
+unpack_library(pugixml)
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src)
+
 set(EXTERNAL_INCLUDES ${EXTERNAL_INCLUDES} PARENT_SCOPE)
