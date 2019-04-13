@@ -21,6 +21,9 @@ TEST_CASE("Read files in CML format") {
 
         Trajectory file2("data/cml/drugs.cml");
         CHECK(file2.nsteps() == 4);
+
+        Trajectory file3("data/cml/properties.cml");
+        CHECK(file3.nsteps() == 1);
     }
 
     SECTION("Read next step") {
@@ -74,5 +77,13 @@ TEST_CASE("Read files in CML format") {
         auto positions = frame.positions();
         auto fract0 = frame.cell().matrix().invert() * positions[0];
         CHECK(approx_eq(fract0, Vector3D(-1.77493, 0.980333, 0.0000), 1e-3));
+    }
+
+    SECTION("Read properties") {
+        Trajectory file("data/cml/properties.cml");
+        auto frame = file.read();
+        CHECK(frame.get("num_c")->as_double() == 10.0);
+        CHECK(frame.get("is_organic")->as_bool() == true);
+        CHECK(frame[6].get("r")->as_string() == "tButyl");
     }
 }
