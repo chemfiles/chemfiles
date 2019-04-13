@@ -30,12 +30,16 @@ CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compre
 {
     auto result = document_.load(*file_);
     if (!result) {
-        throw format_error("Error parsing CML file because '{}'", result.description());
+        throw format_error("[CML] Parsing error: '{}'", result.description());
     }
 
     root_ = document_.child("cml");
     if (root_) {
-        current_ = root_.children("molecule").begin();
+        auto molecules = root_.children("molecule");
+        current_ = molecules.begin();
+        if (current_ == molecules.end()) {
+            throw format_error("[CML] unsupported starting node");
+        }
         is_multiple_frames_ = true;
         return;
     }
@@ -46,7 +50,7 @@ CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compre
         return;
     }
 
-    throw format_error("unsupported starting node");
+    throw format_error("[CML] unsupported starting node");
 }
 
 size_t CMLFormat::nsteps() {
@@ -58,6 +62,41 @@ size_t CMLFormat::nsteps() {
     return static_cast<size_t>(std::distance(children.begin(), children.end()));
 }
 
+template<typename T>
+static void read_property_(T& container, pugi::xml_node& node, const std::string& title) {
+
+    std::string data_type_str = "xsd:string";
+    auto data_type = node.attribute("dataType");
+    if (!data_type) {
+        warning("[CML] {} has no data type, assuming string.", title);
+    } else {
+        data_type_str = data_type.as_string(); 
+    }
+
+    auto value = node.text();
+    if (data_type_str == "xsd:string") {
+        container.set(title, value.as_string());
+    } else if (data_type_str == "xsd:boolean") {
+        container.set(title, value.as_bool());
+    } else if (data_type_str == "xsd:double" || data_type_str == "xsd:integer") {
+        container.set(title, value.as_double());
+    } else {
+        warning("[CML] Unknown data type: {}, assuming string", data_type_str);
+        container.set(title, value.as_string());
+    }
+}
+
+template<typename T>
+static void read_property_(T& container, pugi::xml_node& node) {
+    auto title = node.attribute("title");
+    if (!title) {
+        warning("[CML] Skipping untitled property");
+        return;
+    }
+
+    read_property_(container, node, title.as_string());
+}
+
 void CMLFormat::read(Frame& frame) {
     const auto& current = is_multiple_frames_? *current_ : root_;
     for (auto attribute : current.attributes()) {
@@ -66,7 +105,7 @@ void CMLFormat::read(Frame& frame) {
         } else if(name == "title") {
             frame.set("name", attribute.as_string());
         } else {
-            warning("Unknown molecule attribute: " + name);
+            warning("[CML] Unknown molecule attribute: " + name);
         }
     }
 
@@ -91,13 +130,35 @@ void CMLFormat::read(Frame& frame) {
                 } else if (name == "gamma") {
                     gamma = cell_param.text().as_double();
                 } else {
-                    warning("Unknown crytal scalar: " + name);
+                    warning("[CML] Unknown crytal scalar: " + name);
                 }
             }
         }
         frame.set_cell(UnitCell(a, b, c, alpha, beta, gamma));
     }
 
+    // Frame level properties
+    auto properties_node = current.child("propertyList");
+    if (properties_node) {
+        for (auto property : properties_node.children("property")) {
+            auto title = property.attribute("title");
+            if (!title) {
+                warning("[CML] Skipping untitled property");
+                continue;
+            }
+
+            auto title_str = title.as_string();
+            auto scalar_node = property.child("scalar");
+            if (!scalar_node) {
+                warning("[CML] {} has no scalar associated with it!", title_str);
+                continue;
+            }
+
+            read_property_(frame, scalar_node, title_str);
+        }
+    }
+
+    // Read the atoms 
     std::unordered_map<std::string, size_t> ref_to_id;
     for (auto atom : current.child("atomArray").children("atom")) {
         double x2, y2, x3, y3, z3, xf, yf, zf;
@@ -126,7 +187,7 @@ void CMLFormat::read(Frame& frame) {
             } else if (name == "zFract") {
                 zf = attribute.as_double();
             } else {
-                warning("Unknown atom attribute: " + name);
+                warning("[CML] Unknown atom attribute: " + name);
             }
         }
 
@@ -140,6 +201,10 @@ void CMLFormat::read(Frame& frame) {
         }
 
         ref_to_id[id] = frame.size() - 1;
+
+        for (auto scalar : atom.children("scalar")) {
+            read_property_(frame[frame.size() - 1], scalar);
+        }
     }
 
     for (auto bond : current.child("bondArray").children("bond")) {
@@ -147,20 +212,20 @@ void CMLFormat::read(Frame& frame) {
         auto order = bond.attribute("order");
 
         if (!atomref) {
-            warning("Bad bond");
+            warning("[CML] Bad bond");
             continue;
         }
 
         auto ids = split(atomref.as_string(), ' ');
         if (ids.size() != 2) {
-            warning("Bad bond size");
+            warning("[CML] Bad bond size");
             continue;
         }
 
         auto id1 = ref_to_id.find(ids[0]);
         auto id2 = ref_to_id.find(ids[1]);
         if (id1 == ref_to_id.end() || id2 == ref_to_id.end()) {
-            warning("Bad bond ref");
+            warning("[CML] Bad bond ref");
             continue;
         }
 
@@ -189,7 +254,7 @@ void CMLFormat::read(Frame& frame) {
                     bo = Bond::AROMATIC;
                     break;
                 default:
-                    warning("Unknown bond order: '{}'", order_str[0]);
+                    warning("[CML] Unknown bond order: '{}'", order_str[0]);
                     break;
                 }
             }
