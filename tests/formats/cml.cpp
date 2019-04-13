@@ -87,3 +87,119 @@ TEST_CASE("Read files in CML format") {
         CHECK(frame[6].get("r")->as_string() == "tButyl");
     }
 }
+
+TEST_CASE("Write CML file") {
+    auto tmpfile = NamedTempPath(".cml");
+    const auto EXPECTED_CONTENT =
+    "<?xml version=\"1.0\"?>\n"
+    "<cml xmlns=\"http://www.xml-cml.org/schema\" "
+    "xmlns:cml=\"http://www.xml-cml.org/dict/cml\" "
+    "xmlns:units=\"http://www.xml-cml.org/units/units\" "
+    "xmlns:convention=\"http://www.xml-cml.org/convention\" "
+    "convention=\"convention:molecular\" "
+    "xmlns:iupac=\"http://www.iupac.org\">\n"
+    "  <molecule id=\"m1\">\n"
+    "    <atomArray>\n"
+    "      <atom id=\"a1\" elementType=\"A\" x3=\"1\" y3=\"2\" z3=\"3\" />\n"
+    "      <atom id=\"a2\" elementType=\"B\" x3=\"1\" y3=\"2\" z3=\"3\" />\n"
+    "      <atom id=\"a3\" elementType=\"C\" x3=\"1\" y3=\"2\" z3=\"3\" />\n"
+    "      <atom id=\"a4\" elementType=\"D\" x3=\"1\" y3=\"2\" z3=\"3\" />\n"
+    "    </atomArray>\n"
+    "  </molecule>\n"
+    "  <molecule id=\"m2\">\n"
+    "    <crystal>\n"
+    "      <scalar units=\"units:angstrom\" title=\"a\">22</scalar>\n"
+    "      <scalar units=\"units:angstrom\" title=\"b\">22</scalar>\n"
+    "      <scalar units=\"units:angstrom\" title=\"c\">22</scalar>\n"
+    "      <scalar units=\"units:degree\" title=\"alpha\">90</scalar>\n"
+    "      <scalar units=\"units:degree\" title=\"beta\">90</scalar>\n"
+    "      <scalar units=\"units:degree\" title=\"gamma\">90</scalar>\n"
+    "    </crystal>\n"
+    "    <propertyList>\n"
+    "      <property title=\"name\">\n"
+    "        <scalar dataType=\"xsd:string\">test</scalar>\n"
+    "      </property>\n"
+    "      <property title=\"is_organic\">\n"
+    "        <scalar dataType=\"xsd:boolean\">false</scalar>\n"
+    "      </property>\n"
+    "    </propertyList>\n"
+    "    <atomArray>\n"
+    "      <atom id=\"a1\" elementType=\"A\" x3=\"4\" y3=\"5\" z3=\"6\" />\n"
+    "      <atom id=\"a2\" elementType=\"B\" x3=\"1\" y3=\"2\" z3=\"3\" />\n"
+    "      <atom id=\"a3\" elementType=\"C\" x3=\"1\" y3=\"2\" z3=\"3\">\n"
+    "        <scalar title=\"num_c\" dataType=\"xsd:double\">1</scalar>\n"
+    "        <scalar title=\"force\" dataType=\"xsd:string\">1.000000 2.000000 3.000000</scalar>\n"
+    "      </atom>\n"
+    "      <atom id=\"a4\" elementType=\"D\" x3=\"1\" y3=\"2\" z3=\"3\" />\n"
+    "    </atomArray>\n"
+    "    <bondArray>\n"
+    "      <bond atomRefs2=\"a1 a2\" order=\"1\" />\n"
+    "      <bond atomRefs2=\"a1 a3\" />\n"
+    "      <bond atomRefs2=\"a1 a4\" order=\"a\" />\n"
+    "      <bond atomRefs2=\"a2 a3\" order=\"3\" />\n"
+    "      <bond atomRefs2=\"a3 a4\" order=\"2\" />\n"
+    "    </bondArray>\n"
+    "  </molecule>\n"
+    "</cml>\n";
+
+    auto frame = Frame();
+    frame.add_atom(Atom("A"), {1, 2, 3});
+    frame.add_atom(Atom("B"), {1, 2, 3});
+    frame.add_atom(Atom("C"), {1, 2, 3});
+    frame.add_atom(Atom("D"), {1, 2, 3});
+
+    auto file = Trajectory(tmpfile, 'w');
+    file.write(frame);
+
+    frame.positions()[0] = {4.0, 5.0, 6.0};
+    frame.set_cell(UnitCell(22));
+
+    frame.set("is_organic", false);
+    frame.set("name", "test");
+
+    frame[2].set("force", Vector3D{1., 2., 3.});
+    frame[2].set("num_c", 1.0);
+
+    frame.add_bond(0, 1, Bond::SINGLE);
+    frame.add_bond(1, 2, Bond::TRIPLE);
+    frame.add_bond(2, 3, Bond::DOUBLE);
+    frame.add_bond(3, 0, Bond::AROMATIC);
+    frame.add_bond(0, 2, Bond::UNKNOWN);
+
+    file.write(frame);
+
+    file.close();
+    std::ifstream checking(tmpfile);
+    std::string content((std::istreambuf_iterator<char>(checking)),
+                         std::istreambuf_iterator<char>());
+    CHECK(EXPECTED_CONTENT == content);
+}
+
+TEST_CASE("Append CML file") {
+    auto tmpfile = NamedTempPath(".cml");
+    const auto EXPECTED_CONTENT = // note the lack of indentation
+    "<molecule>\n"
+    "<atomArray>\n"
+    "<atom id=\"a1\" elementType=\"A\" x3=\"1\" y3=\"2\" z3=\"3\" />\n"
+    "<atom id=\"a2\" elementType=\"B\" x3=\"1\" y3=\"2\" z3=\"3\" />\n"
+    "<atom id=\"a3\" elementType=\"C\" x3=\"1\" y3=\"2\" z3=\"3\" />\n"
+    "<atom id=\"a4\" elementType=\"D\" x3=\"1\" y3=\"2\" z3=\"3\" />\n"
+    "</atomArray>\n"
+    "</molecule>\n";
+
+    auto frame = Frame();
+    frame.add_atom(Atom("A"), {1, 2, 3});
+    frame.add_atom(Atom("B"), {1, 2, 3});
+    frame.add_atom(Atom("C"), {1, 2, 3});
+    frame.add_atom(Atom("D"), {1, 2, 3});
+
+    auto file = Trajectory(tmpfile, 'a');
+    file.write(frame);
+    file.close();
+
+    std::ifstream checking(tmpfile);
+    std::string content((std::istreambuf_iterator<char>(checking)),
+                         std::istreambuf_iterator<char>());
+
+    CHECK(EXPECTED_CONTENT == content);
+}

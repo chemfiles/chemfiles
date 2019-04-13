@@ -16,13 +16,17 @@ namespace chemfiles {
 /// [CML]: http://xml-cml.org/
 class CMLFormat final: public Format {
 public:
-    CMLFormat(std::string path, File::Mode mode, File::Compression compression); 
+    CMLFormat(std::string path, File::Mode mode, File::Compression compression);
+    ~CMLFormat();
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;
     void write(const Frame& frame) override;
     size_t nsteps() override;
 private:
+    /// Needed to set the format declaration
+    File::Mode mode_;
+
     /// Text file where we read from. It needs to stay valid if we write to the file
     std::unique_ptr<TextFile> file_;
 
@@ -36,8 +40,8 @@ private:
     /// If multi-frame, store the current location
     pugi::xml_named_node_iterator current_;
 
-    /// Is it multi-frame?
-    bool is_multiple_frames_;
+    /// Number of frames added to the file
+    size_t num_added_ = 0;
 };
 
 template<> FormatInfo format_information<CMLFormat>();
