@@ -26,8 +26,25 @@ template<> FormatInfo chemfiles::format_information<CMLFormat>() {
 }
 
 CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compression)
-    : file_(TextFile::open(std::move(path), mode, compression))
+    : mode_(mode), file_(TextFile::open(std::move(path), mode, compression))
 {
+
+    if (mode_ == File::WRITE) {
+        root_ = document_.append_child("cml");
+        root_.append_attribute("xmlns") = "http://www.xml-cml.org/schema";
+        root_.append_attribute("xmlns:cml") = "http://www.xml-cml.org/dict/cml";
+        root_.append_attribute("xmlns:units") = "http://www.xml-cml.org/units/units";
+        root_.append_attribute("xmlns:convention") = "http://www.xml-cml.org/convention";
+        root_.append_attribute("convention") = "convention:molecular";
+        root_.append_attribute("xmlns:iupac") = "http://www.iupac.org";
+        return;
+    }
+
+    if (mode_ == File::APPEND) { // may need to check the file a CML node in the future, now just append
+        root_ = document_;
+        return;
+    }
+
     auto result = document_.load(*file_);
     if (!result) {
         throw format_error("[CML] Parsing error: '{}'", result.description());
@@ -38,26 +55,37 @@ CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compre
         auto molecules = root_.children("molecule");
         current_ = molecules.begin();
         if (current_ == molecules.end()) {
-            throw format_error("[CML] unsupported starting node");
+            throw format_error("[CML] cml node has no valid children");
         }
-        is_multiple_frames_ = true;
         return;
     }
 
-    root_ = document_.child("molecule");
-    if (root_) {
-        is_multiple_frames_ = false;
+    // Not technically standard to have multiple molecule nodes as root nodes,
+    // but some tools do this and we should support it 
+    if (document_.child("molecule")) {
+        auto molecules = document_.children("molecule");
+        current_ = molecules.begin();
+        root_ = document_;
         return;
     }
 
-    throw format_error("[CML] unsupported starting node");
+    throw format_error("[CML] no supported starting node found");
+}
+
+CMLFormat::~CMLFormat() {
+    if (num_added_ && mode_ == File::WRITE) {
+        document_.save(*file_, "  ");
+        return;
+    }
+
+    // Don't bother to check if anything is added, the document will be blank
+    // regardless
+    if (mode_ == File::APPEND) {
+        document_.save(*file_, "  ", pugi::format_no_declaration);
+    }
 }
 
 size_t CMLFormat::nsteps() {
-    if (!is_multiple_frames_) {
-        return 1;
-    }
-
     auto children = root_.children("molecule");
     return static_cast<size_t>(std::distance(children.begin(), children.end()));
 }
@@ -98,7 +126,7 @@ static void read_property_(T& container, pugi::xml_node& node) {
 }
 
 void CMLFormat::read(Frame& frame) {
-    const auto& current = is_multiple_frames_? *current_ : root_;
+    const auto& current = *current_;
     for (auto attribute : current.attributes()) {
         auto name = std::string(attribute.name());
         if (name == "id") { // do nothing
@@ -263,22 +291,145 @@ void CMLFormat::read(Frame& frame) {
         frame.add_bond((*id1).second, (*id2).second, bo);
     }
 
-    if (is_multiple_frames_) {
-        ++current_;
-    }
+    ++current_;
 }
 
 void CMLFormat::read_step(size_t step, Frame& frame) {
-    if (!is_multiple_frames_) {
-        read(frame);
-        return;
-    }
-
     current_ = root_.children("molecule").begin();
     std::advance(current_, step);
     read(frame);
 }
 
+static void write_property_(const Property& p, pugi::xml_node& node) {
+    Vector3D v;
+    switch (p.kind()) {
+    case Property::DOUBLE:
+        node.append_attribute("dataType") = "xsd:double";
+        node.text() = p.as_double();
+        break;
+    case Property::BOOL:
+        node.append_attribute("dataType") = "xsd:boolean";
+        node.text() = p.as_bool();
+        break;
+    case Property::STRING:
+        node.append_attribute("dataType") = "xsd:string";
+        node.text() = p.as_string().c_str();
+        break;
+    case Property::VECTOR3D: // A bit of a hack...
+        node.append_attribute("dataType") = "xsd:string";
+        v = p.as_vector3d();
+        node.text() = (std::to_string(v[0]) + " " +
+                       std::to_string(v[1]) + " " +
+                       std::to_string(v[2])).c_str();
+        break;
+    }
+}
+
 void CMLFormat::write(const Frame& frame) {
-    //TODO
+    auto mol = root_.append_child("molecule");
+
+    if (mode_ == File::WRITE) {
+        mol.append_attribute("id") = ("m" + std::to_string(++num_added_)).c_str();
+    }
+
+    auto& unit_cell = frame.cell();
+    if (unit_cell.shape() != UnitCell::INFINITE) {
+        auto crystal_node = mol.append_child("crystal");
+        auto scalar = crystal_node.append_child("scalar");
+        scalar.append_attribute("units") = "units:angstrom";
+        scalar.append_attribute("title") = "a";
+        scalar.text() = unit_cell.a();
+
+        scalar = crystal_node.append_child("scalar");
+        scalar.append_attribute("units") = "units:angstrom";
+        scalar.append_attribute("title") = "b";
+        scalar.text() = unit_cell.b();
+
+        scalar = crystal_node.append_child("scalar");
+        scalar.append_attribute("units") = "units:angstrom";
+        scalar.append_attribute("title") = "c";
+        scalar.text() = unit_cell.c();
+
+        scalar = crystal_node.append_child("scalar");
+        scalar.append_attribute("units") = "units:degree";
+        scalar.append_attribute("title") = "alpha";
+        scalar.text() = unit_cell.alpha();
+
+        scalar = crystal_node.append_child("scalar");
+        scalar.append_attribute("units") = "units:degree";
+        scalar.append_attribute("title") = "beta";
+        scalar.text() = unit_cell.beta();
+
+        scalar = crystal_node.append_child("scalar");
+        scalar.append_attribute("units") = "units:degree";
+        scalar.append_attribute("title") = "gamma";
+        scalar.text() = unit_cell.gamma();
+    }
+
+    auto& properties = frame.properties();
+    if (properties.size()) {
+        auto prop_list = mol.append_child("propertyList");
+        for (auto& prop : properties) {
+            auto prop_node = prop_list.append_child("property");
+            prop_node.append_attribute("title") = prop.first.c_str();
+
+            auto scalar_node = prop_node.append_child("scalar");
+            write_property_(prop.second, scalar_node);
+        }
+    }
+
+    auto atom_array = mol.append_child("atomArray");
+    for (size_t i = 0; i < frame.size(); ++i) {
+        auto& atom = frame[i];
+        auto atom_node = atom_array.append_child("atom");
+        atom_node.append_attribute("id") = ("a" + std::to_string(i + 1)).c_str();
+        atom_node.append_attribute("elementType") = atom.type().c_str();
+
+        auto& position = frame.positions()[i];
+        atom_node.append_attribute("x3") = position[0];
+        atom_node.append_attribute("y3") = position[1];
+        atom_node.append_attribute("z3") = position[2];
+
+        auto& atom_properties = atom.properties();
+        if (!atom_properties.size()) {
+            continue;
+        }
+        for (auto& prop : atom_properties) {
+            auto scalar_node = atom_node.append_child("scalar");
+            scalar_node.append_attribute("title") = prop.first.c_str();
+            write_property_(prop.second, scalar_node);
+        }
+    }
+
+    auto& bonds = frame.topology().bonds();
+    if (bonds.size() == 0) {
+        return;
+    }
+
+    auto bond_array = mol.append_child("bondArray");
+    auto& bond_orders = frame.topology().bond_orders();
+
+    for (size_t i = 0; i < bonds.size(); ++i) {
+        std::string refs2 = "a" + std::to_string(bonds[i][0] + 1) +
+                           " a" + std::to_string(bonds[i][1] + 1);
+        auto bond_node = bond_array.append_child("bond");
+        bond_node.append_attribute("atomRefs2") = refs2.c_str();
+
+        switch (bond_orders[i]) {
+            case Bond::SINGLE:
+                bond_node.append_attribute("order") = "1";
+                break;
+            case Bond::DOUBLE:
+                bond_node.append_attribute("order") = "2";
+                break;
+            case Bond::TRIPLE:
+                bond_node.append_attribute("order") = "3";
+                break;
+            case Bond::AROMATIC:
+                bond_node.append_attribute("order") = "a";
+                break;
+            default:
+                break;
+        }
+    }
 }
