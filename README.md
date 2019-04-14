@@ -98,6 +98,7 @@ Chemfiles can read and write files in the following formats:
 
 - XYZ;
 - PDB;
+- CML;
 - Amber NetCDF
 - LAMMPS data files;
 - Tinker XYZ files (.arc files);
