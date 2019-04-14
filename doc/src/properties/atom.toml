@@ -11,6 +11,12 @@ character stored in both of these formats. On writing, this character is stored
 with the ``ATOM`` or ``HETATM`` record. If the property is not set, a space
 character is used."""
 
+[hydrogen_count]
+type = "number"
+
+CML = """The number of hydrogens attached to the atom. The property is only set
+if the attribute is given and is non-zero."""
+
 [sybyl]
 type = "string"
 
