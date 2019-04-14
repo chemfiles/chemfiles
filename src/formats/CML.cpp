@@ -91,6 +91,7 @@ size_t CMLFormat::nsteps() {
     return static_cast<size_t>(std::distance(children.begin(), children.end()));
 }
 
+// Read a property into either a frame or an atom with supplied title
 template<typename T>
 static void read_property_(T& container, pugi::xml_node& node, const std::string& title) {
 
@@ -115,6 +116,7 @@ static void read_property_(T& container, pugi::xml_node& node, const std::string
     }
 }
 
+// Read a property into either a frame or an atom
 template<typename T>
 static void read_property_(T& container, pugi::xml_node& node) {
     auto title = node.attribute("title");
@@ -199,6 +201,8 @@ void CMLFormat::read(Frame& frame) {
 
     // Read the atoms
     std::unordered_map<std::string, size_t> ref_to_id;
+
+    // TODO: Read string vector versions instead of just the nodes
     for (auto atom : current.child("atomArray").children("atom")) {
         double x2, y2, x3, y3, z3, xf, yf, zf;
         x2 = y2 = x3 = y3 = z3 = xf = yf = zf = 0.0;
@@ -250,6 +254,7 @@ void CMLFormat::read(Frame& frame) {
             cart = Vector3D(x3, y3, z3);
         }
 
+        // Set special attributes
         if (formal_charge != 0.0) {
             new_atom.set_charge(formal_charge);
         }
@@ -456,7 +461,7 @@ void CMLFormat::write(const Frame& frame) {
         scalar.text() = unit_cell.gamma();
     }
 
-    // Loop through and add properties to the 
+    // Loop through and add properties to the propertyList node as required
     auto& properties = frame.properties();
     if (properties.size()) {
         auto prop_list = mol.append_child("propertyList");
@@ -480,17 +485,22 @@ void CMLFormat::write(const Frame& frame) {
     for (size_t i = 0; i < frame.size(); ++i) {
         auto& atom = frame[i];
         auto atom_node = atom_array.append_child("atom");
+
+        // Add a new id for the atom which is 1-based
         atom_node.append_attribute("id") = ("a" + std::to_string(i + 1)).c_str();
         atom_node.append_attribute("elementType") = atom.type().c_str();
 
+        // Write special attributes here instead of as scalars
         if (!atom.name().empty()) {
             atom_node.append_attribute("title") = atom.name().c_str();
         }
 
+        // Make sure charge is set and is an integer
         if (atom.charge() != 0.0 && is_double_integer(atom.charge())) {
-            atom_node.append_attribute("formalCharge") = atom.charge();
+            atom_node.append_attribute("formalCharge") = static_cast<int>(atom.charge());
         }
 
+        // See if the mass of the atom is set to something non-default and is an integer
         auto atom_info = find_in_periodic_table(atom.type());
         if (atom_info && atom_info->mass &&
             atom.mass() != *(atom_info->mass) &&
@@ -504,6 +514,7 @@ void CMLFormat::write(const Frame& frame) {
                 static_cast<size_t>(hydrogen_count->as_double());
         }
 
+        // Now write the position attributes
         auto& position = frame.positions()[i];
         atom_node.append_attribute("x3") = position[0];
         atom_node.append_attribute("y3") = position[1];
@@ -526,6 +537,7 @@ void CMLFormat::write(const Frame& frame) {
         }
         for (auto& prop : atom_properties) {
             // special properties which are already written as attributes
+            // charge and isotope are not stored as properties, so no need to check
             if (prop.first == "hydrogen_count" || prop.first == "title") {
                 continue;
             }

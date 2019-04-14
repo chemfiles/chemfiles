@@ -1,6 +1,7 @@
 [name]
 type = "string"
 
+CML = "The text in the ``name`` node of a molecule. Only set if the node is present."
 PDB = "The text described by the ``TITLE`` record is used as the frame **name** when reading."
 GRO = "The first line of a GRO file is used as the frame **name** when reading."
 SDF = "The first line of an SDF file is used as the frame **name** when reading."
@@ -25,3 +26,8 @@ type = "string"
 
 PDB = "Date (DD-MMM-YY format) of the deposition in the PDB. Read from the ``HEADER`` record."
 MMTF = "Date (YYYY-MM-DD format) of the deposition in the PDB. Read from the ``depositionDate`` field."
+
+[title]
+type = "string"
+
+CML = "The text of the ``title`` attribute in a molecule node. Only set if the attribute is present."
