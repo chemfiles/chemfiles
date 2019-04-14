@@ -16,6 +16,7 @@
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/warnings.hpp"
+#include "chemfiles/periodic_table.hpp"
 
 using namespace chemfiles;
 
@@ -129,12 +130,22 @@ void CMLFormat::read(Frame& frame) {
     const auto& current = *current_;
     for (auto attribute : current.attributes()) {
         auto name = std::string(attribute.name());
-        if (name == "id") { // do nothing
-        } else if(name == "title") {
-            frame.set("name", attribute.as_string());
+        if (name == "id") { // do nothing, required junk for validation
+        } else if (name == "xmlns") {
+        } else if (name == "xmlns:cml") {
+        } else if (name == "xmlns:units") {
+        } else if (name == "xmlns:xsd") {
+        } else if (name == "xmlns:iupac") {
+        } else if (name == "title") {
+            frame.set("title", attribute.as_string());
         } else {
             warning("[CML] Unknown molecule attribute: " + name);
         }
+    }
+
+    auto name_node = current.child("name");
+    if (name_node) {
+        frame.set("name", name_node.text().as_string());
     }
 
     auto crystal_node = current.child("crystal");
@@ -186,12 +197,13 @@ void CMLFormat::read(Frame& frame) {
         }
     }
 
-    // Read the atoms 
+    // Read the atoms
     std::unordered_map<std::string, size_t> ref_to_id;
     for (auto atom : current.child("atomArray").children("atom")) {
         double x2, y2, x3, y3, z3, xf, yf, zf;
         x2 = y2 = x3 = y3 = z3 = xf = yf = zf = 0.0;
-        std::string id, element;
+        std::string id, element, title;
+        double formal_charge = 0.0, isotope = 0.0, hydrogen_count = 0.0;
         for (auto attribute : atom.attributes()) {
             auto name = std::string(attribute.name());
             if (name == "id") {
@@ -214,25 +226,86 @@ void CMLFormat::read(Frame& frame) {
                 yf = attribute.as_double();
             } else if (name == "zFract") {
                 zf = attribute.as_double();
+            } else if (name == "title") { // special attributes
+                title = attribute.as_string();
+            } else if (name == "formalCharge") {
+                formal_charge = attribute.as_double();
+            } else if (name == "isotopeNumber") {
+                isotope = attribute.as_double();
+            } else if (name == "hydrogenCount") {
+                hydrogen_count = attribute.as_double();
             } else {
                 warning("[CML] Unknown atom attribute: " + name);
             }
         }
 
+        auto new_atom = Atom(title, element);
+        Vector3D cart, velo;
+
         if (crystal_node && (xf != 0.0 || yf != 0.0 || zf != 0.0)) {
-            auto cart = frame.cell().matrix() * Vector3D(xf, yf, zf);
-            frame.add_atom(Atom(id, element), cart);
+            cart = frame.cell().matrix() * Vector3D(xf, yf, zf);
         } else if (x3 == 0.0 && y3 == 0.0 && z3 == 0.0) {
-            frame.add_atom(Atom(id, element), Vector3D(x2, y2, 0));
+            cart = Vector3D(x2, y2, 0);
         } else {
-            frame.add_atom(Atom(id, element), Vector3D(x3, y3, z3));
+            cart = Vector3D(x3, y3, z3);
         }
 
-        ref_to_id[id] = frame.size() - 1;
+        if (formal_charge != 0.0) {
+            new_atom.set_charge(formal_charge);
+        }
+
+        if (isotope != 0.0) {
+            new_atom.set_mass(isotope);
+        }
+
+        if (hydrogen_count != 0.0) {
+            new_atom.set("hydrogen_count", hydrogen_count);
+        }
 
         for (auto scalar : atom.children("scalar")) {
-            read_property_(frame[frame.size() - 1], scalar);
+            read_property_(new_atom, scalar);
         }
+
+        // Vectors are stored separate where the values of the vector are
+        // stored as doubles separated by whitespace.
+        for (auto vector3 : atom.children("vector3")) {
+            auto title_attribute = vector3.attribute("title");
+
+            if (!title_attribute) {
+                warning("[CML] vector3 is not titled.");
+                continue;
+            }
+            std::string vec_title = title_attribute.as_string();
+
+            auto vect_strings = split(trim(vector3.text().as_string()), ' ');
+            if (vect_strings.size() != 3) {
+                warning("[CML] {} vector3 does not have 3 values.", vec_title);
+                continue;
+            }
+
+            Vector3D vect;
+            
+            try {
+                vect = { parse<double>(vect_strings[0]),
+                         parse<double>(vect_strings[1]),
+                         parse<double>(vect_strings[2])
+                       };
+            } catch (const Error&) {
+                warning("[CML] {} contains elements which are not numberic.", vec_title);
+                continue;
+            }
+
+            if (vec_title == "velocity") {
+                velo = vect;
+                frame.add_velocities();
+                continue;
+            }
+
+            new_atom.set(vec_title, vect);
+        }
+
+        frame.add_atom(std::move(new_atom), cart, velo);
+        ref_to_id[id] = frame.size() - 1;
     }
 
     for (auto bond : current.child("bondArray").children("bond")) {
@@ -315,8 +388,8 @@ static void write_property_(const Property& p, pugi::xml_node& node) {
         node.append_attribute("dataType") = "xsd:string";
         node.text() = p.as_string().c_str();
         break;
-    case Property::VECTOR3D: // A bit of a hack...
-        node.append_attribute("dataType") = "xsd:string";
+    case Property::VECTOR3D: // Supported only in schema3 for properties
+        node.set_name("vector3");
         v = p.as_vector3d();
         node.text() = (std::to_string(v[0]) + " " +
                        std::to_string(v[1]) + " " +
@@ -325,11 +398,28 @@ static void write_property_(const Property& p, pugi::xml_node& node) {
     }
 }
 
+// Used for isotopes and formal charges
+static bool is_double_integer(double val) {
+    return std::abs(val - std::trunc(val)) < 1e-3;
+}
+
 void CMLFormat::write(const Frame& frame) {
     auto mol = root_.append_child("molecule");
 
     if (mode_ == File::WRITE) {
         mol.append_attribute("id") = ("m" + std::to_string(++num_added_)).c_str();
+    }
+
+    // The title is supplied as a attribute
+    auto title_prop = frame.get("title");
+    if (title_prop && title_prop->kind() == Property::STRING) {
+        mol.append_attribute("title") = title_prop->as_string().c_str();
+    }
+
+    // The name is supplied as a child node
+    auto name_prop = frame.get("name");
+    if (name_prop && name_prop->kind() == Property::STRING) {
+        mol.append_child("name").text() = name_prop->as_string().c_str();
     }
 
     auto& unit_cell = frame.cell();
@@ -366,10 +456,17 @@ void CMLFormat::write(const Frame& frame) {
         scalar.text() = unit_cell.gamma();
     }
 
+    // Loop through and add properties to the 
     auto& properties = frame.properties();
     if (properties.size()) {
         auto prop_list = mol.append_child("propertyList");
         for (auto& prop : properties) {
+
+            // This properties are special, don't write them as scalars
+            if (prop.first == "name" || prop.first == "title") {
+                continue;
+            }
+
             auto prop_node = prop_list.append_child("property");
             prop_node.append_attribute("title") = prop.first.c_str();
 
@@ -378,6 +475,7 @@ void CMLFormat::write(const Frame& frame) {
         }
     }
 
+    auto velocities = frame.velocities();
     auto atom_array = mol.append_child("atomArray");
     for (size_t i = 0; i < frame.size(); ++i) {
         auto& atom = frame[i];
@@ -385,16 +483,52 @@ void CMLFormat::write(const Frame& frame) {
         atom_node.append_attribute("id") = ("a" + std::to_string(i + 1)).c_str();
         atom_node.append_attribute("elementType") = atom.type().c_str();
 
+        if (!atom.name().empty()) {
+            atom_node.append_attribute("title") = atom.name().c_str();
+        }
+
+        if (atom.charge() != 0.0 && is_double_integer(atom.charge())) {
+            atom_node.append_attribute("formalCharge") = atom.charge();
+        }
+
+        auto atom_info = find_in_periodic_table(atom.type());
+        if (atom_info && atom_info->mass &&
+            atom.mass() != *(atom_info->mass) &&
+            is_double_integer(atom.mass())) {
+            atom_node.append_attribute("isotopeNumber") = static_cast<size_t>(atom.mass());
+        }
+
+        auto hydrogen_count = atom.get("hydrogen_count");
+        if (hydrogen_count && hydrogen_count->kind() == Property::DOUBLE) {
+            atom_node.append_attribute("hydrogenCount") =
+                static_cast<size_t>(hydrogen_count->as_double());
+        }
+
         auto& position = frame.positions()[i];
         atom_node.append_attribute("x3") = position[0];
         atom_node.append_attribute("y3") = position[1];
         atom_node.append_attribute("z3") = position[2];
+
+        if (velocities) { // write velocities if they are included
+            auto node = atom_node.append_child("vector3");
+            node.append_attribute("title") = "velocity";
+
+            auto v = velocities->at(i);
+            node.text() = (std::to_string(v[0]) + " " +
+                           std::to_string(v[1]) + " " +
+                           std::to_string(v[2])).c_str();
+
+        }
 
         auto& atom_properties = atom.properties();
         if (!atom_properties.size()) {
             continue;
         }
         for (auto& prop : atom_properties) {
+            // special properties which are already written as attributes
+            if (prop.first == "hydrogen_count" || prop.first == "title") {
+                continue;
+            }
             auto scalar_node = atom_node.append_child("scalar");
             scalar_node.append_attribute("title") = prop.first.c_str();
             write_property_(prop.second, scalar_node);
@@ -402,7 +536,7 @@ void CMLFormat::write(const Frame& frame) {
     }
 
     auto& bonds = frame.topology().bonds();
-    if (bonds.size() == 0) {
+    if (bonds.size() == 0) { // don't bother if there's no bonds
         return;
     }
 
