@@ -81,7 +81,7 @@ CMLFormat::~CMLFormat() {
     // Don't bother to check if anything is added, the document will be blank
     // regardless
     if (mode_ == File::APPEND) {
-        document_.save(*file_, "  ", pugi::format_no_declaration);
+        document_.save(*file_, "  ", pugi::format_no_declaration | pugi::format_default);
     }
 }
 
