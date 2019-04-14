@@ -30,7 +30,7 @@ TEST_CASE("Read files in CML format") {
         Trajectory file("data/cml/drugs.cml");
         auto frame = file.read();
         CHECK(frame.size() == 17);
-        CHECK(frame.get("name")->as_string() == "naproxen");
+        CHECK(frame.get("title")->as_string() == "naproxen");
 
         // Check positions
         auto positions = frame.positions();
@@ -48,7 +48,7 @@ TEST_CASE("Read files in CML format") {
         // Read frame at a specific positions
         auto frame = file.read_step(2);
         CHECK(frame.step() == 2);
-        CHECK(frame.get("name")->as_string() == "tylenol");
+        CHECK(frame.get("title")->as_string() == "tylenol");
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.0000, 6.1600, 0.0000), 1e-3));
         auto topology = frame.topology();
@@ -140,26 +140,39 @@ TEST_CASE("Write CML file") {
     CHECK(orders[3] == Bond::TRIPLE);
     CHECK(orders[4] == Bond::AROMATIC);
     CHECK(frame2.get("is_organic")->as_bool() == false);
+    CHECK(frame2.get("name")->as_string() == "test");
     CHECK(frame2[2].get("num_c")->as_double() == 1.0);
+    CHECK(frame2[2].get("force")->as_vector3d() == Vector3D{1., 2., 3.});
 }
 
 TEST_CASE("Append CML file") {
     auto tmpfile = NamedTempPath(".cml");
     const auto EXPECTED_CONTENT =
-    "<molecule>\n"
+    "<molecule title=\"appended\">\n"
+    "  <propertyList />\n"
     "  <atomArray>\n"
-    "    <atom id=\"a1\" elementType=\"A\" x3=\"1\" y3=\"2\" z3=\"3\" />\n"
-    "    <atom id=\"a2\" elementType=\"B\" x3=\"1\" y3=\"2\" z3=\"3\" />\n"
-    "    <atom id=\"a3\" elementType=\"C\" x3=\"1\" y3=\"2\" z3=\"3\" />\n"
-    "    <atom id=\"a4\" elementType=\"D\" x3=\"1\" y3=\"2\" z3=\"3\" />\n"
+    "    <atom id=\"a1\" elementType=\"A\" x3=\"1\" y3=\"2\" z3=\"3\">\n"
+    "      <vector3 title=\"velocity\">4.000000 5.000000 6.000000</vector3>\n"
+    "    </atom>\n"
+    "    <atom id=\"a2\" elementType=\"B\" x3=\"1\" y3=\"2\" z3=\"3\">\n"
+    "      <vector3 title=\"velocity\">0.000000 0.000000 0.000000</vector3>\n"
+    "    </atom>\n"
+    "    <atom id=\"a3\" elementType=\"C\" x3=\"1\" y3=\"2\" z3=\"3\">\n"
+    "      <vector3 title=\"velocity\">0.000000 0.000000 0.000000</vector3>\n"
+    "    </atom>\n"
+    "    <atom id=\"a4\" elementType=\"D\" x3=\"1\" y3=\"2\" z3=\"3\">\n"
+    "      <vector3 title=\"velocity\">0.000000 0.000000 0.000000</vector3>\n"
+    "    </atom>\n"
     "  </atomArray>\n"
     "</molecule>\n";
 
     auto frame = Frame();
-    frame.add_atom(Atom("A"), {1, 2, 3});
-    frame.add_atom(Atom("B"), {1, 2, 3});
-    frame.add_atom(Atom("C"), {1, 2, 3});
-    frame.add_atom(Atom("D"), {1, 2, 3});
+    frame.add_velocities();
+    frame.add_atom(Atom("", "A"), {1, 2, 3}, {4, 5, 6});
+    frame.add_atom(Atom("", "B"), {1, 2, 3});
+    frame.add_atom(Atom("", "C"), {1, 2, 3});
+    frame.add_atom(Atom("", "D"), {1, 2, 3});
+    frame.set("title", "appended");
 
     auto file = Trajectory(tmpfile, 'a');
     file.write(frame);
