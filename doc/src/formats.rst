@@ -19,6 +19,8 @@ specify which format to use.
 +===================+============+=======+=======+==============+=======+
 | `Amber NetCDF`_   | .nc        | |yes| | |yes| | |no|         | |no|  |
 +-------------------+------------+-------+-------+--------------+-------+
+| `CML`_            | .cml       | |yes| | |yes| | |yes|        | |yes| |
++-------------------+------------+-------+-------+--------------+-------+
 | `CSSR`_           | .cssr      | |yes| | |yes| | |yes|        | |yes| |
 +-------------------+------------+-------+-------+--------------+-------+
 | `DCD`_            | .dcd       | |yes| | |no|  | |no|         | |no|  |
@@ -60,6 +62,7 @@ correspond to LAMMPS data files, as read by the LAMMPS
 `read_data <http://lammps.sandia.gov/doc/read_data.html>`_ command.
 
 .. _Amber NetCDF: http://ambermd.org/netcdf/nctraj.xhtml
+.. _CML: http://www.xml-cml.org
 .. _CSSR: http://www.chem.cmu.edu/courses/09-560/docs/msi/modenv/D_Files.html#944777
 .. _DCD: http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/dcdplugin.html
 .. _GRO: http://manual.gromacs.org/current/online/gro.html
