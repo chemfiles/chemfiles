@@ -105,8 +105,13 @@ TEST_CASE("Write CML file") {
     frame.set("is_organic", false);
     frame.set("name", "test");
 
+    frame[1].set_mass(12);
+
     frame[2].set("force", Vector3D{1., 2., 3.});
     frame[2].set("num_c", 1.0);
+
+    frame[3].set_charge(1.0);
+    frame[3].set("hydrogen_count", 3);
 
     frame.add_bond(0, 1, Bond::UNKNOWN);
     frame.add_bond(0, 2, Bond::SINGLE);
@@ -139,10 +144,17 @@ TEST_CASE("Write CML file") {
     CHECK(orders[2] == Bond::DOUBLE);
     CHECK(orders[3] == Bond::TRIPLE);
     CHECK(orders[4] == Bond::AROMATIC);
+
     CHECK(frame2.get("is_organic")->as_bool() == false);
     CHECK(frame2.get("name")->as_string() == "test");
+
+    CHECK(frame2[1].mass() == 12);
+
     CHECK(frame2[2].get("num_c")->as_double() == 1.0);
     CHECK(frame2[2].get("force")->as_vector3d() == Vector3D{1., 2., 3.});
+
+    CHECK(frame2[3].charge() == 1);
+    CHECK(frame2[3].get("hydrogen_count")->as_double() == 3);
 }
 
 TEST_CASE("Append CML file") {
