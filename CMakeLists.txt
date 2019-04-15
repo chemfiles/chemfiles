@@ -101,6 +101,7 @@ set(CHEMFILES_OBJECTS
     $<TARGET_OBJECTS:molfiles>
     $<TARGET_OBJECTS:tng_io>
     $<TARGET_OBJECTS:fmt>
+    $<TARGET_OBJECTS:pugixml>
     ${ZLIB_OBJECTS}
     ${LZMA_OBJECTS}
     ${NETCDF_OBJECTS}
