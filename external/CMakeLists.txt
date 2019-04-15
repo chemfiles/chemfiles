@@ -213,5 +213,6 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/msgpack-c/inc
 # ==========
 unpack_library(pugixml)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src)
+add_library(pugixml OBJECT ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src/pugixml.cpp)
 
 set(EXTERNAL_INCLUDES ${EXTERNAL_INCLUDES} PARENT_SCOPE)

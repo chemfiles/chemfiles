@@ -7,8 +7,6 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#include "pugixml.cpp"
-
 #include "chemfiles/formats/CML.hpp"
 
 #include "chemfiles/ErrorFmt.hpp"
@@ -41,7 +39,11 @@ CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compre
         return;
     }
 
-    if (mode_ == File::APPEND) { // may need to check the file a CML node in the future, now just append
+    // may need to check the file for a CML node in the future for a CML node,
+    // and if it exists append to that node and rewrite the file, appending new
+    // frames to the CML node. For now, let's just add molecule nodes to the end
+    // of the file.
+    if (mode_ == File::APPEND) {
         root_ = document_;
         return;
     }
@@ -74,7 +76,7 @@ CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compre
 }
 
 CMLFormat::~CMLFormat() {
-    if (num_added_ && mode_ == File::WRITE) {
+    if (num_added_ != 0 && mode_ == File::WRITE) {
         document_.save(*file_, "  ");
         return;
     }
@@ -153,7 +155,8 @@ void CMLFormat::read(Frame& frame) {
     auto crystal_node = current.child("crystal");
     if (crystal_node) {
         double a, b, c, alpha, beta, gamma;
-        a = b = c = alpha = beta = gamma = 0.0;
+        a = b = c = 0.0;
+        alpha = beta = gamma = 90.0;
         for (auto cell_param : crystal_node.children("scalar")) {
             auto title = cell_param.attribute("title");
             if (title) {
@@ -318,20 +321,20 @@ void CMLFormat::read(Frame& frame) {
         auto order = bond.attribute("order");
 
         if (!atomref) {
-            warning("[CML] Bad bond");
+            warning("[CML] Bond does not contain an atomref attribute.");
             continue;
         }
 
         auto ids = split(atomref.as_string(), ' ');
         if (ids.size() != 2) {
-            warning("[CML] Bad bond size");
+            warning("[CML] bondArray contains a bond of size {} instead of 2.", ids.size());
             continue;
         }
 
         auto id1 = ref_to_id.find(ids[0]);
         auto id2 = ref_to_id.find(ids[1]);
         if (id1 == ref_to_id.end() || id2 == ref_to_id.end()) {
-            warning("[CML] Bad bond ref");
+            warning("[CML] Invalid atomic references in bond: {} -- {}", ids[0], ids[1]);
             continue;
         }
 
@@ -412,7 +415,8 @@ void CMLFormat::write(const Frame& frame) {
     auto mol = root_.append_child("molecule");
 
     if (mode_ == File::WRITE) {
-        mol.append_attribute("id") = ("m" + std::to_string(++num_added_)).c_str();
+        ++num_added_;
+        mol.append_attribute("id") = ("m" + std::to_string(num_added_)).c_str();
     }
 
     // The title is supplied as a attribute

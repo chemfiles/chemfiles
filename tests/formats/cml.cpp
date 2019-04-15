@@ -160,23 +160,24 @@ TEST_CASE("Write CML file") {
 TEST_CASE("Append CML file") {
     auto tmpfile = NamedTempPath(".cml");
     const auto EXPECTED_CONTENT =
-    "<molecule title=\"appended\">\n"
-    "  <propertyList />\n"
-    "  <atomArray>\n"
-    "    <atom id=\"a1\" elementType=\"A\" x3=\"1\" y3=\"2\" z3=\"3\">\n"
-    "      <vector3 title=\"velocity\">4.000000 5.000000 6.000000</vector3>\n"
-    "    </atom>\n"
-    "    <atom id=\"a2\" elementType=\"B\" x3=\"1\" y3=\"2\" z3=\"3\">\n"
-    "      <vector3 title=\"velocity\">0.000000 0.000000 0.000000</vector3>\n"
-    "    </atom>\n"
-    "    <atom id=\"a3\" elementType=\"C\" x3=\"1\" y3=\"2\" z3=\"3\">\n"
-    "      <vector3 title=\"velocity\">0.000000 0.000000 0.000000</vector3>\n"
-    "    </atom>\n"
-    "    <atom id=\"a4\" elementType=\"D\" x3=\"1\" y3=\"2\" z3=\"3\">\n"
-    "      <vector3 title=\"velocity\">0.000000 0.000000 0.000000</vector3>\n"
-    "    </atom>\n"
-    "  </atomArray>\n"
-    "</molecule>\n";
+    R"(<molecule title="appended">
+  <propertyList />
+  <atomArray>
+    <atom id="a1" elementType="A" x3="1" y3="2" z3="3">
+      <vector3 title="velocity">4.000000 5.000000 6.000000</vector3>
+    </atom>
+    <atom id="a2" elementType="B" x3="1" y3="2" z3="3">
+      <vector3 title="velocity">0.000000 0.000000 0.000000</vector3>
+    </atom>
+    <atom id="a3" elementType="C" x3="1" y3="2" z3="3">
+      <vector3 title="velocity">0.000000 0.000000 0.000000</vector3>
+    </atom>
+    <atom id="a4" elementType="D" x3="1" y3="2" z3="3">
+      <vector3 title="velocity">0.000000 0.000000 0.000000</vector3>
+    </atom>
+  </atomArray>
+</molecule>
+)";
 
     auto frame = Frame();
     frame.add_velocities();
