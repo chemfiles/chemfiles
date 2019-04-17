@@ -30,3 +30,15 @@ hr.docutils {
     border: 1px solid;
     width: 50%
 }
+
+.green {
+    color: green;
+}
+
+.red {
+    color: red;
+}
+
+.alternating-table tbody .row-even {
+    background: #d5d5d5;
+}
