@@ -334,10 +334,13 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
         }
     }
 
-    auto atom = Atom(trim(line.substr(12, 4)));
-    if (line.length() >= 78) {
-        atom.set_type(trim(line.substr(76, 2)));
-    }
+    auto atom = (line.length() >= 78)?
+        // Read both atom name and atom type
+        Atom(trim(line.substr(12, 4)),
+             trim(line.substr(76, 2))) :
+
+        // Read just the atom name and hope for the best.
+        Atom(trim(line.substr(12, 4)));
 
     auto altloc = line.substr(16, 1);
     if (altloc != " ") {
