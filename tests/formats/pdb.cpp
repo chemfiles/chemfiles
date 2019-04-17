@@ -135,7 +135,8 @@ TEST_CASE("Read files in PDB format") {
 
     SECTION("Read ATOM/HETATM information") {
         Trajectory file("data/pdb/hemo.pdb");
-        auto residues = file.read().topology().residues();
+        auto frame = file.read();
+        auto residues = frame.topology().residues();
 
         // HEME group is first
         CHECK(residues[0].get("is_standard_pdb")->as_bool() == false);
@@ -143,6 +144,9 @@ TEST_CASE("Read files in PDB format") {
         for (size_t i = 1; i < residues.size(); i++) {
             CHECK(residues[i].get("is_standard_pdb")->as_bool());
         }
+
+        // Check to be use we've parsed the correct atom type
+        CHECK(frame[74].mass() == 12.011);
     }
 
     SECTION("Handle multiple TER records") {
