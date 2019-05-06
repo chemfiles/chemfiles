@@ -1,4 +1,6 @@
-#!/bin/bash -xe
+#!/bin/bash
+
+set -xe
 
 # Install doc dependencies
 cd $TRAVIS_BUILD_DIR
@@ -33,3 +35,5 @@ else
     rm -rf gh-pages/latest
     mv doc/html/ gh-pages/latest
 fi
+
+set +xe

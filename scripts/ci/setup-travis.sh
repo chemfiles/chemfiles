@@ -11,13 +11,13 @@ if [[ "$CMAKE_GENERATOR" == "" ]]; then
     export CMAKE_GENERATOR="Unix Makefiles"
 fi
 
-if [[ "${STATIC_LIBS}" == "ON" ]]; then
+if [[ "$STATIC_LIBS" == "ON" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DBUILD_SHARED_LIBS=OFF"
 else
     export CMAKE_ARGS="$CMAKE_ARGS -DBUILD_SHARED_LIBS=ON"
 fi
 
-if [[ "${DO_COVERAGE}" == "ON" ]]; then
+if [[ "$DO_COVERAGE" == "ON" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_C_FLAGS=\"--coverage\" -DCMAKE_CXX_FLAGS=\"--coverage\""
     pip install --user codecov
 fi
@@ -47,7 +47,7 @@ fi
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     pip install --user -r doc/requirements.txt
-    if [[ "$CC" == "gcc" ]]; then
+    if [[ "$TRAVIS_COMPILER" == "gcc" ]]; then
         export CC=gcc-4.8
         export CXX=g++-4.8
     fi
@@ -59,7 +59,7 @@ fi
 
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew update
-    if [[ "$CC" == "gcc" ]]; then
+    if [[ "$TRAVIS_COMPILER" == "gcc" ]]; then
         brew install gcc@5
         export CC=gcc-5
         export CXX=g++-5
@@ -70,13 +70,13 @@ if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     export PATH="/c/Program Files/CMake/bin":$PATH
     export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_BUILD_DOCTESTS=OFF"
 
-    if [[ "${CMAKE_GENERATOR}" == "Visual Studio"* ]]; then
+    if [[ "$CMAKE_GENERATOR" == "Visual Studio"* ]]; then
         choco install -y vcbuildtools
         export PATH=$PATH:"/c/Program Files (x86)/Microsoft Visual Studio/2015/BuildTools/MSBuild/14.0/Bin"
         export BUILD_ARGS="-verbosity:minimal -m:2"
     fi
 
-    if [[ "${CMAKE_GENERATOR}" == "MinGW Makefiles" ]]; then
+    if [[ "$CMAKE_GENERATOR" == "MinGW Makefiles" ]]; then
         export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_SH=CMAKE_SH-NOTFOUND"
         export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_BUILD_TYPE=release"
         export CMAKE_BUILD_TYPE="Release"
@@ -98,4 +98,4 @@ if [[ "$ARCH" == "x86" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_C_FLAGS=-m32"
 fi
 
-set +x
+set +xe
