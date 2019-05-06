@@ -2,13 +2,13 @@
 
 export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DCHFL_BUILD_TESTS=ON"
 
-if [[ "${STATIC_LIBS}" == "ON" ]]; then
+if [[ "$STATIC_LIBS" == "ON" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DBUILD_SHARED_LIBS=OFF"
 else
     export CMAKE_ARGS="$CMAKE_ARGS -DBUILD_SHARED_LIBS=ON"
 fi
 
-if [[ "${DO_COVERAGE}" == "ON" ]]; then
+if [[ "$DO_COVERAGE" == "ON" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_C_FLAGS=\"--coverage\" -DCMAKE_CXX_FLAGS=\"--coverage\""
     pip install --user codecov
 fi
@@ -39,7 +39,8 @@ if [[ "$EMSCRIPTEN" == "ON" ]]; then
 fi
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    if [[ "$CC" == "gcc" ]]; then
+    pip install --user -r doc/requirements.txt
+    if [[ "$TRAVIS_COMPILER" == "gcc" ]]; then
         export CC=gcc-4.8
         export CXX=g++-4.8
     fi
@@ -68,7 +69,7 @@ fi
 
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew update
-    if [[ "$CC" == "gcc" ]]; then
+    if [[ "$TRAVIS_COMPILER" == "gcc" ]]; then
         brew install gcc@5
         export CC=gcc-5
         export CXX=g++-5
