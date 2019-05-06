@@ -3,64 +3,92 @@
 Selection language
 ==================
 
-Chemfiles selection language allows to select some atoms in a :ref:`Frame
-<class-Frame>` matching a set of constraints. For examples, ``atom: name H
-and x > 15`` would select all *single atoms* whose name is ``H`` and x
-coordinate is bigger than 15.
+Overview
+^^^^^^^^
 
-Chemfiles selections differs from the well-known `VMD`_ selections by the fact
-that they are *multiple selections*: we can select more than one atom at once.
-All selections starts with a context, indicating the number of atoms we are
-selecting, and the relation between these atoms. Existing contexts are
-``atoms`` or ``one``, ``pairs`` or ``two``, ``three`` and ``four``  to select
-one, two, three or four independent atoms; and ``bonds``, ``angles`` and
-``dihedrals`` for two, three or four bonded atoms.
+Chemfiles implements a rich selection language that allows finding the atoms
+matching a set of constraints in a :cpp:class:`Frame <chemfiles::Frame>`.  For
+example, ``atom: name == H and x > 15`` would select all atoms with a name equal
+to "H" and x cartesian coordinate bigger than 15. Here, ``name == H`` and ``x >
+15`` are individual constraints, and they are combined with ``and``, meaning
+both of them must be true for an atom to match to full selection.
 
-.. _VMD: http://www.ks.uiuc.edu/Research/vmd/
+Chemfiles atomic selection language differs from other atomic selection
+languages (such as the ones in `VMD`_, `MDAnalysis`_, and many others) by the
+fact that it is possible to formulate constraints not only on single atoms, but
+also on pairs, triplets, and quadruplets of atoms. For example, ``angles:
+name(#2) O and mass(#3) < 1.5`` will select all sets of three bonded atoms
+forming an angle such that the name of the second atom is O and the mass of the
+third atom is less than 1.5. Here, the first atom is left unconstrained.  Where
+evaluating simple selections yields a list of matching atomic indexes,
+evaluating triplet selection will return a list of triplets of atomic indexes
+(and correspondingly for pairs and quadruplets).
 
-A selection is built using a context and a set of constraints separated by a
-colon. For example, ``atoms: name == H`` will select all atoms whose name is
-``H``. ``angles: name(#2) == O and mass(#3) < 1.5`` will select all sets of
-three bonded atoms forming an angle such that the name of the second atom is
-``O`` and the mass of the third atom is less than 1.5.
+.. _VMD: https://www.ks.uiuc.edu/Research/vmd/current/ug/node89.html
+.. _MDAnalysis: https://www.mdanalysis.org/docs/documentation_pages/selections.html
 
-These constraints are created using *selectors*. Selectors are small functions
-that are evaluated for each atom, and return either ``true`` if the atom
-matches, or ``false`` if it does not. There are three kinds of selectors:
+The number of atoms to select together is indicated in chemfiles by a context,
+separated from the main selection by a colon. Seven contexts are available:
+``atoms`` is the default context, matching single atoms. ``two``, ``three``, and
+``four`` match arbitrary pairs, triplets and quadruplets of atoms respectively.
+``bonds``, ``angles``, and ``dihedrals`` match pairs, triplets and quadruplets
+of atoms bonded together to form the corresponding connectivity element.
 
-- Boolean selectors returns either ``true`` or ``false`` for a given set of atoms;
-- string selectors compare string values with one of ``==`` (equal) or ``!=``
-  (not equal). One can either compare two atomic properties (``name(#1) ==
-  type(#2)``) or atomic properties to literal strings (``name(#1) != He``);
-- numeric selectors compare two numeric values with either ``==``, ``!=``, ``<``
-  (less than), ``<=`` (less or equal), ``>`` (more than), and ``>=`` (more or
-  equal)
+Expressing the constraints
+--------------------------
 
-Numeric values are produced by numeric selectors (``x``; ``mass``, ...) or
-literal values (``5.2``, ``22.21e-2``). They can also be combined together using
-mathematical operations: the usual ``+``, ``-``, ``*`` and ``/`` operators are
-supported, as well as ``^`` for exponentiation and ``%`` for modulo (remainder
-of Euclidean division). These operations follow the usual priority rules:
-``1 + 2 * 3`` is 7, not 9.
+Selections are built by assembling simple constraints with the Boolean operators
+``and``, ``or`` and ``not``. They follow the usual interpretation of logic: ``A
+and B`` will be true only if both A and B are true, ``A or B`` will be true if
+one of A or B is, and ``not A`` will be true is A is false. You can use three
+types of constraints in your selections: Boolean constraints, string constraints,
+and numeric constraints.
 
-When using a selection with more than one atom, selectors must refer to the
-different atoms with ``#1``, ``#2``, ``#3`` or ``#4`` variables: ``name(#3)``
-will give the name of the third atom, and so on.
+String constraints check text values, such as the atomic ``name`` or atomic
+``type``, comparing it to either a fixed string (``name(#1) == Fe``) or another
+string value (``type(#1) != type(#3)``). When using a selection with more than
+one atom, constraints are applied to different atoms using ``#1``, ``#2``,
+``#3`` or ``#4`` to refer to a specific atom: ``angles: name(#3) Co`` will check
+the name of the third atom of the angles, and so on.
 
-Finally, constraints are combined with Boolean operators. The ``and`` operator
-is true if both side of the expression are true; the ``or`` operator is true if
-either side of the expression is true; and the ``not`` operator reverse true to
-false and false to true. ``name(#1) == H and not x(#1) < 5.0`` and ``(z(#2) < 45
-and name(#4) == O) or name(#1) == C`` are complex selections using Boolean
-operators.
+Numeric constraints check numeric values such as the position of the atoms
+(``x``, ``y``, and ``z``), the atomic ``mass``, the ``index`` of an atom in the
+frame, *etc.* Numeric values can be combined with the usual mathematical
+operations: ``x^2 + y^2 + z^2 < 10^2`` will check for atoms inside the sphere
+with a radius of 10 Å centered on the origin. The usual ``+``, ``-``, ``*`` and
+``/`` operators are supported, as well as ``^`` for exponentiation and ``%`` for
+modulo (remainder of Euclidean division). These operations follow the standard
+priority rules: ``1 + 2 * 3`` is 7, not 9. Numeric values are then compared with
+one of ``==`` (equal), ``!=`` (not equal), ``<`` (less than),
+``<=`` (less or equal), ``>`` (more than), or ``>=`` (more or equal).
 
-List of implemented selectors
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Finally, Boolean constraints directly evaluate to either ``true`` or ``false``
+for a given set of atoms. For example, ``is_bonded(i, j)`` will check if atoms i
+and j are bonded together. Here, ``i`` and ``j`` can either be one of the atoms
+currently being matched (``#1 / #2 / #3 / #4``) or another selection (called
+sub-selection). In the latter case, all the atoms in the sub-selection are
+checked to see if any of them verify the selection. This makes ``is_bonded(#1,
+name O)`` select all atoms bonded to an oxygen; and ``is_angle(type C, #1, name
+O)`` select all atoms in the middle of a C-X-O angle.
 
-Here is the list of currently implemented selectors. Additional ideas are welcome!
+Constraints on atomic properties
+--------------------------------
 
-Boolean selectors
------------------
+It is possible to use atomic :cpp:class:`properties <chemfiles::Property>`
+(unfortunately not frame or residue properties) in constraints, with the
+``[<property>]`` syntax. ``<property>`` should be replaced by the property name:
+``[is_hetatm]``, possibly using quotes around the property name if it contains
+spaces: ``["my own property"]``. Depending on the context, a Boolean, string or
+numeric property will be searched. If none can be found, or if the property type
+does not match, a default value will be used instead.
+
+Selection language reference
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Here is the list of currently implemented constraints. Additional ideas are welcome!
+
+Boolean constraints
+-------------------
 
 - ``all``: always matches any atom and returns ``true``;
 - ``none``: never matches an atom and returns ``false``;
@@ -79,14 +107,6 @@ Boolean selectors
 - ``[<property>]``: check if atoms have a Boolean property named `'property'`
   set, and that this property is true. This will return false if the property
   is not set;
-
-For Boolean selectors taking arguments, ``i/j/k/m`` can either be one of the
-atoms currently being matched (``#1 / #2 / #3 / #4``) or another selection
-(called sub-selection). In the latter case, all the atoms in the sub-selection
-are checked to see if any of them verify the selection. This makes
-``is_bonded(#1, name O)`` select all atoms bonded to an oxygen; and
-``is_angle(type C, #1, name O)`` select all atoms in the middle of a C-X-O
-angle.
 
 String properties
 -----------------
@@ -144,12 +164,20 @@ the trigonometric functions; ``asin`` and ``acos`` inverse trigonometric
 functions and ``sqrt``. Adding new functions is easy, open an issue about the
 one you need on the chemfiles repository.
 
-Elisions
-^^^^^^^^
+.. note::
 
-This multiple selection language can be a bit verbose for simpler cases, so it
-is sometimes allowed to remove parts of the selection. The following rules allow
-simpler selections:
+    Numeric selection operate on double precision floating point number, and as
+    such are subject to the same limitations. In particular, while ``1 + 2 ==
+    3`` will match all atoms, since this relation is always true, ``0.1 + 0.2 ==
+    0.3`` will not, since ``0.1 + 0.2 == 0.30000000000000004`` when using
+    floating point arithmetic.
+
+Elisions
+--------
+
+This selection language is very explicit but it can be too verbose in some
+cases. The following rules allow to omit some parts of the selection when the
+meaning is clear:
 
 - First, in the ``atoms`` context, the ``#1`` variable is optional, and ``atoms:
   name(#1) == H`` is equivalent to ``atoms: name == H``.
