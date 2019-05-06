@@ -1,7 +1,7 @@
 .. _class-Frame:
 
-Frame class
-===========
+Frame
+=====
 
 .. doxygenclass:: chemfiles::Frame
     :members:

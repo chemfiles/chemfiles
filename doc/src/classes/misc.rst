@@ -1,5 +1,5 @@
-Miscelaneous classes and functions
-==================================
+Miscelaneous
+============
 
 Basic types
 -----------
