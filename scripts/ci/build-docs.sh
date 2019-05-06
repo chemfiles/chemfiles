@@ -4,7 +4,7 @@ set -xe
 
 # Install doc dependencies
 cd $TRAVIS_BUILD_DIR
-pip install --user --upgrade -r doc/requirements.txt
+python3.6 -m pip install --user --upgrade -r doc/requirements.txt
 
 DOXYGEN_VER=1.8.13_1
 DOXYGEN_URL="https://linuxbrew.bintray.com/bottles/doxygen-${DOXYGEN_VER}.x86_64_linux.bottle.1.tar.gz"

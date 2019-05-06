@@ -1,5 +1,5 @@
 language: cpp
-sudo: false
+dist: trusty
 
 branches:
   only:
@@ -13,11 +13,13 @@ linux64_addons:
       apt:
         sources:
         - ubuntu-toolchain-r-test
+        - deadsnakes
         packages:
         - g++-4.8
         - valgrind
         # Used for CHFL_EXTERNAL_NETCDF
         - libnetcdf-dev
+        - python3.6
 
 linux32_addons:
     addons: &linux32
