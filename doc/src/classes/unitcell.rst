@@ -1,7 +1,7 @@
 .. _class-UnitCell:
 
-Unit Cell class
-===============
+UnitCell
+========
 
 .. doxygenclass:: chemfiles::UnitCell
     :members:
