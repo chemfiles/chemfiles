@@ -38,7 +38,7 @@ sections.
 ---------------------------------
 
 The ``[types]`` section of the configuration file allow to change atomic types
-to make sure they match element name. For example, in a simulatiion where water
+to make sure they match element name. For example, in a simulation where water
 molecules are named ``Hw-Ow-Hw``, one may use this section of the input file
 like this:
 
@@ -51,14 +51,14 @@ like this:
 Renaming atomic type allow to ensure that bonds will be guessed right, and that
 the right atomic data can be accessed.
 
-The ``[types]`` section contains multiple key wich are the old atom type,
-associated with string values wich are the new atom type.
+The ``[types]`` section contains multiple key which are the old atom type,
+associated with string values which are the new atom type.
 
 ``[atoms]``: Defining new atom types
 ------------------------------------
 
 When working with particles outside of the periodic table (for example coarse
-grained particles), it can be usefull to define new atom types. This can be done
+grained particles), it can be useful to define new atom types. This can be done
 in the ``[atom]`` section.
 
 .. code-block:: text
