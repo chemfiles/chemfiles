@@ -59,11 +59,11 @@ matrix:
     - name: osx clang
       os: osx
       compiler: clang
-      osx_image: xcode7.3
+      osx_image: xcode8.3
     - name: osx gcc
       os: osx
       compiler: gcc
-      osx_image: xcode7.3
+      osx_image: xcode8.3
     - name: MSVC 64-bit
       os: windows
       env: CMAKE_GENERATOR="Visual Studio 14 2015 Win64"
