@@ -7,7 +7,7 @@ Chemfiles internals
    file
    format
 
-Sources organisation
+Sources organization
 --------------------
 
 You will find the following directory in chemfiles source code:
@@ -17,11 +17,11 @@ You will find the following directory in chemfiles source code:
 - ``examples``: usage examples for C and C++ interfaces;
 - ``external``: external libraries used by chemfiles;
 - ``include``: the headers of chemfiles;
-- ``scripts``: some python and bash scripts used in developpement.
+- ``scripts``: some python and bash scripts used in development.
 - ``src``: the sources of the library;
 - ``tests``: the sources of the unit tests;
 
-Classes organisation
+Classes organization
 --------------------
 
 Chemfiles is written in C++11, in an object-oriented fashion. A ``Trajectory``
@@ -29,7 +29,7 @@ is built on the top of two other private classes: a :ref:`File <class-File>` and
 a :ref:`Format <class-Format>`. These are pure abstract class defining the
 interface for reading and writing data.
 
-Adding new formats and tweaking behaviour of existing formats should be done
+Adding new formats and tweaking behavior of existing formats should be done
 either in the ``File`` implementation for everything related to interactions
 with the actual file, or in the ``Format`` implementation for everything related
 with parsing data from the file.

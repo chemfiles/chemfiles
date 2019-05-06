@@ -5,7 +5,7 @@ List of supported formats
 -------------------------
 
 This page list the supported formats in chemfiles, with a link to the format
-specification. For eavch format, it is also indicated wether they have some
+specification. For each format, it is also indicated whether they have some
 information to create a *Topology*, and if you can read them, write them or both
 using chemfiles.
 

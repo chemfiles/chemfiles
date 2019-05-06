@@ -11,7 +11,7 @@ coordinate is bigger than 15.
 Chemfiles selections differs from the well-known `VMD`_ selections by the fact
 that they are *multiple selections*: we can select more than one atom at once.
 All selections starts with a context, indicating the number of atoms we are
-selecting, and the relation between these atoms. Existing contextes are
+selecting, and the relation between these atoms. Existing contexts are
 ``atoms`` or ``one``, ``pairs`` or ``two``, ``three`` and ``four``  to select
 one, two, three or four independent atoms; and ``bonds``, ``angles`` and
 ``dihedrals`` for two, three or four bonded atoms.
@@ -28,7 +28,7 @@ These constraints are created using *selectors*. Selectors are small functions
 that are evaluated for each atom, and return either ``true`` if the atom
 matches, or ``false`` if it does not. There are three kinds of selectors:
 
-- boolean selectors returns either ``true`` or ``false`` for a given set of atoms;
+- Boolean selectors returns either ``true`` or ``false`` for a given set of atoms;
 - string selectors compare string values with one of ``==`` (equal) or ``!=``
   (not equal). One can either compare two atomic properties (``name(#1) ==
   type(#2)``) or atomic properties to literal strings (``name(#1) != He``);
@@ -47,11 +47,11 @@ When using a selection with more than one atom, selectors must refer to the
 different atoms with ``#1``, ``#2``, ``#3`` or ``#4`` variables: ``name(#3)``
 will give the name of the third atom, and so on.
 
-Finally, constraints are combined with boolean operators. The ``and`` operator
+Finally, constraints are combined with Boolean operators. The ``and`` operator
 is true if both side of the expression are true; the ``or`` operator is true if
 either side of the expression is true; and the ``not`` operator reverse true to
 false and false to true. ``name(#1) == H and not x(#1) < 5.0`` and ``(z(#2) < 45
-and name(#4) == O) or name(#1) == C`` are complex selections using booleans
+and name(#4) == O) or name(#1) == C`` are complex selections using Boolean
 operators.
 
 List of implemented selectors
@@ -76,16 +76,17 @@ Boolean selectors
 - ``is_improper(i, j, k, m)``: check if atoms i, j, k and m are bonded together
   to form a dihedral angle, *i.e.* that all of i, k, and m are bonded to j. If
   any of i, j, k or m refer to the same atom, this returns false;
-- ``[<property>]``: check if atoms have a boolean property named `'property'`
+- ``[<property>]``: check if atoms have a Boolean property named `'property'`
   set, and that this property is true. This will return false if the property
   is not set;
 
-For boolean selectors taking arguments, ``i/j/k/m`` can either be one of the
+For Boolean selectors taking arguments, ``i/j/k/m`` can either be one of the
 atoms currently being matched (``#1 / #2 / #3 / #4``) or another selection
 (called sub-selection). In the latter case, all the atoms in the sub-selection
 are checked to see if any of them verify the selection. This makes
 ``is_bonded(#1, name O)`` select all atoms bonded to an oxygen; and
-``is_angle(type C, #1, name O)`` select all atoms in the midle of a C-X-O angle.
+``is_angle(type C, #1, name O)`` select all atoms in the middle of a C-X-O
+angle.
 
 String properties
 -----------------
