@@ -58,9 +58,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
 fi
 
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    brew update
     if [[ "$TRAVIS_COMPILER" == "gcc" ]]; then
-        brew install gcc@5
         export CC=gcc-5
         export CXX=g++-5
     fi
