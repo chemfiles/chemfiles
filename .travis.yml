@@ -64,6 +64,10 @@ matrix:
       os: osx
       compiler: gcc
       osx_image: xcode8.3
+      addons:
+        homebrew:
+          packages:
+            - gcc@5
 
 before_install:
   # Setting environement
