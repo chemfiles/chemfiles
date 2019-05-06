@@ -10,7 +10,9 @@ fi
 
 if [[ "$DO_COVERAGE" == "ON" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_C_FLAGS=\"--coverage\" -DCMAKE_CXX_FLAGS=\"--coverage\""
-    pip install --user codecov
+    curl https://bootstrap.pypa.io/get-pip.py > get-pip.py
+    python3.6 get-pip.py --user
+    python3.6 -m pip install --user codecov
 fi
 
 cd $TRAVIS_BUILD_DIR
@@ -39,7 +41,6 @@ if [[ "$EMSCRIPTEN" == "ON" ]]; then
 fi
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    pip install --user -r doc/requirements.txt
     if [[ "$TRAVIS_COMPILER" == "gcc" ]]; then
         export CC=gcc-4.8
         export CXX=g++-4.8
