@@ -7,7 +7,7 @@ Chemfiles can be configured using `TOML`_ configuration files. By default,
 chemfiles will read configuration from any file named ``.chemfiles.toml`` or
 ``chemfiles.toml`` in the current directory or any parent directory. Data from
 directories higher in the filesystem will be used instead of the one lower in
-the filesystem. For example, with the following filesystem:
+the filesystem. For example, with the following file organization:
 
 .. code-block:: bash
 
