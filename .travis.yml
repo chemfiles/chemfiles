@@ -81,9 +81,11 @@ before_install:
 script:
   - cd $TRAVIS_BUILD_DIR
   - mkdir build && cd build
-  - $CMAKE_CONFIGURE cmake $CMAKE_ARGS $CMAKE_EXTRA ..
-  - make -j2
-  - ctest -j2 --output-on-failure
+  - echo $CMAKE_CONFIGURE cmake -G "${CMAKE_GENERATOR}" $CMAKE_ARGS
+  - $CMAKE_CONFIGURE cmake -G "${CMAKE_GENERATOR}" $CMAKE_ARGS ..
+  - echo cmake --build . --config $CMAKE_BUILD_TYPE -- $BUILD_ARGS
+  - eval cmake --build . --config $CMAKE_BUILD_TYPE -- $BUILD_ARGS
+  - ctest -j2 --output-on-failure -C $CMAKE_BUILD_TYPE
   - cd $TRAVIS_BUILD_DIR
   # Run various additional checks
   - ./scripts/ci/check-capi-docs.py
