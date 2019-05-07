@@ -57,9 +57,9 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
     double a = 0;
     double b = 0;
     double c = 0;
-    double alpha = 0;
-    double beta = 0;
-    double gamma = 0;
+    double alpha = 90;
+    double beta = 90;
+    double gamma = 90;
 
     bool in_loop = false;
     size_t current_index = 0;
@@ -82,27 +82,27 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
             in_loop = false;
         }
 
-        if (line_split[0] == "_cell_length_a") {
+        if (line_split[0] == "_cell_length_a" || line_split[0] == "_cell.length_a") {
             a = cif_to_double(line_split[1]);
         }
 
-        if (line_split[0] == "_cell_length_b") {
+        if (line_split[0] == "_cell_length_b" || line_split[0] == "_cell.length_b") {
             b = cif_to_double(line_split[1]);
         }
 
-        if (line_split[0] == "_cell_length_c") {
+        if (line_split[0] == "_cell_length_c" || line_split[0] == "_cell.length_c") {
             c = cif_to_double(line_split[1]);
         }
 
-        if (line_split[0] == "_cell_angle_alpha") {
+        if (line_split[0] == "_cell_angle_alpha" || line_split[0] == "_cell.angle_alpha") {
             alpha = cif_to_double(line_split[1]);
         }
 
-        if (line_split[0] == "_cell_angle_beta") {
+        if (line_split[0] == "_cell_angle_beta" || line_split[0] == "_cell.angle_beta") {
             beta = cif_to_double(line_split[1]);
         }
 
-        if (line_split[0] == "_cell_angle_gamma") {
+        if (line_split[0] == "_cell_angle_gamma" || line_split[0] == "_cell.angle_gamma") {
             gamma = cif_to_double(line_split[1]);
         }
 
@@ -214,6 +214,7 @@ void mmCIFFormat::read_step(const size_t step, Frame& frame) {
 void mmCIFFormat::read(Frame& frame) {
     frame.resize(0);
     residues_.clear();
+    frame.set_cell(cell_);
 
     if (!name_.empty()) {
         frame.set("name", name_);
