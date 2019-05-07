@@ -98,7 +98,8 @@ script:
   - mkdir build && cd build
   - echo $CMAKE_CONFIGURE cmake -G "${CMAKE_GENERATOR}" $CMAKE_ARGS
   - $CMAKE_CONFIGURE cmake -G "${CMAKE_GENERATOR}" $CMAKE_ARGS ..
-  - cmake --build . --config $CMAKE_BUILD_TYPE -- $BUILD_ARGS
+  - echo cmake --build . --config $CMAKE_BUILD_TYPE -- $BUILD_ARGS
+  - eval cmake --build . --config $CMAKE_BUILD_TYPE -- $BUILD_ARGS
   - ctest -j2 --output-on-failure -C $CMAKE_BUILD_TYPE
   - cd $TRAVIS_BUILD_DIR
   # Run various additional checks
