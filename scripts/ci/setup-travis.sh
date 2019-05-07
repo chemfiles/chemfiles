@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -xe
+set -x
 
 cd $TRAVIS_BUILD_DIR
 export CMAKE_ARGS="-DCMAKE_BUILD_TYPE=debug -DCHFL_BUILD_TESTS=ON $CMAKE_EXTRA"
@@ -62,6 +62,10 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     if [[ "$TRAVIS_COMPILER" == "gcc" ]]; then
         export CC=gcc-5
         export CXX=g++-5
+
+        # Filter out 'warning: section "__textcoal_nt" is deprecated'
+        # from the compiler output, as it makes the log reach the size limit
+        export BUILD_ARGS="$BUILD_ARGS 2> >(python $TRAVIS_BUILD_DIR/scripts/ci/filter-textcoal-warnings.py)"
     fi
 fi
 
@@ -97,4 +101,4 @@ if [[ "$ARCH" == "x86" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_C_FLAGS=-m32"
 fi
 
-set +xe
+set +x
