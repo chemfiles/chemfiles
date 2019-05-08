@@ -111,7 +111,7 @@ file(GLOB all_test_files
 
 foreach(test_file IN LISTS all_test_files)
     chfl_cpp_test(${test_file})
-endforeach(test_file)
+endforeach()
 
 function(chfl_capi_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
@@ -123,7 +123,7 @@ endfunction()
 file(GLOB capi_test_files ${CMAKE_CURRENT_SOURCE_DIR}/capi/*.cpp)
 foreach(test_file IN LISTS capi_test_files)
     chfl_capi_test(${test_file})
-endforeach(test_file)
+endforeach()
 
 file(RELATIVE_PATH VERSION_FILE_PATH ${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/VERSION)
 target_compile_definitions(c-misc PRIVATE "-DVERSION_FILE_PATH=\"${VERSION_FILE_PATH}\"")
@@ -189,12 +189,12 @@ endfunction()
 file(GLOB_RECURSE doctest_files ${CMAKE_CURRENT_SOURCE_DIR}/doc/**.cpp)
 foreach(test_file IN LISTS doctest_files)
     chfl_cpp_doctest(${test_file})
-endforeach(test_file)
+endforeach()
 
 file(GLOB_RECURSE capi_doctest_files ${CMAKE_CURRENT_SOURCE_DIR}/doc/capi/**.c)
 foreach(test_file IN LISTS capi_doctest_files)
     chfl_c_doctest(${test_file})
-endforeach(test_file)
+endforeach()
 
 # Write sample configuration files for tests
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/../.chemfiles.toml
@@ -222,3 +222,24 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/local-file.toml
 "[types]
 Oz = \"F\"
 ")
+
+# Code linting with Python scripts
+if(${CMAKE_VERSION} VERSION_GREATER "3.12")
+    # cmake 3.12 replaced find_package(PythonInterp) with find_package(Python) 
+    find_package(Python REQUIRED)
+    set(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
+else()
+    find_package(PythonInterp REQUIRED)
+endif()
+
+function(chfl_lint _file_)
+    get_filename_component(_name_ ${_file_} NAME_WE)
+    add_test(NAME ${_name_}
+        COMMAND ${PYTHON_EXECUTABLE} ${_file_}
+    )
+endfunction()
+
+file(GLOB lint_scripts ${CMAKE_CURRENT_SOURCE_DIR}/lints/*.py)
+foreach(script IN LISTS lint_scripts)
+    chfl_lint(${script})
+endforeach()
