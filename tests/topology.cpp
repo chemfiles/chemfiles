@@ -321,4 +321,13 @@ TEST_CASE("Residues in topologies") {
     // A residue is linked to itself
     second = topology.residue_for_atom(0);
     CHECK(topology.are_linked(*first, *second));
+
+    // Remove an atom and ensure the residues are updated
+    topology.remove(8);
+    auto& all_residues = topology.residues();
+    CHECK(all_residues[0].size() == 3); // Not affected
+    CHECK(all_residues[1].size() == 3); // This is updated
+    CHECK(all_residues[1].contains(8));
+    CHECK(!all_residues[1].contains(9));
+    CHECK(all_residues[2].size() == 2); // Totally removed
 }

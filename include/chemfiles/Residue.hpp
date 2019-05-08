@@ -148,7 +148,16 @@ private:
     /// Additional properties of this residue
     property_map properties_;
 
+    /// Update the atomic indexes in this residue after an atom has been
+    /// removed from the containing topology.
+    ///
+    /// This function removes the atom with index `i` from this residue if it
+    /// exists, and shifts all the indexes bigger than `i` by -1.
+    void atom_removed(size_t i);
+
     friend bool operator==(const Residue& lhs, const Residue& rhs);
+
+    friend class Topology;
 };
 
 inline bool operator==(const Residue& lhs, const Residue& rhs) {
