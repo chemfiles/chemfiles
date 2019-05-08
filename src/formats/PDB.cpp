@@ -462,7 +462,7 @@ void PDBFormat::link_standard_residue_bonds(Frame& frame) {
         }
 
         const auto& amide_nitrogen = atom_name_to_index.find("N");
-        const auto& amide_carbon = atom_name_to_index.find("O");
+        const auto& amide_carbon = atom_name_to_index.find("C");
 
         if (!residue.id()) {
             warning("got a residues without id in PDB format. This should not happen");
