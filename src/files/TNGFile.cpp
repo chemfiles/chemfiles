@@ -45,18 +45,18 @@ void chemfiles::check_tng_error(tng_function_status status, const std::string& f
     switch (status) {
     case TNG_FAILURE:
         throw chemfiles::FileError(
-            "Error while calling " + function + " in the TNG library"
+            "error while calling " + function + " in the TNG library"
         );
     case TNG_CRITICAL:
         throw chemfiles::FileError(
-            "Critical error while calling " + function + " in the TNG library"
+            "critical error while calling " + function + " in the TNG library"
         );
     case TNG_SUCCESS:
         // Do nothing, this is good
         break;
     default:
         throw chemfiles::FileError(
-            "Unknown status code from TNG library: "
+            "unknown status code from TNG library: "
             + std::to_string(static_cast<unsigned>(status))
         );
         break;

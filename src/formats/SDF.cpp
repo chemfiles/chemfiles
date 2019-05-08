@@ -144,7 +144,7 @@ void SDFFormat::read(Frame& frame) {
             } // TODO: Add actual ATOM property parsing here.....
         } catch (const FileError&) {
             // Premature end of file, but we can safetly end here
-            warning("Premature end of SDF File during atom property reading!");
+            warning("premature end of SDF File during atom property reading");
             return;
         }
     }
@@ -159,7 +159,7 @@ void SDFFormat::read(Frame& frame) {
             if (line.empty()) {
                 // This breaks a property group - so store now
                 if (property_name.empty()) {
-                    warning("Missing property name!");
+                    warning("missing property name in SDF file");
                     continue;
                 }
                 frame.set(property_name, Property(property_value));
@@ -180,7 +180,7 @@ void SDFFormat::read(Frame& frame) {
                 property_value += line;
             }
         } catch (const FileError&) {
-            warning("Premature end of SDF File during global property reading!");
+            warning("premature end of SDF File during global property reading");
             return;
         }
     }
@@ -256,7 +256,7 @@ bool forward(TextFile& file) {
         std::string counts_line = file.readline();
 
         if (counts_line.length() < 10) {
-            throw format_error("Counts line must have at least 10 digits, it has {}", counts_line.length());
+            throw format_error("counts line must have at least 10 digits, it has {}", counts_line.length());
         }
 
         natoms = parse<size_t>(counts_line.substr(0,3));

@@ -446,7 +446,7 @@ MathAst Parser::math_value() {
         if (finished()) {
             throw selection_error("expected content after", previous().as_str());
         } else {
-            throw selection_error("I don't know what to do with {}", peek().as_str());
+            throw selection_error("unexpected content in math selection: {}", peek().as_str());
         }
     }
 }

@@ -159,7 +159,7 @@ void GROFormat::read(Frame& frame) {
 
 static std::string to_gro_index(uint64_t i) {
     if (i >= 99999) {
-        warning("Too many atoms for GRO format, removing atomic id");
+        warning("too many atoms for GRO format, removing atomic id");
         return "*****";
     } else {
         return std::to_string(i + 1);
@@ -190,7 +190,7 @@ void GROFormat::write(const Frame& frame) {
             resname = residue->name();
             if (resname.length() > 5) {
                 warning(
-                    "Residue '{}' has a name too long for GRO format, it will be truncated.",
+                    "residue '{}' has a name too long for GRO format, it will be truncated",
                     resname
                 );
                 resname = resname.substr(0, 5);
@@ -202,7 +202,7 @@ void GROFormat::write(const Frame& frame) {
             if (value <= 99999) {
                 resid = std::to_string(value);
             } else {
-                warning("Too many residues for GRO format, removing residue id");
+                warning("too many residues for GRO format, removing residue id");
             }
         } else {
             // We need to manually assign a residue ID

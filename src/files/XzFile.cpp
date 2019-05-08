@@ -16,21 +16,21 @@ static void check(lzma_ret code) {
     case LZMA_STREAM_END:
         return;
     case LZMA_MEM_ERROR:
-        throw file_error("xzstreambuf: Memory allocation failed (code: {})", code);
+        throw file_error("xzstreambuf: memory allocation failed (code: {})", code);
     case LZMA_FORMAT_ERROR:
-        throw file_error("xzstreambuf: Input not in .xz format (code: {})", code);
+        throw file_error("xzstreambuf: input not in .xz format (code: {})", code);
     case LZMA_OPTIONS_ERROR:
         throw file_error(
-            "xzstreambuf: Unsupported compression options (code: {})", code);
+            "xzstreambuf: unsupported compression options (code: {})", code);
     case LZMA_DATA_ERROR:
-        throw file_error("xzstreambuf: Compressed file is corrupted (code: {})", code);
+        throw file_error("xzstreambuf: compressed file is corrupted (code: {})", code);
     case LZMA_BUF_ERROR:
         throw file_error(
-            "xzstreambuf: Compressed file is truncated or corrupted (code: {})", code);
+            "xzstreambuf: compressed file is truncated or corrupted (code: {})", code);
     case LZMA_UNSUPPORTED_CHECK:
-        throw file_error("xzstreambuf: Specified integrity check is not supported (code: {})", code);
+        throw file_error("xzstreambuf: specified integrity check is not supported (code: {})", code);
     default:
-        throw file_error("xzstreambuf: Unknown error (code: {})", code);
+        throw file_error("xzstreambuf: unknown error (code: {})", code);
     }
 }
 

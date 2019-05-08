@@ -63,7 +63,7 @@ UnitCell::UnitCell(double a, double b, double c, double alpha, double beta, doub
 
 UnitCell::UnitCell(const Matrix3D& matrix): h_(Matrix3D::unit()), h_inv_(Matrix3D::unit()) {
     if (matrix[1][0] != 0 || matrix[2][0] != 0 || matrix[2][1] != 0) {
-        throw error("Matrix supplied to UnitCell is not an upper triangular matrix");
+        throw error("the matrix supplied to UnitCell is not an upper triangular matrix");
     }
 
     if (matrix[0][0] == 0 && matrix[1][1] == 0 && matrix[2][2] == 0 &&

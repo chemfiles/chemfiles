@@ -32,7 +32,7 @@ Configuration::Configuration() {
     for (auto& dir: directories) {
         auto path = dir + "/" + ".chemfilesrc";
         if (std::ifstream(path)) {
-            warning("found deprecated configuration file at '{}'. Please rename it to .chemfiles.toml", path);
+            warning("found deprecated configuration file at '{}', please rename it to .chemfiles.toml", path);
         }
         path = dir + "/" + ".chemfiles.toml";
         if (std::ifstream(path)) {
@@ -187,7 +187,7 @@ void Configuration::add(const std::string& path) {
     if (std::ifstream(path)) {
         instance().read(path);
     } else {
-        throw configuration_error("Can not open configuration file at {}", path);
+        throw configuration_error("can not open configuration file at {}", path);
     }
 }
 
