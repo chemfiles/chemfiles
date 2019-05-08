@@ -102,11 +102,6 @@ script:
   - eval cmake --build . --config $CMAKE_BUILD_TYPE -- $BUILD_ARGS
   - ctest -j2 --output-on-failure -C $CMAKE_BUILD_TYPE
   - cd $TRAVIS_BUILD_DIR
-  # Run various additional checks
-  - ./scripts/ci/check-capi-docs.py
-  - ./scripts/ci/check-public-headers.py
-  - ./scripts/ci/lint-code.py
-  - ./scripts/ci/check-error-messages.py
   # Check exported symbols in shared library
   - |
     if [[ "${CHECK_EXPORTS}" == "ON" ]]; then

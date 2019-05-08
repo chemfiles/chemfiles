@@ -14,7 +14,7 @@ ERRORS = 0
 # Path, line of messages that do not follow the current format, but
 # are allowed
 ALLOWED = [
-    ("src/Configuration.cpp", 34)
+    (os.path.join(ROOT, "src", "Configuration.cpp"), 34)
 ]
 
 
@@ -81,13 +81,10 @@ def check_file(path):
 
 
 if __name__ == '__main__':
-    for path in glob.glob("src/*.cpp"):
-        if path == "src/warnings.cpp":
-            continue
-
+    for path in glob.glob(os.path.join(ROOT, "src/*.cpp")):
         check_file(path)
 
-    for path in glob.glob("src/*/*.cpp"):
+    for path in glob.glob(os.path.join(ROOT, "src/*/*.cpp")):
         check_file(path)
 
     if ERRORS != 0:

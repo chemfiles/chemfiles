@@ -65,7 +65,7 @@ def included_headers(path):
     with open(path) as fd:
         for line in fd:
             if "#include" in line:
-                matched = re.match("#include\s*[\"<](.*)[\">]", line)
+                matched = re.match("#include\\s*[\"<](.*)[\">]", line)
                 if not matched:
                     error("bad include in {}: {}".format(path, line))
                 header = matched.groups()[0]
