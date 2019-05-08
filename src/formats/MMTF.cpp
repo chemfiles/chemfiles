@@ -39,7 +39,7 @@ MMTFFormat::MMTFFormat(std::string path, File::Mode mode, File::Compression comp
             mmtf::decodeFromFile(structure_, path);
         }
         if (!structure_.hasConsistentData()) {
-            throw format_error("Issue with: {}. Please ensure it is valid MMTF file", path);
+            throw format_error("issue with: '{}', please ensure it is valid MMTF file", path);
         }
     } else if (mode == File::WRITE) {
         filename_ = std::move(path); // We really don't need to do anything, yet

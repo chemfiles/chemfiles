@@ -138,7 +138,7 @@ void CSSRFormat::write(const Frame& frame) {
     auto connectivity = std::vector<std::vector<size_t>>(frame.size());
     for (auto& bond : frame.topology().bonds()) {
         if (bond[0] > 9999 || bond[1] > 9999) {
-            warning("Atomic index is too big for connectivity record in CSSR, removing the bond");
+            warning("atomic index is too big for connectivity record in CSSR, removing the bond");
             continue;
         }
         connectivity[bond[0]].push_back(bond[1]);

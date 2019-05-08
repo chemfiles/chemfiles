@@ -106,6 +106,7 @@ script:
   - ./scripts/ci/check-capi-docs.py
   - ./scripts/ci/check-public-headers.py
   - ./scripts/ci/lint-code.py
+  - ./scripts/ci/check-error-messages.py
   # Check exported symbols in shared library
   - |
     if [[ "${CHECK_EXPORTS}" == "ON" ]]; then

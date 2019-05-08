@@ -36,7 +36,7 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
     }
 
     if (mode == File::APPEND) {
-        throw file_error("Cannot Append mmCIF file");
+        throw file_error("cannot open mmCIF files in append ('a') mode");
     }
 
     double a = 0;
@@ -110,7 +110,7 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
     }
 
     if (current_index == 0) {
-        throw format_error("No atom sites!");
+        throw format_error("no atom sites found in mmCIF file");
     }
 
     cell_ = UnitCell(a, b, c, alpha, beta, gamma);
@@ -150,7 +150,7 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
     } else if (fract_x != atom_site_map_.end()) {
         uses_fract_ = true;
     } else {
-        throw format_error("CIF file does not define coordinates!");
+        throw format_error("CIF file does not define coordinates");
     }
 
 
@@ -260,7 +260,7 @@ void mmCIFFormat::read(Frame& frame) {
         auto line_split = split(line, ' ');
 
         if (line_split.size() != atom_site_map_.size()) {
-            throw format_error("Line '{}' has {} items not {}",
+            throw format_error("line '{}' has {} items not {}",
                 line, line_split.size(), atom_site_map_.size()
             );
         }
@@ -320,7 +320,7 @@ void mmCIFFormat::read(Frame& frame) {
                 resid = parse<size_t>(line_split[label_seq_id->second]);
             }
         } catch (const Error& e) {
-            throw format_error("Invalid CIF residue or entity numeric: {}", e.what());
+            throw format_error("invalid CIF residue or entity numeric: {}", e.what());
         }
 
         auto chainid = line_split[label_asym_id->second];

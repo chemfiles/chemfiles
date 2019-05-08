@@ -220,7 +220,7 @@ atom_data atom_style::read_line(const std::string& line, size_t index) const {
         break;
     case HYBRID:
         if (!warned_) {
-            warning("Only reading the first style for atom_style hybrid");
+            warning("only reading the first style for atom_style hybrid");
             warned_ = true;
         }
         // atom-ID atom-type x y z sub-style1 sub-style2 ...
@@ -411,8 +411,7 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
     }
 
     if (atom_style_name_.empty()) {
-        warning("Unknown LAMMPS atom style, defaulting to full.");
-        warning("You can give the atom style like this: Atoms  # <style>");
+        warning("unknown LAMMPS atom style, defaulting to 'full'");
         atom_style_name_ = "full";
     }
     style_ = atom_style(atom_style_name_);
@@ -619,7 +618,7 @@ LAMMPSDataFormat::section_t LAMMPSDataFormat::get_section(std::string line) {
     } else if (IGNORED_SECTIONS.find(section) != IGNORED_SECTIONS.end()) {
         if (section.find("Coeffs") == std::string::npos) {
             // Don't send a warning for force field parameters
-            warning("Ignored section '{}' in LAMMPS data file", section);
+            warning("ignoring section '{}' in LAMMPS data file", section);
         }
         return IGNORED;
     } else {
@@ -712,7 +711,7 @@ size_t DataTypes::atom_type_id(const Atom& atom) const {
     if (it != atoms_.end()) {
         return static_cast<size_t>(it - atoms_.begin());
     } else {
-        throw error("invalid atom type passed to atom_type_id. this is a bug");
+        throw error("invalid atom type passed to atom_type_id, this is a bug");
     }
 }
 
@@ -721,7 +720,7 @@ size_t DataTypes::bond_type_id(size_t type_i, size_t type_j) const {
     if (it != bonds_.end()) {
         return static_cast<size_t>(it - bonds_.begin());
     } else {
-        throw error("invalid bond type passed to bond_type_id. this is a bug");
+        throw error("invalid bond type passed to bond_type_id, this is a bug");
     }
 }
 
@@ -730,7 +729,7 @@ size_t DataTypes::angle_type_id(size_t type_i, size_t type_j, size_t type_k) con
     if (it != angles_.end()) {
         return static_cast<size_t>(it - angles_.begin());
     } else {
-        throw error("invalid angle type passed to angle_type_id. this is a bug");
+        throw error("invalid angle type passed to angle_type_id, this is a bug");
     }
 }
 
@@ -739,7 +738,7 @@ size_t DataTypes::dihedral_type_id(size_t type_i, size_t type_j, size_t type_k, 
     if (it != dihedrals_.end()) {
         return static_cast<size_t>(it - dihedrals_.begin());
     } else {
-        throw error("invalid dihedral type passed to dihedral_type_id. this is a bug");
+        throw error("invalid dihedral type passed to dihedral_type_id, this is a bug");
     }
 }
 
@@ -748,7 +747,7 @@ size_t DataTypes::improper_type_id(size_t type_i, size_t type_j, size_t type_k, 
     if (it != impropers_.end()) {
         return static_cast<size_t>(it - impropers_.begin());
     } else {
-        throw error("invalid improper type passed to improper_type_id. this is a bug");
+        throw error("invalid improper type passed to improper_type_id, this is a bug");
     }
 }
 

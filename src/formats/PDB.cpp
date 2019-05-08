@@ -147,10 +147,10 @@ void PDBFormat::read(Frame& frame) {
             read_HELIX(line);
             continue;
         case Record::SHEET:
-            read_secondary(line, 21, 32, "extended");
+            read_secondary(line, 21, 32, "SHEET");
             continue;
         case Record::TURN:
-            read_secondary(line, 19, 30, "turn");
+            read_secondary(line, 19, 30, "TURN");
             continue;
         case Record::TER:
             if (line.size() >= 12) {
@@ -169,14 +169,14 @@ void PDBFormat::read(Frame& frame) {
             continue; // Nothing to do
         case Record::UNKNOWN_:
             if (!file_->eof()) {
-                warning("Unknown PDB record: {}", line);
+                warning("ignoring unknown PDB record: {}", line);
             }
             continue;
         }
     }
 
     if (!got_end) {
-        warning("Missing END record in PDB file");
+        warning("missing END record in PDB file");
     }
 
     for (const auto& secinfo: secinfo_) {
@@ -217,10 +217,7 @@ void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
     if (line.length() >= 55) {
         auto space_group = trim(line.substr(55, 10));
         if (space_group != "P 1" && space_group != "P1") {
-            warning(
-                "Space group which is not P1 ({}) ignored in '{}'",
-                space_group, file_->path()
-            );
+            warning("ignoring custom space group ({}), using P1 instead", space_group);
         }
     }
 }
@@ -245,7 +242,7 @@ void PDBFormat::read_HELIX(const std::string& line) {
     }
 
     if (chain1 != chain2) {
-        warning("HELIX chain {} and {} are not the same.", chain1, chain2);
+        warning("HELIX chain {} and {} are not the same", chain1, chain2);
         return;
     }
 
@@ -277,10 +274,10 @@ void PDBFormat::read_HELIX(const std::string& line) {
 }
 
 void PDBFormat::read_secondary(const std::string& line, size_t i1, size_t i2,
-                               const std::string& sec) {
+                               const std::string& record) {
 
     if (line.length() < i2 + 5) {
-        warning("Secondary structure record too short: '{}'", line);
+        warning("secondary structure record too short: '{}'", line);
         return;
     }
 
@@ -288,7 +285,7 @@ void PDBFormat::read_secondary(const std::string& line, size_t i1, size_t i2,
     auto chain2 = line[i2];
 
     if (chain1 != chain2) {
-        warning("{} chain {} and {} are not the same.", sec, chain1, chain2);
+        warning("{} chain {} and {} are not the same", record, chain1, chain2);
         return;
     }
 
@@ -299,7 +296,7 @@ void PDBFormat::read_secondary(const std::string& line, size_t i1, size_t i2,
         resid2 = parse<size_t>(line.substr(i2 + 1, 4));
     } catch (const Error&) {
         warning(
-            "Error parsing line: '{}', check {} and {}",
+            "error parsing line: '{}', check {} and {}",
             line, line.substr(i1 + 1, 4), line.substr(i2 + 1, 4)
         );
         return;
@@ -394,7 +391,10 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
     // Helper lambdas
     auto add_bond = [&frame, &line](size_t i, size_t j) {
         if (i >= frame.size() || j >= frame.size()) {
-            warning("Bad atomic numbers in CONECT record, ignored. ({})", line);
+            warning(
+                "ignoring CONECT ('{}') with atomic indexes bigger than frame size ({})",
+                trim(line), frame.size()
+            );
             return;
         }
         frame.add_bond(i, j);
@@ -465,7 +465,7 @@ void PDBFormat::link_standard_residue_bonds(Frame& frame) {
         const auto& amide_carbon = atom_name_to_index.find("C");
 
         if (!residue.id()) {
-            warning("got a residues without id in PDB format. This should not happen");
+            warning("got a residues without id in PDB format, this should not happen");
             continue;
         }
 
@@ -615,7 +615,7 @@ static std::string to_pdb_index(uint64_t i) {
     if (id >= 100000) {
         if (id == 100000) {
             // Only warn once for this
-            warning("Too many atoms for PDB format, removing atomic id bigger than 100000");
+            warning("too many atoms for PDB format, removing atomic id bigger than 100000");
         }
         return "*****";
     } else {
@@ -652,7 +652,7 @@ void PDBFormat::write(const Frame& frame) {
         auto altloc = frame[i].get<Property::STRING>("altloc").value_or(" ");
         if (altloc.length() > 1) {
             warning(
-                "altloc '{}' is too long for PDB format, it will be truncated.",
+                "altloc '{}' is too long for PDB format, it will be truncated",
                 altloc
             );
             altloc = altloc[0];
@@ -673,7 +673,7 @@ void PDBFormat::write(const Frame& frame) {
 
             if (resname.length() > 3) {
                 warning(
-                    "Residue '{}' has a name too long for PDB format, it will be truncated.",
+                    "residue '{}' has a name too long for PDB format, it will be truncated",
                     resname
                 );
                 resname = resname.substr(0, 3);
@@ -682,7 +682,7 @@ void PDBFormat::write(const Frame& frame) {
             if (residue->id()) {
                 auto value = residue->id().value();
                 if (value > 9999) {
-                    warning("Too many residues for PDB format, removing residue id {}", value);
+                    warning("too many residues for PDB format, removing residue id {}", value);
                     resid = "  -1";
                 } else {
                     resid = std::to_string(residue->id().value());
@@ -696,7 +696,7 @@ void PDBFormat::write(const Frame& frame) {
                 chainid = residue->get("chainid")->as_string();
                 if (chainid.length() > 1) {
                     warning(
-                        "Residue '{}' has a chain id too long for PDB format, it will be truncated.",
+                        "residue '{}' has a chain id too long for PDB format, it will be truncated",
                         chainid
                     );
                     chainid = chainid[0];
@@ -710,7 +710,7 @@ void PDBFormat::write(const Frame& frame) {
                 inscode = residue->get("insertion_code")->as_string();
                 if (inscode.length() > 1) {
                     warning(
-                        "Residue '{}' has an insertion code too long for PDB format, it will be truncated.",
+                        "residue '{}' has an insertion code too long for PDB format, it will be truncated",
                         inscode
                     );
                     inscode = inscode[0];
@@ -743,7 +743,7 @@ void PDBFormat::write(const Frame& frame) {
     auto connect = std::vector<std::vector<size_t>>(frame.size());
     for (auto& bond : frame.topology().bonds()) {
         if (bond[0] > 99999 || bond[1] > 99999) {
-            warning("Atomic index is too big for CONNECT, removing the bond between {} and {}", bond[0], bond[1]);
+            warning("atomic index is too big for CONNECT, removing the bond between {} and {}", bond[0], bond[1]);
             continue;
         }
         connect[bond[0]].push_back(bond[1]);

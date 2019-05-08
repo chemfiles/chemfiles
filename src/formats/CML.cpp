@@ -50,7 +50,7 @@ CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compre
 
     auto result = document_.load(*file_);
     if (!result) {
-        throw format_error("[CML] Parsing error: '{}'", result.description());
+        throw format_error("parsing error: '{}'", result.description());
     }
 
     root_ = document_.child("cml");
@@ -58,13 +58,13 @@ CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compre
         auto molecules = root_.children("molecule");
         current_ = molecules.begin();
         if (current_ == molecules.end()) {
-            throw format_error("[CML] cml node has no valid children");
+            throw format_error("cml node has no valid children");
         }
         return;
     }
 
     // Not technically standard to have multiple molecule nodes as root nodes,
-    // but some tools do this and we should support it 
+    // but some tools do this and we should support it
     if (document_.child("molecule")) {
         auto molecules = document_.children("molecule");
         current_ = molecules.begin();
@@ -72,7 +72,7 @@ CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compre
         return;
     }
 
-    throw format_error("[CML] no supported starting node found");
+    throw format_error("no supported starting node found");
 }
 
 CMLFormat::~CMLFormat() {
@@ -100,9 +100,9 @@ static void read_property_(T& container, pugi::xml_node& node, const std::string
     std::string data_type_str = "xsd:string";
     auto data_type = node.attribute("dataType");
     if (!data_type) {
-        warning("[CML] {} has no data type, assuming string.", title);
+        warning("{} has no data type, assuming string", title);
     } else {
-        data_type_str = data_type.as_string(); 
+        data_type_str = data_type.as_string();
     }
 
     auto value = node.text();
@@ -113,7 +113,7 @@ static void read_property_(T& container, pugi::xml_node& node, const std::string
     } else if (data_type_str == "xsd:double" || data_type_str == "xsd:integer") {
         container.set(title, value.as_double());
     } else {
-        warning("[CML] Unknown data type: {}, assuming string", data_type_str);
+        warning("unknown data type: {}, assuming string", data_type_str);
         container.set(title, value.as_string());
     }
 }
@@ -123,7 +123,7 @@ template<typename T>
 static void read_property_(T& container, pugi::xml_node& node) {
     auto title = node.attribute("title");
     if (!title) {
-        warning("[CML] Skipping untitled property");
+        warning("skipping untitled property");
         return;
     }
 
@@ -143,7 +143,7 @@ void CMLFormat::read(Frame& frame) {
         } else if (name == "title") {
             frame.set("title", attribute.as_string());
         } else {
-            warning("[CML] Unknown molecule attribute: " + name);
+            warning("unknown molecule attribute: " + name);
         }
     }
 
@@ -174,7 +174,7 @@ void CMLFormat::read(Frame& frame) {
                 } else if (name == "gamma") {
                     gamma = cell_param.text().as_double();
                 } else {
-                    warning("[CML] Unknown crytal scalar: " + name);
+                    warning("unknown crytal scalar: " + name);
                 }
             }
         }
@@ -187,14 +187,14 @@ void CMLFormat::read(Frame& frame) {
         for (auto property : properties_node.children("property")) {
             auto title = property.attribute("title");
             if (!title) {
-                warning("[CML] Skipping untitled property");
+                warning("skipping untitled property");
                 continue;
             }
 
             auto title_str = title.as_string();
             auto scalar_node = property.child("scalar");
             if (!scalar_node) {
-                warning("[CML] {} has no scalar associated with it!", title_str);
+                warning("{} has no scalar associated with it", title_str);
                 continue;
             }
 
@@ -242,7 +242,7 @@ void CMLFormat::read(Frame& frame) {
             } else if (name == "hydrogenCount") {
                 hydrogen_count = attribute.as_double();
             } else {
-                warning("[CML] Unknown atom attribute: " + name);
+                warning("unknown atom attribute: " + name);
             }
         }
 
@@ -280,26 +280,25 @@ void CMLFormat::read(Frame& frame) {
             auto title_attribute = vector3.attribute("title");
 
             if (!title_attribute) {
-                warning("[CML] vector3 is not titled.");
+                warning("vector3 is not titled");
                 continue;
             }
             std::string vec_title = title_attribute.as_string();
 
             auto vect_strings = split(trim(vector3.text().as_string()), ' ');
             if (vect_strings.size() != 3) {
-                warning("[CML] {} vector3 does not have 3 values.", vec_title);
+                warning("{} vector3 does not have 3 values", vec_title);
                 continue;
             }
 
             Vector3D vect;
-            
             try {
                 vect = { parse<double>(vect_strings[0]),
                          parse<double>(vect_strings[1]),
                          parse<double>(vect_strings[2])
                        };
             } catch (const Error&) {
-                warning("[CML] {} contains elements which are not numberic.", vec_title);
+                warning("{} contains elements which are not numberic", vec_title);
                 continue;
             }
 
@@ -321,20 +320,20 @@ void CMLFormat::read(Frame& frame) {
         auto order = bond.attribute("order");
 
         if (!atomref) {
-            warning("[CML] Bond does not contain an atomref attribute.");
+            warning("bond does not contain an atomref attribute");
             continue;
         }
 
         auto ids = split(atomref.as_string(), ' ');
         if (ids.size() != 2) {
-            warning("[CML] bondArray contains a bond of size {} instead of 2.", ids.size());
+            warning("bondArray contains a bond of size {} instead of 2", ids.size());
             continue;
         }
 
         auto id1 = ref_to_id.find(ids[0]);
         auto id2 = ref_to_id.find(ids[1]);
         if (id1 == ref_to_id.end() || id2 == ref_to_id.end()) {
-            warning("[CML] Invalid atomic references in bond: {} -- {}", ids[0], ids[1]);
+            warning("invalid atomic references in bond: {} -- {}", ids[0], ids[1]);
             continue;
         }
 
@@ -363,7 +362,7 @@ void CMLFormat::read(Frame& frame) {
                     bo = Bond::AROMATIC;
                     break;
                 default:
-                    warning("[CML] Unknown bond order: '{}'", order_str[0]);
+                    warning("unknown bond order: '{}'", order_str[0]);
                     break;
                 }
             }

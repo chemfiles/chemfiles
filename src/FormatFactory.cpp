@@ -94,11 +94,11 @@ void FormatFactory::register_format(FormatInfo info, format_creator_t creator) {
         );
     } else if (!info.name().empty() && find_name(*formats, info.name()) != formats->end()) {
         throw format_error(
-            "the name '{}' is already associated with a format."
+            "the name '{}' is already associated with a format"
         );
     } else if (!info.extension().empty() && find_extension(*formats, info.extension()) != formats->end()) {
         throw format_error(
-            "the extension '{}' is already associated with a format."
+            "the extension '{}' is already associated with a format"
         );
     } else {
         formats->push_back({info, creator});
@@ -142,7 +142,7 @@ format_creator_t FormatFactory::extension(const std::string& extension) {
     auto it = find_extension(*formats, extension);
     if (it == formats->end()) {
         throw format_error(
-            "can not find a format associated with the '{}' extension.", extension
+            "can not find a format associated with the '{}' extension", extension
         );
     }
     return it->second;
