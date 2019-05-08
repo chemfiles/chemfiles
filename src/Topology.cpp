@@ -79,6 +79,10 @@ void Topology::remove(size_t i) {
     }
     // Shift all bonds indexes
     connect_.atom_removed(i);
+    // Remove and shift all residue atoms
+    for (auto& res : residues_) {
+        res.atom_removed(i);
+    }
 }
 
 const std::vector<Bond>& Topology::bonds() const {
