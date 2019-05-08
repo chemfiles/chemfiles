@@ -320,7 +320,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
 
     if (atom_offsets_.empty()) {
         try {
-            auto initial_offset = parse<long long>(line.substr(6, 5));
+            auto initial_offset = parse<long long>(trim(line.substr(6, 5)));
             // We need to handle negative numbers ourselves: https://ideone.com/RdINqa
             if (initial_offset <= 0) {
                 warning("{} is too small, assuming id is '1'", initial_offset);
@@ -575,9 +575,9 @@ Record get_record(const std::string& line) {
         return Record::HETATM;
     } else if (rec == "CONECT") {
         return Record::CONECT;
-    } else if (rec == "MODEL ") {
+    } else if (rec.substr(0, 5) == "MODEL") {
         return Record::MODEL;
-    } else if (rec == "TER   ") {
+    } else if (rec.substr(0, 3) == "TER") {
         return Record::TER;
     } else if (rec == "HELIX ") {
         return Record::HELIX;
@@ -596,8 +596,13 @@ Record get_record(const std::string& line) {
                rec == "SEQRES" || rec == "HET   " || rec == "REVDAT" ||
                rec == "SCALE1" || rec == "SCALE2" || rec == "SCALE3" ||
                rec == "ORIGX1" || rec == "ORIGX2" || rec == "ORIGX3" ||
+               rec == "SCALE1" || rec == "SCALE2" || rec == "SCALE3" ||
                rec == "ANISOU" || rec == "SITE  " || rec == "FORMUL" ||
-               rec == "DBREF " || rec == "HETNAM" || rec == "HETSYN") {
+               rec == "DBREF " || rec == "HETNAM" || rec == "HETSYN" ||
+               rec == "SSBOND" || rec == "LINK  " || rec == "SEQADV" ||
+               rec == "MODRES" || rec == "SEQRES" || rec == "CISPEP") {
+        return Record::IGNORED_;
+    } else if (trim(line).empty()) {
         return Record::IGNORED_;
     } else {
         return Record::UNKNOWN_;
@@ -728,10 +733,6 @@ void PDBFormat::write(const Frame& frame) {
         auto& pos = positions[i];
         check_values_size(pos, 8, "atomic position");
 
-        // We ignore the 'altLoc' and 'iCode' fields, as we do not know them.
-        //
-        // 'chainID' is set to be 'X', and if there is no residue information
-        // 'resSeq' is set to be the atomic number.
         fmt::print(
             *file_,
             "{: <6}{: >5} {: <4s}{:1}{:3} {:1}{: >4s}{:1}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
