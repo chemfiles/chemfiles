@@ -126,7 +126,7 @@ void CSSRFormat::write(const Frame& frame) {
     );
 
     if (frame.size() > 9999) {
-        warning("too many atoms for CSSR format; the file might not open with other programs");
+        warning("CCSR writer", "too many atoms, the file might not open with other programs");
         fmt::print(*file_, "{} 0\n", frame.size());
     } else {
         fmt::print(*file_, "{:4}   0\n", frame.size());
@@ -138,7 +138,7 @@ void CSSRFormat::write(const Frame& frame) {
     auto connectivity = std::vector<std::vector<size_t>>(frame.size());
     for (auto& bond : frame.topology().bonds()) {
         if (bond[0] > 9999 || bond[1] > 9999) {
-            warning("atomic index is too big for connectivity record in CSSR, removing the bond");
+            warning("CCSR writer", "atomic index is too big for connectivity record, removing the bond");
             continue;
         }
         connectivity[bond[0]].push_back(bond[1]);
@@ -163,7 +163,7 @@ void CSSRFormat::write(const Frame& frame) {
         auto bonds = 0;
         for (auto bond: connectivity[i]) {
             if (bonds >= 8) {
-                warning("too many bonds with atom {} for CSSR format", i);
+                warning("CCSR writer", "too many bonds with atom {}, only 8 are supported", i);
                 break;
             }
             fmt::print(*file_, "{:4}", bond + 1);

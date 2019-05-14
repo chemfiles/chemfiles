@@ -296,16 +296,11 @@ void MOL2Format::write(const Frame& frame) {
         }
 
         std::string sybyl;
-        bool has_sybyl = true;
         if (frame[i].get("sybyl") && frame[i].get("sybyl")->kind() == Property::STRING) {
             sybyl = frame[i].get("sybyl")->as_string();
         } else {
-            has_sybyl = false;
             sybyl = frame[i].type();
-        }
-
-        if (!has_sybyl) {
-            warning("sybyl type is not set, using element type instead");
+            warning("MOL2 writer", "sybyl type is not set, using element type instead");
         }
 
         fmt::print(

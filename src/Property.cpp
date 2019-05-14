@@ -87,7 +87,7 @@ optional<typename property_metadata<kind>::type> property_map::get(const std::st
         if (property->kind() == kind) {
             return property_metadata<kind>::extract(*property);
         } else {
-            warning(
+            warning("",
                 "expected '{}' property to be a {}, got a {} instead",
                 name, Property::kind_as_string(kind), Property::kind_as_string(property->kind())
             );

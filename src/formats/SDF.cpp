@@ -144,7 +144,7 @@ void SDFFormat::read(Frame& frame) {
             } // TODO: Add actual ATOM property parsing here.....
         } catch (const FileError&) {
             // Premature end of file, but we can safetly end here
-            warning("premature end of SDF File during atom property reading");
+            warning("SDF reader", "premature end of file while reading atom property");
             return;
         }
     }
@@ -159,7 +159,7 @@ void SDFFormat::read(Frame& frame) {
             if (line.empty()) {
                 // This breaks a property group - so store now
                 if (property_name.empty()) {
-                    warning("missing property name in SDF file");
+                    warning("SDF reader", "missing property name");
                     continue;
                 }
                 frame.set(property_name, Property(property_value));
@@ -180,7 +180,7 @@ void SDFFormat::read(Frame& frame) {
                 property_value += line;
             }
         } catch (const FileError&) {
-            warning("premature end of SDF File during global property reading");
+            warning("SDF reader", "premature end of file while reading global property");
             return;
         }
     }

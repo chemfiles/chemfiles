@@ -30,40 +30,33 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
     return {vector[0], vector[1], vector[2]};
 }
 
-#define CATCH_AND_RETURN(exception, retval)                                    \
-    catch (const chemfiles::exception& e) {                                    \
+#define CATCH_AND_RETURN(_exception_, _retval_)                                \
+    catch (const chemfiles::_exception_& e) {                                  \
         set_last_error(e.what());                                              \
-        chemfiles::warning(e.what());                                          \
-        return retval;                                                         \
+        chemfiles::warning("", e.what());                                      \
+        return _retval_;                                                       \
     }
 
-#define CATCH_AND_GOTO_ERROR(exception)                                        \
-    catch (const chemfiles::exception& e) {                                    \
-        set_last_error(e.what());                                              \
-        chemfiles::warning(e.what());                                          \
-        goto error;  /* NOLINT: goto is OK here */                             \
-    }
-
-#define CHECK_POINTER(ptr)                                                     \
+#define CHECK_POINTER(_ptr_)                                                   \
     do {                                                                       \
-        if ((ptr) == nullptr) {                                                \
+        if ((_ptr_) == nullptr) {                                              \
             std::string message = fmt::format(                                 \
-                "Parameter '{}' cannot be NULL in {}", #ptr, __func__          \
+                "parameter '{}' cannot be NULL in {}", #_ptr_, __func__        \
             );                                                                 \
             set_last_error(message);                                           \
-            chemfiles::warning(message);                                       \
+            chemfiles::warning("", message.c_str());                           \
             return CHFL_MEMORY_ERROR;                                          \
         }                                                                      \
     } while (false)
 
-#define CHECK_POINTER_GOTO(ptr)                                                \
+#define CHECK_POINTER_GOTO(_ptr_)                                              \
     do {                                                                       \
-        if ((ptr) == nullptr) {                                                \
+        if ((_ptr_) == nullptr) {                                              \
             std::string message = fmt::format(                                 \
-                "Parameter '{}' cannot be NULL in {}", #ptr, __func__          \
+                "parameter '{}' cannot be NULL in {}", #_ptr_, __func__        \
             );                                                                 \
             set_last_error(message);                                           \
-            chemfiles::warning(message);                                       \
+            chemfiles::warning("", message.c_str());                           \
             goto error;  /* NOLINT: goto is OK here */                         \
         }                                                                      \
     } while (false)
@@ -71,9 +64,9 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
 
 /// Wrap `instructions` in a try/catch bloc automatically, and return a status
 /// code
-#define CHFL_ERROR_CATCH(instructions)                                         \
+#define CHFL_ERROR_CATCH(_instructions_)                                       \
     try {                                                                      \
-        instructions                                                           \
+        _instructions_                                                         \
     }                                                                          \
     CATCH_AND_RETURN(FileError, CHFL_FILE_ERROR)                               \
     CATCH_AND_RETURN(MemoryError, CHFL_MEMORY_ERROR)                           \
@@ -91,23 +84,19 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
 
 /// Wrap `instructions` in a try/catch bloc automatically, and goto the
 /// `error` label in case of error.
-#define CHFL_ERROR_GOTO(instructions)                                          \
+#define CHFL_ERROR_GOTO(_instructions_)                                        \
     try {                                                                      \
-        instructions                                                           \
-    }                                                                          \
-    CATCH_AND_GOTO_ERROR(FileError)                                            \
-    CATCH_AND_GOTO_ERROR(MemoryError)                                          \
-    CATCH_AND_GOTO_ERROR(FormatError)                                          \
-    CATCH_AND_GOTO_ERROR(SelectionError)                                       \
-    CATCH_AND_GOTO_ERROR(ConfigurationError)                                   \
-    CATCH_AND_GOTO_ERROR(OutOfBounds)                                          \
-    CATCH_AND_GOTO_ERROR(PropertyError)                                        \
-    CATCH_AND_GOTO_ERROR(Error)                                                \
-    catch (const std::exception& e) {                                          \
+        _instructions_                                                         \
+    } catch (const chemfiles::Error& e) {                                      \
+        set_last_error(e.what());                                              \
+        chemfiles::warning("", e.what());                                      \
+        goto error;  /* NOLINT: goto is OK here */                             \
+    } catch (const std::exception& e) {                                        \
         set_last_error(e.what());                                              \
         goto error;  /* NOLINT: goto is OK here */                             \
     }
 
-}
+
+} // namespace chemfiles
 
 #endif

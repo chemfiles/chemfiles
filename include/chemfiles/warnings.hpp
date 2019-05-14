@@ -11,18 +11,24 @@
 namespace chemfiles {
 
 /// Send a warning with the given message
-void warning(const std::string& message);
+void send_warning(const std::string& message);
 
-/// Create a message using the given `format` and `arguments`, and send a
-/// warning with this message.
+/// Create a message for the given `context` formatting the `message` with the
+/// `arguments`, and send a warning with this message.
 ///
-/// `format` and `arguments` will be used to construct a string using the [fmt]
+/// `message` and `arguments` will be used to construct a string using the [fmt]
 /// library.
 ///
 /// [fmt]: https://github.com/fmtlib/fmt
 template<typename... Args>
-void warning(const char* format, Args const&... arguments) {
-    warning(fmt::format(format, arguments...));
+void warning(std::string context, const char* message, Args const&... arguments) {
+    if (context.empty()) {
+        send_warning(fmt::format(message, arguments...));
+    } else {
+        context += ": ";
+        fmt::format_to(std::back_inserter(context), message, arguments...);
+        send_warning(context);
+    }
 }
 
 } // namespace chemfiles

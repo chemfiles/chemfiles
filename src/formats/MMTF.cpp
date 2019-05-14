@@ -399,7 +399,7 @@ MMTFFormat::~MMTFFormat() {
             mmtf::compressGroupList(structure_);
             encodeToFile(structure_, filename_);
         } catch (const std::exception& e) {
-            warning("error while finishing writing to {}: {}", filename_, e.what());
+            warning("MMTF writer", "error while finishing writing to {}: {}", filename_, e.what());
         } catch (...) {
             // ignore exceptions in destructor
         }
