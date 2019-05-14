@@ -4,6 +4,8 @@
 #ifndef CHEMFILES_FORMAT_CML_HPP
 #define CHEMFILES_FORMAT_CML_HPP
 
+#include <unordered_map>
+
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
 
@@ -24,6 +26,11 @@ public:
     void write(const Frame& frame) override;
     size_t nsteps() override;
 private:
+    /// Read the atoms from `atoms` into `frame`
+    void read_atoms(Frame& frame, const pugi::xml_node& atoms);
+    /// Read the bonds from `bonds` into `frame`
+    void read_bonds(Frame& frame, const pugi::xml_node& bonds);
+
     /// Needed to set the format declaration
     File::Mode mode_;
 
@@ -42,6 +49,9 @@ private:
 
     /// Number of frames added to the file
     size_t num_added_ = 0;
+
+    /// Atomic reference to atomic id in the current frame
+    std::unordered_map<std::string, size_t> ref_to_id_;
 };
 
 template<> FormatInfo format_information<CMLFormat>();
