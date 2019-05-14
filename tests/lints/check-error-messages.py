@@ -24,8 +24,14 @@ def error(message):
     print(message)
 
 
-def extract_messages(lines, i):
-    start = lines[i].find('"')
+def extract_messages(lines, i, has_context):
+    if has_context:
+        context_start = lines[i].find('"')
+        context_stop = lines[i].find('"', context_start + 1)
+    else:
+        context_stop = -1
+
+    start = lines[i].find('"', context_stop + 1)
     if start == -1:
         # look in the next line
         i = i + 1
@@ -74,10 +80,10 @@ def check_file(path):
 
     for (i, line) in enumerate(lines):
         if " warning(" in line:
-            check_message(path, i, extract_messages(lines, i))
+            check_message(path, i, extract_messages(lines, i, has_context=True))
 
         if "throw" in line:
-            check_message(path, i, extract_messages(lines, i))
+            check_message(path, i, extract_messages(lines, i, has_context=False))
 
 
 if __name__ == '__main__':

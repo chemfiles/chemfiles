@@ -95,12 +95,11 @@ size_t CMLFormat::nsteps() {
 
 // Read a property into either a frame or an atom with supplied title
 template<typename T>
-static void read_property_(T& container, pugi::xml_node& node, const std::string& title) {
-
+static void read_property_(T& container, const pugi::xml_node& node, const std::string& title) {
     std::string data_type_str = "xsd:string";
     auto data_type = node.attribute("dataType");
     if (!data_type) {
-        warning("{} has no data type, assuming string", title);
+        warning("CML reader", "{} has no data type, assuming string", title);
     } else {
         data_type_str = data_type.as_string();
     }
@@ -113,17 +112,17 @@ static void read_property_(T& container, pugi::xml_node& node, const std::string
     } else if (data_type_str == "xsd:double" || data_type_str == "xsd:integer") {
         container.set(title, value.as_double());
     } else {
-        warning("unknown data type: {}, assuming string", data_type_str);
+        warning("CML reader", "unknown data type: {}, assuming string", data_type_str);
         container.set(title, value.as_string());
     }
 }
 
 // Read a property into either a frame or an atom
 template<typename T>
-static void read_property_(T& container, pugi::xml_node& node) {
+static void read_property_(T& container, const pugi::xml_node& node) {
     auto title = node.attribute("title");
     if (!title) {
-        warning("skipping untitled property");
+        warning("CML reader", "skipping untitled property");
         return;
     }
 
@@ -132,7 +131,7 @@ static void read_property_(T& container, pugi::xml_node& node) {
 
 void CMLFormat::read(Frame& frame) {
     const auto& current = *current_;
-    for (auto attribute : current.attributes()) {
+    for (const auto& attribute: current.attributes()) {
         auto name = std::string(attribute.name());
         if (name == "id") { // do nothing, required junk for validation
         } else if (name == "xmlns") {
@@ -143,7 +142,7 @@ void CMLFormat::read(Frame& frame) {
         } else if (name == "title") {
             frame.set("title", attribute.as_string());
         } else {
-            warning("unknown molecule attribute: " + name);
+            warning("CML reader", "unknown molecule attribute: {}", name);
         }
     }
 
@@ -157,7 +156,7 @@ void CMLFormat::read(Frame& frame) {
         double a, b, c, alpha, beta, gamma;
         a = b = c = 0.0;
         alpha = beta = gamma = 90.0;
-        for (auto cell_param : crystal_node.children("scalar")) {
+        for (const auto& cell_param: crystal_node.children("scalar")) {
             auto title = cell_param.attribute("title");
             if (title) {
                 auto name = std::string(title.value());
@@ -174,7 +173,7 @@ void CMLFormat::read(Frame& frame) {
                 } else if (name == "gamma") {
                     gamma = cell_param.text().as_double();
                 } else {
-                    warning("unknown crytal scalar: " + name);
+                    warning("CML reader", "unknown crytal scalar: {}", name);
                 }
             }
         }
@@ -184,17 +183,17 @@ void CMLFormat::read(Frame& frame) {
     // Frame level properties
     auto properties_node = current.child("propertyList");
     if (properties_node) {
-        for (auto property : properties_node.children("property")) {
+        for (const auto& property: properties_node.children("property")) {
             auto title = property.attribute("title");
             if (!title) {
-                warning("skipping untitled property");
+                warning("CML reader", "skipping untitled property");
                 continue;
             }
 
             auto title_str = title.as_string();
             auto scalar_node = property.child("scalar");
             if (!scalar_node) {
-                warning("{} has no scalar associated with it", title_str);
+                warning("CML reader", "{} has no scalar associated with it", title_str);
                 continue;
             }
 
@@ -206,12 +205,12 @@ void CMLFormat::read(Frame& frame) {
     std::unordered_map<std::string, size_t> ref_to_id;
 
     // TODO: Read string vector versions instead of just the nodes
-    for (auto atom : current.child("atomArray").children("atom")) {
+    for (const auto& atom: current.child("atomArray").children("atom")) {
         double x2, y2, x3, y3, z3, xf, yf, zf;
         x2 = y2 = x3 = y3 = z3 = xf = yf = zf = 0.0;
         std::string id, element, title;
         double formal_charge = 0.0, isotope = 0.0, hydrogen_count = 0.0;
-        for (auto attribute : atom.attributes()) {
+        for (const auto& attribute: atom.attributes()) {
             auto name = std::string(attribute.name());
             if (name == "id") {
                 id = attribute.as_string();
@@ -242,7 +241,7 @@ void CMLFormat::read(Frame& frame) {
             } else if (name == "hydrogenCount") {
                 hydrogen_count = attribute.as_double();
             } else {
-                warning("unknown atom attribute: " + name);
+                warning("CML reader", "unknown atom attribute: {}", name);
             }
         }
 
@@ -270,24 +269,24 @@ void CMLFormat::read(Frame& frame) {
             new_atom.set("hydrogen_count", hydrogen_count);
         }
 
-        for (auto scalar : atom.children("scalar")) {
+        for (const auto& scalar: atom.children("scalar")) {
             read_property_(new_atom, scalar);
         }
 
         // Vectors are stored separate where the values of the vector are
         // stored as doubles separated by whitespace.
-        for (auto vector3 : atom.children("vector3")) {
+        for (const auto& vector3: atom.children("vector3")) {
             auto title_attribute = vector3.attribute("title");
 
             if (!title_attribute) {
-                warning("vector3 is not titled");
+                warning("CML reader", "vector3 is not titled");
                 continue;
             }
             std::string vec_title = title_attribute.as_string();
 
             auto vect_strings = split(trim(vector3.text().as_string()), ' ');
             if (vect_strings.size() != 3) {
-                warning("{} vector3 does not have 3 values", vec_title);
+                warning("CML reader", "{} vector3 does not have 3 values", vec_title);
                 continue;
             }
 
@@ -298,7 +297,7 @@ void CMLFormat::read(Frame& frame) {
                          parse<double>(vect_strings[2])
                        };
             } catch (const Error&) {
-                warning("{} contains elements which are not numberic", vec_title);
+                warning("CML reader", "{} contains elements which are not numeric", vec_title);
                 continue;
             }
 
@@ -315,25 +314,25 @@ void CMLFormat::read(Frame& frame) {
         ref_to_id[id] = frame.size() - 1;
     }
 
-    for (auto bond : current.child("bondArray").children("bond")) {
+    for (const auto& bond: current.child("bondArray").children("bond")) {
         auto atomref = bond.attribute("atomRefs2");
         auto order = bond.attribute("order");
 
         if (!atomref) {
-            warning("bond does not contain an atomref attribute");
+            warning("CML reader", "bond does not contain an atomref attribute");
             continue;
         }
 
         auto ids = split(atomref.as_string(), ' ');
         if (ids.size() != 2) {
-            warning("bondArray contains a bond of size {} instead of 2", ids.size());
+            warning("CML reader", "bondArray contains a bond of size {} instead of 2", ids.size());
             continue;
         }
 
         auto id1 = ref_to_id.find(ids[0]);
         auto id2 = ref_to_id.find(ids[1]);
         if (id1 == ref_to_id.end() || id2 == ref_to_id.end()) {
-            warning("invalid atomic references in bond: {} -- {}", ids[0], ids[1]);
+            warning("CML reader", "invalid atomic references in bond: {} -- {}", ids[0], ids[1]);
             continue;
         }
 
@@ -362,7 +361,7 @@ void CMLFormat::read(Frame& frame) {
                     bo = Bond::AROMATIC;
                     break;
                 default:
-                    warning("unknown bond order: '{}'", order_str[0]);
+                    warning("CML reader", "unknown bond order: '{}'", order_str[0]);
                     break;
                 }
             }

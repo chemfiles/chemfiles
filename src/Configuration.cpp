@@ -32,7 +32,7 @@ Configuration::Configuration() {
     for (auto& dir: directories) {
         auto path = dir + "/" + ".chemfilesrc";
         if (std::ifstream(path)) {
-            warning("found deprecated configuration file at '{}', please rename it to .chemfiles.toml", path);
+            warning("", "found deprecated configuration file at '{}', please rename it to .chemfiles.toml", path);
         }
         path = dir + "/" + ".chemfiles.toml";
         if (std::ifstream(path)) {

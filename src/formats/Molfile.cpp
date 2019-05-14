@@ -55,7 +55,7 @@ template <MolfileFormat F> static int register_plugin(void* user_data, vmdplugin
 
 static int molfiles_to_chemfiles_warning(int level, const char* message) {
     if (level == VMDCON_ERROR || level == VMDCON_WARN) {
-        warning(message);
+        send_warning(message);
     }
     return 0;
 }

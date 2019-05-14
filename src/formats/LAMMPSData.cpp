@@ -220,7 +220,7 @@ atom_data atom_style::read_line(const std::string& line, size_t index) const {
         break;
     case HYBRID:
         if (!warned_) {
-            warning("only reading the first style for atom_style hybrid");
+            warning("LAMMPS Data reader", "only reading the first style for atom_style hybrid");
             warned_ = true;
         }
         // atom-ID atom-type x y z sub-style1 sub-style2 ...
@@ -411,7 +411,7 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
     }
 
     if (atom_style_name_.empty()) {
-        warning("unknown LAMMPS atom style, defaulting to 'full'");
+        warning("LAMMPS Data reader", "unknown atom style, defaulting to 'full'");
         atom_style_name_ = "full";
     }
     style_ = atom_style(atom_style_name_);
@@ -618,7 +618,7 @@ LAMMPSDataFormat::section_t LAMMPSDataFormat::get_section(std::string line) {
     } else if (IGNORED_SECTIONS.find(section) != IGNORED_SECTIONS.end()) {
         if (section.find("Coeffs") == std::string::npos) {
             // Don't send a warning for force field parameters
-            warning("ignoring section '{}' in LAMMPS data file", section);
+            warning("LAMMPS Data reader", "ignoring section '{}'", section);
         }
         return IGNORED;
     } else {

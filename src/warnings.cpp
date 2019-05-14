@@ -19,7 +19,7 @@ void chemfiles::set_warning_callback(warning_callback callback) {
     *guard = std::move(callback);
 }
 
-void chemfiles::warning(const std::string& message) {
+void chemfiles::send_warning(const std::string& message) {
     auto callback = CALLBACK.lock();
     (*callback)(message);
 }
