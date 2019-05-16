@@ -5,6 +5,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+* When compiling chemfiles as a shared library, the dependencies symbols are
+  now hidden. This should prevent clashes between say chemfiles's zlib and the
+  system zlib.
+* Cache sub-selection (the 'name O' in 'is_bonded(#1, name O)'), reducing
+  selection evaluationg time by a huge margin.
+
+### Changes in supported formats
+
+* Added read and write support for CML (Chemical Markup Language) files, a XML
+  based format.
+
 ## 0.9.1 (13 Mar 2019)
 
 * Fix a bug with memory allocation in the C API. The allocator did not remove
