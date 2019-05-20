@@ -2,7 +2,6 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <fstream>
-#include <iostream>
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
