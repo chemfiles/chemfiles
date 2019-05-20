@@ -26,6 +26,8 @@
 #include "chemfiles/formats/CML.hpp"
 #include "chemfiles/formats/SMI.hpp"
 
+#define SENTINEL_INDEX (static_cast<size_t>(-1))
+
 using namespace chemfiles;
 
 namespace chemfiles {
@@ -39,6 +41,8 @@ namespace chemfiles {
 }
 
 static unsigned edit_distance(const std::string& first, const std::string& second);
+static size_t find_by_name(const std::vector<RegisteredFormat>& formats, const std::string& name);
+static size_t find_by_extension(const std::vector<RegisteredFormat>& formats, const std::string& extension);
 
 FormatFactory::FormatFactory() {
     this->add_format<XYZFormat>();
@@ -70,59 +74,55 @@ FormatFactory& FormatFactory::get() {
     return instance_;
 }
 
-FormatFactory::iterator FormatFactory::find_name(const formats_map_t& formats, const std::string& name) {
-    for (auto it = formats.begin(); it != formats.end(); it++) {
-        if (it->first.name() == name) {
-            return it;
-        }
-    }
-    return formats.end();
-}
-
-FormatFactory::iterator FormatFactory::find_extension(const formats_map_t& formats, const std::string& extension) {
-    for (auto it = formats.begin(); it != formats.end(); it++) {
-        if (it->first.extension() == extension) {
-            return it;
-        }
-    }
-    return formats.end();
-}
-
 void FormatFactory::register_format(FormatInfo info, format_creator_t creator) {
-    auto formats = formats_.lock();
-    if (info.name().empty() && info.extension().empty()) {
+    auto guard = formats_.lock();
+    auto& formats = *guard;
+
+    if (info.name().empty()) {
         throw format_error(
-            "can not register a format with no name and no extension"
+            "can not register a format with no name"
         );
-    } else if (!info.name().empty() && find_name(*formats, info.name()) != formats->end()) {
-        throw format_error(
-            "the name '{}' is already associated with a format"
-        );
-    } else if (!info.extension().empty() && find_extension(*formats, info.extension()) != formats->end()) {
-        throw format_error(
-            "the extension '{}' is already associated with a format"
-        );
-    } else {
-        formats->push_back({info, creator});
     }
+
+    auto idx = find_by_name(formats, info.name());
+    if (idx != SENTINEL_INDEX) {
+        throw format_error(
+            "there is already a format associated with the name '{}'", info.name()
+        );
+    }
+
+    if (!info.extension().empty()) {
+        idx = find_by_extension(formats, info.extension());
+        if (idx != SENTINEL_INDEX) {
+            throw format_error(
+                "the extension '{}' is already associated with format '{}'",
+                info.extension(), formats[idx].info.name()
+            );
+        }
+    }
+
+    // actually register the format
+    formats.push_back({info, creator});
 }
 
 format_creator_t FormatFactory::name(const std::string& name) {
-    auto formats = formats_.lock();
-    auto it = find_name(*formats, name);
-    if (it == formats->end()) {
+    auto guard = formats_.lock();
+    auto& formats = *guard;
+
+    auto idx = find_by_name(formats, name);
+    if (idx == SENTINEL_INDEX) {
         auto suggestions = std::vector<std::string>();
-        for (auto& node: *formats) {
-            if (edit_distance(name, node.first.name()) < 4) {
-                suggestions.push_back(node.first.name());
+        for (auto& other: formats) {
+            if (edit_distance(name, other.info.name()) < 4) {
+                suggestions.push_back(other.info.name());
             }
         }
 
         std::stringstream message;
-        fmt::print(message, "can not find a format named '{}'.", name);
+        fmt::print(message, "can not find a format named '{}',", name);
 
         if (!suggestions.empty()) {
-            fmt::print(message, " Did you mean");
+            fmt::print(message, " did you mean");
             bool first = true;
             for (auto& suggestion: suggestions) {
                 if (!first) {
@@ -136,26 +136,28 @@ format_creator_t FormatFactory::name(const std::string& name) {
 
         throw FormatError(message.str());
     }
-    return it->second;
+    return formats.at(idx).creator;
 }
 
 format_creator_t FormatFactory::extension(const std::string& extension) {
-    auto formats = formats_.lock();
-    auto it = find_extension(*formats, extension);
-    if (it == formats->end()) {
+    auto guard = formats_.lock();
+    auto& formats = *guard;
+
+    auto idx = find_by_extension(formats, extension);
+    if (idx == SENTINEL_INDEX) {
         throw format_error(
             "can not find a format associated with the '{}' extension", extension
         );
     }
-    return it->second;
+    return formats.at(idx).creator;
 }
 
 std::vector<FormatInfo> FormatFactory::formats() {
     auto formats = formats_.lock();
     auto metadata = std::vector<FormatInfo>();
     metadata.reserve(formats->size());
-    for (auto& pair: *formats) {
-        metadata.emplace_back(pair.first);
+    for (auto& format: *formats) {
+        metadata.emplace_back(format.info);
     }
     return metadata;
 }
@@ -190,4 +192,22 @@ unsigned edit_distance(const std::string& first, const std::string& second) {
    }
 
    return distances[m - 1][n - 1];
+}
+
+size_t find_by_name(const std::vector<RegisteredFormat>& formats, const std::string& name) {
+    for (size_t i=0; i<formats.size(); i++) {
+        if (formats[i].info.name() == name) {
+            return i;
+        }
+    }
+    return SENTINEL_INDEX;
+}
+
+size_t find_by_extension(const std::vector<RegisteredFormat>& formats, const std::string& extension) {
+    for (size_t i=0; i<formats.size(); i++) {
+        if (formats[i].info.extension() == extension) {
+            return i;
+        }
+    }
+    return SENTINEL_INDEX;
 }

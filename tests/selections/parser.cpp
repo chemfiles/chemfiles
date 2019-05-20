@@ -78,6 +78,8 @@ TEST_CASE("Parsing") {
 
         ast = "is_angle(name H, #2, name O)";
         CHECK(parse("is_angle(name H, #2, name O)")->print() == ast);
+
+        CHECK_THROWS_AS(parse("is_bonded(#1, pairs: name O)"), SelectionError);
     }
 
     SECTION("type") {
@@ -219,8 +221,8 @@ TEST_CASE("Parsing") {
 
         SECTION("String") {
             CHECK(parse("[foo] == bar")->print() == "[foo](#1) == bar");
-            CHECK(parse("[foo] != bar")->print() == "[foo](#1) != bar");
-            CHECK(parse("[foo](#3) == bar")->print() == "[foo](#3) == bar");
+            CHECK(parse("[\"foo\"] != bar")->print() == "[foo](#1) != bar");
+            CHECK(parse("[\"foo bar\"](#3) == bar")->print() == "[\"foo bar\"](#3) == bar");
 
             CHECK(parse("[foo] bar")->print() == "[foo](#1) == bar");
             auto ast = "or -> [foo](#1) == bar\n   -> [foo](#1) == \"fizz foo\"";
@@ -233,7 +235,8 @@ TEST_CASE("Parsing") {
             CHECK(parse("[foo] > 6")->print() == "[foo](#1) > 6");
             CHECK(parse("[foo] >= 6")->print() == "[foo](#1) >= 6");
             CHECK(parse("[foo] != 6")->print() == "[foo](#1) != 6");
-            CHECK(parse("[foo] == 4")->print() == "[foo](#1) == 4");
+            CHECK(parse("[\"foo\"] == 4")->print() == "[foo](#1) == 4");
+            CHECK(parse("[\"foo bar\"] == 4")->print() == "[\"foo bar\"](#1) == 4");
 
             CHECK(parse("5 - [foo] == 4")->print() == "(5 - [foo](#1)) == 4");
             CHECK(parse("[foo] + 3 == 4")->print() == "([foo](#1) + 3) == 4");
@@ -476,13 +479,41 @@ TEST_CASE("Parsing errors") {
 TEST_CASE("Optimizations") {
     SECTION("Doing something") {
         CHECK(parse_and_opt("-4 == +5")->print() == "-4 == 5");
+
+        // Add
         CHECK(parse_and_opt("3 + 4 == 3 + 2")->print() == "7 == 5");
+        CHECK(parse_and_opt("3 == 3 + 2")->print() == "3 == 5");
+        CHECK(parse_and_opt("3 + 4 == 3")->print() == "7 == 3");
+
+        // Sub
         CHECK(parse_and_opt("9 - 2 == 15 - 10")->print() == "7 == 5");
+        CHECK(parse_and_opt("9 == 15 - 10")->print() == "9 == 5");
+        CHECK(parse_and_opt("9 - 2 == 15")->print() == "7 == 15");
+
+        // Mul
         CHECK(parse_and_opt("3 * 4 == 2 * 3")->print() == "12 == 6");
+        CHECK(parse_and_opt("3 == 2 * 3")->print() == "3 == 6");
+        CHECK(parse_and_opt("3 * 4 == 3")->print() == "12 == 3");
+
+        // Div
         CHECK(parse_and_opt("24 / 2 == 24 / 4")->print() == "12 == 6");
+        CHECK(parse_and_opt("24 == 24 / 4")->print() == "24 == 6");
+        CHECK(parse_and_opt("24 / 2 == 4")->print() == "12 == 4");
+
+        // Pow
         CHECK(parse_and_opt("3^2 == 2^5")->print() == "9 == 32");
+        CHECK(parse_and_opt("3 == 2^5")->print() == "3 == 32");
+        CHECK(parse_and_opt("3^2 == 2")->print() == "9 == 2");
+
+        // Mod
         CHECK(parse_and_opt("8 % 3 == 17 % 2")->print() == "2 == 1");
+        CHECK(parse_and_opt("8 == 17 % 2")->print() == "8 == 1");
+        CHECK(parse_and_opt("8 % 3 == 17")->print() == "2 == 17");
+
+        // Functions
         CHECK(parse_and_opt("sqrt(9) == sin(asin(0.5))")->print() == "3 == 0.500000");
+        CHECK(parse_and_opt("9 == sin(asin(0.5))")->print() == "9 == 0.500000");
+        CHECK(parse_and_opt("sqrt(9) == 0.5")->print() == "3 == 0.500000");
     }
 
     SECTION("No optimization") {
