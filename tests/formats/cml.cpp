@@ -12,8 +12,6 @@ using namespace chemfiles;
 #include <boost/filesystem.hpp>
 namespace fs=boost::filesystem;
 
-#include <iostream>
-
 TEST_CASE("Read files in CML format") {
     SECTION("Check nsteps") {
         Trajectory file1("data/cml/ethane.cml");
@@ -118,7 +116,7 @@ TEST_CASE("Write CML file") {
     frame.add_bond(1, 2, Bond::DOUBLE);
     frame.add_bond(1, 3, Bond::TRIPLE);
     frame.add_bond(2, 3, Bond::AROMATIC);
-    
+
     file.write(frame);
 
     file.close();
@@ -129,7 +127,7 @@ TEST_CASE("Write CML file") {
 
     auto check_cml = Trajectory(tmpfile);
     CHECK(check_cml.nsteps() == 2);
-    
+
     auto frame1 = check_cml.read();
     CHECK(frame1.size() == 4);
     CHECK(frame1.topology().bonds().size() == 0);

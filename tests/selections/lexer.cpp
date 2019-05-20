@@ -4,8 +4,6 @@
 #include <catch.hpp>
 #include "chemfiles/selections/lexer.hpp"
 
-#include <iostream>
-
 using namespace chemfiles;
 using namespace chemfiles::selections;
 
