@@ -100,6 +100,9 @@ TEST_CASE("Use the UnitCell type") {
         auto cell = UnitCell(10);
         CHECK(cell == UnitCell(10, 10, 10));
         CHECK(cell != UnitCell(11, 10, 10));
+
+        CHECK(cell != UnitCell());
+        CHECK(cell != UnitCell(10, 10, 10, 120, 90, 90));
     }
 
     SECTION("Set the values") {

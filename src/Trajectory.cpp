@@ -106,10 +106,17 @@ Trajectory& Trajectory::operator=(Trajectory&&) = default;
 
 void Trajectory::pre_read(size_t step) {
     if (step >= nsteps_) {
-        throw file_error(
-            "can not read file '{}' at step {}: maximal step is {}",
-            path_, step, nsteps_ - 1
-        );
+        if (nsteps_ == 0) {
+            throw file_error(
+                "can not read file '{}' at step {}, it does not contain any step",
+                path_, step
+            );
+        } else {
+            throw file_error(
+                "can not read file '{}' at step {}: maximal step is {}",
+                path_, step, nsteps_ - 1
+            );
+        }
     }
     if (!(mode_ == File::READ || mode_ == File::APPEND)) {
         throw file_error(

@@ -120,10 +120,9 @@ inline void scan(const std::string& input, const char* format, ...) {
     }
     auto actual = std::vsscanf(input.c_str(), format, vlist);
     if (actual != expected) {
-        throw chemfiles::Error(
-            "failed to read line '" + input + "' with format '" +
-            std::string(format) + "': " + std::to_string(actual) +
-            " matched out of " + std::to_string(expected)
+        throw error(
+            "failed to read line '{}' with format '{}': {} matched out of {}",
+            input, format, actual, expected
         );
     }
 }

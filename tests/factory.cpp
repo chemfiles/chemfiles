@@ -13,23 +13,43 @@
 #include "chemfiles/FormatFactory.hpp"
 using namespace chemfiles;
 
-struct DummyFormat: public Format {
-    DummyFormat(const std::string&, File::Mode, File::Compression) {}
-    size_t nsteps() override {return 42;}
-};
+#define new_format(_name_)                                                     \
+    struct _name_: public Format {                                             \
+        _name_(const std::string&, File::Mode, File::Compression) {}           \
+        size_t nsteps() override {return 42;}                                  \
+    }
 
-struct DunnyFormat: public Format {
-    DunnyFormat(const std::string&, File::Mode, File::Compression) {}
-    size_t nsteps() override {return 0;}
-};
+new_format(DummyFormat);
+new_format(DunnyFormat);
+new_format(NoNameFormat);
+new_format(BadExtensionFormat);
+new_format(NoFormatInfo);
+new_format(SameNameFormat);
+new_format(SameExtensionFormat);
 
 namespace chemfiles {
     template<> FormatInfo format_information<DummyFormat>() {
         return FormatInfo("Dummy").with_extension(".dummy");
     }
 
+    template<> FormatInfo format_information<SameNameFormat>() {
+        return FormatInfo("Dummy").with_extension(".ext");
+    }
+
+    template<> FormatInfo format_information<SameExtensionFormat>() {
+        return FormatInfo("SameExtension").with_extension(".dummy");
+    }
+
     template<> FormatInfo format_information<DunnyFormat>() {
         return FormatInfo("Dunny");
+    }
+
+    template<> FormatInfo format_information<NoNameFormat>() {
+        return FormatInfo("");
+    }
+
+    template<> FormatInfo format_information<BadExtensionFormat>() {
+        return FormatInfo("BadExtension").with_extension("no-dot");
     }
 }
 
@@ -44,19 +64,26 @@ TEST_CASE("Geting registered format") {
 
     CHECK_THROWS_AS(FormatFactory::get().name("UNKOWN"), FormatError);
     CHECK_THROWS_AS(FormatFactory::get().extension(".UNKOWN"), FormatError);
+}
 
+TEST_CASE("Already registered format/extension") {
+    CHECK_THROWS_AS(FormatFactory::get().add_format<SameNameFormat>(), FormatError);
+    CHECK_THROWS_AS(FormatFactory::get().add_format<SameExtensionFormat>(), FormatError);
+}
+
+TEST_CASE("Format names suggestions") {
     try {
         FormatFactory::get().name("Dully");
         CHECK(false);
     } catch (const FormatError& e) {
-        CHECK(std::string(e.what()) == "can not find a format named 'Dully'. Did you mean 'Dummy'?");
+        CHECK(std::string(e.what()) == "can not find a format named 'Dully', did you mean 'Dummy'?");
     }
 
     try {
         FormatFactory::get().name("DUMMY");
         CHECK(false);
     } catch (const FormatError& e) {
-        CHECK(std::string(e.what()) == "can not find a format named 'DUMMY'. Did you mean 'Dummy'?");
+        CHECK(std::string(e.what()) == "can not find a format named 'DUMMY', did you mean 'Dummy'?");
     }
 
     FormatFactory::get().add_format<DunnyFormat>();
@@ -64,10 +91,16 @@ TEST_CASE("Geting registered format") {
         FormatFactory::get().name("Dully");
         CHECK(false);
     } catch (const FormatError& e) {
-        CHECK(std::string(e.what()) == "can not find a format named 'Dully'. Did you mean 'Dummy' or 'Dunny'?");
+        CHECK(std::string(e.what()) == "can not find a format named 'Dully', did you mean 'Dummy' or 'Dunny'?");
     }
 
     CHECK(FormatFactory::get().formats().back().name() == "Dunny");
+}
+
+TEST_CASE("Bad format info") {
+    CHECK_THROWS_AS(format_information<NoNameFormat>(), FormatError);
+    CHECK_THROWS_AS(format_information<BadExtensionFormat>(), FormatError);
+    CHECK_THROWS_AS(format_information<NoFormatInfo>(), FormatError);
 }
 
 TEST_CASE("Check error throwing in formats") {

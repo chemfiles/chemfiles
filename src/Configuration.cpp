@@ -210,10 +210,10 @@ double toml_get_number(const toml::value& value) {
     assert(is_toml_number(value));
     if (value.type() == toml::value_t::Float) {
         return toml::get<double>(value);
-    } else if (value.type() == toml::value_t::Integer) {
+    } else {
+        assert(value.type() == toml::value_t::Integer);
         return static_cast<double>(toml::get<long long>(value));
     }
-    return 0;
 }
 
 void chemfiles::add_configuration(const std::string& path) {
