@@ -73,8 +73,8 @@ public:
     ///
     /// @throws Error if the format name is the empty string
     FormatInfo(std::string name): name_(std::move(name)) {
-        if (name_ == "") {
-            throw Error("a format name can not be an empty string");
+        if (name_.empty()) {
+            throw FormatError("a format name can not be an empty string");
         }
     }
 
@@ -88,7 +88,7 @@ public:
     /// start by a dot (`".xxx"`).
     FormatInfo& with_extension(std::string extension) {
         if (extension.length() < 1 || extension[0] != '.') {
-            throw Error("a format extension must start with a dot");
+            throw FormatError("a format extension must start with a dot");
         }
         extension_ = std::move(extension);
         return *this;
@@ -136,7 +136,7 @@ private:
 /// ```
 template<class Format>
 FormatInfo format_information() {
-    throw Error("format_informations is unimplemented for this format");
+    throw FormatError("format_informations is unimplemented for this format");
 }
 
 } // namespace chemfiles

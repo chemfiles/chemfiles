@@ -19,6 +19,7 @@ TEST_CASE("Tokens") {
         CHECK_THROWS_AS(token.ident(), Error);
         CHECK_THROWS_AS(token.number(), Error);
         CHECK_THROWS_AS(token.variable(), Error);
+        CHECK_THROWS_AS(token.string(), Error);
     }
 
     SECTION("Identifers") {
@@ -48,6 +49,7 @@ TEST_CASE("Tokens") {
 
         CHECK_THROWS_AS(token.ident(), Error);
         CHECK_THROWS_AS(token.variable(), Error);
+        CHECK_THROWS_AS(token.string(), Error);
     }
 
     SECTION("Variables") {
@@ -57,6 +59,15 @@ TEST_CASE("Tokens") {
 
         CHECK_THROWS_AS(token.ident(), Error);
         CHECK_THROWS_AS(token.number(), Error);
+        CHECK_THROWS_AS(token.string(), Error);
+    }
+
+    SECTION("Constructor errors") {
+        // These constructor needs additional data 
+        CHECK_THROWS_AS(Token(Token::NUMBER), Error);
+        CHECK_THROWS_AS(Token(Token::IDENT), Error);
+        CHECK_THROWS_AS(Token(Token::STRING), Error);
+        CHECK_THROWS_AS(Token(Token::VARIABLE), Error);
     }
 }
 
