@@ -4,7 +4,7 @@
 #ifndef CHEMFILES_FILES_HPP
 #define CHEMFILES_FILES_HPP
 
-#include <iostream>
+#include <istream>
 #include <string>
 #include <vector>
 #include <memory>
