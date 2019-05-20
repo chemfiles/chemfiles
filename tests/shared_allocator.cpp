@@ -78,4 +78,8 @@ TEST_CASE("Shared allocator") {
         shared_allocator::free(shared_3);
         shared_allocator::free(ptr);
     }
+
+    SECTION("Errors") {
+        CHECK_THROWS_AS(shared_allocator::free(reinterpret_cast<void*>(0x1)), Error);
+    }
 }

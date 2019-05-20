@@ -68,3 +68,16 @@ TEST_CASE("String parsing") {
         CHECK_THROWS_AS(chemfiles::parse<size_t>("9223372036854775808"), chemfiles::Error);
     }
 }
+
+TEST_CASE("scan") {
+    int i = 0;
+    double d = 0;
+    char s[32] = {0};
+
+    chemfiles::scan("3, 4.2 baz", "%i, %lf %31s", &i, &d, s);
+    CHECK(i == 3);
+    CHECK(d == 4.2);
+    CHECK(std::string(s) == "baz");
+
+    CHECK_THROWS_AS(chemfiles::scan("3, 4.2", "%i, %lf %31s", &i, &d, s), chemfiles::Error);
+}

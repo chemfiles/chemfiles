@@ -18,6 +18,11 @@ namespace chemfiles {
 
 using format_creator_t = std::function<std::unique_ptr<Format>(std::string path, File::Mode mode, File::Compression compression)>;
 
+struct RegisteredFormat {
+    FormatInfo info;
+    format_creator_t creator;
+};
+
 /// This class allow to register Format with names and file extensions
 class CHFL_EXPORT FormatFactory final {
 private:
@@ -55,16 +60,10 @@ public:
     std::vector<FormatInfo> formats();
 
 private:
-    using formats_map_t = std::vector<std::pair<FormatInfo, format_creator_t>>;
-    using iterator = formats_map_t::const_iterator;
-
-    static iterator find_name(const formats_map_t& formats, const std::string& name);
-    static iterator find_extension(const formats_map_t& formats, const std::string& extension);
-
     void register_format(FormatInfo info, format_creator_t creator);
 
     /// Trajectory map associating format descriptions and creators
-    mutex<formats_map_t> formats_;
+    mutex<std::vector<RegisteredFormat>> formats_;
 };
 
 } // namespace chemfiles

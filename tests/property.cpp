@@ -130,6 +130,8 @@ TEST_CASE("Property") {
 
         CHECK(property.as_vector3d() == Vector3D(0.0, 1.1, 2.2));
         CHECK(property.kind() == Property::VECTOR3D);
+        CHECK(property == Property(Vector3D(0.0, 1.1, 2.2)));
+        CHECK(property != Property(Vector3D(0.1, 1.1, 2.2)));
         CHECK_THROWS_AS(property.as_bool(), PropertyError);
         CHECK_THROWS_AS(property.as_string(), PropertyError);
         CHECK_THROWS_AS(property.as_double(), PropertyError);
