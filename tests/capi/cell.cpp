@@ -63,6 +63,58 @@ TEST_CASE("chfl_cell") {
         chfl_free(cell);
     }
 
+    SECTION("Constructors errors") {
+        chfl_vector3d dummy = {0, 0, 0};
+        fail_next_allocation();
+        CHECK(chfl_cell(dummy) == nullptr);
+
+        fail_next_allocation();
+        CHECK(chfl_cell_triclinic(dummy, dummy) == nullptr);
+
+        CHFL_CELL* cell = chfl_cell(dummy);
+        REQUIRE(cell);
+
+        fail_next_allocation();
+        CHECK(chfl_cell_copy(cell) == nullptr);
+
+        CHFL_FRAME* frame = chfl_frame();
+        REQUIRE(frame);
+
+        fail_next_allocation();
+        CHECK(chfl_cell_from_frame(frame) == nullptr);
+
+        chfl_free(cell);
+        chfl_free(frame);
+    }
+
+    SECTION("copy") {
+        chfl_vector3d lengths = {2, 2, 2};
+        CHFL_CELL* cell = chfl_cell(lengths);
+        REQUIRE(cell);
+
+        CHFL_CELL* copy = chfl_cell_copy(cell);
+        REQUIRE(copy);
+
+        double volume = 0;
+        CHECK_STATUS(chfl_cell_volume(cell, &volume));
+        CHECK(volume == 8);
+
+        CHECK_STATUS(chfl_cell_volume(copy, &volume));
+        CHECK(volume == 8);
+
+        chfl_vector3d new_lengths = {3, 3, 3};
+        CHECK_STATUS(chfl_cell_set_lengths(cell, new_lengths));
+
+        CHECK_STATUS(chfl_cell_volume(cell, &volume));
+        CHECK(volume == 27);
+
+        CHECK_STATUS(chfl_cell_volume(copy, &volume));
+        CHECK(volume == 8);
+
+        chfl_free(copy);
+        chfl_free(cell);
+    }
+
     SECTION("Length") {
         chfl_vector3d lengths = {2, 3, 4};
         CHFL_CELL* cell = chfl_cell(lengths);

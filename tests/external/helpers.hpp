@@ -44,6 +44,11 @@ private:
 // On UNIX, does nothing
 void silent_crash_handlers();
 
+/// Fail the next allocation by throwing std::bad_alloc. This is done by
+/// replacing the global operator new and operator delete, and should thus catch
+/// all C++ allocations.
+void fail_next_allocation();
+
 // Check return status of C API functions
 #define CHECK_STATUS(expr) CHECK(expr == CHFL_SUCCESS);
 

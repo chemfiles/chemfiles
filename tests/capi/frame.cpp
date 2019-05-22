@@ -9,6 +9,46 @@
 constexpr double PI = 3.14159265358979323846;
 
 TEST_CASE("chfl_frame") {
+    SECTION("Constructors errors") {
+        fail_next_allocation();
+        CHECK(chfl_frame() == nullptr);
+
+        CHFL_FRAME* frame = chfl_frame();
+        REQUIRE(frame);
+
+        fail_next_allocation();
+        CHECK(chfl_frame_copy(frame) == nullptr);
+
+        chfl_free(frame);
+    }
+
+    SECTION("copy") {
+        CHFL_FRAME* frame = chfl_frame();
+        REQUIRE(frame);
+        CHECK_STATUS(chfl_frame_resize(frame, 4));
+
+        CHFL_FRAME* copy = chfl_frame_copy(frame);
+        REQUIRE(copy);
+
+        uint64_t natoms = 0;
+        CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
+        CHECK(natoms == 4);
+
+        CHECK_STATUS(chfl_frame_atoms_count(copy, &natoms));
+        CHECK(natoms == 4);
+
+        CHECK_STATUS(chfl_frame_resize(frame, 22));
+
+        CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
+        CHECK(natoms == 22);
+
+        CHECK_STATUS(chfl_frame_atoms_count(copy, &natoms));
+        CHECK(natoms == 4);
+
+        chfl_free(copy);
+        chfl_free(frame);
+    }
+
     SECTION("Size") {
         CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame);
