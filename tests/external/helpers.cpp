@@ -6,6 +6,9 @@
 #include "helpers.hpp"
 #include "chemfiles.hpp"
 
+#include <cstdlib>
+#include <new>
+
 #include <boost/filesystem.hpp>
 namespace fs=boost::filesystem;
 
@@ -79,4 +82,42 @@ NamedTempPath::NamedTempPath(std::string extension) {
 
 NamedTempPath::~NamedTempPath() {
     remove(path_.c_str());
+}
+
+static bool FAIL_NEXT_ALLOCATION = false;
+
+void fail_next_allocation() {
+    FAIL_NEXT_ALLOCATION = true;
+}
+
+// Replace global operator new/operator delete so that we can force them to
+// fail as needed
+void* operator new(size_t count, const std::nothrow_t&) noexcept {
+    if (FAIL_NEXT_ALLOCATION) {
+        FAIL_NEXT_ALLOCATION = false;
+        return nullptr;
+    }
+
+    return std::malloc(count);
+}
+
+void* operator new(size_t count) {
+    void* ptr = operator new(count, std::nothrow_t{});
+    if (ptr != nullptr) {
+        return ptr;
+    } else {
+        throw std::bad_alloc();
+    }
+}
+
+void operator delete(void* ptr) noexcept {
+    std::free(ptr);
+}
+
+void* operator new[](size_t count) {
+    return operator new(count);
+}
+
+void operator delete[](void* ptr) noexcept {
+    operator delete(ptr);
 }

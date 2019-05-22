@@ -6,6 +6,21 @@
 #include "chemfiles.h"
 
 TEST_CASE("Property") {
+    SECTION("Constructors errors") {
+        fail_next_allocation();
+        CHECK(chfl_property_bool(false) == nullptr);
+
+        fail_next_allocation();
+        CHECK(chfl_property_double(42) == nullptr);
+
+        fail_next_allocation();
+        CHECK(chfl_property_string("foo") == nullptr);
+
+        chfl_vector3d initial = {1, 3, 4};
+        fail_next_allocation();
+        CHECK(chfl_property_vector3d(initial) == nullptr);
+    }
+
     SECTION("Bool") {
         CHFL_PROPERTY* property = chfl_property_bool(false);
         REQUIRE(property);
