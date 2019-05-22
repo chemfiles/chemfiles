@@ -9,6 +9,37 @@ static CHFL_FRAME* testing_frame(void);
 static bool find_match(const chfl_match matches[], uint64_t n, chfl_match match);
 
 TEST_CASE("chfl_selection") {
+    SECTION("Constructors errors") {
+        fail_next_allocation();
+        CHECK(chfl_selection("all") == nullptr);
+
+        CHFL_SELECTION* selection = chfl_selection("all");
+        REQUIRE(selection);
+
+        fail_next_allocation();
+        CHECK(chfl_selection_copy(selection) == nullptr);
+
+        chfl_free(selection);
+    }
+
+    SECTION("copy") {
+        CHFL_SELECTION* selection = chfl_selection("name O");
+        REQUIRE(selection);
+
+        CHFL_SELECTION* copy = chfl_selection_copy(selection);
+        REQUIRE(copy);
+
+        char buffer[32] = {0};
+        CHECK_STATUS(chfl_selection_string(selection, buffer, sizeof(buffer)));
+        CHECK(buffer == std::string("name O"));
+
+        CHECK_STATUS(chfl_selection_string(copy, buffer, sizeof(buffer)));
+        CHECK(buffer == std::string("name O"));
+
+        chfl_free(copy);
+        chfl_free(selection);
+    }
+
     SECTION("Selection string") {
         CHFL_SELECTION* selection = chfl_selection("name O");
         REQUIRE(selection);

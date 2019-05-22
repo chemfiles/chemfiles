@@ -46,11 +46,11 @@ private:
     FILE* file_ = nullptr;
 
     /// lzma stream used both for reading and writing. Reading is done through
-    /// a block stream, and writing using a ???
+    /// a block stream, and writing using lzma_easy_encoder.
     lzma_stream stream_ = LZMA_STREAM_INIT;
     /// Current block (used when reading). This must be a class member, as a
     /// pointer to this will be saved in stream_
-    lzma_block block_ = {};
+    lzma_block block_ = lzma_block();
     /// Buffer for storing lzma_filter in the block_
     std::array<lzma_filter, LZMA_FILTERS_MAX + 1> filters_ = {{{LZMA_VLI_UNKNOWN, nullptr}}};
     /// Action for sync. Only used when writing

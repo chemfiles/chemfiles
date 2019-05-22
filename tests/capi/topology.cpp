@@ -8,6 +8,46 @@
 static CHFL_TOPOLOGY* testing_topology();
 
 TEST_CASE("chfl_topology") {
+    SECTION("Constructors errors") {
+        fail_next_allocation();
+        CHECK(chfl_topology() == nullptr);
+
+        CHFL_TOPOLOGY* topology = chfl_topology();
+        REQUIRE(topology);
+
+        fail_next_allocation();
+        CHECK(chfl_topology_copy(topology) == nullptr);
+
+        chfl_free(topology);
+    }
+
+    SECTION("copy") {
+        CHFL_TOPOLOGY* topology = chfl_topology();
+        REQUIRE(topology);
+        CHECK_STATUS(chfl_topology_resize(topology, 4));
+
+        CHFL_TOPOLOGY* copy = chfl_topology_copy(topology);
+        REQUIRE(copy);
+
+        uint64_t natoms = 0;
+        CHECK_STATUS(chfl_topology_atoms_count(topology, &natoms));
+        CHECK(natoms == 4);
+
+        CHECK_STATUS(chfl_topology_atoms_count(copy, &natoms));
+        CHECK(natoms == 4);
+
+        CHECK_STATUS(chfl_topology_resize(topology, 22));
+
+        CHECK_STATUS(chfl_topology_atoms_count(topology, &natoms));
+        CHECK(natoms == 22);
+
+        CHECK_STATUS(chfl_topology_atoms_count(copy, &natoms));
+        CHECK(natoms == 4);
+
+        chfl_free(copy);
+        chfl_free(topology);
+    }
+
     SECTION("Size") {
         CHFL_TOPOLOGY* topology = chfl_topology();
         REQUIRE(topology);
