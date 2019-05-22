@@ -6,6 +6,45 @@
 #include "chemfiles.h"
 
 TEST_CASE("chfl_atom") {
+    SECTION("Constructors errors") {
+        fail_next_allocation();
+        CHECK(chfl_atom("He") == nullptr);
+
+        CHFL_ATOM* atom = chfl_atom("He");
+        REQUIRE(atom);
+
+        fail_next_allocation();
+        CHECK(chfl_atom_copy(atom) == nullptr);
+
+        chfl_free(atom);
+    }
+
+    SECTION("copy") {
+        CHFL_ATOM* atom = chfl_atom("He");
+        REQUIRE(atom);
+
+        CHFL_ATOM* copy = chfl_atom_copy(atom);
+        REQUIRE(copy);
+
+        char name[32];
+        CHECK_STATUS(chfl_atom_name(atom, name, sizeof(name)));
+        CHECK(name == std::string("He"));
+
+        CHECK_STATUS(chfl_atom_name(copy, name, sizeof(name)));
+        CHECK(name == std::string("He"));
+
+        CHECK_STATUS(chfl_atom_set_name(atom, "Zr"));
+
+        CHECK_STATUS(chfl_atom_name(atom, name, sizeof(name)));
+        CHECK(name == std::string("Zr"));
+
+        CHECK_STATUS(chfl_atom_name(copy, name, sizeof(name)));
+        CHECK(name == std::string("He"));
+
+        chfl_free(copy);
+        chfl_free(atom);
+    }
+
     SECTION("Name") {
         CHFL_ATOM* atom = chfl_atom("He");
         REQUIRE(atom);

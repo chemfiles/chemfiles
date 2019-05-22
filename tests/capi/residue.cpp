@@ -6,6 +6,59 @@
 #include "chemfiles.h"
 
 TEST_CASE("chfl_residue") {
+    SECTION("Constructors errors") {
+        fail_next_allocation();
+        CHECK(chfl_residue("ALA") == nullptr);
+
+        fail_next_allocation();
+        CHECK(chfl_residue_with_id("ALA", 22) == nullptr);
+
+        CHFL_RESIDUE* residue = chfl_residue("ALA");
+        REQUIRE(residue);
+
+        fail_next_allocation();
+        CHECK(chfl_residue_copy(residue) == nullptr);
+
+        CHFL_TOPOLOGY* topology = chfl_topology();
+        REQUIRE(topology);
+
+        CHECK(chfl_residue_from_topology(topology, 0) == nullptr);
+        CHECK(chfl_residue_for_atom(topology, 0) == nullptr);
+
+        chfl_free(residue);
+        chfl_free(topology);
+    }
+
+    SECTION("copy") {
+        CHFL_RESIDUE* residue = chfl_residue("ALA");
+        REQUIRE(residue);
+
+        CHECK_STATUS(chfl_residue_add_atom(residue, 33));
+        CHECK_STATUS(chfl_residue_add_atom(residue, 22));
+
+        CHFL_RESIDUE* copy = chfl_residue_copy(residue);
+        REQUIRE(copy);
+
+        uint64_t size = 0;
+        CHECK_STATUS(chfl_residue_atoms_count(residue, &size));
+        CHECK(size == 2);
+
+        CHECK_STATUS(chfl_residue_atoms_count(copy, &size));
+        CHECK(size == 2);
+
+        CHECK_STATUS(chfl_residue_add_atom(residue, 11));
+        CHECK_STATUS(chfl_residue_add_atom(residue, 44));
+
+        CHECK_STATUS(chfl_residue_atoms_count(residue, &size));
+        CHECK(size == 4);
+
+        CHECK_STATUS(chfl_residue_atoms_count(copy, &size));
+        CHECK(size == 2);
+
+        chfl_free(copy);
+        chfl_free(residue);
+    }
+
     SECTION("Name") {
         CHFL_RESIDUE* residue = chfl_residue("Foo");
         REQUIRE(residue);
@@ -151,5 +204,4 @@ TEST_CASE("chfl_residue") {
 
         chfl_free(residue);
     }
-
 }

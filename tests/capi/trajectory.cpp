@@ -11,6 +11,11 @@
 static CHFL_FRAME* testing_frame();
 
 TEST_CASE("Read trajectory") {
+    SECTION("Constructors errors") {
+        CHECK(chfl_trajectory_open("not there", 'r') == nullptr);
+        CHECK(chfl_trajectory_with_format("not there", 'r', "") == nullptr);
+    }
+
     SECTION("Path") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
         REQUIRE(trajectory);

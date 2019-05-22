@@ -40,6 +40,7 @@ if(${CHFL_TEST_RUNNER} STREQUAL "valgrind")
         RUNNER_COMMAND
         "valgrind" "--leak-check=full" "--dsymutil=yes" "--error-exitcode=125"
         "--suppressions=${CMAKE_CURRENT_SOURCE_DIR}/valgrind.supp"
+        "--soname-synonyms=somalloc=nouserintercepts"
     )
 elseif(${CHFL_TEST_RUNNER} STREQUAL "wine")
     set(RUNNER_COMMAND "wine")
@@ -222,3 +223,24 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/local-file.toml
 "[types]
 Oz = \"F\"
 ")
+
+# Code linting with Python scripts
+if(${CMAKE_VERSION} VERSION_GREATER "3.12")
+    # cmake 3.12 replaced find_package(PythonInterp) with find_package(Python)
+    find_package(Python REQUIRED)
+    set(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
+else()
+    find_package(PythonInterp REQUIRED)
+endif()
+
+function(chfl_lint _file_)
+    get_filename_component(_name_ ${_file_} NAME_WE)
+    add_test(NAME ${_name_}
+        COMMAND ${PYTHON_EXECUTABLE} ${_file_}
+    )
+endfunction()
+
+file(GLOB lint_scripts ${CMAKE_CURRENT_SOURCE_DIR}/lints/*.py)
+foreach(script IN LISTS lint_scripts)
+    chfl_lint(${script})
+endforeach()
