@@ -32,6 +32,6 @@ PlainFile::PlainFile(std::string path, File::Mode mode)
 
     buffer_.open(this->path(), openmode);
     if (!buffer_.is_open()) {
-        throw file_error("could not open the file at {}", this->path());
+        throw file_error("could not open the file at '{}'", this->path());
     }
 }

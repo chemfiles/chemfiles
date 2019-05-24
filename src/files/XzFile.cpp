@@ -78,13 +78,22 @@ void xzstreambuf::open(const std::string& path, const std::string& mode) {
     if (is_open()) {
         throw file_error("can not open an xz file twice with the same xzstreambuf");
     }
-    file_ = std::fopen(path.c_str(), mode.c_str());
 
-    if (mode == "wb") {
-        reading_ = false;
-        check(lzma_easy_encoder(&stream_, 6, LZMA_CHECK_CRC64));
-    } else if (mode == "rb") {
+    if (mode == "rb") {
         reading_ = true;
+    } else if (mode == "wb") {
+        reading_ = false;
+    } else {
+        throw file_error("xzstreambuf: unrecognized open mode: '{}'", mode);
+    }
+
+    file_ = std::fopen(path.c_str(), mode.c_str());
+    if (!file_) {
+        // Failed to open the file, bail out
+        return;
+    }
+
+    if (reading_) {
         std::array<uint8_t, LZMA_STREAM_HEADER_SIZE> buffer = {{0}};
         if (!std::fread(buffer.data(), buffer.size(), sizeof(uint8_t), file_)) {
             throw file_error("error while reading lzma header: {}", strerror(errno));
@@ -93,26 +102,18 @@ void xzstreambuf::open(const std::string& path, const std::string& mode) {
         check(lzma_stream_header_decode(&flags, buffer.data()));
         check_ = flags.check;
     } else {
-        throw file_error("xzstreambuf: unrecognized open mode: '{}'", mode);
+        check(lzma_easy_encoder(&stream_, 6, LZMA_CHECK_CRC64));
     }
 
     stream_.next_out = reinterpret_cast<uint8_t*>(out_buffer_.data());
     stream_.avail_out = out_buffer_.size();
 }
 
-int xzstreambuf::overflow(int ch) {
-    if (ch != traits_type::eof()) {
-        *pptr() = traits_type::to_char_type(ch);
-        pbump(1);
-        if (sync() == 0) {
-            return ch;
-        }
+int xzstreambuf::sync() {
+    if (!is_open()) {
+        return -1;
     }
 
-    return traits_type::eof();
-}
-
-int xzstreambuf::sync() {
     if (reading_) {
         return std::streambuf::sync();
     }
@@ -155,9 +156,10 @@ int xzstreambuf::sync() {
 }
 
 int xzstreambuf::underflow() {
-    if (!file_ || !reading_) {
+    if (!is_open() || !reading_) {
         return traits_type::eof();
     }
+
     if (gptr() < egptr()) {
         // buffer not exhausted
         return traits_type::to_int_type(*gptr());
@@ -258,6 +260,10 @@ int xzstreambuf::underflow() {
 xzstreambuf::pos_type xzstreambuf::seekoff(std::streambuf::off_type offset,
                                            std::ios_base::seekdir way,
                                            std::ios_base::openmode which) {
+    if (!is_open()) {
+       return traits_type::eof();
+   }
+
     auto position = pos_type(off_type(decoded_position_) - (egptr() - gptr()));
     auto current_position = position;
 
@@ -271,7 +277,7 @@ xzstreambuf::pos_type xzstreambuf::seekoff(std::streambuf::off_type offset,
     } else if (way == std::ios::end) {
         if (!index_) {
             if (!init_index()) {
-                return EOF;
+                return traits_type::eof();
             }
         }
 
@@ -291,13 +297,13 @@ xzstreambuf::pos_type xzstreambuf::seekoff(std::streambuf::off_type offset,
 
 xzstreambuf::pos_type xzstreambuf::seekpos(std::streambuf::pos_type position,
                                            std::ios_base::openmode /*which*/) {
-    if (file_ == nullptr || sync()) {
-        return EOF;
+    if (!is_open() || sync()) {
+        return traits_type::eof();
     }
 
     if (!index_) {
         if (!init_index()) {
-            return EOF;
+            return traits_type::eof();
         }
     }
 
@@ -306,17 +312,17 @@ xzstreambuf::pos_type xzstreambuf::seekpos(std::streambuf::pos_type position,
 
     // Returns true on failure.
     if (lzma_index_iter_locate(&iter, static_cast<uint64_t>(off_type(position)))) {
-        return EOF;
+        return traits_type::eof();
     }
 
     long seek_amount = 0;
-    if (iter.block.compressed_file_offset > std::numeric_limits<long>::max()) {
+    if (iter.block.compressed_file_offset > static_cast<uint64_t>(std::numeric_limits<long>::max())) {
         seek_amount = std::numeric_limits<long>::max();
     } else {
         seek_amount = static_cast<long>(iter.block.compressed_file_offset);
     }
     if (std::fseek(file_, seek_amount, SEEK_SET)) {
-        return EOF;
+        return traits_type::eof();
     }
 
     decoded_position_ = iter.block.uncompressed_file_offset;
@@ -337,7 +343,7 @@ void xzstreambuf::replenish_compressed_buffer() {
 }
 
 bool xzstreambuf::init_index() {
-    if (!file_) {
+    if (!is_open()) {
         return false;
     }
 
@@ -378,6 +384,6 @@ XzFile::XzFile(std::string path, File::Mode mode): TextFile(std::move(path), mod
     }
 
     if (!buffer_.is_open()) {
-        throw file_error("could not open the file at {}", this->path());
+        throw file_error("could not open the file at '{}'", this->path());
     }
 }

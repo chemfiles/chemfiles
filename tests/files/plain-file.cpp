@@ -4,6 +4,7 @@
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles/files/PlainFile.hpp"
+#include "chemfiles/Error.hpp"
 using namespace chemfiles;
 
 TEST_CASE("Read a text file") {
@@ -22,6 +23,11 @@ TEST_CASE("Read a text file") {
     CHECK(line == "125");
     line = file.readline();
     CHECK(line == "Helium as a Lennard-Jone fluid");
+
+    CHECK_THROWS_WITH(
+        PlainFile("not existing", File::READ),
+        "could not open the file at 'not existing'"
+    );
 }
 
 TEST_CASE("Various line endinds") {
