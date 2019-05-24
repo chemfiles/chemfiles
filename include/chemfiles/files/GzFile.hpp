@@ -29,7 +29,6 @@ public:
     void open(const std::string& path, const std::string& mode);
 
     int underflow() override;
-    int overflow(int ch) override;
 
     int sync() override;
     bool is_open() const;

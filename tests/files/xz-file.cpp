@@ -4,6 +4,7 @@
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles/files/XzFile.hpp"
+#include "chemfiles/Error.hpp"
 #include <fstream>
 using namespace chemfiles;
 
@@ -53,4 +54,50 @@ TEST_CASE("Write an xz file") {
         0x01, 0x00, 0x00, 0x00, 0x00, 0x04, 0x59, 0x5a
     };
     CHECK(content == expected);
+}
+
+TEST_CASE("xzstreambuf errors") {
+    SECTION("Bad mode") {
+        xzstreambuf streambuf;
+
+        CHECK_THROWS_WITH(
+            streambuf.open("data/xyz/water.xyz.xz", "aa"),
+            "xzstreambuf: unrecognized open mode: 'aa'"
+        );
+    }
+
+    SECTION("Open file twice") {
+        xzstreambuf streambuf;
+
+        streambuf.open("data/xyz/water.xyz.xz", "rb");
+        CHECK_THROWS_WITH(
+            streambuf.open("data/xyz/water.xyz.xz", "rb"),
+            "can not open an xz file twice with the same xzstreambuf"
+        );
+    }
+
+    SECTION("Read empty file") {
+        auto filename = NamedTempPath(".xz");
+        std::ofstream file(filename);
+        file << "" << std::endl;
+        file.close();
+
+        xzstreambuf streambuf;
+        CHECK_THROWS_WITH(
+            streambuf.open(filename, "rb"),
+            Catch::StartsWith("error while reading lzma header")
+        );
+    }
+}
+
+TEST_CASE("XzFile errors") {
+    CHECK_THROWS_WITH(
+        XzFile("data/xyz/water.xyz.xz", File::APPEND),
+        "appending (open mode 'a') is not supported with xz files"
+    );
+
+    CHECK_THROWS_WITH(
+        XzFile("not there.xyz.xz", File::READ),
+        "could not open the file at 'not there.xyz.xz'"
+    );
 }

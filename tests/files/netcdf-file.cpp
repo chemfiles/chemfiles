@@ -53,15 +53,27 @@ TEST_CASE("Write NetCDF files") {
         file.add_dimension("finite", 42);
         auto variable = file.add_variable<nc::NcFloat>("variable", "infinite", "finite");
         variable.add_attribute("attribute", "hello");
+
+        file.set_nc_mode(NcFile::DATA);
+        variable.add({0, 0}, {1, 42}, std::vector<float>(42, 38.2f));
+    }
+
+    {
+        NcFile file(tmpfile, File::APPEND);
+        auto variable = file.variable<nc::NcFloat>("variable");
+        variable.add({1, 0}, {1, 42}, std::vector<float>(42, 55.1f));
     }
 
     {
         NcFile file(tmpfile, File::READ);
         CHECK(file.global_attribute("global") == "global.value");
-        CHECK(file.dimension("infinite") == 0);
+        CHECK(file.dimension("infinite") == 2);
         CHECK(file.dimension("finite") == 42);
         CHECK(file.variable_exists("variable"));
         CHECK_FALSE(file.variable_exists("bar"));
-        CHECK(file.variable<nc::NcFloat>("variable").attribute("attribute") == "hello");
+        auto variable = file.variable<nc::NcFloat>("variable");
+        CHECK(variable.attribute("attribute") == "hello");
+        CHECK(variable.get({0, 0}, {1, 42}) == std::vector<float>(42, 38.2f));
+        CHECK(variable.get({1, 0}, {1, 42}) == std::vector<float>(42, 55.1f));
     }
 }

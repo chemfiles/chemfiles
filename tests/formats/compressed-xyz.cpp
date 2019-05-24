@@ -52,6 +52,11 @@ TEST_CASE("Read compressed files in XYZ format") {
     check_read_file(Trajectory("data/xyz/water.blocks.xyz.xz"));
 }
 
+TEST_CASE("Explit compression in format name") {
+    check_read_file(Trajectory("data/xyz/water.9.xyz.gz", 'r', "XYZ / GZ"));
+    check_read_file(Trajectory("data/xyz/water.xyz.xz", 'r', "XYZ / XZ"));
+}
+
 template<class FileClass>
 static void check_write_file(std::string path) {
     auto frame = Frame();
