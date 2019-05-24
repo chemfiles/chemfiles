@@ -174,7 +174,7 @@ int main() {
     chemfiles::Trajectory trajectory("filename.xyz");
 
     auto frame = trajectory.read();
-    std::cout << "There are " << frame.natoms() << " atoms in the frame" << std::endl;
+    std::cout << "There are " << frame.size() << " atoms in the frame" << std::endl;
 
     auto positions = frame.positions();
     // Do awesome science with the positions here !
