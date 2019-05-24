@@ -4,8 +4,10 @@
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles/files/GzFile.hpp"
-#include <fstream>
+#include "chemfiles/Error.hpp"
 using namespace chemfiles;
+
+using Catch::Matchers::Contains;
 
 static void check_file(GzFile& file) {
     std::string line = file.readline();
@@ -29,6 +31,15 @@ TEST_CASE("Read a text file") {
 
     GzFile file_9("data/xyz/water.9.xyz.gz", File::READ);
     check_file(file_9);
+
+    CHECK_THROWS_WITH(
+        GzFile("not existing", File::READ),
+        "could not open the file at 'not existing'"
+    );
+    CHECK_THROWS_WITH(
+        GzFile("data/xyz/water.9.xyz.gz", File::APPEND),
+        "appending (open mode 'a') is not supported with gziped files"
+    );
 }
 
 
@@ -45,4 +56,18 @@ TEST_CASE("Write a gz file") {
     GzFile file(filename, File::READ);
     CHECK(file.readline() == "Test");
     CHECK(file.readline() == "5467");
+}
+
+TEST_CASE("gzstreambuf errors") {
+    gzstreambuf streambuf;
+    streambuf.open("data/xyz/water.9.xyz.gz", "rb");
+
+    CHECK_THROWS_WITH(
+        streambuf.open("data/xyz/water.9.xyz.gz", "rb"),
+        "can not open a gz file twice with the same gzstreambuf"
+    );
+    CHECK_THROWS_WITH(
+        streambuf.seekoff(2, std::ios_base::end, std::ios_base::in),
+        "zlib doesn't support SEEK_END in gzseek()"
+    );
 }

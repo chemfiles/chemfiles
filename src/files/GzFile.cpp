@@ -47,17 +47,21 @@ gzstreambuf::int_type gzstreambuf::underflow() {
     return traits_type::to_int_type(*gptr());
 }
 
-int gzstreambuf::overflow(int ch) {
-    if (ch != traits_type::eof()) {
-        *pptr() = traits_type::to_char_type(ch);
-        pbump(1);
-        if (sync() == 0) {
-            return ch;
-        }
-    }
-
-    return traits_type::eof();
-}
+// This function does not seems to be needed by the current implmentation of
+// GzFile. I'll keep it around in case the code requires it at some point. It
+// should work, but I could not test it.
+//
+// int gzstreambuf::overflow(int ch) {
+//     if (ch != traits_type::eof()) {
+//         *pptr() = traits_type::to_char_type(ch);
+//         pbump(1);
+//         if (sync() == 0) {
+//             return ch;
+//         }
+//     }
+//
+//     return traits_type::eof();
+// }
 
 int gzstreambuf::sync() {
     auto bytes = static_cast<int>(pptr() - pbase());
@@ -126,6 +130,6 @@ GzFile::GzFile(std::string path, File::Mode mode)
 
     buffer_.open(this->path(), openmode);
     if (!buffer_.is_open()) {
-        throw file_error("could not open the file at {}", this->path());
+        throw file_error("could not open the file at '{}'", this->path());
     }
 }
