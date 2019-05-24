@@ -33,7 +33,6 @@ public:
 
 protected:
     int underflow() override;
-    int overflow(int ch) override;
     int sync() override;
     pos_type seekoff(off_type offset, std::ios_base::seekdir way, std::ios_base::openmode which) override;
     pos_type seekpos(pos_type position, std::ios_base::openmode which) override;
