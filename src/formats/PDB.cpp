@@ -160,6 +160,7 @@ void PDBFormat::read(Frame& frame) {
                     warning("TER record not numeric: {}", line);
                 }
             }
+            chain_ended(frame);
             continue;
         case Record::END:
             // We have read a frame!
@@ -179,19 +180,7 @@ void PDBFormat::read(Frame& frame) {
         warning("Missing END record in PDB file");
     }
 
-    for (const auto& secinfo: secinfo_) {
-        auto chain = std::get<0>(secinfo);
-        for (auto i = std::get<1>(secinfo); i < std::get<2>(secinfo); ++i) {
-            auto residue = residues_.find({chain, i});
-            if (residue != residues_.end()) {
-                residue->second.set("secondary_structure", std::get<3>(secinfo));
-            }
-        }
-    }
-
-    for (const auto& residue: residues_) {
-        frame.add_residue(residue.second);
-    }
+    chain_ended(frame);
     link_standard_residue_bonds(frame);
 }
 
@@ -348,7 +337,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
     }
 
     try {
-        auto x = parse<double>(trim(line.substr(31, 8)));
+        auto x = parse<double>(trim(line.substr(30, 8)));
         auto y = parse<double>(trim(line.substr(38, 8)));
         auto z = parse<double>(trim(line.substr(46, 8)));
 
@@ -358,17 +347,17 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
     }
 
     auto atom_id = frame.size() - 1;
+    auto insertion_code = line.substr(26, 1)[0];
     try {
         auto resid = parse<size_t>(line.substr(22, 4));
         auto chain = line[21];
-        if (residues_.find({chain,resid}) == residues_.end()) {
+        if (residues_.find({chain,resid,insertion_code}) == residues_.end()) {
             auto name = trim(line.substr(17, 3));
             Residue residue(std::move(name), resid);
             residue.add_atom(atom_id);
 
-            auto insertion_code = line.substr(26, 1);
-            if (insertion_code != " ") {
-                frame[atom_id].set("insertion_code", insertion_code);
+            if (insertion_code != ' ') {
+                frame[atom_id].set("insertion_code", line.substr(26, 1));
             }
 
             // Set whether or not the residue is standardized
@@ -377,10 +366,10 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
             residue.set("chainid", line.substr(21, 1));
             // PDB format makes no distinction between chainid and chainname
             residue.set("chainname", line.substr(21, 1));
-            residues_.insert({{chain,resid}, residue});
+            residues_.insert({{chain,resid,insertion_code}, residue});
         } else {
             // Just add this atom to the residue
-            residues_.at({chain,resid}).add_atom(atom_id);
+            residues_.at({chain,resid,insertion_code}).add_atom(atom_id);
         }
     } catch (const Error&) {
         // No residue information
@@ -442,6 +431,28 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
     } else {
         return;
     }
+}
+
+void PDBFormat::chain_ended(Frame& frame) {
+    for (const auto& secinfo: secinfo_) {
+        auto chain = std::get<0>(secinfo);
+        for (auto i = std::get<1>(secinfo); i < std::get<2>(secinfo); ++i) {
+            auto residue = residues_.find({chain, i, ' '});
+            if (residue != residues_.end()) {
+                residue->second.set("secondary_structure", std::get<3>(secinfo));
+            }
+        }
+    }
+
+    for (const auto& residue: residues_) {
+        frame.add_residue(residue.second);
+    }
+
+    // This is a 'hack' to allow for badly formatted PDB files which restart
+    // the residue ID after a TER residue in cases where they should not.
+    // IE a metal Ion given the chain ID of A and residue ID of 1 even though
+    // this residue already exists.
+    residues_.clear();
 }
 
 void PDBFormat::link_standard_residue_bonds(Frame& frame) {
