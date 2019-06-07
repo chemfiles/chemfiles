@@ -46,10 +46,12 @@ private:
                         const std::string& sec);
     // Read CONECT record
     void read_CONECT(Frame& frame, const std::string& line);
+    // Runs when a chain is terminated to update residue information
+    void chain_ended(Frame& frame);
 
     std::unique_ptr<TextFile> file_;
-    /// Map of residues, indexed by residue id and chainid.
-    std::map<std::pair<char, size_t>, Residue> residues_;
+    /// Map of residues, indexed by residue id, chain id and insertion code.
+    std::map<std::tuple<char, size_t, char>, Residue> residues_;
     /// Storing the positions of all the steps in the file, so that we can
     /// just `seekg` them instead of reading the whole step.
     std::vector<std::streampos> steps_positions_;
