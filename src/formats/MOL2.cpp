@@ -39,7 +39,11 @@ MOL2Format::MOL2Format(std::string path, File::Mode mode, File::Compression comp
         }
         steps_positions_.push_back(position);
     }
-    file_->rewind();
+    if (steps_positions_.empty()) {
+        file_->rewind();
+    } else {
+        file_->seekg(steps_positions_[0]);
+    }
 }
 
 size_t MOL2Format::nsteps() {
