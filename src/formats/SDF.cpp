@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <sstream>
+#include <cmath>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -83,12 +84,53 @@ void SDFFormat::read(Frame& frame) {
     frame.resize(0);
 
     for (const auto& line: atom_lines) {
+        if (line.length() < 34) {
+            throw format_error(
+                "atom line is too small for SDF: '{}'", line
+            );
+        }
+
         auto x = parse<double>(line.substr(0, 10));
         auto y = parse<double>(line.substr(10, 10));
         auto z = parse<double>(line.substr(20, 10));
         auto name = trim(line.substr(31, 3));
 
-        frame.add_atom(Atom(name), Vector3D(x, y, z));
+        auto atom = Atom(name);
+
+        if (line.length() >= 40) {
+            long long chrg = 0;
+            try {
+                chrg = parse<long long>(line.substr(36, 3));
+            } catch (const Error&) {
+                warning("SDF reader", "charge code not numeric: {}", line.substr(36, 3));
+            }
+            switch(chrg) {
+            case 0:
+                break; // do nothing
+            case 1:
+                atom.set_charge(3.0);
+                break;
+            case 2:
+                atom.set_charge(2.0);
+                break;
+            case 3:
+                atom.set_charge(1.0);
+                break;
+            case 5:
+                atom.set_charge(-1.0);
+                break;
+            case 6:
+                atom.set_charge(-2.0);
+                break;
+            case 7:
+                atom.set_charge(-3.0);
+                break;
+            default:
+                warning("SDF reader", "unknown charge code: '{}'", chrg);
+            }
+        }
+
+        frame.add_atom(std::move(atom), Vector3D(x, y, z));
     }
 
     std::vector<std::string> bond_lines;
@@ -205,9 +247,40 @@ void SDFFormat::write(const Frame& frame) {
             type = "Xxx";
         }
 
+        int charge_code = 0;
+        double int_part;
+        if (std::modf(topology[i].charge(), &int_part) == 0.0) {
+            switch (static_cast<int>(int_part)) {
+            case 0:
+                break; // Do nothing
+            case 1:
+                charge_code = 3;
+                break;
+            case 2:
+                charge_code = 2;
+                break;
+            case 3:
+                charge_code = 1;
+                break;
+            case -1:
+                charge_code = 5;
+                break;
+            case -2:
+                charge_code = 6;
+                break;
+            case -3:
+                charge_code = 7;
+                break;
+            default:
+                warning("SDF writer", "charge code not availible for '{}'", int_part);
+            }
+        } else {
+            warning("SDF writer", "charge not an integer: '{}'", topology[i].charge());
+        }
+
         fmt::print(
-            *file_, "{:>10.4f}{:>10.4f}{:>10.4f} {:3} 0  0  0  0  0  0  0  0  0  0  0  0\n",
-            positions[i][0], positions[i][1], positions[i][2], type
+            *file_, "{:>10.4f}{:>10.4f}{:>10.4f} {:3} 0{:3}  0  0  0  0  0  0  0  0  0  0\n",
+            positions[i][0], positions[i][1], positions[i][2], type, charge_code
         );
     }
 
@@ -241,7 +314,7 @@ void SDFFormat::write(const Frame& frame) {
         );
     }
 
-    fmt::print(*file_, "M END\n$$$$\n");
+    fmt::print(*file_, "M  END\n$$$$\n");
     steps_positions_.push_back(file_->tellg());
 }
 
