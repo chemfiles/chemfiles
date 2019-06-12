@@ -348,7 +348,8 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
     try {
         auto resid = parse<size_t>(line.substr(22, 4));
         auto chain = line[21];
-        if (residues_.find({chain,resid,insertion_code}) == residues_.end()) {
+        auto complete_residue_id = std::make_tuple(chain,resid,insertion_code);
+        if (residues_.find(complete_residue_id) == residues_.end()) {
             auto name = trim(line.substr(17, 3));
             Residue residue(std::move(name), resid);
             residue.add_atom(atom_id);
@@ -363,10 +364,10 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
             residue.set("chainid", line.substr(21, 1));
             // PDB format makes no distinction between chainid and chainname
             residue.set("chainname", line.substr(21, 1));
-            residues_.insert({{chain,resid,insertion_code}, residue});
+            residues_.insert({complete_residue_id, residue});
         } else {
             // Just add this atom to the residue
-            residues_.at({chain,resid,insertion_code}).add_atom(atom_id);
+            residues_.at(complete_residue_id).add_atom(atom_id);
         }
     } catch (const Error&) {
         // No residue information
@@ -437,7 +438,7 @@ void PDBFormat::chain_ended(Frame& frame) {
     for (const auto& secinfo: secinfo_) {
         auto chain = std::get<0>(secinfo);
         for (auto i = std::get<1>(secinfo); i < std::get<2>(secinfo); ++i) {
-            auto residue = residues_.find({chain, i, ' '});
+            auto residue = residues_.find(std::make_tuple(chain, i, ' '));
             if (residue != residues_.end()) {
                 residue->second.set("secondary_structure", std::get<3>(secinfo));
             }
