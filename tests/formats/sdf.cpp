@@ -79,44 +79,64 @@ TEST_CASE("Read files in SDF format") {
         auto prop2 = frame.get("PUBCHEM_MOLECULAR_FORMULA");
         CHECK(prop2->as_string() == "C9H8O4");
     }
+
+    SECTION("Read charges") {
+        Trajectory file("data/sdf/aspirin_charged.sdf");
+
+        auto frame = file.read();
+        CHECK(approx_eq(frame[0].charge(), 0.0));
+        CHECK(approx_eq(frame[1].charge(), 3.0));
+        CHECK(approx_eq(frame[2].charge(), 2.0));
+        CHECK(approx_eq(frame[3].charge(), 1.0));
+        CHECK(approx_eq(frame[4].charge(), 0.0));
+        CHECK(approx_eq(frame[5].charge(),-1.0));
+        CHECK(approx_eq(frame[6].charge(),-2.0));
+        CHECK(approx_eq(frame[7].charge(),-3.0));
+        CHECK(approx_eq(frame[8].charge(), 0.0));
+        CHECK(approx_eq(frame[9].charge(), 0.0));
+        CHECK(approx_eq(frame[10].charge(), 0.0));
+    }
 }
 
 TEST_CASE("Write files in SDF format") {
     auto tmpfile = NamedTempPath(".sdf");
     const auto expected_content =
-    "NONAME\n"
-    " chemfiles-lib\n\n"
-    "  4  3  0     0  0  0  0  0  0999 V2000\n"
-    "    1.0000    2.0000    3.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    1.0000    2.0000    3.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    1.0000    2.0000    3.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    1.0000    2.0000    3.0000 F   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "  1  3  1  0  0  0  0\n"
-    "  2  3  2  0  0  0  0\n"
-    "  3  4  3  0  0  0  0\n"
-    "M END\n"
-    "$$$$\n"
-    "TEST\n"
-    " chemfiles-lib\n\n"
-    " 11  5  0     0  0  0  0  0  0999 V2000\n"
-    "    1.0000    2.0000    3.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    1.0000    2.0000    3.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    1.0000    2.0000    3.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    1.0000    2.0000    3.0000 F   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    4.0000    5.0000    6.0000 E   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    4.0000    5.0000    6.0000 D   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    0.0000    0.0000    0.0000 G   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    0.0000    0.0000    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    0.0000    0.0000    0.0000 I   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    0.0000    0.0000    0.0000 J   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "    0.0000    0.0000    0.0000 K   0  0  0  0  0  0  0  0  0  0  0  0\n"
-    "  1  3  1  0  0  0  0\n"
-    "  2  3  2  0  0  0  0\n"
-    "  3  4  3  0  0  0  0\n"
-    "  9 10  8  0  0  0  0\n"
-    " 10 11  4  0  0  0  0\n"
-    "M END\n"
-    "$$$$\n";
+R"(NONAME
+ chemfiles-lib
+
+  4  3  0     0  0  0  0  0  0999 V2000
+    1.0000    2.0000    3.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+    1.0000    2.0000    3.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
+    1.0000    2.0000    3.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.0000    2.0000    3.0000 F   0  0  0  0  0  0  0  0  0  0  0  0
+  1  3  1  0  0  0  0
+  2  3  2  0  0  0  0
+  3  4  3  0  0  0  0
+M  END
+$$$$
+TEST
+ chemfiles-lib
+
+ 11  5  0     0  0  0  0  0  0999 V2000
+    1.0000    2.0000    3.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+    1.0000    2.0000    3.0000 N   0  3  0  0  0  0  0  0  0  0  0  0
+    1.0000    2.0000    3.0000 C   0  2  0  0  0  0  0  0  0  0  0  0
+    1.0000    2.0000    3.0000 F   0  1  0  0  0  0  0  0  0  0  0  0
+    4.0000    5.0000    6.0000 E   0  0  0  0  0  0  0  0  0  0  0  0
+    4.0000    5.0000    6.0000 D   0  5  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 G   0  6  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 H   0  7  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 I   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 J   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 K   0  0  0  0  0  0  0  0  0  0  0  0
+  1  3  1  0  0  0  0
+  2  3  2  0  0  0  0
+  3  4  3  0  0  0  0
+  9 10  8  0  0  0  0
+ 10 11  4  0  0  0  0
+M  END
+$$$$
+)";
 
     auto frame = Frame();
     frame.add_atom(Atom("A","O"), {1, 2, 3});
@@ -137,6 +157,15 @@ TEST_CASE("Write files in SDF format") {
     frame.add_atom(Atom("I"), {0, 0, 0});
     frame.add_atom(Atom("J"), {0, 0, 0});
     frame.add_atom(Atom("K"), {0, 0, 0});
+
+    frame[0].set_charge(0.05);
+    frame[1].set_charge(1.0);
+    frame[2].set_charge(2.0);
+    frame[3].set_charge(3.0);
+    frame[4].set_charge(4.0);
+    frame[5].set_charge(-1.0);
+    frame[6].set_charge(-2.0);
+    frame[7].set_charge(-3.0);
 
     frame.add_bond(9, 10, Bond::AROMATIC);
     frame.add_bond(8, 9, Bond::UNKNOWN);
