@@ -166,6 +166,51 @@ TEST_CASE("Read files in PDB format") {
         CHECK(topo.residue(36).get("secondary_structure")->as_string() == "alpha helix");
     }
 
+    SECTION("Secondary structure with insertion code test") {
+        Trajectory file("data/pdb/1bcu.pdb");
+        auto frame = file.read();
+
+        // Make sure the residues have been inserted correctly
+        auto& topo = frame.topology();
+        CHECK(topo.residue_for_atom(0)->name() == "ALA");
+        CHECK(topo.residue_for_atom(0)->get("insertion_code")->as_string() == "B");
+        CHECK(topo.residue_for_atom(5)->get("insertion_code")->as_string() == "A");
+        CHECK_FALSE(topo.residue_for_atom(13)->get("insertion_code"));
+
+        // Check secondary structure, no insertion code
+        CHECK(topo.residue(9).get("secondary_structure")->as_string() == "3-10 helix");
+        CHECK(topo.residue(10).get("secondary_structure")->as_string() == "3-10 helix");
+        CHECK(topo.residue(11).get("secondary_structure")->as_string() == "3-10 helix");
+        CHECK_FALSE(topo.residue(12).get("secondary_structure"));
+        CHECK_FALSE(topo.residue(13).get("secondary_structure"));
+        CHECK_FALSE(topo.residue(14).get("secondary_structure"));
+        CHECK_FALSE(topo.residue(15).get("secondary_structure"));
+        CHECK_FALSE(topo.residue(16).get("secondary_structure"));
+        CHECK_FALSE(topo.residue(17).get("secondary_structure"));
+
+        // First residue in a long list of residues with the same secondary structure
+        auto& ins_check = topo.residue(18);
+        CHECK(ins_check.get("secondary_structure")->as_string() == "alpha helix");
+        CHECK(ins_check.get("insertion_code")->as_string() == "C");
+        CHECK((*ins_check.id()) == 14);
+        CHECK(ins_check.get("chainid")->as_string() == "L");
+
+        CHECK(topo.residue(19).get("secondary_structure")->as_string() == "alpha helix");
+        CHECK(topo.residue(19).get("insertion_code")->as_string() == "D");
+        CHECK(topo.residue(20).get("secondary_structure")->as_string() == "alpha helix");
+        CHECK(topo.residue(20).get("insertion_code")->as_string() == "E");
+        CHECK(topo.residue(21).get("secondary_structure")->as_string() == "alpha helix");
+        CHECK(topo.residue(21).get("insertion_code")->as_string() == "F");
+        CHECK(topo.residue(22).get("secondary_structure")->as_string() == "alpha helix");
+        CHECK(topo.residue(22).get("insertion_code")->as_string() == "G");
+
+        // Not included
+        CHECK_FALSE(topo.residue(23).get("secondary_structure"));
+        CHECK(topo.residue(23).get("insertion_code")->as_string() == "H");
+        CHECK((*topo.residue(23).id()) == 14);
+        CHECK(topo.residue(23).get("chainid")->as_string() == "L");
+    }
+
     SECTION("Handle odd PDB numbering") {
         Trajectory file("data/pdb/odd-start.pdb");
         auto frame = file.read();
@@ -228,10 +273,11 @@ TEST_CASE("Read files in PDB format") {
 
     SECTION("Read atomic insertion codes") {
         auto frame = Trajectory("data/pdb/insertion-code.pdb").read();
+        auto& topo = frame.topology();
 
-        CHECK(frame[0].get<Property::STRING>("insertion_code").value() == "a");
-        CHECK(frame[1].get<Property::STRING>("insertion_code").value() == "c");
-        CHECK(frame[2].get<Property::STRING>("insertion_code").value() == "x");
+        CHECK(topo.residue_for_atom(0)->get("insertion_code")->as_string() == "a");
+        CHECK(topo.residue_for_atom(1)->get("insertion_code")->as_string() == "c");
+        CHECK(topo.residue_for_atom(2)->get("insertion_code")->as_string() == "x");
         CHECK_FALSE(frame[3].get("insertion_code"));
     }
 }
