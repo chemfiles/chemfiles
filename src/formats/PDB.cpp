@@ -224,6 +224,8 @@ void PDBFormat::read_HELIX(const std::string& line) {
     auto chain2 = line[31];
     size_t start = 0;
     size_t end = 0;
+    auto inscode1 = line[25];
+    auto inscode2 = line[37];
 
     try {
         start = parse<size_t>(line.substr(21, 4));
@@ -241,24 +243,35 @@ void PDBFormat::read_HELIX(const std::string& line) {
     // Convert the code as a character to its numeric meaning.
     // See http://www.wwpdb.org/documentation/file-format-content/format23/sect5.html
     // for definitions of these numbers
-    switch (line[39] - '0') {
+    auto start_info = std::make_tuple(chain1, start, inscode1);
+    auto end_info = std::make_tuple(chain2, end, inscode2);
+
+    size_t helix_type = 0;
+    try {
+        helix_type = parse<size_t>(line.substr(38,2));
+    } catch (const Error&) {
+        warning("PDB reader", "could not parse helix type");
+        return;
+    }
+
+    switch (helix_type) {
     case 1: // Treat right and left handed helixes the same.
     case 6:
-        secinfo_.emplace_back(std::make_tuple(chain1, start, end, "alpha helix"));
+        secinfo_.emplace_back(std::make_tuple(start_info, end_info, "alpha helix"));
         break;
     case 2:
     case 7:
-        secinfo_.emplace_back(std::make_tuple(chain1, start, end, "omega helix"));
+        secinfo_.emplace_back(std::make_tuple(start_info, end_info, "omega helix"));
         break;
     case 3:
-        secinfo_.emplace_back(std::make_tuple(chain1, start, end, "pi helix"));
+        secinfo_.emplace_back(std::make_tuple(start_info, end_info, "pi helix"));
         break;
     case 4:
     case 8:
-        secinfo_.emplace_back(std::make_tuple(chain1, start, end, "gamma helix"));
+        secinfo_.emplace_back(std::make_tuple(start_info, end_info, "gamma helix"));
         break;
     case 5:
-        secinfo_.emplace_back(std::make_tuple(chain1, start, end, "3-10 helix"));
+        secinfo_.emplace_back(std::make_tuple(start_info, end_info, "3-10 helix"));
         break;
     default:
         break;
@@ -267,8 +280,7 @@ void PDBFormat::read_HELIX(const std::string& line) {
 
 void PDBFormat::read_secondary(const std::string& line, size_t i1, size_t i2,
                                const std::string& sec) {
-
-    if (line.length() < i2 + 5) {
+    if (line.length() < i2 + 6) {
         warning("Secondary structure record too short: '{}'", line);
         return;
     }
@@ -294,7 +306,13 @@ void PDBFormat::read_secondary(const std::string& line, size_t i1, size_t i2,
         return;
     }
 
-    secinfo_.emplace_back(std::make_tuple(chain1, resid1, resid2, "extended"));
+    auto inscode1 = line[i1 + 5];
+    auto inscode2 = line[i2 + 5];
+
+    auto start = std::make_tuple(chain1, resid1, inscode1);
+    auto end = std::make_tuple(chain2, resid2, inscode2);
+
+    secinfo_.emplace_back(std::make_tuple(start, end, "extended"));
 }
 
 void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
@@ -347,7 +365,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
     }
 
     auto atom_id = frame.size() - 1;
-    auto insertion_code = line.substr(26, 1)[0];
+    auto insertion_code = line[26];
     try {
         auto resid = parse<size_t>(line.substr(22, 4));
         auto chain = line[21];
@@ -358,7 +376,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
             residue.add_atom(atom_id);
 
             if (insertion_code != ' ') {
-                frame[atom_id].set("insertion_code", line.substr(26, 1));
+                residue.set("insertion_code", line.substr(26, 1));
             }
 
             // Set whether or not the residue is standardized
@@ -436,12 +454,10 @@ void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
 
 void PDBFormat::chain_ended(Frame& frame) {
     for (const auto& secinfo: secinfo_) {
-        auto chain = std::get<0>(secinfo);
-        for (auto i = std::get<1>(secinfo); i < std::get<2>(secinfo); ++i) {
-            auto residue = residues_.find(std::make_tuple(chain, i, ' '));
-            if (residue != residues_.end()) {
-                residue->second.set("secondary_structure", std::get<3>(secinfo));
-            }
+        auto start = residues_.lower_bound(std::get<0>(secinfo));
+        auto end = residues_.upper_bound(std::get<1>(secinfo));
+        for (auto residue = start; residue != end; ++residue) {
+            residue->second.set("secondary_structure", std::get<2>(secinfo));
         }
     }
 
