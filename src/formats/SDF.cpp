@@ -40,6 +40,10 @@ SDFFormat::SDFFormat(std::string path, File::Mode mode, File::Compression compre
             steps_positions_.push_back(position);
         }
     }
+
+    if (mode == File::READ && steps_positions_.empty()) {
+        throw format_error("file is blank SDF file");
+    }
     file_->rewind();
 }
 
@@ -314,7 +318,36 @@ void SDFFormat::write(const Frame& frame) {
         );
     }
 
-    fmt::print(*file_, "M  END\n$$$$\n");
+    fmt::print(*file_, "M  END\n");
+
+    for (auto& prop : frame.properties()) {
+        if (prop.first == "name") {
+            continue;
+        }
+
+        fmt::print(*file_, "> <{}>\n", prop.first);
+
+        switch(prop.second.kind()) {
+        case Property::STRING:
+            fmt::print(*file_, "{}\n\n", prop.second.as_string());
+            break;
+        case Property::DOUBLE:
+            fmt::print(*file_, "{}\n\n", prop.second.as_double());
+            break;
+        case Property::BOOL:
+            fmt::print(*file_, "{}\n\n", prop.second.as_bool());
+            break;
+        case Property::VECTOR3D:
+            fmt::print(*file_, "{} {} {}\n\n",
+                prop.second.as_vector3d()[0],
+                prop.second.as_vector3d()[1],
+                prop.second.as_vector3d()[2]
+            );
+            break;
+        }
+    }
+
+    fmt::print(*file_, "$$$$\n");
     steps_positions_.push_back(file_->tellg());
 }
 

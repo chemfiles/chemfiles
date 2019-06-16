@@ -98,6 +98,29 @@ TEST_CASE("Read files in SDF format") {
     }
 }
 
+// To use in loops in order to iterate over files in a specific directory.
+struct directory_files_iterator {
+    typedef fs::recursive_directory_iterator iterator;
+    directory_files_iterator(fs::path p) : p_(p) {}
+
+    iterator begin() { return fs::recursive_directory_iterator(p_); }
+    iterator end() { return fs::recursive_directory_iterator(); }
+
+    fs::path p_;
+};
+
+TEST_CASE("Errors in SDF format") {
+    for (auto entry : directory_files_iterator("data/sdf/bad/")) {
+        auto test = [=](){
+            // We can throw either when creating the trajectory, or when reading
+            // the frame, depending on the type of error
+            auto file = Trajectory(entry.path().string());
+            file.read();
+        };
+        CHECK_THROWS_AS(test(), FormatError);
+    }
+}
+
 TEST_CASE("Write files in SDF format") {
     auto tmpfile = NamedTempPath(".sdf");
     const auto expected_content =
@@ -113,6 +136,9 @@ R"(NONAME
   2  3  2  0  0  0  0
   3  4  3  0  0  0  0
 M  END
+> <prop>
+prop1
+
 $$$$
 TEST
  chemfiles-lib
@@ -128,13 +154,36 @@ TEST
     0.0000    0.0000    0.0000 H   0  7  0  0  0  0  0  0  0  0  0  0
     0.0000    0.0000    0.0000 I   0  0  0  0  0  0  0  0  0  0  0  0
     0.0000    0.0000    0.0000 J   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    0.0000    0.0000 K   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 Xxx 0  0  0  0  0  0  0  0  0  0  0  0
   1  3  1  0  0  0  0
   2  3  2  0  0  0  0
   3  4  3  0  0  0  0
   9 10  8  0  0  0  0
  10 11  4  0  0  0  0
 M  END
+> <prop>
+1.23
+
+$$$$
+TEST
+ chemfiles-lib
+
+  1  0  0     0  0  0  0  0  0999 V2000
+    1.0000    2.0000    3.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+M  END
+> <prop>
+false
+
+$$$$
+TEST
+ chemfiles-lib
+
+  1  0  0     0  0  0  0  0  0999 V2000
+    1.0000    2.0000    3.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+M  END
+> <prop>
+1.0 2.0 3.0
+
 $$$$
 )";
 
@@ -146,6 +195,7 @@ $$$$
     frame.add_bond(0, 2, Bond::SINGLE);
     frame.add_bond(1, 2, Bond::DOUBLE);
     frame.add_bond(2, 3, Bond::TRIPLE);
+    frame.set("prop", Property("prop1"));
 
     auto file = Trajectory(tmpfile, 'w');
     file.write(frame);
@@ -156,7 +206,7 @@ $$$$
     frame.add_atom(Atom("H"), {0, 0, 0});
     frame.add_atom(Atom("I"), {0, 0, 0});
     frame.add_atom(Atom("J"), {0, 0, 0});
-    frame.add_atom(Atom("K"), {0, 0, 0});
+    frame.add_atom(Atom(""), {0, 0, 0});
 
     frame[0].set_charge(0.05);
     frame[1].set_charge(1.0);
@@ -171,8 +221,19 @@ $$$$
     frame.add_bond(8, 9, Bond::UNKNOWN);
 
     frame.set("name", Property("TEST"));
+    frame.set("prop", Property(1.23));
 
     file.write(frame);
+
+    frame.clear_bonds();
+    frame.resize(1);
+    
+    frame.set("prop", Property(false));
+    file.write(frame);
+
+    frame.set("prop", Property(Vector3D{1.0, 2.0, 3.0}));
+    file.write(frame);
+
     file.close();
 
     std::ifstream checking(tmpfile);
