@@ -45,6 +45,11 @@ TNGFormat::TNGFormat(std::string path, File::Mode mode, File::Compression compre
     if (compression != File::DEFAULT) {
         throw format_error("TNG format do not support compression");
     }
+
+    int64_t exp = -1;
+    CHECK(tng_distance_unit_exponential_get(tng_, &exp));
+    // calculate the scale factor from a given length scale to angstrom
+    distance_scale_factor_ = pow(10.0, exp + 10.0);
 }
 
 size_t TNGFormat::nsteps() {
@@ -80,9 +85,9 @@ void TNGFormat::read_positions(Frame& frame) {
 
     auto positions = frame.positions();
     for (size_t i=0; i<static_cast<size_t>(natoms_); i++) {
-        positions[i][0] = static_cast<double>(buffer[3 * i + 0]);
-        positions[i][1] = static_cast<double>(buffer[3 * i + 1]);
-        positions[i][2] = static_cast<double>(buffer[3 * i + 2]);
+        positions[i][0] = static_cast<double>(buffer[3 * i + 0]) * distance_scale_factor_;
+        positions[i][1] = static_cast<double>(buffer[3 * i + 1]) * distance_scale_factor_;
+        positions[i][2] = static_cast<double>(buffer[3 * i + 2]) * distance_scale_factor_;
     }
 }
 
@@ -110,9 +115,9 @@ void TNGFormat::read_velocities(Frame& frame) {
     frame.add_velocities();
     auto velocities = *frame.velocities();
     for (size_t i=0; i<static_cast<size_t>(natoms_); i++) {
-        velocities[i][0] = static_cast<double>(buffer[3 * i + 0]);
-        velocities[i][1] = static_cast<double>(buffer[3 * i + 1]);
-        velocities[i][2] = static_cast<double>(buffer[3 * i + 2]);
+        velocities[i][0] = static_cast<double>(buffer[3 * i + 0]) * distance_scale_factor_;
+        velocities[i][1] = static_cast<double>(buffer[3 * i + 1]) * distance_scale_factor_;
+        velocities[i][2] = static_cast<double>(buffer[3 * i + 2]) * distance_scale_factor_;
     }
 }
 
@@ -153,8 +158,8 @@ void TNGFormat::read_cell(Frame& frame) {
     double beta = angle(a, c);
     double gamma = angle(a, b);
 
-    // Factor 10 because the cell lengthes are in nm in the TNG format
-    frame.set_cell({a.norm() * 10, b.norm() * 10, c.norm() * 10, alpha, beta, gamma});
+    frame.set_cell({a.norm() * distance_scale_factor_, b.norm() * distance_scale_factor_, c.norm() * distance_scale_factor_,
+        alpha, beta, gamma});
 }
 
 void TNGFormat::read_topology(Frame& frame) {
