@@ -13,8 +13,8 @@ TEST_CASE("Read files in TNG format") {
 
         CHECK(frame.size() == 15);
         auto positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D(1.0, 1.0, 1.0), 1e-6));
-        CHECK(approx_eq(positions[11], Vector3D(8.5, 33.0, 34.0), 1e-6));
+        CHECK(approx_eq(positions[0], Vector3D(10.0, 10.0, 10.0), 1e-5));
+        CHECK(approx_eq(positions[11], Vector3D(85.0, 330.0, 340.0), 1e-5));
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::INFINITE);
@@ -24,8 +24,8 @@ TEST_CASE("Read files in TNG format") {
 
         CHECK(frame.size() == 15);
         positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D(1.01562, 1.02344, 1.03125), 1e-4));
-        CHECK(approx_eq(positions[11], Vector3D(8.5, 33.0, 34.0), 1e-6));
+        CHECK(approx_eq(positions[0], Vector3D(10.1562, 10.2344, 10.3125), 1e-4));
+        CHECK(approx_eq(positions[11], Vector3D(85.0, 330.0, 340.0), 1e-5));
     }
 
     SECTION("Read velocities") {
@@ -34,8 +34,8 @@ TEST_CASE("Read files in TNG format") {
         CHECK(frame.size() == 38376);
 
         auto velocities = *frame.velocities();
-        CHECK(approx_eq(velocities[450], Vector3D(-0.144889, 6.50066e-2, -0.764032), 1e-5));
-        CHECK(approx_eq(velocities[4653], Vector3D(-1.65949, -0.462240, -0.701133), 1e-5));
+        CHECK(approx_eq(velocities[450], Vector3D(-1.44889, 6.50066e-1, -7.64032), 1e-4));
+        CHECK(approx_eq(velocities[4653], Vector3D(-16.5949, -4.62240, -7.01133), 1e-4));
     }
 
     SECTION("Read cell") {
