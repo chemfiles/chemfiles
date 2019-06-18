@@ -116,7 +116,7 @@ set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
 target_include_directories(chemfiles PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-    $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
+    $<INSTALL_INTERFACE:include>
 )
 
 target_link_libraries(chemfiles ${NETCDF_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBLZMA_LIBRARY})
@@ -138,33 +138,35 @@ generate_export_header(chemfiles
 #----------------------------------------------------------------------------------------#
 # Installation configuration
 #----------------------------------------------------------------------------------------#
-set(INCLUDE_INSTALL_DIR "include")
-install(TARGETS chemfiles EXPORT chemfiles-targets
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib${LIB_SUFFIX}
-    ARCHIVE DESTINATION lib${LIB_SUFFIX}
-)
-install(DIRECTORY include/ DESTINATION include)
-install(DIRECTORY ${PROJECT_BINARY_DIR}/include/ DESTINATION include)
-
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/chemfiles-config-version.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/chemfiles-config-version.cmake"
     @ONLY
 )
 
-# Install package files
-set(PACKAGE_LOCATION lib${LIB_SUFFIX}/cmake/chemfiles)
-install(EXPORT chemfiles-targets
-  FILE chemfiles-targets.cmake
-  DESTINATION ${PACKAGE_LOCATION}
+install(TARGETS chemfiles
+    EXPORT chemfiles-targets
+    LIBRARY DESTINATION lib COMPONENT Runtime
+    ARCHIVE DESTINATION lib COMPONENT Development
+    RUNTIME DESTINATION bin COMPONENT Runtime
+    PUBLIC_HEADER DESTINATION include COMPONENT Development
+    BUNDLE DESTINATION bin COMPONENT Runtime
 )
-install(FILES
-    cmake/chemfiles-config.cmake
-    "${CMAKE_CURRENT_BINARY_DIR}/chemfiles-config-version.cmake"
-    DESTINATION ${PACKAGE_LOCATION}
-    COMPONENT Devel
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+    "${PROJECT_SOURCE_DIR}/cmake/chemfiles-config.cmake.in"
+    "${PROJECT_BINARY_DIR}/chemfiles-config.cmake"
+    INSTALL_DESTINATION lib/cmake/chemfiles
 )
+
+install(EXPORT chemfiles-targets DESTINATION lib/cmake/chemfiles)
+install(FILES "${PROJECT_BINARY_DIR}/chemfiles-config-version.cmake"
+              "${PROJECT_BINARY_DIR}/chemfiles-config.cmake"
+        DESTINATION lib/cmake/chemfiles)
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION include)
+install(DIRECTORY ${PROJECT_BINARY_DIR}/include/ DESTINATION include)
 
 # uninstall target
 configure_file(
