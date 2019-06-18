@@ -1,2 +1,4 @@
-# - Config file for the Chemfiles package
+@PACKAGE_INIT@
+
 include("${CMAKE_CURRENT_LIST_DIR}/chemfiles-targets.cmake")
+check_required_components("@PROJECT_NAME@")
