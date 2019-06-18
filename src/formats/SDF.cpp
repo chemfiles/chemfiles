@@ -41,9 +41,6 @@ SDFFormat::SDFFormat(std::string path, File::Mode mode, File::Compression compre
         }
     }
 
-    if (mode == File::READ && steps_positions_.empty()) {
-        throw format_error("file is blank SDF file");
-    }
     file_->rewind();
 }
 
