@@ -30,6 +30,7 @@
 #include "chemfiles/formats/mmCIF.hpp"
 #include "chemfiles/formats/CML.hpp"
 #include "chemfiles/formats/SMI.hpp"
+#include "chemfiles/formats/XTC.hpp"
 
 #define SENTINEL_INDEX (static_cast<size_t>(-1))
 
@@ -38,7 +39,6 @@ using namespace chemfiles;
 namespace chemfiles {
     extern template class Molfile<DCD>;
     extern template class Molfile<TRR>;
-    extern template class Molfile<XTC>;
     extern template class Molfile<TRJ>;
     extern template class Molfile<LAMMPS>;
     extern template class Molfile<MOLDEN>;
@@ -63,11 +63,11 @@ FormatFactory::FormatFactory() {
     this->add_format<MMTFFormat>();
     this->add_format<CMLFormat>();
     this->add_format<SMIFormat>();
+    this->add_format<XTCFormat>();
 
     // VMD molfile plugins
     this->add_format<Molfile<DCD>>();
     this->add_format<Molfile<TRR>>();
-    this->add_format<Molfile<XTC>>();
     this->add_format<Molfile<TRJ>>();
     this->add_format<Molfile<LAMMPS>>();
     this->add_format<Molfile<MOLDEN>>();
