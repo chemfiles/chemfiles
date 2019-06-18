@@ -117,7 +117,7 @@ TEST_CASE("Errors in SDF format") {
             auto file = Trajectory(entry.path().string());
             file.read();
         };
-        CHECK_THROWS_AS(test(), FormatError);
+        CHECK_THROWS(test());
     }
 }
 
