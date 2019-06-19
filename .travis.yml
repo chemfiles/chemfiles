@@ -70,6 +70,7 @@ matrix:
         homebrew:
           packages:
             - gcc@5
+          update: true
 
 before_install:
   # Setting environement
