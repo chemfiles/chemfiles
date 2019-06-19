@@ -70,6 +70,7 @@ matrix:
         homebrew:
           packages:
             - gcc@5
+          update: true
     - name: MSVC 64-bit
       os: windows
       env: CMAKE_GENERATOR="Visual Studio 14 2015 Win64"
