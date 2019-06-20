@@ -24,6 +24,7 @@
 #include "chemfiles/formats/MOL2.hpp"
 #include "chemfiles/formats/mmCIF.hpp"
 #include "chemfiles/formats/CML.hpp"
+#include "chemfiles/formats/SMI.hpp"
 
 using namespace chemfiles;
 
@@ -53,6 +54,7 @@ FormatFactory::FormatFactory() {
     this->add_format<mmCIFFormat>();
     this->add_format<MMTFFormat>();
     this->add_format<CMLFormat>();
+    this->add_format<SMIFormat>();
 
     // VMD molfile plugins
     this->add_format<Molfile<DCD>>();
