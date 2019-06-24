@@ -170,11 +170,13 @@ TEST_CASE("Check parsing results") {
 TEST_CASE("Write SMI File") {
     auto tmpfile = NamedTempPath(".smi");
     const auto EXPECTED_CONTENT =
-    "C\n"
-    "CN\n"
-    "CN(P)O\n"
-    "CN(P(F)B)O\n"
-    ;
+R"(C
+CN
+CN(P)O
+CN(P(F)B)O
+C1N(P(F1)B)O
+C12N(P(F1)B2)O
+)";
 
     Frame frame;
     frame.add_atom(Atom("C"), {0, 0, 0});
@@ -197,7 +199,12 @@ TEST_CASE("Write SMI File") {
     frame.add_bond(2, 4);
     frame.add_bond(2, 5);
     file.write(frame);
-    
+
+    frame.add_bond(0, 4);
+    file.write(frame);
+
+    frame.add_bond(0, 5);
+    file.write(frame);
 
     file.close();
     std::ifstream checking(tmpfile);

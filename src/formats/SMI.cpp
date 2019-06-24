@@ -3,6 +3,7 @@
 
 #include <set>
 #include <cctype>
+#include <map>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -307,6 +308,9 @@ void SMIFormat::read(Frame& frame) {
         case '%': 
             check_ring(read_number(smiles, ++i)); // TODO: Fix this
         break;
+        case '*':
+            add_atom(topol, "*").set("wildcard", true);
+            break;
         case '[':
         case ']':
         case '+':
@@ -332,57 +336,193 @@ void SMIFormat::read(Frame& frame) {
     }
 }
 
-void SMIFormat::write(const Frame& frame) {
-    // Create a bond map as working with this is easier
-    std::vector<std::vector<size_t>> bonds(frame.size());
-    for (auto& bond : frame.topology().bonds()) {
-        bonds[bond[0]].push_back(bond[1]);
-        bonds[bond[1]].push_back(bond[0]);
+/// Depth first search to find all rings.
+/// Not gaurenteed to fast, nor efficient, but just to work
+/// Also not gaurenteed to find the SSSR, but it will find all rings
+/// needed for a given structure to be writen as SMILES
+/// \param adj_list The adjacentcy list graph
+/// \param hit_atoms Atoms already encountered
+/// \param ring_bonds Bonds already known to ring forming bonds
+/// \param ring_atoms Map from an atom to the number of rings it forms
+/// \param current_atom Atom to be checked in this iteration
+/// \param previous_atom Atom which was bound to the current atom
+static void find_rings_helper(
+    const std::vector<std::vector<size_t>>& adj_list,
+    std::vector<bool>& hit_atoms, std::set<Bond>& ring_bonds,
+    std::map<size_t, size_t>& ring_atoms,
+    size_t current_atom, size_t previous_atom) {
+
+    auto& current_atom_bonds = adj_list[current_atom];
+    hit_atoms[current_atom] = true;
+
+    for (auto neighbor : current_atom_bonds) {
+        // prevent back tracking
+        if (neighbor == previous_atom) {
+            continue;
+        }
+
+        // We've seen this neighbor before! Ring found
+        if (hit_atoms[neighbor]) {
+            // Don't process the same ring connection twice
+            if (ring_bonds.count(Bond(neighbor, current_atom))) {
+                continue;
+            }
+            ring_bonds.insert(Bond(neighbor, current_atom));
+
+            auto neigh_ring_iter = ring_atoms.find(neighbor);
+            if (neigh_ring_iter == ring_atoms.end()) {
+                neigh_ring_iter = ring_atoms.insert({neighbor, 0}).first;
+            }
+            ++neigh_ring_iter->second;
+
+            continue; // No need to see this atom again
+        }
+
+        // Continue the search
+        find_rings_helper(adj_list, hit_atoms, ring_bonds,
+                          ring_atoms, neighbor, current_atom);
+    }
+}
+
+static std::map<size_t, size_t> find_rings(
+    const std::vector<std::vector<size_t>>& adj_list) {
+
+    std::map<size_t, size_t> ring_atoms;
+    std::vector<bool> hit_atoms(adj_list.size(), false);
+    std::set<Bond> ring_bonds;
+    
+    while (!all(hit_atoms)) {
+        auto not_hit = std::find(hit_atoms.begin(), hit_atoms.end(), false);
+        auto current_atom = static_cast<size_t>(std::distance(hit_atoms.begin(), not_hit));
+        auto& current_atom_bonds = adj_list[current_atom];
+        hit_atoms[current_atom] = true;
+        if (current_atom_bonds.empty()) {
+            continue;
+        }
+
+        find_rings_helper(adj_list, hit_atoms, ring_bonds, ring_atoms,
+                          current_atom_bonds[0], current_atom
+        );
     }
 
-    //TODO: Use residues
-    std::vector<bool> written(frame.size(), false);
-    size_t next_atom = 0;
-    std::stack<size_t> branch_points;
-    //std::queue<size_t> rings;
+    return ring_atoms;
+}
 
-    while (!all(written)) {
-        const auto& current_bonds = bonds[next_atom];
+static void write_atom(
+    const std::vector<std::vector<size_t>>& adj_list,
+    const Frame& frame, std::unique_ptr<TextFile>& file,
+    std::vector<bool>& hit_atoms,
+    const std::map<size_t, size_t>& ring_atoms,
+    size_t current_atom, size_t previous_atom,
+    size_t& branch_stack,
+    std::multimap<size_t, size_t>& ring_stack, size_t& ring_count) {
 
-        fmt::print(*file_, frame[next_atom].type());
-        written[next_atom] = true;
+    if (hit_atoms[current_atom]) {
+        return;
+    }
 
-        if (current_bonds.size() == 0) {
-            break;
-        } else if (current_bonds.size() == 1) { //End of a branch point
-            if (written[current_bonds[0]]) { // We are done with a branch
-                if (branch_points.size()) {
-                    next_atom = branch_points.top();
-                    branch_points.pop();
-                    fmt::print(*file_, ")");
-                } else {
-                    break;
-                }
-            } else {
-                next_atom = current_bonds[0];
-            }
-        } else if (current_bonds.size() == 2 && next_atom == 0) {
-            branch_points.push(current_bonds[1]);
-            next_atom = current_bonds[0];
-        } else {
-            fmt::print(*file_, "(");
-            bool selected = false;
-            for (const auto& neighbor : current_bonds) {
-                if (!written[neighbor]) {
-                    if (!selected) {
-                        selected = true;
-                        next_atom = neighbor;
-                    } else {
-                        branch_points.push(neighbor);
-                    }
-                }
+    auto& current_atom_bonds = adj_list[current_atom];
+    hit_atoms[current_atom] = true;
+
+    fmt::print(*file, frame[current_atom].type());
+
+    // Prevent prining of additional '('
+    size_t ring_start = 0;
+
+    auto any_rings = ring_atoms.find(current_atom);
+    if (any_rings != ring_atoms.end()) {
+        for (size_t i = 0; i < any_rings->second; ++i) {
+            ring_count++;
+            ring_start++;
+            fmt::print(*file, "{}", ring_count);
+            ring_stack.insert({current_atom, ring_count});
+        }
+    }
+
+    // Avoid the prining of branch begin/end
+    size_t ring_end = 0;
+
+    // Find all ring connections first
+    for (auto neighbor : current_atom_bonds) {
+        // avoid 'trivial' rings
+        if (neighbor == previous_atom) {
+            continue;
+        }
+
+        // We must have a ring
+        if (hit_atoms[neighbor]) {
+            auto ring = ring_stack.find(neighbor);
+            if (ring != ring_stack.end()) {
+                fmt::print(*file, "{}", ring->second);
+                ring_stack.erase(ring);
+                ring_end++;
             }
         }
+    }
+
+    size_t neighbors_printed = 0;
+    for (auto neighbor : current_atom_bonds) {
+        // prevent back tracking
+        if (neighbor == previous_atom) {
+            continue;
+        }
+
+        if (hit_atoms[neighbor]) {
+            continue;
+        }
+
+        if (neighbors_printed - ring_start <
+            current_atom_bonds.size() - 2 &&
+            current_atom_bonds.size() > 2) {
+            fmt::print(*file, "(");
+            branch_stack++;
+        }
+
+        write_atom(adj_list, frame, file, hit_atoms, ring_atoms,
+            neighbor, current_atom, branch_stack, ring_stack, ring_count);
+
+        neighbors_printed++;
+    }
+
+    // End of branch
+    if (current_atom_bonds.size() - ring_end == 1 && branch_stack != 0) {
+        fmt::print(*file, ")");
+        branch_stack--;
+    }
+}
+
+void SMIFormat::write(const Frame& frame) {
+    
+    if (frame.size() == 0) {
+        fmt::print(*file_, "\n");
+        return;
+    }
+
+    if (frame.size() == 1) {
+        fmt::print(*file_, frame[0].type());
+        fmt::print(*file_, "\n");
+        return;
+    }
+
+    // Create an adjacent list as working with this is easier
+    std::vector<std::vector<size_t>> adj_list(frame.size());
+    for (auto& bond : frame.topology().bonds()) {
+        adj_list[bond[0]].push_back(bond[1]);
+        adj_list[bond[1]].push_back(bond[0]);
+    }
+
+    auto ring_atoms = find_rings(adj_list);
+
+    std::vector<bool> written(frame.size(), false);
+    size_t branch_stack = 0;
+
+    std::multimap<size_t, size_t> ring_stack;
+    size_t ring_count = 0;
+
+    while (!all(written)) {
+        auto not_hit = std::find(written.begin(), written.end(), false);
+        auto current_atom = static_cast<size_t>(std::distance(written.begin(), not_hit));
+        write_atom(adj_list, frame, file_, written, ring_atoms, current_atom, -1, branch_stack, ring_stack, ring_count);
     }
 
     fmt::print(*file_, "\n");
