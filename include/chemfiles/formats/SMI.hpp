@@ -32,28 +32,52 @@ private:
     /// just `seekg` them instead of reading the whole step.
     std::vector<std::streampos> steps_positions_;
 
-    /// Stores location of a branching path
+    /// [for reading] Stores location of a branching path
     std::stack<size_t> branch_point_;
 
-    /// Stores a mapping between a ring ID and the atom which starts the ring
-    /// and a stored bond order
+    /// [for reading] Stores a mapping between a ring ID and the atom which
+    /// starts the ring and a stored bond order
     std::map <size_t, std::pair<size_t, Bond::BondOrder>> rings_ids_;
 
-    /// The current atom being added (active atom)
+    /// [for reading] The current atom being added (active atom)
     size_t current_atom_;
 
-    /// The previous active atom
+    /// [for reading] The previous active atom
     size_t previous_atom_;
 
-    /// The current bond ordeer
+    /// [for reading] The current bond ordeer
     Bond::BondOrder current_bond_order_;
 
-    /// Should we connect the previous atom to the first atom
+    /// [for reading] Should we connect the previous atom to the first atom
+    /// [for writing] Should we add a '.' after the current molecule
     bool first_atom_;
 
+    /// [for reading] adds an atom defined by `atom_name` to the topology
     Atom& add_atom(Topology& topo, const std::string& atom_name);
 
+    /// [for reading] adds an atom defined by the string `smiles` starting at position i
     void process_property_list_(Topology& topo, const std::string& smiles, size_t& i);
+
+    /// [for writing] stores the graph of the topology
+    std::vector<std::vector<size_t>> adj_list_;
+
+    /// [for writing] stores how many branches need to be closed
+    size_t branch_stack_;
+
+    /// [for writing] stores locations of ring closures
+    std::multimap<size_t, size_t> ring_stack_;
+
+    /// [for writing] stores how many rings we need to close
+    size_t ring_count_;
+
+    /// [for writing] stores how many rings each atom is in
+    std::map<size_t, size_t> ring_atoms_;
+
+    /// [for writing] writes a single atom to the internal file
+    /// this function is recursive
+    void write_atom(const Frame& frame,
+        std::vector<bool>& hit_atoms,
+        size_t current_atom, size_t previous_atom);
 };
 
 template<> FormatInfo format_information<SMIFormat>();
