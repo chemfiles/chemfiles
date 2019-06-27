@@ -176,6 +176,7 @@ CN(P)O
 CN(P(F)B)O
 C1N(P(F1)B)O
 C12N(P(F1)B2)O
+[WH5+3].[35Cl-1].[c:1H].[te]
 )";
 
     Frame frame;
@@ -204,6 +205,26 @@ C12N(P(F1)B2)O
     file.write(frame);
 
     frame.add_bond(0, 5);
+    file.write(frame);
+
+    // Reinitialize
+    frame = Frame();
+    frame.add_atom(Atom("W"), {0, 0, 0});
+    frame[0].set_charge(3);
+    frame[0].set("explicit_hydrogens", 5);
+
+    frame.add_atom(Atom("Cl"), {0, 0, 0});
+    frame[1].set_charge(-1);
+    frame[1].set_mass(35);
+
+    frame.add_atom(Atom("C"), {0, 0, 0});
+    frame[2].set("is_aromatic", true);
+    frame[2].set("smiles_class", 1);
+    frame[2].set("explicit_hydrogens", 1);
+
+    frame.add_atom(Atom("Te"), {0, 0, 0});
+    frame[3].set("is_aromatic", true);
+
     file.write(frame);
 
     file.close();
