@@ -4,6 +4,7 @@
 #include <set>
 #include <cctype>
 #include <map>
+#include <algorithm>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -104,7 +105,6 @@ Atom& SMIFormat::add_atom(Topology& topol, const std::string& atom_name) {
     first_atom_ = false;
     previous_atom_ = current_atom_;
     current_bond_order_ = Bond::SINGLE;
-    //molVect.back().add_atom(topol.size() - 1);
     return topol[topol.size() - 1];
 }
 
@@ -408,34 +408,100 @@ static std::map<size_t, size_t> find_rings(
     return ring_atoms;
 }
 
-static void write_atom(
-    const std::vector<std::vector<size_t>>& adj_list,
-    const Frame& frame, std::unique_ptr<TextFile>& file,
-    std::vector<bool>& hit_atoms,
-    const std::map<size_t, size_t>& ring_atoms,
-    size_t current_atom, size_t previous_atom,
-    size_t& branch_stack,
-    std::multimap<size_t, size_t>& ring_stack, size_t& ring_count) {
+static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom) {
+    bool needs_brackets = false;
+    auto type = atom.type();
+
+    double mass;
+    size_t mass_int = 0;
+    if (std::modf(atom.mass(), &mass) == 0.0 && mass != 0.0) {
+        needs_brackets = true;
+        mass_int = static_cast<size_t>(mass);
+    }
+
+    auto smi_class = atom.get("smiles_class");
+    auto chirality = atom.get<Property::STRING>("chirality").value_or("");
+    auto explicit_h =atom.get<Property::DOUBLE>("explicit_hydrogens").value_or(0.0);
+
+    double charge;
+    int charge_int = 0;
+    if (std::modf(atom.charge(), &charge) == 0.0 && charge != 0.0) {
+        needs_brackets = true;
+        charge_int = static_cast<int>(charge);
+    }
+
+    if (explicit_h != 0.0 || smi_class || !chirality.empty() ||
+        aliphatic_organic.count(type) == 0) {
+        needs_brackets = true;
+    }
+
+    auto is_aromatic = atom.get<Property::BOOL>("is_aromatic").value_or(false);
+
+    if (is_aromatic) {
+        if (type.size() > 1) {
+            needs_brackets = true;
+        }
+        std::transform(type.begin(), type.end(), type.begin(), ::tolower);
+    }
+
+    if (needs_brackets) {
+        fmt::print(*file_, "[");
+    }
+
+    if (mass_int != 0) {
+        fmt::print(*file_, "{}", mass_int);
+    }
+
+    fmt::print(*file_, "{}", type);
+
+    if (smi_class && smi_class->kind() == Property::DOUBLE) {
+        fmt::print(*file_, ":{}", static_cast<int>(smi_class->as_double()));
+    }
+
+    if (explicit_h == 1.0) {
+        fmt::print(*file_, "H");
+    }
+
+    if (explicit_h > 1.0) {
+        fmt::print(*file_, "H{}", static_cast<int>(explicit_h));
+    }
+
+    if (charge_int < 0) {
+        fmt::print(*file_, "{}", charge_int);
+    }
+
+    if (charge_int > 0) {
+        fmt::print(*file_, "+{}", charge_int);
+    }
+
+    if (needs_brackets) {
+        fmt::print(*file_, "]");
+    }
+}
+
+void SMIFormat::write_atom(
+    const Frame& frame, std::vector<bool>& hit_atoms,
+    size_t current_atom, size_t previous_atom) {
 
     if (hit_atoms[current_atom]) {
         return;
     }
 
-    auto& current_atom_bonds = adj_list[current_atom];
+    auto& current_atom_bonds = adj_list_[current_atom];
     hit_atoms[current_atom] = true;
 
-    fmt::print(*file, frame[current_atom].type());
+    write_atom_smiles(file_, frame[current_atom]);
 
     // Prevent prining of additional '('
     size_t ring_start = 0;
 
-    auto any_rings = ring_atoms.find(current_atom);
-    if (any_rings != ring_atoms.end()) {
+    auto any_rings = ring_atoms_.find(current_atom);
+    if (any_rings != ring_atoms_.end()) {
         for (size_t i = 0; i < any_rings->second; ++i) {
-            ring_count++;
+            ring_count_++;
             ring_start++;
-            fmt::print(*file, "{}", ring_count);
-            ring_stack.insert({current_atom, ring_count});
+            fmt::print(*file_, "{}", ring_count_);
+            ring_stack_.insert({current_atom, ring_count_});
         }
     }
 
@@ -451,10 +517,10 @@ static void write_atom(
 
         // We must have a ring
         if (hit_atoms[neighbor]) {
-            auto ring = ring_stack.find(neighbor);
-            if (ring != ring_stack.end()) {
-                fmt::print(*file, "{}", ring->second);
-                ring_stack.erase(ring);
+            auto ring = ring_stack_.find(neighbor);
+            if (ring != ring_stack_.end()) {
+                fmt::print(*file_, "{}", ring->second);
+                ring_stack_.erase(ring);
                 ring_end++;
             }
         }
@@ -467,62 +533,73 @@ static void write_atom(
             continue;
         }
 
+        // This got taken care of by printing a ring
         if (hit_atoms[neighbor]) {
             continue;
         }
 
-        if (neighbors_printed - ring_start <
-            current_atom_bonds.size() - 2 &&
+        // To print a start bracket, we need to be branching (> 2 non-ring bonds)
+        // and we don't want to brank the last neighbor printed
+        if (neighbors_printed - ring_start < current_atom_bonds.size() - 2 &&
             current_atom_bonds.size() > 2) {
-            fmt::print(*file, "(");
-            branch_stack++;
+            fmt::print(*file_, "(");
+            branch_stack_++;
         }
 
-        write_atom(adj_list, frame, file, hit_atoms, ring_atoms,
-            neighbor, current_atom, branch_stack, ring_stack, ring_count);
+        // DFS like recursion
+        write_atom(frame, hit_atoms, neighbor, current_atom);
 
+        // we printed a neighbor, if there's more than 1 neighbor, then we need to
+        // branch for all but the last neighbor
         neighbors_printed++;
     }
 
     // End of branch
-    if (current_atom_bonds.size() - ring_end == 1 && branch_stack != 0) {
-        fmt::print(*file, ")");
-        branch_stack--;
+    if (current_atom_bonds.size() - ring_end == 1 && branch_stack_ != 0) {
+        fmt::print(*file_, ")");
+        branch_stack_--;
     }
 }
 
 void SMIFormat::write(const Frame& frame) {
-    
+
     if (frame.size() == 0) {
         fmt::print(*file_, "\n");
         return;
     }
 
     if (frame.size() == 1) {
-        fmt::print(*file_, frame[0].type());
+        write_atom_smiles(file_, frame[0]);
         fmt::print(*file_, "\n");
         return;
     }
 
     // Create an adjacent list as working with this is easier
-    std::vector<std::vector<size_t>> adj_list(frame.size());
+    adj_list_.clear();
+    adj_list_.resize(frame.size());
     for (auto& bond : frame.topology().bonds()) {
-        adj_list[bond[0]].push_back(bond[1]);
-        adj_list[bond[1]].push_back(bond[0]);
+        adj_list_[bond[0]].push_back(bond[1]);
+        adj_list_[bond[1]].push_back(bond[0]);
     }
 
-    auto ring_atoms = find_rings(adj_list);
+    ring_atoms_ = find_rings(adj_list_);
 
     std::vector<bool> written(frame.size(), false);
-    size_t branch_stack = 0;
+    branch_stack_ = 0;
 
-    std::multimap<size_t, size_t> ring_stack;
-    size_t ring_count = 0;
+    ring_stack_.clear();
+    ring_count_ = 0;
+
+    first_atom_= true;
 
     while (!all(written)) {
+        if (!first_atom_) {
+            fmt::print(*file_, ".");
+        }
         auto not_hit = std::find(written.begin(), written.end(), false);
         auto current_atom = static_cast<size_t>(std::distance(written.begin(), not_hit));
-        write_atom(adj_list, frame, file_, written, ring_atoms, current_atom, -1, branch_stack, ring_stack, ring_count);
+        write_atom(frame, written, current_atom, 0);
+        first_atom_ = false;
     }
 
     fmt::print(*file_, "\n");
