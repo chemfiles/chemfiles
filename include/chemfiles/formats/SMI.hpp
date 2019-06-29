@@ -48,6 +48,9 @@ private:
     /// [for reading] The current bond ordeer
     Bond::BondOrder current_bond_order_;
 
+    /// [for reading] The
+    std::vector<Residue> mol_vector_;
+
     /// [for reading] Should we connect the previous atom to the first atom
     /// [for writing] Should we add a '.' after the current molecule
     bool first_atom_;
