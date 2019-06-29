@@ -497,6 +497,24 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
     }
 }
 
+void print_bond(std::unique_ptr<TextFile>& file_, chemfiles::Bond::BondOrder bo) {
+    switch(bo) {
+    case Bond::SINGLE: break;
+    case Bond::DOUBLE: fmt::print(*file_, "="); break;
+    case Bond::TRIPLE: fmt::print(*file_, "#"); break;
+    case Bond::QUADRUPLE: fmt::print(*file_, "$"); break;
+    case Bond::AROMATIC: fmt::print(*file_, ":"); break;
+    case Bond::DATIVEL: fmt::print(*file_, "<-"); break;
+    case Bond::DATIVER: fmt::print(*file_, "->"); break;
+    case Bond::UP: fmt::print(*file_, "/"); break;
+    case Bond::DOWN: fmt::print(*file_, "\\"); break;
+    case Bond::UNKNOWN:
+    default:
+        fmt::print(*file_, "~");
+        break;
+    }
+}
+
 void SMIFormat::write_atom(
     const Frame& frame, std::vector<bool>& hit_atoms,
     size_t current_atom, size_t previous_atom) {
@@ -508,9 +526,14 @@ void SMIFormat::write_atom(
     auto& current_atom_bonds = adj_list_[current_atom];
     hit_atoms[current_atom] = true;
 
+    if (current_atom != previous_atom) {
+        print_bond(file_,
+                   frame.topology().bond_order(previous_atom, current_atom)
+        );
+    }
     write_atom_smiles(file_, frame[current_atom]);
 
-    // Prevent prining of additional '('
+    // Prevent printing of additional '('
     size_t ring_start = 0;
 
     auto any_rings = ring_atoms_.find(current_atom);
@@ -537,6 +560,9 @@ void SMIFormat::write_atom(
         if (hit_atoms[neighbor]) {
             auto ring = ring_stack_.find(neighbor);
             if (ring != ring_stack_.end()) {
+                print_bond(file_,
+                    frame.topology().bond_order(current_atom, neighbor)
+                );
                 fmt::print(*file_, "{}", ring->second);
                 ring_stack_.erase(ring);
                 ring_end++;
@@ -616,7 +642,7 @@ void SMIFormat::write(const Frame& frame) {
         }
         auto not_hit = std::find(written.begin(), written.end(), false);
         auto current_atom = static_cast<size_t>(std::distance(written.begin(), not_hit));
-        write_atom(frame, written, current_atom, 0);
+        write_atom(frame, written, current_atom, current_atom);
         first_atom_ = false;
     }
 
