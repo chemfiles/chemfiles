@@ -16,6 +16,7 @@
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/periodic_table.hpp"
 #include "chemfiles/warnings.hpp"
+#include "chemfiles/utils.hpp"
 
 using namespace chemfiles;
 
@@ -108,6 +109,7 @@ Atom& SMIFormat::add_atom(Topology& topol, const std::string& atom_name) {
     first_atom_ = false;
     previous_atom_ = current_atom_;
     current_bond_order_ = Bond::SINGLE;
+    mol_vector_.back().add_atom(topol.size() - 1);
     return topol[topol.size() - 1];
 }
 
@@ -179,21 +181,20 @@ void SMIFormat::process_property_list_(Topology& topol, const std::string& smile
 }
 
 void SMIFormat::read(Frame& frame) {
+    // Initialize all the reading variables
     branch_point_ = std::stack<size_t>(); 
     rings_ids_.clear();
-
+    mol_vector_.clear();
     current_atom_ = 0;
-
     previous_atom_ = 0;
     current_bond_order_ = Bond::SINGLE;
     first_atom_ = true;
 
     Topology topol;
-    std::vector<Residue> molVect;
     size_t groupid = 1;
-    molVect.push_back(Residue("group " + std::to_string(groupid)));
+    mol_vector_.push_back(Residue("group " + std::to_string(groupid)));
 
-    auto smiles = file_->readline();
+    auto smiles = trim(file_->readline());
 
     auto check_ring =
     [&](size_t ring_id) {
@@ -222,7 +223,7 @@ void SMIFormat::read(Frame& frame) {
     size_t i;
     for (i = 0; i < smiles.size(); ++i) {
 
-        if (topol.size() != 0 && std::isblank(smiles[i]) != 0) {
+        if (std::isblank(smiles[i]) != 0) {
             break;
         }
 
@@ -283,8 +284,9 @@ void SMIFormat::read(Frame& frame) {
                 first_atom_ = true;
                 current_atom_++;
             }
-            molVect.push_back(Residue("group " + std::to_string(groupid)));
+            mol_vector_.push_back(Residue("group " + std::to_string(groupid)));
             break;
+        case '>': ++groupid; break;
         case '/': current_bond_order_ = Bond::UP; break;
         case '\\': current_bond_order_ = Bond::DOWN; break;
         case '~': current_bond_order_ = Bond::UNKNOWN; break;
@@ -301,7 +303,7 @@ void SMIFormat::read(Frame& frame) {
                 current_bond_order_ = Bond::DATIVEL;
                 ++i;
             } else {
-                ++groupid;
+                ++groupid; // Non-standard, otherwise it's an unknown character
             }
             break;
         case '=': current_bond_order_ = Bond::DOUBLE; break;
@@ -315,9 +317,12 @@ void SMIFormat::read(Frame& frame) {
             previous_atom_ = branch_point_.top();
             branch_point_.pop();
             break;
-        case '%': 
-            check_ring(read_number(smiles, ++i)); // TODO: Fix this
-        break;
+        case '%':
+            if (i + 2 >= smiles.size()) {
+                throw format_error("SMI Reader", "rings defined with '%' must be double digits");
+            }
+            check_ring(parse<size_t>(smiles.substr(i + 1, 2)));
+            break;
         case '*':
             add_atom(topol, "*").set("wildcard", true);
             break;
@@ -325,15 +330,15 @@ void SMIFormat::read(Frame& frame) {
         case ']':
         case '+':
         case '@':
-            warning("SMI Reader", "symbol not allowed outside of property: '{}'", smiles[i]);
+            throw format_error("SMI Reader", "symbol not allowed outside of property: '{}'", smiles[i]);
             break;
         default:
-            warning("SMI Reader", "unknown symbol: '{}'", smiles[i]);
+            throw format_error("SMI Reader", "unknown symbol: '{}'", smiles[i]);
             break;
         }
     }
 
-    for (auto res : molVect) {
+    for (auto res : mol_vector_) {
         topol.add_residue(std::move(res));
     }
 
@@ -350,7 +355,7 @@ void SMIFormat::read(Frame& frame) {
 
     if (i < smiles.size()) {
         auto name = smiles.substr(i);
-        frame.set("name", name);
+        frame.set("name", trim(name));
     }
 }
 
@@ -430,6 +435,9 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
     bool needs_brackets = false;
     auto type = atom.type();
 
+    // The mass must be an integer is the only check we need as all atoms in the
+    // periodic table do have non-integer masses. Therefore, if the the mass is
+    // not an integer, then we know the user has set an isotope
     double mass;
     size_t mass_int = 0;
     if (std::modf(atom.mass(), &mass) == 0.0 && mass != 0.0) {
@@ -437,10 +445,12 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
         mass_int = static_cast<size_t>(mass);
     }
 
+    // If any of these values are set / not a default value
     auto smi_class = atom.get("smiles_class");
     auto chirality = atom.get<Property::STRING>("chirality").value_or("");
     auto explicit_h =atom.get<Property::DOUBLE>("explicit_hydrogens").value_or(0.0);
 
+    // Charge is similar to mass. It must be an integer, otherwise it is ignored
     double charge;
     int charge_int = 0;
     if (std::modf(atom.charge(), &charge) == 0.0 && charge != 0.0) {
@@ -448,6 +458,7 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
         charge_int = static_cast<int>(charge);
     }
 
+    // Before the atom is printed, we must know if we are printing a property set.
     if (explicit_h != 0.0 || smi_class || !chirality.empty() ||
         aliphatic_organic.count(type) == 0) {
         needs_brackets = true;
@@ -456,6 +467,9 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
     auto is_aromatic = atom.get<Property::BOOL>("is_aromatic").value_or(false);
 
     if (is_aromatic) {
+        // We need to print brackets for aromatic Te, Se, As, and Si
+        // Note, we allow aromatic Bromine to be bare (no brackets) in following
+        // ChemAxon's standard.
         if (type.size() > 1) {
             needs_brackets = true;
         }
@@ -466,6 +480,7 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
         fmt::print(*file_, "[");
     }
 
+    // Mass must be first, before the element is printed
     if (mass_int != 0) {
         fmt::print(*file_, "{}", mass_int);
     }
@@ -474,6 +489,19 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
 
     if (smi_class && smi_class->kind() == Property::DOUBLE) {
         fmt::print(*file_, ":{}", static_cast<int>(smi_class->as_double()));
+    }
+
+    if (chirality != "") {
+        // If it's clockwise, then we just print the symbol @@ and be done with it
+        if (chirality.find("CW") == 0) {
+            fmt::print(*file_, "@@");
+        } else {
+            fmt::print(*file_, "@");
+            // TODO check if the chirality flag is valid instead of trusting the user
+            if (chirality.size() > 4) {
+                fmt::print(*file_, "{}", chirality.substr(4));
+            }
+        }
     }
 
     if (explicit_h == 1.0) {
@@ -485,11 +513,16 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
     }
 
     if (charge_int < 0) {
-        fmt::print(*file_, "{}", charge_int);
+        fmt::print(*file_, "-", charge_int);
     }
 
     if (charge_int > 0) {
-        fmt::print(*file_, "+{}", charge_int);
+        fmt::print(*file_, "+", charge_int);
+    }
+
+    charge_int = std::abs(charge_int);
+    if (charge_int != 1 && charge_int != 0) {
+        fmt::print(*file_, "{}", charge_int);
     }
 
     if (needs_brackets) {
@@ -497,7 +530,7 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
     }
 }
 
-void print_bond(std::unique_ptr<TextFile>& file_, chemfiles::Bond::BondOrder bo) {
+static void print_bond(std::unique_ptr<TextFile>& file_, chemfiles::Bond::BondOrder bo) {
     switch(bo) {
     case Bond::SINGLE: break;
     case Bond::DOUBLE: fmt::print(*file_, "="); break;
@@ -612,12 +645,6 @@ void SMIFormat::write(const Frame& frame) {
         return;
     }
 
-    if (frame.size() == 1) {
-        write_atom_smiles(file_, frame[0]);
-        fmt::print(*file_, "\n");
-        return;
-    }
-
     // Create an adjacent list as working with this is easier
     adj_list_.clear();
     adj_list_.resize(frame.size());
@@ -644,6 +671,11 @@ void SMIFormat::write(const Frame& frame) {
         auto current_atom = static_cast<size_t>(std::distance(written.begin(), not_hit));
         write_atom(frame, written, current_atom, current_atom);
         first_atom_ = false;
+    }
+
+    auto name = frame.get("name");
+    if (name && name->kind() == Property::STRING) {
+        fmt::print(*file_, "\t{}", name->as_string());
     }
 
     fmt::print(*file_, "\n");

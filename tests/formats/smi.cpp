@@ -16,7 +16,7 @@ namespace fs=boost::filesystem;
 TEST_CASE("Read files in SMI format") {
     SECTION("Check nsteps") {
         Trajectory file1("data/smi/test.smi");
-        CHECK(file1.nsteps() == 6);
+        CHECK(file1.nsteps() == 8);
     }
 
     SECTION("Read next frame") {
@@ -188,6 +188,7 @@ TEST_CASE("Check parsing results") {
         auto frame = file.read();
         frame = file.read();
         CHECK(frame[0].get("is_aromatic")->as_bool());
+        CHECK(frame.get("name")->as_string() == "Benzene");
 
         while (!file.done()) {
             frame = file.read();
@@ -217,7 +218,7 @@ TEST_CASE("Errors in SMI format") {
         CHECK_THROWS(test());
     }
 }
-#include <iostream>
+
 TEST_CASE("Write SMI File") {
     auto tmpfile = NamedTempPath(".smi");
     const auto EXPECTED_CONTENT =
@@ -226,8 +227,8 @@ C~N
 C~N(P)=O
 C~N(P(#F)$B)=O
 C1~N(P(#F:1)$B)=O
-C12~N(P(#F:1)$B/2)=O
-[WH5+3].[35Cl-1]->[c:1H]<-[te]\[C]
+C12~N(P(#F:1)$B/2)=O	test
+[WH5+3].[35Cl-]->[c:1H]<-[te@SP3]\[C@@]
 )";
 
     Frame frame;
@@ -256,6 +257,7 @@ C12~N(P(#F:1)$B/2)=O
     file.write(frame);
 
     frame.add_bond(0, 5, Bond::UP);
+    frame.set("name", "test");
     file.write(frame);
 
     // Reinitialize
@@ -275,9 +277,10 @@ C12~N(P(#F:1)$B/2)=O
 
     frame.add_atom(Atom("Te"), {0, 0, 0});
     frame[3].set("is_aromatic", true);
+    frame[3].set("chirality", "CCW SP3");
 
     frame.add_atom(Atom("C"), {0, 0, 0});
-    frame[4].set("chirality", "CCW");
+    frame[4].set("chirality", "CW");
 
     frame.add_bond(1, 2, Bond::DATIVER);
     frame.add_bond(2, 3, Bond::DATIVEL);
