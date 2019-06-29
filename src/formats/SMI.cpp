@@ -75,9 +75,12 @@ static size_t read_number(const std::string& smiles, size_t& start) {
 
 static std::set<char> aromatic_organic {'b', 'c', 'n', 'o', 's', 'p'};
 
-// Note: Including H here is non-standard
+// Note: Including H here is non-standard, but allows for HC(H)(H)H
 static std::set<std::string> aliphatic_organic {"B", "C", "N", "O", "S", "P",
                                                 "F", "Cl", "Br", "I", "H"};
+
+// Valid chirality tags
+static std::set<std::string> chirality_tags {"TH", "SP", "TB", "OH", "AL"};
 
 static std::string read_property_atom(const std::string& smiles, size_t& i) {
     auto old = i;
@@ -129,7 +132,7 @@ void SMIFormat::process_property_list_(Topology& topol, const std::string& smile
 
     while( i < smiles.size() && smiles[i] != ']') {
         size_t count_or_class = 0;
-        std::string chirality_type = "";
+        std::string chirality_type = "CCW";
         switch (smiles[i]) {
         case 'H':
             count_or_class = read_number(smiles, ++i);
@@ -156,24 +159,14 @@ void SMIFormat::process_property_list_(Topology& topol, const std::string& smile
         case '@':
             // Set the direction of the chirality
             if (i + 1 < smiles.size() && smiles[i + 1] == '@') {
-                chirality_type = "clockwise";
+                chirality_type = "CW";
                 ++i;
-            } else {
-                chirality_type = "counter-clockwise";
-            }
-
-            // Set the type of the chirality
-            if (i + 2 < smiles.size() && smiles.substr(i + 1, 2) == "SP") {
-                chirality_type += " square planar";
+            } else if (i + 2 < smiles.size() &&
+                       chirality_tags.count(smiles.substr(i + 1, 2)) != 0) {
+                // Set the type of the chirality
+                chirality_type += " " + smiles.substr(i + 1, 2);
                 i += 2;
-            }
-            if (i + 2 < smiles.size() && smiles.substr(i + 1, 2) == "TB") {
-                chirality_type += " trigonal bipyramidal";
-                i += 2;
-            }
-            if (i + 2 < smiles.size() && smiles.substr(i + 1, 2) == "OH") {
-                chirality_type += " octahedral";
-                i += 2;
+                chirality_type += std::to_string(read_number(smiles, ++i));
             }
             new_atom.set("chirality", chirality_type);
             break;
@@ -197,7 +190,8 @@ void SMIFormat::read(Frame& frame) {
 
     Topology topol;
     std::vector<Residue> molVect;
-    molVect.push_back(Residue("mol"));
+    size_t groupid = 1;
+    molVect.push_back(Residue("group " + std::to_string(groupid)));
 
     auto smiles = file_->readline();
 
@@ -234,6 +228,7 @@ void SMIFormat::read(Frame& frame) {
 
         if (smiles[i] == '[') {
             // TODO: Don't pass the full string, instead pass an iterator
+            // or maybe a substring till the closing ']'
             process_property_list_(topol, smiles, ++i);
             continue;
         }
@@ -243,7 +238,7 @@ void SMIFormat::read(Frame& frame) {
         // a single character element in the organic subset.
         if (std::islower(smiles[i]) != 0) {
             if (aromatic_organic.count(smiles[i]) == 0) {
-                throw format_error("SMI Reader", "element not found: '{}'", smiles[i]);
+                throw format_error("SMI Reader", "aromatic element not found: '{}'", smiles[i]);
             }
             add_atom(topol, smiles.substr(i, 1)).set("is_aromatic", true);
             continue;
@@ -288,12 +283,27 @@ void SMIFormat::read(Frame& frame) {
                 first_atom_ = true;
                 current_atom_++;
             }
-            molVect.push_back(Residue("mol"));
+            molVect.push_back(Residue("group " + std::to_string(groupid)));
             break;
         case '/': current_bond_order_ = Bond::UP; break;
         case '\\': current_bond_order_ = Bond::DOWN; break;
         case '~': current_bond_order_ = Bond::UNKNOWN; break;
-        case '-': current_bond_order_ = Bond::SINGLE;break;
+        case '-':
+            if (i + 1 < smiles.size() && smiles[i] == '>') {
+                current_bond_order_ = Bond::DATIVER;
+                ++i;
+            } else {
+                current_bond_order_ = Bond::SINGLE;
+            }
+            break;
+        case '<':
+            if (i + 1 < smiles.size() && smiles[i] == '-') {
+                current_bond_order_ = Bond::DATIVEL;
+                ++i;
+            } else {
+                ++groupid;
+            }
+            break;
         case '=': current_bond_order_ = Bond::DOUBLE; break;
         case '#': current_bond_order_ = Bond::TRIPLE; break;
         case '$': current_bond_order_ = Bond::QUADRUPLE; break;
@@ -325,6 +335,14 @@ void SMIFormat::read(Frame& frame) {
 
     for (auto res : molVect) {
         topol.add_residue(std::move(res));
+    }
+
+    if (!branch_point_.empty()) {
+        throw format_error("SMI Reader", "{} unclosed '('(s)", branch_point_.size());
+    }
+
+    if (!rings_ids_.empty()) {
+        throw format_error("SMI Reader", "{} unclosed ringid '{}'", rings_ids_.begin()->first);
     }
 
     frame.resize(topol.size());
