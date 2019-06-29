@@ -148,9 +148,9 @@ TEST_CASE("Check parsing results") {
 
         // [CH2+]C[CH+2]
         frame = file.read_step(6);
-        CHECK(frame[0].get<Property::DOUBLE>("explicit_hydrogens") == 2.0);
+        CHECK(frame[0].get<Property::DOUBLE>("hydrogen_count") == 2.0);
         CHECK(frame[0].charge() == 1.0);
-        CHECK(frame[2].get<Property::DOUBLE>("explicit_hydrogens") == 1.0);
+        CHECK(frame[2].get<Property::DOUBLE>("hydrogen_count") == 1.0);
         CHECK(frame[2].charge() == 2.0);
 
         // C1CC=1
@@ -264,7 +264,7 @@ C12~N(P(#F:1)$B/2)=O	test
     frame = Frame();
     frame.add_atom(Atom("W"), {0, 0, 0});
     frame[0].set_charge(3);
-    frame[0].set("explicit_hydrogens", 5);
+    frame[0].set("hydrogen_count", 5);
 
     frame.add_atom(Atom("Cl"), {0, 0, 0});
     frame[1].set_charge(-1);
@@ -273,7 +273,7 @@ C12~N(P(#F:1)$B/2)=O	test
     frame.add_atom(Atom("C"), {0, 0, 0});
     frame[2].set("is_aromatic", true);
     frame[2].set("smiles_class", 1);
-    frame[2].set("explicit_hydrogens", 1);
+    frame[2].set("hydrogen_count", 1);
 
     frame.add_atom(Atom("Te"), {0, 0, 0});
     frame[3].set("is_aromatic", true);
