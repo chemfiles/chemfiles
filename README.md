@@ -109,6 +109,7 @@ Chemfiles can read and write files in the following formats:
 - TRIPOS mol2 files;
 - MacroMolecular Crystallographic Information Framework (CIF) files;
 - MacroMolecular Transmission Format (MMTF) files;
+- Daylight SMILES: .smi;
 
 For text-based formats (XYZ, PDB, LAMMPS Data, Tinker, ...) Chemfiles will
 transparently read compressed files if the file extension matches the expected

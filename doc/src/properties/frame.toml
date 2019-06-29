@@ -8,6 +8,7 @@ SDF = "The first line of an SDF file is used as the frame **name** when reading.
 MOL2 = "The first line after ``@<TRIPOS>MOLECULE`` is used as the frame **name** when reading."
 MMTF = "The text in the ``title`` field is used as the frame **name** when reading."
 mmCIF = "The text in the ``_struct.title`` field is used as the frame **name** when reading."
+SMI = "Any string after a terminating (blank) character in a SMILES string."
 
 [classification]
 type = "string"
