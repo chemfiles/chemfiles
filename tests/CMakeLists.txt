@@ -1,5 +1,5 @@
 # Update this value if you need to update the data file set
-set(TESTS_DATA_GIT "8e29d19823647e8a0abf6c1b9f090c123bfd8c72")
+set(TESTS_DATA_GIT "5e966e133dbdb75683cd63148c6a166f39f29a44")
 
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT}")
     message(STATUS "Downloading test data files")
@@ -7,7 +7,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT}")
         "https://github.com/chemfiles/tests-data/archive/${TESTS_DATA_GIT}.tar.gz"
         "${CMAKE_CURRENT_BINARY_DIR}/${TESTS_DATA_GIT}.tar.gz"
         SHOW_PROGRESS
-        EXPECTED_HASH SHA1=9cb71fda9ec189c28eced0308ce895289b2b9f22
+        EXPECTED_HASH SHA1=2f17efd344e5c1f210b01d9cc193fa7424bcfc75
     )
 
     message(STATUS "Unpacking test data files")

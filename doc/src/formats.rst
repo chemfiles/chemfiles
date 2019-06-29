@@ -46,6 +46,8 @@ specify which format to use.
     +---------------------+------------+-------+-------+-------------+-------+
     | `SDF`_              | .sdf       | |yes| | |yes| | |yes|       | |yes| |
     +---------------------+------------+-------+-------+-------------+-------+
+    | `SMI`_ [3]_         | .smi       | |yes| | |yes| | |no|        | |yes| |
+    +---------------------+------------+-------+-------+-------------+-------+
     | `TNG`_              | .tng       | |yes| | |no|  | |yes|       | |yes| |
     +---------------------+------------+-------+-------+-------------+-------+
     | `TRJ`_              | .trj       | |yes| | |no|  | |no|        | |no|  |
@@ -65,6 +67,8 @@ specify which format to use.
 .. [2] **LAMMPS Data** format corresponds to LAMMPS data files, as read by the LAMMPS
        `read_data <http://lammps.sandia.gov/doc/read_data.html>`_ command.
 
+.. [3] topology only
+
 .. _Amber NetCDF: http://ambermd.org/netcdf/nctraj.xhtml
 .. _CML: http://www.xml-cml.org
 .. _CSSR: http://www.chem.cmu.edu/courses/09-560/docs/msi/modenv/D_Files.html#944777
@@ -78,6 +82,7 @@ specify which format to use.
 .. _Molden: http://www.cmbi.ru.nl/molden/molden_format.html
 .. _PDB: http://www.rcsb.org/pdb/static.do?p=file_formats/pdb/index.html
 .. _SDF: http://accelrys.com/products/collaborative-science/biovia-draw/ctfile-no-fee.html
+.. _SMI: http://opensmiles.org/
 .. _TNG: http://doi.wiley.com/10.1002/jcc.23495
 .. _TRJ: http://manual.gromacs.org/current/online/trj.html
 .. _TRR: http://manual.gromacs.org/current/online/trr.html

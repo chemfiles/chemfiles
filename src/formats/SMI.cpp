@@ -139,7 +139,7 @@ void SMIFormat::process_property_list_(Topology& topol, const std::string& smile
         case 'H':
             count_or_class = read_number(smiles, ++i);
             count_or_class = count_or_class == 0.0 ? 1.0 : count_or_class;
-            new_atom.set("explicit_hydrogens", count_or_class);
+            new_atom.set("hydrogen_count", count_or_class);
             break;
         case '-':
             count_or_class = read_number(smiles, ++i);
@@ -448,7 +448,7 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
     // If any of these values are set / not a default value
     auto smi_class = atom.get("smiles_class");
     auto chirality = atom.get<Property::STRING>("chirality").value_or("");
-    auto explicit_h =atom.get<Property::DOUBLE>("explicit_hydrogens").value_or(0.0);
+    auto explicit_h =atom.get<Property::DOUBLE>("hydrogen_count").value_or(0.0);
 
     // Charge is similar to mass. It must be an integer, otherwise it is ignored
     double charge;
