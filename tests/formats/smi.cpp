@@ -16,7 +16,7 @@ namespace fs=boost::filesystem;
 TEST_CASE("Read files in SMI format") {
     SECTION("Check nsteps") {
         Trajectory file1("data/smi/test.smi");
-        CHECK(file1.nsteps() == 3);
+        CHECK(file1.nsteps() == 6);
     }
 
     SECTION("Read next frame") {
@@ -164,6 +164,57 @@ TEST_CASE("Check parsing results") {
         bond_orders = frame.topology().bond_orders();
         CHECK(bond_orders[0] == Bond::SINGLE);
         CHECK(bond_orders[1] == Bond::DOUBLE);
+    }
+
+    SECTION("Chirality") {
+        Trajectory file("data/smi/chiral.smi");
+
+        auto frame = file.read();
+        CHECK(frame[1].get("chirality")->as_string() == "CCW TB1");
+        frame = file.read();
+        CHECK(frame[1].get("chirality")->as_string() == "CCW TB15");
+        frame = file.read();
+        CHECK(frame[1].get("chirality")->as_string() == "CW");
+        frame = file.read();
+        CHECK(frame[1].get("chirality")->as_string() == "CCW OH15");
+        frame = file.read();
+        CHECK(frame[1].get("chirality")->as_string() == "CW");
+        frame = file.read();
+        CHECK(frame[1].get("chirality")->as_string() == "CCW");
+    }
+
+    SECTION("Other tests") {
+        Trajectory file("data/smi/test.smi");
+        auto frame = file.read();
+        frame = file.read();
+        CHECK(frame[0].get("is_aromatic")->as_bool());
+
+        while (!file.done()) {
+            frame = file.read();
+        }
+    }
+}
+
+// To use in loops in order to iterate over files in a specific directory.
+struct directory_files_iterator {
+    typedef fs::recursive_directory_iterator iterator;
+    directory_files_iterator(fs::path p) : p_(p) {}
+
+    iterator begin() { return fs::recursive_directory_iterator(p_); }
+    iterator end() { return fs::recursive_directory_iterator(); }
+
+    fs::path p_;
+};
+
+TEST_CASE("Errors in SMI format") {
+    for (auto entry : directory_files_iterator("data/smi/bad/")) {
+        auto test = [=](){
+            // We can throw either when creating the trajectory, or when reading
+            // the frame, depending on the type of error
+            auto file = Trajectory(entry.path().string());
+            file.read();
+        };
+        CHECK_THROWS(test());
     }
 }
 
