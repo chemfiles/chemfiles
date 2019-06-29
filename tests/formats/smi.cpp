@@ -217,17 +217,17 @@ TEST_CASE("Errors in SMI format") {
         CHECK_THROWS(test());
     }
 }
-
+#include <iostream>
 TEST_CASE("Write SMI File") {
     auto tmpfile = NamedTempPath(".smi");
     const auto EXPECTED_CONTENT =
 R"(C
-CN
-CN(P)O
-CN(P(F)B)O
-C1N(P(F1)B)O
-C12N(P(F1)B2)O
-[WH5+3].[35Cl-1].[c:1H].[te]
+C~N
+C~N(P)=O
+C~N(P(#F)$B)=O
+C1~N(P(#F:1)$B)=O
+C12~N(P(#F:1)$B/2)=O
+[WH5+3].[35Cl-1]->[c:1H]<-[te]\[C]
 )";
 
     Frame frame;
@@ -237,25 +237,25 @@ C12N(P(F1)B2)O
     file.write(frame);
 
     frame.add_atom(Atom("N"), {0, 0, 0});
-    frame.add_bond(0, 1);
+    frame.add_bond(0, 1, Bond::UNKNOWN);
     file.write(frame);
 
     frame.add_atom(Atom("P"), {0, 0, 0});
     frame.add_atom(Atom("O"), {0, 0, 0});
-    frame.add_bond(1, 2);
-    frame.add_bond(1, 3);
+    frame.add_bond(1, 2, Bond::SINGLE);
+    frame.add_bond(1, 3, Bond::DOUBLE);
     file.write(frame);
 
     frame.add_atom(Atom("F"), {0, 0, 0});
     frame.add_atom(Atom("B"), {0, 0, 0});
-    frame.add_bond(2, 4);
-    frame.add_bond(2, 5);
+    frame.add_bond(2, 4, Bond::TRIPLE);
+    frame.add_bond(2, 5, Bond::QUADRUPLE);
     file.write(frame);
 
-    frame.add_bond(0, 4);
+    frame.add_bond(0, 4, Bond::AROMATIC);
     file.write(frame);
 
-    frame.add_bond(0, 5);
+    frame.add_bond(0, 5, Bond::UP);
     file.write(frame);
 
     // Reinitialize
@@ -275,6 +275,13 @@ C12N(P(F1)B2)O
 
     frame.add_atom(Atom("Te"), {0, 0, 0});
     frame[3].set("is_aromatic", true);
+
+    frame.add_atom(Atom("C"), {0, 0, 0});
+    frame[4].set("chirality", "CCW");
+
+    frame.add_bond(1, 2, Bond::DATIVER);
+    frame.add_bond(2, 3, Bond::DATIVEL);
+    frame.add_bond(3, 4, Bond::DOWN);
 
     file.write(frame);
 
