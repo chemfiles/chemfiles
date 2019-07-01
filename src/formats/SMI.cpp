@@ -4,6 +4,7 @@
 #include <set>
 #include <cctype>
 #include <map>
+#include <unordered_set>
 #include <algorithm>
 
 #include <fmt/format.h>
@@ -62,23 +63,23 @@ void SMIFormat::read_step(const size_t step, Frame& frame) {
 static size_t read_number(const std::string& smiles, size_t& start) {
     size_t number = 0;
     if (start >= smiles.size() || std::isdigit(smiles[start]) == 0) {
-        --start;
+        start--;
         return number;
     }
     do {
         number *= 10;
         number += static_cast<size_t>(smiles[start] - '0');
-        ++start;
+        start++;
     } while (start < smiles.size() && (std::isdigit(smiles[start]) != 0));
-    --start;
+    start--;
     return number;
 }
 
-static std::set<char> aromatic_organic {'b', 'c', 'n', 'o', 's', 'p'};
+static std::unordered_set<char> AROMATIC_ORGANIC {'b', 'c', 'n', 'o', 's', 'p'};
 
 // Note: Including H here is non-standard, but allows for HC(H)(H)H
-static std::set<std::string> aliphatic_organic {"B", "C", "N", "O", "S", "P",
-                                                "F", "Cl", "Br", "I", "H"};
+static std::unordered_set<std::string> ALIPHATIC_ORGANIC {"B", "C", "N", "O", "S", "P",
+                                                          "F", "Cl", "Br", "I", "H"};
 
 // Valid chirality tags
 static std::set<std::string> chirality_tags {"TH", "SP", "TB", "OH", "AL"};
@@ -87,9 +88,9 @@ static std::string read_property_atom(const std::string& smiles, size_t& i) {
     auto old = i;
     if (smiles[i] == '\'') {
         do {
-             ++i;
+             i++;
         } while( i < smiles.size() && smiles[i] != '\'');
-        ++i;
+        i++;
         return smiles.substr(old + 1, i - old - 2);
     } else {
         do {
@@ -99,8 +100,8 @@ static std::string read_property_atom(const std::string& smiles, size_t& i) {
     }
 }
 
-Atom& SMIFormat::add_atom(Topology& topol, const std::string& atom_name) {
-    topol.add_atom(Atom(atom_name));
+Atom& SMIFormat::add_atom(Topology& topol, std::string atom_name) {
+    topol.add_atom(Atom(std::move(atom_name)));
 
     if (!first_atom_) {
         topol.add_bond(previous_atom_, ++current_atom_, current_bond_order_);
@@ -121,8 +122,8 @@ void SMIFormat::process_property_list_(Topology& topol, const std::string& smile
     }
 
     bool is_aromatic = std::islower(smiles[i]) != 0;
-    auto new_atom_name = read_property_atom(smiles, i);
-    auto& new_atom = add_atom(topol, new_atom_name);
+    auto name = read_property_atom(smiles, i);
+    auto& new_atom = add_atom(topol, std::move(name));
 
     if (is_aromatic) {
         new_atom.set("is_aromatic", true);
@@ -182,7 +183,7 @@ void SMIFormat::process_property_list_(Topology& topol, const std::string& smile
 
 void SMIFormat::read(Frame& frame) {
     // Initialize all the reading variables
-    branch_point_ = std::stack<size_t>(); 
+    branch_point_ = std::stack<size_t, std::vector<size_t>>(); 
     rings_ids_.clear();
     mol_vector_.clear();
     current_atom_ = 0;
@@ -238,10 +239,11 @@ void SMIFormat::read(Frame& frame) {
         // Therefore, if something is lowercase, then it must be
         // a single character element in the organic subset.
         if (std::islower(smiles[i]) != 0) {
-            if (aromatic_organic.count(smiles[i]) == 0) {
+            if (AROMATIC_ORGANIC.count(smiles[i]) == 0) {
                 throw format_error("SMI Reader", "aromatic element not found: '{}'", smiles[i]);
             }
-            add_atom(topol, smiles.substr(i, 1)).set("is_aromatic", true);
+            auto name = smiles.substr(i, 1);
+            add_atom(topol, std::move(name)).set("is_aromatic", true);
             continue;
         }
 
@@ -263,11 +265,11 @@ void SMIFormat::read(Frame& frame) {
 
             auto element_name = smiles.substr(i, element_length);
 
-            if (aliphatic_organic.count(element_name) == 0) {
+            if (ALIPHATIC_ORGANIC.count(element_name) == 0) {
                 throw format_error("SMI Reader", "bare non-organic atom: '{}'", element_name);    
             }
 
-            add_atom(topol, element_name);
+            add_atom(topol, std::move(element_name));
             i += element_length - 1;
             continue;
         }
@@ -292,7 +294,7 @@ void SMIFormat::read(Frame& frame) {
         case '~': current_bond_order_ = Bond::UNKNOWN; break;
         case '-':
             if (i + 1 < smiles.size() && smiles[i] == '>') {
-                current_bond_order_ = Bond::DATIVER;
+                current_bond_order_ = Bond::DATIVE_R;
                 ++i;
             } else {
                 current_bond_order_ = Bond::SINGLE;
@@ -300,7 +302,7 @@ void SMIFormat::read(Frame& frame) {
             break;
         case '<':
             if (i + 1 < smiles.size() && smiles[i] == '-') {
-                current_bond_order_ = Bond::DATIVEL;
+                current_bond_order_ = Bond::DATIVE_L;
                 ++i;
             } else {
                 ++groupid; // Non-standard, otherwise it's an unknown character
@@ -360,8 +362,8 @@ void SMIFormat::read(Frame& frame) {
 }
 
 /// Depth first search to find all rings.
-/// Not gaurenteed to fast, nor efficient, but just to work
-/// Also not gaurenteed to find the SSSR, but it will find all rings
+/// Not guaranteed to fast, nor efficient, but just to work
+/// Also not guaranteed to find the SSSR, but it will find all rings
 /// needed for a given structure to be writen as SMILES
 /// \param adj_list The adjacentcy list graph
 /// \param hit_atoms Atoms already encountered
@@ -372,7 +374,7 @@ void SMIFormat::read(Frame& frame) {
 static void find_rings_helper(
     const std::vector<std::vector<size_t>>& adj_list,
     std::vector<bool>& hit_atoms, std::set<Bond>& ring_bonds,
-    std::map<size_t, size_t>& ring_atoms,
+    std::unordered_map<size_t, size_t>& ring_atoms,
     size_t current_atom, size_t previous_atom) {
 
     auto& current_atom_bonds = adj_list[current_atom];
@@ -407,10 +409,11 @@ static void find_rings_helper(
     }
 }
 
-static std::map<size_t, size_t> find_rings(
-    const std::vector<std::vector<size_t>>& adj_list) {
+static void find_rings(
+    const std::vector<std::vector<size_t>>& adj_list,
+    std::unordered_map<size_t, size_t>& ring_atoms) {
 
-    std::map<size_t, size_t> ring_atoms;
+    ring_atoms.clear();
     std::vector<bool> hit_atoms(adj_list.size(), false);
     std::set<Bond> ring_bonds;
     
@@ -427,8 +430,17 @@ static std::map<size_t, size_t> find_rings(
                           current_atom_bonds[0], current_atom
         );
     }
+}
 
-    return ring_atoms;
+/// Sets int_part to `value` if `value` is actually an integer
+static bool double_to_int(double value, int& int_part) {
+    double integer_section;
+    auto remainder = std::modf(value, &integer_section);
+    if (remainder == 0.0) {
+        int_part = static_cast<int>(std::floor(integer_section));
+        return true;
+    }
+    return false;
 }
 
 static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom) {
@@ -436,31 +448,46 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
     auto type = atom.type();
 
     // The mass must be an integer is the only check we need as all atoms in the
-    // periodic table do have non-integer masses. Therefore, if the the mass is
-    // not an integer, then we know the user has set an isotope
-    double mass;
-    size_t mass_int = 0;
-    if (std::modf(atom.mass(), &mass) == 0.0 && mass != 0.0) {
+    // periodic table have non-integer masses. Therefore, if the the mass is
+    // an integer, then we know the user has set an isotope.
+    int mass_int = 0;
+    if (double_to_int(atom.mass(), mass_int)) {
         needs_brackets = true;
-        mass_int = static_cast<size_t>(mass);
     }
 
     // If any of these values are set / not a default value
-    auto smi_class = atom.get("smiles_class");
     auto chirality = atom.get<Property::STRING>("chirality").value_or("");
-    auto explicit_h =atom.get<Property::DOUBLE>("hydrogen_count").value_or(0.0);
+    if (!chirality.empty()) {
+        needs_brackets = true;
+    }
+
+    int smi_class = -1;
+    auto smi_class_prop = atom.get("smiles_class");
+    if (smi_class_prop && smi_class_prop->kind() == Property::DOUBLE &&
+        double_to_int(smi_class_prop->as_double(), smi_class) && smi_class >= 0) {
+        needs_brackets = true;
+    } else if (smi_class_prop) {
+        warning("SMI Writer", "the 'smiles_class' property must be an integer >= 0");
+    }
+
+    int explicit_h = -1;
+    auto explicit_h_prop = atom.get("hydrogen_count");
+    if (explicit_h_prop && explicit_h_prop->kind() == Property::DOUBLE &&
+        double_to_int(explicit_h_prop->as_double(), explicit_h) && explicit_h >= 0) {
+        needs_brackets = true;
+    } else if (explicit_h_prop) {
+        warning("SMI Writer", "the 'hydrogen_count' property must be an integer >= 0");
+    }
 
     // Charge is similar to mass. It must be an integer, otherwise it is ignored
-    double charge;
     int charge_int = 0;
-    if (std::modf(atom.charge(), &charge) == 0.0 && charge != 0.0) {
-        needs_brackets = true;
-        charge_int = static_cast<int>(charge);
+    if (double_to_int(atom.charge(), charge_int)) {
+        // Use |= because we don't want to unset if charge_int is 0
+        needs_brackets |= (charge_int != 0);
     }
 
     // Before the atom is printed, we must know if we are printing a property set.
-    if (explicit_h != 0.0 || smi_class || !chirality.empty() ||
-        aliphatic_organic.count(type) == 0) {
+    if (ALIPHATIC_ORGANIC.count(type) == 0) {
         needs_brackets = true;
     }
 
@@ -487,8 +514,8 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
 
     fmt::print(*file_, "{}", type);
 
-    if (smi_class && smi_class->kind() == Property::DOUBLE) {
-        fmt::print(*file_, ":{}", static_cast<int>(smi_class->as_double()));
+    if (smi_class != -1) {
+        fmt::print(*file_, ":{}", smi_class);
     }
 
     if (chirality != "") {
@@ -532,17 +559,22 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
 
 static void print_bond(std::unique_ptr<TextFile>& file_, chemfiles::Bond::BondOrder bo) {
     switch(bo) {
-    case Bond::SINGLE: break;
+    case Bond::SINGLE:
+    case Bond::AMIDE:
+        break;
     case Bond::DOUBLE: fmt::print(*file_, "="); break;
     case Bond::TRIPLE: fmt::print(*file_, "#"); break;
     case Bond::QUADRUPLE: fmt::print(*file_, "$"); break;
     case Bond::AROMATIC: fmt::print(*file_, ":"); break;
-    case Bond::DATIVEL: fmt::print(*file_, "<-"); break;
-    case Bond::DATIVER: fmt::print(*file_, "->"); break;
+    case Bond::DATIVE_L: fmt::print(*file_, "<-"); break;
+    case Bond::DATIVE_R: fmt::print(*file_, "->"); break;
     case Bond::UP: fmt::print(*file_, "/"); break;
     case Bond::DOWN: fmt::print(*file_, "\\"); break;
     case Bond::UNKNOWN:
+        fmt::print(*file_, "~");
+        break;
     default:
+        warning("SMI Writer", "unknown bond type");
         fmt::print(*file_, "~");
         break;
     }
@@ -653,7 +685,7 @@ void SMIFormat::write(const Frame& frame) {
         adj_list_[bond[1]].push_back(bond[0]);
     }
 
-    ring_atoms_ = find_rings(adj_list_);
+    find_rings(adj_list_, ring_atoms_);
 
     std::vector<bool> written(frame.size(), false);
     branch_stack_ = 0;

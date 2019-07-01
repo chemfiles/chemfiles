@@ -4,8 +4,10 @@
 #ifndef CHEMFILES_FORMAT_SMI_HPP
 #define CHEMFILES_FORMAT_SMI_HPP
 
+#include <vector>
 #include <stack>
 #include <map>
+#include <unordered_map>
 
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
@@ -33,11 +35,11 @@ private:
     std::vector<std::streampos> steps_positions_;
 
     /// [for reading] Stores location of a branching path
-    std::stack<size_t> branch_point_;
+    std::stack<size_t, std::vector<size_t>> branch_point_;
 
     /// [for reading] Stores a mapping between a ring ID and the atom which
     /// starts the ring and a stored bond order
-    std::map <size_t, std::pair<size_t, Bond::BondOrder>> rings_ids_;
+    std::unordered_map <size_t, std::pair<size_t, Bond::BondOrder>> rings_ids_;
 
     /// [for reading] The current atom being added (active atom)
     size_t current_atom_;
@@ -56,7 +58,7 @@ private:
     bool first_atom_;
 
     /// [for reading] adds an atom defined by `atom_name` to the topology
-    Atom& add_atom(Topology& topo, const std::string& atom_name);
+    Atom& add_atom(Topology& topo, std::string atom_name);
 
     /// [for reading] adds an atom defined by the string `smiles` starting at position i
     void process_property_list_(Topology& topo, const std::string& smiles, size_t& i);
@@ -67,14 +69,15 @@ private:
     /// [for writing] stores how many branches need to be closed
     size_t branch_stack_;
 
-    /// [for writing] stores locations of ring closures
+    /// [for writing] stores locations of ring closures. This is ordered
+    /// to ensure rings get printed in numeric order (where possible)
     std::multimap<size_t, size_t> ring_stack_;
 
     /// [for writing] stores how many rings we need to close
     size_t ring_count_;
 
     /// [for writing] stores how many rings each atom is in
-    std::map<size_t, size_t> ring_atoms_;
+    std::unordered_map<size_t, size_t> ring_atoms_;
 
     /// [for writing] writes a single atom to the internal file
     /// this function is recursive

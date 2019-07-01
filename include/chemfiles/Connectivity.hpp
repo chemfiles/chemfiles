@@ -32,8 +32,8 @@ public:
         // space for more bond types if needed
         DOWN = 250,
         UP = 251,
-        DATIVER = 252,
-        DATIVEL = 253,
+        DATIVE_R = 252,
+        DATIVE_L = 253,
         AMIDE = 254,
         AROMATIC = 255,
     };
