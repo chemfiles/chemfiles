@@ -229,6 +229,7 @@ C~N(P(#F)$B)=O
 C1~N(P(#F:1)$B)=O
 C12~N(P(#F:1)$B/2)=O	test
 [WH5+3].[35Cl-]->[c:1H]<-[te@SP3]\[C@@]
+O.O.O
 )";
 
     Frame frame;
@@ -269,6 +270,8 @@ C12~N(P(#F:1)$B/2)=O	test
     frame.add_atom(Atom("Cl"), {0, 0, 0});
     frame[1].set_charge(-1);
     frame[1].set_mass(35);
+    frame[1].set("hydrogen_count", -1); // warning
+    frame[1].set("smiles_class", "35-chloride"); // warning
 
     frame.add_atom(Atom("C"), {0, 0, 0});
     frame[2].set("is_aromatic", true);
@@ -282,10 +285,17 @@ C12~N(P(#F:1)$B/2)=O	test
     frame.add_atom(Atom("C"), {0, 0, 0});
     frame[4].set("chirality", "CW");
 
-    frame.add_bond(1, 2, Bond::DATIVER);
-    frame.add_bond(2, 3, Bond::DATIVEL);
+    frame.add_bond(1, 2, Bond::DATIVE_R);
+    frame.add_bond(2, 3, Bond::DATIVE_L);
     frame.add_bond(3, 4, Bond::DOWN);
 
+    file.write(frame);
+
+    // Reinitialize and test for descrete molecules
+    frame = Frame();
+    frame.add_atom(Atom("O"), {0, 0, 0});
+    frame.add_atom(Atom("O"), {0, 0, 0});
+    frame.add_atom(Atom("O"), {0, 0, 0});
     file.write(frame);
 
     file.close();
