@@ -58,23 +58,6 @@ void SMIFormat::read_step(const size_t step, Frame& frame) {
     read(frame);
 }
 
-/// Attempts to read a number from the string. The `start` argument is updated
-/// to the last numberic character in `smiles`.
-static size_t read_number(const std::string& smiles, size_t& start) {
-    size_t number = 0;
-    if (start >= smiles.size() || std::isdigit(smiles[start]) == 0) {
-        start--;
-        return number;
-    }
-    do {
-        number *= 10;
-        number += static_cast<size_t>(smiles[start] - '0');
-        start++;
-    } while (start < smiles.size() && (std::isdigit(smiles[start]) != 0));
-    start--;
-    return number;
-}
-
 static std::unordered_set<char> AROMATIC_ORGANIC {'b', 'c', 'n', 'o', 's', 'p'};
 
 // Note: Including H here is non-standard, but allows for HC(H)(H)H
@@ -82,21 +65,36 @@ static std::unordered_set<std::string> ALIPHATIC_ORGANIC {"B", "C", "N", "O", "S
                                                           "F", "Cl", "Br", "I", "H"};
 
 // Valid chirality tags
-static std::set<std::string> chirality_tags {"TH", "SP", "TB", "OH", "AL"};
+static std::set<std::string> CHIRALITY_TAGS {"TH", "SP", "TB", "OH", "AL"};
 
-static std::string read_property_atom(const std::string& smiles, size_t& i) {
-    auto old = i;
-    if (smiles[i] == '\'') {
+/// Attempts to read a number from the string. The `start` argument is updated
+/// to the last numberic character in `smiles`.
+static size_t read_number(const std::string& smiles, size_t& start) {
+    if (start >= smiles.size() || std::isdigit(smiles[start]) == 0) {
+        start--;
+        return 0;
+    }
+    size_t old = start;
+    do {
+        start++;
+    } while (start < smiles.size() && (std::isdigit(smiles[start]) != 0));
+    start--;
+    return parse<size_t>(smiles.substr(old, start - old + 1));
+}
+
+static std::string read_property_atom(const std::string& smiles, size_t& start) {
+    auto old = start;
+    if (smiles[start] == '\'') {
         do {
-             i++;
-        } while( i < smiles.size() && smiles[i] != '\'');
-        i++;
-        return smiles.substr(old + 1, i - old - 2);
+             start++;
+        } while( start < smiles.size() && smiles[start] != '\'');
+        start++;
+        return smiles.substr(old + 1, start - old - 2);
     } else {
         do {
-            ++i;
-        } while( i < smiles.size() && std::islower(smiles[i]) != 0);
-        return smiles.substr(old, i - old);
+            start++;
+        } while( start < smiles.size() && std::islower(smiles[start]) != 0);
+        return smiles.substr(old, start - old);
     }
 }
 
@@ -165,7 +163,7 @@ void SMIFormat::process_property_list_(Topology& topol, const std::string& smile
                 chirality_type = "CW";
                 ++i;
             } else if (i + 2 < smiles.size() &&
-                       chirality_tags.count(smiles.substr(i + 1, 2)) != 0) {
+                       CHIRALITY_TAGS.count(smiles.substr(i + 1, 2)) != 0) {
                 // Set the type of the chirality
                 chirality_type += " " + smiles.substr(i + 1, 2);
                 i += 2;
@@ -305,7 +303,8 @@ void SMIFormat::read(Frame& frame) {
                 current_bond_order_ = Bond::DATIVE_L;
                 ++i;
             } else {
-                ++groupid; // Non-standard, otherwise it's an unknown character
+                ++groupid; // Allow for reaction smiles, otherwise it's an unknown character
+                first_atom_ = true;
             }
             break;
         case '=': current_bond_order_ = Bond::DOUBLE; break;
@@ -495,7 +494,7 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
 
     if (is_aromatic) {
         // We need to print brackets for aromatic Te, Se, As, and Si
-        // Note, we allow aromatic Bromine to be bare (no brackets) in following
+        // Note, we allow aromatic Boron to be bare (no brackets) in following
         // ChemAxon's standard.
         if (type.size() > 1) {
             needs_brackets = true;
@@ -518,25 +517,55 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
         fmt::print(*file_, ":{}", smi_class);
     }
 
-    if (chirality != "") {
+    bool is_good_tag = false;
+    switch(chirality.size()) {
+    case 0:
+        is_good_tag = true;
+        break;
+    case 2:
         // If it's clockwise, then we just print the symbol @@ and be done with it
-        if (chirality.find("CW") == 0) {
+        if (chirality == "CW") {
+            is_good_tag = true;
             fmt::print(*file_, "@@");
-        } else {
-            fmt::print(*file_, "@");
-            // TODO check if the chirality flag is valid instead of trusting the user
-            if (chirality.size() > 4) {
-                fmt::print(*file_, "{}", chirality.substr(4));
-            }
         }
+        break;
+    case 3:
+        if (chirality == "CCW") {
+            is_good_tag = true;
+            fmt::print(*file_, "@");
+        }
+        break;
+    case 7:
+        if (chirality.find("CCW") == 0 &&
+            CHIRALITY_TAGS.count(chirality.substr(4, 2)) != 0 &&
+            std::isdigit(chirality[6]) != 0 ) {
+            is_good_tag = true;
+            fmt::print(*file_, "@{}", chirality.substr(4));
+        }
+        break;
+    case 8:
+        if (chirality.find("CCW") == 0 &&
+            CHIRALITY_TAGS.count(chirality.substr(4, 2)) != 0 &&
+            std::isdigit(chirality[6]) != 0 &&
+            std::isdigit(chirality[7]) != 0) {
+            is_good_tag = true;
+            fmt::print(*file_, "@{}", chirality.substr(4));
+        }
+        break;
+    default:
+        break;
     }
 
-    if (explicit_h == 1.0) {
+    if (!is_good_tag) {
+        warning("SMI Writer", "invalid chirality tag '{}'", chirality);
+    }
+
+    if (explicit_h == 1) {
         fmt::print(*file_, "H");
     }
 
-    if (explicit_h > 1.0) {
-        fmt::print(*file_, "H{}", static_cast<int>(explicit_h));
+    if (explicit_h > 1) {
+        fmt::print(*file_, "H{}", explicit_h);
     }
 
     if (charge_int < 0) {
