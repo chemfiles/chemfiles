@@ -25,10 +25,11 @@ private:
     void read_cell(Frame& frame);
     void read_topology(Frame& frame);
 
-    /// Reference to the associated file
+    /// Associated TNG file
     TNGFile tng_;
-    /// Scale factor for all lenght dependent data e.g. positions, velocities, forces, box shape
-    float distance_scale_factor_ = -1;
+    /// Scale factor for all lenght dependent data:
+    /// positions, velocities, forces, and box shape.
+    double distance_scale_factor_ = -1;
     /// The next step to read
     int64_t step_ = 0;
     /// The number of atoms in the current frame

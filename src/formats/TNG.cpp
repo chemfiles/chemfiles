@@ -49,7 +49,7 @@ TNGFormat::TNGFormat(std::string path, File::Mode mode, File::Compression compre
     int64_t exp = -1;
     CHECK(tng_distance_unit_exponential_get(tng_, &exp));
     // calculate the scale factor from a given length scale to angstrom
-    distance_scale_factor_ = pow(10.0, exp + 10.0);
+    distance_scale_factor_ = pow(10.0, static_cast<double>(exp) + 10.0);
 }
 
 size_t TNGFormat::nsteps() {
