@@ -115,6 +115,7 @@ if(MSVC)
     remove_msvc_warning(4127) # conditional expression is constant
     remove_msvc_warning(4275) # non-dll-export interface as base class of dll-export class
     remove_msvc_warning(4251) # class <> needs to be dll-export
+    remove_msvc_warning(4355) # 'this' used in based member initializer list
     remove_msvc_warning(4503) # mangled name too long was truncated
     remove_msvc_warning(4514) # unreferenced inline function has been removed
     remove_msvc_warning(4571) # catch(...) semantics changed since Visual C++ 7.1;
@@ -123,6 +124,7 @@ if(MSVC)
     remove_msvc_warning(4623) # default constructor was implicitly defined as deleted
     remove_msvc_warning(4625) # copy constructor was implicitly defined as deleted
     remove_msvc_warning(4626) # assignment operator was implicitly defined as deleted
+    remove_msvc_warning(4628) # digraph <: not supported with -Ze (fires with template<::namespace>)
     remove_msvc_warning(4643) # forward declaring 'optional' in namespace std is not permitted by the C++ Standard
     remove_msvc_warning(4668) # not defined preprocessor macro, replacing with '0' for '#if/#elif'
     remove_msvc_warning(4627) # move assignment operator was implicitly defined as deleted
@@ -133,8 +135,11 @@ if(MSVC)
     remove_msvc_warning(5026) # move constructor was implicitly defined as deleted
     remove_msvc_warning(5027) # move assignment operator was implicitly defined as deleted
     remove_msvc_warning(5039) # pointer or reference to potentially throwing function passed to extern C function under -EHc.
+    remove_msvc_warning(5045) # Compiler will insert Spectre mitigation for memory load
 
-    # Noisy warnings from external code that are checked by clang
+    # Noisy warnings from external code that are checked by clang/gcc
+    remove_msvc_warning(4018) # operator >=, signed/unsigned mismatch
+    remove_msvc_warning(4100) # unreferenced formal parameter
     remove_msvc_warning(4365) # conversion from '...' to '...', signed/unsigned mismatch
     remove_msvc_warning(4774) # format string is not a string literal
 else()

@@ -5,13 +5,22 @@ unset(CMAKE_C_STANDARD)
 string(REPLACE "-std=c99" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 
 set(EXTERNAL_FLAGS "")
+
 # Disable warnings about external code
 if(MSVC)
-    string(REGEX REPLACE "/Wall" "/w" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    string(REGEX REPLACE "/Wall" "/w" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-    set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} /EHsc")
+    string(REGEX REPLACE "/Wall" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    string(REGEX REPLACE "/Wall" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    string(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    string(REGEX REPLACE "/W[0-4]" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} /w")
 else()
     set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} -w")
+endif()
+
+if(MSVC)
+    # Do not use MSVC structured exceptions, and assume extern "C" function
+    # do not throw
+    set(EXTERNAL_FLAGS "${EXTERNAL_FLAGS} /EHsc")
 endif()
 
 if(${BUILD_SHARED_LIBS} AND NOT WIN32)
