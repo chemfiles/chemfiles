@@ -137,18 +137,18 @@ void SMIFormat::process_property_list_(Topology& topol, const std::string& smile
         switch (smiles[i]) {
         case 'H':
             count_or_class = read_number(smiles, ++i);
-            count_or_class = count_or_class == 0.0 ? 1.0 : count_or_class;
+            count_or_class = (count_or_class == 0) ? 1 : count_or_class;
             new_atom.set("hydrogen_count", count_or_class);
             break;
         case '-':
             count_or_class = read_number(smiles, ++i);
-            count_or_class = count_or_class == 0.0 ? 1.0 : count_or_class;
-            new_atom.set_charge(new_atom.charge() - count_or_class);
+            count_or_class = (count_or_class == 0) ? 1 : count_or_class;
+            new_atom.set_charge(new_atom.charge() - static_cast<double>(count_or_class));
             break;
         case '+':
             count_or_class = read_number(smiles, ++i);
-            count_or_class = count_or_class == 0.0 ? 1.0 : count_or_class;
-            new_atom.set_charge(new_atom.charge() + count_or_class);
+            count_or_class = (count_or_class == 0) ? 1 : count_or_class;
+            new_atom.set_charge(new_atom.charge() + static_cast<double>(count_or_class));
             break;
         case ':':
             count_or_class = read_number(smiles, ++i);
