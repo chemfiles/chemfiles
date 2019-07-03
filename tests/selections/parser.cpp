@@ -19,6 +19,13 @@ static Ast parse_and_opt(std::string selection) {
 }
 
 TEST_CASE("Parsing") {
+    SECTION("Generic errors") {
+        CHECK_THROWS_WITH(parse(""), "empty selection");
+        CHECK_THROWS_WITH(parse("3 < 5 name bar"), "additional data after the end of the selection: name bar");
+        CHECK_THROWS_WITH(parse("("), "expected content after '('");
+        CHECK_THROWS_WITH(parse("(name bar"), "expected closing parenthesis after 'bar'");
+    }
+
     // This section uses the pretty-printing of AST to check the parsing
     SECTION("Boolean operators") {
         auto ast = "and -> index(#1) == 1\n    -> index(#1) == 1";
@@ -39,12 +46,12 @@ TEST_CASE("Parsing") {
         ast = "and -> index(#1) == 1\n    -> or -> index(#1) == 1\n          -> index(#1) == 1";
         CHECK(parse("index == 1 and (index == 1 or index == 1)")->print() == ast);
 
-        CHECK_THROWS_AS(parse("name H and"), SelectionError);
-        CHECK_THROWS_AS(parse("and name H"), SelectionError);
-        CHECK_THROWS_AS(parse("name H or"), SelectionError);
-        CHECK_THROWS_AS(parse("or name H"), SelectionError);
-        CHECK_THROWS_AS(parse("not"), SelectionError);
-        CHECK_THROWS_AS(parse("name not H"), SelectionError);
+        CHECK_THROWS_WITH(parse("name H and"), "expected content after 'and'");
+        CHECK_THROWS_WITH(parse("and name H"), "unexpected content: 'and'");
+        CHECK_THROWS_WITH(parse("name H or"), "expected content after 'or'");
+        CHECK_THROWS_WITH(parse("or name H"), "unexpected content: 'or'");
+        CHECK_THROWS_WITH(parse("not"), "expected content after 'not'");
+        CHECK_THROWS_WITH(parse("name not H"), "expected one of '!=', '==' or a string value after 'name', found 'not'");
     }
 
     SECTION("all & none") {
@@ -79,7 +86,10 @@ TEST_CASE("Parsing") {
         ast = "is_angle(name H, #2, name O)";
         CHECK(parse("is_angle(name H, #2, name O)")->print() == ast);
 
-        CHECK_THROWS_AS(parse("is_bonded(#1, pairs: name O)"), SelectionError);
+        CHECK_THROWS_WITH(
+            parse("is_bonded(#1, pairs: name O)"),
+            "invalid character ':' in 'is_bonded(#1, pairs: name O)'"
+        );
     }
 
     SECTION("type") {
@@ -94,8 +104,12 @@ TEST_CASE("Parsing") {
         auto ast = "or -> type(#1) == goo\n   -> type(#1) == foo";
         CHECK(parse("type goo foo")->print() == ast);
 
-        CHECK_THROWS_AS(parse("type < bar"), SelectionError);
-        CHECK_THROWS_AS(parse("type >= bar"), SelectionError);
+        CHECK_THROWS_WITH(parse("type < bar"),
+            "expected one of '!=', '==' or a string value after 'type', found '<'"
+        );
+        CHECK_THROWS_WITH(parse("type >= bar"),
+            "expected one of '!=', '==' or a string value after 'type', found '>='"
+        );
     }
 
     SECTION("name") {
@@ -111,8 +125,18 @@ TEST_CASE("Parsing") {
         auto ast = "or -> name(#1) == goo\n   -> name(#1) == foo";
         CHECK(parse("name goo foo")->print() == ast);
 
-        CHECK_THROWS_AS(parse("name < bar"), SelectionError);
-        CHECK_THROWS_AS(parse("name >= bar"), SelectionError);
+        CHECK_THROWS_WITH(parse("name < bar"),
+            "expected one of '!=', '==' or a string value after 'name', found '<'"
+        );
+        CHECK_THROWS_WITH(parse("name >= bar"),
+            "expected one of '!=', '==' or a string value after 'name', found '>='"
+        );
+        CHECK_THROWS_WITH(parse("name == <="),
+            "expected a string value after 'name ==', found <="
+        );
+        CHECK_THROWS_WITH(parse("name != 4"),
+            "expected a string value after 'name !=', found 4"
+        );
     }
 
     SECTION("index") {
@@ -129,7 +153,7 @@ TEST_CASE("Parsing") {
         auto ast = "or -> index(#1) == 4\n   -> index(#1) == 3";
         CHECK(parse("index 4 3")->print() == ast);
 
-        CHECK_THROWS_AS(parse("index == bar"), SelectionError);
+        CHECK_THROWS_WITH(parse("index == bar"), "unexpected identifier 'bar' in mathematical expression");
     }
 
     SECTION("resname") {
@@ -144,8 +168,12 @@ TEST_CASE("Parsing") {
         auto ast = "or -> resname(#1) == goo\n   -> resname(#1) == foo";
         CHECK(parse("resname goo foo")->print() == ast);
 
-        CHECK_THROWS_AS(parse("resname < bar"), SelectionError);
-        CHECK_THROWS_AS(parse("resname >= bar"), SelectionError);
+        CHECK_THROWS_WITH(parse("resname < bar"),
+            "expected one of '!=', '==' or a string value after 'resname', found '<'"
+        );
+        CHECK_THROWS_WITH(parse("resname >= bar"),
+            "expected one of '!=', '==' or a string value after 'resname', found '>='"
+        );
     }
 
     SECTION("resid") {
@@ -162,7 +190,7 @@ TEST_CASE("Parsing") {
         auto ast = "or -> resid(#1) == 4\n   -> resid(#1) == 3";
         CHECK(parse("resid 4 3")->print() == ast);
 
-        CHECK_THROWS_AS(parse("resid == bar"), SelectionError);
+        CHECK_THROWS_WITH(parse("resid == bar"), "unexpected identifier 'bar' in mathematical expression");
     }
 
     SECTION("mass") {
@@ -178,7 +206,7 @@ TEST_CASE("Parsing") {
         auto ast = "or -> mass(#1) == 4\n   -> mass(#1) == 3";
         CHECK(parse("mass 4 3")->print() == ast);
 
-        CHECK_THROWS_AS(parse("mass <= bar"), SelectionError);
+        CHECK_THROWS_WITH(parse("mass <= bar"), "unexpected identifier 'bar' in mathematical expression");
     }
 
     SECTION("Position & velocity") {
@@ -195,10 +223,10 @@ TEST_CASE("Parsing") {
         auto ast = "or -> x(#1) == 4\n   -> x(#1) == 3";
         CHECK(parse("x 4 3")->print() == ast);
 
-        CHECK_THROWS_AS(parse("x <= bar"), SelectionError);
-        CHECK_THROWS_AS(parse("vy > bar"), SelectionError);
-        CHECK_THROWS_AS(parse("z != bar"), SelectionError);
-        CHECK_THROWS_AS(parse("vx == bar"), SelectionError);
+        CHECK_THROWS_WITH(parse("x <= bar"), "unexpected identifier 'bar' in mathematical expression");
+        CHECK_THROWS_WITH(parse("vy > bar"), "unexpected identifier 'bar' in mathematical expression");
+        CHECK_THROWS_WITH(parse("z != bar"), "unexpected identifier 'bar' in mathematical expression");
+        CHECK_THROWS_WITH(parse("vx == bar"), "unexpected identifier 'bar' in mathematical expression");
     }
 
     SECTION("Properties") {
@@ -246,28 +274,38 @@ TEST_CASE("Parsing") {
         }
 
         SECTION("Error") {
-            CHECK_THROWS_AS(parse("[3] == bar"), SelectionError);
-            CHECK_THROWS_AS(parse("[3 + 5] == bar"), SelectionError);
-            CHECK_THROWS_AS(parse("[] == bar"), SelectionError);
-            CHECK_THROWS_AS(parse("[foo == bar"), SelectionError);
-            CHECK_THROWS_AS(parse("foo] == bar"), SelectionError);
-            CHECK_THROWS_AS(parse("[foo(#1)] == bar"), SelectionError);
-            CHECK_THROWS_AS(parse("[\"foo bar\"(#1)] == bar"), SelectionError);
+            CHECK_THROWS_WITH(parse("[3] == bar"), "expected property name after [, got 3");
+            CHECK_THROWS_WITH(parse("[3 + 5] == bar"), "expected property name after [, got 3");
+            CHECK_THROWS_WITH(parse("[] == bar"), "expected property name after [, got ]");
+            CHECK_THROWS_WITH(parse("[foo == bar"), "expected ] after [foo, got ==");
+            CHECK_THROWS_WITH(parse("foo] == bar"), "unexpected identifier 'foo' in mathematical expression");
+            CHECK_THROWS_WITH(parse("[foo(#1)] == bar"), "expected ] after [foo, got (");
+            CHECK_THROWS_WITH(parse("[\"foo bar\"(#1)] == bar"), "expected ] after [\"foo bar\", got (");
 
-            CHECK_THROWS_AS(parse("[foo] < bar"), SelectionError);
-            CHECK_THROWS_AS(parse("[foo] <= bar"), SelectionError);
-            CHECK_THROWS_AS(parse("[foo] > bar"), SelectionError);
-            CHECK_THROWS_AS(parse("[foo] >= bar"), SelectionError);
+            CHECK_THROWS_WITH(parse("[foo] < bar"), "unexpected identifier 'bar' in mathematical expression");
+            CHECK_THROWS_WITH(parse("[foo] <= bar"), "unexpected identifier 'bar' in mathematical expression");
+            CHECK_THROWS_WITH(parse("[foo] > bar"), "unexpected identifier 'bar' in mathematical expression");
+            CHECK_THROWS_WITH(parse("[foo] >= bar"), "unexpected identifier 'bar' in mathematical expression");
         }
     }
 
-    SECTION("Multiple selections") {
+    SECTION("Variables") {
         auto ast = "and -> mass(#1) < 4\n    -> name(#3) == O";
         CHECK(parse("mass(#1) < 4 and name(#3) O")->print() == ast);
         ast = "name(#4) != Cs";
         CHECK(parse("name(#4) != Cs")->print() == ast);
         ast = "or -> index(#1) < 4\n   -> name(#2) == H";
         CHECK(parse("index(#1) < 4 or name(#2) H")->print() == ast);
+
+        CHECK_THROWS_WITH(parse("index(x)"), "expected variable in parenthesis, got 'x'");
+        CHECK_THROWS_WITH(parse("index(#1"), "expected closing parenthesis after variable, got '<end of selection>'");
+
+        CHECK_THROWS_WITH(parse("distance #1 #2"), "expected opening parenthesis, got '#1'");
+        CHECK_THROWS_WITH(parse("distance(x, #2)"), "expected variable in parenthesis, got 'x'");
+        CHECK_THROWS_WITH(parse("distance(#1, y)"), "expected variable in parenthesis, got 'y'");
+        CHECK_THROWS_WITH(parse("distance(#1"), "expected closing parenthesis after variable, got '<end of selection>'");
+
+        CHECK_THROWS_WITH(parse("is_bonded(#1"), "expected closing parenthesis after variable, got '<end of selection>'");
     }
 
     SECTION("Math selections") {
@@ -416,6 +454,18 @@ TEST_CASE("Parsing") {
             ast = "(1 + 2) ^((3 + 2)) == 0";
             CHECK(parse("(1 + 2) ^ (3 + 2) == 0")->print() == ast);
         }
+
+        SECTION("Errors") {
+            CHECK_THROWS_WITH(parse("index < (3 + 4"), "expected closing parenthesis after '4'");
+            CHECK_THROWS_WITH(parse("index < ("), "expected content after '('");
+
+            CHECK_THROWS_WITH(parse("index < [foo"), "expected ] after [foo, got <end of selection>");
+            CHECK_THROWS_WITH(parse("index < [foo(#1)]"), "expected ] after [foo, got (");
+            CHECK_THROWS_WITH(parse("index < [\"foo bar\"(#1)]"), "expected ] after [\"foo bar\", got (");
+
+            CHECK_THROWS_WITH(parse("index < sin"), "missing parenthesis after 'sin' function");
+            CHECK_THROWS_WITH(parse("index < sin(4"), "missing closing parenthesis after 'sin' function call");
+        }
     }
 
     SECTION("Parenthesis") {
@@ -427,52 +477,34 @@ TEST_CASE("Parsing") {
 }
 
 TEST_CASE("Parsing errors") {
-    std::vector<std::string> PARSE_FAIL = {
-        // Giberish at the end of the selection
-        "index == 23 6",
-        "index == 23 njzk",
-        "index == 23 !=",
-        "index == 23 name == 1",
+    std::vector<std::pair<std::string, std::string>> PARSE_FAIL = {
         // Bad usage of the boolean operators
-        "index == 23 and ",
-        "and index == 23",
-        "not and index == 23",
-        "index == 23 or ",
-        "or index == 23",
-        "not or index == 23",
-        "index == 23 not index == 1",
-        // string expressions with bad operators
-        "name == <",
-        "name > foo",
-        "name >= foo",
-        "name < foo",
-        "name <= foo",
-        "name ==",
-        // identifiers as mathematical values
-        "z == <",
-        "y == bar",
-        "x <= foo",
-        "z bar",
+        {"index == 23 and ", "expected content after 'and'"},
+        {"and index == 23", "unexpected content: 'and'"},
+        {"not and index == 23", "unexpected content: 'and'"},
+        {"index == 23 or ", "expected content after 'or'"},
+        {"or index == 23", "unexpected content: 'or'"},
+        {"not or index == 23", "unexpected content: 'or'"},
+        {"index == 23 not index == 1", "additional data after the end of the selection: not index == 1"},
         // https://github.com/chemfiles/chemfiles/issues/79
-        "type(#1) Al and type(#2) O and type(#3) H )",
+        {"type(#1) Al and type(#2) O and type(#3) H )", "additional data after the end of the selection: )"},
         // functions arity and arguments
-        "distance(#1) < 5",
-        "distance(x) < 5",
-        "angle(#2, #3) < 5",
-        "dihedral(#2, #3) < 5",
-        "none(#2, #3)",
-        "all(#2, #3)",
-        "bonded(#2)",
-        "is_angle(#2)",
-        "is_dihedral(#2)",
-        "is_improper(#2)",
+        {"distance(#1) < 5", "expected 2 arguments in 'distance', got 1"},
+        {"distance(x) < 5", "expected variable in parenthesis, got 'x'"},
+        {"angle(#2, #3) < 5", "expected 3 arguments in 'angle', got 2"},
+        {"dihedral(#2, #3) < 5", "expected 4 arguments in 'dihedral', got 2"},
+        {"none(#2, #3)", "expected 0 arguments in 'none', got 2"},
+        {"is_bonded(#2)", "expected 2 arguments in 'is_bonded', got 1"},
+        {"is_angle(#2)", "expected 3 arguments in 'is_angle', got 1"},
+        {"is_dihedral(#2)", "expected 4 arguments in 'is_dihedral', got 1"},
+        {"is_improper(#2)", "expected 4 arguments in 'is_improper', got 1"},
         // Sub-selection
-        "bonded(#2, name(#3) Zn)",
-        "bonded(name N, name Zn)",
+        {"is_bonded(#1, name(#3) Zn)", "variable index 3 is too big for the current context (should be <= 1)"},
+        {"is_bonded(name N, name Zn)", "expected at least one variable (#1/#2/#3/#4) in 'is_bonded'"},
     };
 
     for (auto& failure: PARSE_FAIL) {
-        CHECK_THROWS_AS(parse(failure), SelectionError);
+        CHECK_THROWS_WITH(parse(failure.first), failure.second);
     }
 }
 
