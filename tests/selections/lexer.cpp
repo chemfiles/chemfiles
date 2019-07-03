@@ -13,28 +13,65 @@ static std::vector<Token> tokenize(std::string selection) {
 
 TEST_CASE("Tokens") {
     SECTION("Operators") {
-        auto token = Token(Token::LESS_EQUAL);
-        REQUIRE(token.type() == Token::LESS_EQUAL);
+        auto OPERATORS = std::vector<Token::Type> {
+            Token::END, Token::LPAREN, Token::RPAREN, Token::LBRACKET,
+            Token::RBRACKET, Token::COMMA, Token::EQUAL, Token::NOT_EQUAL,
+            Token::LESS, Token::LESS_EQUAL, Token::GREATER, Token::GREATER_EQUAL,
+            Token::PLUS, Token::MINUS, Token::STAR, Token::SLASH, Token::PERCENT,
+            Token::NOT, Token::AND, Token::OR
+        };
 
-        CHECK_THROWS_AS(token.ident(), Error);
-        CHECK_THROWS_AS(token.number(), Error);
-        CHECK_THROWS_AS(token.variable(), Error);
-        CHECK_THROWS_AS(token.string(), Error);
+        for (auto type: OPERATORS) {
+            auto token = Token(type);
+            CHECK(token.type() == type);
+
+            CHECK_THROWS_AS(token.ident(), Error);
+            CHECK_THROWS_AS(token.number(), Error);
+            CHECK_THROWS_AS(token.variable(), Error);
+            CHECK_THROWS_AS(token.string(), Error);
+        }
+
+        CHECK(Token(Token::END).as_str() == "<end of selection>");
+        CHECK(Token(Token::LPAREN).as_str() == "(");
+        CHECK(Token(Token::RPAREN).as_str() == ")");
+        CHECK(Token(Token::LBRACKET).as_str() == "[");
+        CHECK(Token(Token::RBRACKET).as_str() == "]");
+        CHECK(Token(Token::COMMA).as_str() == ",");
+        CHECK(Token(Token::EQUAL).as_str() == "==");
+        CHECK(Token(Token::NOT_EQUAL).as_str() == "!=");
+        CHECK(Token(Token::LESS).as_str() == "<");
+        CHECK(Token(Token::LESS_EQUAL).as_str() == "<=");
+        CHECK(Token(Token::GREATER).as_str() == ">");
+        CHECK(Token(Token::GREATER_EQUAL).as_str() == ">=");
+        CHECK(Token(Token::PLUS).as_str() == "+");
+        CHECK(Token(Token::MINUS).as_str() == "-");
+        CHECK(Token(Token::STAR).as_str() == "*");
+        CHECK(Token(Token::SLASH).as_str() == "/");
+        CHECK(Token(Token::PERCENT).as_str() == "%");
+        CHECK(Token(Token::NOT).as_str() == "not");
+        CHECK(Token(Token::AND).as_str() == "and");
+        CHECK(Token(Token::OR).as_str() == "or");
     }
 
     SECTION("Identifers") {
         auto token = Token::ident("blabla");
-        REQUIRE(token.type() == Token::IDENT);
+        CHECK(token.type() == Token::IDENT);
         CHECK(token.ident() == "blabla");
         CHECK(token.as_str() == "blabla");
 
         CHECK_THROWS_AS(token.number(), Error);
         CHECK_THROWS_AS(token.variable(), Error);
+
+        CHECK_FALSE(selections::is_ident(""));
+        CHECK_FALSE(selections::is_ident("_not_an_id"));
+        CHECK_FALSE(selections::is_ident("3not_an_id"));
+        CHECK_FALSE(selections::is_ident("not an id"));
+        CHECK_FALSE(selections::is_ident("not-an-id"));
     }
 
     SECTION("Strings") {
         auto token = Token::string("blabla");
-        REQUIRE(token.type() == Token::STRING);
+        CHECK(token.type() == Token::STRING);
         CHECK(token.string() == "blabla");
         CHECK(token.as_str() == "\"blabla\"");
 
@@ -44,8 +81,9 @@ TEST_CASE("Tokens") {
 
     SECTION("Numbers") {
         auto token = Token::number(3.4);
-        REQUIRE(token.type() == Token::NUMBER);
+        CHECK(token.type() == Token::NUMBER);
         CHECK(token.number() == 3.4);
+        CHECK(token.as_str() == "3.400000");
 
         CHECK_THROWS_AS(token.ident(), Error);
         CHECK_THROWS_AS(token.variable(), Error);
@@ -54,8 +92,9 @@ TEST_CASE("Tokens") {
 
     SECTION("Variables") {
         auto token = Token::variable(18);
-        REQUIRE(token.type() == Token::VARIABLE);
+        CHECK(token.type() == Token::VARIABLE);
         CHECK(token.variable() == 18);
+        CHECK(token.as_str() == "#19");
 
         CHECK_THROWS_AS(token.ident(), Error);
         CHECK_THROWS_AS(token.number(), Error);
@@ -63,7 +102,7 @@ TEST_CASE("Tokens") {
     }
 
     SECTION("Constructor errors") {
-        // These constructor needs additional data 
+        // These constructor needs additional data
         CHECK_THROWS_AS(Token(Token::NUMBER), Error);
         CHECK_THROWS_AS(Token(Token::IDENT), Error);
         CHECK_THROWS_AS(Token(Token::STRING), Error);
@@ -206,27 +245,37 @@ TEST_CASE("Lexing") {
         CHECK(tokenize("#9")[0].type() == Token::VARIABLE);
         CHECK(tokenize("#255")[0].type() == Token::VARIABLE);
 
-        CHECK_THROWS_AS(tokenize("# gabo"), SelectionError);
-        CHECK_THROWS_AS(tokenize("#"), SelectionError);
-        CHECK_THROWS_AS(tokenize("78 #"), SelectionError);
-        CHECK_THROWS_AS(tokenize("bhics #"), SelectionError);
-        CHECK_THROWS_AS(tokenize("#256"), SelectionError);
+        CHECK_THROWS_WITH(tokenize("# gabo"), "expected number after #");
+        CHECK_THROWS_WITH(tokenize("#"), "expected number after #");
+        CHECK_THROWS_WITH(tokenize("bhics #"), "expected number after #");
+        CHECK_THROWS_WITH(tokenize("#1844674407370955161555"), "could not parse variable in '1844674407370955161555'");
+        CHECK_THROWS_WITH(tokenize("#256"), "variable index #256 is too big (should be less than 255)");
+        CHECK_THROWS_WITH(tokenize("#0"), "invalid variable index #0");
 
         CHECK(tokenize(",")[0].type() == Token::COMMA);
         auto tokens = tokenize(",bagyu");
-        CHECK(tokens.size() == 3);
+        REQUIRE(tokens.size() == 3);
         CHECK(tokens[0].type() == Token::COMMA);
+        CHECK(tokens[1].type() == Token::IDENT);
+        CHECK(tokens[2].type() == Token::END);
 
         tokens = tokenize("jsqsb,");
-        CHECK(tokens.size() == 3);
+        REQUIRE(tokens.size() == 3);
+        CHECK(tokens[0].type() == Token::IDENT);
         CHECK(tokens[1].type() == Token::COMMA);
+        CHECK(tokens[2].type() == Token::END);
+    }
+
+    SECTION("String") {
+        CHECK(tokenize("\"aa\"")[0].type() == Token::STRING);
+
+        CHECK_THROWS_WITH(tokenize("\"foo"), "closing quote (\") not found in '\"foo'");
+        CHECK_THROWS_WITH(tokenize("\"foo and name 4"), "closing quote (\") not found in '\"foo and name 4'");
     }
 }
 
 TEST_CASE("Lexing errors") {
     std::vector<std::string> LEX_FAIL = {
-        "_not_an_id",
-        "3not_an_id",
         "§", // Not accepted characters
         "`",
         "!",
