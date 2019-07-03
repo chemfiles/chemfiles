@@ -353,7 +353,7 @@ inline double Matrix3D::determinant() const {
 inline Matrix3D Matrix3D::invert() const {
     auto determinant = this->determinant();
     if (determinant <= DBL_EPSILON) {
-        throw Error("This matrix is not invertible");
+        throw Error("this matrix is not invertible");
     }
 
     auto invdet = 1.0 / determinant;
