@@ -38,7 +38,7 @@ def extract_messages(lines, i, has_context):
         start = lines[i].find('"')
         if start == -1:
             print("warning: could not get the message at {}:{}".format(
-                path, i - 1
+                path, i
             ))
             return ""
 
@@ -78,6 +78,10 @@ def check_file(path):
         lines = [l for l in fd]
 
     for (i, line) in enumerate(lines):
+        # ignore comments
+        if line.strip().startswith("//"):
+            continue
+
         if " warning(" in line:
             check_message(path, i, extract_messages(lines, i, has_context=True))
 
@@ -90,6 +94,15 @@ if __name__ == '__main__':
         check_file(path)
 
     for path in glob.glob(os.path.join(ROOT, "src/*/*.cpp")):
+        check_file(path)
+
+    for path in glob.glob(os.path.join(ROOT, "include/chemfiles/*.hpp")):
+        check_file(path)
+
+    for path in glob.glob(os.path.join(ROOT, "include/chemfiles/*/*.hpp")):
+        if "external" in path:
+            continue
+
         check_file(path)
 
     if ERRORS != 0:
