@@ -397,14 +397,13 @@ static void find_rings_helper(
             if (neigh_ring_iter == ring_atoms.end()) {
                 neigh_ring_iter = ring_atoms.insert({neighbor, 0}).first;
             }
-            ++neigh_ring_iter->second;
+            neigh_ring_iter->second++;
 
             continue; // No need to see this atom again
         }
 
         // Continue the search
-        find_rings_helper(adj_list, hit_atoms, ring_bonds,
-                          ring_atoms, neighbor, current_atom);
+        find_rings_helper(adj_list, hit_atoms, ring_bonds, ring_atoms, neighbor, current_atom);
     }
 }
 
@@ -425,9 +424,7 @@ static void find_rings(
             continue;
         }
 
-        find_rings_helper(adj_list, hit_atoms, ring_bonds, ring_atoms,
-                          current_atom_bonds[0], current_atom
-        );
+        find_rings_helper(adj_list, hit_atoms, ring_bonds, ring_atoms, current_atom_bonds[0], current_atom);
     }
 }
 
@@ -684,7 +681,7 @@ void SMIFormat::write_atom(
             branch_stack_++;
         }
 
-        // DFS like recursion
+        // Depth First Search like recursion
         write_atom(frame, hit_atoms, neighbor, current_atom);
 
         // we printed a neighbor, if there's more than 1 neighbor, then we need to
