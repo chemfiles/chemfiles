@@ -17,6 +17,9 @@ type = "number"
 CML = """The number of hydrogens attached to the atom. The property is only set
 if the attribute is given and is non-zero."""
 
+SMI = """The number of hydrogens attached to the atom. The property is only set
+if the property 'H' is given."""
+
 [sybyl]
 type = "string"
 
@@ -29,3 +32,36 @@ not set and the atom type is guessed from the atom name. When writing, if this
 propery is set, then this value is written between the Z coordinate and the
 residue number. Otherwise, the atom's type is used to replace the **sybyl**
 type."""
+
+[is_aromatic]
+type = "bool"
+
+SMI = """Describes if the atom is flagged as aromatic. This flag is set if the
+atom type is given as 'b', 'c', 'o', 'p', or 's'. This flag is also set when
+the atom is lowercase and in a property bracket. If the flag is set when the
+SMILES string is written, then the atom will be written in lowercase."""
+
+[smiles_class]
+type = "number"
+
+SMI = """The class of the atom given in the SMILES string. This propery is set
+if a ':' character followed by a number is found in a property bracket while
+reading. If this property is set when the SMILES string is written, then the
+atom will be written in a property bracket with the ':' character."""
+
+[chirality]
+type = "string"
+
+SMI = """The chirality tag of the atom. If the chirality given in an atom
+property bracket is '@@', then this string is set to 'CW'. If the chirality is
+given as '@', followed by 'TH', 'AL', 'SP', 'TB', or 'OH', which is in turn
+followed by a number, then this string is set to 'CCW <character tag><number>'.
+When writing, if the string begins with 'CW', then '@@' will be added to the
+property bracket. Otherwise, '@' will be writing followed by the remaining
+string. At the moment, no attempt is made to ensure that the chirality of the
+atom is valid."""
+
+[wildcard]
+type = "bool"
+
+SMI = "Sets if the atom was defined as a wildcard card atom."
