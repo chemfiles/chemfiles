@@ -119,6 +119,11 @@ static bool is_boolean_selector(const std::string& name) {
 }
 
 Ast Parser::parse() {
+    // there should always be at least one token (Token::END)
+    if (tokens_.size() <= 1) {
+        throw selection_error("empty selection");
+    }
+
     current_ = 0;
     auto ast = expression();
     if (!finished()) {
@@ -162,11 +167,13 @@ Ast Parser::selector() {
             current_ = index;
             return math_selector();
         }
+
         if (match(Token::RPAREN)) {
             return ast;
         } else {
-            throw selection_error("mismatched parenthesis");
+            throw selection_error("expected closing parenthesis after '{}'", previous().as_str());
         }
+
     } else if (match(Token::NOT)) {
         auto ast = expression();
         return Ast(new Not(std::move(ast)));
@@ -199,7 +206,10 @@ Ast Parser::bool_or_string_property() {
     if (check(Token::IDENT) || check(Token::STRING)) {
         property = advance().string();
         if (!match(Token::RBRACKET)) {
-            throw selection_error("expected brackets after [{}, got {}", property, peek().as_str());
+            throw selection_error(
+                "expected ] after [{}, got {}",
+                previous().as_str(), peek().as_str()
+            );
         }
     }
 
@@ -247,20 +257,20 @@ Ast Parser::bool_selector() {
 
     auto arguments = sub_selection();
     if (arguments.size() != selector.arity) {
-        throw selection_error("expected {} arguments in call to {}, got {}",
-            arguments.size(), name, selector.arity
+        throw selection_error("expected {} arguments in '{}', got {}",
+            selector.arity, name, arguments.size()
         );
     }
 
     // Check that at least one of the argument is a variable. Else, selections
-    // like `bonded(name H, name O)` are equivalent to either all or none
+    // like `is_bonded(name H, name O)` are equivalent to either all or none
     // depending on the system.
     bool at_least_one_variable = false;
     for (auto& arg: arguments) {
         at_least_one_variable = at_least_one_variable || arg.is_variable();
     }
     if (!arguments.empty() && !at_least_one_variable) {
-        throw selection_error("expected at least one variable (#1/#2/#3/#4) in call to {}", name);
+        throw selection_error("expected at least one variable (#1/#2/#3/#4) in '{}'", name);
     }
 
     return selector.creator(std::move(arguments));
@@ -300,7 +310,10 @@ Ast Parser::string_selector() {
             throw selection_error("expected a string value after '{} !=', found {}", name, peek().as_str());
         }
     } else {
-        throw selection_error("expected one of '!=', '==' or a string value after {}, found {}", name, peek().as_str());
+        throw selection_error(
+            "expected one of '!=', '==' or a string value after '{}', found '{}'",
+            name, peek().as_str()
+        );
     }
 }
 
@@ -420,7 +433,10 @@ MathAst Parser::math_value() {
         if (check(Token::IDENT) || check(Token::STRING)) {
             auto property = advance().string();
             if (!match(Token::RBRACKET)) {
-                throw selection_error("expected brackets after [{}, got {}", property, peek().as_str());
+                throw selection_error(
+                    "expected ] after [{}, got {}",
+                    previous().as_str(), peek().as_str()
+                );
             }
             auto var = variable();
             return MathAst(new NumericProperty(std::move(property), var));
@@ -430,7 +446,7 @@ MathAst Parser::math_value() {
     } else if (match(Token::LPAREN)) {
         auto ast = math_sum();
         if (!match(Token::RPAREN)) {
-            throw selection_error("mismatched parenthesis");
+            throw selection_error("expected closing parenthesis after '{}'", previous().as_str());
         }
         return ast;
     } else if (match(Token::NUMBER)) {
@@ -444,9 +460,9 @@ MathAst Parser::math_value() {
         return MathAst(new Neg(std::move(ast)));
     } else {
         if (finished()) {
-            throw selection_error("expected content after", previous().as_str());
+            throw selection_error("expected content after '{}'", previous().as_str());
         } else {
-            throw selection_error("I don't know what to do with {}", peek().as_str());
+            throw selection_error("unexpected content: '{}'", peek().as_str());
         }
     }
 }
@@ -454,11 +470,11 @@ MathAst Parser::math_value() {
 MathAst Parser::math_function(const std::string& name) {
     assert(is_numeric_function(name));
     if (!match(Token::LPAREN)) {
-        throw selection_error("missing parenthesis after {}", name);
+        throw selection_error("missing parenthesis after '{}' function", name);
     }
     auto ast = math_sum();
     if (!match(Token::RPAREN)) {
-        throw selection_error("missing closing parenthesis in {} call", name);
+        throw selection_error("missing closing parenthesis after '{}' function call", name);
     }
     return NUMERIC_FUNCTIONS[name](std::move(ast));
 }
@@ -470,8 +486,8 @@ MathAst Parser::math_var_function(const std::string& name) {
     assert(function.arity >= 1);
     auto arguments = variables();
     if (arguments.size() != function.arity) {
-        throw selection_error("expected {} arguments in call to {}, got {}",
-            arguments.size(), name, function.arity
+        throw selection_error("expected {} arguments in '{}', got {}",
+            function.arity, name, arguments.size()
         );
     }
 
@@ -484,11 +500,11 @@ Variable Parser::variable() {
         if (match(Token::VARIABLE)) {
             var = previous().variable();
         } else {
-            throw selection_error("expected variable in parenthesis, got {}", peek().as_str());
+            throw selection_error("expected variable in parenthesis, got '{}'", peek().as_str());
         }
 
         if (!match(Token::RPAREN)) {
-            throw selection_error("expected closing parenthesis after variable, got {}", peek().as_str());
+            throw selection_error("expected closing parenthesis after variable, got '{}'", peek().as_str());
         }
     }
     return var;
@@ -497,25 +513,25 @@ Variable Parser::variable() {
 std::vector<Variable> Parser::variables() {
     std::vector<Variable> vars;
     if (!match(Token::LPAREN)) {
-        throw selection_error("expected opening parenthesis, got {}", peek().as_str());
+        throw selection_error("expected opening parenthesis, got '{}'", peek().as_str());
     }
 
     if (match(Token::VARIABLE)) {
         vars.push_back(previous().variable());
     } else {
-        throw selection_error("expected variable in parenthesis, got {}", peek().as_str());
+        throw selection_error("expected variable in parenthesis, got '{}'", peek().as_str());
     }
 
     while (match(Token::COMMA)) {
         if (match(Token::VARIABLE)) {
             vars.push_back(previous().variable());
         } else {
-            throw selection_error("expected variable in parenthesis, got {}", peek().as_str());
+            throw selection_error("expected variable in parenthesis, got '{}'", peek().as_str());
         }
     }
 
     if (!match(Token::RPAREN)) {
-        throw selection_error("expected closing parenthesis after variable, got {}", peek().as_str());
+        throw selection_error("expected closing parenthesis after variable, got '{}'", peek().as_str());
     }
 
     return vars;
@@ -559,7 +575,7 @@ std::vector<SubSelection> Parser::sub_selection() {
     }
 
     if (!match(Token::RPAREN)) {
-        throw selection_error("expected closing parenthesis after variable, got {}", peek().as_str());
+        throw selection_error("expected closing parenthesis after variable, got '{}'", peek().as_str());
     }
 
     return vars;
