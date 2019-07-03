@@ -14,7 +14,7 @@ ERRORS = 0
 # Path, line of messages that do not follow the current format, but
 # are allowed
 ALLOWED = [
-    (os.path.join(ROOT, "src", "Configuration.cpp"), 34)
+    "found deprecated configuration file at '{}', please rename it to .chemfiles.toml",
 ]
 
 
@@ -55,9 +55,8 @@ def check_message(path, line, message):
     if not message:
         return
 
-    for allowed_path, allowed_line in ALLOWED:
-        if allowed_path == path and allowed_line == line:
-            return
+    if message in ALLOWED:
+        return
 
     # check for upper case at the start, allow abbreviations (LAMMPS, HELIX)
     if message[0].isupper() and not message[1].isupper():

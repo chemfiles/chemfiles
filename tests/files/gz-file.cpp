@@ -7,8 +7,6 @@
 #include "chemfiles/Error.hpp"
 using namespace chemfiles;
 
-using Catch::Matchers::Contains;
-
 static void check_file(GzFile& file) {
     std::string line = file.readline();
     CHECK(line == "297");

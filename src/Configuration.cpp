@@ -17,11 +17,6 @@ using namespace chemfiles;
 // C:\foo\bar\baz\}`.
 static std::vector<std::string> list_directories(const std::string& leaf);
 
-// Check if a toml value is a number (integer or float)
-static bool is_toml_number(const toml::value& value);
-// Extract a number from a number (integer or float)
-static double toml_get_number(const toml::value& value);
-
 Configuration& Configuration::instance() {
     static Configuration instance_;
     return instance_;
@@ -69,12 +64,55 @@ void Configuration::read_types(const std::string& path, const toml::Table& data)
             auto old_name = entry.first;
             if (entry.second.type() != toml::value_t::String) {
                 throw configuration_error(
-                    "invalid configuration file at '{}': type for {} must be a string",
+                    "invalid configuration file at '{}': type for '{}' must be a string",
                     path, old_name
                 );
             }
             auto new_name = toml::get<std::string>(entry.second);
             (*types)[std::move(old_name)] = std::move(new_name);
+        }
+    }
+}
+
+optional<std::string> Configuration::atomic_data_string(
+    const std::string& path,
+    const toml::Table& table,
+    const std::string& property,
+    const std::string& atomic_type
+) {
+    auto it = table.find(property);
+    if (it == table.end()) {
+        return nullopt;
+    } else {
+        if (it->second.type() != toml::value_t::String) {
+            throw configuration_error(
+                "invalid configuration file at '{}': {} for '{}' must be a string",
+                path, property, atomic_type
+            );
+        }
+        return toml::get<std::string>(it->second);
+    }
+}
+
+optional<double> Configuration::atomic_data_number(
+    const std::string& path,
+    const toml::Table& table,
+    const std::string& property,
+    const std::string& atomic_type
+) {
+    auto it = table.find(property);
+    if (it == table.end()) {
+        return nullopt;
+    } else {
+        if (it->second.type() == toml::value_t::Float) {
+            return toml::get<double>(it->second);
+        } else if (it->second.type() == toml::value_t::Integer) {
+            return static_cast<double>(toml::get<long long>(it->second));
+        } else {
+            throw configuration_error(
+                "invalid configuration file at '{}': {} for '{}' must be a number",
+                path, property, atomic_type
+            );
         }
     }
 }
@@ -87,66 +125,17 @@ void Configuration::read_atomic_data(const std::string& path, const toml::Table&
             auto type = entry.first;
             if (entry.second.type() != toml::value_t::Table) {
                 throw configuration_error(
-                    "invalid configuration file at '{}': atomic data for {} must be a table",
+                    "invalid configuration file at '{}': atomic data for '{}' must be a table",
                     path, type
                 );
             }
             auto table = toml::get<toml::Table>(entry.second);
 
-            optional<std::string> full_name = nullopt;
-            if (table.find("full_name") != table.end()) {
-                if (table.at("full_name").type() != toml::value_t::String) {
-                    throw configuration_error(
-                        "invalid configuration file at '{}': full name for {} must be a string",
-                        path, type
-                    );
-                }
-                full_name = toml::get<std::string>(table.at("full_name"));
-            }
-
-            optional<double> mass = nullopt;
-            if (table.find("mass") != table.end()) {
-                if (!is_toml_number(table.at("mass"))) {
-                    throw configuration_error(
-                        "invalid configuration file at '{}': mass for {} must be a number",
-                        path, type
-                    );
-                }
-                mass = toml_get_number(table.at("mass"));
-            }
-
-            optional<double> charge = nullopt;
-            if (table.find("charge") != table.end()) {
-                if (!is_toml_number(table.at("charge"))) {
-                    throw configuration_error(
-                        "invalid configuration file at '{}': charge for {} must be a number",
-                        path, type
-                    );
-                }
-                charge = toml_get_number(table.at("charge"));
-            }
-
-            optional<double> vdw_radius = nullopt;
-            if (table.find("vdw_radius") != table.end()) {
-                if (!is_toml_number(table.at("vdw_radius"))) {
-                    throw configuration_error(
-                        "invalid configuration file at '{}': vdw_radius for {} must be a number",
-                        path, type
-                    );
-                }
-                vdw_radius = toml_get_number(table.at("vdw_radius"));
-            }
-
-            optional<double> covalent_radius = nullopt;
-            if (table.find("covalent_radius") != table.end()) {
-                if (!is_toml_number(table.at("covalent_radius"))) {
-                    throw configuration_error(
-                        "invalid configuration file at '{}': covalent_radius for {} must be a number",
-                        path, type
-                    );
-                }
-                covalent_radius = toml_get_number(table.at("covalent_radius"));
-            }
+            auto full_name = atomic_data_string(path, table, "full_name", type);
+            auto mass = atomic_data_number(path, table, "mass", type);
+            auto charge = atomic_data_number(path, table, "charge", type);
+            auto vdw_radius = atomic_data_number(path, table, "vdw_radius", type);
+            auto covalent_radius = atomic_data_number(path, table, "covalent_radius", type);
 
             // If the type is an element, use the default from the periodic
             // table.
@@ -187,7 +176,7 @@ void Configuration::add(const std::string& path) {
     if (std::ifstream(path)) {
         instance().read(path);
     } else {
-        throw configuration_error("can not open configuration file at {}", path);
+        throw configuration_error("can not open configuration file at '{}'", path);
     }
 }
 
@@ -200,20 +189,6 @@ std::vector<std::string> list_directories(const std::string& leaf) {
     }
     directories.push_back(leaf);
     return directories;
-}
-
-bool is_toml_number(const toml::value& value) {
-    return value.type() == toml::value_t::Float || value.type() == toml::value_t::Integer;
-}
-
-double toml_get_number(const toml::value& value) {
-    assert(is_toml_number(value));
-    if (value.type() == toml::value_t::Float) {
-        return toml::get<double>(value);
-    } else {
-        assert(value.type() == toml::value_t::Integer);
-        return static_cast<double>(toml::get<long long>(value));
-    }
 }
 
 void chemfiles::add_configuration(const std::string& path) {
