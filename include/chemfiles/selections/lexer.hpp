@@ -108,7 +108,7 @@ public:
     /// `IDENT` or `VARIABLE`.
     Token(Type type): Token(type, "", 0.0, 0) {
         if (type == IDENT || type == STRING || type == NUMBER || type == VARIABLE) {
-            throw Error("invalid Token constructor called. This is a bug.");
+            throw Error("invalid Token constructor called, this is a bug");
         }
     }
 
@@ -119,7 +119,7 @@ public:
     /// The token type must be `NUMBER`.
     double number() const {
         if (type_ != NUMBER) {
-            throw Error("can not get a number value out of this token. This is a bug.");
+            throw Error("can not get a number value out of this token, this is a bug");
         }
         return number_;
     }
@@ -128,7 +128,7 @@ public:
     /// The token type must be `IDENT`.
     const std::string& ident() const {
         if (type_ != IDENT) {
-            throw Error("can not get an identifier out of this token. This is a bug.");
+            throw Error("can not get an identifier out of this token, this is a bug");
         }
         return ident_;
     }
@@ -137,7 +137,7 @@ public:
     /// The token type must be `IDENT` or `RAW_STRING`.
     const std::string& string() const {
         if (type_ != IDENT && type_ != STRING) {
-            throw Error("can not get an string value out of this token. This is a bug.");
+            throw Error("can not get an string value out of this token, this is a bug");
         }
         return ident_;
     }
@@ -146,7 +146,7 @@ public:
     /// The token type must be `VARIABLE`.
     Variable variable() const {
         if (type_ != VARIABLE) {
-            throw Error("can not get a variable value out of this token. This is a bug.");
+            throw Error("can not get a variable value out of this token, this is a bug");
         }
         return variable_;
     }

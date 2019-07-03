@@ -52,7 +52,7 @@ public:
     Atom& operator[](size_t index) {
         if (index >= size()) {
             throw OutOfBounds(
-                "Atomic index out of bounds in topology: we have "
+                "atomic index out of bounds in topology: we have "
                 + std::to_string(size()) + " atoms, but the index is "
                 + std::to_string(index)
             );
@@ -69,7 +69,7 @@ public:
     const Atom& operator[](size_t index) const {
         if (index >= size()) {
             throw OutOfBounds(
-                "Atomic index out of bounds in topology: we have "
+                "atomic index out of bounds in topology: we have "
                 + std::to_string(size()) + " atoms, but the index is "
                 + std::to_string(index)
             );
@@ -263,7 +263,7 @@ public:
     const Residue& residue(size_t index) const {
         if (index >= residues_.size()) {
             throw OutOfBounds(
-                "Residue index out of bounds in topology: we have "
+                "residue index out of bounds in topology: we have "
                 + std::to_string(residues_.size()) + " residues, "
                 + "but the index is " + std::to_string(index)
             );
