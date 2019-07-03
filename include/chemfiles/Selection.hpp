@@ -40,7 +40,7 @@ public:
     /// @throw OutOfBounds if the index is bigger than the `size()` of the match
     const size_t& operator[](size_t i) const {
         if (i >= size_) {
-            throw OutOfBounds("Out of bounds indexing of Match");
+            throw OutOfBounds("out of bounds indexing of Match");
         }
         return data_[i];
     }
