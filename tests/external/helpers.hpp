@@ -31,8 +31,8 @@ public:
     // Convert the path to a std::string
     operator std::string() const {return path_;}
 
-    // Convert the path to a const char*
-    const char* c_str() const {return path_.c_str();}
+    // Get the underlying string
+    const std::string& path() const {return path_;}
 
 private:
     std::string path_;
