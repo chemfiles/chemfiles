@@ -84,6 +84,19 @@ private:
     void read_types(const std::string& path, const toml::Table& data);
     void read_atomic_data(const std::string& path, const toml::Table& data);
 
+    optional<std::string> atomic_data_string(
+        const std::string& path,
+        const toml::Table& table,
+        const std::string& property,
+        const std::string& atomic_type
+    );
+    optional<double> atomic_data_number(
+        const std::string& path,
+        const toml::Table& table,
+        const std::string& property,
+        const std::string& atomic_type
+    );
+
     // Get the Configuration instance
     static Configuration& instance();
 

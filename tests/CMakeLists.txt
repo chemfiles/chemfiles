@@ -211,6 +211,13 @@ full_name = \"methyl\"
 
 [atoms.Zn]
 charge = 1.8
+
+[atoms.SO4]
+mass = 96.0
+charge = -2
+full_name = \"sulfate\"
+vdw_radius = 3.68
+covalent_radius = 2.42
 ")
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/chemfiles.toml

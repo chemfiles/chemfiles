@@ -73,6 +73,7 @@ TEST_CASE("Atom type renaming") {
 }
 
 TEST_CASE("Atomic data") {
+    // Non-existing element
     auto ch3 = Atom("CH3");
     CHECK(ch3.mass() == 15);
     CHECK(ch3.charge() == 0);
@@ -80,12 +81,29 @@ TEST_CASE("Atomic data") {
     CHECK(ch3.vdw_radius() == nullopt);
     CHECK(ch3.covalent_radius() == nullopt);
 
+    // charge from configuration, everything else from periodic table
     auto zn = Atom("Zn");
     CHECK(zn.mass() == 65.38);
     CHECK(zn.charge() == 1.8);
     CHECK(zn.full_name().value() == "Zinc");
     CHECK(zn.vdw_radius().value() == 2.1);
     CHECK(zn.covalent_radius().value() == 1.31);
+
+    // everything from configuration
+    auto so4 = Atom("SO4");
+    CHECK(so4.mass() == 96.0);
+    CHECK(so4.charge() == -2);
+    CHECK(so4.full_name().value() == "sulfate");
+    CHECK(so4.vdw_radius().value() == 3.68);
+    CHECK(so4.covalent_radius().value() == 2.42);
+
+    // everything from periodic table
+    auto f = Atom("F");
+    CHECK(f.mass() == 18.9984032);
+    CHECK(f.charge() == 0);
+    CHECK(f.full_name().value() == "Fluorine");
+    CHECK(f.vdw_radius().value() == 1.5);
+    CHECK(f.covalent_radius().value() == 0.71);
 }
 
 TEST_CASE("Configuration errors") {
@@ -97,7 +115,10 @@ TEST_CASE("Configuration errors") {
         file << "[types]\nfoo: 'bar'\n" << std::endl;
         file.close();
 
-        CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
+        CHECK_THROWS_WITH(
+            chemfiles::add_configuration(tmpfile),
+            Catch::Contains("configuration file at '" + tmpfile.path() + "' is invalid TOML")
+        );
     }
 
     SECTION("Invalid 'types' data") {
@@ -105,37 +126,64 @@ TEST_CASE("Configuration errors") {
         file << "[types]\nfoo = 4\n" << std::endl;
         file.close();
 
-        CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
+        CHECK_THROWS_WITH(
+            chemfiles::add_configuration(tmpfile),
+            "invalid configuration file at '" + tmpfile.path() + "': "
+            "type for 'foo' must be a string"
+        );
     }
 
     SECTION("Invalid 'atoms' data") {
         std::ofstream file(tmpfile);
         file << "[atoms.O]\nmass = '4'\n" << std::endl;
         file.close();
-        CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
+        CHECK_THROWS_WITH(
+            chemfiles::add_configuration(tmpfile),
+            "invalid configuration file at '" + tmpfile.path() + "': "
+            "mass for 'O' must be a number"
+        );
 
         file.open(tmpfile, std::ios_base::out | std::ios_base::trunc);
         file << "[atoms.O]\ncharge = '4'\n" << std::endl;
         file.close();
-        CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
+        CHECK_THROWS_WITH(
+            chemfiles::add_configuration(tmpfile),
+            "invalid configuration file at '" + tmpfile.path() + "': "
+            "charge for 'O' must be a number"
+        );
 
         file.open(tmpfile, std::ios_base::out | std::ios_base::trunc);
         file << "[atoms.O]\ncovalent_radius = '4'\n" << std::endl;
         file.close();
-        CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
+        CHECK_THROWS_WITH(
+            chemfiles::add_configuration(tmpfile),
+            "invalid configuration file at '" + tmpfile.path() + "': "
+            "covalent_radius for 'O' must be a number"
+        );
 
         file.open(tmpfile, std::ios_base::out | std::ios_base::trunc);
         file << "[atoms.O]\nvdw_radius = '4'\n" << std::endl;
         file.close();
-        CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
+        CHECK_THROWS_WITH(
+            chemfiles::add_configuration(tmpfile),
+            "invalid configuration file at '" + tmpfile.path() + "': "
+            "vdw_radius for 'O' must be a number"
+        );
 
         file.open(tmpfile, std::ios_base::out | std::ios_base::trunc);
         file << "[atoms.O]\nfull_name = false\n" << std::endl;
         file.close();
-        CHECK_THROWS_AS(chemfiles::add_configuration(tmpfile), ConfigurationError);
+        CHECK_THROWS_WITH(
+            chemfiles::add_configuration(tmpfile),
+            "invalid configuration file at '" + tmpfile.path() + "': "
+            "full_name for 'O' must be a string"
+        );
     }
 
     SECTION("Could not read file") {
-        CHECK_THROWS_AS(chemfiles::add_configuration("nope"), ConfigurationError);
+        CHECK_THROWS_WITH(
+            chemfiles::add_configuration(tmpfile),
+            "can not open configuration file at '" + tmpfile.path() + "'"
+        );
     }
 }

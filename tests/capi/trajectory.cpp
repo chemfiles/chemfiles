@@ -233,7 +233,7 @@ TEST_CASE("Read trajectory") {
 }
 
 TEST_CASE("Write trajectory") {
-    auto filename = NamedTempPath(".xyz");
+    auto tmpfile = NamedTempPath(".xyz");
     const char* EXPECTED_CONTENT =
     "4\n"
     "Written by the chemfiles library\n"
@@ -242,7 +242,7 @@ TEST_CASE("Write trajectory") {
     "He 1.0 2.0 3.0\n"
     "He 1.0 2.0 3.0\n";
 
-    CHFL_TRAJECTORY* trajectory = chfl_trajectory_open(filename.c_str(), 'w');
+    CHFL_TRAJECTORY* trajectory = chfl_trajectory_open(tmpfile.path().c_str(), 'w');
     REQUIRE(trajectory);
 
     CHFL_FRAME* frame = testing_frame();
@@ -253,7 +253,7 @@ TEST_CASE("Write trajectory") {
     chfl_free(frame);
     chfl_trajectory_close(trajectory);
 
-    std::ifstream file(filename);
+    std::ifstream file(tmpfile);
     REQUIRE(file.is_open());
     std::stringstream content;
     content << file.rdbuf();
