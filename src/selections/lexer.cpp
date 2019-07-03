@@ -195,15 +195,24 @@ Token Tokenizer::variable() {
             break;
         }
     }
+
+    if (count == 0) {
+        throw selection_error("expected number after #");
+    }
+
     size_t data = 0;
     auto number = input_.substr(start, count);
     try {
         data = parse<size_t>(number);
     } catch (const std::exception&) {
-        throw selection_error("could not parse number in '{}'", number);
+        throw selection_error("could not parse variable in '{}'", number);
     }
+
     if (data > static_cast<size_t>(UINT8_MAX)) {
-        throw selection_error("variable index #{} is too big for uint8_t", data);
+        throw selection_error(
+            "variable index #{} is too big (should be less than {})",
+            data, UINT8_MAX
+        );
     } else if (data == 0) {
         throw selection_error("invalid variable index #0");
     }
@@ -228,7 +237,10 @@ Token Tokenizer::string() {
     }
 
     if (!got_quote) {
-        throw selection_error("missing \" after '{}'", input_.substr(start, count));
+        throw selection_error(
+            "closing quote (\") not found in '{}'",
+            input_.substr(start - 1, count + 1)
+        );
     }
 
     return Token::string(input_.substr(start, count));
