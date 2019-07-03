@@ -1,6 +1,8 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <cassert>
+
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Selection.hpp"
 #include "chemfiles/ErrorFmt.hpp"
@@ -34,9 +36,7 @@ SubSelection::SubSelection(Variable variable): selection_(nullptr), variable_(va
 SubSelection::SubSelection(std::string selection):
     selection_(new Selection(std::move(selection))), variable_(UINT8_MAX)
 {
-    if (selection_->size() != 1) {
-        throw selection_error("sub-selection must have a size of 1");
-    }
+    assert(selection_->size() == 1);
 }
 
 const std::vector<size_t>& SubSelection::eval(const Frame& frame, const Match& match) const {
@@ -415,7 +415,7 @@ double Add::eval(const Frame& frame, const Match& match) const {
 optional<double> Add::optimize() {
     auto lhs_opt = lhs_->optimize();
     auto rhs_opt = rhs_->optimize();
-    if (lhs_opt && lhs_opt) {
+    if (lhs_opt && rhs_opt) {
         return lhs_opt.value() + rhs_opt.value();
     } else if (lhs_opt) {
         lhs_ = MathAst(new Number(lhs_opt.value()));
@@ -441,7 +441,7 @@ double Sub::eval(const Frame& frame, const Match& match) const {
 optional<double> Sub::optimize() {
     auto lhs_opt = lhs_->optimize();
     auto rhs_opt = rhs_->optimize();
-    if (lhs_opt && lhs_opt) {
+    if (lhs_opt && rhs_opt) {
         return lhs_opt.value() - rhs_opt.value();
     } else if (lhs_opt) {
         lhs_ = MathAst(new Number(lhs_opt.value()));
@@ -467,7 +467,7 @@ double Mul::eval(const Frame& frame, const Match& match) const {
 optional<double> Mul::optimize() {
     auto lhs_opt = lhs_->optimize();
     auto rhs_opt = rhs_->optimize();
-    if (lhs_opt && lhs_opt) {
+    if (lhs_opt && rhs_opt) {
         return lhs_opt.value() * rhs_opt.value();
     } else if (lhs_opt) {
         lhs_ = MathAst(new Number(lhs_opt.value()));
@@ -493,7 +493,7 @@ double Div::eval(const Frame& frame, const Match& match) const {
 optional<double> Div::optimize() {
     auto lhs_opt = lhs_->optimize();
     auto rhs_opt = rhs_->optimize();
-    if (lhs_opt && lhs_opt) {
+    if (lhs_opt && rhs_opt) {
         return lhs_opt.value() / rhs_opt.value();
     } else if (lhs_opt) {
         lhs_ = MathAst(new Number(lhs_opt.value()));
@@ -519,7 +519,7 @@ double Pow::eval(const Frame& frame, const Match& match) const {
 optional<double> Pow::optimize() {
     auto lhs_opt = lhs_->optimize();
     auto rhs_opt = rhs_->optimize();
-    if (lhs_opt && lhs_opt) {
+    if (lhs_opt && rhs_opt) {
         return pow(lhs_opt.value(), rhs_opt.value());
     } else if (lhs_opt) {
         lhs_ = MathAst(new Number(lhs_opt.value()));
@@ -566,7 +566,7 @@ double Mod::eval(const Frame& frame, const Match& match) const {
 optional<double> Mod::optimize() {
     auto lhs_opt = lhs_->optimize();
     auto rhs_opt = rhs_->optimize();
-    if (lhs_opt && lhs_opt) {
+    if (lhs_opt && rhs_opt) {
         return fmod(lhs_opt.value(), rhs_opt.value());
     } else if (lhs_opt) {
         lhs_ = MathAst(new Number(lhs_opt.value()));

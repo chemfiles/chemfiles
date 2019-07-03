@@ -5,6 +5,7 @@
 #define CHEMFILES_SELECTION_PARSER_HPP
 
 #include <memory>
+#include <cassert>
 
 #include "chemfiles/selections/lexer.hpp"
 #include "chemfiles/selections/expr.hpp"
@@ -74,6 +75,7 @@ private:
     }
 
     Token previous() const {
+        assert(current_ > 0);
         return tokens_[current_ - 1];
     }
 

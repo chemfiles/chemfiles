@@ -80,8 +80,8 @@ Selection::Selection(std::string selection): selection_(std::move(selection)), a
         if (token.type() == selections::Token::VARIABLE) {
             if (token.variable() > max_variable(context_)) {
                 throw selection_error(
-                    "variable index {} is too big for the is too big for the current context",
-                    token.variable()
+                    "variable index {} is too big for the current context (should be <= {})",
+                    token.variable() + 1, max_variable(context_) + 1
                 );
             }
         }
