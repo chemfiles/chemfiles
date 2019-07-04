@@ -9,7 +9,7 @@
 #include <vector>
 #include <memory>
 
-#include "chemfiles/exports.hpp"
+#include "chemfiles/exports.h"
 
 namespace chemfiles {
 

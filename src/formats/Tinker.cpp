@@ -2,16 +2,28 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cassert>
+#include <array>
+#include <string>
+#include <vector>
+#include <memory>
+#include <istream>
 
-#include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#include "chemfiles/formats/Tinker.hpp"
-
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
+#include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
+#include "chemfiles/Topology.hpp"
+#include "chemfiles/UnitCell.hpp"
+#include "chemfiles/Connectivity.hpp"
+
+#include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
-#include "chemfiles/warnings.hpp"
+#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/sorted_set.hpp"
+
+#include "chemfiles/formats/Tinker.hpp"
 
 using namespace chemfiles;
 

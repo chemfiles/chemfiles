@@ -1,8 +1,18 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <ios>
+#include <cstdio>
+#include <string>
+#include <vector>
+
+#include <zlib.h>
+#include <zconf.h>
+
+#include "chemfiles/File.hpp"
 #include "chemfiles/files/GzFile.hpp"
 #include "chemfiles/ErrorFmt.hpp"
+
 using namespace chemfiles;
 
 

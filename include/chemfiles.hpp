@@ -4,8 +4,9 @@
 #ifndef CHEMFILES_HPP
 #define CHEMFILES_HPP
 
-#include "chemfiles/config.hpp"
-#include "chemfiles/exports.hpp"
+#include "chemfiles/exports.h"
+#include "chemfiles/config.h"
+
 #include "chemfiles/misc.hpp"
 
 #include "chemfiles/Error.hpp"

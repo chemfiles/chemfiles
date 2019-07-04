@@ -5,6 +5,10 @@
 #define CHEMFILES_FORMAT_MMCIF_HPP
 
 #include <map>
+#include <iosfwd>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
@@ -12,6 +16,7 @@
 #include "chemfiles/UnitCell.hpp"
 
 namespace chemfiles {
+class Frame;
 
 /// [mmCIF] (Crystallographic Information Framework) for MacroMolecules
 ///

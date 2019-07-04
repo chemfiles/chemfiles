@@ -1,15 +1,23 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
+
+#include <cstdint>
 #include <cstring>
+#include <string>
 
+#include "chemfiles/capi/types.h"
 #include "chemfiles/capi/atom.h"
-#include "chemfiles/capi.hpp"
-#include "chemfiles/shared_allocator.hpp"
+#include "chemfiles/capi/utils.hpp"
+#include "chemfiles/capi/shared_allocator.hpp"
 
-#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Topology.hpp"
+#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/Property.hpp"
+
+#include "chemfiles/external/optional.hpp"
+
 using namespace chemfiles;
 
 extern "C" CHFL_ATOM* chfl_atom(const char* name) {

@@ -1,10 +1,16 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <cassert>
+#include <array>
+#include <memory>
+#include <vector>
+#include <iterator>
+#include <algorithm>
+
 #include "chemfiles/Connectivity.hpp"
 #include "chemfiles/ErrorFmt.hpp"
-
-#include <iterator>
+#include "chemfiles/sorted_set.hpp"
 
 using namespace chemfiles;
 

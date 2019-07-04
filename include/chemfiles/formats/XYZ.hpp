@@ -4,10 +4,16 @@
 #ifndef CHEMFILES_FORMAT_XYZ_HPP
 #define CHEMFILES_FORMAT_XYZ_HPP
 
+#include <iosfwd>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
 
 namespace chemfiles {
+class Frame;
 
 /// [XYZ] file format reader and writer.
 ///

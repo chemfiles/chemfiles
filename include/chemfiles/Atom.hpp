@@ -4,9 +4,10 @@
 #ifndef CHEMFILES_ATOM_HPP
 #define CHEMFILES_ATOM_HPP
 
+#include <cstdint>
 #include <string>
 
-#include "chemfiles/exports.hpp"
+#include "chemfiles/exports.h"
 #include "chemfiles/Property.hpp"
 #include "chemfiles/external/optional.hpp"
 

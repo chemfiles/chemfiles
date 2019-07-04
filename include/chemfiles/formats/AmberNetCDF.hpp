@@ -4,15 +4,19 @@
 #ifndef CHEMFILES_FORMAT_NC_HPP
 #define CHEMFILES_FORMAT_NC_HPP
 
-#include "chemfiles/types.hpp"
+#include <string>
+#include <vector>
+
+#include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/files/NcFile.hpp"
-#include "chemfiles/external/span.hpp"
 
 namespace chemfiles {
 
+class Frame;
 class UnitCell;
-class Topology;
+class Vector3D;
+template <class T> class span;
 
 /// [Amber NetCDF][NetCDF] file format reader.
 ///

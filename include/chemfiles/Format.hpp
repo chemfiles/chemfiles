@@ -4,11 +4,9 @@
 #ifndef CHEMFILES_FORMAT_HPP
 #define CHEMFILES_FORMAT_HPP
 
-#include <memory>
 #include <string>
-#include <functional>
 
-#include "chemfiles/exports.hpp"
+#include "chemfiles/exports.h"
 #include "chemfiles/Error.hpp"
 
 namespace chemfiles {

@@ -2,17 +2,26 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cassert>
+#include <array>
+#include <string>
+#include <vector>
+#include <memory>
 #include <sstream>
+#include <exception>
 
-#include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#include "chemfiles/formats/XYZ.hpp"
-
-#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
+#include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
+#include "chemfiles/Topology.hpp"
+
+#include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
+#include "chemfiles/ErrorFmt.hpp"
+
+#include "chemfiles/formats/XYZ.hpp"
 
 using namespace chemfiles;
 

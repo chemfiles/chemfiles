@@ -1,12 +1,12 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#ifndef CHEMFILES_GENERIC_H
-#define CHEMFILES_GENERIC_H
+#ifndef CHEMFILES_MISC_HPP
+#define CHEMFILES_MISC_HPP
 
 #include <string>
 #include <functional>
-#include "chemfiles/exports.hpp"
+#include "chemfiles/exports.h"
 
 // A few exported function that can not be in the same header as the main
 // functionality; because the rest of the functionality is not exported.

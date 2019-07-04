@@ -1,0 +1,38 @@
+# include-what-you-use mapping file for chemfiles
+[
+    # Some private headers from dependencies
+    {include: ["<fmt/core.h>", "private", "<fmt/format.h>", "public"]},
+    {include: ["<tng/tng_io_fwd.h>", "private", "<tng/tng_io.h>", "public"]},
+
+    # ext/alloc_traits.h is pulled when doing `for (auto& val: vector)`
+    {include: ["<ext/alloc_traits.h>", "private", "<vector>", "public"]},
+
+    # Allow getting size_t from usual header
+    {symbol: ["size_t", "private", "<vector>", "public"]},
+    {symbol: ["size_t", "private", "<string>", "public"]},
+    {symbol: ["size_t", "private", "<array>", "public"]},
+
+    # allow getting std::pair from map header
+    {symbol: ["std::pair", "private", "<map>", "public"]},
+    {symbol: ["std::pair", "private", "<unordered_map>", "public"]},
+    {symbol: ["std::pair", "private", "\"chemfiles/sorted_set.hpp\"", "public"]},
+    {symbol: ["std::pair", "private", "\"chemfiles/Property.hpp\"", "public"]},
+
+    # allow getting std::move/std::forward from any header
+    {symbol: ["std::move", "private", "<string>", "public"]},
+    {symbol: ["std::forward", "private", "<string>", "public"]},
+    {symbol: ["std::move", "private", "<vector>", "public"]},
+    {symbol: ["std::forward", "private", "<vector>", "public"]},
+    {symbol: ["std::move", "private", "<array>", "public"]},
+    {symbol: ["std::forward", "private", "<array>", "public"]},
+    {symbol: ["std::move", "private", "<mutex>", "public"]},
+    {symbol: ["std::forward", "private", "<mutex>", "public"]},
+
+    # allow getting <type_traits> from map header
+    {include: ["<type_traits>", "public", "<map>", "public"]},
+    {include: ["<type_traits>", "public", "<unordered_map>", "public"]},
+
+    # Get various symbols from the right headers
+    {symbol: ["std::exception", "private", "<exception>", "public"]},
+    {symbol: ["std::hash", "private", "<functional>", "public"]},
+]

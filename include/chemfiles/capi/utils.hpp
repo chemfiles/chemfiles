@@ -1,8 +1,14 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#ifndef CHEMFILES_CAPI_ERRORS_H
-#define CHEMFILES_CAPI_ERRORS_H
+#ifndef CHEMFILES_CAPI_UTILS_H
+#define CHEMFILES_CAPI_UTILS_H
+
+#include <cstdint>
+#include <string>
+#include <exception>
+
+#include <fmt/format.h>
 
 #include "chemfiles/capi/types.h"
 #include "chemfiles/warnings.hpp"
@@ -10,7 +16,6 @@
 
 #include "chemfiles/Error.hpp"
 
-#include <fmt/format.h>
 
 namespace chemfiles {
 

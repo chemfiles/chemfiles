@@ -4,13 +4,20 @@
 #ifndef CHEMFILES_FRAME_HPP
 #define CHEMFILES_FRAME_HPP
 
-#include "chemfiles/exports.hpp"
+#include <string>
+#include <vector>
+
+#include "chemfiles/exports.h"
 #include "chemfiles/types.hpp"
 #include "chemfiles/external/span.hpp"
 #include "chemfiles/external/optional.hpp"
 
+#include "chemfiles/Atom.hpp"  // IWYU pragma: keep
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/UnitCell.hpp"
+#include "chemfiles/Connectivity.hpp"
+#include "chemfiles/Property.hpp"
+#include "chemfiles/Residue.hpp"
 
 namespace chemfiles {
 

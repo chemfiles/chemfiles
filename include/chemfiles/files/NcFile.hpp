@@ -1,13 +1,15 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#ifndef CHEMFILES_NCFILE_HPP
-#define CHEMFILES_NCFILE_HPP
+#ifndef CHEMFILES_NC_FILE_HPP
+#define CHEMFILES_NC_FILE_HPP
 
 #include <vector>
 #include <string>
+#include <cassert>
 
 #include <netcdf.h>
+#include <fmt/format.h>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/ErrorFmt.hpp"

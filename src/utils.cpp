@@ -1,11 +1,11 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include "chemfiles/utils.hpp"
-#include "chemfiles/config.hpp"
-#include "chemfiles/warnings.hpp"
+#include <cerrno>
+#include <string>
+#include <vector>
 
-#include <algorithm>
+#include "chemfiles/utils.hpp"
 
 #ifdef CHEMFILES_WINDOWS
 #include <windows.h>  // GetUserName & GetComputerNameEx

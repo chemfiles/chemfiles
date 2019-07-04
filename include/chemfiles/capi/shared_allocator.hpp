@@ -1,10 +1,11 @@
 #ifndef CHFL_SHARED_ALLOCATOR_HPP
 #define CHFL_SHARED_ALLOCATOR_HPP
 
-#include <unordered_map>
-#include <functional>
-#include <cassert>
 #include <vector>
+#include <memory>
+#include <functional>
+#include <algorithm>  // IWYU pragma: keep
+#include <unordered_map>
 
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/mutex.hpp"

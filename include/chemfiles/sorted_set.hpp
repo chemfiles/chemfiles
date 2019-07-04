@@ -5,7 +5,8 @@
 #define CHEMFILES_SORTED_SET_HPP
 
 #include <vector>
-#include <algorithm>
+#include <utility>    // IWYU pragma: keep
+#include <algorithm>  // IWYU pragma: keep
 
 namespace chemfiles {
 

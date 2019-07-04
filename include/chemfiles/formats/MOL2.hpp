@@ -4,13 +4,18 @@
 #ifndef CHEMFILES_FORMAT_MOL2_HPP
 #define CHEMFILES_FORMAT_MOL2_HPP
 
+#include <iosfwd>
+#include <memory>
+#include <string>
+#include <vector>
 #include <unordered_map>
 
-#include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
-#include "chemfiles/Residue.hpp"
+#include "chemfiles/Format.hpp"
+#include "chemfiles/Residue.hpp"  // IWYU pragma: keep
 
 namespace chemfiles {
+class Frame;
 
 /// [MOL2][MOL2] file format reader and writer.
 ///

@@ -8,12 +8,13 @@
 #include <string>
 
 #include "chemfiles/Frame.hpp"
-#include "chemfiles/exports.hpp"
+#include "chemfiles/UnitCell.hpp"
+#include "chemfiles/exports.h"
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
-
 class Format;
+class Topology;
 
 /// A `Trajectory` is a chemistry file on the hard drive. It is the entry point
 /// of the chemfiles library.

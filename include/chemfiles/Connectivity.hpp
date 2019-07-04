@@ -5,10 +5,11 @@
 #define CHEMFILES_CONNECTIVITY_HPP
 
 #include <array>
-#include <cassert>
+#include <vector>
+#include <algorithm> // IWYU pragma: keep
 
 #include "chemfiles/sorted_set.hpp"
-#include "chemfiles/exports.hpp"
+#include "chemfiles/exports.h"
 
 namespace chemfiles {
 
@@ -27,7 +28,7 @@ public:
         DOUBLE = 2,     ///< Double bond
         TRIPLE = 3,     ///< Triple bond
         QUADRUPLE = 4,  ///< Qudadruple bond
-        QINTUPLET = 5,  ///< Quintuplet bond 
+        QINTUPLET = 5,  ///< Quintuplet bond
 
         // space for more bond types if needed
         DOWN = 250,     ///< Single bond direction from frist atom to second is 'down'. Used for cis-trans isomers

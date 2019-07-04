@@ -1,12 +1,17 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include "chemfiles/shared_allocator.hpp"
-#include "chemfiles/capi/trajectory.h"
-#include "chemfiles/capi/misc.h"
-#include "chemfiles/capi.hpp"
+#include <cstdint>
+#include <string>
 
+#include "chemfiles/capi/types.h"
+#include "chemfiles/capi/trajectory.h"
+#include "chemfiles/capi/utils.hpp"
+#include "chemfiles/capi/shared_allocator.hpp"
+
+#include "chemfiles/Frame.hpp"
 #include "chemfiles/Trajectory.hpp"
+
 using namespace chemfiles;
 
 extern "C" CHFL_TRAJECTORY* chfl_trajectory_open(const char* path, char mode) {

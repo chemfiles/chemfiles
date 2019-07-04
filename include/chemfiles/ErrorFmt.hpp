@@ -4,8 +4,8 @@
 #ifndef CHEMFILES_ERROR_FMT_HPP
 #define CHEMFILES_ERROR_FMT_HPP
 
-#include "chemfiles/Error.hpp"
 #include <fmt/format.h>
+#include "chemfiles/Error.hpp"  // IWYU pragma: export
 
 /// This file contains [fmt] based error constructors. These constructors are
 /// not defined in the `Error.hpp` file because this would expose fmt headers

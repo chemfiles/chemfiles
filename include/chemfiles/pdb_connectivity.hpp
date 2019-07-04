@@ -4,11 +4,11 @@
 #ifndef CHEMFILES_PDB_CONNECTIVITY_HPP
 #define CHEMFILES_PDB_CONNECTIVITY_HPP
 
-#include <unordered_map>
 #include <vector>
 #include <string>
+#include <functional>
+#include <unordered_map>
 
-#include "chemfiles/Error.hpp"
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
@@ -72,9 +72,9 @@ inline bool operator>=(const InternedName& lhs, const InternedName& rhs) {
 namespace std {
     template<> struct hash<chemfiles::InternedName> {
         typedef chemfiles::InternedName argument_type;
-        typedef std::size_t result_type;
+        typedef ::size_t result_type;
         result_type operator()(argument_type const& s) const noexcept {
-            return std::hash<size_t>{}(s.index_);
+            return std::hash<::size_t>{}(s.index_);
         }
     };
 }

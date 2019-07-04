@@ -4,17 +4,24 @@
 #ifndef CHEMFILES_FORMAT_SMI_HPP
 #define CHEMFILES_FORMAT_SMI_HPP
 
-#include <vector>
-#include <stack>
 #include <map>
+#include <stack>
+#include <vector>
+#include <iosfwd>
+#include <memory>
+#include <string>
 #include <unordered_map>
 
-#include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
+#include "chemfiles/Residue.hpp"
 #include "chemfiles/Connectivity.hpp"
-#include "chemfiles/Topology.hpp"
 
 namespace chemfiles {
+class Atom;
+class Frame;
+class Topology;
+
 
 /// [SMI] file format reader and writer.
 ///

@@ -4,7 +4,6 @@
 #include "chemfiles/Property.hpp"
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/warnings.hpp"
-#include "chemfiles/utils.hpp"
 using namespace chemfiles;
 
 bool Property::as_bool() const {
