@@ -79,7 +79,7 @@ private:
     template<class T>
     void insert_new(T* ptr) {
         if (pointers_.count(ptr) != 0) {
-            throw chemfiles::error(
+            throw chemfiles::memory_error(
                 "internal error: pointer at {} is already managed by "
                 "shared_allocator", static_cast<void*>(ptr)
             );
@@ -93,7 +93,7 @@ private:
         auto it = pointers_.find(ptr);
         if (it == pointers_.end()) {
             // the main pointer is not a shared pointer
-            throw chemfiles::error(
+            throw chemfiles::memory_error(
                 "internal error: pointer at {} is not managed by "
                 "shared_allocator", ptr
             );
@@ -106,7 +106,7 @@ private:
             if (id != it->second) {
                 // the element pointer is already registered, but with a
                 // different main pointer
-                throw chemfiles::error(
+                throw chemfiles::memory_error(
                     "internal error: element pointer at {} is already managed by "
                     "shared_allocator (associated with {})", element, ptr
                 );
@@ -121,7 +121,7 @@ private:
     void release(const void* ptr) {
         auto it = pointers_.find(ptr);
         if (it == pointers_.end()) {
-            throw chemfiles::error(
+            throw chemfiles::memory_error(
                 "unknown pointer passed to shared_allocator::free: {}", ptr
             );
         }
@@ -130,7 +130,7 @@ private:
         // as it can become invalid after the call to `pointers_.erase` below.
         auto id = it->second;
         if (id >= metadata_.size()) {
-            throw chemfiles::error(
+            throw chemfiles::memory_error(
                 "internal error: metadata index is too big: {} >= {}", id, metadata_.size()
             );
         }
@@ -147,7 +147,7 @@ private:
             metadata_[id].deleter = UNINITIALIZED_DELETER;
             unused_.emplace_back(id);
         } else if (metadata_[id].count < 0) {
-            throw chemfiles::error(
+            throw chemfiles::memory_error(
                 "internal error: negative reference count for {}", ptr
             );
         }
@@ -158,7 +158,7 @@ private:
         if (it != pointers_.end()) {
             return metadata_.at(it->second);
         } else {
-            throw chemfiles::error(
+            throw chemfiles::memory_error(
                 "internal error: unknwon pointer passed to shared_allocator::metadata"
             );
         }
