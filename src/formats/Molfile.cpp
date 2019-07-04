@@ -2,12 +2,32 @@
 #define VMDCON_WARN      2
 #define VMDCON_ERROR     3
 
+extern "C" {
+    #include <vmdplugin.h>
+    #include <molfile_plugin.h>
+}
+
+#include <cassert>
+#include <array>
+#include <string>
+#include <vector>
+#include <unordered_map>
+
+#include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
+#include "chemfiles/Atom.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/Residue.hpp"
+#include "chemfiles/Topology.hpp"
+
+#include "chemfiles/types.hpp"
+#include "chemfiles/warnings.hpp"
+#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/external/span.hpp"
+#include "chemfiles/external/optional.hpp"
+
 #include "chemfiles/formats/Molfile.hpp"
 
-#include "chemfiles/Frame.hpp"
-#include "chemfiles/ErrorFmt.hpp"
-#include "chemfiles/warnings.hpp"
-#include "chemfiles/Topology.hpp"
 using namespace chemfiles;
 
 /******************************************************************************/

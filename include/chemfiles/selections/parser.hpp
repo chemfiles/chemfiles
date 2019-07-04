@@ -4,7 +4,8 @@
 #ifndef CHEMFILES_SELECTION_PARSER_HPP
 #define CHEMFILES_SELECTION_PARSER_HPP
 
-#include <memory>
+#include <string>
+#include <vector>
 #include <cassert>
 
 #include "chemfiles/selections/lexer.hpp"

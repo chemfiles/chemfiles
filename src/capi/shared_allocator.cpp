@@ -1,6 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-#include "chemfiles/shared_allocator.hpp"
+#include "chemfiles/capi/shared_allocator.hpp"
 using namespace chemfiles;
 
 // define the global allocator instance

@@ -1,16 +1,36 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <mmtf.hpp>
+#include <array>
+#include <string>
+#include <vector>
+#include <memory>
+#include <ostream>
+#include <cstdint>
+#include <exception>
+
+#include <mmtf/structure_data.hpp>
+#include <mmtf/decoder.hpp>
+#include <mmtf/encoder.hpp>
 #include <mmtf/export_helpers.hpp>
 
-#include "chemfiles/formats/MMTF.hpp"
-
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
+#include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
+#include "chemfiles/Property.hpp"
+#include "chemfiles/Residue.hpp"
+#include "chemfiles/Topology.hpp"
+#include "chemfiles/Connectivity.hpp"
+
+#include "chemfiles/types.hpp"
+#include "chemfiles/warnings.hpp"
+#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/files/GzFile.hpp"
 #include "chemfiles/files/XzFile.hpp"
+#include "chemfiles/formats/MMTF.hpp"
 
 using namespace chemfiles;
 

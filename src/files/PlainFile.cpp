@@ -1,10 +1,13 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <algorithm>
+#include <ios>
+#include <string>
 
+#include "chemfiles/File.hpp"
 #include "chemfiles/files/PlainFile.hpp"
 #include "chemfiles/ErrorFmt.hpp"
+
 using namespace chemfiles;
 
 PlainFile::PlainFile(std::string path, File::Mode mode)

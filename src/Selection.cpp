@@ -1,17 +1,22 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include "chemfiles/Selection.hpp"
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "chemfiles/Frame.hpp"
+#include "chemfiles/Selection.hpp"
+#include "chemfiles/Connectivity.hpp"
+#include "chemfiles/Topology.hpp"
+#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/utils.hpp"
+#include "chemfiles/unreachable.hpp"
+
 #include "chemfiles/selections/lexer.hpp"
 #include "chemfiles/selections/parser.hpp"
 #include "chemfiles/selections/expr.hpp"
 
-#include <algorithm>
-#include <numeric>
-
-#include "chemfiles/ErrorFmt.hpp"
-#include "chemfiles/utils.hpp"
 using namespace chemfiles;
 
 //! Extract the context from the `string`, and put the selection string

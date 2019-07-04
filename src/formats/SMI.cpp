@@ -1,23 +1,40 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <set>
+#include <cassert>
+#include <cmath>
+#include <cstdlib>
 #include <cctype>
-#include <map>
-#include <unordered_set>
-#include <algorithm>
 
-#include <fmt/format.h>
+#include <set>
+#include <map>
+#include <stack>
+#include <string>
+#include <vector>
+#include <memory>
+#include <istream>
+#include <iterator>
+#include <algorithm>
+#include <unordered_map>
+#include <unordered_set>
+
 #include <fmt/ostream.h>
 
-#include "chemfiles/formats/SMI.hpp"
-
-#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
+#include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
-#include "chemfiles/periodic_table.hpp"
-#include "chemfiles/warnings.hpp"
+#include "chemfiles/Property.hpp"
+#include "chemfiles/Residue.hpp"
+#include "chemfiles/Topology.hpp"
+#include "chemfiles/Connectivity.hpp"
+
 #include "chemfiles/utils.hpp"
+#include "chemfiles/warnings.hpp"
+#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/external/optional.hpp"
+
+#include "chemfiles/formats/SMI.hpp"
 
 using namespace chemfiles;
 
@@ -181,7 +198,7 @@ void SMIFormat::process_property_list_(Topology& topol, const std::string& smile
 
 void SMIFormat::read(Frame& frame) {
     // Initialize all the reading variables
-    branch_point_ = std::stack<size_t, std::vector<size_t>>(); 
+    branch_point_ = std::stack<size_t, std::vector<size_t>>();
     rings_ids_.clear();
     mol_vector_.clear();
     current_atom_ = 0;
@@ -264,7 +281,7 @@ void SMIFormat::read(Frame& frame) {
             auto element_name = smiles.substr(i, element_length);
 
             if (ALIPHATIC_ORGANIC.count(element_name) == 0) {
-                throw format_error("SMI Reader", "bare non-organic atom: '{}'", element_name);    
+                throw format_error("SMI Reader", "bare non-organic atom: '{}'", element_name);
             }
 
             add_atom(topol, std::move(element_name));
@@ -414,7 +431,7 @@ static void find_rings(
     ring_atoms.clear();
     std::vector<bool> hit_atoms(adj_list.size(), false);
     std::set<Bond> ring_bonds;
-    
+
     while (!all(hit_atoms)) {
         auto not_hit = std::find(hit_atoms.begin(), hit_atoms.end(), false);
         auto current_atom = static_cast<size_t>(std::distance(hit_atoms.begin(), not_hit));
@@ -748,7 +765,7 @@ bool forward(TextFile& file) {
         // No more line left in the file
         return false;
     }
-    
+
     return true;
 }
 

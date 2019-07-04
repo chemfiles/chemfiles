@@ -9,6 +9,7 @@
 
 #include "chemfiles/mutex.hpp"
 #include "chemfiles/periodic_table.hpp"
+#include "chemfiles/external/optional.hpp"
 
 namespace toml {
     class value;

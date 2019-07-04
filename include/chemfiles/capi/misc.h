@@ -5,6 +5,8 @@
 #define CHEMFILES_CHFL_LOGGING_H
 
 #include "chemfiles/capi/types.h"
+#include "chemfiles/exports.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

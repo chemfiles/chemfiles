@@ -4,7 +4,10 @@
 #ifndef CHEMFILES_TNG_FILE_HPP
 #define CHEMFILES_TNG_FILE_HPP
 
-#include "tng/tng_io.h"
+#include <string>
+
+#include <tng/tng_io.h>
+
 #include "chemfiles/File.hpp"
 
 namespace chemfiles {

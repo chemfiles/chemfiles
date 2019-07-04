@@ -1,18 +1,36 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <fmt/format.h>
+#include <cassert>
+#include <cctype>
+#include <cstdint>
+
+#include <array>
+#include <string>
+#include <vector>
+#include <memory>
+#include <istream>
+#include <unordered_map>
+
 #include <fmt/ostream.h>
 
-#include "chemfiles/formats/MOL2.hpp"
-
-#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
+#include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
-#include "chemfiles/utils.hpp"
-#include "chemfiles/periodic_table.hpp"
+#include "chemfiles/Property.hpp"
+#include "chemfiles/Residue.hpp"
+#include "chemfiles/Topology.hpp"
+#include "chemfiles/UnitCell.hpp"
+#include "chemfiles/Connectivity.hpp"
 
+#include "chemfiles/utils.hpp"
 #include "chemfiles/warnings.hpp"
+#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/periodic_table.hpp"
+#include "chemfiles/external/optional.hpp"
+
+#include "chemfiles/formats/MOL2.hpp"
 
 using namespace chemfiles;
 template<> FormatInfo chemfiles::format_information<MOL2Format>() {

@@ -1,13 +1,25 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <cstring>
+#include <cerrno>
+#include <cstdlib>
 #include <cassert>
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
+
+#include <ios>
+#include <array>
+#include <string>
+#include <vector>
 #include <limits>
 
-#include "chemfiles/ErrorFmt.hpp"
-#include "chemfiles/warnings.hpp"
+#include <lzma.h>
+
+#include "chemfiles/File.hpp"
 #include "chemfiles/files/XzFile.hpp"
+#include "chemfiles/ErrorFmt.hpp"
+
 using namespace chemfiles;
 
 static void check(lzma_ret code) {

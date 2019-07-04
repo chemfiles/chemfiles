@@ -1,7 +1,16 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <cassert>
+#include <string>
+#include <vector>
+
+#include <netcdf.h>
+
+#include "chemfiles/File.hpp"
 #include "chemfiles/files/NcFile.hpp"
+#include "chemfiles/ErrorFmt.hpp"
+
 using namespace chemfiles;
 
 size_t chemfiles::nc::hyperslab_size(const count_t& count) {

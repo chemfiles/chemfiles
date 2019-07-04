@@ -1,17 +1,38 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <fmt/format.h>
+#include <cassert>
+#include <cstdint>
+
+#include <map>
+#include <tuple>
+#include <array>
+#include <string>
+#include <vector>
+#include <memory>
+#include <istream>
+#include <algorithm>
+#include <unordered_map>
+
 #include <fmt/ostream.h>
 
-#include "chemfiles/formats/PDB.hpp"
-
-#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
+#include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
+#include "chemfiles/Property.hpp"
+#include "chemfiles/Residue.hpp"
+#include "chemfiles/Topology.hpp"
+#include "chemfiles/UnitCell.hpp"
+#include "chemfiles/Connectivity.hpp"
+
+#include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/warnings.hpp"
+#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/external/optional.hpp"
 
+#include "chemfiles/formats/PDB.hpp"
 #include "chemfiles/pdb_connectivity.hpp"
 
 using namespace chemfiles;

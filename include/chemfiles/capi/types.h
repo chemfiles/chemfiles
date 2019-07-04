@@ -4,13 +4,9 @@
 #ifndef CHEMFILES_CHFL_TYPES_H
 #define CHEMFILES_CHFL_TYPES_H
 
-#include <stdint.h>  // NOLINT: this is both a C and C++ file
-#include <stdbool.h>  // NOLINT: this is both a C and C++ file
-#include "chemfiles/config.hpp"
-#include "chemfiles/exports.hpp"
+#include "chemfiles/exports.h"
 
-#ifdef __cplusplus
-extern "C" {
+#if defined(__cplusplus) && !defined(INCLUDE_WHAT_YOU_USE)
 namespace chemfiles {
     class Trajectory;
     class Frame;
@@ -21,15 +17,17 @@ namespace chemfiles {
     class Property;
 }
 struct CAPISelection;
-using CHFL_TRAJECTORY = chemfiles::Trajectory;
-using CHFL_FRAME = chemfiles::Frame;
-using CHFL_ATOM = chemfiles::Atom;
-using CHFL_CELL = chemfiles::UnitCell;
-using CHFL_TOPOLOGY = chemfiles::Topology;
-using CHFL_RESIDUE = chemfiles::Residue;
-using CHFL_PROPERTY = chemfiles::Property;
-using CHFL_SELECTION = CAPISelection;
+typedef chemfiles::Trajectory CHFL_TRAJECTORY;
+typedef chemfiles::Frame CHFL_FRAME;
+typedef chemfiles::Atom CHFL_ATOM;
+typedef chemfiles::UnitCell CHFL_CELL;
+typedef chemfiles::Topology CHFL_TOPOLOGY;
+typedef chemfiles::Residue CHFL_RESIDUE;
+typedef chemfiles::Property CHFL_PROPERTY;
+typedef CAPISelection CHFL_SELECTION;
+
 #else
+
 /// An opaque type handling trajectories files.
 ///
 /// The `CHFL_TRAJECTORY` type is the main entry point when using chemfiles. A
@@ -106,6 +104,10 @@ typedef struct CHFL_SELECTION CHFL_SELECTION;
 /// `CHFL_ATOM`. A property can have various types: bool, double, string or
 /// `chfl_vector3d`.
 typedef struct CHFL_PROPERTY CHFL_PROPERTY;
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /// `chfl_status` list the possible values for the return status code of

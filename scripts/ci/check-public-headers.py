@@ -9,7 +9,7 @@ import sys
 import re
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
-GENERATED_HEADERS = ["chemfiles/config.hpp", "chemfiles/exports.hpp"]
+GENERATED_HEADERS = ["chemfiles/config.h", "chemfiles/exports.h"]
 ERRORS = 0
 
 WHITELIST = [
@@ -18,13 +18,13 @@ WHITELIST = [
     # standard C++11 headers
     "iterator", "functional", "cstdint", "array", "utility", "cassert",
     "string", "memory", "exception", "limits", "algorithm", "stdexcept",
-    "vector", "cmath", "type_traits", "unordered_map", "cfloat",
+    "vector", "cmath", "type_traits", "unordered_map", "cfloat", "new",
     # external headers
     "chemfiles/external/span.hpp",
     "chemfiles/external/optional.hpp",
     # chemfiles helper headers
-    "chemfiles/exports.hpp",
-    "chemfiles/config.hpp",
+    "chemfiles/exports.h",
+    "chemfiles/config.h",
     "chemfiles/sorted_set.hpp",
     "chemfiles/unreachable.hpp",
     # chemfiles main headers

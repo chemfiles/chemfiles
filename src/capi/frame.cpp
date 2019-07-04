@@ -1,12 +1,23 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include "chemfiles/shared_allocator.hpp"
+#include <cstdint>
+#include <string>
+
+#include "chemfiles/capi/types.h"
 #include "chemfiles/capi/frame.h"
-#include "chemfiles/capi.hpp"
+#include "chemfiles/capi/utils.hpp"
+#include "chemfiles/capi/shared_allocator.hpp"
 
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/Property.hpp"
+#include "chemfiles/Connectivity.hpp"
+
+#include "chemfiles/types.hpp"
+#include "chemfiles/external/optional.hpp"
+#include "chemfiles/external/span.hpp"
+
 using namespace chemfiles;
 
 extern "C" CHFL_FRAME* chfl_frame(void) {

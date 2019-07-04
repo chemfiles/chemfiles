@@ -1,13 +1,18 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <cstdint>
 #include <cstring>
+#include <string>
+#include <vector>
 
-#include "chemfiles/shared_allocator.hpp"
+#include "chemfiles/capi/types.h"
 #include "chemfiles/capi/selection.h"
-#include "chemfiles/capi.hpp"
+#include "chemfiles/capi/utils.hpp"
+#include "chemfiles/capi/shared_allocator.hpp"
 
 #include "chemfiles/Selection.hpp"
+
 using namespace chemfiles;
 
 static_assert(

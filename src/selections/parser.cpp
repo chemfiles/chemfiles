@@ -1,14 +1,20 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <cassert>
+#include <cmath>
+#include <map>
+#include <string>
+#include <vector>
+#include <memory>
+#include <functional>
+
+#include "chemfiles/selections/expr.hpp"
 #include "chemfiles/selections/lexer.hpp"
 #include "chemfiles/selections/parser.hpp"
-#include "chemfiles/selections/expr.hpp"
+
 #include "chemfiles/utils.hpp"
 #include "chemfiles/ErrorFmt.hpp"
-
-#include <functional>
-#include <map>
 
 constexpr double PI = 3.141592653589793238463;
 

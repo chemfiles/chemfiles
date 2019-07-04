@@ -9,7 +9,6 @@
 #include <cstdint>
 #include <cassert>
 
-#include <chemfiles/exports.hpp>
 #include <chemfiles/Error.hpp>
 
 namespace chemfiles {

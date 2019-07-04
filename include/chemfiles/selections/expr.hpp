@@ -4,7 +4,9 @@
 #ifndef CHEMFILES_SELECTION_EXPR_HPP
 #define CHEMFILES_SELECTION_EXPR_HPP
 
+#include <cstdint>
 #include <string>
+#include <vector>
 #include <memory>
 #include <cassert>
 #include <functional>
@@ -13,6 +15,8 @@
 #include "chemfiles/Selection.hpp"
 
 namespace chemfiles {
+class Frame;
+
 namespace selections {
 
 using Variable = uint8_t;

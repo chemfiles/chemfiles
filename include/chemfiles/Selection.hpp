@@ -10,6 +10,7 @@
 #include <array>
 
 #include "chemfiles/Error.hpp"
+#include "chemfiles/exports.h"
 
 namespace chemfiles {
 class Frame;

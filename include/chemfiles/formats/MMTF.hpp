@@ -4,12 +4,15 @@
 #ifndef CHEMFILES_FORMAT_MMTF_HPP
 #define CHEMFILES_FORMAT_MMTF_HPP
 
-#include "chemfiles/Format.hpp"
-#include "chemfiles/File.hpp"
+#include <string>
 
 #include <mmtf/structure_data.hpp>
 
+#include "chemfiles/Format.hpp"
+#include "chemfiles/File.hpp"
+
 namespace chemfiles {
+class Frame;
 
 /// [MMTF][MMTF] file format reader and writer.
 ///
