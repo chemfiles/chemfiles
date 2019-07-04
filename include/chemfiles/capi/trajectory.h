@@ -4,7 +4,11 @@
 #ifndef CHEMFILES_CHFL_TRAJECTORY_H
 #define CHEMFILES_CHFL_TRAJECTORY_H
 
+#include <stdint.h>
+
 #include "chemfiles/capi/types.h"
+#include "chemfiles/exports.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

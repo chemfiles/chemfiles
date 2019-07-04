@@ -4,10 +4,14 @@
 #ifndef CHEMFILES_FORMAT_CSSR_HPP
 #define CHEMFILES_FORMAT_CSSR_HPP
 
+#include <memory>
+#include <string>
+
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
 
 namespace chemfiles {
+class Frame;
 
 /// [CSSR] (Cambridge Structure Search and Retrieval) file format reader and
 /// writer. Only one frame can be read or written to this format.

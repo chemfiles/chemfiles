@@ -5,6 +5,7 @@
 #define CHEMFILES_PLAIN_FILES_HPP
 
 #include <fstream>
+#include <string>
 #include "chemfiles/File.hpp"
 
 namespace chemfiles {

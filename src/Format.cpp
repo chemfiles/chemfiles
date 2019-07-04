@@ -1,10 +1,13 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <cstddef>
 #include <typeinfo>
 
+namespace chemfiles { class Frame; }
 #include "chemfiles/Format.hpp"
 #include "chemfiles/ErrorFmt.hpp"
+
 using namespace chemfiles;
 
 void Format::read_step(size_t /*unused*/, Frame& /*unused*/) {

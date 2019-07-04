@@ -4,7 +4,12 @@
 #ifndef CHEMFILES_CHFL_FRAME_H
 #define CHEMFILES_CHFL_FRAME_H
 
+#include <stdint.h>
+#include <stdbool.h>  // IWYU pragma: keep
+
 #include "chemfiles/capi/types.h"
+#include "chemfiles/exports.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

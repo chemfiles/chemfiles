@@ -1,15 +1,28 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <cstdint>
 #include <fstream>
-#include <toml/parser.hpp>
+#include <string>
+#include <vector>
+#include <unordered_map>
+
 #include <toml/get.hpp>
+#include <toml/types.hpp>
+#include <toml/value.hpp>
+#include <toml/parser.hpp>
+#include <toml/exception.hpp>
 
 #include "chemfiles/Configuration.hpp"
 #include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/misc.hpp"
+#include "chemfiles/mutex.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/warnings.hpp"
-#include "chemfiles/misc.hpp"
+#include "chemfiles/periodic_table.hpp"
+
+#include "chemfiles/external/optional.hpp"
+
 using namespace chemfiles;
 
 // Get the list of directories up to `leaf`. For example, if `leaf` is

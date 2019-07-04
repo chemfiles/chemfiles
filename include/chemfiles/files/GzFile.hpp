@@ -4,8 +4,9 @@
 #ifndef CHEMFILES_GZ_FILES_HPP
 #define CHEMFILES_GZ_FILES_HPP
 
-#include <streambuf>
+#include <ios>
 #include <vector>
+#include <string>
 
 #include <zlib.h>
 

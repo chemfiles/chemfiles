@@ -4,13 +4,15 @@
 #ifndef CHEMFILES_TOPOLOGY_HPP
 #define CHEMFILES_TOPOLOGY_HPP
 
+#include <string>
 #include <vector>
 #include <unordered_map>
 
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/Connectivity.hpp"
 #include "chemfiles/Residue.hpp"
-#include "chemfiles/exports.hpp"
+#include "chemfiles/Error.hpp"
+#include "chemfiles/exports.h"
 
 #include "chemfiles/external/optional.hpp"
 

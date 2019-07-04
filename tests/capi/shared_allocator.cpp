@@ -2,7 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 #include <catch.hpp>
 
-#include "chemfiles/shared_allocator.hpp"
+#include "chemfiles/capi/shared_allocator.hpp"
 using namespace chemfiles;
 
 struct Dummy {

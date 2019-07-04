@@ -4,13 +4,13 @@
 #ifndef CHEMFILES_PROPERTY_HPP
 #define CHEMFILES_PROPERTY_HPP
 
+#include <new>
 #include <string>
 #include <unordered_map>
 
-#include "chemfiles/exports.hpp"
 #include "chemfiles/types.hpp"
+#include "chemfiles/exports.h"
 #include "chemfiles/unreachable.hpp"
-#include "chemfiles/Error.hpp"
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
@@ -87,7 +87,7 @@ public:
         this->kind_ = other.kind_;
         switch (this->kind_) {
         case BOOL:
-            new(&this->bool_) bool(other.bool_);
+            new (&this->bool_) bool(other.bool_);
             break;
         case DOUBLE:
             new (&this->double_) double(other.double_);
@@ -107,7 +107,7 @@ public:
         this->kind_ = other.kind_;
         switch (this->kind_) {
         case BOOL:
-            new(&this->bool_) bool(other.bool_);
+            new (&this->bool_) bool(other.bool_);
             break;
         case DOUBLE:
             new (&this->double_) double(other.double_);

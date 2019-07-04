@@ -29,6 +29,7 @@ option(CHFL_BUILD_TESTS "Build unit tests." OFF)
 option(CHFL_BUILD_DOCUMENTATION "Build the documentation." OFF)
 option(CHFL_USE_WARNINGS "Compile the code with warnings (default in debug mode)" OFF)
 option(CHFL_USE_CLANG_TIDY "Compile the code with clang-tidy warnings" OFF)
+option(CHFL_USE_INCLUDE_WHAT_YOU_USE "Compile the code with include-what-you-use warnings" OFF)
 option(CHFL_SYSTEM_NETCDF "Use the system NetCDF instead of the internal one" OFF)
 option(CHFL_SYSTEM_ZLIB "Use the system zlib instead of the internal one" OFF)
 option(CHFL_SYSTEM_LZMA "Use the system lzma instead of the internal one" OFF)
@@ -50,6 +51,7 @@ endif()
 
 include(CompilerFlags)
 include(ClangTidy)
+include(IncludeWhatYouUse)
 
 if(${CHFL_USE_WARNINGS})
     # Make sure to have asserts compiled
@@ -100,6 +102,7 @@ if(${BUILD_SHARED_LIBS})
 endif()
 
 target_use_clang_tidy(chemfiles_objects)
+target_use_include_what_you_use(chemfiles_objects)
 
 set(CHEMFILES_OBJECTS
     $<TARGET_OBJECTS:chemfiles_objects>
@@ -130,14 +133,14 @@ if(WIN32)
 endif()
 
 configure_file (
-  "${PROJECT_SOURCE_DIR}/include/chemfiles/config.in.hpp"
-  "${PROJECT_BINARY_DIR}/include/chemfiles/config.hpp"
+  "${PROJECT_SOURCE_DIR}/include/chemfiles/config.in.h"
+  "${PROJECT_BINARY_DIR}/include/chemfiles/config.h"
 )
 
 include(GenerateExportHeader)
 generate_export_header(chemfiles
     BASE_NAME CHFL
-    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/chemfiles/exports.hpp
+    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/chemfiles/exports.h
 )
 
 #----------------------------------------------------------------------------------------#

@@ -5,8 +5,7 @@
 #define CHEMFILES_UNIT_CELL_HPP
 
 #include "chemfiles/types.hpp"
-#include "chemfiles/exports.hpp"
-#include "chemfiles/config.hpp"
+#include "chemfiles/exports.h"
 
 #ifdef CHEMFILES_WINDOWS
 #undef INFINITE

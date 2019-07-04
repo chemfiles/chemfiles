@@ -1,14 +1,18 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <cstring>
+#include <cstdint>
+#include <vector>
 
+#include "chemfiles/capi/types.h"
 #include "chemfiles/capi/topology.h"
-#include "chemfiles/capi.hpp"
-#include "chemfiles/shared_allocator.hpp"
+#include "chemfiles/capi/utils.hpp"
+#include "chemfiles/capi/shared_allocator.hpp"
 
-#include "chemfiles/Topology.hpp"
 #include "chemfiles/Frame.hpp"
+#include "chemfiles/Topology.hpp"
+#include "chemfiles/Connectivity.hpp"
+
 using namespace chemfiles;
 
 extern "C" CHFL_TOPOLOGY* chfl_topology(void) {

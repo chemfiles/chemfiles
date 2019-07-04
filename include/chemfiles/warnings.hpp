@@ -5,8 +5,8 @@
 #define CHEMFILES_WARNINGS_H
 
 #include <string>
+#include <iterator>
 #include <fmt/format.h>
-#include "chemfiles/exports.hpp"
 
 namespace chemfiles {
 
