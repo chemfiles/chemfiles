@@ -4,12 +4,15 @@
 #ifndef CHEMFILES_UTILS_HPP
 #define CHEMFILES_UTILS_HPP
 
+#include <cctype>
+#include <cstdint>
+#include <cstdio>
+#include <cstdarg>
 #include <vector>
 #include <string>
 #include <sstream>
-#include <cctype>
-#include <cstdarg>
 #include <algorithm>
+#include <stdexcept>
 
 #include "chemfiles/ErrorFmt.hpp"
 

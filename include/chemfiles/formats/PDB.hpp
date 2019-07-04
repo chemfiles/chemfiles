@@ -5,14 +5,18 @@
 #define CHEMFILES_FORMAT_PDB_HPP
 
 #include <map>
+#include <iosfwd>
+#include <memory>
+#include <string>
 #include <vector>
 #include <tuple>
 
-#include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
 #include "chemfiles/Residue.hpp"
 
 namespace chemfiles {
+class Frame;
 
 /// [PDB][PDB] file format reader and writer.
 ///

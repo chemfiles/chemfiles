@@ -2,10 +2,14 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cmath>
+#include <cassert>
+#include <array>
 
+#include "chemfiles/UnitCell.hpp"
+#include "chemfiles/types.hpp"
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/unreachable.hpp"
-#include "chemfiles/UnitCell.hpp"
+
 using namespace chemfiles;
 
 // Sinus and Cosine for degree values

@@ -4,6 +4,9 @@
 #ifndef CHEMFILES_CAPI_H
 #define CHEMFILES_CAPI_H
 
+#include "chemfiles/exports.h"
+#include "chemfiles/config.h"
+
 #include "chemfiles/capi/types.h"
 #include "chemfiles/capi/misc.h"
 #include "chemfiles/capi/property.h"

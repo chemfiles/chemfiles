@@ -1,13 +1,18 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#ifndef CHEMFILES_TNG_FORMAT_HPP
-#define CHEMFILES_TNG_FORMAT_HPP
+#ifndef CHEMFILES_FORMAT_TNG_HPP
+#define CHEMFILES_FORMAT_TNG_HPP
+
+#include <cstdint>
+#include <string>
 
 #include "chemfiles/Format.hpp"
+#include "chemfiles/File.hpp"
 #include "chemfiles/files/TNGFile.hpp"
 
 namespace chemfiles {
+class Frame;
 
 /// [TNG][TNG] file format reader.
 ///

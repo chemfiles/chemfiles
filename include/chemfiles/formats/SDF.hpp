@@ -4,10 +4,16 @@
 #ifndef CHEMFILES_FORMAT_SDF_HPP
 #define CHEMFILES_FORMAT_SDF_HPP
 
+#include <iosfwd>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
 
 namespace chemfiles {
+class Frame;
 
 /// [SDF] file format reader and writer.
 ///

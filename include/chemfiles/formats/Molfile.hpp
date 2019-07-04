@@ -5,13 +5,17 @@
 #define CHEMFILES_FORMAT_MOLFILE_HPP
 
 extern "C" {
-#include "vmdplugin.h"
-#include "molfile_plugin.h"
+    #include "vmdplugin.h"
+    #include "molfile_plugin.h"
 }
+
+#include <string>
+#include <vector>
 
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
-#include "chemfiles/Topology.hpp"
+#include "chemfiles/Frame.hpp"      // IWYU pragma: keep
+#include "chemfiles/Topology.hpp"   // IWYU pragma: keep
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {

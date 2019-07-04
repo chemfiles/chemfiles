@@ -1,11 +1,19 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include "chemfiles/shared_allocator.hpp"
-#include "chemfiles/capi/property.h"
-#include "chemfiles/capi.hpp"
+#include <cstring>
+#include <cstdint>
+#include <array>
+#include <string>
 
+#include "chemfiles/capi/types.h"
+#include "chemfiles/capi/property.h"
+#include "chemfiles/capi/utils.hpp"
+#include "chemfiles/capi/shared_allocator.hpp"
+
+#include "chemfiles/types.hpp"
 #include "chemfiles/Property.hpp"
+
 using namespace chemfiles;
 
 static_assert(sizeof(chfl_property_kind) == sizeof(int), "Wrong size for chfl_property_kind enum");

@@ -6,7 +6,7 @@
 
 #include <stdexcept>
 #include <string>
-#include "chemfiles/exports.hpp"
+#include "chemfiles/exports.h"
 
 namespace chemfiles {
 

@@ -4,15 +4,21 @@
 #ifndef CHEMFILES_FORMAT_LAMMPS_DATA_HPP
 #define CHEMFILES_FORMAT_LAMMPS_DATA_HPP
 
-#include <unordered_map>
+#include <tuple>
 #include <limits>
+#include <vector>
+#include <string>
+#include <memory>
+#include <unordered_map>
 
-#include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
-#include "chemfiles/Topology.hpp"
+#include "chemfiles/Format.hpp"
+#include "chemfiles/Topology.hpp"  // IWYU pragma: keep
 #include "chemfiles/sorted_set.hpp"
 
 namespace chemfiles {
+class Atom;
+class Frame;
 
 struct atom_data final {
     double x = 0;

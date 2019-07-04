@@ -5,14 +5,14 @@
 #define CHEMFILES_FORMAT_FACTORY_HPP
 
 #include <memory>
+#include <string>
+#include <vector>
 #include <functional>
-#include <unordered_map>
 
-#include "chemfiles/exports.hpp"
+#include "chemfiles/exports.h"
 #include "chemfiles/mutex.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/Error.hpp"
 
 namespace chemfiles {
 

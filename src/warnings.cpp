@@ -1,11 +1,13 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <string>
 #include <iostream>
+#include <functional>
 
-#include "chemfiles/warnings.hpp"
 #include "chemfiles/misc.hpp"
 #include "chemfiles/mutex.hpp"
+#include "chemfiles/warnings.hpp"
 
 using namespace chemfiles;
 

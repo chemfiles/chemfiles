@@ -4,10 +4,12 @@
 #ifndef CHEMFILES_XZ_FILES_HPP
 #define CHEMFILES_XZ_FILES_HPP
 
-#include <streambuf>
-#include <vector>
-#include <array>
 #include <cstdio>
+#include <cstdint>
+#include <ios>
+#include <array>
+#include <vector>
+#include <string>
 
 #include <lzma.h>
 

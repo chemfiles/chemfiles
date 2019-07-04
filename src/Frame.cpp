@@ -1,10 +1,24 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <cassert>
+#include <cmath>
+#include <iosfwd>
+#include <string>
+#include <vector>
+#include <iterator>
 #include <algorithm>
 
-#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Frame.hpp"
+
+#include "chemfiles/types.hpp"
+#include "chemfiles/Atom.hpp"
+#include "chemfiles/Connectivity.hpp"
+#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/Topology.hpp"
+#include "chemfiles/UnitCell.hpp"
+#include "chemfiles/external/optional.hpp"
+
 using namespace chemfiles;
 
 Frame::Frame(UnitCell cell): cell_(std::move(cell)) {}

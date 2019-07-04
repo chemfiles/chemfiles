@@ -1,11 +1,26 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <cassert>
+#include <array>
+#include <string>
+#include <vector>
+
+#include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/UnitCell.hpp"
+#include "chemfiles/files/NcFile.hpp"
+
+#include "chemfiles/types.hpp"
+#include "chemfiles/config.h"
+#include "chemfiles/warnings.hpp"
+#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/external/optional.hpp"
+#include "chemfiles/external/span.hpp"
+
 #include "chemfiles/formats/AmberNetCDF.hpp"
 
-#include "chemfiles/ErrorFmt.hpp"
-#include "chemfiles/Frame.hpp"
-#include "chemfiles/warnings.hpp"
 using namespace chemfiles;
 
 template<> FormatInfo chemfiles::format_information<AmberNetCDFFormat>() {

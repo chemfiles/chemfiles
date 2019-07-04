@@ -1,11 +1,32 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include "chemfiles/formats/TNG.hpp"
-#include "chemfiles/files/TNGFile.hpp"
+#include <cmath>
+#include <cstdlib>
+#include <cstdint>
+#include <array>
+#include <string>
+#include <cassert>
+#include <algorithm>
 
+#include <tng/tng_io.h>
+
+#include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
+#include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
+#include "chemfiles/Residue.hpp"
+#include "chemfiles/Topology.hpp"
+#include "chemfiles/UnitCell.hpp"
+
+#include "chemfiles/types.hpp"
 #include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/external/optional.hpp"
+#include "chemfiles/external/span.hpp"
+
+#include "chemfiles/files/TNGFile.hpp"
+#include "chemfiles/formats/TNG.hpp"
+
 using namespace chemfiles;
 
 template<> FormatInfo chemfiles::format_information<TNGFormat>() {

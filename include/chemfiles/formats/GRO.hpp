@@ -5,12 +5,17 @@
 #define CHEMFILES_FORMAT_GRO_HPP
 
 #include <map>
+#include <iosfwd>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Residue.hpp"
 
 namespace chemfiles {
+class Frame;
 
 /// [GRO] file format reader and writer.
 ///
