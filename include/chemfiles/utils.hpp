@@ -103,22 +103,25 @@ template<> inline size_t parse(const std::string& string) {
 __attribute__((format(scanf, 2, 3)))
 #endif
 inline void scan(const std::string& input, const char* format, ...) {
-    va_list vlist;
-    va_start(vlist, format);
     int expected = 0;
     char c = format[0];
     for (size_t i = 0; c != 0; i++, c = format[i]) {
         if (c == '%') {
-            // Do not count %n specifiers, or %* specifiers.
+            // We can access format[i + 1] safely, because we did not reach
+            // the null-terminator yet
             if (format[i + 1] == 'n' || format[i + 1] == '*') {
-                // We can access format[i + 1] safely, because we did not reach
-                // the null-terminator yet
+                // %n and %* specifiers don't increase the assignement count
                 continue;
             }
             expected += 1;
         }
     }
+
+    // Forward the work to std::vsscanf
+    va_list vlist;
+    va_start(vlist, format);
     auto actual = std::vsscanf(input.c_str(), format, vlist);
+    va_end(vlist);
     if (actual != expected) {
         throw error(
             "failed to read line '{}' with format '{}': {} matched out of {}",
