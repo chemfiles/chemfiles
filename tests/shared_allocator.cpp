@@ -80,6 +80,6 @@ TEST_CASE("Shared allocator") {
     }
 
     SECTION("Errors") {
-        CHECK_THROWS_AS(shared_allocator::free(reinterpret_cast<void*>(0x1)), Error);
+        CHECK_THROWS_AS(shared_allocator::free(reinterpret_cast<void*>(0x1)), MemoryError);
     }
 }
