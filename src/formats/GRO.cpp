@@ -207,7 +207,7 @@ void GROFormat::write(const Frame& frame) {
             resname = residue->name();
             if (resname.length() > 5) {
                 warning(
-                    "Residue '{}' has a name too long for GRO format, it will be truncated.",
+                    "residue '{}' has a name too long for GRO format, it will be truncated",
                     resname
                 );
                 resname = resname.substr(0, 5);
@@ -219,7 +219,7 @@ void GROFormat::write(const Frame& frame) {
             if (value <= 99999) {
                 resid = std::to_string(value);
             } else {
-                warning("Too many residues for GRO format, removing residue id");
+                warning("too many residues for GRO format, removing residue id");
             }
         } else {
             // We need to manually assign a residue ID

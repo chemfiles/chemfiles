@@ -77,7 +77,7 @@ void MOL2Format::read_step(const size_t step, Frame& frame) {
 void MOL2Format::read(Frame& frame) {
     auto line = trim(file_->readline());
     if (line != "@<TRIPOS>MOLECULE") {
-        throw format_error("Wrong starting line for a molecule in MOL2 formart: '{}'", line);
+        throw format_error("wrong starting line for a molecule in MOL2 formart: '{}'", line);
     }
 
     frame.set("name", trim(file_->readline()) );
@@ -207,7 +207,7 @@ void MOL2Format::read_bonds(Frame& frame, size_t nbonds) {
         --id_2;
 
         if (id_1 >= frame.size() || id_2 >= frame.size()) {
-            throw format_error("Connect ID '{}' or '{}' larger than number of atoms '{}'",
+            throw format_error("connect ID '{}' or '{}' larger than number of atoms '{}'",
                 id_1, id_2, frame.size()
             );
         }
@@ -243,7 +243,7 @@ std::streampos read_until(TextFile& file, const std::string& tag) {
         }
     }
 
-    throw file_error("File ended before tag '{}' was found", tag);
+    throw file_error("file ended before tag '{}' was found", tag);
 }
 
 std::streampos forward(TextFile& file) {

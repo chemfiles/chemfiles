@@ -373,7 +373,7 @@ bool forward(TextFile& file) {
         std::string counts_line = file.readline();
 
         if (counts_line.length() < 10) {
-            throw format_error("Counts line must have at least 10 digits, it has {}", counts_line.length());
+            throw format_error("counts line must have at least 10 digits, it has {}", counts_line.length());
         }
 
         natoms = parse<size_t>(counts_line.substr(0,3));

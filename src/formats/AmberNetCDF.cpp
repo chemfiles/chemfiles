@@ -35,21 +35,21 @@ static bool is_valid(const NcFile& file_, size_t natoms) {
 
     if (file_.global_attribute("Conventions") != "AMBER") {
         if (!writing) {
-            warning("We can only read AMBER convention NetCDF files.");
+            warning("we can only read AMBER convention NetCDF files");
         }
         return false;
     }
 
     if (file_.global_attribute("ConventionVersion") != "1.0") {
         if (!writing) {
-            warning("We can only read version 1.0 of AMBER convention NetCDF files.");
+            warning("we can only read version 1.0 of AMBER convention NetCDF files");
         }
         return false;
     }
 
     if (file_.dimension("spatial") != 3) {
         if (!writing) {
-            warning("Wrong size for spatial dimension. Should be 3, is {}.", file_.dimension("spatial"));
+            warning("wrong size for spatial dimension: should be 3, is {}", file_.dimension("spatial"));
         }
         return false;
     }
@@ -57,7 +57,7 @@ static bool is_valid(const NcFile& file_, size_t natoms) {
     if (writing) {
         if (file_.dimension("atom") != natoms) {
             warning(
-                "Wrong size for atoms dimension. Should be {}, is {}.",
+                "wrong size for atoms dimension: should be {}, is {}",
                 natoms, file_.dimension("atom")
             );
             return false;

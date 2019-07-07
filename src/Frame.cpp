@@ -67,14 +67,14 @@ void Frame::guess_bonds() {
         auto i_radius = topology_[i].vdw_radius();
         if (!i_radius) {
             throw error(
-                "Missing Van der Waals radius for '{}'", topology_[i].type()
+                "missing Van der Waals radius for '{}'", topology_[i].type()
             );
         }
         for (size_t j = i + 1; j < size(); j++) {
             auto j_radius = topology_[j].vdw_radius();
             if (!j_radius) {
                 throw error(
-                    "Missing Van der Waals radius for '{}'", topology_[j].type()
+                    "missing Van der Waals radius for '{}'", topology_[j].type()
                 );
             }
             auto d = distance(i, j);
@@ -117,7 +117,7 @@ void Frame::guess_bonds() {
 void Frame::set_topology(Topology topology) {
     if (topology.size() != size()) {
         throw error(
-            "The topology contains {} atoms, but the frame contains {} atoms.",
+            "the topology contains {} atoms, but the frame contains {} atoms",
             topology.size(), size()
         );
     }

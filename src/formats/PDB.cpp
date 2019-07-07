@@ -228,7 +228,7 @@ void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
         auto space_group = trim(line.substr(55, 10));
         if (space_group != "P 1" && space_group != "P1") {
             warning(
-                "Space group which is not P1 ({}) ignored in '{}'",
+                "space group which is not P1 ({}) ignored in '{}'",
                 space_group, file_->path()
             );
         }
@@ -321,7 +321,7 @@ void PDBFormat::read_secondary(const std::string& line, size_t i1, size_t i2,
         resid2 = parse<size_t>(line.substr(i2 + 1, 4));
     } catch (const Error&) {
         warning(
-            "Error parsing line: '{}', check {} and {}",
+            "error parsing line: '{}', check {} and {}",
             line, line.substr(i1 + 1, 4), line.substr(i2 + 1, 4)
         );
         return;
@@ -701,7 +701,7 @@ void PDBFormat::write(const Frame& frame) {
         auto altloc = frame[i].get<Property::STRING>("altloc").value_or(" ");
         if (altloc.length() > 1) {
             warning(
-                "altloc '{}' is too long for PDB format, it will be truncated.",
+                "altloc '{}' is too long for PDB format, it will be truncated",
                 altloc
             );
             altloc = altloc[0];
@@ -722,7 +722,7 @@ void PDBFormat::write(const Frame& frame) {
 
             if (resname.length() > 3) {
                 warning(
-                    "Residue '{}' has a name too long for PDB format, it will be truncated.",
+                    "residue '{}' has a name too long for PDB format, it will be truncated",
                     resname
                 );
                 resname = resname.substr(0, 3);
@@ -731,7 +731,7 @@ void PDBFormat::write(const Frame& frame) {
             if (residue->id()) {
                 auto value = residue->id().value();
                 if (value > 9999) {
-                    warning("Too many residues for PDB format, removing residue id {}", value);
+                    warning("too many residues for PDB format, removing residue id {}", value);
                     resid = "  -1";
                 } else {
                     resid = std::to_string(residue->id().value());
@@ -745,7 +745,7 @@ void PDBFormat::write(const Frame& frame) {
                 chainid = residue->get("chainid")->as_string();
                 if (chainid.length() > 1) {
                     warning(
-                        "Residue '{}' has a chain id too long for PDB format, it will be truncated.",
+                        "residue '{}' has a chain id too long for PDB format, it will be truncated",
                         chainid
                     );
                     chainid = chainid[0];
@@ -759,7 +759,7 @@ void PDBFormat::write(const Frame& frame) {
                 inscode = residue->get("insertion_code")->as_string();
                 if (inscode.length() > 1) {
                     warning(
-                        "Residue '{}' has an insertion code too long for PDB format, it will be truncated.",
+                        "residue '{}' has an insertion code too long for PDB format, it will be truncated",
                         inscode
                     );
                     inscode = inscode[0];
@@ -792,7 +792,7 @@ void PDBFormat::write(const Frame& frame) {
     auto connect = std::vector<std::vector<size_t>>(frame.size());
     for (auto& bond : frame.topology().bonds()) {
         if (bond[0] > 99999 || bond[1] > 99999) {
-            warning("Atomic index is too big for CONNECT, removing the bond between {} and {}", bond[0], bond[1]);
+            warning("atomic index is too big for CONNECT, removing the bond between {} and {}", bond[0], bond[1]);
             continue;
         }
         connect[bond[0]].push_back(bond[1]);
