@@ -105,7 +105,7 @@ std::streampos gzstreambuf::seekoff(std::streamoff offset, std::ios_base::seekdi
     } else if (way == std::ios_base::beg) {
         dir = SEEK_SET;
     } else if (way == std::ios_base::end) {
-        throw file_error("zlib doesn't support SEEK_END in gzseek().");
+        throw file_error("zlib doesn't support SEEK_END in gzseek()");
     }
 
     auto position = gzseek(file_, static_cast<z_off_t>(offset), dir);

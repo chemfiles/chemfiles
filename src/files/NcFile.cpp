@@ -167,10 +167,10 @@ std::string NcFile::global_attribute(const std::string& name) const {
 }
 
 void NcFile::add_global_attribute(const std::string& name, const std::string& value) {
-    assert(nc_mode() == DEFINE &&
-           "File must be in define mode to add attribute");
-    auto status = nc_put_att_text(file_id_, NC_GLOBAL, name.c_str(),
-                                 value.size(), value.c_str());
+    assert(nc_mode() == DEFINE && "file must be in define mode to add attribute");
+    auto status = nc_put_att_text(
+        file_id_, NC_GLOBAL, name.c_str(), value.size(), value.c_str()
+    );
 
     nc::check(status,
         "could not add the '{}' global attribute with value '{}'",
@@ -181,7 +181,7 @@ void NcFile::add_global_attribute(const std::string& name, const std::string& va
 size_t NcFile::dimension(const std::string& name) const {
     auto size = optional_dimension(name, static_cast<size_t>(-1));
     if (size == static_cast<size_t>(-1)) {
-        throw file_error("Missing dimmension '{}' in NetCDF file", name);
+        throw file_error("missing dimmension '{}' in NetCDF file", name);
     }
     return size;
 }

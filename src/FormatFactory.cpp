@@ -151,7 +151,7 @@ format_creator_t FormatFactory::extension(const std::string& extension) {
     auto idx = find_by_extension(formats, extension);
     if (idx == SENTINEL_INDEX) {
         throw format_error(
-            "can not find a format associated with the '{}' extension.", extension
+            "can not find a format associated with the '{}' extension", extension
         );
     }
     return formats.at(idx).creator;

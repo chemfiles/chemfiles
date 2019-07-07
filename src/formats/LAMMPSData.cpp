@@ -433,8 +433,8 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
     }
 
     if (atom_style_name_ == "") {
-        warning("Unknown LAMMPS atom style, defaulting to full.");
-        warning("You can give the atom style like this: Atoms  # <style>");
+        warning("unknown LAMMPS atom style, defaulting to full");
+        warning("you can give the atom style like this: Atoms  # <style>");
         atom_style_name_ = "full";
     }
     style_ = atom_style(atom_style_name_);
@@ -734,7 +734,7 @@ size_t DataTypes::atom_type_id(const Atom& atom) const {
     if (it != atoms_.end()) {
         return static_cast<size_t>(it - atoms_.begin());
     } else {
-        throw error("invalid atom type passed to atom_type_id. this is a bug");
+        throw error("invalid atom type passed to atom_type_id; this is a bug");
     }
 }
 
@@ -743,7 +743,7 @@ size_t DataTypes::bond_type_id(size_t type_i, size_t type_j) const {
     if (it != bonds_.end()) {
         return static_cast<size_t>(it - bonds_.begin());
     } else {
-        throw error("invalid bond type passed to bond_type_id. this is a bug");
+        throw error("invalid bond type passed to bond_type_id; this is a bug");
     }
 }
 
@@ -752,7 +752,7 @@ size_t DataTypes::angle_type_id(size_t type_i, size_t type_j, size_t type_k) con
     if (it != angles_.end()) {
         return static_cast<size_t>(it - angles_.begin());
     } else {
-        throw error("invalid angle type passed to angle_type_id. this is a bug");
+        throw error("invalid angle type passed to angle_type_id; this is a bug");
     }
 }
 
@@ -761,7 +761,7 @@ size_t DataTypes::dihedral_type_id(size_t type_i, size_t type_j, size_t type_k, 
     if (it != dihedrals_.end()) {
         return static_cast<size_t>(it - dihedrals_.begin());
     } else {
-        throw error("invalid dihedral type passed to dihedral_type_id. this is a bug");
+        throw error("invalid dihedral type passed to dihedral_type_id; this is a bug");
     }
 }
 
@@ -770,7 +770,7 @@ size_t DataTypes::improper_type_id(size_t type_i, size_t type_j, size_t type_k, 
     if (it != impropers_.end()) {
         return static_cast<size_t>(it - impropers_.begin());
     } else {
-        throw error("invalid improper type passed to improper_type_id. this is a bug");
+        throw error("invalid improper type passed to improper_type_id; this is a bug");
     }
 }
 
