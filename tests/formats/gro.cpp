@@ -9,8 +9,8 @@ using namespace chemfiles;
 
 TEST_CASE("Read files in Gromacs .gro format") {
     SECTION("Simple GRO File") {
-        Trajectory file("data/gro/ubiquitin.gro");
-        CHECK(file.nsteps() == 1);
+        auto file = Trajectory("data/gro/ubiquitin.gro");
+        REQUIRE(file.nsteps() == 1);
         Frame frame = file.read();
 
         CHECK(frame.size() == 1405);
@@ -35,7 +35,7 @@ TEST_CASE("Read files in Gromacs .gro format") {
     }
 
     SECTION("Triclinic Box") {
-        Trajectory file("data/gro/cod_4020641.gro");
+        auto file = Trajectory("data/gro/cod_4020641.gro");
         Frame frame = file.read();
 
         auto cell = frame.cell();
@@ -49,8 +49,8 @@ TEST_CASE("Read files in Gromacs .gro format") {
     }
 
     SECTION("Read next step") {
-        Trajectory file("data/gro/lysozyme.gro");
-        CHECK(file.nsteps() == 3);
+        auto file = Trajectory("data/gro/lysozyme.gro");
+        REQUIRE(file.nsteps() == 3);
         Frame frame = file.read();
 
         CHECK(*frame.get("name") == "LYSOZYME in water NVT");
@@ -89,7 +89,7 @@ TEST_CASE("Read files in Gromacs .gro format") {
     }
 
     SECTION("Read a specific step") {
-        Trajectory file("data/gro/lysozyme.gro");
+        auto file = Trajectory("data/gro/lysozyme.gro");
 
         auto frame = file.read_step(1);
 
@@ -110,7 +110,7 @@ TEST_CASE("Read files in Gromacs .gro format") {
     }
 
     SECTION("Read residue information") {
-        Trajectory file("data/gro/ubiquitin.gro");
+        auto file = Trajectory("data/gro/ubiquitin.gro");
         Frame frame = file.read();
 
         CHECK(frame.topology().residues().size() == 134);
@@ -124,7 +124,7 @@ TEST_CASE("Read files in Gromacs .gro format") {
     }
 /* I will finish this in a different PR that may address more errors than these
     SECTION("Error checking") {
-        Trajectory file("data/gro/length_errors.gro");
+        auto file = Trajectory("data/gro/length_errors.gro");
         CHECK_THROWS_AS(file.read(), FormatError);
 
         auto frame = file.read_step(1);

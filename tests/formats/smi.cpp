@@ -15,12 +15,15 @@ namespace fs=boost::filesystem;
 
 TEST_CASE("Read files in SMI format") {
     SECTION("Check nsteps") {
-        Trajectory file1("data/smi/test.smi");
-        CHECK(file1.nsteps() == 8);
+        auto file = Trajectory("data/smi/test.smi");
+        CHECK(file.nsteps() == 8);
+
+        file = Trajectory("data/smi/spaces.smi");
+        CHECK(file.nsteps() == 8);
     }
 
     SECTION("Read next frame") {
-        Trajectory file("data/smi/test.smi");
+        auto file = Trajectory("data/smi/test.smi");
 
         //Check to make sure things aren't exploding...
         auto frame1 = file.read();
@@ -48,16 +51,42 @@ TEST_CASE("Read files in SMI format") {
     }
 
     SECTION("Read a specific step") {
-        Trajectory file("data/smi/test.smi");
+        auto file = Trajectory("data/smi/test.smi");
         auto frame = file.read_step(1);
         CHECK(frame.size() == 6);
-        auto topol = frame.topology();
-        CHECK(topol.bonds().size() == 6);
+        auto topology = frame.topology();
+        CHECK(topology.bonds().size() == 6);
+
+        frame = file.read_step(7);
+        CHECK(frame.size() == 9);
+        topology = frame.topology();
+        CHECK(topology.bonds().size() == 6);
+
+        file = Trajectory("data/smi/spaces.smi");
+        frame = file.read_step(7);
+        CHECK(frame.size() == 9);
+        topology = frame.topology();
+        CHECK(topology.bonds().size() == 6);
+
+        // Check that calling file.read() repeatedly is the same as frame.read_step()
+        file = Trajectory("data/smi/spaces.smi");
+        file.read();
+        file.read();
+        file.read();
+        file.read();
+        file.read();
+        file.read();
+        file.read();
+        frame = file.read();
+
+        CHECK(frame.size() == 9);
+        topology = frame.topology();
+        CHECK(topology.bonds().size() == 6);
     }
 
     SECTION("Read entire file") {
-        Trajectory file("data/smi/rdkit_problems.smi");
-        CHECK(file.nsteps() == 70);
+        auto file = Trajectory("data/smi/rdkit_problems.smi");
+        REQUIRE(file.nsteps() == 70);
 
         Frame frame;
         while (!file.done()) {
@@ -71,8 +100,8 @@ TEST_CASE("Read files in SMI format") {
 
 TEST_CASE("Check parsing results") {
     SECTION("Details") {
-        Trajectory file("data/smi/details.smi");
-        CHECK(file.nsteps() == 1);
+        auto file = Trajectory("data/smi/details.smi");
+        REQUIRE(file.nsteps() == 1);
 
         auto frame = file.read();
         CHECK(frame.size() == 5);
@@ -83,8 +112,8 @@ TEST_CASE("Check parsing results") {
     }
 
     SECTION("Ugly SMILES strings") {
-        Trajectory file("data/smi/ugly.smi");
-        CHECK(file.nsteps() == 3);
+        auto file = Trajectory("data/smi/ugly.smi");
+        REQUIRE(file.nsteps() == 3);
 
         // C1(CC1CC1CC1)
         auto frame = file.read();
@@ -130,8 +159,8 @@ TEST_CASE("Check parsing results") {
     }
 
     SECTION("RDKit problems") {
-        Trajectory file("data/smi/rdkit_problems.smi");
-        CHECK(file.nsteps() == 70);
+        auto file = Trajectory("data/smi/rdkit_problems.smi");
+        REQUIRE(file.nsteps() == 70);
 
         // C1CC2C1CC2
         Frame frame = file.read();
@@ -167,7 +196,7 @@ TEST_CASE("Check parsing results") {
     }
 
     SECTION("Chirality") {
-        Trajectory file("data/smi/chiral.smi");
+        auto file = Trajectory("data/smi/chiral.smi");
 
         auto frame = file.read();
         CHECK(frame[1].get("chirality")->as_string() == "CCW TB1");
@@ -184,7 +213,7 @@ TEST_CASE("Check parsing results") {
     }
 
     SECTION("Other tests") {
-        Trajectory file("data/smi/test.smi");
+        auto file = Trajectory("data/smi/test.smi");
         auto frame = file.read();
         frame = file.read();
         CHECK(frame[0].get("is_aromatic")->as_bool());

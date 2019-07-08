@@ -4,8 +4,12 @@
 #ifndef CHEMFILES_FORMAT_HPP
 #define CHEMFILES_FORMAT_HPP
 
+#include <iosfwd>
 #include <string>
+#include <vector>
+#include <memory>
 
+#include "chemfiles/File.hpp"
 #include "chemfiles/exports.h"
 #include "chemfiles/Error.hpp"
 
@@ -13,9 +17,11 @@ namespace chemfiles {
 class Frame;
 
 /// The `Format` class defines the interface to implement in order to add a new
-/// format to chemfiles. It is possible to implement only one of `Format::read`;
-/// `Format::read_step` or `Format::write`. In that case, only the corresponding
-/// operations will be available from the corresponding `chemfiles::Trajectory`.
+/// format to chemfiles.
+///
+/// It is possible to implement only one of `Format::read`; `Format::read_step`
+/// or `Format::write`. In that case, only the corresponding operations will be
+/// available from the corresponding `chemfiles::Trajectory`.
 class CHFL_EXPORT Format {
 public:
     Format() = default;
@@ -28,7 +34,7 @@ public:
     Format(Format&&) = delete;
     Format& operator=(Format&&) = delete;
 
-    /// @brief Read a specific step from the trajectory file.
+    /// Read a specific `step` from the trajectory file.
     ///
     /// @throw FormatError if the file does not follow the format
     /// @throw FileError if their is an OS error while reading the file
@@ -37,7 +43,7 @@ public:
     /// @param frame The frame to fill
     virtual void read_step(size_t step, Frame& frame);
 
-    /// @brief Read a specific step from the trajectory file.
+    /// Read the next step from the trajectory file.
     ///
     /// @throw FormatError if the file does not follow the format
     /// @throw FileError if their is an OS error while reading the file
@@ -45,7 +51,7 @@ public:
     /// @param frame The frame to fill
     virtual void read(Frame& frame);
 
-    /// @brief Write a frame to the trajectory file.
+    /// Write a frame to the trajectory file.
     ///
     /// @throw FormatError if the file does not follow the format
     /// @throw FileError if their is an OS error while reading the file
@@ -53,7 +59,9 @@ public:
     /// @param frame The frame to be writen
     virtual void write(const Frame& frame);
 
-    /// @brief Get the number of frames in the associated file
+    /// Get the number of frames in the associated file. This function can be
+    /// expensive to call since it may needs to scan the whole file.
+    ///
     /// @return The number of frames
     virtual size_t nsteps() = 0;
 };
@@ -139,6 +147,45 @@ template<class Format>
 FormatInfo format_information() {
     throw FormatError("format_informations is unimplemented for this format");
 }
+
+/// The `TextFormat` class defines a common, simpler interface for text based
+/// formats.
+///
+/// It is possible to implement only one of `TextFormat::read_next` or
+/// `TextFormat::write_next`. In that case, only the corresponding operations
+/// will be available from the corresponding `chemfiles::Trajectory`.
+class TextFormat: public Format {
+public:
+    TextFormat(std::string path, File::Mode mode, File::Compression compression);
+    virtual ~TextFormat() override = default;
+
+    void read_step(size_t step, Frame& frame) override;
+    void read(Frame& frame) override;
+    void write(const Frame& frame) override;
+    size_t nsteps() override;
+
+    /// Fast-forward the file for one step, returning a valid position if the
+    /// file does contain one more step or `std::streampos(-1)` if it does not.
+    virtual std::streampos forward() = 0;
+
+    virtual void read_next(Frame& frame);
+    virtual void write_next(const Frame& frame);
+
+protected:
+    /// Text file where we read/write to
+    std::unique_ptr<TextFile> file_;
+
+private:
+    /// Scan the whole file to get all the steps positions
+    void scan_all();
+
+    /// Storing the positions of all the steps in the file, so that we can
+    /// just `seekg` them instead of reading the whole step.
+    std::vector<std::streampos> steps_positions_;
+
+    /// Did we found the end of file while scanning or reading?
+    bool eof_found_ = false;
+};
 
 } // namespace chemfiles
 

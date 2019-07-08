@@ -4,7 +4,7 @@
 #ifndef CHEMFILES_FORMAT_CSSR_HPP
 #define CHEMFILES_FORMAT_CSSR_HPP
 
-#include <memory>
+#include <iosfwd>
 #include <string>
 
 #include "chemfiles/Format.hpp"
@@ -17,19 +17,13 @@ class Frame;
 /// writer. Only one frame can be read or written to this format.
 ///
 /// [CSSR]: http://www.chem.cmu.edu/courses/09-560/docs/msi/modenv/D_Files.html#944777
-class CSSRFormat final: public Format {
+class CSSRFormat final: public TextFormat {
 public:
     CSSRFormat(std::string path, File::Mode mode, File::Compression compression);
 
-    void read_step(size_t step, Frame& frame) override;
-    void read(Frame& frame) override;
-    void write(const Frame& frame) override;
-    size_t nsteps() override;
-private:
-    /// Text file where we read from
-    std::unique_ptr<TextFile> file_;
-    /// Did we already wrote a frame to this file
-    bool written_ = false;
+    void read_next(Frame& frame) override;
+    void write_next(const Frame& frame) override;
+    std::streampos forward() override;
 };
 
 template<> FormatInfo format_information<CSSRFormat>();
