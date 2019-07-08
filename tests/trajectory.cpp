@@ -13,7 +13,7 @@ using namespace chemfiles;
 TEST_CASE("Associate a topology and a trajectory") {
     SECTION("Reading") {
         SECTION("From a file") {
-            Trajectory file("data/xyz/trajectory.xyz");
+            auto file = Trajectory("data/xyz/trajectory.xyz");
             file.set_topology("data/xyz/topology.xyz.topology", "XYZ");
             auto frame = file.read();
 
@@ -26,7 +26,7 @@ TEST_CASE("Associate a topology and a trajectory") {
         }
 
         SECTION("Directely") {
-            Trajectory file("data/xyz/trajectory.xyz");
+            auto file = Trajectory("data/xyz/trajectory.xyz");
 
             Topology topology;
             for (size_t i=0; i<9; i++) {
@@ -63,7 +63,7 @@ TEST_CASE("Associate a topology and a trajectory") {
             frame.add_atom(Atom("Ar"), {1, 2, 3});
         }
 
-        Trajectory file(tmpfile, 'w');
+        auto file = Trajectory(tmpfile, 'w');
         file.set_topology(topology);
         file.write(frame);
         file.close();
@@ -79,7 +79,7 @@ TEST_CASE("Associate a topology and a trajectory") {
 
 
 TEST_CASE("Setting frame step") {
-    Trajectory file("data/xyz/helium.xyz");
+    auto file = Trajectory("data/xyz/helium.xyz");
     auto frame = file.read();
     CHECK(frame.step() == 0);
 
@@ -93,7 +93,7 @@ TEST_CASE("Setting frame step") {
 
 TEST_CASE("Associate an unit cell and a trajectory") {
     SECTION("Reading") {
-        Trajectory file("data/xyz/trajectory.xyz");
+        auto file = Trajectory("data/xyz/trajectory.xyz");
         file.set_cell(UnitCell(25, 32, 94));
         auto frame = file.read();
 
@@ -110,7 +110,7 @@ TEST_CASE("Associate an unit cell and a trajectory") {
             positions[i] = Vector3D(1, 2, 3);
         }
 
-        Trajectory file(tmpfile, 'w');
+        auto file = Trajectory(tmpfile, 'w');
         file.set_cell(UnitCell(3, 4, 5));
         file.write(frame);
         file.close();
@@ -164,7 +164,7 @@ TEST_CASE("Associate an unit cell and a trajectory") {
 }
 
 TEST_CASE("Specify a format parameter") {
-    Trajectory file("data/xyz/helium.xyz.but.not.really", 'r', "XYZ");
+    auto file = Trajectory("data/xyz/helium.xyz.but.not.really", 'r', "XYZ");
     auto frame = file.read();
     CHECK(frame.size() == 125);
 
@@ -211,7 +211,7 @@ TEST_CASE("Errors") {
     SECTION("Bad opening mode") {
         auto tmpfile = NamedTempPath(".xyz");
         // Try to read a write-only file
-        Trajectory file(tmpfile, 'w');
+        auto file = Trajectory(tmpfile, 'w');
         CHECK_THROWS_AS(file.read(), FileError);
         CHECK_THROWS_AS(file.read_step(5), FileError);
 
@@ -221,7 +221,7 @@ TEST_CASE("Errors") {
     }
 
     SECTION("Read file past end") {
-        Trajectory file("data/xyz/trajectory.xyz", 'r');
+        auto file = Trajectory("data/xyz/trajectory.xyz", 'r');
         CHECK_THROWS_AS(file.read_step(2), FileError);
 
         file.read();
@@ -230,7 +230,7 @@ TEST_CASE("Errors") {
     }
 
     SECTION("Closed file") {
-        Trajectory file("data/xyz/trajectory.xyz", 'r');
+        auto file = Trajectory("data/xyz/trajectory.xyz", 'r');
         file.close();
 
         CHECK_THROWS_AS(file.read(), FileError);

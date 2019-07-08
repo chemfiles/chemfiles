@@ -16,7 +16,7 @@ TEST_CASE("Read files in mmCIF format") {
     SECTION("Read single step") {
         // This is how I imagine most people will resolve the conflict between
         // CIF files and mmCIF files.
-        Trajectory file("data/cif/4hhb.cif", 'r', "mmCIF");
+        auto file = Trajectory("data/cif/4hhb.cif", 'r', "mmCIF");
         Frame frame = file.read();
 
         // If comparing to the RCSB-PDB file,
@@ -49,17 +49,17 @@ TEST_CASE("Read files in mmCIF format") {
         CHECK(residue.get("is_standard_pdb")->as_bool() == false);
 
         // Check residue connectivity
-        const auto& topo = frame.topology();
+        const auto& topology = frame.topology();
         auto residue1 = *frame.topology().residue_for_atom(0);
         // First two atoms are in the same residue
         CHECK(residue1 == *frame.topology().residue_for_atom(1));
 
         auto residue2 = *frame.topology().residue_for_atom(8);
-        CHECK(topo.are_linked(residue1, residue2));
+        CHECK(topology.are_linked(residue1, residue2));
 
         auto residue3 = *frame.topology().residue_for_atom(17);
-        CHECK(!topo.are_linked(residue1, residue3));
-        CHECK(topo.are_linked(residue2, residue3));
+        CHECK(!topology.are_linked(residue1, residue3));
+        CHECK(topology.are_linked(residue2, residue3));
 
         // Chain information
         CHECK(residue.get("chainid"));
@@ -95,12 +95,12 @@ TEST_CASE("Read files in mmCIF format") {
     }
 
     SECTION("Check nsteps") {
-        Trajectory file1("data/cif/1j8k.cif", 'r', "mmCIF");
-        CHECK(file1.nsteps() == 20);
+        auto file = Trajectory("data/cif/1j8k.cif", 'r', "mmCIF");
+        CHECK(file.nsteps() == 20);
     }
 
     SECTION("Read next step") {
-        Trajectory file("data/cif/1j8k.cif", 'r', "mmCIF");
+        auto file = Trajectory("data/cif/1j8k.cif", 'r', "mmCIF");
         auto frame = file.read();
         CHECK(frame.size() == 1402);
 
@@ -112,7 +112,7 @@ TEST_CASE("Read files in mmCIF format") {
     }
 
     SECTION("Read a specific step") {
-        Trajectory file("data/cif/1j8k.cif", 'r', "mmCIF");
+        auto file = Trajectory("data/cif/1j8k.cif", 'r', "mmCIF");
 
         auto frame = file.read_step(13);
         CHECK(frame.size() == 1402);
@@ -130,7 +130,7 @@ TEST_CASE("Read files in mmCIF format") {
     }
 
     SECTION("Read the entire file") {
-        Trajectory file("data/cif/1j8k.cif", 'r', "mmCIF");
+        auto file = Trajectory("data/cif/1j8k.cif", 'r', "mmCIF");
         auto frame = file.read();
 
         CHECK(frame.get("name")->as_string() ==
@@ -148,8 +148,8 @@ TEST_CASE("Read files in mmCIF format") {
     }
 
     SECTION("Read a COD file") {
-        Trajectory file("data/cif/1544173.cif", 'r', "mmCIF");
-        CHECK(file.nsteps() == 1);
+        auto file = Trajectory("data/cif/1544173.cif", 'r', "mmCIF");
+        REQUIRE(file.nsteps() == 1);
 
         auto frame = file.read();
         CHECK(frame.size() == 50);

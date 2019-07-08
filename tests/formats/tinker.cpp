@@ -20,7 +20,7 @@ static bool contains_bond(const Topology& topology, Bond bond) {
 TEST_CASE("Read files in Tinker XYZ format using Molfile") {
     SECTION("water.arc") {
         auto file = Trajectory("data/tinker/water.arc");
-        CHECK(file.nsteps() == 1);
+        REQUIRE(file.nsteps() == 1);
         auto frame = file.read();
 
         CHECK(frame.size() == 12);
@@ -42,7 +42,7 @@ TEST_CASE("Read files in Tinker XYZ format using Molfile") {
 
     SECTION("nitrogen.arc") {
         auto file = Trajectory("data/tinker/nitrogen.arc");
-        CHECK(file.nsteps() == 50);
+        REQUIRE(file.nsteps() == 50);
         auto frame = file.read();
 
         CHECK(frame.size() == 212);

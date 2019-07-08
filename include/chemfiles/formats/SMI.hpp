@@ -7,9 +7,8 @@
 #include <map>
 #include <stack>
 #include <vector>
-#include <iosfwd>
-#include <memory>
 #include <string>
+#include <iosfwd>
 #include <unordered_map>
 
 #include "chemfiles/File.hpp"
@@ -26,21 +25,15 @@ class Topology;
 /// [SMI] file format reader and writer.
 ///
 /// [SMI]: http://opensmiles.org/opensmiles.html
-class SMIFormat final: public Format {
+class SMIFormat final: public TextFormat {
 public:
-    SMIFormat(const std::string& path, File::Mode mode, File::Compression compression);
+    SMIFormat(const std::string& path, File::Mode mode, File::Compression compression):
+        TextFormat(std::move(path), mode, compression) {}
 
-    void read_step(size_t step, Frame& frame) override;
-    void read(Frame& frame) override;
-    void write(const Frame& frame) override;
-    size_t nsteps() override;
+    void read_next(Frame& frame) override;
+    void write_next(const Frame& frame) override;
+    std::streampos forward() override;
 private:
-    /// Text file where we read from
-    std::unique_ptr<TextFile> file_;
-    /// Storing the positions of all the steps in the file, so that we can
-    /// just `seekg` them instead of reading the whole step.
-    std::vector<std::streampos> steps_positions_;
-
     /// [for reading] Stores location of a branching path
     std::stack<size_t, std::vector<size_t>> branch_point_;
 

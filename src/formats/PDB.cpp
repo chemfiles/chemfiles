@@ -47,9 +47,6 @@ template<> FormatInfo chemfiles::format_information<PDBFormat>() {
 /// we can represen them. In case of error, use the given `context` in the error
 /// message
 static void check_values_size(const Vector3D& values, unsigned width, const std::string& context);
-/// Fast-forward the file for one step, returning `false` if the file does
-/// not contain one more step.
-static bool forward(TextFile& file);
 
 // PDB record handled by chemfiles. Any record not in this enum are not yet
 // implemented.
@@ -83,36 +80,7 @@ enum class Record {
 // Get the record type for a line.
 static Record get_record(const std::string& line);
 
-PDBFormat::PDBFormat(std::string path, File::Mode mode, File::Compression compression)
-  : file_(TextFile::open(std::move(path), mode, compression)), models_(0) {
-    while (!file_->eof()) {
-        auto position = file_->tellg();
-        if (!file_ || position == std::streampos(-1)) {
-            throw format_error("IO error while reading '{}' as PDB", path);
-        }
-        if (forward(*file_)) {
-            steps_positions_.push_back(position);
-        }
-    }
-    file_->rewind();
-
-    // Needed in case there's no end records
-    if (steps_positions_.empty()) {
-        steps_positions_.push_back(file_->tellg());
-    }
-}
-
-size_t PDBFormat::nsteps() {
-    return steps_positions_.size();
-}
-
-void PDBFormat::read_step(const size_t step, Frame& frame) {
-    assert(step < steps_positions_.size());
-    file_->seekg(steps_positions_[step]);
-    read(frame);
-}
-
-void PDBFormat::read(Frame& frame) {
+void PDBFormat::read_next(Frame& frame) {
     frame.resize(0);
     residues_.clear();
     atom_offsets_.clear();
@@ -582,33 +550,6 @@ void PDBFormat::link_standard_residue_bonds(Frame& frame) {
     }
 }
 
-bool forward(TextFile& file) {
-    if (!file) {return false;}
-    while (true) {
-        try {
-            auto line = file.readline();
-
-            if (line.substr(0, 6) == "ENDMDL") {
-                auto position = file.tellg();
-                auto next = file.readline();
-                file.seekg(position);
-                if (next.substr(0, 3) == "END") {
-                    // We found another record starting by END in the next line,
-                    // we skip this one and wait for the next one
-                    continue;
-                }
-            }
-
-            if (line.substr(0, 3) == "END") {
-                return true;
-            }
-
-        } catch (const FileError&) {
-            return false;
-        }
-    }
-}
-
 Record get_record(const std::string& line) {
     auto rec = line.substr(0, 6);
     if(rec == "ENDMDL") {
@@ -672,7 +613,7 @@ static std::string to_pdb_index(uint64_t i) {
     }
 }
 
-void PDBFormat::write(const Frame& frame) {
+void PDBFormat::write_next(const Frame& frame) {
     written_ = true;
     fmt::print(*file_, "MODEL {:>4}\n", models_ + 1);
 
@@ -817,7 +758,6 @@ void PDBFormat::write(const Frame& frame) {
     fmt::print(*file_, "ENDMDL\n");
 
     models_++;
-    steps_positions_.push_back(file_->tellg());
 }
 
 void check_values_size(const Vector3D& values, unsigned width, const std::string& context) {
@@ -834,5 +774,41 @@ void check_values_size(const Vector3D& values, unsigned width, const std::string
 PDBFormat::~PDBFormat() noexcept {
     if (written_) {
       fmt::print(*file_, "END\n");
+    }
+}
+
+std::streampos PDBFormat::forward() {
+    if (!*file_) {
+        return std::streampos(-1);
+    }
+
+    auto position = file_->tellg();
+    while (true) {
+        try {
+            auto line = file_->readline();
+
+            if (line.substr(0, 6) == "ENDMDL") {
+                auto save = file_->tellg();
+                auto next = file_->readline();
+                file_->seekg(save);
+                if (next.substr(0, 3) == "END") {
+                    // We found another record starting by END in the next line,
+                    // we skip this one and wait for the next one
+                    continue;
+                }
+            }
+
+            if (line.substr(0, 3) == "END") {
+                return position;
+            }
+
+        } catch (const FileError&) {
+            // Handle missing END record
+            if (position == 0) {
+                return position;
+            } else {
+                return std::streampos(-1);
+            }
+        }
     }
 }

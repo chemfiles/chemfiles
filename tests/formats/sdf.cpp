@@ -14,15 +14,15 @@ namespace fs=boost::filesystem;
 
 TEST_CASE("Read files in SDF format") {
     SECTION("Check nsteps") {
-        Trajectory file1("data/sdf/aspirin.sdf");
-        CHECK(file1.nsteps() == 1);
+        auto file = Trajectory("data/sdf/aspirin.sdf");
+        CHECK(file.nsteps() == 1);
 
-        Trajectory file2("data/sdf/kinases.sdf");
-        CHECK(file2.nsteps() == 6);
+        file = Trajectory("data/sdf/kinases.sdf");
+        CHECK(file.nsteps() == 6);
     }
 
     SECTION("Read next step") {
-        Trajectory file("data/sdf/kinases.sdf");
+        auto file = Trajectory("data/sdf/kinases.sdf");
         auto frame = file.read();
         CHECK(frame.size() == 47);
 
@@ -38,7 +38,7 @@ TEST_CASE("Read files in SDF format") {
     }
 
     SECTION("Read a specific step") {
-        Trajectory file("data/sdf/kinases.sdf");
+        auto file = Trajectory("data/sdf/kinases.sdf");
         // Read frame at a specific positions
         auto frame = file.read_step(3);
         CHECK(frame.step() == 3);
@@ -57,8 +57,8 @@ TEST_CASE("Read files in SDF format") {
     }
 
     SECTION("Read the whole file") {
-        Trajectory file("data/sdf/kinases.sdf");
-        CHECK(file.nsteps() == 6);
+        auto file = Trajectory("data/sdf/kinases.sdf");
+        REQUIRE(file.nsteps() == 6);
 
         Frame frame;
         while (!file.done()) {
@@ -70,7 +70,7 @@ TEST_CASE("Read files in SDF format") {
     }
 
     SECTION("Read various file properties") {
-        Trajectory file("data/sdf/aspirin.sdf");
+        auto file = Trajectory("data/sdf/aspirin.sdf");
 
         auto frame = file.read();
         auto prop  = frame.get("PUBCHEM_COMPOUND_CID");
@@ -81,7 +81,7 @@ TEST_CASE("Read files in SDF format") {
     }
 
     SECTION("Read charges") {
-        Trajectory file("data/sdf/aspirin_charged.sdf");
+        auto file = Trajectory("data/sdf/aspirin_charged.sdf");
 
         auto frame = file.read();
         CHECK(approx_eq(frame[0].charge(), 0.0));
@@ -227,7 +227,7 @@ $$$$
 
     frame.clear_bonds();
     frame.resize(1);
-    
+
     frame.set("prop", Property(false));
     file.write(frame);
 

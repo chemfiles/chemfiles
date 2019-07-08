@@ -1,11 +1,11 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <cassert>
 #include <array>
 #include <memory>
 #include <string>
 #include <vector>
+#include <istream>
 
 #include <fmt/ostream.h>
 
@@ -40,24 +40,18 @@ template<> FormatInfo chemfiles::format_information<CSSRFormat>() {
 
 
 CSSRFormat::CSSRFormat(std::string path, File::Mode mode, File::Compression compression)
-    : file_(TextFile::open(std::move(path), mode, compression))
+    : TextFormat(std::move(path), mode, compression)
 {
     if (mode == File::APPEND) {
         throw format_error("append mode ('a') is not supported with CSSR format");
     }
 }
 
-size_t CSSRFormat::nsteps() {
-    return 1;
-}
+void CSSRFormat::read_next(Frame& frame) {
+    if (file_->tellg() != 0) {
+        throw format_error("CSSR format only support reading one frame");
+    }
 
-void CSSRFormat::read_step(const size_t step, Frame& frame) {
-    assert(step == 0);
-    file_->rewind();
-    read(frame);
-}
-
-void CSSRFormat::read(Frame& frame) {
     // Read unit cell
     double a = 0, b = 0, c = 0;
     scan(file_->readline(), "%*38c%lf %lf %lf", &a, &b, &c);
@@ -123,11 +117,11 @@ void CSSRFormat::read(Frame& frame) {
     }
 }
 
-void CSSRFormat::write(const Frame& frame) {
-    if (written_) {
+void CSSRFormat::write_next(const Frame& frame) {
+    if (file_->tellg() != 0) {
         throw format_error("CSSR format only support writing one frame");
     }
-    written_ = true;
+
     fmt::print(
         *file_, " REFERENCE STRUCTURE = 00000   A,B,C ={:8.3f}{:8.3f}{:8.3f}\n",
         frame.cell().a(), frame.cell().b(), frame.cell().c()
@@ -187,5 +181,17 @@ void CSSRFormat::write(const Frame& frame) {
         }
 
         fmt::print(*file_, " {:7.3f}\n", frame[i].charge());
+    }
+}
+
+std::streampos CSSRFormat::forward() {
+    // CSSR only support one step, so always act like there is only one
+    auto position = file_->tellg();
+    if (position == 0) {
+        // advance the pointer for the next call
+        file_->readline();
+        return position;
+    } else {
+        return std::streampos(-1);
     }
 }
