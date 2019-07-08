@@ -45,7 +45,7 @@ static void check_values_size(const Vector3D& values, unsigned width, const std:
 void GROFormat::read_next(Frame& frame) {
     size_t natoms = 0;
     try {
-        frame.set("name", (file_->readline())); // GRO comment line;
+        frame.set("name", trim(file_->readline())); // GRO comment line;
         natoms = parse<size_t>(file_->readline());
     } catch (const Error& e) {
         throw format_error("can not read next step as GRO: {}", e.what());
@@ -56,8 +56,7 @@ void GROFormat::read_next(Frame& frame) {
     frame.reserve(natoms);
     frame.resize(0);
 
-    for (const auto& line: file_->readlines(natoms)) {
-
+    for (auto&& line: file_->readlines(natoms)) {
         if (line.length() < 44) {
             throw format_error(
                 "GRO Atom line is too small: '{}'", line
@@ -268,7 +267,7 @@ std::streampos GROFormat::forward() {
     size_t natoms = 0;
     try {
         // Skip the comment line
-        file_->readline();
+        file_->skipline();
         natoms = parse<size_t>(file_->readline());
     } catch (const FileError&) {
         // No more line left in the file
@@ -279,7 +278,7 @@ std::streampos GROFormat::forward() {
     }
 
     try {
-        file_->readlines(natoms + 1);
+        file_->skiplines(natoms + 1);
     } catch (const FileError&) {
         // We could not read the lines from the file
         throw format_error(

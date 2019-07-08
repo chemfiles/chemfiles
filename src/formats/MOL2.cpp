@@ -63,8 +63,7 @@ void MOL2Format::read_next(Frame& frame) {
     frame.resize(0);
     frame.reserve(natoms);
 
-    // Skip a line
-    file_->readline();
+    file_->skipline();
 
     // If charges are specified, we need to expect an addition term for each atom
     bool charges = (trim(file_->readline()) != "NO_CHARGES");
@@ -220,7 +219,7 @@ std::streampos MOL2Format::forward() {
     while (!file_->eof()) {
         try {
             auto position = read_until(*file_, "@<TRIPOS>MOLECULE");
-            file_->readline(); // Skip a line
+            file_->skipline();
             auto line = file_->readline();
 
             const auto counts = split(line, ' ');
@@ -231,10 +230,10 @@ std::streampos MOL2Format::forward() {
             }
 
             read_until(*file_, "@<TRIPOS>ATOM");
-            file_->readlines(natoms);
+            file_->skiplines(natoms);
 
             read_until(*file_, "@<TRIPOS>BOND");
-            file_->readlines(nbonds);
+            file_->skiplines(nbonds);
 
             return position;
         } catch (const Error&) {
