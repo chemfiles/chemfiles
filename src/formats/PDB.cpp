@@ -805,7 +805,7 @@ std::streampos PDBFormat::forward() {
 
         } catch (const FileError&) {
             // Handle missing END record
-            if (position == 0) {
+            if (position == std::streampos(0)) {
                 return position;
             } else {
                 return std::streampos(-1);

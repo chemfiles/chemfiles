@@ -283,8 +283,8 @@ LAMMPSDataFormat::LAMMPSDataFormat(std::string path, File::Mode mode, File::Comp
 {}
 
 void LAMMPSDataFormat::read_next(Frame& frame) {
-    if (file_->tellg() != 0) {
-        throw format_error("LAMMPS Data format only support reading one frame");
+    if (file_->tellg() != std::streampos(0)) {
+        throw format_error("LAMMPS Data format only supports reading one frame");
     }
 
     auto comment = file_->readline();
@@ -771,8 +771,8 @@ size_t DataTypes::improper_type_id(size_t type_i, size_t type_j, size_t type_k, 
 }
 
 void LAMMPSDataFormat::write_next(const Frame& frame) {
-    if (file_->tellg() != 0) {
-        throw format_error("LAMMPS Data format only support writting one frame");
+    if (file_->tellg() != std::streampos(0)) {
+        throw format_error("LAMMPS Data format only supports writting one frame");
     }
 
     auto types = DataTypes(frame.topology());
@@ -1082,11 +1082,11 @@ double tilt_factor(const Matrix3D& matrix, size_t i, size_t j) {
 }
 
 std::streampos LAMMPSDataFormat::forward() {
-    // LAMMPS Data only support one step, so always act like there is only one
+    // LAMMPS Data only supports one step, so always act like there is only one
     auto position = file_->tellg();
-    if (position == 0) {
+    if (position == std::streampos(0)) {
         // advance the pointer for the next call
-        file_->readline();
+        file_->skipline();
         return position;
     } else {
         return std::streampos(-1);
