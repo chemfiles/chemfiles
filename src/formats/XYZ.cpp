@@ -35,7 +35,7 @@ void XYZFormat::read_next(Frame& frame) {
     size_t natoms = 0;
     try {
         natoms = parse<size_t>(file_->readline());
-        file_->readline(); // XYZ comment line;
+        file_->skipline(); // XYZ comment line;
     } catch (const std::exception& e) {
         throw format_error("can not read next step as XYZ: {}", e.what());
     }
@@ -43,7 +43,7 @@ void XYZFormat::read_next(Frame& frame) {
     frame.reserve(natoms);
     frame.resize(0);
 
-    for (const auto& line: file_->readlines(natoms)) {
+    for (auto&& line: file_->readlines(natoms)) {
         double x = 0, y = 0, z = 0;
         char name[32] = {0};
         scan(line, "%31s %lf %lf %lf", &name[0], &x, &y, &z);
@@ -87,7 +87,7 @@ std::streampos XYZFormat::forward() {
     }
 
     try {
-        file_->readlines(natoms + 1);
+        file_->skiplines(natoms + 1);
     } catch (const FileError& e) {
         // We could not read the lines from the file
         throw format_error(

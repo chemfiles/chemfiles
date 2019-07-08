@@ -77,10 +77,14 @@ public:
     std::string readline();
     /// Read `n` lines from the file
     std::vector<std::string> readlines(size_t n);
+
+    /// Skip a single line from the file
+    void skipline();
+    /// Skip `n` lines from the file
+    void skiplines(size_t n);
+
     /// Reset the file cursor
     void rewind();
-    /// Are we at the end of the file ?
-    bool eof();
 
 protected:
     /// Initialize the TextFile at the given `path` and `mode`, with the
@@ -89,7 +93,8 @@ protected:
     TextFile(std::string path, File::Mode mode, File::Compression compression, std::streambuf* buffer);
 
 private:
-    void get_line(std::string& string);
+    void get_line_impl(std::string& string);
+    void skip_line_impl();
 };
 
 } // namespace chemfiles

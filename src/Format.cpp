@@ -63,7 +63,7 @@ void TextFormat::scan_all() {
     // reset failbit in the file
     file_->clear();
 
-    if (before == 0 && !steps_positions_.empty()) {
+    if (before == std::streampos(0) && !steps_positions_.empty()) {
         file_->seekg(steps_positions_[0]);
     } else {
         file_->seekg(before);
