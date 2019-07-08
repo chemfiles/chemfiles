@@ -36,37 +36,7 @@ template<> FormatInfo chemfiles::format_information<SDFFormat>() {
     );
 }
 
-/// Fast-forward the file for one step, returning `false` if the file does
-/// not contain one more step.
-static bool forward(TextFile& file);
-
-SDFFormat::SDFFormat(std::string path, File::Mode mode, File::Compression compression)
-    : file_(TextFile::open(std::move(path), mode, compression))
-{
-    while (!file_->eof()) {
-        auto position = file_->tellg();
-        if (!file_ || position == std::streampos(-1)) {
-            throw format_error("IO error while reading '{}' as SDF", path);
-        }
-        if (forward(*file_)) {
-            steps_positions_.push_back(position);
-        }
-    }
-
-    file_->rewind();
-}
-
-size_t SDFFormat::nsteps() {
-    return steps_positions_.size();
-}
-
-void SDFFormat::read_step(const size_t step, Frame& frame) {
-    assert(step < steps_positions_.size());
-    file_->seekg(steps_positions_[step]);
-    read(frame);
-}
-
-void SDFFormat::read(Frame& frame) {
+void SDFFormat::read_next(Frame& frame) {
 
     // Make this global as it may contain information we need later
     std::string counts_line;
@@ -244,7 +214,7 @@ void SDFFormat::read(Frame& frame) {
 
 }
 
-void SDFFormat::write(const Frame& frame) {
+void SDFFormat::write_next(const Frame& frame) {
     auto& topology = frame.topology();
     auto& positions = frame.positions();
     assert(frame.size() == topology.size());
@@ -357,20 +327,22 @@ void SDFFormat::write(const Frame& frame) {
     }
 
     fmt::print(*file_, "$$$$\n");
-    steps_positions_.push_back(file_->tellg());
 }
 
-bool forward(TextFile& file) {
-    if (!file) {return false;}
+std::streampos SDFFormat::forward() {
+    if (!*file_) {
+        return std::streampos(-1);
+    }
 
+    auto position = file_->tellg();
     size_t natoms = 0;
     size_t nbonds = 0;
     try {
         // Ignore junk lines
-        file.readline();
-        file.readline();
-        file.readline();
-        std::string counts_line = file.readline();
+        file_->readline();
+        file_->readline();
+        file_->readline();
+        std::string counts_line = file_->readline();
 
         if (counts_line.length() < 10) {
             throw format_error("counts line must have at least 10 digits, it has {}", counts_line.length());
@@ -380,29 +352,29 @@ bool forward(TextFile& file) {
         nbonds = parse<size_t>(counts_line.substr(3,3));
     } catch (const FileError&) {
         // No more line left in the file
-        return false;
+        return std::streampos(-1);
     } catch (const Error&) {
         // We could not read an integer, so give up here
-        return false;
+        return std::streampos(-1);
     }
 
     try {
-        file.readlines(natoms + nbonds);
+        file_->readlines(natoms + nbonds);
     } catch (const FileError&) {
         // We could not read the lines from the file
         throw format_error(
-            "not enough lines in '{}' for SDF format", file.path()
+            "not enough lines in '{}' for SDF format", file_->path()
         );
     }
 
     // Search for ending character, updating the position in the file only
-    while (!file.eof()) {
-        if (file.readline() == "$$$$") {
+    while (!file_->eof()) {
+        if (file_->readline() == "$$$$") {
             break;
         }
     }
 
     // We have enough data to parse an entire molecule.
     // So, even if the file does not have an ending string - return true.
-    return true;
+    return position;
 }

@@ -23,36 +23,36 @@ TEST_CASE("Read files in mol2 format") {
     SECTION("Various files") {
         // Just checking that we can read them without error
         auto file = Trajectory("data/mol2/lysozyme-ligand-tripos.mol2");
-        CHECK(file.nsteps() == 1);
+        REQUIRE(file.nsteps() == 1);
         auto frame = file.read();
         CHECK(frame.size() == 18);
 
         file = Trajectory("data/mol2/zinc_856218.mol2");
-        CHECK(file.nsteps() == 1);
+        REQUIRE(file.nsteps() == 1);
         frame = file.read();
         CHECK(frame.size() == 45);
 
         file = Trajectory("data/mol2/adp.mol2");
-        CHECK(file.nsteps() == 1);
+        REQUIRE(file.nsteps() == 1);
         frame = file.read();
         CHECK(frame.size() == 39);
 
         file = Trajectory("data/mol2/li.mol2");
-        CHECK(file.nsteps() == 1);
+        REQUIRE(file.nsteps() == 1);
         frame = file.read();
         CHECK(frame.size() == 1);
         CHECK(frame.cell().shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(frame.cell().a(), 10, 1e-4));
 
         file = Trajectory("data/mol2/status-bits.mol2");
-        CHECK(file.nsteps() == 1);
+        REQUIRE(file.nsteps() == 1);
         frame = file.read();
         CHECK(frame.size() == 18);
     }
 
     SECTION("imatinib.mol2") {
         auto file = Trajectory("data/mol2/imatinib.mol2");
-        CHECK(file.nsteps() == 1);
+        REQUIRE(file.nsteps() == 1);
 
         auto frame = file.read();
         CHECK(frame.size() == 68);
@@ -87,7 +87,7 @@ TEST_CASE("Read files in mol2 format") {
 
     SECTION("Molecules.mol2") {
         auto file = Trajectory("data/mol2/Molecules.mol2");
-        CHECK(file.nsteps() == 200);
+        REQUIRE(file.nsteps() == 200);
 
         auto frame = file.read();
         CHECK(frame.size() == 49);

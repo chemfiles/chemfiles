@@ -12,7 +12,7 @@ namespace fs=boost::filesystem;
 
 TEST_CASE("Read files in NetCDF format") {
     SECTION("Read one frame") {
-        Trajectory file("data/netcdf/water.nc");
+        auto file = Trajectory("data/netcdf/water.nc");
         auto frame = file.read();
         CHECK(frame.size() == 297);
         // Check positions
@@ -22,7 +22,7 @@ TEST_CASE("Read files in NetCDF format") {
     }
 
     SECTION("Read more than one frame") {
-        Trajectory file("data/netcdf/water.nc");
+        auto file = Trajectory("data/netcdf/water.nc");
         auto frame = file.read();
         frame = file.read();
         frame = file.read();
@@ -41,7 +41,7 @@ TEST_CASE("Read files in NetCDF format") {
     }
 
     SECTION("Missing unit cell") {
-        Trajectory file("data/netcdf/no-cell.nc");
+        auto file = Trajectory("data/netcdf/no-cell.nc");
         auto frame = file.read();
         CHECK(frame.size() == 1989);
         CHECK(frame.cell() == UnitCell());
@@ -52,7 +52,7 @@ TEST_CASE("Read files in NetCDF format") {
 TEST_CASE("Write files in NetCDF format") {
     auto tmpfile = NamedTempPath(".nc");
 
-    Trajectory file(tmpfile, 'w');
+    auto file = Trajectory(tmpfile, 'w');
     Frame frame;
     frame.resize(4);
     auto positions = frame.positions();

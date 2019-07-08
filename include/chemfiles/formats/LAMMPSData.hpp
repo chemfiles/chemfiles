@@ -6,9 +6,9 @@
 
 #include <tuple>
 #include <limits>
+#include <iosfwd>
 #include <vector>
 #include <string>
-#include <memory>
 #include <unordered_map>
 
 #include "chemfiles/File.hpp"
@@ -131,14 +131,14 @@ private:
 /// ```
 ///
 /// [LAMMPS Data]: http://lammps.sandia.gov/doc/read_data.html
-class LAMMPSDataFormat final: public Format {
+class LAMMPSDataFormat final: public TextFormat {
 public:
     LAMMPSDataFormat(std::string path, File::Mode mode, File::Compression compression);
 
-    void read_step(size_t step, Frame& frame) override;
-    void read(Frame& frame) override;
-    void write(const Frame& frame) override;
-    size_t nsteps() override;
+    void read_next(Frame& frame) override;
+    void write_next(const Frame& frame) override;
+    std::streampos forward() override;
+
 private:
     enum section_t {
         HEADER,
@@ -179,26 +179,23 @@ private:
     void setup_names(Frame& frame) const;
 
     /// Write the header
-    void write_header(const Frame& frame);
+    void write_header(const DataTypes& types, const Frame& frame);
     /// Write the types sections
-    void write_types();
+    void write_types(const DataTypes& types);
     /// Write the masses section
-    void write_masses();
+    void write_masses(const DataTypes& types);
     /// Write the Atoms section
-    void write_atoms(const Frame& frame);
+    void write_atoms(const DataTypes& types, const Frame& frame);
     /// Write the Velocities section
     void write_velocities(const Frame& frame);
     /// Write the Bonds section
-    void write_bonds(const Topology& topology);
+    void write_bonds(const DataTypes& types, const Topology& topology);
     /// Write the Angles section
-    void write_angles(const Topology& topology);
+    void write_angles(const DataTypes& types, const Topology& topology);
     /// Write the Dihedrals section
-    void write_dihedrals(const Topology& topology);
+    void write_dihedrals(const DataTypes& types, const Topology& topology);
     /// Write the Impropers section
-    void write_impropers(const Topology& topology);
-
-    /// Text file where we read from
-    std::unique_ptr<TextFile> file_;
+    void write_impropers(const DataTypes& types, const Topology& topology);
 
     // =============== Data used for reading files
     /// Name of the atom style to use when reading the "Atoms" section
@@ -215,11 +212,6 @@ private:
     std::unordered_map<std::string, double> masses_;
     /// Optional atomic names, indexed by atomic indexes
     std::vector<std::string> names_;
-
-    // =============== Data used for writting files
-    /// Did we already wrote a frame to this file
-    bool written_ = false;
-    DataTypes types_;
 };
 
 template<> FormatInfo format_information<LAMMPSDataFormat>();

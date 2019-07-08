@@ -8,7 +8,7 @@ using namespace chemfiles;
 TEST_CASE("Read files in Gromacs .trr format using Molfile") {
     double eps = 1e-4;
     SECTION("Ubiquitin") {
-        Trajectory file("data/trr/ubiquitin.trr");
+        auto file = Trajectory("data/trr/ubiquitin.trr");
         auto frame = file.read();
 
         CHECK(frame.size() == 20455);
@@ -19,7 +19,7 @@ TEST_CASE("Read files in Gromacs .trr format using Molfile") {
     }
 
     SECTION("Water") {
-        Trajectory file("data/trr/water.trr");
+        auto file = Trajectory("data/trr/water.trr");
         auto frame = file.read();
         CHECK(frame.size() == 297);
 
@@ -41,7 +41,7 @@ TEST_CASE("Read files in Gromacs .trr format using Molfile") {
     }
 
     SECTION("1AKI") {
-        Trajectory file("data/trr/1aki.trr");
+        auto file = Trajectory("data/trr/1aki.trr");
         auto frame = file.read();
         CHECK(frame.size() == 38376);
 

@@ -31,36 +31,7 @@ template<> FormatInfo chemfiles::format_information<XYZFormat>() {
     );
 }
 
-/// Fast-forward the file for one step, returning `false` if the file does
-/// not contain one more step.
-static bool forward(TextFile& file);
-
-XYZFormat::XYZFormat(std::string path, File::Mode mode, File::Compression compression)
-    : file_(TextFile::open(std::move(path), mode, compression))
-{
-    while (!file_->eof()) {
-        auto position = file_->tellg();
-        if (!file_ || position == std::streampos(-1)) {
-            throw format_error("IO error while reading '{}' as XYZ", path);
-        }
-        if (forward(*file_)) {
-            steps_positions_.push_back(position);
-        }
-    }
-    file_->rewind();
-}
-
-size_t XYZFormat::nsteps() {
-    return steps_positions_.size();
-}
-
-void XYZFormat::read_step(const size_t step, Frame& frame) {
-    assert(step < steps_positions_.size());
-    file_->seekg(steps_positions_[step]);
-    read(frame);
-}
-
-void XYZFormat::read(Frame& frame) {
+void XYZFormat::read_next(Frame& frame) {
     size_t natoms = 0;
     try {
         natoms = parse<size_t>(file_->readline());
@@ -80,7 +51,7 @@ void XYZFormat::read(Frame& frame) {
     }
 }
 
-void XYZFormat::write(const Frame& frame) {
+void XYZFormat::write_next(const Frame& frame) {
     auto& topology = frame.topology();
     auto& positions = frame.positions();
     assert(frame.size() == topology.size());
@@ -96,31 +67,32 @@ void XYZFormat::write(const Frame& frame) {
             name, positions[i][0], positions[i][1], positions[i][2]
         );
     }
-
-    steps_positions_.push_back(file_->tellg());
 }
 
-bool forward(TextFile& file) {
-    if (!file) {return false;}
+std::streampos XYZFormat::forward() {
+    if (!*file_) {
+        return std::streampos(-1);
+    }
 
+    auto position = file_->tellg();
     size_t natoms = 0;
     try {
-        natoms = parse<size_t>(file.readline());
+        natoms = parse<size_t>(file_->readline());
     } catch (const FileError&) {
         // No more line left in the file
-        return false;
+        return std::streampos(-1);
     } catch (const Error&) {
         // We could not read an integer, so give up here
-        return false;
+        return std::streampos(-1);
     }
 
     try {
-        file.readlines(natoms + 1);
+        file_->readlines(natoms + 1);
     } catch (const FileError& e) {
         // We could not read the lines from the file
         throw format_error(
-            "not enough lines for XYZ format: {}", file.path(), e.what()
+            "not enough lines for XYZ format: {}", file_->path(), e.what()
         );
     }
-    return true;
+    return position;
 }

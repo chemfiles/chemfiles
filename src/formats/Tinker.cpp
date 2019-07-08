@@ -33,37 +33,9 @@ template<> FormatInfo chemfiles::format_information<TinkerFormat>() {
     );
 }
 
-/// Fast-forward the file for one step, returning `false` if the file does
-/// not contain one more step.
-static bool forward(TextFile& file);
 static bool is_unit_cell_line(const std::string& line);
 
-TinkerFormat::TinkerFormat(std::string path, File::Mode mode, File::Compression compression)
-    : file_(TextFile::open(std::move(path), mode, compression))
-{
-    while (!file_->eof()) {
-        auto position = file_->tellg();
-        if (!file_ || position == std::streampos(-1)) {
-            throw format_error("IO error while reading '{}' as Tinker XYZ", path);
-        }
-        if (forward(*file_)) {
-            steps_positions_.push_back(position);
-        }
-    }
-    file_->rewind();
-}
-
-size_t TinkerFormat::nsteps() {
-    return steps_positions_.size();
-}
-
-void TinkerFormat::read_step(const size_t step, Frame& frame) {
-    assert(step < steps_positions_.size());
-    file_->seekg(steps_positions_[step]);
-    read(frame);
-}
-
-void TinkerFormat::read(Frame& frame) {
+void TinkerFormat::read_next(Frame& frame) {
     size_t natoms = 0;
     try {
         auto line = file_->readline();
@@ -126,7 +98,7 @@ void TinkerFormat::read(Frame& frame) {
     }
 }
 
-void TinkerFormat::write(const Frame& frame) {
+void TinkerFormat::write_next(const Frame& frame) {
     fmt::print(*file_, "{} written by the chemfiles library\n", frame.size());
     fmt::print(*file_, "{} {} {} {} {} {}\n",
         frame.cell().a(), frame.cell().b(), frame.cell().c(),
@@ -169,33 +141,34 @@ void TinkerFormat::write(const Frame& frame) {
         }
         fmt::print(*file_, "\n");
     }
-
-    steps_positions_.push_back(file_->tellg());
 }
 
-bool forward(TextFile& file) {
-    if (!file) {return false;}
+std::streampos TinkerFormat::forward() {
+    if (!*file_) {
+        return std::streampos(-1);
+    }
 
+    auto position = file_->tellg();
     size_t natoms = 0;
     try {
-        auto line = file.readline();
-        if (trim(line) == "") {
+        auto line = file_->readline();
+        if (trim(line).empty()) {
             // We just read an empty line, we give up here
-            return false;
+            return std::streampos(-1);
         } else {
             // Get the number of atoms in the line
             natoms = parse<size_t>(split(trim(line), ' ')[0]);
         }
     } catch (const FileError&) {
         // No more line left in the file
-        return false;
+        return std::streampos(-1);
     } catch (const Error&) {
         // We could not read an integer, so give up here
-        return false;
+        return std::streampos(-1);
     }
 
     try {
-        auto line = file.readline();
+        auto line = file_->readline();
         // Minus one because we just read a line.
         size_t lines_to_skip = natoms - 1;
 
@@ -205,14 +178,14 @@ bool forward(TextFile& file) {
             lines_to_skip += 1;
         }
 
-        file.readlines(lines_to_skip);
+        file_->readlines(lines_to_skip);
     } catch (const FileError&) {
         // We could not read the lines from the file
         throw format_error(
-            "not enough lines in '{}' for Tinker XYZ format", file.path()
+            "not enough lines in '{}' for Tinker XYZ format", file_->path()
         );
     }
-    return true;
+    return position;
 }
 
 bool is_unit_cell_line(const std::string& line) {

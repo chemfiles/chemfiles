@@ -5,9 +5,7 @@
 #define CHEMFILES_FORMAT_XYZ_HPP
 
 #include <iosfwd>
-#include <memory>
 #include <string>
-#include <vector>
 
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
@@ -18,20 +16,14 @@ class Frame;
 /// [XYZ] file format reader and writer.
 ///
 /// [XYZ]: http://openbabel.org/wiki/XYZ
-class XYZFormat final: public Format {
+class XYZFormat final: public TextFormat {
 public:
-    XYZFormat(std::string path, File::Mode mode, File::Compression compression);
+    XYZFormat(std::string path, File::Mode mode, File::Compression compression):
+        TextFormat(std::move(path), mode, compression){}
 
-    void read_step(size_t step, Frame& frame) override;
-    void read(Frame& frame) override;
-    void write(const Frame& frame) override;
-    size_t nsteps() override;
-private:
-    /// Text file where we read from
-    std::unique_ptr<TextFile> file_;
-    /// Storing the positions of all the steps in the file, so that we can
-    /// just `seekg` them instead of reading the whole step.
-    std::vector<std::streampos> steps_positions_;
+    void read_next(Frame& frame) override;
+    void write_next(const Frame& frame) override;
+    std::streampos forward() override;
 };
 
 template<> FormatInfo format_information<XYZFormat>();

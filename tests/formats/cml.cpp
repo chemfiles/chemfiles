@@ -14,18 +14,18 @@ namespace fs=boost::filesystem;
 
 TEST_CASE("Read files in CML format") {
     SECTION("Check nsteps") {
-        Trajectory file1("data/cml/ethane.cml");
-        CHECK(file1.nsteps() == 1);
+        auto file = Trajectory("data/cml/ethane.cml");
+        CHECK(file.nsteps() == 1);
 
-        Trajectory file2("data/cml/drugs.cml");
-        CHECK(file2.nsteps() == 4);
+        file = Trajectory("data/cml/drugs.cml");
+        CHECK(file.nsteps() == 4);
 
-        Trajectory file3("data/cml/properties.cml");
-        CHECK(file3.nsteps() == 1);
+        file = Trajectory("data/cml/properties.cml");
+        CHECK(file.nsteps() == 1);
     }
 
     SECTION("Read next step") {
-        Trajectory file("data/cml/drugs.cml");
+        auto file = Trajectory("data/cml/drugs.cml");
         auto frame = file.read();
         CHECK(frame.size() == 17);
         CHECK(frame.get("title")->as_string() == "naproxen");
@@ -42,7 +42,7 @@ TEST_CASE("Read files in CML format") {
     }
 
     SECTION("Read a specific step") {
-        Trajectory file("data/cml/drugs.cml");
+        auto file = Trajectory("data/cml/drugs.cml");
         // Read frame at a specific positions
         auto frame = file.read_step(2);
         CHECK(frame.step() == 2);
@@ -61,7 +61,7 @@ TEST_CASE("Read files in CML format") {
     }
 
     SECTION("Read fractional coordinates") {
-        Trajectory file("data/cml/ethane.cml");
+        auto file = Trajectory("data/cml/ethane.cml");
         auto frame = file.read();
 
         auto cell = frame.cell();
@@ -78,7 +78,7 @@ TEST_CASE("Read files in CML format") {
     }
 
     SECTION("Read properties") {
-        Trajectory file("data/cml/properties.cml");
+        auto file = Trajectory("data/cml/properties.cml");
         auto frame = file.read();
         CHECK(frame.get("num_c")->as_double() == 10.0);
         CHECK(frame.get("is_organic")->as_bool() == true);

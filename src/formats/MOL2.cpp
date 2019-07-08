@@ -1,7 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <cassert>
 #include <cctype>
 #include <cstdint>
 
@@ -41,40 +40,8 @@ template<> FormatInfo chemfiles::format_information<MOL2Format>() {
 
 /// Fast-forward the file until the tag is found.
 static std::streampos read_until(TextFile& file, const std::string& tag);
-/// Fast-forward the file for one step, returning a valid positionif the file does
-/// contain one more step or -1 if it does not.
-static std::streampos forward(TextFile& file);
 
-MOL2Format::MOL2Format(std::string path, File::Mode mode, File::Compression compression)
-  : file_(TextFile::open(std::move(path), mode, compression)) {
-    while (!file_->eof()) {
-        auto position = forward(*file_);
-        if (position == std::streampos(-1)) {
-            break;
-        }
-        if (!file_) {
-            throw format_error("IO error while reading '{}' as MOL2", path);
-        }
-        steps_positions_.push_back(position);
-    }
-    if (steps_positions_.empty()) {
-        file_->rewind();
-    } else {
-        file_->seekg(steps_positions_[0]);
-    }
-}
-
-size_t MOL2Format::nsteps() {
-    return steps_positions_.size();
-}
-
-void MOL2Format::read_step(const size_t step, Frame& frame) {
-    assert(step < steps_positions_.size());
-    file_->seekg(steps_positions_[step]);
-    read(frame);
-}
-
-void MOL2Format::read(Frame& frame) {
+void MOL2Format::read_next(Frame& frame) {
     auto line = trim(file_->readline());
     if (line != "@<TRIPOS>MOLECULE") {
         throw format_error("wrong starting line for a molecule in MOL2 formart: '{}'", line);
@@ -246,15 +213,15 @@ std::streampos read_until(TextFile& file, const std::string& tag) {
     throw file_error("file ended before tag '{}' was found", tag);
 }
 
-std::streampos forward(TextFile& file) {
-    if (!file) {
-        return {-1};
+std::streampos MOL2Format::forward() {
+    if (!*file_) {
+        return std::streampos(-1);
     }
-    while (!file.eof()) {
+    while (!file_->eof()) {
         try {
-            std::streampos pos = read_until(file, "@<TRIPOS>MOLECULE");
-            file.readline(); // Skip a line
-            auto line = file.readline();
+            auto position = read_until(*file_, "@<TRIPOS>MOLECULE");
+            file_->readline(); // Skip a line
+            auto line = file_->readline();
 
             const auto counts = split(line, ' ');
             auto natoms = parse<size_t>(counts[0]);
@@ -263,22 +230,22 @@ std::streampos forward(TextFile& file) {
                 nbonds = parse<size_t>(counts[1]);
             }
 
-            read_until(file, "@<TRIPOS>ATOM");
-            file.readlines(natoms);
+            read_until(*file_, "@<TRIPOS>ATOM");
+            file_->readlines(natoms);
 
-            read_until(file, "@<TRIPOS>BOND");
-            file.readlines(nbonds);
+            read_until(*file_, "@<TRIPOS>BOND");
+            file_->readlines(nbonds);
 
-            return pos;
+            return position;
         } catch (const Error&) {
-            return {-1};
+            return std::streampos(-1);
         }
     }
 
-    return {-1};
+    return std::streampos(-1);
 }
 
-void MOL2Format::write(const Frame& frame) {
+void MOL2Format::write_next(const Frame& frame) {
     fmt::print(*file_, "@<TRIPOS>MOLECULE\n");
     fmt::print(*file_, "{}\n", frame.get<Property::STRING>("name").value_or(""));
 

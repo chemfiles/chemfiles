@@ -12,7 +12,7 @@ using namespace chemfiles;
 namespace fs=boost::filesystem;
 
 static void check_read_file(Trajectory&& file) {
-    CHECK(file.nsteps() == 100);
+    REQUIRE(file.nsteps() == 100);
 
     Frame frame = file.read();
 
