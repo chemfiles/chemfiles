@@ -47,7 +47,6 @@ else()
         "CHFL_USE_CLANG_TIDY is enabled but clang-tidy is not found. "
         "Set CLANG_TIDY_EXE to clang-tidy path."
     )
-    set(CMAKE_CXX_CLANG_TIDY "" CACHE STRING "" FORCE)
 endif()
 
 mark_as_advanced(CLANG_TIDY_EXE CHEMFILES_CLANG_TIDY)

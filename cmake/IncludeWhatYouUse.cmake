@@ -36,10 +36,8 @@ if (INCLUDE_WHAT_YOU_USE_EXE)
 else()
     message(WARNING
         "CHFL_USE_INCLUDE_WHAT_YOU_USE is enabled but include-what-you-use is not found. "
-        "Set INCLUDE_WHAT_YOU_USE_EXE to nclude-what-you-use path."
+        "Set INCLUDE_WHAT_YOU_USE_EXE to include-what-you-use path."
     )
-    set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "" CACHE STRING "" FORCE)
-    set(CMAKE_C_INCLUDE_WHAT_YOU_USE "" CACHE STRING "" FORCE)
 endif()
 
 mark_as_advanced(INCLUDE_WHAT_YOU_USE_EXE CHEMFILES_IWYU)
