@@ -29,7 +29,7 @@ TEST_CASE("Read files in TNG format") {
     }
 
     SECTION("Read velocities") {
-        Trajectory file("data/tng/1aki.tng");
+        auto file = Trajectory("data/tng/1aki.tng");
         auto frame = file.read();
         CHECK(frame.size() == 38376);
 

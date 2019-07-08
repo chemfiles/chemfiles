@@ -1,7 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <cassert>
 #include <cmath>
 #include <cstdlib>
 #include <cctype>
@@ -44,36 +43,8 @@ template<> FormatInfo chemfiles::format_information<SMIFormat>() {
     );
 }
 
-/// Fast-forward the file for one step, returning `false` if the file does
-/// not contain one more step.
-static bool forward(TextFile& file);
 /// See if all values in array are true
 static bool all(const std::vector<bool>& vec);
-
-SMIFormat::SMIFormat(const std::string& path, File::Mode mode, File::Compression compression)
-    : file_(TextFile::open(std::move(path), mode, compression))
-{
-    while (!file_->eof()) {
-        auto position = file_->tellg();
-        if (!file_ || position == std::streampos(-1)) {
-            throw format_error("IO error while reading '{}' as SMI", path);
-        }
-        if (forward(*file_)) {
-            steps_positions_.push_back(position);
-        }
-    }
-    file_->rewind();
-}
-
-size_t SMIFormat::nsteps() {
-    return steps_positions_.size() - 1;
-}
-
-void SMIFormat::read_step(const size_t step, Frame& frame) {
-    assert(step < steps_positions_.size());
-    file_->seekg(steps_positions_[step]);
-    read(frame);
-}
 
 static std::unordered_set<char> AROMATIC_ORGANIC {'b', 'c', 'n', 'o', 's', 'p'};
 
@@ -196,7 +167,7 @@ void SMIFormat::process_property_list_(Topology& topol, const std::string& smile
     }
 }
 
-void SMIFormat::read(Frame& frame) {
+void SMIFormat::read_next(Frame& frame) {
     // Initialize all the reading variables
     branch_point_ = std::stack<size_t, std::vector<size_t>>();
     rings_ids_.clear();
@@ -211,6 +182,9 @@ void SMIFormat::read(Frame& frame) {
     mol_vector_.push_back(Residue("group " + std::to_string(groupid)));
 
     auto smiles = trim(file_->readline());
+    while (smiles.empty()) {
+        smiles = trim(file_->readline());
+    }
 
     auto check_ring =
     [&](size_t ring_id) {
@@ -713,8 +687,7 @@ void SMIFormat::write_atom(
     }
 }
 
-void SMIFormat::write(const Frame& frame) {
-
+void SMIFormat::write_next(const Frame& frame) {
     if (frame.size() == 0) {
         fmt::print(*file_, "\n");
         return;
@@ -756,17 +729,23 @@ void SMIFormat::write(const Frame& frame) {
     fmt::print(*file_, "\n");
 }
 
-bool forward(TextFile& file) {
-    if (!file) {return false;}
-
-    try {
-        auto line = file.readline();
-    } catch (const FileError&) {
-        // No more line left in the file
-        return false;
+std::streampos SMIFormat::forward() {
+    if (!*file_) {
+        return std::streampos(-1);
     }
 
-    return true;
+    auto position = file_->tellg();
+    try {
+        auto line = file_->readline();
+        while (trim(line).empty()) {
+            line = file_->readline();
+        }
+    } catch (const FileError&) {
+        // No more line left in the file
+        return std::streampos(-1);
+    }
+
+    return position;
 }
 
 bool all(const std::vector<bool>& vec) {

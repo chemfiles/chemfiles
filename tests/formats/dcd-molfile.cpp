@@ -8,7 +8,7 @@ using namespace chemfiles;
 
 TEST_CASE("Read files in DCD format using Molfile") {
     double eps = 1e-4;
-    Trajectory file("data/dcd/water.dcd");
+    auto file = Trajectory("data/dcd/water.dcd");
 
     auto frame = file.read();
     CHECK(frame.size() == 297);

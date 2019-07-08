@@ -14,19 +14,19 @@ namespace fs=boost::filesystem;
 
 TEST_CASE("Read files in XYZ format") {
     SECTION("Check nsteps") {
-        Trajectory file1("data/xyz/trajectory.xyz");
-        CHECK(file1.nsteps() == 2);
+        auto file = Trajectory("data/xyz/trajectory.xyz");
+        CHECK(file.nsteps() == 2);
 
-        Trajectory file2("data/xyz/helium.xyz");
-        CHECK(file2.nsteps() == 397);
+        file = Trajectory("data/xyz/helium.xyz");
+        CHECK(file.nsteps() == 397);
 
-        Trajectory file3("data/xyz/topology.xyz");
-        CHECK(file3.nsteps() == 1);
+        file = Trajectory("data/xyz/topology.xyz");
+        CHECK(file.nsteps() == 1);
     }
 
 
     SECTION("Read next step") {
-        Trajectory file("data/xyz/helium.xyz");
+        auto file = Trajectory("data/xyz/helium.xyz");
         auto frame = file.read();
         CHECK(frame.size() == 125);
         // Check positions
@@ -40,7 +40,7 @@ TEST_CASE("Read files in XYZ format") {
     }
 
     SECTION("Read a specific step") {
-        Trajectory file("data/xyz/helium.xyz");
+        auto file = Trajectory("data/xyz/helium.xyz");
         // Read frame at a specific positions
         auto frame = file.read_step(42);
         CHECK(frame.step() == 42);
@@ -59,8 +59,8 @@ TEST_CASE("Read files in XYZ format") {
     }
 
     SECTION("Read the whole file") {
-        Trajectory file("data/xyz/helium.xyz");
-        CHECK(file.nsteps() == 397);
+        auto file = Trajectory("data/xyz/helium.xyz");
+        REQUIRE(file.nsteps() == 397);
 
         Frame frame;
         while (!file.done()) {
@@ -72,7 +72,7 @@ TEST_CASE("Read files in XYZ format") {
     }
 
     SECTION("Read various files formatting") {
-        Trajectory file("data/xyz/spaces.xyz");
+        auto file = Trajectory("data/xyz/spaces.xyz");
 
         auto frame = file.read();
         auto positions = frame.positions();

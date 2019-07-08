@@ -5,10 +5,8 @@
 #define CHEMFILES_FORMAT_GRO_HPP
 
 #include <map>
-#include <iosfwd>
-#include <memory>
 #include <string>
-#include <vector>
+#include <iosfwd>
 
 #include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
@@ -20,22 +18,18 @@ class Frame;
 /// [GRO] file format reader and writer.
 ///
 /// [GRO]: http://manual.gromacs.org/current/online/gro.html
-class GROFormat final: public Format {
+class GROFormat final: public TextFormat {
 public:
-    GROFormat(std::string path, File::Mode mode, File::Compression compression);
+    GROFormat(std::string path, File::Mode mode, File::Compression compression):
+        TextFormat(std::move(path), mode, compression) {}
 
-    void read_step(size_t step, Frame& frame) override;
-    void read(Frame& frame) override;
-    void write(const Frame& frame) override;
-    size_t nsteps() override;
+    void read_next(Frame& frame) override;
+    void write_next(const Frame& frame) override;
+    std::streampos forward() override;
+
 private:
     /// Map of residues, indexed by residue id.
     std::map<size_t, Residue> residues_;
-    /// Text file where we read from
-    std::unique_ptr<TextFile> file_;
-    /// Storing the positions of all the steps in the file, so that we can
-    /// just `seekg` them instead of reading the whole step.
-    std::vector<std::streampos> steps_positions_;
 };
 
 template<> FormatInfo format_information<GROFormat>();

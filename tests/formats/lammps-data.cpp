@@ -9,7 +9,7 @@ using namespace chemfiles;
 
 TEST_CASE("Read files in LAMMPS data format") {
     SECTION("File created by VMD/Topotools") {
-        Trajectory file("data/lammps-data/solvated.lmp", 'r', "LAMMPS Data");
+        auto file = Trajectory("data/lammps-data/solvated.lmp", 'r', "LAMMPS Data");
         Frame frame = file.read();
 
         CHECK(frame.size() == 7772);
@@ -43,7 +43,7 @@ TEST_CASE("Read files in LAMMPS data format") {
     }
 
     SECTION("File created with LAMMPS") {
-        Trajectory file("data/lammps-data/data.body", 'r', "LAMMPS Data");
+        auto file = Trajectory("data/lammps-data/data.body", 'r', "LAMMPS Data");
         Frame frame = file.read();
 
         CHECK(frame.size() == 100);
@@ -71,7 +71,7 @@ TEST_CASE("Read files in LAMMPS data format") {
     }
 
     SECTION("Triclinic cells") {
-        Trajectory file("data/lammps-data/triclinic-1.lmp", 'r', "LAMMPS Data");
+        auto file = Trajectory("data/lammps-data/triclinic-1.lmp", 'r', "LAMMPS Data");
         auto cell = file.read().cell();
 
         CHECK(cell.a() == 34);

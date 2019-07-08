@@ -10,7 +10,7 @@ using namespace chemfiles;
 
 TEST_CASE("Read files in MMTF format") {
     SECTION("Read single step") {
-        Trajectory file("data/mmtf/4HHB.mmtf");
+        auto file = Trajectory("data/mmtf/4HHB.mmtf");
         Frame frame = file.read();
 
         // Check frame properties
@@ -57,9 +57,9 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(frame.topology().bond_order(4541, 4542) == Bond::DOUBLE);
 
         // Check residue connectivity
-        const auto& topo = frame.topology();
-        CHECK(topo.are_linked(topo.residue(0), topo.residue(1)));
-        CHECK(!topo.are_linked(topo.residue(0), topo.residue(2)));
+        const auto& topology = frame.topology();
+        CHECK(topology.are_linked(topology.residue(0), topology.residue(1)));
+        CHECK(!topology.are_linked(topology.residue(0), topology.residue(2)));
 
         // Chain information
         CHECK(residue.get("chainid"));
@@ -97,15 +97,15 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(water_res2.get("chainindex")->as_double() == 11 );
 
         // Check the secondary structure
-        CHECK(topo.residue(05).get("secondary_structure")->as_string() == "alpha helix");
-        CHECK(topo.residue(18).get("secondary_structure")->as_string() == "turn");
-        CHECK(topo.residue(36).get("secondary_structure")->as_string() == "3-10 helix");
-        CHECK(topo.residue(45).get("secondary_structure")->as_string() == "bend");
-        CHECK(topo.residue(143).get("secondary_structure")->as_string() == "coil");
+        CHECK(topology.residue(05).get("secondary_structure")->as_string() == "alpha helix");
+        CHECK(topology.residue(18).get("secondary_structure")->as_string() == "turn");
+        CHECK(topology.residue(36).get("secondary_structure")->as_string() == "3-10 helix");
+        CHECK(topology.residue(45).get("secondary_structure")->as_string() == "bend");
+        CHECK(topology.residue(143).get("secondary_structure")->as_string() == "coil");
     }
 
     SECTION("Skip steps") {
-        Trajectory file("data/mmtf/1J8K.mmtf");
+        auto file = Trajectory("data/mmtf/1J8K.mmtf");
 
         auto frame = file.read_step(13);
         CHECK(frame.size() == 1402);
@@ -113,12 +113,12 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
         CHECK(approx_eq(positions[1401], Vector3D(5.601, -22.571, -16.631), 1e-3));
 
-        const auto& topo = frame.topology();
-        CHECK(topo.are_linked(topo.residue(0), topo.residue(1)));
-        CHECK(!topo.are_linked(topo.residue(0), topo.residue(2)));
-        CHECK(topo.residue(0).get("is_standard_pdb")->as_bool());
-        CHECK(topo.residue(1).get("is_standard_pdb")->as_bool());
-        CHECK(topo.residue(2).get("is_standard_pdb")->as_bool());
+        const auto& topology = frame.topology();
+        CHECK(topology.are_linked(topology.residue(0), topology.residue(1)));
+        CHECK(!topology.are_linked(topology.residue(0), topology.residue(2)));
+        CHECK(topology.residue(0).get("is_standard_pdb")->as_bool());
+        CHECK(topology.residue(1).get("is_standard_pdb")->as_bool());
+        CHECK(topology.residue(2).get("is_standard_pdb")->as_bool());
 
         frame = file.read_step(1);
         CHECK(frame.size() == 1402);
@@ -127,34 +127,34 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(approx_eq(positions[1401], Vector3D(4.437, -13.250, -22.569), 1e-3));
 
         const auto& topo2 = frame.topology();
-        CHECK(topo2.are_linked(topo.residue(0), topo2.residue(1)));
-        CHECK(!topo2.are_linked(topo.residue(0), topo2.residue(2)));
-        CHECK(topo.residue(0).get("composition_type")->as_string() == "L-PEPTIDE LINKING");
+        CHECK(topo2.are_linked(topology.residue(0), topo2.residue(1)));
+        CHECK(!topo2.are_linked(topology.residue(0), topo2.residue(2)));
+        CHECK(topology.residue(0).get("composition_type")->as_string() == "L-PEPTIDE LINKING");
 
         // Check secondary structure
-        CHECK(topo.residue(10).get("secondary_structure")->as_string() == "extended");
+        CHECK(topology.residue(10).get("secondary_structure")->as_string() == "extended");
     }
 
     SECTION("Successive steps") {
-        Trajectory file("data/mmtf/1J8K.mmtf");
+        auto file = Trajectory("data/mmtf/1J8K.mmtf");
 
         auto frame = file.read();
 
-        const auto& topo = frame.topology();
-        CHECK(topo.are_linked(topo.residue(0), topo.residue(1)));
-        CHECK(!topo.are_linked(topo.residue(0), topo.residue(2)));
+        const auto& topology = frame.topology();
+        CHECK(topology.are_linked(topology.residue(0), topology.residue(1)));
+        CHECK(!topology.are_linked(topology.residue(0), topology.residue(2)));
 
         auto frame2= file.read();
 
         const auto& topo2 = frame.topology();
-        CHECK(topo2.are_linked(topo.residue(0), topo2.residue(1)));
-        CHECK(!topo2.are_linked(topo.residue(0), topo2.residue(2)));
+        CHECK(topo2.are_linked(topology.residue(0), topo2.residue(1)));
+        CHECK(!topo2.are_linked(topology.residue(0), topo2.residue(2)));
 
         auto frame3= file.read();
     }
 
     SECTION("Alternative locations") {
-        Trajectory file("data/mmtf/5A1I.mmtf");
+        auto file = Trajectory("data/mmtf/5A1I.mmtf");
 
         auto frame = file.read();
         const auto residues = frame.topology().residues();
@@ -177,35 +177,35 @@ TEST_CASE("Read files in MMTF format") {
     }
 
     SECTION("GZ Files") {
-        Trajectory file("data/mmtf/1J8K.mmtf.gz");
+        auto file = Trajectory("data/mmtf/1J8K.mmtf.gz");
 
         auto frame = file.read_step(13);
         CHECK(frame.size() == 1402);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
         CHECK(approx_eq(positions[1401], Vector3D(5.601, -22.571, -16.631), 1e-3));
-        const auto& topo = frame.topology();
-        CHECK(topo.are_linked(topo.residue(0), topo.residue(1)));
-        CHECK(!topo.are_linked(topo.residue(0), topo.residue(2)));
+        const auto& topology = frame.topology();
+        CHECK(topology.are_linked(topology.residue(0), topology.residue(1)));
+        CHECK(!topology.are_linked(topology.residue(0), topology.residue(2)));
     }
 
     SECTION("XZ Files") {
-        Trajectory file("data/mmtf/1J8K.mmtf.xz");
+        auto file = Trajectory("data/mmtf/1J8K.mmtf.xz");
 
         auto frame = file.read_step(13);
         CHECK(frame.size() == 1402);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
         CHECK(approx_eq(positions[1401], Vector3D(5.601, -22.571, -16.631), 1e-3));
-        const auto& topo = frame.topology();
-        CHECK(topo.are_linked(topo.residue(0), topo.residue(1)));
-        CHECK(!topo.are_linked(topo.residue(0), topo.residue(2)));
+        const auto& topology = frame.topology();
+        CHECK(topology.are_linked(topology.residue(0), topology.residue(1)));
+        CHECK(!topology.are_linked(topology.residue(0), topology.residue(2)));
     }
 }
 
 TEST_CASE("Write files in MMTF format") {
     SECTION("Single model") {
-        Trajectory file_r("data/mmtf/4HHB.mmtf");
+        auto file_r = Trajectory("data/mmtf/4HHB.mmtf");
         Frame frame = file_r.read();
 
         auto tmpfile = NamedTempPath(".mmtf");
@@ -213,7 +213,7 @@ TEST_CASE("Write files in MMTF format") {
         file.write(frame);
         file.close();
 
-        Trajectory file_r2(tmpfile);
+        auto file_r2 = Trajectory(tmpfile);
         Frame frame2 = file_r2.read();
 
         CHECK(frame.size() == 4779);
@@ -225,34 +225,29 @@ TEST_CASE("Write files in MMTF format") {
     }
 
     SECTION("Multiple models") {
-        Trajectory file_r("data/mmtf/1J8K.mmtf");
+        auto file_r = Trajectory("data/mmtf/1J8K.mmtf");
 
         auto tmpfile = NamedTempPath(".mmtf");
         auto file = Trajectory(tmpfile, 'w');
 
-        Frame frame = file_r.read();
-        file.write(frame);
-        frame = file_r.read();
-        file.write(frame);
-        frame = file_r.read();
-        file.write(frame);
-        frame = file_r.read();
-        file.write(frame);
-
+        file.write(file_r.read());
+        file.write(file_r.read());
+        file.write(file_r.read());
+        file.write(file_r.read());
         file.close();
 
-        Trajectory file_r2(tmpfile);
+        auto file_r2 = Trajectory(tmpfile);
         CHECK(file_r2.nsteps() == 4);
 
-        frame = file_r2.read_step(1);
+        auto frame = file_r2.read_step(1);
         CHECK(frame.size() == 1402);
         const auto& positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D( -9.134, 11.149, 6.990), 1e-3));
         CHECK(approx_eq(positions[1401], Vector3D(4.437, -13.250, -22.569), 1e-3));
 
         // Check to be sure bonds are copied properly
-        const auto& topo = frame.topology();
-        CHECK(topo.are_linked(topo.residue(0), topo.residue(1)));
-        CHECK(!topo.are_linked(topo.residue(0), topo.residue(2)));
+        const auto& topology = frame.topology();
+        CHECK(topology.are_linked(topology.residue(0), topology.residue(1)));
+        CHECK(!topology.are_linked(topology.residue(0), topology.residue(2)));
     }
 }

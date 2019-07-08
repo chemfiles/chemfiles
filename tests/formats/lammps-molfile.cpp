@@ -8,7 +8,7 @@ using namespace chemfiles;
 
 TEST_CASE("Read files in LAMMPS .lammpstrj format using Molfile") {
     SECTION("Polymer") {
-        Trajectory file("data/lammps/polymer.lammpstrj");
+        auto file = Trajectory("data/lammps/polymer.lammpstrj");
         Frame frame = file.read();
         double eps = 1e-3;
 
@@ -20,7 +20,7 @@ TEST_CASE("Read files in LAMMPS .lammpstrj format using Molfile") {
     }
 
     SECTION("NaCl") {
-        Trajectory file("data/lammps/nacl.lammpstrj");
+        auto file = Trajectory("data/lammps/nacl.lammpstrj");
         Frame frame = file.read();
 
         CHECK(frame.size() == 512);
@@ -43,7 +43,7 @@ TEST_CASE("Read files in LAMMPS .lammpstrj format using Molfile") {
     SECTION("Only use read_step") {
         // This test is here to check that the molfile implementation of
         // read_step is correct even in the absence of calls to read
-        Trajectory file("data/lammps/nacl.lammpstrj");
+        auto file = Trajectory("data/lammps/nacl.lammpstrj");
         Frame frame = file.read_step(0);
 
         CHECK(frame.size() == 512);

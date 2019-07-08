@@ -41,36 +41,8 @@ template<> FormatInfo chemfiles::format_information<GROFormat>() {
 /// we can represen them. In case of error, use the given `context` in the error
 /// message
 static void check_values_size(const Vector3D& values, unsigned width, const std::string& context);
-/// Fast-forward the file for one step, returning `false` if the file does
-/// not contain one more step.
-static bool forward(TextFile& file);
 
-GROFormat::GROFormat(std::string path, File::Mode mode, File::Compression compression)
-    : file_(TextFile::open(std::move(path), mode, compression))
-{
-    while (!file_->eof()) {
-        auto position = file_->tellg();
-        if (!file_ || position == std::streampos(-1)) {
-            throw format_error("IO error while reading '{}' as GRO", path);
-        }
-        if (forward(*file_)) {
-            steps_positions_.push_back(position);
-        }
-    }
-    file_->rewind();
-}
-
-size_t GROFormat::nsteps() {
-    return steps_positions_.size();
-}
-
-void GROFormat::read_step(const size_t step, Frame& frame) {
-    assert(step < steps_positions_.size());
-    file_->seekg(steps_positions_[step]);
-    read(frame);
-}
-
-void GROFormat::read(Frame& frame) {
+void GROFormat::read_next(Frame& frame) {
     size_t natoms = 0;
     try {
         frame.set("name", (file_->readline())); // GRO comment line;
@@ -186,7 +158,7 @@ static std::string to_gro_index(uint64_t i) {
     }
 }
 
-void GROFormat::write(const Frame& frame) {
+void GROFormat::write_next(const Frame& frame) {
     fmt::print(*file_, "{}\n", frame.get<Property::STRING>("name").value_or("GRO File produced by chemfiles"));
     fmt::print(*file_, "{: >5d}\n", frame.size());
 
@@ -274,8 +246,6 @@ void GROFormat::write(const Frame& frame) {
             matrix[0][0], matrix[1][1], matrix[2][2], matrix[0][1], matrix[0][2], matrix[1][2]
         );
     }
-
-    steps_positions_.push_back(file_->tellg());
 }
 
 void check_values_size(const Vector3D& values, unsigned width, const std::string& context) {
@@ -289,29 +259,32 @@ void check_values_size(const Vector3D& values, unsigned width, const std::string
     }
 }
 
-bool forward(TextFile& file) {
-    if (!file) {return false;}
+std::streampos GROFormat::forward() {
+    if (!*file_) {
+        return std::streampos(-1);
+    }
 
+    auto position = file_->tellg();
     size_t natoms = 0;
     try {
         // Skip the comment line
-        file.readline();
-        natoms = parse<size_t>(file.readline());
+        file_->readline();
+        natoms = parse<size_t>(file_->readline());
     } catch (const FileError&) {
         // No more line left in the file
-        return false;
+        return std::streampos(-1);
     } catch (const Error&) {
         // We could not read an integer, so give up here
-        return false;
+        return std::streampos(-1);
     }
 
     try {
-        file.readlines(natoms + 1);
+        file_->readlines(natoms + 1);
     } catch (const FileError&) {
         // We could not read the lines from the file
         throw format_error(
-            "not enough lines in '{}' for GRO format", file.path()
+            "not enough lines in '{}' for GRO format", file_->path()
         );
     }
-    return true;
+    return position;
 }

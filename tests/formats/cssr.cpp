@@ -13,7 +13,7 @@ TEST_CASE("Read files in CSSR format") {
     SECTION("Water") {
         // This is the first frame of data/xyz/water.xyz, converted to CSSR
         // with open babel
-        Trajectory file("data/cssr/water.cssr");
+        auto file = Trajectory("data/cssr/water.cssr");
         auto frame = file.read();
 
         CHECK(frame.size() == 297);
@@ -37,7 +37,7 @@ TEST_CASE("Read files in CSSR format") {
     }
 
     SECTION("EDI zeolite") {
-        Trajectory file("data/cssr/EDI.cssr");
+        auto file = Trajectory("data/cssr/EDI.cssr");
         auto frame = file.read();
 
         CHECK(frame.size() == 15);
