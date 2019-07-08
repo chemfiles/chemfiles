@@ -48,8 +48,8 @@ CSSRFormat::CSSRFormat(std::string path, File::Mode mode, File::Compression comp
 }
 
 void CSSRFormat::read_next(Frame& frame) {
-    if (file_->tellg() != 0) {
-        throw format_error("CSSR format only support reading one frame");
+    if (file_->tellg() != std::streampos(0)) {
+        throw format_error("CSSR format only supports reading one frame");
     }
 
     // Read unit cell
@@ -65,13 +65,13 @@ void CSSRFormat::read_next(Frame& frame) {
     bool use_fractional = (coordinate_style == 0);
 
     // Title line
-    file_->readline();
+    file_->skipline();
 
     frame.resize(0);
     frame.reserve(natoms);
 
     std::vector<std::vector<size_t>> connectivity(natoms);
-    for (const auto& line: file_->readlines(natoms)) {
+    for (auto&& line: file_->readlines(natoms)) {
         unsigned atom_id = 0;
         char name[5] = {0};
         double x = 0, y = 0, z = 0;
@@ -118,8 +118,8 @@ void CSSRFormat::read_next(Frame& frame) {
 }
 
 void CSSRFormat::write_next(const Frame& frame) {
-    if (file_->tellg() != 0) {
-        throw format_error("CSSR format only support writing one frame");
+    if (file_->tellg() != std::streampos(0)) {
+        throw format_error("CSSR format only supports writing one frame");
     }
 
     fmt::print(
@@ -185,11 +185,11 @@ void CSSRFormat::write_next(const Frame& frame) {
 }
 
 std::streampos CSSRFormat::forward() {
-    // CSSR only support one step, so always act like there is only one
+    // CSSR only supports one step, so always act like there is only one
     auto position = file_->tellg();
-    if (position == 0) {
+    if (position == std::streampos(0)) {
         // advance the pointer for the next call
-        file_->readline();
+        file_->skipline();
         return position;
     } else {
         return std::streampos(-1);

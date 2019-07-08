@@ -46,8 +46,8 @@ void SDFFormat::read_next(Frame& frame) {
         std::string molecule_name = file_->readline();
         frame.set("name", molecule_name);
 
-        file_->readline(); // Program line - skip it
-        file_->readline(); // Comment line - skip it
+        file_->skipline(); // Program line - skip it
+        file_->skipline(); // Comment line - skip it
 
         counts_line = file_->readline();
         natoms = parse<size_t>(counts_line.substr(0, 3));
@@ -157,8 +157,8 @@ void SDFFormat::read_next(Frame& frame) {
     // This loop breaks when the property block ends or returns on an error
     while(true) {
         try {
-            const auto& line = file_->readline();
-            if (line == "") {
+            auto line = file_->readline();
+            if (line.empty()) {
                 continue;
             } else if (line.substr(0, 4) == "$$$$") {
                 // Ending block, technically wrong - but we can exit safetly
@@ -182,8 +182,8 @@ void SDFFormat::read_next(Frame& frame) {
 
     while(true) {
         try {
-            const auto& line = file_->readline();
-            if (line == "") {
+            auto line = file_->readline();
+            if (line.empty()) {
                 // This breaks a property group - so store now
                 if (property_name == "") {
                     warning("Missing property name!");
@@ -339,9 +339,7 @@ std::streampos SDFFormat::forward() {
     size_t nbonds = 0;
     try {
         // Ignore junk lines
-        file_->readline();
-        file_->readline();
-        file_->readline();
+        file_->skiplines(3);
         std::string counts_line = file_->readline();
 
         if (counts_line.length() < 10) {
@@ -359,7 +357,7 @@ std::streampos SDFFormat::forward() {
     }
 
     try {
-        file_->readlines(natoms + nbonds);
+        file_->skiplines(natoms + nbonds);
     } catch (const FileError&) {
         // We could not read the lines from the file
         throw format_error(

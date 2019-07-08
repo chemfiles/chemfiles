@@ -178,7 +178,7 @@ std::streampos TinkerFormat::forward() {
             lines_to_skip += 1;
         }
 
-        file_->readlines(lines_to_skip);
+        file_->skiplines(lines_to_skip);
     } catch (const FileError&) {
         // We could not read the lines from the file
         throw format_error(
