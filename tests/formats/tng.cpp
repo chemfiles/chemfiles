@@ -81,4 +81,24 @@ TEST_CASE("Read files in TNG format") {
             CHECK(std::find(bonds.begin(), bonds.end(), bond) != bonds.end());
         }
     }
+
+    SECTION("Non-consecutive frame indexes") {
+        // cf https://github.com/chemfiles/chemfiles/issues/242
+        auto file = Trajectory("data/tng/cobrotoxin.tng");
+        REQUIRE(file.nsteps() == 3);
+
+        auto frame = file.read();
+        CHECK(frame.step() == 0);
+        frame = file.read();
+        CHECK(frame.step() == 25000);
+
+        frame = file.read();
+        CHECK(frame.step() == 50000);
+
+        frame = file.read_step(0);
+        CHECK(frame.size() == 19385);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[5569], Vector3D(14.94, 4.03, 19.89), 1e-5));
+        CHECK(approx_eq(positions[11675], Vector3D(44.75, 16.05, 6.1), 1e-5));
+    }
 }
