@@ -88,8 +88,6 @@ void MMTFFormat::read_step(const size_t step, Frame& frame) {
 }
 
 void MMTFFormat::read(Frame& frame) {
-    frame.resize(0);
-
     if (structure_.unitCell.size() == 6) {
         frame.set_cell({
             static_cast<double>(structure_.unitCell[0]),

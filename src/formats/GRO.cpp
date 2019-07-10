@@ -41,6 +41,8 @@ template<> FormatInfo chemfiles::format_information<GROFormat>() {
 static void check_values_size(const Vector3D& values, unsigned width, const std::string& context);
 
 void GROFormat::read_next(Frame& frame) {
+    residues_.clear();
+
     size_t natoms = 0;
     try {
         // GRO comment line is used as frame name
@@ -51,10 +53,8 @@ void GROFormat::read_next(Frame& frame) {
         throw format_error("can not read next step as GRO: {}", e.what());
     }
 
-    residues_.clear();
     frame.add_velocities();
     frame.reserve(natoms);
-    frame.resize(0);
 
     for (size_t i=0; i<natoms; i++) {
         auto line = file_.readline();
