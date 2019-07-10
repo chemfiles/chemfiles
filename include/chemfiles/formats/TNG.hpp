@@ -35,8 +35,13 @@ private:
     /// Scale factor for all lenght dependent data:
     /// positions, velocities, forces, and box shape.
     double distance_scale_factor_ = -1;
-    /// The next step to read
-    int64_t step_ = 0;
+    /// The next step to read -- in chemfiles numerotation
+    /// Chemfiles frames are numbered sucessivelly: 0, 1, 2, 3; without
+    /// accounting for the underlying simulation step
+    size_t step_ = 0;
+    /// The list of steps in the file -- in TNG numerotation
+    /// TNG frames are numbered by the MD step: 0, 10, 20, 30
+    std::vector<int64_t> tng_steps_;
     /// The number of atoms in the current frame
     int64_t natoms_ = 0;
 };
