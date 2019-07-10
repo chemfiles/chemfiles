@@ -41,6 +41,7 @@ template<> FormatInfo chemfiles::format_information<MOL2Format>() {
 static uint64_t read_until(TextFile& file, string_view tag);
 
 void MOL2Format::read_next(Frame& frame) {
+    residues_.clear();
     auto line = file_.readline();
     if (trim(line) != "@<TRIPOS>MOLECULE") {
         throw format_error("wrong starting line for a molecule in MOL2 formart: '{}'", line);
@@ -59,12 +60,9 @@ void MOL2Format::read_next(Frame& frame) {
         nbonds = parse<size_t>(counts[1]);
     }
 
-    residues_.clear();
-    frame.resize(0);
-    frame.reserve(natoms);
 
     file_.readline();
-
+    frame.reserve(natoms);
     // If charges are specified, we need to expect an addition term for each atom
     line = file_.readline();
     bool charges = (trim(line) != "NO_CHARGES");

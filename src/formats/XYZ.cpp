@@ -39,8 +39,6 @@ void XYZFormat::read_next(Frame& frame) {
     }
 
     frame.reserve(natoms);
-    frame.resize(0);
-
     for (size_t i=0; i<natoms; i++) {
         auto line = file_.readline();
         double x = 0, y = 0, z = 0;
