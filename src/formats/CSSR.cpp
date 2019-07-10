@@ -66,9 +66,7 @@ void CSSRFormat::read_next(Frame& frame) {
     // Title line
     file_.readline();
 
-    frame.resize(0);
     frame.reserve(natoms);
-
     std::vector<std::vector<size_t>> connectivity(natoms);
     for (size_t i=0; i<natoms; i++) {
         auto line = file_.readline();
