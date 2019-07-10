@@ -211,7 +211,6 @@ void mmCIFFormat::read_step(const size_t step, Frame& frame) {
 }
 
 void mmCIFFormat::read(Frame& frame) {
-    frame.resize(0);
     residues_.clear();
     frame.set_cell(cell_);
 

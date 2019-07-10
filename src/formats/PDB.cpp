@@ -80,7 +80,6 @@ enum class Record {
 static Record get_record(string_view line);
 
 void PDBFormat::read_next(Frame& frame) {
-    frame.resize(0);
     residues_.clear();
     atom_offsets_.clear();
 
