@@ -23,6 +23,8 @@
 
 using namespace chemfiles;
 
+#define SENTINEL_VALUE (static_cast<size_t>(-1))
+
 struct file_open_info {
     static file_open_info parse(const std::string& path, const std::string& format);
     std::string format = "";
@@ -138,8 +140,6 @@ void Trajectory::pre_read(size_t step) {
 }
 
 void Trajectory::post_read(Frame& frame) {
-    frame.set_step(step_);
-
     if (custom_topology_) {
         frame.set_topology(*custom_topology_);
     } else {
@@ -168,8 +168,14 @@ Frame Trajectory::read() {
     pre_read(step_);
 
     Frame frame;
+    frame.set_step(SENTINEL_VALUE);
     format_->read(frame);
     post_read(frame);
+
+    // Don't override the step set by a format
+    if (frame.step() == SENTINEL_VALUE) {
+        frame.set_step(step_);
+    }
 
     step_++;
     return frame;
@@ -180,8 +186,14 @@ Frame Trajectory::read_step(const size_t step) {
     pre_read(step);
 
     Frame frame;
+    frame.set_step(SENTINEL_VALUE);
     step_ = step;
     format_->read_step(step_, frame);
+
+    // Don't override the step set by a format
+    if (frame.step() == SENTINEL_VALUE) {
+        frame.set_step(step_);
+    }
 
     post_read(frame);
     return frame;
