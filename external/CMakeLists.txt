@@ -99,6 +99,21 @@ endif()
 list(APPEND EXTERNAL_INCLUDES ${LIBLZMA_INCLUDE_DIRS})
 
 # ==========
+# bzip2: https://github.com/chemfiles/bzip2
+# ==========
+if(${CHFL_SYSTEM_BZIP2})
+    find_package(BZip2 REQUIRED)
+    set(BZIP2_OBJECTS "" PARENT_SCOPE)
+else()
+    external_library(bzip2)
+    set(BZIP2_OBJECTS $<TARGET_OBJECTS:bzip2> PARENT_SCOPE)
+    set(BZIP2_LIBRARIES "" PARENT_SCOPE)
+    set(BZIP2_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/bzip2/)
+    set(BZIP2_INCLUDE_DIR ${BZIP2_INCLUDE_DIR} PARENT_SCOPE)
+endif()
+list(APPEND EXTERNAL_INCLUDES ${BZIP2_INCLUDE_DIR})
+
+# ==========
 # fmtlib: https://github.com/chemfiles/fmt
 # ==========
 external_library(fmt)
