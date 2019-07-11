@@ -28,6 +28,7 @@ option(CHFL_USE_INCLUDE_WHAT_YOU_USE "Compile the code with include-what-you-use
 option(CHFL_SYSTEM_NETCDF "Use the system NetCDF instead of the internal one" OFF)
 option(CHFL_SYSTEM_ZLIB "Use the system zlib instead of the internal one" OFF)
 option(CHFL_SYSTEM_LZMA "Use the system lzma instead of the internal one" OFF)
+option(CHFL_SYSTEM_BZIP2 "Use the system bzip2 instead of the internal one" OFF)
 
 option(CHFL_BUILD_DOCTESTS "Build documentation tests as well as unit tests." ON)
 mark_as_advanced(CHFL_BUILD_DOCTESTS)
@@ -120,6 +121,7 @@ set(CHEMFILES_OBJECTS
     $<TARGET_OBJECTS:xdrfile>
     ${ZLIB_OBJECTS}
     ${LZMA_OBJECTS}
+    ${BZIP2_OBJECTS}
     ${NETCDF_OBJECTS}
 )
 
@@ -135,7 +137,12 @@ target_include_directories(chemfiles PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(chemfiles ${NETCDF_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBLZMA_LIBRARY})
+target_link_libraries(chemfiles
+    ${NETCDF_LIBRARIES}
+    ${ZLIB_LIBRARIES}
+    ${LIBLZMA_LIBRARY}
+    ${BZIP2_LIBRARIES}
+)
 if(WIN32)
     target_link_libraries(chemfiles ws2_32)
 endif()
