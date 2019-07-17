@@ -127,7 +127,12 @@ latex_elements = {
     # The font size ('10pt', '11pt' or '12pt').
     'pointsize': '10pt',
     # Additional stuff for the LaTeX preamble.
-    # 'preamble': '',
+    'preamble': '''
+    \\usepackage{pifont}
+    \\usepackage{newunicodechar}
+    \\newunicodechar{✓}{\\ding{51}}
+    \\newunicodechar{✗}{\\ding{55}}
+    ''',
 }
 
 latex_documents = [
