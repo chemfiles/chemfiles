@@ -41,7 +41,6 @@ namespace chemfiles {
     extern template class Molfile<XTC>;
     extern template class Molfile<TRJ>;
     extern template class Molfile<LAMMPS>;
-    extern template class Molfile<MOL2>;
     extern template class Molfile<MOLDEN>;
 }
 
