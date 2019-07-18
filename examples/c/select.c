@@ -6,7 +6,7 @@
 
 static int compare_matches(const void* lhs, const void* rhs);
 
-int main() {
+int main(void) {
     CHFL_TRAJECTORY* input = chfl_trajectory_open("input.arc", 'r');
     CHFL_TRAJECTORY* output = chfl_trajectory_open("output.pdb", 'w');
     CHFL_FRAME* frame = chfl_frame();
