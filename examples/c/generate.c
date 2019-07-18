@@ -4,7 +4,7 @@
 #include <chemfiles.h>
 #include <stdlib.h>
 
-int main() {
+int main(void) {
     CHFL_FRAME* frame = chfl_frame();
     CHFL_ATOM* H = chfl_atom("H");
     CHFL_ATOM* O = chfl_atom("O");
