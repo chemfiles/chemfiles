@@ -32,8 +32,8 @@ TEST_CASE("Write an xz file") {
 
     {
         XzFile file(filename, File::WRITE);
-        file << "Test" << std::endl;
-        file << 5467 << std::endl;
+        file.print("Test\n");
+        file.print("{}\n", 5467);
     }
 
     std::ifstream verification(filename, std::ios::binary);

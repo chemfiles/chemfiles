@@ -219,9 +219,9 @@ void SDFFormat::write_next(const Frame& frame) {
     auto& positions = frame.positions();
     assert(frame.size() == topology.size());
 
-    fmt::print(*file_, "{}\n", frame.get<Property::STRING>("name").value_or("NONAME"));
-    fmt::print(*file_, " chemfiles-lib\n\n");
-    fmt::print(*file_, "{:>3}{:>3}  0     0  0  0  0  0  0999 V2000\n", frame.size(), topology.bonds().size());
+    file_->print("{}\n", frame.get<Property::STRING>("name").value_or("NONAME"));
+    file_->print(" chemfiles-lib\n\n");
+    file_->print("{:>3}{:>3}  0     0  0  0  0  0  0999 V2000\n", frame.size(), topology.bonds().size());
 
     for (size_t i = 0; i < frame.size(); i++) {
         std::string type = topology[i].type();
@@ -261,8 +261,7 @@ void SDFFormat::write_next(const Frame& frame) {
             warning("SDF writer", "charge not an integer: '{}'", topology[i].charge());
         }
 
-        fmt::print(
-            *file_, "{:>10.4f}{:>10.4f}{:>10.4f} {:3} 0{:3}  0  0  0  0  0  0  0  0  0  0\n",
+        file_->print("{:>10.4f}{:>10.4f}{:>10.4f} {:3} 0{:3}  0  0  0  0  0  0  0  0  0  0\n",
             positions[i][0], positions[i][1], positions[i][2], type, charge_code
         );
     }
@@ -291,33 +290,32 @@ void SDFFormat::write_next(const Frame& frame) {
                 break;
         }
 
-        fmt::print(
-            *file_, "{:>3}{:>3}{}  0  0  0  0\n",
+        file_->print("{:>3}{:>3}{}  0  0  0  0\n",
             bond[0] + 1, bond[1] + 1, bond_order
         );
     }
 
-    fmt::print(*file_, "M  END\n");
+    file_->print("M  END\n");
 
     for (auto& prop : frame.properties()) {
         if (prop.first == "name") {
             continue;
         }
 
-        fmt::print(*file_, "> <{}>\n", prop.first);
+        file_->print("> <{}>\n", prop.first);
 
         switch(prop.second.kind()) {
         case Property::STRING:
-            fmt::print(*file_, "{}\n\n", prop.second.as_string());
+            file_->print("{}\n\n", prop.second.as_string());
             break;
         case Property::DOUBLE:
-            fmt::print(*file_, "{}\n\n", prop.second.as_double());
+            file_->print("{}\n\n", prop.second.as_double());
             break;
         case Property::BOOL:
-            fmt::print(*file_, "{}\n\n", prop.second.as_bool());
+            file_->print("{}\n\n", prop.second.as_bool());
             break;
         case Property::VECTOR3D:
-            fmt::print(*file_, "{} {} {}\n\n",
+            file_->print("{} {} {}\n\n",
                 prop.second.as_vector3d()[0],
                 prop.second.as_vector3d()[1],
                 prop.second.as_vector3d()[2]
@@ -326,15 +324,15 @@ void SDFFormat::write_next(const Frame& frame) {
         }
     }
 
-    fmt::print(*file_, "$$$$\n");
+    file_->print("$$$$\n");
 }
 
 std::streampos SDFFormat::forward() {
-    if (!*file_) {
+    if (file_->fail()) {
         return std::streampos(-1);
     }
 
-    auto position = file_->tellg();
+    auto position = file_->tellpos();
     size_t natoms = 0;
     size_t nbonds = 0;
     try {

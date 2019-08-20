@@ -72,7 +72,7 @@ void MOL2Format::read_next(Frame& frame) {
     bool charges = (trim(line) != "NO_CHARGES");
 
     while (!file_->eof()) {
-        const auto& curr_pos = file_->tellg();
+        const auto& curr_pos = file_->tellpos();
 
         line = file_->readline();
         auto trimed = trim(line);
@@ -89,7 +89,7 @@ void MOL2Format::read_next(Frame& frame) {
 
             frame.set_cell(UnitCell(a, b, c, alpha, beta, gamma));
         } else if (trimed == "@<TRIPOS>MOLECULE") {
-            file_->seekg(curr_pos);
+            file_->seekpos(curr_pos);
             break;
         }
     }
@@ -199,7 +199,7 @@ void MOL2Format::read_bonds(Frame& frame, size_t nbonds) {
 
 std::streampos read_until(TextFile& file, const std::string& tag) {
     while (!file.eof()) {
-        std::streampos pos = file.tellg();
+        std::streampos pos = file.tellpos();
         if (file.readline().substr(0, tag.length()) == tag) {
             return pos;
         }
@@ -209,7 +209,7 @@ std::streampos read_until(TextFile& file, const std::string& tag) {
 }
 
 std::streampos MOL2Format::forward() {
-    if (!*file_) {
+    if (file_->fail()) {
         return std::streampos(-1);
     }
     while (!file_->eof()) {
@@ -241,8 +241,8 @@ std::streampos MOL2Format::forward() {
 }
 
 void MOL2Format::write_next(const Frame& frame) {
-    fmt::print(*file_, "@<TRIPOS>MOLECULE\n");
-    fmt::print(*file_, "{}\n", frame.get<Property::STRING>("name").value_or(""));
+    file_->print("@<TRIPOS>MOLECULE\n");
+    file_->print("{}\n", frame.get<Property::STRING>("name").value_or(""));
 
     // Start after the maximal residue id for atoms without associated residue
     uint64_t max_resid = 0;
@@ -256,11 +256,11 @@ void MOL2Format::write_next(const Frame& frame) {
     const auto& bonds = frame.topology().bonds();
 
     // Basic format taken from VMD Molfiles
-    fmt::print(*file_, "{:4d}  {:4d}    1    0    0\n",
+    file_->print("{:4d}  {:4d}    1    0    0\n",
         frame.size(), bonds.size()
     );
 
-    fmt::print(*file_, "SMALL\nUSER_CHARGES\n\n@<TRIPOS>ATOM\n");
+    file_->print("SMALL\nUSER_CHARGES\n\n@<TRIPOS>ATOM\n");
 
     auto& positions = frame.positions();
     for (size_t i = 0; i < frame.size(); i++) {
@@ -295,14 +295,13 @@ void MOL2Format::write_next(const Frame& frame) {
             warning("Sybyl type not set. Using element type instead");
         }
 
-        fmt::print(
-            *file_,
+        file_->print(
             "{:4d} {:4s}  {:.6f} {:.6f} {:.6f} {:s} {} {} {:.6f}\n",
             i + 1, frame[i].name(), positions[i][0], positions[i][1], positions[i][2], sybyl, resid, resname, frame[i].charge()
         );
     }
 
-    fmt::print(*file_, "@<TRIPOS>BOND\n");
+    file_->print("@<TRIPOS>BOND\n");
 
     auto& bond_orders = frame.topology().bond_orders();
 
@@ -331,20 +330,20 @@ void MOL2Format::write_next(const Frame& frame) {
                 break;
         }
 
-        fmt::print(*file_, "{:4d}  {:4d}  {:4d}    {}\n",
+        file_->print("{:4d}  {:4d}  {:4d}    {}\n",
             i + 1, bonds[i][0] + 1, bonds[i][1] + 1, bond_order
         );
     }
 
     auto cell = frame.cell();
     if (cell.shape() != UnitCell::INFINITE) {
-        fmt::print(*file_, "@<TRIPOS>CRYSIN\n");
-        fmt::print(*file_, "   {:.4f}   {:.4f}   {:.4f}   {:.4f}   {:.4f}   {:.4f} 1 1\n",
+        file_->print("@<TRIPOS>CRYSIN\n");
+        file_->print("   {:.4f}   {:.4f}   {:.4f}   {:.4f}   {:.4f}   {:.4f} 1 1\n",
             cell.a(), cell.b(), cell.c(), cell.alpha(), cell.beta(), cell.gamma()
         );
     }
 
-    fmt::print(*file_,"@<TRIPOS>SUBSTRUCTURE\n");
-    fmt::print(*file_,"   1 ****        1 TEMP                        ");
-    fmt::print(*file_,"0 ****  **** 0 ROOT\n\n");
+    file_->print("@<TRIPOS>SUBSTRUCTURE\n");
+    file_->print("   1 ****        1 TEMP                        ");
+    file_->print("0 ****  **** 0 ROOT\n\n");
 }

@@ -275,7 +275,7 @@ xzstreambuf::pos_type xzstreambuf::seekoff(std::streambuf::off_type offset,
     auto position = pos_type(off_type(decoded_position_) - (egptr() - gptr()));
     auto current_position = position;
 
-    // Fast return path for tellg
+    // Fast return path for tellpos
     if (offset == 0 && way == std::ios::cur) {
         return position;
     }

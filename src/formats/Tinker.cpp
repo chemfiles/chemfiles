@@ -96,8 +96,8 @@ void TinkerFormat::read_next(Frame& frame) {
 }
 
 void TinkerFormat::write_next(const Frame& frame) {
-    fmt::print(*file_, "{} written by the chemfiles library\n", frame.size());
-    fmt::print(*file_, "{} {} {} {} {} {}\n",
+    file_->print("{} written by the chemfiles library\n", frame.size());
+    file_->print("{} {} {} {} {} {}\n",
         frame.cell().a(), frame.cell().b(), frame.cell().c(),
         frame.cell().alpha(), frame.cell().beta(), frame.cell().gamma()
     );
@@ -129,23 +129,22 @@ void TinkerFormat::write_next(const Frame& frame) {
         assert(it != types_id.end());
         auto type = (it - types_id.begin()) + 1;
 
-        fmt::print(
-            *file_, "{} {} {} {} {} {}",
+        file_->print("{} {} {} {} {} {}",
             i + 1, name, positions[i][0], positions[i][1], positions[i][2], type
         );
         for (size_t other: bonded_to[i]) {
-            fmt::print(*file_, " {}", other + 1);
+            file_->print(" {}", other + 1);
         }
-        fmt::print(*file_, "\n");
+        file_->print("\n");
     }
 }
 
 std::streampos TinkerFormat::forward() {
-    if (!*file_) {
+    if (file_->fail()) {
         return std::streampos(-1);
     }
 
-    auto position = file_->tellg();
+    auto position = file_->tellpos();
     size_t natoms = 0;
     try {
         auto line = file_->readline();
