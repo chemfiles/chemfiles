@@ -510,18 +510,18 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
     }
 
     if (needs_brackets) {
-        fmt::print(*file_, "[");
+        file_->print("[");
     }
 
     // Mass must be first, before the element is printed
     if (mass_int != 0) {
-        fmt::print(*file_, "{}", mass_int);
+        file_->print("{}", mass_int);
     }
 
-    fmt::print(*file_, "{}", type);
+    file_->print("{}", type);
 
     if (smi_class != -1) {
-        fmt::print(*file_, ":{}", smi_class);
+        file_->print(":{}", smi_class);
     }
 
     bool is_good_tag = false;
@@ -533,13 +533,13 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
         // If it's clockwise, then we just print the symbol @@ and be done with it
         if (chirality == "CW") {
             is_good_tag = true;
-            fmt::print(*file_, "@@");
+            file_->print("@@");
         }
         break;
     case 3:
         if (chirality == "CCW") {
             is_good_tag = true;
-            fmt::print(*file_, "@");
+            file_->print("@");
         }
         break;
     case 7:
@@ -547,7 +547,7 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
             && is_chirality_tag(chirality.substr(4, 2))
             && std::isdigit(chirality[6]) != 0 ) {
             is_good_tag = true;
-            fmt::print(*file_, "@{}", chirality.substr(4));
+            file_->print("@{}", chirality.substr(4));
         }
         break;
     case 8:
@@ -556,7 +556,7 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
             && std::isdigit(chirality[6]) != 0
             && std::isdigit(chirality[7]) != 0) {
             is_good_tag = true;
-            fmt::print(*file_, "@{}", chirality.substr(4));
+            file_->print("@{}", chirality.substr(4));
         }
         break;
     default:
@@ -568,28 +568,28 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
     }
 
     if (explicit_h == 1) {
-        fmt::print(*file_, "H");
+        file_->print("H");
     }
 
     if (explicit_h > 1) {
-        fmt::print(*file_, "H{}", explicit_h);
+        file_->print("H{}", explicit_h);
     }
 
     if (charge_int < 0) {
-        fmt::print(*file_, "-", charge_int);
+        file_->print("-", charge_int);
     }
 
     if (charge_int > 0) {
-        fmt::print(*file_, "+", charge_int);
+        file_->print("+", charge_int);
     }
 
     charge_int = std::abs(charge_int);
     if (charge_int != 1 && charge_int != 0) {
-        fmt::print(*file_, "{}", charge_int);
+        file_->print("{}", charge_int);
     }
 
     if (needs_brackets) {
-        fmt::print(*file_, "]");
+        file_->print("]");
     }
 }
 
@@ -598,20 +598,20 @@ static void print_bond(std::unique_ptr<TextFile>& file_, chemfiles::Bond::BondOr
     case Bond::SINGLE:
     case Bond::AMIDE:
         break;
-    case Bond::DOUBLE: fmt::print(*file_, "="); break;
-    case Bond::TRIPLE: fmt::print(*file_, "#"); break;
-    case Bond::QUADRUPLE: fmt::print(*file_, "$"); break;
-    case Bond::AROMATIC: fmt::print(*file_, ":"); break;
-    case Bond::DATIVE_L: fmt::print(*file_, "<-"); break;
-    case Bond::DATIVE_R: fmt::print(*file_, "->"); break;
-    case Bond::UP: fmt::print(*file_, "/"); break;
-    case Bond::DOWN: fmt::print(*file_, "\\"); break;
+    case Bond::DOUBLE: file_->print("="); break;
+    case Bond::TRIPLE: file_->print("#"); break;
+    case Bond::QUADRUPLE: file_->print("$"); break;
+    case Bond::AROMATIC: file_->print(":"); break;
+    case Bond::DATIVE_L: file_->print("<-"); break;
+    case Bond::DATIVE_R: file_->print("->"); break;
+    case Bond::UP: file_->print("/"); break;
+    case Bond::DOWN: file_->print("\\"); break;
     case Bond::UNKNOWN:
-        fmt::print(*file_, "~");
+        file_->print("~");
         break;
     default:
         warning("SMI Writer", "unknown bond type");
-        fmt::print(*file_, "~");
+        file_->print("~");
         break;
     }
 }
@@ -642,7 +642,7 @@ void SMIFormat::write_atom(
         for (size_t i = 0; i < any_rings->second; ++i) {
             ring_count_++;
             ring_start++;
-            fmt::print(*file_, "{}", ring_count_);
+            file_->print("{}", ring_count_);
             ring_stack_.insert({current_atom, ring_count_});
         }
     }
@@ -664,7 +664,7 @@ void SMIFormat::write_atom(
                 print_bond(file_,
                     frame.topology().bond_order(current_atom, neighbor)
                 );
-                fmt::print(*file_, "{}", ring->second);
+                file_->print("{}", ring->second);
                 ring_stack_.erase(ring);
                 ring_end++;
             }
@@ -687,7 +687,7 @@ void SMIFormat::write_atom(
         // and we don't want to brank the last neighbor printed
         if (neighbors_printed - ring_start < current_atom_bonds.size() - 2 &&
             current_atom_bonds.size() > 2) {
-            fmt::print(*file_, "(");
+            file_->print("(");
             branch_stack_++;
         }
 
@@ -701,14 +701,14 @@ void SMIFormat::write_atom(
 
     // End of branch
     if (current_atom_bonds.size() - ring_end == 1 && branch_stack_ != 0) {
-        fmt::print(*file_, ")");
+        file_->print(")");
         branch_stack_--;
     }
 }
 
 void SMIFormat::write_next(const Frame& frame) {
     if (frame.size() == 0) {
-        fmt::print(*file_, "\n");
+        file_->print("\n");
         return;
     }
 
@@ -732,7 +732,7 @@ void SMIFormat::write_next(const Frame& frame) {
 
     while (!all(written)) {
         if (!first_atom_) {
-            fmt::print(*file_, ".");
+            file_->print(".");
         }
         auto not_hit = std::find(written.begin(), written.end(), false);
         auto current_atom = static_cast<size_t>(std::distance(written.begin(), not_hit));
@@ -742,18 +742,18 @@ void SMIFormat::write_next(const Frame& frame) {
 
     auto name = frame.get("name");
     if (name && name->kind() == Property::STRING) {
-        fmt::print(*file_, "\t{}", name->as_string());
+        file_->print("\t{}", name->as_string());
     }
 
-    fmt::print(*file_, "\n");
+    file_->print("\n");
 }
 
 std::streampos SMIFormat::forward() {
-    if (!*file_) {
+    if (file_->fail()) {
         return std::streampos(-1);
     }
 
-    auto position = file_->tellg();
+    auto position = file_->tellpos();
     try {
         auto line = file_->readline();
         while (trim(line).empty()) {

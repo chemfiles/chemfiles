@@ -39,6 +39,18 @@ template<> FormatInfo chemfiles::format_information<CMLFormat>() {
     );
 }
 
+class xml_writer final: public pugi::xml_writer {
+public:
+    xml_writer(TextFile& file): file_(file) {}
+
+    void write(const void* data, size_t size) override {
+        file_.print("{}", string_view(static_cast<const char*>(data), size));
+    }
+
+private:
+    TextFile& file_;
+};
+
 CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compression)
     : mode_(mode), file_(TextFile::open(std::move(path), mode, compression))
 {
@@ -63,7 +75,12 @@ CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compre
         return;
     }
 
-    auto result = document_.load(*file_);
+    std::string content;
+    while (!file_->eof()) {
+        content.append(file_->readline());
+    }
+
+    auto result = document_.load_string(content.c_str());
     if (!result) {
         throw format_error("[CML] Parsing error: '{}'", result.description());
     }
@@ -92,14 +109,13 @@ CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compre
 
 CMLFormat::~CMLFormat() {
     if (num_added_ != 0 && mode_ == File::WRITE) {
-        document_.save(*file_, "  ");
-        return;
-    }
-
-    // Don't bother to check if anything is added, the document will be blank
-    // regardless
-    if (mode_ == File::APPEND) {
-        document_.save(*file_, "  ", pugi::format_no_declaration | pugi::format_default);
+        auto writter = xml_writer(*file_);
+        document_.save(writter, "  ");
+    } else if (mode_ == File::APPEND) {
+        // Don't bother to check if anything is added, the document will be blank
+        // regardless
+        auto writter = xml_writer(*file_);
+        document_.save(writter, "  ", pugi::format_no_declaration | pugi::format_default);
     }
 }
 

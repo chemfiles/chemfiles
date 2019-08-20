@@ -30,11 +30,11 @@ std::unique_ptr<TextFile> TextFile::open(std::string path, File::Mode mode, File
 }
 
 TextFile::TextFile(std::string path, File::Mode mode, File::Compression compression, std::streambuf* buffer):
-    File(std::move(path), mode, compression), std::iostream(buffer)
+    File(std::move(path), mode, compression), stream_(buffer)
 {
-    std::iostream::clear();
+    stream_.clear();
     // Throw exceptions on errors
-    std::iostream::exceptions(std::fstream::badbit | std::fstream::failbit);
+    stream_.exceptions(std::fstream::badbit | std::fstream::failbit);
 }
 
 /// Read a single line from `stream` in `string`, handling all possible end of
@@ -50,8 +50,8 @@ void TextFile::get_line_impl(std::string& string) {
     // Code that uses streambuf this way must be guarded by a sentry object.
     // The sentry object performs various tasks,
     // such as thread synchronization and updating the stream state.
-    std::istream::sentry sentry(*this, true);
-    std::streambuf* buffer = this->rdbuf();
+    std::istream::sentry sentry(stream_, true);
+    std::streambuf* buffer = stream_.rdbuf();
 
     while(true) {
         int c = buffer->sbumpc();
@@ -66,7 +66,7 @@ void TextFile::get_line_impl(std::string& string) {
         case EOF:
             // Also handle the case when the last line has no line ending
             if(string.empty()) {
-                this->setstate(std::ios::eofbit);
+                stream_.setstate(std::ios::eofbit);
             }
             return;
         default:
@@ -76,8 +76,8 @@ void TextFile::get_line_impl(std::string& string) {
 }
 
 void TextFile::skip_line_impl() {
-    std::istream::sentry sentry(*this, true);
-    std::streambuf* buffer = this->rdbuf();
+    std::istream::sentry sentry(stream_, true);
+    std::streambuf* buffer = stream_.rdbuf();
 
     while(true) {
         int c = buffer->sbumpc();
@@ -90,7 +90,7 @@ void TextFile::skip_line_impl() {
             }
             return;
         case EOF:
-            this->setstate(std::ios::eofbit);
+            stream_.setstate(std::ios::eofbit);
             return;
         default:
             continue;
@@ -100,72 +100,100 @@ void TextFile::skip_line_impl() {
 
 void TextFile::rewind() {
     this->clear();
-    this->seekg(0, std::ios::beg);
+    this->seekpos(0);
 }
 
 std::string TextFile::readline() {
     // Disable exceptions checking, and manually check bellow
-    auto state = this->exceptions();
-    this->exceptions(std::fstream::goodbit);
+    auto state = stream_.exceptions();
+    stream_.exceptions(std::fstream::goodbit);
 
     std::string line;
     get_line_impl(line);
-    if (this->fail()) {
+    if (stream_.fail()) {
         throw file_error("could not read a line in {}", this->path());
     }
 
     // Re-enable exceptions checking
-    this->exceptions(state);
+    stream_.exceptions(state);
     return line;
 }
 
 std::vector<std::string> TextFile::readlines(size_t n) {
     // Disable exceptions checking, and manually check bellow
-    auto state = this->exceptions();
-    this->exceptions(std::fstream::goodbit);
+    auto state = stream_.exceptions();
+    stream_.exceptions(std::fstream::goodbit);
 
     auto lines = std::vector<std::string>(n);
     for (size_t i = 0; i < n; i++) {
         get_line_impl(lines[i]);
     }
 
-    if (this->fail()) {
+    if (stream_.fail()) {
         throw file_error("could not read a line in {}", this->path());
     }
 
     // Re-enable exceptions checking
-    this->exceptions(state);
+    stream_.exceptions(state);
 
     return lines;
 }
 
 void TextFile::skipline() {
     // Disable exceptions checking, and manually check bellow
-    auto state = this->exceptions();
-    this->exceptions(std::fstream::goodbit);
+    auto state = stream_.exceptions();
+    stream_.exceptions(std::fstream::goodbit);
 
     skip_line_impl();
-    if (this->fail()) {
+    if (stream_.fail()) {
         throw file_error("could not read a line in {}", this->path());
     }
 
     // Re-enable exceptions checking
-    this->exceptions(state);
+    stream_.exceptions(state);
 }
 
 void TextFile::skiplines(size_t n) {
     // Disable exceptions checking, and manually check bellow
-    auto state = this->exceptions();
-    this->exceptions(std::fstream::goodbit);
+    auto state = stream_.exceptions();
+    stream_.exceptions(std::fstream::goodbit);
 
     for (size_t i = 0; i < n; i++) {
         skip_line_impl();
     }
 
-    if (this->fail()) {
+    if (stream_.fail()) {
         throw file_error("could not read a line in {}", this->path());
     }
 
     // Re-enable exceptions checking
-    this->exceptions(state);
+    stream_.exceptions(state);
+}
+
+std::streampos TextFile::tellpos() {
+    return stream_.tellg();
+}
+
+void TextFile::seekpos(std::streampos position) {
+    stream_.seekg(position);
+}
+
+bool TextFile::good() const {
+    return stream_.good();
+}
+
+bool TextFile::eof() const {
+    return stream_.eof();
+}
+
+bool TextFile::fail() const {
+    return stream_.fail();
+}
+
+bool TextFile::bad() const {
+    return stream_.bad();
+}
+
+void TextFile::clear() {
+    stream_.clear();
 }

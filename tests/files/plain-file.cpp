@@ -50,8 +50,8 @@ TEST_CASE("Write a text file") {
 
     {
         PlainFile file(filename, File::WRITE);
-        file << "Test" << std::endl;
-        file << 5467 << std::endl;
+        file.print("Test\n");
+        file.print("{}\n", 5467);
     }
 
     std::ifstream verification(filename);
