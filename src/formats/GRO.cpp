@@ -157,8 +157,8 @@ static std::string to_gro_index(uint64_t i) {
 }
 
 void GROFormat::write_next(const Frame& frame) {
-    fmt::print(*file_, "{}\n", frame.get<Property::STRING>("name").value_or("GRO File produced by chemfiles"));
-    fmt::print(*file_, "{: >5d}\n", frame.size());
+    file_->print("{}\n", frame.get<Property::STRING>("name").value_or("GRO File produced by chemfiles"));
+    file_->print("{: >5d}\n", frame.size());
 
     // Only use numbers bigger than the biggest residue id as "resSeq" for
     // atoms without associated residue, and start generated residue id at
@@ -209,14 +209,12 @@ void GROFormat::write_next(const Frame& frame) {
         if (frame.velocities()) {
             auto vel = (*frame.velocities())[i] / 10;
             check_values_size(vel, 8, "atomic velocity");
-            fmt::print(
-                *file_,
+            file_->print(
                 "{: >5}{: <5}{: >5}{: >5}{:8.3f}{:8.3f}{:8.3f}{:8.4f}{:8.4f}{:8.4f}\n",
                 resid, resname, frame[i].name(), to_gro_index(i), pos[0], pos[1], pos[2], vel[0], vel[1], vel[2]
             );
         } else {
-            fmt::print(
-                *file_,
+            file_->print(
                 "{: >5}{: <5}{: >5}{: >5}{:8.3f}{:8.3f}{:8.3f}\n",
                 resid, resname, frame[i].name(), to_gro_index(i), pos[0], pos[1], pos[2]
             );
@@ -229,8 +227,7 @@ void GROFormat::write_next(const Frame& frame) {
     // This means we cannot support incredibly large cell sizes, but these are likely not practical anyway
     if (cell.shape() == UnitCell::ORTHORHOMBIC || cell.shape() == UnitCell::INFINITE) {
         check_values_size(Vector3D(cell.a() / 10, cell.b() / 10, cell.c() / 10), 8, "Unit Cell");
-        fmt::print(
-            *file_,
+        file_->print(
             // Will print zeros if infinite, line is still required
             "  {:8.5f}  {:8.5f}  {:8.5f}\n",
             cell.a() / 10, cell.b() / 10, cell.c() / 10);
@@ -238,8 +235,7 @@ void GROFormat::write_next(const Frame& frame) {
         const auto& matrix = cell.matrix() / 10;
         check_values_size(Vector3D(matrix[0][0], matrix[1][1], matrix[2][2]), 8, "Unit Cell");
         check_values_size(Vector3D(matrix[0][1], matrix[0][2], matrix[1][2]), 8, "Unit Cell");
-        fmt::print(
-            *file_,
+        file_->print(
             "  {:8.5f}  {:8.5f}  {:8.5f} 0.0 0.0  {:8.5f} 0.0  {:8.5f}  {:8.5f}\n",
             matrix[0][0], matrix[1][1], matrix[2][2], matrix[0][1], matrix[0][2], matrix[1][2]
         );
@@ -258,11 +254,11 @@ void check_values_size(const Vector3D& values, unsigned width, const std::string
 }
 
 std::streampos GROFormat::forward() {
-    if (!*file_) {
+    if (file_->fail()) {
         return std::streampos(-1);
     }
 
-    auto position = file_->tellg();
+    auto position = file_->tellpos();
     size_t natoms = 0;
     try {
         // Skip the comment line

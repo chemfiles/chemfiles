@@ -56,27 +56,26 @@ void XYZFormat::write_next(const Frame& frame) {
     auto& positions = frame.positions();
     assert(frame.size() == topology.size());
 
-    fmt::print(*file_, "{}\n", frame.size());
-    fmt::print(*file_, "Written by the chemfiles library\n", frame.size());
+    file_->print("{}\n", frame.size());
+    file_->print("Written by the chemfiles library\n", frame.size());
 
     for (size_t i = 0; i < frame.size(); i++) {
         auto name = topology[i].name();
         if (name.empty()) {
             name = "X";
         }
-        fmt::print(
-            *file_, "{} {} {} {}\n",
+        file_->print("{} {} {} {}\n",
             name, positions[i][0], positions[i][1], positions[i][2]
         );
     }
 }
 
 std::streampos XYZFormat::forward() {
-    if (!*file_) {
+    if (file_->fail()) {
         return std::streampos(-1);
     }
 
-    auto position = file_->tellg();
+    auto position = file_->tellpos();
     size_t natoms = 0;
     try {
         natoms = parse<size_t>(file_->readline());

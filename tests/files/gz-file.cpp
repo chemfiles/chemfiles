@@ -46,8 +46,8 @@ TEST_CASE("Write a gz file") {
 
     {
         GzFile file(filename, File::WRITE);
-        file << "Test" << std::endl;
-        file << 5467 << std::endl;
+        file.print("Test\n");
+        file.print("{}\n", 5467);
     }
 
     // GZip's header is OS dependant, so let's decompress and compare

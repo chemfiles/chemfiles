@@ -47,7 +47,7 @@ void TextFormat::scan_all() {
         return;
     }
 
-    auto before = file_->tellg();
+    auto before = file_->tellpos();
     while (!file_->eof()) {
         auto position = forward();
         if (position == std::streampos(-1)) {
@@ -64,9 +64,9 @@ void TextFormat::scan_all() {
     file_->clear();
 
     if (before == std::streampos(0) && !steps_positions_.empty()) {
-        file_->seekg(steps_positions_[0]);
+        file_->seekpos(steps_positions_[0]);
     } else {
-        file_->seekg(before);
+        file_->seekpos(before);
     }
 }
 
@@ -92,12 +92,12 @@ void TextFormat::read_step(size_t step, Frame& frame) {
         }
     }
 
-    file_->seekg(steps_positions_[step]);
+    file_->seekpos(steps_positions_[step]);
     read_next(frame);
 }
 
 void TextFormat::read(Frame& frame) {
-    auto position = file_->tellg();
+    auto position = file_->tellpos();
     read_next(frame);
     // If no exception was thrown, we can add this step to the list
     steps_positions_.push_back(position);
@@ -105,7 +105,7 @@ void TextFormat::read(Frame& frame) {
 
 void TextFormat::write(const Frame& frame) {
     write_next(frame);
-    steps_positions_.push_back(file_->tellg());
+    steps_positions_.push_back(file_->tellpos());
 }
 
 size_t TextFormat::nsteps() {

@@ -94,7 +94,7 @@ std::streampos gzstreambuf::seekoff(std::streamoff offset, std::ios_base::seekdi
         return {EOF};
     }
 
-    // fast return path for tellg
+    // fast return path for tellpos
     if (offset == 0 && way == std::ios_base::cur) {
         return gztell(file_) - (egptr() - gptr());
     }
