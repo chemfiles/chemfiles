@@ -9,6 +9,8 @@
 #include <vector>
 #include <memory>
 
+#include <fmt/ostream.h>
+
 #include "chemfiles/exports.h"
 
 namespace chemfiles {
@@ -67,7 +69,7 @@ private:
 ///
 /// All failling operations should throw a `FileError` instead of waiting for
 /// the user of the class to the current state.
-class CHFL_EXPORT TextFile: public File, public std::iostream {
+class CHFL_EXPORT TextFile: public File {
 public:
     /// Open the file at the given `path` with the requested `mode` and
     /// `compression` method using the most adapted child class of `TextFile`.
@@ -83,8 +85,29 @@ public:
     /// Skip `n` lines from the file
     void skiplines(size_t n);
 
-    /// Reset the file cursor
+    /// Reset the position indicator to the beggining of the file
     void rewind();
+
+    /// returns the current position indicator
+    std::streampos tellpos();
+    /// set the position indicator to `position`
+    void seekpos(std::streampos position);
+
+    /// checks if no error has occurred i.e. I/O operations are available
+    bool good() const;
+    /// checks if end-of-file has been reached
+    bool eof() const;
+    /// checks if an error has occurred
+    bool fail() const;
+    /// checks if a non-recoverable error has occurred
+    bool bad() const;
+    /// clear state flags
+    void clear();
+
+    template <typename Str, typename... Args>
+    void print(const Str& format_str, const Args&... args) {
+        fmt::print(stream_, format_str, args...);
+    }
 
 protected:
     /// Initialize the TextFile at the given `path` and `mode`, with the
@@ -95,6 +118,8 @@ protected:
 private:
     void get_line_impl(std::string& string);
     void skip_line_impl();
+
+    std::iostream stream_;
 };
 
 } // namespace chemfiles

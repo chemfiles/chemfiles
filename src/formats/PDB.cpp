@@ -125,9 +125,9 @@ void PDBFormat::read_next(Frame& frame) {
         case Record::ENDMDL:
             // Check if the next record is an `END` record
             if (!file_->eof()) {
-                position = file_->tellg();
+                position = file_->tellpos();
                 line = file_->readline();
-                file_->seekg(position);
+                file_->seekpos(position);
                 if (get_record(line) == Record::END) {
                     // If this is the case, wait for this next record
                     continue;
@@ -631,12 +631,11 @@ static std::string to_pdb_index(uint64_t i) {
 
 void PDBFormat::write_next(const Frame& frame) {
     written_ = true;
-    fmt::print(*file_, "MODEL {:>4}\n", models_ + 1);
+    file_->print("MODEL {:>4}\n", models_ + 1);
 
     auto& cell = frame.cell();
     check_values_size(Vector3D(cell.a(), cell.b(), cell.c()), 9, "cell lengths");
-    fmt::print(
-        *file_,
+    file_->print(
         // Do not try to guess the space group and the z value, just use the
         // default one.
         "CRYST1{:9.3f}{:9.3f}{:9.3f}{:7.2f}{:7.2f}{:7.2f} P 1           1\n",
@@ -733,8 +732,7 @@ void PDBFormat::write_next(const Frame& frame) {
         auto& pos = positions[i];
         check_values_size(pos, 8, "atomic position");
 
-        fmt::print(
-            *file_,
+        file_->print(
             "{: <6}{: >5} {: <4s}{:1}{:3} {:1}{: >4s}{:1}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
             atom_hetatm, to_pdb_index(i), frame[i].name(), altloc, resname, chainid, resid, inscode, pos[0], pos[1], pos[2], 1.0, 0.0, frame[i].type()
         );
@@ -756,16 +754,16 @@ void PDBFormat::write_next(const Frame& frame) {
         if (connections == 0) {continue;}
 
         for (size_t conect_line = 0; conect_line < lines; conect_line++) {
-            fmt::print(*file_, "CONECT{: >5}", to_pdb_index(i));
+            file_->print("CONECT{: >5}", to_pdb_index(i));
             auto last = std::min(connections, 4 * (conect_line + 1));
             for (size_t j = 4 * conect_line; j < last; j++) {
-                fmt::print(*file_, "{: >5}", to_pdb_index(connect[i][j]));
+                file_->print("{: >5}", to_pdb_index(connect[i][j]));
             }
-            fmt::print(*file_, "\n");
+            file_->print("\n");
         }
     }
 
-    fmt::print(*file_, "ENDMDL\n");
+    file_->print("ENDMDL\n");
 
     models_++;
 }
@@ -783,24 +781,24 @@ void check_values_size(const Vector3D& values, unsigned width, const std::string
 
 PDBFormat::~PDBFormat() {
     if (written_) {
-      fmt::print(*file_, "END\n");
+      file_->print("END\n");
     }
 }
 
 std::streampos PDBFormat::forward() {
-    if (!*file_) {
+    if (file_->fail()) {
         return std::streampos(-1);
     }
 
-    auto position = file_->tellg();
+    auto position = file_->tellpos();
     while (true) {
         try {
             auto line = file_->readline();
 
             if (line.substr(0, 6) == "ENDMDL") {
-                auto save = file_->tellg();
+                auto save = file_->tellpos();
                 auto next = file_->readline();
-                file_->seekg(save);
+                file_->seekpos(save);
                 if (next.substr(0, 3) == "END") {
                     // We found another record starting by END in the next line,
                     // we skip this one and wait for the next one

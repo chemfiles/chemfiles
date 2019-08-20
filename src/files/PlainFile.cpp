@@ -15,7 +15,7 @@ PlainFile::PlainFile(std::string path, File::Mode mode)
     // We need to use binary mode when opening the file because we are storing
     // positions in the files relative to line ending positions. Using text
     // mode make the MSVC runtime convert lines ending and then all the values
-    // return by tellg are wrong.
+    // return by tellpos are wrong.
     //
     // We can do this because we are dealing with line ending ourself in the
     // `get_line` function.

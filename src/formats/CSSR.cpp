@@ -48,7 +48,7 @@ CSSRFormat::CSSRFormat(std::string path, File::Mode mode, File::Compression comp
 }
 
 void CSSRFormat::read_next(Frame& frame) {
-    if (file_->tellg() != std::streampos(0)) {
+    if (file_->tellpos() != std::streampos(0)) {
         throw format_error("CSSR format only supports reading one frame");
     }
 
@@ -120,28 +120,28 @@ void CSSRFormat::read_next(Frame& frame) {
 }
 
 void CSSRFormat::write_next(const Frame& frame) {
-    if (file_->tellg() != std::streampos(0)) {
+    if (file_->tellpos() != std::streampos(0)) {
         throw format_error("CSSR format only supports writing one frame");
     }
 
-    fmt::print(
-        *file_, " REFERENCE STRUCTURE = 00000   A,B,C ={:8.3f}{:8.3f}{:8.3f}\n",
+    file_->print(
+        " REFERENCE STRUCTURE = 00000   A,B,C ={:8.3f}{:8.3f}{:8.3f}\n",
         frame.cell().a(), frame.cell().b(), frame.cell().c()
     );
-    fmt::print(
-        *file_, "   ALPHA,BETA,GAMMA ={:8.3f}{:8.3f}{:8.3f}    SPGR =  1 P1\n",
+    file_->print(
+        "   ALPHA,BETA,GAMMA ={:8.3f}{:8.3f}{:8.3f}    SPGR =  1 P1\n",
         frame.cell().alpha(), frame.cell().beta(), frame.cell().gamma()
     );
 
     if (frame.size() > 9999) {
         warning("CCSR writer", "too many atoms, the file might not open with other programs");
-        fmt::print(*file_, "{} 0\n", frame.size());
+        file_->print("{} 0\n", frame.size());
     } else {
-        fmt::print(*file_, "{:4}   0\n", frame.size());
+        file_->print("{:4}   0\n", frame.size());
     }
 
     // TODO: use the frame name/title property in the file title
-    fmt::print(*file_, " file created with chemfiles\n", frame.size());
+    file_->print(" file created with chemfiles\n", frame.size());
 
     auto connectivity = std::vector<std::vector<size_t>>(frame.size());
     for (auto& bond : frame.topology().bonds()) {
@@ -164,7 +164,8 @@ void CSSRFormat::write_next(const Frame& frame) {
         }
 
         auto fractional = cell_inv * positions[i];
-        fmt::print(*file_, "{:4} {:4}  {:9.5f} {:9.5f} {:9.5f}",
+        file_->print(
+            "{:4} {:4}  {:9.5f} {:9.5f} {:9.5f}",
             atom_id, frame[i].name(), fractional[0], fractional[1], fractional[2]
         );
 
@@ -174,21 +175,21 @@ void CSSRFormat::write_next(const Frame& frame) {
                 warning("CCSR writer", "too many bonds with atom {}, only 8 are supported", i);
                 break;
             }
-            fmt::print(*file_, "{:4}", bond + 1);
+            file_->print("{:4}", bond + 1);
             bonds += 1;
         }
         while (bonds < 8) {
-            fmt::print(*file_, "   0");
+            file_->print("   0");
             bonds += 1;
         }
 
-        fmt::print(*file_, " {:7.3f}\n", frame[i].charge());
+        file_->print(" {:7.3f}\n", frame[i].charge());
     }
 }
 
 std::streampos CSSRFormat::forward() {
     // CSSR only supports one step, so always act like there is only one
-    auto position = file_->tellg();
+    auto position = file_->tellpos();
     if (position == std::streampos(0)) {
         // advance the pointer for the next call
         file_->skipline();
