@@ -22,6 +22,7 @@ PARSING_FUNCTIONS = {
     r"(?P<name>\b(std)?(::)?stoll\b)": "parse<long long>",
     r"(?P<name>\b(std)?(::)?stoul\b)": "parse<size_t>",
     r"(?P<name>\b(std)?(::)?stoull\b)": "parse<size_t>",
+    r"(?P<name>\b(std)?(::)?sscanf\b)": "scan",
 }
 
 CAPI_FUNCTIONS = {
