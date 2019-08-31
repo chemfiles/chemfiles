@@ -44,8 +44,6 @@ private:
     } style_;
     /// Did we send the hybrid style warning?
     mutable bool warned_ = false;
-    /// Number of expected data
-    int expected_ = 0;
 
 public:
     atom_style(const std::string& name);
