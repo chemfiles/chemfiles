@@ -57,94 +57,69 @@ template<> FormatInfo chemfiles::format_information<LAMMPSDataFormat>() {
 atom_style::atom_style(const std::string& name): name_(name) {
     if (name == "angle") {
         style_ = ANGLE;
-        expected_ = 6;
     } else if (name == "atomic") {
         style_ = ATOMIC;
-        expected_ = 5;
     } else if (name == "body") {
         style_ = BODY;
-        expected_ = 6;
     } else if (name == "bond") {
         style_ = BOND;
-        expected_ = 6;
     } else if (name == "charge") {
         style_ = CHARGE;
-        expected_ = 6;
     } else if (name == "dipole") {
         style_ = DIPOLE;
-        expected_ = 6;
     } else if (name == "dpd") {
         style_ = DPD;
-        expected_ = 5;
     } else if (name == "electron") {
         style_ = ELECTRON;
-        expected_ = 5;
     } else if (name == "ellipsoid") {
         style_ = ELLIPSOID;
-        expected_ = 5;
     } else if (name == "full") {
         style_ = FULL;
-        expected_ = 7;
     } else if (name == "line") {
         style_ = LINE;
-        expected_ = 6;
     } else if (name == "meso") {
         style_ = MESO;
-        expected_ = 5;
     } else if (name == "molecular") {
         style_ = MOLECULAR;
-        expected_ = 6;
     } else if (name == "peri") {
         style_ = PERI;
-        expected_ = 5;
     } else if (name == "smd") {
         style_ = SMD;
-        expected_ = 7;
     } else if (name == "sphere") {
         style_ = SPHERE;
-        expected_ = 5;
     } else if (name == "template") {
         style_ = TEMPLATE;
-        expected_ = 6;
     } else if (name == "tri") {
         style_ = TRI;
-        expected_ = 6;
     } else if (name == "wavepacket") {
         style_ = WAVEPACKET;
-        expected_ = 6;
     } else if (name == "hybrid") {
         style_ = HYBRID;
-        expected_ = 5;
     } else {
         throw format_error("unknown atom style '{}'", name);
     }
-    assert(expected_ != 0);
 }
 
 atom_data atom_style::read_line(const std::string& line, size_t index) const {
     atom_data data;
-    int assigned = 0;
     switch (style_) {
     case ANGLE:
     case BOND:
     case MOLECULAR:
         // atom-ID molecule-ID atom-type x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %zu %lf %lf %lf",
+        scan(line, "%zu %zu %zu %lf %lf %lf",
             &data.index, &data.molid, &data.type, &data.x, &data.y, &data.z
         );
         break;
     case ATOMIC:
         // atom-ID atom-type x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %lf %lf %lf",
+        scan(line, "%zu %zu %lf %lf %lf",
             &data.index, &data.type, &data.x, &data.y, &data.z
         );
         break;
     case BODY:
         // atom-ID atom-type bodyflag mass x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %*d %lf %lf %lf %lf",
+        scan(line, "%zu %zu %*d %lf %lf %lf %lf",
             &data.index, &data.type, &data.mass, &data.x, &data.y, &data.z
         );
         break;
@@ -152,92 +127,79 @@ atom_data atom_style::read_line(const std::string& line, size_t index) const {
     case DIPOLE:
         // atom-ID atom-type q x y z
         // atom-ID atom-type q x y z mux muy muz
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %lf %lf %lf %lf",
+        scan(line, "%zu %zu %lf %lf %lf %lf",
             &data.index, &data.type, &data.charge, &data.x, &data.y, &data.z
         );
         break;
     case DPD:
         // atom-ID atom-type theta x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %*f %lf %lf %lf",
+        scan(line, "%zu %zu %*f %lf %lf %lf",
             &data.index, &data.type, &data.x, &data.y, &data.z
         );
         break;
     case ELECTRON:
         // atom-ID atom-type q spin eradius x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %*f %*f %lf %lf %lf",
+        scan(line, "%zu %zu %*f %*f %lf %lf %lf",
             &data.index, &data.type, &data.x, &data.y, &data.z
         );
         break;
     case ELLIPSOID:
         // atom-ID atom-type ellipsoidflag density x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %*d %*f %lf %lf %lf",
+        scan(line, "%zu %zu %*d %*f %lf %lf %lf",
             &data.index, &data.type, &data.x, &data.y, &data.z
         );
         break;
     case FULL:
         // atom-ID molecule-ID atom-type q x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %zu %lf %lf %lf %lf",
+        scan(line, "%zu %zu %zu %lf %lf %lf %lf",
             &data.index, &data.molid, &data.type, &data.charge, &data.x, &data.y, &data.z
         );
         break;
     case LINE:
         // atom-ID molecule-ID atom-type lineflag density x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %zu %*d %*f %lf %lf %lf",
+        scan(line, "%zu %zu %zu %*d %*f %lf %lf %lf",
             &data.index, &data.molid, &data.type, &data.x, &data.y, &data.z
         );
         break;
     case MESO:
         // atom-ID atom-type rho e cv x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %*f %*f %*f %lf %lf %lf",
+        scan(line, "%zu %zu %*f %*f %*f %lf %lf %lf",
             &data.index, &data.type, &data.x, &data.y, &data.z
         );
         break;
     case PERI:
         // atom-ID atom-type volume density x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %*f %*f %lf %lf %lf",
+        scan(line, "%zu %zu %*f %*f %lf %lf %lf",
             &data.index, &data.type, &data.x, &data.y, &data.z
         );
         break;
     case SMD:
         // atom-ID atom-type molecule volume mass kernel-radius contact-radius x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %zu %*f %lf %*f %*f %lf %lf %lf",
+        scan(line, "%zu %zu %zu %*f %lf %*f %*f %lf %lf %lf",
             &data.index, &data.type, &data.molid, &data.mass, &data.x, &data.y, &data.z
         );
         break;
     case SPHERE:
         // atom-ID atom-type diameter density x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %*f %*f %lf %lf %lf",
+        scan(line, "%zu %zu %*f %*f %lf %lf %lf",
             &data.index, &data.type, &data.x, &data.y, &data.z
         );
         break;
     case TEMPLATE:
         // atom-ID molecule-ID template-index template-atom atom-type x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %*d %*d %zu %lf %lf %lf",
+        scan(line, "%zu %zu %*d %*d %zu %lf %lf %lf",
             &data.index, &data.molid, &data.type, &data.x, &data.y, &data.z
         );
         break;
     case TRI:
         // atom-ID molecule-ID atom-type triangleflag density x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %zu %*d %*f %lf %lf %lf",
+        scan(line, "%zu %zu %zu %*d %*f %lf %lf %lf",
             &data.index, &data.molid, &data.type, &data.x, &data.y, &data.z
         );
         break;
     case WAVEPACKET:
         // atom-ID atom-type charge spin eradius etag cs_re cs_im x y z
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %lf %*f %*f %*d %*f %*f %lf %lf %lf",
+        scan(line, "%zu %zu %lf %*f %*f %*d %*f %*f %lf %lf %lf",
             &data.index, &data.type, &data.charge, &data.x, &data.y, &data.z
         );
         break;
@@ -247,15 +209,10 @@ atom_data atom_style::read_line(const std::string& line, size_t index) const {
             warned_ = true;
         }
         // atom-ID atom-type x y z sub-style1 sub-style2 ...
-        assigned = sscanf(
-            line.c_str(), "%zu %zu %lf %lf %lf",
+        scan(line, "%zu %zu %lf %lf %lf",
             &data.index, &data.type, &data.x, &data.y, &data.z
         );
         break;
-    }
-
-    if (assigned != expected_) {
-        throw format_error("invalid line for atom style {}: {}", name_, line);
     }
 
     if (data.index == 0) {
