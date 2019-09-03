@@ -110,6 +110,7 @@ set(CHEMFILES_OBJECTS
     $<TARGET_OBJECTS:tng_io>
     $<TARGET_OBJECTS:fmt>
     $<TARGET_OBJECTS:pugixml>
+    $<TARGET_OBJECTS:xdrfile>
     ${ZLIB_OBJECTS}
     ${LZMA_OBJECTS}
     ${NETCDF_OBJECTS}

@@ -224,4 +224,10 @@ unpack_library(pugixml)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src)
 add_library(pugixml OBJECT ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src/pugixml.cpp)
 
+# ==========
+# xdrfile
+# ==========
+external_library(xdrfile)
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/xdrfile/include)
+
 set(EXTERNAL_INCLUDES ${EXTERNAL_INCLUDES} PARENT_SCOPE)
