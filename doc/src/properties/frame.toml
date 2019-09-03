@@ -41,6 +41,7 @@ XTC = "Actual step of the molecular dynamics simulation."
 [time]
 type = "number"
 
+TRR = "The time of the frame in pico seconds."
 XTC = "The time of the frame in pico seconds."
 
 [xtc_precision]
@@ -48,3 +49,8 @@ type = "number"
 
 XTC = """The precision used to compress the coordinates. Only used for ten or more atoms.
 Default is 1000."""
+
+[has_positions]
+type = "bool"
+
+TRR = "Set to ``true`` if the frame contains positions. All positions are zero if not."
