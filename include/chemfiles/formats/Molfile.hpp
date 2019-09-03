@@ -25,7 +25,6 @@ namespace chemfiles {
 /// http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/
 enum MolfileFormat {
     DCD,                ///< DCD binary file format
-    TRR,                ///< Gromacs .trr file format
     XTC,                ///< Gromacs .xtc file format
     TRJ,                ///< Gromacs .trj file format
     LAMMPS,             ///< Lammps trajectory files
@@ -88,7 +87,6 @@ private:
 };
 
 template<> FormatInfo format_information<Molfile<DCD>>();
-template<> FormatInfo format_information<Molfile<TRR>>();
 template<> FormatInfo format_information<Molfile<XTC>>();
 template<> FormatInfo format_information<Molfile<TRJ>>();
 template<> FormatInfo format_information<Molfile<LAMMPS>>();
