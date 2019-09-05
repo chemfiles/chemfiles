@@ -18,6 +18,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 * Added read and write support for CML (Chemical Markup Language) files, a XML
   based format.
+* Added a native implementation of XTC reader, replacing the VMD molfile
+  version. The new code should be faster and use less memory.
 
 ## 0.9.0 (18 Nov 2018)
 
