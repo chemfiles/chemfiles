@@ -46,18 +46,39 @@ template<> FormatInfo chemfiles::format_information<SMIFormat>() {
 /// See if all values in array are true
 static bool all(const std::vector<bool>& vec);
 
-static std::unordered_set<char> AROMATIC_ORGANIC {'b', 'c', 'n', 'o', 's', 'p'};
+static bool is_aromatic_organic(char c) {
+    switch (c) {
+    case 'b':
+    case 'c':
+    case 'n':
+    case 'o':
+    case 's':
+    case 'p':
+        return true;
+    default:
+        return false;
+    }
+}
 
-// Note: Including H here is non-standard, but allows for HC(H)(H)H
-static std::unordered_set<std::string> ALIPHATIC_ORGANIC {"B", "C", "N", "O", "S", "P",
-                                                          "F", "Cl", "Br", "I", "H"};
+static bool is_aliphatic_organic(string_view s) {
+    // Note: Including H here is non-standard, but allows for HC(H)(H)H
+    static std::set<string_view> ALIPHATIC_ORGANIC = {
+        "B", "C", "N", "O", "S", "P", "F", "Cl", "Br", "I", "H"
+    };
+    return ALIPHATIC_ORGANIC.count(s) != 0;
+}
 
-// Valid chirality tags
-static std::set<std::string> CHIRALITY_TAGS {"TH", "SP", "TB", "OH", "AL"};
+static bool is_chirality_tag(string_view s) {
+    // list of valid tags
+    static std::set<string_view> CHIRALITY_TAGS = {
+        "TH", "SP", "TB", "OH", "AL"
+    };
+    return CHIRALITY_TAGS.count(s) != 0;
+}
 
 /// Attempts to read a number from the string. The `start` argument is updated
 /// to the last numberic character in `smiles`.
-static size_t read_number(const std::string& smiles, size_t& start) {
+static size_t read_number(string_view smiles, size_t& start) {
     if (start >= smiles.size() || std::isdigit(smiles[start]) == 0) {
         start--;
         return 0;
@@ -70,7 +91,7 @@ static size_t read_number(const std::string& smiles, size_t& start) {
     return parse<size_t>(smiles.substr(old, start - old + 1));
 }
 
-static std::string read_property_atom(const std::string& smiles, size_t& start) {
+static string_view read_property_atom(string_view smiles, size_t& start) {
     auto old = start;
     if (smiles[start] == '\'') {
         do {
@@ -86,21 +107,21 @@ static std::string read_property_atom(const std::string& smiles, size_t& start) 
     }
 }
 
-Atom& SMIFormat::add_atom(Topology& topol, std::string atom_name) {
-    topol.add_atom(Atom(std::move(atom_name)));
+Atom& SMIFormat::add_atom(Topology& topology, string_view atom_name) {
+    topology.add_atom(Atom(atom_name.to_string()));
 
     if (!first_atom_) {
-        topol.add_bond(previous_atom_, ++current_atom_, current_bond_order_);
+        topology.add_bond(previous_atom_, ++current_atom_, current_bond_order_);
     }
 
     first_atom_ = false;
     previous_atom_ = current_atom_;
     current_bond_order_ = Bond::SINGLE;
-    mol_vector_.back().add_atom(topol.size() - 1);
-    return topol[topol.size() - 1];
+    residues_.back().add_atom(topology.size() - 1);
+    return topology[topology.size() - 1];
 }
 
-void SMIFormat::process_property_list_(Topology& topol, const std::string& smiles, size_t& i) {
+void SMIFormat::process_property_list(Topology& topology, string_view smiles, size_t& i) {
     double mass = 0.0;
     if (std::isdigit(smiles[i]) != 0) {
         mass = static_cast<double>(read_number(smiles, i));
@@ -109,7 +130,7 @@ void SMIFormat::process_property_list_(Topology& topol, const std::string& smile
 
     bool is_aromatic = std::islower(smiles[i]) != 0;
     auto name = read_property_atom(smiles, i);
-    auto& new_atom = add_atom(topol, std::move(name));
+    auto& new_atom = this->add_atom(topology, name);
 
     if (is_aromatic) {
         new_atom.set("is_aromatic", true);
@@ -119,7 +140,7 @@ void SMIFormat::process_property_list_(Topology& topol, const std::string& smile
         new_atom.set_mass(mass);
     }
 
-    while( i < smiles.size() && smiles[i] != ']') {
+    while (i < smiles.size() && smiles[i] != ']') {
         size_t count_or_class = 0;
         std::string chirality_type = "CCW";
         switch (smiles[i]) {
@@ -150,10 +171,9 @@ void SMIFormat::process_property_list_(Topology& topol, const std::string& smile
             if (i + 1 < smiles.size() && smiles[i + 1] == '@') {
                 chirality_type = "CW";
                 ++i;
-            } else if (i + 2 < smiles.size() &&
-                       CHIRALITY_TAGS.count(smiles.substr(i + 1, 2)) != 0) {
+            } else if (i + 2 < smiles.size() && is_chirality_tag(smiles.substr(i + 1, 2))) {
                 // Set the type of the chirality
-                chirality_type += " " + smiles.substr(i + 1, 2);
+                chirality_type += " " + smiles.substr(i + 1, 2).to_string();
                 i += 2;
                 chirality_type += std::to_string(read_number(smiles, ++i));
             }
@@ -171,23 +191,24 @@ void SMIFormat::read_next(Frame& frame) {
     // Initialize all the reading variables
     branch_point_ = std::stack<size_t, std::vector<size_t>>();
     rings_ids_.clear();
-    mol_vector_.clear();
+    residues_.clear();
     current_atom_ = 0;
     previous_atom_ = 0;
     current_bond_order_ = Bond::SINGLE;
     first_atom_ = true;
 
-    Topology topol;
+    Topology topology;
     size_t groupid = 1;
-    mol_vector_.push_back(Residue("group " + std::to_string(groupid)));
+    residues_.push_back(Residue("group " + std::to_string(groupid)));
 
-    auto smiles = trim(file_->readline());
+    auto line = file_->readline();
+    auto smiles = trim(line);
     while (smiles.empty()) {
-        smiles = trim(file_->readline());
+        line = file_->readline();
+        smiles = trim(line);
     }
 
-    auto check_ring =
-    [&](size_t ring_id) {
+    auto check_ring = [this, &topology](size_t ring_id) {
         auto ring_lookup = rings_ids_.find(ring_id);
 
         if (ring_lookup == rings_ids_.end()) {
@@ -199,7 +220,7 @@ void SMIFormat::read_next(Frame& frame) {
         // Deviation from the standard, technically bond orders need to be equal,
         // but we will accept the stored order if the current order is single.
         // This is common practice
-        topol.add_bond(previous_atom_,
+        topology.add_bond(previous_atom_,
             ring_lookup->second.first,
             current_bond_order_ == Bond::SINGLE?
                 ring_lookup->second.second :
@@ -220,7 +241,7 @@ void SMIFormat::read_next(Frame& frame) {
         if (smiles[i] == '[') {
             // TODO: Don't pass the full string, instead pass an iterator
             // or maybe a substring till the closing ']'
-            process_property_list_(topol, smiles, ++i);
+            this->process_property_list(topology, smiles, ++i);
             continue;
         }
 
@@ -228,11 +249,11 @@ void SMIFormat::read_next(Frame& frame) {
         // Therefore, if something is lowercase, then it must be
         // a single character element in the organic subset.
         if (std::islower(smiles[i]) != 0) {
-            if (AROMATIC_ORGANIC.count(smiles[i]) == 0) {
-                throw format_error("SMI Reader", "aromatic element not found: '{}'", smiles[i]);
+            if (!is_aromatic_organic(smiles[i])) {
+                throw format_error("SMI Reader: aromatic element not found: '{}'", smiles[i]);
             }
             auto name = smiles.substr(i, 1);
-            add_atom(topol, std::move(name)).set("is_aromatic", true);
+            this->add_atom(topology, name).set("is_aromatic", true);
             continue;
         }
 
@@ -253,12 +274,11 @@ void SMIFormat::read_next(Frame& frame) {
             }
 
             auto element_name = smiles.substr(i, element_length);
-
-            if (ALIPHATIC_ORGANIC.count(element_name) == 0) {
-                throw format_error("SMI Reader", "bare non-organic atom: '{}'", element_name);
+            if (!is_aliphatic_organic(element_name)) {
+                throw format_error("SMI Reader: bare non-organic atom: '{}'", element_name);
             }
 
-            add_atom(topol, std::move(element_name));
+            this->add_atom(topology, element_name);
             i += element_length - 1;
             continue;
         }
@@ -275,7 +295,7 @@ void SMIFormat::read_next(Frame& frame) {
                 first_atom_ = true;
                 current_atom_++;
             }
-            mol_vector_.push_back(Residue("group " + std::to_string(groupid)));
+            residues_.push_back(Residue("group " + std::to_string(groupid)));
             break;
         case '>': ++groupid; break;
         case '/': current_bond_order_ = Bond::UP; break;
@@ -311,43 +331,41 @@ void SMIFormat::read_next(Frame& frame) {
             break;
         case '%':
             if (i + 2 >= smiles.size()) {
-                throw format_error("SMI Reader", "rings defined with '%' must be double digits");
+                throw format_error("SMI Reader: rings defined with '%' must be double digits");
             }
             check_ring(parse<size_t>(smiles.substr(i + 1, 2)));
             break;
         case '*':
-            add_atom(topol, "*").set("wildcard", true);
+            this->add_atom(topology, "*").set("wildcard", true);
             break;
         case '[':
         case ']':
         case '+':
         case '@':
-            throw format_error("SMI Reader", "symbol not allowed outside of property: '{}'", smiles[i]);
-            break;
+            throw format_error("SMI Reader: symbol not allowed outside of property: '{}'", smiles[i]);
         default:
-            throw format_error("SMI Reader", "unknown symbol: '{}'", smiles[i]);
-            break;
+            throw format_error("SMI Reader: unknown symbol: '{}'", smiles[i]);
         }
     }
 
-    for (auto res : mol_vector_) {
-        topol.add_residue(std::move(res));
+    for (auto residue: std::move(residues_)) {
+        topology.add_residue(std::move(residue));
     }
 
     if (!branch_point_.empty()) {
-        throw format_error("SMI Reader", "{} unclosed '('(s)", branch_point_.size());
+        throw format_error("SMI Reader: {} unclosed '('(s)", branch_point_.size());
     }
 
     if (!rings_ids_.empty()) {
-        throw format_error("SMI Reader", "{} unclosed ringid '{}'", rings_ids_.begin()->first);
+        throw format_error("SMI Reader: {} unclosed ringid '{}'", rings_ids_.begin()->first);
     }
 
-    frame.resize(topol.size());
-    frame.set_topology(topol);
+    frame.resize(topology.size());
+    frame.set_topology(topology);
 
     if (i < smiles.size()) {
         auto name = smiles.substr(i);
-        frame.set("name", trim(name));
+        frame.set("name", trim(name).to_string());
     }
 }
 
@@ -474,7 +492,7 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
     }
 
     // Before the atom is printed, we must know if we are printing a property set.
-    if (ALIPHATIC_ORGANIC.count(type) == 0) {
+    if (!is_aliphatic_organic(type)) {
         needs_brackets = true;
     }
 
@@ -524,18 +542,18 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
         }
         break;
     case 7:
-        if (chirality.find("CCW") == 0 &&
-            CHIRALITY_TAGS.count(chirality.substr(4, 2)) != 0 &&
-            std::isdigit(chirality[6]) != 0 ) {
+        if (chirality.find("CCW") == 0
+            && is_chirality_tag(chirality.substr(4, 2))
+            && std::isdigit(chirality[6]) != 0 ) {
             is_good_tag = true;
             fmt::print(*file_, "@{}", chirality.substr(4));
         }
         break;
     case 8:
-        if (chirality.find("CCW") == 0 &&
-            CHIRALITY_TAGS.count(chirality.substr(4, 2)) != 0 &&
-            std::isdigit(chirality[6]) != 0 &&
-            std::isdigit(chirality[7]) != 0) {
+        if (chirality.find("CCW") == 0
+            && is_chirality_tag(chirality.substr(4, 2))
+            && std::isdigit(chirality[6]) != 0
+            && std::isdigit(chirality[7]) != 0) {
             is_good_tag = true;
             fmt::print(*file_, "@{}", chirality.substr(4));
         }
@@ -673,7 +691,7 @@ void SMIFormat::write_atom(
         }
 
         // Depth First Search like recursion
-        write_atom(frame, hit_atoms, neighbor, current_atom);
+        this->write_atom(frame, hit_atoms, neighbor, current_atom);
 
         // we printed a neighbor, if there's more than 1 neighbor, then we need to
         // branch for all but the last neighbor
@@ -717,7 +735,7 @@ void SMIFormat::write_next(const Frame& frame) {
         }
         auto not_hit = std::find(written.begin(), written.end(), false);
         auto current_atom = static_cast<size_t>(std::distance(written.begin(), not_hit));
-        write_atom(frame, written, current_atom, current_atom);
+        this->write_atom(frame, written, current_atom, current_atom);
         first_atom_ = false;
     }
 

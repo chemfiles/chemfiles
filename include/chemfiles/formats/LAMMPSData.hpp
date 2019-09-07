@@ -46,7 +46,7 @@ private:
     mutable bool warned_ = false;
 
 public:
-    atom_style(const std::string& name);
+    explicit atom_style(std::string name);
     /// Read a single line with this atom style
     atom_data read_line(const std::string& line, size_t index) const;
 };
