@@ -78,7 +78,7 @@ CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compre
     }
 
     // Not technically standard to have multiple molecule nodes as root nodes,
-    // but some tools do this and we should support it 
+    // but some tools do this and we should support it
     if (document_.child("molecule")) {
         auto molecules = document_.children("molecule");
         current_ = molecules.begin();
@@ -116,7 +116,7 @@ static void read_property_(T& container, pugi::xml_node& node, const std::string
     if (!data_type) {
         warning("[CML] {} has no data type, assuming string.", title);
     } else {
-        data_type_str = data_type.as_string(); 
+        data_type_str = data_type.as_string();
     }
 
     auto value = node.text();
@@ -299,14 +299,15 @@ void CMLFormat::read(Frame& frame) {
             }
             std::string vec_title = title_attribute.as_string();
 
-            auto vect_strings = split(trim(vector3.text().as_string()), ' ');
+            auto tmp = vector3.text().as_string();
+            auto vect_strings = split(tmp, ' ');
             if (vect_strings.size() != 3) {
                 warning("[CML] {} vector3 does not have 3 values.", vec_title);
                 continue;
             }
 
             Vector3D vect;
-            
+
             try {
                 vect = { parse<double>(vect_strings[0]),
                          parse<double>(vect_strings[1]),
@@ -345,10 +346,10 @@ void CMLFormat::read(Frame& frame) {
             continue;
         }
 
-        auto id1 = ref_to_id.find(ids[0]);
-        auto id2 = ref_to_id.find(ids[1]);
+        auto id1 = ref_to_id.find(ids[0].to_string());
+        auto id2 = ref_to_id.find(ids[1].to_string());
         if (id1 == ref_to_id.end() || id2 == ref_to_id.end()) {
-            warning("[CML] Invalid atomic references in bond: {} -- {}", ids[0], ids[1]);
+            warning("CML reader", "invalid atomic references in bond: {} -- {}", ids[0], ids[1]);
             continue;
         }
 

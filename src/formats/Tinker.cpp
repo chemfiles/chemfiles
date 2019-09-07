@@ -157,7 +157,7 @@ std::streampos TinkerFormat::forward() {
             return std::streampos(-1);
         } else {
             // Get the number of atoms in the line
-            natoms = parse<size_t>(split(trim(line), ' ')[0]);
+            natoms = parse<size_t>(split(line, ' ')[0]);
         }
     } catch (const FileError&) {
         // No more line left in the file
