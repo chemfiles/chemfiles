@@ -5,41 +5,78 @@
 #define CHEMFILES_UTILS_HPP
 
 #include <cctype>
-#include <cstdint>
-#include <cstdio>
-#include <cstdarg>
+#include <cstdlib>
 #include <vector>
 #include <string>
-#include <sstream>
 #include <algorithm>
-#include <stdexcept>
 
 #include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/string_view.hpp"
 
 namespace chemfiles {
 
-inline std::vector<std::string> split(const std::string &s, char delim) {
-    std::stringstream ss(s);
-    std::string item;
-    std::vector<std::string> elems;
-    while (std::getline(ss, item, delim)) {
-        if (!item.empty()) {
-            elems.push_back(item);
+/// Split `string` into components delimited by `delim`, ignoring empty
+/// components.
+inline std::vector<string_view> split(string_view string, char delim) {
+    std::vector<string_view> elems;
+    size_t last = 0;
+    for (size_t i = 0; i<string.length(); i++) {
+        if (string[i] == delim) {
+            if (last != i) {
+                // Don't add empty elements
+                elems.push_back(string.substr(last, i - last));
+            }
+            last = i + 1;
         }
     }
+
+    if (last < string.length()) {
+        elems.push_back(string.substr(last, string.length() - last));
+    }
+
     return elems;
 }
 
-inline std::string trim(const std::string& str) {
-    auto front = std::find_if_not(str.begin(), str.end(), [](int c) {
-        return std::isspace(c);
-    });
-    auto back = std::find_if_not(str.rbegin(), str.rend(), [](int c) {
-        return std::isspace(c);
-    }).base();
-    return (back <= front ? std::string() : std::string(front, back));
+inline std::vector<string_view> split(const char* string, char delim) {
+    return split(string_view(string), delim);
 }
 
+// disallow temporary string
+std::vector<string_view> split(std::string&& string, char delim) = delete;
+
+namespace detail {
+    inline bool is_space(char c) {
+        return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+    }
+}
+
+/// Remove whitespaces at the begining and end of `string`
+inline string_view trim(string_view string) {
+    auto begin = string.begin();
+    auto end = string.end();
+    while (begin != end && detail::is_space(*begin)) {
+        begin++;
+    }
+
+    if (begin != end) {
+        end--;
+        while (end != begin && detail::is_space(*end)) {
+            end--;
+        }
+        end++;
+    }
+
+    return string_view(begin, static_cast<size_t>(end - begin));
+}
+
+inline string_view trim(const char* string) {
+    return trim(string_view(string));
+}
+
+// disallow temporary string
+string_view trim(std::string&& string) = delete;
+
+/// Transform `string` to lower case
 inline void tolower(std::string& input) {
     std::transform(input.begin(), input.end(), input.begin(),
         [](std::string::value_type c) {
@@ -57,39 +94,45 @@ std::string current_directory();
 
 /// Convert a string to `T`, throwing a `chemfiles::Error` if the string is not
 /// a valid `T`.
-template<typename T> inline T parse(const std::string& string);
+template<typename T> inline T parse(string_view string);
 
-template<> inline double parse(const std::string& string) {
-    try {
-        size_t length = 0;
-        double value = std::stod(string, &length);
-        if (length != string.length()) {
-            throw error("can not convert '{}' to a double", string);
-        }
-        return value;
-    } catch (const std::invalid_argument&) {
+template<> inline double parse(string_view input) {
+    // Create a copy of input, since `std::strtoll` needs the string to be
+    // NULL-terminated
+    auto string = input.to_string();
+    char* end = nullptr;
+    double value = std::strtod(string.c_str(), &end);
+    if (string.empty() || end != string.c_str() + string.length()) {
         throw error("can not convert '{}' to a double", string);
-    } catch (const std::out_of_range&) {
+    }
+
+    if (errno == ERANGE) {
+        errno = 0;
         throw error("{} is out of range for double type", string);
     }
+
+    return value;
 }
 
-template<> inline long long parse(const std::string& string) {
-    try {
-        size_t length = 0;
-        long long int value = std::stoll(string, &length);
-        if (length != string.length()) {
-            throw error("can not convert '{}' to an integer", string);
-        }
-        return value;
-    } catch (const std::invalid_argument&) {
+template<> inline long long parse(string_view input) {
+    // Create a copy of input, since `std::strtoll` needs the string to be
+    // NULL-terminated
+    auto string = input.to_string();
+    char* end = nullptr;
+    long long int value = std::strtoll(string.c_str(), &end, 10);
+    if (string.empty() || end != string.c_str() + string.length()) {
         throw error("can not convert '{}' to an integer", string);
-    } catch (const std::out_of_range&) {
+    }
+
+    if (errno == ERANGE) {
+        errno = 0;
         throw error("{} is out of range for long long type", string);
     }
+
+    return value;
 }
 
-template<> inline size_t parse(const std::string& string) {
+template<> inline size_t parse(string_view string) {
     long long value = parse<long long>(string);
     if (value < 0) {
         throw error("invalid integer: should be positive, is {}", value);
@@ -100,38 +143,12 @@ template<> inline size_t parse(const std::string& string) {
     }
 }
 
-/// A checked version of sscanf: the return value of sscanf is checked to see if
-/// all the argument where matched.
+/// A checked version of sscanf: the return value of sscanf is checked
+/// to see if all the argument where matched.
 #ifdef __GNUC__
 __attribute__((format(scanf, 2, 3)))
 #endif
-inline void scan(const std::string& input, const char* format, ...) {
-    int expected = 0;
-    char c = format[0];
-    for (size_t i = 0; c != 0; i++, c = format[i]) {
-        if (c == '%') {
-            // We can access format[i + 1] safely, because we did not reach
-            // the null-terminator yet
-            if (format[i + 1] == 'n' || format[i + 1] == '*') {
-                // %n and %* specifiers don't increase the assignement count
-                continue;
-            }
-            expected += 1;
-        }
-    }
-
-    // Forward the work to std::vsscanf
-    va_list vlist;
-    va_start(vlist, format);
-    auto actual = std::vsscanf(input.c_str(), format, vlist);
-    va_end(vlist);
-    if (actual != expected) {
-        throw error(
-            "failed to read line '{}' with format '{}': {} matched out of {}",
-            input, format, actual, expected
-        );
-    }
-}
+void scan(const std::string& input, const char* format, ...);
 
 }
 

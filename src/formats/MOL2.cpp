@@ -42,12 +42,13 @@ template<> FormatInfo chemfiles::format_information<MOL2Format>() {
 static std::streampos read_until(TextFile& file, const std::string& tag);
 
 void MOL2Format::read_next(Frame& frame) {
-    auto line = trim(file_->readline());
-    if (line != "@<TRIPOS>MOLECULE") {
+    auto line = file_->readline();
+    if (trim(line) != "@<TRIPOS>MOLECULE") {
         throw format_error("wrong starting line for a molecule in MOL2 formart: '{}'", line);
     }
 
-    frame.set("name", trim(file_->readline()) );
+    line = file_->readline();
+    frame.set("name", trim(line).to_string());
     line = file_->readline();
 
     const auto counts = split(line, ' ');
@@ -66,17 +67,20 @@ void MOL2Format::read_next(Frame& frame) {
     file_->skipline();
 
     // If charges are specified, we need to expect an addition term for each atom
-    bool charges = (trim(file_->readline()) != "NO_CHARGES");
+    line = file_->readline();
+    bool charges = (trim(line) != "NO_CHARGES");
 
     while (!file_->eof()) {
         const auto& curr_pos = file_->tellg();
-        line = trim(file_->readline());
 
-        if (line == "@<TRIPOS>ATOM") {
+        line = file_->readline();
+        auto trimed = trim(line);
+
+        if (trimed == "@<TRIPOS>ATOM") {
             read_atoms(frame, natoms, charges);
-        } else if (line == "@<TRIPOS>BOND") {
+        } else if (trimed == "@<TRIPOS>BOND") {
             read_bonds(frame, nbonds);
-        } else if (line == "@<TRIPOS>CRYSIN") {
+        } else if (trimed == "@<TRIPOS>CRYSIN") {
             auto cryst = file_->readline();
 
             double a, b, c, alpha, beta, gamma;
@@ -85,7 +89,7 @@ void MOL2Format::read_next(Frame& frame) {
             );
 
             frame.set_cell(UnitCell(a, b, c, alpha, beta, gamma));
-        } else if (line == "@<TRIPOS>MOLECULE") {
+        } else if (trimed == "@<TRIPOS>MOLECULE") {
             file_->seekg(curr_pos);
             break;
         }
@@ -120,8 +124,7 @@ void MOL2Format::read_atoms(Frame& frame, size_t natoms, bool charges) {
         bool is_sybyl;
 
         if (std::string(sybyl_type).find('.') != std::string::npos || find_in_periodic_table(sybyl_type)) {
-            auto my_split = split(sybyl_type, '.');
-            atom_type = my_split[0];
+            atom_type = split(sybyl_type, '.')[0].to_string();
             is_sybyl = true;
         } else {
             is_sybyl = false;

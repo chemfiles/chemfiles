@@ -15,6 +15,7 @@
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/Connectivity.hpp"
+#include "chemfiles/string_view.hpp"
 
 namespace chemfiles {
 class Atom;
@@ -33,7 +34,14 @@ public:
     void read_next(Frame& frame) override;
     void write_next(const Frame& frame) override;
     std::streampos forward() override;
+
 private:
+    /// [for reading] adds an atom defined by `atom_name` to the topology
+    Atom& add_atom(Topology& topo, string_view atom_name);
+
+    /// [for reading] adds an atom defined by the string `smiles` starting at position i
+    void process_property_list(Topology& topo, string_view smiles, size_t& i);
+
     /// [for reading] Stores location of a branching path
     std::stack<size_t, std::vector<size_t>> branch_point_;
 
@@ -50,18 +58,18 @@ private:
     /// [for reading] The current bond ordeer
     Bond::BondOrder current_bond_order_;
 
-    /// [for reading] The
-    std::vector<Residue> mol_vector_;
+    /// [for reading] List of groups
+    std::vector<Residue> residues_;
 
     /// [for reading] Should we connect the previous atom to the first atom
     /// [for writing] Should we add a '.' after the current molecule
     bool first_atom_;
 
-    /// [for reading] adds an atom defined by `atom_name` to the topology
-    Atom& add_atom(Topology& topo, std::string atom_name);
-
-    /// [for reading] adds an atom defined by the string `smiles` starting at position i
-    void process_property_list_(Topology& topo, const std::string& smiles, size_t& i);
+    /// [for writing] writes a single atom to the internal file
+    /// this function is recursive
+    void write_atom(const Frame& frame,
+        std::vector<bool>& hit_atoms,
+        size_t current_atom, size_t previous_atom);
 
     /// [for writing] stores the graph of the topology
     std::vector<std::vector<size_t>> adj_list_;
@@ -78,12 +86,6 @@ private:
 
     /// [for writing] stores how many rings each atom is in
     std::unordered_map<size_t, size_t> ring_atoms_;
-
-    /// [for writing] writes a single atom to the internal file
-    /// this function is recursive
-    void write_atom(const Frame& frame,
-        std::vector<bool>& hit_atoms,
-        size_t current_atom, size_t previous_atom);
 };
 
 template<> FormatInfo format_information<SMIFormat>();

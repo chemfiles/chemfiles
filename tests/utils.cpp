@@ -20,6 +20,7 @@ TEST_CASE("Current directory") {
 }
 
 TEST_CASE("trim") {
+    CHECK(chemfiles::trim("   ") == "");
     CHECK(chemfiles::trim("   left") == "left");
     CHECK(chemfiles::trim("right    ") == "right");
     CHECK(chemfiles::trim("   both   \t") == "both");
@@ -32,10 +33,10 @@ TEST_CASE("trim") {
 }
 
 TEST_CASE("split") {
-    auto expected = std::vector<std::string>{"bla", "bla  bla, jk", "fiuks"};
+    auto expected = std::vector<chemfiles::string_view>{"bla", "bla  bla, jk", "fiuks"};
     CHECK(chemfiles::split("bla:bla  bla, jk:fiuks", ':') == expected);
 
-    expected = std::vector<std::string>{"bla  bla", " jk:fiuks"};
+    expected = std::vector<chemfiles::string_view>{"bla  bla", " jk:fiuks"};
     CHECK(chemfiles::split(",,bla  bla, jk:fiuks", ',') == expected);
 }
 
@@ -45,6 +46,7 @@ TEST_CASE("String parsing") {
         CHECK(chemfiles::parse<double>("125") == 125);
         CHECK(chemfiles::parse<double>("-32") == -32);
 
+        CHECK_THROWS_AS(chemfiles::parse<double>(""), chemfiles::Error);
         CHECK_THROWS_AS(chemfiles::parse<double>("foo"), chemfiles::Error);
         CHECK_THROWS_AS(chemfiles::parse<double>("1,2"), chemfiles::Error);
         CHECK_THROWS_AS(chemfiles::parse<double>("3e456782"), chemfiles::Error);
@@ -54,6 +56,7 @@ TEST_CASE("String parsing") {
         CHECK(chemfiles::parse<long long>("125") == 125);
         CHECK(chemfiles::parse<long long>("-32") == -32);
 
+        CHECK_THROWS_AS(chemfiles::parse<long long>(""), chemfiles::Error);
         CHECK_THROWS_AS(chemfiles::parse<long long>("foo"), chemfiles::Error);
         CHECK_THROWS_AS(chemfiles::parse<long long>("2.5"), chemfiles::Error);
         CHECK_THROWS_AS(chemfiles::parse<long long>("9223372036854775808"), chemfiles::Error);
@@ -62,6 +65,7 @@ TEST_CASE("String parsing") {
     SECTION("size_t") {
         CHECK(chemfiles::parse<size_t>("125") == 125);
 
+        CHECK_THROWS_AS(chemfiles::parse<size_t>(""), chemfiles::Error);
         CHECK_THROWS_AS(chemfiles::parse<size_t>("-32"), chemfiles::Error);
         CHECK_THROWS_AS(chemfiles::parse<size_t>("foo"), chemfiles::Error);
         CHECK_THROWS_AS(chemfiles::parse<size_t>("2.5"), chemfiles::Error);

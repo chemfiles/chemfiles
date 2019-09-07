@@ -107,7 +107,7 @@ TEST_CASE("Read files in mmCIF format") {
         frame = file.read();
         CHECK(frame.size() == 1402);
         auto positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D( -9.134, 11.149, 6.990), 1e-3));
+        CHECK(approx_eq(positions[0], Vector3D(-9.134, 11.149, 6.990), 1e-3));
         CHECK(approx_eq(positions[1401], Vector3D(4.437, -13.250, -22.569), 1e-3));
     }
 

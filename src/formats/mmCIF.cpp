@@ -1,6 +1,5 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-
 #include <cassert>
 #include <map>
 #include <array>
@@ -83,41 +82,42 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
         }
 
         if (line_split[0] == "_cell_length_a" || line_split[0] == "_cell.length_a") {
-            a = cif_to_double(line_split[1]);
+            a = cif_to_double(line_split[1].to_string());
         }
 
         if (line_split[0] == "_cell_length_b" || line_split[0] == "_cell.length_b") {
-            b = cif_to_double(line_split[1]);
+            b = cif_to_double(line_split[1].to_string());
         }
 
         if (line_split[0] == "_cell_length_c" || line_split[0] == "_cell.length_c") {
-            c = cif_to_double(line_split[1]);
+            c = cif_to_double(line_split[1].to_string());
         }
 
         if (line_split[0] == "_cell_angle_alpha" || line_split[0] == "_cell.angle_alpha") {
-            alpha = cif_to_double(line_split[1]);
+            alpha = cif_to_double(line_split[1].to_string());
         }
 
         if (line_split[0] == "_cell_angle_beta" || line_split[0] == "_cell.angle_beta") {
-            beta = cif_to_double(line_split[1]);
+            beta = cif_to_double(line_split[1].to_string());
         }
 
         if (line_split[0] == "_cell_angle_gamma" || line_split[0] == "_cell.angle_gamma") {
-            gamma = cif_to_double(line_split[1]);
+            gamma = cif_to_double(line_split[1].to_string());
         }
 
         if (line_split[0] == "_entry.id") {
-            pdb_idcode_ = line_split[1];
+            pdb_idcode_ = line_split[1].to_string();
         }
 
         if (line_split[0] == "_struct.title") {
-            auto temp_name = trim(line.substr(13));
-            name_ = temp_name.size() > 2 ?
-                    temp_name.substr(1, temp_name.size() - 2) : "";
+            auto tmp = line.substr(13);
+            auto trimed = trim(tmp);
+            name_ = trimed.size() > 2 ?
+                    trimed.substr(1, trimed.size() - 2).to_string() : "";
         }
 
         if (in_loop && line_split[0].find("_atom_site") != std::string::npos) {
-            auto atom_label = line_split[0].substr(11);
+            auto atom_label = line_split[0].substr(11).to_string();
             tolower(atom_label);
             atom_site_map_[atom_label] = current_index++;
             break;
@@ -134,9 +134,8 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
     auto line = file_->readline();
 
     do {
-
         if (line.find("_atom_site") != std::string::npos) {
-            auto atom_label = trim(line).substr(11);
+            auto atom_label = trim(line).substr(11).to_string();
             tolower(atom_label);
             atom_site_map_[atom_label] = current_index++;
 
@@ -261,19 +260,22 @@ void mmCIFFormat::read(Frame& frame) {
     auto model_position = atom_site_map_.find("pdbx_pdb_model_num");
 
     auto position = file_->tellg();
-    auto line = file_->readline();
 
     size_t last_position = 0;
     if (model_position != atom_site_map_.end()) {
+        auto line = file_->readline();
         last_position = parse<size_t>(split(line, ' ')[model_position->second]);
+        // Reset file position so that the loop below can start by reading the
+        // first line
+        file_->seekg(position);
     }
 
     while (!file_->eof()) {
+        auto line = file_->readline();
+        auto line_split = split(line, ' ');
         if (line.empty() || line == "loop_" || line[0] == '#') {
             break;
         }
-
-        auto line_split = split(line, ' ');
 
         if (line_split.size() != atom_site_map_.size()) {
             throw format_error("line '{}' has {} items not {}",
@@ -290,38 +292,36 @@ void mmCIFFormat::read(Frame& frame) {
             break;
         }
 
-        Atom atom(line_split[label_atom_id->second],
-                  line_split[type_symbol->second]);
+        Atom atom(line_split[label_atom_id->second].to_string(),
+                  line_split[type_symbol->second].to_string());
 
         if (label_alt_id != atom_site_map_.end() &&
             line_split[label_alt_id->second] != ".") {
-            atom.set("altloc", line_split[label_alt_id->second]);
+            atom.set("altloc", line_split[label_alt_id->second].to_string());
         }
 
         if (formal_charge != atom_site_map_.end()) {
-            atom.set_charge(cif_to_double(line_split[formal_charge->second]));
+            atom.set_charge(cif_to_double(line_split[formal_charge->second].to_string()));
         }
 
         if (!uses_fract_) {
-            auto x = cif_to_double(line_split[cartn_x->second]);
-            auto y = cif_to_double(line_split[cartn_y->second]);
-            auto z = cif_to_double(line_split[cartn_z->second]);
+            auto x = cif_to_double(line_split[cartn_x->second].to_string());
+            auto y = cif_to_double(line_split[cartn_y->second].to_string());
+            auto z = cif_to_double(line_split[cartn_z->second].to_string());
 
             frame.add_atom(std::move(atom), Vector3D(x, y, z));
         } else {
-            auto u = cif_to_double(line_split[fract_x->second]);
-            auto v = cif_to_double(line_split[fract_y->second]);
-            auto w = cif_to_double(line_split[fract_z->second]);
+            auto u = cif_to_double(line_split[fract_x->second].to_string());
+            auto v = cif_to_double(line_split[fract_y->second].to_string());
+            auto w = cif_to_double(line_split[fract_z->second].to_string());
 
             auto vector = cell_.matrix() * Vector3D(u, v, w);
             frame.add_atom(std::move(atom), vector);
         }
 
         position = file_->tellg();
-        line = file_->readline();
 
-        if (label_comp_id == atom_site_map_.end() ||
-            label_asym_id == atom_site_map_.end()) {
+        if (label_comp_id == atom_site_map_.end() || label_asym_id == atom_site_map_.end()) {
             continue;
         }
 
@@ -339,21 +339,21 @@ void mmCIFFormat::read(Frame& frame) {
             throw format_error("invalid CIF residue or entity numeric: {}", e.what());
         }
 
-        auto chainid = line_split[label_asym_id->second];
+        auto chainid = line_split[label_asym_id->second].to_string();
 
         if (residues_.find({chainid, resid}) == residues_.end()) {
 
             auto name = line_split[label_comp_id->second];
-            Residue residue(std::move(name), resid);
+            Residue residue(name.to_string(), resid);
             residue.add_atom(atom_id);
 
-            // This will be save as a string... on purpose to match MMTF
+            // This will be saved as a string on purpose to match MMTF
             if (label_asym_id != atom_site_map_.end()) {
                 residue.set("chainid", chainid);
             }
 
             if (auth_asym_id != atom_site_map_.end()) {
-                residue.set("chainname", line_split[auth_asym_id->second]);
+                residue.set("chainname", line_split[auth_asym_id->second].to_string());
             }
 
             if (group_pdb != atom_site_map_.end()) {
@@ -367,6 +367,7 @@ void mmCIFFormat::read(Frame& frame) {
         }
     }
 
+    // Reset state to previous line
     file_->seekg(position);
 
     for (const auto& residue: residues_) {
