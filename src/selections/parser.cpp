@@ -563,7 +563,7 @@ std::vector<SubSelection> Parser::sub_selection() {
         for (size_t i=before; i<current_; i++) {
             selection += " " + tokens_[i].as_str();
         }
-        vars.emplace_back(trim(selection));
+        vars.emplace_back(trim(selection).to_string());
     }
 
     while (match(Token::COMMA)) {
@@ -576,7 +576,7 @@ std::vector<SubSelection> Parser::sub_selection() {
             for (size_t i=before; i<current_; i++) {
                 selection += " " + tokens_[i].as_str();
             }
-            vars.emplace_back(trim(selection));
+            vars.emplace_back(trim(selection).to_string());
         }
     }
 

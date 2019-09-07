@@ -45,7 +45,9 @@ static void check_values_size(const Vector3D& values, unsigned width, const std:
 void GROFormat::read_next(Frame& frame) {
     size_t natoms = 0;
     try {
-        frame.set("name", trim(file_->readline())); // GRO comment line;
+        // GRO comment line is used as frame name
+        auto line = file_->readline();
+        frame.set("name", trim(line).to_string());
         natoms = parse<size_t>(file_->readline());
     } catch (const Error& e) {
         throw format_error("can not read next step as GRO: {}", e.what());
@@ -69,28 +71,24 @@ void GROFormat::read_next(Frame& frame) {
         } catch (const Error&) {
             // Invalid residue, we'll skip it
         }
-        auto resname = trim(line.substr(5, 5));
-        auto name = trim(line.substr(10, 5));
 
-        // GRO files store atoms in NM, we need to convert to Angstroms
+        auto tmp = line.substr(5, 5);
+        auto resname = trim(tmp).to_string();
+        tmp = line.substr(10, 5);
+        auto name = trim(tmp).to_string();
+
+        // GRO files store atoms in nanometer, we need to convert to Angstroms
         auto x = parse<double>(line.substr(20, 8)) * 10;
         auto y = parse<double>(line.substr(28, 8)) * 10;
         auto z = parse<double>(line.substr(36, 8)) * 10;
 
+        double vx = 0, vy = 0, vz=0;
         if (line.length() >= 68) {
-            auto vx = parse<double>(line.substr(44, 8)) * 10;
-            auto vy = parse<double>(line.substr(52, 8)) * 10;
-            auto vz = parse<double>(line.substr(60, 8)) * 10;
-
-            frame.add_atom(Atom(name),
-                Vector3D(x, y, z),
-                Vector3D(vx, vy, vz)
-            );
-        } else {
-            frame.add_atom(Atom(name),
-                Vector3D(x, y, z)
-            );
+            vx = parse<double>(line.substr(44, 8)) * 10;
+            vy = parse<double>(line.substr(52, 8)) * 10;
+            vz = parse<double>(line.substr(60, 8)) * 10;
         }
+        frame.add_atom(Atom(name), {x, y, z}, {vx, vy, vz});
 
         if (resid != SIZE_MAX) {
             if (residues_.find(resid) == residues_.end()) {

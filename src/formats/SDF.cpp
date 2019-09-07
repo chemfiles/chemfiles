@@ -76,9 +76,8 @@ void SDFFormat::read_next(Frame& frame) {
         auto x = parse<double>(line.substr(0, 10));
         auto y = parse<double>(line.substr(10, 10));
         auto z = parse<double>(line.substr(20, 10));
-        auto name = trim(line.substr(31, 3));
-
-        auto atom = Atom(name);
+        auto name = line.substr(31, 3);
+        auto atom = Atom(trim(name).to_string());
 
         if (line.length() >= 40) {
             long long chrg = 0;

@@ -2,6 +2,8 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cerrno>
+#include <cstdio>
+#include <cstdarg>
 #include <string>
 #include <vector>
 
@@ -77,5 +79,36 @@ std::string chemfiles::current_directory() {
         }
         // Remove additional '\0' from the string
         return std::string(buffer.data());
+    }
+}
+
+// we can not replace the `const std::string&` argument by a `string_view` since
+// we need the null-terminated behavior here, when passing it to vsscanf
+void chemfiles::scan(const std::string& input, const char* format, ...) {
+    int expected = 0;
+    char c = format[0];
+    for (size_t i = 0; c != 0; i++, c = format[i]) {
+        if (c == '%') {
+            // We can access format[i + 1] safely, because we did not reach
+            // the null-terminator yet
+            if (format[i + 1] == 'n' || format[i + 1] == '*') {
+                // %n and %* specifiers don't increase the assignement count
+                continue;
+            }
+            expected += 1;
+        }
+    }
+
+    // Forward the work to std::vsscanf
+    va_list vlist;
+    va_start(vlist, format);
+    auto actual = std::vsscanf(input.c_str(), format, vlist);
+    va_end(vlist);
+
+    if (actual != expected) {
+        throw error(
+            "failed to read line '{}' with format '{}': {} matched out of {}",
+            input, format, actual, expected
+        );
     }
 }

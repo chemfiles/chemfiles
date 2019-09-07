@@ -90,10 +90,10 @@ std::streampos XYZFormat::forward() {
 
     try {
         file_->skiplines(natoms + 1);
-    } catch (const FileError& e) {
+    } catch (const FileError&) {
         // We could not read the lines from the file
         throw format_error(
-            "not enough lines for XYZ format: {}", file_->path(), e.what()
+            "XZ format: not enough lines in '{}'", file_->path()
         );
     }
     return position;

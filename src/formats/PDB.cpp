@@ -90,18 +90,21 @@ void PDBFormat::read_next(Frame& frame) {
     while (!got_end && !file_->eof()) {
         auto line = file_->readline();
         auto record = get_record(line);
+        std::string tmp;
         switch (record) {
         case Record::HEADER:
             if (line.size() < 66) {continue;}
-            frame.set("classification", trim(line.substr(10, 40)));
-            frame.set("deposition_date", trim(line.substr(50, 9)));
-            frame.set("pdb_idcode", trim(line.substr(62, 4)));
+            tmp = line.substr(10, 40);
+            frame.set("classification", trim(tmp).to_string());
+            tmp = line.substr(50, 9);
+            frame.set("deposition_date", trim(tmp).to_string());
+            tmp = line.substr(62, 4);
+            frame.set("pdb_idcode", trim(tmp).to_string());
             continue;
         case Record::TITLE:
             if (line.size() < 11) {continue;}
-            frame.set("name", trim(
-                      frame.get<Property::STRING>("name").value_or("") +
-                      line.substr(10, 70)));
+            tmp = frame.get<Property::STRING>("name").value_or("") + line.substr(10, 70);
+            frame.set("name", trim(tmp).to_string());
             continue;
         case Record::CRYST1:
             read_CRYST1(frame, line);
@@ -193,7 +196,8 @@ void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
     }
 
     if (line.length() >= 55) {
-        auto space_group = trim(line.substr(55, 10));
+        auto tmp = line.substr(55, 10);
+        auto space_group = trim(tmp);
         if (space_group != "P 1" && space_group != "P1") {
             warning("PDB reader", "ignoring custom space group ({}), using P1 instead", space_group);
         }
@@ -314,7 +318,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
 
     if (atom_offsets_.empty()) {
         try {
-            auto initial_offset = parse<long long>(trim(line.substr(6, 5)));
+            auto initial_offset = parse<long long>(line.substr(6, 5));
             // We need to handle negative numbers ourselves: https://ideone.com/RdINqa
             if (initial_offset <= 0) {
                 warning("PDB reader", "{} is too small, assuming id is '1'", initial_offset);
@@ -328,13 +332,16 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
         }
     }
 
-    auto atom = (line.length() >= 78)?
+    Atom atom;
+    auto name = line.substr(12, 4);
+    if (line.length() >= 78) {
+        auto type = line.substr(76, 2);
         // Read both atom name and atom type
-        Atom(trim(line.substr(12, 4)),
-             trim(line.substr(76, 2))) :
-
+        atom = Atom(trim(name).to_string(), trim(type).to_string());
+    } else {
         // Read just the atom name and hope for the best.
-        Atom(trim(line.substr(12, 4)));
+        Atom(trim(name).to_string());
+    }
 
     auto altloc = line.substr(16, 1);
     if (altloc != " ") {
@@ -342,9 +349,9 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
     }
 
     try {
-        auto x = parse<double>(trim(line.substr(30, 8)));
-        auto y = parse<double>(trim(line.substr(38, 8)));
-        auto z = parse<double>(trim(line.substr(46, 8)));
+        auto x = parse<double>(line.substr(30, 8));
+        auto y = parse<double>(line.substr(38, 8));
+        auto z = parse<double>(line.substr(46, 8));
 
         frame.add_atom(std::move(atom), Vector3D(x, y, z));
     } catch (const Error&) {
@@ -358,8 +365,9 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
         auto chain = line[21];
         auto complete_residue_id = std::make_tuple(chain,resid,insertion_code);
         if (residues_.find(complete_residue_id) == residues_.end()) {
-            auto name = trim(line.substr(17, 3));
-            Residue residue(std::move(name), resid);
+            auto tmp = line.substr(17, 3);
+            auto resname = trim(tmp);
+            Residue residue(resname.to_string(), resid);
             residue.add_atom(atom_id);
 
             if (insertion_code != ' ') {

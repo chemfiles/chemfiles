@@ -54,49 +54,49 @@ template<> FormatInfo chemfiles::format_information<LAMMPSDataFormat>() {
     );
 }
 
-atom_style::atom_style(const std::string& name): name_(name) {
-    if (name == "angle") {
+atom_style::atom_style(std::string name): name_(std::move(name)) {
+    if (name_ == "angle") {
         style_ = ANGLE;
-    } else if (name == "atomic") {
+    } else if (name_ == "atomic") {
         style_ = ATOMIC;
-    } else if (name == "body") {
+    } else if (name_ == "body") {
         style_ = BODY;
-    } else if (name == "bond") {
+    } else if (name_ == "bond") {
         style_ = BOND;
-    } else if (name == "charge") {
+    } else if (name_ == "charge") {
         style_ = CHARGE;
-    } else if (name == "dipole") {
+    } else if (name_ == "dipole") {
         style_ = DIPOLE;
-    } else if (name == "dpd") {
+    } else if (name_ == "dpd") {
         style_ = DPD;
-    } else if (name == "electron") {
+    } else if (name_ == "electron") {
         style_ = ELECTRON;
-    } else if (name == "ellipsoid") {
+    } else if (name_ == "ellipsoid") {
         style_ = ELLIPSOID;
-    } else if (name == "full") {
+    } else if (name_ == "full") {
         style_ = FULL;
-    } else if (name == "line") {
+    } else if (name_ == "line") {
         style_ = LINE;
-    } else if (name == "meso") {
+    } else if (name_ == "meso") {
         style_ = MESO;
-    } else if (name == "molecular") {
+    } else if (name_ == "molecular") {
         style_ = MOLECULAR;
-    } else if (name == "peri") {
+    } else if (name_ == "peri") {
         style_ = PERI;
-    } else if (name == "smd") {
+    } else if (name_ == "smd") {
         style_ = SMD;
-    } else if (name == "sphere") {
+    } else if (name_ == "sphere") {
         style_ = SPHERE;
-    } else if (name == "template") {
+    } else if (name_ == "template") {
         style_ = TEMPLATE;
-    } else if (name == "tri") {
+    } else if (name_ == "tri") {
         style_ = TRI;
-    } else if (name == "wavepacket") {
+    } else if (name_ == "wavepacket") {
         style_ = WAVEPACKET;
-    } else if (name == "hybrid") {
+    } else if (name_ == "hybrid") {
         style_ = HYBRID;
     } else {
-        throw format_error("unknown atom style '{}'", name);
+        throw format_error("LAMMPS Data: unknown atom style '{}'", name_);
     }
 }
 
@@ -249,8 +249,8 @@ void LAMMPSDataFormat::read_next(Frame& frame) {
     // VMD topotools writes the atom style in the comment header
     auto it = comment.find("atom_style");
     if (it != std::string::npos) {
-        auto end = trim(comment.substr(it + 10));
-        atom_style_name_ = trim(split(end, ' ')[0]);
+        auto style = comment.substr(it + 10);
+        atom_style_name_ = trim(split(style, ' ')[0]).to_string();
     }
 
     while(!file_->eof()) {
@@ -306,7 +306,7 @@ void LAMMPSDataFormat::read_header(Frame& frame) {
         } else if (content.find("zlo zhi") != std::string::npos) {
             matrix[2][2] = read_header_box_bounds(content, "zlo zhi");
         } else if (content.find("xy xz yz") != std::string::npos) {
-            auto splitted = split(trim(content), ' ');
+            auto splitted = split(content, ' ');
             if (splitted.size() != 6) {
                 throw format_error(
                     "invalid header value: expected '<xy> <xz> <yz> xy xz yz', got '{}'", content
@@ -329,7 +329,7 @@ void LAMMPSDataFormat::read_header(Frame& frame) {
 }
 
 size_t LAMMPSDataFormat::read_header_integer(const std::string& line, const std::string& context) {
-    auto splitted = split(trim(line), ' ');
+    auto splitted = split(line, ' ');
     if (splitted.size() < 2) {
         throw format_error(
             "invalid header value: expected '<n> {}', got '{}'", context, line
@@ -339,7 +339,7 @@ size_t LAMMPSDataFormat::read_header_integer(const std::string& line, const std:
 }
 
 double LAMMPSDataFormat::read_header_box_bounds(const std::string& line, const std::string& context) {
-    auto splitted = split(trim(line), ' ');
+    auto splitted = split(line, ' ');
     if (splitted.size() < 4) {
         throw format_error(
             "invalid header value: expected '<lo> <hi> {}', got '{}'", context, line
@@ -412,11 +412,11 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
 
         if (!comment.empty()) {
             // Read the first string after the comment, and use it as atom name
-            auto name = split(trim(comment), ' ')[0];
+            auto name = split(comment, ' ')[0];
             if (names_.empty()) {
                 names_.resize(natoms_);
             }
-            names_[data.index] = name;
+            names_[data.index] = name.to_string();
         }
 
         auto atom = Atom(std::to_string(data.type));
@@ -463,14 +463,14 @@ void LAMMPSDataFormat::read_masses() {
         split_comment(line);
         if (line.empty()) {continue;}
 
-        auto splitted = split(trim(line), ' ');
+        auto splitted = split(line, ' ');
         if (splitted.size() != 2) {
             throw format_error("bad mass specification '{}'", line);
         }
 
         auto type = splitted[0];
         auto mass = parse<double>(splitted[1]);
-        masses_.emplace(std::move(type), mass);
+        masses_.emplace(type.to_string(), mass);
         n++;
     }
 
@@ -488,7 +488,7 @@ void LAMMPSDataFormat::read_bonds(Frame& frame) {
         split_comment(line);
         if (line.empty()) {continue;}
 
-        auto splitted = split(trim(line), ' ');
+        auto splitted = split(line, ' ');
         if (splitted.size() != 4) {
             throw format_error("bad bond specification '{}'", line);
         }
@@ -519,7 +519,7 @@ void LAMMPSDataFormat::read_velocities(Frame& frame) {
         split_comment(line);
         if (line.empty()) {continue;}
 
-        auto splitted = split(trim(line), ' ');
+        auto splitted = split(line, ' ');
         if (splitted.size() < 4) {
             throw format_error("bad velocity specification '{}'", line);
         }
@@ -563,7 +563,7 @@ void LAMMPSDataFormat::setup_names(Frame& frame) const {
 }
 
 
-static std::unordered_set<std::string> IGNORED_SECTIONS = {
+static std::unordered_set<string_view> IGNORED_SECTIONS = {
     "Ellipsoids", "Lines", "Triangles", "Bodies", "Pair Coeffs",
     "PairIJ Coeffs", "Bond Coeffs", "Angle Coeffs", "Dihedral Coeffs",
     "Improper Coeffs", "BondBond Coeffs", "BondAngle Coeffs",
@@ -576,7 +576,7 @@ LAMMPSDataFormat::section_t LAMMPSDataFormat::get_section(std::string line) {
     auto section = trim(line);
     if (section == "Atoms") {
         if (!comment.empty()) {
-            atom_style_name_ = trim(comment);
+            atom_style_name_ = trim(comment).to_string();
         }
         return ATOMS;
     } else if (section == "Bonds") {

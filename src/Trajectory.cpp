@@ -37,7 +37,8 @@ file_open_info file_open_info::parse(const std::string& path, const std::string&
 
     auto slash = format.find('/');
     if (slash != std::string::npos) {
-        const auto& compression = trim(format.substr(slash + 1));
+        auto tmp = format.substr(slash + 1);
+        auto compression = trim(tmp);
         if (compression == "GZ") {
             info.compression = File::GZIP;
         } else if (compression == "XZ") {
@@ -47,7 +48,8 @@ file_open_info file_open_info::parse(const std::string& path, const std::string&
         }
     }
 
-    info.format = trim(format.substr(0, slash));
+    auto tmp = format.substr(0, slash);
+    info.format = trim(tmp).to_string();
 
     auto dot1 = path.rfind('.');
     if (dot1 != std::string::npos) {

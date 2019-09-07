@@ -254,7 +254,8 @@ void CMLFormat::read_atoms(Frame& frame, const pugi::xml_node& atoms) {
             }
             std::string title = title_attribute.as_string();
 
-            auto vect_strings = split(trim(vector3.text().as_string()), ' ');
+            auto tmp = vector3.text().as_string();
+            auto vect_strings = split(tmp, ' ');
             if (vect_strings.size() != 3) {
                 warning("CML reader", "{} vector3 does not have 3 values", title);
                 continue;
@@ -299,8 +300,8 @@ void CMLFormat::read_bonds(Frame& frame, const pugi::xml_node& bonds) {
             continue;
         }
 
-        auto id1 = ref_to_id_.find(ids[0]);
-        auto id2 = ref_to_id_.find(ids[1]);
+        auto id1 = ref_to_id_.find(ids[0].to_string());
+        auto id2 = ref_to_id_.find(ids[1].to_string());
         if (id1 == ref_to_id_.end() || id2 == ref_to_id_.end()) {
             warning("CML reader", "invalid atomic references in bond: {} -- {}", ids[0], ids[1]);
             continue;
