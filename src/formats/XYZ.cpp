@@ -18,7 +18,7 @@
 #include "chemfiles/Topology.hpp"
 
 #include "chemfiles/types.hpp"
-#include "chemfiles/utils.hpp"
+#include "chemfiles/parse.hpp"
 #include "chemfiles/ErrorFmt.hpp"
 
 #include "chemfiles/formats/XYZ.hpp"
@@ -45,9 +45,9 @@ void XYZFormat::read_next(Frame& frame) {
 
     for (auto&& line: file_->readlines(natoms)) {
         double x = 0, y = 0, z = 0;
-        char name[32] = {0};
-        scan(line, "%31s %lf %lf %lf", &name[0], &x, &y, &z);
-        frame.add_atom(Atom(name), Vector3D(x, y, z));
+        std::string name;
+        scan(line, name, x, y, z);
+        frame.add_atom(Atom(std::move(name)), Vector3D(x, y, z));
     }
 }
 

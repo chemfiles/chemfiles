@@ -7,6 +7,9 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
+#include "fmt/core.h"
+
+
 TEST_CASE("Read files in LAMMPS data format") {
     SECTION("File created by VMD/Topotools") {
         auto file = Trajectory("data/lammps-data/solvated.lmp", 'r', "LAMMPS Data");
@@ -51,13 +54,14 @@ TEST_CASE("Read files in LAMMPS data format") {
 
         auto positions = frame.positions();
         CHECK(positions[0] == Vector3D(-15.5322, -15.5322, 0.0));
+        fmt::print("{} {} {}", positions[0][0], positions[0][1], positions[0][2]);
         CHECK(positions[22] == Vector3D(-9.31933, -9.31933, 0.0));
 
         REQUIRE(frame.velocities());
         auto velocities = *frame.velocities();
-        CHECK(velocities[5] == Vector3D(1.14438145745, 4.42784814304, 1.75516442452));
         CHECK(velocities[0] == Vector3D(1.02255489961, 2.92322463726, 4.88805110017));
         CHECK(velocities[1] == Vector3D(0.111646059519, 0.474226666855, 0.68604865644));
+        CHECK(velocities[5] == Vector3D(1.14438145745, 4.42784814304, 1.75516442452));
         CHECK(velocities[42] == Vector3D(4.70147770939, 2.13317266836, 1.29333445263));
 
         auto& topology = frame.topology();
