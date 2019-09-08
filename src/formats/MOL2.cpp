@@ -24,6 +24,7 @@
 #include "chemfiles/Connectivity.hpp"
 
 #include "chemfiles/utils.hpp"
+#include "chemfiles/parse.hpp"
 #include "chemfiles/warnings.hpp"
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/periodic_table.hpp"
@@ -84,9 +85,7 @@ void MOL2Format::read_next(Frame& frame) {
             auto cryst = file_->readline();
 
             double a, b, c, alpha, beta, gamma;
-            scan(cryst, " %lf %lf %lf %lf %lf %lf",
-                &a, &b, &c, &alpha, &beta, &gamma
-            );
+            scan(cryst, a, b, c, alpha, beta, gamma);
 
             frame.set_cell(UnitCell(a, b, c, alpha, beta, gamma));
         } else if (trimed == "@<TRIPOS>MOLECULE") {
@@ -106,52 +105,48 @@ void MOL2Format::read_atoms(Frame& frame, size_t natoms, bool charges) {
 
     for (const auto& line : lines) {
         unsigned long id, resid;
-        char atom_name[32], sybyl_type[32], res_name[32];
+        std::string atom_name, sybyl_type, resname;
         double x, y, z;
         double charge = 0;
 
         if (charges) {
-            scan(line, " %lu %31s %lf %lf %lf %31s %lu %31s %lf",
-                &id, &atom_name[0], &x, &y, &z, &sybyl_type[0], &resid, &res_name[0], &charge
-            );
+            scan(line, id, atom_name, x, y, z, sybyl_type, resid, resname, charge);
         } else {
-            scan(line, " %lu %31s %lf %lf %lf %31s %lu %31s",
-                &id, &atom_name[0], &x, &y, &z, &sybyl_type[0], &resid, &res_name[0]
-            );
+            scan(line, id, atom_name, x, y, z, sybyl_type, resid, resname);
         }
 
         std::string atom_type;
         bool is_sybyl;
 
-        if (std::string(sybyl_type).find('.') != std::string::npos || find_in_periodic_table(sybyl_type)) {
+        if (sybyl_type.find('.') != std::string::npos || find_in_periodic_table(sybyl_type)) {
             atom_type = split(sybyl_type, '.')[0].to_string();
             is_sybyl = true;
         } else {
             is_sybyl = false;
-            for (auto a : atom_name) {
-                if ((std::isalpha(a) == 0) || !find_in_periodic_table(atom_type + a)) {
+            for (auto c: atom_name) {
+                if ((std::isalpha(c) == 0) || !find_in_periodic_table(atom_type + c)) {
                     break;
                 }
-                atom_type += a;
+                atom_type += c;
             }
-            warning(
+            warning("MOL2 reader",
                 "invalid sybyl type: '{}'; guessing '{}' from '{}'",
                 sybyl_type, atom_type, atom_name
             );
         }
 
-        auto atom = Atom(atom_name, atom_type);
+        auto atom = Atom(std::move(atom_name), std::move(atom_type));
         if (charges) {
             atom.set_charge(charge);
         }
         if (is_sybyl) {
-            atom.set("sybyl", sybyl_type);
+            atom.set("sybyl", std::move(sybyl_type));
         }
         frame.add_atom(std::move(atom), {x, y, z});
 
         size_t current_atom = frame.size() - 1;
         if (residues_.find(resid) == residues_.end()) {
-            Residue residue(res_name, resid);
+            Residue residue(std::move(resname), resid);
             residue.add_atom(current_atom);
             residues_.insert({resid, residue});
         } else {
@@ -167,9 +162,9 @@ void MOL2Format::read_bonds(Frame& frame, size_t nbonds) {
 
     for (const auto& line : lines) {
         unsigned long id, id_1, id_2;
-        char bond_order[32] = {0};
+        std::string bond_order;
 
-        scan(line, " %lu %lu %lu %31s", &id, &id_1, &id_2, &bond_order[0]);
+        scan(line, id, id_1, id_2, bond_order);
 
         // MOL2 is 1 index-based, not 0
         --id_1;
@@ -181,26 +176,24 @@ void MOL2Format::read_bonds(Frame& frame, size_t nbonds) {
             );
         }
 
-        Bond::BondOrder bo;
-        std::string bond_order_str(bond_order);
-
-        if (bond_order_str == "1") {
-            bo = Bond::SINGLE;
-        } else if (bond_order_str == "2") {
-            bo = Bond::DOUBLE;
-        } else if (bond_order_str == "3") {
-            bo = Bond::TRIPLE;
-        } else if (bond_order_str == "ar") {
-            bo = Bond::AROMATIC;
-        } else if (bond_order_str == "am") {
-            bo = Bond::AMIDE;
-        } else if (bond_order_str == "du") { // du is a dummy bond
-            bo = Bond::UNKNOWN;
+        Bond::BondOrder order;
+        if (bond_order == "1") {
+            order = Bond::SINGLE;
+        } else if (bond_order == "2") {
+            order = Bond::DOUBLE;
+        } else if (bond_order == "3") {
+            order = Bond::TRIPLE;
+        } else if (bond_order == "ar") {
+            order = Bond::AROMATIC;
+        } else if (bond_order == "am") {
+            order = Bond::AMIDE;
+        } else if (bond_order == "du") { // du is a dummy bond
+            order = Bond::UNKNOWN;
         } else {
-            bo = Bond::UNKNOWN;
+            order = Bond::UNKNOWN;
         }
 
-        frame.add_bond(id_1, id_2, bo);
+        frame.add_bond(id_1, id_2, order);
     }
 }
 
