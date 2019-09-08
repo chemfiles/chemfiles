@@ -27,11 +27,13 @@
 #include "chemfiles/UnitCell.hpp"
 
 #include "chemfiles/ErrorFmt.hpp"
-#include "chemfiles/sorted_set.hpp"
+
 #include "chemfiles/types.hpp"
-#include "chemfiles/unreachable.hpp"
 #include "chemfiles/utils.hpp"
+#include "chemfiles/parse.hpp"
 #include "chemfiles/warnings.hpp"
+#include "chemfiles/sorted_set.hpp"
+#include "chemfiles/unreachable.hpp"
 #include "chemfiles/external/span.hpp"
 #include "chemfiles/external/optional.hpp"
 
@@ -101,107 +103,78 @@ atom_style::atom_style(std::string name): name_(std::move(name)) {
 }
 
 atom_data atom_style::read_line(const std::string& line, size_t index) const {
-    atom_data data;
+    atom_data d;
+
+    // dummy variable to ignore a value
+    double SKIP;
     switch (style_) {
     case ANGLE:
     case BOND:
     case MOLECULAR:
         // atom-ID molecule-ID atom-type x y z
-        scan(line, "%zu %zu %zu %lf %lf %lf",
-            &data.index, &data.molid, &data.type, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.molid, d.type, d.x, d.y, d.z);
         break;
     case ATOMIC:
         // atom-ID atom-type x y z
-        scan(line, "%zu %zu %lf %lf %lf",
-            &data.index, &data.type, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.type, d.x, d.y, d.z);
         break;
     case BODY:
         // atom-ID atom-type bodyflag mass x y z
-        scan(line, "%zu %zu %*d %lf %lf %lf %lf",
-            &data.index, &data.type, &data.mass, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.type, SKIP, d.mass, d.x, d.y, d.z);
         break;
     case CHARGE:
     case DIPOLE:
         // atom-ID atom-type q x y z
         // atom-ID atom-type q x y z mux muy muz
-        scan(line, "%zu %zu %lf %lf %lf %lf",
-            &data.index, &data.type, &data.charge, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.type, d.charge, d.x, d.y, d.z);
         break;
     case DPD:
         // atom-ID atom-type theta x y z
-        scan(line, "%zu %zu %*f %lf %lf %lf",
-            &data.index, &data.type, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.type, SKIP, d.x, d.y, d.z);
         break;
     case ELECTRON:
         // atom-ID atom-type q spin eradius x y z
-        scan(line, "%zu %zu %*f %*f %lf %lf %lf",
-            &data.index, &data.type, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.type, SKIP, SKIP, d.x, d.y, d.z);
         break;
     case ELLIPSOID:
         // atom-ID atom-type ellipsoidflag density x y z
-        scan(line, "%zu %zu %*d %*f %lf %lf %lf",
-            &data.index, &data.type, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.type, SKIP, SKIP, d.x, d.y, d.z);
         break;
     case FULL:
         // atom-ID molecule-ID atom-type q x y z
-        scan(line, "%zu %zu %zu %lf %lf %lf %lf",
-            &data.index, &data.molid, &data.type, &data.charge, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.molid, d.type, d.charge, d.x, d.y, d.z);
         break;
     case LINE:
         // atom-ID molecule-ID atom-type lineflag density x y z
-        scan(line, "%zu %zu %zu %*d %*f %lf %lf %lf",
-            &data.index, &data.molid, &data.type, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.molid, d.type, SKIP, SKIP, d.x, d.y, d.z);
         break;
     case MESO:
         // atom-ID atom-type rho e cv x y z
-        scan(line, "%zu %zu %*f %*f %*f %lf %lf %lf",
-            &data.index, &data.type, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.type, SKIP, SKIP, SKIP, d.x, d.y, d.z);
         break;
     case PERI:
         // atom-ID atom-type volume density x y z
-        scan(line, "%zu %zu %*f %*f %lf %lf %lf",
-            &data.index, &data.type, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.type, SKIP, SKIP, d.x, d.y, d.z);
         break;
     case SMD:
         // atom-ID atom-type molecule volume mass kernel-radius contact-radius x y z
-        scan(line, "%zu %zu %zu %*f %lf %*f %*f %lf %lf %lf",
-            &data.index, &data.type, &data.molid, &data.mass, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.type, d.molid, SKIP, d.mass, SKIP, SKIP, d.x, d.y, d.z);
         break;
     case SPHERE:
         // atom-ID atom-type diameter density x y z
-        scan(line, "%zu %zu %*f %*f %lf %lf %lf",
-            &data.index, &data.type, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.type, SKIP, SKIP, d.x, d.y, d.z);
         break;
     case TEMPLATE:
         // atom-ID molecule-ID template-index template-atom atom-type x y z
-        scan(line, "%zu %zu %*d %*d %zu %lf %lf %lf",
-            &data.index, &data.molid, &data.type, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.molid, SKIP, SKIP, d.type, d.x, d.y, d.z);
         break;
     case TRI:
         // atom-ID molecule-ID atom-type triangleflag density x y z
-        scan(line, "%zu %zu %zu %*d %*f %lf %lf %lf",
-            &data.index, &data.molid, &data.type, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.molid, d.type, SKIP, SKIP, d.x, d.y, d.z);
         break;
     case WAVEPACKET:
         // atom-ID atom-type charge spin eradius etag cs_re cs_im x y z
-        scan(line, "%zu %zu %lf %*f %*f %*d %*f %*f %lf %lf %lf",
-            &data.index, &data.type, &data.charge, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.type, d.charge, SKIP, SKIP, SKIP, SKIP, SKIP, d.x, d.y, d.z);
         break;
     case HYBRID:
         if (!warned_) {
@@ -209,22 +182,20 @@ atom_data atom_style::read_line(const std::string& line, size_t index) const {
             warned_ = true;
         }
         // atom-ID atom-type x y z sub-style1 sub-style2 ...
-        scan(line, "%zu %zu %lf %lf %lf",
-            &data.index, &data.type, &data.x, &data.y, &data.z
-        );
+        scan(line, d.index, d.type, d.x, d.y, d.z);
         break;
     }
 
-    if (data.index == 0) {
+    if (d.index == 0) {
         // 0 means the user do not care about indexes, but we still need one.
         // So we use the index provided by the caller of this function
-        data.index = index;
+        d.index = index;
     } else {
         // LAMMPS uses 1 based indexes, convert it to 0-based
-        data.index -= 1;
+        d.index -= 1;
     }
 
-    return data;
+    return d;
 }
 
 /// Split a string in data (stays in the `line` parameter) and comment

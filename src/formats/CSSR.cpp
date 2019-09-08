@@ -18,7 +18,7 @@
 #include "chemfiles/Connectivity.hpp"
 
 #include "chemfiles/types.hpp"
-#include "chemfiles/utils.hpp"
+#include "chemfiles/parse.hpp"
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/warnings.hpp"
 
@@ -54,14 +54,14 @@ void CSSRFormat::read_next(Frame& frame) {
 
     // Read unit cell
     double a = 0, b = 0, c = 0;
-    scan(file_->readline(), "%*38c%lf %lf %lf", &a, &b, &c);
+    scan(file_->readline().substr(38), a, b, c);
     double alpha = 0, beta = 0, gamma = 0;
-    scan(file_->readline(), "%*21c%lf %lf %lf", &alpha, &beta, &gamma);
+    scan(file_->readline().substr(21), alpha, beta, gamma);
     frame.set_cell(UnitCell(a, b, c, alpha, beta, gamma));
 
     size_t natoms = 0;
     int coordinate_style = -1;
-    scan(file_->readline(), "%zu %d", &natoms, &coordinate_style);
+    scan(file_->readline(), natoms, coordinate_style);
     bool use_fractional = (coordinate_style == 0);
 
     // Title line
@@ -73,14 +73,16 @@ void CSSRFormat::read_next(Frame& frame) {
     std::vector<std::vector<size_t>> connectivity(natoms);
     for (auto&& line: file_->readlines(natoms)) {
         unsigned atom_id = 0;
-        char name[5] = {0};
+        std::string name;
         double x = 0, y = 0, z = 0;
         unsigned bonds[8] = {0};
         double charge = 0;
 
-        scan(line, "%u %4s %lf %lf %lf %u %u %u %u %u %u %u %u %lf",
-            &atom_id, &name[0], &x, &y, &z, &bonds[0], &bonds[1], &bonds[2],
-            &bonds[3], &bonds[4], &bonds[5], &bonds[6], &bonds[7], &charge
+        scan(line,
+            atom_id, name, x, y, z,
+            bonds[0], bonds[1], bonds[2], bonds[3],
+            bonds[4], bonds[5], bonds[6], bonds[7],
+            charge
         );
 
         auto position = Vector3D(x, y, z);
@@ -89,7 +91,7 @@ void CSSRFormat::read_next(Frame& frame) {
         }
 
         // Atomic names can be created as <type><id>: O121 H22
-        auto type = std::string(name);
+        auto type = name;
         size_t type_length = 0;
         for (auto ch: type) {
             if (is_digit(ch)) {
@@ -99,7 +101,7 @@ void CSSRFormat::read_next(Frame& frame) {
         }
         type = type.substr(0, type_length);
 
-        auto atom = Atom(name, type);
+        auto atom = Atom(std::move(name), std::move(type));
         atom.set_charge(charge);
         frame.add_atom(std::move(atom), position);
 
