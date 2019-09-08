@@ -8,7 +8,7 @@
 #include <vector>
 #include <exception>
 
-#include "chemfiles/utils.hpp"
+#include "chemfiles/parse.hpp"
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/unreachable.hpp"
 
@@ -25,11 +25,6 @@ static bool is_alpha(char c) {
 
 static bool is_digit(char c) {
     return (c >= '0' && c <= '9');
-}
-
-static bool is_space(char c) {
-    return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v' ||
-            c == '\f');
 }
 
 static bool is_ident_component(char c) {
@@ -114,7 +109,7 @@ std::string Token::as_str() const {
 std::vector<Token> Tokenizer::tokenize() {
     auto tokens = std::vector<Token>();
     while (!finished()) {
-        if (match(is_space)) {
+        if (match(is_whitespace)) {
             continue;
         } else if (match('(')) {
             tokens.emplace_back(Token(Token::LPAREN));

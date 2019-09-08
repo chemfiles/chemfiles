@@ -20,6 +20,7 @@
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
+#include "chemfiles/parse.hpp"
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/sorted_set.hpp"
 
@@ -39,7 +40,8 @@ void TinkerFormat::read_next(Frame& frame) {
     size_t natoms = 0;
     try {
         auto line = file_->readline();
-        scan(line, "%zu", &natoms);
+        // only read the number of atoms, ignore any comment
+        scan(line, natoms);
     } catch (const FileError& e) {
         throw format_error(
             "can not read number of atoms in {}: {}", file_->path(), e.what()
@@ -53,7 +55,7 @@ void TinkerFormat::read_next(Frame& frame) {
             // Read the cell
             double a = 0, b = 0, c = 0;
             double alpha = 0, beta = 0, gamma = 0;
-            scan(line, "%lf %lf %lf %lf %lf %lf", &a, &b, &c, &alpha, &beta, &gamma);
+            scan(line, a, b, c, alpha, beta, gamma);
             frame.set_cell(UnitCell(a, b, c, alpha, beta, gamma));
 
             // And get the atoms lines
@@ -75,18 +77,13 @@ void TinkerFormat::read_next(Frame& frame) {
     for (size_t i = 0; i < natoms; i++) {
         double x = 0, y = 0, z = 0;
         int id = 0, atom_type = 0;
-        char name[32];
-        int count = 0;
-        scan(lines[i], "%d %31s %lf %lf %lf %d %n", &id, &name[0], &x, &y, &z, &atom_type, &count);
+        std::string name;
+        auto count = scan(lines[i], id, name, x, y, z, atom_type);
 
         frame.add_atom(Atom(name), Vector3D(x, y, z));
-        while (static_cast<size_t>(count) != lines[i].size()) {
+        while (count != lines[i].size()) {
             size_t bonded = 0;
-            int additional = 0;
-
-            scan(lines[i].substr(static_cast<size_t>(count)), "%zu%n", &bonded, &additional);
-            count += additional;
-
+            count += scan(lines[i].substr(count), bonded);
             bonds[i].push_back(bonded - 1);
         }
     }

@@ -23,6 +23,7 @@
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
+#include "chemfiles/parse.hpp"
 #include "chemfiles/warnings.hpp"
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/external/optional.hpp"
