@@ -30,7 +30,7 @@ TEST_CASE("Read files in XTC format") {
         frame = file.read();
 
         CHECK(frame.get("md_step")->as_double() == 200);
-        CHECK(approx_eq(frame.get("time")->as_double(), 0.6));
+        CHECK(approx_eq(frame.get("time")->as_double(), 0.4, 1e-4));
         CHECK(frame.get("xtc_precision")->as_double() == 1000);
         CHECK(frame.size() == 20455);
 
