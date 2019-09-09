@@ -61,7 +61,7 @@ bool approx_eq(const chemfiles::Matrix3D& lhs, const chemfiles::Matrix3D& rhs, d
 }
 
 bool approx_eq(double a, double b, double tolerance) {
-    return (a - b) < tolerance;
+    return fabs(a - b) < tolerance;
 }
 
 bool is_valgrind_and_travis() {
