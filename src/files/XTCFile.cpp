@@ -34,7 +34,7 @@ XTCFile::~XTCFile() {
 
 unsigned long XTCFile::nframes() const { return nframes_; }
 
-int64_t XTCFile::offset(int64_t step) const { return offsets_[step]; }
+int64_t XTCFile::offset(size_t step) const { return offsets_[step]; }
 
 int XTCFile::natoms() const { return natoms_; }
 

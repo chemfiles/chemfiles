@@ -26,7 +26,7 @@ XTCFormat::XTCFormat(std::string path, File::Mode mode, File::Compression compre
 size_t XTCFormat::nsteps() { return static_cast<size_t>(xtc_.nframes()); }
 
 void XTCFormat::read_step(size_t step, Frame& frame) {
-    step_ = static_cast<int64_t>(step);
+    step_ = step;
     CHECK(xdr_seek(xtc_, xtc_.offset(step_), SEEK_SET));
     read(frame);
 }
@@ -42,8 +42,8 @@ void XTCFormat::read(Frame& frame) {
     CHECK(read_xtc(xtc_, natoms, &md_step, &time, box, reinterpret_cast<float(*)[3]>(x.data()),
                    &precision));
 
-    frame.set("md_step", md_step); // actual step of MD Simulation
-    frame.set("time", time);       // time in pico seconds
+    frame.set_step(static_cast<size_t>(md_step));   // actual step of MD Simulation
+    frame.set("time", time);                        // time in pico seconds
     frame.set("xtc_precision", precision);
     frame.resize(static_cast<size_t>(natoms));
 

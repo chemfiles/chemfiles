@@ -49,7 +49,6 @@ using namespace chemfiles;
 
 namespace chemfiles {
     PLUGINS_DATA(DCD,               dcdplugin,          dcd,            false);
-    PLUGINS_DATA(XTC,               gromacsplugin,      xtc,            false);
     PLUGINS_DATA(TRJ,               gromacsplugin,      trj,            false);
     PLUGINS_DATA(LAMMPS,            lammpsplugin,       lammpstrj,      true);
     PLUGINS_DATA(MOLDEN,            moldenplugin,       molden,         false);
@@ -322,7 +321,6 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
 
 // Instanciate all the templates
 template class chemfiles::Molfile<DCD>;
-template class chemfiles::Molfile<XTC>;
 template class chemfiles::Molfile<TRJ>;
 template class chemfiles::Molfile<LAMMPS>;
 template class chemfiles::Molfile<MOLDEN>;
@@ -335,13 +333,7 @@ template<> FormatInfo chemfiles::format_information<Molfile<DCD>>() {
 
 template<> FormatInfo chemfiles::format_information<Molfile<TRJ>>() {
     return FormatInfo("TRJ").with_extension(".trj").description(
-        "GROMACS .xtc binary format"
-    );
-}
-
-template<> FormatInfo chemfiles::format_information<Molfile<XTC>>() {
-    return FormatInfo("XTC").with_extension(".xtc").description(
-        "GROMACS .xtc binary compressed portable format"
+        "GROMACS .trj binary format"
     );
 }
 

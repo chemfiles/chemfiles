@@ -25,7 +25,7 @@ class XTCFile final : public File {
     /// get the number of frames/steps in the file, as indicated in the file header
     unsigned long nframes() const;
     /// get the offset corresponding to a specific frame/step
-    int64_t offset(int64_t step) const;
+    int64_t offset(size_t step) const;
     /// get the number of atoms, as indicated in the file header
     int natoms() const;
 
