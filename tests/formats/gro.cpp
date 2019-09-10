@@ -66,7 +66,7 @@ TEST_CASE("Read files in Gromacs .gro format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(fabs(cell.a() - 70.1008) < 1e-5);
+        CHECK(approx_eq(cell.a(), 70.1008, 1e-5));
 
         file.read(); // Skip a frame
         frame = file.read();
@@ -85,7 +85,7 @@ TEST_CASE("Read files in Gromacs .gro format") {
 
         cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(fabs(cell.b() - 69.7308) < 1e-5);
+        CHECK(approx_eq(cell.b(), 69.7308, 1e-5));
     }
 
     SECTION("Read a specific step") {
@@ -106,7 +106,7 @@ TEST_CASE("Read files in Gromacs .gro format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(fabs(cell.c() - 70.1008) < 1e-5);
+        CHECK(approx_eq(cell.c(), 70.1008, 1e-5));
     }
 
     SECTION("Read residue information") {

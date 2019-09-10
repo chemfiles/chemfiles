@@ -66,19 +66,19 @@ TEST_CASE("Read trajectory") {
         CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
         CHECK(natoms == 297);
 
-        chfl_vector3d* data = nullptr;
+        chfl_vector3d* positions = nullptr;
         // Check for the error when requesting non-existent velocities
-        CHECK(chfl_frame_velocities(frame, &data, &natoms) != CHFL_SUCCESS);
+        CHECK(chfl_frame_velocities(frame, &positions, &natoms) != CHFL_SUCCESS);
 
         chfl_vector3d positions_0 = {0.417219, 8.303366, 11.737172};
         chfl_vector3d positions_124 = {5.099554, -0.045104, 14.153846};
 
         // Check positions in the first frame
-        CHECK_STATUS(chfl_frame_positions(frame, &data, &natoms));
+        CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
         CHECK(natoms == 297);
         for (unsigned i=0; i<3; i++) {
-            CHECK(data[0][i] == positions_0[i]);
-            CHECK(data[124][i] == positions_124[i]);
+            CHECK(approx_eq(positions[0][i], positions_0[i], 1e-12));
+            CHECK(approx_eq(positions[124][i], positions_124[i], 1e-12));
         }
 
         chfl_free(frame);
@@ -104,8 +104,8 @@ TEST_CASE("Read trajectory") {
         CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
         CHECK(natoms == 297);
         for (unsigned i=0; i<3; i++) {
-            CHECK(positions[0][i] == positions_0[i]);
-            CHECK(positions[124][i] == positions_124[i]);
+            CHECK(approx_eq(positions[0][i], positions_0[i], 1e-12));
+            CHECK(approx_eq(positions[124][i], positions_124[i], 1e-12));
         }
 
         chfl_free(frame);
