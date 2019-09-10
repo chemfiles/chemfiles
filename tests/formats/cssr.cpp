@@ -23,9 +23,9 @@ TEST_CASE("Read files in CSSR format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(fabs(cell.a() - 1.0) < 1e-5);
-        CHECK(fabs(cell.b() - 1.0) < 1e-5);
-        CHECK(fabs(cell.c() - 1.0) < 1e-5);
+        CHECK(approx_eq(cell.a(), 1.0, 1e-5));
+        CHECK(approx_eq(cell.b(), 1.0, 1e-5));
+        CHECK(approx_eq(cell.c(), 1.0, 1e-5));
 
         // bonds comes from open babel, which do not use PBC to guess them
         CHECK(frame.topology().bonds().size() == 186);
@@ -47,9 +47,9 @@ TEST_CASE("Read files in CSSR format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(fabs(cell.a() - 6.926) < 1e-5);
-        CHECK(fabs(cell.b() - 6.926) < 1e-5);
-        CHECK(fabs(cell.c() - 6.410) < 1e-5);
+        CHECK(approx_eq(cell.a(), 6.926, 1e-5));
+        CHECK(approx_eq(cell.b(), 6.926, 1e-5));
+        CHECK(approx_eq(cell.c(), 6.410, 1e-5));
 
         CHECK(frame[0].name() == "O");
         CHECK(frame[0].type() == "O");

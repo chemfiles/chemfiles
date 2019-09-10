@@ -18,14 +18,14 @@ TEST_CASE("Read files in LAMMPS data format") {
         CHECK(frame.size() == 7772);
 
         CHECK(frame.cell().shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(frame.cell().a() == 34.023997999999999);
-        CHECK(frame.cell().b() == 34.023998000000006);
-        CHECK(frame.cell().c() == 163.03599500000001);
+        CHECK(approx_eq(frame.cell().a(), 34.023998, 1e-12));
+        CHECK(approx_eq(frame.cell().b(), 34.023998, 1e-12));
+        CHECK(approx_eq(frame.cell().c(), 163.035995, 1e-12));
 
         auto positions = frame.positions();
-        CHECK(positions[0] == Vector3D(4.253000, 12.759000, 63.506001));
-        CHECK(positions[364] == Vector3D(8.134000, 2.322000, 82.219002));
-        CHECK(positions[653] == Vector3D(6.184000, 8.134000, 104.334000));
+        CHECK(approx_eq(positions[0], {4.253000, 12.759000, 63.506001}, 1e-12));
+        CHECK(approx_eq(positions[364], {8.134000, 2.322000, 82.219002}, 1e-12));
+        CHECK(approx_eq(positions[653], {6.184000, 8.134000, 104.334000}, 1e-12));
 
         auto& topology = frame.topology();
         CHECK(topology.bonds().size() == 6248);
@@ -40,9 +40,9 @@ TEST_CASE("Read files in LAMMPS data format") {
         // Check the read_step function
         frame = file.read_step(0);
         positions = frame.positions();
-        CHECK(positions[0] == Vector3D(4.253000, 12.759000, 63.506001));
-        CHECK(positions[364] == Vector3D(8.134000, 2.322000, 82.219002));
-        CHECK(positions[653] == Vector3D(6.184000, 8.134000, 104.334000));
+        CHECK(approx_eq(positions[0], {4.253000, 12.759000, 63.506001}, 1e-12));
+        CHECK(approx_eq(positions[364], {8.134000, 2.322000, 82.219002}, 1e-12));
+        CHECK(approx_eq(positions[653], {6.184000, 8.134000, 104.334000}, 1e-12));
     }
 
     SECTION("File created with LAMMPS") {
@@ -53,16 +53,15 @@ TEST_CASE("Read files in LAMMPS data format") {
         CHECK(frame.cell() == UnitCell(31.064449134, 31.064449134, 1.0));
 
         auto positions = frame.positions();
-        CHECK(positions[0] == Vector3D(-15.5322, -15.5322, 0.0));
-        fmt::print("{} {} {}", positions[0][0], positions[0][1], positions[0][2]);
-        CHECK(positions[22] == Vector3D(-9.31933, -9.31933, 0.0));
+        CHECK(approx_eq(positions[0], {-15.5322, -15.5322, 0.0}, 1e-12));
+        CHECK(approx_eq(positions[22], {-9.31933, -9.31933, 0.0}, 1e-12));
 
         REQUIRE(frame.velocities());
         auto velocities = *frame.velocities();
-        CHECK(velocities[0] == Vector3D(1.02255489961, 2.92322463726, 4.88805110017));
-        CHECK(velocities[1] == Vector3D(0.111646059519, 0.474226666855, 0.68604865644));
-        CHECK(velocities[5] == Vector3D(1.14438145745, 4.42784814304, 1.75516442452));
-        CHECK(velocities[42] == Vector3D(4.70147770939, 2.13317266836, 1.29333445263));
+        CHECK(approx_eq(velocities[0], {1.02255489961, 2.92322463726, 4.88805110017}));
+        CHECK(approx_eq(velocities[1], {0.111646059519, 0.474226666855, 0.68604865644}));
+        CHECK(approx_eq(velocities[5], {1.14438145745, 4.42784814304, 1.75516442452}));
+        CHECK(approx_eq(velocities[42], {4.70147770939, 2.13317266836, 1.29333445263}));
 
         auto& topology = frame.topology();
         CHECK(topology.bonds().size() == 0);
@@ -89,12 +88,12 @@ TEST_CASE("Read files in LAMMPS data format") {
         file = Trajectory("data/lammps-data/triclinic-2.lmp", 'r', "LAMMPS Data");
         cell = file.read().cell();
 
-        CHECK(fabs(cell.a() - 34) < 1e-9);
-        CHECK(fabs(cell.b() - 34.3656805549) < 1e-9);
-        CHECK(fabs(cell.c() - 35.0570962859) < 1e-9);
-        CHECK(fabs(cell.alpha() - 87.0501134427) < 1e-9);
-        CHECK(fabs(cell.beta() - 103.1910720469) < 1e-9);
-        CHECK(fabs(cell.gamma() - 81.634113876) < 1e-9);
+        CHECK(approx_eq(cell.a(), 34, 1e-9));
+        CHECK(approx_eq(cell.b(), 34.3656805549, 1e-9));
+        CHECK(approx_eq(cell.c(), 35.0570962859, 1e-9));
+        CHECK(approx_eq(cell.alpha(), 87.0501134427, 1e-9));
+        CHECK(approx_eq(cell.beta(), 103.1910720469, 1e-9));
+        CHECK(approx_eq(cell.gamma(), 81.634113876, 1e-9));
         CHECK(cell.shape() == UnitCell::TRICLINIC);
     }
 

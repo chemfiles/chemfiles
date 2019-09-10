@@ -9,78 +9,159 @@ namespace ip = boost::asio::ip;
 #include "chemfiles/parse.hpp"
 #include "chemfiles/Error.hpp"
 
+static bool relative_eq(double a, double b) {
+    return fabs((b - a) / a) < 1e-14;
+}
+
 TEST_CASE("String parsing") {
     SECTION("Double") {
         CHECK(chemfiles::parse<double>("12.5") == 12.5);
-        CHECK(chemfiles::parse<double>("125") == 125);
-        CHECK(chemfiles::parse<double>("-32") == -32);
+        CHECK(chemfiles::parse<double>("-32") == -32.0);
+
+        CHECK(chemfiles::parse<double>(".1") == .1);
+        CHECK(chemfiles::parse<double>(".1e2") == .1e2);
+        CHECK(chemfiles::parse<double>("1.2e3") == 1.2e3);
+        CHECK(chemfiles::parse<double>("-1.2e3") == -1.2e3);
+        CHECK(chemfiles::parse<double>("+1.2e3") == +1.2e3);
+        CHECK(chemfiles::parse<double>("-1.2e0") == -1.2e0);
+        CHECK(chemfiles::parse<double>(".1e0") == .1e0);
+        CHECK(chemfiles::parse<double>(".1e3") == .1e3);
+        CHECK(chemfiles::parse<double>(".1e-3") == .1e-3);
+        CHECK(chemfiles::parse<double>("1.768e00000000000000") == 1.768e0);
+        CHECK(chemfiles::parse<double>("1.3e0") == 1.3e0);
+        CHECK(chemfiles::parse<double>("3.") == 3.);
+        CHECK(chemfiles::parse<double>("3.e2") == 3.e2);
+
+        CHECK(chemfiles::parse<double>("    \t2.3") == 2.3);
+        CHECK(chemfiles::parse<double>("2.3\n  ") == 2.3);
+        CHECK(chemfiles::parse<double>("    2.3  \n") == 2.3);
+
+        CHECK(chemfiles::parse<double>("0.0") == 0.0);
+        CHECK(chemfiles::parse<double>("0") == 0.0);
+        CHECK(chemfiles::parse<double>("+0.0") == 0.0);
+        CHECK(chemfiles::parse<double>("-0.0") == 0.0);
+
+        // Some float are not parsed exactly, but up to a 1e-14 RELATIVE error
+        // which is good enough for our purposes
+        CHECK(relative_eq(chemfiles::parse<double>("1.97576e0"), 1.97576e0));
+        CHECK(relative_eq(chemfiles::parse<double>("2.27e-308"), 2.27e-308));
+        CHECK(relative_eq(chemfiles::parse<double>("1.15507e-173"), 1.15507e-173));
+        CHECK(relative_eq(
+            chemfiles::parse<double>("0.000000000000000000000000000000000000783475"),
+            0.000000000000000000000000000000000000783475
+        ));
 
         CHECK_THROWS_WITH(
             chemfiles::parse<double>(""),
-            "can not convert '' to a double"
-        );
-        CHECK_THROWS_WITH(
-            chemfiles::parse<double>("foo"),
-            "can not convert 'foo' to a double"
-        );
-        CHECK_THROWS_WITH(
-            chemfiles::parse<double>("1,2"),
-            "can not convert '1,2' to a double"
+            "can not parse a double from an empty string"
         );
         CHECK_THROWS_WITH(
             chemfiles::parse<double>("3e456782"),
             "3e456782 is out of range for double"
         );
+        CHECK_THROWS_WITH(
+            chemfiles::parse<double>("3.e"),
+            "missing exponent in '3.e'"
+        );
+        CHECK_THROWS_WITH(
+            chemfiles::parse<double>(".e1"),
+            "can not parse '.e1' as a double"
+        );
+        CHECK_THROWS_WITH(
+            chemfiles::parse<double>("."),
+            "can not parse '.' as a double"
+        );
+
+        auto BAD = {
+            "nan", "NaN", "nan(0xfff)",
+            "inf", "-inf", "INF", "infinity",
+            "1,2", "foo", "2.3foo", "2.3 bar",
+        };
+        for (auto bad: BAD) {
+            CHECK_THROWS_WITH(
+                chemfiles::parse<double>(bad),
+                "can not parse '" + std::string(bad) + "' as a double"
+            );
+        }
     }
 
-    SECTION("long long") {
-        CHECK(chemfiles::parse<long long>("125") == 125);
-        CHECK(chemfiles::parse<long long>("-32") == -32);
+    SECTION("int64_t") {
+        CHECK(chemfiles::parse<int64_t>("125") == 125);
+        CHECK(chemfiles::parse<int64_t>("-32") == -32);
+        CHECK(chemfiles::parse<int64_t>("563940907") == 563940907);
+        CHECK(chemfiles::parse<int64_t>("-125673024611") == -125673024611);
+
+        CHECK(chemfiles::parse<int64_t>("00000000000125") == 125);
+        CHECK(chemfiles::parse<int64_t>("-00000000000032") == -32);
+
+        CHECK(chemfiles::parse<int64_t>("0") == 0);
+        CHECK(chemfiles::parse<int64_t>("-0") == 0);
+
+        CHECK(chemfiles::parse<int64_t>("    \t-23") == -23);
+        CHECK(chemfiles::parse<int64_t>("-23\n  ") == -23);
+        CHECK(chemfiles::parse<int64_t>("    -23  \n") == -23);
+
+        // min/max int64_t value
+        CHECK(chemfiles::parse<int64_t>("9223372036854775807") == std::numeric_limits<int64_t>::max());
+        CHECK(chemfiles::parse<int64_t>("-9223372036854775808") == std::numeric_limits<int64_t>::min());
 
         CHECK_THROWS_WITH(
-            chemfiles::parse<long long>(""),
-            "can not convert '' to a long long integer"
+            chemfiles::parse<int64_t>(""),
+            "can not parse an integer from an empty string"
         );
         CHECK_THROWS_WITH(
-            chemfiles::parse<long long>("foo"),
-            "can not convert 'foo' to a long long integer"
+            chemfiles::parse<int64_t>("9223372036854775808"),
+            "9223372036854775808 is out of range for 64-bit integer"
         );
-        CHECK_THROWS_WITH(
-            chemfiles::parse<long long>("2.5"),
-            "can not convert '2.5' to a long long integer"
-        );
-        CHECK_THROWS_WITH(
-            chemfiles::parse<long long>("9223372036854775808"),
-            "9223372036854775808 is out of range for long long integer"
-        );
+
+        auto BAD = {"foo", "5673bar", "5673  bar", "2.5"};
+        for (auto bad: BAD) {
+            CHECK_THROWS_WITH(
+                chemfiles::parse<int64_t>(bad),
+                "can not parse '" + std::string(bad) + "' as an integer"
+            );
+        }
     }
 
-    SECTION("size_t") {
-        CHECK(chemfiles::parse<size_t>("125") == 125);
+    SECTION("uint64_t") {
+        CHECK(chemfiles::parse<uint64_t>("125") == 125);
+        CHECK(chemfiles::parse<uint64_t>("0") == 0);
+        CHECK(chemfiles::parse<uint64_t>("456720463") == 456720463);
+        CHECK(chemfiles::parse<uint64_t>("0000000000000125") == 125);
+        // max uint64_t value
+        CHECK(chemfiles::parse<uint64_t>("18446744073709551615") == 18446744073709551615ull);
+
+        CHECK(chemfiles::parse<int64_t>("    \t32") == 32);
+        CHECK(chemfiles::parse<int64_t>("32\n  ") == 32);
+        CHECK(chemfiles::parse<int64_t>("    32  \n") == 32);
 
         CHECK_THROWS_WITH(
-            chemfiles::parse<size_t>(""),
-            "can not convert '' to a long long integer"
+            chemfiles::parse<uint64_t>(""),
+            "can not parse an integer from an empty string"
         );
         CHECK_THROWS_WITH(
-            chemfiles::parse<size_t>("-32"),
-            "invalid integer: should be positive, is -32"
+            chemfiles::parse<uint64_t>("18446744073709551616"),
+            "18446744073709551616 is out of range for 64-bit unsigned integer"
         );
-        CHECK_THROWS_WITH(
-            chemfiles::parse<size_t>("foo"),
-            "can not convert 'foo' to a long long integer"
-        );
-        CHECK_THROWS_WITH(
-            chemfiles::parse<size_t>("2.5"),
-            "can not convert '2.5' to a long long integer"
-        );
-        CHECK_THROWS_WITH(
-            chemfiles::parse<size_t>("9223372036854775808"),
-            "9223372036854775808 is out of range for long long integer"
-        );
+
+        auto BAD = {
+            "foo", "5673bar", "5673  bar", "2.5", "-32"
+        };
+        for (auto bad: BAD) {
+            CHECK_THROWS_WITH(
+                chemfiles::parse<uint64_t>(bad),
+                "can not parse '" + std::string(bad) + "' as a positive integer"
+            );
+        }
     }
 
     SECTION("Other integer types") {
+        CHECK(chemfiles::parse<unsigned>("125") == 125);
+        CHECK_THROWS_WITH(
+            chemfiles::parse<unsigned>("-32"),
+            "can not parse '-32' as a positive integer"
+        );
+
         CHECK(chemfiles::parse<uint8_t>("125") == 125);
         CHECK_THROWS_WITH(
             chemfiles::parse<uint8_t>("265"),
@@ -125,6 +206,6 @@ TEST_CASE("scan") {
 
     CHECK_THROWS_WITH(
         chemfiles::scan("4.2 4", i, d),
-        "error while reading '4.2 4': can not convert '4.2' to a long long integer"
+        "error while reading '4.2 4': can not parse '4.2' as an integer"
     );
 }

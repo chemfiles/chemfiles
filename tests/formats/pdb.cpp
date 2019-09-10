@@ -27,7 +27,7 @@ TEST_CASE("Read files in PDB format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(fabs(cell.a() - 15.0) < 1e-5);
+        CHECK(approx_eq(cell.a(), 15.0, 1e-5));
 
         file.read(); // Skip a frame
         frame = file.read();
@@ -55,7 +55,7 @@ TEST_CASE("Read files in PDB format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(fabs(cell.a() - 15.0) < 1e-5);
+        CHECK(approx_eq(cell.a(), 15.0, 1e-5));
     }
 
     SECTION("Read bonds") {

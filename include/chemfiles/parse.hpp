@@ -49,14 +49,6 @@ namespace detail {
         return static_cast<Small>(value);
     }
 
-    template<typename Uint, typename Int>
-    inline Uint convert_signed_unsigned(Int value) {
-        if (value < 0) {
-            throw error("invalid integer: should be positive, is {}", value);
-        }
-        return convert_integer<Uint>(value);
-    }
-
     template<typename T>
     inline typename std::enable_if<std::is_same<T, char>::value || !std::is_integral<T>::value, T>::type
     parse_integer(string_view input) {
@@ -67,20 +59,20 @@ namespace detail {
         );
     }
 
-    // Conversion for all SIGNED integer type, except long long
+    // Conversion for all SIGNED integer type, except char
     template<typename T>
     inline typename std::enable_if<!std::is_same<T, char>::value && std::is_signed<T>::value, T>::type
     parse_integer(string_view input) {
-        auto value = parse<long long>(input);
+        auto value = parse<int64_t>(input);
         return detail::convert_integer<T>(value);
     }
 
-    // Conversion for all UNSIGNED integer type
+    // Conversion for all UNSIGNED integer type, except char
     template<typename T>
     inline typename std::enable_if<!std::is_same<T, char>::value && std::is_unsigned<T>::value, T>::type
     parse_integer(string_view input) {
-        auto value = parse<long long>(input);
-        return detail::convert_signed_unsigned<T>(value);
+        auto value = parse<uint64_t>(input);
+        return detail::convert_integer<T>(value);
     }
 
     /// Iterator over whitespace separated values in a string
@@ -157,26 +149,22 @@ template<> inline std::string parse(string_view input) {
     return input.to_string();
 }
 
-template<> inline double parse(string_view input) {
-    // Create a copy of input, since `std::strtoll` needs the string to be
-    // NULL-terminated
-    auto string = input.to_string();
-    char* end = nullptr;
-    double value = std::strtod(string.c_str(), &end);
-    detail::check_parse_errors(string, end, "double");
-    return value;
-}
+/// Read double value. This only support plain numbers (no
+/// hex or octal notation), with ASCII digits (the system locale is ignored).
+/// This does not support parsing NaN or infinity doubles, since they don't
+/// have much interest in chemfiles;
+/// Number should follow the '(+|-)?(\d+)?(\.\d+)?((e|E)?(+|-)?\d+)' pattern.
+template<> double parse(string_view input);
 
-template<> inline long long parse(string_view input) {
-    // Create a copy of input, since `std::strtoll` needs the string to be
-    // NULL-terminated
-    auto string = input.to_string();
-    char* end = nullptr;
-    // same comment as parse<double>
-    long long int value = std::strtoll(string.c_str(), &end, 10);
-    detail::check_parse_errors(string, end, "long long integer");
-    return value;
-}
+/// Read signed integer as a 64-bit value. This only support plain numbers (no
+/// hex or octal notation), with ASCII digits (the system locale is ignored).
+/// Number should follow the '(+|-)?\d+' pattern.
+template<> int64_t parse(string_view input);
+
+/// Read unsigned integer as a 64-bit value. This only support plain numbers (no
+/// hex or octal notation), with ASCII digits (the system locale is ignored).
+/// Number should follow the '+?\d+' pattern.
+template<> uint64_t parse(string_view input);
 
 template<typename ...Args>
 inline size_t scan(string_view input, Args& ...args) {
