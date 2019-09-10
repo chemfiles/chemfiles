@@ -31,8 +31,8 @@ TEST_CASE("Read files in XYZ format") {
         CHECK(frame.size() == 125);
         // Check positions
         auto positions = frame.positions();
-        CHECK(positions[0] == Vector3D(0.49053, 8.41351, 0.0777257));
-        CHECK(positions[124] == Vector3D(8.57951, 8.65712, 8.06678));
+        CHECK(approx_eq(positions[0], {0.49053, 8.41351, 0.0777257}, 1e-12));
+        CHECK(approx_eq(positions[124], {8.57951, 8.65712, 8.06678}, 1e-12));
         // Check topology
         auto topology = frame.topology();
         CHECK(topology.size() == 125);
@@ -45,8 +45,8 @@ TEST_CASE("Read files in XYZ format") {
         auto frame = file.read_step(42);
         CHECK(frame.step() == 42);
         auto positions = frame.positions();
-        CHECK(positions[0] == Vector3D(-0.145821, 8.540648, 1.090281));
-        CHECK(positions[124] == Vector3D(8.446093, 8.168162, 9.350953));
+        CHECK(approx_eq(positions[0], {-0.145821, 8.540648, 1.090281}, 1e-12));
+        CHECK(approx_eq(positions[124], {8.446093, 8.168162, 9.350953}, 1e-12));
         auto topology = frame.topology();
         CHECK(topology.size() == 125);
         CHECK(topology[0] == Atom("He"));
@@ -54,8 +54,8 @@ TEST_CASE("Read files in XYZ format") {
         frame = file.read_step(0);
         CHECK(frame.step() == 0);
         positions = frame.positions();
-        CHECK(positions[0] == Vector3D(0.49053, 8.41351, 0.0777257));
-        CHECK(positions[124] == Vector3D(8.57951, 8.65712, 8.06678));
+        CHECK(approx_eq(positions[0], {0.49053, 8.41351, 0.0777257}, 1e-12));
+        CHECK(approx_eq(positions[124], {8.57951, 8.65712, 8.06678}, 1e-12));
     }
 
     SECTION("Read the whole file") {
@@ -67,8 +67,8 @@ TEST_CASE("Read files in XYZ format") {
             frame = file.read();
         }
         auto positions = frame.positions();
-        CHECK(positions[0] == Vector3D(-1.186037, 11.439334, 0.529939));
-        CHECK(positions[124] == Vector3D(5.208778, 12.707273, 10.940157));
+        CHECK(approx_eq(positions[0], {-1.186037, 11.439334, 0.529939}, 1e-12));
+        CHECK(approx_eq(positions[124], {5.208778, 12.707273, 10.940157}, 1e-12));
     }
 
     SECTION("Read various files formatting") {
@@ -76,7 +76,7 @@ TEST_CASE("Read files in XYZ format") {
 
         auto frame = file.read();
         auto positions = frame.positions();
-        CHECK(positions[10] == Vector3D(0.8336, 0.3006, 0.4968));
+        CHECK(approx_eq(positions[10], {0.8336, 0.3006, 0.4968}, 1e-12));
     }
 }
 

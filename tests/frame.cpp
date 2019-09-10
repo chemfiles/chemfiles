@@ -8,10 +8,6 @@ using namespace chemfiles;
 
 constexpr double PI = 3.141592653589793238463;
 
-static bool roughly(double a, double b) {
-    return fabs(a - b) < 1e-12;
-}
-
 TEST_CASE("Frame size") {
     auto frame = Frame();
     CHECK(frame.size() == 0);
@@ -195,10 +191,10 @@ TEST_CASE("PBC functions") {
         frame.add_atom(Atom(), Vector3D(1, 0, 0));
         frame.add_atom(Atom(), Vector3D(0, 0, 0));
         frame.add_atom(Atom(), Vector3D(0, 1, 0));
-        CHECK(roughly(frame.angle(0, 1, 2), PI / 2.0));
+        CHECK(approx_eq(frame.angle(0, 1, 2), PI / 2.0));
 
         frame.add_atom(Atom(), Vector3D(cos(1.877), sin(1.877), 0));
-        CHECK(roughly(frame.angle(0, 1, 3), 1.877));
+        CHECK(approx_eq(frame.angle(0, 1, 3), 1.877));
     }
 
     SECTION("Dihedrals") {
@@ -208,14 +204,14 @@ TEST_CASE("PBC functions") {
         frame.add_atom(Atom(), Vector3D(1, 1, 0));
         frame.add_atom(Atom(), Vector3D(2, 1, 0));
 
-        CHECK(roughly(frame.dihedral(0, 1, 2, 3), PI));
+        CHECK(approx_eq(frame.dihedral(0, 1, 2, 3), PI, 1e-12));
 
         frame.add_atom(Atom(), Vector3D(1.241, 0.444, 0.349));
         frame.add_atom(Atom(), Vector3D(-0.011, -0.441, 0.333));
         frame.add_atom(Atom(), Vector3D(-1.176, 0.296, -0.332));
         frame.add_atom(Atom(), Vector3D(-1.396, 1.211, 0.219));
 
-        CHECK(roughly(frame.dihedral(4, 5, 6, 7), 1.045378962606));
+        CHECK(approx_eq(frame.dihedral(4, 5, 6, 7), 1.045378962606, 1e-12));
     }
 
     SECTION("Out of plane") {

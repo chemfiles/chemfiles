@@ -14,14 +14,24 @@ ERRORS = 0
 
 PARSING_FUNCTIONS = {
     # Match 'std::<...>',  '::<...>' and '<...>'
+    r"(?P<name>\b(std)?(::)?atof\b)": "parse<double>",
+    r"(?P<name>\b(std)?(::)?atoi\b)": "parse<int>",
+    r"(?P<name>\b(std)?(::)?atol\b)": "parse<long>",
+    r"(?P<name>\b(std)?(::)?atoll\b)": "parse<long long>",
     r"(?P<name>\b(std)?(::)?stof\b)": "parse<double>",
     r"(?P<name>\b(std)?(::)?stod\b)": "parse<double>",
     r"(?P<name>\b(std)?(::)?stold\b)": "parse<double>",
-    r"(?P<name>\b(std)?(::)?stoi\b)": "parse<long long>",
-    r"(?P<name>\b(std)?(::)?stol\b)": "parse<long long>",
+    r"(?P<name>\b(std)?(::)?stoi\b)": "parse<int>",
+    r"(?P<name>\b(std)?(::)?stol\b)": "parse<long>",
     r"(?P<name>\b(std)?(::)?stoll\b)": "parse<long long>",
     r"(?P<name>\b(std)?(::)?stoul\b)": "parse<size_t>",
     r"(?P<name>\b(std)?(::)?stoull\b)": "parse<size_t>",
+    r"(?P<name>\b(std)?(::)?strtol\b)": "parse<long>",
+    r"(?P<name>\b(std)?(::)?strtoul\b)": "parse<size_t>",
+    r"(?P<name>\b(std)?(::)?strtoull\b)": "parse<size_t>",
+    r"(?P<name>\b(std)?(::)?strtof\b)": "parse<double>",
+    r"(?P<name>\b(std)?(::)?strtod\b)": "parse<double>",
+    r"(?P<name>\b(std)?(::)?strtold\b)": "parse<double>",
     r"(?P<name>\b(std)?(::)?sscanf\b)": "scan",
 }
 
