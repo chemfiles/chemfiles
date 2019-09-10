@@ -24,7 +24,7 @@ class XTCFormat final : public Format {
     /// Reference to the associated file
     XTCFile xtc_;
     /// The next step to read
-    int64_t step_ = 0;
+    size_t step_ = 0;
 };
 
 template <> FormatInfo format_information<XTCFormat>();

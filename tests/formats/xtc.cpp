@@ -11,7 +11,7 @@ TEST_CASE("Read files in XTC format") {
         auto file = Trajectory("data/xtc/ubiquitin.xtc");
         auto frame = file.read();
 
-        CHECK(frame.get("md_step")->as_double() == 0);
+        CHECK(frame.step() == 0);
         CHECK(approx_eq(frame.get("time")->as_double(), 0));
         CHECK(frame.get("xtc_precision")->as_double() == 1000);
         CHECK(frame.size() == 20455);
@@ -29,7 +29,7 @@ TEST_CASE("Read files in XTC format") {
         file.read(); // Skip a frame
         frame = file.read();
 
-        CHECK(frame.get("md_step")->as_double() == 200);
+        CHECK(frame.step() == 200);
         CHECK(approx_eq(frame.get("time")->as_double(), 0.4, 1e-4));
         CHECK(frame.get("xtc_precision")->as_double() == 1000);
         CHECK(frame.size() == 20455);
@@ -46,7 +46,7 @@ TEST_CASE("Read files in XTC format") {
 
         frame = file.read_step(230); // skip forward
 
-        CHECK(frame.get("md_step")->as_double() == 23000);
+        CHECK(frame.step() == 23000);
         CHECK(approx_eq(frame.get("time")->as_double(), 46.0));
         CHECK(frame.get("xtc_precision")->as_double() == 1000);
         CHECK(frame.size() == 20455);
@@ -63,7 +63,7 @@ TEST_CASE("Read files in XTC format") {
 
         frame = file.read_step(50); // skip behind previous step
 
-        CHECK(frame.get("md_step")->as_double() == 5000);
+        CHECK(frame.step() == 5000);
         CHECK(approx_eq(frame.get("time")->as_double(), 10.0));
         CHECK(frame.get("xtc_precision")->as_double() == 1000);
         CHECK(frame.size() == 20455);
