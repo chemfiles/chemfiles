@@ -33,11 +33,6 @@ type = "string"
 
 CML = "The text of the ``title`` attribute in a molecule node. Only set if the attribute is present."
 
-[md_step]
-type = "number"
-
-XTC = "Actual step of the molecular dynamics simulation."
-
 [time]
 type = "number"
 
