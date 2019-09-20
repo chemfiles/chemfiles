@@ -149,13 +149,15 @@ else()
     # C++11 functionalities
     add_warning_flag("-Wsuggest-override")
     add_warning_flag("-Wsuggest-final-types")
-    # C++ standard conformance
+    add_warning_flag("-Wsuggest-final-methods")
+    # C and C++ standard conformance
     add_warning_flag("-Wpedantic")
     add_warning_flag("-pedantic")
     # The compiler is your friend
     add_warning_flag("-Wdocumentation")
     add_warning_flag("-Wdeprecated")
     add_warning_flag("-Wextra-semi")
+    add_warning_flag("-Wextra-semi-stmt")
     add_warning_flag("-Wnon-virtual-dtor")
     add_warning_flag("-Wold-style-cast")
     add_warning_flag("-Wcast-align")
@@ -164,14 +166,31 @@ else()
     add_warning_flag("-Wundefined-func-template")
     add_warning_flag("-Wmissing-prototypes")
     add_warning_flag("-Wmissing-variable-declarations")
+    add_warning_flag("-Waggressive-loop-optimizations")
+    add_warning_flag("-Wc99-c11-compat")
+    add_warning_flag("-Wc++-compat")
+    add_warning_flag("-Wduplicated-branches")
+    add_warning_flag("-Wduplicated-cond")
+    add_warning_flag("-Wjump-misses-init")
+    add_warning_flag("-Wlogical-op")
+    add_warning_flag("-Wundef")
+    add_warning_flag("-Wuseless-cast")
+    add_warning_flag("-Wmissing-prototypes")
+    add_warning_flag("-Wmissing-declarations")
+    add_warning_flag("-Wmultiple-inheritance")
+    add_warning_flag("-Wconditionally-supported")
+    add_warning_flag("-Wzero-as-null-pointer-constant")
+    add_warning_flag("-Winconsistent-missing-destructor-override")
 
-    # Disable some strong warning that are OK here
-    add_warning_flag("-Wno-unknown-pragmas")
-    add_warning_flag("-Wno-overlength-strings")
+    add_warning_flag("-Wsuggest-attribute=pure")
+    add_warning_flag("-Wsuggest-attribute=const")
+    add_warning_flag("-Wsuggest-attribute=noreturn")
 
+    # This list was last updated with GCC 8 warnings
+    # see https://github.com/barro/compiler-warnings for a list of all warnings
+
+    add_warning_flag("-Weverything")
     # Disable some warning implied by -Weverything
-    # -Weverything is not activated by default, but adding these flags help
-    # when adding it manually to check for new warnings
     add_warning_flag("-Wno-c++98-compat")
     add_warning_flag("-Wno-c++98-compat-pedantic")
     add_warning_flag("-Wno-weak-vtables")
