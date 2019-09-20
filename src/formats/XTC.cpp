@@ -42,9 +42,9 @@ void XTCFormat::read(Frame& frame) {
     CHECK(read_xtc(xtc_, natoms, &md_step, &time, box, reinterpret_cast<float(*)[3]>(x.data()),
                    &precision));
 
-    frame.set_step(static_cast<size_t>(md_step));   // actual step of MD Simulation
-    frame.set("time", time);                        // time in pico seconds
-    frame.set("xtc_precision", precision);
+    frame.set_step(static_cast<size_t>(md_step));  // actual step of MD Simulation
+    frame.set("time", static_cast<double>(time));  // time in pico seconds
+    frame.set("xtc_precision", static_cast<double>(precision));
     frame.resize(static_cast<size_t>(natoms));
 
     set_positions(x, frame);

@@ -50,8 +50,8 @@ void TRRFormat::read(Frame& frame) {
     bool has_positions = bool(has_prop & TRR_HAS_POSITIONS);
     bool has_velocities = bool(has_prop & TRR_HAS_VELOCITIES);
 
-    frame.set_step(static_cast<size_t>(md_step));   // actual step of MD Simulation
-    frame.set("time", time);                        // time in pico seconds
+    frame.set_step(static_cast<size_t>(md_step));  // actual step of MD Simulation
+    frame.set("time", static_cast<double>(time));  // time in pico seconds
     frame.set("has_positions", false);
     frame.resize(static_cast<size_t>(natoms));
 
