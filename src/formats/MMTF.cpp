@@ -29,8 +29,6 @@
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/external/optional.hpp"
 
-#include "chemfiles/files/GzFile.hpp"
-#include "chemfiles/files/XzFile.hpp"
 #include "chemfiles/formats/MMTF.hpp"
 
 using namespace chemfiles;
@@ -43,21 +41,9 @@ template<> FormatInfo chemfiles::format_information<MMTFFormat>() {
 
 MMTFFormat::MMTFFormat(std::string path, File::Mode mode, File::Compression compression) {
     if (mode == File::READ) {
-        if (compression == File::GZIP) {
-            gzstreambuf gz_buff;
-            gz_buff.open(path, "rb");
-            std::stringstream buffer;
-            buffer << &gz_buff;
-            mmtf::decodeFromBuffer(structure_, buffer.str().data(), buffer.str().size());
-        } else if (compression == File::LZMA) {
-            xzstreambuf xz_buff;
-            xz_buff.open(path, "rb");
-            std::stringstream buffer;
-            buffer << &xz_buff;
-            mmtf::decodeFromBuffer(structure_, buffer.str().data(), buffer.str().size());
-        } else { // Just in case the user specified MMTF without a proper extension
-            mmtf::decodeFromFile(structure_, path);
-        }
+        auto file = TextFile(std::move(path), mode, compression);
+        auto buffer = file.readall();
+        mmtf::decodeFromBuffer(structure_, buffer.data(), buffer.size());
         if (!structure_.hasConsistentData()) {
             throw format_error("issue with: '{}', please ensure it is valid MMTF file", path);
         }

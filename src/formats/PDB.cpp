@@ -79,33 +79,38 @@ enum class Record {
 };
 
 // Get the record type for a line.
-static Record get_record(const std::string& line);
+static Record get_record(string_view line);
 
 void PDBFormat::read_next(Frame& frame) {
     frame.resize(0);
     residues_.clear();
     atom_offsets_.clear();
 
-    std::streampos position;
+    int64_t position;
     bool got_end = false;
-    while (!got_end && !file_->eof()) {
-        auto line = file_->readline();
+    while (!got_end && !file_.eof()) {
+        auto line = file_.readline();
         auto record = get_record(line);
-        std::string tmp;
+        std::string name;
         switch (record) {
         case Record::HEADER:
-            if (line.size() < 66) {continue;}
-            tmp = line.substr(10, 40);
-            frame.set("classification", trim(tmp).to_string());
-            tmp = line.substr(50, 9);
-            frame.set("deposition_date", trim(tmp).to_string());
-            tmp = line.substr(62, 4);
-            frame.set("pdb_idcode", trim(tmp).to_string());
+            if (line.size() >= 50) {
+                frame.set("classification", trim(line.substr(10, 40)).to_string());
+            }
+            if (line.size() >= 59) {
+                frame.set("deposition_date", trim(line.substr(50, 9)).to_string());
+            }
+            if (line.size() >= 66) {
+                frame.set("pdb_idcode", trim(line.substr(62, 4)).to_string());
+            }
             continue;
         case Record::TITLE:
             if (line.size() < 11) {continue;}
-            tmp = frame.get<Property::STRING>("name").value_or("") + line.substr(10, 70);
-            frame.set("name", trim(tmp).to_string());
+            // get previous frame name (from a previous TITLE record) and
+            // append to it
+            name = frame.get<Property::STRING>("name").value_or("");
+            name = name.empty() ? "" : name + " ";
+            frame.set("name", name + trim(line.substr(10 , 70)));
             continue;
         case Record::CRYST1:
             read_CRYST1(frame, line);
@@ -124,10 +129,10 @@ void PDBFormat::read_next(Frame& frame) {
             continue;
         case Record::ENDMDL:
             // Check if the next record is an `END` record
-            if (!file_->eof()) {
-                position = file_->tellpos();
-                line = file_->readline();
-                file_->seekpos(position);
+            if (!file_.eof()) {
+                position = file_.tellpos();
+                line = file_.readline();
+                file_.seekpos(position);
                 if (get_record(line) == Record::END) {
                     // If this is the case, wait for this next record
                     continue;
@@ -162,7 +167,7 @@ void PDBFormat::read_next(Frame& frame) {
         case Record::IGNORED_:
             continue; // Nothing to do
         case Record::UNKNOWN_:
-            if (!file_->eof()) {
+            if (!file_.eof()) {
                 warning("PDB reader", "ignoring unknown record: {}", line);
             }
             continue;
@@ -177,7 +182,7 @@ void PDBFormat::read_next(Frame& frame) {
     link_standard_residue_bonds(frame);
 }
 
-void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
+void PDBFormat::read_CRYST1(Frame& frame, string_view line) {
     assert(line.substr(0, 6) == "CRYST1");
     if (line.length() < 54) {
         throw format_error("CRYST1 record '{}' is too small", line);
@@ -197,15 +202,14 @@ void PDBFormat::read_CRYST1(Frame& frame, const std::string& line) {
     }
 
     if (line.length() >= 55) {
-        auto tmp = line.substr(55, 10);
-        auto space_group = trim(tmp);
+        auto space_group = trim(line.substr(55, 10));
         if (space_group != "P 1" && space_group != "P1") {
             warning("PDB reader", "ignoring custom space group ({}), using P1 instead", space_group);
         }
     }
 }
 
-void PDBFormat::read_HELIX(const std::string& line) {
+void PDBFormat::read_HELIX(string_view line) {
     if (line.length() < 33 + 5) {
         warning("PDB reader", "HELIX record too short: '{}'", line);
         return;
@@ -269,9 +273,7 @@ void PDBFormat::read_HELIX(const std::string& line) {
     }
 }
 
-void PDBFormat::read_secondary(const std::string& line, size_t i1, size_t i2,
-                               const std::string& record) {
-
+void PDBFormat::read_secondary(string_view line, size_t i1, size_t i2, string_view record) {
     if (line.length() < i2 + 6) {
         warning("PDB reader", "secondary structure record too short: '{}'", line);
         return;
@@ -307,7 +309,7 @@ void PDBFormat::read_secondary(const std::string& line, size_t i1, size_t i2,
     secinfo_.emplace_back(std::make_tuple(start, end, "extended"));
 }
 
-void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
+void PDBFormat::read_ATOM(Frame& frame, string_view line,
     bool is_hetatm) {
     assert(line.substr(0, 6) == "ATOM  " || line.substr(0, 6) == "HETATM");
 
@@ -346,7 +348,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
 
     auto altloc = line.substr(16, 1);
     if (altloc != " ") {
-        atom.set("altloc", altloc);
+        atom.set("altloc", altloc.to_string());
     }
 
     try {
@@ -366,21 +368,21 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
         auto chain = line[21];
         auto complete_residue_id = std::make_tuple(chain,resid,insertion_code);
         if (residues_.find(complete_residue_id) == residues_.end()) {
-            auto tmp = line.substr(17, 3);
-            auto resname = trim(tmp);
+            auto resname = trim(line.substr(17, 3));
             Residue residue(resname.to_string(), resid);
             residue.add_atom(atom_id);
 
             if (insertion_code != ' ') {
-                residue.set("insertion_code", line.substr(26, 1));
+                residue.set("insertion_code", line.substr(26, 1).to_string());
             }
 
             // Set whether or not the residue is standardized
             residue.set("is_standard_pdb", !is_hetatm);
-            // This will be save as a string... on purpose to match MMTF
-            residue.set("chainid", line.substr(21, 1));
+            // This is saved as a string (instead of a number) on purpose
+            // to match MMTF format
+            residue.set("chainid", line.substr(21, 1).to_string());
             // PDB format makes no distinction between chainid and chainname
-            residue.set("chainname", line.substr(21, 1));
+            residue.set("chainname", line.substr(21, 1).to_string());
             residues_.insert({complete_residue_id, residue});
         } else {
             // Just add this atom to the residue
@@ -391,7 +393,7 @@ void PDBFormat::read_ATOM(Frame& frame, const std::string& line,
     }
 }
 
-void PDBFormat::read_CONECT(Frame& frame, const std::string& line) {
+void PDBFormat::read_CONECT(Frame& frame, string_view line) {
     assert(line.substr(0, 6) == "CONECT");
     auto line_length = trim(line).length();
 
@@ -566,7 +568,7 @@ void PDBFormat::link_standard_residue_bonds(Frame& frame) {
     }
 }
 
-Record get_record(const std::string& line) {
+Record get_record(string_view line) {
     auto rec = line.substr(0, 6);
     if(rec == "ENDMDL") {
         return Record::ENDMDL;
@@ -631,11 +633,11 @@ static std::string to_pdb_index(uint64_t i) {
 
 void PDBFormat::write_next(const Frame& frame) {
     written_ = true;
-    file_->print("MODEL {:>4}\n", models_ + 1);
+    file_.print("MODEL {:>4}\n", models_ + 1);
 
     auto& cell = frame.cell();
     check_values_size(Vector3D(cell.a(), cell.b(), cell.c()), 9, "cell lengths");
-    file_->print(
+    file_.print(
         // Do not try to guess the space group and the z value, just use the
         // default one.
         "CRYST1{:9.3f}{:9.3f}{:9.3f}{:7.2f}{:7.2f}{:7.2f} P 1           1\n",
@@ -732,7 +734,7 @@ void PDBFormat::write_next(const Frame& frame) {
         auto& pos = positions[i];
         check_values_size(pos, 8, "atomic position");
 
-        file_->print(
+        file_.print(
             "{: <6}{: >5} {: <4s}{:1}{:3} {:1}{: >4s}{:1}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
             atom_hetatm, to_pdb_index(i), frame[i].name(), altloc, resname, chainid, resid, inscode, pos[0], pos[1], pos[2], 1.0, 0.0, frame[i].type()
         );
@@ -754,16 +756,16 @@ void PDBFormat::write_next(const Frame& frame) {
         if (connections == 0) {continue;}
 
         for (size_t conect_line = 0; conect_line < lines; conect_line++) {
-            file_->print("CONECT{: >5}", to_pdb_index(i));
+            file_.print("CONECT{: >5}", to_pdb_index(i));
             auto last = std::min(connections, 4 * (conect_line + 1));
             for (size_t j = 4 * conect_line; j < last; j++) {
-                file_->print("{: >5}", to_pdb_index(connect[i][j]));
+                file_.print("{: >5}", to_pdb_index(connect[i][j]));
             }
-            file_->print("\n");
+            file_.print("\n");
         }
     }
 
-    file_->print("ENDMDL\n");
+    file_.print("ENDMDL\n");
 
     models_++;
 }
@@ -781,42 +783,37 @@ void check_values_size(const Vector3D& values, unsigned width, const std::string
 
 PDBFormat::~PDBFormat() {
     if (written_) {
-      file_->print("END\n");
+      file_.print("END\n");
     }
 }
 
-std::streampos PDBFormat::forward() {
-    if (file_->fail()) {
-        return std::streampos(-1);
-    }
+int64_t PDBFormat::forward() {
+    auto position = file_.tellpos();
 
-    auto position = file_->tellpos();
-    while (true) {
-        try {
-            auto line = file_->readline();
+    while (!file_.eof()) {
+        auto line = file_.readline();
 
-            if (line.substr(0, 6) == "ENDMDL") {
-                auto save = file_->tellpos();
-                auto next = file_->readline();
-                file_->seekpos(save);
-                if (next.substr(0, 3) == "END") {
-                    // We found another record starting by END in the next line,
-                    // we skip this one and wait for the next one
-                    continue;
-                }
-            }
+        if (line.substr(0, 6) == "ENDMDL") {
+            auto save = file_.tellpos();
+            auto next = file_.readline();
+            file_.seekpos(save);
 
-            if (line.substr(0, 3) == "END") {
-                return position;
-            }
-
-        } catch (const FileError&) {
-            // Handle missing END record
-            if (position == std::streampos(0)) {
-                return position;
-            } else {
-                return std::streampos(-1);
+            if (next.substr(0, 3) == "END") {
+                // We found another record starting by END in the next line,
+                // we skip this one and wait for the next one
+                continue;
             }
         }
+
+        if (line.substr(0, 3) == "END") {
+            return position;
+        }
+    }
+
+    // Handle missing END record in the file
+    if (position == 0) {
+        return position;
+    } else {
+        return -1;
     }
 }

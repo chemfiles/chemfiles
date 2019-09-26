@@ -40,33 +40,30 @@ void Format::write(const Frame& /*unused*/) {
 
 
 TextFormat::TextFormat(std::string path, File::Mode mode, File::Compression compression):
-    file_(TextFile::open(std::move(path), mode, compression)) {}
+    file_(std::move(path), mode, compression) {}
 
 void TextFormat::scan_all() {
     if (eof_found_) {
         return;
     }
 
-    auto before = file_->tellpos();
-    while (!file_->eof()) {
+    auto before = file_.tellpos();
+    while (!file_.eof()) {
         auto position = forward();
-        if (position == std::streampos(-1)) {
+        if (position == -1) {
             break;
-        }
-        if (!file_) {
-            throw format_error("IO error while reading '{}'", file_->path());
         }
         steps_positions_.push_back(position);
     }
 
     eof_found_ = true;
     // reset failbit in the file
-    file_->clear();
+    file_.clear();
 
-    if (before == std::streampos(0) && !steps_positions_.empty()) {
-        file_->seekpos(steps_positions_[0]);
+    if (before == 0 && !steps_positions_.empty()) {
+        file_.seekpos(steps_positions_[0]);
     } else {
-        file_->seekpos(before);
+        file_.seekpos(before);
     }
 }
 
@@ -82,30 +79,27 @@ void TextFormat::read_step(size_t step, Frame& frame) {
         if (steps_positions_.size() == 0) {
             throw file_error(
                 "can not read file '{}' at step {}, it does not contain any step",
-                file_->path(), step
+                file_.path(), step
             );
         } else {
             throw file_error(
                 "can not read file '{}' at step {}: maximal step is {}",
-                file_->path(), step, steps_positions_.size() - 1
+                file_.path(), step, steps_positions_.size() - 1
             );
         }
     }
 
-    file_->seekpos(steps_positions_[step]);
+    file_.seekpos(steps_positions_[step]);
     read_next(frame);
 }
 
 void TextFormat::read(Frame& frame) {
-    auto position = file_->tellpos();
     read_next(frame);
-    // If no exception was thrown, we can add this step to the list
-    steps_positions_.push_back(position);
 }
 
 void TextFormat::write(const Frame& frame) {
     write_next(frame);
-    steps_positions_.push_back(file_->tellpos());
+    steps_positions_.push_back(file_.tellpos());
 }
 
 size_t TextFormat::nsteps() {

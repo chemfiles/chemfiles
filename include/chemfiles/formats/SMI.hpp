@@ -33,7 +33,7 @@ public:
 
     void read_next(Frame& frame) override;
     void write_next(const Frame& frame) override;
-    std::streampos forward() override;
+    int64_t forward() override;
 
 private:
     /// [for reading] adds an atom defined by `atom_name` to the topology

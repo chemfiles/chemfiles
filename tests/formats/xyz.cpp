@@ -24,7 +24,6 @@ TEST_CASE("Read files in XYZ format") {
         CHECK(file.nsteps() == 1);
     }
 
-
     SECTION("Read next step") {
         auto file = Trajectory("data/xyz/helium.xyz");
         auto frame = file.read();
