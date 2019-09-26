@@ -40,17 +40,17 @@ template<> FormatInfo chemfiles::format_information<MOL2Format>() {
 }
 
 /// Fast-forward the file until the tag is found.
-static std::streampos read_until(TextFile& file, const std::string& tag);
+static int64_t read_until(TextFile& file, string_view tag);
 
 void MOL2Format::read_next(Frame& frame) {
-    auto line = file_->readline();
+    auto line = file_.readline();
     if (trim(line) != "@<TRIPOS>MOLECULE") {
         throw format_error("wrong starting line for a molecule in MOL2 formart: '{}'", line);
     }
 
-    line = file_->readline();
+    line = file_.readline();
     frame.set("name", trim(line).to_string());
-    line = file_->readline();
+    line = file_.readline();
 
     const auto counts = split(line, ' ');
 
@@ -65,16 +65,16 @@ void MOL2Format::read_next(Frame& frame) {
     frame.resize(0);
     frame.reserve(natoms);
 
-    file_->skipline();
+    file_.readline();
 
     // If charges are specified, we need to expect an addition term for each atom
-    line = file_->readline();
+    line = file_.readline();
     bool charges = (trim(line) != "NO_CHARGES");
 
-    while (!file_->eof()) {
-        const auto& curr_pos = file_->tellpos();
+    while (!file_.eof()) {
+        const auto& curr_pos = file_.tellpos();
 
-        line = file_->readline();
+        line = file_.readline();
         auto trimed = trim(line);
 
         if (trimed == "@<TRIPOS>ATOM") {
@@ -82,14 +82,14 @@ void MOL2Format::read_next(Frame& frame) {
         } else if (trimed == "@<TRIPOS>BOND") {
             read_bonds(frame, nbonds);
         } else if (trimed == "@<TRIPOS>CRYSIN") {
-            auto cryst = file_->readline();
+            auto cryst = file_.readline();
 
             double a, b, c, alpha, beta, gamma;
             scan(cryst, a, b, c, alpha, beta, gamma);
 
             frame.set_cell(UnitCell(a, b, c, alpha, beta, gamma));
         } else if (trimed == "@<TRIPOS>MOLECULE") {
-            file_->seekpos(curr_pos);
+            file_.seekpos(curr_pos);
             break;
         }
     }
@@ -101,9 +101,9 @@ void MOL2Format::read_next(Frame& frame) {
 }
 
 void MOL2Format::read_atoms(Frame& frame, size_t natoms, bool charges) {
-    auto lines = file_->readlines(natoms);
+    for (size_t i=0; i<natoms; i++) {
+        auto line = file_.readline();
 
-    for (const auto& line : lines) {
         unsigned long id, resid;
         std::string atom_name, sybyl_type, resname;
         double x, y, z;
@@ -158,17 +158,16 @@ void MOL2Format::read_atoms(Frame& frame, size_t natoms, bool charges) {
 }
 
 void MOL2Format::read_bonds(Frame& frame, size_t nbonds) {
-    auto lines = file_->readlines(nbonds);
+    for (size_t i=0; i<nbonds; i++) {
+        auto line = file_.readline();
 
-    for (const auto& line : lines) {
         unsigned long id, id_1, id_2;
         std::string bond_order;
-
         scan(line, id, id_1, id_2, bond_order);
 
         // MOL2 is 1 index-based, not 0
-        --id_1;
-        --id_2;
+        id_1 -= 1;
+        id_2 -= 1;
 
         if (id_1 >= frame.size() || id_2 >= frame.size()) {
             throw format_error("found a bond ({}--{}) between atoms at indexes larger than number of atoms '{}' in the frame",
@@ -197,9 +196,9 @@ void MOL2Format::read_bonds(Frame& frame, size_t nbonds) {
     }
 }
 
-std::streampos read_until(TextFile& file, const std::string& tag) {
+int64_t read_until(TextFile& file, string_view tag) {
     while (!file.eof()) {
-        std::streampos pos = file.tellpos();
+        auto pos = file.tellpos();
         if (file.readline().substr(0, tag.length()) == tag) {
             return pos;
         }
@@ -208,15 +207,12 @@ std::streampos read_until(TextFile& file, const std::string& tag) {
     throw file_error("file ended before tag '{}' was found", tag);
 }
 
-std::streampos MOL2Format::forward() {
-    if (file_->fail()) {
-        return std::streampos(-1);
-    }
-    while (!file_->eof()) {
+int64_t MOL2Format::forward() {
+    while (!file_.eof()) {
         try {
-            auto position = read_until(*file_, "@<TRIPOS>MOLECULE");
-            file_->skipline();
-            auto line = file_->readline();
+            auto position = read_until(file_, "@<TRIPOS>MOLECULE");
+            file_.readline();
+            auto line = file_.readline();
 
             const auto counts = split(line, ' ');
             auto natoms = parse<size_t>(counts[0]);
@@ -225,24 +221,28 @@ std::streampos MOL2Format::forward() {
                 nbonds = parse<size_t>(counts[1]);
             }
 
-            read_until(*file_, "@<TRIPOS>ATOM");
-            file_->skiplines(natoms);
+            read_until(file_, "@<TRIPOS>ATOM");
+            for (size_t i=0; i<natoms; i++) {
+                file_.readline();
+            }
 
-            read_until(*file_, "@<TRIPOS>BOND");
-            file_->skiplines(nbonds);
+            read_until(file_, "@<TRIPOS>BOND");
+            for (size_t i=0; i<nbonds; i++) {
+                file_.readline();
+            }
 
             return position;
         } catch (const Error&) {
-            return std::streampos(-1);
+            return -1;
         }
     }
 
-    return std::streampos(-1);
+    return -1;
 }
 
 void MOL2Format::write_next(const Frame& frame) {
-    file_->print("@<TRIPOS>MOLECULE\n");
-    file_->print("{}\n", frame.get<Property::STRING>("name").value_or(""));
+    file_.print("@<TRIPOS>MOLECULE\n");
+    file_.print("{}\n", frame.get<Property::STRING>("name").value_or(""));
 
     // Start after the maximal residue id for atoms without associated residue
     uint64_t max_resid = 0;
@@ -256,11 +256,11 @@ void MOL2Format::write_next(const Frame& frame) {
     const auto& bonds = frame.topology().bonds();
 
     // Basic format taken from VMD Molfiles
-    file_->print("{:4d}  {:4d}    1    0    0\n",
+    file_.print("{:4d}  {:4d}    1    0    0\n",
         frame.size(), bonds.size()
     );
 
-    file_->print("SMALL\nUSER_CHARGES\n\n@<TRIPOS>ATOM\n");
+    file_.print("SMALL\nUSER_CHARGES\n\n@<TRIPOS>ATOM\n");
 
     auto& positions = frame.positions();
     for (size_t i = 0; i < frame.size(); i++) {
@@ -290,13 +290,13 @@ void MOL2Format::write_next(const Frame& frame) {
             warning("MOL2 writer", "sybyl type is not set, using element type instead");
         }
 
-        file_->print(
+        file_.print(
             "{:4d} {:4s}  {:.6f} {:.6f} {:.6f} {:s} {} {} {:.6f}\n",
             i + 1, frame[i].name(), positions[i][0], positions[i][1], positions[i][2], sybyl, resid, resname, frame[i].charge()
         );
     }
 
-    file_->print("@<TRIPOS>BOND\n");
+    file_.print("@<TRIPOS>BOND\n");
 
     auto& bond_orders = frame.topology().bond_orders();
 
@@ -325,20 +325,20 @@ void MOL2Format::write_next(const Frame& frame) {
                 break;
         }
 
-        file_->print("{:4d}  {:4d}  {:4d}    {}\n",
+        file_.print("{:4d}  {:4d}  {:4d}    {}\n",
             i + 1, bonds[i][0] + 1, bonds[i][1] + 1, bond_order
         );
     }
 
     auto cell = frame.cell();
     if (cell.shape() != UnitCell::INFINITE) {
-        file_->print("@<TRIPOS>CRYSIN\n");
-        file_->print("   {:.4f}   {:.4f}   {:.4f}   {:.4f}   {:.4f}   {:.4f} 1 1\n",
+        file_.print("@<TRIPOS>CRYSIN\n");
+        file_.print("   {:.4f}   {:.4f}   {:.4f}   {:.4f}   {:.4f}   {:.4f} 1 1\n",
             cell.a(), cell.b(), cell.c(), cell.alpha(), cell.beta(), cell.gamma()
         );
     }
 
-    file_->print("@<TRIPOS>SUBSTRUCTURE\n");
-    file_->print("   1 ****        1 TEMP                        ");
-    file_->print("0 ****  **** 0 ROOT\n\n");
+    file_.print("@<TRIPOS>SUBSTRUCTURE\n");
+    file_.print("   1 ****        1 TEMP                        ");
+    file_.print("0 ****  **** 0 ROOT\n\n");
 }

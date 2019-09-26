@@ -44,7 +44,7 @@ template<> FormatInfo chemfiles::format_information<mmCIFFormat>() {
 static double cif_to_double(std::string line);
 
 mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression compression)
-  : file_(TextFile::open(std::move(path), mode, compression)), models_(0), atoms_(0) {
+  : file_(std::move(path), mode, compression), models_(0), atoms_(0) {
 
     if (mode == File::WRITE) {
         return;
@@ -64,8 +64,8 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
     bool in_loop = false;
     size_t current_index = 0;
 
-    while (!file_->eof()) {
-        auto line = file_->readline();
+    while (!file_.eof()) {
+        auto line = file_.readline();
 
         if (line.find("loop_") != std::string::npos) {
             in_loop = true;
@@ -111,8 +111,7 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
         }
 
         if (line_split[0] == "_struct.title") {
-            auto tmp = line.substr(13);
-            auto trimed = trim(tmp);
+            auto trimed = trim(line.substr(13));
             name_ = trimed.size() > 2 ?
                     trimed.substr(1, trimed.size() - 2).to_string() : "";
         }
@@ -131,8 +130,8 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
 
     cell_ = UnitCell(a, b, c, alpha, beta, gamma);
 
-    auto position = file_->tellpos();
-    auto line = file_->readline();
+    auto position = file_.tellpos();
+    auto line = file_.readline();
 
     do {
         if (line.find("_atom_site") != std::string::npos) {
@@ -140,15 +139,15 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
             tolower(atom_label);
             atom_site_map_[atom_label] = current_index++;
 
-            position = file_->tellpos();
-            line = file_->readline();
+            position = file_.tellpos();
+            line = file_.readline();
 
             continue;
         }
 
         // Anything else ends the block
         break;
-    } while (!file_->eof());
+    } while (!file_.eof());
 
     // After this block ends, we have the start of coordinates
     steps_positions_.push_back(position);
@@ -173,7 +172,7 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
     // Do we have a special extension for multiple modes?
     if (model_position == atom_site_map_.end()) {
         // If not, we are done
-        file_->seekpos(steps_positions_[0]);
+        file_.seekpos(steps_positions_[0]);
         return;
     }
 
@@ -181,8 +180,8 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
     auto last_position = parse<size_t>(split(line, ' ')[model_position->second]);
 
     do {
-        position = file_->tellpos();
-        line = file_->readline();
+        position = file_.tellpos();
+        line = file_.readline();
 
         // a break in the text ends the models
         if (line.empty() || line == "line_" || line[0] == '#') {
@@ -196,9 +195,9 @@ mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression co
             steps_positions_.push_back(position);
             last_position = current_position;
         }
-    } while (!file_->eof());
+    } while (!file_.eof());
 
-    file_->seekpos(steps_positions_[0]);
+    file_.seekpos(steps_positions_[0]);
 }
 
 size_t mmCIFFormat::nsteps() {
@@ -207,7 +206,7 @@ size_t mmCIFFormat::nsteps() {
 
 void mmCIFFormat::read_step(const size_t step, Frame& frame) {
     assert(step < steps_positions_.size());
-    file_->seekpos(steps_positions_[step]);
+    file_.seekpos(steps_positions_[step]);
     read(frame);
 }
 
@@ -260,19 +259,19 @@ void mmCIFFormat::read(Frame& frame) {
 
     auto model_position = atom_site_map_.find("pdbx_pdb_model_num");
 
-    auto position = file_->tellpos();
+    auto position = file_.tellpos();
 
     size_t last_position = 0;
     if (model_position != atom_site_map_.end()) {
-        auto line = file_->readline();
+        auto line = file_.readline();
         last_position = parse<size_t>(split(line, ' ')[model_position->second]);
         // Reset file position so that the loop below can start by reading the
         // first line
-        file_->seekpos(position);
+        file_.seekpos(position);
     }
 
-    while (!file_->eof()) {
-        auto line = file_->readline();
+    while (!file_.eof()) {
+        auto line = file_.readline();
         auto line_split = split(line, ' ');
         if (line.empty() || line == "loop_" || line[0] == '#') {
             break;
@@ -320,7 +319,7 @@ void mmCIFFormat::read(Frame& frame) {
             frame.add_atom(std::move(atom), vector);
         }
 
-        position = file_->tellpos();
+        position = file_.tellpos();
 
         if (label_comp_id == atom_site_map_.end() || label_asym_id == atom_site_map_.end()) {
             continue;
@@ -369,7 +368,7 @@ void mmCIFFormat::read(Frame& frame) {
     }
 
     // Reset state to previous line
-    file_->seekpos(position);
+    file_.seekpos(position);
 
     for (const auto& residue: residues_) {
         frame.add_residue(residue.second);
@@ -384,30 +383,30 @@ void mmCIFFormat::read(Frame& frame) {
 
 void mmCIFFormat::write(const Frame& frame) {
     if (models_ == 0) {
-        file_->print("# generated by Chemfiles\n");
-        file_->print("#\n");
-        file_->print("_cell.length_a {}\n", frame.cell().a());
-        file_->print("_cell.length_b {}\n", frame.cell().b());
-        file_->print("_cell.length_c {}\n", frame.cell().c());
-        file_->print("_cell.length_alpha {}\n", frame.cell().alpha());
-        file_->print("_cell.length_beta  {}\n", frame.cell().beta());
-        file_->print("_cell.length_gamma {}\n", frame.cell().gamma());
-        file_->print("#\n");
-        file_->print("loop_\n");
-        file_->print("_atom_site.group_PDB\n");
-        file_->print("_atom_site.id\n");
-        file_->print("_atom_site.type_symbol\n");
-        file_->print("_atom_site.label_atom_id\n");
-        file_->print("_atom_site.label_alt_id\n");
-        file_->print("_atom_site.label_comp_id\n");
-        file_->print("_atom_site.label_asym_id\n");
-        file_->print("_atom_site.label_seq_id\n");
-        file_->print("_atom_site.Cartn_x\n");
-        file_->print("_atom_site.Cartn_y\n");
-        file_->print("_atom_site.Cartn_z\n");
-        file_->print("_atom_site.pdbx_formal_charge\n");
-        file_->print("_atom_site.auth_asym_id\n");
-        file_->print("_atom_site.pdbx_PDB_model_num\n");
+        file_.print("# generated by Chemfiles\n");
+        file_.print("#\n");
+        file_.print("_cell.length_a {}\n", frame.cell().a());
+        file_.print("_cell.length_b {}\n", frame.cell().b());
+        file_.print("_cell.length_c {}\n", frame.cell().c());
+        file_.print("_cell.length_alpha {}\n", frame.cell().alpha());
+        file_.print("_cell.length_beta  {}\n", frame.cell().beta());
+        file_.print("_cell.length_gamma {}\n", frame.cell().gamma());
+        file_.print("#\n");
+        file_.print("loop_\n");
+        file_.print("_atom_site.group_PDB\n");
+        file_.print("_atom_site.id\n");
+        file_.print("_atom_site.type_symbol\n");
+        file_.print("_atom_site.label_atom_id\n");
+        file_.print("_atom_site.label_alt_id\n");
+        file_.print("_atom_site.label_comp_id\n");
+        file_.print("_atom_site.label_asym_id\n");
+        file_.print("_atom_site.label_seq_id\n");
+        file_.print("_atom_site.Cartn_x\n");
+        file_.print("_atom_site.Cartn_y\n");
+        file_.print("_atom_site.Cartn_z\n");
+        file_.print("_atom_site.pdbx_formal_charge\n");
+        file_.print("_atom_site.auth_asym_id\n");
+        file_.print("_atom_site.pdbx_PDB_model_num\n");
     }
 
     models_++;
@@ -442,7 +441,7 @@ void mmCIFFormat::write(const Frame& frame) {
 
         const auto& atom = frame[i];
 
-        file_->print("{} {: <5} {: <2} {: <4} {} {: >3} {} {: >4} {:8.3f} {:8.3f} {:8.3f} {} {} {}\n",
+        file_.print("{} {: <5} {: <2} {: <4} {} {: >3} {} {: >4} {:8.3f} {:8.3f} {:8.3f} {} {} {}\n",
                 pdbgroup, atoms_, atom.type(), atom.name(), ".", compid,
                 asymid, seq_id, positions[i][0], positions[i][1], positions[i][2],
                 atom.charge(), auth_asymid, models_

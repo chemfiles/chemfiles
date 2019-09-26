@@ -1,18 +1,11 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <cerrno>
-#include <cstdlib>
-#include <cassert>
-#include <cstdint>
-#include <cstdio>
-#include <cstring>
-
-#include <ios>
-#include <array>
 #include <string>
 #include <vector>
 #include <limits>
+
+#include <array>
 
 #include <lzma.h>
 
@@ -28,56 +21,57 @@ static void check(lzma_ret code) {
     case LZMA_STREAM_END:
         return;
     case LZMA_MEM_ERROR:
-        throw file_error("xzstreambuf: memory allocation failed (code: {})", code);
+    case LZMA_MEMLIMIT_ERROR:
+        throw file_error("lzma: memory allocation failed (code: {})", code);
     case LZMA_FORMAT_ERROR:
-        throw file_error("xzstreambuf: input not in .xz format (code: {})", code);
+        throw file_error("lzma: input not in .xz format (code: {})", code);
     case LZMA_OPTIONS_ERROR:
         throw file_error(
-            "xzstreambuf: unsupported compression options (code: {})", code);
+            "lzma: unsupported compression options (code: {})", code);
     case LZMA_DATA_ERROR:
-        throw file_error("xzstreambuf: compressed file is corrupted (code: {})", code);
+        throw file_error("lzma: compressed file is corrupted (code: {})", code);
     case LZMA_BUF_ERROR:
         throw file_error(
-            "xzstreambuf: compressed file is truncated or corrupted (code: {})", code);
+            "lzma: compressed file is truncated or corrupted (code: {})", code);
     case LZMA_UNSUPPORTED_CHECK:
-        throw file_error("xzstreambuf: specified integrity check is not supported (code: {})", code);
+        throw file_error("lzma: specified integrity check is not supported (code: {})", code);
+    case LZMA_PROG_ERROR:
+        throw file_error("lzma: programming error (this is a bug) (code: {})", code);
     default:
-        throw file_error("xzstreambuf: unknown error (code: {})", code);
+        throw file_error("lzma: unknown error (code: {})", code);
     }
 }
 
-xzstreambuf::xzstreambuf(size_t buffer_size):
-    in_buffer_(buffer_size),
-    out_buffer_(buffer_size)
-{
-    stream_.next_in = nullptr;
-    stream_.avail_in = 0;
-    stream_.next_out = nullptr;
-    stream_.avail_out = 0;
-
-    auto end = &out_buffer_.back() + 1;
-    setg(end, end, end);
-    setp(&in_buffer_.front(), &in_buffer_.back());
-
-    block_.filters = filters_.data();
+static void open_stream_read(lzma_stream* stream) {
+    auto flags = LZMA_TELL_UNSUPPORTED_CHECK | LZMA_CONCATENATED;
+    auto memory_limit = std::numeric_limits<uint64_t>::max();
+    check(lzma_stream_decoder(stream, memory_limit, flags));
 }
 
-xzstreambuf::~xzstreambuf() {
-    if (!reading_) {
-        action_ = LZMA_FINISH;
-        try {
-            sync();
-        } catch (...) {
-            // ignore exceptions in destructor
-        }
+XzFile::XzFile(const std::string& path, File::Mode mode):  mode_(mode), buffer_(8192) {
+    const char* openmode = nullptr;
+    if (mode == File::READ) {
+        openmode = "rb";
+        open_stream_read(&stream_);
+    } else if (mode == File::WRITE) {
+        openmode = "wb";
+        check(lzma_easy_encoder(&stream_, 6, LZMA_CHECK_CRC64));
+
+        stream_.next_out = buffer_.data();
+        stream_.avail_out = buffer_.size();
+    } else if (mode == File::APPEND) {
+        throw file_error("appending (open mode 'a') is not supported with xz files");
     }
 
-    if (index_) {
-        lzma_index_end(index_, nullptr);
+    file_ = std::fopen(path.c_str(), openmode);
+    if (file_ == nullptr) {
+        throw file_error("could not open the file at '{}'", path);
     }
+}
 
-    for (size_t i = 0; i < LZMA_FILTERS_MAX; ++i) {
-        free(filters_[i].options); // NOLINT: working with a C library
+XzFile::~XzFile() {
+    if (mode_ == File::WRITE) {
+        compress_and_write(LZMA_FINISH);
     }
 
     lzma_end(&stream_);
@@ -86,316 +80,90 @@ xzstreambuf::~xzstreambuf() {
     }
 }
 
-void xzstreambuf::open(const std::string& path, const std::string& mode) {
-    if (is_open()) {
-        throw file_error("can not open an xz file twice with the same xzstreambuf");
-    }
+size_t XzFile::read(char* data, size_t count) {
+    auto action = LZMA_RUN;
 
-    if (mode == "rb") {
-        reading_ = true;
-    } else if (mode == "wb") {
-        reading_ = false;
-    } else {
-        throw file_error("xzstreambuf: unrecognized open mode: '{}'", mode);
-    }
+    stream_.next_out = reinterpret_cast<uint8_t*>(data);
+    stream_.avail_out = count;
 
-    file_ = std::fopen(path.c_str(), mode.c_str());
-    if (!file_) {
-        // Failed to open the file, bail out
-        return;
-    }
+    while (stream_.avail_out != 0) {
+        // read more compressed data from the file
+        if (stream_.avail_in == 0 && !std::feof(file_)) {
+            stream_.next_in = buffer_.data();
+            stream_.avail_in = std::fread(buffer_.data(), 1, buffer_.size(), file_);
 
-    if (reading_) {
-        std::array<uint8_t, LZMA_STREAM_HEADER_SIZE> buffer = {{0}};
-        if (!std::fread(buffer.data(), buffer.size(), sizeof(uint8_t), file_)) {
-            throw file_error("error while reading lzma header: {}", strerror(errno));
+            if (std::ferror(file_)) {
+                throw file_error("IO error while reading xz file");
+            }
         }
-        lzma_stream_flags flags;
-        check(lzma_stream_header_decode(&flags, buffer.data()));
-        check_ = flags.check;
-    } else {
-        check(lzma_easy_encoder(&stream_, 6, LZMA_CHECK_CRC64));
-    }
 
-    stream_.next_out = reinterpret_cast<uint8_t*>(out_buffer_.data());
-    stream_.avail_out = out_buffer_.size();
+        if (std::feof(file_)) {
+            action = LZMA_FINISH;
+        }
+
+        auto status = lzma_code(&stream_, action);
+
+        if (status == LZMA_STREAM_END) {
+            return count - stream_.avail_out;
+        } else {
+            // Check for error
+            check(status);
+        }
+    }
+    return count;
 }
 
-int xzstreambuf::sync() {
-    if (!is_open()) {
-        return -1;
+void XzFile::clear() {
+    std::clearerr(file_);
+}
+
+void XzFile::seek(int64_t position) {
+    assert(mode_ == File::READ);
+    // Reset stream state
+    lzma_end(&stream_);
+    stream_ = LZMA_STREAM_INIT;
+    open_stream_read(&stream_);
+
+    // Dumb implementation, re-decompressing the file from the begining
+    std::fseek(file_, 0, SEEK_SET);
+    constexpr size_t BUFFSIZE = 4096;
+    char buffer[BUFFSIZE];
+
+    while (static_cast<size_t>(position) > BUFFSIZE) {
+        auto count = read(buffer, BUFFSIZE);
+        assert(count == BUFFSIZE);
+        position -= count;
     }
 
-    if (reading_) {
-        return std::streambuf::sync();
-    }
+    auto count = read(buffer, static_cast<size_t>(position));
+    assert(count == static_cast<size_t>(position));
+}
 
-    auto bytes = pptr() - pbase();
-    stream_.next_in = reinterpret_cast<uint8_t*>(pbase());
-    stream_.avail_in = static_cast<size_t>(bytes);
+size_t XzFile::write(const char* data, size_t count) {
+    stream_.next_in = reinterpret_cast<const uint8_t*>(data);
+    stream_.avail_in = count;
+    compress_and_write(LZMA_RUN);
 
-    // Two cases:
-    // 1. We are still compressing the file, in which case we should pump
-    //    the loop until all of the available input bytes are consumed; or
-    //
-    // 2. We are done receiving input (action_ == LZMA_FINISH), in which
-    //    case we should pump the loop until we get the LZMA_STREAM_END
-    //    return code indicating that all input has been processed (note
-    //    that processed != read, hence this second case).
-    lzma_ret status;
+    return count - stream_.avail_in;
+}
+
+void XzFile::compress_and_write(lzma_action action) {
+    lzma_ret status = LZMA_OK;
     do {
-        status = lzma_code(&stream_, action_);
+        status = lzma_code(&stream_, action);
 
         if (stream_.avail_out == 0 || status == LZMA_STREAM_END) {
-            auto size = out_buffer_.size() - stream_.avail_out;
-            if (std::fwrite(out_buffer_.data(), sizeof(uint8_t), size, file_) != size) {
-                return -1;
+            auto size = buffer_.size() - stream_.avail_out;
+            auto written = std::fwrite(buffer_.data(), sizeof(uint8_t), size, file_);
+            if (written != size) {
+                throw file_error("error while writting data to xz file");
             }
 
-            stream_.next_out = reinterpret_cast<uint8_t*>(out_buffer_.data());
-            stream_.avail_out = out_buffer_.size();
+            stream_.next_out = buffer_.data();
+            stream_.avail_out = buffer_.size();
         }
 
         check(status);
 
-    } while (stream_.avail_in > 0 || (action_ == LZMA_FINISH && status != LZMA_STREAM_END));
-
-    if (bytes > 0) {
-        pbump(-static_cast<int>(bytes));
-    }
-
-    return 0;
-}
-
-int xzstreambuf::underflow() {
-    if (!is_open() || !reading_) {
-        return traits_type::eof();
-    }
-
-    if (gptr() < egptr()) {
-        // buffer not exhausted
-        return traits_type::to_int_type(*gptr());
-    }
-
-    lzma_ret status = LZMA_OK;
-    while (gptr() >= egptr() && status == LZMA_OK) {
-        stream_.next_out = reinterpret_cast<uint8_t*>(out_buffer_.data());
-        stream_.avail_out = out_buffer_.size();
-
-        if (at_block_boundary_) {
-            std::vector<std::uint8_t> header_buf(LZMA_BLOCK_HEADER_SIZE_MAX);
-            if (stream_.avail_in == 0 && !std::feof(file_) && !std::ferror(file_)) {
-                replenish_compressed_buffer();
-            }
-            assert(stream_.avail_in > 0);
-            std::memcpy(header_buf.data(), stream_.next_in, 1);
-            ++(stream_.next_in);
-            --(stream_.avail_in);
-
-            if (header_buf[0] == 0x00) {
-                // Index indicator found
-                status = LZMA_STREAM_END;
-            } else {
-                // free previously allocated filters in the block. We can use
-                // `free` directly because no allocator is passed to any lzma
-                // calls
-                for (size_t i = 0; i < LZMA_FILTERS_MAX; ++i) {
-                    free(filters_[i].options); // NOLINT: working with a C library
-                }
-
-                block_.version = 0;
-                block_.check = check_;
-                block_.header_size = lzma_block_header_size_decode(header_buf[0]);
-
-                size_t bytes_already_copied = 0;
-                if (stream_.avail_in < (block_.header_size - 1)) {
-                    bytes_already_copied = stream_.avail_in;
-                    std::memcpy(&header_buf[1], stream_.next_in, bytes_already_copied);
-                    stream_.avail_in -= bytes_already_copied;
-                    stream_.next_in += bytes_already_copied;
-                    assert(stream_.avail_in == 0);
-                    replenish_compressed_buffer();
-                }
-
-                assert(stream_.avail_in >= (block_.header_size - 1) - bytes_already_copied);
-                size_t bytes_left_to_copy = (block_.header_size - 1) - bytes_already_copied;
-                std::memcpy(&header_buf[1 + bytes_already_copied], stream_.next_in, bytes_left_to_copy);
-                stream_.avail_in -= bytes_left_to_copy;
-                stream_.next_in += bytes_left_to_copy;
-
-                status = lzma_block_header_decode(&block_, nullptr, header_buf.data());
-                check(status);
-                status = lzma_block_decoder(&stream_, &block_);
-                check(status);
-            }
-            at_block_boundary_ = false;
-        }
-
-        if (status == LZMA_OK) {
-            if (stream_.avail_in == 0 && !std::feof(file_) && !std::ferror(file_)) {
-                replenish_compressed_buffer();
-            }
-
-            assert(stream_.avail_in > 0);
-            status = lzma_code(&stream_, LZMA_RUN);
-            if (status == LZMA_STREAM_END) {
-                // End of block.
-                at_block_boundary_ = true;
-                status = LZMA_OK;
-            }
-        }
-
-        auto start = out_buffer_.data();
-        setg(start, start, start + (out_buffer_.size() - stream_.avail_out));
-        decoded_position_ += static_cast<uint64_t>(egptr() - gptr());
-
-        if (discard_amount_ > 0) {
-            uint64_t advance_amount = discard_amount_;
-            if (static_cast<uint64_t>(egptr() - gptr()) < advance_amount) {
-                advance_amount = static_cast<uint64_t>(egptr() - gptr());
-            }
-            setg(start, gptr() + advance_amount, egptr());
-            discard_amount_ -= advance_amount;
-        }
-    }
-
-    if (status == LZMA_STREAM_END && gptr() >= egptr()) {
-        return traits_type::eof();
-    } else {
-        // throw an error if neeeded
-        check(status);
-    }
-
-    return traits_type::to_int_type(*gptr());
-}
-
-xzstreambuf::pos_type xzstreambuf::seekoff(std::streambuf::off_type offset,
-                                           std::ios_base::seekdir way,
-                                           std::ios_base::openmode which) {
-    if (!is_open()) {
-       return traits_type::eof();
-   }
-
-    auto position = pos_type(off_type(decoded_position_) - (egptr() - gptr()));
-    auto current_position = position;
-
-    // Fast return path for tellpos
-    if (offset == 0 && way == std::ios::cur) {
-        return position;
-    }
-
-    if (way == std::ios::cur) {
-        position = position + offset;
-    } else if (way == std::ios::end) {
-        if (!index_) {
-            if (!init_index()) {
-                return traits_type::eof();
-            }
-        }
-
-        auto uncompressed_size = lzma_index_uncompressed_size(index_);
-        position = pos_type(off_type(uncompressed_size)) + offset;
-    } else {
-        position = offset;
-    }
-
-    // Do nothing if we are already at the right position
-    if (position == current_position) {
-        return position;
-    }
-
-    return seekpos(position, which);
-}
-
-xzstreambuf::pos_type xzstreambuf::seekpos(std::streambuf::pos_type position,
-                                           std::ios_base::openmode /*which*/) {
-    if (!is_open() || sync()) {
-        return traits_type::eof();
-    }
-
-    if (!index_) {
-        if (!init_index()) {
-            return traits_type::eof();
-        }
-    }
-
-    lzma_index_iter iter;
-    lzma_index_iter_init(&iter, index_);
-
-    // Returns true on failure.
-    if (lzma_index_iter_locate(&iter, static_cast<uint64_t>(off_type(position)))) {
-        return traits_type::eof();
-    }
-
-    long seek_amount = 0;
-    if (iter.block.compressed_file_offset > static_cast<uint64_t>(std::numeric_limits<long>::max())) {
-        seek_amount = std::numeric_limits<long>::max();
-    } else {
-        seek_amount = static_cast<long>(iter.block.compressed_file_offset);
-    }
-    if (std::fseek(file_, seek_amount, SEEK_SET)) {
-        return traits_type::eof();
-    }
-
-    decoded_position_ = iter.block.uncompressed_file_offset;
-    discard_amount_ = static_cast<uint64_t>(off_type(position)) - decoded_position_;
-
-    at_block_boundary_ = true;
-    stream_.next_in = nullptr;
-    stream_.avail_in = 0;
-    auto end = &out_buffer_.back() + 1;
-    setg(end, end, end);
-
-    return position;
-}
-
-void xzstreambuf::replenish_compressed_buffer() {
-    stream_.next_in = reinterpret_cast<uint8_t*>(in_buffer_.data());
-    stream_.avail_in = std::fread(in_buffer_.data(), 1, in_buffer_.size(), file_);
-}
-
-bool xzstreambuf::init_index() {
-    if (!is_open()) {
-        return false;
-    }
-
-    std::array<uint8_t, LZMA_STREAM_HEADER_SIZE> buffer = {{0}};
-    if (std::fseek(file_, -12, SEEK_END) || !std::fread(buffer.data(), 12, 1, file_)) {
-        return false;
-    }
-
-    lzma_stream_flags footer_flags;
-    if (lzma_stream_footer_decode(&footer_flags, buffer.data()) != LZMA_OK) {
-        return false;
-    }
-
-    std::vector<uint8_t> index_buf(static_cast<size_t>(footer_flags.backward_size));
-    auto size = -static_cast<long>(footer_flags.backward_size + 12);
-    if (std::fseek(file_, size, SEEK_END) || !std::fread(index_buf.data(), index_buf.size(), 1, file_)) {
-        return false;
-    }
-
-    uint64_t memlimit = UINT64_MAX;
-    size_t in_pos = 0;
-    auto res = lzma_index_buffer_decode(&index_, &memlimit, nullptr, index_buf.data(), &in_pos, index_buf.size());
-
-    return res == LZMA_OK;
-}
-
-bool xzstreambuf::is_open() const {
-    return file_ != nullptr && !std::ferror(file_);
-}
-
-XzFile::XzFile(std::string path, File::Mode mode): TextFile(std::move(path), mode, File::LZMA, &buffer_), buffer_() {
-    if (mode == File::READ) {
-        buffer_.open(this->path(), "rb");
-    } else if (mode == File::WRITE) {
-        buffer_.open(this->path(), "wb");
-    } else if (mode == File::APPEND) {
-        throw file_error("appending (open mode 'a') is not supported with xz files");
-    }
-
-    if (!buffer_.is_open()) {
-        throw file_error("could not open the file at '{}'", this->path());
-    }
+    } while (stream_.avail_in != 0 || (action == LZMA_FINISH && status != LZMA_STREAM_END));
 }

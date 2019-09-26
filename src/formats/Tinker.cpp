@@ -34,58 +34,54 @@ template<> FormatInfo chemfiles::format_information<TinkerFormat>() {
     );
 }
 
-static bool is_unit_cell_line(const std::string& line);
+static bool is_unit_cell_line(string_view line);
 
 void TinkerFormat::read_next(Frame& frame) {
     size_t natoms = 0;
     try {
-        auto line = file_->readline();
+        auto line = file_.readline();
         // only read the number of atoms, ignore any comment
         scan(line, natoms);
     } catch (const FileError& e) {
         throw format_error(
-            "can not read number of atoms in {}: {}", file_->path(), e.what()
+            "can not read number of atoms in {}: {}", file_.path(), e.what()
         );
     }
 
-    std::vector<std::string> lines;
+    std::vector<std::vector<size_t>> bonds(natoms);
+    frame.reserve(natoms);
     try {
-        auto line = file_->readline();
+        auto position = file_.tellpos();
+        auto line = file_.readline();
         if (is_unit_cell_line(line)) {
             // Read the cell
             double a = 0, b = 0, c = 0;
             double alpha = 0, beta = 0, gamma = 0;
             scan(line, a, b, c, alpha, beta, gamma);
             frame.set_cell(UnitCell(a, b, c, alpha, beta, gamma));
-
-            // And get the atoms lines
-            lines = file_->readlines(natoms);
         } else {
-            lines = file_->readlines(natoms - 1);
-            lines.insert(lines.begin(), line);
+            file_.seekpos(position);
+        }
+
+        for (size_t i = 0; i < natoms; i++) {
+            line = file_.readline();
+            double x = 0, y = 0, z = 0;
+            int id = 0, atom_type = 0;
+            std::string name;
+            auto count = scan(line, id, name, x, y, z, atom_type);
+
+            frame.add_atom(Atom(name), Vector3D(x, y, z));
+            while (count != line.size()) {
+                size_t bonded = 0;
+                count += scan(line.substr(count), bonded);
+                bonds[i].push_back(bonded - 1);
+            }
         }
 
     } catch (const FileError& e) {
         throw format_error(
-            "can not read atomic data in {}: {}", file_->path(), e.what()
+            "can not read atomic data in {}: {}", file_.path(), e.what()
         );
-    }
-
-    std::vector<std::vector<size_t>> bonds(natoms);
-    frame.reserve(natoms);
-    frame.resize(0);
-    for (size_t i = 0; i < natoms; i++) {
-        double x = 0, y = 0, z = 0;
-        int id = 0, atom_type = 0;
-        std::string name;
-        auto count = scan(lines[i], id, name, x, y, z, atom_type);
-
-        frame.add_atom(Atom(name), Vector3D(x, y, z));
-        while (count != lines[i].size()) {
-            size_t bonded = 0;
-            count += scan(lines[i].substr(count), bonded);
-            bonds[i].push_back(bonded - 1);
-        }
     }
 
     for (size_t i = 0; i < natoms; i++) {
@@ -96,8 +92,8 @@ void TinkerFormat::read_next(Frame& frame) {
 }
 
 void TinkerFormat::write_next(const Frame& frame) {
-    file_->print("{} written by the chemfiles library\n", frame.size());
-    file_->print("{} {} {} {} {} {}\n",
+    file_.print("{} written by the chemfiles library\n", frame.size());
+    file_.print("{} {} {} {} {} {}\n",
         frame.cell().a(), frame.cell().b(), frame.cell().c(),
         frame.cell().alpha(), frame.cell().beta(), frame.cell().gamma()
     );
@@ -129,42 +125,35 @@ void TinkerFormat::write_next(const Frame& frame) {
         assert(it != types_id.end());
         auto type = (it - types_id.begin()) + 1;
 
-        file_->print("{} {} {} {} {} {}",
+        file_.print("{} {} {} {} {} {}",
             i + 1, name, positions[i][0], positions[i][1], positions[i][2], type
         );
         for (size_t other: bonded_to[i]) {
-            file_->print(" {}", other + 1);
+            file_.print(" {}", other + 1);
         }
-        file_->print("\n");
+        file_.print("\n");
     }
 }
 
-std::streampos TinkerFormat::forward() {
-    if (file_->fail()) {
-        return std::streampos(-1);
-    }
-
-    auto position = file_->tellpos();
+int64_t TinkerFormat::forward() {
+    auto position = file_.tellpos();
     size_t natoms = 0;
     try {
-        auto line = file_->readline();
+        auto line = file_.readline();
         if (trim(line).empty()) {
             // We just read an empty line, we give up here
-            return std::streampos(-1);
+            return -1;
         } else {
             // Get the number of atoms in the line
             natoms = parse<size_t>(split(line, ' ')[0]);
         }
-    } catch (const FileError&) {
-        // No more line left in the file
-        return std::streampos(-1);
     } catch (const Error&) {
         // We could not read an integer, so give up here
-        return std::streampos(-1);
+        return -1;
     }
 
     try {
-        auto line = file_->readline();
+        auto line = file_.readline();
         // Minus one because we just read a line.
         size_t lines_to_skip = natoms - 1;
 
@@ -174,17 +163,19 @@ std::streampos TinkerFormat::forward() {
             lines_to_skip += 1;
         }
 
-        file_->skiplines(lines_to_skip);
+        for (size_t i=0; i<lines_to_skip; i++) {
+            file_.readline();
+        }
     } catch (const FileError&) {
         // We could not read the lines from the file
         throw format_error(
-            "not enough lines in '{}' for Tinker XYZ format", file_->path()
+            "not enough lines in '{}' for Tinker XYZ format", file_.path()
         );
     }
     return position;
 }
 
-bool is_unit_cell_line(const std::string& line) {
+bool is_unit_cell_line(string_view line) {
     static const char* LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     return line.find_first_of(LETTERS) == std::string::npos;
 }

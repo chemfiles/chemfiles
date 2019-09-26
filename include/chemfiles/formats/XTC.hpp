@@ -8,6 +8,7 @@
 #include "chemfiles/files/XDRFile.hpp"
 
 namespace chemfiles {
+class Frame;
 
 class XTCFormat final : public Format {
   public:

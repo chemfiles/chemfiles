@@ -4,21 +4,27 @@
 #ifndef CHEMFILES_PLAIN_FILES_HPP
 #define CHEMFILES_PLAIN_FILES_HPP
 
-#include <fstream>
+#include <cstdio>
 #include <string>
 #include "chemfiles/File.hpp"
 
 namespace chemfiles {
 
-/// Simple TextFile implementation, only a thin wrapper on top of standard C++
-/// fstreams. Reads plain, uncompressed files
-class PlainFile final: public TextFile {
+/// Simple TextFileImpl reading plain, uncompressed files using `FILE*`.
+class PlainFile final: public TextFileImpl {
 public:
     /// Open a text file with name `filename` and mode `mode`.
-    PlainFile(std::string path, File::Mode mode);
+    PlainFile(const std::string& path, File::Mode mode);
+    ~PlainFile() override;
+
+    size_t read(char* data, size_t count) override;
+    size_t write(const char* data, size_t count) override;
+
+    void clear() override;
+    void seek(int64_t position) override;
 
 private:
-    std::filebuf buffer_;
+    std::FILE* file_;
 };
 
 } // namespace chemfiles

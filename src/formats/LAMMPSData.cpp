@@ -102,7 +102,7 @@ atom_style::atom_style(std::string name): name_(std::move(name)) {
     }
 }
 
-atom_data atom_style::read_line(const std::string& line, size_t index) const {
+atom_data atom_style::read_line(string_view line, size_t index) const {
     atom_data d;
 
     // dummy variable to ignore a value
@@ -198,11 +198,10 @@ atom_data atom_style::read_line(const std::string& line, size_t index) const {
     return d;
 }
 
-/// Split a string in data (stays in the `line` parameter) and comment
-/// (in the return value).
-static std::string split_comment(std::string& line);
+/// Remove the comment from `line` and return it.
+static string_view split_comment(string_view& line);
 /// Check if the line is an unused header value
-static bool is_unused_header(const std::string& line);
+static bool is_unused_header(string_view line);
 
 LAMMPSDataFormat::LAMMPSDataFormat(std::string path, File::Mode mode, File::Compression compression):
     TextFormat(std::move(path), mode, compression),
@@ -211,12 +210,11 @@ LAMMPSDataFormat::LAMMPSDataFormat(std::string path, File::Mode mode, File::Comp
 {}
 
 void LAMMPSDataFormat::read_next(Frame& frame) {
-    if (file_->tellpos() != std::streampos(0)) {
+    if (file_.tellpos() != 0) {
         throw format_error("LAMMPS Data format only supports reading one frame");
     }
 
-    auto comment = file_->readline();
-
+    auto comment = file_.readline();
     // VMD topotools writes the atom style in the comment header
     auto it = comment.find("atom_style");
     if (it != std::string::npos) {
@@ -224,7 +222,7 @@ void LAMMPSDataFormat::read_next(Frame& frame) {
         atom_style_name_ = trim(split(style, ' ')[0]).to_string();
     }
 
-    while(!file_->eof()) {
+    while(!file_.eof()) {
         switch (current_section_) {
         case HEADER:
             read_header(frame);
@@ -258,8 +256,8 @@ void LAMMPSDataFormat::read_header(Frame& frame) {
     auto matrix = Matrix3D::unit();
     auto shape = UnitCell::ORTHORHOMBIC;
 
-    while (!file_->eof()) {
-        auto line = file_->readline();
+    while (!file_.eof()) {
+        auto line = file_.readline();
         auto content = line;
         split_comment(content);
         if (content.empty() || is_unused_header(content)) {
@@ -291,6 +289,7 @@ void LAMMPSDataFormat::read_header(Frame& frame) {
         } else {
             // End of the header, get the section and break
             current_section_ = get_section(line);
+            assert(current_section_ != NOT_A_SECTION);
             break;
         }
     }
@@ -299,7 +298,7 @@ void LAMMPSDataFormat::read_header(Frame& frame) {
     frame.set_cell(cell);
 }
 
-size_t LAMMPSDataFormat::read_header_integer(const std::string& line, const std::string& context) {
+size_t LAMMPSDataFormat::read_header_integer(string_view line, const std::string& context) {
     auto splitted = split(line, ' ');
     if (splitted.size() < 2) {
         throw format_error(
@@ -309,7 +308,7 @@ size_t LAMMPSDataFormat::read_header_integer(const std::string& line, const std:
     return parse<size_t>(splitted[0]);
 }
 
-double LAMMPSDataFormat::read_header_box_bounds(const std::string& line, const std::string& context) {
+double LAMMPSDataFormat::read_header_box_bounds(string_view line, const std::string& context) {
     auto splitted = split(line, ' ');
     if (splitted.size() < 4) {
         throw format_error(
@@ -322,8 +321,8 @@ double LAMMPSDataFormat::read_header_box_bounds(const std::string& line, const s
 }
 
 void LAMMPSDataFormat::get_next_section() {
-    while (!file_->eof()) {
-        auto line = file_->readline();
+    while (!file_.eof()) {
+        auto line = file_.readline();
         if (!line.empty()) {
             auto section = get_section(line);
             if (section == NOT_A_SECTION) {
@@ -337,8 +336,8 @@ void LAMMPSDataFormat::get_next_section() {
 }
 
 void LAMMPSDataFormat::skip_to_next_section() {
-    while (!file_->eof()) {
-        auto line = file_->readline();
+    while (!file_.eof()) {
+        auto line = file_.readline();
         if (!line.empty()) {
             auto section = get_section(line);
             if (section == NOT_A_SECTION) {
@@ -368,8 +367,8 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
     auto residues = std::unordered_map<size_t, Residue>();
 
     size_t n = 0;
-    while (n < natoms_ && !file_->eof()) {
-        auto line = file_->readline();
+    while (n < natoms_ && !file_.eof()) {
+        auto line = file_.readline();
         auto comment = split_comment(line);
         if (line.empty()) {continue;}
 
@@ -429,8 +428,8 @@ void LAMMPSDataFormat::read_masses() {
         throw format_error("missing atom types count in header");
     }
     size_t n = 0;
-    while (n < natom_types_ && !file_->eof()) {
-        auto line = file_->readline();
+    while (n < natom_types_ && !file_.eof()) {
+        auto line = file_.readline();
         split_comment(line);
         if (line.empty()) {continue;}
 
@@ -454,8 +453,8 @@ void LAMMPSDataFormat::read_bonds(Frame& frame) {
         throw format_error("missing bonds count in header");
     }
     size_t n = 0;
-    while (n < nbonds_ && !file_->eof()) {
-        auto line = file_->readline();
+    while (n < nbonds_ && !file_.eof()) {
+        auto line = file_.readline();
         split_comment(line);
         if (line.empty()) {continue;}
 
@@ -470,7 +469,7 @@ void LAMMPSDataFormat::read_bonds(Frame& frame) {
         n++;
     }
 
-    if (file_->eof() && n < nbonds_) {
+    if (file_.eof() && n < nbonds_) {
         throw format_error("end of file found before getting all bonds");
     }
 
@@ -485,8 +484,8 @@ void LAMMPSDataFormat::read_velocities(Frame& frame) {
     size_t n = 0;
     frame.add_velocities();
     auto velocities = *frame.velocities();
-    while (n < natoms_ && !file_->eof()) {
-        auto line = file_->readline();
+    while (n < natoms_ && !file_.eof()) {
+        auto line = file_.readline();
         split_comment(line);
         if (line.empty()) {continue;}
 
@@ -503,7 +502,7 @@ void LAMMPSDataFormat::read_velocities(Frame& frame) {
         n++;
     }
 
-    if (file_->eof() && n < nbonds_) {
+    if (file_.eof() && n < nbonds_) {
         throw format_error("end of file found before getting all velocities");
     }
 
@@ -542,7 +541,7 @@ static std::unordered_set<string_view> IGNORED_SECTIONS = {
     "AngleAngleTorsion Coeffs", "BondBond13 Coeffs", "AngleAngle Coeffs"
 };
 
-LAMMPSDataFormat::section_t LAMMPSDataFormat::get_section(std::string line) {
+LAMMPSDataFormat::section_t LAMMPSDataFormat::get_section(string_view line) {
     auto comment = split_comment(line);
     auto section = trim(line);
     if (section == "Atoms") {
@@ -699,7 +698,7 @@ size_t DataTypes::improper_type_id(size_t type_i, size_t type_j, size_t type_k, 
 }
 
 void LAMMPSDataFormat::write_next(const Frame& frame) {
-    if (file_->tellpos() != std::streampos(0)) {
+    if (file_.tellpos() != 0) {
         throw format_error("LAMMPS Data format only supports writting one frame");
     }
 
@@ -718,51 +717,51 @@ void LAMMPSDataFormat::write_next(const Frame& frame) {
 }
 
 void LAMMPSDataFormat::write_header(const DataTypes& types, const Frame& frame) {
-    file_->print("LAMMPS data file -- atom_style full -- generated by chemfiles\n");
-    file_->print("{} atoms\n", frame.size());
-    file_->print("{} bonds\n", frame.topology().bonds().size());
-    file_->print("{} angles\n", frame.topology().angles().size());
-    file_->print("{} dihedrals\n", frame.topology().dihedrals().size());
-    file_->print("{} impropers\n", frame.topology().impropers().size());
+    file_.print("LAMMPS data file -- atom_style full -- generated by chemfiles\n");
+    file_.print("{} atoms\n", frame.size());
+    file_.print("{} bonds\n", frame.topology().bonds().size());
+    file_.print("{} angles\n", frame.topology().angles().size());
+    file_.print("{} dihedrals\n", frame.topology().dihedrals().size());
+    file_.print("{} impropers\n", frame.topology().impropers().size());
 
-    file_->print("{} atom types\n", types.atoms().size());
-    file_->print("{} bond types\n", types.bonds().size());
-    file_->print("{} angle types\n", types.angles().size());
-    file_->print("{} dihedral types\n", types.dihedrals().size());
-    file_->print("{} improper types\n", types.impropers().size());
+    file_.print("{} atom types\n", types.atoms().size());
+    file_.print("{} bond types\n", types.bonds().size());
+    file_.print("{} angle types\n", types.angles().size());
+    file_.print("{} dihedral types\n", types.dihedrals().size());
+    file_.print("{} improper types\n", types.impropers().size());
 
     auto matrix = frame.cell().matrix();
-    file_->print("0 {} xlo xhi\n", matrix[0][0]);
-    file_->print("0 {} ylo yhi\n", matrix[1][1]);
-    file_->print("0 {} zlo zhi\n", matrix[2][2]);
+    file_.print("0 {} xlo xhi\n", matrix[0][0]);
+    file_.print("0 {} ylo yhi\n", matrix[1][1]);
+    file_.print("0 {} zlo zhi\n", matrix[2][2]);
     if (frame.cell().shape() == UnitCell::TRICLINIC) {
         assert(tilt_factor(matrix, 1, 0) == 0);
         assert(tilt_factor(matrix, 2, 0) == 0);
         assert(tilt_factor(matrix, 2, 1) == 0);
-        file_->print("{} {} {} xy xz yz\n",
+        file_.print("{} {} {} xy xz yz\n",
             tilt_factor(matrix, 0, 1),
             tilt_factor(matrix, 0, 2),
             tilt_factor(matrix, 1, 2)
         );
     }
 
-    file_->print("\n");
+    file_.print("\n");
 }
 
 void LAMMPSDataFormat::write_types(const DataTypes& types) {
     auto& atoms = types.atoms().as_vec();
     if (!atoms.empty()) {
-        file_->print("# Pair Coeffs\n");
+        file_.print("# Pair Coeffs\n");
         for (size_t i=0; i<atoms.size(); i++) {
-            file_->print("# {} {}\n", i + 1, atoms[i].first);
+            file_.print("# {} {}\n", i + 1, atoms[i].first);
         }
     }
 
     auto& bonds = types.bonds().as_vec();
     if (!bonds.empty()) {
-        file_->print("\n# Bond Coeffs\n");
+        file_.print("\n# Bond Coeffs\n");
         for (size_t i=0; i<bonds.size(); i++) {
-            file_->print("# {} {}-{}\n", i + 1,
+            file_.print("# {} {}-{}\n", i + 1,
                 atoms[std::get<0>(bonds[i])].first,
                 atoms[std::get<1>(bonds[i])].first
             );
@@ -771,9 +770,9 @@ void LAMMPSDataFormat::write_types(const DataTypes& types) {
 
     auto& angles = types.angles().as_vec();
     if (!angles.empty()) {
-        file_->print("\n# Angle Coeffs\n");
+        file_.print("\n# Angle Coeffs\n");
         for (size_t i=0; i<angles.size(); i++) {
-            file_->print("# {} {}-{}-{}\n", i + 1,
+            file_.print("# {} {}-{}-{}\n", i + 1,
                 atoms[std::get<0>(angles[i])].first,
                 atoms[std::get<1>(angles[i])].first,
                 atoms[std::get<2>(angles[i])].first
@@ -783,9 +782,9 @@ void LAMMPSDataFormat::write_types(const DataTypes& types) {
 
     auto& dihedrals = types.dihedrals().as_vec();
     if (!dihedrals.empty()) {
-        file_->print("\n# Dihedrals Coeffs\n");
+        file_.print("\n# Dihedrals Coeffs\n");
         for (size_t i=0; i<dihedrals.size(); i++) {
-            file_->print("# {} {}-{}-{}-{}\n", i + 1,
+            file_.print("# {} {}-{}-{}-{}\n", i + 1,
                 atoms[std::get<0>(dihedrals[i])].first,
                 atoms[std::get<1>(dihedrals[i])].first,
                 atoms[std::get<2>(dihedrals[i])].first,
@@ -796,9 +795,9 @@ void LAMMPSDataFormat::write_types(const DataTypes& types) {
 
     auto& impropers = types.impropers().as_vec();
     if (!impropers.empty()) {
-        file_->print("\n# Impropers Coeffs\n");
+        file_.print("\n# Impropers Coeffs\n");
         for (size_t i=0; i<impropers.size(); i++) {
-            file_->print("# {} {}-{}-{}-{}\n", i + 1,
+            file_.print("# {} {}-{}-{}-{}\n", i + 1,
                 atoms[std::get<0>(impropers[i])].first,
                 atoms[std::get<1>(impropers[i])].first,
                 atoms[std::get<2>(impropers[i])].first,
@@ -809,21 +808,21 @@ void LAMMPSDataFormat::write_types(const DataTypes& types) {
 }
 
 void LAMMPSDataFormat::write_masses(const DataTypes& types) {
-    file_->print("\nMasses\n\n");
+    file_.print("\nMasses\n\n");
     auto& atoms = types.atoms().as_vec();
     for (size_t i=0; i<atoms.size(); i++) {
-        file_->print("{} {} # {}\n", i + 1, atoms[i].second, atoms[i].first);
+        file_.print("{} {} # {}\n", i + 1, atoms[i].second, atoms[i].first);
     }
 }
 
 void LAMMPSDataFormat::write_atoms(const DataTypes& types, const Frame& frame) {
-    file_->print("\nAtoms # full\n\n");
+    file_.print("\nAtoms # full\n\n");
     auto positions = frame.positions();
     auto molids = guess_molecules(frame);
     for (size_t i=0; i<frame.size(); i++) {
         auto& atom = frame.topology()[i];
         auto molid = molids[i];
-        file_->print("{} {} {} {} {} {} {} # {}\n",
+        file_.print("{} {} {} {} {} {} {} # {}\n",
             i + 1, molid + 1, types.atom_type_id(atom) + 1, atom.charge(),
             positions[i][0], positions[i][1], positions[i][2],
             atom.type()
@@ -834,10 +833,10 @@ void LAMMPSDataFormat::write_atoms(const DataTypes& types, const Frame& frame) {
 void LAMMPSDataFormat::write_velocities(const Frame& frame) {
     if (!frame.velocities()) { return; }
 
-    file_->print("\nVelocities\n\n");
+    file_.print("\nVelocities\n\n");
     auto velocities = *frame.velocities();
     for (size_t i=0; i<frame.size(); i++) {
-        file_->print("{} {} {} {}\n",
+        file_.print("{} {} {} {}\n",
             i + 1, velocities[i][0], velocities[i][1], velocities[i][2]
         );
     }
@@ -846,13 +845,13 @@ void LAMMPSDataFormat::write_velocities(const Frame& frame) {
 void LAMMPSDataFormat::write_bonds(const DataTypes& types, const Topology& topology) {
     if (topology.bonds().empty()) { return; }
 
-    file_->print("\nBonds\n\n");
+    file_.print("\nBonds\n\n");
     size_t bond_id = 1;
     for (auto bond: topology.bonds()) {
         auto type_i = types.atom_type_id(topology[bond[0]]);
         auto type_j = types.atom_type_id(topology[bond[1]]);
         auto bond_type_id = types.bond_type_id(type_i, type_j);
-        file_->print("{} {} {} {}\n",
+        file_.print("{} {} {} {}\n",
             bond_id, bond_type_id + 1, bond[0] + 1, bond[1] + 1
         );
         bond_id++;
@@ -862,14 +861,14 @@ void LAMMPSDataFormat::write_bonds(const DataTypes& types, const Topology& topol
 void LAMMPSDataFormat::write_angles(const DataTypes& types, const Topology& topology) {
     if (topology.angles().empty()) { return; }
 
-    file_->print("\nAngles\n\n");
+    file_.print("\nAngles\n\n");
     size_t angle_id = 1;
     for (auto angle: topology.angles()) {
         auto type_i = types.atom_type_id(topology[angle[0]]);
         auto type_j = types.atom_type_id(topology[angle[1]]);
         auto type_k = types.atom_type_id(topology[angle[2]]);
         auto angle_type_id = types.angle_type_id(type_i, type_j, type_k);
-        file_->print("{} {} {} {} {}\n",
+        file_.print("{} {} {} {} {}\n",
             angle_id, angle_type_id + 1, angle[0] + 1, angle[1] + 1, angle[2] + 1
         );
         angle_id++;
@@ -879,7 +878,7 @@ void LAMMPSDataFormat::write_angles(const DataTypes& types, const Topology& topo
 void LAMMPSDataFormat::write_dihedrals(const DataTypes& types, const Topology& topology) {
     if (topology.dihedrals().empty()) { return; }
 
-    file_->print("\nDihedrals\n\n");
+    file_.print("\nDihedrals\n\n");
     size_t dihedral_id = 1;
     for (auto dihedral: topology.dihedrals()) {
         auto type_i = types.atom_type_id(topology[dihedral[0]]);
@@ -887,7 +886,7 @@ void LAMMPSDataFormat::write_dihedrals(const DataTypes& types, const Topology& t
         auto type_k = types.atom_type_id(topology[dihedral[2]]);
         auto type_m = types.atom_type_id(topology[dihedral[3]]);
         auto dihedral_type_id = types.dihedral_type_id(type_i, type_j, type_k, type_m);
-        file_->print("{} {} {} {} {} {}\n",
+        file_.print("{} {} {} {} {} {}\n",
             dihedral_id, dihedral_type_id + 1,
             dihedral[0] + 1, dihedral[1] + 1, dihedral[2] + 1, dihedral[3] + 1
         );
@@ -898,7 +897,7 @@ void LAMMPSDataFormat::write_dihedrals(const DataTypes& types, const Topology& t
 void LAMMPSDataFormat::write_impropers(const DataTypes& types, const Topology& topology) {
     if (topology.impropers().empty()) { return; }
 
-    file_->print("\nImpropers\n\n");
+    file_.print("\nImpropers\n\n");
     size_t improper_id = 1;
     for (auto improper: topology.impropers()) {
         auto type_i = types.atom_type_id(topology[improper[0]]);
@@ -906,7 +905,7 @@ void LAMMPSDataFormat::write_impropers(const DataTypes& types, const Topology& t
         auto type_k = types.atom_type_id(topology[improper[2]]);
         auto type_m = types.atom_type_id(topology[improper[3]]);
         auto improper_type_id = types.improper_type_id(type_i, type_j, type_k, type_m);
-        file_->print("{} {} {} {} {} {}\n",
+        file_.print("{} {} {} {} {} {}\n",
             improper_id, improper_type_id + 1,
             improper[0] + 1, improper[1] + 1, improper[2] + 1, improper[3] + 1
         );
@@ -914,17 +913,18 @@ void LAMMPSDataFormat::write_impropers(const DataTypes& types, const Topology& t
     }
 }
 
-std::string split_comment(std::string& line) {
-    std::string comment;
+string_view split_comment(string_view& line) {
     auto position = line.find('#');
     if (position != std::string::npos) {
-        comment = line.substr(position + 1);
-        line.erase(position);
+        auto comment = line.substr(position + 1);
+        line.remove_suffix(line.size() - position);
+        return comment;
+    } else {
+        return "";
     }
-    return comment;
 }
 
-bool is_unused_header(const std::string& line) {
+bool is_unused_header(string_view line) {
     return (line.find("angles") != std::string::npos) ||
            (line.find("dihedrals") != std::string::npos) ||
            (line.find("impropers") != std::string::npos) ||
@@ -1009,14 +1009,14 @@ double tilt_factor(const Matrix3D& matrix, size_t i, size_t j) {
     return factor;
 }
 
-std::streampos LAMMPSDataFormat::forward() {
+int64_t LAMMPSDataFormat::forward() {
     // LAMMPS Data only supports one step, so always act like there is only one
-    auto position = file_->tellpos();
-    if (position == std::streampos(0)) {
+    auto position = file_.tellpos();
+    if (position == 0) {
         // advance the pointer for the next call
-        file_->skipline();
+        file_.readline();
         return position;
     } else {
-        return std::streampos(-1);
+        return -1;
     }
 }

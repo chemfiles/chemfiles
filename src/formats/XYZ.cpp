@@ -34,8 +34,8 @@ template<> FormatInfo chemfiles::format_information<XYZFormat>() {
 void XYZFormat::read_next(Frame& frame) {
     size_t natoms = 0;
     try {
-        natoms = parse<size_t>(file_->readline());
-        file_->skipline(); // XYZ comment line;
+        natoms = parse<size_t>(file_.readline());
+        file_.readline(); // XYZ comment line;
     } catch (const std::exception& e) {
         throw format_error("can not read next step as XYZ: {}", e.what());
     }
@@ -43,7 +43,8 @@ void XYZFormat::read_next(Frame& frame) {
     frame.reserve(natoms);
     frame.resize(0);
 
-    for (auto&& line: file_->readlines(natoms)) {
+    for (size_t i=0; i<natoms; i++) {
+        auto line = file_.readline();
         double x = 0, y = 0, z = 0;
         std::string name;
         scan(line, name, x, y, z);
@@ -56,44 +57,42 @@ void XYZFormat::write_next(const Frame& frame) {
     auto& positions = frame.positions();
     assert(frame.size() == topology.size());
 
-    file_->print("{}\n", frame.size());
-    file_->print("Written by the chemfiles library\n", frame.size());
+    file_.print("{}\n", frame.size());
+    file_.print("Written by the chemfiles library\n", frame.size());
 
     for (size_t i = 0; i < frame.size(); i++) {
         auto name = topology[i].name();
         if (name.empty()) {
             name = "X";
         }
-        file_->print("{} {} {} {}\n",
+        file_.print("{} {} {} {}\n",
             name, positions[i][0], positions[i][1], positions[i][2]
         );
     }
 }
 
-std::streampos XYZFormat::forward() {
-    if (file_->fail()) {
-        return std::streampos(-1);
-    }
-
-    auto position = file_->tellpos();
+int64_t XYZFormat::forward() {
+    auto position = file_.tellpos();
     size_t natoms = 0;
     try {
-        natoms = parse<size_t>(file_->readline());
-    } catch (const FileError&) {
-        // No more line left in the file
-        return std::streampos(-1);
+        natoms = parse<size_t>(file_.readline());
     } catch (const Error&) {
         // We could not read an integer, so give up here
-        return std::streampos(-1);
+        return -1;
+    }
+    static int step = 0;
+    step++;
+
+    for (size_t i=0; i<natoms + 1; i++) {
+        if (file_.eof()) {
+            throw format_error(
+                "XYZ format: not enough lines at step {} (expected {}, got {})",
+                step, natoms + 2, i + 1
+            );
+        }
+
+        file_.readline();
     }
 
-    try {
-        file_->skiplines(natoms + 1);
-    } catch (const FileError&) {
-        // We could not read the lines from the file
-        throw format_error(
-            "XZ format: not enough lines in '{}'", file_->path()
-        );
-    }
     return position;
 }
