@@ -10,8 +10,6 @@
 #include <sstream>
 #include <exception>
 
-#include <fmt/ostream.h>
-
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Atom.hpp"
@@ -38,36 +36,31 @@ template<> FormatInfo chemfiles::format_information<SDFFormat>() {
 }
 
 void SDFFormat::read_next(Frame& frame) {
-
-    // Make this global as it may contain information we need later
-    std::string counts_line;
     size_t natoms = 0;
     size_t nbonds = 0;
     try {
-        std::string molecule_name = file_->readline();
-        frame.set("name", molecule_name);
+        auto line = file_.readline();
+        frame.set("name", line.to_string());
 
-        file_->skipline(); // Program line - skip it
-        file_->skipline(); // Comment line - skip it
+        file_.readline(); // Program line - skip it
+        file_.readline(); // Comment line - skip it
 
-        counts_line = file_->readline();
-        natoms = parse<size_t>(counts_line.substr(0, 3));
-        nbonds = parse<size_t>(counts_line.substr(3, 3));
+        line = file_.readline();
+        natoms = parse<size_t>(line.substr(0, 3));
+        nbonds = parse<size_t>(line.substr(3, 3));
     } catch (const std::exception& e) {
         throw format_error("can not read next step as SDF: {}", e.what());
     }
 
-    std::vector<std::string> atom_lines;
-    try {
-        atom_lines = file_->readlines(natoms);
-    } catch (const FileError& e) {
-        throw format_error("can not read file: {}", e.what());
-    }
-
     frame.reserve(natoms);
-    frame.resize(0);
+    for (size_t i=0; i<natoms; i++) {
+        string_view line;
+        try {
+            line = file_.readline();
+        } catch (const FileError& e) {
+            throw format_error("can not read file: {}", e.what());
+        }
 
-    for (const auto& line: atom_lines) {
         if (line.length() < 34) {
             throw format_error(
                 "atom line is too small for SDF: '{}'", line
@@ -116,14 +109,14 @@ void SDFFormat::read_next(Frame& frame) {
         frame.add_atom(std::move(atom), Vector3D(x, y, z));
     }
 
-    std::vector<std::string> bond_lines;
-    try {
-        bond_lines = file_->readlines(nbonds);
-    } catch (const FileError& e) {
-        throw format_error("can not read file: {}", e.what());
-    }
+    for (size_t i=0; i<nbonds; i++) {
+        string_view line;
+        try {
+            line = file_.readline();
+        } catch (const FileError& e) {
+            throw format_error("can not read file: {}", e.what());
+        }
 
-    for (const auto& line: bond_lines) {
         auto atom1 = parse<size_t>(line.substr(0, 3));
         auto atom2 = parse<size_t>(line.substr(3, 3));
         auto bondo = parse<size_t>(line.substr(6, 3));
@@ -155,9 +148,9 @@ void SDFFormat::read_next(Frame& frame) {
     // Parsing the file is more or less complete now, but atom properties can
     // still be read (until 'M  END' is reached).
     // This loop breaks when the property block ends or returns on an error
-    while(true) {
+    while(!file_.eof()) {
         try {
-            auto line = file_->readline();
+            auto line = file_.readline();
             if (line.empty()) {
                 continue;
             } else if (line.substr(0, 4) == "$$$$") {
@@ -180,16 +173,19 @@ void SDFFormat::read_next(Frame& frame) {
     std::string property_name;
     std::string property_value;
 
-    while(true) {
+    while(!file_.eof()) {
         try {
-            auto line = file_->readline();
+            auto line = file_.readline();
             if (line.empty()) {
                 // This breaks a property group - so store now
                 if (property_name == "") {
                     warning("Missing property name!");
                     continue;
                 }
-                frame.set(property_name, Property(property_value));
+                frame.set(std::move(property_name), Property(std::move(property_value)));
+                // re-init after moving from property_name and property_value
+                property_name = "";
+                property_value = "";
             } else if (line.substr(0, 4) == "$$$$") {
                 // Molecule ending block
                 return;
@@ -198,13 +194,13 @@ void SDFFormat::read_next(Frame& frame) {
                 // It is formated like:
                 //> <NAMEGOESHERE>
                 const auto npos = line.find_last_of('>');
-                property_name = line.substr(3, npos - 3);
+                property_name = line.substr(3, npos - 3).to_string();
 
-                property_value = file_->readline();
+                property_value = file_.readline().to_string();
             } else {
                 // Continuation of a property value
                 property_value += '\n';
-                property_value += line;
+                property_value += line.to_string();
             }
         } catch (const FileError&) {
             warning("Premature end of SDF File during global property reading!");
@@ -219,9 +215,9 @@ void SDFFormat::write_next(const Frame& frame) {
     auto& positions = frame.positions();
     assert(frame.size() == topology.size());
 
-    file_->print("{}\n", frame.get<Property::STRING>("name").value_or("NONAME"));
-    file_->print(" chemfiles-lib\n\n");
-    file_->print("{:>3}{:>3}  0     0  0  0  0  0  0999 V2000\n", frame.size(), topology.bonds().size());
+    file_.print("{}\n", frame.get<Property::STRING>("name").value_or("NONAME"));
+    file_.print(" chemfiles-lib\n\n");
+    file_.print("{:>3}{:>3}  0     0  0  0  0  0  0999 V2000\n", frame.size(), topology.bonds().size());
 
     for (size_t i = 0; i < frame.size(); i++) {
         std::string type = topology[i].type();
@@ -261,7 +257,7 @@ void SDFFormat::write_next(const Frame& frame) {
             warning("SDF writer", "charge not an integer: '{}'", topology[i].charge());
         }
 
-        file_->print("{:>10.4f}{:>10.4f}{:>10.4f} {:3} 0{:3}  0  0  0  0  0  0  0  0  0  0\n",
+        file_.print("{:>10.4f}{:>10.4f}{:>10.4f} {:3} 0{:3}  0  0  0  0  0  0  0  0  0  0\n",
             positions[i][0], positions[i][1], positions[i][2], type, charge_code
         );
     }
@@ -290,32 +286,32 @@ void SDFFormat::write_next(const Frame& frame) {
                 break;
         }
 
-        file_->print("{:>3}{:>3}{}  0  0  0  0\n",
+        file_.print("{:>3}{:>3}{}  0  0  0  0\n",
             bond[0] + 1, bond[1] + 1, bond_order
         );
     }
 
-    file_->print("M  END\n");
+    file_.print("M  END\n");
 
     for (auto& prop : frame.properties()) {
         if (prop.first == "name") {
             continue;
         }
 
-        file_->print("> <{}>\n", prop.first);
+        file_.print("> <{}>\n", prop.first);
 
         switch(prop.second.kind()) {
         case Property::STRING:
-            file_->print("{}\n\n", prop.second.as_string());
+            file_.print("{}\n\n", prop.second.as_string());
             break;
         case Property::DOUBLE:
-            file_->print("{}\n\n", prop.second.as_double());
+            file_.print("{}\n\n", prop.second.as_double());
             break;
         case Property::BOOL:
-            file_->print("{}\n\n", prop.second.as_bool());
+            file_.print("{}\n\n", prop.second.as_bool());
             break;
         case Property::VECTOR3D:
-            file_->print("{} {} {}\n\n",
+            file_.print("{} {} {}\n\n",
                 prop.second.as_vector3d()[0],
                 prop.second.as_vector3d()[1],
                 prop.second.as_vector3d()[2]
@@ -324,53 +320,51 @@ void SDFFormat::write_next(const Frame& frame) {
         }
     }
 
-    file_->print("$$$$\n");
+    file_.print("$$$$\n");
 }
 
-std::streampos SDFFormat::forward() {
-    if (file_->fail()) {
-        return std::streampos(-1);
-    }
-
-    auto position = file_->tellpos();
+int64_t SDFFormat::forward() {
+    auto position = file_.tellpos();
     size_t natoms = 0;
     size_t nbonds = 0;
     try {
         // Ignore junk lines
-        file_->skiplines(3);
-        std::string counts_line = file_->readline();
+        for (size_t i=0; i<3; i++) {
+            file_.readline();
+        }
 
+        auto counts_line = file_.readline();
         if (counts_line.length() < 10) {
             throw format_error("counts line must have at least 10 digits, it has {}", counts_line.length());
         }
 
         natoms = parse<size_t>(counts_line.substr(0,3));
         nbonds = parse<size_t>(counts_line.substr(3,3));
-    } catch (const FileError&) {
-        // No more line left in the file
-        return std::streampos(-1);
     } catch (const Error&) {
         // We could not read an integer, so give up here
-        return std::streampos(-1);
+        return -1;
     }
 
     try {
-        file_->skiplines(natoms + nbonds);
+        for (size_t i=0; i<(natoms + nbonds); i++) {
+            file_.readline();
+        }
     } catch (const FileError&) {
         // We could not read the lines from the file
         throw format_error(
-            "not enough lines in '{}' for SDF format", file_->path()
+            "not enough lines in '{}' for SDF format", file_.path()
         );
     }
 
     // Search for ending character, updating the position in the file only
-    while (!file_->eof()) {
-        if (file_->readline() == "$$$$") {
+    while (!file_.eof()) {
+        if (file_.readline() == "$$$$") {
             break;
         }
     }
 
     // We have enough data to parse an entire molecule.
-    // So, even if the file does not have an ending string - return true.
+    // So, even if the file may not have an ending string,
+    // return the start of this step
     return position;
 }

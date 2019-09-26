@@ -4,14 +4,14 @@
 #ifndef CHEMFILES_FILES_HPP
 #define CHEMFILES_FILES_HPP
 
-#include <istream>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include <fmt/ostream.h>
 
 #include "chemfiles/exports.h"
+#include "chemfiles/string_view.hpp"
+#include "chemfiles/ErrorFmt.hpp"
 
 namespace chemfiles {
 
@@ -41,8 +41,8 @@ public:
     virtual ~File() noexcept = default;
     File(File&&) = default;
     File& operator=(File&&) = default;
-    File(File const&) = delete;
-    File& operator=(File const&) = delete;
+    File(const File&) = delete;
+    File& operator=(const File&) = delete;
 
     /// Get the file path used to open this file.
     const std::string& path() const { return path_; }
@@ -63,63 +63,105 @@ private:
     Compression compression_;
 };
 
+/// Abstract base class for readers used by text files. This is specialized for
+/// compressed files, and might get extended to network or memory mapped files.
+class TextFileImpl {
+public:
+    TextFileImpl() = default;
+    virtual ~TextFileImpl() = default;
+    TextFileImpl(TextFileImpl&&) = delete;
+    TextFileImpl(const TextFileImpl&) = delete;
+    TextFileImpl& operator=(TextFileImpl&&) = delete;
+    TextFileImpl& operator=(const TextFileImpl&) = delete;
+
+    /// clear error and eof flags on the file
+    virtual void clear() = 0;
+
+    /// Set file indicator to `position` characters after the start of the file
+    virtual void seek(int64_t position) = 0;
+
+    /// Fill up the `data` buffer reading at most `count` characters from the
+    /// file.
+    ///
+    /// Returns the amount of characters read. A return value of 0 indicates
+    /// that the end of file has been reached.
+    virtual size_t read(char* data, size_t count) = 0;
+
+    /// Write `count` characters starting at `data` to the file. Returns the
+    /// number of character actually writen.
+    virtual size_t write(const char* data, size_t count) = 0;
+};
+
 /// Abstract base class representing a text file. This class is inteded to be
 /// inherited by any form of text files: compressed files, memory-mapped files,
 /// etc.
 ///
 /// All failling operations should throw a `FileError` instead of waiting for
 /// the user of the class to the current state.
-class CHFL_EXPORT TextFile: public File {
+class CHFL_EXPORT TextFile final: public File {
 public:
     /// Open the file at the given `path` with the requested `mode` and
-    /// `compression` method using the most adapted child class of `TextFile`.
-    static std::unique_ptr<TextFile> open(std::string path, File::Mode mode, File::Compression compression);
+    /// `compression` method, picking the best `TextFileImpl`.
+    TextFile(std::string path, File::Mode mode, File::Compression compression);
 
-    /// Read a line from the file
-    std::string readline();
-    /// Read `n` lines from the file
-    std::vector<std::string> readlines(size_t n);
+    TextFile(TextFile&&) = default;
+    TextFile& operator=(TextFile&&) = default;
+    TextFile(const TextFile&) = delete;
+    TextFile& operator=(const TextFile&) = delete;
 
-    /// Skip a single line from the file
-    void skipline();
-    /// Skip `n` lines from the file
-    void skiplines(size_t n);
+    /// returns the current position indicator
+    int64_t tellpos() const;
+
+    /// set the position indicator to `position`
+    void seekpos(int64_t position);
 
     /// Reset the position indicator to the beggining of the file
     void rewind();
 
-    /// returns the current position indicator
-    std::streampos tellpos();
-    /// set the position indicator to `position`
-    void seekpos(std::streampos position);
-
-    /// checks if no error has occurred i.e. I/O operations are available
-    bool good() const;
     /// checks if end-of-file has been reached
-    bool eof() const;
-    /// checks if an error has occurred
-    bool fail() const;
-    /// checks if a non-recoverable error has occurred
-    bool bad() const;
-    /// clear state flags
-    void clear();
-
-    template <typename Str, typename... Args>
-    void print(const Str& format_str, const Args&... args) {
-        fmt::print(stream_, format_str, args...);
+    bool eof() const {
+        return eof_;
     }
 
-protected:
-    /// Initialize the TextFile at the given `path` and `mode`, with the
-    /// specified 'compression' method. All read and write operations will go
-    /// through the provided `buffer`.
-    TextFile(std::string path, File::Mode mode, File::Compression compression, std::streambuf* buffer);
+    /// clear eof flags on the file
+    void clear();
+
+    /// Read a line from the file
+    string_view readline();
+
+    /// Read the full file into a string.
+    std::string readall();
+
+    template <typename Str, typename... Args>
+    void print(const Str& format, const Args&... args) {
+        this->vprint(format, fmt::make_format_args(args...));
+    }
 
 private:
-    void get_line_impl(std::string& string);
-    void skip_line_impl();
+    /// Fill the buffer, calling `refill` and setting all needed internal values
+    void fill_buffer(size_t start);
 
-    std::iostream stream_;
+    /// Actually format and print data to the file
+    void vprint(fmt::string_view format, fmt::format_args args);
+
+    bool buffer_initialized() const;
+
+    /// Pointer to the actual file implementation
+    std::unique_ptr<TextFileImpl> file_;
+    /// Buffer to store read characters
+    std::vector<char> buffer_;
+    /// Start of the current line;
+    const char* line_start_;
+    /// End of the buffer
+    const char* end_;
+    /// Current position in the file, this points to the character
+    /// corresponding to the start of the buffer
+    int64_t position_ = 0;
+    /// Did we reach the end of the underlying buffer? Since we are
+    /// buffering data, this does not necessarly correspond to `this->eof()`;
+    bool got_impl_eof_ = false;
+    /// Did we actually reached the end of file while reading a line?
+    bool eof_ = false;
 };
 
 } // namespace chemfiles

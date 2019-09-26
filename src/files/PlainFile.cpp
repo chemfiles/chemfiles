@@ -1,8 +1,18 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-
-#include <ios>
+#include <cerrno>
+#include <cstdint>
+#include <cstdio>
 #include <string>
+
+#ifdef __CYGWIN__
+    #define fseek64 fseek
+#elif defined(_MSC_VER)
+    #define fseek64 _fseeki64
+#else
+    // assume unix by default
+    #define fseek64 fseeko
+#endif
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/files/PlainFile.hpp"
@@ -10,31 +20,61 @@
 
 using namespace chemfiles;
 
-PlainFile::PlainFile(std::string path, File::Mode mode)
-    : TextFile(std::move(path), mode, File::DEFAULT, &buffer_) {
+PlainFile::PlainFile(const std::string& path, File::Mode mode) {
     // We need to use binary mode when opening the file because we are storing
     // positions in the files relative to line ending positions. Using text
     // mode make the MSVC runtime convert lines ending and then all the values
     // return by tellpos are wrong.
     //
-    // We can do this because we are dealing with line ending ourself in the
-    // `get_line` function.
-    std::ios_base::openmode openmode = std::ios_base::binary;
+    // We can do this because we are dealing with line ending ourself.
+    const char* openmode;
 
     switch (mode) {
     case File::READ:
-        openmode |= std::ios_base::in;
+        openmode = "rb";
         break;
     case File::APPEND:
-        openmode |= std::ios_base::out | std::ios_base::app;
+        openmode = "a+b";
         break;
     case File::WRITE:
-        openmode |= std::ios_base::out | std::ios_base::trunc;
+        openmode = "wb";
         break;
     }
 
-    buffer_.open(this->path(), openmode);
-    if (!buffer_.is_open()) {
-        throw file_error("could not open the file at '{}'", this->path());
+    file_ = std::fopen(path.c_str(), openmode);
+    if (file_ == nullptr){
+        throw file_error("could not open the file at '{}'", path);
     }
+}
+
+PlainFile::~PlainFile() {
+    if (file_ != nullptr) {
+        std::fclose(file_);
+    }
+}
+
+void PlainFile::clear() {
+    std::clearerr(file_);
+}
+
+void PlainFile::seek(int64_t position) {
+    auto status = fseek64(file_, position, SEEK_SET);
+    if (status != 0) {
+        auto message = std::strerror(errno);
+        throw file_error("error while seeking file: {}", message);
+    }
+}
+
+size_t PlainFile::read(char* data, size_t count) {
+    auto result = std::fread(data, 1, count, file_);
+
+    if (std::ferror(file_) != 0) {
+        throw file_error("IO error while reading the file");
+    }
+
+    return result;
+}
+
+size_t PlainFile::write(const char* data, size_t count) {
+    return std::fwrite(data, 1, count, file_);
 }

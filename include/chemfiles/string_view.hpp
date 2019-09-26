@@ -27,6 +27,16 @@ namespace nonstd { namespace sv_lite {
     GENERATE_OPERATOR(>=)
 
 #undef GENERATE_OPERATOR
+
+    inline std::string& operator+=(std::string& string, string_view additional) {
+        string.append(additional.data(), additional.size());
+        return string;
+    }
+
+    inline std::string operator+(std::string string, string_view additional) {
+        string.append(additional.data(), additional.size());
+        return string;
+    }
 }} // namespace nonstd::sv_lite
 
 namespace chemfiles {
@@ -38,6 +48,9 @@ namespace chemfiles {
     using nonstd::operator>;
     using nonstd::operator<=;
     using nonstd::operator>=;
+
+    using nonstd::sv_lite::operator+=;
+    using nonstd::sv_lite::operator+;
 }
 
 // compatibility with fmt

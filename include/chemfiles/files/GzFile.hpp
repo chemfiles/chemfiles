@@ -4,58 +4,36 @@
 #ifndef CHEMFILES_GZ_FILES_HPP
 #define CHEMFILES_GZ_FILES_HPP
 
-#include <ios>
-#include <vector>
+#include <cstdint>
 #include <string>
-
-#include <zlib.h>
 
 #include "chemfiles/File.hpp"
 
+typedef struct gzFile_s *gzFile;
+
 namespace chemfiles {
 
-/// An implementation of std::streambuf for gziped files
-class gzstreambuf final: public std::streambuf {
+/// An implementation of TextFile for gzip files
+class GzFile final: public TextFileImpl {
 public:
-    gzstreambuf(size_t buffer_size = 512);
-    ~gzstreambuf() override;
+    /// Open a text file with name `filename` and mode `mode`.
+    GzFile(const std::string& path, File::Mode mode);
+    ~GzFile() override;
 
-    gzstreambuf(const gzstreambuf&) = delete;
-    gzstreambuf& operator=(const gzstreambuf&) = delete;
-    gzstreambuf(gzstreambuf&&) = delete;
-    gzstreambuf& operator=(gzstreambuf&&) = delete;
+    size_t read(char* data, size_t count) override;
+    size_t write(const char* data, size_t count) override;
 
-    /// Open the file at `path` with the given `mode`. The mode will be passed
-    /// down to gzopen.
-    void open(const std::string& path, const std::string& mode);
-
-    int underflow() override;
-
-    int sync() override;
-    bool is_open() const;
-
-    std::streampos seekpos(std::streampos offset, std::ios_base::openmode mode) override {
-        return pubseekoff(offset, std::ios_base::beg, mode);
-    }
-
-    std::streampos seekoff(std::streamoff offset, std::ios_base::seekdir way, std::ios_base::openmode mode) override;
+    void clear() override;
+    void seek(int64_t position) override;
 
 private:
-    std::vector<char> buffer_;
+    /// Check if any error happened while reading/writing the file. Returns the
+    /// corresponding error message or `nullptr` if no error occured.
+    const char* check_error() const;
+
     gzFile file_ = nullptr;
 };
 
-
-/// A gziped text file
-class GzFile final: public TextFile {
-public:
-    /// Open the file at the given `path` using the specified `mode`
-    GzFile(std::string path, File::Mode mode);
-
-private:
-    gzstreambuf buffer_;
-};
-
-} // namespace chemfiles
+}
 
 #endif

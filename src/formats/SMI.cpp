@@ -202,10 +202,10 @@ void SMIFormat::read_next(Frame& frame) {
     size_t groupid = 1;
     residues_.push_back(Residue("group " + std::to_string(groupid)));
 
-    auto line = file_->readline();
+    auto line = file_.readline();
     auto smiles = trim(line);
     while (smiles.empty()) {
-        line = file_->readline();
+        line = file_.readline();
         smiles = trim(line);
     }
 
@@ -449,7 +449,7 @@ static bool double_to_int(double value, int& int_part) {
     return false;
 }
 
-static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom) {
+static void write_atom_smiles(TextFile& file, const Atom& atom) {
     bool needs_brackets = false;
     auto type = atom.type();
 
@@ -510,18 +510,18 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
     }
 
     if (needs_brackets) {
-        file_->print("[");
+        file.print("[");
     }
 
     // Mass must be first, before the element is printed
     if (mass_int != 0) {
-        file_->print("{}", mass_int);
+        file.print("{}", mass_int);
     }
 
-    file_->print("{}", type);
+    file.print("{}", type);
 
     if (smi_class != -1) {
-        file_->print(":{}", smi_class);
+        file.print(":{}", smi_class);
     }
 
     bool is_good_tag = false;
@@ -533,13 +533,13 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
         // If it's clockwise, then we just print the symbol @@ and be done with it
         if (chirality == "CW") {
             is_good_tag = true;
-            file_->print("@@");
+            file.print("@@");
         }
         break;
     case 3:
         if (chirality == "CCW") {
             is_good_tag = true;
-            file_->print("@");
+            file.print("@");
         }
         break;
     case 7:
@@ -547,7 +547,7 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
             && is_chirality_tag(chirality.substr(4, 2))
             && std::isdigit(chirality[6]) != 0 ) {
             is_good_tag = true;
-            file_->print("@{}", chirality.substr(4));
+            file.print("@{}", chirality.substr(4));
         }
         break;
     case 8:
@@ -556,7 +556,7 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
             && std::isdigit(chirality[6]) != 0
             && std::isdigit(chirality[7]) != 0) {
             is_good_tag = true;
-            file_->print("@{}", chirality.substr(4));
+            file.print("@{}", chirality.substr(4));
         }
         break;
     default:
@@ -568,50 +568,50 @@ static void write_atom_smiles(std::unique_ptr<TextFile>& file_, const Atom& atom
     }
 
     if (explicit_h == 1) {
-        file_->print("H");
+        file.print("H");
     }
 
     if (explicit_h > 1) {
-        file_->print("H{}", explicit_h);
+        file.print("H{}", explicit_h);
     }
 
     if (charge_int < 0) {
-        file_->print("-", charge_int);
+        file.print("-", charge_int);
     }
 
     if (charge_int > 0) {
-        file_->print("+", charge_int);
+        file.print("+", charge_int);
     }
 
     charge_int = std::abs(charge_int);
     if (charge_int != 1 && charge_int != 0) {
-        file_->print("{}", charge_int);
+        file.print("{}", charge_int);
     }
 
     if (needs_brackets) {
-        file_->print("]");
+        file.print("]");
     }
 }
 
-static void print_bond(std::unique_ptr<TextFile>& file_, chemfiles::Bond::BondOrder bo) {
+static void print_bond(TextFile& file, chemfiles::Bond::BondOrder bo) {
     switch(bo) {
     case Bond::SINGLE:
     case Bond::AMIDE:
         break;
-    case Bond::DOUBLE: file_->print("="); break;
-    case Bond::TRIPLE: file_->print("#"); break;
-    case Bond::QUADRUPLE: file_->print("$"); break;
-    case Bond::AROMATIC: file_->print(":"); break;
-    case Bond::DATIVE_L: file_->print("<-"); break;
-    case Bond::DATIVE_R: file_->print("->"); break;
-    case Bond::UP: file_->print("/"); break;
-    case Bond::DOWN: file_->print("\\"); break;
+    case Bond::DOUBLE: file.print("="); break;
+    case Bond::TRIPLE: file.print("#"); break;
+    case Bond::QUADRUPLE: file.print("$"); break;
+    case Bond::AROMATIC: file.print(":"); break;
+    case Bond::DATIVE_L: file.print("<-"); break;
+    case Bond::DATIVE_R: file.print("->"); break;
+    case Bond::UP: file.print("/"); break;
+    case Bond::DOWN: file.print("\\"); break;
     case Bond::UNKNOWN:
-        file_->print("~");
+        file.print("~");
         break;
     default:
         warning("SMI Writer", "unknown bond type");
-        file_->print("~");
+        file.print("~");
         break;
     }
 }
@@ -628,9 +628,7 @@ void SMIFormat::write_atom(
     hit_atoms[current_atom] = true;
 
     if (current_atom != previous_atom) {
-        print_bond(file_,
-                   frame.topology().bond_order(previous_atom, current_atom)
-        );
+        print_bond(file_, frame.topology().bond_order(previous_atom, current_atom));
     }
     write_atom_smiles(file_, frame[current_atom]);
 
@@ -642,7 +640,7 @@ void SMIFormat::write_atom(
         for (size_t i = 0; i < any_rings->second; ++i) {
             ring_count_++;
             ring_start++;
-            file_->print("{}", ring_count_);
+            file_.print("{}", ring_count_);
             ring_stack_.insert({current_atom, ring_count_});
         }
     }
@@ -664,7 +662,7 @@ void SMIFormat::write_atom(
                 print_bond(file_,
                     frame.topology().bond_order(current_atom, neighbor)
                 );
-                file_->print("{}", ring->second);
+                file_.print("{}", ring->second);
                 ring_stack_.erase(ring);
                 ring_end++;
             }
@@ -687,7 +685,7 @@ void SMIFormat::write_atom(
         // and we don't want to brank the last neighbor printed
         if (neighbors_printed - ring_start < current_atom_bonds.size() - 2 &&
             current_atom_bonds.size() > 2) {
-            file_->print("(");
+            file_.print("(");
             branch_stack_++;
         }
 
@@ -701,14 +699,14 @@ void SMIFormat::write_atom(
 
     // End of branch
     if (current_atom_bonds.size() - ring_end == 1 && branch_stack_ != 0) {
-        file_->print(")");
+        file_.print(")");
         branch_stack_--;
     }
 }
 
 void SMIFormat::write_next(const Frame& frame) {
     if (frame.size() == 0) {
-        file_->print("\n");
+        file_.print("\n");
         return;
     }
 
@@ -732,7 +730,7 @@ void SMIFormat::write_next(const Frame& frame) {
 
     while (!all(written)) {
         if (!first_atom_) {
-            file_->print(".");
+            file_.print(".");
         }
         auto not_hit = std::find(written.begin(), written.end(), false);
         auto current_atom = static_cast<size_t>(std::distance(written.begin(), not_hit));
@@ -742,26 +740,21 @@ void SMIFormat::write_next(const Frame& frame) {
 
     auto name = frame.get("name");
     if (name && name->kind() == Property::STRING) {
-        file_->print("\t{}", name->as_string());
+        file_.print("\t{}", name->as_string());
     }
 
-    file_->print("\n");
+    file_.print("\n");
 }
 
-std::streampos SMIFormat::forward() {
-    if (file_->fail()) {
-        return std::streampos(-1);
-    }
+int64_t SMIFormat::forward() {
+    auto position = file_.tellpos();
 
-    auto position = file_->tellpos();
-    try {
-        auto line = file_->readline();
-        while (trim(line).empty()) {
-            line = file_->readline();
+    auto line = file_.readline();
+    while (trim(line).empty()) {
+        if (file_.eof()) {
+            return -1;
         }
-    } catch (const FileError&) {
-        // No more line left in the file
-        return std::streampos(-1);
+        line = file_.readline();
     }
 
     return position;

@@ -2,14 +2,16 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cstdio>
+#include <cstdlib>
 #include <istream>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "chemfiles/File.hpp"
-#include "chemfiles/files/GzFile.hpp"
+
 #include "chemfiles/files/PlainFile.hpp"
+#include "chemfiles/files/GzFile.hpp"
 #include "chemfiles/files/XzFile.hpp"
 
 #include "chemfiles/ErrorFmt.hpp"
@@ -17,183 +19,184 @@
 
 using namespace chemfiles;
 
-std::unique_ptr<TextFile> TextFile::open(std::string path, File::Mode mode, File::Compression compression) {
+TextFile::TextFile(std::string path, File::Mode mode, File::Compression compression):
+    File(std::move(path), mode, compression),
+    file_(nullptr),
+    buffer_(8192, 0),
+    line_start_(buffer_.data()),
+    end_(buffer_.data() + buffer_.size())
+{
     switch (compression) {
     case File::DEFAULT:
-        return std::unique_ptr<TextFile>(new PlainFile(std::move(path), mode));
+        file_ = std::unique_ptr<TextFileImpl>(new PlainFile(this->path(), this->mode()));
+        break;
     case File::GZIP:
-        return std::unique_ptr<TextFile>(new GzFile(std::move(path), mode));
+        file_ = std::unique_ptr<TextFileImpl>(new GzFile(this->path(), this->mode()));
+        break;
     case File::LZMA:
-        return std::unique_ptr<TextFile>(new XzFile(std::move(path), mode));
+        file_ = std::unique_ptr<TextFileImpl>(new XzFile(this->path(), this->mode()));
+        break;
+    default:
+        unreachable();
     }
-    unreachable();
 }
 
-TextFile::TextFile(std::string path, File::Mode mode, File::Compression compression, std::streambuf* buffer):
-    File(std::move(path), mode, compression), stream_(buffer)
-{
-    stream_.clear();
-    // Throw exceptions on errors
-    stream_.exceptions(std::fstream::badbit | std::fstream::failbit);
+int64_t TextFile::tellpos() const {
+    auto delta = buffer_initialized() ? line_start_ - buffer_.data() : 0;
+    assert(position_ + delta >= 0);
+    return position_ + delta;
 }
 
-/// Read a single line from `stream` in `string`, handling all possible end of
-/// line markers (`\n`, `\r`, `\r\n`).
-///
-/// Code from http://stackoverflow.com/a/6089413
-void TextFile::get_line_impl(std::string& string) {
-    string.clear();
-    string.reserve(128);
+void TextFile::seekpos(int64_t position) {
+    assert(position >= 0);
 
-    // The characters in the stream are read one-by-one using a std::streambuf.
-    // That is faster than reading them one-by-one using the std::istream.
-    // Code that uses streambuf this way must be guarded by a sentry object.
-    // The sentry object performs various tasks,
-    // such as thread synchronization and updating the stream state.
-    std::istream::sentry sentry(stream_, true);
-    std::streambuf* buffer = stream_.rdbuf();
+    got_impl_eof_ = false;
+    eof_ = false;
 
-    while(true) {
-        int c = buffer->sbumpc();
-        switch (c) {
-        case '\n':
+    if (buffer_initialized()) {
+        auto delta = position - position_;
+        if (0 <= delta && delta < static_cast<int64_t>(buffer_.size())) {
+            // the new position is inside our buffer, no need to actually seek,
+            // just reset the line_start_ to the correponding position.
+            line_start_ = buffer_.data() + delta;
+            eof_ = false;
             return;
-        case '\r':
-            if(buffer->sgetc() == '\n') {
-                buffer->sbumpc();
-            }
-            return;
-        case EOF:
-            // Also handle the case when the last line has no line ending
-            if(string.empty()) {
-                stream_.setstate(std::ios::eofbit);
-            }
-            return;
-        default:
-            string.push_back(static_cast<char>(c));
         }
     }
-}
 
-void TextFile::skip_line_impl() {
-    std::istream::sentry sentry(stream_, true);
-    std::streambuf* buffer = stream_.rdbuf();
-
-    while(true) {
-        int c = buffer->sbumpc();
-        switch (c) {
-        case '\n':
-            return;
-        case '\r':
-            if(buffer->sgetc() == '\n') {
-                buffer->sbumpc();
-            }
-            return;
-        case EOF:
-            stream_.setstate(std::ios::eofbit);
-            return;
-        default:
-            continue;
-        }
-    }
+    // actually seek the file
+    file_->seek(position);
+    position_ = position;
+    // mark buffer to be refilled
+    buffer_[0] = '\0';
 }
 
 void TextFile::rewind() {
-    this->clear();
-    this->seekpos(0);
-}
-
-std::string TextFile::readline() {
-    // Disable exceptions checking, and manually check bellow
-    auto state = stream_.exceptions();
-    stream_.exceptions(std::fstream::goodbit);
-
-    std::string line;
-    get_line_impl(line);
-    if (stream_.fail()) {
-        throw file_error("could not read a line in {}", this->path());
-    }
-
-    // Re-enable exceptions checking
-    stream_.exceptions(state);
-    return line;
-}
-
-std::vector<std::string> TextFile::readlines(size_t n) {
-    // Disable exceptions checking, and manually check bellow
-    auto state = stream_.exceptions();
-    stream_.exceptions(std::fstream::goodbit);
-
-    auto lines = std::vector<std::string>(n);
-    for (size_t i = 0; i < n; i++) {
-        get_line_impl(lines[i]);
-    }
-
-    if (stream_.fail()) {
-        throw file_error("could not read a line in {}", this->path());
-    }
-
-    // Re-enable exceptions checking
-    stream_.exceptions(state);
-
-    return lines;
-}
-
-void TextFile::skipline() {
-    // Disable exceptions checking, and manually check bellow
-    auto state = stream_.exceptions();
-    stream_.exceptions(std::fstream::goodbit);
-
-    skip_line_impl();
-    if (stream_.fail()) {
-        throw file_error("could not read a line in {}", this->path());
-    }
-
-    // Re-enable exceptions checking
-    stream_.exceptions(state);
-}
-
-void TextFile::skiplines(size_t n) {
-    // Disable exceptions checking, and manually check bellow
-    auto state = stream_.exceptions();
-    stream_.exceptions(std::fstream::goodbit);
-
-    for (size_t i = 0; i < n; i++) {
-        skip_line_impl();
-    }
-
-    if (stream_.fail()) {
-        throw file_error("could not read a line in {}", this->path());
-    }
-
-    // Re-enable exceptions checking
-    stream_.exceptions(state);
-}
-
-std::streampos TextFile::tellpos() {
-    return stream_.tellg();
-}
-
-void TextFile::seekpos(std::streampos position) {
-    stream_.seekg(position);
-}
-
-bool TextFile::good() const {
-    return stream_.good();
-}
-
-bool TextFile::eof() const {
-    return stream_.eof();
-}
-
-bool TextFile::fail() const {
-    return stream_.fail();
-}
-
-bool TextFile::bad() const {
-    return stream_.bad();
+    clear();
+    seekpos(0);
 }
 
 void TextFile::clear() {
-    stream_.clear();
+    // Clear cached variables
+    got_impl_eof_ = false;
+    eof_ = false;
+    // clear the file
+    file_->clear();
+}
+
+bool TextFile::buffer_initialized() const {
+    return buffer_[0] != '\0';
+}
+
+void TextFile::fill_buffer(size_t start) {
+    auto count = buffer_.size() - start;
+    if (buffer_initialized()) {
+        position_ += count;
+    }
+
+    auto read_count = file_->read(buffer_.data() + start, count);
+    if (read_count < count) {
+        got_impl_eof_ = true;
+        // Erase any remaining data in the buffer
+        std::memset(buffer_.data() + start + read_count, 0, count - read_count);
+    }
+    line_start_ = buffer_.data();
+}
+
+string_view TextFile::readline() {
+    // Initialize buffer if needed
+    if (!buffer_initialized()) {
+        fill_buffer(0);
+    }
+
+    if (eof_) {
+        return "";
+    }
+
+    size_t length = 0;
+    size_t windows_line = 0;
+    while (true) {
+        // How many characters are still in the buffer
+        auto remainder = static_cast<size_t>(end_ - line_start_);
+        // look for end of line character
+        auto needle = std::memchr(line_start_ + length, '\n', remainder - length);
+        auto newline = reinterpret_cast<const char*>(needle);
+
+        if (newline != nullptr) {
+            assert(line_start_ <= newline);
+            length += static_cast<size_t>(newline - line_start_ + 1);
+            // Check if we have a windows style line ending (\r\n)
+            if (newline > buffer_.data() && newline[-1] == '\r') {
+                windows_line = 1;
+            }
+
+            break;
+        }
+
+        if (got_impl_eof_) {
+            // no more data, we found the last line
+            eof_ = true;
+            if (line_start_ != end_ - 1) {
+                // The last line does not contain an end of line character
+                // we don't know the string length, but the buffer is
+                // terminated with zeroes, so we can rely on std::strlen
+                // to create the string_view
+                auto line = string_view(line_start_);
+                line_start_ += line.length();
+                return line;
+            }
+        }
+
+        // no new line found in the current buffer, get more data
+
+        if (remainder >= buffer_.size()) {
+            // We did not found a new line in the whole buffer,
+            // so we increase it size
+            auto delta = line_start_ - buffer_.data();
+            buffer_.resize(2 * buffer_.size(), 0);
+            line_start_ = buffer_.data() + delta;
+            end_ = buffer_.data() + buffer_.size();
+        }
+
+        // Move remaining data to the start of buffer
+        std::memmove(buffer_.data(), line_start_, remainder);
+        fill_buffer(remainder);
+    }
+
+    auto line = string_view(line_start_, length - windows_line - 1);
+    line_start_ += length;
+
+    return line;
+}
+
+void TextFile::vprint(fmt::string_view format, fmt::format_args args) {
+    std::string buffer;
+    buffer.reserve(128);
+    fmt::vformat_to(std::back_inserter(buffer), format, args);
+    if (buffer.size() == 0) {
+        return;
+    }
+    auto count = file_->write(buffer.data(), buffer.size());
+    if (count != buffer.size()) {
+        throw file_error("could not write data to the file at '{}'", this->path());
+    }
+}
+
+std::string TextFile::readall() {
+    std::string buffer;
+    buffer.resize(2048, '\0');
+    size_t start = 0;
+    while (true) {
+        auto count = buffer.size() - start;
+        auto read_count = file_->read(&buffer[0] + start, count);
+        start += read_count;
+        if (read_count < count) {
+            // Remove additional '\0' at the end
+            buffer.resize(start);
+            break;
+        }
+        buffer.resize(2 * buffer.size(), '\0');
+    }
+
+    return buffer;
 }
