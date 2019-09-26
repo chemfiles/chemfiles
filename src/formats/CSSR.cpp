@@ -48,30 +48,31 @@ CSSRFormat::CSSRFormat(std::string path, File::Mode mode, File::Compression comp
 }
 
 void CSSRFormat::read_next(Frame& frame) {
-    if (file_->tellpos() != std::streampos(0)) {
+    if (file_.tellpos() != 0) {
         throw format_error("CSSR format only supports reading one frame");
     }
 
     // Read unit cell
     double a = 0, b = 0, c = 0;
-    scan(file_->readline().substr(38), a, b, c);
+    scan(file_.readline().substr(38), a, b, c);
     double alpha = 0, beta = 0, gamma = 0;
-    scan(file_->readline().substr(21), alpha, beta, gamma);
+    scan(file_.readline().substr(21), alpha, beta, gamma);
     frame.set_cell(UnitCell(a, b, c, alpha, beta, gamma));
 
     size_t natoms = 0;
     int coordinate_style = -1;
-    scan(file_->readline(), natoms, coordinate_style);
+    scan(file_.readline(), natoms, coordinate_style);
     bool use_fractional = (coordinate_style == 0);
 
     // Title line
-    file_->skipline();
+    file_.readline();
 
     frame.resize(0);
     frame.reserve(natoms);
 
     std::vector<std::vector<size_t>> connectivity(natoms);
-    for (auto&& line: file_->readlines(natoms)) {
+    for (size_t i=0; i<natoms; i++) {
+        auto line = file_.readline();
         unsigned atom_id = 0;
         std::string name;
         double x = 0, y = 0, z = 0;
@@ -120,28 +121,28 @@ void CSSRFormat::read_next(Frame& frame) {
 }
 
 void CSSRFormat::write_next(const Frame& frame) {
-    if (file_->tellpos() != std::streampos(0)) {
+    if (file_.tellpos() != 0) {
         throw format_error("CSSR format only supports writing one frame");
     }
 
-    file_->print(
+    file_.print(
         " REFERENCE STRUCTURE = 00000   A,B,C ={:8.3f}{:8.3f}{:8.3f}\n",
         frame.cell().a(), frame.cell().b(), frame.cell().c()
     );
-    file_->print(
+    file_.print(
         "   ALPHA,BETA,GAMMA ={:8.3f}{:8.3f}{:8.3f}    SPGR =  1 P1\n",
         frame.cell().alpha(), frame.cell().beta(), frame.cell().gamma()
     );
 
     if (frame.size() > 9999) {
         warning("too many atoms for CSSR format; the file might not open with other programs");
-        file_->print("{} 0\n", frame.size());
+        file_.print("{} 0\n", frame.size());
     } else {
-        file_->print("{:4}   0\n", frame.size());
+        file_.print("{:4}   0\n", frame.size());
     }
 
     // TODO: use the frame name/title property in the file title
-    file_->print(" file created with chemfiles\n", frame.size());
+    file_.print(" file created with chemfiles\n", frame.size());
 
     auto connectivity = std::vector<std::vector<size_t>>(frame.size());
     for (auto& bond : frame.topology().bonds()) {
@@ -164,7 +165,7 @@ void CSSRFormat::write_next(const Frame& frame) {
         }
 
         auto fractional = cell_inv * positions[i];
-        file_->print(
+        file_.print(
             "{:4} {:4}  {:9.5f} {:9.5f} {:9.5f}",
             atom_id, frame[i].name(), fractional[0], fractional[1], fractional[2]
         );
@@ -175,26 +176,26 @@ void CSSRFormat::write_next(const Frame& frame) {
                 warning("too many bonds with atom {} for CSSR format", i);
                 break;
             }
-            file_->print("{:4}", bond + 1);
+            file_.print("{:4}", bond + 1);
             bonds += 1;
         }
         while (bonds < 8) {
-            file_->print("   0");
+            file_.print("   0");
             bonds += 1;
         }
 
-        file_->print(" {:7.3f}\n", frame[i].charge());
+        file_.print(" {:7.3f}\n", frame[i].charge());
     }
 }
 
-std::streampos CSSRFormat::forward() {
+int64_t CSSRFormat::forward() {
     // CSSR only supports one step, so always act like there is only one
-    auto position = file_->tellpos();
-    if (position == std::streampos(0)) {
-        // advance the pointer for the next call
-        file_->skipline();
+    auto position = file_.tellpos();
+    if (position == 0) {
+        // advance the pointer so that the next call to forward returns -1
+        file_.readline();
         return position;
     } else {
-        return std::streampos(-1);
+        return -1;
     }
 }

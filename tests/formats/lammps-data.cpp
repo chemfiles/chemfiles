@@ -13,8 +13,9 @@ using namespace chemfiles;
 TEST_CASE("Read files in LAMMPS data format") {
     SECTION("File created by VMD/Topotools") {
         auto file = Trajectory("data/lammps-data/solvated.lmp", 'r', "LAMMPS Data");
-        Frame frame = file.read();
+        REQUIRE(file.nsteps() == 1);
 
+        auto frame = file.read();
         CHECK(frame.size() == 7772);
 
         CHECK(frame.cell().shape() == UnitCell::ORTHORHOMBIC);

@@ -52,10 +52,10 @@ private:
 };
 
 CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compression)
-    : mode_(mode), file_(TextFile::open(std::move(path), mode, compression))
+    : file_(std::move(path), mode, compression)
 {
 
-    if (mode_ == File::WRITE) {
+    if (file_.mode() == File::WRITE) {
         root_ = document_.append_child("cml");
         root_.append_attribute("xmlns") = "http://www.xml-cml.org/schema";
         root_.append_attribute("xmlns:cml") = "http://www.xml-cml.org/dict/cml";
@@ -70,14 +70,15 @@ CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compre
     // and if it exists append to that node and rewrite the file, appending new
     // frames to the CML node. For now, let's just add molecule nodes to the end
     // of the file.
-    if (mode_ == File::APPEND) {
+    if (file_.mode() == File::APPEND) {
         root_ = document_;
         return;
     }
 
     std::string content;
-    while (!file_->eof()) {
-        content.append(file_->readline());
+    while (!file_.eof()) {
+        auto line = file_.readline();
+        content.append(line.data(), line.size());
     }
 
     auto result = document_.load_string(content.c_str());
@@ -108,13 +109,13 @@ CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compre
 }
 
 CMLFormat::~CMLFormat() {
-    if (num_added_ != 0 && mode_ == File::WRITE) {
-        auto writter = xml_writer(*file_);
+    if (num_added_ != 0 && file_.mode() == File::WRITE) {
+        auto writter = xml_writer(file_);
         document_.save(writter, "  ");
-    } else if (mode_ == File::APPEND) {
+    } else if (file_.mode() == File::APPEND) {
         // Don't bother to check if anything is added, the document will be blank
         // regardless
-        auto writter = xml_writer(*file_);
+        auto writter = xml_writer(file_);
         document_.save(writter, "  ", pugi::format_no_declaration | pugi::format_default);
     }
 }
@@ -316,8 +317,7 @@ void CMLFormat::read(Frame& frame) {
             }
             std::string vec_title = title_attribute.as_string();
 
-            auto tmp = vector3.text().as_string();
-            auto vect_strings = split(tmp, ' ');
+            auto vect_strings = split(vector3.text().as_string(), ' ');
             if (vect_strings.size() != 3) {
                 warning("[CML] {} vector3 does not have 3 values.", vec_title);
                 continue;
@@ -446,7 +446,7 @@ static bool is_double_integer(double val) {
 void CMLFormat::write(const Frame& frame) {
     auto mol = root_.append_child("molecule");
 
-    if (mode_ == File::WRITE) {
+    if (file_.mode() == File::WRITE) {
         ++num_added_;
         mol.append_attribute("id") = ("m" + std::to_string(num_added_)).c_str();
     }

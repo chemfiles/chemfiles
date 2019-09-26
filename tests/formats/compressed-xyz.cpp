@@ -4,6 +4,7 @@
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
+#include "chemfiles/File.hpp"
 #include "chemfiles/files/GzFile.hpp"
 #include "chemfiles/files/XzFile.hpp"
 using namespace chemfiles;
@@ -57,35 +58,38 @@ TEST_CASE("Explit compression in format name") {
     check_read_file(Trajectory("data/xyz/water.xyz.xz", 'r', "XYZ / XZ"));
 }
 
-template<class FileClass>
-static void check_write_file(std::string path) {
+static void check_write_file(std::string path, File::Compression compression) {
     auto frame = Frame();
     frame.add_atom(Atom("A","O"), {1, 2, 3});
     frame.add_atom(Atom("B"), {1, 2, 4});
     frame.add_atom(Atom("C"), {1, 2, 5});
     frame.add_atom(Atom("D"), {1, 2, 6});
 
-    auto file = Trajectory(path, 'w');
-    file.write(frame);
-    file.close();
+    {
+        auto file = Trajectory(path, 'w');
+        file.write(frame);
+        file.close();
+    }
 
-    FileClass checking(path, File::READ);
-    auto lines = checking.readlines(6);
-    CHECK(lines[0] == "4");
-    CHECK(lines[1] == "Written by the chemfiles library");
-    CHECK(lines[2] == "A 1.0 2.0 3.0");
-    CHECK(lines[3] == "B 1.0 2.0 4.0");
-    CHECK(lines[4] == "C 1.0 2.0 5.0");
-    CHECK(lines[5] == "D 1.0 2.0 6.0");
+    TextFile file(path, File::READ, compression);
+    CHECK(file.readline() == "4");
+    CHECK(file.readline() == "Written by the chemfiles library");
+    CHECK(file.readline() == "A 1.0 2.0 3.0");
+    CHECK(file.readline() == "B 1.0 2.0 4.0");
+    CHECK(file.readline() == "C 1.0 2.0 5.0");
+    CHECK(file.readline() == "D 1.0 2.0 6.0");
+
+    CHECK(file.readline() == "");
+    CHECK(file.eof());
 }
 
 
 TEST_CASE("Write compressed files in XYZ format") {
     // gz compression
     auto gz_path = NamedTempPath(".xyz.gz");
-    check_write_file<GzFile>(gz_path);
+    check_write_file(gz_path, File::GZIP);
 
     // xz compression
     auto xz_path = NamedTempPath(".xyz.xz");
-    check_write_file<XzFile>(xz_path);
+    check_write_file(xz_path, File::LZMA);
 }

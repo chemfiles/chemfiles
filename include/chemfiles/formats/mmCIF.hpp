@@ -30,7 +30,7 @@ public:
     void write(const Frame& frame) override;
     size_t nsteps() override;
 private:
-    std::unique_ptr<TextFile> file_;
+    TextFile file_;
     /// Map of STAR records to their index
     std::map<std::string, size_t> atom_site_map_;
     /// Map of residues, indexed by residue id and chainid.
@@ -39,8 +39,8 @@ private:
     /// Set to false if the file is based on cartn coordinates.
     bool uses_fract_;
     /// Storing the positions of all the steps in the file, so that we can
-    /// just `seekg` them instead of reading the whole step.
-    std::vector<std::streampos> steps_positions_;
+    /// just `seekpos` them instead of reading the whole step.
+    std::vector<int64_t> steps_positions_;
     /// The cell for all frames
     UnitCell cell_;
     /// Number of models written to the file.

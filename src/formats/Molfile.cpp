@@ -213,8 +213,8 @@ template <MolfileFormat F> size_t Molfile<F>::nsteps() {
     }
     // We need to close and re-open the file
     plugin_handle_->close_file_read(data_);
-    int tmp = 0;
-    data_ = plugin_handle_->open_file_read(path_.c_str(), plugin_handle_->name, &tmp);
+    int unused = 0;
+    data_ = plugin_handle_->open_file_read(path_.c_str(), plugin_handle_->name, &unused);
     read_topology();
 
     return n;

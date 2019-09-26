@@ -47,9 +47,9 @@ void GROFormat::read_next(Frame& frame) {
     size_t natoms = 0;
     try {
         // GRO comment line is used as frame name
-        auto line = file_->readline();
+        auto line = file_.readline();
         frame.set("name", trim(line).to_string());
-        natoms = parse<size_t>(file_->readline());
+        natoms = parse<size_t>(file_.readline());
     } catch (const Error& e) {
         throw format_error("can not read next step as GRO: {}", e.what());
     }
@@ -59,7 +59,8 @@ void GROFormat::read_next(Frame& frame) {
     frame.reserve(natoms);
     frame.resize(0);
 
-    for (auto&& line: file_->readlines(natoms)) {
+    for (size_t i=0; i<natoms; i++) {
+        auto line = file_.readline();
         if (line.length() < 44) {
             throw format_error(
                 "GRO Atom line is too small: '{}'", line
@@ -73,10 +74,8 @@ void GROFormat::read_next(Frame& frame) {
             // Invalid residue, we'll skip it
         }
 
-        auto tmp = line.substr(5, 5);
-        auto resname = trim(tmp).to_string();
-        tmp = line.substr(10, 5);
-        auto name = trim(tmp).to_string();
+        auto resname = trim(line.substr(5, 5)).to_string();
+        auto name = trim(line.substr(10, 5)).to_string();
 
         // GRO files store atoms in nanometer, we need to convert to Angstroms
         auto x = parse<double>(line.substr(20, 8)) * 10;
@@ -104,7 +103,7 @@ void GROFormat::read_next(Frame& frame) {
         }
     }
 
-    std::string box = file_->readline();
+    auto box = file_.readline();
     auto box_values = split(box, ' ');
 
     if (box_values.size() == 3) {
@@ -154,8 +153,8 @@ static std::string to_gro_index(uint64_t i) {
 }
 
 void GROFormat::write_next(const Frame& frame) {
-    file_->print("{}\n", frame.get<Property::STRING>("name").value_or("GRO File produced by chemfiles"));
-    file_->print("{: >5d}\n", frame.size());
+    file_.print("{}\n", frame.get<Property::STRING>("name").value_or("GRO File produced by chemfiles"));
+    file_.print("{: >5d}\n", frame.size());
 
     // Only use numbers bigger than the biggest residue id as "resSeq" for
     // atoms without associated residue, and start generated residue id at
@@ -206,12 +205,12 @@ void GROFormat::write_next(const Frame& frame) {
         if (frame.velocities()) {
             auto vel = (*frame.velocities())[i] / 10;
             check_values_size(vel, 8, "atomic velocity");
-            file_->print(
+            file_.print(
                 "{: >5}{: <5}{: >5}{: >5}{:8.3f}{:8.3f}{:8.3f}{:8.4f}{:8.4f}{:8.4f}\n",
                 resid, resname, frame[i].name(), to_gro_index(i), pos[0], pos[1], pos[2], vel[0], vel[1], vel[2]
             );
         } else {
-            file_->print(
+            file_.print(
                 "{: >5}{: <5}{: >5}{: >5}{:8.3f}{:8.3f}{:8.3f}\n",
                 resid, resname, frame[i].name(), to_gro_index(i), pos[0], pos[1], pos[2]
             );
@@ -224,7 +223,7 @@ void GROFormat::write_next(const Frame& frame) {
     // This means we cannot support incredibly large cell sizes, but these are likely not practical anyway
     if (cell.shape() == UnitCell::ORTHORHOMBIC || cell.shape() == UnitCell::INFINITE) {
         check_values_size(Vector3D(cell.a() / 10, cell.b() / 10, cell.c() / 10), 8, "Unit Cell");
-        file_->print(
+        file_.print(
             // Will print zeros if infinite, line is still required
             "  {:8.5f}  {:8.5f}  {:8.5f}\n",
             cell.a() / 10, cell.b() / 10, cell.c() / 10);
@@ -232,7 +231,7 @@ void GROFormat::write_next(const Frame& frame) {
         const auto& matrix = cell.matrix() / 10;
         check_values_size(Vector3D(matrix[0][0], matrix[1][1], matrix[2][2]), 8, "Unit Cell");
         check_values_size(Vector3D(matrix[0][1], matrix[0][2], matrix[1][2]), 8, "Unit Cell");
-        file_->print(
+        file_.print(
             "  {:8.5f}  {:8.5f}  {:8.5f} 0.0 0.0  {:8.5f} 0.0  {:8.5f}  {:8.5f}\n",
             matrix[0][0], matrix[1][1], matrix[2][2], matrix[0][1], matrix[0][2], matrix[1][2]
         );
@@ -250,31 +249,29 @@ void check_values_size(const Vector3D& values, unsigned width, const std::string
     }
 }
 
-std::streampos GROFormat::forward() {
-    if (file_->fail()) {
-        return std::streampos(-1);
-    }
-
-    auto position = file_->tellpos();
+int64_t GROFormat::forward() {
+    auto position = file_.tellpos();
     size_t natoms = 0;
     try {
         // Skip the comment line
-        file_->skipline();
-        natoms = parse<size_t>(file_->readline());
+        file_.readline();
+        natoms = parse<size_t>(file_.readline());
     } catch (const FileError&) {
         // No more line left in the file
-        return std::streampos(-1);
+        return -1;
     } catch (const Error&) {
         // We could not read an integer, so give up here
-        return std::streampos(-1);
+        return -1;
     }
 
     try {
-        file_->skiplines(natoms + 1);
+        for (size_t i=0; i<natoms+1; i++) {
+            file_.readline();
+        }
     } catch (const FileError&) {
         // We could not read the lines from the file
         throw format_error(
-            "not enough lines in '{}' for GRO format", file_->path()
+            "not enough lines in '{}' for GRO format", file_.path()
         );
     }
     return position;

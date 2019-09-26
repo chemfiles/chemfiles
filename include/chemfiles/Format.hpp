@@ -162,23 +162,23 @@ public:
     size_t nsteps() override;
 
     /// Fast-forward the file for one step, returning a valid position if the
-    /// file does contain one more step or `std::streampos(-1)` if it does not.
-    virtual std::streampos forward() = 0;
+    /// file does contain one more step or `-1` if it does not.
+    virtual int64_t forward() = 0;
 
     virtual void read_next(Frame& frame);
     virtual void write_next(const Frame& frame);
 
 protected:
-    /// Text file where we read/write to
-    std::unique_ptr<TextFile> file_;
+    /// Text file used to read/write data
+    TextFile file_;
 
 private:
     /// Scan the whole file to get all the steps positions
     void scan_all();
 
     /// Storing the positions of all the steps in the file, so that we can
-    /// just `seekg` them instead of reading the whole step.
-    std::vector<std::streampos> steps_positions_;
+    /// just `seekpos` them instead of reading the whole step.
+    std::vector<int64_t> steps_positions_;
 
     /// Did we found the end of file while scanning or reading?
     bool eof_found_ = false;
