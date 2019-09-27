@@ -1,34 +1,31 @@
 {
-   getpwuid
+   boost::filesystem
+   Memcheck:Cond
+   ...
+   fun:_ZN5boost10filesystem6detail11unique_pathERKNS0_4pathEPNS_6system10error_codeE
+   ...
+}
+
+{
+   Objc runtime
    Memcheck:Leak
    ...
-   fun:getpwuid
+   fun:_objc_flush_caches
    ...
 }
 
 {
-   wcscmp
-   Memcheck:Addr8
-   fun:wcscmp
-   ...
-   fun:exit
-   ...
-}
-
-{
-   objc runtime
-   Memcheck:Param
-   msg->desc.port.name
-   ...
-   fun:libSystem_initializer
-   ...
-}
-
-{
-   objc runtime
+   Objc runtime
    Memcheck:Leak
    ...
-   fun:libdispatch_init
+   fun:__objc_personality_v0
+   ...
+}
+
+{
+   macOS stuff
+   Memcheck:Leak
+   ...
    fun:libSystem_initializer
    ...
 }
