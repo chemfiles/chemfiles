@@ -65,6 +65,7 @@ XzFile::XzFile(const std::string& path, File::Mode mode):  mode_(mode), buffer_(
 
     file_ = std::fopen(path.c_str(), openmode);
     if (file_ == nullptr) {
+        lzma_end(&stream_);
         throw file_error("could not open the file at '{}'", path);
     }
 }
