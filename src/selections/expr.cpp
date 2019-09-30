@@ -22,7 +22,7 @@
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/Connectivity.hpp"
 
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/unreachable.hpp"
 #include "chemfiles/external/optional.hpp"
 
@@ -47,6 +47,10 @@ static std::string kind_as_string(Property::Kind kind) {
     }
     unreachable();
 }
+
+SubSelection::SubSelection(SubSelection&&) = default;
+SubSelection& SubSelection::operator=(SubSelection&&) = default;
+SubSelection::~SubSelection() = default;
 
 SubSelection::SubSelection(Variable variable): selection_(nullptr), variable_(variable) {
     matches_.resize(1);

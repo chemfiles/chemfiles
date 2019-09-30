@@ -10,11 +10,8 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <istream>
 #include <algorithm>
 #include <unordered_map>
-
-#include <fmt/ostream.h>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
@@ -30,7 +27,8 @@
 #include "chemfiles/utils.hpp"
 #include "chemfiles/parse.hpp"
 #include "chemfiles/warnings.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
+#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/formats/PDB.hpp"

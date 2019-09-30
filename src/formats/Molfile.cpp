@@ -22,7 +22,7 @@ extern "C" {
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/warnings.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/external/span.hpp"
 #include "chemfiles/external/optional.hpp"
 

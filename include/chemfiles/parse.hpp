@@ -4,14 +4,13 @@
 #ifndef CHEMFILES_PARSE_HPP
 #define CHEMFILES_PARSE_HPP
 
-#include <cstdlib>
-#include <vector>
+#include <cstdint>
 #include <string>
 #include <limits>
-#include <algorithm>
+#include <type_traits>
 
 #include "chemfiles/utils.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/string_view.hpp"
 
 namespace chemfiles {
@@ -27,17 +26,6 @@ namespace detail {
 
     template< bool B, class T = void >
     using enable_if_t = typename std::enable_if<B,T>::type;
-
-    inline void check_parse_errors(string_view input, char* end, const char* type) {
-        if (input.empty() || end != input.data() + input.length()) {
-            throw error("can not convert '{}' to a {}", input, type);
-        }
-
-        if (errno == ERANGE) {
-            errno = 0;
-            throw error("{} is out of range for {}", input, type);
-        }
-    }
 
     template<typename Small, typename Large>
     inline Small convert_integer(Large value) {

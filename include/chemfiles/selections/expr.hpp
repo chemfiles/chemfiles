@@ -12,10 +12,11 @@
 #include <functional>
 
 #include "chemfiles/external/optional.hpp"
-#include "chemfiles/Selection.hpp"
 
 namespace chemfiles {
 class Frame;
+class Match;
+class Selection;
 
 namespace selections {
 
@@ -124,6 +125,10 @@ public:
     SubSelection(Variable variable);
     /// Create a sub-selection from an AST
     SubSelection(std::string selection);
+
+    SubSelection(SubSelection&&);
+    SubSelection& operator=(SubSelection&&);
+    ~SubSelection();
 
     /// Evaluate the sub-selection and return the list of matching atoms
     const std::vector<size_t>& eval(const Frame& frame, const Match& match) const;

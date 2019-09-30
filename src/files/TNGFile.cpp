@@ -5,6 +5,8 @@
 
 #include "chemfiles/Error.hpp"
 #include "chemfiles/utils.hpp"
+#include "chemfiles/string_view.hpp"
+
 using namespace chemfiles;
 
 #define STRING_0(x) #x

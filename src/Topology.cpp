@@ -7,7 +7,7 @@
 
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/Connectivity.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/sorted_set.hpp"

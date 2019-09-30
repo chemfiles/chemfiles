@@ -4,14 +4,13 @@
 #ifndef CHEMFILES_FORMAT_MMCIF_HPP
 #define CHEMFILES_FORMAT_MMCIF_HPP
 
+#include <cstdint>
 #include <map>
-#include <iosfwd>
-#include <memory>
 #include <string>
 #include <vector>
 
-#include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/UnitCell.hpp"
 

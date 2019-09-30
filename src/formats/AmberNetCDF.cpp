@@ -15,9 +15,9 @@
 #include "chemfiles/types.hpp"
 #include "chemfiles/config.h"
 #include "chemfiles/warnings.hpp"
-#include "chemfiles/ErrorFmt.hpp"
-#include "chemfiles/external/optional.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/external/span.hpp"
+#include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/formats/AmberNetCDF.hpp"
 

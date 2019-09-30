@@ -1,16 +1,12 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <map>
-#include <array>
-#include <memory>
-#include <string>
-#include <vector>
 #include <cstdint>
 #include <cassert>
-#include <istream>
-
-#include <fmt/ostream.h>
+#include <map>
+#include <array>
+#include <string>
+#include <vector>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
@@ -25,7 +21,8 @@
 #include "chemfiles/utils.hpp"
 #include "chemfiles/parse.hpp"
 #include "chemfiles/warnings.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
+#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/formats/GRO.hpp"

@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <ostream>
 #include <cstdint>
 #include <exception>
 
@@ -24,9 +23,8 @@
 #include "chemfiles/Connectivity.hpp"
 
 #include "chemfiles/types.hpp"
-#include "chemfiles/parse.hpp"
 #include "chemfiles/warnings.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/formats/MMTF.hpp"

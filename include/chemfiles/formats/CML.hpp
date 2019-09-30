@@ -4,14 +4,13 @@
 #ifndef CHEMFILES_FORMAT_CML_HPP
 #define CHEMFILES_FORMAT_CML_HPP
 
-#include <memory>
 #include <string>
 #include <unordered_map>
 
 #include <pugixml.hpp>
 
-#include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
 
 namespace chemfiles {
 class Frame;

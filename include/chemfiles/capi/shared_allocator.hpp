@@ -7,7 +7,7 @@
 #include <algorithm>  // IWYU pragma: keep
 #include <unordered_map>
 
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/mutex.hpp"
 
 namespace chemfiles {

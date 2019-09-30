@@ -9,7 +9,8 @@
 #include <exception>
 
 #include "chemfiles/parse.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/utils.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/unreachable.hpp"
 
 #include "chemfiles/selections/lexer.hpp"

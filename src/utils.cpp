@@ -2,8 +2,6 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cerrno>
-#include <cstdio>
-#include <cstdarg>
 #include <string>
 #include <vector>
 
