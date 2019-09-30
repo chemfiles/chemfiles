@@ -4,7 +4,7 @@
 #ifndef CHEMFILES_FORMAT_MOL2_HPP
 #define CHEMFILES_FORMAT_MOL2_HPP
 
-#include <iosfwd>
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 

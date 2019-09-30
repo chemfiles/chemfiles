@@ -1,7 +1,7 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <cstdio>
+#include <cstdint>
 #include <cassert>
 #include <cmath>
 
@@ -10,12 +10,10 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <istream>
 #include <algorithm>
+#include <functional>
 #include <unordered_map>
 #include <unordered_set>
-
-#include <fmt/ostream.h>
 
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/Connectivity.hpp"
@@ -26,14 +24,14 @@
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/UnitCell.hpp"
 
-#include "chemfiles/ErrorFmt.hpp"
-
 #include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/parse.hpp"
 #include "chemfiles/warnings.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/sorted_set.hpp"
 #include "chemfiles/unreachable.hpp"
+#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/span.hpp"
 #include "chemfiles/external/optional.hpp"
 

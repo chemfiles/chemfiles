@@ -4,8 +4,8 @@
 #ifndef CHEMFILES_FORMAT_PDB_HPP
 #define CHEMFILES_FORMAT_PDB_HPP
 
+#include <cstdint>
 #include <map>
-#include <iosfwd>
 #include <string>
 #include <vector>
 #include <tuple>
@@ -13,6 +13,7 @@
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Residue.hpp"
+#include "chemfiles/string_view.hpp"
 
 namespace chemfiles {
 class Frame;

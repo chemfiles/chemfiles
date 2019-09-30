@@ -7,7 +7,7 @@
 
 #include "chemfiles/UnitCell.hpp"
 #include "chemfiles/types.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/unreachable.hpp"
 
 using namespace chemfiles;

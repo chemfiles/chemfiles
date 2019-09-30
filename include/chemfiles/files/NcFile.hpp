@@ -12,7 +12,7 @@
 #include <fmt/format.h>
 
 #include "chemfiles/File.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
 
 namespace chemfiles {
 

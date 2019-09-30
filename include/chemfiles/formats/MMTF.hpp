@@ -8,8 +8,8 @@
 
 #include <mmtf/structure_data.hpp>
 
-#include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
 
 namespace chemfiles {
 class Frame;

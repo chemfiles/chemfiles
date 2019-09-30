@@ -4,7 +4,11 @@
 #ifndef CHEMFILES_STRING_VIEW_HPP
 #define CHEMFILES_STRING_VIEW_HPP
 
-#include "chemfiles/external/string_view.hpp"
+#include <string>
+
+#include <fmt/format.h>
+
+#include "chemfiles/external/string_view.hpp"  // IWYU pragma: export
 
 // Add overloads for const char* / string_view comparison, which are not
 // provided in `external/string_view.hpp` for some MSVC versions.
@@ -54,8 +58,6 @@ namespace chemfiles {
 }
 
 // compatibility with fmt
-#include <fmt/core.h>
-#include <fmt/format.h>
 namespace fmt {
 
 template <>

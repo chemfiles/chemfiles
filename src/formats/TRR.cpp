@@ -1,14 +1,32 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include "chemfiles/formats/TRR.hpp"
-#include "chemfiles/files/XDRFile.hpp"
+#include <cmath>
+#include <cstdio>
+#include <cassert>
+#include <cstdint>
+
+#include <array>
+#include <string>
+#include <vector>
+#include <algorithm>
 
 #include <xdrfile.h>
 #include <xdrfile_trr.h>
 
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
 #include "chemfiles/Frame.hpp"
+#include "chemfiles/UnitCell.hpp"
+
+#include "chemfiles/types.hpp"
+#include "chemfiles/error_fmt.hpp"
+#include "chemfiles/external/span.hpp"
+#include "chemfiles/external/optional.hpp"
+
+#include "chemfiles/files/XDRFile.hpp"
+#include "chemfiles/formats/TRR.hpp"
+
 using namespace chemfiles;
 
 template <> FormatInfo chemfiles::format_information<TRRFormat>() {

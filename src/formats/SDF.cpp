@@ -2,12 +2,11 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cassert>
+#include <cstdint>
 #include <cmath>
 #include <array>
 #include <string>
 #include <vector>
-#include <memory>
-#include <sstream>
 #include <exception>
 
 #include "chemfiles/File.hpp"
@@ -22,7 +21,8 @@
 #include "chemfiles/utils.hpp"
 #include "chemfiles/parse.hpp"
 #include "chemfiles/warnings.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
+#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/formats/SDF.hpp"

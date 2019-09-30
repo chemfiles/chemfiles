@@ -10,7 +10,7 @@
 #include "chemfiles/capi/shared_allocator.hpp"
 
 #include "chemfiles/Frame.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/Property.hpp"
 #include "chemfiles/Connectivity.hpp"
 

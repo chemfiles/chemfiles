@@ -5,12 +5,10 @@
 #define CHEMFILES_UTILS_HPP
 
 #include <cctype>
-#include <cstdlib>
 #include <vector>
 #include <string>
 #include <algorithm>
 
-#include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/string_view.hpp"
 
 namespace chemfiles {

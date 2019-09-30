@@ -3,7 +3,15 @@
 #include <cerrno>
 #include <cstdint>
 #include <cstdio>
+#include <cstring>
 #include <string>
+
+#include "chemfiles/File.hpp"
+#include "chemfiles/files/PlainFile.hpp"
+#include "chemfiles/string_view.hpp"
+#include "chemfiles/error_fmt.hpp"
+
+using namespace chemfiles;
 
 #ifdef __CYGWIN__
     #define fseek64 fseek
@@ -13,12 +21,6 @@
     // assume unix by default
     #define fseek64 fseeko
 #endif
-
-#include "chemfiles/File.hpp"
-#include "chemfiles/files/PlainFile.hpp"
-#include "chemfiles/ErrorFmt.hpp"
-
-using namespace chemfiles;
 
 PlainFile::PlainFile(const std::string& path, File::Mode mode) {
     // We need to use binary mode when opening the file because we are storing
