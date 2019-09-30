@@ -3,12 +3,16 @@
 #include <zconf.h>
 #include <zlib.h>
 
+#include <cstdio>
+#include <cstdint>
 #include <limits>
 #include <string>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/files/GzFile.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+
+#include "chemfiles/error_fmt.hpp"
+#include "chemfiles/string_view.hpp"
 
 using namespace chemfiles;
 

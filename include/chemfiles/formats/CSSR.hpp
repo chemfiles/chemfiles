@@ -4,11 +4,11 @@
 #ifndef CHEMFILES_FORMAT_CSSR_HPP
 #define CHEMFILES_FORMAT_CSSR_HPP
 
-#include <iosfwd>
+#include <cstdint>
 #include <string>
 
-#include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
 
 namespace chemfiles {
 class Frame;

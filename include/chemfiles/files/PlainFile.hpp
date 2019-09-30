@@ -4,8 +4,10 @@
 #ifndef CHEMFILES_PLAIN_FILES_HPP
 #define CHEMFILES_PLAIN_FILES_HPP
 
+#include <cstdint>
 #include <cstdio>
 #include <string>
+
 #include "chemfiles/File.hpp"
 
 namespace chemfiles {

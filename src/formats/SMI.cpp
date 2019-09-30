@@ -2,8 +2,9 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cmath>
-#include <cstdlib>
 #include <cctype>
+#include <cstdlib>
+#include <cstdint>
 
 #include <set>
 #include <map>
@@ -11,13 +12,9 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <istream>
 #include <iterator>
 #include <algorithm>
 #include <unordered_map>
-#include <unordered_set>
-
-#include <fmt/ostream.h>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
@@ -31,7 +28,8 @@
 #include "chemfiles/utils.hpp"
 #include "chemfiles/parse.hpp"
 #include "chemfiles/warnings.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
+#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/formats/SMI.hpp"

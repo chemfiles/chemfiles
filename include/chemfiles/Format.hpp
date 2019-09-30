@@ -4,10 +4,9 @@
 #ifndef CHEMFILES_FORMAT_HPP
 #define CHEMFILES_FORMAT_HPP
 
-#include <iosfwd>
+#include <cstdint>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/exports.h"

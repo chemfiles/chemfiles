@@ -13,7 +13,7 @@
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Topology.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/Property.hpp"
 
 #include "chemfiles/external/optional.hpp"

@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <array>
 #include <string>
+#include <vector>
 #include <cassert>
 #include <algorithm>
 
@@ -20,7 +21,7 @@
 #include "chemfiles/UnitCell.hpp"
 
 #include "chemfiles/types.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/external/optional.hpp"
 #include "chemfiles/external/span.hpp"
 

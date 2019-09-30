@@ -9,7 +9,7 @@
 #include <algorithm>
 
 #include "chemfiles/Connectivity.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/sorted_set.hpp"
 
 using namespace chemfiles;

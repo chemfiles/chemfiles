@@ -4,10 +4,17 @@
 #ifndef CHEMFILES_TRR_FORMAT_HPP
 #define CHEMFILES_TRR_FORMAT_HPP
 
+#include <string>
+#include <vector>
+
+#include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/files/XDRFile.hpp"
 
+using matrix = float[3][3];
+
 namespace chemfiles {
+class Frame;
 
 class TRRFormat final : public Format {
   public:

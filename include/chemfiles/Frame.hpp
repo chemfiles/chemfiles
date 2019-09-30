@@ -12,7 +12,6 @@
 #include "chemfiles/external/span.hpp"
 #include "chemfiles/external/optional.hpp"
 
-#include "chemfiles/Atom.hpp"  // IWYU pragma: keep
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/UnitCell.hpp"
 #include "chemfiles/Connectivity.hpp"
@@ -20,6 +19,7 @@
 #include "chemfiles/Residue.hpp"
 
 namespace chemfiles {
+class Atom;
 
 /// A frame contains data from one simulation step The Frame class holds data
 /// from one step of a simulation: the current topology, the positions, and the

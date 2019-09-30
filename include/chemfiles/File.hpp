@@ -4,14 +4,15 @@
 #ifndef CHEMFILES_FILES_HPP
 #define CHEMFILES_FILES_HPP
 
+#include <cstdint>
 #include <string>
 #include <vector>
+#include <memory>
 
-#include <fmt/ostream.h>
+#include <fmt/format.h>
 
 #include "chemfiles/exports.h"
 #include "chemfiles/string_view.hpp"
-#include "chemfiles/ErrorFmt.hpp"
 
 namespace chemfiles {
 

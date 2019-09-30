@@ -6,9 +6,10 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
-#include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
 #include "chemfiles/files/TNGFile.hpp"
 
 namespace chemfiles {
