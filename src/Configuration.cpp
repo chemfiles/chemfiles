@@ -14,7 +14,7 @@
 #include <toml/exception.hpp>
 
 #include "chemfiles/Configuration.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/misc.hpp"
 #include "chemfiles/mutex.hpp"
 #include "chemfiles/utils.hpp"

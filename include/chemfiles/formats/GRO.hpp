@@ -4,12 +4,12 @@
 #ifndef CHEMFILES_FORMAT_GRO_HPP
 #define CHEMFILES_FORMAT_GRO_HPP
 
+#include <cstdint>
 #include <map>
 #include <string>
-#include <iosfwd>
 
-#include "chemfiles/Format.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/Format.hpp"
 #include "chemfiles/Residue.hpp"
 
 namespace chemfiles {

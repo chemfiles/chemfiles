@@ -6,7 +6,7 @@
 #include "xdrfile_xtc.h"
 #include "xdrfile_trr.h"
 
-#include "chemfiles/Error.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/utils.hpp"
 using namespace chemfiles;
 

@@ -14,11 +14,11 @@
 #include "chemfiles/selections/parser.hpp"
 
 #include "chemfiles/utils.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
+#include "chemfiles/string_view.hpp"
 
 constexpr double PI = 3.141592653589793238463;
 
-using namespace chemfiles;
 using namespace chemfiles::selections;
 
 using string_selector_creator_t = std::function<Ast(std::string, bool, Variable)>;

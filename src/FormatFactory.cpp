@@ -13,7 +13,7 @@
 #include "chemfiles/mutex.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/FormatFactory.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
 
 #include "chemfiles/formats/Molfile.hpp"
 #include "chemfiles/formats/AmberNetCDF.hpp"

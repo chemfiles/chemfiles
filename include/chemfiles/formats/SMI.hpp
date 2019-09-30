@@ -4,11 +4,11 @@
 #ifndef CHEMFILES_FORMAT_SMI_HPP
 #define CHEMFILES_FORMAT_SMI_HPP
 
+#include <cstdint>
 #include <map>
 #include <stack>
 #include <vector>
 #include <string>
-#include <iosfwd>
 #include <unordered_map>
 
 #include "chemfiles/File.hpp"

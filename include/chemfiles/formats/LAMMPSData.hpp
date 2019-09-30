@@ -4,9 +4,9 @@
 #ifndef CHEMFILES_FORMAT_LAMMPS_DATA_HPP
 #define CHEMFILES_FORMAT_LAMMPS_DATA_HPP
 
+#include <cstdint>
 #include <tuple>
 #include <limits>
-#include <iosfwd>
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -15,6 +15,7 @@
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Topology.hpp"  // IWYU pragma: keep
 #include "chemfiles/sorted_set.hpp"
+#include "chemfiles/string_view.hpp"
 
 namespace chemfiles {
 class Atom;

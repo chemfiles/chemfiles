@@ -23,6 +23,17 @@ endif()
 
 find_program(INCLUDE_WHAT_YOU_USE_EXE NAMES "include-what-you-use" "iwyu")
 if (INCLUDE_WHAT_YOU_USE_EXE)
+
+    # Check version of include-what-you-use
+    execute_process(
+        COMMAND ${INCLUDE_WHAT_YOU_USE_EXE} --version
+        OUTPUT_VARIABLE IWYU_FULL_VERSION
+    )
+    string(REGEX REPLACE "include-what-you-use ([0-9.]+) (.*)" "\\1" IWYU_VERSION "${IWYU_FULL_VERSION}")
+    if("${IWYU_VERSION}" VERSION_LESS "0.12")
+        message(FATAL_ERROR "Unsupported include-what-you-use (version ${IWYU_VERSION}): a newer version (at least 0.12) is required")
+    endif()
+
     set(CHEMFILES_IWYU ${INCLUDE_WHAT_YOU_USE_EXE}
         -Xiwyu --no_comments # do not add '// for XXX' comments
         -Xiwyu --mapping_file=${PROJECT_SOURCE_DIR}/cmake/chemfiles-iwyu.imp

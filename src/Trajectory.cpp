@@ -18,7 +18,8 @@
 #include "chemfiles/Configuration.hpp"
 
 #include "chemfiles/utils.hpp"
-#include "chemfiles/ErrorFmt.hpp"
+#include "chemfiles/error_fmt.hpp"
+#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 using namespace chemfiles;
