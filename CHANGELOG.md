@@ -20,6 +20,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   based format.
 * Added a native implementation of XTC reader, replacing the VMD molfile
   version. The new code should be faster and use less memory.
+* Added a native implementation of TRR reader, replacing the VMD molfile
+  version. The new code should be faster and use less memory.
+* Remove the ability to read frames from a trajectory that was opened in
+  append mode. This mode is now write only.
 
 ## 0.9.0 (18 Nov 2018)
 
