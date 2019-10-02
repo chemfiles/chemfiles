@@ -134,9 +134,9 @@ void Trajectory::pre_read(size_t step) {
             );
         }
     }
-    if (!(mode_ == File::READ || mode_ == File::APPEND)) {
+    if (mode_ != File::READ) {
         throw file_error(
-            "the file at '{}' was not openened in read or append mode", path_
+            "the file at '{}' was not openened in read mode", path_
         );
     }
 }

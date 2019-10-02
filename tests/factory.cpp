@@ -110,8 +110,9 @@ TEST_CASE("Check error throwing in formats") {
     out.close();
 
     Frame frame;
-    Trajectory trajectory(tmpfile, 'a');
-    CHECK_THROWS_AS(trajectory.read(), FormatError);
-    CHECK_THROWS_AS(trajectory.read_step(2), FormatError);
-    CHECK_THROWS_AS(trajectory.write(frame), FormatError);
+    Trajectory trajectory_r(tmpfile, 'r');
+    CHECK_THROWS_AS(trajectory_r.read(), FormatError);
+    CHECK_THROWS_AS(trajectory_r.read_step(2), FormatError);
+    Trajectory trajectory_w(tmpfile, 'w');
+    CHECK_THROWS_AS(trajectory_w.write(frame), FormatError);
 }
