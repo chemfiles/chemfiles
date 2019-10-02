@@ -70,7 +70,7 @@ public:
 
     /// Read the next frame in the trajectory.
     ///
-    /// The trajectory must have been opened in read or append mode, and the
+    /// The trajectory must have been opened in read mode, and the
     /// underlying format must support reading.
     ///
     /// This function throws a `FileError` if there are no more frames to read
@@ -86,7 +86,7 @@ public:
 
     /// Read a single frame at specified `step` from the trajectory.
     ///
-    /// The trajectory must have been opened in read or append mode, and the
+    /// The trajectory must have been opened in read mode, and the
     /// underlying format must support reading.
     ///
     /// This function throws a `FileError` if the step is bigger than the
@@ -104,7 +104,7 @@ public:
 
     /// Write a single frame to the trajectory.
     ///
-    /// The trajectory must have been opened in Write or append mode, and the
+    /// The trajectory must have been opened in write or append mode, and the
     /// underlying format must support reading.
     ///
     /// @example{trajectory/write.cpp}
