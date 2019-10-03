@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   version. The new code should be faster and use less memory.
 * Remove the ability to read frames from a trajectory that was opened in
   append mode. This mode is now write only.
+* Added a native implementation of XTC writer.
 
 ## 0.9.1 (13 Mar 2019)
 
