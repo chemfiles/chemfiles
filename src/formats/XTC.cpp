@@ -53,13 +53,51 @@ void XTCFormat::read(Frame& frame) {
     step_++;
 }
 
+void XTCFormat::write(const Frame& frame) {
+    int natoms = static_cast<int>(frame.size());
+    if (xtc_.nframes() == 0 && step_ == 0) {
+        xtc_.set_natoms(natoms);
+    } else if (natoms != xtc_.natoms()) {
+        throw format_error(
+            "XTC format does not support varying numbers of atoms: expected {}, but got {}",
+            xtc_.natoms(), natoms);
+    }
+
+    int md_step = static_cast<int>(frame.step());
+    float time = static_cast<float>(frame.get("time").value_or(0.0).as_double());
+    // Negative precision is replaced by the default value in xdrlib
+    float precision = static_cast<float>(frame.get("xtc_precision").value_or(-1.0).as_double());
+
+    matrix box;
+    std::vector<float> x(static_cast<size_t>(natoms) * 3);
+    get_cell(box, frame);
+    get_positions(x, frame);
+
+    CHECK(write_xtc(xtc_, natoms, md_step, time, box, reinterpret_cast<float(*)[3]>(x.data()),
+                    precision));
+
+    step_++;
+}
+
 void XTCFormat::set_positions(const std::vector<float>& x, Frame& frame) {
     auto positions = frame.positions();
+    assert(x.size() == 3 * positions.size());
     for (size_t i = 0; i < static_cast<size_t>(xtc_.natoms()); i++) {
         // Factor 10 because the cell lengthes are in nm in the XTC format
         positions[i][0] = static_cast<double>(x[i * 3]) * 10;
         positions[i][1] = static_cast<double>(x[i * 3 + 1]) * 10;
         positions[i][2] = static_cast<double>(x[i * 3 + 2]) * 10;
+    }
+}
+
+void XTCFormat::get_positions(std::vector<float>& x, const Frame& frame) {
+    auto positions = frame.positions();
+    assert(x.size() == 3 * positions.size());
+    for (size_t i = 0; i < static_cast<size_t>(xtc_.natoms()); i++) {
+        // Factor 10 because the cell lengthes are in nm in the XTC format
+        x[i * 3] = static_cast<float>(positions[i][0] / 10.0);
+        x[i * 3 + 1] = static_cast<float>(positions[i][1] / 10.0);
+        x[i * 3 + 2] = static_cast<float>(positions[i][2] / 10.0);
     }
 }
 
@@ -84,4 +122,18 @@ void XTCFormat::set_cell(matrix box, Frame& frame) {
 
     // Factor 10 because the cell lengthes are in nm in the XTC format
     frame.set_cell({a.norm() * 10, b.norm() * 10, c.norm() * 10, alpha, beta, gamma});
+}
+
+void XTCFormat::get_cell(matrix box, const Frame& frame) {
+    // Factor 10 because the cell lengthes are in nm in the XTC format
+    auto matrix = frame.cell().matrix() / 10.0;
+    box[0][0] = static_cast<float>(matrix[0][0]);
+    box[0][1] = static_cast<float>(matrix[1][0]);
+    box[0][2] = static_cast<float>(matrix[2][0]);
+    box[1][0] = static_cast<float>(matrix[0][1]);
+    box[1][1] = static_cast<float>(matrix[1][1]);
+    box[1][2] = static_cast<float>(matrix[2][1]);
+    box[2][0] = static_cast<float>(matrix[0][2]);
+    box[2][1] = static_cast<float>(matrix[1][2]);
+    box[2][2] = static_cast<float>(matrix[2][2]);
 }
