@@ -9,6 +9,7 @@ using namespace chemfiles;
 TEST_CASE("Read files in XTC format") {
     SECTION("Read trajectory") {
         auto file = Trajectory("data/xtc/ubiquitin.xtc");
+        CHECK(file.nsteps() == 251);
         auto frame = file.read();
 
         CHECK(frame.step() == 0);
