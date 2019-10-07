@@ -9,6 +9,7 @@ using namespace chemfiles;
 TEST_CASE("Read files in TRR format") {
     SECTION("Read trajectory: Ubiquitin") {
         auto file = Trajectory("data/trr/ubiquitin.trr");
+        CHECK(file.nsteps() == 2);
         auto frame = file.read();
 
         CHECK(frame.step() == 0);
@@ -56,6 +57,7 @@ TEST_CASE("Read files in TRR format") {
 
     SECTION("Read trajectory: Water") {
         auto file = Trajectory("data/trr/water.trr");
+        CHECK(file.nsteps() == 100);
         auto frame = file.read();
 
         CHECK(frame.step() == 0);
@@ -130,6 +132,7 @@ TEST_CASE("Read files in TRR format") {
 
     SECTION("Read trajectory: 1AKI") {
         auto file = Trajectory("data/trr/1aki.trr");
+        CHECK(file.nsteps() == 6);
         auto frame = file.read();
 
         CHECK(frame.step() == 0);
