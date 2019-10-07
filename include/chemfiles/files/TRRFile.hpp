@@ -28,6 +28,8 @@ class TRRFile final : public File {
     int64_t offset(size_t step) const;
     /// get the number of atoms, as indicated in the file header
     int natoms() const;
+    /// set the number of atoms
+    void set_natoms(int natoms);
 
     operator XDRFILE*() { return handle_; }
 
