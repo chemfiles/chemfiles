@@ -175,3 +175,204 @@ TEST_CASE("Read files in TRR format") {
         CHECK(approx_eq(cell.c(), 73.3925, 1e-4));
     }
 }
+
+TEST_CASE("Write and append files in TRR format") {
+    SECTION("Write and append trajectory") {
+        // Write two frames to a file
+        auto tmpfile = NamedTempPath(".trr");
+
+        auto frame = Frame(UnitCell(10.111, 11.222, 12.333));
+        frame.add_velocities();
+        frame.set("time", 19.376);
+        frame.add_atom(Atom("A"), {1.999, 2.888, 3.777}, {3, 2, 1});
+        frame.add_atom(Atom("B"), {4, 5, 6}, {9, 8, 7});
+        frame.add_atom(Atom("C"), {7, 8, 9}, {6.777, 5.666, 4.555});
+
+        auto file = Trajectory(tmpfile, 'w');
+        file.write(frame);
+
+        frame = Frame(UnitCell(20, 21, 22, 33.333, 44.444, 55.555));
+        frame.set_step(100);
+        frame.set("trr_lambda", 0.345);
+        frame.add_atom(Atom("A"), {4, 5, 6});
+        frame.add_atom(Atom("B"), {7, 8, 9});
+        frame.add_atom(Atom("C"), {1, 2, 3});
+        file.write(frame);
+
+        frame = Frame();
+        frame.add_velocities();
+        frame.set("has_positions", false);
+        frame.add_atom(Atom("A"), {0, 0, 0}, {-7, 8, 9});
+        frame.add_atom(Atom("B"), {0, 0, 0}, {4, 5, 6});
+        frame.add_atom(Atom("C"), {0, 0, 0}, {1.222, -2.333, -3.444});
+        file.write(frame);
+
+        CHECK(file.nsteps() == 3);
+        file.close();
+
+        // now append one frame
+        file = Trajectory(tmpfile, 'a');
+
+        frame = Frame(UnitCell(30, 31, 32));
+        frame.set_step(200);
+        frame.set("time", 20);
+        frame.add_atom(Atom("A"), {7, 8, 9});
+        frame.add_atom(Atom("B"), {1, 2, 3});
+        frame.add_atom(Atom("C"), {4, 5, 6});
+
+        file.write(frame);
+        CHECK(file.nsteps() == 4);
+        file.close();
+
+        // now read every thing back and check
+        file = Trajectory(tmpfile, 'r');
+
+        frame = file.read();
+
+        CHECK(frame.step() == 0); // default step
+        CHECK(approx_eq(frame.get("time")->as_double(), 19.376, 1e-4));
+        CHECK(approx_eq(frame.get("trr_lambda")->as_double(), 0)); // default lambda
+        CHECK(frame.get("has_positions")->as_bool());
+        CHECK(frame.size() == 3);
+        CHECK(frame.velocities());
+
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(1.999, 2.888, 3.777), 1e-4));
+        CHECK(approx_eq(positions[2], Vector3D(7, 8, 9), 1e-4));
+
+        auto velocities = *frame.velocities();
+        CHECK(approx_eq(velocities[0], Vector3D(3, 2, 1), 1e-4));
+        CHECK(approx_eq(velocities[2], Vector3D(6.777, 5.666, 4.555), 1e-4));
+
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(approx_eq(cell.a(), 10.111, 1e-4));
+        CHECK(approx_eq(cell.b(), 11.222, 1e-4));
+        CHECK(approx_eq(cell.c(), 12.333, 1e-4));
+
+        frame = file.read();
+
+        CHECK(frame.step() == 100);
+        CHECK(approx_eq(frame.get("time")->as_double(), 0)); // default time
+        CHECK(approx_eq(frame.get("trr_lambda")->as_double(), 0.345, 1e-4));
+        CHECK(frame.get("has_positions")->as_bool());
+        CHECK(frame.size() == 3);
+        CHECK(!frame.velocities());
+
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(4, 5, 6), 1e-4));
+        CHECK(approx_eq(positions[2], Vector3D(1, 2, 3), 1e-4));
+
+        cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::TRICLINIC);
+        CHECK(approx_eq(cell.a(), 20, 1e-4));
+        CHECK(approx_eq(cell.b(), 21, 1e-4));
+        CHECK(approx_eq(cell.c(), 22, 1e-4));
+        CHECK(approx_eq(cell.alpha(), 33.333, 1e-4));
+        CHECK(approx_eq(cell.beta(), 44.444, 1e-4));
+        CHECK(approx_eq(cell.gamma(), 55.555, 1e-4));
+
+        frame = file.read();
+
+        CHECK(frame.step() == 0); // default step
+        CHECK(approx_eq(frame.get("time")->as_double(), 0)); // default time
+        CHECK(approx_eq(frame.get("trr_lambda")->as_double(), 0)); // default lambda
+        CHECK(!frame.get("has_positions")->as_bool());
+        CHECK(frame.size() == 3);
+        CHECK(frame.velocities());
+
+        velocities = *frame.velocities();
+        CHECK(approx_eq(velocities[0], Vector3D(-7, 8, 9), 1e-4));
+        CHECK(approx_eq(velocities[2], Vector3D(1.222, -2.333, -3.444), 1e-4));
+
+        cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::INFINITE);
+
+        frame = file.read();
+
+        CHECK(frame.step() == 200);
+        CHECK(approx_eq(frame.get("time")->as_double(), 20));
+        CHECK(approx_eq(frame.get("trr_lambda")->as_double(), 0)); // default lambda
+        CHECK(frame.get("has_positions")->as_bool());
+        CHECK(frame.size() == 3);
+        CHECK(!frame.velocities());
+
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(7, 8, 9), 1e-4));
+        CHECK(approx_eq(positions[2], Vector3D(4, 5, 6), 1e-4));
+
+        cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(approx_eq(cell.a(), 30, 1e-4));
+        CHECK(approx_eq(cell.b(), 31, 1e-4));
+        CHECK(approx_eq(cell.c(), 32, 1e-4));
+    }
+
+    SECTION("Append on new trajectory") {
+        auto tmpfile = NamedTempPath(".trr");
+
+        auto frame = Frame(UnitCell(10.111, 11.222, 12.333));
+        frame.add_velocities();
+        frame.set("time", 19.376);
+        frame.set("trr_lambda", 0.753);
+        frame.add_atom(Atom("A"), {1.999, 2.888, 3.777}, {0, -1, -2});
+        frame.add_atom(Atom("B"), {4, 5, 6}, {1, 3, 5});
+        frame.add_atom(Atom("C"), {7, 8, 9}, {0.001, 1.002, -2.333});
+
+        auto file = Trajectory(tmpfile, 'a');
+        file.write(frame);
+        CHECK(file.nsteps() == 1);
+        file.close();
+
+        // now read every thing back and check
+        file = Trajectory(tmpfile, 'r');
+
+        frame = file.read();
+
+        CHECK(frame.step() == 0); // default step
+        CHECK(approx_eq(frame.get("time")->as_double(), 19.376, 1e-4));
+        CHECK(approx_eq(frame.get("trr_lambda")->as_double(), 0.753, 1e-4));
+        CHECK(frame.get("has_positions")->as_bool());
+        CHECK(frame.size() == 3);
+        CHECK(frame.velocities());
+
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(1.999, 2.888, 3.777), 1e-4));
+        CHECK(approx_eq(positions[2], Vector3D(7, 8, 9), 1e-4));
+
+        auto velocities = *frame.velocities();
+        CHECK(approx_eq(velocities[0], Vector3D(0, -1, -2), 1e-4));
+        CHECK(approx_eq(velocities[2], Vector3D(0.001, 1.002, -2.333), 1e-4));
+
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(approx_eq(cell.a(), 10.111, 1e-4));
+        CHECK(approx_eq(cell.b(), 11.222, 1e-4));
+        CHECK(approx_eq(cell.c(), 12.333, 1e-4));
+    }
+}
+
+TEST_CASE("Check Errors") {
+    auto tmpfile = NamedTempPath(".trr");
+    auto file = Trajectory(tmpfile, 'w');
+
+    auto frame = Frame();
+    frame.add_atom(Atom("A"), {1, 2, 3});
+    file.write(frame);
+
+    frame = Frame();
+    frame.add_atom(Atom("A"), {1, 2, 3});
+    frame.add_atom(Atom("B"), {4, 5, 6});
+    CHECK_THROWS_WITH(
+        file.write(frame),
+        "TRR format does not support varying numbers of atoms: expected 1, but got 2");
+    file.close();
+
+    file = Trajectory(tmpfile, 'a');
+    frame = Frame();
+    frame.add_atom(Atom("A"), {1, 2, 3});
+    frame.add_atom(Atom("B"), {4, 5, 6});
+    CHECK_THROWS_WITH(
+        file.write(frame),
+        "TRR format does not support varying numbers of atoms: expected 1, but got 2");
+}
