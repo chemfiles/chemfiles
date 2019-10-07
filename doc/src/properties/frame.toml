@@ -49,3 +49,8 @@ Default is 1000."""
 type = "bool"
 
 TRR = "Set to ``true`` if the frame contains positions. All positions are zero if not."
+
+[trr_lambda]
+type = "number"
+
+TRR = "This is usually the free energy coupling parameter."

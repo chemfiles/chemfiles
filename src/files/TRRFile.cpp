@@ -17,8 +17,13 @@ TRRFile::TRRFile(std::string path, File::Mode mode)
     if (mode == File::READ) {
         openmode = "r";
         CHECK(read_trr_header(this->path().c_str(), &natoms_, &nframes_, &offsets_));
-    } else if (mode == File::WRITE || mode == File::APPEND) {
-        throw chemfiles::FileError("TRR format does not support writing yet");
+    } else if (mode == File::WRITE) {
+        openmode = "w";
+    } else {
+        openmode = "a";
+        // Do not check return value, because the file might not exist
+        // But if it does, we need the number of atoms and number of frames for appending
+        read_trr_header(this->path().c_str(), &natoms_, &nframes_, &offsets_);
     }
 
     handle_ = xdrfile_open(this->path().c_str(), openmode);
@@ -37,6 +42,8 @@ unsigned long TRRFile::nframes() const { return nframes_; }
 int64_t TRRFile::offset(size_t step) const { return offsets_[step]; }
 
 int TRRFile::natoms() const { return natoms_; }
+
+void TRRFile::set_natoms(int natoms) { natoms_ = natoms; }
 
 void chemfiles::check_trr_error(int status, const std::string& function) {
     switch (status) {
