@@ -104,7 +104,7 @@ Chemfiles can read and write files in the following formats:
 - Tinker XYZ files (.arc files);
 - BIOVIA SDF files;
 - SERC Daresbury Laboratory CSSR files;
-- GROMACS formats: .gro; .xtc;
+- GROMACS formats: .gro; .trr; .xtc;
 - TRIPOS mol2 files;
 - MacroMolecular Crystallographic Information Framework (CIF) files;
 - MacroMolecular Transmission Format (MMTF) files;
@@ -118,7 +118,7 @@ Chemfiles can also read but not (yet) write files in the following formats:
 
 - TNG;
 - LAMMPS trajectory;
-- GROMACS formats: .trj; .trr;
+- GROMACS formats: .trj;
 - CHARMM DCD files;
 - Molden files;
 
