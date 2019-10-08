@@ -84,10 +84,10 @@ specify which format to use.
 .. _SDF: http://accelrys.com/products/collaborative-science/biovia-draw/ctfile-no-fee.html
 .. _SMI: http://opensmiles.org/
 .. _TNG: http://doi.wiley.com/10.1002/jcc.23495
-.. _TRJ: http://manual.gromacs.org/current/online/trj.html
-.. _TRR: http://manual.gromacs.org/current/online/trr.html
+.. _TRJ: http://manual.gromacs.org/archive/5.0.7/online/trj.html
+.. _TRR: http://manual.gromacs.org/current/reference-manual/file-formats.html?#trr
 .. _Tinker: http://chembytes.wikidot.com/tnk-tut00#toc2
-.. _XTC: http://manual.gromacs.org/current/online/xtc.html
+.. _XTC: http://manual.gromacs.org/current/reference-manual/file-formats.html?#xtc
 .. _XYZ: https://openbabel.org/wiki/XYZ
 
 .. role:: red
