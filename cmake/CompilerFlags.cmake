@@ -56,6 +56,17 @@ if(${EMSCRIPTEN})
         message(WARNING "Shared libs are not supported with emscripten")
     endif()
 
+    # setting EMSCRIPTEN_GENERATE_BITCODE_STATIC_LIBRARIES=ON here does not
+    # work, since it will only be taken into account on the next cmake
+    # configuration. So we explicitly run the code guarded by
+    # EMSCRIPTEN_GENERATE_BITCODE_STATIC_LIBRARIES=ON in Emscripten.cmake
+    # platform file.
+    SET(CMAKE_STATIC_LIBRARY_SUFFIX ".bc")
+
+	SET(CMAKE_C_CREATE_STATIC_LIBRARY "<CMAKE_C_COMPILER> -o <TARGET> <LINK_FLAGS> <OBJECTS>")
+	SET(CMAKE_CXX_CREATE_STATIC_LIBRARY "<CMAKE_CXX_COMPILER> -o <TARGET> <LINK_FLAGS> <OBJECTS>")
+    # --- end EMSCRIPTEN_GENERATE_BITCODE_STATIC_LIBRARIES
+
     set(EMCC_FLAGS "")
     set(EMCC_FLAGS "${EMCC_FLAGS} -s DISABLE_EXCEPTION_CATCHING=0")
     set(EMCC_FLAGS "${EMCC_FLAGS} -s ERROR_ON_UNDEFINED_SYMBOLS=1")
