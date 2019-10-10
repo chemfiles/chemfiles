@@ -78,10 +78,13 @@ void GzFile::clear() {
 }
 
 void GzFile::seek(int64_t position) {
+// TODO: update to a more recent emscripten, with support for 64-bit fseek
+#if !defined(__EMSCRIPTEN__)
     static_assert(
         sizeof(int64_t) == sizeof(z_off64_t),
         "int64_t and z_off64_t do not have the same size"
     );
+#endif
     auto status = gzseek64(file_, position, SEEK_SET);
     if (status == -1) {
         auto message = check_error();
