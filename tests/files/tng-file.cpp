@@ -2,6 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include "catch.hpp"
+#include "helpers.hpp"
 #include "chemfiles.hpp"
 #include "chemfiles/files/TNGFile.hpp"
 using namespace chemfiles;
@@ -9,56 +10,62 @@ using namespace chemfiles;
 #include <boost/filesystem.hpp>
 namespace fs=boost::filesystem;
 
-TEST_CASE("Opening TNG files") {
+#define CHECK_SUCCESS(x) CHECK(x == TNG_SUCCESS)
+
+TEST_CASE("TNG files") {
     SECTION("Read") {
         // Just checking constructor and destructor
         TNGFile file("data/tng/example.tng", File::READ);
-    }
 
-    auto TESTFILE = "testing.tng";
+        CHECK_THROWS_WITH(
+            TNGFile("not-there.tng", File::READ),
+            "could not open the file at 'not-there.tng'"
+        );
+    }
 
     SECTION("Write") {
-        // Just checking constructor and destructor
-        TNGFile file(TESTFILE, File::WRITE);
-    }
+        auto filename = NamedTempPath(".tng");
+        {
+            // Just checking constructor and destructor
+            TNGFile file(filename, File::WRITE);
+        }
 
-    SECTION("Check write") {
+        // open the file manually and check it
         tng_trajectory_t trajectory = nullptr;
-        CHECK(tng_util_trajectory_open(TESTFILE, 'r', &trajectory) == TNG_SUCCESS);
-        CHECK(tng_file_headers_read(trajectory, TNG_USE_HASH) == TNG_SUCCESS);
+        CHECK_SUCCESS(tng_util_trajectory_open(filename.path().c_str(), 'r', &trajectory));
+        CHECK_SUCCESS(tng_file_headers_read(trajectory, TNG_USE_HASH));
 
         char buffer[1024] = {0};
-        CHECK(tng_first_program_name_get(trajectory, buffer, 1024) == TNG_SUCCESS);
+        CHECK_SUCCESS(tng_first_program_name_get(trajectory, buffer, 1024));
         CHECK(std::string(buffer) == "chemfiles");
 
         memset(buffer, 0, 1024);
-        CHECK(tng_last_program_name_get(trajectory, buffer, 1024) == TNG_SUCCESS);
+        CHECK_SUCCESS(tng_last_program_name_get(trajectory, buffer, 1024));
         CHECK(std::string(buffer) == "chemfiles");
 
-        CHECK(tng_util_trajectory_close(&trajectory) == TNG_SUCCESS);
-        fs::remove(TESTFILE);
+        CHECK_SUCCESS(tng_util_trajectory_close(&trajectory));
     }
 
     SECTION("Append") {
-        fs::copy_file("data/tng/example.tng", TESTFILE);
-        // Just checking constructor and destructor
-        TNGFile file(TESTFILE, File::APPEND);
-    }
+        auto filename = NamedTempPath(".tng");
+        fs::copy_file("data/tng/example.tng", filename.path());
+        {
+            // Just checking constructor and destructor
+            TNGFile file(filename, File::APPEND);
+        }
 
-    SECTION("Check append") {
         tng_trajectory_t trajectory = nullptr;
-        CHECK(tng_util_trajectory_open(TESTFILE, 'r', &trajectory) == TNG_SUCCESS);
-        CHECK(tng_file_headers_read(trajectory, TNG_USE_HASH) == TNG_SUCCESS);
+        CHECK_SUCCESS(tng_util_trajectory_open(filename.path().c_str(), 'r', &trajectory));
+        CHECK_SUCCESS(tng_file_headers_read(trajectory, TNG_USE_HASH));
 
         char buffer[1024] = {0};
-        CHECK(tng_first_program_name_get(trajectory, buffer, 1024) == TNG_SUCCESS);
+        CHECK_SUCCESS(tng_first_program_name_get(trajectory, buffer, 1024));
         CHECK(std::string(buffer) == "");
 
         memset(buffer, 0, 1024);
-        CHECK(tng_last_program_name_get(trajectory, buffer, 1024) == TNG_SUCCESS);
+        CHECK_SUCCESS(tng_last_program_name_get(trajectory, buffer, 1024));
         CHECK(std::string(buffer) == "chemfiles");
 
-        CHECK(tng_util_trajectory_close(&trajectory) == TNG_SUCCESS);
-        fs::remove(TESTFILE);
+        CHECK_SUCCESS(tng_util_trajectory_close(&trajectory));
     }
 }

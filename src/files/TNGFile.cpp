@@ -3,8 +3,8 @@
 
 #include "chemfiles/files/TNGFile.hpp"
 
-#include "chemfiles/Error.hpp"
 #include "chemfiles/utils.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/string_view.hpp"
 
 using namespace chemfiles;
@@ -17,7 +17,11 @@ TNGFile::TNGFile(std::string path, File::Mode mode): File(std::move(path), mode,
     CHECK(tng_util_trajectory_open(this->path().c_str(), mode, &handle_));
 
     if (mode == File::READ) {
-        CHECK(tng_file_headers_read(handle_, TNG_USE_HASH));
+        auto status = tng_file_headers_read(handle_, TNG_USE_HASH);
+        if (status != TNG_SUCCESS) {
+            tng_util_trajectory_close(&handle_);
+            throw file_error("could not open the file at '{}'", this->path());
+        }
     }
 
     if (mode == File::WRITE || mode == File::APPEND) {
@@ -46,21 +50,14 @@ TNGFile::~TNGFile() {
 void chemfiles::check_tng_error(tng_function_status status, const std::string& function) {
     switch (status) {
     case TNG_FAILURE:
-        throw chemfiles::FileError(
-            "error while calling " + function + " in the TNG library"
-        );
+        throw file_error("error while calling {} in the TNG library", function);
     case TNG_CRITICAL:
-        throw chemfiles::FileError(
-            "critical error while calling " + function + " in the TNG library"
-        );
+        throw file_error("critical error while calling {} in the TNG library", function);
     case TNG_SUCCESS:
         // Do nothing, this is good
         break;
     default:
-        throw chemfiles::FileError(
-            "unknown status code from TNG library: "
-            + std::to_string(static_cast<unsigned>(status))
-        );
+        throw file_error("unknown status code from TNG library: {}", status);
         break;
     }
 }

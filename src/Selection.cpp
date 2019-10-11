@@ -53,7 +53,7 @@ static Context get_context(const std::string& string, std::string& selection) {
         }
     } else {
         throw selection_error(
-            "can not get selection context in '{}': too many ':'", string
+            "can not get selection context in '{}', too many ':'", string
         );
     }
 }
