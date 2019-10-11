@@ -2,7 +2,10 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include "chemfiles/formats/XTC.hpp"
-#include "chemfiles/files/XTCFile.hpp"
+#include "chemfiles/files/XDRFile.hpp"
+
+#include <xdrfile.h>
+#include <xdrfile_xtc.h>
 
 #include "chemfiles/ErrorFmt.hpp"
 #include "chemfiles/Frame.hpp"
@@ -14,32 +17,37 @@ template <> FormatInfo chemfiles::format_information<XTCFormat>() {
 
 #define STRING_0(x) #x
 #define STRING(x) STRING_0(x)
-#define CHECK(x) check_xtc_error((x), (STRING(x)))
+#define CHECK(x) check_xdr_error((x), (STRING(x)))
+
+static void set_positions(const std::vector<float>& x, Frame& frame);
+static void get_positions(std::vector<float>& x, const Frame& frame);
+static void set_cell(matrix box, Frame& frame);
+static void get_cell(matrix box, const Frame& frame);
 
 XTCFormat::XTCFormat(std::string path, File::Mode mode, File::Compression compression)
-    : xtc_(std::move(path), mode) {
+    : file_(XDRFile::XTC, std::move(path), mode) {
     if (compression != File::DEFAULT) {
         throw format_error("XTC format does not support compression");
     }
 }
 
-size_t XTCFormat::nsteps() { return static_cast<size_t>(xtc_.nframes()); }
+size_t XTCFormat::nsteps() { return static_cast<size_t>(file_.nframes()); }
 
 void XTCFormat::read_step(size_t step, Frame& frame) {
     step_ = step;
-    CHECK(xdr_seek(xtc_, xtc_.offset(step_), SEEK_SET));
+    CHECK(xdr_seek(file_, file_.offset(step_), SEEK_SET));
     read(frame);
 }
 
 void XTCFormat::read(Frame& frame) {
-    int natoms = xtc_.natoms();
+    int natoms = file_.natoms();
     int md_step = 0;
     float time = 0;
     matrix box;
     std::vector<float> x(static_cast<size_t>(natoms) * 3);
     float precision = 0;
 
-    CHECK(read_xtc(xtc_, natoms, &md_step, &time, box, reinterpret_cast<float(*)[3]>(x.data()),
+    CHECK(read_xtc(file_, natoms, &md_step, &time, box, reinterpret_cast<float(*)[3]>(x.data()),
                    &precision));
 
     frame.set_step(static_cast<size_t>(md_step));  // actual step of MD Simulation
@@ -55,12 +63,12 @@ void XTCFormat::read(Frame& frame) {
 
 void XTCFormat::write(const Frame& frame) {
     int natoms = static_cast<int>(frame.size());
-    if (xtc_.nframes() == 0 && step_ == 0) {
-        xtc_.set_natoms(natoms);
-    } else if (natoms != xtc_.natoms()) {
+    if (file_.nframes() == 0 && step_ == 0) {
+        file_.set_natoms(natoms);
+    } else if (natoms != file_.natoms()) {
         throw format_error(
             "XTC format does not support varying numbers of atoms: expected {}, but got {}",
-            xtc_.natoms(), natoms);
+            file_.natoms(), natoms);
     }
 
     int md_step = static_cast<int>(frame.step());
@@ -73,16 +81,16 @@ void XTCFormat::write(const Frame& frame) {
     get_cell(box, frame);
     get_positions(x, frame);
 
-    CHECK(write_xtc(xtc_, natoms, md_step, time, box, reinterpret_cast<float(*)[3]>(x.data()),
+    CHECK(write_xtc(file_, natoms, md_step, time, box, reinterpret_cast<float(*)[3]>(x.data()),
                     precision));
 
     step_++;
 }
 
-void XTCFormat::set_positions(const std::vector<float>& x, Frame& frame) {
+void set_positions(const std::vector<float>& x, Frame& frame) {
     auto positions = frame.positions();
     assert(x.size() == 3 * positions.size());
-    for (size_t i = 0; i < static_cast<size_t>(xtc_.natoms()); i++) {
+    for (size_t i = 0; i < frame.size(); i++) {
         // Factor 10 because the cell lengthes are in nm in the XTC format
         positions[i][0] = static_cast<double>(x[i * 3]) * 10;
         positions[i][1] = static_cast<double>(x[i * 3 + 1]) * 10;
@@ -90,10 +98,10 @@ void XTCFormat::set_positions(const std::vector<float>& x, Frame& frame) {
     }
 }
 
-void XTCFormat::get_positions(std::vector<float>& x, const Frame& frame) {
+void get_positions(std::vector<float>& x, const Frame& frame) {
     auto positions = frame.positions();
     assert(x.size() == 3 * positions.size());
-    for (size_t i = 0; i < static_cast<size_t>(xtc_.natoms()); i++) {
+    for (size_t i = 0; i < frame.size(); i++) {
         // Factor 10 because the cell lengthes are in nm in the XTC format
         x[i * 3] = static_cast<float>(positions[i][0] / 10.0);
         x[i * 3 + 1] = static_cast<float>(positions[i][1] / 10.0);
@@ -101,7 +109,7 @@ void XTCFormat::get_positions(std::vector<float>& x, const Frame& frame) {
     }
 }
 
-void XTCFormat::set_cell(matrix box, Frame& frame) {
+void set_cell(matrix box, Frame& frame) {
     auto a = Vector3D(static_cast<double>(box[0][0]), static_cast<double>(box[0][1]),
                       static_cast<double>(box[0][2]));
     auto b = Vector3D(static_cast<double>(box[1][0]), static_cast<double>(box[1][1]),
@@ -124,7 +132,7 @@ void XTCFormat::set_cell(matrix box, Frame& frame) {
     frame.set_cell({a.norm() * 10, b.norm() * 10, c.norm() * 10, alpha, beta, gamma});
 }
 
-void XTCFormat::get_cell(matrix box, const Frame& frame) {
+void get_cell(matrix box, const Frame& frame) {
     // Factor 10 because the cell lengthes are in nm in the XTC format
     auto matrix = frame.cell().matrix() / 10.0;
     box[0][0] = static_cast<float>(matrix[0][0]);
