@@ -5,7 +5,7 @@
 #define CHEMFILES_XTC_FORMAT_HPP
 
 #include "chemfiles/Format.hpp"
-#include "chemfiles/files/XTCFile.hpp"
+#include "chemfiles/files/XDRFile.hpp"
 
 namespace chemfiles {
 
@@ -19,13 +19,8 @@ class XTCFormat final : public Format {
     size_t nsteps() override;
 
   private:
-    void set_positions(const std::vector<float>& x, Frame& frame);
-    void get_positions(std::vector<float>& x, const Frame& frame);
-    void set_cell(matrix box, Frame& frame);
-    void get_cell(matrix box, const Frame& frame);
-
-    /// Reference to the associated file
-    XTCFile xtc_;
+    /// Associated XDR file
+    XDRFile file_;
     /// The next step to read
     size_t step_ = 0;
 };

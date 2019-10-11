@@ -1,26 +1,41 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#ifndef CHEMFILES_XTC_FILE_HPP
-#define CHEMFILES_XTC_FILE_HPP
+#ifndef CHEMFILES_XDR_FILE_HPP
+#define CHEMFILES_XDR_FILE_HPP
+
+#include <cstdint>
+#include <string>
 
 #include "chemfiles/File.hpp"
-#include "xdrfile.h"
-#include "xdrfile_xtc.h"
+
+struct XDRFILE;
 
 namespace chemfiles {
 
 /// Simple RAII capsule for `XDRFILE*`, handling the creation and
 /// destruction of the file as needed.
 /// Reads the file header and stores the offsets for individual frames.
-class XTCFile final : public File {
-  public:
-    XTCFile(std::string path, File::Mode mode);
-    ~XTCFile() override;
-    XTCFile(XTCFile&&) noexcept = default;
-    XTCFile& operator=(XTCFile&&) = default;
-    XTCFile(XTCFile const&) = delete;
-    XTCFile& operator=(XTCFile const&) = delete;
+class XDRFile final : public File {
+public:
+    /// Possible variants of the XDR file
+    enum Variants {
+        /// XTC trajectory
+        XTC,
+        /// TRR trajectory
+        TRR,
+    };
+
+    XDRFile(Variants variant, std::string path, File::Mode mode);
+    ~XDRFile() override;
+
+    XDRFile(XDRFile&& other) noexcept : File("", File::READ, File::DEFAULT) {
+        *this = std::move(other);
+    }
+    XDRFile& operator=(XDRFile&& other) noexcept;
+
+    XDRFile(XDRFile const&) = delete;
+    XDRFile& operator=(XDRFile const&) = delete;
 
     /// get the number of frames/steps in the file, as indicated in the file header
     unsigned long nframes() const;
@@ -33,8 +48,8 @@ class XTCFile final : public File {
 
     operator XDRFILE*() { return handle_; }
 
-  private:
-    /// underlying pointer to the xtc file
+private:
+    /// underlying pointer to the xdr file
     XDRFILE* handle_;
     /// The number of frames in the trajectory
     unsigned long nframes_ = 0;
@@ -44,9 +59,9 @@ class XTCFile final : public File {
     int natoms_ = 0;
 };
 
-/// Check a return code from a XTC function, and throw a `FileError` if the
+/// Check a return code from a xdrlib function, and throw a `FileError` if the
 /// status is not exdrOK.
-void check_xtc_error(int status, const std::string& function);
+void check_xdr_error(int status, const std::string& function);
 
 } // namespace chemfiles
 
