@@ -8,11 +8,19 @@
   #define __has_builtin(x) 0
 #endif
 
-#if __has_builtin(__builtin_unreachable) || GCC_VERSION >= 40500
+#ifdef __GNUC__
+#define GCC_VERSION (__GNUC__ * 100 + __GNUC_MINOR__)
+#else
+#define GCC_VERSION 0
+#endif
+
+#if __has_builtin(__builtin_unreachable) || GCC_VERSION >= 405
     #define HAS_BUILTIN_UNREACHABLE 1
 #else
     #define HAS_BUILTIN_UNREACHABLE 0
 #endif
+
+#undef GCC_VERSION
 
 #if !HAS_BUILTIN_UNREACHABLE && !defined(_MSC_VER)
 #include "chemfiles/Error.hpp"
