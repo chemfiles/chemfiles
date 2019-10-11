@@ -118,6 +118,18 @@ TEST_CASE("Atoms selections") {
     }
 
     SECTION("velocities") {
+        // The frame does not have velocities
+        CHECK(Selection("vz == 0").list(frame).empty());
+        CHECK(Selection("vx == 2").list(frame).empty());
+        CHECK(Selection("vy >= 10").list(frame).empty());
+
+        frame.add_velocities();
+        auto velocities = *frame.velocities();
+        velocities[0] = {1.0, 2.0, 0.0};
+        velocities[1] = {2.0, 3.0, 1.0};
+        velocities[2] = {3.0, 4.0, 2.0};
+        velocities[3] = {4.0, 5.0, 3.0};
+
         auto selection = Selection("vz < 2");
         auto expected = std::vector<size_t>{0, 1};
         CHECK(selection.list(frame) == expected);
@@ -213,13 +225,10 @@ TEST_CASE("Atoms selections") {
         expected = std::vector<size_t>{1, 2};
         CHECK(selection.list(frame) == expected);
 
-        // Unknown selection kind
-        CHECK_THROWS_AS(Selection("kind: all"), SelectionError);
-        // Too much colons
-        CHECK_THROWS_AS(Selection("atoms: pairs: atoms"), SelectionError);
-        // Variable index is too big
-        CHECK_THROWS_AS(Selection("pairs: name(#3) O"), SelectionError);
-        CHECK_THROWS_AS(Selection("name(#2) O"), SelectionError);
+        CHECK_THROWS_WITH(Selection("kind: all"), "unknown selection context 'kind' in 'kind: all'");
+        CHECK_THROWS_WITH(Selection("atoms: pairs: atoms"), "can not get selection context in 'atoms: pairs: atoms', too many ':'");
+        CHECK_THROWS_WITH(Selection("pairs: name(#3) O"), "variable index 3 is too big for the current context (should be <= 2)");
+        CHECK_THROWS_WITH(Selection("name(#2) O"), "variable index 2 is too big for the current context (should be <= 1)");
     }
 
     SECTION("math") {
@@ -297,7 +306,7 @@ TEST_CASE("Multiple selections") {
         expected = std::vector<Match>();
         CHECK(selection.evaluate(frame) == expected);
 
-        CHECK_THROWS_AS(selection.list(frame), SelectionError);
+        CHECK_THROWS_WITH(selection.list(frame), "can not call `Selection::list` on a multiple selection");
     }
 
     SECTION("Three") {
@@ -314,7 +323,7 @@ TEST_CASE("Multiple selections") {
         auto natoms = frame.size();
         CHECK(expected.size() == natoms * (natoms - 1) * (natoms - 2));
 
-        CHECK_THROWS_AS(selection.list(frame), SelectionError);
+        CHECK_THROWS_WITH(selection.list(frame), "can not call `Selection::list` on a multiple selection");
     }
 
     SECTION("Four") {
@@ -333,7 +342,7 @@ TEST_CASE("Multiple selections") {
         auto natoms = frame.size();
         CHECK(expected.size() == natoms * (natoms - 1) * (natoms - 2) * (natoms - 3));
 
-        CHECK_THROWS_AS(selection.list(frame), SelectionError);
+        CHECK_THROWS_WITH(selection.list(frame), "can not call `Selection::list` on a multiple selection");
     }
 
     SECTION("Bonds") {
@@ -353,7 +362,7 @@ TEST_CASE("Multiple selections") {
             CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
         }
 
-        CHECK_THROWS_AS(selection.list(frame), SelectionError);
+        CHECK_THROWS_WITH(selection.list(frame), "can not call `Selection::list` on a multiple selection");
     }
 
     SECTION("Angles") {
@@ -373,7 +382,7 @@ TEST_CASE("Multiple selections") {
             CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
         }
 
-        CHECK_THROWS_AS(selection.list(frame), SelectionError);
+        CHECK_THROWS_WITH(selection.list(frame), "can not call `Selection::list` on a multiple selection");
     }
 
     SECTION("Dihedrals") {
@@ -390,7 +399,7 @@ TEST_CASE("Multiple selections") {
             CHECK(std::find(eval.begin(), eval.end(), match) != eval.end());
         }
 
-        CHECK_THROWS_AS(selection.list(frame), SelectionError);
+        CHECK_THROWS_WITH(selection.list(frame), "can not call `Selection::list` on a multiple selection");
     }
 
     SECTION("Properties") {
@@ -413,16 +422,27 @@ TEST_CASE("Multiple selections") {
 
         selection = Selection("[\"string space\"] == \"foo bar\"");
         CHECK(selection.list(frame) == std::vector<size_t>{3ul});
+
+        selection = Selection("[string] and all");
+        CHECK_THROWS_WITH(selection.list(frame), "invalid type for property [string] on atom 2: expected bool, got string");
+
+        selection = Selection("[bool] == foo");
+        CHECK_THROWS_WITH(selection.list(frame), "invalid type for property [bool] on atom 1: expected string, got bool");
+
+        selection = Selection("[string] < 34");
+        CHECK_THROWS_WITH(selection.list(frame), "invalid type for property [string] on atom 2: expected double, got string");
+
+        selection = Selection("[vector] < 34");
+        CHECK_THROWS_WITH(selection.list(frame), "invalid type for property [vector] on atom 0: expected double, got Vector3D");
     }
 }
 
 Frame testing_frame() {
     auto frame = Frame();
-    frame.add_velocities();
-    frame.add_atom(Atom("H1", "H"), {0.0, 1.0, 2.0}, {1.0, 2.0, 0.0});
-    frame.add_atom(Atom("O"), {1.0, 2.0, 3.0}, {2.0, 3.0, 1.0});
-    frame.add_atom(Atom("O"), {2.0, 3.0, 4.0}, {3.0, 4.0, 2.0});
-    frame.add_atom(Atom("H"), {3.0, 4.0, 5.0}, {4.0, 5.0, 3.0});
+    frame.add_atom(Atom("H1", "H"), {0.0, 1.0, 2.0});
+    frame.add_atom(Atom("O"), {1.0, 2.0, 3.0});
+    frame.add_atom(Atom("O"), {2.0, 3.0, 4.0});
+    frame.add_atom(Atom("H"), {3.0, 4.0, 5.0});
 
     frame.add_bond(0, 1);
     frame.add_bond(1, 2);
@@ -434,6 +454,7 @@ Frame testing_frame() {
     frame[2].set("string", "foo");
     frame[3].set("string", "bar");
     frame[3].set("string space", "foo bar");
+    frame[0].set("vector", Vector3D(2.0, 3.0, 4.0));
 
     auto residue = Residue("resime", 3);
     residue.add_atom(2);

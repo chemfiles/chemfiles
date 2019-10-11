@@ -47,6 +47,7 @@ TEST_CASE("Tokens") {
         CHECK(Token(Token::MINUS).as_str() == "-");
         CHECK(Token(Token::STAR).as_str() == "*");
         CHECK(Token(Token::SLASH).as_str() == "/");
+        CHECK(Token(Token::HAT).as_str() == "^");
         CHECK(Token(Token::PERCENT).as_str() == "%");
         CHECK(Token(Token::NOT).as_str() == "not");
         CHECK(Token(Token::AND).as_str() == "and");
@@ -151,13 +152,7 @@ TEST_CASE("Lexing") {
             CHECK(tokens[1].type() == Token::END);
         }
 
-        for (std::string id: {"\"\"", "\"id_3nt___\"", "\"and\"", "\"3.2\""}) {
-            auto tokens = tokenize(id);
-            CHECK(tokens.size() == 2);
-            CHECK(tokens[0].type() == Token::STRING);
-            CHECK(tokens[0].string() == id.substr(1, id.size() - 2));
-            CHECK(tokens[1].type() == Token::END);
-        }
+        CHECK_THROWS_WITH(tokenize("22bar == foo"), "identifiers can not start with a digit: '22bar'");
     }
 
     SECTION("Numbers") {
@@ -268,6 +263,14 @@ TEST_CASE("Lexing") {
 
     SECTION("String") {
         CHECK(tokenize("\"aa\"")[0].type() == Token::STRING);
+
+        for (std::string id: {"\"\"", "\"id_3nt___\"", "\"and\"", "\"3.2\""}) {
+            auto tokens = tokenize(id);
+            CHECK(tokens.size() == 2);
+            CHECK(tokens[0].type() == Token::STRING);
+            CHECK(tokens[0].string() == id.substr(1, id.size() - 2));
+            CHECK(tokens[1].type() == Token::END);
+        }
 
         CHECK_THROWS_WITH(tokenize("\"foo"), "closing quote (\") not found in '\"foo'");
         CHECK_THROWS_WITH(tokenize("\"foo and name 4"), "closing quote (\") not found in '\"foo and name 4'");
