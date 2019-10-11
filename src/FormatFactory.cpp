@@ -123,10 +123,10 @@ format_creator_t FormatFactory::name(const std::string& name) {
         }
 
         std::stringstream message;
-        fmt::print(message, "can not find a format named '{}',", name);
+        fmt::print(message, "can not find a format named '{}'", name);
 
         if (!suggestions.empty()) {
-            fmt::print(message, " did you mean");
+            fmt::print(message, ", did you mean");
             bool first = true;
             for (auto& suggestion: suggestions) {
                 if (!first) {

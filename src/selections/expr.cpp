@@ -162,8 +162,8 @@ bool BoolProperty::is_match(const Frame& frame, const Match& match) const {
             return property->as_bool();
         } else {
             throw selection_error(
-                "invalid type for property [{}]: expected bool, got {}",
-                property_, kind_as_string(property->kind())
+                "invalid type for property [{}] on atom {}: expected bool, got {}",
+                property_, match[argument_], kind_as_string(property->kind())
             );
         }
     } else {
@@ -327,8 +327,8 @@ const std::string& StringProperty::value(const Frame& frame, size_t i) const {
             return property->as_string();
         } else {
             throw selection_error(
-                "invalid type for property [{}]: expected string, got {}",
-                property_, kind_as_string(property->kind())
+                "invalid type for property [{}] on atom {}: expected string, got {}",
+                property_, i, kind_as_string(property->kind())
             );
         }
     } else {
@@ -704,8 +704,8 @@ double NumericProperty::value(const Frame& frame, size_t i) const {
             return property->as_double();
         } else {
             throw selection_error(
-                "invalid type for property [{}]: expected double, got {}",
-                property_, kind_as_string(property->kind())
+                "invalid type for property [{}] on atom {}: expected double, got {}",
+                property_, i, kind_as_string(property->kind())
             );
         }
     } else {
