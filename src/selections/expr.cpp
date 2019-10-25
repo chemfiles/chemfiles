@@ -707,7 +707,7 @@ double NumericProperty::value(const Frame& frame, size_t i) const {
     } else {
         // No property with the given name
         // return nan so that all comparaison down the line evaluate to false
-        return nan("0");
+        return nan("");
     }
 }
 
@@ -773,6 +773,7 @@ double Velocity::value(const Frame& frame, size_t i) const {
         auto& velocities = *frame.velocities();
         return velocities[i][static_cast<size_t>(coordinate_)];
     } else {
-        return 0.0;
+        // return nan so that all comparaison down the line evaluate to false
+        return std::nan("");
     }
 }
