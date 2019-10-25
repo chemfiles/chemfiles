@@ -9,7 +9,7 @@
 #include <cfloat>
 #include <cmath>
 
-#include <chemfiles/Error.hpp>
+#include "chemfiles/Error.hpp"
 
 namespace chemfiles {
 

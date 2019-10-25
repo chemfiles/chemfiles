@@ -31,7 +31,7 @@ static bool is_ident_component(char c) {
     return is_alpha(c) || is_digit(c) || c == '_';
 }
 
-bool chemfiles::selections::is_ident(const std::string& string) {
+bool chemfiles::selections::is_ident(string_view string) {
     if (string.empty()) {
         return false;
     }
