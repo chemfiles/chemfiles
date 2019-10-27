@@ -1,4 +1,4 @@
-sphinx >1.8
-breathe >4.7
+sphinx >2.2
+breathe >4.13
 sphinx_bootstrap_theme
 toml

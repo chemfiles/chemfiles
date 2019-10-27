@@ -7,10 +7,10 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-if ("${DOXYGEN_VERSION}" VERSION_LESS 1.8.13)
+if ("${DOXYGEN_VERSION}" VERSION_LESS 1.8.16)
     message(WARNING
         "Your version of doxygen is too old (${DOXYGEN_VERSION}).\n"
-        "Please upgrade to doxygen >= 1.8.13 for optimal output."
+        "Please upgrade to doxygen >= 1.8.16 for optimal output"
     )
 endif()
 

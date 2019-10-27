@@ -226,6 +226,7 @@ public:
     ///
     /// @throw Error if the matrix is not inversible (i.e. if the determinant
     ///              is zero)
+    ///
     /// @example{matrix3d/invert.cpp}
     Matrix3D invert() const;
 

@@ -12,11 +12,13 @@ a {
 
 pre {
     color: black;
+    background-color: #f8f8fc;
+    border: none;
 }
 
 code {
     color: inherit;
-    background-color: rgba(0, 0, 0, 0.15);
+    background-color: #fafaff;
 }
 
 /* Breathe creates class description with both breathe-sectiondef and container
