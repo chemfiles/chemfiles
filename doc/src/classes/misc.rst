@@ -82,7 +82,7 @@ each warning event.
 
 .. doxygenfunction:: chemfiles::set_warning_callback
 
-.. doxygentypedef:: chemfiles::warning_callback
+.. doxygentypedef:: chemfiles::warning_callback_t
 
 Configuration files
 -------------------
