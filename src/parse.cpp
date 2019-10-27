@@ -203,7 +203,7 @@ template <> double chemfiles::parse(string_view input) {
         }
 
         if (it == exponent_start) {
-            throw error("missing exponent in '{}'", input);
+            throw error("missing exponent in '{}' to read a double", input);
         } else if (expon > 308) {
             throw error("{} is out of range for double", input);
         }

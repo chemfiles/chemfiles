@@ -93,7 +93,7 @@ namespace detail {
 
             if (size == 0) {
                 throw error(
-                    "tried to read {} values, but there are only {}",
+                    "expected {} values, found {}",
                     count_ + 1, count_
                 );
             }

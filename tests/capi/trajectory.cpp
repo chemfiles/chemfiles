@@ -255,7 +255,7 @@ TEST_CASE("Write trajectory") {
     auto tmpfile = NamedTempPath(".xyz");
     const char* EXPECTED_CONTENT =
     "4\n"
-    "Written by the chemfiles library\n"
+    "Properties=species:S:1:pos:R:3\n"
     "He 1 2 3\n"
     "He 1 2 3\n"
     "He 1 2 3\n"
@@ -287,7 +287,7 @@ TEST_CASE("Write trajectory to memory") {
 
     const char* EXPECTED_CONTENT =
     "4\n"
-    "Written by the chemfiles library\n"
+    "Properties=species:S:1:pos:R:3\n"
     "He 1 2 3\n"
     "He 1 2 3\n"
     "He 1 2 3\n"
