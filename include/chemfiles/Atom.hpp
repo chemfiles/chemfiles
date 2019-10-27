@@ -112,10 +112,6 @@ public:
     /// `Na` full name. To change the value returned for a given type, you can
     /// use configuration files.
     ///
-    /// @verbatim embed:rst:leading-slashes This function returns an
-    /// :cpp:class:`chemfiles::optional` value that is close to C++17
-    /// ``std::optional``.  @endverbatim
-    ///
     /// @example{atom/full_name.cpp}
     optional<std::string> full_name() const;
 
@@ -127,11 +123,6 @@ public:
     /// executed with case-insensitive atom type: `Na`, `NA`, `nA` and `na` all
     /// get the `Na` radius. To change the value returned for a given type, you
     /// can use configuration files.
-    ///
-    /// @verbatim embed:rst:leading-slashes
-    /// This function returna an :cpp:class:`chemfiles::optional` value that is
-    /// close to C++17 ``std::optional``.
-    /// @endverbatim
     ///
     /// @example{atom/vdw_radius.cpp}
     optional<double> vdw_radius() const;
@@ -145,11 +136,6 @@ public:
     /// get the `Na` radius. To change the value returned for a given type, you
     /// can use configuration files.
     ///
-    /// @verbatim embed:rst:leading-slashes
-    /// This function returna an :cpp:class:`chemfiles::optional` value that is
-    /// close to C++17 ``std::optional``.
-    /// @endverbatim
-    ///
     /// @example{atom/covalent_radius.cpp}
     optional<double> covalent_radius() const;
 
@@ -161,11 +147,6 @@ public:
     /// is executed with case-insensitive atom type: `Na`, `NA`, `nA` and `na`
     /// all get the `Na` atomic number. To change the value returned for a given
     /// type, you can use configuration files.
-    ///
-    /// @verbatim embed:rst:leading-slashes
-    /// This function returna an :cpp:class:`chemfiles::optional` value that is
-    /// close to C++17 ``std::optional``.
-    /// @endverbatim
     ///
     /// @example{atom/atomic_number.cpp}
     optional<uint64_t> atomic_number() const;
@@ -192,11 +173,6 @@ public:
     /// If no property with the given `name` is found, this function returns
     /// `nullopt`.
     ///
-    /// @verbatim embed:rst:leading-slashes
-    /// This function returns an :cpp:class:`chemfiles::optional` value that is
-    /// close to C++17 ``std::optional``.
-    /// @endverbatim
-    ///
     /// @example{atom/property.cpp}
     optional<const Property&> get(const std::string& name) const {
         return properties_.get(name);
@@ -210,11 +186,6 @@ public:
     ///
     /// If a property with the given `name` is found, but has a different kind,
     /// this function emits a warning and returns `nullopt`.
-    ///
-    /// @verbatim embed:rst:leading-slashes
-    /// This function returns an :cpp:class:`chemfiles::optional` value that is
-    /// close to C++17 ``std::optional``.
-    /// @endverbatim
     ///
     /// @example{atom/property.cpp}
     template<Property::Kind kind>
