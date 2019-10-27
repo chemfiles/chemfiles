@@ -81,7 +81,7 @@ static void check_write_file(std::string path, File::Compression compression) {
 
     TextFile file(path, File::READ, compression);
     CHECK(file.readline() == "4");
-    CHECK(file.readline() == "Written by the chemfiles library");
+    CHECK(file.readline() == "Properties=species:S:1:pos:R:3");
     CHECK(file.readline() == "A 1 2 3");
     CHECK(file.readline() == "B 1 2 4");
     CHECK(file.readline() == "C 1 2 5");
@@ -132,14 +132,14 @@ static void check_append_file(std::string path, File::Compression compression) {
 
     TextFile file(path, File::READ, compression);
     CHECK(file.readline() == "4");
-    CHECK(file.readline() == "Written by the chemfiles library");
+    CHECK(file.readline() == "Properties=species:S:1:pos:R:3");
     CHECK(file.readline() == "A 1 2 3");
     CHECK(file.readline() == "B 1 2 4");
     CHECK(file.readline() == "C 1 2 5");
     CHECK(file.readline() == "D 1 2 6");
 
     CHECK(file.readline() == "4");
-    CHECK(file.readline() == "Written by the chemfiles library");
+    CHECK(file.readline() == "Properties=species:S:1:pos:R:3");
     CHECK(file.readline() == "D 3 2 1");
     CHECK(file.readline() == "C 4 2 1");
     CHECK(file.readline() == "B 5 2 1");

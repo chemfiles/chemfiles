@@ -30,6 +30,11 @@ public:
     void read_next(Frame& frame) override;
     void write_next(const Frame& frame) override;
     optional<uint64_t> forward() override;
+
+private:
+    // used to give better error message in `forward`, this refers to the
+    // current step being checked.
+    size_t current_forward_step_ = 0;
 };
 
 template<> FormatInfo format_information<XYZFormat>();

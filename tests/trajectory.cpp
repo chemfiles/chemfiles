@@ -49,7 +49,7 @@ TEST_CASE("Associate a topology and a trajectory") {
         auto tmpfile = NamedTempPath(".xyz");
         const auto EXPECTED_CONTENT =
         "5\n"
-        "Written by the chemfiles library\n"
+        "Properties=species:S:1:pos:R:3\n"
         "Fe 1 2 3\n"
         "Fe 1 2 3\n"
         "Fe 1 2 3\n"

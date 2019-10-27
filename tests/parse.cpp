@@ -59,7 +59,7 @@ TEST_CASE("String parsing") {
         );
         CHECK_THROWS_WITH(
             chemfiles::parse<double>("3.e"),
-            "missing exponent in '3.e'"
+            "missing exponent in '3.e' to read a double"
         );
         CHECK_THROWS_WITH(
             chemfiles::parse<double>(".e1"),
@@ -199,7 +199,7 @@ TEST_CASE("scan") {
 
     CHECK_THROWS_WITH(
         chemfiles::scan("3 4.2", i, d, s),
-        "error while reading '3 4.2': tried to read 3 values, but there are only 2"
+        "error while reading '3 4.2': expected 3 values, found 2"
     );
 
     CHECK_THROWS_WITH(
