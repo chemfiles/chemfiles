@@ -14,7 +14,7 @@
 namespace chemfiles {
 
 /// Callback type used to process a warning event
-typedef std::function<void(const std::string& message)> warning_callback; // NOLINT: doxygen fails to generate the right XLM from this
+typedef std::function<void(const std::string& message)> warning_callback_t; // NOLINT: doxygen fails to generate the right XLM from this
 
 /// Set the global callback for warning events. The default is to print them
 /// on the standard error stream.
@@ -22,7 +22,7 @@ typedef std::function<void(const std::string& message)> warning_callback; // NOL
 /// @example{set_warning_callback.cpp}
 ///
 /// @param callback callback function that will be called on each warning
-void CHFL_EXPORT set_warning_callback(warning_callback callback);
+void CHFL_EXPORT set_warning_callback(warning_callback_t callback);
 
 /// Read configuration data from the file at `path`.
 ///
