@@ -137,11 +137,19 @@ namespace detail {
     }
 }
 
+/// Read a value of type T from the `input`. This is specialized/implemented for
+/// double, std::string, and all signed and unsigned integer types.
+///
+/// @throw chemfiles::Error if the input is empty
 template<typename T>
 inline T parse(string_view input) {
     return detail::parse_integer<T>(input);
 }
 
+/// Read a string value from the `input`. This function directly returns its
+/// input.
+///
+/// @throw chemfiles::Error if the input is empty
 template<> inline std::string parse(string_view input) {
     if (input.empty()) {
         throw error("tried to read a string, got an empty value");
@@ -149,21 +157,33 @@ template<> inline std::string parse(string_view input) {
     return input.to_string();
 }
 
-/// Read double value. This only support plain numbers (no
+/// Read double value from the `input`. This only support plain numbers (no
 /// hex or octal notation), with ASCII digits (the system locale is ignored).
 /// This does not support parsing NaN or infinity doubles, since they don't
 /// have much interest in chemfiles;
-/// Number should follow the '(+|-)?(\d+)?(\.\d+)?((e|E)?(+|-)?\d+)' pattern.
+/// Numbers should follow the '(+|-)?(\d+)?(\.\d+)?((e|E)?(+|-)?\d+)' pattern.
+///
+/// @throw chemfiles::Error if the input is empty, the number invalid or would
+///                         overflow `double`, or if their is additional data
+///                         after the value
 template<> double parse(string_view input);
 
-/// Read signed integer as a 64-bit value. This only support plain numbers (no
-/// hex or octal notation), with ASCII digits (the system locale is ignored).
-/// Number should follow the '(+|-)?\d+' pattern.
+/// Read a signed 64-bit integer from the `input`. This only support plain
+/// numbers (no hex or octal notation), with ASCII digits (the system locale is
+/// ignored). Numbers should follow the '(+|-)?\d+' pattern.
+///
+/// @throw chemfiles::Error if the input is empty, the number invalid or would
+///                         overflow `int64_t`, or if their is additional data
+///                         after the value
 template<> int64_t parse(string_view input);
 
-/// Read unsigned integer as a 64-bit value. This only support plain numbers (no
-/// hex or octal notation), with ASCII digits (the system locale is ignored).
-/// Number should follow the '+?\d+' pattern.
+/// Read an unsigned 64-bit integer from the `input`. This only support plain
+/// numbers (no hex or octal notation), with ASCII digits (the system locale is
+/// ignored). Numbers should follow the '+?\d+' pattern.
+///
+/// @throw chemfiles::Error if the input is empty, the number invalid or would
+///                         overflow `uint64_t`, or if their is additional data
+///                         after the value
 template<> uint64_t parse(string_view input);
 
 template<typename ...Args>
