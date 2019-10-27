@@ -161,7 +161,7 @@ template<> inline std::string parse(string_view input) {
 /// hex or octal notation), with ASCII digits (the system locale is ignored).
 /// This does not support parsing NaN or infinity doubles, since they don't
 /// have much interest in chemfiles;
-/// Numbers should follow the '(+|-)?(\d+)?(\.\d+)?((e|E)?(+|-)?\d+)' pattern.
+/// Numbers should follow the `(+|-)?(\d+)?(\.\d+)?((e|E)?(+|-)?\d+)` pattern.
 ///
 /// @throw chemfiles::Error if the input is empty, the number invalid or would
 ///                         overflow `double`, or if their is additional data
@@ -170,7 +170,7 @@ template<> double parse(string_view input);
 
 /// Read a signed 64-bit integer from the `input`. This only support plain
 /// numbers (no hex or octal notation), with ASCII digits (the system locale is
-/// ignored). Numbers should follow the '(+|-)?\d+' pattern.
+/// ignored). Numbers should follow the `(+|-)?\d+` pattern.
 ///
 /// @throw chemfiles::Error if the input is empty, the number invalid or would
 ///                         overflow `int64_t`, or if their is additional data
@@ -179,7 +179,7 @@ template<> int64_t parse(string_view input);
 
 /// Read an unsigned 64-bit integer from the `input`. This only support plain
 /// numbers (no hex or octal notation), with ASCII digits (the system locale is
-/// ignored). Numbers should follow the '+?\d+' pattern.
+/// ignored). Numbers should follow the `+?\d+` pattern.
 ///
 /// @throw chemfiles::Error if the input is empty, the number invalid or would
 ///                         overflow `uint64_t`, or if their is additional data
