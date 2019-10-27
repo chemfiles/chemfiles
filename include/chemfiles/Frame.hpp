@@ -31,7 +31,7 @@ namespace chemfiles {
 /// * ``cell`` is an infinite unit cell;
 /// * ``topology`` is empty, and contains no data;
 /// * ``positions`` is filled with zeros;
-/// * ``velocities`` is the nullopt variant of :cpp:class:`chemfiles::optional`.
+/// * ``velocities`` is the ``nullopt`` variant of :cpp:class:`chemfiles::optional`.
 ///
 /// @endverbatim
 ///
@@ -111,11 +111,6 @@ public:
 
     /// Get the positions of the atoms in this frame.
     ///
-    /// @verbatim embed:rst:leading-slashes
-    /// A :cpp:class:`chemfiles::span` is a view inside a vector allowing
-    /// mutation of the values, but no memory allocation.
-    /// @endverbatim
-    ///
     /// @example{frame/positions.cpp}
     span<Vector3D> positions() {
         return positions_;
@@ -138,14 +133,6 @@ public:
 
     /// Get an velocities of the atoms in this frame, if this frame contains
     /// velocity data.
-    ///
-    /// @verbatim embed:rst:leading-slashes
-    /// This function returna an :cpp:class:`chemfiles::optional` value that is
-    /// close to C++17 ``std::optional``.
-    ///
-    /// A :cpp:class:`chemfiles::span` is a view inside a vector allowing
-    /// mutation of the values, but no memory allocation.
-    /// @endverbatim
     ///
     /// @example{frame/velocities.cpp}
     optional<span<Vector3D>> velocities() {
@@ -371,11 +358,6 @@ public:
     /// If no property with the given `name` is found, this function returns
     /// `nullopt`.
     ///
-    /// @verbatim embed:rst:leading-slashes
-    /// This function returns an :cpp:class:`chemfiles::optional` value that is
-    /// close to C++17 ``std::optional``.
-    /// @endverbatim
-    ///
     /// @example{frame/get.cpp}
     optional<const Property&> get(const std::string& name) const {
         return properties_.get(name);
@@ -389,11 +371,6 @@ public:
     ///
     /// If a property with the given `name` is found, but has a different kind,
     /// this function emits a warning and returns `nullopt`.
-    ///
-    /// @verbatim embed:rst:leading-slashes
-    /// This function returns an :cpp:class:`chemfiles::optional` value that is
-    /// close to C++17 ``std::optional``.
-    /// @endverbatim
     ///
     /// @example{frame/get.cpp}
     template<Property::Kind kind>
