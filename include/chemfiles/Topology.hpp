@@ -249,11 +249,6 @@ public:
     ///
     /// If no residue contains this atom, this function returns `nullopt`.
     ///
-    /// @verbatim embed:rst:leading-slashes
-    /// This function returna an :cpp:class:`chemfiles::optional` value that is
-    /// close to C++17 ``std::optional``.
-    /// @endverbatim
-    ///
     /// @example{topology/residue_for_atom.cpp}
     optional<const Residue&> residue_for_atom(size_t index) const;
 

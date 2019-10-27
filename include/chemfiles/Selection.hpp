@@ -107,10 +107,6 @@ public:
     ///
     /// @throws SelectionError if there is a error in the selection string
     ///
-    /// @verbatim embed:rst:leading-slashes
-    /// .. chfl_example:: /../../tests/doc/selection/selection.cpp
-    /// @endverbatim
-    ///
     /// @example{selection/selection.cpp}
     explicit Selection(std::string selection);
 

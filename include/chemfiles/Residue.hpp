@@ -41,19 +41,14 @@ public:
     Residue(Residue&&) = default;
     Residue& operator=(Residue&&) = default;
 
-    /// Get the name of the residue
+    /// Get the name of the residue.
     ///
     /// @example{residue/name.cpp}
     const std::string& name() const {
         return name_;
     }
 
-    /// Get the residue identifier if it exists.
-    ///
-    /// @verbatim embed:rst:leading-slashes
-    /// This function returna an :cpp:class:`chemfiles::optional` value that is
-    /// close to C++17 ``std::optional``.
-    /// @endverbatim
+    /// Get the residue identifier, or `nullopt` if it does not exist.
     ///
     /// @example{residue/id.cpp}
     optional<uint64_t> id() const {
@@ -109,11 +104,6 @@ public:
     /// If no property with the given `name` is found, this function returns
     /// `nullopt`.
     ///
-    /// @verbatim embed:rst:leading-slashes
-    /// This function returns an :cpp:class:`chemfiles::optional` value that is
-    /// close to C++17 ``std::optional``.
-    /// @endverbatim
-    ///
     /// @example{residue/property.cpp}
     optional<const Property&> get(const std::string& name) const {
         return properties_.get(name);
@@ -127,11 +117,6 @@ public:
     ///
     /// If a property with the given `name` is found, but has a different kind,
     /// this function emits a warning and returns `nullopt`.
-    ///
-    /// @verbatim embed:rst:leading-slashes
-    /// This function returns an :cpp:class:`chemfiles::optional` value that is
-    /// close to C++17 ``std::optional``.
-    /// @endverbatim
     ///
     /// @example{residue/property.cpp}
     template<Property::Kind kind>
