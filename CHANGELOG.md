@@ -20,6 +20,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added missing `chfl_frame_clear_bonds` and `chfl_topology_clear_bonds`
   functions.
 
+### Changes in supported formats
+
+* Added read and write support for extended XYZ. The XYZ format now default to
+  extended output, and read extended files. Extended XYZ allow storing unit
+  cell and arbitrary atomic properties.
+
 ## 0.9.3 (5 Feb 2020)
 
 * Fix a bug in the PDB format where no atomic name/type was read from short
@@ -38,14 +44,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 * Added read and write support for CML (Chemical Markup Language) files, a XML
   based format.
-* Added a native implementation of XTC reader, replacing the VMD molfile
-  version. The new code should be faster and use less memory.
-* Added a native implementation of TRR reader, replacing the VMD molfile
-  version. The new code should be faster and use less memory.
+* Added a native implementation of XTC and TRR formats, replacing the VMD
+  molfile version. The new code supports reading and writing files, should be
+  faster and use less memory.
 * Remove the ability to read frames from a trajectory that was opened in
   append mode. This mode is now write only.
-* Added a native implementation of XTC writer.
-* Added a native implementation of TRR writer.
 * Added support for bzip2 (.bz2) compressed files when reading and writing
 
 ## 0.9.1 (13 Mar 2019)
