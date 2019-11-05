@@ -35,6 +35,30 @@ code {
     margin-left: 2em;
 }
 
+.formats-table tr:nth-child(odd) td {
+    background-color: #eee;
+}
+
+.formats-table tr td:nth-of-type(2) ~ td {
+    text-align: center;
+}
+
+.formats-table tr td:nth-of-type(2) ~ td {
+    text-align: center;
+}
+
+/* separation between columns in the formats tables */
+.formats-table tr td:nth-of-type(2),
+.formats-table tr td:nth-of-type(4),
+.formats-table tr td:nth-of-type(7)
+{
+    border-right: 1px solid #bbb;
+}
+
+.red {
+    color: #f36264;
+}
+
 /* Breathe creates class description with both breathe-sectiondef and container
 classes. This make the class description use the container width, and not fit
 on the page anymore. */
