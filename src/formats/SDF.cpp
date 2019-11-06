@@ -323,7 +323,7 @@ void SDFFormat::write_next(const Frame& frame) {
     file_.print("$$$$\n");
 }
 
-int64_t SDFFormat::forward() {
+optional<uint64_t> SDFFormat::forward() {
     auto position = file_.tellpos();
     size_t natoms = 0;
     size_t nbonds = 0;
@@ -342,7 +342,7 @@ int64_t SDFFormat::forward() {
         nbonds = parse<size_t>(counts_line.substr(3,3));
     } catch (const Error&) {
         // We could not read an integer, so give up here
-        return -1;
+        return nullopt;
     }
 
     try {

@@ -84,7 +84,7 @@ void PDBFormat::read_next(Frame& frame) {
     residues_.clear();
     atom_offsets_.clear();
 
-    int64_t position;
+    uint64_t position;
     bool got_end = false;
     while (!got_end && !file_.eof()) {
         auto line = file_.readline();
@@ -785,7 +785,7 @@ PDBFormat::~PDBFormat() noexcept {
     }
 }
 
-int64_t PDBFormat::forward() {
+optional<uint64_t> PDBFormat::forward() {
     auto position = file_.tellpos();
 
     while (!file_.eof()) {
@@ -812,6 +812,6 @@ int64_t PDBFormat::forward() {
     if (position == 0) {
         return position;
     } else {
-        return -1;
+        return nullopt;
     }
 }

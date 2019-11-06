@@ -24,7 +24,7 @@ public:
     void write(const char* data, size_t count) override;
 
     void clear() noexcept override;
-    void seek(int64_t position) override;
+    void seek(uint64_t position) override;
 
 private:
     /// Check if any error happened while reading/writing the file. Returns the

@@ -33,7 +33,7 @@ public:
 
     void read_next(Frame& frame) override;
     void write_next(const Frame& frame) override;
-    int64_t forward() override;
+    optional<uint64_t> forward() override;
 
     // Connect residues based on a predefined table
     static void link_standard_residue_bonds(Frame& frame);

@@ -744,13 +744,13 @@ void SMIFormat::write_next(const Frame& frame) {
     file_.print("\n");
 }
 
-int64_t SMIFormat::forward() {
+optional<uint64_t> SMIFormat::forward() {
     auto position = file_.tellpos();
 
     auto line = file_.readline();
     while (trim(line).empty()) {
         if (file_.eof()) {
-            return -1;
+            return nullopt;
         }
         line = file_.readline();
     }
