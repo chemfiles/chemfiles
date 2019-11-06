@@ -26,7 +26,7 @@ public:
     void write(const char* data, size_t count) override;
 
     void clear() noexcept override;
-    void seek(int64_t position) override;
+    void seek(uint64_t position) override;
 
 private:
     /// Compress data from stream_.next_in, and write the data to the file.

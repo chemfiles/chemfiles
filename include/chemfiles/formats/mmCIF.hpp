@@ -39,7 +39,7 @@ private:
     bool uses_fract_;
     /// Storing the positions of all the steps in the file, so that we can
     /// just `seekpos` them instead of reading the whole step.
-    std::vector<int64_t> steps_positions_;
+    std::vector<uint64_t> steps_positions_;
     /// The cell for all frames
     UnitCell cell_;
     /// Number of models written to the file.

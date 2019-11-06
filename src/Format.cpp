@@ -50,10 +50,10 @@ void TextFormat::scan_all() {
     auto before = file_.tellpos();
     while (!file_.eof()) {
         auto position = forward();
-        if (position == -1) {
+        if (!position) {
             break;
         }
-        steps_positions_.push_back(position);
+        steps_positions_.push_back(position.value());
     }
 
     eof_found_ = true;

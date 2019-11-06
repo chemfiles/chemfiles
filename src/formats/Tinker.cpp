@@ -134,21 +134,21 @@ void TinkerFormat::write_next(const Frame& frame) {
     }
 }
 
-int64_t TinkerFormat::forward() {
+optional<uint64_t> TinkerFormat::forward() {
     auto position = file_.tellpos();
     size_t natoms = 0;
     try {
         auto line = file_.readline();
         if (trim(line).empty()) {
             // We just read an empty line, we give up here
-            return -1;
+            return nullopt;
         } else {
             // Get the number of atoms in the line
             natoms = parse<size_t>(split(line, ' ')[0]);
         }
     } catch (const Error&) {
         // We could not read an integer, so give up here
-        return -1;
+        return nullopt;
     }
 
     try {

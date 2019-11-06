@@ -44,20 +44,22 @@ TextFile::TextFile(std::string path, File::Mode mode, File::Compression compress
     }
 }
 
-int64_t TextFile::tellpos() const {
-    auto delta = buffer_initialized() ? line_start_ - buffer_.data() : 0;
+uint64_t TextFile::tellpos() const {
+    auto delta = buffer_initialized() ? static_cast<uint64_t>(line_start_ - buffer_.data()) : 0;
     assert(position_ + delta >= 0);
     return position_ + delta;
 }
 
-void TextFile::seekpos(int64_t position) {
+void TextFile::seekpos(uint64_t position) {
     assert(position >= 0);
 
     got_impl_eof_ = false;
     eof_ = false;
 
     if (buffer_initialized()) {
-        auto delta = position - position_;
+        // use signed int64_t since the requested position can be smaller than
+        // position_
+        auto delta = static_cast<int64_t>(position) - static_cast<int64_t>(position_);
         if (0 <= delta && delta < static_cast<int64_t>(buffer_.size())) {
             // the new position is inside our buffer, no need to actually seek,
             // just reset the line_start_ to the correponding position.

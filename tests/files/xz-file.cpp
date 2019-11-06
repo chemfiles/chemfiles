@@ -51,7 +51,7 @@ TEST_CASE("Read a text file") {
     SECTION("Lines offsets") {
         // Compare offset with uncompressed file
         auto file = TextFile("data/xyz/water.xyz", File::READ, File::DEFAULT);
-        auto positions = std::vector<int64_t>();
+        auto positions = std::vector<uint64_t>();
         while (!file.eof()) {
             positions.push_back(file.tellpos());
             file.readline();

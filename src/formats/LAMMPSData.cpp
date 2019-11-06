@@ -1008,7 +1008,7 @@ double tilt_factor(const Matrix3D& matrix, size_t i, size_t j) {
     return factor;
 }
 
-int64_t LAMMPSDataFormat::forward() {
+optional<uint64_t> LAMMPSDataFormat::forward() {
     // LAMMPS Data only supports one step, so always act like there is only one
     auto position = file_.tellpos();
     if (position == 0) {
@@ -1016,6 +1016,6 @@ int64_t LAMMPSDataFormat::forward() {
         file_.readline();
         return position;
     } else {
-        return -1;
+        return nullopt;
     }
 }

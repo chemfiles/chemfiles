@@ -187,7 +187,7 @@ void CSSRFormat::write_next(const Frame& frame) {
     }
 }
 
-int64_t CSSRFormat::forward() {
+optional<uint64_t> CSSRFormat::forward() {
     // CSSR only supports one step, so always act like there is only one
     auto position = file_.tellpos();
     if (position == 0) {
@@ -195,6 +195,6 @@ int64_t CSSRFormat::forward() {
         file_.readline();
         return position;
     } else {
-        return -1;
+        return nullopt;
     }
 }

@@ -121,7 +121,7 @@ void XzFile::clear() noexcept {
     std::clearerr(file_);
 }
 
-void XzFile::seek(int64_t position) {
+void XzFile::seek(uint64_t position) {
     assert(mode_ == File::READ);
     // Reset stream state
     lzma_end(&stream_);
@@ -133,14 +133,14 @@ void XzFile::seek(int64_t position) {
     constexpr size_t BUFFSIZE = 4096;
     char buffer[BUFFSIZE];
 
-    while (static_cast<size_t>(position) > BUFFSIZE) {
-        auto count = read(buffer, BUFFSIZE);
+    while (position > BUFFSIZE) {
+        auto count = this->read(buffer, BUFFSIZE);
         assert(count == BUFFSIZE);
         position -= count;
     }
 
-    auto count = read(buffer, static_cast<size_t>(position));
-    assert(count == static_cast<size_t>(position));
+    auto count = this->read(buffer, static_cast<size_t>(position));
+    assert(count == position);
 }
 
 void XzFile::write(const char* data, size_t count) {

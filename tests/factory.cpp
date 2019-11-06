@@ -32,13 +32,13 @@ struct UnimplementedTextFormat final: public TextFormat {
     UnimplementedTextFormat(const std::string& path, File::Mode mode, File::Compression compression):
         TextFormat(std::move(path), mode, compression) {}
 
-    int64_t forward() override {
-        static int64_t pos = -1;
+    optional<uint64_t> forward() override {
+        static int pos = -1;
         if (pos < 4) {
             pos++;
-            return pos;
+            return static_cast<uint64_t>(pos);
         } else {
-            return -1;
+            return nullopt;
         }
     }
 };
