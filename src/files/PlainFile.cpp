@@ -15,11 +15,14 @@ using namespace chemfiles;
 
 #ifdef __CYGWIN__
     #define fseek64 fseek
+    #define off64_t off_t
 #elif defined(_MSC_VER)
     #define fseek64 _fseeki64
+    #define off64_t __int64
 #else
     // assume unix by default
     #define fseek64 fseeko
+    #define off64_t off_t
 #endif
 
 PlainFile::PlainFile(const std::string& path, File::Mode mode): TextFileImpl(path) {
@@ -63,11 +66,11 @@ void PlainFile::seek(uint64_t position) {
 // TODO: update to a more recent emscripten, with support for 64-bit fseek
 #if !defined(__EMSCRIPTEN__)
     static_assert(
-        sizeof(uint64_t) == sizeof(off_t),
-        "uint64_t and off_t do not have the same size"
+        sizeof(uint64_t) == sizeof(off64_t),
+        "uint64_t and off64_t do not have the same size"
     );
 #endif
-    auto status = fseek64(file_, static_cast<off_t>(position), SEEK_SET);
+    auto status = fseek64(file_, static_cast<off64_t>(position), SEEK_SET);
     if (status != 0) {
         auto message = std::strerror(errno);
         throw file_error("error while seeking file: {}", message);
