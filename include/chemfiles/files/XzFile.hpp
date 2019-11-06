@@ -23,14 +23,14 @@ public:
     ~XzFile() override;
 
     size_t read(char* data, size_t count) override;
-    size_t write(const char* data, size_t count) override;
+    void write(const char* data, size_t count) override;
 
-    void clear() override;
+    void clear() noexcept override;
     void seek(int64_t position) override;
 
 private:
     /// Compress data from stream_.next_in, and write the data to the file.
-    /// If action==LZMA_FINISH, continue writting until everything has been
+    /// If action==LZMA_FINISH, continue writing until everything has been
     /// processed.
     void compress_and_write(lzma_action action);
 
@@ -41,7 +41,7 @@ private:
     /// lzma_stream_decoder, and writing using lzma_easy_encoder.
     lzma_stream stream_ = LZMA_STREAM_INIT;
     /// compressed data buffer, straight out from the file when reading, to be
-    /// written to the file when writting.
+    /// written to the file when writing.
     std::vector<uint8_t> buffer_;
 };
 

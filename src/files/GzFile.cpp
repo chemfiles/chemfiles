@@ -24,7 +24,7 @@ static unsigned checked_cast(size_t value) {
     }
 }
 
-GzFile::GzFile(const std::string& path, File::Mode mode) {
+GzFile::GzFile(const std::string& path, File::Mode mode): TextFileImpl(path) {
     const char* openmode;
     switch (mode) {
     case File::READ:
@@ -59,13 +59,15 @@ size_t GzFile::read(char* data, size_t count) {
     return static_cast<size_t>(read);
 }
 
-size_t GzFile::write(const char* data, size_t count) {
-    auto written = gzwrite(file_, data, checked_cast(count));
+void GzFile::write(const char* data, size_t count) {
+    auto actual = gzwrite(file_, data, checked_cast(count));
     auto error = check_error();
-    if (written == 0 || error != nullptr) {
+    if (actual == 0 || error != nullptr) {
         throw file_error("error while writting to gziped file: {}", error);
     }
-    return static_cast<size_t>(written);
+    if (static_cast<size_t>(actual) != count) {
+        throw file_error("could not write data to the file at '{}'", this->path());
+    }
 }
 
 const char* GzFile::check_error() const {
@@ -74,7 +76,7 @@ const char* GzFile::check_error() const {
     return status == Z_OK ? nullptr : message;
 }
 
-void GzFile::clear() {
+void GzFile::clear() noexcept {
     gzclearerr(file_);
 }
 

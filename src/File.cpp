@@ -134,16 +134,16 @@ string_view TextFile::readline() {
             }
 
             break;
-        }
-
-        if (got_impl_eof_) {
+        } else if (got_impl_eof_) {
             // no more data, we found the last line
             eof_ = true;
+
+            // if line_start_ != end_ - 1, we still have a line in the buffer
+            // (not terminated by a newline character)
             if (line_start_ != end_ - 1) {
-                // The last line does not contain an end of line character
-                // we don't know the string length, but the buffer is
-                // terminated with zeroes, so we can rely on std::strlen
-                // to create the string_view
+                // We don't know the line length, but the buffer is terminated
+                // with zeroes, so we can rely on std::strlen to create the
+                // string_view.
                 auto line = string_view(line_start_);
                 line_start_ += line.length();
                 return line;
@@ -151,7 +151,6 @@ string_view TextFile::readline() {
         }
 
         // no new line found in the current buffer, get more data
-
         if (remainder >= buffer_.size()) {
             // We did not found a new line in the whole buffer,
             // so we increase it size
@@ -179,10 +178,7 @@ void TextFile::vprint(fmt::string_view format, fmt::format_args args) {
     if (buffer.size() == 0) {
         return;
     }
-    auto count = file_->write(buffer.data(), buffer.size());
-    if (count != buffer.size()) {
-        throw file_error("could not write data to the file at '{}'", this->path());
-    }
+    file_->write(buffer.data(), buffer.size());
 }
 
 std::string TextFile::readall() {
