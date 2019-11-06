@@ -51,7 +51,7 @@ static void open_stream_read(lzma_stream* stream) {
     check(lzma_stream_decoder(stream, memory_limit, flags));
 }
 
-XzFile::XzFile(const std::string& path, File::Mode mode):  mode_(mode), buffer_(8192) {
+XzFile::XzFile(const std::string& path, File::Mode mode): TextFileImpl(path), mode_(mode), buffer_(8192) {
     const char* openmode = nullptr;
     if (mode == File::READ) {
         openmode = "rb";
@@ -117,7 +117,7 @@ size_t XzFile::read(char* data, size_t count) {
     return count;
 }
 
-void XzFile::clear() {
+void XzFile::clear() noexcept {
     std::clearerr(file_);
 }
 
@@ -143,12 +143,15 @@ void XzFile::seek(int64_t position) {
     assert(count == static_cast<size_t>(position));
 }
 
-size_t XzFile::write(const char* data, size_t count) {
+void XzFile::write(const char* data, size_t count) {
     stream_.next_in = reinterpret_cast<const uint8_t*>(data);
     stream_.avail_in = count;
     compress_and_write(LZMA_RUN);
 
-    return count - stream_.avail_in;
+    auto actual = count - stream_.avail_in;
+    if (actual != count) {
+        throw file_error("could not write data to the file at '{}'", this->path());
+    }
 }
 
 void XzFile::compress_and_write(lzma_action action) {

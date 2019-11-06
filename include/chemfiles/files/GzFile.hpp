@@ -21,9 +21,9 @@ public:
     ~GzFile() override;
 
     size_t read(char* data, size_t count) override;
-    size_t write(const char* data, size_t count) override;
+    void write(const char* data, size_t count) override;
 
-    void clear() override;
+    void clear() noexcept override;
     void seek(int64_t position) override;
 
 private:

@@ -9,7 +9,7 @@
 using namespace chemfiles;
 
 // This file only perform basic testing of the trajectory class. All the
-// differents formats are tested in the formats folder
+// different formats are tested in the formats folder
 TEST_CASE("Associate a topology and a trajectory") {
     SECTION("Reading") {
         SECTION("From a file") {
