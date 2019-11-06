@@ -102,9 +102,12 @@ if(${BUILD_SHARED_LIBS})
 endif()
 
 # Multiple different flags are required by different platform for 64-bit support
-# Default flag
+# These flags are also set in external libraries (zlib & lzma), but they might
+# not be carried over when using system libraries.
+
+# Default flag:
 target_compile_definitions(chemfiles_objects PRIVATE -D_FILE_OFFSET_BITS=64)
-# Required for zlib 64-bit support
+# Required for zlib 64-bit support:
 target_compile_definitions(chemfiles_objects PRIVATE -D_LARGEFILE64_SOURCE=1)
 target_compile_definitions(chemfiles_objects PRIVATE -D_LFS64_LARGEFILE=1)
 
