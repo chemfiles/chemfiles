@@ -22,7 +22,7 @@ using namespace chemfiles;
     #define fseek64 fseeko
 #endif
 
-PlainFile::PlainFile(const std::string& path, File::Mode mode) {
+PlainFile::PlainFile(const std::string& path, File::Mode mode): TextFileImpl(path) {
     // We need to use binary mode when opening the file because we are storing
     // positions in the files relative to line ending positions. Using text
     // mode make the MSVC runtime convert lines ending and then all the values
@@ -55,7 +55,7 @@ PlainFile::~PlainFile() {
     }
 }
 
-void PlainFile::clear() {
+void PlainFile::clear() noexcept {
     std::clearerr(file_);
 }
 
@@ -77,6 +77,9 @@ size_t PlainFile::read(char* data, size_t count) {
     return result;
 }
 
-size_t PlainFile::write(const char* data, size_t count) {
-    return std::fwrite(data, 1, count, file_);
+void PlainFile::write(const char* data, size_t count) {
+    auto actual = std::fwrite(data, 1, count, file_);
+    if (actual != count) {
+        throw file_error("could not write data to the file at '{}'", this->path());
+    }
 }
