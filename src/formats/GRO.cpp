@@ -249,7 +249,7 @@ void check_values_size(const Vector3D& values, unsigned width, const std::string
     }
 }
 
-int64_t GROFormat::forward() {
+optional<uint64_t> GROFormat::forward() {
     auto position = file_.tellpos();
     size_t natoms = 0;
     try {
@@ -258,10 +258,10 @@ int64_t GROFormat::forward() {
         natoms = parse<size_t>(file_.readline());
     } catch (const FileError&) {
         // No more line left in the file
-        return -1;
+        return nullopt;
     } catch (const Error&) {
         // We could not read an integer, so give up here
-        return -1;
+        return nullopt;
     }
 
     try {

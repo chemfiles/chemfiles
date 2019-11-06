@@ -79,15 +79,15 @@ void GzFile::clear() noexcept {
     gzclearerr(file_);
 }
 
-void GzFile::seek(int64_t position) {
+void GzFile::seek(uint64_t position) {
 // TODO: update to a more recent emscripten, with support for 64-bit fseek
 #if !defined(__EMSCRIPTEN__)
     static_assert(
-        sizeof(int64_t) == sizeof(z_off64_t),
-        "int64_t and z_off64_t do not have the same size"
+        sizeof(uint64_t) == sizeof(z_off64_t),
+        "uint64_t and z_off64_t do not have the same size"
     );
 #endif
-    auto status = gzseek64(file_, position, SEEK_SET);
+    auto status = gzseek64(file_, static_cast<z_off64_t>(position), SEEK_SET);
     if (status == -1) {
         auto message = check_error();
         throw file_error("error while seeking gziped file: {}", message);

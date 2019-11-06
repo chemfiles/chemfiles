@@ -69,14 +69,14 @@ void XYZFormat::write_next(const Frame& frame) {
     }
 }
 
-int64_t XYZFormat::forward() {
+optional<uint64_t> XYZFormat::forward() {
     auto position = file_.tellpos();
     size_t natoms = 0;
     try {
         natoms = parse<size_t>(file_.readline());
     } catch (const Error&) {
         // We could not read an integer, so give up here
-        return -1;
+        return nullopt;
     }
     static int step = 0;
     step++;

@@ -23,7 +23,7 @@ public:
 
     void read_next(Frame& frame) override;
     void write_next(const Frame& frame) override;
-    int64_t forward() override;
+    optional<uint64_t> forward() override;
 };
 
 template<> FormatInfo format_information<SDFFormat>();

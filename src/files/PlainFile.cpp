@@ -59,8 +59,15 @@ void PlainFile::clear() noexcept {
     std::clearerr(file_);
 }
 
-void PlainFile::seek(int64_t position) {
-    auto status = fseek64(file_, position, SEEK_SET);
+void PlainFile::seek(uint64_t position) {
+// TODO: update to a more recent emscripten, with support for 64-bit fseek
+#if !defined(__EMSCRIPTEN__)
+    static_assert(
+        sizeof(uint64_t) == sizeof(off_t),
+        "uint64_t and off_t do not have the same size"
+    );
+#endif
+    auto status = fseek64(file_, static_cast<off_t>(position), SEEK_SET);
     if (status != 0) {
         auto message = std::strerror(errno);
         throw file_error("error while seeking file: {}", message);

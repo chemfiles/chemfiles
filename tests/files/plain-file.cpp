@@ -82,13 +82,13 @@ TEST_CASE("Read a text file") {
         // Compare offset with std::getline
         std::ifstream stream("data/xyz/helium.xyz", std::ios::binary);
         std::string line;
-        auto positions = std::vector<std::streampos>();
+        auto positions = std::vector<uint64_t>();
         while (stream) {
-            positions.push_back(stream.tellg());
+            positions.push_back(static_cast<uint64_t>(stream.tellg()));
             std::getline(stream, line);
         }
         stream.close();
-        CHECK(positions.back() == std::streampos(-1));
+        CHECK(positions.back() == static_cast<uint64_t>(-1));
         positions.pop_back();
 
         auto file = TextFile("data/xyz/helium.xyz", File::READ, File::DEFAULT);

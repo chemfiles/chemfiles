@@ -83,7 +83,7 @@ public:
     /// Set file indicator to `position` characters after the start of the file.
     ///
     /// @throws FileError in case of I/O error while seeking
-    virtual void seek(int64_t position) = 0;
+    virtual void seek(uint64_t position) = 0;
 
     /// Fill up the `data` buffer reading at most `count` characters from the
     /// file.
@@ -135,10 +135,10 @@ public:
 
     /// Returns the current position indicator, i.e. the number of characters
     /// from the beginning of the file.
-    int64_t tellpos() const;
+    uint64_t tellpos() const;
 
     /// Set the position indicator to `position`.
-    void seekpos(int64_t position);
+    void seekpos(uint64_t position);
 
     /// Reset the position indicator to the beginning of the file, and clear
     /// end-of-file flag.
@@ -195,7 +195,7 @@ private:
     /// Current position in the file, this is the number of characters in the
     /// file up to the start of the buffer (`buffer_[0]` is the `position_`'th
     /// caracter in the file).
-    int64_t position_ = 0;
+    uint64_t position_ = 0;
     /// Did we reach the end of the underlying `TextFileImpl`? Since we are
     /// buffering data, this does not necessarly correspond to `this->eof()`.
     bool got_impl_eof_ = false;
