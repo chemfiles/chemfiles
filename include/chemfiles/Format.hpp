@@ -8,9 +8,11 @@
 #include <string>
 #include <vector>
 
-#include "chemfiles/File.hpp"
 #include "chemfiles/exports.h"
+
+#include "chemfiles/File.hpp"
 #include "chemfiles/Error.hpp"
+#include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 class Frame;
@@ -164,8 +166,8 @@ public:
     size_t nsteps() override;
 
     /// Fast-forward the file for one step, returning a valid position if the
-    /// file does contain one more step or `-1` if it does not.
-    virtual int64_t forward() = 0;
+    /// file does contain one more step or `nullopt` if it does not.
+    virtual optional<uint64_t> forward() = 0;
 
     virtual void read_next(Frame& frame);
     virtual void write_next(const Frame& frame);
@@ -180,7 +182,7 @@ private:
 
     /// Storing the positions of all the steps in the file, so that we can
     /// just `seekpos` them instead of reading the whole step.
-    std::vector<int64_t> steps_positions_;
+    std::vector<uint64_t> steps_positions_;
 
     /// Did we found the end of file while scanning or reading?
     bool eof_found_ = false;

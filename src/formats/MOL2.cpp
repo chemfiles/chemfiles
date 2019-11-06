@@ -38,7 +38,7 @@ template<> FormatInfo chemfiles::format_information<MOL2Format>() {
 }
 
 /// Fast-forward the file until the tag is found.
-static int64_t read_until(TextFile& file, string_view tag);
+static uint64_t read_until(TextFile& file, string_view tag);
 
 void MOL2Format::read_next(Frame& frame) {
     auto line = file_.readline();
@@ -194,7 +194,7 @@ void MOL2Format::read_bonds(Frame& frame, size_t nbonds) {
     }
 }
 
-int64_t read_until(TextFile& file, string_view tag) {
+uint64_t read_until(TextFile& file, string_view tag) {
     while (!file.eof()) {
         auto pos = file.tellpos();
         if (file.readline().substr(0, tag.length()) == tag) {
@@ -205,7 +205,7 @@ int64_t read_until(TextFile& file, string_view tag) {
     throw file_error("file ended before tag '{}' was found", tag);
 }
 
-int64_t MOL2Format::forward() {
+optional<uint64_t> MOL2Format::forward() {
     while (!file_.eof()) {
         try {
             auto position = read_until(file_, "@<TRIPOS>MOLECULE");
@@ -231,11 +231,11 @@ int64_t MOL2Format::forward() {
 
             return position;
         } catch (const Error&) {
-            return -1;
+            return nullopt;
         }
     }
 
-    return -1;
+    return nullopt;
 }
 
 void MOL2Format::write_next(const Frame& frame) {
