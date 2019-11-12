@@ -126,10 +126,6 @@ if(${CHFL_SYSTEM_NETCDF})
     find_package(NetCDF REQUIRED)
     set(NETCDF_OBJECTS "" PARENT_SCOPE)
 else()
-    if(${EMSCRIPTEN})
-        # Detection of _filelengthi64 does not seems to work with emscripten
-        set(HAVE_FILE_LENGTH_I64 OFF)
-    endif()
     external_library(netcdf)
 
     set(NETCDF_INCLUDES
