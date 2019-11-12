@@ -49,11 +49,10 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
 endif()
 
 if(${EMSCRIPTEN})
-    if(${BUILD_SHARED_LIBS})
-        # Shared libs where not tested and a lot of changes to the build system
-        # for emscripten support disable things that are needed for shared libs
-        # on Windows.
-        message(WARNING "Shared libs are not supported with emscripten")
+    if("${EMSCRIPTEN_VERSION}" VERSION_LESS "1.39.2")
+        # chemfiles requires a version of emscripten with a fix for
+        # https://github.com/emscripten-core/emscripten/issues/9605
+        message(FATAL_ERROR "emscripten ${EMSCRIPTEN_VERSION} is not supported, chemfiles requires at least 1.39.2")
     endif()
 
     # setting EMSCRIPTEN_GENERATE_BITCODE_STATIC_LIBRARIES=ON here does not
@@ -71,7 +70,6 @@ if(${EMSCRIPTEN})
     set(EMCC_FLAGS "${EMCC_FLAGS} -s DISABLE_EXCEPTION_CATCHING=0")
     set(EMCC_FLAGS "${EMCC_FLAGS} -s ERROR_ON_UNDEFINED_SYMBOLS=1")
     set(EMCC_FLAGS "${EMCC_FLAGS} -s ALLOW_MEMORY_GROWTH=1")
-    set(EMCC_FLAGS "${EMCC_FLAGS} -s ASSERTIONS=1")
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EMCC_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EMCC_FLAGS}")
@@ -267,12 +265,6 @@ try_compile(CHFL_HAS_THREAD_LOCAL
     ${PROJECT_BINARY_DIR}
     ${PROJECT_SOURCE_DIR}/cmake/thread_local.cpp
 )
-
-if(${EMSCRIPTEN})
-    # emscripten manages to compile the code, but fails at runtime with
-    # 'missing function: __cxa_thread_atexit'
-    set(CHFL_HAS_THREAD_LOCAL FALSE)
-endif()
 
 # Transform from ON/OFF to 0/1
 if(${CHFL_HAS_THREAD_LOCAL})
