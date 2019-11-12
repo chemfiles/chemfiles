@@ -38,6 +38,7 @@ matrix:
     - name: emscripten
       os: linux
       env: STATIC_LIBS=ON EMSCRIPTEN=ON
+      dist: xenial
     - name: static + doc + coverage
       os: linux
       compiler: gcc
