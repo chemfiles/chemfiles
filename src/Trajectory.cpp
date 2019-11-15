@@ -42,6 +42,8 @@ file_open_info file_open_info::parse(const std::string& path, const std::string&
         auto compression = trim(tmp);
         if (compression == "GZ") {
             info.compression = File::GZIP;
+        } else if (compression == "BZ2") {
+            info.compression = File::BZIP2;
         } else if (compression == "XZ") {
             info.compression = File::LZMA;
         } else {
@@ -61,6 +63,9 @@ file_open_info file_open_info::parse(const std::string& path, const std::string&
             if (info.extension == ".gz") {
                 new_extension = true;
                 info.compression = File::GZIP;
+            } else if (info.extension == ".bz2") {
+                new_extension = true;
+                info.compression = File::BZIP2;
             } else if (info.extension == ".xz") {
                 new_extension = true;
                 info.compression = File::LZMA;

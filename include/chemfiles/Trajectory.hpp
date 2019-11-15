@@ -26,12 +26,12 @@ public:
     /// `"<format>/<compression>"` or `"/<compression>"`. `<format>` should be
     /// the format name (see the corresponding [documentation section][formats]
     /// for the names) or an empty string. `<compression>` should be `GZ` for
-    /// gzip files, or `XZ` for lzma/.xz files. If `<compression>` is present,
-    /// it will determine which compression method is used to read/write the
-    /// file. For example, `format = "XYZ"` will force usage of XYZ format
-    /// regardless of the file extension; `format = "XYZ / GZ"` will
-    /// additionally use gzip compression; and `format = "/ GZ"` will use the
-    /// gzip compression, and the file extension to guess the format.
+    /// gzip files, `BZ2` for bzip2 files, or `XZ` for lzma/.xz files. If
+    /// `<compression>` is present, it will determine which compression method
+    /// is used to read/write the file. For example, `format = "XYZ"` will force
+    /// usage of XYZ format regardless of the file extension; `format = "XYZ /
+    /// GZ"` will additionally use gzip compression; and `format = "/ GZ"` will
+    /// use the gzip compression, and the file extension to guess the format.
     ///
     /// If the `<format>` is an empty string, the file extension will be used
     /// to guess the format. If `<compression>` is NOT presentand the file path

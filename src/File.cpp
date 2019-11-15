@@ -13,8 +13,9 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/files/GzFile.hpp"
-#include "chemfiles/files/PlainFile.hpp"
 #include "chemfiles/files/XzFile.hpp"
+#include "chemfiles/files/Bz2File.hpp"
+#include "chemfiles/files/PlainFile.hpp"
 
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/string_view.hpp"
@@ -35,6 +36,9 @@ TextFile::TextFile(std::string path, File::Mode mode, File::Compression compress
         break;
     case File::GZIP:
         file_ = std::unique_ptr<TextFileImpl>(new GzFile(this->path(), this->mode()));
+        break;
+    case File::BZIP2:
+        file_ = std::unique_ptr<TextFileImpl>(new Bz2File(this->path(), this->mode()));
         break;
     case File::LZMA:
         file_ = std::unique_ptr<TextFileImpl>(new XzFile(this->path(), this->mode()));

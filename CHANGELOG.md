@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   append mode. This mode is now write only.
 * Added a native implementation of XTC writer.
 * Added a native implementation of TRR writer.
+* Added support for bzip2 (.bz2) compressed files when reading and writing
 
 ## 0.9.1 (13 Mar 2019)
 

@@ -47,6 +47,11 @@ TEST_CASE("Read compressed files in XYZ format") {
     // Compression level 9
     check_read_file(Trajectory("data/xyz/water.9.xyz.gz"));
 
+    // Compression level 6
+    check_read_file(Trajectory("data/xyz/water.6.xyz.bz2"));
+    // Compression level 9
+    check_read_file(Trajectory("data/xyz/water.9.xyz.bz2"));
+
     // single stream, single block file
     check_read_file(Trajectory("data/xyz/water.xyz.xz"));
     // single stream, multiple blocks file
@@ -55,6 +60,7 @@ TEST_CASE("Read compressed files in XYZ format") {
 
 TEST_CASE("Explit compression in format name") {
     check_read_file(Trajectory("data/xyz/water.9.xyz.gz", 'r', "XYZ / GZ"));
+    check_read_file(Trajectory("data/xyz/water.9.xyz.bz2", 'r', "XYZ / BZ2"));
     check_read_file(Trajectory("data/xyz/water.xyz.xz", 'r', "XYZ / XZ"));
 }
 
@@ -85,11 +91,12 @@ static void check_write_file(std::string path, File::Compression compression) {
 
 
 TEST_CASE("Write compressed files in XYZ format") {
-    // gz compression
     auto gz_path = NamedTempPath(".xyz.gz");
     check_write_file(gz_path, File::GZIP);
 
-    // xz compression
+    auto bz2_path = NamedTempPath(".xyz.bz2");
+    check_write_file(bz2_path, File::BZIP2);
+
     auto xz_path = NamedTempPath(".xyz.xz");
     check_write_file(xz_path, File::LZMA);
 }
