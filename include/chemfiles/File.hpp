@@ -35,6 +35,8 @@ public:
         DEFAULT,
         /// gzip compression
         GZIP,
+        /// bzip2 compression
+        BZIP2,
         /// lzma compression (.xz)
         LZMA,
     };
