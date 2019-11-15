@@ -8,9 +8,6 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-#include <boost/filesystem.hpp>
-namespace fs=boost::filesystem;
-
 
 TEST_CASE("Read files in XYZ format") {
     SECTION("Check nsteps") {
@@ -79,27 +76,8 @@ TEST_CASE("Read files in XYZ format") {
     }
 }
 
-// To use in loops in order to iterate over files in a specific directory.
-struct directory_files_iterator {
-    typedef fs::recursive_directory_iterator iterator;
-    directory_files_iterator(fs::path p) : p_(p) {}
-
-    iterator begin() { return fs::recursive_directory_iterator(p_); }
-    iterator end() { return fs::recursive_directory_iterator(); }
-
-    fs::path p_;
-};
-
 TEST_CASE("Errors in XYZ format") {
-    for (auto entry : directory_files_iterator("data/xyz/bad/")) {
-        auto test = [=](){
-            // We can throw either when creating the trajectory, or when reading
-            // the frame, depending on the type of error
-            auto file = Trajectory(entry.path().string());
-            file.read();
-        };
-        CHECK_THROWS_AS(test(), FormatError);
-    }
+    CHECK_THROWS_AS(Trajectory("data/xyz/bad/helium.xyz"), FormatError);
 }
 
 TEST_CASE("Write files in XYZ format") {
