@@ -55,6 +55,9 @@ private:
     /// Number of atoms read before the current model being read.
     /// Used as an offset for adding bonds when reading models.
     size_t atomSkip_ = 0;
+
+    /// did we already send the warning for non-contiguous atoms
+    bool warned_non_contiguous_ = false;
 };
 
 template<> FormatInfo format_information<MMTFFormat>();

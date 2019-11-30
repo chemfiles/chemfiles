@@ -254,6 +254,8 @@ void MMTFFormat::read(Frame& frame) {
     }
 
     modelIndex_++;
+
+    // Add additional global (not by group) bonds
     for (size_t i = 0; i < structure_.bondAtomList.size() / 2; i++) {
         auto atom1 = static_cast<size_t>(structure_.bondAtomList[i * 2]);
         auto atom2 = static_cast<size_t>(structure_.bondAtomList[i * 2 + 1]);
@@ -278,120 +280,118 @@ void MMTFFormat::read(Frame& frame) {
 }
 
 void MMTFFormat::write(const Frame& frame) {
-    // Used to add bonds  bonds
-    auto writeAtomLoc = static_cast<size_t>(structure_.numAtoms);
-
     structure_.numModels++;
     structure_.chainsPerModel.emplace_back(0);
+    structure_.numAtoms += static_cast<int32_t>(frame.size());
 
-    std::string prev_chainId;
-    std::string prev_chainName;
-    const chemfiles::Residue* prev_residue = nullptr;
+    const auto& topology = frame.topology();
+    const auto& positions = frame.positions();
 
-    auto& topology = frame.topology();
-    auto& positions = frame.positions();
-    for (size_t i = 0; i<frame.size(); i++) {
-        structure_.numAtoms++;
-        structure_.xCoordList.emplace_back(positions[i][0]);
-        structure_.yCoordList.emplace_back(positions[i][1]);
-        structure_.zCoordList.emplace_back(positions[i][2]);
+    // pre-allocate some memory
+    structure_.xCoordList.reserve(static_cast<size_t>(structure_.numAtoms));
+    structure_.yCoordList.reserve(static_cast<size_t>(structure_.numAtoms));
+    structure_.zCoordList.reserve(static_cast<size_t>(structure_.numAtoms));
 
-        auto res_opt = topology.residue_for_atom(i);
+    structure_.groupList.reserve(structure_.groupList.size() + topology.residues().size());
 
-        if (!res_opt) {
-            continue;
-        }
+    // Since MMTF uses model->chain->residue->atom as storage model, and
+    // chemfiles do not enforce that residues contains contiguous atoms, the
+    // atoms can be re-ordered when adding them to a MMTF structure. This vector
+    // stores the correspondance chemfiles index => MMTF index to be able to add
+    // the right bonds
+    auto new_atom_indexes = std::vector<int32_t>(frame.size(), 0);
 
-        // We've got a new resiude!
-        if (prev_residue == &(*res_opt)) {
-            auto& group = structure_.groupList.back();
-            group.formalChargeList.emplace_back(frame[i].charge());
-            group.atomNameList.emplace_back(frame[i].name());
-            group.elementList.emplace_back(frame[i].type());
-
-            continue;
-        }
-
-        const auto& current_chainId_opt = res_opt->get("chainid");
-        const auto& current_chainName_opt = res_opt->get("chainname");
-        std::string current_chainId;
-        std::string current_chainName;
-
-        if (current_chainId_opt && current_chainId_opt->kind() == Property::STRING) {
-            current_chainId = current_chainId_opt->as_string();
-        }
-
-        if (current_chainName_opt && current_chainName_opt->kind() == Property::STRING) {
-            current_chainName = current_chainName_opt->as_string();
-        }
-
-        if (current_chainName != prev_chainName ||
-            current_chainId != prev_chainId) {
-
+    std::string previous_chainId;
+    std::string previous_chainName;
+    auto previous_atom = static_cast<size_t>(-1);
+    for (const auto& residue: topology.residues()) {
+        // WARNING: this assumes that residues in the same chain are contiguous
+        //
+        // [residue[chainid="A"], residue[chainid="B"], residue[chainid="A"]]
+        // will result in three chains
+        const auto& chainId = residue.get<Property::STRING>("chainid").value_or("");
+        const auto& chainName = residue.get<Property::STRING>("chainname").value_or("");
+        if (chainName != previous_chainName ||
+            chainId != previous_chainId ||
+            // if chainid/chainname are undefined, still add a single chain
+            structure_.groupsPerChain.empty()
+        ) {
             structure_.numChains++;
             structure_.chainsPerModel.back()++;
 
-            // No residues... yet
+            // No residues in this chain yet
             structure_.groupsPerChain.emplace_back(0);
 
-            structure_.chainIdList.emplace_back(current_chainId);
-            structure_.chainNameList.emplace_back(current_chainName);
+            structure_.chainIdList.emplace_back(chainId);
+            structure_.chainNameList.emplace_back(chainName);
 
-            prev_chainId = current_chainId;
-            prev_chainName = current_chainName;
+            previous_chainId = chainId;
+            previous_chainName = chainName;
         }
 
         structure_.numGroups++;
-        prev_residue = &(*res_opt);
-
         structure_.groupsPerChain.back() += 1;
 
         auto groupType = static_cast<int32_t>(structure_.groupList.size());
         structure_.groupTypeList.emplace_back(groupType);
 
-        auto groupId = res_opt->id();
-        structure_.groupIdList.emplace_back(groupId ? *groupId : 0);
-        structure_.groupList.emplace_back();
-        structure_.groupList.back().groupName = prev_residue->name();
-        structure_.groupList.back().chemCompType =
-            prev_residue->get("composition_type") &&
-            prev_residue->get("composition_type")->kind() == Property::STRING ?
-            prev_residue->get("composition_type")->as_string() :
-            "other";
+        auto groupId = residue.id().value_or(0u);
+        structure_.groupIdList.emplace_back(groupId);
 
-        auto& group = structure_.groupList.back();
-        group.formalChargeList.emplace_back(frame[i].charge());
-        group.atomNameList.emplace_back(frame[i].name());
-        group.elementList.emplace_back(frame[i].type());
+        auto group = mmtf::GroupType();
+        group.groupName = residue.name();
+
+        auto composition_type = residue.get<Property::STRING>("composition_type").value_or("other");
+        group.chemCompType = std::move(composition_type);
+
+        // pre-allocate some memory
+        group.formalChargeList.reserve(residue.size());
+        group.atomNameList.reserve(residue.size());
+        group.elementList.reserve(residue.size());
+
+        for (auto i: residue) {
+            if (i != previous_atom + 1 && !warned_non_contiguous_) {
+                warned_non_contiguous_ = true;
+                warning("MMTF Writer", "residues are non-contiguous, atoms will be re-ordered");
+            }
+            previous_atom = i;
+
+            group.formalChargeList.emplace_back(frame[i].charge());
+            group.atomNameList.emplace_back(frame[i].name());
+            group.elementList.emplace_back(frame[i].type());
+
+            new_atom_indexes[i] = static_cast<int32_t>(structure_.xCoordList.size());
+            structure_.xCoordList.emplace_back(positions[i][0]);
+            structure_.yCoordList.emplace_back(positions[i][1]);
+            structure_.zCoordList.emplace_back(positions[i][2]);
+        }
+        structure_.groupList.emplace_back(std::move(group));
     }
 
-    mmtf::BondAdder bondadd(structure_);
-    auto& bonds = topology.bonds();
-    auto& bond_orders = topology.bond_orders();
+    mmtf::BondAdder bond_adder(structure_);
+    const auto& bonds = topology.bonds();
+    const auto& bond_orders = topology.bond_orders();
     for (size_t i = 0; i < bonds.size(); ++i) {
-
-        int8_t bo;
+        int8_t order;
         switch(bond_orders[i]) {
             case Bond::BondOrder::SINGLE:
-                bo = 1;
+                order = 1;
                 break;
             case Bond::BondOrder::DOUBLE:
-                bo = 2;
+                order = 2;
                 break;
             case Bond::BondOrder::TRIPLE:
-                bo = 3;
+                order = 3;
                 break;
             case Bond::BondOrder::QUADRUPLE:
-                bo = 4;
+                order = 4;
                 break;
             default:
-                bo = 1;
+                order = 1;
                 break;
         }
 
-        auto atom1 = static_cast<int32_t>(bonds[i][0] + writeAtomLoc);
-        auto atom2 = static_cast<int32_t>(bonds[i][1] + writeAtomLoc);
-        bondadd(atom1, atom2, bo);
+        bond_adder(new_atom_indexes[bonds[i][0]], new_atom_indexes[bonds[i][1]], order);
     }
 }
 
