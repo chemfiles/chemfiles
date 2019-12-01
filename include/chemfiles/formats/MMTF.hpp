@@ -10,6 +10,7 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/Residue.hpp"
 
 namespace chemfiles {
 class Frame;
@@ -32,6 +33,8 @@ public:
     size_t nsteps() override;
 
 private:
+    // add a single residue to the structure_, using the data from the frame
+    void add_residue_to_structure(const Frame& frame, const Residue& residue);
 
     /// MMTF-CPP object holding all MacroMolecular information.
     /// This can be read and modified.
@@ -54,6 +57,15 @@ private:
 
     /// Number of atoms before the current model.
     size_t atomSkip_ = 0;
+
+    // Since MMTF uses model->chain->residue->atom as storage model, and
+    // chemfiles do not enforce that residues contains contiguous atoms, the
+    // atoms can be re-ordered when adding them to a MMTF structure. This vector
+    // stores the correspondance chemfiles index => MMTF index to be able to add
+    // the right bonds.
+    //
+    // This is only used when writing
+    std::vector<int32_t> new_atom_indexes_;
 };
 
 template<> FormatInfo format_information<MMTFFormat>();
