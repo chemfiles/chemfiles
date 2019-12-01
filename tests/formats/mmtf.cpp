@@ -262,7 +262,7 @@ TEST_CASE("Write files in MMTF format") {
         frame.add_atom(Atom("D"), {3, 3, 3});
         frame.add_atom(Atom("E"), {4, 4, 4});
         frame.add_bond(0, 2);
-        frame.add_bond(2, 4);
+        frame.add_bond(2, 4, Bond::TRIPLE);
 
         auto residue = Residue("A");
         residue.add_atom(0);
@@ -301,5 +301,6 @@ TEST_CASE("Write files in MMTF format") {
         CHECK(approx_eq(positions[4], {3, 3, 3}, 1e-6));
 
         CHECK(frame.topology().bonds() == std::vector<Bond>{{0, 1}, {1, 2}});
+        CHECK(frame.topology().bond_orders() == std::vector<Bond::BondOrder>{Bond::UNKNOWN, Bond::TRIPLE});
     }
 }
