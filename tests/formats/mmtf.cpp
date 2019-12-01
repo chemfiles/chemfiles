@@ -258,7 +258,7 @@ TEST_CASE("Write files in MMTF format") {
             auto frame1 = Frame();
             frame1.add_atom(Atom("A"), {0, 0, 0});
             frame1.add_atom(Atom("B"), {1, 1, 1});
-            frame1.add_atom(Atom("C"), {2, 2, 2});
+            frame1.add_atom(Atom("C23456", "HuuuuH"), {2, 2, 2});
             frame1.add_bond(0, 1);
             frame1.add_bond(0, 2, Bond::TRIPLE);
 
@@ -289,7 +289,9 @@ TEST_CASE("Write files in MMTF format") {
 
         CHECK(frame[0].name() == "A");
         CHECK(frame[1].name() == "B");
-        CHECK(frame[2].name() == "C");
+        // Truncated name & type
+        CHECK(frame[2].name() == "C2345");
+        CHECK(frame[2].type() == "Huu");
 
         auto positions = frame.positions();
         CHECK(positions[0] == Vector3D(0, 0, 0));
