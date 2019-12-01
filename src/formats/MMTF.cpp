@@ -31,6 +31,10 @@
 
 using namespace chemfiles;
 
+static int8_t bond_order_to_mmtf(Bond::BondOrder order);
+static Bond::BondOrder bond_order_to_chemfiles(int32_t order);
+static void set_secondary(Residue& residue, int32_t code);
+
 template<> FormatInfo chemfiles::format_information<MMTFFormat>() {
     return FormatInfo("MMTF").with_extension(".mmtf").description(
         "MMTF (RCSB Protein Data Bank) binary format"
@@ -169,64 +173,15 @@ void MMTFFormat::read(Frame& frame) {
             for (size_t l = 0; l < group.bondOrderList.size(); l++) {
                 auto atom1 = static_cast<size_t>(group.bondAtomList[l * 2]);
                 auto atom2 = static_cast<size_t>(group.bondAtomList[l * 2 + 1]);
-
-                Bond::BondOrder bo;
-                switch(group.bondOrderList[l]) {
-                    case 1:
-                        bo = Bond::SINGLE;
-                        break;
-                    case 2:
-                        bo = Bond::DOUBLE;
-                        break;
-                    case 3:
-                        bo = Bond::TRIPLE;
-                        break;
-                    case 4:
-                        bo = Bond::QUADRUPLE;
-                        break;
-                    default:
-                        bo = Bond::UNKNOWN;
-                        break;
-                }
-
                 frame.add_bond(
                     atomOffset + atom1,
                     atomOffset + atom2,
-                    bo
+                    bond_order_to_chemfiles(group.bondOrderList[l])
                 );
             }
 
             if (groupIndex_ < structure_.secStructList.size()) {
-                // We use the raw values here to directly match the MMTF spec
-                // See https://github.com/rcsb/mmtf/blob/master/spec.md#secstructlist
-                switch(structure_.secStructList[groupIndex_]) {
-                    case 0:
-                        residue.set("secondary_structure", "pi helix");
-                        break;
-                    case 1:
-                        residue.set("secondary_structure", "bend");
-                        break;
-                    case 2:
-                        residue.set("secondary_structure", "alpha helix");
-                        break;
-                    case 3:
-                        residue.set("secondary_structure", "extended");
-                        break;
-                    case 4:
-                        residue.set("secondary_structure", "3-10 helix");
-                        break;
-                    case 5:
-                        residue.set("secondary_structure", "bridge");
-                        break;
-                    case 6:
-                        residue.set("secondary_structure", "turn");
-                        break;
-                    case 7:
-                        residue.set("secondary_structure", "coil");
-                        break;
-                    default:
-                        break;
-                }
+                set_secondary(residue, structure_.secStructList[groupIndex_]);
             }
 
             // If the name of the current assembly is defined in the MMTF file.
@@ -368,30 +323,15 @@ void MMTFFormat::write(const Frame& frame) {
         structure_.groupList.emplace_back(std::move(group));
     }
 
-    mmtf::BondAdder bond_adder(structure_);
+    mmtf::BondAdder add_mmtf_bond(structure_);
     const auto& bonds = topology.bonds();
     const auto& bond_orders = topology.bond_orders();
     for (size_t i = 0; i < bonds.size(); ++i) {
-        int8_t order;
-        switch(bond_orders[i]) {
-            case Bond::BondOrder::SINGLE:
-                order = 1;
-                break;
-            case Bond::BondOrder::DOUBLE:
-                order = 2;
-                break;
-            case Bond::BondOrder::TRIPLE:
-                order = 3;
-                break;
-            case Bond::BondOrder::QUADRUPLE:
-                order = 4;
-                break;
-            default:
-                order = 1;
-                break;
-        }
-
-        bond_adder(new_atom_indexes[bonds[i][0]], new_atom_indexes[bonds[i][1]], order);
+        add_mmtf_bond(
+            new_atom_indexes[bonds[i][0]],
+            new_atom_indexes[bonds[i][1]],
+            bond_order_to_mmtf(bond_orders[i])
+        );
     }
 }
 
@@ -405,5 +345,84 @@ MMTFFormat::~MMTFFormat() {
         } catch (...) {
             // ignore exceptions in destructor
         }
+    }
+}
+
+int8_t bond_order_to_mmtf(Bond::BondOrder order) {
+    switch(order) {
+    case Bond::BondOrder::SINGLE:
+        return 1;
+    case Bond::BondOrder::DOUBLE:
+        return 2;
+    case Bond::BondOrder::TRIPLE:
+        return 3;
+    case Bond::BondOrder::QUADRUPLE:
+        return 4;
+    case Bond::BondOrder::UNKNOWN:
+        return -1;
+    case Bond::BondOrder::QINTUPLET:
+    case Bond::BondOrder::AMIDE:
+    case Bond::BondOrder::AROMATIC:
+    case Bond::BondOrder::UP:
+    case Bond::BondOrder::DOWN:
+    case Bond::BondOrder::DATIVE_L:
+    case Bond::BondOrder::DATIVE_R:
+        warning("MMTF Writer", "bond order '{}' can not be represented in MMTF, defaulting to single bond");
+        return 1;
+    }
+    unreachable();
+}
+
+Bond::BondOrder bond_order_to_chemfiles(int32_t order) {
+    switch(order) {
+    case 1:
+        return Bond::SINGLE;
+    case 2:
+        return Bond::DOUBLE;
+    case 3:
+        return Bond::TRIPLE;
+    case 4:
+        return Bond::QUADRUPLE;
+    case -1:
+        return Bond::UNKNOWN;
+    default:
+        warning("MMTF Reader", "unexpected bond order from MMTF '{}'", order);
+        return Bond::UNKNOWN;
+    }
+}
+
+void set_secondary(Residue& residue, int32_t code) {
+    // We use the raw values here to directly match the MMTF spec
+    // See https://github.com/rcsb/mmtf/blob/master/spec.md#secstructlist
+    switch(code) {
+    case 0:
+        residue.set("secondary_structure", "pi helix");
+        break;
+    case 1:
+        residue.set("secondary_structure", "bend");
+        break;
+    case 2:
+        residue.set("secondary_structure", "alpha helix");
+        break;
+    case 3:
+        residue.set("secondary_structure", "extended");
+        break;
+    case 4:
+        residue.set("secondary_structure", "3-10 helix");
+        break;
+    case 5:
+        residue.set("secondary_structure", "bridge");
+        break;
+    case 6:
+        residue.set("secondary_structure", "turn");
+        break;
+    case 7:
+        residue.set("secondary_structure", "coil");
+        break;
+    case -1:
+        break;
+    default:
+        warning("MMTF Reader", "unknown secondary structure code '{}'", code);
+        break;
     }
 }
