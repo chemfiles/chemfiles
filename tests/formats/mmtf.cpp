@@ -255,56 +255,60 @@ TEST_CASE("Write files in MMTF format") {
         auto tmpfile = NamedTempPath(".mmtf");
 
         {
-            auto frame = Frame();
-            frame.add_atom(Atom("A"), {0, 0, 0});
-            frame.add_atom(Atom("B"), {1, 1, 1});
-            frame.add_atom(Atom("C"), {2, 2, 2});
-            frame.add_atom(Atom("D"), {3, 3, 3});
-            frame.add_atom(Atom("E"), {4, 4, 4});
-            frame.add_bond(0, 2);
-            frame.add_bond(2, 4, Bond::TRIPLE);
+            auto frame1 = Frame();
+            frame1.add_atom(Atom("A"), {0, 0, 0});
+            frame1.add_atom(Atom("B"), {1, 1, 1});
+            frame1.add_atom(Atom("C"), {2, 2, 2});
+            frame1.add_bond(0, 1);
+            frame1.add_bond(0, 2, Bond::TRIPLE);
 
             auto residue = Residue("A");
             residue.add_atom(0);
             residue.add_atom(2);
-            residue.add_atom(4);
-            frame.add_residue(std::move(residue));
+            frame1.add_residue(std::move(residue));
 
             residue = Residue("B");
             residue.add_atom(1);
-            residue.add_atom(3);
-            frame.add_residue(std::move(residue));
+            frame1.add_residue(std::move(residue));
+
+            // No residues, no atom name, nothing!
+            auto frame2 = Frame();
+            frame2.add_atom(Atom(""), {10, 10, 10});
+            frame2.add_atom(Atom(""), {11, 11, 11});
 
             auto trajectory = Trajectory(tmpfile, 'w');
-            trajectory.write(frame);
-            trajectory.write(frame);
+            trajectory.write(frame1);
+            trajectory.write(frame2);
         }
-
-        auto check_frame = [](const Frame& frame){
-            REQUIRE(frame.size() == 5);
-
-            CHECK(frame[0].name() == "A");
-            CHECK(frame[1].name() == "B");
-            CHECK(frame[2].name() == "C");
-            CHECK(frame[3].name() == "D");
-            CHECK(frame[4].name() == "E");
-
-            auto positions = frame.positions();
-            // MMTF stores positions as floats, hence the 1e-6
-            CHECK(approx_eq(positions[0], {0, 0, 0}, 1e-6));
-            CHECK(approx_eq(positions[1], {1, 1, 1}, 1e-6));
-            CHECK(approx_eq(positions[2], {2, 2, 2}, 1e-6));
-            CHECK(approx_eq(positions[3], {3, 3, 3}, 1e-6));
-            CHECK(approx_eq(positions[4], {4, 4, 4}, 1e-6));
-
-            CHECK(frame.topology().bonds() == std::vector<Bond>{{0, 2}, {2, 4}});
-            CHECK(frame.topology().bond_orders() == std::vector<Bond::BondOrder>{Bond::UNKNOWN, Bond::TRIPLE});
-        };
 
         auto trajectory = Trajectory(tmpfile, 'r');
         REQUIRE(trajectory.nsteps() == 2);
 
-        check_frame(trajectory.read());
-        check_frame(trajectory.read());
+        auto frame = trajectory.read();
+        REQUIRE(frame.size() == 3);
+
+        CHECK(frame[0].name() == "A");
+        CHECK(frame[1].name() == "B");
+        CHECK(frame[2].name() == "C");
+
+        auto positions = frame.positions();
+        CHECK(positions[0] == Vector3D(0, 0, 0));
+        CHECK(positions[1] == Vector3D(1, 1, 1));
+        CHECK(positions[2] == Vector3D(2, 2, 2));
+
+        CHECK(frame.topology().bonds() == std::vector<Bond>{{0, 1}, {0, 2}});
+        CHECK(frame.topology().bond_orders() == std::vector<Bond::BondOrder>{Bond::UNKNOWN, Bond::TRIPLE});
+
+        frame = trajectory.read();
+        REQUIRE(frame.size() == 2);
+
+        CHECK(frame[0].name() == "");
+        CHECK(frame[1].name() == "");
+
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], {10, 10, 10}, 1e-6));
+        CHECK(approx_eq(positions[1], {11, 11, 11}, 1e-6));
+
+        CHECK(frame.topology().bonds().empty());
     }
 }
