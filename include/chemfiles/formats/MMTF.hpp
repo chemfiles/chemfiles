@@ -56,12 +56,8 @@ private:
     /// Current atom being read. Ranges from [0, structure.numAtoms)
     size_t atomIndex_ = 0;
 
-    /// Number of atoms read before the current model being read.
-    /// Used as an offset for adding bonds when reading models.
+    /// Number of atoms before the current model.
     size_t atomSkip_ = 0;
-
-    /// did we already send the warning for non-contiguous atoms
-    bool warned_non_contiguous_ = false;
 };
 
 template<> FormatInfo format_information<MMTFFormat>();

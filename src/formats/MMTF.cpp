@@ -56,6 +56,19 @@ MMTFFormat::MMTFFormat(std::string path, File::Mode mode, File::Compression comp
     }
 }
 
+MMTFFormat::~MMTFFormat() {
+    if (!filename_.empty()) {
+        try {
+            mmtf::compressGroupList(structure_);
+            encodeToFile(structure_, filename_);
+        } catch (const std::exception& e) {
+            warning("MMTF writer", "error while finishing writing to {}: {}", filename_, e.what());
+        } catch (...) {
+            // ignore exceptions in destructor
+        }
+    }
+}
+
 size_t MMTFFormat::nsteps() {
     return static_cast<size_t>(structure_.numModels);
 }
@@ -77,13 +90,13 @@ void MMTFFormat::read_step(const size_t step, Frame& frame) {
                 auto group = structure_.groupList[groupType];
                 auto atomCount = group.atomNameList.size();
                 atomIndex_ += atomCount;
-                ++groupIndex_;
+                groupIndex_++;
             }
             groupIndex_ = 0;
-            ++chainIndex_;
+            chainIndex_++;
         }
         chainIndex_ = 0;
-        ++modelIndex_;
+        modelIndex_++;
     }
 
     atomSkip_ = atomIndex_;
@@ -115,7 +128,45 @@ void MMTFFormat::read(Frame& frame) {
         frame.set("deposition_date", structure_.depositionDate);
     }
 
+    // A function to translate from the index in MMTF lists to an atom id
+    // suitable for chemfiles: starts at 0 for each model, and correspond to
+    // the initial atom index if it exists.
+    std::function<size_t(size_t)> atom_id;
+    if (!mmtf::isDefaultValue(structure_.atomIdList)) {
+        atom_id = [&](size_t global_id){
+            auto id = static_cast<size_t>(structure_.atomIdList[global_id]) - 1;
+            assert(atomSkip_ <= id);
+            return id - atomSkip_;
+        };
+    } else {
+        atom_id = [&](size_t global_id){
+            assert(atomSkip_ <= global_id);
+            return global_id - atomSkip_;
+        };
+    }
+
+    // count the number of atoms in this frame/model
+    size_t natoms = 0;
+
     auto modelChainCount = static_cast<size_t>(structure_.chainsPerModel[modelIndex_]);
+    // backup chainIndex & groupIndex to be incremented in the loop below
+    auto chain_index = chainIndex_;
+    auto group_index = groupIndex_;
+    for (size_t j = 0; j < modelChainCount; j++) {
+        auto chainGroupCount = static_cast<size_t>(structure_.groupsPerChain[chain_index]);
+        for (size_t k = 0; k < chainGroupCount; k++) {
+            auto groupType = static_cast<size_t>(structure_.groupTypeList[group_index]);
+            const auto& group = structure_.groupList[groupType];
+            natoms += group.atomNameList.size();
+            group_index++;
+        }
+        chain_index++;
+    }
+
+    frame.resize(natoms);
+    auto positions = frame.positions();
+    // Read the structure iterating over the chains in the model, then the
+    // residues/groups in the chain and finally the atoms in the residue/group
     for (size_t j = 0; j < modelChainCount; j++) {
         auto chainGroupCount = static_cast<size_t>(structure_.groupsPerChain[chainIndex_]);
 
@@ -144,12 +195,13 @@ void MMTFFormat::read(Frame& frame) {
             residue.set("composition_type", group.chemCompType);
             residue.set("is_standard_pdb", !mmtf::is_hetatm(group.chemCompType.c_str()));
 
-            // Save the offset before we go changing it
-            size_t atomOffset = atomIndex_ - atomSkip_;
-
-            auto groupSize = group.atomNameList.size();
-            for (size_t l = 0; l < groupSize; l++) {
-                auto atom = Atom(group.atomNameList[l]);
+            // map between the index of the atom in this group and the global
+            // index in the frame. This is needed to add bonds from this group
+            std::vector<size_t> global_indexes;
+            global_indexes.reserve(group.atomNameList.size());
+            for (size_t l = 0; l < group.atomNameList.size(); l++) {
+                auto atom = Atom(group.atomNameList[l], group.elementList[l]);
+                atom.set_charge(static_cast<double>(group.formalChargeList[l]));
 
                 const auto& altLocList = structure_.altLocList;
                 if (!mmtf::isDefaultValue(altLocList) && !(
@@ -158,24 +210,27 @@ void MMTFFormat::read(Frame& frame) {
                     atom.set("altloc", std::string(1, altLocList[atomIndex_]));
                 }
 
-                atom.set_type(group.elementList[l]);
-                atom.set_charge(static_cast<double>(group.formalChargeList[l]));
-                auto position = Vector3D(
-                    static_cast<double>(structure_.xCoordList[atomIndex_]),
-                    static_cast<double>(structure_.yCoordList[atomIndex_]),
-                    static_cast<double>(structure_.zCoordList[atomIndex_])
-                );
-                frame.add_atom(atom, position);
-                residue.add_atom(atomIndex_ - atomSkip_);
+                auto id = atom_id(atomIndex_);
+                global_indexes.emplace_back(id);
+                frame[id] = std::move(atom);
+                residue.add_atom(id);
+
+                positions[id][0] = static_cast<double>(structure_.xCoordList[atomIndex_]);
+                positions[id][1] = static_cast<double>(structure_.yCoordList[atomIndex_]);
+                positions[id][2] = static_cast<double>(structure_.zCoordList[atomIndex_]);
+
                 atomIndex_++;
             }
 
             for (size_t l = 0; l < group.bondOrderList.size(); l++) {
+                // atom1 and atom2 refer to data in group, so we need to
+                // translate them to the global atomic index
                 auto atom1 = static_cast<size_t>(group.bondAtomList[l * 2]);
                 auto atom2 = static_cast<size_t>(group.bondAtomList[l * 2 + 1]);
+
                 frame.add_bond(
-                    atomOffset + atom1,
-                    atomOffset + atom2,
+                    global_indexes[atom1],
+                    global_indexes[atom2],
                     bond_order_to_chemfiles(group.bondOrderList[l])
                 );
             }
@@ -193,21 +248,16 @@ void MMTFFormat::read(Frame& frame) {
             // This is a string in MMTF, differs from the name as then increments linearly
             // For example, the fourth chainid in ( A B A B) would be D, not B (the chainname)
             residue.set("chainid", structure_.chainIdList[chainIndex_]);
-
-            // An integer
             residue.set("chainindex", chainIndex_);
-
-            if (!structure_.chainNameList.empty()) {
+            if (!mmtf::isDefaultValue(structure_.chainNameList)) {
                 residue.set("chainname", structure_.chainNameList[chainIndex_]);
             }
 
             frame.add_residue(std::move(residue));
             groupIndex_++;
         }
-
         chainIndex_++;
     }
-
     modelIndex_++;
 
     // Add additional global (not by group) bonds
@@ -217,18 +267,21 @@ void MMTFFormat::read(Frame& frame) {
 
         // We are below the atoms we care about
         if (atom1 < atomSkip_ || atom2 < atomSkip_) {
+            if (!(atom1 < atomSkip_ && atom2 < atomSkip_)) {
+                warning("MMTF Reader", "chemfiles can not represent bonds between different models");
+            }
             continue;
         }
 
         // We are above the atoms we care about
         if (atom1 > atomIndex_ || atom2 > atomIndex_) {
+            if (!(atom1 > atomIndex_ && atom2 > atomIndex_)) {
+                warning("MMTF Reader", "chemfiles can not represent bonds between different models");
+            }
             continue;
         }
 
-        size_t atom_idx1 = atom1 - atomSkip_;
-        size_t atom_idx2 = atom2 - atomSkip_;
-
-        frame.add_bond(atom_idx1, atom_idx2);
+        frame.add_bond(atom_id(atom1), atom_id(atom2));
     }
 
     atomSkip_ = atomIndex_;
@@ -243,9 +296,11 @@ void MMTFFormat::write(const Frame& frame) {
     const auto& positions = frame.positions();
 
     // pre-allocate some memory
-    structure_.xCoordList.reserve(static_cast<size_t>(structure_.numAtoms));
-    structure_.yCoordList.reserve(static_cast<size_t>(structure_.numAtoms));
-    structure_.zCoordList.reserve(static_cast<size_t>(structure_.numAtoms));
+    auto size = static_cast<size_t>(structure_.numAtoms);
+    structure_.xCoordList.reserve(size);
+    structure_.yCoordList.reserve(size);
+    structure_.zCoordList.reserve(size);
+    structure_.atomIdList.reserve(size);
 
     structure_.groupList.reserve(structure_.groupList.size() + topology.residues().size());
 
@@ -258,7 +313,7 @@ void MMTFFormat::write(const Frame& frame) {
 
     std::string previous_chainId;
     std::string previous_chainName;
-    auto previous_atom = static_cast<size_t>(-1);
+    bool got_at_least_one_chain_in_this_frame = false;
     for (const auto& residue: topology.residues()) {
         // WARNING: this assumes that residues in the same chain are contiguous
         //
@@ -268,9 +323,9 @@ void MMTFFormat::write(const Frame& frame) {
         const auto& chainName = residue.get<Property::STRING>("chainname").value_or("");
         if (chainName != previous_chainName ||
             chainId != previous_chainId ||
-            // if chainid/chainname are undefined, still add a single chain
-            structure_.groupsPerChain.empty()
+            !got_at_least_one_chain_in_this_frame
         ) {
+            got_at_least_one_chain_in_this_frame = true;
             structure_.numChains++;
             structure_.chainsPerModel.back()++;
 
@@ -290,7 +345,7 @@ void MMTFFormat::write(const Frame& frame) {
         auto groupType = static_cast<int32_t>(structure_.groupList.size());
         structure_.groupTypeList.emplace_back(groupType);
 
-        auto groupId = residue.id().value_or(0u);
+        int32_t groupId = residue.id() ? static_cast<int32_t>(residue.id().value()) : -1;
         structure_.groupIdList.emplace_back(groupId);
 
         auto group = mmtf::GroupType();
@@ -305,17 +360,12 @@ void MMTFFormat::write(const Frame& frame) {
         group.elementList.reserve(residue.size());
 
         for (auto i: residue) {
-            if (i != previous_atom + 1 && !warned_non_contiguous_) {
-                warned_non_contiguous_ = true;
-                warning("MMTF Writer", "residues are non-contiguous, atoms will be re-ordered");
-            }
-            previous_atom = i;
-
             group.formalChargeList.emplace_back(frame[i].charge());
             group.atomNameList.emplace_back(frame[i].name());
             group.elementList.emplace_back(frame[i].type());
 
             new_atom_indexes[i] = static_cast<int32_t>(structure_.xCoordList.size());
+            structure_.atomIdList.emplace_back(atomSkip_ + i + 1);
             structure_.xCoordList.emplace_back(positions[i][0]);
             structure_.yCoordList.emplace_back(positions[i][1]);
             structure_.zCoordList.emplace_back(positions[i][2]);
@@ -333,13 +383,8 @@ void MMTFFormat::write(const Frame& frame) {
             bond_order_to_mmtf(bond_orders[i])
         );
     }
-}
 
-MMTFFormat::~MMTFFormat() {
-    if (!filename_.empty()) {
-        mmtf::compressGroupList(structure_);
-        encodeToFile(structure_, filename_);
-    }
+    atomSkip_ += frame.size();
 }
 
 int8_t bond_order_to_mmtf(Bond::BondOrder order) {
