@@ -398,9 +398,24 @@ void MMTFFormat::add_residue_to_structure(const Frame& frame, const Residue& res
 
     auto positions = frame.positions();
     for (auto i: residue) {
-        group.formalChargeList.emplace_back(frame[i].charge());
-        group.atomNameList.emplace_back(frame[i].name());
-        group.elementList.emplace_back(frame[i].type());
+        const auto& atom = frame[i];
+        group.formalChargeList.emplace_back(atom.charge());
+
+        if (atom.name().size() > 5) {
+            warning("MMTF Writer",
+                "atom name '{}' is too long for MMTF format, it will be truncated",
+                atom.name()
+            );
+        }
+        group.atomNameList.emplace_back(atom.name().substr(0, 5));
+
+        if (atom.type().size() > 3) {
+            warning("MMTF Writer",
+                "atom type '{}' is too long for MMTF format, it will be truncated",
+                atom.type()
+            );
+        }
+        group.elementList.emplace_back(atom.type().substr(0, 3));
 
         new_atom_indexes_[i] = static_cast<int32_t>(structure_.xCoordList.size());
         structure_.atomIdList.emplace_back(atomSkip_ + i + 1);
