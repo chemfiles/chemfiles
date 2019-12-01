@@ -251,56 +251,60 @@ TEST_CASE("Write files in MMTF format") {
         CHECK(!topology.are_linked(topology.residue(0), topology.residue(2)));
     }
 
-
-    SECTION("Non contiguous residues") {
+    SECTION("Structure not from RCSB") {
         auto tmpfile = NamedTempPath(".mmtf");
 
-        auto frame = Frame();
-        frame.add_atom(Atom("A"), {0, 0, 0});
-        frame.add_atom(Atom("B"), {1, 1, 1});
-        frame.add_atom(Atom("C"), {2, 2, 2});
-        frame.add_atom(Atom("D"), {3, 3, 3});
-        frame.add_atom(Atom("E"), {4, 4, 4});
-        frame.add_bond(0, 2);
-        frame.add_bond(2, 4, Bond::TRIPLE);
-
-        auto residue = Residue("A");
-        residue.add_atom(0);
-        residue.add_atom(2);
-        residue.add_atom(4);
-        frame.add_residue(std::move(residue));
-
-        residue = Residue("B");
-        residue.add_atom(1);
-        residue.add_atom(3);
-        frame.add_residue(std::move(residue));
-
         {
+            auto frame = Frame();
+            frame.add_atom(Atom("A"), {0, 0, 0});
+            frame.add_atom(Atom("B"), {1, 1, 1});
+            frame.add_atom(Atom("C"), {2, 2, 2});
+            frame.add_atom(Atom("D"), {3, 3, 3});
+            frame.add_atom(Atom("E"), {4, 4, 4});
+            frame.add_bond(0, 2);
+            frame.add_bond(2, 4, Bond::TRIPLE);
+
+            auto residue = Residue("A");
+            residue.add_atom(0);
+            residue.add_atom(2);
+            residue.add_atom(4);
+            frame.add_residue(std::move(residue));
+
+            residue = Residue("B");
+            residue.add_atom(1);
+            residue.add_atom(3);
+            frame.add_residue(std::move(residue));
+
             auto trajectory = Trajectory(tmpfile, 'w');
+            trajectory.write(frame);
             trajectory.write(frame);
         }
 
-        auto trajectory_read = Trajectory(tmpfile, 'r');
-        frame = trajectory_read.read();
+        auto check_frame = [](const Frame& frame){
+            REQUIRE(frame.size() == 5);
 
-        REQUIRE(frame.size() == 5);
+            CHECK(frame[0].name() == "A");
+            CHECK(frame[1].name() == "B");
+            CHECK(frame[2].name() == "C");
+            CHECK(frame[3].name() == "D");
+            CHECK(frame[4].name() == "E");
 
-        // MMTF re-orders atoms according to residues
-        CHECK(frame[0].name() == "A");
-        CHECK(frame[1].name() == "C");
-        CHECK(frame[2].name() == "E");
-        CHECK(frame[3].name() == "B");
-        CHECK(frame[4].name() == "D");
+            auto positions = frame.positions();
+            // MMTF stores positions as floats, hence the 1e-6
+            CHECK(approx_eq(positions[0], {0, 0, 0}, 1e-6));
+            CHECK(approx_eq(positions[1], {1, 1, 1}, 1e-6));
+            CHECK(approx_eq(positions[2], {2, 2, 2}, 1e-6));
+            CHECK(approx_eq(positions[3], {3, 3, 3}, 1e-6));
+            CHECK(approx_eq(positions[4], {4, 4, 4}, 1e-6));
 
-        const auto& positions = frame.positions();
-        // MMTF stores positions as floats, hence the 1e-6
-        CHECK(approx_eq(positions[0], {0, 0, 0}, 1e-6));
-        CHECK(approx_eq(positions[1], {2, 2, 2}, 1e-6));
-        CHECK(approx_eq(positions[2], {4, 4, 4}, 1e-6));
-        CHECK(approx_eq(positions[3], {1, 1, 1}, 1e-6));
-        CHECK(approx_eq(positions[4], {3, 3, 3}, 1e-6));
+            CHECK(frame.topology().bonds() == std::vector<Bond>{{0, 2}, {2, 4}});
+            CHECK(frame.topology().bond_orders() == std::vector<Bond::BondOrder>{Bond::UNKNOWN, Bond::TRIPLE});
+        };
 
-        CHECK(frame.topology().bonds() == std::vector<Bond>{{0, 1}, {1, 2}});
-        CHECK(frame.topology().bond_orders() == std::vector<Bond::BondOrder>{Bond::UNKNOWN, Bond::TRIPLE});
+        auto trajectory = Trajectory(tmpfile, 'r');
+        REQUIRE(trajectory.nsteps() == 2);
+
+        check_frame(trajectory.read());
+        check_frame(trajectory.read());
     }
 }
