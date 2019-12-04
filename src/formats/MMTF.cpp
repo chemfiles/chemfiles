@@ -128,26 +128,8 @@ void MMTFFormat::read(Frame& frame) {
         frame.set("deposition_date", structure_.depositionDate);
     }
 
-    // A function to translate from the index in MMTF lists to an atom id
-    // suitable for chemfiles: starts at 0 for each model, and correspond to
-    // the initial atom index if it exists.
-    std::function<size_t(size_t)> atom_id;
-    if (!mmtf::isDefaultValue(structure_.atomIdList)) {
-        atom_id = [&](size_t global_id){
-            auto id = static_cast<size_t>(structure_.atomIdList[global_id]) - 1;
-            assert(atomSkip_ <= id);
-            return id - atomSkip_;
-        };
-    } else {
-        atom_id = [&](size_t global_id){
-            assert(atomSkip_ <= global_id);
-            return global_id - atomSkip_;
-        };
-    }
-
     // count the number of atoms in this frame/model
     size_t natoms = 0;
-
     auto modelChainCount = static_cast<size_t>(structure_.chainsPerModel[modelIndex_]);
     // backup chainIndex & groupIndex to be incremented in the loop below
     auto chain_index = chainIndex_;
@@ -426,6 +408,20 @@ void MMTFFormat::add_residue_to_structure(const Frame& frame, const Residue& res
     structure_.groupList.emplace_back(std::move(group));
 }
 
+// A function to translate from the index in MMTF lists to an atom id
+// suitable for chemfiles: starts at 0 for each model, and correspond to
+// the initial atom index if it exists.
+size_t MMTFFormat::atom_id(size_t mmtf_id) {
+    if (!mmtf::isDefaultValue(structure_.atomIdList)) {
+        auto id = static_cast<size_t>(structure_.atomIdList[mmtf_id]) - 1;
+        assert(atomSkip_ <= id);
+        return id - atomSkip_;
+    } else {
+        assert(atomSkip_ <= mmtf_id);
+        return mmtf_id - atomSkip_;
+    }
+}
+
 int8_t bond_order_to_mmtf(Bond::BondOrder order) {
     switch(order) {
     case Bond::BondOrder::SINGLE:
@@ -445,10 +441,14 @@ int8_t bond_order_to_mmtf(Bond::BondOrder order) {
     case Bond::BondOrder::DOWN:
     case Bond::BondOrder::DATIVE_L:
     case Bond::BondOrder::DATIVE_R:
-        warning("MMTF Writer", "bond order '{}' can not be represented in MMTF, defaulting to single bond");
+        warning("MMTF Writer",
+            "bond order '{}' can not be represented in MMTF, defaulting to single bond",
+            order
+        );
         return 1;
+    default:
+        unreachable();
     }
-    unreachable();
 }
 
 Bond::BondOrder bond_order_to_chemfiles(int32_t order) {
