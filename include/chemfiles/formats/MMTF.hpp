@@ -37,8 +37,13 @@ public:
     size_t nsteps() override;
 
 private:
-    // add a single residue to the structure_, using the data from the frame
+    /// add a single residue to the structure_, using the data from the frame
     void add_residue_to_structure(const Frame& frame, const Residue& residue);
+
+    /// A function to translate from the index in MMTF lists to an atom id
+    /// suitable for chemfiles: starts at 0 for each model, and correspond to
+    /// the initial atom index if it exists. This is used when reading.
+    size_t atom_id(size_t mmtf_id);
 
     /// MMTF-CPP object holding all MacroMolecular information.
     /// This can be read and modified.
