@@ -49,14 +49,12 @@ TextFile::TextFile(std::string path, File::Mode mode, File::Compression compress
 }
 
 uint64_t TextFile::tellpos() const {
+    assert(line_start_ >= buffer_.data());
     auto delta = buffer_initialized() ? static_cast<uint64_t>(line_start_ - buffer_.data()) : 0;
-    assert(position_ + delta >= 0);
     return position_ + delta;
 }
 
 void TextFile::seekpos(uint64_t position) {
-    assert(position >= 0);
-
     got_impl_eof_ = false;
     eof_ = false;
 

@@ -83,7 +83,7 @@ AmberNetCDFFormat::AmberNetCDFFormat(std::string path, File::Mode mode, File::Co
 }
 
 size_t AmberNetCDFFormat::nsteps() {
-    return static_cast<size_t>(file_.dimension("frame"));
+    return file_.dimension("frame");
 }
 
 void AmberNetCDFFormat::read_step(const size_t step, Frame& frame) {
