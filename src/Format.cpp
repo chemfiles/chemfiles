@@ -17,6 +17,11 @@ namespace chemfiles {
 
 using namespace chemfiles;
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=noreturn"
+#endif
+
 void Format::read_step(size_t /*unused*/, Frame& /*unused*/) {
     throw format_error(
         "'read_step' is not implemented for this format ({})",
@@ -38,6 +43,23 @@ void Format::write(const Frame& /*unused*/) {
     );
 }
 
+void TextFormat::read_next(Frame& /*unused*/) {
+    throw format_error(
+        "'read' is not implemented for this format ({})",
+        typeid(*this).name()
+    );
+}
+
+void TextFormat::write_next(const Frame& /*unused*/) {
+    throw format_error(
+        "'write' is not implemented for this format ({})",
+        typeid(*this).name()
+    );
+}
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 TextFormat::TextFormat(std::string path, File::Mode mode, File::Compression compression):
     file_(std::move(path), mode, compression) {}
@@ -105,18 +127,4 @@ void TextFormat::write(const Frame& frame) {
 size_t TextFormat::nsteps() {
     scan_all();
     return steps_positions_.size();
-}
-
-void TextFormat::read_next(Frame& /*unused*/) {
-    throw format_error(
-        "'read' is not implemented for this format ({})",
-        typeid(*this).name()
-    );
-}
-
-void TextFormat::write_next(const Frame& /*unused*/) {
-    throw format_error(
-        "'write' is not implemented for this format ({})",
-        typeid(*this).name()
-    );
 }
