@@ -189,6 +189,7 @@ else()
 
     add_warning_flag("-Weverything")
     # Disable some warning implied by -Weverything
+    add_warning_flag("-Wno-c++-compat")
     add_warning_flag("-Wno-c++98-compat")
     add_warning_flag("-Wno-c++98-compat-pedantic")
     add_warning_flag("-Wno-weak-vtables")
