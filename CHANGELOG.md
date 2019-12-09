@@ -5,11 +5,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+## 0.9.2 (9 Dec 2019)
+
 * When compiling chemfiles as a shared library, the dependencies symbols are
   now hidden. This should prevent clashes between say chemfiles's zlib and the
   system zlib.
 * Cache sub-selection (the 'name O' in 'is_bonded(#1, name O)'), reducing
-  selection evaluationg time by a huge margin.
+  selection evaluation time by a huge margin.
 
 ### Changes in supported formats
 
