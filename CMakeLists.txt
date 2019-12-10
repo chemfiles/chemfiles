@@ -36,6 +36,11 @@ option(CHFL_SYSTEM_LZMA "Use the system lzma instead of the internal one" OFF)
 option(CHFL_SYSTEM_BZIP2 "Use the system bzip2 instead of the internal one" OFF)
 
 option(CHFL_BUILD_DOCTESTS "Build documentation tests as well as unit tests." ON)
+
+set(LIB_INSTALL_DIR "lib" CACHE PATH "Path relative to CMAKE_INSTALL_PREFIX where to install libraries")
+set(BIN_INSTALL_DIR "bin" CACHE PATH "Path relative to CMAKE_INSTALL_PREFIX where to install headers")
+set(INCLUDE_INSTALL_DIR "include" CACHE PATH "Path relative to CMAKE_INSTALL_PREFIX where to install DLL/binaries")
+
 mark_as_advanced(CHFL_BUILD_DOCTESTS)
 
 # Set a default build type if none was specified
@@ -161,6 +166,16 @@ generate_export_header(chemfiles
     EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/include/chemfiles/exports.h
 )
 
+if(${CHFL_BUILD_DOCUMENTATION})
+    add_subdirectory(doc)
+endif()
+
+enable_testing()
+if(${CHFL_BUILD_TESTS})
+    add_subdirectory(tests)
+    add_subdirectory(examples)
+endif()
+
 #----------------------------------------------------------------------------------------#
 # Installation configuration
 #----------------------------------------------------------------------------------------#
@@ -172,27 +187,25 @@ configure_file(
 
 install(TARGETS chemfiles
     EXPORT chemfiles-targets
-    LIBRARY DESTINATION lib COMPONENT Runtime
-    ARCHIVE DESTINATION lib COMPONENT Development
-    RUNTIME DESTINATION bin COMPONENT Runtime
-    PUBLIC_HEADER DESTINATION include COMPONENT Development
-    BUNDLE DESTINATION bin COMPONENT Runtime
+    LIBRARY DESTINATION ${LIB_INSTALL_DIR} COMPONENT Runtime
+    ARCHIVE DESTINATION ${LIB_INSTALL_DIR} COMPONENT Development
+    RUNTIME DESTINATION ${BIN_INSTALL_DIR} COMPONENT Runtime
 )
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
     "${PROJECT_SOURCE_DIR}/cmake/chemfiles-config.cmake.in"
     "${PROJECT_BINARY_DIR}/chemfiles-config.cmake"
-    INSTALL_DESTINATION lib/cmake/chemfiles
+    INSTALL_DESTINATION ${LIB_INSTALL_DIR}/cmake/chemfiles
 )
 
-install(EXPORT chemfiles-targets DESTINATION lib/cmake/chemfiles)
+install(EXPORT chemfiles-targets DESTINATION ${LIB_INSTALL_DIR}/cmake/chemfiles)
 install(FILES "${PROJECT_BINARY_DIR}/chemfiles-config-version.cmake"
               "${PROJECT_BINARY_DIR}/chemfiles-config.cmake"
-        DESTINATION lib/cmake/chemfiles)
+        DESTINATION ${LIB_INSTALL_DIR}/cmake/chemfiles)
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION include)
-install(DIRECTORY ${PROJECT_BINARY_DIR}/include/ DESTINATION include)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION ${INCLUDE_INSTALL_DIR})
+install(DIRECTORY ${PROJECT_BINARY_DIR}/include/ DESTINATION ${INCLUDE_INSTALL_DIR})
 
 # uninstall target
 configure_file(
@@ -203,13 +216,3 @@ configure_file(
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${PROJECT_BINARY_DIR}/uninstall.cmake
 )
-
-if(${CHFL_BUILD_DOCUMENTATION})
-    add_subdirectory(doc)
-endif()
-
-enable_testing()
-if(${CHFL_BUILD_TESTS})
-    add_subdirectory(tests)
-    add_subdirectory(examples)
-endif()
