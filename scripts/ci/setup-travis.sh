@@ -17,6 +17,9 @@ else
     export CMAKE_ARGS="$CMAKE_ARGS -DBUILD_SHARED_LIBS=ON"
 fi
 
+# Remove /opt/pyenv/shims from PATH. https://unix.stackexchange.com/a/178822
+export PATH=$(echo ":$PATH:" | sed "s|:/opt/pyenv/shims:|:|g;s|^:\(.*\):\$|\1|")
+
 if [[ "$DO_COVERAGE" == "ON" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_C_FLAGS=\"--coverage\" -DCMAKE_CXX_FLAGS=\"--coverage\""
     curl https://bootstrap.pypa.io/get-pip.py > get-pip.py
