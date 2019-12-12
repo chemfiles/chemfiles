@@ -3,10 +3,12 @@
 """
 Check that all error messages are formatted the same way.
 """
+from __future__ import print_function
 import os
 import sys
 import glob
 import re
+import codecs
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 ERRORS = 0
@@ -74,7 +76,7 @@ def check_message(path, line, message):
 
 
 def check_file(path):
-    with open(path) as fd:
+    with codecs.open(path, encoding="utf8") as fd:
         lines = [l for l in fd]
 
     for (i, line) in enumerate(lines):
