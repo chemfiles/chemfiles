@@ -3,8 +3,6 @@
 #include <catch.hpp>
 #include <boost/filesystem.hpp>
 namespace fs=boost::filesystem;
-#include <boost/asio.hpp>
-namespace ip = boost::asio::ip;
 
 #include "chemfiles/parse.hpp"
 #include "chemfiles/Error.hpp"
