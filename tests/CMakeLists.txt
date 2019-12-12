@@ -32,25 +32,23 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT}")
     )
 endif()
 
-set(CHFL_TEST_RUNNER "none" CACHE STRING "External runner for the tests")
-set_property(CACHE CHFL_TEST_RUNNER PROPERTY STRINGS none valgrind wine node)
-
-if(${CHFL_TEST_RUNNER} STREQUAL "valgrind")
+option(CHFL_TESTS_USE_VALGRIND OFF "Run tests using valgrind")
+if(CHFL_TESTS_USE_VALGRIND)
+    find_program(VALGRIND_EXECUTABLE valgrind)
     set(
-        RUNNER_COMMAND
-        "valgrind" "--dsymutil=yes" "--error-exitcode=125"
+        TEST_RUNNER
+        ${VALGRIND_EXECUTABLE} "--dsymutil=yes" "--error-exitcode=125"
         "--leak-check=full" "--show-leak-kinds=all" "--track-origins=yes"
         "--suppressions=${CMAKE_CURRENT_SOURCE_DIR}/valgrind.supp"
         # don't warn for replacement of operator new/delete
         "--soname-synonyms=somalloc=nouserintercepts"
     )
-elseif(${CHFL_TEST_RUNNER} STREQUAL "wine")
-    set(RUNNER_COMMAND "wine")
-elseif(${CHFL_TEST_RUNNER} STREQUAL "node")
-    set(RUNNER_COMMAND "node")
 else()
-    set(RUNNER_COMMAND "")
+    set(TEST_RUNNER "")
 endif()
+
+# Pick up CMAKE_CROSSCOMPILING_EMULATOR to run tests if it is defined
+set(TEST_RUNNER "${CMAKE_CROSSCOMPILING_EMULATOR};${TEST_RUNNER}")
 
 if(MSVC)
     string(REGEX REPLACE "/Wall" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -61,12 +59,12 @@ add_subdirectory(external)
 
 function(chfl_define_test _name_)
     add_test(NAME ${_name_}
-        COMMAND ${RUNNER_COMMAND} ./${_name_}
+        COMMAND ${TEST_RUNNER} ./${_name_}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 
     set_tests_properties(${_name_}
-        PROPERTIES ENVIRONMENT "CHFL_TEST_RUNNER=${CHFL_TEST_RUNNER}"
+        PROPERTIES ENVIRONMENT "CHFL_TESTS_USE_VALGRIND=${CHFL_TESTS_USE_VALGRIND}"
     )
 
     if(WIN32)
