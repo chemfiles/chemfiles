@@ -245,7 +245,7 @@ void PDBFormat::read_HELIX(string_view line) {
     try {
         helix_type = parse<size_t>(line.substr(38,2));
     } catch (const Error&) {
-        warning("PDB reader", "could not parse helix type");
+        warning("[PDB reader] could not parse helix type");
         return;
     }
 

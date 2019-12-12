@@ -125,8 +125,7 @@ void MOL2Format::read_atoms(Frame& frame, size_t natoms, bool charges) {
                 }
                 atom_type += c;
             }
-            warning("MOL2 reader",
-                "invalid sybyl type: '{}'; guessing '{}' from '{}'",
+            warning("[MOL2 reader] invalid sybyl type: '{}'; guessing '{}' from '{}'",
                 sybyl_type, atom_type, atom_name
             );
         }
