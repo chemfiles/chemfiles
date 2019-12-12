@@ -14,7 +14,6 @@
 #define getcwd _getcwd
 #else
 #include <unistd.h>
-#include <pwd.h>
 #endif
 
 std::string chemfiles::user_name() {
@@ -26,8 +25,11 @@ std::string chemfiles::user_name() {
     }
     return name;
 #else
-    auto user = getpwuid(getuid());
-    return user ? user->pw_name : "";
+    char user[1024];
+    if (getlogin_r(user, sizeof(user)) != 0) {
+        return "";
+    }
+    return user;
 #endif
 }
 
