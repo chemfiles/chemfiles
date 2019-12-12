@@ -62,7 +62,7 @@ MMTFFormat::~MMTFFormat() {
             mmtf::compressGroupList(structure_);
             encodeToFile(structure_, filename_);
         } catch (const std::exception& e) {
-            warning("MMTF writer", "error while finishing writing to {}: {}", filename_, e.what());
+            warning("[MMTF writer] error while finishing writing to {}: {}", filename_, e.what());
         } catch (...) {
             // ignore exceptions in destructor
         }
@@ -250,7 +250,7 @@ void MMTFFormat::read(Frame& frame) {
         // We are below the atoms we care about
         if (atom1 < atomSkip_ || atom2 < atomSkip_) {
             if (!(atom1 < atomSkip_ && atom2 < atomSkip_)) {
-                warning("MMTF Reader", "chemfiles can not represent bonds between different models");
+                warning("[MMTF Reader] chemfiles can not represent bonds between different models");
             }
             continue;
         }
@@ -258,7 +258,7 @@ void MMTFFormat::read(Frame& frame) {
         // We are above the atoms we care about
         if (atom1 > atomIndex_ || atom2 > atomIndex_) {
             if (!(atom1 > atomIndex_ && atom2 > atomIndex_)) {
-                warning("MMTF Reader", "chemfiles can not represent bonds between different models");
+                warning("[MMTF Reader] chemfiles can not represent bonds between different models");
             }
             continue;
         }
@@ -384,16 +384,14 @@ void MMTFFormat::add_residue_to_structure(const Frame& frame, const Residue& res
         group.formalChargeList.emplace_back(atom.charge());
 
         if (atom.name().size() > 5) {
-            warning("MMTF Writer",
-                "atom name '{}' is too long for MMTF format, it will be truncated",
+            warning("[MMTF Writer] atom name '{}' is too long for MMTF format, it will be truncated",
                 atom.name()
             );
         }
         group.atomNameList.emplace_back(atom.name().substr(0, 5));
 
         if (atom.type().size() > 3) {
-            warning("MMTF Writer",
-                "atom type '{}' is too long for MMTF format, it will be truncated",
+            warning("[MMTF Writer] atom type '{}' is too long for MMTF format, it will be truncated",
                 atom.type()
             );
         }
@@ -441,8 +439,7 @@ int8_t bond_order_to_mmtf(Bond::BondOrder order) {
     case Bond::BondOrder::DOWN:
     case Bond::BondOrder::DATIVE_L:
     case Bond::BondOrder::DATIVE_R:
-        warning("MMTF Writer",
-            "bond order '{}' can not be represented in MMTF, defaulting to single bond",
+        warning("[MMTF Writer] bond order '{}' can not be represented in MMTF, defaulting to single bond",
             order
         );
         return 1;
@@ -464,7 +461,7 @@ Bond::BondOrder bond_order_to_chemfiles(int32_t order) {
     case -1:
         return Bond::UNKNOWN;
     default:
-        warning("MMTF Reader", "unexpected bond order from MMTF '{}'", order);
+        warning("[MMTF Reader] unexpected bond order from MMTF '{}'", order);
         return Bond::UNKNOWN;
     }
 }
@@ -500,7 +497,7 @@ void set_secondary(Residue& residue, int32_t code) {
     case -1:
         break;
     default:
-        warning("MMTF Reader", "unknown secondary structure code '{}'", code);
+        warning("[MMTF Reader] unknown secondary structure code '{}'", code);
         break;
     }
 }

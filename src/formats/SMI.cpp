@@ -179,7 +179,7 @@ void SMIFormat::process_property_list(Topology& topology, string_view smiles, si
             new_atom.set("chirality", chirality_type);
             break;
         default:
-            warning("SMI Reader", "unknown property code: '{}'", smiles[i]);
+            warning("[SMI Reader] unknown property code: '{}'", smiles[i]);
             break;
         }
         ++i;
@@ -471,7 +471,7 @@ static void write_atom_smiles(TextFile& file, const Atom& atom) {
         double_to_int(smi_class_prop->as_double(), smi_class) && smi_class >= 0) {
         needs_brackets = true;
     } else if (smi_class_prop) {
-        warning("SMI Writer", "the 'smiles_class' property must be an integer >= 0");
+        warning("[SMI Writer] the 'smiles_class' property must be an integer >= 0");
     }
 
     int explicit_h = -1;
@@ -480,7 +480,7 @@ static void write_atom_smiles(TextFile& file, const Atom& atom) {
         double_to_int(explicit_h_prop->as_double(), explicit_h) && explicit_h >= 0) {
         needs_brackets = true;
     } else if (explicit_h_prop) {
-        warning("SMI Writer", "the 'hydrogen_count' property must be an integer >= 0");
+        warning("[SMI Writer] the 'hydrogen_count' property must be an integer >= 0");
     }
 
     // Charge is similar to mass. It must be an integer, otherwise it is ignored
@@ -562,7 +562,7 @@ static void write_atom_smiles(TextFile& file, const Atom& atom) {
     }
 
     if (!is_good_tag) {
-        warning("SMI Writer", "invalid chirality tag '{}'", chirality);
+        warning("[SMI Writer] invalid chirality tag '{}'", chirality);
     }
 
     if (explicit_h == 1) {
@@ -608,7 +608,7 @@ static void print_bond(TextFile& file, chemfiles::Bond::BondOrder bo) {
         file.print("~");
         break;
     default:
-        warning("SMI Writer", "unknown bond type");
+        warning("[SMI Writer] unknown bond type");
         file.print("~");
         break;
     }

@@ -78,7 +78,7 @@ void SDFFormat::read_next(Frame& frame) {
             try {
                 chrg = parse<long long>(line.substr(36, 3));
             } catch (const Error&) {
-                warning("SDF reader", "charge code not numeric: {}", line.substr(36, 3));
+                warning("[SDF reader] charge code not numeric: {}", line.substr(36, 3));
             }
             switch(chrg) {
             case 0:
@@ -102,7 +102,7 @@ void SDFFormat::read_next(Frame& frame) {
                 atom.set_charge(-3.0);
                 break;
             default:
-                warning("SDF reader", "unknown charge code: '{}'", chrg);
+                warning("[SDF reader] unknown charge code: '{}'", chrg);
             }
         }
 
@@ -251,10 +251,10 @@ void SDFFormat::write_next(const Frame& frame) {
                 charge_code = 7;
                 break;
             default:
-                warning("SDF writer", "charge code not availible for '{}'", int_part);
+                warning("[SDF writer] charge code not availible for '{}'", int_part);
             }
         } else {
-            warning("SDF writer", "charge not an integer: '{}'", topology[i].charge());
+            warning("[SDF writer] charge not an integer: '{}'", topology[i].charge());
         }
 
         file_.print("{:>10.4f}{:>10.4f}{:>10.4f} {:3} 0{:3}  0  0  0  0  0  0  0  0  0  0\n",

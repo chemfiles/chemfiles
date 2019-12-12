@@ -367,7 +367,7 @@ void CMLFormat::read(Frame& frame) {
         auto id1 = ref_to_id.find(ids[0].to_string());
         auto id2 = ref_to_id.find(ids[1].to_string());
         if (id1 == ref_to_id.end() || id2 == ref_to_id.end()) {
-            warning("CML reader", "invalid atomic references in bond: {} -- {}", ids[0], ids[1]);
+            warning("[CML reader] invalid atomic references in bond: {} -- {}", ids[0], ids[1]);
             continue;
         }
 
