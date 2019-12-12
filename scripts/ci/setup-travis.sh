@@ -39,7 +39,8 @@ if [[ "$EMSCRIPTEN" == "ON" ]]; then
     source ./emsdk-master/emsdk_env.sh
 
     export CMAKE_CONFIGURE='emcmake'
-    export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_TEST_RUNNER=node -DCMAKE_BUILD_TYPE=release -DCHFL_BUILD_DOCTESTS=OFF"
+    export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_BUILD_TYPE=release -DCHFL_BUILD_DOCTESTS=OFF"
+    export CMAKE_BUILD_TYPE="Release"
 
     # Install a modern cmake
     cd $HOME
@@ -60,7 +61,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     fi
 
     if [[ "$VALGRIND" == "ON" ]]; then
-        export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_TEST_RUNNER=valgrind"
+        export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_TESTS_USE_VALGRIND=ON"
     fi
 fi
 
