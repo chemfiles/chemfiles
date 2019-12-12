@@ -4,9 +4,11 @@
 This script check for some functions we don't want to use because they are
 better wrappers in chemfiles
 """
+from __future__ import print_function
 import os
 import sys
 import re
+import codecs
 from glob import glob
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
@@ -51,7 +53,7 @@ def error(message):
 
 
 def check_code(path, replacements):
-    with open(path) as fd:
+    with codecs.open(path, encoding="utf8") as fd:
         for i, line in enumerate(fd):
             for bad, replacement in replacements.items():
                 match = re.search(bad, line)
