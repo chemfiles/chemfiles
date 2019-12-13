@@ -128,6 +128,21 @@ void MMTFFormat::read(Frame& frame) {
         frame.set("deposition_date", structure_.depositionDate);
     }
 
+    auto inter_residue_bond_count = structure_.bondAtomList.size() / 2;
+    size_t bond_index = 0;
+    while (bond_index < inter_residue_bond_count) {
+        auto atom1 = structure_.bondAtomList[bond_index * 2 + 0];
+        auto atom2 = structure_.bondAtomList[bond_index * 2 + 1];
+
+        // We are below the atoms we care about
+        if ((atom1 < atomSkip_) || (atom2 < atomSkip_)) {
+            bond_index++;
+            continue;
+        }
+
+        break;
+    }
+
     // count the number of atoms in this frame/model
     size_t natoms = 0;
     auto modelChainCount = static_cast<size_t>(structure_.chainsPerModel[modelIndex_]);
@@ -217,6 +232,28 @@ void MMTFFormat::read(Frame& frame) {
                 );
             }
 
+            // Add additional global (not by group) bonds
+            while (bond_index < inter_residue_bond_count) {
+                auto atom1 = static_cast<size_t>(structure_.bondAtomList[bond_index * 2]);
+                auto atom2 = static_cast<size_t>(structure_.bondAtomList[bond_index * 2 + 1]);
+
+                // We are below the atoms we care about
+                if (atom1 < atomSkip_ || atom2 < atomSkip_) {
+                    if (!(atom1 < atomSkip_ && atom2 < atomSkip_)) {
+                        warning("MMTF Reader", "chemfiles can not represent bonds between different models");
+                    }
+                    continue;
+                }
+
+                // We are above the atoms we care about
+                if (atom1 > atomIndex_ || atom2 > atomIndex_) {
+                    break;
+                }
+
+                frame.add_bond(atom_id(atom1), atom_id(atom2));
+                bond_index++;
+            }
+
             if (groupIndex_ < structure_.secStructList.size()) {
                 set_secondary(residue, structure_.secStructList[groupIndex_]);
             }
@@ -241,31 +278,6 @@ void MMTFFormat::read(Frame& frame) {
         chainIndex_++;
     }
     modelIndex_++;
-
-    // Add additional global (not by group) bonds
-    for (size_t i = 0; i < structure_.bondAtomList.size() / 2; i++) {
-        auto atom1 = static_cast<size_t>(structure_.bondAtomList[i * 2]);
-        auto atom2 = static_cast<size_t>(structure_.bondAtomList[i * 2 + 1]);
-
-        // We are below the atoms we care about
-        if (atom1 < atomSkip_ || atom2 < atomSkip_) {
-            if (!(atom1 < atomSkip_ && atom2 < atomSkip_)) {
-                warning("[MMTF Reader] chemfiles can not represent bonds between different models");
-            }
-            continue;
-        }
-
-        // We are above the atoms we care about
-        if (atom1 > atomIndex_ || atom2 > atomIndex_) {
-            if (!(atom1 > atomIndex_ && atom2 > atomIndex_)) {
-                warning("[MMTF Reader] chemfiles can not represent bonds between different models");
-            }
-            continue;
-        }
-
-        frame.add_bond(atom_id(atom1), atom_id(atom2));
-    }
-
     atomSkip_ = atomIndex_;
 }
 
