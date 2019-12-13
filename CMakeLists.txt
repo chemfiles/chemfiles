@@ -133,6 +133,11 @@ set(CHEMFILES_OBJECTS
 # Add the main chemfiles library
 add_library(chemfiles ${CHEMFILES_OBJECTS})
 
+if(WIN32)
+    # MMTF (and thus chemfiles) uses endianness conversion function from ws2_32
+    target_link_libraries(chemfiles ws2_32)
+endif()
+
 set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
 set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
 
