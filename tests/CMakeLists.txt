@@ -81,7 +81,7 @@ function(chfl_unit_test _name_ _file_)
     add_executable(${_name_} ${_file_} ${CHEMFILES_OBJECTS})
     # We need to pretend we are inside the DLL to access all functions
     target_compile_definitions(${_name_} PRIVATE chemfiles_EXPORTS)
-    target_link_libraries(${_name_} ${NETCDF_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBLZMA_LIBRARY})
+    target_link_libraries(${_name_} $<TARGET_PROPERTY:chemfiles,LINK_LIBRARIES>)
     set_target_properties(${_name_} PROPERTIES LINKER_LANGUAGE CXX)
     target_include_directories(${_name_} SYSTEM PRIVATE ${EXTERNAL_INCLUDES})
 
@@ -122,9 +122,7 @@ target_compile_definitions(c-misc PRIVATE "-DVERSION_FILE_PATH=\"${VERSION_FILE_
 
 # BOOST asio (used for hostname test) requires some additional system
 # libraries, link to them explicitly here
-if(WIN32)
-    set(EXTRA_BOOST_ASIO_LIBS ws2_32)
-elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "PGI" AND "${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "PGI" AND "${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
     set(EXTRA_BOOST_ASIO_LIBS atomic)
 elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "^(arm.*|ARM.*)" OR
        "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "^(aarch64.*|AARCH64.*)" OR
