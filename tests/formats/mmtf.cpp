@@ -189,6 +189,11 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(!topology.are_linked(topology.residue(0), topology.residue(2)));
     }
 
+    SECTION("Large MMTF file") {
+        auto file = Trajectory("data/mmtf/3J3Q.mmtf.gz");
+        auto frame = file.read_step(0);
+    }
+
     SECTION("XZ Files") {
         auto file = Trajectory("data/mmtf/1J8K.mmtf.xz");
 
