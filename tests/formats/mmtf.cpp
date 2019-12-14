@@ -190,8 +190,19 @@ TEST_CASE("Read files in MMTF format") {
     }
 
     SECTION("Large MMTF file") {
-        auto file = Trajectory("data/mmtf/3J3Q.mmtf.gz");
-        auto frame = file.read_step(0);
+    // Test fails on Windows due to timing of MSVC debug builds
+    #ifndef CHEMFILES_WINDOWS
+        // Test takes too long with valgrind
+        if (!is_valgrind_and_travis()) {
+            auto file = Trajectory("data/mmtf/3J3Q.mmtf.gz");
+            auto frame = file.read_step(0);
+
+            // We just read 2,400,000 atoms and 2,500,000 bonds
+            // in ~3s (in release mode) !!!
+            CHECK(frame.size() == 2440800);
+            CHECK(frame.topology().bonds().size() == 2497752);
+        }
+    #endif
     }
 
     SECTION("XZ Files") {
