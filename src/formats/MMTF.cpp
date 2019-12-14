@@ -239,9 +239,6 @@ void MMTFFormat::read(Frame& frame) {
 
                 // We are below the atoms we care about
                 if (atom1 < atomSkip_ || atom2 < atomSkip_) {
-                    if (!(atom1 < atomSkip_ && atom2 < atomSkip_)) {
-                        warning("MMTF Reader", "chemfiles can not represent bonds between different models");
-                    }
                     continue;
                 }
 
