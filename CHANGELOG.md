@@ -5,7 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
-## 0.9.2 (9 Dec 2019)
+## 0.9.2 (18 Dec 2019)
 
 * When compiling chemfiles as a shared library, the dependencies symbols are
   now hidden. This should prevent clashes between say chemfiles's zlib and the
