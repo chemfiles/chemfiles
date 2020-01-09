@@ -80,10 +80,10 @@ static void check_write_file(std::string path, File::Compression compression) {
     TextFile file(path, File::READ, compression);
     CHECK(file.readline() == "4");
     CHECK(file.readline() == "Written by the chemfiles library");
-    CHECK(file.readline() == "A 1.0 2.0 3.0");
-    CHECK(file.readline() == "B 1.0 2.0 4.0");
-    CHECK(file.readline() == "C 1.0 2.0 5.0");
-    CHECK(file.readline() == "D 1.0 2.0 6.0");
+    CHECK(file.readline() == "A 1 2 3");
+    CHECK(file.readline() == "B 1 2 4");
+    CHECK(file.readline() == "C 1 2 5");
+    CHECK(file.readline() == "D 1 2 6");
 
     CHECK(file.readline() == "");
     CHECK(file.eof());

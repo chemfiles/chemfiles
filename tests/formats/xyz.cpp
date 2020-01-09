@@ -85,18 +85,18 @@ TEST_CASE("Write files in XYZ format") {
     const auto expected_content =
 R"(4
 Written by the chemfiles library
-A 1.0 2.0 3.0
-B 1.0 2.0 3.0
-C 1.0 2.0 3.0
-D 1.0 2.0 3.0
+A 1 2 3
+B 1 2 3
+C 1 2 3
+D 1 2 3
 6
 Written by the chemfiles library
-A 1.0 2.0 3.0
-B 1.0 2.0 3.0
-C 1.0 2.0 3.0
-D 1.0 2.0 3.0
-E 4.0 5.0 6.0
-F 4.0 5.0 6.0
+A 1 2 3
+B 1 2 3
+C 1 2 3
+D 1 2 3
+E 4 5 6
+F 4 5 6
 )";
 
     auto frame = Frame();
@@ -118,4 +118,28 @@ F 4.0 5.0 6.0
     std::string content((std::istreambuf_iterator<char>(checking)),
                          std::istreambuf_iterator<char>());
     CHECK(content == expected_content);
+}
+
+TEST_CASE("Round-trip read/write") {
+    auto tmpfile = NamedTempPath(".xyz");
+    auto content =
+R"(3
+Written by the chemfiles library
+O 0.417 8.303 11.737
+H 1.32 8.48 12.003
+H 0.332 8.726 10.882
+)";
+
+    std::ofstream create(tmpfile);
+    create << content;
+    create.close();
+
+    auto frame = Trajectory(tmpfile).read();
+    Trajectory(tmpfile, 'w').write(frame);
+
+    std::ifstream checking(tmpfile);
+    std::string actual((std::istreambuf_iterator<char>(checking)),
+                        std::istreambuf_iterator<char>());
+    CHECK(content == actual);
+
 }
