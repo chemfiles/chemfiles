@@ -121,7 +121,9 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/fmt/include/)
 
 # Hide FMT variables from CMake GUI
 mark_as_advanced(FORCE
+    FMT_CUDA_TEST
     FMT_DOC
+    FMT_FUZZ
     FMT_INSTALL
     FMT_PEDANTIC
     FMT_TEST
