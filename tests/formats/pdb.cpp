@@ -299,6 +299,20 @@ TEST_CASE("Problematic PDB files") {
         auto file = Trajectory("data/pdb/short-cryst1.pdb");
         auto frame = file.read();
     }
+
+    SECTION("Short ATOM record") {
+        auto file = Trajectory("data/pdb/short-atom.pdb");
+        auto frame = file.read();
+        REQUIRE(frame.size() == 9);
+
+        CHECK(frame[0].name() == "O");
+        CHECK(frame[5].name() == "H");
+        CHECK(frame[0].type() == "O");
+        CHECK(frame[5].type() == "H");
+
+        CHECK(approx_eq(frame.positions()[0], {0.417, 8.303, 11.737}, 1e-5));
+        CHECK(approx_eq(frame.positions()[5], {8.922, 9.426, 5.320}, 1e-5));
+    }
 }
 
 TEST_CASE("Write files in PDB format") {

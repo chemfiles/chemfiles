@@ -343,7 +343,7 @@ void PDBFormat::read_ATOM(Frame& frame, string_view line,
         atom = Atom(trim(name).to_string(), trim(type).to_string());
     } else {
         // Read just the atom name and hope for the best.
-        Atom(trim(name).to_string());
+        atom = Atom(trim(name).to_string());
     }
 
     auto altloc = line.substr(16, 1);
