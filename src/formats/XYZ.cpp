@@ -61,7 +61,7 @@ void XYZFormat::write_next(const Frame& frame) {
         if (name.empty()) {
             name = "X";
         }
-        file_.print("{} {} {} {}\n",
+        file_.print("{} {:g} {:g} {:g}\n",
             name, positions[i][0], positions[i][1], positions[i][2]
         );
     }

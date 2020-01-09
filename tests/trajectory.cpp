@@ -50,11 +50,11 @@ TEST_CASE("Associate a topology and a trajectory") {
         const auto EXPECTED_CONTENT =
         "5\n"
         "Written by the chemfiles library\n"
-        "Fe 1.0 2.0 3.0\n"
-        "Fe 1.0 2.0 3.0\n"
-        "Fe 1.0 2.0 3.0\n"
-        "Fe 1.0 2.0 3.0\n"
-        "Fe 1.0 2.0 3.0\n";
+        "Fe 1 2 3\n"
+        "Fe 1 2 3\n"
+        "Fe 1 2 3\n"
+        "Fe 1 2 3\n"
+        "Fe 1 2 3\n";
 
         auto frame = Frame();
         auto topology = Topology();

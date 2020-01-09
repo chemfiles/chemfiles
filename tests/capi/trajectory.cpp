@@ -237,10 +237,10 @@ TEST_CASE("Write trajectory") {
     const char* EXPECTED_CONTENT =
     "4\n"
     "Written by the chemfiles library\n"
-    "He 1.0 2.0 3.0\n"
-    "He 1.0 2.0 3.0\n"
-    "He 1.0 2.0 3.0\n"
-    "He 1.0 2.0 3.0\n";
+    "He 1 2 3\n"
+    "He 1 2 3\n"
+    "He 1 2 3\n"
+    "He 1 2 3\n";
 
     CHFL_TRAJECTORY* trajectory = chfl_trajectory_open(tmpfile.path().c_str(), 'w');
     REQUIRE(trajectory);
