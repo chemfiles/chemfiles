@@ -11,11 +11,11 @@
 #include "chemfiles/UnitCell.hpp"
 #include "chemfiles/exports.h"
 #include "chemfiles/external/optional.hpp"
-#include "chemfiles/files/MemoryBuffer.hpp"
 
 namespace chemfiles {
 class Format;
 class Topology;
+class MemoryBuffer;
 
 /// A `Trajectory` is a chemistry file on the hard drive. It is the entry point
 /// of the chemfiles library.
@@ -276,7 +276,7 @@ private:
     /// is present
     optional<UnitCell> custom_cell_;
     /// The internal memory buffer
-    std::unique_ptr<MemoryBuffer> buffer_ = nullptr;
+    std::unique_ptr<MemoryBuffer> buffer_;
 };
 
 } // namespace chemfiles

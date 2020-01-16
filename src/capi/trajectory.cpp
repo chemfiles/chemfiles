@@ -32,7 +32,7 @@ extern "C" CHFL_TRAJECTORY* chfl_trajectory_with_format(const char* path, char m
     CHECK_POINTER_GOTO(path);
     CHECK_POINTER_GOTO(format);
     CHFL_ERROR_GOTO(
-        trajectory = shared_allocator::make_shared<Trajectory>(std::string(path), (char)mode, format);
+        trajectory = shared_allocator::make_shared<Trajectory>(path, mode, format);
     )
     return trajectory;
 error:
@@ -135,7 +135,7 @@ extern "C" chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const trajectory,
         *nsteps = trajectory->nsteps();
     )
 }
-#include <iostream>
+
 extern "C" chfl_status chfl_trajectory_memory_block(const CHFL_TRAJECTORY* trajectory, const char** data) {
     CHECK_POINTER(trajectory);
     CHECK_POINTER(data);

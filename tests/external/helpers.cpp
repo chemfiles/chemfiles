@@ -6,8 +6,6 @@
 #include "helpers.hpp"
 #include "chemfiles.hpp"
 
-#include "chemfiles/files/MemoryBuffer.hpp" // Needed as 'new' is redefined in this file
-
 #include <cstdlib>
 #include <new>
 

@@ -29,7 +29,6 @@ WHITELIST = [
     "chemfiles/config.h",
     "chemfiles/sorted_set.hpp",
     "chemfiles/unreachable.hpp",
-    "chemfiles/files/MemoryBuffer.hpp",
     # chemfiles main headers
     "chemfiles/misc.hpp",
     "chemfiles/types.hpp",
