@@ -238,13 +238,13 @@ public:
         return path_;
     }
 
-    /// Get the written internal file that is written to in memory
+    /// Get the memory that is written to in memory
     ///
     /// If the trajectory was not created for writing to memory, this will
     /// return `nullopt`.
     ///
-    /// @example{trajectory/internal_file.cpp}
-    optional<std::string> internal_file() const;
+    /// @example{trajectory/memory_block.cpp}
+    optional<const char*> memory_block() const;
 
 private:
 

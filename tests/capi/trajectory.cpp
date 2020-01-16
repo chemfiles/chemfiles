@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <cstring> // for strcmp
 
 #include "catch.hpp"
 #include "helpers.hpp"
@@ -14,6 +15,9 @@ TEST_CASE("Read trajectory") {
     SECTION("Constructors errors") {
         CHECK(chfl_trajectory_open("not there", 'r') == nullptr);
         CHECK(chfl_trajectory_with_format("not there", 'r', "") == nullptr);
+
+        // Not technically constructors, but close enough
+        CHECK(chfl_trajectory_mem_reader("not there", 5, "") == nullptr);
     }
 
     SECTION("Path") {
@@ -49,6 +53,22 @@ TEST_CASE("Read trajectory") {
         uint64_t natoms = 0;
         CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
         CHECK(natoms == 125);
+
+        chfl_free(frame);
+        chfl_trajectory_close(trajectory);
+    }
+
+    SECTION("Open memory for reading") {
+        CHFL_TRAJECTORY* trajectory = chfl_trajectory_mem_reader("c1ccccc1", 9, "SMI");
+        CHFL_FRAME* frame = chfl_frame();
+        REQUIRE(trajectory);
+        REQUIRE(frame);
+
+        CHECK_STATUS(chfl_trajectory_read(trajectory, frame));
+
+        uint64_t natoms = 0;
+        CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));
+        CHECK(natoms == 6);
 
         chfl_free(frame);
         chfl_trajectory_close(trajectory);
@@ -260,6 +280,40 @@ TEST_CASE("Write trajectory") {
     file.close();
 
     CHECK(content.str() == EXPECTED_CONTENT);
+}
+
+TEST_CASE("Write trajectory to memory") {
+    // Make sure this fails
+    CHECK(chfl_trajectory_mem_writer("") == nullptr);
+
+    const char* EXPECTED_CONTENT =
+    "4\n"
+    "Written by the chemfiles library\n"
+    "He 1 2 3\n"
+    "He 1 2 3\n"
+    "He 1 2 3\n"
+    "He 1 2 3\n";
+
+    CHFL_TRAJECTORY* trajectory = chfl_trajectory_mem_writer("XYZ");
+    REQUIRE(trajectory);
+
+    CHFL_FRAME* frame = testing_frame();
+    REQUIRE(frame);
+
+    CHECK_STATUS(chfl_trajectory_write(trajectory, frame));
+
+    const char* result = nullptr;
+    CHECK_STATUS(chfl_trajectory_memory_block(trajectory, &result));
+    CHECK(std::strcmp(EXPECTED_CONTENT, result) == 0);
+
+    chfl_free(frame);
+    chfl_trajectory_close(trajectory);
+
+    // Make sure that improper trajectories don't succeed with internal file
+    CHFL_TRAJECTORY* trajectory2 = chfl_trajectory_open("data/xyz/trajectory.xyz", 'r');
+    REQUIRE(trajectory2);
+    CHECK(chfl_trajectory_memory_block(trajectory2, &result) != CHFL_SUCCESS);
+    chfl_free(trajectory2);
 }
 
 static CHFL_FRAME* testing_frame() {

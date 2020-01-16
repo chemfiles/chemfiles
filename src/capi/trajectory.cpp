@@ -11,6 +11,7 @@
 
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Trajectory.hpp"
+#include "chemfiles/files/MemoryFile.hpp"
 
 using namespace chemfiles;
 
@@ -31,7 +32,36 @@ extern "C" CHFL_TRAJECTORY* chfl_trajectory_with_format(const char* path, char m
     CHECK_POINTER_GOTO(path);
     CHECK_POINTER_GOTO(format);
     CHFL_ERROR_GOTO(
-        trajectory = shared_allocator::make_shared<Trajectory>(path, mode, format);
+        trajectory = shared_allocator::make_shared<Trajectory>(std::string(path), (char)mode, format);
+    )
+    return trajectory;
+error:
+    chfl_trajectory_close(trajectory);
+    return nullptr;
+}
+
+extern "C" CHFL_TRAJECTORY* chfl_trajectory_mem_reader(const char* memory, uint64_t size, const char* format) {
+    CHFL_TRAJECTORY* trajectory = nullptr;
+    CHECK_POINTER_GOTO(memory);
+    CHECK_POINTER_GOTO(format);
+    CHFL_ERROR_GOTO(
+        trajectory = shared_allocator::make_shared<Trajectory>(
+            std::move(Trajectory::memory_reader(memory, checked_cast(size), format))
+        );
+    )
+    return trajectory;
+error:
+    chfl_trajectory_close(trajectory);
+    return nullptr;
+}
+
+extern "C" CHFL_TRAJECTORY* chfl_trajectory_mem_writer(const char* format) {
+    CHFL_TRAJECTORY* trajectory = nullptr;
+    CHECK_POINTER_GOTO(format);
+    CHFL_ERROR_GOTO(
+        trajectory = shared_allocator::make_shared<Trajectory>(
+            std::move(Trajectory::memory_writer(format))
+        );
     )
     return trajectory;
 error:
@@ -103,6 +133,18 @@ extern "C" chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const trajectory,
     CHECK_POINTER(nsteps);
     CHFL_ERROR_CATCH(
         *nsteps = trajectory->nsteps();
+    )
+}
+#include <iostream>
+extern "C" chfl_status chfl_trajectory_memory_block(const CHFL_TRAJECTORY* trajectory, const char** data) {
+    CHECK_POINTER(trajectory);
+    CHECK_POINTER(data);
+    CHFL_ERROR_CATCH(
+        try {
+            *data = trajectory->memory_block().value();
+        } catch (const bad_optional_access&) {
+            throw Error("trajectory not opened to write to a memory block");
+        }
     )
 }
 

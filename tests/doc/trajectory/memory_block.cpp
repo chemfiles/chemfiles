@@ -17,11 +17,11 @@ TEST_CASE() {
 
     trajectory_memory.write(ethane);
 
-    CHECK(*(trajectory_memory.internal_file()) == "CC\n");
+    CHECK(*(trajectory_memory.memory_block()) == std::string("CC\n"));
 
     // This function will return nullopt if opened with a regular file
     auto trajectory_file = Trajectory("ethane.smi", 'w');
-    CHECK(trajectory_file.internal_file() == nullopt);
+    CHECK(trajectory_file.memory_block() == nullopt);
 
     // [example]
 }

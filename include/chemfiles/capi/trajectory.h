@@ -44,6 +44,34 @@ CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_with_format(
     const char* path, char mode, const char* format
 );
 
+/// Read a block of memory as though it were a formatted file
+///
+/// The `format` parameter is required and may contain a compression method.
+///
+/// The caller of this function should free the allocated memory using
+/// `chfl_trajectory_close`.
+///
+/// @example{capi/chfl_trajectory/mem_reader.c}
+/// @return A pointer to the trajectory, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
+CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_mem_reader(
+    const char* memory, uint64_t size, const char* format
+);
+
+/// Write to a block of memory as though it were a formatted file
+///
+/// The `format` parameter is required.
+///
+/// The caller of this function should free the allocated memory using
+/// `chfl_trajectory_close`.
+///
+/// @example{capi/chfl_trajectory/mem_writer.c}
+/// @return A pointer to the trajectory, or NULL in case of error.
+///         You can use `chfl_last_error` to learn about the error.
+CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_mem_writer(
+    const char* format
+);
+
 /// Get the path used to open the `trajectory` in `path`.
 ///
 /// The `path` will point to memory allocated inside the `trajectory`, and it is
@@ -133,6 +161,17 @@ CHFL_EXPORT chfl_status chfl_trajectory_set_cell(
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_trajectory_nsteps(
     CHFL_TRAJECTORY* trajectory, uint64_t* nsteps
+);
+
+/// Obtain the memory block written to by the `trajectory`. The user is **not**
+/// responsible for freeing `data` and this will be done automatically when the
+/// trajectory is closed. It is guaranteed that `data` is null terminated.
+///
+/// @example{capi/chfl_trajectory/memory_block.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_trajectory_memory_block(
+    const CHFL_TRAJECTORY* trajectory, const char** data
 );
 
 /// Close a trajectory file, and free the associated memory.
