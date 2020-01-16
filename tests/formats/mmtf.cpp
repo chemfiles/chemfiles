@@ -371,3 +371,20 @@ TEST_CASE("Read memory in MMTF format") {
         CHECK(approx_eq(positions[1401], Vector3D(5.601, -22.571, -16.631), 1e-3));
     }
 }
+
+TEST_CASE("Error checking") {
+    CHECK_THROWS_WITH(
+        Trajectory("data/mmtf/1J8K.mmtf", 'a'),
+        "append mode ('a') is not supported for the MMTF format"
+    );
+
+    CHECK_THROWS_WITH(
+        Trajectory::memory_reader("JUNK", 5, "MMTF"),
+        "issue with decoding MMTF file from memory: 'Expected msgpack type to be MAP'"
+    );
+
+    CHECK_THROWS_WITH(
+        Trajectory::memory_writer("MMTF"),
+        "the MMTF format cannot write to memory"
+    );
+}

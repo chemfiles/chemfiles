@@ -49,10 +49,7 @@ MMTFFormat::MMTFFormat(std::string path, File::Mode mode, File::Compression comp
     if (mode == File::READ) {
         auto file = TextFile(std::move(path), mode, compression);
         auto buffer = file.readall();
-        mmtf::decodeFromBuffer(structure_, buffer.data(), buffer.size());
-        if (!structure_.hasConsistentData()) {
-            throw format_error("issue with: '{}', please ensure it is valid MMTF file", path);
-        }
+        decode(buffer.data(), buffer.size(), file.path());
     } else if (mode == File::WRITE) {
         filename_ = std::move(path); // We really don't need to do anything, yet
     } else if (mode == File::APPEND) {
@@ -68,13 +65,25 @@ MMTFFormat::MMTFFormat(MemoryBuffer& memory, File::Mode mode, File::Compression 
 
     if (compression != File::DEFAULT) {
         auto decompressed = MemoryFileReader::wrap(memory.data(), memory.size(), compression);
-        mmtf::decodeFromBuffer(structure_, decompressed.data(), decompressed.size());
-    } else { // Just in case the user specified MMTF without a proper extension
-        mmtf::decodeFromBuffer(structure_, memory.data(), memory.size());
+        decode(decompressed.data(), decompressed.size(), "decompressed from memory");
+    } else {
+        decode(memory.data(), memory.size(), "from memory");
     }
 
     if (!structure_.hasConsistentData()) {
         throw format_error("issue with data in memory, please ensure it is valid MMTF");
+    }
+}
+
+void MMTFFormat::decode(const char* data, size_t size, const std::string& source) {
+    try {
+        mmtf::decodeFromBuffer(structure_, data, size);
+    } catch (const mmtf::DecodeError& e) { // rethrow as a chemfiles error
+        throw format_error("issue with decoding MMTF file {}: '{}'", source, e.what());
+    }
+
+    if (!structure_.hasConsistentData()) {
+        throw format_error("issue with: '{}', please ensure it is valid MMTF file", source);
     }
 }
 

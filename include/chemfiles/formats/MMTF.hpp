@@ -34,6 +34,10 @@ public:
     size_t nsteps() override;
 
 private:
+
+    /// Perform the MMTF decoding steps
+    void decode(const char* data, size_t size, const std::string& source);
+
     /// add a single residue to the structure_, using the data from the frame
     void add_residue_to_structure(const Frame& frame, const Residue& residue);
 
