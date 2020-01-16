@@ -127,6 +127,11 @@ NcFile::NcFile(std::string path, File::Mode mode)
     nc::check(status, "could not open the file '{}'", this->path());
 }
 
+NcFile::NcFile(MemoryBuffer& memory, File::Mode mode)
+    : File("", mode, File::DEFAULT) {
+    throw file_error("opening memory for NetCDF files is not supported (yet)");
+}
+
 NcFile::~NcFile() {
     auto status = nc_close(file_id_);
     assert(status == NC_NOERR);

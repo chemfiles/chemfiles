@@ -16,6 +16,7 @@ using namespace chemfiles;
 #define new_format(_name_)                                                     \
     struct _name_ final: public Format {                                       \
         _name_(const std::string&, File::Mode, File::Compression) {}           \
+        _name_(MemoryBuffer&, File::Mode, File::Compression) {}                \
         size_t nsteps() override {return 42;}                                  \
     }
 
@@ -31,6 +32,9 @@ new_format(SameExtensionFormat);
 struct UnimplementedTextFormat final: public TextFormat {
     UnimplementedTextFormat(const std::string& path, File::Mode mode, File::Compression compression):
         TextFormat(std::move(path), mode, compression) {}
+
+    UnimplementedTextFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression) :
+        TextFormat(memory, mode, compression) {}
 
     optional<uint64_t> forward() override {
         static int pos = -1;

@@ -51,6 +51,11 @@ TRRFormat::TRRFormat(std::string path, File::Mode mode, File::Compression compre
     }
 }
 
+TRRFormat::TRRFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression)
+    : file_(XDRFile::TRR, memory, mode) {
+    unreachable();
+}
+
 size_t TRRFormat::nsteps() { return static_cast<size_t>(file_.nframes()); }
 
 void TRRFormat::read_step(size_t step, Frame& frame) {

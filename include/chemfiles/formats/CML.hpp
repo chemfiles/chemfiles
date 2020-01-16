@@ -20,7 +20,16 @@ class Frame;
 /// [CML]: http://xml-cml.org/
 class CMLFormat final: public Format {
 public:
-    CMLFormat(std::string path, File::Mode mode, File::Compression compression);
+    CMLFormat(std::string path, File::Mode mode, File::Compression compression):
+        file_(std::move(path), mode, compression) {
+        init_();
+    }
+
+    CMLFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression):
+        file_(memory, mode, compression) {
+        init_();
+    }
+
     ~CMLFormat() override;
 
     void read_step(size_t step, Frame& frame) override;
@@ -28,6 +37,9 @@ public:
     void write(const Frame& frame) override;
     size_t nsteps() override;
 private:
+    /// Initialize the document and root objects
+    void init_();
+
     /// Read the atoms from `atoms` into `frame`
     void read_atoms(Frame& frame, const pugi::xml_node& atoms);
     /// Read the bonds from `bonds` into `frame`

@@ -17,10 +17,13 @@
 namespace chemfiles {
 
 using format_creator_t = std::function<std::unique_ptr<Format>(std::string path, File::Mode mode, File::Compression compression)>;
+using memory_stream_t = std::function<std::unique_ptr<Format>(MemoryBuffer& memory, File::Mode mode, File::Compression compression)>;
 
 struct RegisteredFormat {
     FormatInfo info;
     format_creator_t creator;
+    memory_stream_t memory_stream_creator;
+
 };
 
 /// This class allow to register Format with names and file extensions
@@ -38,6 +41,13 @@ public:
     /// @throws FormatError if the format can not be found
     format_creator_t name(const std::string& name);
 
+    /// Get a `memory_stream_t` from a format name.
+    ///
+    /// @param name the format name
+    /// @throws FormatError if the format can not be found or does not support
+    ///                     reading from memory
+    memory_stream_t memory_stream(const std::string& name);
+
     /// Get a `format_creator_t` from a format extention.
     ///
     /// @param extension the format extention
@@ -51,16 +61,21 @@ public:
     template<class Format>
     void add_format() {
         auto info = format_information<Format>();
-        register_format(info, [](const std::string& path, File::Mode mode, File::Compression compression) {
-            return std::unique_ptr<Format>(new Format(path, mode, compression));  // NOLINT no make_unique in C++11
-        });
+        register_format(info,
+            [](const std::string& path, File::Mode mode, File::Compression compression) {
+                return std::unique_ptr<Format>(new Format(path, mode, compression));  // NOLINT no make_unique in C++11
+            },
+            [](MemoryBuffer& memory, File::Mode mode, File::Compression compression) {
+                return std::unique_ptr<Format>(new Format(memory, mode, compression));  // NOLINT no make_unique in C++11
+            }
+        );
     }
 
     /// Get the metadata for all registered formats
     std::vector<FormatInfo> formats();
 
 private:
-    void register_format(FormatInfo info, format_creator_t creator);
+    void register_format(FormatInfo info, format_creator_t creator, memory_stream_t memory_reader);
 
     /// Trajectory map associating format descriptions and creators
     mutex<std::vector<RegisteredFormat>> formats_;

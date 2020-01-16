@@ -378,4 +378,10 @@ TEST_CASE("Check Errors") {
     CHECK_THROWS_WITH(
         file.write(frame),
         "TRR format does not support varying numbers of atoms: expected 1, but got 2");
+
+    std::vector<char> junk_memory(1024);
+    CHECK_THROWS_WITH(
+        Trajectory::memory_reader(junk_memory.data(), junk_memory.size(), "TRR"),
+        "opening memory for XDR files (such as TRR and XTC) is not supported"
+    );
 }

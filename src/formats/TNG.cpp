@@ -104,6 +104,10 @@ TNGFormat::TNGFormat(std::string path, File::Mode mode, File::Compression compre
     free(buffer);
 }
 
+TNGFormat::TNGFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression): tng_(memory, mode) {
+    unreachable();
+}
+
 size_t TNGFormat::nsteps() {
     return tng_steps_.size();
 }

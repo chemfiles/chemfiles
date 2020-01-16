@@ -90,3 +90,58 @@ void GzFile::seek(uint64_t position) {
         throw file_error("error while seeking gziped file: {}", message);
     }
 }
+
+
+// Taken from https://www.cocoanetics.com/2012/02/decompressing-files-into-memory/
+std::vector<char> chemfiles::gzinflate_in_place(char* src, size_t size) {
+    size_t dataLength = size;
+    size_t halfLength = dataLength / 2;
+
+    bool done = false;
+    int status;
+
+    z_stream strm;
+    strm.next_in = reinterpret_cast<unsigned char*>(src);
+    strm.avail_in = dataLength;
+    strm.total_out = 0;
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+
+    // inflateInit2 knows how to deal with gzip format
+    status = inflateInit2(&strm, (15+32));
+    if (status != Z_OK) {
+	    throw file_error("error inflating GZ file: '{}'", strm.msg);
+    }
+
+    std::vector<char> dst(20480);
+
+    do {
+	    // extend decompressed if too short
+	    if (strm.total_out >= dst.size()) {
+		    dst.resize(dst.size() + halfLength);
+	    }
+
+	    strm.next_out = reinterpret_cast<unsigned char*>(dst.data() + strm.total_out);
+    	strm.avail_out = dst.size() - strm.total_out;
+
+    	// Inflate another chunk.
+    	status = inflate (&strm, Z_SYNC_FLUSH);
+
+        if (status == Z_STREAM_END) {
+		    done = true;
+        } else if (status != Z_OK) {
+		    inflateEnd(&strm);
+            throw file_error("error inflating GZ file: '{}'", strm.msg);
+	    }
+    } while(!done);
+
+    status = inflateEnd (&strm);
+    if (status != Z_OK || !done) {
+	    throw file_error("error inflating GZ file: '{}'", strm.msg);
+    }
+
+    // set actual length, shrinking the vector is
+    // very efficient in C++11!
+    dst.resize(strm.total_out);
+    return dst;
+}

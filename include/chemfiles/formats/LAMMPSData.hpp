@@ -133,6 +133,7 @@ private:
 class LAMMPSDataFormat final: public TextFormat {
 public:
     LAMMPSDataFormat(std::string path, File::Mode mode, File::Compression compression);
+    LAMMPSDataFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression);
 
     void read_next(Frame& frame) override;
     void write_next(const Frame& frame) override;

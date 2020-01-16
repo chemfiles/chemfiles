@@ -21,6 +21,7 @@ class Frame;
 class TNGFormat final: public Format {
 public:
     TNGFormat(std::string path, File::Mode mode, File::Compression compression);
+    TNGFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;

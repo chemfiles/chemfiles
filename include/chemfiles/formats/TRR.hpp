@@ -19,6 +19,7 @@ class Frame;
 class TRRFormat final : public Format {
   public:
     TRRFormat(std::string path, File::Mode mode, File::Compression compression);
+    TRRFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;

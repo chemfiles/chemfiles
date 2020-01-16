@@ -29,6 +29,9 @@ public:
     PDBFormat(std::string path, File::Mode mode, File::Compression compression):
         TextFormat(std::move(path), mode, compression) {}
 
+    PDBFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression) :
+        TextFormat(memory, mode, compression) {}
+
     ~PDBFormat() override;
 
     void read_next(Frame& frame) override;

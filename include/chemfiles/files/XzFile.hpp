@@ -46,6 +46,8 @@ private:
 };
 
 
+std::vector<char> xzinflate_in_place(char* src, size_t size);
+
 }
 
 #endif

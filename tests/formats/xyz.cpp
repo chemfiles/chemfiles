@@ -120,6 +120,56 @@ F 4 5 6
     CHECK(content == expected_content);
 }
 
+TEST_CASE("Read and write files in memory") {
+    SECTION("Reading from memory") {
+        std::ifstream checking("data/xyz/topology.xyz");
+        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
+            std::istreambuf_iterator<char>());
+
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "XYZ");
+        CHECK(file.nsteps() == 1);
+
+        auto frame = file.read();
+    }
+
+    SECTION("Writing to memory") {
+        const auto expected_content =
+R"(4
+Written by the chemfiles library
+A 1 2 3
+B 1 2 3
+C 1 2 3
+D 1 2 3
+6
+Written by the chemfiles library
+A 1 2 3
+B 1 2 3
+C 1 2 3
+D 1 2 3
+E 4 5 6
+F 4 5 6
+)";
+
+        auto frame = Frame();
+        frame.add_atom(Atom("A", "O"), { 1, 2, 3 });
+        frame.add_atom(Atom("B"), { 1, 2, 3 });
+        frame.add_atom(Atom("C"), { 1, 2, 3 });
+        frame.add_atom(Atom("D"), { 1, 2, 3 });
+
+        auto file = Trajectory::memory_writer("XYZ");
+        file.write(frame);
+
+        frame.add_atom(Atom("E"), { 4, 5, 6 });
+        frame.add_atom(Atom("F"), { 4, 5, 6 });
+
+        file.write(frame);
+        file.close();
+
+        auto result = *(file.internal_file());
+        CHECK(result == expected_content);
+    }
+}
+
 TEST_CASE("Round-trip read/write") {
     auto tmpfile = NamedTempPath(".xyz");
     auto content =
@@ -141,5 +191,5 @@ H 0.332 8.726 10.882
     std::string actual((std::istreambuf_iterator<char>(checking)),
                         std::istreambuf_iterator<char>());
     CHECK(content == actual);
-
 }
+

@@ -16,6 +16,7 @@
 #include "chemfiles/files/XzFile.hpp"
 #include "chemfiles/files/Bz2File.hpp"
 #include "chemfiles/files/PlainFile.hpp"
+#include "chemfiles/files/MemoryFile.hpp"
 
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/string_view.hpp"
@@ -45,6 +46,35 @@ TextFile::TextFile(std::string path, File::Mode mode, File::Compression compress
         break;
     default:
         unreachable();
+    }
+}
+
+TextFile::TextFile(MemoryBuffer& memory, File::Mode mode, File::Compression compression):
+    File("", mode, File::Compression::DEFAULT),
+    file_(nullptr),
+    buffer_(8192, 0),
+    line_start_(buffer_.data()),
+    end_(buffer_.data() + buffer_.size())
+{
+    if (mode == File::APPEND) {
+        throw file_error("cannot append 'a' to a memory file");
+    }
+
+    if (compression != File::DEFAULT) {
+        if (mode != File::READ) {
+            throw file_error("cannot write a compressed memory file");
+        }
+
+        auto decompressed = MemoryFileReader::wrap(memory.data(), memory.size(), compression);
+        memory.reset(std::move(decompressed));
+        file_.reset(new MemoryFileReader(memory));
+        return;
+    }
+
+    if (mode == File::READ) {
+        file_.reset(new MemoryFileReader(memory));
+    } else {
+        file_.reset(new MemoryFileWriter(memory));
     }
 }
 

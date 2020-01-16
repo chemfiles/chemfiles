@@ -43,14 +43,12 @@ template<> FormatInfo chemfiles::format_information<mmCIFFormat>() {
 /// CIF files store which digits are insignificant, we need to remove this
 static double cif_to_double(std::string line);
 
-mmCIFFormat::mmCIFFormat(std::string path, File::Mode mode, File::Compression compression)
-  : file_(std::move(path), mode, compression), models_(0), atoms_(0) {
-
-    if (mode == File::WRITE) {
+void mmCIFFormat::init_() {
+    if (file_.mode() == File::WRITE) {
         return;
     }
 
-    if (mode == File::APPEND) {
+    if (file_.mode() == File::APPEND) {
         throw file_error("cannot open mmCIF files in append ('a') mode");
     }
 

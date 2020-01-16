@@ -26,6 +26,9 @@ public:
     MOL2Format(std::string path, File::Mode mode, File::Compression compression):
         TextFormat(std::move(path), mode, compression) {}
 
+    MOL2Format(MemoryBuffer& memory, File::Mode mode, File::Compression compression) :
+        TextFormat(memory, mode, compression) {}
+
     void read_next(Frame& frame) override;
     void write_next(const Frame& frame) override;
     optional<uint64_t> forward() override;

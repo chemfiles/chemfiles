@@ -27,6 +27,7 @@ public:
     };
 
     XDRFile(Variants variant, std::string path, File::Mode mode);
+    XDRFile(Variants variant, MemoryBuffer& memory, File::Mode mode);
     ~XDRFile() override;
 
     XDRFile(XDRFile&& other) noexcept : File("", File::READ, File::DEFAULT) {

@@ -82,6 +82,11 @@ AmberNetCDFFormat::AmberNetCDFFormat(std::string path, File::Mode mode, File::Co
     }
 }
 
+AmberNetCDFFormat::AmberNetCDFFormat(MemoryBuffer& memory, File::Mode mode, File::Compression)
+    : file_(memory, mode), step_(0), validated_(false) {
+    unreachable();
+}
+
 size_t AmberNetCDFFormat::nsteps() {
     return file_.dimension("frame");
 }

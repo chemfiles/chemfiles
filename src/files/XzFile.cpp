@@ -174,3 +174,55 @@ void XzFile::compress_and_write(lzma_action action) {
 
     } while (stream_.avail_in != 0 || (action == LZMA_FINISH && status != LZMA_STREAM_END));
 }
+
+std::vector<char> chemfiles::xzinflate_in_place(char* src, size_t size) {
+    size_t dataLength = size;
+    size_t halfLength = dataLength / 2;
+
+    bool done = false;
+
+    lzma_stream strm = LZMA_STREAM_INIT;
+    strm.next_in = reinterpret_cast<unsigned char*>(src);
+    strm.avail_in = dataLength;
+    strm.total_out = 0;
+
+    lzma_ret status = lzma_stream_decoder(&strm, UINT64_MAX, 0);
+
+    if (status != LZMA_OK) {
+	    check(status);
+    }
+
+    lzma_action action = LZMA_RUN;
+
+    std::vector<char> dst(20480);
+
+    do {
+
+	    // extend decompressed if too short
+	    if (strm.total_out >= dst.size()) {
+		    dst.resize(dst.size() + halfLength);
+	    }
+
+	    strm.next_out = reinterpret_cast<unsigned char*>(dst.data() + strm.total_out);
+    	strm.avail_out = dst.size() - strm.total_out;
+
+        status = lzma_code(&strm, action);
+
+        if (status == LZMA_STREAM_END) {
+		    done = true;
+        } else if (status != LZMA_OK) {
+		    lzma_end(&strm);
+            check(status);
+	    }
+    } while(!done);
+
+    lzma_end (&strm);
+    if (!done) {
+	    check(status);
+    }
+
+    // set actual length, shrinking the vector is
+    // very efficient in C++11!
+    dst.resize(strm.total_out);
+    return dst;
+}

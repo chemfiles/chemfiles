@@ -52,9 +52,7 @@ private:
     TextFile& file_;
 };
 
-CMLFormat::CMLFormat(std::string path, File::Mode mode, File::Compression compression)
-    : file_(std::move(path), mode, compression)
-{
+void CMLFormat::init_() {
 
     if (file_.mode() == File::WRITE) {
         root_ = document_.append_child("cml");

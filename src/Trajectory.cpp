@@ -16,6 +16,7 @@
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/FormatFactory.hpp"
 #include "chemfiles/Configuration.hpp"
+#include "chemfiles/files/MemoryFile.hpp"
 
 #include "chemfiles/utils.hpp"
 #include "chemfiles/error_fmt.hpp"
@@ -117,6 +118,43 @@ Trajectory::Trajectory(std::string path, char mode, const std::string& format)
 
     format_ = format_creator(path_, char_to_file_mode(mode), info.compression);
 
+    if (mode == 'r' || mode == 'a') {
+        nsteps_ = format_->nsteps();
+    }
+}
+
+Trajectory Trajectory::memory_reader(const char* data, size_t size, const std::string& format) {
+
+    auto info = file_open_info::parse("", format);
+    
+    if (info.format == "") {
+        throw format_error("format name '{}' is invalid", format);
+    }
+
+    auto memory_creator = FormatFactory::get().memory_stream(info.format);
+    auto buffer = std::unique_ptr<MemoryBuffer>(new MemoryBuffer(data, size));
+    auto format_ = memory_creator(*buffer, File::READ, info.compression);
+
+    return Trajectory('r', std::move(format_), std::move(buffer));
+}
+
+Trajectory Trajectory::memory_writer(const std::string& format) {    
+    auto info = file_open_info::parse("", format);
+    
+    if (info.format == "") {
+        throw format_error("format name '{}' is invalid", format);
+    }
+
+    auto memory_creator = FormatFactory::get().memory_stream(info.format);
+    auto buffer = std::unique_ptr<MemoryBuffer>(new MemoryBuffer(20480));
+
+    auto format_ = memory_creator(*buffer, File::WRITE, info.compression);
+
+    return Trajectory('w', std::move(format_), std::move(buffer));
+}
+
+Trajectory::Trajectory(char mode, std::unique_ptr<Format> format, std::unique_ptr<MemoryBuffer> buffer)
+    : mode_(mode), format_(std::move(format)), buffer_(std::move(buffer)) {
     if (mode == 'r' || mode == 'a') {
         nsteps_ = format_->nsteps();
     }
@@ -260,4 +298,13 @@ void Trajectory::close() {
     check_opened();
     // delete the format and set the pointer to nullptr
     format_.reset();
+}
+
+optional<std::string> Trajectory::internal_file() const {
+    if (buffer_ == nullptr || mode_ == File::READ) {
+        return nullopt;
+    }
+
+    // The buffer is null terminated, so std::string should find it properly
+    return std::string(buffer_->data());
 }

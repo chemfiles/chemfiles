@@ -195,3 +195,14 @@ TEST_CASE("Append CML file") {
 
     CHECK(EXPECTED_CONTENT == content);
 }
+
+TEST_CASE("Read and write files in memory") {
+    SECTION("Reading from memory") {
+        std::ifstream checking("data/cml/drugs.cml");
+        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
+            std::istreambuf_iterator<char>());
+
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "CML");
+        CHECK(file.nsteps() == 4);
+    }
+}

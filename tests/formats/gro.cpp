@@ -274,3 +274,22 @@ TEST_CASE("GRO files with big values") {
         }
     }
 }
+
+TEST_CASE("Read and write files in memory") {
+    SECTION("Reading from memory") {
+        std::ifstream checking("data/gro/ubiquitin.gro");
+        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
+            std::istreambuf_iterator<char>());
+
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "GRO");
+        CHECK(file.nsteps() == 1);
+
+        auto frame = file.read();
+
+        CHECK(frame.size() == 1405);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(24.93, 24.95, 18.87), 1e-2));
+        CHECK(approx_eq(positions[1], Vector3D(25.66, 25.37, 18.33), 1e-2));
+        CHECK(approx_eq(positions[678], Vector3D(27.57, 32.25, 37.53), 1e-2));
+    }
+}

@@ -56,6 +56,7 @@ template <MolfileFormat F>
 class Molfile final: public Format {
 public:
     Molfile(std::string path, File::Mode mode, File::Compression compression);
+    Molfile(MemoryBuffer& memory, File::Mode mode, File::Compression compression);
     ~Molfile() override;
 
     void read(Frame& frame) override;

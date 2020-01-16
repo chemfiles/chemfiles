@@ -48,7 +48,6 @@ TEST_CASE("Read files in NetCDF format") {
     }
 }
 
-
 TEST_CASE("Write files in NetCDF format") {
     auto tmpfile = NamedTempPath(".nc");
 
@@ -70,4 +69,12 @@ TEST_CASE("Write files in NetCDF format") {
     CHECK(approx_eq(positions[1], Vector3D(1, 2, 3), 1e-4));
     CHECK(approx_eq(positions[2], Vector3D(1, 2, 3), 1e-4));
     CHECK(approx_eq(positions[3], Vector3D(1, 2, 3), 1e-4));
+}
+
+TEST_CASE("Check Errors") {
+    std::vector<char> junk_memory(1024);
+    CHECK_THROWS_WITH(
+        Trajectory::memory_reader(junk_memory.data(), junk_memory.size(), "Amber NetCDF"),
+        "opening memory for NetCDF files is not supported (yet)"
+    );
 }

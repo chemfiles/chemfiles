@@ -486,3 +486,33 @@ TEST_CASE("PDB files with big values") {
         }
     }
 }
+
+TEST_CASE("Read and write files in memory") {
+    SECTION("Reading from memory") {
+        std::ifstream checking("data/pdb/water.pdb");
+        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
+            std::istreambuf_iterator<char>());
+
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "PDB");
+        REQUIRE(file.nsteps() == 100);
+
+        Frame frame = file.read();
+
+        REQUIRE(frame.size() == 297);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(0.417, 8.303, 11.737), 1e-3));
+        CHECK(approx_eq(positions[296], Vector3D(6.664, 11.6148, 12.961), 1e-3));
+
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(approx_eq(cell.a(), 15.0, 1e-5));
+
+        file.read(); // Skip a frame
+        frame = file.read();
+
+        REQUIRE(frame.size() == 297);
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(0.299, 8.310, 11.721), 1e-4));
+        CHECK(approx_eq(positions[296], Vector3D(6.798, 11.509, 12.704), 1e-4));
+    }
+}

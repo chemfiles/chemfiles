@@ -22,13 +22,24 @@ class Frame;
 /// [mmCIF]: http://mmcif.wwpdb.org/
 class mmCIFFormat final: public Format {
 public:
-    mmCIFFormat(std::string path, File::Mode mode, File::Compression compression);
+    mmCIFFormat(std::string path, File::Mode mode, File::Compression compression) :
+        file_(std::move(path), mode, compression), models_(0), atoms_(0) {
+        init_();
+    }
+
+    mmCIFFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression) :
+        file_(memory, mode, compression), models_(0), atoms_(0) {
+        init_();
+    }
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;
     void write(const Frame& frame) override;
     size_t nsteps() override;
 private:
+    /// Initialize important variables
+    void init_();
+    /// Underlying file representation
     TextFile file_;
     /// Map of STAR records to their index
     std::map<std::string, size_t> atom_site_map_;

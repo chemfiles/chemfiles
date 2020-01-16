@@ -46,6 +46,10 @@ CSSRFormat::CSSRFormat(std::string path, File::Mode mode, File::Compression comp
     }
 }
 
+CSSRFormat::CSSRFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression)
+    : TextFormat(memory, mode, compression)
+{}
+
 void CSSRFormat::read_next(Frame& frame) {
     if (file_.tellpos() != 0) {
         throw format_error("CSSR format only supports reading one frame");

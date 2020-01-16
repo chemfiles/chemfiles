@@ -27,6 +27,10 @@
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/external/optional.hpp"
 
+#include "chemfiles/files/GzFile.hpp"
+#include "chemfiles/files/XzFile.hpp"
+#include "chemfiles/files/MemoryFile.hpp"
+
 #include "chemfiles/formats/MMTF.hpp"
 
 using namespace chemfiles;
@@ -53,6 +57,24 @@ MMTFFormat::MMTFFormat(std::string path, File::Mode mode, File::Compression comp
         filename_ = std::move(path); // We really don't need to do anything, yet
     } else if (mode == File::APPEND) {
         throw file_error("append mode ('a') is not supported for the MMTF format");
+    }
+}
+
+MMTFFormat::MMTFFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression) {
+
+    if (mode == File::WRITE) {
+        throw format_error("the MMTF format cannot write to memory");
+    }
+
+    if (compression != File::DEFAULT) {
+        auto decompressed = MemoryFileReader::wrap(memory.data(), memory.size(), compression);
+        mmtf::decodeFromBuffer(structure_, decompressed.data(), decompressed.size());
+    } else { // Just in case the user specified MMTF without a proper extension
+        mmtf::decodeFromBuffer(structure_, memory.data(), memory.size());
+    }
+
+    if (!structure_.hasConsistentData()) {
+        throw format_error("issue with data in memory, please ensure it is valid MMTF");
     }
 }
 

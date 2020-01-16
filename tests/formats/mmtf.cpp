@@ -330,3 +330,44 @@ TEST_CASE("Write files in MMTF format") {
         CHECK(frame.topology().bonds().empty());
     }
 }
+
+TEST_CASE("Read memory in MMTF format") {
+    SECTION("Plain MMTF Memory") {
+        std::ifstream checking("data/mmtf/1J8K.mmtf", std::ifstream::binary);
+        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
+                         std::istreambuf_iterator<char>());
+        
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "MMTF");
+        auto frame = file.read_step(13);
+        CHECK(frame.size() == 1402);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
+        CHECK(approx_eq(positions[1401], Vector3D(5.601, -22.571, -16.631), 1e-3));
+    }
+
+    SECTION("GZ MMTF Memory") {
+        std::ifstream checking("data/mmtf/1J8K.mmtf.gz", std::ifstream::binary);
+        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
+                         std::istreambuf_iterator<char>());
+
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "MMTF/GZ");
+        auto frame = file.read_step(13);
+        CHECK(frame.size() == 1402);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
+        CHECK(approx_eq(positions[1401], Vector3D(5.601, -22.571, -16.631), 1e-3));
+    }
+
+    SECTION("XZ MMTF Memory") {
+        std::ifstream checking("data/mmtf/1J8K.mmtf.xz", std::ifstream::binary);
+        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
+                         std::istreambuf_iterator<char>());
+
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "MMTF/XZ");
+        auto frame = file.read_step(13);
+        CHECK(frame.size() == 1402);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
+        CHECK(approx_eq(positions[1401], Vector3D(5.601, -22.571, -16.631), 1e-3));
+    }
+}
