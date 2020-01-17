@@ -50,31 +50,31 @@ TextFile::TextFile(std::string path, File::Mode mode, File::Compression compress
 }
 
 TextFile::TextFile(MemoryBuffer& memory, File::Mode mode, File::Compression compression):
-    File("", mode, File::Compression::DEFAULT),
+    File("<in memory>", mode, File::Compression::DEFAULT),
     file_(nullptr),
     buffer_(8192, 0),
     line_start_(buffer_.data()),
     end_(buffer_.data() + buffer_.size())
 {
     if (mode == File::APPEND) {
-        throw file_error("cannot append 'a' to a memory file");
+        throw file_error("cannot append (mode 'a') to a memory file");
     }
 
     if (compression != File::DEFAULT) {
         if (mode != File::READ) {
-            throw file_error("cannot write a compressed memory file");
+            throw file_error("writing to a compressed memory file is not supported");
         }
 
         auto decompressed = MemoryFileReader::wrap(memory.data(), memory.size(), compression);
         memory.reset(std::move(decompressed));
-        file_.reset(new MemoryFileReader(memory));
+        file_ = std::unique_ptr<TextFileImpl>(new MemoryFileReader(memory));
         return;
     }
 
     if (mode == File::READ) {
-        file_.reset(new MemoryFileReader(memory));
+        file_ = std::unique_ptr<TextFileImpl>(new MemoryFileReader(memory));
     } else {
-        file_.reset(new MemoryFileWriter(memory));
+        file_ = std::unique_ptr<TextFileImpl>(new MemoryFileWriter(memory));
     }
 }
 

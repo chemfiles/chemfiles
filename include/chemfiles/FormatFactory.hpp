@@ -45,7 +45,7 @@ public:
     ///
     /// @param name the format name
     /// @throws FormatError if the format can not be found or does not support
-    ///                     reading from memory
+    ///                     reading / writing from memory
     memory_stream_t memory_stream(const std::string& name);
 
     /// Get a `format_creator_t` from a format extention.

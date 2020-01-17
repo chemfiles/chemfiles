@@ -133,9 +133,9 @@ Trajectory Trajectory::memory_reader(const char* data, size_t size, const std::s
 
     auto memory_creator = FormatFactory::get().memory_stream(info.format);
     auto buffer = std::unique_ptr<MemoryBuffer>(new MemoryBuffer(data, size));
-    auto format_ = memory_creator(*buffer, File::READ, info.compression);
+    auto creator = memory_creator(*buffer, File::READ, info.compression);
 
-    return Trajectory('r', std::move(format_), std::move(buffer));
+    return Trajectory('r', std::move(creator), std::move(buffer));
 }
 
 Trajectory Trajectory::memory_writer(const std::string& format) {    

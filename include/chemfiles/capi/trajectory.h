@@ -46,6 +46,8 @@ CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_with_format(
 
 /// Read a block of memory as though it were a formatted file
 ///
+/// The start of the memory block used to store the file is given using the
+/// `data` argument and the size of the block is given by `size`.
 /// The `format` parameter is required and may contain a compression method.
 ///
 /// The caller of this function should free the allocated memory using
@@ -60,7 +62,8 @@ CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_mem_reader(
 
 /// Write to a block of memory as though it were a formatted file
 ///
-/// The `format` parameter is required.
+/// The `format` parameter is required. To retreive the memory written to by
+/// the `CHFL_TRAJECTORY`, use the function `chfl_trajectory_memory_block`.
 ///
 /// The caller of this function should free the allocated memory using
 /// `chfl_trajectory_close`.

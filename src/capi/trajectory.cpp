@@ -46,7 +46,7 @@ extern "C" CHFL_TRAJECTORY* chfl_trajectory_mem_reader(const char* memory, uint6
     CHECK_POINTER_GOTO(format);
     CHFL_ERROR_GOTO(
         trajectory = shared_allocator::make_shared<Trajectory>(
-            std::move(Trajectory::memory_reader(memory, checked_cast(size), format))
+            Trajectory::memory_reader(memory, checked_cast(size), format)
         );
     )
     return trajectory;
@@ -60,7 +60,7 @@ extern "C" CHFL_TRAJECTORY* chfl_trajectory_mem_writer(const char* format) {
     CHECK_POINTER_GOTO(format);
     CHFL_ERROR_GOTO(
         trajectory = shared_allocator::make_shared<Trajectory>(
-            std::move(Trajectory::memory_writer(format))
+            Trajectory::memory_writer(format)
         );
     )
     return trajectory;
@@ -140,11 +140,11 @@ extern "C" chfl_status chfl_trajectory_memory_block(const CHFL_TRAJECTORY* traje
     CHECK_POINTER(trajectory);
     CHECK_POINTER(data);
     CHFL_ERROR_CATCH(
-        try {
-            *data = trajectory->memory_block().value();
-        } catch (const bad_optional_access&) {
+        auto block = trajectory->memory_block();
+        if (!block) {
             throw Error("trajectory not opened to write to a memory block");
         }
+        *data = trajectory->memory_block().value();
     )
 }
 

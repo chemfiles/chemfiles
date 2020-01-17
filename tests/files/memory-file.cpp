@@ -100,7 +100,7 @@ TEST_CASE("Reading from files in memory") {
         auto buffer = MemoryBuffer("JUNK", 5);
         CHECK_THROWS_WITH(
             TextFile(buffer, File::READ, File::BZIP2),
-            "unsupported decompression format for in memory files"
+            "BZip2 is not supported for reading in-memory files"
         );
     }
 
@@ -156,7 +156,7 @@ TEST_CASE("Write to files in memory") {
         MemoryBuffer buffer;
         CHECK_THROWS_WITH(
             TextFile(buffer, File::WRITE, File::GZIP),
-            "cannot write a compressed memory file"
+            "writing to a compressed memory file is not supported"
         );
     }
 
@@ -165,7 +165,7 @@ TEST_CASE("Write to files in memory") {
         MemoryBuffer buffer;
         CHECK_THROWS_WITH(
             TextFile(buffer, File::APPEND, File::DEFAULT),
-            "cannot append 'a' to a memory file"
+            "cannot append (mode 'a') to a memory file"
         );
     }
 }

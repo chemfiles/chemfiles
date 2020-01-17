@@ -89,7 +89,10 @@ public:
 
     /// Write to a block of memory as though it were a formatted file
     ///
-    /// The `format` parameter should be a string formatted as `"<format>"`.
+    /// The `format` parameter should be a string formatted as `"<format>"`. To
+    /// retreive the memory written to by the returned `Trajectory` object, make
+    /// a call to the `memory_block` function.
+    ///
     /// Writing to compressed memory is not supported at this time.
     ///
     /// @example{trajectory/memory_writer.cpp}

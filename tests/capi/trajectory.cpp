@@ -3,7 +3,6 @@
 
 #include <fstream>
 #include <sstream>
-#include <cstring> // for strcmp
 
 #include "catch.hpp"
 #include "helpers.hpp"
@@ -304,7 +303,7 @@ TEST_CASE("Write trajectory to memory") {
 
     const char* result = nullptr;
     CHECK_STATUS(chfl_trajectory_memory_block(trajectory, &result));
-    CHECK(std::strcmp(EXPECTED_CONTENT, result) == 0);
+    CHECK(std::string(result) == EXPECTED_CONTENT);
 
     chfl_free(frame);
     chfl_trajectory_close(trajectory);

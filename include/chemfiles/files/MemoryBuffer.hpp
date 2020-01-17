@@ -8,6 +8,9 @@
 
 namespace chemfiles {
 
+/// A class for handling memory passed directly instead of through a file
+/// handle. Unlike a `std::vector`, it does not assume ownership of the data
+/// when initialized through a pointer and size.
 class MemoryBuffer final {
 public:
 

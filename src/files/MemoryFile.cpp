@@ -29,8 +29,10 @@ std::vector<char> MemoryFileReader::wrap(const char* src, size_t source, File::C
         return gzinflate_in_place(const_cast<char*>(src), source);
     case File::LZMA:
         return xzinflate_in_place(const_cast<char*>(src), source);
+    case File::BZIP2:
+        throw file_error("BZip2 is not supported for reading in-memory files");
     default:
-        throw file_error("unsupported decompression format for in memory files");
+        throw file_error("unsupported decompression format for in-memory files");
     }
 
     unreachable();

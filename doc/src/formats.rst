@@ -96,11 +96,12 @@ specify which format to use.
 .. |yes| replace:: :green:`✓`
 .. |no| replace:: :red:`✗`
 
-Additionally, some formats support reading and writing to a memory block. At
-this time, all text based files (excluding those backed by the Molfiles plugin)
-support both reading and writing to a memory block. The MMTF format supports
-reading from a memory block, but does not support writing. It is possible to
-read a compressed GZ or XZ file from a memory block.
+Additionally, some formats support reading and writing directly to memory,
+without going through a file. At this time, all text based files (excluding
+those backed by the Molfiles plugin) support both reading and writing directly
+to memory. The MMTF format supports reading from a memory block, but does not
+support writing. It is also possible to read a compressed GZ or XZ file directly
+to memory block, but writing compressed files is not supported.
 
 Asking for a new format
 -----------------------

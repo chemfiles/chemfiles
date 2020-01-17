@@ -27,7 +27,7 @@ class MemoryFileReader final: public TextFileImpl {
 
 public:
     /// Open `memory` as though it were a file in mode `mode`. No copy of `memory` is
-    /// made and the original object not be freed until this object is destroyed
+    /// made and the original object **MUST** not be freed until this object is destroyed
     MemoryFileReader(const MemoryBuffer& memory)
         : TextFileImpl(""), buffer_(memory), data_(&buffer_)
     {}
