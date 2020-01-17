@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+## 0.9.3 (17 Jan 2020)
+
+* Fix a bug in the PDB format where no atomic name/type was read from short
+  ATOM/HETATM records.
+
 ## 0.9.2 (18 Dec 2019)
 
 * When compiling chemfiles as a shared library, the dependencies symbols are
