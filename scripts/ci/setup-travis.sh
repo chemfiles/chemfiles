@@ -39,16 +39,18 @@ if [[ "$EMSCRIPTEN" == "ON" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_BUILD_TYPE=release -DCHFL_BUILD_DOCTESTS=OFF"
     export CMAKE_BUILD_TYPE="Release"
 
-    # Install a modern cmake
-    cd $HOME
-    wget https://cmake.org/files/v3.9/cmake-3.9.3-Linux-x86_64.tar.gz
-    tar xf cmake-3.9.3-Linux-x86_64.tar.gz
-    export PATH=$HOME/cmake-3.9.3-Linux-x86_64/bin:$PATH
-
     export CC=emcc
     export CXX=em++
 
     return
+fi
+
+# Install a different version of cmake
+if [[ "${ALTERNATIVE_CMAKE}" != "" ]]; then
+    cd $HOME
+    wget https://cmake.org/files/v${ALTERNATIVE_CMAKE:0:3}/cmake-${ALTERNATIVE_CMAKE}.tar.gz
+    tar xf cmake-${ALTERNATIVE_CMAKE}.tar.gz
+    export PATH=$HOME/cmake-${ALTERNATIVE_CMAKE}/bin:$PATH
 fi
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
