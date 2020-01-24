@@ -37,7 +37,7 @@ matrix:
   include:
     - name: emscripten
       os: linux
-      env: STATIC_LIBS=ON EMSCRIPTEN=ON
+      env: STATIC_LIBS=ON EMSCRIPTEN=ON ALTERNATIVE_CMAKE=3.9.3-Linux-x86_64
       dist: xenial
     - name: static + doc + coverage
       os: linux
@@ -54,6 +54,16 @@ matrix:
       compiler: gcc
       env: VALGRIND=ON CHECK_EXPORTS=ON
       addons: *linux64
+    - name: cmake-2.8.12
+      os: linux
+      compiler: gcc
+      env: ALTERNATIVE_CMAKE=2.8.12.2-Linux-i386
+      addons:
+        <<: *linux64
+        apt:
+          packages:
+            # cmake 2.8.12-Linux-i386 needs 32-bit libc & ld.so
+            - libc6:i386
     - name: 32-bits
       os: linux
       compiler: gcc
