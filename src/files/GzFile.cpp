@@ -1,5 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
+#define ZLIB_CONST
 #include <zconf.h>
 #include <zlib.h>
 
@@ -91,57 +92,49 @@ void GzFile::seek(uint64_t position) {
     }
 }
 
+std::vector<char> chemfiles::gzinflate_in_place(const char* src, size_t size) {
+    // assume a 10% compression ratio, which should be plenty enough
+    // (typical ratio is around 15-20%)
+    std::vector<char> output(10 * size);
 
-// Taken from https://www.cocoanetics.com/2012/02/decompressing-files-into-memory/
-std::vector<char> chemfiles::gzinflate_in_place(char* src, size_t size) {
-    size_t dataLength = size;
-    size_t halfLength = dataLength / 2;
+    z_stream stream;
+    stream.next_in = reinterpret_cast<const Bytef*>(src);
+    stream.avail_in = checked_cast(size);
+    stream.total_out = 0;
+    stream.zalloc = Z_NULL;
+    stream.zfree = Z_NULL;
 
-    bool done = false;
-    int status;
-
-    z_stream strm;
-    strm.next_in = reinterpret_cast<unsigned char*>(src);
-    strm.avail_in = dataLength;
-    strm.total_out = 0;
-    strm.zalloc = Z_NULL;
-    strm.zfree = Z_NULL;
-
-    // inflateInit2 knows how to deal with gzip format
-    status = inflateInit2(&strm, (15+32));
+    // the second parameter is set to 15 (use the largest window possible) + 32
+    // (detect header and check between gzip or zlib header)
+    auto status = inflateInit2(&stream, 15 + 32);
     if (status != Z_OK) {
-	    throw file_error("error inflating GZ file: '{}'", strm.msg);
+	    throw file_error("error creating gz stream: {}", stream.msg);
     }
 
-    std::vector<char> dst(20480);
-
+    bool done = false;
     do {
-	    // extend decompressed if too short
-	    if (strm.total_out >= dst.size()) {
-		    dst.resize(dst.size() + halfLength);
-	    }
+        // if we need more space, resize the vector
+        if (stream.total_out >= output.size()) {
+            output.resize(2 * output.size());
+        }
 
-	    strm.next_out = reinterpret_cast<unsigned char*>(dst.data() + strm.total_out);
-    	strm.avail_out = dst.size() - strm.total_out;
+	    stream.next_out = reinterpret_cast<Bytef*>(output.data() + stream.total_out);
+        stream.avail_out = checked_cast(output.size() - stream.total_out);
 
-    	// Inflate another chunk.
-    	status = inflate (&strm, Z_SYNC_FLUSH);
-
+        status = inflate(&stream, Z_SYNC_FLUSH);
         if (status == Z_STREAM_END) {
 		    done = true;
         } else if (status != Z_OK) {
-		    inflateEnd(&strm);
-            throw file_error("error inflating GZ file: '{}'", strm.msg);
+		    inflateEnd(&stream);
+            throw file_error("error inflating gzipped memory: {}", stream.msg);
 	    }
-    } while(!done);
+    } while (!done);
 
-    status = inflateEnd (&strm);
-    if (status != Z_OK || !done) {
-	    throw file_error("error inflating GZ file: '{}'", strm.msg);
+    status = inflateEnd(&stream);
+    if (status != Z_OK) {
+	    throw file_error("error finishing gz stream: {}", stream.msg);
     }
 
-    // set actual length, shrinking the vector is
-    // very efficient in C++11!
-    dst.resize(strm.total_out);
-    return dst;
+    output.resize(stream.total_out);
+    return output;
 }

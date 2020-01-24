@@ -4,6 +4,7 @@
 #include "chemfiles/files/MemoryFile.hpp"
 #include "chemfiles/files/GzFile.hpp"
 #include "chemfiles/files/XzFile.hpp"
+#include "chemfiles/files/Bz2File.hpp"
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/unreachable.hpp"
 
@@ -22,19 +23,17 @@ std::streampos MemoryFileReader::vector_buffer_reader::seekpos(std::streampos sp
     return ret;
 }
 
-std::vector<char> MemoryFileReader::wrap(const char* src, size_t source, File::Compression compression) {
-
+std::vector<char> MemoryFileReader::wrap(const char* src, size_t size, File::Compression compression) {
     switch(compression) {
     case File::GZIP:
-        return gzinflate_in_place(const_cast<char*>(src), source);
+        return gzinflate_in_place(src, size);
     case File::LZMA:
-        return xzinflate_in_place(const_cast<char*>(src), source);
+        return xzinflate_in_place(src, size);
     case File::BZIP2:
-        throw file_error("BZip2 is not supported for reading in-memory files");
-    default:
-        throw file_error("unsupported decompression format for in-memory files");
+        return bz2inflate_in_place(src, size);
+    case File::DEFAULT:
+        return std::vector<char>(src, src + size);
     }
-
     unreachable();
 }
 

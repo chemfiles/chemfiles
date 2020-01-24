@@ -136,8 +136,8 @@ public:
     /// `compression` method. A `MemoryFileReader` or `MemoryFileWriter` will
     /// be used as the `TextFileImpl`.
     ///
-    /// @throws FileError if the file mode is append, or if the compression is
-    ///                   is `BZip2`.
+    /// @throws FileError if the file mode is append, or if trying to write to
+    ///                   a compressed file.
     TextFile(MemoryBuffer& memory, File::Mode mode, File::Compression compression);
 
     TextFile(TextFile&&) = default;

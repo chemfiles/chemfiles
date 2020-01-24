@@ -45,8 +45,8 @@ private:
     std::vector<uint8_t> buffer_;
 };
 
-
-std::vector<char> xzinflate_in_place(char* src, size_t size);
+/// Inflates LZMA/XZ data from the `src` buffer
+std::vector<char> xzinflate_in_place(const char* src, size_t size);
 
 }
 

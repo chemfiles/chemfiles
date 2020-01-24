@@ -166,3 +166,48 @@ void Bz2File::compress_and_write(int action) {
 
     } while (stream_.avail_in != 0 || (action == BZ_FINISH && status != BZ_STREAM_END));
 }
+
+// Get tehe full, potentially 64-bits, value for total_out from the low and
+// high 32-bits parts.
+static uint64_t full_total_out(const bz_stream& stream) {
+    uint64_t total_out_hi32 = static_cast<uint64_t>(stream.total_out_hi32) << 32;
+    return total_out_hi32 + stream.total_out_lo32;
+}
+
+std::vector<char> chemfiles::bz2inflate_in_place(const char* src, size_t size) {
+    // assume a 10% compression ratio, which should be plenty enough
+    // (typical ratio is around 15-20%)
+    std::vector<char> output(10 * size);
+
+    bz_stream stream;
+    stream.next_in = const_cast<char*>(src);
+    stream.avail_in = checked_cast(size);
+    stream.bzalloc = nullptr;
+    stream.bzfree = nullptr;
+    check(BZ2_bzDecompressInit(&stream, 0, 0));
+
+    bool done = false;
+    do {
+        // if we need more space, resize the vector
+        auto total_out = full_total_out(stream);
+        if (total_out >= output.size()) {
+            output.resize(2 * output.size());
+        }
+
+	    stream.next_out = output.data() + total_out;
+        stream.avail_out = checked_cast(output.size() - total_out);
+
+        auto status = BZ2_bzDecompress(&stream);
+        if (status == BZ_STREAM_END) {
+		    done = true;
+        } else if (status != BZ_OK) {
+		    BZ2_bzDecompressEnd(&stream);
+            check(status);
+	    }
+    } while (!done);
+
+    check(BZ2_bzDecompressEnd(&stream));
+
+    output.resize(full_total_out(stream));
+    return output;
+}

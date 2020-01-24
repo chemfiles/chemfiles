@@ -106,3 +106,28 @@ TEST_CASE("Write a bzip2 file") {
     CHECK(file.readline() == "Test");
     CHECK(file.readline() == "5467");
 }
+
+TEST_CASE("In-memory decompression") {
+    auto content = std::vector<uint8_t> {
+        'B', 'Z', 'h', 0x36, 0x31, 0x41, 0x59, 0x26, 0x53, 0x59, 0xde, 0x45, 0xac,
+        0xea, 0x00, 0x00, 0x03, 0x4b, 0x80, 0x00, 0x10, 0x07, 0x80, 0x04, 0x00,
+        0x02, 0x00, 0x0c, 0x00, 0x20, 0x00, 0x31, 0x06, 0x4c, 0x41, 0x01, 0x93,
+        0x0c, 0x8e, 0x07, 0x7d, 0x38, 0x2e, 0xe4, 0x8a, 0x70, 0xa1, 0x21, 0xbc,
+        0x8b, 0x59, 0xd4
+    };
+
+    auto decompressed = bz2inflate_in_place(reinterpret_cast<const char*>(content.data()), content.size());
+    CHECK(std::string(decompressed.begin(), decompressed.end()) == "Test\n5467\n");
+
+    content[23] = 0x00;
+    CHECK_THROWS_WITH(
+        bz2inflate_in_place(reinterpret_cast<const char*>(content.data()), content.size()),
+        "bzip2: corrupted file (code: -4)"
+    );
+
+    content[0] = 0x00;
+    CHECK_THROWS_WITH(
+        bz2inflate_in_place(reinterpret_cast<const char*>(content.data()), content.size()),
+        "bzip2: this file do not seems to be a bz2 file (code: -5)"
+    );
+}
