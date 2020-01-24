@@ -32,8 +32,6 @@ public:
         : TextFileImpl(""), buffer_(memory), data_(&buffer_)
     {}
 
-    static std::vector<char> wrap(const char* src, size_t source, File::Compression compression);
-
     size_t read(char* data, size_t count) override;
     void write(const char* data, size_t count) override;
 

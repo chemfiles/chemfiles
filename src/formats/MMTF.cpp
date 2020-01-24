@@ -58,17 +58,12 @@ MMTFFormat::MMTFFormat(std::string path, File::Mode mode, File::Compression comp
 }
 
 MMTFFormat::MMTFFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression) {
-
     if (mode == File::WRITE) {
         throw format_error("the MMTF format cannot write to memory");
     }
 
-    if (compression != File::DEFAULT) {
-        auto decompressed = MemoryFileReader::wrap(memory.data(), memory.size(), compression);
-        decode(decompressed.data(), decompressed.size(), "decompressed from memory");
-    } else {
-        decode(memory.data(), memory.size(), "from memory");
-    }
+    memory.decompress(compression);
+    decode(memory.data(), memory.size(), "from memory");
 
     if (!structure_.hasConsistentData()) {
         throw format_error("issue with data in memory, please ensure it is valid MMTF");

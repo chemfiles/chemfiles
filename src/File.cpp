@@ -65,10 +65,7 @@ TextFile::TextFile(MemoryBuffer& memory, File::Mode mode, File::Compression comp
             throw file_error("writing to a compressed memory file is not supported");
         }
 
-        auto decompressed = MemoryFileReader::wrap(memory.data(), memory.size(), compression);
-        memory.reset(std::move(decompressed));
-        file_ = std::unique_ptr<TextFileImpl>(new MemoryFileReader(memory));
-        return;
+        memory.decompress(compression);
     }
 
     if (mode == File::READ) {

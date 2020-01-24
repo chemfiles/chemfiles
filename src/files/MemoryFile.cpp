@@ -2,9 +2,6 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include "chemfiles/files/MemoryFile.hpp"
-#include "chemfiles/files/GzFile.hpp"
-#include "chemfiles/files/XzFile.hpp"
-#include "chemfiles/files/Bz2File.hpp"
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/unreachable.hpp"
 
@@ -21,20 +18,6 @@ std::streampos MemoryFileReader::vector_buffer_reader::seekpos(std::streampos sp
     }
 
     return ret;
-}
-
-std::vector<char> MemoryFileReader::wrap(const char* src, size_t size, File::Compression compression) {
-    switch(compression) {
-    case File::GZIP:
-        return gzinflate_in_place(src, size);
-    case File::LZMA:
-        return xzinflate_in_place(src, size);
-    case File::BZIP2:
-        return bz2inflate_in_place(src, size);
-    case File::DEFAULT:
-        return std::vector<char>(src, src + size);
-    }
-    unreachable();
 }
 
 void MemoryFileReader::clear() noexcept {

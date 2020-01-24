@@ -5,6 +5,7 @@
 #define CHEMFILES_MEMORY_BUFFER_HPP
 
 #include <vector>
+#include "chemfiles/File.hpp"
 
 namespace chemfiles {
 
@@ -51,6 +52,10 @@ public:
     const char* data() const {
         return begin_;
     }
+
+    /// Try to decompress the content of this buffer with the given
+    /// `compression` format
+    void decompress(File::Compression compression);
 
 private:
 
