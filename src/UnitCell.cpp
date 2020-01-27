@@ -77,6 +77,8 @@ UnitCell::UnitCell(const Matrix3D& matrix): h_(Matrix3D::unit()), h_inv_(Matrix3
         a_ = b_ = c_ = 0;
         alpha_ = beta_ = gamma_ = 90.0;
 
+        update_matrix();
+
         return;
     }
 
@@ -88,6 +90,8 @@ UnitCell::UnitCell(const Matrix3D& matrix): h_(Matrix3D::unit()), h_inv_(Matrix3
         c_ = matrix[2][2];
 
         alpha_ = beta_ = gamma_ = 90.0;
+
+        update_matrix();
 
         return;
     }
