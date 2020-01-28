@@ -48,11 +48,19 @@ UnitCell::UnitCell(double a, double b, double c, double alpha, double beta, doub
     beta_(beta),
     gamma_(gamma)
 {
+    auto is_zero = [](double length) {
+        // We think that 0.00001 is close enough to 0
+        return fabs(length) < 1e-5;
+    };
     auto is_90 = [](double angle) {
         // We think that 89.999° is close enough to 90°
         return fabs(angle - 90.0) < 1e-3;
     };
-    if (is_90(alpha_) && is_90(beta_) && is_90(gamma_)) {
+    if (is_zero(a_) && is_zero(b_) && is_zero(c_)) {
+        shape_ = INFINITE;
+        a_ = b_ = c_ = 0;
+        alpha_ = beta_ = gamma_ = 90;
+    } else if (is_90(alpha_) && is_90(beta_) && is_90(gamma_)) {
         shape_ = ORTHORHOMBIC;
         // Make sure alpha/beta/gamma are actually 90°, so that the matrix
         // update below does not create a non diagonal matrix.

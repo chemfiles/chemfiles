@@ -56,6 +56,17 @@ TEST_CASE("Use the UnitCell type") {
         CHECK(infinite2 == infinite);
         CHECK(approx_eq(infinite2.matrix(), Matrix3D::zero()));
 
+        UnitCell infinite3(0, 0, 0);
+        CHECK(infinite3.shape() == UnitCell::INFINITE);
+        CHECK(infinite3.a() == 0);
+        CHECK(infinite3.b() == 0);
+        CHECK(infinite3.c() == 0);
+        CHECK(infinite3.alpha() == 90);
+        CHECK(infinite3.beta() == 90);
+        CHECK(infinite3.gamma() == 90);
+        CHECK(infinite3.volume() == 0);
+        CHECK(approx_eq(infinite3.matrix(), Matrix3D::zero()));
+
         auto ortho_matrix = Matrix3D(10, 0, 0, 0, 11, 0, 0, 0, 12);
         UnitCell ortho3(ortho_matrix);
         CHECK(ortho3.shape() == UnitCell::ORTHORHOMBIC);
