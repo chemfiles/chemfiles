@@ -52,6 +52,11 @@ function(unpack_library _name_)
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
     endif()
+
+    if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${_name_}/.git")
+        # .git directories can get huge and increase the size of this repository
+        message(FATAL_ERROR "${_name_} archive contains a .git directory, please remove it")
+    endif()
 endfunction()
 
 function(external_library _name_)
