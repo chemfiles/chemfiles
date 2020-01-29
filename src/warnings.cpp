@@ -21,7 +21,13 @@ void chemfiles::set_warning_callback(warning_callback_t callback) {
     *guard = std::move(callback);
 }
 
-void chemfiles::send_warning(const std::string& message) {
-    auto callback = CALLBACK.lock();
-    (*callback)(message);
+void chemfiles::send_warning(const std::string& message) noexcept {
+    try {
+        auto callback = CALLBACK.lock();
+        (*callback)(message);
+    } catch (const std::exception& e) {
+        std::cerr << "exception while sending warning: " << e.what() << std::endl;
+    } catch (...) {
+        std::cerr << "unknown exception while sending warning" << std::endl;
+    }
 }

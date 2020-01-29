@@ -11,7 +11,7 @@
 namespace chemfiles {
 
 /// Send a warning with the given message
-void send_warning(const std::string& message);
+void send_warning(const std::string& message) noexcept;
 
 /// Create a message for the given `context` formatting the `message` with the
 /// `arguments`, and send a warning with this message.
