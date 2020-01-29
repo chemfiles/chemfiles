@@ -84,6 +84,9 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
     catch (const std::exception& e) {                                          \
         set_last_error(e.what());                                              \
         return CHFL_CXX_ERROR;                                                 \
+    } catch (...) {                                                            \
+        set_last_error("UNKNOWN ERROR");                                       \
+        return CHFL_CXX_ERROR;                                                 \
     }                                                                          \
     return CHFL_SUCCESS;
 
@@ -98,6 +101,9 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
         goto error;  /* NOLINT: goto is OK here */                             \
     } catch (const std::exception& e) {                                        \
         set_last_error(e.what());                                              \
+        goto error;  /* NOLINT: goto is OK here */                             \
+    } catch (...) {                                                            \
+        set_last_error("UNKNOWN ERROR");                                       \
         goto error;  /* NOLINT: goto is OK here */                             \
     }
 
