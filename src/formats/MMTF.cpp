@@ -131,8 +131,8 @@ void MMTFFormat::read(Frame& frame) {
     auto inter_residue_bond_count = structure_.bondAtomList.size() / 2;
     size_t bond_index = 0;
     while (bond_index < inter_residue_bond_count) {
-        auto atom1 = structure_.bondAtomList[bond_index * 2 + 0];
-        auto atom2 = structure_.bondAtomList[bond_index * 2 + 1];
+        auto atom1 = static_cast<size_t>(structure_.bondAtomList[bond_index * 2 + 0]);
+        auto atom2 = static_cast<size_t>(structure_.bondAtomList[bond_index * 2 + 1]);
 
         // We are below the atoms we care about
         if ((atom1 < atomSkip_) || (atom2 < atomSkip_)) {
