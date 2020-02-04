@@ -95,7 +95,6 @@ namespace nc {
 class NcFile final: public File {
 public:
     NcFile(std::string path, File::Mode mode);
-    NcFile(MemoryBuffer& memory, File::Mode mode);
     ~NcFile() override;
     NcFile(NcFile&&) noexcept = default;
     NcFile& operator=(NcFile&&) = default;

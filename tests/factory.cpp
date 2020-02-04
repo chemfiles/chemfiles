@@ -33,9 +33,6 @@ struct UnimplementedTextFormat final: public TextFormat {
     UnimplementedTextFormat(const std::string& path, File::Mode mode, File::Compression compression):
         TextFormat(std::move(path), mode, compression) {}
 
-    UnimplementedTextFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression) :
-        TextFormat(memory, mode, compression) {}
-
     optional<uint64_t> forward() override {
         static int pos = -1;
         if (pos < 4) {
@@ -198,6 +195,11 @@ TEST_CASE("Check error throwing in formats") {
         CHECK_THROWS_WITH(
             trajectory.write(frame),
             Catch::StartsWith("'write' is not implemented for this format")
+        );
+
+        CHECK_THROWS_WITH(
+            Trajectory::memory_writer("UnimplementedTextFormat"),
+            "memory IO is not supported for the format 'UnimplementedTextFormat'"
         );
     }
 

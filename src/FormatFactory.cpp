@@ -110,6 +110,14 @@ void FormatFactory::register_format(FormatInfo info, format_creator_t creator, m
     formats.push_back({info, creator, memory_stream});
 }
 
+void FormatFactory::register_format(FormatInfo info, format_creator_t creator) {
+    register_format(info, creator,
+        [info](MemoryBuffer&, File::Mode, File::Compression) -> std::unique_ptr<Format> {
+            throw format_error("memory IO is not supported for the format '{}'", info.name());
+        }
+    );
+}
+
 format_creator_t FormatFactory::name(const std::string& name) {
     auto guard = formats_.lock();
     auto& formats = *guard;

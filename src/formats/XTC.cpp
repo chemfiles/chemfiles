@@ -50,11 +50,6 @@ XTCFormat::XTCFormat(std::string path, File::Mode mode, File::Compression compre
     }
 }
 
-XTCFormat::XTCFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression)
-    : file_(XDRFile::XTC, memory, mode) {
-    unreachable();
-}
-
 size_t XTCFormat::nsteps() { return static_cast<size_t>(file_.nframes()); }
 
 void XTCFormat::read_step(size_t step, Frame& frame) {

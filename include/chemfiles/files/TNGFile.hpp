@@ -17,7 +17,6 @@ namespace chemfiles {
 class TNGFile final: public File {
 public:
     TNGFile(std::string path, File::Mode mode);
-    TNGFile(MemoryBuffer& memory, File::Mode mode);
     ~TNGFile() override;
     TNGFile(TNGFile&&) noexcept = default;
     TNGFile& operator=(TNGFile&&) = default;

@@ -17,7 +17,6 @@ class Frame;
 class XTCFormat final : public Format {
   public:
     XTCFormat(std::string path, File::Mode mode, File::Compression compression);
-    XTCFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;

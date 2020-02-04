@@ -24,7 +24,6 @@ template <class T> class span;
 class AmberNetCDFFormat final: public Format {
 public:
     AmberNetCDFFormat(std::string path, File::Mode mode, File::Compression compression);
-    AmberNetCDFFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;

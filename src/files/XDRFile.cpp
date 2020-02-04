@@ -42,11 +42,6 @@ XDRFile::XDRFile(Variants variant, std::string path, File::Mode mode)
     }
 }
 
-XDRFile::XDRFile(Variants variant, MemoryBuffer& memory, File::Mode mode)
-    : File("", mode, File::DEFAULT) {
-    throw file_error("opening memory for XDR files (such as TRR and XTC) is not supported");
-}
-
 XDRFile& XDRFile::operator=(XDRFile&& other) noexcept {
     if (handle_ != nullptr) {
         xdrfile_close(handle_);

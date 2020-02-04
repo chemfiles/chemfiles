@@ -26,6 +26,23 @@ struct RegisteredFormat {
 
 };
 
+/// This is a special template class to check for the existence of the memory
+/// IO constructor
+template <typename T>
+struct SupportsMemoryIO {
+
+    /// This will be defined if U has the constructor U(MemoryBuffer&, File::mode, File::Compression)
+    template<typename U>
+    static int32_t SFINAE(decltype(U(std::declval<MemoryBuffer&>(), File::Mode(), File::Compression()))*);
+
+    /// This is a fall back that is always defined, but at the lowest precedence
+    template<typename U>
+    static int16_t SFINAE(...);
+
+    /// Evaluate one of the above expressions (done at compile time)
+    static const bool value = sizeof(SFINAE<T>(nullptr)) == sizeof(int32_t);
+};
+
 /// This class allow to register Format with names and file extensions
 class CHFL_EXPORT FormatFactory final {
 private:
@@ -54,11 +71,13 @@ public:
     /// @throws FormatError if the format can not be found
     format_creator_t extension(const std::string& extension);
 
-    /// Register a given `Format` in the factory.
+    /// Register a given `Format` in the factory if it supports memory IO
     ///
     /// The format informations are taken from the specialization of the
-    /// template function `chemfiles::format_information` for this format.
-    template<class Format>
+    /// template function `chemfiles::format_information` for this format. The
+    /// second template argument is used to determine if the `Format` supports
+    /// memory IO.
+    template<class Format, typename std::enable_if<SupportsMemoryIO<Format>::value, Format>::type* = nullptr> // NOLINT no std::enable_if_t in C++11
     void add_format() {
         auto info = format_information<Format>();
         register_format(info,
@@ -71,11 +90,28 @@ public:
         );
     }
 
+    /// Register a given `Format` in the factory if it does not support memory IO
+    ///
+    /// The format informations are taken from the specialization of the
+    /// template function `chemfiles::format_information` for this format. The
+    /// second template argument is used to determine if the `Format` supports
+    /// memory IO.
+    template<class Format, typename std::enable_if<!SupportsMemoryIO<Format>::value, Format>::type* = nullptr> // NOLINT no std::enable_if_t in C++11
+    void add_format() {
+        auto info = format_information<Format>();
+        register_format(info,
+            [](const std::string& path, File::Mode mode, File::Compression compression) {
+                return std::unique_ptr<Format>(new Format(path, mode, compression));  // NOLINT no make_unique in C++11
+            }
+        );
+    }
+
     /// Get the metadata for all registered formats
     std::vector<FormatInfo> formats();
 
 private:
     void register_format(FormatInfo info, format_creator_t creator, memory_stream_t memory_reader);
+    void register_format(FormatInfo info, format_creator_t creator);
 
     /// Trajectory map associating format descriptions and creators
     mutex<std::vector<RegisteredFormat>> formats_;

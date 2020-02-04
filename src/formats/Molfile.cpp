@@ -134,13 +134,6 @@ Molfile<F>::Molfile(std::string path, File::Mode mode, File::Compression compres
     read_topology();
 }
 
-template <MolfileFormat F>
-Molfile<F>::Molfile(MemoryBuffer& memory, File::Mode, File::Compression) {
-    throw format_error(
-        "opening memory for {} files is not supported", plugin_data_.format()
-    );
-}
-
 template <MolfileFormat F> Molfile<F>::~Molfile() {
     if (data_) {
         plugin_handle_->close_file_read(data_);

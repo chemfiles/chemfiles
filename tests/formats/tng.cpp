@@ -102,11 +102,3 @@ TEST_CASE("Read files in TNG format") {
         CHECK(approx_eq(positions[11675], Vector3D(44.75, 16.05, 6.1), 1e-5));
     }
 }
-
-TEST_CASE("Check Errors") {
-    std::vector<char> junk_memory(1024);
-    CHECK_THROWS_WITH(
-        Trajectory::memory_reader(junk_memory.data(), junk_memory.size(), "TNG"),
-        "opening memory for TNG files is not supported"
-    );
-}

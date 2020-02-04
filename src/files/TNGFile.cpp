@@ -43,11 +43,6 @@ TNGFile::TNGFile(std::string path, File::Mode mode): File(std::move(path), mode,
     }
 }
 
-TNGFile::TNGFile(MemoryBuffer& memory, File::Mode mode)
-    : File("", mode, File::DEFAULT) {
-    throw file_error("opening memory for TNG files is not supported");
-}
-
 TNGFile::~TNGFile() {
     tng_util_trajectory_close(&handle_);
 }
