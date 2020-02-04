@@ -17,7 +17,8 @@ TEST_CASE() {
 
     trajectory_memory.write(ethane);
 
-    CHECK(*(trajectory_memory.memory_block()) == std::string("CC\n"));
+    auto result = *trajectory_memory.memory_block();
+    CHECK( std::string(result.data(), result.size()) == std::string("CC\n"));
 
     // This function will return nullopt if opened with a regular file
     auto trajectory_file = Trajectory("ethane.smi", 'w');

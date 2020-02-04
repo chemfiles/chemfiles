@@ -300,11 +300,10 @@ void Trajectory::close() {
     format_.reset();
 }
 
-optional<const char *> Trajectory::memory_block() const {
+optional<span<char>> Trajectory::memory_block() const {
     if (buffer_ == nullptr || mode_ == File::READ) {
         return nullopt;
     }
 
-    // The buffer is null terminated, so std::string should find it properly
-    return buffer_->data();
+    return buffer_->write_memory_as_string();
 }

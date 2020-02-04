@@ -7,95 +7,48 @@
 
 using namespace chemfiles;
 
-std::streampos MemoryFileReader::vector_buffer_reader::seekpos(std::streampos sp, std::ios_base::openmode) {
-    const auto pos = static_cast<off_type>(sp);
-    auto ret = pos_type(off_type(-1));
-    const auto* beg = this->eback();
+void MemoryFile::clear() noexcept {
+}
 
-    if (beg && pos >= 0 && pos <= this->egptr() - beg) {
-        this->setg(this->eback(), this->eback() + pos, this->egptr());
-        ret = sp;
+void MemoryFile::seek(uint64_t position) {
+
+    if (mode_ != File::READ) {
+        throw file_error("cannot seek a memory file unless it is opened in read mode");
     }
 
-    return ret;
-}
-
-void MemoryFileReader::clear() noexcept {
-    data_.clear();
-}
-
-void MemoryFileReader::seek(uint64_t position) {
-
-    data_.seekg(static_cast<std::streamoff>(position));
-
-    if (data_.fail()) {
-        throw file_error("error while seeking memory file");
-    }
-}
-
-size_t MemoryFileReader::read(char* data, size_t count) {
-
-    auto result = data_.readsome(data, static_cast<std::streamoff>(count));
-
-
-    if (!data_) {
-        throw file_error("IO error while reading the memory file");
+    if (position > data_.size()) {
+        current_location_ =  data_.size();
     }
 
-    return static_cast<size_t>(result);
+    current_location_ = position;
 }
 
-void MemoryFileReader::write(const char*, size_t) {
-    throw file_error("cannot write to a memory file for reading");
-}
+size_t MemoryFile::read(char* data, size_t count) {
 
-std::streampos MemoryFileWriter::vector_buffer_writer::seekpos(std::streampos sp, std::ios_base::openmode) {
-    const auto pos = static_cast<off_type>(sp);
-    auto ret = pos_type(off_type(-1));
-    const auto* beg = this->pbase();
-
-    if (beg && pos >= 0 && pos <= this->epptr() - beg) {
-        this->setp(this->pbase() + pos, this->epptr());
-        ret = sp;
+    if (mode_ != File::READ) {
+        throw file_error("cannot read a memory file unless it is opened in read mode");
     }
 
-    return ret;
-}
-
-MemoryFileWriter::vector_buffer_writer::int_type MemoryFileWriter::vector_buffer_writer::overflow(int_type ch) {
-    auto current_postion = this->epptr() - this->pbase();
-    original_vector_.grow(); // TODO: Improve this.
-
-    auto& memory = original_vector_.write_memory();
-    setp(memory.data(), memory.data() + memory.size());
-    this->pbump(static_cast<int>(current_postion));
-
-    *this->pptr() = std::char_traits<char>::to_char_type(ch);
-    this->pbump(1);
-
-    return ch;
-}
-
-void MemoryFileWriter::clear() noexcept {
-    data_.clear();
-}
-
-void MemoryFileWriter::seek(uint64_t position) {
-    data_.seekp(static_cast<std::streamoff>(position));
-
-    if (data_.fail()) {
-        throw file_error("error while seeking memory file");
+    if (current_location_ >= data_.size()) {
+        return 0;
     }
+
+    auto amount_to_read = count + current_location_ <= data_.size() ?
+        count : data_.size() - current_location_;
+
+    std::copy(data_.data() + current_location_,
+              data_.data() + current_location_ + amount_to_read,
+              data);
+
+    current_location_ += amount_to_read;
+
+    return amount_to_read;
 }
 
-size_t MemoryFileWriter::read(char*, size_t) {
-    throw file_error("cannot read memory file for writing");
-}
-
-void MemoryFileWriter::write(const char* data, size_t count) {
-    data_.write(data, static_cast<std::streamoff>(count));
-
-    if (data_.fail()) {
-        throw file_error("could not write data to the memory file");
+void MemoryFile::write(const char* data, size_t count) {
+    if (mode_ != File::WRITE) {
+        throw file_error("cannot write to a memory file unless it is opened in write mode");
     }
+
+    std::copy(data, data + count, std::back_inserter(data_.write_memory()));
 }

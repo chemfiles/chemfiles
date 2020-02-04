@@ -165,8 +165,9 @@ F 4 5 6
         file.write(frame);
         file.close();
 
-        auto result = std::string(*(file.memory_block()));
-        CHECK(result == expected_content);
+        auto result = *file.memory_block();
+        auto result_str = std::string(result.data(), result.size());
+        CHECK(result_str == expected_content);
     }
 }
 

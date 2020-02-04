@@ -6,6 +6,7 @@
 
 #include <vector>
 #include "chemfiles/File.hpp"
+#include "chemfiles/external/span.hpp"
 
 namespace chemfiles {
 
@@ -17,28 +18,19 @@ public:
 
     /// Create a MemoryBuffer intended for writting.
     MemoryBuffer(size_t initial_size = 20480)
-        : write_mem_(initial_size, '\0'), begin_(write_mem_.data()), size_(write_mem_.size())
-    {}
+        : write_mem_(), begin_(nullptr), size_(0)
+    {
+        write_mem_.reserve(initial_size);
+        begin_ = write_mem_.data();
+    }
 
     /// Create a MemoryBuffer intended for reading memory external to the class.
     MemoryBuffer(const char* memory, size_t size)
         : begin_(memory), size_(size) {}
 
-    /// Create a MemoryBuffer intended for reading memory owned by the class.
-    MemoryBuffer(std::vector<char> memory)
-        : write_mem_(std::move(memory)), begin_(write_mem_.data()), size_(write_mem_.size())
-    {}
 
-    void reset(std::vector<char> memory) {
-        write_mem_ = std::move(memory);
-        begin_ = write_mem_.data();
-        size_ = write_mem_.size();
-    }
-
-    void grow() {
-        write_mem_.resize(write_mem_.size() * 2, '\0');
-        begin_ = write_mem_.data();
-        size_ = write_mem_.size();
+    span<char> write_memory_as_string() {
+        return span<char>(write_mem_.data(), write_mem_.size());
     }
 
     std::vector<char>& write_memory() {

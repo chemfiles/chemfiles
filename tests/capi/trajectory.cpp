@@ -302,8 +302,9 @@ TEST_CASE("Write trajectory to memory") {
     CHECK_STATUS(chfl_trajectory_write(trajectory, frame));
 
     const char* result = nullptr;
-    CHECK_STATUS(chfl_trajectory_memory_block(trajectory, &result));
-    CHECK(std::string(result) == EXPECTED_CONTENT);
+    uint64_t size_of_result;
+    CHECK_STATUS(chfl_trajectory_memory_block(trajectory, &result, &size_of_result));
+    CHECK(std::string(result, size_of_result) == EXPECTED_CONTENT);
 
     chfl_free(frame);
     chfl_trajectory_close(trajectory);
@@ -311,7 +312,7 @@ TEST_CASE("Write trajectory to memory") {
     // Make sure that improper trajectories don't succeed with internal file
     CHFL_TRAJECTORY* trajectory2 = chfl_trajectory_open("data/xyz/trajectory.xyz", 'r');
     REQUIRE(trajectory2);
-    CHECK(chfl_trajectory_memory_block(trajectory2, &result) != CHFL_SUCCESS);
+    CHECK(chfl_trajectory_memory_block(trajectory2, &result, &size_of_result) != CHFL_SUCCESS);
     chfl_free(trajectory2);
 }
 

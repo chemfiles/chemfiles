@@ -8,21 +8,24 @@
 #include "chemfiles/Error.hpp"
 using namespace chemfiles;
 
-constexpr const char* memory_file =
+const auto memory_file = std::string(
 R"(This is
 a test
 for the memory file
 class!
-)";
+)");
 
 TEST_CASE("Reading from files in memory") {
     SECTION("Basic reading functionalities") {
-        auto buff = MemoryBuffer(memory_file, 43);
+        auto buff = MemoryBuffer(&memory_file[0], memory_file.size());
         auto file = TextFile(buff, File::READ, File::DEFAULT);
 
         CHECK(file.readline() == "This is");
         CHECK(file.readline() == "a test");
         CHECK(file.readline() == "for the memory file");
+        CHECK(file.readline() == "class!");
+        CHECK(file.readline() == ""); // Need to go past the end to get eol
+        CHECK(file.eof());
 
         file.rewind();
         CHECK(file.readline() == "This is");
@@ -33,12 +36,10 @@ TEST_CASE("Reading from files in memory") {
         file.readline();
         file.readline();
         CHECK(file.tellpos() == 15);
-
         file.seekpos(35);
         CHECK(file.readline() == "class!");
 
         // Count lines
-
         file.rewind();
         size_t lines = 0;
         while (!file.eof()) {
@@ -53,6 +54,12 @@ TEST_CASE("Reading from files in memory") {
         CHECK(file.tellpos() == 6);
         CHECK(file.readline() == "s");
 
+        file.seekpos(5);
+        CHECK(file.tellpos() == 5);
+        CHECK(file.readline() == "is");
+        CHECK(file.readline() == "a test");
+        CHECK(file.tellpos() == 15);
+
         file.seekpos(100); // go past the end
         CHECK_FALSE(file.eof());
 
@@ -63,9 +70,13 @@ TEST_CASE("Reading from files in memory") {
         CHECK_FALSE(file.eof());
 
         CHECK_THROWS_WITH(
-            file.seekpos(1000000),
-            "error while seeking memory file"
+            file.print("JUNK"),
+            "cannot write to a memory file unless it is opened in write mode"
         );
+
+        // Note that a large file is tested with the text-based formats!
+        // This way, we can be sure the file works with buffers greater than
+        // 8192 in size
     }
 }
 
@@ -76,12 +87,22 @@ TEST_CASE("Write to files in memory") {
         auto file = TextFile(buffer, File::WRITE, File::DEFAULT);
         file.print("Test\n");
 
-        auto result = std::string(buffer.data());
-        CHECK(result == "Test\n");
+        auto result = buffer.write_memory_as_string();
+        CHECK(std::string(result.data(), result.size()) == "Test\n");
 
         file.print("JUNKJUNK");
-        result = std::string(buffer.data());
-        CHECK(result == "Test\nJUNKJUNK");
+        result = buffer.write_memory_as_string();
+        CHECK(std::string(result.data(), result.size()) == "Test\nJUNKJUNK");
+
+        CHECK_THROWS_WITH(
+            file.seekpos(5),
+            "cannot seek a memory file unless it is opened in read mode"
+        );
+
+        CHECK_THROWS_WITH(
+            file.readline(),
+            "cannot read a memory file unless it is opened in read mode"
+        );
     }
 
     SECTION("Writing to a compressed memory file") {

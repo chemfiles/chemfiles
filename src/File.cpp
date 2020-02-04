@@ -68,11 +68,7 @@ TextFile::TextFile(MemoryBuffer& memory, File::Mode mode, File::Compression comp
         memory.decompress(compression);
     }
 
-    if (mode == File::READ) {
-        file_ = std::unique_ptr<TextFileImpl>(new MemoryFileReader(memory));
-    } else {
-        file_ = std::unique_ptr<TextFileImpl>(new MemoryFileWriter(memory));
-    }
+    file_ = std::unique_ptr<TextFileImpl>(new MemoryFile(memory, mode));
 }
 
 uint64_t TextFile::tellpos() const {

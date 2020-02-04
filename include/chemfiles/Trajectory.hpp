@@ -241,13 +241,13 @@ public:
         return path_;
     }
 
-    /// Get the memory that is written to in memory
+    /// Get a pointer to the memory addressed used for writing
     ///
     /// If the trajectory was not created for writing to memory, this will
     /// return `nullopt`.
     ///
     /// @example{trajectory/memory_block.cpp}
-    optional<const char*> memory_block() const;
+    optional<span<char>> memory_block() const;
 
 private:
 
