@@ -5,10 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
-## 0.9.3 (17 Jan 2020)
+## 0.9.3 (5 Feb 2020)
 
 * Fix a bug in the PDB format where no atomic name/type was read from short
   ATOM/HETATM records.
+* Fix a few bugs related to UnitCell Matrix and infinite UnitCell construction
 
 ## 0.9.2 (18 Dec 2019)
 
