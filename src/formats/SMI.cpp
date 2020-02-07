@@ -244,6 +244,20 @@ void SMIFormat::read_next(Frame& frame) {
             continue;
         }
 
+        // Check for 'CurlySMILES' and add the associated tags
+        if (smiles[i] == '{' && topology.size()) {
+            auto prop_end = smiles.find_first_of('}', i);
+
+            if (prop_end == std::string::npos) {
+                throw format_error("SMI Reader: unmatched curly brace");
+            }
+
+            auto curly_prop = smiles.substr(i + 1, prop_end - i - 1);
+            topology[topology.size() - 1].set("curly_property", curly_prop.to_string());
+            i = prop_end;
+            continue;
+        }
+
         // We are not in a property list!
         // Therefore, if something is lowercase, then it must be
         // a single character element in the organic subset.
@@ -333,6 +347,7 @@ void SMIFormat::read_next(Frame& frame) {
                 throw format_error("SMI Reader: rings defined with '%' must be double digits");
             }
             check_ring(parse<size_t>(smiles.substr(i + 1, 2)));
+            i += 2; // this line alone fixes most of issue 303 :)
             break;
         case '*':
             this->add_atom(topology, "*").set("wildcard", true);

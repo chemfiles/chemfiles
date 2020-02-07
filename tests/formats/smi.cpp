@@ -223,6 +223,36 @@ TEST_CASE("Check parsing results") {
             frame = file.read();
         }
     }
+
+    SECTION("Issue 303") {
+        auto file = Trajectory("data/smi/issue_303.smi");
+
+        // We support only the storage of curly SMILES
+        auto frame = file.read();
+        CHECK(frame[5].get("curly_property")->as_string() == "-");
+        CHECK(frame[8].get("curly_property")->as_string() == "+n");
+
+        // In Issue 303, this failed due to the '%11' marker.
+        frame = file.read();
+        
+        // No explict hydrogens, so the size should be 26 atoms
+        frame = file.read();
+        CHECK(frame.size() == 26);
+
+        // Converting the original SDF file using MarvinSketch preverses the explicit hydrogens
+        frame = file.read();
+        CHECK(frame.size() == 30);
+
+        // For the next test, too many bonds were parsed
+        frame = file.read();
+        CHECK(frame.topology().bonds().size() == 34);
+
+        frame = file.read();
+        CHECK(frame.topology().bonds().size() == 182);
+
+        frame = file.read();
+        CHECK(frame.topology().bonds().size() == 171);
+    }
 }
 
 // To use in loops in order to iterate over files in a specific directory.
