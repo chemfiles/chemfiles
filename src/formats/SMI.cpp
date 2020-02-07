@@ -383,53 +383,6 @@ void SMIFormat::read_next(Frame& frame) {
     }
 }
 
-/// Depth first search to find all rings.
-/// Not guaranteed to fast, nor efficient, but just to work
-/// Also not guaranteed to find the SSSR, but it will find all rings
-/// needed for a given structure to be writen as SMILES
-/// \param adj_list The adjacentcy list graph
-/// \param hit_atoms Atoms already encountered
-/// \param ring_bonds Bonds already known to ring forming bonds
-/// \param ring_atoms Map from an atom to the number of rings it forms
-/// \param current_atom Atom to be checked in this iteration
-/// \param previous_atom Atom which was bound to the current atom
-static void find_rings_helper(
-    const std::vector<std::vector<size_t>>& adj_list,
-    std::vector<bool>& hit_atoms, std::set<Bond>& ring_bonds,
-    std::unordered_map<size_t, size_t>& ring_atoms,
-    size_t current_atom, size_t previous_atom) {
-
-    auto& current_atom_bonds = adj_list[current_atom];
-    hit_atoms[current_atom] = true;
-
-    for (auto neighbor : current_atom_bonds) {
-        // prevent back tracking
-        if (neighbor == previous_atom) {
-            continue;
-        }
-
-        // We've seen this neighbor before! Ring found
-        if (hit_atoms[neighbor]) {
-            // Don't process the same ring connection twice
-            if (ring_bonds.count(Bond(neighbor, current_atom))) {
-                continue;
-            }
-            ring_bonds.insert(Bond(neighbor, current_atom));
-
-            auto neigh_ring_iter = ring_atoms.find(neighbor);
-            if (neigh_ring_iter == ring_atoms.end()) {
-                neigh_ring_iter = ring_atoms.insert({neighbor, 0}).first;
-            }
-            neigh_ring_iter->second++;
-
-            continue; // No need to see this atom again
-        }
-
-        // Continue the search
-        find_rings_helper(adj_list, hit_atoms, ring_bonds, ring_atoms, neighbor, current_atom);
-    }
-}
-
 static void find_rings(
     const std::vector<std::vector<size_t>>& adj_list,
     std::unordered_map<size_t, size_t>& ring_atoms) {
@@ -441,13 +394,88 @@ static void find_rings(
     while (!all(hit_atoms)) {
         auto not_hit = std::find(hit_atoms.begin(), hit_atoms.end(), false);
         auto current_atom = static_cast<size_t>(std::distance(hit_atoms.begin(), not_hit));
-        auto& current_atom_bonds = adj_list[current_atom];
+
+        // mark this atom as processed
         hit_atoms[current_atom] = true;
-        if (current_atom_bonds.empty()) {
+
+        // it has no connections... therefore no rings!
+        if (adj_list[current_atom].empty()) {
             continue;
         }
 
-        find_rings_helper(adj_list, hit_atoms, ring_bonds, ring_atoms, current_atom_bonds[0], current_atom);
+        // Search to find all rings for the component (all connected atoms)
+        // for the 'current' atom.
+        // Not guaranteed to fast, nor efficient, but just to work
+        // Also not guaranteed to find the SSSR, but it will find all rings
+        // needed for a given structure to be writen as SMILES
+        // adj_list The adjacentcy list graph
+        // hit_atoms Atoms already encountered
+        // ring_bonds Bonds already known to ring forming bonds
+        // ring_atoms Map from an atom to the number of rings it forms
+
+        // The atoms to process consist of :
+        // current_atom Atom to be checked in this iteration
+        // previous_atom Atom which was bound to the current atom
+
+        std::stack<std::pair<size_t, size_t>> atoms_to_process;
+        atoms_to_process.push({ current_atom, current_atom });
+
+        while (atoms_to_process.size()) {
+
+            size_t previous_atom;
+
+            std::tie(current_atom, previous_atom) = atoms_to_process.top();
+            atoms_to_process.pop();
+
+            auto& current_atom_bonds = adj_list[current_atom];
+
+            // We go through the neighbors backwards because we are using a
+            // stack instead and want to through them in the forward direction
+            // (think of it like the negative of a negative is a positive)
+            // We cannot use a queue as we want to process all neighbors of an
+            // atom first, then move on to the next atom group (allowing for a
+            // depth first like search).
+            for (auto neighbor_iter = current_atom_bonds.rbegin();
+                neighbor_iter != current_atom_bonds.rend();
+                ++neighbor_iter) {
+
+                auto neighbor = *neighbor_iter;
+
+                // prevent back tracking
+                if (neighbor == previous_atom) {
+                    continue;
+                }
+
+                // We've seen this neighbor before! Ring found
+                // but only if we have NOT processed the current atom as this
+                // prevents rings from being created from mutliple directions.
+                if (hit_atoms[neighbor] && !hit_atoms[current_atom]) {
+
+                    // Don't process the same ring connection twice
+                    if (ring_bonds.count(Bond(neighbor, current_atom))) {
+                        continue;
+                    }
+                    ring_bonds.insert(Bond(neighbor, current_atom));
+
+                    auto neigh_ring_iter = ring_atoms.find(neighbor);
+                    if (neigh_ring_iter == ring_atoms.end()) {
+                        neigh_ring_iter = ring_atoms.insert({ neighbor, 0 }).first;
+                    }
+                    neigh_ring_iter->second++;
+
+                    continue; // No need to see this atom again
+                }
+
+                // Continue the search for new atoms
+                if (!hit_atoms[neighbor]) {
+                    //find_rings_helper(adj_list, hit_atoms, ring_bonds, ring_atoms, neighbor, current_atom);
+                    atoms_to_process.push({ neighbor, current_atom });
+                }
+            }
+
+            // We have processed this atom, mark it as done
+            hit_atoms[current_atom] = true;
+        }
     }
 }
 
@@ -629,94 +657,6 @@ static void print_bond(TextFile& file, chemfiles::Bond::BondOrder bo) {
     }
 }
 
-void SMIFormat::write_atom(
-    const Frame& frame, std::vector<bool>& hit_atoms,
-    size_t current_atom, size_t previous_atom) {
-
-    if (hit_atoms[current_atom]) {
-        return;
-    }
-
-    auto& current_atom_bonds = adj_list_[current_atom];
-    hit_atoms[current_atom] = true;
-
-    if (current_atom != previous_atom) {
-        print_bond(file_, frame.topology().bond_order(previous_atom, current_atom));
-    }
-    write_atom_smiles(file_, frame[current_atom]);
-
-    // Prevent printing of additional '('
-    size_t ring_start = 0;
-
-    auto any_rings = ring_atoms_.find(current_atom);
-    if (any_rings != ring_atoms_.end()) {
-        for (size_t i = 0; i < any_rings->second; ++i) {
-            ring_count_++;
-            ring_start++;
-            file_.print("{}", ring_count_);
-            ring_stack_.insert({current_atom, ring_count_});
-        }
-    }
-
-    // Avoid the prining of branch begin/end
-    size_t ring_end = 0;
-
-    // Find all ring connections first
-    for (auto neighbor : current_atom_bonds) {
-        // avoid 'trivial' rings
-        if (neighbor == previous_atom) {
-            continue;
-        }
-
-        // We must have a ring
-        if (hit_atoms[neighbor]) {
-            auto ring = ring_stack_.find(neighbor);
-            if (ring != ring_stack_.end()) {
-                print_bond(file_,
-                    frame.topology().bond_order(current_atom, neighbor)
-                );
-                file_.print("{}", ring->second);
-                ring_stack_.erase(ring);
-                ring_end++;
-            }
-        }
-    }
-
-    size_t neighbors_printed = 0;
-    for (auto neighbor : current_atom_bonds) {
-        // prevent back tracking
-        if (neighbor == previous_atom) {
-            continue;
-        }
-
-        // This got taken care of by printing a ring
-        if (hit_atoms[neighbor]) {
-            continue;
-        }
-
-        // To print a start bracket, we need to be branching (> 2 non-ring bonds)
-        // and we don't want to brank the last neighbor printed
-        if (neighbors_printed - ring_start < current_atom_bonds.size() - 2 &&
-            current_atom_bonds.size() > 2) {
-            file_.print("(");
-            branch_stack_++;
-        }
-
-        // Depth First Search like recursion
-        this->write_atom(frame, hit_atoms, neighbor, current_atom);
-
-        // we printed a neighbor, if there's more than 1 neighbor, then we need to
-        // branch for all but the last neighbor
-        neighbors_printed++;
-    }
-
-    // End of branch
-    if (current_atom_bonds.size() - ring_end == 1 && branch_stack_ != 0) {
-        file_.print(")");
-        branch_stack_--;
-    }
-}
-
 void SMIFormat::write_next(const Frame& frame) {
     if (frame.size() == 0) {
         file_.print("\n");
@@ -746,8 +686,120 @@ void SMIFormat::write_next(const Frame& frame) {
             file_.print(".");
         }
         auto not_hit = std::find(written.begin(), written.end(), false);
-        auto current_atom = static_cast<size_t>(std::distance(written.begin(), not_hit));
-        this->write_atom(frame, written, current_atom, current_atom);
+        auto start_atom = static_cast<size_t>(std::distance(written.begin(), not_hit));
+
+        // We have found an atom that has not yet been printed! Now we must print it out
+        // along with all of its connections (the entire component).
+
+        // A structure to store a depth first like search through the component.
+        std::stack<std::tuple<size_t, size_t, bool>> atoms_to_process;
+        atoms_to_process.push(std::tuple<size_t,size_t,bool>( start_atom, start_atom, false ));
+
+        while (atoms_to_process.size()) {
+            bool needs_branch; // Do we need the '(' character?
+            size_t previous_atom; // The atom that added the current atom to the stack
+            size_t current_atom; // The current atom to process
+
+            std::tie(previous_atom, current_atom, needs_branch) = atoms_to_process.top();
+            atoms_to_process.pop();
+
+            if (written[current_atom]) {
+                continue;
+            }
+
+            auto& current_atom_bonds = adj_list_[current_atom];
+            written[current_atom] = true;
+
+            if (needs_branch) {
+                file_.print("(");
+                branch_stack_++;
+            }
+
+            // This is only true the first time the loop is run
+            if (current_atom != previous_atom) {
+                print_bond(file_, frame.topology().bond_order(previous_atom, current_atom));
+            }
+            write_atom_smiles(file_, frame[current_atom]);
+
+            // Prevent printing of additional '('
+            size_t ring_start = 0;
+
+            // We already know all rings in the structure, so the number of potential rings
+            // for the current atom can be printed.
+            auto any_rings = ring_atoms_.find(current_atom);
+            if (any_rings != ring_atoms_.end()) {
+                for (size_t i = 0; i < any_rings->second; ++i) {
+                    ring_count_++;
+                    ring_start++;
+                    file_.print("{}", ring_count_ >= 10 ?
+                                "%" + std::to_string(ring_count_) : std::to_string(ring_count_));
+                    ring_stack_.insert({ current_atom, ring_count_ });
+                }
+            }
+
+            // Avoid the prining of branch begin/end
+            size_t ring_end = 0;
+
+            // Find all ring connections first
+            for (auto neighbor : current_atom_bonds) {
+                // avoid 'trivial' rings
+                if (neighbor == previous_atom) {
+                    continue;
+                }
+
+                // We must have a ring to terminate
+                if (written[neighbor]) {
+                    auto ring = ring_stack_.find(neighbor);
+                    if (ring != ring_stack_.end()) {
+                        print_bond(file_,
+                            frame.topology().bond_order(current_atom, neighbor)
+                        );
+                        file_.print("{}", ring->second >= 10 ?
+                            "%" + std::to_string(ring->second) : std::to_string(ring->second));
+                        ring_stack_.erase(ring);
+                        ring_end++;
+                    }
+                }
+            }
+
+            // Handle branching
+            size_t neighbors_printed = 0;
+            for (auto neighbor_iter = current_atom_bonds.rbegin();
+                neighbor_iter != current_atom_bonds.rend();
+                ++neighbor_iter) {
+
+                auto neighbor = *neighbor_iter;
+
+                // prevent back tracking
+                if (neighbor == previous_atom) {
+                    continue;
+                }
+
+                // This got taken care of by printing a ring
+                if (written[neighbor]) {
+                    continue;
+                }
+
+                // To print a start bracket, we need to be branching (> 2 non-ring bonds)
+                // and we don't want to brank the last neighbor printed
+                auto needs_to_branch = neighbors_printed != 0 && neighbors_printed > ring_start;
+
+                // Depth First Search like recursion
+                //this->write_atom(frame, hit_atoms, neighbor, current_atom);
+                atoms_to_process.push(std::tuple<size_t,size_t,bool>( current_atom, neighbor, needs_to_branch));
+
+                // we printed a neighbor, if there's more than 1 neighbor, then we need to
+                // branch for all but the last neighbor
+                neighbors_printed++;
+            }
+
+            // End of branch
+            if (current_atom_bonds.size() - ring_end == 1 && branch_stack_ != 0) {
+                file_.print(")");
+                branch_stack_--;
+            }
+        }
+
         first_atom_ = false;
     }
 

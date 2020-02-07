@@ -65,12 +65,6 @@ private:
     /// [for writing] Should we add a '.' after the current molecule
     bool first_atom_;
 
-    /// [for writing] writes a single atom to the internal file
-    /// this function is recursive
-    void write_atom(const Frame& frame,
-        std::vector<bool>& hit_atoms,
-        size_t current_atom, size_t previous_atom);
-
     /// [for writing] stores the graph of the topology
     std::vector<std::vector<size_t>> adj_list_;
 

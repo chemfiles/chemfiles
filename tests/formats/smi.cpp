@@ -281,20 +281,35 @@ TEST_CASE("Errors in SMI format") {
 TEST_CASE("Write SMI File") {
     auto tmpfile = NamedTempPath(".smi");
     const auto EXPECTED_CONTENT =
-R"(C
+R"(C(C)(C)(C)C
+C
 C~N
 C~N(P)=O
 C~N(P(#F)$B)=O
 C1~N(P(#F:1)$B)=O
 C12~N(P(#F:1)$B/2)=O	test
+C12(~N(P(#F:1)$B/2)=O)~I	test
+C12(~N(P(#F:1)$B/2)(=O)~S)~I	test
 [WH5+3].[35Cl-]->[c:1@H]<-[te@SP3]\[C@@]
 O.O.O
 )";
 
-    Frame frame;
-    frame.add_atom(Atom("C"), {0, 0, 0});
-
     auto file = Trajectory(tmpfile, 'w');
+    auto frame = Frame();
+    frame.add_atom(Atom("C"), { 0, 0, 0 });
+    frame.add_atom(Atom("C"), { 0, 0, 0 });
+    frame.add_atom(Atom("C"), { 0, 0, 0 });
+    frame.add_atom(Atom("C"), { 0, 0, 0 });
+    frame.add_atom(Atom("C"), { 0, 0, 0 });
+
+    frame.add_bond(0, 1, Bond::SINGLE);
+    frame.add_bond(0, 2, Bond::SINGLE);
+    frame.add_bond(0, 3, Bond::SINGLE);
+    frame.add_bond(0, 4, Bond::SINGLE);
+    file.write(frame);
+
+    frame = Frame();
+    frame.add_atom(Atom("C"), {0, 0, 0});
     file.write(frame);
 
     frame.add_atom(Atom("N"), {0, 0, 0});
@@ -318,6 +333,14 @@ O.O.O
 
     frame.add_bond(0, 5, Bond::UP);
     frame.set("name", "test");
+    file.write(frame);
+
+    frame.add_atom(Atom("I"), { 0, 0, 0 });
+    frame.add_bond(0, 6);
+    file.write(frame);
+
+    frame.add_atom(Atom("S"), { 0, 0, 0 });
+    frame.add_bond(1, 7);
     file.write(frame);
 
     // Reinitialize
