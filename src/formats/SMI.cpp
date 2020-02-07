@@ -120,7 +120,8 @@ Atom& SMIFormat::add_atom(Topology& topology, string_view atom_name) {
     return topology[topology.size() - 1];
 }
 
-void SMIFormat::process_property_list(Topology& topology, string_view smiles, size_t& i) {
+void SMIFormat::process_property_list(Topology& topology, string_view smiles) {
+    size_t i = 0;
     double mass = 0.0;
     if (std::isdigit(smiles[i]) != 0) {
         mass = static_cast<double>(read_number(smiles, i));
@@ -139,7 +140,7 @@ void SMIFormat::process_property_list(Topology& topology, string_view smiles, si
         new_atom.set_mass(mass);
     }
 
-    while (i < smiles.size() && smiles[i] != ']') {
+    while (i < smiles.size()) {
         size_t count_or_class = 0;
         std::string chirality_type = "CCW";
         switch (smiles[i]) {
@@ -162,9 +163,6 @@ void SMIFormat::process_property_list(Topology& topology, string_view smiles, si
             count_or_class = read_number(smiles, ++i);
             new_atom.set("smiles_class", count_or_class);
             break;
-        case ']':
-            --i;
-            break;
         case '@':
             // Set the direction of the chirality
             if (i + 1 < smiles.size() && smiles[i + 1] == '@') {
@@ -184,6 +182,29 @@ void SMIFormat::process_property_list(Topology& topology, string_view smiles, si
         }
         ++i;
     }
+}
+
+void SMIFormat::check_ring_(Topology& topology, size_t ring_id) {
+    auto ring_lookup = rings_ids_.find(ring_id);
+
+    if (ring_lookup == rings_ids_.end()) {
+        rings_ids_.insert({ ring_id, {previous_atom_, current_bond_order_} });
+        current_bond_order_ = Bond::SINGLE;
+        return;
+    }
+
+    // Deviation from the standard, technically bond orders need to be equal,
+    // but we will accept the stored order if the current order is single.
+    // This is common practice
+    topology.add_bond(previous_atom_,
+        ring_lookup->second.first,
+        current_bond_order_ == Bond::SINGLE ?
+        ring_lookup->second.second :
+        current_bond_order_
+    );
+    rings_ids_.erase(ring_lookup);
+
+    current_bond_order_ = Bond::SINGLE;
 }
 
 void SMIFormat::read_next(Frame& frame) {
@@ -207,29 +228,6 @@ void SMIFormat::read_next(Frame& frame) {
         smiles = trim(line);
     }
 
-    auto check_ring = [this, &topology](size_t ring_id) {
-        auto ring_lookup = rings_ids_.find(ring_id);
-
-        if (ring_lookup == rings_ids_.end()) {
-            rings_ids_.insert({ring_id, {previous_atom_, current_bond_order_}});
-            current_bond_order_ = Bond::SINGLE;
-            return;
-        }
-
-        // Deviation from the standard, technically bond orders need to be equal,
-        // but we will accept the stored order if the current order is single.
-        // This is common practice
-        topology.add_bond(previous_atom_,
-            ring_lookup->second.first,
-            current_bond_order_ == Bond::SINGLE?
-                ring_lookup->second.second :
-                current_bond_order_
-        );
-        rings_ids_.erase(ring_lookup);
-
-        current_bond_order_ = Bond::SINGLE;
-    };
-
     size_t i;
     for (i = 0; i < smiles.size(); ++i) {
 
@@ -238,9 +236,17 @@ void SMIFormat::read_next(Frame& frame) {
         }
 
         if (smiles[i] == '[') {
-            // TODO: Don't pass the full string, instead pass an iterator
-            // or maybe a substring till the closing ']'
-            this->process_property_list(topology, smiles, ++i);
+            auto prop_end = smiles.find_first_of(']', i);
+
+            if (prop_end == std::string::npos) {
+                throw format_error("SMI Reader: unmatched square brace");
+            }
+
+            auto square_prop = smiles.substr(i + 1, prop_end - i - 1);
+            this->process_property_list(topology, square_prop);
+
+            i = prop_end;
+
             continue;
         }
 
@@ -298,7 +304,7 @@ void SMIFormat::read_next(Frame& frame) {
 
         if (std::isdigit(smiles[i]) != 0) {
             auto ring_id = static_cast<size_t>(smiles[i] - '0');
-            check_ring(ring_id);
+            check_ring_(topology, ring_id);
             continue;
         }
 
@@ -346,13 +352,12 @@ void SMIFormat::read_next(Frame& frame) {
             if (i + 2 >= smiles.size()) {
                 throw format_error("SMI Reader: rings defined with '%' must be double digits");
             }
-            check_ring(parse<size_t>(smiles.substr(i + 1, 2)));
+            check_ring_(topology, parse<size_t>(smiles.substr(i + 1, 2)));
             i += 2; // this line alone fixes most of issue 303 :)
             break;
         case '*':
             this->add_atom(topology, "*").set("wildcard", true);
             break;
-        case '[':
         case ']':
         case '+':
         case '@':
@@ -420,7 +425,7 @@ static void find_rings(
         std::stack<std::pair<size_t, size_t>> atoms_to_process;
         atoms_to_process.push({ current_atom, current_atom });
 
-        while (atoms_to_process.size()) {
+        while (!atoms_to_process.empty()) {
 
             size_t previous_atom;
 
@@ -430,11 +435,12 @@ static void find_rings(
             auto& current_atom_bonds = adj_list[current_atom];
 
             // We go through the neighbors backwards because we are using a
-            // stack instead and want to through them in the forward direction
+            // stack and want to go through them in the forward direction
+            // when the stack is popped
             // (think of it like the negative of a negative is a positive)
             // We cannot use a queue as we want to process all neighbors of an
             // atom first, then move on to the next atom group (allowing for a
-            // depth first like search).
+            // depth first like search instead of a breadth first search).
             for (auto neighbor_iter = current_atom_bonds.rbegin();
                 neighbor_iter != current_atom_bonds.rend();
                 ++neighbor_iter) {
@@ -452,7 +458,7 @@ static void find_rings(
                 if (hit_atoms[neighbor] && !hit_atoms[current_atom]) {
 
                     // Don't process the same ring connection twice
-                    if (ring_bonds.count(Bond(neighbor, current_atom))) {
+                    if (ring_bonds.count(Bond(neighbor, current_atom)) != 0) {
                         continue;
                     }
                     ring_bonds.insert(Bond(neighbor, current_atom));
@@ -468,7 +474,7 @@ static void find_rings(
 
                 // Continue the search for new atoms
                 if (!hit_atoms[neighbor]) {
-                    //find_rings_helper(adj_list, hit_atoms, ring_bonds, ring_atoms, neighbor, current_atom);
+                    // Add this atom to be processed. Replaces recursive section
                     atoms_to_process.push({ neighbor, current_atom });
                 }
             }
@@ -674,7 +680,7 @@ void SMIFormat::write_next(const Frame& frame) {
     find_rings(adj_list_, ring_atoms_);
 
     std::vector<bool> written(frame.size(), false);
-    branch_stack_ = 0;
+    size_t branch_stack = 0;
 
     ring_stack_.clear();
     ring_count_ = 0;
@@ -695,7 +701,7 @@ void SMIFormat::write_next(const Frame& frame) {
         std::stack<std::tuple<size_t, size_t, bool>> atoms_to_process;
         atoms_to_process.push(std::tuple<size_t,size_t,bool>( start_atom, start_atom, false ));
 
-        while (atoms_to_process.size()) {
+        while (!atoms_to_process.empty()) {
             bool needs_branch; // Do we need the '(' character?
             size_t previous_atom; // The atom that added the current atom to the stack
             size_t current_atom; // The current atom to process
@@ -712,7 +718,7 @@ void SMIFormat::write_next(const Frame& frame) {
 
             if (needs_branch) {
                 file_.print("(");
-                branch_stack_++;
+                branch_stack++;
             }
 
             // This is only true the first time the loop is run
@@ -785,7 +791,6 @@ void SMIFormat::write_next(const Frame& frame) {
                 auto needs_to_branch = neighbors_printed != 0 && neighbors_printed > ring_start;
 
                 // Depth First Search like recursion
-                //this->write_atom(frame, hit_atoms, neighbor, current_atom);
                 atoms_to_process.push(std::tuple<size_t,size_t,bool>( current_atom, neighbor, needs_to_branch));
 
                 // we printed a neighbor, if there's more than 1 neighbor, then we need to
@@ -794,9 +799,9 @@ void SMIFormat::write_next(const Frame& frame) {
             }
 
             // End of branch
-            if (current_atom_bonds.size() - ring_end == 1 && branch_stack_ != 0) {
+            if (current_atom_bonds.size() - ring_end == 1 && branch_stack != 0) {
                 file_.print(")");
-                branch_stack_--;
+                branch_stack--;
             }
         }
 
