@@ -158,7 +158,7 @@ FormatInfo format_information() {
 class TextFormat: public Format {
 public:
     TextFormat(std::string path, File::Mode mode, File::Compression compression);
-    TextFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression);
+    TextFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression);
     virtual ~TextFormat() override = default;
 
     void read_step(size_t step, Frame& frame) override;

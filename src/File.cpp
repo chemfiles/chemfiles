@@ -49,7 +49,7 @@ TextFile::TextFile(std::string path, File::Mode mode, File::Compression compress
     }
 }
 
-TextFile::TextFile(MemoryBuffer& memory, File::Mode mode, File::Compression compression):
+TextFile::TextFile(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression):
     File("<in memory>", mode, File::Compression::DEFAULT),
     file_(nullptr),
     buffer_(8192, 0),
@@ -65,10 +65,10 @@ TextFile::TextFile(MemoryBuffer& memory, File::Mode mode, File::Compression comp
             throw file_error("writing to a compressed memory file is not supported");
         }
 
-        memory.decompress(compression);
+        memory->decompress(compression);
     }
 
-    file_ = std::unique_ptr<TextFileImpl>(new MemoryFile(memory, mode));
+    file_ = std::unique_ptr<TextFileImpl>(new MemoryFile(std::move(memory), mode));
 }
 
 uint64_t TextFile::tellpos() const {

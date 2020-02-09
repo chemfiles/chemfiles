@@ -25,8 +25,8 @@ public:
         init_();
     }
 
-    CMLFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression):
-        file_(memory, mode, compression) {
+    CMLFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression):
+        file_(std::move(memory), mode, compression) {
         init_();
     }
 

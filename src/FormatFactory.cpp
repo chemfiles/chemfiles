@@ -112,8 +112,8 @@ void FormatFactory::register_format(FormatInfo info, format_creator_t creator, m
 
 void FormatFactory::register_format(FormatInfo info, format_creator_t creator) {
     register_format(info, creator,
-        [info](MemoryBuffer&, File::Mode, File::Compression) -> std::unique_ptr<Format> {
-            throw format_error("memory IO is not supported for the format '{}'", info.name());
+        [info](std::shared_ptr<MemoryBuffer>, File::Mode, File::Compression) -> std::unique_ptr<Format> {
+            throw format_error("in-memory IO is not supported for the '{}' format", info.name());
         }
     );
 }

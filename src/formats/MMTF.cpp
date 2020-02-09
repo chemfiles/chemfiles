@@ -57,28 +57,24 @@ MMTFFormat::MMTFFormat(std::string path, File::Mode mode, File::Compression comp
     }
 }
 
-MMTFFormat::MMTFFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression) {
+MMTFFormat::MMTFFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression) {
     if (mode == File::WRITE) {
         throw format_error("the MMTF format cannot write to memory");
     }
 
-    memory.decompress(compression);
-    decode(memory.data(), memory.size(), "from memory");
-
-    if (!structure_.hasConsistentData()) {
-        throw format_error("issue with data in memory, please ensure it is valid MMTF");
-    }
+    memory->decompress(compression);
+    decode(memory->data(), memory->size(), "memory");
 }
 
 void MMTFFormat::decode(const char* data, size_t size, const std::string& source) {
     try {
         mmtf::decodeFromBuffer(structure_, data, size);
     } catch (const mmtf::DecodeError& e) { // rethrow as a chemfiles error
-        throw format_error("issue with decoding MMTF file {}: '{}'", source, e.what());
+        throw format_error("error while decoding MMTF from {}: '{}'", source, e.what());
     }
 
     if (!structure_.hasConsistentData()) {
-        throw format_error("issue with: '{}', please ensure it is valid MMTF file", source);
+        throw format_error("issue with data from '{}', please ensure it is valid MMTF file", source);
     }
 }
 

@@ -17,13 +17,12 @@
 namespace chemfiles {
 
 using format_creator_t = std::function<std::unique_ptr<Format>(std::string path, File::Mode mode, File::Compression compression)>;
-using memory_stream_t = std::function<std::unique_ptr<Format>(MemoryBuffer& memory, File::Mode mode, File::Compression compression)>;
+using memory_stream_t = std::function<std::unique_ptr<Format>(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression)>;
 
 struct RegisteredFormat {
     FormatInfo info;
     format_creator_t creator;
     memory_stream_t memory_stream_creator;
-
 };
 
 /// This is a special template class to check for the existence of the memory
@@ -31,9 +30,9 @@ struct RegisteredFormat {
 template <typename T>
 struct SupportsMemoryIO {
 
-    /// This will be defined if U has the constructor U(MemoryBuffer&, File::mode, File::Compression)
+    /// This will be defined if U has the constructor U(std::shared_ptr<MemoryBuffer>, File::mode, File::Compression)
     template<typename U>
-    static int32_t SFINAE(decltype(U(std::declval<MemoryBuffer&>(), File::Mode(), File::Compression()))*);
+    static int32_t SFINAE(decltype(U(std::declval<std::shared_ptr<MemoryBuffer>>(), File::Mode(), File::Compression()))*);
 
     /// This is a fall back that is always defined, but at the lowest precedence
     template<typename U>
@@ -84,8 +83,8 @@ public:
             [](const std::string& path, File::Mode mode, File::Compression compression) {
                 return std::unique_ptr<Format>(new Format(path, mode, compression));  // NOLINT no make_unique in C++11
             },
-            [](MemoryBuffer& memory, File::Mode mode, File::Compression compression) {
-                return std::unique_ptr<Format>(new Format(memory, mode, compression));  // NOLINT no make_unique in C++11
+            [](std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression) {
+                return std::unique_ptr<Format>(new Format(std::move(memory), mode, compression));  // NOLINT no make_unique in C++11
             }
         );
     }

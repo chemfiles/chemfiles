@@ -126,34 +126,34 @@ Trajectory::Trajectory(std::string path, char mode, const std::string& format)
 Trajectory Trajectory::memory_reader(const char* data, size_t size, const std::string& format) {
 
     auto info = file_open_info::parse("", format);
-    
+
     if (info.format == "") {
         throw format_error("format name '{}' is invalid", format);
     }
 
     auto memory_creator = FormatFactory::get().memory_stream(info.format);
-    auto buffer = std::unique_ptr<MemoryBuffer>(new MemoryBuffer(data, size));
-    auto creator = memory_creator(*buffer, File::READ, info.compression);
+    auto buffer = std::make_shared<MemoryBuffer>(data, size);
+    auto creator = memory_creator(buffer, File::READ, info.compression);
 
     return Trajectory('r', std::move(creator), std::move(buffer));
 }
 
-Trajectory Trajectory::memory_writer(const std::string& format) {    
+Trajectory Trajectory::memory_writer(const std::string& format) {
     auto info = file_open_info::parse("", format);
-    
+
     if (info.format == "") {
         throw format_error("format name '{}' is invalid", format);
     }
 
     auto memory_creator = FormatFactory::get().memory_stream(info.format);
-    auto buffer = std::unique_ptr<MemoryBuffer>(new MemoryBuffer(20480));
+    auto buffer = std::make_shared<MemoryBuffer>(8192);
 
-    auto format_ = memory_creator(*buffer, File::WRITE, info.compression);
+    auto format_ = memory_creator(buffer, File::WRITE, info.compression);
 
     return Trajectory('w', std::move(format_), std::move(buffer));
 }
 
-Trajectory::Trajectory(char mode, std::unique_ptr<Format> format, std::unique_ptr<MemoryBuffer> buffer)
+Trajectory::Trajectory(char mode, std::unique_ptr<Format> format, std::shared_ptr<MemoryBuffer> buffer)
     : mode_(mode), format_(std::move(format)), buffer_(std::move(buffer)) {
     if (mode == 'r' || mode == 'a') {
         nsteps_ = format_->nsteps();

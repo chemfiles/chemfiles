@@ -250,8 +250,7 @@ public:
     optional<span<char>> memory_block() const;
 
 private:
-
-    Trajectory(char mode, std::unique_ptr<Format> format, std::unique_ptr<MemoryBuffer> buffer);
+    Trajectory(char mode, std::unique_ptr<Format> format, std::shared_ptr<MemoryBuffer> buffer);
 
     /// Perform a few checks before reading a frame
     void pre_read(size_t step);
@@ -278,8 +277,8 @@ private:
     /// UnitCell to use for reading/writing files when no unit cell information
     /// is present
     optional<UnitCell> custom_cell_;
-    /// The internal memory buffer
-    std::unique_ptr<MemoryBuffer> buffer_;
+    /// The internal memory buffer, shared with the MemoryFile implementation
+    std::shared_ptr<MemoryBuffer> buffer_;
 };
 
 } // namespace chemfiles

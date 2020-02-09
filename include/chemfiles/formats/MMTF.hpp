@@ -24,7 +24,7 @@ class Frame;
 class MMTFFormat final: public Format {
 public:
     MMTFFormat(std::string path, File::Mode mode, File::Compression compression);
-    MMTFFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression);
+    MMTFFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression);
 
     ~MMTFFormat() override;
 

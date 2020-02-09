@@ -132,13 +132,12 @@ public:
     ///                   file is invalid for the given compression method
     TextFile(std::string path, File::Mode mode, File::Compression compression);
 
-    /// Open the `MemoryBuffer` called `memory` with the requested `mode` and
-    /// `compression` method. A `MemoryFileReader` or `MemoryFileWriter` will
-    /// be used as the `TextFileImpl`.
+    /// Use the given `MemoryBuffer` with the requested `mode` and `compression`
+    /// method. A `MemoryFile` will be used as the `TextFileImpl`.
     ///
-    /// @throws FileError if the file mode is append, or if trying to write to
-    ///                   a compressed file.
-    TextFile(MemoryBuffer& memory, File::Mode mode, File::Compression compression);
+    /// @throws FileError if the file mode is append, or if trying to write to a
+    /// compressed file.
+    TextFile(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression);
 
     TextFile(TextFile&&) = default;
     TextFile& operator=(TextFile&&) = default;

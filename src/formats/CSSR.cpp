@@ -46,9 +46,13 @@ CSSRFormat::CSSRFormat(std::string path, File::Mode mode, File::Compression comp
     }
 }
 
-CSSRFormat::CSSRFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression)
-    : TextFormat(memory, mode, compression)
-{}
+CSSRFormat::CSSRFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression)
+    : TextFormat(std::move(memory), mode, compression)
+{
+    if (mode == File::APPEND) {
+        throw format_error("append mode ('a') is not supported with CSSR format");
+    }
+}
 
 void CSSRFormat::read_next(Frame& frame) {
     if (file_.tellpos() != 0) {

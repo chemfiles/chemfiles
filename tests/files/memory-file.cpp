@@ -17,7 +17,7 @@ class!
 
 TEST_CASE("Reading from files in memory") {
     SECTION("Basic reading functionalities") {
-        auto buff = MemoryBuffer(&memory_file[0], memory_file.size());
+        auto buff = std::make_shared<MemoryBuffer>(&memory_file[0], memory_file.size());
         auto file = TextFile(buff, File::READ, File::DEFAULT);
 
         CHECK(file.readline() == "This is");
@@ -82,16 +82,17 @@ TEST_CASE("Reading from files in memory") {
 
 TEST_CASE("Write to files in memory") {
     SECTION("Basic writing functionalities") {
-        MemoryBuffer buffer(6); // It is 6 as a null character is needed
+        // Size 6 as this is the minimal size needed to store "Test\n"
+        auto buffer = std::make_shared<MemoryBuffer>(6);
 
         auto file = TextFile(buffer, File::WRITE, File::DEFAULT);
         file.print("Test\n");
 
-        auto result = buffer.write_memory_as_string();
+        auto result = buffer->write_memory_as_string();
         CHECK(std::string(result.data(), result.size()) == "Test\n");
 
         file.print("JUNKJUNK");
-        result = buffer.write_memory_as_string();
+        result = buffer->write_memory_as_string();
         CHECK(std::string(result.data(), result.size()) == "Test\nJUNKJUNK");
 
         CHECK_THROWS_WITH(
@@ -107,16 +108,26 @@ TEST_CASE("Write to files in memory") {
 
     SECTION("Writing to a compressed memory file") {
         // This currently is not supported
-        MemoryBuffer buffer;
+        auto buffer = std::make_shared<MemoryBuffer>();
         CHECK_THROWS_WITH(
             TextFile(buffer, File::WRITE, File::GZIP),
+            "writing to a compressed memory file is not supported"
+        );
+
+        CHECK_THROWS_WITH(
+            TextFile(buffer, File::WRITE, File::LZMA),
+            "writing to a compressed memory file is not supported"
+        );
+
+        CHECK_THROWS_WITH(
+            TextFile(buffer, File::WRITE, File::BZIP2),
             "writing to a compressed memory file is not supported"
         );
     }
 
     SECTION("Appending to a memory file") {
         // This currently is not supported
-        MemoryBuffer buffer;
+        auto buffer = std::make_shared<MemoryBuffer>();
         CHECK_THROWS_WITH(
             TextFile(buffer, File::APPEND, File::DEFAULT),
             "cannot append (mode 'a') to a memory file"

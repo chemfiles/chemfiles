@@ -27,8 +27,8 @@ public:
         init_();
     }
 
-    mmCIFFormat(MemoryBuffer& memory, File::Mode mode, File::Compression compression) :
-        file_(memory, mode, compression), models_(0), atoms_(0) {
+    mmCIFFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression) :
+        file_(std::move(memory), mode, compression), models_(0), atoms_(0) {
         init_();
     }
 

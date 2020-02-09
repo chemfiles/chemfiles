@@ -336,7 +336,7 @@ TEST_CASE("Read memory in MMTF format") {
         std::ifstream checking("data/mmtf/1J8K.mmtf", std::ifstream::binary);
         std::vector<char> content((std::istreambuf_iterator<char>(checking)),
                          std::istreambuf_iterator<char>());
-        
+
         auto file = Trajectory::memory_reader(content.data(), content.size(), "MMTF");
         auto frame = file.read_step(13);
         CHECK(frame.size() == 1402);
@@ -380,7 +380,7 @@ TEST_CASE("Error checking") {
 
     CHECK_THROWS_WITH(
         Trajectory::memory_reader("JUNK", 5, "MMTF"),
-        "issue with decoding MMTF file from memory: 'Expected msgpack type to be MAP'"
+        "error while decoding MMTF from memory: 'Expected msgpack type to be MAP'"
     );
 
     CHECK_THROWS_WITH(
