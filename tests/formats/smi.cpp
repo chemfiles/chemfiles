@@ -223,6 +223,36 @@ TEST_CASE("Check parsing results") {
             frame = file.read();
         }
     }
+
+    SECTION("Issue 303") {
+        auto file = Trajectory("data/smi/issue_303.smi");
+
+        // We support only the storage of curly SMILES
+        auto frame = file.read();
+        CHECK(frame[5].get("curly_property")->as_string() == "-");
+        CHECK(frame[8].get("curly_property")->as_string() == "+n");
+
+        // In Issue 303, this failed due to the '%11' marker.
+        frame = file.read();
+        
+        // No explict hydrogens, so the size should be 26 atoms
+        frame = file.read();
+        CHECK(frame.size() == 26);
+
+        // Converting the original SDF file using MarvinSketch preverses the explicit hydrogens
+        frame = file.read();
+        CHECK(frame.size() == 30);
+
+        // For the next test, too many bonds were parsed
+        frame = file.read();
+        CHECK(frame.topology().bonds().size() == 34);
+
+        frame = file.read();
+        CHECK(frame.topology().bonds().size() == 182);
+
+        frame = file.read();
+        CHECK(frame.topology().bonds().size() == 171);
+    }
 }
 
 // To use in loops in order to iterate over files in a specific directory.
@@ -251,20 +281,35 @@ TEST_CASE("Errors in SMI format") {
 TEST_CASE("Write SMI File") {
     auto tmpfile = NamedTempPath(".smi");
     const auto EXPECTED_CONTENT =
-R"(C
+R"(C(C)(C)(C)C
+C
 C~N
 C~N(P)=O
 C~N(P(#F)$B)=O
 C1~N(P(#F:1)$B)=O
 C12~N(P(#F:1)$B/2)=O	test
+C12(~N(P(#F:1)$B/2)=O)~I	test
+C12(~N(P(#F:1)$B/2)(=O)~S)~I	test
 [WH5+3].[35Cl-]->[c:1@H]<-[te@SP3]\[C@@]
 O.O.O
 )";
 
-    Frame frame;
-    frame.add_atom(Atom("C"), {0, 0, 0});
-
     auto file = Trajectory(tmpfile, 'w');
+    auto frame = Frame();
+    frame.add_atom(Atom("C"), { 0, 0, 0 });
+    frame.add_atom(Atom("C"), { 0, 0, 0 });
+    frame.add_atom(Atom("C"), { 0, 0, 0 });
+    frame.add_atom(Atom("C"), { 0, 0, 0 });
+    frame.add_atom(Atom("C"), { 0, 0, 0 });
+
+    frame.add_bond(0, 1, Bond::SINGLE);
+    frame.add_bond(0, 2, Bond::SINGLE);
+    frame.add_bond(0, 3, Bond::SINGLE);
+    frame.add_bond(0, 4, Bond::SINGLE);
+    file.write(frame);
+
+    frame = Frame();
+    frame.add_atom(Atom("C"), {0, 0, 0});
     file.write(frame);
 
     frame.add_atom(Atom("N"), {0, 0, 0});
@@ -288,6 +333,14 @@ O.O.O
 
     frame.add_bond(0, 5, Bond::UP);
     frame.set("name", "test");
+    file.write(frame);
+
+    frame.add_atom(Atom("I"), { 0, 0, 0 });
+    frame.add_bond(0, 6);
+    file.write(frame);
+
+    frame.add_atom(Atom("S"), { 0, 0, 0 });
+    frame.add_bond(1, 7);
     file.write(frame);
 
     // Reinitialize

@@ -40,7 +40,10 @@ private:
     Atom& add_atom(Topology& topo, string_view atom_name);
 
     /// [for reading] adds an atom defined by the string `smiles` starting at position i
-    void process_property_list(Topology& topo, string_view smiles, size_t& i);
+    void process_property_list(Topology& topo, string_view smiles);
+
+    /// [for reading] Opens and closes a ring with id `ring_id`
+    void check_ring_(Topology& topology, size_t ring_id);
 
     /// [for reading] Stores location of a branching path
     std::stack<size_t, std::vector<size_t>> branch_point_;
@@ -65,17 +68,8 @@ private:
     /// [for writing] Should we add a '.' after the current molecule
     bool first_atom_;
 
-    /// [for writing] writes a single atom to the internal file
-    /// this function is recursive
-    void write_atom(const Frame& frame,
-        std::vector<bool>& hit_atoms,
-        size_t current_atom, size_t previous_atom);
-
     /// [for writing] stores the graph of the topology
     std::vector<std::vector<size_t>> adj_list_;
-
-    /// [for writing] stores how many branches need to be closed
-    size_t branch_stack_;
 
     /// [for writing] stores locations of ring closures. This is ordered
     /// to ensure rings get printed in numeric order (where possible)
