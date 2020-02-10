@@ -16,7 +16,7 @@ TEST_CASE("Read trajectory") {
         CHECK(chfl_trajectory_with_format("not there", 'r', "") == nullptr);
 
         // Not technically constructors, but close enough
-        CHECK(chfl_trajectory_mem_reader("not there", 5, "") == nullptr);
+        CHECK(chfl_trajectory_memory_reader("not there", 5, "") == nullptr);
     }
 
     SECTION("Path") {
@@ -58,7 +58,7 @@ TEST_CASE("Read trajectory") {
     }
 
     SECTION("Open memory for reading") {
-        CHFL_TRAJECTORY* trajectory = chfl_trajectory_mem_reader("c1ccccc1", 9, "SMI");
+        CHFL_TRAJECTORY* trajectory = chfl_trajectory_memory_reader("c1ccccc1", 9, "SMI");
         CHFL_FRAME* frame = chfl_frame();
         REQUIRE(trajectory);
         REQUIRE(frame);
@@ -283,7 +283,7 @@ TEST_CASE("Write trajectory") {
 
 TEST_CASE("Write trajectory to memory") {
     // Make sure this fails
-    CHECK(chfl_trajectory_mem_writer("") == nullptr);
+    CHECK(chfl_trajectory_memory_writer("") == nullptr);
 
     const char* EXPECTED_CONTENT =
     "4\n"
@@ -293,7 +293,7 @@ TEST_CASE("Write trajectory to memory") {
     "He 1 2 3\n"
     "He 1 2 3\n";
 
-    CHFL_TRAJECTORY* trajectory = chfl_trajectory_mem_writer("XYZ");
+    CHFL_TRAJECTORY* trajectory = chfl_trajectory_memory_writer("XYZ");
     REQUIRE(trajectory);
 
     CHFL_FRAME* frame = testing_frame();
@@ -303,7 +303,7 @@ TEST_CASE("Write trajectory to memory") {
 
     const char* result = nullptr;
     uint64_t size_of_result;
-    CHECK_STATUS(chfl_trajectory_memory_block(trajectory, &result, &size_of_result));
+    CHECK_STATUS(chfl_trajectory_memory_buffer(trajectory, &result, &size_of_result));
     CHECK(std::string(result, size_of_result) == EXPECTED_CONTENT);
 
     chfl_free(frame);
@@ -312,7 +312,7 @@ TEST_CASE("Write trajectory to memory") {
     // Make sure that improper trajectories don't succeed with internal file
     CHFL_TRAJECTORY* trajectory2 = chfl_trajectory_open("data/xyz/trajectory.xyz", 'r');
     REQUIRE(trajectory2);
-    CHECK(chfl_trajectory_memory_block(trajectory2, &result, &size_of_result) != CHFL_SUCCESS);
+    CHECK(chfl_trajectory_memory_buffer(trajectory2, &result, &size_of_result) != CHFL_SUCCESS);
     chfl_free(trajectory2);
 }
 

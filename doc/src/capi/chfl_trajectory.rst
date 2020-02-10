@@ -11,8 +11,8 @@
 
     - :cpp:func:`chfl_trajectory_open`
     - :cpp:func:`chfl_trajectory_with_format`
-    - :cpp:func:`chfl_trajectory_mem_reader`
-    - :cpp:func:`chfl_trajectory_mem_writer`
+    - :cpp:func:`chfl_trajectory_memory_reader`
+    - :cpp:func:`chfl_trajectory_memory_writer`
     - :cpp:func:`chfl_trajectory_path`
     - :cpp:func:`chfl_trajectory_read`
     - :cpp:func:`chfl_trajectory_read_step`
@@ -21,7 +21,7 @@
     - :cpp:func:`chfl_trajectory_set_topology`
     - :cpp:func:`chfl_trajectory_topology_file`
     - :cpp:func:`chfl_trajectory_nsteps`
-    - :cpp:func:`chfl_trajectory_memory_block`
+    - :cpp:func:`chfl_trajectory_memory_buffer`
     - :cpp:func:`chfl_trajectory_close`
 
     --------------------------------------------------------------------
@@ -30,9 +30,9 @@
 
 .. doxygenfunction:: chfl_trajectory_with_format
 
-.. doxygenfunction:: chfl_trajectory_mem_reader
+.. doxygenfunction:: chfl_trajectory_memory_reader
 
-.. doxygenfunction:: chfl_trajectory_mem_writer
+.. doxygenfunction:: chfl_trajectory_memory_writer
 
 .. doxygenfunction:: chfl_trajectory_path
 
@@ -50,6 +50,6 @@
 
 .. doxygenfunction:: chfl_trajectory_nsteps
 
-.. doxygenfunction:: chfl_trajectory_memory_block
+.. doxygenfunction:: chfl_trajectory_memory_buffer
 
 .. doxygenfunction:: chfl_trajectory_close

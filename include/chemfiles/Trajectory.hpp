@@ -61,7 +61,7 @@ public:
     /// [formats]: http://chemfiles.org/chemfiles/latest/formats.html#list-of-supported-formats
     explicit Trajectory(std::string path, char mode = 'r', const std::string& format = "");
 
-    /// Read a block of memory as though it were a formatted file
+    /// Read a memory buffer as though it were a formatted file
     ///
     /// The `format` parameter should be a string formatted as `"<format>"`, or
     /// `"<format>/<compression>"`. `<format>` should be the format name (see
@@ -70,28 +70,28 @@ public:
     /// or `XZ` for lzma/.xz files. If `<compression>` is present, it will
     /// determine which compression method is used to read the file. For
     /// example, `format = "XYZ"` will use the XYZ format to read the memory
-    /// block and `format = "XYZ / GZ"` will additionally use gzip compression.
+    /// buffer and `format = "XYZ / GZ"` will additionally use gzip compression.
     ///
     /// @example{trajectory/memory_reader.cpp}
     ///
-    /// @param data The start of the memory block used to store the file.
+    /// @param data The start of the memory buffer used to store the file.
     ///             It does not need to be *null* terminated.
-    /// @param size The size of the memory block.
+    /// @param size The size of the memory buffer.
     /// @param format Specific format to use.
     ///
     /// @throws FileError If the compression given in `format` is not supported
-    /// @throws FormatError if the block is not valid for the used format, or
-    ///                     the format does not support reading from a memory
-    ///                     block
+    /// @throws FormatError if the data in the buffer is not valid for the used
+    ///                     format, or the format does not support reading from
+    ///                     a memory buffer
     ///
     /// [formats]: http://chemfiles.org/chemfiles/latest/formats.html#list-of-supported-formats
     static Trajectory memory_reader(const char* data, size_t size, const std::string& format);
 
-    /// Write to a block of memory as though it were a formatted file
+    /// Write to a memory buffer as though it were a formatted file
     ///
     /// The `format` parameter should be a string formatted as `"<format>"`. To
     /// retreive the memory written to by the returned `Trajectory` object, make
-    /// a call to the `memory_block` function.
+    /// a call to the `memory_buffer` function.
     ///
     /// Writing to compressed memory is not supported at this time.
     ///
@@ -100,10 +100,7 @@ public:
     /// @param format Specific format to use.
     ///
     /// @throws FileError If any compression is given in `format`
-    /// @throws FormatError if the file is not valid for the used format, or the
-    ///                     format does not support writing to a memory block
-    ///
-    /// [formats]: http://chemfiles.org/chemfiles/latest/formats.html#list-of-supported-formats
+    /// @throws FormatError if the format does not support writing to a memory buffer
     static Trajectory memory_writer(const std::string& format);
 
     ~Trajectory();
@@ -246,8 +243,8 @@ public:
     /// If the trajectory was not created for writing to memory, this will
     /// return `nullopt`.
     ///
-    /// @example{trajectory/memory_block.cpp}
-    optional<span<char>> memory_block() const;
+    /// @example{trajectory/memory_buffer.cpp}
+    optional<span<const char>> memory_buffer() const;
 
 private:
     Trajectory(char mode, std::unique_ptr<Format> format, std::shared_ptr<MemoryBuffer> buffer);

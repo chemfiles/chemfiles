@@ -40,7 +40,7 @@ error:
     return nullptr;
 }
 
-extern "C" CHFL_TRAJECTORY* chfl_trajectory_mem_reader(const char* memory, uint64_t size, const char* format) {
+extern "C" CHFL_TRAJECTORY* chfl_trajectory_memory_reader(const char* memory, uint64_t size, const char* format) {
     CHFL_TRAJECTORY* trajectory = nullptr;
     CHECK_POINTER_GOTO(memory);
     CHECK_POINTER_GOTO(format);
@@ -55,7 +55,7 @@ error:
     return nullptr;
 }
 
-extern "C" CHFL_TRAJECTORY* chfl_trajectory_mem_writer(const char* format) {
+extern "C" CHFL_TRAJECTORY* chfl_trajectory_memory_writer(const char* format) {
     CHFL_TRAJECTORY* trajectory = nullptr;
     CHECK_POINTER_GOTO(format);
     CHFL_ERROR_GOTO(
@@ -136,17 +136,17 @@ extern "C" chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const trajectory,
     )
 }
 
-extern "C" chfl_status chfl_trajectory_memory_block(const CHFL_TRAJECTORY* trajectory, const char** data, uint64_t* max_size) {
+extern "C" chfl_status chfl_trajectory_memory_buffer(const CHFL_TRAJECTORY* trajectory, const char** data, uint64_t* max_size) {
     CHECK_POINTER(trajectory);
     CHECK_POINTER(data);
     CHECK_POINTER(max_size);
     CHFL_ERROR_CATCH(
-        auto block = trajectory->memory_block();
+        auto block = trajectory->memory_buffer();
         if (!block) {
             throw Error("trajectory not opened to write to a memory block");
         }
         *data = block.value().data();
-        *max_size = trajectory->memory_block().value().size();
+        *max_size = trajectory->memory_buffer().value().size();
     )
 }
 

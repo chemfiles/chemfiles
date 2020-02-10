@@ -44,34 +44,34 @@ CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_with_format(
     const char* path, char mode, const char* format
 );
 
-/// Read a block of memory as though it were a formatted file
+/// Read a memory buffer as though it were a formatted file
 ///
-/// The start of the memory block used to store the file is given using the
-/// `data` argument and the size of the block is given by `size`.
+/// The start of the memory buffer used to store the file is given using the
+/// `data` argument and the size of the buffer is given by `size`.
 /// The `format` parameter is required and may contain a compression method.
 ///
 /// The caller of this function should free the allocated memory using
 /// `chfl_trajectory_close`.
 ///
-/// @example{capi/chfl_trajectory/mem_reader.c}
+/// @example{capi/chfl_trajectory/memory_reader.c}
 /// @return A pointer to the trajectory, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
-CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_mem_reader(
+CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_memory_reader(
     const char* memory, uint64_t size, const char* format
 );
 
-/// Write to a block of memory as though it were a formatted file
+/// Write to a memory buffer as though it were a formatted file
 ///
 /// The `format` parameter is required. To retreive the memory written to by
-/// the `CHFL_TRAJECTORY`, use the function `chfl_trajectory_memory_block`.
+/// the `CHFL_TRAJECTORY`, use the function `chfl_trajectory_memory_buffer`.
 ///
 /// The caller of this function should free the allocated memory using
 /// `chfl_trajectory_close`.
 ///
-/// @example{capi/chfl_trajectory/mem_writer.c}
+/// @example{capi/chfl_trajectory/memory_writer.c}
 /// @return A pointer to the trajectory, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
-CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_mem_writer(
+CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_memory_writer(
     const char* format
 );
 
@@ -166,15 +166,15 @@ CHFL_EXPORT chfl_status chfl_trajectory_nsteps(
     CHFL_TRAJECTORY* trajectory, uint64_t* nsteps
 );
 
-/// Obtain the memory block written to by the `trajectory`. The user is **not**
+/// Obtain the memory buffer written to by the `trajectory`. The user is **not**
 /// responsible for freeing `data` and this will be done automatically when the
 /// trajectory is closed. It is guaranteed that `data` is null terminated. The
 /// maximum size of the buffer is given by `max_size`.
 ///
-/// @example{capi/chfl_trajectory/memory_block.c}
+/// @example{capi/chfl_trajectory/memory_buffer.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_trajectory_memory_block(
+CHFL_EXPORT chfl_status chfl_trajectory_memory_buffer(
     const CHFL_TRAJECTORY* trajectory, const char** data, uint64_t* max_size
 );
 

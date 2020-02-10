@@ -300,10 +300,11 @@ void Trajectory::close() {
     format_.reset();
 }
 
-optional<span<char>> Trajectory::memory_block() const {
+optional<span<const char>> Trajectory::memory_buffer() const {
     if (buffer_ == nullptr || mode_ == File::READ) {
         return nullopt;
     }
 
-    return buffer_->write_memory_as_string();
+    auto buffer_string = buffer_->write_memory_as_string();
+    return span<const char>(buffer_string.data(), buffer_string.data() + buffer_string.size());
 }

@@ -6,7 +6,6 @@
 using namespace chemfiles;
 
 TEST_CASE() {
-    // [no-run]
     // [example]
     // Text based formats and some binary support reading from memory
     auto aromatics = std::string("c1ccccc1\nc1ccco1\nc1ccccn1\n");
@@ -17,7 +16,7 @@ TEST_CASE() {
     // Other formats do not and will throw an error
     CHECK_THROWS_WITH(
         Trajectory::memory_reader(aromatics.data(), aromatics.size(), "DCD"),
-        "opening memory for DCD files is not supported"
+        "in-memory IO is not supported for the 'DCD' format"
     );
 
     // [example]

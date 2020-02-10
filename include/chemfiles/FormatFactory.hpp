@@ -32,7 +32,7 @@ struct SupportsMemoryIO {
 
     /// This will be defined if U has the constructor U(std::shared_ptr<MemoryBuffer>, File::mode, File::Compression)
     template<typename U>
-    static int32_t SFINAE(decltype(U(std::declval<std::shared_ptr<MemoryBuffer>>(), File::Mode(), File::Compression()))*);
+    static int32_t SFINAE(decltype(U(std::shared_ptr<MemoryBuffer>(), File::Mode(), File::Compression()))*);
 
     /// This is a fall back that is always defined, but at the lowest precedence
     template<typename U>

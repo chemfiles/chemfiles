@@ -6,7 +6,6 @@
 using namespace chemfiles;
 
 TEST_CASE() {
-    // [no-run]
     // [example]
     // Text based formats support writing to memory
     auto trajectory_memory = Trajectory::memory_writer("SMI");
@@ -14,7 +13,7 @@ TEST_CASE() {
     // Binary formats typically do not support this feature
     CHECK_THROWS_WITH(
         Trajectory::memory_writer("XTC"),
-        "opening memory for XDR files (such as TRR and XTC) is not supported"
+        "in-memory IO is not supported for the 'XTC' format"
     );
 
     // [example]
