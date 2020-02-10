@@ -118,7 +118,7 @@ class MemoryBuffer;
 ///
 /// This class reads text file line by line. It does so in a efficient way by
 /// storing a chunk of the file in a memory buffer, and searching for new line
-/// indicators (either '\n' or '\r\n') in this buffer. It then returns
+/// indicators (either `\n` or `\r\n`) in this buffer. It then returns
 /// `string_view` inside this buffer, removing the need to allocate a new
 /// `std::string` for each line.
 ///

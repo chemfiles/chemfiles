@@ -29,14 +29,16 @@ public:
     /// for the names) or an empty string. `<compression>` should be `GZ` for
     /// gzip files, `BZ2` for bzip2 files, or `XZ` for lzma/.xz files. If
     /// `<compression>` is present, it will determine which compression method
-    /// is used to read/write the file. For example, `format = "XYZ"` will force
-    /// usage of XYZ format regardless of the file extension; `format = "XYZ /
-    /// GZ"` will additionally use gzip compression; and `format = "/ GZ"` will
-    /// use the gzip compression, and the file extension to guess the format.
+    /// is used to read/write the file.
     ///
-    /// If the `<format>` is an empty string, the file extension will be used
-    /// to guess the format. If `<compression>` is NOT presentand the file path
-    /// ends with either `.gz` or `.xz` the file will be treated as a
+    /// For example, `format = "XYZ"` will force usage of XYZ format regardless
+    /// of the file extension; `format = "XYZ / GZ"` will additionally use gzip
+    /// compression; and ` format = "/ GZ"` will use the gzip compression, and
+    /// the file extension to guess the format.
+    ///
+    /// If the `format` is an empty string, the file extension will be used
+    /// to guess the format. If `<compression>` is NOT present and the file path
+    /// ends with `.gz`, `.xz`, or `.bz2`; the file will be treated as a
     /// compressed file and the next extension is used to guess the format. For
     /// example `Trajectory("file.xyz.gz")` will open the file for reading
     /// using the XYZ format and the gzip compression method.
@@ -63,14 +65,8 @@ public:
 
     /// Read a memory buffer as though it were a formatted file
     ///
-    /// The `format` parameter should be a string formatted as `"<format>"`, or
-    /// `"<format>/<compression>"`. `<format>` should be the format name (see
-    /// the corresponding [documentation section][formats] for the names).
-    /// `<compression>` should be `GZ` for gzip files, `BZ2` for bzip2 files,
-    /// or `XZ` for lzma/.xz files. If `<compression>` is present, it will
-    /// determine which compression method is used to read the file. For
-    /// example, `format = "XYZ"` will use the XYZ format to read the memory
-    /// buffer and `format = "XYZ / GZ"` will additionally use gzip compression.
+    /// The `format` parameter should be follow the same rules as in the main
+    /// `Trajectory` constructor.
     ///
     /// @example{trajectory/memory_reader.cpp}
     ///
@@ -83,17 +79,16 @@ public:
     /// @throws FormatError if the data in the buffer is not valid for the used
     ///                     format, or the format does not support reading from
     ///                     a memory buffer
-    ///
-    /// [formats]: http://chemfiles.org/chemfiles/latest/formats.html#list-of-supported-formats
     static Trajectory memory_reader(const char* data, size_t size, const std::string& format);
 
     /// Write to a memory buffer as though it were a formatted file
     ///
-    /// The `format` parameter should be a string formatted as `"<format>"`. To
-    /// retreive the memory written to by the returned `Trajectory` object, make
-    /// a call to the `memory_buffer` function.
+    /// The `format` parameter should be follow the same rules as in the main
+    /// `Trajectory` constructor, except that compression specification are not
+    /// supported.
     ///
-    /// Writing to compressed memory is not supported at this time.
+    /// To retreive the memory written to by the returned `Trajectory` object,
+    /// make a call to the `memory_buffer` function.
     ///
     /// @example{trajectory/memory_writer.cpp}
     ///
@@ -238,7 +233,7 @@ public:
         return path_;
     }
 
-    /// Get the memory buffer used for writing if the trajectory was created 
+    /// Get the memory buffer used for writing if the trajectory was created
     /// with `Trajectory::memory_writer`.
     ///
     /// If the trajectory was not created for writing to memory, this will
