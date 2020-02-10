@@ -25,22 +25,8 @@ struct RegisteredFormat {
     memory_stream_t memory_stream_creator;
 };
 
-/// This is a special template class to check for the existence of the memory
-/// IO constructor
 template <typename T>
-struct SupportsMemoryIO {
-
-    /// This will be defined if U has the constructor U(std::shared_ptr<MemoryBuffer>, File::mode, File::Compression)
-    template<typename U>
-    static int32_t SFINAE(decltype(U(std::shared_ptr<MemoryBuffer>(), File::Mode(), File::Compression()))*);
-
-    /// This is a fall back that is always defined, but at the lowest precedence
-    template<typename U>
-    static int16_t SFINAE(...);
-
-    /// Evaluate one of the above expressions (done at compile time)
-    static const bool value = sizeof(SFINAE<T>(nullptr)) == sizeof(int32_t);
-};
+using SupportsMemoryIO = std::is_constructible<T, std::shared_ptr<MemoryBuffer>, File::Mode, File::Compression>;
 
 /// This class allow to register Format with names and file extensions
 class CHFL_EXPORT FormatFactory final {
