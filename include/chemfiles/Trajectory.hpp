@@ -15,6 +15,7 @@
 namespace chemfiles {
 class Format;
 class Topology;
+class MemoryBuffer;
 
 /// A `Trajectory` is a chemistry file on the hard drive. It is the entry point
 /// of the chemfiles library.
@@ -28,14 +29,16 @@ public:
     /// for the names) or an empty string. `<compression>` should be `GZ` for
     /// gzip files, `BZ2` for bzip2 files, or `XZ` for lzma/.xz files. If
     /// `<compression>` is present, it will determine which compression method
-    /// is used to read/write the file. For example, `format = "XYZ"` will force
-    /// usage of XYZ format regardless of the file extension; `format = "XYZ /
-    /// GZ"` will additionally use gzip compression; and `format = "/ GZ"` will
-    /// use the gzip compression, and the file extension to guess the format.
+    /// is used to read/write the file.
     ///
-    /// If the `<format>` is an empty string, the file extension will be used
-    /// to guess the format. If `<compression>` is NOT presentand the file path
-    /// ends with either `.gz` or `.xz` the file will be treated as a
+    /// For example, `format = "XYZ"` will force usage of XYZ format regardless
+    /// of the file extension; `format = "XYZ / GZ"` will additionally use gzip
+    /// compression; and ` format = "/ GZ"` will use the gzip compression, and
+    /// the file extension to guess the format.
+    ///
+    /// If the `format` is an empty string, the file extension will be used
+    /// to guess the format. If `<compression>` is NOT present and the file path
+    /// ends with `.gz`, `.xz`, or `.bz2`; the file will be treated as a
     /// compressed file and the next extension is used to guess the format. For
     /// example `Trajectory("file.xyz.gz")` will open the file for reading
     /// using the XYZ format and the gzip compression method.
@@ -59,6 +62,41 @@ public:
     ///
     /// [formats]: http://chemfiles.org/chemfiles/latest/formats.html#list-of-supported-formats
     explicit Trajectory(std::string path, char mode = 'r', const std::string& format = "");
+
+    /// Read a memory buffer as though it were a formatted file
+    ///
+    /// The `format` parameter should be follow the same rules as in the main
+    /// `Trajectory` constructor.
+    ///
+    /// @example{trajectory/memory_reader.cpp}
+    ///
+    /// @param data The start of the memory buffer used to store the file.
+    ///             It does not need to be *null* terminated.
+    /// @param size The size of the memory buffer.
+    /// @param format Specific format to use.
+    ///
+    /// @throws FileError If the compression given in `format` is not supported
+    /// @throws FormatError if the data in the buffer is not valid for the used
+    ///                     format, or the format does not support reading from
+    ///                     a memory buffer
+    static Trajectory memory_reader(const char* data, size_t size, const std::string& format);
+
+    /// Write to a memory buffer as though it were a formatted file
+    ///
+    /// The `format` parameter should be follow the same rules as in the main
+    /// `Trajectory` constructor, except that compression specification are not
+    /// supported.
+    ///
+    /// To retreive the memory written to by the returned `Trajectory` object,
+    /// make a call to the `memory_buffer` function.
+    ///
+    /// @example{trajectory/memory_writer.cpp}
+    ///
+    /// @param format Specific format to use.
+    ///
+    /// @throws FileError If any compression is given in `format`
+    /// @throws FormatError if the format does not support writing to a memory buffer
+    static Trajectory memory_writer(const std::string& format);
 
     ~Trajectory();
 
@@ -195,7 +233,18 @@ public:
         return path_;
     }
 
+    /// Get the memory buffer used for writing if the trajectory was created
+    /// with `Trajectory::memory_writer`.
+    ///
+    /// If the trajectory was not created for writing to memory, this will
+    /// return `nullopt`.
+    ///
+    /// @example{trajectory/memory_buffer.cpp}
+    optional<span<const char>> memory_buffer() const;
+
 private:
+    Trajectory(char mode, std::unique_ptr<Format> format, std::shared_ptr<MemoryBuffer> buffer);
+
     /// Perform a few checks before reading a frame
     void pre_read(size_t step);
     /// Set the frame topology and/or cell after reading it
@@ -221,6 +270,8 @@ private:
     /// UnitCell to use for reading/writing files when no unit cell information
     /// is present
     optional<UnitCell> custom_cell_;
+    /// The internal memory buffer, shared with the MemoryFile implementation
+    std::shared_ptr<MemoryBuffer> buffer_;
 };
 
 } // namespace chemfiles

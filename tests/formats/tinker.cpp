@@ -114,3 +114,40 @@ R"(4 written by the chemfiles library
                          std::istreambuf_iterator<char>());
     CHECK(content == expected_content);
 }
+
+
+TEST_CASE("Read and write files in memory") {
+    SECTION("Reading from memory") {
+        std::ifstream checking("data/tinker/nitrogen.arc");
+        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
+            std::istreambuf_iterator<char>());
+
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "Tinker");
+        REQUIRE(file.nsteps() == 50);
+        auto frame = file.read();
+
+        CHECK(frame.size() == 212);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(-2.941653, 3.480677, 3.562162), 1e-6));
+        CHECK(approx_eq(positions[100], Vector3D(-3.328907, 4.080875, -4.559358), 1e-6));
+
+        CHECK(frame.cell() == UnitCell(18.2736));
+
+        auto& topology = frame.topology();
+        CHECK(topology[0].name() == "N");
+        CHECK(topology[154].name() == "N");
+
+        CHECK(topology.bonds().size() == 106);
+        for (size_t i = 0; i < frame.size(); i += 2) {
+            CHECK(contains_bond(topology, {i, i + 1}));
+        }
+
+        frame = file.read_step(34);
+        CHECK(frame.size() == 212);
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(-7.481173, 3.330502, 0.042802), 1e-6));
+        CHECK(approx_eq(positions[67], Vector3D(-0.180228, -7.515172, -5.739137), 1e-6));
+
+        CHECK(frame.cell() == UnitCell(18.2736));
+    }
+}

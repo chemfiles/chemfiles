@@ -96,6 +96,13 @@ specify which format to use.
 .. |yes| replace:: :green:`✓`
 .. |no| replace:: :red:`✗`
 
+Additionally, some formats support reading and writing directly to memory,
+without going through a file. At this time, all text based files (excluding
+those backed by the Molfiles plugin) support both reading and writing directly
+to memory. The MMTF format supports reading from a memory buffer, but does not
+support writing. It is also possible to read a compressed GZ or XZ file directly
+to memory buffer, but writing compressed files is not supported.
+
 Asking for a new format
 -----------------------
 

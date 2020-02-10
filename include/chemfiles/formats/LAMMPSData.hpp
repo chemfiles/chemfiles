@@ -132,7 +132,17 @@ private:
 /// [LAMMPS Data]: http://lammps.sandia.gov/doc/read_data.html
 class LAMMPSDataFormat final: public TextFormat {
 public:
-    LAMMPSDataFormat(std::string path, File::Mode mode, File::Compression compression);
+    LAMMPSDataFormat(std::string path, File::Mode mode, File::Compression compression):
+        TextFormat(std::move(path), mode, compression),
+        current_section_(HEADER),
+        style_("full")
+    {}
+
+    LAMMPSDataFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression):
+        TextFormat(std::move(memory), mode, compression),
+        current_section_(HEADER),
+        style_("full")
+    {}
 
     void read_next(Frame& frame) override;
     void write_next(const Frame& frame) override;

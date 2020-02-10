@@ -174,3 +174,40 @@ void XzFile::compress_and_write(lzma_action action) {
 
     } while (stream_.avail_in != 0 || (action == LZMA_FINISH && status != LZMA_STREAM_END));
 }
+
+std::vector<char> chemfiles::xzinflate_in_place(const char* src, size_t size) {
+    // assume a 10% compression ratio, which should be plenty enough
+    // (typical ratio is around 15-20%)
+    std::vector<char> output(10 * size);
+
+    lzma_stream stream = LZMA_STREAM_INIT;
+    stream.next_in = reinterpret_cast<const uint8_t*>(src);
+    stream.avail_in = size;
+    stream.total_out = 0;
+
+    open_stream_read(&stream);
+
+    bool done = false;
+    do {
+	    // if we need more space, resize the vector
+	    if (stream.total_out >= output.size()) {
+		    output.resize(2 * output.size());
+	    }
+
+	    stream.next_out = reinterpret_cast<uint8_t*>(output.data() + stream.total_out);
+    	stream.avail_out = output.size() - stream.total_out;
+
+        auto status = lzma_code(&stream, LZMA_FINISH);
+        if (status == LZMA_STREAM_END) {
+		    done = true;
+        } else if (status != LZMA_OK) {
+		    lzma_end(&stream);
+            check(status);
+	    }
+    } while (!done);
+
+    lzma_end(&stream);
+
+    output.resize(stream.total_out);
+    return output;
+}

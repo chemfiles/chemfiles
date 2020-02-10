@@ -45,6 +45,7 @@ namespace chemfiles {
 }
 
 static unsigned edit_distance(const std::string& first, const std::string& second);
+static std::string suggest_names(const std::vector<RegisteredFormat>& formats, const std::string& name);
 static size_t find_by_name(const std::vector<RegisteredFormat>& formats, const std::string& name);
 static size_t find_by_extension(const std::vector<RegisteredFormat>& formats, const std::string& extension);
 
@@ -78,7 +79,7 @@ FormatFactory& FormatFactory::get() {
     return instance_;
 }
 
-void FormatFactory::register_format(FormatInfo info, format_creator_t creator) {
+void FormatFactory::register_format(FormatInfo info, format_creator_t creator, memory_stream_t memory_stream) {
     auto guard = formats_.lock();
     auto& formats = *guard;
 
@@ -106,7 +107,15 @@ void FormatFactory::register_format(FormatInfo info, format_creator_t creator) {
     }
 
     // actually register the format
-    formats.push_back({info, creator});
+    formats.push_back({info, creator, memory_stream});
+}
+
+void FormatFactory::register_format(FormatInfo info, format_creator_t creator) {
+    register_format(info, creator,
+        [info](std::shared_ptr<MemoryBuffer>, File::Mode, File::Compression) -> std::unique_ptr<Format> {
+            throw format_error("in-memory IO is not supported for the '{}' format", info.name());
+        }
+    );
 }
 
 format_creator_t FormatFactory::name(const std::string& name) {
@@ -115,32 +124,23 @@ format_creator_t FormatFactory::name(const std::string& name) {
 
     auto idx = find_by_name(formats, name);
     if (idx == SENTINEL_INDEX) {
-        auto suggestions = std::vector<std::string>();
-        for (auto& other: formats) {
-            if (edit_distance(name, other.info.name()) < 4) {
-                suggestions.push_back(other.info.name());
-            }
-        }
-
-        std::stringstream message;
-        fmt::print(message, "can not find a format named '{}'", name);
-
-        if (!suggestions.empty()) {
-            fmt::print(message, ", did you mean");
-            bool first = true;
-            for (auto& suggestion: suggestions) {
-                if (!first) {
-                    fmt::print(message, " or");
-                }
-                fmt::print(message, " '{}'", suggestion);
-                first = false;
-            }
-            fmt::print(message, "?");
-        }
-
-        throw FormatError(message.str());
+        auto suggestions = suggest_names(formats, name);
+        throw FormatError(suggestions);
     }
     return formats.at(idx).creator;
+}
+
+memory_stream_t FormatFactory::memory_stream(const std::string& name) {
+    auto guard = formats_.lock();
+    auto& formats = *guard;
+
+    auto idx = find_by_name(formats, name);
+    if (idx == SENTINEL_INDEX) {
+        auto suggestions = suggest_names(formats, name);
+        throw FormatError(suggestions);
+    }
+
+    return formats.at(idx).memory_stream_creator;
 }
 
 format_creator_t FormatFactory::extension(const std::string& extension) {
@@ -196,6 +196,33 @@ unsigned edit_distance(const std::string& first, const std::string& second) {
    }
 
    return distances[m - 1][n - 1];
+}
+
+std::string suggest_names(const std::vector<RegisteredFormat>& formats, const std::string& name) {
+    auto suggestions = std::vector<std::string>();
+    for (auto& other : formats) {
+        if (edit_distance(name, other.info.name()) < 4) {
+            suggestions.push_back(other.info.name());
+        }
+    }
+
+    std::stringstream message;
+    fmt::print(message, "can not find a format named '{}'", name);
+
+    if (!suggestions.empty()) {
+        fmt::print(message, ", did you mean");
+        bool first = true;
+        for (auto& suggestion : suggestions) {
+            if (!first) {
+                fmt::print(message, " or");
+            }
+            fmt::print(message, " '{}'", suggestion);
+            first = false;
+        }
+        fmt::print(message, "?");
+    }
+
+    return message.str();
 }
 
 size_t find_by_name(const std::vector<RegisteredFormat>& formats, const std::string& name) {

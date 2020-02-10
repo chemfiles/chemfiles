@@ -111,12 +111,14 @@ private:
     std::string path_;
 };
 
+class MemoryBuffer;
+
 /// Line-oriented text file reader and writer, using buffered read and fast
 /// lines search.
 ///
 /// This class reads text file line by line. It does so in a efficient way by
 /// storing a chunk of the file in a memory buffer, and searching for new line
-/// indicators (either '\n' or '\r\n') in this buffer. It then returns
+/// indicators (either `\n` or `\r\n`) in this buffer. It then returns
 /// `string_view` inside this buffer, removing the need to allocate a new
 /// `std::string` for each line.
 ///
@@ -129,6 +131,13 @@ public:
     /// @throws FileError if the file does not exist in read mode, or if the
     ///                   file is invalid for the given compression method
     TextFile(std::string path, File::Mode mode, File::Compression compression);
+
+    /// Use the given `MemoryBuffer` with the requested `mode` and `compression`
+    /// method. A `MemoryFile` will be used as the `TextFileImpl`.
+    ///
+    /// @throws FileError if the file mode is append, or if trying to write to a
+    /// compressed file.
+    TextFile(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression);
 
     TextFile(TextFile&&) = default;
     TextFile& operator=(TextFile&&) = default;

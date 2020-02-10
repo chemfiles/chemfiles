@@ -1,3 +1,6 @@
 build/
+out/
 .vscode/
+.vs/
 *.pyc
+CMakeSettings.json

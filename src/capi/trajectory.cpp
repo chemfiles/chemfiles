@@ -11,6 +11,7 @@
 
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Trajectory.hpp"
+#include "chemfiles/files/MemoryFile.hpp"
 
 using namespace chemfiles;
 
@@ -32,6 +33,35 @@ extern "C" CHFL_TRAJECTORY* chfl_trajectory_with_format(const char* path, char m
     CHECK_POINTER_GOTO(format);
     CHFL_ERROR_GOTO(
         trajectory = shared_allocator::make_shared<Trajectory>(path, mode, format);
+    )
+    return trajectory;
+error:
+    chfl_trajectory_close(trajectory);
+    return nullptr;
+}
+
+extern "C" CHFL_TRAJECTORY* chfl_trajectory_memory_reader(const char* memory, uint64_t size, const char* format) {
+    CHFL_TRAJECTORY* trajectory = nullptr;
+    CHECK_POINTER_GOTO(memory);
+    CHECK_POINTER_GOTO(format);
+    CHFL_ERROR_GOTO(
+        trajectory = shared_allocator::make_shared<Trajectory>(
+            Trajectory::memory_reader(memory, checked_cast(size), format)
+        );
+    )
+    return trajectory;
+error:
+    chfl_trajectory_close(trajectory);
+    return nullptr;
+}
+
+extern "C" CHFL_TRAJECTORY* chfl_trajectory_memory_writer(const char* format) {
+    CHFL_TRAJECTORY* trajectory = nullptr;
+    CHECK_POINTER_GOTO(format);
+    CHFL_ERROR_GOTO(
+        trajectory = shared_allocator::make_shared<Trajectory>(
+            Trajectory::memory_writer(format)
+        );
     )
     return trajectory;
 error:
@@ -103,6 +133,20 @@ extern "C" chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const trajectory,
     CHECK_POINTER(nsteps);
     CHFL_ERROR_CATCH(
         *nsteps = trajectory->nsteps();
+    )
+}
+
+extern "C" chfl_status chfl_trajectory_memory_buffer(const CHFL_TRAJECTORY* trajectory, const char** data, uint64_t* max_size) {
+    CHECK_POINTER(trajectory);
+    CHECK_POINTER(data);
+    CHECK_POINTER(max_size);
+    CHFL_ERROR_CATCH(
+        auto block = trajectory->memory_buffer();
+        if (!block) {
+            throw Error("trajectory not opened to write to a memory block");
+        }
+        *data = block.value().data();
+        *max_size = trajectory->memory_buffer().value().size();
     )
 }
 

@@ -1,5 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
+#define ZLIB_CONST
 #include <zconf.h>
 #include <zlib.h>
 
@@ -89,4 +90,51 @@ void GzFile::seek(uint64_t position) {
         auto message = check_error();
         throw file_error("error while seeking gziped file: {}", message);
     }
+}
+
+std::vector<char> chemfiles::gzinflate_in_place(const char* src, size_t size) {
+    // assume a 10% compression ratio, which should be plenty enough
+    // (typical ratio is around 15-20%)
+    std::vector<char> output(10 * size);
+
+    z_stream stream;
+    stream.next_in = reinterpret_cast<const Bytef*>(src);
+    stream.avail_in = checked_cast(size);
+    stream.total_out = 0;
+    stream.zalloc = Z_NULL;
+    stream.zfree = Z_NULL;
+
+    // the second parameter is set to 15 (use the largest window possible) + 32
+    // (detect header and check between gzip or zlib header)
+    auto status = inflateInit2(&stream, 15 + 32);
+    if (status != Z_OK) {
+	    throw file_error("error creating gz stream: {}", stream.msg);
+    }
+
+    bool done = false;
+    do {
+        // if we need more space, resize the vector
+        if (stream.total_out >= output.size()) {
+            output.resize(2 * output.size());
+        }
+
+	    stream.next_out = reinterpret_cast<Bytef*>(output.data() + stream.total_out);
+        stream.avail_out = checked_cast(output.size() - stream.total_out);
+
+        status = inflate(&stream, Z_SYNC_FLUSH);
+        if (status == Z_STREAM_END) {
+		    done = true;
+        } else if (status != Z_OK) {
+		    inflateEnd(&stream);
+            throw file_error("error inflating gzipped memory: {}", stream.msg);
+	    }
+    } while (!done);
+
+    status = inflateEnd(&stream);
+    if (status != Z_OK) {
+	    throw file_error("error finishing gz stream: {}", stream.msg);
+    }
+
+    output.resize(stream.total_out);
+    return output;
 }

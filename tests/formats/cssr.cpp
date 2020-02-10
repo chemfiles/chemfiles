@@ -97,3 +97,21 @@ R"( REFERENCE STRUCTURE = 00000   A,B,C =  10.000  10.000  12.000
                          std::istreambuf_iterator<char>());
     CHECK(content == expected_content);
 }
+
+TEST_CASE("Read and write files in memory") {
+    SECTION("Reading from memory") {
+        std::ifstream checking("data/cssr/water.cssr");
+        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
+            std::istreambuf_iterator<char>());
+
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "CSSR");
+        CHECK(file.nsteps() == 1);
+
+        auto frame = file.read();
+
+        CHECK(frame.size() == 297);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(0.417, 8.303, 11.737), 1e-3));
+        CHECK(approx_eq(positions[296], Vector3D(6.664, 11.6148, 12.961), 1e-3));
+    }
+}

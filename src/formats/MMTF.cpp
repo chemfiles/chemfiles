@@ -27,6 +27,10 @@
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/external/optional.hpp"
 
+#include "chemfiles/files/GzFile.hpp"
+#include "chemfiles/files/XzFile.hpp"
+#include "chemfiles/files/MemoryFile.hpp"
+
 #include "chemfiles/formats/MMTF.hpp"
 
 using namespace chemfiles;
@@ -45,14 +49,32 @@ MMTFFormat::MMTFFormat(std::string path, File::Mode mode, File::Compression comp
     if (mode == File::READ) {
         auto file = TextFile(std::move(path), mode, compression);
         auto buffer = file.readall();
-        mmtf::decodeFromBuffer(structure_, buffer.data(), buffer.size());
-        if (!structure_.hasConsistentData()) {
-            throw format_error("issue with: '{}', please ensure it is valid MMTF file", path);
-        }
+        decode(buffer.data(), buffer.size(), file.path());
     } else if (mode == File::WRITE) {
         filename_ = std::move(path); // We really don't need to do anything, yet
     } else if (mode == File::APPEND) {
         throw file_error("append mode ('a') is not supported for the MMTF format");
+    }
+}
+
+MMTFFormat::MMTFFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression) {
+    if (mode == File::WRITE) {
+        throw format_error("the MMTF format cannot write to memory");
+    }
+
+    memory->decompress(compression);
+    decode(memory->data(), memory->size(), "memory");
+}
+
+void MMTFFormat::decode(const char* data, size_t size, const std::string& source) {
+    try {
+        mmtf::decodeFromBuffer(structure_, data, size);
+    } catch (const mmtf::DecodeError& e) { // rethrow as a chemfiles error
+        throw format_error("error while decoding MMTF from {}: '{}'", source, e.what());
+    }
+
+    if (!structure_.hasConsistentData()) {
+        throw format_error("issue with data from '{}', please ensure it is valid MMTF file", source);
     }
 }
 

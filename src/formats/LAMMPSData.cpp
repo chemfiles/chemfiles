@@ -201,12 +201,6 @@ static string_view split_comment(string_view& line);
 /// Check if the line is an unused header value
 static bool is_unused_header(string_view line);
 
-LAMMPSDataFormat::LAMMPSDataFormat(std::string path, File::Mode mode, File::Compression compression):
-    TextFormat(std::move(path), mode, compression),
-    current_section_(HEADER),
-    style_("full")
-{}
-
 void LAMMPSDataFormat::read_next(Frame& frame) {
     if (file_.tellpos() != 0) {
         throw format_error("LAMMPS Data format only supports reading one frame");

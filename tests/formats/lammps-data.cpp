@@ -238,3 +238,21 @@ TEST_CASE("Write files in LAMMPS data format") {
                          std::istreambuf_iterator<char>());
     CHECK(content == EXPECTED_CONTENT);
 }
+
+TEST_CASE("Read and write files in memory") {
+    SECTION("Reading from memory") {
+        std::ifstream checking("data/lammps-data/data.body");
+        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
+            std::istreambuf_iterator<char>());
+
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "LAMMPS Data");
+        auto frame = file.read();
+
+        CHECK(frame.size() == 100);
+        CHECK(frame.cell() == UnitCell(31.064449134, 31.064449134, 1.0));
+
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], {-15.5322, -15.5322, 0.0}, 1e-12));
+        CHECK(approx_eq(positions[22], {-9.31933, -9.31933, 0.0}, 1e-12));
+    }
+}

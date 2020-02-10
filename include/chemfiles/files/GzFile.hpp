@@ -34,6 +34,9 @@ private:
     gzFile file_ = nullptr;
 };
 
-}
+/// Inflates GZipped data from the `src` buffer
+std::vector<char> gzinflate_in_place(const char* src, size_t size);
+
+} // namespace chemfiles
 
 #endif

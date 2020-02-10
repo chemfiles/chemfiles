@@ -389,3 +389,22 @@ O.O.O
                          std::istreambuf_iterator<char>());
     CHECK(content == EXPECTED_CONTENT);
 }
+
+TEST_CASE("Read and write files in memory") {
+    SECTION("Reading from memory") {
+        std::ifstream checking("data/smi/rdkit_problems.smi");
+        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
+            std::istreambuf_iterator<char>());
+
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "SMI");
+        REQUIRE(file.nsteps() == 70);
+
+        Frame frame;
+        while (!file.done()) {
+            frame = file.read();
+        }
+        CHECK(frame.size() == 14);
+        CHECK(frame[0].type() == "Db");
+        CHECK(frame[13].type()== "Og");
+    }
+}

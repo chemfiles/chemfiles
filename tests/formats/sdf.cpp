@@ -241,3 +241,22 @@ $$$$
                          std::istreambuf_iterator<char>());
     CHECK(content == expected_content);
 }
+
+TEST_CASE("Read and write files in memory") {
+    SECTION("Reading from memory") {
+        std::ifstream checking("data/sdf/kinases.sdf");
+        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
+            std::istreambuf_iterator<char>());
+
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "SDF");
+        REQUIRE(file.nsteps() == 6);
+
+        Frame frame;
+        while (!file.done()) {
+            frame = file.read();
+        }
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(3.1149, -1.1207, 3.0606), 1e-3));
+        CHECK(approx_eq(positions[49], Vector3D(-7.4890, -0.0147, -2.1114), 1e-3));
+    }
+}

@@ -48,7 +48,6 @@ TEST_CASE("Read files in NetCDF format") {
     }
 }
 
-
 TEST_CASE("Write files in NetCDF format") {
     auto tmpfile = NamedTempPath(".nc");
 

@@ -250,3 +250,25 @@ TEST_CASE("Write files in mol2 format") {
                          std::istreambuf_iterator<char>());
     CHECK(content == EXPECTED_CONTENT);
 }
+
+
+TEST_CASE("Read and write files in memory") {
+    SECTION("Reading from memory") {
+        std::ifstream checking("data/mol2/Molecules.mol2");
+        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
+            std::istreambuf_iterator<char>());
+
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "MOL2");
+        auto frame = file.read_step(1);
+
+        CHECK(frame.size() == 49);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(6.6710, 9.9330, 22.9940), 1e-4));
+        CHECK(approx_eq(positions[33], Vector3D(4.1880, 9.4540, 22.6900), 1e-4));
+
+        auto& topology = frame.topology();
+        CHECK(topology[0].name() == "N1");
+        CHECK(topology[0].type() == "N");
+        CHECK(topology[0].get("sybyl")->as_string() == "N.am");
+    }
+}

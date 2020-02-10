@@ -16,6 +16,7 @@
 #include "chemfiles/files/XzFile.hpp"
 #include "chemfiles/files/Bz2File.hpp"
 #include "chemfiles/files/PlainFile.hpp"
+#include "chemfiles/files/MemoryFile.hpp"
 
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/string_view.hpp"
@@ -46,6 +47,28 @@ TextFile::TextFile(std::string path, File::Mode mode, File::Compression compress
     default:
         unreachable();
     }
+}
+
+TextFile::TextFile(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression):
+    File("<in memory>", mode, File::Compression::DEFAULT),
+    file_(nullptr),
+    buffer_(8192, 0),
+    line_start_(buffer_.data()),
+    end_(buffer_.data() + buffer_.size())
+{
+    if (mode == File::APPEND) {
+        throw file_error("cannot append (mode 'a') to a memory file");
+    }
+
+    if (compression != File::DEFAULT) {
+        if (mode != File::READ) {
+            throw file_error("writing to a compressed memory file is not supported");
+        }
+
+        memory->decompress(compression);
+    }
+
+    file_ = std::unique_ptr<TextFileImpl>(new MemoryFile(std::move(memory), mode));
 }
 
 uint64_t TextFile::tellpos() const {

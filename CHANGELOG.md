@@ -5,14 +5,24 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+* Added ability to read and write files directly in-memory. See
+  `Trajectory::memory_reader`; `Trajectory::memory_writer`;
+  `Trajectory::memory_buffer`; `chfl_trajectory_memory_reader`;
+  `chfl_trajectory_memory_writer` and `chfl_trajectory_memory_buffer`.
+
+## 0.9.3 (5 Feb 2020)
+
+* Fix a bug in the PDB format where no atomic name/type was read from short
+  ATOM/HETATM records.
+* Fix a few bugs related to UnitCell Matrix and infinite UnitCell construction
+
+## 0.9.2 (18 Dec 2019)
+
 * When compiling chemfiles as a shared library, the dependencies symbols are
   now hidden. This should prevent clashes between say chemfiles's zlib and the
   system zlib.
 * Cache sub-selection (the 'name O' in 'is_bonded(#1, name O)'), reducing
-  selection evaluationg time by a huge margin.
-* Fix a bug with memory allocation in the C API. The allocator did not remove
-  pointers as soon as `chfl_free` was called, which leaded to an error when the
-  system allocator re-used the pointers.
+  selection evaluation time by a huge margin.
 
 ### Changes in supported formats
 
@@ -27,6 +37,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added a native implementation of XTC writer.
 * Added a native implementation of TRR writer.
 * Added support for bzip2 (.bz2) compressed files when reading and writing
+
+## 0.9.1 (13 Mar 2019)
+
+* Fix a bug with memory allocation in the C API. The allocator did not remove
+  pointers as soon as `chfl_free` was called, which leaded to an error when the
+  system allocator re-used the pointers.
 
 ## 0.9.0 (18 Nov 2018)
 

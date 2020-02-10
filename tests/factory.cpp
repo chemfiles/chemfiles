@@ -14,10 +14,11 @@
 using namespace chemfiles;
 
 #define new_format(_name_)                                                     \
-    struct _name_ final: public Format {                                       \
-        _name_(const std::string&, File::Mode, File::Compression) {}           \
-        size_t nsteps() override {return 42;}                                  \
-    }
+struct _name_ final: public Format {                                           \
+    _name_(const std::string&, File::Mode, File::Compression) {}               \
+    _name_(std::shared_ptr<MemoryBuffer>, File::Mode, File::Compression) {}    \
+    size_t nsteps() override {return 42;}                                      \
+}
 
 
 new_format(DummyFormat);
@@ -194,6 +195,11 @@ TEST_CASE("Check error throwing in formats") {
         CHECK_THROWS_WITH(
             trajectory.write(frame),
             Catch::StartsWith("'write' is not implemented for this format")
+        );
+
+        CHECK_THROWS_WITH(
+            Trajectory::memory_writer("UnimplementedTextFormat"),
+            "in-memory IO is not supported for the 'UnimplementedTextFormat' format"
         );
     }
 

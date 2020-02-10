@@ -228,3 +228,28 @@ TEST_CASE("Write mmCIF file") {
                          std::istreambuf_iterator<char>());
     CHECK(EXPECTED_CONTENT == content);
 }
+
+TEST_CASE("Read and write files in memory") {
+    SECTION("Reading from memory") {
+
+        std::ifstream checking("data/cif/1j8k.cif");
+        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
+            std::istreambuf_iterator<char>());
+
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "mmCIF");
+
+        auto frame = file.read_step(13);
+        CHECK(frame.size() == 1402);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
+        CHECK(approx_eq(positions[1401], Vector3D(5.601, -22.571, -16.631), 1e-3));
+        CHECK(frame.topology().residue(0).get("is_standard_pdb")->as_bool());
+
+        // Rewind
+        frame = file.read_step(1);
+        CHECK(frame.size() == 1402);
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D( -9.134, 11.149, 6.990), 1e-3));
+        CHECK(approx_eq(positions[1401], Vector3D(4.437, -13.250, -22.569), 1e-3));
+    }
+}

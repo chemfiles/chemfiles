@@ -64,6 +64,9 @@ void TextFormat::write_next(const Frame& /*unused*/) {
 TextFormat::TextFormat(std::string path, File::Mode mode, File::Compression compression):
     file_(std::move(path), mode, compression) {}
 
+TextFormat::TextFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression) :
+    file_(std::move(memory), mode, compression) {}
+
 void TextFormat::scan_all() {
     if (eof_found_) {
         return;
