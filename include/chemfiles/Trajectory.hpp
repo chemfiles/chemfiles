@@ -238,7 +238,8 @@ public:
         return path_;
     }
 
-    /// Get a pointer to the memory addressed used for writing
+    /// Get the memory buffer used for writing if the trajectory was created 
+    /// with `Trajectory::memory_writer`.
     ///
     /// If the trajectory was not created for writing to memory, this will
     /// return `nullopt`.
