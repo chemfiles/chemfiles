@@ -31,12 +31,17 @@ public:
         QINTUPLET = 5,  ///< Quintuplet bond
 
         // space for more bond types if needed
-        DOWN = 250,     ///< Single bond direction from frist atom to second is 'down'. Used for cis-trans isomers
-        UP = 251,       ///< Single bond direction from first atom to second is 'up'. Used for cis-trans isomers
-        DATIVE_R = 252, ///< Dative bond where the electrons are localized to the first atom
-        DATIVE_L = 253, ///< Dative bond where the electrons are localized to the second atom
-        AMIDE = 254,    ///< Amide bond (C(=O)-NH)
-        AROMATIC = 255, ///< Aromatic bond (for example the ring bonds in benzene)
+        ODD_RECTANGLE = 245, ///< Double bond with odd parity. Used for cis-trans isomers and cumulenes
+        EVEN_RECTANGLE = 246,///< Double bond with even parity. Used for cis-trans isomers and cumulenes
+        WEDGE_EITHER = 247,  ///< Single bond connected to unknown sterocenter
+        WEDGE_DOWN = 248,    ///< Single bond where the bond direction is towards the sterocenter
+        WEDGE_UP = 249,      ///< Single bond where the bond direction is away from the sterocenter
+        DOWN = 250,          ///< Single bond direction from frist atom to second is 'down'. Used for cis-trans isomers
+        UP = 251,            ///< Single bond direction from first atom to second is 'up'. Used for cis-trans isomers
+        DATIVE_R = 252,      ///< Dative bond where the electrons are localized to the first atom
+        DATIVE_L = 253,      ///< Dative bond where the electrons are localized to the second atom
+        AMIDE = 254,         ///< Amide bond (C(=O)-NH)
+        AROMATIC = 255,      ///< Aromatic bond (for example the ring bonds in benzene)
     };
 
     /// Create a new `Bond` containing the atoms `i` and `j`.
