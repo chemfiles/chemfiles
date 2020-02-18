@@ -219,8 +219,9 @@ void Connectivity::atom_removed(size_t index) {
     auto to_add = std::vector<Bond>();
     auto bo_add = std::vector<Bond::BondOrder>();
 
+    const auto& bonds = bonds_.as_vec();
     for (size_t idx = 0; idx < bonds_.size(); idx++) {
-        auto& bond = bonds_[idx];
+        const auto& bond = bonds[idx];
 
         if (bond[0] == index || bond[1] == index) {
             throw error("can not shift atomic indexes that still have a bond");

@@ -138,9 +138,11 @@ private:
     /// Update the atomic indexes in this residue after an atom has been
     /// removed from the containing topology.
     ///
-    /// This function removes the atom with index `i` from this residue if it
-    /// exists, and shifts all the indexes bigger than `i` by -1.
+    /// This function shifts all the indexes bigger than `i` by -1.
     void atom_removed(size_t i);
+
+    /// remove the atom at index i from this residue
+    void remove(size_t i);
 
     friend bool operator==(const Residue& lhs, const Residue& rhs);
 
