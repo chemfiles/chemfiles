@@ -23,9 +23,9 @@ void Residue::atom_removed(size_t i) {
         atoms_.erase(iter);
     }
 
-    for (size_t j = 0; j < atoms_.size(); ++j) {
-        if (atoms_[j] > i) {
-            --atoms_[j];
+    for (auto& atom: atoms_.as_mutable_vec()) {
+        if (atom > i) {
+            atom -= 1;
         }
     }
 }
