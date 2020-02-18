@@ -79,7 +79,9 @@ void Frame::guess_bonds() {
             }
             auto d = distance(i, j);
             auto radii = i_radius.value() + j_radius.value();
-            if (0.03 < d && d < 0.6 * radii && d < cutoff) {
+            // This criteria comes from VMD, updated with the -0.4 since we
+            // don't have the same VdW radii (see issue #301)
+            if (0.03 < d && d < 0.6 * (radii - 0.4) && d < cutoff) {
                 topology_.add_bond(i, j);
             }
         }

@@ -174,6 +174,16 @@ TEST_CASE("Guess topology") {
         CHECK(frame.topology().angles() == (std::vector<Angle>{{0, 1, 2}, {0, 3, 2}, {1, 0, 3}, {1, 2, 3}}));
         CHECK(frame.topology().dihedrals() == (std::vector<Dihedral>{{0, 1, 2, 3}, {1, 0, 3, 2}, {1, 2, 3, 0}, {2, 1, 0, 3}}));
     }
+
+    SECTION("Issue #301") {
+        auto frame = Frame();
+        frame.add_atom(Atom("H"), {5.5617326354, 10.1358396373, 9.9055080108});
+        frame.add_atom(Atom("O"), {4.813592106, 8.7324640667, 9.4759788728});
+        frame.add_atom(Atom("O"), {6.2223808696, 10.8616228615, 9.6804566733});
+
+        frame.guess_bonds();
+        CHECK(frame.topology().bonds() == (std::vector<Bond>{{0, 2}}));
+    }
 }
 
 TEST_CASE("PBC functions") {
