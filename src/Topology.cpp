@@ -79,6 +79,7 @@ void Topology::remove(size_t i) {
         );
     }
     atoms_.erase(atoms_.begin() + static_cast<std::ptrdiff_t>(i));
+
     // Remove all bonds with the removed atom
     auto bonds = connect_.bonds();
     for (auto& bond : bonds) {
@@ -86,9 +87,15 @@ void Topology::remove(size_t i) {
             connect_.remove_bond(bond[0], bond[1]);
         }
     }
-    // Shift all bonds indexes
+    // remove the atom from the corresponding residue
+    auto it = residue_mapping_.find(i);
+    if (it != residue_mapping_.end()) {
+        residues_[it->second].remove(i);
+    }
+
+    // shift all bonds indexes
     connect_.atom_removed(i);
-    // Remove and shift all residue atoms
+    // shift all residue atoms
     for (auto& res : residues_) {
         res.atom_removed(i);
     }

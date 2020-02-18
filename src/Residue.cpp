@@ -2,6 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include "chemfiles/Residue.hpp"
+#include "chemfiles/error_fmt.hpp"
 
 using namespace chemfiles;
 
@@ -17,12 +18,16 @@ bool Residue::contains(size_t i) const {
     return atoms_.find(i) != atoms_.end();
 }
 
-void Residue::atom_removed(size_t i) {
+void Residue::remove(size_t i) {
     auto iter = atoms_.find(i);
-    if (iter != atoms_.end()) {
-        atoms_.erase(iter);
+    if (iter == atoms_.end()) {
+        // we should only remove an atom if we know it exists in the residue
+        throw error("invalid call to Residue::remove, this is a bug");
     }
+    atoms_.erase(iter);
+}
 
+void Residue::atom_removed(size_t i) {
     for (auto& atom: atoms_.as_mutable_vec()) {
         if (atom > i) {
             atom -= 1;
