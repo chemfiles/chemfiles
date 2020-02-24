@@ -345,6 +345,9 @@ void SMIFormat::read_next(Frame& frame) {
             branch_point_.push(previous_atom_);
             break;
         case ')':
+            if (branch_point_.empty()) {
+                throw format_error("SMI Reader: unmatched ')'");
+            }
             previous_atom_ = branch_point_.top();
             branch_point_.pop();
             break;

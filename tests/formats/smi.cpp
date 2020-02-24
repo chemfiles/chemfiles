@@ -234,7 +234,7 @@ TEST_CASE("Check parsing results") {
 
         // In Issue 303, this failed due to the '%11' marker.
         frame = file.read();
-        
+
         // No explict hydrogens, so the size should be 26 atoms
         frame = file.read();
         CHECK(frame.size() == 26);
@@ -275,6 +275,12 @@ TEST_CASE("Errors in SMI format") {
             file.read();
         };
         CHECK_THROWS(test());
+    }
+
+    SECTION("Unmatched )") {
+        auto bad = std::string("C)");
+        auto file = Trajectory::memory_reader(bad.c_str(), bad.size(), "SMI");
+        CHECK_THROWS_WITH(file.read(), "SMI Reader: unmatched ')'");
     }
 }
 
