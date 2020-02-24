@@ -9,9 +9,6 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-#include <boost/filesystem.hpp>
-namespace fs=boost::filesystem;
-
 TEST_CASE("Read files in SDF format") {
     SECTION("Check nsteps") {
         auto file = Trajectory("data/sdf/aspirin.sdf");
@@ -98,27 +95,18 @@ TEST_CASE("Read files in SDF format") {
     }
 }
 
-// To use in loops in order to iterate over files in a specific directory.
-struct directory_files_iterator {
-    typedef fs::recursive_directory_iterator iterator;
-    directory_files_iterator(fs::path p) : p_(p) {}
-
-    iterator begin() { return fs::recursive_directory_iterator(p_); }
-    iterator end() { return fs::recursive_directory_iterator(); }
-
-    fs::path p_;
-};
-
 TEST_CASE("Errors in SDF format") {
-    for (auto entry : directory_files_iterator("data/sdf/bad/")) {
-        auto test = [=](){
-            // We can throw either when creating the trajectory, or when reading
-            // the frame, depending on the type of error
-            auto file = Trajectory(entry.path().string());
-            file.read();
-        };
-        CHECK_THROWS(test());
-    }
+    auto file = Trajectory("data/sdf/bad/bad_atom_line.sdf");
+    CHECK_THROWS_WITH(file.read(), "atom line is too small for SDF: '    3.7320   -0.0600'");
+
+    file = Trajectory("data/sdf/bad/bad_counts_line.sdf");
+    CHECK_THROWS_WITH(file.read(), "can not read file 'data/sdf/bad/bad_counts_line.sdf' at step 0, it does not contain any step");
+
+    file = Trajectory("data/sdf/bad/bad_counts_line2.sdf");
+    CHECK_THROWS_WITH(file.read(), "can not read file 'data/sdf/bad/bad_counts_line2.sdf' at step 0, it does not contain any step");
+
+    file = Trajectory("data/sdf/bad/blank.sdf");
+    CHECK_THROWS_WITH(file.read(), "can not read file 'data/sdf/bad/blank.sdf' at step 0, it does not contain any step");
 }
 
 TEST_CASE("Write files in SDF format") {
