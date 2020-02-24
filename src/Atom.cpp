@@ -8,7 +8,6 @@
 #include <unordered_map>
 
 #include "chemfiles/Atom.hpp"
-#include "chemfiles/Error.hpp"
 #include "chemfiles/Configuration.hpp"
 #include "chemfiles/periodic_table.hpp"
 

@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <type_traits>
 
 #include "chemfiles/exports.h"
 #include "chemfiles/cpp14.hpp"
@@ -16,6 +17,7 @@
 #include "chemfiles/Format.hpp"
 
 namespace chemfiles {
+class MemoryBuffer;
 
 using format_creator_t = std::function<std::unique_ptr<Format>(std::string path, File::Mode mode, File::Compression compression)>;
 using memory_stream_t = std::function<std::unique_ptr<Format>(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression)>;

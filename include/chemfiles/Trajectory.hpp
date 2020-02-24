@@ -7,9 +7,10 @@
 #include <memory>
 #include <string>
 
+#include "chemfiles/exports.h"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/UnitCell.hpp"
-#include "chemfiles/exports.h"
+#include "chemfiles/external/span.hpp"  // IWYU pragma: keep
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {

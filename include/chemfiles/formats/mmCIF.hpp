@@ -8,6 +8,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
@@ -16,6 +17,7 @@
 
 namespace chemfiles {
 class Frame;
+class MemoryBuffer;
 
 /// [mmCIF] (Crystallographic Information Framework) for MacroMolecules
 ///

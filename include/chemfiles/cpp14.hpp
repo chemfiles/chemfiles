@@ -5,6 +5,7 @@
 #define CHEMFILES_CPP14_HPP
 
 #include <memory>
+#include <utility>
 #include <type_traits>
 
 // Implementation of various C++14 and later helpers missing from C++11

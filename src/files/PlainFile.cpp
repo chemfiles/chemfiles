@@ -8,12 +8,12 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/files/PlainFile.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/error_fmt.hpp"
 
 using namespace chemfiles;
 
 #ifdef __CYGWIN__
+    #include <sys/types.h>
     #define fseek64 fseek
     #define off64_t off_t
 #elif defined(_MSC_VER)
@@ -21,6 +21,7 @@ using namespace chemfiles;
     #define off64_t __int64
 #else
     // assume unix by default
+    #include <sys/types.h>
     #define fseek64 fseeko
     #define off64_t off_t
 #endif

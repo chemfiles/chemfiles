@@ -8,12 +8,11 @@
 #include <cstdint>
 #include <limits>
 #include <string>
+#include <vector>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/files/GzFile.hpp"
-
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 
 using namespace chemfiles;
 

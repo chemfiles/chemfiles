@@ -9,9 +9,11 @@
 #include "chemfiles/capi/utils.hpp"
 #include "chemfiles/capi/shared_allocator.hpp"
 
+#include "chemfiles/Error.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Trajectory.hpp"
-#include "chemfiles/files/MemoryFile.hpp"
+#include "chemfiles/external/span.hpp"
+#include "chemfiles/external/optional.hpp"
 
 using namespace chemfiles;
 

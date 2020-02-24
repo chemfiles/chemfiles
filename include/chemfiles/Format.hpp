@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "chemfiles/exports.h"
 
@@ -16,6 +17,7 @@
 
 namespace chemfiles {
 class Frame;
+class MemoryBuffer;
 
 /// The `Format` class defines the interface to implement in order to add a new
 /// format to chemfiles.

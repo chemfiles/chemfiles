@@ -4,20 +4,23 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <memory>
 #include <typeinfo>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/error_fmt.hpp"
+#include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
     class Frame;
+    class MemoryBuffer;
 }
 
 using namespace chemfiles;
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && !defined(__clang__)
+#define IGNORING_SUGGEST_ATTRIBUTE_NORETURN
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsuggest-attribute=noreturn"
 #endif
@@ -57,7 +60,7 @@ void TextFormat::write_next(const Frame& /*unused*/) {
     );
 }
 
-#if defined(__GNUC__)
+#if defined(IGNORING_SUGGEST_ATTRIBUTE_NORETURN)
 #pragma GCC diagnostic pop
 #endif
 

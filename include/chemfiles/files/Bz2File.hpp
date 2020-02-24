@@ -4,6 +4,12 @@
 #ifndef CHEMFILES_BZ2_FILES_HPP
 #define CHEMFILES_BZ2_FILES_HPP
 
+#include <cstdio>
+#include <cstdint>
+#include <string>
+#include <vector>
+#include <functional>
+
 #include <bzlib.h>
 
 #include "chemfiles/File.hpp"

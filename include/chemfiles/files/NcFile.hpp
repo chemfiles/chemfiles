@@ -4,9 +4,9 @@
 #ifndef CHEMFILES_NC_FILE_HPP
 #define CHEMFILES_NC_FILE_HPP
 
+#include <cassert>
 #include <vector>
 #include <string>
-#include <cassert>
 
 #include <netcdf.h>
 #include <fmt/format.h>

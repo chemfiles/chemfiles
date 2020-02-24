@@ -17,6 +17,7 @@
 #include "chemfiles/files/Bz2File.hpp"
 #include "chemfiles/files/PlainFile.hpp"
 #include "chemfiles/files/MemoryFile.hpp"
+#include "chemfiles/files/MemoryBuffer.hpp"
 
 #include "chemfiles/cpp14.hpp"
 #include "chemfiles/error_fmt.hpp"

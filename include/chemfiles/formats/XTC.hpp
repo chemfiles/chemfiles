@@ -5,7 +5,6 @@
 #define CHEMFILES_XTC_FORMAT_HPP
 
 #include <string>
-#include <vector>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"

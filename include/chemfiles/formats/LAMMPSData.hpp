@@ -9,6 +9,7 @@
 #include <limits>
 #include <vector>
 #include <string>
+#include <memory>
 #include <unordered_map>
 
 #include "chemfiles/File.hpp"
@@ -16,10 +17,12 @@
 #include "chemfiles/Topology.hpp"  // IWYU pragma: keep
 #include "chemfiles/sorted_set.hpp"
 #include "chemfiles/string_view.hpp"
+#include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 class Atom;
 class Frame;
+class MemoryBuffer;
 
 struct atom_data final {
     double x = 0;

@@ -9,14 +9,17 @@
 #include <string>
 #include <vector>
 #include <tuple>
+#include <memory>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/string_view.hpp"
+#include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 class Frame;
+class MemoryBuffer;
 
 /// [PDB][PDB] file format reader and writer.
 ///

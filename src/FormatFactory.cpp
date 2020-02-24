@@ -10,9 +10,11 @@
 
 #include <fmt/ostream.h>
 
-#include "chemfiles/mutex.hpp"
+#include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/FormatFactory.hpp"
+
+#include "chemfiles/mutex.hpp"
 #include "chemfiles/error_fmt.hpp"
 
 #include "chemfiles/formats/Molfile.hpp"
@@ -35,14 +37,14 @@
 
 #define SENTINEL_INDEX (static_cast<size_t>(-1))
 
-using namespace chemfiles;
-
 namespace chemfiles {
+    class MemoryBuffer;
     extern template class Molfile<DCD>;
     extern template class Molfile<TRJ>;
     extern template class Molfile<LAMMPS>;
     extern template class Molfile<MOLDEN>;
 }
+using namespace chemfiles;
 
 static unsigned edit_distance(const std::string& first, const std::string& second);
 static std::string suggest_names(const std::vector<RegisteredFormat>& formats, const std::string& name);

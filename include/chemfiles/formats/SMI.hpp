@@ -9,19 +9,22 @@
 #include <stack>
 #include <vector>
 #include <string>
+#include <memory>
 #include <unordered_map>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/Connectivity.hpp"
+
 #include "chemfiles/string_view.hpp"
+#include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 class Atom;
 class Frame;
 class Topology;
-
+class MemoryBuffer;
 
 /// [SMI] file format reader and writer.
 ///

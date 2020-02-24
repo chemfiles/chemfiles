@@ -22,6 +22,7 @@
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/sorted_set.hpp"
 #include "chemfiles/string_view.hpp"
+#include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/formats/Tinker.hpp"
 

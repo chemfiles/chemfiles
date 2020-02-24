@@ -25,9 +25,6 @@
 #include "chemfiles/formats/XTC.hpp"
 #include "chemfiles/files/XDRFile.hpp"
 
-#include <xdrfile.h>
-#include <xdrfile_xtc.h>
-
 using namespace chemfiles;
 
 template <> FormatInfo chemfiles::format_information<XTCFormat>() {

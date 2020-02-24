@@ -1,13 +1,15 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <cstdint>
+#include <cassert>
 #include <array>
 #include <string>
 #include <vector>
 #include <memory>
-#include <cstdint>
 #include <exception>
 
+#include <mmtf/errors.hpp>
 #include <mmtf/structure_data.hpp>
 #include <mmtf/decoder.hpp>
 #include <mmtf/encoder.hpp>
@@ -25,11 +27,11 @@
 #include "chemfiles/types.hpp"
 #include "chemfiles/warnings.hpp"
 #include "chemfiles/error_fmt.hpp"
+#include "chemfiles/unreachable.hpp"
+#include "chemfiles/external/span.hpp"
 #include "chemfiles/external/optional.hpp"
 
-#include "chemfiles/files/GzFile.hpp"
-#include "chemfiles/files/XzFile.hpp"
-#include "chemfiles/files/MemoryFile.hpp"
+#include "chemfiles/files/MemoryBuffer.hpp"
 
 #include "chemfiles/formats/MMTF.hpp"
 

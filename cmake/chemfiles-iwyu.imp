@@ -27,6 +27,8 @@
     {symbol: ["std::forward", "private", "<array>", "public"]},
     {symbol: ["std::move", "private", "<mutex>", "public"]},
     {symbol: ["std::forward", "private", "<mutex>", "public"]},
+    {symbol: ["std::move", "private", "<utility>", "public"]},
+    {symbol: ["std::forward", "private", "<utility>", "public"]},
 
     # allow getting <type_traits> from map header
     {include: ["<type_traits>", "public", "<map>", "public"]},
@@ -35,4 +37,23 @@
     # Get various symbols from the right headers
     {symbol: ["std::exception", "private", "<exception>", "public"]},
     {symbol: ["std::hash", "private", "<functional>", "public"]},
+
+    # Don't force to include <memory> when indexing in a vector
+    {symbol: ["std::allocator_traits<std::allocator<chemfiles::Residue> >::value_type", "private", "<vector>", "public"]},
+    # Don't force to include <algorithm> when using std::vector::push_back
+    {symbol: ["std::max", "private", "<vector>", "public"]},
+    # Don't force to include <type_traits> when using properties
+    {symbol: ["std::decay<const chemfiles::Property>::type", "private", "\"chemfiles/Frame.hpp\"", "public"]},
+    # Don't force to include <type_traits> when using move assignement of File
+    {symbol: ["std::remove_reference<chemfiles::XDRFile &>::type", "private", "\"chemfiles/files/XDRFile.hpp\"", "public"]},
+
+    # Allow getting the chemfiles namespace from any file
+    {symbol: ["chemfiles", "private", "\"chemfiles/misc.hpp\"", "public"]},
+    {symbol: ["chemfiles", "private", "\"chemfiles/string_view.hpp\"", "public"]},
+    {symbol: ["chemfiles", "private", "\"chemfiles/sorted_set.hpp\"", "public"]},
+    {symbol: ["chemfiles", "private", "\"chemfiles/error_fmt.hpp\"", "public"]},
+    {symbol: ["chemfiles", "private", "\"chemfiles/Configuration.hpp\"", "public"]},
+    {symbol: ["chemfiles", "private", "\"chemfiles/capi/shared_allocator.hpp\"", "public"]},
+    {symbol: ["chemfiles", "private", "\"chemfiles/periodic_table.hpp\"", "public"]},
+    {symbol: ["chemfiles", "private", "\"chemfiles/pdb_connectivity.hpp\"", "public"]},
 ]
