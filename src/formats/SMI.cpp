@@ -379,7 +379,7 @@ void SMIFormat::read_next(Frame& frame) {
     }
 
     if (!rings_ids_.empty()) {
-        throw format_error("SMI Reader: {} unclosed ringid '{}'", rings_ids_.begin()->first);
+        throw format_error("SMI Reader: unclosed ringid '{}'", rings_ids_.begin()->first);
     }
 
     frame.resize(topology.size());
