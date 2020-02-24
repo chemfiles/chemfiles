@@ -16,11 +16,12 @@
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/FormatFactory.hpp"
 #include "chemfiles/Configuration.hpp"
-#include "chemfiles/files/MemoryFile.hpp"
+#include "chemfiles/files/MemoryBuffer.hpp"
 
 #include "chemfiles/utils.hpp"
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/string_view.hpp"
+#include "chemfiles/external/span.hpp"
 #include "chemfiles/external/optional.hpp"
 
 using namespace chemfiles;

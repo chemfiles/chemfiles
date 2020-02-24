@@ -6,12 +6,15 @@
 
 #include <cstdint>
 #include <string>
+#include <memory>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 class Frame;
+class MemoryBuffer;
 
 /// [SDF] file format reader and writer.
 ///

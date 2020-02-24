@@ -5,6 +5,7 @@
 #define CHEMFILES_FORMAT_CML_HPP
 
 #include <string>
+#include <memory>
 #include <unordered_map>
 
 #include <pugixml.hpp>
@@ -14,6 +15,7 @@
 
 namespace chemfiles {
 class Frame;
+class MemoryBuffer;
 
 /// [CML] file format reader.
 ///

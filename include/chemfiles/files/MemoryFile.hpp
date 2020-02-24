@@ -4,10 +4,15 @@
 #ifndef CHEMFILES_MEMORY_FILES_HPP
 #define CHEMFILES_MEMORY_FILES_HPP
 
+#include <cstdint>
+#include <cstddef>
+#include <memory>
+#include <utility>
+
 #include "chemfiles/File.hpp"
-#include "chemfiles/files/MemoryBuffer.hpp"
 
 namespace chemfiles {
+class MemoryBuffer;
 
 /// Simple TextFile implementation, that wraps memory for reading only.
 class MemoryFile final: public TextFileImpl {

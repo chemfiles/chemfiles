@@ -5,7 +5,6 @@
 
 #include "chemfiles/utils.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 
 using namespace chemfiles;
 

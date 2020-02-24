@@ -9,7 +9,8 @@
 
 #include "chemfiles/File.hpp"
 
-struct XDRFILE;
+// IWYU pragma: no_include <xdrfile.h>
+struct XDRFILE;  // IWYU pragma: keep
 
 namespace chemfiles {
 

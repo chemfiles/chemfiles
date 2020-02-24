@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <exception>
 #include <functional>
 
 #include "chemfiles/misc.hpp"

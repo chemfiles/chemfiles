@@ -13,12 +13,12 @@ extern "C" {
 #include <vector>
 
 #include "chemfiles/File.hpp"
+#include "chemfiles/Frame.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Topology.hpp"   // IWYU pragma: keep
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
-class Frame;
 
 /// List all the VMD molfile plugins enabled. For more documentation about VMD
 /// molfile plugins, please see:

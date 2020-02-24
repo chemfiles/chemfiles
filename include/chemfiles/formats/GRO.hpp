@@ -7,13 +7,16 @@
 #include <cstdint>
 #include <map>
 #include <string>
+#include <memory>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/Residue.hpp"
+#include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 class Frame;
+class MemoryBuffer;
 
 /// [GRO] file format reader and writer.
 ///

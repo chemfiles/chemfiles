@@ -5,6 +5,7 @@
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles/files/MemoryFile.hpp"
+#include "chemfiles/files/MemoryBuffer.hpp"
 #include "chemfiles/Error.hpp"
 using namespace chemfiles;
 

@@ -4,16 +4,20 @@
 #ifndef CHEMFILES_FORMAT_MMTF_HPP
 #define CHEMFILES_FORMAT_MMTF_HPP
 
+#include <cstdint>
 #include <string>
+#include <vector>
+#include <memory>
 
 #include <mmtf/structure_data.hpp>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/Residue.hpp"
 
 namespace chemfiles {
 class Frame;
+class Residue;
+class MemoryBuffer;
 
 /// [MMTF][MMTF] file format reader and writer.
 ///

@@ -17,11 +17,16 @@
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/parse.hpp"
+#include "chemfiles/warnings.hpp"
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/string_view.hpp"
-#include "chemfiles/warnings.hpp"
+#include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/formats/CSSR.hpp"
+
+namespace chemfiles {
+    class MemoryBuffer;
+}
 
 using namespace chemfiles;
 

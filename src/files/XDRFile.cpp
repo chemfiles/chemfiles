@@ -1,13 +1,21 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <cassert>
+#include <cstdlib>
+#include <cstdint>
+#include <string>
+#include <functional>
+
+#include <xdrfile.h>
+#include <xdrfile_xtc.h>
+#include <xdrfile_trr.h>
+
+#include "chemfiles/File.hpp"
 #include "chemfiles/files/XDRFile.hpp"
 
-#include "xdrfile_xtc.h"
-#include "xdrfile_trr.h"
-
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/utils.hpp"
+
 using namespace chemfiles;
 
 XDRFile::XDRFile(Variants variant, std::string path, File::Mode mode)
@@ -43,10 +51,11 @@ XDRFile::XDRFile(Variants variant, std::string path, File::Mode mode)
 }
 
 XDRFile& XDRFile::operator=(XDRFile&& other) noexcept {
+    File::operator=(std::move(other));
     if (handle_ != nullptr) {
         xdrfile_close(handle_);
     }
-    free(offsets_);
+    std::free(offsets_);
 
     // Get the data from other
     handle_ = other.handle_;
@@ -57,13 +66,12 @@ XDRFile& XDRFile::operator=(XDRFile&& other) noexcept {
     // reset other
     other.handle_ = nullptr;
     other.offsets_ = nullptr;
-    File::operator=(std::move(other));
     return *this;
 }
 
 XDRFile::~XDRFile() {
     xdrfile_close(handle_);
-    free(offsets_);
+    std::free(offsets_);
 }
 
 unsigned long XDRFile::nframes() const { return nframes_; }
