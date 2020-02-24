@@ -18,6 +18,7 @@
 #include "chemfiles/files/PlainFile.hpp"
 #include "chemfiles/files/MemoryFile.hpp"
 
+#include "chemfiles/cpp14.hpp"
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/string_view.hpp"
 #include "chemfiles/unreachable.hpp"
@@ -33,16 +34,16 @@ TextFile::TextFile(std::string path, File::Mode mode, File::Compression compress
 {
     switch (compression) {
     case File::DEFAULT:
-        file_ = std::unique_ptr<TextFileImpl>(new PlainFile(this->path(), this->mode()));
+        file_ = chemfiles::make_unique<PlainFile>(this->path(), this->mode());
         break;
     case File::GZIP:
-        file_ = std::unique_ptr<TextFileImpl>(new GzFile(this->path(), this->mode()));
+        file_ = chemfiles::make_unique<GzFile>(this->path(), this->mode());
         break;
     case File::BZIP2:
-        file_ = std::unique_ptr<TextFileImpl>(new Bz2File(this->path(), this->mode()));
+        file_ = chemfiles::make_unique<Bz2File>(this->path(), this->mode());
         break;
     case File::LZMA:
-        file_ = std::unique_ptr<TextFileImpl>(new XzFile(this->path(), this->mode()));
+        file_ = chemfiles::make_unique<XzFile>(this->path(), this->mode());
         break;
     default:
         unreachable();
@@ -68,7 +69,7 @@ TextFile::TextFile(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::
         memory->decompress(compression);
     }
 
-    file_ = std::unique_ptr<TextFileImpl>(new MemoryFile(std::move(memory), mode));
+    file_ = chemfiles::make_unique<MemoryFile>(std::move(memory), mode);
 }
 
 uint64_t TextFile::tellpos() const {
