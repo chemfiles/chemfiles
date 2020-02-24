@@ -9,10 +9,6 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-#include <boost/filesystem.hpp>
-namespace fs=boost::filesystem;
-
-
 TEST_CASE("Read files in SMI format") {
     SECTION("Check nsteps") {
         auto file = Trajectory("data/smi/test.smi");
@@ -255,33 +251,28 @@ TEST_CASE("Check parsing results") {
     }
 }
 
-// To use in loops in order to iterate over files in a specific directory.
-struct directory_files_iterator {
-    typedef fs::recursive_directory_iterator iterator;
-    directory_files_iterator(fs::path p) : p_(p) {}
-
-    iterator begin() { return fs::recursive_directory_iterator(p_); }
-    iterator end() { return fs::recursive_directory_iterator(); }
-
-    fs::path p_;
-};
-
 TEST_CASE("Errors in SMI format") {
-    for (auto entry : directory_files_iterator("data/smi/bad/")) {
-        auto test = [=](){
-            // We can throw either when creating the trajectory, or when reading
-            // the frame, depending on the type of error
-            auto file = Trajectory(entry.path().string());
-            file.read();
-        };
-        CHECK_THROWS(test());
-    }
+    auto file = Trajectory("data/smi/bad/bad_element.smi");
+    CHECK_THROWS_WITH(file.read(), "SMI Reader: bare non-organic atom: 'W'");
 
-    SECTION("Unmatched )") {
-        auto bad = std::string("C)");
-        auto file = Trajectory::memory_reader(bad.c_str(), bad.size(), "SMI");
-        CHECK_THROWS_WITH(file.read(), "SMI Reader: unmatched ')'");
-    }
+    file = Trajectory("data/smi/bad/bad_paren.smi");
+    CHECK_THROWS_WITH(file.read(), "SMI Reader: 1 unclosed '('(s)");
+
+    file = Trajectory("data/smi/bad/bad_percentage_sign.smi");
+    CHECK_THROWS_WITH(file.read(), "SMI Reader: rings defined with '%' must be double digits");
+
+    file = Trajectory("data/smi/bad/bad_ring.smi");
+    CHECK_THROWS_WITH(file.read(), "SMI Reader: unclosed ringid '4'");
+
+    file = Trajectory("data/smi/bad/bad_symbol.smi");
+    CHECK_THROWS_WITH(file.read(), "SMI Reader: unknown symbol: '`'");
+
+    file = Trajectory("data/smi/bad/misplaced_property.smi");
+    CHECK_THROWS_WITH(file.read(), "SMI Reader: symbol not allowed outside of property: '@'");
+
+    auto bad = std::string("C)");
+    file = Trajectory::memory_reader(bad.c_str(), bad.size(), "SMI");
+    CHECK_THROWS_WITH(file.read(), "SMI Reader: unmatched ')'");
 }
 
 TEST_CASE("Write SMI File") {
