@@ -9,6 +9,7 @@
 #include <limits>
 #include <type_traits>
 
+#include "chemfiles/cpp14.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/string_view.hpp"
@@ -24,9 +25,6 @@ namespace detail {
     template<typename T>
     struct always_false { enum { value = false }; };
 
-    template< bool B, class T = void >
-    using enable_if_t = typename std::enable_if<B,T>::type;
-
     template<typename Small, typename Large>
     inline Small convert_integer(Large value) {
         if (sizeof(Small) < sizeof(Large)) {
@@ -38,7 +36,7 @@ namespace detail {
     }
 
     template<typename T>
-    inline typename std::enable_if<std::is_same<T, char>::value || !std::is_integral<T>::value, T>::type
+    inline enable_if_t<std::is_same<T, char>::value || !std::is_integral<T>::value, T>
     parse_integer(string_view input) {
         (void)input;
         static_assert(
@@ -49,7 +47,7 @@ namespace detail {
 
     // Conversion for all SIGNED integer type, except char
     template<typename T>
-    inline typename std::enable_if<!std::is_same<T, char>::value && std::is_signed<T>::value, T>::type
+    inline enable_if_t<!std::is_same<T, char>::value && std::is_signed<T>::value, T>
     parse_integer(string_view input) {
         auto value = parse<int64_t>(input);
         return detail::convert_integer<T>(value);
@@ -57,7 +55,7 @@ namespace detail {
 
     // Conversion for all UNSIGNED integer type, except char
     template<typename T>
-    inline typename std::enable_if<!std::is_same<T, char>::value && std::is_unsigned<T>::value, T>::type
+    inline enable_if_t<!std::is_same<T, char>::value && std::is_unsigned<T>::value, T>
     parse_integer(string_view input) {
         auto value = parse<uint64_t>(input);
         return detail::convert_integer<T>(value);

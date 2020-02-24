@@ -10,6 +10,7 @@
 #include <functional>
 
 #include "chemfiles/exports.h"
+#include "chemfiles/cpp14.hpp"
 #include "chemfiles/mutex.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
@@ -62,15 +63,15 @@ public:
     /// template function `chemfiles::format_information` for this format. The
     /// second template argument is used to determine if the `Format` supports
     /// memory IO.
-    template<class Format, typename std::enable_if<SupportsMemoryIO<Format>::value, Format>::type* = nullptr> // NOLINT no std::enable_if_t in C++11
+    template<class Format, enable_if_t<SupportsMemoryIO<Format>::value, int> = 0>
     void add_format() {
         auto info = format_information<Format>();
         register_format(info,
             [](const std::string& path, File::Mode mode, File::Compression compression) {
-                return std::unique_ptr<Format>(new Format(path, mode, compression));  // NOLINT no make_unique in C++11
+                return chemfiles::make_unique<Format>(path, mode, compression);
             },
             [](std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression) {
-                return std::unique_ptr<Format>(new Format(std::move(memory), mode, compression));  // NOLINT no make_unique in C++11
+                return chemfiles::make_unique<Format>(std::move(memory), mode, compression);
             }
         );
     }
@@ -81,12 +82,12 @@ public:
     /// template function `chemfiles::format_information` for this format. The
     /// second template argument is used to determine if the `Format` supports
     /// memory IO.
-    template<class Format, typename std::enable_if<!SupportsMemoryIO<Format>::value, Format>::type* = nullptr> // NOLINT no std::enable_if_t in C++11
+    template<class Format, enable_if_t<!SupportsMemoryIO<Format>::value, int> = 0>
     void add_format() {
         auto info = format_information<Format>();
         register_format(info,
             [](const std::string& path, File::Mode mode, File::Compression compression) {
-                return std::unique_ptr<Format>(new Format(path, mode, compression));  // NOLINT no make_unique in C++11
+                return chemfiles::make_unique<Format>(path, mode, compression);
             }
         );
     }
