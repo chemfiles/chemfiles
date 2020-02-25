@@ -31,6 +31,17 @@ TEST_CASE("Read files in InChI format") {
         traj.read();
     }
 
+    SECTION("Tetrahedral Chirality") {
+        // https://www.inchi-trust.org/technical-faq-2/#8.6
+        // Technically, this is the only standard way to do things
+        char unknown_stereo[] = "InChI=1S/C6H12O/c1-5-3-4-7-6(5)2/h5-6H,3-4H2,1-2H3/t5?,6-/m0/s1\n";
+        auto traj_u = Trajectory::memory_reader(unknown_stereo, 65, "InChI");
+        auto frame_u = traj_u.read();
+
+        CHECK(frame_u[4].get("chirality")->as_string() == "tetrahedron_unknown");
+        CHECK(frame_u[5].get("chirality")->as_string() == "tetrahedron_odd");
+    }
+
     SECTION("Rectangular Chirality") {
         // https://pubchem.ncbi.nlm.nih.gov/compound/6324998 Note: It is missing the /b tag
         char cumulene[] = "InChI=1S/C10H10O2/c1-2-3-4-5-6-9-7-8-10(11)12-9/h4,7-8H,2-3H2,1H3/b9-4-\n";
@@ -52,10 +63,64 @@ TEST_CASE("Read files in InChI format") {
 
         CHECK(frame[21].get("chirality")->as_string() == "antirectangle_odd");
 
+        // Note: the following generates a warning - this is not fixed on purpose to test
+        // warning handling. The warning is a result of the /h tag
+        char allene2[] = "InChI=1/C27H21OP/c28-29(25-17-9-3-10-18-25,26-19-11-4-12-20-26)27"
+                        "(24-15-7-2-8-16-24)22-21-23-13-5-1-6-14-23/h1-21H/t22+/s2\n";
+        auto traj2 = Trajectory::memory_reader(allene2, 124, "InChI");
+        auto frame2 = traj2.read();
+
+        CHECK(frame2[21].get("chirality")->as_string() == "antirectangle_even");
+
+        char allene3[] = "InChI=1/C27H21OP/c28-29(25-17-9-3-10-18-25,26-19-11-4-12-20-26)27"
+                        "(24-15-7-2-8-16-24)22-21-23-13-5-1-6-14-23/h1-21H/s2\n";
+        auto traj3 = Trajectory::memory_reader(allene3, 119, "InChI");
+        auto frame3 = traj3.read();
+
+        CHECK(frame3[21].get("chirality") == nullopt);
     }
 }
 
 TEST_CASE("Write files in InChI format") {
+
+    SECTION("Tetrahedral stereochemistry") {
+        auto expected_result =
+R"(InChI=1S/CH2ClF/c2-1-3/h1H2
+AuxInfo=1/0/N:1,3,2/rA:3nCFCl/rB:s1;s1;/rC:;;;
+InChI=1S/CHBrClF/c2-1(3)4/h1H/t1-/m0/s1
+AuxInfo=1/0/N:1,4,3,2/it:im/rA:4nC.eFClBr/rB:s1;s1;s1;/rC:;;;;
+InChI=1S/CBrClFI/c2-1(3,4)5/t1-/m0/s1
+AuxInfo=1/0/N:1,4,3,2,5/it:im/rA:5nC.eFClBrI/rB:s1;s1;s1;s1;/rC:;;;;;
+)";
+
+        auto traj = Trajectory::memory_writer("InChI");
+
+        Frame frame;
+        frame.add_atom(Atom("C"), {0.0, 0.0, 0.0});
+        frame.add_atom(Atom("F"), {0.0, 0.0, 0.0});
+        frame.add_atom(Atom("Cl"), {0.0, 0.0, 0.0});
+
+        frame.add_bond(0, 1);
+        frame.add_bond(0, 2);
+
+        // Generates a warning
+        frame[0].set("chirality", "tetrahedron_even");
+        traj.write(frame);
+
+        frame.add_atom(Atom("Br"), {0.0, 0.0, 0.0});
+        frame.add_bond(0, 3);
+        traj.write(frame);
+
+        frame.add_atom(Atom("I"), {0.0, 0.0, 0.0});
+        frame.add_bond(0, 4);
+        traj.write(frame);
+
+        auto result = *(traj.memory_buffer());
+        auto result_str = std::string(result.data(), result.size());
+
+        CHECK(result_str == expected_result);
+    }
+
     SECTION("Starting with 3D information - Odd stereochemistry") {
         Trajectory traj("data/inchi/github3_3d.mol2");
         auto frame = traj.read();
@@ -85,6 +150,25 @@ TEST_CASE("Write files in InChI format") {
 "5318,-2.9508,1.1118;3.9291,-3.0462,.9697;3.6736,-2.4182,-2.3449;5.7691,.9315,"
 "-2.6415;7.3548,-.0821,-2.4917;5.9983,-1.6396,-3.674;6.4738,-.8579,.4378;"
         );
+
+        Trajectory traj_in(tmpfile);
+        auto frame_in = traj_in.read();
+        CHECK(frame_in.size() == 17);
+        CHECK(frame_in[3].get("chirality")->as_string() == "tetrahedron_odd");
+        CHECK(frame_in[4].get("chirality")->as_string() == "tetrahedron_even");
+        CHECK(frame_in[5].get("chirality")->as_string() == "tetrahedron_even");
+        CHECK(frame_in[6].get("chirality")->as_string() == "tetrahedron_even");
+
+        auto tmpfile2 = NamedTempPath(".inchi");
+        Trajectory traj_out2(tmpfile2, 'w');
+        traj_out2.write(frame_in);
+        traj_out2.close();
+
+        std::ifstream tmp2(tmpfile2);
+
+        std::getline(tmp2, line);
+        CHECK(line == "InChI=1S/C7H17NO5/c1-8-2-4(10)6(12)7(13)5(11)3-9/"
+                      "h4-13H,2-3H2,1H3/t4-,5+,6+,7+/m0/s1");
     }
 
     SECTION("Starting with 3D information - Odd sulfur stereochemistry") {
@@ -114,7 +198,24 @@ TEST_CASE("Write files in InChI format") {
 
         Trajectory traj_in(tmpfile);
         auto frame_in = traj_in.read();
-        CHECK(frame_in.size() == frame.size() - 12); // lost 12 hydrogens
-        CHECK(frame_in[6].get("chirality")->as_string() == "tetrahedron_even"); // chirality is set for us
+        CHECK(frame_in.size() == frame.size() - 12);
+        CHECK(frame_in[6].get("chirality")->as_string() == "tetrahedron_even"); // chirality is set for us via 3D
+
+        auto tmpfile2 = NamedTempPath(".inchi");
+        Trajectory traj_out2(tmpfile2, 'w');
+        traj_out2.write(frame_in);
+
+        frame_in[6].set("chirality", "tetrahedron_odd");
+        traj_out2.write(frame_in);
+
+        traj_out2.close();
+        std::ifstream tmp2(tmpfile2);
+
+        std::getline(tmp2, line);
+        CHECK(line == "InChI=1S/C5H12OS/c1-5(2,3)7(4)6/h1-4H3/t7-/m1/s1");
+
+        std::getline(tmp2, line);
+        std::getline(tmp2, line);
+        CHECK(line == "InChI=1S/C5H12OS/c1-5(2,3)7(4)6/h1-4H3/t7-/m0/s1");
     }
 }
