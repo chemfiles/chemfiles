@@ -325,13 +325,18 @@ optional<uint64_t> SDFFormat::forward() {
     auto position = file_.tellpos();
     size_t natoms = 0;
     size_t nbonds = 0;
+    auto counts_line = string_view("");
     try {
         // Ignore junk lines
         for (size_t i=0; i<3; i++) {
             file_.readline();
         }
 
-        auto counts_line = file_.readline();
+        if (file_.eof()) {
+            return nullopt;
+        }
+
+        counts_line = file_.readline();
         if (counts_line.length() < 10) {
             throw format_error("counts line must have at least 10 digits, it has {}", counts_line.length());
         }
@@ -340,7 +345,7 @@ optional<uint64_t> SDFFormat::forward() {
         nbonds = parse<size_t>(counts_line.substr(3,3));
     } catch (const Error&) {
         // We could not read an integer, so give up here
-        return nullopt;
+        throw format_error("could not parse counts line: '{}'", counts_line);
     }
 
     try {
