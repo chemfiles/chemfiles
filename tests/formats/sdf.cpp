@@ -99,14 +99,20 @@ TEST_CASE("Errors in SDF format") {
     auto file = Trajectory("data/sdf/bad/bad_atom_line.sdf");
     CHECK_THROWS_WITH(file.read(), "atom line is too small for SDF: '    3.7320   -0.0600'");
 
-    file = Trajectory("data/sdf/bad/bad_counts_line.sdf");
-    CHECK_THROWS_WITH(file.read(), "can not read file 'data/sdf/bad/bad_counts_line.sdf' at step 0, it does not contain any step");
+    CHECK_THROWS_WITH(
+        Trajectory("data/sdf/bad/bad_counts_line.sdf"),
+        "could not parse counts line: ' 21aaa           '"
+    );
 
-    file = Trajectory("data/sdf/bad/bad_counts_line2.sdf");
-    CHECK_THROWS_WITH(file.read(), "can not read file 'data/sdf/bad/bad_counts_line2.sdf' at step 0, it does not contain any step");
+    CHECK_THROWS_WITH(
+        Trajectory("data/sdf/bad/bad_counts_line2.sdf"),
+        "could not parse counts line: '  0  0'"
+    );
 
-    file = Trajectory("data/sdf/bad/blank.sdf");
-    CHECK_THROWS_WITH(file.read(), "can not read file 'data/sdf/bad/blank.sdf' at step 0, it does not contain any step");
+    CHECK_THROWS_WITH(
+        Trajectory("data/sdf/bad/blank.sdf"),
+        "could not parse counts line: 'asdf'"
+    );
 }
 
 TEST_CASE("Write files in SDF format") {
