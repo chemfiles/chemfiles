@@ -127,6 +127,20 @@ UnitCell AmberNetCDFFormat::read_cell() {
     assert(length.size() == 3);
     assert(angles.size() == 3);
 
+    if (length_var.attribute_exists("scale_factor")) {
+        float scale_factor = length_var.attribute_float("scale_factor");
+        length[0] *= scale_factor;
+        length[1] *= scale_factor;
+        length[2] *= scale_factor;
+    }
+
+    if (angles_var.attribute_exists("scale_factor")) {
+        float scale_factor = angles_var.attribute_float("scale_factor");
+        angles[0] *= scale_factor;
+        angles[1] *= scale_factor;
+        angles[2] *= scale_factor;
+    }
+
     return {
         static_cast<double>(length[0]),
         static_cast<double>(length[1]),
@@ -145,6 +159,13 @@ void AmberNetCDFFormat::read_array(span<Vector3D> array, const std::string& name
     std::vector<size_t> start{step_, 0, 0};
     std::vector<size_t> count{1, natoms, 3};
     auto data = array_var.get(start, count);
+
+    if (array_var.attribute_exists("scale_factor")) {
+        float scale_factor = array_var.attribute_float("scale_factor");
+        for (auto& value : data) {
+            value *= scale_factor;
+        }
+    }
 
     for (size_t i = 0; i < natoms; i++) {
         array[i][0] = static_cast<double>(data[3 * i + 0]);
