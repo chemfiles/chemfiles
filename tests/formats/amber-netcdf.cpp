@@ -46,6 +46,29 @@ TEST_CASE("Read files in NetCDF format") {
         CHECK(frame.size() == 1989);
         CHECK(frame.cell() == UnitCell());
     }
+
+    SECTION("Scale factor") {
+        auto file = Trajectory("data/netcdf/scaled_traj.nc");
+        CHECK(file.nsteps() == 26);
+        auto frame = file.read_step(12);
+        CHECK(frame.size() == 1938);
+        // Check cell
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(approx_eq(cell.a(), 60.9682 * 1.765, 1e-4));
+        CHECK(approx_eq(cell.b(), 60.9682 * 1.765, 1e-4));
+        CHECK(cell.c() == 0);
+        // Check positions
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(1.39, 1.39, 0) * 0.455, 1e-4));
+        CHECK(approx_eq(positions[296], Vector3D(29.1, 37.41, 0) * 0.455, 1e-4));
+        // Check velocities
+        auto velocities = *frame.velocities();
+        CHECK(
+            approx_eq(velocities[1400], Vector3D(0.6854072, 0.09196011, 2.260214) * -0.856, 1e-4));
+        CHECK(
+            approx_eq(velocities[1600], Vector3D(-0.3342645, 0.322594, -2.446901) * -0.856, 1e-4));
+    }
 }
 
 TEST_CASE("Write files in NetCDF format") {
