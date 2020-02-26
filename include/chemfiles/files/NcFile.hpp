@@ -55,9 +55,14 @@ namespace nc {
 
         /// Get the attribute `name`.
         std::string attribute(const std::string& name) const;
+        /// Get the float attribute `name`.
+        float attribute_float(const std::string& name) const;
         /// Add an attribute with the given `value` and `name`.
         void add_attribute(const std::string& name, const std::string& value);
-    protected:
+        /// Check if an attribute exists
+        bool attribute_exists(const std::string& name) const;
+
+      protected:
         netcdf_id_t file_id_;
         netcdf_id_t var_id_;
     };

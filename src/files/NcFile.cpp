@@ -56,10 +56,29 @@ std::string nc::NcVariable::attribute(const std::string& name) const {
     return value;
 }
 
+float nc::NcVariable::attribute_float(const std::string& name) const {
+    size_t size = 0;
+    int status = nc_inq_attlen(file_id_, var_id_, name.c_str(), &size);
+    nc::check(status, "can not read attribute id for attribute '{}'", name);
+    if (size != 1) {
+        throw file_error("expected one value for attribute '{}'", name);
+    }
+
+    float value = -1;
+    status = nc_get_att_float(file_id_, var_id_, name.c_str(), &value);
+    nc::check(status, "can not read attribute float for attribute '{}'", name);
+    return value;
+}
 
 void nc::NcVariable::add_attribute(const std::string& name, const std::string& value) {
     int status = nc_put_att_text(file_id_, var_id_, name.c_str(), value.size(), value.c_str());
     nc::check(status, "can not set attribute '{}'", name);
+}
+
+bool nc::NcVariable::attribute_exists(const std::string& name) const {
+    auto id = nc::netcdf_id_t(-1);
+    auto status = nc_inq_attid(file_id_, var_id_, name.c_str(), &id);
+    return status == NC_NOERR;
 }
 
 std::vector<float> nc::NcFloat::get(count_t start, count_t count) const {
