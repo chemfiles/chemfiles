@@ -64,13 +64,13 @@ public:
                 errors += "\n";
                 break;
             case IXA_STATUS_WARNING:
-                warning("InChI IXA: ", "'{}'", IXA_STATUS_GetMessage(status_, index));
+                warning("inchi IXA: ", "'{}'", IXA_STATUS_GetMessage(status_, index));
                 break;
             }
         }
 
         if (!errors.empty()) {
-            throw format_error("problem in InChI IXA: '{}'", errors);
+            throw format_error("problem in inchi IXA: '{}'", errors);
         }
 
         IXA_STATUS_Clear(status_);
@@ -84,8 +84,13 @@ public:
     std::pair<std::string, std::string> get_strings() {
         auto builder = IXA_INCHIBUILDER_Create(status_);
         IXA_INCHIBUILDER_SetMolecule(status_, builder, handle_);
-        std::string inchi(IXA_INCHIBUILDER_GetInChIEx(status_, builder));
-        std::string auxinfo(IXA_INCHIBUILDER_GetAuxInfo(status_, builder));
+
+        auto inchi_result = IXA_INCHIBUILDER_GetInChIEx(status_, builder);
+        auto auxinfo_result = IXA_INCHIBUILDER_GetAuxInfo(status_, builder);
+        check_for_errors();
+
+        std::string inchi(inchi_result);
+        std::string auxinfo(auxinfo_result);
         IXA_INCHIBUILDER_Destroy(status_, builder);
         return {inchi, auxinfo};
     }
@@ -263,13 +268,7 @@ public:
         }
 
         // TODO: Add explicit hydrogen support
-        //auto h_count = atom.get("hydrogen_count");
-
-        //if (!h_count) {
         IXA_MOL_SetAtomHydrogens(status_, handle_, new_atom, 0, -1);
-        //} else if (h_count->kind() == Property::DOUBLE && double_to_int(h_count->as_double(), int_part)) {
-        //    IXA_MOL_SetAtomHydrogens(status_, handle_, new_atom, 1, int_part);
-        //}
 
         check_for_errors();
     }
@@ -287,9 +286,6 @@ public:
         case Bond::DATIVE_R:
         case Bond::UP:
         case Bond::DOWN:
-        case Bond::WEDGE_UP:
-        case Bond::WEDGE_DOWN:
-        case Bond::WEDGE_EITHER:
             IXA_MOL_SetBondType(status_, handle_, new_bond, IXA_BOND_TYPE_SINGLE);
             break;
         case Bond::DOUBLE:
@@ -311,7 +307,20 @@ public:
         check_for_errors();
     }
 
-    IXA_STEREOID create_stereo_tetrahedron(size_t center, const std::vector<size_t>& a, string_view parity) {
+    void set_stereo_parity(IXA_STEREOID stereo, string_view parity) {
+        if (parity == "odd") {
+            IXA_MOL_SetStereoParity(status_, handle_, stereo, IXA_STEREO_PARITY_ODD);
+        } else if (parity == "even") {
+            IXA_MOL_SetStereoParity(status_, handle_, stereo, IXA_STEREO_PARITY_EVEN);
+        } else if (parity == "none") {
+            IXA_MOL_SetStereoParity(status_, handle_, stereo, IXA_STEREO_PARITY_NONE);
+        } else {
+            IXA_MOL_SetStereoParity(status_, handle_, stereo, IXA_STEREO_PARITY_UNKNOWN);
+        }
+        check_for_errors();
+    }
+
+    IXA_STEREOID create_stereo_tetrahedron(size_t center, const std::vector<size_t>& a) {
 
         assert(a.size() >= 3);
 
@@ -324,21 +333,35 @@ public:
         // We have an implicit hydrogen or the fourth atom is a hydrogen,
         // so we need to swap it with the first vertex
         // I'm not sure why the IXA interface does not do this for us.
+        // A similar solution can be found in RDkit 
         if (a.size() == 3 || IXA_MOL_GetAtomAtomicNumber(status_, handle_, v4) == 1) {
             std::swap(v1, v4);
         }
 
         auto stereo = IXA_MOL_CreateStereoTetrahedron(status_, handle_, c0, v1, v2, v3, v4);
 
-        if (parity == "odd") {
-            IXA_MOL_SetStereoParity(status_, handle_, stereo, IXA_STEREO_PARITY_ODD);
-        } else if (parity == "even") {
-            IXA_MOL_SetStereoParity(status_, handle_, stereo, IXA_STEREO_PARITY_EVEN);
-        } else if (parity == "none") {
-            IXA_MOL_SetStereoParity(status_, handle_, stereo, IXA_STEREO_PARITY_NONE);
-        } else {
-            IXA_MOL_SetStereoParity(status_, handle_, stereo, IXA_STEREO_PARITY_UNKNOWN);
-        }
+        check_for_errors();
+
+        return stereo;
+    }
+
+    void set_double_bond_configuration(size_t index) {
+        auto b = bond(index);
+        IXA_MOL_SetDblBondConfig(status_, handle_, b, IXA_DBLBOND_CONFIG_EITHER);
+    }
+
+    IXA_STEREOID create_stereo_rectangle(size_t center, size_t a, Bond cbond, size_t b) {
+
+        auto c0 = bond(static_cast<int>(center));
+
+        auto a1 = atom(static_cast<int>(a));
+        auto a2 = atom(static_cast<int>(cbond[0]));
+
+        auto b1 = atom(static_cast<int>(cbond[1]));
+        auto b2 = atom(static_cast<int>(b));
+
+        auto stereo = IXA_MOL_CreateStereoRectangle(status_, handle_, c0, a1, a2, b1, b2);
+
         check_for_errors();
 
         return stereo;
@@ -452,6 +475,28 @@ static bool is_zero_dimensions(const Frame &frame) {
     return true;
 }
 
+static std::vector<size_t> stereo_verticies(const Frame& frame,
+                                            const std::vector<std::vector<size_t>>& adj_list,
+                                            size_t atom1, size_t atom2) {
+
+    std::vector<size_t> result;
+    size_t num_single_bonds = 0;
+    std::copy_if(adj_list[atom1].begin(), adj_list[atom1].end(), std::back_inserter(result),
+        [atom1, atom2, &frame, &num_single_bonds](size_t neighbor) {
+            switch (frame.topology().bond_order(atom1, neighbor)) {
+            case Bond::SINGLE:
+            case Bond::UP:
+            case Bond::DOWN:
+                ++num_single_bonds;
+                break;
+            }
+            return neighbor != atom2;
+        }
+    );
+
+    return result;
+}
+
 void InChIFormat::write_next(const Frame &frame) {
 
     IXAMolWrapper writer;
@@ -485,17 +530,45 @@ void InChIFormat::write_next(const Frame &frame) {
             if (chirality_sv.starts_with("tetrahedron")) {
                 if (adj_list[i].size() <= 2) {
                     warning(
-                        "InChI writer",
+                        "inchi writer",
                         "tetrahedral chirality property set for atom with fewer than 3 bonds"
                     );
                     continue;
                 }
 
-                auto parity = chirality_sv.substr(12);
+                auto stereo = writer.create_stereo_tetrahedron(i, adj_list[i]);
+                writer.set_stereo_parity(stereo, chirality_sv.substr(12));
 
-                auto stereo = writer.create_stereo_tetrahedron(i, adj_list[i], parity);
                 continue;
             }
+        }
+
+        auto& bonds = frame.topology().bonds();
+        auto& bond_orders = frame.topology().bond_orders();
+        for (size_t i = 0; i < bonds.size(); ++i) {
+            if (bond_orders[i] == Bond::DOUBLE) {
+                writer.set_double_bond_configuration(i);
+            }
+
+            if (bond_orders[i] != Bond::EVEN_RECTANGLE && bond_orders[i] != Bond::ODD_RECTANGLE) {
+                continue;
+            }
+
+            auto atom1 = bonds[i][0];
+            auto atom2 = bonds[i][1];
+
+            auto stereo_atom1 = stereo_verticies(frame, adj_list, atom1, atom2);
+            auto stereo_atom2 = stereo_verticies(frame, adj_list, atom2, atom1);
+
+            if (stereo_atom1.size() == 0 || stereo_atom2.size() == 0) {
+                warning("inchi writer",
+                        "attempt to set chirality on a double bond where an atom is bound to two implicit hydrogens"
+                );
+                continue;
+            }
+
+            auto stereo = writer.create_stereo_rectangle(i, stereo_atom1[0], bonds[i], stereo_atom2[0]);
+            writer.set_stereo_parity(stereo, bond_orders[i] == Bond::EVEN_RECTANGLE? "even" : "odd");
         }
     }
 

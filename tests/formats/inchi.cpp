@@ -44,14 +44,14 @@ TEST_CASE("Read files in InChI format") {
 
     SECTION("Rectangular Chirality") {
         // https://pubchem.ncbi.nlm.nih.gov/compound/6324998 Note: It is missing the /b tag
-        char cumulene[] = "InChI=1S/C10H10O2/c1-2-3-4-5-6-9-7-8-10(11)12-9/h4,7-8H,2-3H2,1H3/b9-4-\n";
-        auto traj = Trajectory::memory_reader(cumulene, 72, "InChI");
-        auto frame = traj.read();
+        char cumulene1[] = "InChI=1S/C10H10O2/c1-2-3-4-5-6-9-7-8-10(11)12-9/h4,7-8H,2-3H2,1H3/b9-4-\n";
+        auto traj1 = Trajectory::memory_reader(cumulene1, 72, "InChI");
+        auto frame1 = traj1.read();
 
-        CHECK(frame.size() == 13);
-        CHECK(frame.topology().bond_order(4, 5) == Bond::ODD_RECTANGLE);
+        CHECK(frame1.size() == 13);
+        CHECK(frame1.topology().bond_order(4, 5) == Bond::ODD_RECTANGLE);
 
-        CHECK(*(frame[frame.size() - 1].atomic_number()) == 1);
+        CHECK(*(frame1[frame1.size() - 1].atomic_number()) == 1);
     }
 
     SECTION("Anti-rectangular Chirality") {
@@ -217,5 +217,45 @@ AuxInfo=1/0/N:1,4,3,2,5/it:im/rA:5nC.eFClBrI/rB:s1;s1;s1;s1;/rC:;;;;;
         std::getline(tmp2, line);
         std::getline(tmp2, line);
         CHECK(line == "InChI=1S/C5H12OS/c1-5(2,3)7(4)6/h1-4H3/t7-/m0/s1");
+    }
+
+    SECTION("Rectangular Chirality Writing") {
+
+        auto expected =
+R"(InChI=1S/C2H4/c1-2/h1-2H2
+AuxInfo=1/0/N:1,2/E:(1,2)/rA:2nCC/rB:d1;/rC:;;
+InChI=1S/C2H2F2/c3-1-2-4/h1-2H/b2-1+
+AuxInfo=1/0/N:1,2,3,4/E:(1,2)(3,4)/rA:4nCCFF/rB:d+1;s1;s2;/rC:;;;;
+InChI=1S/C2H2F2/c3-1-2-4/h1-2H/b2-1-
+AuxInfo=1/0/N:1,2,3,4/E:(1,2)(3,4)/rA:4nCCFF/rB:d-1;s1;s2;/rC:;;;;
+InChI=1S/C2H2F2/c3-1-2-4/h1-2H
+AuxInfo=1/0/N:1,2,3,4/E:(1,2)(3,4)/rA:4nCCFF/rB:w1;s1;s2;/rC:;;;;
+)";
+
+        auto traj = Trajectory::memory_writer("InChI");
+
+        Frame frame;
+        frame.add_atom(Atom("C"), {0., 0., 0.});
+        frame.add_atom(Atom("C"), {0., 0., 0.});
+        frame.add_bond(0, 1, Bond::EVEN_RECTANGLE); // Trans bond (gerade symmetry)
+        traj.write(frame); // Generates a warning.
+
+        frame.add_atom(Atom("F"), {0., 0., 0.});
+        frame.add_atom(Atom("F"), {0., 0., 0.});
+        frame.add_bond(0, 2, Bond::SINGLE);
+        frame.add_bond(1, 3, Bond::SINGLE);
+        traj.write(frame);
+
+        frame.remove_bond(0, 1);
+        frame.add_bond(0, 1, Bond::ODD_RECTANGLE); // Cis bond (ungerade symmetry)
+        traj.write(frame);
+
+        frame.remove_bond(0, 1);
+        frame.add_bond(0, 1, Bond::DOUBLE);
+        traj.write(frame);
+
+        auto result = *traj.memory_buffer();
+        std::string result_str(result.data(), result.size());
+        CHECK(result_str == expected);
     }
 }
