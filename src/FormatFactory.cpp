@@ -27,6 +27,7 @@
 #include "chemfiles/formats/CSSR.hpp"
 #include "chemfiles/formats/GRO.hpp"
 #include "chemfiles/formats/MOL2.hpp"
+#include "chemfiles/formats/InChI.hpp"
 #include "chemfiles/formats/mmCIF.hpp"
 #include "chemfiles/formats/CML.hpp"
 #include "chemfiles/formats/SMI.hpp"
@@ -66,6 +67,7 @@ FormatFactory::FormatFactory() {
     this->add_format<SMIFormat>();
     this->add_format<TRRFormat>();
     this->add_format<XTCFormat>();
+    this->add_format<InChIFormat>();
 
     // VMD molfile plugins
     this->add_format<Molfile<DCD>>();

@@ -255,4 +255,17 @@ add_library(pugixml OBJECT ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src/pugixml.cpp)
 external_library(xdrfile)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/xdrfile/include)
 
+# ==========
+# inchi: https://github.com/chemfiles/iupac_formats
+# ==========
+external_library(inchi)
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/inchi/inchi/INCHI_BASE )
+
+mark_as_advanced(FORCE
+    INCHI_BUILD_SHARED
+    INCHI_DEMOS
+    INCHI_TESTING
+    RINCHI_TESTING
+)
+
 set(EXTERNAL_INCLUDES ${EXTERNAL_INCLUDES} PARENT_SCOPE)

@@ -106,6 +106,7 @@ Chemfiles can read and write files in the following formats:
 - SERC Daresbury Laboratory CSSR files;
 - GROMACS formats: .gro; .trr; .xtc;
 - TRIPOS mol2 files;
+- IUPAC International Chemical Identifier (InChI) strings;
 - MacroMolecular Crystallographic Information Framework (CIF) files;
 - MacroMolecular Transmission Format (MMTF) files;
 - Daylight SMILES: .smi;
