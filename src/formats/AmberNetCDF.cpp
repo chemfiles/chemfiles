@@ -128,14 +128,14 @@ UnitCell AmberNetCDFFormat::read_cell() {
     assert(angles.size() == 3);
 
     if (length_var.attribute_exists("scale_factor")) {
-        float scale_factor = length_var.attribute_float("scale_factor");
+        float scale_factor = length_var.float_attribute("scale_factor");
         length[0] *= scale_factor;
         length[1] *= scale_factor;
         length[2] *= scale_factor;
     }
 
     if (angles_var.attribute_exists("scale_factor")) {
-        float scale_factor = angles_var.attribute_float("scale_factor");
+        float scale_factor = angles_var.float_attribute("scale_factor");
         angles[0] *= scale_factor;
         angles[1] *= scale_factor;
         angles[2] *= scale_factor;
@@ -161,7 +161,7 @@ void AmberNetCDFFormat::read_array(span<Vector3D> array, const std::string& name
     auto data = array_var.get(start, count);
 
     if (array_var.attribute_exists("scale_factor")) {
-        float scale_factor = array_var.attribute_float("scale_factor");
+        float scale_factor = array_var.float_attribute("scale_factor");
         for (auto& value : data) {
             value *= scale_factor;
         }
@@ -197,20 +197,20 @@ static void initialize(NcFile& file, size_t natoms, bool with_velocities) {
 
     auto coordinates =
         file.add_variable<nc::NcFloat>("coordinates", "frame", "atom", "spatial");
-    coordinates.add_attribute("units", "angstrom");
+    coordinates.add_string_attribute("units", "angstrom");
 
     auto cell_lenght =
         file.add_variable<nc::NcFloat>("cell_lengths", "frame", "cell_spatial");
-    cell_lenght.add_attribute("units", "angstrom");
+    cell_lenght.add_string_attribute("units", "angstrom");
 
     auto cell_angles =
         file.add_variable<nc::NcFloat>("cell_angles", "frame", "cell_angular");
-    cell_angles.add_attribute("units", "degree");
+    cell_angles.add_string_attribute("units", "degree");
 
     if (with_velocities) {
         auto velocities =
             file.add_variable<nc::NcFloat>("velocities", "frame", "atom", "spatial");
-        velocities.add_attribute("units", "angstrom/picosecond");
+        velocities.add_string_attribute("units", "angstrom/picosecond");
     }
     file.set_nc_mode(NcFile::DATA);
 
