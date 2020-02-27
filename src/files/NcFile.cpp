@@ -44,8 +44,7 @@ std::vector<size_t> nc::NcVariable::dimmensions() const {
     return result;
 }
 
-
-std::string nc::NcVariable::attribute(const std::string& name) const {
+std::string nc::NcVariable::string_attribute(const std::string& name) const {
     size_t size = 0;
     int status = nc_inq_attlen(file_id_, var_id_, name.c_str(), &size);
     nc::check(status, "can not read attribute id for attribute '{}'", name);
@@ -56,7 +55,7 @@ std::string nc::NcVariable::attribute(const std::string& name) const {
     return value;
 }
 
-float nc::NcVariable::attribute_float(const std::string& name) const {
+float nc::NcVariable::float_attribute(const std::string& name) const {
     size_t size = 0;
     int status = nc_inq_attlen(file_id_, var_id_, name.c_str(), &size);
     nc::check(status, "can not read attribute id for attribute '{}'", name);
@@ -70,7 +69,7 @@ float nc::NcVariable::attribute_float(const std::string& name) const {
     return value;
 }
 
-void nc::NcVariable::add_attribute(const std::string& name, const std::string& value) {
+void nc::NcVariable::add_string_attribute(const std::string& name, const std::string& value) {
     int status = nc_put_att_text(file_id_, var_id_, name.c_str(), value.size(), value.c_str());
     nc::check(status, "can not set attribute '{}'", name);
 }
