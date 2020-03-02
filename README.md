@@ -29,6 +29,8 @@ Chemfiles is used in multiple scientific software
 - [lumol](https://github.com/lumol-org/lumol) is a prototype of universal
   extensible molecular simulation engine, supporting both molecular dynamics
   and Metropolis Monte Carlo simulations;
+- [ANA](https://ana.run/) detects cavities, calculates their volume and their
+  flexibility in macromolecular structures and molecular dynamics trajectories;
 
 This repository contains the core of the chemfiles library — written in C++11,
 with a C99 interface. You can also use chemfiles from other languages: [Python
