@@ -279,6 +279,13 @@ extern "C" chfl_status chfl_frame_remove_bond(CHFL_FRAME* const frame, uint64_t 
     )
 }
 
+extern "C" chfl_status chfl_frame_clear_bonds(CHFL_FRAME* const frame) {
+    CHECK_POINTER(frame);
+    CHFL_ERROR_CATCH(
+        frame->clear_bonds();
+    )
+}
+
 extern "C" chfl_status chfl_frame_add_residue(CHFL_FRAME* const frame, const CHFL_RESIDUE* const residue) {
     CHECK_POINTER(frame);
     CHECK_POINTER(residue);

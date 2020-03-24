@@ -202,6 +202,13 @@ extern "C" chfl_status chfl_topology_remove_bond(CHFL_TOPOLOGY* const topology, 
     )
 }
 
+extern "C" chfl_status chfl_topology_clear_bonds(CHFL_TOPOLOGY* const topology) {
+    CHECK_POINTER(topology);
+    CHFL_ERROR_CATCH(
+        topology->clear_bonds();
+    )
+}
+
 extern "C" chfl_status chfl_topology_residues_count(const CHFL_TOPOLOGY* const topology, uint64_t* const count) {
     CHECK_POINTER(topology);
     CHECK_POINTER(count);

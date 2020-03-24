@@ -5,11 +5,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Next Release (current master)
 
+### New features
+
 * Added ability to read and write files directly in-memory. See
   `Trajectory::memory_reader`; `Trajectory::memory_writer`;
   `Trajectory::memory_buffer`; `chfl_trajectory_memory_reader`;
   `chfl_trajectory_memory_writer` and `chfl_trajectory_memory_buffer`.
 * Added support for appending to gzip (.gz) compressed trajectories.
+
+### Changes to the C API
+
+* Added missing `chfl_frame_clear_bonds` and `chfl_topology_clear_bonds`
+  functions.
 
 ## 0.9.3 (5 Feb 2020)
 
@@ -91,7 +98,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added `Cambridge Structure Search and Retrieval (CSSR)` support, reading and writing.
 * `LAMMPS Data` format now support triclinic unit cells.
 
-###  C API changes
+### Changes to the C API
 
 * Added `chfl_residue_get_property` and `chfl_residue_set_property` to provide
   access to residue properties.
@@ -151,7 +158,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 [LAMMPS data files]: http://lammps.sandia.gov/doc/read_data.html
 
-### C API changes
+### Changes to the C API
 
 * Added `chfl_add_configuration` to add more configuration files.
 * Renamed `chfl_vector_t` to `chfl_vector3d`, `chfl_match_t` to `cfl_match`; and
@@ -212,7 +219,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Add read support for TNG files, an new portable and compressed binary format
   used by GROMACS.
 
-### C API changes
+### Changes to the C API
 
 * All the integers at C boundary have a fixed size, most of the time using
   `uint64_t`.

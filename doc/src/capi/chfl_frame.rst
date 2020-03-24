@@ -24,6 +24,7 @@
     - :cpp:func:`chfl_frame_add_bond`
     - :cpp:func:`chfl_frame_bond_with_order`
     - :cpp:func:`chfl_frame_remove_bond`
+    - :cpp:func:`chfl_frame_clear_bonds`
     - :cpp:func:`chfl_frame_add_residue`
     - :cpp:func:`chfl_frame_step`
     - :cpp:func:`chfl_frame_set_step`
@@ -68,6 +69,8 @@
 .. doxygenfunction:: chfl_frame_bond_with_order
 
 .. doxygenfunction:: chfl_frame_remove_bond
+
+.. doxygenfunction:: chfl_frame_clear_bonds
 
 .. doxygenfunction:: chfl_frame_add_residue
 
