@@ -287,9 +287,13 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_frame_set_topology(frame, new_topology));
         chfl_free(new_topology);
 
-        // Topology changed
+        // Topology changed, but its address did not
         CHECK_STATUS(chfl_topology_bonds_count(topology, &nbonds));
         CHECK(nbonds == 2);
+
+        CHECK_STATUS(chfl_frame_clear_bonds(frame));
+        CHECK_STATUS(chfl_topology_bonds_count(topology, &nbonds));
+        CHECK(nbonds == 0);
 
         chfl_free(topology);
         chfl_free(frame);

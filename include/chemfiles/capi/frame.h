@@ -322,6 +322,14 @@ CHFL_EXPORT chfl_status chfl_frame_remove_bond(
     CHFL_FRAME* frame, uint64_t i, uint64_t j
 );
 
+/// Remove all existing bonds, angles, dihedral angles and improper dihedral
+/// angles in the `frame`.
+///
+/// @example{capi/chfl_frame/clear_bonds.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_frame_clear_bonds(CHFL_FRAME* frame);
+
 /// Add a copy of `residue` to this `frame`.
 ///
 /// The residue id must not already be in this frame's topology, and the residue

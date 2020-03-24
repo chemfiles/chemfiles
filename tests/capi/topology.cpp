@@ -111,6 +111,10 @@ TEST_CASE("chfl_topology") {
         CHECK_STATUS(chfl_topology_bonds_count(topology, &n));
         CHECK(n == 2);
 
+        CHECK_STATUS(chfl_topology_clear_bonds(topology));
+        CHECK_STATUS(chfl_topology_bonds_count(topology, &n));
+        CHECK(n == 0);
+
         chfl_free(topology);
     }
 

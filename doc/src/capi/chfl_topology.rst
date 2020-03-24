@@ -18,6 +18,7 @@
     - :cpp:func:`chfl_topology_remove`
     - :cpp:func:`chfl_topology_add_bond`
     - :cpp:func:`chfl_topology_remove_bond`
+    - :cpp:func:`chfl_topology_clear_bonds`
     - :cpp:func:`chfl_topology_bonds_count`
     - :cpp:func:`chfl_topology_angles_count`
     - :cpp:func:`chfl_topology_dihedrals_count`
@@ -52,6 +53,8 @@
 .. doxygenfunction:: chfl_topology_add_bond
 
 .. doxygenfunction:: chfl_topology_remove_bond
+
+.. doxygenfunction:: chfl_topology_clear_bonds
 
 .. doxygenfunction:: chfl_topology_bonds_count
 
