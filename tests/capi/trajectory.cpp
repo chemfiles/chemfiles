@@ -23,8 +23,8 @@ TEST_CASE("Read trajectory") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
         REQUIRE(trajectory);
 
-        const char* path = nullptr;
-        CHECK_STATUS(chfl_trajectory_path(trajectory, &path));
+        char path[256] = {0};
+        CHECK_STATUS(chfl_trajectory_path(trajectory, path, sizeof(path)));
         CHECK(std::string(path) == "data/xyz/water.xyz");
 
         chfl_trajectory_close(trajectory);

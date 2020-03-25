@@ -11,8 +11,8 @@ int main() {
     // [example] [no-run]
     CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("water.xyz", 'r');
 
-    const char* path = NULL;
-    chfl_trajectory_path(trajectory, &path);
+    char path[256] = {0};
+    chfl_trajectory_path(trajectory, path, sizeof(path));
     assert(strcmp(path, "water.xyz") == 0);
 
     chfl_trajectory_close(trajectory);

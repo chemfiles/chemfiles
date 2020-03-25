@@ -75,17 +75,16 @@ CHFL_EXPORT CHFL_TRAJECTORY* chfl_trajectory_memory_writer(
     const char* format
 );
 
-/// Get the path used to open the `trajectory` in `path`.
+/// Get the path used to open the `trajectory` in the `path` buffer.
 ///
-/// The `path` will point to memory allocated inside the `trajectory`, and it is
-/// only valid until the trajectory is closed (`chfl_trajectory_close`). There
-/// is no need to `free` the corresponding memory
+/// The buffer size must be passed in `buffsize`. This function will truncate
+/// the selection string to fit in the buffer.
 ///
 /// @example{capi/chfl_trajectory/path.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_trajectory_path(
-    const CHFL_TRAJECTORY* trajectory, const char** path
+    const CHFL_TRAJECTORY* trajectory, char* path, uint64_t buffsize
 );
 
 /// Read the next step of the `trajectory` into a `frame`.
