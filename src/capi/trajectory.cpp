@@ -71,11 +71,12 @@ error:
     return nullptr;
 }
 
-extern "C" chfl_status chfl_trajectory_path(const CHFL_TRAJECTORY* const trajectory, const char** const path) {
+extern "C" chfl_status chfl_trajectory_path(const CHFL_TRAJECTORY* const trajectory, char* const path, uint64_t buffsize) {
     CHECK_POINTER(trajectory);
     CHECK_POINTER(path);
     CHFL_ERROR_CATCH(
-        *path = trajectory->path().c_str();
+        strncpy(path, trajectory->path().c_str(), checked_cast(buffsize) - 1);
+        path[buffsize - 1] = '\0';
     )
 }
 

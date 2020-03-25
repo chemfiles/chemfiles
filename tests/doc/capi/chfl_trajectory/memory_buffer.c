@@ -15,7 +15,7 @@ int main() {
     }
 
     const char* result = NULL;
-    size_t size_of_result;
+    uint64_t size_of_result;
     chfl_trajectory_memory_buffer(trajectory, &result, &size_of_result);
 
     chfl_trajectory_close(trajectory);
