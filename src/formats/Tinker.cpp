@@ -71,6 +71,7 @@ void TinkerFormat::read_next(Frame& frame) {
             auto count = scan(line, id, name, x, y, z, atom_type);
 
             frame.add_atom(Atom(name), Vector3D(x, y, z));
+            frame[i].set("atom_type", atom_type);
             while (count != line.size()) {
                 size_t bonded = 0;
                 count += scan(line.substr(count), bonded);
