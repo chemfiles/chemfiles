@@ -34,7 +34,8 @@ GzFile::GzFile(const std::string& path, File::Mode mode): TextFileImpl(path) {
         openmode = "wb7";
         break;
     case File::APPEND:
-        throw file_error("appending (open mode 'a') is not supported with gziped files");
+        openmode = "ab7";
+        break;
     }
 
     file_ = gzopen64(path.c_str(), openmode);
