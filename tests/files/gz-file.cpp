@@ -49,11 +49,6 @@ TEST_CASE("Read a text file") {
             GzFile("not existing", File::READ),
             "could not open the file at 'not existing'"
         );
-
-        CHECK_THROWS_WITH(
-            GzFile("data/xyz/water.9.xyz.gz", File::APPEND),
-            "appending (open mode 'a') is not supported with gziped files"
-        );
     }
 
     SECTION("Lines offsets") {
@@ -107,6 +102,58 @@ TEST_CASE("Write a gz file") {
     TextFile file(filename, File::READ, File::GZIP);
     CHECK(file.readline() == "Test");
     CHECK(file.readline() == "5467");
+}
+
+TEST_CASE("Append to a gz file") {
+    auto filename = NamedTempPath(".gz");
+
+    {
+        TextFile file(filename, File::APPEND, File::GZIP);
+        file.print("Append 1\n");
+        file.print("{}\n", 7645);
+    }
+
+    {
+        TextFile file(filename, File::APPEND, File::GZIP);
+        file.print("Append 2\n");
+        file.print("{}\n", 6754);
+    }
+
+    std::ifstream checking(filename, std::ios::binary);
+    REQUIRE(checking.is_open());
+    checking.seekg(0, std::ios::end);
+    auto size = static_cast<size_t>(checking.tellg());
+    checking.seekg(0, std::ios::beg);
+
+    auto content = std::vector<uint8_t>(size);
+    checking.read(reinterpret_cast<char*>(content.data()), static_cast<std::streamsize>(size));
+
+    // Byte 9 identify the OS in gzip files.
+    // Override it so we can check for the full file output
+    content[9] = 0xff;
+    // A new header is written when appending
+    content[43] = 0xff;
+
+    auto expected = std::vector<uint8_t> {
+        0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff,
+        0x73, 0x2c, 0x28, 0x48, 0xcd, 0x4b, 0x51, 0x30, 0xe4, 0x32,
+        0x37, 0x33, 0x31, 0xe5, 0x02, 0x00, 0xf8, 0x06, 0xaf, 0x8d,
+        0x0e, 0x00, 0x00, 0x00,
+        0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff,
+        0x73, 0x2c, 0x28, 0x48, 0xcd, 0x4b, 0x51, 0x30, 0xe2, 0x32,
+        0x33, 0x37, 0x35, 0xe1, 0x02, 0x00, 0xc6, 0x09, 0x42, 0x21,
+        0x0e, 0x00, 0x00, 0x00,
+    };
+    CHECK(content == expected);
+
+    // Decompress and compare
+    TextFile file(filename, File::READ, File::GZIP);
+    CHECK(file.readline() == "Append 1");
+    CHECK(file.readline() == "7645");
+    CHECK(file.readline() == "Append 2");
+    CHECK(file.readline() == "6754");
+    CHECK(file.readline() == "");
+    CHECK(file.eof());
 }
 
 TEST_CASE("In-memory decompression") {
