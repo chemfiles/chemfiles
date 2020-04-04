@@ -46,6 +46,8 @@ TEST_CASE("Read compressed files in XYZ format") {
     check_read_file(Trajectory("data/xyz/water.6.xyz.gz"));
     // Compression level 9
     check_read_file(Trajectory("data/xyz/water.9.xyz.gz"));
+    // Multiple streams, compression level 7
+    check_read_file(Trajectory("data/xyz/water.multistream.7.xyz.gz"));
 
     // Compression level 6
     check_read_file(Trajectory("data/xyz/water.6.xyz.bz2"));
