@@ -232,6 +232,12 @@ void PDBFormat::read_HELIX(string_view line) {
         return;
     }
 
+    // Fix 1HTQ
+    if (start > end) {
+        warning("PDB reader", "HELIX starting residue {} is greater than ending id {}", start, end);
+        return;
+    }
+
     // Convert the code as a character to its numeric meaning.
     // See http://www.wwpdb.org/documentation/file-format-content/format23/sect5.html
     // for definitions of these numbers
@@ -294,6 +300,11 @@ void PDBFormat::read_secondary(string_view line, size_t i1, size_t i2, string_vi
             "error parsing line: '{}', check {} and {}",
             line, line.substr(i1 + 1, 4), line.substr(i2 + 1, 4)
         );
+        return;
+    }
+
+    if (resid1 >= resid2) {
+        warning("PDB reader", "SHEET starting residue {} is greater than ending id {}", resid1, resid2);
         return;
     }
 
