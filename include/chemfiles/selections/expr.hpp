@@ -5,6 +5,7 @@
 #define CHEMFILES_SELECTION_EXPR_HPP
 
 #include <cstdint>
+#include <cstring>
 #include <string>
 #include <vector>
 #include <memory>
@@ -286,7 +287,92 @@ public:
 class MathExpr;
 using MathAst = std::unique_ptr<MathExpr>;
 
-/// Expression for math selectors
+
+/// Store multiple double values as in a std::vector<double>, while not
+/// allocating heap memory for a single value.
+///
+/// In the heap-allocating case, all the data is behind a pointer, so that
+/// sizeof(NumericValues) <= 2 * sizeof(void*), and NumericValues can be passed
+/// in registers in x86_64.
+///
+/// The goal of this class is to try to get good performances in the common,
+/// single value case, but was not benchmarked versus a simple
+/// std::vector<double>.
+class NumericValues {
+public:
+    /// Create an empty NumericValues vector
+    NumericValues(): NumericValues(EMPTY_VALUE, nullptr) {}
+
+    /// Initialize the NumericValues as stack-allocated data with the given
+    /// single value
+    explicit NumericValues(double value): NumericValues(value, nullptr) {}
+
+    NumericValues(NumericValues&& other);
+    NumericValues& operator=(NumericValues&& other);
+    NumericValues(const NumericValues&) = delete;
+    NumericValues& operator=(const NumericValues&) = delete;
+
+    ~NumericValues();
+
+    /// Get the current capacity of this NumericValues vector
+    size_t capacity() const;
+    /// Get the current size of this NumericValues vector
+    size_t size() const;
+
+    /// Reserve memory for `size` elements in this NumericValues vector
+    void reserve(size_t size);
+    /// Add the given value at the end of this NumericValues vector
+    void push_back(double value);
+
+    using iterator = const double*;
+
+    /// Get an iterator to the beginning of this NumericValues vector
+    iterator begin() const;
+    /// Get an iterator to the end of this NumericValues vector
+    iterator end() const;
+
+    /// Get the element at index `i` this NumericValues vector
+    double operator[](size_t i) const;
+    /// Get the element at index `i` this NumericValues vector as a mutable reference
+    double& operator[](size_t i);
+
+private:
+    // use `+inf` as sentinel value for len == 0
+    static constexpr double EMPTY_VALUE = HUGE_VAL;
+
+    NumericValues(double value, void* heap): value_(value), heap_(static_cast<double*>(heap)) {}
+
+    void set_capacity(uint64_t value) {
+        assert(heap_ != nullptr);
+        std::memcpy(&heap_[1], &value, sizeof(uint64_t));
+    }
+
+    void set_size(uint64_t value) {
+        assert(heap_ != nullptr);
+        std::memcpy(&heap_[0], &value, sizeof(uint64_t));
+    }
+
+    static_assert(sizeof(double) == sizeof(uint64_t), "");
+
+    double value_;
+    // data is stored on the heap if this value is not nullptr
+    // metadata about the allocation is stored at heap_[0] (size) and heap_[1]
+    // (capacity) as `uint64_t`. The bytes of the uint64_t are stored inside
+    // the double values.
+    double* heap_;
+};
+
+
+/// Expression for math selectors.
+///
+/// Math selectors look like `<lhs> <op> <rhs>`, where `<lhs>` and `<rhs>`
+/// evaluate to numeric values, and `<op>` can be any comparison operator (==,
+/// <, >=, !=, ...). This makes the whole selector evaluate to a boolean value.
+///
+/// It is possible for either or both `<lhs>` and `<rhs>` to evaluate to
+/// multiple numeric values (for example `distance(#1, name O)`), in which case
+/// the math selector with evaluate to `true` if ANY of the comparison evaluate
+/// to `true`.
 class Math final: public Selector {
 public:
     enum class Operator {
@@ -324,11 +410,13 @@ public:
     MathExpr(const MathExpr&) = delete;
     MathExpr& operator=(const MathExpr&) = delete;
 
-    /// Evaluate the expression and get the value
-    virtual double eval(const Frame& frame, const Match& match) const = 0;
+    /// Evaluate the expression and get the all the matching values
+    virtual NumericValues eval(const Frame& frame, const Match& match) const = 0;
 
     /// Propagate all constants in this sub ast, and return the corresponding
     /// value if possible.
+    ///
+    /// This currently only support single values, i.e. optimizing `3 + 4` to 7.
     virtual optional<double> optimize() = 0;
 
     /// Clear any cached data
@@ -343,7 +431,7 @@ class Add final: public MathExpr {
 public:
     Add(MathAst lhs, MathAst rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
 
-    double eval(const Frame& frame, const Match& match) const override;
+    NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
     void clear() override;
@@ -358,7 +446,7 @@ class Sub final: public MathExpr {
 public:
     Sub(MathAst lhs, MathAst rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
 
-    double eval(const Frame& frame, const Match& match) const override;
+    NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
     void clear() override;
@@ -373,7 +461,7 @@ class Mul final: public MathExpr {
 public:
     Mul(MathAst lhs, MathAst rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
 
-    double eval(const Frame& frame, const Match& match) const override;
+    NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
     void clear() override;
@@ -388,7 +476,7 @@ class Div final: public MathExpr {
 public:
     Div(MathAst lhs, MathAst rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
 
-    double eval(const Frame& frame, const Match& match) const override;
+    NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
     void clear() override;
@@ -403,7 +491,7 @@ class Pow final: public MathExpr {
 public:
     Pow(MathAst lhs, MathAst rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
 
-    double eval(const Frame& frame, const Match& match) const override;
+    NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
     void clear() override;
@@ -418,7 +506,7 @@ class Neg final: public MathExpr {
 public:
     Neg(MathAst ast): ast_(std::move(ast)) {}
 
-    double eval(const Frame& frame, const Match& match) const override;
+    NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
     void clear() override;
@@ -432,7 +520,7 @@ class Mod final: public MathExpr {
 public:
     Mod(MathAst lhs, MathAst rhs): lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
 
-    double eval(const Frame& frame, const Match& match) const override;
+    NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
     void clear() override;
@@ -448,7 +536,7 @@ public:
     Function(std::function<double(double)> fn, std::string name, MathAst ast):
         fn_(std::move(fn)), name_(std::move(name)), ast_(std::move(ast)) {}
 
-    double eval(const Frame& frame, const Match& match) const override;
+    NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
     void clear() override;
@@ -459,12 +547,13 @@ private:
     MathAst ast_;
 };
 
-/// Literal number
+/// Statically known number (either literal number or the result of
+/// optimization of literal numbers).
 class Number final: public MathExpr {
 public:
     Number(double value): value_(value) {}
 
-    double eval(const Frame& frame, const Match& match) const override;
+    NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override;
     std::string print() const override;
     void clear() override {}
@@ -478,7 +567,7 @@ class Distance final: public MathExpr {
 public:
     Distance(Variable i, Variable j): i_(i), j_(j) {}
 
-    double eval(const Frame& frame, const Match& match) const override;
+    NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override {
         return nullopt;
     }
@@ -495,7 +584,7 @@ class Angle final: public MathExpr {
 public:
     Angle(Variable i, Variable j, Variable k): i_(i), j_(j), k_(k) {}
 
-    double eval(const Frame& frame, const Match& match) const override;
+    NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override {
         return nullopt;
     }
@@ -513,7 +602,7 @@ class Dihedral final: public MathExpr {
 public:
     Dihedral(Variable i, Variable j, Variable k, Variable m): i_(i), j_(j), k_(k), m_(m) {}
 
-    double eval(const Frame& frame, const Match& match) const override;
+    NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override {
         return nullopt;
     }
@@ -532,7 +621,7 @@ class OutOfPlane final: public MathExpr {
 public:
     OutOfPlane(Variable i, Variable j, Variable k, Variable m): i_(i), j_(j), k_(k), m_(m) {}
 
-    double eval(const Frame& frame, const Match& match) const override;
+    NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override {
         return nullopt;
     }
@@ -552,7 +641,7 @@ public:
     NumericSelector(Variable argument): argument_(argument) {}
     ~NumericSelector() override = default;
 
-    double eval(const Frame& frame, const Match& match) const final;
+    NumericValues eval(const Frame& frame, const Match& match) const final;
     optional<double> optimize() final;
     std::string print() const final;
 
