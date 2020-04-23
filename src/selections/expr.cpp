@@ -398,23 +398,38 @@ const std::string& Resname::value(const Frame& frame, size_t i) const {
 }
 
 bool Math::is_match(const Frame& frame, const Match& match) const {
-    auto lhs = lhs_->eval(frame, match);
-    auto rhs = rhs_->eval(frame, match);
+    std::function<bool(double, double)> operation;
     switch (op_) {
     case Math::Operator::EQUAL:
-        return lhs == rhs;
+        operation = [](double l, double r){ return l == r; };
+        break;
     case Math::Operator::NOT_EQUAL:
-        return lhs != rhs;
+        operation = [](double l, double r){ return l != r; };
+        break;
     case Math::Operator::LESS:
-        return lhs < rhs;
+        operation = [](double l, double r){ return l < r; };
+        break;
     case Math::Operator::LESS_EQUAL:
-        return lhs <= rhs;
+        operation = [](double l, double r){ return l <= r; };
+        break;
     case Math::Operator::GREATER:
-        return lhs > rhs;
+        operation = [](double l, double r){ return l > r; };
+        break;
     case Math::Operator::GREATER_EQUAL:
-        return lhs >= rhs;
+        operation = [](double l, double r){ return l >= r; };
+        break;
     }
-    unreachable();
+
+    auto lhs = lhs_->eval(frame, match);
+    auto rhs = rhs_->eval(frame, match);
+    for (auto left: lhs) {
+        for (auto right: rhs) {
+            if (operation(left, right)) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 std::string Math::print(unsigned /*unused*/) const {
@@ -462,8 +477,19 @@ void Math::clear() {
     rhs_->clear();
 }
 
-double Add::eval(const Frame& frame, const Match& match) const {
-    return lhs_->eval(frame, match) + rhs_->eval(frame, match);
+NumericValues Add::eval(const Frame& frame, const Match& match) const {
+    auto lhs = lhs_->eval(frame, match);
+    auto rhs = rhs_->eval(frame, match);
+
+    auto result = NumericValues();
+    result.reserve(lhs.size() * rhs.size());
+    for (auto left: lhs) {
+        for (auto right: rhs) {
+            result.push_back(left + right);
+        }
+    }
+
+    return result;
 }
 
 optional<double> Add::optimize() {
@@ -488,8 +514,19 @@ void Add::clear() {
     rhs_->clear();
 }
 
-double Sub::eval(const Frame& frame, const Match& match) const {
-    return lhs_->eval(frame, match) - rhs_->eval(frame, match);
+NumericValues Sub::eval(const Frame& frame, const Match& match) const {
+    auto lhs = lhs_->eval(frame, match);
+    auto rhs = rhs_->eval(frame, match);
+
+    auto result = NumericValues();
+    result.reserve(lhs.size() * rhs.size());
+    for (auto left: lhs) {
+        for (auto right: rhs) {
+            result.push_back(left - right);
+        }
+    }
+
+    return result;
 }
 
 optional<double> Sub::optimize() {
@@ -514,8 +551,19 @@ void Sub::clear() {
     rhs_->clear();
 }
 
-double Mul::eval(const Frame& frame, const Match& match) const {
-    return lhs_->eval(frame, match) * rhs_->eval(frame, match);
+NumericValues Mul::eval(const Frame& frame, const Match& match) const {
+    auto lhs = lhs_->eval(frame, match);
+    auto rhs = rhs_->eval(frame, match);
+
+    auto result = NumericValues();
+    result.reserve(lhs.size() * rhs.size());
+    for (auto left: lhs) {
+        for (auto right: rhs) {
+            result.push_back(left * right);
+        }
+    }
+
+    return result;
 }
 
 optional<double> Mul::optimize() {
@@ -540,8 +588,19 @@ void Mul::clear() {
     rhs_->clear();
 }
 
-double Div::eval(const Frame& frame, const Match& match) const {
-    return lhs_->eval(frame, match) / rhs_->eval(frame, match);
+NumericValues Div::eval(const Frame& frame, const Match& match) const {
+    auto lhs = lhs_->eval(frame, match);
+    auto rhs = rhs_->eval(frame, match);
+
+    auto result = NumericValues();
+    result.reserve(lhs.size() * rhs.size());
+    for (auto left: lhs) {
+        for (auto right: rhs) {
+            result.push_back(left / right);
+        }
+    }
+
+    return result;
 }
 
 optional<double> Div::optimize() {
@@ -566,8 +625,19 @@ void Div::clear() {
     rhs_->clear();
 }
 
-double Pow::eval(const Frame& frame, const Match& match) const {
-    return pow(lhs_->eval(frame, match), rhs_->eval(frame, match));
+NumericValues Pow::eval(const Frame& frame, const Match& match) const {
+    auto lhs = lhs_->eval(frame, match);
+    auto rhs = rhs_->eval(frame, match);
+
+    auto result = NumericValues();
+    result.reserve(lhs.size() * rhs.size());
+    for (auto left: lhs) {
+        for (auto right: rhs) {
+            result.push_back(pow(left, right));
+        }
+    }
+
+    return result;
 }
 
 optional<double> Pow::optimize() {
@@ -592,8 +662,12 @@ void Pow::clear() {
     rhs_->clear();
 }
 
-double Neg::eval(const Frame& frame, const Match& match) const {
-    return - ast_->eval(frame, match);
+NumericValues Neg::eval(const Frame& frame, const Match& match) const {
+    auto result = ast_->eval(frame, match);
+    for (size_t i=0; i<result.size(); i++) {
+        result[i] = -result[i];
+    }
+    return result;
 }
 
 optional<double> Neg::optimize() {
@@ -613,8 +687,19 @@ void Neg::clear() {
     ast_->clear();
 }
 
-double Mod::eval(const Frame& frame, const Match& match) const {
-    return fmod(lhs_->eval(frame, match), rhs_->eval(frame, match));
+NumericValues Mod::eval(const Frame& frame, const Match& match) const {
+    auto lhs = lhs_->eval(frame, match);
+    auto rhs = rhs_->eval(frame, match);
+
+    auto result = NumericValues();
+    result.reserve(lhs.size() * rhs.size());
+    for (auto left: lhs) {
+        for (auto right: rhs) {
+            result.push_back(fmod(left, right));
+        }
+    }
+
+    return result;
 }
 
 optional<double> Mod::optimize() {
@@ -639,8 +724,12 @@ void Mod::clear() {
     rhs_->clear();
 }
 
-double Function::eval(const Frame& frame, const Match& match) const {
-    return fn_(ast_->eval(frame, match));
+NumericValues Function::eval(const Frame& frame, const Match& match) const {
+    auto result = ast_->eval(frame, match);
+    for (size_t i=0; i<result.size(); i++) {
+        result[i] = fn_(result[i]);
+    }
+    return result;
 }
 
 optional<double> Function::optimize() {
@@ -660,8 +749,8 @@ void Function::clear() {
     ast_->clear();
 }
 
-double Number::eval(const Frame& /*unused*/, const Match& /*unused*/) const {
-    return value_;
+NumericValues Number::eval(const Frame& /*unused*/, const Match& /*unused*/) const {
+    return NumericValues(value_);
 }
 
 optional<double> Number::optimize() {
@@ -676,40 +765,40 @@ std::string Number::print() const {
     }
 }
 
-double Distance::eval(const Frame& frame, const Match& match) const {
-    return frame.distance(match[i_], match[j_]);
+NumericValues Distance::eval(const Frame& frame, const Match& match) const {
+    return NumericValues(frame.distance(match[i_], match[j_]));
 }
 
 std::string Distance::print() const {
     return fmt::format("distance(#{}, #{})", i_ + 1, j_ + 1);
 }
 
-double selections::Angle::eval(const Frame& frame, const Match& match) const {
-    return frame.angle(match[i_], match[j_], match[k_]);
+NumericValues selections::Angle::eval(const Frame& frame, const Match& match) const {
+    return NumericValues(frame.angle(match[i_], match[j_], match[k_]));
 }
 
 std::string selections::Angle::print() const {
     return fmt::format("angle(#{}, #{}, #{})", i_ + 1, j_ + 1, k_ + 1);
 }
 
-double selections::Dihedral::eval(const Frame& frame, const Match& match) const {
-    return frame.dihedral(match[i_], match[j_], match[k_], match[m_]);
+NumericValues selections::Dihedral::eval(const Frame& frame, const Match& match) const {
+    return NumericValues(frame.dihedral(match[i_], match[j_], match[k_], match[m_]));
 }
 
 std::string selections::Dihedral::print() const {
     return fmt::format("dihedral(#{}, #{}, #{}, #{})", i_ + 1, j_ + 1, k_ + 1, m_ + 1);
 }
 
-double OutOfPlane::eval(const Frame& frame, const Match& match) const {
-    return frame.out_of_plane(match[i_], match[j_], match[k_], match[m_]);
+NumericValues OutOfPlane::eval(const Frame& frame, const Match& match) const {
+    return NumericValues(frame.out_of_plane(match[i_], match[j_], match[k_], match[m_]));
 }
 
 std::string OutOfPlane::print() const {
     return fmt::format("out_of_plane(#{}, #{}, #{}, #{})", i_ + 1, j_ + 1, k_ + 1, m_ + 1);
 }
 
-double NumericSelector::eval(const Frame& frame, const Match& match) const {
-    return this->value(frame, match[argument_]);
+NumericValues NumericSelector::eval(const Frame& frame, const Match& match) const {
+    return NumericValues(this->value(frame, match[argument_]));
 }
 
 optional<double> NumericSelector::optimize() {
@@ -826,4 +915,126 @@ double Velocity::value(const Frame& frame, size_t i) const {
         // return nan so that all comparaison down the line evaluate to false
         return std::nan("");
     }
+}
+
+// provide definition for EMPTY_VALUE. This is required in C++11.
+constexpr double NumericValues::EMPTY_VALUE;
+
+NumericValues::NumericValues(NumericValues&& other): NumericValues(0) {
+    *this = std::move(other);
+}
+
+NumericValues& NumericValues::operator=(NumericValues&& other) {
+    this->~NumericValues();
+    this->value_ = other.value_;
+    this->heap_ = other.heap_;
+
+    other.heap_ = nullptr;
+    return *this;
+}
+
+NumericValues::~NumericValues() {
+    std::free(heap_);
+}
+
+void NumericValues::reserve(size_t size) {
+    if (heap_ == nullptr) {
+        assert(size > 0);
+        heap_ = static_cast<double*>(std::malloc((size + 2) * sizeof(double)));
+        if (heap_ == nullptr) {
+            throw error("could not allocate memory for NumericValues");
+        }
+
+        if (value_ == EMPTY_VALUE) {
+            this->set_size(0);
+        } else {
+            heap_[2] = value_;
+            this->set_size(1);
+        }
+
+        this->set_capacity(size);
+    } else {
+        // do not allocate if it is not needed
+        if (size < this->capacity()) {
+            return;
+        }
+
+        auto heap = static_cast<double*>(std::realloc(heap_, (size + 2) * sizeof(double)));
+        if (heap == nullptr) {
+            throw error("could not allocate memory for NumericValues");
+        }
+        heap_ = heap;
+        this->set_capacity(size);
+    }
+}
+
+size_t NumericValues::capacity() const {
+    if (heap_ == nullptr) {
+        return 1;
+    } else {
+        uint64_t capacity;
+        std::memcpy(&capacity, &heap_[1], sizeof(uint64_t));
+        return static_cast<size_t>(capacity);
+    }
+}
+
+/// Get the current size of this NumericValues vector
+size_t NumericValues::size() const {
+    if (heap_ == nullptr) {
+        if (value_ == EMPTY_VALUE) {
+            return 0;
+        } else {
+            return 1;
+        }
+    } else {
+        uint64_t size;
+        std::memcpy(&size, &heap_[0], sizeof(uint64_t));
+        return static_cast<size_t>(size);
+    }
+}
+
+void NumericValues::push_back(double value) {
+    auto size = this->size();
+    if (heap_ == nullptr) {
+        if (size == 0) {
+            if (value == EMPTY_VALUE) {
+                throw error("invalid value +inf as first value of NumericValues");
+            }
+            value_ = value;
+            return;
+        }
+        this->reserve(64);
+        // reserve deals with copying from value_ to heap_
+        assert(heap_[2] == value_);
+    } else if (this->capacity() == size) {
+        this->reserve(2 * size);
+    }
+    heap_[2 + size] = value;
+    this->set_size(size + 1);
+}
+
+double& NumericValues::operator[](size_t i) {
+    assert(i < this->size());
+    if (heap_ == nullptr) {
+        assert(i == 0);
+        return value_;
+    } else {
+        return heap_[2 + i];
+    }
+}
+
+double NumericValues::operator[](size_t i) const {
+    return (*const_cast<NumericValues*>(this))[i];
+}
+
+const double* NumericValues::begin() const {
+    if (heap_ == nullptr) {
+        return &value_;
+    } else {
+        return heap_ + 2;
+    }
+}
+
+const double* NumericValues::end() const {
+    return this->begin() + this->size();
 }
