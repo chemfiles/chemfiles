@@ -72,11 +72,11 @@ matrix:
     - name: osx clang
       os: osx
       compiler: clang
-      osx_image: xcode8.3
+      osx_image: xcode9.4
     - name: osx gcc
       os: osx
       compiler: gcc
-      osx_image: xcode8.3
+      osx_image: xcode9.4
       addons:
         homebrew:
           packages:
