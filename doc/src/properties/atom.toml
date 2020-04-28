@@ -65,3 +65,8 @@ atom is valid."""
 type = "bool"
 
 SMI = "Sets if the atom was defined as a wildcard card atom."
+
+[atom_type]
+type = "number"
+
+Tinker = "The Tinker atom type."
