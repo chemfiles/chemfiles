@@ -46,6 +46,8 @@ TEST_CASE("Read compressed files in XYZ format") {
     check_read_file(Trajectory("data/xyz/water.6.xyz.gz"));
     // Compression level 9
     check_read_file(Trajectory("data/xyz/water.9.xyz.gz"));
+    // Multiple streams, compression level 7
+    check_read_file(Trajectory("data/xyz/water.multistream.7.xyz.gz"));
 
     // Compression level 6
     check_read_file(Trajectory("data/xyz/water.6.xyz.bz2"));
@@ -99,4 +101,56 @@ TEST_CASE("Write compressed files in XYZ format") {
 
     auto xz_path = NamedTempPath(".xyz.xz");
     check_write_file(xz_path, File::LZMA);
+}
+
+static void check_append_file(std::string path, File::Compression compression) {
+    auto frame = Frame();
+    frame.add_atom(Atom("A","O"), {1, 2, 3});
+    frame.add_atom(Atom("B"), {1, 2, 4});
+    frame.add_atom(Atom("C"), {1, 2, 5});
+    frame.add_atom(Atom("D"), {1, 2, 6});
+
+    {
+        auto file = Trajectory(path, 'a');
+        file.write(frame);
+        CHECK(file.nsteps() == 1);
+        file.close();
+    }
+
+    frame = Frame();
+    frame.add_atom(Atom("D","O"), {3, 2, 1});
+    frame.add_atom(Atom("C"), {4, 2, 1});
+    frame.add_atom(Atom("B"), {5, 2, 1});
+    frame.add_atom(Atom("A"), {6, 2, 1});
+
+    {
+        auto file = Trajectory(path, 'a');
+        file.write(frame);
+        CHECK(file.nsteps() == 2);
+        file.close();
+    }
+
+    TextFile file(path, File::READ, compression);
+    CHECK(file.readline() == "4");
+    CHECK(file.readline() == "Written by the chemfiles library");
+    CHECK(file.readline() == "A 1 2 3");
+    CHECK(file.readline() == "B 1 2 4");
+    CHECK(file.readline() == "C 1 2 5");
+    CHECK(file.readline() == "D 1 2 6");
+
+    CHECK(file.readline() == "4");
+    CHECK(file.readline() == "Written by the chemfiles library");
+    CHECK(file.readline() == "D 3 2 1");
+    CHECK(file.readline() == "C 4 2 1");
+    CHECK(file.readline() == "B 5 2 1");
+    CHECK(file.readline() == "A 6 2 1");
+
+    CHECK(file.readline() == "");
+    CHECK(file.eof());
+}
+
+
+TEST_CASE("Append to compressed files in XYZ format") {
+    auto gz_path = NamedTempPath(".xyz.gz");
+    check_append_file(gz_path, File::GZIP);
 }

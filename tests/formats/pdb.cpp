@@ -313,6 +313,11 @@ TEST_CASE("Problematic PDB files") {
         CHECK(approx_eq(frame.positions()[0], {0.417, 8.303, 11.737}, 1e-5));
         CHECK(approx_eq(frame.positions()[5], {8.922, 9.426, 5.320}, 1e-5));
     }
+
+    SECTION("Bug in 1HTQ") {
+        auto file = Trajectory("data/pdb/1htq.pdb");
+        auto frame = file.read();
+    }
 }
 
 TEST_CASE("Write files in PDB format") {

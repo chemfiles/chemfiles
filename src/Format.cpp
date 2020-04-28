@@ -64,7 +64,7 @@ void TextFormat::write_next(const Frame& /*unused*/) {
 #pragma GCC diagnostic pop
 #endif
 
-TextFormat::TextFormat(std::string path, File::Mode mode, File::Compression compression):
+TextFormat::TextFormat(std::string path, File::Mode mode, File::Compression compression) :
     file_(std::move(path), mode, compression) {}
 
 TextFormat::TextFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression) :
@@ -73,6 +73,13 @@ TextFormat::TextFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, Fi
 void TextFormat::scan_all() {
     if (eof_found_) {
         return;
+    }
+
+    optional<TextFile> tmp_read_file = nullopt;
+    if (file_.mode() == File::Mode::APPEND && file_.compression() == File::Compression::GZIP) {
+        tmp_read_file = TextFile(file_.path(), File::Mode::READ, file_.compression());
+        // `forward()` needs a readable file
+        std::swap(*tmp_read_file, file_);
     }
 
     auto before = file_.tellpos();
@@ -87,6 +94,11 @@ void TextFormat::scan_all() {
     eof_found_ = true;
     // reset failbit in the file
     file_.clear();
+
+    if (tmp_read_file) {
+        // use original file for all further write operations
+        std::swap(file_, *tmp_read_file);
+    }
 
     if (before == 0 && !steps_positions_.empty()) {
         file_.seekpos(steps_positions_[0]);

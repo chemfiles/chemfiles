@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   `Trajectory::memory_reader`; `Trajectory::memory_writer`;
   `Trajectory::memory_buffer`; `chfl_trajectory_memory_reader`;
   `chfl_trajectory_memory_writer` and `chfl_trajectory_memory_buffer`.
+* Added support for appending to gzip (.gz) compressed trajectories.
 
 ## 0.9.3 (5 Feb 2020)
 
