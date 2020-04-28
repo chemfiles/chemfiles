@@ -32,8 +32,8 @@ TEST_CASE("Read files in Tinker XYZ format") {
         CHECK(topology[0].name() == "O");
         CHECK(topology[7].name() == "H");
 
-		CHECK(topology[0].get("atom_type")->as_double() == 1);
-		CHECK(topology[7].get("atom_type")->as_double() == 2);
+        CHECK(topology[0].get("atom_type")->as_double() == 1);
+        CHECK(topology[7].get("atom_type")->as_double() == 2);
 
         CHECK(topology.bonds().size() == 8);
 
@@ -59,8 +59,8 @@ TEST_CASE("Read files in Tinker XYZ format") {
         CHECK(topology[0].name() == "N");
         CHECK(topology[154].name() == "N");
 
-		CHECK(topology[0].get("atom_type")->as_double() == 24);
-		CHECK(topology[154].get("atom_type")->as_double() == 24);
+        CHECK(topology[0].get("atom_type")->as_double() == 24);
+        CHECK(topology[154].get("atom_type")->as_double() == 24);
 		
         CHECK(topology.bonds().size() == 106);
         for (size_t i = 0; i < frame.size(); i += 2) {
@@ -143,8 +143,8 @@ TEST_CASE("Read and write files in memory") {
         CHECK(topology[0].name() == "N");
         CHECK(topology[154].name() == "N");
 		
-		CHECK(topology[0].get("atom_type")->as_double() == 24);
-		CHECK(topology[154].get("atom_type")->as_double() == 24);
+        CHECK(topology[0].get("atom_type")->as_double() == 24);
+        CHECK(topology[154].get("atom_type")->as_double() == 24);
 
         CHECK(topology.bonds().size() == 106);
         for (size_t i = 0; i < frame.size(); i += 2) {
