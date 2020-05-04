@@ -170,8 +170,16 @@ bool BoolProperty::is_match(const Frame& frame, const Match& match) const {
         auto residue = frame.topology().residue_for_atom(match[argument_]);
         if (residue) {
             const auto& resProperty = residue->get(property_);
-            if (resProperty && resProperty->kind() == Property::BOOL) {
+            if(!resProperty) {
+                return false;
+            }
+            if (resProperty->kind() == Property::BOOL) {
                 return resProperty->as_bool();
+            } else {
+                throw selection_error(
+                    "invalid type for property [{}] on the residue containing atom {}: expected bool, got {}",
+                    property_, match[argument_], kind_as_string(resProperty->kind())
+                );
             }
         }
         // No property with the given name
@@ -342,8 +350,16 @@ const std::string& StringProperty::value(const Frame& frame, size_t i) const {
         auto residue = frame.topology().residue_for_atom(i);
         if (residue) {
             const auto& resProperty = residue->get(property_);
-            if (resProperty && resProperty->kind() == Property::STRING) {
+            if(!resProperty) {
+                return EMPTY_STRING;
+            }
+            if (resProperty->kind() == Property::STRING) {
                 return resProperty->as_string();
+            } else {
+                throw selection_error(
+                    "invalid type for property [{}] on the residue containing atom {}: expected string, got {}",
+                    property_, i, kind_as_string(resProperty->kind())
+                );
             }
         }
         // No property with the given name
@@ -726,8 +742,16 @@ double NumericProperty::value(const Frame& frame, size_t i) const {
         auto residue = frame.topology().residue_for_atom(i);
         if (residue) {
             const auto& resProperty = residue->get(property_);
-            if (resProperty && resProperty->kind() == Property::DOUBLE) {
+            if(!resProperty) {
+                return nan("");
+            }
+            if (resProperty->kind() == Property::DOUBLE) {
                 return resProperty->as_double();
+            } else {
+                throw selection_error(
+                    "invalid type for property [{}] on the residue containing atom {}: expected double, got {}",
+                    property_, i, kind_as_string(resProperty->kind())
+                );
             }
         }
         // No property with the given name
