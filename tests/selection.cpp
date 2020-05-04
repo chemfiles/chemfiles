@@ -434,6 +434,28 @@ TEST_CASE("Multiple selections") {
 
         selection = Selection("[vector] < 34");
         CHECK_THROWS_WITH(selection.list(frame), "invalid type for property [vector] on atom 0: expected double, got Vector3D");
+        
+        selection = Selection("[res_numeric] < 3.15");
+        CHECK(selection.list(frame) == std::vector<size_t>{2ul, 3ul});
+        
+        selection = Selection("[res_bool]");
+        CHECK(selection.list(frame) == std::vector<size_t>{2ul, 3ul});
+        
+        selection = Selection("[res_string] == foo");
+        CHECK(selection.list(frame) == std::vector<size_t>{2ul, 3ul});
+        
+        selection = Selection("[absent] == foo");
+        CHECK(selection.list(frame).size()==0);
+        
+        //atom property has precedence over residue property
+        selection = Selection("[string2] == foo");
+        CHECK(selection.list(frame) == std::vector<size_t>{3ul});
+        
+        selection = Selection("[bool2]");
+        CHECK(selection.list(frame) == std::vector<size_t>{2ul});
+        
+        selection = Selection("[numeric2] > 3");
+        CHECK(selection.list(frame) == std::vector<size_t>{2ul});
     }
 }
 
@@ -451,14 +473,24 @@ Frame testing_frame() {
     frame[0].set("numeric", 3);
     frame[1].set("bool", true);
     frame[2].set("bool", false);
+    frame[2].set("bool2", true);
     frame[2].set("string", "foo");
+    frame[2].set("numeric2", 3.14);
     frame[3].set("string", "bar");
+    frame[3].set("string2", "foo");
     frame[3].set("string space", "foo bar");
     frame[0].set("vector", Vector3D(2.0, 3.0, 4.0));
 
     auto residue = Residue("resime", 3);
+    residue.set("res_bool",true);
+    residue.set("res_string","foo");
+    residue.set("res_numeric",3.14);
+    residue.set("string2","bar");
+    residue.set("bool2", false);
+    residue.set("numeric2",2.718);
     residue.add_atom(2);
     residue.add_atom(3);
+    
     frame.add_residue(residue);
 
     return frame;
