@@ -167,6 +167,13 @@ bool BoolProperty::is_match(const Frame& frame, const Match& match) const {
             );
         }
     } else {
+        auto residue = frame.topology().residue_for_atom(match[argument_]);
+        if (residue) {
+            const auto& resProperty = residue->get(property_);
+            if (resProperty && resProperty->kind() == Property::BOOL) {
+                return resProperty->as_bool();
+            }
+        }
         // No property with the given name
         return false;
     }
@@ -332,6 +339,13 @@ const std::string& StringProperty::value(const Frame& frame, size_t i) const {
             );
         }
     } else {
+        auto residue = frame.topology().residue_for_atom(i);
+        if (residue) {
+            const auto& resProperty = residue->get(property_);
+            if (resProperty && resProperty->kind() == Property::STRING) {
+                return resProperty->as_string();
+            }
+        }
         // No property with the given name
         return EMPTY_STRING;
     }
@@ -709,6 +723,13 @@ double NumericProperty::value(const Frame& frame, size_t i) const {
             );
         }
     } else {
+        auto residue = frame.topology().residue_for_atom(i);
+        if (residue) {
+            const auto& resProperty = residue->get(property_);
+            if (resProperty && resProperty->kind() == Property::DOUBLE) {
+                return resProperty->as_double();
+            }
+        }
         // No property with the given name
         // return nan so that all comparaison down the line evaluate to false
         return nan("");
