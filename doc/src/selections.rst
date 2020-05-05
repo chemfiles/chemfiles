@@ -75,12 +75,14 @@ Constraints on atomic properties
 --------------------------------
 
 It is possible to use atomic :cpp:class:`properties <chemfiles::Property>`
-(unfortunately not frame or residue properties) in constraints, with the
+(unfortunately not frame properties) in constraints, with the
 ``[<property>]`` syntax. ``<property>`` should be replaced by the property name:
 ``[is_hetatm]``, possibly using quotes around the property name if it contains
 spaces: ``["my own property"]``. Depending on the context, a Boolean, string or
-numeric property will be searched. If none can be found, or if the property type
-does not match, a default value will be used instead.
+numeric property will be searched. If an atomic property with a given name cannot
+be found, residue property is searched instead, however, atomic properties take 
+precedence. If none can be found, or if the property type does not match, a 
+default value will be used instead.
 
 Selection language reference
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -104,7 +106,7 @@ Boolean constraints
 - ``is_improper(i, j, k, m)``: check if atoms i, j, k and m are bonded together
   to form a dihedral angle, *i.e.* that all of i, k, and m are bonded to j. If
   any of i, j, k or m refer to the same atom, this returns false;
-- ``[<property>]``: check if atoms have a Boolean property named `'property'`
+- ``[<property>]``: check if atoms or residues they belong to have a Boolean property named `'property'`
   set, and that this property is true. This will return false if the property
   is not set;
 
@@ -118,7 +120,7 @@ String properties
 - ``resname``: gives the residue name. If an atom is not in a residue, this
   return the empty string;
 - ``[<property>]``: gives the value of the string property named `'property'`
-  for the atom. This will return an empty string (`""`) if the property is not
+  for the atom or the reside. This will return an empty string (`""`) if the property is not
   set;
 
 Numeric properties
@@ -133,7 +135,7 @@ Most of the numeric properties only apply to a single atom:
 - ``resid``: gives the atomic residue index. If an atom is not in a residue,
   this return -1;
 - ``[<property>]``: gives the value of the numeric property named `'property'`
-  for the atom. This will return 0 if the property is not set;
+  for the atom or the residue. This will return 0 if the property is not set;
 
 But some properties apply to multiple atoms, and as such are only usable when
 selecting multiple atoms:
