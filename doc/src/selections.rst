@@ -120,7 +120,7 @@ String properties
 - ``resname``: gives the residue name. If an atom is not in a residue, this
   return the empty string;
 - ``[<property>]``: gives the value of the string property named `'property'`
-  for the atom or the reside. This will return an empty string (`""`) if the property is not
+  for the atom or the residue containing the atom, if any. This will return an empty string (`""`) if the property is not
   set;
 
 Numeric properties
@@ -135,7 +135,7 @@ Most of the numeric properties only apply to a single atom:
 - ``resid``: gives the atomic residue index. If an atom is not in a residue,
   this return -1;
 - ``[<property>]``: gives the value of the numeric property named `'property'`
-  for the atom or the residue. This will return 0 if the property is not set;
+  for the atom or the residue containing the atom, if any. This will return 0 if the property is not set;
 
 But some properties apply to multiple atoms, and as such are only usable when
 selecting multiple atoms:
