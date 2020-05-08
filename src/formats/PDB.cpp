@@ -801,7 +801,13 @@ optional<uint64_t> PDBFormat::forward() {
     while (!file_.eof()) {
         auto line = file_.readline();
 
+        std::string saved_line;
         if (line.substr(0, 6) == "ENDMDL") {
+            // save the current line into an owned string, since the underlying
+            // buffer in file_ can change in file_->readline();
+            saved_line = line.to_string();
+            line = saved_line;
+
             auto save = file_.tellpos();
             auto next = file_.readline();
             file_.seekpos(save);
@@ -818,7 +824,7 @@ optional<uint64_t> PDBFormat::forward() {
         }
     }
 
-    // Handle missing END record in the file
+    // Handle file without END/ENDML record at all
     if (position == 0) {
         return position;
     } else {
