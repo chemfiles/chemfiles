@@ -766,35 +766,69 @@ std::string Number::print() const {
 }
 
 NumericValues Distance::eval(const Frame& frame, const Match& match) const {
-    return NumericValues(frame.distance(match[i_], match[j_]));
+    auto results = NumericValues();
+    for (auto i: i_.eval(frame, match)) {
+        for (auto j: j_.eval(frame, match)) {
+            results.push_back(frame.distance(i, j));
+        }
+    }
+    return results;
 }
 
 std::string Distance::print() const {
-    return fmt::format("distance(#{}, #{})", i_ + 1, j_ + 1);
+    return fmt::format("distance({}, {})", i_.print(), j_.print());
 }
 
 NumericValues selections::Angle::eval(const Frame& frame, const Match& match) const {
-    return NumericValues(frame.angle(match[i_], match[j_], match[k_]));
+    auto results = NumericValues();
+    for (auto i: i_.eval(frame, match)) {
+        for (auto j: j_.eval(frame, match)) {
+            for (auto k: k_.eval(frame, match)) {
+                results.push_back(frame.angle(i, j, k));
+            }
+        }
+    }
+    return results;
 }
 
 std::string selections::Angle::print() const {
-    return fmt::format("angle(#{}, #{}, #{})", i_ + 1, j_ + 1, k_ + 1);
+    return fmt::format("angle({}, {}, {})", i_.print(), j_.print(), k_.print());
 }
 
 NumericValues selections::Dihedral::eval(const Frame& frame, const Match& match) const {
-    return NumericValues(frame.dihedral(match[i_], match[j_], match[k_], match[m_]));
+    auto results = NumericValues();
+    for (auto i: i_.eval(frame, match)) {
+        for (auto j: j_.eval(frame, match)) {
+            for (auto k: k_.eval(frame, match)) {
+                for (auto m: m_.eval(frame, match)) {
+                    results.push_back(frame.dihedral(i, j, k, m));
+                }
+            }
+        }
+    }
+    return results;
 }
 
 std::string selections::Dihedral::print() const {
-    return fmt::format("dihedral(#{}, #{}, #{}, #{})", i_ + 1, j_ + 1, k_ + 1, m_ + 1);
+    return fmt::format("dihedral({}, {}, {}, {})", i_.print(), j_.print(), k_.print(), m_.print());
 }
 
 NumericValues OutOfPlane::eval(const Frame& frame, const Match& match) const {
-    return NumericValues(frame.out_of_plane(match[i_], match[j_], match[k_], match[m_]));
+    auto results = NumericValues();
+    for (auto i: i_.eval(frame, match)) {
+        for (auto j: j_.eval(frame, match)) {
+            for (auto k: k_.eval(frame, match)) {
+                for (auto m: m_.eval(frame, match)) {
+                    results.push_back(frame.out_of_plane(i, j, k, m));
+                }
+            }
+        }
+    }
+    return results;
 }
 
 std::string OutOfPlane::print() const {
-    return fmt::format("out_of_plane(#{}, #{}, #{}, #{})", i_ + 1, j_ + 1, k_ + 1, m_ + 1);
+    return fmt::format("out_of_plane({}, {}, {}, {})", i_.print(), j_.print(), k_.print(), m_.print());
 }
 
 NumericValues NumericSelector::eval(const Frame& frame, const Match& match) const {

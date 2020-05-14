@@ -565,7 +565,7 @@ private:
 /// Compute the distance between atoms
 class Distance final: public MathExpr {
 public:
-    Distance(Variable i, Variable j): i_(i), j_(j) {}
+    Distance(SubSelection i, SubSelection j): i_(std::move(i)), j_(std::move(j)) {}
 
     NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override {
@@ -575,14 +575,15 @@ public:
     void clear() override {}
 
 private:
-    Variable i_;
-    Variable j_;
+    SubSelection i_;
+    SubSelection j_;
 };
 
 /// Compute the angle between three atoms
 class Angle final: public MathExpr {
 public:
-    Angle(Variable i, Variable j, Variable k): i_(i), j_(j), k_(k) {}
+    Angle(SubSelection i, SubSelection j, SubSelection k):
+        i_(std::move(i)), j_(std::move(j)), k_(std::move(k)) {}
 
     NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override {
@@ -592,15 +593,16 @@ public:
     void clear() override {}
 
 private:
-    Variable i_;
-    Variable j_;
-    Variable k_;
+    SubSelection i_;
+    SubSelection j_;
+    SubSelection k_;
 };
 
 /// Compute the dihedral angle between four atoms
 class Dihedral final: public MathExpr {
 public:
-    Dihedral(Variable i, Variable j, Variable k, Variable m): i_(i), j_(j), k_(k), m_(m) {}
+    Dihedral(SubSelection i, SubSelection j, SubSelection k, SubSelection m):
+        i_(std::move(i)), j_(std::move(j)), k_(std::move(k)), m_(std::move(m)) {}
 
     NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override {
@@ -610,16 +612,17 @@ public:
     void clear() override {}
 
 private:
-    Variable i_;
-    Variable j_;
-    Variable k_;
-    Variable m_;
+    SubSelection i_;
+    SubSelection j_;
+    SubSelection k_;
+    SubSelection m_;
 };
 
 /// Compute the out of plane distance between four atoms
 class OutOfPlane final: public MathExpr {
 public:
-    OutOfPlane(Variable i, Variable j, Variable k, Variable m): i_(i), j_(j), k_(k), m_(m) {}
+    OutOfPlane(SubSelection i, SubSelection j, SubSelection k, SubSelection m):
+        i_(std::move(i)), j_(std::move(j)), k_(std::move(k)), m_(std::move(m)) {}
 
     NumericValues eval(const Frame& frame, const Match& match) const override;
     optional<double> optimize() override {
@@ -629,10 +632,10 @@ public:
     void clear() override {}
 
 private:
-    Variable i_;
-    Variable j_;
-    Variable k_;
-    Variable m_;
+    SubSelection i_;
+    SubSelection j_;
+    SubSelection k_;
+    SubSelection m_;
 };
 
 /// Abstract base class for numeric selectors

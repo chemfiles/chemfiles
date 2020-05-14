@@ -300,9 +300,7 @@ TEST_CASE("Parsing") {
         CHECK_THROWS_WITH(parse("index(x)"), "expected variable in parenthesis, got 'x'");
         CHECK_THROWS_WITH(parse("index(#1"), "expected closing parenthesis after variable, got '<end of selection>'");
 
-        CHECK_THROWS_WITH(parse("distance #1 #2"), "expected opening parenthesis, got '#1'");
-        CHECK_THROWS_WITH(parse("distance(x, #2)"), "expected variable in parenthesis, got 'x'");
-        CHECK_THROWS_WITH(parse("distance(#1, y)"), "expected variable in parenthesis, got 'y'");
+        CHECK_THROWS_WITH(parse("distance #1 #2"), "expected 2 arguments in 'distance', got 0");
         CHECK_THROWS_WITH(parse("distance(#1"), "expected closing parenthesis after variable, got '<end of selection>'");
 
         CHECK_THROWS_WITH(parse("is_bonded(#1"), "expected closing parenthesis after variable, got '<end of selection>'");
@@ -399,18 +397,57 @@ TEST_CASE("Parsing") {
             CHECK(parse("deg2rad(1) < 5")->print() == ast);
         }
 
-        SECTION("Atomic functions") {
+        SECTION("distance function") {
             auto ast = "distance(#1, #2) < 5";
             CHECK(parse("distance(#1, #2) < 5")->print() == ast);
 
-            ast = "angle(#1, #3, #2) < 5";
+            ast = "distance(#1, name O) < 5";
+            CHECK(parse("distance(#1, name O) < 5")->print() == ast);
+
+            ast = "distance(index 3, #1) < 5";
+            CHECK(parse("distance(index 3, #1) < 5")->print() == ast);
+        }
+
+        SECTION("angle function") {
+            auto ast = "angle(#1, #3, #2) < 5";
             CHECK(parse("angle(#1, #3, #2) < 5")->print() == ast);
 
-            ast = "dihedral(#1, #3, #2, #3) < 5";
-            CHECK(parse("dihedral(#1, #3, #2, #3) < 5")->print() == ast);
+            ast = "angle(name O, #3, #2) < 5";
+            CHECK(parse("angle(name O, #3, #2) < 5")->print() == ast);
 
-            ast = "out_of_plane(#1, #3, #2, #4) < 5";
+            ast = "angle(#1, name H or mass > 3 + 4, #2) < 5";
+            CHECK(parse("angle(#1, name H or mass > 3 + 4, #2) < 5")->print() == ast);
+
+            ast = "angle(#1, #3, name Zn) < 5";
+            CHECK(parse("angle(#1, #3, name Zn) < 5")->print() == ast);
+        }
+
+        SECTION("dihedral function") {
+            auto ast = "dihedral(#1, #3, #2, #4) < 5";
+            CHECK(parse("dihedral(#1, #3, #2, #4) < 5")->print() == ast);
+
+            ast = "dihedral(name O, #3, #2, #3) < 5";
+            CHECK(parse("dihedral(name O, #3, #2, #3) < 5")->print() == ast);
+
+            ast = "dihedral(name O, #3, name H, #3) < 5";
+            CHECK(parse("dihedral(name O, #3, name H, #3) < 5")->print() == ast);
+
+            ast = "dihedral(#1, #3, #2, all) < 5";
+            CHECK(parse("dihedral(#1, #3, #2, all) < 5")->print() == ast);
+        }
+
+        SECTION("out_of_plane function") {
+            auto ast = "out_of_plane(#1, #3, #2, #4) < 5";
             CHECK(parse("out_of_plane(#1, #3, #2, #4) < 5")->print() == ast);
+
+            ast = "out_of_plane(name O, #3, #2, #3) < 5";
+            CHECK(parse("out_of_plane(name O, #3, #2, #3) < 5")->print() == ast);
+
+            ast = "out_of_plane(name O, #3, name H, #3) < 5";
+            CHECK(parse("out_of_plane(name O, #3, name H, #3) < 5")->print() == ast);
+
+            ast = "out_of_plane(#1, #3, #2, all) < 5";
+            CHECK(parse("out_of_plane(#1, #3, #2, all) < 5")->print() == ast);
         }
 
         SECTION("Complex expressions") {
@@ -490,7 +527,6 @@ TEST_CASE("Parsing errors") {
         {"type(#1) Al and type(#2) O and type(#3) H )", "additional data after the end of the selection: )"},
         // functions arity and arguments
         {"distance(#1) < 5", "expected 2 arguments in 'distance', got 1"},
-        {"distance(x) < 5", "expected variable in parenthesis, got 'x'"},
         {"angle(#2, #3) < 5", "expected 3 arguments in 'angle', got 2"},
         {"dihedral(#2, #3) < 5", "expected 4 arguments in 'dihedral', got 2"},
         {"none(#2, #3)", "expected 0 arguments in 'none', got 2"},

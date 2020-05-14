@@ -4,6 +4,7 @@
 #ifndef CHEMFILES_SELECTION_PARSER_HPP
 #define CHEMFILES_SELECTION_PARSER_HPP
 
+#include <array>
 #include <string>
 #include <vector>
 #include <cassert>
@@ -13,6 +14,18 @@
 
 namespace chemfiles {
 namespace selections {
+
+/// Group together the actual arguments to a selector function
+///
+/// This is used to store `#1, #3, #2` in `angle(#1, #3, #2)`, and related
+/// constructions
+struct SelectionArguments {
+    size_t count;
+    constexpr static size_t MAX_ARGS = 4;
+    std::array<SubSelection, MAX_ARGS> values;
+
+    void add(const std::string& context, SubSelection selection);
+};
 
 /// A recursive descent parser for chemfiles selection language. This parser
 /// does not handle selection context (`pairs: ...`) that should be striped
@@ -51,11 +64,9 @@ private:
     MathAst math_function(const std::string& name);
     // functions of atomic variables (distance(#1, #2), ...)
     MathAst math_var_function(const std::string& name);
-
-    // Match multiple variables and the surrounding parenthesis
-    std::vector<Variable> variables();
     // Match multiple variables or sub-selections
-    std::vector<SubSelection> sub_selection();
+    SelectionArguments arguments(const std::string& context);
+
     // Match an optional single variable and the surrounding parenthesis
     Variable variable();
 
