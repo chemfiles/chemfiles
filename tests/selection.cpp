@@ -4,6 +4,8 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
+#include <iostream>
+
 static Frame testing_frame();
 
 TEST_CASE("Match class") {
@@ -262,12 +264,16 @@ TEST_CASE("Atoms selections") {
         CHECK(selection.list(frame) == expected);
     }
 
-    SECTION("functions") {
+    SECTION("numeric functions") {
         auto selection = Selection("four: distance(#1, #2) > 4");
         auto expected = std::vector<Match>{
             {0ul, 3ul, 1ul, 2ul}, {0ul, 3ul, 2ul, 1ul},
             {3ul, 0ul, 1ul, 2ul}, {3ul, 0ul, 2ul, 1ul},
         };
+        CHECK(selection.evaluate(frame) == expected);
+
+        selection = Selection("distance(#1, name O) > 3");
+        expected = std::vector<Match>{{0ul}, {3ul}};
         CHECK(selection.evaluate(frame) == expected);
 
         selection = Selection("four: angle(#1, #2, #3) > deg2rad(120)");
@@ -278,12 +284,33 @@ TEST_CASE("Atoms selections") {
         };
         CHECK(selection.evaluate(frame) == expected);
 
-        selection = Selection("four: dihedral(#1, #2, #3, #4) > deg2rad(90)");
-        expected = std::vector<Match>{};
+        selection = Selection("angle(#1, name O, name H) > deg2rad(90)");
+        expected = std::vector<Match>{{0ul}, {1ul}};
         CHECK(selection.evaluate(frame) == expected);
 
-        selection = Selection("four: out_of_plane(#1, #2, #3, #4) > 1.1");
-        expected = std::vector<Match>{};
+        // all atoms are co-linear in the test frame, add more of themto get
+        // non-zero dihedral/out of plane values
+        frame.add_atom(Atom("Cl"), {0, 0, 0});
+        frame.add_atom(Atom("F"), {2, -2, 2});
+
+        Trajectory("tmp.pdb", 'w').write(frame);
+
+        selection = Selection("four: dihedral(#1, #2, #3, #4) > deg2rad(120) and name(#1) H1 and name(#2) Cl");
+        expected = std::vector<Match>{
+            {0ul, 4ul, 1ul, 2ul}, {0ul, 4ul, 1ul, 3ul}, {0ul, 4ul, 2ul, 3ul},
+        };
+        CHECK(selection.evaluate(frame) == expected);
+
+        selection = Selection("dihedral(#1, name Cl, name O, name H) > deg2rad(30)");
+        expected = std::vector<Match>{{0ul}, {1ul}};
+        CHECK(selection.evaluate(frame) == expected);
+
+        selection = Selection("four: out_of_plane(#1, #2, #3, #4) > 3 and name(#1) F");
+        expected = std::vector<Match>{{5ul, 3ul, 4ul, 0ul}};
+        CHECK(selection.evaluate(frame) == expected);
+
+        selection = Selection("pairs: out_of_plane(#1, name O, name Cl, #2) > 1");
+        expected = std::vector<Match>{{5ul, 0ul}};
         CHECK(selection.evaluate(frame) == expected);
     }
 }
@@ -434,26 +461,26 @@ TEST_CASE("Multiple selections") {
 
         selection = Selection("[vector] < 34");
         CHECK_THROWS_WITH(selection.list(frame), "invalid type for property [vector] on atom 0: expected double, got Vector3D");
-        
+
         selection = Selection("[res_numeric] < 3.15");
         CHECK(selection.list(frame) == std::vector<size_t>{2ul, 3ul});
-        
+
         selection = Selection("[res_bool]");
         CHECK(selection.list(frame) == std::vector<size_t>{2ul, 3ul});
-        
+
         selection = Selection("[res_string] == foo");
         CHECK(selection.list(frame) == std::vector<size_t>{2ul, 3ul});
-        
+
         selection = Selection("[absent] == foo");
         CHECK(selection.list(frame).size()==0);
-        
+
         //atom property has precedence over residue property
         selection = Selection("[string2] == foo");
         CHECK(selection.list(frame) == std::vector<size_t>{3ul});
-        
+
         selection = Selection("[bool2]");
         CHECK(selection.list(frame) == std::vector<size_t>{2ul});
-        
+
         selection = Selection("[numeric2] > 3");
         CHECK(selection.list(frame) == std::vector<size_t>{2ul});
     }
@@ -490,7 +517,6 @@ Frame testing_frame() {
     residue.set("numeric2",2.718);
     residue.add_atom(2);
     residue.add_atom(3);
-    
     frame.add_residue(residue);
 
     return frame;

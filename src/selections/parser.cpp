@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cmath>
 #include <map>
+#include <array>
 #include <string>
 #include <vector>
 #include <memory>
@@ -13,93 +14,141 @@
 #include "chemfiles/selections/lexer.hpp"
 #include "chemfiles/selections/parser.hpp"
 
+#include "chemfiles/cpp14.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/string_view.hpp"
 
 constexpr double PI = 3.141592653589793238463;
 
+using namespace chemfiles;
 using namespace chemfiles::selections;
 
 using string_selector_creator_t = std::function<Ast(std::string, bool, Variable)>;
 static std::map<std::string, string_selector_creator_t> STRING_SELECTORS = {
     {"name", [](std::string value, bool equals, Variable var) {
-        return Ast(new Name(std::move(value), equals, var));
+        return make_unique<Name>(std::move(value), equals, var);
     }},
     {"type", [](std::string value, bool equals, Variable var) {
-        return Ast(new Type(std::move(value), equals, var));
+        return make_unique<Type>(std::move(value), equals, var);
     }},
     {"resname", [](std::string value, bool equals, Variable var) {
-        return Ast(new Resname(std::move(value), equals, var));
+        return make_unique<Resname>(std::move(value), equals, var);
     }},
 };
 
 using numeric_selector_creator_t = std::function<MathAst(Variable)>;
 static std::map<std::string, numeric_selector_creator_t> NUMERIC_SELECTORS = {
-    {"index", [](Variable var){ return MathAst(new Index(var));}},
-    {"mass", [](Variable var){ return MathAst(new Mass(var));}},
-    {"resid", [](Variable var){ return MathAst(new Resid(var));}},
-    {"x", [](Variable var){ return MathAst(new Position(var, Coordinate::X));}},
-    {"y", [](Variable var){ return MathAst(new Position(var, Coordinate::Y));}},
-    {"z", [](Variable var){ return MathAst(new Position(var, Coordinate::Z));}},
-    {"vx", [](Variable var){ return MathAst(new Velocity(var, Coordinate::X));}},
-    {"vy", [](Variable var){ return MathAst(new Velocity(var, Coordinate::Y));}},
-    {"vz", [](Variable var){ return MathAst(new Velocity(var, Coordinate::Z));}},
+    {"index", [](Variable variable){ return make_unique<Index>(variable);}},
+    {"mass", [](Variable variable){ return make_unique<Mass>(variable);}},
+    {"resid", [](Variable variable){ return make_unique<Resid>(variable);}},
+    {"x", [](Variable variable){ return make_unique<Position>(variable, Coordinate::X);}},
+    {"y", [](Variable variable){ return make_unique<Position>(variable, Coordinate::Y);}},
+    {"z", [](Variable variable){ return make_unique<Position>(variable, Coordinate::Z);}},
+    {"vx", [](Variable variable){ return make_unique<Velocity>(variable, Coordinate::X);}},
+    {"vy", [](Variable variable){ return make_unique<Velocity>(variable, Coordinate::Y);}},
+    {"vz", [](Variable variable){ return make_unique<Velocity>(variable, Coordinate::Z);}},
 };
 
 using numeric_functions_creator_t = std::function<MathAst(MathAst)>;
 static std::map<std::string, numeric_functions_creator_t> NUMERIC_FUNCTIONS = {
-    {"sin", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(sin), "sin", std::move(ast)));}},
-    {"cos", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(cos), "cos", std::move(ast)));}},
-    {"tan", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(tan), "tan", std::move(ast)));}},
-    {"asin", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(asin), "asin", std::move(ast)));}},
-    {"acos", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(acos), "acos", std::move(ast)));}},
-    {"sqrt", [](MathAst ast){ return MathAst(new Function(static_cast<double (*)(double)>(sqrt), "sqrt", std::move(ast)));}},
-    {"rad2deg", [](MathAst ast){ return MathAst(new Function([](double rad){ return rad * 180 / PI; }, "rad2deg", std::move(ast)));}},
-    {"deg2rad", [](MathAst ast){ return MathAst(new Function([](double deg){ return deg * PI / 180; }, "deg2rad", std::move(ast)));}},
+    {"sin", [](MathAst ast){ return make_unique<Function>(static_cast<double (*)(double)>(sin), "sin", std::move(ast));}},
+    {"cos", [](MathAst ast){ return make_unique<Function>(static_cast<double (*)(double)>(cos), "cos", std::move(ast));}},
+    {"tan", [](MathAst ast){ return make_unique<Function>(static_cast<double (*)(double)>(tan), "tan", std::move(ast));}},
+    {"asin", [](MathAst ast){ return make_unique<Function>(static_cast<double (*)(double)>(asin), "asin", std::move(ast));}},
+    {"acos", [](MathAst ast){ return make_unique<Function>(static_cast<double (*)(double)>(acos), "acos", std::move(ast));}},
+    {"sqrt", [](MathAst ast){ return make_unique<Function>(static_cast<double (*)(double)>(sqrt), "sqrt", std::move(ast));}},
+    {"rad2deg", [](MathAst ast){ return make_unique<Function>([](double rad){ return rad * 180 / PI; }, "rad2deg", std::move(ast));}},
+    {"deg2rad", [](MathAst ast){ return make_unique<Function>([](double deg){ return deg * PI / 180; }, "deg2rad", std::move(ast));}},
 };
 
-using numeric_variable_functions_creator_t = std::function<MathAst(std::vector<Variable>)>;
+using numeric_variable_functions_creator_t = std::function<MathAst(SelectionArguments)>;
 struct NumericVariableFunction {  // NOLINT: constructor does not initialize these fields: arity
     unsigned arity;
     numeric_variable_functions_creator_t creator;
 };
 
 static std::map<std::string, NumericVariableFunction> NUMERIC_VAR_FUNCTIONS = {
-    {"distance", {2, [](std::vector<Variable> args){ return MathAst(new Distance(args[0], args[1])); }}},
-    {"angle", {3, [](std::vector<Variable> args){ return MathAst(new Angle(args[0], args[1], args[2])); }}},
-    {"dihedral", {4, [](std::vector<Variable> args){ return MathAst(new Dihedral(args[0], args[1], args[2], args[3])); }}},
-    {"out_of_plane", {4, [](std::vector<Variable> args){ return MathAst(new OutOfPlane(args[0], args[1], args[2], args[3])); }}},
+    {"distance", {2, [](SelectionArguments args) {
+        assert(args.count == 2);
+        return make_unique<Distance>(
+            std::move(args.values[0]),
+            std::move(args.values[1])
+        );
+    }}},
+    {"angle", {3, [](SelectionArguments args) {
+        assert(args.count == 3);
+        return make_unique<Angle>(
+            std::move(args.values[0]),
+            std::move(args.values[1]),
+            std::move(args.values[2])
+        );
+    }}},
+    {"dihedral", {4, [](SelectionArguments args) {
+        assert(args.count == 4);
+        return make_unique<Dihedral>(
+            std::move(args.values[0]),
+            std::move(args.values[1]),
+            std::move(args.values[2]),
+            std::move(args.values[3])
+        );
+    }}},
+    {"out_of_plane", {4, [](SelectionArguments args) {
+        assert(args.count == 4);
+        return make_unique<OutOfPlane>(
+            std::move(args.values[0]),
+            std::move(args.values[1]),
+            std::move(args.values[2]),
+            std::move(args.values[3])
+        );
+    }}},
 };
 
 
-using bool_selector_creator_t = std::function<Ast(std::vector<SubSelection>)>;
+using bool_selector_creator_t = std::function<Ast(SelectionArguments)>;
 struct BooleanFunction {  // NOLINT: constructor does not initialize these fields: arity
     unsigned arity;
     bool_selector_creator_t creator;
 };
 
 static std::map<std::string, BooleanFunction> BOOLEAN_SELECTORS = {
-    {"all", {0, [](std::vector<SubSelection> /*unused*/) {  // NOLINT: can not make std::vector<SubSelection> a const reference
+    {"all", {0, [](SelectionArguments /*unused*/) {  // NOLINT: can not make std::vector<SubSelection> a const reference
         return Ast(new All());
     }}},
-    {"none", {0, [](std::vector<SubSelection> /*unused*/) {  // NOLINT: can not make std::vector<SubSelection> a const reference
+    {"none", {0, [](SelectionArguments /*unused*/) {  // NOLINT: can not make std::vector<SubSelection> a const reference
         return Ast(new None());
     }}},
-    {"is_bonded", {2, [](std::vector<SubSelection> args){
-        return Ast(new IsBonded(std::move(args[0]), std::move(args[1])));
+    {"is_bonded", {2, [](SelectionArguments args){
+        assert(args.count == 2);
+        return Ast(new IsBonded(
+            std::move(args.values[0]),
+            std::move(args.values[1]))
+        );
     }}},
-    {"is_angle", {3, [](std::vector<SubSelection> args) {
-        assert(args.size() == 3);
-        return Ast(new IsAngle(std::move(args[0]), std::move(args[1]), std::move(args[2])));
+    {"is_angle", {3, [](SelectionArguments args) {
+        assert(args.count == 3);
+        return Ast(new IsAngle(
+            std::move(args.values[0]),
+            std::move(args.values[1]),
+            std::move(args.values[2])));
     }}},
-    {"is_dihedral", {4, [](std::vector<SubSelection> args) {
-        assert(args.size() == 4);
-        return Ast(new IsDihedral(std::move(args[0]), std::move(args[1]), std::move(args[2]), std::move(args[3])));
+    {"is_dihedral", {4, [](SelectionArguments args) {
+        assert(args.count == 4);
+        return Ast(new IsDihedral(
+            std::move(args.values[0]),
+            std::move(args.values[1]),
+            std::move(args.values[2]),
+            std::move(args.values[3]))
+        );
     }}},
-    {"is_improper", {4, [](std::vector<SubSelection> args) {
-        assert(args.size() == 4);
-        return Ast(new IsImproper(std::move(args[0]), std::move(args[1]), std::move(args[2]), std::move(args[3])));
+    {"is_improper", {4, [](SelectionArguments args) {
+        assert(args.count == 4);
+        return Ast(new IsImproper(
+            std::move(args.values[0]),
+            std::move(args.values[1]),
+            std::move(args.values[2]),
+            std::move(args.values[3]))
+        );
     }}},
 };
 
@@ -122,6 +171,17 @@ static bool is_numeric_var_function(const std::string& name) {
 
 static bool is_boolean_selector(const std::string& name) {
     return BOOLEAN_SELECTORS.find(name) != BOOLEAN_SELECTORS.end();
+}
+
+// provide definition for MAX_ARGS. This is required in C++11.
+constexpr size_t SelectionArguments::MAX_ARGS;
+
+void SelectionArguments::add(const std::string& context, SubSelection selection) {
+   if (this->count >= MAX_ARGS) {
+       throw selection_error("too many argument in '{}', expected no more than {}", context, MAX_ARGS);
+   }
+   this->values[this->count] = std::move(selection);
+   this->count += 1;
 }
 
 Ast Parser::parse() {
@@ -261,24 +321,12 @@ Ast Parser::bool_selector() {
 
     auto selector = BOOLEAN_SELECTORS[name];
 
-    auto arguments = sub_selection();
-    if (arguments.size() != selector.arity) {
+    auto arguments = this->arguments(name);
+    if (arguments.count != selector.arity) {
         throw selection_error("expected {} arguments in '{}', got {}",
-            selector.arity, name, arguments.size()
+            selector.arity, name, arguments.count
         );
     }
-
-    // Check that at least one of the argument is a variable. Else, selections
-    // like `is_bonded(name H, name O)` are equivalent to either all or none
-    // depending on the system.
-    bool at_least_one_variable = false;
-    for (auto& arg: arguments) {
-        at_least_one_variable = at_least_one_variable || arg.is_variable();
-    }
-    if (!arguments.empty() && !at_least_one_variable) {
-        throw selection_error("expected at least one variable (#1/#2/#3/#4) in '{}'", name);
-    }
-
     return selector.creator(std::move(arguments));
 }
 
@@ -490,14 +538,14 @@ MathAst Parser::math_var_function(const std::string& name) {
     auto& function = NUMERIC_VAR_FUNCTIONS[name];
 
     assert(function.arity >= 1);
-    auto arguments = variables();
-    if (arguments.size() != function.arity) {
+    auto arguments = this->arguments(name);
+    if (arguments.count != function.arity) {
         throw selection_error("expected {} arguments in '{}', got {}",
-            function.arity, name, arguments.size()
+            function.arity, name, arguments.count
         );
     }
 
-    return function.creator(arguments);
+    return function.creator(std::move(arguments));
 }
 
 Variable Parser::variable() {
@@ -516,42 +564,18 @@ Variable Parser::variable() {
     return var;
 }
 
-std::vector<Variable> Parser::variables() {
-    std::vector<Variable> vars;
-    if (!match(Token::LPAREN)) {
-        throw selection_error("expected opening parenthesis, got '{}'", peek().as_str());
-    }
+SelectionArguments Parser::arguments(const std::string& context) {
+    auto arguments = SelectionArguments {
+        0, {0, 0, 0, 0}
+    };
 
-    if (match(Token::VARIABLE)) {
-        vars.push_back(previous().variable());
-    } else {
-        throw selection_error("expected variable in parenthesis, got '{}'", peek().as_str());
-    }
-
-    while (match(Token::COMMA)) {
-        if (match(Token::VARIABLE)) {
-            vars.push_back(previous().variable());
-        } else {
-            throw selection_error("expected variable in parenthesis, got '{}'", peek().as_str());
-        }
-    }
-
-    if (!match(Token::RPAREN)) {
-        throw selection_error("expected closing parenthesis after variable, got '{}'", peek().as_str());
-    }
-
-    return vars;
-}
-
-std::vector<SubSelection> Parser::sub_selection() {
-    std::vector<SubSelection> vars;
     if (!match(Token::LPAREN)) {
         // no arguments
-        return vars;
+        return arguments;
     }
 
     if (match(Token::VARIABLE)) {
-        vars.emplace_back(previous().variable());
+        arguments.add(context, previous().variable());
     } else {
         // HACK: We can not (yet) build a selection directly from AST, because
         // we need to validate the variables and get the context. So we eat all
@@ -563,12 +587,12 @@ std::vector<SubSelection> Parser::sub_selection() {
         for (size_t i=before; i<current_; i++) {
             selection += " " + tokens_[i].as_str();
         }
-        vars.emplace_back(trim(selection).to_string());
+        arguments.add(context, trim(selection).to_string());
     }
 
     while (match(Token::COMMA)) {
         if (match(Token::VARIABLE)) {
-            vars.emplace_back(previous().variable());
+            arguments.add(context, previous().variable());
         } else {
             auto before = current_;
             auto _ast = expression();
@@ -576,7 +600,7 @@ std::vector<SubSelection> Parser::sub_selection() {
             for (size_t i=before; i<current_; i++) {
                 selection += " " + tokens_[i].as_str();
             }
-            vars.emplace_back(trim(selection).to_string());
+            arguments.add(context, trim(selection).to_string());
         }
     }
 
@@ -584,5 +608,17 @@ std::vector<SubSelection> Parser::sub_selection() {
         throw selection_error("expected closing parenthesis after variable, got '{}'", peek().as_str());
     }
 
-    return vars;
+
+    // Check that at least one of the argument is a variable. Else, selections
+    // like `is_bonded(name H, name O)` are equivalent to either all or none
+    // depending on the system.
+    bool at_least_one_variable = false;
+    for (size_t i = 0; i<arguments.count; i++) {
+        at_least_one_variable = at_least_one_variable || arguments.values[i].is_variable();
+    }
+    if (arguments.count != 0 && !at_least_one_variable) {
+        throw selection_error("expected at least one variable (#1/#2/#3/#4) in '{}'", context);
+    }
+
+    return arguments;
 }
