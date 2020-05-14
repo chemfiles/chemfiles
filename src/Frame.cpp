@@ -211,5 +211,11 @@ double Frame::out_of_plane(size_t i, size_t j, size_t k, size_t m) const {
     auto rim = cell_.wrap(positions_[i] - positions_[m]);
 
     auto n = cross(rik, rim);
-    return dot(rji, n) / n.norm();
+    auto n_norm = n.norm();
+    if (n_norm < 1e-12) {
+        // if i, k, and m are colinear, then j is always inside the plane
+        return 0;
+    } else {
+        return dot(rji, n) / n_norm;
+    }
 }

@@ -222,6 +222,14 @@ TEST_CASE("PBC functions") {
         frame.add_atom(Atom(), Vector3D(0, 1, 0));
 
         CHECK(frame.out_of_plane(0, 1, 2, 3) == 2);
+
+        frame = Frame();
+        frame.add_atom(Atom(), Vector3D(0, 0, 0));
+        frame.add_atom(Atom(), Vector3D(0, 1, 0));
+        frame.add_atom(Atom(), Vector3D(0, 0, 1));
+        frame.add_atom(Atom(), Vector3D(0, 0, -1));
+
+        CHECK(frame.out_of_plane(0, 1, 2, 3) == 0);
     }
 }
 
