@@ -1,7 +1,7 @@
 [is_standard_pdb]
 type = "bool"
 
-PDB = """When reading, **is_standard_pdb** is set to ``true`` for residues 
+PDB = """When reading, **is_standard_pdb** is set to ``true`` for residues
 defined with a ``ATOM`` record, and ``false`` for atoms defined with an
 ``HETATM`` record. When writing, **is_standard_pdb** is used to determine
 whether to emit an ``HETATM`` or an ``ATOM`` record. If the property is not set,
@@ -106,4 +106,4 @@ MMTF = """On reading, the **secondary_structure** is assigned via the
 descriptions by the *Define Secondary Strucutre of Proteins (DSSP)* algorithm.
 Examples include ``extended``, ``alpha helix``, ``pi helix``, ``turn`` and
 ``coil``. This property is not set for undefined secondary structures and is not
-used for writing.
+used for writing."""
