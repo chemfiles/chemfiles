@@ -176,6 +176,15 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(frame[*edo.begin()].get("altloc")->as_string() == "B");
     }
 
+    SECTION("Check symmetry") {
+        if (!is_valgrind_and_travis()) {
+            auto file = Trajectory("data/mmtf/5IRE.mmtf");
+
+            auto frame = file.read();
+            CHECK(frame.size() == 661440);
+        }
+    }
+
     SECTION("GZ Files") {
         auto file = Trajectory("data/mmtf/1J8K.mmtf.gz");
 

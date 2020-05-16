@@ -190,21 +190,25 @@ void MMTFFormat::read(Frame& frame) {
     // residues/groups in the chain and finally the atoms in the residue/group
     for (size_t j = 0; j < modelChainCount; j++) {
         auto chainGroupCount = static_cast<size_t>(structure_.groupsPerChain[chainIndex_]);
-
+        
         // Unfortunetly we must loop through the assembly lists to find which
         // one our current chain belongs to. Forunetly, these lists are fairly
         // short in the vast majority of cases.
-        std::string current_assembly;
-        for (const auto& assembly : structure_.bioAssemblyList) {
-            for (const auto& transform : assembly.transformList) {
-                for (auto id : transform.chainIndexList) {
-                    if (static_cast<size_t>(id) == chainIndex_) {
-                        current_assembly += "bio";
-                        current_assembly += assembly.name;
+        auto find_assembly = [this]() -> std::string {
+            for (const auto& assembly : structure_.bioAssemblyList) {
+                for (const auto& transform : assembly.transformList) {
+                    for (auto id : transform.chainIndexList) {
+                        if (static_cast<size_t>(id) == chainIndex_) {
+                            return "bio" + assembly.name;
+                        }
                     }
                 }
             }
-        }
+
+            return "";
+        };
+
+        auto current_assembly = find_assembly();
 
         // A group is like a residue or other molecule in a PDB file.
         for (size_t k = 0; k < chainGroupCount; k++) {
@@ -301,6 +305,115 @@ void MMTFFormat::read(Frame& frame) {
     modelIndex_++;
 
     atomSkip_ = atomIndex_;
+
+    const auto original_size = frame.size();
+
+    for (const auto& assembly : structure_.bioAssemblyList) {
+        for (const auto& transform : assembly.transformList) {
+
+            std::unordered_set<double> chains_to_transform;
+            for (auto id : transform.chainIndexList) {
+                chains_to_transform.insert(static_cast<double>(id));
+            }
+
+            auto& ncs = transform.matrix;
+
+            auto rotation = Matrix3D(ncs[0], ncs[4], ncs[8],
+                                     ncs[1], ncs[5], ncs[9],
+                                     ncs[2], ncs[6], ncs[10]);
+            auto translation = Vector3D(ncs[3], ncs[7], ncs[11]);
+
+            if (rotation == Matrix3D::unit() && translation == Vector3D()) {
+                continue;
+            }
+
+            rotation = rotation.invert();
+
+            // See comment below
+            // std::unordered_map<size_t, size_t> old_to_sym;
+
+            std::vector<Residue> residues_to_add;
+            for (const auto& residue : frame.topology().residues()) {
+
+                auto asmbl = residue.get("assembly");
+                
+                if (!asmbl || asmbl->as_string() != "bio" + assembly.name) {
+                    continue;
+                }
+
+                auto chainindex = residue.get("chainindex");
+                if (!chainindex || chains_to_transform.count(chainindex->as_double()) == 0) {
+                    continue;
+                }
+
+                auto new_residue = Residue(residue.name(), *residue.id());
+
+                new_residue.set("assembly", *asmbl);
+                new_residue.set("composition_type", *residue.get("composition_type"));
+                new_residue.set("is_standard_pdb", *residue.get("is_standard_pdb"));
+                new_residue.set("chainid", *residue.get("chainname"));
+
+                auto chainname = residue.get("chainname");
+                if (chainname) {
+                    new_residue.set("chainname", *chainname);
+                }
+
+                auto ss = residue.get("secondary_structure");
+                if (ss) {
+                    new_residue.set("secondary_structure", *ss);
+                }
+
+                for (auto atom_id : residue) {
+
+                    if (atom_id >= original_size) {
+                        continue;
+                    }
+
+                    auto atom_copy = frame[atom_id];
+                    auto new_position = rotation * frame.positions()[atom_id] + translation;
+
+                    frame.add_atom(std::move(atom_copy), std::move(new_position));
+                    new_residue.add_atom(frame.size() - 1);
+                    // old_to_sym.insert({ atom_id, frame.size() - 1 });
+                }
+
+                residues_to_add.emplace_back(new_residue);
+            }
+
+            for (auto&& residue : residues_to_add) {
+                frame.add_residue(std::move(residue));
+            }
+            
+            /*
+
+            The code below is way too slow, even in release mode. It is probably
+            due to the ordered nature of the bonds array. Keeping the first, but
+            not second loop causes the slow down.
+
+            std::vector<std::pair<Bond, Bond::BondOrder>> bonds_to_add;
+            for (size_t i = 0; i < original_bond_size; ++i) {
+                auto& bond = frame.topology().bonds()[i];
+
+                // bonds should be sorted so that when we hit original size, we're done
+                if (bond[0] >= original_size || bond[1] >= original_size) {
+                    break;
+                }
+
+                auto new_bond_0 = old_to_sym.find(bond[0]);
+                auto new_bond_1 = old_to_sym.find(bond[1]);
+                if (new_bond_0 == old_to_sym.end() || new_bond_1 == old_to_sym.end()) {
+                    continue;
+                }
+
+                bonds_to_add.push_back({ {new_bond_0->second, new_bond_1->second}, frame.topology().bond_orders()[i] });
+            }
+
+            for (auto& bond : bonds_to_add) {
+                frame.add_bond(bond.first[0], bond.first[1], bond.second);
+            }
+            */
+        }
+    }
 }
 
 void MMTFFormat::write(const Frame& frame) {
