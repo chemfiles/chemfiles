@@ -103,6 +103,7 @@ void MMTFFormat::read_step(const size_t step, Frame& frame) {
     groupIndex_ = 0;
     atomIndex_  = 0;
     atomSkip_   = 0;
+    interBondIndex_ = 0;
 
     // Fast-forward, keeping all indexes updated
     while(modelIndex_ != step) {
@@ -124,6 +125,20 @@ void MMTFFormat::read_step(const size_t step, Frame& frame) {
     }
 
     atomSkip_ = atomIndex_;
+
+    auto inter_residue_bond_count = structure_.bondAtomList.size() / 2;
+    while (interBondIndex_ < inter_residue_bond_count) {
+        auto atom1 = static_cast<size_t>(structure_.bondAtomList[interBondIndex_ * 2 + 0]);
+        auto atom2 = static_cast<size_t>(structure_.bondAtomList[interBondIndex_ * 2 + 1]);
+
+        // We are below the atoms we care about
+        if ((atom1 < atomSkip_) || (atom2 < atomSkip_)) {
+            interBondIndex_++;
+            continue;
+        }
+
+        break;
+    }
 
     read(frame);
 }
@@ -152,25 +167,18 @@ void MMTFFormat::read(Frame& frame) {
         frame.set("deposition_date", structure_.depositionDate);
     }
 
-    auto inter_residue_bond_count = structure_.bondAtomList.size() / 2;
-    size_t bond_index = 0;
-    while (bond_index < inter_residue_bond_count) {
-        auto atom1 = static_cast<size_t>(structure_.bondAtomList[bond_index * 2 + 0]);
-        auto atom2 = static_cast<size_t>(structure_.bondAtomList[bond_index * 2 + 1]);
+    read_model(frame);
+    apply_symmetry(frame);
 
-        // We are below the atoms we care about
-        if ((atom1 < atomSkip_) || (atom2 < atomSkip_)) {
-            bond_index++;
-            continue;
-        }
+    atomSkip_ = atomIndex_;
+}
 
-        break;
-    }
+void MMTFFormat::read_model(Frame& frame) {
 
-    // count the number of atoms in this frame/model
-    size_t natoms = 0;
     auto modelChainCount = static_cast<size_t>(structure_.chainsPerModel[modelIndex_]);
-    // backup chainIndex & groupIndex to be incremented in the loop below
+
+    // The following block of code simply counts the total number of atoms in the model
+    size_t natoms = 0;
     auto chain_index = chainIndex_;
     auto group_index = groupIndex_;
     for (size_t j = 0; j < modelChainCount; j++) {
@@ -186,126 +194,145 @@ void MMTFFormat::read(Frame& frame) {
 
     frame.resize(natoms);
     auto positions = frame.positions();
+
     // Read the structure iterating over the chains in the model, then the
     // residues/groups in the chain and finally the atoms in the residue/group
     for (size_t j = 0; j < modelChainCount; j++) {
-        auto chainGroupCount = static_cast<size_t>(structure_.groupsPerChain[chainIndex_]);
-        
-        // Unfortunetly we must loop through the assembly lists to find which
-        // one our current chain belongs to. Forunetly, these lists are fairly
-        // short in the vast majority of cases.
-        auto find_assembly = [this]() -> std::string {
-            for (const auto& assembly : structure_.bioAssemblyList) {
-                for (const auto& transform : assembly.transformList) {
-                    for (auto id : transform.chainIndexList) {
-                        if (static_cast<size_t>(id) == chainIndex_) {
-                            return "bio" + assembly.name;
-                        }
-                    }
-                }
-            }
-
-            return "";
-        };
 
         auto current_assembly = find_assembly();
 
+        auto chainGroupCount = static_cast<size_t>(structure_.groupsPerChain[chainIndex_]);
         // A group is like a residue or other molecule in a PDB file.
         for (size_t k = 0; k < chainGroupCount; k++) {
-            auto groupType = static_cast<size_t>(structure_.groupTypeList[groupIndex_]);
-            const auto& group = structure_.groupList[groupType];
+            // groupType is a 'pointer' to the appropriate residue information in the structure.
+            auto group_type = static_cast<size_t>(structure_.groupTypeList[groupIndex_]);
+            auto residue = create_residue(current_assembly, group_type);
 
-            auto groupId = static_cast<size_t>(structure_.groupIdList[groupIndex_]);
-            auto residue = Residue(group.groupName, groupId);
-            residue.set("composition_type", group.chemCompType);
-            residue.set("is_standard_pdb", !mmtf::is_hetatm(group.chemCompType.c_str()));
-
-            // map between the index of the atom in this group and the global
-            // index in the frame. This is needed to add bonds from this group
-            std::vector<size_t> global_indexes;
-            global_indexes.reserve(group.atomNameList.size());
-            for (size_t l = 0; l < group.atomNameList.size(); l++) {
-                auto atom = Atom(group.atomNameList[l], group.elementList[l]);
-                atom.set_charge(static_cast<double>(group.formalChargeList[l]));
-
-                const auto& altLocList = structure_.altLocList;
-                if (!mmtf::isDefaultValue(altLocList) && !(
-                    altLocList[atomIndex_] == ' ' ||
-                    altLocList[atomIndex_] == 0x00)) {
-                    atom.set("altloc", std::string(1, altLocList[atomIndex_]));
-                }
-
-                auto id = atom_id(atomIndex_);
-                global_indexes.emplace_back(id);
-                frame[id] = std::move(atom);
-                residue.add_atom(id);
-
-                positions[id][0] = static_cast<double>(structure_.xCoordList[atomIndex_]);
-                positions[id][1] = static_cast<double>(structure_.yCoordList[atomIndex_]);
-                positions[id][2] = static_cast<double>(structure_.zCoordList[atomIndex_]);
-
-                atomIndex_++;
-            }
-
-            for (size_t l = 0; l < group.bondOrderList.size(); l++) {
-                // atom1 and atom2 refer to data in group, so we need to
-                // translate them to the global atomic index
-                auto atom1 = static_cast<size_t>(group.bondAtomList[l * 2]);
-                auto atom2 = static_cast<size_t>(group.bondAtomList[l * 2 + 1]);
-
-                frame.add_bond(
-                    global_indexes[atom1],
-                    global_indexes[atom2],
-                    bond_order_to_chemfiles(group.bondOrderList[l])
-                );
-            }
-
-            // Add additional global (not by group) bonds
-            while (bond_index < inter_residue_bond_count) {
-                auto atom1 = static_cast<size_t>(structure_.bondAtomList[bond_index * 2]);
-                auto atom2 = static_cast<size_t>(structure_.bondAtomList[bond_index * 2 + 1]);
-
-                // We are below the atoms we care about
-                if (atom1 < atomSkip_ || atom2 < atomSkip_) {
-                    continue;
-                }
-
-                // We are above the atoms we care about
-                if (atom1 > atomIndex_ || atom2 > atomIndex_) {
-                    break;
-                }
-
-                frame.add_bond(atom_id(atom1), atom_id(atom2));
-                bond_index++;
-            }
-
-            if (groupIndex_ < structure_.secStructList.size()) {
-                set_secondary(residue, structure_.secStructList[groupIndex_]);
-            }
-
-            // If the name of the current assembly is defined in the MMTF file.
-            // Bioassemblies are optional, however.
-            if (!current_assembly.empty()) {
-                residue.set("assembly", current_assembly);
-            }
-
-            // This is a string in MMTF, differs from the name as then increments linearly
-            // For example, the fourth chainid in ( A B A B) would be D, not B (the chainname)
-            residue.set("chainid", structure_.chainIdList[chainIndex_]);
-            residue.set("chainindex", chainIndex_);
-            if (!mmtf::isDefaultValue(structure_.chainNameList)) {
-                residue.set("chainname", structure_.chainNameList[chainIndex_]);
-            }
-
+            read_group(frame, group_type, residue, positions);
             frame.add_residue(std::move(residue));
+
+            add_inter_residue_bonds(frame);
+
             groupIndex_++;
         }
         chainIndex_++;
     }
     modelIndex_++;
+}
 
-    atomSkip_ = atomIndex_;
+std::string MMTFFormat::find_assembly() {
+    // Unfortunetly we must loop through the assembly lists to find which
+    // one our current chain belongs to. Forunetly, these lists are fairly
+    // short in the vast majority of cases.
 
+    for (const auto& assembly : structure_.bioAssemblyList) {
+        for (const auto& transform : assembly.transformList) {
+            for (auto id : transform.chainIndexList) {
+                if (static_cast<size_t>(id) == chainIndex_) {
+                    return "bio" + assembly.name;
+                }
+            }
+        }
+    }
+
+    return "";
+}
+
+Residue MMTFFormat::create_residue(const std::string& current_assembly, size_t group_type) {
+
+    const auto& group = structure_.groupList[group_type];
+
+    auto groupId = static_cast<size_t>(structure_.groupIdList[groupIndex_]);
+    auto residue = Residue(group.groupName, groupId);
+    residue.set("composition_type", group.chemCompType);
+    residue.set("is_standard_pdb", !mmtf::is_hetatm(group.chemCompType.c_str()));
+
+    if (groupIndex_ < structure_.secStructList.size()) {
+        set_secondary(residue, structure_.secStructList[groupIndex_]);
+    }
+
+    // If the name of the current assembly is defined in the MMTF file.
+    // Bioassemblies are optional, however.
+    if (!current_assembly.empty()) {
+        residue.set("assembly", current_assembly);
+    }
+
+    // This is a string in MMTF, differs from the name as then increments linearly
+    // For example, the fourth chainid in ( A B A B) would be D, not B (the chainname)
+    residue.set("chainid", structure_.chainIdList[chainIndex_]);
+    residue.set("chainindex", chainIndex_);
+    if (!mmtf::isDefaultValue(structure_.chainNameList)) {
+        residue.set("chainname", structure_.chainNameList[chainIndex_]);
+    }
+
+    return residue;
+}
+
+void MMTFFormat::read_group(Frame& frame, size_t group_type, Residue& residue, span<Vector3D> positions) {
+
+    const auto& group = structure_.groupList[group_type];
+
+    // map between the index of the atom in this group and the global
+    // index in the frame. This is needed to add bonds from this group
+    std::vector<size_t> global_indexes;
+    global_indexes.reserve(group.atomNameList.size());
+
+    for (size_t l = 0; l < group.atomNameList.size(); l++) {
+        auto atom = Atom(group.atomNameList[l], group.elementList[l]);
+        atom.set_charge(static_cast<double>(group.formalChargeList[l]));
+
+        const auto& altLocList = structure_.altLocList;
+        if (!mmtf::isDefaultValue(altLocList) && !(
+            altLocList[atomIndex_] == ' ' ||
+            altLocList[atomIndex_] == 0x00)) {
+            atom.set("altloc", std::string(1, altLocList[atomIndex_]));
+        }
+
+        auto id = atom_id(atomIndex_);
+        global_indexes.emplace_back(id);
+        frame[id] = std::move(atom);
+        residue.add_atom(id);
+
+        positions[id][0] = static_cast<double>(structure_.xCoordList[atomIndex_]);
+        positions[id][1] = static_cast<double>(structure_.yCoordList[atomIndex_]);
+        positions[id][2] = static_cast<double>(structure_.zCoordList[atomIndex_]);
+
+        atomIndex_++;
+    }
+
+    for (size_t l = 0; l < group.bondOrderList.size(); l++) {
+        // atom1 and atom2 refer to data in group, so we need to
+        // translate them to the global atomic index
+        auto atom1 = static_cast<size_t>(group.bondAtomList[l * 2]);
+        auto atom2 = static_cast<size_t>(group.bondAtomList[l * 2 + 1]);
+
+        frame.add_bond(
+            global_indexes[atom1],
+            global_indexes[atom2],
+            bond_order_to_chemfiles(group.bondOrderList[l])
+        );
+    }
+}
+
+void MMTFFormat::add_inter_residue_bonds(Frame& frame) {
+    auto inter_residue_bond_count = structure_.bondAtomList.size() / 2;
+
+    // Add additional global (not by group) bonds
+    while (interBondIndex_ < inter_residue_bond_count) {
+        auto atom1 = static_cast<size_t>(structure_.bondAtomList[interBondIndex_ * 2]);
+        auto atom2 = static_cast<size_t>(structure_.bondAtomList[interBondIndex_ * 2 + 1]);
+
+        // We are above the atoms we care about
+        if (atom1 > atomIndex_ || atom2 > atomIndex_) {
+            break;
+        }
+
+        frame.add_bond(atom_id(atom1), atom_id(atom2));
+        interBondIndex_++;
+    }
+}
+
+void MMTFFormat::apply_symmetry(Frame& frame) {
     const auto original_size = frame.size();
 
     for (const auto& assembly : structure_.bioAssemblyList) {
@@ -318,6 +345,7 @@ void MMTFFormat::read(Frame& frame) {
 
             auto& ncs = transform.matrix;
 
+            // ncs is a 4x4 matrix stored in column major order.
             auto rotation = Matrix3D(ncs[0], ncs[4], ncs[8],
                                      ncs[1], ncs[5], ncs[9],
                                      ncs[2], ncs[6], ncs[10]);
@@ -346,33 +374,26 @@ void MMTFFormat::read(Frame& frame) {
                     continue;
                 }
 
+                // Copy over everything except the atoms
                 auto new_residue = Residue(residue.name(), *residue.id());
-
-                new_residue.set("assembly", *asmbl);
-                new_residue.set("composition_type", *residue.get("composition_type"));
-                new_residue.set("is_standard_pdb", *residue.get("is_standard_pdb"));
-                new_residue.set("chainid", *residue.get("chainname"));
-
-                auto chainname = residue.get("chainname");
-                if (chainname) {
-                    new_residue.set("chainname", *chainname);
+                for (auto& prop : residue.properties()) {
+                    new_residue.set(prop.first, prop.second);
                 }
 
-                auto ss = residue.get("secondary_structure");
-                if (ss) {
-                    new_residue.set("secondary_structure", *ss);
-                }
+                // Avoid using this chain in future symmetry operations
+                new_residue.set("chainindex", -1.0);
 
                 for (auto atom_id : residue) {
 
+                    // Ensure that the current atom is not a result of a symmetry operation
                     if (atom_id >= original_size) {
                         continue;
                     }
 
-                    auto atom_copy = frame[atom_id];
+                    auto new_atom = frame[atom_id];
                     auto new_position = rotation * frame.positions()[atom_id] + translation;
 
-                    frame.add_atom(std::move(atom_copy), std::move(new_position));
+                    frame.add_atom(std::move(new_atom), std::move(new_position));
                     new_residue.add_atom(frame.size() - 1);
                     // old_to_sym.insert({ atom_id, frame.size() - 1 });
                 }
@@ -388,7 +409,8 @@ void MMTFFormat::read(Frame& frame) {
 
             The code below is way too slow, even in release mode. It is probably
             due to the ordered nature of the bonds array. Keeping the first, but
-            not second loop causes the slow down.
+            not second loop causes no slow down, but having the second loop makes
+            the code run sluggish.
 
             std::vector<std::pair<Bond, Bond::BondOrder>> bonds_to_add;
             for (size_t i = 0; i < original_bond_size; ++i) {
