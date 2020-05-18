@@ -27,39 +27,39 @@ using namespace chemfiles::selections;
 using string_selector_creator_t = std::function<Ast(std::string, bool, Variable)>;
 static std::map<std::string, string_selector_creator_t> STRING_SELECTORS = {
     {"name", [](std::string value, bool equals, Variable var) {
-        return make_unique<Name>(std::move(value), equals, var);
+        return chemfiles::make_unique<Name>(std::move(value), equals, var);
     }},
     {"type", [](std::string value, bool equals, Variable var) {
-        return make_unique<Type>(std::move(value), equals, var);
+        return chemfiles::make_unique<Type>(std::move(value), equals, var);
     }},
     {"resname", [](std::string value, bool equals, Variable var) {
-        return make_unique<Resname>(std::move(value), equals, var);
+        return chemfiles::make_unique<Resname>(std::move(value), equals, var);
     }},
 };
 
 using numeric_selector_creator_t = std::function<MathAst(Variable)>;
 static std::map<std::string, numeric_selector_creator_t> NUMERIC_SELECTORS = {
-    {"index", [](Variable variable){ return make_unique<Index>(variable);}},
-    {"mass", [](Variable variable){ return make_unique<Mass>(variable);}},
-    {"resid", [](Variable variable){ return make_unique<Resid>(variable);}},
-    {"x", [](Variable variable){ return make_unique<Position>(variable, Coordinate::X);}},
-    {"y", [](Variable variable){ return make_unique<Position>(variable, Coordinate::Y);}},
-    {"z", [](Variable variable){ return make_unique<Position>(variable, Coordinate::Z);}},
-    {"vx", [](Variable variable){ return make_unique<Velocity>(variable, Coordinate::X);}},
-    {"vy", [](Variable variable){ return make_unique<Velocity>(variable, Coordinate::Y);}},
-    {"vz", [](Variable variable){ return make_unique<Velocity>(variable, Coordinate::Z);}},
+    {"index", [](Variable variable){ return chemfiles::make_unique<Index>(variable);}},
+    {"mass", [](Variable variable){ return chemfiles::make_unique<Mass>(variable);}},
+    {"resid", [](Variable variable){ return chemfiles::make_unique<Resid>(variable);}},
+    {"x", [](Variable variable){ return chemfiles::make_unique<Position>(variable, Coordinate::X);}},
+    {"y", [](Variable variable){ return chemfiles::make_unique<Position>(variable, Coordinate::Y);}},
+    {"z", [](Variable variable){ return chemfiles::make_unique<Position>(variable, Coordinate::Z);}},
+    {"vx", [](Variable variable){ return chemfiles::make_unique<Velocity>(variable, Coordinate::X);}},
+    {"vy", [](Variable variable){ return chemfiles::make_unique<Velocity>(variable, Coordinate::Y);}},
+    {"vz", [](Variable variable){ return chemfiles::make_unique<Velocity>(variable, Coordinate::Z);}},
 };
 
 using numeric_functions_creator_t = std::function<MathAst(MathAst)>;
 static std::map<std::string, numeric_functions_creator_t> NUMERIC_FUNCTIONS = {
-    {"sin", [](MathAst ast){ return make_unique<Function>(static_cast<double (*)(double)>(sin), "sin", std::move(ast));}},
-    {"cos", [](MathAst ast){ return make_unique<Function>(static_cast<double (*)(double)>(cos), "cos", std::move(ast));}},
-    {"tan", [](MathAst ast){ return make_unique<Function>(static_cast<double (*)(double)>(tan), "tan", std::move(ast));}},
-    {"asin", [](MathAst ast){ return make_unique<Function>(static_cast<double (*)(double)>(asin), "asin", std::move(ast));}},
-    {"acos", [](MathAst ast){ return make_unique<Function>(static_cast<double (*)(double)>(acos), "acos", std::move(ast));}},
-    {"sqrt", [](MathAst ast){ return make_unique<Function>(static_cast<double (*)(double)>(sqrt), "sqrt", std::move(ast));}},
-    {"rad2deg", [](MathAst ast){ return make_unique<Function>([](double rad){ return rad * 180 / PI; }, "rad2deg", std::move(ast));}},
-    {"deg2rad", [](MathAst ast){ return make_unique<Function>([](double deg){ return deg * PI / 180; }, "deg2rad", std::move(ast));}},
+    {"sin", [](MathAst ast){ return chemfiles::make_unique<Function>(static_cast<double (*)(double)>(sin), "sin", std::move(ast));}},
+    {"cos", [](MathAst ast){ return chemfiles::make_unique<Function>(static_cast<double (*)(double)>(cos), "cos", std::move(ast));}},
+    {"tan", [](MathAst ast){ return chemfiles::make_unique<Function>(static_cast<double (*)(double)>(tan), "tan", std::move(ast));}},
+    {"asin", [](MathAst ast){ return chemfiles::make_unique<Function>(static_cast<double (*)(double)>(asin), "asin", std::move(ast));}},
+    {"acos", [](MathAst ast){ return chemfiles::make_unique<Function>(static_cast<double (*)(double)>(acos), "acos", std::move(ast));}},
+    {"sqrt", [](MathAst ast){ return chemfiles::make_unique<Function>(static_cast<double (*)(double)>(sqrt), "sqrt", std::move(ast));}},
+    {"rad2deg", [](MathAst ast){ return chemfiles::make_unique<Function>([](double rad){ return rad * 180 / PI; }, "rad2deg", std::move(ast));}},
+    {"deg2rad", [](MathAst ast){ return chemfiles::make_unique<Function>([](double deg){ return deg * PI / 180; }, "deg2rad", std::move(ast));}},
 };
 
 using numeric_variable_functions_creator_t = std::function<MathAst(SelectionArguments)>;
@@ -71,14 +71,14 @@ struct NumericVariableFunction {  // NOLINT: constructor does not initialize the
 static std::map<std::string, NumericVariableFunction> NUMERIC_VAR_FUNCTIONS = {
     {"distance", {2, [](SelectionArguments args) {
         assert(args.count == 2);
-        return make_unique<Distance>(
+        return chemfiles::make_unique<Distance>(
             std::move(args.values[0]),
             std::move(args.values[1])
         );
     }}},
     {"angle", {3, [](SelectionArguments args) {
         assert(args.count == 3);
-        return make_unique<Angle>(
+        return chemfiles::make_unique<Angle>(
             std::move(args.values[0]),
             std::move(args.values[1]),
             std::move(args.values[2])
@@ -86,7 +86,7 @@ static std::map<std::string, NumericVariableFunction> NUMERIC_VAR_FUNCTIONS = {
     }}},
     {"dihedral", {4, [](SelectionArguments args) {
         assert(args.count == 4);
-        return make_unique<Dihedral>(
+        return chemfiles::make_unique<Dihedral>(
             std::move(args.values[0]),
             std::move(args.values[1]),
             std::move(args.values[2]),
@@ -95,7 +95,7 @@ static std::map<std::string, NumericVariableFunction> NUMERIC_VAR_FUNCTIONS = {
     }}},
     {"out_of_plane", {4, [](SelectionArguments args) {
         assert(args.count == 4);
-        return make_unique<OutOfPlane>(
+        return chemfiles::make_unique<OutOfPlane>(
             std::move(args.values[0]),
             std::move(args.values[1]),
             std::move(args.values[2]),
