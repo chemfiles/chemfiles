@@ -442,6 +442,22 @@ void MMTFFormat::write(const Frame& frame) {
     structure_.chainsPerModel.emplace_back(0);
     structure_.numAtoms += static_cast<int32_t>(frame.size());
 
+    if (mmtf::isDefaultValue(structure_.unitCell)) {
+        auto& cell = frame.cell();
+        structure_.unitCell.resize(6);
+        structure_.unitCell[0] = static_cast<float>(cell.a());
+        structure_.unitCell[1] = static_cast<float>(cell.b());
+        structure_.unitCell[2] = static_cast<float>(cell.c());
+        structure_.unitCell[3] = static_cast<float>(cell.alpha());
+        structure_.unitCell[4] = static_cast<float>(cell.beta());
+        structure_.unitCell[5] = static_cast<float>(cell.gamma());
+
+        unitcellForWrite_ = cell;
+    }
+    else if (unitcellForWrite_ != frame.cell()) {
+        warning("MMTF Writer", "the MMTF format only allows one unit cell to be defined for all models, using the first one defined");
+    }
+
     const auto& topology = frame.topology();
 
     // pre-allocate some memory
@@ -526,6 +542,7 @@ void MMTFFormat::write(const Frame& frame) {
 }
 
 void MMTFFormat::add_residue_to_structure(const Frame& frame, const Residue& residue) {
+
     structure_.numGroups++;
     structure_.groupsPerChain.back() += 1;
 
