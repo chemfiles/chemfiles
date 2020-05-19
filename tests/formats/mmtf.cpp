@@ -177,12 +177,14 @@ TEST_CASE("Read files in MMTF format") {
     }
 
     SECTION("Check symmetry") {
+    #ifndef CHEMFILES_WINDOWS
         if (!is_valgrind_and_travis()) {
             auto file = Trajectory("data/mmtf/5IRE.mmtf");
 
             auto frame = file.read();
             CHECK(frame.size() == 661440);
         }
+    #endif
     }
 
     SECTION("GZ Files") {

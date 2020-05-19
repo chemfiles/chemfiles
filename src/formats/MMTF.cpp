@@ -334,6 +334,12 @@ void MMTFFormat::add_inter_residue_bonds(Frame& frame) {
 
 void MMTFFormat::apply_symmetry(Frame& frame) {
     const auto original_size = frame.size();
+    const auto original_bond_size = frame.topology().bonds().size();
+
+    size_t symm_count = 0;
+
+    using bond_w_order = std::pair<Bond, Bond::BondOrder>;
+    std::vector<bond_w_order> bonds_to_add;
 
     for (const auto& assembly : structure_.bioAssemblyList) {
         for (const auto& transform : assembly.transformList) {
@@ -357,8 +363,8 @@ void MMTFFormat::apply_symmetry(Frame& frame) {
 
             rotation = rotation.invert();
 
-            // See comment below
-            // std::unordered_map<size_t, size_t> old_to_sym;
+            // Makes an atom into its symmetry partner
+            std::vector<size_t> old_to_sym(original_size, 0);
 
             std::vector<Residue> residues_to_add;
             for (const auto& residue : frame.topology().residues()) {
@@ -395,7 +401,7 @@ void MMTFFormat::apply_symmetry(Frame& frame) {
 
                     frame.add_atom(std::move(new_atom), std::move(new_position));
                     new_residue.add_atom(frame.size() - 1);
-                    // old_to_sym.insert({ atom_id, frame.size() - 1 });
+                    old_to_sym[atom_id] = frame.size() - 1;
                 }
 
                 residues_to_add.emplace_back(new_residue);
@@ -405,14 +411,6 @@ void MMTFFormat::apply_symmetry(Frame& frame) {
                 frame.add_residue(std::move(residue));
             }
             
-            /*
-
-            The code below is way too slow, even in release mode. It is probably
-            due to the ordered nature of the bonds array. Keeping the first, but
-            not second loop causes no slow down, but having the second loop makes
-            the code run sluggish.
-
-            std::vector<std::pair<Bond, Bond::BondOrder>> bonds_to_add;
             for (size_t i = 0; i < original_bond_size; ++i) {
                 auto& bond = frame.topology().bonds()[i];
 
@@ -421,20 +419,21 @@ void MMTFFormat::apply_symmetry(Frame& frame) {
                     break;
                 }
 
-                auto new_bond_0 = old_to_sym.find(bond[0]);
-                auto new_bond_1 = old_to_sym.find(bond[1]);
-                if (new_bond_0 == old_to_sym.end() || new_bond_1 == old_to_sym.end()) {
+                auto new_bond_0 = old_to_sym[bond[0]];
+                auto new_bond_1 = old_to_sym[bond[1]];
+
+                // zero simply means that the atom has no partner
+                if (new_bond_0 == 0 || new_bond_1 == 0) {
                     continue;
                 }
 
-                bonds_to_add.push_back({ {new_bond_0->second, new_bond_1->second}, frame.topology().bond_orders()[i] });
-            }
-
-            for (auto& bond : bonds_to_add) {
-                frame.add_bond(bond.first[0], bond.first[1], bond.second);
-            }
-            */
+                bonds_to_add.push_back({ {new_bond_0, new_bond_1}, frame.topology().bond_orders()[i] });
+            }            
         }
+    }
+
+    for (auto& bond : bonds_to_add) {
+        frame.add_bond(bond.first[0], bond.first[1], bond.second);
     }
 }
 
