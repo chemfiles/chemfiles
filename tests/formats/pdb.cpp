@@ -380,6 +380,7 @@ TEST_CASE("Write files in PDB format") {
     frame.add_bond(4, 5);
     frame.add_bond(0, 6);
     frame.add_bond(1, 6);
+    frame.add_bond(1, 2); // This bond will not be printed
     frame.add_bond(2, 6);
     frame.add_bond(3, 6);
     frame.add_bond(4, 6);

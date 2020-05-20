@@ -661,6 +661,9 @@ void PDBFormat::write_next(const Frame& frame) {
         }
     }
 
+    // Used to skip writing unnecessary connect records
+    auto is_atom_record = std::vector<bool>(frame.size(), false);
+
     auto& positions = frame.positions();
     for (size_t i = 0; i < frame.size(); i++) {
 
@@ -681,6 +684,7 @@ void PDBFormat::write_next(const Frame& frame) {
             if (residue->get<Property::BOOL>("is_standard_pdb").value_or(false)) {
                 // only use ATOM if the residue is standardized
                 atom_hetatm = "ATOM  ";
+                is_atom_record[i] = true;
             }
 
             if (resname.length() > 3) {
@@ -750,6 +754,9 @@ void PDBFormat::write_next(const Frame& frame) {
 
     auto connect = std::vector<std::vector<size_t>>(frame.size());
     for (auto& bond : frame.topology().bonds()) {
+        if (is_atom_record[bond[0]] && is_atom_record[bond[1]]) { // both must be standard residue atoms
+            continue;
+        }
         if (bond[0] > 99999 || bond[1] > 99999) {
             warning("PDB writer", "atomic index is too big for CONNECT, removing the bond between {} and {}", bond[0], bond[1]);
             continue;
