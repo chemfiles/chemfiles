@@ -656,7 +656,7 @@ void PDBFormat::write_next(const Frame& frame) {
     uint64_t max_resid = 0;
     for (const auto& residue: frame.topology().residues()) {
         auto resid = residue.id();
-        if (resid && resid.value() > max_resid) {
+        if (resid && resid.value() > max_resid && static_cast<int64_t>(resid.value()) > 0 ) {
             max_resid = resid.value();
         }
     }
@@ -695,8 +695,14 @@ void PDBFormat::write_next(const Frame& frame) {
             if (residue->id()) {
                 auto value = residue->id().value();
                 if (value > 9999) {
-                    warning("PDB writer", "too many residues, removing residue id {}", value);
-                    resid = "  -1";
+                    auto negative_conversion = std::to_string(static_cast<int64_t>(value));
+                    if (negative_conversion.length() <= 4) {
+                        warning("PDB writer", "it appears {} is actually negative, treating as {}", value, negative_conversion);
+                        resid = negative_conversion;
+                    } else {
+                        warning("PDB writer", "too many residues, treating residue id {} as -1", value);
+                        resid = "  -1";
+                    }
                 } else {
                     resid = std::to_string(residue->id().value());
                 }

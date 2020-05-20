@@ -349,8 +349,8 @@ TEST_CASE("Write files in PDB format") {
     "ATOM      3 C    foo A   3       1.000   2.000   3.000  1.00  0.00           C\n"
     "HETATM    4 D    bar C  -1B      1.000   2.000   3.000  1.00  0.00           D\n"
     "HETATM    5 E    XXX X   5       4.000   5.000   6.000  1.00  0.00           E\n"
-    "HETATM    6 F    XXX X   6       4.000   5.000   6.000  1.00  0.00           F\n"
-    "HETATM    7 G    XXX X   7       4.000   5.000   6.000  1.00  0.00           G\n"
+    "HETATM    6 F    baz X  -2       4.000   5.000   6.000  1.00  0.00           F\n"
+    "HETATM    7 G    XXX X   6       4.000   5.000   6.000  1.00  0.00           G\n"
     "CONECT    1    2    7\n"
     "CONECT    2    1    7\n"
     "CONECT    3    7\n"
@@ -397,6 +397,10 @@ TEST_CASE("Write files in PDB format") {
     residue.add_atom(3);
     residue.set("chainid", "CB");
     residue.set("insertion_code", "BB");
+    frame.add_residue(residue);
+
+    residue = Residue("baz", -2);
+    residue.add_atom(5);
     frame.add_residue(residue);
 
     file.write(frame);
