@@ -183,6 +183,17 @@ inline size_t scan(string_view input, Args& ...args) {
     return iterator.read_count();
 }
 
+/// Encodes an integer using the [hybrid36] encoding scheme. Returns a string
+/// of `*` characters if the integer is out of range.
+///
+/// [hybrid36]: http://cci.lbl.gov/hybrid_36/
+std::string encode_hydrid36(uint64_t width, int64_t value);
+
+/// Decodes an integer using the [hybrid36] encoding scheme.
+///
+/// [hybrid36]: http://cci.lbl.gov/hybrid_36/
+int64_t decode_hybrid36(uint64_t width, string_view input);
+
 }
 
 #endif

@@ -207,3 +207,131 @@ TEST_CASE("scan") {
         "error while reading '4.2 4': can not parse '4.2' as an integer"
     );
 }
+
+void recycle(uint64_t width, int64_t value, const std::string& hybrid) {
+    CHECK(chemfiles::encode_hydrid36(width, value) == hybrid);
+    CHECK(chemfiles::decode_hybrid36(width, hybrid) == value);
+}
+
+TEST_CASE("hyrid encode and decode") {
+    CHECK(chemfiles::decode_hybrid36(4, "    ") == 0);
+    CHECK(chemfiles::decode_hybrid36(4, "  -0") == 0);
+    recycle(4, -999, "-999");
+    recycle(4, -78, "-78");
+    recycle(4, -6, "-6");
+    recycle(4, 0, "0");
+    recycle(4, 9999, "9999");
+    recycle(4, 10000, "A000");
+    recycle(4, 10001, "A001");
+    recycle(4, 10002, "A002");
+    recycle(4, 10003, "A003");
+    recycle(4, 10004, "A004");
+    recycle(4, 10005, "A005");
+    recycle(4, 10006, "A006");
+    recycle(4, 10007, "A007");
+    recycle(4, 10008, "A008");
+    recycle(4, 10009, "A009");
+    recycle(4, 10010, "A00A");
+    recycle(4, 10011, "A00B");
+    recycle(4, 10012, "A00C");
+    recycle(4, 10013, "A00D");
+    recycle(4, 10014, "A00E");
+    recycle(4, 10015, "A00F");
+    recycle(4, 10016, "A00G");
+    recycle(4, 10017, "A00H");
+    recycle(4, 10018, "A00I");
+    recycle(4, 10019, "A00J");
+    recycle(4, 10020, "A00K");
+    recycle(4, 10021, "A00L");
+    recycle(4, 10022, "A00M");
+    recycle(4, 10023, "A00N");
+    recycle(4, 10024, "A00O");
+    recycle(4, 10025, "A00P");
+    recycle(4, 10026, "A00Q");
+    recycle(4, 10027, "A00R");
+    recycle(4, 10028, "A00S");
+    recycle(4, 10029, "A00T");
+    recycle(4, 10030, "A00U");
+    recycle(4, 10031, "A00V");
+    recycle(4, 10032, "A00W");
+    recycle(4, 10033, "A00X");
+    recycle(4, 10034, "A00Y");
+    recycle(4, 10035, "A00Z");
+    recycle(4, 10036, "A010");
+    recycle(4, 10046, "A01A");
+    recycle(4, 10071, "A01Z");
+    recycle(4, 10072, "A020");
+    recycle(4, 10000 + 36 * 36 - 1, "A0ZZ");
+    recycle(4, 10000 + 36 * 36, "A100");
+    recycle(4, 10000 + 36 * 36 * 36 - 1, "AZZZ");
+    recycle(4, 10000 + 36 * 36 * 36, "B000");
+    recycle(4, 10000 + 26 * 36 * 36 * 36 - 1, "ZZZZ");
+    recycle(4, 10000 + 26 * 36 * 36 * 36, "a000");
+    recycle(4, 10000 + 26 * 36 * 36 * 36 + 35, "a00z");
+    recycle(4, 10000 + 26 * 36 * 36 * 36 + 36, "a010");
+    recycle(4, 10000 + 26 * 36 * 36 * 36 + 36 * 36 - 1, "a0zz");
+    recycle(4, 10000 + 26 * 36 * 36 * 36 + 36 * 36, "a100");
+    recycle(4, 10000 + 26 * 36 * 36 * 36 + 36 * 36 * 36 - 1, "azzz");
+    recycle(4, 10000 + 26 * 36 * 36 * 36 + 36 * 36 * 36, "b000");
+    recycle(4, 10000 + 2 * 26 * 36 * 36 * 36 - 1, "zzzz");
+
+    CHECK(chemfiles::decode_hybrid36(5, "    ") == 0);
+    CHECK(chemfiles::decode_hybrid36(5, "  -0") == 0);
+    recycle(5, -9999, "-9999");
+    recycle(5, -123, "-123");
+    recycle(5, -45, "-45");
+    recycle(5, -6, "-6");
+    recycle(5, 0, "0");
+    recycle(5, 12, "12");
+    recycle(5, 345, "345");
+    recycle(5, 6789, "6789");
+    recycle(5, 99999, "99999");
+    recycle(5, 100000, "A0000");
+    recycle(5, 100010, "A000A");
+    recycle(5, 100035, "A000Z");
+    recycle(5, 100036, "A0010");
+    recycle(5, 100046, "A001A");
+    recycle(5, 100071, "A001Z");
+    recycle(5, 100072, "A0020");
+    recycle(5, 100000 + 36 * 36 - 1, "A00ZZ");
+    recycle(5, 100000 + 36 * 36, "A0100");
+    recycle(5, 100000 + 36 * 36 * 36 - 1, "A0ZZZ");
+    recycle(5, 100000 + 36 * 36 * 36, "A1000");
+    recycle(5, 100000 + 36 * 36 * 36 * 36 - 1, "AZZZZ");
+    recycle(5, 100000 + 36 * 36 * 36 * 36, "B0000");
+    recycle(5, 100000 + 2 * 36 * 36 * 36 * 36, "C0000");
+    recycle(5, 100000 + 26 * 36 * 36 * 36 * 36 - 1, "ZZZZZ");
+    recycle(5, 100000 + 26 * 36 * 36 * 36 * 36, "a0000");
+    recycle(5, 100000 + 26 * 36 * 36 * 36 * 36 + 36 - 1, "a000z");
+    recycle(5, 100000 + 26 * 36 * 36 * 36 * 36 + 36, "a0010");
+    recycle(5, 100000 + 26 * 36 * 36 * 36 * 36 + 36 * 36 - 1, "a00zz");
+    recycle(5, 100000 + 26 * 36 * 36 * 36 * 36 + 36 * 36, "a0100");
+    recycle(5, 100000 + 26 * 36 * 36 * 36 * 36 + 36 * 36 * 36 - 1, "a0zzz");
+    recycle(5, 100000 + 26 * 36 * 36 * 36 * 36 + 36 * 36 * 36, "a1000");
+    recycle(5, 100000 + 26 * 36 * 36 * 36 * 36 + 36 * 36 * 36 * 36 - 1, "azzzz");
+    recycle(5, 100000 + 26 * 36 * 36 * 36 * 36 + 36 * 36 * 36 * 36, "b0000");
+    recycle(5, 100000 + 2 * 26 * 36 * 36 * 36 * 36 - 1, "zzzzz");
+
+    CHECK(chemfiles::encode_hydrid36(4, -99999) == "****");
+    CHECK(chemfiles::encode_hydrid36(4, 9999999) == "****");
+
+    CHECK_THROWS_WITH(
+        chemfiles::decode_hybrid36(5, "*0000"),
+        "the value '*0000' is not a valid hybrid 36 number"
+    );
+
+    CHECK_THROWS_WITH(
+        chemfiles::decode_hybrid36(5, "A*000"),
+        "the value 'A*000' is not a valid hybrid 36 number"
+    );
+
+    CHECK_THROWS_WITH(
+        chemfiles::decode_hybrid36(5, "a*000"),
+        "the value 'a*000' is not a valid hybrid 36 number"
+    );
+
+    CHECK_THROWS_WITH(
+        chemfiles::decode_hybrid36(2, "12345"),
+        "the length of '12345' is greater than the width '2', this is a bug in chemfiles"
+    );
+}
