@@ -33,7 +33,7 @@ public:
     /// Create a new residue with a given `name` and residue id `resid`.
     ///
     /// @example{residue/residue-2.cpp}
-    Residue(std::string name, uint64_t resid);
+    Residue(std::string name, int64_t resid);
 
     ~Residue() = default;
     Residue(const Residue&) = default;
@@ -51,7 +51,7 @@ public:
     /// Get the residue identifier, or `nullopt` if it does not exist.
     ///
     /// @example{residue/id.cpp}
-    optional<uint64_t> id() const {
+    optional<int64_t> id() const {
         return id_;
     }
 
@@ -128,7 +128,7 @@ private:
     /// Name of the residue
     std::string name_;
     /// Index of the residue in the initial topology file
-    optional<uint64_t> id_;
+    optional<int64_t> id_;
     /// Indexes of the atoms in this residue. These indexes refers to the
     /// associated topology.
     sorted_set<size_t> atoms_;

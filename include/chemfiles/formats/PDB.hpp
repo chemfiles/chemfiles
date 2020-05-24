@@ -64,7 +64,7 @@ private:
 
     /// This typedef represent the 'full' name of a residue, this means the
     /// chainid, the residue sequence id, and the residue insertion code
-    using residue_info = std::tuple<char, size_t, char>;
+    using residue_info = std::tuple<char, int64_t, char>;
 
     /// Map where the key is the residue_info and the value is a residue object
     std::map<residue_info, Residue> residues_;

@@ -131,10 +131,10 @@ void Topology::add_residue(Residue residue) {
             );
         }
     }
-    auto resid = residues_.size();
+    auto res_index = residues_.size();
     residues_.emplace_back(std::move(residue));
     for (auto i: residues_.back()) {
-        residue_mapping_.insert({i, resid});
+        residue_mapping_.insert({i, res_index});
     }
 }
 

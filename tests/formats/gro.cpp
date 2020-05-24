@@ -251,7 +251,7 @@ TEST_CASE("GRO files with big values") {
             auto frame = Frame();
             for(size_t i=0; i<100001; i++) {
                 frame.add_atom(Atom("A"), {0, 0, 0});
-                Residue residue("ANA", i + 1);
+                Residue residue("ANA", static_cast<int64_t>(i + 1));
                 residue.add_atom(i);
                 frame.add_residue(std::move(residue));
             }

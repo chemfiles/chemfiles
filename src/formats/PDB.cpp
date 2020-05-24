@@ -152,7 +152,7 @@ void PDBFormat::read_next(Frame& frame) {
                 try {
                     auto ter_serial = decode_hybrid36(5, line.substr(6, 5));
                     if (ter_serial != 0) { // this happens if the ter serial number is blank
-                        atom_offsets_.push_back(ter_serial);
+                        atom_offsets_.push_back(static_cast<size_t>(ter_serial));
                     }
                 } catch (const Error&) {
                     warning("PDB reader", "TER record not numeric: {}", line);
@@ -217,8 +217,8 @@ void PDBFormat::read_HELIX(string_view line) {
 
     auto chain1 = line[19];
     auto chain2 = line[31];
-    size_t start = 0;
-    size_t end = 0;
+    int64_t start = 0;
+    int64_t end = 0;
     auto inscode1 = line[25];
     auto inscode2 = line[37];
 
@@ -293,8 +293,8 @@ void PDBFormat::read_secondary(string_view line, size_t i1, size_t i2, string_vi
         return;
     }
 
-    size_t resid1 = 0;
-    size_t resid2 = 0;
+    int64_t resid1 = 0;
+    int64_t resid2 = 0;
     try {
         resid1 = decode_hybrid36(4, line.substr(i1 + 1, 4));
         resid2 = decode_hybrid36(4, line.substr(i2 + 1, 4));
@@ -425,9 +425,8 @@ void PDBFormat::read_CONECT(Frame& frame, string_view line) {
             auto pdb_atom_id = decode_hybrid36(5, line.substr(initial, 5));
             auto lower = std::lower_bound(atom_offsets_.begin(),
                                           atom_offsets_.end(), pdb_atom_id);
-            pdb_atom_id -= static_cast<size_t>(lower - atom_offsets_.begin());
-            pdb_atom_id -= atom_offsets_.front();
-            return pdb_atom_id;
+            pdb_atom_id -= lower - atom_offsets_.begin();
+            return static_cast<size_t>(pdb_atom_id) - atom_offsets_.front();
         } catch (const Error&) {
             throw format_error("could not read atomic number in '{}'", line);
         }
@@ -487,7 +486,7 @@ void PDBFormat::chain_ended(Frame& frame) {
 void PDBFormat::link_standard_residue_bonds(Frame& frame) {
     bool link_previous_peptide = false;
     bool link_previous_nucleic = false;
-    uint64_t previous_residue_id = 0;
+    int64_t previous_residue_id = 0;
     size_t previous_carboxylic_id = 0;
 
     for (const auto& residue: frame.topology().residues()) {
@@ -647,7 +646,7 @@ struct ResidueInformation {
     std::string comp_type { "" };
 };
 
-static ResidueInformation get_residue_strings(optional<const Residue&> residue_opt, uint64_t& max_resid) {
+static ResidueInformation get_residue_strings(optional<const Residue&> residue_opt, int64_t& max_resid) {
 
     ResidueInformation res_info;
 
@@ -672,7 +671,6 @@ static ResidueInformation get_residue_strings(optional<const Residue&> residue_o
     }
 
     if (residue.id()) {
-        auto value = residue.id().value();
         res_info.resid = to_pdb_index(residue.id().value() - 1, 4);
     }
 
@@ -720,9 +718,9 @@ static bool needs_ter_record(const ResidueInformation& residue) {
 // It does so by determining the position of the greatest TER record in `ters`
 // and uses iterator arithmatic to calculate the adjustment. Note that `ters`
 // is expected to be sorted
-static size_t adjust_for_ter_residues(size_t v, const std::vector<size_t>& ters) {
+static int64_t adjust_for_ter_residues(size_t v, const std::vector<size_t>& ters) {
     auto lower = std::lower_bound(ters.begin(), ters.end(), v + 1);
-    auto b0 = v + static_cast<size_t>(lower - ters.begin());
+    auto b0 = static_cast<int64_t>(v) + (lower - ters.begin());
     return b0;
 }
 
@@ -740,10 +738,10 @@ void PDBFormat::write_next(const Frame& frame) {
 
     // Only use numbers bigger than the biggest residue id as "resSeq" for
     // atoms without associated residue.
-    uint64_t max_resid = 0;
+    int64_t max_resid = 0;
     for (const auto& residue: frame.topology().residues()) {
         auto resid = residue.id();
-        if (resid && resid.value() > max_resid && static_cast<int64_t>(resid.value()) > 0 ) {
+        if (resid && resid.value() > max_resid) {
             max_resid = resid.value();
         }
     }
@@ -775,7 +773,7 @@ void PDBFormat::write_next(const Frame& frame) {
 
         if (last_residue && last_residue->chainid != r.chainid && needs_ter_record(*last_residue)) {
             file_.print("TER   {: >5}      {:3} {:1}{: >4s}{:1}\n",
-                to_pdb_index(i + ter_count, 5),
+                to_pdb_index(static_cast<int64_t>(i + ter_count), 5),
                 last_residue->resname, last_residue->chainid, last_residue->resid, last_residue->inscode);
             ter_serial_numbers.push_back(i + ter_count);
             ++ter_count;
@@ -785,7 +783,7 @@ void PDBFormat::write_next(const Frame& frame) {
         check_values_size(pos, 8, "atomic position");
         file_.print(
             "{: <6}{: >5} {: <4s}{:1}{:3} {:1}{: >4s}{:1}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
-            r.atom_hetatm, to_pdb_index(i + ter_count, 5), frame[i].name(), altloc,
+            r.atom_hetatm, to_pdb_index(static_cast<int64_t>(i + ter_count), 5), frame[i].name(), altloc,
             r.resname, r.chainid, r.resid, r.inscode,
             pos[0], pos[1], pos[2], 1.0, 0.0, frame[i].type()
         );
@@ -799,7 +797,7 @@ void PDBFormat::write_next(const Frame& frame) {
 
     }
 
-    auto connect = std::vector<std::vector<size_t>>(frame.size());
+    auto connect = std::vector<std::vector<int64_t>>(frame.size());
     for (auto& bond : frame.topology().bonds()) {
         if (is_atom_record[bond[0]] && is_atom_record[bond[1]]) { // both must be standard residue atoms
             continue;

@@ -74,7 +74,7 @@ TEST_CASE("chfl_residue") {
         CHFL_RESIDUE* residue = chfl_residue_with_id("", 5426);
         REQUIRE(residue);
 
-        uint64_t resid = 0;
+        int64_t resid = 0;
         CHECK_STATUS(chfl_residue_id(residue, &resid));
         CHECK(resid == 5426);
 
@@ -140,7 +140,7 @@ TEST_CASE("chfl_residue") {
 
         const CHFL_RESIDUE* checking_residue = chfl_residue_from_topology(topology, 0);
         REQUIRE(checking_residue);
-        uint64_t resid = 0;
+        int64_t resid = 0;
         CHECK_STATUS(chfl_residue_id(checking_residue, &resid));
         CHECK(resid == 56);
         chfl_free(checking_residue);

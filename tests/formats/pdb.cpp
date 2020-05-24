@@ -474,7 +474,7 @@ TEST_CASE("PDB files with big values") {
         auto frame = Frame();
         for(size_t i=0; i<3; i++) {
             frame.add_atom(Atom("A"), {0, 0, 0});
-            Residue residue("ANA", 2436110 + i);
+            Residue residue("ANA", static_cast<int64_t>(2436110 + i));
             residue.add_atom(i);
             frame.add_residue(std::move(residue));
         }

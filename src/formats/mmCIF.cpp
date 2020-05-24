@@ -323,14 +323,14 @@ void mmCIFFormat::read(Frame& frame) {
         }
 
         auto atom_id = frame.size() - 1;
-        size_t resid = 0;
+        int64_t resid = 0;
         auto resid_text = line_split[label_seq_id->second];
 
         try {
             if (resid_text == ".") { // In this case, we need to use the entity id
-                resid = parse<size_t>(line_split[label_entity_id->second]);
+                resid = parse<int64_t>(line_split[label_entity_id->second]);
             } else {
-                resid = parse<size_t>(line_split[label_seq_id->second]);
+                resid = parse<int64_t>(line_split[label_seq_id->second]);
             }
         } catch (const Error& e) {
             throw format_error("invalid CIF residue or entity numeric: {}", e.what());

@@ -220,7 +220,7 @@ template <> double chemfiles::parse(string_view input) {
 static const auto digits_upper = std::string("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 static const auto digits_lower = std::string("0123456789abcdefghijklmnopqrstuvwxyz");
 
-static uint8_t digit_to_value(char c) {
+static int32_t digit_to_value(char c) {
     if (c >= '0' && c <= '9') {
         return c - '0';
     }
@@ -233,16 +233,16 @@ static uint8_t digit_to_value(char c) {
     return c - 'a' + 10;
 }
 
-static std::string encode_pure(const std::string& digits, uint64_t value) {
+static std::string encode_pure(const std::string& digits, int64_t value) {
     if (value == 0) {
         return std::string(digits, 1);
     }
     
-    auto n = digits.length();
+    auto n = static_cast<int32_t>(digits.length());
     std::string result;
     while (value != 0) {
         auto rest = value / n;
-        result += digits[value - rest * n];
+        result += digits[static_cast<size_t>(value - rest * n)];
         value = rest;
     }
 
@@ -250,9 +250,9 @@ static std::string encode_pure(const std::string& digits, uint64_t value) {
     return result;
 }
 
-static uint64_t decode_pure(string_view s) {
-    uint64_t result = 0;
-    auto n = digits_upper.length();
+static int64_t decode_pure(string_view s) {
+    int64_t result = 0;
+    auto n = static_cast<int64_t>(digits_upper.length());
     for (auto c : s) {
         result *= n;
         result += digit_to_value(c);

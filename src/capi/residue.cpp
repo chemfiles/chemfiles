@@ -31,7 +31,7 @@ error:
     return nullptr;
 }
 
-extern "C" CHFL_RESIDUE* chfl_residue_with_id(const char* name, uint64_t resid) {
+extern "C" CHFL_RESIDUE* chfl_residue_with_id(const char* name, int64_t resid) {
     CHFL_RESIDUE* residue = nullptr;
     CHECK_POINTER_GOTO(name);
     CHFL_ERROR_GOTO(
@@ -106,7 +106,7 @@ extern "C" chfl_status chfl_residue_atoms(const CHFL_RESIDUE* const residue, uin
     )
 }
 
-extern "C" chfl_status chfl_residue_id(const CHFL_RESIDUE* const residue, uint64_t* id) {
+extern "C" chfl_status chfl_residue_id(const CHFL_RESIDUE* const residue, int64_t* id) {
     CHECK_POINTER(residue);
     CHECK_POINTER(id);
     CHFL_ERROR_CATCH(

@@ -64,9 +64,9 @@ void GROFormat::read_next(Frame& frame) {
             );
         }
 
-        size_t resid = SIZE_MAX;
+        int64_t resid = std::numeric_limits<int64_t>::max();
         try {
-            resid = parse<size_t>(line.substr(0, 5));
+            resid = parse<int64_t>(line.substr(0, 5));
         } catch (const Error&) {
             // Invalid residue, we'll skip it
         }
@@ -87,7 +87,7 @@ void GROFormat::read_next(Frame& frame) {
         }
         frame.add_atom(Atom(name), {x, y, z}, {vx, vy, vz});
 
-        if (resid != SIZE_MAX) {
+        if (resid != std::numeric_limits<int64_t>::max()) {
             if (residues_.find(resid) == residues_.end()) {
                 Residue residue(resname, resid);
                 residue.add_atom(frame.size() - 1);
@@ -159,7 +159,7 @@ void GROFormat::write_next(const Frame& frame) {
     // Only use numbers bigger than the biggest residue id as "resSeq" for
     // atoms without associated residue, and start generated residue id at
     // 1
-    uint64_t max_resid = 1;
+    int64_t max_resid = 1;
     for (const auto& residue: frame.topology().residues()) {
         auto resid = residue.id();
         if (resid && resid.value() > max_resid) {
@@ -185,7 +185,7 @@ void GROFormat::write_next(const Frame& frame) {
 
         if (residue && residue->id()) {
             auto value = residue->id().value();
-            if (value <= 99999) {
+            if (value <= 99999 && value >= 0) {
                 resid = std::to_string(value);
             } else {
                 warning("GRO writer", "too many residues, removing residue id");
