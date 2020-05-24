@@ -329,7 +329,7 @@ TEST_CASE("Problematic PDB files") {
         REQUIRE(file.nsteps() == 156);
     }
 }
-
+#include <iostream>
 TEST_CASE("Write files in PDB format") {
     auto tmpfile = NamedTempPath(".pdb");
     const auto EXPECTED_CONTENT =
@@ -442,13 +442,18 @@ TEST_CASE("PDB files with big values") {
         auto tmpfile = NamedTempPath(".pdb");
 
         auto frame = Frame();
-        for(size_t i=0; i<10001; i++) {
+        for(size_t i=0; i<100; i++) {
             frame.add_atom(Atom("A"), {0, 0, 0});
         }
+
+        Residue residue("XXX", 2436110);
+        residue.add_atom(0);
+        frame.add_residue(residue);
+
         auto positions = frame.positions();
-        positions[998] = Vector3D(1., 2., 3.);
-        positions[9998] = Vector3D(4., 5., 6.);
-        positions[9999] = Vector3D(7., 8., 9.);
+        positions[97] = Vector3D(1., 2., 3.);
+        positions[98] = Vector3D(4., 5., 6.);
+        positions[99] = Vector3D(7., 8., 9.);
 
         Trajectory(tmpfile, 'w').write(frame);
 
@@ -458,25 +463,25 @@ TEST_CASE("PDB files with big values") {
 
         // If resSeq is has more than 4 characters, coordinates won't be read
         // correctly
-        CHECK(positions[998] == Vector3D(1., 2., 3.));
-        CHECK(positions[9998] == Vector3D(4., 5., 6.));
-        CHECK(positions[9999] == Vector3D(7., 8., 9.));
+        CHECK(positions[97] == Vector3D(1., 2., 3.));
+        CHECK(positions[98] == Vector3D(4., 5., 6.));
+        CHECK(positions[99] == Vector3D(7., 8., 9.));
     }
 
     SECTION("User specified residues") {
         auto tmpfile = NamedTempPath(".pdb");
 
         auto frame = Frame();
-        for(size_t i=0; i<10001; i++) {
+        for(size_t i=0; i<3; i++) {
             frame.add_atom(Atom("A"), {0, 0, 0});
-            Residue residue("ANA", i + 1);
+            Residue residue("ANA", 2436110 + i);
             residue.add_atom(i);
             frame.add_residue(std::move(residue));
         }
         auto positions = frame.positions();
-        positions[998] = Vector3D(1., 2., 3.);
-        positions[9998] = Vector3D(4., 5., 6.);
-        positions[9999] = Vector3D(7., 8., 9.);
+        positions[0] = Vector3D(1., 2., 3.);
+        positions[1] = Vector3D(4., 5., 6.);
+        positions[2] = Vector3D(7., 8., 9.);
 
         Trajectory(tmpfile, 'w').write(frame);
 
@@ -486,27 +491,42 @@ TEST_CASE("PDB files with big values") {
 
         // If resSeq is has more than 4 characters, coordinates won't be read
         // correctly
-        CHECK(positions[998] == Vector3D(1., 2., 3.));
-        CHECK(positions[9998] == Vector3D(4., 5., 6.));
-        CHECK(positions[9999] == Vector3D(7., 8., 9.));
+        CHECK(positions[0] == Vector3D(1., 2., 3.));
+        CHECK(positions[1] == Vector3D(4., 5., 6.));
+        CHECK(positions[2] == Vector3D(7., 8., 9.));
+
+        auto residue1 = frame.topology().residue_for_atom(0);
+        CHECK(*(residue1->id()) == 2436110);
+
+        auto residue2 = frame.topology().residue_for_atom(1);
+        CHECK(*(residue2->id()) == 2436111);
+
+        auto residue3 = frame.topology().residue_for_atom(2);
+        CHECK(residue3 == nullopt);
     }
+    
+    /*
+
+    This test is too expensive with the limits of hybrid36...
 
     SECTION("CONNECT with too many atoms") {
         if (!is_valgrind_and_travis()) {
             auto tmpfile = NamedTempPath(".pdb");
 
             auto frame = Frame();
-            for(size_t i=0; i<110000; i++) {
+            frame.reserve(87440031 + 10);
+            for(size_t i=0; i< 87440031 + 10; i++) {
                 frame.add_atom(Atom("A"), {0.0, 0.0, 0.0});
             }
-            frame.add_bond(101000, 101008);
+
+            frame.add_bond(87440035, 87440037);
             Trajectory(tmpfile, 'w').write(frame);
 
             // Re-read the file we just wrote
             frame = Trajectory(tmpfile, 'r').read();
             CHECK(frame.topology().bonds().empty());
         }
-    }
+    }*/
 }
 
 TEST_CASE("Read and write files in memory") {
