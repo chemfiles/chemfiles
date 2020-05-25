@@ -37,7 +37,6 @@ if(${COMPILER_SUPPORTS_C99})
 endif()
 
 if(MSVC)
-    add_definitions("/D NOMINMAX")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
     set(CMAKE_SHARED_LINKER_FLAGS "/SUBSYSTEM:CONSOLE")
 endif()

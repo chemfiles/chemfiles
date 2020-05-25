@@ -77,14 +77,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CHEMFILES_SANITIZERS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CHEMFILES_SANITIZERS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CHEMFILES_SANITIZERS}")
 
-if(WIN32)
-    add_definitions("-DCHEMFILES_WINDOWS")
-endif()
-
-if(MSVC)
-    add_definitions("-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS")
-endif()
-
 add_subdirectory(external)
 
 # We need to use a separated library for non-dll-exported classes that have an
@@ -121,6 +113,11 @@ target_compile_definitions(chemfiles_objects PRIVATE -D_FILE_OFFSET_BITS=64)
 # Required for zlib 64-bit support:
 target_compile_definitions(chemfiles_objects PRIVATE -D_LARGEFILE64_SOURCE=1)
 target_compile_definitions(chemfiles_objects PRIVATE -D_LFS64_LARGEFILE=1)
+
+if(MSVC)
+    target_compile_definitions(chemfiles_objects PRIVATE -D_CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(chemfiles_objects PRIVATE -D_SCL_SECURE_NO_WARNINGS)
+endif()
 
 target_use_clang_tidy(chemfiles_objects)
 target_use_include_what_you_use(chemfiles_objects)
@@ -163,6 +160,10 @@ target_link_libraries(chemfiles
 )
 if(WIN32)
     target_link_libraries(chemfiles ws2_32)
+endif()
+
+if(WIN32)
+    set(CHEMFILES_WINDOWS ON)
 endif()
 
 configure_file (
