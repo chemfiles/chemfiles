@@ -6,6 +6,7 @@
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/exports.h"
+#include "chemfiles/config.h"
 
 #ifdef CHEMFILES_WINDOWS
 #undef INFINITE

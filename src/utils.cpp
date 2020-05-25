@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "chemfiles/config.h"
 #include "chemfiles/utils.hpp"
 
 #ifdef CHEMFILES_WINDOWS

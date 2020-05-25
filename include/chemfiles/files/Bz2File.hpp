@@ -10,9 +10,17 @@
 #include <vector>
 #include <functional>
 
-#include <bzlib.h>
-
+#include "chemfiles/config.h"
 #include "chemfiles/File.hpp"
+
+// bzlib.h includes windows.h on Windows platforms, which defines `min` and
+// `max` symbols, failing compilation below.
+#ifdef CHEMFILES_WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#endif
+
+#include <bzlib.h>
 
 namespace chemfiles {
 

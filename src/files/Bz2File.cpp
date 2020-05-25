@@ -10,11 +10,11 @@
 #include <vector>
 #include <functional>
 
-#include <bzlib.h>
-
 #include "chemfiles/File.hpp"
 #include "chemfiles/files/Bz2File.hpp"
 #include "chemfiles/error_fmt.hpp"
+
+#include <bzlib.h>
 
 using namespace chemfiles;
 

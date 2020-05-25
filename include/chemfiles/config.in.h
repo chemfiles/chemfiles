@@ -14,6 +14,9 @@
 /// The full version of chemfiles ("x.y.z"), as a string
 #define CHEMFILES_VERSION "@CHEMFILES_VERSION@"
 
+/// Are we building code on Windows?
+#cmakedefine CHEMFILES_WINDOWS
+
 /// thread_local implementation
 #ifdef __cplusplus
     #if @CHFL_HAS_THREAD_LOCAL@
