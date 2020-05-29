@@ -336,12 +336,11 @@ void MMTFFormat::apply_symmetry(Frame& frame) {
     const auto original_size = frame.size();
     const auto original_bond_size = frame.topology().bonds().size();
 
-    size_t symm_count = 0;
-
     using bond_w_order = std::pair<Bond, Bond::BondOrder>;
     std::vector<bond_w_order> bonds_to_add;
 
     for (const auto& assembly : structure_.bioAssemblyList) {
+
         for (const auto& transform : assembly.transformList) {
 
             std::unordered_set<double> chains_to_transform;

@@ -153,7 +153,7 @@ TEST_CASE("Read files in MMTF format") {
         auto frame3= file.read();
     }
 
-    SECTION("Alternative locations") {
+    SECTION("Alternative locations and symmetry operations") {
         auto file = Trajectory("data/mmtf/5A1I.mmtf");
 
         auto frame = file.read();
@@ -174,17 +174,12 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(edo.name() == "EDO");
         REQUIRE(frame[*edo.begin()].get("altloc"));
         CHECK(frame[*edo.begin()].get("altloc")->as_string() == "B");
-    }
 
-    SECTION("Check symmetry") {
-    #ifndef CHEMFILES_WINDOWS
-        if (!is_valgrind_and_travis()) {
-            auto file = Trajectory("data/mmtf/5IRE.mmtf");
+        // Check to ensure that the symmetry operations are applied
+        CHECK(frame.size() == 15912);
 
-            auto frame = file.read();
-            CHECK(frame.size() == 661440);
-        }
-    #endif
+        const auto& last_residue = residues[residues.size() - 1];
+        CHECK(last_residue.get("chainindex")->as_double() == -1.0);
     }
 
     SECTION("GZ Files") {
