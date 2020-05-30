@@ -183,7 +183,7 @@ template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
     }
     molfile_to_frame(timestep, frame);
 
-    frames_.emplace_back(std::move(frame.clone()));
+    frames_.emplace_back(frame.clone());
 }
 
 template <MolfileFormat F> void Molfile<F>::read_step(size_t step, Frame& frame) {
