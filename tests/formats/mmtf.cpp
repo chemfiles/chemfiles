@@ -153,7 +153,7 @@ TEST_CASE("Read files in MMTF format") {
         auto frame3= file.read();
     }
 
-    SECTION("Alternative locations") {
+    SECTION("Alternative locations and symmetry operations") {
         auto file = Trajectory("data/mmtf/5A1I.mmtf");
 
         auto frame = file.read();
@@ -174,6 +174,12 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(edo.name() == "EDO");
         REQUIRE(frame[*edo.begin()].get("altloc"));
         CHECK(frame[*edo.begin()].get("altloc")->as_string() == "B");
+
+        // Check to ensure that the symmetry operations are applied
+        CHECK(frame.size() == 15912);
+
+        const auto& last_residue = residues[residues.size() - 1];
+        CHECK(last_residue.get("chainindex")->as_double() == -1.0);
     }
 
     SECTION("GZ Files") {
@@ -232,12 +238,14 @@ TEST_CASE("Write files in MMTF format") {
         auto file_r2 = Trajectory(tmpfile);
         Frame frame2 = file_r2.read();
 
-        CHECK(frame.size() == 4779);
+        CHECK(frame2.size() == 4779);
 
-        auto positions = frame.positions();
+        auto positions = frame2.positions();
         CHECK(approx_eq(positions[0], Vector3D(6.204, 16.869, 4.854), 1e-3));
         CHECK(approx_eq(positions[296], Vector3D(10.167, -7.889, -16.138 ), 1e-3));
         CHECK(approx_eq(positions[4778], Vector3D(-1.263, -2.837, -21.251 ), 1e-3));
+
+        CHECK(frame2.cell() == frame.cell());
     }
 
     SECTION("Multiple models") {
@@ -249,7 +257,11 @@ TEST_CASE("Write files in MMTF format") {
         file.write(file_r.read());
         file.write(file_r.read());
         file.write(file_r.read());
-        file.write(file_r.read());
+
+        auto frame_mod = file_r.read();
+        frame_mod.set_cell(UnitCell(10., 10., 10.));
+        file.write(frame_mod);
+
         file.close();
 
         auto file_r2 = Trajectory(tmpfile);

@@ -42,6 +42,24 @@ private:
     /// Perform the MMTF decoding steps
     void decode(const char* data, size_t size, const std::string& source);
 
+    /// Add a model to a frame, increasing all the private indicies below
+    void read_model(Frame& frame);
+
+    /// Get the assembly that the current chain is a member of
+    std::string find_assembly();
+
+    /// Called by read_model to create new residues. Uses/updates groupIndex_
+    Residue create_residue(const std::string& current_assembly, size_t group_type);
+
+    /// Read a group from the MMTF structure, adding atoms and a residue to frame
+    void read_group(Frame& frame, size_t group_type, Residue& residue, span<Vector3D> positions);
+
+    /// Add inter residue bonds to the structure.
+    void add_inter_residue_bonds(Frame& frame);
+
+    /// Apply symmetry operations to the frame
+    void apply_symmetry(Frame& frame);
+
     /// add a single residue to the structure_, using the data from the frame
     void add_residue_to_structure(const Frame& frame, const Residue& residue);
 
@@ -69,6 +87,9 @@ private:
     /// Current atom being read. Ranges from [0, structure.numAtoms)
     size_t atomIndex_ = 0;
 
+    /// Location of the inter-residue bonds being read. 
+    size_t interBondIndex_ = 0;
+
     /// Number of atoms before the current model.
     size_t atomSkip_ = 0;
 
@@ -80,6 +101,9 @@ private:
     //
     // This is only used when writing
     std::vector<int32_t> new_atom_indexes_;
+
+    /// Have we written the unitcell data?
+    UnitCell unitcellForWrite_;
 };
 
 template<> FormatInfo format_information<MMTFFormat>();

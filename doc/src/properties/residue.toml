@@ -54,7 +54,8 @@ the crystal structure."""
 type = "number"
 
 MMTF = """The **chainindex** is a numeric representation of the **chainindex**
-and it may be removed in a future release."""
+and it may be removed in a future release. It will be negative if the residue
+is created through a symmetry operation."""
 
 [composition_type]
 type = "string"
