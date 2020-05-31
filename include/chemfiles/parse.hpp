@@ -194,6 +194,12 @@ std::string encode_hydrid36(uint64_t width, int64_t value);
 /// [hybrid36]: http://cci.lbl.gov/hybrid_36/
 int64_t decode_hybrid36(uint64_t width, string_view input);
 
+/// Maximum value for a width 4 number
+constexpr auto MAX_HYBRID36_W4_NUMBER = 2436111;
+
+/// Maximum value for a width 5 number
+constexpr auto MAX_HYBRID36_W5_NUMBER = 87440031;
+
 }
 
 #endif

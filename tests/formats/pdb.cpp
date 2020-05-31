@@ -329,7 +329,7 @@ TEST_CASE("Problematic PDB files") {
         REQUIRE(file.nsteps() == 156);
     }
 }
-#include <iostream>
+
 TEST_CASE("Write files in PDB format") {
     auto tmpfile = NamedTempPath(".pdb");
     const auto EXPECTED_CONTENT =
@@ -504,29 +504,6 @@ TEST_CASE("PDB files with big values") {
         auto residue3 = frame.topology().residue_for_atom(2);
         CHECK(residue3 == nullopt);
     }
-    
-    /*
-
-    This test is too expensive with the limits of hybrid36...
-
-    SECTION("CONNECT with too many atoms") {
-        if (!is_valgrind_and_travis()) {
-            auto tmpfile = NamedTempPath(".pdb");
-
-            auto frame = Frame();
-            frame.reserve(87440031 + 10);
-            for(size_t i=0; i< 87440031 + 10; i++) {
-                frame.add_atom(Atom("A"), {0.0, 0.0, 0.0});
-            }
-
-            frame.add_bond(87440035, 87440037);
-            Trajectory(tmpfile, 'w').write(frame);
-
-            // Re-read the file we just wrote
-            frame = Trajectory(tmpfile, 'r').read();
-            CHECK(frame.topology().bonds().empty());
-        }
-    }*/
 }
 
 TEST_CASE("Read and write files in memory") {

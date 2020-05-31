@@ -13,6 +13,10 @@ using namespace chemfiles;
 
 static bool is_digit(char c) { return '0' <= c && c <= '9'; }
 
+static bool is_ascii_upper(char c) { return 'A' <= c && c <= 'Z'; }
+
+static bool is_ascii_lower(char c) { return 'a' <= c && c <= 'z'; }
+
 template <> int64_t chemfiles::parse(string_view input) {
     if (input.empty()) {
         throw error("can not parse an integer from an empty string");
@@ -260,6 +264,8 @@ static int64_t decode_pure(string_view s) {
     return result;
 }
 
+/// Evaluates base^(power) and casts the result to int64_t while addressing
+/// issues where the result maybe rounded down due to floating point errors
 static int64_t pow_int(uint64_t base, uint64_t power) {
     return static_cast<int64_t>(std::pow(base, power) + 0.5);
 }
@@ -304,7 +310,7 @@ int64_t chemfiles::decode_hybrid36(uint64_t width, string_view s) {
     }
 
     auto f = s[0];
-    if (f == '-' || f == ' ' || std::isdigit(f)) {
+    if (f == '-' || f == ' ' || is_digit(f)) {
         // Negative number, these are not encoded
         return parse<int64_t>(s);
     }
@@ -316,7 +322,7 @@ int64_t chemfiles::decode_hybrid36(uint64_t width, string_view s) {
 
     if (digits_upper.find(f) != std::string::npos) {
         auto is_valid = std::all_of(s.begin(), s.end(), [](unsigned char c) {
-            return std::isdigit(c) || std::isupper(c);
+            return is_digit(c) || is_ascii_upper(c);
         });
 
         if (!is_valid) {
@@ -328,7 +334,7 @@ int64_t chemfiles::decode_hybrid36(uint64_t width, string_view s) {
 
     if (digits_lower.find(f) != std::string::npos) {
         auto is_valid = std::all_of(s.begin(), s.end(), [](unsigned char c) {
-            return std::isdigit(c) || std::islower(c);
+            return is_digit(c) || is_ascii_lower(c);
          });
 
         if (!is_valid) {

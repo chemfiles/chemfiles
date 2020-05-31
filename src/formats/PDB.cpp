@@ -628,13 +628,16 @@ Record get_record(string_view line) {
 }
 
 static std::string to_pdb_index(int64_t value, uint64_t width) {
-    if (value == 10000 + 2 * 26 * static_cast<int64_t>(std::pow(36, width - 1) + 0.5)) {
+    auto encoded = encode_hydrid36(width, value + 1);
+
+    if (encoded[0] == '*' && (value == MAX_HYBRID36_W4_NUMBER || value == MAX_HYBRID36_W5_NUMBER)) {
         auto type = width == 5 ?
             "atom" : "residue";
-        warning("PDB writer", "the value for a {} serial/id is too large, using '*' instead", type);
+
+        warning("PDB writer", "the value for a {} serial/id is too large, using '{}' instead", type, encoded);
     }
 
-    return encode_hydrid36(width, value + 1);
+    return encoded;
 }
 
 struct ResidueInformation {
