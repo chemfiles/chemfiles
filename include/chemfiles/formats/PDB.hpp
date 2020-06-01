@@ -79,7 +79,11 @@ private:
     /// Store secondary structure information. Each item is a tuple, containing
     /// the starting and ending residue_info of the seconary structure and a
     /// string which is an written description of the secondary structure
-    std::vector<std::tuple<residue_info, residue_info, std::string>> secinfo_;
+    std::map<residue_info, std::pair<residue_info, std::string>> secinfo_;
+    /// This will be nullopt when no secondary structure informatio should be
+    /// read. It is set to the final residue of a secondary structure and the
+    /// text description which should be set.
+    optional<std::pair<residue_info, std::string>> current_secinfo_;
 };
 
 template<> FormatInfo format_information<PDBFormat>();
