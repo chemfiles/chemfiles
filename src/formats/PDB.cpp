@@ -235,12 +235,6 @@ void PDBFormat::read_HELIX(string_view line) {
         return;
     }
 
-    // Fix 1HTQ
-    if (start > end) {
-        warning("PDB reader", "HELIX starting residue {} is greater than ending id {}", start, end);
-        return;
-    }
-
     // Convert the code as a character to its numeric meaning.
     // See http://www.wwpdb.org/documentation/file-format-content/format23/sect5.html
     // for definitions of these numbers
@@ -258,21 +252,21 @@ void PDBFormat::read_HELIX(string_view line) {
     switch (helix_type) {
     case 1: // Treat right and left handed helixes the same.
     case 6:
-        secinfo_.emplace_back(std::make_tuple(start_info, end_info, "alpha helix"));
+        secinfo_.insert({ start_info, std::make_pair(end_info, "alpha helix") });
         break;
     case 2:
     case 7:
-        secinfo_.emplace_back(std::make_tuple(start_info, end_info, "omega helix"));
+        secinfo_.insert({ start_info, std::make_pair(end_info, "omega helix") });
         break;
     case 3:
-        secinfo_.emplace_back(std::make_tuple(start_info, end_info, "pi helix"));
+        secinfo_.insert({ start_info, std::make_pair(end_info, "pi helix") });
         break;
     case 4:
     case 8:
-        secinfo_.emplace_back(std::make_tuple(start_info, end_info, "gamma helix"));
+        secinfo_.insert({ start_info, std::make_pair(end_info, "gamma helix") });
         break;
     case 5:
-        secinfo_.emplace_back(std::make_tuple(start_info, end_info, "3-10 helix"));
+        secinfo_.insert({ start_info, std::make_pair(end_info, "3-10 helix") });
         break;
     default:
         break;
@@ -306,18 +300,13 @@ void PDBFormat::read_secondary(string_view line, size_t i1, size_t i2, string_vi
         return;
     }
 
-    if (resid1 >= resid2) {
-        warning("PDB reader", "SHEET starting residue {} is greater than ending id {}", resid1, resid2);
-        return;
-    }
-
     auto inscode1 = line[i1 + 5];
     auto inscode2 = line[i2 + 5];
 
     auto start = std::make_tuple(chain1, resid1, inscode1);
     auto end = std::make_tuple(chain2, resid2, inscode2);
 
-    secinfo_.emplace_back(std::make_tuple(start, end, "extended"));
+    secinfo_.insert({ start, std::make_pair(end, "extended") });
 }
 
 void PDBFormat::read_ATOM(Frame& frame, string_view line,
@@ -394,7 +383,25 @@ void PDBFormat::read_ATOM(Frame& frame, string_view line,
             residue.set("chainid", line.substr(21, 1).to_string());
             // PDB format makes no distinction between chainid and chainname
             residue.set("chainname", line.substr(21, 1).to_string());
-            residues_.insert({complete_residue_id, residue});
+
+            // Are we withing a secondary information sequence?
+            if (current_secinfo_) {
+                residue.set("secondary_structure", current_secinfo_->second);
+
+                // Are we the end of a secondary information sequence?
+                if (current_secinfo_->first == complete_residue_id) {
+                    current_secinfo_ = nullopt;
+                }
+            }
+
+            // Are we the start of a secondary information sequence?
+            auto secinfo_for_residue = secinfo_.find(complete_residue_id);
+            if (secinfo_for_residue != secinfo_.end()) {
+                current_secinfo_ = secinfo_for_residue->second;
+                residue.set("secondary_structure", secinfo_for_residue->second.second);
+            }
+
+            residues_.insert({ complete_residue_id, residue });
         } else {
             // Just add this atom to the residue
             residues_.at(complete_residue_id).add_atom(atom_id);
@@ -464,14 +471,6 @@ void PDBFormat::read_CONECT(Frame& frame, string_view line) {
 }
 
 void PDBFormat::chain_ended(Frame& frame) {
-    for (const auto& secinfo: secinfo_) {
-        auto start = residues_.lower_bound(std::get<0>(secinfo));
-        auto end = residues_.upper_bound(std::get<1>(secinfo));
-        for (auto residue = start; residue != end; ++residue) {
-            residue->second.set("secondary_structure", std::get<2>(secinfo));
-        }
-    }
-
     for (const auto& residue: residues_) {
         frame.add_residue(residue.second);
     }
