@@ -394,7 +394,7 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
             if (residue_iter != residues.end()) {
                 residue_iter->second.add_atom(data.index);
             } else {
-                auto residue = Residue("", data.molid);
+                auto residue = Residue("", static_cast<int64_t>(data.molid));
                 residue.add_atom(data.index);
                 residues.emplace(data.molid, std::move(residue));
             }

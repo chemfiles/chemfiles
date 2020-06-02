@@ -150,7 +150,10 @@ void PDBFormat::read_next(Frame& frame) {
         case Record::TER:
             if (line.size() >= 12) {
                 try {
-                    atom_offsets_.push_back(parse<size_t>(line.substr(6, 5)));
+                    auto ter_serial = decode_hybrid36(5, line.substr(6, 5));
+                    if (ter_serial != 0) { // this happens if the ter serial number is blank
+                        atom_offsets_.push_back(static_cast<size_t>(ter_serial));
+                    }
                 } catch (const Error&) {
                     warning("PDB reader", "TER record not numeric: {}", line);
                 }
@@ -214,14 +217,14 @@ void PDBFormat::read_HELIX(string_view line) {
 
     auto chain1 = line[19];
     auto chain2 = line[31];
-    size_t start = 0;
-    size_t end = 0;
+    int64_t start = 0;
+    int64_t end = 0;
     auto inscode1 = line[25];
     auto inscode2 = line[37];
 
     try {
-        start = parse<size_t>(line.substr(21, 4));
-        end = parse<size_t>(line.substr(33, 4));
+        start = decode_hybrid36(4, line.substr(21, 4));
+        end = decode_hybrid36(4, line.substr(33, 4));
     } catch (const Error&) {
         warning("PDB reader", "HELIX record contains invalid numbers: '{}'", line);
         return;
@@ -290,11 +293,11 @@ void PDBFormat::read_secondary(string_view line, size_t i1, size_t i2, string_vi
         return;
     }
 
-    size_t resid1 = 0;
-    size_t resid2 = 0;
+    int64_t resid1 = 0;
+    int64_t resid2 = 0;
     try {
-        resid1 = parse<size_t>(line.substr(i1 + 1, 4));
-        resid2 = parse<size_t>(line.substr(i2 + 1, 4));
+        resid1 = decode_hybrid36(4, line.substr(i1 + 1, 4));
+        resid2 = decode_hybrid36(4, line.substr(i2 + 1, 4));
     } catch (const Error&) {
         warning("PDB reader",
             "error parsing line: '{}', check {} and {}",
@@ -329,8 +332,8 @@ void PDBFormat::read_ATOM(Frame& frame, string_view line,
 
     if (atom_offsets_.empty()) {
         try {
-            auto initial_offset = parse<long long>(line.substr(6, 5));
-            // We need to handle negative numbers ourselves: https://ideone.com/RdINqa
+            auto initial_offset = decode_hybrid36(5, line.substr(6, 5));
+
             if (initial_offset <= 0) {
                 warning("PDB reader", "{} is too small, assuming id is '1'", initial_offset);
                 atom_offsets_.push_back(0);
@@ -372,7 +375,7 @@ void PDBFormat::read_ATOM(Frame& frame, string_view line,
     auto atom_id = frame.size() - 1;
     auto insertion_code = line[26];
     try {
-        auto resid = parse<size_t>(line.substr(22, 4));
+        auto resid = decode_hybrid36(4, line.substr(22, 4));
         auto chain = line[21];
         auto complete_residue_id = std::make_tuple(chain,resid,insertion_code);
         if (residues_.find(complete_residue_id) == residues_.end()) {
@@ -419,12 +422,11 @@ void PDBFormat::read_CONECT(Frame& frame, string_view line) {
 
     auto read_index = [&line,this](size_t initial) -> size_t {
         try {
-            auto pdb_atom_id = parse<size_t>(line.substr(initial, 5));
+            auto pdb_atom_id = decode_hybrid36(5, line.substr(initial, 5));
             auto lower = std::lower_bound(atom_offsets_.begin(),
                                           atom_offsets_.end(), pdb_atom_id);
-            pdb_atom_id -= static_cast<size_t>(lower - atom_offsets_.begin());
-            pdb_atom_id -= atom_offsets_.front();
-            return pdb_atom_id;
+            pdb_atom_id -= lower - atom_offsets_.begin();
+            return static_cast<size_t>(pdb_atom_id) - atom_offsets_.front();
         } catch (const Error&) {
             throw format_error("could not read atomic number in '{}'", line);
         }
@@ -484,7 +486,7 @@ void PDBFormat::chain_ended(Frame& frame) {
 void PDBFormat::link_standard_residue_bonds(Frame& frame) {
     bool link_previous_peptide = false;
     bool link_previous_nucleic = false;
-    uint64_t previous_residue_id = 0;
+    int64_t previous_residue_id = 0;
     size_t previous_carboxylic_id = 0;
 
     for (const auto& residue: frame.topology().residues()) {
@@ -625,18 +627,104 @@ Record get_record(string_view line) {
     }
 }
 
-static std::string to_pdb_index(uint64_t i) {
-    auto id = i + 1;
+static std::string to_pdb_index(int64_t value, uint64_t width) {
+    auto encoded = encode_hydrid36(width, value + 1);
 
-    if (id > 99999) {
-        if (id == 99999) {
-            // Only warn once for this
-            warning("PDB writer", "too many atoms, removing atomic id bigger than 100000");
-        }
-        return "*****";
-    } else {
-        return std::to_string(i + 1);
+    if (encoded[0] == '*' && (value == MAX_HYBRID36_W4_NUMBER || value == MAX_HYBRID36_W5_NUMBER)) {
+        auto type = width == 5 ?
+            "atom" : "residue";
+
+        warning("PDB writer", "the value for a {} serial/id is too large, using '{}' instead", type, encoded);
     }
+
+    return encoded;
+}
+
+struct ResidueInformation {
+    std::string atom_hetatm{ "HETATM" };
+    std::string resname { "XXX" };
+    std::string resid { "  -1" };
+    std::string chainid { "X" };
+    std::string inscode { " " };
+    std::string comp_type { "" };
+};
+
+static ResidueInformation get_residue_strings(optional<const Residue&> residue_opt, int64_t& max_resid) {
+
+    ResidueInformation res_info;
+
+    if (!residue_opt) {
+        auto value = max_resid++;
+        res_info.resid = to_pdb_index(value, 4);
+
+        return res_info;
+    }
+
+    auto residue = *residue_opt;
+
+    res_info.resname = residue.name();
+    if (residue.get<Property::BOOL>("is_standard_pdb").value_or(false)) {
+        // only use ATOM if the residue is standardized
+        res_info.atom_hetatm = "ATOM  ";
+    }
+
+    if (res_info.resname.length() > 3) {
+        warning("PDB writer", "residue '{}' name is too long, it will be truncated", res_info.resname);
+        res_info.resname = res_info.resname.substr(0, 3);
+    }
+
+    if (residue.id()) {
+        res_info.resid = to_pdb_index(residue.id().value() - 1, 4);
+    }
+
+    if (residue.get("chainid") &&
+        residue.get("chainid")->kind() == Property::STRING) {
+        res_info.chainid = residue.get("chainid")->as_string();
+
+        if (res_info.chainid.length() > 1) {
+            warning("PDB writer",
+                "residue '{}' chain id is too long, it will be truncated",
+                res_info.chainid
+            );
+            res_info.chainid = res_info.chainid[0];
+        }
+    }
+
+    if (residue.get("insertion_code") &&
+        residue.get("insertion_code")->kind() == Property::STRING) {
+        res_info.inscode = residue.get("insertion_code")->as_string();
+        if (res_info.inscode.length() > 1) {
+            warning("PDB writer",
+                "residue '{}' insertion code is too long, it will be truncated",
+                res_info.inscode
+            );
+            res_info.inscode = res_info.inscode[0];
+        }
+    }
+
+    res_info.comp_type = residue.get<Property::STRING>("composition_type").value_or("");
+
+    return res_info;
+}
+
+static bool needs_ter_record(const ResidueInformation& residue) {
+    if (residue.comp_type.empty() ||
+        residue.comp_type == "other" || residue.comp_type == "OTHER" ||
+        residue.comp_type == "non-polymer" || residue.comp_type == "NON-POLYMER") {
+        return false;
+    }
+
+    return true;
+}
+
+// This function adjusts a given index to account for intervening TER records.
+// It does so by determining the position of the greatest TER record in `ters`
+// and uses iterator arithmatic to calculate the adjustment. Note that `ters`
+// is expected to be sorted
+static int64_t adjust_for_ter_residues(size_t v, const std::vector<size_t>& ters) {
+    auto lower = std::lower_bound(ters.begin(), ters.end(), v + 1);
+    auto b0 = static_cast<int64_t>(v) + (lower - ters.begin());
+    return b0;
 }
 
 void PDBFormat::write_next(const Frame& frame) {
@@ -653,13 +741,21 @@ void PDBFormat::write_next(const Frame& frame) {
 
     // Only use numbers bigger than the biggest residue id as "resSeq" for
     // atoms without associated residue.
-    uint64_t max_resid = 0;
+    int64_t max_resid = 0;
     for (const auto& residue: frame.topology().residues()) {
         auto resid = residue.id();
         if (resid && resid.value() > max_resid) {
             max_resid = resid.value();
         }
     }
+
+    // Used to skip writing unnecessary connect records
+    auto is_atom_record = std::vector<bool>(frame.size(), false);
+
+    // Used for writing TER records.
+    size_t ter_count = 0;
+    optional<ResidueInformation> last_residue = nullopt;
+    std::vector<size_t> ter_serial_numbers;
 
     auto& positions = frame.positions();
     for (size_t i = 0; i < frame.size(); i++) {
@@ -670,104 +766,69 @@ void PDBFormat::write_next(const Frame& frame) {
             altloc = altloc[0];
         }
 
-        std::string atom_hetatm = "HETATM";
-        std::string resname;
-        std::string resid;
-        std::string chainid;
-        std::string inscode;
         auto residue = frame.topology().residue_for_atom(i);
-        if (residue) {
-            resname = residue->name();
-            if (residue->get<Property::BOOL>("is_standard_pdb").value_or(false)) {
-                // only use ATOM if the residue is standardized
-                atom_hetatm = "ATOM  ";
-            }
-
-            if (resname.length() > 3) {
-                warning("PDB writer", "residue '{}' name is too long, it will be truncated", resname);
-                resname = resname.substr(0, 3);
-            }
-
-            if (residue->id()) {
-                auto value = residue->id().value();
-                if (value > 9999) {
-                    warning("PDB writer", "too many residues, removing residue id {}", value);
-                    resid = "  -1";
-                } else {
-                    resid = std::to_string(residue->id().value());
-                }
-            } else {
-                resid = "  -1";
-            }
-
-            if (residue->get("chainid") &&
-                residue->get("chainid")->kind() == Property::STRING) {
-                chainid = residue->get("chainid")->as_string();
-                if (chainid.length() > 1) {
-                    warning("PDB writer",
-                        "residue '{}' chain id is too long, it will be truncated",
-                        chainid
-                    );
-                    chainid = chainid[0];
-                }
-            } else {
-                chainid = "X";
-            }
-
-            if (residue->get("insertion_code") &&
-                residue->get("insertion_code")->kind() == Property::STRING) {
-                inscode = residue->get("insertion_code")->as_string();
-                if (inscode.length() > 1) {
-                    warning("PDB writer",
-                        "residue '{}' insertion code is too long, it will be truncated",
-                        inscode
-                    );
-                    inscode = inscode[0];
-                }
-            } else {
-                inscode = " ";
-            }
-        } else {
-            resname = "XXX";
-            chainid = "X";
-            auto value = max_resid++;
-            if (value < 9999) {
-                resid = to_pdb_index(value);
-            } else {
-                resid = "  -1";
-            }
+        auto r = get_residue_strings(residue, max_resid);
+        if (r.atom_hetatm == "ATOM  ") {
+            is_atom_record[i] = true;
         }
 
-        assert(resname.length() <= 3);
+        assert(r.resname.length() <= 3);
+
+        if (last_residue && last_residue->chainid != r.chainid && needs_ter_record(*last_residue)) {
+            file_.print("TER   {: >5}      {:3} {:1}{: >4s}{:1}\n",
+                to_pdb_index(static_cast<int64_t>(i + ter_count), 5),
+                last_residue->resname, last_residue->chainid, last_residue->resid, last_residue->inscode);
+            ter_serial_numbers.push_back(i + ter_count);
+            ++ter_count;
+        }
+
         auto& pos = positions[i];
         check_values_size(pos, 8, "atomic position");
-
         file_.print(
             "{: <6}{: >5} {: <4s}{:1}{:3} {:1}{: >4s}{:1}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
-            atom_hetatm, to_pdb_index(i), frame[i].name(), altloc, resname, chainid, resid, inscode, pos[0], pos[1], pos[2], 1.0, 0.0, frame[i].type()
+            r.atom_hetatm, to_pdb_index(static_cast<int64_t>(i + ter_count), 5), frame[i].name(), altloc,
+            r.resname, r.chainid, r.resid, r.inscode,
+            pos[0], pos[1], pos[2], 1.0, 0.0, frame[i].type()
         );
+
+        if (residue) {
+            last_residue = std::move(r);
+        }
+        else {
+            last_residue = nullopt;
+        }
+
     }
 
-    auto connect = std::vector<std::vector<size_t>>(frame.size());
+    auto connect = std::vector<std::vector<int64_t>>(frame.size());
     for (auto& bond : frame.topology().bonds()) {
-        if (bond[0] > 99999 || bond[1] > 99999) {
+        if (is_atom_record[bond[0]] && is_atom_record[bond[1]]) { // both must be standard residue atoms
+            continue;
+        }
+        if (bond[0] > 87440031 || bond[1] > 87440031) {
             warning("PDB writer", "atomic index is too big for CONNECT, removing the bond between {} and {}", bond[0], bond[1]);
             continue;
         }
-        connect[bond[0]].push_back(bond[1]);
-        connect[bond[1]].push_back(bond[0]);
+
+        connect[bond[0]].push_back(adjust_for_ter_residues(bond[1], ter_serial_numbers));
+        connect[bond[1]].push_back(adjust_for_ter_residues(bond[0], ter_serial_numbers));
     }
 
     for (size_t i = 0; i < frame.size(); i++) {
         auto connections = connect[i].size();
         auto lines = connections / 4 + 1;
-        if (connections == 0) {continue;}
+        if (connections == 0) {
+            continue;
+        }
+
+        auto correction = adjust_for_ter_residues(i, ter_serial_numbers);
 
         for (size_t conect_line = 0; conect_line < lines; conect_line++) {
-            file_.print("CONECT{: >5}", to_pdb_index(i));
+            file_.print("CONECT{: >5}", to_pdb_index(correction, 5));
+
             auto last = std::min(connections, 4 * (conect_line + 1));
             for (size_t j = 4 * conect_line; j < last; j++) {
-                file_.print("{: >5}", to_pdb_index(connect[i][j]));
+                file_.print("{: >5}", to_pdb_index(connect[i][j], 5));
             }
             file_.print("\n");
         }

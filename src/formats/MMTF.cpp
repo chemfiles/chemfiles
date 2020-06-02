@@ -242,7 +242,7 @@ Residue MMTFFormat::create_residue(const std::string& current_assembly, size_t g
 
     const auto& group = structure_.groupList[group_type];
 
-    auto groupId = static_cast<size_t>(structure_.groupIdList[groupIndex_]);
+    auto groupId = static_cast<int64_t>(structure_.groupIdList[groupIndex_]);
     auto residue = Residue(group.groupName, groupId);
     residue.set("composition_type", group.chemCompType);
     residue.set("is_standard_pdb", !mmtf::is_hetatm(group.chemCompType.c_str()));

@@ -44,7 +44,7 @@ private:
     void read_bonds(Frame& frame, size_t nbonds);
 
     /// Map of residues, indexed by residue id.
-    std::unordered_map<size_t, Residue> residues_;
+    std::unordered_map<int64_t, Residue> residues_;
 };
 
 template<> FormatInfo format_information<MOL2Format>();

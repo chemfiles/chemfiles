@@ -100,7 +100,8 @@ void MOL2Format::read_atoms(Frame& frame, size_t natoms, bool charges) {
     for (size_t i=0; i<natoms; i++) {
         auto line = file_.readline();
 
-        unsigned long id, resid;
+        size_t id;
+        int64_t resid;
         std::string atom_name, sybyl_type, resname;
         double x, y, z;
         double charge = 0;
@@ -241,7 +242,7 @@ void MOL2Format::write_next(const Frame& frame) {
     file_.print("{}\n", frame.get<Property::STRING>("name").value_or(""));
 
     // Start after the maximal residue id for atoms without associated residue
-    uint64_t max_resid = 0;
+    int64_t max_resid = 0;
     for (const auto& residue: frame.topology().residues()) {
         auto resid = residue.id();
         if (resid && resid.value() > max_resid) {

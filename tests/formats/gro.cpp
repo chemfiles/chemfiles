@@ -140,7 +140,7 @@ TEST_CASE("Write files in GRO format") {
     "    3foo      B    2   0.100   0.200   0.300  0.0000  0.0000  0.0000\n"
     "    3foo      C    3   0.100   0.200   0.300  0.0000  0.0000  0.0000\n"
     "    5barba    D    4   0.100   0.200   0.300  0.0000  0.0000  0.0000\n"
-    "    6XXXXX    E    5   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
+    "    6baz      E    5   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
     "    7XXXXX    F    6   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
     "    8XXXXX    G    7   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
     "   2.20000   1.90526   4.40000 0.0 0.0  -1.10000 0.0   0.00000   0.00000\n";
@@ -170,6 +170,10 @@ TEST_CASE("Write files in GRO format") {
 
     residue = Residue("barbar"); // This will be truncated in output
     residue.add_atom(3);
+    frame.add_residue(residue);
+
+    residue = Residue("baz", -1);
+    residue.add_atom(4);
     frame.add_residue(residue);
 
     file.write(frame);
@@ -251,7 +255,7 @@ TEST_CASE("GRO files with big values") {
             auto frame = Frame();
             for(size_t i=0; i<100001; i++) {
                 frame.add_atom(Atom("A"), {0, 0, 0});
-                Residue residue("ANA", i + 1);
+                Residue residue("ANA", static_cast<int64_t>(i + 1));
                 residue.add_atom(i);
                 frame.add_residue(std::move(residue));
             }

@@ -64,9 +64,9 @@ void GROFormat::read_next(Frame& frame) {
             );
         }
 
-        size_t resid = SIZE_MAX;
+        optional<int64_t> resid = nullopt;
         try {
-            resid = parse<size_t>(line.substr(0, 5));
+            resid = parse<int64_t>(line.substr(0, 5));
         } catch (const Error&) {
             // Invalid residue, we'll skip it
         }
@@ -87,16 +87,18 @@ void GROFormat::read_next(Frame& frame) {
         }
         frame.add_atom(Atom(name), {x, y, z}, {vx, vy, vz});
 
-        if (resid != SIZE_MAX) {
-            if (residues_.find(resid) == residues_.end()) {
-                Residue residue(resname, resid);
-                residue.add_atom(frame.size() - 1);
+        if (!resid) {
+            continue;
+        }
 
-                residues_.insert({resid, residue});
-            } else {
-                // Just add this atom to the residue
-                residues_.at(resid).add_atom(frame.size() - 1);
-            }
+        if (residues_.find(*resid) == residues_.end()) {
+            Residue residue(resname, *resid);
+            residue.add_atom(frame.size() - 1);
+
+            residues_.insert({*resid, residue});
+        } else {
+            // Just add this atom to the residue
+            residues_.at(*resid).add_atom(frame.size() - 1);
         }
     }
 
@@ -159,7 +161,7 @@ void GROFormat::write_next(const Frame& frame) {
     // Only use numbers bigger than the biggest residue id as "resSeq" for
     // atoms without associated residue, and start generated residue id at
     // 1
-    uint64_t max_resid = 1;
+    int64_t max_resid = 1;
     for (const auto& residue: frame.topology().residues()) {
         auto resid = residue.id();
         if (resid && resid.value() > max_resid) {
@@ -185,7 +187,13 @@ void GROFormat::write_next(const Frame& frame) {
 
         if (residue && residue->id()) {
             auto value = residue->id().value();
-            if (value <= 99999) {
+            if (value <= 0) {
+                warning("GRO writer", "the residue id '{}' should not be negative or zero, treating it as blank", value);
+                auto value = max_resid++;
+                if (value <= 99999) {
+                    resid = std::to_string(value);
+                }
+            } else if (value <= 99999) {
                 resid = std::to_string(value);
             } else {
                 warning("GRO writer", "too many residues, removing residue id");

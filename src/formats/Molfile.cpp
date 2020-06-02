@@ -268,7 +268,7 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
 
     topology_ = Topology();
 
-    auto residues = std::unordered_map<size_t, Residue>();
+    auto residues = std::unordered_map<int64_t, Residue>();
     size_t atom_id = 0;
     for (auto& molfile_atom : atoms) {
         Atom atom(molfile_atom.name, molfile_atom.type);
@@ -282,7 +282,7 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
         topology_->add_atom(std::move(atom));
 
         if (molfile_atom.resname != std::string("")) {
-            auto resid = static_cast<size_t>(molfile_atom.resid);
+            auto resid = static_cast<int64_t>(molfile_atom.resid);
             auto residue = Residue(molfile_atom.resname, resid);
             auto inserted = residues.insert({resid, std::move(residue)});
             inserted.first->second.add_atom(atom_id);

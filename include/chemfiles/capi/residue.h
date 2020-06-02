@@ -32,7 +32,7 @@ CHFL_EXPORT CHFL_RESIDUE* chfl_residue(const char* name);
 /// @example{capi/chfl_residue/with_id.c}
 /// @return A pointer to the residue, or NULL in case of error.
 ///         You can use `chfl_last_error` to learn about the error.
-CHFL_EXPORT CHFL_RESIDUE* chfl_residue_with_id(const char* name, uint64_t resid);
+CHFL_EXPORT CHFL_RESIDUE* chfl_residue_with_id(const char* name, int64_t resid);
 
 /// Get access to the residue at index `i` in a `topology`.
 ///
@@ -134,7 +134,7 @@ CHFL_EXPORT chfl_status chfl_residue_atoms(
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_residue_id(
-    const CHFL_RESIDUE* residue, uint64_t* id
+    const CHFL_RESIDUE* residue, int64_t* id
 );
 
 /// Get the name of a `residue` in the string buffer `name`.

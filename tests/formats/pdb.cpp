@@ -347,18 +347,19 @@ TEST_CASE("Write files in PDB format") {
     "HETATM    1 A   AXXX X   4       1.000   2.000   3.000  1.00  0.00           A\n"
     "ATOM      2 B   Bfoo A   3       1.000   2.000   3.000  1.00  0.00           B\n"
     "ATOM      3 C    foo A   3       1.000   2.000   3.000  1.00  0.00           C\n"
-    "HETATM    4 D    bar C  -1B      1.000   2.000   3.000  1.00  0.00           D\n"
-    "HETATM    5 E    XXX X   5       4.000   5.000   6.000  1.00  0.00           E\n"
-    "HETATM    6 F    XXX X   6       4.000   5.000   6.000  1.00  0.00           F\n"
-    "HETATM    7 G    XXX X   7       4.000   5.000   6.000  1.00  0.00           G\n"
-    "CONECT    1    2    7\n"
-    "CONECT    2    1    7\n"
-    "CONECT    3    7\n"
-    "CONECT    4    7\n"
-    "CONECT    5    6    7\n"
-    "CONECT    6    5    7\n"
-    "CONECT    7    1    2    3    4\n"
-    "CONECT    7    5    6\n"
+    "TER       4      foo A   3 \n"
+    "HETATM    5 D    bar C  -1B      1.000   2.000   3.000  1.00  0.00           D\n"
+    "HETATM    6 E    XXX X   5       4.000   5.000   6.000  1.00  0.00           E\n"
+    "HETATM    7 F    baz X  -2       4.000   5.000   6.000  1.00  0.00           F\n"
+    "HETATM    8 G    XXX X   6       4.000   5.000   6.000  1.00  0.00           G\n"
+    "CONECT    1    2    8\n"
+    "CONECT    2    1    8\n"
+    "CONECT    3    8\n"
+    "CONECT    5    8\n"
+    "CONECT    6    7    8\n"
+    "CONECT    7    6    8\n"
+    "CONECT    8    1    2    3    5\n"
+    "CONECT    8    6    7\n"
     "ENDMDL\n"
     "END\n";
 
@@ -380,6 +381,7 @@ TEST_CASE("Write files in PDB format") {
     frame.add_bond(4, 5);
     frame.add_bond(0, 6);
     frame.add_bond(1, 6);
+    frame.add_bond(1, 2); // This bond will not be printed
     frame.add_bond(2, 6);
     frame.add_bond(3, 6);
     frame.add_bond(4, 6);
@@ -390,12 +392,17 @@ TEST_CASE("Write files in PDB format") {
     residue.add_atom(2);
     residue.set("chainid", "A");
     residue.set("is_standard_pdb", true);
+    residue.set("composition_type", "L-PEPTIDE LINKING");
     frame.add_residue(residue);
 
     residue = Residue("barbar"); // This will be truncated in output
     residue.add_atom(3);
     residue.set("chainid", "CB");
     residue.set("insertion_code", "BB");
+    frame.add_residue(residue);
+
+    residue = Residue("baz", -2);
+    residue.add_atom(5);
     frame.add_residue(residue);
 
     file.write(frame);
@@ -435,13 +442,18 @@ TEST_CASE("PDB files with big values") {
         auto tmpfile = NamedTempPath(".pdb");
 
         auto frame = Frame();
-        for(size_t i=0; i<10001; i++) {
+        for(size_t i=0; i<100; i++) {
             frame.add_atom(Atom("A"), {0, 0, 0});
         }
+
+        Residue residue("XXX", 2436110);
+        residue.add_atom(0);
+        frame.add_residue(residue);
+
         auto positions = frame.positions();
-        positions[998] = Vector3D(1., 2., 3.);
-        positions[9998] = Vector3D(4., 5., 6.);
-        positions[9999] = Vector3D(7., 8., 9.);
+        positions[97] = Vector3D(1., 2., 3.);
+        positions[98] = Vector3D(4., 5., 6.);
+        positions[99] = Vector3D(7., 8., 9.);
 
         Trajectory(tmpfile, 'w').write(frame);
 
@@ -451,25 +463,25 @@ TEST_CASE("PDB files with big values") {
 
         // If resSeq is has more than 4 characters, coordinates won't be read
         // correctly
-        CHECK(positions[998] == Vector3D(1., 2., 3.));
-        CHECK(positions[9998] == Vector3D(4., 5., 6.));
-        CHECK(positions[9999] == Vector3D(7., 8., 9.));
+        CHECK(positions[97] == Vector3D(1., 2., 3.));
+        CHECK(positions[98] == Vector3D(4., 5., 6.));
+        CHECK(positions[99] == Vector3D(7., 8., 9.));
     }
 
     SECTION("User specified residues") {
         auto tmpfile = NamedTempPath(".pdb");
 
         auto frame = Frame();
-        for(size_t i=0; i<10001; i++) {
+        for(size_t i=0; i<3; i++) {
             frame.add_atom(Atom("A"), {0, 0, 0});
-            Residue residue("ANA", i + 1);
+            Residue residue("ANA", static_cast<int64_t>(2436110 + i));
             residue.add_atom(i);
             frame.add_residue(std::move(residue));
         }
         auto positions = frame.positions();
-        positions[998] = Vector3D(1., 2., 3.);
-        positions[9998] = Vector3D(4., 5., 6.);
-        positions[9999] = Vector3D(7., 8., 9.);
+        positions[0] = Vector3D(1., 2., 3.);
+        positions[1] = Vector3D(4., 5., 6.);
+        positions[2] = Vector3D(7., 8., 9.);
 
         Trajectory(tmpfile, 'w').write(frame);
 
@@ -479,26 +491,18 @@ TEST_CASE("PDB files with big values") {
 
         // If resSeq is has more than 4 characters, coordinates won't be read
         // correctly
-        CHECK(positions[998] == Vector3D(1., 2., 3.));
-        CHECK(positions[9998] == Vector3D(4., 5., 6.));
-        CHECK(positions[9999] == Vector3D(7., 8., 9.));
-    }
+        CHECK(positions[0] == Vector3D(1., 2., 3.));
+        CHECK(positions[1] == Vector3D(4., 5., 6.));
+        CHECK(positions[2] == Vector3D(7., 8., 9.));
 
-    SECTION("CONNECT with too many atoms") {
-        if (!is_valgrind_and_travis()) {
-            auto tmpfile = NamedTempPath(".pdb");
+        auto residue1 = frame.topology().residue_for_atom(0);
+        CHECK(*(residue1->id()) == 2436110);
 
-            auto frame = Frame();
-            for(size_t i=0; i<110000; i++) {
-                frame.add_atom(Atom("A"), {0.0, 0.0, 0.0});
-            }
-            frame.add_bond(101000, 101008);
-            Trajectory(tmpfile, 'w').write(frame);
+        auto residue2 = frame.topology().residue_for_atom(1);
+        CHECK(*(residue2->id()) == 2436111);
 
-            // Re-read the file we just wrote
-            frame = Trajectory(tmpfile, 'r').read();
-            CHECK(frame.topology().bonds().empty());
-        }
+        auto residue3 = frame.topology().residue_for_atom(2);
+        CHECK(residue3 == nullopt);
     }
 }
 

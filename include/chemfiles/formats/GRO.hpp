@@ -35,7 +35,7 @@ public:
 
 private:
     /// Map of residues, indexed by residue id.
-    std::map<size_t, Residue> residues_;
+    std::map<int64_t, Residue> residues_;
 };
 
 template<> FormatInfo format_information<GROFormat>();

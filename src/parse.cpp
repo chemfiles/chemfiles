@@ -13,6 +13,10 @@ using namespace chemfiles;
 
 static bool is_digit(char c) { return '0' <= c && c <= '9'; }
 
+static bool is_ascii_upper(char c) { return 'A' <= c && c <= 'Z'; }
+
+static bool is_ascii_lower(char c) { return 'a' <= c && c <= 'z'; }
+
 template <> int64_t chemfiles::parse(string_view input) {
     if (input.empty()) {
         throw error("can not parse an integer from an empty string");
@@ -215,4 +219,130 @@ template <> double chemfiles::parse(string_view input) {
 
     // Return signed and scaled floating point result.
     return sign * (frac ? (value / scale) : (value * scale));
+}
+
+static const auto digits_upper = std::string("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+static const auto digits_lower = std::string("0123456789abcdefghijklmnopqrstuvwxyz");
+
+static int32_t digit_to_value(char c) {
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    }
+
+    if (c >= 'A' && c <= 'Z') {
+        return c - 'A' + 10;
+    }
+
+    // We know all the places this function is used, so this should be fine
+    return c - 'a' + 10;
+}
+
+static std::string encode_pure(const std::string& digits, int64_t value) {
+    if (value == 0) {
+        return std::string(digits, 1);
+    }
+    
+    auto n = static_cast<int32_t>(digits.length());
+    std::string result;
+    while (value != 0) {
+        auto rest = value / n;
+        result += digits[static_cast<size_t>(value - rest * n)];
+        value = rest;
+    }
+
+    std::reverse(result.begin(), result.end());
+    return result;
+}
+
+static int64_t decode_pure(string_view s) {
+    int64_t result = 0;
+    auto n = static_cast<int64_t>(digits_upper.length());
+    for (auto c : s) {
+        result *= n;
+        result += digit_to_value(c);
+    }
+    return result;
+}
+
+/// Evaluates base^(power) and casts the result to int64_t while addressing
+/// issues where the result maybe rounded down due to floating point errors
+static int64_t pow_int(uint64_t base, uint64_t power) {
+    return static_cast<int64_t>(std::pow(base, power) + 0.5);
+}
+
+std::string chemfiles::encode_hydrid36(uint64_t width, int64_t value) {
+    
+    // the number is too negative to be encoded
+    if (value < (1 - pow_int(10, width - 1))) {
+        return std::string(width, '*');
+    }
+
+    // no need to encode
+    if (value < pow_int(10, width)) {
+        return std::to_string(value);
+    }
+    
+    // use upper case set
+    value -= pow_int(10, width);
+    if (value < 26 * pow_int(36, (width - 1))) {
+        value += 10 * pow_int(36, (width - 1));
+        return encode_pure(digits_upper, value);
+    }
+    
+    // use lower case set
+    value -= 26 * pow_int(36, width - 1);
+    if (value < 26 * pow_int(36, width - 1)) {
+        value += 10 * pow_int(36, width - 1);
+        return encode_pure(digits_lower, value);
+    }
+
+    // too large to be encoded
+    return std::string(width, '*');
+}
+
+int64_t chemfiles::decode_hybrid36(uint64_t width, string_view s) {
+
+    // This function is only called within chemfiles for fixed format files.
+    // Therefore, the width should also be the length of the string as this is
+    // known at compile time.
+    if (s.length() > width) {
+        throw error("the length of '{}' is greater than the width '{}', this is a bug in chemfiles", s, width);
+    }
+
+    auto f = s[0];
+    if (f == '-' || f == ' ' || is_digit(f)) {
+        // Negative number, these are not encoded
+        return parse<int64_t>(s);
+    }
+    
+    // See above comment. Standard says blank strings needs to be treated as 0
+    if (trim(s).size() == 0) {
+        return 0;
+    }
+
+    if (digits_upper.find(f) != std::string::npos) {
+        auto is_valid = std::all_of(s.begin(), s.end(), [](unsigned char c) {
+            return is_digit(c) || is_ascii_upper(c);
+        });
+
+        if (!is_valid) {
+            throw error("the value '{}' is not a valid hybrid 36 number", s);
+        }
+
+        return decode_pure(s) - 10 * pow_int(36, width - 1) + pow_int(10, width);
+    }
+
+    if (digits_lower.find(f) != std::string::npos) {
+        auto is_valid = std::all_of(s.begin(), s.end(), [](unsigned char c) {
+            return is_digit(c) || is_ascii_lower(c);
+         });
+
+        if (!is_valid) {
+            throw error("the value '{}' is not a valid hybrid 36 number", s);
+        }
+
+        return decode_pure(s) + 16 * pow_int(36, width - 1) + pow_int(10, width);
+    }
+
+    throw error("the value '{}' is not a valid hybrid 36 number", s);
 }
