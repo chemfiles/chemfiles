@@ -597,6 +597,8 @@ void MMTFFormat::add_residue_to_structure(const Frame& frame, const Residue& res
 // the initial atom index if it exists.
 size_t MMTFFormat::atom_id(size_t mmtf_id) {
     if (!mmtf::isDefaultValue(structure_.atomIdList)) {
+        assert(mmtf_id < structure_.atomIdList.size());
+        assert(structure_.atomIdList[mmtf_id] > 0);
         auto id = static_cast<size_t>(structure_.atomIdList[mmtf_id]) - 1;
         assert(atomSkip_ <= id);
         return id - atomSkip_;
