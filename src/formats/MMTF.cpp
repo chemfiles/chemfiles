@@ -174,7 +174,6 @@ void MMTFFormat::read(Frame& frame) {
 }
 
 void MMTFFormat::read_model(Frame& frame) {
-
     auto modelChainCount = static_cast<size_t>(structure_.chainsPerModel[modelIndex_]);
 
     // The following block of code simply counts the total number of atoms in the model
@@ -239,7 +238,6 @@ std::string MMTFFormat::find_assembly() {
 }
 
 Residue MMTFFormat::create_residue(const std::string& current_assembly, size_t group_type) {
-
     const auto& group = structure_.groupList[group_type];
 
     auto groupId = static_cast<int64_t>(structure_.groupIdList[groupIndex_]);
@@ -369,7 +367,7 @@ void MMTFFormat::apply_symmetry(Frame& frame) {
             for (const auto& residue : frame.topology().residues()) {
 
                 auto asmbl = residue.get("assembly");
-                
+
                 if (!asmbl || asmbl->as_string() != "bio" + assembly.name) {
                     continue;
                 }
@@ -409,7 +407,7 @@ void MMTFFormat::apply_symmetry(Frame& frame) {
             for (auto&& residue : residues_to_add) {
                 frame.add_residue(std::move(residue));
             }
-            
+
             for (size_t i = 0; i < original_bond_size; ++i) {
                 auto& bond = frame.topology().bonds()[i];
 
@@ -427,7 +425,7 @@ void MMTFFormat::apply_symmetry(Frame& frame) {
                 }
 
                 bonds_to_add.push_back({ {new_bond_0, new_bond_1}, frame.topology().bond_orders()[i] });
-            }            
+            }
         }
     }
 
