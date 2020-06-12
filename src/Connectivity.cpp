@@ -159,9 +159,6 @@ void Connectivity::recalculate() const {
 }
 
 const sorted_set<Bond>& Connectivity::bonds() const {
-    if (!uptodate_) {
-        recalculate();
-    }
     return bonds_;
 }
 
