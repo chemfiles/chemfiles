@@ -395,6 +395,18 @@ TEST_CASE("Parsing") {
 
             ast = "deg2rad(1) < 5";
             CHECK(parse("deg2rad(1) < 5")->print() == ast);
+
+            ast = "exp(1) < 5";
+            CHECK(parse("exp(1) < 5")->print() == ast);
+
+            ast = "log(1) < 5";
+            CHECK(parse("log(1) < 5")->print() == ast);
+
+            ast = "log2(1) < 5";
+            CHECK(parse("log2(1) < 5")->print() == ast);
+
+            ast = "log10(1) < 5";
+            CHECK(parse("log10(1) < 5")->print() == ast);
         }
 
         SECTION("distance function") {
