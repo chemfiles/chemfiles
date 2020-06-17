@@ -11,11 +11,17 @@
 
 using namespace chemfiles;
 
-static bool is_digit(char c) { return '0' <= c && c <= '9'; }
+static bool is_digit(char c) {
+    return '0' <= c && c <= '9';
+}
 
-static bool is_ascii_upper(char c) { return 'A' <= c && c <= 'Z'; }
+static bool is_ascii_upper(char c) {
+    return 'A' <= c && c <= 'Z';
+}
 
-static bool is_ascii_lower(char c) { return 'a' <= c && c <= 'z'; }
+static bool is_ascii_lower(char c) {
+    return 'a' <= c && c <= 'z';
+}
 
 template <> int64_t chemfiles::parse(string_view input) {
     if (input.empty()) {
@@ -241,7 +247,7 @@ static std::string encode_pure(const std::string& digits, int64_t value) {
     if (value == 0) {
         return std::string(digits, 1);
     }
-    
+
     auto n = static_cast<int32_t>(digits.length());
     std::string result;
     while (value != 0) {
@@ -271,7 +277,7 @@ static int64_t pow_int(uint64_t base, uint64_t power) {
 }
 
 std::string chemfiles::encode_hydrid36(uint64_t width, int64_t value) {
-    
+
     // the number is too negative to be encoded
     if (value < (1 - pow_int(10, width - 1))) {
         return std::string(width, '*');
@@ -281,14 +287,14 @@ std::string chemfiles::encode_hydrid36(uint64_t width, int64_t value) {
     if (value < pow_int(10, width)) {
         return std::to_string(value);
     }
-    
+
     // use upper case set
     value -= pow_int(10, width);
     if (value < 26 * pow_int(36, (width - 1))) {
         value += 10 * pow_int(36, (width - 1));
         return encode_pure(digits_upper, value);
     }
-    
+
     // use lower case set
     value -= 26 * pow_int(36, width - 1);
     if (value < 26 * pow_int(36, width - 1)) {
@@ -314,14 +320,14 @@ int64_t chemfiles::decode_hybrid36(uint64_t width, string_view s) {
         // Negative number, these are not encoded
         return parse<int64_t>(s);
     }
-    
+
     // See above comment. Standard says blank strings needs to be treated as 0
     if (trim(s).size() == 0) {
         return 0;
     }
 
     if (digits_upper.find(f) != std::string::npos) {
-        auto is_valid = std::all_of(s.begin(), s.end(), [](unsigned char c) {
+        auto is_valid = std::all_of(s.begin(), s.end(), [](char c) {
             return is_digit(c) || is_ascii_upper(c);
         });
 
@@ -333,7 +339,7 @@ int64_t chemfiles::decode_hybrid36(uint64_t width, string_view s) {
     }
 
     if (digits_lower.find(f) != std::string::npos) {
-        auto is_valid = std::all_of(s.begin(), s.end(), [](unsigned char c) {
+        auto is_valid = std::all_of(s.begin(), s.end(), [](char c) {
             return is_digit(c) || is_ascii_lower(c);
          });
 
