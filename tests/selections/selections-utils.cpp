@@ -22,12 +22,12 @@ TEST_CASE("NumericValues") {
 
     SECTION("invalid value") {
         auto vec = selections::NumericValues();
-        CHECK_THROWS_WITH(vec.push_back(INFINITY), "invalid value +inf as first value of NumericValues");
+        CHECK_THROWS_WITH(vec.push_back(static_cast<double>(INFINITY)), "invalid value +inf as first value of NumericValues");
 
-        vec.push_back(-INFINITY);
+        vec.push_back(static_cast<double>(-INFINITY));
         CHECK(vec.size() == 1);
         CHECK(vec.capacity() == 1);
-        CHECK(vec[0] == -INFINITY);
+        CHECK(vec[0] == static_cast<double>(-INFINITY));
     }
 
     SECTION("contains 1 value") {
@@ -58,7 +58,7 @@ TEST_CASE("NumericValues") {
         }
 
         for (size_t i=0; i<22; i++) {
-            CHECK(vec[i] == i);
+            CHECK(vec[i] == static_cast<double>(i));
         }
 
         CHECK(vec.size() == 22);

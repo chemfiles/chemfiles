@@ -103,7 +103,7 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_frame_positions(frame, &positions, &natoms));
         for (size_t i=0; i<natoms; i++) {
             for (size_t j=0; j<3; j++) {
-                CHECK(positions[i][j] == i * j);
+                CHECK(positions[i][j] == static_cast<double>(i * j));
             }
         }
 
@@ -137,7 +137,7 @@ TEST_CASE("chfl_frame") {
         CHECK_STATUS(chfl_frame_velocities(frame, &velocities, &natoms));
         for (size_t i=0; i<natoms; i++) {
             for (size_t j=0; j<3; j++) {
-                CHECK(velocities[i][j] == i * j + 1);
+                CHECK(velocities[i][j] == static_cast<double>(i * j + 1));
             }
         }
 

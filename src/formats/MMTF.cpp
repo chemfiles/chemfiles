@@ -346,13 +346,18 @@ void MMTFFormat::apply_symmetry(Frame& frame) {
                 chains_to_transform.insert(static_cast<double>(id));
             }
 
-            auto& ncs = transform.matrix;
-
             // ncs is a 4x4 matrix stored in column major order.
-            auto rotation = Matrix3D(ncs[0], ncs[4], ncs[8],
-                                     ncs[1], ncs[5], ncs[9],
-                                     ncs[2], ncs[6], ncs[10]);
-            auto translation = Vector3D(ncs[3], ncs[7], ncs[11]);
+            auto& ncs = transform.matrix;
+            auto rotation = Matrix3D(
+                static_cast<double>(ncs[0]), static_cast<double>(ncs[4]), static_cast<double>(ncs[8]),
+                static_cast<double>(ncs[1]), static_cast<double>(ncs[5]), static_cast<double>(ncs[9]),
+                static_cast<double>(ncs[2]), static_cast<double>(ncs[6]), static_cast<double>(ncs[10])
+            );
+            auto translation = Vector3D(
+                static_cast<double>(ncs[3]),
+                static_cast<double>(ncs[7]),
+                static_cast<double>(ncs[11])
+            );
 
             if (rotation == Matrix3D::unit() && translation == Vector3D()) {
                 continue;
@@ -365,7 +370,6 @@ void MMTFFormat::apply_symmetry(Frame& frame) {
 
             std::vector<Residue> residues_to_add;
             for (const auto& residue : frame.topology().residues()) {
-
                 auto asmbl = residue.get("assembly");
 
                 if (!asmbl || asmbl->as_string() != "bio" + assembly.name) {
@@ -450,8 +454,7 @@ void MMTFFormat::write(const Frame& frame) {
         structure_.unitCell[5] = static_cast<float>(cell.gamma());
 
         unitcellForWrite_ = cell;
-    }
-    else if (unitcellForWrite_ != frame.cell()) {
+    } else if (unitcellForWrite_ != frame.cell()) {
         warning("MMTF Writer", "the MMTF format only allows one unit cell to be defined for all models, using the first one defined");
     }
 

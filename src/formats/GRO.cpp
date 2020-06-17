@@ -189,7 +189,7 @@ void GROFormat::write_next(const Frame& frame) {
             auto value = residue->id().value();
             if (value <= 0) {
                 warning("GRO writer", "the residue id '{}' should not be negative or zero, treating it as blank", value);
-                auto value = max_resid++;
+                value = max_resid++;
                 if (value <= 99999) {
                     resid = std::to_string(value);
                 }
