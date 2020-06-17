@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   `Trajectory::memory_buffer`; `chfl_trajectory_memory_reader`;
   `chfl_trajectory_memory_writer` and `chfl_trajectory_memory_buffer`.
 * Added support for appending to gzip (.gz) compressed trajectories.
+* Added support for sub-selection in numerical functions, for example
+  `distance(#1, name O)`.
 
 ### Changes to the C API
 
