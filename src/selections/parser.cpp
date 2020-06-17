@@ -58,6 +58,10 @@ static std::map<std::string, numeric_functions_creator_t> NUMERIC_FUNCTIONS = {
     {"asin", [](MathAst ast){ return chemfiles::make_unique<Function>(static_cast<double (*)(double)>(asin), "asin", std::move(ast));}},
     {"acos", [](MathAst ast){ return chemfiles::make_unique<Function>(static_cast<double (*)(double)>(acos), "acos", std::move(ast));}},
     {"sqrt", [](MathAst ast){ return chemfiles::make_unique<Function>(static_cast<double (*)(double)>(sqrt), "sqrt", std::move(ast));}},
+    {"exp", [](MathAst ast){ return chemfiles::make_unique<Function>(static_cast<double (*)(double)>(exp), "exp", std::move(ast));}},
+    {"log", [](MathAst ast){ return chemfiles::make_unique<Function>(static_cast<double (*)(double)>(sqrt), "log", std::move(ast));}},
+    {"log2", [](MathAst ast){ return chemfiles::make_unique<Function>(static_cast<double (*)(double)>(log2), "log2", std::move(ast));}},
+    {"log10", [](MathAst ast){ return chemfiles::make_unique<Function>(static_cast<double (*)(double)>(log10), "log10", std::move(ast));}},
     {"rad2deg", [](MathAst ast){ return chemfiles::make_unique<Function>([](double rad){ return rad * 180 / PI; }, "rad2deg", std::move(ast));}},
     {"deg2rad", [](MathAst ast){ return chemfiles::make_unique<Function>([](double deg){ return deg * PI / 180; }, "deg2rad", std::move(ast));}},
 };
