@@ -68,6 +68,7 @@ extensions = [
     # chemfiles specific extensions, in doc/ext
     'htmlhidden',
     'chfl_example',
+    'chfl_selection',
 ]
 
 # The suffix of source filenames.

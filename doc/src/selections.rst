@@ -3,8 +3,8 @@
 Selection language
 ==================
 
-Overview
-^^^^^^^^
+Introduction
+^^^^^^^^^^^^
 
 Chemfiles implements a rich selection language that allows finding the atoms
 matching a set of constraints in a :cpp:class:`Frame <chemfiles::Frame>`.  For
@@ -45,11 +45,10 @@ types of constraints in your selections: Boolean constraints, string constraints
 and numeric constraints.
 
 String constraints check text values, such as the atomic ``name`` or atomic
-``type``, comparing it to either a fixed string (``name(#1) == Fe``) or another
-string value (``type(#1) != type(#3)``). When using a selection with more than
-one atom, constraints are applied to different atoms using ``#1``, ``#2``,
-``#3`` or ``#4`` to refer to a specific atom: ``angles: name(#3) Co`` will check
-the name of the third atom of the angles, and so on.
+``type``, comparing it to a fixed value: ``name(#1) == Fe``. When using a
+selection with more than one atom, constraints are applied to different atoms
+using ``#1``, ``#2``, ``#3`` or ``#4`` to refer to a specific atom: ``angles:
+name(#3) Co`` will check the name of the third atom of the angles, and so on.
 
 Numeric constraints check numeric values such as the position of the atoms
 (``x``, ``y``, and ``z``), the atomic ``mass``, the ``index`` of an atom in the
@@ -71,18 +70,19 @@ checked to see if any of them verify the selection. This makes ``is_bonded(#1,
 name O)`` select all atoms bonded to an oxygen; and ``is_angle(type C, #1, name
 O)`` select all atoms in the middle of a C-X-O angle.
 
-Constraints on atomic properties
---------------------------------
+Constraints on atomic or residue properties
+-------------------------------------------
 
 It is possible to use atomic :cpp:class:`properties <chemfiles::Property>`
-(unfortunately not frame properties) in constraints, with the
-``[<property>]`` syntax. ``<property>`` should be replaced by the property name:
-``[is_hetatm]``, possibly using quotes around the property name if it contains
-spaces: ``["my own property"]``. Depending on the context, a Boolean, string or
-numeric property will be searched. If an atomic property with a given name cannot
-be found, residue property is searched instead, however, atomic properties take 
-precedence. If none can be found, or if the property type does not match, a 
-default value will be used instead.
+(unfortunately not frame properties) in constraints, with the ``[<property>]``
+syntax. ``<property>`` should be replaced by the property name: ``[is_hetatm]``,
+possibly using quotes around the property name if it contains spaces: ``["my own
+property"]``. Depending on the context, a Boolean, string or numeric property
+will be searched. If an atomic property with a given name cannot be found,
+residue properties are searched instead, however, atomic properties take
+precedence. If none can be found, or if the property type does not match, a
+default value will be used instead: ``false`` for Boolean properties, ``""``
+(empty string) for string properties, and ``NaN`` for numeric properties.
 
 Selection language reference
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -92,106 +92,263 @@ Here is the list of currently implemented constraints. Additional ideas are welc
 Boolean constraints
 -------------------
 
-- ``all``: always matches any atom and returns ``true``;
-- ``none``: never matches an atom and returns ``false``;
-- ``is_bonded(i, j)``: check if atoms i and j are bonded together. If i and j
-  refers to the same atom, this returns false;
-- ``is_angle(i, j, k)``: check if atoms i, j and k are bonded together to form
-  an angle, *i.e.* that i is bonded to j and j is bonded to k. If any of i, j or
-  k refer to the same atom, this returns false;
-- ``is_dihedral(i, j, k, m)``: check if atoms i, j, k and m are bonded together
-  to form a dihedral angle, *i.e.* that i is bonded to  j, j is bonded to k, and
-  k is bonded to m.  If any of i, j, k or m refer to the same atom, this returns
-  false;
-- ``is_improper(i, j, k, m)``: check if atoms i, j, k and m are bonded together
-  to form a dihedral angle, *i.e.* that all of i, k, and m are bonded to j. If
-  any of i, j, k or m refer to the same atom, this returns false;
-- ``[<property>]``: check if atoms or residues they belong to have a Boolean property named `'property'`
-  set, and that this property is true. This will return false if the property
-  is not set;
+Boolean constraints directly evaluate to ``true`` or ``false``, and can be
+combined with other constraints with ``and``, ``or`` and ``not``.
 
-String properties
------------------
+.. chemfiles-selection:: ``all``
 
-- ``type``: gives the atomic type;
-- ``name``: gives the atomic name. Some formats store both an atomic name (H3)
-  and an atom type (H), this is why you can use two different selectors
-  depending on the actual data;
-- ``resname``: gives the residue name. If an atom is not in a residue, this
-  return the empty string;
-- ``[<property>]``: gives the value of the string property named `'property'`
-  for the atom or the residue containing the atom, if any. This will return an empty string (`""`) if the property is not
-  set;
+    Matches any atom and always evaluate to ``true``
 
-Numeric properties
+
+.. chemfiles-selection:: ``none``
+
+    Never matches an atom and always evaluate to ``false``
+
+
+.. chemfiles-selection:: ``is_bonded(i, j)``
+
+    Check if atoms i and j are bonded together.
+
+    i and j can either be one of the atoms currently being matched (i.e. ``#1 /
+    #2 / #3 / #4``); or a sub-selection (e.g. ``is_bonded(#1, name O)``). In the
+    latter case, the constrain will be checked for all atoms returned by the
+    sub-selection, and evaluate to ``true`` if any of them matches.
+
+    If i and j refers to the same atom, this evaluates to ``false``.
+
+
+.. chemfiles-selection:: ``is_angle(i, j, k)``
+
+    Check if atoms i, j and k are bonded together to form an angle, *i.e.* that
+    i is bonded to j and j is bonded to k.
+
+    i, j, and k can either be one of the atoms currently being matched (i.e.
+    ``#1 / #2 / #3 / #4``); or a sub-selection (with the same behavior as
+    ``is_bonded``).
+
+    If any of i, j or k refer to the same atom, ``is_angle`` evaluate to
+    ``false``.
+
+
+.. chemfiles-selection::  ``is_dihedral(i, j, k, m)``
+
+    Check if atoms i, j, k and m are bonded together to form a dihedral angle,
+    *i.e.* that i is bonded to  j, j is bonded to k, and k is bonded to m.
+
+    i, j, k, and m can either be one of the atoms currently being matched (i.e.
+    ``#1 / #2 / #3 / #4``); or a sub-selection (with the same behavior as
+    ``is_bonded``).
+
+    If any of i, j, k or m refer to the same atom, ``is_dihedral`` evaluate to
+    ``false``.
+
+
+.. chemfiles-selection:: ``is_improper(i, j, k, m)``
+
+    Check if atoms i, j, k and m are bonded together to form a dihedral angle,
+    *i.e.* that all of i, k, and m are bonded to j.
+
+    If any of i, j, k or m refer to the same atom, ``is_improper`` evaluate to
+    ``false``.
+
+.. |multiple-atoms-#i| replace::
+
+    If multiple atoms are being matched simultaneously, the one to check can be
+    specified by setting ``#i`` to one of ``#1 / #2 / #3 / #4``. If ``#i`` is
+    not specified, ``#1`` is checked by default.
+
+
+.. chemfiles-selection:: ``[<property>]`` / ``[<property>](#i)``
+
+    Check if atoms or residues they belong to have a Boolean property named
+    ``'property'``, and that this property is set to ``true``.
+
+    This will evaluate to ``false`` if the property does not exist.
+
+    |multiple-atoms-#i|
+
+String constraints
 ------------------
 
-Most of the numeric properties only apply to a single atom:
+String constraints are compared to a literal value for either equality with
+``constrain == value``, or inequality with ``constrain != value``. Values
+without spaces, starting with an ASCII letter and using only ASCII letters and
+numbers can be written directly (``type == Fe``, ``resname != ALA``), other
+values must be surrounded by quotation marks: ``name == "17"``, ``resname != "a
+long name"``.
 
-- ``index``: gives the atomic index in the frame;
-- ``mass``: gives the atomic mass;
-- ``x``, ``y`` and ``z``: gives the atomic position  in cartesian coordinates;
-- ``vx``, ``vy`` and ``vz``: gives the atomic velocity in cartesian coordinates;
-- ``resid``: gives the atomic residue index. If an atom is not in a residue,
-  this return -1;
-- ``[<property>]``: gives the value of the numeric property named `'property'`
-  for the atom or the residue containing the atom, if any. This will return 0 if the property is not set;
+For string selectors, ``constrain value`` is equivalent to ``constrain ==
+value``, and ``constrain value1 value2 value3`` is equivalent to ``constrain ==
+value1 or constrain == value2 or constrain == value3``. This simplifies common
+selections, such as ``name H O C N``.
 
-But some properties apply to multiple atoms, and as such are only usable when
-selecting multiple atoms:
+.. chemfiles-selection:: ``type`` / ``type(#i)``
 
-- ``distance(i, j)``: gives the distance in Ångströms between atoms i and j,
-  accounting for periodic boundary conditions.
-- ``angle(i, j, k)``: gives the angle between atoms i, j and k in radians,
-  accounting for periodic boundary conditions. The atoms do not need to be
-  bonded together.
-- ``dihedral(i, j, k, m)``: gives the dihedral angle between atoms i, j, k and m
-  in radians, accounting for periodic boundary conditions. The atoms do not need
-  to be bonded together.
-- ``out_of_plane(i, j, k, m)``: gives the distance in Ångströms between the
-  plane formed by the three atoms i, k, and m; and the atom j, accounting for
-  periodic boundary conditions.
+    Evaluates to the atomic type of the atom being checked.
 
-.. note::
+    |multiple-atoms-#i|
 
-    The ``angle`` and ``dihedral`` selectors are different from the ``is_angle``
-    and ``is_dihedral`` selectors. The firsts returns a number that can then be
-    used in mathematical expressions, while the second returns directly ``true``
-    or ``false``.
+.. chemfiles-selection:: ``name`` / ``name(#i)``
 
-One can also use mathematical function to transform a number to another value.
-Currently supported functions are: ``deg2rad`` and ``rad2deg`` functions for
-transforming radians to degrees and respectively; ``sin``, ``cos``, ``tan`` for
-the trigonometric functions; ``asin`` and ``acos`` inverse trigonometric
-functions and ``sqrt``. Adding new functions is easy, open an issue about the
-one you need on the chemfiles repository.
+    Evaluates to the atomic name of the atom being checked. Some formats store
+    both an atomic name (e.g. H3) and an atom type (e.g. H), this is why you can
+    use two different selectors depending on the actual data;
+
+    |multiple-atoms-#i|
+
+.. chemfiles-selection:: ``resname`` / ``resname(#i)``
+
+    Evaluates to the name of the :cpp:class:`chemfiles::Residue` containing the
+    atom being checked. If an atom is not in a residue, this evaluates to the
+    empty string.
+
+    |multiple-atoms-#i|
+
+.. chemfiles-selection:: ``[<property>]`` / ``[<property>](#i)``
+
+    If the atom being matched or the residue it belongs to (if any) have a
+    string property named ``'property'``, this evaluates to the value of the
+    property.  Else this evaluates to an empty string (``""``).
+
+    |multiple-atoms-#i|
+
+Numeric constraints
+-------------------
+
+Numeric constraints can be combined using all of the usual numeric operations:
+``+``, ``-``, ``*``, ``/``; as well as ``^`` for exponentiation and ``%`` for
+modulo (remainder of Euclidean division). Parenthesis can be used for grouping
+operations.
+
+Additionally, mathematical functions are available to transform a number to
+another value. Currently supported functions are: ``deg2rad`` and ``rad2deg``
+functions for transforming radians to degrees and respectively; ``sin``,
+``cos``, ``tan`` for the trigonometric functions (taking radians as input);
+``asin`` and ``acos`` inverse trigonometric functions (giving output in
+radians); ``sqrt`` for square root; ``exp`` for base *e* exponential; ``log``
+for the natural or base *e* logarithm; ``log2`` for the base 2 logarithm and
+``log10`` for the base 10 logarithm. If you need another of such mathematical
+function, `open an issue`_ in the chemfiles repository!
+
+.. _open an issue: https://github.com/chemfiles/chemfiles/issues/new/choose
+
+Numeric values are finally compared using one of ``==`` (equal), ``!=`` (not
+equal), ``>`` (greater), ``>=`` (greater or equal), ``<`` (lesser), or ``<=``
+(lesser or equal). They can be compared with one another (``(x^2 + z) > y``) or
+with literal values (``z <= 1.24e-1``).
 
 .. note::
 
     Numeric selection operate on double precision floating point number, and as
     such are subject to the same limitations. In particular, while ``1 + 2 ==
     3`` will match all atoms, since this relation is always true, ``0.1 + 0.2 ==
-    0.3`` will not, since ``0.1 + 0.2 == 0.30000000000000004`` when using
-    floating point arithmetic.
+    0.3`` will match no atoms, since ``0.1 + 0.2 == 0.30000000000000004`` when
+    using floating point arithmetic.
 
-Elisions
---------
+Here are all the available numeric values
 
-This selection language is very explicit but it can be too verbose in some
-cases. The following rules allow to omit some parts of the selection when the
-meaning is clear:
+.. chemfiles-selection:: ``index`` / ``index(#i)``
 
-- First, in the ``atoms`` context, the ``#1`` variable is optional, and ``atoms:
-  name(#1) == H`` is equivalent to ``atoms: name == H``.
-- Then, if no context is given, the ``atoms`` context is used. This make ``atoms:
-  name == H`` equivalent to ``name == H``.
-- Then if no comparison operator is given, ``==`` is used by default. This means
-  that we can write ``name H`` instead of ``name == H``.
-- Then, multiple values are interpreted as multiple choices. A selection like
-  ``name H O C`` is expanded into ``name H or name O or name C``.
+    Evaluates to the atomic index of the atom being matched.
 
-At the end, using all these elisions rules, ``atom: name(#1) == H or name(#1) ==
-O`` is equivalent to ``name H O``. A more complex example can be ``bonds:
-name(#1) O C and index(#2) 23 55 69``, which is equivalent to ``bonds:
-(name(#1) == O or name(#1) == C) and (index(#2) == 23 or index(#2) == 55 or
-index(#2) == 69)``
+    |multiple-atoms-#i|
+
+.. chemfiles-selection:: ``mass`` / ``mass(#i)``
+
+    Evaluates to the mass of the atom being matched. For atoms with a type from
+    the periodic table, the element mass is used as default. The atom mass can
+    also be set manually, either directly with
+    :cpp:func:`chemfiles::Atom::set_mass`, or using a :ref:`configuration file
+    <configuration>`.
+
+    |multiple-atoms-#i|
+
+.. chemfiles-selection:: ``x`` / ``y`` / ``z`` / ``x(#i)`` / ``y(#i)`` / ``z(#i)``
+
+    Evaluates to the cartesian component of the position of the atom being
+    matched, in Ångströms.
+
+    |multiple-atoms-#i|
+
+.. chemfiles-selection:: ``vx`` / ``vy`` / ``vz`` / ``vx(#i)`` / ``vy(#i)`` / ``vz(#i)``
+
+    Evaluates to the cartesian component of the velocity of the atom being
+    matched. If velocities are not defined in the :cpp:class:`chemfiles::Frame`
+    being matched, this evaluates to `NaN`_.
+
+    |multiple-atoms-#i|
+
+.. chemfiles-selection:: ``resid`` / ``resid(#i)``
+
+    Evaluates to the id of the :cpp:class:`chemfiles::Residue` containing the
+    atom being checked. If an atom is not in a residue, or if the residue do not
+    have an id, this evaluates to -1.
+
+    |multiple-atoms-#i|
+
+.. chemfiles-selection:: ``[<property>]`` / ``[<property>](#i)``
+
+    If the atom being matched or the residue it belongs to (if any) have a
+    numeric property named ``'property'``, this evaluates to the value of the
+    property. Else this evaluates to `NaN`_.
+
+    |multiple-atoms-#i|
+
+.. _NaN: https://en.wikipedia.org/wiki/Na
+
+
+.. chemfiles-selection:: ``distance(i, j)``
+
+    Evaluates to the distance in Ångströms between atoms i and j, accounting
+    for periodic boundary conditions.
+
+    i and j can either be one of the atoms currently being matched (i.e. ``#1 /
+    #2 / #3 / #4``); or a sub-selection (``distance(#1, name O)``). In the case
+    of a sub-selection, the distance will be evaluated for all atoms matching
+    the sub-selection, and then propagated through mathematical operations. In
+    the end, the atoms will be considered a match if **any** of the values is a
+    match. So ``distance(#1, name O) + 3 < 5`` will return all atoms at less
+    than 2Å from **any** atom with name O.
+
+
+.. chemfiles-selection:: ``angle(i, j, k)``
+
+    Evaluates to the angle between atoms i, j and k in radians, accounting for
+    periodic boundary conditions. The atoms do not need to be bonded together.
+
+    i, j, and k can either be one of the atoms currently being matched (i.e.
+    ``#1 / #2 / #3 / #4``); or a sub-selections. In the latter case,
+    mathematical operations are combined as for ``distance(i, j)``.
+
+
+.. chemfiles-selection:: ``dihedral(i, j, k, m)``
+
+    Evaluates to the dihedral angle between atoms i, j, k and m in radians,
+    accounting for periodic boundary conditions. The atoms do not need to be
+    bonded together.
+
+    i, j, k and m can either be one of the atoms currently being matched (i.e.
+    ``#1 / #2 / #3 / #4``); or a sub-selections. In the latter case,
+    mathematical operations are combined as for ``distance(i, j)``.
+
+
+.. chemfiles-selection:: ``out_of_plane(i, j, k, m)``
+
+    Evaluates to  the distance in Ångströms between the plane formed by the three
+    atoms i, k, and m; and the atom j, accounting for periodic boundary
+    conditions.
+
+    i, j, k and m can either be one of the atoms currently being matched (i.e.
+    ``#1 / #2 / #3 / #4``); or a sub-selections. In the latter case,
+    mathematical operations are combined as for ``distance(i, j)``.
+
+
+.. note::
+
+    ``angle`` and ``dihedral`` constraints are different from the ``is_angle``
+    and ``is_dihedral``. The firsts returns a number that can then be used in
+    mathematical expressions, and can be used even if the atoms are not bonded
+    together in the corresponding topology elements.
+
+    The seconds directly evaluate to ``true`` or ``false``, and only check if
+    the atoms are bonded together in the corresponding topology elements.

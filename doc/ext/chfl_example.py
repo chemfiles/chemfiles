@@ -1,7 +1,7 @@
 from sphinx.directives.code import LiteralInclude
 
 
-class CHFLExample(LiteralInclude):
+class ChemfilesExample(LiteralInclude):
     """Add a code example for chemfiles documentation"""
 
     def run(self):
@@ -9,8 +9,8 @@ class CHFLExample(LiteralInclude):
         self.options["start-after"] = "[example]"
         self.options["end-before"] = "[example]"
         self.options["dedent"] = 4
-        return super(CHFLExample, self).run()
+        return super(ChemfilesExample, self).run()
 
 
 def setup(app):
-    app.add_directive("chfl_example", CHFLExample)
+    app.add_directive("chemfiles-example", ChemfilesExample)
