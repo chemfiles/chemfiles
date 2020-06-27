@@ -117,41 +117,42 @@ struct BooleanFunction {  // NOLINT: constructor does not initialize these field
 
 static std::map<std::string, BooleanFunction> BOOLEAN_SELECTORS = {
     {"all", {0, [](SelectionArguments /*unused*/) {  // NOLINT: can not make std::vector<SubSelection> a const reference
-        return Ast(new All());
+        return chemfiles::make_unique<All>();
     }}},
     {"none", {0, [](SelectionArguments /*unused*/) {  // NOLINT: can not make std::vector<SubSelection> a const reference
-        return Ast(new None());
+        return chemfiles::make_unique<None>();
     }}},
     {"is_bonded", {2, [](SelectionArguments args){
         assert(args.count == 2);
-        return Ast(new IsBonded(
+        return chemfiles::make_unique<IsBonded>(
             std::move(args.values[0]),
-            std::move(args.values[1]))
+            std::move(args.values[1])
         );
     }}},
     {"is_angle", {3, [](SelectionArguments args) {
         assert(args.count == 3);
-        return Ast(new IsAngle(
+        return chemfiles::make_unique<IsAngle>(
             std::move(args.values[0]),
             std::move(args.values[1]),
-            std::move(args.values[2])));
+            std::move(args.values[2])
+        );
     }}},
     {"is_dihedral", {4, [](SelectionArguments args) {
         assert(args.count == 4);
-        return Ast(new IsDihedral(
+        return chemfiles::make_unique<IsDihedral>(
             std::move(args.values[0]),
             std::move(args.values[1]),
             std::move(args.values[2]),
-            std::move(args.values[3]))
+            std::move(args.values[3])
         );
     }}},
     {"is_improper", {4, [](SelectionArguments args) {
         assert(args.count == 4);
-        return Ast(new IsImproper(
+        return chemfiles::make_unique<IsImproper>(
             std::move(args.values[0]),
             std::move(args.values[1]),
             std::move(args.values[2]),
-            std::move(args.values[3]))
+            std::move(args.values[3])
         );
     }}},
 };
@@ -211,10 +212,10 @@ Ast Parser::expression() {
     while (true) {
         if (match(Token::AND)) {
             auto rhs = selector();
-            ast = Ast(new And(std::move(ast), std::move(rhs)));
+            ast = chemfiles::make_unique<And>(std::move(ast), std::move(rhs));
         } else if (match(Token::OR)) {
             auto rhs = selector();
-            ast = Ast(new Or(std::move(ast), std::move(rhs)));
+            ast = chemfiles::make_unique<Or>(std::move(ast), std::move(rhs));
         } else {
             break;
         }
@@ -246,7 +247,7 @@ Ast Parser::selector() {
 
     } else if (match(Token::NOT)) {
         auto ast = expression();
-        return Ast(new Not(std::move(ast)));
+        return chemfiles::make_unique<Not>(std::move(ast));
     } else if (match(Token::LBRACKET)) {
         auto index = current_ - 1;
         auto ast = bool_or_string_property();
@@ -287,31 +288,31 @@ Ast Parser::bool_or_string_property() {
     if (match(Token::IDENT) || match(Token::STRING)) {
         // `[name] value` shortand, where value is a string
         auto value = previous().string();
-        auto ast = Ast(new StringProperty(property, std::move(value), true, var));
+        Ast ast = chemfiles::make_unique<StringProperty>(property, std::move(value), true, var);
         while (match(Token::IDENT) || match(Token::STRING)) {
             // handle multiple values '[name] H N C O'
             value = previous().string();
-            auto rhs = Ast(new StringProperty(property, std::move(value), true, var));
-            ast = Ast(new Or(std::move(ast), std::move(rhs)));
+            auto rhs = chemfiles::make_unique<StringProperty>(property, std::move(value), true, var);
+            ast = chemfiles::make_unique<Or>(std::move(ast), std::move(rhs));
         }
         return ast;
     } else if (match(Token::EQUAL)) {
         if (match(Token::IDENT) || match(Token::STRING)) {
             auto value = previous().string();
-            return Ast(new StringProperty(property, std::move(value), true, var));
+            return chemfiles::make_unique<StringProperty>(property, std::move(value), true, var);
         } else {
             return nullptr;
         }
     } else if (match(Token::NOT_EQUAL)) {
         if (match(Token::IDENT) || match(Token::STRING)) {
             auto value = previous().string();
-            return Ast(new StringProperty(property, std::move(value), false, var));
+            return chemfiles::make_unique<StringProperty>(property, std::move(value), false, var);
         } else {
             return nullptr;
         }
     } else if (finished() || check(Token::AND) || check(Token::OR)) {
         // Use it as a bool property
-        return Ast(new BoolProperty(property, var));
+        return chemfiles::make_unique<BoolProperty>(property, var);
     } else {
         return nullptr;
     }
@@ -350,7 +351,7 @@ Ast Parser::string_selector() {
             // handle multiple values 'name H N C O'
             value = previous().string();
             auto rhs = STRING_SELECTORS[name](std::move(value), true, var);
-            ast = Ast(new Or(std::move(ast), std::move(rhs)));
+            ast = chemfiles::make_unique<Or>(std::move(ast), std::move(rhs));
         }
         return ast;
     } else if (match(Token::EQUAL)) {
@@ -385,15 +386,15 @@ Ast Parser::math_selector()  {
                 // `name value` shortand, where value is a number
                 auto value = previous().number();
                 auto math_lhs = NUMERIC_SELECTORS[name](var);
-                auto math_rhs = MathAst(new Number(value));
-                auto ast = Ast(new Math(Math::Operator::EQUAL, std::move(math_lhs), std::move(math_rhs)));
+                MathAst math_rhs = chemfiles::make_unique<Number>(value);
+                Ast ast = chemfiles::make_unique<Math>(Math::Operator::EQUAL, std::move(math_lhs), std::move(math_rhs));
                 while (match(Token::NUMBER)) {
                     // handle multiple values 'index 7 8 9 11'
                     value = previous().number();
                     math_lhs = NUMERIC_SELECTORS[name](var);
-                    math_rhs = MathAst(new Number(value));
-                    auto rhs = Ast(new Math(Math::Operator::EQUAL, std::move(math_lhs), std::move(math_rhs)));
-                    ast = Ast(new Or(std::move(ast), std::move(rhs)));
+                    math_rhs = chemfiles::make_unique<Number>(value);
+                    auto rhs = chemfiles::make_unique<Math>(Math::Operator::EQUAL, std::move(math_lhs), std::move(math_rhs));
+                    ast = chemfiles::make_unique<Or>(std::move(ast), std::move(rhs));
                 }
                 return ast;
             } else {
@@ -426,7 +427,7 @@ Ast Parser::math_selector()  {
     }
 
     auto rhs = math_sum();
-    return Ast(new Math(op, std::move(lhs), std::move(rhs)));
+    return chemfiles::make_unique<Math>(op, std::move(lhs), std::move(rhs));
 }
 
 MathAst Parser::math_sum() {
@@ -434,10 +435,10 @@ MathAst Parser::math_sum() {
     while (true) {
         if (match(Token::PLUS)) {
             auto rhs = math_product();
-            ast = MathAst(new Add(std::move(ast), std::move(rhs)));
+            ast = chemfiles::make_unique<Add>(std::move(ast), std::move(rhs));
         } else if (match(Token::MINUS)) {
             auto rhs = math_product();
-            ast = MathAst(new Sub(std::move(ast), std::move(rhs)));
+            ast = chemfiles::make_unique<Sub>(std::move(ast), std::move(rhs));
         } else {
             break;
         }
@@ -450,13 +451,13 @@ MathAst Parser::math_product() {
     while (true) {
         if (match(Token::STAR)) {
             auto rhs = math_power();
-            ast = MathAst(new Mul(std::move(ast), std::move(rhs)));
+            ast = chemfiles::make_unique<Mul>(std::move(ast), std::move(rhs));
         } else if (match(Token::SLASH)) {
             auto rhs = math_power();
-            ast = MathAst(new Div(std::move(ast), std::move(rhs)));
+            ast = chemfiles::make_unique<Div>(std::move(ast), std::move(rhs));
         } else if (match(Token::PERCENT)) {
             auto rhs = math_power();
-            ast = MathAst(new Mod(std::move(ast), std::move(rhs)));
+            ast = chemfiles::make_unique<Mod>(std::move(ast), std::move(rhs));
         } else {
             break;
         }
@@ -468,7 +469,7 @@ MathAst Parser::math_power() {
     auto lhs = math_value();
     if (match(Token::HAT)) {
         auto rhs = math_power();
-        return MathAst(new Pow(std::move(lhs), std::move(rhs)));
+        return chemfiles::make_unique<Pow>(std::move(lhs), std::move(rhs));
     } else {
         return lhs;
     }
@@ -497,7 +498,7 @@ MathAst Parser::math_value() {
                 );
             }
             auto var = variable();
-            return MathAst(new NumericProperty(std::move(property), var));
+            return chemfiles::make_unique<NumericProperty>(std::move(property), var);
         } else {
             throw selection_error("expected property name after [, got {}", peek().as_str());
         }
@@ -508,14 +509,14 @@ MathAst Parser::math_value() {
         }
         return ast;
     } else if (match(Token::NUMBER)) {
-        return MathAst(new Number(previous().number()));
+        return chemfiles::make_unique<Number>(previous().number());
     } else if (match(Token::PLUS)) {
         // Unary plus, nothing to do
         return math_value();
     } else if (match(Token::MINUS)) {
         // Unary minus
         auto ast = math_value();
-        return MathAst(new Neg(std::move(ast)));
+        return chemfiles::make_unique<Neg>(std::move(ast));
     } else {
         if (finished()) {
             throw selection_error("expected content after '{}'", previous().as_str());
