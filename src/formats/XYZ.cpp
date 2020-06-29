@@ -134,7 +134,7 @@ optional<uint64_t> XYZFormat::forward() {
 static bool should_be_quoted(string_view s) {
     for (auto c: s) {
         // TODO: ASE also allow [] {} and () to function as quotes. This should
-        // be updated when a specification is agreed on. 
+        // be updated when a specification is agreed on.
         if (is_whitespace(c) || c == '=' || c == '\'' || c == '"') {
             return true;
         }
@@ -229,7 +229,7 @@ std::string write_extended_comment_line(const Frame& frame) {
 /// mapping name=>properties values. The use of string_view is safe since the
 /// original string_view (as returned by file.readline()) will stay alive longer
 /// than this map.
-using extended_xyz_properties_map_t = std::unordered_map<string_view, string_view>;
+using extended_xyz_properties_map_t = std::unordered_map<string_view, Property>;
 
 /// A simple parser for the extended XYZ comment line. This parser bails out as
 /// soons as possible if the line does not seems to follow extended XYZ
@@ -256,8 +256,9 @@ public:
             if (!name.empty() && current() == '=') {
                 advance();
             } else {
-                // this does not look like a property, bail out
-                break;
+                // properties without associated value are set to True by ASE
+                properties.emplace(name, true);
+                continue;
             }
 
             auto value = next_substring();
@@ -267,7 +268,7 @@ public:
                 break;
             }
 
-            properties.emplace(name, value);
+            properties.emplace(name, value.to_string());
         }
         return properties;
     }
@@ -449,6 +450,10 @@ static properties_list_t parse_property_list(string_view input) {
 }
 
 properties_list_t read_extended_comment_line(string_view line, Frame& frame) {
+    // only try to parse as extended XYZ if `Properties` is defined as expected
+    if (line.find("species:S:1:pos:R:3") == std::string::npos) {
+        return {};
+    }
     auto properties = extended_xyz_parser(line).parse();
 
     for (const auto& it: properties) {
@@ -456,15 +461,15 @@ properties_list_t read_extended_comment_line(string_view line, Frame& frame) {
         if (name == "Lattice" || name == "Properties") {
             continue;
         }
-        frame.set(name.to_string(), it.second.to_string());
+        frame.set(name.to_string(), std::move(it.second));
     }
 
     if (properties.count("Lattice") == 1) {
-        frame.set_cell(parse_cell(properties.at("Lattice")));
+        frame.set_cell(parse_cell(properties.at("Lattice").as_string()));
     }
 
     if (properties.count("Properties") == 1) {
-        return parse_property_list(properties.at("Properties"));
+        return parse_property_list(properties.at("Properties").as_string());
     } else {
         return {};
     }

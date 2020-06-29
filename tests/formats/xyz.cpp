@@ -96,6 +96,7 @@ TEST_CASE("Read files in XYZ format") {
         CHECK(frame.get("ENERGY")->as_string() == "-2069.84934116");
         CHECK(frame.get("Natoms")->as_string() == "192");
         CHECK(frame.get("NAME")->as_string() == "COBHUW");
+        CHECK(frame.get("IsStrange")->as_bool() == true);
 
         // Atom level properties
         CHECK(approx_eq(frame.positions()[0], {2.33827271799, 4.55315540425, 11.5841360926}, 1e-12));
@@ -190,7 +191,9 @@ TEST_CASE("Errors in XYZ format") {
 
         auto frame = file.read();
         check_bad_properties_still_read_frame(frame);
-        CHECK(WARNINGS == "Extended XYZ: ignoring non-standard Properties='pos:R:3:species:S:1', should start with 'species:S:1:pos:R:3'");
+        // This one is not even recognized as an extended XYZ file
+        CHECK(WARNINGS == "");
+        CHECK_FALSE(frame.get("invalid"));
         WARNINGS.clear();
 
         frame = file.read();
