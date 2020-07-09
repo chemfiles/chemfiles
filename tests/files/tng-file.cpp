@@ -7,9 +7,6 @@
 #include "chemfiles/files/TNGFile.hpp"
 using namespace chemfiles;
 
-#include <boost/filesystem.hpp>
-namespace fs=boost::filesystem;
-
 #define CHECK_SUCCESS(x) CHECK(x == TNG_SUCCESS)
 
 TEST_CASE("TNG files") {
@@ -48,7 +45,7 @@ TEST_CASE("TNG files") {
 
     SECTION("Append") {
         auto filename = NamedTempPath(".tng");
-        fs::copy_file("data/tng/example.tng", filename.path());
+        copy_file("data/tng/example.tng", filename.path());
         {
             // Just checking constructor and destructor
             TNGFile file(filename, File::APPEND);

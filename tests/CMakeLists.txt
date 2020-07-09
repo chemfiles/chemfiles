@@ -121,20 +121,6 @@ endforeach()
 file(RELATIVE_PATH VERSION_FILE_PATH ${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/VERSION)
 target_compile_definitions(c-misc PRIVATE "-DVERSION_FILE_PATH=\"${VERSION_FILE_PATH}\"")
 
-# BOOST asio (used for hostname test) requires some additional system
-# libraries, link to them explicitly here
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "PGI" AND "${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
-    set(EXTRA_BOOST_ASIO_LIBS atomic)
-elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "^(arm.*|ARM.*)" OR
-       "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "^(aarch64.*|AARCH64.*)" OR
-       "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "^(powerpc|ppc)64le" OR
-       "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "^(powerpc|ppc)64"
-   )
-    find_package(Threads REQUIRED)
-    set(EXTRA_BOOST_ASIO_LIBS ${CMAKE_THREAD_LIBS_INIT})
-endif()
-target_link_libraries(utils ${EXTRA_BOOST_ASIO_LIBS})
-
 function(chfl_doctest _name_ _file_)
     if(NOT ${CHFL_BUILD_DOCTESTS})
         return()

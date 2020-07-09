@@ -9,9 +9,6 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-#include <boost/filesystem.hpp>
-namespace fs=boost::filesystem;
-
 TEST_CASE("Read files in mmCIF format") {
     SECTION("Read single step") {
         // This is how I imagine most people will resolve the conflict between

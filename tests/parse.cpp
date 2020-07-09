@@ -1,8 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 #include <catch.hpp>
-#include <boost/filesystem.hpp>
-namespace fs=boost::filesystem;
 
 #include "chemfiles/parse.hpp"
 #include "chemfiles/Error.hpp"

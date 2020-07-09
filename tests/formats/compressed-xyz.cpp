@@ -9,9 +9,6 @@
 #include "chemfiles/files/XzFile.hpp"
 using namespace chemfiles;
 
-#include <boost/filesystem.hpp>
-namespace fs=boost::filesystem;
-
 static void check_read_file(Trajectory&& file) {
     REQUIRE(file.nsteps() == 100);
 

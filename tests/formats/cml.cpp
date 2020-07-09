@@ -9,9 +9,6 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-#include <boost/filesystem.hpp>
-namespace fs=boost::filesystem;
-
 TEST_CASE("Read files in CML format") {
     SECTION("Check nsteps") {
         auto file = Trajectory("data/cml/ethane.cml");
