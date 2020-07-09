@@ -76,6 +76,7 @@ set(EXTERNAL_INCLUDES "")
 # ==========
 
 if(${CHFL_SYSTEM_ZLIB})
+    message(WARNING "64-bit offsets are often not supported by the system zlib, consider using CHFL_SYSTEM_ZLIB=OFF")
     find_package(ZLIB REQUIRED)
     set(ZLIB_LIBRARIES ${ZLIB_LIBRARIES} PARENT_SCOPE)
     set(ZLIB_OBJECTS "" PARENT_SCOPE)
