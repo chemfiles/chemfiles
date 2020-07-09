@@ -38,6 +38,9 @@ private:
     std::string path_;
 };
 
+/// copy the file at `src` to `dst`
+void copy_file(std::string src, std::string dst);
+
 // On Windows, disable the "Application error" dialog box, because it
 // requires an human intervention, and there is no one on Appveyor.
 //

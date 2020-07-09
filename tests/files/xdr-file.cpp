@@ -7,9 +7,6 @@
 #include "chemfiles/files/XDRFile.hpp"
 using namespace chemfiles;
 
-#include <boost/filesystem.hpp>
-namespace fs=boost::filesystem;
-
 TEST_CASE("XTC files") {
     SECTION("Read") {
         XDRFile file(XDRFile::XTC, "data/xtc/ubiquitin.xtc", File::READ);
@@ -38,7 +35,7 @@ TEST_CASE("XTC files") {
 
     SECTION("Append") {
         auto filename = NamedTempPath(".xtc");
-        fs::copy_file("data/xtc/ubiquitin.xtc", filename.path());
+        copy_file("data/xtc/ubiquitin.xtc", filename.path());
         XDRFile file(XDRFile::XTC, filename, File::APPEND);
 
         CHECK(file.natoms() == 20455);
@@ -83,7 +80,7 @@ TEST_CASE("TRR files") {
 
     SECTION("Append") {
         auto filename = NamedTempPath(".trr");
-        fs::copy_file("data/trr/water.trr", filename.path());
+        copy_file("data/trr/water.trr", filename.path());
         XDRFile file(XDRFile::TRR, filename, File::APPEND);
 
         CHECK(file.natoms() == 297);

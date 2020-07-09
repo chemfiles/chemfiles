@@ -7,14 +7,15 @@
 #include "chemfiles.hpp"
 
 #include <cstdlib>
+#include <cstdio>
+#include <stdexcept>
 #include <new>
-
-#include <boost/filesystem.hpp>
-namespace fs=boost::filesystem;
 
 #ifdef CHEMFILES_WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#else
+#include <unistd.h>
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -72,17 +73,43 @@ bool is_valgrind_and_travis() {
 }
 
 NamedTempPath::NamedTempPath(std::string extension) {
-    // Maybe operator overloading have been too far?
-    auto path = fs::temp_directory_path() / fs::unique_path();
-    // Convert std::wstring to std::string, needed on windows. This is fine
-    // because we are only using this class internally, with characters in the
-    // ASCII range.
-    path_ = std::string(path.native().begin(), path.native().end());
-    path_ += extension;
+#ifdef CHEMFILES_WINDOWS
+    char temp_path[MAX_PATH + 1] = {0};
+    auto status = GetTempPathA(MAX_PATH + 1, temp_path);
+    if (status == 0) {
+        throw std::runtime_error("failed to get temporary files directory");
+    }
+
+    auto attributes = GetFileAttributesA(temp_path);
+    if (attributes == INVALID_FILE_ATTRIBUTES || !(attributes & FILE_ATTRIBUTE_DIRECTORY)) {
+        throw std::runtime_error("temporary files directory '" + std::string(temp_path) + "' do not exists");
+    }
+
+    char buffer[MAX_PATH] = {0};
+    status = GetTempFileNameA(temp_path, "chemfiles-tmp-", 0, buffer);
+    if (status == 0) {
+        throw std::runtime_error("failed to get a temporary file name");
+    }
+#else
+    char buffer[] = "/tmp/chemfiles-tmp-XXXXXX";
+    auto status = mkstemp(buffer);
+    if (status == -1) {
+        throw std::runtime_error("failed to get a temporary file name");
+    }
+#endif
+
+    path_ = buffer + extension;
 }
 
 NamedTempPath::~NamedTempPath() {
     remove(path_.c_str());
+}
+
+void copy_file(std::string src, std::string dst) {
+    std::ifstream input(src, std::ios::binary);
+    std::ofstream output(dst, std::ios::binary);
+
+    output << input.rdbuf();
 }
 
 static bool FAIL_NEXT_ALLOCATION = false;

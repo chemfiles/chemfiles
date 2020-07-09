@@ -6,10 +6,6 @@
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
-#include <boost/filesystem.hpp>
-namespace fs=boost::filesystem;
-
-
 TEST_CASE("Read files in NetCDF format") {
     SECTION("Read one frame") {
         auto file = Trajectory("data/netcdf/water.nc");
