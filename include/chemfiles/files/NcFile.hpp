@@ -73,7 +73,16 @@ namespace nc {
         /// Get `count` values starting at `start` from this variable
         std::vector<float> get(count_t start, count_t count) const;
         /// Add `cout` values from `data` starting at `start` in this variable
-        void add(count_t start, count_t count, std::vector<float> data);
+        void add(count_t start, count_t count, const std::vector<float>& data);
+    };
+
+    class NcDouble final: public NcVariable {
+    public:
+        NcDouble(NcFile& file, netcdf_id_t var) : NcVariable(file, var) {}
+        /// Get `count` values starting at `start` from this variable
+        std::vector<double> get(count_t start, count_t count) const;
+        /// Add `cout` values from `data` starting at `start` in this variable
+        void add(count_t start, count_t count, const std::vector<double>& data);
     };
 
     class NcChar final: public NcVariable {
@@ -87,6 +96,7 @@ namespace nc {
 
     template<typename NcType> struct nc_type;
     template<> struct nc_type<NcFloat> {static constexpr auto value = NC_FLOAT;};
+    template<> struct nc_type<NcDouble> {static constexpr auto value = NC_DOUBLE;};
     template<> struct nc_type<NcChar> {static constexpr auto value = NC_CHAR;};
 } // namespace nc
 
@@ -96,7 +106,7 @@ namespace nc {
 /// format. All the operation are guaranteed to return a valid value or throw an
 /// error.
 ///
-/// The template functions are manually specialized for float and char data types.
+/// The template functions are manually specialized for float, double and char data types.
 class NcFile final: public File {
 public:
     NcFile(std::string path, File::Mode mode);
