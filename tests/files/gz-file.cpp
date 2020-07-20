@@ -76,6 +76,7 @@ TEST_CASE("Write a gz file") {
         TextFile file(filename, File::WRITE, File::GZIP);
         file.print("Test\n");
         file.print("{}\n", 5467);
+        CHECK(file.tellpos() == 10);
     }
 
     std::ifstream checking(filename, std::ios::binary);

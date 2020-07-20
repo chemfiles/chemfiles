@@ -90,6 +90,9 @@ R"( REFERENCE STRUCTURE = 00000   A,B,C =  10.000  10.000  12.000
     frame.set_cell(UnitCell(10, 10, 12));
     auto t = Trajectory(tmpfile, 'w');
     t.write(frame);
+
+    CHECK_THROWS_WITH(t.write(frame), "CSSR format only supports writing one frame");
+
     t.close();
 
     std::ifstream checking(tmpfile);

@@ -81,6 +81,7 @@ TEST_CASE("Write a bzip2 file") {
         TextFile file(filename, File::WRITE, File::BZIP2);
         file.print("Test\n");
         file.print("{}\n", 5467);
+        CHECK(file.tellpos() == 10);
     }
 
     std::ifstream checking(filename, std::ios::binary);

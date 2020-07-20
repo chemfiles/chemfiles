@@ -93,6 +93,7 @@ TEST_CASE("Write to files in memory") {
         CHECK(std::string(result.data(), result.size()) == "Test\n");
 
         file.print("JUNKJUNK");
+        CHECK(file.tellpos() == 13);
         result = buffer->write_memory_as_string();
         CHECK(std::string(result.data(), result.size()) == "Test\nJUNKJUNK");
 

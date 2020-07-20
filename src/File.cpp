@@ -208,6 +208,7 @@ void TextFile::vprint(fmt::string_view format, fmt::format_args args) {
         return;
     }
     file_->write(buffer.data(), buffer.size());
+    position_ += buffer.size();
 }
 
 std::string TextFile::readall() {

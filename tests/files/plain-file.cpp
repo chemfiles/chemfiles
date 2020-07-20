@@ -165,6 +165,7 @@ TEST_CASE("Write a text file") {
         TextFile file(filename, File::WRITE, File::DEFAULT);
         file.print("Test\n");
         file.print("{}\n", 5467);
+        CHECK(file.tellpos() == 10);
     }
 
     std::ifstream verification(filename);
