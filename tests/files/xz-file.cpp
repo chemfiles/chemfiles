@@ -73,6 +73,7 @@ TEST_CASE("Write an xz file") {
         auto file = TextFile(filename, File::WRITE, File::LZMA);
         file.print("Test\n");
         file.print("{}\n", 5467);
+        CHECK(file.tellpos() == 10);
     }
 
     std::ifstream verification(filename, std::ios::binary);
