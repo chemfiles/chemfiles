@@ -66,6 +66,9 @@ fi
 
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     if [[ "$TRAVIS_COMPILER" == "gcc" ]]; then
+        export HOMEBREW_NO_INSTALL_CLEANUP=1
+        export HOMEBREW_NO_AUTO_UPDATE=1
+        brew install gcc@5
         export CC=gcc-5
         export CXX=g++-5
 
