@@ -23,6 +23,8 @@ constructor to manually specify which format to use.
     +=================+============+=======+=======+===========+============+===========+=======+=======+==========+
     | `Amber NetCDF`_ | .nc        | |yes| | |yes| | |yes|     | |yes|      | |yes|     | |no|  | |no|  | |no|     |
     +-----------------+------------+-------+-------+-----------+------------+-----------+-------+-------+----------+
+    | `CIF`_          | .cif       | |yes| | |yes| | |yes|     | |no|       | |yes|     | |yes| | |no|  | |no|     |
+    +-----------------+------------+-------+-------+-----------+------------+-----------+-------+-------+----------+
     | `CML`_          | .cml       | |yes| | |yes| | |yes|     | |yes|      | |yes|     | |yes| | |yes| | |no|     |
     +-----------------+------------+-------+-------+-----------+------------+-----------+-------+-------+----------+
     | `CSSR`_         | .cssr      | |yes| | |yes| | |yes|     | |no|       | |yes|     | |yes| | |yes| | |no|     |
@@ -68,6 +70,7 @@ constructor to manually specify which format to use.
   `read_data <http://lammps.sandia.gov/doc/read_data.html>`_ command.
 
 .. _Amber NetCDF: http://ambermd.org/netcdf/nctraj.xhtml
+.. _CIF: https://www.iucr.org/resources/cif
 .. _CML: http://www.xml-cml.org
 .. _CSSR: http://www.chem.cmu.edu/courses/09-560/docs/msi/modenv/D_Files.html#944777
 .. _DCD: http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/dcdplugin.html
