@@ -49,8 +49,9 @@ void CIFFormat::init_() {
     }
 
     // Parse the CIF file
+    auto content = file_.readall();
     try {
-	doc = new gemmi::cif::Document(gemmi::cif::read_file(filename));
+	doc = new gemmi::cif::Document(gemmi::cif::read_string(content));
     } catch (std::exception& e) {
 	throw format_error("cannot parse CIF file");
     }
@@ -58,13 +59,12 @@ void CIFFormat::init_() {
     // Interpret the content of each block, to remove blocks that contain
     // no atom: those can occur, but are not useful to us (they contain comments
     // and associated experimental data).
-    for (const auto &block int doc->blocks) {
+    for (const auto &block: doc->blocks) {
       try {
-	gemmi::SmallStructure s = gemmi::make_small_structure_from_block(data->doc->blocks[i]);
+	gemmi::SmallStructure s = gemmi::make_small_structure_from_block(block);
 
 	if (s.get_all_unit_cell_sites().size() > 0) {
 	  structures_.push_back(s);
-	  // natoms is s.get_all_unit_cell_sites().size();
 	}
       } catch (std::exception& e) {
 	/* Simply skip to the next block. */
@@ -84,26 +84,23 @@ void CIFFormat::read_step(const size_t step, Frame& frame) {
     assert(step < structures_.size());
 
     auto structure = structures_[step];
-    auto sites = s.get_all_unit_cell_sites();
+    auto sites = structure.get_all_unit_cell_sites();
 
     UnitCell cell = UnitCell(structure.cell.a, structure.cell.b, structure.cell.c,
 	structure.cell.alpha, structure.cell.beta, structure.cell.gamma);
     frame.set_cell(cell);
 
-    // TODO: figure out if Gemmi can provide a name for us to record
-    if (!name_.empty()) {
-        frame.set("name", name_);
-    }
+    frame.set("name", structure.name);
 
-    for (auto atom in sites) {
-        Atom atom(atom.label, atom.element.name());
+    for (const auto& site: sites) {
+        Atom atom(site.label, site.element.name());
         // TODO: should we use those somehow?
-	// atom.element.atomic_number()
-	// atom.element.weight()
-	// atom.occ is the occupancy
+	// site.element.atomic_number()
+	// site.element.weight()
+	// site.occ is the occupancy
 
-	gemmi::Fractional fract = sites[i].fract.wrap_to_unit();
-	gemmi::Position p = s.cell.orthogonalize(fract);
+	gemmi::Fractional fract = site.fract.wrap_to_unit();
+	gemmi::Position p = structure.cell.orthogonalize(fract);
 
         frame.add_atom(std::move(atom), Vector3D(p.x, p.y, p.z));
     }
@@ -138,7 +135,9 @@ void CIFFormat::write(const Frame& frame) {
     file_.print("_atom_site_fract_x\n");
     file_.print("_atom_site_fract_y\n");
     file_.print("_atom_site_fract_z\n");
-    file_.print("_atom_site_Cartn_x\n"); // TODO: having Cartn is rare for pure CIF formats, but is allowed. I do not think it hurts.
+    // Cartesian coordinates are rare in CIF file, but allowed. Most programs will ignore them
+    // and use fractional coordinates
+    file_.print("_atom_site_Cartn_x\n");
     file_.print("_atom_site_Cartn_y\n");
     file_.print("_atom_site_Cartn_z\n");
 
@@ -147,10 +146,10 @@ void CIFFormat::write(const Frame& frame) {
     for (size_t i = 0; i < frame.size(); ++i) {
         const auto& atom = frame[i];
 
-	// TODO: are the fractional coordinates stored? if not, use the cell transformation matrix to transform positions[i] into a fract vector
-	// fract = 
+	// TODO: handle infinite cells
+        Matrix3D invmat = frame.cell().matrix().invert();
+	Vector3D fract = invmat * positions[i];
 
-	// TODO: can atoms have nonunit occupancy in Chemfiles? if so, use it here instead of "1.0"
         file_.print("{} {} 1.0 {: <4} {} {: >3} {} {: >4} {:8.3f} {:8.3f} {:8.3f} {} {} {}\n",
                 atom.name(), atom.type(), fract[0], fract[1], fract[2],
                 positions[i][0], positions[i][1], positions[i][2]
