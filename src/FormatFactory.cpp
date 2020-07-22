@@ -34,6 +34,7 @@
 #include "chemfiles/formats/SMI.hpp"
 #include "chemfiles/formats/TRR.hpp"
 #include "chemfiles/formats/XTC.hpp"
+#include "chemfiles/formats/CIF.hpp"
 
 #define SENTINEL_INDEX (static_cast<size_t>(-1))
 
@@ -68,6 +69,7 @@ FormatFactory::FormatFactory() {
     this->add_format<SMIFormat>();
     this->add_format<TRRFormat>();
     this->add_format<XTCFormat>();
+    this->add_format<CIFFormat>();
 
     // VMD molfile plugins
     this->add_format<Molfile<DCD>>();
