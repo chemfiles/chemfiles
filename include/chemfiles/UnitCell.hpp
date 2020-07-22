@@ -57,7 +57,7 @@ public:
     /// @example{cell/cell-1.cpp}
     UnitCell(double a);
 
-    /// Construct an `ORTHOROMBIC` unit cell of side size `a`, `b`, `c`
+    /// Construct an `ORTHORHOMBIC` unit cell of side size `a`, `b`, `c`
     ///
     /// @example{cell/cell-3.cpp}
     UnitCell(double a, double b, double c);
@@ -66,7 +66,7 @@ public:
     /// `alpha`, `beta`, `gamma`.
     ///
     /// If all of `alpha`, `beta` and `gamma` are 90.0, then the cell is
-    /// `ORTHOROMBIC`. Else a `TRICLINIC` cell is created.
+    /// `ORTHORHOMBIC`. Else a `TRICLINIC` cell is created.
     ///
     /// @example{cell/cell-6.cpp}
     UnitCell(double a, double b, double c, double alpha, double beta, double gamma);
@@ -77,7 +77,7 @@ public:
     /// created.
     ///
     /// If only the diagonal of the matrix is non-zero, then the cell is
-    /// `ORTHOROMBIC`. Else a `TRICLINIC` cell is created.
+    /// `ORTHORHOMBIC`. Else a `TRICLINIC` cell is created.
     ///
     /// @example{cell/matrix.cpp}
     UnitCell(const Matrix3D& matrix);
@@ -187,7 +187,7 @@ public:
 
     /// Wrap the `vector` in the unit cell, using periodic boundary conditions.
     ///
-    /// For an orthorombic unit cell, this make sure that all the vector
+    /// For an orthorhombic unit cell, this make sure that all the vector
     /// components are between `-L/2` and `L/2` where `L` is the corresponding
     /// cell length.
     ///
@@ -195,8 +195,8 @@ public:
     Vector3D wrap(const Vector3D& vector) const;
 
 private:
-    /// Wrap a vector in orthorombic cell
-    Vector3D wrap_orthorombic(const Vector3D& vector) const;
+    /// Wrap a vector in orthorhombic cell
+    Vector3D wrap_orthorhombic(const Vector3D& vector) const;
     /// Wrap a vector in triclinic cell
     Vector3D wrap_triclinic(const Vector3D& vector) const;
     /// Compute the cell matrix from the cell parameters

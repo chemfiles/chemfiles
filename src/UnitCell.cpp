@@ -248,8 +248,8 @@ void UnitCell::set_gamma(double val) {
     update_matrix();
 }
 
-// Wrap a vector in an Orthorombic UnitCell
-Vector3D UnitCell::wrap_orthorombic(const Vector3D& vector) const {
+// Wrap a vector in an Orthorhombic UnitCell
+Vector3D UnitCell::wrap_orthorhombic(const Vector3D& vector) const {
     return {
         vector[0] - round(vector[0] / a_) * a_,
         vector[1] - round(vector[1] / b_) * b_,
@@ -257,7 +257,7 @@ Vector3D UnitCell::wrap_orthorombic(const Vector3D& vector) const {
     };
 }
 
-// Wrap a vector in an Orthorombic UnitCell
+// Wrap a vector in an Orthorhombic UnitCell
 Vector3D UnitCell::wrap_triclinic(const Vector3D& vector) const {
     auto fractional = h_inv_ * vector;
     fractional[0] -= round(fractional[0]);
@@ -271,7 +271,7 @@ Vector3D UnitCell::wrap(const Vector3D& vector) const {
         case INFINITE:
             return vector;
         case ORTHORHOMBIC:
-            return wrap_orthorombic(vector);
+            return wrap_orthorhombic(vector);
         case TRICLINIC:
             return wrap_triclinic(vector);
     }
