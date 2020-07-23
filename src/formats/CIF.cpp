@@ -1,6 +1,9 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include "chemfiles/config.h"
+#ifndef CHFL_DISABLE_GEMMI
+
 #include <cassert>
 #include <cstdint>
 #include <map>
@@ -158,3 +161,5 @@ void CIFFormat::write(const Frame& frame) {
 
     models_++;
 }
+
+#endif // CHFL_DISABLE_GEMMI

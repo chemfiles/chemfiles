@@ -44,10 +44,10 @@ matrix:
       compiler: gcc
       env: STATIC_LIBS=ON DO_COVERAGE=ON DEPLOY_DOCS=ON
       addons: *linux64
-    - name: clang + system libs
+    - name: clang + non-standard external libs
       os: linux
       compiler: clang
-      env: CMAKE_EXTRA="-DCHFL_SYSTEM_NETCDF=ON -DCHFL_SYSTEM_ZLIB=ON -DCHFL_SYSTEM_LZMA=ON"
+      env: CMAKE_EXTRA="-DCHFL_SYSTEM_NETCDF=ON -DCHFL_SYSTEM_ZLIB=ON -DCHFL_SYSTEM_LZMA=ON -DCHFL_DISABLE_GEMMI=ON"
       addons: *linux64
     - name: valgrind
       os: linux

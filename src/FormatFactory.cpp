@@ -10,6 +10,7 @@
 
 #include <fmt/ostream.h>
 
+#include "chemfiles/config.h"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/FormatFactory.hpp"
@@ -69,7 +70,9 @@ FormatFactory::FormatFactory() {
     this->add_format<SMIFormat>();
     this->add_format<TRRFormat>();
     this->add_format<XTCFormat>();
+#ifndef CHFL_DISABLE_GEMMI
     this->add_format<CIFFormat>();
+#endif
 
     // VMD molfile plugins
     this->add_format<Molfile<DCD>>();

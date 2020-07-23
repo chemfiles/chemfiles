@@ -4,6 +4,9 @@
 #ifndef CHEMFILES_FORMAT_CIF_HPP
 #define CHEMFILES_FORMAT_CIF_HPP
 
+#include "chemfiles/config.h"
+#ifndef CHFL_DISABLE_GEMMI
+
 #include <cstdint>
 #include <map>
 #include <string>
@@ -56,5 +59,7 @@ private:
 template<> FormatInfo format_information<CIFFormat>();
 
 } // namespace chemfiles
+
+#endif // CHFL_DISABLE_GEMMI
 
 #endif
