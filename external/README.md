@@ -7,18 +7,19 @@ archive and reproduced at the end of this file.
 ## Updating
 
 We maintain a set of patches to these libraries, in there respective forks, in
-the `chemfiles` branch.
+the `chemfiles` branch. These patches mainly concern integration of the code 
+with chemfiles build system.
 
 - fmt: https://github.com/chemfiles/fmt
 - toml11: https://github.com/chemfiles/toml11
-- molfiles: https://github.com/chemfiles/molfiles
-- TNG: https://github.com/chemfiles/tng
-- NetCDF: https://github.com/chemfiles/netcdf-c
-- mmtf-c: https://github.com/chemfiles/mmtf-c
-- msgpack-c: https://github.com/chemfiles/msgpack-c
 - zlib: https://github.com/chemfiles/zlib
 - bzip2: https://github.com/chemfiles/bzip2
 - liblzma: https://github.com/chemfiles/lzma
+- pugixml: https://github.com/chemfiles/pugixml
+- molfiles: https://github.com/chemfiles/molfiles
+- TNG: https://github.com/chemfiles/tng
+- NetCDF: https://github.com/chemfiles/netcdf-c
+- mmtf-cpp: https://github.com/chemfiles/mmtf-c
 
 To update a library, update the corresponding repository, and then regenerate
 the archive to be included in this directory with
@@ -183,6 +184,31 @@ FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
 NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
 WITH THE ACCESS, USE OR PERFORMANCE OF THIS SOFTWARE.
 
+## mmft-cpp
+
+The MIT license applies to all files unless otherwise noted.
+
+Copyright 2017, University of California San Diego
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+**mmtf-cpp depends on msgpack-c**
+
 ## msgpack-c
 
 Boost Software License - Version 1.0 - August 17th, 2003
@@ -208,22 +234,6 @@ SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
 FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
-
-## mmft-c
-
-Copyright 2016 RCSB
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 ## zlib
 

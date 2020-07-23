@@ -162,7 +162,10 @@ int main() {
 
 Guillaume Fraux created and maintains Chemfiles, which is distributed under the
 [3 clauses BSD license](LICENSE). By contributing to Chemfiles, you agree to
-distribute your contributions under the same license.
+distribute your contributions under the same license. Chemfiles depends on
+multiple external libraries, which are distributed [their respective
+licenses](external/README.md). All external libraries licenses should be
+compatible with chemfiles's 3 clauses BSD.
 
 The [AUTHORS](AUTHORS) file lists all contributors to Chemfiles. Many thanks to
 all of them!
