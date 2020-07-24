@@ -164,7 +164,7 @@ Guillaume Fraux created and maintains Chemfiles, which is distributed under the
 [3 clauses BSD license](LICENSE). By contributing to Chemfiles, you agree to
 distribute your contributions under the same license. 
 
-Chemfiles depends on multiple external libraries, which are distributed [their
+Chemfiles depends on multiple external libraries, which are distributed under [their
 respective licenses](external/README.md). All external libraries licenses should
 be compatible with chemfiles's 3 clauses BSD. One notable execption depending on
 your use case is [Gemmi](https://gemmi.readthedocs.io) which is distributed
