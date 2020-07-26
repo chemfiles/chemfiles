@@ -36,9 +36,28 @@ TEST_CASE("Read files in CIF format") {
         CHECK(approx_eq(cell.gamma(), 90., 1e-4));
     }
 
-    SECTION("Check nsteps") {
+    SECTION("Check nsteps and read frame by frame") {
         auto file = Trajectory("data/cif/Zr-UiO-66-pressure.cif", 'r', "CIF");
         CHECK(file.nsteps() == 3);
+
+        Frame frame = file.read();
+        CHECK(approx_eq(frame.cell().a(), 20.721205, 1e-4));
+        frame = file.read();
+        CHECK(approx_eq(frame.cell().a(), 20.561233, 1e-4));
+        frame = file.read();
+        CHECK(approx_eq(frame.cell().a(), 20.415146, 1e-4));
+    }
+
+    SECTION("Read specific frame") {
+        auto file = Trajectory("data/cif/Zr-UiO-66-pressure.cif", 'r', "CIF");
+        CHECK(file.nsteps() == 3);
+
+        Frame frame = file.read_step(1);
+        CHECK(approx_eq(frame.cell().a(), 20.561233, 1e-4));
+        frame = file.read_step(0);
+        CHECK(approx_eq(frame.cell().a(), 20.721205, 1e-4));
+        frame = file.read_step(2);
+        CHECK(approx_eq(frame.cell().a(), 20.415146, 1e-4));
     }
 }
 
@@ -70,8 +89,8 @@ TEST_CASE("Write CIF file") {
     "_atom_site_Cartn_x\n"
     "_atom_site_Cartn_y\n"
     "_atom_site_Cartn_z\n"
-    "Si Si 1.0  1.0000000  2.0000000  3.0000000  1.00000  2.00000  3.00000\n"
-    "C C 1.0  2.0000000  3.0000000  4.0000000  2.00000  3.00000  4.00000\n";
+    "Si Si 1.0  0.0454545  0.0909091  0.1363636  1.00000  2.00000  3.00000\n"
+    "C C 1.0  0.0909091  0.1363636  0.1818182  2.00000  3.00000  4.00000\n";
 
     auto frame = Frame(UnitCell(22));
     frame.add_atom(Atom("Si"), {1, 2, 3});

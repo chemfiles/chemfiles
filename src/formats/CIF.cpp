@@ -111,7 +111,8 @@ void CIFFormat::read_step(const size_t step, Frame& frame) {
 
 // TODO: is it mandatory to implement both read_step() and read()?
 void CIFFormat::read(Frame& frame) {
-    // TODO
+    read_step(current_step_, frame);
+    current_step_++;
 }
 
 void CIFFormat::write(const Frame& frame) {

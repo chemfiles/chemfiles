@@ -32,12 +32,12 @@ class MemoryBuffer;
 class CIFFormat final: public Format {
 public:
     CIFFormat(std::string path, File::Mode mode, File::Compression compression) :
-        file_(std::move(path), mode, compression), models_(0) {
+        file_(std::move(path), mode, compression), models_(0), current_step_(0) {
         init_();
     }
 
     CIFFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression) :
-        file_(std::move(memory), mode, compression), models_(0) {
+        file_(std::move(memory), mode, compression), models_(0), current_step_(0) {
         init_();
     }
 
@@ -54,6 +54,8 @@ private:
     std::vector<gemmi::SmallStructure> structures_;
     /// Number of models written to the file.
     size_t models_;
+    /// When reading frame by frame, remember where we are
+    size_t current_step_;
 };
 
 template<> FormatInfo format_information<CIFFormat>();
