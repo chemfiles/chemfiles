@@ -17,14 +17,14 @@ TEST_CASE("Read files in CIF format") {
         Frame frame = file.read();
 
         CHECK(frame.size() == 100);
-	CHECK(frame.name == "1544173");
+	CHECK(frame.get("name")->as_string() == "1544173");
 
         // Check reading positions
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-0.428, 5.427, 11.536), 1e-3));
         CHECK(approx_eq(positions[1], Vector3D(4.634, 11.178, 0.405), 1e-3));
-	CHECK(frame[0].name == "O1");
-	CHECK(frame[1].name == "O1");
+	CHECK(frame[0].name() == "O1");
+	CHECK(frame[1].name() == "O1");
 
         // Check the unit cell
         auto cell = frame.cell();
