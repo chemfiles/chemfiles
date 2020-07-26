@@ -140,12 +140,12 @@ void CIFFormat::write(const Frame& frame) {
       gamma = frame.cell().gamma();
     }
 
-    file_.print("_cell.length_a {}\n", a);
-    file_.print("_cell.length_b {}\n", b);
-    file_.print("_cell.length_c {}\n", c);
-    file_.print("_cell.length_alpha {}\n", alpha);
-    file_.print("_cell.length_beta  {}\n", beta);
-    file_.print("_cell.length_gamma {}\n", gamma);
+    file_.print("_cell_length_a {}\n", a);
+    file_.print("_cell_length_b {}\n", b);
+    file_.print("_cell_length_c {}\n", c);
+    file_.print("_cell_angle_alpha {}\n", alpha);
+    file_.print("_cell_angle_beta  {}\n", beta);
+    file_.print("_cell_angle_gamma {}\n", gamma);
     file_.print("loop_\n");
     file_.print("  _symmetry_equiv_pos_as_xyz\n");
     file_.print("  '+x,+y,+z'\n");
