@@ -46,6 +46,9 @@ TEST_CASE("Parsing") {
         ast = "and -> index(#1) == 1\n    -> or -> index(#1) == 1\n          -> index(#1) == 1";
         CHECK(parse("index == 1 and (index == 1 or index == 1)")->print() == ast);
 
+        ast = "or -> not index(#1) == 1\n   -> index(#1) == 3";
+        CHECK(parse("not index 1 or index 3")->print() == ast);
+
         CHECK_THROWS_WITH(parse("name H and"), "expected content after 'and'");
         CHECK_THROWS_WITH(parse("and name H"), "unexpected content: 'and'");
         CHECK_THROWS_WITH(parse("name H or"), "expected content after 'or'");

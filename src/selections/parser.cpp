@@ -246,7 +246,7 @@ Ast Parser::selector() {
         }
 
     } else if (match(Token::NOT)) {
-        auto ast = expression();
+        auto ast = selector();
         return chemfiles::make_unique<Not>(std::move(ast));
     } else if (match(Token::LBRACKET)) {
         auto index = current_ - 1;
