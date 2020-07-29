@@ -7,57 +7,94 @@
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
+
+#ifndef CHFL_DISABLE_GEMMI
+
 using namespace chemfiles;
 
 TEST_CASE("Read files in CIF format") {
     SECTION("Read single step") {
-        // This is how I imagine most people will resolve the conflict between
-        // CIF files and mmCIF files.
-        auto file = Trajectory("data/cif/1544173.cif", 'r', "CIF");
-        Frame frame = file.read();
+	// This is how I imagine most people will resolve the conflict between
+	// CIF files and mmCIF files.
+	auto file = Trajectory("data/cif/1544173.cif", 'r', "CIF");
+	Frame frame = file.read();
 
-        CHECK(frame.size() == 100);
+	CHECK(frame.size() == 100);
 	CHECK(frame.get("name")->as_string() == "1544173");
 
-        // Check reading positions
-        auto positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D(-0.428, 5.427, 11.536), 1e-3));
-        CHECK(approx_eq(positions[1], Vector3D(4.634, 11.178, 0.405), 1e-3));
+	// Check reading positions
+	auto positions = frame.positions();
+	CHECK(approx_eq(positions[0], Vector3D(-0.428, 5.427, 11.536), 1e-3));
+	CHECK(approx_eq(positions[1], Vector3D(4.634, 11.178, 0.405), 1e-3));
 	CHECK(frame[0].name() == "O1");
+	CHECK(frame[0].type() == "O");
+	CHECK(frame[0].get("occupancy")->as_double() == 1.0);
+	CHECK(frame[0].get("atomic_number")->as_double() == 8);
 	CHECK(frame[1].name() == "O1");
+	CHECK(frame[1].type() == "O");
+	CHECK(frame[1].get("occupancy")->as_double() == 1.0);
+	CHECK(frame[1].get("atomic_number")->as_double() == 8);
 
-        // Check the unit cell
-        auto cell = frame.cell();
-        CHECK(approx_eq(cell.a(), 5.9170, 1e-4));
-        CHECK(approx_eq(cell.b(), 11.5030, 1e-4));
-        CHECK(approx_eq(cell.c(), 12.0635, 1e-4));
-        CHECK(approx_eq(cell.alpha(), 90., 1e-4));
-        CHECK(approx_eq(cell.beta(), 98.153, 1e-4));
-        CHECK(approx_eq(cell.gamma(), 90., 1e-4));
+	// Check the unit cell
+	auto cell = frame.cell();
+	CHECK(approx_eq(cell.a(), 5.9170, 1e-4));
+	CHECK(approx_eq(cell.b(), 11.5030, 1e-4));
+	CHECK(approx_eq(cell.c(), 12.0635, 1e-4));
+	CHECK(approx_eq(cell.alpha(), 90., 1e-4));
+	CHECK(approx_eq(cell.beta(), 98.153, 1e-4));
+	CHECK(approx_eq(cell.gamma(), 90., 1e-4));
     }
 
     SECTION("Check nsteps and read frame by frame") {
-        auto file = Trajectory("data/cif/Zr-UiO-66-pressure.cif", 'r', "CIF");
-        CHECK(file.nsteps() == 3);
+	auto file = Trajectory("data/cif/Zr-UiO-66-pressure.cif", 'r', "CIF");
+	CHECK(file.nsteps() == 3);
 
-        Frame frame = file.read();
-        CHECK(approx_eq(frame.cell().a(), 20.721205, 1e-4));
-        frame = file.read();
-        CHECK(approx_eq(frame.cell().a(), 20.561233, 1e-4));
-        frame = file.read();
-        CHECK(approx_eq(frame.cell().a(), 20.415146, 1e-4));
+	Frame frame = file.read();
+	CHECK(approx_eq(frame.cell().a(), 20.721205, 1e-4));
+	CHECK(frame[0].name() == "C1");
+	CHECK(frame[0].type() == "C");
+	CHECK(frame[0].get("occupancy")->as_double() == 1.0);
+	CHECK(frame[0].get("atomic_number")->as_double() == 6);
+	CHECK(approx_eq(frame.positions()[0], Vector3D(0.124, 14.561, 4.200), 1e-3));
+	frame = file.read();
+	CHECK(approx_eq(frame.cell().a(), 20.561233, 1e-4));
+	CHECK(frame[0].name() == "C1");
+	CHECK(frame[0].get("occupancy")->as_double() == 1.0);
+	CHECK(frame[0].get("atomic_number")->as_double() == 6);
+	CHECK(approx_eq(frame.positions()[0], Vector3D(0.159, 4.170, 14.451), 1e-3));
+	frame = file.read();
+	CHECK(approx_eq(frame.cell().a(), 20.415146, 1e-4));
+	CHECK(frame[0].name() == "C1");
+	CHECK(frame[0].get("occupancy")->as_double() == 1.0);
+	CHECK(frame[0].get("atomic_number")->as_double() == 6);
+	CHECK(approx_eq(frame.positions()[0], Vector3D(0.220, 4.142, 14.350), 1e-3));
     }
 
     SECTION("Read specific frame") {
-        auto file = Trajectory("data/cif/Zr-UiO-66-pressure.cif", 'r', "CIF");
-        CHECK(file.nsteps() == 3);
+	auto file = Trajectory("data/cif/Zr-UiO-66-pressure.cif", 'r', "CIF");
+	CHECK(file.nsteps() == 3);
 
-        Frame frame = file.read_step(1);
-        CHECK(approx_eq(frame.cell().a(), 20.561233, 1e-4));
-        frame = file.read_step(0);
-        CHECK(approx_eq(frame.cell().a(), 20.721205, 1e-4));
-        frame = file.read_step(2);
-        CHECK(approx_eq(frame.cell().a(), 20.415146, 1e-4));
+	Frame frame = file.read_step(1);
+	CHECK(approx_eq(frame.cell().a(), 20.561233, 1e-4));
+	CHECK(frame[0].name() == "C1");
+	CHECK(frame[0].type() == "C");
+	CHECK(frame[0].get("occupancy")->as_double() == 1.0);
+	CHECK(frame[0].get("atomic_number")->as_double() == 6);
+	CHECK(approx_eq(frame.positions()[0], Vector3D(0.159, 4.170, 14.451), 1e-3));
+	frame = file.read_step(0);
+	CHECK(approx_eq(frame.cell().a(), 20.721205, 1e-4));
+	CHECK(frame[0].name() == "C1");
+	CHECK(frame[0].type() == "C");
+	CHECK(frame[0].get("occupancy")->as_double() == 1.0);
+	CHECK(frame[0].get("atomic_number")->as_double() == 6);
+	CHECK(approx_eq(frame.positions()[0], Vector3D(0.124, 14.561, 4.200), 1e-3));
+	frame = file.read_step(2);
+	CHECK(approx_eq(frame.cell().a(), 20.415146, 1e-4));
+	CHECK(frame[0].name() == "C1");
+	CHECK(frame[0].type() == "C");
+	CHECK(frame[0].get("occupancy")->as_double() == 1.0);
+	CHECK(frame[0].get("atomic_number")->as_double() == 6);
+	CHECK(approx_eq(frame.positions()[0], Vector3D(0.220, 4.142, 14.350), 1e-3));
     }
 }
 
@@ -102,6 +139,8 @@ TEST_CASE("Write CIF file") {
 
     std::ifstream checking(tmpfile);
     std::string content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
+	                 std::istreambuf_iterator<char>());
     CHECK(EXPECTED_CONTENT == content);
 }
+
+#endif
