@@ -209,6 +209,21 @@ void PDBFormat::read_CRYST1(Frame& frame, string_view line) {
     }
 }
 
+// See http://www.wwpdb.org/documentation/file-format-content/format23/sect5.html
+// for definitions of helix types
+const static char* HELIX_TYPES[10] = {
+    "right-handed alpha helix",
+    "right-handed omega helix",
+    "right-handed pi helix",
+    "right-handed gamma helix",
+    "right-handed 3-10 helix",
+    "left-handed alpha helix",
+    "left-handed omega helix",
+    "left-handed gamma helix",
+    "2-7 ribbon/helix",
+    "polyproline",
+};
+
 void PDBFormat::read_HELIX(string_view line) {
     if (line.length() < 33 + 5) {
         warning("PDB reader", "HELIX record too short: '{}'", line);
@@ -235,9 +250,6 @@ void PDBFormat::read_HELIX(string_view line) {
         return;
     }
 
-    // Convert the code as a character to its numeric meaning.
-    // See http://www.wwpdb.org/documentation/file-format-content/format23/sect5.html
-    // for definitions of these numbers
     auto start_info = std::make_tuple(chain1, start, inscode1);
     auto end_info = std::make_tuple(chain2, end, inscode2);
 
@@ -249,27 +261,10 @@ void PDBFormat::read_HELIX(string_view line) {
         return;
     }
 
-    switch (helix_type) {
-    case 1: // Treat right and left handed helixes the same.
-    case 6:
-        secinfo_.insert({ start_info, std::make_pair(end_info, "alpha helix") });
-        break;
-    case 2:
-    case 7:
-        secinfo_.insert({ start_info, std::make_pair(end_info, "omega helix") });
-        break;
-    case 3:
-        secinfo_.insert({ start_info, std::make_pair(end_info, "pi helix") });
-        break;
-    case 4:
-    case 8:
-        secinfo_.insert({ start_info, std::make_pair(end_info, "gamma helix") });
-        break;
-    case 5:
-        secinfo_.insert({ start_info, std::make_pair(end_info, "3-10 helix") });
-        break;
-    default:
-        break;
+    if (helix_type <= 10) {
+        secinfo_.emplace(start_info, std::make_pair(end_info, HELIX_TYPES[helix_type - 1]));
+    } else {
+        warning("PDB reader", "invalid HELIX type {}", helix_type);
     }
 }
 
