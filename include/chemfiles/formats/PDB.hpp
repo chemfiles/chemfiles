@@ -66,7 +66,7 @@ private:
     /// chainid, the residue sequence id, and the residue insertion code
     using residue_info = std::tuple<char, int64_t, char>;
 
-    /// Map where the key is the residue_info and the value is a residue object
+    /// Residue information in the current step
     std::map<residue_info, Residue> residues_;
     /// Number of models written/read to the file.
     size_t models_ = 0;
@@ -76,13 +76,14 @@ private:
     /// Did we wrote a frame to the file? This is used to check wheter we need
     /// to write a final `END` record in the destructor
     bool written_ = false;
-    /// Store secondary structure information. Each item is a tuple, containing
-    /// the starting and ending residue_info of the seconary structure and a
-    /// string which is an written description of the secondary structure
+    /// Store secondary structure information. Keys are the
+    /// starting residue of the secondary structure, and values are pairs
+    /// containing the ending residue and a string which is a written
+    /// description of the secondary structure
     std::map<residue_info, std::pair<residue_info, std::string>> secinfo_;
-    /// This will be nullopt when no secondary structure informatio should be
-    /// read. It is set to the final residue of a secondary structure and the
-    /// text description which should be set.
+    /// This will be nullopt when no secondary structure information should be
+    /// read. Else It is set to the final residue of a secondary structure and
+    /// the text description which should be set.
     optional<std::pair<residue_info, std::string>> current_secinfo_;
 };
 
