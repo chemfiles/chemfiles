@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added support for appending to gzip (.gz) compressed trajectories.
 * Added support for sub-selection in numerical functions, for example
   `distance(#1, name O)`.
+* Added read and write support for CIF format.
 
 ### Changes to the C API
 
