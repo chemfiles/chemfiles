@@ -159,8 +159,8 @@ TEST_CASE("Read files in PDB format") {
 
         // Check secondary structure
         auto& topology = frame.topology();
-        CHECK(topology.residue(05).get("secondary_structure")->as_string() == "alpha helix");
-        CHECK(topology.residue(36).get("secondary_structure")->as_string() == "alpha helix");
+        CHECK(topology.residue(05).get("secondary_structure")->as_string() == "right-handed alpha helix");
+        CHECK(topology.residue(36).get("secondary_structure")->as_string() == "right-handed alpha helix");
     }
 
     SECTION("Secondary structure with insertion code test") {
@@ -175,9 +175,9 @@ TEST_CASE("Read files in PDB format") {
         CHECK_FALSE(topology.residue_for_atom(13)->get("insertion_code"));
 
         // Check secondary structure, no insertion code
-        CHECK(topology.residue(9).get("secondary_structure")->as_string() == "3-10 helix");
-        CHECK(topology.residue(10).get("secondary_structure")->as_string() == "3-10 helix");
-        CHECK(topology.residue(11).get("secondary_structure")->as_string() == "3-10 helix");
+        CHECK(topology.residue(9).get("secondary_structure")->as_string() == "right-handed 3-10 helix");
+        CHECK(topology.residue(10).get("secondary_structure")->as_string() == "right-handed 3-10 helix");
+        CHECK(topology.residue(11).get("secondary_structure")->as_string() == "right-handed 3-10 helix");
         CHECK_FALSE(topology.residue(12).get("secondary_structure"));
         CHECK_FALSE(topology.residue(13).get("secondary_structure"));
         CHECK_FALSE(topology.residue(14).get("secondary_structure"));
@@ -187,18 +187,18 @@ TEST_CASE("Read files in PDB format") {
 
         // First residue in a long list of residues with the same secondary structure
         auto& ins_check = topology.residue(18);
-        CHECK(ins_check.get("secondary_structure")->as_string() == "alpha helix");
+        CHECK(ins_check.get("secondary_structure")->as_string() == "right-handed alpha helix");
         CHECK(ins_check.get("insertion_code")->as_string() == "C");
         CHECK((*ins_check.id()) == 14);
         CHECK(ins_check.get("chainid")->as_string() == "L");
 
-        CHECK(topology.residue(19).get("secondary_structure")->as_string() == "alpha helix");
+        CHECK(topology.residue(19).get("secondary_structure")->as_string() == "right-handed alpha helix");
         CHECK(topology.residue(19).get("insertion_code")->as_string() == "D");
-        CHECK(topology.residue(20).get("secondary_structure")->as_string() == "alpha helix");
+        CHECK(topology.residue(20).get("secondary_structure")->as_string() == "right-handed alpha helix");
         CHECK(topology.residue(20).get("insertion_code")->as_string() == "E");
-        CHECK(topology.residue(21).get("secondary_structure")->as_string() == "alpha helix");
+        CHECK(topology.residue(21).get("secondary_structure")->as_string() == "right-handed alpha helix");
         CHECK(topology.residue(21).get("insertion_code")->as_string() == "F");
-        CHECK(topology.residue(22).get("secondary_structure")->as_string() == "alpha helix");
+        CHECK(topology.residue(22).get("secondary_structure")->as_string() == "right-handed alpha helix");
         CHECK(topology.residue(22).get("insertion_code")->as_string() == "G");
 
         // Not included
@@ -235,6 +235,14 @@ TEST_CASE("Read files in PDB format") {
         CHECK(topology.residue_for_atom(1)->get("insertion_code")->as_string() == "c");
         CHECK(topology.residue_for_atom(2)->get("insertion_code")->as_string() == "x");
         CHECK_FALSE(frame[3].get("insertion_code"));
+    }
+
+    SECTION("Left-handed helix") {
+        auto frame = Trajectory("data/pdb/1npc.pdb.gz").read();
+        auto& topology = frame.topology();
+
+        CHECK(topology.residue(226).get("secondary_structure")->as_string() == "left-handed alpha helix");
+        CHECK(topology.residue(138).get("secondary_structure")->as_string() == "right-handed alpha helix");
     }
 }
 
@@ -324,22 +332,22 @@ TEST_CASE("Problematic PDB files") {
         // The residue IDs are out of order, but still read correctly
         auto& first_residue = *topo.residue_for_atom(2316);
         CHECK((*first_residue.id()) == 503);
-        CHECK(first_residue.get("secondary_structure")->as_string() == "3-10 helix");
+        CHECK(first_residue.get("secondary_structure")->as_string() == "right-handed 3-10 helix");
 
         // The 'next' residue
         auto& second_residue = *topo.residue_for_atom(2320);
         CHECK((*second_residue.id()) == 287);
-        CHECK(second_residue.get("secondary_structure")->as_string() == "3-10 helix");
+        CHECK(second_residue.get("secondary_structure")->as_string() == "right-handed 3-10 helix");
 
         // The 'third' residue
         auto& third_residue = *topo.residue_for_atom(2332);
         CHECK((*third_residue.id()) == 288);
-        CHECK(third_residue.get("secondary_structure")->as_string() == "3-10 helix");
+        CHECK(third_residue.get("secondary_structure")->as_string() == "right-handed 3-10 helix");
 
         // The 'last' residue
         auto& final_residue = *topo.residue_for_atom(2337);
         CHECK((*final_residue.id()) == 289);
-        CHECK(final_residue.get("secondary_structure")->as_string() == "3-10 helix");
+        CHECK(final_residue.get("secondary_structure")->as_string() == "right-handed 3-10 helix");
 
         // No secondary structure after the chain
         auto & no_ss_residue = *topo.residue_for_atom(2341);
@@ -362,17 +370,17 @@ TEST_CASE("Problematic PDB files") {
         auto& first_residue = *topo.residue_for_atom(79);
         CHECK((*first_residue.id()) == 1);
         CHECK(first_residue.get("insertion_code")->as_string() == "C");
-        CHECK(first_residue.get("secondary_structure")->as_string() == "3-10 helix");
+        CHECK(first_residue.get("secondary_structure")->as_string() == "right-handed 3-10 helix");
 
         auto& second_residue = *topo.residue_for_atom(88);
         CHECK((*second_residue.id()) == 1);
         CHECK(second_residue.get("insertion_code")->as_string() == "B");
-        CHECK(second_residue.get("secondary_structure")->as_string() == "3-10 helix");
+        CHECK(second_residue.get("secondary_structure")->as_string() == "right-handed 3-10 helix");
 
         auto& third_residue = *topo.residue_for_atom(93);
         CHECK((*third_residue.id()) == 1);
         CHECK(third_residue.get("insertion_code")->as_string() == "A");
-        CHECK(third_residue.get("secondary_structure")->as_string() == "3-10 helix");
+        CHECK(third_residue.get("secondary_structure")->as_string() == "right-handed 3-10 helix");
 
         auto& fourth_residue = *topo.residue_for_atom(101);
         CHECK((*fourth_residue.id()) == 1);
