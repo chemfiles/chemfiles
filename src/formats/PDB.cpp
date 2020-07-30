@@ -363,51 +363,54 @@ void PDBFormat::read_ATOM(Frame& frame, string_view line,
 
     auto atom_id = frame.size() - 1;
     auto insertion_code = line[26];
+    int64_t resid;
     try {
-        auto resid = decode_hybrid36(4, line.substr(22, 4));
-        auto chain = line[21];
-        auto complete_residue_id = std::make_tuple(chain,resid,insertion_code);
-        if (residues_.find(complete_residue_id) == residues_.end()) {
-            auto resname = trim(line.substr(17, 3));
-            Residue residue(resname.to_string(), resid);
-            residue.add_atom(atom_id);
-
-            if (insertion_code != ' ') {
-                residue.set("insertion_code", line.substr(26, 1).to_string());
-            }
-
-            // Set whether or not the residue is standardized
-            residue.set("is_standard_pdb", !is_hetatm);
-            // This is saved as a string (instead of a number) on purpose
-            // to match MMTF format
-            residue.set("chainid", line.substr(21, 1).to_string());
-            // PDB format makes no distinction between chainid and chainname
-            residue.set("chainname", line.substr(21, 1).to_string());
-
-            // Are we withing a secondary information sequence?
-            if (current_secinfo_) {
-                residue.set("secondary_structure", current_secinfo_->second);
-
-                // Are we the end of a secondary information sequence?
-                if (current_secinfo_->first == complete_residue_id) {
-                    current_secinfo_ = nullopt;
-                }
-            }
-
-            // Are we the start of a secondary information sequence?
-            auto secinfo_for_residue = secinfo_.find(complete_residue_id);
-            if (secinfo_for_residue != secinfo_.end()) {
-                current_secinfo_ = secinfo_for_residue->second;
-                residue.set("secondary_structure", secinfo_for_residue->second.second);
-            }
-
-            residues_.insert({ complete_residue_id, residue });
-        } else {
-            // Just add this atom to the residue
-            residues_.at(complete_residue_id).add_atom(atom_id);
-        }
+        resid = decode_hybrid36(4, line.substr(22, 4));
     } catch (const Error&) {
         // No residue information
+        return;
+    }
+
+    auto chain = line[21];
+    auto complete_residue_id = std::make_tuple(chain, resid, insertion_code);
+    if (residues_.find(complete_residue_id) == residues_.end()) {
+        auto resname = trim(line.substr(17, 3));
+        Residue residue(resname.to_string(), resid);
+        residue.add_atom(atom_id);
+
+        if (insertion_code != ' ') {
+            residue.set("insertion_code", line.substr(26, 1).to_string());
+        }
+
+        // Set whether or not the residue is standardized
+        residue.set("is_standard_pdb", !is_hetatm);
+        // This is saved as a string (instead of a number) on purpose
+        // to match MMTF format
+        residue.set("chainid", line.substr(21, 1).to_string());
+        // PDB format makes no distinction between chainid and chainname
+        residue.set("chainname", line.substr(21, 1).to_string());
+
+        // Are we withing a secondary information sequence?
+        if (current_secinfo_) {
+            residue.set("secondary_structure", current_secinfo_->second);
+
+            // Are we the end of a secondary information sequence?
+            if (current_secinfo_->first == complete_residue_id) {
+                current_secinfo_ = nullopt;
+            }
+        }
+
+        // Are we the start of a secondary information sequence?
+        auto secinfo_for_residue = secinfo_.find(complete_residue_id);
+        if (secinfo_for_residue != secinfo_.end()) {
+            current_secinfo_ = secinfo_for_residue->second;
+            residue.set("secondary_structure", secinfo_for_residue->second.second);
+        }
+
+        residues_.insert({ complete_residue_id, residue });
+    } else {
+        // Just add this atom to the residue
+        residues_.at(complete_residue_id).add_atom(atom_id);
     }
 }
 
