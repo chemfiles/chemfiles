@@ -230,28 +230,28 @@ void PDBFormat::read_HELIX(string_view line) {
         return;
     }
 
-    auto chain1 = line[19];
-    auto chain2 = line[31];
-    int64_t start = 0;
-    int64_t end = 0;
-    auto inscode1 = line[25];
-    auto inscode2 = line[37];
+    auto chain_start = line[19];
+    auto chain_end = line[31];
+    int64_t resid_start = 0;
+    int64_t resid_end = 0;
+    auto inscode_start = line[25];
+    auto inscode_end = line[37];
 
     try {
-        start = decode_hybrid36(4, line.substr(21, 4));
-        end = decode_hybrid36(4, line.substr(33, 4));
+        resid_start = decode_hybrid36(4, line.substr(21, 4));
+        resid_end = decode_hybrid36(4, line.substr(33, 4));
     } catch (const Error&) {
         warning("PDB reader", "HELIX record contains invalid numbers: '{}'", line);
         return;
     }
 
-    if (chain1 != chain2) {
-        warning("PDB reader", "HELIX chain {} and {} are not the same", chain1, chain2);
+    if (chain_start != chain_end) {
+        warning("PDB reader", "HELIX chain {} and {} are not the same", chain_start, chain_end);
         return;
     }
 
-    auto start_info = std::make_tuple(chain1, start, inscode1);
-    auto end_info = std::make_tuple(chain2, end, inscode2);
+    auto start = std::make_tuple(chain_start, resid_start, inscode_start);
+    auto end = std::make_tuple(chain_end, resid_end, inscode_end);
 
     size_t helix_type = 0;
     try {
@@ -262,44 +262,44 @@ void PDBFormat::read_HELIX(string_view line) {
     }
 
     if (helix_type <= 10) {
-        secinfo_.emplace(start_info, std::make_pair(end_info, HELIX_TYPES[helix_type - 1]));
+        secinfo_.emplace(start, std::make_pair(end, HELIX_TYPES[helix_type - 1]));
     } else {
         warning("PDB reader", "invalid HELIX type {}", helix_type);
     }
 }
 
-void PDBFormat::read_secondary(string_view line, size_t i1, size_t i2, string_view record) {
-    if (line.length() < i2 + 6) {
+void PDBFormat::read_secondary(string_view line, size_t i_start, size_t i_end, string_view record) {
+    if (line.length() < i_end + 6) {
         warning("PDB reader", "secondary structure record too short: '{}'", line);
         return;
     }
 
-    auto chain1 = line[i1];
-    auto chain2 = line[i2];
+    auto chain_start = line[i_start];
+    auto chain_end = line[i_end];
 
-    if (chain1 != chain2) {
-        warning("PDB reader", "{} chain {} and {} are not the same", record, chain1, chain2);
+    if (chain_start != chain_end) {
+        warning("PDB reader", "{} chain {} and {} are not the same", record, chain_start, chain_end);
         return;
     }
 
-    int64_t resid1 = 0;
-    int64_t resid2 = 0;
+    int64_t resid_start = 0;
+    int64_t resid_end = 0;
     try {
-        resid1 = decode_hybrid36(4, line.substr(i1 + 1, 4));
-        resid2 = decode_hybrid36(4, line.substr(i2 + 1, 4));
+        resid_start = decode_hybrid36(4, line.substr(i_start + 1, 4));
+        resid_end = decode_hybrid36(4, line.substr(i_end + 1, 4));
     } catch (const Error&) {
         warning("PDB reader",
             "error parsing line: '{}', check {} and {}",
-            line, line.substr(i1 + 1, 4), line.substr(i2 + 1, 4)
+            line, line.substr(i_start + 1, 4), line.substr(i_end + 1, 4)
         );
         return;
     }
 
-    auto inscode1 = line[i1 + 5];
-    auto inscode2 = line[i2 + 5];
+    auto inscode_start = line[i_start + 5];
+    auto inscode_end = line[i_end + 5];
 
-    auto start = std::make_tuple(chain1, resid1, inscode1);
-    auto end = std::make_tuple(chain2, resid2, inscode2);
+    auto start = std::make_tuple(chain_start, resid_start, inscode_start);
+    auto end = std::make_tuple(chain_end, resid_end, inscode_end);
 
     secinfo_.insert({ start, std::make_pair(end, "extended") });
 }
