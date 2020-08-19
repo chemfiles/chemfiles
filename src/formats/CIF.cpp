@@ -23,6 +23,10 @@
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/UnitCell.hpp"
 
+#include "gemmi/cif.hpp"
+#include "gemmi/smcif.hpp"
+#include "gemmi/to_cif.hpp"
+
 #include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/parse.hpp"
@@ -54,24 +58,23 @@ void CIFFormat::init_() {
     // Parse the CIF file
     auto content = file_.readall();
     try {
-	doc = gemmi::cif::Document(gemmi::cif::read_string(content));
+        doc = gemmi::cif::Document(gemmi::cif::read_string(content));
     } catch (std::exception& e) {
-	throw format_error("cannot parse CIF file: {}", e.what());
+        throw format_error("cannot parse CIF file: {}", e.what());
     }
 
     // Interpret the content of each block, to remove blocks that contain
     // no atom: those can occur, but are not useful to us (they contain comments
     // and associated experimental data).
     for (const auto &block: doc.blocks) {
-      try {
-	gemmi::SmallStructure s = gemmi::make_small_structure_from_block(block);
-
-	if (s.sites.size() > 0) {
-	  structures_.push_back(s);
-	}
-      } catch (std::exception& e) {
-	throw format_error("cannot interpret CIF block: {}", e.what());
-      }
+        try {
+            gemmi::SmallStructure s = gemmi::make_small_structure_from_block(block);
+            if (s.sites.size() > 0) {
+                structures_.push_back(s);
+            }
+        } catch (std::exception& e) {
+            throw format_error("cannot interpret CIF block: {}", e.what());
+        }
     }
 }
 
@@ -84,29 +87,32 @@ void CIFFormat::read_step(const size_t step, Frame& frame) {
 
     const auto& structure = structures_[step];
     auto sites = structure.get_all_unit_cell_sites();
-    UnitCell cell;
 
-    // Take care of the "special case" used to flag an infinite
-    // cell
+    UnitCell cell;
+    // Take care of the "special case" used to flag an infinite cell
     if (!(std::abs(structure.cell.a - 1) < 1.e-3
-	  && std::abs(structure.cell.b - 1) < 1.e-3
-	  && std::abs(structure.cell.c - 1) < 1.e-3
-	  && std::abs(structure.cell.alpha - 90) < 1.e-3
-	  && std::abs(structure.cell.beta - 90) < 1.e-3
-	  && std::abs(structure.cell.gamma - 90) < 1.e-3))
-      cell = UnitCell(structure.cell.a, structure.cell.b, structure.cell.c,
-	structure.cell.alpha, structure.cell.beta, structure.cell.gamma);
+       && std::abs(structure.cell.b - 1) < 1.e-3
+       && std::abs(structure.cell.c - 1) < 1.e-3
+       && std::abs(structure.cell.alpha - 90) < 1.e-3
+       && std::abs(structure.cell.beta - 90) < 1.e-3
+       && std::abs(structure.cell.gamma - 90) < 1.e-3)) {
+        cell = UnitCell(
+            structure.cell.a, structure.cell.b, structure.cell.c,
+            structure.cell.alpha, structure.cell.beta, structure.cell.gamma
+        );
+    }
+
 
     frame.set_cell(cell);
     frame.set("name", structure.name);
 
     for (const auto& site: sites) {
         Atom atom(site.label, site.element.name());
-	atom.set("occupancy", site.occ);
-	atom.set("atomic_number", site.element.atomic_number());
+        atom.set("occupancy", site.occ);
+        atom.set("atomic_number", site.element.atomic_number());
 
-	gemmi::Fractional fract = site.fract.wrap_to_unit();
-	gemmi::Position p = structure.cell.orthogonalize(fract);
+        gemmi::Fractional fract = site.fract.wrap_to_unit();
+        gemmi::Position p = structure.cell.orthogonalize(fract);
 
         frame.add_atom(std::move(atom), Vector3D(p.x, p.y, p.z));
     }
@@ -136,13 +142,13 @@ void CIFFormat::write(const Frame& frame) {
     double a = 1, b = 1, c = 1;
     double alpha = 90, beta = 90, gamma = 90;
     if (frame.cell().shape() != UnitCell::INFINITE) {
-      invmat = frame.cell().matrix().invert();
-      a = frame.cell().a();
-      b = frame.cell().b();
-      c = frame.cell().c();
-      alpha = frame.cell().alpha();
-      beta = frame.cell().beta();
-      gamma = frame.cell().gamma();
+        invmat = frame.cell().matrix().invert();
+        a = frame.cell().a();
+        b = frame.cell().b();
+        c = frame.cell().c();
+        alpha = frame.cell().alpha();
+        beta = frame.cell().beta();
+        gamma = frame.cell().gamma();
     }
 
     file_.print("_cell_length_a {}\n", a);
@@ -172,10 +178,10 @@ void CIFFormat::write(const Frame& frame) {
     const auto& positions = frame.positions();
     for (size_t i = 0; i < frame.size(); ++i) {
         const auto& atom = frame[i];
-	Vector3D fract = invmat * positions[i];
+        auto fract = invmat * positions[i];
         file_.print("{} {} 1.0 {:10.7f} {:10.7f} {:10.7f} {:8.5f} {:8.5f} {:8.5f}\n",
-                atom.name(), atom.type(), fract[0], fract[1], fract[2],
-                positions[i][0], positions[i][1], positions[i][2]
+            atom.name(), atom.type(), fract[0], fract[1], fract[2],
+            positions[i][0], positions[i][1], positions[i][2]
         );
     }
 

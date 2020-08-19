@@ -13,14 +13,10 @@
 #include <vector>
 #include <memory>
 
-#include "gemmi/cif.hpp"
 #include "gemmi/smcif.hpp"
-#include "gemmi/to_cif.hpp"
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/Residue.hpp"
-#include "chemfiles/UnitCell.hpp"
 
 namespace chemfiles {
 class Frame;
