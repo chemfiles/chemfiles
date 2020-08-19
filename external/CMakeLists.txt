@@ -239,7 +239,7 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/molfiles/include)
 #       webpdbplugin
 
 # ==========
-# mmtf-cpp format: https://github.com/rcsb/mmtf-cpp
+# mmtf-cpp: https://github.com/chemfiles/mmtf-cpp
 # ==========
 unpack_library(mmtf-cpp)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/include )
@@ -257,5 +257,16 @@ add_library(pugixml OBJECT ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src/pugixml.cpp)
 # ==========
 external_library(xdrfile)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/xdrfile/include)
+
+# ==========
+# gemmi
+# ==========
+option(CHFL_DISABLE_GEMMI OFF)
+mark_as_advanced(CHFL_DISABLE_GEMMI)
+
+if (NOT ${CHFL_DISABLE_GEMMI})
+    unpack_library(gemmi)
+    list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/gemmi/include)
+endif()
 
 set(EXTERNAL_INCLUDES ${EXTERNAL_INCLUDES} PARENT_SCOPE)

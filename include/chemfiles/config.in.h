@@ -17,6 +17,9 @@
 /// Are we building code on Windows?
 #cmakedefine CHEMFILES_WINDOWS
 
+// Should we include GEMMI code?
+#cmakedefine CHFL_DISABLE_GEMMI
+
 /// thread_local implementation
 #ifdef __cplusplus
     #if @CHFL_HAS_THREAD_LOCAL@
