@@ -244,6 +244,19 @@ TEST_CASE("Read files in PDB format") {
         CHECK(topology.residue(226).get("secondary_structure")->as_string() == "left-handed alpha helix");
         CHECK(topology.residue(138).get("secondary_structure")->as_string() == "right-handed alpha helix");
     }
+
+    SECTION("Multiple residues with the same id") {
+        auto frame = Trajectory("data/pdb/psfgen-output.pdb").read();
+        auto& topology = frame.topology();
+
+        CHECK(topology.residues().size() == 3);
+        CHECK(topology.residue(0).name() == "ALA");
+        CHECK(topology.residue(0).id().value() == 1);
+        CHECK(topology.residue(1).name() == "GLY");
+        CHECK(topology.residue(1).id().value() == 1);
+        CHECK(topology.residue(2).name() == "GLY");
+        CHECK(topology.residue(2).id().value() == 2);
+    }
 }
 
 TEST_CASE("Problematic PDB files") {

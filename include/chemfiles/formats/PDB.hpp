@@ -8,7 +8,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <tuple>
 #include <memory>
 
 #include "chemfiles/File.hpp"
@@ -20,6 +19,21 @@
 namespace chemfiles {
 class Frame;
 class MemoryBuffer;
+
+/// Full identification of residues, including everything needed
+struct FullResidueId {
+    /// Chain identifier
+    char chain;
+    /// Residue id
+    int64_t resid;
+    /// Residue name
+    std::string resname;
+    /// Insertion code of the residue
+    char insertion_code;
+};
+
+bool operator==(const FullResidueId& lhs, const FullResidueId& rhs);
+bool operator<(const FullResidueId& lhs, const FullResidueId& rhs);
 
 /// [PDB][PDB] file format reader and writer.
 ///
@@ -62,12 +76,8 @@ private:
     // Runs when a chain is terminated to update residue information
     void chain_ended(Frame& frame);
 
-    /// This typedef represent the 'full' name of a residue, this means the
-    /// chainid, the residue sequence id, and the residue insertion code
-    using residue_info = std::tuple<char, int64_t, char>;
-
     /// Residue information in the current step
-    std::map<residue_info, Residue> residues_;
+    std::map<FullResidueId, Residue> residues_;
     /// Number of models written/read to the file.
     size_t models_ = 0;
     /// List of all atom offsets. This maybe pushed in read_ATOM or if a TER
@@ -80,11 +90,11 @@ private:
     /// starting residue of the secondary structure, and values are pairs
     /// containing the ending residue and a string which is a written
     /// description of the secondary structure
-    std::map<residue_info, std::pair<residue_info, std::string>> secinfo_;
+    std::map<FullResidueId, std::pair<FullResidueId, std::string>> secinfo_;
     /// This will be nullopt when no secondary structure information should be
     /// read. Else It is set to the final residue of a secondary structure and
     /// the text description which should be set.
-    optional<std::pair<residue_info, std::string>> current_secinfo_;
+    optional<std::pair<FullResidueId, std::string>> current_secinfo_;
 };
 
 template<> FormatInfo format_information<PDBFormat>();
