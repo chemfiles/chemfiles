@@ -668,76 +668,69 @@ static std::string to_pdb_index(int64_t value, uint64_t width) {
 }
 
 struct ResidueInformation {
-    std::string atom_hetatm{ "HETATM" };
-    std::string resname { "XXX" };
-    std::string resid { "  -1" };
-    std::string chainid { "X" };
-    std::string inscode { " " };
-    std::string comp_type { "" };
+    std::string atom_hetatm = "HETATM";
+    std::string resname;
+    std::string resid;
+    std::string chainid;
+    std::string insertion_code;
+    std::string composition_type;
 };
 
-static ResidueInformation get_residue_strings(optional<const Residue&> residue_opt, int64_t& max_resid) {
-
-    ResidueInformation res_info;
+static ResidueInformation get_residue_information(optional<const Residue&> residue_opt, int64_t& max_resid) {
+    ResidueInformation info;
 
     if (!residue_opt) {
         auto value = max_resid++;
-        res_info.resid = to_pdb_index(value, 4);
+        info.resid = to_pdb_index(value, 4);
 
-        return res_info;
+        return info;
     }
 
     auto residue = *residue_opt;
 
-    res_info.resname = residue.name();
     if (residue.get<Property::BOOL>("is_standard_pdb").value_or(false)) {
         // only use ATOM if the residue is standardized
-        res_info.atom_hetatm = "ATOM  ";
+        info.atom_hetatm = "ATOM  ";
     }
 
-    if (res_info.resname.length() > 3) {
-        warning("PDB writer", "residue '{}' name is too long, it will be truncated", res_info.resname);
-        res_info.resname = res_info.resname.substr(0, 3);
+    info.resname = residue.name();
+    if (info.resname.length() > 3) {
+        warning("PDB writer", "residue '{}' name is too long, it will be truncated", info.resname);
+        info.resname = info.resname.substr(0, 3);
     }
 
     if (residue.id()) {
-        res_info.resid = to_pdb_index(residue.id().value() - 1, 4);
+        info.resid = to_pdb_index(residue.id().value() - 1, 4);
     }
 
-    if (residue.get("chainid") &&
-        residue.get("chainid")->kind() == Property::STRING) {
-        res_info.chainid = residue.get("chainid")->as_string();
-
-        if (res_info.chainid.length() > 1) {
-            warning("PDB writer",
-                "residue '{}' chain id is too long, it will be truncated",
-                res_info.chainid
-            );
-            res_info.chainid = res_info.chainid[0];
-        }
+    info.chainid = residue.get<Property::STRING>("chainid").value_or(" ");
+    if (info.chainid.length() > 1) {
+        warning("PDB writer",
+            "residue '{}' chain id is too long, it will be truncated",
+            info.chainid
+        );
+        info.chainid = info.chainid[0];
     }
 
-    if (residue.get("insertion_code") &&
-        residue.get("insertion_code")->kind() == Property::STRING) {
-        res_info.inscode = residue.get("insertion_code")->as_string();
-        if (res_info.inscode.length() > 1) {
-            warning("PDB writer",
-                "residue '{}' insertion code is too long, it will be truncated",
-                res_info.inscode
-            );
-            res_info.inscode = res_info.inscode[0];
-        }
+
+    info.insertion_code = residue.get<Property::STRING>("insertion_code").value_or("");
+    if (info.insertion_code.length() > 1) {
+        warning("PDB writer",
+            "residue '{}' insertion code is too long, it will be truncated",
+            info.insertion_code
+        );
+        info.insertion_code = info.insertion_code[0];
     }
 
-    res_info.comp_type = residue.get<Property::STRING>("composition_type").value_or("");
+    info.composition_type = residue.get<Property::STRING>("composition_type").value_or("");
 
-    return res_info;
+    return info;
 }
 
 static bool needs_ter_record(const ResidueInformation& residue) {
-    if (residue.comp_type.empty() ||
-        residue.comp_type == "other" || residue.comp_type == "OTHER" ||
-        residue.comp_type == "non-polymer" || residue.comp_type == "NON-POLYMER") {
+    if (residue.composition_type.empty() ||
+        residue.composition_type == "other" || residue.composition_type == "OTHER" ||
+        residue.composition_type == "non-polymer" || residue.composition_type == "NON-POLYMER") {
         return false;
     }
 
@@ -794,17 +787,17 @@ void PDBFormat::write_next(const Frame& frame) {
         }
 
         auto residue = frame.topology().residue_for_atom(i);
-        auto r = get_residue_strings(residue, max_resid);
-        if (r.atom_hetatm == "ATOM  ") {
+        auto resinfo = get_residue_information(residue, max_resid);
+        if (resinfo.atom_hetatm == "ATOM  ") {
             is_atom_record[i] = true;
         }
 
-        assert(r.resname.length() <= 3);
+        assert(resinfo.resname.length() <= 3);
 
-        if (last_residue && last_residue->chainid != r.chainid && needs_ter_record(*last_residue)) {
+        if (last_residue && last_residue->chainid != resinfo.chainid && needs_ter_record(*last_residue)) {
             file_.print("TER   {: >5}      {:3} {:1}{: >4s}{:1}\n",
                 to_pdb_index(static_cast<int64_t>(i + ter_count), 5),
-                last_residue->resname, last_residue->chainid, last_residue->resid, last_residue->inscode);
+                last_residue->resname, last_residue->chainid, last_residue->resid, last_residue->insertion_code);
             ter_serial_numbers.push_back(i + ter_count);
             ++ter_count;
         }
@@ -813,15 +806,14 @@ void PDBFormat::write_next(const Frame& frame) {
         check_values_size(pos, 8, "atomic position");
         file_.print(
             "{: <6}{: >5} {: <4s}{:1}{:3} {:1}{: >4s}{:1}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
-            r.atom_hetatm, to_pdb_index(static_cast<int64_t>(i + ter_count), 5), frame[i].name(), altloc,
-            r.resname, r.chainid, r.resid, r.inscode,
+            resinfo.atom_hetatm, to_pdb_index(static_cast<int64_t>(i + ter_count), 5), frame[i].name(), altloc,
+            resinfo.resname, resinfo.chainid, resinfo.resid, resinfo.insertion_code,
             pos[0], pos[1], pos[2], 1.0, 0.0, frame[i].type()
         );
 
         if (residue) {
-            last_residue = std::move(r);
-        }
-        else {
+            last_residue = std::move(resinfo);
+        } else {
             last_residue = nullopt;
         }
 
