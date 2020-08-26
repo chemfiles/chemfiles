@@ -42,6 +42,31 @@ template<> FormatInfo chemfiles::format_information<PDBFormat>() {
     );
 }
 
+bool chemfiles::operator==(const FullResidueId& lhs, const FullResidueId& rhs) {
+    return lhs.chain == rhs.chain &&
+           lhs.resid == rhs.resid &&
+           lhs.resname == rhs.resname &&
+           lhs.insertion_code == rhs.insertion_code;
+}
+
+bool chemfiles::operator<(const FullResidueId& lhs, const FullResidueId& rhs) {
+    if (lhs.chain != rhs.chain) {
+        return lhs.chain < rhs.chain;
+    } else if (lhs.resid != rhs.resid) {
+        return lhs.resid < rhs.resid;
+    } else if (lhs.insertion_code != rhs.insertion_code) {
+        return lhs.insertion_code < rhs.insertion_code;
+    } else if (lhs.resname != rhs.resname) {
+        // Check resname last, since resid should already have taken care of
+        // identical residues. Files containing residues with different names
+        // but the same resid can be created when multiple PDB are merged
+        // together
+        return lhs.resname < rhs.resname;
+    } else {
+        return false;
+    }
+}
+
 /// Check the number of digits before the decimal separator to be sure than
 /// we can represen them. In case of error, use the given `context` in the error
 /// message
@@ -142,10 +167,10 @@ void PDBFormat::read_next(Frame& frame) {
             read_HELIX(line);
             continue;
         case Record::SHEET:
-            read_secondary(line, 21, 32, "SHEET");
+            read_secondary(line, 17, 28, "SHEET");
             continue;
         case Record::TURN:
-            read_secondary(line, 19, 30, "TURN");
+            read_secondary(line, 15, 26, "TURN");
             continue;
         case Record::TER:
             if (line.size() >= 12) {
@@ -232,11 +257,13 @@ void PDBFormat::read_HELIX(string_view line) {
 
     auto chain_start = line[19];
     auto chain_end = line[31];
-    int64_t resid_start = 0;
-    int64_t resid_end = 0;
     auto inscode_start = line[25];
     auto inscode_end = line[37];
+    auto resname_start = trim(line.substr(15, 3)).to_string();
+    auto resname_end = trim(line.substr(27, 3)).to_string();
 
+    int64_t resid_start = 0;
+    int64_t resid_end = 0;
     try {
         resid_start = decode_hybrid36(4, line.substr(21, 4));
         resid_end = decode_hybrid36(4, line.substr(33, 4));
@@ -250,8 +277,8 @@ void PDBFormat::read_HELIX(string_view line) {
         return;
     }
 
-    auto start = std::make_tuple(chain_start, resid_start, inscode_start);
-    auto end = std::make_tuple(chain_end, resid_end, inscode_end);
+    auto start = FullResidueId {chain_start, resid_start, resname_start, inscode_start};
+    auto end = FullResidueId {chain_end, resid_end, resname_end, inscode_end};
 
     size_t helix_type = 0;
     try {
@@ -269,13 +296,16 @@ void PDBFormat::read_HELIX(string_view line) {
 }
 
 void PDBFormat::read_secondary(string_view line, size_t i_start, size_t i_end, string_view record) {
-    if (line.length() < i_end + 6) {
+    if (line.length() < i_end + 10) {
         warning("PDB reader", "secondary structure record too short: '{}'", line);
         return;
     }
 
-    auto chain_start = line[i_start];
-    auto chain_end = line[i_end];
+    auto resname_start = trim(line.substr(i_start, 3)).to_string();
+    auto resname_end = trim(line.substr(i_end, 3)).to_string();
+
+    auto chain_start = line[i_start + 4];
+    auto chain_end = line[i_end + 4];
 
     if (chain_start != chain_end) {
         warning("PDB reader", "{} chain {} and {} are not the same", record, chain_start, chain_end);
@@ -285,21 +315,21 @@ void PDBFormat::read_secondary(string_view line, size_t i_start, size_t i_end, s
     int64_t resid_start = 0;
     int64_t resid_end = 0;
     try {
-        resid_start = decode_hybrid36(4, line.substr(i_start + 1, 4));
-        resid_end = decode_hybrid36(4, line.substr(i_end + 1, 4));
+        resid_start = decode_hybrid36(4, line.substr(i_start + 5, 4));
+        resid_end = decode_hybrid36(4, line.substr(i_end + 5, 4));
     } catch (const Error&) {
         warning("PDB reader",
             "error parsing line: '{}', check {} and {}",
-            line, line.substr(i_start + 1, 4), line.substr(i_end + 1, 4)
+            line, line.substr(i_start + 5, 4), line.substr(i_end + 5, 4)
         );
         return;
     }
 
-    auto inscode_start = line[i_start + 5];
-    auto inscode_end = line[i_end + 5];
+    auto inscode_start = line[i_start + 9];
+    auto inscode_end = line[i_end + 9];
 
-    auto start = std::make_tuple(chain_start, resid_start, inscode_start);
-    auto end = std::make_tuple(chain_end, resid_end, inscode_end);
+    auto start = FullResidueId {chain_start, resid_start, resname_start, inscode_start};
+    auto end = FullResidueId {chain_end, resid_end, resname_end, inscode_end};
 
     secinfo_.insert({ start, std::make_pair(end, "extended") });
 }
@@ -367,10 +397,10 @@ void PDBFormat::read_ATOM(Frame& frame, string_view line,
     }
 
     auto chain = line[21];
-    auto complete_residue_id = std::make_tuple(chain, resid, insertion_code);
-    if (residues_.find(complete_residue_id) == residues_.end()) {
-        auto resname = trim(line.substr(17, 3));
-        Residue residue(resname.to_string(), resid);
+    auto resname = trim(line.substr(17, 3)).to_string();
+    auto full_residue_id = FullResidueId {chain, resid, resname, insertion_code};
+    if (residues_.count(full_residue_id) == 0) {
+        Residue residue(std::move(resname), resid);
         residue.add_atom(atom_id);
 
         if (insertion_code != ' ') {
@@ -390,22 +420,22 @@ void PDBFormat::read_ATOM(Frame& frame, string_view line,
             residue.set("secondary_structure", current_secinfo_->second);
 
             // Are we the end of a secondary information sequence?
-            if (current_secinfo_->first == complete_residue_id) {
+            if (current_secinfo_->first == full_residue_id) {
                 current_secinfo_ = nullopt;
             }
         }
 
         // Are we the start of a secondary information sequence?
-        auto secinfo_for_residue = secinfo_.find(complete_residue_id);
+        auto secinfo_for_residue = secinfo_.find(full_residue_id);
         if (secinfo_for_residue != secinfo_.end()) {
             current_secinfo_ = secinfo_for_residue->second;
             residue.set("secondary_structure", secinfo_for_residue->second.second);
         }
 
-        residues_.insert({ complete_residue_id, residue });
+        residues_.emplace(full_residue_id, residue);
     } else {
         // Just add this atom to the residue
-        residues_.at(complete_residue_id).add_atom(atom_id);
+        residues_.at(full_residue_id).add_atom(atom_id);
     }
 }
 
