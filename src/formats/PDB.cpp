@@ -415,6 +415,15 @@ void PDBFormat::read_ATOM(Frame& frame, string_view line,
         // PDB format makes no distinction between chainid and chainname
         residue.set("chainname", line.substr(21, 1).to_string());
 
+        // segment name is not part of the standard, but something added by
+        // CHARM/NAMD in the un-used character range 73-76
+        if (line.length() > 72) {
+            auto segname = trim(line.substr(72, 4));
+            if (segname != "") {
+                residue.set("segname", segname.to_string());
+            }
+        }
+
         // Are we withing a secondary information sequence?
         if (current_secinfo_) {
             residue.set("secondary_structure", current_secinfo_->second);
@@ -674,6 +683,7 @@ struct ResidueInformation {
     std::string chainid;
     std::string insertion_code;
     std::string composition_type;
+    std::string segment;
 };
 
 static ResidueInformation get_residue_information(optional<const Residue&> residue_opt, int64_t& max_resid) {
@@ -682,7 +692,6 @@ static ResidueInformation get_residue_information(optional<const Residue&> resid
     if (!residue_opt) {
         auto value = max_resid++;
         info.resid = to_pdb_index(value, 4);
-
         return info;
     }
 
@@ -706,7 +715,7 @@ static ResidueInformation get_residue_information(optional<const Residue&> resid
     info.chainid = residue.get<Property::STRING>("chainid").value_or(" ");
     if (info.chainid.length() > 1) {
         warning("PDB writer",
-            "residue '{}' chain id is too long, it will be truncated",
+            "residue's chain id '{}' is too long, it will be truncated",
             info.chainid
         );
         info.chainid = info.chainid[0];
@@ -716,10 +725,19 @@ static ResidueInformation get_residue_information(optional<const Residue&> resid
     info.insertion_code = residue.get<Property::STRING>("insertion_code").value_or("");
     if (info.insertion_code.length() > 1) {
         warning("PDB writer",
-            "residue '{}' insertion code is too long, it will be truncated",
+            "residue's insertion code '{}' is too long, it will be truncated",
             info.insertion_code
         );
         info.insertion_code = info.insertion_code[0];
+    }
+
+    info.segment = residue.get<Property::STRING>("segname").value_or("");
+    if (info.segment.length() > 4) {
+        warning("PDB writer",
+            "residue's segment name '{}' is too long, it will be truncated",
+            info.segment
+        );
+        info.segment = info.segment.substr(0, 4);
     }
 
     info.composition_type = residue.get<Property::STRING>("composition_type").value_or("");
@@ -805,10 +823,10 @@ void PDBFormat::write_next(const Frame& frame) {
         auto& pos = positions[i];
         check_values_size(pos, 8, "atomic position");
         file_.print(
-            "{: <6}{: >5} {: <4s}{:1}{:3} {:1}{: >4s}{:1}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {: >2s}\n",
+            "{: <6}{: >5} {: <4s}{:1}{:3} {:1}{: >4s}{:1}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}      {: <4s}{: >2s}\n",
             resinfo.atom_hetatm, to_pdb_index(static_cast<int64_t>(i + ter_count), 5), frame[i].name(), altloc,
             resinfo.resname, resinfo.chainid, resinfo.resid, resinfo.insertion_code,
-            pos[0], pos[1], pos[2], 1.0, 0.0, frame[i].type()
+            pos[0], pos[1], pos[2], 1.0, 0.0, resinfo.segment, frame[i].type()
         );
 
         if (residue) {
