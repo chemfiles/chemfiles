@@ -108,3 +108,9 @@ descriptions by the *Define Secondary Strucutre of Proteins (DSSP)* algorithm.
 Examples include ``extended``, ``alpha helix``, ``pi helix``, ``turn`` and
 ``coil``. This property is not set for undefined secondary structures and is not
 used for writing."""
+
+[resname]
+type = "string"
+PDB = """``PDB`` files used with CHARM, NAMD and a few other software package
+can contain a non-standard *segment* name associated with a residue. If set when
+writting a frame, this property is written to the file."""

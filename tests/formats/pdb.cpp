@@ -252,10 +252,15 @@ TEST_CASE("Read files in PDB format") {
         CHECK(topology.residues().size() == 3);
         CHECK(topology.residue(0).name() == "ALA");
         CHECK(topology.residue(0).id().value() == 1);
+        CHECK(topology.residue(0).get("segname")->as_string() == "PROT");
+
         CHECK(topology.residue(1).name() == "GLY");
         CHECK(topology.residue(1).id().value() == 1);
+        CHECK(topology.residue(1).get("segname")->as_string() == "PROT");
+
         CHECK(topology.residue(2).name() == "GLY");
         CHECK(topology.residue(2).id().value() == 2);
+        CHECK(topology.residue(2).get("segname")->as_string() == "PROT");
     }
 }
 
@@ -428,7 +433,7 @@ TEST_CASE("Write files in PDB format") {
     "ATOM      2 B   Bfoo A   3       1.000   2.000   3.000  1.00  0.00           B\n"
     "ATOM      3 C    foo A   3       1.000   2.000   3.000  1.00  0.00           C\n"
     "TER       4      foo A   3 \n"
-    "HETATM    5 D    bar C    B      1.000   2.000   3.000  1.00  0.00           D\n"
+    "HETATM    5 D    bar C    B      1.000   2.000   3.000  1.00  0.00      SEGM D\n"
     "HETATM    6 E            5       4.000   5.000   6.000  1.00  0.00           E\n"
     "HETATM    7 F    baz    -2       4.000   5.000   6.000  1.00  0.00           F\n"
     "HETATM    8 G            6       4.000   5.000   6.000  1.00  0.00           G\n"
@@ -479,6 +484,7 @@ TEST_CASE("Write files in PDB format") {
     residue.add_atom(3);
     residue.set("chainid", "CB");
     residue.set("insertion_code", "BB");
+    residue.set("segname", "SEGMENT");
     frame.add_residue(residue);
 
     residue = Residue("baz", -2);
