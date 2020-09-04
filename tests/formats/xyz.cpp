@@ -84,13 +84,11 @@ TEST_CASE("Read files in XYZ format") {
         CHECK(frame.size() == 192);
 
         // Reading the unit cell
-        auto expected = UnitCell(8.43116035, 14.50510613, 15.60911468, 73.31699212, 85.70200582, 89.37501529);
-        CHECK(approx_eq(frame.cell().a(), expected.a(), 1e-6));
-        CHECK(approx_eq(frame.cell().b(), expected.b(), 1e-6));
-        CHECK(approx_eq(frame.cell().c(), expected.c(), 1e-6));
-        CHECK(approx_eq(frame.cell().alpha(), expected.alpha(), 1e-6));
-        CHECK(approx_eq(frame.cell().beta(), expected.beta(), 1e-6));
-        CHECK(approx_eq(frame.cell().gamma(), expected.gamma(), 1e-6));
+        auto expected = UnitCell(
+            {8.43116035, 14.50510613, 15.60911468}, 
+            {73.31699212, 85.70200582, 89.37501529}
+        );
+        CHECK(approx_eq(frame.cell().matrix(), expected.matrix(), 1e-6));
 
         // frame level properties
         CHECK(frame.get("ENERGY")->as_string() == "-2069.84934116");
@@ -252,7 +250,7 @@ F 4 5 6
     auto file = Trajectory(tmpfile, 'w');
     file.write(frame);
 
-    frame.set_cell(UnitCell(12, 13, 14));
+    frame.set_cell(UnitCell({12, 13, 14}));
     frame.set("is_open", false);
     frame.set("speed", 33.4);
     frame.set("direction", Vector3D(1, 0, 2));

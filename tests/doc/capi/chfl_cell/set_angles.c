@@ -4,6 +4,7 @@
 #include <chemfiles.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 
 int main() {
     // [example]
@@ -13,9 +14,10 @@ int main() {
 
     chfl_vector3d angles = {0, 0, 0};
     chfl_cell_angles(cell, angles);
-    assert(angles[0] == 120);
-    assert(angles[1] == 110);
-    assert(angles[2] == 100);
+    // Floating point rounding error can exist when accessing angles
+    assert(fabs(angles[0] - 120) < 1e-12);
+    assert(fabs(angles[1] - 110) < 1e-12);
+    assert(fabs(angles[2] - 100) < 1e-12);
 
     chfl_free(cell);
     // [example]

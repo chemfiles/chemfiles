@@ -144,15 +144,11 @@ void MMTFFormat::read_step(const size_t step, Frame& frame) {
 }
 
 void MMTFFormat::read(Frame& frame) {
+    const auto& cell = structure_.unitCell;
     if (structure_.unitCell.size() == 6) {
-        frame.set_cell({
-            static_cast<double>(structure_.unitCell[0]),
-            static_cast<double>(structure_.unitCell[1]),
-            static_cast<double>(structure_.unitCell[2]),
-            static_cast<double>(structure_.unitCell[3]),
-            static_cast<double>(structure_.unitCell[4]),
-            static_cast<double>(structure_.unitCell[5])
-        });
+        Vector3D lengths = {static_cast<double>(cell[0]), static_cast<double>(cell[1]), static_cast<double>(cell[2])};
+        Vector3D angles = {static_cast<double>(cell[3]), static_cast<double>(cell[4]), static_cast<double>(cell[5])};
+        frame.set_cell({lengths, angles});
     }
 
     if (!mmtf::isDefaultValue(structure_.title)) {
@@ -445,13 +441,15 @@ void MMTFFormat::write(const Frame& frame) {
 
     if (mmtf::isDefaultValue(structure_.unitCell)) {
         auto& cell = frame.cell();
+        auto lengths = cell.lengths();
+        auto angles = cell.angles();
         structure_.unitCell.resize(6);
-        structure_.unitCell[0] = static_cast<float>(cell.a());
-        structure_.unitCell[1] = static_cast<float>(cell.b());
-        structure_.unitCell[2] = static_cast<float>(cell.c());
-        structure_.unitCell[3] = static_cast<float>(cell.alpha());
-        structure_.unitCell[4] = static_cast<float>(cell.beta());
-        structure_.unitCell[5] = static_cast<float>(cell.gamma());
+        structure_.unitCell[0] = static_cast<float>(lengths[0]);
+        structure_.unitCell[1] = static_cast<float>(lengths[1]);
+        structure_.unitCell[2] = static_cast<float>(lengths[2]);
+        structure_.unitCell[3] = static_cast<float>(angles[0]);
+        structure_.unitCell[4] = static_cast<float>(angles[1]);
+        structure_.unitCell[5] = static_cast<float>(angles[2]);
 
         unitcellForWrite_ = cell;
     } else if (unitcellForWrite_ != frame.cell()) {

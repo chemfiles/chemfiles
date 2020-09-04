@@ -9,17 +9,11 @@ using namespace chemfiles;
 
 TEST_CASE() {
     // [example]
-    auto cell = UnitCell(11, 22, 33);
+    auto cell = UnitCell({11, 22, 33}, {80, 90, 70});
 
-    assert(cell.shape() == UnitCell::ORTHORHOMBIC);
+    assert(cell.shape() == UnitCell::TRICLINIC);
 
-    assert(cell.a() == 11);
-    assert(cell.b() == 22);
-    assert(cell.c() == 33);
-
-    assert(cell.alpha() == 90);
-    assert(cell.beta() == 90);
-    assert(cell.gamma() == 90);
-
+    assert(cell.lengths() == Vector3D(11, 22, 33));
+    assert(cell.angles() == Vector3D(80, 90, 70));
     // [example]
 }

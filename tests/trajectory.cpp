@@ -94,10 +94,10 @@ TEST_CASE("Setting frame step") {
 TEST_CASE("Associate an unit cell and a trajectory") {
     SECTION("Reading") {
         auto file = Trajectory("data/xyz/trajectory.xyz");
-        file.set_cell(UnitCell(25, 32, 94));
+        file.set_cell(UnitCell({25, 32, 94}));
         auto frame = file.read();
 
-        CHECK(frame.cell() == UnitCell(25, 32, 94));
+        CHECK(frame.cell() == UnitCell({25, 32, 94}));
     }
 
     SECTION("Writing") {
@@ -111,7 +111,7 @@ TEST_CASE("Associate an unit cell and a trajectory") {
         }
 
         auto file = Trajectory(tmpfile, 'w');
-        file.set_cell(UnitCell(3, 4, 5));
+        file.set_cell(UnitCell({3, 4, 5}));
         file.write(frame);
         file.close();
 

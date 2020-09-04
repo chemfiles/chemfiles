@@ -9,7 +9,7 @@ using namespace chemfiles;
 
 TEST_CASE() {
     // [example]
-    auto cell = UnitCell(11, 22, 33);
+    auto cell = UnitCell({11, 22, 33});
     assert(cell.volume() == 11 * 22 * 33);
     // [example]
 }

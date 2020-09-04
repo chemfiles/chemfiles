@@ -9,7 +9,8 @@ using namespace chemfiles;
 
 TEST_CASE() {
     // [example]
-    auto cell = UnitCell(11, 22, 33);
-    assert(cell.wrap(Vector3D(14, -12, 5)) == Vector3D(3, 10, 5));
+    auto cell = UnitCell({11, 22, 33});
+    auto wrapped = cell.wrap(Vector3D(14, -12, 5));
+    assert(wrapped == Vector3D(3, 10, 5));
     // [example]
 }

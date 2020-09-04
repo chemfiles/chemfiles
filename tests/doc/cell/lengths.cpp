@@ -9,18 +9,11 @@ using namespace chemfiles;
 
 TEST_CASE() {
     // [example]
-    auto cell = UnitCell(11, 22, 33);
+    auto cell = UnitCell({11, 22, 33});
 
-    assert(cell.a() == 11);
-    assert(cell.b() == 22);
-    assert(cell.c() == 33);
+    assert(cell.lengths() == Vector3D(11, 22, 33));
 
-    cell.set_a(111);
-    cell.set_b(222);
-    cell.set_c(333);
-
-    assert(cell.a() == 111);
-    assert(cell.b() == 222);
-    assert(cell.c() == 333);
+    cell.set_lengths({111, 222, 333});
+    assert(cell.lengths() == Vector3D(111, 222, 333));
     // [example]
 }

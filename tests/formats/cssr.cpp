@@ -23,9 +23,7 @@ TEST_CASE("Read files in CSSR format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 1.0, 1e-5));
-        CHECK(approx_eq(cell.b(), 1.0, 1e-5));
-        CHECK(approx_eq(cell.c(), 1.0, 1e-5));
+        CHECK(approx_eq(cell.lengths(), {1.0, 1.0, 1.0}, 1e-5));
 
         // bonds comes from open babel, which do not use PBC to guess them
         CHECK(frame.topology().bonds().size() == 186);
@@ -47,9 +45,7 @@ TEST_CASE("Read files in CSSR format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 6.926, 1e-5));
-        CHECK(approx_eq(cell.b(), 6.926, 1e-5));
-        CHECK(approx_eq(cell.c(), 6.410, 1e-5));
+        CHECK(approx_eq(cell.lengths(), {6.926, 6.926, 6.410}, 1e-5));
 
         CHECK(frame[0].name() == "O");
         CHECK(frame[0].type() == "O");
@@ -87,7 +83,7 @@ R"( REFERENCE STRUCTURE = 00000   A,B,C =  10.000  10.000  12.000
     frame.add_bond(0, 2);
     frame.add_bond(1, 3);
 
-    frame.set_cell(UnitCell(10, 10, 12));
+    frame.set_cell(UnitCell({10, 10, 12}));
     auto t = Trajectory(tmpfile, 'w');
     t.write(frame);
 

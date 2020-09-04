@@ -27,13 +27,9 @@ TEST_CASE("Read files in mmCIF format") {
         CHECK(approx_eq(positions[4778], Vector3D(-1.263, -2.837, -21.251 ), 1e-3));
 
         // Check the unit cell
-        auto cell = frame.cell();
-        CHECK(approx_eq(cell.a(), 63.150, 1e-3));
-        CHECK(approx_eq(cell.b(), 83.590, 1e-3));
-        CHECK(approx_eq(cell.c(), 53.800, 1e-3));
-        CHECK(approx_eq(cell.alpha(), 90.00, 1e-3));
-        CHECK(approx_eq(cell.beta(), 99.34, 1e-3));
-        CHECK(approx_eq(cell.gamma(), 90.00, 1e-3));
+        CHECK(frame.cell().shape() == UnitCell::TRICLINIC);
+        CHECK(approx_eq(frame.cell().lengths(), {63.150, 83.590, 53.800}, 1e-3));
+        CHECK(approx_eq(frame.cell().angles(), {90.00, 99.34, 90.00}, 1e-3));
 
         // Check residue information
         // Note: CIF files are silly and treat all waters as one Residue....
@@ -195,7 +191,7 @@ TEST_CASE("Write mmCIF file") {
     "HETATM 8     D  D    . bar G    ?    1.000    2.000    3.000 0.0 A 2\n";
 
 
-    auto frame = Frame(UnitCell(22));
+    auto frame = Frame(UnitCell({22, 22, 22}));
     frame.add_atom(Atom("A"), {1, 2, 3});
     frame.add_atom(Atom("B"), {1, 2, 3});
     frame.add_atom(Atom("C"), {1, 2, 3});

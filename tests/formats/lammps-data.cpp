@@ -19,9 +19,7 @@ TEST_CASE("Read files in LAMMPS data format") {
         CHECK(frame.size() == 7772);
 
         CHECK(frame.cell().shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(frame.cell().a(), 34.023998, 1e-12));
-        CHECK(approx_eq(frame.cell().b(), 34.023998, 1e-12));
-        CHECK(approx_eq(frame.cell().c(), 163.035995, 1e-12));
+        CHECK(approx_eq(frame.cell().lengths(), {34.023998, 34.023998, 163.035995}, 1e-12));
 
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], {4.253000, 12.759000, 63.506001}, 1e-12));
@@ -51,7 +49,7 @@ TEST_CASE("Read files in LAMMPS data format") {
         Frame frame = file.read();
 
         CHECK(frame.size() == 100);
-        CHECK(frame.cell() == UnitCell(31.064449134, 31.064449134, 1.0));
+        CHECK(approx_eq(frame.cell().lengths(), {31.064449134, 31.064449134, 1.0}, 1e-12));
 
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], {-15.5322, -15.5322, 0.0}, 1e-12));
@@ -78,24 +76,15 @@ TEST_CASE("Read files in LAMMPS data format") {
         auto file = Trajectory("data/lammps-data/triclinic-1.lmp", 'r', "LAMMPS Data");
         auto cell = file.read().cell();
 
-        CHECK(cell.a() == 34);
-        CHECK(cell.b() == 34);
-        CHECK(cell.c() == 34);
-        CHECK(cell.alpha() == 90);
-        CHECK(cell.beta() == 90);
-        CHECK(cell.gamma() == 90);
         CHECK(cell.shape() == UnitCell::TRICLINIC);
+        CHECK(cell.lengths() == Vector3D(34, 34, 34));
+        CHECK(cell.angles() == Vector3D(90, 90, 90));
 
         file = Trajectory("data/lammps-data/triclinic-2.lmp", 'r', "LAMMPS Data");
         cell = file.read().cell();
-
-        CHECK(approx_eq(cell.a(), 34, 1e-9));
-        CHECK(approx_eq(cell.b(), 34.3656805549, 1e-9));
-        CHECK(approx_eq(cell.c(), 35.0570962859, 1e-9));
-        CHECK(approx_eq(cell.alpha(), 87.0501134427, 1e-9));
-        CHECK(approx_eq(cell.beta(), 103.1910720469, 1e-9));
-        CHECK(approx_eq(cell.gamma(), 81.634113876, 1e-9));
         CHECK(cell.shape() == UnitCell::TRICLINIC);
+        CHECK(approx_eq(cell.lengths(), {34, 34.3656805549, 35.0570962859}, 1e-9));
+        CHECK(approx_eq(cell.angles(), {87.0501134427, 103.1910720469, 81.634113876}, 1e-9));
     }
 
     SECTION("Molecule ids") {
@@ -215,7 +204,7 @@ TEST_CASE("Write files in LAMMPS data format") {
 
     auto tmpfile = NamedTempPath(".lmp");
 
-    auto frame = Frame(UnitCell(5, 7, 9, 90, 90, 120));
+    auto frame = Frame(UnitCell({5, 7, 9}, {90, 90, 120}));
     frame.add_velocities();
     frame.add_atom(Atom("As"), {1.1, 2.2, 3.3}, {0.1, 0.2, 0.3});
     frame.add_atom(Atom("As"), {1.1, 2.2, 3.3}, {0.1, 0.2, 0.3});
@@ -249,7 +238,7 @@ TEST_CASE("Read and write files in memory") {
         auto frame = file.read();
 
         CHECK(frame.size() == 100);
-        CHECK(frame.cell() == UnitCell(31.064449134, 31.064449134, 1.0));
+        CHECK(frame.cell() == UnitCell({31.064449134, 31.064449134, 1.0}));
 
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], {-15.5322, -15.5322, 0.0}, 1e-12));

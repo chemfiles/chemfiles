@@ -31,13 +31,8 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(approx_eq(positions[4778], Vector3D(-1.263, -2.837, -21.251 ), 1e-3));
 
         // Check the unit cell
-        auto cell = frame.cell();
-        CHECK(approx_eq(cell.a(), 63.150, 1e-3));
-        CHECK(approx_eq(cell.b(), 83.590, 1e-3));
-        CHECK(approx_eq(cell.c(), 53.800, 1e-3));
-        CHECK(approx_eq(cell.alpha(), 90.00, 1e-3));
-        CHECK(approx_eq(cell.beta(), 99.34, 1e-3));
-        CHECK(approx_eq(cell.gamma(), 90.00, 1e-3));
+        CHECK(approx_eq(frame.cell().lengths(), {63.150, 83.590,53.800}, 1e-3));
+        CHECK(approx_eq(frame.cell().angles(), {90.00, 99.34, 90.00}, 1e-3));
 
         // Check residue information
         CHECK(frame.topology().residues().size() == 801);
@@ -259,7 +254,7 @@ TEST_CASE("Write files in MMTF format") {
         file.write(file_r.read());
 
         auto frame_mod = file_r.read();
-        frame_mod.set_cell(UnitCell(10., 10., 10.));
+        frame_mod.set_cell(UnitCell({10, 10, 10}));
         file.write(frame_mod);
 
         file.close();

@@ -14,7 +14,7 @@ TEST_CASE() {
     auto cell = frame.cell();
     assert(cell.shape() == UnitCell::INFINITE);
 
-    cell = UnitCell(23, 34, 11.5);
+    cell = UnitCell({23, 34, 11.5});
     frame.set_cell(cell);
 
     assert(frame.cell().shape() == UnitCell::ORTHORHOMBIC);

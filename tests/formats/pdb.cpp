@@ -22,20 +22,20 @@ TEST_CASE("Read files in PDB format") {
 
         REQUIRE(frame.size() == 297);
         auto positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D(0.417, 8.303, 11.737), 1e-3));
-        CHECK(approx_eq(positions[296], Vector3D(6.664, 11.6148, 12.961), 1e-3));
+        CHECK(approx_eq(positions[0], {0.417, 8.303, 11.737}, 1e-3));
+        CHECK(approx_eq(positions[296], {6.664, 11.6148, 12.961}, 1e-3));
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 15.0, 1e-5));
+        CHECK(approx_eq(cell.lengths(), {15.0, 15.0, 15.0}));
 
         file.read(); // Skip a frame
         frame = file.read();
 
         REQUIRE(frame.size() == 297);
         positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D(0.299, 8.310, 11.721), 1e-4));
-        CHECK(approx_eq(positions[296], Vector3D(6.798, 11.509, 12.704), 1e-4));
+        CHECK(approx_eq(positions[0], {0.299, 8.310, 11.721}, 1e-4));
+        CHECK(approx_eq(positions[296], {6.798, 11.509, 12.704}, 1e-4));
     }
 
     SECTION("Read a specific step") {
@@ -44,18 +44,18 @@ TEST_CASE("Read files in PDB format") {
         auto frame = file.read_step(2);
         REQUIRE(frame.size() == 297);
         auto positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D(0.299, 8.310, 11.721), 1e-4));
-        CHECK(approx_eq(positions[296], Vector3D(6.798, 11.509, 12.704), 1e-4));
+        CHECK(approx_eq(positions[0], {0.299, 8.310, 11.721}, 1e-4));
+        CHECK(approx_eq(positions[296], {6.798, 11.509, 12.704}, 1e-4));
 
         frame = file.read_step(0);
         REQUIRE(frame.size() == 297);
         positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D(0.417, 8.303, 11.737), 1e-3));
-        CHECK(approx_eq(positions[296], Vector3D(6.664, 11.6148, 12.961), 1e-3));
+        CHECK(approx_eq(positions[0], {0.417, 8.303, 11.737}, 1e-3));
+        CHECK(approx_eq(positions[296], {6.664, 11.6148, 12.961}, 1e-3));
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 15.0, 1e-5));
+        CHECK(cell.lengths() == Vector3D(15.0, 15.0, 15.0));
     }
 
     SECTION("Read bonds") {
@@ -84,6 +84,27 @@ TEST_CASE("Read files in PDB format") {
 
         CHECK(contains(topology.dihedrals(), Dihedral(64, 62, 58, 53)));
         CHECK(contains(topology.dihedrals(), Dihedral(22, 21, 23, 33)));
+    }
+
+    SECTION("Support short records") {
+        auto file = Trajectory("data/pdb/short-cryst1.pdb");
+        auto frame = file.read();
+
+        CHECK(frame.size() == 9);
+
+        CHECK(frame.cell().shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(frame.cell().lengths() == Vector3D(15.0, 15.0, 15.0));
+    }
+
+    SECTION("Read triclinic cells") {
+        auto file = Trajectory("data/pdb/1vln-triclinic.pdb");
+        auto frame = file.read();
+        CHECK(frame.size() == 14520);
+
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::TRICLINIC);
+        CHECK(cell.lengths() == Vector3D(78.8, 79.3, 133.3));
+        CHECK(approx_eq(cell.angles(), {97.1, 90.2, 97.5}, 1e-12));
     }
 
     SECTION("Read frame properties") {
@@ -448,7 +469,7 @@ TEST_CASE("Write files in PDB format") {
     "ENDMDL\n"
     "END\n";
 
-    auto frame = Frame(UnitCell(22));
+    auto frame = Frame(UnitCell({22, 22, 22}));
     frame.add_atom(Atom("A"), {1, 2, 3});
     frame.add_atom(Atom("B"), {1, 2, 3});
     frame.add_atom(Atom("C"), {1, 2, 3});
@@ -516,12 +537,12 @@ TEST_CASE("PDB files with big values") {
 
         auto frame = Frame();
         frame.resize(1);
-        frame.set_cell(UnitCell(1234567890));
-        CHECK_THROWS_AS(trajectory.write(frame), FormatError);
+        frame.set_cell(UnitCell({1234567890, 1234567890, 1234567890}));
+        CHECK_THROWS_WITH(trajectory.write(frame), "value in cell lengths is too big for representation in PDB format");
 
-        frame.set_cell(UnitCell(12));
+        frame.set_cell(UnitCell({12, 12, 12}));
         frame.positions()[0] = Vector3D(123456789, 2, 3);
-        CHECK_THROWS_AS(trajectory.write(frame), FormatError);
+        CHECK_THROWS_WITH(trajectory.write(frame), "value in atomic position is too big for representation in PDB format");
     }
 
     SECTION("Default residues") {
@@ -610,7 +631,7 @@ TEST_CASE("Read and write files in memory") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 15.0, 1e-5));
+        CHECK(approx_eq(cell.lengths(), {15.0, 15.0, 15.0}, 1e-5));
 
         file.read(); // Skip a frame
         frame = file.read();

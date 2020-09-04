@@ -196,23 +196,13 @@ void TNGFormat::read_cell(Frame& frame) {
         );
     }
 
-    auto a = Vector3D(static_cast<double>(buffer[0]), static_cast<double>(buffer[1]), static_cast<double>(buffer[2]));
-    auto b = Vector3D(static_cast<double>(buffer[3]), static_cast<double>(buffer[4]), static_cast<double>(buffer[5]));
-    auto c = Vector3D(static_cast<double>(buffer[6]), static_cast<double>(buffer[7]), static_cast<double>(buffer[8]));
+    auto matrix = distance_scale_factor_ * Matrix3D(
+        static_cast<double>(buffer[0]), static_cast<double>(buffer[3]), static_cast<double>(buffer[6]),
+        static_cast<double>(buffer[1]), static_cast<double>(buffer[4]), static_cast<double>(buffer[7]),
+        static_cast<double>(buffer[2]), static_cast<double>(buffer[5]), static_cast<double>(buffer[8])
+    );
 
-    auto angle = [](const Vector3D& u, const Vector3D& v) {
-        constexpr double PI = 3.141592653589793238463;
-        auto cos = dot(u, v) / (u.norm() * v.norm());
-        cos = std::max(-1., std::min(1., cos));
-        return acos(cos) * 180.0 / PI;
-    };
-
-    double alpha = angle(b, c);
-    double beta = angle(a, c);
-    double gamma = angle(a, b);
-
-    frame.set_cell({a.norm() * distance_scale_factor_, b.norm() * distance_scale_factor_, c.norm() * distance_scale_factor_,
-        alpha, beta, gamma});
+    frame.set_cell(UnitCell(matrix));
 }
 
 void TNGFormat::read_topology(Frame& frame) {

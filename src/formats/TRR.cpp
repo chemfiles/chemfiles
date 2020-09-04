@@ -41,7 +41,6 @@ static void set_positions(const std::vector<float>& x, Frame& frame);
 static void get_positions(std::vector<float>& x, const Frame& frame);
 static void set_velocities(const std::vector<float>& v, Frame& frame);
 static void get_velocities(std::vector<float>& v, const Frame& frame);
-static void set_cell(matrix box, Frame& frame);
 static void get_cell(matrix box, const Frame& frame);
 
 TRRFormat::TRRFormat(std::string path, File::Mode mode, File::Compression compression)
@@ -84,8 +83,15 @@ void TRRFormat::read(Frame& frame) {
     frame.resize(static_cast<size_t>(natoms));
 
     if (has_box) {
-        set_cell(box, frame);
+        auto matrix = Matrix3D(
+            static_cast<double>(box[0][0]), static_cast<double>(box[1][0]), static_cast<double>(box[2][0]),
+            static_cast<double>(box[0][1]), static_cast<double>(box[1][1]), static_cast<double>(box[2][1]),
+            static_cast<double>(box[0][2]), static_cast<double>(box[1][2]), static_cast<double>(box[2][2])
+        );
+        // Factor 10 because the cell lengthes are in nm in the TRR format
+        frame.set_cell(UnitCell(10 * matrix));
     }
+
     if (has_positions) {
         frame.set("has_positions", true);
         set_positions(x, frame);
@@ -179,29 +185,6 @@ void get_velocities(std::vector<float>& v, const Frame& frame) {
         v[i * 3 + 1] = static_cast<float>(velocities[i][1] / 10.0);
         v[i * 3 + 2] = static_cast<float>(velocities[i][2] / 10.0);
     }
-}
-
-void set_cell(matrix box, Frame& frame) {
-    auto a = Vector3D(static_cast<double>(box[0][0]), static_cast<double>(box[0][1]),
-                      static_cast<double>(box[0][2]));
-    auto b = Vector3D(static_cast<double>(box[1][0]), static_cast<double>(box[1][1]),
-                      static_cast<double>(box[1][2]));
-    auto c = Vector3D(static_cast<double>(box[2][0]), static_cast<double>(box[2][1]),
-                      static_cast<double>(box[2][2]));
-
-    auto angle = [](const Vector3D& u, const Vector3D& v) {
-        constexpr double PI = 3.141592653589793238463;
-        auto cos = dot(u, v) / (u.norm() * v.norm());
-        cos = std::max(-1., std::min(1., cos));
-        return acos(cos) * 180.0 / PI;
-    };
-
-    double alpha = angle(b, c);
-    double beta = angle(a, c);
-    double gamma = angle(a, b);
-
-    // Factor 10 because the cell lengthes are in nm in the TRR format
-    frame.set_cell({a.norm() * 10, b.norm() * 10, c.norm() * 10, alpha, beta, gamma});
 }
 
 void get_cell(matrix box, const Frame& frame) {

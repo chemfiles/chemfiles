@@ -13,13 +13,7 @@ TEST_CASE() {
 
     assert(cell.shape() == UnitCell::INFINITE);
 
-    assert(cell.a() == 0);
-    assert(cell.b() == 0);
-    assert(cell.c() == 0);
-
-    assert(cell.alpha() == 90);
-    assert(cell.beta() == 90);
-    assert(cell.gamma() == 90);
-
+    assert(cell.lengths() == Vector3D(0, 0, 0));
+    assert(cell.angles() == Vector3D(90, 90, 90));
     // [example]
 }

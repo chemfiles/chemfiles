@@ -35,12 +35,8 @@ TEST_CASE("Read files in CIF format") {
 
         // Check the unit cell
         auto cell = frame.cell();
-        CHECK(approx_eq(cell.a(), 5.9170, 1e-4));
-        CHECK(approx_eq(cell.b(), 11.5030, 1e-4));
-        CHECK(approx_eq(cell.c(), 12.0635, 1e-4));
-        CHECK(approx_eq(cell.alpha(), 90., 1e-4));
-        CHECK(approx_eq(cell.beta(), 98.153, 1e-4));
-        CHECK(approx_eq(cell.gamma(), 90., 1e-4));
+        CHECK(approx_eq(cell.lengths(), {5.9170, 11.5030, 12.0635}, 1e-4));
+        CHECK(approx_eq(cell.angles(), {90.0, 98.153, 90.0}, 1e-4));
     }
 
     SECTION("Check nsteps and read frame by frame") {
@@ -48,20 +44,22 @@ TEST_CASE("Read files in CIF format") {
         CHECK(file.nsteps() == 3);
 
         Frame frame = file.read();
-        CHECK(approx_eq(frame.cell().a(), 20.721205, 1e-4));
+        CHECK(approx_eq(frame.cell().lengths(), {20.721205, 20.721205, 20.721205}, 1e-6));
         CHECK(frame[0].name() == "C1");
         CHECK(frame[0].type() == "C");
         CHECK(frame[0].get("occupancy")->as_double() == 1.0);
         CHECK(frame[0].get("atomic_number")->as_double() == 6);
         CHECK(approx_eq(frame.positions()[0], Vector3D(0.124, 14.561, 4.200), 1e-3));
+        
         frame = file.read();
-        CHECK(approx_eq(frame.cell().a(), 20.561233, 1e-4));
+        CHECK(approx_eq(frame.cell().lengths(), {20.561233, 20.561233, 20.561233}, 1e-6));
         CHECK(frame[0].name() == "C1");
         CHECK(frame[0].get("occupancy")->as_double() == 1.0);
         CHECK(frame[0].get("atomic_number")->as_double() == 6);
         CHECK(approx_eq(frame.positions()[0], Vector3D(0.159, 4.170, 14.451), 1e-3));
+        
         frame = file.read();
-        CHECK(approx_eq(frame.cell().a(), 20.415146, 1e-4));
+        CHECK(approx_eq(frame.cell().lengths(), {20.415146, 20.415146, 20.415146}, 1e-6));
         CHECK(frame[0].name() == "C1");
         CHECK(frame[0].get("occupancy")->as_double() == 1.0);
         CHECK(frame[0].get("atomic_number")->as_double() == 6);
@@ -72,22 +70,24 @@ TEST_CASE("Read files in CIF format") {
         auto file = Trajectory("data/cif/Zr-UiO-66-pressure.cif", 'r', "CIF");
         CHECK(file.nsteps() == 3);
 
-        Frame frame = file.read_step(1);
-        CHECK(approx_eq(frame.cell().a(), 20.561233, 1e-4));
+        auto frame = file.read_step(1);
+        CHECK(approx_eq(frame.cell().lengths(), {20.561233, 20.561233, 20.561233}, 1e-6));
         CHECK(frame[0].name() == "C1");
         CHECK(frame[0].type() == "C");
         CHECK(frame[0].get("occupancy")->as_double() == 1.0);
         CHECK(frame[0].get("atomic_number")->as_double() == 6);
         CHECK(approx_eq(frame.positions()[0], Vector3D(0.159, 4.170, 14.451), 1e-3));
+        
         frame = file.read_step(0);
-        CHECK(approx_eq(frame.cell().a(), 20.721205, 1e-4));
+        CHECK(approx_eq(frame.cell().lengths(), {20.721205, 20.721205, 20.721205}, 1e-6));
         CHECK(frame[0].name() == "C1");
         CHECK(frame[0].type() == "C");
         CHECK(frame[0].get("occupancy")->as_double() == 1.0);
         CHECK(frame[0].get("atomic_number")->as_double() == 6);
         CHECK(approx_eq(frame.positions()[0], Vector3D(0.124, 14.561, 4.200), 1e-3));
+        
         frame = file.read_step(2);
-        CHECK(approx_eq(frame.cell().a(), 20.415146, 1e-4));
+        CHECK(approx_eq(frame.cell().lengths(), {20.415146, 20.415146, 20.415146}, 1e-6));
         CHECK(frame[0].name() == "C1");
         CHECK(frame[0].type() == "C");
         CHECK(frame[0].get("occupancy")->as_double() == 1.0);
@@ -127,7 +127,7 @@ TEST_CASE("Write CIF file") {
     "Si Si 1.0  0.0454545  0.0909091  0.1363636  1.00000  2.00000  3.00000\n"
     "C C 1.0  0.0909091  0.1363636  0.1818182  2.00000  3.00000  4.00000\n";
 
-    auto frame = Frame(UnitCell(22));
+    auto frame = Frame(UnitCell({22, 22, 22}));
     frame.add_atom(Atom("Si"), {1, 2, 3});
     frame.add_atom(Atom("C"), {2, 3, 4});
 
