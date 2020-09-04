@@ -29,23 +29,26 @@ TEST_CASE("Read files in Gromacs .gro format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 55.68, 1e-2));
-        CHECK(approx_eq(cell.b(), 58.87, 1e-2));
-        CHECK(approx_eq(cell.c(), 62.57, 1e-2));
+        CHECK(approx_eq(cell.lengths(), {55.68, 58.87, 62.57}, 1e-2));
     }
 
     SECTION("Triclinic Box") {
         auto file = Trajectory("data/gro/cod_4020641.gro");
-        Frame frame = file.read();
+        auto frame = file.read();
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::TRICLINIC);
-        CHECK(approx_eq(cell.a(), 26.2553, 1e-2));
-        CHECK(approx_eq(cell.b(), 11.3176, 1e-2));
-        CHECK(approx_eq(cell.c(), 11.8892, 1e-2));
-        CHECK(approx_eq(cell.alpha(), 90.0, 1e-2));
-        CHECK(approx_eq(cell.beta(), 112.159, 1e-2));
-        CHECK(approx_eq(cell.gamma(), 90.0, 1e-2));
+        CHECK(approx_eq(cell.lengths(), {26.2553, 11.3176, 11.8892}, 1e-2));
+        CHECK(approx_eq(cell.angles(), {90.0, 112.159, 90.0}, 1e-2));
+
+        file = Trajectory("data/pdb/1vln-triclinic.pdb");
+        frame = file.read();
+        CHECK(frame.size() == 14520);
+
+        cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::TRICLINIC);
+        CHECK(cell.lengths() == Vector3D(78.8, 79.3, 133.3));
+        CHECK(approx_eq(cell.angles(), Vector3D(97.1, 90.2, 97.5), 1e-12));
     }
 
     SECTION("Read next step") {
@@ -66,7 +69,7 @@ TEST_CASE("Read files in Gromacs .gro format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 70.1008, 1e-5));
+        CHECK(approx_eq(cell.lengths(), {70.1008, 70.1008, 70.1008}, 1e-5));
 
         file.read(); // Skip a frame
         frame = file.read();
@@ -85,7 +88,7 @@ TEST_CASE("Read files in Gromacs .gro format") {
 
         cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.b(), 69.7308, 1e-5));
+        CHECK(approx_eq(cell.lengths(), {69.7308, 69.7308, 69.7308}, 1e-5));
     }
 
     SECTION("Read a specific step") {
@@ -106,7 +109,7 @@ TEST_CASE("Read files in Gromacs .gro format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.c(), 70.1008, 1e-5));
+        CHECK(approx_eq(cell.lengths(), {70.1008, 70.1008, 70.1008}, 1e-5));
     }
 
     SECTION("Read residue information") {
@@ -133,7 +136,7 @@ TEST_CASE("Write files in GRO format") {
     "    2XXXXX    B    2   0.100   0.200   0.300\n"
     "    3XXXXX    C    3   0.100   0.200   0.300\n"
     "    4XXXXX    D    4   0.100   0.200   0.300\n"
-    "   2.20000   2.20000   2.20000\n"
+    "    2.20000  2.20000  2.20000\n"
     "Second test\n"
     "    7\n"
     "    4XXXXX    A    1   0.100   0.200   0.300  0.0000  0.0000  0.0000\n"
@@ -143,9 +146,9 @@ TEST_CASE("Write files in GRO format") {
     "    6baz      E    5   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
     "    7XXXXX    F    6   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
     "    8XXXXX    G    7   0.400   0.500   0.600  0.9000  1.0000  1.1000\n"
-    "   2.20000   1.90526   4.40000 0.0 0.0  -1.10000 0.0   0.00000   0.00000\n";
+    "    2.20000  1.90526  4.40000 0.0 0.0 -1.10000 0.0  0.00000  0.00000\n";
 
-    auto frame = Frame(UnitCell(22));
+    auto frame = Frame(UnitCell({22, 22, 22}));
     frame.add_atom(Atom("A"), {1, 2, 3});
     frame.add_atom(Atom("B"), {1, 2, 3});
     frame.add_atom(Atom("C"), {1, 2, 3});
@@ -156,7 +159,7 @@ TEST_CASE("Write files in GRO format") {
     file.write(frame);
 
     frame.set("name", "Second test");
-    frame.set_cell(UnitCell(22, 22, 44, 90, 90, 120));
+    frame.set_cell(UnitCell({22, 22, 44}, {90, 90, 120}));
     frame.add_velocities();
 
     frame.add_atom(Atom("E"), {4, 5, 6}, {9, 10, 11});
@@ -198,11 +201,11 @@ TEST_CASE("GRO files with big values") {
 
         auto frame = Frame();
         frame.resize(1);
-        frame.set_cell(UnitCell(1234567890));
-        CHECK_THROWS_AS(trajectory.write(frame), FormatError);
+        frame.set_cell(UnitCell({1234567890, 1234567890, 1234567890}));
+        CHECK_THROWS_WITH(trajectory.write(frame), "value in unit cell is too big for representation in GRO format");
 
-        frame.set_cell(UnitCell(12,12,12345678900, 120, 90, 90));
-        CHECK_THROWS_AS(trajectory.write(frame), FormatError);
+        frame.set_cell(UnitCell({12, 12, 12345678900}, {120, 90, 90}));
+        CHECK_THROWS_WITH(trajectory.write(frame), "value in unit cell is too big for representation in GRO format");
     }
 
     SECTION("Coordinates and velocity") {
@@ -210,15 +213,13 @@ TEST_CASE("GRO files with big values") {
         auto trajectory = Trajectory(tmpfile, 'w');
 
         auto frame = Frame();
-        frame.resize(1);
-        frame.set_cell(UnitCell(12));
-        frame.positions()[0] = Vector3D(1234567890, 2, 3);
-        CHECK_THROWS_AS(trajectory.write(frame), FormatError);
+        frame.add_atom(Atom(""), {1234567890, 2, 3});
+        CHECK_THROWS_WITH(trajectory.write(frame), "value in atomic position is too big for representation in GRO format");
 
-        frame.positions()[0] = Vector3D(1, 2, 3);
+        frame.resize(0);
         frame.add_velocities();
-        (*frame.velocities())[0] = Vector3D(1234567890, 2, 3);
-        CHECK_THROWS_AS(trajectory.write(frame), FormatError);
+        frame.add_atom(Atom(""), {1, 2, 3}, {1234567890, 2, 3});
+        CHECK_THROWS_WITH(trajectory.write(frame), "value in atomic velocity is too big for representation in GRO format");
     }
 
     SECTION("Atom counts") {

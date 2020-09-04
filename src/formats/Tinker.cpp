@@ -55,10 +55,9 @@ void TinkerFormat::read_next(Frame& frame) {
         auto line = file_.readline();
         if (is_unit_cell_line(line)) {
             // Read the cell
-            double a = 0, b = 0, c = 0;
-            double alpha = 0, beta = 0, gamma = 0;
-            scan(line, a, b, c, alpha, beta, gamma);
-            frame.set_cell(UnitCell(a, b, c, alpha, beta, gamma));
+            Vector3D lengths, angles;
+            scan(line, lengths[0], lengths[1], lengths[2], angles[0], angles[1], angles[2]);
+            frame.set_cell({lengths, angles});
         } else {
             file_.seekpos(position);
         }
@@ -93,10 +92,11 @@ void TinkerFormat::read_next(Frame& frame) {
 }
 
 void TinkerFormat::write_next(const Frame& frame) {
+    auto lengths = frame.cell().lengths();
+    auto angles = frame.cell().angles();
     file_.print("{} written by the chemfiles library\n", frame.size());
     file_.print("{} {} {} {} {} {}\n",
-        frame.cell().a(), frame.cell().b(), frame.cell().c(),
-        frame.cell().alpha(), frame.cell().beta(), frame.cell().gamma()
+        lengths[0], lengths[1], lengths[2], angles[0], angles[1], angles[2]
     );
 
     auto& topology = frame.topology();

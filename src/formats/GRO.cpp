@@ -106,12 +106,13 @@ void GROFormat::read_next(Frame& frame) {
     auto box_values = split(box, ' ');
 
     if (box_values.size() == 3) {
-        auto a = parse<double>(box_values[0]) * 10;
-        auto b = parse<double>(box_values[1]) * 10;
-        auto c = parse<double>(box_values[2]) * 10;
+        auto lengths = Vector3D(
+            parse<double>(box_values[0]) * 10,
+            parse<double>(box_values[1]) * 10,
+            parse<double>(box_values[2]) * 10
+        );
 
-        auto cell = UnitCell(a, b, c);
-        frame.set_cell(cell);
+        frame.set_cell(UnitCell(lengths));
     } else if (box_values.size() == 9) {
         auto v1_x = parse<double>(box_values[0]) * 10;
         auto v2_y = parse<double>(box_values[1]) * 10;
@@ -127,13 +128,11 @@ void GROFormat::read_next(Frame& frame) {
         auto v3_x = parse<double>(box_values[7]) * 10;
         auto v3_y = parse<double>(box_values[8]) * 10;
 
-        auto H = Matrix3D(
+        auto cell = UnitCell({
             v1_x, v2_x, v3_x,
             0.00, v2_y, v3_y,
-            0.00, 0.00, v3_z);
-
-        auto cell = UnitCell(H);
-
+            0.00, 0.00, v3_z
+        });
         frame.set_cell(cell);
     }
 
@@ -230,17 +229,16 @@ void GROFormat::write_next(const Frame& frame) {
     // While this line is free form, we should try to print it in a pretty way that most gro parsers expect
     // This means we cannot support incredibly large cell sizes, but these are likely not practical anyway
     if (cell.shape() == UnitCell::ORTHORHOMBIC || cell.shape() == UnitCell::INFINITE) {
-        check_values_size(Vector3D(cell.a() / 10, cell.b() / 10, cell.c() / 10), 8, "Unit Cell");
-        file_.print(
-            // Will print zeros if infinite, line is still required
-            "  {:8.5f}  {:8.5f}  {:8.5f}\n",
-            cell.a() / 10, cell.b() / 10, cell.c() / 10);
+        auto lengths = cell.lengths() / 10;
+        check_values_size(lengths, 8, "unit cell");
+        // print zeros if the cell is infinite, this line is still required
+        file_.print("   {:8.5f} {:8.5f} {:8.5f}\n", lengths[0], lengths[1], lengths[2]);
     } else { // Triclinic
         const auto& matrix = cell.matrix() / 10;
-        check_values_size(Vector3D(matrix[0][0], matrix[1][1], matrix[2][2]), 8, "Unit Cell");
-        check_values_size(Vector3D(matrix[0][1], matrix[0][2], matrix[1][2]), 8, "Unit Cell");
+        check_values_size(Vector3D(matrix[0][0], matrix[1][1], matrix[2][2]), 8, "unit cell");
+        check_values_size(Vector3D(matrix[0][1], matrix[0][2], matrix[1][2]), 8, "unit cell");
         file_.print(
-            "  {:8.5f}  {:8.5f}  {:8.5f} 0.0 0.0  {:8.5f} 0.0  {:8.5f}  {:8.5f}\n",
+            "   {:8.5f} {:8.5f} {:8.5f} 0.0 0.0 {:8.5f} 0.0 {:8.5f} {:8.5f}\n",
             matrix[0][0], matrix[1][1], matrix[2][2], matrix[0][1], matrix[0][2], matrix[1][2]
         );
     }

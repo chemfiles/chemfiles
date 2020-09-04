@@ -53,7 +53,7 @@ TEST_CASE("Read files in Tinker XYZ format") {
         CHECK(approx_eq(positions[0], Vector3D(-2.941653, 3.480677, 3.562162), 1e-6));
         CHECK(approx_eq(positions[100], Vector3D(-3.328907, 4.080875, -4.559358), 1e-6));
 
-        CHECK(frame.cell() == UnitCell(18.2736));
+        CHECK(frame.cell() == UnitCell({18.2736, 18.2736, 18.2736}));
 
         auto& topology = frame.topology();
         CHECK(topology[0].name() == "N");
@@ -73,7 +73,7 @@ TEST_CASE("Read files in Tinker XYZ format") {
         CHECK(approx_eq(positions[0], Vector3D(-7.481173, 3.330502, 0.042802), 1e-6));
         CHECK(approx_eq(positions[67], Vector3D(-0.180228, -7.515172, -5.739137), 1e-6));
 
-        CHECK(frame.cell() == UnitCell(18.2736));
+        CHECK(frame.cell() == UnitCell({18.2736, 18.2736, 18.2736}));
     }
 }
 
@@ -110,7 +110,7 @@ R"(4 written by the chemfiles library
 
     frame.add_atom(Atom("E"), {4, 5, 6});
     frame.add_atom(Atom("F"), {4, 5, 6});
-    frame.set_cell(UnitCell(22, 33, 44));
+    frame.set_cell(UnitCell({22, 33, 44}));
 
     file.write(frame);
     file.close();
@@ -137,7 +137,7 @@ TEST_CASE("Read and write files in memory") {
         CHECK(approx_eq(positions[0], Vector3D(-2.941653, 3.480677, 3.562162), 1e-6));
         CHECK(approx_eq(positions[100], Vector3D(-3.328907, 4.080875, -4.559358), 1e-6));
 
-        CHECK(frame.cell() == UnitCell(18.2736));
+        CHECK(frame.cell() == UnitCell({18.2736, 18.2736, 18.2736}));
 
         auto& topology = frame.topology();
         CHECK(topology[0].name() == "N");
@@ -157,6 +157,6 @@ TEST_CASE("Read and write files in memory") {
         CHECK(approx_eq(positions[0], Vector3D(-7.481173, 3.330502, 0.042802), 1e-6));
         CHECK(approx_eq(positions[67], Vector3D(-0.180228, -7.515172, -5.739137), 1e-6));
 
-        CHECK(frame.cell() == UnitCell(18.2736));
+        CHECK(frame.cell() == UnitCell({18.2736, 18.2736, 18.2736}));
     }
 }

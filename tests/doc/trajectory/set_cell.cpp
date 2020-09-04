@@ -9,11 +9,11 @@ TEST_CASE() {
     // [no-run]
     // [example]
     auto trajectory = Trajectory("water.xyz");
-    trajectory.set_cell(UnitCell(11, 11, 22));
+    trajectory.set_cell(UnitCell({11, 11, 22}));
 
     auto frame = trajectory.read();
     // The frame cell is now an orthorhombic cell with lengths of
     // 11 A, 11 A and 22 A, regardless of what was defined in the file.
-
+    assert(frame.cell() == UnitCell({11, 11, 22}));
     // [example]
 }

@@ -18,119 +18,97 @@ inline double deg2rad(double x) {
     return x * pi / 180.0;
 }
 
-inline double rad2deg(double x) {
+static double rad2deg(double x) {
     return x * 180.0 / pi;
 }
 
-inline double cosd(double theta) {
+static double cosd(double theta) {
     return cos(deg2rad(theta));
 }
 
-inline double sind(double theta) {
+static double sind(double theta) {
     return sin(deg2rad(theta));
 }
 
-UnitCell::UnitCell(): UnitCell(0) {
-    shape_ = INFINITE;
+static bool is_roughly_zero(double value) {
+    // We think that 0.00001 is close enough to 0
+    return fabs(value) < 1e-5;
 }
 
-UnitCell::UnitCell(double a): UnitCell(a, a, a) {}
+static bool is_roughly_90(double value) {
+    // We think that 89.999° is close enough to 90°
+    return fabs(value - 90.0) < 1e-3;
+}
 
-UnitCell::UnitCell(double a, double b, double c): UnitCell(a, b, c, 90, 90, 90) {}
+UnitCell::UnitCell(): UnitCell({0, 0, 0}) {}
 
-UnitCell::UnitCell(double a, double b, double c, double alpha, double beta, double gamma):
-    h_(Matrix3D::unit()),
-    h_inv_(Matrix3D::unit()),
-    a_(a),
-    b_(b),
-    c_(c),
-    alpha_(alpha),
-    beta_(beta),
-    gamma_(gamma)
+UnitCell::UnitCell(Vector3D lengths): UnitCell(lengths, {90, 90, 90}) {}
+
+UnitCell::UnitCell(Vector3D lengths, Vector3D angles):
+    matrix_(Matrix3D::unit()),
+    matrix_inv_(Matrix3D::unit()),
+    lengths_(lengths),
+    angles_(angles)
 {
-    auto is_zero = [](double length) {
-        // We think that 0.00001 is close enough to 0
-        return fabs(length) < 1e-5;
-    };
-    auto is_90 = [](double angle) {
-        // We think that 89.999° is close enough to 90°
-        return fabs(angle - 90.0) < 1e-3;
-    };
-    if (is_zero(a_) && is_zero(b_) && is_zero(c_)) {
+    
+    if (is_roughly_zero(lengths_[0]) && is_roughly_zero(lengths_[1]) && is_roughly_zero(lengths_[2])) {
         shape_ = INFINITE;
-        a_ = b_ = c_ = 0;
-        alpha_ = beta_ = gamma_ = 90;
-    } else if (is_90(alpha_) && is_90(beta_) && is_90(gamma_)) {
+        lengths_ = {0, 0, 0};
+        angles_ = {90, 90, 90};
+    } else if (is_roughly_90(angles_[0]) && is_roughly_90(angles_[1]) && is_roughly_90(angles_[2])) {
         shape_ = ORTHORHOMBIC;
         // Make sure alpha/beta/gamma are actually 90°, so that the matrix
         // update below does not create a non diagonal matrix.
-        alpha_ = 90;
-        beta_ = 90;
-        gamma_ = 90;
+        angles_ = {90, 90, 90};
     } else {
         shape_ = TRICLINIC;
     }
     update_matrix();
 }
 
-UnitCell::UnitCell(const Matrix3D& matrix): h_(Matrix3D::unit()), h_inv_(Matrix3D::unit()) {
+UnitCell::UnitCell(const Matrix3D& matrix): matrix_(Matrix3D::unit()), matrix_inv_(Matrix3D::unit()) {
     if (matrix[1][0] != 0 || matrix[2][0] != 0 || matrix[2][1] != 0) {
         throw error("the matrix supplied to UnitCell is not an upper triangular matrix");
+    } else if (matrix_.determinant() <= 0) {
+        throw error("the matrix supplied to UnitCell do not have a positive determinant");
     }
 
-    if (matrix[0][0] == 0 && matrix[1][1] == 0 && matrix[2][2] == 0 &&
-        matrix[0][1] == 0 && matrix[0][2] == 0 && matrix[1][2] == 0) {
-
+    if (is_roughly_zero(matrix[0][0]) && is_roughly_zero(matrix[1][1]) && is_roughly_zero(matrix[2][2]) &&
+        is_roughly_zero(matrix[0][1]) && is_roughly_zero(matrix[0][2]) && is_roughly_zero(matrix[1][2])) {
         shape_ = INFINITE;
-        a_ = b_ = c_ = 0;
-        alpha_ = beta_ = gamma_ = 90.0;
-
-        update_matrix();
-
-        return;
-    }
-
-    if (matrix[0][1] == 0 && matrix[0][2] == 0 && matrix[1][2] == 0) {
+        lengths_ = {0, 0, 0};
+        angles_ = {90, 90, 90};
+    } else if (is_roughly_zero(matrix[0][1]) && is_roughly_zero(matrix[0][2]) && is_roughly_zero(matrix[1][2])) {
         shape_ = ORTHORHOMBIC;
+        lengths_ = {matrix[0][0], matrix[1][1], matrix[2][2]};
+        angles_ = {90, 90, 90};
+    } else {
+        shape_ = TRICLINIC;
 
-        a_ = matrix[0][0];
-        b_ = matrix[1][1];
-        c_ = matrix[2][2];
+        auto v1 = Vector3D(matrix[0][0], matrix[1][0], matrix[2][0]);
+        auto v2 = Vector3D(matrix[0][1], matrix[1][1], matrix[2][1]);
+        auto v3 = Vector3D(matrix[0][2], matrix[1][2], matrix[2][2]);
+        
+        auto angle = [](Vector3D& r1, Vector3D& r2) {
+            return rad2deg(acos(dot(r1, r2) / (r1.norm() * r2.norm()))); 
+        };
 
-        alpha_ = beta_ = gamma_ = 90.0;
-
-        update_matrix();
-
-        return;
+        lengths_ = {v1.norm(), v2.norm(), v3.norm()};
+        angles_ = {angle(v2, v3), angle(v1, v3), angle(v1, v2)};
     }
-
-    shape_ = TRICLINIC;
-
-    Vector3D v1 = {matrix[0][0], matrix[1][0], matrix[2][0]};
-    Vector3D v2 = {matrix[0][1], matrix[1][1], matrix[2][1]};
-    Vector3D v3 = {matrix[0][2], matrix[1][2], matrix[2][2]};
-
-    a_ = v1.norm();
-    b_ = v2.norm();
-    c_ = v3.norm();
-
-    alpha_ = rad2deg(acos(dot(v2, v3) / (b_ * c_)));
-    beta_  = rad2deg(acos(dot(v1, v3) / (a_ * c_)));
-    gamma_ = rad2deg(acos(dot(v1, v2) / (a_ * b_)));
-
+    
     update_matrix();
+    assert(fabs(matrix_[0][0] - matrix[0][0]) < 1e-5);
+    assert(fabs(matrix_[1][0] - matrix[1][0]) < 1e-5);
+    assert(fabs(matrix_[2][0] - matrix[2][0]) < 1e-5);
 
-    assert(fabs(h_[0][0] - matrix[0][0]) < 1e-5);
-    assert(fabs(h_[1][0] - matrix[1][0]) < 1e-5);
-    assert(fabs(h_[2][0] - matrix[2][0]) < 1e-5);
+    assert(fabs(matrix_[0][1] - matrix[0][1]) < 1e-5);
+    assert(fabs(matrix_[1][1] - matrix[1][1]) < 1e-5);
+    assert(fabs(matrix_[2][1] - matrix[2][1]) < 1e-5);
 
-    assert(fabs(h_[0][1] - matrix[0][1]) < 1e-5);
-    assert(fabs(h_[1][1] - matrix[1][1]) < 1e-5);
-    assert(fabs(h_[2][1] - matrix[2][1]) < 1e-5);
-
-    assert(fabs(h_[0][2] - matrix[0][2]) < 1e-5);
-    assert(fabs(h_[1][2] - matrix[1][2]) < 1e-5);
-    assert(fabs(h_[2][2] - matrix[2][2]) < 1e-5);
+    assert(fabs(matrix_[0][2] - matrix[0][2]) < 1e-5);
+    assert(fabs(matrix_[1][2] - matrix[1][2]) < 1e-5);
+    assert(fabs(matrix_[2][2] - matrix[2][2]) < 1e-5);
 }
 
 double UnitCell::volume() const {
@@ -138,61 +116,53 @@ double UnitCell::volume() const {
     case INFINITE:
         return 0;
     case ORTHORHOMBIC:
-        return a_ * b_ * c_;
+        return lengths_[0] * lengths_[1] * lengths_[2];
     case TRICLINIC:
-        break; // The computation is too complexe to take place in a switch
+        return matrix_.determinant();
     }
-    double cos_alpha = cos(deg2rad(alpha_));
-    double cos_beta = cos(deg2rad(beta_));
-    double cos_gamma = cos(deg2rad(gamma_));
-
-    double factor = sqrt(
-        1 - cos_alpha * cos_alpha - cos_beta * cos_beta -
-        cos_gamma * cos_gamma + 2 * cos_alpha * cos_beta * cos_gamma
-    );
-    return a_ * b_ * c_ * factor;
 }
 
 void UnitCell::update_matrix() {
-    h_[0][0] = a_;
-    h_[1][0] = 0;
-    h_[2][0] = 0;
+    matrix_[0][0] = lengths_[0];
+    matrix_[1][0] = 0;
+    matrix_[2][0] = 0;
 
-    h_[0][1] = cosd(gamma_) * b_;
-    h_[1][1] = sind(gamma_) * b_;
-    h_[2][1] = 0;
+    matrix_[0][1] = cosd(angles_[2]) * lengths_[1];
+    matrix_[1][1] = sind(angles_[2]) * lengths_[1];
+    matrix_[2][1] = 0;
 
-    h_[0][2] = cosd(beta_);
-    h_[1][2] = (cosd(alpha_) - cosd(beta_) * cosd(gamma_)) / sind(gamma_);
-    h_[2][2] = sqrt(1 - h_[0][2] * h_[0][2] - h_[1][2] * h_[1][2]);
-    h_[0][2] *= c_;
-    h_[1][2] *= c_;
-    h_[2][2] *= c_;
+    matrix_[0][2] = cosd(angles_[1]);
+    matrix_[1][2] = (cosd(angles_[0]) - cosd(angles_[1]) * cosd(angles_[2])) / sind(angles_[2]);
+    matrix_[2][2] = sqrt(1 - matrix_[0][2] * matrix_[0][2] - matrix_[1][2] * matrix_[1][2]);
+    matrix_[0][2] *= lengths_[2];
+    matrix_[1][2] *= lengths_[2];
+    matrix_[2][2] *= lengths_[2];
 
     // Do not try to invert a cell with a 0 volume
-    if (volume() == 0.0) {
-        h_inv_ = Matrix3D::unit();
+    if (matrix_.determinant() <= 0.0) {
+        matrix_inv_ = Matrix3D::unit();
     } else {
-        h_inv_ = h_.invert();
+        matrix_inv_ = matrix_.invert();
     }
 }
 
 void UnitCell::set_shape(CellShape shape) {
     if (shape == ORTHORHOMBIC) {
-        if (!(alpha_ == 90 && beta_ == 90 && gamma_ == 90)) {
+        if (angles_ != Vector3D(90, 90, 90)) {
             throw error(
-                "can not be set cell shape to ORTHORHOMBIC: some angles are not 90°"
+                "can not set cell shape to ORTHORHOMBIC: some angles are not 90°"
             );
         }
     } else if (shape == INFINITE) {
-        if (!(alpha_ == 90 && beta_ == 90 && gamma_ == 90)) {
+        if (angles_ != Vector3D(90, 90, 90)) {
             throw error(
-                "can not be set cell shape to INFINITE: some angles are not 90°"
+                "can not set cell shape to INFINITE: some angles are not 90°"
             );
         }
-        if (!(a_ == 0.0 && b_ == 0.0 && c_ == 0.0)) {
+        
+        if (lengths_ != Vector3D(0, 0, 0)) {
             throw error(
-                "can not be set cell shape to INFINITE: some lengths are not 0"
+                "can not set cell shape to INFINITE: some lengths are not 0"
             );
         }
     }
@@ -200,70 +170,38 @@ void UnitCell::set_shape(CellShape shape) {
     shape_ = shape;
 }
 
-void UnitCell::set_a(double val) {
+void UnitCell::set_lengths(Vector3D lengths) {
     if (shape_ == INFINITE) {
-        throw error("can not set 'a' on infinite cell");
+        throw error("can not set lengths for an infinite cell");
     }
-    a_ = val;
+    lengths_ = lengths;
     update_matrix();
 }
 
-void UnitCell::set_b(double val) {
-    if (shape_ == INFINITE) {
-        throw error("can not set 'b' on infinite cell");
-    }
-    b_ = val;
-    update_matrix();
-}
-
-void UnitCell::set_c(double val) {
-    if (shape_ == INFINITE) {
-        throw error("can not set 'c' on infinite cell");
-    }
-    c_ = val;
-    update_matrix();
-}
-
-void UnitCell::set_alpha(double val) {
+void UnitCell::set_angles(Vector3D angles) {
     if (shape_ != TRICLINIC) {
-        throw error("can not set 'alpha' on non triclinic cell");
+        throw error("can not set angles for a non-triclinic cell");
     }
-    alpha_ = val;
-    update_matrix();
-}
-
-void UnitCell::set_beta(double val) {
-    if (shape_ != TRICLINIC) {
-        throw error("can not set 'beta' on non triclinic cell");
-    }
-    beta_ = val;
-    update_matrix();
-}
-
-void UnitCell::set_gamma(double val) {
-    if (shape_ != TRICLINIC) {
-        throw error("can not set 'gamma' on non triclinic cell");
-    }
-    gamma_ = val;
+    angles_ = angles;
     update_matrix();
 }
 
 // Wrap a vector in an Orthorhombic UnitCell
 Vector3D UnitCell::wrap_orthorhombic(const Vector3D& vector) const {
     return {
-        vector[0] - round(vector[0] / a_) * a_,
-        vector[1] - round(vector[1] / b_) * b_,
-        vector[2] - round(vector[2] / c_) * c_
+        vector[0] - round(vector[0] / lengths_[0]) * lengths_[0],
+        vector[1] - round(vector[1] / lengths_[1]) * lengths_[1],
+        vector[2] - round(vector[2] / lengths_[2]) * lengths_[2]
     };
 }
 
-// Wrap a vector in an Orthorhombic UnitCell
+// Wrap a vector in a triclinic UnitCell
 Vector3D UnitCell::wrap_triclinic(const Vector3D& vector) const {
-    auto fractional = h_inv_ * vector;
+    auto fractional = matrix_inv_ * vector;
     fractional[0] -= round(fractional[0]);
     fractional[1] -= round(fractional[1]);
     fractional[2] -= round(fractional[2]);
-    return h_ * fractional;
+    return matrix_ * fractional;
 }
 
 Vector3D UnitCell::wrap(const Vector3D& vector) const {
@@ -284,12 +222,8 @@ namespace chemfiles {
             return false;
         }
 
-        return rhs.a() == lhs.a() &&
-               rhs.b() == lhs.b() &&
-               rhs.c() == lhs.c() &&
-               rhs.alpha() == lhs.alpha() &&
-               rhs.beta() == lhs.beta() &&
-               rhs.gamma() == lhs.gamma();
+        return rhs.lengths() == lhs.lengths() &&
+               rhs.angles() == lhs.angles();
     }
 
     bool operator!=(const UnitCell& rhs, const UnitCell& lhs) {

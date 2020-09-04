@@ -90,7 +90,7 @@ TEST_CASE("Frame step") {
 TEST_CASE("Unit cell") {
     auto frame = Frame();
     CHECK(frame.cell().shape() == UnitCell::INFINITE);
-    frame.set_cell(UnitCell(10));
+    frame.set_cell(UnitCell({10, 10, 10}));
     CHECK(frame.cell().shape() == UnitCell::ORTHORHOMBIC);
 }
 
@@ -189,7 +189,7 @@ TEST_CASE("Guess topology") {
 TEST_CASE("PBC functions") {
     SECTION("Distance") {
         auto frame = Frame();
-        frame.set_cell(UnitCell(3.0, 4.0, 5.0));
+        frame.set_cell(UnitCell({3.0, 4.0, 5.0}));
         frame.add_atom(Atom(), Vector3D(0, 0, 0));
         frame.add_atom(Atom(), Vector3D(1, 2, 6));
 

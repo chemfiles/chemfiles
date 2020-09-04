@@ -1,17 +1,21 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
+#include <cmath>
+#include <array>
 
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.h"
-#include <cmath>
 
-static bool approx_eq(double A[3][3], double B[3][3]) {
-    double eps = 1e-10;
+static bool approx_eq(chfl_vector3d lhs, std::array<double, 3> rhs, double eps = 1e-12) {
+    return (fabs(lhs[0] - rhs[0]) < eps) && (fabs(lhs[1] - rhs[1]) < eps) && (fabs(lhs[2] - rhs[2]) < eps);
+}
+
+static bool approx_eq(chfl_vector3d lhs[3], chfl_vector3d rhs[3], double eps = 1e-12) {
     return
-        (fabs(A[0][0] - B[0][0]) < eps) && (fabs(A[0][1] - B[0][1]) < eps) && (fabs(A[0][2] - B[0][2]) < eps) &&
-        (fabs(A[1][0] - B[1][0]) < eps) && (fabs(A[1][1] - B[1][1]) < eps) && (fabs(A[1][2] - B[1][2]) < eps) &&
-        (fabs(A[2][0] - B[2][0]) < eps) && (fabs(A[2][1] - B[2][1]) < eps) && (fabs(A[2][2] - B[2][2]) < eps);
+        (fabs(lhs[0][0] - rhs[0][0]) < eps) && (fabs(lhs[0][1] - rhs[0][1]) < eps) && (fabs(lhs[0][2] - rhs[0][2]) < eps) &&
+        (fabs(lhs[1][0] - rhs[1][0]) < eps) && (fabs(lhs[1][1] - rhs[1][1]) < eps) && (fabs(lhs[1][2] - rhs[1][2]) < eps) &&
+        (fabs(lhs[2][0] - rhs[2][0]) < eps) && (fabs(lhs[2][1] - rhs[2][1]) < eps) && (fabs(lhs[2][2] - rhs[2][2]) < eps);
 }
 
 TEST_CASE("chfl_cell") {
@@ -39,14 +43,10 @@ TEST_CASE("chfl_cell") {
         REQUIRE(cell);
 
         CHECK_STATUS(chfl_cell_lengths(cell, data));
-        CHECK(data[0] == 20);
-        CHECK(data[1] == 21);
-        CHECK(data[2] == 22);
+        CHECK(approx_eq(data, {{20, 21, 22}}));
 
         CHECK_STATUS(chfl_cell_angles(cell, data));
-        CHECK(data[0] == 90);
-        CHECK(data[1] == 100);
-        CHECK(data[2] == 120);
+        CHECK(approx_eq(data, {{90, 100, 120}}));
 
         chfl_free(cell);
 

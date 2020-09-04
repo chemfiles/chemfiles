@@ -80,10 +80,10 @@ void MOL2Format::read_next(Frame& frame) {
         } else if (trimed == "@<TRIPOS>CRYSIN") {
             auto cryst = file_.readline();
 
-            double a, b, c, alpha, beta, gamma;
-            scan(cryst, a, b, c, alpha, beta, gamma);
+            Vector3D lengths, angles;
+            scan(cryst, lengths[0], lengths[1], lengths[2], angles[0], angles[1], angles[2]);
 
-            frame.set_cell(UnitCell(a, b, c, alpha, beta, gamma));
+            frame.set_cell({lengths, angles});
         } else if (trimed == "@<TRIPOS>MOLECULE") {
             file_.seekpos(curr_pos);
             break;
@@ -327,11 +327,13 @@ void MOL2Format::write_next(const Frame& frame) {
         );
     }
 
-    auto cell = frame.cell();
+    const auto& cell = frame.cell();
     if (cell.shape() != UnitCell::INFINITE) {
+        auto lengths = cell.lengths();
+        auto angles = cell.angles();
         file_.print("@<TRIPOS>CRYSIN\n");
         file_.print("   {:.4f}   {:.4f}   {:.4f}   {:.4f}   {:.4f}   {:.4f} 1 1\n",
-            cell.a(), cell.b(), cell.c(), cell.alpha(), cell.beta(), cell.gamma()
+            lengths[0], lengths[1], lengths[2], angles[0], angles[1], angles[2]
         );
     }
 

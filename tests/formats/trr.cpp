@@ -28,9 +28,7 @@ TEST_CASE("Read files in TRR format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 55.6800, 1e-4));
-        CHECK(approx_eq(cell.b(), 58.8700, 1e-4));
-        CHECK(approx_eq(cell.c(), 62.5700, 1e-4));
+        CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
 
         frame = file.read();
 
@@ -50,9 +48,7 @@ TEST_CASE("Read files in TRR format") {
 
         cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 55.6800, 1e-4));
-        CHECK(approx_eq(cell.b(), 58.8700, 1e-4));
-        CHECK(approx_eq(cell.c(), 62.5700, 1e-4));
+        CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
     }
 
     SECTION("Read trajectory: Water") {
@@ -72,9 +68,7 @@ TEST_CASE("Read files in TRR format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 15.0, 1e-4));
-        CHECK(approx_eq(cell.b(), 15.0, 1e-4));
-        CHECK(approx_eq(cell.c(), 15.0, 1e-4));
+        CHECK(approx_eq(cell.lengths(), {15.0, 15.0, 15.0}, 1e-4));
 
         file.read(); // Skip a frame
         frame = file.read();
@@ -91,9 +85,7 @@ TEST_CASE("Read files in TRR format") {
 
         cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 15.0, 1e-4));
-        CHECK(approx_eq(cell.b(), 15.0, 1e-4));
-        CHECK(approx_eq(cell.c(), 15.0, 1e-4));
+        CHECK(approx_eq(cell.lengths(), {15.0, 15.0, 15.0}, 1e-4));
 
         frame = file.read_step(75); // skip forward
 
@@ -108,9 +100,7 @@ TEST_CASE("Read files in TRR format") {
 
         cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 15.0, 1e-4));
-        CHECK(approx_eq(cell.b(), 15.0, 1e-4));
-        CHECK(approx_eq(cell.c(), 15.0, 1e-4));
+        CHECK(approx_eq(cell.lengths(), {15.0, 15.0, 15.0}, 1e-4));
 
         frame = file.read_step(50); // skip behind previous step
 
@@ -125,9 +115,7 @@ TEST_CASE("Read files in TRR format") {
 
         cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 15.0, 1e-4));
-        CHECK(approx_eq(cell.b(), 15.0, 1e-4));
-        CHECK(approx_eq(cell.c(), 15.0, 1e-4));
+        CHECK(approx_eq(cell.lengths(), {15.0, 15.0, 15.0}, 1e-4));
     }
 
     SECTION("Read trajectory: 1AKI") {
@@ -151,9 +139,7 @@ TEST_CASE("Read files in TRR format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 73.3925, 1e-4));
-        CHECK(approx_eq(cell.b(), 73.3925, 1e-4));
-        CHECK(approx_eq(cell.c(), 73.3925, 1e-4));
+        CHECK(approx_eq(cell.lengths(), {73.3925, 73.3925, 73.3925}, 1e-4));
 
         frame = file.read_step(5); // skip forward
 
@@ -173,9 +159,7 @@ TEST_CASE("Read files in TRR format") {
 
         cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 73.3925, 1e-4));
-        CHECK(approx_eq(cell.b(), 73.3925, 1e-4));
-        CHECK(approx_eq(cell.c(), 73.3925, 1e-4));
+        CHECK(approx_eq(cell.lengths(), {73.3925, 73.3925, 73.3925}, 1e-4));
     }
 }
 
@@ -184,7 +168,7 @@ TEST_CASE("Write and append files in TRR format") {
         // Write two frames to a file
         auto tmpfile = NamedTempPath(".trr");
 
-        auto frame = Frame(UnitCell(10.111, 11.222, 12.333));
+        auto frame = Frame(UnitCell({10.111, 11.222, 12.333}));
         frame.add_velocities();
         frame.set("time", 19.376);
         frame.add_atom(Atom("A"), {1.999, 2.888, 3.777}, {3, 2, 1});
@@ -194,7 +178,7 @@ TEST_CASE("Write and append files in TRR format") {
         auto file = Trajectory(tmpfile, 'w');
         file.write(frame);
 
-        frame = Frame(UnitCell(20, 21, 22, 33.333, 44.444, 55.555));
+        frame = Frame(UnitCell({20, 21, 22}, {33.333, 44.444, 55.555}));
         frame.set_step(100);
         frame.set("trr_lambda", 0.345);
         frame.add_atom(Atom("A"), {4, 5, 6});
@@ -216,7 +200,7 @@ TEST_CASE("Write and append files in TRR format") {
         // now append one frame
         file = Trajectory(tmpfile, 'a');
 
-        frame = Frame(UnitCell(30, 31, 32));
+        frame = Frame(UnitCell({30, 31, 32}));
         frame.set_step(200);
         frame.set("time", 20);
         frame.add_atom(Atom("A"), {7, 8, 9});
@@ -249,9 +233,7 @@ TEST_CASE("Write and append files in TRR format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 10.111, 1e-4));
-        CHECK(approx_eq(cell.b(), 11.222, 1e-4));
-        CHECK(approx_eq(cell.c(), 12.333, 1e-4));
+        CHECK(approx_eq(cell.lengths(), {10.111, 11.222, 12.333}, 1e-4));
 
         frame = file.read();
 
@@ -268,12 +250,8 @@ TEST_CASE("Write and append files in TRR format") {
 
         cell = frame.cell();
         CHECK(cell.shape() == UnitCell::TRICLINIC);
-        CHECK(approx_eq(cell.a(), 20, 1e-4));
-        CHECK(approx_eq(cell.b(), 21, 1e-4));
-        CHECK(approx_eq(cell.c(), 22, 1e-4));
-        CHECK(approx_eq(cell.alpha(), 33.333, 1e-4));
-        CHECK(approx_eq(cell.beta(), 44.444, 1e-4));
-        CHECK(approx_eq(cell.gamma(), 55.555, 1e-4));
+        CHECK(approx_eq(cell.lengths(), {20, 21, 22}, 1e-4));
+        CHECK(approx_eq(cell.angles(), {33.333, 44.444, 55.555}, 1e-4));
 
         frame = file.read();
 
@@ -306,15 +284,13 @@ TEST_CASE("Write and append files in TRR format") {
 
         cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 30, 1e-4));
-        CHECK(approx_eq(cell.b(), 31, 1e-4));
-        CHECK(approx_eq(cell.c(), 32, 1e-4));
+        CHECK(approx_eq(cell.lengths(), {30, 31, 32}, 1e-4));
     }
 
     SECTION("Append on new trajectory") {
         auto tmpfile = NamedTempPath(".trr");
 
-        auto frame = Frame(UnitCell(10.111, 11.222, 12.333));
+        auto frame = Frame(UnitCell({10.111, 11.222, 12.333}));
         frame.add_velocities();
         frame.set("time", 19.376);
         frame.set("trr_lambda", 0.753);
@@ -349,9 +325,7 @@ TEST_CASE("Write and append files in TRR format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.a(), 10.111, 1e-4));
-        CHECK(approx_eq(cell.b(), 11.222, 1e-4));
-        CHECK(approx_eq(cell.c(), 12.333, 1e-4));
+        CHECK(approx_eq(cell.lengths(), {10.111, 11.222, 12.333}, 1e-4));
     }
 }
 

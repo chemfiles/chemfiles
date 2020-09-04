@@ -4,7 +4,7 @@
 #include <chemfiles.hpp>
 
 int main() {
-    auto frame = chemfiles::Frame(chemfiles::UnitCell(10, 10, 10));
+    auto frame = chemfiles::Frame(chemfiles::UnitCell({10, 10, 10}));
 
     frame.add_atom(chemfiles::Atom("H"), {1, 0, 0});
     frame.add_atom(chemfiles::Atom("O"), {0, 0, 0});

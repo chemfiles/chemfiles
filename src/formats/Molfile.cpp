@@ -162,7 +162,7 @@ template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
     std::vector<float> coords(3 * static_cast<size_t>(natoms_));
     std::vector<float> velocities(0);
 
-    molfile_timestep_t timestep{nullptr, nullptr, 0, 0, 0, 0, 0, 0, 0};
+    molfile_timestep_t timestep{nullptr, nullptr, 0, 0, 0, 90, 90, 90, 0};
     timestep.coords = coords.data();
     if (plugin_data_.have_velocities()) {
         velocities.resize(3 * static_cast<size_t>(natoms_));
@@ -221,16 +221,18 @@ template <MolfileFormat F> size_t Molfile<F>::nsteps() {
 }
 
 template <MolfileFormat F>
-void Molfile<F>::molfile_to_frame(const molfile_timestep_t& timestep,
-                                  Frame& frame) {
-    frame.set_cell({
+void Molfile<F>::molfile_to_frame(const molfile_timestep_t& timestep, Frame& frame) {
+    auto lengths = Vector3D(
         static_cast<double>(timestep.A),
         static_cast<double>(timestep.B),
-        static_cast<double>(timestep.C),
+        static_cast<double>(timestep.C)
+    );
+    auto angles = Vector3D(
         static_cast<double>(timestep.alpha),
         static_cast<double>(timestep.beta),
         static_cast<double>(timestep.gamma)
-    });
+    );
+    frame.set_cell({lengths, angles});
 
     frame.resize(static_cast<size_t>(natoms_));
     auto positions = frame.positions();

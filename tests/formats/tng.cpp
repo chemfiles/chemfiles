@@ -9,6 +9,7 @@ using namespace chemfiles;
 TEST_CASE("Read files in TNG format") {
     SECTION("Read trajectory") {
         auto file = Trajectory("data/tng/example.tng");
+        CHECK(file.nsteps() == 10);
         auto frame = file.read();
 
         CHECK(frame.size() == 15);
@@ -33,6 +34,10 @@ TEST_CASE("Read files in TNG format") {
         auto frame = file.read();
         CHECK(frame.size() == 38376);
 
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(cell.lengths() == Vector3D(73.392500877380371, 73.392500877380371, 73.392500877380371));
+
         auto velocities = *frame.velocities();
         CHECK(approx_eq(velocities[450], Vector3D(-1.44889, 6.50066e-1, -7.64032), 1e-4));
         CHECK(approx_eq(velocities[4653], Vector3D(-16.5949, -4.62240, -7.01133), 1e-4));
@@ -41,14 +46,21 @@ TEST_CASE("Read files in TNG format") {
     SECTION("Read cell") {
         auto file = Trajectory("data/tng/water.tng");
         auto frame = file.read();
-
         CHECK(frame.size() == 29700);
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(cell.a() == 15.0);
-        CHECK(cell.b() == 15.0);
-        CHECK(cell.c() == 15.0);
+        CHECK(cell.lengths() == Vector3D(15.0, 15.0, 15.0));
+
+        file = Trajectory("data/tng/1vln-triclinic.tng");
+        frame = file.read();
+        CHECK(frame.size() == 14520);
+
+        cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::TRICLINIC);
+
+        CHECK(approx_eq(cell.lengths(), Vector3D(78.8, 79.3, 133.3), 1e-5));
+        CHECK(approx_eq(cell.angles(), Vector3D(97.1, 90.2, 97.5), 1e-5));
     }
 
     SECTION("Read topology") {

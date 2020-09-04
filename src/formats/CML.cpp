@@ -161,31 +161,30 @@ static void read_property_(T& container, const pugi::xml_node& node) {
 }
 
 static UnitCell read_cell(const pugi::xml_node& crystal) {
-    double a, b, c, alpha, beta, gamma;
-    a = b = c = 0.0;
-    alpha = beta = gamma = 90.0;
+    Vector3D lengths;
+    Vector3D angles = {90, 90, 90};
     for (const auto& scalar: crystal.children("scalar")) {
         auto title = scalar.attribute("title");
         if (title) {
             auto name = std::string(title.value());
             if (name == "a") {
-                a = scalar.text().as_double();
+                lengths[0] = scalar.text().as_double();
             } else if (name == "b") {
-                b = scalar.text().as_double();
+                lengths[1] = scalar.text().as_double();
             } else if (name == "c") {
-                c = scalar.text().as_double();
+                lengths[2] = scalar.text().as_double();
             } else if (name == "alpha") {
-                alpha = scalar.text().as_double();
+                angles[0] = scalar.text().as_double();
             } else if (name == "beta") {
-                beta = scalar.text().as_double();
+                angles[1] = scalar.text().as_double();
             } else if (name == "gamma") {
-                gamma = scalar.text().as_double();
+                angles[2] = scalar.text().as_double();
             } else {
                 warning("CML reader", "unknown crytal scalar: {}", name);
             }
         }
     }
-    return UnitCell(a, b, c, alpha, beta, gamma);
+    return UnitCell(lengths, angles);
 }
 
 void CMLFormat::read_atoms(Frame& frame, const pugi::xml_node& atoms) {
@@ -477,38 +476,41 @@ void CMLFormat::write(const Frame& frame) {
         mol.append_child("name").text() = name_prop->as_string().c_str();
     }
 
-    auto& unit_cell = frame.cell();
-    if (unit_cell.shape() != UnitCell::INFINITE) {
+    const auto& cell = frame.cell();
+    if (cell.shape() != UnitCell::INFINITE) {
+        auto lengths = cell.lengths();
+        auto angles = cell.angles();
+
         auto crystal_node = mol.append_child("crystal");
         auto scalar = crystal_node.append_child("scalar");
         scalar.append_attribute("units") = "units:angstrom";
         scalar.append_attribute("title") = "a";
-        scalar.text() = unit_cell.a();
+        scalar.text() = lengths[0];
 
         scalar = crystal_node.append_child("scalar");
         scalar.append_attribute("units") = "units:angstrom";
         scalar.append_attribute("title") = "b";
-        scalar.text() = unit_cell.b();
+        scalar.text() = lengths[1];
 
         scalar = crystal_node.append_child("scalar");
         scalar.append_attribute("units") = "units:angstrom";
         scalar.append_attribute("title") = "c";
-        scalar.text() = unit_cell.c();
+        scalar.text() = lengths[2];
 
         scalar = crystal_node.append_child("scalar");
         scalar.append_attribute("units") = "units:degree";
         scalar.append_attribute("title") = "alpha";
-        scalar.text() = unit_cell.alpha();
+        scalar.text() = angles[0];
 
         scalar = crystal_node.append_child("scalar");
         scalar.append_attribute("units") = "units:degree";
         scalar.append_attribute("title") = "beta";
-        scalar.text() = unit_cell.beta();
+        scalar.text() = angles[1];
 
         scalar = crystal_node.append_child("scalar");
         scalar.append_attribute("units") = "units:degree";
         scalar.append_attribute("title") = "gamma";
-        scalar.text() = unit_cell.gamma();
+        scalar.text() = angles[2];
     }
 
     // Loop through and add properties to the propertyList node as required

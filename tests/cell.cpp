@@ -8,172 +8,93 @@ using namespace chemfiles;
 
 TEST_CASE("Use the UnitCell type") {
     SECTION("Constructors") {
-        UnitCell infinite{};
-        CHECK(infinite.shape() == UnitCell::INFINITE);
-        CHECK(infinite.a() == 0);
-        CHECK(infinite.b() == 0);
-        CHECK(infinite.c() == 0);
-        CHECK(infinite.alpha() == 90);
-        CHECK(infinite.beta() == 90);
-        CHECK(infinite.gamma() == 90);
-        CHECK(infinite.volume() == 0);
-        CHECK(approx_eq(infinite.matrix(), Matrix3D::zero()));
+        SECTION("Infinite") {
+            auto infinite = UnitCell();
+            CHECK(infinite.shape() == UnitCell::INFINITE);
+            CHECK(infinite.lengths() == Vector3D(0, 0, 0));
+            CHECK(infinite.angles() == Vector3D(90, 90, 90));
+            CHECK(infinite.volume() == 0);
 
-        UnitCell ortho1(10);
-        CHECK(ortho1.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(ortho1.a() == 10);
-        CHECK(ortho1.b() == 10);
-        CHECK(ortho1.c() == 10);
-        CHECK(ortho1.alpha() == 90);
-        CHECK(ortho1.beta() == 90);
-        CHECK(ortho1.gamma() == 90);
-        CHECK(approx_eq(ortho1.matrix(), Matrix3D(10, 0, 0, 0, 10, 0, 0, 0, 10)));
+            CHECK(UnitCell({0, 0, 0})== UnitCell());
+            CHECK(UnitCell({0, 0, 0}, {90, 90, 90})== UnitCell());
+            CHECK(UnitCell(Matrix3D::zero())== UnitCell());
+        }
 
-        UnitCell ortho2(10, 11, 12);
-        CHECK(ortho2.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(ortho2.a() == 10);
-        CHECK(ortho2.b() == 11);
-        CHECK(ortho2.c() == 12);
-        CHECK(ortho2.alpha() == 90);
-        CHECK(ortho2.beta() == 90);
-        CHECK(ortho2.gamma() == 90);
-        CHECK(ortho2.volume() == 10*11*12);
-        CHECK(approx_eq(ortho2.matrix(), Matrix3D(10, 0, 0, 0, 11, 0, 0, 0, 12)));
+        SECTION("Orthorhombic") {
+            auto cell = UnitCell({10, 11, 12});
+            CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+            CHECK(cell.lengths() == Vector3D(10, 11, 12));
+            CHECK(cell.angles() == Vector3D(90, 90, 90));
+            CHECK(cell.volume() == 10 * 11 * 12);
 
-        UnitCell triclinic(10, 11, 12, 90, 80, 120);
-        CHECK(triclinic.shape() == UnitCell::TRICLINIC);
-        CHECK(triclinic.a() == 10);
-        CHECK(triclinic.b() == 11);
-        CHECK(triclinic.c() == 12);
-        CHECK(triclinic.alpha() == 90);
-        CHECK(triclinic.beta() == 80);
-        CHECK(triclinic.gamma() == 120);
-        CHECK(approx_eq(triclinic.volume(), 1119.9375925598192, 1e-12));
-        CHECK(approx_eq(triclinic.matrix(),
-                        Matrix3D(10, -5.5, 2.08378, 0, 9.52628, 1.20307, 0, 0, 11.7563), 1e-4));
+            auto matrix = Matrix3D(10, 0, 0, 0, 11, 0, 0, 0, 12);
+            cell = UnitCell(matrix);
+            CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+            CHECK(cell.lengths() == Vector3D(10, 11, 12));
+            CHECK(cell.angles() == Vector3D(90, 90, 90));
+            CHECK(cell.volume() == 10 * 11 * 12);
+        }
 
-        UnitCell infinite2(Matrix3D::zero());
-        CHECK(infinite2 == infinite);
-        CHECK(approx_eq(infinite2.matrix(), Matrix3D::zero()));
+        SECTION("Triclinic") {
+            auto cell = UnitCell({10, 11, 12}, {90, 80, 120});
+            CHECK(cell.shape() == UnitCell::TRICLINIC);
+            CHECK(approx_eq(cell.lengths(), {10, 11, 12}, 1e-12));
+            CHECK(approx_eq(cell.angles(), {90, 80, 120}, 1e-12));
+            CHECK(approx_eq(cell.volume(), 1119.9375925598192, 1e-12));
 
-        UnitCell infinite3(0, 0, 0);
-        CHECK(infinite3.shape() == UnitCell::INFINITE);
-        CHECK(infinite3.a() == 0);
-        CHECK(infinite3.b() == 0);
-        CHECK(infinite3.c() == 0);
-        CHECK(infinite3.alpha() == 90);
-        CHECK(infinite3.beta() == 90);
-        CHECK(infinite3.gamma() == 90);
-        CHECK(infinite3.volume() == 0);
-        CHECK(approx_eq(infinite3.matrix(), Matrix3D::zero()));
+            auto matrix = cell.matrix();
+            cell = UnitCell(matrix);
+            CHECK(cell.shape() == UnitCell::TRICLINIC);
+            CHECK(approx_eq(cell.lengths(), {10, 11, 12}, 1e-12));
+            CHECK(approx_eq(cell.angles(), {90, 80, 120}, 1e-12));
+            CHECK(approx_eq(cell.volume(), 1119.9375925598192, 1e-12));
 
-        auto ortho_matrix = Matrix3D(10, 0, 0, 0, 11, 0, 0, 0, 12);
-        UnitCell ortho3(ortho_matrix);
-        CHECK(ortho3.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(ortho3.a() == 10);
-        CHECK(ortho3.b() == 11);
-        CHECK(ortho3.c() == 12);
-        CHECK(ortho3.alpha() == 90);
-        CHECK(ortho3.beta() == 90);
-        CHECK(ortho3.gamma() == 90);
-        CHECK(ortho3.volume() == 10*11*12);
-        CHECK(approx_eq(ortho3.matrix(), Matrix3D(10, 0, 0, 0, 11, 0, 0, 0, 12)));
+            matrix = Matrix3D(
+                26.2553,  0.0000, -4.4843,
+                 0.0000, 11.3176,  0.0000,
+                 0.0000,  0.0000,  11.011
+            );
 
-        // These need to be approximate due to acos used in this constructor
-        UnitCell triclinic2(triclinic.matrix());
-        CHECK(triclinic2.shape() == UnitCell::TRICLINIC);
-        CHECK(approx_eq(triclinic2.a(), 10.0, 1e-12));
-        CHECK(approx_eq(triclinic2.b(), 11.0, 1e-12));
-        CHECK(approx_eq(triclinic2.c(), 12.0, 1e-12));
-        CHECK(approx_eq(triclinic2.alpha(), 90.0, 1e-12));
-        CHECK(approx_eq(triclinic2.beta(), 80.0, 1e-12));
-        CHECK(approx_eq(triclinic2.gamma(), 120.0, 1e-12));
-        CHECK(approx_eq(triclinic2.volume(), 1119.9375925598192, 1e-12));
-        CHECK(approx_eq(triclinic2.matrix(), triclinic.matrix(), 1e-12));
-
-        auto wrong_matrix = Matrix3D(
-            1.0, 2.0, 3.0,
-            4.0, 5.0, 6.0,
-            7.0, 8.0, 9.0
-        );
-
-        CHECK_THROWS_AS(UnitCell(wrong_matrix), Error);
-
-        auto triclinic_matrix = Matrix3D(
-            26.2553,  0.0000, -4.4843,
-             0.0000, 11.3176,  0.0000,
-             0.0000,  0.0000,  11.011
-        );
-
-        UnitCell triclinic3(triclinic_matrix);
-        CHECK(triclinic3.shape() == UnitCell::TRICLINIC);
-        CHECK(approx_eq(triclinic3.a(), 26.2553, 1e-4));
-        CHECK(approx_eq(triclinic3.b(), 11.3176, 1e-4));
-        CHECK(approx_eq(triclinic3.c(), 11.8892, 1e-4));
-        CHECK(approx_eq(triclinic3.alpha(), 90.0, 1e-4));
-        CHECK(approx_eq(triclinic3.beta(), 112.159, 1e-4));
-        CHECK(approx_eq(triclinic3.gamma(), 90.0, 1e-4));
-        CHECK(approx_eq(triclinic3.matrix(), triclinic_matrix, 1e-4));
+            cell = UnitCell(matrix);
+            CHECK(cell.shape() == UnitCell::TRICLINIC);
+            CHECK(approx_eq(cell.lengths(), {26.2553, 11.3176, 11.8892}, 1e-4));
+            CHECK(approx_eq(cell.angles(), {90, 112.159, 90}, 1e-4));
+        }
     }
 
     SECTION("Operators") {
-        auto cell = UnitCell(10);
-        CHECK(cell == UnitCell(10, 10, 10));
-        CHECK(cell != UnitCell(11, 10, 10));
+        auto cell = UnitCell({10, 10, 10});
+        CHECK(cell == UnitCell({10, 10, 10}));
+        CHECK(cell != UnitCell({11, 10, 10}));
 
         CHECK(cell != UnitCell());
-        CHECK(cell != UnitCell(10, 10, 10, 120, 90, 90));
+        CHECK(cell != UnitCell({10, 10, 10}, {120, 90, 90}));
     }
 
     SECTION("Set the values") {
-        UnitCell cell;
+        auto cell = UnitCell();
 
         cell.set_shape(UnitCell::ORTHORHOMBIC);
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.matrix(), Matrix3D::zero()));
 
-        cell.set_a(10);
-        CHECK(cell.a() == 10);
-        cell.set_b(15);
-        CHECK(cell.b() == 15);
-        cell.set_c(20);
-        CHECK(cell.c() == 20);
-        CHECK(approx_eq(cell.matrix(), Matrix3D(10, 0, 0, 0, 15, 0, 0, 0, 20), 1e-12));
+        cell.set_lengths({10, 15, 20});
+        CHECK(cell.lengths() == Vector3D(10, 15, 20));
 
         cell.set_shape(UnitCell::TRICLINIC);
         CHECK(cell.shape() == UnitCell::TRICLINIC);
 
-        cell.set_alpha(80);
-        CHECK(cell.alpha() == 80);
-        cell.set_beta(120);
-        CHECK(cell.beta() == 120);
-        cell.set_gamma(60);
-        CHECK(cell.gamma() == 60);
-        CHECK(approx_eq(cell.matrix(), Matrix3D(10, 7.5, -10, 0, 12.9904, 9.78374, 0, 0, 14.2926),
-                        1e-4));
-    }
-
-    SECTION("Matricial representation") {
-        UnitCell triclinic(10, 11, 12, 90, 60, 120);
-        auto H = triclinic.matrix();
-        double a = 0, b = 0, c = 0;
-
-        a = H[0][0];
-        b = sqrt(H[0][1] * H[0][1] + H[1][1] * H[1][1]);
-        c = sqrt(H[0][2] * H[0][2] + H[1][2] * H[1][2] + H[2][2] * H[2][2]);
-
-        CHECK(a == triclinic.a());
-        CHECK(b == triclinic.b());
-        CHECK(c == triclinic.c());
+        cell.set_angles({80, 120, 60});
+        CHECK(approx_eq(cell.angles(), {80, 120, 60}, 1e-12));
     }
 
     SECTION("Wraping vectors") {
         UnitCell infinite;
-        UnitCell ortho(10, 11, 12);
-        UnitCell triclinic_algo(10, 11, 12);
+        UnitCell ortho({10, 11, 12});
+        UnitCell triclinic_algo({10, 11, 12});
         triclinic_algo.set_shape(UnitCell::TRICLINIC);
-        UnitCell triclinic(10, 11, 12, 90, 90, 80);
-        UnitCell tilted(10, 10, 10, 140, 100, 100);
+        UnitCell triclinic({10, 11, 12}, {90, 90, 80});
+        UnitCell tilted({10, 10, 10}, {140, 100, 100});
         auto v = Vector3D(22.0, -15.0, 5.8);
 
         CHECK(infinite.wrap(v) == v);
@@ -184,35 +105,22 @@ TEST_CASE("Use the UnitCell type") {
     }
 
     SECTION("UnitCell errors") {
-        UnitCell cell;
-
+        auto cell = UnitCell();
         // Atempt to set values of an infinite unit cell
-        CHECK_THROWS_AS(cell.set_a(10), Error);
-        CHECK_THROWS_AS(cell.set_b(10), Error);
-        CHECK_THROWS_AS(cell.set_c(10), Error);
-
-        CHECK_THROWS_AS(cell.set_alpha(100), Error);
-        CHECK_THROWS_AS(cell.set_beta(100), Error);
-        CHECK_THROWS_AS(cell.set_gamma(100), Error);
+        CHECK_THROWS_WITH(cell.set_lengths({10, 10, 10}), "can not set lengths for an infinite cell");
+        CHECK_THROWS_WITH(cell.set_angles({90, 90, 100}), "can not set angles for a non-triclinic cell");
 
         cell.set_shape(UnitCell::ORTHORHOMBIC);
-        CHECK_THROWS_AS(cell.set_alpha(100), Error);
-        CHECK_THROWS_AS(cell.set_beta(100), Error);
-        CHECK_THROWS_AS(cell.set_gamma(100), Error);
-
-        cell.set_shape(UnitCell::TRICLINIC);
-        cell.set_alpha(80);
-        cell.set_beta(120);
-        cell.set_gamma(60);
+        CHECK_THROWS_WITH(cell.set_angles({90, 90, 100}), "can not set angles for a non-triclinic cell");
     }
 
     SECTION("Setting shape errors") {
-        auto cell = UnitCell(3, 4, 5, 60, 70, 80);
-        CHECK_THROWS_AS(cell.set_shape(UnitCell::ORTHORHOMBIC), Error);
+        auto cell = UnitCell({3, 4, 5}, {60, 70, 80});
+        CHECK_THROWS_WITH(cell.set_shape(UnitCell::ORTHORHOMBIC), "can not set cell shape to ORTHORHOMBIC: some angles are not 90°");
 
-        cell = UnitCell(3, 4, 5, 60, 70, 80);
-        CHECK_THROWS_AS(cell.set_shape(UnitCell::INFINITE), Error);
-        cell = UnitCell(3, 4, 5);
-        CHECK_THROWS_AS(cell.set_shape(UnitCell::INFINITE), Error);
+        cell = UnitCell({3, 4, 5}, {60, 70, 80});
+        CHECK_THROWS_WITH(cell.set_shape(UnitCell::INFINITE), "can not set cell shape to INFINITE: some angles are not 90°");
+        cell = UnitCell({3, 4, 5});
+        CHECK_THROWS_WITH(cell.set_shape(UnitCell::INFINITE), "can not set cell shape to INFINITE: some lengths are not 0");
     }
 }

@@ -213,15 +213,18 @@ void PDBFormat::read_CRYST1(Frame& frame, string_view line) {
         throw format_error("CRYST1 record '{}' is too small", line);
     }
     try {
-        auto a = parse<double>(line.substr(6, 9));
-        auto b = parse<double>(line.substr(15, 9));
-        auto c = parse<double>(line.substr(24, 9));
-        auto alpha = parse<double>(line.substr(33, 7));
-        auto beta = parse<double>(line.substr(40, 7));
-        auto gamma = parse<double>(line.substr(47, 7));
-        auto cell = UnitCell(a, b, c, alpha, beta, gamma);
+        auto lengths = Vector3D(
+            parse<double>(line.substr(6, 9)),
+            parse<double>(line.substr(15, 9)),
+            parse<double>(line.substr(24, 9))
+        );
+        auto angles = Vector3D(
+            parse<double>(line.substr(33, 7)),
+            parse<double>(line.substr(40, 7)),
+            parse<double>(line.substr(47, 7))
+        );
 
-        frame.set_cell(cell);
+        frame.set_cell({lengths, angles});
     } catch (const Error&) {
         throw format_error("could not read CRYST1 record '{}'", line);
     }
@@ -769,13 +772,15 @@ void PDBFormat::write_next(const Frame& frame) {
     written_ = true;
     file_.print("MODEL {:>4}\n", models_ + 1);
 
-    auto& cell = frame.cell();
-    check_values_size(Vector3D(cell.a(), cell.b(), cell.c()), 9, "cell lengths");
-    file_.print(
-        // Do not try to guess the space group and the z value, just use the
-        // default one.
-        "CRYST1{:9.3f}{:9.3f}{:9.3f}{:7.2f}{:7.2f}{:7.2f} P 1           1\n",
-        cell.a(), cell.b(), cell.c(), cell.alpha(), cell.beta(), cell.gamma());
+    auto lengths = frame.cell().lengths();
+    auto angles = frame.cell().angles();
+    check_values_size(lengths, 9, "cell lengths");
+    check_values_size(angles, 7, "cell angles");
+    // Do not try to guess the space group and the z value, just use the
+    // default one.
+    file_.print("CRYST1{:9.3f}{:9.3f}{:9.3f}{:7.2f}{:7.2f}{:7.2f} P 1           1\n",
+        lengths[0], lengths[1], lengths[2], angles[0], angles[1], angles[2]
+    );
 
     // Only use numbers bigger than the biggest residue id as "resSeq" for
     // atoms without associated residue.

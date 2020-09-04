@@ -52,24 +52,19 @@ public:
     /// @example{cell/cell-0.cpp}
     UnitCell();
 
-    /// Construct a cubic unit cell of side size `a`
+    /// Construct an `ORTHORHOMBIC` unit cell with the given cell `lengths`
     ///
     /// @example{cell/cell-1.cpp}
-    UnitCell(double a);
+    UnitCell(Vector3D lengths);
 
-    /// Construct an `ORTHORHOMBIC` unit cell of side size `a`, `b`, `c`
+    /// Construct a unit cell with the given cell `lengths` and `angles`
     ///
-    /// @example{cell/cell-3.cpp}
-    UnitCell(double a, double b, double c);
-
-    /// Construct a unit cell of side size `a`, `b`, `c`, and cell angles
-    /// `alpha`, `beta`, `gamma`.
+    /// If all lengths are set to 0, then the cell is `INFINITE`
+    /// If all lengths are not zero and all angles are 90.0, then the cell is `ORTHORHOMBIC`.
+    /// Else a `TRICLINIC` cell is created.
     ///
-    /// If all of `alpha`, `beta` and `gamma` are 90.0, then the cell is
-    /// `ORTHORHOMBIC`. Else a `TRICLINIC` cell is created.
-    ///
-    /// @example{cell/cell-6.cpp}
-    UnitCell(double a, double b, double c, double alpha, double beta, double gamma);
+    /// @example{cell/from-2.cpp}
+    UnitCell(Vector3D lengths, Vector3D angles);
 
     /// Construct a unit cell via from an upper triangular matrix.
     ///
@@ -92,93 +87,48 @@ public:
     ///
     /// @example{cell/matrix.cpp}
     Matrix3D matrix() const {
-        return h_;
+        return matrix_;
     }
 
     /// Get the cell shape
     ///
     /// @example{cell/shape.cpp}
-    CellShape shape() const { return shape_; }
+    CellShape shape() const {
+        return shape_;
+    }
 
     /// Set the cell shape to `shape`
     ///
     /// @example{cell/shape.cpp}
-    ///
     /// @throws Error if `shape` is `ORTHORHOMBIC` and some angles are not 90°,
     ///         or if `shape` is `INFINITE` and some lengths are not 0.0.
     void set_shape(CellShape shape);
 
-    /// Get the first lenght (a) of the cell
+    /// Get the lenghts of the cell's vectors, in angstroms.
     ///
     /// @example{cell/lengths.cpp}
-    double a() const { return a_; }
+    Vector3D lengths() const {
+        return lengths_;
+    }
+    
+    /// Get the angles between the cell's vectors in degrees
+    ///
+    /// @example{cell/angles.cpp}
+    Vector3D angles() const {
+        return angles_;
+    }
 
-    /// Set the first lenght (a) of the cell
+    /// Set the lenghts of the cell's vectors. The values should be in angstroms.
     ///
     /// @example{cell/lengths.cpp}
-    ///
     /// @throws Error if the cell shape is `INFINITE`.
-    void set_a(double val);
+    void set_lengths(Vector3D lengths);
 
-    /// Get the second lenght (b) of the cell
-    ///
-    /// @example{cell/lengths.cpp}
-    double b() const { return b_; }
-
-    /// Set the second lenght (b) of the cell
-    ///
-    /// @example{cell/lengths.cpp}
-    ///
-    /// @throws Error if the cell shape is `INFINITE`.
-    void set_b(double val);
-
-    /// Get the third lenght (c) of the cell
-    ///
-    /// @example{cell/lengths.cpp}
-    double c() const { return c_; }
-
-    /// Set the third lenght (c) of the cell
-    ///
-    /// @example{cell/lengths.cpp}
-    ///
-    /// @throws Error if the cell shape is `INFINITE`.
-    void set_c(double val);
-
-    /// Get the first angle (alpha) of the cell
+    /// Set the angles between the cell's vectors. The values should be in degrees.
     ///
     /// @example{cell/angles.cpp}
-    double alpha() const { return alpha_; }
-
-    /// Set the first angle (alpha) of the cell
-    ///
-    /// @example{cell/angles.cpp}
-    ///
     /// @throws Error if the cell shape is not `TRICLINIC`.
-    void set_alpha(double val);
-
-    /// Get the second angle (beta) of the cell
-    ///
-    /// @example{cell/angles.cpp}
-    double beta() const { return beta_; }
-
-    /// Set the second angle (beta) of the cell if possible
-    ///
-    /// @example{cell/angles.cpp}
-    ///
-    /// @throws Error if the cell shape is not `TRICLINIC`.
-    void set_beta(double val);
-
-    /// Get the third angle (gamma) of the cell
-    ///
-    /// @example{cell/angles.cpp}
-    double gamma() const { return gamma_; }
-
-    /// Set the third angle (gamma) of the cell if possible
-    ///
-    /// @example{cell/angles.cpp}
-    ///
-    /// @throws Error if the cell shape is not `TRICLINIC`.
-    void set_gamma(double val);
+    void set_angles(Vector3D angles);
 
     /// Get the unit cell volume
     ///
@@ -202,14 +152,14 @@ private:
     /// Compute the cell matrix from the cell parameters
     void update_matrix();
     /// Caching the cell matrix
-    Matrix3D h_;
+    Matrix3D matrix_;
     /// Caching the inverse of the cell matrix
-    Matrix3D h_inv_;
+    Matrix3D matrix_inv_;
 
     /// Cell lengths
-    double a_, b_, c_;
+    Vector3D lengths_;
     /// Cell angles
-    double alpha_, beta_, gamma_;
+    Vector3D angles_;
     /// Cell type
     CellShape shape_;
 };

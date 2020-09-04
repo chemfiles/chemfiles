@@ -62,12 +62,8 @@ TEST_CASE("Read files in CML format") {
         auto frame = file.read();
 
         auto cell = frame.cell();
-        CHECK(cell.a() == 3.0);
-        CHECK(cell.b() == 3.0);
-        CHECK(cell.c() == 3.0);
-        CHECK(cell.alpha() == 90.0);
-        CHECK(cell.beta() == 90.0);
-        CHECK(cell.gamma() == 120.0);
+        CHECK(approx_eq(cell.lengths(), {3.0, 3.0, 3.0}, 1e-12));
+        CHECK(approx_eq(cell.angles(), {90.0, 90.0, 120.0}, 1e-12));
 
         auto positions = frame.positions();
         auto fract0 = frame.cell().matrix().invert() * positions[0];
@@ -95,7 +91,7 @@ TEST_CASE("Write CML file") {
     file.write(frame);
 
     frame.positions()[0] = {4.0, 5.0, 6.0};
-    frame.set_cell(UnitCell(22));
+    frame.set_cell(UnitCell({22, 22, 22}));
 
     frame.set("is_organic", false);
     frame.set("name", "test");
@@ -131,7 +127,7 @@ TEST_CASE("Write CML file") {
 
     auto frame2 = check_cml.read();
     CHECK(frame2.size() == 4);
-    CHECK(frame2.cell() == UnitCell(22));
+    CHECK(frame2.cell() == UnitCell({22, 22, 22}));
 
     auto& orders = frame2.topology().bond_orders();
     CHECK(orders[0] == Bond::UNKNOWN);

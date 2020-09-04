@@ -97,8 +97,8 @@ void CIFFormat::read_step(const size_t step, Frame& frame) {
        && std::abs(structure.cell.beta - 90) < 1.e-3
        && std::abs(structure.cell.gamma - 90) < 1.e-3)) {
         cell = UnitCell(
-            structure.cell.a, structure.cell.b, structure.cell.c,
-            structure.cell.alpha, structure.cell.beta, structure.cell.gamma
+            {structure.cell.a, structure.cell.b, structure.cell.c},
+            {structure.cell.alpha, structure.cell.beta, structure.cell.gamma}
         );
     }
 
@@ -139,24 +139,20 @@ void CIFFormat::write(const Frame& frame) {
     // https://www.ccdc.cam.ac.uk/solutions/csd-system/components/mercury/
     // i.e. we define a cubic cell with side 1 ångström
     Matrix3D invmat = Matrix3D::unit();
-    double a = 1, b = 1, c = 1;
-    double alpha = 90, beta = 90, gamma = 90;
+    Vector3D lengths = {1, 1, 1};
+    Vector3D angles = {90, 90, 90};
     if (frame.cell().shape() != UnitCell::INFINITE) {
         invmat = frame.cell().matrix().invert();
-        a = frame.cell().a();
-        b = frame.cell().b();
-        c = frame.cell().c();
-        alpha = frame.cell().alpha();
-        beta = frame.cell().beta();
-        gamma = frame.cell().gamma();
+        lengths = frame.cell().lengths();
+        angles = frame.cell().angles();
     }
 
-    file_.print("_cell_length_a {}\n", a);
-    file_.print("_cell_length_b {}\n", b);
-    file_.print("_cell_length_c {}\n", c);
-    file_.print("_cell_angle_alpha {}\n", alpha);
-    file_.print("_cell_angle_beta  {}\n", beta);
-    file_.print("_cell_angle_gamma {}\n", gamma);
+    file_.print("_cell_length_a {}\n", lengths[0]);
+    file_.print("_cell_length_b {}\n", lengths[1]);
+    file_.print("_cell_length_c {}\n", lengths[2]);
+    file_.print("_cell_angle_alpha {}\n", angles[0]);
+    file_.print("_cell_angle_beta  {}\n", angles[1]);
+    file_.print("_cell_angle_gamma {}\n", angles[2]);
     file_.print("loop_\n");
     file_.print("  _symmetry_equiv_pos_as_xyz\n");
     file_.print("  '+x,+y,+z'\n");

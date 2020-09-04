@@ -42,7 +42,7 @@ TEST_CASE("Read files in mol2 format") {
         frame = file.read();
         CHECK(frame.size() == 1);
         CHECK(frame.cell().shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(frame.cell().a(), 10, 1e-4));
+        CHECK(approx_eq(frame.cell().lengths(), {10, 10, 10}, 1e-4));
 
         file = Trajectory("data/mol2/status-bits.mol2");
         REQUIRE(file.nsteps() == 1);
@@ -214,7 +214,7 @@ TEST_CASE("Write files in mol2 format") {
     auto file = Trajectory(tmpfile, 'w');
     file.write(frame);
 
-    frame.set_cell(UnitCell(22));
+    frame.set_cell(UnitCell({22, 22, 22}));
     frame.set("name", "test");
     frame.add_atom(Atom("E"), {4, 5, 6});
     frame.add_atom(Atom("F"), {4, 5, 6});
