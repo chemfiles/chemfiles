@@ -37,3 +37,6 @@ These classes implement the ``File`` interface defined previously.
 
 .. doxygenclass:: chemfiles::TNGFile
     :members:
+
+.. doxygenclass:: chemfiles::XDRFile
+    :members:

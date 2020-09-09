@@ -18,12 +18,9 @@ class Frame;
 class Residue;
 class MemoryBuffer;
 
-/// [MOL2][MOL2] file format reader and writer.
+/// Tripos [MOL2] format reader and writer.
 ///
-/// For multi-frame trajectories, we follow the convention of VMD to use multiple
-/// `END` records, separating the steps.
-///
-/// [MOL2]:
+/// [MOL2]: http://chemyang.ccnu.edu.cn/ccb/server/AIMMS/mol2.pdf
 class MOL2Format final: public TextFormat {
 public:
     MOL2Format(std::string path, File::Mode mode, File::Compression compression):

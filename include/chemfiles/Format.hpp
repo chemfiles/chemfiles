@@ -20,7 +20,8 @@ class Frame;
 class MemoryBuffer;
 
 /// The `Format` class defines the interface to implement in order to add a new
-/// format to chemfiles.
+/// format to chemfiles. For text-based formats, it might be simpler to 
+/// implement the `TextFormat` interface instead.
 ///
 /// It is possible to implement only one of `Format::read`; `Format::read_step`
 /// or `Format::write`. In that case, only the corresponding operations will be
@@ -157,7 +158,7 @@ FormatInfo format_information() {
 /// It is possible to implement only one of `TextFormat::read_next` or
 /// `TextFormat::write_next`. In that case, only the corresponding operations
 /// will be available from the corresponding `chemfiles::Trajectory`.
-class TextFormat: public Format {
+class CHFL_EXPORT TextFormat: public Format {
 public:
     TextFormat(std::string path, File::Mode mode, File::Compression compression);
     TextFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression);

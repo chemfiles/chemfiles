@@ -13,6 +13,9 @@
 namespace chemfiles {
 class Frame;
 
+/// GROMACS [XTC] file format reader.
+///
+/// [XTC]: http://manual.gromacs.org/archive/5.0.4/online/xtc.html
 class XTCFormat final : public Format {
   public:
     XTCFormat(std::string path, File::Mode mode, File::Compression compression);
