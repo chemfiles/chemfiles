@@ -23,8 +23,9 @@ class MemoryBuffer;
 
 /// [PDB][PDB] file format reader and writer.
 ///
-/// For multi-frame trajectories, we follow the convention of VMD to use multiple
-/// `END` records, separating the steps.
+/// For multi-frame trajectories, we support both the convention from VMD to 
+/// use multiple `END` records separating the steps; or the use of multiple 
+/// `MODEL`/`ENDMODEL` pairs.
 ///
 /// [PDB]: ftp://ftp.wwpdb.org/pub/pdb/doc/format_descriptions/Format_v33_A4.pdf
 class PDBFormat final: public TextFormat {
