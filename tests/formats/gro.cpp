@@ -38,8 +38,8 @@ TEST_CASE("Read files in Gromacs .gro format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::TRICLINIC);
-        CHECK(approx_eq(cell.lengths(), {26.2553, 11.3176, 11.8892}, 1e-2));
-        CHECK(approx_eq(cell.angles(), {90.0, 112.159, 90.0}, 1e-2));
+        CHECK(approx_eq(cell.lengths(), {26.2553, 11.3176, 11.8892}, 1e-4));
+        CHECK(approx_eq(cell.angles(), {90.0, 112.159, 90.0}, 1e-3));
 
         file = Trajectory("data/pdb/1vln-triclinic.pdb");
         frame = file.read();
@@ -47,8 +47,8 @@ TEST_CASE("Read files in Gromacs .gro format") {
 
         cell = frame.cell();
         CHECK(cell.shape() == UnitCell::TRICLINIC);
-        CHECK(cell.lengths() == Vector3D(78.8, 79.3, 133.3));
-        CHECK(approx_eq(cell.angles(), Vector3D(97.1, 90.2, 97.5), 1e-12));
+        CHECK(approx_eq(cell.lengths(), {78.8, 79.3, 133.3}, 1e-12));
+        CHECK(approx_eq(cell.angles(), {97.1, 90.2, 97.5}, 1e-12));
     }
 
     SECTION("Read next step") {

@@ -9,12 +9,13 @@
 #include "chemfiles/types.hpp"
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/unreachable.hpp"
+#include "chemfiles/warnings.hpp"
 
 using namespace chemfiles;
 
 // Sinus and Cosine for degree values
 constexpr double pi = 3.141592653589793238463;
-inline double deg2rad(double x) {
+static double deg2rad(double x) {
     return x * pi / 180.0;
 }
 
@@ -30,85 +31,113 @@ static double sind(double theta) {
     return sin(deg2rad(theta));
 }
 
-static bool is_roughly_zero(double value) {
-    // We think that 0.00001 is close enough to 0
-    return fabs(value) < 1e-5;
+namespace chemfiles { namespace private_details {
+    bool is_roughly_zero(double value) {
+        // We think that 0.00001 is close enough to 0
+        return fabs(value) < 1e-5;
+    }
+
+    bool is_roughly_90(double value) {
+        // We think that 89.999° is close enough to 90°
+        return fabs(value - 90.0) < 1e-3;
+    }
+
+    bool is_diagonal(const Matrix3D& matrix) {
+        return is_roughly_zero(matrix[1][0]) && is_roughly_zero(matrix[2][0]) &&
+               is_roughly_zero(matrix[0][1]) && is_roughly_zero(matrix[2][1]) &&
+               is_roughly_zero(matrix[0][2]) && is_roughly_zero(matrix[1][2]);
+    }
+
+    bool is_upper_triangular(const Matrix3D& matrix) {
+        return is_roughly_zero(matrix[1][0]) && is_roughly_zero(matrix[2][0]) &&
+               is_roughly_zero(matrix[2][1]);
+    }
+}}
+
+using namespace chemfiles::private_details;
+
+static void check_lengths(const Vector3D& lengths) {
+    if (lengths[0] < 0 || lengths[1] < 0 || lengths[2] < 0) {
+        throw error("a unit cell can not have negative lengths");
+    }
+
+    if (lengths != Vector3D(0, 0, 0) && (is_roughly_zero(lengths[0]) || is_roughly_zero(lengths[1]) || is_roughly_zero(lengths[2]))) {
+        warning("", "trying to set one or two unit cell lengths to zero, something might be wrong");
+    }
 }
 
-static bool is_roughly_90(double value) {
-    // We think that 89.999° is close enough to 90°
-    return fabs(value - 90.0) < 1e-3;
+static void check_angles(const Vector3D& angles) {
+    if (angles[0] < 0 || angles[1] < 0 || angles[2] < 0) {
+        throw error("a unit cell can not have negative angles");
+    }
+
+    if (is_roughly_zero(angles[0]) || is_roughly_zero(angles[1]) || is_roughly_zero(angles[2])) {
+        throw error("a unit cell can not have 0° angles");
+    }
+
+    if (angles[0] >= 180 || angles[1] >= 180 || angles[2] >= 180) {
+        throw error("a unit cell can not have angles larger than or equal to 180°");
+    }
+}
+
+static Matrix3D cell_matrix_from_lenths_angles(Vector3D lengths, Vector3D angles) {
+    check_lengths(lengths);
+    check_angles(angles);
+
+    if (is_roughly_90(angles[0]) && is_roughly_90(angles[1]) && is_roughly_90(angles[2])) {
+        angles = {90, 90, 90};
+    }
+
+    auto matrix = Matrix3D::zero();
+
+    matrix[0][0] = lengths[0];
+    matrix[1][0] = 0;
+    matrix[2][0] = 0;
+
+    matrix[0][1] = cosd(angles[2]) * lengths[1];
+    matrix[1][1] = sind(angles[2]) * lengths[1];
+    matrix[2][1] = 0;
+
+    matrix[0][2] = cosd(angles[1]);
+    matrix[1][2] = (cosd(angles[0]) - cosd(angles[1]) * cosd(angles[2])) / sind(angles[2]);
+    matrix[2][2] = sqrt(1 - matrix[0][2] * matrix[0][2] - matrix[1][2] * matrix[1][2]);
+    matrix[0][2] *= lengths[2];
+    matrix[1][2] *= lengths[2];
+    matrix[2][2] *= lengths[2];
+
+    assert(is_upper_triangular(matrix));
+
+    return matrix;
 }
 
 UnitCell::UnitCell(): UnitCell({0, 0, 0}) {}
 
-UnitCell::UnitCell(Vector3D lengths): UnitCell(lengths, {90, 90, 90}) {}
+UnitCell::UnitCell(Vector3D lengths): UnitCell(std::move(lengths), {90, 90, 90}) {}
 
 UnitCell::UnitCell(Vector3D lengths, Vector3D angles):
-    matrix_(Matrix3D::unit()),
-    matrix_inv_(Matrix3D::unit()),
-    lengths_(lengths),
-    angles_(angles)
-{
-    
-    if (is_roughly_zero(lengths_[0]) && is_roughly_zero(lengths_[1]) && is_roughly_zero(lengths_[2])) {
-        shape_ = INFINITE;
-        lengths_ = {0, 0, 0};
-        angles_ = {90, 90, 90};
-    } else if (is_roughly_90(angles_[0]) && is_roughly_90(angles_[1]) && is_roughly_90(angles_[2])) {
-        shape_ = ORTHORHOMBIC;
-        // Make sure alpha/beta/gamma are actually 90°, so that the matrix
-        // update below does not create a non diagonal matrix.
-        angles_ = {90, 90, 90};
+    UnitCell(cell_matrix_from_lenths_angles(std::move(lengths), std::move(angles))) {}
+
+UnitCell::UnitCell(Matrix3D matrix): matrix_(std::move(matrix)), matrix_inv_(Matrix3D::unit()) {
+    auto determinant = matrix_.determinant();
+    if (determinant < 0.0) {
+        throw error("invalid unit cell matrix with negative determinant");
+    }
+
+    if (is_diagonal(matrix_)) {
+        if (is_roughly_zero(matrix_[0][0]) && is_roughly_zero(matrix_[1][1]) && is_roughly_zero(matrix_[2][2])) {
+            shape_ = INFINITE;
+            matrix_ = Matrix3D::zero();
+        } else {
+            shape_ = ORTHORHOMBIC;
+        }
     } else {
         shape_ = TRICLINIC;
     }
-    update_matrix();
-}
 
-UnitCell::UnitCell(const Matrix3D& matrix): matrix_(Matrix3D::unit()), matrix_inv_(Matrix3D::unit()) {
-    if (matrix[1][0] != 0 || matrix[2][0] != 0 || matrix[2][1] != 0) {
-        throw error("the matrix supplied to UnitCell is not an upper triangular matrix");
-    } else if (matrix_.determinant() <= 0) {
-        throw error("the matrix supplied to UnitCell do not have a positive determinant");
+    if (!is_roughly_zero(this->volume())) {
+        // Do not try to invert a cell with a 0 volume
+        matrix_inv_ = matrix_.invert();
     }
-
-    if (is_roughly_zero(matrix[0][0]) && is_roughly_zero(matrix[1][1]) && is_roughly_zero(matrix[2][2]) &&
-        is_roughly_zero(matrix[0][1]) && is_roughly_zero(matrix[0][2]) && is_roughly_zero(matrix[1][2])) {
-        shape_ = INFINITE;
-        lengths_ = {0, 0, 0};
-        angles_ = {90, 90, 90};
-    } else if (is_roughly_zero(matrix[0][1]) && is_roughly_zero(matrix[0][2]) && is_roughly_zero(matrix[1][2])) {
-        shape_ = ORTHORHOMBIC;
-        lengths_ = {matrix[0][0], matrix[1][1], matrix[2][2]};
-        angles_ = {90, 90, 90};
-    } else {
-        shape_ = TRICLINIC;
-
-        auto v1 = Vector3D(matrix[0][0], matrix[1][0], matrix[2][0]);
-        auto v2 = Vector3D(matrix[0][1], matrix[1][1], matrix[2][1]);
-        auto v3 = Vector3D(matrix[0][2], matrix[1][2], matrix[2][2]);
-        
-        auto angle = [](Vector3D& r1, Vector3D& r2) {
-            return rad2deg(acos(dot(r1, r2) / (r1.norm() * r2.norm()))); 
-        };
-
-        lengths_ = {v1.norm(), v2.norm(), v3.norm()};
-        angles_ = {angle(v2, v3), angle(v1, v3), angle(v1, v2)};
-    }
-    
-    update_matrix();
-    assert(fabs(matrix_[0][0] - matrix[0][0]) < 1e-5);
-    assert(fabs(matrix_[1][0] - matrix[1][0]) < 1e-5);
-    assert(fabs(matrix_[2][0] - matrix[2][0]) < 1e-5);
-
-    assert(fabs(matrix_[0][1] - matrix[0][1]) < 1e-5);
-    assert(fabs(matrix_[1][1] - matrix[1][1]) < 1e-5);
-    assert(fabs(matrix_[2][1] - matrix[2][1]) < 1e-5);
-
-    assert(fabs(matrix_[0][2] - matrix[0][2]) < 1e-5);
-    assert(fabs(matrix_[1][2] - matrix[1][2]) < 1e-5);
-    assert(fabs(matrix_[2][2] - matrix[2][2]) < 1e-5);
 }
 
 double UnitCell::volume() const {
@@ -116,51 +145,28 @@ double UnitCell::volume() const {
     case INFINITE:
         return 0;
     case ORTHORHOMBIC:
-        return lengths_[0] * lengths_[1] * lengths_[2];
     case TRICLINIC:
         return matrix_.determinant();
     }
-}
-
-void UnitCell::update_matrix() {
-    matrix_[0][0] = lengths_[0];
-    matrix_[1][0] = 0;
-    matrix_[2][0] = 0;
-
-    matrix_[0][1] = cosd(angles_[2]) * lengths_[1];
-    matrix_[1][1] = sind(angles_[2]) * lengths_[1];
-    matrix_[2][1] = 0;
-
-    matrix_[0][2] = cosd(angles_[1]);
-    matrix_[1][2] = (cosd(angles_[0]) - cosd(angles_[1]) * cosd(angles_[2])) / sind(angles_[2]);
-    matrix_[2][2] = sqrt(1 - matrix_[0][2] * matrix_[0][2] - matrix_[1][2] * matrix_[1][2]);
-    matrix_[0][2] *= lengths_[2];
-    matrix_[1][2] *= lengths_[2];
-    matrix_[2][2] *= lengths_[2];
-
-    // Do not try to invert a cell with a 0 volume
-    if (matrix_.determinant() <= 0.0) {
-        matrix_inv_ = Matrix3D::unit();
-    } else {
-        matrix_inv_ = matrix_.invert();
-    }
+    unreachable();
 }
 
 void UnitCell::set_shape(CellShape shape) {
     if (shape == ORTHORHOMBIC) {
-        if (angles_ != Vector3D(90, 90, 90)) {
+        if (!is_diagonal(matrix_)) {
             throw error(
                 "can not set cell shape to ORTHORHOMBIC: some angles are not 90°"
             );
         }
     } else if (shape == INFINITE) {
-        if (angles_ != Vector3D(90, 90, 90)) {
+        if (!is_diagonal(matrix_)) {
             throw error(
                 "can not set cell shape to INFINITE: some angles are not 90°"
             );
         }
-        
-        if (lengths_ != Vector3D(0, 0, 0)) {
+
+        auto lengths = this->lengths();
+        if (!(is_roughly_zero(lengths[0]) && is_roughly_zero(lengths[1]) && is_roughly_zero(lengths[2]))) {
             throw error(
                 "can not set cell shape to INFINITE: some lengths are not 0"
             );
@@ -170,32 +176,81 @@ void UnitCell::set_shape(CellShape shape) {
     shape_ = shape;
 }
 
+Vector3D UnitCell::lengths() const {
+    switch (shape_) {
+    case INFINITE:
+        return {0, 0, 0};
+    case ORTHORHOMBIC:
+        return {matrix_[0][0], matrix_[1][1], matrix_[2][2]};
+    case TRICLINIC:
+        break;  // See below
+    }
+
+    Vector3D v1 = {matrix_[0][0], matrix_[1][0], matrix_[2][0]};
+    Vector3D v2 = {matrix_[0][1], matrix_[1][1], matrix_[2][1]};
+    Vector3D v3 = {matrix_[0][2], matrix_[1][2], matrix_[2][2]};
+
+    return {v1.norm(), v2.norm(), v3.norm()};
+}
+
+Vector3D UnitCell::angles() const {
+    switch (shape_) {
+    case INFINITE:
+    case ORTHORHOMBIC:
+        return {90, 90, 90};
+    case TRICLINIC:
+        break;  // See below
+    }
+    Vector3D v1 = {matrix_[0][0], matrix_[1][0], matrix_[2][0]};
+    Vector3D v2 = {matrix_[0][1], matrix_[1][1], matrix_[2][1]};
+    Vector3D v3 = {matrix_[0][2], matrix_[1][2], matrix_[2][2]};
+
+    return {
+        rad2deg(acos(dot(v2, v3) / (v2.norm() * v3.norm()))),
+        rad2deg(acos(dot(v1, v3) / (v1.norm() * v3.norm()))),
+        rad2deg(acos(dot(v1, v2) / (v1.norm() * v2.norm())))
+    };
+}
+
 void UnitCell::set_lengths(Vector3D lengths) {
     if (shape_ == INFINITE) {
         throw error("can not set lengths for an infinite cell");
     }
-    lengths_ = lengths;
-    update_matrix();
+
+    check_lengths(lengths);
+
+    if (!is_upper_triangular(matrix_)) {
+        warning("UnitCell", "resetting unit cell orientation in set_lengths");
+    }
+
+    // Reset the unit cell, and remove any existing rotation.
+    *this = UnitCell(std::move(lengths), this->angles());
 }
 
 void UnitCell::set_angles(Vector3D angles) {
     if (shape_ != TRICLINIC) {
         throw error("can not set angles for a non-triclinic cell");
     }
-    angles_ = angles;
-    update_matrix();
+
+    check_angles(angles);
+
+    if (!is_upper_triangular(matrix_)) {
+        warning("UnitCell", "resetting unit cell orientation in set_angles");
+    }
+
+    // Reset the unit cell, and remove any existing rotation.
+    *this = UnitCell(this->lengths(), std::move(angles));
 }
 
-// Wrap a vector in an Orthorhombic UnitCell
 Vector3D UnitCell::wrap_orthorhombic(const Vector3D& vector) const {
+    auto lengths = this->lengths();
     return {
-        vector[0] - round(vector[0] / lengths_[0]) * lengths_[0],
-        vector[1] - round(vector[1] / lengths_[1]) * lengths_[1],
-        vector[2] - round(vector[2] / lengths_[2]) * lengths_[2]
+        vector[0] - round(vector[0] / lengths[0]) * lengths[0],
+        vector[1] - round(vector[1] / lengths[1]) * lengths[1],
+        vector[2] - round(vector[2] / lengths[2]) * lengths[2]
     };
 }
 
-// Wrap a vector in a triclinic UnitCell
 Vector3D UnitCell::wrap_triclinic(const Vector3D& vector) const {
     auto fractional = matrix_inv_ * vector;
     fractional[0] -= round(fractional[0]);
@@ -222,8 +277,7 @@ namespace chemfiles {
             return false;
         }
 
-        return rhs.lengths() == lhs.lengths() &&
-               rhs.angles() == lhs.angles();
+        return rhs.matrix() == lhs.matrix();
     }
 
     bool operator!=(const UnitCell& rhs, const UnitCell& lhs) {

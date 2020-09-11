@@ -7,7 +7,7 @@
 
 int main() {
     // [example]
-    CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 10, 10});
+    CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 10, 10}, NULL);
 
     chfl_cell_set_shape(cell, CHFL_CELL_TRICLINIC);
 

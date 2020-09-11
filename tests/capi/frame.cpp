@@ -166,7 +166,7 @@ TEST_CASE("chfl_frame") {
 
         // Setting an unit cell
         lengths[0] = 3; lengths[1] = 4; lengths[2] = 5;
-        cell = chfl_cell(lengths);
+        cell = chfl_cell(lengths, nullptr);
         REQUIRE(cell);
         CHECK_STATUS(chfl_frame_set_cell(frame, cell));
         chfl_free(cell);
@@ -332,7 +332,7 @@ TEST_CASE("chfl_frame") {
         REQUIRE(trajectory);
 
         chfl_vector3d lengths = {30, 30, 30};
-        CHFL_CELL* cell = chfl_cell(lengths);
+        CHFL_CELL* cell = chfl_cell(lengths, nullptr);
         CHECK_STATUS(chfl_trajectory_set_cell(trajectory, cell));
         chfl_free(cell);
 

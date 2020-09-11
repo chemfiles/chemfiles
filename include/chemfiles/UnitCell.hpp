@@ -14,20 +14,31 @@
 
 namespace chemfiles {
 
+namespace private_details {
+    /// check if a single value is close enough to zero to be considered equal
+    /// to zero, in the context of unit cell matrices
+    bool is_roughly_zero(double value);
+
+    /// check if a single value is close enough to 90 to be considered equal
+    /// to 90, in the context of unit cell matrices
+    bool is_roughly_90(double value);
+
+    /// check if a matrix is diagonal according to `is_roughly_zero`
+    bool is_diagonal(const Matrix3D& matrix);
+
+    /// check if a matrix is an upper triangular matrix according to
+    /// `is_roughly_zero`
+    bool is_upper_triangular(const Matrix3D& matrix);
+}
+
 /// An UnitCell represent the box containing the atoms, and its periodicity
 ///
-/// A unit cell is fully represented by three lengths (a, b, c); and three angles
-/// (alpha, beta, gamma). The angles are stored in degrees, and the lengths in
-/// Angstroms.
-///
-/// A cell also has a matricial representation, by projecting the three base
-/// vector into an orthonormal base. We choose to represent such matrix as an
-/// upper triangular matrix:
-///
+/// A unit cell is represented by the cell matrix, containing the three cell
+/// vectors:
 /// ```
 /// | a_x   b_x   c_x |
-/// |  0    b_y   c_y |
-/// |  0     0    c_z |
+/// | a_y   b_y   c_y |
+/// | a_z   b_z   c_z |
 /// ```
 class CHFL_EXPORT UnitCell final {
 public:
@@ -59,31 +70,24 @@ public:
 
     /// Construct a unit cell with the given cell `lengths` and `angles`
     ///
-    /// If all lengths are set to 0, then the cell is `INFINITE`
-    /// If all lengths are not zero and all angles are 90.0, then the cell is `ORTHORHOMBIC`.
-    /// Else a `TRICLINIC` cell is created.
+    /// If all lengths are set to 0, then the cell is `INFINITE`. If at least
+    /// one length is not zero and all angles are 90.0, then the cell is
+    /// `ORTHORHOMBIC`.  Else a `TRICLINIC` cell is created.
     ///
     /// @example{cell/from-2.cpp}
     UnitCell(Vector3D lengths, Vector3D angles);
 
-    /// Construct a unit cell via from an upper triangular matrix.
+    /// Construct a unit cell from a cell matrix.
     ///
-    /// If a matrix of all zeros is given, then an infinite cell is
-    /// created.
+    /// If `matrix` contains only zeros, then an infinite cell is created. If
+    /// only the diagonal of the matrix is non-zero, then the cell is
+    /// `ORTHORHOMBIC`.  Else a `TRICLINIC` cell is created. The matrix entries
+    /// should be in Angstroms.
     ///
-    /// If only the diagonal of the matrix is non-zero, then the cell is
-    /// `ORTHORHOMBIC`. Else a `TRICLINIC` cell is created.
-    ///
-    /// @example{cell/matrix.cpp}
-    UnitCell(const Matrix3D& matrix);
+    /// @example{cell/cell-matrix.cpp}
+    UnitCell(Matrix3D matrix);
 
-    /// Get the cell matrix, defined as the upper triangular matrix
-    ///
-    /// ```
-    /// | a_x   b_x   c_x |
-    /// |  0    b_y   c_y |
-    /// |  0     0    c_z |
-    /// ```
+    /// Get the cell matrix
     ///
     /// @example{cell/matrix.cpp}
     Matrix3D matrix() const {
@@ -107,24 +111,30 @@ public:
     /// Get the lenghts of the cell's vectors, in angstroms.
     ///
     /// @example{cell/lengths.cpp}
-    Vector3D lengths() const {
-        return lengths_;
-    }
-    
+    Vector3D lengths() const;
+
     /// Get the angles between the cell's vectors in degrees
     ///
     /// @example{cell/angles.cpp}
-    Vector3D angles() const {
-        return angles_;
-    }
+    Vector3D angles() const;
 
     /// Set the lenghts of the cell's vectors. The values should be in angstroms.
+    ///
+    /// **This function reset cell orientation!**
+    ///
+    /// After the call, the cell is aligned such that the first cell vector is
+    /// along the *x* axis, and the second cell vector is in the *xy* plane.
     ///
     /// @example{cell/lengths.cpp}
     /// @throws Error if the cell shape is `INFINITE`.
     void set_lengths(Vector3D lengths);
 
     /// Set the angles between the cell's vectors. The values should be in degrees.
+    ///
+    /// **This function reset cell orientation!**
+    ///
+    /// After the call, the cell is aligned such that the first cell vector is
+    /// along the *x* axis, and the second cell vector is in the *xy* plane.
     ///
     /// @example{cell/angles.cpp}
     /// @throws Error if the cell shape is not `TRICLINIC`.
@@ -149,17 +159,11 @@ private:
     Vector3D wrap_orthorhombic(const Vector3D& vector) const;
     /// Wrap a vector in triclinic cell
     Vector3D wrap_triclinic(const Vector3D& vector) const;
-    /// Compute the cell matrix from the cell parameters
-    void update_matrix();
-    /// Caching the cell matrix
+
+    /// Cell matrix
     Matrix3D matrix_;
     /// Caching the inverse of the cell matrix
     Matrix3D matrix_inv_;
-
-    /// Cell lengths
-    Vector3D lengths_;
-    /// Cell angles
-    Vector3D angles_;
     /// Cell type
     CellShape shape_;
 };

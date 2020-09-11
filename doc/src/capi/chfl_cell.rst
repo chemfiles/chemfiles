@@ -10,7 +10,7 @@
     Here is the full list of functions acting on :cpp:type:`CHFL_CELL`:
 
     - :cpp:func:`chfl_cell`
-    - :cpp:func:`chfl_cell_triclinic`
+    - :cpp:func:`chfl_cell_from_matrix`
     - :cpp:func:`chfl_cell_from_frame`
     - :cpp:func:`chfl_cell_copy`
     - :cpp:func:`chfl_cell_volume`
@@ -27,7 +27,7 @@
 
 .. doxygenfunction:: chfl_cell
 
-.. doxygenfunction:: chfl_cell_triclinic
+.. doxygenfunction:: chfl_cell_from_matrix
 
 .. doxygenfunction:: chfl_cell_from_frame
 

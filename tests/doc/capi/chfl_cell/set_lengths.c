@@ -7,7 +7,7 @@
 
 int main() {
     // [example]
-    CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 10, 10});
+    CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 10, 10}, NULL);
 
     chfl_cell_set_lengths(cell, (chfl_vector3d){42, 8, 3});
 
