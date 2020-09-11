@@ -35,6 +35,8 @@ template<> FormatInfo chemfiles::format_information<GROFormat>() {
     );
 }
 
+using chemfiles::private_details::is_upper_triangular;
+
 /// Check the number of digits before the decimal separator to be sure than
 /// we can represen them. In case of error, use the given `context` in the error
 /// message
@@ -112,7 +114,7 @@ void GROFormat::read_next(Frame& frame) {
             parse<double>(box_values[2]) * 10
         );
 
-        frame.set_cell(UnitCell(lengths));
+        frame.set_cell({lengths});
     } else if (box_values.size() == 9) {
         auto v1_x = parse<double>(box_values[0]) * 10;
         auto v2_y = parse<double>(box_values[1]) * 10;
@@ -224,8 +226,7 @@ void GROFormat::write_next(const Frame& frame) {
         }
     }
 
-    auto& cell = frame.cell();
-
+    const auto& cell = frame.cell();
     // While this line is free form, we should try to print it in a pretty way that most gro parsers expect
     // This means we cannot support incredibly large cell sizes, but these are likely not practical anyway
     if (cell.shape() == UnitCell::ORTHORHOMBIC || cell.shape() == UnitCell::INFINITE) {
@@ -235,6 +236,9 @@ void GROFormat::write_next(const Frame& frame) {
         file_.print("   {:8.5f} {:8.5f} {:8.5f}\n", lengths[0], lengths[1], lengths[2]);
     } else { // Triclinic
         const auto& matrix = cell.matrix() / 10;
+        if (!is_upper_triangular(matrix)) {
+            throw format_error("unsupported triclinic but non upper-triangular cell matrix in GRO writer");
+        }
         check_values_size(Vector3D(matrix[0][0], matrix[1][1], matrix[2][2]), 8, "unit cell");
         check_values_size(Vector3D(matrix[0][1], matrix[0][2], matrix[1][2]), 8, "unit cell");
         file_.print(

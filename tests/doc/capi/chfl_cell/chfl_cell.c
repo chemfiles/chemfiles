@@ -6,11 +6,17 @@
 
 int main() {
     // [example]
-    CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 10, 10});
+    /* Orthorhombic cell */
+    CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 10, 10}, NULL);
 
-    if (cell == NULL) {
-        /* handle error */
-    }
+    if (cell == NULL) { /* handle error */ }
+
+    chfl_free(cell);
+
+    /* Triclinic cell */
+    cell = chfl_cell((chfl_vector3d){10, 10, 10}, (chfl_vector3d){92, 88, 100});
+
+    if (cell == NULL) { /* handle error */ }
 
     chfl_free(cell);
     // [example]

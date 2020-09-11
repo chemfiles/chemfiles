@@ -103,7 +103,7 @@ TEST_CASE("Read files in PDB format") {
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::TRICLINIC);
-        CHECK(cell.lengths() == Vector3D(78.8, 79.3, 133.3));
+        CHECK(approx_eq(cell.lengths(), {78.8, 79.3, 133.3}, 1e-12));
         CHECK(approx_eq(cell.angles(), {97.1, 90.2, 97.5}, 1e-12));
     }
 

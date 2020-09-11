@@ -168,7 +168,7 @@ TEST_CASE("Read trajectory") {
         REQUIRE(trajectory);
 
         chfl_vector3d lengths = {30, 30, 30};
-        CHFL_CELL* cell = chfl_cell(lengths);
+        CHFL_CELL* cell = chfl_cell(lengths, nullptr);
         CHECK_STATUS(chfl_trajectory_set_cell(trajectory, cell));
         chfl_free(cell);
 

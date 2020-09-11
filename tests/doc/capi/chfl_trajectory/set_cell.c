@@ -2,11 +2,12 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <chemfiles.h>
+#include <stdlib.h>
 
 int main() {
     // [example] [no-run]
     CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("water.xyz", 'r');
-    CHFL_CELL* cell = chfl_cell((chfl_vector3d){22, 22, 34});
+    CHFL_CELL* cell = chfl_cell((chfl_vector3d){22, 22, 34}, NULL);
 
     chfl_trajectory_set_cell(trajectory, cell);
 

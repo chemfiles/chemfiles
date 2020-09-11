@@ -16,7 +16,7 @@ int main(void) {
     chfl_frame_add_bond(frame, 0, 1);
     chfl_frame_add_bond(frame, 2, 1);
 
-    CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 10, 10});
+    CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 10, 10}, NULL);
     chfl_frame_set_cell(frame, cell);
     chfl_free(cell);
 

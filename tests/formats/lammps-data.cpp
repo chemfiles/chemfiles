@@ -49,6 +49,7 @@ TEST_CASE("Read files in LAMMPS data format") {
         Frame frame = file.read();
 
         CHECK(frame.size() == 100);
+        CHECK(frame.cell().shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(frame.cell().lengths(), {31.064449134, 31.064449134, 1.0}, 1e-12));
 
         auto positions = frame.positions();
@@ -238,7 +239,8 @@ TEST_CASE("Read and write files in memory") {
         auto frame = file.read();
 
         CHECK(frame.size() == 100);
-        CHECK(frame.cell() == UnitCell({31.064449134, 31.064449134, 1.0}));
+        CHECK(frame.cell().shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(approx_eq(frame.cell().lengths(), {31.064449134, 31.064449134, 1.0}, 1e-12));
 
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], {-15.5322, -15.5322, 0.0}, 1e-12));

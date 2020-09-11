@@ -21,25 +21,25 @@ static bool approx_eq(chfl_vector3d lhs[3], chfl_vector3d rhs[3], double eps = 1
 TEST_CASE("chfl_cell") {
     SECTION("Constructors") {
         chfl_vector3d lengths = {2, 3, 4};
-        CHFL_CELL* cell = chfl_cell(lengths);
+        CHFL_CELL* cell = chfl_cell(lengths, nullptr);
         REQUIRE(cell);
 
         chfl_vector3d data = {0};
         CHECK_STATUS(chfl_cell_lengths(cell, data));
-        CHECK(data[0] == 2);
-        CHECK(data[1] == 3);
-        CHECK(data[2] == 4);
+        CHECK(approx_eq(data, {{2, 3, 4}}));
 
         CHECK_STATUS(chfl_cell_angles(cell, data));
-        CHECK(data[0] == 90);
-        CHECK(data[1] == 90);
-        CHECK(data[2] == 90);
+        CHECK(approx_eq(data, {{90, 90, 90}}));
+
+        chfl_cellshape shape;
+        CHECK_STATUS(chfl_cell_shape(cell, &shape));
+        CHECK(shape == CHFL_CELL_ORTHORHOMBIC);
 
         chfl_free(cell);
 
         lengths[0] = 20; lengths[1] = 21; lengths[2] = 22;
         chfl_vector3d angles = {90, 100, 120};
-        cell = chfl_cell_triclinic(lengths, angles);
+        cell = chfl_cell(lengths, angles);
         REQUIRE(cell);
 
         CHECK_STATUS(chfl_cell_lengths(cell, data));
@@ -48,17 +48,27 @@ TEST_CASE("chfl_cell") {
         CHECK_STATUS(chfl_cell_angles(cell, data));
         CHECK(approx_eq(data, {{90, 100, 120}}));
 
-        chfl_free(cell);
-
-        // Check that a call to chfl_cell_triclinic always gives a triclinic
-        // cell, even with all angles equal to 90°
-        angles[0] = 90; angles[1] = 90; angles[2] = 90;
-        cell = chfl_cell_triclinic(lengths, angles);
-        REQUIRE(cell);
-
-        chfl_cellshape shape;
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
         CHECK(shape == CHFL_CELL_TRICLINIC);
+
+        chfl_free(cell);
+
+        chfl_vector3d matrix[3] = {
+            {5, 0, 0},
+            {0, 3, 0},
+            {0, 0, 8}
+        };
+        cell = chfl_cell_from_matrix(matrix);
+        REQUIRE(cell);
+
+        CHECK_STATUS(chfl_cell_lengths(cell, data));
+        CHECK(approx_eq(data, {{5, 3, 8}}));
+
+        CHECK_STATUS(chfl_cell_angles(cell, data));
+        CHECK(approx_eq(data, {{90, 90, 90}}));
+
+        CHECK_STATUS(chfl_cell_shape(cell, &shape));
+        CHECK(shape == CHFL_CELL_ORTHORHOMBIC);
 
         chfl_free(cell);
     }
@@ -66,12 +76,17 @@ TEST_CASE("chfl_cell") {
     SECTION("Constructors errors") {
         chfl_vector3d dummy = {0, 0, 0};
         fail_next_allocation();
-        CHECK(chfl_cell(dummy) == nullptr);
+        CHECK(chfl_cell(dummy, nullptr) == nullptr);
 
         fail_next_allocation();
-        CHECK(chfl_cell_triclinic(dummy, dummy) == nullptr);
+        chfl_vector3d matrix[3] = {
+            {5, 0, 0},
+            {0, 3, 0},
+            {0, 0, 8}
+        };
+        CHECK(chfl_cell_from_matrix(matrix) == nullptr);
 
-        CHFL_CELL* cell = chfl_cell(dummy);
+        CHFL_CELL* cell = chfl_cell(dummy, nullptr);
         REQUIRE(cell);
 
         fail_next_allocation();
@@ -89,7 +104,7 @@ TEST_CASE("chfl_cell") {
 
     SECTION("copy") {
         chfl_vector3d lengths = {2, 2, 2};
-        CHFL_CELL* cell = chfl_cell(lengths);
+        CHFL_CELL* cell = chfl_cell(lengths, nullptr);
         REQUIRE(cell);
 
         CHFL_CELL* copy = chfl_cell_copy(cell);
@@ -117,7 +132,7 @@ TEST_CASE("chfl_cell") {
 
     SECTION("Length") {
         chfl_vector3d lengths = {2, 3, 4};
-        CHFL_CELL* cell = chfl_cell(lengths);
+        CHFL_CELL* cell = chfl_cell(lengths, nullptr);
         REQUIRE(cell);
 
         chfl_vector3d data = {0};
@@ -138,7 +153,7 @@ TEST_CASE("chfl_cell") {
 
     SECTION("Angles") {
         chfl_vector3d lengths = {2, 3, 4};
-        CHFL_CELL* cell = chfl_cell(lengths);
+        CHFL_CELL* cell = chfl_cell(lengths, nullptr);
         REQUIRE(cell);
 
         chfl_vector3d data = {0};
@@ -164,7 +179,7 @@ TEST_CASE("chfl_cell") {
 
     SECTION("Volume") {
         chfl_vector3d lengths = {2, 3, 4};
-        CHFL_CELL* cell = chfl_cell(lengths);
+        CHFL_CELL* cell = chfl_cell(lengths, nullptr);
         REQUIRE(cell);
 
         double volume = 0;
@@ -176,7 +191,7 @@ TEST_CASE("chfl_cell") {
 
     SECTION("Matrix") {
         chfl_vector3d lengths = {10, 20, 30};
-        CHFL_CELL* cell = chfl_cell(lengths);
+        CHFL_CELL* cell = chfl_cell(lengths, nullptr);
         REQUIRE(cell);
 
         chfl_vector3d expected[3] = {{10, 0, 0}, {0, 20, 0}, {0, 0, 30}};
@@ -188,11 +203,17 @@ TEST_CASE("chfl_cell") {
     }
 
     SECTION("Shape") {
-        chfl_vector3d lengths = {2, 3, 4};
-        CHFL_CELL* cell = chfl_cell(lengths);
+        CHFL_CELL* cell = chfl_cell(nullptr, nullptr);
         REQUIRE(cell);
 
         chfl_cellshape shape;
+        CHECK_STATUS(chfl_cell_shape(cell, &shape));
+        CHECK(shape == CHFL_CELL_INFINITE);
+
+        chfl_vector3d lengths = {2, 3, 4};
+        CHECK_STATUS(chfl_cell_set_shape(cell, CHFL_CELL_ORTHORHOMBIC));
+        CHECK_STATUS(chfl_cell_set_lengths(cell, lengths));
+
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
         CHECK(shape == CHFL_CELL_ORTHORHOMBIC);
 
@@ -200,18 +221,12 @@ TEST_CASE("chfl_cell") {
         CHECK_STATUS(chfl_cell_shape(cell, &shape));
         CHECK(shape == CHFL_CELL_TRICLINIC);
 
-        lengths[0] = 0; lengths[1] = 0; lengths[2] = 0;
-        CHECK_STATUS(chfl_cell_set_lengths(cell, lengths));
-        CHECK_STATUS(chfl_cell_set_shape(cell, CHFL_CELL_INFINITE));
-        CHECK_STATUS(chfl_cell_shape(cell, &shape));
-        CHECK(shape == CHFL_CELL_INFINITE);
-
         chfl_free(cell);
     }
 
     SECTION("Wrap") {
         chfl_vector3d lengths = {2, 3, 4};
-        CHFL_CELL* cell = chfl_cell(lengths);
+        CHFL_CELL* cell = chfl_cell(lengths, nullptr);
         REQUIRE(cell);
 
         chfl_vector3d vector = {0.8, 1.7, -6};

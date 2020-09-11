@@ -27,12 +27,29 @@ TEST_CASE("Use the UnitCell type") {
             CHECK(cell.angles() == Vector3D(90, 90, 90));
             CHECK(cell.volume() == 10 * 11 * 12);
 
-            auto matrix = Matrix3D(10, 0, 0, 0, 11, 0, 0, 0, 12);
-            cell = UnitCell(matrix);
+            cell = UnitCell({
+                10, 0, 0,
+                0, 11, 0,
+                0, 0, 12
+            });
             CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
             CHECK(cell.lengths() == Vector3D(10, 11, 12));
             CHECK(cell.angles() == Vector3D(90, 90, 90));
             CHECK(cell.volume() == 10 * 11 * 12);
+
+            // we support cell with one or two length of 0, even if they don't
+            // make much physical sense
+            cell = UnitCell({0, 10, 10});
+            CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+            CHECK(cell.lengths() == Vector3D(0, 10, 10));
+            CHECK(cell.angles() == Vector3D(90, 90, 90));
+            CHECK(cell.volume() == 0);
+
+            cell = UnitCell({0, 0, 10});
+            CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+            CHECK(cell.lengths() == Vector3D(0, 0, 10));
+            CHECK(cell.angles() == Vector3D(90, 90, 90));
+            CHECK(cell.volume() == 0);
         }
 
         SECTION("Triclinic") {
@@ -105,22 +122,70 @@ TEST_CASE("Use the UnitCell type") {
     }
 
     SECTION("UnitCell errors") {
-        auto cell = UnitCell();
-        // Atempt to set values of an infinite unit cell
-        CHECK_THROWS_WITH(cell.set_lengths({10, 10, 10}), "can not set lengths for an infinite cell");
-        CHECK_THROWS_WITH(cell.set_angles({90, 90, 100}), "can not set angles for a non-triclinic cell");
+        SECTION("constructors") {
+            std::string message = "a unit cell can not have negative lengths";
+            CHECK_THROWS_WITH(UnitCell({-1, 1, 1}), message);
+            CHECK_THROWS_WITH(UnitCell({1, -1, 1}), message);
+            CHECK_THROWS_WITH(UnitCell({1, 1, -1}), message);
 
-        cell.set_shape(UnitCell::ORTHORHOMBIC);
-        CHECK_THROWS_WITH(cell.set_angles({90, 90, 100}), "can not set angles for a non-triclinic cell");
-    }
+            message = "a unit cell can not have negative angles";
+            CHECK_THROWS_WITH(UnitCell({1, 1, 1}, {-90, 90, 90}), message);
+            CHECK_THROWS_WITH(UnitCell({1, 1, 1}, {90, -90, 90}), message);
+            CHECK_THROWS_WITH(UnitCell({1, 1, 1}, {90, 90, -90}), message);
 
-    SECTION("Setting shape errors") {
-        auto cell = UnitCell({3, 4, 5}, {60, 70, 80});
-        CHECK_THROWS_WITH(cell.set_shape(UnitCell::ORTHORHOMBIC), "can not set cell shape to ORTHORHOMBIC: some angles are not 90°");
+            message = "a unit cell can not have 0° angles";
+            CHECK_THROWS_WITH(UnitCell({1, 1, 1}, {0, 90, 90}), message);
+            CHECK_THROWS_WITH(UnitCell({1, 1, 1}, {90, 0, 90}), message);
+            CHECK_THROWS_WITH(UnitCell({1, 1, 1}, {90, 90, 0}), message);
 
-        cell = UnitCell({3, 4, 5}, {60, 70, 80});
-        CHECK_THROWS_WITH(cell.set_shape(UnitCell::INFINITE), "can not set cell shape to INFINITE: some angles are not 90°");
-        cell = UnitCell({3, 4, 5});
-        CHECK_THROWS_WITH(cell.set_shape(UnitCell::INFINITE), "can not set cell shape to INFINITE: some lengths are not 0");
+            // bad matrix
+            auto matrix = Matrix3D(
+                26.2553,  0.0000, -4.4843,
+                 0.0000, -11.3176,  0.0000,
+                 0.0000,  0.0000,  11.011
+            );
+            CHECK_THROWS_WITH(UnitCell(matrix), "invalid unit cell matrix with negative determinant");
+        }
+
+        SECTION("setting lengths & angles") {
+            auto cell = UnitCell();
+            // Atempt to set values of an infinite unit cell
+            CHECK_THROWS_WITH(cell.set_lengths({10, 10, 10}), "can not set lengths for an infinite cell");
+            CHECK_THROWS_WITH(cell.set_angles({90, 90, 100}), "can not set angles for a non-triclinic cell");
+
+            cell.set_shape(UnitCell::ORTHORHOMBIC);
+            CHECK_THROWS_WITH(cell.set_angles({90, 90, 100}), "can not set angles for a non-triclinic cell");
+
+            std::string message = "a unit cell can not have negative lengths";
+            CHECK_THROWS_WITH(cell.set_lengths({-10, 10, 10}), message);
+            CHECK_THROWS_WITH(cell.set_lengths({10, -10, 10}), message);
+            CHECK_THROWS_WITH(cell.set_lengths({10, 10, -10}), message);
+
+            cell.set_shape(UnitCell::TRICLINIC);
+            message = "a unit cell can not have negative angles";
+            CHECK_THROWS_WITH(cell.set_angles({-90, 90, 90}), message);
+            CHECK_THROWS_WITH(cell.set_angles({90, -90, 90}), message);
+            CHECK_THROWS_WITH(cell.set_angles({90, 90, -90}), message);
+
+            message = "a unit cell can not have 0° angles";
+            CHECK_THROWS_WITH(cell.set_angles({0, 90, 90}), message);
+            CHECK_THROWS_WITH(cell.set_angles({90, 0, 90}), message);
+            CHECK_THROWS_WITH(cell.set_angles({90, 90, 0}), message);
+
+            message = "a unit cell can not have angles larger than or equal to 180°";
+            CHECK_THROWS_WITH(cell.set_angles({180, 90, 90}), message);
+            CHECK_THROWS_WITH(cell.set_angles({90, 180, 90}), message);
+            CHECK_THROWS_WITH(cell.set_angles({90, 90, 190}), message);
+        }
+
+        SECTION("setting shape") {
+            auto cell = UnitCell({3, 4, 5}, {60, 70, 80});
+            CHECK_THROWS_WITH(cell.set_shape(UnitCell::ORTHORHOMBIC), "can not set cell shape to ORTHORHOMBIC: some angles are not 90°");
+
+            cell = UnitCell({3, 4, 5}, {60, 70, 80});
+            CHECK_THROWS_WITH(cell.set_shape(UnitCell::INFINITE), "can not set cell shape to INFINITE: some angles are not 90°");
+            cell = UnitCell({3, 4, 5});
+            CHECK_THROWS_WITH(cell.set_shape(UnitCell::INFINITE), "can not set cell shape to INFINITE: some lengths are not 0");
+        }
     }
 }

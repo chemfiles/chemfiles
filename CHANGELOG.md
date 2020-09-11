@@ -15,11 +15,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added support for sub-selection in numerical functions, for example
   `distance(#1, name O)`.
 * Added read and write support for CIF format.
+* Changed the UnitCell representation to the full cell matrix instead of
+  a/b/c/alpha/beta/gamma
 
 ### Changes to the C API
 
-* Added missing `chfl_frame_clear_bonds` and `chfl_topology_clear_bonds`
-  functions.
+* Added missing `chfl_frame_clear_bonds` and `chfl_topology_clear_bonds`.
+* Added `chfl_cell_from_matrix` and changed parameters to `chfl_cell`, removed
+  `chfl_cell_triclinic`.
 
 ### Changes in supported formats
 

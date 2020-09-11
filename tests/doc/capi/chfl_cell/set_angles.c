@@ -8,7 +8,8 @@
 
 int main() {
     // [example]
-    CHFL_CELL* cell = chfl_cell_triclinic((chfl_vector3d){10, 10, 10}, (chfl_vector3d){90, 90, 90});
+    CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 10, 10}, NULL);
+    chfl_cell_set_shape(cell, CHFL_CELL_TRICLINIC);
 
     chfl_cell_set_angles(cell, (chfl_vector3d){120, 110, 100});
 

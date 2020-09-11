@@ -16,11 +16,16 @@ using namespace chemfiles;
 
 static_assert(sizeof(chfl_cellshape) == sizeof(int), "Wrong size for chfl_cellshape enum");
 
-extern "C" CHFL_CELL* chfl_cell(const chfl_vector3d lengths) {
+extern "C" CHFL_CELL* chfl_cell(const chfl_vector3d lengths, const chfl_vector3d angles) {
     CHFL_CELL* cell = nullptr;
-    CHECK_POINTER_GOTO(lengths);
     CHFL_ERROR_GOTO(
-        cell = shared_allocator::make_shared<UnitCell>(vector3d(lengths));
+        if (lengths == nullptr) {
+            cell = shared_allocator::make_shared<UnitCell>();
+        } else if (angles == nullptr) {
+            cell = shared_allocator::make_shared<UnitCell>(vector3d(lengths));
+        } else {
+            cell = shared_allocator::make_shared<UnitCell>(vector3d(lengths), vector3d(angles));
+        }
     )
     return cell;
 error:
@@ -28,15 +33,13 @@ error:
     return nullptr;
 }
 
-extern "C" CHFL_CELL* chfl_cell_triclinic(const chfl_vector3d lengths, const chfl_vector3d angles) {
+extern "C" CHFL_CELL* chfl_cell_from_matrix(const chfl_vector3d matrix[3]) {
     CHFL_CELL* cell = nullptr;
-    CHECK_POINTER_GOTO(lengths);
-    CHECK_POINTER_GOTO(angles);
+    CHECK_POINTER_GOTO(matrix);
     CHFL_ERROR_GOTO(
-        cell = shared_allocator::make_shared<UnitCell>(vector3d(lengths), vector3d(angles));
-        // ensure that the unit cell shape is always TRICLINIC, even if the
-        // three angles are 90°.
-        cell->set_shape(UnitCell::TRICLINIC);
+        auto cpp_matrix = Matrix3D::zero();
+        std::copy(&matrix[0][0], &matrix[0][0] + 9, &cpp_matrix[0][0]);
+        cell = shared_allocator::make_shared<UnitCell>(cpp_matrix);
     )
     return cell;
 error:
