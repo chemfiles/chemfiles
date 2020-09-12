@@ -27,8 +27,12 @@
 
 using namespace chemfiles;
 
-template <> FormatInfo chemfiles::format_information<XTCFormat>() {
-    return FormatInfo("XTC").with_extension(".xtc").description("XTC binary format");
+template<> const FormatMetadata& chemfiles::format_metadata<XTCFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "XTC";
+    metadata.extension = ".xtc";
+    metadata.description = "XTC binary format";
+    return metadata;
 }
 
 #define STRING_0(x) #x

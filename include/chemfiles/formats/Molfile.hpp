@@ -15,6 +15,7 @@ extern "C" {
 #include "chemfiles/File.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 #include "chemfiles/Topology.hpp"   // IWYU pragma: keep
 #include "chemfiles/external/optional.hpp"
 
@@ -85,10 +86,10 @@ private:
     std::vector<Frame> frames_;
 };
 
-template<> FormatInfo format_information<Molfile<DCD>>();
-template<> FormatInfo format_information<Molfile<TRJ>>();
-template<> FormatInfo format_information<Molfile<LAMMPS>>();
-template<> FormatInfo format_information<Molfile<MOLDEN>>();
+template<> const FormatMetadata& format_metadata<Molfile<DCD>>();
+template<> const FormatMetadata& format_metadata<Molfile<TRJ>>();
+template<> const FormatMetadata& format_metadata<Molfile<LAMMPS>>();
+template<> const FormatMetadata& format_metadata<Molfile<MOLDEN>>();
 
 } // namespace chemfiles
 

@@ -9,6 +9,8 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
+
 #include "chemfiles/files/NcFile.hpp"
 
 namespace chemfiles {
@@ -52,7 +54,7 @@ private:
     bool validated_;
 };
 
-template<> FormatInfo format_information<AmberNetCDFFormat>();
+template<> const FormatMetadata& format_metadata<AmberNetCDFFormat>();
 
 } // namespace chemfiles
 

@@ -17,6 +17,7 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 
 namespace chemfiles {
 class Frame;
@@ -24,7 +25,7 @@ class MemoryBuffer;
 
 /// [CIF][CIF] (Crystallographic Information Framework) files reader and writer.
 ///
-/// The reader code is based on the [gemmi](https://project-gemmi.github.io/) 
+/// The reader code is based on the [gemmi](https://project-gemmi.github.io/)
 /// project.
 ///
 /// [CIF]: https://en.wikipedia.org/wiki/Crystallographic_Information_File
@@ -55,7 +56,7 @@ private:
     size_t current_step_;
 };
 
-template<> FormatInfo format_information<CIFFormat>();
+template<> const FormatMetadata& format_metadata<CIFFormat>();
 
 } // namespace chemfiles
 

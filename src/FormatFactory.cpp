@@ -48,10 +48,10 @@ namespace chemfiles {
 }
 using namespace chemfiles;
 
-static unsigned edit_distance(const std::string& first, const std::string& second);
-static std::string suggest_names(const std::vector<RegisteredFormat>& formats, const std::string& name);
-static size_t find_by_name(const std::vector<RegisteredFormat>& formats, const std::string& name);
-static size_t find_by_extension(const std::vector<RegisteredFormat>& formats, const std::string& extension);
+static unsigned edit_distance(string_view first, string_view second);
+static std::string suggest_names(const std::vector<RegisteredFormat>& formats, string_view name);
+static size_t find_by_name(const std::vector<RegisteredFormat>& formats, string_view name);
+static size_t find_by_extension(const std::vector<RegisteredFormat>& formats, string_view extension);
 
 FormatFactory::FormatFactory() {
     this->add_format<XYZFormat>();
@@ -86,41 +86,35 @@ FormatFactory& FormatFactory::get() {
     return instance_;
 }
 
-void FormatFactory::register_format(FormatInfo info, format_creator_t creator, memory_stream_t memory_stream) {
+void FormatFactory::register_format(const FormatMetadata& metadata, format_creator_t creator, memory_stream_t memory_stream) {
     auto guard = formats_.lock();
     auto& formats = *guard;
 
-    if (info.name().empty()) {
-        throw format_error(
-            "can not register a format with no name"
-        );
-    }
-
-    auto idx = find_by_name(formats, info.name());
+    auto idx = find_by_name(formats, metadata.name);
     if (idx != SENTINEL_INDEX) {
         throw format_error(
-            "there is already a format associated with the name '{}'", info.name()
+            "there is already a format associated with the name '{}'", metadata.name
         );
     }
 
-    if (!info.extension().empty()) {
-        idx = find_by_extension(formats, info.extension());
+    if (metadata.extension) {
+        idx = find_by_extension(formats, metadata.extension.value());
         if (idx != SENTINEL_INDEX) {
             throw format_error(
                 "the extension '{}' is already associated with format '{}'",
-                info.extension(), formats[idx].info.name()
+                metadata.extension.value(), formats[idx].metadata.name
             );
         }
     }
 
     // actually register the format
-    formats.push_back({info, creator, memory_stream});
+    formats.push_back({metadata, creator, memory_stream});
 }
 
-void FormatFactory::register_format(FormatInfo info, format_creator_t creator) {
-    register_format(info, creator,
-        [info](std::shared_ptr<MemoryBuffer>, File::Mode, File::Compression) -> std::unique_ptr<Format> {
-            throw format_error("in-memory IO is not supported for the '{}' format", info.name());
+void FormatFactory::register_format(const FormatMetadata& metadata, format_creator_t creator) {
+    register_format(metadata, creator,
+        [&metadata](std::shared_ptr<MemoryBuffer>, File::Mode, File::Compression) -> std::unique_ptr<Format> {
+            throw format_error("in-memory IO is not supported for the '{}' format", metadata.name);
         }
     );
 }
@@ -163,18 +157,8 @@ format_creator_t FormatFactory::extension(const std::string& extension) {
     return formats.at(idx).creator;
 }
 
-std::vector<FormatInfo> FormatFactory::formats() {
-    auto formats = formats_.lock();
-    auto metadata = std::vector<FormatInfo>();
-    metadata.reserve(formats->size());
-    for (auto& format: *formats) {
-        metadata.emplace_back(format.info);
-    }
-    return metadata;
-}
-
 // Compute the edit distance between two strings using Wagner–Fischer algorithm
-unsigned edit_distance(const std::string& first, const std::string& second) {
+unsigned edit_distance(string_view first, string_view second) {
     auto m = first.length() + 1;
     auto n = second.length() + 1;
 
@@ -205,11 +189,11 @@ unsigned edit_distance(const std::string& first, const std::string& second) {
    return distances[m - 1][n - 1];
 }
 
-std::string suggest_names(const std::vector<RegisteredFormat>& formats, const std::string& name) {
+std::string suggest_names(const std::vector<RegisteredFormat>& formats, string_view name) {
     auto suggestions = std::vector<std::string>();
     for (auto& other : formats) {
-        if (edit_distance(name, other.info.name()) < 4) {
-            suggestions.push_back(other.info.name());
+        if (edit_distance(name, other.metadata.name) < 4) {
+            suggestions.push_back(other.metadata.name);
         }
     }
 
@@ -232,18 +216,19 @@ std::string suggest_names(const std::vector<RegisteredFormat>& formats, const st
     return message.str();
 }
 
-size_t find_by_name(const std::vector<RegisteredFormat>& formats, const std::string& name) {
+size_t find_by_name(const std::vector<RegisteredFormat>& formats, string_view name) {
     for (size_t i=0; i<formats.size(); i++) {
-        if (formats[i].info.name() == name) {
+        if (formats[i].metadata.name == name) {
             return i;
         }
     }
     return SENTINEL_INDEX;
 }
 
-size_t find_by_extension(const std::vector<RegisteredFormat>& formats, const std::string& extension) {
+size_t find_by_extension(const std::vector<RegisteredFormat>& formats, string_view extension) {
     for (size_t i=0; i<formats.size(); i++) {
-        if (formats[i].info.extension() == extension) {
+        auto& format_extension = formats[i].metadata.extension;
+        if (format_extension && *format_extension == extension) {
             return i;
         }
     }

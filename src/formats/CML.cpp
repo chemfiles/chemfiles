@@ -34,10 +34,12 @@
 
 using namespace chemfiles;
 
-template<> FormatInfo chemfiles::format_information<CMLFormat>() {
-    return FormatInfo("CML").with_extension(".cml").description(
-        "Chemical Markup Language"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<CMLFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "CML";
+    metadata.extension = ".cml";
+    metadata.description = "Chemical Markup Language";
+    return metadata;
 }
 
 class xml_writer final: public pugi::xml_writer {

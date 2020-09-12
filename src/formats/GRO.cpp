@@ -29,10 +29,12 @@
 
 using namespace chemfiles;
 
-template<> FormatInfo chemfiles::format_information<GROFormat>() {
-    return FormatInfo("GRO").with_extension(".gro").description(
-        "GROMACS GRO text format"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<GROFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "GRO";
+    metadata.extension = ".gro";
+    metadata.description = "GROMACS GRO text format";
+    return metadata;
 }
 
 using chemfiles::private_details::is_upper_triangular;

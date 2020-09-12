@@ -11,6 +11,7 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
@@ -44,7 +45,7 @@ private:
     std::unordered_map<int64_t, Residue> residues_;
 };
 
-template<> FormatInfo format_information<MOL2Format>();
+template<> const FormatMetadata& format_metadata<MOL2Format>();
 
 } // namespace chemfiles
 

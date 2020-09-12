@@ -10,6 +10,8 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
+
 #include "chemfiles/files/TNGFile.hpp"
 
 namespace chemfiles {
@@ -47,7 +49,7 @@ private:
     int64_t natoms_ = 0;
 };
 
-template<> FormatInfo format_information<TNGFormat>();
+template<> const FormatMetadata& format_metadata<TNGFormat>();
 
 } // namespace chemfiles
 

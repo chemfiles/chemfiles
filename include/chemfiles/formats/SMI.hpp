@@ -14,6 +14,8 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
+
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/Connectivity.hpp"
 
@@ -88,7 +90,7 @@ private:
     std::unordered_map<size_t, size_t> ring_atoms_;
 };
 
-template<> FormatInfo format_information<SMIFormat>();
+template<> const FormatMetadata& format_metadata<SMIFormat>();
 
 } // namespace chemfiles
 

@@ -38,10 +38,12 @@
 
 using namespace chemfiles;
 
-template<> FormatInfo chemfiles::format_information<CIFFormat>() {
-    return FormatInfo("CIF").with_extension(".cif").description(
-        "CIF (Crystallographic Information Framework)"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<CIFFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "CIF";
+    metadata.extension = ".cif";
+    metadata.description = "Crystallographic Information Framework files";
+    return metadata;
 }
 
 void CIFFormat::init_() {

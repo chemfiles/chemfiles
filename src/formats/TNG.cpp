@@ -30,10 +30,12 @@
 
 using namespace chemfiles;
 
-template<> FormatInfo chemfiles::format_information<TNGFormat>() {
-    return FormatInfo("TNG").with_extension(".tng").description(
-        "Trajectory New Generation binary format"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<TNGFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "TNG";
+    metadata.extension = ".tng";
+    metadata.description = "Trajectory New Generation binary format";
+    return metadata;
 }
 
 /// A buffer for TNG allocated data. It will not allocate its own memory, but

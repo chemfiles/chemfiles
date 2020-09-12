@@ -327,26 +327,34 @@ template class chemfiles::Molfile<TRJ>;
 template class chemfiles::Molfile<LAMMPS>;
 template class chemfiles::Molfile<MOLDEN>;
 
-template<> FormatInfo chemfiles::format_information<Molfile<DCD>>() {
-    return FormatInfo("DCD").with_extension(".dcd").description(
-        "DCD binary format"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<Molfile<DCD>>() {
+    static FormatMetadata metadata;
+    metadata.name = "DCD";
+    metadata.extension = ".dcd";
+    metadata.description = "DCD binary format";
+    return metadata;
 }
 
-template<> FormatInfo chemfiles::format_information<Molfile<TRJ>>() {
-    return FormatInfo("TRJ").with_extension(".trj").description(
-        "GROMACS .trj binary format"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<Molfile<TRJ>>() {
+    static FormatMetadata metadata;
+    metadata.name = "TRJ";
+    metadata.extension = ".trj";
+    metadata.description = "GROMACS .trj binary format";
+    return metadata;
 }
 
-template<> FormatInfo chemfiles::format_information<Molfile<LAMMPS>>() {
-    return FormatInfo("LAMMPS").with_extension(".lammpstrj").description(
-        "LAMMPS text trajectory format"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<Molfile<LAMMPS>>() {
+    static FormatMetadata metadata;
+    metadata.name = "LAMMPS";
+    metadata.extension = ".lammpstrj";
+    metadata.description = "LAMMPS text trajectory format";
+    return metadata;
 }
 
-template<> FormatInfo chemfiles::format_information<Molfile<MOLDEN>>() {
-    return FormatInfo("Molden").with_extension(".molden").description(
-        "Molden text format"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<Molfile<MOLDEN>>() {
+    static FormatMetadata metadata;
+    metadata.name = "Molden";
+    metadata.extension = ".molden";
+    metadata.description = "Molden text format";
+    return metadata;
 }

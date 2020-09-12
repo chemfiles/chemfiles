@@ -48,10 +48,12 @@ static std::vector<size_t> guess_molecules(const Frame& frame);
 /// and matrix[i][i] / 2.
 static double tilt_factor(const Matrix3D& matrix, size_t i, size_t j);
 
-template<> FormatInfo chemfiles::format_information<LAMMPSDataFormat>() {
-    return FormatInfo("LAMMPS Data").description(
-        "LAMMPS text input data file"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<LAMMPSDataFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "LAMMPS Data";
+    metadata.extension = nullopt;
+    metadata.description = "LAMMPS input data file";
+    return metadata;
 }
 
 atom_style::atom_style(std::string name): name_(std::move(name)) {

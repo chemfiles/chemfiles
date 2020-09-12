@@ -13,6 +13,10 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
+
+#include "chemfiles/UnitCell.hpp"
+#include "chemfiles/external/span.hpp"
 
 namespace chemfiles {
 class Frame;
@@ -87,7 +91,7 @@ private:
     /// Current atom being read. Ranges from [0, structure.numAtoms)
     size_t atomIndex_ = 0;
 
-    /// Location of the inter-residue bonds being read. 
+    /// Location of the inter-residue bonds being read.
     size_t interBondIndex_ = 0;
 
     /// Number of atoms before the current model.
@@ -106,7 +110,7 @@ private:
     UnitCell unitcellForWrite_;
 };
 
-template<> FormatInfo format_information<MMTFFormat>();
+template<> const FormatMetadata& format_metadata<MMTFFormat>();
 
 } // namespace chemfiles
 

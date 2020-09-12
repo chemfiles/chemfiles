@@ -29,8 +29,12 @@
 
 using namespace chemfiles;
 
-template <> FormatInfo chemfiles::format_information<TRRFormat>() {
-    return FormatInfo("TRR").with_extension(".trr").description("TRR binary format");
+template<> const FormatMetadata& chemfiles::format_metadata<TRRFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "TRR";
+    metadata.extension = ".trr";
+    metadata.description = "TRR binary format";
+    return metadata;
 }
 
 #define STRING_0(x) #x

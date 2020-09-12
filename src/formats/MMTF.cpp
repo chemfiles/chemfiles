@@ -42,10 +42,12 @@ static int8_t bond_order_to_mmtf(Bond::BondOrder order);
 static Bond::BondOrder bond_order_to_chemfiles(int32_t order);
 static void set_secondary(Residue& residue, int32_t code);
 
-template<> FormatInfo chemfiles::format_information<MMTFFormat>() {
-    return FormatInfo("MMTF").with_extension(".mmtf").description(
-        "MMTF (RCSB Protein Data Bank) binary format"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<MMTFFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "MMTF";
+    metadata.extension = ".mmtf";
+    metadata.description = "MMTF (RCSB Protein Data Bank) binary format";
+    return metadata;
 }
 
 MMTFFormat::MMTFFormat(std::string path, File::Mode mode, File::Compression compression) {

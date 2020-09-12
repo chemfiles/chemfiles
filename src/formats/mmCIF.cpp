@@ -34,10 +34,12 @@
 
 using namespace chemfiles;
 
-template<> FormatInfo chemfiles::format_information<mmCIFFormat>() {
-    return FormatInfo("mmCIF").with_extension(".mmcif").description(
-        "mmCIF (Crystallographic Information Framework) for MacroMolecules"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<mmCIFFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "mmCIF";
+    metadata.extension = ".mmcif";
+    metadata.description = "Crystallographic Information Framework files for MacroMolecules";
+    return metadata;
 }
 
 /// CIF files store which digits are insignificant, we need to remove this

@@ -23,10 +23,12 @@
 
 using namespace chemfiles;
 
-template<> FormatInfo chemfiles::format_information<AmberNetCDFFormat>() {
-    return FormatInfo("Amber NetCDF").with_extension(".nc").description(
-        "Amber convention for binary NetCDF molecular trajectories"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<AmberNetCDFFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "Amber NetCDF";
+    metadata.extension = ".nc";
+    metadata.description = "Amber convention for binary NetCDF molecular trajectories";
+    return metadata;
 }
 
 //! Check the validity of a NetCDF file

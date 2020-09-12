@@ -36,10 +36,12 @@
 
 using namespace chemfiles;
 
-template<> FormatInfo chemfiles::format_information<PDBFormat>() {
-    return FormatInfo("PDB").with_extension(".pdb").description(
-        "PDB (RCSB Protein Data Bank) text format"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<PDBFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "PDB";
+    metadata.extension = ".pdb";
+    metadata.description = "PDB (RCSB Protein Data Bank) text format";
+    return metadata;
 }
 
 bool chemfiles::operator==(const FullResidueId& lhs, const FullResidueId& rhs) {

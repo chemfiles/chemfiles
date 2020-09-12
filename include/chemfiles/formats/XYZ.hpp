@@ -10,6 +10,8 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
+
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
@@ -37,7 +39,7 @@ private:
     size_t current_forward_step_ = 0;
 };
 
-template<> FormatInfo format_information<XYZFormat>();
+template<> const FormatMetadata& format_metadata<XYZFormat>();
 
 } // namespace chemfiles
 

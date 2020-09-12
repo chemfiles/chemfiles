@@ -10,6 +10,7 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
@@ -30,7 +31,7 @@ public:
     optional<uint64_t> forward() override;
 };
 
-template<> FormatInfo format_information<CSSRFormat>();
+template<> const FormatMetadata& format_metadata<CSSRFormat>();
 
 } // namespace chemfiles
 

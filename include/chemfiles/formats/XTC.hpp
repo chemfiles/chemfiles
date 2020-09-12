@@ -8,6 +8,8 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
+
 #include "chemfiles/files/XDRFile.hpp"
 
 namespace chemfiles {
@@ -32,7 +34,7 @@ class XTCFormat final : public Format {
     size_t step_ = 0;
 };
 
-template <> FormatInfo format_information<XTCFormat>();
+template<> const FormatMetadata& format_metadata<XTCFormat>();
 
 } // namespace chemfiles
 
