@@ -31,10 +31,12 @@
 #include "chemfiles/formats/MOL2.hpp"
 
 using namespace chemfiles;
-template<> FormatInfo chemfiles::format_information<MOL2Format>() {
-    return FormatInfo("MOL2").with_extension(".mol2").description(
-        "Tripos mol2 text format"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<MOL2Format>() {
+    static FormatMetadata metadata;
+    metadata.name = "MOL2";
+    metadata.extension = ".mol2";
+    metadata.description = "Tripos mol2 text format";
+    return metadata;
 }
 
 /// Fast-forward the file until the tag is found.

@@ -15,6 +15,7 @@
 #include "chemfiles/mutex.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 
 namespace chemfiles {
 class MemoryBuffer;
@@ -23,7 +24,7 @@ using format_creator_t = std::function<std::unique_ptr<Format>(std::string path,
 using memory_stream_t = std::function<std::unique_ptr<Format>(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression)>;
 
 struct RegisteredFormat {
-    FormatInfo info;
+    const FormatMetadata& metadata;
     format_creator_t creator;
     memory_stream_t memory_stream_creator;
 };
@@ -62,13 +63,14 @@ public:
     /// Register a given `Format` in the factory if it supports memory IO
     ///
     /// The format informations are taken from the specialization of the
-    /// template function `chemfiles::format_information` for this format. The
+    /// template function `chemfiles::format_metadata` for this format. The
     /// second template argument is used to determine if the `Format` supports
     /// memory IO.
     template<class Format, enable_if_t<SupportsMemoryIO<Format>::value, int> = 0>
     void add_format() {
-        auto info = format_information<Format>();
-        register_format(info,
+        const auto& metadata = format_metadata<Format>();
+        metadata.validate();
+        register_format(metadata,
             [](const std::string& path, File::Mode mode, File::Compression compression) {
                 return chemfiles::make_unique<Format>(path, mode, compression);
             },
@@ -81,25 +83,23 @@ public:
     /// Register a given `Format` in the factory if it does not support memory IO
     ///
     /// The format informations are taken from the specialization of the
-    /// template function `chemfiles::format_information` for this format. The
+    /// template function `chemfiles::format_metadata` for this format. The
     /// second template argument is used to determine if the `Format` supports
     /// memory IO.
     template<class Format, enable_if_t<!SupportsMemoryIO<Format>::value, int> = 0>
     void add_format() {
-        auto info = format_information<Format>();
-        register_format(info,
+        const auto& metadata = format_metadata<Format>();
+        metadata.validate();
+        register_format(metadata,
             [](const std::string& path, File::Mode mode, File::Compression compression) {
                 return chemfiles::make_unique<Format>(path, mode, compression);
             }
         );
     }
 
-    /// Get the metadata for all registered formats
-    std::vector<FormatInfo> formats();
-
 private:
-    void register_format(FormatInfo info, format_creator_t creator, memory_stream_t memory_reader);
-    void register_format(FormatInfo info, format_creator_t creator);
+    void register_format(const FormatMetadata& metadata, format_creator_t creator, memory_stream_t memory_reader);
+    void register_format(const FormatMetadata& metadata, format_creator_t creator);
 
     /// Trajectory map associating format descriptions and creators
     mutex<std::vector<RegisteredFormat>> formats_;

@@ -12,6 +12,7 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 
 namespace chemfiles {
 class Frame;
@@ -67,7 +68,7 @@ private:
     std::unordered_map<std::string, size_t> ref_to_id_;
 };
 
-template<> FormatInfo format_information<CMLFormat>();
+template<> const FormatMetadata& format_metadata<CMLFormat>();
 
 } // namespace chemfiles
 

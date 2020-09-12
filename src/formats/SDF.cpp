@@ -29,10 +29,12 @@
 
 using namespace chemfiles;
 
-template<> FormatInfo chemfiles::format_information<SDFFormat>() {
-    return FormatInfo("SDF").with_extension(".sdf").description(
-        "Structural Data File format"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<SDFFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "SDF";
+    metadata.extension = ".sdf";
+    metadata.description = "Structural Data File format";
+    return metadata;
 }
 
 void SDFFormat::read_next(Frame& frame) {

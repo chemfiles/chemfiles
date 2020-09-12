@@ -8,6 +8,8 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
+
 #include "chemfiles/files/XDRFile.hpp"
 
 using matrix = float[3][3];
@@ -34,7 +36,7 @@ class TRRFormat final : public Format {
     size_t step_ = 0;
 };
 
-template <> FormatInfo format_information<TRRFormat>();
+template<> const FormatMetadata& format_metadata<TRRFormat>();
 
 } // namespace chemfiles
 

@@ -12,6 +12,8 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
+
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
@@ -37,8 +39,8 @@ bool operator<(const FullResidueId& lhs, const FullResidueId& rhs);
 
 /// [PDB][PDB] file format reader and writer.
 ///
-/// For multi-frame trajectories, we support both the convention from VMD to 
-/// use multiple `END` records separating the steps; or the use of multiple 
+/// For multi-frame trajectories, we support both the convention from VMD to
+/// use multiple `END` records separating the steps; or the use of multiple
 /// `MODEL`/`ENDMODEL` pairs.
 ///
 /// [PDB]: ftp://ftp.wwpdb.org/pub/pdb/doc/format_descriptions/Format_v33_A4.pdf
@@ -98,7 +100,7 @@ private:
     optional<std::pair<FullResidueId, std::string>> current_secinfo_;
 };
 
-template<> FormatInfo format_information<PDBFormat>();
+template<> const FormatMetadata& format_metadata<PDBFormat>();
 
 } // namespace chemfiles
 

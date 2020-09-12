@@ -14,6 +14,8 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
+
 #include "chemfiles/Topology.hpp"  // IWYU pragma: keep
 #include "chemfiles/sorted_set.hpp"
 #include "chemfiles/string_view.hpp"
@@ -225,7 +227,7 @@ private:
     std::vector<std::string> names_;
 };
 
-template<> FormatInfo format_information<LAMMPSDataFormat>();
+template<> const FormatMetadata& format_metadata<LAMMPSDataFormat>();
 
 } // namespace chemfiles
 

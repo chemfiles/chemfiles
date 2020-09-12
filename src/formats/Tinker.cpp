@@ -28,10 +28,12 @@
 
 using namespace chemfiles;
 
-template<> FormatInfo chemfiles::format_information<TinkerFormat>() {
-    return FormatInfo("Tinker").with_extension(".arc").description(
-        "Tinker XYZ text format"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<TinkerFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "Tinker";
+    metadata.extension = ".arc";
+    metadata.description = "Tinker XYZ text format";
+    return metadata;
 }
 
 static bool is_unit_cell_line(string_view line);

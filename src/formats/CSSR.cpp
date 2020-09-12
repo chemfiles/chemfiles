@@ -36,10 +36,12 @@ static bool is_digit(char c) {
 }
 
 
-template<> FormatInfo chemfiles::format_information<CSSRFormat>() {
-    return FormatInfo("CSSR").with_extension(".cssr").description(
-        "CSSR text format"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<CSSRFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "CSSR";
+    metadata.extension = ".cssr";
+    metadata.description = "CSSR text format";
+    return metadata;
 }
 
 

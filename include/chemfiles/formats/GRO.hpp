@@ -11,6 +11,8 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
+
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/external/optional.hpp"
 
@@ -38,7 +40,7 @@ private:
     std::map<int64_t, Residue> residues_;
 };
 
-template<> FormatInfo format_information<GROFormat>();
+template<> const FormatMetadata& format_metadata<GROFormat>();
 
 } // namespace chemfiles
 

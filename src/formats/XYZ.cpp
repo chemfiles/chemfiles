@@ -47,10 +47,12 @@ static void read_atomic_properties(const properties_list_t& properties, string_v
 /// Generate the extended XYZ comment line for the given frame
 static std::string write_extended_comment_line(const Frame& frame);
 
-template<> FormatInfo chemfiles::format_information<XYZFormat>() {
-    return FormatInfo("XYZ").with_extension(".xyz").description(
-        "XYZ text format"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<XYZFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "XYZ";
+    metadata.extension = ".xyz";
+    metadata.description = "XYZ text format";
+    return metadata;
 }
 
 void XYZFormat::read_next(Frame& frame) {

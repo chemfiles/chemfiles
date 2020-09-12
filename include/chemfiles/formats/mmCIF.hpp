@@ -12,6 +12,8 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
+
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/UnitCell.hpp"
 
@@ -19,7 +21,7 @@ namespace chemfiles {
 class Frame;
 class MemoryBuffer;
 
-/// [mmCIF] Crystallographic Information Framework for MacroMolecules 
+/// [mmCIF] Crystallographic Information Framework for MacroMolecules
 /// reader and writer.
 ///
 /// [mmCIF]: http://mmcif.wwpdb.org/
@@ -65,7 +67,7 @@ private:
     std::string pdb_idcode_;
 };
 
-template<> FormatInfo format_information<mmCIFFormat>();
+template<> const FormatMetadata& format_metadata<mmCIFFormat>();
 
 } // namespace chemfiles
 

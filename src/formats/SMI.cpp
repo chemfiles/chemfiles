@@ -37,10 +37,12 @@
 
 using namespace chemfiles;
 
-template<> FormatInfo chemfiles::format_information<SMIFormat>() {
-    return FormatInfo("SMI").with_extension(".smi").description(
-        "SMI text format"
-    );
+template<> const FormatMetadata& chemfiles::format_metadata<SMIFormat>() {
+    static FormatMetadata metadata;
+    metadata.name = "SMI";
+    metadata.extension = ".smi";
+    metadata.description = "SMI text format";
+    return metadata;
 }
 
 /// See if all values in array are true
