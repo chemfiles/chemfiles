@@ -7,15 +7,15 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-if ("${DOXYGEN_VERSION}" VERSION_LESS 1.8.16)
+if ("${DOXYGEN_VERSION}" VERSION_LESS 1.8.20)
     message(WARNING
         "Your version of doxygen is too old (${DOXYGEN_VERSION}).\n"
-        "Please upgrade to doxygen >= 1.8.16 for optimal output"
+        "Please upgrade to doxygen >= 1.8.20 for optimal output"
     )
 endif()
 
 configure_file(
-    ${PROJECT_SOURCE_DIR}/Doxyfile.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
     ${PROJECT_BINARY_DIR}/Doxyfile
     @ONLY
 )
