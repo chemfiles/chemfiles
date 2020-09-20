@@ -22,6 +22,9 @@ export PATH=$(echo ":$PATH:" | sed "s|:/opt/pyenv/shims:|:|g;s|^:\(.*\):\$|\1|")
 
 if [[ "$DO_COVERAGE" == "ON" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_C_FLAGS=\"--coverage\" -DCMAKE_CXX_FLAGS=\"--coverage\""
+fi
+
+if [[ "$DO_COVERAGE" == "ON" || "$DEPLOY_DOCS" == "ON" ]]; then
     curl https://bootstrap.pypa.io/get-pip.py > get-pip.py
     python3.6 get-pip.py --user
     python3.6 -m pip install --user codecov

@@ -35,14 +35,26 @@ linux32_addons:
 matrix:
   fast_finish: true
   include:
+    - name: documentation
+      os: linux
+      env: DEPLOY_DOCS=ON
+      dist: xenial
+      addons:
+        apt:
+          sources:
+            - deadsnakes
+          packages:
+            - python3.6
+            - patchelf
+      script: ./scripts/ci/build-docs.sh
     - name: emscripten
       os: linux
       env: STATIC_LIBS=ON EMSCRIPTEN=ON ALTERNATIVE_CMAKE=3.9.3-Linux-x86_64
       dist: xenial
-    - name: static + doc + coverage
+    - name: static + coverage
       os: linux
       compiler: gcc
-      env: STATIC_LIBS=ON DO_COVERAGE=ON DEPLOY_DOCS=ON
+      env: STATIC_LIBS=ON DO_COVERAGE=ON
       addons: *linux64
     - name: clang + non-standard external libs
       os: linux
@@ -113,11 +125,6 @@ script:
   - |
     if [[ "${CHECK_EXPORTS}" == "ON" ]]; then
         ./scripts/ci/check-exported-symbols.py build/libchemfiles.so
-    fi
-  # Build docs
-  - |
-    if [[ "${DEPLOY_DOCS}" == "ON" ]]; then
-        ./scripts/ci/build-docs.sh
     fi
   # Generate and upload coverage
   - |
