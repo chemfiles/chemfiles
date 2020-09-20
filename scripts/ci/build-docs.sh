@@ -9,11 +9,16 @@ python3.6 -m pip install --user --upgrade -r doc/requirements.txt
 DOXYGEN_VER=1.8.20
 DOXYGEN_URL="https://linuxbrew.bintray.com/bottles/doxygen-${DOXYGEN_VER}.x86_64_linux.bottle.tar.gz"
 wget -O - "${DOXYGEN_URL}" | tar xz -C /tmp doxygen/${DOXYGEN_VER}/bin/doxygen
-export PATH="/tmp/doxygen/${DOXYGEN_VER}/bin:$PATH"
+
+# Explicitly use /lib64/ld-linux-x86-64.so.2 because bash do not do it
+# by itself and fails with "No such file or directory" error. The doxygen
+# binary requires @@HOMEBREW_PREFIX@@/lib/ld.so, which does not exists
+sudo patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 /tmp/doxygen/${DOXYGEN_VER}/bin/doxygen
+export PATH=/tmp/doxygen/${DOXYGEN_VER}/bin:$PATH
 
 doxygen --version
 
-cd build
+mkdir build && cd build
 
 # Get previous documentation
 git clone https://github.com/$TRAVIS_REPO_SLUG --branch gh-pages gh-pages
@@ -21,7 +26,7 @@ rm -rf gh-pages/.git
 rm -rf gh-pages/deployed*
 
 # Build new documentation
-cmake -DCHFL_BUILD_DOCUMENTATION=ON .
+cmake -DCHFL_BUILD_DOCUMENTATION=ON ..
 cmake --build . --target doc_html
 rm -rf doc/html/.doctrees/ doc/html/.buildinfo
 rm -rf doc/html/_static/bootswatch-2.3.2/ doc/html/_static/bootstrap-2.3.2/
