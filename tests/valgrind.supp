@@ -15,9 +15,33 @@
 }
 
 {
+   Objc runtime
+   Memcheck:Cond
+   ...
+   fun:__objc_personality_v0
+   ...
+}
+
+{
    macOS stuff
    Memcheck:Leak
    ...
    fun:libSystem_initializer
    ...
+}
+
+{
+    macOS stuff
+    Memcheck:Cond
+    ...
+    fun:_libxpc_initializer
+    ...
+}
+
+{
+    macOS stuff
+    Memcheck:Value8
+    ...
+    fun:_libxpc_initializer
+    ...
 }
