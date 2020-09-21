@@ -15,6 +15,11 @@ distributions using the `OpenSUSE build service`_.
         width="100%" height="400px" frameborder="0"
     ></iframe>
 
+Binaries follow the usual linux naming scheme: 
+`chemfiles` package only contains the shared library
+`chemfiles-static` contains the static library
+`chemfiles-dev` (Debian & friends) / `chemfiles-devel` (CentOS & friends) contains the headers
+
 We also provide three `conda`_ packages in the `conda-forge` community channel for
 Linux and Os X.
 
