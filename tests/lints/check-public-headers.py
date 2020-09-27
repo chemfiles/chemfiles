@@ -42,6 +42,7 @@ WHITELIST = [
     "chemfiles/Trajectory.hpp",
     "chemfiles/Selection.hpp",
     "chemfiles/Connectivity.hpp",
+    "chemfiles/FormatMetadata.hpp",
     # chemfiles capi headers
     "chemfiles/capi/atom.h",
     "chemfiles/capi/selection.h",

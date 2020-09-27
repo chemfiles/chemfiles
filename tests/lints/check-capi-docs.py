@@ -33,8 +33,12 @@ def documented_functions():
 
 
 def functions_in_outline():
-    functions = ["chfl_last_error", "chfl_clear_errors", "chfl_version"]
+    MISC_FUNCTIONS = [
+        "chfl_last_error", "chfl_clear_errors", "chfl_version",
+        "chfl_formats_list",
+    ]
     DOCS = os.path.join(ROOT, "doc", "src", "capi")
+    functions = MISC_FUNCTIONS
     for (root, _, paths) in os.walk(DOCS):
         for path in paths:
             with codecs.open(os.path.join(root, path), encoding="utf8") as fd:

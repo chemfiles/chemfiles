@@ -17,12 +17,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added read and write support for CIF format.
 * Changed the UnitCell representation to the full cell matrix instead of
   a/b/c/alpha/beta/gamma
+* Added `chemfiles::formats_list` function to get a list of formats
+  and associated metadata.
 
 ### Changes to the C API
 
 * Added missing `chfl_frame_clear_bonds` and `chfl_topology_clear_bonds`.
 * Added `chfl_cell_from_matrix` and changed parameters to `chfl_cell`, removed
   `chfl_cell_triclinic`.
+* Added `chfl_formats_list` function to get a list of formats and
+  associated metadata.
 
 ### Changes in supported formats
 

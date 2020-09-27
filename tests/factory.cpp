@@ -167,6 +167,8 @@ TEST_CASE("Format names suggestions") {
     } catch (const FormatError& e) {
         CHECK(std::string(e.what()) == "can not find a format named 'Dully', did you mean 'Dummy' or 'Dunny'?");
     }
+
+    CHECK(FormatFactory::get().formats().back().get().name == std::string("Dunny"));
 }
 
 TEST_CASE("Bad format info") {

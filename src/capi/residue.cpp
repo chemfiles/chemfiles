@@ -6,9 +6,11 @@
 #include <string>
 
 #include "chemfiles/capi/types.h"
-#include "chemfiles/capi/residue.h"
+#include "chemfiles/capi/misc.h"
 #include "chemfiles/capi/utils.hpp"
 #include "chemfiles/capi/shared_allocator.hpp"
+
+#include "chemfiles/capi/residue.h"
 
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/Property.hpp"

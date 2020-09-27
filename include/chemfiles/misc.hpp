@@ -5,8 +5,11 @@
 #define CHEMFILES_MISC_HPP
 
 #include <string>
+#include <vector>
 #include <functional>
+
 #include "chemfiles/exports.h"
+#include "chemfiles/FormatMetadata.hpp"
 
 // A few exported function that can not be in the same header as the main
 // functionality; because the rest of the functionality is not exported.
@@ -42,6 +45,11 @@ void CHFL_EXPORT set_warning_callback(warning_callback_t callback);
 /// @throws ConfigurationError if the file at `path` can not be read, or if it
 ///                            is invalid.
 void CHFL_EXPORT add_configuration(const std::string& path);
+
+/// Get the list of formats chemfiles knows about, and all associated metadata
+///
+/// @example{formats_list.cpp}
+std::vector<std::reference_wrapper<const FormatMetadata>> CHFL_EXPORT formats_list();
 
 } // namespace chemfiles
 

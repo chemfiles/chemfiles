@@ -5,9 +5,11 @@
 #include <algorithm>
 
 #include "chemfiles/capi/types.h"
-#include "chemfiles/capi/cell.h"
+#include "chemfiles/capi/misc.h"
 #include "chemfiles/capi/utils.hpp"
 #include "chemfiles/capi/shared_allocator.hpp"
+
+#include "chemfiles/capi/cell.h"
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/UnitCell.hpp"

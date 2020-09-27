@@ -11,6 +11,7 @@
 #include <fmt/ostream.h>
 
 #include "chemfiles/config.h"
+#include "chemfiles/misc.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 #include "chemfiles/FormatFactory.hpp"
@@ -157,6 +158,16 @@ format_creator_t FormatFactory::extension(const std::string& extension) {
     return formats.at(idx).creator;
 }
 
+std::vector<std::reference_wrapper<const FormatMetadata>> FormatFactory::formats() {
+    auto formats = formats_.lock();
+    auto metadata = std::vector<std::reference_wrapper<const FormatMetadata>>();
+    metadata.reserve(formats->size());
+    for (auto& format: *formats) {
+        metadata.emplace_back(format.metadata);
+    }
+    return metadata;
+}
+
 // Compute the edit distance between two strings using Wagner–Fischer algorithm
 unsigned edit_distance(string_view first, string_view second) {
     auto m = first.length() + 1;
@@ -233,4 +244,8 @@ size_t find_by_extension(const std::vector<RegisteredFormat>& formats, string_vi
         }
     }
     return SENTINEL_INDEX;
+}
+
+std::vector<std::reference_wrapper<const FormatMetadata>> chemfiles::formats_list() {
+    return FormatFactory::get().formats();
 }

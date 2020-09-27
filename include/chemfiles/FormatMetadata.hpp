@@ -13,7 +13,7 @@
 namespace chemfiles {
 
 /// Metadata associated with a format.
-struct CHFL_EXPORT FormatMetadata {
+class CHFL_EXPORT FormatMetadata {
 public:
     FormatMetadata(): name(""), extension(nullopt), description("") {}
     ~FormatMetadata() = default;
@@ -41,7 +41,7 @@ public:
     /// User facing format description
     const char* description;
 
-    /// Validate the format metadata
+    // Validate the format metadata
     void validate() const;
 };
 

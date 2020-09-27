@@ -14,6 +14,14 @@ chemfiles types); all the functions return a status code from the
 
 .. doxygenfunction:: chfl_clear_errors
 
+Format list and Metadata
+------------------------
+
+.. doxygenfunction:: chfl_formats_list
+
+.. doxygenstruct:: chfl_format_metadata
+    :members:
+
 Warnings
 --------
 

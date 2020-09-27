@@ -1,8 +1,10 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#ifndef CHEMFILES_CHFL_LOGGING_H
-#define CHEMFILES_CHFL_LOGGING_H
+#ifndef CHEMFILES_CHFL_MISC_H
+#define CHEMFILES_CHFL_MISC_H
+
+#include <stdint.h>
 
 #include "chemfiles/capi/types.h"
 #include "chemfiles/exports.h"
@@ -54,6 +56,28 @@ CHFL_EXPORT chfl_status chfl_set_warning_callback(chfl_warning_callback callback
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_add_configuration(const char* path);
+
+/// Get the list of formats known by chemfiles, as well as all associated
+/// metadata.
+///
+/// This function allocate memory for all known formats, and set `metadata` to
+/// this new array. Users of this function are responsible with cleaning up
+/// this memory using the standard library `free`. The number of known formats
+/// (and thus the size of the metadata array) is set in `count`.
+///
+/// @example{capi/chfl_formats_list.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_formats_list(chfl_format_metadata** metadata, uint64_t* count);
+
+/// Free the memory associated with a chemfiles object.
+///
+/// This function is NOT equivalent to the standard C function `free`, as memory
+/// is acquired and released for all chemfiles objects using a references
+/// counter to allow direct modification of C++ objects.
+///
+/// @example{capi/chfl_free.c}
+CHFL_EXPORT void chfl_free(const void* object);
 
 #ifdef __cplusplus
 }

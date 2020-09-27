@@ -14,6 +14,14 @@ Basic types
 .. doxygenclass:: chemfiles::Matrix3D
     :members:
 
+Format list and Metadata
+------------------------
+
+.. doxygenfunction:: chemfiles::formats_list
+
+.. doxygenclass:: chemfiles::FormatMetadata
+    :members:
+
 Errors handling
 ---------------
 

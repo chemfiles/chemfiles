@@ -5,9 +5,11 @@
 #include <vector>
 
 #include "chemfiles/capi/types.h"
-#include "chemfiles/capi/topology.h"
+#include "chemfiles/capi/misc.h"
 #include "chemfiles/capi/utils.hpp"
 #include "chemfiles/capi/shared_allocator.hpp"
+
+#include "chemfiles/capi/topology.h"
 
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Topology.hpp"
