@@ -7,9 +7,11 @@
 #include <vector>
 
 #include "chemfiles/capi/types.h"
-#include "chemfiles/capi/selection.h"
+#include "chemfiles/capi/misc.h"
 #include "chemfiles/capi/utils.hpp"
 #include "chemfiles/capi/shared_allocator.hpp"
+
+#include "chemfiles/capi/selection.h"
 
 #include "chemfiles/Selection.hpp"
 

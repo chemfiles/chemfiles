@@ -97,6 +97,9 @@ public:
         );
     }
 
+    /// Get the metadata for all registered formats
+    std::vector<std::reference_wrapper<const FormatMetadata>> formats();
+
 private:
     void register_format(const FormatMetadata& metadata, format_creator_t creator, memory_stream_t memory_reader);
     void register_format(const FormatMetadata& metadata, format_creator_t creator);

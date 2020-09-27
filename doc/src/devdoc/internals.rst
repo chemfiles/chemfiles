@@ -43,13 +43,10 @@ with parsing data from the file.
 Every ``Format`` class can be associated to an extension and a format name, the
 associations are managed by the ``FormatFactory`` class. New file and formats
 should be registered with this class, by specializing the
-:cpp:func:`chemfiles::format_information` template and calling
+:cpp:func:`chemfiles::format_metadata` template and calling
 :cpp:func:`chemfiles::FormatFactory::add_format`.
 
 .. doxygenclass:: chemfiles::FormatFactory
     :members:
 
-.. doxygenclass:: chemfiles::FormatInfo
-    :members:
-
-.. doxygenfunction:: chemfiles::format_information
+.. doxygenfunction:: chemfiles::format_metadata

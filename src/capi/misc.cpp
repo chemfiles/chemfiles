@@ -52,3 +52,23 @@ extern "C" chfl_status chfl_add_configuration(const char* path) {
         add_configuration(path);
     )
 }
+
+extern "C" chfl_status chfl_formats_list(chfl_format_metadata** metadata, uint64_t* count) {
+    CHECK_POINTER(metadata);
+    CHECK_POINTER(count);
+    CHFL_ERROR_CATCH(
+        auto formats = formats_list();
+        *count = static_cast<uint64_t>(formats.size());
+        *metadata = static_cast<chfl_format_metadata*>(malloc(*count * sizeof(chfl_format_metadata)));  // NOLINT: use malloc instead of chfl_allocator to allow users to call free
+        for (uint64_t i=0; i<*count; i++) {
+            // here we rely on the fact that only one instance of each matdata
+            // exist, and that they come from static storage, allowing us to
+            // take reference to data directly inside `formats[i]` even if is it
+            // a local temporary.
+            const auto& meta = formats[i].get();
+            (*metadata)[i].name = meta.name;
+            (*metadata)[i].extension = meta.extension.value_or(nullptr);
+            (*metadata)[i].description = meta.description;
+        }
+    )
+}

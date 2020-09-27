@@ -4,6 +4,8 @@
 #ifndef CHEMFILES_CHFL_TYPES_H
 #define CHEMFILES_CHFL_TYPES_H
 
+#include <stdint.h>
+
 #include "chemfiles/exports.h"
 
 #if defined(__cplusplus) && !defined(INCLUDE_WHAT_YOU_USE)
@@ -166,14 +168,31 @@ typedef enum {  // NOLINT: this is both a C and C++ file
     CHFL_BOND_AROMATIC = 255,
 } chfl_bond_order;
 
-/// Free the memory associated with a chemfiles object.
-///
-/// This function is NOT equivalent to the standard C function `free`, as memory
-/// is acquired and released for all chemfiles objects using a references
-/// counter to allow direct modification of C++ objects.
-///
-/// @example{capi/chfl_atom/chfl_atom.c}
-CHFL_EXPORT void chfl_free(const void* object);
+/// Maximal size for a selection match
+#define CHFL_MAX_SELECTION_SIZE 4
+
+/// A `chfl_match` is a set of atomic indexes matching a given selection. The
+/// size of a match depends on the associated selection, and can vary from 1 to
+/// `CHFL_MAX_SELECTION_SIZE`.
+typedef struct {  // NOLINT: this is both a C and C++ file
+    /// The actual size of the match. Elements in `atoms` are significant up
+    /// to this value, and filled with `(uint64_t)-1` for all the other values.
+    uint64_t size;
+    /// Atomic indexes matching the associated selection
+    uint64_t atoms[CHFL_MAX_SELECTION_SIZE];
+} chfl_match;
+
+
+/// A `chfl_format_metadata` contains metdata associated with one format
+typedef struct {
+    /// Name of the format
+    const char* name;
+    /// Extension associated with the format, or `NULL` if there is no extension
+    /// associated.
+    const char* extension;
+    /// Extended, user-facing description of the format
+    const char* description;
+} chfl_format_metadata;
 
 #ifdef __cplusplus
 }
