@@ -236,7 +236,7 @@ void PDBFormat::read_CRYST1(Frame& frame, string_view line) {
 
 // See http://www.wwpdb.org/documentation/file-format-content/format23/sect5.html
 // for definitions of helix types
-const static char* HELIX_TYPES[10] = {
+static const char* HELIX_TYPES[10] = {
     "right-handed alpha helix",
     "right-handed omega helix",
     "right-handed pi helix",

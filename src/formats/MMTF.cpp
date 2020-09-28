@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 #include <exception>
+#include <unordered_set>
 
 #include <mmtf/errors.hpp>
 #include <mmtf/structure_data.hpp>
