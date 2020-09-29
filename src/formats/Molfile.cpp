@@ -332,6 +332,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<Molfile<DCD>>() {
     metadata.name = "DCD";
     metadata.extension = ".dcd";
     metadata.description = "DCD binary format";
+    metadata.reference = "http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/dcdplugin.html";
+
+    metadata.read = true;
+    metadata.write = false;
+    metadata.memory = false;
+
+    metadata.positions = true;
+    metadata.velocities = false;
+    metadata.unit_cell = false;
+    metadata.atoms = false;
+    metadata.bonds = false;
+    metadata.residues = false;
     return metadata;
 }
 
@@ -340,6 +352,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<Molfile<TRJ>>() {
     metadata.name = "TRJ";
     metadata.extension = ".trj";
     metadata.description = "GROMACS .trj binary format";
+    metadata.reference = "http://manual.gromacs.org/archive/5.0.7/online/trj.html";
+
+    metadata.read = true;
+    metadata.write = false;
+    metadata.memory = false;
+
+    metadata.positions = true;
+    metadata.velocities = false;
+    metadata.unit_cell = false;
+    metadata.atoms = false;
+    metadata.bonds = false;
+    metadata.residues = false;
     return metadata;
 }
 
@@ -348,6 +372,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<Molfile<LAMMPS>>() {
     metadata.name = "LAMMPS";
     metadata.extension = ".lammpstrj";
     metadata.description = "LAMMPS text trajectory format";
+    metadata.reference = "https://lammps.sandia.gov/doc/dump.html";
+
+    metadata.read = true;
+    metadata.write = false;
+    metadata.memory = false;
+
+    metadata.positions = true;
+    metadata.velocities = false;
+    metadata.unit_cell = false;
+    metadata.atoms = false;
+    metadata.bonds = false;
+    metadata.residues = false;
     return metadata;
 }
 
@@ -356,5 +392,17 @@ template<> const FormatMetadata& chemfiles::format_metadata<Molfile<MOLDEN>>() {
     metadata.name = "Molden";
     metadata.extension = ".molden";
     metadata.description = "Molden text format";
+    metadata.reference = "http://www.cmbi.ru.nl/molden/molden_format.html";
+
+    metadata.read = true;
+    metadata.write = false;
+    metadata.memory = false;
+
+    metadata.positions = true;
+    metadata.velocities = false;
+    metadata.unit_cell = false;
+    metadata.atoms = true;
+    metadata.bonds = false;
+    metadata.residues = false;
     return metadata;
 }

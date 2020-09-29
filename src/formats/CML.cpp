@@ -39,6 +39,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<CMLFormat>() {
     metadata.name = "CML";
     metadata.extension = ".cml";
     metadata.description = "Chemical Markup Language";
+    metadata.reference = "http://www.xml-cml.org";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = true;
+
+    metadata.positions = true;
+    metadata.velocities = true;
+    metadata.unit_cell = true;
+    metadata.atoms = true;
+    metadata.bonds = true;
+    metadata.residues = false;
     return metadata;
 }
 
@@ -55,7 +67,6 @@ private:
 };
 
 void CMLFormat::init_() {
-
     if (file_.mode() == File::WRITE) {
         root_ = document_.append_child("cml");
         root_.append_attribute("xmlns") = "http://www.xml-cml.org/schema";

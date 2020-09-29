@@ -39,6 +39,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<mmCIFFormat>() {
     metadata.name = "mmCIF";
     metadata.extension = ".mmcif";
     metadata.description = "Crystallographic Information Framework files for MacroMolecules";
+    metadata.reference = "http://mmcif.wwpdb.org/";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = true;
+
+    metadata.positions = true;
+    metadata.velocities = false;
+    metadata.unit_cell = true;
+    metadata.atoms = true;
+    metadata.bonds = true;
+    metadata.residues = true;
     return metadata;
 }
 

@@ -52,4 +52,14 @@ void chemfiles::FormatMetadata::validate() const {
             throw format_error("the extension for format '{}' must start with a dot", this->name);
         }
     }
+
+    check_not_null(reference, "reference", name);
+    check_trimmed(reference, "reference", name);
+
+    auto reference_s = std::string(reference);
+    if (!reference_s.empty()) {
+        if (!(reference_s.substr(0, 7) == "http://" || reference_s.substr(0, 8) == "https://")) {
+            throw format_error("the reference for format '{}' must be an http link", this->name);
+        }
+    }
 }

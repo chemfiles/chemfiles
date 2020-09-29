@@ -47,6 +47,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<MMTFFormat>() {
     metadata.name = "MMTF";
     metadata.extension = ".mmtf";
     metadata.description = "MMTF (RCSB Protein Data Bank) binary format";
+    metadata.reference = "https://mmtf.rcsb.org/";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = true;
+
+    metadata.positions = true;
+    metadata.velocities = false;
+    metadata.unit_cell = true;
+    metadata.atoms = true;
+    metadata.bonds = true;
+    metadata.residues = true;
     return metadata;
 }
 

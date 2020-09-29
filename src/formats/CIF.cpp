@@ -43,6 +43,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<CIFFormat>() {
     metadata.name = "CIF";
     metadata.extension = ".cif";
     metadata.description = "Crystallographic Information Framework files";
+    metadata.reference = "https://www.iucr.org/resources/cif";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = true;
+
+    metadata.positions = true;
+    metadata.velocities = false;
+    metadata.unit_cell = true;
+    metadata.atoms = true;
+    metadata.bonds = false;
+    metadata.residues = false;
     return metadata;
 }
 

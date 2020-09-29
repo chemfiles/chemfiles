@@ -28,6 +28,8 @@ new_format(NoDotExtensionFormat);
 new_format(SpacesInNameFormat);
 new_format(SpacesInExtensionFormat);
 new_format(SpacesInDescriptionFormat);
+new_format(SpacesInReferenceFormat);
+new_format(BadReferenceFormat);
 new_format(NoFormatMetadata);
 new_format(SameNameFormat);
 new_format(SameExtensionFormat);
@@ -111,6 +113,20 @@ namespace chemfiles {
         static FormatMetadata meta;
         meta.name = "SpacesInDescriptionFormat";
         meta.description = "test  \t";
+        return meta;
+    }
+
+    template<> const FormatMetadata& format_metadata<SpacesInReferenceFormat>() {
+        static FormatMetadata meta;
+        meta.name = "SpacesInReferenceFormat";
+        meta.reference = "http://test  \t";
+        return meta;
+    }
+
+    template<> const FormatMetadata& format_metadata<BadReferenceFormat>() {
+        static FormatMetadata meta;
+        meta.name = "BadReferenceFormat";
+        meta.reference = "foo.bar";
         return meta;
     }
 }
@@ -200,6 +216,16 @@ TEST_CASE("Bad format info") {
     CHECK_THROWS_WITH(
         FormatFactory::get().add_format<SpacesInDescriptionFormat>(),
         "the description can not start or end with spaces for format 'SpacesInDescriptionFormat'"
+    );
+
+    CHECK_THROWS_WITH(
+        FormatFactory::get().add_format<SpacesInReferenceFormat>(),
+        "the reference can not start or end with spaces for format 'SpacesInReferenceFormat'"
+    );
+
+    CHECK_THROWS_WITH(
+        FormatFactory::get().add_format<BadReferenceFormat>(),
+        "the reference for format 'BadReferenceFormat' must be an http link"
     );
 }
 

@@ -52,6 +52,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<XYZFormat>() {
     metadata.name = "XYZ";
     metadata.extension = ".xyz";
     metadata.description = "XYZ text format";
+    metadata.reference = "https://openbabel.org/wiki/XYZ";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = true;
+
+    metadata.positions = true;
+    metadata.velocities = false;
+    metadata.unit_cell = true;
+    metadata.atoms = true;
+    metadata.bonds = false;
+    metadata.residues = false;
     return metadata;
 }
 

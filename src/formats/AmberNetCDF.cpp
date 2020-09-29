@@ -28,6 +28,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<AmberNetCDFFormat>()
     metadata.name = "Amber NetCDF";
     metadata.extension = ".nc";
     metadata.description = "Amber convention for binary NetCDF molecular trajectories";
+    metadata.reference = "http://ambermd.org/netcdf/nctraj.xhtml";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = false;
+
+    metadata.positions = true;
+    metadata.velocities = true;
+    metadata.unit_cell = true;
+    metadata.atoms = false;
+    metadata.bonds = false;
+    metadata.residues = false;
     return metadata;
 }
 

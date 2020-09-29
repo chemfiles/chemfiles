@@ -15,7 +15,7 @@ namespace chemfiles {
 /// Metadata associated with a format.
 class CHFL_EXPORT FormatMetadata {
 public:
-    FormatMetadata(): name(""), extension(nullopt), description("") {}
+    FormatMetadata() = default;
     ~FormatMetadata() = default;
 
     // Disable all copy & assignment operator to ensure no copy can be made.
@@ -35,11 +35,33 @@ public:
     FormatMetadata& operator=(FormatMetadata&&) = delete;
 
     /// Name of the format
-    const char* name;
+    const char* name = "";
     /// Potential extension associated with the format
-    optional<const char*> extension;
+    optional<const char*> extension = nullopt;
     /// User facing format description
-    const char* description;
+    const char* description = "";
+    /// URL pointing to the format definition/reference
+    const char* reference = "";
+
+    /// Is reading files in this format implemented?
+    bool read = false;
+    /// Is writing files in this format implemented?
+    bool write = false;
+    /// Does this format support in-memory IO?
+    bool memory = false;
+
+    /// Does this format support storing atomic positions?
+    bool positions = false;
+    /// Does this format support storing atomic velocities?
+    bool velocities = false;
+    /// Does this format support storing unit cell information?
+    bool unit_cell = false;
+    /// Does this format support storing atom names or types?
+    bool atoms = false;
+    /// Does this format support storing bonds between atoms?
+    bool bonds = false;
+    /// Does this format support storing residues?
+    bool residues = false;
 
     // Validate the format metadata
     void validate() const;

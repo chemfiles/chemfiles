@@ -53,6 +53,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<LAMMPSDataFormat>() 
     metadata.name = "LAMMPS Data";
     metadata.extension = nullopt;
     metadata.description = "LAMMPS input data file";
+    metadata.reference = "http://lammps.sandia.gov/doc/read_data.html";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = true;
+
+    metadata.positions = true;
+    metadata.velocities = true;
+    metadata.unit_cell = true;
+    metadata.atoms = true;
+    metadata.bonds = true;
+    metadata.residues = true;
     return metadata;
 }
 

@@ -31,7 +31,19 @@ template<> const FormatMetadata& chemfiles::format_metadata<XTCFormat>() {
     static FormatMetadata metadata;
     metadata.name = "XTC";
     metadata.extension = ".xtc";
-    metadata.description = "XTC binary format";
+    metadata.description = "GROMACS XTC binary format";
+    metadata.reference = "http://manual.gromacs.org/current/reference-manual/file-formats.html?#xtc";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = false;
+
+    metadata.positions = true;
+    metadata.velocities = false;
+    metadata.unit_cell = true;
+    metadata.atoms = false;
+    metadata.bonds = false;
+    metadata.residues = false;
     return metadata;
 }
 

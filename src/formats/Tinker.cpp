@@ -33,6 +33,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<TinkerFormat>() {
     metadata.name = "Tinker";
     metadata.extension = ".arc";
     metadata.description = "Tinker XYZ text format";
+    metadata.reference = "http://chembytes.wikidot.com/tnk-tut00#toc2";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = true;
+
+    metadata.positions = true;
+    metadata.velocities = false;
+    metadata.unit_cell = true;
+    metadata.atoms = true;
+    metadata.bonds = true;
+    metadata.residues = false;
     return metadata;
 }
 
