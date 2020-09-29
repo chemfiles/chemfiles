@@ -34,7 +34,19 @@ template<> const FormatMetadata& chemfiles::format_metadata<TNGFormat>() {
     static FormatMetadata metadata;
     metadata.name = "TNG";
     metadata.extension = ".tng";
-    metadata.description = "Trajectory New Generation binary format";
+    metadata.description = "Trajectory Next Generation binary format";
+    metadata.reference = "http://doi.wiley.com/10.1002/jcc.23495";
+
+    metadata.read = true;
+    metadata.write = false;
+    metadata.memory = false;
+
+    metadata.positions = true;
+    metadata.velocities = true;
+    metadata.unit_cell = true;
+    metadata.atoms = true;
+    metadata.bonds = true;
+    metadata.residues = true;
     return metadata;
 }
 

@@ -42,6 +42,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<SMIFormat>() {
     metadata.name = "SMI";
     metadata.extension = ".smi";
     metadata.description = "SMI text format";
+    metadata.reference = "http://opensmiles.org/";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = true;
+
+    metadata.positions = false;
+    metadata.velocities = false;
+    metadata.unit_cell = false;
+    metadata.atoms = true;
+    metadata.bonds = true;
+    metadata.residues = true;
     return metadata;
 }
 

@@ -34,6 +34,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<GROFormat>() {
     metadata.name = "GRO";
     metadata.extension = ".gro";
     metadata.description = "GROMACS GRO text format";
+    metadata.reference = "http://manual.gromacs.org/current/online/gro.html";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = true;
+
+    metadata.positions = true;
+    metadata.velocities = true;
+    metadata.unit_cell = true;
+    metadata.atoms = true;
+    metadata.bonds = false;
+    metadata.residues = true;
     return metadata;
 }
 

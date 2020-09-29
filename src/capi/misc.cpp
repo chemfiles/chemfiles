@@ -69,6 +69,18 @@ extern "C" chfl_status chfl_formats_list(chfl_format_metadata** metadata, uint64
             (*metadata)[i].name = meta.name;
             (*metadata)[i].extension = meta.extension.value_or(nullptr);
             (*metadata)[i].description = meta.description;
+            (*metadata)[i].reference = meta.reference;
+
+            (*metadata)[i].read = meta.read;
+            (*metadata)[i].write = meta.write;
+            (*metadata)[i].memory = meta.memory;
+
+            (*metadata)[i].positions = meta.positions;
+            (*metadata)[i].velocities = meta.velocities;
+            (*metadata)[i].unit_cell = meta.unit_cell;
+            (*metadata)[i].atoms = meta.atoms;
+            (*metadata)[i].bonds = meta.bonds;
+            (*metadata)[i].residues = meta.residues;
         }
     )
 }

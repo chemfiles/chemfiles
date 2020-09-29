@@ -5,6 +5,7 @@
 #define CHEMFILES_CHFL_TYPES_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "chemfiles/exports.h"
 
@@ -192,6 +193,28 @@ typedef struct {
     const char* extension;
     /// Extended, user-facing description of the format
     const char* description;
+    /// URL pointing to the format definition/reference
+    const char* reference;
+
+    /// Is reading files in this format implemented?
+    bool read;
+    /// Is writing files in this format implemented?
+    bool write;
+    /// Does this format support in-memory IO?
+    bool memory;
+
+    /// Does this format support storing atomic positions?
+    bool positions;
+    /// Does this format support storing atomic velocities?
+    bool velocities;
+    /// Does this format support storing unit cell information?
+    bool unit_cell;
+    /// Does this format support storing atom names or types?
+    bool atoms;
+    /// Does this format support storing bonds between atoms?
+    bool bonds;
+    /// Does this format support storing residues?
+    bool residues;
 } chfl_format_metadata;
 
 #ifdef __cplusplus

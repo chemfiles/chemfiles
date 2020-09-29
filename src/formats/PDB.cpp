@@ -41,6 +41,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<PDBFormat>() {
     metadata.name = "PDB";
     metadata.extension = ".pdb";
     metadata.description = "PDB (RCSB Protein Data Bank) text format";
+    metadata.reference = "http://www.wwpdb.org/documentation/file-format";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = true;
+
+    metadata.positions = true;
+    metadata.velocities = false;
+    metadata.unit_cell = true;
+    metadata.atoms = true;
+    metadata.bonds = true;
+    metadata.residues = true;
     return metadata;
 }
 

@@ -1,3 +1,7 @@
+if (CMAKE_CROSSCOMPILING)
+    message(FATAL_ERROR "can not build documentation when cross-compiling")
+endif()
+
 find_package(Sphinx REQUIRED)
 find_package(Doxygen REQUIRED)
 
@@ -40,10 +44,24 @@ add_custom_target(doxygen ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/doxygen/xml/index.xml
 )
 
+add_executable(extract-formats extract-formats-doc.cpp)
+target_link_libraries(extract-formats chemfiles)
+
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/formats-overview.csv
+    COMMAND extract-formats
+    DEPENDS extract-formats
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/
+    COMMENT "Extracting format informations"
+)
+
+add_custom_target(formats-overview-csv ALL
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/formats-overview.csv
+)
+
 set(SPHINX_CONF_DIR ${PROJECT_BINARY_DIR}/doc)
 set(SPHINX_INPUT_DIR ${PROJECT_SOURCE_DIR}/doc/src)
 set(SPHINX_DESTINATION ${PROJECT_BINARY_DIR}/doc)
-set(SPHINX_DEPENDENCIES doxygen)
+set(SPHINX_DEPENDENCIES doxygen formats-overview-csv)
 
 set(sphinx_target_base_name doc)
 Sphinx_add_targets(${sphinx_target_base_name} ${SPHINX_CONF_DIR} ${SPHINX_INPUT_DIR} ${SPHINX_DESTINATION} ${SPHINX_DEPENDENCIES})

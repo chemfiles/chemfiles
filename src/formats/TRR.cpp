@@ -33,7 +33,19 @@ template<> const FormatMetadata& chemfiles::format_metadata<TRRFormat>() {
     static FormatMetadata metadata;
     metadata.name = "TRR";
     metadata.extension = ".trr";
-    metadata.description = "TRR binary format";
+    metadata.description = "GROMACS TRR binary format";
+    metadata.reference = "http://manual.gromacs.org/current/reference-manual/file-formats.html?#trr";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = false;
+
+    metadata.positions = true;
+    metadata.velocities = true;
+    metadata.unit_cell = true;
+    metadata.atoms = false;
+    metadata.bonds = false;
+    metadata.residues = false;
     return metadata;
 }
 

@@ -55,31 +55,30 @@ static size_t find_by_name(const std::vector<RegisteredFormat>& formats, string_
 static size_t find_by_extension(const std::vector<RegisteredFormat>& formats, string_view extension);
 
 FormatFactory::FormatFactory() {
-    this->add_format<XYZFormat>();
-    this->add_format<PDBFormat>();
-    this->add_format<TNGFormat>();
+    // add formats in alphabetic order
     this->add_format<AmberNetCDFFormat>();
-    this->add_format<TinkerFormat>();
-    this->add_format<LAMMPSDataFormat>();
-    this->add_format<SDFFormat>();
-    this->add_format<CSSRFormat>();
-    this->add_format<GROFormat>();
-    this->add_format<MOL2Format>();
-    this->add_format<mmCIFFormat>();
-    this->add_format<MMTFFormat>();
-    this->add_format<CMLFormat>();
-    this->add_format<SMIFormat>();
-    this->add_format<TRRFormat>();
-    this->add_format<XTCFormat>();
 #ifndef CHFL_DISABLE_GEMMI
     this->add_format<CIFFormat>();
 #endif
-
-    // VMD molfile plugins
+    this->add_format<CMLFormat>();
+    this->add_format<CSSRFormat>();
     this->add_format<Molfile<DCD>>();
-    this->add_format<Molfile<TRJ>>();
+    this->add_format<GROFormat>();
     this->add_format<Molfile<LAMMPS>>();
+    this->add_format<LAMMPSDataFormat>();
+    this->add_format<mmCIFFormat>();
+    this->add_format<MMTFFormat>();
+    this->add_format<MOL2Format>();
     this->add_format<Molfile<MOLDEN>>();
+    this->add_format<PDBFormat>();
+    this->add_format<SDFFormat>();
+    this->add_format<SMIFormat>();
+    this->add_format<TinkerFormat>();
+    this->add_format<TNGFormat>();
+    this->add_format<Molfile<TRJ>>();
+    this->add_format<TRRFormat>();
+    this->add_format<XTCFormat>();
+    this->add_format<XYZFormat>();
 }
 
 FormatFactory& FormatFactory::get() {

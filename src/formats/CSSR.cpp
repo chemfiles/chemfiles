@@ -41,6 +41,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<CSSRFormat>() {
     metadata.name = "CSSR";
     metadata.extension = ".cssr";
     metadata.description = "CSSR text format";
+    metadata.reference = "http://www.chem.cmu.edu/courses/09-560/docs/msi/modenv/D_Files.html#944777";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = true;
+
+    metadata.positions = true;
+    metadata.velocities = false;
+    metadata.unit_cell = true;
+    metadata.atoms = true;
+    metadata.bonds = true;
+    metadata.residues = false;
     return metadata;
 }
 

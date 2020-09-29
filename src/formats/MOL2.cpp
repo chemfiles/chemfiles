@@ -36,6 +36,18 @@ template<> const FormatMetadata& chemfiles::format_metadata<MOL2Format>() {
     metadata.name = "MOL2";
     metadata.extension = ".mol2";
     metadata.description = "Tripos mol2 text format";
+    metadata.reference = "http://chemyang.ccnu.edu.cn/ccb/server/AIMMS/mol2.pdf";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = true;
+
+    metadata.positions = true;
+    metadata.velocities = false;
+    metadata.unit_cell = true;
+    metadata.atoms = true;
+    metadata.bonds = true;
+    metadata.residues = true;
     return metadata;
 }
 
