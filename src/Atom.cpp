@@ -11,6 +11,7 @@
 #include "chemfiles/Configuration.hpp"
 #include "chemfiles/periodic_table.hpp"
 
+#include "chemfiles/utils.hpp"
 #include "chemfiles/external/optional.hpp"
 
 using namespace chemfiles;
@@ -19,10 +20,10 @@ static std::string normalize_atomic_name(const std::string& type) {
     assert(type.length() <= 2);
     std::string normalized = type;
     if (type.length() == 1) {
-        normalized[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(normalized[0])));
+        normalized[0] = to_ascii_uppercase(normalized[0]);
     } else if (type.length() == 2) {
-        normalized[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(normalized[0])));
-        normalized[1] = static_cast<char>(std::tolower(static_cast<unsigned char>(normalized[1])));
+        normalized[0] = to_ascii_uppercase(normalized[0]);
+        normalized[1] = to_ascii_lowercase(normalized[1]);
     }
     return normalized;
 }

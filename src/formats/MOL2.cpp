@@ -135,7 +135,7 @@ void MOL2Format::read_atoms(Frame& frame, size_t natoms, bool charges) {
         } else {
             is_sybyl = false;
             for (auto c: atom_name) {
-                if ((std::isalpha(c) == 0) || !find_in_periodic_table(atom_type + c)) {
+                if (!is_ascii_letter(c) || !find_in_periodic_table(atom_type + c)) {
                     break;
                 }
                 atom_type += c;

@@ -79,14 +79,14 @@ namespace detail {
             auto end = input_.end();
 
             // skip whitespace
-            while (start != end && is_whitespace(*start)) {
+            while (start != end && is_ascii_whitespace(*start)) {
                 start++;
             }
             input_.remove_prefix(static_cast<size_t>(start - input_.begin()));
 
             // Find next whitespace
             auto stop = start;
-            while (stop != end && !is_whitespace(*stop)) {
+            while (stop != end && !is_ascii_whitespace(*stop)) {
                 stop++;
             }
             auto size = static_cast<size_t>(stop - start);

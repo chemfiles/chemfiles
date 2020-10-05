@@ -4,7 +4,7 @@
 #ifndef CHEMFILES_UTILS_HPP
 #define CHEMFILES_UTILS_HPP
 
-#include <cctype>
+#include <cassert>
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -42,22 +42,64 @@ inline std::vector<string_view> split(const char* string, char delim) {
 // disallow temporary string
 std::vector<string_view> split(std::string&& string, char delim) = delete;
 
-// chemfiles' definition of whitespace only includes ' ', '\t' and new lines
-inline bool is_whitespace(char c) {
-    return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+// Check whether the given character is an ASCII whitespace
+inline bool is_ascii_whitespace(char c) {
+    return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\x0C';
+}
+
+// Check whether the given character is an ASCII lowercase letter (a-z)
+inline bool is_ascii_lowercase(char c) {
+    return 'a' <= c && c <= 'z';
+}
+
+// Check whether the given character is an ASCII uppercase letter (A-Z)
+inline bool is_ascii_uppercase(char c) {
+    return 'A' <= c && c <= 'Z';
+}
+
+// Check whether the given character is an ASCII letter (a-z, A-Z)
+inline bool is_ascii_letter(char c) {
+    return is_ascii_lowercase(c) || is_ascii_uppercase(c);
+}
+
+// Check whether the given character is an ASCII digit (0-9)
+inline bool is_ascii_digit(char c) {
+    return '0' <= c && c <= '9';
+}
+
+// Check whether the given character is an ASCII digit (0-9) or an ASCII letter
+// (a-z, A-Z)
+inline bool is_ascii_alphanumeric(char c) {
+    return is_ascii_letter(c) || is_ascii_digit(c);
+}
+
+inline char to_ascii_lowercase(char c) {
+    if (is_ascii_uppercase(c)) {
+        return static_cast<char>(c - ('Z' - 'z'));
+    } else {
+        return c;
+    }
+}
+
+inline char to_ascii_uppercase(char c) {
+    if (is_ascii_lowercase(c)) {
+        return static_cast<char>(c + ('Z' - 'z'));
+    } else {
+        return c;
+    }
 }
 
 /// Remove whitespaces at the begining and end of `string`
 inline string_view trim(string_view string) {
     auto begin = string.begin();
     auto end = string.end();
-    while (begin != end && is_whitespace(*begin)) {
+    while (begin != end && is_ascii_whitespace(*begin)) {
         begin++;
     }
 
     if (begin != end) {
         end--;
-        while (end != begin && is_whitespace(*end)) {
+        while (end != begin && is_ascii_whitespace(*end)) {
             end--;
         }
         end++;
@@ -73,11 +115,24 @@ inline string_view trim(const char* string) {
 // disallow temporary string
 string_view trim(std::string&& string) = delete;
 
-/// Transform `string` to lower case
-inline void tolower(std::string& input) {
+/// Transform all characters in ASCII range in the given `string` to lower case.
+///
+/// Non letters and characters oustide of ASCII will be left untouched
+inline void to_ascii_lowercase(std::string& input) {
     std::transform(input.begin(), input.end(), input.begin(),
         [](std::string::value_type c) {
-            return std::tolower(c);
+            return to_ascii_lowercase(c);
+        }
+    );
+}
+
+/// Transform all characters in ASCII range in the given `string` to upper case.
+///
+/// Non letters and characters oustide of ASCII will be left untouched
+inline void to_ascii_uppercase(std::string& input) {
+    std::transform(input.begin(), input.end(), input.begin(),
+        [](std::string::value_type c) {
+            return to_ascii_uppercase(c);
         }
     );
 }

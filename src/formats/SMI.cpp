@@ -93,14 +93,14 @@ static bool is_chirality_tag(string_view s) {
 /// Attempts to read a number from the string. The `start` argument is updated
 /// to the last numberic character in `smiles`.
 static size_t read_number(string_view smiles, size_t& start) {
-    if (start >= smiles.size() || std::isdigit(smiles[start]) == 0) {
+    if (start >= smiles.size() || !is_ascii_digit(smiles[start])) {
         start--;
         return 0;
     }
     size_t old = start;
     do {
         start++;
-    } while (start < smiles.size() && (std::isdigit(smiles[start]) != 0));
+    } while (start < smiles.size() && is_ascii_digit(smiles[start]));
     start--;
     return parse<size_t>(smiles.substr(old, start - old + 1));
 }
@@ -116,7 +116,7 @@ static string_view read_property_atom(string_view smiles, size_t& start) {
     } else {
         do {
             start++;
-        } while( start < smiles.size() && std::islower(smiles[start]) != 0);
+        } while (start < smiles.size() && is_ascii_lowercase(smiles[start]));
         return smiles.substr(old, start - old);
     }
 }
@@ -138,12 +138,12 @@ Atom& SMIFormat::add_atom(Topology& topology, string_view atom_name) {
 void SMIFormat::process_property_list(Topology& topology, string_view smiles) {
     size_t i = 0;
     double mass = 0.0;
-    if (std::isdigit(smiles[i]) != 0) {
+    if (is_ascii_digit(smiles[i])) {
         mass = static_cast<double>(read_number(smiles, i));
         ++i;
     }
 
-    bool is_aromatic = std::islower(smiles[i]) != 0;
+    bool is_aromatic = is_ascii_lowercase(smiles[i]);
     auto name = read_property_atom(smiles, i);
     auto& new_atom = this->add_atom(topology, name);
 
@@ -246,7 +246,7 @@ void SMIFormat::read_next(Frame& frame) {
     size_t i;
     for (i = 0; i < smiles.size(); ++i) {
 
-        if (std::isblank(smiles[i]) != 0) {
+        if (is_ascii_whitespace(smiles[i])) {
             break;
         }
 
@@ -282,7 +282,7 @@ void SMIFormat::read_next(Frame& frame) {
         // We are not in a property list!
         // Therefore, if something is lowercase, then it must be
         // a single character element in the organic subset.
-        if (std::islower(smiles[i]) != 0) {
+        if (is_ascii_lowercase(smiles[i])) {
             if (!is_aromatic_organic(smiles[i])) {
                 throw format_error("SMI Reader: aromatic element not found: '{}'", smiles[i]);
             }
@@ -294,7 +294,7 @@ void SMIFormat::read_next(Frame& frame) {
         // We are not in a property list!
         // Therefore, aliphatic atoms can be written without brackets.
         // Br and Cl are tricky as, but the rest are single character
-        if (std::isupper(smiles[i]) != 0) {
+        if (is_ascii_uppercase(smiles[i])) {
             size_t element_length = 1;
             if (smiles[i] == 'C'
                 && i + 1 < smiles.size()
@@ -317,7 +317,7 @@ void SMIFormat::read_next(Frame& frame) {
             continue;
         }
 
-        if (std::isdigit(smiles[i]) != 0) {
+        if (is_ascii_digit(smiles[i])) {
             auto ring_id = static_cast<size_t>(smiles[i] - '0');
             check_ring_(topology, ring_id);
             continue;
@@ -571,7 +571,7 @@ static void write_atom_smiles(TextFile& file, const Atom& atom) {
         if (type.size() > 1) {
             needs_brackets = true;
         }
-        std::transform(type.begin(), type.end(), type.begin(), ::tolower);
+        to_ascii_lowercase(type);
     }
 
     if (needs_brackets) {
@@ -610,7 +610,7 @@ static void write_atom_smiles(TextFile& file, const Atom& atom) {
     case 7:
         if (chirality.find("CCW") == 0
             && is_chirality_tag(chirality.substr(4, 2))
-            && std::isdigit(chirality[6]) != 0 ) {
+            && is_ascii_digit(chirality[6])) {
             is_good_tag = true;
             file.print("@{}", chirality.substr(4));
         }
@@ -618,8 +618,8 @@ static void write_atom_smiles(TextFile& file, const Atom& atom) {
     case 8:
         if (chirality.find("CCW") == 0
             && is_chirality_tag(chirality.substr(4, 2))
-            && std::isdigit(chirality[6]) != 0
-            && std::isdigit(chirality[7]) != 0) {
+            && is_ascii_digit(chirality[6])
+            && is_ascii_digit(chirality[7])) {
             is_good_tag = true;
             file.print("@{}", chirality.substr(4));
         }
