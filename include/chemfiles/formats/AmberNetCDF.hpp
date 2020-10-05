@@ -9,7 +9,6 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/files/NcFile.hpp"
 
@@ -18,6 +17,8 @@ namespace chemfiles {
 class Frame;
 class UnitCell;
 class Vector3D;
+class FormatMetadata;
+
 template <class T> class span;
 
 /// Amber NetCDF file format reader.

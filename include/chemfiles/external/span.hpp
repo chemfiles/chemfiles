@@ -18,16 +18,14 @@
 #ifndef SPAN_HPP
 #define SPAN_HPP
 
-#include <exception>
 #include <iterator>
-#include <limits>
-#include <memory>
-#include <stdexcept>
-#include <string>
 #include <utility>
-#include <vector>
+#include <array>
 #include <cstdint>
 #include <cassert>
+#include <cstddef>
+#include <algorithm>
+#include <type_traits>
 
 namespace chemfiles {
 enum class byte : std::uint8_t {};

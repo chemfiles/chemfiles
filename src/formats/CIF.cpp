@@ -1,38 +1,34 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include "chemfiles/config.h"
+#include "chemfiles/config.h"  // IWYU pragma: keep
 #ifndef CHFL_DISABLE_GEMMI
 
 #include <cassert>
-#include <cstdint>
-#include <map>
+#include <cmath>
+
 #include <array>
 #include <vector>
 #include <string>
-#include <memory>
-#include <utility>
-#include <algorithm>
+#include <exception>
+
+#include "gemmi/cif.hpp"
+#include "gemmi/elem.hpp"
+#include "gemmi/small.hpp"
+#include "gemmi/smcif.hpp"
+#include "gemmi/cifdoc.hpp"
+#include "gemmi/unitcell.hpp"
+
+#include "chemfiles/types.hpp"
+#include "chemfiles/error_fmt.hpp"
+#include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/File.hpp"
-#include "chemfiles/Format.hpp"
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Property.hpp"
-#include "chemfiles/Residue.hpp"
-#include "chemfiles/Topology.hpp"
 #include "chemfiles/UnitCell.hpp"
-
-#include "gemmi/cif.hpp"
-#include "gemmi/smcif.hpp"
-#include "gemmi/to_cif.hpp"
-
-#include "chemfiles/types.hpp"
-#include "chemfiles/utils.hpp"
-#include "chemfiles/parse.hpp"
-#include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
-#include "chemfiles/external/optional.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/formats/CIF.hpp"
 

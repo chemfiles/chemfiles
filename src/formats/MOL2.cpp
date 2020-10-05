@@ -1,25 +1,13 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <cctype>
 #include <cstdint>
-
 #include <array>
 #include <string>
 #include <vector>
-#include <memory>
 #include <unordered_map>
 
-#include "chemfiles/File.hpp"
-#include "chemfiles/Format.hpp"
-#include "chemfiles/Atom.hpp"
-#include "chemfiles/Frame.hpp"
-#include "chemfiles/Property.hpp"
-#include "chemfiles/Residue.hpp"
-#include "chemfiles/Topology.hpp"
-#include "chemfiles/UnitCell.hpp"
-#include "chemfiles/Connectivity.hpp"
-
+#include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/parse.hpp"
 #include "chemfiles/warnings.hpp"
@@ -27,6 +15,16 @@
 #include "chemfiles/string_view.hpp"
 #include "chemfiles/periodic_table.hpp"
 #include "chemfiles/external/optional.hpp"
+
+#include "chemfiles/File.hpp"
+#include "chemfiles/Atom.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/Property.hpp"
+#include "chemfiles/Residue.hpp"
+#include "chemfiles/Topology.hpp"
+#include "chemfiles/UnitCell.hpp"
+#include "chemfiles/Connectivity.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/formats/MOL2.hpp"
 

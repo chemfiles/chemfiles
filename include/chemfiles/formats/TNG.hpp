@@ -10,12 +10,12 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/files/TNGFile.hpp"
 
 namespace chemfiles {
 class Frame;
+class FormatMetadata;
 
 /// TNG file format reader.
 class TNGFormat final: public Format {

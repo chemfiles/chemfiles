@@ -8,12 +8,12 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/files/XDRFile.hpp"
 
 namespace chemfiles {
 class Frame;
+class FormatMetadata;
 
 /// GROMACS XTC file format reader.
 class XTCFormat final : public Format {

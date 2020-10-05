@@ -2,6 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cstdint>
+#include <cstring>
 #include <string>
 
 #include "chemfiles/capi/types.h"

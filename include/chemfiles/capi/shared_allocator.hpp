@@ -2,9 +2,7 @@
 #define CHFL_SHARED_ALLOCATOR_HPP
 
 #include <vector>
-#include <memory>
 #include <functional>
-#include <algorithm>  // IWYU pragma: keep
 #include <unordered_map>
 
 #include "chemfiles/error_fmt.hpp"

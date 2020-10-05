@@ -12,7 +12,6 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/string_view.hpp"
@@ -21,6 +20,7 @@
 namespace chemfiles {
 class Frame;
 class MemoryBuffer;
+class FormatMetadata;
 
 /// Full identification of residues, including everything needed
 struct FullResidueId {

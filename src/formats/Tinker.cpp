@@ -6,15 +6,6 @@
 #include <array>
 #include <string>
 #include <vector>
-#include <memory>
-
-#include "chemfiles/File.hpp"
-#include "chemfiles/Format.hpp"
-#include "chemfiles/Atom.hpp"
-#include "chemfiles/Frame.hpp"
-#include "chemfiles/Topology.hpp"
-#include "chemfiles/UnitCell.hpp"
-#include "chemfiles/Connectivity.hpp"
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
@@ -23,6 +14,14 @@
 #include "chemfiles/sorted_set.hpp"
 #include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
+
+#include "chemfiles/File.hpp"
+#include "chemfiles/Atom.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/Topology.hpp"
+#include "chemfiles/UnitCell.hpp"
+#include "chemfiles/Connectivity.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/formats/Tinker.hpp"
 

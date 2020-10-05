@@ -11,6 +11,7 @@
 #include "helpers.hpp"
 #include "chemfiles.hpp"
 #include "chemfiles/FormatFactory.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 using namespace chemfiles;
 
 #define new_format(_name_)                                                     \

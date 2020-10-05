@@ -6,12 +6,6 @@
 #include <string>
 #include <vector>
 
-#include "chemfiles/File.hpp"
-#include "chemfiles/Format.hpp"
-#include "chemfiles/Frame.hpp"
-#include "chemfiles/UnitCell.hpp"
-#include "chemfiles/files/NcFile.hpp"
-
 #include "chemfiles/types.hpp"
 #include "chemfiles/config.h"
 #include "chemfiles/warnings.hpp"
@@ -19,6 +13,13 @@
 #include "chemfiles/external/span.hpp"
 #include "chemfiles/external/optional.hpp"
 
+
+#include "chemfiles/File.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/UnitCell.hpp"
+#include "chemfiles/FormatMetadata.hpp"
+
+#include "chemfiles/files/NcFile.hpp"
 #include "chemfiles/formats/AmberNetCDF.hpp"
 
 using namespace chemfiles;

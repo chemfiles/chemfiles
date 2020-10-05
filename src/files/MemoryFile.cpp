@@ -2,9 +2,8 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cstdint>
-#include <cstddef>
+#include <vector>
 #include <memory>
-#include <iterator>
 #include <algorithm>
 
 #include "chemfiles/File.hpp"

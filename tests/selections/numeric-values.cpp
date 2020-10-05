@@ -6,11 +6,10 @@
 #include "chemfiles/selections/expr.hpp"
 
 using namespace chemfiles;
-using namespace chemfiles::selections;
 
 TEST_CASE("NumericValues") {
     SECTION("empty") {
-        auto vec = selections::NumericValues();
+        auto vec = NumericValues();
         CHECK(vec.size() == 0);
         CHECK(vec.capacity() == 1);
 
@@ -21,7 +20,7 @@ TEST_CASE("NumericValues") {
     }
 
     SECTION("invalid value") {
-        auto vec = selections::NumericValues();
+        auto vec = NumericValues();
         CHECK_THROWS_WITH(vec.push_back(static_cast<double>(INFINITY)), "invalid value +inf as first value of NumericValues");
 
         vec.push_back(static_cast<double>(-INFINITY));
@@ -31,7 +30,7 @@ TEST_CASE("NumericValues") {
     }
 
     SECTION("contains 1 value") {
-        auto vec = selections::NumericValues(3);
+        auto vec = NumericValues(3);
         CHECK(vec.size() == 1);
         CHECK(vec.capacity() == 1);
         CHECK(vec[0] == 3);
@@ -47,7 +46,7 @@ TEST_CASE("NumericValues") {
     }
 
     SECTION("multiple values") {
-        auto vec = selections::NumericValues();
+        auto vec = NumericValues();
         vec.reserve(32);
         CHECK(vec.size() == 0);
         CHECK(vec.capacity() == 32);

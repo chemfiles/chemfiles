@@ -8,7 +8,6 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/files/XDRFile.hpp"
 
@@ -16,6 +15,7 @@ using matrix = float[3][3];
 
 namespace chemfiles {
 class Frame;
+class FormatMetadata;
 
 /// GROMACS TRR file format reader.
 class TRRFormat final : public Format {

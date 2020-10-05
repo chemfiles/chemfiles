@@ -11,13 +11,13 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 class Frame;
 class Residue;
 class MemoryBuffer;
+class FormatMetadata;
 
 /// Tripos MOL2 format reader and writer.
 class MOL2Format final: public TextFormat {

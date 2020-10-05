@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "chemfiles/File.hpp"
-#include "chemfiles/external/span.hpp"
 
 namespace chemfiles {
 class MemoryBuffer;
