@@ -27,7 +27,7 @@ foreach(example IN LISTS c_examples)
     chfl_c_example(${example})
 endforeach()
 
-CHECK_C_COMPILER_FLAG("-Wno-format" CC_SUPPORTS_WNO_FORMAT)
+CHECK_COMPILER_FLAG(C "-Wno-format" CC_SUPPORTS_WNO_FORMAT)
 if(${CC_SUPPORTS_WNO_FORMAT})
     target_compile_options(example-c-select PRIVATE "-Wno-format")
 endif()
