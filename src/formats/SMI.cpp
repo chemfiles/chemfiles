@@ -10,6 +10,7 @@
 #include <map>
 #include <stack>
 #include <tuple>
+#include <deque>
 #include <string>
 #include <vector>
 #include <memory>
@@ -58,7 +59,7 @@ template<> const FormatMetadata& chemfiles::format_metadata<SMIFormat>() {
 }
 
 /// See if all values in array are true
-static bool all(const std::vector<bool>& vec);
+static bool all(const std::deque<bool>& vec);
 
 static bool is_aromatic_organic(char c) {
     switch (c) {
@@ -411,7 +412,7 @@ static void find_rings(
     std::unordered_map<size_t, size_t>& ring_atoms) {
 
     ring_atoms.clear();
-    std::vector<bool> hit_atoms(adj_list.size(), false);
+    std::deque<bool> hit_atoms(adj_list.size(), false);
     std::set<Bond> ring_bonds;
 
     while (!all(hit_atoms)) {
@@ -697,7 +698,7 @@ void SMIFormat::write_next(const Frame& frame) {
 
     find_rings(adj_list_, ring_atoms_);
 
-    std::vector<bool> written(frame.size(), false);
+    std::deque<bool> written(frame.size(), false);
     size_t branch_stack = 0;
 
     ring_stack_.clear();
@@ -848,7 +849,7 @@ optional<uint64_t> SMIFormat::forward() {
     return position;
 }
 
-bool all(const std::vector<bool>& vec) {
+bool all(const std::deque<bool>& vec) {
     for (auto i : vec) {
         if (!i) {
             return false;
