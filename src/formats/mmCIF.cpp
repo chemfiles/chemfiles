@@ -125,7 +125,7 @@ void mmCIFFormat::init_() {
 
         if (in_loop && line_split[0].find("_atom_site") != std::string::npos) {
             auto atom_label = line_split[0].substr(11).to_string();
-            tolower(atom_label);
+            to_ascii_lowercase(atom_label);
             atom_site_map_[atom_label] = current_index++;
             break;
         }
@@ -143,7 +143,7 @@ void mmCIFFormat::init_() {
     do {
         if (line.find("_atom_site") != std::string::npos) {
             auto atom_label = trim(line).substr(11).to_string();
-            tolower(atom_label);
+            to_ascii_lowercase(atom_label);
             atom_site_map_[atom_label] = current_index++;
 
             position = file_.tellpos();

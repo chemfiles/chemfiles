@@ -19,25 +19,15 @@
 using namespace chemfiles;
 using namespace chemfiles::selections;
 
-// This intentionally does not account for other encoding or locale. Selection
-// strings should be given in ASCII or UTF-8 encoding.
-static bool is_alpha(char c) {
-    return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'));
-}
-
-static bool is_digit(char c) {
-    return (c >= '0' && c <= '9');
-}
-
 static bool is_ident_component(char c) {
-    return is_alpha(c) || is_digit(c) || c == '_';
+    return is_ascii_letter(c) || is_ascii_digit(c) || c == '_';
 }
 
 bool chemfiles::selections::is_ident(string_view string) {
     if (string.empty()) {
         return false;
     }
-    if (!is_alpha(string[0])) {
+    if (!is_ascii_letter(string[0])) {
         return false;
     }
     for (auto c: string) {
@@ -111,7 +101,7 @@ std::string Token::as_str() const {
 std::vector<Token> Tokenizer::tokenize() {
     auto tokens = std::vector<Token>();
     while (!finished()) {
-        if (match(is_whitespace)) {
+        if (match(is_ascii_whitespace)) {
             continue;
         } else if (match('(')) {
             tokens.emplace_back(Token(Token::LPAREN));
@@ -172,10 +162,10 @@ std::vector<Token> Tokenizer::tokenize() {
         } else if (match('"')) {
             tokens.emplace_back(string());
             continue;
-        } else if (check(is_alpha)) {
+        } else if (check(is_ascii_letter)) {
             tokens.emplace_back(ident());
             continue;
-        } else if (check(is_digit)) {
+        } else if (check(is_ascii_digit)) {
             tokens.emplace_back(number());
             continue;
         } else {
@@ -190,7 +180,7 @@ Token Tokenizer::variable() {
     size_t start = current_;
     size_t count = 0;
     while (!finished()) {
-        if (match(is_digit)) {
+        if (match(is_ascii_digit)) {
             count += 1;
         } else {
             break;
@@ -274,7 +264,7 @@ Token Tokenizer::number() {
     size_t start = current_;
     size_t count = 0;
     while (!finished()) {
-        if (match(is_digit) || match('.')) {
+        if (match(is_ascii_digit) || match('.')) {
             count += 1;
         } else {
             break;
@@ -288,7 +278,7 @@ Token Tokenizer::number() {
             count += 1;
         }
         while (!finished()) {
-            if (match(is_digit)) {
+            if (match(is_ascii_digit)) {
                 count += 1;
             } else {
                 break;

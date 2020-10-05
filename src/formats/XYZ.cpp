@@ -149,7 +149,7 @@ static bool should_be_quoted(string_view s) {
     for (auto c: s) {
         // TODO: ASE also allow [] {} and () to function as quotes. This should
         // be updated when a specification is agreed on.
-        if (is_whitespace(c) || c == '=' || c == '\'' || c == '"') {
+        if (is_ascii_whitespace(c) || c == '=' || c == '\'' || c == '"') {
             return true;
         }
     }
@@ -276,7 +276,7 @@ public:
             }
 
             auto value = next_substring();
-            if (!is_whitespace(current()) && !done()) {
+            if (!is_ascii_whitespace(current()) && !done()) {
                 // missing a space after the value, bail out here
                 warning("Extended XYZ", "expected whitespace after the value for {}, got {}", name, current());
                 break;
@@ -290,7 +290,7 @@ public:
 private:
     void skip_whitespace() {
         while (!done()) {
-            if (is_whitespace(current())) {
+            if (is_ascii_whitespace(current())) {
                 advance();
             } else {
                 return;
@@ -317,7 +317,7 @@ private:
                 check_for_quote = false;
                 advance();
                 break;
-            } else if (!check_for_quote && (is_whitespace(current()) || current() == '=')) {
+            } else if (!check_for_quote && (is_ascii_whitespace(current()) || current() == '=')) {
                 // end of non-quoted value
                 break;
             } else {
@@ -504,7 +504,7 @@ void read_atomic_properties(const properties_list_t& properties, string_view lin
             std::string value;
             auto count = scan(line, value);
             line.remove_prefix(count);
-            tolower(value);
+            to_ascii_lowercase(value);
             if (value == "t" || value == "true") {
                 atom.set(property.name, true);
             } else if (value == "f" || value == "false") {

@@ -35,6 +35,15 @@ PARSING_FUNCTIONS = {
     r"(?P<name>\b(std)?(::)?strtod\b)": "parse<double>",
     r"(?P<name>\b(std)?(::)?strtold\b)": "parse<double>",
     r"(?P<name>\b(std)?(::)?sscanf\b)": "scan",
+    r"(?P<name>\b(std)?(::)?isalnum\b)": "is_ascii_alphanumeric",
+    r"(?P<name>\b(std)?(::)?isalpha\b)": "is_ascii_letter",
+    r"(?P<name>\b(std)?(::)?islower\b)": "is_ascii_lowercase",
+    r"(?P<name>\b(std)?(::)?isupper\b)": "is_ascii_uppercase",
+    r"(?P<name>\b(std)?(::)?isdigit\b)": "is_ascii_digit",
+    r"(?P<name>\b(std)?(::)?isspace\b)": "is_ascii_whitespace",
+    r"(?P<name>\b(std)?(::)?isblank\b)": "is_ascii_whitespace",
+    r"(?P<name>\b(std)?(::)?tolower\b)": "to_ascii_lowercase",
+    r"(?P<name>\b(std)?(::)?toupper\b)": "to_ascii_uppercase",
 }
 
 CAPI_FUNCTIONS = {

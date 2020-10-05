@@ -17,6 +17,7 @@
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/parse.hpp"
+#include "chemfiles/utils.hpp"
 #include "chemfiles/warnings.hpp"
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/string_view.hpp"
@@ -29,12 +30,6 @@ namespace chemfiles {
 }
 
 using namespace chemfiles;
-
-static bool is_digit(char c) {
-    return c == '0' || c == '1' || c == '2' || c == '3' || c == '4' ||
-           c == '5' || c == '6' || c == '7' || c == '8' || c == '9';
-}
-
 
 template<> const FormatMetadata& chemfiles::format_metadata<CSSRFormat>() {
     static FormatMetadata metadata;
@@ -118,7 +113,7 @@ void CSSRFormat::read_next(Frame& frame) {
         auto type = name;
         size_t type_length = 0;
         for (auto ch: type) {
-            if (is_digit(ch)) {
+            if (is_ascii_digit(ch)) {
                 break;
             }
             type_length += 1;

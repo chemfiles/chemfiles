@@ -16,6 +16,7 @@
 #include "chemfiles/Format.hpp"
 #include "chemfiles/FormatFactory.hpp"
 
+#include "chemfiles/utils.hpp"
 #include "chemfiles/mutex.hpp"
 #include "chemfiles/error_fmt.hpp"
 
@@ -184,7 +185,7 @@ unsigned edit_distance(string_view first, string_view second) {
 
    for (unsigned j=1; j<n; j++) {
         for (unsigned i=1; i<m; i++) {
-            if (std::tolower(first[i - 1]) == std::tolower(second[j - 1])) {
+            if (to_ascii_lowercase(first[i - 1]) == to_ascii_lowercase(second[j - 1])) {
                 distances[i][j] = distances[i - 1][j - 1];
             } else {
                 distances[i][j] = std::min(std::min(
