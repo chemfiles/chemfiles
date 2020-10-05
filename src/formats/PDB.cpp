@@ -7,6 +7,7 @@
 #include <map>
 #include <tuple>
 #include <array>
+#include <deque>
 #include <string>
 #include <vector>
 #include <memory>
@@ -806,8 +807,10 @@ void PDBFormat::write_next(const Frame& frame) {
         }
     }
 
-    // Used to skip writing unnecessary connect records
-    auto is_atom_record = std::vector<bool>(frame.size(), false);
+    // Used to skip writing unnecessary connect record
+    // use std::deque because std::vector<bool> have a surprising behavior due
+    // to C++ standard requiring it to pack multiple bool in a byte
+    auto is_atom_record = std::deque<bool>(frame.size(), false);
 
     // Used for writing TER records.
     size_t ter_count = 0;
