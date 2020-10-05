@@ -68,7 +68,7 @@ void CIFFormat::init_() {
     // Parse the CIF file
     auto content = file_.readall();
     try {
-        doc = gemmi::cif::Document(gemmi::cif::read_string(content));
+        doc = gemmi::cif::read_string(content);
     } catch (std::exception& e) {
         throw format_error("cannot parse CIF file: {}", e.what());
     }

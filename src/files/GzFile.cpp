@@ -11,6 +11,7 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/error_fmt.hpp"
+#include "chemfiles/unreachable.hpp"
 
 #include "chemfiles/files/MemoryBuffer.hpp"
 #include "chemfiles/files/GzFile.hpp"
@@ -37,6 +38,8 @@ GzFile::GzFile(const std::string& path, File::Mode mode): TextFileImpl(path) {
     case File::APPEND:
         openmode = "ab7";
         break;
+    default:
+        unreachable();
     }
 
     file_ = gzopen64(path.c_str(), openmode);
@@ -102,8 +105,8 @@ MemoryBuffer chemfiles::decompress_gz(const char* src, size_t size) {
     stream.next_in = reinterpret_cast<const Bytef*>(src);
     stream.avail_in = checked_cast(size);
     stream.total_out = 0;
-    stream.zalloc = Z_NULL;
-    stream.zfree = Z_NULL;
+    stream.zalloc = nullptr;
+    stream.zfree = nullptr;
 
     // the second parameter is set to 15 (use the largest window possible) + 32
     // (detect header and check between gzip or zlib header)

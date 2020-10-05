@@ -6,9 +6,11 @@
 #include <cstring>
 #include <string>
 
+#include "chemfiles/unreachable.hpp"
+#include "chemfiles/error_fmt.hpp"
+
 #include "chemfiles/File.hpp"
 #include "chemfiles/files/PlainFile.hpp"
-#include "chemfiles/error_fmt.hpp"
 
 using namespace chemfiles;
 
@@ -45,6 +47,8 @@ PlainFile::PlainFile(const std::string& path, File::Mode mode): TextFileImpl(pat
     case File::WRITE:
         openmode = "wb";
         break;
+    default:
+        unreachable();
     }
 
     file_ = std::fopen(path.c_str(), openmode);

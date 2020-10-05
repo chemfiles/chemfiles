@@ -198,6 +198,7 @@ void MOL2Format::read_bonds(Frame& frame, size_t nbonds) {
         } else if (bond_order == "du") { // du is a dummy bond
             order = Bond::UNKNOWN;
         } else {
+            warning("MOL2 reader", "unknown bond order '{}'", bond_order);
             order = Bond::UNKNOWN;
         }
 
