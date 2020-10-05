@@ -74,7 +74,7 @@ void nc::NcVariable::add_string_attribute(const std::string& name, const std::st
 }
 
 bool nc::NcVariable::attribute_exists(const std::string& name) const {
-    auto id = nc::netcdf_id_t(-1);
+    nc::netcdf_id_t id = -1;
     auto status = nc_inq_attid(file_id_, var_id_, name.c_str(), &id);
     return status == NC_NOERR;
 }
@@ -147,6 +147,8 @@ NcFile::NcFile(std::string path, File::Mode mode)
 NcFile::~NcFile() {
     auto status = nc_close(file_id_);
     assert(status == NC_NOERR);
+    // silent "unused variable" when compiling without assertions
+    (void)status;
 }
 
 void NcFile::set_nc_mode(NcMode mode) {
@@ -206,9 +208,9 @@ size_t NcFile::dimension(const std::string& name) const {
 
 size_t NcFile::optional_dimension(const std::string& name, size_t value) const {
     // Get the dimmension id
-    auto dim_id = nc::netcdf_id_t(-1);
+    nc::netcdf_id_t dim_id = -1;
     auto status = nc_inq_dimid(file_id_, name.c_str(), &dim_id);
-    if (dim_id == nc::netcdf_id_t(-1)) {
+    if (dim_id == -1) {
         return value;
     }
     nc::check(status, "can not get dimmension id for '{}'", name);
@@ -224,13 +226,13 @@ size_t NcFile::optional_dimension(const std::string& name, size_t value) const {
 void NcFile::add_dimension(const std::string& name, size_t value) {
     assert(nc_mode() == DEFINE &&
            "File must be in define mode to add dimmension");
-    auto dim_id = nc::netcdf_id_t(-1);
+    nc::netcdf_id_t dim_id = -1;
     auto status = nc_def_dim(file_id_, name.c_str(), value, &dim_id);
     nc::check(status, "can not add dimension '{}'", name);
 }
 
 bool NcFile::variable_exists(const std::string& name) const {
-    auto id = nc::netcdf_id_t(-1);
+    nc::netcdf_id_t id = -1;
     auto status = nc_inq_varid(file_id_, name.c_str(), &id);
     return status == NC_NOERR;
 }

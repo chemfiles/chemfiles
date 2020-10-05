@@ -141,6 +141,8 @@ void XzFile::seek(uint64_t position) {
 
     auto count = this->read(buffer, static_cast<size_t>(position));
     assert(count == position);
+    // silent "unused variable" when compiling without assertions
+    (void)count;
 }
 
 void XzFile::write(const char* data, size_t count) {

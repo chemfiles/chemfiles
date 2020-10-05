@@ -153,6 +153,8 @@ void Bz2File::seek(uint64_t position) {
 
     auto count = this->read(buffer, static_cast<size_t>(position));
     assert(count == position);
+    // silent "unused variable" when compiling without assertions
+    (void)count;
 }
 
 void Bz2File::write(const char* data, size_t count) {
