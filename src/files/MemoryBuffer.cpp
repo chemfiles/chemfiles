@@ -2,15 +2,19 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cstdlib>
+#include <cstring>
+#include <utility>
+#include <algorithm>
 
-#include "chemfiles/files/MemoryBuffer.hpp"
+#include "chemfiles/error_fmt.hpp"
+#include "chemfiles/unreachable.hpp"
 
+#include "chemfiles/File.hpp"
 #include "chemfiles/files/GzFile.hpp"
 #include "chemfiles/files/XzFile.hpp"
 #include "chemfiles/files/Bz2File.hpp"
 
-#include "chemfiles/error_fmt.hpp"
-#include "chemfiles/unreachable.hpp"
+#include "chemfiles/files/MemoryBuffer.hpp"
 
 using namespace chemfiles;
 

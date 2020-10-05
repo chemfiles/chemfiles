@@ -15,6 +15,7 @@
 
 #define TR2_OPTIONAL_DISABLE_EMULATION_OF_TYPE_TRAITS
 
+# include <new>
 # include <utility>
 # include <type_traits>
 # include <initializer_list>
@@ -177,10 +178,10 @@ struct is_nothrow_move_assignable
 
 
 // 20.5.4, optional for object types
-template <class T> class optional;
+template <class T> class optional; // IWYU pragma: keep
 
 // 20.5.5, optional for lvalue reference types
-template <class T> class optional<T&>;
+template <class T> class optional<T&>; // IWYU pragma: keep
 
 
 // workaround: std utility functions aren't constexpr yet

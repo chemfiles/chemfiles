@@ -14,7 +14,6 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/Connectivity.hpp"
@@ -27,6 +26,7 @@ class Atom;
 class Frame;
 class Topology;
 class MemoryBuffer;
+class FormatMetadata;
 
 /// SMI/OpenSMILES file format reader and writer.
 class SMIFormat final: public TextFormat {

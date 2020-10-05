@@ -10,13 +10,13 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 class Frame;
 class MemoryBuffer;
+class FormatMetadata;
 
 /// XYZ file format reader and writer.
 ///

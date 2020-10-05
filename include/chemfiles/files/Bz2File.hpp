@@ -10,7 +10,6 @@
 #include <vector>
 #include <functional>
 
-#include "chemfiles/config.h"
 #include "chemfiles/File.hpp"
 #include "chemfiles/files/MemoryBuffer.hpp"
 

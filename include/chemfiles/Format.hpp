@@ -18,9 +18,36 @@
 namespace chemfiles {
 class Frame;
 class MemoryBuffer;
+class FormatMetadata;
+
+/// Get the metadata associated with `Format`.
+///
+/// The metadata should be a reference to static memory.
+///
+/// In order to implement a new format, one should specialise this function
+/// with the corresponding format:
+///
+/// ```cpp
+/// class MyFormat: public Format {
+///     // ...
+/// };
+///
+/// namespace chemfiles {
+///     template<> const FormatMetadata& format_metadata<MyFormat>() {
+///         static FormatMetadata metadata;
+///         metadata.name = "MyFormat";
+///         metadata.extension = ".mtf";
+///         return metadata;
+///     }
+/// }
+/// ```
+template<class Format>
+const FormatMetadata& format_metadata() {
+    throw FormatError("format_metadata is not implemented for this format");
+}
 
 /// The `Format` class defines the interface to implement in order to add a new
-/// format to chemfiles. For text-based formats, it might be simpler to 
+/// format to chemfiles. For text-based formats, it might be simpler to
 /// implement the `TextFormat` interface instead.
 ///
 /// It is possible to implement only one of `Format::read`; `Format::read_step`

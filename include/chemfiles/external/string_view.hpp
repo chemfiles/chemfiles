@@ -351,6 +351,8 @@ using std::operator<<;
 #include <limits>
 #include <ostream>
 #include <string>   // std::char_traits<>
+#include <cstddef>
+#include <utility>
 
 #if ! nssv_CONFIG_NO_EXCEPTIONS
 # include <stdexcept>
@@ -425,7 +427,7 @@ template
     class CharT,
     class Traits = std::char_traits<CharT>
 >
-class basic_string_view;
+class basic_string_view;  // IWYU pragma: keep
 
 //
 // basic_string_view:

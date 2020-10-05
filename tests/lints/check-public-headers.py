@@ -21,6 +21,7 @@ WHITELIST = [
     "iterator", "functional", "cstdint", "array", "utility", "cassert",
     "string", "memory", "exception", "limits", "algorithm", "stdexcept",
     "vector", "cmath", "type_traits", "unordered_map", "cfloat", "new",
+    "cstddef",
     # external headers
     "chemfiles/external/span.hpp",
     "chemfiles/external/optional.hpp",

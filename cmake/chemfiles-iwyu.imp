@@ -7,10 +7,13 @@
     # ext/alloc_traits.h is pulled when doing `for (auto& val: vector)`
     {include: ["<ext/alloc_traits.h>", "private", "<vector>", "public"]},
 
-    # Allow getting size_t from usual header
+    # Allow getting size_t from usual headers
     {symbol: ["size_t", "private", "<vector>", "public"]},
+    {symbol: ["std::size_t", "private", "<vector>", "public"]},
     {symbol: ["size_t", "private", "<string>", "public"]},
+    {symbol: ["std::size_t", "private", "<string>", "public"]},
     {symbol: ["size_t", "private", "<array>", "public"]},
+    {symbol: ["std::size_t", "private", "<array>", "public"]},
 
     # allow getting std::pair from map header
     {symbol: ["std::pair", "private", "<map>", "public"]},
@@ -30,22 +33,53 @@
     {symbol: ["std::move", "private", "<utility>", "public"]},
     {symbol: ["std::forward", "private", "<utility>", "public"]},
 
+    # allow getting std::operator== from any header
+    {symbol: ["std::operator==", "private", "<string>", "public"]},
+    {symbol: ["std::operator!=", "private", "<string>", "public"]},
+    {symbol: ["std::operator==", "private", "<vector>", "public"]},
+    {symbol: ["std::operator!=", "private", "<vector>", "public"]},
+    {symbol: ["std::operator==", "private", "<mutex>", "public"]},
+    {symbol: ["std::operator!=", "private", "<mutex>", "public"]},
+
     # allow getting <type_traits> from map header
     {include: ["<type_traits>", "public", "<map>", "public"]},
     {include: ["<type_traits>", "public", "<unordered_map>", "public"]},
 
+    # allow getting std::hash from unordered_map header
+    {symbol: ["std::hash", "private", "<unordered_map>", "public"]},
+
     # Get various symbols from the right headers
     {symbol: ["std::exception", "private", "<exception>", "public"]},
     {symbol: ["std::hash", "private", "<functional>", "public"]},
+    {symbol: ["std::mutex", "private", "<mutex>", "public"]},
+    {symbol: ["std::unique_lock", "private", "<mutex>", "public"]},
+    {symbol: ["std::reference_wrapper", "private", "<functional>", "public"]},
+    {symbol: ["std::swap", "private", "<utility>", "public"]},
+    {symbol: ["std::string", "private", "<string>", "public"]},
+    {symbol: ["std::toupper", "private", "<cctype>", "public"]},
+    {symbol: ["toupper", "private", "<cctype>", "public"]},
+    {symbol: ["std::tolower", "private", "<cctype>", "public"]},
+    {symbol: ["tolower", "private", "<cctype>", "public"]},
+    {symbol: ["std::nullptr_t", "private", "<cstddef>", "public"]},
+    {symbol: ["SEEK_SET", "private", "<cstdio>", "public"]},
+    {symbol: ["errno", "private", "<cerrno>", "public"]},
+    {symbol: ["ERANGE", "private", "<cerrno>", "public"]},
 
     # Don't force to include <memory> when indexing in a vector
     {symbol: ["std::allocator_traits<std::allocator<chemfiles::Residue> >::value_type", "private", "<vector>", "public"]},
+
     # Don't force to include <algorithm> when using std::vector::push_back
     {symbol: ["std::max", "private", "<vector>", "public"]},
+
     # Don't force to include <type_traits> when using properties
     {symbol: ["std::decay<const chemfiles::Property>::type", "private", "\"chemfiles/Frame.hpp\"", "public"]},
+
     # Don't force to include <type_traits> when using move assignement of File
     {symbol: ["std::remove_reference<chemfiles::XDRFile &>::type", "private", "\"chemfiles/files/XDRFile.hpp\"", "public"]},
+
+    # Don't force to include <functional> when using chemfiles::shared_allocator
+    {symbol: ["std::__function::__base", "private", "<functional>", "public"]},
+    {symbol: ["std::__function::__base", "private", "\"chemfiles/capi/shared_allocator.hpp\"", "public"]},
 
     # Allow getting the chemfiles namespace from any file
     {symbol: ["chemfiles", "private", "\"chemfiles/misc.hpp\"", "public"]},

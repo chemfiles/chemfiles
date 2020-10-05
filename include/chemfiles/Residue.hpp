@@ -6,7 +6,6 @@
 
 #include <cstdint>
 #include <string>
-#include <vector>
 #include <algorithm>
 
 #include "chemfiles/exports.h"

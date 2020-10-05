@@ -2,10 +2,17 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 #include <cassert>
 
-#include "chemfiles/FormatMetadata.hpp"
+#include <cstring>
+#include <string>
+
+#include <fmt/format.h>
 
 #include "chemfiles/utils.hpp"
 #include "chemfiles/error_fmt.hpp"
+#include "chemfiles/string_view.hpp"
+#include "chemfiles/external/optional.hpp"
+
+#include "chemfiles/FormatMetadata.hpp"
 using namespace chemfiles;
 
 static void check_not_empty(const char* field_value, string_view field_name, const char* format_name) {

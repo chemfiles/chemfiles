@@ -2,23 +2,26 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cassert>
+#include <cstddef>
 #include <cmath>
-#include <iosfwd>
 #include <string>
 #include <vector>
 #include <iterator>
 #include <algorithm>
-
-#include "chemfiles/Frame.hpp"
+#include <unordered_map>
 
 #include "chemfiles/types.hpp"
-#include "chemfiles/Atom.hpp"
-#include "chemfiles/Connectivity.hpp"
-#include "chemfiles/Configuration.hpp"
 #include "chemfiles/error_fmt.hpp"
+#include "chemfiles/periodic_table.hpp"
+#include "chemfiles/external/optional.hpp"
+
+#include "chemfiles/Atom.hpp"
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/UnitCell.hpp"
-#include "chemfiles/external/optional.hpp"
+#include "chemfiles/Connectivity.hpp"
+#include "chemfiles/Configuration.hpp"
+
+#include "chemfiles/Frame.hpp"
 
 using namespace chemfiles;
 

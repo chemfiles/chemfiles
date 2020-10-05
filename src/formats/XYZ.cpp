@@ -3,24 +3,32 @@
 
 #include <cassert>
 #include <cstdint>
+
 #include <map>
 #include <array>
 #include <string>
 #include <vector>
 #include <exception>
+#include <unordered_map>
+
+#include <fmt/format.h>
+
+#include "chemfiles/types.hpp"
+#include "chemfiles/parse.hpp"
+#include "chemfiles/utils.hpp"
+#include "chemfiles/warnings.hpp"
+#include "chemfiles/error_fmt.hpp"
+#include "chemfiles/string_view.hpp"
+#include "chemfiles/unreachable.hpp"
+#include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/File.hpp"
-#include "chemfiles/Format.hpp"
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/Property.hpp"
-
-#include "chemfiles/types.hpp"
-#include "chemfiles/parse.hpp"
-#include "chemfiles/error_fmt.hpp"
-#include "chemfiles/external/optional.hpp"
-#include "chemfiles/warnings.hpp"
+#include "chemfiles/UnitCell.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/formats/XYZ.hpp"
 

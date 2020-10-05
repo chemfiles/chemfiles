@@ -1,24 +1,26 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <cctype>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <functional>
 
 #include <fmt/ostream.h>
 
-#include "chemfiles/config.h"
 #include "chemfiles/misc.hpp"
 #include "chemfiles/File.hpp"
-#include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
+
 #include "chemfiles/FormatFactory.hpp"
 
 #include "chemfiles/utils.hpp"
 #include "chemfiles/mutex.hpp"
 #include "chemfiles/error_fmt.hpp"
+#include "chemfiles/string_view.hpp"
+#include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/formats/Molfile.hpp"
 #include "chemfiles/formats/AmberNetCDF.hpp"
@@ -43,6 +45,8 @@
 
 namespace chemfiles {
     class MemoryBuffer;
+    class Format;
+
     extern template class Molfile<DCD>;
     extern template class Molfile<TRJ>;
     extern template class Molfile<LAMMPS>;

@@ -13,7 +13,6 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/UnitCell.hpp"
 #include "chemfiles/external/span.hpp"
@@ -21,7 +20,9 @@
 namespace chemfiles {
 class Frame;
 class Residue;
+class Vector3D;
 class MemoryBuffer;
+class FormatMetadata;
 
 /// MMTF file format reader and writer.
 ///

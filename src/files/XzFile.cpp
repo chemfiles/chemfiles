@@ -11,9 +11,10 @@
 #include <lzma.h>
 
 #include "chemfiles/File.hpp"
-#include "chemfiles/files/XzFile.hpp"
-
 #include "chemfiles/error_fmt.hpp"
+
+#include "chemfiles/files/XzFile.hpp"
+#include "chemfiles/files/MemoryBuffer.hpp"
 
 using namespace chemfiles;
 

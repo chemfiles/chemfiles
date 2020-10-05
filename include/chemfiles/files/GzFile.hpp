@@ -6,7 +6,6 @@
 
 #include <cstdint>
 #include <string>
-#include <vector>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/files/MemoryBuffer.hpp"

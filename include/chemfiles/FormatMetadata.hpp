@@ -4,11 +4,8 @@
 #ifndef CHEMFILES_FORMAT_METADATA_HPP
 #define CHEMFILES_FORMAT_METADATA_HPP
 
-#include <string>
-
 #include "chemfiles/exports.h"
 #include "chemfiles/external/optional.hpp"
-#include "chemfiles/Error.hpp"
 
 namespace chemfiles {
 
@@ -66,32 +63,6 @@ public:
     // Validate the format metadata
     void validate() const;
 };
-
-/// Get the metadata associated with `Format`.
-///
-/// The metadata should be a reference to static memory.
-///
-/// In order to implement a new format, one should specialise this function
-/// with the corresponding format:
-///
-/// ```cpp
-/// class MyFormat: public Format {
-///     // ...
-/// };
-///
-/// namespace chemfiles {
-///     template<> const FormatMetadata& format_metadata<MyFormat>() {
-///         static FormatMetadata metadata;
-///         metadata.name = "MyFormat";
-///         metadata.extension = ".mtf";
-///         return metadata;
-///     }
-/// }
-/// ```
-template<class Format>
-const FormatMetadata& format_metadata() {
-    throw FormatError("format_metadata is not implemented for this format");
-}
 
 } // namespace chemfiles
 

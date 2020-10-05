@@ -10,12 +10,12 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
 class Frame;
 class MemoryBuffer;
+class FormatMetadata;
 
 /// CSSR (Cambridge Structure Search and Retrieval) file format reader
 /// and writer. Only one frame can be read or written to this format.

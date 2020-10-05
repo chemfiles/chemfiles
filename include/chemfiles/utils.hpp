@@ -4,7 +4,6 @@
 #ifndef CHEMFILES_UTILS_HPP
 #define CHEMFILES_UTILS_HPP
 
-#include <cassert>
 #include <vector>
 #include <string>
 #include <algorithm>

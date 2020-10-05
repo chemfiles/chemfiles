@@ -5,7 +5,7 @@
 #define CHEMFILES_CHFL_TYPES_H
 
 #include <stdint.h>
-#include <stdbool.h>
+#include <stdbool.h>  // IWYU pragma: keep
 
 #include "chemfiles/exports.h"
 

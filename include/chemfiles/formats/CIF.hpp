@@ -4,24 +4,22 @@
 #ifndef CHEMFILES_FORMAT_CIF_HPP
 #define CHEMFILES_FORMAT_CIF_HPP
 
-#include "chemfiles/config.h"
+#include "chemfiles/config.h"  // IWYU pragma: keep
 #ifndef CHFL_DISABLE_GEMMI
 
-#include <cstdint>
-#include <map>
 #include <string>
 #include <vector>
 #include <memory>
 
-#include "gemmi/smcif.hpp"
+#include "gemmi/small.hpp"
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 
 namespace chemfiles {
 class Frame;
 class MemoryBuffer;
+class FormatMetadata;
 
 /// CIF (Crystallographic Information Framework) files reader and writer.
 ///

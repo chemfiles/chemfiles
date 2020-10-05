@@ -6,7 +6,7 @@
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/exports.h"
-#include "chemfiles/config.h"
+#include "chemfiles/config.h"  // IWYU pragma: keep
 
 #ifdef CHEMFILES_WINDOWS
 #undef INFINITE

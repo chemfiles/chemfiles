@@ -1,7 +1,7 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <iosfwd>
+#include <cstddef>
 #include <vector>
 #include <unordered_map>
 

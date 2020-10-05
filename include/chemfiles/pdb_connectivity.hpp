@@ -6,7 +6,6 @@
 
 #include <vector>
 #include <string>
-#include <functional>
 #include <unordered_map>
 
 #include "chemfiles/external/optional.hpp"

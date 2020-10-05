@@ -14,7 +14,6 @@
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/Topology.hpp"  // IWYU pragma: keep
 #include "chemfiles/sorted_set.hpp"
@@ -25,6 +24,7 @@ namespace chemfiles {
 class Atom;
 class Frame;
 class MemoryBuffer;
+class FormatMetadata;
 
 struct atom_data final {
     double x = 0;

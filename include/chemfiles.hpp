@@ -8,6 +8,7 @@
 #include "chemfiles/config.h"
 
 #include "chemfiles/misc.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/Error.hpp"
 #include "chemfiles/Property.hpp"

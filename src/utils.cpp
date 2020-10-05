@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "chemfiles/config.h"
+#include "chemfiles/config.h"  // IWYU pragma: keep
 #include "chemfiles/utils.hpp"
 
 #ifdef CHEMFILES_WINDOWS
@@ -15,6 +15,7 @@
 #define getcwd _getcwd
 #else
 #include <unistd.h>
+#include <limits.h>
 #endif
 
 std::string chemfiles::user_name() {

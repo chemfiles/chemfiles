@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <utility>
 #include <typeinfo>
 
 #include "chemfiles/File.hpp"

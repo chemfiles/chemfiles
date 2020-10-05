@@ -2,7 +2,6 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cassert>
-#include <cctype>
 #include <cstdint>
 #include <string>
 #include <unordered_map>

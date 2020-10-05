@@ -9,20 +9,9 @@
 #include <array>
 #include <string>
 #include <vector>
-#include <memory>
 #include <algorithm>
-#include <functional>
 #include <unordered_map>
 #include <unordered_set>
-
-#include "chemfiles/Atom.hpp"
-#include "chemfiles/Connectivity.hpp"
-#include "chemfiles/File.hpp"
-#include "chemfiles/Format.hpp"
-#include "chemfiles/Frame.hpp"
-#include "chemfiles/Residue.hpp"
-#include "chemfiles/Topology.hpp"
-#include "chemfiles/UnitCell.hpp"
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
@@ -34,6 +23,15 @@
 #include "chemfiles/string_view.hpp"
 #include "chemfiles/external/span.hpp"
 #include "chemfiles/external/optional.hpp"
+
+#include "chemfiles/Atom.hpp"
+#include "chemfiles/File.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/Residue.hpp"
+#include "chemfiles/Topology.hpp"
+#include "chemfiles/UnitCell.hpp"
+#include "chemfiles/Connectivity.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/formats/LAMMPSData.hpp"
 
