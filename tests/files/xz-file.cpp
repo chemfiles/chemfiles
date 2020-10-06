@@ -106,18 +106,18 @@ TEST_CASE("In-memory decompression") {
         0x01, 0x00, 0x00, 0x00, 0x00, 0x04, 0x59, 0x5a
     };
 
-    auto decompressed = xzinflate_in_place(reinterpret_cast<const char*>(content.data()), content.size());
-    CHECK(std::string(decompressed.begin(), decompressed.end()) == "Test\n5467\n");
+    auto decompressed = decompress_xz(reinterpret_cast<const char*>(content.data()), content.size());
+    CHECK(std::string(decompressed.data(), decompressed.size()) == "Test\n5467\n");
 
     content[23] = 0x00;
     CHECK_THROWS_WITH(
-        xzinflate_in_place(reinterpret_cast<const char*>(content.data()), content.size()),
+        decompress_xz(reinterpret_cast<const char*>(content.data()), content.size()),
         "lzma: compressed file is corrupted (code: 9)"
     );
 
     content[0] = 0x00;
     CHECK_THROWS_WITH(
-        xzinflate_in_place(reinterpret_cast<const char*>(content.data()), content.size()),
+        decompress_xz(reinterpret_cast<const char*>(content.data()), content.size()),
         "lzma: input not in .xz format (code: 7)"
     );
 }

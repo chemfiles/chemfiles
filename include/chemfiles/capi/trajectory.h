@@ -165,16 +165,18 @@ CHFL_EXPORT chfl_status chfl_trajectory_nsteps(
     CHFL_TRAJECTORY* trajectory, uint64_t* nsteps
 );
 
-/// Obtain the memory buffer written to by the `trajectory`. The user is **not**
-/// responsible for freeing `data` and this will be done automatically when the
-/// trajectory is closed. It is guaranteed that `data` is null terminated. The
-/// maximum size of the buffer is given by `max_size`.
+/// Obtain the memory buffer written to by the `trajectory`.
+///
+/// The user is **not** responsible for freeing `data` and this will be done
+/// automatically when the trajectory is closed. It is guaranteed that `data` is
+/// null terminated, and the size of the buffer, **not including** the final
+/// `NULL` character, is passed in `size`
 ///
 /// @example{capi/chfl_trajectory/memory_buffer.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_trajectory_memory_buffer(
-    const CHFL_TRAJECTORY* trajectory, const char** data, uint64_t* max_size
+    const CHFL_TRAJECTORY* trajectory, const char** data, uint64_t* size
 );
 
 /// Close a trajectory file, and free the associated memory.

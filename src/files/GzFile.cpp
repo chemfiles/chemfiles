@@ -92,10 +92,10 @@ void GzFile::seek(uint64_t position) {
     }
 }
 
-std::vector<char> chemfiles::gzinflate_in_place(const char* src, size_t size) {
+MemoryBuffer chemfiles::decompress_gz(const char* src, size_t size) {
     // assume a 10% compression ratio, which should be plenty enough
     // (typical ratio is around 15-20%)
-    std::vector<char> output(10 * size);
+    auto output = MemoryBuffer(10 * size);
 
     z_stream stream;
     stream.next_in = reinterpret_cast<const Bytef*>(src);
@@ -114,12 +114,12 @@ std::vector<char> chemfiles::gzinflate_in_place(const char* src, size_t size) {
     bool done = false;
     do {
         // if we need more space, resize the vector
-        if (stream.total_out >= output.size()) {
-            output.resize(2 * output.size());
+        if (stream.total_out >= output.capacity()) {
+            output.reserve_extra(output.capacity());
         }
 
-	    stream.next_out = reinterpret_cast<Bytef*>(output.data() + stream.total_out);
-        stream.avail_out = checked_cast(output.size() - stream.total_out);
+	    stream.next_out = reinterpret_cast<Bytef*>(output.data_mut() + stream.total_out);
+        stream.avail_out = checked_cast(output.capacity() - stream.total_out);
 
         status = inflate(&stream, Z_SYNC_FLUSH);
         if (status == Z_STREAM_END) {
@@ -135,6 +135,10 @@ std::vector<char> chemfiles::gzinflate_in_place(const char* src, size_t size) {
 	    throw file_error("error finishing gz stream: {}", stream.msg);
     }
 
-    output.resize(stream.total_out);
+    if (stream.total_out >= output.capacity()) {
+        // make sure the buffer always contains a terminal NULL
+        output.reserve_extra(1);
+    }
+    output.set_size(stream.total_out);
     return output;
 }

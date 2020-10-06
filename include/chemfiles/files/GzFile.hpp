@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "chemfiles/File.hpp"
+#include "chemfiles/files/MemoryBuffer.hpp"
 
 typedef struct gzFile_s *gzFile;
 
@@ -36,7 +37,7 @@ private:
 };
 
 /// Inflates GZipped data from the `src` buffer
-std::vector<char> gzinflate_in_place(const char* src, size_t size);
+MemoryBuffer decompress_gz(const char* src, size_t size);
 
 } // namespace chemfiles
 

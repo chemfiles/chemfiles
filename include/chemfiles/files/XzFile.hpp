@@ -12,6 +12,7 @@
 #include <lzma.h>
 
 #include "chemfiles/File.hpp"
+#include "chemfiles/files/MemoryBuffer.hpp"
 
 namespace chemfiles {
 
@@ -46,7 +47,7 @@ private:
 };
 
 /// Inflates LZMA/XZ data from the `src` buffer
-std::vector<char> xzinflate_in_place(const char* src, size_t size);
+MemoryBuffer decompress_xz(const char* src, size_t size);
 
 }
 

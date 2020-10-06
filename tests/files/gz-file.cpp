@@ -164,18 +164,18 @@ TEST_CASE("In-memory decompression") {
         0x5e, 0x98, 0x0a, 0x00, 0x00, 0x00,
     };
 
-    auto decompressed = gzinflate_in_place(reinterpret_cast<const char*>(content.data()), content.size());
-    CHECK(std::string(decompressed.begin(), decompressed.end()) == "Test\n5467\n");
+    auto decompressed = decompress_gz(reinterpret_cast<const char*>(content.data()), content.size());
+    CHECK(std::string(decompressed.data(), decompressed.size()) == "Test\n5467\n");
 
     content[23] = 0x00;
     CHECK_THROWS_WITH(
-        gzinflate_in_place(reinterpret_cast<const char*>(content.data()), content.size()),
+        decompress_gz(reinterpret_cast<const char*>(content.data()), content.size()),
         "error inflating gzipped memory: incorrect data check"
     );
 
     content[0] = 0x00;
     CHECK_THROWS_WITH(
-        gzinflate_in_place(reinterpret_cast<const char*>(content.data()), content.size()),
+        decompress_gz(reinterpret_cast<const char*>(content.data()), content.size()),
         "error inflating gzipped memory: incorrect header check"
     );
 }

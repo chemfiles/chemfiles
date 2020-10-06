@@ -9,7 +9,7 @@
 #include "chemfiles/Error.hpp"
 using namespace chemfiles;
 
-const auto memory_file = std::string(
+const auto TEST_DATA = std::string(
 R"(This is
 a test
 for the memory file
@@ -18,8 +18,8 @@ class!
 
 TEST_CASE("Reading from files in memory") {
     SECTION("Basic reading functionalities") {
-        auto buff = std::make_shared<MemoryBuffer>(&memory_file[0], memory_file.size());
-        auto file = TextFile(buff, File::READ, File::DEFAULT);
+        auto buffer = std::make_shared<MemoryBuffer>(TEST_DATA.data(), TEST_DATA.size());
+        auto file = TextFile(buffer, File::READ, File::DEFAULT);
 
         CHECK(file.readline() == "This is");
         CHECK(file.readline() == "a test");
@@ -85,17 +85,25 @@ TEST_CASE("Write to files in memory") {
     SECTION("Basic writing functionalities") {
         // Size 6 as this is the minimal size needed to store "Test\n"
         auto buffer = std::make_shared<MemoryBuffer>(6);
-
         auto file = TextFile(buffer, File::WRITE, File::DEFAULT);
+        CHECK(file.tellpos() == buffer->size());
+        CHECK(buffer->size() == 0);
+        CHECK(buffer->capacity() == 6);
+
         file.print("Test\n");
+        CHECK(std::string(buffer->data(), buffer->size()) == "Test\n");
+        CHECK(std::strlen(buffer->data()) == buffer->size());
+        CHECK(file.tellpos() == buffer->size());
+        CHECK(buffer->size() == 5);
+        CHECK(buffer->capacity() == 6);
 
-        auto result = buffer->write_memory_as_string();
-        CHECK(std::string(result.data(), result.size()) == "Test\n");
-
-        file.print("JUNKJUNK");
-        CHECK(file.tellpos() == 13);
-        result = buffer->write_memory_as_string();
-        CHECK(std::string(result.data(), result.size()) == "Test\nJUNKJUNK");
+        // Check reallocation (more than twice the previous size)
+        file.print("JUNKJUNKJUNKJUNKJUNK");
+        CHECK(std::string(buffer->data(), buffer->size()) == "Test\nJUNKJUNKJUNKJUNKJUNK");
+        CHECK(std::strlen(buffer->data()) == buffer->size());
+        CHECK(file.tellpos() == buffer->size());
+        CHECK(buffer->size() == 25);
+        CHECK(buffer->capacity() > buffer->size());
 
         CHECK_THROWS_WITH(
             file.seekpos(5),
@@ -110,7 +118,7 @@ TEST_CASE("Write to files in memory") {
 
     SECTION("Writing to a compressed memory file") {
         // This currently is not supported
-        auto buffer = std::make_shared<MemoryBuffer>();
+        auto buffer = std::make_shared<MemoryBuffer>(4096);
         CHECK_THROWS_WITH(
             TextFile(buffer, File::WRITE, File::GZIP),
             "writing to a compressed memory file is not supported"
@@ -129,7 +137,7 @@ TEST_CASE("Write to files in memory") {
 
     SECTION("Appending to a memory file") {
         // This currently is not supported
-        auto buffer = std::make_shared<MemoryBuffer>();
+        auto buffer = std::make_shared<MemoryBuffer>(4096);
         CHECK_THROWS_WITH(
             TextFile(buffer, File::APPEND, File::DEFAULT),
             "cannot append (mode 'a') to a memory file"

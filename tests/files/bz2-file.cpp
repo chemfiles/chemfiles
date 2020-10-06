@@ -117,18 +117,18 @@ TEST_CASE("In-memory decompression") {
         0x8b, 0x59, 0xd4
     };
 
-    auto decompressed = bz2inflate_in_place(reinterpret_cast<const char*>(content.data()), content.size());
-    CHECK(std::string(decompressed.begin(), decompressed.end()) == "Test\n5467\n");
+    auto decompressed = decompress_bz2(reinterpret_cast<const char*>(content.data()), content.size());
+    CHECK(std::string(decompressed.data(), decompressed.size()) == "Test\n5467\n");
 
     content[23] = 0x00;
     CHECK_THROWS_WITH(
-        bz2inflate_in_place(reinterpret_cast<const char*>(content.data()), content.size()),
+        decompress_bz2(reinterpret_cast<const char*>(content.data()), content.size()),
         "bzip2: corrupted file (code: -4)"
     );
 
     content[0] = 0x00;
     CHECK_THROWS_WITH(
-        bz2inflate_in_place(reinterpret_cast<const char*>(content.data()), content.size()),
+        decompress_bz2(reinterpret_cast<const char*>(content.data()), content.size()),
         "bzip2: this file do not seems to be a bz2 file (code: -5)"
     );
 }

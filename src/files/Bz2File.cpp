@@ -184,10 +184,10 @@ static uint64_t full_total_out(const bz_stream& stream) {
     return total_out_hi32 + stream.total_out_lo32;
 }
 
-std::vector<char> chemfiles::bz2inflate_in_place(const char* src, size_t size) {
+MemoryBuffer chemfiles::decompress_bz2(const char* src, size_t size) {
     // assume a 10% compression ratio, which should be plenty enough
     // (typical ratio is around 15-20%)
-    std::vector<char> output(10 * size);
+    auto output = MemoryBuffer(10 * size);
 
     bz_stream stream;
     stream.next_in = const_cast<char*>(src);
@@ -200,12 +200,12 @@ std::vector<char> chemfiles::bz2inflate_in_place(const char* src, size_t size) {
     do {
         // if we need more space, resize the vector
         auto total_out = full_total_out(stream);
-        if (total_out >= output.size()) {
-            output.resize(2 * output.size());
+        if (total_out >= output.capacity()) {
+            output.reserve_extra(output.capacity());
         }
 
-	    stream.next_out = output.data() + total_out;
-        stream.avail_out = checked_cast(output.size() - total_out);
+	    stream.next_out = output.data_mut() + total_out;
+        stream.avail_out = checked_cast(output.capacity() - total_out);
 
         auto status = BZ2_bzDecompress(&stream);
         if (status == BZ_STREAM_END) {
@@ -218,6 +218,11 @@ std::vector<char> chemfiles::bz2inflate_in_place(const char* src, size_t size) {
 
     check(BZ2_bzDecompressEnd(&stream));
 
-    output.resize(full_total_out(stream));
+    auto total_out = full_total_out(stream);
+    if (total_out >= output.capacity()) {
+        // make sure the buffer always contains a terminal NULL
+        output.reserve_extra(1);
+    }
+    output.set_size(total_out);
     return output;
 }
