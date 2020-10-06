@@ -39,10 +39,8 @@ size_t MemoryFile::read(char* data, size_t count) {
     auto amount_to_read = count + current_location_ <= buffer_->size() ?
         count : buffer_->size() - current_location_;
 
-    std::copy(buffer_->data() + current_location_,
-              buffer_->data() + current_location_ + amount_to_read,
-              data);
-
+    const char* start = buffer_->data() + current_location_;
+    std::copy(start, start + amount_to_read, data);
     current_location_ += amount_to_read;
 
     return amount_to_read;
@@ -53,5 +51,5 @@ void MemoryFile::write(const char* data, size_t count) {
         throw file_error("cannot write to a memory file unless it is opened in write mode");
     }
 
-    std::copy(data, data + count, std::back_inserter(buffer_->write_memory()));
+    buffer_->write(data, count);
 }

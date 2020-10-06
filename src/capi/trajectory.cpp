@@ -139,17 +139,17 @@ extern "C" chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const trajectory,
     )
 }
 
-extern "C" chfl_status chfl_trajectory_memory_buffer(const CHFL_TRAJECTORY* trajectory, const char** data, uint64_t* max_size) {
+extern "C" chfl_status chfl_trajectory_memory_buffer(const CHFL_TRAJECTORY* trajectory, const char** data, uint64_t* size) {
     CHECK_POINTER(trajectory);
     CHECK_POINTER(data);
-    CHECK_POINTER(max_size);
+    CHECK_POINTER(size);
     CHFL_ERROR_CATCH(
         auto block = trajectory->memory_buffer();
         if (!block) {
-            throw Error("trajectory not opened to write to a memory block");
+            throw Error("trajectory was not opened to write to a memory block");
         }
         *data = block.value().data();
-        *max_size = trajectory->memory_buffer().value().size();
+        *size = trajectory->memory_buffer().value().size();
     )
 }
 

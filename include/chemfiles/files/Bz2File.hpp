@@ -12,6 +12,7 @@
 
 #include "chemfiles/config.h"
 #include "chemfiles/File.hpp"
+#include "chemfiles/files/MemoryBuffer.hpp"
 
 // bzlib.h includes windows.h on Windows platforms, which defines `min` and
 // `max` symbols, failing compilation below.
@@ -53,7 +54,7 @@ private:
 };
 
 /// Inflates BZIP2 data from the `src` buffer
-std::vector<char> bz2inflate_in_place(const char* src, size_t size);
+MemoryBuffer decompress_bz2(const char* src, size_t size);
 
 }
 

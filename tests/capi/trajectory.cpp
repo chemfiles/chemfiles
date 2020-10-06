@@ -1,6 +1,7 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <cstring>
 #include <fstream>
 #include <sstream>
 
@@ -301,19 +302,20 @@ TEST_CASE("Write trajectory to memory") {
 
     CHECK_STATUS(chfl_trajectory_write(trajectory, frame));
 
-    const char* result = nullptr;
-    uint64_t size_of_result;
-    CHECK_STATUS(chfl_trajectory_memory_buffer(trajectory, &result, &size_of_result));
-    CHECK(std::string(result, size_of_result) == EXPECTED_CONTENT);
+    const char* data = nullptr;
+    uint64_t size;
+    CHECK_STATUS(chfl_trajectory_memory_buffer(trajectory, &data, &size));
+    CHECK(size == std::strlen(EXPECTED_CONTENT));
+    CHECK(std::string(data) == EXPECTED_CONTENT);
 
     chfl_free(frame);
     chfl_trajectory_close(trajectory);
 
-    // Make sure that improper trajectories don't succeed with internal file
-    CHFL_TRAJECTORY* trajectory2 = chfl_trajectory_open("data/xyz/trajectory.xyz", 'r');
-    REQUIRE(trajectory2);
-    CHECK(chfl_trajectory_memory_buffer(trajectory2, &result, &size_of_result) != CHFL_SUCCESS);
-    chfl_free(trajectory2);
+    // Make sure that we can not access memory buffer on standard trajectories
+    trajectory = chfl_trajectory_open("data/xyz/trajectory.xyz", 'r');
+    REQUIRE(trajectory);
+    CHECK(chfl_trajectory_memory_buffer(trajectory, &data, &size) != CHFL_SUCCESS);
+    chfl_free(trajectory);
 }
 
 static CHFL_FRAME* testing_frame() {

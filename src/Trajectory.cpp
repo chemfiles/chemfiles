@@ -306,6 +306,5 @@ optional<span<const char>> Trajectory::memory_buffer() const {
         return nullopt;
     }
 
-    auto buffer_string = buffer_->write_memory_as_string();
-    return span<const char>(buffer_string.data(), buffer_string.data() + buffer_string.size());
+    return span<const char>(buffer_->data(), buffer_->data() + buffer_->size());
 }
