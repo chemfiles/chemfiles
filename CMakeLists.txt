@@ -3,7 +3,9 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/InitRules.
 
 if(NOT "${LAST_CMAKE_VERSION}" VERSION_EQUAL ${CMAKE_VERSION})
     set(LAST_CMAKE_VERSION ${CMAKE_VERSION} CACHE INTERNAL "Last version of cmake used to configure")
-    message(STATUS "Running CMake version ${CMAKE_VERSION}")
+    if (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
+        message(STATUS "Running CMake version ${CMAKE_VERSION}")
+    endif()
 endif()
 
 project(chemfiles C CXX)
