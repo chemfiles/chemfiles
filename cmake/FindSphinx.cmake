@@ -50,6 +50,7 @@ option(SPHINX_EPUB_OUTPUT "Build HTML pages with additional information for buil
 option(SPHINX_LATEX_OUTPUT "Build LaTeX sources that can be compiled to a PDF document using pdflatex." OFF)
 option(SPHINX_MAN_OUTPUT "Build manual pages in groff format for UNIX systems." OFF)
 option(SPHINX_TEXT_OUTPUT "Build plain text files." OFF)
+option(SPHINX_LINKCHECK_OUTPUT "Run a build checking that all referenced links exist" OFF)
 
 
 mark_as_advanced(
@@ -136,5 +137,11 @@ function(Sphinx_add_targets target_base_name conf source base_destination)
     Sphinx_add_target(${target_base_name}_text text ${conf} ${source} ${base_destination}/text)
 
     add_dependencies(${target_base_name}_text ${_dependencies})
+  endif()
+
+  if(${SPHINX_LINKCHECK_OUTPUT})
+    Sphinx_add_target(${target_base_name}_linkcheck linkcheck ${conf} ${source} ${base_destination}/linkcheck)
+
+    add_dependencies(${target_base_name}_linkcheck ${_dependencies})
   endif()
 endfunction()
