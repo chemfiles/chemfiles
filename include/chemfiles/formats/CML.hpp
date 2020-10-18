@@ -18,9 +18,7 @@ namespace chemfiles {
 class Frame;
 class MemoryBuffer;
 
-/// [CML] file format reader.
-///
-/// [CML]: http://xml-cml.org/
+/// CML file format reader.
 class CMLFormat final: public Format {
 public:
     CMLFormat(std::string path, File::Mode mode, File::Compression compression):

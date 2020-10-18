@@ -392,7 +392,7 @@ template<> const FormatMetadata& chemfiles::format_metadata<Molfile<MOLDEN>>() {
     metadata.name = "Molden";
     metadata.extension = ".molden";
     metadata.description = "Molden text format";
-    metadata.reference = "http://www.cmbi.ru.nl/molden/molden_format.html";
+    metadata.reference = "https://web.archive.org/web/20200531080022/http://cheminf.cmbi.ru.nl/molden/molden_format.html";
 
     metadata.read = true;
     metadata.write = false;

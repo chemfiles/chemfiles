@@ -19,9 +19,7 @@ class Frame;
 class Residue;
 class MemoryBuffer;
 
-/// Tripos [MOL2] format reader and writer.
-///
-/// [MOL2]: http://chemyang.ccnu.edu.cn/ccb/server/AIMMS/mol2.pdf
+/// Tripos MOL2 format reader and writer.
 class MOL2Format final: public TextFormat {
 public:
     MOL2Format(std::string path, File::Mode mode, File::Compression compression):

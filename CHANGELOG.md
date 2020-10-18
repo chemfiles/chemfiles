@@ -1,7 +1,7 @@
 # Change Log
 
 All notable changes to this project will be documented in this file.
-This project adheres to [Semantic Versioning](http://semver.org/).
+This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Next Release (current master)
 
@@ -169,7 +169,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Added `MOL2` format, reading mol2 files using VMD molfiles plugin.
 * Added `Molden` format, reading molden files using VMD molfiles plugin.
 
-[LAMMPS data files]: http://lammps.sandia.gov/doc/read_data.html
+[LAMMPS data files]: https://lammps.sandia.gov/doc/read_data.html
 
 ### Changes to the C API
 

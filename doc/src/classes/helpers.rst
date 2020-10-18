@@ -37,7 +37,7 @@ how to use these types.
         double c = optional.value_or(-1);
 
 
-.. _cppreference: http://en.cppreference.com/w/cpp/utility/optional
+.. _cppreference: https://en.cppreference.com/w/cpp/utility/optional
 
 ``span<T>``
 -----------
@@ -71,4 +71,4 @@ how to use these types.
         auto sum = std::accumulate(span.begin(), span.end(), 0.0);
 
 
-.. _GSL: http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gsl-guideline-support-library
+.. _GSL: https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl

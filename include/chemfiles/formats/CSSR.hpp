@@ -17,10 +17,8 @@ namespace chemfiles {
 class Frame;
 class MemoryBuffer;
 
-/// [CSSR][CSSR] (Cambridge Structure Search and Retrieval) file format reader
+/// CSSR (Cambridge Structure Search and Retrieval) file format reader
 /// and writer. Only one frame can be read or written to this format.
-///
-/// [CSSR]: http://www.chem.cmu.edu/courses/09-560/docs/msi/modenv/D_Files.html#944777
 class CSSRFormat final: public TextFormat {
 public:
     CSSRFormat(std::string path, File::Mode mode, File::Compression compression);

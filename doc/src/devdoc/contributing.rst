@@ -57,7 +57,7 @@ all these projects are needed.
   sphinx.
 - Build system: `cmake`_ is used as a cross-plateform, cross-build system
   generator.
-- Automatic testing: `CATCH`_ provide an nice unit test framework, and `travis`_
+- Automatic testing: `Catch2`_ provide an nice unit test framework, and `travis`_
   run these tests each time the code is pushed to the repository.
 
 
@@ -67,7 +67,7 @@ all these projects are needed.
 .. _Doxygen: http://doxygen.org/
 .. _breathe: https://breathe.readthedocs.io/
 .. _cmake: https://cmake.org/
-.. _CATCH: https://github.com/philsquared/Catch/
+.. _Catch2: https://github.com/catchorg/Catch2
 .. _travis: https://travis-ci.org/chemfiles/chemfiles/
 
 

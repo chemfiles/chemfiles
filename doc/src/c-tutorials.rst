@@ -229,7 +229,7 @@ atoms after i. So we need start from the end and work toward the start of the
 frame. The ``compare_matches`` function is used to do this sorting in reverse
 order with the standard `qsort function`_.
 
-.. _qsort function: http://en.cppreference.com/w/c/algorithm/qsort
+.. _qsort function: https://en.cppreference.com/w/c/algorithm/qsort
 
 .. literalinclude:: ../../examples/c/select.c
    :language: c

@@ -37,13 +37,11 @@ struct FullResidueId {
 bool operator==(const FullResidueId& lhs, const FullResidueId& rhs);
 bool operator<(const FullResidueId& lhs, const FullResidueId& rhs);
 
-/// [PDB][PDB] file format reader and writer.
+/// PDB file format reader and writer.
 ///
 /// For multi-frame trajectories, we support both the convention from VMD to
 /// use multiple `END` records separating the steps; or the use of multiple
 /// `MODEL`/`ENDMODEL` pairs.
-///
-/// [PDB]: ftp://ftp.wwpdb.org/pub/pdb/doc/format_descriptions/Format_v33_A4.pdf
 class PDBFormat final: public TextFormat {
 public:
     PDBFormat(std::string path, File::Mode mode, File::Compression compression):

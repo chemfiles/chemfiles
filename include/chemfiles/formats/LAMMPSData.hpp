@@ -119,7 +119,7 @@ private:
     sorted_set<improper_type> impropers_;
 };
 
-/// [LAMMPS Data] file format reader and writer.
+/// LAMMPS Data file format reader and writer.
 ///
 /// LAMMPS data files are not fully stand-alone, as one needs to know the atom
 /// style to read the data. This reader will try to guess the atom style by
@@ -133,8 +133,6 @@ private:
 /// ```
 /// 44 44 2 0.000000 1.094000 2.061000 69.552002 # C2 RES
 /// ```
-///
-/// [LAMMPS Data]: http://lammps.sandia.gov/doc/read_data.html
 class LAMMPSDataFormat final: public TextFormat {
 public:
     LAMMPSDataFormat(std::string path, File::Mode mode, File::Compression compression):

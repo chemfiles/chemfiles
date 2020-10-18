@@ -23,12 +23,10 @@ class Frame;
 class Residue;
 class MemoryBuffer;
 
-/// [MMTF][MMTF] file format reader and writer.
+/// MMTF file format reader and writer.
 ///
 /// For multi-frame trajectories, we follow the PyMOL convention to use multiple
 /// models for different frames
-///
-/// [MMTF]: https://mmtf.rcsb.org/
 class MMTFFormat final: public Format {
 public:
     MMTFFormat(std::string path, File::Mode mode, File::Compression compression);

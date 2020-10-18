@@ -34,7 +34,7 @@ template<> const FormatMetadata& chemfiles::format_metadata<TRRFormat>() {
     metadata.name = "TRR";
     metadata.extension = ".trr";
     metadata.description = "GROMACS TRR binary format";
-    metadata.reference = "http://manual.gromacs.org/current/reference-manual/file-formats.html?#trr";
+    metadata.reference = "http://manual.gromacs.org/current/reference-manual/file-formats.html#trr";
 
     metadata.read = true;
     metadata.write = true;

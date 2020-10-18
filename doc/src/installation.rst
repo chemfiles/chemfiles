@@ -5,13 +5,13 @@ Pre-compiled binaries
 ^^^^^^^^^^^^^^^^^^^^^
 
 We provide compiled packages of the latest release for muliple Linux
-distributions using the `OpenSUSE build service`_. The name of packages 
-you can install this way follow the usual linux naming scheme: 
+distributions using the `OpenSUSE build service`_. The name of packages
+you can install this way follow the usual linux naming scheme:
 
 - ``chemfiles`` package only contains the shared library ``libchemfiles.so.x.y``
 - ``chemfiles-static`` contains the static library ``libchemfiles.a``
-- ``chemfiles-dev`` (for Debian and derivatives) or ``chemfiles-devel`` 
-  (for CentOS and derivatives) contains the files usefull for 
+- ``chemfiles-dev`` (for Debian and derivatives) or ``chemfiles-devel``
+  (for CentOS and derivatives) contains the files usefull for
   development, including cmake configuration and the C and C++ headers.
 
 .. raw:: html
@@ -41,7 +41,7 @@ Linux and Os X.
     # Get the C++ and C library
     conda install -c conda-forge chemfiles-lib
 
-.. _conda: https://conda.pydata.org/docs/
+.. _conda: https://conda.io/
 .. _OpenSUSE build service: https://software.opensuse.org/download.html?project=home%3ALuthaf&package=chemfiles
 
 Building from sources
@@ -85,7 +85,7 @@ All these dependencies can be installed in one command:
 On Windows
 """"""""""
 
-You can use either MSVC 2015 compiler, or gcc as provided by `mingw-w64`_.
+You can use either MSVC 2015 compiler, or gcc as provided by `mingw`_.
 `MSYS2`_ offer a package manager to install all the needed libraries. After the
 initial installation steps, you can run the following to install a recent C++
 compiler:
@@ -98,10 +98,10 @@ compiler:
     # On 32-bits windows
     pacman -S mingw32/mingw-w64-i686-gcc
 
-You will also need to install cmake, which can be found `here <https://www.cmake.org/download/>`_.
+You will also need to install cmake, which can be found `here <https://cmake.org/download/>`_.
 
-.. _mingw-w64: https://mingw-w64.org/doku.php
-.. _MSYS2: https://msys2.github.io/
+.. _mingw: http://www.mingw.org/
+.. _MSYS2: https://www.msys2.org/
 
 Build steps
 -----------

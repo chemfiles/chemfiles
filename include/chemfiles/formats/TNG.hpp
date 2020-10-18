@@ -17,9 +17,7 @@
 namespace chemfiles {
 class Frame;
 
-/// [TNG][TNG] file format reader.
-///
-/// [TNG]: http://dx.doi.org/10.1007/s00894-010-0948-5
+/// TNG file format reader.
 class TNGFormat final: public Format {
 public:
     TNGFormat(std::string path, File::Mode mode, File::Compression compression);

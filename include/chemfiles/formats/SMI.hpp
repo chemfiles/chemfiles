@@ -28,9 +28,7 @@ class Frame;
 class Topology;
 class MemoryBuffer;
 
-/// [SMI] file format reader and writer.
-///
-/// [SMI]: http://opensmiles.org/opensmiles.html
+/// SMI/OpenSMILES file format reader and writer.
 class SMIFormat final: public TextFormat {
 public:
     SMIFormat(const std::string& path, File::Mode mode, File::Compression compression):
