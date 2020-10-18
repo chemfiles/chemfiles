@@ -20,9 +20,7 @@ namespace chemfiles {
 class Frame;
 class MemoryBuffer;
 
-/// [GRO] file format reader and writer.
-///
-/// [GRO]: http://manual.gromacs.org/current/online/gro.html
+/// GRO file format reader and writer.
 class GROFormat final: public TextFormat {
 public:
     GROFormat(std::string path, File::Mode mode, File::Compression compression):

@@ -23,12 +23,10 @@ namespace chemfiles {
 class Frame;
 class MemoryBuffer;
 
-/// [CIF][CIF] (Crystallographic Information Framework) files reader and writer.
+/// CIF (Crystallographic Information Framework) files reader and writer.
 ///
 /// The reader code is based on the [gemmi](https://project-gemmi.github.io/)
 /// project.
-///
-/// [CIF]: https://en.wikipedia.org/wiki/Crystallographic_Information_File
 class CIFFormat final: public Format {
 public:
     CIFFormat(std::string path, File::Mode mode, File::Compression compression) :

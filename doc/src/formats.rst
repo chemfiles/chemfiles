@@ -28,9 +28,9 @@ constructor to manually specify which format to use.
 
 
 - **LAMMPS** format corresponds to trajectory files written by the LAMMPS `dump
-  <http://lammps.sandia.gov/doc/dump.html>`_ command.
+  <https://lammps.sandia.gov/doc/dump.html>`_ command.
 - **LAMMPS Data** format corresponds to LAMMPS data files, as read by the LAMMPS
-  `read_data <http://lammps.sandia.gov/doc/read_data.html>`_ command.
+  `read_data <https://lammps.sandia.gov/doc/read_data.html>`_ command.
 
 .. note:: in-memory IO
 

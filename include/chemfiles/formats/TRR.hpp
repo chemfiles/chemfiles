@@ -17,9 +17,7 @@ using matrix = float[3][3];
 namespace chemfiles {
 class Frame;
 
-/// GROMACS [TRR] file format reader.
-///
-/// [TRR]: http://manual.gromacs.org/archive/5.0.4/online/trr.html
+/// GROMACS TRR file format reader.
 class TRRFormat final : public Format {
   public:
     TRRFormat(std::string path, File::Mode mode, File::Compression compression);

@@ -34,7 +34,7 @@ template<> const FormatMetadata& chemfiles::format_metadata<SDFFormat>() {
     metadata.name = "SDF";
     metadata.extension = ".sdf";
     metadata.description = "Structural Data File format";
-    metadata.reference = "http://accelrys.com/products/collaborative-science/biovia-draw/ctfile-no-fee.html";
+    metadata.reference = "https://discover.3ds.com/ctfile-documentation-request-form";
 
     metadata.read = true;
     metadata.write = true;

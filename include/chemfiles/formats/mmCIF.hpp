@@ -21,10 +21,8 @@ namespace chemfiles {
 class Frame;
 class MemoryBuffer;
 
-/// [mmCIF] Crystallographic Information Framework for MacroMolecules
+/// mmCIF Crystallographic Information Framework for MacroMolecules
 /// reader and writer.
-///
-/// [mmCIF]: http://mmcif.wwpdb.org/
 class mmCIFFormat final: public Format {
 public:
     mmCIFFormat(std::string path, File::Mode mode, File::Compression compression) :

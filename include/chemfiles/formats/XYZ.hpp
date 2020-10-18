@@ -18,9 +18,10 @@ namespace chemfiles {
 class Frame;
 class MemoryBuffer;
 
-/// [XYZ] file format reader and writer.
+/// XYZ file format reader and writer.
 ///
-/// [XYZ]: http://openbabel.org/wiki/XYZ
+/// This class also support the extended XYZ specification, as defined in
+/// [ASE](https://wiki.fysik.dtu.dk/ase/ase/io/formatoptions.html#extxyz)
 class XYZFormat final: public TextFormat {
 public:
     XYZFormat(std::string path, File::Mode mode, File::Compression compression):
