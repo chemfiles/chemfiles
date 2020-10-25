@@ -208,9 +208,9 @@ static void initialize(NcFile& file, size_t natoms, bool with_velocities) {
         file.add_variable<nc::NcFloat>("coordinates", "frame", "atom", "spatial");
     coordinates.add_string_attribute("units", "angstrom");
 
-    auto cell_lenght =
+    auto cell_length =
         file.add_variable<nc::NcFloat>("cell_lengths", "frame", "cell_spatial");
-    cell_lenght.add_string_attribute("units", "angstrom");
+    cell_length.add_string_attribute("units", "angstrom");
 
     auto cell_angles =
         file.add_variable<nc::NcFloat>("cell_angles", "frame", "cell_angular");

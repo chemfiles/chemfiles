@@ -192,7 +192,7 @@ static UnitCell read_cell(const pugi::xml_node& crystal) {
             } else if (name == "gamma") {
                 angles[2] = scalar.text().as_double();
             } else {
-                warning("CML reader", "unknown crytal scalar: {}", name);
+                warning("CML reader", "unknown crystal scalar: {}", name);
             }
         }
     }

@@ -187,7 +187,7 @@ inline size_t scan(string_view input, Args& ...args) {
 /// of `*` characters if the integer is out of range.
 ///
 /// [hybrid36]: http://cci.lbl.gov/hybrid_36/
-std::string encode_hydrid36(uint64_t width, int64_t value);
+std::string encode_hybrid36(uint64_t width, int64_t value);
 
 /// Decodes an integer using the [hybrid36] encoding scheme.
 ///

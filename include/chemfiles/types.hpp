@@ -170,7 +170,7 @@ static_assert(std::is_standard_layout<Vector3D>::value, "Vector3D must have a st
 ///
 /// * Comparison operators: `==` and `!=` performs strict float equality
 ///   comparison;
-/// * Mathematical operators: only mulitplication between matrixes and between
+/// * Mathematical operators: only multiplication between matrixes and between
 ///   matrix and vector are defined, using the `*` operator.
 ///
 /// @example{matrix3d/ops.cpp}
@@ -224,7 +224,7 @@ public:
 
     /// Compute the inverse of this matrix.
     ///
-    /// @throw Error if the matrix is not inversible (i.e. if the determinant
+    /// @throw Error if the matrix is not invertible (i.e. if the determinant
     ///              is zero)
     ///
     /// @example{matrix3d/invert.cpp}

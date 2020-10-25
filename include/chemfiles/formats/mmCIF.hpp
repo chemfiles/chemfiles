@@ -49,7 +49,7 @@ private:
     /// Map of residues, indexed by residue id and chainid.
     std::map<std::pair<std::string, int64_t>, Residue> residues_;
     /// Set to true if the file is based on fractional coordinates.
-    /// Set to false if the file is based on cartn coordinates.
+    /// Set to false if the file is based on cartesian coordinates.
     bool uses_fract_;
     /// Storing the positions of all the steps in the file, so that we can
     /// just `seekpos` them instead of reading the whole step.

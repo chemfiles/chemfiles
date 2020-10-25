@@ -54,7 +54,7 @@ template<> const FormatMetadata& chemfiles::format_metadata<GROFormat>() {
 using chemfiles::private_details::is_upper_triangular;
 
 /// Check the number of digits before the decimal separator to be sure than
-/// we can represen them. In case of error, use the given `context` in the error
+/// we can represent them. In case of error, use the given `context` in the error
 /// message
 static void check_values_size(const Vector3D& values, unsigned width, const std::string& context);
 

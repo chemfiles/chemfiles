@@ -170,12 +170,12 @@ TEST_CASE("In-memory decompression") {
     content[23] = 0x00;
     CHECK_THROWS_WITH(
         decompress_gz(reinterpret_cast<const char*>(content.data()), content.size()),
-        "error inflating gzipped memory: incorrect data check"
+        "error inflating gziped memory: incorrect data check"
     );
 
     content[0] = 0x00;
     CHECK_THROWS_WITH(
         decompress_gz(reinterpret_cast<const char*>(content.data()), content.size()),
-        "error inflating gzipped memory: incorrect header check"
+        "error inflating gziped memory: incorrect header check"
     );
 }

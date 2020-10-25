@@ -974,7 +974,7 @@ std::vector<size_t> guess_molecules(const Frame& frame) {
         }
     }
 
-    // Make sure the molids are consecutives
+    // Make sure the molids are consecutive
     std::unordered_map<size_t, size_t> molids_mapping;
     for (auto& molid: molids) {
         auto it = molids_mapping.find(molid);

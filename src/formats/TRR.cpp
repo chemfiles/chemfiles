@@ -102,7 +102,7 @@ void TRRFormat::read(Frame& frame) {
             static_cast<double>(box[0][1]), static_cast<double>(box[1][1]), static_cast<double>(box[2][1]),
             static_cast<double>(box[0][2]), static_cast<double>(box[1][2]), static_cast<double>(box[2][2])
         );
-        // Factor 10 because the cell lengthes are in nm in the TRR format
+        // Factor 10 because the cell lengths are in nm in the TRR format
         frame.set_cell(UnitCell(10 * matrix));
     }
 
@@ -160,7 +160,7 @@ void set_positions(const std::vector<float>& x, Frame& frame) {
     auto positions = frame.positions();
     assert(x.size() == 3 * positions.size());
     for (size_t i = 0; i < frame.size(); i++) {
-        // Factor 10 because the cell lengthes are in nm in the TRR format
+        // Factor 10 because the cell lengths are in nm in the TRR format
         positions[i][0] = static_cast<double>(x[i * 3]) * 10;
         positions[i][1] = static_cast<double>(x[i * 3 + 1]) * 10;
         positions[i][2] = static_cast<double>(x[i * 3 + 2]) * 10;
@@ -171,7 +171,7 @@ void get_positions(std::vector<float>& x, const Frame& frame) {
     auto positions = frame.positions();
     assert(x.size() == 3 * positions.size());
     for (size_t i = 0; i < frame.size(); i++) {
-        // Factor 10 because the cell lengthes are in nm in the TRR format
+        // Factor 10 because the cell lengths are in nm in the TRR format
         x[i * 3] = static_cast<float>(positions[i][0] / 10.0);
         x[i * 3 + 1] = static_cast<float>(positions[i][1] / 10.0);
         x[i * 3 + 2] = static_cast<float>(positions[i][2] / 10.0);
@@ -183,7 +183,7 @@ void set_velocities(const std::vector<float>& v, Frame& frame) {
     auto velocities = *frame.velocities();
     assert(v.size() == 3 * velocities.size());
     for (size_t i = 0; i < frame.size(); i++) {
-        // Factor 10 because the cell lengthes are in nm in the TRR format
+        // Factor 10 because the cell lengths are in nm in the TRR format
         velocities[i][0] = static_cast<double>(v[i * 3]) * 10;
         velocities[i][1] = static_cast<double>(v[i * 3 + 1]) * 10;
         velocities[i][2] = static_cast<double>(v[i * 3 + 2]) * 10;
@@ -194,7 +194,7 @@ void get_velocities(std::vector<float>& v, const Frame& frame) {
     auto velocities = *frame.velocities();
     assert(v.size() == 3 * velocities.size());
     for (size_t i = 0; i < frame.size(); i++) {
-        // Factor 10 because the cell lengthes are in nm in the TRR format
+        // Factor 10 because the cell lengths are in nm in the TRR format
         v[i * 3] = static_cast<float>(velocities[i][0] / 10.0);
         v[i * 3 + 1] = static_cast<float>(velocities[i][1] / 10.0);
         v[i * 3 + 2] = static_cast<float>(velocities[i][2] / 10.0);
@@ -202,7 +202,7 @@ void get_velocities(std::vector<float>& v, const Frame& frame) {
 }
 
 void get_cell(matrix box, const Frame& frame) {
-    // Factor 10 because the cell lengthes are in nm in the TRR format
+    // Factor 10 because the cell lengths are in nm in the TRR format
     auto matrix = frame.cell().matrix() / 10.0;
     box[0][0] = static_cast<float>(matrix[0][0]);
     box[0][1] = static_cast<float>(matrix[1][0]);

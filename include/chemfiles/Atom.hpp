@@ -16,7 +16,7 @@ namespace chemfiles {
 /// An `Atom` is a particle in the current `Frame`.
 ///
 /// An atom stores atomic properties such as the atom name and type, the mass
-/// and the charge. It also stores arbitrary property unsing the Property class.
+/// and the charge. It also stores arbitrary property using the Property class.
 /// Position and velocity are not stored in the `Atom` class, but in separated
 /// arrays in the `Frame` class.
 ///
@@ -151,7 +151,7 @@ public:
     /// @example{atom/atomic_number.cpp}
     optional<uint64_t> atomic_number() const;
 
-    /// Get the map of properties asociated with this atom. This map might be
+    /// Get the map of properties associated with this atom. This map might be
     /// iterated over to list the properties of the atom, or directly accessed.
     ///
     /// @example{atom/properties.cpp}

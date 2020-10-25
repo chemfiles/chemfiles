@@ -393,7 +393,7 @@ void SMIFormat::read_next(Frame& frame) {
     }
 
     if (!rings_ids_.empty()) {
-        throw format_error("SMI Reader: unclosed ringid '{}'", rings_ids_.begin()->first);
+        throw format_error("SMI Reader: unclosed ring id '{}'", rings_ids_.begin()->first);
     }
 
     frame.resize(topology.size());
@@ -429,8 +429,8 @@ static void find_rings(
         // for the 'current' atom.
         // Not guaranteed to fast, nor efficient, but just to work
         // Also not guaranteed to find the SSSR, but it will find all rings
-        // needed for a given structure to be writen as SMILES
-        // adj_list The adjacentcy list graph
+        // needed for a given structure to be written as SMILES
+        // adj_list The adjacency list graph
         // hit_atoms Atoms already encountered
         // ring_bonds Bonds already known to ring forming bonds
         // ring_atoms Map from an atom to the number of rings it forms
@@ -471,7 +471,7 @@ static void find_rings(
 
                 // We've seen this neighbor before! Ring found
                 // but only if we have NOT processed the current atom as this
-                // prevents rings from being created from mutliple directions.
+                // prevents rings from being created from multiple directions.
                 if (hit_atoms[neighbor] && !hit_atoms[current_atom]) {
 
                     // Don't process the same ring connection twice
@@ -760,7 +760,7 @@ void SMIFormat::write_next(const Frame& frame) {
                 }
             }
 
-            // Avoid the prining of branch begin/end
+            // Avoid the printing of branch begin/end
             size_t ring_end = 0;
 
             // Find all ring connections first
@@ -804,7 +804,7 @@ void SMIFormat::write_next(const Frame& frame) {
                 }
 
                 // To print a start bracket, we need to be branching (> 2 non-ring bonds)
-                // and we don't want to brank the last neighbor printed
+                // and we don't want to branch the last neighbor printed
                 auto needs_to_branch = neighbors_printed != 0 && neighbors_printed > ring_start;
 
                 // Depth First Search like recursion

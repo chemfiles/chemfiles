@@ -181,7 +181,7 @@ void Bz2File::compress_and_write(int action) {
     } while (stream_.avail_in != 0 || (action == BZ_FINISH && status != BZ_STREAM_END));
 }
 
-// Get tehe full, potentially 64-bits, value for total_out from the low and
+// Get the full, potentially 64-bits large, value for total_out from the low and
 // high 32-bits parts.
 static uint64_t full_total_out(const bz_stream& stream) {
     uint64_t total_out_hi32 = static_cast<uint64_t>(stream.total_out_hi32) << 32;

@@ -140,7 +140,7 @@ typedef enum {  // NOLINT: this is both a C and C++ file
     CHFL_CXX_ERROR = 255,
 } chfl_status;
 
-/// A 3-dimmensional vector for the chemfiles interface
+/// A 3-dimensional vector for the chemfiles interface
 typedef double chfl_vector3d[3];  // NOLINT: this is both a C and C++ file
 
 /// Get the version of the chemfiles library.
@@ -161,8 +161,8 @@ typedef enum {  // NOLINT: this is both a C and C++ file
     CHFL_BOND_TRIPLE = 3,
     /// Quadruple bond (present in some metals)
     CHFL_BOND_QUADRUPLE = 4,
-    /// Qintuplet bond (present in some metals)
-    CHFL_BOND_QINTUPLET = 5,
+    /// Quintuplet bond (present in some metals)
+    CHFL_BOND_QUINTUPLET = 5,
     /// Amide bond (required by some file formats)
     CHFL_BOND_AMIDE = 254,
     /// Aromatic bond (required by some file formats)

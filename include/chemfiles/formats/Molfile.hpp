@@ -27,7 +27,7 @@ class FormatMetadata;
 enum MolfileFormat {
     DCD,                ///< DCD binary file format
     TRJ,                ///< Gromacs .trj file format
-    LAMMPS,             ///< Lammps trajectory files
+    LAMMPS,             ///< LAMMPS trajectory files
     MOLDEN,             ///< Molden file format
 };
 

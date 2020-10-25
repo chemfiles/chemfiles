@@ -108,7 +108,7 @@ public:
     ///         or if `shape` is `INFINITE` and some lengths are not 0.0.
     void set_shape(CellShape shape);
 
-    /// Get the lenghts of the cell's vectors, in angstroms.
+    /// Get the lengths of the cell's vectors, in angstroms.
     ///
     /// @example{cell/lengths.cpp}
     Vector3D lengths() const;
@@ -118,7 +118,7 @@ public:
     /// @example{cell/angles.cpp}
     Vector3D angles() const;
 
-    /// Set the lenghts of the cell's vectors. The values should be in angstroms.
+    /// Set the lengths of the cell's vectors. The values should be in angstroms.
     ///
     /// **This function reset cell orientation!**
     ///

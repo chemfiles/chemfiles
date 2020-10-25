@@ -82,8 +82,8 @@ bool chemfiles::operator<(const FullResidueId& lhs, const FullResidueId& rhs) {
     }
 }
 
-/// Check the number of digits before the decimal separator to be sure than
-/// we can represen them. In case of error, use the given `context` in the error
+/// Check the number of digits before the decimal separator to be sure than we
+/// can represent them. In case of error, use the given `context` in the error
 /// message
 static void check_values_size(const Vector3D& values, unsigned width, const std::string& context);
 
@@ -352,8 +352,7 @@ void PDBFormat::read_secondary(string_view line, size_t i_start, size_t i_end, s
     secinfo_.insert({ start, std::make_pair(end, "extended") });
 }
 
-void PDBFormat::read_ATOM(Frame& frame, string_view line,
-    bool is_hetatm) {
+void PDBFormat::read_ATOM(Frame& frame, string_view line, bool is_hetatm) {
     assert(line.substr(0, 6) == "ATOM  " || line.substr(0, 6) == "HETATM");
 
     if (line.length() < 54) {
@@ -578,10 +577,10 @@ void PDBFormat::link_standard_residue_bonds(Frame& frame) {
         }
 
         const auto& three_prime_oxygen = atom_name_to_index.find("O3'");
-        const auto& five_prime_phospho = atom_name_to_index.find("P");
+        const auto& five_prime_phosphorus = atom_name_to_index.find("P");
 
         if (link_previous_nucleic &&
-            five_prime_phospho != atom_name_to_index.end() &&
+            five_prime_phosphorus != atom_name_to_index.end() &&
             resid == previous_residue_id + 1 )
         {
             link_previous_nucleic = false;
@@ -682,7 +681,7 @@ Record get_record(string_view line) {
 }
 
 static std::string to_pdb_index(int64_t value, uint64_t width) {
-    auto encoded = encode_hydrid36(width, value + 1);
+    auto encoded = encode_hybrid36(width, value + 1);
 
     if (encoded[0] == '*' && (value == MAX_HYBRID36_W4_NUMBER || value == MAX_HYBRID36_W5_NUMBER)) {
         auto type = width == 5 ?
@@ -775,7 +774,7 @@ static bool needs_ter_record(const ResidueInformation& residue) {
 
 // This function adjusts a given index to account for intervening TER records.
 // It does so by determining the position of the greatest TER record in `ters`
-// and uses iterator arithmatic to calculate the adjustment. Note that `ters`
+// and uses iterator arithmetic to calculate the adjustment. Note that `ters`
 // is expected to be sorted
 static int64_t adjust_for_ter_residues(size_t v, const std::vector<size_t>& ters) {
     auto lower = std::lower_bound(ters.begin(), ters.end(), v + 1);

@@ -26,7 +26,7 @@ typedef enum {  // NOLINT: this is both a C and C++ file
 /// If both `lengths` and `angles` are NULL, this creates an infinite unit cell.
 /// If `angles` is NULL, it defaults to `[90, 90, 90]`.
 ///
-/// The shape of the cell depends on the angles: it will be ORTHORHOMBIC if the 
+/// The shape of the cell depends on the angles: it will be ORTHORHOMBIC if the
 /// three angles are 90°, TRICLINIC otherwise.
 ///
 /// The cell lengths should be in Angstroms, and the angles in degree.

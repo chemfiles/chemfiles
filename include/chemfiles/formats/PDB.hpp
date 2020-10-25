@@ -84,7 +84,7 @@ private:
     /// List of all atom offsets. This maybe pushed in read_ATOM or if a TER
     /// record is found. It is reset every time a frame is read.
     std::vector<size_t> atom_offsets_;
-    /// Did we wrote a frame to the file? This is used to check wheter we need
+    /// Did we wrote a frame to the file? This is used to check whether we need
     /// to write a final `END` record in the destructor
     bool written_ = false;
     /// Store secondary structure information. Keys are the

@@ -205,10 +205,10 @@ private:
     const char* end_;
     /// Current position in the file, this is the number of characters in the
     /// file up to the start of the buffer (`buffer_[0]` is the `position_`'th
-    /// caracter in the file).
+    /// character in the file).
     uint64_t position_ = 0;
     /// Did we reach the end of the underlying `TextFileImpl`? Since we are
-    /// buffering data, this does not necessarly correspond to `this->eof()`.
+    /// buffering data, this does not necessarily correspond to `this->eof()`.
     bool got_impl_eof_ = false;
     /// Did we actually reached the end of file while reading a line?
     bool eof_ = false;

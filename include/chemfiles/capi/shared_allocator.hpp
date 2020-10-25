@@ -27,7 +27,7 @@ namespace {
 /// An allocator with shared_ptr like semantics, working with raw pointers.
 ///
 /// This is used in the C API to ensure that when taking pointers to
-/// atoms/residues/cell inside a frame/topology, the frame/topology is keept
+/// atoms/residues/cell inside a frame/topology, the frame/topology is kept
 /// alive even if the user calls chfl_free.
 class shared_allocator {
 public:
@@ -61,7 +61,7 @@ public:
     template<class T, class U>
     static const T* shared_ptr(U* ptr, const T* element) {
         // const_cast is OK here, since we return a const T* anyway, and only
-        // use the adress of the pointer to create a new shared_ptr
+        // use the address of the pointer to create a new shared_ptr
         return shared_ptr(ptr, const_cast<T*>(element));
     }
 
@@ -158,7 +158,7 @@ private:
             return metadata_.at(it->second);
         } else {
             throw chemfiles::memory_error(
-                "internal error: unknwon pointer passed to shared_allocator::metadata"
+                "internal error: unknown pointer passed to shared_allocator::metadata"
             );
         }
     }
@@ -176,7 +176,7 @@ private:
         }
     }
 
-    /// A map of pointer adresses -> indexes of metadata in metadata_
+    /// A map of pointer addresses -> indexes of metadata in metadata_
     std::unordered_multimap<const void*, size_t> pointers_;
     /// Metadata for all known pointers
     std::vector<shared_metadata> metadata_;

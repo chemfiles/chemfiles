@@ -20,7 +20,7 @@ namespace chemfiles {
 /// `Vector3D`.
 class CHFL_EXPORT Property final {
 public:
-    /// Possible types holded by a property
+    /// Possible types held by a property
     enum Kind {
         BOOL = 0,
         DOUBLE = 1,
@@ -129,7 +129,7 @@ public:
         }
     }
 
-    /// Get the kind of property, *i.e.* the type of the holded value
+    /// Get the kind of property, *i.e.* the type of the held value
     ///
     /// @example{property/get_kind.cpp}
     Kind kind() const {

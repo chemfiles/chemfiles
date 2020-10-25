@@ -28,7 +28,7 @@ using namespace chemfiles;
 // get radius compatible with VMD bond guessing algorithm
 static optional<double> guess_bonds_radius(const Atom& atom);
 
-Frame::Frame(UnitCell cell): cell_(std::move(cell)) {} // NOLINT: std::move for trivially copiable type
+Frame::Frame(UnitCell cell): cell_(std::move(cell)) {} // NOLINT: std::move for trivially copyable type
 
 size_t Frame::size() const {
     assert(positions_.size() == topology_.size());

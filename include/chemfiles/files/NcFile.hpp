@@ -28,7 +28,7 @@ namespace nc {
         }
     }
 
-    /// Maximum lenght for strings in variables
+    /// Maximum length for strings in variables
     const size_t STRING_MAXLEN = 10;
 
     /// NetCDF id type definition
@@ -124,9 +124,9 @@ public:
         return file_id_;
     }
 
-    /// Get a global string attribut from the file
+    /// Get a global string attribute from the file
     std::string global_attribute(const std::string& name) const;
-    /// Create a global attribut in the file_
+    /// Create a global attribute in the file_
     void add_global_attribute(const std::string& name, const std::string& value);
 
     /// Get the value of a specific dimmension

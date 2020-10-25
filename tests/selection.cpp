@@ -288,7 +288,7 @@ TEST_CASE("Atoms selections") {
         expected = std::vector<Match>{{0ul}, {1ul}};
         CHECK(selection.evaluate(frame) == expected);
 
-        // all atoms are co-linear in the test frame, add more of themto get
+        // all atoms are co-linear in the test frame, add more of them to get
         // non-zero dihedral/out of plane values
         frame.add_atom(Atom("Cl"), {0, 0, 0});
         frame.add_atom(Atom("F"), {2, -2, 2});

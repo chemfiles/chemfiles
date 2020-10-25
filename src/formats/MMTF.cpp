@@ -232,8 +232,8 @@ void MMTFFormat::read_model(Frame& frame) {
 }
 
 std::string MMTFFormat::find_assembly() {
-    // Unfortunetly we must loop through the assembly lists to find which
-    // one our current chain belongs to. Forunetly, these lists are fairly
+    // Unfortunately we must loop through the assembly lists to find which
+    // one our current chain belongs to. Fortunately, these lists are fairly
     // short in the vast majority of cases.
 
     for (const auto& assembly : structure_.bioAssemblyList) {
@@ -382,9 +382,9 @@ void MMTFFormat::apply_symmetry(Frame& frame) {
 
             std::vector<Residue> residues_to_add;
             for (const auto& residue : frame.topology().residues()) {
-                auto asmbl = residue.get("assembly");
+                auto assembly_s = residue.get("assembly");
 
-                if (!asmbl || asmbl->as_string() != "bio" + assembly.name) {
+                if (!assembly_s || assembly_s->as_string() != "bio" + assembly.name) {
                     continue;
                 }
 
@@ -635,7 +635,7 @@ int8_t bond_order_to_mmtf(Bond::BondOrder order) {
         return 4;
     case Bond::BondOrder::UNKNOWN:
         return -1;
-    case Bond::BondOrder::QINTUPLET:
+    case Bond::BondOrder::QUINTUPLET:
     case Bond::BondOrder::AMIDE:
     case Bond::BondOrder::AROMATIC:
     case Bond::BondOrder::UP:

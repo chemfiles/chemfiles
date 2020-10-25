@@ -35,7 +35,7 @@ void CHFL_EXPORT set_warning_callback(warning_callback_t callback);
 /// file.
 ///
 /// This function will throw a `ConfigurationError` if there is no file at
-/// `path`, or if the file is incorectly formatted. Data from the new
+/// `path`, or if the file is incorrectly formatted. Data from the new
 /// configuration file will overwrite any existing data.
 ///
 /// @example{add_configuration.cpp}

@@ -201,7 +201,7 @@ public:
     /// This replace any unit cell in the file being read, or in the `Frame`
     /// being written.
     ///
-    /// This is mainly usefull when a format does not define unti cell
+    /// This is mainly usefull when a format does not define unit cell
     /// information.
     ///
     /// @param cell the unit cell to use with this frame

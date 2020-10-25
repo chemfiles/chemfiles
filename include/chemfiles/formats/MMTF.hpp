@@ -99,8 +99,8 @@ private:
     // Since MMTF uses model->chain->residue->atom as storage model, and
     // chemfiles do not enforce that residues contains contiguous atoms, the
     // atoms can be re-ordered when adding them to a MMTF structure. This vector
-    // stores the correspondance chemfiles index => MMTF index to be able to add
-    // the right bonds.
+    // stores the association from chemfiles index to MMTF index to be able to
+    // add the right bonds.
     //
     // This is only used when writing
     std::vector<int32_t> new_atom_indexes_;

@@ -87,12 +87,12 @@ public:
         return super::erase(it);
     }
 
-    /// Get the underlying vector data wihtout a copy
+    /// Get the underlying vector data without a copy
     const super& as_vec() const {
         return *this;
     }
 
-    /// Get the underlying vector data wihtout a copy.
+    /// Get the underlying vector data without a copy.
     ///
     /// WARNING: the vector is not const and can be modified, the user is
     /// supposed to ensure that the values inside stay ordered.

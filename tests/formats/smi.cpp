@@ -1,4 +1,4 @@
-// Chemfiles, a modern library for chemistry file readiconng and writing
+// Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <streambuf>
@@ -22,28 +22,26 @@ TEST_CASE("Read files in SMI format") {
         auto file = Trajectory("data/smi/test.smi");
 
         //Check to make sure things aren't exploding...
-        auto frame1 = file.read();
-        CHECK(frame1.size() == 6);
-        auto topol1 = frame1.topology();
-        CHECK(topol1.bonds().size() == 7);
+        auto frame = file.read();
+        CHECK(frame.size() == 6);
+        CHECK(frame.topology().bonds().size() == 7);
 
-        auto frame2 = file.read();
-        CHECK(frame2.size() == 6);
-        auto topol2 = frame2.topology();
-        CHECK(topol2.bonds().size() == 6);
+        frame = file.read();
+        CHECK(frame.size() == 6);
+        CHECK(frame.topology().bonds().size() == 6);
 
-        auto frame3 = file.read();
-        CHECK(frame3.size() == 4);
-        auto topol3 = frame3.topology();
-        auto bonds3 = topol3.bonds();
-        CHECK(bonds3.size() == 3);
-        CHECK((bonds3[0][0] == 0 && bonds3[0][1] == 1));
-        CHECK((bonds3[1][0] == 0 && bonds3[1][1] == 2));
-        CHECK((bonds3[2][0] == 0 && bonds3[2][1] == 3));
-        CHECK(frame3[0].type() == "C");
-        CHECK(frame3[1].type() == "Cl");
-        CHECK(frame3[2].type() == "Cl");
-        CHECK(frame3[3].type() == "Cl");
+        frame = file.read();
+        CHECK(frame.size() == 4);
+        auto topology = frame.topology();
+        auto bonds = topology.bonds();
+        CHECK(bonds.size() == 3);
+        CHECK((bonds[0][0] == 0 && bonds[0][1] == 1));
+        CHECK((bonds[1][0] == 0 && bonds[1][1] == 2));
+        CHECK((bonds[2][0] == 0 && bonds[2][1] == 3));
+        CHECK(frame[0].type() == "C");
+        CHECK(frame[1].type() == "Cl");
+        CHECK(frame[2].type() == "Cl");
+        CHECK(frame[3].type() == "Cl");
     }
 
     SECTION("Read a specific step") {
@@ -262,7 +260,7 @@ TEST_CASE("Errors in SMI format") {
     CHECK_THROWS_WITH(file.read(), "SMI Reader: rings defined with '%' must be double digits");
 
     file = Trajectory("data/smi/bad/bad_ring.smi");
-    CHECK_THROWS_WITH(file.read(), "SMI Reader: unclosed ringid '4'");
+    CHECK_THROWS_WITH(file.read(), "SMI Reader: unclosed ring id '4'");
 
     file = Trajectory("data/smi/bad/bad_symbol.smi");
     CHECK_THROWS_WITH(file.read(), "SMI Reader: unknown symbol: '`'");

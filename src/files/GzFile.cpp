@@ -130,7 +130,7 @@ MemoryBuffer chemfiles::decompress_gz(const char* src, size_t size) {
 		    done = true;
         } else if (status != Z_OK) {
 		    inflateEnd(&stream);
-            throw file_error("error inflating gzipped memory: {}", stream.msg);
+            throw file_error("error inflating gziped memory: {}", stream.msg);
 	    }
     } while (!done);
 

@@ -83,20 +83,20 @@ void MOL2Format::read_next(Frame& frame) {
         const auto& curr_pos = file_.tellpos();
 
         line = file_.readline();
-        auto trimed = trim(line);
+        auto trimmed = trim(line);
 
-        if (trimed == "@<TRIPOS>ATOM") {
+        if (trimmed == "@<TRIPOS>ATOM") {
             read_atoms(frame, natoms, charges);
-        } else if (trimed == "@<TRIPOS>BOND") {
+        } else if (trimmed == "@<TRIPOS>BOND") {
             read_bonds(frame, nbonds);
-        } else if (trimed == "@<TRIPOS>CRYSIN") {
+        } else if (trimmed == "@<TRIPOS>CRYSIN") {
             auto cryst = file_.readline();
 
             Vector3D lengths, angles;
             scan(cryst, lengths[0], lengths[1], lengths[2], angles[0], angles[1], angles[2]);
 
             frame.set_cell({lengths, angles});
-        } else if (trimed == "@<TRIPOS>MOLECULE") {
+        } else if (trimmed == "@<TRIPOS>MOLECULE") {
             file_.seekpos(curr_pos);
             break;
         }

@@ -127,7 +127,7 @@ private:
 /// reading any comment after the `Atoms` section name. If no atom style is
 /// specified, the code default to `full` and send a warning.
 ///
-/// The code alse tries to read atomic names at the end of data lines. For
+/// The code also tries to read atomic names at the end of data lines. For
 /// example, the atom at index 44 will have `C2` as atomic name.
 ///
 /// ```

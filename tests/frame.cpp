@@ -138,7 +138,7 @@ TEST_CASE("Guess topology") {
         CHECK(topology.bonds() == (std::vector<Bond>{{0, 1}, {0, 2}, {0, 3}}));
     }
 
-    SECTION("Cleanup supplementaty H-H bonds") {
+    SECTION("Cleanup supplementary H-H bonds") {
         auto frame = Frame();
         frame.add_atom(Atom("O"), {0, 0, 0});
         frame.add_atom(Atom("H"), {0.2, 0.8, 0});

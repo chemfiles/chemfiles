@@ -40,8 +40,8 @@ CHFL_EXPORT CHFL_SELECTION* chfl_selection_copy(const CHFL_SELECTION* selection)
 ///
 /// The size of a selection is the number of atoms we are selecting together.
 /// This value is 1 for the 'atom' context, 2 for the 'pair' and 'bond' context,
-/// 3 for the 'three' and 'angles' contextes and 4 for the 'four' and 'dihedral'
-/// contextes.
+/// 3 for the 'three' and 'angles' contexts and 4 for the 'four' and 'dihedral'
+/// contexts.
 ///
 /// @example{capi/chfl_selection/size.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn

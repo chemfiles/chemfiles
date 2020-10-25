@@ -34,7 +34,7 @@ TEST_CASE("Shared allocator") {
         // Valgrind tests make sure all memory is released here
     }
 
-    SECTION("Internal re-alloctation") {
+    SECTION("Internal re-allocation") {
         auto ptr = shared_allocator::make_shared<Dummy>();
         ptr->data.insert(std::end(ptr->data), {1, 2, 3});
 

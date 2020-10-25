@@ -108,7 +108,7 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
         CHECK(approx_eq(positions[1401], Vector3D(5.601, -22.571, -16.631), 1e-3));
 
-        const auto& topology = frame.topology();
+        auto topology = frame.topology();
         CHECK(topology.are_linked(topology.residue(0), topology.residue(1)));
         CHECK(!topology.are_linked(topology.residue(0), topology.residue(2)));
         CHECK(topology.residue(0).get("is_standard_pdb")->as_bool());
@@ -121,9 +121,9 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(approx_eq(positions[0], Vector3D( -9.134, 11.149, 6.990), 1e-3));
         CHECK(approx_eq(positions[1401], Vector3D(4.437, -13.250, -22.569), 1e-3));
 
-        const auto& topo2 = frame.topology();
-        CHECK(topo2.are_linked(topology.residue(0), topo2.residue(1)));
-        CHECK(!topo2.are_linked(topology.residue(0), topo2.residue(2)));
+        topology = frame.topology();
+        CHECK(topology.are_linked(topology.residue(0), topology.residue(1)));
+        CHECK(!topology.are_linked(topology.residue(0), topology.residue(2)));
         CHECK(topology.residue(0).get("composition_type")->as_string() == "L-PEPTIDE LINKING");
 
         // Check secondary structure
@@ -135,15 +135,14 @@ TEST_CASE("Read files in MMTF format") {
 
         auto frame = file.read();
 
-        const auto& topology = frame.topology();
+        auto topology = frame.topology();
         CHECK(topology.are_linked(topology.residue(0), topology.residue(1)));
         CHECK(!topology.are_linked(topology.residue(0), topology.residue(2)));
 
-        auto frame2= file.read();
-
-        const auto& topo2 = frame.topology();
-        CHECK(topo2.are_linked(topology.residue(0), topo2.residue(1)));
-        CHECK(!topo2.are_linked(topology.residue(0), topo2.residue(2)));
+        frame = file.read();
+        topology = frame.topology();
+        CHECK(topology.are_linked(topology.residue(0), topology.residue(1)));
+        CHECK(!topology.are_linked(topology.residue(0), topology.residue(2)));
 
         auto frame3= file.read();
     }

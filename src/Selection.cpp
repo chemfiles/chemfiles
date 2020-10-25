@@ -24,14 +24,14 @@ using namespace chemfiles;
 //! Extract the context from the `string`, and put the selection string
 //! (without the context) in `selection`
 static Context get_context(const std::string& string, std::string& selection) {
-    auto splited = split(string, ':');
-    if (splited.size() == 1) {
+    auto splitted = split(string, ':');
+    if (splitted.size() == 1) {
         // Default to ATOM
         selection = string;
         return Context::ATOM;
-    } else if (splited.size() == 2) {
-        selection = splited[1].to_string();
-        auto context = trim(splited[0]);
+    } else if (splitted.size() == 2) {
+        selection = splitted[1].to_string();
+        auto context = trim(splitted[0]);
         if (context == "atoms" || context == "one") {
             return Context::ATOM;
         } else if (context == "pairs" || context == "two") {

@@ -117,9 +117,9 @@ void mmCIFFormat::init_() {
         }
 
         if (line_split[0] == "_struct.title") {
-            auto trimed = trim(line.substr(13));
-            name_ = trimed.size() > 2 ?
-                    trimed.substr(1, trimed.size() - 2).to_string() : "";
+            auto trimmed = trim(line.substr(13));
+            name_ = trimmed.size() > 2 ?
+                    trimmed.substr(1, trimmed.size() - 2).to_string() : "";
         }
 
         if (in_loop && line_split[0].find("_atom_site") != std::string::npos) {

@@ -89,7 +89,7 @@ void TextFile::seekpos(uint64_t position) {
         auto delta = static_cast<int64_t>(position) - static_cast<int64_t>(position_);
         if (0 <= delta && delta < static_cast<int64_t>(buffer_.size())) {
             // the new position is inside our buffer, no need to actually seek,
-            // just reset the line_start_ to the correponding position.
+            // just reset the line_start_ to the corresponding position.
             line_start_ = buffer_.data() + delta;
             eof_ = false;
             return;

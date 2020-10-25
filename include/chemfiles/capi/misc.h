@@ -49,7 +49,7 @@ CHFL_EXPORT chfl_status chfl_set_warning_callback(chfl_warning_callback callback
 /// file.
 ///
 /// This function will fail if there is no file at `path`, or if the file is
-/// incorectly formatted. Data from the new configuration file will overwrite
+/// incorrectly formatted. Data from the new configuration file will overwrite
 /// any existing data.
 ///
 /// @example{capi/chfl_add_configuration.c}

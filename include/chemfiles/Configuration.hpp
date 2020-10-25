@@ -72,7 +72,7 @@ public:
     }
 
     /// Read configuration from the file at `path`. If the same configuration
-    /// data is already present in a previouly read configuration file, the
+    /// data is already present in a previously read configuration file, the
     /// data is replaced by the one in this file.
     ///
     /// If the file at `path` can not be opened, a `ConfigurationError` is
@@ -104,7 +104,7 @@ private:
     using types_map = std::unordered_map<std::string, std::string>;
     /// Map for old-type => new-type renaming
     mutex<types_map> types_;
-    /// Map for element type => data assocations
+    /// Map for element type => data associations
     mutex<atomic_data_map> atoms_;
 };
 
