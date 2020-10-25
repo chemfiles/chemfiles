@@ -182,11 +182,11 @@ template <> double chemfiles::parse(string_view input) {
         }
 
         // Get digits of exponent, if any.
-        unsigned expon = 0;
+        unsigned exponent = 0;
         while (it != end && is_ascii_digit(*it)) {
             unsigned digit = static_cast<unsigned>(*it - '0');
-            if (expon <= ((std::numeric_limits<unsigned>::max() - digit) / 10))
-                expon = expon * 10 + digit;
+            if (exponent <= ((std::numeric_limits<unsigned>::max() - digit) / 10))
+                exponent = exponent * 10 + digit;
             else {
                 throw error("float exponent in {} is out of range for unsigned integer", input);
             }
@@ -196,14 +196,14 @@ template <> double chemfiles::parse(string_view input) {
 
         if (it == exponent_start) {
             throw error("missing exponent in '{}' to read a double", input);
-        } else if (expon > 308) {
+        } else if (exponent > 308) {
             throw error("{} is out of range for double", input);
         }
 
         // Calculate scaling factor.
-        while (expon >= 50) { scale *= 1e50; expon -= 50; }
-        while (expon >=  8) { scale *= 1e8;  expon -=  8; }
-        while (expon >   0) { scale *= 1e1;  expon -=  1; }
+        while (exponent >= 50) { scale *= 1e50; exponent -= 50; }
+        while (exponent >=  8) { scale *= 1e8;  exponent -=  8; }
+        while (exponent >   0) { scale *= 1e1;  exponent -=  1; }
     }
 
     // skip whitespaces after number if any
@@ -268,7 +268,7 @@ static int64_t pow_int(uint64_t base, uint64_t power) {
     return static_cast<int64_t>(std::pow(base, power) + 0.5);
 }
 
-std::string chemfiles::encode_hydrid36(uint64_t width, int64_t value) {
+std::string chemfiles::encode_hybrid36(uint64_t width, int64_t value) {
 
     // the number is too negative to be encoded
     if (value < (1 - pow_int(10, width - 1))) {

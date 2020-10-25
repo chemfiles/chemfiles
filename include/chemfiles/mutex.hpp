@@ -10,7 +10,7 @@ namespace chemfiles {
 
 template<class T> class mutex;
 
-/// A lock guard that guarantee exlusive access to the underlying data.
+/// A lock guard that guarantee exclusive access to the underlying data.
 ///
 /// When the lock guard is destroyed, it releases the associated mutex.
 template<class T>

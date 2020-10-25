@@ -199,7 +199,7 @@ template <MolfileFormat F> size_t Molfile<F>::nsteps() {
     if (plugin_handle_->read_next_timestep == nullptr) {
         // FIXME: this is hacky, but the molden plugin does not respect a NULL
         // argument for molfile_timestep_t, so for now we are only able to read
-        // a sinle step from all the QM format plugins.
+        // a single step from all the QM format plugins.
         return 1;
     }
     size_t n = 0;
@@ -322,7 +322,7 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
     }
 }
 
-// Instanciate all the templates
+// Instantiate all the templates
 template class chemfiles::Molfile<DCD>;
 template class chemfiles::Molfile<TRJ>;
 template class chemfiles::Molfile<LAMMPS>;

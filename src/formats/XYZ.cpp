@@ -254,7 +254,7 @@ std::string write_extended_comment_line(const Frame& frame) {
 using extended_xyz_properties_map_t = std::unordered_map<string_view, Property>;
 
 /// A simple parser for the extended XYZ comment line. This parser bails out as
-/// soons as possible if the line does not seems to follow extended XYZ
+/// soon as possible if the line does not seems to follow extended XYZ
 /// convention.
 ///
 /// This line should contains key/values pairs separated by spaces, while the
@@ -389,7 +389,7 @@ static UnitCell parse_cell(string_view lattice) {
 /// returned in the property list.
 ///
 /// When converting atomic properties as described by the 'Properties'
-/// value, the followig rules are used:
+/// value, the following rules are used:
 ///
 /// - Properties of type L:1 are maped to boolean values
 /// - Properties of type L:N are maped to N separate boolean properties,

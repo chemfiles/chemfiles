@@ -87,7 +87,7 @@ public:
     /// @throw FormatError if the file does not follow the format
     /// @throw FileError if their is an OS error while reading the file
     ///
-    /// @param frame The frame to be writen
+    /// @param frame The frame to be written
     virtual void write(const Frame& frame);
 
     /// Get the number of frames in the associated file. This function can be

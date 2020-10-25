@@ -149,7 +149,7 @@ TEST_CASE("Use the UnitCell type") {
 
         SECTION("setting lengths & angles") {
             auto cell = UnitCell();
-            // Atempt to set values of an infinite unit cell
+            // Attempt to set values of an infinite unit cell
             CHECK_THROWS_WITH(cell.set_lengths({10, 10, 10}), "can not set lengths for an infinite cell");
             CHECK_THROWS_WITH(cell.set_angles({90, 90, 100}), "can not set angles for a non-triclinic cell");
 

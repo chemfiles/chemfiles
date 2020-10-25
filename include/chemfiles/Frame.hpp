@@ -101,7 +101,7 @@ public:
     ///
     /// @example{frame/cell.cpp}
     void set_cell(UnitCell cell) {
-        cell_ = std::move(cell);  // NOLINT: std::move for trivially copiable type
+        cell_ = std::move(cell);  // NOLINT: std::move for trivially copyable type
     }
 
     /// Get the number of atoms in this frame
@@ -158,7 +158,7 @@ public:
     /// Resize the frame to contain `size` atoms.
     ///
     /// If the new number of atoms is bigger than the old one, missing data is
-    /// initializd to 0. Pre-existing values are conserved.
+    /// initialized to 0. Pre-existing values are conserved.
     ///
     /// If the new size if smaller than the old one, all atoms and connectivity
     /// elements after the new size are removed.
@@ -327,7 +327,7 @@ public:
     /// `k` and `m`, accounting for periodic boundary conditions. The distance
     /// is expressed in angstroms.
     ///
-    /// This is the distance betweent the atom j and the ikm plane. The j atom
+    /// This is the distance between the atom j and the ikm plane. The j atom
     /// is the center of the improper dihedral angle formed by i, j, k and m.
     ///
     /// @throws chemfiles::OutOfBounds if `i`, `j`, `k` or `m` are bigger than
@@ -336,7 +336,7 @@ public:
     /// @example{frame/out_of_plane.cpp}
     double out_of_plane(size_t i, size_t j, size_t k, size_t m) const;
 
-    /// Get the map of properties asociated with this frame. This map might be
+    /// Get the map of properties associated with this frame. This map might be
     /// iterated over to list the properties of the frame, or directly accessed.
     ///
     /// @example{frame/properties.cpp}

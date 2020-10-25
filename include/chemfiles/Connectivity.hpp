@@ -27,11 +27,11 @@ public:
         SINGLE = 1,     ///< Single bond
         DOUBLE = 2,     ///< Double bond
         TRIPLE = 3,     ///< Triple bond
-        QUADRUPLE = 4,  ///< Qudadruple bond
-        QINTUPLET = 5,  ///< Quintuplet bond
+        QUADRUPLE = 4,  ///< Quadruplet bond
+        QUINTUPLET = 5,  ///< Quintuplet bond
 
         // space for more bond types if needed
-        DOWN = 250,     ///< Single bond direction from frist atom to second is 'down'. Used for cis-trans isomers
+        DOWN = 250,     ///< Single bond direction from first atom to second is 'down'. Used for cis-trans isomers
         UP = 251,       ///< Single bond direction from first atom to second is 'up'. Used for cis-trans isomers
         DATIVE_R = 252, ///< Dative bond where the electrons are localized to the first atom
         DATIVE_L = 253, ///< Dative bond where the electrons are localized to the second atom

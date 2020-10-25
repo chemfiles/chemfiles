@@ -181,7 +181,7 @@ void Trajectory::pre_read(size_t step) {
     }
     if (mode_ != File::READ) {
         throw file_error(
-            "the file at '{}' was not openened in read mode", path_
+            "the file at '{}' was not opened in read mode", path_
         );
     }
 }
@@ -250,7 +250,7 @@ void Trajectory::write(const Frame& frame) {
     check_opened();
     if (!(mode_ == File::WRITE || mode_ == File::APPEND)) {
         throw file_error(
-            "the file at '{}' was not openened in write or append mode", path_
+            "the file at '{}' was not opened in write or append mode", path_
         );
     }
 
@@ -278,10 +278,10 @@ void Trajectory::set_topology(const Topology& topology) {
 
 void Trajectory::set_topology(const std::string& filename, const std::string& format) {
     check_opened();
-    Trajectory topolgy_file(filename, 'r', format);
-    assert(topolgy_file.nsteps() > 0);
+    Trajectory topology_file(filename, 'r', format);
+    assert(topology_file.nsteps() > 0);
 
-    auto frame = topolgy_file.read_step(0);
+    auto frame = topology_file.read_step(0);
     set_topology(frame.topology());
 }
 

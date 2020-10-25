@@ -29,7 +29,7 @@ public:
 
 private:
     /// Check if any error happened while reading/writing the file. Returns the
-    /// corresponding error message or `nullptr` if no error occured.
+    /// corresponding error message or `nullptr` if no error occurred.
     const char* check_error() const;
 
     gzFile file_ = nullptr;

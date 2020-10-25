@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-/// Possible values holded by a CHFL_PROPERTY
+/// Possible values held by a CHFL_PROPERTY
 typedef enum {  // NOLINT: this is both a C and C++ file
     /// Bool value
     CHFL_PROPERTY_BOOL = 0,
@@ -66,7 +66,7 @@ CHFL_EXPORT CHFL_PROPERTY* chfl_property_string(const char* value);
 ///         `chfl_last_error` to learn about the error.
 CHFL_EXPORT CHFL_PROPERTY* chfl_property_vector3d(const chfl_vector3d value);
 
-/// Get the type of value holded by this `property` in `kind`.
+/// Get the type of value held by this `property` in `kind`.
 ///
 /// @example{capi/chfl_property/kind.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
@@ -75,7 +75,7 @@ CHFL_EXPORT chfl_status chfl_property_get_kind(
     const CHFL_PROPERTY* property, chfl_property_kind* kind
 );
 
-/// Get the boolean value holded by this `property` in the location pointed to
+/// Get the boolean value held by this `property` in the location pointed to
 /// by `value`.
 ///
 /// This function returns CHFL_PROPERTY_ERROR if the property is not a boolean
@@ -101,9 +101,9 @@ CHFL_EXPORT chfl_status chfl_property_get_double(
     const CHFL_PROPERTY* property, double* value
 );
 
-/// Get the string value holded by this `property` in the given `buffer`.
+/// Get the string value held by this `property` in the given `buffer`.
 ///
-/// This function returns CHFL_PROPERTY_ERROR if the property is not a sring
+/// This function returns CHFL_PROPERTY_ERROR if the property is not a string
 /// property.
 ///
 /// The buffer size must be passed in `buffsize`. This function will truncate
@@ -116,7 +116,7 @@ CHFL_EXPORT chfl_status chfl_property_get_string(
     const CHFL_PROPERTY* property, char* buffer, uint64_t buffsize
 );
 
-/// Get the 3D vector value holded by this `property` in the location pointed to
+/// Get the 3D vector value held by this `property` in the location pointed to
 /// by `value`.
 ///
 /// This function returns CHFL_PROPERTY_ERROR if the property is not a 3D vector

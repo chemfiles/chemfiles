@@ -43,10 +43,10 @@ public:
 
 private:
     /// [for reading] adds an atom defined by `atom_name` to the topology
-    Atom& add_atom(Topology& topo, string_view atom_name);
+    Atom& add_atom(Topology& topology, string_view atom_name);
 
     /// [for reading] adds an atom defined by the string `smiles` starting at position i
-    void process_property_list(Topology& topo, string_view smiles);
+    void process_property_list(Topology& topology, string_view smiles);
 
     /// [for reading] Opens and closes a ring with id `ring_id`
     void check_ring_(Topology& topology, size_t ring_id);
@@ -64,7 +64,7 @@ private:
     /// [for reading] The previous active atom
     size_t previous_atom_;
 
-    /// [for reading] The current bond ordeer
+    /// [for reading] The current bond order
     Bond::BondOrder current_bond_order_;
 
     /// [for reading] List of groups

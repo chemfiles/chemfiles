@@ -207,11 +207,11 @@ TEST_CASE("scan") {
 }
 
 static void recycle(uint64_t width, int64_t value, const std::string& hybrid) {
-    CHECK(chemfiles::encode_hydrid36(width, value) == hybrid);
+    CHECK(chemfiles::encode_hybrid36(width, value) == hybrid);
     CHECK(chemfiles::decode_hybrid36(width, hybrid) == value);
 }
 
-TEST_CASE("hyrid encode and decode") {
+TEST_CASE("hybrid encode and decode") {
     CHECK(chemfiles::decode_hybrid36(4, "    ") == 0);
     CHECK(chemfiles::decode_hybrid36(4, "  -0") == 0);
     recycle(4, -999, "-999");
@@ -310,8 +310,8 @@ TEST_CASE("hyrid encode and decode") {
     recycle(5, 100000 + 26 * 36 * 36 * 36 * 36 + 36 * 36 * 36 * 36, "b0000");
     recycle(5, 100000 + 2 * 26 * 36 * 36 * 36 * 36 - 1, "zzzzz");
 
-    CHECK(chemfiles::encode_hydrid36(4, -99999) == "****");
-    CHECK(chemfiles::encode_hydrid36(4, 9999999) == "****");
+    CHECK(chemfiles::encode_hybrid36(4, -99999) == "****");
+    CHECK(chemfiles::encode_hybrid36(4, 9999999) == "****");
 
     CHECK_THROWS_WITH(
         chemfiles::decode_hybrid36(5, "*0000"),

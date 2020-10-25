@@ -230,7 +230,7 @@ CHFL_EXPORT chfl_status chfl_frame_dihedral(
 /// and `m` in the `frame`, accounting for periodic boundary conditions. The
 /// result is placed in `distance` and expressed in angstroms.
 ///
-/// This is the distance betweent the atom j and the ikm plane. The j atom
+/// This is the distance between the atom j and the ikm plane. The j atom
 /// is the center of the improper dihedral angle formed by i, j, k and m.
 ///
 /// @example{capi/chfl_frame/out_of_plane.c}
