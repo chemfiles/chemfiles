@@ -121,6 +121,11 @@ if(MSVC)
     target_compile_definitions(chemfiles_objects PRIVATE -D_SCL_SECURE_NO_WARNINGS)
 endif()
 
+if(WIN32)
+    target_compile_definitions(chemfiles_objects PRIVATE -DWIN32_LEAN_AND_MEAN)
+    target_compile_definitions(chemfiles_objects PRIVATE -DNOMINMAX)
+endif()
+
 target_use_clang_tidy(chemfiles_objects)
 target_use_include_what_you_use(chemfiles_objects)
 
@@ -140,11 +145,6 @@ set(CHEMFILES_OBJECTS
 # Add the main chemfiles library
 add_library(chemfiles ${CHEMFILES_OBJECTS})
 
-if(WIN32)
-    # MMTF (and thus chemfiles) uses endianness conversion function from ws2_32
-    target_link_libraries(chemfiles ws2_32)
-endif()
-
 set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
 set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
 
@@ -160,11 +160,10 @@ target_link_libraries(chemfiles
     ${LIBLZMA_LIBRARY}
     ${BZIP2_LIBRARIES}
 )
-if(WIN32)
-    target_link_libraries(chemfiles ws2_32)
-endif()
 
 if(WIN32)
+    # MMTF (and thus chemfiles) uses endianness conversion function from ws2_32
+    target_link_libraries(chemfiles ws2_32)
     set(CHEMFILES_WINDOWS ON)
 endif()
 
