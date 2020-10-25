@@ -9,7 +9,6 @@
 #include "chemfiles/utils.hpp"
 
 #ifdef CHEMFILES_WINDOWS
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>  // GetUserName & GetComputerNameEx
 #include <direct.h>  // _getcwd
 #define getcwd _getcwd
