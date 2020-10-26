@@ -1,4 +1,4 @@
 sphinx >3.2
-breathe >4.20
+breathe ==4.23
 sphinx_bootstrap_theme
 toml
