@@ -74,7 +74,7 @@ public:
     /// one length is not zero and all angles are 90.0, then the cell is
     /// `ORTHORHOMBIC`.  Else a `TRICLINIC` cell is created.
     ///
-    /// @example{cell/from-2.cpp}
+    /// @example{cell/cell-2.cpp}
     UnitCell(Vector3D lengths, Vector3D angles);
 
     /// Construct a unit cell from a cell matrix.
