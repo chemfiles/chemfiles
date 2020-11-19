@@ -222,12 +222,12 @@ public:
 
 	//***********************************************************************************
 
-	void getMinMaxBox(std::vector<Vector3D> pos, int n, float* min, float* max);
+	void getMinMaxBox(std::vector<Vector3D> pos, int n, Vector3D& min, Vector3D& max);
 
-	int createNeighborList(int** nbList, int xCells, int yCells, int zCells);
+	int createNeighborList(std::vector<std::vector<int>>& nbList, int xCells, int yCells, int zCells);
 
-	int generateBonds(std::vector<int>& result, int totalCells, int** (&cells),
-	   int* (&numInCell), int** (&neighborList), int maxBonds, float cutoff);
+	int generateBonds(std::vector<int>& result, int totalCells, std::vector<std::vector<int>>& cells,
+	   std::vector<int>& numInCell, std::vector<std::vector<int>>& neighborList, int maxBonds, float cutoff);
 
 	void guess_bonds_cls();
 
