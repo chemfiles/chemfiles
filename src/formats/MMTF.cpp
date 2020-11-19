@@ -124,19 +124,17 @@ void MMTFFormat::read_step(const size_t step, Frame& frame) {
     // Fast-forward, keeping all indexes updated
     while(modelIndex_ != step) {
         auto chainsPerModel = static_cast<size_t>(structure_.chainsPerModel[modelIndex_]);
-        while(chainIndex_ != chainsPerModel) {
+        for (size_t j = 0; j < chainsPerModel; ++j) {
             auto groupsPerChain = static_cast<size_t>(structure_.groupsPerChain[chainIndex_]);
-            while(groupIndex_ != groupsPerChain) {
+            for (size_t k = 0; k < groupsPerChain; ++k) {
                 auto groupType = static_cast<size_t>(structure_.groupTypeList[groupIndex_]);
-                auto group = structure_.groupList[groupType];
+                const auto& group = structure_.groupList[groupType];
                 auto atomCount = group.atomNameList.size();
                 atomIndex_ += atomCount;
                 groupIndex_++;
             }
-            groupIndex_ = 0;
             chainIndex_++;
         }
-        chainIndex_ = 0;
         modelIndex_++;
     }
 
