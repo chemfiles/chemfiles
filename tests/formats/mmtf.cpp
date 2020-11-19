@@ -130,6 +130,24 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(topology.residue(10).get("secondary_structure")->as_string() == "extended");
     }
 
+    SECTION("Bug in 1HTQ") {
+        // Fast-forward in `read_step` calculates wrong indices
+        // https://github.com/chemfiles/chemfiles/issues/344
+        auto file = Trajectory("data/mmtf/1HTQ.mmtf");
+
+        auto frame = file.read_step(9);
+        CHECK(frame.size() == 97872);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(103.657, 52.540, 137.019), 1e-3));
+        CHECK(approx_eq(positions[1401], Vector3D(73.297, 19.998, 146.804), 1e-3));
+
+        frame = file.read_step(1);
+        CHECK(frame.size() == 97872);
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(104.485, 52.282, 139.288), 1e-3));
+        CHECK(approx_eq(positions[1401], Vector3D(73.385, 19.914, 146.528), 1e-3));
+    }
+
     SECTION("Successive steps") {
         auto file = Trajectory("data/mmtf/1J8K.mmtf");
 
