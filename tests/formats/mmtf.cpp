@@ -162,7 +162,7 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(topology.are_linked(topology.residue(0), topology.residue(1)));
         CHECK(!topology.are_linked(topology.residue(0), topology.residue(2)));
 
-        auto frame3= file.read();
+        auto frame3 = file.read();
     }
 
     SECTION("Alternative locations and symmetry operations") {
@@ -192,6 +192,23 @@ TEST_CASE("Read files in MMTF format") {
 
         const auto& last_residue = residues[residues.size() - 1];
         CHECK(last_residue.get("chainindex")->as_double() == -1.0);
+    }
+
+    SECTION("Read reduced representation") {
+        auto file = Trajectory("data/mmtf/1HTQ_reduced.mmtf");
+        CHECK(file.nsteps() == 10);
+
+        auto frame = file.read_step(9);
+        CHECK(frame.size() == 12336);
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(104.656, 52.957, 138.038), 1e-3));
+        CHECK(approx_eq(positions[1401], Vector3D(66.292, -29.336, 158.267), 1e-3));
+
+        frame = file.read_step(1);
+        CHECK(frame.size() == 12336);
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(105.482, 51.793, 140.282), 1e-3));
+        CHECK(approx_eq(positions[1401], Vector3D(66.033, -29.676, 158.009), 1e-3));
     }
 
     SECTION("GZ Files") {
