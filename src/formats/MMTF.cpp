@@ -68,6 +68,21 @@ MMTFFormat::MMTFFormat(std::string path, File::Mode mode, File::Compression comp
         auto file = TextFile(std::move(path), mode, compression);
         auto buffer = file.readall();
         decode(buffer.data(), buffer.size(), file.path());
+        if (!mmtf::isDefaultValue(structure_.atomIdList)) {
+            // If ids are not ordered or are missing consecutive values the atoms
+            // have to be re-ordered.
+            bool isValidIdOrder = false;
+            if (structure_.atomIdList[0] == 1) {
+                // hack `is_sorted` to check that all ids are consecutive and sorted
+                isValidIdOrder = std::is_sorted(
+                    new_atom_indexes_.begin(), new_atom_indexes_.end(),
+                    [](const int32_t& lhs, const int32_t& rhs) { return (lhs + 1) == rhs; });
+            }
+            if (!isValidIdOrder) {
+                new_atom_indexes_ = structure_.atomIdList;
+                std::sort(new_atom_indexes_.begin(), new_atom_indexes_.end());
+            }
+        }
     } else if (mode == File::WRITE) {
         filename_ = std::move(path); // We really don't need to do anything, yet
     } else if (mode == File::APPEND) {
@@ -612,7 +627,20 @@ size_t MMTFFormat::atom_id(size_t mmtf_id) {
     if (!mmtf::isDefaultValue(structure_.atomIdList)) {
         assert(mmtf_id < structure_.atomIdList.size());
         assert(structure_.atomIdList[mmtf_id] > 0);
-        auto id = static_cast<size_t>(structure_.atomIdList[mmtf_id]) - 1;
+        size_t id;
+        if (new_atom_indexes_.empty()) {
+            // atom ids are well-behaved, no reordering necessary
+            id = static_cast<size_t>(structure_.atomIdList[mmtf_id]) - 1;
+        } else {
+            assert(structure_.atomIdList.size() == new_atom_indexes_.size());
+            auto listedId = structure_.atomIdList[mmtf_id];
+            // use the fact that indexes are sorted for faster search
+            auto it =
+                std::lower_bound(new_atom_indexes_.begin(), new_atom_indexes_.end(), listedId);
+            // it is guaranteed that the lower bound is an exact match
+            assert(it != new_atom_indexes_.end() && *it == listedId);
+            id = static_cast<size_t>(std::distance(new_atom_indexes_.begin(), it));
+        }
         assert(atomSkip_ <= id);
         return id - atomSkip_;
     } else {

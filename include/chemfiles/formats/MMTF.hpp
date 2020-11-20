@@ -102,7 +102,8 @@ private:
     // stores the association from chemfiles index to MMTF index to be able to
     // add the right bonds.
     //
-    // This is only used when writing
+    // This is only used when writing files, or reading files
+    // with unordered or incomplete ids (e.g. reduced representation).
     std::vector<int32_t> new_atom_indexes_;
 
     /// Have we written the unitcell data?
