@@ -140,3 +140,9 @@ latex_documents = [
     ('index', 'chemfiles.tex', u'Chemfiles Documentation',
      u'Guillaume Fraux', 'howto'),
 ]
+
+
+# -- Options for Linkcheck -------------------------------------------------
+
+# do not try to check archive.org, it can timeout a lot
+linkcheck_ignore = [r'https://web.archive.org/']
