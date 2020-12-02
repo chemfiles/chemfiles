@@ -118,26 +118,30 @@ void Frame::guess_bonds() {
    }
 }
 
-void Frame::getMinMaxBox(std::vector<Vector3D> pos, int n, Vector3D& min, Vector3D& max) {
+void Frame::getMinMaxBox(Vector3D& min, Vector3D& max) {
 
    float x1, x2, y1, y2, z1, z2;
 
    //Consider first atom's coordinates as min and max.
-   x1 = pos[0][0];
-   x2 = pos[0][0];
-   y1 = pos[0][1];
-   y2 = pos[0][1];
-   z1 = pos[0][2];
-   z2 = pos[0][2];
+   x1 = this->positions_[0][0];
+   x2 = this->positions_[0][0];
+   y1 = this->positions_[0][1];
+   y2 = this->positions_[0][1];
+   z1 = this->positions_[0][2];
+   z2 = this->positions_[0][2];
 
-   for (int i = 1; i < n; i++) {
-      if (pos[i][0] < x1) x1 = pos[i][0];
-      if (pos[i][0] > x2) x2 = pos[i][0];
-      if (pos[i][1] < y1) y1 = pos[i][1];
-      if (pos[i][1] > y2) y2 = pos[i][1];
-      if (pos[i][2] < z1) z1 = pos[i][2];
-      if (pos[i][2] > z2) z2 = pos[i][2];
+   for (const auto& position : this->positions_) {
+      if (position[0] < x1) x1 = position[0];
+      if (position[0] > x2) x2 = position[0];
+      if (position[1] < y1) y1 = position[1];
+      if (position[1] > y2) y2 = position[1];
+      if (position[2] < z1) z1 = position[2];
+      if (position[2] > z2) z2 = position[2];
    }
+
+   assert(x2 > x1);
+   assert(y2 > y1);
+   assert(z2 > z1);
 
    min[0] = x1;
    max[0] = x2;
@@ -147,108 +151,162 @@ void Frame::getMinMaxBox(std::vector<Vector3D> pos, int n, Vector3D& min, Vector
    max[2] = z2;
 }
 
-int Frame::createNeighborList(std::vector<std::vector<int>>& nbList, int xCells, int yCells, int zCells) {
+size_t Frame::createNeighborList(std::vector<std::vector<size_t>>& nbList, size_t xCells, 
+   size_t yCells, size_t zCells) {
 
-   int xyTotalCells = xCells * yCells;
-   int cellIndex = 0;
-   for (int zCell = 0; zCell < zCells; zCell++) {
-      for (int yCell = 0; yCell < yCells; yCell++) {
-         for (int xCell = 0; xCell < xCells; xCell++) {
-
-            //27 neighbors plus a -1 for the end of the list
-            nbList[cellIndex].push_back(cellIndex);
+   size_t xyTotalCells = xCells * yCells;
+   size_t cellIndex = 0;
+   for (size_t zCell = 0; zCell < zCells; zCell++) {
+      for (size_t yCell = 0; yCell < yCells; yCell++) {
+         for (size_t xCell = 0; xCell < xCells; xCell++) {
+            nbList[cellIndex].reserve(14);
+            nbList[cellIndex].emplace_back(cellIndex);
             if (xCell < xCells - 1) {
-               nbList[cellIndex].push_back(cellIndex + 1);
+               nbList[cellIndex].emplace_back(cellIndex + 1);
             }
             if (yCell < yCells - 1) {
-               nbList[cellIndex].push_back(cellIndex + xCells);
+               nbList[cellIndex].emplace_back(cellIndex + xCells);
             }
             if (zCell < zCells - 1) {
-               nbList[cellIndex].push_back(cellIndex + xyTotalCells);
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells);
             }
             if (xCell < (xCells - 1) && yCell < (yCells - 1)) {
-               nbList[cellIndex].push_back(cellIndex + xCells + 1);
+               nbList[cellIndex].emplace_back(cellIndex + xCells + 1);
             }
             if (xCell < (xCells - 1) && zCell < (zCells - 1)) {
-               nbList[cellIndex].push_back(cellIndex + xyTotalCells + 1);
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells + 1);
             }
             if (yCell < (yCells - 1) && zCell < (zCells - 1)) {
-               nbList[cellIndex].push_back(cellIndex + xyTotalCells + xCells);
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells + xCells);
             }
             if (xCell < (xCells - 1) && yCell > 0) {
-               nbList[cellIndex].push_back(cellIndex - xCells + 1);
+               nbList[cellIndex].emplace_back(cellIndex - xCells + 1);
             }
             if (xCell > 0 && zCell < (zCells - 1)) {
-               nbList[cellIndex].push_back(cellIndex + xyTotalCells - 1);
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells - 1);
             }
             if (yCell > 0 && zCell < (zCells - 1)) {
-               nbList[cellIndex].push_back(cellIndex + xyTotalCells - xCells);
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells - xCells);
             }
             if (xCell < (xCells - 1) && yCell < (yCells - 1) && zCell < (zCells - 1)) {
-               nbList[cellIndex].push_back(cellIndex + xyTotalCells + xCells + 1);
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells + xCells + 1);
             }
             if (xCell > 0 && yCell < (yCells - 1) && zCell < (zCells - 1)) {
-               nbList[cellIndex].push_back(cellIndex + xyTotalCells + xCells - 1);
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells + xCells - 1);
             }
             if (xCell < (xCells - 1) && yCell > 0 && zCell < (zCells - 1)) {
-               nbList[cellIndex].push_back(cellIndex + xyTotalCells - xCells + 1);
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells - xCells + 1);
             }
             if (xCell > 0 && yCell > 0 && zCell < (zCells - 1)) {
-               nbList[cellIndex].push_back(cellIndex + xyTotalCells - xCells - 1);
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells - xCells - 1);
             }
-            if (xCell) {
-               nbList[cellIndex].push_back(cellIndex - 1);
-            }
-            if (yCell) {
-               nbList[cellIndex].push_back(cellIndex - xCells);
-            }
-            if (zCell) {
-               nbList[cellIndex].push_back(cellIndex - xyTotalCells);
-            }
-            if (xCell && yCell) {
-               nbList[cellIndex].push_back(cellIndex - xCells - 1);
-            }
-            if (xCell && zCell) {
-               nbList[cellIndex].push_back(cellIndex - xyTotalCells - 1);
-            }
-            if (yCell && zCell) {
-               nbList[cellIndex].push_back(cellIndex - xyTotalCells - xCells);
-            }
-            if (xCell && yCell < (yCells - 1)) {
-               nbList[cellIndex].push_back(cellIndex + xCells - 1);
-            }
-            if (xCell < (xCells - 1) && zCell) {
-               nbList[cellIndex].push_back(cellIndex - xyTotalCells + 1);
-            }
-            if (yCell < (yCells - 1) && zCell) {
-               nbList[cellIndex].push_back(cellIndex - xyTotalCells + xCells);
-            }
-            if (xCell && yCell && zCell) {
-               nbList[cellIndex].push_back(cellIndex - xyTotalCells - xCells - 1);
-            }
-            if (xCell < (xCells - 1) && yCell && zCell) {
-               nbList[cellIndex].push_back(cellIndex - xyTotalCells - xCells + 1);
-            }
-            if (xCell && yCell < (yCells - 1) && zCell) {
-               nbList[cellIndex].push_back(cellIndex - xyTotalCells + xCells - 1);
-            }
-            if (xCell < (xCells - 1) && yCell < (yCells - 1) && zCell) {
-               nbList[cellIndex].push_back(cellIndex - xyTotalCells + xCells + 1);
-            }
-
-            //End of the list
-            nbList[cellIndex].push_back(-1);
+            nbList[cellIndex].shrink_to_fit();
             cellIndex++;
          }
       }
    }
+   return 0;
+}
 
+size_t Frame::createNeighborListSym(std::vector<std::vector<size_t>>& nbList, size_t xCells,
+   size_t yCells, size_t zCells) {
+
+   size_t xyTotalCells = xCells * yCells;
+   size_t cellIndex = 0;
+   for (size_t zCell = 0; zCell < zCells; zCell++) {
+      for (size_t yCell = 0; yCell < yCells; yCell++) {
+         for (size_t xCell = 0; xCell < xCells; xCell++) {
+            nbList[cellIndex].reserve(27);
+            nbList[cellIndex].emplace_back(cellIndex);
+            if (xCell < xCells - 1) {
+               nbList[cellIndex].emplace_back(cellIndex + 1);
+            }
+            if (yCell < yCells - 1) {
+               nbList[cellIndex].emplace_back(cellIndex + xCells);
+            }
+            if (zCell < zCells - 1) {
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells);
+            }
+            if (xCell < (xCells - 1) && yCell < (yCells - 1)) {
+               nbList[cellIndex].emplace_back(cellIndex + xCells + 1);
+            }
+            if (xCell < (xCells - 1) && zCell < (zCells - 1)) {
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells + 1);
+            }
+            if (yCell < (yCells - 1) && zCell < (zCells - 1)) {
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells + xCells);
+            }
+            if (xCell < (xCells - 1) && yCell > 0) {
+               nbList[cellIndex].emplace_back(cellIndex - xCells + 1);
+            }
+            if (xCell > 0 && zCell < (zCells - 1)) {
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells - 1);
+            }
+            if (yCell > 0 && zCell < (zCells - 1)) {
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells - xCells);
+            }
+            if (xCell < (xCells - 1) && yCell < (yCells - 1) && zCell < (zCells - 1)) {
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells + xCells + 1);
+            }
+            if (xCell > 0 && yCell < (yCells - 1) && zCell < (zCells - 1)) {
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells + xCells - 1);
+            }
+            if (xCell < (xCells - 1) && yCell > 0 && zCell < (zCells - 1)) {
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells - xCells + 1);
+            }
+            if (xCell > 0 && yCell > 0 && zCell < (zCells - 1)) {
+               nbList[cellIndex].emplace_back(cellIndex + xyTotalCells - xCells - 1);
+            }
+            if (xCell) {
+               nbList[cellIndex].emplace_back(cellIndex - 1);
+            }
+            if (yCell) {
+               nbList[cellIndex].emplace_back(cellIndex - xCells);
+            }
+            if (zCell) {
+               nbList[cellIndex].emplace_back(cellIndex - xyTotalCells);
+            }
+            if (xCell && yCell) {
+               nbList[cellIndex].emplace_back(cellIndex - xCells - 1);
+            }
+            if (xCell && zCell) {
+               nbList[cellIndex].emplace_back(cellIndex - xyTotalCells - 1);
+            }
+            if (yCell && zCell) {
+               nbList[cellIndex].emplace_back(cellIndex - xyTotalCells - xCells);
+            }
+            if (xCell && yCell < (yCells - 1)) {
+               nbList[cellIndex].emplace_back(cellIndex + xCells - 1);
+            }
+            if (xCell < (xCells - 1) && zCell) {
+               nbList[cellIndex].emplace_back(cellIndex - xyTotalCells + 1);
+            }
+            if (yCell < (yCells - 1) && zCell) {
+               nbList[cellIndex].emplace_back(cellIndex - xyTotalCells + xCells);
+            }
+            if (xCell && yCell && zCell) {
+               nbList[cellIndex].emplace_back(cellIndex - xyTotalCells - xCells - 1);
+            }
+            if (xCell < (xCells - 1) && yCell && zCell) {
+               nbList[cellIndex].emplace_back(cellIndex - xyTotalCells - xCells + 1);
+            }
+            if (xCell && yCell < (yCells - 1) && zCell) {
+               nbList[cellIndex].emplace_back(cellIndex - xyTotalCells + xCells - 1);
+            }
+            if (xCell < (xCells - 1) && yCell < (yCells - 1) && zCell) {
+               nbList[cellIndex].emplace_back(cellIndex - xyTotalCells + xCells + 1);
+            }
+            nbList[cellIndex].shrink_to_fit();
+            cellIndex++;
+         }
+      }
+   }
    return 0;
 }
 
 void Frame::guess_bonds_cls() {
 
-   int numAtoms = size();
+   size_t numAtoms = size();
 
    topology_.clear_bonds();
 
@@ -265,7 +323,7 @@ void Frame::guess_bonds_cls() {
 
    //Get box's min and max
    Vector3D min, max;
-   getMinMaxBox(positions_, numAtoms, min, max);
+   getMinMaxBox(min, max);
 
    //Box's xyz ranges
    float xRange = max[0] - min[0];
@@ -274,20 +332,11 @@ void Frame::guess_bonds_cls() {
 
    //Box's number of cells in each dim, in x and y dimensions, and in total (in x, y and z dimensions)
    const float inversedCutoff = 1.0 / cutoff;
-   int xCells = ((int)(xRange * inversedCutoff)) + 1;
-   int yCells = ((int)(yRange * inversedCutoff)) + 1;
-   int zCells = ((int)(zRange * inversedCutoff)) + 1;
-   int xyTotalCells = yCells * xCells;
-   int totalCells = xyTotalCells * zCells;
-
-   //Check if total cells is not negative
-   if (totalCells <= 0)
-   {
-      throw error(
-         "Negative number of cells"
-      );
-      return;
-   }
+   size_t xCells = std::ceil(xRange * inversedCutoff);
+   size_t yCells = std::ceil(yRange * inversedCutoff);
+   size_t zCells = std::ceil(zRange * inversedCutoff);
+   size_t xyTotalCells = yCells * xCells;
+   size_t totalCells = xyTotalCells * zCells;
 
    //Limit number of cells in the box (to avoid memory issues)
    if (totalCells > 40000000000)
@@ -299,88 +348,46 @@ void Frame::guess_bonds_cls() {
    }
 
    //Sort atoms in cells
-   std::vector<std::vector<int>> cells;
-   std::vector<int> numInCell;
-   std::vector<int> maxInCell;
-
+   std::vector<std::vector<size_t>> cells;
    cells.resize(totalCells);
-   numInCell.resize(totalCells);
-   maxInCell.resize(totalCells);
 
-   for (int i = 0; i < numAtoms; i++) {
-      int atomXCellNum, atomYCellNum, atomZCellNum, atomCellIndex, numOfAtomsInCell;
+   for (size_t atomIndex = 0; atomIndex < numAtoms; atomIndex++) {
+      size_t atomXCellNum, atomYCellNum, atomZCellNum, atomCellIndex;
 
       //Compute atom's cell index
-      Vector3D atomCoord = positions_[i];
-      atomXCellNum = (int)((atomCoord[0] - min[0]) * inversedCutoff);
-      atomYCellNum = (int)((atomCoord[1] - min[1]) * inversedCutoff);
-      atomZCellNum = (int)((atomCoord[2] - min[2]) * inversedCutoff);
+      Vector3D atomCoord = positions_[atomIndex];
+      atomXCellNum = std::floor((atomCoord[0] - min[0]) * inversedCutoff);
+      atomYCellNum = std::floor((atomCoord[1] - min[1]) * inversedCutoff);
+      atomZCellNum = std::floor((atomCoord[2] - min[2]) * inversedCutoff);
 
       atomCellIndex = atomZCellNum * xyTotalCells + atomYCellNum * xCells + atomXCellNum;
 
-      //Grow cell
-      numOfAtomsInCell = numInCell[atomCellIndex];
-      if (numOfAtomsInCell == maxInCell[atomCellIndex]) {
-         cells[atomCellIndex].resize(numOfAtomsInCell + 4);
-         maxInCell[atomCellIndex] += 4;
+      if (cells[atomCellIndex].capacity() == 0)
+      {
+         cells[atomCellIndex].reserve(8);
       }
-
+      else if (cells[atomCellIndex].capacity() == cells[atomCellIndex].size())
+      {
+         cells[atomCellIndex].reserve(cells[atomCellIndex].capacity() + 4);
+      }
+      
       //Store atom index in appropriate cell
-      cells[atomCellIndex][numOfAtomsInCell] = i;
-      numInCell[atomCellIndex]++;
+      cells[atomCellIndex].emplace_back(atomIndex);
    }
 
-   maxInCell.clear();
+   for (size_t cell = 0; cell < cells.size(); cell++)
+   {
+      cells[cell].shrink_to_fit();
+   }
 
-   //Create the neighbor list 
-   std::vector<std::vector<int>> nbList;
+   //Create the neighbor vector
+   std::vector<std::vector<size_t>> nbList;
    nbList.resize(totalCells);
    createNeighborList(nbList, xCells, yCells, zCells);
 
    //Max number of 12 bonds per atom
-   int maxNumBonds = numAtoms * 12;
-   std::vector<int> bondResults;
-   int bondsCount = generateBonds(bondResults, totalCells, cells, numInCell, nbList, maxNumBonds, cutoff);
-
-   cells.clear();
-   nbList.clear();
-   numInCell.clear();
-
-   if (bondsCount == 0 || bondsCount > maxNumBonds)
-   {
-      if (bondsCount == 0)
-      {
-         throw error(
-            "no bonds found"
-         );
-      }
-      else if (bondsCount > maxNumBonds)
-      {
-         throw error(
-            "exceeded max number of bonds"
-         );
-      }
-   }
-
-   // Go through the bond results vector to add bonds to connectivity
-   for (int bond = 0; bond < bondResults.size() / 2; bond++) {
-
-      int atom1Index = bondResults[bond * 2];
-      int atom2Index = bondResults[(bond * 2) + 1];
-
-      Atom atom1 = topology_[atom1Index];
-      Atom atom2 = topology_[atom2Index];
-
-      //Prevent hydrogen atoms from bonding with each other
-      std::string atom1Type = atom1.type();
-      std::string atom2Type = atom2.type();
-      if (atom1Type != "H" || atom2Type != "H") {
-         // Add a bond, bondorder defaults to 1, bond type to -1
-         add_bond(atom1Index, atom2Index);
-      }
-   }
-
-   bondResults.clear();
+   size_t maxNumBonds = numAtoms * 12;
+   createBonds(cells, nbList, maxNumBonds, cutoff);
 }
 
 void Frame::set_topology(Topology topology) {
@@ -518,32 +525,32 @@ optional<double> guess_bonds_radius(const Atom& atom) {
    }
 }
 
-int Frame::generateBonds(std::vector<int>& result, int totalCells, std::vector<std::vector<int>>& cells,
-   std::vector<int>& numInCell, std::vector<std::vector<int>>& neighborList, int maxBonds, float cutoff)
+size_t Frame::createBonds(std::vector<std::vector<size_t>>& cells,
+   std::vector<std::vector<size_t>>& neighborList, size_t maxBonds, float cutoff)
 {
-   int bondsCount = 0;
+   size_t bondsCount = 0;
    float cutoffPow2 = cutoff * cutoff;
 
-   for (int cellIndex = 0; (cellIndex < totalCells) && (bondsCount < maxBonds); cellIndex += 1) {
-      int atomsInCell = numInCell[cellIndex];
+   for (size_t cellIndex = 0; (cellIndex < cells.size()) && (bondsCount < maxBonds); cellIndex++) {
+      size_t atomsInCell = cells[cellIndex].size();
 
-      for (int nghb = 0; (neighborList[cellIndex][nghb] != -1) && (bondsCount < maxBonds); nghb++) {
-         int neighborCellIndex = neighborList[cellIndex][nghb];
-         int atomNumInCell = numInCell[neighborCellIndex];
-         
+      for (size_t nghb = 0; nghb < neighborList[cellIndex].size() && bondsCount < maxBonds; nghb++) {
+         size_t neighborCellIndex = neighborList[cellIndex][nghb];
+         size_t atomNumInCell = cells[neighborCellIndex].size();
+
          bool selfCell;
          if (cellIndex == neighborCellIndex)
             selfCell = true;
          else
             selfCell = false;
 
-         for (int i = 0; (i < atomsInCell) && (bondsCount < maxBonds); i++) {
-            int atom1 = cells[cellIndex][i];
+         for (size_t i = 0; i < atomsInCell && bondsCount < maxBonds; i++) {
+            size_t atom1 = cells[cellIndex][i];
             //Skip over self and already-tested atoms
-            int firstNeighborCell = (selfCell) ? i + 1 : 0;
+            size_t firstNeighborCell = (selfCell) ? i + 1 : 0;
 
-            for (int j = firstNeighborCell; (j < atomNumInCell) && (bondsCount < maxBonds); j++) {
-               int atom2 = cells[neighborCellIndex][j];
+            for (size_t j = firstNeighborCell; (j < atomNumInCell) && (bondsCount < maxBonds); j++) {
+               size_t atom2 = cells[neighborCellIndex][j];
 
                float interAtomicDist = this->distance(atom1, atom2);
                interAtomicDist *= interAtomicDist;
@@ -567,14 +574,19 @@ int Frame::generateBonds(std::vector<int>& result, int totalCells, std::vector<s
                }
                auto radii = atom1Radius.value() + atom2Radius.value();
                if (interAtomicDist > 0.03 && interAtomicDist < radii) {
-                  result.push_back(atom1);
-                  result.push_back(atom2);
-                  bondsCount++;
+                  const auto& atm1 = topology_[atom1];
+                  const auto& atm2 = topology_[atom2];
+                  //Prevent hydrogen atoms from bonding with each other
+                  if (atm1.type() != "H" || atm2.type() != "H") {
+                     // Add a bond
+                     add_bond(atom1, atom2);
+                     bondsCount++;
+                  }
                }
             }
          }
       }
    }
 
-   return result.size();
+   return bondsCount;
 }

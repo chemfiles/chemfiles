@@ -220,18 +220,57 @@ public:
 	/// @example{frame/guess_bonds.cpp}
 	void guess_bonds();
 
-	//***********************************************************************************
-
-	void getMinMaxBox(std::vector<Vector3D> pos, int n, Vector3D& min, Vector3D& max);
-
-	int createNeighborList(std::vector<std::vector<int>>& nbList, int xCells, int yCells, int zCells);
-
-	int generateBonds(std::vector<int>& result, int totalCells, std::vector<std::vector<int>>& cells,
-	   std::vector<int>& numInCell, std::vector<std::vector<int>>& neighborList, int maxBonds, float cutoff);
-
+	/// Guess the bonds of the frame using a cell lists algorithm.
+	/// 
+	/// Sort the atoms of the structure in the corresponding cell based on their position. 
+	/// Create a neighbour list for each cell, and create bonds between atom pairs based .
+	/// 
+	/// @throw an error if the system has a maximum number of cells.
 	void guess_bonds_cls();
+	
+	/// Compute the minimum and maximum positions (in x, y and z) of a box containing 
+	///	 all the atoms of the structure. 
+	/// 
+	/// @param min the lower limit of the boundary box containing the structure's atoms.
+	/// @param max the upper limit of the boundary box containing the structure's atoms.
+	void getMinMaxBox(Vector3D& min, Vector3D& max);
 
-	//***********************************************************************************
+	/// Create a list of neighbouring cells for each cell of the system. 
+	///	
+	/// Pass through all the cells of the system and fill a list of 14 neighbouring cells at maximum
+	/// for each cell: 13 neighbouring cell + the given cell.
+	///   
+	/// @param nbList the list of neighbouring cells.
+	/// @param xCells the number of cells in the x axis.
+	/// @param yCells the number of cells in the y axis.
+	/// @param zCells the number of cells in the z axis.
+	size_t createNeighborList(std::vector<std::vector<size_t>>& nbList, size_t xCells, size_t yCells,
+	   size_t zCells);
+
+	/// Create a symetrical list of neighbouring cells for each cell of the system. 
+	///	
+	/// Pass through all the cells of the system and fill a list of 27 neighbouring cells at maximum
+	/// for each cell: 26 neighbouring cell + the given cell.
+	///   
+	/// @param nbList the list of neighbouring cells for each cell.
+	/// @param xCells the number of cells in the x axis.
+	/// @param yCells the number of cells in the y axis.
+	/// @param zCells the number of cells in the z axis.
+	size_t createNeighborListSym(std::vector<std::vector<size_t>>& nbList, size_t xCells, size_t yCells,
+	   size_t zCells);
+
+	/// Create bonds between pairs of atoms using a distance-based cell lists algorithm.
+	/// 
+	/// Run through the system's cells, and compute the distance between a cell's atom and atoms
+	///  from neighbouring cells.
+	/// 
+	/// @param cells list of all the cells of the system with each cell listing the contained atoms
+	/// @param neighborList list of neighbouring cells for each cell.
+	/// @param maxBonds maximum nubmer of bonds in the system.
+	/// @param cutoff maximum distance between two atoms to have a bond.
+	/// @throw Error if the Van der Waals radius in unknown for a given atom.
+	size_t createBonds(std::vector<std::vector<size_t>>& cells,
+	   std::vector<std::vector<size_t>>& neighborList, size_t maxBonds, float cutoff);
 
 	/// Remove all connectivity information in the frame's topology
 	///
