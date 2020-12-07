@@ -184,7 +184,7 @@ typedef struct {  // NOLINT: this is both a C and C++ file
 } chfl_match;
 
 
-/// A `chfl_format_metadata` contains metdata associated with one format
+/// A `chfl_format_metadata` contains metadata associated with one format
 typedef struct {
     /// Name of the format
     const char* name;
