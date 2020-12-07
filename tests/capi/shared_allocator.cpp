@@ -34,6 +34,25 @@ TEST_CASE("Shared allocator") {
         // Valgrind tests make sure all memory is released here
     }
 
+    SECTION("Allocation of array type") {
+        auto ptr = shared_allocator::make_shared<Dummy[]>(4);
+
+        // just checking that we can access all items in the array
+        ptr[0].data.push_back(4);
+        ptr[2].data.push_back(2);
+        ptr[3].data.push_back(65);
+
+        auto shared = shared_allocator::shared_ptr(ptr, &ptr[3].data[0]);
+
+        CHECK(*shared == 65);
+        shared_allocator::free(ptr);
+
+        *shared -= 20;
+        CHECK(*shared == 45);
+
+        shared_allocator::free(shared);
+    }
+
     SECTION("Internal re-allocation") {
         auto ptr = shared_allocator::make_shared<Dummy>();
         ptr->data.insert(std::end(ptr->data), {1, 2, 3});
