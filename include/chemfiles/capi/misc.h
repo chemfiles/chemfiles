@@ -62,8 +62,8 @@ CHFL_EXPORT chfl_status chfl_add_configuration(const char* path);
 ///
 /// This function allocate memory for all known formats, and set `metadata` to
 /// this new array. Users of this function are responsible with cleaning up
-/// this memory using the standard library `free`. The number of known formats
-/// (and thus the size of the metadata array) is set in `count`.
+/// this memory using `chfl_free`. The number of known formats (and thus the
+/// size of the metadata array) is set in `count`.
 ///
 /// @example{capi/chfl_formats_list.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
