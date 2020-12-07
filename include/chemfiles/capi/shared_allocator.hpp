@@ -4,6 +4,7 @@
 #include <vector>
 #include <functional>
 #include <unordered_map>
+#include <type_traits>
 
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/mutex.hpp"
@@ -37,9 +38,9 @@ public:
     shared_allocator(shared_allocator&&) = default;
     shared_allocator& operator=(shared_allocator&&) = default;
 
-    /// Like std::make_shared: create a new shared pointer by constructing a
+    /// Like `std::make_shared`: create a new shared pointer by constructing a
     /// value of type T with the given arguments.
-    template<class T, typename ... Args>
+    template<class T, typename ... Args, typename std::enable_if<!std::is_array<T>::value>::type* = nullptr>
     static T* make_shared(Args&& ... args) {
         auto instance = instance_.lock();
         auto ptr = new T{std::forward<Args>(args)...};
@@ -47,9 +48,19 @@ public:
         return ptr;
     }
 
-    /// Like std::shared_ptr<U> aliasing contructor: element and ptr will share
-    /// the references count, and none will be freed while the other one is
-    /// alive.
+    /// Like `std::make_shared`: create a new shared pointer to an array type.
+    /// This function returns a pointer to the first element of the array.
+    template<class T, typename std::enable_if<std::is_array<T>::value>::type* = nullptr>
+    static typename std::remove_extent<T>::type* make_shared(size_t count) {
+        auto instance = instance_.lock();
+        auto ptr = new typename std::remove_extent<T>::type[count];
+        instance->insert_new_array(ptr);
+        return ptr;
+    }
+
+    /// Like `std::shared_ptr<U>` aliasing contructor: element and ptr will
+    /// share the references count, and none will be freed while the other one
+    /// is alive.
     ///
     /// `ptr` must have been allocated with make_shared.
     template<class T, class U>
@@ -85,6 +96,19 @@ private:
         }
         size_t id = get_unused_metadata();
         metadata_[id] = shared_metadata{1, [ptr](){ delete ptr; }};
+        pointers_.emplace(ptr, id);
+    }
+
+    template<class T>
+    void insert_new_array(T* ptr) {
+        if (pointers_.count(ptr) != 0) {
+            throw chemfiles::memory_error(
+                "internal error: pointer at {} is already managed by "
+                "shared_allocator", static_cast<void*>(ptr)
+            );
+        }
+        size_t id = get_unused_metadata();
+        metadata_[id] = shared_metadata{1, [ptr](){ delete[] ptr; }};
         pointers_.emplace(ptr, id);
     }
 

@@ -16,7 +16,7 @@ int main() {
     }
 
     // the user is responsible with freeing the memory
-    free(formats);
+    chfl_free(formats);
     // [example]
     return 0;
 }
