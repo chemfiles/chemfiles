@@ -149,7 +149,7 @@ extern "C" chfl_status chfl_trajectory_memory_buffer(const CHFL_TRAJECTORY* traj
     CHFL_ERROR_CATCH(
         auto block = trajectory->memory_buffer();
         if (!block) {
-            throw Error("trajectory was not opened to write to a memory block");
+            throw Error("this trajectory was not opened to write to a memory buffer");
         }
         *data = block.value().data();
         *size = trajectory->memory_buffer().value().size();
