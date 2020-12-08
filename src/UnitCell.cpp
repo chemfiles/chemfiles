@@ -110,6 +110,42 @@ static Matrix3D cell_matrix_from_lenths_angles(Vector3D lengths, Vector3D angles
     return matrix;
 }
 
+static Vector3D calc_lengths_from_cell_matrix(const Matrix3D& matrix) {
+    Vector3D v1 = {matrix[0][0], matrix[1][0], matrix[2][0]};
+    Vector3D v2 = {matrix[0][1], matrix[1][1], matrix[2][1]};
+    Vector3D v3 = {matrix[0][2], matrix[1][2], matrix[2][2]};
+
+    return {v1.norm(), v2.norm(), v3.norm()};
+}
+
+static Vector3D calc_angles_from_cell_matrix(const Matrix3D& matrix) {
+    Vector3D v1 = {matrix[0][0], matrix[1][0], matrix[2][0]};
+    Vector3D v2 = {matrix[0][1], matrix[1][1], matrix[2][1]};
+    Vector3D v3 = {matrix[0][2], matrix[1][2], matrix[2][2]};
+
+    return {
+        rad2deg(acos(dot(v2, v3) / (v2.norm() * v3.norm()))),
+        rad2deg(acos(dot(v1, v3) / (v1.norm() * v3.norm()))),
+        rad2deg(acos(dot(v1, v2) / (v1.norm() * v2.norm())))
+    };
+}
+
+static bool is_infinite(const Vector3D& lengths) {
+    return is_roughly_zero(lengths[0])
+        && is_roughly_zero(lengths[1])
+        && is_roughly_zero(lengths[2]);
+}
+
+static bool is_orthorhombic(const Vector3D& lengths, const Vector3D& angles) {
+    if (is_infinite(lengths)) {
+        return false;
+    }
+    // we support cells with one or two lengths of 0 which results in NaN angles
+    return (is_roughly_90(angles[0]) || std::isnan(angles[0]))
+        && (is_roughly_90(angles[1]) || std::isnan(angles[1]))
+        && (is_roughly_90(angles[2]) || std::isnan(angles[2]));
+}
+
 UnitCell::UnitCell(): UnitCell({0, 0, 0}) {}
 
 UnitCell::UnitCell(Vector3D lengths): UnitCell(std::move(lengths), {90, 90, 90}) {}
@@ -121,6 +157,12 @@ UnitCell::UnitCell(Matrix3D matrix): matrix_(std::move(matrix)), matrix_inv_(Mat
     auto determinant = matrix_.determinant();
     if (determinant < 0.0) {
         throw error("invalid unit cell matrix with negative determinant");
+    }
+
+    auto lengths = calc_lengths_from_cell_matrix(matrix_);
+    auto angles = calc_angles_from_cell_matrix(matrix_);
+    if (!is_diagonal(matrix_) && is_orthorhombic(lengths, angles)) {
+        throw error("orthorhombic cell must have their a vector along x axis, b vector along y axis and c vector along z axis");
     }
 
     if (is_diagonal(matrix_)) {
@@ -183,14 +225,9 @@ Vector3D UnitCell::lengths() const {
     case ORTHORHOMBIC:
         return {matrix_[0][0], matrix_[1][1], matrix_[2][2]};
     case TRICLINIC:
-        break;  // See below
+        return calc_lengths_from_cell_matrix(matrix_);
     }
-
-    Vector3D v1 = {matrix_[0][0], matrix_[1][0], matrix_[2][0]};
-    Vector3D v2 = {matrix_[0][1], matrix_[1][1], matrix_[2][1]};
-    Vector3D v3 = {matrix_[0][2], matrix_[1][2], matrix_[2][2]};
-
-    return {v1.norm(), v2.norm(), v3.norm()};
+    unreachable();
 }
 
 Vector3D UnitCell::angles() const {
@@ -199,17 +236,9 @@ Vector3D UnitCell::angles() const {
     case ORTHORHOMBIC:
         return {90, 90, 90};
     case TRICLINIC:
-        break;  // See below
+        return calc_angles_from_cell_matrix(matrix_);
     }
-    Vector3D v1 = {matrix_[0][0], matrix_[1][0], matrix_[2][0]};
-    Vector3D v2 = {matrix_[0][1], matrix_[1][1], matrix_[2][1]};
-    Vector3D v3 = {matrix_[0][2], matrix_[1][2], matrix_[2][2]};
-
-    return {
-        rad2deg(acos(dot(v2, v3) / (v2.norm() * v3.norm()))),
-        rad2deg(acos(dot(v1, v3) / (v1.norm() * v3.norm()))),
-        rad2deg(acos(dot(v1, v2) / (v1.norm() * v2.norm())))
-    };
+    unreachable();
 }
 
 void UnitCell::set_lengths(Vector3D lengths) {
