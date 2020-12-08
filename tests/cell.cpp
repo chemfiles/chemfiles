@@ -141,10 +141,19 @@ TEST_CASE("Use the UnitCell type") {
             // bad matrix
             auto matrix = Matrix3D(
                 26.2553,  0.0000, -4.4843,
-                 0.0000, -11.3176,  0.0000,
-                 0.0000,  0.0000,  11.011
+                0.0000, -11.3176,  0.0000,
+                0.0000,  0.0000,  11.011
             );
             CHECK_THROWS_WITH(UnitCell(matrix), "invalid unit cell matrix with negative determinant");
+
+            // Rotated cells are not supported
+            matrix = Matrix3D(
+                0, 0, 3,
+                5, 0, 0,
+                0, 1, 0
+            );
+            CHECK_THROWS_WITH(UnitCell(matrix),
+                "orthorhombic cell must have their a vector along x axis, b vector along y axis and c vector along z axis");
         }
 
         SECTION("setting lengths & angles") {
