@@ -3,28 +3,28 @@
 #define VMDCON_ERROR     3
 
 extern "C" {
-    #include <vmdplugin.h>
     #include <molfile_plugin.h>
+    #include <vmdplugin.h>
 }
 
-#include <cassert>
 #include <array>
+#include <cassert>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
+#include "chemfiles/Atom.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/Atom.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/Topology.hpp"
 
+#include "chemfiles/error_fmt.hpp"
+#include "chemfiles/external/optional.hpp"
+#include "chemfiles/external/span.hpp"
 #include "chemfiles/types.hpp"
 #include "chemfiles/warnings.hpp"
-#include "chemfiles/error_fmt.hpp"
-#include "chemfiles/external/span.hpp"
-#include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/formats/Molfile.hpp"
 
@@ -48,7 +48,6 @@ using namespace chemfiles;
     }
 
 namespace chemfiles {
-    PLUGINS_DATA(DCD,               dcdplugin,          dcd,            false);
     PLUGINS_DATA(TRJ,               gromacsplugin,      trj,            false);
     PLUGINS_DATA(LAMMPS,            lammpsplugin,       lammpstrj,      true);
     PLUGINS_DATA(MOLDEN,            moldenplugin,       molden,         false);
@@ -320,16 +319,9 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
 }
 
 // Instanciate all the templates
-template class chemfiles::Molfile<DCD>;
 template class chemfiles::Molfile<TRJ>;
 template class chemfiles::Molfile<LAMMPS>;
 template class chemfiles::Molfile<MOLDEN>;
-
-template<> FormatInfo chemfiles::format_information<Molfile<DCD>>() {
-    return FormatInfo("DCD").with_extension(".dcd").description(
-        "DCD binary format"
-    );
-}
 
 template<> FormatInfo chemfiles::format_information<Molfile<TRJ>>() {
     return FormatInfo("TRJ").with_extension(".trj").description(
