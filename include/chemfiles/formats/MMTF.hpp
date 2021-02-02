@@ -5,15 +5,14 @@
 #define CHEMFILES_FORMAT_MMTF_HPP
 
 #include <cstdint>
-#include <memory>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <mmtf/structure_data.hpp>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
-#include "chemfiles/UnitCell.hpp"
 
 namespace chemfiles {
 class Frame;
