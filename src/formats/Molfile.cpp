@@ -3,29 +3,29 @@
 #define VMDCON_ERROR     3
 
 extern "C" {
-    #include <vmdplugin.h>
     #include <molfile_plugin.h>
+    #include <vmdplugin.h>
 }
 
+#include <array>
 #include <cassert>
 #include <cstdint>
-#include <array>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
+#include "chemfiles/error_fmt.hpp"
+#include "chemfiles/external/optional.hpp"
+#include "chemfiles/external/span.hpp"
 #include "chemfiles/types.hpp"
 #include "chemfiles/warnings.hpp"
-#include "chemfiles/error_fmt.hpp"
-#include "chemfiles/external/span.hpp"
-#include "chemfiles/external/optional.hpp"
 
-#include "chemfiles/File.hpp"
 #include "chemfiles/Atom.hpp"
+#include "chemfiles/File.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/Topology.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/formats/Molfile.hpp"
 
@@ -49,7 +49,6 @@ using namespace chemfiles;
     }
 
 namespace chemfiles {
-    PLUGINS_DATA(DCD,               dcdplugin,          dcd,            false);
     PLUGINS_DATA(TRJ,               gromacsplugin,      trj,            false);
     PLUGINS_DATA(LAMMPS,            lammpsplugin,       lammpstrj,      true);
     PLUGINS_DATA(MOLDEN,            moldenplugin,       molden,         false);
@@ -323,30 +322,9 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
 }
 
 // Instantiate all the templates
-template class chemfiles::Molfile<DCD>;
 template class chemfiles::Molfile<TRJ>;
 template class chemfiles::Molfile<LAMMPS>;
 template class chemfiles::Molfile<MOLDEN>;
-
-template<> const FormatMetadata& chemfiles::format_metadata<Molfile<DCD>>() {
-    static FormatMetadata metadata;
-    metadata.name = "DCD";
-    metadata.extension = ".dcd";
-    metadata.description = "DCD binary format";
-    metadata.reference = "http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/dcdplugin.html";
-
-    metadata.read = true;
-    metadata.write = false;
-    metadata.memory = false;
-
-    metadata.positions = true;
-    metadata.velocities = false;
-    metadata.unit_cell = false;
-    metadata.atoms = false;
-    metadata.bonds = false;
-    metadata.residues = false;
-    return metadata;
-}
 
 template<> const FormatMetadata& chemfiles::format_metadata<Molfile<TRJ>>() {
     static FormatMetadata metadata;

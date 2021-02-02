@@ -1,45 +1,47 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <algorithm>
+#include <functional>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <algorithm>
-#include <functional>
 
 #include <fmt/ostream.h>
 
-#include "chemfiles/misc.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/FormatMetadata.hpp"
+#include "chemfiles/misc.hpp"
 
 #include "chemfiles/FormatFactory.hpp"
 
-#include "chemfiles/utils.hpp"
-#include "chemfiles/mutex.hpp"
+#include "chemfiles/config.h"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
+#include "chemfiles/mutex.hpp"
+#include "chemfiles/string_view.hpp"
+#include "chemfiles/utils.hpp"
 
-#include "chemfiles/formats/Molfile.hpp"
 #include "chemfiles/formats/AmberNetCDF.hpp"
-#include "chemfiles/formats/LAMMPSData.hpp"
-#include "chemfiles/formats/Tinker.hpp"
-#include "chemfiles/formats/PDB.hpp"
-#include "chemfiles/formats/XYZ.hpp"
-#include "chemfiles/formats/SDF.hpp"
-#include "chemfiles/formats/TNG.hpp"
-#include "chemfiles/formats/MMTF.hpp"
-#include "chemfiles/formats/CSSR.hpp"
-#include "chemfiles/formats/GRO.hpp"
-#include "chemfiles/formats/MOL2.hpp"
-#include "chemfiles/formats/mmCIF.hpp"
-#include "chemfiles/formats/CML.hpp"
-#include "chemfiles/formats/SMI.hpp"
-#include "chemfiles/formats/TRR.hpp"
-#include "chemfiles/formats/XTC.hpp"
 #include "chemfiles/formats/CIF.hpp"
+#include "chemfiles/formats/CML.hpp"
+#include "chemfiles/formats/CSSR.hpp"
+#include "chemfiles/formats/DCD.hpp"
+#include "chemfiles/formats/GRO.hpp"
+#include "chemfiles/formats/LAMMPSData.hpp"
+#include "chemfiles/formats/MMTF.hpp"
+#include "chemfiles/formats/MOL2.hpp"
+#include "chemfiles/formats/Molfile.hpp"
+#include "chemfiles/formats/PDB.hpp"
+#include "chemfiles/formats/SDF.hpp"
+#include "chemfiles/formats/SMI.hpp"
+#include "chemfiles/formats/TNG.hpp"
+#include "chemfiles/formats/TRR.hpp"
+#include "chemfiles/formats/Tinker.hpp"
+#include "chemfiles/formats/XTC.hpp"
+#include "chemfiles/formats/XYZ.hpp"
+#include "chemfiles/formats/mmCIF.hpp"
 
 #define SENTINEL_INDEX (static_cast<size_t>(-1))
 
@@ -47,7 +49,6 @@ namespace chemfiles {
     class MemoryBuffer;
     class Format;
 
-    extern template class Molfile<DCD>;
     extern template class Molfile<TRJ>;
     extern template class Molfile<LAMMPS>;
     extern template class Molfile<MOLDEN>;
@@ -67,7 +68,7 @@ FormatFactory::FormatFactory() {
 #endif
     this->add_format<CMLFormat>();
     this->add_format<CSSRFormat>();
-    this->add_format<Molfile<DCD>>();
+    this->add_format<DCDFormat>();
     this->add_format<GROFormat>();
     this->add_format<Molfile<LAMMPS>>();
     this->add_format<LAMMPSDataFormat>();

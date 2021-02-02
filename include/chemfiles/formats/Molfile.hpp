@@ -5,16 +5,16 @@
 #define CHEMFILES_FORMAT_MOLFILE_HPP
 
 extern "C" {
-    #include "vmdplugin.h"
     #include "molfile_plugin.h"
+    #include "vmdplugin.h"
 }
 
 #include <string>
 #include <vector>
 
 #include "chemfiles/File.hpp"
-#include "chemfiles/Frame.hpp"
 #include "chemfiles/Format.hpp"
+#include "chemfiles/Frame.hpp"
 #include "chemfiles/Topology.hpp"   // IWYU pragma: keep
 #include "chemfiles/external/optional.hpp"
 
@@ -25,7 +25,6 @@ class FormatMetadata;
 /// molfile plugins, please see:
 /// http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/
 enum MolfileFormat {
-    DCD,                ///< DCD binary file format
     TRJ,                ///< Gromacs .trj file format
     LAMMPS,             ///< LAMMPS trajectory files
     MOLDEN,             ///< Molden file format
@@ -86,7 +85,6 @@ private:
     std::vector<Frame> frames_;
 };
 
-template<> const FormatMetadata& format_metadata<Molfile<DCD>>();
 template<> const FormatMetadata& format_metadata<Molfile<TRJ>>();
 template<> const FormatMetadata& format_metadata<Molfile<LAMMPS>>();
 template<> const FormatMetadata& format_metadata<Molfile<MOLDEN>>();
