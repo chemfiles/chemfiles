@@ -5,6 +5,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Next Release (current master)
 
+## 0.10.0 (14 Feb 2021)
+
+### Changes in supported formats
+
+* Added read and write support for CIF format.
+* Added read and write support for extended XYZ. The XYZ format now default to
+  extended output, and read extended files. Extended XYZ allow storing unit
+  cell and arbitrary atomic properties.
+
 ### New features
 
 * Added ability to read and write files directly in-memory. See
@@ -14,7 +23,6 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 * Added support for appending to gzip (.gz) compressed trajectories.
 * Added support for sub-selection in numerical functions, for example
   `distance(#1, name O)`.
-* Added read and write support for CIF format.
 * Changed the UnitCell representation to the full cell matrix instead of
   a/b/c/alpha/beta/gamma
 * Added `chemfiles::formats_list` function to get a list of formats
@@ -27,12 +35,6 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   `chfl_cell_triclinic`.
 * Added `chfl_formats_list` function to get a list of formats and
   associated metadata.
-
-### Changes in supported formats
-
-* Added read and write support for extended XYZ. The XYZ format now default to
-  extended output, and read extended files. Extended XYZ allow storing unit
-  cell and arbitrary atomic properties.
 
 ## 0.9.3 (5 Feb 2020)
 
