@@ -53,4 +53,3 @@ better a link to the format specification.
 
 .. _gh-new-format: https://github.com/chemfiles/chemfiles/labels/A-formats
 .. _gh-new-issue: https://github.com/chemfiles/chemfiles/issues/new
-.. _vmd-formats: http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/

@@ -24,6 +24,7 @@
 
 #include "chemfiles/formats/Molfile.hpp"
 #include "chemfiles/formats/AmberNetCDF.hpp"
+#include "chemfiles/formats/LAMMPSAtom.hpp"
 #include "chemfiles/formats/LAMMPSData.hpp"
 #include "chemfiles/formats/Tinker.hpp"
 #include "chemfiles/formats/PDB.hpp"
@@ -49,7 +50,6 @@ namespace chemfiles {
 
     extern template class Molfile<DCD>;
     extern template class Molfile<TRJ>;
-    extern template class Molfile<LAMMPS>;
     extern template class Molfile<MOLDEN>;
 }
 using namespace chemfiles;
@@ -69,7 +69,7 @@ FormatFactory::FormatFactory() {
     this->add_format<CSSRFormat>();
     this->add_format<Molfile<DCD>>();
     this->add_format<GROFormat>();
-    this->add_format<Molfile<LAMMPS>>();
+    this->add_format<LAMMPSAtomFormat>();
     this->add_format<LAMMPSDataFormat>();
     this->add_format<mmCIFFormat>();
     this->add_format<MMTFFormat>();
