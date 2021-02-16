@@ -36,8 +36,14 @@ CML = "The text of the ``title`` attribute in a molecule node. Only set if the a
 [time]
 type = "number"
 
+LAMMPS = "The time of the frame in time units."
 TRR = "The time of the frame in pico seconds."
 XTC = "The time of the frame in pico seconds."
+
+[lammps_units]
+type = "string"
+
+LAMMPS = "Style of units used by LAMMPS for a simulation."
 
 [xtc_precision]
 type = "number"

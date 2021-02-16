@@ -51,7 +51,6 @@ using namespace chemfiles;
 namespace chemfiles {
     PLUGINS_DATA(DCD,               dcdplugin,          dcd,            false);
     PLUGINS_DATA(TRJ,               gromacsplugin,      trj,            false);
-    PLUGINS_DATA(LAMMPS,            lammpsplugin,       lammpstrj,      true);
     PLUGINS_DATA(MOLDEN,            moldenplugin,       molden,         false);
 }
 
@@ -325,7 +324,6 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
 // Instantiate all the templates
 template class chemfiles::Molfile<DCD>;
 template class chemfiles::Molfile<TRJ>;
-template class chemfiles::Molfile<LAMMPS>;
 template class chemfiles::Molfile<MOLDEN>;
 
 template<> const FormatMetadata& chemfiles::format_metadata<Molfile<DCD>>() {
@@ -354,26 +352,6 @@ template<> const FormatMetadata& chemfiles::format_metadata<Molfile<TRJ>>() {
     metadata.extension = ".trj";
     metadata.description = "GROMACS .trj binary format";
     metadata.reference = "http://manual.gromacs.org/archive/5.0.7/online/trj.html";
-
-    metadata.read = true;
-    metadata.write = false;
-    metadata.memory = false;
-
-    metadata.positions = true;
-    metadata.velocities = false;
-    metadata.unit_cell = false;
-    metadata.atoms = false;
-    metadata.bonds = false;
-    metadata.residues = false;
-    return metadata;
-}
-
-template<> const FormatMetadata& chemfiles::format_metadata<Molfile<LAMMPS>>() {
-    static FormatMetadata metadata;
-    metadata.name = "LAMMPS";
-    metadata.extension = ".lammpstrj";
-    metadata.description = "LAMMPS text trajectory format";
-    metadata.reference = "https://lammps.sandia.gov/doc/dump.html";
 
     metadata.read = true;
     metadata.write = false;
