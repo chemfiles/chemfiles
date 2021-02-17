@@ -30,6 +30,7 @@ class LAMMPSAtomFormat final : public TextFormat {
         : TextFormat(std::move(memory), mode, compression) {}
 
     void read_next(Frame& frame) override;
+    void write_next(const Frame& frame) override;
     optional<uint64_t> forward() override;
 
   private:
