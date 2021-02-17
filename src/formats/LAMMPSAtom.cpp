@@ -33,7 +33,7 @@ template <> const FormatMetadata& chemfiles::format_metadata<LAMMPSAtomFormat>()
     metadata.reference = "https://lammps.sandia.gov/doc/dump.html";
 
     metadata.read = true;
-    metadata.write = false;
+    metadata.write = true;
     metadata.memory = true;
 
     metadata.positions = true;
@@ -534,6 +534,96 @@ void LAMMPSAtomFormat::read_next(Frame& frame) {
         for (size_t i = 0; i < natoms; ++i) {
             unwrap(positions[i], (*images)[i], matrix);
         }
+    }
+}
+
+void LAMMPSAtomFormat::write_next(const Frame& frame) {
+    // use angstrom and femtosecond as default
+    file_.print("ITEM: UNITS\n{:s}\n",
+                frame.get<Property::STRING>("lammps_units").value_or("real"));
+    if (frame.get("time")) {
+        file_.print("ITEM: TIME\n{:.16g}\n", (*frame.get("time")).as_double());
+    }
+    file_.print("ITEM: TIMESTEP\n{:d}\n", frame.step());
+    file_.print("ITEM: NUMBER OF ATOMS\n{:d}\n", frame.size());
+
+    const auto& cell = frame.cell();
+    if (cell.shape() == UnitCell::ORTHORHOMBIC || cell.shape() == UnitCell::INFINITE) {
+        file_.print("ITEM: BOX BOUNDS pp pp pp\n");
+        auto lengths = cell.lengths();
+        // print zeros if the cell is infinite, this line is still required
+        file_.print("{:-1.16e} {:-1.16e}\n", 0.0, lengths[0]);
+        file_.print("{:-1.16e} {:-1.16e}\n", 0.0, lengths[1]);
+        file_.print("{:-1.16e} {:-1.16e}\n", 0.0, lengths[2]);
+    } else { // Triclinic
+        const auto& matrix = cell.matrix();
+        if (!is_upper_triangular(matrix)) {
+            throw format_error("unsupported triclinic but non upper-triangular cell "
+                               "matrix in LAMMPS writer");
+        }
+        file_.print("ITEM: BOX BOUNDS xy xz yz pp pp pp\n");
+        file_.print("{:-1.16e} {:-1.16e} {:-1.16e}\n", 0.0, matrix[0][0], matrix[0][1]);
+        file_.print("{:-1.16e} {:-1.16e} {:-1.16e}\n", 0.0, matrix[1][1], matrix[0][2]);
+        file_.print("{:-1.16e} {:-1.16e} {:-1.16e}\n", 0.0, matrix[2][2], matrix[1][2]);
+    }
+
+    bool has_types = false;
+    bool has_names = false;
+    for (size_t i = 0; i < frame.size(); ++i) {
+        auto& atom = frame[i];
+        if (!atom.type().empty() && !has_types) {
+            try {
+                int type = parse<int>(atom.type());
+                if (type > 0)
+                    has_types = true;
+            } catch (const Error&) {
+                // ignore types that are not a number
+            }
+        }
+        if (!atom.name().empty())
+            has_names = true;
+        if (has_types && has_names) {
+            break;
+        }
+    }
+
+    auto positions = frame.positions();
+    auto velocities = frame.velocities();
+    file_.print("ITEM: ATOMS id xu yu zu"); // write unwrapped positions
+    if (has_types) {
+        file_.print(" type");
+    }
+    if (has_names) {
+        file_.print(" element");
+    }
+    file_.print(" mass q");
+    if (velocities) {
+        file_.print(" vx vy vz");
+    }
+    file_.print("\n");
+    for (size_t i = 0; i < frame.size(); ++i) {
+        auto& atom = frame[i];
+        // LAMMPS uses atom IDs that start with 1
+        file_.print("{:d} {:g} {:g} {:g}", i + 1, positions[i][0], positions[i][1],
+                    positions[i][2]);
+        if (has_types) {
+            int type = 1; // use type 1 as default
+            try {
+                type = parse<int>(atom.type());
+            } catch (const Error&) {
+                // use default for types that are not a number
+            }
+            file_.print(" {:d}", type);
+        }
+        if (has_names) {
+            file_.print(" {:s}", atom.name());
+        }
+        file_.print(" {:g} {:g}", atom.mass(), atom.charge());
+        if (velocities) {
+            auto& v = (*velocities)[i];
+            file_.print(" {:g} {:g} {:g}", v[0], v[1], v[2]);
+        }
+        file_.print("\n");
     }
 }
 
