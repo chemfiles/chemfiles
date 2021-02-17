@@ -34,13 +34,12 @@ if [[ "$EMSCRIPTEN" == "ON" ]]; then
     # Install a Travis compatible emscripten SDK
     wget https://github.com/emscripten-core/emsdk/archive/master.tar.gz
     tar xf master.tar.gz
-    ./emsdk-master/emsdk install 1.39.2
-    ./emsdk-master/emsdk activate 1.39.2
+    ./emsdk-master/emsdk install 2.0.14
+    ./emsdk-master/emsdk activate 2.0.14
     source ./emsdk-master/emsdk_env.sh
 
     export CMAKE_CONFIGURE='emcmake'
-    export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_BUILD_TYPE=release -DCHFL_BUILD_DOCTESTS=OFF"
-    export CMAKE_BUILD_TYPE="Release"
+    export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_BUILD_DOCTESTS=OFF -DCMAKE_C_FLAGS=-O1 -DCMAKE_CXX_FLAGS=-O1"
 
     export CC=emcc
     export CXX=em++
