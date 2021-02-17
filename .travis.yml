@@ -9,12 +9,12 @@ branches:
     - /^\d+\.\d+(\.\d+)?(-\S*)?$/.
 
 linux64_addons:
-    addons: &linux64
-      apt:
-        sources:
+  addons: &linux64
+    apt:
+      sources:
         - ubuntu-toolchain-r-test
         - deadsnakes
-        packages:
+      packages:
         - g++-4.8
         - valgrind
         # Used for CHFL_EXTERNAL_NETCDF
@@ -22,11 +22,11 @@ linux64_addons:
         - python3.6
 
 linux32_addons:
-    addons: &linux32
-      apt:
-        sources:
+  addons: &linux32
+    apt:
+      sources:
         - ubuntu-toolchain-r-test
-        packages:
+      packages:
         - g++-4.8
         - g++-4.8-multilib
         - linux-libc-dev:i386
@@ -50,7 +50,11 @@ matrix:
     - name: emscripten
       os: linux
       env: STATIC_LIBS=ON EMSCRIPTEN=ON ALTERNATIVE_CMAKE=3.9.3-Linux-x86_64
-      dist: xenial
+      dist: bionic
+      addons:
+        apt:
+          packages:
+            - python3
     - name: static + coverage
       os: linux
       compiler: gcc
@@ -142,12 +146,12 @@ deploy:
     github_token: $GH_TOKEN
     local_dir: build/gh-pages
     on:
-        branch: master
-        condition: $DEPLOY_DOCS == ON
+      branch: master
+      condition: $DEPLOY_DOCS == ON
   - provider: pages
     skip_cleanup: true
     github_token: $GH_TOKEN
     local_dir: build/gh-pages
     on:
-        tags: true
-        condition: $DEPLOY_DOCS == ON
+      tags: true
+      condition: $DEPLOY_DOCS == ON
