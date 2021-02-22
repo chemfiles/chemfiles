@@ -120,7 +120,7 @@ void Frame::guess_bonds() {
 
 void Frame::getMinMaxBox(Vector3D& min, Vector3D& max) {
 
-   float x1, x2, y1, y2, z1, z2;
+   double x1, x2, y1, y2, z1, z2;
 
    //Consider first atom's coordinates as min and max.
    x1 = this->positions_[0][0];
@@ -362,17 +362,27 @@ void Frame::guess_bonds_cls() {
 
       atomCellIndex = atomZCellNum * xyTotalCells + atomYCellNum * xCells + atomXCellNum;
 
-      if (cells[atomCellIndex].capacity() == 0)
+      if (atomCellIndex > 0 && atomCellIndex < cells.size())
       {
-         cells[atomCellIndex].reserve(8);
+         if (cells[atomCellIndex].capacity() == 0)
+         {
+            cells[atomCellIndex].reserve(8);
+         }
+         else if (cells[atomCellIndex].capacity() == cells[atomCellIndex].size())
+         {
+            cells[atomCellIndex].reserve(cells[atomCellIndex].capacity() + 4);
+         }
+
+         //Store atom index in appropriate cell
+         cells[atomCellIndex].emplace_back(atomIndex);
       }
-      else if (cells[atomCellIndex].capacity() == cells[atomCellIndex].size())
+      else
       {
-         cells[atomCellIndex].reserve(cells[atomCellIndex].capacity() + 4);
+         throw error(
+            "the index of the cell containing the atom {}, is {} while total cells number is {}",
+            atomIndex, atomCellIndex, cells.size()
+         );
       }
-      
-      //Store atom index in appropriate cell
-      cells[atomCellIndex].emplace_back(atomIndex);
    }
 
    for (size_t cell = 0; cell < cells.size(); cell++)
