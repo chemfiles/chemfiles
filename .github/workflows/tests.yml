@@ -1,0 +1,40 @@
+name: Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    # Check all PR
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          # TODO: emscripten, static build, clang, external libs, valgrind,
+          # check exports, cmake-2.8.12 + gcc-4.8.5, 32-bit build, MSVC 64,
+          # MSVC 64 static, MSVC 32, MinGW, macOS gcc + clang, code coverage
+          - os: ubuntu-18.04
+            cc: gcc
+            cxx: g++
+            build-type: Release
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: configure cmake
+        run: |
+          mkdir build && cd build
+          cmake -DCMAKE_BUILD_TYPE ${{ matrix.build-type }} \
+                -DCMAKE_C_COMPILER ${{ matrix.cc }} \
+                -DCMAKE_CXX_COMPILER ${{ matrix.cxx }} \
+                -DCHFL_BUILD_TESTS=ON \
+                ..
+      - name: build
+        run: |
+          cd build
+          cmake --build . --config ${{ matrix.build-type }} --parallel 2
+      - name: run tests
+        run: |
+          cd build
+          ctest --build-config ${{ matrix.build-type }} --parallel 2
