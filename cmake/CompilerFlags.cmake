@@ -114,6 +114,12 @@ if(MSVC)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Wall")
     endif()
 
+    if (${MSVC_TOOLSET_VERSION} GREATER_EQUAL 141)
+        # supported since MVSC 15.6
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /experimental:external /external:anglebrackets /external:W0")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /experimental:external /external:anglebrackets /external:W0")
+    endif()
+
     # Disable other warnings
     remove_msvc_warning(4061) # enumerator in switch of enum is not explicitly handled by a case label
     remove_msvc_warning(4127) # conditional expression is constant

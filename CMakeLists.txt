@@ -1,14 +1,17 @@
 cmake_minimum_required(VERSION 2.8.12)
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/InitRules.cmake")
 
+project(chemfiles C CXX)
+
 if(NOT "${LAST_CMAKE_VERSION}" VERSION_EQUAL ${CMAKE_VERSION})
     set(LAST_CMAKE_VERSION ${CMAKE_VERSION} CACHE INTERNAL "Last version of cmake used to configure")
     if (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
         message(STATUS "Running CMake version ${CMAKE_VERSION}")
+
+        math(EXPR POINTER_SIZE "${CMAKE_SIZEOF_VOID_P} * 8")
+        message(STATUS "Compiling to ${POINTER_SIZE}-bit code")
     endif()
 endif()
-
-project(chemfiles C CXX)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
 if (POLICY CMP0042)
