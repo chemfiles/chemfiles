@@ -1,0 +1,209 @@
+name: Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    # Check all PR
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    name: ${{ matrix.name }}
+    strategy:
+      matrix:
+        include:
+          # ==
+          # linux builders, also used for various checks that should be
+          # platform independent
+          # ==
+          - name: Linux / gcc-10
+            os: ubuntu-18.04
+            cc: gcc-10
+            cxx: g++-10
+            build-type: Debug
+            check-exported-symbols: true
+            setup-dependencies: |
+              sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+              sudo apt-get update
+              sudo apt-get install -y gcc-10 g++-10
+          - name: Linux / clang-11
+            os: ubuntu-18.04
+            cc: clang-11
+            cxx: clang++-11
+            build-type: Debug
+            setup-dependencies: |
+              wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+              sudo apt-get update
+              sudo apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main"
+              sudo apt-get install -y clang-11
+          - name: Linux / gcc / static library
+            os: ubuntu-18.04
+            cc: gcc
+            cxx: g++
+            build-type: Debug
+            collect-coverage: true
+            cmake-extra-args:
+              - -DBUILD_SHARED_LIBS=OFF
+              - -DCMAKE_C_FLAGS="--coverage"
+              - -DCMAKE_CXX_FLAGS="--coverage"
+          - name: Linux / gcc / external dependencies
+            os: ubuntu-18.04
+            cc: gcc
+            cxx: g++
+            build-type: Debug
+            cmake-extra-args:
+              - -DCHFL_SYSTEM_NETCDF=ON
+              - -DCHFL_SYSTEM_ZLIB=ON
+              - -DCHFL_SYSTEM_LZMA=ON
+              - -DCHFL_SYSTEM_BZIP2=ON
+              - -DCHFL_DISABLE_GEMMI=ON
+            setup-dependencies: |
+              sudo apt-get update
+              sudo apt-get install -y libnetcdf-dev
+          - name: Linux / gcc / 32-bit build
+            os: ubuntu-18.04
+            cc: gcc
+            cxx: g++
+            build-type: Debug
+            cmake-extra-args:
+              - -DCMAKE_CXX_FLAGS=-m32
+              - -DCMAKE_C_FLAGS=-m32
+            setup-dependencies: |
+              sudo apt-get update
+              sudo apt-get install -y libc6-dev-i386 lib32stdc++-7-dev
+          - name: Linux / gcc-4.8.5 & cmake-2.12.8
+            os: ubuntu-18.04
+            container: centos:7
+            cc: gcc
+            cxx: g++
+            build-type: Debug
+            setup-dependencies: |
+              yum install -y cmake gcc gcc-c++ make
+          - name: Linux / emscripten
+            os: ubuntu-18.04
+            cc: emcc
+            cxx: emcc
+            build-type: Debug
+            use-emsdk: true
+            emscripten-version: 2.0.16
+            cmake-extra-args:
+              - -DCHFL_BUILD_DOCTESTS=OFF
+              - -DBUILD_SHARED_LIBS=OFF
+              - -DCMAKE_CXX_FLAGS="-O1"
+              - -DCMAKE_C_FLAGS="-O1"
+              - -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-master/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+              - -DCMAKE_CROSSCOMPILING_EMULATOR=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-master/node/14.15.5_64bit/bin/node
+          - name: Linux / valgrind
+            os: ubuntu-18.04
+            cc: gcc
+            cxx: g++
+            build-type: Debug
+            cmake-extra-args:
+              - -DCHFL_TESTS_USE_VALGRIND=ON
+            setup-dependencies: |
+              sudo apt-get update
+              sudo apt-get install -y valgrind
+          # ==
+          # macOS builders
+          # ==
+          - name: macOS / clang
+            os: macos-10.15
+            cc: clang
+            cxx: clang++
+            build-type: Debug
+          - name: macOS / gcc
+            os: macos-10.15
+            cc: gcc-5
+            cxx: g++-5
+            build-type: Debug
+            setup-dependencies: |
+              export HOMEBREW_NO_AUTO_UPDATE=1
+              brew install gcc@5
+          # ==
+          # windows builders
+          # ==
+          - name: windows / MSVC 64-bit
+            os: windows-2019
+            cc: cl.exe
+            cxx: cl.exe
+            build-type: Debug
+            cmake-extra-args:
+              - -G "Visual Studio 16 2019" -A x64
+          - name: windows / MSVC 64-bit / static library
+            os: windows-2019
+            cc: cl.exe
+            cxx: cl.exe
+            # The compiler completely fills up the disk when building all tests
+            # in debug mode, so use release
+            build-type: Release
+            cmake-extra-args:
+              - -G "Visual Studio 16 2019" -A x64
+              - -DBUILD_SHARED_LIBS=OFF
+          - name: windows / MSVC 32-bit
+            os: windows-2019
+            cc: cl.exe
+            cxx: cl.exe
+            build-type: Debug
+            cmake-extra-args:
+              - -G "Visual Studio 16 2019" -A Win32
+          - name: windows / MinGW
+            os: windows-2019
+            cc: cc
+            cxx: c++
+            build-type: Release
+            use-mingw: true
+            cmake-extra-args:
+              - -G "MinGW Makefiles"
+              - -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++"
+              - -DCMAKE_SHARED_LINKER_FLAGS="-static-libstdc++"
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Set up MinGW
+        if: ${{ matrix.use-mingw }}
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+      - name: Setup emsdk
+        if: ${{ matrix.use-emsdk }}
+        uses: mymindstorm/setup-emsdk@v7
+        with:
+          version: ${{ matrix.emscripten-version }}
+          actions-cache-folder: "emsdk"
+      - name: setup dependencies
+        run: ${{ matrix.setup-dependencies }}
+      - name: configure cmake
+        shell: bash
+        run: |
+          mkdir build && cd build
+          cmake -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} \
+                -DCMAKE_C_COMPILER=${{ matrix.cc }} \
+                -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
+                -DBUILD_SHARED_LIBS=ON \
+                -DCHFL_BUILD_TESTS=ON \
+                ${{ join(matrix.cmake-extra-args, ' ') }} \
+                ..
+      - name: build (cmake >= 3)
+        if: matrix.container != 'centos:7'
+        run: |
+          cd build
+          cmake --build . --config ${{ matrix.build-type }} --parallel 2
+      - name: build (cmake == 2.8.12)
+        if: matrix.container == 'centos:7'
+        run: |
+          cd build
+          cmake --build . --config ${{ matrix.build-type }} -- -j2
+      - name: run tests
+        run: |
+          cd build
+          ctest --build-config ${{ matrix.build-type }} --parallel 2
+      - name: check the list of exported symbols
+        if: matrix.check-exported-symbols
+        run: ./scripts/ci/check-exported-symbols.py build/libchemfiles.so
+      - name: upload coverage
+        if: matrix.collect-coverage
+        run: bash <(curl -s https://codecov.io/bash)
