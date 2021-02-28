@@ -12,12 +12,12 @@
 #include <string>
 #include <exception>
 
-#include "gemmi/cif.hpp"
-#include "gemmi/elem.hpp"
-#include "gemmi/small.hpp"
-#include "gemmi/smcif.hpp"
-#include "gemmi/cifdoc.hpp"
-#include "gemmi/unitcell.hpp"
+#include <gemmi/cif.hpp>
+#include <gemmi/elem.hpp>
+#include <gemmi/small.hpp>
+#include <gemmi/smcif.hpp>
+#include <gemmi/cifdoc.hpp>
+#include <gemmi/unitcell.hpp>
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/error_fmt.hpp"
