@@ -198,86 +198,130 @@ TEST_CASE("Read files in LAMMPS Atom format") {
 }
 
 TEST_CASE("Write files in LAMMPS Atom format") {
-    auto tmpfile = NamedTempPath(".lammpstrj");
-    const auto EXPECTED_CONTENT =
-        "ITEM: UNITS\n"
-        "real\n"
-        "ITEM: TIMESTEP\n"
-        "0\n"
-        "ITEM: NUMBER OF ATOMS\n"
-        "4\n"
-        "ITEM: BOX BOUNDS pp pp pp\n"
-        "0.0000000000000000e+00 2.2000000000000000e+01\n"
-        "0.0000000000000000e+00 2.2000000000000000e+01\n"
-        "0.0000000000000000e+00 2.2000000000000000e+01\n"
-        "ITEM: ATOMS id xu yu zu type element mass q\n"
-        "1 1 2 3 1 A 0 0\n"
-        "2 1 2 3 1 B 10.81 0\n"
-        "3 1 2 3 3 C 12.011 0\n"
-        "4 1 2 3 1 D 0 0\n"
-        "ITEM: UNITS\n"
-        "cgs\n"
-        "ITEM: TIME\n"
-        "235.67\n"
-        "ITEM: TIMESTEP\n"
-        "0\n"
-        "ITEM: NUMBER OF ATOMS\n"
-        "7\n"
-        "ITEM: BOX BOUNDS xy xz yz pp pp pp\n"
-        "0.0000000000000000e+00 2.2000000000000000e+01 -1.0999999999999995e+01\n"
-        "0.0000000000000000e+00 1.9052558883257653e+01 -2.1999999999999989e+01\n"
-        "0.0000000000000000e+00 3.0209918110637730e+01 2.3224143638648190e+01\n"
-        "ITEM: ATOMS id xu yu zu element mass q vx vy vz\n"
-        "1 1 2 3 A 0 -1 0 0 0\n"
-        "2 1 2 3 B 10.81 2.5 0 0 0\n"
-        "3 1 2 3 C 12.011 0 0 0 0\n"
-        "4 1 2 3 D 0 0 0 0 0\n"
-        "5 4 5 6 E 0 0 9 10 11\n"
-        "6 4 5 6 F 18.9984 0 9 10 11\n"
-        "7 4 5 6 G 0 0 9 10 11\n";
+    SECTION("Single frame") {
+        auto tmpfile = NamedTempPath(".lammpstrj");
+        const auto EXPECTED_CONTENT = "ITEM: UNITS\n"
+                                      "real\n"
+                                      "ITEM: TIMESTEP\n"
+                                      "0\n"
+                                      "ITEM: NUMBER OF ATOMS\n"
+                                      "2\n"
+                                      "ITEM: BOX BOUNDS pp pp pp\n"
+                                      "0.0000000000000000e+00 0.0000000000000000e+00\n"
+                                      "0.0000000000000000e+00 0.0000000000000000e+00\n"
+                                      "0.0000000000000000e+00 0.0000000000000000e+00\n"
+                                      "ITEM: ATOMS id xu yu zu type element mass q\n"
+                                      "1 1 2 3 1 A 0 0\n"
+                                      "2 1 2 3 2 B 10.81 0\n";
 
-    auto frame = Frame(UnitCell({22, 22, 22}));
-    frame.add_atom(Atom("A"), {1, 2, 3});
-    frame.add_atom(Atom("B"), {1, 2, 3});
-    frame.add_atom(Atom("C"), {1, 2, 3});
-    frame.add_atom(Atom("D"), {1, 2, 3});
-    frame[2].set_type("3"); // set one type to a valid LAMMPS type
+        auto frame = Frame(UnitCell());
+        frame.add_atom(Atom("A"), {1, 2, 3});
+        frame.add_atom(Atom("B"), {1, 2, 3});
+        auto file = Trajectory(tmpfile, 'w');
+        file.write(frame);
+        file.close();
 
-    auto file = Trajectory(tmpfile, 'w');
-    file.write(frame);
+        auto check_traj = Trajectory(tmpfile);
+        CHECK(check_traj.nsteps() == 1);
+        frame = check_traj.read();
+        CHECK(frame.size() == 2);
+        CHECK(approx_eq(frame.positions()[1], Vector3D(1.0, 2.0, 3.0), 1e-3));
+        CHECK(frame[0].type() == "1"); // generated type should start at 1
+        CHECK(frame[1].type() == "2");
+        CHECK(frame.cell().shape() == UnitCell::INFINITE);
+        check_traj.close();
 
-    frame[2].set_type(""); // remove valid type again
+        std::ifstream checking(tmpfile);
+        std::string content((std::istreambuf_iterator<char>(checking)),
+                            std::istreambuf_iterator<char>());
+        CHECK(content == EXPECTED_CONTENT);
+    }
 
-    frame.set("lammps_units", "cgs");
-    frame.set("time", 235.67);
-    frame.set_cell(UnitCell({22, 22, 44}, {45, 120, 120}));
-    frame.add_velocities();
+    SECTION("Multiple frames") {
+        auto tmpfile = NamedTempPath(".lammpstrj");
+        const auto EXPECTED_CONTENT =
+            "ITEM: UNITS\n"
+            "real\n"
+            "ITEM: TIMESTEP\n"
+            "0\n"
+            "ITEM: NUMBER OF ATOMS\n"
+            "4\n"
+            "ITEM: BOX BOUNDS pp pp pp\n"
+            "0.0000000000000000e+00 2.2000000000000000e+01\n"
+            "0.0000000000000000e+00 2.2000000000000000e+01\n"
+            "0.0000000000000000e+00 2.2000000000000000e+01\n"
+            "ITEM: ATOMS id xu yu zu type element mass q\n"
+            "1 1 2 3 1 A 0 0\n"
+            "2 1 2 3 2 B 10.81 0\n"
+            "3 1 2 3 10 C 12.011 0\n"
+            "4 1 2 3 11 D 0 0\n"
+            "ITEM: UNITS\n"
+            "cgs\n"
+            "ITEM: TIME\n"
+            "235.67\n"
+            "ITEM: TIMESTEP\n"
+            "0\n"
+            "ITEM: NUMBER OF ATOMS\n"
+            "7\n"
+            "ITEM: BOX BOUNDS xy xz yz pp pp pp\n"
+            "0.0000000000000000e+00 2.2000000000000000e+01 -1.0999999999999995e+01\n"
+            "0.0000000000000000e+00 1.9052558883257653e+01 -2.1999999999999989e+01\n"
+            "0.0000000000000000e+00 3.0209918110637730e+01 2.3224143638648190e+01\n"
+            "ITEM: ATOMS id xu yu zu type element mass q vx vy vz\n"
+            "1 1 2 3 1 A 0 -1 0 0 0\n"
+            "2 1 2 3 2 B 10.81 2.5 0 0 0\n"
+            "3 1 2 3 12 C 12.011 0 0 0 0\n"
+            "4 1 2 3 11 D 0 0 0 0 0\n"
+            "5 4 5 6 13 E 0 0 9 10 11\n"
+            "6 4 5 6 14 F 18.9984 0 9 10 11\n"
+            "7 4 5 6 15 G 0 0 9 10 11\n";
 
-    frame.add_atom(Atom("E"), {4, 5, 6}, {9, 10, 11});
-    frame.add_atom(Atom("F"), {4, 5, 6}, {9, 10, 11});
-    frame.add_atom(Atom("G"), {4, 5, 6}, {9, 10, 11});
+        auto frame = Frame(UnitCell({22, 22, 22}));
+        frame.add_atom(Atom("A"), {1, 2, 3});
+        frame.add_atom(Atom("B"), {1, 2, 3});
+        frame.add_atom(Atom("C"), {1, 2, 3});
+        frame.add_atom(Atom("D"), {1, 2, 3});
+        // set the first types to valid LAMMPS types
+        frame[0].set_type("1");
+        frame[1].set_type("2");
+        frame[2].set_type("10");
 
-    frame[0].set_charge(-1.0);
-    frame[1].set_charge(2.5);
+        auto file = Trajectory(tmpfile, 'w');
+        file.write(frame);
 
-    file.write(frame);
-    file.close();
+        frame[2].set_type(""); // empty type
 
-    auto check_traj = Trajectory(tmpfile);
-    CHECK(check_traj.nsteps() == 2);
-    CHECK(check_traj.read().size() == 4);
-    frame = check_traj.read();
-    CHECK(frame.size() == 7);
-    CHECK(approx_eq(frame.positions()[0], Vector3D(1.0, 2.0, 3.0), 1e-3));
-    CHECK(frame.cell().shape() == UnitCell::TRICLINIC);
-    CHECK(approx_eq(frame.cell().lengths(), Vector3D(22.0, 22.0, 44.0), 1e-2));
-    CHECK(approx_eq(frame.cell().angles(), Vector3D(45.0, 120.0, 120.0), 1e-2));
-    check_traj.close();
+        frame.set("lammps_units", "cgs");
+        frame.set("time", 235.67);
+        frame.set_cell(UnitCell({22, 22, 44}, {45, 120, 120}));
+        frame.add_velocities();
 
-    std::ifstream checking(tmpfile);
-    std::string content((std::istreambuf_iterator<char>(checking)),
-                        std::istreambuf_iterator<char>());
-    CHECK(content == EXPECTED_CONTENT);
+        frame.add_atom(Atom("E"), {4, 5, 6}, {9, 10, 11});
+        frame.add_atom(Atom("F"), {4, 5, 6}, {9, 10, 11});
+        frame.add_atom(Atom("G"), {4, 5, 6}, {9, 10, 11});
+
+        frame[0].set_charge(-1.0);
+        frame[1].set_charge(2.5);
+
+        file.write(frame);
+        file.close();
+
+        auto check_traj = Trajectory(tmpfile);
+        CHECK(check_traj.nsteps() == 2);
+        CHECK(check_traj.read().size() == 4);
+        frame = check_traj.read();
+        CHECK(frame.size() == 7);
+        CHECK(approx_eq(frame.positions()[0], Vector3D(1.0, 2.0, 3.0), 1e-3));
+        CHECK(frame.cell().shape() == UnitCell::TRICLINIC);
+        CHECK(approx_eq(frame.cell().lengths(), Vector3D(22.0, 22.0, 44.0), 1e-2));
+        CHECK(approx_eq(frame.cell().angles(), Vector3D(45.0, 120.0, 120.0), 1e-2));
+        check_traj.close();
+
+        std::ifstream checking(tmpfile);
+        std::string content((std::istreambuf_iterator<char>(checking)),
+                            std::istreambuf_iterator<char>());
+        CHECK(content == EXPECTED_CONTENT);
+    }
 }
 
 TEST_CASE("Read files in memory") {
