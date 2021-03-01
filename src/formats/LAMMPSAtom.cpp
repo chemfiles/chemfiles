@@ -15,6 +15,7 @@
 #include "chemfiles/string_view.hpp"
 #include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
+#include "chemfiles/warnings.hpp"
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/FormatMetadata.hpp"
@@ -537,6 +538,19 @@ void LAMMPSAtomFormat::read_next(Frame& frame) {
     }
 }
 
+static optional<size_t> parse_lammps_type(const std::string& type_str) {
+    if (type_str.empty())
+        return nullopt;
+    try {
+        int type = parse<int>(type_str);
+        if (type > 0)
+            return static_cast<size_t>(type);
+    } catch (const Error&) {
+        // parsing errors indicate invalid types
+    }
+    return nullopt;
+}
+
 void LAMMPSAtomFormat::write_next(const Frame& frame) {
     // use angstrom and femtosecond as default
     file_.print("ITEM: UNITS\n{:s}\n",
@@ -567,32 +581,18 @@ void LAMMPSAtomFormat::write_next(const Frame& frame) {
         file_.print("{:-1.16e} {:-1.16e} {:-1.16e}\n", 0.0, matrix[2][2], matrix[1][2]);
     }
 
-    bool has_types = false;
     bool has_names = false;
     for (size_t i = 0; i < frame.size(); ++i) {
         auto& atom = frame[i];
-        if (!atom.type().empty() && !has_types) {
-            try {
-                int type = parse<int>(atom.type());
-                if (type > 0)
-                    has_types = true;
-            } catch (const Error&) {
-                // ignore types that are not a number
-            }
-        }
-        if (!atom.name().empty())
+        if (!atom.name().empty()) {
             has_names = true;
-        if (has_types && has_names) {
             break;
         }
     }
 
     auto positions = frame.positions();
     auto velocities = frame.velocities();
-    file_.print("ITEM: ATOMS id xu yu zu"); // write unwrapped positions
-    if (has_types) {
-        file_.print(" type");
-    }
+    file_.print("ITEM: ATOMS id xu yu zu type"); // write unwrapped positions
     if (has_names) {
         file_.print(" element");
     }
@@ -606,14 +606,28 @@ void LAMMPSAtomFormat::write_next(const Frame& frame) {
         // LAMMPS uses atom IDs that start with 1
         file_.print("{:d} {:g} {:g} {:g}", i + 1, positions[i][0], positions[i][1],
                     positions[i][2]);
-        if (has_types) {
-            int type = 1; // use type 1 as default
-            try {
-                type = parse<int>(atom.type());
-            } catch (const Error&) {
-                // use default for types that are not a number
+        auto type = parse_lammps_type(atom.type());
+        if (type && (min_numeric_type_ == 0 || *type <= min_numeric_type_)) {
+            // a valid numeric type and no other invalid types encountered previously
+            file_.print(" {:d}", *type);
+            if (*type > max_numeric_type_)
+                max_numeric_type_ = *type;
+        } else {
+            // use a generated numeric type because trajectory contains invalid types
+            auto search = type_list_.find(atom.type());
+            if (search != type_list_.end()) {
+                // type has already a numeric type
+                file_.print(" {:d}", search->second);
+            } else {
+                // a new type to generate a numeric type for
+                min_numeric_type_ = max_numeric_type_;
+                ++max_numeric_type_;
+                type_list_.emplace(atom.type(), max_numeric_type_);
+                file_.print(" {:d}", max_numeric_type_);
+                warning("LAMMPS writer",
+                        "trajectory with invalid types: generated type for '{}' is {}", atom.type(),
+                        max_numeric_type_);
             }
-            file_.print(" {:d}", type);
         }
         if (has_names) {
             file_.print(" {:s}", atom.name());

@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
@@ -35,6 +36,9 @@ class LAMMPSAtomFormat final : public TextFormat {
 
   private:
     std::array<double, 3> read_cell(Frame& frame);
+    size_t min_numeric_type_ = 0;
+    size_t max_numeric_type_ = 0;
+    std::unordered_map<std::string, size_t> type_list_;
 };
 
 template <> const FormatMetadata& format_metadata<LAMMPSAtomFormat>();
