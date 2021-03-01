@@ -228,7 +228,7 @@ TEST_CASE("Read files in MMTF format") {
     // Test fails on Windows due to timing of MSVC debug builds
     #ifndef CHEMFILES_WINDOWS
         // Test takes too long with valgrind
-        if (!is_valgrind_and_travis()) {
+        if (!is_valgrind_and_ci()) {
             auto file = Trajectory("data/mmtf/3J3Q.mmtf.gz");
             auto frame = file.read_step(0);
 
