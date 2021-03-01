@@ -223,7 +223,7 @@ TEST_CASE("GRO files with big values") {
     }
 
     SECTION("Atom counts") {
-        if (!is_valgrind_and_travis()) {
+        if (!is_valgrind_and_ci()) {
             auto tmpfile = NamedTempPath(".gro");
 
             auto frame = Frame();
@@ -250,7 +250,7 @@ TEST_CASE("GRO files with big values") {
     }
 
     SECTION("User specified residues") {
-        if (!is_valgrind_and_travis()) {
+        if (!is_valgrind_and_ci()) {
             auto tmpfile = NamedTempPath(".gro");
 
             auto frame = Frame();
