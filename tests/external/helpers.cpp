@@ -66,10 +66,10 @@ bool approx_eq(double a, double b, double tolerance) {
     return fabs(a - b) < tolerance;
 }
 
-bool is_valgrind_and_travis() {
-    auto travis = std::getenv("TRAVIS");
+bool is_valgrind_and_ci() {
+    auto CI = std::getenv("CI");
     auto valgrind = std::getenv("CHFL_TESTS_USE_VALGRIND");
-    return (travis && valgrind && std::string(valgrind) == "ON");
+    return (CI && valgrind && std::string(valgrind) == "ON");
 }
 
 NamedTempPath::NamedTempPath(std::string extension) {
