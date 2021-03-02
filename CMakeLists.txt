@@ -45,8 +45,8 @@ option(CHFL_SYSTEM_BZIP2 "Use the system bzip2 instead of the internal one" OFF)
 option(CHFL_BUILD_DOCTESTS "Build documentation tests as well as unit tests." ON)
 
 set(LIB_INSTALL_DIR "lib" CACHE PATH "Path relative to CMAKE_INSTALL_PREFIX where to install libraries")
-set(BIN_INSTALL_DIR "bin" CACHE PATH "Path relative to CMAKE_INSTALL_PREFIX where to install headers")
-set(INCLUDE_INSTALL_DIR "include" CACHE PATH "Path relative to CMAKE_INSTALL_PREFIX where to install DLL/binaries")
+set(BIN_INSTALL_DIR "bin" CACHE PATH "Path relative to CMAKE_INSTALL_PREFIX where to install DLL/binaries")
+set(INCLUDE_INSTALL_DIR "include" CACHE PATH "Path relative to CMAKE_INSTALL_PREFIX where to install headers")
 
 mark_as_advanced(CHFL_BUILD_DOCTESTS)
 
