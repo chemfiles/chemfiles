@@ -680,7 +680,7 @@ Record get_record(string_view line) {
     }
 }
 
-static std::string to_pdb_index(int64_t value, uint64_t width) {
+static std::string to_pdb_index(int64_t value, size_t width) {
     auto encoded = encode_hybrid36(width, value + 1);
 
     if (encoded[0] == '*' && (value == MAX_HYBRID36_W4_NUMBER || value == MAX_HYBRID36_W5_NUMBER)) {

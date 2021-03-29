@@ -18,6 +18,14 @@
 
 using namespace chemfiles;
 
+static size_t checked_cast(uint64_t value) {
+    if (value < std::numeric_limits<size_t>::max()) {
+        return static_cast<size_t>(value);
+    } else {
+        throw file_error("{} is too big for size_t in call to xz function", value);
+    }
+}
+
 static void check(lzma_ret code) {
     switch (code) {
     case LZMA_OK:
@@ -197,7 +205,7 @@ MemoryBuffer chemfiles::decompress_xz(const char* src, size_t size) {
 	    }
 
 	    stream.next_out = reinterpret_cast<uint8_t*>(output.data_mut() + stream.total_out);
-    	stream.avail_out = output.capacity() - stream.total_out;
+    	stream.avail_out = output.capacity() - checked_cast(stream.total_out);
 
         auto status = lzma_code(&stream, LZMA_FINISH);
         if (status == LZMA_STREAM_END) {
@@ -214,6 +222,6 @@ MemoryBuffer chemfiles::decompress_xz(const char* src, size_t size) {
         // make sure the buffer always contains a terminal NULL
         output.reserve_extra(1);
     }
-    output.set_size(stream.total_out);
+    output.set_size(checked_cast(stream.total_out));
     return output;
 }

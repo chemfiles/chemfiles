@@ -264,12 +264,11 @@ static int64_t decode_pure(string_view s) {
 
 /// Evaluates base^(power) and casts the result to int64_t while addressing
 /// issues where the result maybe rounded down due to floating point errors
-static int64_t pow_int(uint64_t base, uint64_t power) {
+static int64_t pow_int(size_t base, size_t power) {
     return static_cast<int64_t>(std::pow(base, power) + 0.5);
 }
 
-std::string chemfiles::encode_hybrid36(uint64_t width, int64_t value) {
-
+std::string chemfiles::encode_hybrid36(size_t width, int64_t value) {
     // the number is too negative to be encoded
     if (value < (1 - pow_int(10, width - 1))) {
         return std::string(width, '*');
@@ -298,8 +297,7 @@ std::string chemfiles::encode_hybrid36(uint64_t width, int64_t value) {
     return std::string(width, '*');
 }
 
-int64_t chemfiles::decode_hybrid36(uint64_t width, string_view s) {
-
+int64_t chemfiles::decode_hybrid36(size_t width, string_view s) {
     // This function is only called within chemfiles for fixed format files.
     // Therefore, the width should also be the length of the string as this is
     // known at compile time.

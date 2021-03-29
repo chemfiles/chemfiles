@@ -72,7 +72,7 @@ std::array<double, 3> LAMMPSAtomFormat::read_cell(Frame& frame) {
                 shape = UnitCell::TRICLINIC;
             }
             line = file_.readline();
-            auto splitted = split(line, ' ');
+            splitted = split(line, ' ');
             if ((shape == UnitCell::ORTHORHOMBIC && splitted.size() != 2) ||
                 (shape == UnitCell::TRICLINIC && splitted.size() != 3)) {
                 size_t expected_dims = (shape == UnitCell::ORTHORHOMBIC) ? 2 : 3;
@@ -133,8 +133,8 @@ std::array<double, 3> LAMMPSAtomFormat::read_cell(Frame& frame) {
     }
 }
 
-// LAMMPS is able to dump various per-atom properties and arbitrary user-defined variables
-// posible per-atom attributes by dump command
+/// LAMMPS is able to dump various per-atom properties and arbitrary user-defined
+/// variables
 enum lammps_atom_attr_t {
     // other possible attributes that are not important for chemfiles
     UNKNOWN,
@@ -347,18 +347,18 @@ void LAMMPSAtomFormat::read_next(Frame& frame) {
     if (!item) {
         throw format_error("can not read next step as LAMMPS format: expected an ITEM entry");
     }
-    auto splitted = split(*item, ' ');
-    if (splitted.empty() || splitted[0] != "ATOMS") {
+    auto atoms_item = split(*item, ' ');
+    if (atoms_item.empty() || atoms_item[0] != "ATOMS") {
         throw format_error("can not read next step as LAMMPS format: expected 'ATOMS' got '{}'",
                            *item);
     }
     std::vector<lammps_atom_attr_t> fields;
-    fields.reserve(splitted.size() - 1);
+    fields.reserve(atoms_item.size() - 1);
     optional<size_t> atomid_column = nullopt;
     std::vector<bool> duplicate_check;
     optional<std::vector<std::array<int, 3>>> images = nullopt;
-    for (size_t i = 1; i < splitted.size(); ++i) {
-        auto attr = attribute_from_str(splitted[i]);
+    for (size_t i = 1; i < atoms_item.size(); ++i) {
+        auto attr = attribute_from_str(atoms_item[i]);
         if (attr == ATOMID) {
             atomid_column = i - 1;
             duplicate_check = std::vector<bool>(natoms, false);
