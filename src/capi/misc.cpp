@@ -67,8 +67,8 @@ extern "C" chfl_status chfl_formats_list(chfl_format_metadata** metadata, uint64
     CHFL_ERROR_CATCH(
         auto formats = formats_list();
         *count = static_cast<uint64_t>(formats.size());
-        *metadata = shared_allocator::make_shared<chfl_format_metadata[]>(*count);
-        for (uint64_t i=0; i<*count; i++) {
+        *metadata = shared_allocator::make_shared<chfl_format_metadata[]>(formats.size());
+        for (size_t i=0; i<formats.size(); i++) {
             // here we rely on the fact that only one instance of each matdata
             // exist, and that they come from static storage, allowing us to
             // take reference to data directly inside `formats[i]` even if is it

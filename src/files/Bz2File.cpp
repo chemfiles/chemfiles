@@ -20,7 +20,7 @@
 
 using namespace chemfiles;
 
-static unsigned checked_cast(size_t value) {
+static unsigned checked_cast(uint64_t value) {
     if (value < std::numeric_limits<unsigned>::max()) {
         return static_cast<unsigned>(value);
     } else {
@@ -227,6 +227,6 @@ MemoryBuffer chemfiles::decompress_bz2(const char* src, size_t size) {
         // make sure the buffer always contains a terminal NULL
         output.reserve_extra(1);
     }
-    output.set_size(total_out);
+    output.set_size(checked_cast(total_out));
     return output;
 }
