@@ -2,10 +2,11 @@ coverage:
   ignore:
     - tests/.*
     - build/external/.*
+    - examples/.*
   status:
     project:
       default:
-        target: 85%
+        target: 90%
     patch: off
 
 comment: off
