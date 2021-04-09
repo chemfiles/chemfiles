@@ -218,30 +218,34 @@ TEST_CASE("Read files in LAMMPS Atom format") {
         );
 
         file = Trajectory("data/lammps/bad/box-not-numbers.lammpstrj");
+        CHECK(file.nsteps() == 3);
         CHECK_THROWS_WITH(
-            file.read_step(0),
+            file.read(),
             "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 2 but got 1"
         );
         CHECK_THROWS_WITH(
             file.read_step(1),
             "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 2 but got 1"
         );
+        // read a step after an exception was thrown
         CHECK_THROWS_WITH(
-            file.read_step(2),
+            file.read(),
             "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 2 but got 1"
         );
 
         file = Trajectory("data/lammps/bad/box-wrong-size.lammpstrj");
+        CHECK(file.nsteps() == 3);
         CHECK_THROWS_WITH(
-            file.read_step(0),
+            file.read(),
             "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 3 but got 2"
         );
         CHECK_THROWS_WITH(
             file.read_step(1),
             "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 3 but got 2"
         );
+        // read a step after an exception was thrown
         CHECK_THROWS_WITH(
-            file.read_step(2),
+            file.read(),
             "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 3 but got 2"
         );
 

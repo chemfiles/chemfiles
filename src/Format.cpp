@@ -130,17 +130,21 @@ void TextFormat::read_step(size_t step, Frame& frame) {
         }
     }
 
+    step_ = step;
     file_.seekpos(steps_positions_[step]);
     read_next(frame);
 }
 
 void TextFormat::read(Frame& frame) {
+    file_.seekpos(steps_positions_[step_]);
+    ++step_;
     read_next(frame);
 }
 
 void TextFormat::write(const Frame& frame) {
     write_next(frame);
     steps_positions_.push_back(file_.tellpos());
+    ++step_;
 }
 
 size_t TextFormat::nsteps() {
