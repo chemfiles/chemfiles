@@ -129,6 +129,9 @@ private:
     /// Scan the whole file to get all the steps positions
     void scan_all();
 
+    /// The next step to read
+    size_t step_ = 0;
+
     /// Storing the positions of all the steps in the file, so that we can
     /// just `seekpos` them instead of reading the whole step.
     std::vector<uint64_t> steps_positions_;
