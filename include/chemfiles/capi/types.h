@@ -96,11 +96,11 @@ typedef struct CHFL_RESIDUE CHFL_RESIDUE;
 
 /// An opaque type handling a selection.
 ///
-/// `CHFL_SELECTION` allow to select atoms in a `CHFL_FRAME`, from a selection
-/// language. The selection language is built by combining basic operations.
-/// Each basic operation follows the `<selector>[(<variable>)] <operator>
-/// <value>` structure, where `<operator>` is a comparison operator in
-/// `== != < <= > >=`.
+/// `CHFL_SELECTION` allow to select atoms in a `CHFL_FRAME` using chemfiles
+/// selection language. The selection language is built by combining basic
+/// operations, following the `<selector>[(<variable>)] <operator>
+/// <value>` structure, where `<operator>` is a comparison operator in `== != <
+/// <= > >=`.
 typedef struct CHFL_SELECTION CHFL_SELECTION;
 
 /// This class holds the data used in properties in `CHFL_FRAME` and
