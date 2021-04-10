@@ -7,11 +7,10 @@ archive and reproduced at the end of this file.
 ## Updating
 
 We maintain a set of patches to these libraries, in there respective forks, in
-the `chemfiles` branch. These patches mainly concern integration of the code 
+the `chemfiles` branch. These patches mainly concern integration of the code
 with chemfiles build system.
 
 - fmt: https://github.com/chemfiles/fmt
-- toml11: https://github.com/chemfiles/toml11
 - zlib: https://github.com/chemfiles/zlib
 - bzip2: https://github.com/chemfiles/bzip2
 - liblzma: https://github.com/chemfiles/lzma
@@ -32,6 +31,7 @@ git archive HEAD -9 --prefix=<lib>/ -o <lib>.tar.gz
 
 For gemmi, since the library is header only you should use this command to
 create the archive:
+
 ```bash
 git archive HEAD -9 --prefix=gemmi/ -o gemmi.tar.gz include
 ```
@@ -64,39 +64,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-### toml11
-
-The MIT License (MIT)
-
-Copyright (c) 2017 Toru Niina
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
 ### VMD molfiles
 
 University of Illinois Open Source License
 Copyright 2003 Theoretical and Computational Biophysics Group,
 All rights reserved.
 
-Developed by:		Theoretical and Computational Biophysics Group
-			University of Illinois at Urbana-Champaign
-			http://www.ks.uiuc.edu/
+Developed by: Theoretical and Computational Biophysics Group
+University of Illinois at Urbana-Champaign
+http://www.ks.uiuc.edu/
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the Software), to deal with
@@ -119,7 +95,7 @@ specific prior written permission.
 
 THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
@@ -133,12 +109,13 @@ All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-* Redistributions of source code must retain the above copyright
+
+- Redistributions of source code must retain the above copyright
   notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright
+- Redistributions in binary form must reproduce the above copyright
   notice, this list of conditions and the following disclaimer in the
   documentation and/or other materials provided with the distribution.
-* Neither the name of the GROMACS development team nor the
+- Neither the name of the GROMACS development team nor the
   names of its contributors may be used to endorse or promote products
   derived from this software without specific prior written permission.
 
@@ -170,7 +147,7 @@ any fee or cost, to use, copy, modify, alter, enhance and distribute
 this software, and any derivative works thereof, and its supporting
 documentation for any purpose whatsoever, provided that this entire
 notice appears in all copies of the software, derivative works and
-supporting documentation.  Further, UCAR requests that the user credit
+supporting documentation. Further, UCAR requests that the user credit
 UCAR/Unidata in any publications that result from the use of this
 software or in any product that includes this software, although this
 is not an obligation. The names UCAR and/or Unidata, however, may not
@@ -246,24 +223,24 @@ DEALINGS IN THE SOFTWARE.
 
 (C) 1995-2017 Jean-loup Gailly and Mark Adler
 
- This software is provided 'as-is', without any express or implied
- warranty.  In no event will the authors be held liable for any damages
- arising from the use of this software.
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
 
- Permission is granted to anyone to use this software for any purpose,
- including commercial applications, and to alter it and redistribute it
- freely, subject to the following restrictions:
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
 
- 1. The origin of this software must not be misrepresented; you must not
+1.  The origin of this software must not be misrepresented; you must not
     claim that you wrote the original software. If you use this software
     in a product, an acknowledgment in the product documentation would be
     appreciated but is not required.
- 2. Altered source versions must be plainly marked as such, and must not be
+2.  Altered source versions must be plainly marked as such, and must not be
     misrepresented as being the original software.
- 3. This notice may not be removed or altered from any source distribution.
+3.  This notice may not be removed or altered from any source distribution.
 
- Jean-loup Gailly        Mark Adler
- jloup@gzip.org          madler@alumni.caltech.edu
+Jean-loup Gailly Mark Adler
+jloup@gzip.org madler@alumni.caltech.edu
 
 ## liblzma
 
@@ -272,7 +249,7 @@ liblzma is in the public domain.
 ## libbzip2
 
 This program, "bzip2", the associated library "libbzip2", and all
-documentation, are copyright (C) 1996-2010 Julian R Seward.  All
+documentation, are copyright (C) 1996-2010 Julian R Seward. All
 rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -283,7 +260,7 @@ are met:
    notice, this list of conditions and the following disclaimer.
 
 2. The origin of this software must not be misrepresented; you must
-   not claim that you wrote the original software.  If you use this
+   not claim that you wrote the original software. If you use this
    software in a product, an acknowledgment in the product
    documentation would be appreciated but is not required.
 
@@ -297,7 +274,7 @@ are met:
 THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
 OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
 GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -334,31 +311,31 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ## gemmi
 
-Mozilla Public License Version 2.0
-==================================
+# Mozilla Public License Version 2.0
 
 1. Definitions
---------------
+
+---
 
 1.1. "Contributor"
-    means each individual or legal entity that creates, contributes to
-    the creation of, or owns Covered Software.
+means each individual or legal entity that creates, contributes to
+the creation of, or owns Covered Software.
 
 1.2. "Contributor Version"
-    means the combination of the Contributions of others (if any) used
-    by a Contributor and that particular Contributor's Contribution.
+means the combination of the Contributions of others (if any) used
+by a Contributor and that particular Contributor's Contribution.
 
 1.3. "Contribution"
-    means Covered Software of a particular Contributor.
+means Covered Software of a particular Contributor.
 
 1.4. "Covered Software"
-    means Source Code Form to which the initial Contributor has attached
-    the notice in Exhibit A, the Executable Form of such Source Code
-    Form, and Modifications of such Source Code Form, in each case
-    including portions thereof.
+means Source Code Form to which the initial Contributor has attached
+the notice in Exhibit A, the Executable Form of such Source Code
+Form, and Modifications of such Source Code Form, in each case
+including portions thereof.
 
 1.5. "Incompatible With Secondary Licenses"
-    means
+means
 
     (a) that the initial Contributor has attached the notice described
         in Exhibit B to the Covered Software; or
@@ -368,22 +345,22 @@ Mozilla Public License Version 2.0
         terms of a Secondary License.
 
 1.6. "Executable Form"
-    means any form of the work other than Source Code Form.
+means any form of the work other than Source Code Form.
 
 1.7. "Larger Work"
-    means a work that combines Covered Software with other material, in 
-    a separate file or files, that is not Covered Software.
+means a work that combines Covered Software with other material, in
+a separate file or files, that is not Covered Software.
 
 1.8. "License"
-    means this document.
+means this document.
 
 1.9. "Licensable"
-    means having the right to grant, to the maximum extent possible,
-    whether at the time of the initial grant or subsequently, any and
-    all of the rights conveyed by this License.
+means having the right to grant, to the maximum extent possible,
+whether at the time of the initial grant or subsequently, any and
+all of the rights conveyed by this License.
 
 1.10. "Modifications"
-    means any of the following:
+means any of the following:
 
     (a) any file in Source Code Form that results from an addition to,
         deletion from, or modification of the contents of Covered
@@ -393,34 +370,35 @@ Mozilla Public License Version 2.0
         Software.
 
 1.11. "Patent Claims" of a Contributor
-    means any patent claim(s), including without limitation, method,
-    process, and apparatus claims, in any patent Licensable by such
-    Contributor that would be infringed, but for the grant of the
-    License, by the making, using, selling, offering for sale, having
-    made, import, or transfer of either its Contributions or its
-    Contributor Version.
+means any patent claim(s), including without limitation, method,
+process, and apparatus claims, in any patent Licensable by such
+Contributor that would be infringed, but for the grant of the
+License, by the making, using, selling, offering for sale, having
+made, import, or transfer of either its Contributions or its
+Contributor Version.
 
 1.12. "Secondary License"
-    means either the GNU General Public License, Version 2.0, the GNU
-    Lesser General Public License, Version 2.1, the GNU Affero General
-    Public License, Version 3.0, or any later versions of those
-    licenses.
+means either the GNU General Public License, Version 2.0, the GNU
+Lesser General Public License, Version 2.1, the GNU Affero General
+Public License, Version 3.0, or any later versions of those
+licenses.
 
 1.13. "Source Code Form"
-    means the form of the work preferred for making modifications.
+means the form of the work preferred for making modifications.
 
 1.14. "You" (or "Your")
-    means an individual or a legal entity exercising rights under this
-    License. For legal entities, "You" includes any entity that
-    controls, is controlled by, or is under common control with You. For
-    purposes of this definition, "control" means (a) the power, direct
-    or indirect, to cause the direction or management of such entity,
-    whether by contract or otherwise, or (b) ownership of more than
-    fifty percent (50%) of the outstanding shares or beneficial
-    ownership of such entity.
+means an individual or a legal entity exercising rights under this
+License. For legal entities, "You" includes any entity that
+controls, is controlled by, or is under common control with You. For
+purposes of this definition, "control" means (a) the power, direct
+or indirect, to cause the direction or management of such entity,
+whether by contract or otherwise, or (b) ownership of more than
+fifty percent (50%) of the outstanding shares or beneficial
+ownership of such entity.
 
 2. License Grants and Conditions
---------------------------------
+
+---
 
 2.1. Grants
 
@@ -428,14 +406,14 @@ Each Contributor hereby grants You a world-wide, royalty-free,
 non-exclusive license:
 
 (a) under intellectual property rights (other than patent or trademark)
-    Licensable by such Contributor to use, reproduce, make available,
-    modify, display, perform, distribute, and otherwise exploit its
-    Contributions, either on an unmodified basis, with Modifications, or
-    as part of a Larger Work; and
+Licensable by such Contributor to use, reproduce, make available,
+modify, display, perform, distribute, and otherwise exploit its
+Contributions, either on an unmodified basis, with Modifications, or
+as part of a Larger Work; and
 
 (b) under Patent Claims of such Contributor to make, use, sell, offer
-    for sale, have made, import, and otherwise transfer either its
-    Contributions or its Contributor Version.
+for sale, have made, import, and otherwise transfer either its
+Contributions or its Contributor Version.
 
 2.2. Effective Date
 
@@ -452,15 +430,15 @@ Notwithstanding Section 2.1(b) above, no patent license is granted by a
 Contributor:
 
 (a) for any code that a Contributor has removed from Covered Software;
-    or
+or
 
 (b) for infringements caused by: (i) Your and any other third party's
-    modifications of Covered Software, or (ii) the combination of its
-    Contributions with other software (except as part of its Contributor
-    Version); or
+modifications of Covered Software, or (ii) the combination of its
+Contributions with other software (except as part of its Contributor
+Version); or
 
 (c) under Patent Claims infringed by Covered Software in the absence of
-    its Contributions.
+its Contributions.
 
 This License does not grant any rights in the trademarks, service marks,
 or logos of any Contributor (except as may be necessary to comply with
@@ -491,7 +469,8 @@ Sections 3.1, 3.2, 3.3, and 3.4 are conditions of the licenses granted
 in Section 2.1.
 
 3. Responsibilities
--------------------
+
+---
 
 3.1. Distribution of Source Form
 
@@ -508,15 +487,15 @@ Form.
 If You distribute Covered Software in Executable Form then:
 
 (a) such Covered Software must also be made available in Source Code
-    Form, as described in Section 3.1, and You must inform recipients of
-    the Executable Form how they can obtain a copy of such Source Code
-    Form by reasonable means in a timely manner, at a charge no more
-    than the cost of distribution to the recipient; and
+Form, as described in Section 3.1, and You must inform recipients of
+the Executable Form how they can obtain a copy of such Source Code
+Form by reasonable means in a timely manner, at a charge no more
+than the cost of distribution to the recipient; and
 
 (b) You may distribute such Executable Form under the terms of this
-    License, or sublicense it under different terms, provided that the
-    license for the Executable Form does not attempt to limit or alter
-    the recipients' rights in the Source Code Form under this License.
+License, or sublicense it under different terms, provided that the
+license for the Executable Form does not attempt to limit or alter
+the recipients' rights in the Source Code Form under this License.
 
 3.3. Distribution of a Larger Work
 
@@ -553,7 +532,8 @@ disclaimers of warranty and limitations of liability specific to any
 jurisdiction.
 
 4. Inability to Comply Due to Statute or Regulation
----------------------------------------------------
+
+---
 
 If it is impossible for You to comply with any of the terms of this
 License with respect to some or all of the Covered Software due to
@@ -566,7 +546,8 @@ or regulation, such description must be sufficiently detailed for a
 recipient of ordinary skill to be able to understand it.
 
 5. Termination
---------------
+
+---
 
 5.1. The rights granted under this License will terminate automatically
 if You fail to comply with any of its terms. However, if You become
@@ -594,50 +575,55 @@ end user license agreements (excluding distributors and resellers) which
 have been validly granted by You or Your distributors under this License
 prior to termination shall survive termination.
 
-************************************************************************
-*                                                                      *
-*  6. Disclaimer of Warranty                                           *
-*  -------------------------                                           *
-*                                                                      *
-*  Covered Software is provided under this License on an "as is"       *
-*  basis, without warranty of any kind, either expressed, implied, or  *
-*  statutory, including, without limitation, warranties that the       *
-*  Covered Software is free of defects, merchantable, fit for a        *
-*  particular purpose or non-infringing. The entire risk as to the     *
-*  quality and performance of the Covered Software is with You.        *
-*  Should any Covered Software prove defective in any respect, You     *
-*  (not any Contributor) assume the cost of any necessary servicing,   *
-*  repair, or correction. This disclaimer of warranty constitutes an   *
-*  essential part of this License. No use of any Covered Software is   *
-*  authorized under this License except under this disclaimer.         *
-*                                                                      *
-************************************************************************
+---
 
-************************************************************************
-*                                                                      *
-*  7. Limitation of Liability                                          *
-*  --------------------------                                          *
-*                                                                      *
-*  Under no circumstances and under no legal theory, whether tort      *
-*  (including negligence), contract, or otherwise, shall any           *
-*  Contributor, or anyone who distributes Covered Software as          *
-*  permitted above, be liable to You for any direct, indirect,         *
-*  special, incidental, or consequential damages of any character      *
-*  including, without limitation, damages for lost profits, loss of    *
-*  goodwill, work stoppage, computer failure or malfunction, or any    *
-*  and all other commercial damages or losses, even if such party      *
-*  shall have been informed of the possibility of such damages. This   *
-*  limitation of liability shall not apply to liability for death or   *
-*  personal injury resulting from such party's negligence to the       *
-*  extent applicable law prohibits such limitation. Some               *
-*  jurisdictions do not allow the exclusion or limitation of           *
-*  incidental or consequential damages, so this exclusion and          *
-*  limitation may not apply to You.                                    *
-*                                                                      *
-************************************************************************
+-                                                                      *
+- 6.  Disclaimer of Warranty \*
+- ------------------------- \*
+-                                                                      *
+- Covered Software is provided under this License on an "as is" \*
+- basis, without warranty of any kind, either expressed, implied, or \*
+- statutory, including, without limitation, warranties that the \*
+- Covered Software is free of defects, merchantable, fit for a \*
+- particular purpose or non-infringing. The entire risk as to the \*
+- quality and performance of the Covered Software is with You. \*
+- Should any Covered Software prove defective in any respect, You \*
+- (not any Contributor) assume the cost of any necessary servicing, \*
+- repair, or correction. This disclaimer of warranty constitutes an \*
+- essential part of this License. No use of any Covered Software is \*
+- authorized under this License except under this disclaimer. \*
+-                                                                      *
+
+---
+
+---
+
+-                                                                      *
+- 7.  Limitation of Liability \*
+- -------------------------- \*
+-                                                                      *
+- Under no circumstances and under no legal theory, whether tort \*
+- (including negligence), contract, or otherwise, shall any \*
+- Contributor, or anyone who distributes Covered Software as \*
+- permitted above, be liable to You for any direct, indirect, \*
+- special, incidental, or consequential damages of any character \*
+- including, without limitation, damages for lost profits, loss of \*
+- goodwill, work stoppage, computer failure or malfunction, or any \*
+- and all other commercial damages or losses, even if such party \*
+- shall have been informed of the possibility of such damages. This \*
+- limitation of liability shall not apply to liability for death or \*
+- personal injury resulting from such party's negligence to the \*
+- extent applicable law prohibits such limitation. Some \*
+- jurisdictions do not allow the exclusion or limitation of \*
+- incidental or consequential damages, so this exclusion and \*
+- limitation may not apply to You. \*
+-                                                                      *
+
+---
 
 8. Litigation
--------------
+
+---
 
 Any litigation relating to this License may be brought only in the
 courts of a jurisdiction where the defendant maintains its principal
@@ -647,7 +633,8 @@ Nothing in this Section shall prevent a party's ability to bring
 cross-claims or counter-claims.
 
 9. Miscellaneous
-----------------
+
+---
 
 This License represents the complete agreement concerning the subject
 matter hereof. If any provision of this License is held to be
@@ -657,7 +644,8 @@ that the language of a contract shall be construed against the drafter
 shall not be used to construe this License against a Contributor.
 
 10. Versions of the License
----------------------------
+
+---
 
 10.1. New Versions
 
@@ -688,12 +676,11 @@ If You choose to distribute Source Code Form that is Incompatible With
 Secondary Licenses under the terms of this version of the License, the
 notice described in Exhibit B of this License must be attached.
 
-Exhibit A - Source Code Form License Notice
--------------------------------------------
+## Exhibit A - Source Code Form License Notice
 
-  This Source Code Form is subject to the terms of the Mozilla Public
-  License, v. 2.0. If a copy of the MPL was not distributed with this
-  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 If it is not possible or desirable to put the notice in a particular
 file, then You may include the notice in a location (such as a LICENSE
@@ -702,8 +689,7 @@ for such a notice.
 
 You may add additional accurate notices of copyright ownership.
 
-Exhibit B - "Incompatible With Secondary Licenses" Notice
----------------------------------------------------------
+## Exhibit B - "Incompatible With Secondary Licenses" Notice
 
-  This Source Code Form is "Incompatible With Secondary Licenses", as
-  defined by the Mozilla Public License, v. 2.0.
+This Source Code Form is "Incompatible With Secondary Licenses", as
+defined by the Mozilla Public License, v. 2.0.

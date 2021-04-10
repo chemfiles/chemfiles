@@ -34,11 +34,3 @@ it a callback function to be called on each warning event.
 .. doxygentypedef:: chfl_warning_callback
 
 .. doxygenfunction:: chfl_set_warning_callback
-
-Configuration files
--------------------
-
-You can add more :ref:`configuration <configuration>` file to chemfiles with
-:cpp:func:`chfl_add_configuration`.
-
-.. doxygenfunction:: chfl_add_configuration

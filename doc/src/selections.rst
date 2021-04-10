@@ -257,9 +257,7 @@ Here are all the available numeric values
 
     Evaluates to the mass of the atom being matched. For atoms with a type from
     the periodic table, the element mass is used as default. The atom mass can
-    also be set manually, either directly with
-    :cpp:func:`chemfiles::Atom::set_mass`, or using a :ref:`configuration file
-    <configuration>`.
+    also be set manually with :cpp:func:`chemfiles::Atom::set_mass`.
 
     |multiple-atoms-#i|
 

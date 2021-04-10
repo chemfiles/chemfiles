@@ -7,7 +7,6 @@
 #include <unordered_map>
 
 #include "chemfiles/Atom.hpp"
-#include "chemfiles/Configuration.hpp"
 #include "chemfiles/periodic_table.hpp"
 
 #include "chemfiles/utils.hpp"
@@ -43,13 +42,7 @@ optional<const AtomicData&> chemfiles::find_in_periodic_table(const std::string&
 }
 
 static optional<const AtomicData&> find_element(const std::string& type) {
-    // Look in the configuration first, and then in the periodic table
-    auto element = Configuration::atom_data(type);
-    if (element) {
-        return element;
-    } else {
-        return find_in_periodic_table(type);
-    }
+    return find_in_periodic_table(type);
 }
 
 Atom::Atom(std::string name): name_(std::move(name)), type_(name_) {

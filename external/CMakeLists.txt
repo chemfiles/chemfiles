@@ -146,12 +146,6 @@ mark_as_advanced(FORCE
 )
 
 # ==========
-# toml11
-# ==========
-unpack_library(toml11)
-list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/toml11)
-
-# ==========
 # netcdf: https://github.com/chemfiles/netcdf-c
 # ==========
 if(${CHFL_SYSTEM_NETCDF})

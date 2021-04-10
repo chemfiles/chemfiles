@@ -55,12 +55,6 @@ extern "C" chfl_status chfl_set_warning_callback(chfl_warning_callback callback)
     )
 }
 
-extern "C" chfl_status chfl_add_configuration(const char* path) {
-    CHFL_ERROR_CATCH(
-        add_configuration(path);
-    )
-}
-
 extern "C" chfl_status chfl_formats_list(chfl_format_metadata** metadata, uint64_t* count) {
     CHECK_POINTER(metadata);
     CHECK_POINTER(count);

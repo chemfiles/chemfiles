@@ -25,11 +25,6 @@ TEST_CASE("Errors") {
     CHECK(chfl_last_error() == std::string(""));
 }
 
-TEST_CASE("Configuration") {
-    CHECK_STATUS(chfl_add_configuration("local-file.toml"));
-    CHECK(chfl_add_configuration("not-there") == CHFL_CONFIGURATION_ERROR);
-}
-
 TEST_CASE("Version") {
     std::ifstream file(VERSION_FILE_PATH);
     REQUIRE(file.is_open());
