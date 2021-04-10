@@ -19,7 +19,6 @@
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/UnitCell.hpp"
 #include "chemfiles/Connectivity.hpp"
-#include "chemfiles/Configuration.hpp"
 
 #include "chemfiles/Frame.hpp"
 
@@ -240,13 +239,7 @@ optional<double> guess_bonds_radius(const Atom& atom) {
     const auto& type = atom.type();
     auto it = BOND_GUESSING_RADII.find(type);
     if (it != BOND_GUESSING_RADII.end()) {
-        // allow configuration file to override data from BOND_GUESSING_RADII
-        auto user_config = Configuration::atom_data(type);
-        if (user_config && user_config->vdw_radius) {
-            return user_config->vdw_radius.value();
-        } else {
-            return it->second;
-        }
+        return it->second;
     } else {
         // default to chemfiles provided atom type
         return atom.vdw_radius();

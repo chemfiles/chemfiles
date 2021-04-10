@@ -41,22 +41,6 @@ typedef void (*chfl_warning_callback)(const char* message);  // NOLINT: this is 
 /// @return `CHFL_SUCCESS`
 CHFL_EXPORT chfl_status chfl_set_warning_callback(chfl_warning_callback callback);
 
-/// Read configuration data from the file at `path`.
-///
-/// By default, chemfiles reads configuration from any file named
-/// `.chemfiles.toml` or `chemfiles.toml` in the current directory or any parent
-/// directory. This function can be used to add data from another configuration
-/// file.
-///
-/// This function will fail if there is no file at `path`, or if the file is
-/// incorrectly formatted. Data from the new configuration file will overwrite
-/// any existing data.
-///
-/// @example{capi/chfl_add_configuration.c}
-/// @return The operation status code. You can use `chfl_last_error` to learn
-///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_add_configuration(const char* path);
-
 /// Get the list of formats known by chemfiles, as well as all associated
 /// metadata.
 ///

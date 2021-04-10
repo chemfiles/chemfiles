@@ -3,8 +3,8 @@ Chemfiles, a modern library for chemistry file reading and writing
 
 Chemfiles is a multi-language library written in modern C++ for reading and
 writing from and to molecular trajectory files. These files are created by your
-favorite theoretical chemistry program, and contains informations about atomic
-or residues names and positions. Some format also have additional informations,
+favorite theoretical chemistry program, and contains information about atomic
+or residues names and positions. Some format also have additional information,
 such as velocities, forces, energy, …
 
 The main targeted audience of chemfiles are chemistry researchers working on
@@ -13,7 +13,7 @@ about handling all the files format that may exist in the world.
 
 Running simulation (either Quantum Dynamic, Monte Carlo, Molecular Dynamic, or
 any other method) often produce enormous amounts of data, which had to be
-post-processed in order to extract informations. This post-processing step
+post-processed in order to extract information. This post-processing step
 involve reading and parsing the data, and computing physical values with the
 help of statistical thermodynamic. Chemfiles tries to help you on the first
 point, by providing the same interface to all the trajectory formats. If you
@@ -25,8 +25,8 @@ Even if chemfiles is written in C++, it can be used from the most popular
 scientific programming languages: C, Fortran, Python, … You can just pick up
 your favorite language to use it. This part of the documentation presents the
 data model used by chemfiles to store information about the trajectories, and
-how to acess that data in C and C++. The documentation for the other languages
-interfaces to chemfiles are accessibles at the following places:
+how to access that data in C and C++. The documentation for the other languages
+interfaces to chemfiles are accessible at the following places:
 
 * `Python interface`_, usable with Python 2 and 3;
 * `Fortran interface`_, for Fortran 2003;
@@ -65,7 +65,6 @@ in our `Gitter chat room <https://gitter.im/chemfiles/chemfiles>`_.
     c-tutorials
     formats
     selections
-    configuration
     properties
 
 .. _classes-reference:

@@ -188,40 +188,6 @@ foreach(test_file IN LISTS capi_doctest_files)
     chfl_c_doctest(${test_file})
 endforeach()
 
-# Write sample configuration files for tests
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/../.chemfiles.toml
-"[types]
-Oh = \"O\"
-Oz = \"O\"
-N2 = \"N\"
-
-[atoms.CH3]
-mass = 15.0
-charge = 0
-full_name = \"methyl\"
-
-[atoms.Zn]
-charge = 1.8
-
-[atoms.SO4]
-mass = 96.0
-charge = -2
-full_name = \"sulfate\"
-vdw_radius = 3.68
-covalent_radius = 2.42
-")
-
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/chemfiles.toml
-"[types]
-# This override the root .chemfiles.toml file
-N2 = \"N4\"
-")
-
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/local-file.toml
-"[types]
-Oz = \"F\"
-")
-
 # Code linting with Python scripts
 if(${CMAKE_VERSION} VERSION_GREATER "3.12")
     # cmake 3.12 replaced find_package(PythonInterp) with find_package(Python)

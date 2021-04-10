@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Next Release (current master)
 
+### Deprecation and removals
+
+- Remove support for configuration files (`chemfiles.toml`) and associated
+  functions.
+
 ## 0.10.0 (14 Feb 2021)
 
 ### Changes in supported formats
