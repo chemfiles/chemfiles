@@ -108,7 +108,7 @@ void TinkerFormat::write_next(const Frame& frame) {
     auto lengths = frame.cell().lengths();
     auto angles = frame.cell().angles();
     file_.print("{} written by the chemfiles library\n", frame.size());
-    file_.print("{} {} {} {} {} {}\n",
+    file_.print("{:#} {:#} {:#} {:#} {:#} {:#}\n",
         lengths[0], lengths[1], lengths[2], angles[0], angles[1], angles[2]
     );
 
@@ -139,7 +139,7 @@ void TinkerFormat::write_next(const Frame& frame) {
         assert(it != types_id.end());
         auto type = (it - types_id.begin()) + 1;
 
-        file_.print("{} {} {} {} {} {}",
+        file_.print("{} {} {:#} {:#} {:#} {}",
             i + 1, name, positions[i][0], positions[i][1], positions[i][2], type
         );
         for (size_t other: bonded_to[i]) {

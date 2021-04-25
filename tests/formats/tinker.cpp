@@ -61,7 +61,7 @@ TEST_CASE("Read files in Tinker XYZ format") {
 
         CHECK(topology[0].get("atom_type")->as_double() == 24);
         CHECK(topology[154].get("atom_type")->as_double() == 24);
-		
+
         CHECK(topology.bonds().size() == 106);
         for (size_t i = 0; i < frame.size(); i += 2) {
             CHECK(contains_bond(topology, {i, i + 1}));
@@ -142,7 +142,7 @@ TEST_CASE("Read and write files in memory") {
         auto& topology = frame.topology();
         CHECK(topology[0].name() == "N");
         CHECK(topology[154].name() == "N");
-		
+
         CHECK(topology[0].get("atom_type")->as_double() == 24);
         CHECK(topology[154].get("atom_type")->as_double() == 24);
 

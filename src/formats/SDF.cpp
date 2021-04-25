@@ -227,8 +227,11 @@ void SDFFormat::write_next(const Frame& frame) {
     auto& positions = frame.positions();
     assert(frame.size() == topology.size());
 
-    file_.print("{}\n", frame.get<Property::STRING>("name").value_or("NONAME"));
-    file_.print(" chemfiles-lib\n\n");
+    // TODO: this can not be more than 80 characters
+    file_.print("{}\n", frame.get<Property::STRING>("name").value_or(""));
+    // TODO: this line can contain more data (file creation time and energy in particular)
+    file_.print("\n");
+    file_.print("created by chemfiles\n");
     file_.print("{:>3}{:>3}  0     0  0  0  0  0  0999 V2000\n", frame.size(), topology.bonds().size());
 
     for (size_t i = 0; i < frame.size(); i++) {
@@ -275,7 +278,6 @@ void SDFFormat::write_next(const Frame& frame) {
     }
 
     for (const auto& bond : topology.bonds()) {
-
         std::string bond_order;
         auto bo = topology.bond_order(bond[0], bond[1]);
 
@@ -317,13 +319,13 @@ void SDFFormat::write_next(const Frame& frame) {
             file_.print("{}\n\n", prop.second.as_string());
             break;
         case Property::DOUBLE:
-            file_.print("{}\n\n", prop.second.as_double());
+            file_.print("{:#}\n\n", prop.second.as_double());
             break;
         case Property::BOOL:
             file_.print("{}\n\n", prop.second.as_bool());
             break;
         case Property::VECTOR3D:
-            file_.print("{} {} {}\n\n",
+            file_.print("{:#} {:#} {:#}\n\n",
                 prop.second.as_vector3d()[0],
                 prop.second.as_vector3d()[1],
                 prop.second.as_vector3d()[2]

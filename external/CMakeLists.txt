@@ -146,6 +146,13 @@ mark_as_advanced(FORCE
 )
 
 # ==========
+# pugixml: http://github.com/chemfiles/pugixml
+# ==========
+unpack_library(pugixml)
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src)
+add_library(pugixml OBJECT ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src/pugixml.cpp)
+
+# ==========
 # netcdf: https://github.com/chemfiles/netcdf-c
 # ==========
 if(${CHFL_SYSTEM_NETCDF})
@@ -238,13 +245,6 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/molfiles/include)
 unpack_library(mmtf-cpp)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/include )
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/msgpack-c/include )
-
-# ==========
-# pugixml: http://github.com/chemfiles/pugixml
-# ==========
-unpack_library(pugixml)
-list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src)
-add_library(pugixml OBJECT ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src/pugixml.cpp)
 
 # ==========
 # xdrfile
