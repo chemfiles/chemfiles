@@ -735,14 +735,14 @@ void LAMMPSDataFormat::write_header(const DataTypes& types, const Frame& frame) 
     file_.print("{} improper types\n", types.impropers().size());
 
     auto matrix = frame.cell().matrix();
-    file_.print("0 {} xlo xhi\n", matrix[0][0]);
-    file_.print("0 {} ylo yhi\n", matrix[1][1]);
-    file_.print("0 {} zlo zhi\n", matrix[2][2]);
+    file_.print("0.0 {:#} xlo xhi\n", matrix[0][0]);
+    file_.print("0.0 {:#} ylo yhi\n", matrix[1][1]);
+    file_.print("0.0 {:#} zlo zhi\n", matrix[2][2]);
     if (frame.cell().shape() == UnitCell::TRICLINIC) {
         assert(tilt_factor(matrix, 1, 0) == 0);
         assert(tilt_factor(matrix, 2, 0) == 0);
         assert(tilt_factor(matrix, 2, 1) == 0);
-        file_.print("{} {} {} xy xz yz\n",
+        file_.print("{:#} {:#} {:#} xy xz yz\n",
             tilt_factor(matrix, 0, 1),
             tilt_factor(matrix, 0, 2),
             tilt_factor(matrix, 1, 2)
@@ -815,7 +815,7 @@ void LAMMPSDataFormat::write_masses(const DataTypes& types) {
     file_.print("\nMasses\n\n");
     auto& atoms = types.atoms().as_vec();
     for (size_t i=0; i<atoms.size(); i++) {
-        file_.print("{} {} # {}\n", i + 1, atoms[i].second, atoms[i].first);
+        file_.print("{} {:#} # {}\n", i + 1, atoms[i].second, atoms[i].first);
     }
 }
 
@@ -826,7 +826,7 @@ void LAMMPSDataFormat::write_atoms(const DataTypes& types, const Frame& frame) {
     for (size_t i=0; i<frame.size(); i++) {
         auto& atom = frame.topology()[i];
         auto molid = molids[i];
-        file_.print("{} {} {} {} {} {} {} # {}\n",
+        file_.print("{} {} {} {:#} {:#} {:#} {:#} # {}\n",
             i + 1, molid + 1, types.atom_type_id(atom) + 1, atom.charge(),
             positions[i][0], positions[i][1], positions[i][2],
             atom.type()
