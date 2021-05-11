@@ -194,13 +194,8 @@ TEST_CASE("chfl_residue") {
 
         const char* names[2] = {nullptr};
         CHECK_STATUS(chfl_residue_list_properties(residue, names, count));
-        // There are no guarantee of ordering
-        if (names[0] == std::string("this")) {
-            CHECK(names[1] == std::string("that"));
-        } else {
-            CHECK(names[0] == std::string("that"));
-            CHECK(names[1] == std::string("this"));
-        }
+        CHECK(names[0] == std::string("that"));
+        CHECK(names[1] == std::string("this"));
 
         chfl_free(residue);
     }

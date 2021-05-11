@@ -34,7 +34,9 @@ def documented_functions():
 
 def functions_in_outline():
     MISC_FUNCTIONS = [
-        "chfl_last_error", "chfl_clear_errors", "chfl_version",
+        "chfl_last_error",
+        "chfl_clear_errors",
+        "chfl_version",
         "chfl_formats_list",
     ]
     DOCS = os.path.join(ROOT, "doc", "src", "capi")
@@ -50,12 +52,12 @@ def functions_in_outline():
 
 
 def function_name(line):
-    assert(line.startswith("CHFL_EXPORT"))
+    assert line.startswith("CHFL_EXPORT")
     splitted = line.split()
     if splitted[2].startswith("chfl_"):
-        name = splitted[2].split('(')[0]
+        name = splitted[2].split("(")[0]
     elif splitted[3].startswith("chfl_"):
-        name = splitted[3].split('(')[0]
+        name = splitted[3].split("(")[0]
     else:
         raise RuntimeError("Could not get function name in '" + line + "'")
     return name
@@ -84,7 +86,7 @@ def check_examples():
                 for line in fd:
                     if "@example" in line and in_doc:
                         example_found = True
-                        path = line.split('{')[1].split('}')[0]
+                        path = line.split("{")[1].split("}")[0]
                         if not os.path.exists(os.path.join(ROOT, "tests", "doc", path)):
                             error("Missing example file at {}".format(path))
 
@@ -98,7 +100,7 @@ def check_examples():
                         example_found = False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     docs = documented_functions()
     outline = functions_in_outline()
     for function in all_functions():

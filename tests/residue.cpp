@@ -56,19 +56,17 @@ TEST_CASE("Residue class usage") {
         // Iterate over all properties
         residue.set("buzz", 22);
         residue.set("fizz", Vector3D(1, 2, 3));
+        auto expected = std::vector<std::tuple<std::string, Property>>{
+            std::tuple<std::string, Property>{"bar", false},
+            std::tuple<std::string, Property>{"buzz", 22},
+            std::tuple<std::string, Property>{"fizz", Vector3D(1, 2, 3)},
+            std::tuple<std::string, Property>{"foo", "test"},
+        };
+        size_t i = 0;
         for(auto it: residue.properties()) {
-            auto name = it.first;
-            if (name == "bar") {
-                CHECK(it.second.as_bool() == false);
-            } else if (name == "foo") {
-                CHECK(it.second.as_string() == "test");
-            } else if (name == "buzz") {
-                CHECK(it.second.as_double() == 22);
-            } else if (name == "fizz") {
-                CHECK(it.second.as_vector3d() == Vector3D(1, 2, 3));
-            } else {
-                CHECK(false);  // all case should have been covered
-            }
+            CHECK(it.first == std::get<0>(expected[i]));
+            CHECK(it.second == std::get<1>(expected[i]));
+            i += 1;
         }
 
         // Typed access to properties

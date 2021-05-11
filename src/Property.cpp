@@ -97,7 +97,7 @@ optional<typename property_metadata<kind>::type> property_map::get(const std::st
     }
 }
 
-// Explicit template instanciation
+// Explicit template instantiations
 template optional<bool> property_map::get<Property::BOOL>(const std::string& name) const;
 template optional<double> property_map::get<Property::DOUBLE>(const std::string& name) const;
 template optional<const std::string&> property_map::get<Property::STRING>(const std::string& name) const;

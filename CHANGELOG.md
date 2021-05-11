@@ -10,6 +10,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Remove support for configuration files (`chemfiles.toml`) and associated
   functions.
 
+### New features
+
+- properties are now sorted, and iterating over properties will always yield
+  them sorted by the associated key.
+
+### Changes in supported formats
+
+### Changes to the C API
+
 ## 0.10.0 (14 Feb 2021)
 
 ### Changes in supported formats

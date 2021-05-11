@@ -161,4 +161,11 @@ TEST_CASE("Property map") {
     CHECK_FALSE(map.get<Property::BOOL>("bar"));
     CHECK_FALSE(map.get<Property::DOUBLE>("bar"));
     CHECK_FALSE(map.get<Property::VECTOR3D>("bar"));
+
+    // iterating over the property map should yield sorted strings
+    auto properties_names = std::vector<std::string>();
+    for (const auto& it: map) {
+        properties_names.push_back(it.first);
+    }
+    CHECK(properties_names == std::vector<std::string>{"bar", "foo"});
 }

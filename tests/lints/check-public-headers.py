@@ -16,12 +16,29 @@ ERRORS = 0
 
 WHITELIST = [
     # standard C99 headers
-    "stdbool.h", "stdint.h",
+    "stdbool.h",
+    "stdint.h",
     # standard C++11 headers
-    "iterator", "functional", "cstdint", "array", "utility", "cassert",
-    "string", "memory", "exception", "limits", "algorithm", "stdexcept",
-    "vector", "cmath", "type_traits", "unordered_map", "cfloat", "new",
+    "iterator",
+    "functional",
+    "cstdint",
+    "array",
+    "utility",
+    "cassert",
+    "string",
+    "memory",
+    "exception",
+    "limits",
+    "algorithm",
+    "stdexcept",
+    "vector",
+    "cmath",
+    "type_traits",
+    "unordered_map",
+    "cfloat",
+    "new",
     "cstddef",
+    "map",
     # external headers
     "chemfiles/external/span.hpp",
     "chemfiles/external/optional.hpp",
@@ -69,7 +86,7 @@ def included_headers(path):
     with codecs.open(path, encoding="utf8") as fd:
         for line in fd:
             if "#include" in line:
-                matched = re.match("#include\\s*[\"<](.*)[\">]", line)
+                matched = re.match('#include\\s*["<](.*)[">]', line)
                 if not matched:
                     error("bad include in {}: {}".format(path, line))
                 header = matched.groups()[0]
@@ -87,7 +104,7 @@ def check_allowded(headers):
             error("private header {} is publicly reachable".format(header))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     headers = included_headers(os.path.join(ROOT, "include", "chemfiles.h"))
     check_allowded(headers)
 
