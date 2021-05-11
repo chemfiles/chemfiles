@@ -39,18 +39,14 @@ def extract_messages(lines, i, has_context):
         i = i + 1
         start = lines[i].find('"')
         if start == -1:
-            print("warning: could not get the message at {}:{}".format(
-                path, i
-            ))
+            print("warning: could not get the message at {}:{}".format(path, i))
             return ""
 
     stop = lines[i].find('"', start + 1)
     if stop == -1:
-        error("could not get the message end at {}:{}".format(
-            path, i
-        ))
+        error("could not get the message end at {}:{}".format(path, i))
 
-    return lines[i][start + 1:stop]
+    return lines[i][start + 1 : stop]
 
 
 def check_message(path, line, message):
@@ -91,7 +87,7 @@ def check_file(path):
             check_message(path, i, extract_messages(lines, i, has_context=False))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     for path in glob.glob(os.path.join(ROOT, "src/*.cpp")):
         check_file(path)
 
