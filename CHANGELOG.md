@@ -10,12 +10,17 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Remove support for configuration files (`chemfiles.toml`) and associated
   functions.
 
-## 0.10.1 (22 Jul 2021)
+## 0.10.2 (TBD)
 
 ### New features
 
 - properties are now sorted, and iterating over properties will always yield
   them sorted by the associated key.
+
+## 0.10.1 (22 Jul 2021)
+
+### New features
+
 - added `chemfiles::guess_format` and `chfl_guess_format` to get the format
   chemfiles would use for a given file based on its filename
 
