@@ -54,6 +54,28 @@ CHFL_EXPORT chfl_status chfl_set_warning_callback(chfl_warning_callback callback
 ///         about the error if the status code is not `CHFL_SUCCESS`.
 CHFL_EXPORT chfl_status chfl_formats_list(chfl_format_metadata** metadata, uint64_t* count);
 
+/// Get the format that chemfiles would use to read a file at the given `path`
+/// in the string buffer `format`.
+///
+/// The buffer size must be passed in `buffsize`. This function will return
+/// `CHFL_MEMORY_ERROR` if the format does not fit in the buffer.
+///
+/// The format is only guessed from the filename extension, chemfiles does not
+/// currently read the file to guess the format. Opening the file using the
+/// returned format string might still fail. For example, it will fail if the
+/// file is not actually formatted according to the guessed format; or the
+/// format/compression combination is not supported (e.g. `XTC / GZ` will not
+/// work since the XTC reader does not support compressed files).
+///
+/// The format is represented in a way compatible with the various `Trajectory`
+/// constructors, i.e. `"<format name> [/ <compression>]"`, where compression is
+/// optional.
+///
+/// @example{capi/chfl_guess_format.c}
+/// @return The operation status code. You can use `chfl_last_error` to learn
+///         about the error if the status code is not `CHFL_SUCCESS`.
+CHFL_EXPORT chfl_status chfl_guess_format(const char* path, char* format, uint64_t buffsize);
+
 /// Free the memory associated with a chemfiles object.
 ///
 /// This function is NOT equivalent to the standard C function `free`, as memory
