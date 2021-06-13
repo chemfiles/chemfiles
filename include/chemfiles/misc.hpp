@@ -27,25 +27,6 @@ typedef std::function<void(const std::string& message)> warning_callback_t; // N
 /// @param callback callback function that will be called on each warning
 void CHFL_EXPORT set_warning_callback(warning_callback_t callback);
 
-/// Read configuration data from the file at `path`.
-///
-/// By default, chemfiles reads configuration from any file named
-/// `.chemfiles.toml` or `chemfiles.toml` in the current directory or any parent
-/// directory. This function can be used to add data from another configuration
-/// file.
-///
-/// This function will throw a `ConfigurationError` if there is no file at
-/// `path`, or if the file is incorrectly formatted. Data from the new
-/// configuration file will overwrite any existing data.
-///
-/// @example{add_configuration.cpp}
-///
-/// @param path path to the configuration file to add
-///
-/// @throws ConfigurationError if the file at `path` can not be read, or if it
-///                            is invalid.
-void CHFL_EXPORT add_configuration(const std::string& path);
-
 /// Get the list of formats chemfiles knows about, and all associated metadata
 ///
 /// @example{formats_list.cpp}

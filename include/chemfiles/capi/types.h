@@ -128,8 +128,7 @@ typedef enum {  // NOLINT: this is both a C and C++ file
     CHFL_FORMAT_ERROR = 3,
     /// Status code for invalid selection strings.
     CHFL_SELECTION_ERROR = 4,
-    /// Status code for configuration files errors.
-    CHFL_CONFIGURATION_ERROR = 5,
+    /* error code 5 used to be CHFL_CONFIGURATION_ERROR */
     /// Status code for out of bounds errors.
     CHFL_OUT_OF_BOUNDS = 6,
     /// Status code for errors related to properties.

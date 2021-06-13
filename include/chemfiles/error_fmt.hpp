@@ -46,12 +46,6 @@ inline SelectionError selection_error(const char *format, Args && ... arguments)
     return SelectionError(fmt::format(format, std::forward<Args>(arguments)...));
 }
 
-/// Create a `ConfigurationError` using the given `format` and `arguments`.
-template <typename... Args>
-inline ConfigurationError configuration_error(const char *format, Args && ... arguments) {
-    return ConfigurationError(fmt::format(format, std::forward<Args>(arguments)...));
-}
-
 /// Create an `OutOfBounds` error using the given `format` and `arguments`.
 template <typename... Args>
 inline OutOfBounds out_of_bounds(const char *format, Args && ... arguments) {

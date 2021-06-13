@@ -209,9 +209,7 @@ public:
     ///
     /// The bonds are guessed using a distance-based algorithm, and then angles,
     /// dihedrals and impropers are guessed from the bonds. The distance
-    /// criterion uses the Van der Waals radii of the atoms. If this
-    /// information is missing for a specific atoms, one can use configuration
-    /// files to provide it.
+    /// criterion uses the Van der Waals radii of the atoms.
     ///
     /// @throw Error if the Van der Waals radius in unknown for a given atom.
     ///

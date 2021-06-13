@@ -77,7 +77,6 @@ inline Vector3D vector3d(const chfl_vector3d vector) {
     CATCH_AND_RETURN(MemoryError, CHFL_MEMORY_ERROR)                           \
     CATCH_AND_RETURN(FormatError, CHFL_FORMAT_ERROR)                           \
     CATCH_AND_RETURN(SelectionError, CHFL_SELECTION_ERROR)                     \
-    CATCH_AND_RETURN(ConfigurationError, CHFL_CONFIGURATION_ERROR)             \
     CATCH_AND_RETURN(OutOfBounds, CHFL_OUT_OF_BOUNDS)                          \
     CATCH_AND_RETURN(PropertyError, CHFL_PROPERTY_ERROR)                       \
     CATCH_AND_RETURN(Error, CHFL_GENERIC_ERROR)                                \
