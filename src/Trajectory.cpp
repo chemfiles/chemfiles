@@ -107,9 +107,9 @@ Trajectory::Trajectory(std::string path, char mode, const std::string& format)
     auto info = file_open_info::parse(path_, format);
     format_creator_t format_creator;
     if (!info.format.empty()) {
-        format_creator = FormatFactory::get().name(info.format);
+        format_creator = FormatFactory::get().by_name(info.format).creator;
     } else if (!info.extension.empty()) {
-        format_creator = FormatFactory::get().extension(info.extension);
+        format_creator = FormatFactory::get().by_extension(info.extension).creator;
     } else {
         throw file_error(
             "file at '{}' does not have an extension, provide a format name to read it",
@@ -132,11 +132,12 @@ Trajectory Trajectory::memory_reader(const char* data, size_t size, const std::s
         throw format_error("format name '{}' is invalid", format);
     }
 
-    auto memory_creator = FormatFactory::get().memory_stream(info.format);
+    auto memory_creator = FormatFactory::get().by_name(info.format).memory_stream_creator;
     auto buffer = std::make_shared<MemoryBuffer>(data, size);
-    auto creator = memory_creator(buffer, File::READ, info.compression);
+    // if in-memory I/O is not supported, this call will throw
+    auto format_impl = memory_creator(buffer, File::READ, info.compression);
 
-    return Trajectory('r', std::move(creator), std::move(buffer));
+    return Trajectory('r', std::move(format_impl), std::move(buffer));
 }
 
 Trajectory Trajectory::memory_writer(const std::string& format) {
@@ -146,12 +147,12 @@ Trajectory Trajectory::memory_writer(const std::string& format) {
         throw format_error("format name '{}' is invalid", format);
     }
 
-    auto memory_creator = FormatFactory::get().memory_stream(info.format);
+    auto memory_creator = FormatFactory::get().by_name(info.format).memory_stream_creator;
     auto buffer = std::make_shared<MemoryBuffer>(8192);
+    // if in-memory I/O is not supported, this call will throw
+    auto format_impl = memory_creator(buffer, File::WRITE, info.compression);
 
-    auto format_ = memory_creator(buffer, File::WRITE, info.compression);
-
-    return Trajectory('w', std::move(format_), std::move(buffer));
+    return Trajectory('w', std::move(format_impl), std::move(buffer));
 }
 
 Trajectory::Trajectory(char mode, std::unique_ptr<Format> format, std::shared_ptr<MemoryBuffer> buffer)
