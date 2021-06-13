@@ -191,11 +191,25 @@ TEST_CASE("Specify a format parameter") {
     frame = Trajectory(tmpfile, 'r', "XYZ /GZ").read();
     CHECK(frame.size() == 1);
     CHECK(frame[0].name() == "Fe");
+}
 
-    // only the compression method, the format will be guessed from extension
-    frame = Trajectory(tmpfile, 'r', "/ GZ").read();
-    CHECK(frame.size() == 1);
-    CHECK(frame[0].name() == "Fe");
+TEST_CASE("Guessing format") {
+    CHECK(guess_format("not-a-file.xyz") == "XYZ");
+    CHECK(guess_format("not-a-file.pdb") == "PDB");
+    CHECK(guess_format("not-a-file.nc") == "Amber NetCDF");
+
+    CHECK(guess_format("not-a-file.xyz.gz") == "XYZ / GZ");
+    CHECK(guess_format("not-a-file.xyz.bz2") == "XYZ / BZ2");
+    CHECK(guess_format("not-a-file.xyz.xz") == "XYZ / XZ");
+
+    CHECK_THROWS_WITH(
+        guess_format("not-a-file.unknown"),
+        "can not find a format associated with the '.unknown' extension"
+    );
+    CHECK_THROWS_WITH(
+        guess_format("not-a-file"),
+        "file at 'not-a-file' does not have an extension, provide a format name to read it"
+    );
 }
 
 TEST_CASE("Errors") {

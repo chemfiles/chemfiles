@@ -16,8 +16,10 @@
 #include "chemfiles/Topology.hpp"
 #include "chemfiles/FormatFactory.hpp"
 #include "chemfiles/Configuration.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 #include "chemfiles/files/MemoryBuffer.hpp"
 
+#include "chemfiles/misc.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/string_view.hpp"
@@ -28,15 +30,64 @@ using namespace chemfiles;
 
 #define SENTINEL_VALUE (static_cast<size_t>(-1))
 
+std::string chemfiles::guess_format(std::string path) {
+    std::string extension;
+    std::string compression;
+
+    auto dot1 = path.rfind('.');
+    if (dot1 != std::string::npos) {
+        extension = path.substr(dot1);
+        bool new_extension = false;
+        // check file extension for compressed file extension
+        if (extension == ".gz") {
+            new_extension = true;
+            compression = "GZ";
+        } else if (extension == ".bz2") {
+            new_extension = true;
+            compression = "BZ2";
+        } else if (extension == ".xz") {
+            new_extension = true;
+            compression = "XZ";
+        }
+
+        if (new_extension) {
+            extension = "";
+            auto dot2 = path.substr(0, dot1).rfind('.');
+            if (dot2 != std::string::npos) {
+                extension = path.substr(0, dot1).substr(dot2);
+            }
+        }
+    }
+
+    if (extension.empty()) {
+        throw file_error(
+            "file at '{}' does not have an extension, provide a format name to read it",
+            path
+        );
+    }
+
+    auto registered_format = FormatFactory::get().by_extension(extension);
+    auto format = std::string(registered_format.metadata.name);
+
+    if (!compression.empty()) {
+        format += " / " + compression;
+    }
+
+    return format;
+}
+
 struct file_open_info {
-    static file_open_info parse(const std::string& path, const std::string& format);
+    static file_open_info parse(const std::string& path, std::string format);
     std::string format = "";
-    std::string extension = "";
     File::Compression compression = File::DEFAULT;
 };
 
-file_open_info file_open_info::parse(const std::string& path, const std::string& format) {
+file_open_info file_open_info::parse(const std::string& path, std::string format) {
     file_open_info info;
+
+    if (format.empty()) {
+        format = guess_format(path);
+    }
 
     auto slash = format.find('/');
     if (slash != std::string::npos) {
@@ -55,32 +106,6 @@ file_open_info file_open_info::parse(const std::string& path, const std::string&
 
     auto tmp = format.substr(0, slash);
     info.format = trim(tmp).to_string();
-
-    auto dot1 = path.rfind('.');
-    if (dot1 != std::string::npos) {
-        info.extension = path.substr(dot1);
-        if (info.compression == File::DEFAULT) {
-            bool new_extension = false;
-            // check file extension for compressed file extension
-            if (info.extension == ".gz") {
-                new_extension = true;
-                info.compression = File::GZIP;
-            } else if (info.extension == ".bz2") {
-                new_extension = true;
-                info.compression = File::BZIP2;
-            } else if (info.extension == ".xz") {
-                new_extension = true;
-                info.compression = File::LZMA;
-            }
-
-            if (new_extension) {
-                auto dot2 = path.substr(0, dot1).rfind('.');
-                if (dot2 != std::string::npos) {
-                    info.extension = path.substr(0, dot1).substr(dot2);
-                }
-            }
-        }
-    }
 
     return info;
 }
@@ -105,17 +130,7 @@ Trajectory::Trajectory(std::string path, char mode, const std::string& format)
     : path_(std::move(path)), mode_(mode), format_(nullptr) {
 
     auto info = file_open_info::parse(path_, format);
-    format_creator_t format_creator;
-    if (!info.format.empty()) {
-        format_creator = FormatFactory::get().by_name(info.format).creator;
-    } else if (!info.extension.empty()) {
-        format_creator = FormatFactory::get().by_extension(info.extension).creator;
-    } else {
-        throw file_error(
-            "file at '{}' does not have an extension, provide a format name to read it",
-            path_
-        );
-    }
+    auto format_creator = FormatFactory::get().by_name(info.format).creator;
 
     format_ = format_creator(path_, char_to_file_mode(mode), info.compression);
 
@@ -125,7 +140,6 @@ Trajectory::Trajectory(std::string path, char mode, const std::string& format)
 }
 
 Trajectory Trajectory::memory_reader(const char* data, size_t size, const std::string& format) {
-
     auto info = file_open_info::parse("", format);
 
     if (info.format == "") {

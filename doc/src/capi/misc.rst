@@ -17,6 +17,8 @@ chemfiles types); all the functions return a status code from the
 Format list and Metadata
 ------------------------
 
+.. doxygenfunction:: chfl_guess_format
+
 .. doxygenfunction:: chfl_formats_list
 
 .. doxygenstruct:: chfl_format_metadata

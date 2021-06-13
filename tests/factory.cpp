@@ -286,3 +286,17 @@ TEST_CASE("Check error throwing in formats") {
         );
     }
 }
+
+TEST_CASE("Guess format") {
+    auto format = chemfiles::guess_format("filename.nc");
+    CHECK(format == "Amber NetCDF");
+
+    format = chemfiles::guess_format("filename.xyz.gz");
+    CHECK(format == "XYZ / GZ");
+
+    // no associated format
+    CHECK_THROWS_WITH(
+        chemfiles::guess_format("filename.not-there"),
+        "can not find a format associated with the '.not-there' extension"
+    );
+}
