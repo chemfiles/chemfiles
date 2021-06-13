@@ -70,9 +70,6 @@ nicely with any existing C++ error handling.
 .. doxygenstruct:: chemfiles::SelectionError
     :members:
 
-.. doxygenstruct:: chemfiles::ConfigurationError
-    :members:
-
 .. doxygenstruct:: chemfiles::OutOfBounds
     :members:
 

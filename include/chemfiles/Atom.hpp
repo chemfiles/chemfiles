@@ -68,8 +68,6 @@ public:
     /// Get the atom mass.
     ///
     /// The default mass is set when constructing the atom from the atomic type.
-    /// To change the default value for a given type, you can use configuration
-    /// files.
     ///
     /// @example{atom/mass.cpp}
     double mass() const { return mass_; }
@@ -77,8 +75,7 @@ public:
     /// Get the atom charge.
     ///
     /// The default charge is set when constructing the atom from the atomic
-    /// type (usually to 0). To change the default value for a given type, you
-    /// can use configuration files.
+    /// type (usually to 0).
     ///
     /// @example{atom/charge.cpp}
     double charge() const { return charge_; }
@@ -109,8 +106,7 @@ public:
     /// atom type: for example, the full name for `He` is `"Helium"`. If no name
     /// can be found, this function returns `nullopt`. This check is executed
     /// with case-insensitive atom type: `Na`, `NA`, `nA` and `na` all get the
-    /// `Na` full name. To change the value returned for a given type, you can
-    /// use configuration files.
+    /// `Na` full name.
     ///
     /// @example{atom/full_name.cpp}
     optional<std::string> full_name() const;
@@ -121,8 +117,7 @@ public:
     /// current atom type: for example, the radius for `He` is 1.4 A. If no
     /// radius can be found, this function returns `nullopt`. This check is
     /// executed with case-insensitive atom type: `Na`, `NA`, `nA` and `na` all
-    /// get the `Na` radius. To change the value returned for a given type, you
-    /// can use configuration files.
+    /// get the `Na` radius.
     ///
     /// @example{atom/vdw_radius.cpp}
     optional<double> vdw_radius() const;
@@ -133,8 +128,7 @@ public:
     /// current atom type: for example, the radius for `He` is 0.32 A. If no
     /// radius can be found, this function returns `nullopt`. This check is
     /// executed with case-insensitive atom type: `Na`, `NA`, `nA` and `na` all
-    /// get the `Na` radius. To change the value returned for a given type, you
-    /// can use configuration files.
+    /// get the `Na` radius.
     ///
     /// @example{atom/covalent_radius.cpp}
     optional<double> covalent_radius() const;
@@ -145,8 +139,7 @@ public:
     /// current atom type: for example, the atomic number for `He` is 2. If no
     /// atomic number can be found, this function returns `nullopt`. This check
     /// is executed with case-insensitive atom type: `Na`, `NA`, `nA` and `na`
-    /// all get the `Na` atomic number. To change the value returned for a given
-    /// type, you can use configuration files.
+    /// all get the `Na` atomic number.
     ///
     /// @example{atom/atomic_number.cpp}
     optional<uint64_t> atomic_number() const;

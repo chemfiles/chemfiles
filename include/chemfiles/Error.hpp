@@ -35,11 +35,6 @@ struct CHFL_EXPORT SelectionError: public Error {
     SelectionError(const std::string& err): Error(err) {}
 };
 
-/// Exception for errors in configuration files
-struct CHFL_EXPORT ConfigurationError: public Error {
-    ConfigurationError(const std::string& err): Error(err) {}
-};
-
 /// Exception for out of bounds error when accessing atoms or residues
 struct CHFL_EXPORT OutOfBounds: public Error {
     OutOfBounds(const std::string& err): Error(err) {}
