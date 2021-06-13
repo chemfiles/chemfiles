@@ -15,6 +15,7 @@
 #include "chemfiles/capi/shared_allocator.hpp"
 
 #include "chemfiles/misc.hpp"
+#include "chemfiles/error_fmt.hpp"
 #include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/FormatMetadata.hpp"
@@ -84,5 +85,23 @@ extern "C" chfl_status chfl_formats_list(chfl_format_metadata** metadata, uint64
             (*metadata)[i].bonds = meta.bonds;
             (*metadata)[i].residues = meta.residues;
         }
+    )
+}
+
+extern "C" chfl_status chfl_guess_format(const char* const path, char* const format, uint64_t buffsize) {
+    CHECK_POINTER(path);
+    CHECK_POINTER(format);
+    CHFL_ERROR_CATCH(
+        auto cpp_format = guess_format(path);
+
+        if (cpp_format.size() >= buffsize) {
+            throw memory_error(
+                "the format needs {} character, but the buffer only have room for {}",
+                cpp_format.size(), buffsize
+            );
+        }
+
+        strncpy(format, cpp_format.c_str(), checked_cast(buffsize) - 1);
+        format[buffsize - 1] = '\0';
     )
 }

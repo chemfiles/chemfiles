@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 - properties are now sorted, and iterating over properties will always yield
   them sorted by the associated key.
+- added `chemfiles::guess_format` and `chfl_guess_format` to get the format
+  chemfiles would use for a given file based on its filename
 
 ### Changes in supported formats
 
