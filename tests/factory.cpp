@@ -136,17 +136,17 @@ TEST_CASE("Geting registered format") {
     FormatFactory::get().add_format<DummyFormat>();
 
     DummyFormat dummy("", File::READ, File::DEFAULT);
-    auto format = FormatFactory::get().extension(".dummy")("", File::READ, File::DEFAULT);
+    auto format = FormatFactory::get().by_extension(".dummy").creator("", File::READ, File::DEFAULT);
     CHECK(typeid(dummy) == typeid(*format));
-    format = FormatFactory::get().name("Dummy")("", File::READ, File::DEFAULT);
+    format = FormatFactory::get().by_name("Dummy").creator("", File::READ, File::DEFAULT);
     CHECK(typeid(dummy) == typeid(*format));
 
     CHECK_THROWS_WITH(
-        FormatFactory::get().name("UNKOWN"),
+        FormatFactory::get().by_name("UNKOWN"),
         "can not find a format named 'UNKOWN'"
     );
     CHECK_THROWS_WITH(
-        FormatFactory::get().extension(".UNKOWN"),
+        FormatFactory::get().by_extension(".UNKOWN"),
         "can not find a format associated with the '.UNKOWN' extension"
     );
 }
@@ -164,14 +164,14 @@ TEST_CASE("Already registered format/extension") {
 
 TEST_CASE("Format names suggestions") {
     try {
-        FormatFactory::get().name("Dully");
+        FormatFactory::get().by_name("Dully");
         CHECK(false);
     } catch (const FormatError& e) {
         CHECK(std::string(e.what()) == "can not find a format named 'Dully', did you mean 'Dummy'?");
     }
 
     try {
-        FormatFactory::get().name("DUMMY");
+        FormatFactory::get().by_name("DUMMY");
         CHECK(false);
     } catch (const FormatError& e) {
         CHECK(std::string(e.what()) == "can not find a format named 'DUMMY', did you mean 'Dummy'?");
@@ -179,7 +179,7 @@ TEST_CASE("Format names suggestions") {
 
     FormatFactory::get().add_format<DunnyFormat>();
     try {
-        FormatFactory::get().name("Dully");
+        FormatFactory::get().by_name("Dully");
         CHECK(false);
     } catch (const FormatError& e) {
         CHECK(std::string(e.what()) == "can not find a format named 'Dully', did you mean 'Dummy' or 'Dunny'?");

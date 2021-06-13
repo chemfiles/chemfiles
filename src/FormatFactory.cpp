@@ -124,7 +124,7 @@ void FormatFactory::register_format(const FormatMetadata& metadata, format_creat
     );
 }
 
-format_creator_t FormatFactory::name(const std::string& name) {
+const RegisteredFormat& FormatFactory::by_name(const std::string& name) {
     auto guard = formats_.lock();
     auto& formats = *guard;
 
@@ -133,23 +133,10 @@ format_creator_t FormatFactory::name(const std::string& name) {
         auto suggestions = suggest_names(formats, name);
         throw FormatError(suggestions);
     }
-    return formats.at(idx).creator;
+    return formats.at(idx);
 }
 
-memory_stream_t FormatFactory::memory_stream(const std::string& name) {
-    auto guard = formats_.lock();
-    auto& formats = *guard;
-
-    auto idx = find_by_name(formats, name);
-    if (idx == SENTINEL_INDEX) {
-        auto suggestions = suggest_names(formats, name);
-        throw FormatError(suggestions);
-    }
-
-    return formats.at(idx).memory_stream_creator;
-}
-
-format_creator_t FormatFactory::extension(const std::string& extension) {
+const RegisteredFormat& FormatFactory::by_extension(const std::string& extension) {
     auto guard = formats_.lock();
     auto& formats = *guard;
 
@@ -159,7 +146,7 @@ format_creator_t FormatFactory::extension(const std::string& extension) {
             "can not find a format associated with the '{}' extension", extension
         );
     }
-    return formats.at(idx).creator;
+    return formats.at(idx);
 }
 
 std::vector<std::reference_wrapper<const FormatMetadata>> FormatFactory::formats() {
