@@ -24,25 +24,24 @@ class CHFL_EXPORT Trajectory final {
 public:
     /// Open a file, automatically gessing the file format from the extension.
     ///
-    /// The `format` parameter should be a string formatted as `"<format>"`,
-    /// `"<format>/<compression>"` or `"/<compression>"`. `<format>` should be
-    /// the format name (see the corresponding [documentation section][formats]
-    /// for the names) or an empty string. `<compression>` should be `GZ` for
-    /// gzip files, `BZ2` for bzip2 files, or `XZ` for lzma/.xz files. If
-    /// `<compression>` is present, it will determine which compression method
-    /// is used to read/write the file.
+    /// The `format` parameter should be a string formatted as `"<format>"` or
+    /// `"<format>/<compression>"`. `<format>` should be the format name (see
+    /// the corresponding [documentation section][formats] for the names) or an
+    /// empty string. `<compression>` should be `GZ` for gzip files, `BZ2` for
+    /// bzip2 files, or `XZ` for lzma/.xz files. If `<compression>` is present,
+    /// it will determine which compression method is used to read/write the
+    /// file.
     ///
     /// For example, `format = "XYZ"` will force usage of XYZ format regardless
     /// of the file extension; `format = "XYZ / GZ"` will additionally use gzip
-    /// compression; and ` format = "/ GZ"` will use the gzip compression, and
-    /// the file extension to guess the format.
+    /// compression.
     ///
-    /// If the `format` is an empty string, the file extension will be used
-    /// to guess the format. If `<compression>` is NOT present and the file path
-    /// ends with `.gz`, `.xz`, or `.bz2`; the file will be treated as a
-    /// compressed file and the next extension is used to guess the format. For
-    /// example `Trajectory("file.xyz.gz")` will open the file for reading
-    /// using the XYZ format and the gzip compression method.
+    /// If the `format` is an empty string, the file extension will be used to
+    /// guess the format. If the file path ends with `.gz`, `.xz`, or `.bz2`;
+    /// the file will be treated as a compressed file and the next extension is
+    /// used to guess the format. For example `Trajectory("file.xyz.gz")` will
+    /// open the file for reading using the XYZ format and the gzip compression
+    /// method.
     ///
     /// @example{trajectory/trajectory.cpp}
     ///

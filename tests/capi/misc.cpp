@@ -42,6 +42,23 @@ TEST_CASE("Version") {
     CHECK(chfl_version() == version);
 }
 
+TEST_CASE("Guess format") {
+    char format[256] = {0};
+    CHECK_STATUS(chfl_guess_format("filename.nc", format, sizeof(format)));
+    CHECK(format == std::string("Amber NetCDF"));
+
+    CHECK_STATUS(chfl_guess_format("filename.xyz.gz", format, sizeof(format)));
+    CHECK(format == std::string("XYZ / GZ"));
+
+    // buffer too small for the format
+    chfl_status status = chfl_guess_format("filename.nc", format, 8);
+    CHECK(status == CHFL_MEMORY_ERROR);
+
+    // no associated format
+    status = chfl_guess_format("filename.not-there", format, 8);
+    CHECK(status == CHFL_FORMAT_ERROR);
+}
+
 // Global variables for access from callback and main
 static char* buffer = nullptr;
 
