@@ -51,6 +51,26 @@ void CHFL_EXPORT add_configuration(const std::string& path);
 /// @example{formats_list.cpp}
 std::vector<std::reference_wrapper<const FormatMetadata>> CHFL_EXPORT formats_list();
 
+/// Get the format that chemfiles would use to read a file at the given path.
+///
+/// The format is only guessed from the filename extension, chemfiles does not
+/// currently read the file to guess the format. Opening the file using the
+/// returned format string might still fail. For example, it will fail if the
+/// file is not actually formatted according to the guessed format; or the
+/// format/compression combination is not supported (e.g. `XTC / GZ` will not
+/// work since the XTC reader does not support compressed files).
+///
+/// The format is represented in a way compatible with the various `Trajectory`
+/// constructors, i.e. `"<format name> [/ <compression>]"`, where compression is
+/// optional.
+///
+/// @param path path of the file we are trying to read
+/// @return guessed format of the file
+/// @throw FormatError if no format matching this filename is found.
+///
+/// @example{guess_format.cpp}
+std::string CHFL_EXPORT guess_format(std::string path);
+
 } // namespace chemfiles
 
 #endif
