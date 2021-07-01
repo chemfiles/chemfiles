@@ -19,6 +19,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changes in supported formats
 
+- Added read and write support for Amber Restart (.ncrst) files.
+
 ### Changes to the C API
 
 ## 0.10.0 (14 Feb 2021)

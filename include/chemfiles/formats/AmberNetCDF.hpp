@@ -21,10 +21,16 @@ class FormatMetadata;
 
 template <class T> class span;
 
+enum AmberFormat {
+    AMBER_NC_RESTART,     ///< AMBER Restart
+    AMBER_NC_TRAJECTORY,  ///< AMBER NetCDF Trajectory
+};
+
 /// Amber NetCDF file format reader.
-class AmberNetCDFFormat final: public Format {
+template <AmberFormat F>
+class Amber final: public Format {
 public:
-    AmberNetCDFFormat(std::string path, File::Mode mode, File::Compression compression);
+    Amber(std::string path, File::Mode mode, File::Compression compression);
 
     void read_step(size_t step, Frame& frame) override;
     void read(Frame& frame) override;
@@ -32,6 +38,10 @@ public:
 
     size_t nsteps() override;
 private:
+    /// Generate the range of indices [start, stop] for a 3D vector at the current step.
+    std::array<std::vector<size_t>, 2> vec3d_range();
+    /// Generate the range of indices [start, stop] for multiple 3D vectors at the current step.
+    std::array<std::vector<size_t>, 2> vec3d_n_range(size_t n);
     /// Read the unit cell at the current internal step, the file is assumed to
     /// be valid.
     UnitCell read_cell();
@@ -53,7 +63,11 @@ private:
     bool validated_;
 };
 
-template<> const FormatMetadata& format_metadata<AmberNetCDFFormat>();
+template<> size_t Amber<AMBER_NC_RESTART>::nsteps();
+template<> size_t Amber<AMBER_NC_TRAJECTORY>::nsteps();
+
+template<> const FormatMetadata& format_metadata<Amber<AMBER_NC_RESTART>>();
+template<> const FormatMetadata& format_metadata<Amber<AMBER_NC_TRAJECTORY>>();
 
 } // namespace chemfiles
 
