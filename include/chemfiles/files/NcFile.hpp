@@ -134,6 +134,8 @@ public:
         return file_id_;
     }
 
+    /// Check if a global string attribut exists
+    bool global_attribute_exists(const std::string& name) const;
     /// Get a global string attribute from the file
     std::string global_attribute(const std::string& name) const;
     /// Create a global attribute in the file_
