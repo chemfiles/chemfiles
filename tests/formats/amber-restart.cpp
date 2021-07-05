@@ -12,6 +12,7 @@ TEST_CASE("Read files in Amber Restart format") {
         CHECK(file.nsteps() == 1);
         auto frame = file.read();
         CHECK(frame.size() == 297);
+        CHECK(frame.get("name").value() == "Cpptraj Generated Restart");
 
         // Check cell
         auto cell = frame.cell();
@@ -29,6 +30,7 @@ TEST_CASE("Read files in Amber Restart format") {
         // Check `read_step`
         auto frame = file.read_step(0);
         CHECK(frame.size() == 1989);
+        CHECK(frame.get("name").value() == "Cpptraj Generated Restart");
         CHECK(frame.cell() == UnitCell());
     }
 
@@ -36,6 +38,7 @@ TEST_CASE("Read files in Amber Restart format") {
         auto file = Trajectory("data/netcdf/scaled_traj.ncrst");
         auto frame = file.read();
         CHECK(frame.size() == 1938);
+        CHECK(frame.get("name").value() == "Cpptraj Generated Restart");
 
         // Check cell
         auto cell = frame.cell();
@@ -60,6 +63,7 @@ TEST_CASE("Write files in Amber Restart format") {
 
     auto file = Trajectory(tmpfile, 'w');
     Frame frame;
+    frame.set("name", "Test Title 123");
     frame.resize(4);
     auto positions = frame.positions();
     frame.add_velocities();
@@ -76,6 +80,7 @@ TEST_CASE("Write files in Amber Restart format") {
 
     Trajectory check(tmpfile, 'r');
     frame = check.read();
+    CHECK(frame.get("name").value() == "Test Title 123");
 
     positions = frame.positions();
     CHECK(approx_eq(positions[0], Vector3D(1, 2, 3), 1e-4));

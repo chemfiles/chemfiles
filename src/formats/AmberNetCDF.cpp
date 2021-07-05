@@ -117,6 +117,10 @@ void Amber<F>::read_step(const size_t step, Frame& frame) {
 
     frame.set_cell(read_cell());
 
+    if (file_.global_attribute_exists("title")) {
+        frame.set("name", file_.global_attribute("title"));
+    }
+
     frame.resize(file_.dimension("atom"));
     read_array(frame.positions(), "coordinates");
     if (file_.variable_exists("velocities")) {
@@ -268,13 +272,17 @@ void init_frame<AMBER_NC_TRAJECTORY>(NcFile& file, bool with_velocities) {
 
 // Initialize a file, assuming that it is empty
 template<AmberFormat F>
-void initialize(NcFile& file, size_t natoms, bool with_velocities) {
+void initialize(NcFile& file, size_t natoms, bool with_velocities, optional<const std::string&> name) {
     file.set_nc_mode(NcFile::DEFINE);
 
     file.add_global_attribute("Conventions", FormatSpec<F>::convention);
     file.add_global_attribute("ConventionVersion", "1.0");
     file.add_global_attribute("program", "Chemfiles");
     file.add_global_attribute("programVersion", CHEMFILES_VERSION);
+
+    if (name) {
+        file.add_global_attribute("title", name.value());
+    }
 
     file.add_dimension("spatial", 3);
     file.add_dimension("atom", natoms);
@@ -302,7 +310,8 @@ void Amber<F>::write(const Frame& frame) {
     auto natoms = frame.size();
     // If we created the file, let's initialize it.
     if (!validated_) {
-        initialize<F>(file_, natoms, bool(frame.velocities()));
+        auto name = frame.get<Property::STRING>("name");
+        initialize<F>(file_, natoms, bool(frame.velocities()), name);
         assert(is_valid<F>(file_, natoms));
         validated_ = true;
     }
