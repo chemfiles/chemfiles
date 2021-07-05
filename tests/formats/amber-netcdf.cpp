@@ -11,6 +11,7 @@ TEST_CASE("Read files in NetCDF format") {
         auto file = Trajectory("data/netcdf/water.nc");
         auto frame = file.read();
         CHECK(frame.size() == 297);
+        CHECK_FALSE(frame.get("name"));
         // Check positions
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.4172191, 8.303366, 11.73717), 1e-4));
@@ -23,6 +24,7 @@ TEST_CASE("Read files in NetCDF format") {
         frame = file.read();
         frame = file.read();
         CHECK(frame.size() == 297);
+        CHECK_FALSE(frame.get("name"));
 
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.2990952, 8.31003, 11.72146), 1e-4));
@@ -40,6 +42,7 @@ TEST_CASE("Read files in NetCDF format") {
         auto file = Trajectory("data/netcdf/no-cell.nc");
         auto frame = file.read();
         CHECK(frame.size() == 1989);
+        CHECK(frame.get("name").value() == "Cpptraj Generated trajectory");
         CHECK(frame.cell() == UnitCell());
     }
 
@@ -48,6 +51,7 @@ TEST_CASE("Read files in NetCDF format") {
         CHECK(file.nsteps() == 26);
         auto frame = file.read_step(12);
         CHECK(frame.size() == 1938);
+        CHECK_FALSE(frame.get("name"));
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
@@ -68,6 +72,7 @@ TEST_CASE("Write files in NetCDF format") {
 
     auto file = Trajectory(tmpfile, 'w');
     Frame frame;
+    frame.set("name", "Test Title 123");
     frame.resize(4);
     auto positions = frame.positions();
     for(size_t i=0; i<4; i++) {
@@ -79,6 +84,7 @@ TEST_CASE("Write files in NetCDF format") {
 
     Trajectory check(tmpfile, 'r');
     frame = check.read();
+    CHECK(frame.get("name").value() == "Test Title 123");
     positions = frame.positions();
     CHECK(approx_eq(positions[0], {1, 2, 3}, 1e-4));
     CHECK(approx_eq(positions[1], {1, 2, 3}, 1e-4));
