@@ -193,6 +193,12 @@ NcFile::NcMode NcFile::nc_mode() const {
     return nc_mode_;
 }
 
+bool NcFile::global_attribute_exists(const std::string& name) const {
+    size_t size = 0;
+    auto status = nc_inq_attlen(file_id_, NC_GLOBAL, name.c_str(), &size);
+    return status == NC_NOERR;
+}
+
 std::string NcFile::global_attribute(const std::string& name) const {
     size_t size = 0;
     auto status = nc_inq_attlen(file_id_, NC_GLOBAL, name.c_str(), &size);
