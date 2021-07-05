@@ -1,6 +1,8 @@
 [name]
 type = "string"
 
+"Amber NetCDF" = "The global attribute ``title`` is used as the frame **name** when reading."
+"Amber Restart" = "The global attribute ``title`` is used as the frame **name** when reading."
 CML = "The text in the ``name`` node of a molecule. Only set if the node is present."
 PDB = "The text described by the ``TITLE`` record is used as the frame **name** when reading."
 GRO = "The first line of a GRO file is used as the frame **name** when reading."
