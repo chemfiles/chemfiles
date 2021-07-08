@@ -140,17 +140,12 @@ TEST_CASE("Read files in mmCIF format") {
         CHECK(frame.size() == 1402);
     }
 
-    SECTION("Read a COD file") {
-        auto file = Trajectory("data/cif/1544173.cif", 'r', "mmCIF");
+    SECTION("1AKE") {
+        auto file = Trajectory("data/cif/1ake.cif.gz", 'r', "mmCIF / GZ");
         REQUIRE(file.nsteps() == 1);
 
         auto frame = file.read();
-        CHECK(frame.size() == 50);
-
-        auto positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D( -0.428, 5.427, 11.536), 1e-3));
-        CHECK(approx_eq(positions[1], Vector3D( -0.846, 4.873, 12.011), 1e-3));
-        CHECK(approx_eq(positions[10],Vector3D(  2.507, 4.442, 8.863), 1e-3));
+        CHECK(frame.size() == 3816);
     }
 }
 
