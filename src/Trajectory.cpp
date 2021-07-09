@@ -30,52 +30,6 @@ using namespace chemfiles;
 
 #define SENTINEL_VALUE (static_cast<size_t>(-1))
 
-std::string chemfiles::guess_format(std::string path) {
-    std::string extension;
-    std::string compression;
-
-    auto dot1 = path.rfind('.');
-    if (dot1 != std::string::npos) {
-        extension = path.substr(dot1);
-        bool new_extension = false;
-        // check file extension for compressed file extension
-        if (extension == ".gz") {
-            new_extension = true;
-            compression = "GZ";
-        } else if (extension == ".bz2") {
-            new_extension = true;
-            compression = "BZ2";
-        } else if (extension == ".xz") {
-            new_extension = true;
-            compression = "XZ";
-        }
-
-        if (new_extension) {
-            extension = "";
-            auto dot2 = path.substr(0, dot1).rfind('.');
-            if (dot2 != std::string::npos) {
-                extension = path.substr(0, dot1).substr(dot2);
-            }
-        }
-    }
-
-    if (extension.empty()) {
-        throw file_error(
-            "file at '{}' does not have an extension, provide a format name to read it",
-            path
-        );
-    }
-
-    auto registered_format = FormatFactory::get().by_extension(extension);
-    auto format = std::string(registered_format.metadata.name);
-
-    if (!compression.empty()) {
-        format += " / " + compression;
-    }
-
-    return format;
-}
-
 struct file_open_info {
     static file_open_info parse(const std::string& path, std::string format);
     std::string format = "";
