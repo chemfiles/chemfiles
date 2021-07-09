@@ -11,9 +11,7 @@ using namespace chemfiles;
 
 TEST_CASE("Read files in mmCIF format") {
     SECTION("Read single step") {
-        // This is how I imagine most people will resolve the conflict between
-        // CIF files and mmCIF files.
-        auto file = Trajectory("data/cif/4hhb.cif", 'r', "mmCIF");
+        auto file = Trajectory("data/cif/4hhb.cif");
         Frame frame = file.read();
 
         // If comparing to the RCSB-PDB file,
@@ -88,12 +86,12 @@ TEST_CASE("Read files in mmCIF format") {
     }
 
     SECTION("Check nsteps") {
-        auto file = Trajectory("data/cif/1j8k.cif", 'r', "mmCIF");
+        auto file = Trajectory("data/cif/1j8k.cif");
         CHECK(file.nsteps() == 20);
     }
 
     SECTION("Read next step") {
-        auto file = Trajectory("data/cif/1j8k.cif", 'r', "mmCIF");
+        auto file = Trajectory("data/cif/1j8k.cif");
         auto frame = file.read();
         CHECK(frame.size() == 1402);
 
@@ -105,7 +103,7 @@ TEST_CASE("Read files in mmCIF format") {
     }
 
     SECTION("Read a specific step") {
-        auto file = Trajectory("data/cif/1j8k.cif", 'r', "mmCIF");
+        auto file = Trajectory("data/cif/1j8k.cif");
 
         auto frame = file.read_step(13);
         CHECK(frame.size() == 1402);
@@ -123,7 +121,7 @@ TEST_CASE("Read files in mmCIF format") {
     }
 
     SECTION("Read the entire file") {
-        auto file = Trajectory("data/cif/1j8k.cif", 'r', "mmCIF");
+        auto file = Trajectory("data/cif/1j8k.cif");
         auto frame = file.read();
 
         CHECK(frame.get("name")->as_string() ==
@@ -141,7 +139,7 @@ TEST_CASE("Read files in mmCIF format") {
     }
 
     SECTION("1AKE") {
-        auto file = Trajectory("data/cif/1ake.cif.gz", 'r', "mmCIF / GZ");
+        auto file = Trajectory("data/cif/1ake.cif.gz");
         REQUIRE(file.nsteps() == 1);
 
         auto frame = file.read();

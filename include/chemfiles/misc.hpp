@@ -46,11 +46,12 @@ std::vector<std::reference_wrapper<const FormatMetadata>> CHFL_EXPORT formats_li
 /// optional.
 ///
 /// @param path path of the file we are trying to read
+/// @param mode the opening mode of the file, can be 'r', 'a' or 'w'
 /// @return guessed format of the file
 /// @throw FormatError if no format matching this filename is found.
 ///
 /// @example{guess_format.cpp}
-std::string CHFL_EXPORT guess_format(std::string path);
+std::string CHFL_EXPORT guess_format(std::string path, char mode = 'r');
 
 } // namespace chemfiles
 
