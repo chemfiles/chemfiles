@@ -48,9 +48,6 @@ private:
     std::map<std::string, size_t> atom_site_map_;
     /// Map of residues, indexed by residue id and chainid.
     std::map<std::pair<std::string, int64_t>, Residue> residues_;
-    /// Set to true if the file is based on fractional coordinates.
-    /// Set to false if the file is based on cartesian coordinates.
-    bool uses_fract_;
     /// Storing the positions of all the steps in the file, so that we can
     /// just `seekpos` them instead of reading the whole step.
     std::vector<uint64_t> steps_positions_;
@@ -62,6 +59,7 @@ private:
     size_t atoms_;
     /// Frame properties need to be stored
     std::string name_;
+    /// The PDB icode, if any
     std::string pdb_idcode_;
 };
 

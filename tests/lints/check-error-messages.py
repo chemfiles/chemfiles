@@ -17,6 +17,8 @@ ERRORS = 0
 # are allowed
 ALLOWED = [
     "found deprecated configuration file at '{}', please rename it to .chemfiles.toml",
+    "could not find _atom_site.type_symbol in '{}'",
+    "could not find _atom_site.Cartn_x in '{}'",
 ]
 
 
@@ -73,7 +75,7 @@ def check_message(path, line, message):
 
 def check_file(path):
     with codecs.open(path, encoding="utf8") as fd:
-        lines = [l for l in fd]
+        lines = list(fd)
 
     for (i, line) in enumerate(lines):
         # ignore comments

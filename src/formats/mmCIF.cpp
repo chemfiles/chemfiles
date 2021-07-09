@@ -122,16 +122,15 @@ void mmCIFFormat::init_() {
                     trimmed.substr(1, trimmed.size() - 2).to_string() : "";
         }
 
-        if (in_loop && line_split[0].find("_atom_site") != std::string::npos) {
+        if (in_loop && line_split[0].find("_atom_site.") != std::string::npos) {
             auto atom_label = line_split[0].substr(11).to_string();
-            to_ascii_lowercase(atom_label);
             atom_site_map_[atom_label] = current_index++;
             break;
         }
     }
 
     if (current_index == 0) {
-        throw format_error("no atom sites found in mmCIF file");
+        throw format_error("could not find _atom_site loop in '{}'", file_.path());
     }
 
     cell_ = UnitCell(lengths, angles);
@@ -142,7 +141,6 @@ void mmCIFFormat::init_() {
     do {
         if (line.find("_atom_site") != std::string::npos) {
             auto atom_label = trim(line).substr(11).to_string();
-            to_ascii_lowercase(atom_label);
             atom_site_map_[atom_label] = current_index++;
 
             position = file_.tellpos();
@@ -159,22 +157,14 @@ void mmCIFFormat::init_() {
     steps_positions_.push_back(position);
 
     if (atom_site_map_.find("type_symbol") == atom_site_map_.end()) {
-        throw format_error("CIF files does not define type symbol");
+        throw format_error("could not find _atom_site.type_symbol in '{}'", file_.path());
     }
 
-    // Attempt to guess how coordinates are stored
-    auto cartn_x = atom_site_map_.find("cartn_x");
-    auto fract_x = atom_site_map_.find("fract_x");
-    if (cartn_x != atom_site_map_.end()) {
-        uses_fract_ = false;
-    } else if (fract_x != atom_site_map_.end()) {
-        uses_fract_ = true;
-    } else {
-        throw format_error("CIF file does not define coordinates");
+    if (atom_site_map_.find("Cartn_x") == atom_site_map_.end()) {
+        throw format_error("could not find _atom_site.Cartn_x in '{}'", file_.path());
     }
 
-
-    auto model_position = atom_site_map_.find("pdbx_pdb_model_num");
+    auto model_position = atom_site_map_.find("pdbx_PDB_model_num");
     // Do we have a special extension for multiple modes?
     if (model_position == atom_site_map_.end()) {
         // If not, we are done
@@ -232,7 +222,7 @@ void mmCIFFormat::read(Frame& frame) {
     // and stored with optional. I don't know which solution is better.
 
     // These are required for atoms
-    auto type_symbol = atom_site_map_.find("type_symbol");
+    auto type_symbol = atom_site_map_.at("type_symbol");
 
     // This has two names...
     auto label_atom_id = atom_site_map_.find("label_atom_id");
@@ -241,19 +231,14 @@ void mmCIFFormat::read(Frame& frame) {
     }
 
     // Other atom properties
-    auto group_pdb = atom_site_map_.find("group_pdb");
+    auto group_pdb = atom_site_map_.find("group_PDB");
     auto label_alt_id = atom_site_map_.find("label_alt_id");
     auto formal_charge = atom_site_map_.find("formal_charge");
 
     // Positions
-    auto cartn_x = atom_site_map_.find("cartn_x");
-    auto cartn_y = atom_site_map_.find("cartn_y");
-    auto cartn_z = atom_site_map_.find("cartn_z");
-
-    // Positions used by COD and CCSD
-    auto fract_x = atom_site_map_.find("fract_x");
-    auto fract_y = atom_site_map_.find("fract_y");
-    auto fract_z = atom_site_map_.find("fract_z");
+    auto cartn_x = atom_site_map_.at("Cartn_x");
+    auto cartn_y = atom_site_map_.at("Cartn_y");
+    auto cartn_z = atom_site_map_.at("Cartn_z");
 
     // Residue properties
     auto label_comp_id = atom_site_map_.find("label_comp_id");
@@ -262,7 +247,7 @@ void mmCIFFormat::read(Frame& frame) {
     auto label_seq_id = atom_site_map_.find("label_seq_id");
     auto label_entity_id = atom_site_map_.find("label_entity_id");
 
-    auto model_position = atom_site_map_.find("pdbx_pdb_model_num");
+    auto model_position = atom_site_map_.find("pdbx_PDB_model_num");
 
     auto position = file_.tellpos();
 
@@ -297,8 +282,10 @@ void mmCIFFormat::read(Frame& frame) {
             break;
         }
 
-        Atom atom(line_split[label_atom_id->second].to_string(),
-                  line_split[type_symbol->second].to_string());
+        Atom atom(
+            line_split[label_atom_id->second].to_string(),
+            line_split[type_symbol].to_string()
+        );
 
         if (label_alt_id != atom_site_map_.end() &&
             line_split[label_alt_id->second] != ".") {
@@ -309,20 +296,10 @@ void mmCIFFormat::read(Frame& frame) {
             atom.set_charge(cif_to_double(line_split[formal_charge->second].to_string()));
         }
 
-        if (!uses_fract_) {
-            auto x = cif_to_double(line_split[cartn_x->second].to_string());
-            auto y = cif_to_double(line_split[cartn_y->second].to_string());
-            auto z = cif_to_double(line_split[cartn_z->second].to_string());
-
-            frame.add_atom(std::move(atom), Vector3D(x, y, z));
-        } else {
-            auto u = cif_to_double(line_split[fract_x->second].to_string());
-            auto v = cif_to_double(line_split[fract_y->second].to_string());
-            auto w = cif_to_double(line_split[fract_z->second].to_string());
-
-            auto vector = cell_.matrix() * Vector3D(u, v, w);
-            frame.add_atom(std::move(atom), vector);
-        }
+        auto x = cif_to_double(line_split[cartn_x].to_string());
+        auto y = cif_to_double(line_split[cartn_y].to_string());
+        auto z = cif_to_double(line_split[cartn_z].to_string());
+        frame.add_atom(std::move(atom), Vector3D(x, y, z));
 
         position = file_.tellpos();
 

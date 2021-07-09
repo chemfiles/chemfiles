@@ -50,14 +50,14 @@ TEST_CASE("Read files in CIF format") {
         CHECK(frame[0].get("occupancy")->as_double() == 1.0);
         CHECK(frame[0].get("atomic_number")->as_double() == 6);
         CHECK(approx_eq(frame.positions()[0], Vector3D(0.124, 14.561, 4.200), 1e-3));
-        
+
         frame = file.read();
         CHECK(approx_eq(frame.cell().lengths(), {20.561233, 20.561233, 20.561233}, 1e-6));
         CHECK(frame[0].name() == "C1");
         CHECK(frame[0].get("occupancy")->as_double() == 1.0);
         CHECK(frame[0].get("atomic_number")->as_double() == 6);
         CHECK(approx_eq(frame.positions()[0], Vector3D(0.159, 4.170, 14.451), 1e-3));
-        
+
         frame = file.read();
         CHECK(approx_eq(frame.cell().lengths(), {20.415146, 20.415146, 20.415146}, 1e-6));
         CHECK(frame[0].name() == "C1");
@@ -77,7 +77,7 @@ TEST_CASE("Read files in CIF format") {
         CHECK(frame[0].get("occupancy")->as_double() == 1.0);
         CHECK(frame[0].get("atomic_number")->as_double() == 6);
         CHECK(approx_eq(frame.positions()[0], Vector3D(0.159, 4.170, 14.451), 1e-3));
-        
+
         frame = file.read_step(0);
         CHECK(approx_eq(frame.cell().lengths(), {20.721205, 20.721205, 20.721205}, 1e-6));
         CHECK(frame[0].name() == "C1");
@@ -85,7 +85,7 @@ TEST_CASE("Read files in CIF format") {
         CHECK(frame[0].get("occupancy")->as_double() == 1.0);
         CHECK(frame[0].get("atomic_number")->as_double() == 6);
         CHECK(approx_eq(frame.positions()[0], Vector3D(0.124, 14.561, 4.200), 1e-3));
-        
+
         frame = file.read_step(2);
         CHECK(approx_eq(frame.cell().lengths(), {20.415146, 20.415146, 20.415146}, 1e-6));
         CHECK(frame[0].name() == "C1");
@@ -93,6 +93,18 @@ TEST_CASE("Read files in CIF format") {
         CHECK(frame[0].get("occupancy")->as_double() == 1.0);
         CHECK(frame[0].get("atomic_number")->as_double() == 6);
         CHECK(approx_eq(frame.positions()[0], Vector3D(0.220, 4.142, 14.350), 1e-3));
+    }
+
+    SECTION("Read a COD file") {
+        auto file = Trajectory("data/cif/1544173.cif");
+        REQUIRE(file.nsteps() == 1);
+
+        auto frame = file.read();
+        CHECK(frame.size() == 100);
+
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(-0.428, 5.427, 11.536), 1e-3));
+        CHECK(approx_eq(positions[20],Vector3D(2.507, 4.442, 8.863), 1e-3));
     }
 }
 
