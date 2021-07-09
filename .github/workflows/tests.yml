@@ -215,7 +215,7 @@ jobs:
       - name: run tests
         run: |
           cd build
-          ctest --build-config ${{ matrix.build-type }} --parallel 2
+          ctest --output-on-failure --build-config ${{ matrix.build-type }} --parallel 2
       - name: check the list of exported symbols
         if: matrix.check-exported-symbols
         run: ./scripts/ci/check-exported-symbols.py build/libchemfiles.so
