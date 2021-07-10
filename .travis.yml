@@ -95,15 +95,15 @@ matrix:
     #   osx_image: xcode9.4
     - name: MSVC 64-bit
       os: windows
-      env: CMAKE_GENERATOR="Visual Studio 14 2015 Win64"
+      env: CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
       filter_secrets: false
     - name: MSVC 64-bit static
       os: windows
-      env: CMAKE_GENERATOR="Visual Studio 14 2015 Win64" STATIC_LIBS=ON
+      env: CMAKE_GENERATOR="Visual Studio 15 2017 Win64" STATIC_LIBS=ON
       filter_secrets: false
     - name: MSVC 32-bit
       os: windows
-      env: CMAKE_GENERATOR="Visual Studio 14 2015"
+      env: CMAKE_GENERATOR="Visual Studio 15 2017"
       filter_secrets: false
     - name: MinGW
       os: windows
