@@ -1,8 +1,8 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#ifndef CHEMFILES_FORMAT_LAMMPS_ATOM_HPP
-#define CHEMFILES_FORMAT_LAMMPS_ATOM_HPP
+#ifndef CHEMFILES_FORMAT_LAMMPS_TRAJECTORY_HPP
+#define CHEMFILES_FORMAT_LAMMPS_TRAJECTORY_HPP
 
 #include <array>
 #include <cstdint>
@@ -21,12 +21,12 @@ class MemoryBuffer;
 class FormatMetadata;
 
 /// LAMMPS Atom file format reader and writer.
-class LAMMPSAtomFormat final : public TextFormat {
+class LAMMPSTrajectoryFormat final : public TextFormat {
   public:
-    LAMMPSAtomFormat(std::string path, File::Mode mode, File::Compression compression)
+    LAMMPSTrajectoryFormat(std::string path, File::Mode mode, File::Compression compression)
         : TextFormat(std::move(path), mode, compression) {}
 
-    LAMMPSAtomFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode,
+    LAMMPSTrajectoryFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode,
                      File::Compression compression)
         : TextFormat(std::move(memory), mode, compression) {}
 
@@ -41,7 +41,7 @@ class LAMMPSAtomFormat final : public TextFormat {
     std::unordered_map<std::string, size_t> type_list_;
 };
 
-template <> const FormatMetadata& format_metadata<LAMMPSAtomFormat>();
+template <> const FormatMetadata& format_metadata<LAMMPSTrajectoryFormat>();
 
 } // namespace chemfiles
 
