@@ -22,11 +22,11 @@
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/UnitCell.hpp"
 
-#include "chemfiles/formats/LAMMPSAtom.hpp"
+#include "chemfiles/formats/LAMMPSTrajectory.hpp"
 
 using namespace chemfiles;
 
-template <> const FormatMetadata& chemfiles::format_metadata<LAMMPSAtomFormat>() {
+template <> const FormatMetadata& chemfiles::format_metadata<LAMMPSTrajectoryFormat>() {
     static FormatMetadata metadata;
     metadata.name = "LAMMPS";
     metadata.extension = ".lammpstrj";
@@ -56,7 +56,7 @@ static optional<string_view> get_item(string_view line) {
     return trim(splitted[1]);
 }
 
-std::array<double, 3> LAMMPSAtomFormat::read_cell(Frame& frame) {
+std::array<double, 3> LAMMPSTrajectoryFormat::read_cell(Frame& frame) {
     auto line = file_.readline();
     auto item = get_item(line);
     try {
@@ -300,7 +300,7 @@ static void unwrap(Vector3D& position, std::array<int, 3>& image, Matrix3D& matr
     position[2] += image[2] * matrix[2][2];
 }
 
-void LAMMPSAtomFormat::read_next(Frame& frame) {
+void LAMMPSTrajectoryFormat::read_next(Frame& frame) {
     auto item = get_item(file_.readline());
     if (!item) {
         throw format_error("can not read next step as LAMMPS format: expected an ITEM entry");
@@ -551,7 +551,7 @@ static optional<size_t> parse_lammps_type(const std::string& type_str) {
     return nullopt;
 }
 
-void LAMMPSAtomFormat::write_next(const Frame& frame) {
+void LAMMPSTrajectoryFormat::write_next(const Frame& frame) {
     // use angstrom and femtosecond as default
     file_.print("ITEM: UNITS\n{:s}\n",
                 frame.get<Property::STRING>("lammps_units").value_or("real"));
@@ -641,7 +641,7 @@ void LAMMPSAtomFormat::write_next(const Frame& frame) {
     }
 }
 
-optional<uint64_t> LAMMPSAtomFormat::forward() {
+optional<uint64_t> LAMMPSTrajectoryFormat::forward() {
     auto position = file_.tellpos();
     size_t natoms = 0;
     try {
