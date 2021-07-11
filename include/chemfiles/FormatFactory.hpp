@@ -41,24 +41,17 @@ public:
     /// Get the instance of the `FormatFactory`
     static FormatFactory& get();
 
-    /// Get a `format_creator_t` from a format name.
+    /// Get a `RegisteredFormat` from a format name.
     ///
     /// @param name the format name
     /// @throws FormatError if the format can not be found
-    format_creator_t name(const std::string& name);
+    const RegisteredFormat& by_name(const std::string& name);
 
-    /// Get a `memory_stream_t` from a format name.
-    ///
-    /// @param name the format name
-    /// @throws FormatError if the format can not be found or does not support
-    ///                     reading / writing from memory
-    memory_stream_t memory_stream(const std::string& name);
-
-    /// Get a `format_creator_t` from a format extention.
+    /// Get a `RegisteredFormat` from a format extention.
     ///
     /// @param extension the format extention
     /// @throws FormatError if the format can not be found
-    format_creator_t extension(const std::string& extension);
+    const RegisteredFormat& by_extension(const std::string& extension);
 
     /// Register a given `Format` in the factory if it supports memory IO
     ///

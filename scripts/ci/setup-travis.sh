@@ -85,8 +85,6 @@ if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     export CMAKE_ARGS="$CMAKE_ARGS -DCHFL_BUILD_DOCTESTS=OFF"
 
     if [[ "$CMAKE_GENERATOR" == "Visual Studio"* ]]; then
-        choco install -y vcbuildtools
-        export PATH=$PATH:"/c/Program Files (x86)/Microsoft Visual Studio/2015/BuildTools/MSBuild/14.0/Bin"
         export BUILD_ARGS="-verbosity:minimal -m:2"
     fi
 

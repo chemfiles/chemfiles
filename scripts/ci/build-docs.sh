@@ -6,16 +6,10 @@ set -xe
 cd $TRAVIS_BUILD_DIR
 python3.6 -m pip install --user --upgrade -r doc/requirements.txt
 
-DOXYGEN_VER=1.8.20
-DOXYGEN_URL="https://linuxbrew.bintray.com/bottles/doxygen-${DOXYGEN_VER}.x86_64_linux.bottle.tar.gz"
-wget -O - "${DOXYGEN_URL}" | tar xz -C /tmp doxygen/${DOXYGEN_VER}/bin/doxygen
-
-# Explicitly use /lib64/ld-linux-x86-64.so.2 because bash do not do it
-# by itself and fails with "No such file or directory" error. The doxygen
-# binary requires @@HOMEBREW_PREFIX@@/lib/ld.so, which does not exists since we
-# are not using a full linuxbrew installation
-sudo patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 /tmp/doxygen/${DOXYGEN_VER}/bin/doxygen
-export PATH=/tmp/doxygen/${DOXYGEN_VER}/bin:$PATH
+mkdir -p /tmp/doxygen-1.8.20-for-travis/bin
+wget http://luthaf.fr/chemfiles/doxygen-1.8.20-for-travis/doxygen -O /tmp/doxygen-1.8.20-for-travis/bin/doxygen
+chmod +x /tmp/doxygen-1.8.20-for-travis/bin/doxygen
+export PATH=/tmp/doxygen-1.8.20-for-travis/bin:$PATH
 echo $(doxygen --version)
 
 # Build new documentation

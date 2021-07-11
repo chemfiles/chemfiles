@@ -17,6 +17,8 @@ Basic types
 Format list and Metadata
 ------------------------
 
+.. doxygenfunction:: chemfiles::guess_format
+
 .. doxygenfunction:: chemfiles::formats_list
 
 .. doxygenclass:: chemfiles::FormatMetadata

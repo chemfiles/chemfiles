@@ -36,6 +36,7 @@ def functions_in_outline():
     MISC_FUNCTIONS = [
         "chfl_last_error", "chfl_clear_errors", "chfl_version",
         "chfl_formats_list",
+        "chfl_guess_format",
     ]
     DOCS = os.path.join(ROOT, "doc", "src", "capi")
     functions = MISC_FUNCTIONS

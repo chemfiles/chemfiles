@@ -703,7 +703,7 @@ size_t DataTypes::improper_type_id(size_t type_i, size_t type_j, size_t type_k, 
 
 void LAMMPSDataFormat::write_next(const Frame& frame) {
     if (file_.tellpos() != 0) {
-        throw format_error("LAMMPS Data format only supports writting one frame");
+        throw format_error("LAMMPS Data format only supports writing one frame");
     }
 
     auto types = DataTypes(frame.topology());
