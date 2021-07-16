@@ -8,7 +8,7 @@ Interface for formats
 
 .. doxygenclass:: chemfiles::Format
     :members:
-    
+
 .. doxygenclass:: chemfiles::TextFormat
     :members:
 
@@ -19,7 +19,9 @@ These classes implement the format interface defined previously.
 
 .. binary/non text based formats
 
-.. doxygenclass:: chemfiles::AmberNetCDFFormat
+.. doxygenclass:: chemfiles::Amber
+
+.. doxygenenum:: chemfiles::AmberFormat
 
 .. doxygenclass:: chemfiles::TNGFormat
 
