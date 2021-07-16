@@ -381,8 +381,10 @@ void LAMMPSTrajectoryFormat::read_next(Frame& frame) {
         auto line = file_.readline();
         auto splitted = split(line, ' ');
         if (splitted.size() != fields.size()) {
-            throw format_error("LAMMPS line has wrong number of fields: expected {} got {}",
-                               fields.size(), splitted.size());
+            throw format_error(
+                "LAMMPS atom line has wrong number of fields: expected {} got {}",
+                fields.size(), splitted.size()
+            );
         }
 
         size_t atomid = i;
@@ -543,8 +545,9 @@ static optional<size_t> parse_lammps_type(const std::string& type_str) {
         return nullopt;
     try {
         int type = parse<int>(type_str);
-        if (type > 0)
+        if (type > 0) {
             return static_cast<size_t>(type);
+        }
     } catch (const Error&) {
         // parsing errors indicate invalid types
     }
@@ -644,42 +647,69 @@ void LAMMPSTrajectoryFormat::write_next(const Frame& frame) {
 optional<uint64_t> LAMMPSTrajectoryFormat::forward() {
     auto position = file_.tellpos();
     size_t natoms = 0;
+
+    auto line = file_.readline();
+    if (trim(line).empty() || file_.eof()) {
+        // no more data to read, so give up here
+        return nullopt;
+    }
+    auto item = get_item(line);
+    while (!file_.eof() && (!item || *item != "NUMBER OF ATOMS")) {
+        line = file_.readline();
+        item = get_item(line);
+    }
+    if (!item || *item != "NUMBER OF ATOMS") {
+        throw format_error(
+            "could not find 'ITEM: NUMBER OF ATOMS' in LAMMPS trajectory"
+        );
+    }
+
     try {
-        auto line = file_.readline();
-        if (line.empty() && file_.eof()) {
-            // no more data to read, so give up here
-            return nullopt;
-        }
-        auto item = get_item(line);
-        while (!file_.eof() && (!item || *item != "NUMBER OF ATOMS")) {
-            line = file_.readline();
-            item = get_item(line);
-        }
-        if (!item || *item != "NUMBER OF ATOMS") {
-            throw format_error("could not find the number of atoms header in LAMMPS format");
-        }
-        natoms = parse<size_t>(trim(file_.readline()));
-        // read the box
-        for (size_t i = 0; i < 4; ++i) {
-            file_.readline();
-            if (file_.eof()) {
-                throw format_error("could not read box data in LAMMPS format");
-            }
-        }
-        file_.readline();
+        line = file_.readline();
+        natoms = parse<size_t>(trim(line));
+    } catch (const Error&) {
+        throw format_error(
+            "could not parse the number of atoms in '{}' for LAMMPS trajectory",
+            line
+        );
+    }
+
+    // read the box
+    for (size_t i = 0; i < 4; ++i) {
+        line = file_.readline();
         if (file_.eof()) {
-            throw format_error("could not read atom header in LAMMPS format");
+            throw format_error(
+                "could not read box data in LAMMPS trajectory: not enough lines in the file"
+            );
         }
 
-        for (size_t i = 0; i < natoms; ++i) {
-            file_.readline();
-            if (file_.eof()) {
-                throw format_error("could not read enough atoms in LAMMPS format");
+        if (i == 0) {
+            item = get_item(line);
+            if (!item || item->substr(0, 10) != "BOX BOUNDS") {
+                throw format_error(
+                    "expected 'ITEM: BOX BOUNDS' after the number of atoms in "
+                    "LAMMPS trajectory, got '{}'", line
+                );
             }
         }
-    } catch (const Error& e) {
-        throw format_error("not enough lines in '{}' for LAMMPS format: {}", file_.path(),
-                           e.what());
+    }
+
+    line = file_.readline();
+    item = get_item(line);
+    if (!item || item->substr(0, 5) != "ATOMS") {
+        throw format_error(
+            "could not read atom header for LAMMPS trajectory in this line: '{}'",
+            line
+        );
+    }
+
+    for (size_t i = 0; i < natoms; ++i) {
+        file_.readline();
+        if (file_.eof()) {
+            throw format_error(
+                "this file does not contain enough lines in ATOMS section for LAMMPS trajectory"
+            );
+        }
     }
 
     return position;

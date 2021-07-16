@@ -298,3 +298,15 @@ TEST_CASE("Read and write files in memory") {
         CHECK(approx_eq(positions[678], Vector3D(27.57, 32.25, 37.53), 1e-2));
     }
 }
+
+
+TEST_CASE("Buggy files") {
+    CHECK_THROWS_WITH(
+        Trajectory("data/gro/truncated.gro"),
+        "not enough lines in 'data/gro/truncated.gro' for GRO format"
+    );
+
+    // just a missing final newline is alright
+    auto file = Trajectory("data/gro/no-final-line.gro");
+    CHECK(file.nsteps() == 1);
+}
