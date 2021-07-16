@@ -128,7 +128,9 @@ jobs:
             os: windows-2019
             cc: cl.exe
             cxx: cl.exe
-            build-type: Debug
+            # The compiler completely fills up the disk when building all tests
+            # in debug mode, so use release
+            build-type: Release
             cmake-extra-args:
               - -G "Visual Studio 16 2019" -A x64
           - name: windows / MSVC 64-bit / static library
