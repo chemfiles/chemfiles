@@ -22,8 +22,8 @@ class FormatMetadata;
 template <class T> class span;
 
 enum AmberFormat {
-    AMBER_NC_RESTART,     ///< AMBER Restart
-    AMBER_NC_TRAJECTORY,  ///< AMBER NetCDF Trajectory
+    AMBER_NC_RESTART,     ///< AMBER NetCDF restart format
+    AMBER_NC_TRAJECTORY,  ///< AMBER NetCDF trajectory format
 };
 
 /// Amber NetCDF file format reader.
@@ -62,9 +62,6 @@ private:
     /// Was the associated file validated?
     bool validated_;
 };
-
-template<> size_t Amber<AMBER_NC_RESTART>::nsteps();
-template<> size_t Amber<AMBER_NC_TRAJECTORY>::nsteps();
 
 template<> const FormatMetadata& format_metadata<Amber<AMBER_NC_RESTART>>();
 template<> const FormatMetadata& format_metadata<Amber<AMBER_NC_TRAJECTORY>>();

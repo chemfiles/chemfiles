@@ -96,16 +96,6 @@ Amber<F>::Amber(std::string path, File::Mode mode, File::Compression compression
     }
 }
 
-template <>
-size_t Amber<AMBER_NC_RESTART>::nsteps() {
-    return 1;
-}
-
-template <>
-size_t Amber<AMBER_NC_TRAJECTORY>::nsteps() {
-    return file_.dimension("frame");
-}
-
 template <AmberFormat F>
 void Amber<F>::read_step(const size_t step, Frame& frame) {
     // Set the internal step_ before further reading
@@ -154,6 +144,16 @@ namespace chemfiles {
     template <>
     std::array<std::vector<size_t>, 2> Amber<AMBER_NC_TRAJECTORY>::vec3d_n_range(size_t n) {
         return {std::vector<size_t>({step_, 0, 0}), std::vector<size_t>({1, n, 3})};
+    }
+
+    template <>
+    size_t Amber<AMBER_NC_RESTART>::nsteps() {
+        return 1;
+    }
+
+    template <>
+    size_t Amber<AMBER_NC_TRAJECTORY>::nsteps() {
+        return file_.dimension("frame");
     }
 }
 
