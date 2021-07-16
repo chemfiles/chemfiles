@@ -163,37 +163,78 @@ TEST_CASE("Read files in LAMMPS Atom format") {
     }
 
     SECTION("Errors") {
-        auto file = Trajectory("data/lammps/broken.lammpstrj");
-        std::string msg = "can not read box header in LAMMPS format: expected an ITEM entry in "
-                          "LAMMPS format, got 'DUMMY'";
-        CHECK_THROWS_WITH(file.read_step(0), msg);
-        msg =
-            "can not read box header in LAMMPS format: missing 'BOX BOUNDS' item in LAMMPS format";
-        CHECK_THROWS_WITH(file.read_step(1), msg);
-        msg = "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS "
-              "format, expected 2 but got 1";
-        CHECK_THROWS_WITH(file.read_step(2), msg);
-        CHECK_THROWS_WITH(file.read_step(3), msg);
-        CHECK_THROWS_WITH(file.read_step(4), msg);
-        msg = "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS "
-              "format, expected 3 but got 2";
-        CHECK_THROWS_WITH(file.read_step(5), msg);
-        CHECK_THROWS_WITH(file.read_step(6), msg);
-        CHECK_THROWS_WITH(file.read_step(7), msg);
-        msg = "can not read next step as LAMMPS format: expected an ITEM entry";
-        CHECK_THROWS_WITH(file.read_step(8), msg);
-        CHECK_THROWS_WITH(file.read_step(9), msg);
-        CHECK_THROWS_WITH(file.read_step(10), msg);
-        CHECK_THROWS_WITH(file.read_step(12), msg);
-        msg = "can not read next step as LAMMPS format: expected 'TIMESTEP' got 'DUMMY'";
-        CHECK_THROWS_WITH(file.read_step(11), msg);
-        msg = "can not read next step as LAMMPS format: expected 'ATOMS' got 'DUMMY'";
-        CHECK_THROWS_WITH(file.read_step(13), msg);
-        msg = "LAMMPS line has wrong number of fields: expected 5 got 6";
-        CHECK_THROWS_WITH(file.read_step(14), msg);
-        msg = "found atoms with the same ID in LAMMPS format: 2 is already present";
-        CHECK_THROWS_WITH(file.read_step(15), msg);
-        CHECK_THROWS_AS(file.read_step(16), FileError);
+        // ITEM: TIMESTEP issues
+        auto file = Trajectory("data/lammps/bad/timestep-no-item.lammpstrj");
+        CHECK_THROWS_WITH(file.read(), "can not read next step as LAMMPS format: expected an ITEM entry");
+
+        file = Trajectory("data/lammps/bad/timestep-item-name.lammpstrj");
+        CHECK_THROWS_WITH(file.read(), "can not read next step as LAMMPS format: expected 'TIMESTEP' got 'DUMMY'");
+
+        // ITEM: BOX BOUNDS issues
+        CHECK_THROWS_WITH(
+            Trajectory("data/lammps/bad/box-not-item.lammpstrj"),
+            "expected 'ITEM: BOX BOUNDS' after the number of atoms in LAMMPS trajectory, got 'DUMMY'"
+        );
+        CHECK_THROWS_WITH(
+            Trajectory("data/lammps/bad/box-item-name.lammpstrj"),
+            "expected 'ITEM: BOX BOUNDS' after the number of atoms in LAMMPS trajectory, got 'ITEM: DUMMY'"
+        );
+
+        file = Trajectory("data/lammps/bad/box-not-numbers.lammpstrj");
+        CHECK_THROWS_WITH(
+            file.read_step(0),
+            "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 2 but got 1"
+        );
+        CHECK_THROWS_WITH(
+            file.read_step(1),
+            "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 2 but got 1"
+        );
+        CHECK_THROWS_WITH(
+            file.read_step(2),
+            "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 2 but got 1"
+        );
+
+        file = Trajectory("data/lammps/bad/box-wrong-size.lammpstrj");
+        CHECK_THROWS_WITH(
+            file.read_step(0),
+            "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 3 but got 2"
+        );
+        CHECK_THROWS_WITH(
+            file.read_step(1),
+            "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 3 but got 2"
+        );
+        CHECK_THROWS_WITH(
+            file.read_step(2),
+            "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 3 but got 2"
+        );
+
+        // ITEM: ATOMS issues
+        CHECK_THROWS_WITH(
+            Trajectory("data/lammps/bad/atom-no-item.lammpstrj"),
+            "could not read atom header for LAMMPS trajectory in this line: 'DUMMY'"
+        );
+
+        CHECK_THROWS_WITH(
+            Trajectory("data/lammps/bad/atom-item-name.lammpstrj"),
+            "could not read atom header for LAMMPS trajectory in this line: 'ITEM: DUMMY'"
+        );
+
+        file = Trajectory("data/lammps/bad/atom-too-many-fields.lammpstrj");
+        CHECK_THROWS_WITH(
+            file.read(),
+            "LAMMPS atom line has wrong number of fields: expected 5 got 6"
+        );
+
+        file = Trajectory("data/lammps/bad/atom-duplicated-id.lammpstrj");
+        CHECK_THROWS_WITH(
+            file.read(),
+            "found atoms with the same ID in LAMMPS format: 2 is already present"
+        );
+
+        CHECK_THROWS_WITH(
+            Trajectory("data/lammps/bad/items-after-atoms.lammpstrj"),
+            "could not find 'ITEM: NUMBER OF ATOMS' in LAMMPS trajectory"
+        );
     }
 }
 
