@@ -61,14 +61,17 @@ static void check_values_size(const Vector3D& values, unsigned width, const std:
 void GROFormat::read_next(Frame& frame) {
     residues_.clear();
 
+    // GRO comment line is used as frame name
+    auto name = trim(file_.readline());
+    if (!name.empty()) {
+        frame.set("name", name.to_string());
+    }
+
     size_t natoms = 0;
     try {
-        // GRO comment line is used as frame name
-        auto line = file_.readline();
-        frame.set("name", trim(line).to_string());
         natoms = parse<size_t>(file_.readline());
     } catch (const Error& e) {
-        throw format_error("can not read next step as GRO: {}", e.what());
+        throw format_error("can not read number of atoms in GRO file: {}", e.what());
     }
 
     frame.add_velocities();
@@ -77,9 +80,7 @@ void GROFormat::read_next(Frame& frame) {
     for (size_t i=0; i<natoms; i++) {
         auto line = file_.readline();
         if (line.length() < 44) {
-            throw format_error(
-                "GRO Atom line is too small: '{}'", line
-            );
+            throw format_error("GRO Atom line is too small: '{}'", line);
         }
 
         optional<int64_t> resid = nullopt;
@@ -87,6 +88,7 @@ void GROFormat::read_next(Frame& frame) {
             resid = parse<int64_t>(line.substr(0, 5));
         } catch (const Error&) {
             // Invalid residue, we'll skip it
+            warning("GRO Reader", "skiping invalid residue with resid '{}'", line.substr(0, 5));
         }
 
         auto resname = trim(line.substr(5, 5)).to_string();
@@ -277,28 +279,33 @@ void check_values_size(const Vector3D& values, unsigned width, const std::string
 
 optional<uint64_t> GROFormat::forward() {
     auto position = file_.tellpos();
-    size_t natoms = 0;
-    try {
-        // Skip the comment line
-        file_.readline();
-        natoms = parse<size_t>(file_.readline());
-    } catch (const FileError&) {
-        // No more line left in the file
-        return nullopt;
-    } catch (const Error&) {
-        // We could not read an integer, so give up here
+    size_t n_atoms = 0;
+
+    // Skip the comment line
+    file_.readline();
+
+    if (file_.eof()) {
         return nullopt;
     }
 
+    auto line = file_.readline();
     try {
-        for (size_t i=0; i<natoms+1; i++) {
-            file_.readline();
-        }
-    } catch (const FileError&) {
-        // We could not read the lines from the file
+        n_atoms = parse<size_t>(line);
+    } catch (const Error&) {
         throw format_error(
-            "not enough lines in '{}' for GRO format", file_.path()
+            "could not read the number of atoms for GRO format: the line is '{}'",
+            line
         );
     }
+
+    for (size_t i=0; i<n_atoms+1; i++) {
+        if (file_.eof()) {
+            throw format_error(
+                "not enough lines in '{}' for GRO format", file_.path()
+            );
+        }
+        file_.readline();
+    }
+
     return position;
 }

@@ -96,22 +96,17 @@ TEST_CASE("Read files in SDF format") {
 }
 
 TEST_CASE("Errors in SDF format") {
-    auto file = Trajectory("data/sdf/bad/bad_atom_line.sdf");
+    auto file = Trajectory("data/sdf/bad/bad-atom-line.sdf");
     CHECK_THROWS_WITH(file.read(), "atom line is too small for SDF: '    3.7320   -0.0600'");
 
     CHECK_THROWS_WITH(
-        Trajectory("data/sdf/bad/bad_counts_line.sdf"),
-        "could not parse counts line: ' 21aaa           '"
+        Trajectory("data/sdf/bad/count-line-not-numbers.sdf"),
+        "could not parse counts line in SDF file: ' 21aaa           '"
     );
 
     CHECK_THROWS_WITH(
-        Trajectory("data/sdf/bad/bad_counts_line2.sdf"),
-        "could not parse counts line: '  0  0'"
-    );
-
-    CHECK_THROWS_WITH(
-        Trajectory("data/sdf/bad/blank.sdf"),
-        "could not parse counts line: 'asdf'"
+        Trajectory("data/sdf/bad/count-line-too-short.sdf"),
+        "counts line must have at least 10 characters in SFD file, it has 6: '  0  0'"
     );
 }
 

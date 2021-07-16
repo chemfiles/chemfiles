@@ -76,17 +76,12 @@ template<> const FormatMetadata& chemfiles::format_metadata<XYZFormat>() {
 }
 
 void XYZFormat::read_next(Frame& frame) {
-    size_t natoms = 0;
-    try {
-        natoms = parse<size_t>(file_.readline());
-    } catch (const std::exception& e) {
-        throw format_error("can not read next step as XYZ: {}", e.what());
-    }
+    size_t n_atoms = parse<size_t>(file_.readline());
 
     auto properties = read_extended_comment_line(file_.readline(), frame);
 
-    frame.reserve(natoms);
-    for (size_t i=0; i<natoms; i++) {
+    frame.reserve(n_atoms);
+    for (size_t i=0; i<n_atoms; i++) {
         auto line = file_.readline();
         double x = 0, y = 0, z = 0;
         std::string name;
@@ -118,19 +113,28 @@ void XYZFormat::write_next(const Frame& frame) {
 
 optional<uint64_t> XYZFormat::forward() {
     auto position = file_.tellpos();
-    size_t natoms = 0;
-    try {
-        natoms = parse<size_t>(file_.readline());
-    } catch (const Error&) {
-        // We could not read an integer, so give up here
+
+    auto line = file_.readline();
+    if (trim(line).empty() || file_.eof()) {
+        // We just read an empty line, give up here
         return nullopt;
     }
 
-    for (size_t i=0; i<natoms + 1; i++) {
+    size_t n_atoms = 0;
+    try {
+        n_atoms = parse<size_t>(line);
+    } catch (const Error&) {
+        throw format_error(
+            "could not read the number of atoms for XYZ format: the line is '{}'",
+            line
+        );
+    }
+
+    for (size_t i=0; i<n_atoms + 1; i++) {
         if (file_.eof()) {
             throw format_error(
                 "XYZ format: not enough lines at step {} (expected {}, got {})",
-                current_forward_step_, natoms + 2, i + 1
+                current_forward_step_, n_atoms + 2, i + 1
             );
         }
 
