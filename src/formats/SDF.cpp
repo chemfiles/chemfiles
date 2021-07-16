@@ -50,30 +50,22 @@ template<> const FormatMetadata& chemfiles::format_metadata<SDFFormat>() {
 }
 
 void SDFFormat::read_next(Frame& frame) {
-    size_t natoms = 0;
-    size_t nbonds = 0;
-    try {
-        auto line = file_.readline();
+    auto line = trim(file_.readline());
+
+    if (!line.empty()) {
         frame.set("name", line.to_string());
-
-        file_.readline(); // Program line - skip it
-        file_.readline(); // Comment line - skip it
-
-        line = file_.readline();
-        natoms = parse<size_t>(line.substr(0, 3));
-        nbonds = parse<size_t>(line.substr(3, 3));
-    } catch (const std::exception& e) {
-        throw format_error("can not read next step as SDF: {}", e.what());
     }
+
+    file_.readline(); // Program line - skip it
+    file_.readline(); // Comment line - skip it
+
+    line = file_.readline();
+    auto natoms = parse<size_t>(line.substr(0, 3));
+    auto nbonds = parse<size_t>(line.substr(3, 3));
 
     frame.reserve(natoms);
     for (size_t i=0; i<natoms; i++) {
-        string_view line;
-        try {
-            line = file_.readline();
-        } catch (const FileError& e) {
-            throw format_error("can not read file: {}", e.what());
-        }
+        auto line = file_.readline();
 
         if (line.length() < 34) {
             throw format_error(
@@ -92,7 +84,7 @@ void SDFFormat::read_next(Frame& frame) {
             try {
                 charge_code = parse<long long>(line.substr(36, 3));
             } catch (const Error&) {
-                warning("SDF reader", "charge code not numeric: {}", line.substr(36, 3));
+                warning("SDF reader", "charge code is not numeric: {}", line.substr(36, 3));
             }
             switch(charge_code) {
             case 0:
@@ -124,61 +116,48 @@ void SDFFormat::read_next(Frame& frame) {
     }
 
     for (size_t i=0; i<nbonds; i++) {
-        string_view line;
-        try {
-            line = file_.readline();
-        } catch (const FileError& e) {
-            throw format_error("can not read file: {}", e.what());
-        }
-
-        auto atom1 = parse<size_t>(line.substr(0, 3));
-        auto atom2 = parse<size_t>(line.substr(3, 3));
+        auto line = file_.readline();
+        auto atom_1 = parse<size_t>(line.substr(0, 3));
+        auto atom_2 = parse<size_t>(line.substr(3, 3));
         auto order = parse<size_t>(line.substr(6, 3));
 
-        Bond::BondOrder bo;
-
+        Bond::BondOrder bond_order;
         switch (order) {
             case 1:
-                bo = Bond::SINGLE;
+                bond_order = Bond::SINGLE;
                 break;
             case 2:
-                bo = Bond::DOUBLE;
+                bond_order = Bond::DOUBLE;
                 break;
             case 3:
-                bo = Bond::TRIPLE;
+                bond_order = Bond::TRIPLE;
                 break;
             case 4:
-                bo = Bond::AROMATIC;
+                bond_order = Bond::AROMATIC;
                 break;
             case 8: // The 8 specifically means unspecified
             default:
-                bo = Bond::UNKNOWN;
+                bond_order = Bond::UNKNOWN;
                 break;
         }
 
-        frame.add_bond(atom1 - 1, atom2 - 1, bo);
+        frame.add_bond(atom_1 - 1, atom_2 - 1, bond_order);
     }
 
     // Parsing the file is more or less complete now, but atom properties can
     // still be read (until 'M  END' is reached).
     // This loop breaks when the property block ends or returns on an error
     while(!file_.eof()) {
-        try {
-            auto line = file_.readline();
-            if (line.empty()) {
-                continue;
-            } else if (line.substr(0, 4) == "$$$$") {
-                // Ending block, technically wrong - but we can exit safely
-                return;
-            } else if (line.substr(0, 6) == "M  END") {
-                // Proper end of block
-                break;
-            } // TODO: Add actual ATOM property parsing here.....
-        } catch (const FileError&) {
-            // Premature end of file, but we can safely end here
-            warning("SDF reader", "premature end of file while reading atom property");
+        auto line = file_.readline();
+        if (line.empty()) {
+            continue;
+        } else if (line.substr(0, 4) == "$$$$") {
+            // Ending block, technically wrong - but we can exit safely
             return;
-        }
+        } else if (line.substr(0, 6) == "M  END") {
+            // Proper end of block
+            break;
+        } // TODO: Add actual ATOM property parsing here.....
     }
 
     // This portion of the file is for molecule wide properties.
@@ -186,40 +165,34 @@ void SDFFormat::read_next(Frame& frame) {
     std::string property_name;
     std::string property_value;
     while(!file_.eof()) {
-        try {
-            auto line = file_.readline();
-            if (line.empty()) {
-                // This breaks a property group - so store now
-                if (property_name.empty()) {
-                    warning("SDF reader", "missing property name");
-                    continue;
-                }
-                frame.set(std::move(property_name), Property(std::move(property_value)));
-                // re-init after moving from property_name and property_value
-                property_name = "";
-                property_value = "";
-            } else if (line.substr(0, 4) == "$$$$") {
-                // Molecule ending block
-                return;
-            } else if (line.substr(0, 3) == "> <") {
-                // Get the property name
-                // It is formated like:
-                //> <NAMEGOESHERE>
-                const auto npos = line.find_last_of('>');
-                property_name = line.substr(3, npos - 3).to_string();
-
-                property_value = file_.readline().to_string();
-            } else {
-                // Continuation of a property value
-                property_value += '\n';
-                property_value += line.to_string();
+        auto line = file_.readline();
+        if (line.empty()) {
+            // This breaks a property group - so store now
+            if (property_name.empty()) {
+                warning("SDF reader", "missing property name");
+                continue;
             }
-        } catch (const FileError&) {
-            warning("SDF reader", "premature end of file while reading global property");
+            frame.set(std::move(property_name), Property(std::move(property_value)));
+            // re-init after moving from property_name and property_value
+            property_name = "";
+            property_value = "";
+        } else if (line.substr(0, 4) == "$$$$") {
+            // Molecule ending block
             return;
+        } else if (line.substr(0, 3) == "> <") {
+            // Get the property name
+            // It is formated like:
+            //> <NAMEGOESHERE>
+            const auto npos = line.find_last_of('>');
+            property_name = line.substr(3, npos - 3).to_string();
+
+            property_value = file_.readline().to_string();
+        } else {
+            // Continuation of a property value
+            property_value += '\n';
+            property_value += line.to_string();
         }
     }
-
 }
 
 void SDFFormat::write_next(const Frame& frame) {
@@ -337,43 +310,45 @@ void SDFFormat::write_next(const Frame& frame) {
 
 optional<uint64_t> SDFFormat::forward() {
     auto position = file_.tellpos();
-    size_t natoms = 0;
-    size_t nbonds = 0;
-    auto counts_line = string_view("");
-    try {
-        // Ignore junk lines
-        for (size_t i=0; i<3; i++) {
-            file_.readline();
-        }
 
-        if (file_.eof()) {
-            return nullopt;
-        }
-
-        counts_line = file_.readline();
-        if (counts_line.length() < 10) {
-            throw format_error("counts line must have at least 10 digits, it has {}", counts_line.length());
-        }
-
-        natoms = parse<size_t>(counts_line.substr(0,3));
-        nbonds = parse<size_t>(counts_line.substr(3,3));
-    } catch (const Error&) {
-        // We could not read an integer, so give up here
-        throw format_error("could not parse counts line: '{}'", counts_line);
+    // Ignore header lines: molecule name, metadata and general comment line
+    for (size_t i=0; i<3; i++) {
+        file_.readline();
     }
 
-    try {
-        for (size_t i=0; i<(natoms + nbonds); i++) {
-            file_.readline();
-        }
-    } catch (const FileError&) {
-        // We could not read the lines from the file
+    if (file_.eof()) {
+        return nullopt;
+    }
+
+    auto counts_line = file_.readline();
+    if (counts_line.length() < 10) {
         throw format_error(
-            "not enough lines in '{}' for SDF format", file_.path()
+            "counts line must have at least 10 characters in SFD file, it has {}: '{}'",
+            counts_line.length(), counts_line
         );
     }
 
-    // Search for ending character, updating the position in the file only
+    size_t natoms = 0;
+    size_t nbonds = 0;
+    try {
+        natoms = parse<size_t>(counts_line.substr(0, 3));
+        nbonds = parse<size_t>(counts_line.substr(3, 3));
+    } catch (const Error&) {
+        // We could not read an integer, so give up here
+        throw format_error("could not parse counts line in SDF file: '{}'", counts_line);
+    }
+
+    for (size_t i=0; i<(natoms + nbonds); i++) {
+        if (file_.eof()) {
+            throw format_error(
+                "not enough lines in '{}' for SDF format", file_.path()
+            );
+        }
+        file_.readline();
+    }
+
+    // Search for ending character, updating the cursor in the file for the next
+    // call to forward
     while (!file_.eof()) {
         if (file_.readline() == "$$$$") {
             break;

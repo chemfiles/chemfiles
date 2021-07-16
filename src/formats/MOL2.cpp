@@ -56,39 +56,39 @@ void MOL2Format::read_next(Frame& frame) {
     residues_.clear();
     auto line = file_.readline();
     if (trim(line) != "@<TRIPOS>MOLECULE") {
-        throw format_error("wrong starting line for a molecule in MOL2 formart: '{}'", line);
+        throw format_error("wrong starting line for a molecule in MOL2 format: '{}'", line);
+    }
+
+    auto name = trim(file_.readline());
+    if (!name.empty()) {
+        frame.set("name", name.to_string());
     }
 
     line = file_.readline();
-    frame.set("name", trim(line).to_string());
-    line = file_.readline();
+    auto counts = split(line, ' ');
 
-    const auto counts = split(line, ' ');
-
-    auto natoms = parse<size_t>(counts[0]);
-    size_t nbonds = 0;
-
+    auto n_atoms = parse<size_t>(counts[0]);
+    size_t n_bonds = 0;
     if (counts.size() >= 2) {
-        nbonds = parse<size_t>(counts[1]);
+        n_bonds = parse<size_t>(counts[1]);
     }
-
 
     file_.readline();
-    frame.reserve(natoms);
+    frame.reserve(n_atoms);
     // If charges are specified, we need to expect an addition term for each atom
     line = file_.readline();
     bool charges = (trim(line) != "NO_CHARGES");
 
     while (!file_.eof()) {
-        const auto& curr_pos = file_.tellpos();
+        auto curr_pos = file_.tellpos();
 
         line = file_.readline();
         auto trimmed = trim(line);
 
         if (trimmed == "@<TRIPOS>ATOM") {
-            read_atoms(frame, natoms, charges);
+            read_atoms(frame, n_atoms, charges);
         } else if (trimmed == "@<TRIPOS>BOND") {
-            read_bonds(frame, nbonds);
+            read_bonds(frame, n_bonds);
         } else if (trimmed == "@<TRIPOS>CRYSIN") {
             auto cryst = file_.readline();
 
@@ -105,7 +105,6 @@ void MOL2Format::read_next(Frame& frame) {
     for (auto& residue: residues_) {
         frame.add_residue(residue.second);
     }
-
 }
 
 void MOL2Format::read_atoms(Frame& frame, size_t natoms, bool charges) {
@@ -214,40 +213,57 @@ uint64_t read_until(TextFile& file, string_view tag) {
         }
     }
 
-    throw file_error("file ended before tag '{}' was found", tag);
+    throw format_error("MOL2 file ended before tag '{}' was found", tag);
 }
 
 optional<uint64_t> MOL2Format::forward() {
-    while (!file_.eof()) {
-        try {
-            auto position = read_until(file_, "@<TRIPOS>MOLECULE");
-            file_.readline();
-            auto line = file_.readline();
-
-            const auto counts = split(line, ' ');
-            auto natoms = parse<size_t>(counts[0]);
-            size_t nbonds = 0;
-            if (counts.size() >= 2) {
-                nbonds = parse<size_t>(counts[1]);
-            }
-
-            read_until(file_, "@<TRIPOS>ATOM");
-            for (size_t i=0; i<natoms; i++) {
-                file_.readline();
-            }
-
-            read_until(file_, "@<TRIPOS>BOND");
-            for (size_t i=0; i<nbonds; i++) {
-                file_.readline();
-            }
-
-            return position;
-        } catch (const Error&) {
-            return nullopt;
-        }
+    uint64_t position = 0;
+    try {
+        position = read_until(file_, "@<TRIPOS>MOLECULE");
+    } catch (const FormatError&) {
+        // could not find @<TRIPOS>MOLECULE, the previous step was the last
+        return nullopt;
     }
 
-    return nullopt;
+    file_.readline();
+    auto line = file_.readline();
+    auto counts = split(line, ' ');
+
+    size_t n_atoms = 0;
+    size_t n_bonds = 0;
+    try {
+        n_atoms = parse<size_t>(counts[0]);
+        if (counts.size() >= 2) {
+            n_bonds = parse<size_t>(counts[1]);
+        }
+    } catch (const Error&) {
+        throw format_error(
+            "could not read the number of atoms and bonds for MOL2 in line '{}'",
+            line
+        );
+    }
+
+    read_until(file_, "@<TRIPOS>ATOM");
+    for (size_t i=0; i<n_atoms; i++) {
+        if (file_.eof()) {
+            throw format_error(
+                "not enough lines for all atoms in '{}' using MOL2 format", file_.path()
+            );
+        }
+        file_.readline();
+    }
+
+    read_until(file_, "@<TRIPOS>BOND");
+    for (size_t i=0; i<n_bonds; i++) {
+        if (file_.eof()) {
+            throw format_error(
+                "not enough lines for all bonds in '{}' using MOL2 format", file_.path()
+            );
+        }
+        file_.readline();
+    }
+
+    return position;
 }
 
 void MOL2Format::write_next(const Frame& frame) {
