@@ -137,7 +137,7 @@ std::array<double, 3> LAMMPSTrajectoryFormat::read_cell(Frame& frame) {
 // posible per-atom attributes by dump command
 enum lammps_atom_attr_t {
     // other possible attributes that are not important for chemfiles
-    UNKNOWN,
+    CUSTOM,
     // atom ID
     ATOMID,
     // atom type
@@ -238,18 +238,23 @@ static lammps_atom_attr_t attribute_from_str(string_view attr_str) {
     } else if (attr_str == "q") {
         return CHARGE;
     } else {
-        return UNKNOWN;
+        return CUSTOM;
     }
 }
 
+struct AtomField {
+    std::string name;
+    lammps_atom_attr_t kind;
+};
+
 static lammps_position_representation_t
-detect_best_pos_representation(const std::vector<lammps_atom_attr_t>& fields) {
+detect_best_pos_representation(const std::vector<AtomField>& fields) {
     int wrapped_count = 0;
     int scaled_count = 0;
     int unwrapped_count = 0;
     int scaled_unwrapped_count = 0;
-    for (const auto& attr : fields) {
-        switch (attr) {
+    for (const auto& atom_field : fields) {
+        switch (atom_field.kind) {
         case POSX:
         case POSY:
         case POSZ:
@@ -352,7 +357,8 @@ void LAMMPSTrajectoryFormat::read_next(Frame& frame) {
         throw format_error("can not read next step as LAMMPS format: expected 'ATOMS' got '{}'",
                            *item);
     }
-    std::vector<lammps_atom_attr_t> fields;
+
+    std::vector<AtomField> fields;
     fields.reserve(splitted.size() - 1);
     optional<size_t> atomid_column = nullopt;
     std::vector<bool> duplicate_check;
@@ -369,7 +375,7 @@ void LAMMPSTrajectoryFormat::read_next(Frame& frame) {
         if (attr == IMGX || attr == IMGY || attr == IMGZ) {
             images = std::vector<std::array<int, 3>>(natoms, {0, 0, 0});
         }
-        fields.push_back(attr);
+        fields.push_back({splitted[i].to_string(), attr});
     }
     lammps_position_representation_t use_pos_repr = detect_best_pos_representation(fields);
 
@@ -404,7 +410,7 @@ void LAMMPSTrajectoryFormat::read_next(Frame& frame) {
 
         auto& atom = frame[atomid];
         for (size_t j = 0; j < fields.size(); ++j) {
-            switch (fields[j]) {
+            switch (fields[j].kind) {
             case TYPE:
                 atom.set_type(splitted[j].to_string());
                 break;
@@ -507,7 +513,15 @@ void LAMMPSTrajectoryFormat::read_next(Frame& frame) {
                 atom.set_charge(charge);
             } break;
             case ATOMID:
-            case UNKNOWN:
+                break;
+            case CUSTOM:
+                try {
+                    // LAMMPS should always write double values
+                    atom.set(fields[j].name, parse<double>(splitted[j]));
+                } catch (const Error&) {
+                    // use the string value as fallback
+                    atom.set(fields[j].name, splitted[j].to_string());
+                }
                 break;
             }
         }

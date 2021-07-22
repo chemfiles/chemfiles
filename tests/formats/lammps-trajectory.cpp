@@ -162,6 +162,44 @@ TEST_CASE("Read files in LAMMPS Atom format") {
         CHECK_THROWS_AS(file.read(), FileError);
     }
 
+    SECTION("Atom Properties") {
+        auto file = Trajectory("data/lammps/properties.lammpstrj");
+        CHECK(file.nsteps() == 4);
+
+        Frame frame = file.read();
+        CHECK(frame.size() == 4000);
+        CHECK(frame.step() == 0);
+        CHECK(!frame.velocities());
+        auto positions = frame.positions();
+
+        CHECK(approx_eq(positions[390], Vector3D(10.4004,12.4805, 0.693361), 1e-3));
+        CHECK(approx_eq(positions[789], Vector3D(10.4004,13.1739, 1.38672), 1e-3));
+
+        CHECK(approx_eq(frame[390].get("c_stress[6]")->as_double(), -1.38816, 1e-3));
+        CHECK(approx_eq(frame[390].get("v_sq_pos")->as_double(), 264.412, 1e-3));
+        CHECK(approx_eq(frame[390].get("i_flag")->as_double(), 1.0, 1e-12));
+        CHECK(approx_eq(frame[789].get("c_stress[1]")->as_double(), -59.7086, 1e-3));
+        CHECK(approx_eq(frame[789].get("v_sq_pos")->as_double(), 283.642, 1e-3));
+        CHECK(approx_eq(frame[789].get("i_flag")->as_double(), 0.0, 1e-12));
+
+        frame = file.read_step(3);
+        CHECK(frame.size() == 4000);
+        CHECK(frame.step() == 300);
+        CHECK(!frame.velocities());
+        positions = frame.positions();
+
+        CHECK(approx_eq(positions[2988], Vector3D(9.71147, 5.5884, 9.71147), 1e-3));
+        CHECK(approx_eq(positions[3905], Vector3D(9.01993, 10.4242, 12.4797), 1e-3));
+
+        CHECK(approx_eq(frame[2988].get("c_stress[5]")->as_double(), 12.9949, 1e-3));
+        CHECK(approx_eq(frame[2988].get("v_sq_pos")->as_double(), 219.855, 1e-3));
+        CHECK(approx_eq(frame[2988].get("i_flag")->as_double(), 1.0, 1e-12));
+        CHECK(approx_eq(frame[3905].get("c_stress[2]")->as_double(), -67.6015, 1e-3));
+        CHECK(approx_eq(frame[3905].get("v_sq_pos")->as_double(), 345.766, 1e-3));
+        CHECK(approx_eq(frame[3905].get("i_flag")->as_double(), 0.0, 1e-12));
+
+    }
+
     SECTION("Errors") {
         // ITEM: TIMESTEP issues
         auto file = Trajectory("data/lammps/bad/timestep-no-item.lammpstrj");
