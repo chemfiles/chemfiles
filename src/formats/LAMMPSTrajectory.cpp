@@ -517,7 +517,7 @@ void LAMMPSTrajectoryFormat::read_next(Frame& frame) {
                 try {
                     // LAMMPS should always write double values
                     atom.set(fields[j].name, parse<double>(splitted[j]));
-                } catch (const Error& e) {
+                } catch (const Error&) {
                     // use the string value as fallback
                     atom.set(fields[j].name, splitted[j].to_string());
                 }
