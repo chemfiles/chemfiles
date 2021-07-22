@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Remove support for configuration files (`chemfiles.toml`) and associated
   functions.
 
+## 0.10.1 (22 Jul 2021)
+
 ### New features
 
 - properties are now sorted, and iterating over properties will always yield
@@ -20,8 +22,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ### Changes in supported formats
 
 - Added read and write support for Amber Restart (.ncrst) files.
-
-### Changes to the C API
+- Added read and write support for LAMMPS Trajectory (.lammpstrj) files.
 
 ## 0.10.0 (14 Feb 2021)
 
