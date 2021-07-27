@@ -20,6 +20,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ### Changes in supported formats
 
 - Added read and write support for Amber Restart (.ncrst) files.
+- Added native read and write support for LAMMPS trajectory (.lammpstrj) files,
+  replacing the VMD molfile implementation.
 - Added read support for PSF files using VMD molfile plugin.
 
 ### Changes to the C API
