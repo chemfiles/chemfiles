@@ -200,8 +200,13 @@ void SDFFormat::write_next(const Frame& frame) {
     auto& positions = frame.positions();
     assert(frame.size() == topology.size());
 
-    // TODO: this can not be more than 80 characters
-    file_.print("{}\n", frame.get<Property::STRING>("name").value_or(""));
+    auto frame_name = frame.get<Property::STRING>("name").value_or("");
+    if (frame_name.size() > 80) {
+        warning("SDF writer", "the frame 'name' property is too long for the SDF format, we truncated it to 80 characters");
+        frame_name = frame_name.substr(0, 80);
+    }
+    file_.print("{}\n", frame_name);
+
     // TODO: this line can contain more data (file creation time and energy in particular)
     file_.print("\n");
     file_.print("created by chemfiles\n");
