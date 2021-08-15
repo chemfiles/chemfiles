@@ -65,7 +65,7 @@ void SDFFormat::read_next(Frame& frame) {
 
     frame.reserve(natoms);
     for (size_t i=0; i<natoms; i++) {
-        auto line = file_.readline();
+        line = file_.readline();
 
         if (line.length() < 34) {
             throw format_error(
@@ -116,7 +116,7 @@ void SDFFormat::read_next(Frame& frame) {
     }
 
     for (size_t i=0; i<nbonds; i++) {
-        auto line = file_.readline();
+        line = file_.readline();
         auto atom_1 = parse<size_t>(line.substr(0, 3));
         auto atom_2 = parse<size_t>(line.substr(3, 3));
         auto order = parse<size_t>(line.substr(6, 3));
@@ -148,7 +148,7 @@ void SDFFormat::read_next(Frame& frame) {
     // still be read (until 'M  END' is reached).
     // This loop breaks when the property block ends or returns on an error
     while(!file_.eof()) {
-        auto line = file_.readline();
+        line = file_.readline();
         if (line.empty()) {
             continue;
         } else if (line.substr(0, 4) == "$$$$") {
@@ -165,7 +165,7 @@ void SDFFormat::read_next(Frame& frame) {
     std::string property_name;
     std::string property_value;
     while(!file_.eof()) {
-        auto line = file_.readline();
+        line = file_.readline();
         if (line.empty()) {
             // This breaks a property group - so store now
             if (property_name.empty()) {
