@@ -113,9 +113,9 @@ TEST_CASE("Errors in SDF format") {
 TEST_CASE("Write files in SDF format") {
     auto tmpfile = NamedTempPath(".sdf");
     const auto expected_content =
-R"(NONAME
- chemfiles-lib
+R"(
 
+created by chemfiles
   4  3  0     0  0  0  0  0  0999 V2000
     1.0000    2.0000    3.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
     1.0000    2.0000    3.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
@@ -125,13 +125,13 @@ R"(NONAME
   2  3  2  0  0  0  0
   3  4  3  0  0  0  0
 M  END
-> <prop>
+> <string-property>
 prop1
 
 $$$$
 TEST
- chemfiles-lib
 
+created by chemfiles
  11  5  0     0  0  0  0  0  0999 V2000
     1.0000    2.0000    3.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
     1.0000    2.0000    3.0000 N   0  3  0  0  0  0  0  0  0  0  0  0
@@ -150,29 +150,53 @@ TEST
   9 10  8  0  0  0  0
  10 11  4  0  0  0  0
 M  END
-> <prop>
+> <float property>
 1.23
 
+> <string-property>
+prop1
+
 $$$$
 TEST
- chemfiles-lib
 
+created by chemfiles
   1  0  0     0  0  0  0  0  0999 V2000
     1.0000    2.0000    3.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <prop>
+> <bool property>
 false
 
+> <float property>
+1.23
+
+> <string-property>
+prop1
+
 $$$$
 TEST
- chemfiles-lib
 
+created by chemfiles
   1  0  0     0  0  0  0  0  0999 V2000
     1.0000    2.0000    3.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <prop>
+> <bool property>
+false
+
+> <float property>
+1.23
+
+> <string-property>
+prop1
+
+> <vector property>
 1.0 2.0 3.0
 
+$$$$
+abc dfe ghi jkl mno pqr stu vwx yz 123 456 789 ABC DFE GHI JKL MNO PQR STU VWX Y
+
+created by chemfiles
+  0  0  0     0  0  0  0  0  0999 V2000
+M  END
 $$$$
 )";
 
@@ -184,7 +208,7 @@ $$$$
     frame.add_bond(0, 2, Bond::SINGLE);
     frame.add_bond(1, 2, Bond::DOUBLE);
     frame.add_bond(2, 3, Bond::TRIPLE);
-    frame.set("prop", Property("prop1"));
+    frame.set("string-property", "prop1");
 
     auto file = Trajectory(tmpfile, 'w');
     file.write(frame);
@@ -209,18 +233,23 @@ $$$$
     frame.add_bond(9, 10, Bond::AROMATIC);
     frame.add_bond(8, 9, Bond::UNKNOWN);
 
-    frame.set("name", Property("TEST"));
-    frame.set("prop", Property(1.23));
+    frame.set("name", "TEST");
+    frame.set("float property", 1.23);
 
     file.write(frame);
 
     frame.clear_bonds();
     frame.resize(1);
 
-    frame.set("prop", Property(false));
+    frame.set("bool property", false);
     file.write(frame);
 
-    frame.set("prop", Property(Vector3D{1.0, 2.0, 3.0}));
+    frame.set("vector property", Vector3D{1.0, 2.0, 3.0});
+    file.write(frame);
+
+    // name is too long for SDF specification
+    frame = Frame();
+    frame.set("name", "abc dfe ghi jkl mno pqr stu vwx yz 123 456 789 ABC DFE GHI JKL MNO PQR STU VWX YZ 123 456 789");
     file.write(frame);
 
     file.close();
