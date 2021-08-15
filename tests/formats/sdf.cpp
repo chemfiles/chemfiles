@@ -192,6 +192,12 @@ prop1
 1.0 2.0 3.0
 
 $$$$
+abc dfe ghi jkl mno pqr stu vwx yz 123 456 789 ABC DFE GHI JKL MNO PQR STU VWX Y
+
+created by chemfiles
+  0  0  0     0  0  0  0  0  0999 V2000
+M  END
+$$$$
 )";
 
     auto frame = Frame();
@@ -227,18 +233,23 @@ $$$$
     frame.add_bond(9, 10, Bond::AROMATIC);
     frame.add_bond(8, 9, Bond::UNKNOWN);
 
-    frame.set("name", Property("TEST"));
-    frame.set("float property", Property(1.23));
+    frame.set("name", "TEST");
+    frame.set("float property", 1.23);
 
     file.write(frame);
 
     frame.clear_bonds();
     frame.resize(1);
 
-    frame.set("bool property", Property(false));
+    frame.set("bool property", false);
     file.write(frame);
 
-    frame.set("vector property", Property(Vector3D{1.0, 2.0, 3.0}));
+    frame.set("vector property", Vector3D{1.0, 2.0, 3.0});
+    file.write(frame);
+
+    // name is too long for SDF specification
+    frame = Frame();
+    frame.set("name", "abc dfe ghi jkl mno pqr stu vwx yz 123 456 789 ABC DFE GHI JKL MNO PQR STU VWX YZ 123 456 789");
     file.write(frame);
 
     file.close();
