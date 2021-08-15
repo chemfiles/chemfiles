@@ -213,17 +213,15 @@ void Amber<F>::read_array(span<Vector3D> array, const std::string& name) {
     auto range = vec3d_n_range(natoms);
     auto data = array_var.get(range[0], range[1]);
 
+    double scale_factor = 1.0;
     if (array_var.attribute_exists("scale_factor")) {
-        float scale_factor = array_var.float_attribute("scale_factor");
-        for (auto& value : data) {
-            value *= scale_factor;
-        }
+        scale_factor = static_cast<double>(array_var.float_attribute("scale_factor"));
     }
 
     for (size_t i = 0; i < natoms; i++) {
-        array[i][0] = static_cast<double>(data[3 * i + 0]);
-        array[i][1] = static_cast<double>(data[3 * i + 1]);
-        array[i][2] = static_cast<double>(data[3 * i + 2]);
+        array[i][0] = scale_factor * static_cast<double>(data[3 * i + 0]);
+        array[i][1] = scale_factor * static_cast<double>(data[3 * i + 1]);
+        array[i][2] = scale_factor * static_cast<double>(data[3 * i + 2]);
     }
 }
 

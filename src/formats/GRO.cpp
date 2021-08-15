@@ -62,9 +62,9 @@ void GROFormat::read_next(Frame& frame) {
     residues_.clear();
 
     // GRO comment line is used as frame name
-    auto name = trim(file_.readline());
-    if (!name.empty()) {
-        frame.set("name", name.to_string());
+    auto frame_name = trim(file_.readline());
+    if (!frame_name.empty()) {
+        frame.set("name", frame_name.to_string());
     }
 
     size_t natoms = 0;
