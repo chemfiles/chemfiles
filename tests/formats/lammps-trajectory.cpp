@@ -4,7 +4,6 @@
 #include "catch.hpp"
 #include "chemfiles.hpp"
 #include "helpers.hpp"
-#include <fstream>
 using namespace chemfiles;
 
 // {wrapped, scaled_wrapped, unwrapped, scaled_unwrapped}.lammpstrj
@@ -310,9 +309,7 @@ TEST_CASE("Write files in LAMMPS Atom format") {
         CHECK(frame.cell().shape() == UnitCell::INFINITE);
         check_traj.close();
 
-        std::ifstream checking(tmpfile);
-        std::string content((std::istreambuf_iterator<char>(checking)),
-                            std::istreambuf_iterator<char>());
+        auto content = read_text_file(tmpfile);
         CHECK(content == EXPECTED_CONTENT);
     }
 
@@ -396,9 +393,7 @@ TEST_CASE("Write files in LAMMPS Atom format") {
         CHECK(approx_eq(frame.cell().angles(), Vector3D(45.0, 120.0, 120.0), 1e-2));
         check_traj.close();
 
-        std::ifstream checking(tmpfile);
-        std::string content((std::istreambuf_iterator<char>(checking)),
-                            std::istreambuf_iterator<char>());
+        auto content = read_text_file(tmpfile);
         CHECK(content == EXPECTED_CONTENT);
     }
 }

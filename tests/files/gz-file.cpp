@@ -1,8 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <fstream>
-
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles/File.hpp"
@@ -79,15 +77,7 @@ TEST_CASE("Write a gz file") {
         CHECK(file.tellpos() == 10);
     }
 
-    std::ifstream checking(filename, std::ios::binary);
-    REQUIRE(checking.is_open());
-    checking.seekg(0, std::ios::end);
-    auto size = static_cast<size_t>(checking.tellg());
-    checking.seekg(0, std::ios::beg);
-
-    auto content = std::vector<uint8_t>(size);
-    checking.read(reinterpret_cast<char*>(content.data()), static_cast<std::streamsize>(size));
-
+    auto content = read_binary_file(filename);
     // Byte 9 identify the OS in gzip files.
     // Override it so we can check for the full file output
     content[9] = 0xff;
@@ -120,15 +110,7 @@ TEST_CASE("Append to a gz file") {
         file.print("{}\n", 6754);
     }
 
-    std::ifstream checking(filename, std::ios::binary);
-    REQUIRE(checking.is_open());
-    checking.seekg(0, std::ios::end);
-    auto size = static_cast<size_t>(checking.tellg());
-    checking.seekg(0, std::ios::beg);
-
-    auto content = std::vector<uint8_t>(size);
-    checking.read(reinterpret_cast<char*>(content.data()), static_cast<std::streamsize>(size));
-
+    auto content = read_binary_file(filename);
     // Byte 9 identify the OS in gzip files.
     // Override it so we can check for the full file output
     content[9] = 0xff;
