@@ -5,6 +5,8 @@
 #define CHEMFILES_TESTS_HELPERS_HPP
 
 #include <string>
+#include <vector>
+#include <cstdint>
 
 namespace chemfiles {
     class Vector3D;
@@ -40,6 +42,12 @@ private:
 
 /// copy the file at `src` to `dst`
 void copy_file(std::string src, std::string dst);
+
+/// get the content of the file at `path` as a vector of bytes
+std::vector<uint8_t> read_binary_file(std::string path);
+
+/// get the content of the file at `path` as a string
+std::string read_text_file(std::string path);
 
 // On Windows, disable the "Application error" dialog box, because it
 // requires an human intervention, and there is no one on Appveyor.

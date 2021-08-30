@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <thread>
+
 #include <catch.hpp>
 
 #include "helpers.hpp"
@@ -69,11 +70,7 @@ TEST_CASE("Associate a topology and a trajectory") {
         file.write(frame);
         file.close();
 
-        std::ifstream checking(tmpfile);
-        std::string content{
-            std::istreambuf_iterator<char>(checking),
-            std::istreambuf_iterator<char>()
-        };
+        auto content = read_text_file(tmpfile);
         CHECK(content == EXPECTED_CONTENT);
     }
 }
@@ -126,11 +123,7 @@ TEST_CASE("Associate an unit cell and a trajectory") {
             "ENDMDL\n"
             "END\n";
 
-            std::ifstream checking(tmpfile);
-            std::string content{
-                std::istreambuf_iterator<char>(checking),
-                std::istreambuf_iterator<char>()
-            };
+            auto content = read_text_file(tmpfile);
             CHECK(content == EXPECTED_CONTENT);
         }
 
@@ -154,11 +147,7 @@ TEST_CASE("Associate an unit cell and a trajectory") {
             file.write(frame);
             file.close();
 
-            std::ifstream checking(tmpfile);
-            std::string content{
-                std::istreambuf_iterator<char>(checking),
-                std::istreambuf_iterator<char>()
-            };
+            auto content = read_text_file(tmpfile);
             CHECK(content == EXPECTED_CONTENT);
         }
     }

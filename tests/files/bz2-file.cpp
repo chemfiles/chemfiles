@@ -1,8 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <fstream>
-
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles/File.hpp"
@@ -84,15 +82,7 @@ TEST_CASE("Write a bzip2 file") {
         CHECK(file.tellpos() == 10);
     }
 
-    std::ifstream checking(filename, std::ios::binary);
-    REQUIRE(checking.is_open());
-    checking.seekg(0, std::ios::end);
-    auto size = static_cast<size_t>(checking.tellg());
-    checking.seekg(0, std::ios::beg);
-
-    auto content = std::vector<uint8_t>(size);
-    checking.read(reinterpret_cast<char*>(content.data()), static_cast<std::streamsize>(size));
-
+    auto content = read_binary_file(filename);
     auto expected = std::vector<uint8_t> {
         'B', 'Z', 'h', 0x36, 0x31, 0x41, 0x59, 0x26, 0x53, 0x59, 0xde, 0x45, 0xac,
         0xea, 0x00, 0x00, 0x03, 0x4b, 0x80, 0x00, 0x10, 0x07, 0x80, 0x04, 0x00,

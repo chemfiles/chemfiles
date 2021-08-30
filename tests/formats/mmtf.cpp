@@ -1,7 +1,5 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-
-#include <fstream>
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
@@ -374,9 +372,7 @@ TEST_CASE("Write files in MMTF format") {
 
 TEST_CASE("Read memory in MMTF format") {
     SECTION("Plain MMTF Memory") {
-        std::ifstream checking("data/mmtf/1J8K.mmtf", std::ifstream::binary);
-        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
+        auto content = read_text_file("data/mmtf/1J8K.mmtf");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "MMTF");
         auto frame = file.read_step(13);
@@ -387,9 +383,7 @@ TEST_CASE("Read memory in MMTF format") {
     }
 
     SECTION("GZ MMTF Memory") {
-        std::ifstream checking("data/mmtf/1J8K.mmtf.gz", std::ifstream::binary);
-        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
+        auto content = read_text_file("data/mmtf/1J8K.mmtf.gz");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "MMTF/GZ");
         auto frame = file.read_step(13);
@@ -400,9 +394,7 @@ TEST_CASE("Read memory in MMTF format") {
     }
 
     SECTION("XZ MMTF Memory") {
-        std::ifstream checking("data/mmtf/1J8K.mmtf.xz", std::ifstream::binary);
-        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
+        auto content = read_text_file("data/mmtf/1J8K.mmtf.xz");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "MMTF/XZ");
         auto frame = file.read_step(13);

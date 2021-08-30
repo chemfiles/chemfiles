@@ -1,8 +1,5 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-
-#include <fstream>
-
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
@@ -61,7 +58,7 @@ TEST_CASE("Read files in CSSR format") {
 
 TEST_CASE("Write files in CSSR format") {
     auto tmpfile = NamedTempPath(".cssr");
-    const auto expected_content =
+    const auto EXPECTED_CONTENT =
 R"( REFERENCE STRUCTURE = 00000   A,B,C =  10.000  10.000  12.000
    ALPHA,BETA,GAMMA =  90.000  90.000  90.000    SPGR =  1 P1
    4   0
@@ -84,24 +81,23 @@ R"( REFERENCE STRUCTURE = 00000   A,B,C =  10.000  10.000  12.000
     frame.add_bond(1, 3);
 
     frame.set_cell(UnitCell({10, 10, 12}));
-    auto t = Trajectory(tmpfile, 'w');
-    t.write(frame);
+    auto trajectory = Trajectory(tmpfile, 'w');
+    trajectory.write(frame);
 
-    CHECK_THROWS_WITH(t.write(frame), "CSSR format only supports writing one frame");
+    CHECK_THROWS_WITH(
+        trajectory.write(frame),
+        "CSSR format only supports writing one frame"
+    );
 
-    t.close();
+    trajectory.close();
 
-    std::ifstream checking(tmpfile);
-    std::string content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
-    CHECK(content == expected_content);
+    auto content = read_text_file(tmpfile);
+    CHECK(content == EXPECTED_CONTENT);
 }
 
 TEST_CASE("Read and write files in memory") {
     SECTION("Reading from memory") {
-        std::ifstream checking("data/cssr/water.cssr");
-        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
-            std::istreambuf_iterator<char>());
+        auto content = read_text_file("data/cssr/water.cssr");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "CSSR");
         CHECK(file.nsteps() == 1);

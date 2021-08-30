@@ -1,10 +1,8 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
-#include <fstream>
 using namespace chemfiles;
 
 TEST_CASE("Read files in Gromacs .gro format") {
@@ -188,9 +186,7 @@ TEST_CASE("Write files in GRO format") {
     CHECK(check_gro.read().size() == 7);
     check_gro.close();
 
-    std::ifstream checking(tmpfile);
-    std::string content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
+    auto content = read_text_file(tmpfile);
     CHECK(content == EXPECTED_CONTENT);
 }
 
@@ -282,9 +278,7 @@ TEST_CASE("GRO files with big values") {
 
 TEST_CASE("Read and write files in memory") {
     SECTION("Reading from memory") {
-        std::ifstream checking("data/gro/ubiquitin.gro");
-        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
-            std::istreambuf_iterator<char>());
+        auto content = read_text_file("data/gro/ubiquitin.gro");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "GRO");
         CHECK(file.nsteps() == 1);

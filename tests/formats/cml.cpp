@@ -1,9 +1,5 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-
-#include <streambuf>
-#include <fstream>
-
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
@@ -182,18 +178,13 @@ TEST_CASE("Append CML file") {
     file.write(frame);
     file.close();
 
-    std::ifstream checking(tmpfile, std::ios::binary);
-    std::string content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
-
+    auto content = read_text_file(tmpfile);
     CHECK(EXPECTED_CONTENT == content);
 }
 
 TEST_CASE("Read and write files in memory") {
     SECTION("Reading from memory") {
-        std::ifstream checking("data/cml/drugs.cml");
-        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
-            std::istreambuf_iterator<char>());
+        auto content = read_text_file("data/cml/drugs.cml");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "CML");
         CHECK(file.nsteps() == 4);

@@ -1,8 +1,7 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-
-#include <fstream>
 #include <cstdlib>
+
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
@@ -524,9 +523,7 @@ TEST_CASE("Write files in PDB format") {
     CHECK(check_pdb.read().size() == 7);
     check_pdb.close();
 
-    std::ifstream checking(tmpfile);
-    std::string content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
+    auto content = read_text_file(tmpfile);
     CHECK(content == EXPECTED_CONTENT);
 }
 
@@ -615,9 +612,7 @@ TEST_CASE("PDB files with big values") {
 
 TEST_CASE("Read and write files in memory") {
     SECTION("Reading from memory") {
-        std::ifstream checking("data/pdb/water.pdb");
-        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
-            std::istreambuf_iterator<char>());
+        auto content = read_text_file("data/pdb/water.pdb");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "PDB");
         REQUIRE(file.nsteps() == 100);
