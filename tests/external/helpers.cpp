@@ -8,6 +8,7 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <fstream>
 #include <stdexcept>
 #include <new>
 
@@ -110,6 +111,26 @@ void copy_file(std::string src, std::string dst) {
     std::ofstream output(dst, std::ios::binary);
 
     output << input.rdbuf();
+}
+
+std::vector<uint8_t> read_binary_file(std::string path) {
+    std::ifstream file(path, std::ios::binary);
+    file.seekg(0, std::ios::end);
+    auto size = static_cast<size_t>(file.tellg());
+    file.seekg(0, std::ios::beg);
+
+    auto content = std::vector<uint8_t>(size);
+    file.read(reinterpret_cast<char*>(content.data()), static_cast<std::streamsize>(size));
+
+    return content;
+}
+
+std::string read_text_file(std::string path) {
+    std::ifstream file(path, std::ios::binary);
+    return {
+        std::istreambuf_iterator<char>(file),
+        std::istreambuf_iterator<char>()
+    };
 }
 
 static bool FAIL_NEXT_ALLOCATION = false;

@@ -137,10 +137,7 @@ TEST_CASE("Read a text file") {
         // Check that we don't use extra memory storing '\0'
         CHECK(content.size() == std::strlen(content.c_str()));
 
-        std::ifstream checking("data/xyz/helium.xyz");
-        std::string expected((std::istreambuf_iterator<char>(checking)),
-                              std::istreambuf_iterator<char>());
-
+        auto expected = read_text_file("data/xyz/helium.xyz");
         CHECK(content == expected);
     }
 }

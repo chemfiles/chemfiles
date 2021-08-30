@@ -1,7 +1,5 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-#include <fstream>
-
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
@@ -221,23 +219,22 @@ TEST_CASE("Write files in LAMMPS data format") {
     frame[0].set_mass(25);
     frame[2].set_charge(-2.4);
 
-    auto traj = Trajectory(tmpfile, 'w', "LAMMPS Data");
-    traj.write(frame);
-    CHECK_THROWS_WITH(traj.write(frame), "LAMMPS Data format only supports writing one frame");
-    traj.close();
+    auto trajectory = Trajectory(tmpfile, 'w', "LAMMPS Data");
+    trajectory.write(frame);
 
-    std::ifstream checking(tmpfile);
-    std::string content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
+    CHECK_THROWS_WITH(
+        trajectory.write(frame),
+        "LAMMPS Data format only supports writing one frame"
+    );
+    trajectory.close();
+
+    auto content = read_text_file(tmpfile);
     CHECK(content == EXPECTED_CONTENT);
 }
 
 TEST_CASE("Read and write files in memory") {
     SECTION("Reading from memory") {
-        std::ifstream checking("data/lammps-data/data.body");
-        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
-            std::istreambuf_iterator<char>());
-
+        auto content = read_text_file("data/lammps-data/data.body");
         auto file = Trajectory::memory_reader(content.data(), content.size(), "LAMMPS Data");
         auto frame = file.read();
 
