@@ -2,3 +2,10 @@
 
 include("${CMAKE_CURRENT_LIST_DIR}/chemfiles-targets.cmake")
 check_required_components("@PROJECT_NAME@")
+
+get_target_property(IMPORTED_CONFIGURATIONS chemfiles IMPORTED_CONFIGURATIONS)
+
+get_target_property(IMPORTED_SONAME chemfiles "IMPORTED_SONAME_${IMPORTED_CONFIGURATIONS}")
+if (IMPORTED_SONAME)
+    set_target_properties(chemfiles PROPERTIES IMPORTED_SONAME "${IMPORTED_SONAME}")
+endif()
