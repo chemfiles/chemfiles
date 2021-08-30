@@ -2,8 +2,6 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cstring>
-#include <fstream>
-#include <sstream>
 
 #include "catch.hpp"
 #include "helpers.hpp"
@@ -273,13 +271,8 @@ TEST_CASE("Write trajectory") {
     chfl_free(frame);
     chfl_trajectory_close(trajectory);
 
-    std::ifstream file(tmpfile);
-    REQUIRE(file.is_open());
-    std::stringstream content;
-    content << file.rdbuf();
-    file.close();
-
-    CHECK(content.str() == EXPECTED_CONTENT);
+    auto content = read_text_file(tmpfile);
+    CHECK(content == EXPECTED_CONTENT);
 }
 
 TEST_CASE("Write trajectory to memory") {

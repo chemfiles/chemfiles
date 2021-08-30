@@ -1,9 +1,5 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-
-#include <streambuf>
-#include <fstream>
-
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
@@ -379,17 +375,13 @@ O.O.O
     file.write(frame);
 
     file.close();
-    std::ifstream checking(tmpfile);
-    std::string content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
+    auto content = read_text_file(tmpfile);
     CHECK(content == EXPECTED_CONTENT);
 }
 
 TEST_CASE("Read and write files in memory") {
     SECTION("Reading from memory") {
-        std::ifstream checking("data/smi/rdkit_problems.smi");
-        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
-            std::istreambuf_iterator<char>());
+        auto content = read_text_file("data/smi/rdkit_problems.smi");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "SMI");
         REQUIRE(file.nsteps() == 70);

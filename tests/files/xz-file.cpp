@@ -5,7 +5,6 @@
 #include "helpers.hpp"
 #include "chemfiles/files/XzFile.hpp"
 #include "chemfiles/Error.hpp"
-#include <fstream>
 using namespace chemfiles;
 
 TEST_CASE("Read a text file") {
@@ -76,15 +75,7 @@ TEST_CASE("Write an xz file") {
         CHECK(file.tellpos() == 10);
     }
 
-    std::ifstream verification(filename, std::ios::binary);
-    REQUIRE(verification.is_open());
-    verification.seekg(0, std::ios::end);
-    auto size = static_cast<size_t>(verification.tellg());
-    verification.seekg(0, std::ios::beg);
-
-    auto content = std::vector<uint8_t>(size);
-    verification.read(reinterpret_cast<char*>(content.data()), static_cast<std::streamsize>(size));
-
+    auto content = read_binary_file(filename);
     auto expected = std::vector<uint8_t> {
         0xfd, 0x37, 0x7a, 0x58, 0x5a, 0x00, 0x00, 0x04, 0xe6, 0xd6, 0xb4, 0x46,
         0x02, 0x00, 0x21, 0x01, 0x16, 0x00, 0x00, 0x00, 0x74, 0x2f, 0xe5, 0xa3,

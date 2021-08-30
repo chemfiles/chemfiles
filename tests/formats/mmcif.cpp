@@ -2,7 +2,6 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <streambuf>
-#include <fstream>
 
 #include "catch.hpp"
 #include "helpers.hpp"
@@ -207,21 +206,15 @@ TEST_CASE("Write mmCIF file") {
 
     frame.positions()[0] = {4.0, 5.0, 6.0};
     file.write(frame);
-
     file.close();
-    std::ifstream checking(tmpfile);
-    std::string content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
+
+    auto content = read_text_file(tmpfile);
     CHECK(EXPECTED_CONTENT == content);
 }
 
 TEST_CASE("Read and write files in memory") {
     SECTION("Reading from memory") {
-
-        std::ifstream checking("data/cif/1j8k.cif");
-        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
-            std::istreambuf_iterator<char>());
-
+        auto content = read_text_file("data/cif/1j8k.cif");
         auto file = Trajectory::memory_reader(content.data(), content.size(), "mmCIF");
 
         auto frame = file.read_step(13);

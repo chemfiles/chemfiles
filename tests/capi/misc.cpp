@@ -1,7 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <fstream>
 #include <sstream>
 #include <cstring>
 
@@ -31,14 +30,14 @@ TEST_CASE("Configuration") {
 }
 
 TEST_CASE("Version") {
-    std::ifstream file(VERSION_FILE_PATH);
-    REQUIRE(file.is_open());
-    std::stringstream content;
-    content << file.rdbuf();
-    file.close();
+    auto version = read_text_file(VERSION_FILE_PATH);
 
-    // Remove trailling \n
-    std::string version = content.str().substr(0, content.str().length() - 1);
+    // Remove trailling [\r]\n
+    version = version.substr(0, version.length() - 1);
+    if (version[version.length() - 1] == '\r') {
+        version = version.substr(0, version.length() - 1);
+    }
+
     CHECK(chfl_version() == version);
 }
 

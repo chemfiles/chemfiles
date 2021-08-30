@@ -1,9 +1,5 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-
-#include <streambuf>
-#include <fstream>
-
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
@@ -147,9 +143,7 @@ TEST_CASE("Write CIF file") {
     file.write(frame);
     file.close();
 
-    std::ifstream checking(tmpfile);
-    std::string content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
+    auto content = read_text_file(tmpfile);
     CHECK(EXPECTED_CONTENT == content);
 }
 

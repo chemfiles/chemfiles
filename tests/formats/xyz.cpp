@@ -1,7 +1,5 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-
-#include <fstream>
 #include <iostream>
 
 #include "catch.hpp"
@@ -223,7 +221,7 @@ TEST_CASE("Errors in XYZ format") {
 
 TEST_CASE("Write files in XYZ format") {
     auto tmpfile = NamedTempPath(".xyz");
-    const auto expected_content =
+    const auto EXPECTED_CONTENT =
 R"(4
 Properties=species:S:1:pos:R:3:bool:L:1:double:R:1:string:S:1:vector:R:3 name="Test"
 A 1 2 3 T 10 atom_0 10 20 30
@@ -300,17 +298,13 @@ F 4 5 6
     file.write(frame);
     file.close();
 
-    std::ifstream checking(tmpfile);
-    std::string content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
-    CHECK(content == expected_content);
+    auto content = read_text_file(tmpfile);
+    CHECK(content == EXPECTED_CONTENT);
 }
 
 TEST_CASE("Read and write files in memory") {
     SECTION("Reading from memory") {
-        std::ifstream checking("data/xyz/topology.xyz");
-        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
-            std::istreambuf_iterator<char>());
+        auto content = read_text_file("data/xyz/topology.xyz");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "XYZ");
         CHECK(file.nsteps() == 1);
@@ -358,8 +352,7 @@ F 4 5 6
 }
 
 TEST_CASE("Round-trip read/write") {
-    auto tmpfile = NamedTempPath(".xyz");
-    auto content =
+    std::string EXPECTED =
 R"(3
 Properties=species:S:1:pos:R:3
 O 0.417 8.303 11.737
@@ -367,15 +360,10 @@ H 1.32 8.48 12.003
 H 0.332 8.726 10.882
 )";
 
-    std::ofstream create(tmpfile);
-    create << content;
-    create.close();
+    auto frame = Trajectory::memory_reader(EXPECTED.data(), EXPECTED.size(), "XYZ").read();
 
-    auto frame = Trajectory(tmpfile).read();
-    Trajectory(tmpfile, 'w').write(frame);
+    auto writer = Trajectory::memory_writer("XYZ");
+    writer.write(frame);
 
-    std::ifstream checking(tmpfile);
-    std::string actual((std::istreambuf_iterator<char>(checking)),
-                        std::istreambuf_iterator<char>());
-    CHECK(content == actual);
+    CHECK(writer.memory_buffer().value() == EXPECTED);
 }

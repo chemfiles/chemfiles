@@ -1,8 +1,5 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-
-#include <fstream>
-
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
@@ -245,18 +242,14 @@ TEST_CASE("Write files in mol2 format") {
     CHECK(check_pdb.read().size() == 7);
     check_pdb.close();
 
-    std::ifstream checking(tmpfile);
-    std::string content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
+    auto content = read_text_file(tmpfile);
     CHECK(content == EXPECTED_CONTENT);
 }
 
 
 TEST_CASE("Read and write files in memory") {
     SECTION("Reading from memory") {
-        std::ifstream checking("data/mol2/Molecules.mol2");
-        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
-            std::istreambuf_iterator<char>());
+        auto content = read_text_file("data/mol2/Molecules.mol2");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "MOL2");
         auto frame = file.read_step(1);

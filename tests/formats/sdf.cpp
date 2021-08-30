@@ -1,9 +1,5 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-
-#include <streambuf>
-#include <fstream>
-
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
@@ -112,7 +108,7 @@ TEST_CASE("Errors in SDF format") {
 
 TEST_CASE("Write files in SDF format") {
     auto tmpfile = NamedTempPath(".sdf");
-    const auto expected_content =
+    const auto EXPECTED_CONTENT =
 R"(
 
 created by chemfiles
@@ -254,17 +250,13 @@ $$$$
 
     file.close();
 
-    std::ifstream checking(tmpfile);
-    std::string content((std::istreambuf_iterator<char>(checking)),
-                         std::istreambuf_iterator<char>());
-    CHECK(content == expected_content);
+    auto content = read_text_file(tmpfile);
+    CHECK(content == EXPECTED_CONTENT);
 }
 
 TEST_CASE("Read and write files in memory") {
     SECTION("Reading from memory") {
-        std::ifstream checking("data/sdf/kinases.sdf");
-        std::vector<char> content((std::istreambuf_iterator<char>(checking)),
-            std::istreambuf_iterator<char>());
+        auto content = read_text_file("data/sdf/kinases.sdf");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "SDF");
         REQUIRE(file.nsteps() == 6);
