@@ -31,7 +31,6 @@ string(STRIP ${CHEMFILES_VERSION} CHEMFILES_VERSION)
 string(REGEX REPLACE "^([0-9]+)\\..*" "\\1" CHEMFILES_VERSION_MAJOR "${CHEMFILES_VERSION}")
 string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" CHEMFILES_VERSION_MINOR "${CHEMFILES_VERSION}")
 string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CHEMFILES_VERSION_PATCH "${CHEMFILES_VERSION}")
-set(CHEMFILES_VERSION_SHORT "${CHEMFILES_VERSION_MAJOR}.${CHEMFILES_VERSION_MINOR}.${CHEMFILES_VERSION_PATCH}")
 
 option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
 
@@ -148,8 +147,12 @@ set(CHEMFILES_OBJECTS
 # Add the main chemfiles library
 add_library(chemfiles ${CHEMFILES_OBJECTS})
 
-set_property(TARGET chemfiles PROPERTY VERSION ${CHEMFILES_VERSION_SHORT})
-set_property(TARGET chemfiles PROPERTY SOVERSION ${CHEMFILES_VERSION_SHORT})
+set_target_properties(chemfiles PROPERTIES
+    VERSION "${CHEMFILES_VERSION_MAJOR}.${CHEMFILES_VERSION_MINOR}.${CHEMFILES_VERSION_PATCH}"
+    # This needs to be the part of the version which matter for backward
+    # compatibility, so "major.minor" until 1.0 and then "major" only
+    SOVERSION "${CHEMFILES_VERSION_MAJOR}.${CHEMFILES_VERSION_MINOR}"
+)
 
 target_include_directories(chemfiles PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
