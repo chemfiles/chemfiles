@@ -339,7 +339,7 @@ template<> const FormatMetadata& chemfiles::format_metadata<Molfile<DCD>>() {
 
     metadata.positions = true;
     metadata.velocities = false;
-    metadata.unit_cell = false;
+    metadata.unit_cell = true;
     metadata.atoms = false;
     metadata.bonds = false;
     metadata.residues = false;
