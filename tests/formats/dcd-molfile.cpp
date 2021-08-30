@@ -28,3 +28,22 @@ TEST_CASE("Read files in DCD format using Molfile") {
     CHECK(approx_eq(positions[0], Vector3D(0.2990952, 8.31003, 11.72146), eps));
     CHECK(approx_eq(positions[296], Vector3D(6.797599, 11.50882, 12.70423), eps));
 }
+
+
+TEST_CASE("Read unit cell in DCD files") {
+    auto file = Trajectory("data/dcd/nopbc.dcd");
+    auto frame = file.read();
+
+    auto cell = frame.cell();
+    // FIXME: this should be UnitCell::INFINITE, cf https://github.com/chemfiles/chemfiles/issues/419
+    CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+    CHECK(cell.lengths() == Vector3D(1.0, 1.0, 1.0));
+
+
+    file = Trajectory("data/dcd/withpbc.dcd");
+    frame = file.read();
+
+    cell = frame.cell();
+    CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+    CHECK(cell.lengths() == Vector3D(100.0, 100.0, 100.0));
+}
