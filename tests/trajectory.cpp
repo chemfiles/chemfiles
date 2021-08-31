@@ -2,6 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <fstream>
+#include <thread>
 #include <catch.hpp>
 
 #include "helpers.hpp"
@@ -211,6 +212,75 @@ TEST_CASE("Guessing format") {
         "file at 'not-a-file' does not have an extension, provide a format name to read it"
     );
 }
+
+static void read_from_multiple_threads(std::string filename, size_t n_atoms) {
+    auto n_steps = Trajectory(filename).nsteps();
+    size_t n_threads = 4;
+
+    auto thread_1 = std::thread([=](){
+        auto file = Trajectory(filename);
+        for (size_t i=0; i<n_steps; i += n_threads) {
+            auto frame = file.read_step(i);
+            CHECK(frame.size() == n_atoms);
+        }
+    });
+
+    auto thread_2 = std::thread([=](){
+        auto file = Trajectory(filename);
+        for (size_t i=1; i<n_steps; i += n_threads) {
+            auto frame = file.read_step(i);
+            CHECK(frame.size() == n_atoms);
+        }
+    });
+
+    auto thread_3 = std::thread([=](){
+        auto file = Trajectory(filename);
+        for (size_t i=2; i<n_steps; i += n_threads) {
+            auto frame = file.read_step(i);
+            CHECK(frame.size() == n_atoms);
+        }
+    });
+
+    auto thread_4 = std::thread([=](){
+        auto file = Trajectory(filename);
+        for (size_t i=3; i<n_steps; i += n_threads) {
+            auto frame = file.read_step(i);
+            CHECK(frame.size() == n_atoms);
+        }
+    });
+
+    thread_1.join();
+    thread_2.join();
+    thread_3.join();
+    thread_4.join();
+}
+
+// don't run threading tests on wasm/emscripten
+#ifndef __EMSCRIPTEN__
+
+TEST_CASE("reading a files from multiple threads") {
+    // text file
+    read_from_multiple_threads("data/xyz/water.xyz", 297);
+
+    // compressed files
+    read_from_multiple_threads("data/xyz/water.9.xyz.gz", 297);
+    read_from_multiple_threads("data/xyz/water.9.xyz.bz2", 297);
+    read_from_multiple_threads("data/xyz/water.blocks.xyz.xz", 297);
+
+    // non text files
+    read_from_multiple_threads("data/mmtf/1HTQ_reduced.mmtf", 12336);
+    read_from_multiple_threads("data/dcd/water.dcd", 297);
+    read_from_multiple_threads("data/trr/1aki.trr", 38376);
+    read_from_multiple_threads("data/xtc/ubiquitin.xtc", 20455);
+
+    // FIXME: these fail, probably because the underlying library maintains a
+    // pool of ressources without synchronization
+
+    // read_from_multiple_threads("data/tng/1aki.tng", 38376);
+    // read_from_multiple_threads("data/netcdf/water.nc", 297);
+}
+
+#endif
 
 TEST_CASE("Errors") {
     SECTION("Unknow opening mode") {
