@@ -77,6 +77,8 @@ function(chfl_define_test _name_)
     endif()
 endfunction()
 
+find_package(Threads REQUIRED)
+
 function(chfl_unit_test _name_ _file_)
     add_executable(${_name_} ${_file_} ${CHEMFILES_OBJECTS})
     # We need to pretend we are inside the DLL to access all functions
@@ -84,6 +86,13 @@ function(chfl_unit_test _name_ _file_)
     target_link_libraries(${_name_} $<TARGET_PROPERTY:chemfiles,LINK_LIBRARIES>)
     set_target_properties(${_name_} PROPERTIES LINKER_LANGUAGE CXX)
     target_include_directories(${_name_} SYSTEM PRIVATE ${EXTERNAL_INCLUDES})
+
+    if(THREADS_HAVE_PTHREAD_ARG)
+        target_compile_options(${_name_} PUBLIC "-pthread")
+    endif()
+    if(CMAKE_THREAD_LIBS_INIT)
+        target_link_libraries(${_name_} "${CMAKE_THREAD_LIBS_INIT}")
+    endif()
 
     chfl_define_test(${_name_})
 endfunction()
