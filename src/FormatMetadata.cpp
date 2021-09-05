@@ -66,7 +66,10 @@ void chemfiles::FormatMetadata::validate() const {
     auto reference_s = std::string(reference);
     if (!reference_s.empty()) {
         if (!(reference_s.substr(0, 7) == "http://" || reference_s.substr(0, 8) == "https://")) {
-            throw format_error("the reference for format '{}' must be an http link", this->name);
+            throw format_error(
+                "the reference for format '{}' must be an http link, got '{}'",
+                this->name, reference_s
+            );
         }
     }
 }
