@@ -226,7 +226,7 @@ TEST_CASE("Bad format info") {
 
     CHECK_THROWS_WITH(
         FormatFactory::get().add_format<BadReferenceFormat>(),
-        "the reference for format 'BadReferenceFormat' must be an http link"
+        "the reference for format 'BadReferenceFormat' must be an http link, got 'foo.bar'"
     );
 }
 
