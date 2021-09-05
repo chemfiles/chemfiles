@@ -17,6 +17,10 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - properties are now sorted, and iterating over properties will always yield
   them sorted by the associated key.
 
+### Changes in supported formats
+
+- Added read support for PSF files using VMD molfile plugin.
+
 ## 0.10.1 (22 Jul 2021)
 
 ### New features

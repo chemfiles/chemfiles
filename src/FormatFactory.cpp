@@ -50,8 +50,10 @@ namespace chemfiles {
 
     extern template class Amber<AMBER_NC_RESTART>;
     extern template class Amber<AMBER_NC_TRAJECTORY>;
+
     extern template class Molfile<DCD>;
     extern template class Molfile<TRJ>;
+    extern template class Molfile<PSF>;
     extern template class Molfile<MOLDEN>;
 }
 using namespace chemfiles;
@@ -79,6 +81,7 @@ FormatFactory::FormatFactory() {
     this->add_format<MOL2Format>();
     this->add_format<Molfile<MOLDEN>>();
     this->add_format<PDBFormat>();
+    this->add_format<Molfile<PSF>>();
     this->add_format<SDFFormat>();
     this->add_format<SMIFormat>();
     this->add_format<TinkerFormat>();
