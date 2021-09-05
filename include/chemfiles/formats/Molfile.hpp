@@ -27,6 +27,7 @@ class FormatMetadata;
 enum MolfileFormat {
     DCD,                ///< DCD binary file format
     TRJ,                ///< Gromacs .trj file format
+    PSF,                ///< PSF topology files
     MOLDEN,             ///< Molden file format
 };
 
@@ -87,6 +88,7 @@ private:
 
 template<> const FormatMetadata& format_metadata<Molfile<DCD>>();
 template<> const FormatMetadata& format_metadata<Molfile<TRJ>>();
+template<> const FormatMetadata& format_metadata<Molfile<PSF>>();
 template<> const FormatMetadata& format_metadata<Molfile<MOLDEN>>();
 
 } // namespace chemfiles

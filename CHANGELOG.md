@@ -20,6 +20,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ### Changes in supported formats
 
 - Added read and write support for Amber Restart (.ncrst) files.
+- Added read support for PSF files using VMD molfile plugin.
 
 ### Changes to the C API
 

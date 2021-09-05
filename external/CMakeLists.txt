@@ -196,7 +196,7 @@ mark_as_advanced(FORCE
 # VMD molfile: https://github.com/chemfiles/molfiles
 # ==========
 set(VMD_MOLFILE_PLUGINS
-    dcdplugin gromacsplugin lammpsplugin moldenplugin
+    dcdplugin gromacsplugin moldenplugin psfplugin
 )
 
 external_library(molfiles)
@@ -215,7 +215,7 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/molfiles/include)
 # brixplugin ccp4plugin cifplugin corplugin crdplugin cubeplugin dsn6plugin
 # dtrplugin dxplugin edmplugin fs4plugin graspplugin grdplugin gridplugin
 # jsplugin maeffplugin mapplugin molemeshplugin offplugin pbeqplugin phiplugin
-# pltplugin pqrplugin psfplugin raster3dplugin rst7plugin situsplugin
+# pltplugin pqrplugin raster3dplugin rst7plugin situsplugin
 # spiderplugin stlplugin uhbdplugin vtfplugin xbgfplugin xsfplugin
 
 # ==========
