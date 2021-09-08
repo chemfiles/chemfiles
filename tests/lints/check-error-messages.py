@@ -31,6 +31,10 @@ def error(message):
 def extract_messages(lines, i, has_context):
     if has_context:
         context_start = lines[i].find('"')
+        if context_start == -1:
+            # look at the next line
+            i = i + 1
+            context_start = lines[i].find('"')
         context_stop = lines[i].find('"', context_start + 1)
     else:
         context_stop = -1

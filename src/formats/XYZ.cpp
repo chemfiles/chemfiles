@@ -5,6 +5,7 @@
 #include <cstdint>
 
 #include <map>
+#include <set>
 #include <array>
 #include <string>
 #include <vector>
@@ -52,8 +53,11 @@ static properties_list_t read_extended_comment_line(string_view line, Frame& fra
 /// Read the properties in the list form the line and set them on the atom
 static void read_atomic_properties(const properties_list_t& properties, string_view line, Atom& atom);
 
+/// Get the list of atoms properties defined for all atoms in the frame
+static properties_list_t get_atom_properties(const Frame& frame);
+
 /// Generate the extended XYZ comment line for the given frame
-static std::string write_extended_comment_line(const Frame& frame);
+static std::string write_extended_comment_line(const Frame& frame, properties_list_t properties);
 
 template<> const FormatMetadata& chemfiles::format_metadata<XYZFormat>() {
     static FormatMetadata metadata;
@@ -93,21 +97,44 @@ void XYZFormat::read_next(Frame& frame) {
 }
 
 void XYZFormat::write_next(const Frame& frame) {
-    auto& topology = frame.topology();
     auto& positions = frame.positions();
-    assert(frame.size() == topology.size());
+    auto properties = get_atom_properties(frame);
 
     file_.print("{}\n", frame.size());
-    file_.print("{}\n", write_extended_comment_line(frame));
+    file_.print("{}\n", write_extended_comment_line(frame, properties));
 
     for (size_t i = 0; i < frame.size(); i++) {
-        auto name = topology[i].name();
+        const auto& atom = frame[i];
+
+        auto name = atom.name();
         if (name.empty()) {
             name = "X";
         }
-        file_.print("{} {:g} {:g} {:g}\n",
+
+        file_.print("{} {:g} {:g} {:g}",
             name, positions[i][0], positions[i][1], positions[i][2]
         );
+
+        for (const auto& property: properties) {
+            const auto& value = atom.get(property.name).value();
+
+            if (property.type == Property::STRING) {
+                file_.print(" {}", value.as_string());
+            } else if (property.type == Property::BOOL) {
+                if (value.as_bool()) {
+                    file_.print(" T");
+                } else {
+                    file_.print(" F");
+                }
+            } else if (property.type == Property::DOUBLE) {
+                file_.print(" {:g}", value.as_double());
+            } else if (property.type == Property::VECTOR3D) {
+                const auto& vector = value.as_vector3d();
+                file_.print(" {:g} {:g} {:g}", vector[0], vector[1], vector[2]);
+            }
+        }
+
+        file_.print("\n");
     }
 }
 
@@ -186,12 +213,33 @@ static bool contains_double_quote(string_view s) {
     return false;
 }
 
-std::string write_extended_comment_line(const Frame& frame) {
-    std::string result;
-    // TODO: store more properties? Atom-level properties are a good idea, but
-    // we don't have guarantee that they exist for all atoms. Residue
-    // information could also be nice (resid/resname).
-    result += "Properties=species:S:1:pos:R:3";
+std::string write_extended_comment_line(const Frame& frame, properties_list_t properties) {
+    std::string result = "Properties=species:S:1:pos:R:3";
+
+    for (const auto& property: properties) {
+        char type;
+        int count;
+        switch (property.type) {
+        case Property::STRING:
+            type = 'S';
+            count = 1;
+            break;
+        case Property::BOOL:
+            type = 'L';
+            count = 1;
+            break;
+        case Property::DOUBLE:
+            type = 'R';
+            count = 1;
+            break;
+        case Property::VECTOR3D:
+            type = 'R';
+            count = 3;
+            break;
+        }
+
+        result += fmt::format(":{}:{}:{}", property.name, type, count);
+    }
 
     // support for Lattice
     if (frame.cell().shape() != UnitCell::INFINITE) {
@@ -224,7 +272,11 @@ std::string write_extended_comment_line(const Frame& frame) {
             } else if (!contains_single_quote(it.first)) {
                 result += fmt::format(" '{}'=", it.first);
             } else {
-                 warning("Extended XYZ", "frame property '{}' can not be represented, skipping", it.first);
+                 warning(
+                    "Extended XYZ",
+                    "frame property '{}' contains both single and double quote, it will not be saved",
+                    it.first
+                );
                  continue;
             }
         } else {
@@ -250,6 +302,118 @@ std::string write_extended_comment_line(const Frame& frame) {
         }
     }
     return result;
+}
+
+static bool is_valid_property_name(const std::string& name) {
+    if (name.empty()) {
+        return false;
+    }
+
+    if (!is_ascii_letter(name[0])) {
+        return false;
+    }
+
+    for (auto c: name) {
+        if (!(is_ascii_alphanumeric(c) || c == '_')) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+properties_list_t get_atom_properties(const Frame& frame) {
+    if (frame.size() == 0) {
+        return {};
+    }
+
+    auto all_properties = std::map<std::string, Property::Kind>();
+    auto partially_defined_already_warned = std::set<std::string>();
+
+    const auto& first_atom = frame[0];
+    for (const auto& property: first_atom.properties()) {
+        if (!is_valid_property_name(property.first)) {
+            warning(
+                "Extended XYZ", "'{}' is not a valid property name for extended "
+                "XYZ, is will not be saved",
+                property.first, 0
+            );
+            partially_defined_already_warned.insert(property.first);
+            continue;
+        }
+
+        if (property.second.kind() == Property::STRING) {
+            if (should_be_quoted(property.second.as_string())) {
+                warning(
+                    "Extended XYZ", "string value for property '{}' on atom {} "
+                    "can not be be saved as an atomic property",
+                    property.first, 0
+                );
+                continue;
+            }
+        }
+
+        all_properties.emplace(property.first, property.second.kind());
+    }
+
+    for (size_t i=1; i<frame.size(); i++) {
+        const auto& atom = frame[i];
+
+        auto to_remove = std::vector<std::string>();
+        for (const auto& property: all_properties) {
+            auto current_property = atom.get(property.first);
+            if (!current_property) {
+                // this property was present for all atoms until now, but
+                // not on the current one
+                warning(
+                    "Extended XYZ",
+                    "property '{}' is only defined for a subset of atoms, it will not be saved",
+                    property.first
+                );
+
+                to_remove.push_back(property.first);
+                continue;
+            }
+
+            if (current_property.value().kind() != property.second) {
+                warning(
+                    "Extended XYZ",
+                    "property '{}' is defined with different types on different atoms, if will not be saved",
+                    property.first
+                );
+                partially_defined_already_warned.insert(property.first);
+                to_remove.push_back(property.first);
+                continue;
+            }
+        }
+
+        if (atom.properties().size() > all_properties.size()) {
+            // warn for properties defined on this atom but not on others
+            for (const auto& property: atom.properties()) {
+                if (all_properties.count(property.first) == 0) {
+                    if (partially_defined_already_warned.count(property.first) == 0) {
+                        warning(
+                            "Extended XYZ",
+                            "property '{}' is only defined for a subset of atoms, it will not be saved",
+                            property.first
+                        );
+                        partially_defined_already_warned.insert(property.first);
+                    }
+                }
+            }
+        }
+
+        for (const auto& name: to_remove) {
+            all_properties.erase(name);
+        }
+    }
+
+    auto results = properties_list_t();
+    results.reserve(all_properties.size());
+    for (auto property: std::move(all_properties)) {
+        results.push_back({std::move(property.first), std::move(property.second)});
+    }
+    return results;
 }
 
 /// mapping name=>properties values. The use of string_view is safe since the
