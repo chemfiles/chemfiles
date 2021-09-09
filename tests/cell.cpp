@@ -15,9 +15,17 @@ TEST_CASE("Use the UnitCell type") {
             CHECK(infinite.angles() == Vector3D(90, 90, 90));
             CHECK(infinite.volume() == 0);
 
-            CHECK(UnitCell({0, 0, 0})== UnitCell());
-            CHECK(UnitCell({0, 0, 0}, {90, 90, 90})== UnitCell());
-            CHECK(UnitCell(Matrix3D::zero())== UnitCell());
+            CHECK(UnitCell({0, 0, 0}) == UnitCell());
+            CHECK(UnitCell({0, 0, 0}, {90, 90, 90}) == UnitCell());
+            CHECK(UnitCell(Matrix3D::zero()) == UnitCell());
+
+            auto matrix = Matrix3D(
+                0, 0, 0,
+                0, 0, 0,
+                0, 0, 0
+            );
+            infinite = UnitCell(matrix);
+            CHECK(infinite.shape() == UnitCell::INFINITE);
         }
 
         SECTION("Orthorhombic") {

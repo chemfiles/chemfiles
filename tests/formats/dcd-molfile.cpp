@@ -35,9 +35,8 @@ TEST_CASE("Read unit cell in DCD files") {
     auto frame = file.read();
 
     auto cell = frame.cell();
-    // FIXME: this should be UnitCell::INFINITE, cf https://github.com/chemfiles/chemfiles/issues/419
-    CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-    CHECK(cell.lengths() == Vector3D(1.0, 1.0, 1.0));
+    CHECK(cell.shape() == UnitCell::INFINITE);
+    CHECK(cell.lengths() == Vector3D(0.0, 0.0, 0.0));
 
 
     file = Trajectory("data/dcd/withpbc.dcd");
