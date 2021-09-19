@@ -34,6 +34,7 @@ TEST_CASE("Read files in TNG format") {
         CHECK(file.nsteps() == 6);
         auto frame = file.read();
         CHECK(frame.step() == 0);
+        CHECK(approx_eq(frame.get("time")->as_double(), 0.0, 1e-4));
         CHECK(frame.size() == 38376);
 
         auto cell = frame.cell();
@@ -47,6 +48,7 @@ TEST_CASE("Read files in TNG format") {
         frame = file.read_step(5);
         CHECK(frame.step() == 50);
         CHECK(frame.size() == 38376);
+        CHECK(approx_eq(frame.get("time")->as_double(), 0.1, 1e-4));
 
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), Vector3D(73.39250, 73.39250, 73.39250), 1e-5));
@@ -112,12 +114,15 @@ TEST_CASE("Read files in TNG format") {
 
         auto frame = file.read();
         CHECK(frame.step() == 0);
+        CHECK(approx_eq(frame.get("time")->as_double(), 0.0, 1e-4));
 
         frame = file.read();
         CHECK(frame.step() == 25000);
+        CHECK(approx_eq(frame.get("time")->as_double(), 50.0, 1e-4));
 
         frame = file.read();
         CHECK(frame.step() == 50000);
+        CHECK(approx_eq(frame.get("time")->as_double(), 100.0, 1e-4));
 
         frame = file.read_step(0);
         CHECK(frame.size() == 19385);
