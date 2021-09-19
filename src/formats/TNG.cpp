@@ -133,6 +133,15 @@ void TNGFormat::read(Frame& frame) {
     assert(natoms_ > 0);
     frame.resize(static_cast<size_t>(natoms_));
 
+    double time = 0;
+    tng_function_status status =
+        tng_util_time_of_frame_get(tng_, tng_steps_[step_], &time);
+    if (status == TNG_SUCCESS) {
+        // TNG stores time in seconds
+        // convert to pico seconds
+        frame.set("time", time * 1e12);
+    }
+
     read_positions(frame);
     read_velocities(frame);
     read_cell(frame);
