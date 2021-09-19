@@ -2,8 +2,8 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include "catch.hpp"
-#include "helpers.hpp"
 #include "chemfiles.hpp"
+#include "helpers.hpp"
 using namespace chemfiles;
 
 TEST_CASE("Read files in TNG format") {
@@ -31,16 +31,29 @@ TEST_CASE("Read files in TNG format") {
 
     SECTION("Read velocities") {
         auto file = Trajectory("data/tng/1aki.tng");
+        CHECK(file.nsteps() == 6);
         auto frame = file.read();
+        CHECK(frame.step() == 0);
         CHECK(frame.size() == 38376);
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(cell.lengths() == Vector3D(73.392500877380371, 73.392500877380371, 73.392500877380371));
+        CHECK(approx_eq(cell.lengths(), Vector3D(73.39250, 73.39250, 73.39250), 1e-5));
 
         auto velocities = *frame.velocities();
         CHECK(approx_eq(velocities[450], Vector3D(-1.44889, 6.50066e-1, -7.64032), 1e-4));
         CHECK(approx_eq(velocities[4653], Vector3D(-16.5949, -4.62240, -7.01133), 1e-4));
+
+        frame = file.read_step(5);
+        CHECK(frame.step() == 50);
+        CHECK(frame.size() == 38376);
+
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(approx_eq(cell.lengths(), Vector3D(73.39250, 73.39250, 73.39250), 1e-5));
+
+        velocities = *frame.velocities();
+        CHECK(approx_eq(velocities[450], Vector3D(8.23913, 2.99123, 10.5270), 1e-4));
+        CHECK(approx_eq(velocities[4653], Vector3D(-48.8318, -5.90270, -6.86679), 1e-4));
     }
 
     SECTION("Read cell") {
@@ -83,13 +96,11 @@ TEST_CASE("Read files in TNG format") {
         CHECK(residue.contains(2));
 
         auto bonds = topology.bonds();
-        auto expected = std::vector<Bond>{
-            {0, 1}, {0, 2}, {3, 4}, {3, 5}, {6, 7}, {6, 8},
-            {9, 10}, {9, 11}, {12, 13}, {12, 14}
-        };
+        auto expected = std::vector<Bond>{{0, 1}, {0, 2},  {3, 4},  {3, 5},   {6, 7},
+                                          {6, 8}, {9, 10}, {9, 11}, {12, 13}, {12, 14}};
 
         CHECK(bonds.size() == expected.size());
-        for (auto bond: expected) {
+        for (auto bond : expected) {
             CHECK(std::find(bonds.begin(), bonds.end(), bond) != bonds.end());
         }
     }
@@ -101,6 +112,7 @@ TEST_CASE("Read files in TNG format") {
 
         auto frame = file.read();
         CHECK(frame.step() == 0);
+
         frame = file.read();
         CHECK(frame.step() == 25000);
 
