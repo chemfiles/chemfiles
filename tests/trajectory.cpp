@@ -272,11 +272,11 @@ TEST_CASE("reading a files from multiple threads") {
     read_from_multiple_threads("data/dcd/water.dcd", 297);
     read_from_multiple_threads("data/trr/1aki.trr", 38376);
     read_from_multiple_threads("data/xtc/ubiquitin.xtc", 20455);
+    read_from_multiple_threads("data/tng/1aki.tng", 38376);
 
     // FIXME: these fail, probably because the underlying library maintains a
     // pool of ressources without synchronization
 
-    // read_from_multiple_threads("data/tng/1aki.tng", 38376);
     // read_from_multiple_threads("data/netcdf/water.nc", 297);
 }
 
