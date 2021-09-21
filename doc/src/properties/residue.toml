@@ -22,16 +22,20 @@ If the property is not set, ``HETATM`` is used."""
 type = "string"
 
 PDB = """The **chainname** defines the name assigned to a protein chain by
-biologists. It is is a single character used to group residues which are linked
+biologists. It is a single character used to group residues which are linked
 together in a crystallographic file where it may not be unique."""
 
+PSF = """The **chainname** is a single character used to group residues which
+are linked together. For PSF files, it is taken as the first letter of the
+``segname``."""
+
 mmCIF = """The **chainname** defines the name assigned to a protein chain by
-biologists. It is is a single character used to group residues which are linked
+biologists. It is a single character used to group residues which are linked
 together in a crystallographic file where it may *not* be unique. This name *is*
 unique to a given biological assembly, however."""
 
 MMTF = """The **chainname** defines the name assigned to a protein chain by
-biologists. It is is a single character used to group residues which are linked
+biologists. It is a single character used to group residues which are linked
 together in a crystallographic file where it may *not* be unique. This name *is*
 unique to a given biological assembly, however."""
 
@@ -39,6 +43,8 @@ unique to a given biological assembly, however."""
 type = "string"
 
 PDB = "For ``PDB`` files, the **chainid** is identical to **chainname**"
+
+PSF = "For ``PSF`` files, the **chainid** is identical to **chainname**"
 
 mmCIF = """The **chainname** defines the name assigned to a protein chain by
 biologists. It is is a single character used to group residues which are linked
@@ -109,8 +115,12 @@ Examples include ``extended``, ``alpha helix``, ``pi helix``, ``turn`` and
 ``coil``. This property is not set for undefined secondary structures and is not
 used for writing."""
 
-[resname]
+[segname]
 type = "string"
 PDB = """``PDB`` files used with CHARM, NAMD and a few other software package
 can contain a non-standard *segment* name associated with a residue. If set when
 writting a frame, this property is written to the file."""
+
+PSF = """Name of the segment containing this resiude. A segment is typically a
+single chain of protein or DNA. Segments may also contain pure solvent or
+lipid."""
