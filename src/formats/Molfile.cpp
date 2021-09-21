@@ -58,6 +58,42 @@ namespace chemfiles {
 #undef PLUGINS_FUNCTIONS
 /******************************************************************************/
 
+/// data identifying a residue in molfile plugins
+struct residue_info_t {
+    int id;
+    std::string name;
+    std::string segid;
+    std::string chain;
+
+    bool operator==(const residue_info_t& other) const {
+        return (
+            this->id == other.id &&
+            this->name == other.name &&
+            this->segid == other.segid &&
+            this->chain == other.chain
+        );
+    }
+};
+
+inline void hash_combine(std::size_t& seed) { }
+
+template <typename T, typename... Tail>
+inline void hash_combine(std::size_t& seed, const T& v, Tail... tail) {
+    std::hash<T> hasher;
+    seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    hash_combine(seed, tail...);
+}
+
+namespace std {
+    template<> struct hash<residue_info_t> {
+        std::size_t operator()(const residue_info_t &info) const {
+            std::size_t result = 0;
+            hash_combine(result, info.id, info.name, info.segid, info.chain);
+            return result;
+        }
+    };
+}
+
 template <MolfileFormat F> static int register_plugin(void* user_data, vmdplugin_t* vmd_plugin) {
     auto user_plugin = static_cast<molfile_plugin_t**>(user_data);
     assert(std::string(MOLFILE_PLUGIN_TYPE) == std::string(vmd_plugin->type));
@@ -159,8 +195,8 @@ template <MolfileFormat F> int Molfile<F>::read_next_timestep(molfile_timestep_t
         return MOLFILE_SUCCESS;
     } else {
         throw format_error(
-            "both read_next_timestep and read_timestep are missing in this "
-            "plugin. This is a bug"
+            "read_next_timestep, read_timestep and read_structure are missing "
+            "in this plugin. This is a bug"
         );
     }
 }
@@ -277,7 +313,7 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
 
     topology_ = Topology();
 
-    auto residues = std::unordered_map<int64_t, Residue>();
+    auto residues = std::unordered_map<residue_info_t, Residue>();
     size_t atom_id = 0;
     for (auto& molfile_atom : atoms) {
         Atom atom(molfile_atom.name, molfile_atom.type);
@@ -293,10 +329,23 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
         if (molfile_atom.resname != std::string("")) {
             auto resid = static_cast<int64_t>(molfile_atom.resid);
             auto residue = Residue(molfile_atom.resname, resid);
-            auto inserted = residues.insert({resid, std::move(residue)});
+            residue.set("segname", molfile_atom.segid);
+            residue.set("chainname", molfile_atom.chain);
+            residue.set("chainid", molfile_atom.chain);
+            auto info = residue_info_t {
+                molfile_atom.resid,
+                molfile_atom.resname,
+                molfile_atom.segid,
+                molfile_atom.chain,
+            };
+            auto inserted = residues.insert({std::move(info), std::move(residue)});
             inserted.first->second.add_atom(atom_id);
         }
         atom_id++;
+    }
+
+    for (auto residue: residues) {
+        topology_->add_residue(std::move(residue.second));
     }
 
     if (plugin_handle_->read_bonds == nullptr) {

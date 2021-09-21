@@ -30,9 +30,27 @@ TEST_CASE("Read PSF format") {
         CHECK(topology[3104].charge() == 2.0);
         CHECK(topology[3104].mass() == static_cast<double>(40.0800f));
 
-        // FIXME: the molfile plugin does not read residue information, we
-        // should add it when re-implementing a PSF reader.
-        CHECK(topology.residues().size() == 0);
+        CHECK(topology.residues().size() == 777);
+        auto residue = topology.residue_for_atom(0).value();
+        CHECK(residue.id().value() == 1);
+        CHECK(residue.name() == "TIP4");
+        CHECK(residue.get("segname")->as_string() == "WT1");
+        CHECK(residue.get("chainname")->as_string() == "W");
+        CHECK(residue.get("chainid")->as_string() == "W");
+
+        // a different residue with the same resid
+        residue = topology.residue_for_atom(2098).value();
+        CHECK(residue.id().value() == 1);
+        CHECK(residue.name() == "TIP4");
+        CHECK(residue.get("segname")->as_string() == "WT5");
+        CHECK(residue.get("chainname")->as_string() == "W");
+        CHECK(residue.get("chainid")->as_string() == "W");
+
+        CHECK(residue.size() == 4);
+        CHECK(residue.contains(2096));
+        CHECK(residue.contains(2097));
+        CHECK(residue.contains(2098));
+        CHECK(residue.contains(2099));
 
         auto& bonds = topology.bonds();
         CHECK(bonds.size() == 3104);
