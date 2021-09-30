@@ -76,12 +76,17 @@ CHFL_EXPORT chfl_status chfl_formats_list(chfl_format_metadata** metadata, uint6
 /// The buffer size must be passed in `buffsize`. This function will return
 /// `CHFL_MEMORY_ERROR` if the format does not fit in the buffer.
 ///
-/// The format is only guessed from the filename extension, chemfiles does not
-/// currently read the file to guess the format. Opening the file using the
-/// returned format string might still fail. For example, it will fail if the
-/// file is not actually formatted according to the guessed format; or the
-/// format/compression combination is not supported (e.g. `XTC / GZ` will not
-/// work since the XTC reader does not support compressed files).
+/// Most of the time, the format is only guessed from the filename extension,
+/// without reading the file to guess the format. When two or more format can
+/// share the same extension (for example CIF and mmCIF), chemfiles tries to
+/// read the file to distinguish between them. If reading fails, the default
+/// format for this extension is returned.
+///
+/// Opening the file using the returned format string might still fail. For
+/// example, it will fail if the file is not actually formatted according to the
+/// guessed format; or the format/compression combination is not supported (e.g.
+/// `XTC / GZ` will not work since the XTC reader does not support compressed
+/// files).
 ///
 /// The format is represented in a way compatible with the various `Trajectory`
 /// constructors, i.e. `"<format name> [/ <compression>]"`, where compression is
