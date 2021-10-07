@@ -46,8 +46,10 @@ private:
     TextFile file_;
     /// Map of STAR records to their index
     std::map<std::string, size_t> atom_site_map_;
-    /// Map of residues, indexed by residue id and chainid.
-    std::map<std::pair<std::string, int64_t>, Residue> residues_;
+    /// Vector with all the residues.
+    std::vector<Residue> residues_;
+    /// Map of residue indexes, indexed by residue id and chainid. We use an indirection to keep the residue order (and don't sort them with the map id).
+    std::map<std::pair<std::string, int64_t>, size_t> map_residues_indexes;
     /// Storing the positions of all the steps in the file, so that we can
     /// just `seekpos` them instead of reading the whole step.
     std::vector<uint64_t> steps_positions_;
