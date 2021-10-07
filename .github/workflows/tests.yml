@@ -102,14 +102,14 @@ jobs:
             cxx: emcc
             build-type: Debug
             use-emsdk: true
-            emscripten-version: 2.0.16
+            emscripten-version: 2.0.29
             cmake-extra-args:
               - -DCHFL_BUILD_DOCTESTS=OFF
               - -DBUILD_SHARED_LIBS=OFF
               - -DCMAKE_CXX_FLAGS="-O1"
               - -DCMAKE_C_FLAGS="-O1"
-              - -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-master/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
-              - -DCMAKE_CROSSCOMPILING_EMULATOR=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-master/node/14.15.5_64bit/bin/node
+              - -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-main/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+              - -DCMAKE_CROSSCOMPILING_EMULATOR=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-main/node/14.15.5_64bit/bin/node
           - name: Linux / valgrind
             os: ubuntu-18.04
             cc: gcc
@@ -185,7 +185,7 @@ jobs:
           platform: x64
       - name: Setup emsdk
         if: ${{ matrix.use-emsdk }}
-        uses: mymindstorm/setup-emsdk@v7
+        uses: mymindstorm/setup-emsdk@v10
         with:
           version: ${{ matrix.emscripten-version }}
           actions-cache-folder: "emsdk"
