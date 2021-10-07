@@ -207,6 +207,7 @@ void mmCIFFormat::read_step(const size_t step, Frame& frame) {
 }
 
 void mmCIFFormat::read(Frame& frame) {
+    map_residues_indexes.clear();
     residues_.clear();
     frame.set_cell(cell_);
 
@@ -323,7 +324,7 @@ void mmCIFFormat::read(Frame& frame) {
 
         auto chainid = line_split[label_asym_id->second].to_string();
 
-        if (residues_.find({chainid, resid}) == residues_.end()) {
+        if (map_residues_indexes.find({chainid, resid}) == map_residues_indexes.end()) {
 
             auto name = line_split[label_comp_id->second];
             Residue residue(name.to_string(), resid);
@@ -342,10 +343,11 @@ void mmCIFFormat::read(Frame& frame) {
                 residue.set("is_standard_pdb", line_split[group_pdb->second] == "ATOM");
             }
 
-            residues_.emplace(std::make_pair(chainid, resid), std::move(residue));
+            map_residues_indexes.emplace(std::make_pair(chainid, resid), residues_.size());
+            residues_.emplace_back(std::move(residue));
         } else {
             // Just add this atom to the residue
-            residues_.at({chainid, resid}).add_atom(atom_id);
+            residues_[map_residues_indexes.at({ chainid, resid })].add_atom(atom_id);
         }
     }
 
@@ -353,7 +355,7 @@ void mmCIFFormat::read(Frame& frame) {
     file_.seekpos(position);
 
     for (const auto& residue: residues_) {
-        frame.add_residue(residue.second);
+        frame.add_residue(residue);
     }
 
     // Only link if we are reading mmCIF
