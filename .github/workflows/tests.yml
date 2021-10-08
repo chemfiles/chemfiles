@@ -219,6 +219,12 @@ jobs:
       - name: check the list of exported symbols
         if: matrix.check-exported-symbols
         run: ./scripts/ci/check-exported-symbols.py build/libchemfiles.so
-      - name: upload coverage
+      - name: extract coverage data
         if: matrix.collect-coverage
-        run: bash <(curl -s https://codecov.io/bash)
+        run: find . -type f -name '*.gcno' -exec gcov -p {} +
+      - name: upload coverage
+        uses: codecov/codecov-action@v2
+        if: matrix.collect-coverage
+        with:
+          fail_ci_if_error: true
+          verbose: true
