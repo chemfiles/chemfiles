@@ -12,26 +12,15 @@ Installation
     - Rust: https://chemfiles.org/chemfiles.rs/latest/
     - Fortran: https://chemfiles.org/chemfiles.f03/latest/
 
-Pre-compiled binaries
-^^^^^^^^^^^^^^^^^^^^^
+Pre-compiled chemfiles
+^^^^^^^^^^^^^^^^^^^^^^
 
-We provide compiled packages of the latest release for muliple Linux
-distributions using the `OpenSUSE build service`_. The name of packages
-you can install this way follow the usual linux naming scheme:
+We provide pre-compiled version of chemfiles (both a static library build and a
+shared library build) on github. Please look for the version you need on the
+`chemfiles/chemfiles-prebuilt
+<https://github.com/chemfiles/chemfiles-prebuilt/releases>`_ repository.
 
-- ``chemfiles`` package only contains the shared library ``libchemfiles.so.x.y``
-- ``chemfiles-static`` contains the static library ``libchemfiles.a``
-- ``chemfiles-dev`` (for Debian and derivatives) or ``chemfiles-devel``
-  (for CentOS and derivatives) contains the files usefull for
-  development, including cmake configuration and the C and C++ headers.
-
-.. raw:: html
-    <p>You can download them directly below:</p>
-
-    <iframe
-        src="https://software.opensuse.org/download/package.iframe?project=home%3ALuthaf&package=chemfiles"
-        width="100%" height="400px" frameborder="0"
-    ></iframe>
+--------------------------------------------------------------------------------
 
 We also provide three `conda`_ packages in the `conda-forge` community channel for
 Linux and Os X.
