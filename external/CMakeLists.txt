@@ -57,6 +57,10 @@ function(unpack_library _name_)
         # .git directories can get huge and increase the size of this repository
         message(FATAL_ERROR "${_name_} archive contains a .git directory, please remove it")
     endif()
+
+    # make sure cmake re-runs whenever the file changes
+    get_directory_property(_previous_list_ CMAKE_CONFIGURE_DEPENDS)
+    set_directory_properties(PROPERTIES CMAKE_CONFIGURE_DEPENDS "${_previous_list_};${_name_}.tar.gz")
 endfunction()
 
 function(external_library _name_)
