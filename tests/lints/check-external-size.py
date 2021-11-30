@@ -15,16 +15,16 @@ ERRORS = 0
 
 # when adding new files here, make sure that they are as small as possible!
 EXPECTED_SIZES = {
-    "bzip2.tar.gz": 344,
-    "fmt.tar.gz": 745,
+    "bzip2.tar.gz": 114,
+    "fmt.tar.gz": 189,
     "gemmi.tar.gz": 476,
     "lzma.tar.gz": 256,
     "mmtf-cpp.tar.gz": 439,
     "molfiles.tar.gz": 477,
     "netcdf.tar.gz": 494,
-    "pugixml.tar.gz": 549,
-    "tng.tar.gz": 317,
-    "xdrfile.tar.gz": 41,
+    "pugixml.tar.gz": 198,
+    "tng.tar.gz": 207,
+    "xdrfile.tar.gz": 26,
     "zlib.tar.gz": 370,
 }
 
@@ -40,6 +40,7 @@ if __name__ == "__main__":
         size = os.path.getsize(path)
         size_kb = size // 1024
         name = os.path.basename(path)
+        print(name, size_kb)
 
         if name not in EXPECTED_SIZES:
             error("{} is not a known external file, please edit this file".format(name))
