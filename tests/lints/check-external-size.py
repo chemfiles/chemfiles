@@ -15,17 +15,17 @@ ERRORS = 0
 
 # when adding new files here, make sure that they are as small as possible!
 EXPECTED_SIZES = {
-    "bzip2.tar.gz": 344,
-    "fmt.tar.gz": 745,
+    "bzip2.tar.gz": 114,
+    "fmt.tar.gz": 701,
     "gemmi.tar.gz": 476,
     "lzma.tar.gz": 256,
     "mmtf-cpp.tar.gz": 439,
     "molfiles.tar.gz": 477,
     "netcdf.tar.gz": 494,
-    "pugixml.tar.gz": 549,
-    "tng.tar.gz": 317,
+    "pugixml.tar.gz": 198,
+    "tng.tar.gz": 207,
     "toml11.tar.gz": 69,
-    "xdrfile.tar.gz": 41,
+    "xdrfile.tar.gz": 26,
     "zlib.tar.gz": 370,
 }
 
