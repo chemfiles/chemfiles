@@ -26,6 +26,7 @@ using namespace chemfiles;
     #include <sys/types.h>
     #define fseek64 fseeko
     #define off64_t off_t
+    static_assert(_FILE_OFFSET_BITS == 64, "_FILE_OFFSET_BITS must be 64");
 #endif
 
 PlainFile::PlainFile(const std::string& path, File::Mode mode): TextFileImpl(path) {
