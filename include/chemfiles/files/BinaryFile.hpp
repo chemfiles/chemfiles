@@ -251,7 +251,7 @@ private:
     FILE* file_;
 };
 
-class LittleEndianFile final: public BinaryFile {
+class LittleEndianFile: public BinaryFile {
 public:
     LittleEndianFile(std::string path, File::Mode mode): BinaryFile(std::move(path), mode) {}
 
@@ -282,7 +282,7 @@ public:
     void write_f64(const double* data, size_t count) final override;
 };
 
-class BigEndianFile final: public BinaryFile {
+class BigEndianFile: public BinaryFile {
 public:
     BigEndianFile(std::string path, File::Mode mode): BinaryFile(std::move(path), mode) {}
 
