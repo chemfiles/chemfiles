@@ -19,6 +19,11 @@
 #include <unistd.h>
 #endif
 
+#ifdef CHEMFILES_WINDOWS
+    #define popen _popen
+    #define pclose _pclose
+#endif
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -169,4 +174,25 @@ void* operator new[](size_t count) {
 
 void operator delete[](void* ptr) noexcept {
     operator delete(ptr);
+}
+
+std::string run_process(std::string command) {
+    auto process = popen(command.c_str(), "r");
+    if (process == nullptr) {
+        throw std::runtime_error("could not start command '" + command + "'");
+    }
+
+    std::array<char, 128> buffer;
+    std::string result;
+
+    while (std::fgets(buffer.data(), 128, process) != nullptr) {
+        result += buffer.data();
+    }
+
+    auto status = pclose(process);
+    if (status != 0) {
+        throw std::runtime_error("running '" + command + "' returned " + std::to_string(status));
+    }
+
+    return result;
 }
