@@ -61,20 +61,29 @@ class Netcdf3File;
 /// Tagged enum representation for the variables or global attributes
 class Value {
 public:
-    Value(char value): byte_(value), kind_(kind::BYTE) {}
+    enum kind_t {
+        BYTE,
+        SHORT,
+        INT,
+        FLOAT,
+        DOUBLE,
+        STRING,
+    };
 
-    Value(int16_t value): short_(value), kind_(kind::SHORT) {}
+    Value(char value): byte_(value), kind_(kind_t::BYTE) {}
 
-    Value(int32_t value): int_(value), kind_(kind::INT) {}
+    Value(int16_t value): short_(value), kind_(kind_t::SHORT) {}
 
-    Value(float value): float_(value), kind_(kind::FLOAT) {}
+    Value(int32_t value): int_(value), kind_(kind_t::INT) {}
 
-    Value(double value): double_(value), kind_(kind::DOUBLE) {}
+    Value(float value): float_(value), kind_(kind_t::FLOAT) {}
 
-    Value(std::string value): string_(std::move(value)), kind_(kind::STRING) {}
+    Value(double value): double_(value), kind_(kind_t::DOUBLE) {}
+
+    Value(std::string value): string_(std::move(value)), kind_(kind_t::STRING) {}
 
     ~Value() {
-        if (kind_ == kind::STRING) {
+        if (kind_ == kind_t::STRING) {
             using std::string;
             string_.~string();
         }
@@ -92,64 +101,35 @@ public:
 
     Value& operator=(const Value& other);
 
-    optional<const std::string&> as_string() const {
-        if (kind_ == kind::STRING) {
-            return string_;
-        } else {
-            return nullopt;
-        }
-    }
+    /// get the string stored in this `Value` or throw an error if the value
+    /// does not store a string
+    const std::string& as_string() const;
 
-    optional<int8_t> as_i8() const {
-        if (kind_ == kind::BYTE) {
-            return byte_;
-        } else {
-            return nullopt;
-        }
-    }
+    /// get the 8-bit integer stored in this `Value` or throw an error if the
+    /// value does not store an 8-bit integer
+    int8_t as_i8() const;
 
-    optional<int16_t> as_i16() const {
-        if (kind_ == kind::SHORT) {
-            return short_;
-        } else {
-            return nullopt;
-        }
-    }
+    /// get the 16-bit integer stored in this `Value` or throw an error if the
+    /// value does not store an 16-bit integer
+    int16_t as_i16() const;
 
-    optional<int32_t> as_i32() const {
-        if (kind_ == kind::INT) {
-            return int_;
-        } else {
-            return nullopt;
-        }
-    }
+    /// get the 32-bit integer stored in this `Value` or throw an error if the
+    /// value does not store an 32-bit integer
+    int32_t as_i32() const;
 
-    optional<float> as_f32() const {
-        if (kind_ == kind::FLOAT) {
-            return float_;
-        } else {
-            return nullopt;
-        }
-    }
+    /// get the 32-bit floating point stored in this `Value` or throw an error
+    /// if the value does not store a 32-bit floating point
+    float as_f32() const;
 
-    optional<double> as_f64() const {
-        if (kind_ == kind::DOUBLE) {
-            return double_;
-        } else {
-            return nullopt;
-        }
+    /// get the 64-bit floating point stored in this `Value` or throw an error
+    /// if the value does not store a 64-bit floating point
+    double as_f64() const;
+
+    kind_t kind() const {
+        return kind_;
     }
 
 private:
-    enum class kind {
-        BYTE,
-        SHORT,
-        INT,
-        FLOAT,
-        DOUBLE,
-        STRING,
-    };
-
     union {
         /// char or byte
         int8_t byte_;
@@ -164,21 +144,26 @@ private:
         /// string
         std::string string_;
     };
-    kind kind_;
+
+    kind_t kind_;
 };
 
 
 /// A single dimension for a variable.
 struct Dimension {
-    Dimension(std::string name_, int32_t size_, bool is_record_):
-        name(std::move(name_)), size(size_), is_record(is_record_) {}
+    Dimension(std::string name_, int32_t size_):
+        name(std::move(name_)), size(size_) {}
 
     /// Name of the dimension
     std::string name;
-    /// size of the dimension
+    /// size of the dimension, 0 indicates the optional record (i.e. infinite)
+    /// dimension
     int32_t size;
-    /// Is this dimension the optional record (i.e. infinite) dimension?
-    bool is_record;
+
+    /// Is this dimension the record (i.e. infinite) dimension?
+    bool is_record() const {
+        return size == 0;
+    }
 };
 
 struct VariableLayout {
@@ -188,10 +173,8 @@ struct VariableLayout {
     /// record variables: size in bytes of a single entry
     int32_t size;
     /// Offset in the file of the first byte in this variable
-    int64_t begin;
+    int64_t offset;
 
-    /// size of a single value of the current type
-    size_t size_for_type() const;
     /// non record variables: number of values in the full array
     /// record variables: number of values in a single entry
     size_t count() const;
@@ -202,19 +185,18 @@ struct VariableLayout {
 /// Base class used to define both `Variable` and `RecordVariable`.
 class BaseVariable {
 public:
-    /// Get all attributes for this variable
+    /// Get all the attributes for this variable
     const std::map<std::string, Value>& attributes() const {
         return attributes_;
     }
 
-    /// Get the attribute with the given `name` for this variable, throwing
-    /// an exception if it does not exist.
-    const Value& attribute(const std::string& name) const {
-        return attributes_.at(name);
+    /// Get all the dimensions for this variable
+    const std::vector<std::shared_ptr<Dimension>>& dimensions() const {
+        return dimensions_;
     }
 
-    /// Shape of this variable
-    std::vector<size_t> shape() const;
+    /// Get the attribute with the given `name` for this variable, if it exists
+    optional<const Value&> attribute(const std::string& name) const;
 
     /// Get the type of this variable as one of the values in
     /// `chemfiles::netcdf3::constants`.
@@ -224,6 +206,7 @@ public:
 
 protected:
     friend class Netcdf3File;
+    friend class Netcdf3Builder;
     BaseVariable(
         Netcdf3File& file,
         std::vector<std::shared_ptr<Dimension>> dimensions,
@@ -242,117 +225,133 @@ protected:
 /// are a record (infinite) dimension.
 class Variable: public BaseVariable {
 public:
-    /// read this variable as 16-bit integer, filling the given vector
-    ///
-    /// @throws if the vector is too small to fit all values for this variable
-    void read_i16(std::vector<int16_t>& data);
-    /// read this variable as 16-bit integer, writing data from `data` to `data
-    /// + count`
-    ///
-    /// @throws if `count` is too small to fit all values for this variable
-    void read_i16(int16_t* data, size_t count);
+    /// Get the shape of this variable
+    std::vector<size_t> shape() const;
 
-    /// read this variable as 32-bit integer, filling the given vector
+    /// read the content of this variable, filling the `data` vector
     ///
-    /// @throws if the vector is too small to fit all values for this variable
-    void read_i32(std::vector<int32_t>& data);
-    /// read this variable as 32-bit integer, writing data from `data` to `data
-    /// + count`
-    ///
-    /// @throws if `count` is too small to fit all values for this variable
-    void read_i32(int32_t* data, size_t count);
+    /// @throws if the vector type does not match this variable type
+    template<typename T>
+    void read(std::vector<T>& data) {
+        data.resize(this->layout_.count());
+        this->read(data.data(), data.size());
+    }
 
-    /// read this variable as 32-bit floating point number, filling the given
-    /// vector
-    ///
-    /// @throws if the vector is too small to fit all values for this variable
-    void read_f32(std::vector<float>& data);
-    /// read this variable as 32-bit floating point number, writing data from
-    /// `data` to `data + count`
+    /// read the content of this variable, writing values from `data` to `data +
+    /// count`
     ///
     /// @throws if `count` is too small to fit all values for this variable
-    void read_f32(float* data, size_t count);
+    /// @throws if the pointer type does not match this variable type
+    template<typename T>
+    void read(T* data, size_t count);
 
-    /// read this variable as 64-bit floating point number, filling the given
-    /// vector
+    /// write the content of `data` to this variable
     ///
-    /// @throws if the vector is too small to fit all values for this variable
-    void read_f64(std::vector<double>& data);
-    /// read this variable as 64-bit floating point number, writing data from
-    /// `data` to `data + count`
+    /// @throws if the vector type does not match this variable type
+    /// @throws if the vector size does not match this variable size
+    template<typename T>
+    void write(const std::vector<T>& data) {
+        this->write(data.data(), data.size());
+    }
+
+    /// write the values between `data` and `data + count` to this variable
     ///
-    /// @throws if `count` is too small to fit all values for this variable
-    void read_f64(double* data, size_t count);
+    /// @throws if the data type does not match this variable type
+    /// @throws if count does not match this variable size
+    template<typename T>
+    void write(const T* data, size_t count);
 
 private:
+    /// Write the netcdf fill/default value to this variable, ignoring any
+    /// "fillValue" attribute
+    void write_fill_value();
+
     friend class Netcdf3File;
+    friend class Netcdf3Builder;
     Variable(BaseVariable base);
 };
+
+extern template void Variable::read(int32_t* data, size_t count);
+extern template void Variable::read(float* data, size_t count);
+extern template void Variable::read(double* data, size_t count);
+
+extern template void Variable::write(const int32_t* data, size_t count);
+extern template void Variable::write(const float* data, size_t count);
+extern template void Variable::write(const double* data, size_t count);
 
 /// A single variable in a NetCDF3 file. One of the dimension for this variable
 /// is a record (infinite) dimension.
 class RecordVariable: public BaseVariable {
 public:
-    /// read this variable as 16-bit integer at the given `step`, filling the
-    /// given vector
+    /// Get the shape of this variable
+    std::vector<size_t> shape() const;
+
+    /// read the content of this variable at the given `step`, filling the
+    /// `data` vector
     ///
-    /// @throws if `count` is too small to fit all values for this variable
-    void read_i16(size_t step, std::vector<int16_t>& data);
-    /// read this variable as 32-bit integer at the given `step`, writing data
+    /// @throws if the vector type does not match this variable type
+    template<typename T>
+    void read(size_t step, std::vector<T>& data) {
+        data.resize(this->layout_.count());
+        this->read(step, data.data(), data.size());
+    }
+
+    /// read the content of this variable at the given `step`, writing values
     /// from `data` to `data + count`
     ///
     /// @throws if `count` is too small to fit all values for this variable
-    void read_i16(size_t step, int16_t* data, size_t count);
+    /// @throws if the pointer type does not match this variable type
+    template<typename T>
+    void read(size_t step, T* data, size_t count);
 
-    /// read this variable as 32-bit integer at the given `step`, filling the
-    /// given vector
+    /// write the content of `data` to this variable at the given `step`
     ///
-    /// @throws if `count` is too small to fit all values for this variable
-    void read_i32(size_t step, std::vector<int32_t>& data);
-    /// read this variable as 32-bit integer at the given `step`, writing data
-    /// from `data` to `data + count`
-    ///
-    /// @throws if `count` is too small to fit all values for this variable
-    void read_i32(size_t step, int32_t* data, size_t count);
+    /// @throws if the vector type does not match this variable type
+    /// @throws if the vector size does not match this variable size
+    template<typename T>
+    void write(size_t step, const std::vector<T>& data) {
+        this->write(step, data.data(), data.size());
+    }
 
-    /// read this variable as 32-bit floating point number at the given `step`,
-    /// filling the given vector
+    /// write the values between `data` and `data + count` to this variable at
+    /// the given `step`
     ///
-    /// @throws if `count` is too small to fit all values for this variable
-    void read_f32(size_t step, std::vector<float>& data);
-    /// read this variable as 32-bit floating point number at the given `step`,
-    /// writing data from `data` to `data + count`
-    ///
-    /// @throws if `count` is too small to fit all values for this variable
-    void read_f32(size_t step, float* data, size_t count);
-
-    /// read this variable as 64-bit floating point number at the given `step`,
-    /// filling the given vector
-    ///
-    /// @throws if `count` is too small to fit all values for this variable
-    void read_f64(size_t step, std::vector<double>& data);
-    /// read this variable as 64-bit floating point number at the given `step`,
-    /// writing data from `data` to `data + count`
-    ///
-    /// @throws if `count` is too small to fit all values for this variable
-    void read_f64(size_t step, double* data, size_t count);
+    /// @throws if the vector type does not match this variable type @throws if
+    /// the vector size does not match this variable size
+    template<typename T>
+    void write(size_t step, const T* data, size_t count);
 
 private:
-    /// the size of a full record, containing a single entry for all record
-    /// variable
-    uint64_t record_size_;
-    /// current number of records in the file
-    size_t record_length_;
+    /// Write the netcdf fill/default value to this variable at the given
+    /// `step`, ignoring any "fillValue" attribute
+    void write_fill_value(size_t step);
 
     friend class Netcdf3File;
+    friend class Netcdf3Builder;
     RecordVariable(BaseVariable base);
 };
 
+extern template void RecordVariable::read(size_t step, int32_t* data, size_t count);
+extern template void RecordVariable::read(size_t step, float* data, size_t count);
+extern template void RecordVariable::read(size_t step, double* data, size_t count);
 
-/// TODO: more docs
+extern template void RecordVariable::write(size_t step, const int32_t* data, size_t count);
+extern template void RecordVariable::write(size_t step, const float* data, size_t count);
+extern template void RecordVariable::write(size_t step, const double* data, size_t count);
+
+
+/// An implementation of NetCDF version 3 (or classic) binary files, using
+/// 64-bit offsets for variables.
 ///
-/// NetCDF 3 files are guaranteed to be stored as big endian, regardless of the
-/// native system endianess.
+/// A NetCDF 3 file contains global attributes (i.e. key/values associated with
+/// the file); a set of named and sized dimensions, one of which can be
+/// unlimited (called the record dimension in the code); and a set of variables.
+/// Each variable is linked to some dimensions, and can have its own attributes.
+/// Variables which use the record dimension are stored separately, and have a
+/// different API in this implementation.
+///
+/// NetCDF 3 files are stored using big endian, regardless of the native system
+/// endianess.
 class Netcdf3File: public BigEndianFile {
 public:
     Netcdf3File(std::string filename, File::Mode mode);
@@ -364,60 +363,124 @@ public:
     Netcdf3File& operator=(Netcdf3File&&) = delete;
     Netcdf3File& operator=(const Netcdf3File&) = delete;
 
-    /// Get all global attribute for this file
+    /// Get all the global attribute for this file
     const std::map<std::string, Value>& attributes() const {
         return attributes_;
     }
 
-    /// Get the global attribute with the given `name` for this file, throwing
-    /// a `FileError` if it does not exist
-    const Value& attribute(const std::string& name) const;
+    /// Get the global attribute with the given `name` for this file, if it exists
+    optional<const Value&> attribute(const std::string& name) const;
 
-    /// Get all fixed size variables defined in this file
+    /// Get all the fixed size variables for this file
     const std::map<std::string, Variable>& variables() const {
         return variables_;
     }
 
-    /// Get the fixed size variable with the given name in this file, throwing
-    /// a `FileError` if it does not exist
-    Variable& variable(const std::string& name);
+    /// Get the fixed size variable with the given name in this file if it exists
+    optional<Variable&> variable(const std::string& name);
 
-    /// Get all record variables defined in this file
+    /// Get all the record size variables for this file
     const std::map<std::string, RecordVariable>& record_variables() const {
         return record_variables_;
     }
 
-    /// Get the record variable with the given name in this file, throwing
-    /// a `FileError` if it does not exist
-    RecordVariable& record_variable(const std::string& name);
+    /// Get the record variable with the given name in this file if it exists
+    optional<RecordVariable&> record_variable(const std::string& name);
 
     /// Get all the dimensions defined in this file
     const std::vector<std::shared_ptr<Dimension>>& dimensions() const {
         return dimensions_;
     }
 
+    /// Add an empty new record to this file, increasing the record dimension by
+    /// one
+    void add_record();
+
+    /// get the current number of records in the file
+    uint64_t n_records() const {
+        return n_records_;
+    }
+
+    /// get the size in bytes of a full record entry, including all record variables
+    uint64_t record_size() const {
+        return record_size_;
+    }
+
 private:
+    /// skip `count` bytes of padding from the file
     void skip_padding(size_t count);
+    /// write `count` bytes of padding to the file
+    void add_padding(size_t count);
+
+    /// read a "Pascal" string (size + char array, no NULL terminator) from the file
     std::string read_pascal_string();
+    /// write string to the file in "Pascal" format
+    void write_pascal_string(const std::string& value);
 
+    /// read attributes at the current point in file (these could be global or
+    /// variable attributes)
     std::map<std::string, Value> read_attributes();
+    /// read a single attribute value from the file
     Value read_attribute_value();
+    /// write a single attribute value to the file
+    void write_attribute_value(const Value& value);
 
-    struct variable_list {
-        /// record variables
-        std::map<std::string, RecordVariable> records;
-        /// non-record variables
-        std::map<std::string, Variable> globals;
+    struct variable_list_t {
+        std::map<std::string, RecordVariable> record_variables;
+        std::map<std::string, Variable> variables;
     };
-
-    variable_list read_variable_list();
+    variable_list_t read_variable_list();
 
     /// current number of records in the file
-    int32_t record_length_;
+    uint64_t n_records_;
+    /// size in bytes of a full record entry, including all record variables
+    uint64_t record_size_;
+
+    /// list of dimensions in this file
+    std::vector<std::shared_ptr<Dimension>> dimensions_;
+    /// global attributes of the file
+    std::map<std::string, Value> attributes_;
+    /// variables **not** using the record dimension in this file
+    std::map<std::string, Variable> variables_;
+    /// variables using the record dimension in this file
+    std::map<std::string, RecordVariable> record_variables_;
+
+    // was this file initialized?
+    bool initialized_;
+
+    friend class Netcdf3Builder;
+};
+
+/// Definition for variables to be added to a new NetCDF 3 file
+struct VariableDefinition {
+    /// NetCDF type identifier for this variable
+    int32_t type;
+    /// list of dimensions for this variable
+    std::vector<size_t> dimensions;
+    /// attributes for this variable
+    std::map<std::string, Value> attributes;
+};
+
+/// `Netcdf3Builder` should be used to initialize new `Netcdf3File`, setting up
+/// dimensions, attributes and variables in the file.
+class Netcdf3Builder {
+public:
+    /// Add a new dimension to the builder
+    size_t add_dimension(std::shared_ptr<Dimension> dimension);
+
+    /// Add a new global attribute to the builder with the give `name` and `value`
+    void add_attribute(std::string name, Value value);
+
+    /// Add a new `variable` with the give `name` to the builder
+    void add_variable(std::string name, VariableDefinition definition);
+
+    /// Initialize an opened file, moving all data from this builder to the file
+    void initialize(Netcdf3File* file) &&;
+
+private:
     std::vector<std::shared_ptr<Dimension>> dimensions_;
     std::map<std::string, Value> attributes_;
-    std::map<std::string, Variable> variables_;
-    std::map<std::string, RecordVariable> record_variables_;
+    std::map<std::string, VariableDefinition> variables_;
 };
 
 } // namespace netcdf3

@@ -60,7 +60,10 @@ void silent_crash_handlers();
 /// all C++ allocations.
 void fail_next_allocation();
 
-// Check return status of C API functions
+/// Check return status of C API functions
 #define CHECK_STATUS(expr) CHECK(expr == CHFL_SUCCESS)
+
+/// run the given command using the system shell, and return the standard output
+std::string run_process(std::string command);
 
 #endif

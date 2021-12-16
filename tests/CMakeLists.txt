@@ -126,8 +126,10 @@ foreach(test_file IN LISTS capi_test_files)
     chfl_capi_test(${test_file})
 endforeach()
 
+# Pass extra data to some tests
 file(RELATIVE_PATH VERSION_FILE_PATH ${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/VERSION)
 target_compile_definitions(c-misc PRIVATE "-DVERSION_FILE_PATH=\"${VERSION_FILE_PATH}\"")
+target_compile_definitions(netcdf3-file PRIVATE "-DCMAKE_COMMAND=\"${CMAKE_COMMAND}\"")
 
 function(chfl_doctest _name_ _file_)
     if(NOT ${CHFL_BUILD_DOCTESTS})
