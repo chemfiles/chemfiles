@@ -19,356 +19,626 @@
 #include "chemfiles/UnitCell.hpp"
 #include "chemfiles/FormatMetadata.hpp"
 
-#include "chemfiles/files/NcFile.hpp"
+#include "chemfiles/files/Netcdf3File.hpp"
 #include "chemfiles/formats/AmberNetCDF.hpp"
 
 using namespace chemfiles;
 
-template<AmberFormat F>
-struct FormatSpec;
+/// Create the basic builder common to AMBER and AMBERRESTART conventions
+static netcdf3::Netcdf3Builder base_builder(std::string convention, std::string title, size_t n_atoms);
 
-template<> struct FormatSpec<AMBER_NC_RESTART>  {
-    typedef nc::NcDouble nc_type;
-    typedef double real_type;
-    static constexpr char const* convention = "AMBERRESTART";
-};
+/// Find the dimension with the given name in the file
+static optional<netcdf3::Dimension&> find_dimension(netcdf3::Netcdf3File& file, const std::string& name);
+/// Find the id of the dimension with the given name in the builder
+static size_t get_dimension_id(const netcdf3::Netcdf3Builder& builder, const std::string& name);
 
-template<> struct FormatSpec<AMBER_NC_TRAJECTORY>  {
-    typedef nc::NcFloat nc_type;
-    typedef float real_type;
-    static constexpr char const* convention = "AMBER";
-};
+/******************************************************************************/
 
-//! Check the validity of a NetCDF file
-template <AmberFormat F>
-static bool is_valid(const NcFile& file_, optional<size_t> natoms) {
-    bool writing = static_cast<bool>(natoms);
-    auto convention = FormatSpec<F>::convention;
-
-    if (file_.global_attribute("Conventions") != convention) {
-        if (!writing) {
-            warning("Amber NetCDF reader", "we can only read {} convention", convention);
-        }
-        return false;
-    }
-
-    if (file_.global_attribute("ConventionVersion") != "1.0") {
-        if (!writing) {
-            warning("Amber NetCDF reader", "we can only read version 1.0 of {} convention",
-                    convention);
-        }
-        return false;
-    }
-
-    if (file_.dimension("spatial") != 3) {
-        if (!writing) {
-            warning("Amber NetCDF reader",
-                "wrong size for spatial dimension: should be 3, is {}",
-                file_.dimension("spatial")
-            );
-        }
-        return false;
-    }
-
-    if (writing) {
-        if (file_.dimension("atom") != *natoms) {
-            warning("Amber NetCDF writer",
-                "wrong size for atoms dimension: should be {}, is {}",
-                *natoms, file_.dimension("atom")
-            );
-            return false;
-        }
-    }
-    return true;
-}
-
-template <AmberFormat F>
-Amber<F>::Amber(std::string path, File::Mode mode, File::Compression compression)
-    : file_(std::move(path), mode), step_(0), validated_(false) {
-    if (file_.mode() == File::READ || file_.mode() == File::APPEND) {
-        if (!is_valid<F>(file_, nullopt)) {
-            throw format_error("invalid AMBER NetCDF file at '{}'", file_.path());
-        }
-        validated_ = true;
-    }
+AmberNetCDFBase::AmberNetCDFBase(std::string convention, std::string path, File::Mode mode, File::Compression compression):
+    file_(std::move(path), mode),
+    convention_(std::move(convention)),
+    step_(0)
+{
     if (compression != File::DEFAULT) {
         throw format_error("compression is not supported with NetCDF format");
     }
+
+    if (file_.mode() == File::WRITE) {
+        // the file will be initialized on the first write
+        return;
+    }
+
+    try {
+        this->validate_common();
+    } catch (const Error& e) {
+        throw format_error("invalid Amber NetCDF file at '{}': {}", file_.path(), e.what());
+    }
+
+    auto& attributes = file_.attributes();
+    auto title = attributes.find("title");
+    if (title != attributes.end() && title->second.kind() == netcdf3::Value::STRING) {
+        file_title_ = title->second.as_string();
+    }
+
+    n_atoms_ = find_dimension(file_, "atom")->size;
+
+    // get the variables actually defined in the file
+    variables_.coordinates = this->get_variable("coordinates");
+    if (variables_.coordinates.var) {
+        // TODO: units
+    } else {
+        warning("Amber NetCDF reader", "the coordinates variable is not defined in this file");
+    }
+
+    variables_.velocities = this->get_variable("velocities");
+    if (variables_.velocities.var) {
+        // TODO: units
+    }
+
+    variables_.cell_lengths = this->get_variable("cell_lengths");
+    variables_.cell_angles = this->get_variable("cell_angles");
+    if (variables_.cell_lengths.var && variables_.cell_angles.var) {
+        // TODO: units
+    } else if (variables_.cell_lengths.var) {
+        if (!variables_.cell_angles.var) {
+            throw format_error(
+                "invalid Amber NetCDF file at '{}': "
+                "cell_lengths requires cell_angles to be defined",
+                file_.path()
+            );
+        }
+
+        if (!variables_.coordinates.var) {
+            throw format_error(
+                "invalid Amber NetCDF file at '{}': "
+                "cell_lengths requires coordinates to be defined",
+                file_.path()
+            );
+        }
+    }
 }
 
-template <AmberFormat F>
-void Amber<F>::read_step(const size_t step, Frame& frame) {
+void AmberNetCDFBase::validate_common() {
+    auto conventions = file_.attribute("Conventions");
+    if (!conventions) {
+        throw format_error("expected a 'Conventions' attribute to be defined");
+    } else if (conventions->as_string() != convention_) {
+        throw format_error("expected '{}' convention", convention_);
+    }
+
+    auto convention_version = file_.attribute("ConventionVersion");
+    if (!convention_version) {
+        throw format_error("expected a 'ConventionVersion' attribute to be defined");
+    } else if (convention_version->as_string() != "1.0") {
+        throw format_error("expected version 1.0 of '{}' convention", convention_);
+    }
+
+    auto spatial = find_dimension(file_, "spatial");
+    if (!spatial) {
+        throw format_error("missing 'spatial' dimension");
+    } else if (spatial->size != 3) {
+        throw format_error("'spatial' dimension must have a size of 3, got {}", spatial->size);
+    }
+
+    if (!find_dimension(file_, "atom")) {
+        throw format_error("missing 'atom' dimension");
+    }
+
+    auto cell_spatial = find_dimension(file_, "cell_spatial");
+    if (cell_spatial && cell_spatial->size != 3) {
+        throw format_error("'cell_spatial' dimension must have a size of 3, got {}", cell_spatial->size);
+    }
+
+    auto cell_angular = find_dimension(file_, "cell_angular");
+    if (cell_angular && cell_angular->size != 3) {
+        throw format_error("'cell_angular' dimension must have a size of 3, got {}", cell_angular->size);
+    }
+}
+
+AmberNetCDFBase::variable_scale_t AmberNetCDFBase::get_variable(const std::string& name) {
+    double scale = 1.0;
+    auto variable = file_.variable(name);
+    if (variable) {
+        auto scale_factor = variable->attribute("scale_factor");
+        if (scale_factor) {
+            if (scale_factor->kind() == netcdf3::Value::FLOAT) {
+                scale = static_cast<double>(scale_factor->as_f32());
+            } else if (scale_factor->kind() == netcdf3::Value::DOUBLE) {
+                // this is non standard, but LAMMPS does it
+                scale = scale_factor->as_f64();
+            } else {
+                throw format_error("scale_factor attribute for '{}' must be a floating point value", name);
+            }
+        }
+
+        return variable_scale_t{&variable.value(), scale};
+    } else {
+        return variable_scale_t{nullptr, scale};
+    }
+}
+
+/******************************************************************************/
+
+void AmberNetCDFBase::read(Frame& frame) {
+    this->read_step(step_, frame);
+    step_++;
+}
+
+void AmberNetCDFBase::read_step(const size_t step, Frame& frame) {
     // Set the internal step_ before further reading
     step_ = step;
 
-    if (F == AMBER_NC_RESTART && step_ != 0) {
-        throw format_error("AMBER Restart format only supports reading one frame");
-    }
-
     frame.set_cell(read_cell());
 
-    if (file_.global_attribute_exists("title")) {
-        frame.set("name", file_.global_attribute("title"));
+    if (file_title_) {
+        frame.set("name", file_title_.value());
     }
 
-    frame.resize(file_.dimension("atom"));
-    read_array(frame.positions(), "coordinates");
-    if (file_.variable_exists("velocities")) {
+    frame.resize(n_atoms_);
+
+    if (variables_.coordinates.var) {
+        this->read_array(variables_.coordinates, frame.positions());
+    }
+
+    if (variables_.velocities.var) {
         frame.add_velocities();
-        read_array(*frame.velocities(), "velocities");
+        this->read_array(variables_.velocities, *frame.velocities());
     }
 }
 
-template <AmberFormat F>
-void Amber<F>::read(Frame& frame) {
-    read_step(step_, frame);
-    step_++;
+void AmberNetCDFBase::write(const Frame& frame) {
+    if (!file_.initialized()) {
+        this->initialize(frame);
+
+        file_.variable("spatial")->write(0, "xyz", 3);
+        file_.variable("cell_spatial")->write(0, "abc", 3);
+        file_.variable("cell_angular")->write(0, "alphabeta gamma", 15);
+
+        variables_.coordinates = this->get_variable("coordinates");
+        variables_.velocities = this->get_variable("velocities");
+        variables_.cell_lengths = this->get_variable("cell_lengths");
+        variables_.cell_angles = this->get_variable("cell_angles");
+
+        n_atoms_ = frame.size();
+    }
+
+    file_.add_record();
+
+    if (frame.size() != n_atoms_) {
+        throw format_error(
+            "this file can only write frame with {} atoms, but the frame contains {} atoms",
+            n_atoms_, frame.size()
+        );
+    }
+
+    write_cell(frame.cell());
+
+    if (variables_.coordinates.var) {
+        this->write_array(variables_.coordinates, frame.positions());
+    }
+
+    if (frame.velocities()) {
+        if (variables_.velocities.var) {
+            this->write_array(variables_.velocities, *frame.velocities());
+        } else {
+            warning("AMBER NetCDF", "this file does not contain space for velocities, they will not be saved");
+        }
+    }
+
+    step_ += 1;
 }
 
-namespace chemfiles {
-    template <>
-    std::array<std::vector<size_t>, 2> Amber<AMBER_NC_RESTART>::vec3d_range() {
-        return {std::vector<size_t>({0}), std::vector<size_t>({3})};
+/******************************************************************************/
+
+UnitCell AmberNetCDFBase::read_cell() {
+    if (!variables_.cell_lengths.var || !variables_.cell_angles.var) {
+        // No cell information
+        return {};
     }
 
-    template <>
-    std::array<std::vector<size_t>, 2> Amber<AMBER_NC_TRAJECTORY>::vec3d_range() {
-        return {std::vector<size_t>({step_, 0}), std::vector<size_t>({1, 3})};
+    auto data_f32 = std::array<float, 3>();
+    auto data_f64 = std::array<double, 3>();
+
+    Vector3D lengths;
+    auto& cell_lengths = variables_.cell_lengths.var;
+    if (cell_lengths->type() == netcdf3::constants::NC_FLOAT) {
+        cell_lengths->read(step_, data_f32.data(), data_f32.size());
+        lengths = Vector3D(
+            static_cast<double>(data_f32[0]),
+            static_cast<double>(data_f32[1]),
+            static_cast<double>(data_f32[2])
+        );
+    } else if (cell_lengths->type() == netcdf3::constants::NC_DOUBLE) {
+        cell_lengths->read(step_, data_f64.data(), data_f64.size());
+        lengths = Vector3D(
+            data_f64[0],
+            data_f64[1],
+            data_f64[2]
+        );
+    } else {
+        unreachable();
     }
 
-    template <>
-    std::array<std::vector<size_t>, 2> Amber<AMBER_NC_RESTART>::vec3d_n_range(size_t n) {
-        return {std::vector<size_t>({0, 0}), std::vector<size_t>({n, 3})};
+    Vector3D angles;
+    auto& cell_angles = variables_.cell_angles.var;
+    if (cell_angles->type() == netcdf3::constants::NC_FLOAT) {
+        cell_angles->read(step_, data_f32.data(), data_f32.size());
+        angles = Vector3D(
+            static_cast<double>(data_f32[0]),
+            static_cast<double>(data_f32[1]),
+            static_cast<double>(data_f32[2])
+        );
+    } else if (cell_angles->type() == netcdf3::constants::NC_DOUBLE) {
+        cell_angles->read(step_, data_f64.data(), data_f64.size());
+        angles = Vector3D(
+            data_f64[0],
+            data_f64[1],
+            data_f64[2]
+        );
+    } else {
+        unreachable();
     }
 
-    template <>
-    std::array<std::vector<size_t>, 2> Amber<AMBER_NC_TRAJECTORY>::vec3d_n_range(size_t n) {
-        return {std::vector<size_t>({step_, 0, 0}), std::vector<size_t>({1, n, 3})};
-    }
-
-    template <>
-    size_t Amber<AMBER_NC_RESTART>::nsteps() {
-        return 1;
-    }
-
-    template <>
-    size_t Amber<AMBER_NC_TRAJECTORY>::nsteps() {
-        return file_.dimension("frame");
-    }
-}
-
-template <AmberFormat F>
-static typename FormatSpec<F>::nc_type get_variable(NcFile& file_, const std::string& name) {
-    return file_.variable<typename FormatSpec<F>::nc_type>(name);
-}
-
-template <AmberFormat F>
-UnitCell Amber<F>::read_cell() {
-    if (!file_.variable_exists("cell_lengths") ||
-        !file_.variable_exists("cell_angles")) {
-        return {}; // No UnitCell information
-    }
-
-    if (file_.optional_dimension("cell_spatial", 0) != 3 ||
-        file_.optional_dimension("cell_angular", 0) != 3) {
-            return {}; // No UnitCell information
-    }
-
-    auto length_var = get_variable<F>(file_, "cell_lengths");
-    auto angles_var = get_variable<F>(file_, "cell_angles");
-
-    auto range = vec3d_range();
-    auto lengths_f = length_var.get(range[0], range[1]);
-    auto angles_f = angles_var.get(range[0], range[1]);
-
-    auto lengths = Vector3D(
-        static_cast<double>(lengths_f[0]),
-        static_cast<double>(lengths_f[1]),
-        static_cast<double>(lengths_f[2])
+    return UnitCell(
+        variables_.cell_lengths.scale * lengths,
+        variables_.cell_angles.scale * angles
     );
-    auto angles = Vector3D(
-        static_cast<double>(angles_f[0]),
-        static_cast<double>(angles_f[1]),
-        static_cast<double>(angles_f[2])
+}
+
+void AmberNetCDFBase::read_array(variable_scale_t& variable, span<Vector3D> array) {
+    if (variable.var->type() == netcdf3::constants::NC_FLOAT) {
+        variable.var->read(step_, buffer_f32_);
+        for (size_t i=0; i<n_atoms_; i++) {
+            array[i][0] = variable.scale * static_cast<double>(buffer_f32_[3 * i + 0]);
+            array[i][1] = variable.scale * static_cast<double>(buffer_f32_[3 * i + 1]);
+            array[i][2] = variable.scale * static_cast<double>(buffer_f32_[3 * i + 2]);
+        }
+    } else if (variable.var->type() == netcdf3::constants::NC_DOUBLE) {
+        variable.var->read(step_, buffer_f64_);
+        for (size_t i=0; i<n_atoms_; i++) {
+            array[i][0] = variable.scale * buffer_f64_[3 * i + 0];
+            array[i][1] = variable.scale * buffer_f64_[3 * i + 1];
+            array[i][2] = variable.scale * buffer_f64_[3 * i + 2];
+        }
+    } else {
+        throw format_error("invalid type for variable, expected floating point");
+    }
+}
+
+/******************************************************************************/
+
+void AmberNetCDFBase::write_cell(const UnitCell& cell) {
+    if (!variables_.cell_lengths.var || !variables_.cell_angles.var) {
+        // no cell information
+        if (cell.shape() != UnitCell::INFINITE) {
+            warning("AMBER NetCDF", "this file does not contain space for unit cell data, it will not be saved");
+        }
+        return;
+    }
+
+    auto lengths = cell.lengths();
+    auto& cell_lengths = variables_.cell_lengths.var;
+    if (cell_lengths->type() == netcdf3::constants::NC_FLOAT) {
+        auto data_f32 = std::array<float, 3>{
+            static_cast<float>(lengths[0]),
+            static_cast<float>(lengths[1]),
+            static_cast<float>(lengths[2]),
+        };
+        cell_lengths->write(step_, data_f32.data(), data_f32.size());
+    } else if (cell_lengths->type() == netcdf3::constants::NC_DOUBLE) {
+        cell_lengths->write(step_, &lengths[0], 3);
+    } else {
+        unreachable();
+    }
+
+    auto angles = cell.angles();
+    auto& cell_angles = variables_.cell_angles.var;
+    if (cell_angles->type() == netcdf3::constants::NC_FLOAT) {
+        auto data_f32 = std::array<float, 3>{
+            static_cast<float>(angles[0]),
+            static_cast<float>(angles[1]),
+            static_cast<float>(angles[2]),
+        };
+        cell_angles->write(step_, data_f32.data(), data_f32.size());
+    } else if (cell_angles->type() == netcdf3::constants::NC_DOUBLE) {
+        cell_angles->write(step_, &angles[0], 3);
+    } else {
+        unreachable();
+    }
+}
+
+void AmberNetCDFBase::write_array(variable_scale_t& variable, span<const Vector3D> array) {
+    if (variable.var->type() == netcdf3::constants::NC_FLOAT) {
+        buffer_f32_.resize(3 * array.size());
+        for (size_t i=0; i<n_atoms_; i++) {
+            buffer_f32_[3 * i + 0] = static_cast<float>(array[i][0]);
+            buffer_f32_[3 * i + 1] = static_cast<float>(array[i][1]);
+            buffer_f32_[3 * i + 2] = static_cast<float>(array[i][2]);
+        }
+        variable.var->write(step_, buffer_f32_);
+    } else if (variable.var->type() == netcdf3::constants::NC_DOUBLE) {
+        variable.var->write(step_, &array[0][0], 3 * array.size());
+    } else {
+        throw format_error("invalid type for variable, expected floating point");
+    }
+}
+
+/******************************************************************************/
+
+AmberTrajectory::AmberTrajectory(std::string path, File::Mode mode, File::Compression compression):
+    AmberNetCDFBase("AMBER", std::move(path), mode, compression)
+{
+    if (mode == File::WRITE) {
+        // no need to validate the file when writing, it will be initialized later
+        return;
+    }
+
+    try {
+        this->validate();
+    } catch (const Error& e) {
+        throw format_error("invalid Amber NetCDF trajectory at '{}': {}", file_.path(), e.what());
+    }
+}
+
+size_t AmberTrajectory::nsteps() {
+    return file_.n_records();
+}
+
+void AmberTrajectory::validate() {
+    auto frame = find_dimension(file_, "frame");
+    if (!frame) {
+        throw format_error("missing 'frame' dimension");
+    } else if (!frame->is_record()) {
+        throw format_error("the 'frame' dimension must be the record dimension");
+    }
+
+    auto variables = file_.variables();
+
+    auto validate_atom_variable = [](std::string name, const netcdf3::Variable& variable) {
+        if (variable.type() != netcdf3::constants::NC_DOUBLE && variable.type() != netcdf3::constants::NC_FLOAT) {
+            throw format_error(
+                "'{}' variable must contain floating point data, got netcdf type {} instead",
+                name, variable.type()
+            );
+        }
+
+        auto dimensions = variable.dimensions();
+        if (dimensions.size() != 3) {
+            throw format_error("'{}' variable must have three dimensions", name);
+        } else if (dimensions[0]->name != "frame") {
+            throw format_error("first dimension of '{}' variable must be 'frame'", name);
+        } else if (dimensions[1]->name != "atom") {
+            throw format_error("second dimension of '{}' variable must be 'atom'", name);
+        } else if (dimensions[2]->name != "spatial") {
+            throw format_error("third dimension of '{}' variable must be 'spatial'", name);
+        }
+    };
+
+    auto coordinates = variables.find("coordinates");
+    if (coordinates != variables.end()) {
+        validate_atom_variable("coordinates", coordinates->second);
+    }
+
+    auto velocities = variables.find("velocities");
+    if (velocities != variables.end()) {
+        validate_atom_variable("velocities", velocities->second);
+    }
+
+    auto validate_cell_variable = [](std::string name, std::string dimension, const netcdf3::Variable& variable) {
+        if (variable.type() != netcdf3::constants::NC_DOUBLE && variable.type() != netcdf3::constants::NC_FLOAT) {
+            throw format_error(
+                "'{}' variable must contain floating point data, got netcdf type {} instead",
+                name, variable.type()
+            );
+        }
+
+        auto dimensions = variable.dimensions();
+        if (dimensions.size() != 2) {
+            throw format_error("'{}' variable must have two dimensions", name);
+        } else if (dimensions[0]->name != "frame") {
+            throw format_error("first dimension of '{}' variable must be 'frame'", name);
+        } else if (dimensions[1]->name != dimension) {
+            throw format_error("second dimension of '{}' variable must be '{}'", name, dimension);
+        }
+    };
+
+    auto cell_lengths = variables.find("cell_lengths");
+    if (cell_lengths != variables.end()) {
+        validate_cell_variable("cell_lengths", "cell_spatial", cell_lengths->second);
+    }
+
+    auto cell_angles = variables.find("cell_angles");
+    if (cell_angles != variables.end()) {
+        validate_cell_variable("cell_angles", "cell_angular", cell_angles->second);
+    }
+}
+
+void AmberTrajectory::initialize(const Frame& frame) {
+    netcdf3::Netcdf3Builder builder = base_builder(
+        "AMBER",
+        frame.get<Property::STRING>("name").value_or(""),
+        frame.size()
     );
 
-    if (length_var.attribute_exists("scale_factor")) {
-        lengths *= static_cast<double>(length_var.float_attribute("scale_factor"));
+    auto frame_dim = builder.add_dimension("frame", 0);
+    auto atom_dim = get_dimension_id(builder, "atom");
+    auto spatial_dim = get_dimension_id(builder, "spatial");
+    auto cell_spatial_dim = get_dimension_id(builder, "cell_spatial");
+    auto cell_angular_dim = get_dimension_id(builder, "cell_angular");
+
+    builder.add_variable("coordinates", {
+        /* type = */ netcdf3::constants::NC_FLOAT,
+        /* dimensions = */ {frame_dim, atom_dim, spatial_dim},
+        /* attributes = */ {{"units", netcdf3::Value("angstrom")}}
+    });
+
+    builder.add_variable("cell_lengths", {
+        /* type = */ netcdf3::constants::NC_FLOAT,
+        /* dimensions = */ {frame_dim, cell_spatial_dim},
+        /* attributes = */ {{"units", netcdf3::Value("angstrom")}}
+    });
+
+    builder.add_variable("cell_angles", {
+        /* type = */ netcdf3::constants::NC_FLOAT,
+        /* dimensions = */ {frame_dim, cell_angular_dim},
+        /* attributes = */ {{"units", netcdf3::Value("degree")}}
+    });
+
+    if (frame.velocities()) {
+        builder.add_variable("velocities", {
+            /* type = */ netcdf3::constants::NC_FLOAT,
+            /* dimensions = */ {frame_dim, atom_dim, spatial_dim},
+            /* attributes = */ {{"units", netcdf3::Value("angstrom/femptosecond")}}
+        });
     }
 
-    if (angles_var.attribute_exists("scale_factor")) {
-        angles *= static_cast<double>(angles_var.float_attribute("scale_factor"));
-    }
-
-    return UnitCell(lengths, angles);
+    std::move(builder).initialize(&file_);
 }
 
-template <AmberFormat F>
-void Amber<F>::read_array(span<Vector3D> array, const std::string& name) {
-    auto array_var = get_variable<F>(file_, name);
-    auto natoms = file_.dimension("atom");
-    assert(array.size() == natoms);
+/******************************************************************************/
 
-
-    auto range = vec3d_n_range(natoms);
-    auto data = array_var.get(range[0], range[1]);
-
-    double scale_factor = 1.0;
-    if (array_var.attribute_exists("scale_factor")) {
-        scale_factor = static_cast<double>(array_var.float_attribute("scale_factor"));
-    }
-
-    for (size_t i = 0; i < natoms; i++) {
-        array[i][0] = scale_factor * static_cast<double>(data[3 * i + 0]);
-        array[i][1] = scale_factor * static_cast<double>(data[3 * i + 1]);
-        array[i][2] = scale_factor * static_cast<double>(data[3 * i + 2]);
-    }
-}
-
-template <AmberFormat F>
-static void init_frame(NcFile& file, bool with_velocities);
-
-template<>
-void init_frame<AMBER_NC_RESTART>(NcFile& file, bool with_velocities) {
-    auto coordinates = file.add_variable<nc::NcDouble>("coordinates", "atom", "spatial");
-    coordinates.add_string_attribute("units", "angstrom");
-
-    auto cell_lenght = file.add_variable<nc::NcDouble>("cell_lengths", "cell_spatial");
-    cell_lenght.add_string_attribute("units", "angstrom");
-
-    auto cell_angles = file.add_variable<nc::NcDouble>("cell_angles", "cell_angular");
-    cell_angles.add_string_attribute("units", "degree");
-
-    if (with_velocities) {
-        auto velocities = file.add_variable<nc::NcDouble>("velocities", "atom", "spatial");
-        velocities.add_string_attribute("units", "angstrom/picosecond");
+AmberRestart::AmberRestart(std::string path, File::Mode mode, File::Compression compression):
+    AmberNetCDFBase("AMBERRESTART", std::move(path), mode, compression)
+{
+    try {
+        this->validate();
+    } catch (const Error& e) {
+        throw format_error("invalid Amber NetCDF restart at '{}': {}", file_.path(), e.what());
     }
 }
 
-template<>
-void init_frame<AMBER_NC_TRAJECTORY>(NcFile& file, bool with_velocities) {
-    file.add_dimension("frame");
-
-    auto coordinates =
-        file.add_variable<nc::NcFloat>("coordinates", "frame", "atom", "spatial");
-    coordinates.add_string_attribute("units", "angstrom");
-
-    auto cell_length =
-        file.add_variable<nc::NcFloat>("cell_lengths", "frame", "cell_spatial");
-    cell_length.add_string_attribute("units", "angstrom");
-
-    auto cell_angles =
-        file.add_variable<nc::NcFloat>("cell_angles", "frame", "cell_angular");
-    cell_angles.add_string_attribute("units", "degree");
-
-    if (with_velocities) {
-        auto velocities =
-            file.add_variable<nc::NcFloat>("velocities", "frame", "atom", "spatial");
-        velocities.add_string_attribute("units", "angstrom/picosecond");
-    }
-}
-
-// Initialize a file, assuming that it is empty
-template<AmberFormat F>
-void initialize(NcFile& file, size_t natoms, bool with_velocities, optional<const std::string&> name) {
-    file.set_nc_mode(NcFile::DEFINE);
-
-    file.add_global_attribute("Conventions", FormatSpec<F>::convention);
-    file.add_global_attribute("ConventionVersion", "1.0");
-    file.add_global_attribute("program", "Chemfiles");
-    file.add_global_attribute("programVersion", CHEMFILES_VERSION);
-
-    if (name) {
-        file.add_global_attribute("title", name.value());
-    }
-
-    file.add_dimension("spatial", 3);
-    file.add_dimension("atom", natoms);
-    file.add_dimension("cell_spatial", 3);
-    file.add_dimension("cell_angular", 3);
-    file.add_dimension("label", nc::STRING_MAXLEN);
-    auto spatial = file.add_variable<nc::NcChar>("spatial", "spatial");
-    auto cell_spatial = file.add_variable<nc::NcChar>("cell_spatial", "cell_spatial");
-    auto cell_angular =
-        file.add_variable<nc::NcChar>("cell_angular", "cell_angular", "label");
-    init_frame<F>(file, with_velocities);
-    file.set_nc_mode(NcFile::DATA);
-
-    spatial.add("xyz");
-    cell_spatial.add("abc");
-    cell_angular.add({"alpha", "beta", "gamma"});
-}
-
-template <AmberFormat F>
-void Amber<F>::write(const Frame& frame) {
-    if (F == AMBER_NC_RESTART && step_ != 0) {
+void AmberRestart::write(const Frame& frame) {
+    if (step_ != 0) {
         throw format_error("AMBER Restart format only supports writing one frame");
     }
-
-    auto natoms = frame.size();
-    // If we created the file, let's initialize it.
-    if (!validated_) {
-        auto name = frame.get<Property::STRING>("name");
-        initialize<F>(file_, natoms, bool(frame.velocities()), name);
-        assert(is_valid<F>(file_, natoms));
-        validated_ = true;
-    }
-    write_cell(frame.cell());
-    write_array(frame.positions(), "coordinates");
-    auto velocities = frame.velocities();
-    if (velocities) {
-        write_array(*velocities, "velocities");
-    }
-
-    step_++;
+    AmberNetCDFBase::write(frame);
 }
 
-template <AmberFormat F>
-void Amber<F>::write_array(const std::vector<Vector3D>& array, const std::string& name) {
-    using real_t = typename FormatSpec<F>::real_type;
+size_t AmberRestart::nsteps() {
+    return 1;
+}
 
-    auto var = get_variable<F>(file_, name);
-    auto natoms = array.size();
-    auto range = vec3d_n_range(natoms);
+void AmberRestart::validate() {
+    auto variables = file_.variables();
+    auto validate_atom_variable = [](std::string name, const netcdf3::Variable& variable) {
+        if (variable.type() != netcdf3::constants::NC_DOUBLE && variable.type() != netcdf3::constants::NC_FLOAT) {
+            throw format_error(
+                "'{}' variable must contain floating point data, got netcdf type {} instead",
+                name, variable.type()
+            );
+        }
 
-    auto data = std::vector<real_t>(natoms * 3);
-    for (size_t i = 0; i < natoms; i++) {
-        data[3 * i + 0] = static_cast<real_t>(array[i][0]);
-        data[3 * i + 1] = static_cast<real_t>(array[i][1]);
-        data[3 * i + 2] = static_cast<real_t>(array[i][2]);
+        auto dimensions = variable.dimensions();
+        if (dimensions.size() != 2) {
+            throw format_error("'{}' variable must have two dimensions", name);
+        } else if (dimensions[0]->name != "atom") {
+            throw format_error("first dimension of '{}' variable must be 'atom'", name);
+        } else if (dimensions[1]->name != "spatial") {
+            throw format_error("second dimension of '{}' variable must be 'spatial'", name);
+        }
+    };
+
+    auto coordinates = variables.find("coordinates");
+    if (coordinates != variables.end()) {
+        validate_atom_variable("coordinates", coordinates->second);
     }
-    var.add(range[0], range[1], data);
+
+    auto velocities = variables.find("velocities");
+    if (velocities != variables.end()) {
+        validate_atom_variable("velocities", velocities->second);
+    }
+
+    auto validate_cell_variable = [](std::string name, std::string dimension, const netcdf3::Variable& variable) {
+        if (variable.type() != netcdf3::constants::NC_DOUBLE && variable.type() != netcdf3::constants::NC_FLOAT) {
+            throw format_error(
+                "'{}' variable must contain floating point data, got netcdf type {} instead",
+                name, variable.type()
+            );
+        }
+
+        auto dimensions = variable.dimensions();
+        if (dimensions.size() != 1) {
+            throw format_error("'{}' variable must have one dimension", name);
+        } else if (dimensions[0]->name != dimension) {
+            throw format_error("first dimension of '{}' variable must be '{}'", name, dimension);
+        }
+    };
+
+    auto cell_lengths = variables.find("cell_lengths");
+    if (cell_lengths != variables.end()) {
+        validate_cell_variable("cell_lengths", "cell_spatial", cell_lengths->second);
+    }
+
+    auto cell_angles = variables.find("cell_angles");
+    if (cell_angles != variables.end()) {
+        validate_cell_variable("cell_angles", "cell_angular", cell_angles->second);
+    }
 }
 
-template <AmberFormat F> void Amber<F>::write_cell(const UnitCell& cell) {
-    using real_t = typename FormatSpec<F>::real_type;
+void AmberRestart::initialize(const Frame& frame) {
+    netcdf3::Netcdf3Builder builder = base_builder(
+        "AMBERRESTART",
+        frame.get<Property::STRING>("name").value_or(""),
+        frame.size()
+    );
 
-    auto length = get_variable<F>(file_, "cell_lengths");
-    auto angles = get_variable<F>(file_, "cell_angles");
+    auto atom_dim = get_dimension_id(builder, "atom");
+    auto spatial_dim = get_dimension_id(builder, "spatial");
+    auto cell_spatial_dim = get_dimension_id(builder, "cell_spatial");
+    auto cell_angular_dim = get_dimension_id(builder, "cell_angular");
 
-    auto cell_lengths = cell.lengths();
-    auto cell_angles = cell.angles();
+    builder.add_variable("coordinates", {
+        /* type = */ netcdf3::constants::NC_DOUBLE,
+        /* dimensions = */ {atom_dim, spatial_dim},
+        /* attributes = */ {{"units", netcdf3::Value("angstrom")}}
+    });
 
-    auto length_data = std::vector<real_t>{
-        static_cast<real_t>(cell_lengths[0]),
-        static_cast<real_t>(cell_lengths[1]),
-        static_cast<real_t>(cell_lengths[2])};
+    builder.add_variable("cell_lengths", {
+        /* type = */ netcdf3::constants::NC_DOUBLE,
+        /* dimensions = */ {cell_spatial_dim},
+        /* attributes = */ {{"units", netcdf3::Value("angstrom")}}
+    });
 
-    auto angles_data = std::vector<real_t>{
-        static_cast<real_t>(cell_angles[0]),
-        static_cast<real_t>(cell_angles[1]),
-        static_cast<real_t>(cell_angles[2])};
+    builder.add_variable("cell_angles", {
+        /* type = */ netcdf3::constants::NC_DOUBLE,
+        /* dimensions = */ {cell_angular_dim},
+        /* attributes = */ {{"units", netcdf3::Value("degree")}}
+    });
 
-    auto range = vec3d_range();
-    length.add(range[0], range[1], length_data);
-    angles.add(range[0], range[1], angles_data);
+    if (frame.velocities()) {
+        builder.add_variable("velocities", {
+            /* type = */ netcdf3::constants::NC_DOUBLE,
+            /* dimensions = */ {atom_dim, spatial_dim},
+            /* attributes = */ {{"units", netcdf3::Value("angstrom/femptosecond")}}
+        });
+    }
+
+    std::move(builder).initialize(&file_);
 }
 
-// Instantiate all the templates
-template class chemfiles::Amber<AMBER_NC_RESTART>;
-template class chemfiles::Amber<AMBER_NC_TRAJECTORY>;
+/******************************************************************************/
 
-template<> const FormatMetadata& chemfiles::format_metadata<Amber<AMBER_NC_RESTART>>() {
+template<> const FormatMetadata& chemfiles::format_metadata<AmberTrajectory>() {
+    static FormatMetadata metadata;
+    metadata.name = "Amber NetCDF";
+    metadata.extension = ".nc";
+    metadata.description = "Amber convention for binary NetCDF molecular trajectories";
+    metadata.reference = "http://ambermd.org/netcdf/nctraj.xhtml";
+
+    metadata.read = true;
+    metadata.write = true;
+    metadata.memory = false;
+
+    metadata.positions = true;
+    metadata.velocities = true;
+    metadata.unit_cell = true;
+    metadata.atoms = false;
+    metadata.bonds = false;
+    metadata.residues = false;
+    return metadata;
+}
+
+template<> const FormatMetadata& chemfiles::format_metadata<AmberRestart>() {
     static FormatMetadata metadata;
     metadata.name = "Amber Restart";
     metadata.extension = ".ncrst";
@@ -388,22 +658,62 @@ template<> const FormatMetadata& chemfiles::format_metadata<Amber<AMBER_NC_RESTA
     return metadata;
 }
 
-template<> const FormatMetadata& chemfiles::format_metadata<Amber<AMBER_NC_TRAJECTORY>>() {
-    static FormatMetadata metadata;
-    metadata.name = "Amber NetCDF";
-    metadata.extension = ".nc";
-    metadata.description = "Amber convention for binary NetCDF molecular trajectories";
-    metadata.reference = "http://ambermd.org/netcdf/nctraj.xhtml";
+/******************************************************************************/
 
-    metadata.read = true;
-    metadata.write = true;
-    metadata.memory = false;
+optional<netcdf3::Dimension&> find_dimension(netcdf3::Netcdf3File& file, const std::string& name) {
+    for (auto& dimension: file.dimensions()) {
+        if (dimension->name == name) {
+            return *dimension;
+        }
+    }
+    return nullopt;
+}
 
-    metadata.positions = true;
-    metadata.velocities = true;
-    metadata.unit_cell = true;
-    metadata.atoms = false;
-    metadata.bonds = false;
-    metadata.residues = false;
-    return metadata;
+size_t get_dimension_id(const netcdf3::Netcdf3Builder& builder, const std::string& name) {
+    const auto& dimensions = builder.dimensions();
+    for (size_t i=0; i<dimensions.size(); i++) {
+        if (dimensions[i]->name == name) {
+            return i;
+        }
+    }
+    throw error("internal error: unable to find a dimension named {} in this Netcdf3Builder", name);
+}
+
+netcdf3::Netcdf3Builder base_builder(std::string convention, std::string title, size_t n_atoms) {
+    auto builder = netcdf3::Netcdf3Builder();
+    builder.add_attribute("Conventions", {convention});
+    builder.add_attribute("ConventionVersion", {"1.0"});
+    builder.add_attribute("program", {"chemfiles"});
+    builder.add_attribute("programVersion", {CHEMFILES_VERSION});
+
+    if (!title.empty()) {
+        builder.add_attribute("title", {title});
+    }
+
+    auto spatial_dim = builder.add_dimension("spatial", 3);
+    builder.add_dimension("atom", n_atoms);
+
+    auto cell_spatial_dim = builder.add_dimension("cell_spatial", 3);
+    auto cell_angular_dim = builder.add_dimension("cell_angular", 3);
+    auto label_dim = builder.add_dimension("label", 5);
+
+    builder.add_variable("spatial", {
+        /* type = */ netcdf3::constants::NC_CHAR,
+        /* dimensions = */ {spatial_dim},
+        /* attributes = */ {}
+    });
+
+    builder.add_variable("cell_spatial", {
+        /* type = */ netcdf3::constants::NC_CHAR,
+        /* dimensions = */ {cell_spatial_dim},
+        /* attributes = */ {}
+    });
+
+    builder.add_variable("cell_angular", {
+        /* type = */ netcdf3::constants::NC_CHAR,
+        /* dimensions = */ {cell_angular_dim, label_dim},
+        /* attributes = */ {}
+    });
+
+    return builder;
 }
