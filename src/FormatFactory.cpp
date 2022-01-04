@@ -48,9 +48,6 @@ namespace chemfiles {
     class MemoryBuffer;
     class Format;
 
-    extern template class Amber<AMBER_NC_RESTART>;
-    extern template class Amber<AMBER_NC_TRAJECTORY>;
-
     extern template class Molfile<DCD>;
     extern template class Molfile<TRJ>;
     extern template class Molfile<PSF>;
@@ -65,8 +62,8 @@ static size_t find_by_extension(const std::vector<RegisteredFormat>& formats, st
 
 FormatFactory::FormatFactory() {
     // add formats in alphabetic order
-    this->add_format<Amber<AMBER_NC_RESTART>>();
-    this->add_format<Amber<AMBER_NC_TRAJECTORY>>();
+    this->add_format<AmberRestart>();
+    this->add_format<AmberTrajectory>();
 #ifndef CHFL_DISABLE_GEMMI
     this->add_format<CIFFormat>();
 #endif

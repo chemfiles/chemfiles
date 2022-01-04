@@ -157,30 +157,6 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src)
 add_library(pugixml OBJECT ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src/pugixml.cpp)
 
 # ==========
-# netcdf: https://github.com/chemfiles/netcdf-c
-# ==========
-if(${CHFL_SYSTEM_NETCDF})
-    find_package(NetCDF REQUIRED)
-    set(NETCDF_OBJECTS "" PARENT_SCOPE)
-else()
-    external_library(netcdf)
-
-    set(NETCDF_INCLUDES
-        ${CMAKE_CURRENT_BINARY_DIR}/netcdf/include
-        ${CMAKE_CURRENT_BINARY_DIR}/netcdf
-    )
-    set(NETCDF_OBJECTS $<TARGET_OBJECTS:netcdf> PARENT_SCOPE)
-    set(NETCDF_LIBRARIES "" PARENT_SCOPE)
-    if(${EMSCRIPTEN})
-        set(NETCDF_OBJECTS_TESTS "" PARENT_SCOPE)
-    else()
-        set(NETCDF_OBJECTS_TESTS ${NETCDF_OBJECTS} PARENT_SCOPE)
-    endif()
-endif()
-
-list(APPEND EXTERNAL_INCLUDES ${NETCDF_INCLUDES})
-
-# ==========
 # TNG io: https://github.com/chemfiles/tng
 # ==========
 external_library(tng)
