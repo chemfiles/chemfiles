@@ -86,8 +86,8 @@ TEST_CASE("Write files in NetCDF format") {
     frame = check.read();
     CHECK(frame.get("name").value() == "Test Title 123");
     positions = frame.positions();
-    CHECK(approx_eq(positions[0], {1, 2, 3}, 1e-4));
-    CHECK(approx_eq(positions[1], {1, 2, 3}, 1e-4));
-    CHECK(approx_eq(positions[2], {1, 2, 3}, 1e-4));
-    CHECK(approx_eq(positions[3], {1, 2, 3}, 1e-4));
+    CHECK(approx_eq(positions[0], {1, 2, 3}, 1e-6));
+    CHECK(approx_eq(positions[1], {1, 2, 3}, 1e-6));
+    CHECK(approx_eq(positions[2], {1, 2, 3}, 1e-6));
+    CHECK(approx_eq(positions[3], {1, 2, 3}, 1e-6));
 }

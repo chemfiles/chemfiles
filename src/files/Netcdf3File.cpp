@@ -12,6 +12,11 @@
 using namespace chemfiles;
 using namespace chemfiles::netcdf3;
 
+// number of padding bytes required to align size on 4-bytes
+static int64_t padding(int64_t size) {
+    return (4 - (size % 4)) % 4;
+}
+
 // define some metadata for type T (name, netcdf type)
 template<typename T> struct nc_type_info {};
 
@@ -227,13 +232,13 @@ Variable::Variable(
     std::map<std::string, Value> attributes,
     VariableLayout layout
 ):
-    file_(file),
     is_record_(false),
+    file_(file),
     dimensions_(std::move(dimensions)),
     attributes_(std::move(attributes)),
     layout_(std::move(layout))
 {
-    auto layout_size = layout_.size;
+    auto size_from_file = layout_.size_with_padding;
     // the size coming from the file (in layout) is not reliable since it can
     // only go up to 2^32 - 1. Fortunately, we can compute the information
     // we need from the dimension sizes.
@@ -246,11 +251,12 @@ Variable::Variable(
         }
     }
 
+    layout_.size_with_padding = layout_.size + padding(layout_.size);
+
     // sanity check w.r.t. the size stored in the file when possible
     if (layout_.size < INT32_MAX) {
-        auto padding = (4 - (layout_.size % 4)) % 4;
         assert(
-            layout_.size + padding == layout_size
+            layout_.size_with_padding == size_from_file
             && "declared size does not match dimension size for this variable"
         );
     }
@@ -354,6 +360,7 @@ void Variable::write(size_t step, const T* data, size_t count) {
     (file.*nc_type_info<T>::writer)(data, count);
 }
 
+template void Variable::write(size_t step, const char* data, size_t count);
 template void Variable::write(size_t step, const int32_t* data, size_t count);
 template void Variable::write(size_t step, const float* data, size_t count);
 template void Variable::write(size_t step, const double* data, size_t count);
@@ -369,8 +376,11 @@ void Variable::write_fill_value(size_t step) {
     } else if (layout_.type == constants::NC_DOUBLE) {
         auto data = std::vector<double>(layout_.count(), constants::NC_FILL_DOUBLE);
         this->write(step, data);
+    } else if (layout_.type == constants::NC_CHAR) {
+        auto data = std::vector<char>(layout_.count(), constants::NC_FILL_CHAR);
+        this->write(step, data);
     } else {
-        throw file_error("unimplemented Variable::write_fill_value for this type");
+        throw file_error("unimplemented Variable::write_fill_value for type {}", layout_.type);
     }
 }
 
@@ -424,16 +434,14 @@ Netcdf3File::Netcdf3File(std::string filename, File::Mode mode):
     initialized_ = true;
 }
 
-void Netcdf3File::skip_padding(size_t count) {
-    auto padding = (4 - (count % 4)) % 4;
-    for (size_t i=0; i<padding; i++){
+void Netcdf3File::skip_padding(int64_t size) {
+    for (int64_t i=0; i<padding(size); i++){
         this->read_single_char();
     }
 }
 
-void Netcdf3File::add_padding(size_t count) {
-    auto padding = (4 - (count % 4)) % 4;
-    for (size_t i=0; i<padding; i++){
+void Netcdf3File::add_padding(int64_t size) {
+    for (int64_t i=0; i<padding(size); i++){
         this->write_single_char(0);
     }
 }
@@ -442,7 +450,7 @@ std::string Netcdf3File::read_pascal_string() {
     auto size = static_cast<size_t>(this->read_single_i32());
     auto value = std::string(size, '\0');
     this->read_char(&value[0], size);
-    this->skip_padding(size);
+    this->skip_padding(static_cast<int64_t>(size));
     return value;
 }
 
@@ -452,7 +460,7 @@ void Netcdf3File::write_pascal_string(const std::string& value) {
 
     this->write_single_i32(static_cast<int32_t>(value.size()));
     this->write_char(value.c_str(), value.size());
-    this->add_padding(value.size());
+    this->add_padding(static_cast<int64_t>(value.size()));
 }
 
 std::map<std::string, Value> Netcdf3File::read_attributes() {
@@ -513,7 +521,7 @@ Value Netcdf3File::read_attribute_value() {
         );
     }
 
-    this->skip_padding(count * size);
+    this->skip_padding(static_cast<int64_t>(count * size));
 
     return value;
 }
@@ -568,7 +576,7 @@ void Netcdf3File::write_attribute_value(const Value& value) {
         unreachable();
     }
 
-    this->add_padding(count * size);
+    this->add_padding(static_cast<int64_t>(count * size));
 }
 
 void Netcdf3File::read_variables() {
@@ -596,7 +604,7 @@ void Netcdf3File::read_variables() {
         auto attributes = this->read_attributes();
 
         auto type = this->read_single_i32();
-        auto size = this->read_single_i32();
+        auto size_with_padding = this->read_single_i32();
         // this is where the 64-bit offset changes something to the format
         // auto offset = this->read_single_i32();
         auto offset = this->read_single_i64();
@@ -605,7 +613,7 @@ void Netcdf3File::read_variables() {
             *this,
             std::move(dimensions),
             std::move(attributes),
-            VariableLayout { type, size, offset }
+            VariableLayout { type, /*size*/ 0, size_with_padding, offset }
         ));
     }
 
@@ -617,8 +625,7 @@ void Netcdf3File::read_variables() {
 
         if (variable.is_record()) {
             this->record_size_ += static_cast<uint64_t>(variable.layout_.size);
-            auto padding = (4 - (variable.layout_.size % 4)) % 4;
-            this->record_size_ += static_cast<uint64_t>(padding);
+            this->record_size_ += static_cast<uint64_t>(padding(variable.layout_.size));
         }
     }
 }
@@ -756,7 +763,6 @@ void Netcdf3Builder::initialize(Netcdf3File* file) && {
         file->write_attribute_value(it.second);
     }
 
-
     auto variables = std::map<std::string, Variable>();
     // positions where the variables offset should be written
     auto offset_positions = std::map<std::string, uint64_t>();
@@ -769,7 +775,7 @@ void Netcdf3Builder::initialize(Netcdf3File* file) && {
         auto variable = std::move(it.second);
 
         file->write_pascal_string(name);
-        int32_t size = sizeof_nc_type(variable.type);
+        int64_t size_with_padding = sizeof_nc_type(variable.type);
 
         // write variable dimensions
         auto dimensions = std::vector<std::shared_ptr<Dimension>>();
@@ -782,11 +788,14 @@ void Netcdf3Builder::initialize(Netcdf3File* file) && {
             if (dimension->is_record()) {
                 is_record_variable = true;
             } else {
-                size *= dimension->size;
+                size_with_padding *= dimension->size;
             }
 
             dimensions.emplace_back(dimension);
         }
+
+        // add padding to size
+        size_with_padding += padding(size_with_padding);
 
         // write variable attributes
         file->write_single_i32(constants::NC_ATTRIBUTE);
@@ -797,7 +806,7 @@ void Netcdf3Builder::initialize(Netcdf3File* file) && {
         }
 
         file->write_single_i32(variable.type);
-        file->write_single_i32(size);
+        file->write_single_i32(static_cast<int32_t>(size_with_padding));
 
         // the actual offset will be set below, once all variable metadata have
         // been added to the file
@@ -809,7 +818,7 @@ void Netcdf3Builder::initialize(Netcdf3File* file) && {
             *file,
             std::move(dimensions),
             std::move(variable.attributes),
-            VariableLayout { variable.type, size, offset }
+            VariableLayout { variable.type, /*size*/ 0, size_with_padding, offset }
         ));
     }
 
@@ -828,8 +837,7 @@ void Netcdf3Builder::initialize(Netcdf3File* file) && {
         file->seek(offset_positions.at(it.first));
         file->write_single_i64(static_cast<int64_t>(offset));
 
-        auto padding = (4 - (layout.size % 4)) % 4;
-        auto delta = static_cast<size_t>(layout.size) + static_cast<size_t>(padding);
+        auto delta = static_cast<size_t>(layout.size) + static_cast<size_t>(padding(layout.size));
         offset += delta;
     }
 
@@ -846,8 +854,7 @@ void Netcdf3Builder::initialize(Netcdf3File* file) && {
         file->seek(offset_positions.at(it.first));
         file->write_single_i64(static_cast<int64_t>(offset));
 
-        auto padding = (4 - (layout.size % 4)) % 4;
-        auto delta = static_cast<uint64_t>(layout.size) + static_cast<uint64_t>(padding);
+        auto delta = static_cast<uint64_t>(layout.size) + static_cast<uint64_t>(padding(layout.size));
         offset += delta;
         record_size += delta;
     }

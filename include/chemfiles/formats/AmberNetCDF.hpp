@@ -1,8 +1,8 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#ifndef CHEMFILES_FORMAT_NC_HPP
-#define CHEMFILES_FORMAT_NC_HPP
+#ifndef CHEMFILES_FORMAT_AMBER_NETCDF_HPP
+#define CHEMFILES_FORMAT_AMBER_NETCDF_HPP
 
 #include <string>
 #include <vector>
@@ -10,7 +10,7 @@
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
 
-#include "chemfiles/files/NcFile.hpp"
+#include "chemfiles/files/Netcdf3File.hpp"
 
 namespace chemfiles {
 
@@ -21,50 +21,87 @@ class FormatMetadata;
 
 template <class T> class span;
 
-enum AmberFormat {
-    AMBER_NC_RESTART,     ///< AMBER NetCDF restart format
-    AMBER_NC_TRAJECTORY,  ///< AMBER NetCDF trajectory format
-};
-
-/// Amber NetCDF file format reader.
-template <AmberFormat F>
-class Amber final: public Format {
+/// Amber NetCDF file format implementation.
+class AmberNetCDFBase: public Format {
 public:
-    Amber(std::string path, File::Mode mode, File::Compression compression);
+    AmberNetCDFBase(std::string convention, std::string path, File::Mode mode, File::Compression compression);
 
-    void read_step(size_t step, Frame& frame) override;
-    void read(Frame& frame) override;
+    void read(Frame& frame) override final;
+    void read_step(size_t step, Frame& frame) override final;
     void write(const Frame& frame) override;
 
-    size_t nsteps() override;
-private:
-    /// Generate the range of indices [start, stop] for a 3D vector at the current step.
-    std::array<std::vector<size_t>, 2> vec3d_range();
-    /// Generate the range of indices [start, stop] for multiple 3D vectors at the current step.
-    std::array<std::vector<size_t>, 2> vec3d_n_range(size_t n);
-    /// Read the unit cell at the current internal step, the file is assumed to
-    /// be valid.
+protected:
+    struct variable_scale_t {
+        netcdf3::Variable* var;
+        double scale;
+    };
+
+    /// read the unit cell at the current step
     UnitCell read_cell();
-    /// Generic function to read an std::vector<Vector3D> at the current
-    /// internal step, the file is assumed to be valid.
-    void read_array(span<Vector3D> array, const std::string& name);
+    /// read the values from the variable at the current internal step to the array
+    void read_array(variable_scale_t& variable, span<Vector3D> array);
 
-    /// Write an std::vector<Vector3D> to the file, as a variable with the name
-    /// `name`, at the current internal step.
-    void write_array(const std::vector<Vector3D>& array, const std::string& name);
-    /// Write an UnitCell to the file, at the current internal step
+    /// write the unit cell at the current step
     void write_cell(const UnitCell& cell);
+    /// write the values from the array to the variable at the current internal step
+    void write_array(variable_scale_t& variable, span<const Vector3D> array);
 
-    /// Associated NetCDF file.
-    NcFile file_;
-    /// Last read step
+    /// associated NetCDF file.
+    netcdf3::Netcdf3File file_;
+    /// convention used
+    std::string convention_;
+    /// last step read
     size_t step_;
-    /// Was the associated file validated?
-    bool validated_;
+
+    struct {
+        variable_scale_t coordinates;
+        variable_scale_t velocities;
+        variable_scale_t cell_lengths;
+        variable_scale_t cell_angles;
+    } variables_;
+
+    optional<std::string> file_title_;
+    size_t n_atoms_;
+
+    std::vector<float> buffer_f32_;
+    std::vector<double> buffer_f64_;
+
+    virtual void initialize(const Frame& frame) = 0;
+
+private:
+    /// Validate the common bits between AMBER and AMBERRESTART conventions
+    void validate_common();
+
+    variable_scale_t get_variable(const std::string& name);
 };
 
-template<> const FormatMetadata& format_metadata<Amber<AMBER_NC_RESTART>>();
-template<> const FormatMetadata& format_metadata<Amber<AMBER_NC_TRAJECTORY>>();
+/// Amber NetCDF trajectory file format
+class AmberTrajectory final: public AmberNetCDFBase {
+public:
+    AmberTrajectory(std::string path, File::Mode mode, File::Compression compression);
+
+    size_t nsteps() override;
+    void initialize(const Frame& frame) override;
+
+private:
+    void validate();
+};
+
+/// Amber NetCDF restart file format
+class AmberRestart final: public AmberNetCDFBase {
+public:
+    AmberRestart(std::string path, File::Mode mode, File::Compression compression);
+
+    void write(const Frame& frame) override;
+    size_t nsteps() override;
+    void initialize(const Frame& frame) override;
+
+private:
+    void validate();
+};
+
+template<> const FormatMetadata& format_metadata<AmberTrajectory>();
+template<> const FormatMetadata& format_metadata<AmberRestart>();
 
 } // namespace chemfiles
 

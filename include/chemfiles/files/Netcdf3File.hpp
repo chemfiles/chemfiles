@@ -169,9 +169,12 @@ struct Dimension {
 struct VariableLayout {
     /// NetCDF type identifier
     int32_t type;
-    /// non record variables: the size (in bytes) of the full array
-    /// record variables: size in bytes of a single entry
-    int32_t size;
+    /// non record variables: the size (in bytes) of the full array, excluding padding
+    /// record variables: size in bytes of a single entry, excluding padding
+    int64_t size;
+    /// non record variables: the size (in bytes) of the full array, including padding
+    /// record variables: size in bytes of a single entry, including padding
+    int64_t size_with_padding;
     /// Offset in the file of the first byte in this variable
     int64_t offset;
 
@@ -282,6 +285,7 @@ extern template void Variable::read(size_t step, int32_t* data, size_t count);
 extern template void Variable::read(size_t step, float* data, size_t count);
 extern template void Variable::read(size_t step, double* data, size_t count);
 
+extern template void Variable::write(size_t step, const char* data, size_t count);
 extern template void Variable::write(size_t step, const int32_t* data, size_t count);
 extern template void Variable::write(size_t step, const float* data, size_t count);
 extern template void Variable::write(size_t step, const double* data, size_t count);
@@ -351,10 +355,12 @@ public:
     }
 
 private:
-    /// skip `count` bytes of padding from the file
-    void skip_padding(size_t count);
-    /// write `count` bytes of padding to the file
-    void add_padding(size_t count);
+    /// skip as many bytes of padding as required from the file to align the
+    /// given `size` to 4-bytes
+    void skip_padding(int64_t size);
+    /// write as many bytes of padding as required from the file to align the
+    /// given `size` to 4-bytes
+    void add_padding(int64_t size);
 
     /// read a "Pascal" string (size + char array, no NULL terminator) from the file
     std::string read_pascal_string();
