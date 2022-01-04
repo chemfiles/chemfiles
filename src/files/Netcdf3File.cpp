@@ -221,13 +221,14 @@ std::string VariableLayout::type_name() const {
 
 /******************************************************************************/
 
-BaseVariable::BaseVariable(
+Variable::Variable(
     Netcdf3File& file,
     std::vector<std::shared_ptr<Dimension>> dimensions,
     std::map<std::string, Value> attributes,
     VariableLayout layout
 ):
     file_(file),
+    is_record_(false),
     dimensions_(std::move(dimensions)),
     attributes_(std::move(attributes)),
     layout_(std::move(layout))
@@ -238,7 +239,9 @@ BaseVariable::BaseVariable(
     // we need from the dimension sizes.
     layout_.size = sizeof_nc_type(layout_.type);
     for (const auto& dimension: dimensions_) {
-        if (!dimension->is_record()) {
+        if (dimension->is_record()) {
+            is_record_ = true;
+        } else {
             layout_.size *= dimension->size;
         }
     }
@@ -253,7 +256,7 @@ BaseVariable::BaseVariable(
     }
 }
 
-optional<const Value&> BaseVariable::attribute(const std::string& name) const {
+optional<const Value&> Variable::attribute(const std::string& name) const {
     auto it = attributes_.find(name);
     if (it != attributes_.end()) {
         return it->second;
@@ -262,104 +265,7 @@ optional<const Value&> BaseVariable::attribute(const std::string& name) const {
     }
 }
 
-Variable::Variable(BaseVariable base): BaseVariable(std::move(base)) {
-    bool check_is_record = false;
-    for (const auto& dimension: dimensions_) {
-        if (dimension->is_record()) {
-            check_is_record = true;
-        }
-    }
-    assert(!check_is_record && "Variable refers to a record dimension");
-}
-
 std::vector<size_t> Variable::shape() const {
-    auto results = std::vector<size_t>();
-    for (const auto& dimension: dimensions_) {
-        results.emplace_back(dimension->size);
-    }
-    return results;
-}
-
-template<typename T>
-void Variable::read(T* data, size_t count) {
-    if (layout_.type != nc_type_info<T>::nc_type) {
-        throw file_error(
-            "internal error: the code tried to read {} data, but this "
-            "variable contains {} values",
-            nc_type_info<T>::name, layout_.type_name()
-        );
-    }
-
-    if (count != layout_.count()) {
-        throw file_error(
-            "wrong array size in Variable::read: expected {}, got {}",
-            layout_.count(), count
-        );
-    }
-
-    file_.get().seek(static_cast<uint64_t>(layout_.offset));
-    (file_.get().*nc_type_info<T>::reader)(data, count);
-}
-
-template void Variable::read(int32_t* data, size_t count);
-template void Variable::read(float* data, size_t count);
-template void Variable::read(double* data, size_t count);
-
-template<typename T>
-void Variable::write(const T* data, size_t count) {
-    if (layout_.type != nc_type_info<T>::nc_type) {
-        throw file_error(
-            "internal error: the code tried to write {} data, but this "
-            "variable contains {} values",
-            nc_type_info<T>::name, layout_.type_name()
-        );
-    }
-
-    if (count != layout_.count()) {
-        throw file_error(
-            "wrong array size in Variable::read: expected {}, got {}",
-            layout_.count(), count
-        );
-    }
-
-    file_.get().seek(static_cast<uint64_t>(layout_.offset));
-    (file_.get().*nc_type_info<T>::writer)(data, count);
-}
-
-template void Variable::write(const int32_t* data, size_t count);
-template void Variable::write(const float* data, size_t count);
-template void Variable::write(const double* data, size_t count);
-
-void Variable::write_fill_value() {
-    // TODO: this function allocate vectors, but should not have to
-    if (layout_.type == constants::NC_INT) {
-        auto data = std::vector<int32_t>(layout_.count(), constants::NC_FILL_INT);
-        this->write(data);
-    } else if (layout_.type == constants::NC_FLOAT) {
-        auto data = std::vector<float>(layout_.count(), constants::NC_FILL_FLOAT);
-        this->write(data);
-    } else if (layout_.type == constants::NC_DOUBLE) {
-        auto data = std::vector<double>(layout_.count(), constants::NC_FILL_DOUBLE);
-        this->write(data);
-    } else {
-        throw file_error("unimplemented Variable::write_fill_value for this type");
-    }
-}
-
-/******************************************************************************/
-
-RecordVariable::RecordVariable(BaseVariable base): BaseVariable(std::move(base)) {
-    bool check_is_record = false;
-    for (const auto& dimension: dimensions_) {
-        if (dimension->is_record()) {
-            check_is_record = true;
-        }
-    }
-
-    assert(check_is_record && "RecordVariable does not refer to a record dimension");
-}
-
-std::vector<size_t> RecordVariable::shape() const {
     auto results = std::vector<size_t>();
     for (const auto& dimension: dimensions_) {
         if (dimension->is_record()) {
@@ -372,15 +278,19 @@ std::vector<size_t> RecordVariable::shape() const {
 }
 
 template<typename T>
-void RecordVariable::read(size_t step, T* data, size_t count) {
+void Variable::read(size_t step, T* data, size_t count) {
     auto& file = file_.get();
 
-    if (step >= file.n_records()) {
-        throw file_error(
-            "out of bounds: trying to read record variable at step {}, "
-            "but there are only {} steps in this file",
-            step, file.n_records()
-        );
+    if (this->is_record()) {
+        if (step >= file.n_records()) {
+            throw file_error(
+                "out of bounds: trying to read variable at step {}, "
+                "but there are only {} steps in this file",
+                step, file.n_records()
+            );
+        }
+    } else if (step != 0) {
+        throw file_error("can not read non-record variable at an other step than 0");
     }
 
     if (layout_.type != nc_type_info<T>::nc_type) {
@@ -393,7 +303,7 @@ void RecordVariable::read(size_t step, T* data, size_t count) {
 
     if (count != layout_.count()) {
         throw file_error(
-            "wrong array size in RecordVariable::read: expected {}, got {}",
+            "wrong array size in Variable::read: expected {}, got {}",
             layout_.count(), count
         );
     }
@@ -404,20 +314,23 @@ void RecordVariable::read(size_t step, T* data, size_t count) {
     (file.*nc_type_info<T>::reader)(data, count);
 }
 
-template void RecordVariable::read(size_t step, int32_t* data, size_t count);
-template void RecordVariable::read(size_t step, float* data, size_t count);
-template void RecordVariable::read(size_t step, double* data, size_t count);
+template void Variable::read(size_t step, int32_t* data, size_t count);
+template void Variable::read(size_t step, float* data, size_t count);
+template void Variable::read(size_t step, double* data, size_t count);
 
 template<typename T>
-void RecordVariable::write(size_t step, const T* data, size_t count) {
+void Variable::write(size_t step, const T* data, size_t count) {
     auto& file = file_.get();
-
-    if (step >= file.n_records()) {
-        throw file_error(
-            "out of bounds: trying to write record variable at step {}, "
-            "but there are only {} steps in this file",
-            step, file.n_records()
-        );
+    if (this->is_record()) {
+        if (step >= file.n_records()) {
+            throw file_error(
+                "out of bounds: trying to write variable at step {}, "
+                "but there are only {} steps in this file",
+                step, file.n_records()
+            );
+        }
+    } else if (step != 0) {
+        throw file_error("can not write to non-record variable at an other step than 0");
     }
 
     if (layout_.type != nc_type_info<T>::nc_type) {
@@ -430,7 +343,7 @@ void RecordVariable::write(size_t step, const T* data, size_t count) {
 
     if (count != layout_.count()) {
         throw file_error(
-            "wrong array size in RecordVariable::read: expected {}, got {}",
+            "wrong array size in Variable::read: expected {}, got {}",
             layout_.count(), count
         );
     }
@@ -441,12 +354,12 @@ void RecordVariable::write(size_t step, const T* data, size_t count) {
     (file.*nc_type_info<T>::writer)(data, count);
 }
 
-template void RecordVariable::write(size_t step, const int32_t* data, size_t count);
-template void RecordVariable::write(size_t step, const float* data, size_t count);
-template void RecordVariable::write(size_t step, const double* data, size_t count);
+template void Variable::write(size_t step, const int32_t* data, size_t count);
+template void Variable::write(size_t step, const float* data, size_t count);
+template void Variable::write(size_t step, const double* data, size_t count);
 
-void RecordVariable::write_fill_value(size_t step) {
-    // TODO: this function allocate vectors, but should not have to
+
+void Variable::write_fill_value(size_t step) {
     if (layout_.type == constants::NC_INT) {
         auto data = std::vector<int32_t>(layout_.count(), constants::NC_FILL_INT);
         this->write(step, data);
@@ -457,7 +370,7 @@ void RecordVariable::write_fill_value(size_t step) {
         auto data = std::vector<double>(layout_.count(), constants::NC_FILL_DOUBLE);
         this->write(step, data);
     } else {
-        throw file_error("unimplemented RecordVariable::write_fill_value for this type");
+        throw file_error("unimplemented Variable::write_fill_value for this type");
     }
 }
 
@@ -506,10 +419,7 @@ Netcdf3File::Netcdf3File(std::string filename, File::Mode mode):
     }
 
     attributes_ = this->read_attributes();
-
-    auto all_variables = this->read_variable_list();
-    variables_ = std::move(all_variables.variables);
-    record_variables_ = std::move(all_variables.record_variables);
+    this->read_variables();
 
     initialized_ = true;
 }
@@ -661,7 +571,7 @@ void Netcdf3File::write_attribute_value(const Value& value) {
     this->add_padding(count * size);
 }
 
-Netcdf3File::variable_list_t Netcdf3File::read_variable_list() {
+void Netcdf3File::read_variables() {
     auto header = this->read_single_i32();
     if (header != constants::NC_VARIABLE && header != 0) {
         throw file_error(
@@ -671,22 +581,16 @@ Netcdf3File::variable_list_t Netcdf3File::read_variable_list() {
     }
     auto count = this->read_single_i32();
 
-    auto variables = std::map<std::string, Variable>();
-    auto record_variables = std::map<std::string, RecordVariable>();
     for (int var_i=0; var_i<count; var_i++) {
         auto name = this->read_pascal_string();
 
         auto n_dims = this->read_single_i32();
         auto dimensions = std::vector<std::shared_ptr<Dimension>>();
-        auto is_record_variable = false;
         for (int i=0; i<n_dims; i++) {
             auto id = static_cast<size_t>(this->read_single_i32());
 
             auto dimension = this->dimensions_[id];
             dimensions.emplace_back(dimension);
-            if (dimension->is_record()) {
-                is_record_variable = true;
-            }
         }
 
         auto attributes = this->read_attributes();
@@ -694,38 +598,29 @@ Netcdf3File::variable_list_t Netcdf3File::read_variable_list() {
         auto type = this->read_single_i32();
         auto size = this->read_single_i32();
         // this is where the 64-bit offset changes something to the format
+        // auto offset = this->read_single_i32();
         auto offset = this->read_single_i64();
 
-        auto base = BaseVariable(
+        variables_.emplace(std::move(name), Variable(
             *this,
             std::move(dimensions),
             std::move(attributes),
             VariableLayout { type, size, offset }
-        );
-
-        if (is_record_variable) {
-            record_variables.emplace(
-                std::move(name), RecordVariable(std::move(base))
-            );
-        } else {
-            variables.emplace(
-                std::move(name), Variable(std::move(base))
-            );
-        }
+        ));
     }
 
     // now that we know all the variables, compute the size of a single record
     // entry, which includes all record variables
     this->record_size_ = 0;
-    for (const auto& it: record_variables) {
+    for (const auto& it: variables_) {
         const auto& variable = it.second;
 
-        this->record_size_ += static_cast<uint64_t>(variable.layout_.size);
-        auto padding = (4 - (variable.layout_.size % 4)) % 4;
-        this->record_size_ += static_cast<uint64_t>(padding);
+        if (variable.is_record()) {
+            this->record_size_ += static_cast<uint64_t>(variable.layout_.size);
+            auto padding = (4 - (variable.layout_.size % 4)) % 4;
+            this->record_size_ += static_cast<uint64_t>(padding);
+        }
     }
-
-    return {record_variables, variables};
 }
 
 optional<const Value&> Netcdf3File::attribute(const std::string& name) const {
@@ -746,15 +641,6 @@ optional<Variable&> Netcdf3File::variable(const std::string& name) {
     }
 }
 
-optional<RecordVariable&> Netcdf3File::record_variable(const std::string& name) {
-    auto it = record_variables_.find(name);
-    if (it != record_variables_.end()) {
-        return it->second;
-    } else {
-        return nullopt;
-    }
-}
-
 void Netcdf3File::add_record() {
     if (this->mode() != File::WRITE && this->mode() != File::APPEND) {
         throw file_error("can not add a record to a file opened in read-only mode");
@@ -764,8 +650,11 @@ void Netcdf3File::add_record() {
     this->n_records_ += 1;
 
     // update variables
-    for (auto& it: record_variables_) {
-        it.second.write_fill_value(step);
+    for (auto& it: variables_) {
+        auto& variable = it.second;
+        if (variable.is_record()) {
+            variable.write_fill_value(step);
+        }
     }
 
     // update the number of records in the header, it is always at byte 4
@@ -775,7 +664,8 @@ void Netcdf3File::add_record() {
 
 /******************************************************************************/
 
-size_t Netcdf3Builder::add_dimension(std::shared_ptr<Dimension> dimension) {
+size_t Netcdf3Builder::add_dimension(std::string name, size_t size) {
+    auto dimension = std::make_shared<Dimension>(std::move(name), size);
     if (dimension->size < 0) {
         throw file_error(
             "dimension size must be positive, got {} for '{}'",
@@ -868,7 +758,6 @@ void Netcdf3Builder::initialize(Netcdf3File* file) && {
 
 
     auto variables = std::map<std::string, Variable>();
-    auto record_variables = std::map<std::string, RecordVariable>();
     // positions where the variables offset should be written
     auto offset_positions = std::map<std::string, uint64_t>();
 
@@ -914,30 +803,24 @@ void Netcdf3Builder::initialize(Netcdf3File* file) && {
         // been added to the file
         int64_t offset = -1;
         offset_positions.emplace(name, file->tell());
-        file->write_single_i64(size);
+        file->write_single_i64(0);
 
-        auto base = BaseVariable(
+        variables.emplace(std::move(name), Variable(
             *file,
             std::move(dimensions),
             std::move(variable.attributes),
             VariableLayout { variable.type, size, offset }
-        );
-
-        if (is_record_variable) {
-            record_variables.emplace(
-                std::move(name), RecordVariable(std::move(base))
-            );
-        } else {
-            variables.emplace(
-                std::move(name), Variable(std::move(base))
-            );
-        }
+        ));
     }
 
     // now that we know the size taken by the file metadata, we can compute the
     // offset for all variables, starting by the non-record variables
     uint64_t offset = file->tell();
     for (auto& it: variables) {
+        if (it.second.is_record()) {
+            continue;
+        }
+
         auto& layout = it.second.layout_;
         // write offset to the variable
         layout.offset = static_cast<int64_t>(offset);
@@ -951,7 +834,11 @@ void Netcdf3Builder::initialize(Netcdf3File* file) && {
     }
 
     uint64_t record_size = 0;
-    for (auto& it: record_variables) {
+    for (auto& it: variables) {
+        if (!it.second.is_record()) {
+            continue;
+        }
+
         auto& layout = it.second.layout_;
         // write offset to the variable
         layout.offset = static_cast<int64_t>(offset);
@@ -965,9 +852,11 @@ void Netcdf3Builder::initialize(Netcdf3File* file) && {
         record_size += delta;
     }
 
-    // fill up the variable with fill values
+    // fill up the non-record variable with fill values
     for (auto& it: variables) {
-        it.second.write_fill_value();
+        if (!it.second.is_record()) {
+            it.second.write_fill_value(0);
+        }
     }
 
     // move all the data to the file
@@ -976,5 +865,4 @@ void Netcdf3Builder::initialize(Netcdf3File* file) && {
     file->attributes_ = std::move(this->attributes_);
     file->dimensions_ = std::move(this->dimensions_);
     file->variables_ = std::move(variables);
-    file->record_variables_ = std::move(record_variables);
 }
