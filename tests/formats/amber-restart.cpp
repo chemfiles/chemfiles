@@ -83,15 +83,15 @@ TEST_CASE("Write files in Amber Restart format") {
     CHECK(frame.get("name").value() == "Test Title 123");
 
     positions = frame.positions();
-    CHECK(approx_eq(positions[0], Vector3D(1, 2, 3), 1e-4));
-    CHECK(approx_eq(positions[1], Vector3D(1, 2, 3), 1e-4));
-    CHECK(approx_eq(positions[2], Vector3D(1, 2, 3), 1e-4));
-    CHECK(approx_eq(positions[3], Vector3D(1, 2, 3), 1e-4));
+    CHECK(approx_eq(positions[0], Vector3D(1, 2, 3), 1e-9));
+    CHECK(approx_eq(positions[1], Vector3D(1, 2, 3), 1e-9));
+    CHECK(approx_eq(positions[2], Vector3D(1, 2, 3), 1e-9));
+    CHECK(approx_eq(positions[3], Vector3D(1, 2, 3), 1e-9));
 
     CHECK(frame.velocities());
     velocities = *frame.velocities();
-    CHECK(approx_eq(velocities[0], Vector3D(-3, -2, -1), 1e-4));
-    CHECK(approx_eq(velocities[1], Vector3D(-3, -2, -1), 1e-4));
-    CHECK(approx_eq(velocities[2], Vector3D(-3, -2, -1), 1e-4));
-    CHECK(approx_eq(velocities[3], Vector3D(-3, -2, -1), 1e-4));
+    CHECK(approx_eq(velocities[0], Vector3D(-3, -2, -1), 1e-9));
+    CHECK(approx_eq(velocities[1], Vector3D(-3, -2, -1), 1e-9));
+    CHECK(approx_eq(velocities[2], Vector3D(-3, -2, -1), 1e-9));
+    CHECK(approx_eq(velocities[3], Vector3D(-3, -2, -1), 1e-9));
 }
