@@ -34,18 +34,20 @@ TEST_CASE("Read a NetCDF file") {
         CHECK(dimension->size == 0);
         CHECK(dimension->is_record() == true);
 
+        CHECK(file.variables().size() == 9);
         // standard variable
-        CHECK(file.variables().size() == 4);
         auto atom_types = file.variable("atom_types").value();
+        CHECK(!atom_types.is_record());
         CHECK(atom_types.shape() == std::vector<size_t>{297});
         CHECK(atom_types.type() == netcdf3::constants::NC_INT);
 
         // record variable
-        CHECK(file.record_variables().size() == 5);
-        auto cell_lengths = file.record_variable("cell_lengths").value();
+        auto cell_lengths = file.variable("cell_lengths").value();
+        CHECK(cell_lengths.is_record());
         CHECK(cell_lengths.attribute("units")->as_string() == "Angstrom");
 
-        auto coordinates = file.record_variable("coordinates").value();
+        auto coordinates = file.variable("coordinates").value();
+        CHECK(coordinates.is_record());
         CHECK(coordinates.shape() == std::vector<size_t>{100, 297, 3});
         CHECK(coordinates.type() == netcdf3::constants::NC_FLOAT);
 
@@ -70,7 +72,6 @@ TEST_CASE("Read a NetCDF file") {
 
         // standard variable
         CHECK(file.variables().size() == 7);
-        CHECK(file.record_variables().size() == 0);
         auto cell_lengths = file.variable("cell_lengths").value();
         CHECK(cell_lengths.attribute("units")->as_string() == "angstrom");
 
@@ -79,7 +80,7 @@ TEST_CASE("Read a NetCDF file") {
         CHECK(coordinates.type() == netcdf3::constants::NC_DOUBLE);
 
         auto positions = std::vector<double>(297 * 3, 0.0);
-        coordinates.read(positions);
+        coordinates.read(0, positions);
         CHECK(std::abs(positions[0] - 0.4172191) < 1e-5);
         CHECK(std::abs(positions[1] - 8.303366) < 1e-5);
         CHECK(std::abs(positions[2] - 11.73717) < 1e-5);
@@ -92,8 +93,8 @@ static netcdf3::Netcdf3Builder file_builder() {
     netcdf3::Netcdf3Builder builder;
 
     builder.add_attribute("global", netcdf3::Value("global.value"));
-    auto infinite = builder.add_dimension(std::make_shared<netcdf3::Dimension>("infinite", 0));
-    auto finite = builder.add_dimension(std::make_shared<netcdf3::Dimension>("finite", 42));
+    auto infinite = builder.add_dimension("infinite", 0);
+    auto finite = builder.add_dimension("finite", 42);
 
     auto A = netcdf3::VariableDefinition {
         netcdf3::constants::NC_FLOAT,
@@ -121,9 +122,9 @@ TEST_CASE("Write NetCDF files") {
             netcdf3::Netcdf3File file(tmpfile, File::WRITE);
             file_builder().initialize(&file);
 
-            file.variable("B").value().write(std::vector<double>(42 * 42, 37.4));
+            file.variable("B").value().write(0, std::vector<double>(42 * 42, 37.4));
             file.add_record();
-            file.record_variable("A").value().write(0, std::vector<float>(42, 38.2f));
+            file.variable("A").value().write(0, std::vector<float>(42, 38.2f));
         }
 
 #ifndef __EMSCRIPTEN__
@@ -148,8 +149,8 @@ TEST_CASE("Write NetCDF files") {
         CHECK(dimensions[1]->name == "finite");
         CHECK(dimensions[1]->size == 42);
 
-        CHECK(file.record_variables().size() == 1);
-        auto A = file.record_variable("A").value();
+        CHECK(file.variables().size() == 2);
+        auto A = file.variable("A").value();
         CHECK(A.type() == netcdf3::constants::NC_FLOAT);
         CHECK(A.attributes().size() == 1);
         CHECK(A.attribute("attribute")->as_string() == "hello");
@@ -159,7 +160,6 @@ TEST_CASE("Write NetCDF files") {
         A.read(0, float_data);
         CHECK(float_data == std::vector<float>(42, 38.2f));
 
-        CHECK(file.variables().size() == 1);
         auto B = file.variable("B").value();
         CHECK(B.type() == netcdf3::constants::NC_DOUBLE);
         CHECK(B.attributes().size() == 1);
@@ -167,7 +167,7 @@ TEST_CASE("Write NetCDF files") {
         CHECK(B.shape() == std::vector<size_t>{42, 42});
 
         auto double_data = std::vector<double>(42 * 42);
-        B.read(double_data);
+        B.read(0, double_data);
         CHECK(double_data == std::vector<double>(42 * 42, 37.4));
     }
 
@@ -181,14 +181,14 @@ TEST_CASE("Write NetCDF files") {
         }
 
         netcdf3::Netcdf3File file(tmpfile, File::READ);
-        auto A = file.record_variable("A").value();
+        auto A = file.variable("A").value();
         auto float_data = std::vector<float>(42);
         A.read(0, float_data);
         CHECK(float_data == std::vector<float>(42, netcdf3::constants::NC_FILL_FLOAT));
 
         auto B = file.variable("B").value();
         auto double_data = std::vector<double>(42 * 42);
-        B.read(double_data);
+        B.read(0, double_data);
         CHECK(double_data == std::vector<double>(42 * 42, netcdf3::constants::NC_FILL_DOUBLE));
     }
 
@@ -197,20 +197,20 @@ TEST_CASE("Write NetCDF files") {
         {
             netcdf3::Netcdf3File file(tmpfile, File::WRITE);
             file_builder().initialize(&file);
-            file.variable("B").value().write(std::vector<double>(42 * 42, 37.4));
+            file.variable("B").value().write(0, std::vector<double>(42 * 42, 37.4));
 
             file.add_record();
-            file.record_variable("A").value().write(0, std::vector<float>(42, 38.2f));
+            file.variable("A").value().write(0, std::vector<float>(42, 38.2f));
         }
 
         {
             netcdf3::Netcdf3File file(tmpfile, File::APPEND);
             file.add_record();
-            file.record_variable("A").value().write(1, std::vector<float>(42, 56.8f));
+            file.variable("A").value().write(1, std::vector<float>(42, 56.8f));
         }
 
         netcdf3::Netcdf3File file(tmpfile, File::READ);
-        auto A = file.record_variable("A").value();
+        auto A = file.variable("A").value();
         auto float_data = std::vector<float>(42);
         A.read(0, float_data);
         CHECK(float_data == std::vector<float>(42, 38.2f));
@@ -220,7 +220,7 @@ TEST_CASE("Write NetCDF files") {
 
         auto B = file.variable("B").value();
         auto double_data = std::vector<double>(42 * 42);
-        B.read(double_data);
+        B.read(0, double_data);
         CHECK(double_data == std::vector<double>(42 * 42, 37.4));
     }
 }

@@ -9,7 +9,7 @@
 // chemfiles overall size (this is mostly important in a WASM context); and is
 // significantly faster as well. Only the subset of NetCDF 3 format required for
 // Amber convention is supported. This implementation is inspired by
-// scipy.io.netcdf_file.
+// `scipy.io.netcdf_file`.
 
 #include <cstdio>
 #include <cstdint>
@@ -182,8 +182,11 @@ struct VariableLayout {
     std::string type_name() const;
 };
 
-/// Base class used to define both `Variable` and `RecordVariable`.
-class BaseVariable {
+/// This class represent a variable in a netcdf file.
+///
+/// All variables have a type & shape (corresponding to a list of dimension), as
+/// well as a list of attributes (key/value pairs associated with the variable).
+class Variable {
 public:
     /// Get all the attributes for this variable
     const std::map<std::string, Value>& attributes() const {
@@ -204,90 +207,18 @@ public:
         return layout_.type;
     }
 
-protected:
-    friend class Netcdf3File;
-    friend class Netcdf3Builder;
-    BaseVariable(
-        Netcdf3File& file,
-        std::vector<std::shared_ptr<Dimension>> dimensions,
-        std::map<std::string, Value> attributes,
-        VariableLayout layout
-    );
-
-    std::reference_wrapper<Netcdf3File> file_;
-    std::vector<std::shared_ptr<Dimension>> dimensions_;
-    std::map<std::string, Value> attributes_;
-
-    VariableLayout layout_;
-};
-
-/// A single variable in a NetCDF3 file. None of the dimension for this variable
-/// are a record (infinite) dimension.
-class Variable: public BaseVariable {
-public:
     /// Get the shape of this variable
     std::vector<size_t> shape() const;
 
-    /// read the content of this variable, filling the `data` vector
-    ///
-    /// @throws if the vector type does not match this variable type
-    template<typename T>
-    void read(std::vector<T>& data) {
-        data.resize(this->layout_.count());
-        this->read(data.data(), data.size());
+    /// Is this variable a record variable, i.e. one of the dimension of the
+    /// variable is the record dimension?
+    bool is_record() const {
+        return is_record_;
     }
-
-    /// read the content of this variable, writing values from `data` to `data +
-    /// count`
-    ///
-    /// @throws if `count` is too small to fit all values for this variable
-    /// @throws if the pointer type does not match this variable type
-    template<typename T>
-    void read(T* data, size_t count);
-
-    /// write the content of `data` to this variable
-    ///
-    /// @throws if the vector type does not match this variable type
-    /// @throws if the vector size does not match this variable size
-    template<typename T>
-    void write(const std::vector<T>& data) {
-        this->write(data.data(), data.size());
-    }
-
-    /// write the values between `data` and `data + count` to this variable
-    ///
-    /// @throws if the data type does not match this variable type
-    /// @throws if count does not match this variable size
-    template<typename T>
-    void write(const T* data, size_t count);
-
-private:
-    /// Write the netcdf fill/default value to this variable, ignoring any
-    /// "fillValue" attribute
-    void write_fill_value();
-
-    friend class Netcdf3File;
-    friend class Netcdf3Builder;
-    Variable(BaseVariable base);
-};
-
-extern template void Variable::read(int32_t* data, size_t count);
-extern template void Variable::read(float* data, size_t count);
-extern template void Variable::read(double* data, size_t count);
-
-extern template void Variable::write(const int32_t* data, size_t count);
-extern template void Variable::write(const float* data, size_t count);
-extern template void Variable::write(const double* data, size_t count);
-
-/// A single variable in a NetCDF3 file. One of the dimension for this variable
-/// is a record (infinite) dimension.
-class RecordVariable: public BaseVariable {
-public:
-    /// Get the shape of this variable
-    std::vector<size_t> shape() const;
 
     /// read the content of this variable at the given `step`, filling the
-    /// `data` vector
+    /// `data` vector. If this variable is not a record variable `step` must be
+    /// 0.
     ///
     /// @throws if the vector type does not match this variable type
     template<typename T>
@@ -297,14 +228,16 @@ public:
     }
 
     /// read the content of this variable at the given `step`, writing values
-    /// from `data` to `data + count`
+    /// from `data` to `data + count`. If this variable is not a record
+    /// variable `step` must be 0.
     ///
     /// @throws if `count` is too small to fit all values for this variable
     /// @throws if the pointer type does not match this variable type
     template<typename T>
     void read(size_t step, T* data, size_t count);
 
-    /// write the content of `data` to this variable at the given `step`
+    /// write the content of `data` to this variable at the given `step`. If
+    /// this variable is not a record variable `step` must be 0.
     ///
     /// @throws if the vector type does not match this variable type
     /// @throws if the vector size does not match this variable size
@@ -314,31 +247,44 @@ public:
     }
 
     /// write the values between `data` and `data + count` to this variable at
-    /// the given `step`
+    /// the given `step`. If this variable is not a record variable `step` must
+    /// be 0.
     ///
-    /// @throws if the vector type does not match this variable type @throws if
-    /// the vector size does not match this variable size
+    /// @throws if the pointer type does not match this variable type
+    /// @throws if count does not match this variable size
     template<typename T>
     void write(size_t step, const T* data, size_t count);
 
 private:
     /// Write the netcdf fill/default value to this variable at the given
-    /// `step`, ignoring any "fillValue" attribute
+    /// `step`, ignoring any "fillValue" attribute. If this variable is not a
+    /// record variable `step` must be 0.
     void write_fill_value(size_t step);
 
     friend class Netcdf3File;
     friend class Netcdf3Builder;
-    RecordVariable(BaseVariable base);
+    Variable(
+        Netcdf3File& file,
+        std::vector<std::shared_ptr<Dimension>> dimensions,
+        std::map<std::string, Value> attributes,
+        VariableLayout layout
+    );
+
+    bool is_record_;
+    std::reference_wrapper<Netcdf3File> file_;
+    std::vector<std::shared_ptr<Dimension>> dimensions_;
+    std::map<std::string, Value> attributes_;
+
+    VariableLayout layout_;
 };
 
-extern template void RecordVariable::read(size_t step, int32_t* data, size_t count);
-extern template void RecordVariable::read(size_t step, float* data, size_t count);
-extern template void RecordVariable::read(size_t step, double* data, size_t count);
+extern template void Variable::read(size_t step, int32_t* data, size_t count);
+extern template void Variable::read(size_t step, float* data, size_t count);
+extern template void Variable::read(size_t step, double* data, size_t count);
 
-extern template void RecordVariable::write(size_t step, const int32_t* data, size_t count);
-extern template void RecordVariable::write(size_t step, const float* data, size_t count);
-extern template void RecordVariable::write(size_t step, const double* data, size_t count);
-
+extern template void Variable::write(size_t step, const int32_t* data, size_t count);
+extern template void Variable::write(size_t step, const float* data, size_t count);
+extern template void Variable::write(size_t step, const double* data, size_t count);
 
 /// An implementation of NetCDF version 3 (or classic) binary files, using
 /// 64-bit offsets for variables.
@@ -371,21 +317,13 @@ public:
     /// Get the global attribute with the given `name` for this file, if it exists
     optional<const Value&> attribute(const std::string& name) const;
 
-    /// Get all the fixed size variables for this file
+    /// Get all the variables for this file
     const std::map<std::string, Variable>& variables() const {
         return variables_;
     }
 
-    /// Get the fixed size variable with the given name in this file if it exists
+    /// Get the variable with the given name in this file if it exists
     optional<Variable&> variable(const std::string& name);
-
-    /// Get all the record size variables for this file
-    const std::map<std::string, RecordVariable>& record_variables() const {
-        return record_variables_;
-    }
-
-    /// Get the record variable with the given name in this file if it exists
-    optional<RecordVariable&> record_variable(const std::string& name);
 
     /// Get all the dimensions defined in this file
     const std::vector<std::shared_ptr<Dimension>>& dimensions() const {
@@ -406,6 +344,12 @@ public:
         return record_size_;
     }
 
+    /// Was this file already intialized (i.e. all variables/dimensions/etc.
+    /// have been defined)?
+    bool initialized() const {
+        return initialized_;
+    }
+
 private:
     /// skip `count` bytes of padding from the file
     void skip_padding(size_t count);
@@ -424,12 +368,8 @@ private:
     Value read_attribute_value();
     /// write a single attribute value to the file
     void write_attribute_value(const Value& value);
-
-    struct variable_list_t {
-        std::map<std::string, RecordVariable> record_variables;
-        std::map<std::string, Variable> variables;
-    };
-    variable_list_t read_variable_list();
+    /// read the header for all variables
+    void read_variables();
 
     /// current number of records in the file
     uint64_t n_records_;
@@ -440,10 +380,8 @@ private:
     std::vector<std::shared_ptr<Dimension>> dimensions_;
     /// global attributes of the file
     std::map<std::string, Value> attributes_;
-    /// variables **not** using the record dimension in this file
+    /// variables in this file
     std::map<std::string, Variable> variables_;
-    /// variables using the record dimension in this file
-    std::map<std::string, RecordVariable> record_variables_;
 
     // was this file initialized?
     bool initialized_;
@@ -465,8 +403,14 @@ struct VariableDefinition {
 /// dimensions, attributes and variables in the file.
 class Netcdf3Builder {
 public:
-    /// Add a new dimension to the builder
-    size_t add_dimension(std::shared_ptr<Dimension> dimension);
+    /// Add a new dimension with the given name and size to the builder. A size
+    /// of 0 indicates a record dimension
+    size_t add_dimension(std::string name, size_t size);
+
+    /// Get the list of dimensions currently defined
+    const std::vector<std::shared_ptr<Dimension>>& dimensions() const {
+        return dimensions_;
+    }
 
     /// Add a new global attribute to the builder with the give `name` and `value`
     void add_attribute(std::string name, Value value);
