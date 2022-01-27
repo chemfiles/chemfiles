@@ -358,6 +358,15 @@ void Variable::write(size_t step, const T* data, size_t count) {
     begin += static_cast<uint64_t>(step) * file.record_size();
     file.seek(begin);
     (file.*nc_type_info<T>::writer)(data, count);
+
+    if (this->is_record()) {
+        // fmt::print("written to {} at step {}", , step)
+        if (step == file.n_records() - 1) {
+            written_at_last_step_ = true;
+        }
+    } else {
+        written_at_last_step_ = true;
+    }
 }
 
 template void Variable::write(size_t step, const char* data, size_t count);
@@ -443,6 +452,28 @@ Netcdf3File::Netcdf3File(std::string filename, File::Mode mode):
     this->read_variables();
 
     initialized_ = true;
+}
+
+Netcdf3File::~Netcdf3File() {
+    if (this->mode() != File::READ) {
+        // write fill values where needed
+        for (auto& it: variables_) {
+            auto& variable = it.second;
+            if (variable.is_record()) {
+                if (!variable.written_at_last_step_ && this->n_records_ > 0) {
+                    variable.write_fill_value(this->n_records_ - 1);
+                }
+            } else {
+                if (!variable.written_at_last_step_) {
+                    variable.write_fill_value(0);
+                }
+            }
+        }
+
+        // update the number of records in the header, it is always at byte 4
+        this->seek(4);
+        this->write_single_i32(static_cast<int32_t>(this->n_records_));
+    }
 }
 
 void Netcdf3File::skip_padding(int64_t size) {
@@ -664,20 +695,19 @@ void Netcdf3File::add_record() {
         throw file_error("can not add a record to a file opened in read-only mode");
     }
 
-    auto step = this->n_records_;
     this->n_records_ += 1;
 
-    // update variables
+    // write fill value in record variables for last step if needed & mark them
+    // as not written to for this step
     for (auto& it: variables_) {
         auto& variable = it.second;
         if (variable.is_record()) {
-            variable.write_fill_value(step);
+            if (!variable.written_at_last_step_ && this->n_records_ > 1) {
+                variable.write_fill_value(this->n_records_ - 2);
+            }
+            variable.written_at_last_step_ = false;
         }
     }
-
-    // update the number of records in the header, it is always at byte 4
-    this->seek(4);
-    this->write_single_i32(static_cast<int32_t>(this->n_records_));
 }
 
 /******************************************************************************/
