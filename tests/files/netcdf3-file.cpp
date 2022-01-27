@@ -192,7 +192,7 @@ TEST_CASE("Write NetCDF files") {
         CHECK(double_data == std::vector<double>(42 * 42, netcdf3::constants::NC_FILL_DOUBLE));
     }
 
-    SECTION("append") {
+    SECTION("append to existing file") {
         auto tmpfile = NamedTempPath(".nc");
         {
             netcdf3::Netcdf3File file(tmpfile, File::WRITE);
@@ -217,6 +217,29 @@ TEST_CASE("Write NetCDF files") {
 
         A.read(1, float_data);
         CHECK(float_data == std::vector<float>(42, 56.8f));
+
+        auto B = file.variable("B").value();
+        auto double_data = std::vector<double>(42 * 42);
+        B.read(0, double_data);
+        CHECK(double_data == std::vector<double>(42 * 42, 37.4));
+    }
+
+    SECTION("append to new file") {
+        auto tmpfile = NamedTempPath(".nc");
+        {
+            netcdf3::Netcdf3File file(tmpfile, File::APPEND);
+            file_builder().initialize(&file);
+            file.variable("B").value().write(0, std::vector<double>(42 * 42, 37.4));
+
+            file.add_record();
+            file.variable("A").value().write(0, std::vector<float>(42, 38.2f));
+        }
+
+        netcdf3::Netcdf3File file(tmpfile, File::READ);
+        auto A = file.variable("A").value();
+        auto float_data = std::vector<float>(42);
+        A.read(0, float_data);
+        CHECK(float_data == std::vector<float>(42, 38.2f));
 
         auto B = file.variable("B").value();
         auto double_data = std::vector<double>(42 * 42);
