@@ -171,7 +171,7 @@ TEST_CASE("Write NetCDF files") {
         CHECK(double_data == std::vector<double>(42 * 42, 37.4));
     }
 
-    SECTION("fill values") {
+    SECTION("fill values with 1 record") {
         auto tmpfile = NamedTempPath(".nc");
         {
             netcdf3::Netcdf3File file(tmpfile, File::WRITE);
@@ -184,6 +184,39 @@ TEST_CASE("Write NetCDF files") {
         auto A = file.variable("A").value();
         auto float_data = std::vector<float>(42);
         A.read(0, float_data);
+        CHECK(float_data == std::vector<float>(42, netcdf3::constants::NC_FILL_FLOAT));
+
+        auto B = file.variable("B").value();
+        auto double_data = std::vector<double>(42 * 42);
+        B.read(0, double_data);
+        CHECK(double_data == std::vector<double>(42 * 42, netcdf3::constants::NC_FILL_DOUBLE));
+    }
+
+    SECTION("fill values with more than 1 record") {
+        auto tmpfile = NamedTempPath(".nc");
+        {
+            netcdf3::Netcdf3File file(tmpfile, File::WRITE);
+            file_builder().initialize(&file);
+
+            file.add_record();
+            file.variable("A").value().write(0, std::vector<float>(42, 38.2f));
+
+            file.add_record();
+            file.variable("A").value().write(1, std::vector<float>(42, 56.8f));
+
+            file.add_record();
+        }
+
+        netcdf3::Netcdf3File file(tmpfile, File::READ);
+        auto A = file.variable("A").value();
+        auto float_data = std::vector<float>(42);
+        A.read(0, float_data);
+        CHECK(float_data == std::vector<float>(42, 38.2f));
+
+        A.read(1, float_data);
+        CHECK(float_data == std::vector<float>(42, 56.8f));
+
+        A.read(2, float_data);
         CHECK(float_data == std::vector<float>(42, netcdf3::constants::NC_FILL_FLOAT));
 
         auto B = file.variable("B").value();
