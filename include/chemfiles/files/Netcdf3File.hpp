@@ -278,6 +278,11 @@ private:
     std::vector<std::shared_ptr<Dimension>> dimensions_;
     std::map<std::string, Value> attributes_;
 
+    // was this variable written to at `step == file.n_records() - 1`?
+    // This member is managed by both Netcdf3File (when adding a new record)
+    // and the Variable itself (when writing)
+    bool written_at_last_step_ = true;
+
     VariableLayout layout_;
 };
 
@@ -305,6 +310,7 @@ extern template void Variable::write(size_t step, const double* data, size_t cou
 class Netcdf3File: public BigEndianFile {
 public:
     Netcdf3File(std::string filename, File::Mode mode);
+    ~Netcdf3File();
 
     // disable moving/copying Netcdf3File since Variable instances take a
     // pointer to the file
