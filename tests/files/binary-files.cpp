@@ -40,7 +40,7 @@ static void check_read_binary_file(BinaryFile& file) {
 
     auto size = file.read_single_i32();
     CHECK(size == 5);
-    file.read_char(buffer, size);
+    file.read_char(buffer, static_cast<size_t>(size));
     CHECK(buffer == std::string("hello"));
 
     int16_t i16[10];
@@ -105,13 +105,6 @@ static void write_binary_file(BinaryFile& file) {
 
 TEST_CASE("Write binary files") {
     SECTION("big endian") {
-        auto filename = NamedTempPath(".data");
-        {
-            auto file = BigEndianFile(filename, File::Mode::WRITE);
-            write_binary_file(file);
-        }
-
-        auto content = read_binary_file(filename);
         auto expected = std::vector<uint8_t> {
             'A', 'B', 'C', 'D',
             0xff, 0xd6,
@@ -123,31 +116,52 @@ TEST_CASE("Write binary files") {
             0x42, 0x5, 0x33, 0x33,
             0xc0, 0x4b, 0xe6, 0x66, 0x66, 0x66, 0x66, 0x66
         };
-        CHECK(content == expected);
 
-        auto file = BigEndianFile(filename, File::Mode::READ);
-        CHECK(file.read_single_char() == 'A');
-        CHECK(file.read_single_char() == 'B');
-        CHECK(file.read_single_char() == 'C');
-        CHECK(file.read_single_char() == 'D');
-        CHECK(file.read_single_i16() == -42);
-        CHECK(file.read_single_u16() == 42);
-        CHECK(file.read_single_i32() == -573);
-        CHECK(file.read_single_u32() == 573);
-        CHECK(file.read_single_i64() == -123456);
-        CHECK(file.read_single_u64() == 123456);
-        CHECK(file.read_single_f32() == 33.3f);
-        CHECK(file.read_single_f64() == -55.8);
+        SECTION("write to file") {
+            auto filename = NamedTempPath(".data");
+            {
+                auto file = BigEndianFile(filename, File::Mode::WRITE);
+                write_binary_file(file);
+            }
+
+            auto content = read_binary_file(filename);
+            CHECK(content == expected);
+        }
+
+        SECTION("write and append") {
+            auto filename = NamedTempPath(".data");
+            {
+                auto file = BigEndianFile(filename, File::Mode::WRITE);
+                write_binary_file(file);
+            }
+
+            auto content = read_binary_file(filename);
+            CHECK(content == expected);
+
+            {
+                auto file = BigEndianFile(filename, File::Mode::APPEND);
+                write_binary_file(file);
+            }
+
+            content = read_binary_file(filename);
+            auto expected_2 = expected;
+            expected_2.insert(expected_2.end(), expected.begin(), expected.end());
+            CHECK(content == expected_2);
+        }
+
+        SECTION("append") {
+            auto filename = NamedTempPath(".data");
+            {
+                auto file = BigEndianFile(filename, File::Mode::APPEND);
+                write_binary_file(file);
+            }
+
+            auto content = read_binary_file(filename);
+            CHECK(content == expected);
+        }
     }
 
     SECTION("little endian") {
-        auto filename = NamedTempPath(".data");
-        {
-            auto file = LittleEndianFile(filename, File::Mode::WRITE);
-            write_binary_file(file);
-        }
-
-        auto content = read_binary_file(filename);
         auto expected = std::vector<uint8_t> {
             'A', 'B', 'C', 'D',
             0xd6, 0xff,
@@ -159,20 +173,48 @@ TEST_CASE("Write binary files") {
             0x33, 0x33, 0x5,  0x42,
             0x66, 0x66, 0x66, 0x66, 0x66, 0xe6, 0x4b, 0xc0,
         };
-        CHECK(content == expected);
 
-        auto file = LittleEndianFile(filename, File::Mode::READ);
-        CHECK(file.read_single_char() == 'A');
-        CHECK(file.read_single_char() == 'B');
-        CHECK(file.read_single_char() == 'C');
-        CHECK(file.read_single_char() == 'D');
-        CHECK(file.read_single_i16() == -42);
-        CHECK(file.read_single_u16() == 42);
-        CHECK(file.read_single_i32() == -573);
-        CHECK(file.read_single_u32() == 573);
-        CHECK(file.read_single_i64() == -123456);
-        CHECK(file.read_single_u64() == 123456);
-        CHECK(file.read_single_f32() == 33.3f);
-        CHECK(file.read_single_f64() == -55.8);
+        SECTION("write to file") {
+            auto filename = NamedTempPath(".data");
+            {
+                auto file = LittleEndianFile(filename, File::Mode::WRITE);
+                write_binary_file(file);
+            }
+
+            auto content = read_binary_file(filename);
+            CHECK(content == expected);
+        }
+
+        SECTION("write and append") {
+            auto filename = NamedTempPath(".data");
+            {
+                auto file = LittleEndianFile(filename, File::Mode::WRITE);
+                write_binary_file(file);
+            }
+
+            auto content = read_binary_file(filename);
+            CHECK(content == expected);
+
+            {
+                auto file = LittleEndianFile(filename, File::Mode::APPEND);
+                write_binary_file(file);
+            }
+
+            content = read_binary_file(filename);
+            auto expected_2 = expected;
+            expected_2.insert(expected_2.end(), expected.begin(), expected.end());
+            CHECK(content == expected_2);
+        }
+
+        SECTION("append") {
+            auto filename = NamedTempPath(".data");
+            {
+                auto file = LittleEndianFile(filename, File::Mode::APPEND);
+                write_binary_file(file);
+            }
+
+            auto content = read_binary_file(filename);
+            CHECK(content == expected);
+        }
     }
 }

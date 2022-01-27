@@ -59,39 +59,65 @@ TEST_CASE("Read files in Amber Restart format") {
 }
 
 TEST_CASE("Write files in Amber Restart format") {
-    auto tmpfile = NamedTempPath(".ncrst");
+    auto check_frame = [](const Frame& frame) {
+        CHECK(frame.get("name").value() == "Test Title 123");
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], {0, 0, 0}, 1e-9));
+        CHECK(approx_eq(positions[1], {1, 2, 3}, 1e-9));
+        CHECK(approx_eq(positions[2], {2, 4, 6}, 1e-9));
+        CHECK(approx_eq(positions[3], {3, 6, 9}, 1e-9));
 
-    auto file = Trajectory(tmpfile, 'w');
-    Frame frame;
+        auto velocities = frame.velocities().value();
+        CHECK(approx_eq(velocities[0], {-3, -2, -1}, 1e-9));
+        CHECK(approx_eq(velocities[1], {-3, -2, -1}, 1e-9));
+        CHECK(approx_eq(velocities[2], {-3, -2, -1}, 1e-9));
+        CHECK(approx_eq(velocities[3], {-3, -2, -1}, 1e-9));
+
+        auto cell = frame.cell();
+        CHECK(approx_eq(cell.lengths(), {2, 3, 4}, 1e-9));
+        CHECK(approx_eq(cell.angles(), {80, 90, 120}, 1e-9));
+    };
+
+    auto frame = Frame(UnitCell({2, 3, 4}, {80, 90, 120}));
     frame.set("name", "Test Title 123");
-    frame.resize(4);
-    auto positions = frame.positions();
     frame.add_velocities();
-    auto velocities = *frame.velocities();
-    for (size_t i = 0; i < 4; i++) {
-        positions[i] = Vector3D(1, 2, 3);
-        velocities[i] = Vector3D(-3, -2, -1);
+    for(size_t i=0; i<4; i++) {
+        frame.add_atom(
+            Atom("X"),
+            {1.0 * i, 2.0 * i, 3.0 * i},
+            {-3, -2, -1}
+        );
     }
-    file.write(frame);
 
-    CHECK_THROWS_WITH(file.write(frame), "AMBER Restart format only supports writing one frame");
+    SECTION("Write new file") {
+        auto tmpfile = NamedTempPath(".ncrst");
 
-    file.close();
+        {
+            auto file = Trajectory(tmpfile, 'w');
+            file.write(frame);
+            CHECK_THROWS_WITH(file.write(frame), "AMBER Restart format only supports writing one frame");
+        }
 
-    Trajectory check(tmpfile, 'r');
-    frame = check.read();
-    CHECK(frame.get("name").value() == "Test Title 123");
+        {
+            auto file = Trajectory(tmpfile, 'a');
+            CHECK_THROWS_WITH(file.write(frame), "AMBER Restart format only supports writing one frame");
+        }
 
-    positions = frame.positions();
-    CHECK(approx_eq(positions[0], Vector3D(1, 2, 3), 1e-9));
-    CHECK(approx_eq(positions[1], Vector3D(1, 2, 3), 1e-9));
-    CHECK(approx_eq(positions[2], Vector3D(1, 2, 3), 1e-9));
-    CHECK(approx_eq(positions[3], Vector3D(1, 2, 3), 1e-9));
+        auto file = Trajectory(tmpfile, 'r');
+        CHECK(file.nsteps() == 1);
+        check_frame(file.read());
+    }
 
-    CHECK(frame.velocities());
-    velocities = *frame.velocities();
-    CHECK(approx_eq(velocities[0], Vector3D(-3, -2, -1), 1e-9));
-    CHECK(approx_eq(velocities[1], Vector3D(-3, -2, -1), 1e-9));
-    CHECK(approx_eq(velocities[2], Vector3D(-3, -2, -1), 1e-9));
-    CHECK(approx_eq(velocities[3], Vector3D(-3, -2, -1), 1e-9));
+    SECTION("Append to new file") {
+        auto tmpfile = NamedTempPath(".ncrst");
+
+        auto file = Trajectory(tmpfile, 'a');
+        file.write(frame);
+        CHECK_THROWS_WITH(file.write(frame), "AMBER Restart format only supports writing one frame");
+        file.close();
+
+        file = Trajectory(tmpfile, 'r');
+        CHECK(file.nsteps() == 1);
+        check_frame(file.read());
+    }
 }

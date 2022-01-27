@@ -378,9 +378,9 @@ private:
     void read_variables();
 
     /// current number of records in the file
-    uint64_t n_records_;
+    uint64_t n_records_ = 0;
     /// size in bytes of a full record entry, including all record variables
-    uint64_t record_size_;
+    uint64_t record_size_ = 0;
 
     /// list of dimensions in this file
     std::vector<std::shared_ptr<Dimension>> dimensions_;
@@ -390,7 +390,7 @@ private:
     std::map<std::string, Variable> variables_;
 
     // was this file initialized?
-    bool initialized_;
+    bool initialized_ = false;
 
     friend class Netcdf3Builder;
 };

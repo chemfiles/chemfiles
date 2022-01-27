@@ -14,6 +14,8 @@
 /// The full version of chemfiles ("x.y.z"), as a string
 #define CHEMFILES_VERSION "@CHEMFILES_VERSION@"
 
+#define CHEMFILES_SIZEOF_VOID_P @CMAKE_SIZEOF_VOID_P@
+
 /// Are we building code on Windows?
 #cmakedefine CHEMFILES_WINDOWS
 
