@@ -43,7 +43,7 @@ AmberNetCDFBase::AmberNetCDFBase(std::string convention, std::string path, File:
         throw format_error("compression is not supported with NetCDF format");
     }
 
-    if (file_.mode() == File::WRITE) {
+    if (!file_.initialized()) {
         // the file will be initialized on the first write
         return;
     }
@@ -60,7 +60,7 @@ AmberNetCDFBase::AmberNetCDFBase(std::string convention, std::string path, File:
         file_title_ = title->second.as_string();
     }
 
-    n_atoms_ = find_dimension(file_, "atom")->size;
+    n_atoms_ = static_cast<size_t>(find_dimension(file_, "atom")->size);
 
     // get the variables actually defined in the file
     variables_.coordinates = this->get_variable("coordinates");
@@ -95,6 +95,11 @@ AmberNetCDFBase::AmberNetCDFBase(std::string convention, std::string path, File:
                 file_.path()
             );
         }
+    }
+
+    if (mode == File::APPEND) {
+        // start writing at the end of pre-existing files in append mode
+        step_ = file_.n_records();
     }
 }
 
@@ -368,8 +373,8 @@ void AmberNetCDFBase::write_array(variable_scale_t& variable, span<const Vector3
 AmberTrajectory::AmberTrajectory(std::string path, File::Mode mode, File::Compression compression):
     AmberNetCDFBase("AMBER", std::move(path), mode, compression)
 {
-    if (mode == File::WRITE) {
-        // no need to validate the file when writing, it will be initialized later
+    if (!file_.initialized()) {
+        // skip validation, the file will be initialized later
         return;
     }
 

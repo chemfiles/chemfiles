@@ -393,14 +393,25 @@ Netcdf3File::Netcdf3File(std::string filename, File::Mode mode):
     variables_(),
     initialized_(false)
 {
-    if (mode == 'w') {
+    if (mode == File::WRITE) {
         // nothing to do for now, the file will be intialized by a Netcdf3Builder
         return;
     }
 
     this->seek(0);
     auto buffer = std::string(3, '\0');
-    this->read_char(&buffer[0], 3);
+
+    try {
+        this->read_char(&buffer[0], 3);
+    } catch (const FileError& e) {
+        if (mode == File::APPEND) {
+            // An empty file was opened in append mode, it will be initialized
+            // later by a Netcdf3Builder
+            return;
+        }
+        throw e;
+    }
+
     if (buffer != "CDF") {
         throw file_error("the file at '{}' is not a valid NetCDF 3 file", this->path());
     }
@@ -736,8 +747,8 @@ void Netcdf3Builder::add_variable(std::string name, VariableDefinition definitio
 }
 
 void Netcdf3Builder::initialize(Netcdf3File* file) && {
-    if (file->mode() != 'w' || file->initialized_) {
-        throw file_error("can not initialize a file twice or outside of write mode");
+    if (file->initialized_) {
+        throw file_error("can not initialize a file twice");
     }
     file->initialized_ = true;
 

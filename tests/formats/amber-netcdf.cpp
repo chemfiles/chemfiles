@@ -68,26 +68,80 @@ TEST_CASE("Read files in NetCDF format") {
 }
 
 TEST_CASE("Write files in NetCDF format") {
-    auto tmpfile = NamedTempPath(".nc");
+    auto check_frame = [](const Frame& frame) {
+        CHECK(frame.get("name").value() == "Test Title 123");
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], {0, 0, 0}, 1e-6));
+        CHECK(approx_eq(positions[1], {1, 2, 3}, 1e-6));
+        CHECK(approx_eq(positions[2], {2, 4, 6}, 1e-6));
+        CHECK(approx_eq(positions[3], {3, 6, 9}, 1e-6));
 
-    auto file = Trajectory(tmpfile, 'w');
-    Frame frame;
+        auto velocities = frame.velocities().value();
+        CHECK(approx_eq(velocities[0], {-3, -2, -1}, 1e-6));
+        CHECK(approx_eq(velocities[1], {-3, -2, -1}, 1e-6));
+        CHECK(approx_eq(velocities[2], {-3, -2, -1}, 1e-6));
+        CHECK(approx_eq(velocities[3], {-3, -2, -1}, 1e-6));
+
+        auto cell = frame.cell();
+        CHECK(approx_eq(cell.lengths(), {2, 3, 4}, 1e-6));
+        CHECK(approx_eq(cell.angles(), {80, 90, 120}, 1e-6));
+    };
+
+    auto frame = Frame(UnitCell({2, 3, 4}, {80, 90, 120}));
     frame.set("name", "Test Title 123");
-    frame.resize(4);
-    auto positions = frame.positions();
+    frame.add_velocities();
     for(size_t i=0; i<4; i++) {
-        positions[i] = Vector3D(1, 2, 3);
+        frame.add_atom(
+            Atom("X"),
+            {1.0 * i, 2.0 * i, 3.0 * i},
+            {-3, -2, -1}
+        );
     }
 
-    file.write(frame);
-    file.close();
+    SECTION("Write new file") {
+        auto tmpfile = NamedTempPath(".nc");
 
-    Trajectory check(tmpfile, 'r');
-    frame = check.read();
-    CHECK(frame.get("name").value() == "Test Title 123");
-    positions = frame.positions();
-    CHECK(approx_eq(positions[0], {1, 2, 3}, 1e-6));
-    CHECK(approx_eq(positions[1], {1, 2, 3}, 1e-6));
-    CHECK(approx_eq(positions[2], {1, 2, 3}, 1e-6));
-    CHECK(approx_eq(positions[3], {1, 2, 3}, 1e-6));
+        auto file = Trajectory(tmpfile, 'w');
+        file.write(frame);
+        file.write(frame);
+        file.close();
+
+        file = Trajectory(tmpfile, 'r');
+        CHECK(file.nsteps() == 2);
+        check_frame(file.read());
+        check_frame(file.read());
+    }
+
+    SECTION("Append to existing file") {
+        auto tmpfile = NamedTempPath(".nc");
+
+        {
+            auto file = Trajectory(tmpfile, 'w');
+            file.write(frame);
+        }
+
+        {
+            auto file = Trajectory(tmpfile, 'a');
+            file.write(frame);
+        }
+
+        auto file = Trajectory(tmpfile, 'r');
+        CHECK(file.nsteps() == 2);
+        check_frame(file.read());
+        check_frame(file.read());
+    }
+
+    SECTION("Append to new file") {
+        auto tmpfile = NamedTempPath(".nc");
+
+        auto file = Trajectory(tmpfile, 'a');
+        file.write(frame);
+        file.write(frame);
+        file.close();
+
+        file = Trajectory(tmpfile, 'r');
+        CHECK(file.nsteps() == 2);
+        check_frame(file.read());
+        check_frame(file.read());
+    }
 }

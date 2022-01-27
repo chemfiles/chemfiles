@@ -75,7 +75,7 @@ struct residue_info_t {
     }
 };
 
-inline void hash_combine(std::size_t& seed) { }
+inline void hash_combine(std::size_t&) { }
 
 template <typename T, typename... Tail>
 inline void hash_combine(std::size_t& seed, const T& v, Tail... tail) {
