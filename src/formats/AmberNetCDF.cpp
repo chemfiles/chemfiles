@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "chemfiles/types.hpp"
-#include "chemfiles/config.h"
+#include "chemfiles/utils.hpp"
 #include "chemfiles/warnings.hpp"
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/external/span.hpp"
@@ -31,6 +31,9 @@ static netcdf3::Netcdf3Builder base_builder(std::string convention, std::string 
 static optional<netcdf3::Dimension&> find_dimension(netcdf3::Netcdf3File& file, const std::string& name);
 /// Find the id of the dimension with the given name in the builder
 static size_t get_dimension_id(const netcdf3::Netcdf3Builder& builder, const std::string& name);
+
+static double scale_for_distance(std::string unit);
+static double scale_for_velocity(std::string unit);
 
 /******************************************************************************/
 
@@ -65,20 +68,44 @@ AmberNetCDFBase::AmberNetCDFBase(std::string convention, std::string path, File:
     // get the variables actually defined in the file
     variables_.coordinates = this->get_variable("coordinates");
     if (variables_.coordinates.var) {
-        // TODO: units
+        auto units_attr = variables_.coordinates.var->attribute("units");
+        if (units_attr && units_attr->kind() == netcdf3::Value::STRING) {
+            variables_.coordinates.scale *= scale_for_distance(units_attr->as_string());
+        }
     } else {
         warning("Amber NetCDF reader", "the coordinates variable is not defined in this file");
     }
 
     variables_.velocities = this->get_variable("velocities");
     if (variables_.velocities.var) {
-        // TODO: units
+        auto units_attr = variables_.velocities.var->attribute("units");
+        if (units_attr && units_attr->kind() == netcdf3::Value::STRING) {
+            variables_.velocities.scale *= scale_for_velocity(units_attr->as_string());
+        }
     }
 
     variables_.cell_lengths = this->get_variable("cell_lengths");
     variables_.cell_angles = this->get_variable("cell_angles");
     if (variables_.cell_lengths.var && variables_.cell_angles.var) {
-        // TODO: units
+        auto units_attr = variables_.cell_lengths.var->attribute("units");
+        if (units_attr && units_attr->kind() == netcdf3::Value::STRING) {
+            variables_.cell_lengths.scale *= scale_for_distance(units_attr->as_string());
+        }
+
+        units_attr = variables_.cell_angles.var->attribute("units");
+        if (units_attr && units_attr->kind() == netcdf3::Value::STRING) {
+            auto units = units_attr->as_string();
+            to_ascii_lowercase(units);
+
+            if (units == "" || units == "degrees" || units == "degree") {
+                // nothing to do
+            } else if (units == "radians" || units == "radians") {
+                constexpr double pi = 3.141592653589793238463;
+                variables_.cell_angles.scale *= 180 / pi;
+            } else {
+                warning("Amber NetCDF reader", "unknown unit ({}) for angles", units);
+            }
+        }
     } else if (variables_.cell_lengths.var) {
         if (!variables_.cell_angles.var) {
             throw format_error(
@@ -493,7 +520,7 @@ void AmberTrajectory::initialize(const Frame& frame) {
         builder.add_variable("velocities", {
             /* type = */ netcdf3::constants::NC_FLOAT,
             /* dimensions = */ {frame_dim, atom_dim, spatial_dim},
-            /* attributes = */ {{"units", netcdf3::Value("angstrom/femptosecond")}}
+            /* attributes = */ {{"units", netcdf3::Value("angstrom/picosecond")}},
         });
     }
 
@@ -721,4 +748,53 @@ netcdf3::Netcdf3Builder base_builder(std::string convention, std::string title, 
     });
 
     return builder;
+}
+
+double scale_for_distance(std::string units) {
+    to_ascii_lowercase(units);
+
+    if (units == "angstroms" || units == "angstrom" || units == "a") {
+        return 1.0;
+    } else if (units == "meters" || units == "meter" || units == "m") {
+        return 1e10;
+    } else if (units == "centimeters" || units == "centimeter" || units == "cm") {
+        return 1e8;
+    } else if (units == "micrometers" || units == "micrometer" || units == "µm"  || units == "um") {
+        return 1e4;
+    } else if (units == "nanometers" || units == "nanometer" || units == "nm") {
+        return 1e4;
+    } else if (units == "bohrs" || units == "bohr") {
+        return 0.52918;
+    } else {
+        warning("Amber NetCDF reader", "unknown unit ({}) for distances", units);
+        return 1.0;
+    }
+}
+
+double scale_for_velocity(std::string units) {
+    to_ascii_lowercase(units);
+
+    auto splitted = split(units, '/');
+    if (splitted.size() != 2) {
+        warning("Amber NetCDF reader", "unknown unit ({}) for velocities", units);
+        return 1.0;
+    }
+    auto scale = scale_for_distance(splitted[0].to_string());
+    auto time_unit = splitted[1];
+
+    if (time_unit == "picoseconds" || time_unit == "picosecond" || time_unit == "ps") {
+        // nothing to do
+    } else if (time_unit == "femtoseconds" || time_unit == "femtosecond" || time_unit == "fs") {
+        scale *= 1e3;
+    } else if (time_unit == "nanoseconds" || time_unit == "nanosecond" || time_unit == "ns") {
+        scale *= 1e-3;
+    } else if (time_unit == "microseconds" || time_unit == "microsecond" || time_unit == "µs" || time_unit == "us") {
+        scale *= 1e-6;
+    } else if (time_unit == "seconds" || time_unit == "second" || time_unit == "s") {
+        scale *= 1e-12;
+    } else {
+        warning("Amber NetCDF reader", "unknown unit ({}) for time", time_unit);
+    }
+
+    return scale;
 }
