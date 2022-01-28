@@ -109,14 +109,15 @@ public:
     /// @example{frame/size.cpp}
     size_t size() const;
 
-    /// Get the positions of the atoms in this frame.
+    /// Get the positions (in Angstroms) of the atoms in this frame.
     ///
     /// @example{frame/positions.cpp}
     span<Vector3D> positions() {
         return positions_;
     }
 
-    /// Get the positions in this frame as a const reference
+    /// Get the positions (in Angstroms) of the atoms in this frame as a const
+    /// reference
     ///
     /// @example{frame/positions.cpp}
     const std::vector<Vector3D>& positions() const {
@@ -131,8 +132,8 @@ public:
     /// @example{frame/add_velocities.cpp}
     void add_velocities();
 
-    /// Get an velocities of the atoms in this frame, if this frame contains
-    /// velocity data.
+    /// Get an velocities (in Angstroms/ps) of the atoms in this frame, if this
+    /// frame contains velocity data.
     ///
     /// @example{frame/velocities.cpp}
     optional<span<Vector3D>> velocities() {
@@ -143,8 +144,8 @@ public:
         }
     }
 
-    /// Get an velocities of the atoms in this frame as a const reference, if
-    /// this frame contains velocity data.
+    /// Get an velocities (in Angstroms/ps) of the atoms in this frame as a
+    /// const reference, if this frame contains velocity data.
     ///
     /// @example{frame/velocities.cpp}
     optional<const std::vector<Vector3D>&> velocities() const {
