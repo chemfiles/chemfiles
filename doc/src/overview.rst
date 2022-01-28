@@ -53,3 +53,23 @@ implemented in the :cpp:class:`Selection <chemfiles::Selection>` class. This
 selection language allows the users to select a group of atoms from a
 :cpp:class:`frame <chemfiles::Frame>` using a selection string such as ``"(x <
 45 and name O) or name C"``.
+
+
+Units
+-----
+
+Chemfiles uses the following set of internal units:
+
+- lengths (positions and cell lengths) are in Angstroms;
+- velocities are in Angstroms/picosecond;
+- angles are in degrees;
+
+When reading from a file, chemfiles tries to to convert from the data stored in
+the file to these units. Some formats do not document the units of the value
+stored, in which case the data is read as-is and assumed to follow the units
+above.
+
+When writing to a file, chemfiles tries to convert from these units to the units
+expected by the format. If the format does not have a way to specify units and
+does not define units in its specification, then chemfiles will write its
+internal data as-is.
