@@ -1,12 +1,6 @@
 Chemfiles internals
 ===================
 
-.. toctree::
-   :maxdepth: 2
-
-   file
-   format
-
 Sources organization
 --------------------
 
@@ -37,7 +31,7 @@ with parsing data from the file.
 .. toctree::
    :maxdepth: 2
 
-   file
+   files/index
    format
 
 Every ``Format`` class can be associated to an extension and a format name, the
