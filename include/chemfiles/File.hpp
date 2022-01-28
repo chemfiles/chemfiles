@@ -123,6 +123,10 @@ class MemoryBuffer;
 /// `std::string` for each line.
 ///
 /// Writing to the files is done without buffering or considering lines.
+///
+///
+/// This class can read compressed data or in-memory data by using one of the
+/// `TextFileImpl` interface implementation.
 class CHFL_EXPORT TextFile final: public File {
 public:
     /// Open the file at the given `path` with the requested `mode` and
