@@ -19,9 +19,9 @@ These classes implement the format interface defined previously.
 
 .. binary/non text based formats
 
-.. doxygenclass:: chemfiles::Amber
+.. doxygenclass:: chemfiles::AmberTrajectory
 
-.. doxygenenum:: chemfiles::AmberFormat
+.. doxygenclass:: chemfiles::AmberRestart
 
 .. doxygenclass:: chemfiles::TNGFormat
 
