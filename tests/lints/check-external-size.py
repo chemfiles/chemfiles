@@ -21,7 +21,6 @@ EXPECTED_SIZES = {
     "lzma.tar.gz": 256,
     "mmtf-cpp.tar.gz": 439,
     "molfiles.tar.gz": 477,
-    "netcdf.tar.gz": 494,
     "pugixml.tar.gz": 198,
     "tng.tar.gz": 207,
     "toml11.tar.gz": 69,

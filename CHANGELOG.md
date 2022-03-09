@@ -10,6 +10,12 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Remove support for configuration files (`chemfiles.toml`) and associated
   functions.
 
+## 0.10.3
+
+### Changes in supported formats
+
+- Amber NetCDF files are now read/written with a custom netcdf parser (#443)
+
 ## 0.10.2 (20 Oct 2021)
 
 ### New features
@@ -33,6 +39,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Added read and write support for Amber Restart (.ncrst) files.
 - Added native read and write support for LAMMPS trajectory (.lammpstrj) files,
   replacing the VMD molfile implementation.
+
+### Changes to the C API
 
 ## 0.10.0 (14 Feb 2021)
 
