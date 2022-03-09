@@ -39,7 +39,6 @@ option(CHFL_BUILD_DOCUMENTATION "Build the documentation." OFF)
 option(CHFL_USE_WARNINGS "Compile the code with warnings (default in debug mode)" OFF)
 option(CHFL_USE_CLANG_TIDY "Compile the code with clang-tidy warnings" OFF)
 option(CHFL_USE_INCLUDE_WHAT_YOU_USE "Compile the code with include-what-you-use warnings" OFF)
-option(CHFL_SYSTEM_NETCDF "Use the system NetCDF instead of the internal one" OFF)
 option(CHFL_SYSTEM_ZLIB "Use the system zlib instead of the internal one" OFF)
 option(CHFL_SYSTEM_LZMA "Use the system lzma instead of the internal one" OFF)
 option(CHFL_SYSTEM_BZIP2 "Use the system bzip2 instead of the internal one" OFF)
@@ -141,7 +140,6 @@ set(CHEMFILES_OBJECTS
     ${ZLIB_OBJECTS}
     ${LZMA_OBJECTS}
     ${BZIP2_OBJECTS}
-    ${NETCDF_OBJECTS}
 )
 
 # Add the main chemfiles library
@@ -161,7 +159,6 @@ target_include_directories(chemfiles PUBLIC
 )
 
 target_link_libraries(chemfiles
-    ${NETCDF_LIBRARIES}
     ${ZLIB_LIBRARIES}
     ${LIBLZMA_LIBRARY}
     ${BZIP2_LIBRARIES}
