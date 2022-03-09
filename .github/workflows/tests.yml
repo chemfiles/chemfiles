@@ -69,14 +69,10 @@ jobs:
             cxx: g++
             build-type: Debug
             cmake-extra-args:
-              - -DCHFL_SYSTEM_NETCDF=ON
               - -DCHFL_SYSTEM_ZLIB=ON
               - -DCHFL_SYSTEM_LZMA=ON
               - -DCHFL_SYSTEM_BZIP2=ON
               - -DCHFL_DISABLE_GEMMI=ON
-            setup-dependencies: |
-              sudo apt-get update
-              sudo apt-get install -y libnetcdf-dev
           - name: Linux / gcc / 32-bit build
             os: ubuntu-18.04
             cc: gcc
