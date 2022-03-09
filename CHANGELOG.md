@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Added native read and write support for LAMMPS trajectory (.lammpstrj) files,
   replacing the VMD molfile implementation.
 - Added read support for PSF files using VMD molfile plugin.
+- Amber NetCDF files are now read/written with a custom netcdf parser (#443)
 
 ### Changes to the C API
 
