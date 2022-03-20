@@ -532,7 +532,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
     DecodeState state = {0, 0, 0};
     for (size_t i = 0; i < natoms; ++i) {
         bool is_small = false;
-        auto thiscoord = span<int>(intbuf_.data() + i * 3, 6);
+        auto thiscoord = span<int>(intbuf_.data() + i * 3, 3);
         if (smallidx < maxidx && i >= 1 && abs(thiscoord[0] - prevcoord[0]) < larger &&
             abs(thiscoord[1] - prevcoord[1]) < larger &&
             abs(thiscoord[2] - prevcoord[2]) < larger) {
@@ -543,14 +543,16 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
             is_smaller = 0;
         }
         if (i + 1 < natoms) {
-            if (abs(thiscoord[0] - thiscoord[3]) < smallnum &&
-                abs(thiscoord[1] - thiscoord[4]) < smallnum &&
-                abs(thiscoord[2] - thiscoord[5]) < smallnum) {
+            // look ahead and see if the difference to next coordinate is small
+            auto nextcoord = span<int>(intbuf_.data() + (i + 1) * 3, 3);
+            if (abs(thiscoord[0] - nextcoord[0]) < smallnum &&
+                abs(thiscoord[1] - nextcoord[1]) < smallnum &&
+                abs(thiscoord[2] - nextcoord[2]) < smallnum) {
                 // interchange first with second atom
                 // for better compression of water molecules
-                std::swap(thiscoord[0], thiscoord[3]);
-                std::swap(thiscoord[1], thiscoord[4]);
-                std::swap(thiscoord[2], thiscoord[5]);
+                std::swap(thiscoord[0], nextcoord[0]);
+                std::swap(thiscoord[1], nextcoord[1]);
+                std::swap(thiscoord[2], nextcoord[2]);
                 is_small = true;
             }
         }
@@ -594,12 +596,15 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
             prevcoord[2] = thiscoord[2];
 
             ++i;
-            thiscoord = span<int>(intbuf_.data() + (i + 1) * 3, 3);
             is_small = false;
-            if (i < natoms && abs(thiscoord[0] - prevcoord[0]) < smallnum &&
-                abs(thiscoord[1] - prevcoord[1]) < smallnum &&
-                abs(thiscoord[2] - prevcoord[2]) < smallnum) {
-                is_small = true;
+            if (i + 1 < natoms) {
+                // look ahead and see if the difference to next coordinate is small
+                thiscoord = span<int>(intbuf_.data() + (i + 1) * 3, 3);
+                if (abs(thiscoord[0] - prevcoord[0]) < smallnum &&
+                    abs(thiscoord[1] - prevcoord[1]) < smallnum &&
+                    abs(thiscoord[2] - prevcoord[2]) < smallnum) {
+                    is_small = true;
+                }
             }
         }
         if (run != prevrun || is_smaller != 0) {
