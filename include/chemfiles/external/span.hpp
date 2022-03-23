@@ -64,7 +64,7 @@ public:
     }
 
     span(pointer data, size_type size): begin_(data), end_(data + size) {
-        assert(size == 0 ||(size > 0 && data != NULL));
+        assert(size == 0 ||(size > 0 && data != nullptr));
     }
 
     template< class U, size_t N >
