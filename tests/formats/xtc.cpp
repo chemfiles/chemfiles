@@ -456,7 +456,19 @@ TEST_CASE("Large Numbers") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {16777220, 16777220, 16777220}, 1e-4));
 
-        CHECK_THROWS_WITH(file.read(),
-                          "Invalid size found during decompression of XTC coordinates");
+        frame = file.read();
+
+        CHECK(frame.step() == 0);
+        CHECK(approx_eq(frame.get("time")->as_double(), 0));
+        CHECK(approx_eq(frame.get("xtc_precision")->as_double(), 1000));
+        CHECK(frame.size() == 10);
+
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(16777216.0, 16777216.0, 16777216.0), 0.3));
+        CHECK(approx_eq(positions[9], Vector3D(0.0, 0.0, 0.0), 1e-4));
+
+        cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(approx_eq(cell.lengths(), {16777220, 16777220, 16777220}, 1e-4));
     }
 }
