@@ -323,6 +323,9 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data) {
         read_int(),
     };
     unsigned int smallidx = static_cast<unsigned int>(read_int());
+    if (!(smallidx < LASTIDX)) {
+        throw file_error("internal overflow compressing XTC coordinates");
+    }
 
     unsigned int sizeint[3], bitsizeint[3];
     const unsigned int bitsize = calc_sizeint(minint, maxint, sizeint, bitsizeint);
@@ -505,7 +508,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
     }
 
     unsigned int smallidx = FIRSTIDX;
-    while (smallidx < LASTIDX && MAGICINTS[smallidx] < mindiff) {
+    while (smallidx < (LASTIDX - 1) && MAGICINTS[smallidx] < mindiff) {
         smallidx++;
     }
     write_int(static_cast<int32_t>(smallidx));
