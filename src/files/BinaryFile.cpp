@@ -416,25 +416,22 @@ inline uint64_t u64_from_big_endian(char buffer[8]) {
     return value;
 }
 
-inline void u16_to_big_endian(uint16_t value, char buffer[2]) {
+inline void u16_to_big_endian(uint16_t& value) {
 #if CHEMFILES_BYTE_ORDER == CHEMFILES_LITTLE_ENDIAN
     value = swap_u16(value);
 #endif
-    std::memcpy(buffer, &value, sizeof(uint16_t));
 }
 
-inline void u32_to_big_endian(uint32_t value, char buffer[4]) {
+inline void u32_to_big_endian(uint32_t& value) {
 #if CHEMFILES_BYTE_ORDER == CHEMFILES_LITTLE_ENDIAN
     value = swap_u32(value);
 #endif
-    std::memcpy(buffer, &value, sizeof(uint32_t));
 }
 
-inline void u64_to_big_endian(uint64_t value, char buffer[8]) {
+inline void u64_to_big_endian(uint64_t& value) {
 #if CHEMFILES_BYTE_ORDER == CHEMFILES_LITTLE_ENDIAN
     value = swap_u64(value);
 #endif
-    std::memcpy(buffer, &value, sizeof(uint64_t));
 }
 
 void BigEndianFile::read_i16(int16_t* data, size_t count) {
@@ -514,76 +511,82 @@ void BigEndianFile::read_f64(double* data, size_t count) {
 }
 
 void BigEndianFile::write_i16(const int16_t* data, size_t count) {
-    char buffer[sizeof(int16_t)];
     uint16_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
         std::memcpy(&unsigned_value, data + i, sizeof(int16_t));
-        u16_to_big_endian(unsigned_value, buffer);
-        this->write_char(buffer, sizeof(int16_t));
+        u16_to_big_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(int16_t));
     }
 }
 
 void BigEndianFile::write_u16(const uint16_t* data, size_t count) {
-    char buffer[sizeof(uint16_t)];
+    uint16_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
-        u16_to_big_endian(data[i], buffer);
-        this->write_char(buffer, sizeof(uint16_t));
+        std::memcpy(&unsigned_value, data + i, sizeof(uint16_t));
+        u16_to_big_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(uint16_t));
     }
 }
 
 void BigEndianFile::write_i32(const int32_t* data, size_t count) {
-    char buffer[sizeof(int32_t)];
     uint32_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
         std::memcpy(&unsigned_value, data + i, sizeof(int32_t));
-        u32_to_big_endian(unsigned_value, buffer);
-        this->write_char(buffer, sizeof(int32_t));
+        u32_to_big_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(int32_t));
     }
 }
 
 void BigEndianFile::write_u32(const uint32_t* data, size_t count) {
-    char buffer[sizeof(uint32_t)];
+    uint32_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
-        u32_to_big_endian(data[i], buffer);
-        this->write_char(buffer, sizeof(uint32_t));
+        std::memcpy(&unsigned_value, data + i, sizeof(uint32_t));
+        u32_to_big_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(uint32_t));
     }
 }
 
 void BigEndianFile::write_i64(const int64_t* data, size_t count) {
-    char buffer[sizeof(int64_t)];
     uint64_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
         std::memcpy(&unsigned_value, data + i, sizeof(int64_t));
-        u64_to_big_endian(unsigned_value, buffer);
-        this->write_char(buffer, sizeof(int64_t));
+        u64_to_big_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(int64_t));
     }
 }
 
 void BigEndianFile::write_u64(const uint64_t* data, size_t count) {
-    char buffer[sizeof(uint64_t)];
+    uint64_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
-        u64_to_big_endian(data[i], buffer);
-        this->write_char(buffer, sizeof(uint64_t));
+        std::memcpy(&unsigned_value, data + i, sizeof(uint64_t));
+        u64_to_big_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(uint64_t));
     }
 }
 
 void BigEndianFile::write_f32(const float* data, size_t count) {
-    char buffer[sizeof(float)];
     uint32_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
         std::memcpy(&unsigned_value, data + i, sizeof(float));
-        u32_to_big_endian(unsigned_value, buffer);
-        this->write_char(buffer, sizeof(float));
+        u32_to_big_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(float));
     }
 }
 
 void BigEndianFile::write_f64(const double* data, size_t count) {
-    char buffer[sizeof(double)];
     uint64_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
         std::memcpy(&unsigned_value, data + i, sizeof(double));
-        u64_to_big_endian(unsigned_value, buffer);
-        this->write_char(buffer, sizeof(double));
+        u64_to_big_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(double));
     }
 }
 
@@ -617,25 +620,22 @@ inline uint64_t u64_from_little_endian(char buffer[8]) {
     return value;
 }
 
-inline void u16_to_little_endian(uint16_t value, char buffer[2]) {
+inline void u16_to_little_endian(uint16_t& value) {
 #if CHEMFILES_BYTE_ORDER == CHEMFILES_BIG_ENDIAN
     value = swap_u16(value);
 #endif
-    std::memcpy(buffer, &value, sizeof(uint16_t));
 }
 
-inline void u32_to_little_endian(uint32_t value, char buffer[4]) {
+inline void u32_to_little_endian(uint32_t& value) {
 #if CHEMFILES_BYTE_ORDER == CHEMFILES_BIG_ENDIAN
     value = swap_u32(value);
 #endif
-    std::memcpy(buffer, &value, sizeof(uint32_t));
 }
 
-inline void u64_to_little_endian(uint64_t value, char buffer[8]) {
+inline void u64_to_little_endian(uint64_t& value) {
 #if CHEMFILES_BYTE_ORDER == CHEMFILES_BIG_ENDIAN
     value = swap_u64(value);
 #endif
-    std::memcpy(buffer, &value, sizeof(uint64_t));
 }
 
 
@@ -716,75 +716,81 @@ void LittleEndianFile::read_f64(double* data, size_t count) {
 }
 
 void LittleEndianFile::write_i16(const int16_t* data, size_t count) {
-    char buffer[sizeof(int16_t)];
     uint16_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
         std::memcpy(&unsigned_value, data + i, sizeof(int16_t));
-        u16_to_little_endian(unsigned_value, buffer);
-        this->write_char(buffer, sizeof(int16_t));
+        u16_to_little_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(int16_t));
     }
 }
 
 void LittleEndianFile::write_u16(const uint16_t* data, size_t count) {
-    char buffer[sizeof(uint16_t)];
+    uint16_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
-        u16_to_little_endian(data[i], buffer);
-        this->write_char(buffer, sizeof(uint16_t));
+        std::memcpy(&unsigned_value, data + i, sizeof(uint16_t));
+        u16_to_little_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(uint16_t));
     }
 }
 
 void LittleEndianFile::write_i32(const int32_t* data, size_t count) {
-    char buffer[sizeof(int32_t)];
     uint32_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
         std::memcpy(&unsigned_value, data + i, sizeof(int32_t));
-        u32_to_little_endian(unsigned_value, buffer);
-        this->write_char(buffer, sizeof(int32_t));
+        u32_to_little_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(int32_t));
     }
 }
 
 void LittleEndianFile::write_u32(const uint32_t* data, size_t count) {
-    char buffer[sizeof(uint32_t)];
+    uint32_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
-        u32_to_little_endian(data[i], buffer);
-        this->write_char(buffer, sizeof(uint32_t));
+        std::memcpy(&unsigned_value, data + i, sizeof(uint32_t));
+        u32_to_little_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(uint32_t));
     }
 }
 
 void LittleEndianFile::write_i64(const int64_t* data, size_t count) {
-    char buffer[sizeof(int64_t)];
     uint64_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
         std::memcpy(&unsigned_value, data + i, sizeof(int64_t));
-        u64_to_little_endian(unsigned_value, buffer);
-        this->write_char(buffer, sizeof(int64_t));
+        u64_to_little_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(int64_t));
     }
 }
 
 void LittleEndianFile::write_u64(const uint64_t* data, size_t count) {
-    char buffer[sizeof(uint64_t)];
+    uint64_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
-        u64_to_little_endian(data[i], buffer);
-        this->write_char(buffer, sizeof(uint64_t));
+        std::memcpy(&unsigned_value, data + i, sizeof(uint64_t));
+        u64_to_little_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(uint64_t));
     }
 }
 
 void LittleEndianFile::write_f32(const float* data, size_t count) {
-    char buffer[sizeof(float)];
     uint32_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
         std::memcpy(&unsigned_value, data + i, sizeof(float));
-        u32_to_little_endian(unsigned_value, buffer);
-        this->write_char(buffer, sizeof(float));
+        u32_to_little_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(float));
     }
 }
 
 void LittleEndianFile::write_f64(const double* data, size_t count) {
-    char buffer[sizeof(double)];
     uint64_t unsigned_value;
+    auto value_ptr = reinterpret_cast<char*>(&unsigned_value);
     for (size_t i=0; i<count; i++) {
         std::memcpy(&unsigned_value, data + i, sizeof(double));
-        u64_to_little_endian(unsigned_value, buffer);
-        this->write_char(buffer, sizeof(double));
+        u64_to_little_endian(unsigned_value);
+        this->write_char(value_ptr, sizeof(double));
     }
 }
