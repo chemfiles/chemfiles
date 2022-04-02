@@ -45,6 +45,8 @@ public:
     Vector3D& operator=(Vector3D&&) noexcept = default;
 
     using super::operator[];
+    using super::begin;
+    using super::end;
 
     /// Compute the euclidean norm of this Vector3D.
     ///
@@ -216,6 +218,8 @@ public:
     Matrix3D& operator=(Matrix3D&&) noexcept = default;
 
     using super::operator[];
+    using super::begin;
+    using super::end;
 
     /// Compute the determinant of this matrix.
     ///
