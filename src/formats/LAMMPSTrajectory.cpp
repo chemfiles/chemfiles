@@ -582,9 +582,9 @@ void LAMMPSTrajectoryFormat::write_next(const Frame& frame) {
         file_.print("ITEM: BOX BOUNDS pp pp pp\n");
         auto lengths = cell.lengths();
         // print zeros if the cell is infinite, this line is still required
-        file_.print("{:-1.16e} {:-1.16e}\n", 0.0, lengths[0]);
-        file_.print("{:-1.16e} {:-1.16e}\n", 0.0, lengths[1]);
-        file_.print("{:-1.16e} {:-1.16e}\n", 0.0, lengths[2]);
+        file_.print("{:-1.12e} {:-1.12e}\n", 0.0, lengths[0]);
+        file_.print("{:-1.12e} {:-1.12e}\n", 0.0, lengths[1]);
+        file_.print("{:-1.12e} {:-1.12e}\n", 0.0, lengths[2]);
     } else { // Triclinic
         const auto& matrix = cell.matrix();
         if (!is_upper_triangular(matrix)) {
@@ -592,9 +592,9 @@ void LAMMPSTrajectoryFormat::write_next(const Frame& frame) {
                                "matrix in LAMMPS writer");
         }
         file_.print("ITEM: BOX BOUNDS xy xz yz pp pp pp\n");
-        file_.print("{:-1.16e} {:-1.16e} {:-1.16e}\n", 0.0, matrix[0][0], matrix[0][1]);
-        file_.print("{:-1.16e} {:-1.16e} {:-1.16e}\n", 0.0, matrix[1][1], matrix[0][2]);
-        file_.print("{:-1.16e} {:-1.16e} {:-1.16e}\n", 0.0, matrix[2][2], matrix[1][2]);
+        file_.print("{:-1.12e} {:-1.12e} {:-1.12e}\n", 0.0, matrix[0][0], matrix[0][1]);
+        file_.print("{:-1.12e} {:-1.12e} {:-1.12e}\n", 0.0, matrix[1][1], matrix[0][2]);
+        file_.print("{:-1.12e} {:-1.12e} {:-1.12e}\n", 0.0, matrix[2][2], matrix[1][2]);
     }
 
     bool has_names = false;
