@@ -4,65 +4,70 @@
 #ifndef CHEMFILES_XDR_FILE_HPP
 #define CHEMFILES_XDR_FILE_HPP
 
-#include <cstdint>
 #include <string>
+#include <vector>
 
-#include "chemfiles/File.hpp"
-
-// IWYU pragma: no_include <xdrfile.h>
-struct XDRFILE;  // IWYU pragma: keep
+#include "chemfiles/files/BinaryFile.hpp"
 
 namespace chemfiles {
 
-/// Simple RAII capsule for `XDRFILE*`, handling the creation and
-/// destruction of the file as needed.
-/// Reads the file header and stores the offsets for individual frames.
-class XDRFile final : public File {
-public:
-    /// Possible variants of the XDR file
-    enum Variants {
-        /// XTC trajectory
-        XTC,
-        /// TRR trajectory
-        TRR,
-    };
+/// Partial implementation of XDR according to RFC 4506
+/// (see: https://datatracker.ietf.org/doc/html/rfc4506)
+/// Including additional helper routines for GROMACS
+class XDRFile final : public BigEndianFile {
+  public:
+    XDRFile(std::string path, File::Mode mode);
+    ~XDRFile() = default;
 
-    XDRFile(Variants variant, std::string path, File::Mode mode);
-    ~XDRFile() override;
+    /// Read an XDR signed integer
+    int32_t read_int() { return read_single_i32(); }
+    /// Write an XDR signed integer
+    void write_int(int32_t value) { write_single_i32(value); }
 
-    XDRFile(XDRFile&& other) noexcept : File("", File::READ, File::DEFAULT) {
-        *this = std::move(other);
-    }
-    XDRFile& operator=(XDRFile&& other) noexcept;
+    /// Read an XDR unsigned integer
+    uint32_t read_uint() { return read_single_u32(); }
+    /// Write an XDR unsigned integer
+    void write_uint(uint32_t value) { write_single_u32(value); }
 
-    XDRFile(XDRFile const&) = delete;
-    XDRFile& operator=(XDRFile const&) = delete;
+    /// Read an XDR double
+    double read_double() { return read_single_f64(); }
 
-    /// get the number of frames/steps in the file, as indicated in the file header
-    unsigned long nframes() const;
-    /// get the offset corresponding to a specific frame/step
-    int64_t offset(size_t step) const;
-    /// get the number of atoms, as indicated in the file header
-    int natoms() const;
-    /// set the number of atoms
-    void set_natoms(int natoms);
+    /// Read an XDR float
+    float read_float() { return read_single_f32(); }
+    /// Write an XDR float
+    void write_float(float value) { write_single_f32(value); }
 
-    operator XDRFILE*() { return handle_; }
+    /// Read XDR doubles into an allocated vector
+    void read_double_array(std::vector<double>& data) { read_f64(data.data(), data.size()); }
 
-private:
-    /// underlying pointer to the xdr file
-    XDRFILE* handle_;
-    /// The number of frames in the trajectory
-    unsigned long nframes_ = 0;
-    /// Offsets within file for fast indexing
-    int64_t* offsets_ = nullptr;
-    /// The number of atoms in the trajectory
-    int natoms_ = 0;
+    /// Read XDR floats into an allocated vector
+    void read_float_array(std::vector<float>& data) { read_f32(data.data(), data.size()); }
+    /// Write XDR floats
+    void write_float_array(const std::vector<float> data) { write_f32(data.data(), data.size()); }
+
+    /// Read a non-compliant GROMACS string
+    /// A GROMACS string stores the length of the string including the NULL
+    /// terminator as int32 before the XDR compliant string data without the
+    /// terminator. An XDR string has the same representation as opaque data.
+    std::string read_gmx_string();
+    /// Write a non-compliant GROMACS string
+    void write_gmx_string(const std::string& value);
+
+    /// Read compressed GROMACS floats and returns the precision
+    float read_gmx_compressed_floats(std::vector<float>& data);
+    /// Write compressed GROMACS floats with a given precision
+    void write_gmx_compressed_floats(const std::vector<float>& data, float precision);
+
+  private:
+    /// Read XDR variable-length opaque data
+    void read_opaque(std::vector<char>& data);
+    /// Write XDR variable-length opaque data
+    void write_opaque(const char* data, uint32_t count);
+    /// Cache allocation for compressed data (XTC)
+    std::vector<char> compressed_data_;
+    /// Cache allocation for intermediate buffer (XTC)
+    std::vector<int> intbuf_;
 };
-
-/// Check a return code from a xdrlib function, and throw a `FileError` if the
-/// status is not exdrOK.
-void check_xdr_error(int status, const std::string& function);
 
 } // namespace chemfiles
 
