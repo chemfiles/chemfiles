@@ -265,6 +265,8 @@ public:
     void write_single_f64(double value) {
         this->write_f64(&value, 1);
     }
+protected:
+    std::vector<char> swap_buf_;
 
 private:
 #if CHEMFILES_BINARY_FILE_USE_MMAP
@@ -279,37 +281,6 @@ private:
 #else
     FILE* file_ = nullptr;
 #endif
-};
-
-class LittleEndianFile: public BinaryFile {
-public:
-    LittleEndianFile(std::string path, File::Mode mode): BinaryFile(std::move(path), mode) {}
-
-    virtual ~LittleEndianFile() override = default;
-
-    LittleEndianFile(const LittleEndianFile&) = delete;
-    LittleEndianFile& operator=(const LittleEndianFile&) = delete;
-
-    LittleEndianFile(LittleEndianFile&&) = default;
-    LittleEndianFile& operator=(LittleEndianFile&&) = default;
-
-    void read_i16(int16_t* data, size_t count) final override;
-    void read_u16(uint16_t* data, size_t count) final override;
-    void read_i32(int32_t* data, size_t count) final override;
-    void read_u32(uint32_t* data, size_t count) final override;
-    void read_i64(int64_t* data, size_t count) final override;
-    void read_u64(uint64_t* data, size_t count) final override;
-    void read_f32(float* data, size_t count) final override;
-    void read_f64(double* data, size_t count) final override;
-
-    void write_i16(const int16_t* data, size_t count) final override;
-    void write_u16(const uint16_t* data, size_t count) final override;
-    void write_i32(const int32_t* data, size_t count) final override;
-    void write_u32(const uint32_t* data, size_t count) final override;
-    void write_i64(const int64_t* data, size_t count) final override;
-    void write_u64(const uint64_t* data, size_t count) final override;
-    void write_f32(const float* data, size_t count) final override;
-    void write_f64(const double* data, size_t count) final override;
 };
 
 class BigEndianFile: public BinaryFile {
@@ -341,6 +312,43 @@ public:
     void write_u64(const uint64_t* data, size_t count) final override;
     void write_f32(const float* data, size_t count) final override;
     void write_f64(const double* data, size_t count) final override;
+private:
+    template<typename T> inline void read_as_big_endian(T* data, size_t count);
+    template<typename T> inline void write_as_big_endian(const T* data, size_t count);
+};
+
+class LittleEndianFile: public BinaryFile {
+public:
+    LittleEndianFile(std::string path, File::Mode mode): BinaryFile(std::move(path), mode) {}
+
+    virtual ~LittleEndianFile() override = default;
+
+    LittleEndianFile(const LittleEndianFile&) = delete;
+    LittleEndianFile& operator=(const LittleEndianFile&) = delete;
+
+    LittleEndianFile(LittleEndianFile&&) = default;
+    LittleEndianFile& operator=(LittleEndianFile&&) = default;
+
+    void read_i16(int16_t* data, size_t count) final override;
+    void read_u16(uint16_t* data, size_t count) final override;
+    void read_i32(int32_t* data, size_t count) final override;
+    void read_u32(uint32_t* data, size_t count) final override;
+    void read_i64(int64_t* data, size_t count) final override;
+    void read_u64(uint64_t* data, size_t count) final override;
+    void read_f32(float* data, size_t count) final override;
+    void read_f64(double* data, size_t count) final override;
+
+    void write_i16(const int16_t* data, size_t count) final override;
+    void write_u16(const uint16_t* data, size_t count) final override;
+    void write_i32(const int32_t* data, size_t count) final override;
+    void write_u32(const uint32_t* data, size_t count) final override;
+    void write_i64(const int64_t* data, size_t count) final override;
+    void write_u64(const uint64_t* data, size_t count) final override;
+    void write_f32(const float* data, size_t count) final override;
+    void write_f64(const double* data, size_t count) final override;
+private:
+    template<typename T> inline void read_as_little_endian(T* data, size_t count);
+    template<typename T> inline void write_as_little_endian(const T* data, size_t count);
 };
 
 }
