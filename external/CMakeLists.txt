@@ -227,12 +227,6 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/include )
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/msgpack-c/include )
 
 # ==========
-# xdrfile
-# ==========
-external_library(xdrfile)
-list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/xdrfile/include)
-
-# ==========
 # gemmi
 # ==========
 option(CHFL_DISABLE_GEMMI OFF)
