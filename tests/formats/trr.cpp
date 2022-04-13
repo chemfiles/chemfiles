@@ -10,7 +10,7 @@ TEST_CASE("Read files in TRR format") {
     SECTION("Read trajectory: Ubiquitin") {
         auto file = Trajectory("data/trr/ubiquitin.trr");
         CHECK(file.nsteps() == 2);
-        auto frame = file.read();
+        auto frame = file.read_step(0);
 
         CHECK(frame.step() == 0);
         CHECK(approx_eq(frame.get("time")->as_double(), 0));
@@ -30,7 +30,7 @@ TEST_CASE("Read files in TRR format") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
 
-        frame = file.read();
+        frame = file.read_step(1);
 
         CHECK(frame.step() == 25000);
         CHECK(approx_eq(frame.get("time")->as_double(), 50));

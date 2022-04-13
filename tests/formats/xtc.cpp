@@ -10,7 +10,7 @@ TEST_CASE("Read files in XTC format") {
     SECTION("Read trajectory") {
         auto file = Trajectory("data/xtc/ubiquitin.xtc");
         CHECK(file.nsteps() == 251);
-        auto frame = file.read();
+        auto frame = file.read_step(0);
 
         CHECK(frame.step() == 0);
         CHECK(approx_eq(frame.get("time")->as_double(), 0));
@@ -25,7 +25,9 @@ TEST_CASE("Read files in XTC format") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
 
-        file.read(); // Skip a frame
+        frame = file.read_step(1); // Skip a frame
+        CHECK(frame.step() == 100);
+
         frame = file.read();
 
         CHECK(frame.step() == 200);
@@ -116,7 +118,7 @@ TEST_CASE("Write and append files in uncompressed XTC format") {
         // now read every thing back and check
         file = Trajectory(tmpfile, 'r');
 
-        frame = file.read();
+        frame = file.read_step(0);
 
         CHECK(frame.step() == 0); // default step
         CHECK(approx_eq(frame.get("time")->as_double(), 19.376, 1e-4));
@@ -130,7 +132,7 @@ TEST_CASE("Write and append files in uncompressed XTC format") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {10.111, 11.222, 12.333}, 1e-4));
 
-        frame = file.read();
+        frame = file.read_step(1);
 
         CHECK(frame.step() == 100);
         CHECK(approx_eq(frame.get("time")->as_double(), 0)); // default time
@@ -369,4 +371,92 @@ TEST_CASE("Check Errors") {
     CHECK_THROWS_WITH(
         file.write(frame),
         "XTC format does not support varying numbers of atoms: expected 1, but got 2");
+}
+
+TEST_CASE("Large Numbers") {
+    SECTION("Read large numbers") {
+        auto file = Trajectory("data/xtc/large_diff.xtc", 'r');
+
+        CHECK(file.nsteps() == 4);
+        auto frame = file.read();
+
+        CHECK(frame.step() == 0);
+        CHECK(approx_eq(frame.get("time")->as_double(), 0));
+        CHECK(frame.get("xtc_precision")->as_double() == 1000);
+        CHECK(frame.size() == 10);
+
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(0.0, 0.0, 0.0), 1e-4));
+        CHECK(approx_eq(positions[5], Vector3D(5.0, 50.0, 500.0), 1e-4));
+        // compression error gets pretty large
+        CHECK(approx_eq(positions[9], Vector3D(16777216.0, 0.0, 0.0), 0.3));
+
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(approx_eq(cell.lengths(), {16777220.0, 10.0, 10.0}, 1e-4));
+
+        frame = file.read_step(3);
+
+        CHECK(frame.step() == 0);
+        CHECK(approx_eq(frame.get("time")->as_double(), 0));
+        CHECK(frame.get("xtc_precision")->as_double() == 1000);
+        CHECK(frame.size() == 10);
+
+        positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(0.0, 0.0, 0.0), 1e-4));
+        CHECK(approx_eq(positions[5], Vector3D(5.0, 50.0, 500.0), 1e-4));
+        CHECK(approx_eq(positions[9], Vector3D(16777216.0, 16777216.0, 16777216.0), 0.3));
+
+        cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(approx_eq(cell.lengths(), {16777220.0, 16777220.0, 16777220.0}, 1e-4));
+    }
+
+    SECTION("Write large numbers") {
+        auto tmpfile = NamedTempPath(".xtc");
+        auto file = Trajectory(tmpfile, 'w');
+
+        // check large numbers close together
+        auto frame = Frame(UnitCell({16777220, 16777220, 16777220}));
+        frame.add_atom(Atom("A"), {0.0, 0.0, 0.0});
+        for (size_t i = 0; i < 9; ++i) {
+            frame.add_atom(Atom("A"), {-16777216.0, 16777216.0, 16777216.0});
+        }
+        file.write(frame);
+
+        // check large difference to previous atom
+        frame = Frame(UnitCell({16777220, 16777220, 16777220}));
+        for (size_t i = 0; i < 5; ++i) {
+            frame.add_atom(Atom("A"), {16777216.0, 16777216.0, 16777216.0});
+            frame.add_atom(Atom("A"), {0.0, 0.0, 0.0});
+        }
+        file.write(frame);
+
+        // this must be at the end because it writes some bytes
+        frame.set("xtc_precision", 10000);
+        CHECK_THROWS_WITH(file.write(frame), "internal overflow compressing XTC coordinates");
+        file.close();
+
+        // now read every thing back and check
+        file = Trajectory(tmpfile, 'r');
+        CHECK(file.nsteps() == 2);
+
+        frame = file.read();
+
+        CHECK(frame.step() == 0);
+        CHECK(approx_eq(frame.get("time")->as_double(), 0));
+        CHECK(approx_eq(frame.get("xtc_precision")->as_double(), 1000));
+        CHECK(frame.size() == 10);
+
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(0.0, 0.0, 0.0), 1e-4));
+        CHECK(approx_eq(positions[9], Vector3D(-16777216.0, 16777216.0, 16777216.0), 0.3));
+
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(approx_eq(cell.lengths(), {16777220, 16777220, 16777220}, 1e-4));
+
+        CHECK_THROWS_WITH(file.read(),
+                          "Invalid size found during decompression of XTC coordinates");
+    }
 }
