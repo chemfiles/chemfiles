@@ -92,6 +92,7 @@ BinaryFile::BinaryFile(std::string path, File::Mode mode):
 
     if (mode == File::READ) {
         mmap_size_ = file_size_;
+        total_written_size_ = file_size_;
     } else if (mode == File::WRITE) {
         // set the map size to a large value (1GiB here) to reduce the number of
         // time we have to unmap/mmap the file. This drastically improves
@@ -211,7 +212,6 @@ void BinaryFile::read_char(char* data, size_t count) {
             count, this->path()
         );
     }
-
     std::memcpy(data, mmap_data_ + offset_, count);
     offset_ += count;
 #else
@@ -292,6 +292,28 @@ void BinaryFile::seek(uint64_t position) {
     offset_ = position;
 #else
     fseek64(file_, static_cast<off64_t>(position), SEEK_SET);
+#endif
+}
+
+
+void BinaryFile::skip(uint64_t count) {
+#if CHEMFILES_BINARY_FILE_USE_MMAP
+    offset_ += count;
+#else
+    fseek64(file_, static_cast<off64_t>(count), SEEK_CUR);
+#endif
+}
+
+
+uint64_t BinaryFile::file_size() {
+#if CHEMFILES_BINARY_FILE_USE_MMAP
+    return total_written_size_;
+#else
+    uint64_t cur_pos = tell();
+    fseek64(file_, 0L, SEEK_END);
+    const uint64_t filesize = tell();
+    seek(cur_pos);
+    return filesize;
 #endif
 }
 

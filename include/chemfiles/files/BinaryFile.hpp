@@ -52,6 +52,12 @@ public:
     /// Seek to the specified `position` in the file
     void seek(uint64_t position);
 
+    /// Skip the next `count` Bytes in the file
+    void skip(uint64_t count);
+
+    /// Get the size of the file
+    uint64_t file_size();
+
     /// Read exactly `count` char, and store them in the `data` array
     void read_char(char* data, size_t count);
 
