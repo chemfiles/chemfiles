@@ -76,15 +76,29 @@ static void check_read_binary_file(BinaryFile& file) {
     CHECK_BINARY_ARRAY(f64);
 }
 
+static void check_read_skip_binary_file(BinaryFile& file) {
+    file.seek(0L);
+    file.skip(7L);
+    CHECK(file.read_single_u16() == 42);
+    file.skip(8L);
+    CHECK(file.read_single_i64() == -123456);
+    file.skip(341L); // -88B (10*f64 + 2*f32) from end
+    CHECK(file.read_single_f32() == 8.0f);
+}
+
 TEST_CASE("Read binary files") {
     SECTION("big endian") {
         auto file = BigEndianFile("data/misc/big-endian.dat", File::Mode::READ);
+        CHECK(file.file_size() == 454);
         check_read_binary_file(file);
+        check_read_skip_binary_file(file);
     }
 
     SECTION("little endian") {
         auto file = LittleEndianFile("data/misc/little-endian.dat", File::Mode::READ);
+        CHECK(file.file_size() == 454);
         check_read_binary_file(file);
+        check_read_skip_binary_file(file);
     }
 }
 
@@ -116,12 +130,15 @@ TEST_CASE("Write binary files") {
             0x42, 0x5, 0x33, 0x33,
             0xc0, 0x4b, 0xe6, 0x66, 0x66, 0x66, 0x66, 0x66
         };
+        auto expected_2 = expected;
+        expected_2.insert(expected_2.end(), expected.begin(), expected.end());
 
         SECTION("write to file") {
             auto filename = NamedTempPath(".data");
             {
                 auto file = BigEndianFile(filename, File::Mode::WRITE);
                 write_binary_file(file);
+                CHECK(file.file_size() == expected.size());
             }
 
             auto content = read_binary_file(filename);
@@ -133,6 +150,7 @@ TEST_CASE("Write binary files") {
             {
                 auto file = BigEndianFile(filename, File::Mode::WRITE);
                 write_binary_file(file);
+                CHECK(file.file_size() == expected.size());
             }
 
             auto content = read_binary_file(filename);
@@ -141,11 +159,10 @@ TEST_CASE("Write binary files") {
             {
                 auto file = BigEndianFile(filename, File::Mode::APPEND);
                 write_binary_file(file);
+                CHECK(file.file_size() == expected_2.size());
             }
 
             content = read_binary_file(filename);
-            auto expected_2 = expected;
-            expected_2.insert(expected_2.end(), expected.begin(), expected.end());
             CHECK(content == expected_2);
         }
 
@@ -154,6 +171,7 @@ TEST_CASE("Write binary files") {
             {
                 auto file = BigEndianFile(filename, File::Mode::APPEND);
                 write_binary_file(file);
+                CHECK(file.file_size() == expected.size());
             }
 
             auto content = read_binary_file(filename);
@@ -173,12 +191,15 @@ TEST_CASE("Write binary files") {
             0x33, 0x33, 0x5,  0x42,
             0x66, 0x66, 0x66, 0x66, 0x66, 0xe6, 0x4b, 0xc0,
         };
+        auto expected_2 = expected;
+        expected_2.insert(expected_2.end(), expected.begin(), expected.end());
 
         SECTION("write to file") {
             auto filename = NamedTempPath(".data");
             {
                 auto file = LittleEndianFile(filename, File::Mode::WRITE);
                 write_binary_file(file);
+                CHECK(file.file_size() == expected.size());
             }
 
             auto content = read_binary_file(filename);
@@ -190,6 +211,7 @@ TEST_CASE("Write binary files") {
             {
                 auto file = LittleEndianFile(filename, File::Mode::WRITE);
                 write_binary_file(file);
+                CHECK(file.file_size() == expected.size());
             }
 
             auto content = read_binary_file(filename);
@@ -198,11 +220,10 @@ TEST_CASE("Write binary files") {
             {
                 auto file = LittleEndianFile(filename, File::Mode::APPEND);
                 write_binary_file(file);
+                CHECK(file.file_size() == expected_2.size());
             }
 
             content = read_binary_file(filename);
-            auto expected_2 = expected;
-            expected_2.insert(expected_2.end(), expected.begin(), expected.end());
             CHECK(content == expected_2);
         }
 
@@ -211,6 +232,7 @@ TEST_CASE("Write binary files") {
             {
                 auto file = LittleEndianFile(filename, File::Mode::APPEND);
                 write_binary_file(file);
+                CHECK(file.file_size() == expected.size());
             }
 
             auto content = read_binary_file(filename);
