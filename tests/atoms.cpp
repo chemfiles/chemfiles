@@ -124,7 +124,7 @@ TEST_CASE("Use the Atom type") {
             std::tuple<std::string, Property>{"foo", "test"},
         };
         size_t i = 0;
-        for(auto it: atom.properties()) {
+        for(auto it: *atom.properties()) {
             CHECK(it.first == std::get<0>(expected[i]));
             CHECK(it.second == std::get<1>(expected[i]));
             i += 1;

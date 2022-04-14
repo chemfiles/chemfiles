@@ -15,7 +15,7 @@ TEST_CASE() {
     atom.set("a number", 42.5);
 
     // Iterator over properties in the atom
-    for (auto it: atom.properties()) {
+    for (auto it: *atom.properties()) {
         if (it.first == "a string") {
             assert(it.second.as_string() == "this is a carbon");
         } else if (it.first == "a number") {

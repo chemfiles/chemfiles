@@ -25,7 +25,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Added read support for PSF files using VMD molfile plugin.
 - Amber NetCDF files are now read/written with a custom netcdf parser (#443)
 
-### Changes to the C API
+### Changes to the C++ API
+- Per-atom properties are optional, i.e. `Atom::properties` returns an optional property map.
 
 ## 0.10.0 (14 Feb 2021)
 
