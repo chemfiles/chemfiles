@@ -74,6 +74,8 @@ static void check_read_binary_file(BinaryFile& file) {
     double f64[10];
     file.read_f64(f64, 10);
     CHECK_BINARY_ARRAY(f64);
+
+    CHECK_THROWS_AS(file.read_single_char(), FileError);
 }
 
 static void check_read_skip_binary_file(BinaryFile& file) {
