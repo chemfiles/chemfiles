@@ -86,11 +86,7 @@ void CMLFormat::init_() {
         return;
     }
 
-    std::string content;
-    while (!file_.eof()) {
-        auto line = file_.readline();
-        content.append(line.data(), line.size());
-    }
+    auto content = file_.readall();
 
     auto result = document_.load_string(content.c_str());
     if (!result) {
