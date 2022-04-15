@@ -218,10 +218,17 @@ void BinaryFile::read_char(char* data, size_t count) {
     offset_ += count;
 #else
     auto read = std::fread(data, 1, count, file_);
+    const char* error_info = "unknown cause";
     if (read != count) {
+        if (feof(file_)) {
+            error_info = "reached end of file";
+        }
+        else if (ferror(file_)) {
+            error_info = std::strerror(errno);
+        }
         throw file_error(
             "failed to read {} bytes from the file at '{}': {}",
-            count, this->path(), std::strerror(errno)
+            count, this->path(), error_info
         );
     }
 #endif
