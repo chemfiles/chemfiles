@@ -477,9 +477,8 @@ Netcdf3File::~Netcdf3File() {
 }
 
 void Netcdf3File::skip_padding(int64_t size) {
-    for (int64_t i=0; i<padding(size); i++){
-        this->read_single_char();
-    }
+    const auto count = static_cast<uint64_t>(padding(size));
+    this->skip(count);
 }
 
 void Netcdf3File::add_padding(int64_t size) {
