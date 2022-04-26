@@ -56,9 +56,9 @@ void XDRFile::write_gmx_string(const std::string& value) {
  * sizeofint - calculate smallest number of bits necessary
  * to represent a certain integer.
  */
-static unsigned int sizeofint(unsigned int size) {
-    unsigned int num = 1;
-    unsigned int num_of_bits = 0;
+static uint32_t sizeofint(uint32_t size) {
+    uint32_t num = 1;
+    uint32_t num_of_bits = 0;
 
     while (size >= num && num_of_bits < 32) {
         num_of_bits++;
@@ -78,14 +78,14 @@ static unsigned int sizeofint(unsigned int size) {
  * which is the exact number of bits, and them we dont need to call
  * this routine).
  */
-static unsigned int sizeofints(unsigned int num_of_ints, unsigned int sizes[]) {
-    unsigned int num_of_bytes = 1;
-    unsigned int bytes[32];
+static uint32_t sizeofints(uint32_t num_of_ints, uint32_t sizes[]) {
+    uint32_t num_of_bytes = 1;
+    uint8_t bytes[32];
     bytes[0] = 1;
-    unsigned int num_of_bits = 0;
-    for (unsigned int i = 0; i < num_of_ints; i++) {
-        unsigned int tmp = 0;
-        unsigned int bytecnt;
+    uint32_t num_of_bits = 0;
+    for (size_t i = 0; i < num_of_ints; ++i) {
+        uint32_t tmp = 0;
+        uint32_t bytecnt;
         for (bytecnt = 0; bytecnt < num_of_bytes; bytecnt++) {
             tmp = bytes[bytecnt] * sizes[i] + tmp;
             bytes[bytecnt] = tmp & 0xff;
@@ -97,7 +97,7 @@ static unsigned int sizeofints(unsigned int num_of_ints, unsigned int sizes[]) {
         }
         num_of_bytes = bytecnt;
     }
-    unsigned int num = 1;
+    uint32_t num = 1;
     num_of_bytes--;
     while (bytes[num_of_bytes] >= num) {
         num_of_bits++;
@@ -107,9 +107,9 @@ static unsigned int sizeofints(unsigned int num_of_ints, unsigned int sizes[]) {
 }
 
 struct DecodeState {
-    unsigned int count;
-    unsigned int lastbits;
-    unsigned int lastbyte;
+    size_t count;
+    size_t lastbits;
+    uint8_t lastbyte;
 };
 
 /*
@@ -120,11 +120,12 @@ struct DecodeState {
  * better make sure that this number of bits is enough to hold the value.
  * Num must also be positive.
  */
-static void encodebits(std::vector<char>& buf, DecodeState& state, unsigned int num_of_bits,
-                       unsigned int num) {
-    unsigned int cnt = state.count;
-    unsigned int lastbits = state.lastbits;
-    unsigned int lastbyte = state.lastbyte;
+static void encodebits(std::vector<char>& buf, DecodeState& state, uint32_t num_of_bits,
+                       uint32_t num) {
+    size_t cnt = state.count;
+    size_t lastbits = state.lastbits;
+    // last byte needs 1B headspace for shifting
+    uint32_t lastbyte = state.lastbyte;
     while (num_of_bits >= 8) {
         lastbyte = (lastbyte << 8) | (num >> (num_of_bits - 8));
         buf[cnt++] = static_cast<char>(lastbyte >> lastbits);
@@ -140,7 +141,8 @@ static void encodebits(std::vector<char>& buf, DecodeState& state, unsigned int 
     }
     state.count = cnt;
     state.lastbits = lastbits;
-    state.lastbyte = lastbyte;
+    // discard everything but the last byte
+    state.lastbyte = lastbyte & 0xff;
     if (lastbits > 0) {
         buf[cnt] = static_cast<char>(lastbyte << (8 - lastbits));
     }
@@ -161,24 +163,24 @@ static void encodebits(std::vector<char>& buf, DecodeState& state, unsigned int 
  * to remove those checks...
  */
 
-static void encodeints(std::vector<char>& buf, DecodeState& state, unsigned int num_of_ints,
-                       unsigned int num_of_bits, unsigned int sizes[], unsigned int nums[]) {
-    unsigned int tmp = nums[0];
-    unsigned int num_of_bytes = 0;
-    unsigned int bytes[32];
+static void encodeints(std::vector<char>& buf, DecodeState& state, uint32_t num_of_ints,
+                       uint32_t num_of_bits, uint32_t sizes[], uint32_t nums[]) {
+    uint32_t tmp = nums[0];
+    uint32_t num_of_bytes = 0;
+    uint8_t bytes[32];
     do {
         bytes[num_of_bytes++] = tmp & 0xff;
         tmp >>= 8;
     } while (tmp != 0);
 
-    for (unsigned int i = 1; i < num_of_ints; i++) {
+    for (size_t i = 1; i < num_of_ints; i++) {
         if (nums[i] >= sizes[i]) {
             throw file_error("major breakdown in encodeints - num {} doesn't match size {}",
                              nums[i], sizes[i]);
         }
         /* use one step multiply */
         tmp = nums[i];
-        unsigned int bytecnt;
+        uint32_t bytecnt;
         for (bytecnt = 0; bytecnt < num_of_bytes; bytecnt++) {
             tmp = bytes[bytecnt] * sizes[i] + tmp;
             bytes[bytecnt] = tmp & 0xff;
@@ -191,12 +193,12 @@ static void encodeints(std::vector<char>& buf, DecodeState& state, unsigned int 
         num_of_bytes = bytecnt;
     }
     if (num_of_bits >= num_of_bytes * 8) {
-        for (unsigned int i = 0; i < num_of_bytes; i++) {
+        for (size_t i = 0; i < num_of_bytes; i++) {
             encodebits(buf, state, 8, bytes[i]);
         }
         encodebits(buf, state, num_of_bits - num_of_bytes * 8, 0);
     } else {
-        unsigned int i;
+        size_t i;
         for (i = 0; i < num_of_bytes - 1; i++) {
             encodebits(buf, state, 8, bytes[i]);
         }
@@ -212,24 +214,25 @@ static void encodeints(std::vector<char>& buf, DecodeState& state, unsigned int 
  *
  */
 
-static unsigned int decodebits(const std::vector<char>& buf, DecodeState& state,
-                               unsigned int num_of_bits) {
-    unsigned int mask = static_cast<unsigned int>(1 << num_of_bits) - 1;
+template <typename T>
+static T decodebits(const std::vector<char>& buf, DecodeState& state, uint32_t num_of_bits) {
+    uint32_t mask = static_cast<uint32_t>(1 << num_of_bits) - 1;
 
-    unsigned int cnt = state.count;
-    unsigned int lastbits = state.lastbits;
-    unsigned int lastbyte = state.lastbyte;
+    size_t cnt = state.count;
+    size_t lastbits = state.lastbits;
+    // last byte needs 1B headspace for shifting
+    uint32_t lastbyte = state.lastbyte;
 
-    unsigned int num = 0;
+    uint32_t num = 0;
     while (num_of_bits >= 8) {
-        lastbyte = (lastbyte << 8) | static_cast<unsigned char>(buf[cnt++]);
+        lastbyte = (lastbyte << 8) | (buf[cnt++] & 0xff);
         num |= (lastbyte >> lastbits) << (num_of_bits - 8);
         num_of_bits -= 8;
     }
     if (num_of_bits > 0) {
         if (lastbits < num_of_bits) {
             lastbits += 8;
-            lastbyte = (lastbyte << 8) | static_cast<unsigned char>(buf[cnt++]);
+            lastbyte = (lastbyte << 8) | (buf[cnt++] & 0xff);
         }
         lastbits -= num_of_bits;
         num |= (lastbyte >> lastbits) & mask;
@@ -237,50 +240,55 @@ static unsigned int decodebits(const std::vector<char>& buf, DecodeState& state,
     num &= mask;
     state.count = cnt;
     state.lastbits = lastbits;
-    state.lastbyte = lastbyte;
-    return num;
+    // discard everything but the last byte
+    state.lastbyte = lastbyte & 0xff;
+
+    assert(sizeof(T) * 8 >= num_of_bits);
+    return static_cast<T>(num);
 }
 
 /*
  * decodeints - decode 'small' integers from the buf array
  *
- * This routine is the inverse from encodeints() and decodes the small integers
- * written to buf by calculating the remainder and doing divisions with
- * the given sizes[]. You need to specify the total number of bits to be
- * used from buf in num_of_bits.
+ * This routine is the inverse from `encodeints()` and decodes 3 the small
+ * integers written to `buf` by calculating the remainder and doing divisions
+ * with the given `sizes`. You need to specify the total number of bits to be
+ * used from `buf` in `num_of_bits`.
  *
  */
 
-static void decodeints(const std::vector<char>& buf, DecodeState& state, unsigned int num_of_ints,
-                       unsigned int num_of_bits, unsigned int sizes[3], span<int> nums) {
-    unsigned int bytes[32];
+static void decodeints(const std::vector<char>& buf, DecodeState& state, uint32_t num_of_bits,
+                       uint32_t sizes[3], span<int32_t> nums) {
+    assert(nums.size() == 3 && "invalid number of integers to unpack");
+    uint8_t bytes[32];
     bytes[1] = bytes[2] = bytes[3] = 0;
-    unsigned int num_of_bytes = 0;
+    size_t num_of_bytes = 0;
     while (num_of_bits > 8) {
-        bytes[num_of_bytes++] = decodebits(buf, state, 8);
+        bytes[num_of_bytes++] = decodebits<uint8_t>(buf, state, 8);
         num_of_bits -= 8;
     }
     if (num_of_bits > 0) {
-        bytes[num_of_bytes++] = decodebits(buf, state, num_of_bits);
+        bytes[num_of_bytes++] = decodebits<uint8_t>(buf, state, num_of_bits);
     }
-    for (unsigned int i = num_of_ints - 1; i > 0; i--) {
-        unsigned int num = 0;
-        for (int j = static_cast<int>(num_of_bytes - 1); j >= 0; j--) {
-            num = (num << 8) | bytes[j];
-            unsigned int p = num / sizes[i];
-            bytes[j] = p;
+    for (size_t i = 2; i > 0; --i) {
+        uint32_t num = 0;
+        for (size_t j = 0; j < num_of_bytes; ++j) {
+            const size_t k = num_of_bytes - 1 - j;
+            num = (num << 8) | bytes[k];
+            uint32_t p = num / sizes[i];
+            bytes[k] = static_cast<uint8_t>(p);
             num = num - p * sizes[i];
         }
-        nums[i] = static_cast<int>(num);
+        nums[i] = static_cast<int32_t>(num);
     }
-    nums[0] = static_cast<int>(bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24));
+    nums[0] = bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
 }
 
-static unsigned int calc_sizeint(const int minint[3], const int maxint[3], unsigned int sizeint[3],
-                                 unsigned int bitsizeint[3]) {
-    sizeint[0] = static_cast<unsigned int>(maxint[0] - minint[0]) + 1;
-    sizeint[1] = static_cast<unsigned int>(maxint[1] - minint[1]) + 1;
-    sizeint[2] = static_cast<unsigned int>(maxint[2] - minint[2]) + 1;
+static uint32_t calc_sizeint(const int minint[3], const int maxint[3], uint32_t sizeint[3],
+                             uint32_t bitsizeint[3]) {
+    sizeint[0] = static_cast<uint32_t>(maxint[0] - minint[0]) + 1;
+    sizeint[1] = static_cast<uint32_t>(maxint[1] - minint[1]) + 1;
+    sizeint[2] = static_cast<uint32_t>(maxint[2] - minint[2]) + 1;
 
     bitsizeint[0] = bitsizeint[1] = bitsizeint[2] = 0;
     // check if one of the sizes is to big to be multiplied
@@ -322,21 +330,21 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data) {
         read_int(),
         read_int(),
     };
-    unsigned int smallidx = static_cast<unsigned int>(read_int());
+    uint32_t smallidx = read_uint();
     if (!(smallidx < LASTIDX)) {
         throw file_error("internal overflow compressing XTC coordinates");
     }
 
-    unsigned int sizeint[3], bitsizeint[3];
-    const unsigned int bitsize = calc_sizeint(minint, maxint, sizeint, bitsizeint);
+    uint32_t sizeint[3], bitsizeint[3];
+    const uint32_t bitsize = calc_sizeint(minint, maxint, sizeint, bitsizeint);
 
-    unsigned int tmpidx = smallidx - 1;
+    size_t tmpidx = smallidx - 1;
     tmpidx = (FIRSTIDX > tmpidx) ? FIRSTIDX : tmpidx;
 
     int smaller = MAGICINTS[tmpidx] / 2;
     int smallnum = MAGICINTS[smallidx] / 2;
-    unsigned int sizesmall[3];
-    sizesmall[0] = sizesmall[1] = sizesmall[2] = static_cast<unsigned int>(MAGICINTS[smallidx]);
+    uint32_t sizesmall[3];
+    sizesmall[0] = sizesmall[1] = sizesmall[2] = static_cast<uint32_t>(MAGICINTS[smallidx]);
 
     read_opaque(compressed_data_);
     intbuf_.resize(data.size());
@@ -350,15 +358,15 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data) {
     const float inv_precision = 1.0f / precision;
     size_t write_idx = 0;
     for (size_t read_idx = 0; read_idx < natoms; ++read_idx) {
-        auto thiscoord = span<int>(intbuf_.data() + read_idx * 3, 3);
+        auto thiscoord = span<int32_t>(intbuf_.data() + read_idx * 3, 3);
         auto thiscoord_fl = span<float>(data.data() + write_idx * 3, 3);
 
         if (bitsize == 0) {
-            thiscoord[0] = static_cast<int>(decodebits(compressed_data_, state, bitsizeint[0]));
-            thiscoord[1] = static_cast<int>(decodebits(compressed_data_, state, bitsizeint[1]));
-            thiscoord[2] = static_cast<int>(decodebits(compressed_data_, state, bitsizeint[2]));
+            thiscoord[0] = decodebits<int>(compressed_data_, state, bitsizeint[0]);
+            thiscoord[1] = decodebits<int>(compressed_data_, state, bitsizeint[1]);
+            thiscoord[2] = decodebits<int>(compressed_data_, state, bitsizeint[2]);
         } else {
-            decodeints(compressed_data_, state, 3, bitsize, sizeint, thiscoord);
+            decodeints(compressed_data_, state, bitsize, sizeint, thiscoord);
         }
 
         thiscoord[0] += minint[0];
@@ -369,10 +377,10 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data) {
         prevcoord[1] = thiscoord[1];
         prevcoord[2] = thiscoord[2];
 
-        const unsigned int flag = decodebits(compressed_data_, state, 1);
+        const bool flag = decodebits<bool>(compressed_data_, state, 1);
         int is_smaller = 0;
-        if (flag == 1) {
-            run = static_cast<int>(decodebits(compressed_data_, state, 5));
+        if (flag) {
+            run = decodebits<int>(compressed_data_, state, 5);
             is_smaller = run % 3;
             run -= is_smaller;
             is_smaller--;
@@ -382,10 +390,10 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data) {
         }
         if (run > 0) {
             // read the next coordinate
-            thiscoord = span<int>(intbuf_.data() + (read_idx + 1) * 3, 3);
+            thiscoord = span<int32_t>(intbuf_.data() + (read_idx + 1) * 3, 3);
 
             for (int k = 0; k < run; k += 3) {
-                decodeints(compressed_data_, state, 3, smallidx, sizesmall, thiscoord);
+                decodeints(compressed_data_, state, smallidx, sizesmall, thiscoord);
                 ++read_idx;
                 thiscoord[0] += prevcoord[0] - smallnum;
                 thiscoord[1] += prevcoord[1] - smallnum;
@@ -432,7 +440,7 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data) {
             smaller = smallnum;
             smallnum = MAGICINTS[smallidx] / 2;
         }
-        sizesmall[0] = sizesmall[1] = sizesmall[2] = static_cast<unsigned int>(MAGICINTS[smallidx]);
+        sizesmall[0] = sizesmall[1] = sizesmall[2] = static_cast<uint32_t>(MAGICINTS[smallidx]);
         if (sizesmall[0] == 0 || sizesmall[1] == 0 || sizesmall[2] == 0) {
             throw file_error("invalid size found during decompression of XTC coordinates");
         }
@@ -450,7 +458,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
 
     const size_t size3 = data.size();
     intbuf_.resize(size3);
-    compressed_data_.resize(size3 * sizeof(int));
+    compressed_data_.resize(size3 * sizeof(int32_t));
 
     assert(data.size() % 3 == 0 && "internal Error: invalid allocation size");
     const size_t natoms = data.size() / 3;
@@ -461,7 +469,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
     int mindiff = INT_MAX;
     int oldlint[3] = {0, 0, 0};
     for (size_t atom_idx = 0; atom_idx < natoms; ++atom_idx) {
-        auto thiscoord = span<int>(intbuf_.data() + atom_idx * 3, 3);
+        auto thiscoord = span<int32_t>(intbuf_.data() + atom_idx * 3, 3);
         const auto thiscoord_fl = span<const float>(data.data() + atom_idx * 3, 3);
         int lint[3];
         for (size_t i = 0; i < 3; ++i) {
@@ -507,35 +515,35 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
         throw file_error("internal overflow compressing XTC coordinates");
     }
 
-    unsigned int smallidx = FIRSTIDX;
+    uint32_t smallidx = FIRSTIDX;
     while (smallidx < (LASTIDX - 1) && MAGICINTS[smallidx] < mindiff) {
         smallidx++;
     }
-    write_int(static_cast<int32_t>(smallidx));
+    write_uint(smallidx);
 
-    unsigned int sizeint[3], bitsizeint[3];
-    const unsigned int bitsize = calc_sizeint(minint, maxint, sizeint, bitsizeint);
+    uint32_t sizeint[3], bitsizeint[3];
+    const uint32_t bitsize = calc_sizeint(minint, maxint, sizeint, bitsizeint);
 
-    unsigned int tmpidx = smallidx + 8;
-    unsigned int maxidx = (LASTIDX < tmpidx) ? LASTIDX : tmpidx;
-    unsigned int minidx = maxidx - 8; // often this equal smallidx
+    size_t tmpidx = smallidx + 8;
+    size_t maxidx = (LASTIDX < tmpidx) ? LASTIDX : tmpidx;
+    size_t minidx = maxidx - 8; // often this equal smallidx
     tmpidx = smallidx - 1;
     tmpidx = (FIRSTIDX > tmpidx) ? FIRSTIDX : tmpidx;
 
     int smaller = MAGICINTS[tmpidx] / 2;
     int smallnum = MAGICINTS[smallidx] / 2;
-    unsigned int sizesmall[3];
-    sizesmall[0] = sizesmall[1] = sizesmall[2] = static_cast<unsigned int>(MAGICINTS[smallidx]);
+    uint32_t sizesmall[3];
+    sizesmall[0] = sizesmall[1] = sizesmall[2] = static_cast<uint32_t>(MAGICINTS[smallidx]);
     int larger = MAGICINTS[maxidx] / 2;
 
     int prevrun = -1;
-    unsigned int tmpcoord[8 * 3]; // max run lenght is 8*3
+    uint32_t tmpcoord[8 * 3]; // max run lenght is 8*3
     int prevcoord[3] = {0, 0, 0};
     int is_smaller;
     DecodeState state = {0, 0, 0};
     for (size_t i = 0; i < natoms; ++i) {
         bool is_small = false;
-        auto thiscoord = span<int>(intbuf_.data() + i * 3, 3);
+        auto thiscoord = span<int32_t>(intbuf_.data() + i * 3, 3);
         if (smallidx < maxidx && i >= 1 && abs(thiscoord[0] - prevcoord[0]) < larger &&
             abs(thiscoord[1] - prevcoord[1]) < larger &&
             abs(thiscoord[2] - prevcoord[2]) < larger) {
@@ -547,7 +555,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
         }
         if (i + 1 < natoms) {
             // look ahead and see if the difference to next coordinate is small
-            auto nextcoord = span<int>(intbuf_.data() + (i + 1) * 3, 3);
+            auto nextcoord = span<int32_t>(intbuf_.data() + (i + 1) * 3, 3);
             if (abs(thiscoord[0] - nextcoord[0]) < smallnum &&
                 abs(thiscoord[1] - nextcoord[1]) < smallnum &&
                 abs(thiscoord[2] - nextcoord[2]) < smallnum) {
@@ -560,9 +568,9 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
             }
         }
         // overflow should have been checked already
-        tmpcoord[0] = static_cast<unsigned int>(thiscoord[0] - minint[0]);
-        tmpcoord[1] = static_cast<unsigned int>(thiscoord[1] - minint[1]);
-        tmpcoord[2] = static_cast<unsigned int>(thiscoord[2] - minint[2]);
+        tmpcoord[0] = static_cast<uint32_t>(thiscoord[0] - minint[0]);
+        tmpcoord[1] = static_cast<uint32_t>(thiscoord[1] - minint[1]);
+        tmpcoord[2] = static_cast<uint32_t>(thiscoord[2] - minint[2]);
         if (bitsize == 0) {
             encodebits(compressed_data_, state, bitsizeint[0], tmpcoord[0]);
             encodebits(compressed_data_, state, bitsizeint[1], tmpcoord[1]);
@@ -573,7 +581,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
         prevcoord[0] = thiscoord[0];
         prevcoord[1] = thiscoord[1];
         prevcoord[2] = thiscoord[2];
-        thiscoord = span<int>(intbuf_.data() + (i + 1) * 3, 3);
+        thiscoord = span<int32_t>(intbuf_.data() + (i + 1) * 3, 3);
 
         if (!is_small && is_smaller == -1) {
             is_smaller = 0;
@@ -590,9 +598,9 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
             }
 
             // no overflow as long as is_small == true
-            tmpcoord[run++] = static_cast<unsigned int>(thiscoord[0] - prevcoord[0] + smallnum);
-            tmpcoord[run++] = static_cast<unsigned int>(thiscoord[1] - prevcoord[1] + smallnum);
-            tmpcoord[run++] = static_cast<unsigned int>(thiscoord[2] - prevcoord[2] + smallnum);
+            tmpcoord[run++] = static_cast<uint32_t>(thiscoord[0] - prevcoord[0] + smallnum);
+            tmpcoord[run++] = static_cast<uint32_t>(thiscoord[1] - prevcoord[1] + smallnum);
+            tmpcoord[run++] = static_cast<uint32_t>(thiscoord[2] - prevcoord[2] + smallnum);
 
             prevcoord[0] = thiscoord[0];
             prevcoord[1] = thiscoord[1];
@@ -602,7 +610,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
             is_small = false;
             if (i + 1 < natoms) {
                 // look ahead and see if the difference to next coordinate is small
-                thiscoord = span<int>(intbuf_.data() + (i + 1) * 3, 3);
+                thiscoord = span<int32_t>(intbuf_.data() + (i + 1) * 3, 3);
                 if (abs(thiscoord[0] - prevcoord[0]) < smallnum &&
                     abs(thiscoord[1] - prevcoord[1]) < smallnum &&
                     abs(thiscoord[2] - prevcoord[2]) < smallnum) {
@@ -613,7 +621,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
         if (run != prevrun || is_smaller != 0) {
             prevrun = run;
             encodebits(compressed_data_, state, 1, 1); // flag the change in run-length
-            unsigned int num = static_cast<unsigned int>(run + is_smaller + 1);
+            uint32_t num = static_cast<uint32_t>(run + is_smaller + 1);
             encodebits(compressed_data_, state, 5, num);
         } else {
             encodebits(compressed_data_, state, 1, 0); // flag the fact that runlength did not change
@@ -631,13 +639,12 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
                 smaller = smallnum;
                 smallnum = MAGICINTS[smallidx] / 2;
             }
-            sizesmall[0] = sizesmall[1] = sizesmall[2] =
-                static_cast<unsigned int>(MAGICINTS[smallidx]);
+            sizesmall[0] = sizesmall[1] = sizesmall[2] = static_cast<uint32_t>(MAGICINTS[smallidx]);
         }
     }
     if (state.lastbits != 0) {
         ++state.count;
     }
     assert(state.count < compressed_data_.size() && "internal Error: overflow during decompression");
-    write_opaque(compressed_data_.data(), state.count);
+    write_opaque(compressed_data_.data(), static_cast<uint32_t>(state.count));
 }
