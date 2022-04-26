@@ -66,7 +66,7 @@ class XDRFile final : public BigEndianFile {
     /// Cache allocation for compressed data (XTC)
     std::vector<char> compressed_data_;
     /// Cache allocation for intermediate buffer (XTC)
-    std::vector<int> intbuf_;
+    std::vector<int32_t> intbuf_;
 };
 
 } // namespace chemfiles

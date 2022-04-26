@@ -396,7 +396,7 @@ inline T swap_endianness(T value) {
     uval = swap_endianness(uval);
     std::memcpy(&value, &uval, sizeof(T));
     return value;
-};
+}
 
 template<>
 inline uint16_t swap_endianness(uint16_t value) {
