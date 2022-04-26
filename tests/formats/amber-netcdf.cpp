@@ -91,9 +91,10 @@ TEST_CASE("Write files in NetCDF format") {
     frame.set("name", "Test Title 123");
     frame.add_velocities();
     for(size_t i=0; i<4; i++) {
+        double d = static_cast<double>(i);
         frame.add_atom(
             Atom("X"),
-            {1.0 * i, 2.0 * i, 3.0 * i},
+            {1.0 * d, 2.0 * d, 3.0 * d},
             {-3, -2, -1}
         );
     }
