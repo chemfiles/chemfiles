@@ -138,7 +138,10 @@ BinaryFile::BinaryFile(std::string path, File::Mode mode):
     assert(file_ != nullptr);
 
     if (mode == Mode::APPEND) {
-        fseek64(file_, 0, SEEK_END);
+        auto status = fseek64(file_, 0, SEEK_END);
+        if (status != 0) {
+            throw file_error("failed to seek in file: {}", std::strerror(errno));
+        }
     } else {
         this->seek(0);
     }
@@ -173,8 +176,23 @@ BinaryFile& BinaryFile::operator=(BinaryFile&& other) noexcept {
 void BinaryFile::close_file() noexcept {
 #if CHEMFILES_BINARY_FILE_USE_MMAP
     if (mmap_data_ != nullptr) {
-        msync(mmap_data_, mmap_size_, MS_SYNC);
-        munmap(mmap_data_, mmap_size_);
+        auto status = msync(mmap_data_, mmap_size_, MS_SYNC);
+        if (status != 0) {
+            warning(
+                "binary file writer",
+                "failed to sync file ({}), some data might be lost",
+                std::strerror(errno)
+            );
+        }
+
+        status = munmap(mmap_data_, mmap_size_);
+        if (status != 0) {
+            warning(
+                "binary file writer",
+                "failed to unmap file ({}), something might be wrong",
+                std::strerror(errno)
+            );
+        }
     }
 
     if (file_descriptor_ != -1) {
@@ -189,7 +207,13 @@ void BinaryFile::close_file() noexcept {
             }
         }
 
-        close(file_descriptor_);
+        if (close(file_descriptor_) != 0) {
+            warning(
+                "binary file writer",
+                "failed to close the file ({}), something might be wrong",
+                std::strerror(errno)
+            );
+        }
     }
 
     file_descriptor_ = -1;
@@ -201,11 +225,19 @@ void BinaryFile::close_file() noexcept {
     page_size_ = 0;
     offset_ = 0;
 #else
-    if (this->mode() != Mode::READ) {
-        std::fflush(file_);
+    if (file_ == nullptr) {
+        return;
     }
 
-    std::fclose(file_);
+    if (this->mode() != Mode::READ) {
+        if (std::fflush(file_) != 0) {
+            warning("binary file writer", "failed to flush when closing the file, some data might be lost");
+        }
+    }
+
+    if (std::fclose(file_) != 0) {
+        warning("binary file writer", "failed to close the file, something might be wrong");
+    }
     file_ = nullptr;
 #endif
 }
@@ -250,14 +282,24 @@ void BinaryFile::write_char(const char* data, size_t count) {
         // resize the file, but keep the same mmap allocation unless
         // file_size_ > mmap_size_
         auto status = ftruncate(file_descriptor_, static_cast<off_t>(file_size_));
-        if (status == -1) {
+        if (status != 0) {
             throw file_error("failed to resize file: {}", std::strerror(errno));
         }
 
         if (file_size_ > mmap_size_) {
             // unmap & remap file with bigger mapping
-            msync(mmap_data_, mmap_size_, MS_SYNC);
-            munmap(mmap_data_, mmap_size_);
+            status = msync(mmap_data_, mmap_size_, MS_SYNC);
+            if (status != 0) {
+                throw file_error(
+                    "failed to sync file ({}), some data might be lost",
+                    std::strerror(errno)
+                );
+            }
+
+            status = munmap(mmap_data_, mmap_size_);
+            if (status != 0) {
+                throw file_error("failed to unmap file: {}", std::strerror(errno));
+            }
 
             while (file_size_ > mmap_size_) {
                 mmap_size_ *= 2;
@@ -295,7 +337,11 @@ uint64_t BinaryFile::tell() const {
 #if CHEMFILES_BINARY_FILE_USE_MMAP
     return offset_;
 #else
-    return static_cast<uint64_t>(ftell64(file_));
+    auto position = ftell64(file_);
+    if (position < 0) {
+        throw file_error("call to ftell failed: {}", std::strerror(errno));
+    }
+    return static_cast<uint64_t>(position);
 #endif
 }
 
@@ -304,7 +350,11 @@ void BinaryFile::seek(uint64_t position) {
 #if CHEMFILES_BINARY_FILE_USE_MMAP
     offset_ = position;
 #else
-    fseek64(file_, static_cast<off64_t>(position), SEEK_SET);
+    auto status = fseek64(file_, static_cast<off64_t>(position), SEEK_SET);
+
+    if (status != 0) {
+        throw file_error("failed to seek in file: {}", std::strerror(errno));
+    }
 #endif
 }
 
@@ -313,7 +363,10 @@ void BinaryFile::skip(uint64_t count) {
 #if CHEMFILES_BINARY_FILE_USE_MMAP
     offset_ += count;
 #else
-    fseek64(file_, static_cast<off64_t>(count), SEEK_CUR);
+    auto status = fseek64(file_, static_cast<off64_t>(count), SEEK_CUR);
+    if (status != 0) {
+        throw file_error("failed to seek in file: {}", std::strerror(errno));
+    }
 #endif
 }
 
@@ -322,11 +375,16 @@ uint64_t BinaryFile::file_size() {
 #if CHEMFILES_BINARY_FILE_USE_MMAP
     return total_written_size_;
 #else
-    uint64_t cur_pos = tell();
-    fseek64(file_, 0L, SEEK_END);
-    const uint64_t filesize = tell();
-    seek(cur_pos);
-    return filesize;
+    auto current = this->tell();
+
+    auto status = fseek64(file_, 0L, SEEK_END);
+    if (status != 0) {
+        throw file_error("failed to seek in file: {}", std::strerror(errno));
+    }
+
+    auto file_size = this->tell();
+    this->seek(current);
+    return file_size;
 #endif
 }
 
@@ -456,12 +514,12 @@ template<typename T>
 inline void BigEndianFile::write_as_big_endian(const T* data, size_t count) {
     const size_t byte_count = sizeof(T) * count;
 #if CHEMFILES_BYTE_ORDER == CHEMFILES_LITTLE_ENDIAN
-    swap_buf_.resize(byte_count);
+    swap_buffer_.resize(byte_count);
     for (size_t i = 0; i < count; ++i) {
         T value = swap_endianness(data[i]);
-        std::memcpy(swap_buf_.data() + i * sizeof(T), &value, sizeof(T));
+        std::memcpy(swap_buffer_.data() + i * sizeof(T), &value, sizeof(T));
     }
-    this->write_char(swap_buf_.data(), byte_count);
+    this->write_char(swap_buffer_.data(), byte_count);
 #else
     this->write_char(reinterpret_cast<const char*>(data), byte_count);
 #endif
@@ -561,12 +619,12 @@ template<typename T>
 inline void LittleEndianFile::write_as_little_endian(const T* data, size_t count) {
     const size_t byte_count = sizeof(T) * count;
 #if CHEMFILES_BYTE_ORDER == CHEMFILES_BIG_ENDIAN
-    swap_buf_.resize(byte_count);
+    swap_buffer_.resize(byte_count);
     for (size_t i = 0; i < count; ++i) {
         T value = swap_endianness(data[i]);
-        std::memcpy(swap_buf_.data() + i * sizeof(T), &value, sizeof(T));
+        std::memcpy(swap_buffer_.data() + i * sizeof(T), &value, sizeof(T));
     }
-    this->write_char(swap_buf_.data(), byte_count);
+    this->write_char(swap_buffer_.data(), byte_count);
 #else
     this->write_char(reinterpret_cast<const char*>(data), byte_count);
 #endif
