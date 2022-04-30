@@ -17,7 +17,9 @@ namespace chemfiles {
 class XDRFile final : public BigEndianFile {
   public:
     XDRFile(std::string path, File::Mode mode);
-    ~XDRFile() = default;
+    XDRFile(XDRFile&& other) noexcept = default;
+    XDRFile& operator=(XDRFile&& other) = default;
+    ~XDRFile() noexcept override = default;
 
     using BinaryFile::read_f32;
     using BinaryFile::read_f64;
@@ -41,6 +43,7 @@ class XDRFile final : public BigEndianFile {
     void read_opaque(std::vector<char>& data);
     /// Write XDR variable-length opaque data
     void write_opaque(const char* data, uint32_t count);
+
     /// Cache allocation for compressed data (XTC)
     std::vector<char> compressed_data_;
     /// Cache allocation for intermediate buffer (XTC)

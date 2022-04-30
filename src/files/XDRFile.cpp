@@ -480,7 +480,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
             } else {
                 lf = thiscoord_fl[i] * precision - 0.5f;
             }
-            if (fabsf(lf) > static_cast<float>(INT_MAX) - 2.0) {
+            if (fabsf(lf) > static_cast<float>(INT_MAX) - 2.0f) {
                 // scaling would cause overflow when casting to int
                 throw file_error("internal overflow compressing XTC coordinates");
             }

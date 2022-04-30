@@ -145,7 +145,7 @@ BinaryFile::BinaryFile(std::string path, File::Mode mode):
 #endif
 }
 
-BinaryFile::~BinaryFile() {
+BinaryFile::~BinaryFile() noexcept {
     this->close_file();
 }
 
@@ -170,7 +170,7 @@ BinaryFile& BinaryFile::operator=(BinaryFile&& other) noexcept {
     return *this;
 }
 
-void BinaryFile::close_file() {
+void BinaryFile::close_file() noexcept {
 #if CHEMFILES_BINARY_FILE_USE_MMAP
     if (mmap_data_ != nullptr) {
         msync(mmap_data_, mmap_size_, MS_SYNC);
