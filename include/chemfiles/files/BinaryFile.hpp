@@ -331,7 +331,7 @@ public:
         this->write_f64(&value, 1);
     }
 protected:
-    std::vector<char> swap_buf_;
+    std::vector<char> swap_buffer_;
 
 private:
     /// Close the file and mmap binding, and reset all member to

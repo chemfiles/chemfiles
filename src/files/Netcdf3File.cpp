@@ -829,15 +829,12 @@ void Netcdf3Builder::initialize(Netcdf3File* file) && {
 
         // write variable dimensions
         auto dimensions = std::vector<std::shared_ptr<Dimension>>();
-        bool is_record_variable = false;
         file->write_single_i32(static_cast<int32_t>(variable.dimensions.size()));
         for (const auto& id: variable.dimensions) {
             file->write_single_i32(static_cast<int32_t>(id));
 
             auto dimension = dimensions_[id];
-            if (dimension->is_record()) {
-                is_record_variable = true;
-            } else {
+            if (!dimension->is_record()) {
                 size_with_padding *= dimension->size;
             }
 
