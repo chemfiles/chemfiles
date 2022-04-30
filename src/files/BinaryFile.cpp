@@ -146,6 +146,31 @@ BinaryFile::BinaryFile(std::string path, File::Mode mode):
 }
 
 BinaryFile::~BinaryFile() {
+    this->close_file();
+}
+
+BinaryFile& BinaryFile::operator=(BinaryFile&& other) noexcept {
+    File::operator=(std::move(other));
+
+    this->close_file();
+
+#if CHEMFILES_BINARY_FILE_USE_MMAP
+    std::swap(this->file_descriptor_, other.file_descriptor_);
+    std::swap(this->total_written_size_, other.total_written_size_);
+    std::swap(this->mmap_data_, other.mmap_data_);
+    std::swap(this->file_size_, other.file_size_);
+    std::swap(this->mmap_size_, other.mmap_size_);
+    std::swap(this->mmap_prot_, other.mmap_prot_);
+    std::swap(this->page_size_, other.page_size_);
+    std::swap(this->offset_, other.offset_);
+#else
+    std::swap(this->file_, other.file_);
+#endif
+
+    return *this;
+}
+
+void BinaryFile::close_file() {
 #if CHEMFILES_BINARY_FILE_USE_MMAP
     if (mmap_data_ != nullptr) {
         msync(mmap_data_, mmap_size_, MS_SYNC);
@@ -183,27 +208,6 @@ BinaryFile::~BinaryFile() {
     std::fclose(file_);
     file_ = nullptr;
 #endif
-}
-
-BinaryFile& BinaryFile::operator=(BinaryFile&& other) {
-    this->~BinaryFile();
-
-    File::operator=(std::move(other));
-
-#if CHEMFILES_BINARY_FILE_USE_MMAP
-    std::swap(this->file_descriptor_, other.file_descriptor_);
-    std::swap(this->total_written_size_, other.total_written_size_);
-    std::swap(this->mmap_data_, other.mmap_data_);
-    std::swap(this->file_size_, other.file_size_);
-    std::swap(this->mmap_size_, other.mmap_size_);
-    std::swap(this->mmap_prot_, other.mmap_prot_);
-    std::swap(this->page_size_, other.page_size_);
-    std::swap(this->offset_, other.offset_);
-#else
-    std::swap(this->file_, other.file_);
-#endif
-
-    return *this;
 }
 
 void BinaryFile::read_char(char* data, size_t count) {

@@ -93,7 +93,10 @@ constexpr void(Netcdf3File::*nc_type_info<double>::writer)(const double*, size_t
 /******************************************************************************/
 
 Value& Value::operator=(Value&& other) {
-    this->~Value();
+    if (kind_ == kind_t::STRING) {
+        using std::string;
+        string_.~string();
+    }
 
     this->kind_ = other.kind_;
     if (kind_ == kind_t::BYTE) {
@@ -118,7 +121,10 @@ Value& Value::operator=(Value&& other) {
 }
 
 Value& Value::operator=(const Value& other) {
-    this->~Value();
+    if (kind_ == kind_t::STRING) {
+        using std::string;
+        string_.~string();
+    }
 
     this->kind_ = other.kind_;
     if (kind_ == kind_t::BYTE) {
