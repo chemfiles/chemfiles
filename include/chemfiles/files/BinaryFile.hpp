@@ -36,15 +36,15 @@ public:
     /// Open the file at the given `path` using the given `mode`
     BinaryFile(std::string path, File::Mode mode);
 
-    virtual ~BinaryFile();
+    virtual ~BinaryFile() noexcept override;
 
     BinaryFile(const BinaryFile&) = delete;
     BinaryFile& operator=(const BinaryFile&) = delete;
 
-    BinaryFile(BinaryFile&& other): File(std::move(other)) {
+    BinaryFile(BinaryFile&& other) noexcept : File(std::move(other)) {
         *this = std::move(other);
     }
-    BinaryFile& operator=(BinaryFile&&);
+    BinaryFile& operator=(BinaryFile&&) noexcept;
 
     /// Get the current position in the file
     uint64_t tell() const;
@@ -336,8 +336,8 @@ protected:
 private:
     /// Close the file and mmap binding, and reset all member to
     /// default/moved-from values. This is used to implement both the
-    /// desctructor and move assignment operator
-    void close_file();
+    /// destructor and move assignment operator
+    void close_file() noexcept;
 
 #if CHEMFILES_BINARY_FILE_USE_MMAP
     int file_descriptor_ = -1;
@@ -357,13 +357,13 @@ class BigEndianFile: public BinaryFile {
 public:
     BigEndianFile(std::string path, File::Mode mode): BinaryFile(std::move(path), mode) {}
 
-    virtual ~BigEndianFile() override = default;
+    virtual ~BigEndianFile() noexcept override = default;
 
     BigEndianFile(const BigEndianFile&) = delete;
     BigEndianFile& operator=(const BigEndianFile&) = delete;
 
-    BigEndianFile(BigEndianFile&&) = default;
-    BigEndianFile& operator=(BigEndianFile&&) = default;
+    BigEndianFile(BigEndianFile&&) noexcept = default;
+    BigEndianFile& operator=(BigEndianFile&&) noexcept = default;
 
     void read_i16(int16_t* data, size_t count) final override;
     void read_u16(uint16_t* data, size_t count) final override;
@@ -391,13 +391,13 @@ class LittleEndianFile: public BinaryFile {
 public:
     LittleEndianFile(std::string path, File::Mode mode): BinaryFile(std::move(path), mode) {}
 
-    virtual ~LittleEndianFile() override = default;
+    virtual ~LittleEndianFile() noexcept override = default;
 
     LittleEndianFile(const LittleEndianFile&) = delete;
     LittleEndianFile& operator=(const LittleEndianFile&) = delete;
 
-    LittleEndianFile(LittleEndianFile&&) = default;
-    LittleEndianFile& operator=(LittleEndianFile&&) = default;
+    LittleEndianFile(LittleEndianFile&&) noexcept = default;
+    LittleEndianFile& operator=(LittleEndianFile&&) noexcept = default;
 
     void read_i16(int16_t* data, size_t count) final override;
     void read_u16(uint16_t* data, size_t count) final override;

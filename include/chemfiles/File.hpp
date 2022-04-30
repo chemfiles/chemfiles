@@ -41,7 +41,7 @@ public:
         LZMA,
     };
 
-    virtual ~File() = default;
+    virtual ~File() noexcept = default;
     File(File&&) = default;
     File& operator=(File&&) = default;
     File(const File&) = delete;
