@@ -735,14 +735,14 @@ void LAMMPSDataFormat::write_header(const DataTypes& types, const Frame& frame) 
     file_.print("{} improper types\n", types.impropers().size());
 
     auto matrix = frame.cell().matrix();
-    file_.print("0 {} xlo xhi\n", matrix[0][0]);
-    file_.print("0 {} ylo yhi\n", matrix[1][1]);
-    file_.print("0 {} zlo zhi\n", matrix[2][2]);
+    file_.print("{:#.9} {:#.9} xlo xhi\n", 0.0, matrix[0][0]);
+    file_.print("{:#.9} {:#.9} ylo yhi\n", 0.0, matrix[1][1]);
+    file_.print("{:#.9} {:#.9} zlo zhi\n", 0.0, matrix[2][2]);
     if (frame.cell().shape() == UnitCell::TRICLINIC) {
         assert(tilt_factor(matrix, 1, 0) == 0);
         assert(tilt_factor(matrix, 2, 0) == 0);
         assert(tilt_factor(matrix, 2, 1) == 0);
-        file_.print("{} {} {} xy xz yz\n",
+        file_.print("{:#.9} {:#.9} {:#.9} xy xz yz\n",
             tilt_factor(matrix, 0, 1),
             tilt_factor(matrix, 0, 2),
             tilt_factor(matrix, 1, 2)
