@@ -310,7 +310,7 @@ extern template void Variable::write(size_t step, const double* data, size_t cou
 class Netcdf3File: public BigEndianFile {
 public:
     Netcdf3File(std::string filename, File::Mode mode);
-    ~Netcdf3File();
+    ~Netcdf3File() override;
 
     // disable moving/copying Netcdf3File since Variable instances take a
     // pointer to the file
