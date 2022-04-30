@@ -41,7 +41,10 @@ MemoryBuffer::MemoryBuffer(MemoryBuffer&& other): MemoryBuffer(nullptr, 0) {
 }
 
 MemoryBuffer& MemoryBuffer::operator=(MemoryBuffer&& other) {
-    this->~MemoryBuffer();
+    if (this->is_owned()) {
+        std::free(this->ptr_);
+    }
+
     this->ptr_ = other.ptr_;
     this->len_ = other.len_;
     this->capacity_ = other.capacity_;
