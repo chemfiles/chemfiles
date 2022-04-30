@@ -21,7 +21,8 @@ NumericValues::NumericValues(NumericValues&& other): NumericValues(0) {
 }
 
 NumericValues& NumericValues::operator=(NumericValues&& other) {
-    this->~NumericValues();
+    std::free(heap_);
+
     this->value_ = other.value_;
     this->heap_ = other.heap_;
 

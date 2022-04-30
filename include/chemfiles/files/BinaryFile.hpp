@@ -334,6 +334,11 @@ protected:
     std::vector<char> swap_buf_;
 
 private:
+    /// Close the file and mmap binding, and reset all member to
+    /// default/moved-from values. This is used to implement both the
+    /// desctructor and move assignment operator
+    void close_file();
+
 #if CHEMFILES_BINARY_FILE_USE_MMAP
     int file_descriptor_ = -1;
     char* mmap_data_ = nullptr;
