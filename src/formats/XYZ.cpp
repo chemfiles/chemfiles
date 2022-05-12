@@ -247,7 +247,7 @@ std::string write_extended_comment_line(const Frame& frame, properties_list_t pr
         // set small elements to 0
         for (size_t i=0; i<3; i++) {
             for (size_t j=0; j<3; j++) {
-                if (matrix[i][j] < 1e-12) {
+                if (std::abs(matrix[i][j]) < 1e-12) {
                     matrix[i][j] = 0;
                 }
             }
