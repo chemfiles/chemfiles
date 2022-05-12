@@ -367,3 +367,25 @@ H 0.332 8.726 10.882
 
     CHECK(writer.memory_buffer().value() == EXPECTED);
 }
+
+
+TEST_CASE("Triclinic cell with negative values (issue 449)") {
+    auto matrix = Matrix3D(
+        6.92395,  -3.22455, 0.0000,
+        0.00000,   5.45355, 0.0000,
+        0.100667, -3.32057, 7.2836
+    );
+    auto frame = Frame(UnitCell(matrix));
+    frame.resize(1);
+
+    auto writer = Trajectory::memory_writer("XYZ");
+    writer.write(frame);
+
+    std::string EXPECTED =
+R"(1
+Properties=species:S:1:pos:R:3 Lattice="6.92395 0 0.100667 -3.22455 5.45355 -3.32057 0 0 7.2836"
+X 0 0 0
+)";
+
+    CHECK(writer.memory_buffer().value() == EXPECTED);
+}
