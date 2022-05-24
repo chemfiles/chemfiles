@@ -73,6 +73,35 @@ TEST_CASE("Read files in XTC format") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
     }
+
+    SECTION("Read different cell shapes") {
+        auto file = Trajectory("data/xtc/cell_shapes.xtc");
+        CHECK(file.nsteps() == 3);
+
+        auto frame = file.read();
+        CHECK(frame.size() == 10);
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(approx_eq(cell.lengths(), {11.23, 22.34, 33.45}, 1e-4));
+        CHECK(approx_eq(cell.angles(), {90.0, 90.0, 90.0}, 1e-4));
+        CHECK(approx_eq(frame.positions()[9], Vector3D(9.0000, 90.0000, 900.0000), 1e-4));
+
+        frame = file.read();
+        CHECK(frame.size() == 10);
+        cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::TRICLINIC);
+        CHECK(approx_eq(cell.lengths(), {11.23, 22.34, 33.45}, 1e-4));
+        CHECK(approx_eq(cell.angles(), {33.45, 44.56, 55.67}, 1e-4));
+        CHECK(approx_eq(frame.positions()[9], Vector3D(9.0000, 90.0000, 900.0000), 1e-4));
+
+        frame = file.read();
+        CHECK(frame.size() == 10);
+        cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::INFINITE);
+        CHECK(approx_eq(cell.lengths(), {0.0, 0.0, 0.0}, 1e-4));
+        CHECK(approx_eq(cell.angles(), {90.0, 90.0, 90.0}, 1e-4));
+        CHECK(approx_eq(frame.positions()[9], Vector3D(9.0000, 90.0000, 900.0000), 1e-4));
+    }
 }
 
 TEST_CASE("Write and append files in uncompressed XTC format") {
