@@ -27,9 +27,9 @@ class XTCFormat final : public Format {
 
   private:
     struct FrameHeader {
-        int natoms; /* The total number of atoms */
-        int step;   /* Current step number       */
-        float time; /* Current time              */
+        int32_t natoms; /* The total number of atoms */
+        int32_t step;   /* Current step number       */
+        float time;     /* Current time              */
     };
 
     /// Read header of the Frame at the current position
