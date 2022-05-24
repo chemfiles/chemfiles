@@ -109,7 +109,7 @@ void TRRFormat::read(Frame& frame) {
     frame.resize(natoms);
 
     auto skip_legacy = [&header, this]() {
-        int legacy_size = header.vir_size + header.pres_size;
+        int32_t legacy_size = header.vir_size + header.pres_size;
         if (legacy_size > 0) {
             file_.skip(static_cast<uint64_t>(legacy_size));
         }
@@ -323,21 +323,21 @@ void TRRFormat::write(const Frame& frame) {
             natoms_, natoms);
     }
 
-    int box_size = static_cast<int>(sizeof(float) * 3 * 3);
+    int32_t box_size = static_cast<int32_t>(sizeof(float) * 3 * 3);
     if (frame.cell().shape() == UnitCell::INFINITE) {
         // no box data
         box_size = 0;
     }
 
-    const int dx_size = static_cast<int>(sizeof(float) * natoms * 3);
+    const int32_t dx_size = static_cast<int32_t>(sizeof(float) * natoms * 3);
 
-    int x_size = dx_size;
+    int32_t x_size = dx_size;
     if (frame.get("has_positions") && !(*frame.get("has_positions")).as_bool()) {
         // no position data
         x_size = 0;
     }
 
-    int v_size = dx_size;
+    int32_t v_size = dx_size;
     if (!frame.velocities()) {
         // no velocity data
         v_size = 0;
@@ -356,8 +356,8 @@ void TRRFormat::write(const Frame& frame) {
         v_size,   // v_size
         0,        // f_size
 
-        static_cast<int>(natoms),                          // natoms
-        static_cast<int>(frame.step()),                    // step
+        static_cast<int32_t>(natoms),                      // natoms
+        static_cast<int32_t>(frame.step()),                // step
         0,                                                 // nre
         frame.get("time").value_or(0.0).as_double(),       // time
         frame.get("trr_lambda").value_or(0.0).as_double(), // lambda
