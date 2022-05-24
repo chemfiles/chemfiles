@@ -9,13 +9,9 @@
 using namespace chemfiles;
 
 static void write_xdr_file(XDRFile& file) {
-    file.write_int(-123);
-    file.write_uint(123);
-    file.write_float(-4.567f);
-    const std::vector<float> arr = {1.234, -5.123, 100.232};
-    file.write_float_array(arr);
     file.write_gmx_string("Hello!"); // needs 2B padding
-    file.write_gmx_compressed_floats(arr, 1000.0);
+    const std::vector<float> farr = {1.234, -5.123, 100.232};
+    file.write_gmx_compressed_floats(farr, 1000.0);
 }
 
 TEST_CASE("XDR files") {
@@ -23,24 +19,26 @@ TEST_CASE("XDR files") {
         XDRFile file("data/misc/xdr.bin", File::READ);
         CHECK(file.file_size() == 112);
 
-        CHECK(file.read_int() == -123);
-        CHECK(file.read_uint() == 123);
-        CHECK(file.read_double() == 5.678);
-        CHECK(file.read_float() == -4.567f);
+        // read some big-endian data types
+        CHECK(file.read_single_i32() == -123);
+        CHECK(file.read_single_u32() == 123);
+        CHECK(file.read_single_f64() == 5.678);
+        CHECK(file.read_single_f32() == -4.567f);
 
         std::vector<double> darr;
         darr.resize(3);
-        file.read_double_array(darr);
+        file.read_f64_array(darr);
         const std::vector<double> dexpected = {1.234, -6.234, 105.232};
         CHECK(darr == dexpected);
 
         std::vector<float> farr;
         farr.resize(3);
-        file.read_float_array(farr);
+        file.read_f32_array(farr);
         const std::vector<float> fexpected = {1.234, -5.123, 100.232};
         CHECK(farr == fexpected);
         farr = {0.0, 0.0, 0.0};
 
+        // read XDR and GROMACS specific data types
         CHECK(file.read_gmx_string() == "Hello!");
         CHECK(file.read_gmx_compressed_floats(farr) == 1000.0);
         for (size_t i = 0; i < 3; ++i) {
@@ -50,10 +48,6 @@ TEST_CASE("XDR files") {
 
     // clang-format off
     auto expected = std::vector<uint8_t> {
-        0xff, 0xff, 0xff, 0x85,
-        0x00, 0x00, 0x00, 0x7b,
-        0xc0, 0x92, 0x24, 0xdd,
-        0x3f, 0x9d, 0xf3, 0xb6, 0xc0, 0xa3, 0xef, 0x9e, 0x42, 0xc8, 0x76, 0xc9,
         0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x06,
         'H', 'e', 'l', 'l', 'o', '!', 0x00, 0x00,
         0x44, 0x7a, 0x00, 0x00, 0x00, 0x00, 0x04, 0xd2, 0xff, 0xff, 0xeb, 0xfd,

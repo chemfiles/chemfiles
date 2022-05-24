@@ -17,7 +17,7 @@ using namespace chemfiles;
 XDRFile::XDRFile(std::string path, File::Mode mode) : BigEndianFile(std::move(path), mode) {}
 
 void XDRFile::read_opaque(std::vector<char>& data) {
-    const uint32_t count = read_uint();
+    const uint32_t count = read_single_u32();
     const uint32_t num_filler = (4 - (count % 4)) % 4;
     data.resize(static_cast<size_t>(count + num_filler));
     read_char(data.data(), count + num_filler);
@@ -25,7 +25,7 @@ void XDRFile::read_opaque(std::vector<char>& data) {
 }
 
 void XDRFile::write_opaque(const char* data, uint32_t count) {
-    write_uint(count);
+    write_single_u32(count);
     write_char(data, count);
     const uint32_t num_filler = (4 - (count % 4)) % 4;
     const std::vector<char> filler(num_filler, 0);
@@ -34,7 +34,7 @@ void XDRFile::write_opaque(const char* data, uint32_t count) {
 
 std::string XDRFile::read_gmx_string() {
     // lenght with null terminator
-    const uint32_t len = read_uint();
+    const uint32_t len = read_single_u32();
     // next comes XDR string without terminator
     std::vector<char> buf;
     read_opaque(buf);
@@ -45,7 +45,7 @@ std::string XDRFile::read_gmx_string() {
 void XDRFile::write_gmx_string(const std::string& value) {
     // lenght with null terminator
     const uint32_t len = static_cast<uint32_t>(value.size() + 1);
-    write_uint(len);
+    write_single_u32(len);
     // next comes XDR string without terminator
     write_opaque(value.c_str(), len - 1);
 }
@@ -319,18 +319,18 @@ static const int MAGICINTS[] = {
 /***** from xdrfile (end) *****/
 
 float XDRFile::read_gmx_compressed_floats(std::vector<float>& data) {
-    const float precision = read_float();
+    const float precision = read_single_f32();
     const int minint[3] = {
-        read_int(),
-        read_int(),
-        read_int(),
+        read_single_i32(),
+        read_single_i32(),
+        read_single_i32(),
     };
     const int maxint[3] = {
-        read_int(),
-        read_int(),
-        read_int(),
+        read_single_i32(),
+        read_single_i32(),
+        read_single_i32(),
     };
-    uint32_t smallidx = read_uint();
+    uint32_t smallidx = read_single_u32();
     if (!(smallidx < LASTIDX)) {
         throw file_error("internal overflow compressing XTC coordinates");
     }
@@ -454,7 +454,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
         warning("XTC compression", "invalid precision {} <= 0, use 1000 as fallback", precision);
         precision = 1000;
     }
-    write_float(precision);
+    write_single_f32(precision);
 
     const size_t size3 = data.size();
     intbuf_.resize(size3);
@@ -503,10 +503,10 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
         oldlint[2] = lint[2];
     }
     for (size_t i = 0; i < 3; ++i) {
-        write_int(minint[i]);
+        write_single_i32(minint[i]);
     }
     for (size_t i = 0; i < 3; ++i) {
-        write_int(maxint[i]);
+        write_single_i32(maxint[i]);
     }
 
     if (maxint[0] - minint[0] >= INT_MAX - 2 || maxint[1] - minint[1] >= INT_MAX - 2 ||
@@ -519,7 +519,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
     while (smallidx < (LASTIDX - 1) && MAGICINTS[smallidx] < mindiff) {
         smallidx++;
     }
-    write_uint(smallidx);
+    write_single_u32(smallidx);
 
     uint32_t sizeint[3], bitsizeint[3];
     const uint32_t bitsize = calc_sizeint(minint, maxint, sizeint, bitsizeint);
