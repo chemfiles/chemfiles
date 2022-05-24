@@ -19,32 +19,6 @@ class XDRFile final : public BigEndianFile {
     XDRFile(std::string path, File::Mode mode);
     ~XDRFile() = default;
 
-    /// Read an XDR signed integer
-    int32_t read_int() { return read_single_i32(); }
-    /// Write an XDR signed integer
-    void write_int(int32_t value) { write_single_i32(value); }
-
-    /// Read an XDR unsigned integer
-    uint32_t read_uint() { return read_single_u32(); }
-    /// Write an XDR unsigned integer
-    void write_uint(uint32_t value) { write_single_u32(value); }
-
-    /// Read an XDR double
-    double read_double() { return read_single_f64(); }
-
-    /// Read an XDR float
-    float read_float() { return read_single_f32(); }
-    /// Write an XDR float
-    void write_float(float value) { write_single_f32(value); }
-
-    /// Read XDR doubles into an allocated vector
-    void read_double_array(std::vector<double>& data) { read_f64(data.data(), data.size()); }
-
-    /// Read XDR floats into an allocated vector
-    void read_float_array(std::vector<float>& data) { read_f32(data.data(), data.size()); }
-    /// Write XDR floats
-    void write_float_array(const std::vector<float> data) { write_f32(data.data(), data.size()); }
-
     /// Read a non-compliant GROMACS string
     /// A GROMACS string stores the length of the string including the NULL
     /// terminator as int32 before the XDR compliant string data without the

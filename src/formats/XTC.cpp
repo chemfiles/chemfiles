@@ -110,7 +110,7 @@ void XTCFormat::read(Frame& frame) {
     frame.resize(natoms);
 
     std::vector<float> box(3 * 3);
-    file_.read_float_array(box);
+    file_.read_f32_array(box);
     auto matrix = Matrix3D(
         static_cast<double>(box[0]), static_cast<double>(box[3]), static_cast<double>(box[6]),
         static_cast<double>(box[1]), static_cast<double>(box[4]), static_cast<double>(box[7]),
@@ -118,7 +118,7 @@ void XTCFormat::read(Frame& frame) {
     // Factor 10 because the lengths are in nm in the XTC format
     frame.set_cell(UnitCell(10.0 * matrix));
 
-    size_t natoms_again = static_cast<size_t>(file_.read_int());
+    size_t natoms_again = static_cast<size_t>(file_.read_single_i32());
     if (natoms_again != natoms) {
         throw format_error("contradictory number of atoms in XTC file at '{}': expected {}, got {}",
                            file_.path(), natoms, natoms_again);
@@ -126,7 +126,7 @@ void XTCFormat::read(Frame& frame) {
 
     std::vector<float> x(natoms * 3);
     if (header.natoms <= 9) {
-        file_.read_float_array(x);
+        file_.read_f32_array(x);
     } else {
         float precision = file_.read_gmx_compressed_floats(x);
         frame.set("xtc_precision", static_cast<double>(precision));
@@ -145,7 +145,7 @@ void XTCFormat::read(Frame& frame) {
 
 XTCFormat::FrameHeader XTCFormat::read_frame_header() {
     try {
-        const int32_t magic = file_.read_int();
+        const int32_t magic = file_.read_single_i32();
         if (magic != XTC_MAGIC) {
             throw format_error("invalid XTC file at '{}': "
                                "expected XTC_MAGIC '{}', got '{}'",
@@ -153,9 +153,9 @@ XTCFormat::FrameHeader XTCFormat::read_frame_header() {
         }
 
         FrameHeader header = {
-            file_.read_int(),   // natoms
-            file_.read_int(),   // step
-            file_.read_float(), // time
+            file_.read_single_i32(),   // natoms
+            file_.read_single_i32(),   // step
+            file_.read_single_f32(), // time
         };
 
         return header;
@@ -196,7 +196,7 @@ void XTCFormat::determine_frame_offsets() {
     } else {
         file_.seek(XTC_HEADER_SIZE);
 
-        uint64_t framebytes = static_cast<uint64_t>(round_to_int_boundary(file_.read_int()));
+        uint64_t framebytes = static_cast<uint64_t>(round_to_int_boundary(file_.read_single_i32()));
 
         const size_t est_nframes = static_cast<size_t>(filesize / (framebytes + XTC_HEADER_SIZE));
         frame_offsets_.reserve(est_nframes);
@@ -206,7 +206,7 @@ void XTCFormat::determine_frame_offsets() {
 
             const uint64_t frame_pos = file_.tell() - XTC_HEADER_SIZE;
             try {
-                framebytes = static_cast<uint64_t>(round_to_int_boundary(file_.read_int()));
+                framebytes = static_cast<uint64_t>(round_to_int_boundary(file_.read_single_i32()));
             } catch (const Error&) {
                 break;
             }
@@ -236,14 +236,14 @@ void XTCFormat::write(const Frame& frame) {
 
     std::vector<float> box(3 * 3);
     get_cell(box, frame);
-    file_.write_float_array(box);
+    file_.write_f32_array(box);
 
-    file_.write_int(header.natoms); // natoms (again)
+    file_.write_single_i32(header.natoms); // natoms (again)
 
     std::vector<float> x(natoms * 3);
     get_positions(x, frame);
     if (natoms <= 9) {
-        file_.write_float_array(x);
+        file_.write_f32_array(x);
     } else {
         const float precision =
             static_cast<float>(frame.get("xtc_precision").value_or(1000.0).as_double());
@@ -254,11 +254,11 @@ void XTCFormat::write(const Frame& frame) {
 }
 
 void XTCFormat::write_frame_header(const FrameHeader& header) {
-    file_.write_int(XTC_MAGIC);
+    file_.write_single_i32(XTC_MAGIC);
 
-    file_.write_int(header.natoms);
-    file_.write_int(header.step);
-    file_.write_float(static_cast<float>(header.time));
+    file_.write_single_i32(header.natoms);
+    file_.write_single_i32(header.step);
+    file_.write_single_f32(static_cast<float>(header.time));
 }
 
 void get_cell(std::vector<float>& box, const Frame& frame) {

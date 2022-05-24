@@ -119,7 +119,7 @@ void TRRFormat::read(Frame& frame) {
         // Double
         if (has_box) {
             std::vector<double> box(3 * 3);
-            file_.read_double_array(box);
+            file_.read_f64_array(box);
             auto matrix =
                 Matrix3D(box[0], box[3], box[6], box[1], box[4], box[7], box[2], box[5], box[8]);
             // Factor 10 because the lengths are in nm in the TRR format
@@ -130,7 +130,7 @@ void TRRFormat::read(Frame& frame) {
 
         std::vector<double> dx(natoms * 3);
         if (has_positions) {
-            file_.read_double_array(dx);
+            file_.read_f64_array(dx);
             auto positions = frame.positions();
             assert(dx.size() == 3 * positions.size());
             for (size_t i = 0; i < frame.size(); i++) {
@@ -141,7 +141,7 @@ void TRRFormat::read(Frame& frame) {
             }
         }
         if (has_velocities) {
-            file_.read_double_array(dx);
+            file_.read_f64_array(dx);
             frame.add_velocities();
             auto velocities = *frame.velocities();
             assert(dx.size() == 3 * velocities.size());
@@ -156,7 +156,7 @@ void TRRFormat::read(Frame& frame) {
         // Float
         if (has_box) {
             std::vector<float> box(3 * 3);
-            file_.read_float_array(box);
+            file_.read_f32_array(box);
             auto matrix = Matrix3D(static_cast<double>(box[0]), static_cast<double>(box[3]),
                                    static_cast<double>(box[6]), static_cast<double>(box[1]),
                                    static_cast<double>(box[4]), static_cast<double>(box[7]),
@@ -170,7 +170,7 @@ void TRRFormat::read(Frame& frame) {
 
         std::vector<float> dx(natoms * 3);
         if (has_positions) {
-            file_.read_float_array(dx);
+            file_.read_f32_array(dx);
             auto positions = frame.positions();
             assert(dx.size() == 3 * positions.size());
             for (size_t i = 0; i < frame.size(); i++) {
@@ -181,7 +181,7 @@ void TRRFormat::read(Frame& frame) {
             }
         }
         if (has_velocities) {
-            file_.read_float_array(dx);
+            file_.read_f32_array(dx);
             frame.add_velocities();
             auto velocities = *frame.velocities();
             assert(dx.size() == 3 * velocities.size());
@@ -203,7 +203,7 @@ void TRRFormat::read(Frame& frame) {
 
 TRRFormat::FrameHeader TRRFormat::read_frame_header() {
     try {
-        const int32_t magic = file_.read_int();
+        const int32_t magic = file_.read_single_i32();
         if (magic != TRR_MAGIC) {
             throw format_error("invalid TRR file at '{}': "
                                "expected TRR_MAGIC '{}', got '{}'",
@@ -218,23 +218,23 @@ TRRFormat::FrameHeader TRRFormat::read_frame_header() {
         }
 
         FrameHeader header = {
-            false,            // use_double
-            file_.read_int(), // ir_size
-            file_.read_int(), // e_size
-            file_.read_int(), // box_size
-            file_.read_int(), // vir_size
-            file_.read_int(), // pres_size
-            file_.read_int(), // top_size
-            file_.read_int(), // sym_size
-            file_.read_int(), // x_size
-            file_.read_int(), // v_size
-            file_.read_int(), // f_size
+            false,                   // use_double
+            file_.read_single_i32(), // ir_size
+            file_.read_single_i32(), // e_size
+            file_.read_single_i32(), // box_size
+            file_.read_single_i32(), // vir_size
+            file_.read_single_i32(), // pres_size
+            file_.read_single_i32(), // top_size
+            file_.read_single_i32(), // sym_size
+            file_.read_single_i32(), // x_size
+            file_.read_single_i32(), // v_size
+            file_.read_single_i32(), // f_size
 
-            file_.read_int(), // natoms
-            file_.read_int(), // step
-            file_.read_int(), // nre
-            0.0,              // time
-            0.0,              // lambda
+            file_.read_single_i32(), // natoms
+            file_.read_single_i32(), // step
+            file_.read_single_i32(), // nre
+            0.0,                     // time
+            0.0,                     // lambda
         };
 
         // determine real representation (float or double)
@@ -262,11 +262,11 @@ TRRFormat::FrameHeader TRRFormat::read_frame_header() {
         header.use_double = (nflsize == sizeof(double));
 
         if (header.use_double) {
-            header.time = file_.read_double();
-            header.lambda = file_.read_double();
+            header.time = file_.read_single_f64();
+            header.lambda = file_.read_single_f64();
         } else {
-            header.time = static_cast<double>(file_.read_float());
-            header.lambda = static_cast<double>(file_.read_float());
+            header.time = static_cast<double>(file_.read_single_f32());
+            header.lambda = static_cast<double>(file_.read_single_f32());
         }
 
         return header;
@@ -367,18 +367,18 @@ void TRRFormat::write(const Frame& frame) {
     std::vector<float> box(3 * 3);
     if (box_size > 0) {
         get_cell(box, frame);
-        file_.write_float_array(box);
+        file_.write_f32_array(box);
     }
 
     if (x_size > 0 || v_size > 0) {
         std::vector<float> dx(natoms * 3);
         if (x_size > 0) {
             get_positions(dx, frame);
-            file_.write_float_array(dx);
+            file_.write_f32_array(dx);
         }
         if (v_size > 0) {
             get_velocities(dx, frame);
-            file_.write_float_array(dx);
+            file_.write_f32_array(dx);
         }
     }
 
@@ -386,27 +386,27 @@ void TRRFormat::write(const Frame& frame) {
 }
 
 void TRRFormat::write_frame_header(const FrameHeader& header) {
-    file_.write_int(TRR_MAGIC);
+    file_.write_single_i32(TRR_MAGIC);
 
     file_.write_gmx_string(TRR_VERSION);
 
     // use_double is not written and has to be inferred when reading
-    file_.write_int(header.ir_size);
-    file_.write_int(header.e_size);
-    file_.write_int(header.box_size);
-    file_.write_int(header.vir_size);
-    file_.write_int(header.pres_size);
-    file_.write_int(header.top_size);
-    file_.write_int(header.sym_size);
-    file_.write_int(header.x_size);
-    file_.write_int(header.v_size);
-    file_.write_int(header.f_size);
+    file_.write_single_i32(header.ir_size);
+    file_.write_single_i32(header.e_size);
+    file_.write_single_i32(header.box_size);
+    file_.write_single_i32(header.vir_size);
+    file_.write_single_i32(header.pres_size);
+    file_.write_single_i32(header.top_size);
+    file_.write_single_i32(header.sym_size);
+    file_.write_single_i32(header.x_size);
+    file_.write_single_i32(header.v_size);
+    file_.write_single_i32(header.f_size);
 
-    file_.write_int(header.natoms);
-    file_.write_int(header.step);
-    file_.write_int(header.nre);
-    file_.write_float(static_cast<float>(header.time));
-    file_.write_float(static_cast<float>(header.lambda));
+    file_.write_single_i32(header.natoms);
+    file_.write_single_i32(header.step);
+    file_.write_single_i32(header.nre);
+    file_.write_single_f32(static_cast<float>(header.time));
+    file_.write_single_f32(static_cast<float>(header.lambda));
 }
 
 void get_cell(std::vector<float>& box, const Frame& frame) {

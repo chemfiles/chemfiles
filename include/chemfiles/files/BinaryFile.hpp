@@ -161,6 +161,8 @@ public:
         this->read_f32(&value, 1);
         return value;
     }
+    /// Read exactly as many 32-bit floating point numbers as fit in the pre-allocated vector
+    void read_f32_array(std::vector<float>& data) { this->read_f32(data.data(), data.size()); }
 
     /// Read exactly `count` 64-bit floating point numbers, and store them in
     /// the `data` array
@@ -171,6 +173,8 @@ public:
         this->read_f64(&value, 1);
         return value;
     }
+    /// Read exactly as many 64-bit floating point numbers as fit in the pre-allocated vector
+    void read_f64_array(std::vector<double>& data) { this->read_f64(data.data(), data.size()); }
 
 
 
@@ -257,6 +261,10 @@ public:
     void write_single_f32(float value) {
         this->write_f32(&value, 1);
     }
+    /// Write all 32-bit floating point numbers from the pre-allocated vector
+    void write_f32_array(const std::vector<float> data) {
+        this->write_f32(data.data(), data.size());
+    }
 
     /// Write exactly `count` 64-bit floating point numbers taken from the
     /// `data` array to the file
@@ -264,6 +272,10 @@ public:
     /// Write a single 64-bit floating point number to the file
     void write_single_f64(double value) {
         this->write_f64(&value, 1);
+    }
+    /// Write all 64-bit floating point numbers from the pre-allocated vector
+    void write_f64_array(const std::vector<double> data) {
+        this->write_f64(data.data(), data.size());
     }
 protected:
     std::vector<char> swap_buf_;
