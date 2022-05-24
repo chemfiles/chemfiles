@@ -164,7 +164,7 @@ XTCFormat::FrameHeader XTCFormat::read_frame_header() {
     }
 }
 
-static int round_to_int_boundary(int x) {
+static int32_t round_to_int_boundary(int32_t x) {
     // Rounding to the next 32-bit boundary
     return (x + 3) & ~0x03;
 }
@@ -228,8 +228,8 @@ void XTCFormat::write(const Frame& frame) {
     }
 
     FrameHeader header = {
-        static_cast<int>(natoms),                                        // natoms
-        static_cast<int>(frame.step()),                                  // step
+        static_cast<int32_t>(natoms),                                    // natoms
+        static_cast<int32_t>(frame.step()),                              // step
         static_cast<float>(frame.get("time").value_or(0.0).as_double()), // time
     };
     write_frame_header(header);
