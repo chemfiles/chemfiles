@@ -28,20 +28,20 @@ class TRRFormat final : public Format {
   private:
     struct FrameHeader {
         bool use_double; /* Double precision?                                       */
-        int ir_size;     /* Backward compatibility                                  */
-        int e_size;      /* Backward compatibility                                  */
-        int box_size;    /* Size in Bytes, non zero if a box is present             */
-        int vir_size;    /* Backward compatibility                                  */
-        int pres_size;   /* Backward compatibility                                  */
-        int top_size;    /* Backward compatibility                                  */
-        int sym_size;    /* Backward compatibility                                  */
-        int x_size;      /* Size in Bytes, non zero if coordinates are present      */
-        int v_size;      /* Size in Bytes, non zero if velocities are present       */
-        int f_size;      /* Size in Bytes, non zero if forces are present           */
+        int32_t ir_size;     /* Backward compatibility                              */
+        int32_t e_size;      /* Backward compatibility                              */
+        int32_t box_size;    /* Size in Bytes, non zero if a box is present         */
+        int32_t vir_size;    /* Backward compatibility                              */
+        int32_t pres_size;   /* Backward compatibility                              */
+        int32_t top_size;    /* Backward compatibility                              */
+        int32_t sym_size;    /* Backward compatibility                              */
+        int32_t x_size;      /* Size in Bytes, non zero if coordinates are present  */
+        int32_t v_size;      /* Size in Bytes, non zero if velocities are present   */
+        int32_t f_size;      /* Size in Bytes, non zero if forces are present       */
 
-        int natoms;    /* The total number of atoms                               */
-        int step;      /* Current step number                                     */
-        int nre;       /* Backward compatibility                                  */
+        int32_t natoms;    /* The total number of atoms                           */
+        int32_t step;      /* Current step number                                 */
+        int32_t nre;       /* Backward compatibility                              */
         double time;   /* Current time (float or double)                          */
         double lambda; /* Current value of lambda (float or double)               */
     };
