@@ -24,8 +24,10 @@ template<> struct nc_type_info<char> {
     static constexpr int32_t nc_type = constants::NC_CHAR;
     static constexpr const char* name = "char";
 
-    static constexpr void(Netcdf3File::*reader)(char*, size_t) = &Netcdf3File::read_char;
-    static constexpr void(Netcdf3File::*writer)(const char*, size_t) = &Netcdf3File::write_char;
+    static constexpr void(Netcdf3File::*reader)(char*, size_t)
+        = static_cast<void (Netcdf3File::*)(char*, size_t)>(&Netcdf3File::read_char);
+    static constexpr void(Netcdf3File::*writer)(const char*, size_t)
+        = static_cast<void (Netcdf3File::*)(const char*, size_t)>(&Netcdf3File::write_char);
 };
 constexpr const char* nc_type_info<char>::name;
 constexpr void(Netcdf3File::*nc_type_info<char>::reader)(char*, size_t);
@@ -35,8 +37,10 @@ template<> struct nc_type_info<int8_t> {
     static constexpr int32_t nc_type = constants::NC_BYTE;
     static constexpr const char* name = "byte/i8";
 
-    static constexpr void(Netcdf3File::*reader)(int8_t*, size_t) = &Netcdf3File::read_i8;
-    static constexpr void(Netcdf3File::*writer)(const int8_t*, size_t) = &Netcdf3File::write_i8;
+    static constexpr void(Netcdf3File::*reader)(int8_t*, size_t)
+        = static_cast<void (Netcdf3File::*)(int8_t*, size_t)>(&Netcdf3File::read_i8);
+    static constexpr void(Netcdf3File::*writer)(const int8_t*, size_t)
+        = static_cast<void (Netcdf3File::*)(const int8_t*, size_t)>(&Netcdf3File::write_i8);
 };
 constexpr const char* nc_type_info<int8_t>::name;
 constexpr void(Netcdf3File::*nc_type_info<int8_t>::reader)(int8_t*, size_t);
