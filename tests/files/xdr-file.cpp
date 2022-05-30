@@ -27,13 +27,13 @@ TEST_CASE("XDR files") {
 
         std::vector<double> darr;
         darr.resize(3);
-        file.read_f64_array(darr);
+        file.read_f64(darr);
         const std::vector<double> dexpected = {1.234, -6.234, 105.232};
         CHECK(darr == dexpected);
 
         std::vector<float> farr;
         farr.resize(3);
-        file.read_f32_array(farr);
+        file.read_f32(farr);
         const std::vector<float> fexpected = {1.234, -5.123, 100.232};
         CHECK(farr == fexpected);
         farr = {0.0, 0.0, 0.0};
