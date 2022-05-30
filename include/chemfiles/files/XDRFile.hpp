@@ -19,6 +19,10 @@ class XDRFile final : public BigEndianFile {
     XDRFile(std::string path, File::Mode mode);
     ~XDRFile() = default;
 
+    using BinaryFile::read_f32;
+    using BinaryFile::read_f64;
+    using BinaryFile::write_f32;
+
     /// Read a non-compliant GROMACS string
     /// A GROMACS string stores the length of the string including the NULL
     /// terminator as int32 before the XDR compliant string data without the

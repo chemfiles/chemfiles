@@ -110,7 +110,7 @@ void XTCFormat::read(Frame& frame) {
     frame.resize(natoms);
 
     std::vector<float> box(3 * 3);
-    file_.read_f32_array(box);
+    file_.read_f32(box);
     auto matrix = Matrix3D(
         static_cast<double>(box[0]), static_cast<double>(box[3]), static_cast<double>(box[6]),
         static_cast<double>(box[1]), static_cast<double>(box[4]), static_cast<double>(box[7]),
@@ -126,7 +126,7 @@ void XTCFormat::read(Frame& frame) {
 
     std::vector<float> x(natoms * 3);
     if (header.natoms <= 9) {
-        file_.read_f32_array(x);
+        file_.read_f32(x);
     } else {
         float precision = file_.read_gmx_compressed_floats(x);
         frame.set("xtc_precision", static_cast<double>(precision));
@@ -236,14 +236,14 @@ void XTCFormat::write(const Frame& frame) {
 
     std::vector<float> box(3 * 3);
     get_cell(box, frame);
-    file_.write_f32_array(box);
+    file_.write_f32(box);
 
     file_.write_single_i32(header.natoms); // natoms (again)
 
     std::vector<float> x(natoms * 3);
     get_positions(x, frame);
     if (natoms <= 9) {
-        file_.write_f32_array(x);
+        file_.write_f32(x);
     } else {
         const float precision =
             static_cast<float>(frame.get("xtc_precision").value_or(1000.0).as_double());

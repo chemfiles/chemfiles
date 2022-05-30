@@ -119,7 +119,7 @@ void TRRFormat::read(Frame& frame) {
         // Double
         if (has_box) {
             std::vector<double> box(3 * 3);
-            file_.read_f64_array(box);
+            file_.read_f64(box);
             auto matrix =
                 Matrix3D(box[0], box[3], box[6], box[1], box[4], box[7], box[2], box[5], box[8]);
             // Factor 10 because the lengths are in nm in the TRR format
@@ -130,7 +130,7 @@ void TRRFormat::read(Frame& frame) {
 
         std::vector<double> dx(natoms * 3);
         if (has_positions) {
-            file_.read_f64_array(dx);
+            file_.read_f64(dx);
             auto positions = frame.positions();
             assert(dx.size() == 3 * positions.size());
             for (size_t i = 0; i < frame.size(); i++) {
@@ -141,7 +141,7 @@ void TRRFormat::read(Frame& frame) {
             }
         }
         if (has_velocities) {
-            file_.read_f64_array(dx);
+            file_.read_f64(dx);
             frame.add_velocities();
             auto velocities = *frame.velocities();
             assert(dx.size() == 3 * velocities.size());
@@ -156,7 +156,7 @@ void TRRFormat::read(Frame& frame) {
         // Float
         if (has_box) {
             std::vector<float> box(3 * 3);
-            file_.read_f32_array(box);
+            file_.read_f32(box);
             auto matrix = Matrix3D(static_cast<double>(box[0]), static_cast<double>(box[3]),
                                    static_cast<double>(box[6]), static_cast<double>(box[1]),
                                    static_cast<double>(box[4]), static_cast<double>(box[7]),
@@ -170,7 +170,7 @@ void TRRFormat::read(Frame& frame) {
 
         std::vector<float> dx(natoms * 3);
         if (has_positions) {
-            file_.read_f32_array(dx);
+            file_.read_f32(dx);
             auto positions = frame.positions();
             assert(dx.size() == 3 * positions.size());
             for (size_t i = 0; i < frame.size(); i++) {
@@ -181,7 +181,7 @@ void TRRFormat::read(Frame& frame) {
             }
         }
         if (has_velocities) {
-            file_.read_f32_array(dx);
+            file_.read_f32(dx);
             frame.add_velocities();
             auto velocities = *frame.velocities();
             assert(dx.size() == 3 * velocities.size());
@@ -367,18 +367,18 @@ void TRRFormat::write(const Frame& frame) {
     std::vector<float> box(3 * 3);
     if (box_size > 0) {
         get_cell(box, frame);
-        file_.write_f32_array(box);
+        file_.write_f32(box);
     }
 
     if (x_size > 0 || v_size > 0) {
         std::vector<float> dx(natoms * 3);
         if (x_size > 0) {
             get_positions(dx, frame);
-            file_.write_f32_array(dx);
+            file_.write_f32(dx);
         }
         if (v_size > 0) {
             get_velocities(dx, frame);
-            file_.write_f32_array(dx);
+            file_.write_f32(dx);
         }
     }
 
