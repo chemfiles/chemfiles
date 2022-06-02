@@ -1,6 +1,7 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
-#include <catch.hpp>
+#include "catch.hpp"
+#include "helpers.hpp"
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
@@ -293,7 +294,7 @@ TEST_CASE("Atoms selections") {
         frame.add_atom(Atom("Cl"), {0, 0, 0});
         frame.add_atom(Atom("F"), {2, -2, 2});
 
-        Trajectory("tmp.pdb", 'w').write(frame);
+        Trajectory(NamedTempPath(".pdb"), 'w').write(frame);
 
         selection = Selection("four: dihedral(#1, #2, #3, #4) > deg2rad(120) and name(#1) H1 and name(#2) Cl");
         expected = std::vector<Match>{
