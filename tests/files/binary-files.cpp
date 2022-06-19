@@ -176,7 +176,7 @@ static void write_binary_file(BinaryFile& file) {
     const std::vector<uint64_t> vec_u64 = {11U, 18446744073709551610U, 27U};
     file.write_u64(vec_u64);
 
-    const std::vector<float> vec_f32 = {1.234, -5.123, 100.232};
+    const std::vector<float> vec_f32 = {1.234f, -5.123f, 100.232f};
     file.write_f32(vec_f32);
     const std::vector<double> vec_f64 = {1.234, -5.123, 100.232};
     file.write_f64(vec_f64);

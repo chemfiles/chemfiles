@@ -72,6 +72,10 @@ bool approx_eq(double a, double b, double tolerance) {
     return fabs(a - b) < tolerance;
 }
 
+bool approx_eq(float a, float b, float tolerance) {
+    return fabs(a - b) < tolerance;
+}
+
 bool is_valgrind_and_ci() {
     auto CI = std::getenv("CI");
     auto valgrind = std::getenv("CHFL_TESTS_USE_VALGRIND");
