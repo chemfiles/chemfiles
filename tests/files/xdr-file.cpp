@@ -10,8 +10,8 @@ using namespace chemfiles;
 
 static void write_xdr_file(XDRFile& file) {
     file.write_gmx_string("Hello!"); // needs 2B padding
-    const std::vector<float> farr = {1.234, -5.123, 100.232};
-    file.write_gmx_compressed_floats(farr, 1000.0);
+    const std::vector<float> arrary = {1.234f, -5.123f, 100.232f};
+    file.write_gmx_compressed_floats(arrary, 1000.0);
 }
 
 TEST_CASE("XDR files") {
@@ -31,18 +31,18 @@ TEST_CASE("XDR files") {
         const std::vector<double> dexpected = {1.234, -6.234, 105.232};
         CHECK(darr == dexpected);
 
-        std::vector<float> farr;
-        farr.resize(3);
-        file.read_f32(farr);
-        const std::vector<float> fexpected = {1.234, -5.123, 100.232};
-        CHECK(farr == fexpected);
-        farr = {0.0, 0.0, 0.0};
+        auto array = std::vector<float>();
+        array.resize(3);
+        file.read_f32(array);
+        const std::vector<float> expected = {1.234f, -5.123f, 100.232f};
+        CHECK(array == expected);
+        array = {0.0, 0.0, 0.0};
 
         // read XDR and GROMACS specific data types
         CHECK(file.read_gmx_string() == "Hello!");
-        CHECK(file.read_gmx_compressed_floats(farr) == 1000.0);
+        CHECK(file.read_gmx_compressed_floats(array) == 1000.0f);
         for (size_t i = 0; i < 3; ++i) {
-            CHECK(approx_eq(farr[i], fexpected[i], 1e-4));
+            CHECK(approx_eq(array[i], expected[i], 1e-4f));
         }
     }
 
