@@ -19,6 +19,7 @@ ALLOWED = [
     "found deprecated configuration file at '{}', please rename it to .chemfiles.toml",
     "could not find _atom_site.type_symbol in '{}'",
     "could not find _atom_site.Cartn_x in '{}'",
+    "unable to guess unit cell convention. The cell is stored as [{} {} {} {} {} {}]",
 ]
 
 

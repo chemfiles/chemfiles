@@ -49,7 +49,6 @@ using namespace chemfiles;
     }
 
 namespace chemfiles {
-    PLUGINS_DATA(DCD,     dcdplugin,     dcd,    false);
     PLUGINS_DATA(TRJ,     gromacsplugin, trj,    false);
     PLUGINS_DATA(PSF,     psfplugin,     psf,    false);
     PLUGINS_DATA(MOLDEN,  moldenplugin,  molden, false);
@@ -378,30 +377,9 @@ template <MolfileFormat F> void Molfile<F>::read_topology() {
 }
 
 // Instantiate all the templates
-template class chemfiles::Molfile<DCD>;
 template class chemfiles::Molfile<TRJ>;
 template class chemfiles::Molfile<PSF>;
 template class chemfiles::Molfile<MOLDEN>;
-
-template<> const FormatMetadata& chemfiles::format_metadata<Molfile<DCD>>() {
-    static FormatMetadata metadata;
-    metadata.name = "DCD";
-    metadata.extension = ".dcd";
-    metadata.description = "DCD binary format";
-    metadata.reference = "http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/dcdplugin.html";
-
-    metadata.read = true;
-    metadata.write = false;
-    metadata.memory = false;
-
-    metadata.positions = true;
-    metadata.velocities = false;
-    metadata.unit_cell = true;
-    metadata.atoms = false;
-    metadata.bonds = false;
-    metadata.residues = false;
-    return metadata;
-}
 
 template<> const FormatMetadata& chemfiles::format_metadata<Molfile<TRJ>>() {
     static FormatMetadata metadata;
