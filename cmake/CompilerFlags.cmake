@@ -218,6 +218,7 @@ else()
     # This warning trigger when compiling for 64-bit,
     # but the code is relevant for 32-bit
     add_warning_flag("-Wno-tautological-type-limit-compare")
+    add_warning_flag("-Wno-useless-cast")
     # Not everyone is as smart as clang for code reachability
     add_warning_flag("-Wno-covered-switch-default")
     add_warning_flag("-Wno-unreachable-code-break")
