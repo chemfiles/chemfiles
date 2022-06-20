@@ -45,7 +45,9 @@ class FormatMetadata;
 ///   full unit cell vectors (this is only used by CHARMM, starting with version
 ///   22).
 ///
-/// https://web.archive.org/web/20070406065433/http://www.bio.unizh.ch/docu/acc_docs/doc/charmm_principles/Ch04_mol_dyn.FM5.html
+/// When writing, this format uses a native endianess file, always outputs the
+/// unit cell (infinite unit cells being represented with 0), and uses a 3D
+/// format without any fixed atoms.
 class DCDFormat: public Format {
 public:
     DCDFormat(std::string path, File::Mode mode, File::Compression compression);
@@ -66,11 +68,18 @@ private:
     // current position
     void expect_marker(size_t size);
 
+    void write_marker(size_t size);
+
     /************ high level function specialized for DCD format **************/
+    /// read & parse the file header
+    void read_header();
     UnitCell read_cell();
     void read_positions(Frame& frame);
     void read_fixed_coordinates();
 
+    void write_header();
+    void write_cell(const UnitCell& cell);
+    void write_positions(const Frame& frame);
 
     std::unique_ptr<BinaryFile> file_;
     /// which variant of the DCD format are we trying to read?
@@ -80,7 +89,7 @@ private:
         /// Does the file use the CHARMM or X-PLOR variant of the DCD format
         bool charmm_format = false;
         /// The CHARMM version this file says it uses
-        uint8_t charmm_version = false;
+        uint8_t charmm_version = 0;
         /// Does the file contains unit cell information?
         bool charmm_unitcell = false;
         /// CHARMM supports adding an extra dimension to MD simulation, which is
@@ -95,7 +104,9 @@ private:
     /// `frame_size_` only for files with fixed atoms)
     uint64_t first_frame_size_ = 0;
 
+    /// Total number of atoms in this file
     size_t n_atoms_ = 0;
+    /// Total number of free (non-fixed) atoms in this file
     size_t n_free_atoms_ = 0;
 
     /// Additional metadata when the file contains fixed atoms
@@ -114,13 +125,13 @@ private:
     /// the case most of the time)
     std::vector<fixed_atom_data_t> fixed_atoms_;
 
-    /// total number of frames in the system
+    /// total number of frames in the file
     size_t n_frames_ = 0;
     /// simulation timestep metadata
     struct {
         double dt = 0;
         size_t start = 0;
-        size_t step = 0;
+        size_t step = 1;
     } timesteps_;
     /// title of the file
     std::string title_;
@@ -128,7 +139,7 @@ private:
     /// next step to read
     size_t step_ = 0;
 
-    /// temporary buffer used when reading coordinates
+    /// temporary buffer used when reading/writing coordinates
     std::vector<float> buffer_;
 };
 

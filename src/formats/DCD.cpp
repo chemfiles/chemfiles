@@ -46,10 +46,21 @@ static size_t checked_cast(int64_t value) {
 using namespace chemfiles;
 
 static std::unique_ptr<BinaryFile> open_dcd_file(std::string path, File::Mode mode, bool& use_64_bit_markers) {
-    // we need to check multiple variants: 32 and 64-bits fortran record
-    // markers, and little or big endian files. The file should start with 84,
-    // and then the magic 'CORD'.
+    if (mode == File::WRITE) {
+        return BinaryFile::open_native(std::move(path), mode);
+    }
+
     auto file = LittleEndianFile(path, mode);
+
+    if (mode == File::APPEND && file.file_size() == 0) {
+        return BinaryFile::open_native(std::move(path), mode);
+    }
+
+    // we need to check multiple variants of the DCD format: 32 and 64-bits
+    // fortran record markers, and little or big endian files.
+    //
+    // The file should start with 84, and then the magic 'CORD'.
+    file.seek(0);
 
     char data[8] = {0};
     file.read_char(data, 8);
@@ -98,18 +109,87 @@ DCDFormat::DCDFormat(std::string path, File::Mode mode, File::Compression compre
         throw format_error("compression is not supported for DCD files");
     }
 
-    if (mode != File::READ) {
-        throw format_error("write & append are not implemented yet");
-    }
-
     try {
         file_ = open_dcd_file(path, mode, options_.use_64_bit_markers);
     } catch (const Error& e) {
         throw format_error("unable to open '{}': {}", path, e.what());
     }
 
+    if (mode == File::WRITE || (mode == File::APPEND && file_->file_size() == 0)) {
+        return;
+    }
+
     file_->seek(0);
-    // read & parse the file header
+    this->read_header();
+
+    if (mode == File::APPEND) {
+        if (options_.has_4d_data) {
+            throw format_error("can not append to file with 4D data");
+        }
+
+        if (options_.use_64_bit_markers) {
+            throw format_error("can not append to file with 64-bit markers");
+        }
+
+        if (!options_.charmm_unitcell) {
+            throw format_error("can not append to file without unit cell");
+        }
+
+        if (!fixed_atoms_.empty()) {
+            throw format_error("can not append to file with fixed atoms");
+        }
+
+        file_->seek(file_->file_size());
+    }
+}
+
+size_t DCDFormat::nsteps() {
+    return n_frames_;
+}
+
+void DCDFormat::read(Frame& frame) {
+    this->read_step(step_, frame);
+    step_++;
+}
+
+void DCDFormat::read_step(size_t step, Frame& frame) {
+    step_ = step;
+
+    if (step_ == 0) {
+        file_->seek(header_size_);
+    } else {
+        file_->seek(header_size_ + first_frame_size_ + (step_ - 1) * frame_size_);
+    }
+
+    frame.set_cell(this->read_cell());
+    read_positions(frame);
+
+    // set frame properties
+    if (timesteps_.dt != 0.0 && timesteps_.step != 0) {
+        frame.set("time", timesteps_.dt * (timesteps_.step * step_ + timesteps_.start));
+    }
+
+    if (!title_.empty()) {
+        frame.set("title", title_);
+    }
+}
+
+size_t DCDFormat::read_marker() {
+    if (options_.use_64_bit_markers) {
+        return checked_cast(file_->read_single_i64());
+    } else {
+        return checked_cast(file_->read_single_i32());
+    }
+}
+
+void DCDFormat::expect_marker(size_t size) {
+    auto marker = this->read_marker();
+    if (marker != size) {
+        throw format_error("invalid fortran record marker, expected {} got {}", size, marker);
+    }
+}
+
+void DCDFormat::read_header() {
     auto header_size = this->read_marker();
     assert(header_size == 84);
 
@@ -149,9 +229,11 @@ DCDFormat::DCDFormat(std::string path, File::Mode mode, File::Compression compre
     this->expect_marker(84);
 
     auto title_size = this->read_marker();
-    if ((title_size - 4) % 80 != 0) {
-        warning("DCD reader", "invalid title record size ({}), skipping title section", title_size);
-        file_->seek(file_->tell() + static_cast<uint64_t>(title_size));
+    if (title_size < 4 || (title_size - 4) % 80 != 0) {
+        if (title_size != 0) {
+            warning("DCD reader", "invalid title record size ({}), skipping title section", title_size);
+            file_->seek(file_->tell() + static_cast<uint64_t>(title_size));
+        }
     } else {
         auto n_lines = checked_cast(file_->read_single_i32());
         if (n_lines != (title_size - 4) / 80) {
@@ -261,7 +343,7 @@ DCDFormat::DCDFormat(std::string path, File::Mode mode, File::Compression compre
     if (n_frames_from_size != n_frames_) {
         warning(
             "DCD reader",
-            "the file header claims {} frames, but the file size indicate we only have {}",
+            "the file header claims {} frames, but the file size indicate we have {}",
             n_frames_,
             n_frames_from_size
         );
@@ -273,62 +355,15 @@ DCDFormat::DCDFormat(std::string path, File::Mode mode, File::Compression compre
     }
 }
 
-size_t DCDFormat::nsteps() {
-    return n_frames_;
-}
-
-void DCDFormat::read(Frame& frame) {
-    this->read_step(step_, frame);
-    step_++;
-}
-
-void DCDFormat::read_step(size_t step, Frame& frame) {
-    step_ = step;
-
-    if (step_ == 0) {
-        file_->seek(header_size_);
-    } else {
-        file_->seek(header_size_ + first_frame_size_ + (step_ - 1) * frame_size_);
-    }
-
-    frame.set_cell(this->read_cell());
-    read_positions(frame);
-
-    // set frame properties
-    // TODO: document properties
-    frame.set("time", timesteps_.dt * (timesteps_.step * step_ + timesteps_.start));
-    frame.set("title", title_);
-}
-
-void DCDFormat::write(const Frame& frame) {
-    throw format_error("not yet implemented");
-}
-
-
-size_t DCDFormat::read_marker() {
-    if (options_.use_64_bit_markers) {
-        return checked_cast(file_->read_single_i64());
-    } else {
-        return checked_cast(file_->read_single_i32());
-    }
-}
-
-void DCDFormat::expect_marker(size_t size) {
-    auto marker = this->read_marker();
-    if (marker != size) {
-        throw format_error("invalid fortran record marker, expected {} got {}", size, marker);
-    }
-}
-
 UnitCell DCDFormat::read_cell() {
     if (!options_.charmm_format || !options_.charmm_unitcell) {
         return {};
     }
 
-    this->expect_marker(48);
+    this->expect_marker(6 * sizeof(double));
     double buffer[6] = {0};
     file_->read_f64(buffer, 6);
-    this->expect_marker(48);
+    this->expect_marker(6 * sizeof(double));
 
     if (options_.charmm_format && options_.charmm_version > 25) {
         // recent charmm version store cell vectors directly. It seems to be
@@ -466,15 +501,183 @@ void DCDFormat::read_fixed_coordinates() {
 
 /******************************************************************************/
 
+void DCDFormat::write(const Frame& frame) {
+    if (n_frames_ == 0) {
+        // initialize data that will be constant for this file
+        n_atoms_ = frame.size();
+        n_free_atoms_ = frame.size();
+
+        if (n_atoms_ == 0) {
+            throw file_error("can not write a frame with 0 atoms");
+        }
+
+        title_ = frame.get<Property::STRING>("title").value_or("");
+
+        options_.charmm_format = true;
+        options_.charmm_version = 24;
+        options_.charmm_unitcell = true;
+        options_.use_64_bit_markers = false;
+        options_.has_4d_data = false;
+
+        file_->seek(0);
+        this->write_header();
+
+        header_size_ = file_->tell();
+
+        frame_size_ = 0;
+        size_t marker_size = 4;
+        // 6 doubles and two markers for the unit cell
+        frame_size_ += 2 * marker_size + 6 * sizeof(double);
+        // three coordinates sets, each with two markers
+        frame_size_ += 3 * (2 * marker_size + n_atoms_ * sizeof(float));
+
+        first_frame_size_ = frame_size_;
+    } else if (n_atoms_ != frame.size()) {
+        throw format_error(
+            "this file was initialized with {} atoms, can not write a frame with {} atoms to it",
+            n_atoms_, frame.size()
+        );
+    } else if (n_atoms_ != n_free_atoms_) {
+        throw format_error("can not append to a file with fixed atoms");
+    } else if (options_.has_4d_data) {
+        throw format_error("can not append to a file with 4D data");
+    } else if (options_.use_64_bit_markers) {
+        throw format_error("can not append to a file with 64 bit markers");
+    }
+
+    this->write_cell(frame.cell());
+    this->write_positions(frame);
+
+    n_frames_ += 1;
+    step_ += 1;
+
+    // update the number of frames in the header
+    auto current = file_->tell();
+    file_->seek(8); // the number of frames is always at offset 8 (1 marker + CORD)
+    file_->write_single_i32(static_cast<int32_t>(n_frames_));
+    file_->seek(current);
+}
+
+void DCDFormat::write_header() {
+    this->write_marker(84);
+
+    file_->write_char("CORD", 4);
+    file_->write_single_i32(static_cast<int32_t>(n_frames_));
+    file_->write_single_i32(static_cast<int32_t>(timesteps_.start));
+    file_->write_single_i32(static_cast<int32_t>(timesteps_.step));
+
+    // 16 unused bytes
+    file_->write_char("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16);
+
+    file_->write_single_i32(/* n_degree_of_freedom */ 3 * static_cast<int32_t>(n_atoms_));
+    file_->write_single_i32(/* n_fixed_atoms */ 0);
+    file_->write_single_f32(static_cast<float>(timesteps_.dt));
+
+    file_->write_single_i32(/* has_unit_cell */ 1);
+    file_->write_single_i32(/* has_4d_data */ 0);
+
+    // 28 unused bytes
+    file_->write_char("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 28);
+    file_->write_single_i32(/* charmm version */ 24);
+    this->write_marker(84);
+
+    if (title_.empty()) {
+        this->write_marker(0);
+        this->write_marker(0);
+    } else {
+        std::string title = title_;
+        if (title.size() % 80 != 0) {
+            auto padded_size = (title.size() / 80 + 1) * 80;
+            title.resize(padded_size, '\0');
+        }
+        this->write_marker(title.size() + sizeof(int32_t));
+        file_->write_single_i32(static_cast<int32_t>(title.size() / 80));
+        file_->write_char(title.data(), title.size());
+        this->write_marker(title.size() + sizeof(int32_t));
+
+    }
+
+    this->write_marker(sizeof(int32_t));
+    file_->write_single_i32(static_cast<int32_t>(n_atoms_));
+    this->write_marker(sizeof(int32_t));
+}
+
+
+void DCDFormat::write_cell(const UnitCell& cell) {
+    auto matrix = cell.matrix();
+    if (std::abs(matrix[1][0]) > 1e-12 || std::abs(matrix[2][0]) > 1e-12 || std::abs(matrix[2][1]) > 1e-12) {
+        warning(
+            "DCD writer",
+            "the unit cell is not upper-triangular, positions might not align "
+            "with the cell in the file"
+        );
+    }
+
+    auto lengths = cell.lengths();
+    auto angles = cell.angles();
+
+    this->write_marker(6 * sizeof(double));
+    double buffer[6] = {
+        lengths[0],
+        angles[2],
+        lengths[1],
+        angles[1],
+        angles[0],
+        lengths[2],
+    };
+    file_->write_f64(buffer, 6);
+    this->write_marker(6 * sizeof(double));
+}
+
+
+void DCDFormat::write_positions(const Frame& frame) {
+    const auto& positions = frame.positions();
+
+    buffer_.resize(n_atoms_);
+    for (size_t i=0; i<n_atoms_; i++) {
+        buffer_[i] = static_cast<float>(positions[i][0]);
+    }
+    this->write_marker(sizeof(float) * n_atoms_);
+    file_->write_f32(buffer_);
+    this->write_marker(sizeof(float) * n_atoms_);
+
+
+    for (size_t i=0; i<n_atoms_; i++) {
+        buffer_[i] = static_cast<float>(positions[i][1]);
+    }
+    this->write_marker(sizeof(float) * n_atoms_);
+    file_->write_f32(buffer_);
+    this->write_marker(sizeof(float) * n_atoms_);
+
+
+    for (size_t i=0; i<n_atoms_; i++) {
+        buffer_[i] = static_cast<float>(positions[i][2]);
+    }
+    this->write_marker(sizeof(float) * n_atoms_);
+    file_->write_f32(buffer_);
+    this->write_marker(sizeof(float) * n_atoms_);
+}
+
+
+void DCDFormat::write_marker(size_t size) {
+    if (options_.use_64_bit_markers) {
+        file_->write_single_i64(static_cast<int64_t>(size));
+    } else {
+        file_->write_single_i32(static_cast<int32_t>(size));
+    }
+}
+
+/******************************************************************************/
+
 template <> const FormatMetadata& chemfiles::format_metadata<DCDFormat>() {
     static FormatMetadata metadata;
     metadata.name = "DCD";
     metadata.extension = ".dcd";
     metadata.description = "DCD binary format";
-    metadata.reference = "http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/dcdplugin.html";
+    metadata.reference = "https://web.archive.org/web/20070406065433/http://www.bio.unizh.ch/docu/acc_docs/doc/charmm_principles/Ch04_mol_dyn.FM5.html";
 
     metadata.read = true;
-    metadata.write = false;
+    metadata.write = true;
     metadata.memory = false;
 
     metadata.positions = true;
