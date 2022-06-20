@@ -41,6 +41,7 @@
 #include "chemfiles/formats/TRR.hpp"
 #include "chemfiles/formats/XTC.hpp"
 #include "chemfiles/formats/CIF.hpp"
+#include "chemfiles/formats/DCD.hpp"
 
 #define SENTINEL_INDEX (static_cast<size_t>(-1))
 
@@ -48,7 +49,6 @@ namespace chemfiles {
     class MemoryBuffer;
     class Format;
 
-    extern template class Molfile<DCD>;
     extern template class Molfile<TRJ>;
     extern template class Molfile<PSF>;
     extern template class Molfile<MOLDEN>;
@@ -69,7 +69,7 @@ FormatFactory::FormatFactory() {
 #endif
     this->add_format<CMLFormat>();
     this->add_format<CSSRFormat>();
-    this->add_format<Molfile<DCD>>();
+    this->add_format<DCDFormat>();
     this->add_format<GROFormat>();
     this->add_format<LAMMPSTrajectoryFormat>();
     this->add_format<LAMMPSDataFormat>();

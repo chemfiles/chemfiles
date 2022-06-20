@@ -175,7 +175,7 @@ mark_as_advanced(FORCE
 # VMD molfile: https://github.com/chemfiles/molfiles
 # ==========
 set(VMD_MOLFILE_PLUGINS
-    dcdplugin gromacsplugin moldenplugin psfplugin
+    gromacsplugin moldenplugin psfplugin
 )
 
 external_library(molfiles)
