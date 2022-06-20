@@ -15,7 +15,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ### Changes in supported formats
 
 - Amber NetCDF files are now read/written with a custom netcdf parser (#443)
-- TRR and XTC files are now read/written with a custom parser
+- TRR and XTC files are now read/written with a custom parser (#451)
+- DCD files are now read/written with a custom parser (#453)
 
 ## 0.10.2 (20 Oct 2021)
 

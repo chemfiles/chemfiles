@@ -34,6 +34,8 @@ MMTF = "Date (YYYY-MM-DD format) of the deposition in the PDB. Read from the ``d
 type = "string"
 
 CML = "The text of the ``title`` attribute in a molecule node. Only set if the attribute is present."
+DCD = """Content of the title lines in the DCD file header.
+When writing, the first frame writen to a DCD file sets this header field."""
 
 [time]
 type = "number"
@@ -42,6 +44,7 @@ LAMMPS = "The time of the frame in time units."
 TNG = "The time of the frame in pico seconds."
 TRR = "The time of the frame in pico seconds."
 XTC = "The time of the frame in pico seconds."
+DCD = "The time of the frame in the file units."
 
 [lammps_units]
 type = "string"
@@ -51,8 +54,7 @@ LAMMPS = "Style of units used by LAMMPS for a simulation."
 [xtc_precision]
 type = "number"
 
-XTC = """The precision used to compress the coordinates. Only used for ten or more atoms.
-Default is 1000."""
+XTC = """The precision used to compress the coordinates. Only used for ten or more atoms. Default is 1000."""
 
 [has_positions]
 type = "bool"

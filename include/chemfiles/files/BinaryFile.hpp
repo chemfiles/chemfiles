@@ -36,6 +36,10 @@ public:
     /// Open the file at the given `path` using the given `mode`
     BinaryFile(std::string path, File::Mode mode);
 
+    /// Open the file at the given `path` using the given `mode` as a file with
+    /// the current native endianess
+    static std::unique_ptr<BinaryFile> open_native(std::string path, File::Mode mode);
+
     virtual ~BinaryFile() noexcept override;
 
     BinaryFile(const BinaryFile&) = delete;
