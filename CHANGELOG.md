@@ -24,7 +24,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   replacing the VMD molfile implementation.
 - Added read support for PSF files using VMD molfile plugin.
 - Amber NetCDF files are now read/written with a custom netcdf parser (#443)
-- TRR and XTC files are now read/written with a custom parser
+- TRR and XTC files are now read/written with a custom XDR files parser (#451)
+- DCD files are now read/written with a custom parser (#453)
 
 ### Changes to the C++ API
 - Per-atom properties are optional, i.e. `Atom::properties` returns an optional property map.
