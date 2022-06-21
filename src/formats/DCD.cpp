@@ -347,7 +347,7 @@ void DCDFormat::read_header() {
             n_frames_,
             n_frames_from_size
         );
-        n_frames_ = n_frames_from_size;
+        n_frames_ = static_cast<size_t>(n_frames_from_size);
     }
 
     if (!fixed_atoms_.empty()) {
