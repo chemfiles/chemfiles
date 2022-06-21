@@ -213,7 +213,7 @@ double Value::as_f64() const {
 }
 
 size_t VariableLayout::count() const {
-    return static_cast<uint64_t>(this->size) / static_cast<uint64_t>(sizeof_nc_type(this->type));
+    return static_cast<size_t>(this->size) / static_cast<size_t>(sizeof_nc_type(this->type));
 }
 
 std::string VariableLayout::type_name() const {
@@ -471,7 +471,7 @@ Netcdf3File::~Netcdf3File() {
             auto& variable = it.second;
             if (variable.is_record()) {
                 if (!variable.written_at_last_step_ && this->n_records_ > 0) {
-                    variable.write_fill_value(this->n_records_ - 1);
+                    variable.write_fill_value(static_cast<size_t>(this->n_records_ - 1));
                 }
             } else {
                 if (!variable.written_at_last_step_) {
@@ -712,7 +712,7 @@ void Netcdf3File::add_record() {
         auto& variable = it.second;
         if (variable.is_record()) {
             if (!variable.written_at_last_step_ && this->n_records_ > 1) {
-                variable.write_fill_value(this->n_records_ - 2);
+                variable.write_fill_value(static_cast<size_t>(this->n_records_ - 2));
             }
             variable.written_at_last_step_ = false;
         }

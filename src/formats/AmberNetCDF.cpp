@@ -126,7 +126,7 @@ AmberNetCDFBase::AmberNetCDFBase(std::string convention, std::string path, File:
 
     if (mode == File::APPEND) {
         // start writing at the end of pre-existing files in append mode
-        step_ = file_.n_records();
+        step_ = static_cast<size_t>(file_.n_records());
     }
 }
 
@@ -413,7 +413,7 @@ AmberTrajectory::AmberTrajectory(std::string path, File::Mode mode, File::Compre
 }
 
 size_t AmberTrajectory::nsteps() {
-    return file_.n_records();
+    return static_cast<size_t>(file_.n_records());
 }
 
 void AmberTrajectory::validate() {
