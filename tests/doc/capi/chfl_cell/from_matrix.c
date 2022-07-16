@@ -7,7 +7,7 @@
 
 int main() {
     // [example]
-    chfl_vector3d matrix[3] = {
+    const chfl_vector3d matrix[3] = {
         {10, 0, 0},
         {0, 12, 0},
         {0, 0, 15}

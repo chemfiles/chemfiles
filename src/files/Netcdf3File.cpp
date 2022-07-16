@@ -440,7 +440,7 @@ Netcdf3File::Netcdf3File(std::string filename, File::Mode mode):
         throw file_error("only 64-bit netcdf3 files are supported");
     }
 
-    this->n_records_ = static_cast<size_t>(this->read_single_i32());
+    this->n_records_ = static_cast<uint64_t>(this->read_single_i32());
 
     // read dimensions
     auto header = this->read_single_i32();
