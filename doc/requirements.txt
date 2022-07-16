@@ -1,5 +1,4 @@
-# sphinx 4.1 can not parse some of our C++ code
-sphinx >=3,<4
+sphinx >=5
 breathe >=4.30
 sphinx_bootstrap_theme
 toml

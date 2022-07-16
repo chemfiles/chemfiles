@@ -1,0 +1,49 @@
+name: Documentation
+
+on:
+  push:
+    branches: [master]
+    tags: ["*"]
+  pull_request:
+    # Check all PR
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - name: install dependencies
+        run: |
+          pip install -r doc/requirements.txt
+          sudo apt install doxygen
+      - name: build documentation
+        run: |
+          mkdir build && cd build
+          cmake -DCMAKE_BUILD_TYPE=Debug -DCHFL_BUILD_DOCUMENTATION=ON ..
+
+          cmake --build . --config Debug --parallel 2 --target doc_html
+      - name: put documentation in the website
+        run: |
+          git clone https://github.com/$GITHUB_REPOSITORY --branch gh-pages gh-pages
+          rm -rf gh-pages/.git
+          cd gh-pages
+
+          REF_KIND=$(echo $GITHUB_REF | cut -d / -f2)
+          if [[ "$REF_KIND" == "tags" ]]; then
+              TAG=${GITHUB_REF#refs/tags/}
+              mv ../build/doc/html $TAG
+          else
+              rm -rf latest
+              mv ../build/doc/html latest
+          fi
+      - name: deploy to gh-pages
+        if: github.event_name == 'push'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gh-pages/
+          force_orphan: true
