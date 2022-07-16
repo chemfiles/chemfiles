@@ -121,8 +121,10 @@ private:
             Vector3D fixed_coord;
         };
     };
-    /// metadata for fixed atoms. This is empty if all atoms are mobile (this is
-    /// the case most of the time)
+    /// Metadata when there are fixed atoms in the file. This will tell for each
+    /// atom if it is fixed or mobile.
+    ///
+    /// This is empty if all atoms are mobile (which is the common case)
     std::vector<fixed_atom_data_t> fixed_atoms_;
 
     /// total number of frames in the file

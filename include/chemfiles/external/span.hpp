@@ -127,7 +127,7 @@ public:
     }
 
     operator bool() const noexcept {
-        return begin_ != NULL;
+        return begin_ != nullptr;
     }
 
     reference operator[](size_type index) {
@@ -229,12 +229,12 @@ private:
     // helpers for member as_span()
     template< typename U >
     span(U * & data, size_type size): begin_(data), end_(data + size) {
-        assert(size == 0 ||(size > 0 && data != NULL));
+        assert(size == 0 ||(size > 0 && data != nullptr));
     }
 
     template< typename U >
     span(U * const & data, size_type size): begin_(data), end_(data + size) {
-        assert(size == 0 ||(size > 0 && data != NULL));
+        assert(size == 0 ||(size > 0 && data != nullptr));
     }
 
 private:
