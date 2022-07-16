@@ -44,7 +44,7 @@ LAMMPS = "The time of the frame in time units."
 TNG = "The time of the frame in pico seconds."
 TRR = "The time of the frame in pico seconds."
 XTC = "The time of the frame in pico seconds."
-DCD = "The time of the frame in the file units."
+DCD = "The time of the frame in the file units, only set when reading a file"
 
 [lammps_units]
 type = "string"
