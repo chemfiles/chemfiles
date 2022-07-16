@@ -131,10 +131,6 @@ DCDFormat::DCDFormat(std::string path, File::Mode mode, File::Compression compre
             throw format_error("can not append to file with 64-bit markers");
         }
 
-        if (!options_.charmm_unitcell) {
-            throw format_error("can not append to file without unit cell");
-        }
-
         if (!fixed_atoms_.empty()) {
             throw format_error("can not append to file with fixed atoms");
         }
@@ -166,7 +162,8 @@ void DCDFormat::read_step(size_t step, Frame& frame) {
 
     // set frame properties
     if (timesteps_.dt != 0.0 && timesteps_.step != 0) {
-        frame.set("time", timesteps_.dt * (timesteps_.step * step_ + timesteps_.start));
+        auto step = static_cast<double>(timesteps_.step * step_ + timesteps_.start);
+        frame.set("time", timesteps_.dt * step);
     }
 
     if (!title_.empty()) {
@@ -249,8 +246,8 @@ void DCDFormat::read_header() {
         file_->read_char(buffer);
 
         // each line in the title might be padded with NULL or space characters,
-        // or just NULL-terminated and contain garbage. This tries to clean
-        // everything up
+        // or just NULL-terminated and contain garbage. This code tries to clean
+        // up the title, removing the risk of reading in garbage.
         for (size_t line_i=0; line_i<n_lines; line_i++) {
             for (size_t char_i=line_i * 80; char_i<(line_i + 1) * 80; char_i++) {
                 if (buffer[char_i] == '\0') {
@@ -383,30 +380,16 @@ UnitCell DCDFormat::read_cell() {
     auto gamma = buffer[1];
 
     if (std::fabs(alpha) <= 1.0 && std::fabs(beta) <= 1.0 && std::fabs(gamma) <= 1.0) {
-        // cell angles are either stored directly or as the cos of the angle
+        // cell angles can be stored either directly or as the cos of the angle.
+        // if all of the angles are smaller than 1, we assume they are stored as
+        // their cosine
         alpha = cos_to_angle_degrees(alpha);
         beta = cos_to_angle_degrees(beta);
         gamma = cos_to_angle_degrees(gamma);
     }
 
-    auto is_degree_angle = [](double angle) {
-        return angle >= 0.0 && angle <= 180.0;
-    };
-
-    if (
-        lengths[0] >= 0.0 && lengths[1] >= 0.0 && lengths[2] >= 0.0 &&
-        is_degree_angle(alpha) && is_degree_angle(beta) && is_degree_angle(gamma)
-    ) {
-        auto angles = Vector3D(alpha, beta, gamma);
-        return UnitCell(lengths, angles);
-    } else {
-        warning(
-            "DCD reader",
-            "unable to guess unit cell convention. The cell is stored as [{} {} {} {} {} {}]",
-            buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5]
-        );
-        return UnitCell();
-    }
+    auto angles = Vector3D(alpha, beta, gamma);
+    return UnitCell(lengths, angles);
 }
 
 void DCDFormat::read_positions(Frame& frame) {
@@ -515,7 +498,7 @@ void DCDFormat::write(const Frame& frame) {
 
         options_.charmm_format = true;
         options_.charmm_version = 24;
-        options_.charmm_unitcell = true;
+        options_.charmm_unitcell = frame.cell().shape() != UnitCell::INFINITE;
         options_.use_64_bit_markers = false;
         options_.has_4d_data = false;
 
@@ -545,6 +528,14 @@ void DCDFormat::write(const Frame& frame) {
         throw format_error("can not append to a file with 64 bit markers");
     }
 
+    auto title = frame.get<Property::STRING>("title");
+    if (title && title.value() != title_) {
+        warning("DCD writer",
+            "the title of this frame doesn't match the title of the file, "
+            "the frame title will be ignored"
+        );
+    }
+
     this->write_cell(frame.cell());
     this->write_positions(frame);
 
@@ -571,9 +562,12 @@ void DCDFormat::write_header() {
 
     file_->write_single_i32(/* n_degree_of_freedom */ 3 * static_cast<int32_t>(n_atoms_));
     file_->write_single_i32(/* n_fixed_atoms */ 0);
+    // TODO: this might lose information: when writing to a file, this is always
+    // 0, even if the frame has a *time* property. If we read back, the
+    // resulting frame will not have a *time* property at all.
     file_->write_single_f32(static_cast<float>(timesteps_.dt));
 
-    file_->write_single_i32(/* has_unit_cell */ 1);
+    file_->write_single_i32(options_.charmm_unitcell ? 1 : 0);
     file_->write_single_i32(/* has_4d_data */ 0);
 
     // 28 unused bytes
@@ -604,10 +598,27 @@ void DCDFormat::write_header() {
 
 
 void DCDFormat::write_cell(const UnitCell& cell) {
-    auto matrix = cell.matrix();
-    if (std::abs(matrix[1][0]) > 1e-12 || std::abs(matrix[2][0]) > 1e-12 || std::abs(matrix[2][1]) > 1e-12) {
-        warning(
-            "DCD writer",
+    if (cell.shape() == UnitCell::INFINITE) {
+        if (options_.charmm_unitcell) {
+            warning("DCD writer",
+                "this file contains unit cell information, but we have an "
+                "infinite cell, we'll write zeros for the cell lengths"
+            );
+        } else {
+            return;
+        }
+    } else {
+        if (!options_.charmm_unitcell) {
+            warning("DCD writer",
+                "this file does not store unit cell information, "
+                "we'll skip writing the cell"
+            );
+            return;
+        }
+    }
+
+    if (!chemfiles::private_details::is_upper_triangular(cell.matrix())) {
+        warning("DCD writer",
             "the unit cell is not upper-triangular, positions might not align "
             "with the cell in the file"
         );
