@@ -52,10 +52,11 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
 endif()
 
 if(${EMSCRIPTEN})
-    if("${EMSCRIPTEN_VERSION}" VERSION_LESS "2")
-        message(FATAL_ERROR "emscripten ${EMSCRIPTEN_VERSION} is not supported, chemfiles requires version 2 or later")
+    if("${EMSCRIPTEN_VERSION}" VERSION_LESS "3")
+        message(FATAL_ERROR "emscripten ${EMSCRIPTEN_VERSION} is not supported, chemfiles requires version 3 or later")
     endif()
 
+    set(CMAKE_CXX_EXTENSIONS ON)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s DISABLE_EXCEPTION_CATCHING=0")
 
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ERROR_ON_UNDEFINED_SYMBOLS=1")
