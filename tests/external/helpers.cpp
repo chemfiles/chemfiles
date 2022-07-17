@@ -31,11 +31,11 @@
 int main(int argc, char* argv[]) {
 #ifdef __EMSCRIPTEN__
     // Give node.js an access to the root filesystem
-    EM_ASM(
+    EM_ASM({
         FS.mkdir('root');
         FS.mount(NODEFS, { root: '/' }, 'root');
         FS.chdir('root/' + process.cwd());
-    );
+    },);
 #endif
     silent_crash_handlers();
     return Catch::Session().run(argc, argv);
