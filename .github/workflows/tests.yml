@@ -98,7 +98,7 @@ jobs:
             cxx: emcc
             build-type: Debug
             use-emsdk: true
-            emscripten-version: 2.0.29
+            emscripten-version: 3.1.16
             cmake-extra-args:
               - -DCHFL_BUILD_DOCTESTS=OFF
               - -DBUILD_SHARED_LIBS=OFF
