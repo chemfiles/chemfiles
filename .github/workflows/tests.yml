@@ -120,18 +120,18 @@ jobs:
           # macOS builders
           # ==
           - name: macOS / clang
-            os: macos-10.15
+            os: macos-11
             cc: clang
             cxx: clang++
             build-type: Debug
           - name: macOS / gcc
-            os: macos-10.15
-            cc: gcc-7
-            cxx: g++-7
+            os: macos-11
+            cc: gcc-9
+            cxx: g++-9
             build-type: Debug
             setup-dependencies: |
               export HOMEBREW_NO_AUTO_UPDATE=1
-              brew install gcc@7
+              brew install gcc@9
           # ==
           # windows builders
           # ==
