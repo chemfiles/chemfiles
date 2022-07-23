@@ -54,7 +54,7 @@ LAMMPS = "Style of units used by LAMMPS for a simulation."
 [xtc_precision]
 type = "number"
 
-XTC = """The precision used to compress the coordinates. Only used for ten or more atoms. Default is 1000."""
+XTC = "The precision used to compress the coordinates. Only used for ten or more atoms. Default is 1000."
 
 [has_positions]
 type = "bool"
@@ -65,3 +65,8 @@ TRR = "Set to ``true`` if the frame contains positions. All positions are zero i
 type = "number"
 
 TRR = "This is usually the free energy coupling parameter."
+
+[is_unwrapped]
+type = "bool"
+
+LAMMPS = "Indicates whether the frame contains unwrapped positions. Only set when reading a file."
