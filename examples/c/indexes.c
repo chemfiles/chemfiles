@@ -26,7 +26,7 @@ int main(void) {
 
     printf("Atoms with x < 5:\n");
     for (size_t i=0; i<matched; i++) {
-        printf("  - %lu", less_than_five[i]);
+        printf("  - %zu", less_than_five[i]);
     }
 
     free(less_than_five);

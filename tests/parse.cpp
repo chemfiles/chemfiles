@@ -206,7 +206,7 @@ TEST_CASE("scan") {
     );
 }
 
-static void recycle(uint64_t width, int64_t value, const std::string& hybrid) {
+static void recycle(size_t width, int64_t value, const std::string& hybrid) {
     CHECK(chemfiles::encode_hybrid36(width, value) == hybrid);
     CHECK(chemfiles::decode_hybrid36(width, hybrid) == value);
 }
