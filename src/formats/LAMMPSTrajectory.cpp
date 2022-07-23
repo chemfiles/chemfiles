@@ -552,6 +552,13 @@ void LAMMPSTrajectoryFormat::read_next(Frame& frame) {
             unwrap(positions[i], (*images)[i], matrix);
         }
     }
+
+    if (use_pos_repr == UNWRAPPED || use_pos_repr == SCALED_UNWRAPPED || images) {
+        frame.set("is_unwrapped", true);
+    }
+    else {
+        frame.set("is_unwrapped", false);
+    }
 }
 
 static optional<size_t> parse_lammps_type(const std::string& type_str) {
