@@ -162,8 +162,8 @@ void DCDFormat::read_step(size_t step, Frame& frame) {
 
     // set frame properties
     if (timesteps_.dt != 0.0 && timesteps_.step != 0) {
-        auto step = static_cast<double>(timesteps_.step * step_ + timesteps_.start);
-        frame.set("time", timesteps_.dt * step);
+        auto simulation_step = static_cast<double>(timesteps_.step * step_ + timesteps_.start);
+        frame.set("time", timesteps_.dt * simulation_step);
     }
 
     if (!title_.empty()) {
