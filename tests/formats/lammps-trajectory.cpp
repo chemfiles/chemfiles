@@ -30,6 +30,8 @@ static void check_pos_representation(Trajectory& file) {
     CHECK(frame[5000].type() == "2");
     CHECK(frame[5000].name() == "C");
 
+    CHECK(frame.get("is_unwrapped").value().as_bool());
+
     frame = file.read_step(5);
     CHECK(frame.size() == 7751);
 
@@ -40,6 +42,8 @@ static void check_pos_representation(Trajectory& file) {
     velocities = *frame.velocities();
     CHECK(approx_eq(velocities[5000], Vector3D(-0.00404259, -0.000939097, 0.0152453), 1e-7));
     CHECK(approx_eq(velocities[7000], Vector3D(0.00122365, 0.0100476, -0.0167459), 1e-7));
+
+    CHECK(frame.get("is_unwrapped").value().as_bool());
 
     CHECK_THROWS_AS(file.read_step(11), FileError);
 }
@@ -57,6 +61,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
         CHECK(approx_eq(positions[1189], Vector3D(116.829, 91.2404, 79.8858), eps));
         // this one has a non zero image index (2 1 -3)
         CHECK(approx_eq(positions[1327], Vector3D(173.311, 87.853, 109.417), eps));
+
+        CHECK(frame.get("is_unwrapped").value().as_bool());
     }
 
     SECTION("NaCl") {
@@ -71,6 +77,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
         auto velocities = *frame.velocities();
         CHECK(approx_eq(velocities[0], Vector3D(-0.00258494, 0.00270859, -0.00314039), 1e-7));
         CHECK(approx_eq(velocities[222], Vector3D(-0.00466812, -0.00196397, -0.000147051), 1e-7));
+
+        CHECK(!frame.get("is_unwrapped").value().as_bool());
 
         frame = file.read_step(5);
         CHECK(frame.size() == 512);
@@ -121,6 +129,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
         CHECK(approx_eq(positions[679], Vector3D(1.47679, -25.2886, 2.38234), 1e-3));
         CHECK(approx_eq(positions[764], Vector3D(-256.58, 117.368, 1.9654), 1e-3));
 
+        CHECK(frame.get("is_unwrapped").value().as_bool());
+
         frame = file.read();
         CHECK(frame.size() == 854);
         CHECK(frame.step() == 101000);
@@ -134,6 +144,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
         CHECK(approx_eq(positions[683], Vector3D(-43.3683, 322.948, 208.063), 1e-3));
         CHECK(approx_eq(positions[828], Vector3D(150.083, -135.113, 189.641), 1e-3));
 
+        CHECK(frame.get("is_unwrapped").value().as_bool());
+
         frame = file.read();
         CHECK(frame.size() == 856);
         CHECK(frame.step() == 102000);
@@ -141,6 +153,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
         positions = frame.positions();
         CHECK(approx_eq(positions[747], Vector3D(-158.317, 142.593, 2.11392), 1e-3));
         CHECK(approx_eq(positions[799], Vector3D(224.784, -167.878, 39.3765), 1e-3));
+
+        CHECK(frame.get("is_unwrapped").value().as_bool());
 
         frame = file.read();
         CHECK(frame.size() == 856);
@@ -150,6 +164,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
         CHECK(approx_eq(positions[735], Vector3D(67.2657, 30.0627, 2.1141), 1e-3));
         CHECK(approx_eq(positions[775], Vector3D(125.347, -82.3507, 46.611), 1e-3));
 
+        CHECK(frame.get("is_unwrapped").value().as_bool());
+
         frame = file.read();
         CHECK(frame.size() == 856);
         CHECK(frame.step() == 104000);
@@ -157,6 +173,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
         positions = frame.positions();
         CHECK(approx_eq(positions[652], Vector3D(-188.131, 96.0777, 196.23), 1e-3));
         CHECK(approx_eq(positions[838], Vector3D(-33.6068, -50.5113, 209.306), 1e-3));
+
+        CHECK(frame.get("is_unwrapped").value().as_bool());
 
         CHECK_THROWS_AS(file.read(), FileError);
     }
@@ -181,6 +199,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
         CHECK(approx_eq(frame[789].get("v_sq_pos")->as_double(), 283.642, 1e-3));
         CHECK(approx_eq(frame[789].get("i_flag")->as_double(), 0.0, 1e-12));
 
+        CHECK(!frame.get("is_unwrapped").value().as_bool());
+
         frame = file.read_step(3);
         CHECK(frame.size() == 4000);
         CHECK(frame.step() == 300);
@@ -196,6 +216,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
         CHECK(approx_eq(frame[3905].get("c_stress[2]")->as_double(), -67.6015, 1e-3));
         CHECK(approx_eq(frame[3905].get("v_sq_pos")->as_double(), 345.766, 1e-3));
         CHECK(approx_eq(frame[3905].get("i_flag")->as_double(), 0.0, 1e-12));
+
+        CHECK(!frame.get("is_unwrapped").value().as_bool());
 
     }
 
