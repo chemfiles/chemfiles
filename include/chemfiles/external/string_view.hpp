@@ -39,7 +39,7 @@
 #endif
 
 #ifndef  nssv_CONFIG_USR_SV_OPERATOR
-# define nssv_CONFIG_USR_SV_OPERATOR  1
+# define nssv_CONFIG_USR_SV_OPERATOR  0
 #endif
 
 #ifdef   nssv_CONFIG_CONVERSION_STD_STRING
