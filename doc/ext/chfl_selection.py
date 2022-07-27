@@ -11,7 +11,7 @@ class ChemfilesSelection(Directive):
         self.assert_has_content()
 
         node = nodes.admonition('\n'.join(self.content))
-        node.set_class("chemfiles-selection")
+        node['classes'].append('chemfiles-selection')
 
         title_text = self.arguments[0]
         textnodes, _ = self.state.inline_text(title_text, self.lineno)
