@@ -72,6 +72,14 @@ UnitCell XDRFile::read_gmx_box(bool use_double) {
     }
 }
 
+size_t XDRFile::read_single_size_as_i32() {
+    int32_t value = read_single_i32();
+    if (value < 0) {
+        throw file_error("invalid value in XDR file: expected a positive integer, got {}", value);
+    }
+    return static_cast<size_t>(value);
+}
+
 /***** from xdrfile *****/
 
 /* Internal support routines for reading/writing compressed coordinates
