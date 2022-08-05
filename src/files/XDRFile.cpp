@@ -50,6 +50,28 @@ void XDRFile::write_gmx_string(const std::string& value) {
     write_opaque(value.c_str(), len - 1);
 }
 
+UnitCell XDRFile::read_gmx_box(bool use_double) {
+    if (use_double) {
+        // Double
+        std::vector<double> box(3 * 3);
+        read_f64(box);
+        auto matrix =
+            Matrix3D(box[0], box[3], box[6], box[1], box[4], box[7], box[2], box[5], box[8]);
+        // Factor 10 because the lengths are in nm in the TPR/TRR/XTC format
+        return UnitCell(10.0 * matrix);
+    } else {
+        // Float
+        std::vector<float> box(3 * 3);
+        read_f32(box);
+        auto matrix = Matrix3D(
+            static_cast<double>(box[0]), static_cast<double>(box[3]), static_cast<double>(box[6]),
+            static_cast<double>(box[1]), static_cast<double>(box[4]), static_cast<double>(box[7]),
+            static_cast<double>(box[2]), static_cast<double>(box[5]), static_cast<double>(box[8]));
+        // Factor 10 because the lengths are in nm in the TPR/TRR/XTC format
+        return UnitCell(10.0 * matrix);
+    }
+}
+
 /***** from xdrfile *****/
 
 /* Internal support routines for reading/writing compressed coordinates

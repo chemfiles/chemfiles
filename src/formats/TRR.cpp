@@ -108,26 +108,17 @@ void TRRFormat::read(Frame& frame) {
     frame.set("has_positions", has_positions);
     frame.resize(natoms);
 
-    auto skip_legacy = [&header, this]() {
-        int32_t legacy_size = header.vir_size + header.pres_size;
-        if (legacy_size > 0) {
-            file_.skip(static_cast<uint64_t>(legacy_size));
-        }
-    };
+    if (has_box) {
+        const auto box = file_.read_gmx_box(header.use_double);
+        frame.set_cell(box);
+    }
+
+    int32_t legacy_size = header.vir_size + header.pres_size;
+    if (legacy_size > 0) {
+        file_.skip(static_cast<uint64_t>(legacy_size));
+    }
 
     if (header.use_double) {
-        // Double
-        if (has_box) {
-            std::vector<double> box(3 * 3);
-            file_.read_f64(box);
-            auto matrix =
-                Matrix3D(box[0], box[3], box[6], box[1], box[4], box[7], box[2], box[5], box[8]);
-            // Factor 10 because the lengths are in nm in the TRR format
-            frame.set_cell(UnitCell(10.0 * matrix));
-        }
-
-        skip_legacy();
-
         std::vector<double> dx(natoms * 3);
         if (has_positions) {
             file_.read_f64(dx);
@@ -153,21 +144,6 @@ void TRRFormat::read(Frame& frame) {
             }
         }
     } else {
-        // Float
-        if (has_box) {
-            std::vector<float> box(3 * 3);
-            file_.read_f32(box);
-            auto matrix = Matrix3D(static_cast<double>(box[0]), static_cast<double>(box[3]),
-                                   static_cast<double>(box[6]), static_cast<double>(box[1]),
-                                   static_cast<double>(box[4]), static_cast<double>(box[7]),
-                                   static_cast<double>(box[2]), static_cast<double>(box[5]),
-                                   static_cast<double>(box[8]));
-            // Factor 10 because the lengths are in nm in the TRR format
-            frame.set_cell(UnitCell(10.0 * matrix));
-        }
-
-        skip_legacy();
-
         std::vector<float> dx(natoms * 3);
         if (has_positions) {
             file_.read_f32(dx);

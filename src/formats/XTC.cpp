@@ -109,14 +109,8 @@ void XTCFormat::read(Frame& frame) {
     frame.set("time", static_cast<double>(header.time)); // time in pico seconds
     frame.resize(natoms);
 
-    std::vector<float> box(3 * 3);
-    file_.read_f32(box);
-    auto matrix = Matrix3D(
-        static_cast<double>(box[0]), static_cast<double>(box[3]), static_cast<double>(box[6]),
-        static_cast<double>(box[1]), static_cast<double>(box[4]), static_cast<double>(box[7]),
-        static_cast<double>(box[2]), static_cast<double>(box[5]), static_cast<double>(box[8]));
-    // Factor 10 because the lengths are in nm in the XTC format
-    frame.set_cell(UnitCell(10.0 * matrix));
+    const auto box = file_.read_gmx_box();
+    frame.set_cell(box);
 
     size_t natoms_again = static_cast<size_t>(file_.read_single_i32());
     if (natoms_again != natoms) {
