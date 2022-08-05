@@ -44,6 +44,12 @@ TEST_CASE("XDR files") {
         for (size_t i = 0; i < 3; ++i) {
             CHECK(approx_eq(array[i], expected[i], 1e-4f));
         }
+
+        // Go back to the beginning to check reading of sizes as i32
+        file.seek(0);
+        CHECK_THROWS_WITH(file.read_single_size_as_i32(),
+                          "invalid value in XDR file: expected a positive integer, got -123");
+        CHECK(file.read_single_size_as_i32() == 123);
     }
 
     // clang-format off
