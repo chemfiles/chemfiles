@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "chemfiles/UnitCell.hpp"
+
 #include "chemfiles/files/BinaryFile.hpp"
 
 namespace chemfiles {
@@ -37,6 +39,9 @@ class XDRFile final : public BigEndianFile {
     float read_gmx_compressed_floats(std::vector<float>& data);
     /// Write compressed GROMACS floats with a given precision
     void write_gmx_compressed_floats(const std::vector<float>& data, float precision);
+
+    /// Read the GROMACS simulation box in nano meters
+    UnitCell read_gmx_box(bool use_double = false);
 
   private:
     /// Read XDR variable-length opaque data
