@@ -43,6 +43,9 @@ class XDRFile final : public BigEndianFile {
     /// Read the GROMACS simulation box in nano meters
     UnitCell read_gmx_box(bool use_double = false);
 
+    /// Read an unsigned size value as i32 by performing a checked conversion
+    size_t read_single_size_as_i32();
+
   private:
     /// Read XDR variable-length opaque data
     void read_opaque(std::vector<char>& data);
