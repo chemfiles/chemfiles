@@ -103,22 +103,20 @@ void XTCFormat::read_step(size_t step, Frame& frame) {
 void XTCFormat::read(Frame& frame) {
     FrameHeader header = read_frame_header();
 
-    size_t natoms = static_cast<size_t>(header.natoms);
-
-    frame.set_step(static_cast<size_t>(header.step));    // actual step of MD Simulation
+    frame.set_step(header.step);                         // actual step of MD Simulation
     frame.set("time", static_cast<double>(header.time)); // time in pico seconds
-    frame.resize(natoms);
+    frame.resize(header.natoms);
 
     const auto box = file_.read_gmx_box();
     frame.set_cell(box);
 
-    size_t natoms_again = static_cast<size_t>(file_.read_single_i32());
-    if (natoms_again != natoms) {
+    size_t natoms_again = file_.read_single_size_as_i32();
+    if (natoms_again != header.natoms) {
         throw format_error("contradictory number of atoms in XTC file at '{}': expected {}, got {}",
-                           file_.path(), natoms, natoms_again);
+                           file_.path(), header.natoms, natoms_again);
     }
 
-    std::vector<float> x(natoms * 3);
+    std::vector<float> x(header.natoms * 3);
     if (header.natoms <= 9) {
         file_.read_f32(x);
     } else {
@@ -147,9 +145,9 @@ XTCFormat::FrameHeader XTCFormat::read_frame_header() {
         }
 
         FrameHeader header = {
-            file_.read_single_i32(),   // natoms
-            file_.read_single_i32(),   // step
-            file_.read_single_f32(), // time
+            file_.read_single_size_as_i32(), // natoms
+            file_.read_single_size_as_i32(), // step
+            file_.read_single_f32(),         // time
         };
 
         return header;
@@ -168,7 +166,7 @@ void XTCFormat::determine_frame_offsets() {
     file_.seek(0L);
     FrameHeader header = read_frame_header();
 
-    natoms_ = static_cast<size_t>(header.natoms);
+    natoms_ = header.natoms;
 
     const uint64_t filesize = file_.file_size();
 
@@ -222,8 +220,8 @@ void XTCFormat::write(const Frame& frame) {
     }
 
     FrameHeader header = {
-        static_cast<int32_t>(natoms),                                    // natoms
-        static_cast<int32_t>(frame.step()),                              // step
+        natoms,                                                          // natoms
+        frame.step(),                                                    // step
         static_cast<float>(frame.get("time").value_or(0.0).as_double()), // time
     };
     write_frame_header(header);
@@ -232,7 +230,7 @@ void XTCFormat::write(const Frame& frame) {
     get_cell(box, frame);
     file_.write_f32(box);
 
-    file_.write_single_i32(header.natoms); // natoms (again)
+    file_.write_single_i32(static_cast<int32_t>(header.natoms)); // natoms (again)
 
     std::vector<float> x(natoms * 3);
     get_positions(x, frame);
@@ -250,8 +248,8 @@ void XTCFormat::write(const Frame& frame) {
 void XTCFormat::write_frame_header(const FrameHeader& header) {
     file_.write_single_i32(XTC_MAGIC);
 
-    file_.write_single_i32(header.natoms);
-    file_.write_single_i32(header.step);
+    file_.write_single_i32(static_cast<int32_t>(header.natoms));
+    file_.write_single_i32(static_cast<int32_t>(header.step));
     file_.write_single_f32(static_cast<float>(header.time));
 }
 
