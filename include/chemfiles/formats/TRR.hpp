@@ -27,23 +27,23 @@ class TRRFormat final : public Format {
 
   private:
     struct FrameHeader {
-        bool use_double; /* Double precision?                                       */
-        int32_t ir_size;     /* Backward compatibility                              */
-        int32_t e_size;      /* Backward compatibility                              */
-        int32_t box_size;    /* Size in Bytes, non zero if a box is present         */
-        int32_t vir_size;    /* Backward compatibility                              */
-        int32_t pres_size;   /* Backward compatibility                              */
-        int32_t top_size;    /* Backward compatibility                              */
-        int32_t sym_size;    /* Backward compatibility                              */
-        int32_t x_size;      /* Size in Bytes, non zero if coordinates are present  */
-        int32_t v_size;      /* Size in Bytes, non zero if velocities are present   */
-        int32_t f_size;      /* Size in Bytes, non zero if forces are present       */
+        bool use_double;  /* Double precision?                                  */
+        size_t ir_size;   /* Backward compatibility                             */
+        size_t e_size;    /* Backward compatibility                             */
+        size_t box_size;  /* Size in Bytes, non zero if a box is present        */
+        size_t vir_size;  /* Backward compatibility                             */
+        size_t pres_size; /* Backward compatibility                             */
+        size_t top_size;  /* Backward compatibility                             */
+        size_t sym_size;  /* Backward compatibility                             */
+        size_t x_size;    /* Size in Bytes, non zero if coordinates are present */
+        size_t v_size;    /* Size in Bytes, non zero if velocities are present  */
+        size_t f_size;    /* Size in Bytes, non zero if forces are present      */
 
-        int32_t natoms;    /* The total number of atoms                           */
-        int32_t step;      /* Current step number                                 */
-        int32_t nre;       /* Backward compatibility                              */
-        double time;   /* Current time (float or double)                          */
-        double lambda; /* Current value of lambda (float or double)               */
+        size_t natoms; /* The total number of atoms                 */
+        size_t step;   /* Current step number                       */
+        size_t nre;    /* Backward compatibility                    */
+        double time;   /* Current time (float or double)            */
+        double lambda; /* Current value of lambda (float or double) */
     };
 
     /// Read header of the Frame at the current position
