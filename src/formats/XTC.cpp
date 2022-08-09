@@ -3,8 +3,8 @@
 
 #include <cassert>
 #include <cstdint>
-#include <cstdio>
 
+#include <array>
 #include <string>
 #include <vector>
 

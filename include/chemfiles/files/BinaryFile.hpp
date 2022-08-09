@@ -1,10 +1,11 @@
 #ifndef CHEMFILES_BINARY_FILE
 #define CHEMFILES_BINARY_FILE
 
-#include <vector>
-#include <string>
 #include <cstdint>
-#include <cstddef>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 #include "chemfiles/config.h"
 #include "chemfiles/File.hpp"
