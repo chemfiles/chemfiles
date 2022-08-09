@@ -4,7 +4,9 @@
 #ifndef CHEMFILES_TRR_FORMAT_HPP
 #define CHEMFILES_TRR_FORMAT_HPP
 
+#include <cstdint>
 #include <string>
+#include <vector>
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"

@@ -4,9 +4,11 @@
 #ifndef CHEMFILES_XDR_FILE_HPP
 #define CHEMFILES_XDR_FILE_HPP
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
+#include "chemfiles/File.hpp"
 #include "chemfiles/UnitCell.hpp"
 
 #include "chemfiles/files/BinaryFile.hpp"

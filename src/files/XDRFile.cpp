@@ -3,13 +3,22 @@
 
 #include <cassert>
 #include <climits>
+#include <cmath>
+#include <cstdint>
+#include <cstdlib>
+
 #include <string>
+#include <utility>
 #include <vector>
 
+#include "chemfiles/files/BinaryFile.hpp"
 #include "chemfiles/files/XDRFile.hpp"
 
+#include "chemfiles/File.hpp"
+#include "chemfiles/UnitCell.hpp"
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/external/span.hpp"
+#include "chemfiles/types.hpp"
 #include "chemfiles/warnings.hpp"
 
 using namespace chemfiles;
@@ -654,7 +663,8 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
             uint32_t num = static_cast<uint32_t>(run + is_smaller + 1);
             encodebits(compressed_data_, state, 5, num);
         } else {
-            encodebits(compressed_data_, state, 1, 0); // flag the fact that runlength did not change
+            // flag the fact that runlength did not change
+            encodebits(compressed_data_, state, 1, 0);
         }
         for (int k = 0; k < run; k += 3) {
             encodeints(compressed_data_, state, 3, smallidx, sizesmall, &tmpcoord[k]);
@@ -675,6 +685,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
     if (state.lastbits != 0) {
         ++state.count;
     }
-    assert(state.count < compressed_data_.size() && "internal Error: overflow during decompression");
+    assert(state.count < compressed_data_.size() &&
+           "internal Error: overflow during decompression");
     write_opaque(compressed_data_.data(), static_cast<uint32_t>(state.count));
 }

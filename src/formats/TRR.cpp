@@ -3,8 +3,8 @@
 
 #include <cassert>
 #include <cstdint>
-#include <cstdio>
 
+#include <array>
 #include <string>
 #include <vector>
 
@@ -16,6 +16,7 @@
 #include "chemfiles/File.hpp"
 #include "chemfiles/FormatMetadata.hpp"
 #include "chemfiles/Frame.hpp"
+#include "chemfiles/Property.hpp"
 #include "chemfiles/UnitCell.hpp"
 
 #include "chemfiles/files/XDRFile.hpp"
