@@ -200,6 +200,13 @@ enum FunctionType {
     F_NRE // This number is for the total number of energies
 };
 
+// Set of function types which are considered as bonds.
+// Update when new function types are introduced.
+const std::vector<FunctionType> BOND_TYPES = {
+    F_BONDS,     F_G96BONDS,   F_MORSE,  F_CUBICBONDS, F_CONNBONDS, F_HARMONIC,
+    F_FENEBONDS, F_RESTRBONDS, F_CONSTR, F_CONSTRNC,   F_TABBONDS,  F_TABBONDSNC,
+};
+
 // All force filed parameters of the system.
 // see `gmx_ffparams_t` in <GMX>/api/legacy/include/gromacs/topology/forcefieldparameters.h
 struct FFParams {
@@ -469,7 +476,7 @@ template <> const FormatMetadata& chemfiles::format_metadata<TPRFormat>() {
     metadata.velocities = false;
     metadata.unit_cell = true;
     metadata.atoms = true;
-    metadata.bonds = false;
+    metadata.bonds = true;
     metadata.residues = true;
     return metadata;
 }
@@ -664,6 +671,35 @@ static InteractionLists read_interaction_lists(XDRFile& file, int file_version) 
         }
     }
     return interaction_lists;
+}
+
+// Add connectivity elements i.e. bonds to the frame.
+// Use the atom index offset to correct for molecule-internal numbering.
+static void add_conectivity(Frame& frame, const InteractionLists& interaction_lists,
+                            size_t atom_idx_offset = 0) {
+    auto contains = [](const std::vector<FunctionType>& types_set,
+                       FunctionType function_type) -> bool {
+        auto cnt = std::count(types_set.begin(), types_set.end(), function_type);
+        return cnt != 0;
+    };
+    for (const auto& ilist : interaction_lists) {
+        if (!ilist)
+            continue;
+        else if (contains(BOND_TYPES, ilist.value().function_type)) {
+            for (size_t i = 0; i < ilist.value().size(); ++i) {
+                auto iatoms = ilist.value()[i];
+                assert(iatoms.size() == 2);
+                frame.add_bond(atom_idx_offset + iatoms[0], atom_idx_offset + iatoms[1]);
+            }
+        } else if (ilist.value().function_type == F_SETTLE) {
+            for (size_t i = 0; i < ilist.value().size(); ++i) {
+                auto iatoms = ilist.value()[i];
+                assert(iatoms.size() == 3);
+                frame.add_bond(atom_idx_offset + iatoms[0], atom_idx_offset + iatoms[1]);
+                frame.add_bond(atom_idx_offset + iatoms[0], atom_idx_offset + iatoms[2]);
+            }
+        }
+    }
 }
 
 // Read all the different interations in the system. As only the types of
@@ -1025,6 +1061,8 @@ void TPRFormat::read_topology(Frame& frame, const TprHeader& header) {
                         "residue index out of bounds, there are {} residues, got index {}",
                         moltype.atoms.residue_infos.size(), props.residue_idx);
                 }
+
+                add_conectivity(frame, moltype.interaction_lists, global_atom_idx);
             }
             global_atom_idx += atoms.size();
             for (const auto& residue : residues_of_mol) {
@@ -1047,6 +1085,7 @@ void TPRFormat::read_topology(Frame& frame, const TprHeader& header) {
         bool has_intermolecular_bonds = read_gmx_bool(header.body_convention);
         if (has_intermolecular_bonds) {
             InteractionLists interaction_lists = read_interaction_lists(file_, header.file_version);
+            add_conectivity(frame, interaction_lists);
         }
     }
 
