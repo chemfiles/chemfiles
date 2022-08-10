@@ -35,6 +35,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 - added `chemfiles::guess_format` and `chfl_guess_format` to get the format
   chemfiles would use for a given file based on its filename
+- Added read support for GROMACS TPR format.
 
 ### Changes in supported formats
 
