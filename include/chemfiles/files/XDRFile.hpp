@@ -27,6 +27,7 @@ class XDRFile final : public BigEndianFile {
 
     using BinaryFile::read_f32;
     using BinaryFile::read_f64;
+    using BinaryFile::read_i32;
     using BinaryFile::write_f32;
 
     /// Read a non-compliant GROMACS string
