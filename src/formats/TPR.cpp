@@ -472,8 +472,8 @@ template <> const FormatMetadata& chemfiles::format_metadata<TPRFormat>() {
     metadata.write = false;
     metadata.memory = false;
 
-    metadata.positions = false;
-    metadata.velocities = false;
+    metadata.positions = true;
+    metadata.velocities = true;
     metadata.unit_cell = true;
     metadata.atoms = true;
     metadata.bonds = true;
@@ -766,6 +766,12 @@ void TPRFormat::read(Frame& frame) {
     if (header.has_topology) {
         read_topology(frame, header);
     }
+
+    read_coordinates(frame, header);
+
+    // Now comes the simulation parameters in the input record
+    // The parsing is done by `do_tpx_finalize()`
+    // We stop parsing here
 
     step_++;
 }
@@ -1144,6 +1150,65 @@ void TPRFormat::read_topology(Frame& frame, const TprHeader& header) {
         uint64_t skip_size =
             static_cast<uint64_t>(intermolecularExclusionGroupSize) * sizeof(int32_t);
         file_.skip(skip_size);
+    }
+}
+
+void TPRFormat::read_coordinates(Frame& frame, const TprHeader& header) {
+    if (header.use_double) {
+        // Double
+        std::vector<double> dx(header.natoms * 3);
+        if (header.has_positions) {
+            file_.read_f64(dx);
+            auto positions = frame.positions();
+            assert(dx.size() == 3 * positions.size());
+            for (size_t i = 0; i < frame.size(); i++) {
+                // Factor 10 because the cell lengths are in nm in the TPR format
+                positions[i][0] = dx[i * 3] * 10.0;
+                positions[i][1] = dx[i * 3 + 1] * 10.0;
+                positions[i][2] = dx[i * 3 + 2] * 10.0;
+            }
+        }
+        if (header.has_velocities) {
+            file_.read_f64(dx);
+            frame.add_velocities();
+            auto velocities = *frame.velocities();
+            assert(dx.size() == 3 * velocities.size());
+            for (size_t i = 0; i < frame.size(); i++) {
+                // Factor 10 because the lengths are in nm in the TPR format
+                velocities[i][0] = dx[i * 3] * 10.0;
+                velocities[i][1] = dx[i * 3 + 1] * 10.0;
+                velocities[i][2] = dx[i * 3 + 2] * 10.0;
+            }
+        }
+    } else {
+        // Float
+        std::vector<float> dx(header.natoms * 3);
+        if (header.has_positions) {
+            file_.read_f32(dx);
+            auto positions = frame.positions();
+            assert(dx.size() == 3 * positions.size());
+            for (size_t i = 0; i < frame.size(); i++) {
+                // Factor 10 because the cell lengths are in nm in the TPR format
+                positions[i][0] = static_cast<double>(dx[i * 3]) * 10.0;
+                positions[i][1] = static_cast<double>(dx[i * 3 + 1]) * 10.0;
+                positions[i][2] = static_cast<double>(dx[i * 3 + 2]) * 10.0;
+            }
+        }
+        if (header.has_velocities) {
+            file_.read_f32(dx);
+            frame.add_velocities();
+            auto velocities = *frame.velocities();
+            assert(dx.size() == 3 * velocities.size());
+            for (size_t i = 0; i < frame.size(); i++) {
+                // Factor 10 because the lengths are in nm in the TPR format
+                velocities[i][0] = static_cast<double>(dx[i * 3]) * 10.0;
+                velocities[i][1] = static_cast<double>(dx[i * 3 + 1]) * 10.0;
+                velocities[i][2] = static_cast<double>(dx[i * 3 + 2]) * 10.0;
+            }
+        }
+    }
+    if (header.has_forces) {
+        file_.skip(header.natoms * 3 * header.sizeof_real);
     }
 }
 
