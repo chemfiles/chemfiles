@@ -95,6 +95,10 @@ class TPRFormat final : public Format {
     /// see `do_tpx_mtop()` and `do_mtop` in <GMX>/src/gromacs/fileio/tpxio.cpp
     void read_topology(Frame& frame, const TprHeader& header);
 
+    // Read positions, velocities, and skip forces
+    // see `do_tpx_state_second` in <GMX>/src/gromacs/fileio/tpxio.cpp
+    void read_coordinates(Frame& frame, const TprHeader& header);
+
     // Read all symbol strings which can be referenced by index.
     // see `do_symtab` in <GMX>/src/gromacs/fileio/tpxio.cpp
     std::vector<std::string> read_symbol_table(const TprHeader& header);
