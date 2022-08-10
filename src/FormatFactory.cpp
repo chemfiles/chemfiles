@@ -38,6 +38,7 @@
 #include "chemfiles/formats/mmCIF.hpp"
 #include "chemfiles/formats/CML.hpp"
 #include "chemfiles/formats/SMI.hpp"
+#include "chemfiles/formats/TPR.hpp"
 #include "chemfiles/formats/TRR.hpp"
 #include "chemfiles/formats/XTC.hpp"
 #include "chemfiles/formats/CIF.hpp"
@@ -84,6 +85,7 @@ FormatFactory::FormatFactory() {
     this->add_format<TinkerFormat>();
     this->add_format<TNGFormat>();
     this->add_format<Molfile<TRJ>>();
+    this->add_format<TPRFormat>();
     this->add_format<TRRFormat>();
     this->add_format<XTCFormat>();
     this->add_format<XYZFormat>();
