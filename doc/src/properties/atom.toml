@@ -70,3 +70,10 @@ SMI = "Sets if the atom was defined as a wildcard card atom."
 type = "number"
 
 Tinker = "The Tinker atom type."
+
+[ff_type]
+type = "string"
+
+TPR = """Describes the atom type specified in the ``[atoms]`` section of the
+topology. The type can be used to reference a specific set of force field
+parameters for a given atom."""

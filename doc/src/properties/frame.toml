@@ -11,6 +11,7 @@ MOL2 = "The first line after ``@<TRIPOS>MOLECULE`` is used as the frame **name**
 MMTF = "The text in the ``title`` field is used as the frame **name** when reading."
 mmCIF = "The text in the ``_struct.title`` field is used as the frame **name** when reading."
 SMI = "Any string after a terminating (blank) character in a SMILES string."
+TPR = "Name of the system as declared in the ``[system]`` section of the TOP file."
 
 [classification]
 type = "string"
