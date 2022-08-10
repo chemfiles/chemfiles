@@ -90,8 +90,25 @@ class TPRFormat final : public Format {
     /// see `do_tpx_state_first()` in <GMX>/src/gromacs/fileio/tpxio.cpp
     void read_box(Frame& frame, const TprHeader& header);
 
+    /// Read the topology which contains atoms, residues, and bonds.
+    /// Angles, Dihedrals, and Impropers are not added to the frame.
+    /// see `do_tpx_mtop()` and `do_mtop` in <GMX>/src/gromacs/fileio/tpxio.cpp
+    void read_topology(Frame& frame, const TprHeader& header);
+
+    // Read all symbol strings which can be referenced by index.
+    // see `do_symtab` in <GMX>/src/gromacs/fileio/tpxio.cpp
+    std::vector<std::string> read_symbol_table(const TprHeader& header);
+
+    /// Read an index to an entry from the symbol table
+    /// Return a reference to the entry in the table
+    /// see `do_symstr()` in <GMX>/src/gromacs/fileio/tpxio.cpp
+    const std::string& read_symbol_table_entry(const std::vector<std::string>& table);
+
     /// Read a GROMACS string dependending on the body convention
     std::string read_gmx_string(TprBodyConvention body_convention);
+
+    /// Read a GROMACS unsigned char dependending on the body convention
+    uint8_t read_gmx_uchar(TprBodyConvention body_convention);
 
     /// Read a GROMACS bool dependending on the body convention
     bool read_gmx_bool(TprBodyConvention body_convention = FileIOXdr);
