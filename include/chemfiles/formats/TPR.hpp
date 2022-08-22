@@ -76,10 +76,13 @@ class TPRFormat final : public Format {
         int file_generation = 0;
         /// If the TPR file was written in double precision
         bool use_double = false;
-        /// Size of real values in bytes, depends on `use_double`
-        size_t sizeof_real;
         /// Version-dependent serializer used for the body
         TprBodyConvention body_convention = FileIOXdr;
+
+        /// Size of real values in bytes
+        inline constexpr size_t sizeof_real() {
+            return this->use_double ? sizeof(double) : sizeof(float);
+        }
     };
 
     /// Read the file header
