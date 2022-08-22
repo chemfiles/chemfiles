@@ -84,24 +84,24 @@ class TPRFormat final : public Format {
 
     /// Read the file header
     /// see `do_tpxheader()` in <GMX>/src/gromacs/fileio/tpxio.cpp
-    TprHeader read_header();
+    void read_header();
 
     /// Read box and skip temperature coupling groups
     /// see `do_tpx_state_first()` in <GMX>/src/gromacs/fileio/tpxio.cpp
-    void read_box(Frame& frame, const TprHeader& header);
+    void read_box(Frame& frame);
 
     /// Read the topology which contains atoms, residues, and bonds.
     /// Angles, Dihedrals, and Impropers are not added to the frame.
     /// see `do_tpx_mtop()` and `do_mtop` in <GMX>/src/gromacs/fileio/tpxio.cpp
-    void read_topology(Frame& frame, const TprHeader& header);
+    void read_topology(Frame& frame);
 
     // Read positions, velocities, and skip forces
     // see `do_tpx_state_second` in <GMX>/src/gromacs/fileio/tpxio.cpp
-    void read_coordinates(Frame& frame, const TprHeader& header);
+    void read_coordinates(Frame& frame);
 
     // Read all symbol strings which can be referenced by index.
     // see `do_symtab` in <GMX>/src/gromacs/fileio/tpxio.cpp
-    std::vector<std::string> read_symbol_table(const TprHeader& header);
+    std::vector<std::string> read_symbol_table();
 
     /// Read an index to an entry from the symbol table
     /// Return a reference to the entry in the table
@@ -109,16 +109,18 @@ class TPRFormat final : public Format {
     const std::string& read_symbol_table_entry(const std::vector<std::string>& table);
 
     /// Read a GROMACS string dependending on the body convention
-    std::string read_gmx_string(TprBodyConvention body_convention);
+    std::string read_gmx_string();
 
     /// Read a GROMACS unsigned char dependending on the body convention
-    uint8_t read_gmx_uchar(TprBodyConvention body_convention);
+    uint8_t read_gmx_uchar();
 
     /// Read a GROMACS bool dependending on the body convention
-    bool read_gmx_bool(TprBodyConvention body_convention = FileIOXdr);
+    bool read_gmx_bool();
 
     /// Associated XDR file
     XDRFile file_;
+    /// TPR header of the file
+    TprHeader header_;
     /// The next step to read
     size_t step_ = 0;
 };
