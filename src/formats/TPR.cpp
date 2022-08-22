@@ -33,41 +33,44 @@
 // GROMACS explains: Enum of values that describe the contents of a TPR file
 // whose format matches a version number.
 // see `tpxv` in <GMX>/src/gromacs/fileio/tpxio.cpp
-enum TPRVersion {
-    tprv_ComputationalElectrophysiology = 96,
-    tprv_Use64BitRandomSeed,
-    tprv_RestrictedBendingAndCombinedAngleTorsionPotentials,
-    tprv_InteractiveMolecularDynamics,
-    tprv_RemoveObsoleteParameters1,
-    tprv_PullCoordTypeGeom,
-    tprv_PullGeomDirRel,
-    tprv_IntermolecularBondeds,
-    tprv_CompElWithSwapLayerOffset,
-    tprv_CompElPolyatomicIonsAndMultipleIonTypes,
-    tprv_RemoveAdress,
-    tprv_PullCoordNGroup,
-    tprv_RemoveTwinRange,
-    tprv_ReplacePullPrintCOM12,
-    tprv_PullExternalPotential,
-    tprv_GenericParamsForElectricField,
-    tprv_AcceleratedWeightHistogram,
-    tprv_RemoveImplicitSolvation,
-    tprv_PullPrevStepCOMAsReference,
-    tprv_MimicQMMM,
-    tprv_PullAverage,
-    tprv_GenericInternalParameters,
-    tprv_VSite2FD,
-    tprv_AddSizeField,
-    tprv_StoreNonBondedInteractionExclusionGroup,
-    tprv_VSite1,
-    tprv_MTS,
-    tprv_RemovedConstantAcceleration,
-    tprv_TransformationPullCoord,
-    tprv_SoftcoreGapsys,
-    tprv_ReaddedConstantAcceleration,
-    tprv_RemoveTholeRfac,
-    tprv_RemoveAtomtypes,
-    tprv_Count // This number is for the total number of versions
+class TPRVersion {
+  public:
+    enum TV : int {
+        ComputationalElectrophysiology = 96,
+        Use64BitRandomSeed,
+        RestrictedBendingAndCombinedAngleTorsionPotentials,
+        InteractiveMolecularDynamics,
+        RemoveObsoleteParameters1,
+        PullCoordTypeGeom,
+        PullGeomDirRel,
+        IntermolecularBondeds,
+        CompElWithSwapLayerOffset,
+        CompElPolyatomicIonsAndMultipleIonTypes,
+        RemoveAdress,
+        PullCoordNGroup,
+        RemoveTwinRange,
+        ReplacePullPrintCOM12,
+        PullExternalPotential,
+        GenericParamsForElectricField,
+        AcceleratedWeightHistogram,
+        RemoveImplicitSolvation,
+        PullPrevStepCOMAsReference,
+        MimicQMMM,
+        PullAverage,
+        GenericInternalParameters,
+        VSite2FD,
+        AddSizeField,
+        StoreNonBondedInteractionExclusionGroup,
+        VSite1,
+        MTS,
+        RemovedConstantAcceleration,
+        TransformationPullCoord,
+        SoftcoreGapsys,
+        ReaddedConstantAcceleration,
+        RemoveTholeRfac,
+        RemoveAtomtypes,
+        Count // This number is for the total number of versions
+    };
 };
 
 // GROMACS explains:
@@ -79,7 +82,7 @@ enum TPRVersion {
 // Backward compatibility for reading old run input files is maintained
 // by checking this version number against that of the file and then using
 // the correct code path.
-static const int TPR_VERSION = tprv_Count - 1;
+static const int TPR_VERSION = TPRVersion::Count - 1;
 
 // GROMACS explains:
 // Value of current TPR generation to keep track of incompatible changes for older TPR versions.
@@ -233,10 +236,10 @@ struct FunctionTypeUpdate {
 // see `ftupd` in <GMX>/src/gromacs/fileio/tpxio.cpp
 static const FunctionTypeUpdate FUNCTION_TYPE_UPDATES[24]{
     {70, F_RESTRBONDS},
-    {tprv_RestrictedBendingAndCombinedAngleTorsionPotentials, F_RESTRANGLES},
+    {TPRVersion::RestrictedBendingAndCombinedAngleTorsionPotentials, F_RESTRANGLES},
     {76, F_LINEAR_ANGLES},
-    {tprv_RestrictedBendingAndCombinedAngleTorsionPotentials, F_RESTRDIHS},
-    {tprv_RestrictedBendingAndCombinedAngleTorsionPotentials, F_CBTDIHS},
+    {TPRVersion::RestrictedBendingAndCombinedAngleTorsionPotentials, F_RESTRDIHS},
+    {TPRVersion::RestrictedBendingAndCombinedAngleTorsionPotentials, F_CBTDIHS},
     {65, F_CMAP},
     {60, F_GB12_NOLONGERUSED},
     {61, F_GB13_NOLONGERUSED},
@@ -246,9 +249,9 @@ static const FunctionTypeUpdate FUNCTION_TYPE_UPDATES[24]{
     {93, F_LJ_RECIP},
     {76, F_ANHARM_POL},
     {90, F_FBPOSRES},
-    {tprv_VSite1, F_VSITE1},
-    {tprv_VSite2FD, F_VSITE2FD},
-    {tprv_GenericInternalParameters, F_DENSITYFITTING},
+    {TPRVersion::VSite1, F_VSITE1},
+    {TPRVersion::VSite2FD, F_VSITE2FD},
+    {TPRVersion::GenericInternalParameters, F_DENSITYFITTING},
     {69, F_VTEMP_NOLONGERUSED},
     {66, F_PDISPCORR},
     {79, F_DVDL_COUL},
@@ -557,7 +560,7 @@ static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, in
         return 6 * sizeof_real;
     case F_THOLE_POL: {
         size_t size = 3 * sizeof_real;
-        if (file_version < tprv_RemoveTholeRfac) {
+        if (file_version < TPRVersion::RemoveTholeRfac) {
             size += sizeof_real;
         }
         return size;
@@ -627,7 +630,7 @@ static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, in
         if (file_version < 68) {
             size += 4 * sizeof_real;
         }
-        if (file_version < tprv_RemoveImplicitSolvation) {
+        if (file_version < TPRVersion::RemoveImplicitSolvation) {
             size += 5 * sizeof_real;
         }
         return size;
@@ -862,7 +865,7 @@ void TPRFormat::read_header() {
     header_.has_forces = read_gmx_bool();
     header_.has_box = read_gmx_bool();
 
-    if (header_.file_version >= tprv_AddSizeField && header_.file_generation >= 27) {
+    if (header_.file_version >= TPRVersion::AddSizeField && header_.file_generation >= 27) {
         // Skip size of the TPR body in bytes
         file_.read_single_i64();
     }
@@ -873,7 +876,7 @@ void TPRFormat::read_header() {
         header_.has_input_record = false;
     }
 
-    if (header_.file_version >= tprv_AddSizeField && header_.file_generation >= 27) {
+    if (header_.file_version >= TPRVersion::AddSizeField && header_.file_generation >= 27) {
         header_.body_convention = InMemory;
     } else {
         header_.body_convention = FileIOXdr;
@@ -1083,7 +1086,7 @@ void TPRFormat::read_topology(Frame& frame) {
     const size_t natoms = file_.read_single_size_as_i32();
     assert(natoms == header_.natoms);
 
-    if (header_.file_version >= tprv_IntermolecularBondeds) {
+    if (header_.file_version >= TPRVersion::IntermolecularBondeds) {
         bool has_intermolecular_bonds = read_gmx_bool();
         if (has_intermolecular_bonds) {
             InteractionLists interaction_lists =
@@ -1094,13 +1097,14 @@ void TPRFormat::read_topology(Frame& frame) {
 
     // Skip atom types for old formats
     // see `do_atomtypes`
-    if (header_.file_version < tprv_RemoveAtomtypes) {
+    if (header_.file_version < TPRVersion::RemoveAtomtypes) {
         size_t ntypes = file_.read_single_size_as_i32();
-        if (header_.file_version < tprv_RemoveImplicitSolvation) {
+        if (header_.file_version < TPRVersion::RemoveImplicitSolvation) {
             file_.skip(3 * ntypes * header_.sizeof_real);
         }
         file_.skip(ntypes * sizeof(int32_t));
-        if (header_.file_version >= 60 && header_.file_version < tprv_RemoveImplicitSolvation) {
+        if (header_.file_version >= 60 &&
+            header_.file_version < TPRVersion::RemoveImplicitSolvation) {
             file_.skip(2 * ntypes * header_.sizeof_real);
         }
     }
@@ -1137,7 +1141,7 @@ void TPRFormat::read_topology(Frame& frame) {
         }
     }
 
-    if (header_.file_version >= tprv_StoreNonBondedInteractionExclusionGroup) {
+    if (header_.file_version >= TPRVersion::StoreNonBondedInteractionExclusionGroup) {
         int64_t intermolecularExclusionGroupSize = file_.read_single_i64();
         if (intermolecularExclusionGroupSize < 0) {
             throw format_error("invalid intermolecular exclusion group size in TPR file: expected "
