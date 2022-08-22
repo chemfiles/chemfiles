@@ -774,7 +774,7 @@ void TPRFormat::read(Frame& frame) {
     }
 
     if (header_.ngroups_temperature_coupling > 0) {
-        const size_t ngtc_size = header_.ngroups_temperature_coupling * header_.sizeof_real;
+        const size_t ngtc_size = header_.ngroups_temperature_coupling * header_.sizeof_real();
         if (header_.file_version < 69) {
             // Skip some legacy entries
             file_.skip(ngtc_size);
@@ -808,8 +808,6 @@ void TPRFormat::read_header() {
         throw format_error("invalid precision {}, expected {} or {}", precision, sizeof(float),
                            sizeof(double));
     }
-
-    header_.sizeof_real = header_.use_double ? sizeof(double) : sizeof(float);
 
     header_.file_version = file_.read_single_i32();
 
@@ -864,7 +862,7 @@ void TPRFormat::read_header() {
 
     if (header_.file_version < 62) {
         // Skip some legacy entries
-        file_.skip(sizeof(int) + header_.sizeof_real);
+        file_.skip(sizeof(int) + header_.sizeof_real());
     }
     if (header_.file_version >= 79) {
         // Skip current value of the alchemical state
@@ -907,16 +905,16 @@ void TPRFormat::read_box(Frame& frame) {
     if (header_.file_version >= 51) {
         // Relative box vectors characteristic of the box shape
         // Skip unused 3*3 real matrix
-        file_.skip(header_.sizeof_real * 9);
+        file_.skip(header_.sizeof_real() * 9);
     }
 
     // Box velocities for Parrinello-Rahman barostat
     // Skip unused 3*3 real matrix
-    file_.skip(header_.sizeof_real * 9);
+    file_.skip(header_.sizeof_real() * 9);
 
     if (header_.file_version < 56) {
         // Skip some legacy entries
-        file_.skip(header_.sizeof_real * 9);
+        file_.skip(header_.sizeof_real() * 9);
     }
 }
 
@@ -929,7 +927,7 @@ void TPRFormat::read_topology(Frame& frame) {
     frame.set("name", read_symbol_table_entry(symbol_table));
 
     const FFParams ffparams =
-        read_force_field_parameters(file_, header_.sizeof_real, header_.file_version);
+        read_force_field_parameters(file_, header_.sizeof_real(), header_.file_version);
 
     // Read the definitions of the different molecule types and
     // their atoms and residues.
@@ -953,7 +951,7 @@ void TPRFormat::read_topology(Frame& frame) {
                 atom_prop.charge = file_.read_single_f64();
             }
             // Skip mass and charge for Free Energy calculations
-            file_.skip(2 * header_.sizeof_real);
+            file_.skip(2 * header_.sizeof_real());
             // Skip internal atom type
             if (header_.body_convention == FileIOXdr) {
                 file_.skip(2 * sizeof(uint32_t));
@@ -1096,7 +1094,7 @@ void TPRFormat::read_topology(Frame& frame) {
         file_.skip(sizeof(int32_t));
         for (size_t j = 0; j < 2; ++j) {
             size_t nposition_restraints = file_.read_single_size_as_i32();
-            file_.skip(nposition_restraints * 3 * header_.sizeof_real);
+            file_.skip(nposition_restraints * 3 * header_.sizeof_real());
         }
     }
 
@@ -1117,12 +1115,12 @@ void TPRFormat::read_topology(Frame& frame) {
     if (header_.file_version < TPRVersion::RemoveAtomtypes) {
         size_t ntypes = file_.read_single_size_as_i32();
         if (header_.file_version < TPRVersion::RemoveImplicitSolvation) {
-            file_.skip(3 * ntypes * header_.sizeof_real);
+            file_.skip(3 * ntypes * header_.sizeof_real());
         }
         file_.skip(ntypes * sizeof(int32_t));
         if (header_.file_version >= 60 &&
             header_.file_version < TPRVersion::RemoveImplicitSolvation) {
-            file_.skip(2 * ntypes * header_.sizeof_real);
+            file_.skip(2 * ntypes * header_.sizeof_real());
         }
     }
 
@@ -1131,7 +1129,7 @@ void TPRFormat::read_topology(Frame& frame) {
     if (header_.file_version >= 65) {
         size_t ngrids = file_.read_single_size_as_i32();
         size_t grid_spacing = file_.read_single_size_as_i32();
-        file_.skip(ngrids * grid_spacing * grid_spacing * 4 * header_.sizeof_real);
+        file_.skip(ngrids * grid_spacing * grid_spacing * 4 * header_.sizeof_real());
     }
 
     // Skip atom groups
@@ -1226,7 +1224,7 @@ void TPRFormat::read_coordinates(Frame& frame) {
         }
     }
     if (header_.has_forces) {
-        file_.skip(header_.natoms * 3 * header_.sizeof_real);
+        file_.skip(header_.natoms * 3 * header_.sizeof_real());
     }
 }
 
