@@ -489,6 +489,7 @@ TPRFormat::TPRFormat(std::string path, File::Mode mode, File::Compression compre
     if (mode != File::READ) {
         throw format_error("TPR format does not support write & append");
     }
+    read_header();
 }
 
 size_t TPRFormat::nsteps() { return 1; }
@@ -743,19 +744,18 @@ static FFParams read_force_field_parameters(XDRFile& file, size_t sizeof_real, i
 }
 
 void TPRFormat::read(Frame& frame) {
-    const TprHeader header = read_header();
-    frame.resize(header.natoms);
+    frame.resize(header_.natoms);
 
     // Now read the body of the TPR file
     // see `do_tpx_body` in <GMX>/src/gromacs/fileio/tpxio.cpp
 
-    if (header.has_box) {
-        read_box(frame, header);
+    if (header_.has_box) {
+        read_box(frame);
     }
 
-    if (header.ngroups_temperature_coupling > 0) {
-        const size_t ngtc_size = header.ngroups_temperature_coupling * header.sizeof_real;
-        if (header.file_version < 69) {
+    if (header_.ngroups_temperature_coupling > 0) {
+        const size_t ngtc_size = header_.ngroups_temperature_coupling * header_.sizeof_real;
+        if (header_.file_version < 69) {
             // Skip some legacy entries
             file_.skip(ngtc_size);
         }
@@ -763,11 +763,11 @@ void TPRFormat::read(Frame& frame) {
         file_.skip(ngtc_size);
     }
 
-    if (header.has_topology) {
-        read_topology(frame, header);
+    if (header_.has_topology) {
+        read_topology(frame);
     }
 
-    read_coordinates(frame, header);
+    read_coordinates(frame);
 
     // Now comes the simulation parameters in the input record
     // The parsing is done by `do_tpx_finalize()`
@@ -776,24 +776,22 @@ void TPRFormat::read(Frame& frame) {
     step_++;
 }
 
-TPRFormat::TprHeader TPRFormat::read_header() {
-    TprHeader header;
-
+void TPRFormat::read_header() {
     const std::string version = file_.read_gmx_string();
     if (version.compare(0, 7, "VERSION") != 0) {
         throw format_error("unsupported file from a GROMACS version which is older than 2.0");
     }
 
     size_t precision = file_.read_single_size_as_i32();
-    header.use_double = (precision == sizeof(double));
+    header_.use_double = (precision == sizeof(double));
     if (precision != sizeof(float) && precision != sizeof(double)) {
         throw format_error("invalid precision {}, expected {} or {}", precision, sizeof(float),
                            sizeof(double));
     }
 
-    header.sizeof_real = header.use_double ? sizeof(double) : sizeof(float);
+    header_.sizeof_real = header_.use_double ? sizeof(double) : sizeof(float);
 
-    header.file_version = file_.read_single_i32();
+    header_.file_version = file_.read_single_i32();
 
     // GROMACS explains:
     // This is for backward compatibility with development versions 77-79
@@ -801,16 +799,16 @@ TPRFormat::TprHeader TPRFormat::read_header() {
     // which would cause a segv instead of a proper error message
     // when reading the topology only from tpx with <77 code.
     std::string fileTag;
-    if (header.file_version >= 77 && header.file_version <= 79) {
+    if (header_.file_version >= 77 && header_.file_version <= 79) {
         fileTag = file_.read_gmx_string();
     }
 
-    header.file_generation = file_.read_single_i32();
+    header_.file_generation = file_.read_single_i32();
 
-    if (header.file_version >= 81) {
+    if (header_.file_version >= 81) {
         fileTag = file_.read_gmx_string();
     }
-    if (header.file_version < 77 || header.file_version == 80) {
+    if (header_.file_version < 77 || header_.file_version == 80) {
         // GROMACS: Versions before 77 don't have the tag, set it to release.
         // Version 80 is not handled by the current GROMACS implementation
         // but MDAnalysis sets the tag to release as well for version 80.
@@ -821,113 +819,111 @@ TPRFormat::TprHeader TPRFormat::read_header() {
     // GROMACS explains:
     // We only support reading tpx files with the same tag as the code
     // or tpx files with the release tag and with lower version number.
-    if (fileTag != TPR_TAG_RELEASE && header.file_version < TPR_VERSION) {
+    if (fileTag != TPR_TAG_RELEASE && header_.file_version < TPR_VERSION) {
         throw format_error("TPR tag/version mismatch: reading file with version {}, tag '{}' with "
                            "program for version {}, tag '{}'",
-                           header.file_version, fileTag, TPR_VERSION, TPR_TAG_RELEASE);
+                           header_.file_version, fileTag, TPR_VERSION, TPR_TAG_RELEASE);
     }
 
-    if (header.file_version > TPR_VERSION) {
+    if (header_.file_version > TPR_VERSION) {
         warning("TPR",
                 "file version is from the future: implementation uses version {}, but got {}",
-                TPR_VERSION, header.file_version);
+                TPR_VERSION, header_.file_version);
     }
 
     // Assume `TopOnlyOK` is true, i.e. we need only the topology and not the input record.
     // This allows reading of future versions of the same generation.
-    if ((header.file_version <= TPR_INCOMPATIBLE_VERSION) ||
-        (header.file_generation > TPR_GENERATION)) {
-        throw format_error("unable to read version {} with version {} program", header.file_version,
-                           TPR_VERSION);
+    if ((header_.file_version <= TPR_INCOMPATIBLE_VERSION) ||
+        (header_.file_generation > TPR_GENERATION)) {
+        throw format_error("unable to read version {} with version {} program",
+                           header_.file_version, TPR_VERSION);
     }
 
-    header.natoms = file_.read_single_size_as_i32();
-    header.ngroups_temperature_coupling = file_.read_single_size_as_i32();
+    header_.natoms = file_.read_single_size_as_i32();
+    header_.ngroups_temperature_coupling = file_.read_single_size_as_i32();
 
-    if (header.file_version < 62) {
+    if (header_.file_version < 62) {
         // Skip some legacy entries
-        file_.skip(sizeof(int) + header.sizeof_real);
+        file_.skip(sizeof(int) + header_.sizeof_real);
     }
-    if (header.file_version >= 79) {
+    if (header_.file_version >= 79) {
         // Skip current value of the alchemical state
         file_.read_single_i32();
     }
-    if (!header.use_double) {
-        header.lambda = static_cast<double>(file_.read_single_f32());
+    if (!header_.use_double) {
+        header_.lambda = static_cast<double>(file_.read_single_f32());
     } else {
-        header.lambda = file_.read_single_f64();
+        header_.lambda = file_.read_single_f64();
     }
-    header.has_input_record = read_gmx_bool();
-    header.has_topology = read_gmx_bool();
-    header.has_positions = read_gmx_bool();
-    header.has_velocities = read_gmx_bool();
-    header.has_forces = read_gmx_bool();
-    header.has_box = read_gmx_bool();
+    header_.has_input_record = read_gmx_bool();
+    header_.has_topology = read_gmx_bool();
+    header_.has_positions = read_gmx_bool();
+    header_.has_velocities = read_gmx_bool();
+    header_.has_forces = read_gmx_bool();
+    header_.has_box = read_gmx_bool();
 
-    if (header.file_version >= tprv_AddSizeField && header.file_generation >= 27) {
+    if (header_.file_version >= tprv_AddSizeField && header_.file_generation >= 27) {
         // Skip size of the TPR body in bytes
         file_.read_single_i64();
     }
 
-    if (header.file_generation > TPR_GENERATION && header.has_input_record) {
+    if (header_.file_generation > TPR_GENERATION && header_.has_input_record) {
         // Trying to read a file from the future with an input record.
         // At this point in time, it's unknown what will be in the record.
-        header.has_input_record = false;
+        header_.has_input_record = false;
     }
 
-    if (header.file_version >= tprv_AddSizeField && header.file_generation >= 27) {
-        header.body_convention = InMemory;
+    if (header_.file_version >= tprv_AddSizeField && header_.file_generation >= 27) {
+        header_.body_convention = InMemory;
     } else {
-        header.body_convention = FileIOXdr;
+        header_.body_convention = FileIOXdr;
     }
-
-    return header;
 }
 
-void TPRFormat::read_box(Frame& frame, const TprHeader& header) {
-    const auto box = file_.read_gmx_box(header.use_double);
+void TPRFormat::read_box(Frame& frame) {
+    const auto box = file_.read_gmx_box(header_.use_double);
     frame.set_cell(box);
 
-    if (header.file_version >= 51) {
+    if (header_.file_version >= 51) {
         // Relative box vectors characteristic of the box shape
         // Skip unused 3*3 real matrix
-        file_.skip(header.sizeof_real * 9);
+        file_.skip(header_.sizeof_real * 9);
     }
 
     // Box velocities for Parrinello-Rahman barostat
     // Skip unused 3*3 real matrix
-    file_.skip(header.sizeof_real * 9);
+    file_.skip(header_.sizeof_real * 9);
 
-    if (header.file_version < 56) {
+    if (header_.file_version < 56) {
         // Skip some legacy entries
-        file_.skip(header.sizeof_real * 9);
+        file_.skip(header_.sizeof_real * 9);
     }
 }
 
-void TPRFormat::read_topology(Frame& frame, const TprHeader& header) {
+void TPRFormat::read_topology(Frame& frame) {
     // Most of the used functions are defined in <GMX>/src/gromacs/fileio/tpxio.cpp
     // which is not repeated everytime in the following section.
 
-    const std::vector<std::string> symbol_table = read_symbol_table(header);
+    const std::vector<std::string> symbol_table = read_symbol_table();
 
     frame.set("name", read_symbol_table_entry(symbol_table));
 
     const FFParams ffparams =
-        read_force_field_parameters(file_, header.sizeof_real, header.file_version);
+        read_force_field_parameters(file_, header_.sizeof_real, header_.file_version);
 
     // Read the definitions of the different molecule types and
     // their atoms and residues.
     // see `do_moltype`
-    auto read_molecule_types = [this, header, symbol_table]() -> std::vector<MoleculeType> {
+    auto read_molecule_types = [this, symbol_table]() -> std::vector<MoleculeType> {
         const size_t nmoltypes = file_.read_single_size_as_i32();
         std::vector<MoleculeType> molecule_types;
         molecule_types.reserve(nmoltypes);
 
         // Read the properties of single atom
         // see `do_atom`
-        auto read_atom = [this, header]() -> AtomProperties {
+        auto read_atom = [this]() -> AtomProperties {
             AtomProperties atom_prop;
-            if (!header.use_double) {
+            if (!header_.use_double) {
                 // Float
                 atom_prop.mass = static_cast<double>(file_.read_single_f32());
                 atom_prop.charge = static_cast<double>(file_.read_single_f32());
@@ -937,12 +933,12 @@ void TPRFormat::read_topology(Frame& frame, const TprHeader& header) {
                 atom_prop.charge = file_.read_single_f64();
             }
             // Skip mass and charge for Free Energy calculations
-            file_.skip(2 * header.sizeof_real);
+            file_.skip(2 * header_.sizeof_real);
             // Skip internal atom type
-            if (header.body_convention == FileIOXdr) {
+            if (header_.body_convention == FileIOXdr) {
                 file_.skip(2 * sizeof(uint32_t));
             } else {
-                assert(header.body_convention == InMemory);
+                assert(header_.body_convention == InMemory);
                 file_.skip(2 * sizeof(uint16_t));
             }
             // Skip internal particle type
@@ -962,7 +958,7 @@ void TPRFormat::read_topology(Frame& frame, const TprHeader& header) {
 
         // Read the definition of all the atoms in a molecule type
         // -> do_atoms
-        auto read_atoms = [this, header, symbol_table, read_atom]() -> Atoms {
+        auto read_atoms = [this, symbol_table, read_atom]() -> Atoms {
             Atoms atoms;
             const size_t natoms = file_.read_single_size_as_i32();
             const size_t nresidue_info = file_.read_single_size_as_i32();
@@ -993,9 +989,9 @@ void TPRFormat::read_topology(Frame& frame, const TprHeader& header) {
                 std::string name = read_symbol_table_entry(symbol_table);
                 uint8_t insertion_code = ' ';
                 int64_t residue_number = static_cast<int64_t>(j) + 1;
-                if (header.file_version >= 63) {
+                if (header_.file_version >= 63) {
                     residue_number = static_cast<int64_t>(file_.read_single_i32());
-                    insertion_code = read_gmx_uchar(header.body_convention);
+                    insertion_code = read_gmx_uchar();
                 }
                 ResidueInfo res_info = {name, residue_number, insertion_code};
                 atoms.residue_infos.emplace_back(res_info);
@@ -1010,7 +1006,7 @@ void TPRFormat::read_topology(Frame& frame, const TprHeader& header) {
             moltype.atoms = read_atoms();
 
             // Read the interaction lists
-            moltype.interaction_lists = read_interaction_lists(file_, header.file_version);
+            moltype.interaction_lists = read_interaction_lists(file_, header_.file_version);
 
             molecule_types.emplace_back(moltype);
 
@@ -1080,40 +1076,41 @@ void TPRFormat::read_topology(Frame& frame, const TprHeader& header) {
         file_.skip(sizeof(int32_t));
         for (size_t j = 0; j < 2; ++j) {
             size_t nposition_restraints = file_.read_single_size_as_i32();
-            file_.skip(nposition_restraints * 3 * header.sizeof_real);
+            file_.skip(nposition_restraints * 3 * header_.sizeof_real);
         }
     }
 
     const size_t natoms = file_.read_single_size_as_i32();
-    assert(natoms == header.natoms);
+    assert(natoms == header_.natoms);
 
-    if (header.file_version >= tprv_IntermolecularBondeds) {
-        bool has_intermolecular_bonds = read_gmx_bool(header.body_convention);
+    if (header_.file_version >= tprv_IntermolecularBondeds) {
+        bool has_intermolecular_bonds = read_gmx_bool();
         if (has_intermolecular_bonds) {
-            InteractionLists interaction_lists = read_interaction_lists(file_, header.file_version);
+            InteractionLists interaction_lists =
+                read_interaction_lists(file_, header_.file_version);
             add_conectivity(frame, interaction_lists);
         }
     }
 
     // Skip atom types for old formats
     // see `do_atomtypes`
-    if (header.file_version < tprv_RemoveAtomtypes) {
+    if (header_.file_version < tprv_RemoveAtomtypes) {
         size_t ntypes = file_.read_single_size_as_i32();
-        if (header.file_version < tprv_RemoveImplicitSolvation) {
-            file_.skip(3 * ntypes * header.sizeof_real);
+        if (header_.file_version < tprv_RemoveImplicitSolvation) {
+            file_.skip(3 * ntypes * header_.sizeof_real);
         }
         file_.skip(ntypes * sizeof(int32_t));
-        if (header.file_version >= 60 && header.file_version < tprv_RemoveImplicitSolvation) {
-            file_.skip(2 * ntypes * header.sizeof_real);
+        if (header_.file_version >= 60 && header_.file_version < tprv_RemoveImplicitSolvation) {
+            file_.skip(2 * ntypes * header_.sizeof_real);
         }
     }
 
     // Skip dihedral correction maps (CMAP)
     // see `do_cmap`
-    if (header.file_version >= 65) {
+    if (header_.file_version >= 65) {
         size_t ngrids = file_.read_single_size_as_i32();
         size_t grid_spacing = file_.read_single_size_as_i32();
-        file_.skip(ngrids * grid_spacing * grid_spacing * 4 * header.sizeof_real);
+        file_.skip(ngrids * grid_spacing * grid_spacing * 4 * header_.sizeof_real);
     }
 
     // Skip atom groups
@@ -1131,16 +1128,16 @@ void TPRFormat::read_topology(Frame& frame, const TprHeader& header) {
         // Skip group numbers
         for (size_t i = 0; i < NR_GROUP_TYPES; ++i) {
             size_t ngroup_numbers = file_.read_single_size_as_i32();
-            if (header.body_convention == FileIOXdr) {
+            if (header_.body_convention == FileIOXdr) {
                 file_.skip(ngroup_numbers * sizeof(uint32_t));
             } else {
-                assert(header.body_convention == InMemory);
+                assert(header_.body_convention == InMemory);
                 file_.skip(ngroup_numbers * sizeof(uint8_t));
             }
         }
     }
 
-    if (header.file_version >= tprv_StoreNonBondedInteractionExclusionGroup) {
+    if (header_.file_version >= tprv_StoreNonBondedInteractionExclusionGroup) {
         int64_t intermolecularExclusionGroupSize = file_.read_single_i64();
         if (intermolecularExclusionGroupSize < 0) {
             throw format_error("invalid intermolecular exclusion group size in TPR file: expected "
@@ -1153,11 +1150,11 @@ void TPRFormat::read_topology(Frame& frame, const TprHeader& header) {
     }
 }
 
-void TPRFormat::read_coordinates(Frame& frame, const TprHeader& header) {
-    if (header.use_double) {
+void TPRFormat::read_coordinates(Frame& frame) {
+    if (header_.use_double) {
         // Double
-        std::vector<double> dx(header.natoms * 3);
-        if (header.has_positions) {
+        std::vector<double> dx(header_.natoms * 3);
+        if (header_.has_positions) {
             file_.read_f64(dx);
             auto positions = frame.positions();
             assert(dx.size() == 3 * positions.size());
@@ -1168,7 +1165,7 @@ void TPRFormat::read_coordinates(Frame& frame, const TprHeader& header) {
                 positions[i][2] = dx[i * 3 + 2] * 10.0;
             }
         }
-        if (header.has_velocities) {
+        if (header_.has_velocities) {
             file_.read_f64(dx);
             frame.add_velocities();
             auto velocities = *frame.velocities();
@@ -1182,8 +1179,8 @@ void TPRFormat::read_coordinates(Frame& frame, const TprHeader& header) {
         }
     } else {
         // Float
-        std::vector<float> dx(header.natoms * 3);
-        if (header.has_positions) {
+        std::vector<float> dx(header_.natoms * 3);
+        if (header_.has_positions) {
             file_.read_f32(dx);
             auto positions = frame.positions();
             assert(dx.size() == 3 * positions.size());
@@ -1194,7 +1191,7 @@ void TPRFormat::read_coordinates(Frame& frame, const TprHeader& header) {
                 positions[i][2] = static_cast<double>(dx[i * 3 + 2]) * 10.0;
             }
         }
-        if (header.has_velocities) {
+        if (header_.has_velocities) {
             file_.read_f32(dx);
             frame.add_velocities();
             auto velocities = *frame.velocities();
@@ -1207,17 +1204,17 @@ void TPRFormat::read_coordinates(Frame& frame, const TprHeader& header) {
             }
         }
     }
-    if (header.has_forces) {
-        file_.skip(header.natoms * 3 * header.sizeof_real);
+    if (header_.has_forces) {
+        file_.skip(header_.natoms * 3 * header_.sizeof_real);
     }
 }
 
-std::vector<std::string> TPRFormat::read_symbol_table(const TprHeader& header) {
+std::vector<std::string> TPRFormat::read_symbol_table() {
     size_t nsymbols = file_.read_single_size_as_i32();
     std::vector<std::string> symbol_table;
     symbol_table.reserve(nsymbols);
     for (size_t i = 0; i < nsymbols; ++i) {
-        symbol_table.emplace_back(read_gmx_string(header.body_convention));
+        symbol_table.emplace_back(read_gmx_string());
     }
     return symbol_table;
 }
@@ -1227,11 +1224,11 @@ const std::string& TPRFormat::read_symbol_table_entry(const std::vector<std::str
     return table.at(idx);
 }
 
-std::string TPRFormat::read_gmx_string(TprBodyConvention body_convention) {
-    if (body_convention == FileIOXdr) {
+std::string TPRFormat::read_gmx_string() {
+    if (header_.body_convention == FileIOXdr) {
         return file_.read_gmx_string();
     } else {
-        assert(body_convention == InMemory);
+        assert(header_.body_convention == InMemory);
         // Read a non-XDR-compliant *long* GROMACS string
         // A long GROMACS string stores the length of the string as uint64 before
         // the string contents. The contents are *not* padded to make the size a
@@ -1247,20 +1244,20 @@ std::string TPRFormat::read_gmx_string(TprBodyConvention body_convention) {
     }
 }
 
-uint8_t TPRFormat::read_gmx_uchar(TprBodyConvention body_convention) {
-    if (body_convention == FileIOXdr) {
+uint8_t TPRFormat::read_gmx_uchar() {
+    if (header_.body_convention == FileIOXdr) {
         return static_cast<uint8_t>(file_.read_single_u32());
     } else {
-        assert(body_convention == InMemory);
+        assert(header_.body_convention == InMemory);
         return file_.read_single_u8();
     }
 }
 
-bool TPRFormat::read_gmx_bool(TprBodyConvention body_convention) {
-    if (body_convention == FileIOXdr) {
+bool TPRFormat::read_gmx_bool() {
+    if (header_.body_convention == FileIOXdr) {
         return file_.read_single_i32() != 0;
     } else {
-        assert(body_convention == InMemory);
+        assert(header_.body_convention == InMemory);
         return file_.read_single_u8() != 0;
     }
 }
