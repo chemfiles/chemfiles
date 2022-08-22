@@ -105,109 +105,125 @@ static const int TPR_GENERATION = 28;
 static const int TPR_INCOMPATIBLE_VERSION = 57; // GMX4.0 has version 58
 
 // see <GMX>/api/legacy/include/gromacs/topology/ifunc.h
-enum FunctionType {
-    F_BONDS,
-    F_G96BONDS,
-    F_MORSE,
-    F_CUBICBONDS,
-    F_CONNBONDS,
-    F_HARMONIC,
-    F_FENEBONDS,
-    F_TABBONDS,
-    F_TABBONDSNC,
-    F_RESTRBONDS,
-    F_ANGLES,
-    F_G96ANGLES,
-    F_RESTRANGLES,
-    F_LINEAR_ANGLES,
-    F_CROSS_BOND_BONDS,
-    F_CROSS_BOND_ANGLES,
-    F_UREY_BRADLEY,
-    F_QUARTIC_ANGLES,
-    F_TABANGLES,
-    F_PDIHS,
-    F_RBDIHS,
-    F_RESTRDIHS,
-    F_CBTDIHS,
-    F_FOURDIHS,
-    F_IDIHS,
-    F_PIDIHS,
-    F_TABDIHS,
-    F_CMAP,
-    F_GB12_NOLONGERUSED,
-    F_GB13_NOLONGERUSED,
-    F_GB14_NOLONGERUSED,
-    F_GBPOL_NOLONGERUSED,
-    F_NPSOLVATION_NOLONGERUSED,
-    F_LJ14,
-    F_COUL14,
-    F_LJC14_Q,
-    F_LJC_PAIRS_NB,
-    F_LJ,
-    F_BHAM,
-    F_LJ_LR_NOLONGERUSED,
-    F_BHAM_LR_NOLONGERUSED,
-    F_DISPCORR,
-    F_COUL_SR,
-    F_COUL_LR_NOLONGERUSED,
-    F_RF_EXCL,
-    F_COUL_RECIP,
-    F_LJ_RECIP,
-    F_DPD,
-    F_POLARIZATION,
-    F_WATER_POL,
-    F_THOLE_POL,
-    F_ANHARM_POL,
-    F_POSRES,
-    F_FBPOSRES,
-    F_DISRES,
-    F_DISRESVIOL,
-    F_ORIRES,
-    F_ORIRESDEV,
-    F_ANGRES,
-    F_ANGRESZ,
-    F_DIHRES,
-    F_DIHRESVIOL,
-    F_CONSTR,
-    F_CONSTRNC,
-    F_SETTLE,
-    F_VSITE1,
-    F_VSITE2,
-    F_VSITE2FD,
-    F_VSITE3,
-    F_VSITE3FD,
-    F_VSITE3FAD,
-    F_VSITE3OUT,
-    F_VSITE4FD,
-    F_VSITE4FDN,
-    F_VSITEN,
-    F_COM_PULL,
-    F_DENSITYFITTING,
-    F_EQM,
-    F_EPOT,
-    F_EKIN,
-    F_ETOT,
-    F_ECONSERVED,
-    F_TEMP,
-    F_VTEMP_NOLONGERUSED,
-    F_PDISPCORR,
-    F_PRES,
-    F_DVDL_CONSTR,
-    F_DVDL,
-    F_DKDL,
-    F_DVDL_COUL,
-    F_DVDL_VDW,
-    F_DVDL_BONDED,
-    F_DVDL_RESTRAINT,
-    F_DVDL_TEMPERATURE,
-    F_NRE // This number is for the total number of energies
+class FunctionType {
+  public:
+    enum FT : size_t {
+        BONDS,
+        G96BONDS,
+        MORSE,
+        CUBICBONDS,
+        CONNBONDS,
+        HARMONIC,
+        FENEBONDS,
+        TABBONDS,
+        TABBONDSNC,
+        RESTRBONDS,
+        ANGLES,
+        G96ANGLES,
+        RESTRANGLES,
+        LINEAR_ANGLES,
+        CROSS_BOND_BONDS,
+        CROSS_BOND_ANGLES,
+        UREY_BRADLEY,
+        QUARTIC_ANGLES,
+        TABANGLES,
+        PDIHS,
+        RBDIHS,
+        RESTRDIHS,
+        CBTDIHS,
+        FOURDIHS,
+        IDIHS,
+        PIDIHS,
+        TABDIHS,
+        CMAP,
+        GB12_NOLONGERUSED,
+        GB13_NOLONGERUSED,
+        GB14_NOLONGERUSED,
+        GBPOL_NOLONGERUSED,
+        NPSOLVATION_NOLONGERUSED,
+        LJ14,
+        COUL14,
+        LJC14_Q,
+        LJC_PAIRS_NB,
+        LJ,
+        BHAM,
+        LJ_LR_NOLONGERUSED,
+        BHAM_LR_NOLONGERUSED,
+        DISPCORR,
+        COUL_SR,
+        COUL_LR_NOLONGERUSED,
+        RF_EXCL,
+        COUL_RECIP,
+        LJ_RECIP,
+        DPD,
+        POLARIZATION,
+        WATER_POL,
+        THOLE_POL,
+        ANHARM_POL,
+        POSRES,
+        FBPOSRES,
+        DISRES,
+        DISRESVIOL,
+        ORIRES,
+        ORIRESDEV,
+        ANGRES,
+        ANGRESZ,
+        DIHRES,
+        DIHRESVIOL,
+        CONSTR,
+        CONSTRNC,
+        SETTLE,
+        VSITE1,
+        VSITE2,
+        VSITE2FD,
+        VSITE3,
+        VSITE3FD,
+        VSITE3FAD,
+        VSITE3OUT,
+        VSITE4FD,
+        VSITE4FDN,
+        VSITEN,
+        COM_PULL,
+        DENSITYFITTING,
+        EQM,
+        EPOT,
+        EKIN,
+        ETOT,
+        ECONSERVED,
+        TEMP,
+        VTEMP_NOLONGERUSED,
+        PDISPCORR,
+        PRES,
+        DVDL_CONSTR,
+        DVDL,
+        DKDL,
+        DVDL_COUL,
+        DVDL_VDW,
+        DVDL_BONDED,
+        DVDL_RESTRAINT,
+        DVDL_TEMPERATURE,
+        Count
+    };
+    FunctionType() = default;
+    constexpr FunctionType(FT v) : value(v) {}
+    constexpr FunctionType(size_t v) : value(static_cast<FT>(v)) {}
+    FunctionType(int v) : value(static_cast<FT>(v)) { assert(v >= 0); }
+    operator int() const { return static_cast<int>(value); }
+
+  private:
+    FT value;
 };
+
+// This number is for the total number of energies / interaction function types
+static const int NRE = FunctionType::Count;
 
 // Set of function types which are considered as bonds.
 // Update when new function types are introduced.
 const std::vector<FunctionType> BOND_TYPES = {
-    F_BONDS,     F_G96BONDS,   F_MORSE,  F_CUBICBONDS, F_CONNBONDS, F_HARMONIC,
-    F_FENEBONDS, F_RESTRBONDS, F_CONSTR, F_CONSTRNC,   F_TABBONDS,  F_TABBONDSNC,
+    FunctionType::BONDS,      FunctionType::G96BONDS,   FunctionType::MORSE,
+    FunctionType::CUBICBONDS, FunctionType::CONNBONDS,  FunctionType::HARMONIC,
+    FunctionType::FENEBONDS,  FunctionType::RESTRBONDS, FunctionType::CONSTR,
+    FunctionType::CONSTRNC,   FunctionType::TABBONDS,   FunctionType::TABBONDSNC,
 };
 
 // All force filed parameters of the system.
@@ -235,30 +251,30 @@ struct FunctionTypeUpdate {
 // are added. Necessary to support reading of old TPR file versions.
 // see `ftupd` in <GMX>/src/gromacs/fileio/tpxio.cpp
 static const FunctionTypeUpdate FUNCTION_TYPE_UPDATES[24]{
-    {70, F_RESTRBONDS},
-    {TPRVersion::RestrictedBendingAndCombinedAngleTorsionPotentials, F_RESTRANGLES},
-    {76, F_LINEAR_ANGLES},
-    {TPRVersion::RestrictedBendingAndCombinedAngleTorsionPotentials, F_RESTRDIHS},
-    {TPRVersion::RestrictedBendingAndCombinedAngleTorsionPotentials, F_CBTDIHS},
-    {65, F_CMAP},
-    {60, F_GB12_NOLONGERUSED},
-    {61, F_GB13_NOLONGERUSED},
-    {61, F_GB14_NOLONGERUSED},
-    {72, F_GBPOL_NOLONGERUSED},
-    {72, F_NPSOLVATION_NOLONGERUSED},
-    {93, F_LJ_RECIP},
-    {76, F_ANHARM_POL},
-    {90, F_FBPOSRES},
-    {TPRVersion::VSite1, F_VSITE1},
-    {TPRVersion::VSite2FD, F_VSITE2FD},
-    {TPRVersion::GenericInternalParameters, F_DENSITYFITTING},
-    {69, F_VTEMP_NOLONGERUSED},
-    {66, F_PDISPCORR},
-    {79, F_DVDL_COUL},
-    {79, F_DVDL_VDW},
-    {79, F_DVDL_BONDED},
-    {79, F_DVDL_RESTRAINT},
-    {79, F_DVDL_TEMPERATURE},
+    {70, FunctionType::RESTRBONDS},
+    {TPRVersion::RestrictedBendingAndCombinedAngleTorsionPotentials, FunctionType::RESTRANGLES},
+    {76, FunctionType::LINEAR_ANGLES},
+    {TPRVersion::RestrictedBendingAndCombinedAngleTorsionPotentials, FunctionType::RESTRDIHS},
+    {TPRVersion::RestrictedBendingAndCombinedAngleTorsionPotentials, FunctionType::CBTDIHS},
+    {65, FunctionType::CMAP},
+    {60, FunctionType::GB12_NOLONGERUSED},
+    {61, FunctionType::GB13_NOLONGERUSED},
+    {61, FunctionType::GB14_NOLONGERUSED},
+    {72, FunctionType::GBPOL_NOLONGERUSED},
+    {72, FunctionType::NPSOLVATION_NOLONGERUSED},
+    {93, FunctionType::LJ_RECIP},
+    {76, FunctionType::ANHARM_POL},
+    {90, FunctionType::FBPOSRES},
+    {TPRVersion::VSite1, FunctionType::VSITE1},
+    {TPRVersion::VSite2FD, FunctionType::VSITE2FD},
+    {TPRVersion::GenericInternalParameters, FunctionType::DENSITYFITTING},
+    {69, FunctionType::VTEMP_NOLONGERUSED},
+    {66, FunctionType::PDISPCORR},
+    {79, FunctionType::DVDL_COUL},
+    {79, FunctionType::DVDL_VDW},
+    {79, FunctionType::DVDL_BONDED},
+    {79, FunctionType::DVDL_RESTRAINT},
+    {79, FunctionType::DVDL_TEMPERATURE},
 };
 
 // see `t_interaction_function` in <GMX>/api/legacy/include/gromacs/topology/ifunc.h
@@ -270,7 +286,7 @@ struct FunctionTypeInfo {
 // This table contains a human-readable name for a function type
 // and the number of atoms needed per function.
 // see `interaction_function` in <GMX>/src/gromacs/topology/ifunc.cpp
-const FunctionTypeInfo FUNCTION_TYPE_INFOS[F_NRE]{
+const FunctionTypeInfo FUNCTION_TYPE_INFOS[NRE]{
     {"Bond", 2},
     {"G96Bond", 2},
     {"Morse", 2},
@@ -430,7 +446,7 @@ struct InteractionList {
     }
 
     void add_settle_atoms() {
-        assert(function_type == F_SETTLE);
+        assert(function_type == FunctionType::SETTLE);
         assert(!settle_done); // This can be called only once
         settle_done = true;
         // GROMACS: Settle used to only store the first atom: add the other two
@@ -449,7 +465,7 @@ struct InteractionList {
 
 // GROMACS: List of interaction lists, one list for each interaction type.
 // see <GMX>/api/legacy/include/gromacs/topology/idef.h
-typedef std::array<chemfiles::optional<InteractionList>, F_NRE> InteractionLists;
+typedef std::array<chemfiles::optional<InteractionList>, NRE> InteractionLists;
 
 // see `gmx_moltype_t` in <GMX>/api/legacy/include/gromacs/topology/topology.h
 struct MoleculeType {
@@ -506,85 +522,85 @@ void TPRFormat::read_step(size_t step, Frame& frame) {
 // see `do_iparams` <GMX>/src/gromacs/fileio/tpxio.cpp
 static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, int file_version) {
     switch (ftype) {
-    case F_ANGLES:
-    case F_G96ANGLES:
-    case F_BONDS:
-    case F_G96BONDS:
-    case F_HARMONIC:
-    case F_IDIHS:
+    case FunctionType::ANGLES:
+    case FunctionType::G96ANGLES:
+    case FunctionType::BONDS:
+    case FunctionType::G96BONDS:
+    case FunctionType::HARMONIC:
+    case FunctionType::IDIHS:
         return 4 * sizeof_real;
-    case F_RESTRANGLES:
+    case FunctionType::RESTRANGLES:
         return 2 * sizeof_real;
-    case F_LINEAR_ANGLES:
+    case FunctionType::LINEAR_ANGLES:
         return 4 * sizeof_real;
-    case F_FENEBONDS:
+    case FunctionType::FENEBONDS:
         return 2 * sizeof_real;
-    case F_RESTRBONDS:
+    case FunctionType::RESTRBONDS:
         return 8 * sizeof_real;
-    case F_TABBONDS:
-    case F_TABBONDSNC:
-    case F_TABANGLES:
-    case F_TABDIHS:
+    case FunctionType::TABBONDS:
+    case FunctionType::TABBONDSNC:
+    case FunctionType::TABANGLES:
+    case FunctionType::TABDIHS:
         return 2 * sizeof_real + sizeof(int32_t);
-    case F_CROSS_BOND_BONDS:
+    case FunctionType::CROSS_BOND_BONDS:
         return 3 * sizeof_real;
-    case F_CROSS_BOND_ANGLES:
+    case FunctionType::CROSS_BOND_ANGLES:
         return 4 * sizeof_real;
-    case F_UREY_BRADLEY: {
+    case FunctionType::UREY_BRADLEY: {
         size_t size = 4 * sizeof_real;
         if (file_version >= 79) {
             size += 4 * sizeof_real;
         }
         return size;
     }
-    case F_QUARTIC_ANGLES:
+    case FunctionType::QUARTIC_ANGLES:
         return 6 * sizeof_real;
-    case F_BHAM:
+    case FunctionType::BHAM:
         return 3 * sizeof_real;
-    case F_MORSE: {
+    case FunctionType::MORSE: {
         size_t size = 3 * sizeof_real;
         if (file_version >= 79) {
             size += 3 * sizeof_real;
         }
         return size;
     }
-    case F_CUBICBONDS:
+    case FunctionType::CUBICBONDS:
         return 3 * sizeof_real;
-    case F_CONNBONDS:
+    case FunctionType::CONNBONDS:
         return 0;
-    case F_POLARIZATION:
+    case FunctionType::POLARIZATION:
         return sizeof_real;
-    case F_ANHARM_POL:
+    case FunctionType::ANHARM_POL:
         return 3 * sizeof_real;
-    case F_WATER_POL:
+    case FunctionType::WATER_POL:
         return 6 * sizeof_real;
-    case F_THOLE_POL: {
+    case FunctionType::THOLE_POL: {
         size_t size = 3 * sizeof_real;
         if (file_version < TPRVersion::RemoveTholeRfac) {
             size += sizeof_real;
         }
         return size;
     }
-    case F_LJ:
+    case FunctionType::LJ:
         return 2 * sizeof_real;
-    case F_LJ14:
+    case FunctionType::LJ14:
         return 4 * sizeof_real;
-    case F_LJC14_Q:
+    case FunctionType::LJC14_Q:
         return 5 * sizeof_real;
-    case F_LJC_PAIRS_NB:
+    case FunctionType::LJC_PAIRS_NB:
         return 4 * sizeof_real;
-    case F_PDIHS:
-    case F_PIDIHS:
-    case F_ANGRES:
-    case F_ANGRESZ:
+    case FunctionType::PDIHS:
+    case FunctionType::PIDIHS:
+    case FunctionType::ANGRES:
+    case FunctionType::ANGRESZ:
         return 4 * sizeof_real + sizeof(int32_t);
-    case F_RESTRDIHS:
+    case FunctionType::RESTRDIHS:
         return 2 * sizeof_real;
-    case F_DISRES:
+    case FunctionType::DISRES:
         return 2 * sizeof(int32_t) + 4 * sizeof_real;
-    case F_ORIRES:
+    case FunctionType::ORIRES:
         return 3 * sizeof(int32_t) + 3 * sizeof_real;
-    case F_DIHRES: {
+    case FunctionType::DIHRES: {
         size_t size = 3 * sizeof_real;
         if (file_version < 82) {
             size += 2 * sizeof(int32_t);
@@ -594,38 +610,38 @@ static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, in
         }
         return size;
     }
-    case F_POSRES:
+    case FunctionType::POSRES:
         return 4 * 3 * sizeof_real;
-    case F_FBPOSRES:
+    case FunctionType::FBPOSRES:
         return sizeof(int32_t) + 5 * sizeof_real;
-    case F_CBTDIHS:
+    case FunctionType::CBTDIHS:
         return NR_CBTDIHS * sizeof_real;
-    case F_RBDIHS:
-    case F_FOURDIHS:
+    case FunctionType::RBDIHS:
+    case FunctionType::FOURDIHS:
         return 2 * NR_RBDIHS * sizeof_real;
-    case F_CONSTR:
-    case F_CONSTRNC:
+    case FunctionType::CONSTR:
+    case FunctionType::CONSTRNC:
         return 2 * sizeof_real;
-    case F_SETTLE:
+    case FunctionType::SETTLE:
         return 2 * sizeof_real;
-    case F_VSITE1:
+    case FunctionType::VSITE1:
         return 0;
-    case F_VSITE2:
-    case F_VSITE2FD:
+    case FunctionType::VSITE2:
+    case FunctionType::VSITE2FD:
         return 1 * sizeof_real;
-    case F_VSITE3:
-    case F_VSITE3FD:
-    case F_VSITE3FAD:
+    case FunctionType::VSITE3:
+    case FunctionType::VSITE3FD:
+    case FunctionType::VSITE3FAD:
         return 2 * sizeof_real;
-    case F_VSITE3OUT:
-    case F_VSITE4FD:
-    case F_VSITE4FDN:
+    case FunctionType::VSITE3OUT:
+    case FunctionType::VSITE4FD:
+    case FunctionType::VSITE4FDN:
         return 3 * sizeof_real;
-    case F_VSITEN:
+    case FunctionType::VSITEN:
         return sizeof(int32_t) + sizeof_real;
-    case F_GB12_NOLONGERUSED:
-    case F_GB13_NOLONGERUSED:
-    case F_GB14_NOLONGERUSED: {
+    case FunctionType::GB12_NOLONGERUSED:
+    case FunctionType::GB13_NOLONGERUSED:
+    case FunctionType::GB14_NOLONGERUSED: {
         size_t size = 0;
         if (file_version < 68) {
             size += 4 * sizeof_real;
@@ -635,7 +651,7 @@ static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, in
         }
         return size;
     }
-    case F_CMAP:
+    case FunctionType::CMAP:
         return 2 * sizeof(int32_t);
     default:
         throw format_error("unknown function type {} ({})", ftype, FUNCTION_TYPE_INFOS[ftype].name);
@@ -645,7 +661,7 @@ static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, in
 // see `do_ilists` in <GMX>/src/gromacs/fileio/tpxio.cpp
 static InteractionLists read_interaction_lists(XDRFile& file, int file_version) {
     InteractionLists interaction_lists;
-    for (size_t i = 0; i < F_NRE; ++i) {
+    for (size_t i = 0; i < NRE; ++i) {
         const FunctionType function_type = static_cast<FunctionType>(i);
         bool is_old_interaction = false;
         for (const auto function_type_update : FUNCTION_TYPE_UPDATES) {
@@ -667,7 +683,8 @@ static InteractionLists read_interaction_lists(XDRFile& file, int file_version) 
                 ilist.interaction_tuples.emplace_back(idx);
             }
 
-            if (file_version < 78 && ilist.function_type == F_SETTLE && !ilist.empty()) {
+            if (file_version < 78 && ilist.function_type == FunctionType::SETTLE &&
+                !ilist.empty()) {
                 ilist.add_settle_atoms();
             }
 
@@ -695,7 +712,7 @@ static void add_conectivity(Frame& frame, const InteractionLists& interaction_li
                 assert(iatoms.size() == 2);
                 frame.add_bond(atom_idx_offset + iatoms[0], atom_idx_offset + iatoms[1]);
             }
-        } else if (ilist.value().function_type == F_SETTLE) {
+        } else if (ilist.value().function_type == FunctionType::SETTLE) {
             for (size_t i = 0; i < ilist.value().size(); ++i) {
                 auto iatoms = ilist.value()[i];
                 assert(iatoms.size() == 3);
