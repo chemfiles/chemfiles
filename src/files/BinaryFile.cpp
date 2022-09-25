@@ -425,6 +425,10 @@ uint64_t BinaryFile::file_size() {
    || defined(__x86_64) || defined(__x86_64__) \
    || defined(_M_X64) || defined(__bfin__)
 # define CHEMFILES_BYTE_ORDER CHEMFILES_LITTLE_ENDIAN
+#elif defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+# define CHEMFILES_BYTE_ORDER CHEMFILES_LITTLE_ENDIAN
+#elif defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+# define CHEMFILES_BYTE_ORDER CHEMFILES_BIG_ENDIAN
 #else
 # error Unknown target machine endianness
 #endif
