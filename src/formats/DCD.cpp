@@ -576,8 +576,9 @@ void DCDFormat::write_header() {
     this->write_marker(84);
 
     if (title_.empty()) {
-        this->write_marker(0);
-        this->write_marker(0);
+        this->write_marker(sizeof(int32_t));
+        file_->write_single_i32(0);
+        this->write_marker(sizeof(int32_t));
     } else {
         std::string title = title_;
         if (title.size() % 80 != 0) {
@@ -588,7 +589,6 @@ void DCDFormat::write_header() {
         file_->write_single_i32(static_cast<int32_t>(title.size() / 80));
         file_->write_char(title.data(), title.size());
         this->write_marker(title.size() + sizeof(int32_t));
-
     }
 
     this->write_marker(sizeof(int32_t));
