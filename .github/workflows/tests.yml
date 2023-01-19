@@ -171,7 +171,7 @@ jobs:
               - -DCMAKE_SHARED_LINKER_FLAGS="-static-libstdc++"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 2
       - name: Set up MinGW
@@ -181,7 +181,7 @@ jobs:
           platform: x64
       - name: Setup emsdk
         if: ${{ matrix.use-emsdk }}
-        uses: mymindstorm/setup-emsdk@v10
+        uses: mymindstorm/setup-emsdk@v12
         with:
           version: ${{ matrix.emscripten-version }}
           actions-cache-folder: "emsdk"
@@ -219,7 +219,7 @@ jobs:
         if: matrix.collect-coverage
         run: find . -type f -name '*.gcno' -exec gcov -p {} +
       - name: upload coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         if: matrix.collect-coverage
         with:
           fail_ci_if_error: true
