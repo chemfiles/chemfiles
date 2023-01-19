@@ -116,6 +116,7 @@ jobs:
             setup-dependencies: |
               sudo apt-get update
               sudo apt-get install -y valgrind
+
           # ==
           # macOS builders
           # ==
@@ -132,6 +133,7 @@ jobs:
             setup-dependencies: |
               export HOMEBREW_NO_AUTO_UPDATE=1
               brew install gcc@9
+
           # ==
           # windows builders
           # ==
@@ -161,24 +163,32 @@ jobs:
               - -G "Visual Studio 16 2019" -A Win32
           - name: windows / MinGW
             os: windows-2019
-            cc: cc
-            cxx: c++
+            cc: C:/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/x86_64-w64-mingw32-gcc.exe
+            cxx: C:/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/x86_64-w64-mingw32-g++.exe
+            # Linking takes a lot longer with debug information
             build-type: Release
             use-mingw: true
             cmake-extra-args:
               - -G "MinGW Makefiles"
-              - -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++"
-              - -DCMAKE_SHARED_LINKER_FLAGS="-static-libstdc++"
+              - -DCMAKE_TOOLCHAIN_FILE=.github/MinGW-Toolchain.cmake
+              - -DCHFL_BUILD_DOCTESTS=OFF
 
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 2
+
       - name: Set up MinGW
         if: ${{ matrix.use-mingw }}
         uses: egor-tensin/setup-mingw@v2
         with:
           platform: x64
+
+      - name: DEBUG
+        if: ${{ matrix.use-mingw }}
+        run: |
+          get-command gcc-ar
+          get-command gcc-ranlib
       - name: Setup emsdk
         if: ${{ matrix.use-emsdk }}
         uses: mymindstorm/setup-emsdk@v12
