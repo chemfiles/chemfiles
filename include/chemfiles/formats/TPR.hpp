@@ -80,7 +80,7 @@ class TPRFormat final : public Format {
         TprBodyConvention body_convention = FileIOXdr;
 
         /// Size of real values in bytes
-        inline constexpr size_t sizeof_real() {
+        size_t sizeof_real() const {
             return this->use_double ? sizeof(double) : sizeof(float);
         }
     };
@@ -111,13 +111,13 @@ class TPRFormat final : public Format {
     /// see `do_symstr()` in <GMX>/src/gromacs/fileio/tpxio.cpp
     const std::string& read_symbol_table_entry(const std::vector<std::string>& table);
 
-    /// Read a GROMACS string dependending on the body convention
+    /// Read a GROMACS string according to the body convention
     std::string read_gmx_string();
 
-    /// Read a GROMACS unsigned char dependending on the body convention
+    /// Read a GROMACS unsigned char according to the body convention
     uint8_t read_gmx_uchar();
 
-    /// Read a GROMACS bool dependending on the body convention
+    /// Read a GROMACS bool according to the body convention
     bool read_gmx_bool();
 
     /// Associated XDR file

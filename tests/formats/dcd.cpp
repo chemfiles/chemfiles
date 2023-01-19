@@ -101,12 +101,12 @@ TEST_CASE("Read unit cell in DCD files") {
         CHECK(cell.shape() == UnitCell::TRICLINIC);
 
         CHECK(approx_eq(cell.lengths(), {4.109898, 4.707060, 10.993230}, 1e-6));
-        CHECK(approx_eq(cell.angles(), {93.892818, 85.922246, 98.783338}, 1e-6));
+        CHECK(approx_eq(cell.angles(), {105.571274, 73.688985, 125.133355}, 1e-6));
     }
 
     SECTION("Triclinic cell, direct angles") {
         // this is the result of reading triclinic-octane-vectors.dcd and
-        // writting it back with MDAnalysis
+        // writing it back with MDAnalysis
         auto file = Trajectory("data/dcd/triclinic-octane-direct.dcd");
         CHECK(file.nsteps() == 10);
 
@@ -116,6 +116,20 @@ TEST_CASE("Read unit cell in DCD files") {
 
         CHECK(approx_eq(cell.lengths(), {4.109898, 4.707060, 10.993230}, 1e-6));
         CHECK(approx_eq(cell.angles(), {105.571273, 73.688987, 125.133354}, 1e-6));
+    }
+
+    SECTION("Triclinic cell from NAMD") {
+        auto file = Trajectory("data/dcd/triclinic-namd.dcd");
+        CHECK(file.nsteps() == 1);
+
+        auto frame = file.read();
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::TRICLINIC);
+
+        CHECK(approx_eq(cell.lengths(), {85.440037, 89.442719, 85.440037}, 1e-6));
+        CHECK(approx_eq(cell.angles(), {65.244990, 70.806038, 71.696265}, 1e-6));
+
+        CHECK(approx_eq(cell.volume(), 548000, 1e-6));
     }
 }
 

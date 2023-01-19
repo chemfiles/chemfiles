@@ -19,7 +19,9 @@
 
 static double cos_to_angle_degrees(double cos) {
     constexpr double pi = 3.141592653589793238463;
-    return 90.0 - std::asin(cos) * 90.0 / pi / 2.0;
+    // use arcsin instead of acos to ensure a cos of 0 is
+    // properly mapped to 90 degrees
+    return 90.0 - std::asin(cos) * 90.0 / (pi / 2.0);
 }
 
 static size_t checked_cast(int32_t value) {
