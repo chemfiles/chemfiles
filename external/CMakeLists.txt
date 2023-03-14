@@ -135,19 +135,25 @@ if (${CMAKE_VERSION} VERSION_LESS "3.1")
     endfunction()
 endif()
 
-external_library(fmt)
-list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/fmt/include/)
+if(NOT TARGET fmt)
+    external_library(fmt)
+    list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/fmt/include/)
 
-# Hide FMT variables from CMake GUI
-mark_as_advanced(FORCE
-    FMT_CUDA_TEST
-    FMT_DOC
-    FMT_FUZZ
-    FMT_INSTALL
-    FMT_PEDANTIC
-    FMT_TEST
-    FMT_WERROR
-)
+    # Hide FMT variables from CMake GUI
+    mark_as_advanced(FORCE
+        FMT_CUDA_TEST
+        FMT_DOC
+        FMT_FUZZ
+        FMT_INSTALL
+        FMT_PEDANTIC
+        FMT_TEST
+        FMT_WERROR
+    )
+else()
+    get_target_property(FMT_INCLUDES fmt INCLUDE_DIRECTORIES)
+    list(APPEND EXTERNAL_INCLUDES "${FMT_INCLUDES}")
+endif()
+
 
 # ==========
 # pugixml: http://github.com/chemfiles/pugixml
