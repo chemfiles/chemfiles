@@ -4,8 +4,8 @@
 Check that only chemfiles symbols are exported by the shared library.
 """
 import os
-import sys
 import subprocess
+import sys
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 ERRORS = 0
@@ -18,7 +18,10 @@ def error(message):
 
 
 def list_symbols(path):
-    list = subprocess.check_output(["nm", "-D", "-C", path], stderr=subprocess.STDOUT)
+    list = subprocess.check_output(
+        ["nm", "-D", "-C", path],
+        stderr=subprocess.STDOUT,
+    ).decode("utf8")
     symbols = []
     for line in list.split("\n"):
         # Only global code symbols
@@ -28,7 +31,7 @@ def list_symbols(path):
     return symbols
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     for symbol in list_symbols(sys.argv[1]):
         if symbol.startswith("std::"):
             continue
