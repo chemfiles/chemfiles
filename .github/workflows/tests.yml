@@ -19,7 +19,7 @@ jobs:
           # platform independent
           # ==
           - name: Linux / gcc-11
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             cc: gcc-11
             cxx: g++-11
             build-type: Debug
@@ -28,18 +28,18 @@ jobs:
               sudo add-apt-repository ppa:ubuntu-toolchain-r/test
               sudo apt-get update
               sudo apt-get install -y gcc-11 g++-11
-          - name: Linux / clang-13
-            os: ubuntu-18.04
-            cc: clang-13
-            cxx: clang++-13
+          - name: Linux / clang-15
+            os: ubuntu-20.04
+            cc: clang-15
+            cxx: clang++-15
             build-type: Debug
             setup-dependencies: |
               wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
               sudo apt-get update
-              sudo apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-13 main"
-              sudo apt-get install -y clang-13
+              sudo apt-add-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main"
+              sudo apt-get install -y clang-15
           - name: Linux / Intel compiler
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             cc: icc
             cxx: icpc
             build-type: Debug
@@ -54,7 +54,7 @@ jobs:
               source /opt/intel/oneapi/setvars.sh
               env > $GITHUB_ENV
           - name: Linux / gcc / static library
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             cc: gcc
             cxx: g++
             build-type: Debug
@@ -64,7 +64,7 @@ jobs:
               - -DCMAKE_C_FLAGS="--coverage"
               - -DCMAKE_CXX_FLAGS="--coverage"
           - name: Linux / gcc / external dependencies
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             cc: gcc
             cxx: g++
             build-type: Debug
@@ -74,7 +74,7 @@ jobs:
               - -DCHFL_SYSTEM_BZIP2=ON
               - -DCHFL_DISABLE_GEMMI=ON
           - name: Linux / gcc / 32-bit build
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             cc: gcc
             cxx: g++
             build-type: Debug
@@ -83,9 +83,9 @@ jobs:
               - -DCMAKE_C_FLAGS=-m32
             setup-dependencies: |
               sudo apt-get update
-              sudo apt-get install -y libc6-dev-i386 lib32stdc++-7-dev
+              sudo apt-get install -y gcc-multilib g++-multilib
           - name: Linux / gcc-4.8.5 & cmake-2.12.8
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             container: centos:7
             cc: gcc
             cxx: g++
@@ -93,12 +93,12 @@ jobs:
             setup-dependencies: |
               yum install -y cmake gcc gcc-c++ make
           - name: Linux / emscripten
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             cc: emcc
             cxx: emcc
             build-type: Debug
             use-emsdk: true
-            emscripten-version: 3.1.16
+            emscripten-version: 3.1.34
             cmake-extra-args:
               - -DCHFL_BUILD_DOCTESTS=OFF
               - -DBUILD_SHARED_LIBS=OFF
@@ -107,7 +107,7 @@ jobs:
               - -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-main/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
               - -DCMAKE_CROSSCOMPILING_EMULATOR=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-main/node/14.15.5_64bit/bin/node
           - name: Linux / valgrind
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             cc: gcc
             cxx: g++
             build-type: Debug
@@ -116,6 +116,7 @@ jobs:
             setup-dependencies: |
               sudo apt-get update
               sudo apt-get install -y valgrind
+
           # ==
           # macOS builders
           # ==
@@ -132,6 +133,7 @@ jobs:
             setup-dependencies: |
               export HOMEBREW_NO_AUTO_UPDATE=1
               brew install gcc@9
+
           # ==
           # windows builders
           # ==
@@ -148,8 +150,6 @@ jobs:
             os: windows-2019
             cc: cl.exe
             cxx: cl.exe
-            # The compiler completely fills up the disk when building all tests
-            # in debug mode, so use release
             build-type: Release
             cmake-extra-args:
               - -G "Visual Studio 16 2019" -A x64
@@ -158,32 +158,40 @@ jobs:
             os: windows-2019
             cc: cl.exe
             cxx: cl.exe
-            build-type: Debug
+            build-type: Release
             cmake-extra-args:
               - -G "Visual Studio 16 2019" -A Win32
           - name: windows / MinGW
             os: windows-2019
-            cc: cc
-            cxx: c++
+            cc: C:/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/x86_64-w64-mingw32-gcc.exe
+            cxx: C:/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/x86_64-w64-mingw32-g++.exe
+            # Linking takes a lot longer with debug information
             build-type: Release
             use-mingw: true
             cmake-extra-args:
               - -G "MinGW Makefiles"
-              - -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++"
-              - -DCMAKE_SHARED_LINKER_FLAGS="-static-libstdc++"
+              - -DCMAKE_TOOLCHAIN_FILE=.github/MinGW-Toolchain.cmake
+              - -DCHFL_BUILD_DOCTESTS=OFF
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 2
+
       - name: Set up MinGW
         if: ${{ matrix.use-mingw }}
         uses: egor-tensin/setup-mingw@v2
         with:
           platform: x64
+
+      - name: DEBUG
+        if: ${{ matrix.use-mingw }}
+        run: |
+          get-command gcc-ar
+          get-command gcc-ranlib
       - name: Setup emsdk
         if: ${{ matrix.use-emsdk }}
-        uses: mymindstorm/setup-emsdk@v10
+        uses: mymindstorm/setup-emsdk@v12
         with:
           version: ${{ matrix.emscripten-version }}
           actions-cache-folder: "emsdk"
@@ -217,6 +225,12 @@ jobs:
       - name: check the list of exported symbols
         if: matrix.check-exported-symbols
         run: ./scripts/ci/check-exported-symbols.py build/libchemfiles.so
-      - name: upload coverage
+      - name: extract coverage data
         if: matrix.collect-coverage
-        run: bash <(curl -s https://codecov.io/bash)
+        run: find . -type f -name '*.gcno' -exec gcov -p {} +
+      - name: upload coverage
+        uses: codecov/codecov-action@v3
+        if: matrix.collect-coverage
+        with:
+          fail_ci_if_error: true
+          verbose: true
