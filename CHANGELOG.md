@@ -10,6 +10,14 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Remove support for configuration files (`chemfiles.toml`) and associated
   functions.
 
+## 0.10.4 (7 May 2023)
+
+### Changes in supported formats
+
+- Added read support for the TPR format (#459)
+- Fix an issue when writing DCD files that made them incompatible with VMD (#465)
+- Fix a bug when converting cell angles in DCD (#467)
+
 ## 0.10.3 (20 Aug 2022)
 
 ### Changes in supported formats
