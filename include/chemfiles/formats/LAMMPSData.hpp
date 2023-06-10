@@ -59,7 +59,7 @@ public:
 
 // atom types are defined by the type string and the mass of the atom
 using atom_type = std::pair<std::string, double>;
-using bond_type = std::tuple<size_t, size_t>;
+using bond_type = std::tuple<std::string, size_t, size_t>;
 using angle_type = std::tuple<size_t, size_t, size_t>;
 using dihedral_type = std::tuple<size_t, size_t, size_t, size_t>;
 using improper_type = std::tuple<size_t, size_t, size_t, size_t>;
@@ -81,12 +81,12 @@ public:
     /// the vector backing the `sorted_set<atom_type>` returned by `atoms()`.
     size_t atom_type_id(const Atom& atom) const;
 
-    /// Get the bond type number for the bond type i-j.
+    /// Get the bond type number for the bond type.
     ///
     /// The bond type must be in the topology used to construct this `DataTypes`
     /// instance. The index numbering starts at zero, and can be used to index
     /// the vector backing the `sorted_set<bond_type>` returned by `bonds()`.
-    size_t bond_type_id(size_t type_i, size_t type_j) const;
+    size_t bond_type_id(std::string, size_t, size_t) const;
 
     /// Get the angle type number for the angle type i-j-k.
     ///
