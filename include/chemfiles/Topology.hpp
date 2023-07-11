@@ -145,7 +145,7 @@ public:
     ///
     /// If the bond does not exist, this will thrown an Error.
     ///
-    /// @example{topology/bond_order.cpp}
+    /// @example{topology/bond_type.cpp}
     ///
     /// @param atom_i the index of the first atom in the bond
     /// @param atom_j the index of the second atom in the bond
