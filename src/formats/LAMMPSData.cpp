@@ -466,8 +466,9 @@ void LAMMPSDataFormat::read_bonds(Frame& frame) {
         if (splitted.size() != 4) {
             throw format_error("bad bond specification '{}'", line);
         }
+        auto type = std::string(splitted[1]);
+        
         // LAMMPS use 1-based indexing
-        auto type = parse<std::string>(splitted[1]);
         auto i = parse<size_t>(splitted[2]) - 1;
         auto j = parse<size_t>(splitted[3]) - 1;
         frame.add_bond(i, j, Bond::UNKNOWN, type);
