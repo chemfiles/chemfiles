@@ -317,7 +317,7 @@ public:
     const sorted_set<Improper>& impropers() const;
 
     /// Add a bond between the atoms `i` and `j`
-    void add_bond(size_t i, size_t j, Bond::BondOrder bond_order = Bond::UNKNOWN, std::string = "");
+    void add_bond(size_t i, size_t j, Bond::BondOrder bond_order = Bond::UNKNOWN, std::string bond_type = "");
 
     /// Remove any bond between the atoms `i` and `j`
     void remove_bond(size_t i, size_t j);
