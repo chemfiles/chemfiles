@@ -151,7 +151,7 @@ public:
     /// @param atom_j the index of the second atom in the bond
     /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `size()`
     /// @throws Error if no bond between `atom_i` and `atom_j` exists.
-    std::string bond_type(size_t atom_i, size_t atom_j) const;
+    const std::string& bond_type(size_t atom_i, size_t atom_j) const;
 
 
     /// Get the number of atoms in the topology
