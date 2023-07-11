@@ -165,6 +165,10 @@ const std::vector<Bond::BondOrder>& Connectivity::bond_orders() const {
     return bond_orders_;
 }
 
+const std::vector<Bond::BondOrder>& Connectivity::bond_types() const {
+    return bond_types_;
+}
+
 const sorted_set<Angle>& Connectivity::angles() const {
     if (!uptodate_) {
         recalculate();

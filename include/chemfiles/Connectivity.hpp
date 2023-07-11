@@ -307,6 +307,9 @@ public:
     /// Get the bond orders in this connectivity
     const std::vector<Bond::BondOrder>& bond_orders() const;
 
+    /// Get the bond types in this connectivity
+    const std::vector<Bond::BondOrder>& bond_types() const;
+
     /// Get the angles in this connectivity
     const sorted_set<Angle>& angles() const;
 
