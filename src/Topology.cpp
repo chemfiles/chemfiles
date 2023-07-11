@@ -44,7 +44,7 @@ void Topology::add_bond(size_t atom_i, size_t atom_j, Bond::BondOrder bond_order
             size(), atom_i, atom_j
         );
     }
-    connect_.add_bond(atom_i, atom_j, bond_order, bond_type);
+    connect_.add_bond(atom_i, atom_j, bond_order, std::move(bond_type));
 }
 
 void Topology::remove_bond(size_t atom_i, size_t atom_j) {
