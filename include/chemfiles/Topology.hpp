@@ -115,7 +115,7 @@ public:
     /// @param bond_order the bond order for the bond added
     /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `size()`
     /// @throws Error if `atom_i == atom_j`, as this is an invalid bond
-    void add_bond(size_t atom_i, size_t atom_j, Bond::BondOrder bond_order = Bond::UNKNOWN, std::string = "");
+    void add_bond(size_t atom_i, size_t atom_j, Bond::BondOrder bond_order = Bond::UNKNOWN, std::string bond_type = "");
 
     /// Remove a bond in the system, between the atoms at index `atom_i` and
     /// `atom_j`.
