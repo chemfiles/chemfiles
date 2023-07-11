@@ -471,7 +471,7 @@ void LAMMPSDataFormat::read_bonds(Frame& frame) {
         // LAMMPS use 1-based indexing
         auto i = parse<size_t>(splitted[2]) - 1;
         auto j = parse<size_t>(splitted[3]) - 1;
-        frame.add_bond(i, j, Bond::UNKNOWN, type);
+        frame.add_bond(i, j, Bond::UNKNOWN, std::move(type));
         n++;
     }
 
