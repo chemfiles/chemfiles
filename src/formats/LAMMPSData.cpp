@@ -628,10 +628,18 @@ DataTypes::DataTypes(const Topology& topology) {
         atoms_.insert(make_atom_type(atom));
     }
 
-    for (auto& bond: topology.bonds()) {
-        auto i = atom_type_id(topology[bond[0]]);
-        auto j = atom_type_id(topology[bond[1]]);
-        bonds_.insert(normalize_bond_type(i, j));
+    auto bonds = topology.bonds();
+    auto bond_types = topology.bond_types();
+    auto n_bonds = bonds.size();
+
+    for (size_t n_bond = 0; n_bond < n_bonds; n_bond++) {
+        auto i = atom_type_id(topology[bonds[n_bond][0]]);
+        auto j = atom_type_id(topology[bonds[n_bond][1]]);
+        auto result = bonds_.insert(normalize_bond_type(i, j));
+        auto bond_type = bond_types[n_bond];
+        if (bond_type != "") {
+            custom_bond_types_.insert({result.first - bonds_.begin(), bond_type});
+        }
     }
 
     for (auto& angle: topology.angles()) {
