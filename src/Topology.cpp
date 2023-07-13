@@ -121,7 +121,7 @@ const std::vector<Bond::BondOrder>& Topology::bond_orders() const {
     return connect_.bond_orders();
 }
 
-const std::vector<Bond::BondOrder>& Topology::bond_types() const {
+const std::vector<std::string>& Topology::bond_types() const {
     return connect_.bond_types();
 }
 

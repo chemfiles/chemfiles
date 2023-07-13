@@ -578,13 +578,13 @@ LAMMPSDataFormat::section_t LAMMPSDataFormat::get_section(string_view line) {
     }
 }
 
-// static bond_type normalize_bond_type(size_t i, size_t j) {
-//     if (i < j) {
-//         return std::make_tuple(i, j);
-//     } else {
-//         return std::make_tuple(j, i);
-//     }
-// }
+static bond_type normalize_bond_type(size_t i, size_t j) {
+    if (i < j) {
+        return std::make_tuple(i, j);
+    } else {
+        return std::make_tuple(j, i);
+    }
+}
 
 static angle_type normalize_angle_type(size_t i, size_t j, size_t k) {
     if (i < k) {
@@ -623,19 +623,15 @@ static atom_type make_atom_type(const Atom& atom) {
     return {atom.type(), atom.mass()};
 }
 
-static bond_type make_bond_type(std::string type, size_t i, size_t j) {
-    return {type, i, j};
-}
-
 DataTypes::DataTypes(const Topology& topology) {
     for (auto& atom: topology) {
         atoms_.insert(make_atom_type(atom));
     }
 
     for (auto& bond: topology.bonds()) {
-        auto i = bond[0];
-        auto j = bond[1];
-        bonds_.insert(make_bond_type(topology.bond_type(i, j), i, j));
+        auto i = atom_type_id(topology[bond[0]]);
+        auto j = atom_type_id(topology[bond[1]]);
+        bonds_.insert(normalize_bond_type(i, j));
     }
 
     for (auto& angle: topology.angles()) {
@@ -671,8 +667,8 @@ size_t DataTypes::atom_type_id(const Atom& atom) const {
     }
 }
 
-size_t DataTypes::bond_type_id(std::string bond_type, size_t i, size_t j) const {
-    auto it = bonds_.find(make_bond_type(bond_type, i, j));
+size_t DataTypes::bond_type_id(size_t type_i, size_t type_j) const {
+    auto it = bonds_.find(normalize_bond_type(type_i, type_j));
     if (it != bonds_.end()) {
         return static_cast<size_t>(it - bonds_.begin());
     } else {
@@ -704,6 +700,14 @@ size_t DataTypes::improper_type_id(size_t type_i, size_t type_j, size_t type_k, 
         return static_cast<size_t>(it - impropers_.begin());
     } else {
         throw error("invalid improper type passed to improper_type_id, this is a bug");
+    }
+}
+
+optional<std::string> DataTypes::bond_type_name(size_t type_id) const {
+    if (custom_bond_types_.find(type_id) == custom_bond_types_.end()) {
+        return nullopt;
+    } else {
+        return custom_bond_types_.at(type_id);
     }
 }
 
@@ -771,9 +775,14 @@ void LAMMPSDataFormat::write_types(const DataTypes& types) {
     if (!bonds.empty()) {
         file_.print("\n# Bond Coeffs\n");
         for (size_t i=0; i<bonds.size(); i++) {
-            file_.print("# {} {}-{}\n", i + 1,
-                atoms[std::get<1>(bonds[i])].first,
-                atoms[std::get<2>(bonds[i])].first
+            auto atom_i = std::get<0>(bonds[i]);
+            auto atom_j = std::get<1>(bonds[i]);
+            auto type_id = types.bond_type_id(atom_i, atom_j);
+            optional<std::string> type_name = types.bond_type_name(type_id);
+            file_.print("# {} {}-{} {}\n", i + 1,
+                atoms[atom_i].first,
+                atoms[atom_j].first,
+                type_name.value_or("")
             );
         }
     }
@@ -858,11 +867,12 @@ void LAMMPSDataFormat::write_bonds(const DataTypes& types, const Topology& topol
     file_.print("\nBonds\n\n");
     size_t bond_id = 1;
     for (auto bond: topology.bonds()) {
-        auto i = bond[0];
-        auto j = bond[1];
-        auto bond_type_id = types.bond_type_id(topology.bond_type(i, j), i, j);
+        auto type_i = types.atom_type_id(topology[bond[0]]);
+        auto type_j = types.atom_type_id(topology[bond[1]]);
+        auto bond_type_id = types.bond_type_id(type_i, type_j);
+        auto bond_type_name = types.bond_type_name(bond_type_id);
         file_.print("{} {} {} {}\n",
-            bond_id, bond_type_id + 1, bond[0] + 1, bond[1] + 1
+            bond_id, bond_type_name.value_or(std::to_string(bond_type_id + 1)), bond[0] + 1, bond[1] + 1
         );
         bond_id++;
     }

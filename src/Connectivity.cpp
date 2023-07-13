@@ -165,7 +165,7 @@ const std::vector<Bond::BondOrder>& Connectivity::bond_orders() const {
     return bond_orders_;
 }
 
-const std::vector<Bond::BondOrder>& Connectivity::bond_types() const {
+const std::vector<std::string>& Connectivity::bond_types() const {
     return bond_types_;
 }
 

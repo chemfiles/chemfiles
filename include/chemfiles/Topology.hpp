@@ -151,7 +151,7 @@ public:
     /// @param atom_j the index of the second atom in the bond
     /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `size()`
     /// @throws Error if no bond between `atom_i` and `atom_j` exists.
-    const std::string& bond_type(size_t atom_i, size_t atom_j) const;
+    std::string bond_type(size_t atom_i, size_t atom_j) const;
 
     /// Get the bond types in the system.
     ///
@@ -161,7 +161,7 @@ public:
     /// `bond_types()[index]`.
     ///
     /// @example{topology/bond_order.cpp}
-    const std::vector<Bond::BondOrder>& bond_types() const;
+    const std::vector<std::string>& bond_types() const;
 
     /// Get the number of atoms in the topology
     ///

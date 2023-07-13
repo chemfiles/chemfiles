@@ -7,6 +7,7 @@
 #include <array>
 #include <vector>
 #include <algorithm> // IWYU pragma: keep
+#include <string>
 
 #include "chemfiles/sorted_set.hpp"
 #include "chemfiles/exports.h"
@@ -308,7 +309,7 @@ public:
     const std::vector<Bond::BondOrder>& bond_orders() const;
 
     /// Get the bond types in this connectivity
-    const std::vector<Bond::BondOrder>& bond_types() const;
+    const std::vector<std::string>& bond_types() const;
 
     /// Get the angles in this connectivity
     const sorted_set<Angle>& angles() const;
