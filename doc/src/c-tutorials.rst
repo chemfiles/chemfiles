@@ -4,9 +4,9 @@ C Tutorials
 ===========
 
 This section present some hand-on tutorials to the chemfiles C API. These
-examples do exaclty the same thing as the :ref:`C++ ones <cxx-tutorials>`, using
+examples do exactly the same thing as the :ref:`C++ ones <cxx-tutorials>`, using
 the C API instead of the C++ API. As such, they are much more verbose. They also
-do not correclty check for error conditions. When using the C API, you should
+do not correctly check for error conditions. When using the C API, you should
 alway check that the return value of the functions is ``CHFL_SUCCESS``.
 
 All the code here is under the `CC-0 Universal Licence`_ which means that you

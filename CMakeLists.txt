@@ -1,7 +1,12 @@
-cmake_minimum_required(VERSION 2.8.12)
-set(CMAKE_USER_MAKE_RULES_OVERRIDE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/InitRules.cmake")
+cmake_minimum_required(VERSION 3.16)
 
-project(chemfiles C CXX)
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/VERSION CHEMFILES_FULL_VERSION)
+string(STRIP ${CHEMFILES_FULL_VERSION} CHEMFILES_FULL_VERSION)
+# strip the "-dev" suffix on the version since project(VERSION) does not support it
+string(REGEX REPLACE "([0-9]*)\\.([0-9]*)\\.([0-9]*).*" "\\1.\\2.\\3" CHEMFILES_VERSION ${CHEMFILES_FULL_VERSION})
+
+project(chemfiles VERSION ${CHEMFILES_VERSION} LANGUAGES C CXX)
+set(PROJECT_VERSION ${CHEMFILES_FULL_VERSION})
 
 if(NOT "${LAST_CMAKE_VERSION}" VERSION_EQUAL ${CMAKE_VERSION})
     set(LAST_CMAKE_VERSION ${CMAKE_VERSION} CACHE INTERNAL "Last version of cmake used to configure")
@@ -25,12 +30,6 @@ if (POLICY CMP0063)
     # Use of `<LANG>_VISIBILITY_PRESET` in OBJECT libraries
     cmake_policy(SET CMP0063 NEW)
 endif()
-
-file(READ ${PROJECT_SOURCE_DIR}/VERSION CHEMFILES_VERSION)
-string(STRIP ${CHEMFILES_VERSION} CHEMFILES_VERSION)
-string(REGEX REPLACE "^([0-9]+)\\..*" "\\1" CHEMFILES_VERSION_MAJOR "${CHEMFILES_VERSION}")
-string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" CHEMFILES_VERSION_MINOR "${CHEMFILES_VERSION}")
-string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CHEMFILES_VERSION_PATCH "${CHEMFILES_VERSION}")
 
 option(BUILD_SHARED_LIBS "Build shared libraries instead of static ones" OFF)
 
@@ -88,6 +87,7 @@ add_subdirectory(external)
 # unit tests.
 file(GLOB_RECURSE chemfiles_objects_sources src/**.cpp)
 add_library(chemfiles_objects OBJECT ${chemfiles_objects_sources})
+target_compile_features(chemfiles_objects PRIVATE cxx_std_11 c_std_99)
 
 target_include_directories(chemfiles_objects SYSTEM BEFORE PRIVATE ${EXTERNAL_INCLUDES})
 target_include_directories(chemfiles_objects SYSTEM BEFORE PRIVATE ${ZLIB_INCLUDE_DIRS} ${LIBLZMA_INCLUDE_DIRS})
@@ -106,6 +106,13 @@ endif()
 if(${BUILD_SHARED_LIBS})
     set_target_properties(chemfiles_objects PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 endif()
+
+# hide non-exported symbols by default, this mimics Windows behavior on Unix
+set_target_properties(chemfiles_objects PROPERTIES
+    CXX_VISIBILITY_PRESET hidden
+    C_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN ON
+)
 
 # Multiple different flags are required by different platform for 64-bit support
 # These flags are also set in external libraries (zlib & lzma), but they might
@@ -143,12 +150,19 @@ set(CHEMFILES_OBJECTS
 
 # Add the main chemfiles library
 add_library(chemfiles ${CHEMFILES_OBJECTS})
+target_compile_features(chemfiles PUBLIC cxx_std_11 c_std_99)
 
 set_target_properties(chemfiles PROPERTIES
-    VERSION "${CHEMFILES_VERSION_MAJOR}.${CHEMFILES_VERSION_MINOR}.${CHEMFILES_VERSION_PATCH}"
+    CXX_VISIBILITY_PRESET hidden
+    C_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN ON
+)
+
+set_target_properties(chemfiles PROPERTIES
+    VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"
     # This needs to be the part of the version which matter for backward
     # compatibility, so "major.minor" until 1.0 and then "major" only
-    SOVERSION "${CHEMFILES_VERSION_MAJOR}.${CHEMFILES_VERSION_MINOR}"
+    SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}"
 )
 
 target_include_directories(chemfiles PUBLIC
@@ -193,10 +207,11 @@ endif()
 #----------------------------------------------------------------------------------------#
 # Installation configuration
 #----------------------------------------------------------------------------------------#
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/chemfiles-config-version.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/chemfiles-config-version.cmake"
-    @ONLY
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    ${PROJECT_BINARY_DIR}/chemfiles-config-version.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMinorVersion
 )
 
 install(TARGETS chemfiles
@@ -214,9 +229,11 @@ configure_package_config_file(
 )
 
 install(EXPORT chemfiles-targets DESTINATION ${LIB_INSTALL_DIR}/cmake/chemfiles)
-install(FILES "${PROJECT_BINARY_DIR}/chemfiles-config-version.cmake"
-              "${PROJECT_BINARY_DIR}/chemfiles-config.cmake"
-        DESTINATION ${LIB_INSTALL_DIR}/cmake/chemfiles)
+install(
+    FILES ${PROJECT_BINARY_DIR}/chemfiles-config-version.cmake
+          ${PROJECT_BINARY_DIR}/chemfiles-config.cmake
+    DESTINATION ${LIB_INSTALL_DIR}/cmake/chemfiles
+)
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION ${INCLUDE_INSTALL_DIR})
 install(DIRECTORY ${PROJECT_BINARY_DIR}/include/ DESTINATION ${INCLUDE_INSTALL_DIR})
