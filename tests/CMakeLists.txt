@@ -200,15 +200,8 @@ foreach(test_file IN LISTS capi_doctest_files)
 endforeach()
 
 # Code linting with Python scripts
-if(${CMAKE_VERSION} VERSION_GREATER "3.12")
-    # cmake 3.12 replaced find_package(PythonInterp) with find_package(Python)
-    find_package(Python REQUIRED)
-    set(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
-else()
-    # cmake 2.8.12 only knows about python <= 3.3
-    set(Python_ADDITIONAL_VERSIONS 3.9 3.8 3.7 3.6 3.5 3.4)
-    find_package(PythonInterp REQUIRED)
-endif()
+find_package(Python REQUIRED)
+set(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
 
 function(chfl_lint _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)

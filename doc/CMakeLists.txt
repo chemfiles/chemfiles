@@ -2,7 +2,6 @@ if (CMAKE_CROSSCOMPILING)
     message(FATAL_ERROR "can not build documentation when cross-compiling")
 endif()
 
-find_package(Sphinx REQUIRED)
 find_package(Doxygen REQUIRED)
 
 execute_process(
@@ -40,7 +39,7 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/doxygen/xml/index.xml
     COMMENT "Generating API documentation with Doxygen"
 )
 
-add_custom_target(doxygen ALL
+add_custom_target(generate-doxygen-xml ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/doxygen/xml/index.xml
 )
 
@@ -58,43 +57,11 @@ add_custom_target(formats-overview-csv ALL
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/formats-overview.csv
 )
 
-set(SPHINX_CONF_DIR ${PROJECT_BINARY_DIR}/doc)
-set(SPHINX_INPUT_DIR ${PROJECT_SOURCE_DIR}/doc/src)
-set(SPHINX_DESTINATION ${PROJECT_BINARY_DIR}/doc)
-set(SPHINX_DEPENDENCIES doxygen formats-overview-csv)
 
-set(sphinx_target_base_name doc)
-Sphinx_add_targets(${sphinx_target_base_name} ${SPHINX_CONF_DIR} ${SPHINX_INPUT_DIR} ${SPHINX_DESTINATION} ${SPHINX_DEPENDENCIES})
+find_package(Sphinx REQUIRED)
 
-if( ${SPHINX_HTML_OUTPUT} )
-    install( DIRECTORY ${SPHINX_DESTINATION}/html
-        DESTINATION share/chemfiles/doc
-        COMPONENT Doc
-        PATTERN "${SPHINX_DESTINATION}/html/*"
-        )
-endif()
-
-if(${SPHINX_LATEX_OUTPUT})
-    set(DOC_WITH_LOCAL_DOXYGEN OFF)
-
-    # Build the PDF with pdflatex
-    find_package(LATEX)
-    if( NOT PDFLATEX_COMPILER )
-      message("pdflatex compiler was not found. Please pass to advanced mode and provide its full path")
-    else()
-      # Needs to be executed twice to get table of contents.
-      add_custom_command( TARGET ${sphinx_target_base_name}_latex
-        POST_BUILD
-        COMMAND ${PDFLATEX_COMPILER}
-          ${SPHINX_DESTINATION}/latex/chemfiles.tex
-          -output-directory ${SPHINX_DESTINATION}/latex
-        COMMAND ${MAKEINDEX_COMPILER}
-            chemfiles.idx
-        COMMAND ${PDFLATEX_COMPILER}
-          ${SPHINX_DESTINATION}/latex/chemfiles.tex
-          -output-directory ${SPHINX_DESTINATION}/latex
-        WORKING_DIRECTORY ${SPHINX_DESTINATION}/latex
-        COMMENT "Building PDF"
-        )
-  endif()
-endif()
+add_custom_target(doc_html ALL
+    COMMAND ${SPHINX_EXECUTABLE} -b html -c ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/html
+    DEPENDS generate-doxygen-xml formats-overview-csv
+    COMMENT "Generating sphinx documentation"
+)
