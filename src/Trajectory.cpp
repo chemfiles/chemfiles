@@ -21,7 +21,6 @@
 #include "chemfiles/misc.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/span.hpp"
 #include "chemfiles/external/optional.hpp"
 
@@ -58,7 +57,7 @@ file_open_info file_open_info::parse(const std::string& path, std::string format
     }
 
     auto tmp = format.substr(0, slash);
-    info.format = trim(tmp).to_string();
+    info.format = std::string(trim(tmp));
 
     return info;
 }

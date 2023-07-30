@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <string_view>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -20,7 +21,6 @@
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/sorted_set.hpp"
 #include "chemfiles/unreachable.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/span.hpp"
 #include "chemfiles/external/optional.hpp"
 
@@ -112,7 +112,7 @@ atom_style::atom_style(std::string name): name_(std::move(name)) {
     }
 }
 
-atom_data atom_style::read_line(string_view line, size_t index) const {
+atom_data atom_style::read_line(std::string_view line, size_t index) const {
     atom_data d;
 
     // dummy variable to ignore a value
@@ -209,9 +209,9 @@ atom_data atom_style::read_line(string_view line, size_t index) const {
 }
 
 /// Remove the comment from `line` and return it.
-static string_view split_comment(string_view& line);
+static std::string_view split_comment(std::string_view& line);
 /// Check if the line is an unused header value
-static bool is_unused_header(string_view line);
+static bool is_unused_header(std::string_view line);
 
 void LAMMPSDataFormat::read_next(Frame& frame) {
     if (file_.tellpos() != 0) {
@@ -223,7 +223,7 @@ void LAMMPSDataFormat::read_next(Frame& frame) {
     auto it = comment.find("atom_style");
     if (it != std::string::npos) {
         auto style = comment.substr(it + 10);
-        atom_style_name_ = (split(style, ' ')[0]).to_string();
+        atom_style_name_ = std::string(trim(split(style, ' ')[0]));
     }
 
     while(!file_.eof()) {
@@ -303,7 +303,7 @@ void LAMMPSDataFormat::read_header(Frame& frame) {
     frame.set_cell(cell);
 }
 
-size_t LAMMPSDataFormat::read_header_integer(string_view line, const std::string& context) {
+size_t LAMMPSDataFormat::read_header_integer(std::string_view line, const std::string& context) {
     auto splitted = split(line, ' ');
     if (splitted.size() < 2) {
         throw format_error(
@@ -313,7 +313,7 @@ size_t LAMMPSDataFormat::read_header_integer(string_view line, const std::string
     return parse<size_t>(splitted[0]);
 }
 
-double LAMMPSDataFormat::read_header_box_bounds(string_view line, const std::string& lo, const std::string& hi) {
+double LAMMPSDataFormat::read_header_box_bounds(std::string_view line, const std::string& lo, const std::string& hi) {
     auto splitted = split(line, ' ');
     if (splitted.size() < 4 || splitted[2] != lo || splitted[3] != hi) {
         throw format_error(
@@ -393,7 +393,7 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
             if (names_.empty()) {
                 names_.resize(natoms_);
             }
-            names_[data.index] = name.to_string();
+            names_[data.index] = std::string(name);
         }
 
         auto atom = Atom(std::to_string(data.type));
@@ -449,7 +449,7 @@ void LAMMPSDataFormat::read_masses() {
 
         auto type = splitted[0];
         auto mass = parse<double>(splitted[1]);
-        masses_.emplace(type.to_string(), mass);
+        masses_.emplace(std::string(type), mass);
         n++;
     }
 
@@ -546,7 +546,7 @@ void LAMMPSDataFormat::setup_names(Frame& frame) const {
 }
 
 
-static std::unordered_set<string_view> IGNORED_SECTIONS = {
+static std::unordered_set<std::string_view> IGNORED_SECTIONS = {
     "Ellipsoids", "Lines", "Triangles", "Bodies", "Pair Coeffs",
     "PairIJ Coeffs", "Bond Coeffs", "Angle Coeffs", "Dihedral Coeffs",
     "Improper Coeffs", "BondBond Coeffs", "BondAngle Coeffs",
@@ -554,11 +554,11 @@ static std::unordered_set<string_view> IGNORED_SECTIONS = {
     "AngleAngleTorsion Coeffs", "BondBond13 Coeffs", "AngleAngle Coeffs"
 };
 
-LAMMPSDataFormat::section_t LAMMPSDataFormat::get_section(string_view section) {
+LAMMPSDataFormat::section_t LAMMPSDataFormat::get_section(std::string_view section) {
     auto comment = split_comment(section);
     if (section == "Atoms") {
         if (!comment.empty()) {
-            atom_style_name_ = trim(comment).to_string();
+            atom_style_name_ = std::string(trim(comment));
         }
         return ATOMS;
     } else if (section == "Bonds") {
@@ -925,7 +925,7 @@ void LAMMPSDataFormat::write_impropers(const DataTypes& types, const Topology& t
     }
 }
 
-string_view split_comment(string_view& line) {
+std::string_view split_comment(std::string_view& line) {
     line = trim(line);
     auto position = line.find('#');
     if (position != std::string::npos) {
@@ -938,7 +938,7 @@ string_view split_comment(string_view& line) {
     }
 }
 
-bool is_unused_header(string_view line) {
+bool is_unused_header(std::string_view line) {
     return (line.find("angles") != std::string::npos) ||
            (line.find("dihedrals") != std::string::npos) ||
            (line.find("impropers") != std::string::npos) ||

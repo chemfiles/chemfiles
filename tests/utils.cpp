@@ -123,9 +123,9 @@ TEST_CASE("trim") {
 }
 
 TEST_CASE("split") {
-    auto expected = std::vector<chemfiles::string_view>{"bla", "bla  bla, jk", "fiuks"};
+    auto expected = std::vector<std::string_view>{"bla", "bla  bla, jk", "fiuks"};
     CHECK(chemfiles::split("bla:bla  bla, jk:fiuks", ':') == expected);
 
-    expected = std::vector<chemfiles::string_view>{"bla  bla", " jk:fiuks"};
+    expected = std::vector<std::string_view>{"bla  bla", " jk:fiuks"};
     CHECK(chemfiles::split(",,bla  bla, jk:fiuks", ',') == expected);
 }

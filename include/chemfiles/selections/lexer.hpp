@@ -10,7 +10,6 @@
 #include <cassert>
 
 #include "chemfiles/Error.hpp"
-#include "chemfiles/string_view.hpp"
 
 namespace chemfiles {
 namespace selections {
@@ -18,7 +17,7 @@ namespace selections {
 using Variable = uint8_t;
 
 /// Check that a given string is a valid identifier
-bool is_ident(string_view string);
+bool is_ident(std::string_view string);
 
 /// A token in the selection stream
 class Token {
