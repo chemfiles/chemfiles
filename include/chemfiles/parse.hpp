@@ -7,18 +7,17 @@
 #include <cstdint>
 #include <string>
 #include <limits>
+#include <string_view>
 #include <type_traits>
 
-#include "chemfiles/cpp14.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 
 namespace chemfiles {
 
 /// Convert a input to `T`, throwing a `chemfiles::Error` if the input is not
 /// a valid `T`.
-template<typename T> T parse(string_view input);
+template<typename T> T parse(std::string_view input);
 
 namespace detail {
     /// Helper for the static_assert below
@@ -36,8 +35,8 @@ namespace detail {
     }
 
     template<typename T>
-    inline enable_if_t<std::is_same<T, char>::value || !std::is_integral<T>::value, T>
-    parse_integer(string_view input) {
+    inline std::enable_if_t<std::is_same<T, char>::value || !std::is_integral<T>::value, T>
+    parse_integer(std::string_view input) {
         (void)input;
         static_assert(
             detail::always_false<T>::value,
@@ -47,16 +46,16 @@ namespace detail {
 
     // Conversion for all SIGNED integer type, except char
     template<typename T>
-    inline enable_if_t<!std::is_same<T, char>::value && std::is_signed<T>::value, T>
-    parse_integer(string_view input) {
+    inline std::enable_if_t<!std::is_same<T, char>::value && std::is_signed<T>::value, T>
+    parse_integer(std::string_view input) {
         auto value = parse<int64_t>(input);
         return detail::convert_integer<T>(value);
     }
 
     // Conversion for all UNSIGNED integer type, except char
     template<typename T>
-    inline enable_if_t<!std::is_same<T, char>::value && std::is_unsigned<T>::value, T>
-    parse_integer(string_view input) {
+    inline std::enable_if_t<!std::is_same<T, char>::value && std::is_unsigned<T>::value, T>
+    parse_integer(std::string_view input) {
         auto value = parse<uint64_t>(input);
         return detail::convert_integer<T>(value);
     }
@@ -64,7 +63,7 @@ namespace detail {
     /// Iterator over whitespace separated values in a string
     class tokens_iterator {
     public:
-        explicit tokens_iterator(string_view input):
+        explicit tokens_iterator(std::string_view input):
             input_(input), initial_start_(input_.data()) {}
 
         /// Get the number of characters read from input
@@ -74,7 +73,7 @@ namespace detail {
 
         /// Get the next non-whitespace value. If all values have been read,
         /// this returns an empty string.
-        string_view next() {
+        std::string_view next() {
             auto start = input_.begin();
             auto end = input_.end();
 
@@ -106,7 +105,7 @@ namespace detail {
         }
 
     private:
-        string_view input_;
+        std::string_view input_;
         const char* initial_start_;
         size_t count_ = 0;
     };
@@ -128,7 +127,7 @@ namespace detail {
 ///
 /// @throw chemfiles::Error if the input is empty
 template<typename T>
-inline T parse(string_view input) {
+inline T parse(std::string_view input) {
     return detail::parse_integer<T>(input);
 }
 
@@ -136,11 +135,11 @@ inline T parse(string_view input) {
 /// input.
 ///
 /// @throw chemfiles::Error if the input is empty
-template<> inline std::string parse(string_view input) {
+template<> inline std::string parse(std::string_view input) {
     if (input.empty()) {
         throw error("tried to read a string, got an empty value");
     }
-    return input.to_string();
+    return std::string(input);
 }
 
 /// Read double value from the `input`. This only support plain numbers (no
@@ -152,7 +151,7 @@ template<> inline std::string parse(string_view input) {
 /// @throw chemfiles::Error if the input is empty, the number invalid or would
 ///                         overflow `double`, or if their is additional data
 ///                         after the value
-template<> double parse(string_view input);
+template<> double parse(std::string_view input);
 
 /// Read a signed 64-bit integer from the `input`. This only support plain
 /// numbers (no hex or octal notation), with ASCII digits (the system locale is
@@ -161,7 +160,7 @@ template<> double parse(string_view input);
 /// @throw chemfiles::Error if the input is empty, the number invalid or would
 ///                         overflow `int64_t`, or if their is additional data
 ///                         after the value
-template<> int64_t parse(string_view input);
+template<> int64_t parse(std::string_view input);
 
 /// Read an unsigned 64-bit integer from the `input`. This only support plain
 /// numbers (no hex or octal notation), with ASCII digits (the system locale is
@@ -170,10 +169,10 @@ template<> int64_t parse(string_view input);
 /// @throw chemfiles::Error if the input is empty, the number invalid or would
 ///                         overflow `uint64_t`, or if their is additional data
 ///                         after the value
-template<> uint64_t parse(string_view input);
+template<> uint64_t parse(std::string_view input);
 
 template<typename ...Args>
-inline size_t scan(string_view input, Args& ...args) {
+inline size_t scan(std::string_view input, Args& ...args) {
     auto iterator = detail::tokens_iterator(input);
     try {
         detail::scan_impl(iterator, args...);
@@ -192,7 +191,7 @@ std::string encode_hybrid36(size_t width, int64_t value);
 /// Decodes an integer using the [hybrid36] encoding scheme.
 ///
 /// [hybrid36]: http://cci.lbl.gov/hybrid_36/
-int64_t decode_hybrid36(size_t width, string_view input);
+int64_t decode_hybrid36(size_t width, std::string_view input);
 
 /// Maximum value for a width 4 number
 constexpr auto MAX_HYBRID36_W4_NUMBER = 2436111;

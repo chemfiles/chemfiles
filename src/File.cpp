@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <iterator>
+#include <string_view>
 
 #include <fmt/format.h>
 
@@ -19,9 +20,7 @@
 #include "chemfiles/files/MemoryFile.hpp"
 #include "chemfiles/files/MemoryBuffer.hpp"
 
-#include "chemfiles/cpp14.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/unreachable.hpp"
 
 using namespace chemfiles;
@@ -35,16 +34,16 @@ TextFile::TextFile(std::string path, File::Mode mode, File::Compression compress
 {
     switch (compression) {
     case File::DEFAULT:
-        file_ = chemfiles::make_unique<PlainFile>(this->path(), this->mode());
+        file_ = std::make_unique<PlainFile>(this->path(), this->mode());
         break;
     case File::GZIP:
-        file_ = chemfiles::make_unique<GzFile>(this->path(), this->mode());
+        file_ = std::make_unique<GzFile>(this->path(), this->mode());
         break;
     case File::BZIP2:
-        file_ = chemfiles::make_unique<Bz2File>(this->path(), this->mode());
+        file_ = std::make_unique<Bz2File>(this->path(), this->mode());
         break;
     case File::LZMA:
-        file_ = chemfiles::make_unique<XzFile>(this->path(), this->mode());
+        file_ = std::make_unique<XzFile>(this->path(), this->mode());
         break;
     default:
         unreachable();
@@ -70,7 +69,7 @@ TextFile::TextFile(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::
         memory->decompress(compression);
     }
 
-    file_ = chemfiles::make_unique<MemoryFile>(std::move(memory), mode);
+    file_ = std::make_unique<MemoryFile>(std::move(memory), mode);
 }
 
 uint64_t TextFile::tellpos() const {
@@ -135,7 +134,7 @@ void TextFile::fill_buffer(size_t start) {
     line_start_ = buffer_.data();
 }
 
-string_view TextFile::readline() {
+std::string_view TextFile::readline() {
     // Initialize buffer if needed
     if (!buffer_initialized()) {
         fill_buffer(0);
@@ -173,7 +172,7 @@ string_view TextFile::readline() {
                 // We don't know the line length, but the buffer is terminated
                 // with zeroes, so we can rely on std::strlen to create the
                 // string_view.
-                auto line = string_view(line_start_);
+                auto line = std::string_view(line_start_);
                 line_start_ += line.length();
                 return line;
             }
@@ -194,7 +193,7 @@ string_view TextFile::readline() {
         fill_buffer(remainder);
     }
 
-    auto line = string_view(line_start_, length - windows_line - 1);
+    auto line = std::string_view(line_start_, length - windows_line - 1);
     line_start_ += length;
 
     return line;

@@ -2,6 +2,7 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <string>
+#include <string_view>
 
 #include "chemfiles/FormatFactory.hpp"
 #include "chemfiles/FormatMetadata.hpp"
@@ -10,7 +11,6 @@
 #include "chemfiles/misc.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 using namespace chemfiles;
@@ -19,8 +19,8 @@ using namespace chemfiles;
 /// `.cif` extension
 static optional<std::string> distinguish_cif_variants(const std::string& path, const std::string& compression);
 
-static bool contains(string_view haystack, string_view needle) {
-    return haystack.find(needle) != haystack.npos;
+static bool contains(std::string_view haystack, std::string_view needle) {
+    return haystack.find(needle) != std::string_view::npos;
 }
 
 std::string chemfiles::guess_format(std::string path, char mode) {

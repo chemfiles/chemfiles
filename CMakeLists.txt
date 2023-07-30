@@ -87,7 +87,7 @@ add_subdirectory(external)
 # unit tests.
 file(GLOB_RECURSE chemfiles_objects_sources src/**.cpp)
 add_library(chemfiles_objects OBJECT ${chemfiles_objects_sources})
-target_compile_features(chemfiles_objects PRIVATE cxx_std_11 c_std_99)
+target_compile_features(chemfiles_objects PRIVATE cxx_std_17 c_std_99)
 
 target_include_directories(chemfiles_objects SYSTEM BEFORE PRIVATE ${EXTERNAL_INCLUDES})
 target_include_directories(chemfiles_objects SYSTEM BEFORE PRIVATE ${ZLIB_INCLUDE_DIRS} ${LIBLZMA_INCLUDE_DIRS})
@@ -150,7 +150,7 @@ set(CHEMFILES_OBJECTS
 
 # Add the main chemfiles library
 add_library(chemfiles ${CHEMFILES_OBJECTS})
-target_compile_features(chemfiles PUBLIC cxx_std_11 c_std_99)
+target_compile_features(chemfiles PUBLIC cxx_std_17 c_std_99)
 
 set_target_properties(chemfiles PROPERTIES
     CXX_VISIBILITY_PRESET hidden

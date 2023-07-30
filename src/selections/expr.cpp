@@ -15,7 +15,6 @@
 #include <fmt/format.h>
 
 #include "chemfiles/types.hpp"
-#include "chemfiles/cpp14.hpp"
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/unreachable.hpp"
 #include "chemfiles/external/optional.hpp"
@@ -60,7 +59,7 @@ SubSelection::SubSelection(Variable variable): selection_(nullptr), variable_(va
 }
 
 SubSelection::SubSelection(std::string selection):
-    selection_(chemfiles::make_unique<Selection>(std::move(selection))), variable_(UINT8_MAX)
+    selection_(std::make_unique<Selection>(std::move(selection))), variable_(UINT8_MAX)
 {
     assert(selection_->size() == 1);
 }
@@ -465,12 +464,12 @@ std::string Math::print(unsigned /*unused*/) const {
 void Math::optimize() {
     auto lhs_opt = lhs_->optimize();
     if (lhs_opt) {
-        lhs_ = chemfiles::make_unique<Number>(lhs_opt.value());
+        lhs_ = std::make_unique<Number>(lhs_opt.value());
     }
 
     auto rhs_opt = rhs_->optimize();
     if (rhs_opt) {
-        rhs_ = chemfiles::make_unique<Number>(rhs_opt.value());
+        rhs_ = std::make_unique<Number>(rhs_opt.value());
     }
 }
 
@@ -500,9 +499,9 @@ optional<double> Add::optimize() {
     if (lhs_opt && rhs_opt) {
         return lhs_opt.value() + rhs_opt.value();
     } else if (lhs_opt) {
-        lhs_ = chemfiles::make_unique<Number>(lhs_opt.value());
+        lhs_ = std::make_unique<Number>(lhs_opt.value());
     } else if (rhs_opt) {
-        rhs_ = chemfiles::make_unique<Number>(rhs_opt.value());
+        rhs_ = std::make_unique<Number>(rhs_opt.value());
     }
     return nullopt;
 }
@@ -537,9 +536,9 @@ optional<double> Sub::optimize() {
     if (lhs_opt && rhs_opt) {
         return lhs_opt.value() - rhs_opt.value();
     } else if (lhs_opt) {
-        lhs_ = chemfiles::make_unique<Number>(lhs_opt.value());
+        lhs_ = std::make_unique<Number>(lhs_opt.value());
     } else if (rhs_opt) {
-        rhs_ = chemfiles::make_unique<Number>(rhs_opt.value());
+        rhs_ = std::make_unique<Number>(rhs_opt.value());
     }
     return nullopt;
 }
@@ -574,9 +573,9 @@ optional<double> Mul::optimize() {
     if (lhs_opt && rhs_opt) {
         return lhs_opt.value() * rhs_opt.value();
     } else if (lhs_opt) {
-        lhs_ = chemfiles::make_unique<Number>(lhs_opt.value());
+        lhs_ = std::make_unique<Number>(lhs_opt.value());
     } else if (rhs_opt) {
-        rhs_ = chemfiles::make_unique<Number>(rhs_opt.value());
+        rhs_ = std::make_unique<Number>(rhs_opt.value());
     }
     return nullopt;
 }
@@ -611,9 +610,9 @@ optional<double> Div::optimize() {
     if (lhs_opt && rhs_opt) {
         return lhs_opt.value() / rhs_opt.value();
     } else if (lhs_opt) {
-        lhs_ = chemfiles::make_unique<Number>(lhs_opt.value());
+        lhs_ = std::make_unique<Number>(lhs_opt.value());
     } else if (rhs_opt) {
-        rhs_ = chemfiles::make_unique<Number>(rhs_opt.value());
+        rhs_ = std::make_unique<Number>(rhs_opt.value());
     }
     return nullopt;
 }
@@ -648,9 +647,9 @@ optional<double> Pow::optimize() {
     if (lhs_opt && rhs_opt) {
         return pow(lhs_opt.value(), rhs_opt.value());
     } else if (lhs_opt) {
-        lhs_ = chemfiles::make_unique<Number>(lhs_opt.value());
+        lhs_ = std::make_unique<Number>(lhs_opt.value());
     } else if (rhs_opt) {
-        rhs_ = chemfiles::make_unique<Number>(rhs_opt.value());
+        rhs_ = std::make_unique<Number>(rhs_opt.value());
     }
     return nullopt;
 }
@@ -710,9 +709,9 @@ optional<double> Mod::optimize() {
     if (lhs_opt && rhs_opt) {
         return fmod(lhs_opt.value(), rhs_opt.value());
     } else if (lhs_opt) {
-        lhs_ = chemfiles::make_unique<Number>(lhs_opt.value());
+        lhs_ = std::make_unique<Number>(lhs_opt.value());
     } else if (rhs_opt) {
-        rhs_ = chemfiles::make_unique<Number>(rhs_opt.value());
+        rhs_ = std::make_unique<Number>(rhs_opt.value());
     }
     return nullopt;
 }

@@ -7,15 +7,14 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-
-#include "chemfiles/string_view.hpp"
+#include <string_view>
 
 namespace chemfiles {
 
 /// Split `string` into components delimited by `delim`, ignoring empty
 /// components.
-inline std::vector<string_view> split(string_view string, char delim) {
-    std::vector<string_view> elems;
+inline std::vector<std::string_view> split(std::string_view string, char delim) {
+    std::vector<std::string_view> elems;
     size_t last = 0;
     for (size_t i = 0; i<string.length(); i++) {
         if (string[i] == delim) {
@@ -34,12 +33,12 @@ inline std::vector<string_view> split(string_view string, char delim) {
     return elems;
 }
 
-inline std::vector<string_view> split(const char* string, char delim) {
-    return split(string_view(string), delim);
+inline std::vector<std::string_view> split(const char* string, char delim) {
+    return split(std::string_view(string), delim);
 }
 
 // disallow temporary string
-std::vector<string_view> split(std::string&& string, char delim) = delete;
+std::vector<std::string_view> split(std::string&& string, char delim) = delete;
 
 // Check whether the given character is an ASCII whitespace
 inline bool is_ascii_whitespace(char c) {
@@ -89,9 +88,9 @@ inline char to_ascii_uppercase(char c) {
 }
 
 /// Remove whitespaces at the beginning and end of `string`
-inline string_view trim(string_view string) {
-    auto begin = string.begin();
-    auto end = string.end();
+inline std::string_view trim(std::string_view string) {
+    auto begin = string.data();
+    auto end = string.data() + string.length();
     while (begin != end && is_ascii_whitespace(*begin)) {
         begin++;
     }
@@ -104,19 +103,19 @@ inline string_view trim(string_view string) {
         end++;
     }
 
-    return string_view(begin, static_cast<size_t>(end - begin));
+    return std::string_view(begin, static_cast<size_t>(end - begin));
 }
 
-inline string_view trim(const char* string) {
-    return trim(string_view(string));
+inline std::string_view trim(const char* string) {
+    return trim(std::string_view(string));
 }
 
 // disallow temporary string
-string_view trim(std::string&& string) = delete;
+std::string_view trim(std::string&& string) = delete;
 
 /// Transform all characters in ASCII range in the given `string` to lower case.
 ///
-/// Non letters and characters oustide of ASCII will be left untouched
+/// Non letters and characters outside of ASCII will be left untouched
 inline void to_ascii_lowercase(std::string& input) {
     std::transform(input.begin(), input.end(), input.begin(),
         [](std::string::value_type c) {
@@ -127,7 +126,7 @@ inline void to_ascii_lowercase(std::string& input) {
 
 /// Transform all characters in ASCII range in the given `string` to upper case.
 ///
-/// Non letters and characters oustide of ASCII will be left untouched
+/// Non letters and characters outside of ASCII will be left untouched
 inline void to_ascii_uppercase(std::string& input) {
     std::transform(input.begin(), input.end(), input.begin(),
         [](std::string::value_type c) {

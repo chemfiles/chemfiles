@@ -11,7 +11,6 @@
 #include <type_traits>
 
 #include "chemfiles/exports.h"
-#include "chemfiles/cpp14.hpp"
 #include "chemfiles/mutex.hpp"
 #include "chemfiles/File.hpp"
 #include "chemfiles/Format.hpp"
@@ -59,16 +58,16 @@ public:
     /// template function `chemfiles::format_metadata` for this format. The
     /// second template argument is used to determine if the `Format` supports
     /// memory IO.
-    template<class Format, enable_if_t<SupportsMemoryIO<Format>::value, int> = 0>
+    template<class Format, std::enable_if_t<SupportsMemoryIO<Format>::value, int> = 0>
     void add_format() {
         const auto& metadata = format_metadata<Format>();
         metadata.validate();
         register_format(metadata,
             [](const std::string& path, File::Mode mode, File::Compression compression) {
-                return chemfiles::make_unique<Format>(path, mode, compression);
+                return std::make_unique<Format>(path, mode, compression);
             },
             [](std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression) {
-                return chemfiles::make_unique<Format>(std::move(memory), mode, compression);
+                return std::make_unique<Format>(std::move(memory), mode, compression);
             }
         );
     }
@@ -79,13 +78,13 @@ public:
     /// template function `chemfiles::format_metadata` for this format. The
     /// second template argument is used to determine if the `Format` supports
     /// memory IO.
-    template<class Format, enable_if_t<!SupportsMemoryIO<Format>::value, int> = 0>
+    template<class Format, std::enable_if_t<!SupportsMemoryIO<Format>::value, int> = 0>
     void add_format() {
         const auto& metadata = format_metadata<Format>();
         metadata.validate();
         register_format(metadata,
             [](const std::string& path, File::Mode mode, File::Compression compression) {
-                return chemfiles::make_unique<Format>(path, mode, compression);
+                return std::make_unique<Format>(path, mode, compression);
             }
         );
     }

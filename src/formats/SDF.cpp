@@ -3,18 +3,19 @@
 
 #include <cassert>
 #include <cstdint>
+
 #include <cmath>
 #include <array>
 #include <string>
 #include <vector>
 #include <exception>
+#include <string_view>
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/parse.hpp"
 #include "chemfiles/warnings.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/File.hpp"
@@ -53,7 +54,7 @@ void SDFFormat::read_next(Frame& frame) {
     auto line = trim(file_.readline());
 
     if (!line.empty()) {
-        frame.set("name", line.to_string());
+        frame.set("name", std::string(line));
     }
 
     file_.readline(); // Program line - skip it
@@ -77,7 +78,7 @@ void SDFFormat::read_next(Frame& frame) {
         auto y = parse<double>(line.substr(10, 10));
         auto z = parse<double>(line.substr(20, 10));
         auto name = line.substr(31, 3);
-        auto atom = Atom(trim(name).to_string());
+        auto atom = Atom(std::string(trim(name)));
 
         if (line.length() >= 40) {
             long long charge_code = 0;
@@ -184,13 +185,13 @@ void SDFFormat::read_next(Frame& frame) {
             // It is formated like:
             //> <NAMEGOESHERE>
             const auto npos = line.find_last_of('>');
-            property_name = line.substr(3, npos - 3).to_string();
+            property_name = std::string(line.substr(3, npos - 3));
 
-            property_value = file_.readline().to_string();
+            property_value = std::string(file_.readline());
         } else {
             // Continuation of a property value
             property_value += '\n';
-            property_value += line.to_string();
+            property_value += std::string(line);
         }
     }
 }
