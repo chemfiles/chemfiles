@@ -147,6 +147,11 @@ static void check_traj(const char* path) {
 }
 
 TEST_CASE("Read files in TPR format") {
+    SECTION("Read TPR Version 2023") {
+        check_traj("data/tpr/gmx_v2023_s.tpr");
+        check_traj("data/tpr/gmx_v2023_d.tpr");
+    }
+
     SECTION("Read TPR Version 2022") {
         check_traj("data/tpr/gmx_v2022_s.tpr");
         check_traj("data/tpr/gmx_v2022_d.tpr");

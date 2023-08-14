@@ -69,6 +69,7 @@ class TPRVersion {
         ReaddedConstantAcceleration,
         RemoveTholeRfac,
         RemoveAtomtypes,
+        EnsembleTemperature,
         Count // This number is for the total number of versions
     };
 };
