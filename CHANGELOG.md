@@ -29,6 +29,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - DCD files are now read/written with a custom parser (#453)
 - Support TPR files up to version 2023 without a warning. Files from future
   versions are tried to be read but emit a warning
+- Improved reading speed of XTC files by implementing a decoding routine
+  proposed by [libxtc](https://doi.org/10.1186/s13104-021-05536-5)
 
 ### Changes to the C++ API
 - Per-atom properties are optional, i.e. `Atom::properties` returns an optional property map.
