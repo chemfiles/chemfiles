@@ -250,6 +250,7 @@ static void encodeints(std::vector<char>& buf, DecodeState& state, uint32_t num_
  *
  * Extract the number of bits from the array buf and construct an integer
  * from it. Return that value.
+ * The number of bits must be <32.
  *
  */
 
@@ -259,19 +260,18 @@ static T decodebits(const std::vector<char>& buf, DecodeState& state, uint32_t n
 
     size_t cnt = state.count;
     size_t lastbits = state.lastbits;
-    // last byte needs 1B headspace for shifting
     uint32_t lastbyte = state.lastbyte;
 
     uint32_t num = 0;
     while (num_of_bits >= 8) {
-        lastbyte = (lastbyte << 8) | (buf[cnt++] & 0xff);
+        lastbyte = (lastbyte << 8) | static_cast<uint8_t>(buf[cnt++]);
         num |= (lastbyte >> lastbits) << (num_of_bits - 8);
         num_of_bits -= 8;
     }
     if (num_of_bits > 0) {
         if (lastbits < num_of_bits) {
             lastbits += 8;
-            lastbyte = (lastbyte << 8) | (buf[cnt++] & 0xff);
+            lastbyte = (lastbyte << 8) | static_cast<uint8_t>(buf[cnt++]);
         }
         lastbits -= num_of_bits;
         num |= (lastbyte >> lastbits) & mask;
@@ -286,6 +286,51 @@ static T decodebits(const std::vector<char>& buf, DecodeState& state, uint32_t n
     return static_cast<T>(num);
 }
 
+template <typename T> class FastTypes;
+
+template <> class FastTypes<uint32_t> {
+  public:
+    using Full = uint_fast32_t;
+    using Half = uint_fast16_t;
+};
+
+template <> class FastTypes<uint64_t> {
+  public:
+    using Full = uint_fast64_t;
+    using Half = uint_fast32_t;
+};
+
+template <typename T>
+static void unpack_from_int(const std::vector<char>& buf, DecodeState& state, uint32_t num_of_bits,
+                            uint32_t sizes[3], span<int32_t> nums) {
+    T v = 0;
+    size_t num_of_bytes = 0;
+    while (num_of_bits >= 8) {
+        const T byte = decodebits<T>(buf, state, 8);
+        v |= byte << (8 * num_of_bytes++);
+        num_of_bits -= 8;
+    }
+    if (num_of_bits > 0) {
+        const T byte = decodebits<T>(buf, state, num_of_bits);
+        v |= byte << (8 * num_of_bytes);
+    }
+
+    using FastType = typename FastTypes<T>::Full;
+    using FastTypeHalf = typename FastTypes<T>::Half;
+
+    const FastType sz = static_cast<FastType>(sizes[2]);
+    const FastTypeHalf sy = static_cast<FastTypeHalf>(sizes[1]);
+    const FastType szy = sz * sy;
+    const FastTypeHalf x1 = v / szy;
+    const FastType q1 = v - x1 * szy;
+    const FastTypeHalf y1 = q1 / sz;
+    const FastTypeHalf z1 = q1 - y1 * sz;
+
+    nums[0] = static_cast<int32_t>(x1);
+    nums[1] = static_cast<int32_t>(y1);
+    nums[2] = static_cast<int32_t>(z1);
+}
+
 /*
  * decodeints - decode 'small' integers from the buf array
  *
@@ -294,15 +339,29 @@ static T decodebits(const std::vector<char>& buf, DecodeState& state, uint32_t n
  * with the given `sizes`. You need to specify the total number of bits to be
  * used from `buf` in `num_of_bits`.
  *
+ * The function has been extended to use fast integer arithmetic
+ * for sizes <= 64 bit. This technique was proposed by the authors of libxtc.
+ * See https://doi.org/10.1186/s13104-021-05536-5
+ * and https://gitlab.com/impulse_md/libxtc
+ *
  */
 
 static void decodeints(const std::vector<char>& buf, DecodeState& state, uint32_t num_of_bits,
                        uint32_t sizes[3], span<int32_t> nums) {
     assert(nums.size() == 3 && "invalid number of integers to unpack");
+
+    if (num_of_bits <= 32) {
+        unpack_from_int<uint32_t>(buf, state, num_of_bits, sizes, nums);
+        return;
+    } else if (num_of_bits <= 64) {
+        unpack_from_int<uint64_t>(buf, state, num_of_bits, sizes, nums);
+        return;
+    }
+
     uint8_t bytes[32];
     bytes[1] = bytes[2] = bytes[3] = 0;
     size_t num_of_bytes = 0;
-    while (num_of_bits > 8) {
+    while (num_of_bits >= 8) {
         bytes[num_of_bytes++] = decodebits<uint8_t>(buf, state, 8);
         num_of_bits -= 8;
     }
