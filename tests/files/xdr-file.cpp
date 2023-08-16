@@ -10,14 +10,14 @@ using namespace chemfiles;
 
 static void write_xdr_file(XDRFile& file) {
     file.write_gmx_string("Hello!"); // needs 2B padding
-    const std::vector<float> arrary = {1.234f, -5.123f, 100.232f};
-    file.write_gmx_compressed_floats(arrary, 1000.0);
+    const std::vector<float> array = {1.234f, -5.123f, 100.232f};
+    file.write_gmx_compressed_floats(array, 1000.0);
 }
 
 TEST_CASE("XDR files") {
     SECTION("read") {
         XDRFile file("data/misc/xdr.bin", File::READ);
-        CHECK(file.file_size() == 112);
+        CHECK(file.file_size() == 164);
 
         // read some big-endian data types
         CHECK(file.read_single_i32() == -123);
@@ -26,17 +26,19 @@ TEST_CASE("XDR files") {
         CHECK(file.read_single_f32() == -4.567f);
 
         std::vector<double> darr;
-        darr.resize(3);
+        darr.resize(6);
         file.read_f64(darr);
-        const std::vector<double> dexpected = {1.234, -6.234, 105.232};
+        const std::vector<double> dexpected = {1.234,    -6.234,    105.232,
+                                               1034.346, -5056.465, 10054.475};
         CHECK(darr == dexpected);
 
         auto array = std::vector<float>();
-        array.resize(3);
+        array.resize(6);
         file.read_f32(array);
-        const std::vector<float> expected = {1.234f, -5.123f, 100.232f};
+        const std::vector<float> expected = {1.234f,    -5.123f,    100.232f,
+                                             1034.346f, -5056.465f, 10054.475f};
         CHECK(array == expected);
-        array = {0.0, 0.0, 0.0};
+        array = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
         // read XDR and GROMACS specific data types
         CHECK(file.read_gmx_string() == "Hello!");
