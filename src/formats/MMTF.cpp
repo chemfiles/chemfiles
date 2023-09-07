@@ -590,7 +590,7 @@ void MMTFFormat::add_residue_to_structure(const Frame& frame, const Residue& res
     group.atomNameList.reserve(residue.size());
     group.elementList.reserve(residue.size());
 
-    auto positions = frame.positions();
+    const auto& positions = frame.positions();
     for (auto i: residue) {
         const auto& atom = frame[i];
         group.formalChargeList.emplace_back(atom.charge());
