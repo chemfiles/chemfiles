@@ -5,7 +5,7 @@
 #include <string.h>
 #include <assert.h>
 
-int main() {
+int main(void) {
     // [example]
     const char* version = chfl_version();
     assert(strcmp(version, CHEMFILES_VERSION) == 0);

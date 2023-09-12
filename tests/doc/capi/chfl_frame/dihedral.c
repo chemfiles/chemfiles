@@ -10,7 +10,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-int main() {
+int main(void) {
     // [example]
     CHFL_FRAME* frame = chfl_frame();
     CHFL_ATOM* atom = chfl_atom("");

@@ -4,7 +4,7 @@
 #include <chemfiles.h>
 #include <stdlib.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_FRAME* frame = chfl_frame();
     chfl_frame_add_velocities(frame);

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_RESIDUE* residue = chfl_residue("water");
     chfl_residue_add_atom(residue, 0);

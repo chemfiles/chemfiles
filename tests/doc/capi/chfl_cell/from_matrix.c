@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-int main() {
+int main(void) {
     // [example]
     const chfl_vector3d matrix[3] = {
         {10, 0, 0},

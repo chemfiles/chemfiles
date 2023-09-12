@@ -5,7 +5,7 @@
 #include <string.h>
 #include <assert.h>
 
-int main() {
+int main(void) {
     // [example]
     // Generate an error
     chfl_trajectory_open("noformat", 'r');

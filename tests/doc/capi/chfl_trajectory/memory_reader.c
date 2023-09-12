@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main() {
+int main(void) {
     // [example]
     const char* memory_buffer = "c1ccccc1\nc1ccco1\nc1ccccn1\n";
     CHFL_TRAJECTORY* trajectory = chfl_trajectory_memory_reader(memory_buffer, strlen(memory_buffer), "SMI");

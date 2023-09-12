@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_FRAME* frame = chfl_frame();
     chfl_frame_resize(frame, 42);

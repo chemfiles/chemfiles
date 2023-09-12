@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <string.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_PROPERTY* property = chfl_property_string("a great property");
 

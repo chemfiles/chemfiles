@@ -178,9 +178,6 @@ static bool is_boolean_selector(const std::string& name) {
     return BOOLEAN_SELECTORS.find(name) != BOOLEAN_SELECTORS.end();
 }
 
-// provide definition for MAX_ARGS. This is required in C++11.
-constexpr size_t SelectionArguments::MAX_ARGS;
-
 void SelectionArguments::add(const std::string& context, SubSelection selection) {
    if (this->count >= MAX_ARGS) {
        throw selection_error("too many argument in '{}', expected no more than {}", context, MAX_ARGS);

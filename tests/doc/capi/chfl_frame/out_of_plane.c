@@ -6,7 +6,7 @@
 #include <math.h>
 #include <assert.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_FRAME* frame = chfl_frame();
     CHFL_ATOM* atom = chfl_atom("");

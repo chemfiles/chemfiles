@@ -4,7 +4,7 @@
 #include <chemfiles.h>
 #include <stdlib.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_ATOM* atom = chfl_atom("Na");
     CHFL_ATOM* copy = chfl_atom_copy(atom);

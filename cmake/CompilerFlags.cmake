@@ -177,6 +177,8 @@ else()
     add_warning_flag("-Wno-documentation-unknown-command")
     add_warning_flag("-Wno-exit-time-destructors")
     add_warning_flag("-Wno-global-constructors")
+    add_warning_flag("-Wno-unsafe-buffer-usage")
+    add_warning_flag("-Wno-declaration-after-statement")
     # This warning trigger when compiling for 64-bit,
     # but the code is relevant for 32-bit
     add_warning_flag("-Wno-tautological-type-limit-compare")

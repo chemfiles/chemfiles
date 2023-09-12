@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_FRAME* frame = chfl_frame();
     CHFL_PROPERTY* property = chfl_property_double(-23);
