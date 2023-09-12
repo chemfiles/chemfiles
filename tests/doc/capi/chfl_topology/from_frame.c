@@ -4,7 +4,7 @@
 #include <chemfiles.h>
 #include <stdlib.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_FRAME* frame = chfl_frame();
     const CHFL_TOPOLOGY* topology = chfl_topology_from_frame(frame);

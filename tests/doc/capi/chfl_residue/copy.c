@@ -4,7 +4,7 @@
 #include <chemfiles.h>
 #include <stdlib.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_RESIDUE* residue = chfl_residue("water");
     CHFL_RESIDUE* copy = chfl_residue_copy(residue);

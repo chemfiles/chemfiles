@@ -29,9 +29,6 @@ template<> struct nc_type_info<char> {
     static constexpr void(Netcdf3File::*writer)(const char*, size_t)
         = static_cast<void (Netcdf3File::*)(const char*, size_t)>(&Netcdf3File::write_char);
 };
-constexpr const char* nc_type_info<char>::name;
-constexpr void(Netcdf3File::*nc_type_info<char>::reader)(char*, size_t);
-constexpr void(Netcdf3File::*nc_type_info<char>::writer)(const char*, size_t);
 
 template<> struct nc_type_info<int8_t> {
     static constexpr int32_t nc_type = constants::NC_BYTE;
@@ -42,9 +39,6 @@ template<> struct nc_type_info<int8_t> {
     static constexpr void(Netcdf3File::*writer)(const int8_t*, size_t)
         = static_cast<void (Netcdf3File::*)(const int8_t*, size_t)>(&Netcdf3File::write_i8);
 };
-constexpr const char* nc_type_info<int8_t>::name;
-constexpr void(Netcdf3File::*nc_type_info<int8_t>::reader)(int8_t*, size_t);
-constexpr void(Netcdf3File::*nc_type_info<int8_t>::writer)(const int8_t*, size_t);
 
 template<> struct nc_type_info<int16_t> {
     static constexpr int32_t nc_type = constants::NC_SHORT;
@@ -53,9 +47,6 @@ template<> struct nc_type_info<int16_t> {
     static constexpr void(Netcdf3File::*reader)(int16_t*, size_t) = &Netcdf3File::read_i16;
     static constexpr void(Netcdf3File::*writer)(const int16_t*, size_t) = &Netcdf3File::write_i16;
 };
-constexpr const char* nc_type_info<int16_t>::name;
-constexpr void(Netcdf3File::*nc_type_info<int16_t>::reader)(int16_t*, size_t);
-constexpr void(Netcdf3File::*nc_type_info<int16_t>::writer)(const int16_t*, size_t);
 
 template<> struct nc_type_info<int32_t> {
     static constexpr int32_t nc_type = constants::NC_INT;
@@ -64,9 +55,6 @@ template<> struct nc_type_info<int32_t> {
     static constexpr void(Netcdf3File::*reader)(int32_t*, size_t) = &Netcdf3File::read_i32;
     static constexpr void(Netcdf3File::*writer)(const int32_t*, size_t) = &Netcdf3File::write_i32;
 };
-constexpr const char* nc_type_info<int32_t>::name;
-constexpr void(Netcdf3File::*nc_type_info<int32_t>::reader)(int32_t*, size_t);
-constexpr void(Netcdf3File::*nc_type_info<int32_t>::writer)(const int32_t*, size_t);
 
 template<> struct nc_type_info<float> {
     static constexpr int32_t nc_type = constants::NC_FLOAT;
@@ -75,9 +63,6 @@ template<> struct nc_type_info<float> {
     static constexpr void(Netcdf3File::*reader)(float*, size_t) = &Netcdf3File::read_f32;
     static constexpr void(Netcdf3File::*writer)(const float*, size_t) = &Netcdf3File::write_f32;
 };
-constexpr const char* nc_type_info<float>::name;
-constexpr void(Netcdf3File::*nc_type_info<float>::reader)(float*, size_t);
-constexpr void(Netcdf3File::*nc_type_info<float>::writer)(const float*, size_t);
 
 template<> struct nc_type_info<double> {
     static constexpr int32_t nc_type = constants::NC_DOUBLE;
@@ -86,9 +71,6 @@ template<> struct nc_type_info<double> {
     static constexpr void(Netcdf3File::*reader)(double*, size_t) = &Netcdf3File::read_f64;
     static constexpr void(Netcdf3File::*writer)(const double*, size_t) = &Netcdf3File::write_f64;
 };
-constexpr const char* nc_type_info<double>::name;
-constexpr void(Netcdf3File::*nc_type_info<double>::reader)(double*, size_t);
-constexpr void(Netcdf3File::*nc_type_info<double>::writer)(const double*, size_t);
 
 /******************************************************************************/
 

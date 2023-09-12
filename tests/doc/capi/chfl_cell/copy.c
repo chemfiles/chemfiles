@@ -4,7 +4,7 @@
 #include <chemfiles.h>
 #include <stdlib.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 10, 10}, NULL);
     CHFL_CELL* copy = chfl_cell_copy(cell);

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-int main() {
+int main(void) {
     // [example]
     // Building a frame containing a Cl2 molecule
     CHFL_FRAME* frame = chfl_frame();

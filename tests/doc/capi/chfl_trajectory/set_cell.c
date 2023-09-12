@@ -4,7 +4,7 @@
 #include <chemfiles.h>
 #include <stdlib.h>
 
-int main() {
+int main(void) {
     // [example] [no-run]
     CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("water.xyz", 'r');
     CHFL_CELL* cell = chfl_cell((chfl_vector3d){22, 22, 34}, NULL);

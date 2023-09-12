@@ -4,7 +4,7 @@
 #include <chemfiles.h>
 #include <stdlib.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_SELECTION* selection = chfl_selection("name O");
     CHFL_SELECTION* copy = chfl_selection_copy(selection);

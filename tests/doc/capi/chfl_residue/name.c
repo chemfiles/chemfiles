@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <string.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_RESIDUE* residue = chfl_residue("water");
 

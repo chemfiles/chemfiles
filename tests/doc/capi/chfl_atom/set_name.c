@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <string.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_ATOM* atom = chfl_atom("Na");
 

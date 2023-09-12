@@ -18,7 +18,7 @@ void warning_callback(const char* message);
         LAST_WARNING[1023] = '\0';
     }
 
-    int main() {
+    int main(void) {
         chfl_set_warning_callback(warning_callback);
 
         // Generate a warning event

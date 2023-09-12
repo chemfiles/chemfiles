@@ -3,7 +3,7 @@
 
 #include <chemfiles.h>
 
-int main() {
+int main(void) {
     // [example] [no-run]
     CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("water.nc", 'r');
 

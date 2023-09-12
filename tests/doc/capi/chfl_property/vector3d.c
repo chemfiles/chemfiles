@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <math.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_PROPERTY* property = chfl_property_vector3d((chfl_vector3d){2, 3.2, -1});
 
