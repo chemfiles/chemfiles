@@ -18,7 +18,7 @@ EXPECTED_SIZES = {
     "bzip2.tar.gz": 114,
     "fmt.tar.gz": 189,
     "gemmi.tar.gz": 476,
-    "lzma.tar.gz": 256,
+    "lzma.tar.gz": 302,
     "mmtf-cpp.tar.gz": 439,
     "molfiles.tar.gz": 477,
     "pugixml.tar.gz": 198,

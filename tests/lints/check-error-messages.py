@@ -82,7 +82,7 @@ def check_file(path):
     with codecs.open(path, encoding="utf8") as fd:
         lines = list(fd)
 
-    for (i, line) in enumerate(lines):
+    for i, line in enumerate(lines):
         # ignore comments
         if line.strip().startswith("//"):
             continue
