@@ -99,7 +99,7 @@ endif()
 list(APPEND EXTERNAL_INCLUDES ${ZLIB_INCLUDE_DIRS})
 
 # ==========
-# lzma: https://github.com/chemfiles/lzma
+# lzma: https://github.com/chemfiles/xz
 # ==========
 if(${CHFL_SYSTEM_LZMA})
     find_package(LibLZMA REQUIRED)
@@ -107,9 +107,9 @@ if(${CHFL_SYSTEM_LZMA})
     set(LZMA_OBJECTS "" PARENT_SCOPE)
 else()
     external_library(lzma)
-    set(LZMA_OBJECTS $<TARGET_OBJECTS:lzma> PARENT_SCOPE)
+    set(LZMA_OBJECTS $<TARGET_OBJECTS:chemfiles_lzma> PARENT_SCOPE)
     set(LIBLZMA_LIBRARY "" PARENT_SCOPE)
-    set(LIBLZMA_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/lzma/liblzma/api ${CMAKE_CURRENT_BINARY_DIR}/lzma)
+    set(LIBLZMA_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/lzma/src/liblzma/api ${CMAKE_CURRENT_BINARY_DIR}/lzma)
     set(LIBLZMA_INCLUDE_DIRS ${LIBLZMA_INCLUDE_DIRS} PARENT_SCOPE)
 endif()
 list(APPEND EXTERNAL_INCLUDES ${LIBLZMA_INCLUDE_DIRS})
