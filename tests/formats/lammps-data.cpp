@@ -110,6 +110,12 @@ TEST_CASE("Read files in LAMMPS data format") {
         CHECK(topology.residue_for_atom(9)->contains(11));
         CHECK(topology.residue_for_atom(9)->id().value() == 3);
     }
+
+    SECTION("File with whitespaces") {
+        // https://github.com/chemfiles/chemfiles/issues/485
+        auto file = Trajectory("data/lammps-data/whitespaces.lmp", 'r', "LAMMPS Data");
+        auto frame = file.read();
+    }
 }
 
 TEST_CASE("Write files in LAMMPS data format") {
