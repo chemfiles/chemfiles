@@ -168,7 +168,7 @@ private:
     /// Read the header section
     void read_header(Frame& frame);
     size_t read_header_integer(string_view line, const std::string& context);
-    double read_header_box_bounds(string_view line, const std::string& context);
+    double read_header_box_bounds(string_view line, const std::string& lo, const std::string& hi);
 
     /// Get the section name from the next non-empty line
     void get_next_section();

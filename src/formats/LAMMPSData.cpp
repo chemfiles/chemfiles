@@ -223,7 +223,7 @@ void LAMMPSDataFormat::read_next(Frame& frame) {
     auto it = comment.find("atom_style");
     if (it != std::string::npos) {
         auto style = comment.substr(it + 10);
-        atom_style_name_ = trim(split(style, ' ')[0]).to_string();
+        atom_style_name_ = (split(style, ' ')[0]).to_string();
     }
 
     while(!file_.eof()) {
@@ -264,6 +264,7 @@ void LAMMPSDataFormat::read_header(Frame& frame) {
         auto line = file_.readline();
         auto content = line;
         split_comment(content);
+
         if (content.empty() || is_unused_header(content)) {
             // Nothing to do
         } else if (content.find("atoms") != std::string::npos) {
@@ -272,15 +273,15 @@ void LAMMPSDataFormat::read_header(Frame& frame) {
             nbonds_ = read_header_integer(content, "bonds");
         } else if (content.find("atom types") != std::string::npos) {
             natom_types_ = read_header_integer(content, "atom types");
-        } else if (content.find("xlo xhi") != std::string::npos) {
-            matrix[0][0] = read_header_box_bounds(content, "xlo xhi");
-        } else if (content.find("ylo yhi") != std::string::npos) {
-            matrix[1][1] = read_header_box_bounds(content, "ylo yhi");
-        } else if (content.find("zlo zhi") != std::string::npos) {
-            matrix[2][2] = read_header_box_bounds(content, "zlo zhi");
-        } else if (content.find("xy xz yz") != std::string::npos) {
+        } else if (content.find("xlo") != std::string::npos) {
+            matrix[0][0] = read_header_box_bounds(content, "xlo", "xhi");
+        } else if (content.find("ylo") != std::string::npos) {
+            matrix[1][1] = read_header_box_bounds(content, "ylo", "yhi");
+        } else if (content.find("zlo") != std::string::npos) {
+            matrix[2][2] = read_header_box_bounds(content, "zlo", "zhi");
+        } else if (content.find("xy") != std::string::npos) {
             auto splitted = split(content, ' ');
-            if (splitted.size() != 6) {
+            if (splitted.size() != 6 || splitted[3] != "xy" || splitted[4] != "xz" || splitted[5] != "yz") {
                 throw format_error(
                     "invalid header value: expected '<xy> <xz> <yz> xy xz yz', got '{}'", content
                 );
@@ -312,11 +313,11 @@ size_t LAMMPSDataFormat::read_header_integer(string_view line, const std::string
     return parse<size_t>(splitted[0]);
 }
 
-double LAMMPSDataFormat::read_header_box_bounds(string_view line, const std::string& context) {
+double LAMMPSDataFormat::read_header_box_bounds(string_view line, const std::string& lo, const std::string& hi) {
     auto splitted = split(line, ' ');
-    if (splitted.size() < 4) {
+    if (splitted.size() < 4 || splitted[2] != lo || splitted[3] != hi) {
         throw format_error(
-            "invalid header value: expected '<lo> <hi> {}', got '{}'", context, line
+            "invalid header value: expected '<lo> <hi> {} {}', got '{}'", lo, hi, line
         );
     }
     auto low = parse<double>(splitted[0]);
@@ -374,7 +375,9 @@ void LAMMPSDataFormat::read_atoms(Frame& frame) {
     while (n < natoms_ && !file_.eof()) {
         auto line = file_.readline();
         auto comment = split_comment(line);
-        if (line.empty()) {continue;}
+        if (line.empty()) {
+            continue;
+        }
 
         auto data = style_.read_line(line, n);
         if (data.index >= natoms_) {
@@ -435,7 +438,9 @@ void LAMMPSDataFormat::read_masses() {
     while (n < natom_types_ && !file_.eof()) {
         auto line = file_.readline();
         split_comment(line);
-        if (line.empty()) {continue;}
+        if (line.empty()) {
+            continue;
+        }
 
         auto splitted = split(line, ' ');
         if (splitted.size() != 2) {
@@ -460,7 +465,9 @@ void LAMMPSDataFormat::read_bonds(Frame& frame) {
     while (n < nbonds_ && !file_.eof()) {
         auto line = file_.readline();
         split_comment(line);
-        if (line.empty()) {continue;}
+        if (line.empty()) {
+            continue;
+        }
 
         auto splitted = split(line, ' ');
         if (splitted.size() != 4) {
@@ -491,7 +498,9 @@ void LAMMPSDataFormat::read_velocities(Frame& frame) {
     while (n < natoms_ && !file_.eof()) {
         auto line = file_.readline();
         split_comment(line);
-        if (line.empty()) {continue;}
+        if (line.empty()) {
+            continue;
+        }
 
         auto splitted = split(line, ' ');
         if (splitted.size() < 4) {
@@ -545,9 +554,8 @@ static std::unordered_set<string_view> IGNORED_SECTIONS = {
     "AngleAngleTorsion Coeffs", "BondBond13 Coeffs", "AngleAngle Coeffs"
 };
 
-LAMMPSDataFormat::section_t LAMMPSDataFormat::get_section(string_view line) {
-    auto comment = split_comment(line);
-    auto section = trim(line);
+LAMMPSDataFormat::section_t LAMMPSDataFormat::get_section(string_view section) {
+    auto comment = split_comment(section);
     if (section == "Atoms") {
         if (!comment.empty()) {
             atom_style_name_ = trim(comment).to_string();
@@ -918,10 +926,12 @@ void LAMMPSDataFormat::write_impropers(const DataTypes& types, const Topology& t
 }
 
 string_view split_comment(string_view& line) {
+    line = trim(line);
     auto position = line.find('#');
     if (position != std::string::npos) {
         auto comment = line.substr(position + 1);
         line.remove_suffix(line.size() - position);
+        line = trim(line);
         return comment;
     } else {
         return "";

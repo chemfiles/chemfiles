@@ -88,7 +88,7 @@ inline char to_ascii_uppercase(char c) {
     }
 }
 
-/// Remove whitespaces at the begining and end of `string`
+/// Remove whitespaces at the beginning and end of `string`
 inline string_view trim(string_view string) {
     auto begin = string.begin();
     auto end = string.end();
