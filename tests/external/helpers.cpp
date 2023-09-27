@@ -172,11 +172,19 @@ void operator delete(void* ptr) noexcept {
     std::free(ptr);
 }
 
+void operator delete(void* ptr, size_t) noexcept {
+    operator delete(ptr);
+}
+
 void* operator new[](size_t count) {
     return operator new(count);
 }
 
 void operator delete[](void* ptr) noexcept {
+    operator delete(ptr);
+}
+
+void operator delete[](void* ptr, size_t) noexcept {
     operator delete(ptr);
 }
 
