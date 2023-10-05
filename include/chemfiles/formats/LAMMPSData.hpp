@@ -219,8 +219,6 @@ private:
     size_t natom_types_ = 0;
     /// Number of bonds in the file
     size_t nbonds_ = 0;
-    /// Optional masses, indexed by atomic type
-    std::unordered_map<std::string, double> masses_;
     /// Optional atomic names, indexed by atomic indexes
     std::vector<std::string> names_;
 };
