@@ -749,14 +749,14 @@ DataTypes::DataTypes(const Topology& topology) {
     for (auto& bond: topology.bonds()) {
         auto i = atom_type_id(topology[bond[0]]);
         auto j = atom_type_id(topology[bond[1]]);
-        bonds_.insert({normalize_bond_type(i, j), topology.bond_type(i, j)});
+        bonds_.insert({normalize_bond_type(i, j), topology.bond_type(bond[0], bond[1])});
     }
 
     for (auto& angle: topology.angles()) {
         auto i = atom_type_id(topology[angle[0]]);
         auto j = atom_type_id(topology[angle[1]]);
         auto k = atom_type_id(topology[angle[2]]);
-        angles_.insert({normalize_angle_type(i, j, k), topology.angle_type(i, j, k)});
+        angles_.insert({normalize_angle_type(i, j, k), topology.angle_type(angle[0], angle[1], angle[2])});
     }
 
     for (auto& dihedral: topology.dihedrals()) {
@@ -764,7 +764,7 @@ DataTypes::DataTypes(const Topology& topology) {
         auto j = atom_type_id(topology[dihedral[1]]);
         auto k = atom_type_id(topology[dihedral[2]]);
         auto m = atom_type_id(topology[dihedral[3]]);
-        dihedrals_.insert({normalize_dihedral_type(i, j, k, m), topology.dihedral_type(i, j, k, m)});
+        dihedrals_.insert({normalize_dihedral_type(i, j, k, m), topology.dihedral_type(dihedral[0], dihedral[1], dihedral[2], dihedral[3])});
     }
 
     for (auto& improper: topology.impropers()) {
@@ -772,7 +772,7 @@ DataTypes::DataTypes(const Topology& topology) {
         auto j = atom_type_id(topology[improper[1]]);
         auto k = atom_type_id(topology[improper[2]]);
         auto m = atom_type_id(topology[improper[3]]);
-        impropers_.insert({normalize_improper_type(i, j, k, m), topology.improper_type(i, j, k, m)});
+        impropers_.insert({normalize_improper_type(i, j, k, m), topology.improper_type(improper[0], improper[1], improper[2], improper[3])});
     }
 }
 
@@ -790,6 +790,9 @@ std::string DataTypes::bond_type_id(size_t type_i, size_t type_j) const {
         return std::get<0>(pair) == normalize_bond_type(type_i, type_j);
     });
     if (it != bonds_.end()) {
+        if (std::get<1>(*it).empty()) {
+            return std::to_string(it - bonds_.begin() + 1);
+        }
         return std::get<1>(*it);
     } else {
         throw error("invalid bond type passed to bond_type_id, this is a bug");
@@ -801,6 +804,9 @@ std::string DataTypes::angle_type_id(size_t type_i, size_t type_j, size_t type_k
         return std::get<0>(pair) == normalize_angle_type(type_i, type_j, type_k);
     });
     if (it != angles_.end()) {
+        if (std::get<1>(*it).empty()) {
+            return std::to_string(it - angles_.begin() + 1);
+        }
         return std::get<1>(*it);
     } else {
         throw error("invalid angle type passed to angle_type_id, this is a bug");
@@ -812,6 +818,9 @@ std::string DataTypes::dihedral_type_id(size_t type_i, size_t type_j, size_t typ
         return std::get<0>(pair) == normalize_dihedral_type(type_i, type_j, type_k, type_m);
     });
     if (it != dihedrals_.end()) {
+        if (std::get<1>(*it).empty()) {
+            return std::to_string(it - dihedrals_.begin() + 1);
+        }
         return std::get<1>(*it);
     } else {
         throw error("invalid dihedral type passed to dihedral_type_id, this is a bug");
@@ -823,6 +832,9 @@ std::string DataTypes::improper_type_id(size_t type_i, size_t type_j, size_t typ
         return std::get<0>(pair) == normalize_improper_type(type_i, type_j, type_k, type_m);
     });
     if (it != impropers_.end()) {
+        if (std::get<1>(*it).empty()) {
+            return std::to_string(it - impropers_.begin() + 1);
+        }
         return std::get<1>(*it);
     } else {
         throw error("invalid improper type passed to improper_type_id, this is a bug");
@@ -983,21 +995,17 @@ void LAMMPSDataFormat::write_bonds(const DataTypes& types, const Topology& topol
 
     file_.print("\nBonds\n\n");
     size_t bond_id = 1;
-    size_t bond_type_id;
     for (auto bond: topology.bonds()) {
         auto type_i = types.atom_type_id(topology[bond[0]]);
         auto type_j = types.atom_type_id(topology[bond[1]]);
         auto bond_type_str = types.bond_type_id(type_i, type_j);
-        if (bond_type_str.empty()) {
-            bond_type_id = std::stoul(bond_type_str) + 1;
-            file_.print("{} {} {} {} {}\n",
-                bond_id, bond_type_id, bond[0] + 1, bond[1] + 1
-            );
-        } else {
-            file_.print("{} {} {} {} {}\n",
-                bond_id, bond_type_str, bond[0] + 1, bond[1] + 1
-            );
-        }
+        size_t bond_type_id = parse<size_t>(bond_type_str);
+        // if (bond_type_str.empty()) {
+        //     bond_type_id += 1;
+        // }
+        file_.print("{} {} {} {}\n",
+            bond_id, bond_type_id, bond[0] + 1, bond[1] + 1
+        );
         bond_id++;
     }
 }
@@ -1007,22 +1015,19 @@ void LAMMPSDataFormat::write_angles(const DataTypes& types, const Topology& topo
 
     file_.print("\nAngles\n\n");
     size_t angle_id = 1;
-    size_t angle_type_id;
     for (auto angle: topology.angles()) {
         auto type_i = types.atom_type_id(topology[angle[0]]);
         auto type_j = types.atom_type_id(topology[angle[1]]);
         auto type_k = types.atom_type_id(topology[angle[2]]);
         auto angle_type_str = types.angle_type_id(type_i, type_j, type_k);
-        if (angle_type_str.empty()) {
-            angle_type_id = std::stoul(angle_type_str) + 1;
-            file_.print("{} {} {} {} {}\n",
-                angle_id, angle_type_id, angle[0] + 1, angle[1] + 1, angle[2] + 1
-            );
-        } else {
-            file_.print("{} {} {} {} {}\n",
-                angle_id, angle_type_str, angle[0] + 1, angle[1] + 1, angle[2] + 1
-            );
-        }
+        size_t angle_type_id = parse<size_t>(angle_type_str);
+        // if (angle_type_str.empty()) {
+        //     angle_type_id += 1;
+        // }
+        file_.print("{} {} {} {} {}\n",
+            angle_id, angle_type_id,
+            angle[0] + 1, angle[1] + 1, angle[2] + 1
+        );
         angle_id++;
     }
 }
@@ -1032,25 +1037,20 @@ void LAMMPSDataFormat::write_dihedrals(const DataTypes& types, const Topology& t
 
     file_.print("\nDihedrals\n\n");
     size_t dihedral_id = 1;
-    size_t dihedral_type_id;
     for (auto dihedral: topology.dihedrals()) {
         auto type_i = types.atom_type_id(topology[dihedral[0]]);
         auto type_j = types.atom_type_id(topology[dihedral[1]]);
         auto type_k = types.atom_type_id(topology[dihedral[2]]);
         auto type_m = types.atom_type_id(topology[dihedral[3]]);
         auto dihedral_type_str = types.dihedral_type_id(type_i, type_j, type_k, type_m);
-        if (dihedral_type_str.empty()) {
-            dihedral_type_id = std::stoul(dihedral_type_str) + 1;
-            file_.print("{} {} {} {} {} {}\n",
-                dihedral_id, dihedral_type_id,
-                dihedral[0] + 1, dihedral[1] + 1, dihedral[2] + 1, dihedral[3] + 1
-            );
-        } else {
-            file_.print("{} {} {} {} {} {}\n",
-                dihedral_id, dihedral_type_str,
-                dihedral[0] + 1, dihedral[1] + 1, dihedral[2] + 1, dihedral[3] + 1
-            );
-        }
+        size_t dihedral_type_id = parse<size_t>(dihedral_type_str);
+        // if (dihedral_type_str.empty()) {
+        //     dihedral_type_id += 1;
+        // }
+        file_.print("{} {} {} {} {} {}\n",
+            dihedral_id, dihedral_type_id,
+            dihedral[0] + 1, dihedral[1] + 1, dihedral[2] + 1, dihedral[3] + 1
+        );
         dihedral_id++;
     }
 }
@@ -1060,25 +1060,20 @@ void LAMMPSDataFormat::write_impropers(const DataTypes& types, const Topology& t
 
     file_.print("\nImpropers\n\n");
     size_t improper_id = 1;
-    size_t improper_type_id;
     for (auto improper: topology.impropers()) {
         auto type_i = types.atom_type_id(topology[improper[0]]);
         auto type_j = types.atom_type_id(topology[improper[1]]);
         auto type_k = types.atom_type_id(topology[improper[2]]);
         auto type_m = types.atom_type_id(topology[improper[3]]);
         auto improper_type_str = types.improper_type_id(type_i, type_j, type_k, type_m);
-        if (improper_type_str.empty()) {
-            improper_type_id = std::stoul(improper_type_str) + 1;
-            file_.print("{} {} {} {} {} {}\n",
-                improper_id, improper_type_id,
-                improper[0] + 1, improper[1] + 1, improper[2] + 1, improper[3] + 1
-            );
-        } else {
-            file_.print("{} {} {} {} {} {}\n",
-                improper_id, improper_type_str,
-                improper[0] + 1, improper[1] + 1, improper[2] + 1, improper[3] + 1
-            );
-        }
+        size_t improper_type_id = parse<size_t>(improper_type_str);
+        // if (improper_type_str.empty()) {
+        //     improper_type_id += 1;
+        // }
+        file_.print("{} {} {} {} {} {}\n",
+            improper_id, improper_type_id,
+            improper[0] + 1, improper[1] + 1, improper[2] + 1, improper[3] + 1
+        );
         improper_id++;
     }
 }

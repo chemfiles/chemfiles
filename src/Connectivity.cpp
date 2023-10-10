@@ -104,6 +104,9 @@ void Connectivity::recalculate() const {
     angles_.clear();
     dihedrals_.clear();
     impropers_.clear();
+    angle_types_.clear();
+    dihedral_types_.clear();
+    improper_types_.clear();
 
     // Generate the list of which atom is bonded to which one
     auto bonded_to = std::vector<std::vector<size_t>>(biggest_atom_ + 1);
@@ -121,12 +124,14 @@ void Connectivity::recalculate() const {
         for (auto k: bonded_to[i]) {
             if (k != j) {
                 angles_.insert(Angle(k, i, j));
+                angle_types_.push_back("");
             }
         }
 
         for (auto k: bonded_to[j]) {
             if (k != i) {
                 angles_.insert(Angle(i, j, k));
+                angle_types_.push_back("");
             }
         }
     }
@@ -139,22 +144,24 @@ void Connectivity::recalculate() const {
         for (auto m: bonded_to[i]) {
             if (m != j && m != k) {
                 dihedrals_.insert(Dihedral(m, i, j, k));
+                dihedral_types_.push_back("");
             }
         }
 
         for (auto m: bonded_to[k]) {
             if (m != i && m != j) {
                 dihedrals_.insert(Dihedral(i, j, k, m));
+                dihedral_types_.push_back("");
             }
         }
 
         for (auto m: bonded_to[j]) {
             if (m != i && m != k) {
                 impropers_.insert(Improper(i, j, k, m));
+                improper_types_.push_back("");
             }
         }
     }
-
     uptodate_ = true;
 }
 
@@ -310,5 +317,47 @@ const std::string& Connectivity::bond_type(size_t i, size_t j) const {
         "out of bounds atomic index in `Connectivity::bond_order`: "
         "No bond between {} and {} exists",
         i, j
+    );
+}
+
+const std::string& Connectivity::angle_type(size_t i, size_t j, size_t k) const {
+    auto pos = angles_.find(Angle(i, j, k));
+    if (pos != angles_.end()) {
+        auto diff = std::distance(angles_.cbegin(), pos);
+        return angle_types_[static_cast<size_t>(diff)];
+    }
+
+    throw error(
+        "out of bounds atomic index in `Connectivity::angle_type`: "
+        "No angle between {}, {} and {} exists",
+        i, j, k
+    );
+}
+
+const std::string& Connectivity::dihedral_type(size_t i, size_t j, size_t k, size_t m) const {
+    auto pos = dihedrals_.find(Dihedral(i, j, k, m));
+    if (pos != dihedrals_.end()) {
+        auto diff = std::distance(dihedrals_.cbegin(), pos);
+        return dihedral_types_[static_cast<size_t>(diff)];
+    }
+
+    throw error(
+        "out of bounds atomic index in `Connectivity::dihedral_type`: "
+        "No dihedral between {}, {}, {} and {} exists",
+        i, j, k, m
+    );
+}
+
+const std::string& Connectivity::improper_type(size_t i, size_t j, size_t k, size_t m) const {
+    auto pos = impropers_.find(Improper(i, j, k, m));
+    if (pos != impropers_.end()) {
+        auto diff = std::distance(impropers_.cbegin(), pos);
+        return improper_types_[static_cast<size_t>(diff)];
+    }
+
+    throw error(
+        "out of bounds atomic index in `Connectivity::improper_type`: "
+        "No improper between {}, {}, {} and {} exists",
+        i, j, k, m
     );
 }

@@ -117,6 +117,42 @@ const std::string& Topology::bond_type(size_t atom_i, size_t atom_j) const {
     return connect_.bond_type(atom_i, atom_j);
 }
 
+const std::string& Topology::angle_type(size_t atom_i, size_t atom_j, size_t atom_k) const {
+    if (atom_i >= size() || atom_j >= size() || atom_k >= size()) {
+        throw out_of_bounds(
+            "out of bounds atomic index in `Topology::angle_type`: "
+            "we have {} atoms, but the angle indexes are {}, {} and {}",
+            size(), atom_i, atom_j, atom_k
+        );
+    }
+
+    return connect_.angle_type(atom_i, atom_j, atom_k);
+}
+
+const std::string& Topology::dihedral_type(size_t atom_i, size_t atom_j, size_t atom_k, size_t atom_m) const {
+    if (atom_i >= size() || atom_j >= size() || atom_k >= size() || atom_m >= size()) {
+        throw out_of_bounds(
+            "out of bounds atomic index in `Topology::dihedral_type`: "
+            "we have {} atoms, but the dihedral indexes are {}, {}, {} and {}",
+            size(), atom_i, atom_j, atom_k, atom_m
+        );
+    }
+
+    return connect_.dihedral_type(atom_i, atom_j, atom_k, atom_m);
+}
+
+const std::string& Topology::improper_type(size_t atom_i, size_t atom_j, size_t atom_k, size_t atom_m) const {
+    if (atom_i >= size() || atom_j >= size() || atom_k >= size() || atom_m >= size()) {
+        throw out_of_bounds(
+            "out of bounds atomic index in `Topology::improper_type`: "
+            "we have {} atoms, but the improper indexes are {}, {}, {} and {}",
+            size(), atom_i, atom_j, atom_k, atom_m
+        );
+    }
+
+    return connect_.improper_type(atom_i, atom_j, atom_k, atom_m);
+}
+
 void Topology::remove(size_t i) {
     if (i >= size()) {
         throw out_of_bounds(

@@ -344,6 +344,15 @@ public:
 
     /// Get the bond type of the bond between i and j
     const std::string& bond_type(size_t i, size_t j) const;
+
+    /// Get the angle type of the angle between i, j and k
+    const std::string& angle_type(size_t i, size_t j, size_t k) const;
+
+    /// Get the dihedral type of the dihedral between i, j, k and l
+    const std::string& dihedral_type(size_t i, size_t j, size_t k, size_t l) const;
+
+    /// Get the improper type of the improper between i, j, k and l
+    const std::string& improper_type(size_t i, size_t j, size_t k, size_t l) const;
 private:
     /// Recalculate the angles and the dihedrals from the bond list
     void recalculate() const;
@@ -364,13 +373,13 @@ private:
     /// Store the bond orders
     std::vector<Bond::BondOrder> bond_orders_;
     /// Store the bond types
-    std::vector<std::string> bond_types_;
+    mutable std::vector<std::string> bond_types_;
     /// Store the angle types
-    std::vector<std::string> angle_types_;
+    mutable std::vector<std::string> angle_types_;
     /// Store the dihedral types
-    std::vector<std::string> dihedral_types_;
+    mutable std::vector<std::string> dihedral_types_;
     /// Store the improper types
-    std::vector<std::string> improper_types_;
+    mutable std::vector<std::string> improper_types_;
 };
 
 } // namespace chemfiles
