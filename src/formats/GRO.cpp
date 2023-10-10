@@ -9,13 +9,13 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <string_view>
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/parse.hpp"
 #include "chemfiles/warnings.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/File.hpp"
@@ -64,7 +64,7 @@ void GROFormat::read_next(Frame& frame) {
     // GRO comment line is used as frame name
     auto frame_name = trim(file_.readline());
     if (!frame_name.empty()) {
-        frame.set("name", frame_name.to_string());
+        frame.set("name", std::string(frame_name));
     }
 
     size_t natoms = 0;
@@ -91,8 +91,8 @@ void GROFormat::read_next(Frame& frame) {
             warning("GRO Reader", "skiping invalid residue with resid '{}'", line.substr(0, 5));
         }
 
-        auto resname = trim(line.substr(5, 5)).to_string();
-        auto name = trim(line.substr(10, 5)).to_string();
+        auto resname = std::string(trim(line.substr(5, 5)));
+        auto name = std::string(trim(line.substr(10, 5)));
 
         // GRO files store atoms in nanometer, we need to convert to Angstroms
         auto x = parse<double>(line.substr(20, 8)) * 10;

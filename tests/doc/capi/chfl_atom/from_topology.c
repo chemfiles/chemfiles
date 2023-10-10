@@ -4,7 +4,7 @@
 #include <chemfiles.h>
 #include <stdlib.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_TOPOLOGY* topology = chfl_topology();
     /* Update the topology by hand, or using a file */

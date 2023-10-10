@@ -19,7 +19,6 @@
 #include "chemfiles/utils.hpp"
 #include "chemfiles/mutex.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/formats/Molfile.hpp"
@@ -56,10 +55,10 @@ namespace chemfiles {
 }
 using namespace chemfiles;
 
-static unsigned edit_distance(string_view first, string_view second);
-static std::string suggest_names(const std::vector<RegisteredFormat>& formats, string_view name);
-static size_t find_by_name(const std::vector<RegisteredFormat>& formats, string_view name);
-static size_t find_by_extension(const std::vector<RegisteredFormat>& formats, string_view extension);
+static unsigned edit_distance(std::string_view first, std::string_view second);
+static std::string suggest_names(const std::vector<RegisteredFormat>& formats, std::string_view name);
+static size_t find_by_name(const std::vector<RegisteredFormat>& formats, std::string_view name);
+static size_t find_by_extension(const std::vector<RegisteredFormat>& formats, std::string_view extension);
 
 FormatFactory::FormatFactory() {
     // add formats in alphabetic order
@@ -165,7 +164,7 @@ std::vector<std::reference_wrapper<const FormatMetadata>> FormatFactory::formats
 }
 
 // Compute the edit distance between two strings using Wagner–Fischer algorithm
-unsigned edit_distance(string_view first, string_view second) {
+unsigned edit_distance(std::string_view first, std::string_view second) {
     auto m = first.length() + 1;
     auto n = second.length() + 1;
 
@@ -196,7 +195,7 @@ unsigned edit_distance(string_view first, string_view second) {
    return distances[m - 1][n - 1];
 }
 
-std::string suggest_names(const std::vector<RegisteredFormat>& formats, string_view name) {
+std::string suggest_names(const std::vector<RegisteredFormat>& formats, std::string_view name) {
     auto suggestions = std::vector<std::string>();
     for (auto& other : formats) {
         if (edit_distance(name, other.metadata.name) < 4) {
@@ -223,7 +222,7 @@ std::string suggest_names(const std::vector<RegisteredFormat>& formats, string_v
     return message.str();
 }
 
-size_t find_by_name(const std::vector<RegisteredFormat>& formats, string_view name) {
+size_t find_by_name(const std::vector<RegisteredFormat>& formats, std::string_view name) {
     for (size_t i=0; i<formats.size(); i++) {
         if (formats[i].metadata.name == name) {
             return i;
@@ -232,7 +231,7 @@ size_t find_by_name(const std::vector<RegisteredFormat>& formats, string_view na
     return SENTINEL_INDEX;
 }
 
-size_t find_by_extension(const std::vector<RegisteredFormat>& formats, string_view extension) {
+size_t find_by_extension(const std::vector<RegisteredFormat>& formats, std::string_view extension) {
     for (size_t i=0; i<formats.size(); i++) {
         auto& format_extension = formats[i].metadata.extension;
         if (format_extension && *format_extension == extension) {

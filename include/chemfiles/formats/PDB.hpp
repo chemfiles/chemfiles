@@ -14,7 +14,6 @@
 #include "chemfiles/Format.hpp"
 
 #include "chemfiles/Residue.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
@@ -61,19 +60,19 @@ public:
 
 private:
     // Read HEADER record
-    void read_HEADER(Frame& frame, string_view line);
+    void read_HEADER(Frame& frame, std::string_view line);
     // Read TITLE record
-    void read_TITLE(Frame& frame, string_view line);
+    void read_TITLE(Frame& frame, std::string_view line);
     // Read CRYST1 record
-    void read_CRYST1(Frame& frame, string_view line);
+    void read_CRYST1(Frame& frame, std::string_view line);
     // Read ATOM and HETATM records
-    void read_ATOM(Frame& frame, string_view line, bool is_hetatm);
+    void read_ATOM(Frame& frame, std::string_view line, bool is_hetatm);
     // Read secondary structure records. All push secinfo_ vector if line is valid
-    void read_HELIX(string_view line);
+    void read_HELIX(std::string_view line);
     // reads SHEET and TURN records. i1 and i2 are the indicies of the chain ids
-    void read_secondary(string_view line, size_t i1, size_t i2, string_view record);
+    void read_secondary(std::string_view line, size_t i1, size_t i2, std::string_view record);
     // Read CONECT record
-    void read_CONECT(Frame& frame, string_view line);
+    void read_CONECT(Frame& frame, std::string_view line);
     // Runs when a chain is terminated to update residue information
     void chain_ended(Frame& frame);
 

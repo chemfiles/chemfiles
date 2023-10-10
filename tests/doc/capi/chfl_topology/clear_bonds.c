@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_TOPOLOGY* topology = chfl_topology();
     CHFL_ATOM* atom = chfl_atom("C");

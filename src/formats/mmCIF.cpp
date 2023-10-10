@@ -9,12 +9,12 @@
 #include <string>
 #include <utility>
 #include <algorithm>
+#include <string_view>
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/parse.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/File.hpp"
@@ -53,8 +53,9 @@ template<> const FormatMetadata& chemfiles::format_metadata<mmCIFFormat>() {
     return metadata;
 }
 
-/// CIF files store which digits are insignificant, we need to remove this
-static double cif_to_double(std::string line);
+/// CIF files store which digits are insignificant inside parenthesis, this
+/// function handle this
+static double cif_to_double(std::string_view line);
 
 void mmCIFFormat::init_() {
     if (file_.mode() == File::WRITE) {
@@ -89,41 +90,40 @@ void mmCIFFormat::init_() {
         }
 
         if (line_split[0] == "_cell_length_a" || line_split[0] == "_cell.length_a") {
-            lengths[0] = cif_to_double(line_split[1].to_string());
+            lengths[0] = cif_to_double(line_split[1]);
         }
 
         if (line_split[0] == "_cell_length_b" || line_split[0] == "_cell.length_b") {
-            lengths[1] = cif_to_double(line_split[1].to_string());
+            lengths[1] = cif_to_double(line_split[1]);
         }
 
         if (line_split[0] == "_cell_length_c" || line_split[0] == "_cell.length_c") {
-            lengths[2] = cif_to_double(line_split[1].to_string());
+            lengths[2] = cif_to_double(line_split[1]);
         }
 
         if (line_split[0] == "_cell_angle_alpha" || line_split[0] == "_cell.angle_alpha") {
-            angles[0] = cif_to_double(line_split[1].to_string());
+            angles[0] = cif_to_double(line_split[1]);
         }
 
         if (line_split[0] == "_cell_angle_beta" || line_split[0] == "_cell.angle_beta") {
-            angles[1] = cif_to_double(line_split[1].to_string());
+            angles[1] = cif_to_double(line_split[1]);
         }
 
         if (line_split[0] == "_cell_angle_gamma" || line_split[0] == "_cell.angle_gamma") {
-            angles[2] = cif_to_double(line_split[1].to_string());
+            angles[2] = cif_to_double(line_split[1]);
         }
 
         if (line_split[0] == "_entry.id") {
-            pdb_idcode_ = line_split[1].to_string();
+            pdb_idcode_ = std::string(line_split[1]);
         }
 
         if (line_split[0] == "_struct.title") {
             auto trimmed = trim(line.substr(13));
-            name_ = trimmed.size() > 2 ?
-                    trimmed.substr(1, trimmed.size() - 2).to_string() : "";
+            name_ = trimmed.size() > 2 ? std::string(trimmed.substr(1, trimmed.size() - 2)) : "";
         }
 
         if (in_loop && line_split[0].find("_atom_site.") != std::string::npos) {
-            auto atom_label = line_split[0].substr(11).to_string();
+            auto atom_label = std::string(line_split[0].substr(11));
             atom_site_map_[atom_label] = current_index++;
             break;
         }
@@ -140,7 +140,7 @@ void mmCIFFormat::init_() {
 
     do {
         if (line.find("_atom_site") != std::string::npos) {
-            auto atom_label = trim(line).substr(11).to_string();
+            auto atom_label = std::string(trim(line).substr(11));
             atom_site_map_[atom_label] = current_index++;
 
             position = file_.tellpos();
@@ -283,23 +283,23 @@ void mmCIFFormat::read(Frame& frame) {
             break;
         }
 
-        Atom atom(
-            line_split[label_atom_id->second].to_string(),
-            line_split[type_symbol].to_string()
+        auto atom = Atom(
+            std::string(line_split[label_atom_id->second]),
+            std::string(line_split[type_symbol])
         );
 
         if (label_alt_id != atom_site_map_.end() &&
             line_split[label_alt_id->second] != ".") {
-            atom.set("altloc", line_split[label_alt_id->second].to_string());
+            atom.set("altloc", std::string(line_split[label_alt_id->second]));
         }
 
         if (formal_charge != atom_site_map_.end()) {
-            atom.set_charge(cif_to_double(line_split[formal_charge->second].to_string()));
+            atom.set_charge(cif_to_double(line_split[formal_charge->second]));
         }
 
-        auto x = cif_to_double(line_split[cartn_x].to_string());
-        auto y = cif_to_double(line_split[cartn_y].to_string());
-        auto z = cif_to_double(line_split[cartn_z].to_string());
+        auto x = cif_to_double(line_split[cartn_x]);
+        auto y = cif_to_double(line_split[cartn_y]);
+        auto z = cif_to_double(line_split[cartn_z]);
         frame.add_atom(std::move(atom), Vector3D(x, y, z));
 
         position = file_.tellpos();
@@ -322,12 +322,12 @@ void mmCIFFormat::read(Frame& frame) {
             throw format_error("invalid CIF residue or entity numeric: {}", e.what());
         }
 
-        auto chainid = line_split[label_asym_id->second].to_string();
+        auto chainid = std::string(line_split[label_asym_id->second]);
 
         if (map_residues_indexes.find({chainid, resid}) == map_residues_indexes.end()) {
 
             auto name = line_split[label_comp_id->second];
-            Residue residue(name.to_string(), resid);
+            Residue residue(std::string(name), resid);
             residue.add_atom(atom_id);
 
             // This will be saved as a string on purpose to match MMTF
@@ -336,7 +336,7 @@ void mmCIFFormat::read(Frame& frame) {
             }
 
             if (auth_asym_id != atom_site_map_.end()) {
-                residue.set("chainname", line_split[auth_asym_id->second].to_string());
+                residue.set("chainname", std::string(line_split[auth_asym_id->second]));
             }
 
             if (group_pdb != atom_site_map_.end()) {
@@ -436,8 +436,19 @@ void mmCIFFormat::write(const Frame& frame) {
 
 }
 
-double cif_to_double(std::string line) {
-    line.erase(std::remove(line.begin(), line.end(), '('), line.end());
-    line.erase(std::remove(line.begin(), line.end(), ')'), line.end());
+double cif_to_double(std::string_view line) {
+    // only allocate a new string if we actually find `(` somewhere, otherwise
+    // just parse it
+    std::string line_string;
+
+    auto open = std::find(line.begin(), line.end(), '(');
+    if (open != line.end()) {
+        line_string = std::string(line);
+        line_string.erase(std::remove(line_string.begin(), line_string.end(), '('), line_string.end());
+        line_string.erase(std::remove(line_string.begin(), line_string.end(), ')'), line_string.end());
+
+        line = line_string;
+    }
+
     return parse<double>(line);
 }

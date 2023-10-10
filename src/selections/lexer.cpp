@@ -7,11 +7,11 @@
 #include <string>
 #include <vector>
 #include <exception>
+#include <string_view>
 
 #include "chemfiles/parse.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/unreachable.hpp"
 
 #include "chemfiles/selections/lexer.hpp"
@@ -23,7 +23,7 @@ static bool is_ident_component(char c) {
     return is_ascii_letter(c) || is_ascii_digit(c) || c == '_';
 }
 
-bool chemfiles::selections::is_ident(string_view string) {
+bool chemfiles::selections::is_ident(std::string_view string) {
     if (string.empty()) {
         return false;
     }

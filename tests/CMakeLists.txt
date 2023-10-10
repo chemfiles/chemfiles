@@ -1,5 +1,5 @@
 # Update this value if you need to update the data file set
-set(TESTS_DATA_GIT "26e54a77e8ee73cf015413c1c247908495ad06dc")
+set(TESTS_DATA_GIT "1256f2dbf7370528fb8361b28d78e4534633b1f7")
 
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT}")
     message(STATUS "Downloading test data files")
@@ -7,7 +7,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT}")
         "https://github.com/chemfiles/tests-data/archive/${TESTS_DATA_GIT}.tar.gz"
         "${CMAKE_CURRENT_BINARY_DIR}/${TESTS_DATA_GIT}.tar.gz"
         SHOW_PROGRESS
-        EXPECTED_HASH SHA1=b1b01f355320cc9f6ba47c417f36f14acd01ac1b
+        EXPECTED_HASH SHA1=5b25c9b2b5e3be9eeacfc435a15ad0598ee4ace5
     )
 
     message(STATUS "Unpacking test data files")
@@ -200,15 +200,8 @@ foreach(test_file IN LISTS capi_doctest_files)
 endforeach()
 
 # Code linting with Python scripts
-if(${CMAKE_VERSION} VERSION_GREATER "3.12")
-    # cmake 3.12 replaced find_package(PythonInterp) with find_package(Python)
-    find_package(Python REQUIRED)
-    set(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
-else()
-    # cmake 2.8.12 only knows about python <= 3.3
-    set(Python_ADDITIONAL_VERSIONS 3.9 3.8 3.7 3.6 3.5 3.4)
-    find_package(PythonInterp REQUIRED)
-endif()
+find_package(Python REQUIRED)
+set(PYTHON_EXECUTABLE ${Python_EXECUTABLE})
 
 function(chfl_lint _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)

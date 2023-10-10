@@ -5,7 +5,6 @@
 #include <memory>
 #include <set>
 
-#include "chemfiles/cpp14.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/warnings.hpp"
 #include "chemfiles/error_fmt.hpp"
@@ -70,27 +69,27 @@ static std::unique_ptr<BinaryFile> open_dcd_file(std::string path, File::Mode mo
     if (data[0] == 84 && data[1] == 0 && data[2] == 0 && data[3] == 0) {
         if (data[4] == 'C' && data[5] == 'O' && data[6] == 'R' && data[7] == 'D') {
             use_64_bit_markers = false;
-            return chemfiles::make_unique<LittleEndianFile>(std::move(file));
+            return std::make_unique<LittleEndianFile>(std::move(file));
         } else if (data[4] == 0 && data[5] == 0 && data[6] == 0 && data[7] == 0) {
             // We might be using 64-bit record markers, check for CORD
             char extra[4] = {0};
             file.read_char(extra, 4);
             if (extra[0] == 'C' && extra[1] == 'O' && extra[2] == 'R' && extra[3] == 'D') {
                 use_64_bit_markers = true;
-                return chemfiles::make_unique<LittleEndianFile>(std::move(file));
+                return std::make_unique<LittleEndianFile>(std::move(file));
             }
         }
     } else if (data[0] == 0 && data[1] == 0 && data[2] == 0) {
         if (data[3] == 84 && data[4] == 'C' && data[5] == 'O' && data[6] == 'R' && data[7] == 'D') {
             use_64_bit_markers = false;
-            return chemfiles::make_unique<BigEndianFile>(path, mode);
+            return std::make_unique<BigEndianFile>(path, mode);
         } else if (data[3] == 0 && data[4] == 0 && data[5] == 0 && data[6] == 0 && data[7] == 84) {
             // We might be using 64-bit record markers, check for CORD
             char extra[4] = {0};
             file.read_char(extra, 4);
             if (extra[0] == 'C' && extra[1] == 'O' && extra[2] == 'R' && extra[3] == 'D') {
                 use_64_bit_markers = true;
-                return chemfiles::make_unique<BigEndianFile>(path, mode);
+                return std::make_unique<BigEndianFile>(path, mode);
             }
         }
     }

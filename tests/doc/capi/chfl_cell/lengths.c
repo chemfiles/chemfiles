@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_CELL* cell = chfl_cell((chfl_vector3d){10, 11, 12}, NULL);
 

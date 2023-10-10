@@ -6,6 +6,10 @@ on:
   pull_request:
     # Check all PR
 
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
 jobs:
   tests:
     runs-on: ${{ matrix.os }}
@@ -84,28 +88,29 @@ jobs:
             setup-dependencies: |
               sudo apt-get update
               sudo apt-get install -y gcc-multilib g++-multilib
-          - name: Linux / gcc-4.8.5 & cmake-2.12.8
+          - name: Linux / gcc-9 & cmake-3.16
             os: ubuntu-20.04
-            container: centos:7
+            container: ubuntu:20.04
             cc: gcc
             cxx: g++
             build-type: Debug
             setup-dependencies: |
-              yum install -y cmake gcc gcc-c++ make
-          - name: Linux / emscripten
-            os: ubuntu-20.04
-            cc: emcc
-            cxx: emcc
-            build-type: Debug
-            use-emsdk: true
-            emscripten-version: 3.1.34
-            cmake-extra-args:
-              - -DCHFL_BUILD_DOCTESTS=OFF
-              - -DBUILD_SHARED_LIBS=OFF
-              - -DCMAKE_CXX_FLAGS="-O1"
-              - -DCMAKE_C_FLAGS="-O1"
-              - -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-main/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
-              - -DCMAKE_CROSSCOMPILING_EMULATOR=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-main/node/14.15.5_64bit/bin/node
+              apt-get update
+              apt-get install -y cmake gcc g++ make python3
+          # - name: Linux / emscripten
+          #   os: ubuntu-20.04
+          #   cc: emcc
+          #   cxx: emcc
+          #   build-type: Debug
+          #   use-emsdk: true
+          #   emscripten-version: 3.1.43
+          #   cmake-extra-args:
+          #     - -DCHFL_BUILD_DOCTESTS=OFF
+          #     - -DBUILD_SHARED_LIBS=OFF
+          #     - -DCMAKE_CXX_FLAGS="-O1"
+          #     - -DCMAKE_C_FLAGS="-O1"
+          #     - -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-main/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+          #     - -DCMAKE_CROSSCOMPILING_EMULATOR=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-main/node/14.15.5_64bit/bin/node
           - name: Linux / valgrind
             os: ubuntu-20.04
             cc: gcc
@@ -118,21 +123,13 @@ jobs:
               sudo apt-get install -y valgrind
 
           # ==
-          # macOS builders
+          # macOS builder
           # ==
           - name: macOS / clang
             os: macos-11
             cc: clang
             cxx: clang++
             build-type: Debug
-          - name: macOS / gcc
-            os: macos-11
-            cc: gcc-9
-            cxx: g++-9
-            build-type: Debug
-            setup-dependencies: |
-              export HOMEBREW_NO_AUTO_UPDATE=1
-              brew install gcc@9
 
           # ==
           # windows builders
@@ -184,11 +181,6 @@ jobs:
         with:
           platform: x64
 
-      - name: DEBUG
-        if: ${{ matrix.use-mingw }}
-        run: |
-          get-command gcc-ar
-          get-command gcc-ranlib
       - name: Setup emsdk
         if: ${{ matrix.use-emsdk }}
         uses: mymindstorm/setup-emsdk@v12
@@ -208,16 +200,10 @@ jobs:
                 -DCHFL_BUILD_TESTS=ON \
                 ${{ join(matrix.cmake-extra-args, ' ') }} \
                 ..
-      - name: build (cmake >= 3)
-        if: matrix.container != 'centos:7'
+      - name: build
         run: |
           cd build
           cmake --build . --config ${{ matrix.build-type }} --parallel 2
-      - name: build (cmake == 2.8.12)
-        if: matrix.container == 'centos:7'
-        run: |
-          cd build
-          cmake --build . --config ${{ matrix.build-type }} -- -j2
       - name: run tests
         run: |
           cd build

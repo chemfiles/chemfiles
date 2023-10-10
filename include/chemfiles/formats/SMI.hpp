@@ -18,7 +18,6 @@
 #include "chemfiles/Residue.hpp"
 #include "chemfiles/Connectivity.hpp"
 
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
@@ -43,10 +42,10 @@ public:
 
 private:
     /// [for reading] adds an atom defined by `atom_name` to the topology
-    Atom& add_atom(Topology& topology, string_view atom_name);
+    Atom& add_atom(Topology& topology, std::string_view atom_name);
 
     /// [for reading] adds an atom defined by the string `smiles` starting at position i
-    void process_property_list(Topology& topology, string_view smiles);
+    void process_property_list(Topology& topology, std::string_view smiles);
 
     /// [for reading] Opens and closes a ring with id `ring_id`
     void check_ring_(Topology& topology, size_t ring_id);

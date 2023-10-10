@@ -3,16 +3,17 @@
 
 #include <cassert>
 #include <cstdint>
+
 #include <array>
 #include <string>
 #include <vector>
+#include <string_view>
 
 #include "chemfiles/types.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/parse.hpp"
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/sorted_set.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/File.hpp"
@@ -47,7 +48,7 @@ template<> const FormatMetadata& chemfiles::format_metadata<TinkerFormat>() {
     return metadata;
 }
 
-static bool is_unit_cell_line(string_view line);
+static bool is_unit_cell_line(std::string_view line);
 
 void TinkerFormat::read_next(Frame& frame) {
     auto line = file_.readline();
@@ -179,7 +180,7 @@ optional<uint64_t> TinkerFormat::forward() {
 
 // This is how tinker does it to check if there is unit cell information
 // in the file, so let's follow them here.
-bool is_unit_cell_line(string_view line) {
+bool is_unit_cell_line(std::string_view line) {
     static const char* LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     return line.find_first_of(LETTERS) == std::string::npos;
 }

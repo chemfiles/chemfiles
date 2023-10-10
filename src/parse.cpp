@@ -7,15 +7,15 @@
 #include <string>
 #include <limits>
 #include <algorithm>
+#include <string_view>
 
 #include "chemfiles/parse.hpp"
 #include "chemfiles/utils.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 
 using namespace chemfiles;
 
-template <> int64_t chemfiles::parse(string_view input) {
+template <> int64_t chemfiles::parse(std::string_view input) {
     if (input.empty()) {
         throw error("can not parse an integer from an empty string");
     }
@@ -74,7 +74,7 @@ template <> int64_t chemfiles::parse(string_view input) {
     return result;
 }
 
-template <> uint64_t chemfiles::parse(string_view input) {
+template <> uint64_t chemfiles::parse(std::string_view input) {
     if (input.empty()) {
         throw error("can not parse an integer from an empty string");
     }
@@ -121,7 +121,7 @@ template <> uint64_t chemfiles::parse(string_view input) {
 }
 
 
-template <> double chemfiles::parse(string_view input) {
+template <> double chemfiles::parse(std::string_view input) {
     if (input.empty()) {
         throw error("can not parse a double from an empty string");
     }
@@ -252,7 +252,7 @@ static std::string encode_pure(const std::string& digits, int64_t value) {
     return result;
 }
 
-static int64_t decode_pure(string_view s) {
+static int64_t decode_pure(std::string_view s) {
     int64_t result = 0;
     auto n = static_cast<int64_t>(digits_upper.length());
     for (auto c : s) {
@@ -297,7 +297,7 @@ std::string chemfiles::encode_hybrid36(size_t width, int64_t value) {
     return std::string(width, '*');
 }
 
-int64_t chemfiles::decode_hybrid36(size_t width, string_view s) {
+int64_t chemfiles::decode_hybrid36(size_t width, std::string_view s) {
     // This function is only called within chemfiles for fixed format files.
     // Therefore, the width should also be the length of the string as this is
     // known at compile time.

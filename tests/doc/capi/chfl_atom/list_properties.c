@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_ATOM* atom = chfl_atom("Na");
     CHFL_PROPERTY* property = chfl_property_double(-23);

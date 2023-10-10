@@ -7,6 +7,11 @@ on:
   pull_request:
     # Check all PR
 
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
 jobs:
   build-and-publish:
     runs-on: ubuntu-20.04

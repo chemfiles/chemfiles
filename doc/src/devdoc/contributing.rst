@@ -34,7 +34,7 @@ Improve documentation
 This documentation try to be easy to use, but there is always room for
 improvements.  You can easily edit any :file:`.rst` file on `the github
 repository <https://github.com/chemfiles/chemfiles/tree/master/doc>`_, and
-propose your changes even with no git knowledge. All you need is a Github
+propose your changes even with no git knowledge. All you need is a GitHub
 account.
 
 Share and spread the word
@@ -46,16 +46,16 @@ the more features we can add to it, together!
 External project used
 ---------------------
 
-A few external projects are used in chemfiles developement, and you will need a
+A few external projects are used in chemfiles development, and you will need a
 bit of knowledge of them to contribute. Depending on what you want to do, not
 all these projects are needed.
 
-- Source code versionning: `git`_, together with `github`_ web interface for
+- Source code versioning: `git`_, together with `github`_ web interface for
   issues and pull requests.
 - documentation: `sphinx`_ for generating HTML and PDF documentation, `Doxygen`_
   for documenting the source code, and `breathe`_ to use Doxygen content in
   sphinx.
-- Build system: `cmake`_ is used as a cross-plateform, cross-build system
+- Build system: `cmake`_ is used as a cross-platform, cross-build system
   generator.
 - Automatic testing: `Catch2`_ provide an nice unit test framework, and `travis`_
   run these tests each time the code is pushed to the repository.
@@ -83,7 +83,7 @@ macOS and Windows. You should add unit tests for each new piece of code, they
 will be run on `travis`_ before your changes are merged.
 
 Git messages should be informatives, and describe the *what*, not the *how*. If
-your commit concern the documentation, please add the ``[doc]`` at the beggining
+your commit concern the documentation, please add the ``[doc]`` at the beginning
 of the message.
 
 Happy coding!

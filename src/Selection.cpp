@@ -12,7 +12,6 @@
 
 #include "chemfiles/utils.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/unreachable.hpp"
 
 #include "chemfiles/selections/lexer.hpp"
@@ -30,7 +29,7 @@ static Context get_context(const std::string& string, std::string& selection) {
         selection = string;
         return Context::ATOM;
     } else if (splitted.size() == 2) {
-        selection = splitted[1].to_string();
+        selection = std::string(splitted[1]);
         auto context = trim(splitted[0]);
         if (context == "atoms" || context == "one") {
             return Context::ATOM;

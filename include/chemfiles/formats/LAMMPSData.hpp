@@ -17,7 +17,6 @@
 
 #include "chemfiles/Topology.hpp"  // IWYU pragma: keep
 #include "chemfiles/sorted_set.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 namespace chemfiles {
@@ -54,7 +53,7 @@ private:
 public:
     explicit atom_style(std::string name);
     /// Read a single line with this atom style
-    atom_data read_line(string_view line, size_t index) const;
+    atom_data read_line(std::string_view line, size_t index) const;
 };
 
 // atom types are defined by the type string and the mass of the atom
@@ -166,12 +165,12 @@ private:
     } current_section_;
 
     /// Get the section corresponding to a given line
-    section_t get_section(string_view line);
+    section_t get_section(std::string_view line);
 
     /// Read the header section
     void read_header(Frame& frame);
-    size_t read_header_integer(string_view line, const std::string& context);
-    double read_header_box_bounds(string_view line, const std::string& context);
+    size_t read_header_integer(std::string_view line, const std::string& context);
+    double read_header_box_bounds(std::string_view line, const std::string& lo, const std::string& hi);
 
     /// Get the section name from the next non-empty line
     void get_next_section();

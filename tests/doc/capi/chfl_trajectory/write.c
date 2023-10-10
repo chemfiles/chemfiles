@@ -4,7 +4,7 @@
 #include <chemfiles.h>
 #include <stdio.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_FRAME* frame = chfl_frame();
     /* Add atoms to the frame */

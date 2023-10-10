@@ -779,7 +779,7 @@ double scale_for_velocity(std::string units) {
         warning("Amber NetCDF reader", "unknown unit ({}) for velocities", units);
         return 1.0;
     }
-    auto scale = scale_for_distance(splitted[0].to_string());
+    auto scale = scale_for_distance(std::string(splitted[0]));
     auto time_unit = splitted[1];
 
     if (time_unit == "picoseconds" || time_unit == "picosecond" || time_unit == "ps") {

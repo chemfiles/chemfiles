@@ -13,9 +13,6 @@
 
 using namespace chemfiles;
 
-// provide definition for EMPTY_VALUE. This is required in C++11.
-constexpr double NumericValues::EMPTY_VALUE;
-
 NumericValues::NumericValues(NumericValues&& other): NumericValues(0) {
     *this = std::move(other);
 }

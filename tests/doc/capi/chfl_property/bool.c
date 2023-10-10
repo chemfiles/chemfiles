@@ -4,7 +4,7 @@
 #include <chemfiles.h>
 #include <assert.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_PROPERTY* property = chfl_property_bool(true);
 

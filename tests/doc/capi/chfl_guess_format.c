@@ -5,7 +5,7 @@
 #include <string.h>
 #include <assert.h>
 
-int main() {
+int main(void) {
     // [example]
     char format[256] = {0};
     chfl_guess_format("filename.nc", format, sizeof(format));

@@ -3,7 +3,7 @@
 
 #include <chemfiles.h>
 
-int main() {
+int main(void) {
     // [example] [no-run]
     CHFL_TOPOLOGY* topology = chfl_topology();
     /* Build the topology by hand or by reading a file */

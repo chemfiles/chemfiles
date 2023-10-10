@@ -16,7 +16,7 @@ Pre-compiled chemfiles
 ^^^^^^^^^^^^^^^^^^^^^^
 
 We provide pre-compiled version of chemfiles (both a static library build and a
-shared library build) on github. Please look for the version you need on the
+shared library build) on GitHub. Please look for the version you need on the
 `chemfiles/chemfiles-prebuilt
 <https://github.com/chemfiles/chemfiles-prebuilt/releases>`_ repository.
 
@@ -53,12 +53,11 @@ from sources.
 Core library dependencies
 -------------------------
 
-In order to build the core library, you will need a C++11 capable compiler.
-Chemfiles is automatically tested against GCC (>= 4.8) on Linux, OSX and Windows
-(mingw-w64); clang (>= 3.3) on Linux and OS X and MSCV 14 on Windows. It was
-also compiled successfully with Intel C++ compilers. Please report any successful
-compilation with other compilers! Chemfiles also uses the `CMake`_ build system,
-which is available in all the package managers.
+In order to build the core library, you will need a compiler able to compile
+C++17 code. Chemfiles is automatically tested against GCC (>= 9) on Linux, OSX
+and Windows (mingw-w64); clang (>= 15) on Linux and OS X and MSCV 17 on Windows.
+It was also compiled successfully with Intel C++ compilers. Chemfiles also uses
+the `CMake`_ build system, which is available in all the package managers.
 
 On UNIX-like systems (Linux, OS X, ...)
 """""""""""""""""""""""""""""""""""""""

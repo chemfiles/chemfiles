@@ -7,48 +7,9 @@ set(CMAKE_MODULE_PATH "${OLD_CMAKE_MODULE_PATH}")
 
 set(CMAKE_REQUIRED_QUIET YES)
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_C_EXTENSIONS OFF)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_C_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
-
-# Manually check for some flags, as some versions of CMake do not support
-# `CMAKE_CXX_STANDARD`
-CHECK_COMPILER_FLAG(CXX "-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_COMPILER_FLAG(CXX "-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(${COMPILER_SUPPORTS_CXX11})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif(${COMPILER_SUPPORTS_CXXOX})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-elseif(MSVC)
-    if(${MSVC_VERSION} LESS 1900)
-        message(SEND_ERROR "MSVC < 14.0 is not supported. Please update your compiler or use mingw")
-    endif()
-else()
-    message(SEND_ERROR "The ${CMAKE_CXX_COMPILER} compiler lacks C++11 support. Use another compiler.")
-endif()
-
-CHECK_COMPILER_FLAG(C "-std=c99" COMPILER_SUPPORTS_C99)
-if(${COMPILER_SUPPORTS_C99})
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
-endif()
-
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
     set(CMAKE_SHARED_LINKER_FLAGS "/SUBSYSTEM:CONSOLE")
-endif()
-
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-    # Some version of intel compiler (icc 14 at least) have only partial support
-    # for C++11
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMSGPACK_USE_CPP03")
 endif()
 
 if(${EMSCRIPTEN})
@@ -216,6 +177,8 @@ else()
     add_warning_flag("-Wno-documentation-unknown-command")
     add_warning_flag("-Wno-exit-time-destructors")
     add_warning_flag("-Wno-global-constructors")
+    add_warning_flag("-Wno-unsafe-buffer-usage")
+    add_warning_flag("-Wno-declaration-after-statement")
     # This warning trigger when compiling for 64-bit,
     # but the code is relevant for 32-bit
     add_warning_flag("-Wno-tautological-type-limit-compare")
@@ -260,16 +223,4 @@ endif()
 if(NOT ${CHFL_SANITIZER} STREQUAL "none")
     set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -fno-omit-frame-pointer")
     set(CHEMFILES_SANITIZERS "${CHEMFILES_SANITIZERS} -g")
-endif()
-
-try_compile(CHFL_HAS_THREAD_LOCAL
-    ${PROJECT_BINARY_DIR}
-    ${PROJECT_SOURCE_DIR}/cmake/thread_local.cpp
-)
-
-# Transform from ON/OFF to 0/1
-if(${CHFL_HAS_THREAD_LOCAL})
-    set(CHFL_HAS_THREAD_LOCAL 1)
-else()
-    set(CHFL_HAS_THREAD_LOCAL 0)
 endif()

@@ -8,7 +8,6 @@
 #include "chemfiles/external/span.hpp"
 #include "chemfiles/unreachable.hpp"
 #include "chemfiles/warnings.hpp"
-#include "chemfiles/cpp14.hpp"
 
 #include "chemfiles/files/BinaryFile.hpp"
 
@@ -711,8 +710,8 @@ void LittleEndianFile::write_f64(const double* data, size_t count) {
 
 std::unique_ptr<BinaryFile> BinaryFile::open_native(std::string path, File::Mode mode) {
 #if CHEMFILES_BYTE_ORDER == CHEMFILES_LITTLE_ENDIAN
-    return chemfiles::make_unique<LittleEndianFile>(std::move(path), mode);
+    return std::make_unique<LittleEndianFile>(std::move(path), mode);
 #else
-    return chemfiles::make_unique<BigEndianFile>(std::move(path), mode);
+    return std::make_unique<BigEndianFile>(std::move(path), mode);
 #endif
 }

@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <iterator>
+#include <string_view>
 #include <unordered_map>
 
 #include <pugixml.hpp>
@@ -16,7 +17,6 @@
 #include "chemfiles/parse.hpp"
 #include "chemfiles/warnings.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/File.hpp"
@@ -58,7 +58,7 @@ public:
     xml_writer(TextFile& file): file_(file) {}
 
     void write(const void* data, size_t size) override {
-        file_.print("{}", string_view(static_cast<const char*>(data), size));
+        file_.print("{}", std::string_view(static_cast<const char*>(data), size));
     }
 
 private:
@@ -323,8 +323,8 @@ void CMLFormat::read_bonds(Frame& frame, const pugi::xml_node& bonds) {
             continue;
         }
 
-        auto id1 = ref_to_id_.find(ids[0].to_string());
-        auto id2 = ref_to_id_.find(ids[1].to_string());
+        auto id1 = ref_to_id_.find(std::string(ids[0]));
+        auto id2 = ref_to_id_.find(std::string(ids[1]));
         if (id1 == ref_to_id_.end() || id2 == ref_to_id_.end()) {
             warning("CML reader", "invalid atomic references in bond: {} -- {}", ids[0], ids[1]);
             continue;

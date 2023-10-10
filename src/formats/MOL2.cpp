@@ -5,6 +5,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <string_view>
 #include <unordered_map>
 
 #include "chemfiles/types.hpp"
@@ -12,7 +13,6 @@
 #include "chemfiles/parse.hpp"
 #include "chemfiles/warnings.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/periodic_table.hpp"
 #include "chemfiles/external/optional.hpp"
 
@@ -50,7 +50,7 @@ template<> const FormatMetadata& chemfiles::format_metadata<MOL2Format>() {
 }
 
 /// Fast-forward the file until the tag is found.
-static uint64_t read_until(TextFile& file, string_view tag);
+static uint64_t read_until(TextFile& file, std::string_view tag);
 
 void MOL2Format::read_next(Frame& frame) {
     residues_.clear();
@@ -61,7 +61,7 @@ void MOL2Format::read_next(Frame& frame) {
 
     auto name = trim(file_.readline());
     if (!name.empty()) {
-        frame.set("name", name.to_string());
+        frame.set("name", std::string(name));
     }
 
     line = file_.readline();
@@ -127,7 +127,7 @@ void MOL2Format::read_atoms(Frame& frame, size_t natoms, bool charges) {
         bool is_sybyl;
 
         if (sybyl_type.find('.') != std::string::npos || find_in_periodic_table(sybyl_type)) {
-            atom_type = split(sybyl_type, '.')[0].to_string();
+            atom_type = std::string(split(sybyl_type, '.')[0]);
             is_sybyl = true;
         } else {
             is_sybyl = false;
@@ -205,7 +205,7 @@ void MOL2Format::read_bonds(Frame& frame, size_t nbonds) {
     }
 }
 
-uint64_t read_until(TextFile& file, string_view tag) {
+uint64_t read_until(TextFile& file, std::string_view tag) {
     while (!file.eof()) {
         auto pos = file.tellpos();
         if (file.readline().substr(0, tag.length()) == tag) {

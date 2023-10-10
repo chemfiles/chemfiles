@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int main() {
+int main(void) {
     // [example]
     chfl_format_metadata* formats = NULL;
     uint64_t count = 0;

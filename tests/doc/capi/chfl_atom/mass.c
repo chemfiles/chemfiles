@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_ATOM* atom = chfl_atom("Na");
 

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-int main() {
+int main(void) {
     // [example]
     CHFL_SELECTION* selection = chfl_selection("pairs: name(#1) O and name(#2) H");
 

@@ -9,13 +9,12 @@
 
 #include "chemfiles/utils.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/external/optional.hpp"
 
 #include "chemfiles/FormatMetadata.hpp"
 using namespace chemfiles;
 
-static void check_not_empty(const char* field_value, string_view field_name, const char* format_name) {
+static void check_not_empty(const char* field_value, std::string_view field_name, const char* format_name) {
     assert(field_value != nullptr);
     if (std::string(field_value).empty()) {
         if (format_name == nullptr || field_name == "name") {
@@ -26,7 +25,7 @@ static void check_not_empty(const char* field_value, string_view field_name, con
     }
 }
 
-static void check_trimmed(const char* field_value, string_view field_name, const char* format_name) {
+static void check_trimmed(const char* field_value, std::string_view field_name, const char* format_name) {
     assert(field_value != nullptr);
     assert(format_name != nullptr);
     if (field_value != trim(field_value)) {
@@ -34,7 +33,7 @@ static void check_trimmed(const char* field_value, string_view field_name, const
     }
 }
 
-static void check_not_null(const char* field_value, string_view field_name, const char* format_name) {
+static void check_not_null(const char* field_value, std::string_view field_name, const char* format_name) {
     assert(format_name != nullptr);
     if (field_value == nullptr) {
         throw format_error("the {} can not be null for format '{}'", field_name, format_name);

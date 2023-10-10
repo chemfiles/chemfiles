@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <exception>
+#include <string_view>
 #include <unordered_map>
 
 #include <fmt/format.h>
@@ -19,7 +20,6 @@
 #include "chemfiles/utils.hpp"
 #include "chemfiles/warnings.hpp"
 #include "chemfiles/error_fmt.hpp"
-#include "chemfiles/string_view.hpp"
 #include "chemfiles/unreachable.hpp"
 #include "chemfiles/external/optional.hpp"
 
@@ -36,7 +36,7 @@
 using namespace chemfiles;
 
 /// Parse the Lattice="..." in extended XYZ
-static UnitCell parse_cell(string_view lattice);
+static UnitCell parse_cell(std::string_view lattice);
 
 struct extended_property {
     std::string name;
@@ -48,10 +48,10 @@ using properties_list_t = std::vector<extended_property>;
 
 /// Read the extended XYZ properties from the line, set frame properties
 /// directly and return the list of atomic properties to read
-static properties_list_t read_extended_comment_line(string_view line, Frame& frame);
+static properties_list_t read_extended_comment_line(std::string_view line, Frame& frame);
 
 /// Read the properties in the list form the line and set them on the atom
-static void read_atomic_properties(const properties_list_t& properties, string_view line, Atom& atom);
+static void read_atomic_properties(const properties_list_t& properties, std::string_view line, Atom& atom);
 
 /// Get the list of atoms properties defined for all atoms in the frame
 static properties_list_t get_atom_properties(const Frame& frame);
@@ -184,7 +184,7 @@ optional<uint64_t> XYZFormat::forward() {
 /*****************************************************************************/
 
 // Should we surround `s` with quotation marks when using it as property name?
-static bool should_be_quoted(string_view s) {
+static bool should_be_quoted(std::string_view s) {
     for (auto c: s) {
         // TODO: ASE also allow [] {} and () to function as quotes. This should
         // be updated when a specification is agreed on.
@@ -195,7 +195,7 @@ static bool should_be_quoted(string_view s) {
     return false;
 }
 
-static bool contains_single_quote(string_view s) {
+static bool contains_single_quote(std::string_view s) {
     for (auto c: s) {
         if (c == '\'') {
             return true;
@@ -204,7 +204,7 @@ static bool contains_single_quote(string_view s) {
     return false;
 }
 
-static bool contains_double_quote(string_view s) {
+static bool contains_double_quote(std::string_view s) {
     for (auto c: s) {
         if (c == '"') {
             return true;
@@ -260,7 +260,7 @@ std::string write_extended_comment_line(const Frame& frame, properties_list_t pr
     }
 
     // sort properties to have reproducible output
-    auto sorted_properties = std::map<string_view, Property>{
+    auto sorted_properties = std::map<std::string_view, Property>{
         frame.properties().begin(), frame.properties().end()
     };
     // support for generic frame properties
@@ -422,7 +422,7 @@ properties_list_t get_atom_properties(const Frame& frame) {
 /// mapping name=>properties values. The use of string_view is safe since the
 /// original string_view (as returned by file.readline()) will stay alive longer
 /// than this map.
-using extended_xyz_properties_map_t = std::unordered_map<string_view, Property>;
+using extended_xyz_properties_map_t = std::unordered_map<std::string_view, Property>;
 
 /// A simple parser for the extended XYZ comment line. This parser bails out as
 /// soon as possible if the line does not seems to follow extended XYZ
@@ -434,7 +434,7 @@ using extended_xyz_properties_map_t = std::unordered_map<string_view, Property>;
 /// Example: Properties=species:S:1:pos:R:3:bad:I:1 Lattice="3 0 0 0 4 0 0 0 5" name='simple file'
 struct extended_xyz_parser {
 public:
-    extended_xyz_parser(string_view line): current_(line.data()), end_(line.data() + line.size()) {}
+    extended_xyz_parser(std::string_view line): current_(line.data()), end_(line.data() + line.size()) {}
     ~extended_xyz_parser() = default;
     extended_xyz_parser(extended_xyz_parser&&) = delete;
     extended_xyz_parser(const extended_xyz_parser&) = delete;
@@ -461,7 +461,7 @@ public:
                 break;
             }
 
-            properties.emplace(name, value.to_string());
+            properties.emplace(name, std::string(value));
         }
         return properties;
     }
@@ -479,7 +479,7 @@ private:
 
     /// Get a string, either quoted and possibly containing spaces; or unquoted.
     /// Unquoted strings ends on a space or '=' sign.
-    string_view next_substring() {
+    std::string_view next_substring() {
         bool check_for_quote = false;
         char quote = '\0';
         if (current() == '"' || current() == '\'') {
@@ -505,7 +505,7 @@ private:
             }
         }
 
-        auto value = string_view(start, size);
+        auto value = std::string_view(start, size);
         if (check_for_quote) {
             // we found an initial quote, but no final one
             assert(done());
@@ -539,7 +539,7 @@ private:
 };
 
 
-static UnitCell parse_cell(string_view lattice) {
+static UnitCell parse_cell(std::string_view lattice) {
     auto matrix = Matrix3D::zero();
     scan(lattice,
         matrix[0][0], matrix[1][0], matrix[2][0],
@@ -574,7 +574,7 @@ static UnitCell parse_cell(string_view lattice) {
 /// - Properties of type S:1 are maped to string values
 /// - Properties of type S:N are maped to N separate string properties,
 ///   named `$name_$i`
-static properties_list_t parse_property_list(string_view input) {
+static properties_list_t parse_property_list(std::string_view input) {
     if (input.substr(0, 19) != "species:S:1:pos:R:3") {
         warning("Extended XYZ", "ignoring non-standard Properties='{}', should start with 'species:S:1:pos:R:3'", input);
         return {};
@@ -596,7 +596,7 @@ static properties_list_t parse_property_list(string_view input) {
 
     auto count = splitted.size() / 3;
     for (size_t i=0; i<count; i++) {
-        auto name = splitted[3 * i].to_string();
+        auto name = std::string(splitted[3 * i]);
 
         auto type_str = splitted[3 * i + 1];
         Property::Kind type;
@@ -642,7 +642,7 @@ static properties_list_t parse_property_list(string_view input) {
     return properties;
 }
 
-properties_list_t read_extended_comment_line(string_view line, Frame& frame) {
+properties_list_t read_extended_comment_line(std::string_view line, Frame& frame) {
     // only try to parse as extended XYZ if `Properties` is defined as expected
     if (line.find("species:S:1:pos:R:3") == std::string::npos) {
         return {};
@@ -654,7 +654,7 @@ properties_list_t read_extended_comment_line(string_view line, Frame& frame) {
         if (name == "Lattice" || name == "Properties") {
             continue;
         }
-        frame.set(name.to_string(), std::move(it.second));
+        frame.set(std::string(name), std::move(it.second));
     }
 
     if (properties.count("Lattice") == 1) {
@@ -672,7 +672,7 @@ properties_list_t read_extended_comment_line(string_view line, Frame& frame) {
 // the expected type. If the files contains a valid `Properties=...`
 // description,throwing errors if the rest of the files does not follow the
 // description is fair game.
-void read_atomic_properties(const properties_list_t& properties, string_view line, Atom& atom) {
+void read_atomic_properties(const properties_list_t& properties, std::string_view line, Atom& atom) {
     for (const auto& property: properties) {
         if (property.type == Property::STRING) {
             std::string value;
