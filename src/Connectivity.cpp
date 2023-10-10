@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <array>
+#include <cstddef>
 #include <vector>
 #include <iterator>
 #include <algorithm>
@@ -186,7 +187,7 @@ const sorted_set<Improper>& Connectivity::impropers() const {
     return impropers_;
 }
 
-void Connectivity::add_bond(size_t i, size_t j, Bond::BondOrder bond_order) {
+void Connectivity::add_bond(size_t i, size_t j, Bond::BondOrder bond_order, std::string bond_type) {
     uptodate_ = false;
     auto result = bonds_.emplace(i, j);
     if (i > biggest_atom_) {biggest_atom_ = i;}
@@ -195,6 +196,48 @@ void Connectivity::add_bond(size_t i, size_t j, Bond::BondOrder bond_order) {
     if (result.second) {
         auto diff = std::distance(bonds_.cbegin(), result.first);
         bond_orders_.insert(bond_orders_.begin() + diff, bond_order);
+        bond_types_.insert(bond_types_.begin() + diff, std::move(bond_type));
+    }
+}
+
+void Connectivity::add_angle(size_t i, size_t j, size_t k, std::string angle_type) {
+    uptodate_ = true;
+    auto result = angles_.emplace(i, j, k);
+    if (i > biggest_atom_) {biggest_atom_ = i;}
+    if (j > biggest_atom_) {biggest_atom_ = j;}
+    if (k > biggest_atom_) {biggest_atom_ = k;}
+
+    if (result.second) {
+        auto diff = std::distance(angles_.cbegin(), result.first);
+        angle_types_.insert(angle_types_.begin() + diff, std::move(angle_type));
+    }
+}
+
+void Connectivity::add_dihedral(size_t i, size_t j, size_t k, size_t l, std::string dihedral_type) {
+    uptodate_ = true;
+    auto result = dihedrals_.emplace(i, j, k, l);
+    if (i > biggest_atom_) {biggest_atom_ = i;}
+    if (j > biggest_atom_) {biggest_atom_ = j;}
+    if (k > biggest_atom_) {biggest_atom_ = k;}
+    if (l > biggest_atom_) {biggest_atom_ = l;}
+
+    if (result.second) {
+        auto diff = std::distance(dihedrals_.cbegin(), result.first);
+        dihedral_types_.insert(dihedral_types_.begin() + diff, std::move(dihedral_type));
+    }
+}
+
+void Connectivity::add_improper(size_t i, size_t j, size_t k, size_t l, std::string improper_type) {
+    uptodate_ = true;
+    auto result = impropers_.emplace(i, j, k, l);
+    if (i > biggest_atom_) {biggest_atom_ = i;}
+    if (j > biggest_atom_) {biggest_atom_ = j;}
+    if (k > biggest_atom_) {biggest_atom_ = k;}
+    if (l > biggest_atom_) {biggest_atom_ = l;}
+
+    if (result.second) {
+        auto diff = std::distance(impropers_.cbegin(), result.first);
+        improper_types_.insert(improper_types_.begin() + diff, std::move(improper_type));
     }
 }
 
@@ -247,6 +290,20 @@ Bond::BondOrder Connectivity::bond_order(size_t i, size_t j) const {
     if (pos != bonds_.end()) {
         auto diff = std::distance(bonds_.cbegin(), pos);
         return bond_orders_[static_cast<size_t>(diff)];
+    }
+
+    throw error(
+        "out of bounds atomic index in `Connectivity::bond_order`: "
+        "No bond between {} and {} exists",
+        i, j
+    );
+}
+
+const std::string& Connectivity::bond_type(size_t i, size_t j) const {
+    auto pos = bonds_.find(Bond(i, j));
+    if (pos != bonds_.end()) {
+        auto diff = std::distance(bonds_.cbegin(), pos);
+        return bond_types_[static_cast<size_t>(diff)];
     }
 
     throw error(

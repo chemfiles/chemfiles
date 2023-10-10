@@ -4,6 +4,11 @@ unset(CMAKE_C_STANDARD)
 # symbols (such as strdup) undefined.
 string(REPLACE "-std=c99" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 
+# TODO: update all the external projects to use this and remove it from here
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+
 set(EXTERNAL_FLAGS "")
 
 # Disable warnings about external code
