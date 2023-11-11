@@ -25,7 +25,6 @@ class FormatMetadata;
 /// molfile plugins, please see:
 /// http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/
 enum MolfileFormat {
-    DCD,                ///< DCD binary file format
     TRJ,                ///< Gromacs .trj file format
     PSF,                ///< PSF topology files
     MOLDEN,             ///< Molden file format
@@ -86,7 +85,6 @@ private:
     std::vector<Frame> frames_;
 };
 
-template<> const FormatMetadata& format_metadata<Molfile<DCD>>();
 template<> const FormatMetadata& format_metadata<Molfile<TRJ>>();
 template<> const FormatMetadata& format_metadata<Molfile<PSF>>();
 template<> const FormatMetadata& format_metadata<Molfile<MOLDEN>>();

@@ -160,51 +160,14 @@ external_library(molfiles)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/molfiles/include)
 
 # ==========
-# Plugins not yet enabled but that should compile without issue:
-# ==========
-
-# abinitplugin carplugin cpmdplugin  gamessplugin mdfplugin msmsplugin
-# namdbinplugin parm7plugin parmplugin vasp5xdatcarplugin vaspchgcarplugin
-# vaspoutcarplugin vaspparchgplugin vaspposcarplugin vaspxdatcarplugin
-# vaspxmlplugin dlpolyplugin tinkerplugin
-#
-# avsplugin babelplugin basissetplugin bgfplugin binposplugin biomoccaplugin
-# brixplugin ccp4plugin cifplugin corplugin crdplugin cubeplugin dsn6plugin
-# dtrplugin dxplugin edmplugin fs4plugin graspplugin grdplugin gridplugin
-# jsplugin maeffplugin mapplugin molemeshplugin offplugin pbeqplugin phiplugin
-# pltplugin pqrplugin raster3dplugin rst7plugin situsplugin
-# spiderplugin stlplugin uhbdplugin vtfplugin xbgfplugin xsfplugin
-
-# ==========
-# Plugins with a chemfiles specific implementation
-# ==========
-#     xyzplugin pdbplugin tngplugin netcdfplugin mol2plugin gromacsplugin (.gro only)
-
-# ==========
-# These plugins do not compile or link
-# ==========
-# error: no member named 'have_esp' in 'molfile_qm_metadata_t'
-#       cpmdlogplugin
-# Needs to link the sqlite3 library
-#       dmsplugin
-# error: no member named 'have_esp' in 'molfile_qm_metadata_t'
-#       gaussianplugin
-# Needs to link to some XML parser
-#       hoomdplugin
-# The code is not yet written ...
-#       mmcif
-# Needs to link to TCL interpreter
-#       webpdbplugin
-
-# ==========
 # mmtf-cpp: https://github.com/chemfiles/mmtf-cpp
 # ==========
 unpack_library(mmtf-cpp)
-list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/include )
-list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/msgpack-c/include )
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/include)
+list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/mmtf-cpp/msgpack-c/include)
 
 # ==========
-# gemmi
+# gemmi: https://github.com/chemfiles/gemmi
 # ==========
 option(CHFL_DISABLE_GEMMI OFF)
 mark_as_advanced(CHFL_DISABLE_GEMMI)
