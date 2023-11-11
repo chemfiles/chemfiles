@@ -141,7 +141,7 @@ set(CHEMFILES_OBJECTS
     $<TARGET_OBJECTS:chemfiles_objects>
     $<TARGET_OBJECTS:molfiles>
     $<TARGET_OBJECTS:tng_io>
-    $<TARGET_OBJECTS:fmt>
+    $<TARGET_OBJECTS:chemfiles_fmt>
     $<TARGET_OBJECTS:pugixml>
     ${ZLIB_OBJECTS}
     ${LZMA_OBJECTS}

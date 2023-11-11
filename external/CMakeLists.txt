@@ -133,26 +133,8 @@ list(APPEND EXTERNAL_INCLUDES ${BZIP2_INCLUDE_DIR})
 # ==========
 # fmtlib: https://github.com/chemfiles/fmt
 # ==========
-if (${CMAKE_VERSION} VERSION_LESS "3.1")
-    # fmt uses target_compile_features, which is not available on older cmake
-    # versions.
-    function(target_compile_features)
-    endfunction()
-endif()
-
 external_library(fmt)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/fmt/include/)
-
-# Hide FMT variables from CMake GUI
-mark_as_advanced(FORCE
-    FMT_CUDA_TEST
-    FMT_DOC
-    FMT_FUZZ
-    FMT_INSTALL
-    FMT_PEDANTIC
-    FMT_TEST
-    FMT_WERROR
-)
 
 # ==========
 # pugixml: http://github.com/chemfiles/pugixml

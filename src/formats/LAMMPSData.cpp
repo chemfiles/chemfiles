@@ -823,7 +823,7 @@ void LAMMPSDataFormat::write_masses(const DataTypes& types) {
     file_.print("\nMasses\n\n");
     auto& atoms = types.atoms().as_vec();
     for (size_t i=0; i<atoms.size(); i++) {
-        file_.print("{} {:#} # {}\n", i + 1, atoms[i].second, atoms[i].first);
+        file_.print("{} {:#g} # {}\n", i + 1, atoms[i].second, atoms[i].first);
     }
 }
 
@@ -834,7 +834,7 @@ void LAMMPSDataFormat::write_atoms(const DataTypes& types, const Frame& frame) {
     for (size_t i=0; i<frame.size(); i++) {
         auto& atom = frame.topology()[i];
         auto molid = molids[i];
-        file_.print("{} {} {} {:#} {:#} {:#} {:#} # {}\n",
+        file_.print("{} {} {} {:#g} {:#g} {:#g} {:#g} # {}\n",
             i + 1, molid + 1, types.atom_type_id(atom) + 1, atom.charge(),
             positions[i][0], positions[i][1], positions[i][2],
             atom.type()

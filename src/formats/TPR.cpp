@@ -655,7 +655,11 @@ static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, in
     case FunctionType::CMAP:
         return 2 * sizeof(int32_t);
     default:
-        throw format_error("unknown function type {} ({})", ftype, FUNCTION_TYPE_INFOS[ftype].name);
+        throw format_error(
+            "unknown function type {} ({})",
+            static_cast<int>(ftype),
+            FUNCTION_TYPE_INFOS[ftype].name
+        );
     }
 }
 

@@ -650,6 +650,14 @@ size_t MMTFFormat::atom_id(size_t mmtf_id) {
 }
 
 int8_t bond_order_to_mmtf(Bond::BondOrder order) {
+    auto warn_bad_bond_order = [](const char* name) {
+        warning("MMTF Writer",
+            "bond order '{}' can not be represented in MMTF, defaulting to single bond",
+            name
+        );
+        return 1;
+    };
+
     switch(order) {
     case Bond::BondOrder::SINGLE:
         return 1;
@@ -662,17 +670,19 @@ int8_t bond_order_to_mmtf(Bond::BondOrder order) {
     case Bond::BondOrder::UNKNOWN:
         return -1;
     case Bond::BondOrder::QUINTUPLET:
+        return warn_bad_bond_order("quintuplet");
     case Bond::BondOrder::AMIDE:
+        return warn_bad_bond_order("amide");
     case Bond::BondOrder::AROMATIC:
+        return warn_bad_bond_order("aromatic");
     case Bond::BondOrder::UP:
+        return warn_bad_bond_order("up");
     case Bond::BondOrder::DOWN:
+        return warn_bad_bond_order("down");
     case Bond::BondOrder::DATIVE_L:
+        return warn_bad_bond_order("dative_l");
     case Bond::BondOrder::DATIVE_R:
-        warning("MMTF Writer",
-            "bond order '{}' can not be represented in MMTF, defaulting to single bond",
-            order
-        );
-        return 1;
+        return warn_bad_bond_order("dative_r");
     default:
         unreachable();
     }

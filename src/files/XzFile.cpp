@@ -27,29 +27,30 @@ static size_t checked_cast(uint64_t value) {
 }
 
 static void check(lzma_ret code) {
+    int int_code = static_cast<int>(code);
     switch (code) {
     case LZMA_OK:
     case LZMA_STREAM_END:
         return;
     case LZMA_MEM_ERROR:
     case LZMA_MEMLIMIT_ERROR:
-        throw file_error("lzma: memory allocation failed (code: {})", code);
+        throw file_error("lzma: memory allocation failed (code: {})", int_code);
     case LZMA_FORMAT_ERROR:
-        throw file_error("lzma: input not in .xz format (code: {})", code);
+        throw file_error("lzma: input not in .xz format (code: {})", int_code);
     case LZMA_OPTIONS_ERROR:
         throw file_error(
-            "lzma: unsupported compression options (code: {})", code);
+            "lzma: unsupported compression options (code: {})", int_code);
     case LZMA_DATA_ERROR:
-        throw file_error("lzma: compressed file is corrupted (code: {})", code);
+        throw file_error("lzma: compressed file is corrupted (code: {})", int_code);
     case LZMA_BUF_ERROR:
         throw file_error(
-            "lzma: compressed file is truncated or corrupted (code: {})", code);
+            "lzma: compressed file is truncated or corrupted (code: {})", int_code);
     case LZMA_UNSUPPORTED_CHECK:
-        throw file_error("lzma: specified integrity check is not supported (code: {})", code);
+        throw file_error("lzma: specified integrity check is not supported (code: {})", int_code);
     case LZMA_PROG_ERROR:
-        throw file_error("lzma: programming error (this is a bug) (code: {})", code);
+        throw file_error("lzma: programming error (this is a bug) (code: {})", int_code);
     default:
-        throw file_error("lzma: unknown error (code: {})", code);
+        throw file_error("lzma: unknown error (code: {})", int_code);
     }
 }
 
