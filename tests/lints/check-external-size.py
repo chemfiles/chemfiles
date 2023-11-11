@@ -1,13 +1,10 @@
-#!/usr/bin/env python
-# -*- coding: utf8 -*-
 """
 This script checks that all the external archive included in the repository are
 as small as they can be.
 """
-from __future__ import print_function
+import glob
 import os
 import sys
-import glob
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 ERRORS = 0
