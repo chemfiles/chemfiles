@@ -1,13 +1,9 @@
-#!/usr/bin/env python
-# -*- coding: utf8 -*-
 """
 A small script checking that all the C API functions are documented, and have
 an example.
 """
-from __future__ import print_function
 import os
 import sys
-import codecs
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 ERRORS = 0
@@ -22,9 +18,9 @@ def error(message):
 def documented_functions():
     functions = []
     DOCS = os.path.join(ROOT, "doc", "src", "capi")
-    for (root, _, paths) in os.walk(DOCS):
+    for root, _, paths in os.walk(DOCS):
         for path in paths:
-            with codecs.open(os.path.join(root, path), encoding="utf8") as fd:
+            with open(os.path.join(root, path), encoding="utf8") as fd:
                 for line in fd:
                     if line.startswith(".. doxygenfunction::"):
                         name = line.split()[2]
@@ -42,9 +38,9 @@ def functions_in_outline():
     ]
     DOCS = os.path.join(ROOT, "doc", "src", "capi")
     functions = MISC_FUNCTIONS
-    for (root, _, paths) in os.walk(DOCS):
+    for root, _, paths in os.walk(DOCS):
         for path in paths:
-            with codecs.open(os.path.join(root, path), encoding="utf8") as fd:
+            with open(os.path.join(root, path), encoding="utf8") as fd:
                 for line in fd:
                     if ":cpp:func:" in line:
                         name = line.split("`")[1]
@@ -67,9 +63,9 @@ def function_name(line):
 def all_functions():
     functions = []
     HEADERS = os.path.join(ROOT, "include", "chemfiles", "capi")
-    for (root, _, paths) in os.walk(HEADERS):
+    for root, _, paths in os.walk(HEADERS):
         for path in paths:
-            with codecs.open(os.path.join(root, path), encoding="utf8") as fd:
+            with open(os.path.join(root, path), encoding="utf8") as fd:
                 for line in fd:
                     if line.startswith("CHFL_EXPORT"):
                         functions.append(function_name(line))
@@ -78,9 +74,9 @@ def all_functions():
 
 def check_examples():
     HEADERS = os.path.join(ROOT, "include", "chemfiles", "capi")
-    for (root, _, paths) in os.walk(HEADERS):
+    for root, _, paths in os.walk(HEADERS):
         for path in paths:
-            with codecs.open(os.path.join(root, path), encoding="utf8") as fd:
+            with open(os.path.join(root, path), encoding="utf8") as fd:
                 in_doc = False
                 example_found = False
 

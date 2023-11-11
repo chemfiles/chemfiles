@@ -1,14 +1,10 @@
-#!/usr/bin/env python
-# -*- coding: utf8 -*-
 """
-This script check that only whitelisted headers are included (transitivly) by
+This script check that only whitelisted headers are included (transitively) by
 including chemfiles.h or chemfiles.hpp.
 """
-from __future__ import print_function
 import os
-import sys
 import re
-import codecs
+import sys
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 GENERATED_HEADERS = ["chemfiles/config.h", "chemfiles/exports.h"]
@@ -83,7 +79,7 @@ def error(message):
 
 def included_headers(path):
     includes = set()
-    with codecs.open(path, encoding="utf8") as fd:
+    with open(path, encoding="utf8") as fd:
         for line in fd:
             if "#include" in line:
                 matched = re.match('#include\\s*["<](.*)[">]', line)

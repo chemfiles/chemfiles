@@ -1,14 +1,10 @@
-#!/usr/bin/env python
-# -*- coding: utf8 -*-
 """
 This script check for some functions we don't want to use because they are
 better wrappers in chemfiles
 """
-from __future__ import print_function
 import os
-import sys
 import re
-import codecs
+import sys
 from glob import glob
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
@@ -62,7 +58,7 @@ def error(message):
 
 
 def check_code(path, replacements):
-    with codecs.open(path, encoding="utf8") as fd:
+    with open(path, encoding="utf8") as fd:
         for i, line in enumerate(fd):
             for bad, replacement in replacements.items():
                 match = re.search(bad, line)
