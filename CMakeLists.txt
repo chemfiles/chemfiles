@@ -140,7 +140,7 @@ target_use_include_what_you_use(chemfiles_objects)
 set(CHEMFILES_OBJECTS
     $<TARGET_OBJECTS:chemfiles_objects>
     $<TARGET_OBJECTS:molfiles>
-    $<TARGET_OBJECTS:tng_io>
+    $<TARGET_OBJECTS:chemfiles_tng>
     $<TARGET_OBJECTS:chemfiles_fmt>
     $<TARGET_OBJECTS:chemfiles_pugixml>
     ${ZLIB_OBJECTS}

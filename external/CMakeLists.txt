@@ -147,16 +147,7 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src)
 # ==========
 external_library(tng)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/tng/include)
-target_include_directories(tng_io PUBLIC ${ZLIB_INCLUDE_DIRS})
-
-# Hide TNG variables from CMake GUI
-mark_as_advanced(FORCE
-    TNG_BUILD_COMPRESSION_TESTS
-    TNG_BUILD_EXAMPLES
-    TNG_BUILD_FORTRAN
-    TNG_BUILD_OWN_ZLIB
-    TNG_BUILD_TEST
-)
+target_include_directories(chemfiles_tng PUBLIC ${ZLIB_INCLUDE_DIRS})
 
 # ==========
 # VMD molfile: https://github.com/chemfiles/molfiles
