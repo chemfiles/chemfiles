@@ -15,7 +15,7 @@ ERRORS = 0
 
 # when adding new files here, make sure that they are as small as possible!
 EXPECTED_SIZES = {
-    "bzip2.tar.gz": 114,
+    "bzip2.tar.gz": 58,
     "fmt.tar.gz": 189,
     "gemmi.tar.gz": 476,
     "lzma.tar.gz": 302,
