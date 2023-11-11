@@ -298,13 +298,13 @@ void SDFFormat::write_next(const Frame& frame) {
             file_.print("{}\n\n", prop.second.as_string());
             break;
         case Property::DOUBLE:
-            file_.print("{:#}\n\n", prop.second.as_double());
+            file_.print("{:#g}\n\n", prop.second.as_double());
             break;
         case Property::BOOL:
             file_.print("{}\n\n", prop.second.as_bool());
             break;
         case Property::VECTOR3D:
-            file_.print("{:#} {:#} {:#}\n\n",
+            file_.print("{:#g} {:#g} {:#g}\n\n",
                 prop.second.as_vector3d()[0],
                 prop.second.as_vector3d()[1],
                 prop.second.as_vector3d()[2]

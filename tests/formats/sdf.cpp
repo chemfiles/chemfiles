@@ -147,7 +147,7 @@ created by chemfiles
  10 11  4  0  0  0  0
 M  END
 > <float property>
-1.23
+1.23000
 
 > <string-property>
 prop1
@@ -163,7 +163,7 @@ M  END
 false
 
 > <float property>
-1.23
+1.23000
 
 > <string-property>
 prop1
@@ -179,13 +179,13 @@ M  END
 false
 
 > <float property>
-1.23
+1.23000
 
 > <string-property>
 prop1
 
 > <vector property>
-1.0 2.0 3.0
+1.00000 2.00000 3.00000
 
 $$$$
 abc dfe ghi jkl mno pqr stu vwx yz 123 456 789 ABC DFE GHI JKL MNO PQR STU VWX Y
