@@ -24,15 +24,7 @@ To update a library, update the corresponding repository, and then regenerate
 the archive to be included in this directory with
 
 ```bash
-# <lib> is the library name: tng, molfiles, netcdf, ...
-git archive HEAD -9 --prefix=<lib>/ -o <lib>.tar.gz
-```
-
-For gemmi, since the library is header only you should use this command to
-create the archive:
-
-```bash
-git archive HEAD -9 --prefix=gemmi/ -o gemmi.tar.gz include
+./0-chemfiles/create-archive.sh
 ```
 
 ## Licences
