@@ -139,9 +139,8 @@ list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/fmt/include/)
 # ==========
 # pugixml: http://github.com/chemfiles/pugixml
 # ==========
-unpack_library(pugixml)
+external_library(pugixml)
 list(APPEND EXTERNAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src)
-add_library(pugixml OBJECT ${CMAKE_CURRENT_BINARY_DIR}/pugixml/src/pugixml.cpp)
 
 # ==========
 # TNG io: https://github.com/chemfiles/tng
