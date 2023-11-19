@@ -180,6 +180,7 @@ jobs:
         uses: egor-tensin/setup-mingw@v2
         with:
           platform: x64
+          version: 12.2.0
 
       - name: Setup emsdk
         if: ${{ matrix.use-emsdk }}
