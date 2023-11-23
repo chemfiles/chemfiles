@@ -7,6 +7,7 @@
 #include <array>
 #include <vector>
 #include <algorithm> // IWYU pragma: keep
+#include <string>
 
 #include "chemfiles/sorted_set.hpp"
 #include "chemfiles/exports.h"
@@ -307,6 +308,9 @@ public:
     /// Get the bond orders in this connectivity
     const std::vector<Bond::BondOrder>& bond_orders() const;
 
+    /// Get the bond types in this connectivity
+    const std::vector<std::string>& bond_types() const;
+
     /// Get the angles in this connectivity
     const sorted_set<Angle>& angles() const;
 
@@ -317,7 +321,7 @@ public:
     const sorted_set<Improper>& impropers() const;
 
     /// Add a bond between the atoms `i` and `j`
-    void add_bond(size_t i, size_t j, Bond::BondOrder bond_order = Bond::UNKNOWN);
+    void add_bond(size_t i, size_t j, Bond::BondOrder bond_order = Bond::UNKNOWN, std::string bond_type = "");
 
     /// Remove any bond between the atoms `i` and `j`
     void remove_bond(size_t i, size_t j);
@@ -330,6 +334,9 @@ public:
 
     /// Get the bond order of the bond between i and j
     Bond::BondOrder bond_order(size_t i, size_t j) const;
+
+    /// Get the bond type of the bond between i and j
+    std::string bond_type(size_t i, size_t j) const;
 private:
     /// Recalculate the angles and the dihedrals from the bond list
     void recalculate() const;
@@ -349,6 +356,7 @@ private:
     mutable bool uptodate_ = false;
     /// Store the bond orders
     std::vector<Bond::BondOrder> bond_orders_;
+    std::vector<std::string> bond_types_;
 };
 
 } // namespace chemfiles

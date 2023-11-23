@@ -115,7 +115,7 @@ public:
     /// @param bond_order the bond order for the bond added
     /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `size()`
     /// @throws Error if `atom_i == atom_j`, as this is an invalid bond
-    void add_bond(size_t atom_i, size_t atom_j, Bond::BondOrder bond_order = Bond::UNKNOWN);
+    void add_bond(size_t atom_i, size_t atom_j, Bond::BondOrder bond_order = Bond::UNKNOWN, std::string bond_type = "");
 
     /// Remove a bond in the system, between the atoms at index `atom_i` and
     /// `atom_j`.
@@ -140,6 +140,28 @@ public:
     /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `size()`
     /// @throws Error if no bond between `atom_i` and `atom_j` exists.
     Bond::BondOrder bond_order(size_t atom_i, size_t atom_j) const;
+
+    /// Get the bond type for the given bond
+    ///
+    /// If the bond does not exist, this will thrown an Error.
+    ///
+    /// @example{topology/bond_type.cpp}
+    ///
+    /// @param atom_i the index of the first atom in the bond
+    /// @param atom_j the index of the second atom in the bond
+    /// @throws OutOfBounds if `atom_i` or `atom_j` are greater than `size()`
+    /// @throws Error if no bond between `atom_i` and `atom_j` exists.
+    std::string bond_type(size_t atom_i, size_t atom_j) const;
+
+    /// Get the bond types in the system.
+    ///
+    /// The bond types are sorted so that the index of each bond is the same as
+    /// its index in the array returned by `Topology::bonds`. This means that
+    /// the bond order for `Topology::bonds()[index]` would be given by
+    /// `bond_types()[index]`.
+    ///
+    /// @example{topology/bond_order.cpp}
+    const std::vector<std::string>& bond_types() const;
 
     /// Get the number of atoms in the topology
     ///
