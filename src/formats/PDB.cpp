@@ -607,7 +607,7 @@ void PDBFormat::link_standard_residue_bonds(Frame& frame) {
                 if (first_name[0] != 'H' && first_name != "OXT" &&
                     first_name[0] != 'P' && first_name.substr(0, 2) != "OP" ) {
                     warning("PDB reader",
-                        "found unexpected, non-standard atom '{}' in residue '{}' (resid {})",
+                        "could not find standard atom '{}' in residue '{}' (resid {})",
                         first_name, residue.name(), resid
                     );
                 }
@@ -619,7 +619,7 @@ void PDBFormat::link_standard_residue_bonds(Frame& frame) {
                 if (second_name[0] != 'H' && second_name != "OXT" &&
                     second_name[0] != 'P' && second_name.substr(0, 2) != "OP" ) {
                         warning("PDB reader",
-                            "found unexpected, non-standard atom '{}' in residue '{}' (resid {})",
+                            "could not find standard atom '{}' in residue '{}' (resid {})",
                             second_name, residue.name(), resid
                         );
                 }
