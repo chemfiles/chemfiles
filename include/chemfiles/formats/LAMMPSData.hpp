@@ -63,6 +63,8 @@ using angle_type = std::tuple<size_t, size_t, size_t>;
 using dihedral_type = std::tuple<size_t, size_t, size_t, size_t>;
 using improper_type = std::tuple<size_t, size_t, size_t, size_t>;
 
+using custom_bond_type_map = std::unordered_map<size_t, std::string>;
+
 class DataTypes {
 public:
     DataTypes(const Topology& topology = Topology());
@@ -110,12 +112,17 @@ public:
     /// returned by `impropers()`.
     size_t improper_type_id(size_t type_i, size_t type_j, size_t type_k, size_t type_m) const;
 
+    /// Get the custom bond type name for the given bond type.
+    optional<std::string> bond_type_name(size_t) const;
+
 private:
     sorted_set<atom_type> atoms_;
     sorted_set<bond_type> bonds_;
     sorted_set<angle_type> angles_;
     sorted_set<dihedral_type> dihedrals_;
     sorted_set<improper_type> impropers_;
+    
+    std::map<size_t, std::string> custom_bond_types_;
 };
 
 /// LAMMPS Data file format reader and writer.

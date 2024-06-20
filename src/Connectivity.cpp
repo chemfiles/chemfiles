@@ -165,6 +165,10 @@ const std::vector<Bond::BondOrder>& Connectivity::bond_orders() const {
     return bond_orders_;
 }
 
+const std::vector<std::string>& Connectivity::bond_types() const {
+    return bond_types_;
+}
+
 const sorted_set<Angle>& Connectivity::angles() const {
     if (!uptodate_) {
         recalculate();
@@ -186,7 +190,7 @@ const sorted_set<Improper>& Connectivity::impropers() const {
     return impropers_;
 }
 
-void Connectivity::add_bond(size_t i, size_t j, Bond::BondOrder bond_order) {
+void Connectivity::add_bond(size_t i, size_t j, Bond::BondOrder bond_order, std::string bond_type) {
     uptodate_ = false;
     auto result = bonds_.emplace(i, j);
     if (i > biggest_atom_) {biggest_atom_ = i;}
@@ -195,6 +199,7 @@ void Connectivity::add_bond(size_t i, size_t j, Bond::BondOrder bond_order) {
     if (result.second) {
         auto diff = std::distance(bonds_.cbegin(), result.first);
         bond_orders_.insert(bond_orders_.begin() + diff, bond_order);
+        bond_types_.insert(bond_types_.begin() + diff, bond_type);
     }
 }
 
@@ -251,6 +256,20 @@ Bond::BondOrder Connectivity::bond_order(size_t i, size_t j) const {
 
     throw error(
         "out of bounds atomic index in `Connectivity::bond_order`: "
+        "No bond between {} and {} exists",
+        i, j
+    );
+}
+
+std::string Connectivity::bond_type(size_t i, size_t j) const {
+    auto pos = bonds_.find(Bond(i, j));
+    if (pos != bonds_.end()) {
+        auto diff = std::distance(bonds_.cbegin(), pos);
+        return bond_types_[static_cast<size_t>(diff)];
+    }
+
+    throw error(
+        "out of bounds atomic index in `Connectivity::bond_type`: "
         "No bond between {} and {} exists",
         i, j
     );
