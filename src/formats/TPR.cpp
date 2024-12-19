@@ -2,27 +2,28 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 
 #include <algorithm>
 #include <array>
 #include <memory>
 #include <string>
-#include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/external/optional.hpp"
 #include "chemfiles/external/span.hpp"
 #include "chemfiles/periodic_table.hpp"
-#include "chemfiles/types.hpp"
 #include "chemfiles/warnings.hpp"
 
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/File.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Residue.hpp"
+#include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/files/XDRFile.hpp"
 #include "chemfiles/formats/TPR.hpp"
@@ -35,7 +36,7 @@
 // see `tpxv` in <GMX>/src/gromacs/fileio/tpxio.cpp
 class TPRVersion {
   public:
-    enum TV : int {
+    enum TV : int {  // NOLINT(performance-enum-size)
         ComputationalElectrophysiology = 96,
         Use64BitRandomSeed,
         RestrictedBendingAndCombinedAngleTorsionPotentials,
@@ -108,7 +109,7 @@ static const int TPR_INCOMPATIBLE_VERSION = 57; // GMX4.0 has version 58
 // see <GMX>/api/legacy/include/gromacs/topology/ifunc.h
 class FunctionType {
   public:
-    enum FT : size_t {
+    enum FT : size_t {  // NOLINT(performance-enum-size)
         BONDS,
         G96BONDS,
         MORSE,
@@ -501,8 +502,9 @@ template <> const FormatMetadata& chemfiles::format_metadata<TPRFormat>() {
     return metadata;
 }
 
-TPRFormat::TPRFormat(std::string path, File::Mode mode, File::Compression compression)
-    : file_(std::move(path), mode) {
+TPRFormat::TPRFormat(std::string path, File::Mode mode, File::Compression compression):
+    file_(std::move(path), mode)
+{
     if (compression != File::DEFAULT) {
         throw format_error("TPR format does not support compression");
     }
@@ -622,7 +624,6 @@ static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, in
         return 2 * NR_RBDIHS * sizeof_real;
     case FunctionType::CONSTR:
     case FunctionType::CONSTRNC:
-        return 2 * sizeof_real;
     case FunctionType::SETTLE:
         return 2 * sizeof_real;
     case FunctionType::VSITE1:
@@ -709,9 +710,9 @@ static void add_conectivity(Frame& frame, const InteractionLists& interaction_li
         return cnt != 0;
     };
     for (const auto& ilist : interaction_lists) {
-        if (!ilist)
+        if (!ilist) {
             continue;
-        else if (contains(BOND_TYPES, ilist.value().function_type)) {
+        } else if (contains(BOND_TYPES, ilist.value().function_type)) {
             for (size_t i = 0; i < ilist.value().size(); ++i) {
                 auto iatoms = ilist.value()[i];
                 assert(iatoms.size() == 2);
@@ -1056,7 +1057,7 @@ void TPRFormat::read_topology(Frame& frame) {
     for (size_t i = 0; i < nmolblocks; ++i) {
         // Index of the molecule type read previously
         size_t moltype_idx = file_.read_single_size_as_i32();
-        auto& moltype = molecule_types.at(moltype_idx);
+        const auto& moltype = molecule_types.at(moltype_idx);
         size_t nmolecules = file_.read_single_size_as_i32();
         const auto& atoms = moltype.atoms;
         for (size_t j = 0; j < nmolecules; ++j) {
@@ -1072,7 +1073,7 @@ void TPRFormat::read_topology(Frame& frame) {
                 auto& atom = frame[global_atom_idx + atom_idx];
                 atom.set_name(atoms.atom_names[atom_idx]);
                 atom.set("ff_type", atoms.atom_types[atom_idx]);
-                auto& props = atoms.atom_properties[atom_idx];
+                const auto& props = atoms.atom_properties[atom_idx];
                 if (props.element_name) {
                     atom.set_type(*props.element_name);
                 }
