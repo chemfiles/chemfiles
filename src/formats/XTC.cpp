@@ -2,10 +2,12 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 
 #include <array>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "chemfiles/error_fmt.hpp"
@@ -14,9 +16,11 @@
 #include "chemfiles/types.hpp"
 
 #include "chemfiles/File.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/UnitCell.hpp"
+
+#include "chemfiles/Format.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/files/XDRFile.hpp"
 #include "chemfiles/formats/XTC.hpp"
@@ -85,7 +89,7 @@ XTCFormat::XTCFormat(std::string path, File::Mode mode, File::Compression compre
     } else if (mode == File::APPEND) {
         try {
             determine_frame_offsets();
-        } catch (const Error&) {
+        } catch (const Error&) {  // NOLINT(bugprone-empty-catch)
             // Ignore exceptions, because the file might not exist. If it does,
             // we need to get the number of atoms and frames for appending.
         }
@@ -226,7 +230,7 @@ void XTCFormat::write(const Frame& frame) {
     };
     write_frame_header(header);
 
-    std::vector<float> box(3 * 3);
+    std::vector<float> box(9);
     get_cell(box, frame);
     file_.write_f32(box);
 
@@ -254,7 +258,7 @@ void XTCFormat::write_frame_header(const FrameHeader& header) {
 }
 
 void get_cell(std::vector<float>& box, const Frame& frame) {
-    assert(box.size() == 3 * 3);
+    assert(box.size() == 9);
     // Factor 10 because the lengths are in nm in the XTC format
     auto matrix = frame.cell().matrix() / 10.0;
     box[0] = static_cast<float>(matrix[0][0]);
@@ -269,7 +273,7 @@ void get_cell(std::vector<float>& box, const Frame& frame) {
 }
 
 void get_positions(std::vector<float>& x, const Frame& frame) {
-    auto positions = frame.positions();
+    const auto& positions = frame.positions();
     assert(x.size() == 3 * positions.size());
     for (size_t i = 0; i < frame.size(); ++i) {
         // Factor 10 because the lengths are in nm in the XTC format
