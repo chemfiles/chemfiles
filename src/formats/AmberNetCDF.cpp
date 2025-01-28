@@ -257,6 +257,8 @@ void AmberNetCDFBase::write(const Frame& frame) {
         variables_.cell_lengths = this->get_variable("cell_lengths");
         variables_.cell_angles = this->get_variable("cell_angles");
 
+        variables_.time = this->get_variable("time");
+
         n_atoms_ = frame.size();
     }
 
@@ -270,6 +272,25 @@ void AmberNetCDFBase::write(const Frame& frame) {
     }
 
     write_cell(frame.cell());
+
+    auto time_opt = frame.get<Property::DOUBLE>("time");
+    if (time_opt) {
+        if (variables_.time.var) {
+            if (variables_.time.var->type() == netcdf3::constants::NC_FLOAT) {
+                // Amber NetCDF trajectory
+                float time_f32 = static_cast<float>(*time_opt);
+                variables_.time.var->write(step_, &time_f32, 1);
+            } else if (variables_.time.var->type() == netcdf3::constants::NC_DOUBLE) {
+                // Amber Restart
+                double time_f64 = *time_opt;
+                variables_.time.var->write(step_, &time_f64, 1);
+            } else {
+                throw format_error("invalid type for time variable");
+            }
+        } else {
+            warning("AMBER NetCDF", "this file does not contain space for time, it will not be saved");
+        }
+    }
 
     if (variables_.coordinates.var) {
         this->write_array(variables_.coordinates, frame.positions());
@@ -524,6 +545,15 @@ void AmberTrajectory::initialize(const Frame& frame) {
     auto cell_spatial_dim = get_dimension_id(builder, "cell_spatial");
     auto cell_angular_dim = get_dimension_id(builder, "cell_angular");
 
+    // the time property is only set up if the first written frame contains a time information!
+    if (frame.get<Property::DOUBLE>("time")) {
+        builder.add_variable("time", {
+            /* type = */ netcdf3::constants::NC_FLOAT,
+            /* dimensions = */ {frame_dim},
+            /* attributes = */ {{"units", netcdf3::Value("picosecond")}}
+        });
+    }
+
     builder.add_variable("coordinates", {
         /* type = */ netcdf3::constants::NC_FLOAT,
         /* dimensions = */ {frame_dim, atom_dim, spatial_dim},
@@ -644,6 +674,14 @@ void AmberRestart::initialize(const Frame& frame) {
     auto spatial_dim = get_dimension_id(builder, "spatial");
     auto cell_spatial_dim = get_dimension_id(builder, "cell_spatial");
     auto cell_angular_dim = get_dimension_id(builder, "cell_angular");
+
+    if (frame.get<Property::DOUBLE>("time")) {
+        builder.add_variable("time", {
+            /* type = */ netcdf3::constants::NC_DOUBLE,
+            /* dimensions = */ {},
+            /* attributes = */ {{"units", netcdf3::Value("picosecond")}}
+        });
+    }
 
     builder.add_variable("coordinates", {
         /* type = */ netcdf3::constants::NC_DOUBLE,

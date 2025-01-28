@@ -45,9 +45,9 @@ LAMMPS = "The time of the frame in time units."
 TNG = "The time of the frame in picoseconds."
 TRR = "The time of the frame in picoseconds."
 XTC = "The time of the frame in picoseconds."
-DCD = "The time of the frame in the file units, only set when reading a file"
-"Amber NetCDF" = "The time of the frame in picoseconds, only set when reading a file"
-"Amber Restart" = "The time of the frame in picoseconds, only set when reading a file"
+DCD = "The time of the frame in the file units, only set when reading a file."
+"Amber NetCDF" = "The time of the frame in picoseconds."
+"Amber Restart" = "The time of the frame in picoseconds."
 
 [lammps_units]
 type = "string"

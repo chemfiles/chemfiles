@@ -89,10 +89,13 @@ TEST_CASE("Write files in NetCDF format") {
         auto cell = frame.cell();
         CHECK(approx_eq(cell.lengths(), {2, 3, 4}, 1e-6));
         CHECK(approx_eq(cell.angles(), {80, 90, 120}, 1e-6));
+
+        CHECK(approx_eq(frame.get("time")->as_double(), 10.0));
     };
 
     auto frame = Frame(UnitCell({2, 3, 4}, {80, 90, 120}));
     frame.set("name", "Test Title 123");
+    frame.set("time", 10.0);
     frame.add_velocities();
     for(size_t i=0; i<4; i++) {
         double d = static_cast<double>(i);
