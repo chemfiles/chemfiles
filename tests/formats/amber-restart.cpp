@@ -23,6 +23,10 @@ TEST_CASE("Read files in Amber Restart format") {
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.4172191, 8.303366, 11.73717), 1e-4));
         CHECK(approx_eq(positions[296], Vector3D(6.664049, 11.61418, 12.96149), 1e-4));
+
+        // Check time
+        // time in water.ncrst is in ps, but in water.nc it's in fs
+        CHECK(approx_eq(frame.get("time")->as_double(), 2020.0));
     }
 
     SECTION("Missing unit cell") {

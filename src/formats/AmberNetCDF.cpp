@@ -34,6 +34,7 @@ static size_t get_dimension_id(const netcdf3::Netcdf3Builder& builder, const std
 
 static double scale_for_distance(std::string unit);
 static double scale_for_velocity(std::string unit);
+static double scale_for_time(std::string unit);
 
 /******************************************************************************/
 
@@ -123,6 +124,15 @@ AmberNetCDFBase::AmberNetCDFBase(std::string convention, std::string path, File:
             );
         }
     }
+
+    variables_.time = this->get_variable("time");
+    if (variables_.time.var) {
+        auto units_attr = variables_.time.var->attribute("units");
+        if (units_attr && units_attr->kind() == netcdf3::Value::STRING) {
+            variables_.time.scale *= scale_for_time(units_attr->as_string());
+        }
+    }
+
 
     if (mode == File::APPEND) {
         // start writing at the end of pre-existing files in append mode
@@ -215,6 +225,22 @@ void AmberNetCDFBase::read_step(const size_t step, Frame& frame) {
     if (variables_.velocities.var) {
         frame.add_velocities();
         this->read_array(variables_.velocities, *frame.velocities());
+    }
+
+    if (variables_.time.var) {
+        double time_value = 0.0;
+        if (variables_.time.var->type() == netcdf3::constants::NC_FLOAT) {
+            float value;
+            variables_.time.var->read(step, &value, 1);
+            time_value = variables_.time.scale * static_cast<double>(value);
+        } else if (variables_.time.var->type() == netcdf3::constants::NC_DOUBLE) {
+            double value;
+            variables_.time.var->read(step, &value, 1);
+            time_value = variables_.time.scale * value;
+        } else {
+            throw format_error("invalid type for time variable");
+        }
+        frame.set("time", time_value);
     }
 }
 
@@ -797,4 +823,23 @@ double scale_for_velocity(std::string units) {
     }
 
     return scale;
+}
+
+double scale_for_time(std::string units) {
+    to_ascii_lowercase(units);
+
+    if (units == "picoseconds" || units == "picosecond" || units == "ps") {
+        return 1.0;
+    } else if (units == "femtoseconds" || units == "femtosecond" || units == "fs") {
+        return 1e-3;
+    } else if (units == "nanoseconds" || units == "nanosecond" || units == "ns") {
+        return 1e3;
+    } else if (units == "microseconds" || units == "microsecond" || units == "µs" || units == "us") {
+        return 1e6;
+    } else if (units == "seconds" || units == "second" || units == "s") {
+        return 1e12;
+    } else {
+        warning("Amber NetCDF reader", "unknown units ({}) for time", units);
+        return 1.0;
+    }
 }
