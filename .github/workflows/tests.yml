@@ -22,28 +22,28 @@ jobs:
           # linux builders, also used for various checks that should be
           # platform independent
           # ==
-          - name: Linux / gcc-11
-            os: ubuntu-20.04
-            cc: gcc-11
-            cxx: g++-11
+          - name: Linux / gcc-13
+            os: ubuntu-22.04
+            cc: gcc-13
+            cxx: g++-13
             build-type: Debug
             check-exported-symbols: true
             setup-dependencies: |
               sudo add-apt-repository ppa:ubuntu-toolchain-r/test
               sudo apt-get update
-              sudo apt-get install -y gcc-11 g++-11
-          - name: Linux / clang-15
-            os: ubuntu-20.04
-            cc: clang-15
-            cxx: clang++-15
+              sudo apt-get install -y gcc-13 g++-13
+          - name: Linux / clang-19
+            os: ubuntu-22.04
+            cc: clang-19
+            cxx: clang++-19
             build-type: Debug
             setup-dependencies: |
               wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
               sudo apt-get update
-              sudo apt-add-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main"
-              sudo apt-get install -y clang-15
+              sudo apt-add-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-19 main"
+              sudo apt-get install -y clang-19
           - name: Linux / Intel compiler
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             cc: icc
             cxx: icpc
             build-type: Debug
@@ -58,7 +58,7 @@ jobs:
               source /opt/intel/oneapi/setvars.sh
               env > $GITHUB_ENV
           - name: Linux / gcc / static library
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             cc: gcc
             cxx: g++
             build-type: Debug
@@ -68,7 +68,7 @@ jobs:
               - -DCMAKE_C_FLAGS="--coverage"
               - -DCMAKE_CXX_FLAGS="--coverage"
           - name: Linux / gcc / external dependencies
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             cc: gcc
             cxx: g++
             build-type: Debug
@@ -78,7 +78,7 @@ jobs:
               - -DCHFL_SYSTEM_BZIP2=ON
               - -DCHFL_DISABLE_GEMMI=ON
           - name: Linux / gcc / 32-bit build
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             cc: gcc
             cxx: g++
             build-type: Debug
@@ -89,7 +89,7 @@ jobs:
               sudo apt-get update
               sudo apt-get install -y gcc-multilib g++-multilib
           - name: Linux / gcc-9 & cmake-3.16
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             container: ubuntu:20.04
             cc: gcc
             cxx: g++
@@ -98,7 +98,7 @@ jobs:
               apt-get update
               apt-get install -y cmake gcc g++ make python3
           # - name: Linux / emscripten
-          #   os: ubuntu-20.04
+          #   os: ubuntu-22.04
           #   cc: emcc
           #   cxx: emcc
           #   build-type: Debug
@@ -112,7 +112,7 @@ jobs:
           #     - -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-main/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
           #     - -DCMAKE_CROSSCOMPILING_EMULATOR=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-main/node/14.15.5_64bit/bin/node
           - name: Linux / valgrind
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             cc: gcc
             cxx: g++
             build-type: Debug
@@ -126,7 +126,7 @@ jobs:
           # macOS builder
           # ==
           - name: macOS / clang
-            os: macos-11
+            os: macos-14
             cc: clang
             cxx: clang++
             build-type: Debug
@@ -171,7 +171,7 @@ jobs:
               - -DCHFL_BUILD_DOCTESTS=OFF
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
@@ -182,14 +182,16 @@ jobs:
           platform: x64
           version: 12.2.0
 
-      - name: Setup emsdk
-        if: ${{ matrix.use-emsdk }}
-        uses: mymindstorm/setup-emsdk@v12
-        with:
-          version: ${{ matrix.emscripten-version }}
-          actions-cache-folder: "emsdk"
+      # - name: Setup emsdk
+      #   if: ${{ matrix.use-emsdk }}
+      #   uses: mymindstorm/setup-emsdk@v12
+      #   with:
+      #     version: ${{ matrix.emscripten-version }}
+      #     actions-cache-folder: "emsdk"
+
       - name: setup dependencies
         run: ${{ matrix.setup-dependencies }}
+
       - name: configure cmake
         shell: bash
         run: |
@@ -201,22 +203,27 @@ jobs:
                 -DCHFL_BUILD_TESTS=ON \
                 ${{ join(matrix.cmake-extra-args, ' ') }} \
                 ..
+
       - name: build
         run: |
           cd build
           cmake --build . --config ${{ matrix.build-type }} --parallel 2
+
       - name: run tests
         run: |
           cd build
           ctest --output-on-failure --build-config ${{ matrix.build-type }} --parallel 2
+
       - name: check the list of exported symbols
         if: matrix.check-exported-symbols
         run: ./scripts/ci/check-exported-symbols.py build/libchemfiles.so
+
       - name: extract coverage data
         if: matrix.collect-coverage
         run: find . -type f -name '*.gcno' -exec gcov -p {} +
+
       - name: upload coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         if: matrix.collect-coverage
         with:
           fail_ci_if_error: true
