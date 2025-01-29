@@ -288,7 +288,7 @@ void AmberNetCDFBase::write(const Frame& frame) {
                 throw format_error("invalid type for time variable");
             }
         } else {
-            warning("AMBER NetCDF", "this file does not contain space for time, it will not be saved");
+            warning("AMBER NetCDF", "this file does not have a 'time' attribute, it will not be saved");
         }
     }
 
