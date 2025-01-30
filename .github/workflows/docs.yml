@@ -14,13 +14,15 @@ concurrency:
 
 jobs:
   build-and-publish:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: "3.12"
+
       - name: install dependencies
         run: |
           pip install -r doc/requirements.txt
@@ -31,6 +33,7 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=Debug -DCHFL_BUILD_DOCUMENTATION=ON ..
 
           cmake --build . --config Debug --parallel 2 --target doc_html
+
       - name: put documentation in the website
         run: |
           git clone https://github.com/$GITHUB_REPOSITORY --branch gh-pages gh-pages
@@ -45,9 +48,10 @@ jobs:
               rm -rf latest
               mv ../build/doc/html latest
           fi
+
       - name: deploy to gh-pages
         if: github.event_name == 'push'
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./gh-pages/
