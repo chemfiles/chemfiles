@@ -16,6 +16,8 @@ TEST_CASE("Read files in NetCDF format") {
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.4172191, 8.303366, 11.73717), 1e-4));
         CHECK(approx_eq(positions[296], Vector3D(6.664049, 11.61418, 12.96149), 1e-4));
+        // Check time
+        CHECK(approx_eq(frame.get("time")->as_double(), 2.02));
     }
 
     SECTION("Read more than one frame") {
@@ -29,6 +31,7 @@ TEST_CASE("Read files in NetCDF format") {
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.2990952, 8.31003, 11.72146), 1e-4));
         CHECK(approx_eq(positions[296], Vector3D(6.797599, 11.50882, 12.70423), 1e-4));
+        CHECK(approx_eq(frame.get("time")->as_double(), 2.04));
 
         while (!file.done()) {
             frame = file.read();
@@ -36,6 +39,7 @@ TEST_CASE("Read files in NetCDF format") {
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.3185586, 8.776042, 11.8927), 1e-4));
         CHECK(approx_eq(positions[296], Vector3D(7.089802, 10.35007, 12.8159), 1e-4));
+        CHECK(approx_eq(frame.get("time")->as_double(), 3.01));
     }
 
     SECTION("Missing unit cell") {
@@ -85,10 +89,13 @@ TEST_CASE("Write files in NetCDF format") {
         auto cell = frame.cell();
         CHECK(approx_eq(cell.lengths(), {2, 3, 4}, 1e-6));
         CHECK(approx_eq(cell.angles(), {80, 90, 120}, 1e-6));
+
+        CHECK(approx_eq(frame.get("time")->as_double(), 10.0));
     };
 
     auto frame = Frame(UnitCell({2, 3, 4}, {80, 90, 120}));
     frame.set("name", "Test Title 123");
+    frame.set("time", 10.0);
     frame.add_velocities();
     for(size_t i=0; i<4; i++) {
         double d = static_cast<double>(i);

@@ -42,10 +42,12 @@ When writing, the first frame writen to a DCD file sets this header field."""
 type = "number"
 
 LAMMPS = "The time of the frame in time units."
-TNG = "The time of the frame in pico seconds."
-TRR = "The time of the frame in pico seconds."
-XTC = "The time of the frame in pico seconds."
-DCD = "The time of the frame in the file units, only set when reading a file"
+TNG = "The time of the frame in picoseconds."
+TRR = "The time of the frame in picoseconds."
+XTC = "The time of the frame in picoseconds."
+DCD = "The time of the frame in the file units, only set when reading a file."
+"Amber NetCDF" = "The time of the frame in picoseconds."
+"Amber Restart" = "The time of the frame in picoseconds."
 
 [lammps_units]
 type = "string"

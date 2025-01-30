@@ -34,6 +34,7 @@ static size_t get_dimension_id(const netcdf3::Netcdf3Builder& builder, const std
 
 static double scale_for_distance(std::string unit);
 static double scale_for_velocity(std::string unit);
+static double scale_for_time(std::string unit);
 
 /******************************************************************************/
 
@@ -123,6 +124,15 @@ AmberNetCDFBase::AmberNetCDFBase(std::string convention, std::string path, File:
             );
         }
     }
+
+    variables_.time = this->get_variable("time");
+    if (variables_.time.var) {
+        auto units_attr = variables_.time.var->attribute("units");
+        if (units_attr && units_attr->kind() == netcdf3::Value::STRING) {
+            variables_.time.scale *= scale_for_time(units_attr->as_string());
+        }
+    }
+
 
     if (mode == File::APPEND) {
         // start writing at the end of pre-existing files in append mode
@@ -216,6 +226,22 @@ void AmberNetCDFBase::read_step(const size_t step, Frame& frame) {
         frame.add_velocities();
         this->read_array(variables_.velocities, *frame.velocities());
     }
+
+    if (variables_.time.var) {
+        double time_value = 0.0;
+        if (variables_.time.var->type() == netcdf3::constants::NC_FLOAT) {
+            float value;
+            variables_.time.var->read(step, &value, 1);
+            time_value = variables_.time.scale * static_cast<double>(value);
+        } else if (variables_.time.var->type() == netcdf3::constants::NC_DOUBLE) {
+            double value;
+            variables_.time.var->read(step, &value, 1);
+            time_value = variables_.time.scale * value;
+        } else {
+            throw format_error("invalid type for time variable");
+        }
+        frame.set("time", time_value);
+    }
 }
 
 void AmberNetCDFBase::write(const Frame& frame) {
@@ -231,6 +257,8 @@ void AmberNetCDFBase::write(const Frame& frame) {
         variables_.cell_lengths = this->get_variable("cell_lengths");
         variables_.cell_angles = this->get_variable("cell_angles");
 
+        variables_.time = this->get_variable("time");
+
         n_atoms_ = frame.size();
     }
 
@@ -244,6 +272,25 @@ void AmberNetCDFBase::write(const Frame& frame) {
     }
 
     write_cell(frame.cell());
+
+    auto time_opt = frame.get<Property::DOUBLE>("time");
+    if (time_opt) {
+        if (variables_.time.var) {
+            if (variables_.time.var->type() == netcdf3::constants::NC_FLOAT) {
+                // Amber NetCDF trajectory
+                float time_f32 = static_cast<float>(*time_opt);
+                variables_.time.var->write(step_, &time_f32, 1);
+            } else if (variables_.time.var->type() == netcdf3::constants::NC_DOUBLE) {
+                // Amber Restart
+                double time_f64 = *time_opt;
+                variables_.time.var->write(step_, &time_f64, 1);
+            } else {
+                throw format_error("invalid type for time variable");
+            }
+        } else {
+            warning("AMBER NetCDF", "this file does not have a 'time' attribute, it will not be saved");
+        }
+    }
 
     if (variables_.coordinates.var) {
         this->write_array(variables_.coordinates, frame.positions());
@@ -498,6 +545,15 @@ void AmberTrajectory::initialize(const Frame& frame) {
     auto cell_spatial_dim = get_dimension_id(builder, "cell_spatial");
     auto cell_angular_dim = get_dimension_id(builder, "cell_angular");
 
+    // the time property is only set up if the first written frame contains a time information!
+    if (frame.get<Property::DOUBLE>("time")) {
+        builder.add_variable("time", {
+            /* type = */ netcdf3::constants::NC_FLOAT,
+            /* dimensions = */ {frame_dim},
+            /* attributes = */ {{"units", netcdf3::Value("picosecond")}}
+        });
+    }
+
     builder.add_variable("coordinates", {
         /* type = */ netcdf3::constants::NC_FLOAT,
         /* dimensions = */ {frame_dim, atom_dim, spatial_dim},
@@ -618,6 +674,14 @@ void AmberRestart::initialize(const Frame& frame) {
     auto spatial_dim = get_dimension_id(builder, "spatial");
     auto cell_spatial_dim = get_dimension_id(builder, "cell_spatial");
     auto cell_angular_dim = get_dimension_id(builder, "cell_angular");
+
+    if (frame.get<Property::DOUBLE>("time")) {
+        builder.add_variable("time", {
+            /* type = */ netcdf3::constants::NC_DOUBLE,
+            /* dimensions = */ {},
+            /* attributes = */ {{"units", netcdf3::Value("picosecond")}}
+        });
+    }
 
     builder.add_variable("coordinates", {
         /* type = */ netcdf3::constants::NC_DOUBLE,
@@ -797,4 +861,23 @@ double scale_for_velocity(std::string units) {
     }
 
     return scale;
+}
+
+double scale_for_time(std::string units) {
+    to_ascii_lowercase(units);
+
+    if (units == "picoseconds" || units == "picosecond" || units == "ps") {
+        return 1.0;
+    } else if (units == "femtoseconds" || units == "femtosecond" || units == "fs") {
+        return 1e-3;
+    } else if (units == "nanoseconds" || units == "nanosecond" || units == "ns") {
+        return 1e3;
+    } else if (units == "microseconds" || units == "microsecond" || units == "µs" || units == "us") {
+        return 1e6;
+    } else if (units == "seconds" || units == "second" || units == "s") {
+        return 1e12;
+    } else {
+        warning("Amber NetCDF reader", "unknown units ({}) for time", units);
+        return 1.0;
+    }
 }

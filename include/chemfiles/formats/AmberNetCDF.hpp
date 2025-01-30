@@ -58,6 +58,7 @@ protected:
         variable_scale_t velocities;
         variable_scale_t cell_lengths;
         variable_scale_t cell_angles;
+        variable_scale_t time;
     } variables_;
 
     optional<std::string> file_title_;

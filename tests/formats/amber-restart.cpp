@@ -23,6 +23,10 @@ TEST_CASE("Read files in Amber Restart format") {
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.4172191, 8.303366, 11.73717), 1e-4));
         CHECK(approx_eq(positions[296], Vector3D(6.664049, 11.61418, 12.96149), 1e-4));
+
+        // Check time
+        // time in water.ncrst is in ps, but in water.nc it's in fs
+        CHECK(approx_eq(frame.get("time")->as_double(), 2020.0));
     }
 
     SECTION("Missing unit cell") {
@@ -76,10 +80,13 @@ TEST_CASE("Write files in Amber Restart format") {
         auto cell = frame.cell();
         CHECK(approx_eq(cell.lengths(), {2, 3, 4}, 1e-9));
         CHECK(approx_eq(cell.angles(), {80, 90, 120}, 1e-9));
+        
+        CHECK(approx_eq(frame.get("time")->as_double(), 10.0));
     };
 
     auto frame = Frame(UnitCell({2, 3, 4}, {80, 90, 120}));
     frame.set("name", "Test Title 123");
+    frame.set("time", 10.0);
     frame.add_velocities();
     for(size_t i=0; i<4; i++) {
         double d = static_cast<double>(i);
