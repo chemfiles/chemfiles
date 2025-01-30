@@ -653,12 +653,15 @@ static properties_list_t parse_property_list(std::string_view input) {
 }
 
 properties_list_t read_extended_comment_line(std::string_view line, Frame& frame) {
-    // only try to parse as extended XYZ if `Properties` is defined as expected
-    if (line.find("species:S:1:pos:R:3") == std::string::npos) {
+    // only try to parse as extended XYZ if `Properties` or `Lattice` are
+    // defined as expected
+    auto contains_properties = line.find("species:S:1:pos:R:3") != std::string::npos;
+    auto contains_lattice = line.find("Lattice") != std::string::npos;
+    if (!(contains_properties || contains_lattice)) {
         return {};
     }
-    auto properties = extended_xyz_parser(line).parse();
 
+    auto properties = extended_xyz_parser(line).parse();
     for (const auto& it: properties) {
         auto name = it.first;
         if (name == "Lattice" || name == "Properties") {

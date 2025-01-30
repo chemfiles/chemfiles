@@ -1,6 +1,7 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 #include <iostream>
+#include <string>
 
 #include "catch.hpp"
 #include "helpers.hpp"
@@ -123,6 +124,24 @@ TEST_CASE("Read files in XYZ format") {
         CHECK(frame[0].get("strings_0")->as_string() == "bar");
         CHECK(frame[0].get("strings_1")->as_string() == "\"test\"");
     }
+
+    SECTION("Extended XYZ — no Properties=") {
+        auto xyz = std::string(R"(3
+Lattice="10.0 0.0 0.0 0.0 10.0 0.0 0.0 0.0 10.0" pbc="T T T"
+O       0.06633400       0.00000000       0.00370100
+H      -0.52638300      -0.76932700      -0.02936600
+H      -0.52638300       0.76932700      -0.02936600
+)");
+
+        auto file = Trajectory::memory_reader(xyz.data(), xyz.size(), "XYZ");
+        CHECK(file.nsteps() == 1);
+
+        auto frame = file.read();
+        CHECK(frame.size() == 3);
+
+        auto expected = UnitCell({10.0, 10.0, 10.0}, {90.0, 90.0, 90.0});
+        CHECK(approx_eq(frame.cell().matrix(), expected.matrix(), 1e-6));
+    }
 }
 
 static void check_bad_properties_still_read_frame(const Frame& frame) {
@@ -221,7 +240,7 @@ TEST_CASE("Errors in XYZ format") {
 
 TEST_CASE("Write files in XYZ format") {
     auto tmpfile = NamedTempPath(".xyz");
-    const auto EXPECTED_CONTENT =
+    const auto* EXPECTED_CONTENT =
 R"(4
 Properties=species:S:1:pos:R:3:bool:L:1:double:R:1:string:S:1:vector:R:3 name="Test"
 A 1 2 3 T 10 atom_0 10 20 30
@@ -313,7 +332,7 @@ TEST_CASE("Read and write files in memory") {
     }
 
     SECTION("Writing to memory") {
-        const auto expected_content =
+        const auto* expected_content =
 R"(4
 Properties=species:S:1:pos:R:3
 A 1 2 3
