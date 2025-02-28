@@ -424,11 +424,26 @@ Netcdf3File::Netcdf3File(std::string filename, File::Mode mode):
     }
 
     char version = this->read_single_char();
-    if (version != 2) {
+    if (version != 2 && version != 5) {
         throw file_error("only 64-bit netcdf3 files are supported");
     }
 
-    this->n_records_ = static_cast<uint64_t>(this->read_single_i32());
+    if (version == 5) {
+        this->use_64bit_header_ = true;
+        if (mode != 'r') {
+            throw file_error(
+                "file at '{}' can not be written, only read: "
+                "64-bit headers are not supported when writting", this->path()
+            );
+        }
+    }
+
+
+    if (this->use_64bit_header_) {
+        this->n_records_ = this->read_single_u64();
+    } else {
+        this->n_records_ = static_cast<uint64_t>(this->read_single_i32());
+    }
 
     // read dimensions
     auto header = this->read_single_i32();
@@ -438,11 +453,28 @@ Netcdf3File::Netcdf3File(std::string filename, File::Mode mode):
             header
         );
     }
-    auto count = this->read_single_i32();
 
-    for (int i=0; i<count; i++) {
+    int64_t count = 0;
+    if (this->use_64bit_header_) {
+        count = this->read_single_i64();
+    } else {
+        count = this->read_single_i32();
+    }
+
+    for (int64_t i=0; i<count; i++) {
         auto name = this->read_pascal_string();
-        auto size = this->read_single_i32();
+        int32_t size = 0;
+        if (this->use_64bit_header_) {
+            auto real_size = this->read_single_i64();
+            if (real_size >= INT32_MAX) {
+                throw file_error(
+                    "dimensions ({}) larger than 32-bit integer are not supported", name
+                );
+            }
+            size = static_cast<int32_t>(real_size);
+        } else {
+            size = this->read_single_i32();
+        }
         dimensions_.push_back(std::make_shared<Dimension>(std::move(name), size));
     }
 
@@ -475,7 +507,7 @@ Netcdf3File::~Netcdf3File() {
 }
 
 void Netcdf3File::skip_padding(int64_t size) {
-    const auto count = static_cast<uint64_t>(padding(size));
+    auto count = static_cast<uint64_t>(padding(size));
     this->skip(count);
 }
 
@@ -486,7 +518,12 @@ void Netcdf3File::add_padding(int64_t size) {
 }
 
 std::string Netcdf3File::read_pascal_string() {
-    auto size = static_cast<size_t>(this->read_single_i32());
+    size_t size = 0;
+    if (this->use_64bit_header_) {
+        size = static_cast<size_t>(this->read_single_i64());
+    } else {
+        size = static_cast<size_t>(this->read_single_i32());
+    }
     auto value = std::string(size, '\0');
     this->read_char(value.data(), size);
     this->skip_padding(static_cast<int64_t>(size));
@@ -510,10 +547,16 @@ std::map<std::string, Value> Netcdf3File::read_attributes() {
             header
         );
     }
-    auto count = this->read_single_i32();
+
+    int64_t count = 0;
+    if (this->use_64bit_header_) {
+        count = this->read_single_i64();
+    } else {
+        count = this->read_single_i32();
+    }
 
     auto attributes = std::map<std::string, Value>();
-    for (int i=0; i<count; i++) {
+    for (int64_t i=0; i<count; i++) {
         auto name = this->read_pascal_string();
         auto value = this->read_attribute_value();
         attributes.emplace(std::move(name), std::move(value));
@@ -524,7 +567,13 @@ std::map<std::string, Value> Netcdf3File::read_attributes() {
 
 Value Netcdf3File::read_attribute_value() {
     auto type = this->read_single_i32();
-    auto count = static_cast<size_t>(this->read_single_i32());
+
+    size_t count = 0;
+    if (this->use_64bit_header_) {
+        count = static_cast<size_t>(this->read_single_i64());
+    } else {
+        count = static_cast<size_t>(this->read_single_i32());
+    }
 
     if (count != 1 && type != constants::NC_CHAR) {
         throw file_error("not implemented: attributes with more than one value");
@@ -537,7 +586,7 @@ Value Netcdf3File::read_attribute_value() {
         value = Value(this->read_single_char());
     } else if (type == constants::NC_CHAR) {
         size = sizeof(char);
-        auto str = std::string(static_cast<size_t>(count), '\0');
+        auto str = std::string(count, '\0');
         this->read_char(str.data(), count);
         // should we remove trailing NULL if there is any?
         value = Value(std::move(str));
@@ -626,15 +675,33 @@ void Netcdf3File::read_variables() {
             header
         );
     }
-    auto count = this->read_single_i32();
 
-    for (int var_i=0; var_i<count; var_i++) {
+    int64_t count = 0;
+    if (this->use_64bit_header_) {
+        count = this->read_single_i64();
+    } else {
+        count = this->read_single_i32();
+    }
+
+    for (int64_t var_i=0; var_i<count; var_i++) {
         auto name = this->read_pascal_string();
 
-        auto n_dims = this->read_single_i32();
+        int32_t n_dims = 0;
+        if (this->use_64bit_header_) {
+            auto real_n_dims = this->read_single_i64();
+            assert(real_n_dims < INT32_MAX);
+            n_dims = static_cast<int32_t>(real_n_dims);
+        } else {
+            n_dims = this->read_single_i32();
+        }
         auto dimensions = std::vector<std::shared_ptr<Dimension>>();
         for (int i=0; i<n_dims; i++) {
-            auto id = static_cast<size_t>(this->read_single_i32());
+            size_t id = 0;
+            if (this->use_64bit_header_) {
+                id = static_cast<size_t>(this->read_single_i64());
+            } else {
+                id = static_cast<size_t>(this->read_single_i32());
+            }
 
             auto dimension = this->dimensions_[id];
             dimensions.emplace_back(dimension);
@@ -643,7 +710,12 @@ void Netcdf3File::read_variables() {
         auto attributes = this->read_attributes();
 
         auto type = this->read_single_i32();
-        auto size_with_padding = this->read_single_i32();
+        int64_t size_with_padding = 0;
+        if (this->use_64bit_header_) {
+            size_with_padding = this->read_single_i64();
+        } else {
+            size_with_padding = this->read_single_i32();
+        }
         // this is where the 64-bit offset changes something to the format
         // auto offset = this->read_single_i32();
         auto offset = this->read_single_i64();
