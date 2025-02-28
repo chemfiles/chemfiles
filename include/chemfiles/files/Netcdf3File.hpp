@@ -385,6 +385,8 @@ private:
     /// read the header for all variables
     void read_variables();
 
+    /// whether the file uses 32 or 64-bi variables in the headerr
+    bool use_64bit_header_ = false;
     /// current number of records in the file
     uint64_t n_records_ = 0;
     /// size in bytes of a full record entry, including all record variables

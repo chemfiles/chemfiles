@@ -69,12 +69,28 @@ TEST_CASE("Read files in NetCDF format") {
         CHECK(approx_eq(velocities[1400], Vector3D(0.6854072, 0.09196011, 2.260214) * -0.856, 1e-4));
         CHECK(approx_eq(velocities[1600], Vector3D(-0.3342645, 0.322594, -2.446901) * -0.856, 1e-4));
     }
+
+    SECTION("Netcdf v5") {
+        auto file = Trajectory("data/netcdf/version-5.nc");
+        CHECK(file.nsteps() == 11);
+        auto frame = file.read_step(2);
+        CHECK(frame.size() == 1576);
+
+        auto cell = frame.cell();
+        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+        CHECK(approx_eq(cell.lengths(), Vector3D(24, 23.38269, 0), 1e-4));
+
+        auto positions = frame.positions();
+        CHECK(approx_eq(positions[0], Vector3D(7.751209, 13.0018, 52.84197), 1e-4));
+        CHECK(approx_eq(positions[1273], Vector3D(12.75, 22.08365, 0), 1e-4));
+    }
 }
+
 
 TEST_CASE("Write files in NetCDF format") {
     auto check_frame = [](const Frame& frame) {
         CHECK(frame.get("name").value() == "Test Title 123");
-        auto positions = frame.positions();
+        const auto& positions = frame.positions();
         CHECK(approx_eq(positions[0], {0, 0, 0}, 1e-6));
         CHECK(approx_eq(positions[1], {1, 2, 3}, 1e-6));
         CHECK(approx_eq(positions[2], {2, 4, 6}, 1e-6));
@@ -98,7 +114,7 @@ TEST_CASE("Write files in NetCDF format") {
     frame.set("time", 10.0);
     frame.add_velocities();
     for(size_t i=0; i<4; i++) {
-        double d = static_cast<double>(i);
+        auto d = static_cast<double>(i);
         frame.add_atom(
             Atom("X"),
             {1.0 * d, 2.0 * d, 3.0 * d},
