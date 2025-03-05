@@ -291,9 +291,9 @@ void LAMMPSDataFormat::read_header(Frame& frame) {
                     "invalid header value: expected '<xy> <xz> <yz> xy xz yz', got '{}'", content
                 );
             }
-            matrix[0][1] = parse<double>(splitted[0]);
-            matrix[0][2] = parse<double>(splitted[1]);
-            matrix[1][2] = parse<double>(splitted[2]);
+            matrix[1][0] = parse<double>(splitted[0]);
+            matrix[2][0] = parse<double>(splitted[1]);
+            matrix[2][1] = parse<double>(splitted[2]);
             // Even if all parameters are 0, set shape to TRICLINIC
             shape = UnitCell::TRICLINIC;
         } else {
@@ -752,13 +752,13 @@ void LAMMPSDataFormat::write_header(const DataTypes& types, const Frame& frame) 
     file_.print("{:#.9} {:#.9} ylo yhi\n", 0.0, matrix[1][1]);
     file_.print("{:#.9} {:#.9} zlo zhi\n", 0.0, matrix[2][2]);
     if (frame.cell().shape() == UnitCell::TRICLINIC) {
-        assert(tilt_factor(matrix, 1, 0) == 0);
-        assert(tilt_factor(matrix, 2, 0) == 0);
-        assert(tilt_factor(matrix, 2, 1) == 0);
+        assert(tilt_factor(matrix, 0, 1) == 0);
+        assert(tilt_factor(matrix, 0, 2) == 0);
+        assert(tilt_factor(matrix, 1, 2) == 0);
         file_.print("{:#.9} {:#.9} {:#.9} xy xz yz\n",
-            tilt_factor(matrix, 0, 1),
-            tilt_factor(matrix, 0, 2),
-            tilt_factor(matrix, 1, 2)
+            tilt_factor(matrix, 1, 0),
+            tilt_factor(matrix, 2, 0),
+            tilt_factor(matrix, 2, 1)
         );
     }
 
@@ -1009,7 +1009,7 @@ std::vector<size_t> guess_molecules(const Frame& frame) {
 double tilt_factor(const Matrix3D& matrix, size_t i, size_t j) {
     assert(i != j);
     auto factor = matrix[i][j];
-    auto a = matrix[i][i];
+    auto a = matrix[j][j];
     if (factor >= 0) {
         while (fabs(factor) > a / 2) {
             factor -= a;

@@ -31,7 +31,7 @@ static double sind(double theta) {
     return sin(deg2rad(theta));
 }
 
-namespace chemfiles { namespace private_details {
+namespace chemfiles { namespace details {
     bool is_roughly_zero(double value) {
         // We think that 0.00001 is close enough to 0
         return fabs(value) < 1e-5;
@@ -48,13 +48,13 @@ namespace chemfiles { namespace private_details {
                is_roughly_zero(matrix[0][2]) && is_roughly_zero(matrix[1][2]);
     }
 
-    bool is_upper_triangular(const Matrix3D& matrix) {
-        return is_roughly_zero(matrix[1][0]) && is_roughly_zero(matrix[2][0]) &&
-               is_roughly_zero(matrix[2][1]);
+    bool is_lower_triangular(const Matrix3D& matrix) {
+        return is_roughly_zero(matrix[0][1]) && is_roughly_zero(matrix[0][2]) &&
+               is_roughly_zero(matrix[1][2]);
     }
 }}
 
-using namespace chemfiles::private_details;
+using namespace chemfiles::details;
 
 static void check_lengths(const Vector3D& lengths) {
     if (lengths[0] < 0 || lengths[1] < 0 || lengths[2] < 0) {
@@ -91,37 +91,37 @@ static Matrix3D cell_matrix_from_lenths_angles(Vector3D lengths, Vector3D angles
     auto matrix = Matrix3D::zero();
 
     matrix[0][0] = lengths[0];
-    matrix[1][0] = 0;
-    matrix[2][0] = 0;
+    matrix[0][1] = 0;
+    matrix[0][2] = 0;
 
-    matrix[0][1] = cosd(angles[2]) * lengths[1];
+    matrix[1][0] = cosd(angles[2]) * lengths[1];
     matrix[1][1] = sind(angles[2]) * lengths[1];
-    matrix[2][1] = 0;
+    matrix[1][2] = 0;
 
-    matrix[0][2] = cosd(angles[1]);
-    matrix[1][2] = (cosd(angles[0]) - cosd(angles[1]) * cosd(angles[2])) / sind(angles[2]);
-    matrix[2][2] = sqrt(1 - matrix[0][2] * matrix[0][2] - matrix[1][2] * matrix[1][2]);
-    matrix[0][2] *= lengths[2];
-    matrix[1][2] *= lengths[2];
+    matrix[2][0] = cosd(angles[1]);
+    matrix[2][1] = (cosd(angles[0]) - cosd(angles[1]) * cosd(angles[2])) / sind(angles[2]);
+    matrix[2][2] = sqrt(1 - matrix[2][0] * matrix[2][0] - matrix[2][1] * matrix[2][1]);
+    matrix[2][0] *= lengths[2];
+    matrix[2][1] *= lengths[2];
     matrix[2][2] *= lengths[2];
 
-    assert(is_upper_triangular(matrix));
+    assert(is_lower_triangular(matrix));
 
     return matrix;
 }
 
 static Vector3D calc_lengths_from_cell_matrix(const Matrix3D& matrix) {
-    Vector3D v1 = {matrix[0][0], matrix[1][0], matrix[2][0]};
-    Vector3D v2 = {matrix[0][1], matrix[1][1], matrix[2][1]};
-    Vector3D v3 = {matrix[0][2], matrix[1][2], matrix[2][2]};
+    auto v1 = Vector3D(matrix[0]);
+    auto v2 = Vector3D(matrix[1]);
+    auto v3 = Vector3D(matrix[2]);
 
     return {v1.norm(), v2.norm(), v3.norm()};
 }
 
 static Vector3D calc_angles_from_cell_matrix(const Matrix3D& matrix) {
-    Vector3D v1 = {matrix[0][0], matrix[1][0], matrix[2][0]};
-    Vector3D v2 = {matrix[0][1], matrix[1][1], matrix[2][1]};
-    Vector3D v3 = {matrix[0][2], matrix[1][2], matrix[2][2]};
+    auto v1 = Vector3D(matrix[0]);
+    auto v2 = Vector3D(matrix[1]);
+    auto v3 = Vector3D(matrix[2]);
 
     return {
         rad2deg(acos(dot(v2, v3) / (v2.norm() * v3.norm()))),
@@ -153,7 +153,7 @@ UnitCell::UnitCell(Vector3D lengths): UnitCell(lengths, {90, 90, 90}) {}
 UnitCell::UnitCell(Vector3D lengths, Vector3D angles):
     UnitCell(cell_matrix_from_lenths_angles(lengths, angles)) {}
 
-UnitCell::UnitCell(Matrix3D matrix): matrix_(matrix), matrix_inv_(Matrix3D::unit()) {
+UnitCell::UnitCell(Matrix3D matrix): matrix_(matrix), matrix_inv_transposed_(Matrix3D::unit()) {
     auto determinant = matrix_.determinant();
     if (determinant < 0.0) {
         throw error("invalid unit cell matrix with negative determinant");
@@ -178,7 +178,7 @@ UnitCell::UnitCell(Matrix3D matrix): matrix_(matrix), matrix_inv_(Matrix3D::unit
 
     if (!is_roughly_zero(this->volume())) {
         // Do not try to invert a cell with a 0 volume
-        matrix_inv_ = matrix_.invert();
+        matrix_inv_transposed_ = matrix_.invert().transpose();
     }
 }
 
@@ -251,7 +251,7 @@ void UnitCell::set_lengths(Vector3D lengths) {
 
     check_lengths(lengths);
 
-    if (!is_upper_triangular(matrix_)) {
+    if (!is_lower_triangular(matrix_)) {
         warning("UnitCell", "resetting unit cell orientation in set_lengths");
     }
 
@@ -266,7 +266,7 @@ void UnitCell::set_angles(Vector3D angles) {
 
     check_angles(angles);
 
-    if (!is_upper_triangular(matrix_)) {
+    if (!is_lower_triangular(matrix_)) {
         warning("UnitCell", "resetting unit cell orientation in set_angles");
     }
 
@@ -284,11 +284,11 @@ Vector3D UnitCell::wrap_orthorhombic(const Vector3D& vector) const {
 }
 
 Vector3D UnitCell::wrap_triclinic(const Vector3D& vector) const {
-    auto fractional = matrix_inv_ * vector;
+    auto fractional = matrix_inv_transposed_ * vector;
     fractional[0] -= round(fractional[0]);
     fractional[1] -= round(fractional[1]);
     fractional[2] -= round(fractional[2]);
-    return matrix_ * fractional;
+    return matrix_.transpose() * fractional;
 }
 
 Vector3D UnitCell::wrap(const Vector3D& vector) const {

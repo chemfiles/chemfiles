@@ -49,7 +49,7 @@ template <> const FormatMetadata& chemfiles::format_metadata<LAMMPSTrajectoryFor
     return metadata;
 }
 
-using chemfiles::private_details::is_upper_triangular;
+using chemfiles::details::is_lower_triangular;
 
 static optional<std::string_view> get_item(std::string_view line) {
     auto splitted = split(line, ':');
@@ -88,7 +88,7 @@ std::array<double, 3> LAMMPSTrajectoryFormat::read_cell(Frame& frame) {
             matrix[0][0] = xhi - xlo;
             origin[0] = xlo;
             if (shape == UnitCell::TRICLINIC) {
-                matrix[0][1] = parse<double>(splitted[2]);
+                matrix[1][0] = parse<double>(splitted[2]);
             }
 
             line = file_.readline();
@@ -105,7 +105,7 @@ std::array<double, 3> LAMMPSTrajectoryFormat::read_cell(Frame& frame) {
             matrix[1][1] = yhi - ylo;
             origin[1] = ylo;
             if (shape == UnitCell::TRICLINIC) {
-                matrix[0][2] = parse<double>(splitted[2]);
+                matrix[2][0] = parse<double>(splitted[2]);
             }
 
             line = file_.readline();
@@ -122,7 +122,7 @@ std::array<double, 3> LAMMPSTrajectoryFormat::read_cell(Frame& frame) {
             matrix[2][2] = zhi - zlo;
             origin[2] = zlo;
             if (shape == UnitCell::TRICLINIC) {
-                matrix[1][2] = parse<double>(splitted[2]);
+                matrix[2][1] = parse<double>(splitted[2]);
             }
 
             auto cell = UnitCell(matrix);
@@ -303,8 +303,8 @@ detect_best_pos_representation(const std::vector<AtomField>& fields) {
 
 static void unwrap(Vector3D& position, std::array<int, 3>& image, Matrix3D& matrix) {
     // unwrap coordinates by using image data
-    position[0] += image[0] * matrix[0][0] + image[1] * matrix[0][1] + image[2] * matrix[0][2];
-    position[1] += image[1] * matrix[1][1] + image[2] * matrix[1][2];
+    position[0] += image[0] * matrix[0][0] + image[1] * matrix[1][0] + image[2] * matrix[2][0];
+    position[1] += image[1] * matrix[1][1] + image[2] * matrix[2][1];
     position[2] += image[2] * matrix[2][2];
 }
 
@@ -538,10 +538,10 @@ void LAMMPSTrajectoryFormat::read_next(Frame& frame) {
         for (size_t i = 0; i < natoms; ++i) {
             // x = xlo + xs * (xhi - xlo) + ys * xy + zs * xz
             positions[i][0] = origin[0] + positions[i][0] * matrix[0][0] +
-                              positions[i][1] * matrix[0][1] + positions[i][2] * matrix[0][2];
+                              positions[i][1] * matrix[1][0] + positions[i][2] * matrix[2][0];
             // y = ylo + ys * (yhi - ylo) + z * yz
             positions[i][1] =
-                origin[1] + positions[i][1] * matrix[1][1] + positions[i][2] * matrix[1][2];
+                origin[1] + positions[i][1] * matrix[1][1] + positions[i][2] * matrix[2][1];
             // z = zlo + zs * (zhi - zlo)
             positions[i][2] = origin[2] + positions[i][2] * matrix[2][2];
             if (images && use_pos_repr != SCALED_UNWRAPPED) {
@@ -600,14 +600,14 @@ void LAMMPSTrajectoryFormat::write_next(const Frame& frame) {
         file_.print("{:-1.12e} {:-1.12e}\n", 0.0, lengths[2]);
     } else { // Triclinic
         const auto& matrix = cell.matrix();
-        if (!is_upper_triangular(matrix)) {
-            throw format_error("unsupported triclinic but non upper-triangular cell "
+        if (!is_lower_triangular(matrix)) {
+            throw format_error("unsupported triclinic but non lower-triangular cell "
                                "matrix in LAMMPS writer");
         }
         file_.print("ITEM: BOX BOUNDS xy xz yz pp pp pp\n");
-        file_.print("{:-1.12e} {:-1.12e} {:-1.12e}\n", 0.0, matrix[0][0], matrix[0][1]);
-        file_.print("{:-1.12e} {:-1.12e} {:-1.12e}\n", 0.0, matrix[1][1], matrix[0][2]);
-        file_.print("{:-1.12e} {:-1.12e} {:-1.12e}\n", 0.0, matrix[2][2], matrix[1][2]);
+        file_.print("{:-1.12e} {:-1.12e} {:-1.12e}\n", 0.0, matrix[0][0], matrix[1][0]);
+        file_.print("{:-1.12e} {:-1.12e} {:-1.12e}\n", 0.0, matrix[1][1], matrix[2][0]);
+        file_.print("{:-1.12e} {:-1.12e} {:-1.12e}\n", 0.0, matrix[2][2], matrix[2][1]);
     }
 
     bool has_names = false;

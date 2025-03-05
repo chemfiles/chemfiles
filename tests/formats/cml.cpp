@@ -62,7 +62,7 @@ TEST_CASE("Read files in CML format") {
         CHECK(approx_eq(cell.angles(), {90.0, 90.0, 120.0}, 1e-12));
 
         auto positions = frame.positions();
-        auto fract0 = frame.cell().matrix().invert() * positions[0];
+        auto fract0 = frame.cell().matrix().invert().transpose() * positions[0];
         CHECK(approx_eq(fract0, Vector3D(-1.77493, 0.980333, 0.0000), 1e-3));
     }
 

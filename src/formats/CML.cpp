@@ -255,7 +255,7 @@ void CMLFormat::read_atoms(Frame& frame, const pugi::xml_node& atoms) {
 
         Vector3D position;
         if (frame.cell().shape() != UnitCell::INFINITE && (xf != 0.0 || yf != 0.0 || zf != 0.0)) {
-            position = frame.cell().matrix() * Vector3D(xf, yf, zf);
+            position = frame.cell().matrix().transpose() * Vector3D(xf, yf, zf);
         } else if (x3 == 0.0 && y3 == 0.0 && z3 == 0.0) {
             position = Vector3D(x2, y2, 0);
         } else {

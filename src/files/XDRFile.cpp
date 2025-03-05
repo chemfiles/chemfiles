@@ -53,7 +53,7 @@ std::string XDRFile::read_gmx_string() {
 
 void XDRFile::write_gmx_string(const std::string& value) {
     // lenght with null terminator
-    const uint32_t len = static_cast<uint32_t>(value.size() + 1);
+    auto len = static_cast<uint32_t>(value.size() + 1);
     write_single_u32(len);
     // next comes XDR string without terminator
     write_opaque(value.c_str(), len - 1);
@@ -64,8 +64,7 @@ UnitCell XDRFile::read_gmx_box(bool use_double) {
         // Double
         std::vector<double> box(3 * 3);
         read_f64(box);
-        auto matrix =
-            Matrix3D(box[0], box[3], box[6], box[1], box[4], box[7], box[2], box[5], box[8]);
+        auto matrix = Matrix3D(box[0], box[1], box[2], box[3], box[4], box[5], box[6], box[7], box[8]);
         // Factor 10 because the lengths are in nm in the TPR/TRR/XTC format
         return UnitCell(10.0 * matrix);
     } else {
@@ -73,9 +72,9 @@ UnitCell XDRFile::read_gmx_box(bool use_double) {
         std::vector<float> box(3 * 3);
         read_f32(box);
         auto matrix = Matrix3D(
-            static_cast<double>(box[0]), static_cast<double>(box[3]), static_cast<double>(box[6]),
-            static_cast<double>(box[1]), static_cast<double>(box[4]), static_cast<double>(box[7]),
-            static_cast<double>(box[2]), static_cast<double>(box[5]), static_cast<double>(box[8]));
+            static_cast<double>(box[0]), static_cast<double>(box[1]), static_cast<double>(box[2]),
+            static_cast<double>(box[3]), static_cast<double>(box[4]), static_cast<double>(box[5]),
+            static_cast<double>(box[6]), static_cast<double>(box[7]), static_cast<double>(box[8]));
         // Factor 10 because the lengths are in nm in the TPR/TRR/XTC format
         return UnitCell(10.0 * matrix);
     }
@@ -311,12 +310,12 @@ static void unpack_from_int(
     T v = 0;
     size_t num_of_bytes = 0;
     while (num_of_bits >= 8) {
-        const T byte = decodebits<T>(buf, state, 8);
+        auto byte = decodebits<T>(buf, state, 8);
         v |= byte << (8 * num_of_bytes++);
         num_of_bits -= 8;
     }
     if (num_of_bits > 0) {
-        const T byte = decodebits<T>(buf, state, num_of_bits);
+        auto byte = decodebits<T>(buf, state, num_of_bits);
         v |= byte << (8 * num_of_bytes);
     }
 
@@ -376,7 +375,7 @@ static void decodeints(const std::vector<char>& buf, DecodeState& state, uint32_
     for (size_t i = 2; i > 0; --i) {
         uint32_t num = 0;
         for (size_t j = 0; j < num_of_bytes; ++j) {
-            const size_t k = num_of_bytes - 1 - j;
+            size_t k = num_of_bytes - 1 - j;
             num = (num << 8) | bytes[k];
             uint32_t p = num / sizes[i];
             bytes[k] = static_cast<uint8_t>(p);
@@ -387,8 +386,12 @@ static void decodeints(const std::vector<char>& buf, DecodeState& state, uint32_
     nums[0] = bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
 }
 
-static uint32_t calc_sizeint(const int minint[3], const int maxint[3], uint32_t sizeint[3],
-                             uint32_t bitsizeint[3]) {
+static uint32_t calc_sizeint(
+    const int minint[3],
+    const int maxint[3],
+    uint32_t sizeint[3],
+    uint32_t bitsizeint[3]
+) {
     sizeint[0] = static_cast<uint32_t>(maxint[0] - minint[0]) + 1;
     sizeint[1] = static_cast<uint32_t>(maxint[1] - minint[1]) + 1;
     sizeint[2] = static_cast<uint32_t>(maxint[2] - minint[2]) + 1;
@@ -422,7 +425,7 @@ static const int MAGICINTS[] = {
 /***** from xdrfile (end) *****/
 
 float XDRFile::read_gmx_compressed_floats(std::vector<float>& data) {
-    const float precision = read_single_f32();
+    auto precision = read_single_f32();
     const int minint[3] = {
         read_single_i32(),
         read_single_i32(),
@@ -440,7 +443,7 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data) {
 
     uint32_t sizeint[3];
     uint32_t bitsizeint[3];
-    const uint32_t bitsize = calc_sizeint(minint, maxint, sizeint, bitsizeint);
+    auto bitsize = calc_sizeint(minint, maxint, sizeint, bitsizeint);
 
     size_t tmpidx = smallidx - 1;
     tmpidx = (FIRSTIDX > tmpidx) ? FIRSTIDX : tmpidx;
@@ -454,12 +457,12 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data) {
     intbuf_.resize(data.size());
 
     assert(data.size() % 3 == 0 && "internal Error: invalid allocation size");
-    const size_t natoms = data.size() / 3;
+    auto natoms = data.size() / 3;
 
     DecodeState state = {0, 0, 0};
     int run = 0;
     int prevcoord[3];
-    const float inv_precision = 1.0f / precision;
+    auto inv_precision = 1.0f / precision;
     size_t write_idx = 0;
     for (size_t read_idx = 0; read_idx < natoms; ++read_idx) {
         auto thiscoord = span<int32_t>(intbuf_.data() + read_idx * 3, 3);
@@ -481,7 +484,7 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data) {
         prevcoord[1] = thiscoord[1];
         prevcoord[2] = thiscoord[2];
 
-        const bool flag = decodebits<bool>(compressed_data_, state, 1);
+        auto flag = decodebits<bool>(compressed_data_, state, 1);
         int is_smaller = 0;
         if (flag) {
             run = decodebits<int>(compressed_data_, state, 5);
@@ -560,12 +563,10 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
     }
     write_single_f32(precision);
 
-    const size_t size3 = data.size();
-    intbuf_.resize(size3);
-    compressed_data_.resize(size3 * sizeof(int32_t));
-
     assert(data.size() % 3 == 0 && "internal Error: invalid allocation size");
-    const size_t natoms = data.size() / 3;
+    auto natoms = data.size() / 3;
+    intbuf_.resize(3 * natoms);
+    compressed_data_.resize(3 * natoms * sizeof(int32_t));
 
     int minint[3] = {INT_MAX, INT_MAX, INT_MAX};
     int maxint[3] = {INT_MIN, INT_MIN, INT_MIN};
@@ -574,7 +575,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
     int oldlint[3] = {0, 0, 0};
     for (size_t atom_idx = 0; atom_idx < natoms; ++atom_idx) {
         auto thiscoord = span<int32_t>(intbuf_.data() + atom_idx * 3, 3);
-        const auto thiscoord_fl = span<const float>(data.data() + atom_idx * 3, 3);
+        auto thiscoord_fl = span<const float>(data.data() + atom_idx * 3, 3);
         int lint[3];
         for (size_t i = 0; i < 3; ++i) {
             // find nearest integer
@@ -627,7 +628,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
 
     uint32_t sizeint[3];
     uint32_t bitsizeint[3];
-    const uint32_t bitsize = calc_sizeint(minint, maxint, sizeint, bitsizeint);
+    auto bitsize = calc_sizeint(minint, maxint, sizeint, bitsizeint);
 
     size_t tmpidx = smallidx + 8;
     size_t maxidx = (LASTIDX < tmpidx) ? LASTIDX : tmpidx;

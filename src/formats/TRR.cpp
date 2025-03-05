@@ -393,13 +393,13 @@ void get_cell(std::vector<float>& box, const Frame& frame) {
     // Factor 10 because the lengths are in nm in the TRR format
     auto matrix = frame.cell().matrix() / 10.0;
     box[0] = static_cast<float>(matrix[0][0]);
-    box[1] = static_cast<float>(matrix[1][0]);
-    box[2] = static_cast<float>(matrix[2][0]);
-    box[3] = static_cast<float>(matrix[0][1]);
+    box[1] = static_cast<float>(matrix[0][1]);
+    box[2] = static_cast<float>(matrix[0][2]);
+    box[3] = static_cast<float>(matrix[1][0]);
     box[4] = static_cast<float>(matrix[1][1]);
-    box[5] = static_cast<float>(matrix[2][1]);
-    box[6] = static_cast<float>(matrix[0][2]);
-    box[7] = static_cast<float>(matrix[1][2]);
+    box[5] = static_cast<float>(matrix[1][2]);
+    box[6] = static_cast<float>(matrix[2][0]);
+    box[7] = static_cast<float>(matrix[2][1]);
     box[8] = static_cast<float>(matrix[2][2]);
 }
 
