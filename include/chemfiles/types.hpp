@@ -38,6 +38,9 @@ public:
     /// @example{vector3d/vector3d-3.cpp}
     Vector3D(double x, double y, double z): super({{x, y, z}}) {}
 
+    /// Create a Vector3D from an std::array
+    Vector3D(std::array<double, 3> v): super(v) {}
+
     ~Vector3D() = default;
     Vector3D(const Vector3D&) = default;
     Vector3D& operator=(const Vector3D&) = default;

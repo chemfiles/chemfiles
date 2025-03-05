@@ -112,7 +112,7 @@ void CSSRFormat::read_next(Frame& frame) {
 
         auto position = Vector3D(x, y, z);
         if (use_fractional) {
-            position = frame.cell().matrix() * position;
+            position = frame.cell().matrix().transpose() * position;
         }
 
         // Atomic names can be created as <type><id>: O121 H22
@@ -182,7 +182,7 @@ void CSSRFormat::write_next(const Frame& frame) {
     }
 
     const auto& positions = frame.positions();
-    auto cell_inv = frame.cell().matrix().invert();
+    auto cell_inv = frame.cell().matrix().invert().transpose();
     for (size_t i = 0; i<frame.size(); i++) {
         std::string atom_id;
         if (i <= 9999) {

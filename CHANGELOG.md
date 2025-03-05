@@ -33,7 +33,11 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   proposed by [libxtc](https://doi.org/10.1186/s13104-021-05536-5)
 
 ### Changes to the C++ API
-- Per-atom properties are optional, i.e. `Atom::properties` returns an optional property map.
+
+- Per-atom properties are optional, i.e. `Atom::properties` returns an optional
+  property map.
+- Unit cell matrixes are now stored one cell vector per row (previously of cell
+  vector per column).
 
 ## 0.10.0 (14 Feb 2021)
 

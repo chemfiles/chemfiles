@@ -75,9 +75,9 @@ TEST_CASE("Use the UnitCell type") {
             CHECK(approx_eq(cell.volume(), 1119.9375925598192, 1e-12));
 
             matrix = Matrix3D(
-                26.2553,  0.0000, -4.4843,
+                26.2553,  0.0000,  0.0000,
                  0.0000, 11.3176,  0.0000,
-                 0.0000,  0.0000,  11.011
+                -4.4843,  0.0000,  11.011
             );
 
             cell = UnitCell(matrix);

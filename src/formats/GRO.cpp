@@ -52,7 +52,7 @@ template<> const FormatMetadata& chemfiles::format_metadata<GROFormat>() {
     return metadata;
 }
 
-using chemfiles::private_details::is_upper_triangular;
+using chemfiles::details::is_lower_triangular;
 
 /// Check the number of digits before the decimal separator to be sure than
 /// we can represent them. In case of error, use the given `context` in the error
@@ -152,9 +152,9 @@ void GROFormat::read_next(Frame& frame) {
         auto v3_y = parse<double>(box_values[8]) * 10;
 
         auto cell = UnitCell({
-            v1_x, v2_x, v3_x,
-            0.00, v2_y, v3_y,
-            0.00, 0.00, v3_z
+            v1_x, 0.00, 0.00,
+            v2_x, v2_y, 0.00,
+            v3_x, v3_y, v3_z
         });
         frame.set_cell(cell);
     }
@@ -257,14 +257,14 @@ void GROFormat::write_next(const Frame& frame) {
         file_.print("   {:8.5f} {:8.5f} {:8.5f}\n", lengths[0], lengths[1], lengths[2]);
     } else { // Triclinic
         const auto& matrix = cell.matrix() / 10;
-        if (!is_upper_triangular(matrix)) {
-            throw format_error("unsupported triclinic but non upper-triangular cell matrix in GRO writer");
+        if (!is_lower_triangular(matrix)) {
+            throw format_error("unsupported triclinic but non lower-triangular cell matrix in GRO writer");
         }
         check_values_size(Vector3D(matrix[0][0], matrix[1][1], matrix[2][2]), 8, "unit cell");
-        check_values_size(Vector3D(matrix[0][1], matrix[0][2], matrix[1][2]), 8, "unit cell");
+        check_values_size(Vector3D(matrix[1][0], matrix[2][0], matrix[2][1]), 8, "unit cell");
         file_.print(
             "   {:8.5f} {:8.5f} {:8.5f} 0.0 0.0 {:8.5f} 0.0 {:8.5f} {:8.5f}\n",
-            matrix[0][0], matrix[1][1], matrix[2][2], matrix[0][1], matrix[0][2], matrix[1][2]
+            matrix[0][0], matrix[1][1], matrix[2][2], matrix[1][0], matrix[2][0], matrix[2][1]
         );
     }
 }

@@ -627,9 +627,9 @@ void DCDFormat::write_cell(const UnitCell& cell) {
         }
     }
 
-    if (!chemfiles::private_details::is_upper_triangular(cell.matrix())) {
+    if (!chemfiles::details::is_lower_triangular(cell.matrix())) {
         warning("DCD writer",
-            "the unit cell is not upper-triangular, positions might not align "
+            "the unit cell is not lower-triangular, positions might not align "
             "with the cell in the file"
         );
     }

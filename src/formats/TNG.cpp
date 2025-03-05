@@ -230,9 +230,9 @@ void TNGFormat::read_cell(Frame& frame) {
     }
 
     auto matrix = distance_scale_factor_ * Matrix3D(
-        static_cast<double>(buffer[0]), static_cast<double>(buffer[3]), static_cast<double>(buffer[6]),
-        static_cast<double>(buffer[1]), static_cast<double>(buffer[4]), static_cast<double>(buffer[7]),
-        static_cast<double>(buffer[2]), static_cast<double>(buffer[5]), static_cast<double>(buffer[8])
+        static_cast<double>(buffer[0]), static_cast<double>(buffer[1]), static_cast<double>(buffer[2]),
+        static_cast<double>(buffer[3]), static_cast<double>(buffer[4]), static_cast<double>(buffer[5]),
+        static_cast<double>(buffer[6]), static_cast<double>(buffer[7]), static_cast<double>(buffer[8])
     );
 
     frame.set_cell(UnitCell(matrix));

@@ -65,18 +65,26 @@ typedef struct CHFL_ATOM CHFL_ATOM;
 ///
 /// A `CHFL_CELL` represent the box containing the atoms, and its periodicity.
 ///
-/// An unit cell is fully represented by three lengths (a, b, c); and three angles
-/// (alpha, beta, gamma). The angles are stored in degrees, and the lengths in
-/// Angstroms.
-///
-/// A cell also has a matricial representation, by projecting the three base
-/// vector into an orthonormal base. We choose to represent such matrix as an
-/// upper triangular matrix:
+/// An unit cell is defined by three vectors (A, B, and C), which can be stored
+/// together to define a matrix represenation of the cell (storing one vector
+/// per row):
 ///
 /// ```
-/// | a_x   b_x   c_x |
-/// |  0    b_y   c_y |
-/// |  0     0    c_z |
+/// | a_x    a_y   a_z |
+/// | b_x    b_y   b_z |
+/// | c_x    c_y   c_z |
+/// ```
+///
+/// Alternatively, the cell can be represented with three lengths (a, b, c); and
+/// three angles (alpha, beta, gamma). The angles are stored in degrees, and the
+/// lengths in Angstroms. In this representation, the overall cell orientation
+/// is lost, and we choose to orient the cell such that the A vector is along
+/// the x axis, and the B vector is in the xy plane:
+///
+/// ```
+/// | a_x    0     0   |
+/// | b_x    b_y   0   |
+/// | c_x    c_y   c_z |
 /// ```
 typedef struct CHFL_CELL CHFL_CELL;
 

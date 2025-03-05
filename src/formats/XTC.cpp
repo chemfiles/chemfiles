@@ -111,8 +111,7 @@ void XTCFormat::read(Frame& frame) {
     frame.set("time", static_cast<double>(header.time)); // time in pico seconds
     frame.resize(header.natoms);
 
-    const auto box = file_.read_gmx_box();
-    frame.set_cell(box);
+    frame.set_cell(file_.read_gmx_box());
 
     size_t natoms_again = file_.read_single_size_as_i32();
     if (natoms_again != header.natoms) {
@@ -172,18 +171,17 @@ void XTCFormat::determine_frame_offsets() {
 
     natoms_ = header.natoms;
 
-    const uint64_t filesize = file_.file_size();
+    uint64_t filesize = file_.file_size();
 
     frame_offsets_.clear();
     frame_offsets_.emplace_back(0);
 
     // GROMACS does not bother with compression for nine atoms or less
     if (header.natoms <= 9) {
-        const uint64_t framebytes =
-            static_cast<uint64_t>(XTC_SMALL_HEADER_SIZE + header.natoms * XTC_SMALL_COORDS_SIZE);
+        auto framebytes = static_cast<uint64_t>(XTC_SMALL_HEADER_SIZE + header.natoms * XTC_SMALL_COORDS_SIZE);
         file_.seek(framebytes);
 
-        const uint64_t nframes = filesize / framebytes;
+        auto nframes = filesize / framebytes;
         frame_offsets_.reserve(static_cast<size_t>(nframes));
 
         for (uint64_t i = 1; i < nframes; ++i) {
@@ -192,15 +190,15 @@ void XTCFormat::determine_frame_offsets() {
     } else {
         file_.seek(XTC_HEADER_SIZE);
 
-        uint64_t framebytes = static_cast<uint64_t>(round_to_int_boundary(file_.read_single_i32()));
+        auto framebytes = static_cast<uint64_t>(round_to_int_boundary(file_.read_single_i32()));
 
-        const size_t est_nframes = static_cast<size_t>(filesize / (framebytes + XTC_HEADER_SIZE));
+        auto est_nframes = static_cast<size_t>(filesize / (framebytes + XTC_HEADER_SIZE));
         frame_offsets_.reserve(est_nframes);
 
         while (true) {
             file_.skip(framebytes + XTC_HEADER_SIZE);
 
-            const uint64_t frame_pos = file_.tell() - XTC_HEADER_SIZE;
+            auto frame_pos = file_.tell() - XTC_HEADER_SIZE;
             try {
                 framebytes = static_cast<uint64_t>(round_to_int_boundary(file_.read_single_i32()));
             } catch (const Error&) {
@@ -214,7 +212,7 @@ void XTCFormat::determine_frame_offsets() {
 }
 
 void XTCFormat::write(const Frame& frame) {
-    const size_t natoms = frame.size();
+    auto natoms = frame.size();
     if (frame_offsets_.empty() && step_ == 0) {
         natoms_ = natoms;
     } else if (natoms_ != natoms) {
@@ -241,8 +239,7 @@ void XTCFormat::write(const Frame& frame) {
     if (natoms <= 9) {
         file_.write_f32(x);
     } else {
-        const float precision =
-            static_cast<float>(frame.get("xtc_precision").value_or(1000.0).as_double());
+        auto precision = static_cast<float>(frame.get("xtc_precision").value_or(1000.0).as_double());
         file_.write_gmx_compressed_floats(x, precision);
     }
 
@@ -262,13 +259,13 @@ void get_cell(std::vector<float>& box, const Frame& frame) {
     // Factor 10 because the lengths are in nm in the XTC format
     auto matrix = frame.cell().matrix() / 10.0;
     box[0] = static_cast<float>(matrix[0][0]);
-    box[1] = static_cast<float>(matrix[1][0]);
-    box[2] = static_cast<float>(matrix[2][0]);
-    box[3] = static_cast<float>(matrix[0][1]);
+    box[1] = static_cast<float>(matrix[0][1]);
+    box[2] = static_cast<float>(matrix[0][2]);
+    box[3] = static_cast<float>(matrix[1][0]);
     box[4] = static_cast<float>(matrix[1][1]);
-    box[5] = static_cast<float>(matrix[2][1]);
-    box[6] = static_cast<float>(matrix[0][2]);
-    box[7] = static_cast<float>(matrix[1][2]);
+    box[5] = static_cast<float>(matrix[1][2]);
+    box[6] = static_cast<float>(matrix[2][0]);
+    box[7] = static_cast<float>(matrix[2][1]);
     box[8] = static_cast<float>(matrix[2][2]);
 }
 
