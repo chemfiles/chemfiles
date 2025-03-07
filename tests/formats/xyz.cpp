@@ -39,7 +39,7 @@ TEST_CASE("Read files in XYZ format") {
         auto file = Trajectory("data/xyz/helium.xyz");
         // Read frame at a specific positions
         auto frame = file.read_step(42);
-        CHECK(frame.step() == 42);
+        CHECK(frame.index() == 42);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], {-0.145821, 8.540648, 1.090281}, 1e-12));
         CHECK(approx_eq(positions[124], {8.446093, 8.168162, 9.350953}, 1e-12));
@@ -48,7 +48,7 @@ TEST_CASE("Read files in XYZ format") {
         CHECK(topology[0] == Atom("He"));
 
         frame = file.read_step(0);
-        CHECK(frame.step() == 0);
+        CHECK(frame.index() == 0);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], {0.49053, 8.41351, 0.0777257}, 1e-12));
         CHECK(approx_eq(positions[124], {8.57951, 8.65712, 8.06678}, 1e-12));

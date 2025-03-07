@@ -34,7 +34,7 @@ TEST_CASE("Read files in SDF format") {
         auto file = Trajectory("data/sdf/kinases.sdf");
         // Read frame at a specific positions
         auto frame = file.read_step(3);
-        CHECK(frame.step() == 3);
+        CHECK(frame.index() == 3);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-0.8276, 0.2486, -1.0418), 1e-3));
         CHECK(approx_eq(positions[67], Vector3D(-1.1356, 5.2260, 1.3726), 1e-3));
@@ -43,7 +43,7 @@ TEST_CASE("Read files in SDF format") {
         CHECK(topology[0] == Atom("O"));
 
         frame = file.read_step(0);
-        CHECK(frame.step() == 0);
+        CHECK(frame.index() == 0);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(4.9955, -2.6277, 0.2047), 1e-3));
         CHECK(approx_eq(positions[46], Vector3D(-8.5180, 0.2962, 2.1406), 1e-3));

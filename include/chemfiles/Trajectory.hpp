@@ -258,8 +258,8 @@ private:
     std::string path_;
     /// Opening mode of the associated file
     char mode_ = '\0';
-    /// Current step
-    size_t step_ = 0;
+    /// Index of the next step that will be read by `read`
+    size_t index_ = 0;
     /// Number of steps in the file, if available
     size_t nsteps_ = 0;
     /// Format used to read the associated file. It will be `nullptr` is the

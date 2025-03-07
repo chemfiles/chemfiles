@@ -107,8 +107,8 @@ void XTCFormat::read_step(size_t step, Frame& frame) {
 void XTCFormat::read(Frame& frame) {
     FrameHeader header = read_frame_header();
 
-    frame.set_step(header.step);                         // actual step of MD Simulation
-    frame.set("time", static_cast<double>(header.time)); // time in pico seconds
+    frame.set("simulation_step", header.step);            // actual step of MD Simulation
+    frame.set("time", static_cast<double>(header.time));  // time in pico seconds
     frame.resize(header.natoms);
 
     frame.set_cell(file_.read_gmx_box());
@@ -221,9 +221,10 @@ void XTCFormat::write(const Frame& frame) {
             natoms_, natoms);
     }
 
+    auto step = frame.get("simulation_step").value_or(frame.index()).as_double();
     FrameHeader header = {
         natoms,                                                          // natoms
-        frame.step(),                                                    // step
+        static_cast<size_t>(step),                                       // step
         static_cast<float>(frame.get("time").value_or(0.0).as_double()), // time
     };
     write_frame_header(header);

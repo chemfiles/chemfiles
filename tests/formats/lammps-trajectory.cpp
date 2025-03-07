@@ -1,7 +1,9 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
+#include <string>
 
 #include "catch.hpp"
+
 #include "chemfiles.hpp"
 #include "helpers.hpp"
 using namespace chemfiles;
@@ -122,7 +124,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
 
         Frame frame = file.read();
         CHECK(frame.size() == 854);
-        CHECK(frame.step() == 100000);
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 100000);
         CHECK(approx_eq((*frame.get("time")).as_double(), 25e9, 1e-6));
         auto positions = frame.positions();
 
@@ -133,7 +136,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
 
         frame = file.read();
         CHECK(frame.size() == 854);
-        CHECK(frame.step() == 101000);
+        CHECK(frame.index() == 1);
+        CHECK(frame.get("simulation_step")->as_double() == 101000);
         CHECK(!frame.get("time"));
         positions = frame.positions();
 
@@ -148,7 +152,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
 
         frame = file.read();
         CHECK(frame.size() == 856);
-        CHECK(frame.step() == 102000);
+        CHECK(frame.index() == 2);
+        CHECK(frame.get("simulation_step")->as_double() == 102000);
 
         positions = frame.positions();
         CHECK(approx_eq(positions[747], Vector3D(-158.317, 142.593, 2.11392), 1e-3));
@@ -158,7 +163,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
 
         frame = file.read();
         CHECK(frame.size() == 856);
-        CHECK(frame.step() == 103000);
+        CHECK(frame.index() == 3);
+        CHECK(frame.get("simulation_step")->as_double() == 103000);
 
         positions = frame.positions();
         CHECK(approx_eq(positions[735], Vector3D(67.2657, 30.0627, 2.1141), 1e-3));
@@ -168,7 +174,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
 
         frame = file.read();
         CHECK(frame.size() == 856);
-        CHECK(frame.step() == 104000);
+        CHECK(frame.index() == 4);
+        CHECK(frame.get("simulation_step")->as_double() == 104000);
 
         positions = frame.positions();
         CHECK(approx_eq(positions[652], Vector3D(-188.131, 96.0777, 196.23), 1e-3));
@@ -185,7 +192,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
 
         Frame frame = file.read();
         CHECK(frame.size() == 4000);
-        CHECK(frame.step() == 0);
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 0);
         CHECK(!frame.velocities());
         auto positions = frame.positions();
 
@@ -203,7 +211,8 @@ TEST_CASE("Read files in LAMMPS Atom format") {
 
         frame = file.read_step(3);
         CHECK(frame.size() == 4000);
-        CHECK(frame.step() == 300);
+        CHECK(frame.index() == 3);
+        CHECK(frame.get("simulation_step")->as_double() == 300);
         CHECK(!frame.velocities());
         positions = frame.positions();
 
@@ -218,7 +227,6 @@ TEST_CASE("Read files in LAMMPS Atom format") {
         CHECK(approx_eq(frame[3905].get("i_flag")->as_double(), 0.0, 1e-12));
 
         CHECK(!frame.get("is_unwrapped").value().as_bool());
-
     }
 
     SECTION("Errors") {
@@ -304,7 +312,7 @@ TEST_CASE("Read files in LAMMPS Atom format") {
 TEST_CASE("Write files in LAMMPS Atom format") {
     SECTION("Single frame") {
         auto tmpfile = NamedTempPath(".lammpstrj");
-        const auto EXPECTED_CONTENT = "ITEM: UNITS\n"
+        const auto* EXPECTED_CONTENT = "ITEM: UNITS\n"
                                       "real\n"
                                       "ITEM: TIMESTEP\n"
                                       "0\n"
@@ -341,7 +349,7 @@ TEST_CASE("Write files in LAMMPS Atom format") {
 
     SECTION("Multiple frames") {
         auto tmpfile = NamedTempPath(".lammpstrj");
-        const auto EXPECTED_CONTENT =
+        const auto* EXPECTED_CONTENT =
             "ITEM: UNITS\n"
             "real\n"
             "ITEM: TIMESTEP\n"
@@ -503,19 +511,22 @@ ITEM: ATOMS id type x y z
         CHECK(frame.size() == 0);
         CHECK(*frame.get("lammps_units") == "lj");
         CHECK(approx_eq((*frame.get("time")).as_double(), 250.5, 1e-6));
-        CHECK(frame.step() == 5);
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 5);
 
         frame = file.read();
         CHECK(frame.size() == 3);
         CHECK(*frame.get("lammps_units") == "metal");
         CHECK(!frame.get("time"));
-        CHECK(frame.step() == 15);
+        CHECK(frame.index() == 1);
+        CHECK(frame.get("simulation_step")->as_double() == 15);
 
         frame = file.read();
         CHECK(frame.size() == 0);
         CHECK(!frame.get("lammps_units"));
         CHECK(approx_eq((*frame.get("time")).as_double(), 335.678, 1e-6));
-        CHECK(frame.step() == 20);
+        CHECK(frame.index() == 2);
+        CHECK(frame.get("simulation_step")->as_double() == 20);
     }
 
     SECTION("Atom properties") {
@@ -545,7 +556,8 @@ ITEM: ATOMS type element z mass y x vy vz q id
         auto velocities = *frame.velocities();
         CHECK(approx_eq(velocities[0], Vector3D(0.0, 8.0, 9.0), 1e-6));
         CHECK(approx_eq(velocities[1], Vector3D(0.0, -2.345, 6.456), 1e-6));
-        CHECK(frame.step() == 7);
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 7);
         CHECK(frame[0].type() == "87");
         CHECK(frame[1].type() == "32");
         CHECK(frame[0].name() == "Fr");

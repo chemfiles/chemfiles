@@ -26,8 +26,8 @@
     - :cpp:func:`chfl_frame_remove_bond`
     - :cpp:func:`chfl_frame_clear_bonds`
     - :cpp:func:`chfl_frame_add_residue`
-    - :cpp:func:`chfl_frame_step`
-    - :cpp:func:`chfl_frame_set_step`
+    - :cpp:func:`chfl_frame_index`
+    - :cpp:func:`chfl_frame_set_index`
     - :cpp:func:`chfl_frame_guess_bonds`
     - :cpp:func:`chfl_frame_distance`
     - :cpp:func:`chfl_frame_angle`
@@ -74,9 +74,9 @@
 
 .. doxygenfunction:: chfl_frame_add_residue
 
-.. doxygenfunction:: chfl_frame_step
+.. doxygenfunction:: chfl_frame_index
 
-.. doxygenfunction:: chfl_frame_set_step
+.. doxygenfunction:: chfl_frame_set_index
 
 .. doxygenfunction:: chfl_frame_guess_bonds
 

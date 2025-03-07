@@ -32,12 +32,16 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Improved reading speed of XTC files by implementing a decoding routine
   proposed by [libxtc](https://doi.org/10.1186/s13104-021-05536-5)
 
-### Changes to the C++ API
+### Changes to the API
 
 - Per-atom properties are optional, i.e. `Atom::properties` returns an optional
   property map.
 - Unit cell matrixes are now stored one cell vector per row (previously of cell
   vector per column).
+- Renamed `Frame::step` and related functions (`Frame::set_step`,
+  `chfl_frame_step`, `chfl_frame_set_step`) to `Frame::index`. This always
+  corresponds to the index of the frame in the file; the `"simulation_step"`
+  property is used to store the step of the simulation that created this frame.
 
 ## 0.10.0 (14 Feb 2021)
 

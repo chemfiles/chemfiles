@@ -150,18 +150,18 @@ extern "C" chfl_status chfl_frame_set_topology(CHFL_FRAME* const frame, const CH
     )
 }
 
-extern "C" chfl_status chfl_frame_step(const CHFL_FRAME* const frame, uint64_t* step) {
+extern "C" chfl_status chfl_frame_index(const CHFL_FRAME* const frame, uint64_t* index) {
     CHECK_POINTER(frame);
-    CHECK_POINTER(step);
+    CHECK_POINTER(index);
     CHFL_ERROR_CATCH(
-        *step = frame->step();
+        *index = frame->index();
     )
 }
 
-extern "C" chfl_status chfl_frame_set_step(CHFL_FRAME* const frame, uint64_t step) {
+extern "C" chfl_status chfl_frame_set_index(CHFL_FRAME* const frame, uint64_t index) {
     CHECK_POINTER(frame);
     CHFL_ERROR_CATCH(
-        frame->set_step(checked_cast(step));
+        frame->set_index(checked_cast(index));
     )
 }
 

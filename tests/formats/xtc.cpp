@@ -12,7 +12,8 @@ TEST_CASE("Read files in XTC format") {
         CHECK(file.nsteps() == 251);
         auto frame = file.read_step(0);
 
-        CHECK(frame.step() == 0);
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 0);
         CHECK(approx_eq(frame.get("time")->as_double(), 0));
         CHECK(frame.get("xtc_precision")->as_double() == 1000);
         CHECK(frame.size() == 20455);
@@ -26,11 +27,13 @@ TEST_CASE("Read files in XTC format") {
         CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
 
         frame = file.read_step(1); // Skip a frame
-        CHECK(frame.step() == 100);
+        CHECK(frame.index() == 1);
+        CHECK(frame.get("simulation_step")->as_double() == 100);
 
         frame = file.read();
 
-        CHECK(frame.step() == 200);
+        CHECK(frame.index() == 2);
+        CHECK(frame.get("simulation_step")->as_double() == 200);
         CHECK(approx_eq(frame.get("time")->as_double(), 0.4, 1e-4));
         CHECK(frame.get("xtc_precision")->as_double() == 1000);
         CHECK(frame.size() == 20455);
@@ -45,7 +48,8 @@ TEST_CASE("Read files in XTC format") {
 
         frame = file.read_step(230); // skip forward
 
-        CHECK(frame.step() == 23000);
+        CHECK(frame.index() == 230);
+        CHECK(frame.get("simulation_step")->as_double() == 23000);
         CHECK(approx_eq(frame.get("time")->as_double(), 46.0));
         CHECK(frame.get("xtc_precision")->as_double() == 1000);
         CHECK(frame.size() == 20455);
@@ -60,7 +64,8 @@ TEST_CASE("Read files in XTC format") {
 
         frame = file.read_step(50); // skip behind previous step
 
-        CHECK(frame.step() == 5000);
+        CHECK(frame.index() == 50);
+        CHECK(frame.get("simulation_step")->as_double() == 5000);
         CHECK(approx_eq(frame.get("time")->as_double(), 10.0));
         CHECK(frame.get("xtc_precision")->as_double() == 1000);
         CHECK(frame.size() == 20455);
@@ -121,7 +126,7 @@ TEST_CASE("Write and append files in uncompressed XTC format") {
         file.write(frame);
 
         frame = Frame(UnitCell({20, 21, 22}, {33.333, 44.444, 55.555}));
-        frame.set_step(100);
+        frame.set_index(100);
         frame.add_atom(Atom("A"), {4, 5, 6});
         frame.add_atom(Atom("B"), {7, 8, 9});
         frame.add_atom(Atom("C"), {1, 2, 3});
@@ -134,7 +139,7 @@ TEST_CASE("Write and append files in uncompressed XTC format") {
         file = Trajectory(tmpfile, 'a');
 
         frame = Frame(UnitCell({30, 31, 32}));
-        frame.set_step(200);
+        frame.set("simulation_step", 200);
         frame.set("time", 20);
         frame.add_atom(Atom("A"), {7, 8, 9});
         frame.add_atom(Atom("B"), {1, 2, 3});
@@ -149,7 +154,8 @@ TEST_CASE("Write and append files in uncompressed XTC format") {
 
         frame = file.read_step(0);
 
-        CHECK(frame.step() == 0); // default step
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 0); // default step
         CHECK(approx_eq(frame.get("time")->as_double(), 19.376, 1e-4));
         CHECK(frame.size() == 3);
 
@@ -163,7 +169,8 @@ TEST_CASE("Write and append files in uncompressed XTC format") {
 
         frame = file.read_step(1);
 
-        CHECK(frame.step() == 100);
+        CHECK(frame.index() == 1);
+        CHECK(frame.get("simulation_step")->as_double() == 100);
         CHECK(approx_eq(frame.get("time")->as_double(), 0)); // default time
         CHECK(frame.size() == 3);
 
@@ -178,7 +185,8 @@ TEST_CASE("Write and append files in uncompressed XTC format") {
 
         frame = file.read();
 
-        CHECK(frame.step() == 200);
+        CHECK(frame.index() == 2);
+        CHECK(frame.get("simulation_step")->as_double() == 200);
         CHECK(approx_eq(frame.get("time")->as_double(), 20));
         CHECK(frame.size() == 3);
 
@@ -210,7 +218,8 @@ TEST_CASE("Write and append files in uncompressed XTC format") {
 
         frame = file.read();
 
-        CHECK(frame.step() == 0); // default step
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 0); // default step
         CHECK(approx_eq(frame.get("time")->as_double(), 19.376, 1e-4));
         CHECK(frame.size() == 3);
 
@@ -247,7 +256,7 @@ TEST_CASE("Write and append files in compressed XTC format") {
         file.write(frame);
 
         frame = Frame(UnitCell({20, 21, 22}, {33.333, 44.444, 55.555}));
-        frame.set_step(100);
+        frame.set("simulation_step", 100);
         frame.set("xtc_precision", 1000.01);
         frame.add_atom(Atom("A"), {4, 5, 6});
         frame.add_atom(Atom("B"), {7, 8, 9});
@@ -268,7 +277,7 @@ TEST_CASE("Write and append files in compressed XTC format") {
         file = Trajectory(tmpfile, 'a');
 
         frame = Frame(UnitCell({30, 31, 32}));
-        frame.set_step(200);
+        frame.set_index(200);
         frame.set("time", 20);
         frame.add_atom(Atom("A"), {7, 8, 9});
         frame.add_atom(Atom("B"), {1, 2, 3});
@@ -290,7 +299,8 @@ TEST_CASE("Write and append files in compressed XTC format") {
 
         frame = file.read();
 
-        CHECK(frame.step() == 0); // default step
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 0); // default step
         CHECK(approx_eq(frame.get("time")->as_double(), 19.376, 1e-4));
         CHECK(approx_eq(frame.get("xtc_precision")->as_double(), 10000));
         CHECK(frame.size() == 10);
@@ -305,7 +315,8 @@ TEST_CASE("Write and append files in compressed XTC format") {
 
         frame = file.read();
 
-        CHECK(frame.step() == 100);
+        CHECK(frame.index() == 1);
+        CHECK(frame.get("simulation_step")->as_double() == 100);
         CHECK(approx_eq(frame.get("time")->as_double(), 0)); // default time
         CHECK(approx_eq(frame.get("xtc_precision")->as_double(), 1000.01, 1e-4));
         CHECK(frame.size() == 10);
@@ -321,7 +332,8 @@ TEST_CASE("Write and append files in compressed XTC format") {
 
         frame = file.read();
 
-        CHECK(frame.step() == 200);
+        CHECK(frame.index() == 2);
+        CHECK(frame.get("simulation_step")->as_double() == 200);
         CHECK(approx_eq(frame.get("time")->as_double(), 20));
         CHECK(approx_eq(frame.get("xtc_precision")->as_double(), 1000)); // default precision
         CHECK(frame.size() == 10);
@@ -362,7 +374,8 @@ TEST_CASE("Write and append files in compressed XTC format") {
 
         frame = file.read();
 
-        CHECK(frame.step() == 0); // default step
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 0); // default step
         CHECK(approx_eq(frame.get("time")->as_double(), 19.376, 1e-4));
         CHECK(approx_eq(frame.get("xtc_precision")->as_double(), 10000));
         CHECK(frame.size() == 10);
@@ -409,7 +422,7 @@ TEST_CASE("Large Numbers") {
         CHECK(file.nsteps() == 4);
         auto frame = file.read();
 
-        CHECK(frame.step() == 0);
+        CHECK(frame.index() == 0);
         CHECK(approx_eq(frame.get("time")->as_double(), 0));
         CHECK(frame.get("xtc_precision")->as_double() == 1000);
         CHECK(frame.size() == 10);
@@ -426,7 +439,8 @@ TEST_CASE("Large Numbers") {
 
         frame = file.read_step(3);
 
-        CHECK(frame.step() == 0);
+        CHECK(frame.index() == 3);
+        CHECK(frame.get("simulation_step")->as_double() == 0);
         CHECK(approx_eq(frame.get("time")->as_double(), 0));
         CHECK(frame.get("xtc_precision")->as_double() == 1000);
         CHECK(frame.size() == 10);
@@ -472,7 +486,8 @@ TEST_CASE("Large Numbers") {
 
         frame = file.read();
 
-        CHECK(frame.step() == 0);
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 0);
         CHECK(approx_eq(frame.get("time")->as_double(), 0));
         CHECK(approx_eq(frame.get("xtc_precision")->as_double(), 1000));
         CHECK(frame.size() == 10);
@@ -487,7 +502,8 @@ TEST_CASE("Large Numbers") {
 
         frame = file.read();
 
-        CHECK(frame.step() == 0);
+        CHECK(frame.index() == 1);
+        CHECK(frame.get("simulation_step")->as_double() == 0);
         CHECK(approx_eq(frame.get("time")->as_double(), 0));
         CHECK(approx_eq(frame.get("xtc_precision")->as_double(), 1000));
         CHECK(frame.size() == 10);
