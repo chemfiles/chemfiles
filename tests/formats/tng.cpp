@@ -33,9 +33,10 @@ TEST_CASE("Read files in TNG format") {
         auto file = Trajectory("data/tng/1aki.tng");
         CHECK(file.nsteps() == 6);
         auto frame = file.read();
-        CHECK(frame.step() == 0);
-        CHECK(approx_eq(frame.get("time")->as_double(), 0.0, 1e-4));
         CHECK(frame.size() == 38376);
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 0);
+        CHECK(approx_eq(frame.get("time")->as_double(), 0.0, 1e-4));
 
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
@@ -46,8 +47,9 @@ TEST_CASE("Read files in TNG format") {
         CHECK(approx_eq(velocities[4653], Vector3D(-16.5949, -4.62240, -7.01133), 1e-4));
 
         frame = file.read_step(5);
-        CHECK(frame.step() == 50);
         CHECK(frame.size() == 38376);
+        CHECK(frame.index() == 5);
+        CHECK(frame.get("simulation_step")->as_double() == 50);
         CHECK(approx_eq(frame.get("time")->as_double(), 0.1, 1e-4));
 
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
@@ -113,15 +115,18 @@ TEST_CASE("Read files in TNG format") {
         REQUIRE(file.nsteps() == 3);
 
         auto frame = file.read();
-        CHECK(frame.step() == 0);
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 0);
         CHECK(approx_eq(frame.get("time")->as_double(), 0.0, 1e-4));
 
         frame = file.read();
-        CHECK(frame.step() == 25000);
+        CHECK(frame.index() == 1);
+        CHECK(frame.get("simulation_step")->as_double() == 25000);
         CHECK(approx_eq(frame.get("time")->as_double(), 50.0, 1e-4));
 
         frame = file.read();
-        CHECK(frame.step() == 50000);
+        CHECK(frame.index() == 2);
+        CHECK(frame.get("simulation_step")->as_double() == 50000);
         CHECK(approx_eq(frame.get("time")->as_double(), 100.0, 1e-4));
 
         frame = file.read_step(0);

@@ -104,9 +104,9 @@ void TRRFormat::read(Frame& frame) {
     bool has_positions = (header.x_size > 0);
     bool has_velocities = (header.v_size > 0);
 
-    frame.set_step(header.step);            // actual step of MD Simulation
-    frame.set("time", header.time);         // time in pico seconds
-    frame.set("trr_lambda", header.lambda); // coupling parameter for free energy methods
+    frame.set("simulation_step", header.step);    // actual step of MD Simulation
+    frame.set("time", header.time);               // time in pico seconds
+    frame.set("trr_lambda", header.lambda);       // coupling parameter for free energy methods
     frame.set("has_positions", has_positions);
     frame.resize(header.natoms);
 
@@ -322,6 +322,7 @@ void TRRFormat::write(const Frame& frame) {
         v_size = 0;
     }
 
+    auto step = frame.get("simulation_step").value_or(frame.index()).as_double();
     FrameHeader header = {
         false,    // use_double
         0,        // ir_size
@@ -336,7 +337,7 @@ void TRRFormat::write(const Frame& frame) {
         0,        // f_size
 
         natoms,                                            // natoms
-        frame.step(),                                      // step
+        static_cast<size_t>(step),                         // step
         0,                                                 // nre
         frame.get("time").value_or(0.0).as_double(),       // time
         frame.get("trr_lambda").value_or(0.0).as_double(), // lambda

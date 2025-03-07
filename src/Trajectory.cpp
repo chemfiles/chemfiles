@@ -27,8 +27,6 @@
 
 using namespace chemfiles;
 
-#define SENTINEL_VALUE (static_cast<size_t>(-1))
-
 struct file_open_info {
     static file_open_info parse(const std::string& path, std::string format);
     std::string format;
@@ -177,19 +175,15 @@ size_t Trajectory::nsteps() const  {
 
 Frame Trajectory::read() {
     check_opened();
-    pre_read(step_);
+    pre_read(index_);
 
     Frame frame;
-    frame.set_step(SENTINEL_VALUE);
     format_->read(frame);
     post_read(frame);
 
-    // Don't override the step set by a format
-    if (frame.step() == SENTINEL_VALUE) {
-        frame.set_step(step_);
-    }
+    frame.set_index(index_);
+    index_++;
 
-    step_++;
     return frame;
 }
 
@@ -198,16 +192,12 @@ Frame Trajectory::read_step(const size_t step) {
     pre_read(step);
 
     Frame frame;
-    frame.set_step(SENTINEL_VALUE);
-    step_ = step;
-    format_->read_step(step_, frame);
-
-    // Don't override the step set by a format
-    if (frame.step() == SENTINEL_VALUE) {
-        frame.set_step(step_);
-    }
-
+    format_->read_step(step, frame);
     post_read(frame);
+
+    frame.set_index(step);
+    index_ = step + 1;
+
     return frame;
 }
 
@@ -232,7 +222,7 @@ void Trajectory::write(const Frame& frame) {
         format_->write(frame);
     }
 
-    step_++;
+    index_++;
     nsteps_++;
 }
 
@@ -257,7 +247,7 @@ void Trajectory::set_cell(const UnitCell& cell) {
 
 bool Trajectory::done() const {
     check_opened();
-    return step_ >= nsteps_;
+    return index_ >= nsteps_;
 }
 
 void Trajectory::close() {

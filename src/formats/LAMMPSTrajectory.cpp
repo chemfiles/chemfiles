@@ -331,7 +331,7 @@ void LAMMPSTrajectoryFormat::read_next(Frame& frame) {
 
     if (*item == "TIMESTEP") {
         int64_t timestep = parse<int64_t>(trim(file_.readline()));
-        frame.set_step(static_cast<size_t>(timestep));
+        frame.set("simulation_step", timestep);
     } else {
         throw format_error("can not read next step as LAMMPS format: expected 'TIMESTEP' got '{}'",
                            *item);
@@ -587,7 +587,9 @@ void LAMMPSTrajectoryFormat::write_next(const Frame& frame) {
     if (frame.get("time")) {
         file_.print("ITEM: TIME\n{:.16g}\n", (*frame.get("time")).as_double());
     }
-    file_.print("ITEM: TIMESTEP\n{:d}\n", frame.step());
+
+    auto step = frame.get("simulation_step").value_or(frame.index()).as_double();
+    file_.print("ITEM: TIMESTEP\n{:d}\n", static_cast<uint64_t>(step));
     file_.print("ITEM: NUMBER OF ATOMS\n{:d}\n", frame.size());
 
     const auto& cell = frame.cell();

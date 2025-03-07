@@ -130,7 +130,7 @@ void TNGFormat::read_step(size_t step, Frame& frame) {
 }
 
 void TNGFormat::read(Frame& frame) {
-    frame.set_step(static_cast<size_t>(tng_steps_[step_]));
+    frame.set("simulation_step", tng_steps_[step_]);
     natoms_ = 0;
     CHECK(tng_num_particles_get(tng_, &natoms_));
     assert(natoms_ > 0);

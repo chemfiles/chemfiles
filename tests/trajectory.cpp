@@ -79,13 +79,13 @@ TEST_CASE("Associate a topology and a trajectory") {
 TEST_CASE("Setting frame step") {
     auto file = Trajectory("data/xyz/helium.xyz");
     auto frame = file.read();
-    CHECK(frame.step() == 0);
+    CHECK(frame.index() == 0);
 
     frame = file.read();
-    CHECK(frame.step() == 1);
+    CHECK(frame.index() == 1);
 
     frame = file.read_step(10);
-    CHECK(frame.step() == 10);
+    CHECK(frame.index() == 10);
 }
 
 
