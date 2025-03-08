@@ -49,7 +49,7 @@ TEST_CASE("Read files in CSSR format") {
         CHECK(frame[11].name() == "Si");
         CHECK(frame[11].type() == "Si");
 
-        frame = file.read_step(0);
+        frame = file.read_at(0);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(1.31455, 0.0, 2.27555), 1e-5));
         CHECK(approx_eq(positions[11], Vector3D(0.0, 5.07052, 5.65106), 1e-3));
@@ -58,7 +58,7 @@ TEST_CASE("Read files in CSSR format") {
 
 TEST_CASE("Write files in CSSR format") {
     auto tmpfile = NamedTempPath(".cssr");
-    const auto EXPECTED_CONTENT =
+    const auto* EXPECTED_CONTENT =
 R"( REFERENCE STRUCTURE = 00000   A,B,C =  10.000  10.000  12.000
    ALPHA,BETA,GAMMA =  90.000  90.000  90.000    SPGR =  1 P1
    4   0
@@ -100,7 +100,7 @@ TEST_CASE("Read and write files in memory") {
         auto content = read_text_file("data/cssr/water.cssr");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "CSSR");
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
 
         auto frame = file.read();
 

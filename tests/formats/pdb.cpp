@@ -8,14 +8,14 @@
 using namespace chemfiles;
 
 template <typename T>
-static bool contains(const std::vector<T> haystack, const T& needle) {
+static bool contains(const std::vector<T>& haystack, const T& needle) {
     return std::find(haystack.begin(), haystack.end(), needle) != haystack.end();
 }
 
 TEST_CASE("Read files in PDB format") {
     SECTION("Read next step") {
         auto file = Trajectory("data/pdb/water.pdb");
-        REQUIRE(file.nsteps() == 100);
+        REQUIRE(file.size() == 100);
 
         auto frame = file.read();
 
@@ -40,13 +40,13 @@ TEST_CASE("Read files in PDB format") {
     SECTION("Read a specific step") {
         auto file = Trajectory("data/pdb/water.pdb");
 
-        auto frame = file.read_step(2);
+        auto frame = file.read_at(2);
         REQUIRE(frame.size() == 297);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], {0.299, 8.310, 11.721}, 1e-4));
         CHECK(approx_eq(positions[296], {6.798, 11.509, 12.704}, 1e-4));
 
-        frame = file.read_step(0);
+        frame = file.read_at(0);
         REQUIRE(frame.size() == 297);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], {0.417, 8.303, 11.737}, 1e-3));
@@ -61,8 +61,7 @@ TEST_CASE("Read files in PDB format") {
         auto file = Trajectory("data/pdb/MOF-5.pdb");
         auto frame = file.read();
 
-        auto topology = frame.topology();
-
+        const auto& topology = frame.topology();
         CHECK(topology.size() == 65);
 
         CHECK(topology[0].type() == "Zn");
@@ -108,7 +107,7 @@ TEST_CASE("Read files in PDB format") {
 
     SECTION("Read frame properties") {
         auto file = Trajectory("data/pdb/2hkb.pdb");
-        REQUIRE(file.nsteps() == 11);
+        REQUIRE(file.size() == 11);
 
         auto frame = file.read();
         CHECK(frame.get("classification")->as_string() == "DNA");
@@ -178,7 +177,7 @@ TEST_CASE("Read files in PDB format") {
         CHECK_THROWS(frame.topology().bond_order(4561, 4560));
 
         // Check secondary structure
-        auto& topology = frame.topology();
+        const auto& topology = frame.topology();
         CHECK(topology.residue(05).get("secondary_structure")->as_string() == "right-handed alpha helix");
         CHECK(topology.residue(36).get("secondary_structure")->as_string() == "right-handed alpha helix");
     }
@@ -188,7 +187,7 @@ TEST_CASE("Read files in PDB format") {
         auto frame = file.read();
 
         // Make sure the residues have been inserted correctly
-        auto& topology = frame.topology();
+        const auto& topology = frame.topology();
         CHECK(topology.residue_for_atom(0)->name() == "ALA");
         CHECK(topology.residue_for_atom(0)->get("insertion_code")->as_string() == "B");
         CHECK(topology.residue_for_atom(5)->get("insertion_code")->as_string() == "A");
@@ -206,7 +205,7 @@ TEST_CASE("Read files in PDB format") {
         CHECK_FALSE(topology.residue(17).get("secondary_structure"));
 
         // First residue in a long list of residues with the same secondary structure
-        auto& ins_check = topology.residue(18);
+        const auto& ins_check = topology.residue(18);
         CHECK(ins_check.get("secondary_structure")->as_string() == "right-handed alpha helix");
         CHECK(ins_check.get("insertion_code")->as_string() == "C");
         CHECK((*ins_check.id()) == 14);
@@ -230,7 +229,7 @@ TEST_CASE("Read files in PDB format") {
 
     SECTION("Read Protein Residues") {
         auto frame = Trajectory("data/pdb/hemo.pdb").read();
-        auto topology = frame.topology();
+        const auto& topology = frame.topology();
 
         CHECK(!topology.are_linked(topology.residue(2), topology.residue(3)));
         CHECK( topology.are_linked(topology.residue(3), topology.residue(4)));
@@ -240,7 +239,7 @@ TEST_CASE("Read files in PDB format") {
 
     SECTION("Read Nucleic Residues") {
         auto frame = Trajectory("data/pdb/2hkb.pdb").read();
-        auto topology = frame.topology();
+        const auto& topology = frame.topology();
 
         CHECK(topology.are_linked(topology.residue(3), topology.residue(4)));
         CHECK(!topology.are_linked(topology.residue(3), topology.residue(5)));
@@ -249,7 +248,7 @@ TEST_CASE("Read files in PDB format") {
 
     SECTION("Read atomic insertion codes") {
         auto frame = Trajectory("data/pdb/insertion-code.pdb").read();
-        auto& topology = frame.topology();
+        const auto& topology = frame.topology();
 
         CHECK(topology.residue_for_atom(0)->get("insertion_code")->as_string() == "a");
         CHECK(topology.residue_for_atom(1)->get("insertion_code")->as_string() == "c");
@@ -259,7 +258,7 @@ TEST_CASE("Read files in PDB format") {
 
     SECTION("Left-handed helix") {
         auto frame = Trajectory("data/pdb/1npc.pdb.gz").read();
-        auto& topology = frame.topology();
+        const auto& topology = frame.topology();
 
         CHECK(topology.residue(226).get("secondary_structure")->as_string() == "left-handed alpha helix");
         CHECK(topology.residue(138).get("secondary_structure")->as_string() == "right-handed alpha helix");
@@ -267,7 +266,7 @@ TEST_CASE("Read files in PDB format") {
 
     SECTION("Multiple residues with the same id") {
         auto frame = Trajectory("data/pdb/psfgen-output.pdb").read();
-        auto& topology = frame.topology();
+        const auto& topology = frame.topology();
 
         CHECK(topology.residues().size() == 3);
         CHECK(topology.residue(0).name() == "ALA");
@@ -298,7 +297,7 @@ TEST_CASE("Problematic PDB files") {
 
     SECTION("Atom ID starts at 0") {
         auto file = Trajectory("data/pdb/atom-id-0.pdb");
-        REQUIRE(file.nsteps() == 1);
+        REQUIRE(file.size() == 1);
         auto frame = file.read();
         REQUIRE(frame.size() == 2);
 
@@ -313,7 +312,7 @@ TEST_CASE("Problematic PDB files") {
 
     SECTION("Multiple END records") {
         auto file = Trajectory("data/pdb/end-endmdl.pdb");
-        REQUIRE(file.nsteps() == 2);
+        REQUIRE(file.size() == 2);
 
         auto frame = file.read();
         REQUIRE(frame.size() == 4);
@@ -324,7 +323,7 @@ TEST_CASE("Problematic PDB files") {
 
     SECTION("Multiple MODEL without END") {
         auto file = Trajectory("data/pdb/model.pdb");
-        REQUIRE(file.nsteps() == 2);
+        REQUIRE(file.size() == 2);
 
         auto frame = file.read();
         REQUIRE(frame.size() == 2223);
@@ -335,7 +334,7 @@ TEST_CASE("Problematic PDB files") {
 
     SECTION("File generated by Crystal Maker") {
         auto file = Trajectory("data/pdb/crystal-maker.pdb");
-        REQUIRE(file.nsteps() == 1);
+        REQUIRE(file.size() == 1);
 
         auto frame = file.read();
         REQUIRE(frame.size() == 8);
@@ -365,30 +364,30 @@ TEST_CASE("Problematic PDB files") {
         // some secondary structure residues are not in the expected order
         auto file = Trajectory("data/pdb/1htq.pdb");
         auto frame = file.read();
-        auto& topology = frame.topology();
+        const auto& topology = frame.topology();
 
         // The residue IDs are out of order, but still read correctly
-        auto& first_residue = *topology.residue_for_atom(2316);
+        const auto& first_residue = *topology.residue_for_atom(2316);
         CHECK((*first_residue.id()) == 503);
         CHECK(first_residue.get("secondary_structure")->as_string() == "right-handed 3-10 helix");
 
         // The 'next' residue
-        auto& second_residue = *topology.residue_for_atom(2320);
+        const auto& second_residue = *topology.residue_for_atom(2320);
         CHECK((*second_residue.id()) == 287);
         CHECK(second_residue.get("secondary_structure")->as_string() == "right-handed 3-10 helix");
 
         // The 'third' residue
-        auto& third_residue = *topology.residue_for_atom(2332);
+        const auto& third_residue = *topology.residue_for_atom(2332);
         CHECK((*third_residue.id()) == 288);
         CHECK(third_residue.get("secondary_structure")->as_string() == "right-handed 3-10 helix");
 
         // The 'last' residue
-        auto& final_residue = *topology.residue_for_atom(2337);
+        const auto& final_residue = *topology.residue_for_atom(2337);
         CHECK((*final_residue.id()) == 289);
         CHECK(final_residue.get("secondary_structure")->as_string() == "right-handed 3-10 helix");
 
         // No secondary structure after the chain
-        auto & no_ss_residue = *topology.residue_for_atom(2341);
+        const auto& no_ss_residue = *topology.residue_for_atom(2341);
         CHECK((*no_ss_residue.id()) == 290);
         CHECK(no_ss_residue.get("secondary_structure") == nullopt);
     }
@@ -398,29 +397,29 @@ TEST_CASE("Problematic PDB files") {
         // some secondary structure residues are not in the expected order
         auto file = Trajectory("data/pdb/1avg.pdb");
         auto frame = file.read();
-        auto& topology = frame.topology();
+        const auto& topology = frame.topology();
 
-        auto & pre_residue = *topology.residue_for_atom(75);
+        const auto& pre_residue = *topology.residue_for_atom(75);
         CHECK((*pre_residue.id()) == 1);
         CHECK(pre_residue.get("insertion_code")->as_string() == "D");
         CHECK(pre_residue.get("secondary_structure") == nullopt);
 
-        auto& first_residue = *topology.residue_for_atom(79);
+        const auto& first_residue = *topology.residue_for_atom(79);
         CHECK((*first_residue.id()) == 1);
         CHECK(first_residue.get("insertion_code")->as_string() == "C");
         CHECK(first_residue.get("secondary_structure")->as_string() == "right-handed 3-10 helix");
 
-        auto& second_residue = *topology.residue_for_atom(88);
+        const auto& second_residue = *topology.residue_for_atom(88);
         CHECK((*second_residue.id()) == 1);
         CHECK(second_residue.get("insertion_code")->as_string() == "B");
         CHECK(second_residue.get("secondary_structure")->as_string() == "right-handed 3-10 helix");
 
-        auto& third_residue = *topology.residue_for_atom(93);
+        const auto& third_residue = *topology.residue_for_atom(93);
         CHECK((*third_residue.id()) == 1);
         CHECK(third_residue.get("insertion_code")->as_string() == "A");
         CHECK(third_residue.get("secondary_structure")->as_string() == "right-handed 3-10 helix");
 
-        auto& fourth_residue = *topology.residue_for_atom(101);
+        const auto& fourth_residue = *topology.residue_for_atom(101);
         CHECK((*fourth_residue.id()) == 1);
         CHECK(fourth_residue.get("insertion_code") == nullopt);
         CHECK(fourth_residue.get("secondary_structure") == nullopt);
@@ -431,13 +430,13 @@ TEST_CASE("Problematic PDB files") {
         // would be found. The bug cammed from an interaction with buffering of
         // files, and the usage of string_view in TextFile::readline().
         auto file = Trajectory("data/pdb/ase.pdb");
-        REQUIRE(file.nsteps() == 156);
+        REQUIRE(file.size() == 156);
     }
 }
 
 TEST_CASE("Write files in PDB format") {
     auto tmpfile = NamedTempPath(".pdb");
-    const auto EXPECTED_CONTENT =
+    const auto* EXPECTED_CONTENT =
     "MODEL    1\n"
     "CRYST1   22.000   22.000   22.000  90.00  90.00  90.00 P 1           1\n"
     "HETATM    1 A   A        1       1.000   2.000   3.000  1.00  0.00           A\n"
@@ -515,7 +514,7 @@ TEST_CASE("Write files in PDB format") {
     file.close();
 
     auto check_pdb = Trajectory(tmpfile);
-    CHECK(check_pdb.nsteps() == 2);
+    CHECK(check_pdb.size() == 2);
     auto frame1 = check_pdb.read();
     CHECK(frame1.size() == 4);
     CHECK(frame1[0].get("altloc")->as_string() == "A");
@@ -615,7 +614,7 @@ TEST_CASE("Read and write files in memory") {
         auto content = read_text_file("data/pdb/water.pdb");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "PDB");
-        REQUIRE(file.nsteps() == 100);
+        REQUIRE(file.size() == 100);
 
         Frame frame = file.read();
 

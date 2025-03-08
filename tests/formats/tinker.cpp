@@ -6,7 +6,7 @@
 using namespace chemfiles;
 
 static bool contains_bond(const Topology& topology, Bond bond) {
-    for (auto& exist: topology.bonds()) {
+    for (const auto& exist: topology.bonds()) {
         if (bond == exist) {
             return true;
         }
@@ -17,7 +17,7 @@ static bool contains_bond(const Topology& topology, Bond bond) {
 TEST_CASE("Read files in Tinker XYZ format") {
     SECTION("water.arc") {
         auto file = Trajectory("data/tinker/water.arc");
-        REQUIRE(file.nsteps() == 1);
+        REQUIRE(file.size() == 1);
         auto frame = file.read();
 
         CHECK(frame.size() == 12);
@@ -25,7 +25,7 @@ TEST_CASE("Read files in Tinker XYZ format") {
         CHECK(approx_eq(positions[0], Vector3D(-12.3637905407, 1.6985027871, 1.2163946648), 1e-6));
         CHECK(approx_eq(positions[10], Vector3D(-9.8283360322, 2.2477303421, 4.0053506840), 1e-6));
 
-        auto& topology = frame.topology();
+        const auto& topology = frame.topology();
         CHECK(topology[0].name() == "O");
         CHECK(topology[7].name() == "H");
 
@@ -42,7 +42,7 @@ TEST_CASE("Read files in Tinker XYZ format") {
 
     SECTION("nitrogen.arc") {
         auto file = Trajectory("data/tinker/nitrogen.arc");
-        REQUIRE(file.nsteps() == 50);
+        REQUIRE(file.size() == 50);
         auto frame = file.read();
 
         CHECK(frame.size() == 212);
@@ -52,7 +52,7 @@ TEST_CASE("Read files in Tinker XYZ format") {
 
         CHECK(frame.cell() == UnitCell({18.2736, 18.2736, 18.2736}));
 
-        auto& topology = frame.topology();
+        const auto& topology = frame.topology();
         CHECK(topology[0].name() == "N");
         CHECK(topology[154].name() == "N");
 
@@ -64,7 +64,7 @@ TEST_CASE("Read files in Tinker XYZ format") {
             CHECK(contains_bond(topology, {i, i + 1}));
         }
 
-        frame = file.read_step(34);
+        frame = file.read_at(34);
         CHECK(frame.size() == 212);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-7.481173, 3.330502, 0.042802), 1e-6));
@@ -76,7 +76,7 @@ TEST_CASE("Read files in Tinker XYZ format") {
 
 TEST_CASE("Write files in Tinker XYZ format") {
     auto tmpfile = NamedTempPath(".arc");
-    const auto expected_content =
+    const auto* expected_content =
 R"(4 written by the chemfiles library
 0.00000 0.00000 0.00000 90.0000 90.0000 90.0000
 1 A 1.00000 2.00000 3.00000 1 2 3
@@ -122,7 +122,7 @@ TEST_CASE("Read and write files in memory") {
         auto content = read_text_file("data/tinker/nitrogen.arc");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "Tinker");
-        REQUIRE(file.nsteps() == 50);
+        REQUIRE(file.size() == 50);
         auto frame = file.read();
 
         CHECK(frame.size() == 212);
@@ -132,7 +132,7 @@ TEST_CASE("Read and write files in memory") {
 
         CHECK(frame.cell() == UnitCell({18.2736, 18.2736, 18.2736}));
 
-        auto& topology = frame.topology();
+        const auto& topology = frame.topology();
         CHECK(topology[0].name() == "N");
         CHECK(topology[154].name() == "N");
 
@@ -144,7 +144,7 @@ TEST_CASE("Read and write files in memory") {
             CHECK(contains_bond(topology, {i, i + 1}));
         }
 
-        frame = file.read_step(34);
+        frame = file.read_at(34);
         CHECK(frame.size() == 212);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-7.481173, 3.330502, 0.042802), 1e-6));

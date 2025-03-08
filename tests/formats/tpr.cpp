@@ -50,8 +50,8 @@ static void check_traj(const char* path) {
     const std::vector<Residue>& residues_ref = frame_ref.topology().residues();
     CHECK(residues.size() == residues_ref.size());
     for (size_t i = 0; i < residues.size(); ++i) {
-        auto& res = residues[i];
-        auto& res_ref = residues_ref[i];
+        const auto& res = residues[i];
+        const auto& res_ref = residues_ref[i];
         CHECK(res.name() == res_ref.name());
         // Do not compare residue ids because PDB is numbered sequentially
         // and TPR uses internal numbering with possible duplicates.
@@ -209,7 +209,9 @@ TEST_CASE("Errors") {
         file.read();
         CHECK_THROWS_WITH(
             file.read(),
-            "can not read file 'data/tpr/gmx_v2021_s.tpr' at step 1: maximal step is 0");
+            "can not read file 'data/tpr/gmx_v2021_s.tpr' at index 1: "
+            "there are 1 frames in this file"
+        );
     }
 
     SECTION("Write error") {

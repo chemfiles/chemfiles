@@ -9,7 +9,7 @@ using namespace chemfiles;
 TEST_CASE("Read files in TNG format") {
     SECTION("Read trajectory") {
         auto file = Trajectory("data/tng/example.tng");
-        CHECK(file.nsteps() == 10);
+        CHECK(file.size() == 10);
         auto frame = file.read();
 
         CHECK(frame.size() == 15);
@@ -31,7 +31,7 @@ TEST_CASE("Read files in TNG format") {
 
     SECTION("Read velocities") {
         auto file = Trajectory("data/tng/1aki.tng");
-        CHECK(file.nsteps() == 6);
+        CHECK(file.size() == 6);
         auto frame = file.read();
         CHECK(frame.size() == 38376);
         CHECK(frame.index() == 0);
@@ -46,7 +46,7 @@ TEST_CASE("Read files in TNG format") {
         CHECK(approx_eq(velocities[450], Vector3D(-1.44889, 6.50066e-1, -7.64032), 1e-4));
         CHECK(approx_eq(velocities[4653], Vector3D(-16.5949, -4.62240, -7.01133), 1e-4));
 
-        frame = file.read_step(5);
+        frame = file.read_at(5);
         CHECK(frame.size() == 38376);
         CHECK(frame.index() == 5);
         CHECK(frame.get("simulation_step")->as_double() == 50);
@@ -112,7 +112,7 @@ TEST_CASE("Read files in TNG format") {
     SECTION("Non-consecutive frame indexes") {
         // cf https://github.com/chemfiles/chemfiles/issues/242
         auto file = Trajectory("data/tng/cobrotoxin.tng");
-        REQUIRE(file.nsteps() == 3);
+        REQUIRE(file.size() == 3);
 
         auto frame = file.read();
         CHECK(frame.index() == 0);
@@ -129,7 +129,7 @@ TEST_CASE("Read files in TNG format") {
         CHECK(frame.get("simulation_step")->as_double() == 50000);
         CHECK(approx_eq(frame.get("time")->as_double(), 100.0, 1e-4));
 
-        frame = file.read_step(0);
+        frame = file.read_at(0);
         CHECK(frame.size() == 19385);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[5569], Vector3D(14.94, 4.03, 19.89), 1e-5));

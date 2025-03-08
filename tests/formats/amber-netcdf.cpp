@@ -52,8 +52,8 @@ TEST_CASE("Read files in NetCDF format") {
 
     SECTION("Scale factor") {
         auto file = Trajectory("data/netcdf/scaled_traj.nc");
-        CHECK(file.nsteps() == 26);
-        auto frame = file.read_step(12);
+        CHECK(file.size() == 26);
+        auto frame = file.read_at(12);
         CHECK(frame.size() == 1938);
         CHECK_FALSE(frame.get("name"));
 
@@ -72,8 +72,8 @@ TEST_CASE("Read files in NetCDF format") {
 
     SECTION("Netcdf v5") {
         auto file = Trajectory("data/netcdf/version-5.nc");
-        CHECK(file.nsteps() == 11);
-        auto frame = file.read_step(2);
+        CHECK(file.size() == 11);
+        auto frame = file.read_at(2);
         CHECK(frame.size() == 1576);
 
         auto cell = frame.cell();
@@ -131,7 +131,7 @@ TEST_CASE("Write files in NetCDF format") {
         file.close();
 
         file = Trajectory(tmpfile, 'r');
-        CHECK(file.nsteps() == 2);
+        CHECK(file.size() == 2);
         check_frame(file.read());
         check_frame(file.read());
     }
@@ -150,7 +150,7 @@ TEST_CASE("Write files in NetCDF format") {
         }
 
         auto file = Trajectory(tmpfile, 'r');
-        CHECK(file.nsteps() == 2);
+        CHECK(file.size() == 2);
         check_frame(file.read());
         check_frame(file.read());
     }
@@ -164,7 +164,7 @@ TEST_CASE("Write files in NetCDF format") {
         file.close();
 
         file = Trajectory(tmpfile, 'r');
-        CHECK(file.nsteps() == 2);
+        CHECK(file.size() == 2);
         check_frame(file.read());
         check_frame(file.read());
     }

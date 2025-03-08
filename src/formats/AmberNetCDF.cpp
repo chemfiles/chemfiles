@@ -47,7 +47,7 @@ static double scale_for_time(std::string unit);
 AmberNetCDFBase::AmberNetCDFBase(std::string convention, std::string path, File::Mode mode, File::Compression compression):
     file_(std::move(path), mode),
     convention_(std::move(convention)),
-    step_(0)
+    index_(0)
 {
     if (compression != File::DEFAULT) {
         throw format_error("compression is not supported with NetCDF format");
@@ -142,7 +142,7 @@ AmberNetCDFBase::AmberNetCDFBase(std::string convention, std::string path, File:
 
     if (mode == File::APPEND) {
         // start writing at the end of pre-existing files in append mode
-        step_ = static_cast<size_t>(file_.n_records());
+        index_ = static_cast<size_t>(file_.n_records());
     }
 }
 
@@ -208,13 +208,13 @@ AmberNetCDFBase::variable_scale_t AmberNetCDFBase::get_variable(const std::strin
 /******************************************************************************/
 
 void AmberNetCDFBase::read(Frame& frame) {
-    this->read_step(step_, frame);
-    step_++;
+    this->read_at(index_, frame);
+    index_++;
 }
 
-void AmberNetCDFBase::read_step(const size_t step, Frame& frame) {
-    // Set the internal step_ before further reading
-    step_ = step;
+void AmberNetCDFBase::read_at(const size_t index, Frame& frame) {
+    // Set the internal index_ before further reading
+    index_ = index;
 
     frame.set_cell(read_cell());
 
@@ -237,11 +237,11 @@ void AmberNetCDFBase::read_step(const size_t step, Frame& frame) {
         double time_value = 0.0;
         if (variables_.time.var->type() == netcdf3::constants::NC_FLOAT) {
             float value;
-            variables_.time.var->read(step, &value, 1);
+            variables_.time.var->read(index, &value, 1);
             time_value = variables_.time.scale * static_cast<double>(value);
         } else if (variables_.time.var->type() == netcdf3::constants::NC_DOUBLE) {
             double value;
-            variables_.time.var->read(step, &value, 1);
+            variables_.time.var->read(index, &value, 1);
             time_value = variables_.time.scale * value;
         } else {
             throw format_error("invalid type for time variable");
@@ -285,11 +285,11 @@ void AmberNetCDFBase::write(const Frame& frame) {
             if (variables_.time.var->type() == netcdf3::constants::NC_FLOAT) {
                 // Amber NetCDF trajectory
                 float time_f32 = static_cast<float>(*time_opt);
-                variables_.time.var->write(step_, &time_f32, 1);
+                variables_.time.var->write(index_, &time_f32, 1);
             } else if (variables_.time.var->type() == netcdf3::constants::NC_DOUBLE) {
                 // Amber Restart
                 double time_f64 = *time_opt;
-                variables_.time.var->write(step_, &time_f64, 1);
+                variables_.time.var->write(index_, &time_f64, 1);
             } else {
                 throw format_error("invalid type for time variable");
             }
@@ -310,7 +310,7 @@ void AmberNetCDFBase::write(const Frame& frame) {
         }
     }
 
-    step_ += 1;
+    index_ += 1;
 }
 
 /******************************************************************************/
@@ -327,14 +327,14 @@ UnitCell AmberNetCDFBase::read_cell() {
     Vector3D lengths;
     auto& cell_lengths = variables_.cell_lengths.var;
     if (cell_lengths->type() == netcdf3::constants::NC_FLOAT) {
-        cell_lengths->read(step_, data_f32.data(), data_f32.size());
+        cell_lengths->read(index_, data_f32.data(), data_f32.size());
         lengths = Vector3D(
             static_cast<double>(data_f32[0]),
             static_cast<double>(data_f32[1]),
             static_cast<double>(data_f32[2])
         );
     } else if (cell_lengths->type() == netcdf3::constants::NC_DOUBLE) {
-        cell_lengths->read(step_, data_f64.data(), data_f64.size());
+        cell_lengths->read(index_, data_f64.data(), data_f64.size());
         lengths = Vector3D(
             data_f64[0],
             data_f64[1],
@@ -347,14 +347,14 @@ UnitCell AmberNetCDFBase::read_cell() {
     Vector3D angles;
     auto& cell_angles = variables_.cell_angles.var;
     if (cell_angles->type() == netcdf3::constants::NC_FLOAT) {
-        cell_angles->read(step_, data_f32.data(), data_f32.size());
+        cell_angles->read(index_, data_f32.data(), data_f32.size());
         angles = Vector3D(
             static_cast<double>(data_f32[0]),
             static_cast<double>(data_f32[1]),
             static_cast<double>(data_f32[2])
         );
     } else if (cell_angles->type() == netcdf3::constants::NC_DOUBLE) {
-        cell_angles->read(step_, data_f64.data(), data_f64.size());
+        cell_angles->read(index_, data_f64.data(), data_f64.size());
         angles = Vector3D(
             data_f64[0],
             data_f64[1],
@@ -372,14 +372,14 @@ UnitCell AmberNetCDFBase::read_cell() {
 
 void AmberNetCDFBase::read_array(variable_scale_t& variable, span<Vector3D> array) {
     if (variable.var->type() == netcdf3::constants::NC_FLOAT) {
-        variable.var->read(step_, buffer_f32_);
+        variable.var->read(index_, buffer_f32_);
         for (size_t i=0; i<n_atoms_; i++) {
             array[i][0] = variable.scale * static_cast<double>(buffer_f32_[3 * i + 0]);
             array[i][1] = variable.scale * static_cast<double>(buffer_f32_[3 * i + 1]);
             array[i][2] = variable.scale * static_cast<double>(buffer_f32_[3 * i + 2]);
         }
     } else if (variable.var->type() == netcdf3::constants::NC_DOUBLE) {
-        variable.var->read(step_, buffer_f64_);
+        variable.var->read(index_, buffer_f64_);
         for (size_t i=0; i<n_atoms_; i++) {
             array[i][0] = variable.scale * buffer_f64_[3 * i + 0];
             array[i][1] = variable.scale * buffer_f64_[3 * i + 1];
@@ -409,9 +409,9 @@ void AmberNetCDFBase::write_cell(const UnitCell& cell) {
             static_cast<float>(lengths[1]),
             static_cast<float>(lengths[2]),
         };
-        cell_lengths->write(step_, data_f32.data(), data_f32.size());
+        cell_lengths->write(index_, data_f32.data(), data_f32.size());
     } else if (cell_lengths->type() == netcdf3::constants::NC_DOUBLE) {
-        cell_lengths->write(step_, lengths.data(), 3);
+        cell_lengths->write(index_, lengths.data(), 3);
     } else {
         unreachable();
     }
@@ -424,9 +424,9 @@ void AmberNetCDFBase::write_cell(const UnitCell& cell) {
             static_cast<float>(angles[1]),
             static_cast<float>(angles[2]),
         };
-        cell_angles->write(step_, data_f32.data(), data_f32.size());
+        cell_angles->write(index_, data_f32.data(), data_f32.size());
     } else if (cell_angles->type() == netcdf3::constants::NC_DOUBLE) {
-        cell_angles->write(step_, angles.data(), 3);
+        cell_angles->write(index_, angles.data(), 3);
     } else {
         unreachable();
     }
@@ -440,9 +440,9 @@ void AmberNetCDFBase::write_array(variable_scale_t& variable, span<const Vector3
             buffer_f32_[3 * i + 1] = static_cast<float>(array[i][1]);
             buffer_f32_[3 * i + 2] = static_cast<float>(array[i][2]);
         }
-        variable.var->write(step_, buffer_f32_);
+        variable.var->write(index_, buffer_f32_);
     } else if (variable.var->type() == netcdf3::constants::NC_DOUBLE) {
-        variable.var->write(step_, array[0].data(), 3 * array.size());
+        variable.var->write(index_, array[0].data(), 3 * array.size());
     } else {
         throw format_error("invalid type for variable, expected floating point");
     }
@@ -465,7 +465,7 @@ AmberTrajectory::AmberTrajectory(std::string path, File::Mode mode, File::Compre
     }
 }
 
-size_t AmberTrajectory::nsteps() {
+size_t AmberTrajectory::size() {
     return static_cast<size_t>(file_.n_records());
 }
 
@@ -602,13 +602,13 @@ AmberRestart::AmberRestart(std::string path, File::Mode mode, File::Compression 
 }
 
 void AmberRestart::write(const Frame& frame) {
-    if (step_ != 0) {
+    if (index_ != 0) {
         throw format_error("AMBER Restart format only supports writing one frame");
     }
     AmberNetCDFBase::write(frame);
 }
 
-size_t AmberRestart::nsteps() {
+size_t AmberRestart::size() {
     return 1;
 }
 

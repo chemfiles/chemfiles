@@ -24,10 +24,10 @@ class XTCFormat final : public Format {
   public:
     XTCFormat(std::string path, File::Mode mode, File::Compression compression);
 
-    void read_step(size_t step, Frame& frame) override;
+    void read_at(size_t index, Frame& frame) override;
     void read(Frame& frame) override;
     void write(const Frame& frame) override;
-    size_t nsteps() override;
+    size_t size() override;
 
   private:
     struct FrameHeader {
@@ -47,9 +47,9 @@ class XTCFormat final : public Format {
     /// Associated XDR file
     XDRFile file_;
     /// Offsets within file for fast indexing
-    std::vector<uint64_t> frame_offsets_;
-    /// The next step to read
-    size_t step_ = 0;
+    std::vector<uint64_t> frame_positions_;
+    /// index of the next step to read
+    size_t index_ = 0;
     /// The number of atoms in the trajectory
     size_t natoms_ = 0;
 };

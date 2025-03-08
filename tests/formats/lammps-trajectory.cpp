@@ -11,7 +11,7 @@ using namespace chemfiles;
 // {wrapped, scaled_wrapped, unwrapped, scaled_unwrapped}.lammpstrj
 // are based on the same simulation and contain therefore the same unwrapped positions
 static void check_pos_representation(Trajectory& file) {
-    CHECK(file.nsteps() == 11);
+    CHECK(file.size() == 11);
 
     Frame frame = file.read();
     CHECK(frame.size() == 7751);
@@ -34,7 +34,7 @@ static void check_pos_representation(Trajectory& file) {
 
     CHECK(frame.get("is_unwrapped").value().as_bool());
 
-    frame = file.read_step(5);
+    frame = file.read_at(5);
     CHECK(frame.size() == 7751);
 
     positions = frame.positions();
@@ -47,7 +47,7 @@ static void check_pos_representation(Trajectory& file) {
 
     CHECK(frame.get("is_unwrapped").value().as_bool());
 
-    CHECK_THROWS_AS(file.read_step(11), FileError);
+    CHECK_THROWS_AS(file.read_at(11), FileError);
 }
 
 TEST_CASE("Read files in LAMMPS Atom format") {
@@ -82,20 +82,20 @@ TEST_CASE("Read files in LAMMPS Atom format") {
 
         CHECK(!frame.get("is_unwrapped").value().as_bool());
 
-        frame = file.read_step(5);
+        frame = file.read_at(5);
         CHECK(frame.size() == 512);
         positions = frame.positions();
 
         CHECK(approx_eq(positions[0], Vector3D(0.095924, -0.0222584, -0.0152489), 1e-3));
         CHECK(approx_eq(positions[222], Vector3D(14.0788, 0.0954186, 8.56453), 1e-3));
 
-        frame = file.read_step(0); // read a previous step
+        frame = file.read_at(0); // read a previous step
         CHECK(frame.size() == 512);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.0, 0.0, 0.0), 1e-3));
         CHECK(approx_eq(positions[222], Vector3D(14.1005, 0.0, 8.4603), 1e-3));
 
-        CHECK_THROWS_AS(file.read_step(6), FileError);
+        CHECK_THROWS_AS(file.read_at(6), FileError);
     }
 
     SECTION("Wrapped Coordinates") {
@@ -120,7 +120,7 @@ TEST_CASE("Read files in LAMMPS Atom format") {
 
     SECTION("Position Representation") {
         auto file = Trajectory("data/lammps/detect_best_pos_repr.lammpstrj");
-        CHECK(file.nsteps() == 5);
+        CHECK(file.size() == 5);
 
         Frame frame = file.read();
         CHECK(frame.size() == 854);
@@ -188,7 +188,7 @@ TEST_CASE("Read files in LAMMPS Atom format") {
 
     SECTION("Atom Properties") {
         auto file = Trajectory("data/lammps/properties.lammpstrj");
-        CHECK(file.nsteps() == 4);
+        CHECK(file.size() == 4);
 
         Frame frame = file.read();
         CHECK(frame.size() == 4000);
@@ -209,7 +209,7 @@ TEST_CASE("Read files in LAMMPS Atom format") {
 
         CHECK(!frame.get("is_unwrapped").value().as_bool());
 
-        frame = file.read_step(3);
+        frame = file.read_at(3);
         CHECK(frame.size() == 4000);
         CHECK(frame.index() == 3);
         CHECK(frame.get("simulation_step")->as_double() == 300);
@@ -248,13 +248,13 @@ TEST_CASE("Read files in LAMMPS Atom format") {
         );
 
         file = Trajectory("data/lammps/bad/box-not-numbers.lammpstrj");
-        CHECK(file.nsteps() == 3);
+        CHECK(file.size() == 3);
         CHECK_THROWS_WITH(
             file.read(),
             "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 2 but got 1"
         );
         CHECK_THROWS_WITH(
-            file.read_step(1),
+            file.read_at(1),
             "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 2 but got 1"
         );
         // read a step after an exception was thrown
@@ -264,13 +264,13 @@ TEST_CASE("Read files in LAMMPS Atom format") {
         );
 
         file = Trajectory("data/lammps/bad/box-wrong-size.lammpstrj");
-        CHECK(file.nsteps() == 3);
+        CHECK(file.size() == 3);
         CHECK_THROWS_WITH(
             file.read(),
             "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 3 but got 2"
         );
         CHECK_THROWS_WITH(
-            file.read_step(1),
+            file.read_at(1),
             "can not read box header in LAMMPS format: incomplete box dimensions in LAMMPS format, expected 3 but got 2"
         );
         // read a step after an exception was thrown
@@ -334,7 +334,7 @@ TEST_CASE("Write files in LAMMPS Atom format") {
         file.close();
 
         auto check_traj = Trajectory(tmpfile);
-        CHECK(check_traj.nsteps() == 1);
+        CHECK(check_traj.size() == 1);
         frame = check_traj.read();
         CHECK(frame.size() == 2);
         CHECK(approx_eq(frame.positions()[1], Vector3D(1.0, 2.0, 3.0), 1e-3));
@@ -417,7 +417,7 @@ TEST_CASE("Write files in LAMMPS Atom format") {
         file.close();
 
         auto check_traj = Trajectory(tmpfile);
-        CHECK(check_traj.nsteps() == 2);
+        CHECK(check_traj.size() == 2);
         CHECK(check_traj.read().size() == 4);
         frame = check_traj.read();
         CHECK(frame.size() == 7);
@@ -448,7 +448,7 @@ ITEM: ATOMS id type x y z
 )");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "LAMMPS");
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
 
         auto frame = file.read();
         CHECK(frame.size() == 2);
@@ -505,7 +505,7 @@ ITEM: ATOMS id type x y z
 )");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "LAMMPS");
-        CHECK(file.nsteps() == 3);
+        CHECK(file.size() == 3);
 
         auto frame = file.read();
         CHECK(frame.size() == 0);
@@ -544,7 +544,7 @@ ITEM: ATOMS type element z mass y x vy vz q id
 )"); // column order very messed up
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "LAMMPS");
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
 
         auto frame = file.read();
         CHECK(frame.size() == 2);
@@ -602,7 +602,7 @@ ITEM: ATOMS id type
 )");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "LAMMPS");
-        CHECK(file.nsteps() == 3);
+        CHECK(file.size() == 3);
 
         auto frame = file.read();
         CHECK(frame.size() == 1);
@@ -644,7 +644,7 @@ ITEM: ATOMS id type xs ys zs ix iy iz
 )"); // in older LAMMPS versions (pre Apr 2011 [f7ce527]) the boundary flags come before 'xy xz yz'
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "LAMMPS");
-        CHECK(file.nsteps() == 2);
+        CHECK(file.size() == 2);
 
         auto frame = file.read();
         CHECK(frame.size() == 1);

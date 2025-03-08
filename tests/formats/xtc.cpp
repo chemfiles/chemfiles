@@ -9,8 +9,8 @@ using namespace chemfiles;
 TEST_CASE("Read files in XTC format") {
     SECTION("Read trajectory") {
         auto file = Trajectory("data/xtc/ubiquitin.xtc");
-        CHECK(file.nsteps() == 251);
-        auto frame = file.read_step(0);
+        CHECK(file.size() == 251);
+        auto frame = file.read_at(0);
 
         CHECK(frame.index() == 0);
         CHECK(frame.get("simulation_step")->as_double() == 0);
@@ -26,7 +26,7 @@ TEST_CASE("Read files in XTC format") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
 
-        frame = file.read_step(1); // Skip a frame
+        frame = file.read_at(1); // Skip a frame
         CHECK(frame.index() == 1);
         CHECK(frame.get("simulation_step")->as_double() == 100);
 
@@ -46,7 +46,7 @@ TEST_CASE("Read files in XTC format") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
 
-        frame = file.read_step(230); // skip forward
+        frame = file.read_at(230); // skip forward
 
         CHECK(frame.index() == 230);
         CHECK(frame.get("simulation_step")->as_double() == 23000);
@@ -62,7 +62,7 @@ TEST_CASE("Read files in XTC format") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
 
-        frame = file.read_step(50); // skip behind previous step
+        frame = file.read_at(50); // skip behind previous step
 
         CHECK(frame.index() == 50);
         CHECK(frame.get("simulation_step")->as_double() == 5000);
@@ -81,7 +81,7 @@ TEST_CASE("Read files in XTC format") {
 
     SECTION("Read different cell shapes") {
         auto file = Trajectory("data/xtc/cell_shapes.xtc");
-        CHECK(file.nsteps() == 3);
+        CHECK(file.size() == 3);
 
         auto frame = file.read();
         CHECK(frame.size() == 10);
@@ -132,7 +132,7 @@ TEST_CASE("Write and append files in uncompressed XTC format") {
         frame.add_atom(Atom("C"), {1, 2, 3});
 
         file.write(frame);
-        CHECK(file.nsteps() == 2);
+        CHECK(file.size() == 2);
         file.close();
 
         // now append one frame
@@ -146,13 +146,13 @@ TEST_CASE("Write and append files in uncompressed XTC format") {
         frame.add_atom(Atom("C"), {4, 5, 6});
 
         file.write(frame);
-        CHECK(file.nsteps() == 3);
+        CHECK(file.size() == 3);
         file.close();
 
         // now read every thing back and check
         file = Trajectory(tmpfile, 'r');
 
-        frame = file.read_step(0);
+        frame = file.read_at(0);
 
         CHECK(frame.index() == 0);
         CHECK(frame.get("simulation_step")->as_double() == 0); // default step
@@ -167,7 +167,7 @@ TEST_CASE("Write and append files in uncompressed XTC format") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {10.111, 11.222, 12.333}, 1e-4));
 
-        frame = file.read_step(1);
+        frame = file.read_at(1);
 
         CHECK(frame.index() == 1);
         CHECK(frame.get("simulation_step")->as_double() == 100);
@@ -210,7 +210,7 @@ TEST_CASE("Write and append files in uncompressed XTC format") {
 
         auto file = Trajectory(tmpfile, 'a');
         file.write(frame);
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
         file.close();
 
         // now read every thing back and check
@@ -270,7 +270,7 @@ TEST_CASE("Write and append files in compressed XTC format") {
         frame.add_atom(Atom("J"), {28, 29, 30});
 
         file.write(frame);
-        CHECK(file.nsteps() == 2);
+        CHECK(file.size() == 2);
         file.close();
 
         // now append one frame
@@ -291,7 +291,7 @@ TEST_CASE("Write and append files in compressed XTC format") {
         frame.add_atom(Atom("J"), {28, 29, 30});
 
         file.write(frame);
-        CHECK(file.nsteps() == 3);
+        CHECK(file.size() == 3);
         file.close();
 
         // now read every thing back and check
@@ -366,7 +366,7 @@ TEST_CASE("Write and append files in compressed XTC format") {
 
         auto file = Trajectory(tmpfile, 'a');
         file.write(frame);
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
         file.close();
 
         // now read every thing back and check
@@ -419,7 +419,7 @@ TEST_CASE("Large Numbers") {
     SECTION("Read large numbers") {
         auto file = Trajectory("data/xtc/large_diff.xtc", 'r');
 
-        CHECK(file.nsteps() == 4);
+        CHECK(file.size() == 4);
         auto frame = file.read();
 
         CHECK(frame.index() == 0);
@@ -437,7 +437,7 @@ TEST_CASE("Large Numbers") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {16777220.0, 10.0, 10.0}, 1e-4));
 
-        frame = file.read_step(3);
+        frame = file.read_at(3);
 
         CHECK(frame.index() == 3);
         CHECK(frame.get("simulation_step")->as_double() == 0);
@@ -482,7 +482,7 @@ TEST_CASE("Large Numbers") {
 
         // now read every thing back and check
         file = Trajectory(tmpfile, 'r');
-        CHECK(file.nsteps() == 2);
+        CHECK(file.size() == 2);
 
         frame = file.read();
 

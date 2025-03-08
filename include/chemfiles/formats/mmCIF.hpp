@@ -38,10 +38,10 @@ public:
         init_();
     }
 
-    void read_step(size_t step, Frame& frame) override;
+    void read_at(size_t index, Frame& frame) override;
     void read(Frame& frame) override;
     void write(const Frame& frame) override;
-    size_t nsteps() override;
+    size_t size() override;
 private:
     /// Initialize important variables
     void init_();
@@ -55,7 +55,7 @@ private:
     std::map<std::pair<std::string, int64_t>, size_t> map_residues_indexes;
     /// Storing the positions of all the steps in the file, so that we can
     /// just `seekpos` them instead of reading the whole step.
-    std::vector<uint64_t> steps_positions_;
+    std::vector<uint64_t> frame_positions_;
     /// The cell for all frames
     UnitCell cell_;
     /// Number of models written to the file.

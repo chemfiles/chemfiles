@@ -7,8 +7,8 @@
 using namespace chemfiles;
 
 static void check_ubiquitin(Trajectory& file) {
-    CHECK(file.nsteps() == 2);
-    auto frame = file.read_step(0);
+    CHECK(file.size() == 2);
+    auto frame = file.read_at(0);
 
     CHECK(frame.index() == 0);
     CHECK(frame.get("simulation_step")->as_double() == 0);
@@ -29,7 +29,7 @@ static void check_ubiquitin(Trajectory& file) {
     CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
     CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
 
-    frame = file.read_step(1);
+    frame = file.read_at(1);
 
     CHECK(frame.index() == 1);
     CHECK(frame.get("simulation_step")->as_double() == 25000);
@@ -52,7 +52,7 @@ static void check_ubiquitin(Trajectory& file) {
 }
 
 static void check_different_cell_shapes(Trajectory& file) {
-    CHECK(file.nsteps() == 3);
+    CHECK(file.size() == 3);
 
     auto frame = file.read();
     CHECK(frame.size() == 10);
@@ -92,7 +92,7 @@ TEST_CASE("Read files in TRR format") {
 
     SECTION("Read trajectory: Water") {
         auto file = Trajectory("data/trr/water.trr");
-        CHECK(file.nsteps() == 100);
+        CHECK(file.size() == 100);
         auto frame = file.read();
 
         CHECK(frame.index() == 0);
@@ -128,7 +128,7 @@ TEST_CASE("Read files in TRR format") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {15.0, 15.0, 15.0}, 1e-4));
 
-        frame = file.read_step(75); // skip forward
+        frame = file.read_at(75); // skip forward
 
         CHECK(frame.index() == 75);
         CHECK(frame.get("simulation_step")->as_double() == 75);
@@ -144,7 +144,7 @@ TEST_CASE("Read files in TRR format") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {15.0, 15.0, 15.0}, 1e-4));
 
-        frame = file.read_step(50); // skip behind previous step
+        frame = file.read_at(50); // skip behind previous step
 
         CHECK(frame.index() == 50);
         CHECK(frame.get("simulation_step")->as_double() == 50);
@@ -163,7 +163,7 @@ TEST_CASE("Read files in TRR format") {
 
     SECTION("Read trajectory: 1AKI") {
         auto file = Trajectory("data/trr/1aki.trr");
-        CHECK(file.nsteps() == 6);
+        CHECK(file.size() == 6);
         auto frame = file.read();
 
         CHECK(frame.index() == 0);
@@ -185,7 +185,7 @@ TEST_CASE("Read files in TRR format") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {73.3925, 73.3925, 73.3925}, 1e-4));
 
-        frame = file.read_step(5); // skip forward
+        frame = file.read_at(5); // skip forward
 
         CHECK(frame.index() == 5);
         CHECK(frame.get("simulation_step")->as_double() == 50);
@@ -249,7 +249,7 @@ TEST_CASE("Write and append files in TRR format") {
         frame.add_atom(Atom("C"), {0, 0, 0}, {1.222, -2.333, -3.444});
         file.write(frame);
 
-        CHECK(file.nsteps() == 3);
+        CHECK(file.size() == 3);
         file.close();
 
         // now append one frame
@@ -263,7 +263,7 @@ TEST_CASE("Write and append files in TRR format") {
         frame.add_atom(Atom("C"), {4, 5, 6});
 
         file.write(frame);
-        CHECK(file.nsteps() == 4);
+        CHECK(file.size() == 4);
         file.close();
 
         // now read every thing back and check
@@ -359,7 +359,7 @@ TEST_CASE("Write and append files in TRR format") {
 
         auto file = Trajectory(tmpfile, 'a');
         file.write(frame);
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
         file.close();
 
         // now read every thing back and check

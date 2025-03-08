@@ -129,7 +129,7 @@ CMLFormat::~CMLFormat() {
     }
 }
 
-size_t CMLFormat::nsteps() {
+size_t CMLFormat::size() {
     auto children = root_.children("molecule");
     return static_cast<size_t>(std::distance(children.begin(), children.end()));
 }
@@ -440,9 +440,9 @@ void CMLFormat::read(Frame& frame) {
     current_++;
 }
 
-void CMLFormat::read_step(size_t step, Frame& frame) {
+void CMLFormat::read_at(size_t index, Frame& frame) {
     current_ = root_.children("molecule").begin();
-    std::advance(current_, static_cast<ptrdiff_t>(step));
+    std::advance(current_, static_cast<ptrdiff_t>(index));
     read(frame);
 }
 
