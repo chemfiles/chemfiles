@@ -17,13 +17,13 @@ TEST_CASE() {
         auto frame = trajectory.read();
     }
 
-    // When using `read_step`, `done()` returns `true` if the most recent call
-    // was used to read the last step (`nsteps() - 1`).
-    auto frame = trajectory.read_step(0);
+    // When using `read_at`, `done()` returns `true` if the most recent call
+    // was used to read the last step (`size() - 1`).
+    auto frame = trajectory.read_at(0);
     assert(!trajectory.done());
 
-    auto nsteps = trajectory.nsteps();
-    frame = trajectory.read_step(nsteps - 1);
+    auto size = trajectory.size();
+    frame = trajectory.read_at(size - 1);
     assert(trajectory.done());
     // [example]
 }

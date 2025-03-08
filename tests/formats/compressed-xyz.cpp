@@ -5,12 +5,10 @@
 #include "helpers.hpp"
 #include "chemfiles.hpp"
 #include "chemfiles/File.hpp"
-#include "chemfiles/files/GzFile.hpp"
-#include "chemfiles/files/XzFile.hpp"
 using namespace chemfiles;
 
 static void check_read_file(Trajectory&& file) {
-    REQUIRE(file.nsteps() == 100);
+    REQUIRE(file.size() == 100);
 
     Frame frame = file.read();
 
@@ -30,7 +28,7 @@ static void check_read_file(Trajectory&& file) {
     file.read();
     file.read();
     // Get back
-    frame = file.read_step(2);
+    frame = file.read_at(2);
     CHECK(frame.size() == 297);
     positions = frame.positions();
     CHECK(approx_eq(positions[0], Vector3D(0.299, 8.310, 11.721), 1e-3));
@@ -63,7 +61,7 @@ TEST_CASE("Explit compression in format name") {
     check_read_file(Trajectory("data/xyz/water.xyz.xz", 'r', "XYZ / XZ"));
 }
 
-static void check_write_file(std::string path, File::Compression compression) {
+static void check_write_file(const std::string& path, File::Compression compression) {
     auto frame = Frame();
     frame.add_atom(Atom("A","O"), {1, 2, 3});
     frame.add_atom(Atom("B"), {1, 2, 4});
@@ -100,7 +98,7 @@ TEST_CASE("Write compressed files in XYZ format") {
     check_write_file(xz_path, File::LZMA);
 }
 
-static void check_append_file(std::string path, File::Compression compression) {
+static void check_append_file(const std::string& path, File::Compression compression) {
     auto frame = Frame();
     frame.add_atom(Atom("A","O"), {1, 2, 3});
     frame.add_atom(Atom("B"), {1, 2, 4});
@@ -110,7 +108,7 @@ static void check_append_file(std::string path, File::Compression compression) {
     {
         auto file = Trajectory(path, 'a');
         file.write(frame);
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
         file.close();
     }
 
@@ -123,7 +121,7 @@ static void check_append_file(std::string path, File::Compression compression) {
     {
         auto file = Trajectory(path, 'a');
         file.write(frame);
-        CHECK(file.nsteps() == 2);
+        CHECK(file.size() == 2);
         file.close();
     }
 

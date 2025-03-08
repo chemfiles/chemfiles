@@ -29,7 +29,7 @@ public:
     AmberNetCDFBase(std::string convention, std::string path, File::Mode mode, File::Compression compression);
 
     void read(Frame& frame) final;
-    void read_step(size_t step, Frame& frame) final;
+    void read_at(size_t index, Frame& frame) final;
     void write(const Frame& frame) override;
 
 protected:
@@ -52,8 +52,8 @@ protected:
     netcdf3::Netcdf3File file_;
     /// convention used
     std::string convention_;
-    /// last step read
-    size_t step_;
+    /// index of last step read
+    size_t index_;
 
     struct {
         variable_scale_t coordinates;
@@ -83,7 +83,7 @@ class AmberTrajectory final: public AmberNetCDFBase {
 public:
     AmberTrajectory(std::string path, File::Mode mode, File::Compression compression);
 
-    size_t nsteps() override;
+    size_t size() override;
     void initialize(const Frame& frame) override;
 
 private:
@@ -96,7 +96,7 @@ public:
     AmberRestart(std::string path, File::Mode mode, File::Compression compression);
 
     void write(const Frame& frame) override;
-    size_t nsteps() override;
+    size_t size() override;
     void initialize(const Frame& frame) override;
 
 private:

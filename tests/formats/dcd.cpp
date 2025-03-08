@@ -1,11 +1,12 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
+#include <cstring>
+
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
 
-#include "chemfiles/error_fmt.hpp"
 using namespace chemfiles;
 
 static Vector3D vector3d_float(float x, float y, float z) {
@@ -24,7 +25,7 @@ static bool is_little_endian() {
 
 TEST_CASE("Read files in DCD format") {
     auto file = Trajectory("data/dcd/water.dcd");
-    CHECK(file.nsteps() == 100);
+    CHECK(file.size() == 100);
 
     auto frame = file.read();
     CHECK(frame.size() == 297);
@@ -39,7 +40,7 @@ TEST_CASE("Read files in DCD format") {
     CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
     CHECK(cell.lengths() == vector3d_float(15.0, 15.0, 15.0));
 
-    frame = file.read_step(2);
+    frame = file.read_at(2);
     CHECK(frame.size() == 297);
     CHECK(frame.get<Property::DOUBLE>("time") == 2.0);
 
@@ -70,7 +71,7 @@ TEST_CASE("Read unit cell in DCD files") {
     SECTION("Triclinic cell, cell vectors") {
         // this is used by modern version of CHARMM
         auto file = Trajectory("data/dcd/triclinic-octane-vectors.dcd");
-        CHECK(file.nsteps() == 10);
+        CHECK(file.size() == 10);
 
         auto frame = file.read();
         auto cell = frame.cell();
@@ -94,7 +95,7 @@ TEST_CASE("Read unit cell in DCD files") {
         // this is the same file as triclinic-octane-vectors.dcd, with the
         // CHARMM version set to 24.
         auto file = Trajectory("data/dcd/triclinic-octane-cos.dcd");
-        CHECK(file.nsteps() == 10);
+        CHECK(file.size() == 10);
 
         auto frame = file.read();
         auto cell = frame.cell();
@@ -108,7 +109,7 @@ TEST_CASE("Read unit cell in DCD files") {
         // this is the result of reading triclinic-octane-vectors.dcd and
         // writing it back with MDAnalysis
         auto file = Trajectory("data/dcd/triclinic-octane-direct.dcd");
-        CHECK(file.nsteps() == 10);
+        CHECK(file.size() == 10);
 
         auto frame = file.read();
         auto cell = frame.cell();
@@ -120,7 +121,7 @@ TEST_CASE("Read unit cell in DCD files") {
 
     SECTION("Triclinic cell from NAMD") {
         auto file = Trajectory("data/dcd/triclinic-namd.dcd");
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
 
         auto frame = file.read();
         auto cell = frame.cell();
@@ -135,7 +136,7 @@ TEST_CASE("Read unit cell in DCD files") {
 
 TEST_CASE("4D DCD files") {
     auto file = Trajectory("data/dcd/4d-dynamic.dcd");
-    CHECK(file.nsteps() == 5);
+    CHECK(file.size() == 5);
 
     auto frame = file.read();
     CHECK(frame.cell().shape() == UnitCell::INFINITE);
@@ -146,7 +147,7 @@ TEST_CASE("4D DCD files") {
     CHECK(positions[15] == vector3d_float(2.2381972f, -0.5173331f, -0.4879273f));
 
 
-    frame = file.read_step(3);
+    frame = file.read_at(3);
     CHECK(frame.cell().shape() == UnitCell::INFINITE);
     CHECK(frame.size() == 27);
     positions = frame.positions();
@@ -158,7 +159,7 @@ TEST_CASE("4D DCD files") {
 TEST_CASE("fixed atoms") {
     // atoms 0 to 5 are fixed, the rest are free
     auto file = Trajectory("data/dcd/fixed-atoms.dcd");
-    CHECK(file.nsteps() == 10);
+    CHECK(file.size() == 10);
 
     auto frame = file.read();
     CHECK(frame.size() == 12);
@@ -173,7 +174,7 @@ TEST_CASE("fixed atoms") {
     CHECK(positions[2] == vector3d_float(-1.0220516f, -1.0135641f, 0.0));
     CHECK(positions[10] == vector3d_float(1.8200468f, -1.3015325f, 10.0f));
 
-    frame = file.read_step(5);
+    frame = file.read_at(5);
     CHECK(frame.size() == 12);
     CHECK(frame.cell().shape() == UnitCell::INFINITE);
     positions = frame.positions();
@@ -187,9 +188,9 @@ TEST_CASE("reading uncommon files") {
 
     SECTION("64-bit fortran markers, little endian") {
         auto file = Trajectory("data/dcd/mrmd_h2so4-64bit-le.dcd");
-        CHECK(file.nsteps() == 50);
+        CHECK(file.size() == 50);
 
-        auto frame = file.read_step(23);
+        auto frame = file.read_at(23);
         CHECK(frame.size() == 7);
         CHECK(frame.cell().shape() == UnitCell::INFINITE);
         auto positions = frame.positions();
@@ -199,9 +200,9 @@ TEST_CASE("reading uncommon files") {
 
     SECTION("32-bit fortran markers, big endian") {
         auto file = Trajectory("data/dcd/mrmd_h2so4-32bit-be.dcd");
-        CHECK(file.nsteps() == 50);
+        CHECK(file.size() == 50);
 
-        auto frame = file.read_step(23);
+        auto frame = file.read_at(23);
         CHECK(frame.size() == 7);
         CHECK(frame.cell().shape() == UnitCell::INFINITE);
         auto positions = frame.positions();
@@ -211,9 +212,9 @@ TEST_CASE("reading uncommon files") {
 
     SECTION("64-bit fortran markers, big endian") {
         auto file = Trajectory("data/dcd/mrmd_h2so4-64bit-be.dcd");
-        CHECK(file.nsteps() == 50);
+        CHECK(file.size() == 50);
 
-        auto frame = file.read_step(23);
+        auto frame = file.read_at(23);
         CHECK(frame.size() == 7);
         CHECK(frame.cell().shape() == UnitCell::INFINITE);
         auto positions = frame.positions();
@@ -327,9 +328,9 @@ TEST_CASE("write DCD files") {
     }
 
     auto check = Trajectory(tmpfile);
-    CHECK(check.nsteps() == 2);
+    CHECK(check.size() == 2);
 
-    auto check_frame = check.read_step(1);
+    auto check_frame = check.read_at(1);
     CHECK(check_frame.size() == 3);
     CHECK(approx_eq(check_frame.cell().lengths(), {10, 12, 11}, 1e-12));
     CHECK(approx_eq(check_frame.cell().angles(), {90, 80, 120}, 1e-12));
@@ -424,9 +425,9 @@ TEST_CASE("Append to DCD files") {
         }
 
         auto check = Trajectory(tmpfile);
-        CHECK(check.nsteps() == 2);
+        CHECK(check.size() == 2);
 
-        auto frame = check.read_step(0);
+        auto frame = check.read_at(0);
         CHECK(frame.size() == 3);
         CHECK(approx_eq(frame.cell().lengths(), {10, 12, 11}, 1e-12));
         CHECK(approx_eq(frame.cell().angles(), {90, 90, 90}, 1e-12));
@@ -436,7 +437,7 @@ TEST_CASE("Append to DCD files") {
         CHECK(approx_eq(positions[1], {0, 0, 0}, 1e-12));
         CHECK(approx_eq(positions[2], {0, 0, 0}, 1e-12));
 
-        frame = check.read_step(1);
+        frame = check.read_at(1);
         CHECK(frame.size() == 3);
         CHECK(approx_eq(frame.cell().lengths(), {10, 12, 11}, 1e-12));
         CHECK(approx_eq(frame.cell().angles(), {90, 80, 120}, 1e-12));
@@ -462,7 +463,7 @@ TEST_CASE("Append to DCD files") {
         }
 
         auto check = Trajectory(tmpfile);
-        CHECK(check.nsteps() == 1);
+        CHECK(check.size() == 1);
 
         auto frame = check.read();
         CHECK(frame.size() == 3);

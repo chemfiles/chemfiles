@@ -66,16 +66,16 @@ public:
     Format(Format&&) = delete;
     Format& operator=(Format&&) = delete;
 
-    /// Read a specific `step` from the trajectory file.
+    /// Read a specific `index` from the trajectory file.
     ///
     /// @throw FormatError if the file does not follow the format
     /// @throw FileError if their is an OS error while reading the file
     ///
-    /// @param step The step to read
+    /// @param index The index to read
     /// @param frame The frame to fill
-    virtual void read_step(size_t step, Frame& frame);
+    virtual void read_at(size_t index, Frame& frame);
 
-    /// Read the next step from the trajectory file.
+    /// Read the next frame from the trajectory file.
     ///
     /// @throw FormatError if the file does not follow the format
     /// @throw FileError if their is an OS error while reading the file
@@ -95,7 +95,7 @@ public:
     /// expensive to call since it may needs to scan the whole file.
     ///
     /// @return The number of frames
-    virtual size_t nsteps() = 0;
+    virtual size_t size() = 0;
 };
 
 /// The `TextFormat` class defines a common, simpler interface for text based
@@ -110,10 +110,10 @@ public:
     TextFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression);
     virtual ~TextFormat() override = default;
 
-    void read_step(size_t step, Frame& frame) override;
+    void read_at(size_t index, Frame& frame) override;
     void read(Frame& frame) override;
     void write(const Frame& frame) override;
-    size_t nsteps() override;
+    size_t size() override;
 
     /// Fast-forward the file for one step, returning a valid position if the
     /// file does contain one more step or `nullopt` if it does not.
@@ -130,12 +130,12 @@ private:
     /// Scan the whole file to get all the steps positions
     void scan_all();
 
-    /// The next step to read
-    size_t step_ = 0;
+    /// The next index to read
+    size_t index_ = 0;
 
-    /// Storing the positions of all the steps in the file, so that we can
+    /// Storing the positions of all the new frames in the file, so that we can
     /// just `seekpos` them instead of reading the whole step.
-    std::vector<uint64_t> steps_positions_;
+    std::vector<uint64_t> frame_positions_;
 
     /// Did we found the end of file while scanning or reading?
     bool eof_found_ = false;

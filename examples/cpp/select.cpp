@@ -10,7 +10,7 @@ int main() {
 
     auto selection = chemfiles::Selection("name Zn or name N");
 
-    for (size_t step=0; step<input.nsteps(); step++) {
+    for (size_t step=0; step<input.size(); step++) {
         auto frame = input.read();
         auto to_remove = selection.list(frame);
         std::sort(std::begin(to_remove), std::end(to_remove), std::greater<size_t>());

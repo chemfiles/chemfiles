@@ -130,11 +130,11 @@ MMTFFormat::~MMTFFormat() {
     }
 }
 
-size_t MMTFFormat::nsteps() {
+size_t MMTFFormat::size() {
     return static_cast<size_t>(structure_.numModels);
 }
 
-void MMTFFormat::read_step(const size_t step, Frame& frame) {
+void MMTFFormat::read_at(const size_t index, Frame& frame) {
     modelIndex_ = 0;
     chainIndex_ = 0;
     groupIndex_ = 0;
@@ -143,7 +143,7 @@ void MMTFFormat::read_step(const size_t step, Frame& frame) {
     interBondIndex_ = 0;
 
     // Fast-forward, keeping all indexes updated
-    while(modelIndex_ != step) {
+    while(modelIndex_ != index) {
         auto chainsPerModel = static_cast<size_t>(structure_.chainsPerModel[modelIndex_]);
         for (size_t j = 0; j < chainsPerModel; ++j) {
             auto groupsPerChain = static_cast<size_t>(structure_.groupsPerChain[chainIndex_]);

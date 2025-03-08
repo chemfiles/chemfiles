@@ -1,7 +1,6 @@
 // Chemfiles, a modern library for chemistry file reading and writing
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
-#include <fstream>
 #include <thread>
 
 #include <catch.hpp>
@@ -20,7 +19,7 @@ TEST_CASE("Associate a topology and a trajectory") {
             auto frame = file.read();
 
             CHECK(frame.size() == 9);
-            auto topology = frame.topology();
+            const auto& topology = frame.topology();
             CHECK(topology.size() == 9);
             CHECK(topology[0] == Atom("Zn"));
             CHECK(topology[1] == Atom("Cs"));
@@ -49,7 +48,7 @@ TEST_CASE("Associate a topology and a trajectory") {
 
     SECTION("Writing") {
         auto tmpfile = NamedTempPath(".xyz");
-        const auto EXPECTED_CONTENT =
+        const auto* EXPECTED_CONTENT =
         "5\n"
         "Properties=species:S:1:pos:R:3\n"
         "Fe 1 2 3\n"
@@ -84,7 +83,7 @@ TEST_CASE("Setting frame step") {
     frame = file.read();
     CHECK(frame.index() == 1);
 
-    frame = file.read_step(10);
+    frame = file.read_at(10);
     CHECK(frame.index() == 10);
 }
 
@@ -114,7 +113,7 @@ TEST_CASE("Associate an unit cell and a trajectory") {
         file.close();
 
         SECTION("Directly") {
-            const auto EXPECTED_CONTENT =
+            const auto* EXPECTED_CONTENT =
             "MODEL    1\n"
             "CRYST1    3.000    4.000    5.000  90.00  90.00  90.00 P 1           1\n"
             "HETATM    1              1       1.000   2.000   3.000  1.00  0.00            \n"
@@ -128,7 +127,7 @@ TEST_CASE("Associate an unit cell and a trajectory") {
         }
 
         SECTION("Append") {
-            const auto EXPECTED_CONTENT =
+            const auto* EXPECTED_CONTENT =
             "MODEL    1\n"
             "CRYST1    3.000    4.000    5.000  90.00  90.00  90.00 P 1           1\n"
             "HETATM    1              1       1.000   2.000   3.000  1.00  0.00            \n"
@@ -202,14 +201,14 @@ TEST_CASE("Guessing format") {
     );
 }
 
-static void read_from_multiple_threads(std::string filename, size_t n_atoms) {
-    auto n_steps = Trajectory(filename).nsteps();
+static void read_from_multiple_threads(const std::string& filename, size_t n_atoms) {
+    auto n_steps = Trajectory(filename).size();
     size_t n_threads = 4;
 
     auto thread_1 = std::thread([=](){
         auto file = Trajectory(filename);
         for (size_t i=0; i<n_steps; i += n_threads) {
-            auto frame = file.read_step(i);
+            auto frame = file.read_at(i);
             CHECK(frame.size() == n_atoms);
         }
     });
@@ -217,7 +216,7 @@ static void read_from_multiple_threads(std::string filename, size_t n_atoms) {
     auto thread_2 = std::thread([=](){
         auto file = Trajectory(filename);
         for (size_t i=1; i<n_steps; i += n_threads) {
-            auto frame = file.read_step(i);
+            auto frame = file.read_at(i);
             CHECK(frame.size() == n_atoms);
         }
     });
@@ -225,7 +224,7 @@ static void read_from_multiple_threads(std::string filename, size_t n_atoms) {
     auto thread_3 = std::thread([=](){
         auto file = Trajectory(filename);
         for (size_t i=2; i<n_steps; i += n_threads) {
-            auto frame = file.read_step(i);
+            auto frame = file.read_at(i);
             CHECK(frame.size() == n_atoms);
         }
     });
@@ -233,7 +232,7 @@ static void read_from_multiple_threads(std::string filename, size_t n_atoms) {
     auto thread_4 = std::thread([=](){
         auto file = Trajectory(filename);
         for (size_t i=3; i<n_steps; i += n_threads) {
-            auto frame = file.read_step(i);
+            auto frame = file.read_at(i);
             CHECK(frame.size() == n_atoms);
         }
     });
@@ -283,7 +282,7 @@ TEST_CASE("Errors") {
         // Try to read a write-only file
         auto file = Trajectory(tmpfile, 'w');
         CHECK_THROWS_AS(file.read(), FileError);
-        CHECK_THROWS_AS(file.read_step(5), FileError);
+        CHECK_THROWS_AS(file.read_at(5), FileError);
 
         // Try to write a read-only file
         file = Trajectory("data/xyz/trajectory.xyz", 'r');
@@ -292,7 +291,7 @@ TEST_CASE("Errors") {
 
     SECTION("Read file past end") {
         auto file = Trajectory("data/xyz/trajectory.xyz", 'r');
-        CHECK_THROWS_AS(file.read_step(2), FileError);
+        CHECK_THROWS_AS(file.read_at(2), FileError);
 
         file.read();
         file.read();
@@ -304,9 +303,9 @@ TEST_CASE("Errors") {
         file.close();
 
         CHECK_THROWS_AS(file.read(), FileError);
-        CHECK_THROWS_AS(file.read_step(0), FileError);
+        CHECK_THROWS_AS(file.read_at(0), FileError);
         CHECK_THROWS_AS(file.write(Frame()), FileError);
-        CHECK_THROWS_AS(file.nsteps(), FileError);
+        CHECK_THROWS_AS(file.size(), FileError);
         CHECK_THROWS_AS(file.done(), FileError);
         CHECK_THROWS_AS(file.set_cell(UnitCell()), FileError);
         CHECK_THROWS_AS(file.set_topology(Topology()), FileError);

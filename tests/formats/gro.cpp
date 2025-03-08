@@ -8,7 +8,7 @@ using namespace chemfiles;
 TEST_CASE("Read files in Gromacs .gro format") {
     SECTION("Simple GRO File") {
         auto file = Trajectory("data/gro/ubiquitin.gro");
-        REQUIRE(file.nsteps() == 1);
+        REQUIRE(file.size() == 1);
         Frame frame = file.read();
 
         CHECK(frame.size() == 1405);
@@ -51,7 +51,7 @@ TEST_CASE("Read files in Gromacs .gro format") {
 
     SECTION("Read next step") {
         auto file = Trajectory("data/gro/lysozyme.gro");
-        REQUIRE(file.nsteps() == 3);
+        REQUIRE(file.size() == 3);
         Frame frame = file.read();
 
         CHECK(*frame.get("name") == "LYSOZYME in water NVT");
@@ -92,14 +92,14 @@ TEST_CASE("Read files in Gromacs .gro format") {
     SECTION("Read a specific step") {
         auto file = Trajectory("data/gro/lysozyme.gro");
 
-        auto frame = file.read_step(1);
+        auto frame = file.read_at(1);
 
         CHECK(frame.size() == 1960);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(42.25, 32.32, 22.45), 1e-4));
         CHECK(approx_eq(positions[1526], Vector3D(26.98, 39.97, 46.18), 1e-3));
 
-        frame = file.read_step(0);
+        frame = file.read_at(0);
         CHECK(frame.size() == 1960);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(42.68, 32.61, 22.84), 1e-3));
@@ -127,7 +127,7 @@ TEST_CASE("Read files in Gromacs .gro format") {
 
 TEST_CASE("Write files in GRO format") {
     auto tmpfile = NamedTempPath(".gro");
-    const auto EXPECTED_CONTENT =
+    const auto* EXPECTED_CONTENT =
     "GRO File produced by chemfiles\n"
     "    4\n"
     "    1XXXXX    A    1   0.100   0.200   0.300\n"
@@ -181,7 +181,7 @@ TEST_CASE("Write files in GRO format") {
     file.close();
 
     auto check_gro = Trajectory(tmpfile);
-    CHECK(check_gro.nsteps() == 2);
+    CHECK(check_gro.size() == 2);
     CHECK(check_gro.read().size() == 4);
     CHECK(check_gro.read().size() == 7);
     check_gro.close();
@@ -281,7 +281,7 @@ TEST_CASE("Read and write files in memory") {
         auto content = read_text_file("data/gro/ubiquitin.gro");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "GRO");
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
 
         auto frame = file.read();
 
@@ -302,5 +302,5 @@ TEST_CASE("Buggy files") {
 
     // just a missing final newline is alright
     auto file = Trajectory("data/gro/no-final-line.gro");
-    CHECK(file.nsteps() == 1);
+    CHECK(file.size() == 1);
 }

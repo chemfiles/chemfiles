@@ -18,7 +18,7 @@ using namespace chemfiles;
 struct _name_ final: public Format {                                           \
     _name_(const std::string&, File::Mode, File::Compression) {}               \
     _name_(std::shared_ptr<MemoryBuffer>, File::Mode, File::Compression) {}    \
-    size_t nsteps() override {return 42;}                                      \
+    size_t size() override {return 42;}                                      \
 }
 
 
@@ -37,7 +37,7 @@ new_format(SameExtensionFormat);
 
 struct UnimplementedTextFormat final: public TextFormat {
     UnimplementedTextFormat(const std::string& path, File::Mode mode, File::Compression compression):
-        TextFormat(std::move(path), mode, compression) {}
+        TextFormat(path, mode, compression) {}
 
     optional<uint64_t> forward() override {
         static int pos = -1;
@@ -243,8 +243,8 @@ TEST_CASE("Check error throwing in formats") {
             Catch::StartsWith("'read' is not implemented for this format")
         );
         CHECK_THROWS_WITH(
-            trajectory.read_step(2),
-            Catch::StartsWith("'read_step' is not implemented for this format")
+            trajectory.read_at(2),
+            Catch::StartsWith("'read_at' is not implemented for this format")
         );
 
         auto frame = Frame();
@@ -269,7 +269,7 @@ TEST_CASE("Check error throwing in formats") {
             Catch::StartsWith("'read' is not implemented for this format")
         );
         CHECK_THROWS_WITH(
-            trajectory.read_step(2),
+            trajectory.read_at(2),
             Catch::StartsWith("'read' is not implemented for this format")
         );
 

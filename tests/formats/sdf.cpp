@@ -8,10 +8,10 @@ using namespace chemfiles;
 TEST_CASE("Read files in SDF format") {
     SECTION("Check nsteps") {
         auto file = Trajectory("data/sdf/aspirin.sdf");
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
 
         file = Trajectory("data/sdf/kinases.sdf");
-        CHECK(file.nsteps() == 6);
+        CHECK(file.size() == 6);
     }
 
     SECTION("Read next step") {
@@ -33,7 +33,7 @@ TEST_CASE("Read files in SDF format") {
     SECTION("Read a specific step") {
         auto file = Trajectory("data/sdf/kinases.sdf");
         // Read frame at a specific positions
-        auto frame = file.read_step(3);
+        auto frame = file.read_at(3);
         CHECK(frame.index() == 3);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-0.8276, 0.2486, -1.0418), 1e-3));
@@ -42,7 +42,7 @@ TEST_CASE("Read files in SDF format") {
         CHECK(topology.size() == 68);
         CHECK(topology[0] == Atom("O"));
 
-        frame = file.read_step(0);
+        frame = file.read_at(0);
         CHECK(frame.index() == 0);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(4.9955, -2.6277, 0.2047), 1e-3));
@@ -51,7 +51,7 @@ TEST_CASE("Read files in SDF format") {
 
     SECTION("Read the whole file") {
         auto file = Trajectory("data/sdf/kinases.sdf");
-        REQUIRE(file.nsteps() == 6);
+        REQUIRE(file.size() == 6);
 
         Frame frame;
         while (!file.done()) {
@@ -108,8 +108,7 @@ TEST_CASE("Errors in SDF format") {
 
 TEST_CASE("Write files in SDF format") {
     auto tmpfile = NamedTempPath(".sdf");
-    const auto EXPECTED_CONTENT =
-R"(
+    const auto* EXPECTED_CONTENT = R"(
 
 created by chemfiles
   4  3  0     0  0  0  0  0  0999 V2000
@@ -259,7 +258,7 @@ TEST_CASE("Read and write files in memory") {
         auto content = read_text_file("data/sdf/kinases.sdf");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "SDF");
-        REQUIRE(file.nsteps() == 6);
+        REQUIRE(file.size() == 6);
 
         Frame frame;
         while (!file.done()) {

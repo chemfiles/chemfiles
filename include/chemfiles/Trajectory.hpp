@@ -123,23 +123,26 @@ public:
     ///                     the format does not support reading.
     Frame read();
 
-    /// Read a single frame at specified `step` from the trajectory.
+    /// Read a single frame at specified `index` from the trajectory.
     ///
     /// The trajectory must have been opened in read mode, and the
     /// underlying format must support reading.
     ///
-    /// This function throws a `FileError` if the step is bigger than the
-    /// number of steps in the trajectory.
+    /// This function throws a `FileError` if the index is bigger than the
+    /// number of frames in the trajectory.
     ///
-    /// @example{trajectory/read_step.cpp}
+    /// @example{trajectory/read_at.cpp}
     ///
-    /// @param step step to read from the trajectory
+    /// @param index index of the frame to read in the trajectory
     ///
     /// @throws FileError for all errors concerning the physical file: can not
     ///                   open it, can not read/write it, *etc.*
     /// @throws FormatError if the file is not valid for the used format, or if
     ///                     the format does not support reading.
-    Frame read_step(size_t step);
+    Frame read_at(size_t index);
+
+    // /// Deprecated, see `Frame::read_at`
+    // Frame read_step(size_t step);
 
     /// Write a single frame to the trajectory.
     ///
@@ -209,10 +212,10 @@ public:
     /// @example{trajectory/set_cell.cpp}
     void set_cell(const UnitCell& cell);
 
-    /// Get the number of steps (the number of frames) in this trajectory.
+    /// Get the number of frames in this trajectory.
     ///
-    /// @example{trajectory/nsteps.cpp}
-    size_t nsteps() const;
+    /// @example{trajectory/size.cpp}
+    size_t size() const;
 
     /// Check if all the frames in this trajectory have been read, *i.e.* if
     /// the last read frame is the last frame of the trajectory.
@@ -247,7 +250,7 @@ private:
     Trajectory(char mode, std::unique_ptr<Format> format, std::shared_ptr<MemoryBuffer> buffer);
 
     /// Perform a few checks before reading a frame
-    void pre_read(size_t step);
+    void pre_read(size_t index);
     /// Set the frame topology and/or cell after reading it
     void post_read(Frame& frame);
     /// Check that the trajectory is still open, and throw a `FileError` is it
@@ -258,10 +261,10 @@ private:
     std::string path_;
     /// Opening mode of the associated file
     char mode_ = '\0';
-    /// Index of the next step that will be read by `read`
+    /// Next index that will be read by `read`
     size_t index_ = 0;
-    /// Number of steps in the file, if available
-    size_t nsteps_ = 0;
+    /// Number of frames in the file
+    size_t size_ = 0;
     /// Format used to read the associated file. It will be `nullptr` is the
     /// trajectory is closed
     std::unique_ptr<Format> format_;

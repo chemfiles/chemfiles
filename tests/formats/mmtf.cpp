@@ -100,7 +100,7 @@ TEST_CASE("Read files in MMTF format") {
     SECTION("Skip steps") {
         auto file = Trajectory("data/mmtf/1J8K.mmtf");
 
-        auto frame = file.read_step(13);
+        auto frame = file.read_at(13);
         CHECK(frame.size() == 1402);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
@@ -113,7 +113,7 @@ TEST_CASE("Read files in MMTF format") {
         CHECK(topology.residue(1).get("is_standard_pdb")->as_bool());
         CHECK(topology.residue(2).get("is_standard_pdb")->as_bool());
 
-        frame = file.read_step(1);
+        frame = file.read_at(1);
         CHECK(frame.size() == 1402);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D( -9.134, 11.149, 6.990), 1e-3));
@@ -133,13 +133,13 @@ TEST_CASE("Read files in MMTF format") {
         // https://github.com/chemfiles/chemfiles/issues/344
         auto file = Trajectory("data/mmtf/1HTQ.mmtf");
 
-        auto frame = file.read_step(9);
+        auto frame = file.read_at(9);
         CHECK(frame.size() == 97872);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(103.657, 52.540, 137.019), 1e-3));
         CHECK(approx_eq(positions[1401], Vector3D(73.297, 19.998, 146.804), 1e-3));
 
-        frame = file.read_step(1);
+        frame = file.read_at(1);
         CHECK(frame.size() == 97872);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(104.485, 52.282, 139.288), 1e-3));
@@ -194,15 +194,15 @@ TEST_CASE("Read files in MMTF format") {
 
     SECTION("Read reduced representation") {
         auto file = Trajectory("data/mmtf/1HTQ_reduced.mmtf");
-        CHECK(file.nsteps() == 10);
+        CHECK(file.size() == 10);
 
-        auto frame = file.read_step(9);
+        auto frame = file.read_at(9);
         CHECK(frame.size() == 12336);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(104.656, 52.957, 138.038), 1e-3));
         CHECK(approx_eq(positions[1401], Vector3D(66.292, -29.336, 158.267), 1e-3));
 
-        frame = file.read_step(1);
+        frame = file.read_at(1);
         CHECK(frame.size() == 12336);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(105.482, 51.793, 140.282), 1e-3));
@@ -212,7 +212,7 @@ TEST_CASE("Read files in MMTF format") {
     SECTION("GZ Files") {
         auto file = Trajectory("data/mmtf/1J8K.mmtf.gz");
 
-        auto frame = file.read_step(13);
+        auto frame = file.read_at(13);
         CHECK(frame.size() == 1402);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
@@ -228,7 +228,7 @@ TEST_CASE("Read files in MMTF format") {
         // Test takes too long with valgrind
         if (!is_valgrind_and_ci()) {
             auto file = Trajectory("data/mmtf/3J3Q.mmtf.gz");
-            auto frame = file.read_step(0);
+            auto frame = file.read_at(0);
 
             // We just read 2,400,000 atoms and 2,500,000 bonds
             // in ~3s (in release mode) !!!
@@ -241,7 +241,7 @@ TEST_CASE("Read files in MMTF format") {
     SECTION("XZ Files") {
         auto file = Trajectory("data/mmtf/1J8K.mmtf.xz");
 
-        auto frame = file.read_step(13);
+        auto frame = file.read_at(13);
         CHECK(frame.size() == 1402);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
@@ -292,9 +292,9 @@ TEST_CASE("Write files in MMTF format") {
         file.close();
 
         auto file_r2 = Trajectory(tmpfile);
-        CHECK(file_r2.nsteps() == 4);
+        CHECK(file_r2.size() == 4);
 
-        auto frame = file_r2.read_step(1);
+        auto frame = file_r2.read_at(1);
         CHECK(frame.size() == 1402);
         const auto& positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D( -9.134, 11.149, 6.990), 1e-3));
@@ -337,7 +337,7 @@ TEST_CASE("Write files in MMTF format") {
         }
 
         auto trajectory = Trajectory(tmpfile, 'r');
-        REQUIRE(trajectory.nsteps() == 2);
+        REQUIRE(trajectory.size() == 2);
 
         auto frame = trajectory.read();
         REQUIRE(frame.size() == 3);
@@ -375,7 +375,7 @@ TEST_CASE("Read memory in MMTF format") {
         auto content = read_text_file("data/mmtf/1J8K.mmtf");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "MMTF");
-        auto frame = file.read_step(13);
+        auto frame = file.read_at(13);
         CHECK(frame.size() == 1402);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
@@ -386,7 +386,7 @@ TEST_CASE("Read memory in MMTF format") {
         auto content = read_text_file("data/mmtf/1J8K.mmtf.gz");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "MMTF/GZ");
-        auto frame = file.read_step(13);
+        auto frame = file.read_at(13);
         CHECK(frame.size() == 1402);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));
@@ -397,7 +397,7 @@ TEST_CASE("Read memory in MMTF format") {
         auto content = read_text_file("data/mmtf/1J8K.mmtf.xz");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "MMTF/XZ");
-        auto frame = file.read_step(13);
+        auto frame = file.read_at(13);
         CHECK(frame.size() == 1402);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(-5.106, 16.212, 4.562), 1e-3));

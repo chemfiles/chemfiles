@@ -12,13 +12,13 @@ using namespace chemfiles;
 TEST_CASE("Read files in XYZ format") {
     SECTION("Check nsteps") {
         auto file = Trajectory("data/xyz/trajectory.xyz");
-        CHECK(file.nsteps() == 2);
+        CHECK(file.size() == 2);
 
         file = Trajectory("data/xyz/helium.xyz");
-        CHECK(file.nsteps() == 397);
+        CHECK(file.size() == 397);
 
         file = Trajectory("data/xyz/topology.xyz");
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
     }
 
     SECTION("Read next step") {
@@ -38,7 +38,7 @@ TEST_CASE("Read files in XYZ format") {
     SECTION("Read a specific step") {
         auto file = Trajectory("data/xyz/helium.xyz");
         // Read frame at a specific positions
-        auto frame = file.read_step(42);
+        auto frame = file.read_at(42);
         CHECK(frame.index() == 42);
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], {-0.145821, 8.540648, 1.090281}, 1e-12));
@@ -47,7 +47,7 @@ TEST_CASE("Read files in XYZ format") {
         CHECK(topology.size() == 125);
         CHECK(topology[0] == Atom("He"));
 
-        frame = file.read_step(0);
+        frame = file.read_at(0);
         CHECK(frame.index() == 0);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], {0.49053, 8.41351, 0.0777257}, 1e-12));
@@ -56,7 +56,7 @@ TEST_CASE("Read files in XYZ format") {
 
     SECTION("Read the whole file") {
         auto file = Trajectory("data/xyz/helium.xyz");
-        REQUIRE(file.nsteps() == 397);
+        REQUIRE(file.size() == 397);
 
         Frame frame;
         while (!file.done()) {
@@ -77,7 +77,7 @@ TEST_CASE("Read files in XYZ format") {
 
     SECTION("Extended XYZ") {
         auto file = Trajectory("data/xyz/extended.xyz");
-        CHECK(file.nsteps() == 3);
+        CHECK(file.size() == 3);
 
         auto frame = file.read();
         CHECK(frame.size() == 192);
@@ -134,7 +134,7 @@ H      -0.52638300       0.76932700      -0.02936600
 )");
 
         auto file = Trajectory::memory_reader(xyz.data(), xyz.size(), "XYZ");
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
 
         auto frame = file.read();
         CHECK(frame.size() == 3);
@@ -157,39 +157,39 @@ TEST_CASE("Errors in XYZ format") {
         );
 
         auto file = Trajectory("data/xyz/bad/extended.xyz");
-        CHECK_THROWS_WITH(file.read_step(0),
+        CHECK_THROWS_WITH(file.read_at(0),
             "error while reading '': expected 1 values, found 0"
         );
 
-        CHECK_THROWS_WITH(file.read_step(1),
+        CHECK_THROWS_WITH(file.read_at(1),
             "error while reading ' ff': can not parse 'ff' as a double"
         );
 
-        CHECK_THROWS_WITH(file.read_step(2),
+        CHECK_THROWS_WITH(file.read_at(2),
             "error while reading '': expected 1 values, found 0"
         );
 
-        CHECK_THROWS_WITH(file.read_step(3),
+        CHECK_THROWS_WITH(file.read_at(3),
             "error while reading ' ze': can not parse 'ze' as a double"
         );
 
-        CHECK_THROWS_WITH(file.read_step(4),
+        CHECK_THROWS_WITH(file.read_at(4),
             "error while reading ' 3 4': expected 3 values, found 2"
         );
 
-        CHECK_THROWS_WITH(file.read_step(5),
+        CHECK_THROWS_WITH(file.read_at(5),
             "error while reading ' 3 4 ff': can not parse 'ff' as a double"
         );
 
-        CHECK_THROWS_WITH(file.read_step(6),
+        CHECK_THROWS_WITH(file.read_at(6),
             "error while reading '': expected 1 values, found 0"
         );
 
-        CHECK_THROWS_WITH(file.read_step(7),
+        CHECK_THROWS_WITH(file.read_at(7),
             "invalid value for boolean 'ok'"
         );
 
-        CHECK_THROWS_WITH(file.read_step(8),
+        CHECK_THROWS_WITH(file.read_at(8),
             "error while reading '': expected 1 values, found 0"
         );
     }
@@ -202,7 +202,7 @@ TEST_CASE("Errors in XYZ format") {
         });
 
         auto file = Trajectory("data/xyz/bad/extended-bad-properties.xyz");
-        REQUIRE(file.nsteps() == 5);
+        REQUIRE(file.size() == 5);
 
         auto frame = file.read();
         check_bad_properties_still_read_frame(frame);
@@ -326,7 +326,7 @@ TEST_CASE("Read and write files in memory") {
         auto content = read_text_file("data/xyz/topology.xyz");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "XYZ");
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
 
         auto frame = file.read();
     }

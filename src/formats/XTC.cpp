@@ -96,11 +96,13 @@ XTCFormat::XTCFormat(std::string path, File::Mode mode, File::Compression compre
     }
 }
 
-size_t XTCFormat::nsteps() { return frame_offsets_.size(); }
+size_t XTCFormat::size() {
+    return frame_positions_.size();
+}
 
-void XTCFormat::read_step(size_t step, Frame& frame) {
-    step_ = step;
-    file_.seek(frame_offsets_[step_]);
+void XTCFormat::read_at(size_t index, Frame& frame) {
+    index_ = index;
+    file_.seek(frame_positions_[index_]);
     read(frame);
 }
 
@@ -135,7 +137,7 @@ void XTCFormat::read(Frame& frame) {
         positions[i][2] = static_cast<double>(x[i * 3 + 2]) * 10.0;
     }
 
-    step_++;
+    index_++;
 }
 
 XTCFormat::FrameHeader XTCFormat::read_frame_header() {
@@ -173,8 +175,8 @@ void XTCFormat::determine_frame_offsets() {
 
     uint64_t filesize = file_.file_size();
 
-    frame_offsets_.clear();
-    frame_offsets_.emplace_back(0);
+    frame_positions_.clear();
+    frame_positions_.emplace_back(0);
 
     // GROMACS does not bother with compression for nine atoms or less
     if (header.natoms <= 9) {
@@ -182,10 +184,10 @@ void XTCFormat::determine_frame_offsets() {
         file_.seek(framebytes);
 
         auto nframes = filesize / framebytes;
-        frame_offsets_.reserve(static_cast<size_t>(nframes));
+        frame_positions_.reserve(static_cast<size_t>(nframes));
 
         for (uint64_t i = 1; i < nframes; ++i) {
-            frame_offsets_.emplace_back(i * framebytes);
+            frame_positions_.emplace_back(i * framebytes);
         }
     } else {
         file_.seek(XTC_HEADER_SIZE);
@@ -193,7 +195,7 @@ void XTCFormat::determine_frame_offsets() {
         auto framebytes = static_cast<uint64_t>(round_to_int_boundary(file_.read_single_i32()));
 
         auto est_nframes = static_cast<size_t>(filesize / (framebytes + XTC_HEADER_SIZE));
-        frame_offsets_.reserve(est_nframes);
+        frame_positions_.reserve(est_nframes);
 
         while (true) {
             file_.skip(framebytes + XTC_HEADER_SIZE);
@@ -204,7 +206,7 @@ void XTCFormat::determine_frame_offsets() {
             } catch (const Error&) {
                 break;
             }
-            frame_offsets_.emplace_back(frame_pos);
+            frame_positions_.emplace_back(frame_pos);
         }
     }
 
@@ -213,7 +215,7 @@ void XTCFormat::determine_frame_offsets() {
 
 void XTCFormat::write(const Frame& frame) {
     auto natoms = frame.size();
-    if (frame_offsets_.empty() && step_ == 0) {
+    if (frame_positions_.empty() && index_ == 0) {
         natoms_ = natoms;
     } else if (natoms_ != natoms) {
         throw format_error(
@@ -244,7 +246,7 @@ void XTCFormat::write(const Frame& frame) {
         file_.write_gmx_compressed_floats(x, precision);
     }
 
-    step_++;
+    index_++;
 }
 
 void XTCFormat::write_frame_header(const FrameHeader& header) {

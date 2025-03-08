@@ -514,10 +514,12 @@ TPRFormat::TPRFormat(std::string path, File::Mode mode, File::Compression compre
     read_header();
 }
 
-size_t TPRFormat::nsteps() { return 1; }
+size_t TPRFormat::size() {
+    return 1;
+}
 
-void TPRFormat::read_step(size_t step, Frame& frame) {
-    step_ = step;
+void TPRFormat::read_at(size_t index, Frame& frame) {
+    index_ = index;
     this->read(frame);
 }
 
@@ -799,7 +801,7 @@ void TPRFormat::read(Frame& frame) {
     // The parsing is done by `do_tpx_finalize()`
     // We stop parsing here
 
-    step_++;
+    index_++;
 }
 
 void TPRFormat::read_header() {

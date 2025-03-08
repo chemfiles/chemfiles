@@ -42,6 +42,10 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   `chfl_frame_step`, `chfl_frame_set_step`) to `Frame::index`. This always
   corresponds to the index of the frame in the file; the `"simulation_step"`
   property is used to store the step of the simulation that created this frame.
+- `Trajectory::nsteps`/`chfl_trajectory_nsteps` has been renamed to
+  `Trajectory::size`/`chfl_trajectory_size`
+- `Trajectory::read_step`/`chfl_trajectory_read_step` has been renamed to
+  `Trajectory::read_at`/`chfl_trajectory_read_at`
 
 ## 0.10.0 (14 Feb 2021)
 

@@ -8,10 +8,10 @@ using namespace chemfiles;
 TEST_CASE("Read files in SMI format") {
     SECTION("Check nsteps") {
         auto file = Trajectory("data/smi/test.smi");
-        CHECK(file.nsteps() == 8);
+        CHECK(file.size() == 8);
 
         file = Trajectory("data/smi/spaces.smi");
-        CHECK(file.nsteps() == 8);
+        CHECK(file.size() == 8);
     }
 
     SECTION("Read next frame") {
@@ -29,7 +29,7 @@ TEST_CASE("Read files in SMI format") {
         frame = file.read();
         CHECK(frame.size() == 4);
         auto topology = frame.topology();
-        auto bonds = topology.bonds();
+        const auto& bonds = topology.bonds();
         CHECK(bonds.size() == 3);
         CHECK((bonds[0][0] == 0 && bonds[0][1] == 1));
         CHECK((bonds[1][0] == 0 && bonds[1][1] == 2));
@@ -42,23 +42,23 @@ TEST_CASE("Read files in SMI format") {
 
     SECTION("Read a specific step") {
         auto file = Trajectory("data/smi/test.smi");
-        auto frame = file.read_step(1);
+        auto frame = file.read_at(1);
         CHECK(frame.size() == 6);
         auto topology = frame.topology();
         CHECK(topology.bonds().size() == 6);
 
-        frame = file.read_step(7);
+        frame = file.read_at(7);
         CHECK(frame.size() == 9);
         topology = frame.topology();
         CHECK(topology.bonds().size() == 6);
 
         file = Trajectory("data/smi/spaces.smi");
-        frame = file.read_step(7);
+        frame = file.read_at(7);
         CHECK(frame.size() == 9);
         topology = frame.topology();
         CHECK(topology.bonds().size() == 6);
 
-        // Check that calling file.read() repeatedly is the same as frame.read_step()
+        // Check that calling file.read() repeatedly is the same as frame.read_at()
         file = Trajectory("data/smi/spaces.smi");
         file.read();
         file.read();
@@ -76,7 +76,7 @@ TEST_CASE("Read files in SMI format") {
 
     SECTION("Read entire file") {
         auto file = Trajectory("data/smi/rdkit_problems.smi");
-        REQUIRE(file.nsteps() == 70);
+        REQUIRE(file.size() == 70);
 
         Frame frame;
         while (!file.done()) {
@@ -91,7 +91,7 @@ TEST_CASE("Read files in SMI format") {
 TEST_CASE("Check parsing results") {
     SECTION("Details") {
         auto file = Trajectory("data/smi/details.smi");
-        REQUIRE(file.nsteps() == 1);
+        REQUIRE(file.size() == 1);
 
         auto frame = file.read();
         CHECK(frame.size() == 5);
@@ -103,7 +103,7 @@ TEST_CASE("Check parsing results") {
 
     SECTION("Ugly SMILES strings") {
         auto file = Trajectory("data/smi/ugly.smi");
-        REQUIRE(file.nsteps() == 3);
+        REQUIRE(file.size() == 3);
 
         // C1(CC1CC1CC1)
         auto frame = file.read();
@@ -150,7 +150,7 @@ TEST_CASE("Check parsing results") {
 
     SECTION("RDKit problems") {
         auto file = Trajectory("data/smi/rdkit_problems.smi");
-        REQUIRE(file.nsteps() == 70);
+        REQUIRE(file.size() == 70);
 
         // C1CC2C1CC2
         Frame frame = file.read();
@@ -166,20 +166,20 @@ TEST_CASE("Check parsing results") {
         CHECK((bonds[6][0] == 4 && bonds[6][1] == 5));
 
         // [CH2+]C[CH+2]
-        frame = file.read_step(6);
+        frame = file.read_at(6);
         CHECK(frame[0].get<Property::DOUBLE>("hydrogen_count") == 2.0);
         CHECK(frame[0].charge() == 1.0);
         CHECK(frame[2].get<Property::DOUBLE>("hydrogen_count") == 1.0);
         CHECK(frame[2].charge() == 2.0);
 
         // C1CC=1
-        frame = file.read_step(8);
+        frame = file.read_at(8);
         auto bond_orders = frame.topology().bond_orders();
         CHECK(bond_orders[0] == Bond::SINGLE);
         CHECK(bond_orders[1] == Bond::DOUBLE);
 
         // C=1CC1
-        frame = file.read_step(9);
+        frame = file.read_at(9);
         bond_orders = frame.topology().bond_orders();
         CHECK(bond_orders[0] == Bond::SINGLE);
         CHECK(bond_orders[1] == Bond::DOUBLE);
@@ -271,7 +271,7 @@ TEST_CASE("Errors in SMI format") {
 
 TEST_CASE("Write SMI File") {
     auto tmpfile = NamedTempPath(".smi");
-    const auto EXPECTED_CONTENT =
+    const auto* EXPECTED_CONTENT =
 R"(C(C)(C)(C)C
 C
 C~N
@@ -384,7 +384,7 @@ TEST_CASE("Read and write files in memory") {
         auto content = read_text_file("data/smi/rdkit_problems.smi");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "SMI");
-        REQUIRE(file.nsteps() == 70);
+        REQUIRE(file.size() == 70);
 
         Frame frame;
         while (!file.done()) {

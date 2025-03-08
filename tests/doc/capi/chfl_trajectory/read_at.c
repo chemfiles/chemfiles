@@ -8,7 +8,7 @@ int main(void) {
     CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("water.xyz", 'r');
     CHFL_FRAME* frame = chfl_frame();
 
-    chfl_trajectory_read_step(trajectory, 42, frame);
+    chfl_trajectory_read_at(trajectory, 42, frame);
 
     /* We can use the 42nd frame here */
 
