@@ -12,10 +12,10 @@ int main(void) {
     CHFL_FRAME* frame = chfl_frame();
     CHFL_SELECTION* selection = chfl_selection("name Zn or name N");
 
-    uint64_t nsteps = 0;
-    chfl_trajectory_nsteps(input, &nsteps);
+    uint64_t size = 0;
+    chfl_trajectory_size(input, &size);
 
-    for (size_t step=0; step<nsteps; step++) {
+    for (size_t index=0; index<size; index++) {
         chfl_trajectory_read(input, frame);
 
         uint64_t n_matches = 0;
@@ -51,7 +51,11 @@ int compare_matches(const void* lhs, const void* rhs) {
     size_t left = *(const size_t*)lhs;
     size_t right = *(const size_t*)rhs;
 
-    if (left > right) return -1;
-    if (right < left) return 1;
-    return 0;
+    if (left > right) {
+        return -1;
+    } else if (right < left) {
+        return 1;
+    } else {
+        return 0;
+    }
 }

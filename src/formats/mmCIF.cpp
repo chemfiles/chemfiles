@@ -156,7 +156,7 @@ void mmCIFFormat::init_() {
     } while (!file_.eof());
 
     // After this block ends, we have the start of coordinates
-    steps_positions_.push_back(position);
+    frame_positions_.push_back(position);
 
     if (atom_site_map_.find("type_symbol") == atom_site_map_.end()) {
         throw format_error("could not find _atom_site.type_symbol in '{}'", file_.path());
@@ -170,7 +170,7 @@ void mmCIFFormat::init_() {
     // Do we have a special extension for multiple modes?
     if (model_position == atom_site_map_.end()) {
         // If not, we are done
-        file_.seekpos(steps_positions_[0]);
+        file_.seekpos(frame_positions_[0]);
         return;
     }
 
@@ -190,21 +190,21 @@ void mmCIFFormat::init_() {
         size_t current_position = parse<size_t>(line_split[model_position->second]);
 
         if (current_position != last_position) {
-            steps_positions_.push_back(position);
+            frame_positions_.push_back(position);
             last_position = current_position;
         }
     } while (!file_.eof());
 
-    file_.seekpos(steps_positions_[0]);
+    file_.seekpos(frame_positions_[0]);
 }
 
-size_t mmCIFFormat::nsteps() {
-    return steps_positions_.size();
+size_t mmCIFFormat::size() {
+    return frame_positions_.size();
 }
 
-void mmCIFFormat::read_step(const size_t step, Frame& frame) {
-    assert(step < steps_positions_.size());
-    file_.seekpos(steps_positions_[step]);
+void mmCIFFormat::read_at(const size_t index, Frame& frame) {
+    assert(index < frame_positions_.size());
+    file_.seekpos(frame_positions_[index]);
     read(frame);
 }
 

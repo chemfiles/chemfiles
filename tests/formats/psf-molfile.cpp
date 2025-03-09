@@ -2,19 +2,19 @@
 // Copyright (C) Guillaume Fraux and contributors -- BSD license
 
 #include "catch.hpp"
-#include "helpers.hpp"
+
 #include "chemfiles.hpp"
 using namespace chemfiles;
 
 TEST_CASE("Read PSF format") {
     SECTION("Standard PSF") {
         auto file = Trajectory("data/psf/776wat_1Ca.psf");
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
         auto frame = file.read();
 
         CHECK(frame.size() == 3105);
 
-        auto& topology = frame.topology();
+        const auto& topology = frame.topology();
         CHECK(topology[0].name() == "OH2");
         CHECK(topology[0].type() == "OT");
         CHECK(topology[0].charge() == 0.0);
@@ -52,7 +52,7 @@ TEST_CASE("Read PSF format") {
         CHECK(residue.contains(2098));
         CHECK(residue.contains(2099));
 
-        auto& bonds = topology.bonds();
+        const auto& bonds = topology.bonds();
         CHECK(bonds.size() == 3104);
 
         CHECK(bonds[0][0] == 0);
@@ -61,12 +61,12 @@ TEST_CASE("Read PSF format") {
 
     SECTION("Extended PSF") {
         auto file = Trajectory("data/psf/ligandrm.psf");
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
         auto frame = file.read();
 
         CHECK(frame.size() == 4);
 
-        auto& topology = frame.topology();
+        const auto& topology = frame.topology();
         CHECK(topology[0].name() == "C1");
         CHECK(topology[0].type() == "CG2O6");
         CHECK(topology[0].charge() == static_cast<double>(1.42000f));
@@ -87,7 +87,7 @@ TEST_CASE("Read PSF format") {
         CHECK(topology[3].charge() == static_cast<double>(-1.14000f));
         CHECK(topology[3].mass() == static_cast<double>(15.9994f));
 
-        auto& bonds = topology.bonds();
+        const auto& bonds = topology.bonds();
         CHECK(bonds.size() == 3);
 
         CHECK(bonds[0][0] == 0);

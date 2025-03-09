@@ -26,9 +26,9 @@ using namespace chemfiles;
 #pragma GCC diagnostic ignored "-Wsuggest-attribute=noreturn"
 #endif
 
-void Format::read_step(size_t /*unused*/, Frame& /*unused*/) {
+void Format::read_at(size_t /*unused*/, Frame& /*unused*/) {
     throw format_error(
-        "'read_step' is not implemented for this format ({})",
+        "'read_at' is not implemented for this format ({})",
         typeid(*this).name()
     );
 }
@@ -89,7 +89,7 @@ void TextFormat::scan_all() {
         if (!position) {
             break;
         }
-        steps_positions_.push_back(position.value());
+        frame_positions_.push_back(position.value());
     }
 
     eof_found_ = true;
@@ -101,53 +101,53 @@ void TextFormat::scan_all() {
         std::swap(file_, *tmp_read_file);
     }
 
-    if (before == 0 && !steps_positions_.empty()) {
-        file_.seekpos(steps_positions_[0]);
+    if (before == 0 && !frame_positions_.empty()) {
+        file_.seekpos(frame_positions_[0]);
     } else {
         file_.seekpos(before);
     }
 }
 
-void TextFormat::read_step(size_t step, Frame& frame) {
-    // Start by checking if we know this step, if not, look for all steps in
+void TextFormat::read_at(size_t index, Frame& frame) {
+    // Start by checking if we know this index, if not, look for all frames in
     // the file
-    if (step >= steps_positions_.size()) {
+    if (index >= frame_positions_.size()) {
         scan_all();
     }
 
     // If the step is still too big, this is an error
-    if (step >= steps_positions_.size()) {
-        if (steps_positions_.size() == 0) {
+    if (index >= frame_positions_.size()) {
+        if (frame_positions_.size() == 0) {
             throw file_error(
-                "can not read file '{}' at step {}, it does not contain any step",
-                file_.path(), step
+                "can not read file '{}' at index {}, it does not contain any frames",
+                file_.path(), index
             );
         } else {
             throw file_error(
-                "can not read file '{}' at step {}: maximal step is {}",
-                file_.path(), step, steps_positions_.size() - 1
+                "can not read file '{}' at index {}: maximal index is {}",
+                file_.path(), index, frame_positions_.size() - 1
             );
         }
     }
 
-    step_ = step;
-    file_.seekpos(steps_positions_[step]);
+    index_ = index;
+    file_.seekpos(frame_positions_[index]);
     read_next(frame);
 }
 
 void TextFormat::read(Frame& frame) {
-    file_.seekpos(steps_positions_[step_]);
-    ++step_;
+    file_.seekpos(frame_positions_[index_]);
+    index_++;
     read_next(frame);
 }
 
 void TextFormat::write(const Frame& frame) {
     write_next(frame);
-    steps_positions_.push_back(file_.tellpos());
-    ++step_;
+    frame_positions_.push_back(file_.tellpos());
+    index_++;
 }
 
-size_t TextFormat::nsteps() {
+size_t TextFormat::size() {
     scan_all();
-    return steps_positions_.size();
+    return frame_positions_.size();
 }

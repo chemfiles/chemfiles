@@ -27,8 +27,6 @@
 
 using namespace chemfiles;
 
-#define SENTINEL_VALUE (static_cast<size_t>(-1))
-
 struct file_open_info {
     static file_open_info parse(const std::string& path, std::string format);
     std::string format;
@@ -88,7 +86,7 @@ Trajectory::Trajectory(std::string path, char mode, const std::string& format)
     format_ = format_creator(path_, char_to_file_mode(mode), info.compression);
 
     if (mode == 'r' || mode == 'a') {
-        nsteps_ = format_->nsteps();
+        size_ = format_->size();
     }
 }
 
@@ -125,7 +123,7 @@ Trajectory Trajectory::memory_writer(const std::string& format) {
 Trajectory::Trajectory(char mode, std::unique_ptr<Format> format, std::shared_ptr<MemoryBuffer> buffer)
     : mode_(mode), format_(std::move(format)), buffer_(std::move(buffer)) {
     if (mode == 'r' || mode == 'a') {
-        nsteps_ = format_->nsteps();
+        size_ = format_->size();
     }
 }
 
@@ -133,17 +131,17 @@ Trajectory::~Trajectory() = default;
 Trajectory::Trajectory(Trajectory&&) noexcept = default;
 Trajectory& Trajectory::operator=(Trajectory&&) noexcept = default;
 
-void Trajectory::pre_read(size_t step) {
-    if (step >= nsteps_) {
-        if (nsteps_ == 0) {
+void Trajectory::pre_read(size_t index) {
+    if (index >= size_) {
+        if (size_ == 0) {
             throw file_error(
-                "can not read file '{}' at step {}, it does not contain any step",
-                path_, step
+                "can not read file '{}' at index {}, it does not contain any frames",
+                path_, index
             );
         } else {
             throw file_error(
-                "can not read file '{}' at step {}: maximal step is {}",
-                path_, step, nsteps_ - 1
+                "can not read file '{}' at index {}: there are {} frames in this file",
+                path_, index, size_
             );
         }
     }
@@ -170,44 +168,36 @@ void Trajectory::check_opened() const {
     }
 }
 
-size_t Trajectory::nsteps() const  {
+size_t Trajectory::size() const  {
     check_opened();
-    return nsteps_;
+    return size_;
 }
 
 Frame Trajectory::read() {
     check_opened();
-    pre_read(step_);
+    pre_read(index_);
 
     Frame frame;
-    frame.set_step(SENTINEL_VALUE);
     format_->read(frame);
     post_read(frame);
 
-    // Don't override the step set by a format
-    if (frame.step() == SENTINEL_VALUE) {
-        frame.set_step(step_);
-    }
+    frame.set_index(index_);
+    index_++;
 
-    step_++;
     return frame;
 }
 
-Frame Trajectory::read_step(const size_t step) {
+Frame Trajectory::read_at(const size_t index) {
     check_opened();
-    pre_read(step);
+    pre_read(index);
 
     Frame frame;
-    frame.set_step(SENTINEL_VALUE);
-    step_ = step;
-    format_->read_step(step_, frame);
-
-    // Don't override the step set by a format
-    if (frame.step() == SENTINEL_VALUE) {
-        frame.set_step(step_);
-    }
-
+    format_->read_at(index, frame);
     post_read(frame);
+
+    frame.set_index(index);
+    index_ = index + 1;
+
     return frame;
 }
 
@@ -232,8 +222,8 @@ void Trajectory::write(const Frame& frame) {
         format_->write(frame);
     }
 
-    step_++;
-    nsteps_++;
+    index_++;
+    size_++;
 }
 
 void Trajectory::set_topology(const Topology& topology) {
@@ -244,9 +234,9 @@ void Trajectory::set_topology(const Topology& topology) {
 void Trajectory::set_topology(const std::string& filename, const std::string& format) {
     check_opened();
     Trajectory topology_file(filename, 'r', format);
-    assert(topology_file.nsteps() > 0);
+    assert(topology_file.size() > 0);
 
-    auto frame = topology_file.read_step(0);
+    auto frame = topology_file.read_at(0);
     set_topology(frame.topology());
 }
 
@@ -257,7 +247,7 @@ void Trajectory::set_cell(const UnitCell& cell) {
 
 bool Trajectory::done() const {
     check_opened();
-    return step_ >= nsteps_;
+    return index_ >= size_;
 }
 
 void Trajectory::close() {

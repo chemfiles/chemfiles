@@ -30,19 +30,19 @@ class FormatMetadata;
 class CIFFormat final: public Format {
 public:
     CIFFormat(std::string path, File::Mode mode, File::Compression compression) :
-        file_(std::move(path), mode, compression), current_step_(0) {
+        file_(std::move(path), mode, compression), index_(0) {
         init_();
     }
 
     CIFFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression) :
-        file_(std::move(memory), mode, compression), current_step_(0) {
+        file_(std::move(memory), mode, compression), index_(0) {
         init_();
     }
 
-    void read_step(size_t step, Frame& frame) override;
+    void read_at(size_t index, Frame& frame) override;
     void read(Frame& frame) override;
     void write(const Frame& frame) override;
-    size_t nsteps() override;
+    size_t size() override;
 private:
     /// Initialize important variables
     void init_();
@@ -50,8 +50,8 @@ private:
     TextFile file_;
     /// Store all structures, reading the whole file during init_()
     std::vector<gemmi::SmallStructure> structures_;
-    /// When reading frame by frame, or writing, remember where we are
-    size_t current_step_;
+    /// index of last structure read
+    size_t index_;
 };
 
 template<> const FormatMetadata& format_metadata<CIFFormat>();

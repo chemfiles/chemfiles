@@ -8,13 +8,13 @@ using namespace chemfiles;
 TEST_CASE("Read files in CML format") {
     SECTION("Check nsteps") {
         auto file = Trajectory("data/cml/ethane.cml");
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
 
         file = Trajectory("data/cml/drugs.cml");
-        CHECK(file.nsteps() == 4);
+        CHECK(file.size() == 4);
 
         file = Trajectory("data/cml/properties.cml");
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
     }
 
     SECTION("Read next step") {
@@ -37,8 +37,8 @@ TEST_CASE("Read files in CML format") {
     SECTION("Read a specific step") {
         auto file = Trajectory("data/cml/drugs.cml");
         // Read frame at a specific positions
-        auto frame = file.read_step(2);
-        CHECK(frame.step() == 2);
+        auto frame = file.read_at(2);
+        CHECK(frame.index() == 2);
         CHECK(frame.get("title")->as_string() == "tylenol");
         auto positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.0000, 6.1600, 0.0000), 1e-3));
@@ -46,8 +46,8 @@ TEST_CASE("Read files in CML format") {
         CHECK(topology.size() == 11);
         CHECK(topology[0].type() == "C");
 
-        frame = file.read_step(0);
-        CHECK(frame.step() == 0);
+        frame = file.read_at(0);
+        CHECK(frame.index() == 0);
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(0.0000, -4.6200, 0.0000), 1e-3));
         CHECK(approx_eq(positions[14], Vector3D(9.3358, -0.7700, 0.0000), 1e-3));
@@ -115,7 +115,7 @@ TEST_CASE("Write CML file") {
     // just try to reload the file and see if everything is as it should be.
 
     auto check_cml = Trajectory(tmpfile);
-    CHECK(check_cml.nsteps() == 2);
+    CHECK(check_cml.size() == 2);
 
     auto frame1 = check_cml.read();
     CHECK(frame1.size() == 4);
@@ -125,7 +125,7 @@ TEST_CASE("Write CML file") {
     CHECK(frame2.size() == 4);
     CHECK(frame2.cell() == UnitCell({22, 22, 22}));
 
-    auto& orders = frame2.topology().bond_orders();
+    const auto& orders = frame2.topology().bond_orders();
     CHECK(orders[0] == Bond::UNKNOWN);
     CHECK(orders[1] == Bond::SINGLE);
     CHECK(orders[2] == Bond::DOUBLE);
@@ -146,7 +146,7 @@ TEST_CASE("Write CML file") {
 
 TEST_CASE("Append CML file") {
     auto tmpfile = NamedTempPath(".cml");
-    const auto EXPECTED_CONTENT =
+    const auto* EXPECTED_CONTENT =
     R"(<molecule title="appended">
   <propertyList />
   <atomArray>
@@ -187,6 +187,6 @@ TEST_CASE("Read and write files in memory") {
         auto content = read_text_file("data/cml/drugs.cml");
 
         auto file = Trajectory::memory_reader(content.data(), content.size(), "CML");
-        CHECK(file.nsteps() == 4);
+        CHECK(file.size() == 4);
     }
 }

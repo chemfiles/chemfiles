@@ -13,6 +13,28 @@ mmCIF = "The text in the ``_struct.title`` field is used as the frame **name** w
 SMI = "Any string after a terminating (blank) character in a SMILES string."
 TPR = "Name of the system as declared in the ``[system]`` section of the TOP file."
 
+[time]
+type = "number"
+
+LAMMPS = "The time of the frame in time units."
+TNG = "The time of the frame in picoseconds."
+TRR = "The time of the frame in picoseconds."
+XTC = "The time of the frame in picoseconds."
+DCD = "The time of the frame in the file units, only set when reading a file."
+"Amber NetCDF" = "The time of the frame in picoseconds."
+"Amber Restart" = "The time of the frame in picoseconds."
+
+[simulation_step]
+type = "number"
+
+LAMMPS = "The time of the frame in time units."
+TNG = "The time of the frame in picoseconds."
+TRR = "The time of the frame in picoseconds."
+XTC = "The time of the frame in picoseconds."
+DCD = "The time of the frame in the file units, only set when reading a file."
+"Amber NetCDF" = "The time of the frame in picoseconds."
+"Amber Restart" = "The time of the frame in picoseconds."
+
 [classification]
 type = "string"
 
@@ -38,21 +60,14 @@ CML = "The text of the ``title`` attribute in a molecule node. Only set if the a
 DCD = """Content of the title lines in the DCD file header.
 When writing, the first frame writen to a DCD file sets this header field."""
 
-[time]
-type = "number"
-
-LAMMPS = "The time of the frame in time units."
-TNG = "The time of the frame in picoseconds."
-TRR = "The time of the frame in picoseconds."
-XTC = "The time of the frame in picoseconds."
-DCD = "The time of the frame in the file units, only set when reading a file."
-"Amber NetCDF" = "The time of the frame in picoseconds."
-"Amber Restart" = "The time of the frame in picoseconds."
-
 [lammps_units]
 type = "string"
 
-LAMMPS = "Style of units used by LAMMPS for a simulation."
+LAMMPS = "TODO"
+TNG = "TODO"
+TRR = "TODO"
+XTC = "TODO"
+
 
 [xtc_precision]
 type = "number"

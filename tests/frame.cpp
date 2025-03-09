@@ -80,13 +80,6 @@ TEST_CASE("Positions and velocities") {
     }
 }
 
-TEST_CASE("Frame step") {
-    auto frame = Frame();
-    CHECK(frame.step() == 0);
-    frame.set_step(1000);
-    CHECK(frame.step() == 1000);
-}
-
 TEST_CASE("Unit cell") {
     auto frame = Frame();
     CHECK(frame.cell().shape() == UnitCell::INFINITE);

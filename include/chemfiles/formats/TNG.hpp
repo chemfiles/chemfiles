@@ -24,9 +24,9 @@ class TNGFormat final: public Format {
 public:
     TNGFormat(std::string path, File::Mode mode, File::Compression compression);
 
-    void read_step(size_t step, Frame& frame) override;
+    void read_at(size_t index, Frame& frame) override;
     void read(Frame& frame) override;
-    size_t nsteps() override;
+    size_t size() override;
 private:
     void read_positions(Frame& frame);
     void read_velocities(Frame& frame);
@@ -38,13 +38,10 @@ private:
     /// Scale factor for all length-dependent data:
     /// positions, velocities, forces, and box shape.
     double distance_scale_factor_ = -1;
-    /// The next step to read -- in chemfiles numbering
-    /// Chemfiles frames are numbered successively: 0, 1, 2, 3; without
-    /// accounting for the underlying simulation step
-    size_t step_ = 0;
-    /// The list of steps in the file -- in TNG numbering
-    /// TNG frames are numbered by the MD step: 0, 10, 20, 30
-    std::vector<int64_t> tng_steps_;
+    /// index of the next frame to read
+    size_t index_ = 0;
+    /// All the simulation steps in this file
+    std::vector<int64_t> simulation_steps_;
     /// The number of atoms in the current frame
     int64_t natoms_ = 0;
 };

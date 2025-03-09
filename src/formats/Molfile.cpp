@@ -233,15 +233,15 @@ template <MolfileFormat F> void Molfile<F>::read(Frame& frame) {
     frames_.emplace_back(frame.clone());
 }
 
-template <MolfileFormat F> void Molfile<F>::read_step(size_t step, Frame& frame) {
-    while (step >= frames_.size()) {
+template <MolfileFormat F> void Molfile<F>::read_at(size_t index, Frame& frame) {
+    while (index >= frames_.size()) {
         Frame new_frame;
         this->read(new_frame);
     }
-    frame = frames_.at(step).clone();
+    frame = frames_.at(index).clone();
 }
 
-template <MolfileFormat F> size_t Molfile<F>::nsteps() {
+template <MolfileFormat F> size_t Molfile<F>::size() {
     if (plugin_handle_->read_next_timestep == nullptr) {
         // FIXME: this is hacky, but the molden plugin does not respect a NULL
         // argument for molfile_timestep_t, so for now we are only able to read

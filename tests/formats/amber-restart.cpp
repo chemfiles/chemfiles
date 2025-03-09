@@ -9,7 +9,7 @@ using namespace chemfiles;
 TEST_CASE("Read files in Amber Restart format") {
     SECTION("Water") {
         auto file = Trajectory("data/netcdf/water.ncrst");
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
         auto frame = file.read();
         CHECK(frame.size() == 297);
         CHECK(frame.get("name").value() == "Cpptraj Generated Restart");
@@ -32,7 +32,7 @@ TEST_CASE("Read files in Amber Restart format") {
     SECTION("Missing unit cell") {
         auto file = Trajectory("data/netcdf/no-cell.ncrst");
         // Check `read_step`
-        auto frame = file.read_step(0);
+        auto frame = file.read_at(0);
         CHECK(frame.size() == 1989);
         CHECK(frame.get("name").value() == "Cpptraj Generated Restart");
         CHECK(frame.cell() == UnitCell());
@@ -65,7 +65,7 @@ TEST_CASE("Read files in Amber Restart format") {
 TEST_CASE("Write files in Amber Restart format") {
     auto check_frame = [](const Frame& frame) {
         CHECK(frame.get("name").value() == "Test Title 123");
-        auto positions = frame.positions();
+        const auto& positions = frame.positions();
         CHECK(approx_eq(positions[0], {0, 0, 0}, 1e-9));
         CHECK(approx_eq(positions[1], {1, 2, 3}, 1e-9));
         CHECK(approx_eq(positions[2], {2, 4, 6}, 1e-9));
@@ -80,7 +80,7 @@ TEST_CASE("Write files in Amber Restart format") {
         auto cell = frame.cell();
         CHECK(approx_eq(cell.lengths(), {2, 3, 4}, 1e-9));
         CHECK(approx_eq(cell.angles(), {80, 90, 120}, 1e-9));
-        
+
         CHECK(approx_eq(frame.get("time")->as_double(), 10.0));
     };
 
@@ -112,7 +112,7 @@ TEST_CASE("Write files in Amber Restart format") {
         }
 
         auto file = Trajectory(tmpfile, 'r');
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
         check_frame(file.read());
     }
 
@@ -125,7 +125,7 @@ TEST_CASE("Write files in Amber Restart format") {
         file.close();
 
         file = Trajectory(tmpfile, 'r');
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
         check_frame(file.read());
     }
 }

@@ -164,23 +164,23 @@ CHFL_EXPORT chfl_status chfl_frame_set_topology(
     CHFL_FRAME* frame, const CHFL_TOPOLOGY* topology
 );
 
-/// Get a `frame` step, *i.e.* the frame number in the trajectory in the integer
-/// pointed to by `step`.
+/// Get a `frame` index, *i.e.* the frame number in the trajectory in the
+/// integer pointed to by `index`.
 ///
-/// @example{capi/chfl_frame/step.c}
+/// @example{capi/chfl_frame/index.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_frame_step(
-    const CHFL_FRAME* frame, uint64_t* step
+CHFL_EXPORT chfl_status chfl_frame_index(
+    const CHFL_FRAME* frame, uint64_t* index
 );
 
-/// Set a `frame` step, *i.e.* the frame number in the trajectory to `step`.
+/// Set a `frame` index, *i.e.* the frame number in the trajectory to `index`.
 ///
-/// @example{capi/chfl_frame/set_step.c}
+/// @example{capi/chfl_frame/set_index.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_frame_set_step(
-    CHFL_FRAME* frame, uint64_t step
+CHFL_EXPORT chfl_status chfl_frame_set_index(
+    CHFL_FRAME* frame, uint64_t index
 );
 
 /// Guess the bonds, angles and dihedrals in a `frame`.

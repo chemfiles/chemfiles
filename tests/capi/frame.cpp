@@ -68,21 +68,6 @@ TEST_CASE("chfl_frame") {
         chfl_free(frame);
     }
 
-    SECTION("Step") {
-        CHFL_FRAME* frame = chfl_frame();
-        REQUIRE(frame);
-
-        uint64_t step = 0;
-        CHECK_STATUS(chfl_frame_step(frame, &step));
-        CHECK(step == 0);
-
-        CHECK_STATUS(chfl_frame_set_step(frame, 42));
-        CHECK_STATUS(chfl_frame_step(frame, &step));
-        CHECK(step == 42);
-
-        chfl_free(frame);
-    }
-
     SECTION("Positions") {
         CHFL_FRAME* frame = chfl_frame();
         REQUIRE(frame);

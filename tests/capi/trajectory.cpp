@@ -29,13 +29,13 @@ TEST_CASE("Read trajectory") {
         chfl_trajectory_close(trajectory);
     }
 
-    SECTION("Number of steps") {
+    SECTION("Trajectory size") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
         REQUIRE(trajectory);
 
-        uint64_t nsteps = 0;
-        CHECK_STATUS(chfl_trajectory_nsteps(trajectory, &nsteps));
-        CHECK(nsteps == 100);
+        uint64_t size = 0;
+        CHECK_STATUS(chfl_trajectory_size(trajectory, &size));
+        CHECK(size == 100);
 
         chfl_trajectory_close(trajectory);
     }
@@ -103,13 +103,13 @@ TEST_CASE("Read trajectory") {
         chfl_trajectory_close(trajectory);
     }
 
-    SECTION("Read specific step") {
+    SECTION("Read specific index") {
         CHFL_TRAJECTORY* trajectory = chfl_trajectory_open("data/xyz/water.xyz", 'r');
         CHFL_FRAME* frame = chfl_frame();
         REQUIRE(trajectory);
         REQUIRE(frame);
 
-        CHECK_STATUS(chfl_trajectory_read_step(trajectory, 41, frame));
+        CHECK_STATUS(chfl_trajectory_read_at(trajectory, 41, frame));
 
         uint64_t natoms = 0;
         CHECK_STATUS(chfl_frame_atoms_count(frame, &natoms));

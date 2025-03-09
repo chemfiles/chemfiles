@@ -10,15 +10,9 @@ using namespace chemfiles;
 TEST_CASE() {
     // [example]
     auto frame = Frame();
-    frame.add_atom(Atom("Co"), {0.0, 0.0, 0.0});
-    frame.add_atom(Atom("V"), {1.0, 0.0, 0.0});
-    frame.add_atom(Atom("Fe"), {0.0, 2.0, 0.0});
-    frame.add_atom(Atom("Fe"), {0.0, 0.0, 3.0});
+    assert(frame.index() == 0);
 
-    assert(frame[0].name() == "Co");
-    assert(frame[1].name() == "V");
-
-    frame[2].set_mass(45);
-    assert(frame[2].mass() == 45);
+    frame.set_index(424);
+    assert(frame.index() == 424);
     // [example]
 }

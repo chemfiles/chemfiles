@@ -15,7 +15,7 @@ TEST_CASE("Read files in Molden format using Molfile") {
     CHECK(approx_eq(positions[0], Vector3D(0.930994, 1.038515, 0.000010), 1e-6));
     CHECK(approx_eq(positions[6], Vector3D(-0.771849, 2.358500, 0.000020), 1e-6));
 
-    auto& topology = frame.topology();
+    const auto& topology = frame.topology();
     CHECK(topology[0].name() == "C");
     CHECK(topology[6].name() == "H");
 }

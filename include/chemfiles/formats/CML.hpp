@@ -35,10 +35,10 @@ public:
 
     ~CMLFormat() override;
 
-    void read_step(size_t step, Frame& frame) override;
+    void read_at(size_t index, Frame& frame) override;
     void read(Frame& frame) override;
     void write(const Frame& frame) override;
-    size_t nsteps() override;
+    size_t size() override;
 private:
     /// Initialize the document and root objects
     void init_();

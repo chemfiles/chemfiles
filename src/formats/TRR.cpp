@@ -89,11 +89,13 @@ TRRFormat::TRRFormat(std::string path, File::Mode mode, File::Compression compre
     }
 }
 
-size_t TRRFormat::nsteps() { return frame_offsets_.size(); }
+size_t TRRFormat::size() {
+    return frame_positions_.size();
+}
 
-void TRRFormat::read_step(size_t step, Frame& frame) {
-    step_ = step;
-    file_.seek(frame_offsets_[step_]);
+void TRRFormat::read_at(size_t index, Frame& frame) {
+    index_ = index;
+    file_.seek(frame_positions_[index_]);
     read(frame);
 }
 
@@ -104,9 +106,9 @@ void TRRFormat::read(Frame& frame) {
     bool has_positions = (header.x_size > 0);
     bool has_velocities = (header.v_size > 0);
 
-    frame.set_step(header.step);            // actual step of MD Simulation
-    frame.set("time", header.time);         // time in pico seconds
-    frame.set("trr_lambda", header.lambda); // coupling parameter for free energy methods
+    frame.set("simulation_step", header.step);    // actual step of MD Simulation
+    frame.set("time", header.time);               // time in pico seconds
+    frame.set("trr_lambda", header.lambda);       // coupling parameter for free energy methods
     frame.set("has_positions", has_positions);
     frame.resize(header.natoms);
 
@@ -176,7 +178,7 @@ void TRRFormat::read(Frame& frame) {
         file_.skip(static_cast<uint64_t>(header.f_size));
     }
 
-    step_++;
+    index_++;
 }
 
 TRRFormat::FrameHeader TRRFormat::read_frame_header() {
@@ -271,9 +273,9 @@ void TRRFormat::determine_frame_offsets() {
     uint64_t filesize = file_.file_size();
     auto est_nframes = static_cast<size_t>(filesize / (framebytes + TRR_MIN_HEADER_SIZE));
 
-    frame_offsets_.clear();
-    frame_offsets_.emplace_back(0);
-    frame_offsets_.reserve(est_nframes);
+    frame_positions_.clear();
+    frame_positions_.emplace_back(0);
+    frame_positions_.reserve(est_nframes);
 
     while (true) {
         file_.skip(framebytes);
@@ -284,7 +286,7 @@ void TRRFormat::determine_frame_offsets() {
         } catch (const Error&) {
             break;
         }
-        frame_offsets_.emplace_back(frame_pos);
+        frame_positions_.emplace_back(frame_pos);
 
         framebytes = calc_framebytes();
     }
@@ -294,7 +296,7 @@ void TRRFormat::determine_frame_offsets() {
 
 void TRRFormat::write(const Frame& frame) {
     const size_t natoms = frame.size();
-    if (frame_offsets_.empty() && step_ == 0) {
+    if (frame_positions_.empty() && index_ == 0) {
         natoms_ = natoms;
     } else if (natoms_ != natoms) {
         throw format_error(
@@ -322,6 +324,7 @@ void TRRFormat::write(const Frame& frame) {
         v_size = 0;
     }
 
+    auto step = frame.get("simulation_step").value_or(frame.index()).as_double();
     FrameHeader header = {
         false,    // use_double
         0,        // ir_size
@@ -336,7 +339,7 @@ void TRRFormat::write(const Frame& frame) {
         0,        // f_size
 
         natoms,                                            // natoms
-        frame.step(),                                      // step
+        static_cast<size_t>(step),                         // step
         0,                                                 // nre
         frame.get("time").value_or(0.0).as_double(),       // time
         frame.get("trr_lambda").value_or(0.0).as_double(), // lambda
@@ -361,7 +364,7 @@ void TRRFormat::write(const Frame& frame) {
         }
     }
 
-    step_++;
+    index_++;
 }
 
 void TRRFormat::write_frame_header(const FrameHeader& header) {

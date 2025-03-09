@@ -99,15 +99,15 @@ CHFL_EXPORT chfl_status chfl_trajectory_read(
     CHFL_TRAJECTORY* trajectory, CHFL_FRAME* frame
 );
 
-/// Read a specific `step` of the `trajectory` into a `frame`.
+/// Read a `frame` from a `trajectory` at a specific `index`.
 ///
 /// If the number of atoms in frame does not correspond to the number of atom
-/// in the step, the frame is resized.
+/// at this index, the frame is resized.
 ///
-/// @example{capi/chfl_trajectory/read_step.c}
+/// @example{capi/chfl_trajectory/read_at.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_trajectory_read_step(
+CHFL_EXPORT chfl_status chfl_trajectory_read_at(
     CHFL_TRAJECTORY* trajectory, uint64_t step, CHFL_FRAME* frame
 );
 
@@ -155,14 +155,13 @@ CHFL_EXPORT chfl_status chfl_trajectory_set_cell(
     CHFL_TRAJECTORY* trajectory, const CHFL_CELL* cell
 );
 
-/// Store the number of steps (the number of frames) from the `trajectory` in
-/// `nsteps`.
+/// Store the number of frames of the `trajectory` in `size`.
 ///
-/// @example{capi/chfl_trajectory/nsteps.c}
+/// @example{capi/chfl_trajectory/size.c}
 /// @return The operation status code. You can use `chfl_last_error` to learn
 ///         about the error if the status code is not `CHFL_SUCCESS`.
-CHFL_EXPORT chfl_status chfl_trajectory_nsteps(
-    CHFL_TRAJECTORY* trajectory, uint64_t* nsteps
+CHFL_EXPORT chfl_status chfl_trajectory_size(
+    CHFL_TRAJECTORY* trajectory, uint64_t* size
 );
 
 /// Obtain the memory buffer written to by the `trajectory`.

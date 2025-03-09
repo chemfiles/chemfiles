@@ -82,11 +82,11 @@ extern "C" chfl_status chfl_trajectory_path(const CHFL_TRAJECTORY* const traject
     )
 }
 
-extern "C" chfl_status chfl_trajectory_read_step(CHFL_TRAJECTORY* const trajectory, uint64_t step, CHFL_FRAME* const frame) {
+extern "C" chfl_status chfl_trajectory_read_at(CHFL_TRAJECTORY* const trajectory, uint64_t index, CHFL_FRAME* const frame) {
     CHECK_POINTER(trajectory);
     CHECK_POINTER(frame);
     CHFL_ERROR_CATCH(
-        *frame = trajectory->read_step(checked_cast(step));
+        *frame = trajectory->read_at(checked_cast(index));
     )
 }
 
@@ -133,11 +133,11 @@ extern "C" chfl_status chfl_trajectory_set_cell(CHFL_TRAJECTORY* const trajector
     )
 }
 
-extern "C" chfl_status chfl_trajectory_nsteps(CHFL_TRAJECTORY* const trajectory, uint64_t* nsteps) {
+extern "C" chfl_status chfl_trajectory_size(CHFL_TRAJECTORY* const trajectory, uint64_t* size) {
     CHECK_POINTER(trajectory);
-    CHECK_POINTER(nsteps);
+    CHECK_POINTER(size);
     CHFL_ERROR_CATCH(
-        *nsteps = trajectory->nsteps();
+        *size = trajectory->size();
     )
 }
 

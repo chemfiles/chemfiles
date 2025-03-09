@@ -7,10 +7,11 @@
 using namespace chemfiles;
 
 static void check_ubiquitin(Trajectory& file) {
-    CHECK(file.nsteps() == 2);
-    auto frame = file.read_step(0);
+    CHECK(file.size() == 2);
+    auto frame = file.read_at(0);
 
-    CHECK(frame.step() == 0);
+    CHECK(frame.index() == 0);
+    CHECK(frame.get("simulation_step")->as_double() == 0);
     CHECK(approx_eq(frame.get("time")->as_double(), 0));
     CHECK(frame.get("has_positions")->as_bool());
     CHECK(frame.size() == 20455);
@@ -28,9 +29,10 @@ static void check_ubiquitin(Trajectory& file) {
     CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
     CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
 
-    frame = file.read_step(1);
+    frame = file.read_at(1);
 
-    CHECK(frame.step() == 25000);
+    CHECK(frame.index() == 1);
+    CHECK(frame.get("simulation_step")->as_double() == 25000);
     CHECK(approx_eq(frame.get("time")->as_double(), 50));
     CHECK(frame.get("has_positions")->as_bool());
     CHECK(frame.size() == 20455);
@@ -50,7 +52,7 @@ static void check_ubiquitin(Trajectory& file) {
 }
 
 static void check_different_cell_shapes(Trajectory& file) {
-    CHECK(file.nsteps() == 3);
+    CHECK(file.size() == 3);
 
     auto frame = file.read();
     CHECK(frame.size() == 10);
@@ -90,10 +92,11 @@ TEST_CASE("Read files in TRR format") {
 
     SECTION("Read trajectory: Water") {
         auto file = Trajectory("data/trr/water.trr");
-        CHECK(file.nsteps() == 100);
+        CHECK(file.size() == 100);
         auto frame = file.read();
 
-        CHECK(frame.step() == 0);
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 0);
         CHECK(approx_eq(frame.get("time")->as_double(), 0));
         CHECK(frame.get("has_positions")->as_bool());
         CHECK(frame.size() == 297);
@@ -110,7 +113,8 @@ TEST_CASE("Read files in TRR format") {
         file.read(); // Skip a frame
         frame = file.read();
 
-        CHECK(frame.step() == 2);
+        CHECK(frame.index() == 2);
+        CHECK(frame.get("simulation_step")->as_double() == 2);
         CHECK(approx_eq(frame.get("time")->as_double(), 0.2, 1e-4));
         CHECK(frame.get("has_positions")->as_bool());
         CHECK(frame.size() == 297);
@@ -124,9 +128,10 @@ TEST_CASE("Read files in TRR format") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {15.0, 15.0, 15.0}, 1e-4));
 
-        frame = file.read_step(75); // skip forward
+        frame = file.read_at(75); // skip forward
 
-        CHECK(frame.step() == 75);
+        CHECK(frame.index() == 75);
+        CHECK(frame.get("simulation_step")->as_double() == 75);
         CHECK(approx_eq(frame.get("time")->as_double(), 7.5));
         CHECK(frame.get("has_positions")->as_bool());
         CHECK(frame.size() == 297);
@@ -139,9 +144,10 @@ TEST_CASE("Read files in TRR format") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {15.0, 15.0, 15.0}, 1e-4));
 
-        frame = file.read_step(50); // skip behind previous step
+        frame = file.read_at(50); // skip behind previous step
 
-        CHECK(frame.step() == 50);
+        CHECK(frame.index() == 50);
+        CHECK(frame.get("simulation_step")->as_double() == 50);
         CHECK(approx_eq(frame.get("time")->as_double(), 5.0));
         CHECK(frame.get("has_positions")->as_bool());
         CHECK(frame.size() == 297);
@@ -157,10 +163,11 @@ TEST_CASE("Read files in TRR format") {
 
     SECTION("Read trajectory: 1AKI") {
         auto file = Trajectory("data/trr/1aki.trr");
-        CHECK(file.nsteps() == 6);
+        CHECK(file.size() == 6);
         auto frame = file.read();
 
-        CHECK(frame.step() == 0);
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 0);
         CHECK(approx_eq(frame.get("time")->as_double(), 0));
         CHECK(frame.get("has_positions")->as_bool());
         CHECK(frame.size() == 38376);
@@ -178,9 +185,10 @@ TEST_CASE("Read files in TRR format") {
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {73.3925, 73.3925, 73.3925}, 1e-4));
 
-        frame = file.read_step(5); // skip forward
+        frame = file.read_at(5); // skip forward
 
-        CHECK(frame.step() == 50);
+        CHECK(frame.index() == 5);
+        CHECK(frame.get("simulation_step")->as_double() == 50);
         CHECK(approx_eq(frame.get("time")->as_double(), 0.1, 1e-4));
         CHECK(frame.get("has_positions")->as_bool());
         CHECK(frame.size() == 38376);
@@ -226,7 +234,7 @@ TEST_CASE("Write and append files in TRR format") {
         file.write(frame);
 
         frame = Frame(UnitCell({20, 21, 22}, {33.333, 44.444, 55.555}));
-        frame.set_step(100);
+        frame.set("simulation_step", 100);
         frame.set("trr_lambda", 0.345);
         frame.add_atom(Atom("A"), {4, 5, 6});
         frame.add_atom(Atom("B"), {7, 8, 9});
@@ -241,21 +249,21 @@ TEST_CASE("Write and append files in TRR format") {
         frame.add_atom(Atom("C"), {0, 0, 0}, {1.222, -2.333, -3.444});
         file.write(frame);
 
-        CHECK(file.nsteps() == 3);
+        CHECK(file.size() == 3);
         file.close();
 
         // now append one frame
         file = Trajectory(tmpfile, 'a');
 
         frame = Frame(UnitCell({30, 31, 32}));
-        frame.set_step(200);
+        frame.set_index(200);
         frame.set("time", 20);
         frame.add_atom(Atom("A"), {7, 8, 9});
         frame.add_atom(Atom("B"), {1, 2, 3});
         frame.add_atom(Atom("C"), {4, 5, 6});
 
         file.write(frame);
-        CHECK(file.nsteps() == 4);
+        CHECK(file.size() == 4);
         file.close();
 
         // now read every thing back and check
@@ -263,7 +271,8 @@ TEST_CASE("Write and append files in TRR format") {
 
         frame = file.read();
 
-        CHECK(frame.step() == 0); // default step
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 0); // default step
         CHECK(approx_eq(frame.get("time")->as_double(), 19.376, 1e-4));
         CHECK(approx_eq(frame.get("trr_lambda")->as_double(), 0)); // default lambda
         CHECK(frame.get("has_positions")->as_bool());
@@ -284,7 +293,8 @@ TEST_CASE("Write and append files in TRR format") {
 
         frame = file.read();
 
-        CHECK(frame.step() == 100);
+        CHECK(frame.index() == 1);
+        CHECK(frame.get("simulation_step")->as_double() == 100);
         CHECK(approx_eq(frame.get("time")->as_double(), 0)); // default time
         CHECK(approx_eq(frame.get("trr_lambda")->as_double(), 0.345, 1e-4));
         CHECK(frame.get("has_positions")->as_bool());
@@ -302,7 +312,8 @@ TEST_CASE("Write and append files in TRR format") {
 
         frame = file.read();
 
-        CHECK(frame.step() == 0); // default step
+        CHECK(frame.index() == 2);
+        CHECK(frame.get("simulation_step")->as_double() == 0); // default step
         CHECK(approx_eq(frame.get("time")->as_double(), 0)); // default time
         CHECK(approx_eq(frame.get("trr_lambda")->as_double(), 0)); // default lambda
         CHECK(!frame.get("has_positions")->as_bool());
@@ -318,7 +329,8 @@ TEST_CASE("Write and append files in TRR format") {
 
         frame = file.read();
 
-        CHECK(frame.step() == 200);
+        CHECK(frame.index() == 3);
+        CHECK(frame.get("simulation_step")->as_double() == 200);
         CHECK(approx_eq(frame.get("time")->as_double(), 20));
         CHECK(approx_eq(frame.get("trr_lambda")->as_double(), 0)); // default lambda
         CHECK(frame.get("has_positions")->as_bool());
@@ -347,7 +359,7 @@ TEST_CASE("Write and append files in TRR format") {
 
         auto file = Trajectory(tmpfile, 'a');
         file.write(frame);
-        CHECK(file.nsteps() == 1);
+        CHECK(file.size() == 1);
         file.close();
 
         // now read every thing back and check
@@ -355,7 +367,8 @@ TEST_CASE("Write and append files in TRR format") {
 
         frame = file.read();
 
-        CHECK(frame.step() == 0); // default step
+        CHECK(frame.index() == 0);
+        CHECK(frame.get("simulation_step")->as_double() == 0); // default step
         CHECK(approx_eq(frame.get("time")->as_double(), 19.376, 1e-4));
         CHECK(approx_eq(frame.get("trr_lambda")->as_double(), 0.753, 1e-4));
         CHECK(frame.get("has_positions")->as_bool());
