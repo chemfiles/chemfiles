@@ -1,10 +1,11 @@
 ## Chemfiles: a library for reading and writing chemistry files
 
 [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](http://chemfiles.org/chemfiles/)
-[![Build Status](https://img.shields.io/travis/chemfiles/chemfiles/master.svg)](https://travis-ci.org/chemfiles/chemfiles)
+[![Tests status](https://img.shields.io/github/checks-status/chemfiles/chemfiles/master)](https://github.com/chemfiles/chemfiles/actions?query=branch%3Amaster)
 [![Code Coverage](http://codecov.io/github/chemfiles/chemfiles/coverage.svg?branch=master)](http://codecov.io/github/chemfiles/chemfiles?branch=master)
-[![Gitter](https://badges.gitter.im/chemfiles/chemfiles.svg)](https://gitter.im/chemfiles/chemfiles)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3653157.svg)](https://doi.org/10.5281/zenodo.3653157)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1202207.svg)](https://doi.org/10.5281/zenodo.1202207)
+
+
 
 Chemfiles is a high-quality library for reading and writing trajectory files
 created by computational chemistry simulations programs. To help you access
@@ -98,8 +99,7 @@ new library.
 Chemfiles is free and open source. Your [contributions](Contributing.md) are
 always welcome!
 
-If you have questions or suggestions, or need help, please open an [issue] or
-join us on our [Gitter] chat room.
+If you have questions or suggestions, or need help, please open an [issue].
 
 If you are using Chemfiles in a published scientific study, please cite us using
 the following DOI: https://doi.org/10.5281/zenodo.3653157.
@@ -162,7 +162,7 @@ int main() {
 
 Guillaume Fraux created and maintains Chemfiles, which is distributed under the
 [3 clauses BSD license](LICENSE). By contributing to Chemfiles, you agree to
-distribute your contributions under the same license. 
+distribute your contributions under the same license.
 
 Chemfiles depends on multiple external libraries, which are distributed under [their
 respective licenses](external/README.md). All external libraries licenses should
@@ -174,8 +174,5 @@ CMake flag to remove this dependency.
 The [AUTHORS](AUTHORS) file lists all contributors to Chemfiles. Many thanks to
 all of them!
 
-[Gitter]: https://gitter.im/chemfiles/chemfiles
 [issue]: https://github.com/chemfiles/chemfiles/issues/new
 [install]: http://chemfiles.org/chemfiles/latest/installation.html
-[OpenSuseBuild]: https://build.opensuse.org/package/show/home:Luthaf/chemfiles
-[OSB-download]: https://software.opensuse.org/download.html?project=home%3ALuthaf&package=chemfiles
