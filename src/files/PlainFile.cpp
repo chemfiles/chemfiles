@@ -6,6 +6,10 @@
 #include <cstring>
 #include <string>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "chemfiles/unreachable.hpp"
 #include "chemfiles/error_fmt.hpp"
 
@@ -36,6 +40,32 @@ PlainFile::PlainFile(const std::string& path, File::Mode mode): TextFileImpl(pat
     // return by tellpos are wrong.
     //
     // We can do this because we are dealing with line ending ourself.
+    
+#ifdef _WIN32
+    // On Windows, allow for UTF-8 paths containing non-ASCII characters
+    const wchar_t* openmode;
+
+    switch (mode) {
+    case File::READ:
+        openmode = L"rb";
+        break;
+    case File::APPEND:
+        openmode = L"a+b";
+        break;
+    case File::WRITE:
+        openmode = L"wb";
+        break;
+    default:
+        unreachable();
+    }
+
+    // convert to a wide string (UTF-8) to take care of special characters
+    const int size_needed = MultiByteToWideChar(CP_UTF8, 0, &path[0], (int)path.size(), NULL, 0);
+    std::wstring w_path = std::wstring(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, &path[0], (int)path.size(), &w_path[0], size_needed);
+
+    file_ = _wfopen(w_path.c_str(), openmode);
+#else
     const char* openmode;
 
     switch (mode) {
@@ -53,6 +83,7 @@ PlainFile::PlainFile(const std::string& path, File::Mode mode): TextFileImpl(pat
     }
 
     file_ = std::fopen(path.c_str(), openmode);
+#endif
     if (file_ == nullptr){
         throw file_error("could not open the file at '{}'", path);
     }
