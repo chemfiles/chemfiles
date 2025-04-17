@@ -35,8 +35,6 @@ WHITELIST = [
     "new",
     "cstddef",
     "map",
-    # windows headers used for converting to a wide string
-    "windows.h",
     # external headers
     "chemfiles/external/span.hpp",
     "chemfiles/external/optional.hpp",

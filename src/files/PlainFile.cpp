@@ -6,15 +6,17 @@
 #include <cstring>
 #include <string>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
 #include "chemfiles/unreachable.hpp"
 #include "chemfiles/error_fmt.hpp"
 
 #include "chemfiles/File.hpp"
 #include "chemfiles/files/PlainFile.hpp"
+
+#include "chemfiles/config.h"
+
+#ifdef CHEMFILES_WINDOWS
+#include <windows.h>
+#endif
 
 using namespace chemfiles;
 

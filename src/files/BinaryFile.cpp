@@ -22,11 +22,7 @@
 
 #ifdef CHEMFILES_WINDOWS
 #include <io.h>
-
-#ifdef _WIN32
 #include <windows.h>
-#endif
-
 #endif
 
 #ifdef __CYGWIN__
