@@ -71,7 +71,7 @@ BinaryFile::BinaryFile(std::string path, File::Mode mode):
     int permissions = S_IRWXU | S_IRWXG | S_IROTH;
 #endif
 
-#ifdef _WIN32
+#ifdef CHEMFILES_WINDOWS
     // On Windows, allow for UTF-8 paths containing non-ASCII characters
 
     // convert to a wide string (UTF-8) to take care of special characters

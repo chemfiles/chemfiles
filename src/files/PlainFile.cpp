@@ -43,7 +43,7 @@ PlainFile::PlainFile(const std::string& path, File::Mode mode): TextFileImpl(pat
     //
     // We can do this because we are dealing with line ending ourself.
     
-#ifdef _WIN32
+#ifdef CHEMFILES_WINDOWS
     // On Windows, allow for UTF-8 paths containing non-ASCII characters
     const wchar_t* openmode;
 
