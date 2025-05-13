@@ -31,6 +31,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   versions are tried to be read but emit a warning
 - Improved reading speed of XTC files by implementing a decoding routine
   proposed by [libxtc](https://doi.org/10.1186/s13104-021-05536-5)
+- Read and write forces from/to TRR files as atomic properties (#511)
 
 ### Changes to the API
 
