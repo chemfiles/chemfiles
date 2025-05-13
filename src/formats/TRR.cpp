@@ -105,6 +105,7 @@ void TRRFormat::read(Frame& frame) {
     bool has_box = (header.box_size > 0);
     bool has_positions = (header.x_size > 0);
     bool has_velocities = (header.v_size > 0);
+    bool has_forces = (header.f_size > 0);
 
     frame.set("simulation_step", header.step);    // actual step of MD Simulation
     frame.set("time", header.time);               // time in pico seconds
@@ -147,6 +148,19 @@ void TRRFormat::read(Frame& frame) {
                 velocities[i][2] = dx[i * 3 + 2] * 10.0;
             }
         }
+        if (has_forces) {
+            file_.read_f64(dx);
+            assert(dx.size() == 3 * frame.size());
+            for (size_t i = 0; i < frame.size(); i++) {
+                // Factor 10 because the lengths are in nm in the TRR format
+                const Vector3D force = {
+                    dx[i * 3] / 10.0,
+                    dx[i * 3 + 1] / 10.0,
+                    dx[i * 3 + 2] / 10.0,
+                };
+                frame[i].set("force", force);
+            }
+        }
     } else {
         std::vector<float> dx(header.natoms * 3);
         if (has_positions) {
@@ -167,15 +181,26 @@ void TRRFormat::read(Frame& frame) {
             assert(dx.size() == 3 * velocities.size());
             for (size_t i = 0; i < frame.size(); i++) {
                 // Factor 10 because the lengths are in nm in the TRR format
+                // GROMACS velocity unit: nm / ps
                 velocities[i][0] = static_cast<double>(dx[i * 3]) * 10.0;
                 velocities[i][1] = static_cast<double>(dx[i * 3 + 1]) * 10.0;
                 velocities[i][2] = static_cast<double>(dx[i * 3 + 2]) * 10.0;
             }
         }
-    }
-
-    if (header.f_size > 0) {
-        file_.skip(static_cast<uint64_t>(header.f_size));
+        if (has_forces) {
+            file_.read_f32(dx);
+            assert(dx.size() == 3 * frame.size());
+            for (size_t i = 0; i < frame.size(); i++) {
+                // Factor 10 because the lengths are in nm in the TRR format
+                // GROMACS force unit: kJ / (mol * nm)
+                const Vector3D force = {
+                    static_cast<double>(dx[i * 3] / 10.0),
+                    static_cast<double>(dx[i * 3 + 1] / 10.0),
+                    static_cast<double>(dx[i * 3 + 2] / 10.0),
+                };
+                frame[i].set("force", force);
+            }
+        }
     }
 
     index_++;
