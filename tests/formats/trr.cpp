@@ -354,8 +354,8 @@ TEST_CASE("Write and append files in TRR format") {
         frame = file.read();
 
         CHECK(frame.index() == 2);
-        CHECK(frame.get("simulation_step")->as_double() == 0); // default step
-        CHECK(approx_eq(frame.get("time")->as_double(), 0)); // default time
+        CHECK(frame.get("simulation_step")->as_double() == 0);     // default step
+        CHECK(approx_eq(frame.get("time")->as_double(), 0));       // default time
         CHECK(approx_eq(frame.get("trr_lambda")->as_double(), 0)); // default lambda
         CHECK(!frame.get("has_positions")->as_bool());
         CHECK(frame.size() == 3);

@@ -11,17 +11,19 @@
 #include <utility>
 #include <vector>
 
+#include "fmt/core.h"
+
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/external/optional.hpp"
 #include "chemfiles/external/span.hpp"
 #include "chemfiles/types.hpp"
 
+#include "chemfiles/Atom.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Property.hpp"
 #include "chemfiles/UnitCell.hpp"
-#include "chemfiles/Format.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/files/XDRFile.hpp"
 #include "chemfiles/formats/TRR.hpp"
@@ -85,16 +87,14 @@ TRRFormat::TRRFormat(std::string path, File::Mode mode, File::Compression compre
     } else if (mode == File::APPEND) {
         try {
             determine_frame_offsets();
-        } catch (const Error&) {  // NOLINT(bugprone-empty-catch)
+        } catch (const Error&) { // NOLINT(bugprone-empty-catch)
             // Ignore exceptions, because the file might not exist. If it does,
             // we need to get the number of atoms and frames for appending.
         }
     }
 }
 
-size_t TRRFormat::size() {
-    return frame_positions_.size();
-}
+size_t TRRFormat::size() { return frame_positions_.size(); }
 
 void TRRFormat::read_at(size_t index, Frame& frame) {
     index_ = index;
@@ -169,9 +169,9 @@ void TRRFormat::read(Frame& frame) {
     bool has_velocities = (header.v_size > 0);
     bool has_forces = (header.f_size > 0);
 
-    frame.set("simulation_step", header.step);    // actual step of MD Simulation
-    frame.set("time", header.time);               // time in pico seconds
-    frame.set("trr_lambda", header.lambda);       // coupling parameter for free energy methods
+    frame.set("simulation_step", header.step); // actual step of MD Simulation
+    frame.set("time", header.time);            // time in pico seconds
+    frame.set("trr_lambda", header.lambda);    // coupling parameter for free energy methods
     frame.set("has_positions", has_positions);
     frame.resize(header.natoms);
 
@@ -276,10 +276,9 @@ void TRRFormat::determine_frame_offsets() {
     natoms_ = header.natoms;
 
     auto calc_framebytes = [&header]() {
-        return (
-            header.ir_size + header.e_size + header.box_size + header.vir_size + header.pres_size +
-            header.top_size + header.sym_size + header.x_size + header.v_size + header.f_size
-        );
+        return (header.ir_size + header.e_size + header.box_size + header.vir_size +
+                header.pres_size + header.top_size + header.sym_size + header.x_size +
+                header.v_size + header.f_size);
     };
     uint64_t framebytes = calc_framebytes();
 
