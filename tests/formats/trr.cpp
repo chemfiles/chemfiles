@@ -257,6 +257,7 @@ TEST_CASE("Write and append files in TRR format") {
         frame.add_atom(Atom("A"), {1.999, 2.888, 3.777}, {3, 2, 1});
         frame.add_atom(Atom("B"), {4, 5, 6}, {9, 8, 7});
         frame.add_atom(Atom("C"), {7, 8, 9}, {6.777, 5.666, 4.555});
+        frame[1].set("force", Vector3D(8, 6, 3));
 
         auto file = Trajectory(tmpfile, 'w');
         file.write(frame);
@@ -275,6 +276,9 @@ TEST_CASE("Write and append files in TRR format") {
         frame.add_atom(Atom("A"), {0, 0, 0}, {-7, 8, 9});
         frame.add_atom(Atom("B"), {0, 0, 0}, {4, 5, 6});
         frame.add_atom(Atom("C"), {0, 0, 0}, {1.222, -2.333, -3.444});
+        frame[0].set("force", Vector3D(3, 9, 2));
+        frame[1].set("force", Vector3D(8, 5, 8));
+        frame[2].set("force", Vector3D(5, 3, 2));
         file.write(frame);
 
         CHECK(file.size() == 3);
@@ -289,6 +293,7 @@ TEST_CASE("Write and append files in TRR format") {
         frame.add_atom(Atom("A"), {7, 8, 9});
         frame.add_atom(Atom("B"), {1, 2, 3});
         frame.add_atom(Atom("C"), {4, 5, 6});
+        frame[2].set("force", Vector3D(1.713, 3.577, 9.119));
 
         file.write(frame);
         CHECK(file.size() == 4);
@@ -315,6 +320,10 @@ TEST_CASE("Write and append files in TRR format") {
         CHECK(approx_eq(velocities[0], Vector3D(3, 2, 1), 1e-4));
         CHECK(approx_eq(velocities[2], Vector3D(6.777, 5.666, 4.555), 1e-4));
 
+        CHECK(approx_eq(frame[0].get("force")->as_vector3d(), Vector3D(0, 0, 0), 1e-4));
+        CHECK(approx_eq(frame[1].get("force")->as_vector3d(), Vector3D(8, 6, 3), 1e-4));
+        CHECK(approx_eq(frame[2].get("force")->as_vector3d(), Vector3D(0, 0, 0), 1e-4));
+
         auto cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
         CHECK(approx_eq(cell.lengths(), {10.111, 11.222, 12.333}, 1e-4));
@@ -332,6 +341,10 @@ TEST_CASE("Write and append files in TRR format") {
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(4, 5, 6), 1e-4));
         CHECK(approx_eq(positions[2], Vector3D(1, 2, 3), 1e-4));
+
+        CHECK(!frame[0].get("force"));
+        CHECK(!frame[1].get("force"));
+        CHECK(!frame[2].get("force"));
 
         cell = frame.cell();
         CHECK(cell.shape() == UnitCell::TRICLINIC);
@@ -352,6 +365,10 @@ TEST_CASE("Write and append files in TRR format") {
         CHECK(approx_eq(velocities[0], Vector3D(-7, 8, 9), 1e-4));
         CHECK(approx_eq(velocities[2], Vector3D(1.222, -2.333, -3.444), 1e-4));
 
+        CHECK(approx_eq(frame[0].get("force")->as_vector3d(), Vector3D(3, 9, 2), 1e-4));
+        CHECK(approx_eq(frame[1].get("force")->as_vector3d(), Vector3D(8, 5, 8), 1e-4));
+        CHECK(approx_eq(frame[2].get("force")->as_vector3d(), Vector3D(5, 3, 2), 1e-4));
+
         cell = frame.cell();
         CHECK(cell.shape() == UnitCell::INFINITE);
 
@@ -368,6 +385,10 @@ TEST_CASE("Write and append files in TRR format") {
         positions = frame.positions();
         CHECK(approx_eq(positions[0], Vector3D(7, 8, 9), 1e-4));
         CHECK(approx_eq(positions[2], Vector3D(4, 5, 6), 1e-4));
+
+        CHECK(approx_eq(frame[0].get("force")->as_vector3d(), Vector3D(0, 0, 0), 1e-4));
+        CHECK(approx_eq(frame[1].get("force")->as_vector3d(), Vector3D(0, 0, 0), 1e-4));
+        CHECK(approx_eq(frame[2].get("force")->as_vector3d(), Vector3D(1.713, 3.577, 9.119), 1e-4));
 
         cell = frame.cell();
         CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);

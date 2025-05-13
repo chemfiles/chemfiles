@@ -70,6 +70,8 @@ template <> const FormatMetadata& chemfiles::format_metadata<TRRFormat>() {
 static void get_cell(std::vector<float>& box, const Frame& frame);
 static void get_positions(std::vector<float>& x, const Frame& frame);
 static void get_velocities(std::vector<float>& v, const Frame& frame);
+static void get_forces(std::vector<float>& f, const Frame& frame);
+static bool has_forces(const Frame& frame);
 
 TRRFormat::TRRFormat(std::string path, File::Mode mode, File::Compression compression)
     : file_(std::move(path), mode) {
@@ -349,6 +351,8 @@ void TRRFormat::write(const Frame& frame) {
         v_size = 0;
     }
 
+    const size_t f_size = has_forces(frame) ? dx_size : 0;
+
     auto step = frame.get("simulation_step").value_or(frame.index()).as_double();
     FrameHeader header = {
         false,    // use_double
@@ -361,7 +365,7 @@ void TRRFormat::write(const Frame& frame) {
         0,        // sym_size
         x_size,   // x_size
         v_size,   // v_size
-        0,        // f_size
+        f_size,   // f_size
 
         natoms,                                            // natoms
         static_cast<size_t>(step),                         // step
@@ -385,6 +389,10 @@ void TRRFormat::write(const Frame& frame) {
         }
         if (v_size > 0) {
             get_velocities(dx, frame);
+            file_.write_f32(dx);
+        }
+        if (f_size > 0) {
+            get_forces(dx, frame);
             file_.write_f32(dx);
         }
     }
@@ -451,4 +459,26 @@ void get_velocities(std::vector<float>& v, const Frame& frame) {
         v[i * 3 + 1] = static_cast<float>(velocities[i][1] / 10.0);
         v[i * 3 + 2] = static_cast<float>(velocities[i][2] / 10.0);
     }
+}
+
+void get_forces(std::vector<float>& f, const Frame& frame) {
+    assert(f.size() == 3 * frame.size());
+    for (size_t i = 0; i < frame.size(); i++) {
+        // Default to zero force on atoms without the force property
+        const Vector3D atomic_force =
+            frame[i].get("force").value_or(Vector3D(0., 0., 0.)).as_vector3d();
+        // Factor 10 because the lengths are in nm in the TRR format
+        f[i * 3] = static_cast<float>(atomic_force[0] * 10.0);
+        f[i * 3 + 1] = static_cast<float>(atomic_force[1] * 10.0);
+        f[i * 3 + 2] = static_cast<float>(atomic_force[2] * 10.0);
+    }
+}
+
+bool has_forces(const Frame& frame) {
+    for (size_t i = 0; i < frame.size(); ++i) {
+        if (frame[i].get("force")) {
+            return true;
+        }
+    }
+    return false;
 }
