@@ -7,6 +7,7 @@
 
 #include <array>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -101,6 +102,65 @@ void TRRFormat::read_at(size_t index, Frame& frame) {
     read(frame);
 }
 
+template <typename T> void read_real_vec(XDRFile& file, std::vector<T>& dx) {
+    // Compile-time error whenever T is a concrete type here
+    // (i.e. specialization for float/double is not used)
+    static_assert(sizeof(T) == -1, "read_real_vec can only be used with float or double");
+}
+
+template <> void read_real_vec<double>(XDRFile& file, std::vector<double>& dx) {
+    file.read_f64(dx);
+}
+
+template <> void read_real_vec<float>(XDRFile& file, std::vector<float>& dx) { file.read_f32(dx); }
+
+template <typename T>
+void read_xvf(Frame& frame, XDRFile& file, size_t natoms, bool has_positions, bool has_velocities,
+              bool has_forces) {
+    static_assert(std::is_same<T, float>::value || std::is_same<T, double>::value,
+                  "read_xvf can only be used with float or double");
+
+    std::vector<T> dx(natoms * 3);
+    if (has_positions) {
+        read_real_vec(file, dx);
+        auto positions = frame.positions();
+        assert(dx.size() == 3 * positions.size());
+        for (size_t i = 0; i < frame.size(); i++) {
+            // Factor 10 because the cell lengths are in nm in the TRR format
+            positions[i][0] = static_cast<double>(dx[i * 3]) * 10.0;
+            positions[i][1] = static_cast<double>(dx[i * 3 + 1]) * 10.0;
+            positions[i][2] = static_cast<double>(dx[i * 3 + 2]) * 10.0;
+        }
+    }
+    if (has_velocities) {
+        read_real_vec(file, dx);
+        frame.add_velocities();
+        auto velocities = *frame.velocities();
+        assert(dx.size() == 3 * velocities.size());
+        for (size_t i = 0; i < frame.size(); i++) {
+            // Factor 10 because the lengths are in nm in the TRR format
+            // GROMACS velocity unit: nm / ps
+            velocities[i][0] = static_cast<double>(dx[i * 3]) * 10.0;
+            velocities[i][1] = static_cast<double>(dx[i * 3 + 1]) * 10.0;
+            velocities[i][2] = static_cast<double>(dx[i * 3 + 2]) * 10.0;
+        }
+    }
+    if (has_forces) {
+        read_real_vec(file, dx);
+        assert(dx.size() == 3 * frame.size());
+        for (size_t i = 0; i < frame.size(); i++) {
+            // Factor 10 because the lengths are in nm in the TRR format
+            // GROMACS force unit: kJ / (mol * nm)
+            const Vector3D force = {
+                static_cast<double>(dx[i * 3] / 10.0),
+                static_cast<double>(dx[i * 3 + 1] / 10.0),
+                static_cast<double>(dx[i * 3 + 2] / 10.0),
+            };
+            frame[i].set("force", force);
+        }
+    }
+}
+
 void TRRFormat::read(Frame& frame) {
     FrameHeader header = read_frame_header();
 
@@ -126,83 +186,9 @@ void TRRFormat::read(Frame& frame) {
     }
 
     if (header.use_double) {
-        std::vector<double> dx(header.natoms * 3);
-        if (has_positions) {
-            file_.read_f64(dx);
-            auto positions = frame.positions();
-            assert(dx.size() == 3 * positions.size());
-            for (size_t i = 0; i < frame.size(); i++) {
-                // Factor 10 because the cell lengths are in nm in the TRR format
-                positions[i][0] = dx[i * 3] * 10.0;
-                positions[i][1] = dx[i * 3 + 1] * 10.0;
-                positions[i][2] = dx[i * 3 + 2] * 10.0;
-            }
-        }
-        if (has_velocities) {
-            file_.read_f64(dx);
-            frame.add_velocities();
-            auto velocities = *frame.velocities();
-            assert(dx.size() == 3 * velocities.size());
-            for (size_t i = 0; i < frame.size(); i++) {
-                // Factor 10 because the lengths are in nm in the TRR format
-                velocities[i][0] = dx[i * 3] * 10.0;
-                velocities[i][1] = dx[i * 3 + 1] * 10.0;
-                velocities[i][2] = dx[i * 3 + 2] * 10.0;
-            }
-        }
-        if (has_forces) {
-            file_.read_f64(dx);
-            assert(dx.size() == 3 * frame.size());
-            for (size_t i = 0; i < frame.size(); i++) {
-                // Factor 10 because the lengths are in nm in the TRR format
-                const Vector3D force = {
-                    dx[i * 3] / 10.0,
-                    dx[i * 3 + 1] / 10.0,
-                    dx[i * 3 + 2] / 10.0,
-                };
-                frame[i].set("force", force);
-            }
-        }
+        read_xvf<double>(frame, file_, header.natoms, has_positions, has_velocities, has_forces);
     } else {
-        std::vector<float> dx(header.natoms * 3);
-        if (has_positions) {
-            file_.read_f32(dx);
-            auto positions = frame.positions();
-            assert(dx.size() == 3 * positions.size());
-            for (size_t i = 0; i < frame.size(); i++) {
-                // Factor 10 because the cell lengths are in nm in the TRR format
-                positions[i][0] = static_cast<double>(dx[i * 3]) * 10.0;
-                positions[i][1] = static_cast<double>(dx[i * 3 + 1]) * 10.0;
-                positions[i][2] = static_cast<double>(dx[i * 3 + 2]) * 10.0;
-            }
-        }
-        if (has_velocities) {
-            file_.read_f32(dx);
-            frame.add_velocities();
-            auto velocities = *frame.velocities();
-            assert(dx.size() == 3 * velocities.size());
-            for (size_t i = 0; i < frame.size(); i++) {
-                // Factor 10 because the lengths are in nm in the TRR format
-                // GROMACS velocity unit: nm / ps
-                velocities[i][0] = static_cast<double>(dx[i * 3]) * 10.0;
-                velocities[i][1] = static_cast<double>(dx[i * 3 + 1]) * 10.0;
-                velocities[i][2] = static_cast<double>(dx[i * 3 + 2]) * 10.0;
-            }
-        }
-        if (has_forces) {
-            file_.read_f32(dx);
-            assert(dx.size() == 3 * frame.size());
-            for (size_t i = 0; i < frame.size(); i++) {
-                // Factor 10 because the lengths are in nm in the TRR format
-                // GROMACS force unit: kJ / (mol * nm)
-                const Vector3D force = {
-                    static_cast<double>(dx[i * 3] / 10.0),
-                    static_cast<double>(dx[i * 3 + 1] / 10.0),
-                    static_cast<double>(dx[i * 3 + 2] / 10.0),
-                };
-                frame[i].set("force", force);
-            }
-        }
+        read_xvf<float>(frame, file_, header.natoms, has_positions, has_velocities, has_forces);
     }
 
     index_++;
