@@ -32,7 +32,7 @@ Chemfiles is used in multiple scientific software
 - [ANA](https://ana.run/) detects cavities, calculates their volume and their
   flexibility in macromolecular structures and molecular dynamics trajectories;
 
-This repository contains the core of the chemfiles library — written in C++11,
+This repository contains the core of the chemfiles library — written in C++17,
 with a C99 interface. You can also use chemfiles from other languages: [Python
 2&3](https://github.com/chemfiles/chemfiles.py),
 [Fortran](https://github.com/chemfiles/chemfiles.f03),
@@ -127,7 +127,7 @@ Find more information about pre-compiled packages in the [documentation][install
 
 ### Building from Source
 
-You will need [cmake](http://cmake.org/) and a C++11 compiler.
+You will need [cmake](http://cmake.org/) and a C++17 compiler.
 
 ```bash
 git clone https://github.com/chemfiles/chemfiles
