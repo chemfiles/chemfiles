@@ -77,3 +77,8 @@ type = "string"
 TPR = """Describes the atom type specified in the ``[atoms]`` section of the
 topology. The type can be used to reference a specific set of force field
 parameters for a given atom."""
+
+[force]
+type = "vector"
+
+TRR = "Force acting on an atom. In units of 'kJ / (mol * Å)'."
