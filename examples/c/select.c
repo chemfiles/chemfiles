@@ -51,9 +51,9 @@ int compare_matches(const void* lhs, const void* rhs) {
     size_t left = *(const size_t*)lhs;
     size_t right = *(const size_t*)rhs;
 
-    if (left > right) {
+    if (left < right) {
         return -1;
-    } else if (right < left) {
+    } else if (left > right) {
         return 1;
     } else {
         return 0;
