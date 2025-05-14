@@ -82,9 +82,7 @@ class TPRFormat final : public Format {
         TprBodyConvention body_convention = FileIOXdr;
 
         /// Size of real values in bytes
-        size_t sizeof_real() const {
-            return this->use_double ? sizeof(double) : sizeof(float);
-        }
+        size_t sizeof_real() const { return this->use_double ? sizeof(double) : sizeof(float); }
     };
 
     /// Read the file header

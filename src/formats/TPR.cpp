@@ -7,23 +7,25 @@
 
 #include <algorithm>
 #include <array>
-#include <memory>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
+
+#include "fmt/core.h"
 
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/external/optional.hpp"
 #include "chemfiles/external/span.hpp"
 #include "chemfiles/periodic_table.hpp"
+#include "chemfiles/types.hpp"
 #include "chemfiles/warnings.hpp"
 
 #include "chemfiles/Atom.hpp"
 #include "chemfiles/File.hpp"
+#include "chemfiles/FormatMetadata.hpp"
 #include "chemfiles/Frame.hpp"
 #include "chemfiles/Residue.hpp"
-#include "chemfiles/Format.hpp"
-#include "chemfiles/FormatMetadata.hpp"
 
 #include "chemfiles/files/XDRFile.hpp"
 #include "chemfiles/formats/TPR.hpp"
@@ -36,7 +38,7 @@
 // see `tpxv` in <GMX>/src/gromacs/fileio/tpxio.cpp
 class TPRVersion {
   public:
-    enum TV : int {  // NOLINT(performance-enum-size)
+    enum TV : int { // NOLINT(performance-enum-size)
         Pre96Version51 = 51,
         Pre96Version53 = 53,
         Pre96Version56 = 56,
@@ -154,7 +156,7 @@ static const int TPR_INCOMPATIBLE_VERSION = TPRVersion::Pre96Version57; // GMX4.
 // see <GMX>/api/legacy/include/gromacs/topology/ifunc.h
 class FunctionType {
   public:
-    enum FT : size_t {  // NOLINT(performance-enum-size)
+    enum FT : size_t { // NOLINT(performance-enum-size)
         BONDS,
         G96BONDS,
         MORSE,
@@ -551,9 +553,8 @@ template <> const FormatMetadata& chemfiles::format_metadata<TPRFormat>() {
     return metadata;
 }
 
-TPRFormat::TPRFormat(std::string path, File::Mode mode, File::Compression compression):
-    file_(std::move(path), mode)
-{
+TPRFormat::TPRFormat(std::string path, File::Mode mode, File::Compression compression)
+    : file_(std::move(path), mode) {
     if (compression != File::DEFAULT) {
         throw format_error("TPR format does not support compression");
     }
@@ -563,9 +564,7 @@ TPRFormat::TPRFormat(std::string path, File::Mode mode, File::Compression compre
     read_header();
 }
 
-size_t TPRFormat::size() {
-    return 1;
-}
+size_t TPRFormat::size() { return 1; }
 
 void TPRFormat::read_at(size_t index, Frame& frame) {
     index_ = index;
@@ -722,11 +721,8 @@ static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, in
     case FunctionType::CMAP:
         return 2 * sizeof(int32_t);
     default:
-        throw format_error(
-            "unknown function type {} ({})",
-            static_cast<int>(ftype),
-            FUNCTION_TYPE_INFOS[ftype].name
-        );
+        throw format_error("unknown function type {} ({})", static_cast<int>(ftype),
+                           FUNCTION_TYPE_INFOS[ftype].name);
     }
 }
 
@@ -755,8 +751,8 @@ static InteractionLists read_interaction_lists(XDRFile& file, int file_version) 
                 ilist.interaction_tuples.emplace_back(idx);
             }
 
-            if (file_version < TPRVersion::Pre96Version78 && ilist.function_type == FunctionType::SETTLE &&
-                !ilist.empty()) {
+            if (file_version < TPRVersion::Pre96Version78 &&
+                ilist.function_type == FunctionType::SETTLE && !ilist.empty()) {
                 ilist.add_settle_atoms();
             }
 
@@ -889,7 +885,8 @@ void TPRFormat::read_header() {
     // which would cause a segv instead of a proper error message
     // when reading the topology only from tpx with <77 code.
     std::string fileTag;
-    if (header_.file_version >= TPRVersion::Pre96Version77 && header_.file_version <= TPRVersion::Pre96Version79) {
+    if (header_.file_version >= TPRVersion::Pre96Version77 &&
+        header_.file_version <= TPRVersion::Pre96Version79) {
         fileTag = file_.read_gmx_string();
     }
 
@@ -898,7 +895,8 @@ void TPRFormat::read_header() {
     if (header_.file_version >= TPRVersion::Pre96Version81) {
         fileTag = file_.read_gmx_string();
     }
-    if (header_.file_version < TPRVersion::Pre96Version77 || header_.file_version == TPRVersion::Pre96Version80) {
+    if (header_.file_version < TPRVersion::Pre96Version77 ||
+        header_.file_version == TPRVersion::Pre96Version80) {
         // GROMACS: Versions before 77 don't have the tag, set it to release.
         // Version 80 is not handled by the current GROMACS implementation
         // but MDAnalysis sets the tag to release as well for version 80.
@@ -952,7 +950,8 @@ void TPRFormat::read_header() {
     header_.has_forces = read_gmx_bool();
     header_.has_box = read_gmx_bool();
 
-    if (header_.file_version >= TPRVersion::AddSizeField && header_.file_generation >= TPR_GEN_ADD_SIZE_FIELD) {
+    if (header_.file_version >= TPRVersion::AddSizeField &&
+        header_.file_generation >= TPR_GEN_ADD_SIZE_FIELD) {
         // Skip size of the TPR body in bytes
         file_.read_single_i64();
     }
@@ -963,7 +962,8 @@ void TPRFormat::read_header() {
         header_.has_input_record = false;
     }
 
-    if (header_.file_version >= TPRVersion::AddSizeField && header_.file_generation >= TPR_GEN_ADD_SIZE_FIELD) {
+    if (header_.file_version >= TPRVersion::AddSizeField &&
+        header_.file_generation >= TPR_GEN_ADD_SIZE_FIELD) {
         header_.body_convention = InMemory;
     } else {
         header_.body_convention = FileIOXdr;
