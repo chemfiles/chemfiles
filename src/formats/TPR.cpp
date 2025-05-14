@@ -37,6 +37,40 @@
 class TPRVersion {
   public:
     enum TV : int {  // NOLINT(performance-enum-size)
+        Pre96Version51 = 51,
+        Pre96Version53 = 53,
+        Pre96Version56 = 56,
+        Pre96Version57,
+        Pre96Version58,
+        Pre96Version59,
+        Pre96Version60,
+        Pre96Version61,
+        Pre96Version62,
+        Pre96Version63,
+        Pre96Version64,
+        Pre96Version65,
+        Pre96Version66,
+        Pre96Version67,
+        Pre96Version68,
+        Pre96Version69,
+        Pre96Version70,
+        Pre96Version71,
+        Pre96Version72,
+        Pre96Version73,
+        Pre96Version74,
+        Pre96Version76 = 76,
+        Pre96Version77,
+        Pre96Version78,
+        Pre96Version79,
+        Pre96Version80,
+        Pre96Version81,
+        Pre96Version82,
+        Pre96Version83,
+        Pre96Version90 = 90,
+        Pre96Version92 = 92,
+        Pre96Version93,
+        Pre96Version94,
+        Pre96Version95,
         ComputationalElectrophysiology = 96,
         Use64BitRandomSeed,
         RestrictedBendingAndCombinedAngleTorsionPotentials,
@@ -71,6 +105,14 @@ class TPRVersion {
         RemoveTholeRfac,
         RemoveAtomtypes,
         EnsembleTemperature,
+        AwhGrowthFactor,
+        MassRepartitioning,
+        AwhTargetMetricScaling,
+        VerletBufferPressureTol,
+        HandleMartiniBondedBStateParametersProperly,
+        RefScaleMultipleCOMs,
+        InputHistogramCounts,
+        NNPotIFuncType,
         Count // This number is for the total number of versions
     };
 };
@@ -85,6 +127,9 @@ class TPRVersion {
 // by checking this version number against that of the file and then using
 // the correct code path.
 static const int TPR_VERSION = TPRVersion::Count - 1;
+
+// Generation which has a modified header with an additional size field
+static const int TPR_GEN_ADD_SIZE_FIELD = 27;
 
 // GROMACS explains:
 // Value of current TPR generation to keep track of incompatible changes for older TPR versions.
@@ -104,7 +149,7 @@ static const int TPR_GENERATION = 28;
 
 // This number should be the most recent backwards incompatible version.
 // I.e., if this number is 9, we cannot read TPR version 9 with this code.
-static const int TPR_INCOMPATIBLE_VERSION = 57; // GMX4.0 has version 58
+static const int TPR_INCOMPATIBLE_VERSION = TPRVersion::Pre96Version57; // GMX4.0 has version 58
 
 // see <GMX>/api/legacy/include/gromacs/topology/ifunc.h
 class FunctionType {
@@ -188,6 +233,7 @@ class FunctionType {
         COM_PULL,
         DENSITYFITTING,
         EQM,
+        ENNPOT,
         EPOT,
         EKIN,
         ETOT,
@@ -211,6 +257,7 @@ class FunctionType {
     constexpr FunctionType(size_t v) : value(static_cast<FT>(v)) {}
     FunctionType(int v) : value(static_cast<FT>(v)) { assert(v >= 0); }
     operator int() const { return static_cast<int>(value); }
+    bool operator==(FT const& other) const { return value == other; }
 
   private:
     FT value;
@@ -252,31 +299,32 @@ struct FunctionTypeUpdate {
 // The following Table is used maintain TRR compatibility  when function types
 // are added. Necessary to support reading of old TPR file versions.
 // see `ftupd` in <GMX>/src/gromacs/fileio/tpxio.cpp
-static const FunctionTypeUpdate FUNCTION_TYPE_UPDATES[24]{
-    {70, FunctionType::RESTRBONDS},
+static const FunctionTypeUpdate FUNCTION_TYPE_UPDATES[25]{
+    {TPRVersion::Pre96Version57, FunctionType::RESTRBONDS},
     {TPRVersion::RestrictedBendingAndCombinedAngleTorsionPotentials, FunctionType::RESTRANGLES},
-    {76, FunctionType::LINEAR_ANGLES},
+    {TPRVersion::Pre96Version76, FunctionType::LINEAR_ANGLES},
     {TPRVersion::RestrictedBendingAndCombinedAngleTorsionPotentials, FunctionType::RESTRDIHS},
     {TPRVersion::RestrictedBendingAndCombinedAngleTorsionPotentials, FunctionType::CBTDIHS},
-    {65, FunctionType::CMAP},
-    {60, FunctionType::GB12_NOLONGERUSED},
-    {61, FunctionType::GB13_NOLONGERUSED},
-    {61, FunctionType::GB14_NOLONGERUSED},
-    {72, FunctionType::GBPOL_NOLONGERUSED},
-    {72, FunctionType::NPSOLVATION_NOLONGERUSED},
-    {93, FunctionType::LJ_RECIP},
-    {76, FunctionType::ANHARM_POL},
-    {90, FunctionType::FBPOSRES},
+    {TPRVersion::Pre96Version65, FunctionType::CMAP},
+    {TPRVersion::Pre96Version60, FunctionType::GB12_NOLONGERUSED},
+    {TPRVersion::Pre96Version61, FunctionType::GB13_NOLONGERUSED},
+    {TPRVersion::Pre96Version61, FunctionType::GB14_NOLONGERUSED},
+    {TPRVersion::Pre96Version72, FunctionType::GBPOL_NOLONGERUSED},
+    {TPRVersion::Pre96Version72, FunctionType::NPSOLVATION_NOLONGERUSED},
+    {TPRVersion::Pre96Version93, FunctionType::LJ_RECIP},
+    {TPRVersion::Pre96Version76, FunctionType::ANHARM_POL},
+    {TPRVersion::Pre96Version90, FunctionType::FBPOSRES},
     {TPRVersion::VSite1, FunctionType::VSITE1},
     {TPRVersion::VSite2FD, FunctionType::VSITE2FD},
     {TPRVersion::GenericInternalParameters, FunctionType::DENSITYFITTING},
-    {69, FunctionType::VTEMP_NOLONGERUSED},
-    {66, FunctionType::PDISPCORR},
-    {79, FunctionType::DVDL_COUL},
-    {79, FunctionType::DVDL_VDW},
-    {79, FunctionType::DVDL_BONDED},
-    {79, FunctionType::DVDL_RESTRAINT},
-    {79, FunctionType::DVDL_TEMPERATURE},
+    {TPRVersion::NNPotIFuncType, FunctionType::ENNPOT},
+    {TPRVersion::Pre96Version69, FunctionType::VTEMP_NOLONGERUSED},
+    {TPRVersion::Pre96Version66, FunctionType::PDISPCORR},
+    {TPRVersion::Pre96Version79, FunctionType::DVDL_COUL},
+    {TPRVersion::Pre96Version79, FunctionType::DVDL_VDW},
+    {TPRVersion::Pre96Version79, FunctionType::DVDL_BONDED},
+    {TPRVersion::Pre96Version79, FunctionType::DVDL_RESTRAINT},
+    {TPRVersion::Pre96Version79, FunctionType::DVDL_TEMPERATURE},
 };
 
 // see `t_interaction_function` in <GMX>/api/legacy/include/gromacs/topology/ifunc.h
@@ -317,22 +365,22 @@ const FunctionTypeInfo FUNCTION_TYPE_INFOS[NRE]{
     {"Periodic Improper Dih.", 4},
     {"Tab. Dih.", 4},
     {"CMAP Dih.", 5},
-    {"GB 1-2 Pol. ", 0},
-    {"GB 1-3 Pol. ", 0},
-    {"GB 1-4 Pol. ", 0},
-    {"GB Polarization ", 0},
-    {"Nonpolar Sol. ", 0},
+    {"GB 1-2 Pol.", 0},
+    {"GB 1-3 Pol.", 0},
+    {"GB 1-4 Pol.", 0},
+    {"GB Polarization", 0},
+    {"Nonpolar Sol.", 0},
     {"LJ-14", 2},
     {"Coulomb-14", 0},
     {"LJC-14 q", 2},
     {"LJC Pairs NB", 2},
     {"LJ (SR)", 2},
     {"Buck.ham (SR)", 2},
-    {"LJ ", 0},
-    {"B.ham ", 0},
+    {"LJ", 0},
+    {"B.ham", 0},
     {"Disper. corr.", 0},
     {"Coulomb (SR)", 0},
-    {"Coul ", 0},
+    {"Coul", 0},
     {"RF excl.", 0},
     {"Coul. recip.", 0},
     {"LJ recip.", 0},
@@ -367,12 +415,13 @@ const FunctionTypeInfo FUNCTION_TYPE_INFOS[NRE]{
     {"COM Pull En.", 0},
     {"Density fitting", 0},
     {"Quantum En.", 0},
+    {"NN Potential", 0},
     {"Potential", 0},
     {"Kinetic En.", 0},
     {"Total Energy", 0},
     {"Conserved En.", 0},
     {"Temperature", 0},
-    {"Vir. Temp. ", 0},
+    {"Vir. Temp.", 0},
     {"Pres. DC", 0},
     {"Pressure", 0},
     {"dH/dl constr.", 0},
@@ -534,8 +583,13 @@ static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, in
     case FunctionType::HARMONIC:
     case FunctionType::IDIHS:
         return 4 * sizeof_real;
-    case FunctionType::RESTRANGLES:
-        return 2 * sizeof_real;
+    case FunctionType::RESTRANGLES: {
+        size_t size = 2 * sizeof_real;
+        if (file_version >= TPRVersion::HandleMartiniBondedBStateParametersProperly) {
+            size += 2 * sizeof_real;
+        }
+        return size;
+    }
     case FunctionType::LINEAR_ANGLES:
         return 4 * sizeof_real;
     case FunctionType::FENEBONDS:
@@ -553,7 +607,7 @@ static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, in
         return 4 * sizeof_real;
     case FunctionType::UREY_BRADLEY: {
         size_t size = 4 * sizeof_real;
-        if (file_version >= 79) {
+        if (file_version >= TPRVersion::Pre96Version79) {
             size += 4 * sizeof_real;
         }
         return size;
@@ -564,7 +618,7 @@ static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, in
         return 3 * sizeof_real;
     case FunctionType::MORSE: {
         size_t size = 3 * sizeof_real;
-        if (file_version >= 79) {
+        if (file_version >= TPRVersion::Pre96Version79) {
             size += 3 * sizeof_real;
         }
         return size;
@@ -599,18 +653,23 @@ static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, in
     case FunctionType::ANGRES:
     case FunctionType::ANGRESZ:
         return 4 * sizeof_real + sizeof(int32_t);
-    case FunctionType::RESTRDIHS:
-        return 2 * sizeof_real;
+    case FunctionType::RESTRDIHS: {
+        size_t size = 2 * sizeof_real;
+        if (file_version >= TPRVersion::HandleMartiniBondedBStateParametersProperly) {
+            size += 2 * sizeof_real;
+        }
+        return size;
+    }
     case FunctionType::DISRES:
         return 2 * sizeof(int32_t) + 4 * sizeof_real;
     case FunctionType::ORIRES:
         return 3 * sizeof(int32_t) + 3 * sizeof_real;
     case FunctionType::DIHRES: {
         size_t size = 3 * sizeof_real;
-        if (file_version < 82) {
+        if (file_version < TPRVersion::Pre96Version82) {
             size += 2 * sizeof(int32_t);
         }
-        if (file_version >= 82) {
+        if (file_version >= TPRVersion::Pre96Version82) {
             size += 3 * sizeof_real;
         }
         return size;
@@ -619,8 +678,13 @@ static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, in
         return 4 * 3 * sizeof_real;
     case FunctionType::FBPOSRES:
         return sizeof(int32_t) + 5 * sizeof_real;
-    case FunctionType::CBTDIHS:
-        return NR_CBTDIHS * sizeof_real;
+    case FunctionType::CBTDIHS: {
+        size_t size = NR_CBTDIHS * sizeof_real;
+        if (file_version >= TPRVersion::HandleMartiniBondedBStateParametersProperly) {
+            size += NR_CBTDIHS * sizeof_real;
+        }
+        return size;
+    }
     case FunctionType::RBDIHS:
     case FunctionType::FOURDIHS:
         return 2 * NR_RBDIHS * sizeof_real;
@@ -647,7 +711,7 @@ static size_t interaction_params_size(FunctionType ftype, size_t sizeof_real, in
     case FunctionType::GB13_NOLONGERUSED:
     case FunctionType::GB14_NOLONGERUSED: {
         size_t size = 0;
-        if (file_version < 68) {
+        if (file_version < TPRVersion::Pre96Version68) {
             size += 4 * sizeof_real;
         }
         if (file_version < TPRVersion::RemoveImplicitSolvation) {
@@ -691,7 +755,7 @@ static InteractionLists read_interaction_lists(XDRFile& file, int file_version) 
                 ilist.interaction_tuples.emplace_back(idx);
             }
 
-            if (file_version < 78 && ilist.function_type == FunctionType::SETTLE &&
+            if (file_version < TPRVersion::Pre96Version78 && ilist.function_type == FunctionType::SETTLE &&
                 !ilist.empty()) {
                 ilist.add_settle_atoms();
             }
@@ -743,7 +807,7 @@ static FFParams read_force_field_parameters(XDRFile& file, size_t sizeof_real, i
     // Read all function types
     file.read_i32(ffparams.function_types);
 
-    if (file_version >= 66) {
+    if (file_version >= TPRVersion::Pre96Version66) {
         // Skip `reppow`: Repulsion power $p$ for VdW: $C12*r^-p$
         file.skip(sizeof(double));
     }
@@ -783,7 +847,7 @@ void TPRFormat::read(Frame& frame) {
 
     if (header_.ngroups_temperature_coupling > 0) {
         const size_t ngtc_size = header_.ngroups_temperature_coupling * header_.sizeof_real();
-        if (header_.file_version < 69) {
+        if (header_.file_version < TPRVersion::Pre96Version69) {
             // Skip some legacy entries
             file_.skip(ngtc_size);
         }
@@ -825,16 +889,16 @@ void TPRFormat::read_header() {
     // which would cause a segv instead of a proper error message
     // when reading the topology only from tpx with <77 code.
     std::string fileTag;
-    if (header_.file_version >= 77 && header_.file_version <= 79) {
+    if (header_.file_version >= TPRVersion::Pre96Version77 && header_.file_version <= TPRVersion::Pre96Version79) {
         fileTag = file_.read_gmx_string();
     }
 
     header_.file_generation = file_.read_single_i32();
 
-    if (header_.file_version >= 81) {
+    if (header_.file_version >= TPRVersion::Pre96Version81) {
         fileTag = file_.read_gmx_string();
     }
-    if (header_.file_version < 77 || header_.file_version == 80) {
+    if (header_.file_version < TPRVersion::Pre96Version77 || header_.file_version == TPRVersion::Pre96Version80) {
         // GROMACS: Versions before 77 don't have the tag, set it to release.
         // Version 80 is not handled by the current GROMACS implementation
         // but MDAnalysis sets the tag to release as well for version 80.
@@ -868,11 +932,11 @@ void TPRFormat::read_header() {
     header_.natoms = file_.read_single_size_as_i32();
     header_.ngroups_temperature_coupling = file_.read_single_size_as_i32();
 
-    if (header_.file_version < 62) {
+    if (header_.file_version < TPRVersion::Pre96Version62) {
         // Skip some legacy entries
         file_.skip(sizeof(int) + header_.sizeof_real());
     }
-    if (header_.file_version >= 79) {
+    if (header_.file_version >= TPRVersion::Pre96Version79) {
         // Skip current value of the alchemical state
         file_.read_single_i32();
     }
@@ -888,7 +952,7 @@ void TPRFormat::read_header() {
     header_.has_forces = read_gmx_bool();
     header_.has_box = read_gmx_bool();
 
-    if (header_.file_version >= TPRVersion::AddSizeField && header_.file_generation >= 27) {
+    if (header_.file_version >= TPRVersion::AddSizeField && header_.file_generation >= TPR_GEN_ADD_SIZE_FIELD) {
         // Skip size of the TPR body in bytes
         file_.read_single_i64();
     }
@@ -899,7 +963,7 @@ void TPRFormat::read_header() {
         header_.has_input_record = false;
     }
 
-    if (header_.file_version >= TPRVersion::AddSizeField && header_.file_generation >= 27) {
+    if (header_.file_version >= TPRVersion::AddSizeField && header_.file_generation >= TPR_GEN_ADD_SIZE_FIELD) {
         header_.body_convention = InMemory;
     } else {
         header_.body_convention = FileIOXdr;
@@ -910,7 +974,7 @@ void TPRFormat::read_box(Frame& frame) {
     const auto box = file_.read_gmx_box(header_.use_double);
     frame.set_cell(box);
 
-    if (header_.file_version >= 51) {
+    if (header_.file_version >= TPRVersion::Pre96Version51) {
         // Relative box vectors characteristic of the box shape
         // Skip unused 3*3 real matrix
         file_.skip(header_.sizeof_real() * 9);
@@ -1015,7 +1079,7 @@ void TPRFormat::read_topology(Frame& frame) {
                 std::string name = read_symbol_table_entry(symbol_table);
                 uint8_t insertion_code = ' ';
                 int64_t residue_number = static_cast<int64_t>(j) + 1;
-                if (header_.file_version >= 63) {
+                if (header_.file_version >= TPRVersion::Pre96Version63) {
                     residue_number = static_cast<int64_t>(file_.read_single_i32());
                     insertion_code = read_gmx_uchar();
                 }
@@ -1126,7 +1190,7 @@ void TPRFormat::read_topology(Frame& frame) {
             file_.skip(3 * ntypes * header_.sizeof_real());
         }
         file_.skip(ntypes * sizeof(int32_t));
-        if (header_.file_version >= 60 &&
+        if (header_.file_version >= TPRVersion::Pre96Version60 &&
             header_.file_version < TPRVersion::RemoveImplicitSolvation) {
             file_.skip(2 * ntypes * header_.sizeof_real());
         }
@@ -1134,7 +1198,7 @@ void TPRFormat::read_topology(Frame& frame) {
 
     // Skip dihedral correction maps (CMAP)
     // see `do_cmap`
-    if (header_.file_version >= 65) {
+    if (header_.file_version >= TPRVersion::Pre96Version65) {
         size_t ngrids = file_.read_single_size_as_i32();
         size_t grid_spacing = file_.read_single_size_as_i32();
         file_.skip(ngrids * grid_spacing * grid_spacing * 4 * header_.sizeof_real());
