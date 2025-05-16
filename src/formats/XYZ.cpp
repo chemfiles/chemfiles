@@ -75,7 +75,7 @@ template<> const FormatMetadata& chemfiles::format_metadata<XYZFormat>() {
     metadata.memory = true;
 
     metadata.positions = true;
-    metadata.velocities = false;
+    metadata.velocities = true;
     metadata.unit_cell = true;
     metadata.atoms = true;
     metadata.bonds = false;
@@ -98,12 +98,22 @@ void XYZFormat::read_next(Frame& frame) {
         auto count = scan(line, name, x, y, z);
         auto atom = Atom(std::move(name));
         read_atomic_properties(properties, line.substr(count), atom);
-        frame.add_atom(std::move(atom), Vector3D(x, y, z));
+
+        // Check for velocity 
+        if (auto velo = atom.get("velo")) {
+            auto v = velo.value().as_vector3d();
+
+            frame.add_atom(std::move(atom), Vector3D(x, y, z), v);
+        } else {
+            frame.add_atom(std::move(atom), Vector3D(x, y, z));
+        }
+        
     }
 }
 
 void XYZFormat::write_next(const Frame& frame) {
     const auto& positions = frame.positions();
+    auto velocities = frame.velocities();
     auto properties = get_atom_properties(frame);
 
     file_.print("{}\n", frame.size());
@@ -117,9 +127,18 @@ void XYZFormat::write_next(const Frame& frame) {
             name = "X";
         }
 
-        file_.print("{} {:g} {:g} {:g}",
-            name, positions[i][0], positions[i][1], positions[i][2]
-        );
+        if (velocities) {// write velocities if included
+            auto velo = velocities.value();
+
+            file_.print("{} {:g} {:g} {:g} {:g} {:g} {:g}",
+                name, positions[i][0], positions[i][1], positions[i][2],
+                velo[i][0], velo[i][1], velo[i][2]
+            );
+        } else {
+            file_.print("{} {:g} {:g} {:g}",
+                name, positions[i][0], positions[i][1], positions[i][2]
+            );
+        }
 
         for (const auto& property: properties) {
             const auto& value = atom.get(property.name).value();
@@ -221,6 +240,10 @@ static bool contains_double_quote(std::string_view s) {
 
 std::string write_extended_comment_line(const Frame& frame, const properties_list_t& properties) {
     std::string result = "Properties=species:S:1:pos:R:3";
+
+    if (frame.velocities()) {
+        result += ":velo:R:3";
+    }
 
     for (const auto& property: properties) {
         char type;
@@ -675,7 +698,13 @@ properties_list_t read_extended_comment_line(std::string_view line, Frame& frame
     }
 
     if (properties.count("Properties") == 1) {
-        return parse_property_list(properties.at("Properties").as_string());
+        auto props = properties.at("Properties").as_string();
+
+        if (props.find("velo") != std::string::npos) {
+            frame.add_velocities();
+        }
+
+        return parse_property_list(props);
     } else {
         return {};
     }
