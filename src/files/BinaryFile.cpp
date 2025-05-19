@@ -22,6 +22,7 @@
 
 #ifdef CHEMFILES_WINDOWS
 #include <io.h>
+#include <filesystem>
 #endif
 
 #ifdef __CYGWIN__
@@ -70,7 +71,15 @@ BinaryFile::BinaryFile(std::string path, File::Mode mode):
     int permissions = S_IRWXU | S_IRWXG | S_IROTH;
 #endif
 
+#ifdef CHEMFILES_WINDOWS
+    // On Windows, allow for UTF-8 paths containing non-ASCII characters
+    // Create a filesystem path. Using u8path ensures that the string is treated as UTF-8.
+    const std::filesystem::path file_path = std::filesystem::u8path(this->path());
+
+    auto file_descriptor = _wopen(file_path.c_str(), open_mode, permissions);
+#else
     auto file_descriptor = open(this->path().c_str(), open_mode, permissions);
+#endif
     if (file_descriptor == -1) {
         throw file_error(
             "could not open file at '{}': {}", this->path(), std::strerror(errno)

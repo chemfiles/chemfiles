@@ -12,6 +12,12 @@
 #include "chemfiles/File.hpp"
 #include "chemfiles/files/PlainFile.hpp"
 
+#include "chemfiles/config.h"
+
+#ifdef CHEMFILES_WINDOWS
+#include <filesystem>
+#endif
+
 using namespace chemfiles;
 
 #ifdef __CYGWIN__
@@ -36,6 +42,30 @@ PlainFile::PlainFile(const std::string& path, File::Mode mode): TextFileImpl(pat
     // return by tellpos are wrong.
     //
     // We can do this because we are dealing with line ending ourself.
+    
+#ifdef CHEMFILES_WINDOWS
+    // On Windows, allow for UTF-8 paths containing non-ASCII characters
+    const wchar_t* openmode;
+
+    switch (mode) {
+    case File::READ:
+        openmode = L"rb";
+        break;
+    case File::APPEND:
+        openmode = L"a+b";
+        break;
+    case File::WRITE:
+        openmode = L"wb";
+        break;
+    default:
+        unreachable();
+    }
+
+    // Create a filesystem path. Using u8path ensures that the string is treated as UTF-8.
+    const std::filesystem::path file_path = std::filesystem::u8path(path);
+
+    file_ = _wfopen(file_path.c_str(), openmode);
+#else
     const char* openmode;
 
     switch (mode) {
@@ -53,6 +83,7 @@ PlainFile::PlainFile(const std::string& path, File::Mode mode): TextFileImpl(pat
     }
 
     file_ = std::fopen(path.c_str(), openmode);
+#endif
     if (file_ == nullptr){
         throw file_error("could not open the file at '{}'", path);
     }
