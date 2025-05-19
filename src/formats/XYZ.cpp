@@ -55,7 +55,7 @@ using properties_list_t = std::vector<extended_property>;
 static properties_list_t read_extended_comment_line(std::string_view line, Frame& frame);
 
 /// Read the properties in the list form the line and set them on the atom
-static void read_atomic_properties(const properties_list_t& properties, std::string_view line, Atom& atom);
+static void read_atomic_properties(const properties_list_t& properties, std::string_view line, Atom& atom, Vector3D& velo);
 
 /// Get the list of atoms properties defined for all atoms in the frame
 static properties_list_t get_atom_properties(const Frame& frame);
@@ -94,20 +94,12 @@ void XYZFormat::read_next(Frame& frame) {
         double x = 0;
         double y = 0;
         double z = 0;
+        auto velo = Vector3D();
         std::string name;
         auto count = scan(line, name, x, y, z);
         auto atom = Atom(std::move(name));
-        read_atomic_properties(properties, line.substr(count), atom);
-
-        // Check for velocity 
-        if (auto velo = atom.get("velo")) {
-            auto v = velo.value().as_vector3d();
-
-            frame.add_atom(std::move(atom), Vector3D(x, y, z), v);
-        } else {
-            frame.add_atom(std::move(atom), Vector3D(x, y, z));
-        }
-        
+        read_atomic_properties(properties, line.substr(count), atom, velo);
+        frame.add_atom(std::move(atom), Vector3D(x, y, z), velo);
     }
 }
 
@@ -714,7 +706,7 @@ properties_list_t read_extended_comment_line(std::string_view line, Frame& frame
 // the expected type. If the files contains a valid `Properties=...`
 // description,throwing errors if the rest of the files does not follow the
 // description is fair game.
-void read_atomic_properties(const properties_list_t& properties, std::string_view line, Atom& atom) {
+void read_atomic_properties(const properties_list_t& properties, std::string_view line, Atom& atom, Vector3D& velo) {
     for (const auto& property: properties) {
         if (property.type == Property::STRING) {
             std::string value;
@@ -739,10 +731,17 @@ void read_atomic_properties(const properties_list_t& properties, std::string_vie
             line.remove_prefix(count);
             atom.set(property.name, value);
         }  else if (property.type == Property::VECTOR3D) {
-            Vector3D value;
-            auto count = scan(line, value[0], value[1], value[2]);
-            line.remove_prefix(count);
-            atom.set(property.name, value);
+
+            if (property.name == "velo") {
+                auto count = scan(line, velo[0], velo[1], velo[2]);
+                line.remove_prefix(count);
+            } else {
+                Vector3D value;
+                auto count = scan(line, value[0], value[1], value[2]);
+                atom.set(property.name, value);
+                line.remove_prefix(count);
+            }
+
         } else {
             unreachable();
         }
