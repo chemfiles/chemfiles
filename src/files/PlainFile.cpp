@@ -15,7 +15,7 @@
 #include "chemfiles/config.h"
 
 #ifdef CHEMFILES_WINDOWS
-#include <windows.h>
+#include <filesystem>
 #endif
 
 using namespace chemfiles;
@@ -61,12 +61,10 @@ PlainFile::PlainFile(const std::string& path, File::Mode mode): TextFileImpl(pat
         unreachable();
     }
 
-    // convert to a wide string (UTF-8) to take care of special characters
-    const int size_needed = MultiByteToWideChar(CP_UTF8, 0, &path[0], (int)path.size(), NULL, 0);
-    std::wstring w_path = std::wstring(size_needed, 0);
-    MultiByteToWideChar(CP_UTF8, 0, &path[0], (int)path.size(), &w_path[0], size_needed);
+    // Create a filesystem path. Using u8path ensures that the string is treated as UTF-8.
+    const std::filesystem::path file_path = std::filesystem::u8path(path);
 
-    file_ = _wfopen(w_path.c_str(), openmode);
+    file_ = _wfopen(file_path.c_str(), openmode);
 #else
     const char* openmode;
 
