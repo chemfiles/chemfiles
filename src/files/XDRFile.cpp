@@ -41,6 +41,22 @@ void XDRFile::write_opaque(const char* data, uint32_t count) {
     write_char(filler.data(), num_filler);
 }
 
+void XDRFile::read_gmx_long_opaque(std::vector<char>& data) {
+    const uint64_t count = read_single_u64();
+    const uint64_t num_filler = (4 - (count % 4)) % 4;
+    data.resize(static_cast<size_t>(count + num_filler));
+    read_char(data.data(), count + num_filler);
+    data.resize(count);
+}
+
+void XDRFile::write_gmx_long_opaque(const char* data, uint64_t count) {
+    write_single_u64(count);
+    write_char(data, count);
+    const uint64_t num_filler = (4 - (count % 4)) % 4;
+    const std::vector<char> filler(num_filler, 0);
+    write_char(filler.data(), num_filler);
+}
+
 std::string XDRFile::read_gmx_string() {
     // lenght with null terminator
     const uint32_t len = read_single_u32();
@@ -424,8 +440,8 @@ static const int MAGICINTS[] = {
 
 /***** from xdrfile (end) *****/
 
-float XDRFile::read_gmx_compressed_floats(std::vector<float>& data) {
-    auto precision = read_single_f32();
+float XDRFile::read_gmx_compressed_floats(std::vector<float>& data, bool is_long_format) {
+    const float precision = read_single_f32();
     const int minint[3] = {
         read_single_i32(),
         read_single_i32(),
@@ -453,7 +469,12 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data) {
     uint32_t sizesmall[3];
     sizesmall[0] = sizesmall[1] = sizesmall[2] = static_cast<uint32_t>(MAGICINTS[smallidx]);
 
-    read_opaque(compressed_data_);
+    if (is_long_format) {
+        read_gmx_long_opaque(compressed_data_);
+    }
+    else {
+        read_opaque(compressed_data_);
+    }
     intbuf_.resize(data.size());
 
     assert(data.size() % 3 == 0 && "internal Error: invalid allocation size");
@@ -556,7 +577,7 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data) {
     return precision;
 }
 
-void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float precision) {
+void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float precision, bool is_long_format) {
     if (precision <= 0) {
         warning("XTC compression", "invalid precision {} <= 0, use 1000 as fallback", precision);
         precision = 1000;
@@ -754,5 +775,10 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
     }
     assert(state.count < compressed_data_.size() &&
            "internal Error: overflow during decompression");
-    write_opaque(compressed_data_.data(), static_cast<uint32_t>(state.count));
+    if (is_long_format) {
+        write_gmx_long_opaque(compressed_data_.data(), static_cast<uint64_t>(state.count));
+    }
+    else {
+        write_opaque(compressed_data_.data(), static_cast<uint32_t>(state.count));
+    }
 }

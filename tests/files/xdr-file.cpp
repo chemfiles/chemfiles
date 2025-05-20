@@ -11,7 +11,7 @@ using namespace chemfiles;
 static void write_xdr_file(XDRFile& file) {
     file.write_gmx_string("Hello!"); // needs 2B padding
     const std::vector<float> array = {1.234f, -5.123f, 100.232f};
-    file.write_gmx_compressed_floats(array, 1000.0);
+    file.write_gmx_compressed_floats(array, 1000.0, false);
 }
 
 TEST_CASE("XDR files") {
@@ -42,7 +42,7 @@ TEST_CASE("XDR files") {
 
         // read XDR and GROMACS specific data types
         CHECK(file.read_gmx_string() == "Hello!");
-        CHECK(file.read_gmx_compressed_floats(array) == 1000.0f);
+        CHECK(file.read_gmx_compressed_floats(array, false) == 1000.0f);
         for (size_t i = 0; i < 3; ++i) {
             CHECK(approx_eq(array[i], expected[i], 1e-4f));
         }

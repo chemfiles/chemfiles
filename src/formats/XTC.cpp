@@ -27,6 +27,10 @@
 
 // definitions from the xdrfile library
 #define XTC_MAGIC 1995
+#define XTC_NEW_MAGIC 2023 // 64-bit sizing for compressed data buffer
+
+// See <GMX@v2023>/src/gromacs/fileio/xdrf.h
+#define XTC_1995_MAX_NATOMS 298261617
 
 /* XTC small header size (natoms<=9).
  *  > int(4) magic
@@ -125,7 +129,7 @@ void XTCFormat::read(Frame& frame) {
     if (header.natoms <= 9) {
         file_.read_f32(x);
     } else {
-        float precision = file_.read_gmx_compressed_floats(x);
+        float precision = file_.read_gmx_compressed_floats(x, header.is_long_format());
         frame.set("xtc_precision", static_cast<double>(precision));
     }
     auto positions = frame.positions();
@@ -140,16 +144,21 @@ void XTCFormat::read(Frame& frame) {
     index_++;
 }
 
+bool XTCFormat::FrameHeader::is_long_format() const {
+    return magic == XTC_NEW_MAGIC;
+}
+
 XTCFormat::FrameHeader XTCFormat::read_frame_header() {
     try {
         const int32_t magic = file_.read_single_i32();
-        if (magic != XTC_MAGIC) {
+        if (magic != XTC_MAGIC && magic != XTC_NEW_MAGIC) {
             throw format_error("invalid XTC file at '{}': "
-                               "expected XTC_MAGIC '{}', got '{}'",
-                               file_.path(), XTC_MAGIC, magic);
+                               "expected XTC_MAGIC '{}' or '{}', got '{}'",
+                               file_.path(), XTC_MAGIC, XTC_NEW_MAGIC, magic);
         }
 
         FrameHeader header = {
+            magic,
             file_.read_single_size_as_i32(), // natoms
             file_.read_single_size_as_i32(), // step
             file_.read_single_f32(),         // time
@@ -161,9 +170,19 @@ XTCFormat::FrameHeader XTCFormat::read_frame_header() {
     }
 }
 
-static int32_t round_to_int_boundary(int32_t x) {
-    // Rounding to the next 32-bit boundary
+template <typename T>
+static T round_up_to_multiple_of_4(T x) {
+    // Rounds to the next multiple of 4
     return (x + 3) & ~0x03;
+}
+
+uint64_t XTCFormat::read_framebytes(bool is_long_format) {
+    if (is_long_format) {
+        return static_cast<uint64_t>(round_up_to_multiple_of_4(file_.read_single_i64()));
+    }
+    else {
+        return static_cast<uint64_t>(round_up_to_multiple_of_4(file_.read_single_i32()));
+    }
 }
 
 void XTCFormat::determine_frame_offsets() {
@@ -192,7 +211,7 @@ void XTCFormat::determine_frame_offsets() {
     } else {
         file_.seek(XTC_HEADER_SIZE);
 
-        auto framebytes = static_cast<uint64_t>(round_to_int_boundary(file_.read_single_i32()));
+        uint64_t framebytes = read_framebytes(header.is_long_format());
 
         auto est_nframes = static_cast<size_t>(filesize / (framebytes + XTC_HEADER_SIZE));
         frame_positions_.reserve(est_nframes);
@@ -202,7 +221,7 @@ void XTCFormat::determine_frame_offsets() {
 
             auto frame_pos = file_.tell() - XTC_HEADER_SIZE;
             try {
-                framebytes = static_cast<uint64_t>(round_to_int_boundary(file_.read_single_i32()));
+                framebytes = read_framebytes(header.is_long_format());
             } catch (const Error&) {
                 break;
             }
@@ -225,6 +244,7 @@ void XTCFormat::write(const Frame& frame) {
 
     auto step = frame.get("simulation_step").value_or(frame.index()).as_double();
     FrameHeader header = {
+        (natoms > XTC_1995_MAX_NATOMS) ? XTC_NEW_MAGIC : XTC_MAGIC,      // magic
         natoms,                                                          // natoms
         static_cast<size_t>(step),                                       // step
         static_cast<float>(frame.get("time").value_or(0.0).as_double()), // time
@@ -242,16 +262,16 @@ void XTCFormat::write(const Frame& frame) {
     if (natoms <= 9) {
         file_.write_f32(x);
     } else {
-        auto precision = static_cast<float>(frame.get("xtc_precision").value_or(1000.0).as_double());
-        file_.write_gmx_compressed_floats(x, precision);
+        const float precision =
+            static_cast<float>(frame.get("xtc_precision").value_or(1000.0).as_double());
+        file_.write_gmx_compressed_floats(x, precision, header.is_long_format());
     }
 
     index_++;
 }
 
 void XTCFormat::write_frame_header(const FrameHeader& header) {
-    file_.write_single_i32(XTC_MAGIC);
-
+    file_.write_single_i32(header.magic);
     file_.write_single_i32(static_cast<int32_t>(header.natoms));
     file_.write_single_i32(static_cast<int32_t>(header.step));
     file_.write_single_f32(static_cast<float>(header.time));
