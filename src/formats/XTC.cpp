@@ -10,17 +10,18 @@
 #include <utility>
 #include <vector>
 
+#include "fmt/core.h"
+
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/external/optional.hpp"
 #include "chemfiles/external/span.hpp"
 #include "chemfiles/types.hpp"
 
 #include "chemfiles/File.hpp"
-#include "chemfiles/Frame.hpp"
-#include "chemfiles/UnitCell.hpp"
-
-#include "chemfiles/Format.hpp"
 #include "chemfiles/FormatMetadata.hpp"
+#include "chemfiles/Frame.hpp"
+#include "chemfiles/Property.hpp"
+#include "chemfiles/UnitCell.hpp"
 
 #include "chemfiles/files/XDRFile.hpp"
 #include "chemfiles/formats/XTC.hpp"
@@ -96,16 +97,14 @@ XTCFormat::XTCFormat(std::string path, File::Mode mode, File::Compression compre
     } else if (mode == File::APPEND) {
         try {
             determine_frame_offsets();
-        } catch (const Error&) {  // NOLINT(bugprone-empty-catch)
+        } catch (const Error&) { // NOLINT(bugprone-empty-catch)
             // Ignore exceptions, because the file might not exist. If it does,
             // we need to get the number of atoms and frames for appending.
         }
     }
 }
 
-size_t XTCFormat::size() {
-    return frame_positions_.size();
-}
+size_t XTCFormat::size() { return frame_positions_.size(); }
 
 void XTCFormat::read_at(size_t index, Frame& frame) {
     index_ = index;
@@ -116,8 +115,8 @@ void XTCFormat::read_at(size_t index, Frame& frame) {
 void XTCFormat::read(Frame& frame) {
     FrameHeader header = read_frame_header();
 
-    frame.set("simulation_step", header.step);            // actual step of MD Simulation
-    frame.set("time", static_cast<double>(header.time));  // time in pico seconds
+    frame.set("simulation_step", header.step);           // actual step of MD Simulation
+    frame.set("time", static_cast<double>(header.time)); // time in pico seconds
     frame.resize(header.natoms);
 
     frame.set_cell(file_.read_gmx_box());
@@ -147,9 +146,7 @@ void XTCFormat::read(Frame& frame) {
     index_++;
 }
 
-bool XTCFormat::FrameHeader::is_long_format() const {
-    return magic == XTC_NEW_MAGIC;
-}
+bool XTCFormat::FrameHeader::is_long_format() const { return magic == XTC_NEW_MAGIC; }
 
 XTCFormat::FrameHeader XTCFormat::read_frame_header() {
     try {
@@ -173,8 +170,7 @@ XTCFormat::FrameHeader XTCFormat::read_frame_header() {
     }
 }
 
-template <typename T>
-static T round_up_to_multiple_of_4(T x) {
+template <typename T> static T round_up_to_multiple_of_4(T x) {
     // Rounds to the next multiple of 4
     return (x + 3) & ~0x03;
 }
@@ -182,8 +178,7 @@ static T round_up_to_multiple_of_4(T x) {
 uint64_t XTCFormat::read_framebytes(bool is_long_format) {
     if (is_long_format) {
         return static_cast<uint64_t>(round_up_to_multiple_of_4(file_.read_single_i64()));
-    }
-    else {
+    } else {
         return static_cast<uint64_t>(round_up_to_multiple_of_4(file_.read_single_i32()));
     }
 }
@@ -201,7 +196,8 @@ void XTCFormat::determine_frame_offsets() {
     frame_positions_.emplace_back(0);
 
     if (header.natoms <= XTC_MAX_NATOMS_UNCOMPRESSED) {
-        auto framebytes = static_cast<uint64_t>(XTC_SMALL_HEADER_SIZE + header.natoms * XTC_SMALL_COORDS_SIZE);
+        auto framebytes =
+            static_cast<uint64_t>(XTC_SMALL_HEADER_SIZE + header.natoms * XTC_SMALL_COORDS_SIZE);
         file_.seek(framebytes);
 
         auto nframes = filesize / framebytes;

@@ -11,6 +11,8 @@
 #include <utility>
 #include <vector>
 
+#include "fmt/core.h"
+
 #include "chemfiles/files/BinaryFile.hpp"
 #include "chemfiles/files/XDRFile.hpp"
 
@@ -80,7 +82,8 @@ UnitCell XDRFile::read_gmx_box(bool use_double) {
         // Double
         std::vector<double> box(3 * 3);
         read_f64(box);
-        auto matrix = Matrix3D(box[0], box[1], box[2], box[3], box[4], box[5], box[6], box[7], box[8]);
+        auto matrix =
+            Matrix3D(box[0], box[1], box[2], box[3], box[4], box[5], box[6], box[7], box[8]);
         // Factor 10 because the lengths are in nm in the TPR/TRR/XTC format
         return UnitCell(10.0 * matrix);
     } else {
@@ -316,13 +319,8 @@ template <> class FastTypes<uint64_t> {
 };
 
 template <typename T>
-static void unpack_from_int(
-    const std::vector<char>& buf,
-    DecodeState& state,
-    uint32_t num_of_bits,
-    const uint32_t sizes[3],
-    span<int32_t> nums
-) {
+static void unpack_from_int(const std::vector<char>& buf, DecodeState& state, uint32_t num_of_bits,
+                            const uint32_t sizes[3], span<int32_t> nums) {
     T v = 0;
     size_t num_of_bytes = 0;
     while (num_of_bits >= 8) {
@@ -402,12 +400,8 @@ static void decodeints(const std::vector<char>& buf, DecodeState& state, uint32_
     nums[0] = bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
 }
 
-static uint32_t calc_sizeint(
-    const int minint[3],
-    const int maxint[3],
-    uint32_t sizeint[3],
-    uint32_t bitsizeint[3]
-) {
+static uint32_t calc_sizeint(const int minint[3], const int maxint[3], uint32_t sizeint[3],
+                             uint32_t bitsizeint[3]) {
     sizeint[0] = static_cast<uint32_t>(maxint[0] - minint[0]) + 1;
     sizeint[1] = static_cast<uint32_t>(maxint[1] - minint[1]) + 1;
     sizeint[2] = static_cast<uint32_t>(maxint[2] - minint[2]) + 1;
@@ -471,8 +465,7 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data, bool is_long
 
     if (is_long_format) {
         read_gmx_long_opaque(compressed_data_);
-    }
-    else {
+    } else {
         read_opaque(compressed_data_);
     }
     intbuf_.resize(data.size());
@@ -577,7 +570,8 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data, bool is_long
     return precision;
 }
 
-void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float precision, bool is_long_format) {
+void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float precision,
+                                          bool is_long_format) {
     if (precision <= 0) {
         warning("XTC compression", "invalid precision {} <= 0, use 1000 as fallback", precision);
         precision = 1000;
@@ -777,8 +771,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
            "internal Error: overflow during decompression");
     if (is_long_format) {
         write_gmx_long_opaque(compressed_data_.data(), static_cast<uint64_t>(state.count));
-    }
-    else {
+    } else {
         write_opaque(compressed_data_.data(), static_cast<uint32_t>(state.count));
     }
 }

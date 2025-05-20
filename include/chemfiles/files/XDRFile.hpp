@@ -11,11 +11,11 @@
 #include <vector>
 
 #include "chemfiles/File.hpp"
-#include "chemfiles/UnitCell.hpp"
 
 #include "chemfiles/files/BinaryFile.hpp"
 
 namespace chemfiles {
+class UnitCell;
 
 /// Partial implementation of XDR according to RFC 4506
 /// (see: https://datatracker.ietf.org/doc/html/rfc4506)
@@ -43,7 +43,8 @@ class XDRFile final : public BigEndianFile {
     /// Read compressed GROMACS floats and returns the precision
     float read_gmx_compressed_floats(std::vector<float>& data, bool is_long_format);
     /// Write compressed GROMACS floats with a given precision
-    void write_gmx_compressed_floats(const std::vector<float>& data, float precision, bool is_long_format);
+    void write_gmx_compressed_floats(const std::vector<float>& data, float precision,
+                                     bool is_long_format);
 
     /// Read the GROMACS simulation box in nano meters
     UnitCell read_gmx_box(bool use_double = false);
