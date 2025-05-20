@@ -6,77 +6,85 @@
 #include "helpers.hpp"
 using namespace chemfiles;
 
+static void check_traj_ubiquitin(const char* path) {
+    auto file = Trajectory(path);
+    CHECK(file.size() == 251);
+    auto frame = file.read_at(0);
+
+    CHECK(frame.index() == 0);
+    CHECK(frame.get("simulation_step")->as_double() == 0);
+    CHECK(approx_eq(frame.get("time")->as_double(), 0));
+    CHECK(frame.get("xtc_precision")->as_double() == 1000);
+    CHECK(frame.size() == 20455);
+
+    auto positions = frame.positions();
+    CHECK(approx_eq(positions[0], Vector3D(24.8300, 24.6600, 18.8100), 1e-4));
+    CHECK(approx_eq(positions[11], Vector3D(23.7700, 24.5600, 21.4700), 1e-4));
+
+    auto cell = frame.cell();
+    CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+    CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
+
+    frame = file.read_at(1); // Skip a frame
+    CHECK(frame.index() == 1);
+    CHECK(frame.get("simulation_step")->as_double() == 100);
+
+    frame = file.read();
+
+    CHECK(frame.index() == 2);
+    CHECK(frame.get("simulation_step")->as_double() == 200);
+    CHECK(approx_eq(frame.get("time")->as_double(), 0.4, 1e-4));
+    CHECK(frame.get("xtc_precision")->as_double() == 1000);
+    CHECK(frame.size() == 20455);
+
+    positions = frame.positions();
+    CHECK(approx_eq(positions[0], Vector3D(24.7100, 24.5700, 18.4500), 1e-4));
+    CHECK(approx_eq(positions[11], Vector3D(23.6700, 24.4800, 21.5200), 1e-4));
+
+    cell = frame.cell();
+    CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+    CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
+
+    frame = file.read_at(230); // skip forward
+
+    CHECK(frame.index() == 230);
+    CHECK(frame.get("simulation_step")->as_double() == 23000);
+    CHECK(approx_eq(frame.get("time")->as_double(), 46.0));
+    CHECK(frame.get("xtc_precision")->as_double() == 1000);
+    CHECK(frame.size() == 20455);
+
+    positions = frame.positions();
+    CHECK(approx_eq(positions[0], Vector3D(24.6300, 24.6700, 18.5000), 1e-4));
+    CHECK(approx_eq(positions[11], Vector3D(23.6800, 24.0700, 21.3100), 1e-4));
+
+    cell = frame.cell();
+    CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+    CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
+
+    frame = file.read_at(50); // skip behind previous step
+
+    CHECK(frame.index() == 50);
+    CHECK(frame.get("simulation_step")->as_double() == 5000);
+    CHECK(approx_eq(frame.get("time")->as_double(), 10.0));
+    CHECK(frame.get("xtc_precision")->as_double() == 1000);
+    CHECK(frame.size() == 20455);
+
+    positions = frame.positions();
+    CHECK(approx_eq(positions[0], Vector3D(24.5100, 24.5300, 18.7800), 1e-4));
+    CHECK(approx_eq(positions[11], Vector3D(23.5300, 24.0900, 21.3100), 1e-4));
+
+    cell = frame.cell();
+    CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
+    CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
+}
+
 TEST_CASE("Read files in XTC format") {
     SECTION("Read trajectory") {
-        auto file = Trajectory("data/xtc/ubiquitin.xtc");
-        CHECK(file.size() == 251);
-        auto frame = file.read_at(0);
+        check_traj_ubiquitin("data/xtc/ubiquitin.xtc");
+    }
 
-        CHECK(frame.index() == 0);
-        CHECK(frame.get("simulation_step")->as_double() == 0);
-        CHECK(approx_eq(frame.get("time")->as_double(), 0));
-        CHECK(frame.get("xtc_precision")->as_double() == 1000);
-        CHECK(frame.size() == 20455);
-
-        auto positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D(24.8300, 24.6600, 18.8100), 1e-4));
-        CHECK(approx_eq(positions[11], Vector3D(23.7700, 24.5600, 21.4700), 1e-4));
-
-        auto cell = frame.cell();
-        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
-
-        frame = file.read_at(1); // Skip a frame
-        CHECK(frame.index() == 1);
-        CHECK(frame.get("simulation_step")->as_double() == 100);
-
-        frame = file.read();
-
-        CHECK(frame.index() == 2);
-        CHECK(frame.get("simulation_step")->as_double() == 200);
-        CHECK(approx_eq(frame.get("time")->as_double(), 0.4, 1e-4));
-        CHECK(frame.get("xtc_precision")->as_double() == 1000);
-        CHECK(frame.size() == 20455);
-
-        positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D(24.7100, 24.5700, 18.4500), 1e-4));
-        CHECK(approx_eq(positions[11], Vector3D(23.6700, 24.4800, 21.5200), 1e-4));
-
-        cell = frame.cell();
-        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
-
-        frame = file.read_at(230); // skip forward
-
-        CHECK(frame.index() == 230);
-        CHECK(frame.get("simulation_step")->as_double() == 23000);
-        CHECK(approx_eq(frame.get("time")->as_double(), 46.0));
-        CHECK(frame.get("xtc_precision")->as_double() == 1000);
-        CHECK(frame.size() == 20455);
-
-        positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D(24.6300, 24.6700, 18.5000), 1e-4));
-        CHECK(approx_eq(positions[11], Vector3D(23.6800, 24.0700, 21.3100), 1e-4));
-
-        cell = frame.cell();
-        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
-
-        frame = file.read_at(50); // skip behind previous step
-
-        CHECK(frame.index() == 50);
-        CHECK(frame.get("simulation_step")->as_double() == 5000);
-        CHECK(approx_eq(frame.get("time")->as_double(), 10.0));
-        CHECK(frame.get("xtc_precision")->as_double() == 1000);
-        CHECK(frame.size() == 20455);
-
-        positions = frame.positions();
-        CHECK(approx_eq(positions[0], Vector3D(24.5100, 24.5300, 18.7800), 1e-4));
-        CHECK(approx_eq(positions[11], Vector3D(23.5300, 24.0900, 21.3100), 1e-4));
-
-        cell = frame.cell();
-        CHECK(cell.shape() == UnitCell::ORTHORHOMBIC);
-        CHECK(approx_eq(cell.lengths(), {55.6800, 58.8700, 62.5700}, 1e-4));
+    SECTION("Read trajectory with gigantic system") {
+        check_traj_ubiquitin("data/xtc/ubiquitin_faux2023magic.xtc");
     }
 
     SECTION("Read different cell shapes") {
