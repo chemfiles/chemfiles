@@ -32,6 +32,9 @@
 // See <GMX@v2023>/src/gromacs/fileio/xdrf.h
 #define XTC_1995_MAX_NATOMS 298261617
 
+// GROMACS does not bother with compression for nine atoms or less
+#define XTC_MAX_NATOMS_UNCOMPRESSED 9
+
 /* XTC small header size (natoms<=9).
  *  > int(4) magic
  *  > int(4) natoms
@@ -126,7 +129,7 @@ void XTCFormat::read(Frame& frame) {
     }
 
     std::vector<float> x(header.natoms * 3);
-    if (header.natoms <= 9) {
+    if (header.natoms <= XTC_MAX_NATOMS_UNCOMPRESSED) {
         file_.read_f32(x);
     } else {
         float precision = file_.read_gmx_compressed_floats(x, header.is_long_format());
@@ -197,8 +200,7 @@ void XTCFormat::determine_frame_offsets() {
     frame_positions_.clear();
     frame_positions_.emplace_back(0);
 
-    // GROMACS does not bother with compression for nine atoms or less
-    if (header.natoms <= 9) {
+    if (header.natoms <= XTC_MAX_NATOMS_UNCOMPRESSED) {
         auto framebytes = static_cast<uint64_t>(XTC_SMALL_HEADER_SIZE + header.natoms * XTC_SMALL_COORDS_SIZE);
         file_.seek(framebytes);
 
@@ -259,7 +261,7 @@ void XTCFormat::write(const Frame& frame) {
 
     std::vector<float> x(natoms * 3);
     get_positions(x, frame);
-    if (natoms <= 9) {
+    if (natoms <= XTC_MAX_NATOMS_UNCOMPRESSED) {
         file_.write_f32(x);
     } else {
         const float precision =
