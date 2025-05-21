@@ -228,8 +228,8 @@ static void encodebits(std::vector<char>& buf, DecodeState& state, uint32_t num_
  * to remove those checks...
  */
 
-static void encodeints(std::vector<char>& buf, DecodeState& state, const uint32_t num_of_ints,
-                       const uint32_t num_of_bits, const uint32_t sizes[], const uint32_t nums[]) {
+static void encodeints(std::vector<char>& buf, DecodeState& state, const uint32_t num_of_bits,
+                       const uint32_t sizes[], const uint32_t nums[]) {
     uint32_t tmp = nums[0];
     uint32_t num_of_bytes = 0;
     uint8_t bytes[32];
@@ -238,7 +238,7 @@ static void encodeints(std::vector<char>& buf, DecodeState& state, const uint32_
         tmp >>= CHAR_BIT;
     } while (tmp != 0);
 
-    for (size_t i = 1; i < num_of_ints; i++) {
+    for (size_t i = 1; i < 3; i++) {
         if (nums[i] >= sizes[i]) {
             throw file_error("major breakdown in encodeints - num {} doesn't match size {}",
                              nums[i], sizes[i]);
@@ -724,7 +724,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
             encodebits(compressed_data_, state, bitsizeint[1], tmpcoord[1]);
             encodebits(compressed_data_, state, bitsizeint[2], tmpcoord[2]);
         } else {
-            encodeints(compressed_data_, state, 3, bitsize, sizeint, tmpcoord);
+            encodeints(compressed_data_, state, bitsize, sizeint, tmpcoord);
         }
         prevcoord[0] = thiscoord[0];
         prevcoord[1] = thiscoord[1];
@@ -776,7 +776,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
             encodebits(compressed_data_, state, 1, 0);
         }
         for (int k = 0; k < run; k += 3) {
-            encodeints(compressed_data_, state, 3, smallidx, sizesmall, &tmpcoord[k]);
+            encodeints(compressed_data_, state, smallidx, sizesmall, &tmpcoord[k]);
         }
         if (is_smaller != 0) {
             if (is_smaller < 0) {
