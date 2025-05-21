@@ -8,6 +8,7 @@
 #include <cstdlib>
 
 #include <algorithm>
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -46,6 +47,10 @@ void XDRFile::write_opaque(const char* data, uint32_t count) {
 
 void XDRFile::read_gmx_long_opaque(std::vector<char>& data) {
     const uint64_t count = read_single_u64();
+    if (count > std::numeric_limits<size_t>::max()) {
+        // count would overflow the address space
+        throw file_error("compressed data is too large to be allocated");
+    }
     const uint64_t num_filler = (4 - (count % 4)) % 4;
     data.resize(static_cast<size_t>(count + num_filler));
     read_char(data.data(), count + num_filler);
