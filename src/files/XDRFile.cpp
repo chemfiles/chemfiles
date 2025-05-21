@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <cstdlib>
 
+#include <algorithm>
 #include <string>
 #include <utility>
 #include <vector>
@@ -113,11 +114,11 @@ size_t XDRFile::read_single_size_as_i32() {
  * sizeofint - calculate smallest number of bits necessary
  * to represent a certain integer.
  */
-static uint32_t sizeofint(uint32_t size) {
+static uint32_t sizeofint(const uint32_t size) {
     uint32_t num = 1;
     uint32_t num_of_bits = 0;
 
-    while (size >= num && num_of_bits < 32) {
+    while (size >= num && num_of_bits < 4 * CHAR_BIT) {
         num_of_bits++;
         num <<= 1;
     }
@@ -135,7 +136,7 @@ static uint32_t sizeofint(uint32_t size) {
  * which is the exact number of bits, and them we dont need to call
  * this routine).
  */
-static uint32_t sizeofints(uint32_t num_of_ints, const uint32_t sizes[]) {
+static uint32_t sizeofints(const uint32_t num_of_ints, const uint32_t sizes[]) {
     uint32_t num_of_bytes = 1;
     uint8_t bytes[32];
     bytes[0] = 1;
@@ -146,11 +147,11 @@ static uint32_t sizeofints(uint32_t num_of_ints, const uint32_t sizes[]) {
         for (bytecnt = 0; bytecnt < num_of_bytes; bytecnt++) {
             tmp = bytes[bytecnt] * sizes[i] + tmp;
             bytes[bytecnt] = tmp & 0xff;
-            tmp >>= 8;
+            tmp >>= CHAR_BIT;
         }
         while (tmp != 0) {
             bytes[bytecnt++] = tmp & 0xff;
-            tmp >>= 8;
+            tmp >>= CHAR_BIT;
         }
         num_of_bytes = bytecnt;
     }
@@ -160,7 +161,7 @@ static uint32_t sizeofints(uint32_t num_of_ints, const uint32_t sizes[]) {
         num_of_bits++;
         num *= 2;
     }
-    return num_of_bits + num_of_bytes * 8;
+    return num_of_bits + num_of_bytes * CHAR_BIT;
 }
 
 struct DecodeState {
@@ -172,41 +173,43 @@ struct DecodeState {
 /*
  * encodebits - encode num into buf using the specified number of bits
  *
+ * Equivalent to `sendbits` in Gromacs.
+ *
  * This routines appends the value of num to the bits already present in
- * the array buf. You need to give it the number of bits to use and you had
+ * the data buffer. You need to give it the number of bits to use and you had
  * better make sure that this number of bits is enough to hold the value.
  * Num must also be positive.
  */
 static void encodebits(std::vector<char>& buf, DecodeState& state, uint32_t num_of_bits,
                        uint32_t num) {
-    size_t cnt = state.count;
     size_t lastbits = state.lastbits;
     // last byte needs 1B headspace for shifting
     uint32_t lastbyte = state.lastbyte;
-    while (num_of_bits >= 8) {
-        lastbyte = (lastbyte << 8) | (num >> (num_of_bits - 8));
-        buf[cnt++] = static_cast<char>(lastbyte >> lastbits);
-        num_of_bits -= 8;
+    while (num_of_bits >= CHAR_BIT) {
+        lastbyte = (lastbyte << CHAR_BIT) | (num >> (num_of_bits - CHAR_BIT));
+        buf[state.count++] = static_cast<char>(lastbyte >> lastbits);
+        num_of_bits -= CHAR_BIT;
     }
     if (num_of_bits > 0) {
         lastbyte = (lastbyte << num_of_bits) | num;
         lastbits += num_of_bits;
-        if (lastbits >= 8) {
-            lastbits -= 8;
-            buf[cnt++] = static_cast<char>(lastbyte >> lastbits);
+        if (lastbits >= CHAR_BIT) {
+            lastbits -= CHAR_BIT;
+            buf[state.count++] = static_cast<char>(lastbyte >> lastbits);
         }
     }
-    state.count = cnt;
     state.lastbits = lastbits;
     // discard everything but the last byte
     state.lastbyte = lastbyte & 0xff;
     if (lastbits > 0) {
-        buf[cnt] = static_cast<char>(lastbyte << (8 - lastbits));
+        buf[state.count] = static_cast<char>(lastbyte << (CHAR_BIT - lastbits));
     }
 }
 
 /*
  * encodeints - encode a small set of small integers in compressed format
+ *
+ * Equivalent to `sendints` in Gromacs.
  *
  * This routine is used internally by xdr3dfcoord, to encode a set of
  * small integers to the buffer for writing to a file.
@@ -216,18 +219,18 @@ static void encodebits(std::vector<char>& buf, DecodeState& state, uint32_t num_
  * a few integers, this is not done because the gain in compression
  * isn't worth the effort. Note that overflowing the multiplication
  * or the byte buffer (32 bytes) is unchecked and whould cause bad results.
- * THese things are checked in the calling routines, so make sure not
+ * These things are checked in the calling routines, so make sure not
  * to remove those checks...
  */
 
-static void encodeints(std::vector<char>& buf, DecodeState& state, uint32_t num_of_ints,
-                       uint32_t num_of_bits, uint32_t sizes[], uint32_t nums[]) {
+static void encodeints(std::vector<char>& buf, DecodeState& state, const uint32_t num_of_ints,
+                       const uint32_t num_of_bits, const uint32_t sizes[], const uint32_t nums[]) {
     uint32_t tmp = nums[0];
     uint32_t num_of_bytes = 0;
     uint8_t bytes[32];
     do {
         bytes[num_of_bytes++] = tmp & 0xff;
-        tmp >>= 8;
+        tmp >>= CHAR_BIT;
     } while (tmp != 0);
 
     for (size_t i = 1; i < num_of_ints; i++) {
@@ -241,32 +244,39 @@ static void encodeints(std::vector<char>& buf, DecodeState& state, uint32_t num_
         for (bytecnt = 0; bytecnt < num_of_bytes; bytecnt++) {
             tmp = bytes[bytecnt] * sizes[i] + tmp;
             bytes[bytecnt] = tmp & 0xff;
-            tmp >>= 8;
+            tmp >>= CHAR_BIT;
         }
         while (tmp != 0) {
             bytes[bytecnt++] = tmp & 0xff;
-            tmp >>= 8;
+            tmp >>= CHAR_BIT;
         }
         num_of_bytes = bytecnt;
     }
-    if (num_of_bits >= num_of_bytes * 8) {
+    // If the caller specified a sufficiently large bit count,
+    // do what they say.
+    if (num_of_bits >= num_of_bytes * CHAR_BIT) {
         for (size_t i = 0; i < num_of_bytes; i++) {
-            encodebits(buf, state, 8, bytes[i]);
+            encodebits(buf, state, CHAR_BIT, bytes[i]);
         }
-        encodebits(buf, state, num_of_bits - num_of_bytes * 8, 0);
+        encodebits(buf, state, num_of_bits - num_of_bytes * CHAR_BIT, 0);
     } else {
+        // Otherwise send each byte we found
         size_t i;
         for (i = 0; i < num_of_bytes - 1; i++) {
-            encodebits(buf, state, 8, bytes[i]);
+            encodebits(buf, state, CHAR_BIT, bytes[i]);
         }
-        encodebits(buf, state, num_of_bits - (num_of_bytes - 1) * 8, bytes[i]);
+        const uint32_t num_bits_remaining = num_of_bits - (num_of_bytes - 1) * CHAR_BIT;
+        assert(num_bits_remaining < CHAR_BIT); // Help clang analyzer understand
+        encodebits(buf, state, num_bits_remaining, bytes[i]);
     }
 }
 
 /*
  * decodebits - decode number from buf using specified number of bits
  *
- * Extract the number of bits from the array buf and construct an integer
+ * Equivalent to `receivebits` in Gromacs.
+ *
+ * Extract the number of bits from the databuffer and construct an integer
  * from it. Return that value.
  * The number of bits must be <32.
  *
@@ -274,33 +284,31 @@ static void encodeints(std::vector<char>& buf, DecodeState& state, uint32_t num_
 
 template <typename T>
 static T decodebits(const std::vector<char>& buf, DecodeState& state, uint32_t num_of_bits) {
-    uint32_t mask = static_cast<uint32_t>(1 << num_of_bits) - 1;
+    const uint32_t mask = static_cast<uint32_t>(1 << num_of_bits) - 1;
 
-    size_t cnt = state.count;
     size_t lastbits = state.lastbits;
     uint32_t lastbyte = state.lastbyte;
 
     uint32_t num = 0;
-    while (num_of_bits >= 8) {
-        lastbyte = (lastbyte << 8) | static_cast<uint8_t>(buf[cnt++]);
-        num |= (lastbyte >> lastbits) << (num_of_bits - 8);
-        num_of_bits -= 8;
+    while (num_of_bits >= CHAR_BIT) {
+        lastbyte = (lastbyte << CHAR_BIT) | static_cast<uint8_t>(buf[state.count++]);
+        num |= (lastbyte >> lastbits) << (num_of_bits - CHAR_BIT);
+        num_of_bits -= CHAR_BIT;
     }
     if (num_of_bits > 0) {
         if (lastbits < num_of_bits) {
-            lastbits += 8;
-            lastbyte = (lastbyte << 8) | static_cast<uint8_t>(buf[cnt++]);
+            lastbits += CHAR_BIT;
+            lastbyte = (lastbyte << CHAR_BIT) | static_cast<uint8_t>(buf[state.count++]);
         }
         lastbits -= num_of_bits;
         num |= (lastbyte >> lastbits) & (static_cast<uint32_t>(1 << num_of_bits) - 1);
     }
     num &= mask;
-    state.count = cnt;
     state.lastbits = lastbits;
     // discard everything but the last byte
     state.lastbyte = lastbyte & 0xff;
 
-    assert(sizeof(T) * 8 >= num_of_bits);
+    assert(sizeof(T) * CHAR_BIT >= num_of_bits);
     return static_cast<T>(num);
 }
 
@@ -323,14 +331,14 @@ static void unpack_from_int(const std::vector<char>& buf, DecodeState& state, ui
                             const uint32_t sizes[3], span<int32_t> nums) {
     T v = 0;
     size_t num_of_bytes = 0;
-    while (num_of_bits >= 8) {
-        auto byte = decodebits<T>(buf, state, 8);
-        v |= byte << (8 * num_of_bytes++);
-        num_of_bits -= 8;
+    while (num_of_bits >= CHAR_BIT) {
+        auto byte = decodebits<T>(buf, state, CHAR_BIT);
+        v |= byte << (CHAR_BIT * num_of_bytes++);
+        num_of_bits -= CHAR_BIT;
     }
     if (num_of_bits > 0) {
         auto byte = decodebits<T>(buf, state, num_of_bits);
-        v |= byte << (8 * num_of_bytes);
+        v |= byte << (CHAR_BIT * num_of_bytes);
     }
 
     using FastType = typename FastTypes<T>::Full;
@@ -338,9 +346,9 @@ static void unpack_from_int(const std::vector<char>& buf, DecodeState& state, ui
 
     auto sz = static_cast<FastType>(sizes[2]);
     auto sy = static_cast<FastTypeHalf>(sizes[1]);
-    FastType szy = sz * sy;
+    const FastType szy = sz * sy;
     auto x1 = static_cast<FastTypeHalf>(v / szy);
-    FastType q1 = v - x1 * szy;
+    const FastType q1 = v - x1 * szy;
     auto y1 = static_cast<FastTypeHalf>(q1 / sz);
     auto z1 = static_cast<FastTypeHalf>(q1 - y1 * sz);
 
@@ -351,6 +359,8 @@ static void unpack_from_int(const std::vector<char>& buf, DecodeState& state, ui
 
 /*
  * decodeints - decode 'small' integers from the buf array
+ *
+ * Equivalent to `receiveints` in Gromacs.
  *
  * This routine is the inverse from `encodeints()` and decodes 3 the small
  * integers written to `buf` by calculating the remainder and doing divisions
@@ -365,8 +375,11 @@ static void unpack_from_int(const std::vector<char>& buf, DecodeState& state, ui
  */
 
 static void decodeints(const std::vector<char>& buf, DecodeState& state, uint32_t num_of_bits,
-                       uint32_t sizes[3], span<int32_t> nums) {
+                       const uint32_t sizes[3], span<int32_t> nums) {
     assert(nums.size() == 3 && "invalid number of integers to unpack");
+    if (sizes[0] == 0 || sizes[1] == 0 || sizes[2] == 0) {
+        throw file_error("size of zero encountered while reading XTC, file possibly corrupted");
+    }
 
     if (num_of_bits <= 32) {
         unpack_from_int<uint32_t>(buf, state, num_of_bits, sizes, nums);
@@ -379,9 +392,11 @@ static void decodeints(const std::vector<char>& buf, DecodeState& state, uint32_
     uint8_t bytes[32];
     bytes[1] = bytes[2] = bytes[3] = 0;
     size_t num_of_bytes = 0;
-    while (num_of_bits >= 8) {
-        bytes[num_of_bytes++] = decodebits<uint8_t>(buf, state, 8);
-        num_of_bits -= 8;
+    // note: Gromacs loops `while (num_of_bits > CHAR_BIT)`
+    // this is equivalent to the following but would break symmetry to `decodebits`
+    while (num_of_bits >= CHAR_BIT) {
+        bytes[num_of_bytes++] = decodebits<uint8_t>(buf, state, CHAR_BIT);
+        num_of_bits -= CHAR_BIT;
     }
     if (num_of_bits > 0) {
         bytes[num_of_bytes++] = decodebits<uint8_t>(buf, state, num_of_bits);
@@ -389,15 +404,16 @@ static void decodeints(const std::vector<char>& buf, DecodeState& state, uint32_
     for (size_t i = 2; i > 0; --i) {
         uint32_t num = 0;
         for (size_t j = 0; j < num_of_bytes; ++j) {
-            size_t k = num_of_bytes - 1 - j;
-            num = (num << 8) | bytes[k];
-            uint32_t p = num / sizes[i];
+            const size_t k = num_of_bytes - 1 - j;
+            num = (num << CHAR_BIT) | bytes[k];
+            const uint32_t p = num / sizes[i];
             bytes[k] = static_cast<uint8_t>(p);
             num = num - p * sizes[i];
         }
         nums[i] = static_cast<int32_t>(num);
     }
-    nums[0] = bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
+    nums[0] =
+        bytes[0] | (bytes[1] << CHAR_BIT) | (bytes[2] << 2 * CHAR_BIT) | (bytes[3] << 3 * CHAR_BIT);
 }
 
 static uint32_t calc_sizeint(const int minint[3], const int maxint[3], uint32_t sizeint[3],
@@ -429,11 +445,21 @@ static const int MAGICINTS[] = {
     1048576,  1321122,  1664510, 2097152, 2642245, 3329021, 4194304, 5284491, 6658042, 8388607,
     10568983, 13316085, 16777216};
 //clang-format on
-#define FIRSTIDX 9 // note that MAGICINTS[FIRSTIDX-1] == 0
-#define LASTIDX (sizeof(MAGICINTS) / sizeof(*MAGICINTS))
+static constexpr const uint32_t FIRSTIDX = 9; // note that MAGICINTS[FIRSTIDX-1] == 0
+static constexpr const uint32_t LASTIDX =
+    static_cast<uint32_t>(sizeof(MAGICINTS) / sizeof(*MAGICINTS));
+
+// Integers above 2^24 do not have unique representations in
+// 32-bit floats ie with 24 bits of precision. We use MAX_ABSOLUTE_INT
+// to check that float values can be transformed into an in-range
+// 32-bit integer. There is no need to ensure we are within the range
+// of ints with exact floating-point representations. However, we should
+// reject all floats above that which converts to an in-range 32-bit integer.
+static const float MAX_ABSOLUTE_INT = std::nextafter(static_cast<float>(INT_MAX), 0.0f);
 
 /***** from xdrfile (end) *****/
 
+// Read part of xdr3dfcoord in Gromacs
 float XDRFile::read_gmx_compressed_floats(std::vector<float>& data, bool is_long_format) {
     const float precision = read_single_f32();
     const int minint[3] = {
@@ -453,12 +479,9 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data, bool is_long
 
     uint32_t sizeint[3];
     uint32_t bitsizeint[3];
-    auto bitsize = calc_sizeint(minint, maxint, sizeint, bitsizeint);
+    const uint32_t bitsize = calc_sizeint(minint, maxint, sizeint, bitsizeint);
 
-    size_t tmpidx = smallidx - 1;
-    tmpidx = (FIRSTIDX > tmpidx) ? FIRSTIDX : tmpidx;
-
-    int smaller = MAGICINTS[tmpidx] / 2;
+    int smaller = MAGICINTS[std::max(FIRSTIDX, smallidx - 1)] / 2;
     int smallnum = MAGICINTS[smallidx] / 2;
     uint32_t sizesmall[3];
     sizesmall[0] = sizesmall[1] = sizesmall[2] = static_cast<uint32_t>(MAGICINTS[smallidx]);
@@ -471,12 +494,12 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data, bool is_long
     intbuf_.resize(data.size());
 
     assert(data.size() % 3 == 0 && "internal Error: invalid allocation size");
-    auto natoms = data.size() / 3;
+    const size_t natoms = data.size() / 3;
 
     DecodeState state = {0, 0, 0};
     int run = 0;
     int prevcoord[3];
-    auto inv_precision = 1.0f / precision;
+    const float inv_precision = 1.0f / precision;
     size_t write_idx = 0;
     for (size_t read_idx = 0; read_idx < natoms; ++read_idx) {
         auto thiscoord = span<int32_t>(intbuf_.data() + read_idx * 3, 3);
@@ -498,7 +521,7 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data, bool is_long
         prevcoord[1] = thiscoord[1];
         prevcoord[2] = thiscoord[2];
 
-        auto flag = decodebits<bool>(compressed_data_, state, 1);
+        const auto flag = decodebits<bool>(compressed_data_, state, 1);
         int is_smaller = 0;
         if (flag) {
             run = decodebits<int>(compressed_data_, state, 5);
@@ -570,6 +593,7 @@ float XDRFile::read_gmx_compressed_floats(std::vector<float>& data, bool is_long
     return precision;
 }
 
+// Write part of xdr3dfcoord in Gromacs
 void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float precision,
                                           bool is_long_format) {
     if (precision <= 0) {
@@ -579,7 +603,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
     write_single_f32(precision);
 
     assert(data.size() % 3 == 0 && "internal Error: invalid allocation size");
-    auto natoms = data.size() / 3;
+    const size_t natoms = data.size() / 3;
     intbuf_.resize(3 * natoms);
     compressed_data_.resize(3 * natoms * sizeof(int32_t));
 
@@ -600,7 +624,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
             } else {
                 lf = thiscoord_fl[i] * precision - 0.5f;
             }
-            if (fabsf(lf) > static_cast<float>(INT_MAX) - 2.0f) {
+            if (fabsf(lf) > MAX_ABSOLUTE_INT) {
                 // scaling would cause overflow when casting to int
                 throw file_error("internal overflow compressing XTC coordinates");
             }
@@ -613,7 +637,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
             }
             thiscoord[i] = lint[i];
         }
-        int diff =
+        const int diff =
             abs(oldlint[0] - lint[0]) + abs(oldlint[1] - lint[1]) + abs(oldlint[2] - lint[2]);
         if (diff < mindiff && atom_idx > 0) {
             mindiff = diff;
@@ -629,8 +653,9 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
         write_single_i32(maxint[i]);
     }
 
-    if (maxint[0] - minint[0] >= INT_MAX - 2 || maxint[1] - minint[1] >= INT_MAX - 2 ||
-        maxint[2] - minint[2] >= INT_MAX - 2) {
+    if (static_cast<float>(maxint[0]) - static_cast<float>(minint[0]) >= MAX_ABSOLUTE_INT ||
+        static_cast<float>(maxint[1]) - static_cast<float>(minint[1]) >= MAX_ABSOLUTE_INT ||
+        static_cast<float>(maxint[2]) - static_cast<float>(minint[2]) >= MAX_ABSOLUTE_INT) {
         // turning value in unsigned by subtracting minint would cause overflow
         throw file_error("internal overflow compressing XTC coordinates");
     }
@@ -643,22 +668,19 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
 
     uint32_t sizeint[3];
     uint32_t bitsizeint[3];
-    auto bitsize = calc_sizeint(minint, maxint, sizeint, bitsizeint);
+    const uint32_t bitsize = calc_sizeint(minint, maxint, sizeint, bitsizeint);
 
-    size_t tmpidx = smallidx + 8;
-    size_t maxidx = (LASTIDX < tmpidx) ? LASTIDX : tmpidx;
-    size_t minidx = maxidx - 8; // often this equal smallidx
-    tmpidx = smallidx - 1;
-    tmpidx = (FIRSTIDX > tmpidx) ? FIRSTIDX : tmpidx;
+    const size_t maxidx = std::min(LASTIDX, smallidx + 8);
+    const size_t minidx = maxidx - 8; // often this equal smallidx
 
-    int smaller = MAGICINTS[tmpidx] / 2;
+    int smaller = MAGICINTS[std::max(FIRSTIDX, smallidx - 1)] / 2;
     int smallnum = MAGICINTS[smallidx] / 2;
     uint32_t sizesmall[3];
     sizesmall[0] = sizesmall[1] = sizesmall[2] = static_cast<uint32_t>(MAGICINTS[smallidx]);
-    int larger = MAGICINTS[maxidx] / 2;
+    const int larger = MAGICINTS[maxidx] / 2;
 
     int prevrun = -1;
-    uint32_t tmpcoord[8 * 3]; // max run lenght is 8*3
+    uint32_t tmpcoord[8 * 3]; // max run length is 8*3
     int prevcoord[3] = {0, 0, 0};
     int is_smaller;
     DecodeState state = {0, 0, 0};
@@ -711,7 +733,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
         while (is_small && run < 8 * 3) {
             int tmpsum = 0;
             for (size_t j = 0; j < 3; ++j) {
-                int tmp = thiscoord[j] - prevcoord[j];
+                const int tmp = thiscoord[j] - prevcoord[j];
                 tmpsum += tmp * tmp;
             }
             if (is_smaller == -1 && tmpsum >= smaller * smaller) {
@@ -742,7 +764,7 @@ void XDRFile::write_gmx_compressed_floats(const std::vector<float>& data, float 
         if (run != prevrun || is_smaller != 0) {
             prevrun = run;
             encodebits(compressed_data_, state, 1, 1); // flag the change in run-length
-            uint32_t num = static_cast<uint32_t>(run + is_smaller + 1);
+            const auto num = static_cast<uint32_t>(run + is_smaller + 1);
             encodebits(compressed_data_, state, 5, num);
         } else {
             // flag the fact that runlength did not change
