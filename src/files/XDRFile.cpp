@@ -292,7 +292,7 @@ static T decodebits(const std::vector<char>& buf, DecodeState& state, uint32_t n
             lastbyte = (lastbyte << 8) | static_cast<uint8_t>(buf[cnt++]);
         }
         lastbits -= num_of_bits;
-        num |= (lastbyte >> lastbits) & mask;
+        num |= (lastbyte >> lastbits) & (static_cast<uint32_t>(1 << num_of_bits) - 1);
     }
     num &= mask;
     state.count = cnt;
