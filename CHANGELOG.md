@@ -17,6 +17,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - added `chemfiles::guess_format` and `chfl_guess_format` to get the format
   chemfiles would use for a given file based on its filename
 - Added read support for GROMACS TPR format.
+- Added support for XTC trajectories of gigantic systems (> ~300M atoms)
+  as introduced with GROMACS version 2023
 
 ### Changes in supported formats
 
