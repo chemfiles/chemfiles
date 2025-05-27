@@ -5,6 +5,7 @@
 #define CHEMFILES_ERROR_FMT_HPP
 
 #include <utility>
+#include <fmt/core.h> // IWYU pragma: export
 #include <fmt/format.h>
 #include "chemfiles/Error.hpp"  // IWYU pragma: export
 

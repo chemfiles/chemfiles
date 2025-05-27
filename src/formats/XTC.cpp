@@ -10,8 +10,6 @@
 #include <utility>
 #include <vector>
 
-#include "fmt/core.h"
-
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/external/optional.hpp"
 #include "chemfiles/external/span.hpp"
