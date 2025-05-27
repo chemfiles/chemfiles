@@ -13,8 +13,6 @@
 #include <utility>
 #include <vector>
 
-#include "fmt/core.h"
-
 #include "chemfiles/files/BinaryFile.hpp"
 #include "chemfiles/files/XDRFile.hpp"
 
