@@ -11,9 +11,6 @@
 #include <iterator>
 #include <string_view>
 
-#include <fmt/core.h>
-#include <fmt/format.h>
-
 #include "chemfiles/File.hpp"
 #include "chemfiles/files/GzFile.hpp"
 #include "chemfiles/files/XzFile.hpp"

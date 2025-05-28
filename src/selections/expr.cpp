@@ -14,9 +14,6 @@
 #include <algorithm>
 #include <functional>
 
-#include <fmt/core.h>
-#include <fmt/format.h>
-
 #include "chemfiles/error_fmt.hpp"
 #include "chemfiles/unreachable.hpp"
 #include "chemfiles/external/optional.hpp"

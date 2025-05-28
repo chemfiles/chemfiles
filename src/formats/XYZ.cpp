@@ -15,9 +15,6 @@
 #include <string_view>
 #include <unordered_map>
 
-#include <fmt/core.h>
-#include <fmt/format.h>
-
 #include "chemfiles/types.hpp"
 #include "chemfiles/parse.hpp"
 #include "chemfiles/utils.hpp"
