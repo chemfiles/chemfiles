@@ -6,23 +6,16 @@
 
 #include <memory>
 #include <string>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
-#include "chemfiles/config.h"
 #include "chemfiles/File.hpp"
 
 static_assert(sizeof(char) == sizeof(int8_t), "char must be 8-bits");
 
 #if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
-#if (CHEMFILES_SIZEOF_VOID_P == 8)
-    // use mmap in 64-bit posix
+    // use mmap on posix
     #define CHEMFILES_BINARY_FILE_USE_MMAP 1
-#else
-    // otherwise fallback to an implementation using only <cstdio>
-    #define CHEMFILES_BINARY_FILE_USE_MMAP 0
-#endif
 #else
     #define CHEMFILES_BINARY_FILE_USE_MMAP 0
 #endif
@@ -347,14 +340,19 @@ private:
     /// destructor and move assignment operator
     void close_file() noexcept;
 
+    /// When in mmap mode, sync, unmap and then remap the file starting at
+    /// `mmap_offset_`
+    void remap_file();
+
 #if CHEMFILES_BINARY_FILE_USE_MMAP
     int file_descriptor_ = -1;
     char* mmap_data_ = nullptr;
     size_t file_size_ = 0;
-    size_t mmap_size_ = 0;
+    uint64_t mmap_offset_ = 0;
+    // size_t mmap_size_ = 0;
     int mmap_prot_ = 0;
     size_t page_size_ = 0;
-    uint64_t offset_ = 0;
+    uint64_t current_ = 0;
     uint64_t total_written_size_ = 0;
 #else
     FILE* file_ = nullptr;
