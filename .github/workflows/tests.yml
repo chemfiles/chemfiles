@@ -135,31 +135,31 @@ jobs:
           # windows builders
           # ==
           - name: windows / MSVC 64-bit
-            os: windows-2019
+            os: windows-2022
             cc: cl.exe
             cxx: cl.exe
             build-type: Debug
             cmake-extra-args:
-              - -G "Visual Studio 16 2019" -A x64
+              - -G "Visual Studio 17 2022" -A x64
           - name: windows / MSVC 64-bit / static library
-            os: windows-2019
+            os: windows-2022
             cc: cl.exe
             cxx: cl.exe
             # The compiler completely fills up the disk when building all tests
             # in debug mode, so use release
             build-type: Release
             cmake-extra-args:
-              - -G "Visual Studio 16 2019" -A x64
+              - -G "Visual Studio 17 2022" -A x64
               - -DBUILD_SHARED_LIBS=OFF
           - name: windows / MSVC 32-bit
-            os: windows-2019
+            os: windows-2022
             cc: cl.exe
             cxx: cl.exe
             build-type: Debug
             cmake-extra-args:
-              - -G "Visual Studio 16 2019" -A Win32
+              - -G "Visual Studio 17 2022" -A Win32
           - name: windows / MinGW
-            os: windows-2019
+            os: windows-2022
             cc: C:/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/x86_64-w64-mingw32-gcc.exe
             cxx: C:/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/x86_64-w64-mingw32-g++.exe
             # Linking takes a lot longer with debug information
