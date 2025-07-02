@@ -96,6 +96,7 @@ TEST_CASE("Read files in XYZ format") {
         CHECK(frame.get("IsStrange")->as_bool() == true);
 
         // Atom level properties
+        CHECK_FALSE(frame.velocities());
         CHECK(approx_eq(frame.positions()[0], {2.33827271799, 4.55315540425, 11.5841360926}, 1e-12));
         CHECK(frame[0].get("CS_0")->as_double() == 24.10);
         CHECK(frame[0].get("CS_1")->as_double() == 31.34);
@@ -123,6 +124,15 @@ TEST_CASE("Read files in XYZ format") {
         CHECK(frame[0].get("int")->as_double() == 33.0);
         CHECK(frame[0].get("strings_0")->as_string() == "bar");
         CHECK(frame[0].get("strings_1")->as_string() == "\"test\"");
+
+        file = Trajectory("data/xyz/velocities.xyz");
+        CHECK(file.size() == 1);
+        frame = file.read();
+        CHECK(frame.size() == 3);
+        CHECK(approx_eq(frame.positions()[0], {0, 0, 1}, 1e-12));
+
+        CHECK(frame.velocities());
+        CHECK(approx_eq(frame.velocities().value()[0], {1, 0, 0}, 1e-12));
     }
 
     SECTION("Extended XYZ — no Properties=") {
@@ -248,13 +258,13 @@ B 1 2 3 F 11 atom_1 11 21 31
 C 1 2 3 T 12 atom_2 12 22 32
 D 1 2 3 T 13 atom_2 13 23 33
 6
-Properties=species:S:1:pos:R:3 Lattice="12 0 0 0 13 0 0 0 14" direction="1 0 2" is_open=F name="Test" 'quotes"'=T "quotes'"=T speed=33.4 "with space"=T
-A 1 2 3
-B 1 2 3
-C 1 2 3
-D 1 2 3
-E 4 5 6
-F 4 5 6
+Properties=species:S:1:pos:R:3:velo:R:3 Lattice="12 0 0 0 13 0 0 0 14" direction="1 0 2" is_open=F name="Test" 'quotes"'=T "quotes'"=T speed=33.4 "with space"=T
+A 1 2 3 0 0 0
+B 1 2 3 0 0 0
+C 1 2 3 0 0 0
+D 1 2 3 0 0 0
+E 4 5 6 7 8 9
+F 4 5 6 7 8 9
 )";
 
     auto frame = Frame();
@@ -311,8 +321,10 @@ F 4 5 6
     // properties with two type of quotes are skipped
     frame.set("all_quotes'\"", true);
 
-    frame.add_atom(Atom("E"), {4, 5, 6});
-    frame.add_atom(Atom("F"), {4, 5, 6});
+    frame.add_velocities();
+
+    frame.add_atom(Atom("E"), {4, 5, 6}, {7, 8, 9});
+    frame.add_atom(Atom("F"), {4, 5, 6}, {7, 8, 9});
 
     file.write(frame);
     file.close();

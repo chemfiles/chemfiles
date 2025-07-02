@@ -91,12 +91,12 @@ void XYZFormat::read_next(Frame& frame) {
         double x = 0;
         double y = 0;
         double z = 0;
-        auto velo = Vector3D();
+        auto velocity = Vector3D();
         std::string name;
         auto count = scan(line, name, x, y, z);
         auto atom = Atom(std::move(name));
-        read_atomic_properties(properties, line.substr(count), atom, velo);
-        frame.add_atom(std::move(atom), Vector3D(x, y, z), velo);
+        read_atomic_properties(properties, line.substr(count), atom, velocity);
+        frame.add_atom(std::move(atom), Vector3D(x, y, z), velocity);
     }
 }
 
@@ -117,7 +117,7 @@ void XYZFormat::write_next(const Frame& frame) {
         }
 
         if (velocities) {// write velocities if included
-            auto velo = velocities.value();
+            const auto& velo = velocities.value();
 
             file_.print("{} {:g} {:g} {:g} {:g} {:g} {:g}",
                 name, positions[i][0], positions[i][1], positions[i][2],
@@ -703,7 +703,7 @@ properties_list_t read_extended_comment_line(std::string_view line, Frame& frame
 // the expected type. If the files contains a valid `Properties=...`
 // description,throwing errors if the rest of the files does not follow the
 // description is fair game.
-void read_atomic_properties(const properties_list_t& properties, std::string_view line, Atom& atom, Vector3D& velo) {
+void read_atomic_properties(const properties_list_t& properties, std::string_view line, Atom& atom, Vector3D& velocity) {
     for (const auto& property: properties) {
         if (property.type == Property::STRING) {
             std::string value;
@@ -728,9 +728,8 @@ void read_atomic_properties(const properties_list_t& properties, std::string_vie
             line.remove_prefix(count);
             atom.set(property.name, value);
         }  else if (property.type == Property::VECTOR3D) {
-
             if (property.name == "velo") {
-                auto count = scan(line, velo[0], velo[1], velo[2]);
+                auto count = scan(line, velocity[0], velocity[1], velocity[2]);
                 line.remove_prefix(count);
             } else {
                 Vector3D value;
