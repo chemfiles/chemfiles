@@ -41,21 +41,6 @@ jobs:
               sudo apt-get update
               sudo apt-add-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-21 main"
               sudo apt-get install -y clang-21
-          - name: Linux / Intel compiler
-            os: ubuntu-24.04
-            cc: icc
-            cxx: icpc
-            build-type: Debug
-            setup-dependencies: |
-              wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-              sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-
-              sudo add-apt-repository "deb https://apt.repos.intel.com/oneapi all main"
-              sudo apt-get update
-              sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic
-
-              source /opt/intel/oneapi/setvars.sh
-              env > $GITHUB_ENV
           - name: Linux / gcc / static library
             os: ubuntu-24.04
             cc: gcc
