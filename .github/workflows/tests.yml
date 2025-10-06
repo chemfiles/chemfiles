@@ -22,28 +22,27 @@ jobs:
           # linux builders, also used for various checks that should be
           # platform independent
           # ==
-          - name: Linux / gcc-13
-            os: ubuntu-22.04
-            cc: gcc-13
-            cxx: g++-13
+          - name: Linux / gcc-14
+            os: ubuntu-24.04
+            cc: gcc-14
+            cxx: g++-14
             build-type: Debug
             check-exported-symbols: true
             setup-dependencies: |
-              sudo add-apt-repository ppa:ubuntu-toolchain-r/test
               sudo apt-get update
-              sudo apt-get install -y gcc-13 g++-13
-          - name: Linux / clang-19
-            os: ubuntu-22.04
-            cc: clang-19
-            cxx: clang++-19
+              sudo apt-get install -y gcc-14 g++-14
+          - name: Linux / clang-21
+            os: ubuntu-24.04
+            cc: clang-21
+            cxx: clang++-21
             build-type: Debug
             setup-dependencies: |
               wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
               sudo apt-get update
-              sudo apt-add-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-19 main"
-              sudo apt-get install -y clang-19
+              sudo apt-add-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-21 main"
+              sudo apt-get install -y clang-21
           - name: Linux / Intel compiler
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             cc: icc
             cxx: icpc
             build-type: Debug
@@ -58,7 +57,7 @@ jobs:
               source /opt/intel/oneapi/setvars.sh
               env > $GITHUB_ENV
           - name: Linux / gcc / static library
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             cc: gcc
             cxx: g++
             build-type: Debug
@@ -68,7 +67,7 @@ jobs:
               - -DCMAKE_C_FLAGS="--coverage"
               - -DCMAKE_CXX_FLAGS="--coverage"
           - name: Linux / gcc / external dependencies
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             cc: gcc
             cxx: g++
             build-type: Debug
@@ -77,8 +76,11 @@ jobs:
               - -DCHFL_SYSTEM_LZMA=ON
               - -DCHFL_SYSTEM_BZIP2=ON
               - -DCHFL_DISABLE_GEMMI=ON
+            setup-dependencies: |
+              sudo apt-get update
+              sudo apt-get install -y liblzma-dev libbz2-dev zlib1g-dev
           - name: Linux / gcc / 32-bit build
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             cc: gcc
             cxx: g++
             build-type: Debug
@@ -89,7 +91,7 @@ jobs:
               sudo apt-get update
               sudo apt-get install -y gcc-multilib g++-multilib
           - name: Linux / gcc-9 & cmake-3.16
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             container: ubuntu:20.04
             cc: gcc
             cxx: g++
@@ -98,7 +100,7 @@ jobs:
               apt-get update
               apt-get install -y cmake gcc g++ make python3
           # - name: Linux / emscripten
-          #   os: ubuntu-22.04
+          #   os: ubuntu-24.04
           #   cc: emcc
           #   cxx: emcc
           #   build-type: Debug
@@ -112,7 +114,7 @@ jobs:
           #     - -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-main/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
           #     - -DCMAKE_CROSSCOMPILING_EMULATOR=/home/runner/work/chemfiles/chemfiles/emsdk/emsdk-main/node/14.15.5_64bit/bin/node
           - name: Linux / valgrind
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             cc: gcc
             cxx: g++
             build-type: Debug
@@ -126,7 +128,7 @@ jobs:
           # macOS builder
           # ==
           - name: macOS / clang
-            os: macos-14
+            os: macos-15
             cc: clang
             cxx: clang++
             build-type: Debug
