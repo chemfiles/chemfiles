@@ -1,13 +1,14 @@
 # Update this value if you need to update the data file set
-set(TESTS_DATA_GIT "7610e0ba23bd8b03a4f74b039f8fe5f6b0a4873a")
+set(TESTS_DATA_GIT "e39b877ac29569e6d9e184907047383364c655cf")
 
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT}")
     message(STATUS "Downloading test data files")
     file(DOWNLOAD
-        "https://github.com/chemfiles/tests-data/archive/${TESTS_DATA_GIT}.tar.gz"
+        "https://github.com/VTX-Molecular-Visualization/chemfiles-tests-data/archive/${TESTS_DATA_GIT}.tar.gz" # To keep while in vtx fork
+        #"https://github.com/chemfiles/tests-data/archive/${TESTS_DATA_GIT}.tar.gz"
         "${CMAKE_CURRENT_BINARY_DIR}/${TESTS_DATA_GIT}.tar.gz"
         SHOW_PROGRESS
-        EXPECTED_HASH SHA1=a2da9634db29dc5a51f084a32b9cf4a35025b324
+        EXPECTED_HASH SHA1=664a284980d95fc96b95f80291883d47b03bc6f7 # curl -sL https://github.com/VTX-Molecular-Visualization/chemfiles-tests-data/archive/[commit_full_hash].tar.gz | sha1sum
     )
 
     message(STATUS "Unpacking test data files")
@@ -22,7 +23,8 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT}")
     )
 
     execute_process(
-        COMMAND ${CMAKE_COMMAND} -E rename tests-data-${TESTS_DATA_GIT} data
+        COMMAND ${CMAKE_COMMAND} -E rename chemfiles-tests-data-${TESTS_DATA_GIT} data
+        # COMMAND ${CMAKE_COMMAND} -E rename tests-data-${TESTS_DATA_GIT} data
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 
