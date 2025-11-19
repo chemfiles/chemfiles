@@ -4,8 +4,7 @@ set(TESTS_DATA_GIT "e39b877ac29569e6d9e184907047383364c655cf")
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT}")
     message(STATUS "Downloading test data files")
     file(DOWNLOAD
-        "https://github.com/VTX-Molecular-Visualization/chemfiles-tests-data/archive/${TESTS_DATA_GIT}.tar.gz" # To keep while in vtx fork
-        #"https://github.com/chemfiles/tests-data/archive/${TESTS_DATA_GIT}.tar.gz"
+        "https://github.com/chemfiles/tests-data/archive/${TESTS_DATA_GIT}.tar.gz"
         "${CMAKE_CURRENT_BINARY_DIR}/${TESTS_DATA_GIT}.tar.gz"
         SHOW_PROGRESS
         EXPECTED_HASH SHA1=664a284980d95fc96b95f80291883d47b03bc6f7 # curl -sL https://github.com/VTX-Molecular-Visualization/chemfiles-tests-data/archive/[commit_full_hash].tar.gz | sha1sum
