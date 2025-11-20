@@ -7,7 +7,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT}")
         "https://github.com/chemfiles/tests-data/archive/${TESTS_DATA_GIT}.tar.gz"
         "${CMAKE_CURRENT_BINARY_DIR}/${TESTS_DATA_GIT}.tar.gz"
         SHOW_PROGRESS
-        EXPECTED_HASH SHA1=664a284980d95fc96b95f80291883d47b03bc6f7 # curl -sL https://github.com/chemfiles/tests-data/archive/[commit_full_hash].tar.gz | sha1sum
+        EXPECTED_HASH SHA1=cf99614e876c1e326c73b028caab07cdb80120ce # curl -sL https://github.com/chemfiles/tests-data/archive/[commit_full_hash].tar.gz | sha1sum
     )
 
     message(STATUS "Unpacking test data files")
