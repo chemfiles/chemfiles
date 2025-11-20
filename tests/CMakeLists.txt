@@ -22,8 +22,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/data/${TESTS_DATA_GIT}")
     )
 
     execute_process(
-        COMMAND ${CMAKE_COMMAND} -E rename chemfiles-tests-data-${TESTS_DATA_GIT} data
-        # COMMAND ${CMAKE_COMMAND} -E rename tests-data-${TESTS_DATA_GIT} data
+        COMMAND ${CMAKE_COMMAND} -E rename tests-data-${TESTS_DATA_GIT} data
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 
