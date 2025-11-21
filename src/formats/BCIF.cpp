@@ -61,8 +61,8 @@ template<> const FormatMetadata& ::chemfiles::format_metadata<BCIFFormat>() {
     metadata.velocities = false;
     metadata.unit_cell = true;
     metadata.atoms = true;
-    metadata.bonds = false;  // Phase 2
-    metadata.residues = false;  // Phase 2
+    metadata.bonds = true;
+    metadata.residues = true;
     return metadata;
 }
 namespace
@@ -236,7 +236,7 @@ namespace msgpack {
         void parse_data_block(const msgpack::object & block, BCIFData & data) {
 
             if (block.type != msgpack::type::MAP) {
-                throw format_error("BCIF data block must be a map");
+                throw format_error("the BCIF data block must be a map");
             }
 
             // Get categories map
@@ -255,7 +255,7 @@ namespace msgpack {
             }
 
             if (!found_categories || categories_obj.type != msgpack::type::ARRAY) {
-                throw format_error("BCIF data block must contain a 'categories' array");
+                throw format_error("the BCIF data block must contain a categories array");
             }
 
             // Parse each category
@@ -1322,7 +1322,7 @@ namespace msgpack {
                     size = data_obj.via.ext.size;
                 }
                 else {
-                    throw format_error("ByteArray data must be binary or extension type");
+                    throw format_error("the ByteArray data must be binary or extension type");
                 }
 
                 // Extract type parameter - can be string or integer
@@ -1580,7 +1580,7 @@ namespace msgpack {
                 // Handle direct Float32/Float64 encoding
                 if (kind == "ByteArray" && (type_str == "Float32" || type_str == "Float64")) {
                     if (data_obj.type != msgpack::type::BIN) {
-                        throw format_error("ByteArray data must be binary type");
+                        throw format_error("the ByteArray data must be binary type");
                     }
                     const uint8_t* bytes = reinterpret_cast<const uint8_t*>(data_obj.via.bin.ptr);
                     size_t size = data_obj.via.bin.size;
@@ -1718,7 +1718,7 @@ namespace msgpack {
         std::vector<int32_t> decode_byte_array(const msgpack::object & data) {
             // ByteArray decoder: converts byte array from MessagePack to int32 array
             if (data.type != msgpack::type::BIN) {
-                throw format_error("ByteArray data must be binary type");
+                throw format_error("the ByteArray data must be binary type");
             }
 
             const uint8_t* bytes = reinterpret_cast<const uint8_t*>(data.via.bin.ptr);
@@ -1854,7 +1854,7 @@ namespace msgpack {
                 }
             }
             else {
-                throw format_error("IntegerPacking: unsupported byte count {}", byte_count);
+                throw format_error("the IntegerPacking: unsupported byte count {}", byte_count);
             }
 
             return result;
@@ -3305,7 +3305,7 @@ namespace chemfiles
 
     void BCIFFormat::read_at(size_t index, Frame& frame) {
         if (index >= data_.num_models) {
-            throw file_error("BCIF file contains {} models, cannot read model {}", data_.num_models, index);
+            throw file_error("the BCIF file contains {} models, cannot read model {}", data_.num_models, index);
         }
 
         model_index_ = index;
@@ -3608,7 +3608,7 @@ namespace chemfiles
 
     void BCIFFormat::read(Frame& frame) {
         if (!decoded_) {
-            throw file_error("BCIF file has not been decoded");
+            throw file_error("the BCIF file has not been decoded");
         }
 
         // Check that we have atom position data
