@@ -706,6 +706,7 @@ TEST_CASE("BCIF Compression Support") {
         test_args.residue_chain_ids.emplace(6, "A");  // Last residue of chain A
         test_args.residue_chain_ids.emplace(1, "B");  // First residue of chain B
         test_args.residue_chain_ids.emplace(6, "B"); // Last residue of chain B
+        test_args.atom_bonds.emplace(std::make_pair(9, 11), chemfiles::Bond::UNKNOWN); // inter-sugar bond declared in struct_conn. The bond order data is absent from this specific file.
         TestResults rslt = test_readwrite(test_args);
 
         CHECK(rslt.first_read.all_atom_count);
@@ -714,23 +715,16 @@ TEST_CASE("BCIF Compression Support") {
         CHECK(rslt.first_read.all_residue_count);
         CHECK(rslt.first_read.specific_residue_count);
         CHECK(rslt.first_read.residue_chains);
+        CHECK(rslt.first_read.bonds);
         CHECK(rslt.re_read.all_atom_count);
         CHECK(rslt.re_read.positions);
         CHECK(rslt.re_read.specific_atom_count);
         CHECK(rslt.re_read.all_residue_count);
         CHECK(rslt.re_read.specific_residue_count);
         CHECK(rslt.re_read.residue_chains);
+        CHECK(rslt.re_read.bonds);
+        CHECK(rslt.all_bonds_conserved);
 
-    }
-
-    SECTION("XZ compressed BCIF - not implemented yet") {
-        // Will be tested when .bcif.xz test files are available
-        WARN("XZ compression test - awaiting test file");
-    }
-
-    SECTION("BZ2 compressed BCIF - not implemented yet") {
-        // Will be tested when .bcif.bz2 test files are available
-        WARN("BZ2 compression test - awaiting test file");
     }
 }
 
@@ -963,7 +957,7 @@ TEST_CASE("Read-Write sample files","[samples]") {
         // standard intra-residue bonds
         test_args.atom_bonds.emplace(std::make_pair(3, 4), chemfiles::Bond::DOUBLE); 
         // standard inter-residue bonds
-        test_args.atom_bonds.emplace(std::make_pair(3, 9), chemfiles::Bond::SINGLE); 
+        test_args.atom_bonds.emplace(std::make_pair(3, 9), chemfiles::Bond::SINGLE); // Here the bond is created implicitly by linking consecutive residues as per the standard (I guess) so the bond should be single
         // Non-standard intra-residue bonds
         test_args.atom_bonds.emplace(std::make_pair(15774, 15775), chemfiles::Bond::SINGLE); 
         test_args.atom_bonds.emplace(std::make_pair(15614, 15636), chemfiles::Bond::SINGLE); 

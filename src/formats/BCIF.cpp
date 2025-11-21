@@ -65,6 +65,82 @@ template<> const FormatMetadata& ::chemfiles::format_metadata<BCIFFormat>() {
     metadata.residues = true;
     return metadata;
 }
+namespace chemfiles {
+
+    struct BCIFFormat::BCIFData {
+        // Atom site data
+        std::vector<double> atom_x;
+        std::vector<double> atom_y;
+        std::vector<double> atom_z;
+        std::vector<std::string> atom_type_symbol;
+        std::vector<std::string> atom_label;        // label_atom_id (primary)
+        std::vector<std::string> auth_atom_label;   // auth_atom_id (fallback)
+        std::vector<int32_t> atom_id;
+
+        // Residue data (from _atom_site category)
+        std::vector<std::string> residue_name;      // label_comp_id
+        std::vector<int32_t> residue_id;            // label_seq_id (primary)
+        std::vector<std::string> chain_id;          // label_asym_id (primary)
+        std::vector<std::string> insertion_code;    // pdbx_PDB_ins_code
+
+        // Author-provided identifiers (stored for round-trip writing)
+        std::vector<int32_t> auth_residue_id;       // auth_seq_id
+        std::vector<std::string> auth_chain_id;     // auth_asym_id
+
+        // Cell data
+        double cell_length_a = 0.0;
+        double cell_length_b = 0.0;
+        double cell_length_c = 0.0;
+        double cell_angle_alpha = 90.0;
+        double cell_angle_beta = 90.0;
+        double cell_angle_gamma = 90.0;
+
+        // Entry data
+        std::string entry_id;
+
+        // Model tracking
+        size_t num_models = 1;
+
+        // Secondary structure data (from _struct_conf category)
+        // Maps (chain_id, beg_seq_id) -> (chain_id, end_seq_id, conf_type_id)
+        using SecondaryStructureKey = std::pair<std::string, int32_t>;  // chain, resid
+        using SecondaryStructureRange = std::tuple<std::string, int32_t, std::string>;  // end_chain, end_resid, type
+        std::map<SecondaryStructureKey, SecondaryStructureRange> secondary_structures;
+
+        // Bond data (from _chem_comp_bond category)
+        // Component-level bond definitions (template bonds for residue types)
+        struct ChemCompBond {
+            std::string comp_id;              // Residue name
+            std::string atom_id_1;            // First atom name
+            std::string atom_id_2;            // Second atom name
+            std::string value_order;          // Bond order (sing, doub, trip, etc.)
+            std::string pdbx_aromatic_flag;   // For round-trip
+            std::string pdbx_stereo_config;   // For round-trip
+            int32_t pdbx_ordinal = 0;         // For round-trip
+        };
+        std::vector<ChemCompBond> chem_comp_bonds;
+
+        // Bond data (from _struct_conn category)
+        // Instance-specific bonds (inter-residue, metal coordination, disulfide, etc.)
+        struct StructConn {
+            struct LinkPartner
+            {
+                std::string label_asym_id;      // Chain ID 
+                std::string label_comp_id;      // Residue name 
+                int32_t label_seq_id;           // Residue ID
+                std::string label_atom_id;      // Atom name 
+            };
+            std::string conn_type_id;             // Type of connection (covale, disulf, metalc, etc.)
+            LinkPartner ptnr1, ptnr2;
+            std::string pdbx_value_order;         // Bond order
+        };
+        std::vector<StructConn> struct_conns;
+    };
+    void BCIFFormat::BCIFDataDtor::operator()(BCIFFormat::BCIFData* ptr) noexcept{
+        delete ptr;
+    };
+
+}
 namespace
 {
 
@@ -162,7 +238,8 @@ namespace
             case Bond::TRIPLE: return "TRIP";
             case Bond::QUADRUPLE: return "QUAD";
             case Bond::AROMATIC: return "AROM";
-            default: return "SING";  // Default to single
+            case Bond::UNKNOWN: return "?";
+            default: return "?";  
         }
     }
 }
@@ -1107,15 +1184,15 @@ namespace msgpack {
         {
             struct StructConnData
             {
+                struct LinkPartner
+                {
+                    std::vector<std::string> auth_asym_id;
+                    std::vector<std::string> auth_comp_id;
+                    std::vector<int32_t> auth_seq_id;
+                    std::vector<std::string> label_atom_id;
+                };
                 std::vector<std::string> conn_type_id;
-                std::vector<std::string> ptnr1_label_asym_id;
-                std::vector<std::string> ptnr1_label_comp_id;
-                std::vector<int32_t> ptnr1_label_seq_id;
-                std::vector<std::string> ptnr1_label_atom_id;
-                std::vector<std::string> ptnr2_label_asym_id;
-                std::vector<std::string> ptnr2_label_comp_id;
-                std::vector<int32_t> ptnr2_label_seq_id;
-                std::vector<std::string> ptnr2_label_atom_id;
+                LinkPartner ptnr1, ptnr2;
                 std::vector<std::string> pdbx_value_order;
 
             };
@@ -1127,20 +1204,19 @@ namespace msgpack {
                     out.push_back({});
                     BCIFData::StructConn& conn = out.back();
                     conn.conn_type_id = (i < struct_data.conn_type_id.size()) ? struct_data. conn_type_id[i] : "";
-                    conn.ptnr1_label_asym_id = (i < struct_data.ptnr1_label_asym_id.size()) ? struct_data. ptnr1_label_asym_id[i] : "";
-                    conn.ptnr1_label_comp_id = (i < struct_data.ptnr1_label_comp_id.size()) ? struct_data.ptnr1_label_comp_id[i] : "";
-                    conn.ptnr1_label_seq_id = (i < struct_data.ptnr1_label_seq_id.size()) ? struct_data.ptnr1_label_seq_id[i] : -1;
-                    conn.ptnr1_label_atom_id = (i < struct_data.ptnr1_label_atom_id.size()) ? struct_data.ptnr1_label_atom_id[i] : "";
-                    conn.ptnr2_label_asym_id = (i < struct_data.ptnr2_label_asym_id.size()) ? struct_data.ptnr2_label_asym_id[i] : "";
-                    conn.ptnr2_label_comp_id = (i < struct_data.ptnr2_label_comp_id.size()) ? struct_data.ptnr2_label_comp_id[i] : "";
-                    conn.ptnr2_label_seq_id = (i < struct_data.ptnr2_label_seq_id.size()) ? struct_data.ptnr2_label_seq_id[i] : -1;
-                    conn.ptnr2_label_atom_id = (i < struct_data.ptnr2_label_atom_id.size()) ? struct_data.ptnr2_label_atom_id[i] : "";
+                    conn.ptnr1.label_asym_id = (i < struct_data.ptnr1.auth_asym_id.size()) ? struct_data. ptnr1.auth_asym_id[i] : "";
+                    conn.ptnr1.label_comp_id = (i < struct_data.ptnr1.auth_comp_id.size()) ? struct_data.ptnr1.auth_comp_id[i] : "";
+                    conn.ptnr1.label_seq_id = (i < struct_data.ptnr1.auth_seq_id.size()) ? struct_data.ptnr1.auth_seq_id[i] : -1;
+                    conn.ptnr1.label_atom_id = (i < struct_data.ptnr1.label_atom_id.size()) ? struct_data.ptnr1.label_atom_id[i] : "";
+                    conn.ptnr2.label_asym_id = (i < struct_data.ptnr2.auth_asym_id.size()) ? struct_data.ptnr2.auth_asym_id[i] : "";
+                    conn.ptnr2.label_comp_id = (i < struct_data.ptnr2.auth_comp_id.size()) ? struct_data.ptnr2.auth_comp_id[i] : "";
+                    conn.ptnr2.label_seq_id = (i < struct_data.ptnr2.auth_seq_id.size()) ? struct_data.ptnr2.auth_seq_id[i] : -1;
+                    conn.ptnr2.label_atom_id = (i < struct_data.ptnr2.label_atom_id.size()) ? struct_data.ptnr2.label_atom_id[i] : "";
                     conn.pdbx_value_order = (i < struct_data.pdbx_value_order.size()) ? struct_data.pdbx_value_order[i] : "";
                 }
             }
             inline void parse_struct_conn_columns(const std::string& column_name, const msgpack::object& data_obj, const msgpack::object& mask_obj, const bool& has_mask, StructConnData& struct_data)
             {
-
                 // Decode mask if present
                 std::vector<int32_t> mask;
                 if (has_mask) {
@@ -1154,52 +1230,52 @@ namespace msgpack {
                         struct_data.conn_type_id = apply_mask_to_strings(struct_data.conn_type_id, mask);
                     }
                 }
-                else if (column_name == "ptnr1_label_asym_id") {
-                    struct_data.ptnr1_label_asym_id = decode_string_column(data_obj);
+                else if (column_name == "ptnr1_auth_asym_id") {
+                    struct_data.ptnr1.auth_asym_id = decode_string_column(data_obj);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr1_label_asym_id = apply_mask_to_strings(struct_data.ptnr1_label_asym_id, mask);
+                        struct_data.ptnr1.auth_asym_id = apply_mask_to_strings(struct_data.ptnr1.auth_asym_id, mask);
                     }
                 }
-                else if (column_name == "ptnr1_label_comp_id") {
-                    struct_data.ptnr1_label_comp_id = decode_string_column(data_obj);
+                else if (column_name == "ptnr1_auth_comp_id") {
+                    struct_data.ptnr1.auth_comp_id = decode_string_column(data_obj);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr1_label_comp_id = apply_mask_to_strings(struct_data.ptnr1_label_comp_id, mask);
+                        struct_data.ptnr1.auth_comp_id = apply_mask_to_strings(struct_data.ptnr1.auth_comp_id, mask);
                     }
                 }
-                else if (column_name == "ptnr1_label_seq_id") {
-                    struct_data.ptnr1_label_seq_id = decode_integer_column(data_obj);
+                else if (column_name == "ptnr1_auth_seq_id") {
+                    struct_data.ptnr1.auth_seq_id = decode_integer_column(data_obj);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr1_label_seq_id = apply_mask_to_integers(struct_data.ptnr1_label_seq_id, mask);
+                        struct_data.ptnr1.auth_seq_id = apply_mask_to_integers(struct_data.ptnr1.auth_seq_id, mask);
                     }
                 }
                 else if (column_name == "ptnr1_label_atom_id") {
-                    struct_data.ptnr1_label_atom_id = decode_string_column(data_obj);
+                    struct_data.ptnr1.label_atom_id = decode_string_column(data_obj);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr1_label_atom_id = apply_mask_to_strings(struct_data.ptnr1_label_atom_id, mask);
+                        struct_data.ptnr1.label_atom_id = apply_mask_to_strings(struct_data.ptnr1.label_atom_id, mask);
                     }
                 }
-                else if (column_name == "ptnr2_label_asym_id") {
-                    struct_data.ptnr2_label_asym_id = decode_string_column(data_obj);
+                else if (column_name == "ptnr2_auth_asym_id") {
+                    struct_data.ptnr2.auth_asym_id = decode_string_column(data_obj);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr2_label_asym_id = apply_mask_to_strings(struct_data.ptnr2_label_asym_id, mask);
+                        struct_data.ptnr2.auth_asym_id = apply_mask_to_strings(struct_data.ptnr2.auth_asym_id, mask);
                     }
                 }
-                else if (column_name == "ptnr2_label_comp_id") {
-                    struct_data.ptnr2_label_comp_id = decode_string_column(data_obj);
+                else if (column_name == "ptnr2_auth_comp_id") {
+                    struct_data.ptnr2.auth_comp_id = decode_string_column(data_obj);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr2_label_comp_id = apply_mask_to_strings(struct_data.ptnr2_label_comp_id, mask);
+                        struct_data.ptnr2.auth_comp_id = apply_mask_to_strings(struct_data.ptnr2.auth_comp_id, mask);
                     }
                 }
-                else if (column_name == "ptnr2_label_seq_id") {
-                    struct_data.ptnr2_label_seq_id = decode_integer_column(data_obj);
+                else if (column_name == "ptnr2_auth_seq_id") {
+                    struct_data.ptnr2.auth_seq_id = decode_integer_column(data_obj);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr2_label_seq_id = apply_mask_to_integers(struct_data.ptnr2_label_seq_id, mask);
+                        struct_data.ptnr2.auth_seq_id = apply_mask_to_integers(struct_data.ptnr2.auth_seq_id, mask);
                     }
                 }
                 else if (column_name == "ptnr2_label_atom_id") {
-                    struct_data.ptnr2_label_atom_id = decode_string_column(data_obj);
+                    struct_data.ptnr2.label_atom_id = decode_string_column(data_obj);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr2_label_atom_id = apply_mask_to_strings(struct_data.ptnr2_label_atom_id, mask);
+                        struct_data.ptnr2.label_atom_id = apply_mask_to_strings(struct_data.ptnr2.label_atom_id, mask);
                     }
                 }
                 else if (column_name == "pdbx_value_order") {
@@ -2871,17 +2947,16 @@ namespace msgpack {
         {
             struct EncodeStructConnData
             {
-
+                struct LinkPartner
+                {
+                std::vector<std::string> auth_asym_ids;
+                std::vector<std::string> auth_comp_ids;
+                std::vector<int32_t> auth_seq_ids;
+                std::vector<std::string> label_atom_ids;
+                };
                 std::vector<std::string> ids;
                 std::vector<std::string> conn_type_ids;
-                std::vector<std::string> ptnr1_label_asym_ids;
-                std::vector<std::string> ptnr1_label_comp_ids;
-                std::vector<int32_t> ptnr1_label_seq_ids;
-                std::vector<std::string> ptnr1_label_atom_ids;
-                std::vector<std::string> ptnr2_label_asym_ids;
-                std::vector<std::string> ptnr2_label_comp_ids;
-                std::vector<int32_t> ptnr2_label_seq_ids;
-                std::vector<std::string> ptnr2_label_atom_ids;
+                LinkPartner ptnr1, ptnr2;
                 std::vector<std::string> pdbx_value_orders;
             };
             inline bool is_peptide_bond(
@@ -2932,12 +3007,12 @@ namespace msgpack {
                     data.resid = residue1.id() ? static_cast<int32_t>(*residue1.id()) : 1;
                 }
             }
-            inline void append(EncodeStructConnData& struct_conn_data, const StructConnResidueData& data_residue, const std::string& atom_name)
+            inline void append_ptnr(EncodeStructConnData::LinkPartner& ptnr, const StructConnResidueData& data_residue, const std::string& atom_name)
             {
-                struct_conn_data.ptnr1_label_asym_ids.push_back(data_residue.chain);
-                struct_conn_data.ptnr1_label_comp_ids.push_back(data_residue.comp_id);
-                struct_conn_data.ptnr1_label_seq_ids.push_back(data_residue.resid);
-                struct_conn_data.ptnr1_label_atom_ids.push_back(atom_name);
+                ptnr.auth_asym_ids.push_back(data_residue.chain);
+                ptnr.auth_comp_ids.push_back(data_residue.comp_id);
+                ptnr.auth_seq_ids.push_back(data_residue.resid);
+                ptnr.label_atom_ids.push_back(atom_name);
             }
 
             inline void fill(const Frame& frame, EncodeStructConnData& struct_conn_data)
@@ -2992,11 +3067,12 @@ namespace msgpack {
                     struct_conn_data.ids.push_back("conn" + std::to_string(conn_id++));
                     struct_conn_data.conn_type_ids.push_back("covale");  // Covalent bond
 
-                    append(struct_conn_data, data_residue1, atom1_name);
-                    append(struct_conn_data, data_residue2, atom2_name);
+                    append_ptnr(struct_conn_data.ptnr1, data_residue1, atom1_name);
+                    append_ptnr(struct_conn_data.ptnr2, data_residue2, atom2_name);
 
                     struct_conn_data.pdbx_value_orders.push_back(bond_order_to_string(bond_order));
                 }
+
             }
 
             inline void pack(msgpack::packer<msgpack::sbuffer>& pk, const EncodeStructConnData& struct_conn_data)
@@ -3012,15 +3088,15 @@ namespace msgpack {
 
                 encode_string_column(pk, "id", struct_conn_data.ids);
                 encode_string_column(pk, "conn_type_id", struct_conn_data.conn_type_ids);
-                encode_string_column(pk, "ptnr1_label_asym_id", struct_conn_data.ptnr1_label_asym_ids);
-                encode_string_column(pk, "ptnr1_label_comp_id", struct_conn_data.ptnr1_label_comp_ids);
-                encode_integer_column(pk, "ptnr1_label_seq_id", struct_conn_data.ptnr1_label_seq_ids);
-                encode_string_column(pk, "ptnr1_label_atom_id", struct_conn_data.ptnr1_label_atom_ids);
-                encode_string_column(pk, "ptnr2_label_asym_id", struct_conn_data.ptnr2_label_asym_ids);
-                encode_string_column(pk, "ptnr2_label_comp_id", struct_conn_data.ptnr2_label_comp_ids);
-                encode_integer_column(pk, "ptnr2_label_seq_id", struct_conn_data.ptnr2_label_seq_ids);
-                encode_string_column(pk, "ptnr2_label_atom_id", struct_conn_data.ptnr2_label_atom_ids);
-                encode_string_column(pk, "pdbx_value_order", struct_conn_data.pdbx_value_orders);
+                encode_string_column(pk, "ptnr1_auth_asym_id",  struct_conn_data.ptnr1.auth_asym_ids);
+                encode_string_column(pk, "ptnr1_auth_comp_id",  struct_conn_data.ptnr1.auth_comp_ids);
+                encode_integer_column(pk, "ptnr1_auth_seq_id",  struct_conn_data.ptnr1.auth_seq_ids);
+                encode_string_column(pk, "ptnr1_label_atom_id", struct_conn_data.ptnr1.label_atom_ids);
+                encode_string_column(pk, "ptnr2_auth_asym_id",  struct_conn_data.ptnr2.auth_asym_ids);
+                encode_string_column(pk, "ptnr2_auth_comp_id",  struct_conn_data.ptnr2.auth_comp_ids);
+                encode_integer_column(pk, "ptnr2_auth_seq_id",  struct_conn_data.ptnr2.auth_seq_ids);
+                encode_string_column(pk, "ptnr2_label_atom_id", struct_conn_data.ptnr2.label_atom_ids);
+                encode_string_column(pk, "pdbx_value_order",    struct_conn_data.pdbx_value_orders);
             }
         }
         void encode_struct_conn_category(msgpack::packer<msgpack::sbuffer>& pk, const Frame& frame) {
@@ -3266,7 +3342,9 @@ namespace msgpack {
 namespace chemfiles
 {
 
-    BCIFFormat::BCIFFormat(std::string path, File::Mode mode, File::Compression compression) {
+    BCIFFormat::BCIFFormat(std::string path, File::Mode mode, File::Compression compression)
+        : data_(new BCIFData()) 
+    {
         if (mode == File::READ) {
             auto file = TextFile(std::move(path), mode, compression);
             auto buffer = file.readall();
@@ -3287,7 +3365,9 @@ namespace chemfiles
         }
     }
 
-    BCIFFormat::BCIFFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression) {
+    BCIFFormat::BCIFFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression) 
+        : data_(new BCIFData()) 
+    {
         if (mode == File::WRITE) {
             throw format_error("the BCIF format cannot write to memory");
         }
@@ -3300,12 +3380,12 @@ namespace chemfiles
 
 
     size_t BCIFFormat::size() {
-        return data_.num_models;
+        return data_->num_models;
     }
 
     void BCIFFormat::read_at(size_t index, Frame& frame) {
-        if (index >= data_.num_models) {
-            throw file_error("the BCIF file contains {} models, cannot read model {}", data_.num_models, index);
+        if (index >= data_->num_models) {
+            throw file_error("the BCIF file contains {} models, cannot read model {}", data_->num_models, index);
         }
 
         model_index_ = index;
@@ -3516,6 +3596,119 @@ namespace chemfiles
 
         }
 
+        inline void create_bonds_from_struct_conn(const BCIFFormat::BCIFData& data_, Frame& frame)
+        {
+            // Add bonds from _struct_conn
+            // These are instance-specific bonds: inter-residue bonds, metal coordination, disulfides, etc.
+            for (const auto& conn : data_.struct_conns) {
+                // Find atom 1 by matching chain/residue/atom identifiers
+                size_t atom1_idx = static_cast<size_t>(-1);
+                size_t atom2_idx = static_cast<size_t>(-1);
+
+                // Search for both atoms in residues
+                for (const auto& residue : frame.topology().residues()) {
+                    // Check if this residue might contain atom 1 or atom 2
+                    auto chain_prop = residue.get("chainid");
+                    std::string res_chain = chain_prop ? chain_prop->as_string() : "";
+                    auto res_id_opt = residue.id();
+                    if (!res_id_opt) {
+                        continue;
+                    }
+                    int32_t res_id = static_cast<int32_t>(*res_id_opt);
+
+                    // When label_seq_id is negative (typically -1), ignore sequence ID matching
+                    // and match only by chain and residue name
+                    bool is_atom1_residue = (res_chain == conn.ptnr1.label_asym_id &&
+                                             residue.name() == conn.ptnr1.label_comp_id &&
+                                             (conn.ptnr1.label_seq_id < 0 || res_id == conn.ptnr1.label_seq_id));
+                    bool is_atom2_residue = (res_chain == conn.ptnr2.label_asym_id &&
+                                             residue.name() == conn.ptnr2.label_comp_id &&
+                                             (conn.ptnr2.label_seq_id < 0 || res_id == conn.ptnr2.label_seq_id));
+
+                    if (is_atom1_residue || is_atom2_residue) {
+                        for (size_t atom_idx : residue) {
+                            if (atom_idx < frame.size()) {
+                                const std::string& atom_name = frame[atom_idx].name();
+
+                                if (is_atom1_residue && atom_name == conn.ptnr1.label_atom_id &&
+                                    atom1_idx == static_cast<size_t>(-1)) {
+                                    atom1_idx = atom_idx;
+                                }
+                                if (is_atom2_residue && atom_name == conn.ptnr2.label_atom_id &&
+                                    atom2_idx == static_cast<size_t>(-1)) {
+                                    atom2_idx = atom_idx;
+                                }
+                            }
+                        }
+                    }
+
+                    // Break early if we found both atoms
+                    if (atom1_idx != static_cast<size_t>(-1) && atom2_idx != static_cast<size_t>(-1)) {
+                        break;
+                    }
+                }
+
+                // If we haven't found the atoms in residues, search all atoms
+                // (handles atoms not belonging to any residue, like solvents or ions)
+                if (atom1_idx == static_cast<size_t>(-1) || atom2_idx == static_cast<size_t>(-1)) {
+                    for (size_t atom_idx = 0; atom_idx < frame.size(); ++atom_idx) {
+                        const std::string& atom_name = frame[atom_idx].name();
+
+                        // Try to match atom 1
+                        if (atom1_idx == static_cast<size_t>(-1) && atom_name == conn.ptnr1.label_atom_id) {
+                            auto residue_opt = frame.topology().residue_for_atom(atom_idx);
+                            bool matches_residue = !residue_opt;  // Matches if no residue
+                            if (residue_opt) {
+                                const auto& residue = residue_opt.value();
+                                auto chain_prop = residue.get("chainid");
+                                std::string res_chain = chain_prop ? chain_prop->as_string() : "";
+                                auto res_id_opt = residue.id();
+                                int32_t res_id = res_id_opt ? static_cast<int32_t>(*res_id_opt) : -1;
+                                matches_residue = (res_chain == conn.ptnr1.label_asym_id &&
+                                                 res_id == conn.ptnr1.label_seq_id &&
+                                                 residue.name() == conn.ptnr1.label_comp_id);
+                            }
+                            if (matches_residue) {
+                                atom1_idx = atom_idx;
+                            }
+                        }
+
+                        // Try to match atom 2
+                        if (atom2_idx == static_cast<size_t>(-1) && atom_name == conn.ptnr2.label_atom_id) {
+                            auto residue_opt = frame.topology().residue_for_atom(atom_idx);
+                            bool matches_residue = !residue_opt;  // Matches if no residue
+                            if (residue_opt) {
+                                const auto& residue = residue_opt.value();
+                                auto chain_prop = residue.get("chainid");
+                                std::string res_chain = chain_prop ? chain_prop->as_string() : "";
+                                auto res_id_opt = residue.id();
+                                int32_t res_id = res_id_opt ? static_cast<int32_t>(*res_id_opt) : -1;
+                                matches_residue = (res_chain == conn.ptnr2.label_asym_id &&
+                                                 res_id == conn.ptnr2.label_seq_id &&
+                                                 residue.name() == conn.ptnr2.label_comp_id);
+                            }
+                            if (matches_residue) {
+                                atom2_idx = atom_idx;
+                            }
+                        }
+
+                        if (atom1_idx != static_cast<size_t>(-1) && atom2_idx != static_cast<size_t>(-1)) {
+                            break;
+                        }
+                    }
+                }
+
+                // Add the bond if we found both atoms
+                if (atom1_idx != static_cast<size_t>(-1) &&
+                    atom2_idx != static_cast<size_t>(-1) &&
+                    atom1_idx != atom2_idx) {
+
+                    Bond::BondOrder bond_order = parse_bond_order(conn.pdbx_value_order);
+                    frame.add_bond(atom1_idx, atom2_idx, bond_order);
+                } 
+            }
+        }
+
         inline void create_bonds_interResidues_chain(const BCIFFormat::BCIFData& data_, std::vector<size_t>& chain_residues, Frame& frame) 
         {
             auto& residues = frame.topology().residues();
@@ -3568,9 +3761,13 @@ namespace chemfiles
                 }
             }
         }
-        inline void create_bonds_interResidues(const BCIFFormat::BCIFData& data_, Frame& frame) 
+        inline void create_bonds_interResidues(const BCIFFormat::BCIFData& data_, Frame& frame)
         {
-            // Add peptide bonds between consecutive residues on the same chain
+            // First, add explicit bonds from _struct_conn (inter-residue bonds, disulfides, etc.)
+            create_bonds_from_struct_conn(data_, frame);
+
+            
+            // Then add automatic peptide bonds between consecutive residues on the same chain
             // Peptide bond: C atom of residue N connects to N atom of residue N+1
             auto& residues = frame.topology().residues();
 
@@ -3597,6 +3794,7 @@ namespace chemfiles
                     });
                 create_bonds_interResidues_chain(data_, chain_residues, frame);
             }
+            
         }
         inline void create_bonds(const BCIFFormat::BCIFData& data_, Frame& frame)
         {
@@ -3612,32 +3810,32 @@ namespace chemfiles
         }
 
         // Check that we have atom position data
-        if (data_.atom_x.empty() || data_.atom_y.empty() || data_.atom_z.empty()) {
+        if (data_->atom_x.empty() || data_->atom_y.empty() || data_->atom_z.empty()) {
             throw format_error("BCIF file does not contain atom position data");
         }
 
-        const size_t& natoms = data_.atom_x.size();
-        if (natoms != data_.atom_y.size() || natoms != data_.atom_z.size()) {
+        const size_t& natoms = data_->atom_x.size();
+        if (natoms != data_->atom_y.size() || natoms != data_->atom_z.size()) {
             throw format_error("BCIF atom coordinate arrays have inconsistent sizes");
         }
 
-        create_atoms(data_, frame);
-        create_atoms(data_, frame);
+        create_atoms(*data_, frame);
+        create_atoms(*data_, frame);
 
         // Set unit cell
-        if (data_.cell_length_a > 0.0 && data_.cell_length_b > 0.0 && data_.cell_length_c > 0.0) {
-            Vector3D lengths = { data_.cell_length_a, data_.cell_length_b, data_.cell_length_c };
-            Vector3D angles = { data_.cell_angle_alpha, data_.cell_angle_beta, data_.cell_angle_gamma };
+        if (data_->cell_length_a > 0.0 && data_->cell_length_b > 0.0 && data_->cell_length_c > 0.0) {
+            Vector3D lengths = { data_->cell_length_a, data_->cell_length_b, data_->cell_length_c };
+            Vector3D angles = { data_->cell_angle_alpha, data_->cell_angle_beta, data_->cell_angle_gamma };
             frame.set_cell({ lengths, angles });
         }
 
         // Set PDB ID code if available
-        if (!data_.entry_id.empty()) {
-            frame.set("pdb_idcode", data_.entry_id);
+        if (!data_->entry_id.empty()) {
+            frame.set("pdb_idcode", data_->entry_id);
         }
 
-        create_residues(data_, frame);
-        create_bonds(data_, frame);
+        create_residues(*data_, frame);
+        create_bonds(*data_, frame);
 
         // For now, we only support single model
         model_index_++;
@@ -3716,7 +3914,7 @@ namespace chemfiles
 
             // Parse the first data block (single structure for Phase 1)
             // Call the free function in the msgpack namespace
-            msgpack::parse_data_block(data_blocks.ptr[0], data_);
+            msgpack::parse_data_block(data_blocks.ptr[0], *data_);
 
             decoded_ = true;
 
@@ -3753,22 +3951,14 @@ namespace chemfiles
 
             // Categories array
             pk.pack("categories");
-            pk.pack_array(5);  // _atom_site + _cell + _struct_conf + _struct_sheet_range + _chem_comp_bond 
+            pk.pack_array(6); 
 
-            // === _atom_site category ===
             msgpack::encode_atom_site_category(pk, frame);
-
-            // === _cell category ===
             msgpack::encode_cell_category(pk, frame);
-
-            // === _struct_conf category ===
             msgpack::encode_struct_conf_category(pk, frame);
-
-            // === _struct_sheet_range category ===
             msgpack::encode_struct_sheet_range_category(pk, frame);
-
-            // === _chem_comp_bond category ===
             msgpack::encode_chem_comp_bond_category(pk, frame);
+            msgpack::encode_struct_conn_category(pk, frame);
 
             // Convert buffer to vector
             std::vector<char> result(buffer.data(), buffer.data() + buffer.size());
