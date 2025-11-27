@@ -2959,11 +2959,42 @@ namespace msgpack {
                 LinkPartner ptnr1, ptnr2;
                 std::vector<std::string> pdbx_value_orders;
             };
+            inline bool is_phosphate_bond(
+                const std::experimental::optional<const Residue&>& residue1_opt
+                , const std::string& atom1_name
+                , const std::string& chain1
+                , const std::experimental::optional<const Residue&>& residue2_opt
+                , const std::string& atom2_name
+                , const std::string& chain2
+            )
+            {
+                // Skip phosphate bonds - they'll be created automatically on read
+                // Phosphate bond: O3' atom of residue N connects to P atom of residue N+1 on same chain
+                bool is_phosphate_bond = false;
+                if (residue1_opt && residue2_opt) {
+                    const auto& residue1 = residue1_opt.value();
+                    const auto& residue2 = residue2_opt.value();
+                    auto id1 = residue1.id();
+                    auto id2 = residue2.id();
+
+                    // Check if consecutive residues on same chain
+                    bool consecutive = (id1 && id2 && (*id2 == *id1 + 1 || *id1 == *id2 + 1));
+                    bool same_chain = (chain1 == chain2);
+
+                    if (consecutive && same_chain) {
+                        // Check if it's an O3'-P phosphate bond
+                        is_phosphate_bond = ((atom1_name == "O3'" && atom2_name == "P") ||
+                            (atom1_name == "P" && atom2_name == "O3'"));
+                    }
+                }
+                return is_phosphate_bond;
+            }
+
             inline bool is_peptide_bond(
                 const std::experimental::optional<const Residue&>& residue1_opt
                 , const std::string& atom1_name
                 , const std::string& chain1
-                , const std::experimental::optional<const Residue&>& residue2_opt 
+                , const std::experimental::optional<const Residue&>& residue2_opt
                 , const std::string& atom2_name
                 , const std::string& chain2
             )
@@ -3061,6 +3092,10 @@ namespace msgpack {
 
                     if (is_peptide_bond(residue1_opt, atom1_name, data_residue1.chain, residue2_opt, atom2_name, data_residue2.chain)) {
                         continue;  // Skip peptide bonds
+                    }
+
+                    if (is_phosphate_bond(residue1_opt, atom1_name, data_residue1.chain, residue2_opt, atom2_name, data_residue2.chain)) {
+                        continue;  // Skip phosphate bonds
                     }
 
                     // Add the connection
@@ -3709,11 +3744,23 @@ namespace chemfiles
             }
         }
 
-        inline void create_bonds_interResidues_chain(const BCIFFormat::BCIFData& data_, std::vector<size_t>& chain_residues, Frame& frame) 
+        // Helper function to check if a residue is a nucleotide (RNA or DNA)
+        inline bool is_nucleotide(const std::string& residue_name) {
+            // Common RNA nucleotides
+            if (residue_name == "A" || residue_name == "C" || residue_name == "G" || residue_name == "U" ||
+                residue_name == "DA" || residue_name == "DC" || residue_name == "DG" || residue_name == "DT") {
+                return true;
+            }
+            // Modified nucleotides often have single letter codes or variants
+            // We can expand this list if needed
+            return false;
+        }
+
+        inline void create_bonds_interResidues_chain(const BCIFFormat::BCIFData& data_, std::vector<size_t>& chain_residues, Frame& frame)
         {
             auto& residues = frame.topology().residues();
 
-            // Create peptide bonds between consecutive residues
+            // Create inter-residue bonds between consecutive residues
             for (size_t i = 0; i + 1 < chain_residues.size(); ++i) {
                 const auto& residue_n = residues[chain_residues[i]];
                 const auto& residue_n1 = residues[chain_residues[i + 1]];
@@ -3721,41 +3768,88 @@ namespace chemfiles
                 // Check if residues have consecutive IDs
                 auto id_n = residue_n.id();
                 auto id_n1 = residue_n1.id();
+                bool are_residue_consecutive_in_id = id_n && id_n1 && (*id_n1 == *id_n + 1);
 
-                if (id_n && id_n1 && (*id_n1 == *id_n + 1)) {
-                    // Find C atom in residue N
-                    size_t c_atom_idx = static_cast<size_t>(-1);
-                    for (size_t atom_idx : residue_n) {
-                        if (atom_idx < frame.size() && frame[atom_idx].name() == "C") {
-                            c_atom_idx = atom_idx;
-                            break;
-                        }
-                    }
+                if (are_residue_consecutive_in_id) {
+                    // Check if this is a nucleotide chain (RNA/DNA)
+                    bool is_nucleotide_chain = is_nucleotide(residue_n.name()) && is_nucleotide(residue_n1.name());
 
-                    // Find N atom in residue N+1
-                    size_t n_atom_idx = static_cast<size_t>(-1);
-                    for (size_t atom_idx : residue_n1) {
-                        if (atom_idx < frame.size() && frame[atom_idx].name() == "N") {
-                            n_atom_idx = atom_idx;
-                            break;
-                        }
-                    }
+                    if (is_nucleotide_chain) {
+                        // Phosphate bond: O3' atom of residue N connects to P atom of residue N+1
+                        // Note: O3' is the 3' oxygen in the ribose/deoxyribose sugar
 
-                    // Create peptide bond if both atoms found
-                    if (c_atom_idx != static_cast<size_t>(-1) &&
-                        n_atom_idx != static_cast<size_t>(-1)) {
-                        // Check if bond doesn't already exist
-                        bool bond_exists = false;
-                        for (const auto& existing_bond : frame.topology().bonds()) {
-                            if ((existing_bond[0] == c_atom_idx && existing_bond[1] == n_atom_idx) ||
-                                (existing_bond[0] == n_atom_idx && existing_bond[1] == c_atom_idx)) {
-                                bond_exists = true;
+                        // Find O3' atom in residue N
+                        size_t o3p_atom_idx = static_cast<size_t>(-1);
+                        for (size_t atom_idx : residue_n) {
+                            if (atom_idx < frame.size() && frame[atom_idx].name() == "O3'") {
+                                o3p_atom_idx = atom_idx;
                                 break;
                             }
                         }
 
-                        if (!bond_exists) {
-                            frame.add_bond(c_atom_idx, n_atom_idx, Bond::SINGLE);
+                        // Find P atom in residue N+1
+                        size_t p_atom_idx = static_cast<size_t>(-1);
+                        for (size_t atom_idx : residue_n1) {
+                            if (atom_idx < frame.size() && frame[atom_idx].name() == "P") {
+                                p_atom_idx = atom_idx;
+                                break;
+                            }
+                        }
+
+                        // Create phosphate bond if both atoms found
+                        if (o3p_atom_idx != static_cast<size_t>(-1) &&
+                            p_atom_idx != static_cast<size_t>(-1)) {
+                            // Check if bond doesn't already exist
+                            bool bond_exists = false;
+                            for (const auto& existing_bond : frame.topology().bonds()) {
+                                if ((existing_bond[0] == o3p_atom_idx && existing_bond[1] == p_atom_idx) ||
+                                    (existing_bond[0] == p_atom_idx && existing_bond[1] == o3p_atom_idx)) {
+                                    bond_exists = true;
+                                    break;
+                                }
+                            }
+
+                            if (!bond_exists) {
+                                frame.add_bond(o3p_atom_idx, p_atom_idx, Bond::SINGLE);
+                            }
+                        }
+                    } else {
+                        // Peptide bond: C atom of residue N connects to N atom of residue N+1
+
+                        // Find C atom in residue N
+                        size_t c_atom_idx = static_cast<size_t>(-1);
+                        for (size_t atom_idx : residue_n) {
+                            if (atom_idx < frame.size() && frame[atom_idx].name() == "C") {
+                                c_atom_idx = atom_idx;
+                                break;
+                            }
+                        }
+
+                        // Find N atom in residue N+1
+                        size_t n_atom_idx = static_cast<size_t>(-1);
+                        for (size_t atom_idx : residue_n1) {
+                            if (atom_idx < frame.size() && frame[atom_idx].name() == "N") {
+                                n_atom_idx = atom_idx;
+                                break;
+                            }
+                        }
+
+                        // Create peptide bond if both atoms found
+                        if (c_atom_idx != static_cast<size_t>(-1) &&
+                            n_atom_idx != static_cast<size_t>(-1)) {
+                            // Check if bond doesn't already exist
+                            bool bond_exists = false;
+                            for (const auto& existing_bond : frame.topology().bonds()) {
+                                if ((existing_bond[0] == c_atom_idx && existing_bond[1] == n_atom_idx) ||
+                                    (existing_bond[0] == n_atom_idx && existing_bond[1] == c_atom_idx)) {
+                                    bond_exists = true;
+                                    break;
+                                }
+                            }
+
+                            if (!bond_exists) {
+                                frame.add_bond(c_atom_idx, n_atom_idx, Bond::SINGLE);
+                            }
                         }
                     }
                 }

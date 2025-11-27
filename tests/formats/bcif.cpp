@@ -990,5 +990,39 @@ TEST_CASE("Read-Write sample files","[samples]") {
         CHECK(rslt.all_atom_id_conserved);
         CHECK(rslt.all_bonds_conserved);
     }
+    SECTION("1l9z") {
+        ReadWriteTestArgs test_args{ "data/bcif/1l9z.bcif.gz" };
+        test_args.atom_count = 10078 ;
+        test_args.specific_atom_counts.emplace("C", 6569);
+        test_args.specific_atom_counts.emplace("P", 63);
+        test_args.specific_atom_positions.emplace(10044, Vector3D(87.804,  211.745, 237.246));
+        //test_args.residue_count = ;
+
+        // standard intra-nucleic acid phosphate bonds
+        test_args.atom_bonds.emplace(std::make_pair(619,622 ), chemfiles::Bond::SINGLE); 
+
+        TestResults rslt = test_readwrite(test_args);
+
+        CHECK(rslt.first_read.all_atom_count);
+        CHECK(rslt.first_read.positions);
+        CHECK(rslt.first_read.specific_atom_count);
+        //CHECK(rslt.first_read.all_residue_count);
+        CHECK(rslt.first_read.specific_residue_count);
+        CHECK(rslt.first_read.residue_chains);
+        CHECK(rslt.first_read.secondary_structures);
+        CHECK(rslt.first_read.bonds);
+        CHECK(rslt.first_read.all_atom_have_id);
+        CHECK(rslt.re_read.all_atom_count);
+        CHECK(rslt.re_read.positions);
+        CHECK(rslt.re_read.specific_atom_count);
+        //CHECK(rslt.re_read.all_residue_count);
+        CHECK(rslt.re_read.specific_residue_count);
+        CHECK(rslt.re_read.residue_chains);
+        CHECK(rslt.re_read.secondary_structures);
+        CHECK(rslt.re_read.bonds);
+        CHECK(rslt.re_read.all_atom_have_id);
+        CHECK(rslt.all_atom_id_conserved);
+        CHECK(rslt.all_bonds_conserved);
+    }
 
 }
