@@ -78,7 +78,7 @@ namespace
         size_t idx = 0;
         for (auto& it_atom : frame.topology()) {
 
-            const uint64_t id = static_cast<uint64_t>(it_atom.get("id").value_or(0ui64).as_double());
+            const uint64_t id = static_cast<uint64_t>(it_atom.get("id").value_or(0).as_double());
             if (args.specific_atom_positions.count(id) > 0)
             {
                 rslt.positions |= approx_eq(frame.positions()[idx], args.specific_atom_positions.at(id), 1.0E-3);
