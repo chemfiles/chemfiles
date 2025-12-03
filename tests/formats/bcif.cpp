@@ -33,6 +33,8 @@ namespace
         ReadResultsMatch re_read;
         bool all_atom_id_conserved = false;
         bool all_bonds_conserved = false;
+        bool all_residues_conserved = false;
+        bool all_ss_conserved = false;
     };
     struct ReadWriteTestArgs
     {
@@ -316,17 +318,57 @@ namespace
 
         // Read back
         auto read_traj = Trajectory(tmpfile, 'r');
-        Frame read_frame = read_traj.read();
-        test(read_frame, args, out.re_read);
+        Frame reread_frame = read_traj.read();
+        test(reread_frame, args, out.re_read);
         size_t re_read_hash;
-        out.re_read.all_atom_have_id = hash_atom_ids(read_frame, re_read_hash);
+        out.re_read.all_atom_have_id = hash_atom_ids(reread_frame, re_read_hash);
         out.all_atom_id_conserved = re_read_hash == first_read_hash;
-        out.all_bonds_conserved = hash_bonds(original_frame) == hash_bonds(read_frame);
+        out.all_bonds_conserved = hash_bonds(original_frame) == hash_bonds(reread_frame);
 
         // Check atom types match
-        for (size_t i = 0; i < read_frame.size(); ++i) {
-            CHECK(read_frame[i].type() == original_frame[i].type());
+        for (size_t i = 0; i < reread_frame.size(); ++i) {
+            CHECK(reread_frame[i].type() == original_frame[i].type());
         }
+
+        // Check ss types match
+        auto& residues_orig = original_frame.topology().residues();
+        auto& residues_rere = reread_frame.topology().residues();
+        out.all_residues_conserved = residues_orig.size() == residues_rere.size();
+        if (!out.all_residues_conserved)
+        {
+            std::cerr << "Number of residues not consistent : " << residues_orig.size() << " v.s. " << residues_rere.size() << "\n";
+        }
+
+        out.all_ss_conserved = true;  // Initialize to true, will be set to false on first mismatch
+        size_t ss_num_orig = 0, ss_num_rere = 0;
+        if (out.all_residues_conserved)
+        {
+            for (size_t res_idx = 0; res_idx < residues_orig.size(); ++res_idx) {
+                auto& res_orig = residues_orig[res_idx];
+                auto& res_rere = residues_rere[res_idx];
+                std::string ss_orig, ss_rere;
+                auto maybe_ss_orig = res_orig.get("secondary_structure");
+                if (maybe_ss_orig)
+                    ss_orig = maybe_ss_orig.value().as_string();
+                auto maybe_ss_rere = res_rere.get("secondary_structure");
+                if (maybe_ss_rere)
+                    ss_rere = maybe_ss_rere.value().as_string();  // FIX: was ss_orig
+                if (ss_orig != ss_rere)
+                {
+                    out.all_ss_conserved = false;
+                    std::cerr << "residue ss mismatch : <" << ss_orig << "> v.s. <" << ss_rere << ">\n";
+                }
+                if (!ss_orig.empty())
+                    ss_num_orig++;
+                if (!ss_rere.empty())
+                    ss_num_rere++;
+            }
+        }
+        if (out.all_ss_conserved == false)
+        {
+            std::cerr << "Number of SS in original : " << ss_num_orig << "\n" << "Number of SS in reread : " << ss_num_rere << "\n";
+        }
+
         return out;
     }
 
@@ -690,7 +732,7 @@ TEST_CASE("Write files in BCIF format") {
 }
 
 
-TEST_CASE("BCIF Compression Support") {
+TEST_CASE("BCIF Compression Support", "[samples]") {
     SECTION("GZ compressed BCIF") {
         // Will be tested when .bcif.gz test files are available
         ReadWriteTestArgs test_args{ "data/bcif/1aga.bcif.gz" };
@@ -728,62 +770,22 @@ TEST_CASE("BCIF Compression Support") {
     }
 }
 
-TEST_CASE("Read-Write sample files","[samples]") {
-    SECTION("9bhh") {
-        ReadWriteTestArgs test_args{ "data/bcif/9bhh.bcif.gz" };
-        test_args.atom_count = 92756;
-        test_args.specific_atom_counts.emplace("C", 29452);
-        test_args.specific_atom_counts.emplace("O", 8976);
-        test_args.specific_atom_counts.emplace("H", 45956);
-        test_args.specific_atom_counts.emplace("N", 8052);
-        test_args.specific_atom_counts.emplace("S", 320);
-        test_args.specific_atom_positions.emplace(1, Vector3D(240.978, 304.206 ,134.229));
-        test_args.specific_atom_positions.emplace(82459, Vector3D(207.612, 170.359, 178.770));
-        test_args.specific_atom_positions.emplace(50219, Vector3D(244.862, 196.782, 249.481));
-        test_args.specific_residue_counts.emplace("HIS", 180);
-        test_args.specific_residue_counts.emplace("SER", 524);
-        test_args.specific_residue_counts.emplace("ILE", 244);
-        test_args.residue_count = 6088;
-        test_args.residue_chain_ids.emplace(1, "A");
-        test_args.residue_chain_ids.emplace(438, "A");
-        test_args.residue_chain_ids.emplace(1, "B");
-        test_args.residue_chain_ids.emplace(438, "B");        
-        test_args.residue_chain_ids.emplace(1, "L");  
-        test_args.residue_chain_ids.emplace(213, "L");  
-        test_args.secondary_structures.emplace(ReadWriteTestArgs::ResKey{ 112, "A"}, "right-handed alpha helix");
-        test_args.secondary_structures.emplace(ReadWriteTestArgs::ResKey{ 250, "D"}, "right-handed alpha helix");
-        test_args.secondary_structures.emplace(ReadWriteTestArgs::ResKey{ 21, "U"}, "right-handed alpha helix");
-        test_args.secondary_structures.emplace(ReadWriteTestArgs::ResKey{ 2, "A"}, "extended");
-        test_args.secondary_structures.emplace(ReadWriteTestArgs::ResKey{ 27, "A"}, "extended");
-        test_args.secondary_structures.emplace(ReadWriteTestArgs::ResKey{ 260, "B"}, "extended");
-
+TEST_CASE("Speed bench", "[.]") {
+    SECTION("3j3q") {
+        using namespace chemfiles;
         auto t0 = std::chrono::steady_clock::now();
 
-        TestResults rslt = test_readwrite(test_args);
-        auto t1 = std::chrono::steady_clock::now();
-        std::cout << "9bhh test elapsed time : " << std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(t1 - t0).count() << "ms\n";
 
-        CHECK(rslt.first_read.all_atom_count);
-        CHECK(rslt.first_read.positions);
-        CHECK(rslt.first_read.specific_atom_count);
-        CHECK(rslt.first_read.all_residue_count);
-        CHECK(rslt.first_read.specific_residue_count);
-        CHECK(rslt.first_read.residue_chains);
-        CHECK(rslt.first_read.secondary_structures);
-        CHECK(rslt.first_read.bonds);
-        CHECK(rslt.first_read.all_atom_have_id);
-        CHECK(rslt.re_read.all_atom_count);
-        CHECK(rslt.re_read.positions);
-        CHECK(rslt.re_read.specific_atom_count);
-        CHECK(rslt.re_read.all_residue_count);
-        CHECK(rslt.re_read.specific_residue_count);
-        CHECK(rslt.re_read.residue_chains);
-        CHECK(rslt.re_read.secondary_structures);
-        CHECK(rslt.re_read.bonds);
-        CHECK(rslt.re_read.all_atom_have_id);
-        CHECK(rslt.all_atom_id_conserved);
-        CHECK(rslt.all_bonds_conserved);
+        auto original_traj = Trajectory("C:\\Users\\Valen\\Desktop\\tmp\\3j3q.bcif.gz");
+        Frame original_frame = original_traj.read();
+
+
+        auto t1 = std::chrono::steady_clock::now();
+        std::cout << "3j3q test elapsed time : " << std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(t1 - t0).count() << "ms\n";
+
     }
+}
+TEST_CASE("Read-Write sample files","[samples]") {
     SECTION("9jze") {
         ReadWriteTestArgs test_args{ "data/bcif/9jze.bcif.gz" };
         test_args.atom_count = 7070;
@@ -834,6 +836,8 @@ TEST_CASE("Read-Write sample files","[samples]") {
         CHECK(rslt.re_read.all_atom_have_id);
         CHECK(rslt.all_atom_id_conserved);
         CHECK(rslt.all_bonds_conserved);
+        CHECK(rslt.all_residues_conserved);
+        CHECK(rslt.all_ss_conserved);
     }
     SECTION("5m5e") {
         ReadWriteTestArgs test_args{ "data/bcif/5m5e.bcif.gz" };
@@ -881,6 +885,8 @@ TEST_CASE("Read-Write sample files","[samples]") {
         CHECK(rslt.re_read.all_atom_have_id);
         CHECK(rslt.all_atom_id_conserved);
         CHECK(rslt.all_bonds_conserved);
+        CHECK(rslt.all_residues_conserved);
+        CHECK(rslt.all_ss_conserved);
     }
     SECTION("9y48") {
         ReadWriteTestArgs test_args{ "data/bcif/9y48.bcif.gz" };
@@ -928,6 +934,8 @@ TEST_CASE("Read-Write sample files","[samples]") {
         CHECK(rslt.re_read.all_atom_have_id);
         CHECK(rslt.all_atom_id_conserved);
         CHECK(rslt.all_bonds_conserved);
+        CHECK(rslt.all_residues_conserved);
+        CHECK(rslt.all_ss_conserved);
     }
     SECTION("4nxo") {
         ReadWriteTestArgs test_args{ "data/bcif/4nxo.bcif.gz" };
@@ -989,6 +997,8 @@ TEST_CASE("Read-Write sample files","[samples]") {
         CHECK(rslt.re_read.all_atom_have_id);
         CHECK(rslt.all_atom_id_conserved);
         CHECK(rslt.all_bonds_conserved);
+        CHECK(rslt.all_residues_conserved);
+        CHECK(rslt.all_ss_conserved);
     }
     SECTION("1l9z") {
         ReadWriteTestArgs test_args{ "data/bcif/1l9z.bcif.gz" };
@@ -1023,6 +1033,8 @@ TEST_CASE("Read-Write sample files","[samples]") {
         CHECK(rslt.re_read.all_atom_have_id);
         CHECK(rslt.all_atom_id_conserved);
         CHECK(rslt.all_bonds_conserved);
+        CHECK(rslt.all_residues_conserved);
+        CHECK(rslt.all_ss_conserved);
     }
 
 }

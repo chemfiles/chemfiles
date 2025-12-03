@@ -18,6 +18,7 @@
 #include <filesystem>
 #include <iostream>
 #include <iomanip>
+#include <unordered_set>
 
 // Include msgpack headers
 #include <msgpack.hpp>
@@ -65,6 +66,28 @@ template<> const FormatMetadata& ::chemfiles::format_metadata<BCIFFormat>() {
     metadata.residues = true;
     return metadata;
 }
+
+// Hash function for std::pair<std::string, std::string> used in ChemCompMap
+namespace std {
+    template<>
+    struct hash<std::pair<std::string, std::string>> {
+        size_t operator()(const std::pair<std::string, std::string>& p) const {
+            auto h1 = std::hash<std::string>{}(p.first);
+            auto h2 = std::hash<std::string>{}(p.second);
+            // Combine hash values using a simple approach
+            return h1 ^ (h2 << 1);
+        }
+    };
+    template<>
+    struct hash<std::pair<size_t, size_t>> {
+        size_t operator()(const std::pair<size_t, size_t>& p) const {
+            auto h1 = std::hash<size_t>{}(p.first);
+            auto h2 = std::hash<size_t>{}(p.second);
+            // Combine hash values using a simple approach
+            return h1 ^ (h2 << 1);
+        }
+    };
+}
 namespace chemfiles {
 
     struct BCIFFormat::BCIFData {
@@ -101,11 +124,9 @@ namespace chemfiles {
         // Model tracking
         size_t num_models = 1;
 
-        // Secondary structure data (from _struct_conf category)
-        // Maps (chain_id, beg_seq_id) -> (chain_id, end_seq_id, conf_type_id)
-        using SecondaryStructureKey = std::pair<std::string, int32_t>;  // chain, resid
-        using SecondaryStructureRange = std::tuple<std::string, int32_t, std::string>;  // end_chain, end_resid, type
-        std::map<SecondaryStructureKey, SecondaryStructureRange> secondary_structures;
+        // Secondary structure data
+        using ChainNameResId = std::pair<std::string, uint32_t>;
+        std::map<ChainNameResId, const char*> secondary_structure_map;
 
         // Bond data (from _chem_comp_bond category)
         // Component-level bond definitions (template bonds for residue types)
@@ -119,6 +140,13 @@ namespace chemfiles {
             int32_t pdbx_ordinal = 0;         // For round-trip
         };
         std::vector<ChemCompBond> chem_comp_bonds;
+        using AtomName = std::string;
+        using ResName = std::string;
+        using BondOrder = std::string;
+        using ChemCompMapKey = std::pair<ResName, AtomName>;
+        using ChemCompMapValue = std::pair<AtomName, BondOrder>;
+        using ChemCompMap = std::unordered_multimap<ChemCompMapKey, ChemCompMapValue>;
+        ChemCompMap chem_comp_bonds_map;
 
         // Bond data (from _struct_conn category)
         // Instance-specific bonds (inter-residue, metal coordination, disulfide, etc.)
@@ -135,12 +163,20 @@ namespace chemfiles {
             std::string pdbx_value_order;         // Bond order
         };
         std::vector<StructConn> struct_conns;
+        
+        using ChaineName = std::string;
+        using SeqId = int32_t;
+        using StructConnMapKey = std::tuple<ChaineName, ResName, SeqId, AtomName>;
+        using StructConnMap = std::map<StructConnMapKey, StructConn*>;
+        StructConnMap struct_conn_map;
     };
     void BCIFFormat::BCIFDataDtor::operator()(BCIFFormat::BCIFData* ptr) noexcept{
         delete ptr;
     };
 
 }
+
+
 namespace
 {
 
@@ -158,9 +194,10 @@ namespace
         "2-7 ribbon/helix",
         "polyproline",
     };
+    static const char* PDB_BETA_SHEET = "extended";
 
     // Convert BCIF/mmCIF conf_type_id to PDB-style secondary structure name
-    std::string bcif_to_pdb_secondary_structure(const std::string& conf_type_id) {
+    const char* bcif_to_pdb_secondary_structure(const std::string& conf_type_id) {
         // BCIF/mmCIF conf_type_id values from mmCIF dictionary
         // See: http://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v50.dic/Items/_struct_conf.conf_type_id.html
 
@@ -185,7 +222,7 @@ namespace
         if (conf_type_id.find("TURN") == 0) return "turn";
 
         // If unknown, return the original value
-        return conf_type_id;
+        return nullptr;
     }
 
     // Convert PDB-style secondary structure name back to BCIF conf_type_id
@@ -829,7 +866,7 @@ namespace msgpack {
 
                     // Store the secondary structure range
                     // Determine the secondary structure type
-                    std::string pdb_ss_type;
+                    const char* pdb_ss_type = nullptr;
 
                     // Check if this is a helix with pdbx_PDB_helix_class specified
                     if (i < struct_data.pdbx_PDB_helix_class.size() && struct_data.pdbx_PDB_helix_class[i] >= 1 && struct_data.pdbx_PDB_helix_class[i] <= 10) {
@@ -841,9 +878,12 @@ namespace msgpack {
                         pdb_ss_type = bcif_to_pdb_secondary_structure(struct_data.conf_type_id[i]);
                     }
 
-                    BCIFData::SecondaryStructureKey key = std::make_pair(beg_chain, beg_resid);
-                    BCIFData::SecondaryStructureRange range = std::make_tuple(end_chain, end_resid, pdb_ss_type);
-                    data.secondary_structures[key] = range;
+
+                    if (beg_chain == end_chain)
+                        for (size_t resid = beg_resid; resid <= static_cast<size_t>(end_resid); resid++)
+                        {
+                            data.secondary_structure_map[BCIFFormat::BCIFData::ChainNameResId(beg_chain, static_cast<uint32_t>(resid))] = pdb_ss_type;
+                        }
                 }
             }
         }
@@ -997,10 +1037,11 @@ namespace msgpack {
                         end_resid = struct_data.end_auth_seq_id[i];
                     }
 
-                    // Store the beta sheet range (all sheets use "extended" as the secondary structure type)
-                    BCIFData::SecondaryStructureKey key = std::make_pair(beg_chain, beg_resid);
-                    BCIFData::SecondaryStructureRange range = std::make_tuple(end_chain, end_resid, "extended");
-                    data.secondary_structures[key] = range;
+                    if (beg_chain == end_chain)
+                        for (size_t resid = beg_resid; resid <= static_cast<size_t>(end_resid); resid++)
+                        {
+                            data.secondary_structure_map[std::make_pair(beg_chain, static_cast<uint32_t>(resid))] = PDB_BETA_SHEET;
+                        }
                 }
             }
         }
@@ -1115,7 +1156,8 @@ namespace msgpack {
                     }
                 }
             }
-            inline void generate_bonds(const ChemCompBondData& bond_data, std::vector<BCIFFormat::BCIFData::ChemCompBond>& out)
+
+            inline void generate_bonds(const ChemCompBondData& bond_data, std::vector<BCIFFormat::BCIFData::ChemCompBond>& out, BCIFFormat::BCIFData::ChemCompMap& map)
             {
                 // Build the bond list
                 size_t num_entries = bond_data.comp_id.size();
@@ -1130,6 +1172,15 @@ namespace msgpack {
                     bond.pdbx_aromatic_flag = (i < bond_data.pdbx_aromatic_flag.size()) ? bond_data.pdbx_aromatic_flag[i] : "";
                     bond.pdbx_stereo_config = (i < bond_data.pdbx_stereo_config.size()) ? bond_data.pdbx_stereo_config[i] : "";
                     bond.pdbx_ordinal = (i < bond_data.pdbx_ordinal.size()) ? bond_data.pdbx_ordinal[i] : 0;
+
+                    // Insert bond into map (bidirectional: atom1->atom2 and atom2->atom1)
+                    BCIFFormat::BCIFData::ChemCompMapKey key1{ bond.comp_id, bond.atom_id_1 };
+                    BCIFFormat::BCIFData::ChemCompMapValue val1{ bond.atom_id_2, bond.value_order };
+                    BCIFFormat::BCIFData::ChemCompMapKey key2{ bond.comp_id, bond.atom_id_2 };
+                    BCIFFormat::BCIFData::ChemCompMapValue val2{ bond.atom_id_1, bond.value_order };
+
+                    map.insert({ key1, val1 });
+                    map.insert({ key2, val2 });
                 }
 
             }
@@ -1177,7 +1228,7 @@ namespace msgpack {
 
                 parse_chem_comp_bond_column(column_name, data_obj, mask_obj, has_mask, bond_data);
             }
-            generate_bonds(bond_data, data.chem_comp_bonds);
+            generate_bonds(bond_data, data.chem_comp_bonds, data.chem_comp_bonds_map);
         }
 
         namespace
@@ -1196,10 +1247,11 @@ namespace msgpack {
                 std::vector<std::string> pdbx_value_order;
 
             };
-            inline void generate_structconn(const StructConnData& struct_data, std::vector<BCIFFormat::BCIFData::StructConn>& out)
+            inline void generate_structconn(const StructConnData& struct_data, std::vector<BCIFFormat::BCIFData::StructConn>& out, BCIFFormat::BCIFData::StructConnMap& map)
             {
                 // Build struct_conn entries
                 size_t num_conns = struct_data.conn_type_id.size();
+                out.reserve(num_conns);
                 for (size_t i = 0; i < num_conns; ++i) {
                     out.push_back({});
                     BCIFData::StructConn& conn = out.back();
@@ -1213,6 +1265,12 @@ namespace msgpack {
                     conn.ptnr2.label_seq_id = (i < struct_data.ptnr2.auth_seq_id.size()) ? struct_data.ptnr2.auth_seq_id[i] : -1;
                     conn.ptnr2.label_atom_id = (i < struct_data.ptnr2.label_atom_id.size()) ? struct_data.ptnr2.label_atom_id[i] : "";
                     conn.pdbx_value_order = (i < struct_data.pdbx_value_order.size()) ? struct_data.pdbx_value_order[i] : "";
+                    // WIP
+                    BCIFFormat::BCIFData::StructConnMapKey k1{ conn.ptnr1.label_asym_id , conn.ptnr1.label_comp_id , conn.ptnr1.label_seq_id, conn.ptnr1.label_atom_id};
+                    BCIFFormat::BCIFData::StructConnMapKey k2{ conn.ptnr2.label_asym_id , conn.ptnr2.label_comp_id , conn.ptnr2.label_seq_id, conn.ptnr2.label_atom_id};
+                    map[k1] = &conn;
+                    map[k2] = &conn;
+                    // !WIP
                 }
             }
             inline void parse_struct_conn_columns(const std::string& column_name, const msgpack::object& data_obj, const msgpack::object& mask_obj, const bool& has_mask, StructConnData& struct_data)
@@ -1330,7 +1388,7 @@ namespace msgpack {
                 }
                 parse_struct_conn_columns(column_name, data_obj, mask_obj, has_mask, struct_data);
             }
-            generate_structconn(struct_data, data.struct_conns);
+            generate_structconn(struct_data, data.struct_conns, data.struct_conn_map);
         }
 
         namespace
@@ -3181,8 +3239,8 @@ namespace msgpack {
             pk.pack("data");
             // Encode as Float64 ByteArray
             auto binary_data = encode_byte_array_float64(data);
-            pk.pack_bin(binary_data.size());
-            pk.pack_bin_body(reinterpret_cast<const char*>(binary_data.data()), binary_data.size());
+            pk.pack_bin(static_cast<uint32_t>(binary_data.size()));
+            pk.pack_bin_body(reinterpret_cast<const char*>(binary_data.data()), static_cast<uint32_t>(binary_data.size()));
 
             pk.pack("encoding");
             pk.pack_array(1);  // Single encoding: ByteArray
@@ -3209,8 +3267,8 @@ namespace msgpack {
 
                 // offsets
                 pk.pack("offsets");
-                pk.pack_bin(offsets_binary.size());
-                pk.pack_bin_body(reinterpret_cast<const char*>(offsets_binary.data()), offsets_binary.size());
+                pk.pack_bin(static_cast<uint32_t>(offsets_binary.size()));
+                pk.pack_bin_body(reinterpret_cast<const char*>(offsets_binary.data()), static_cast<uint32_t>(offsets_binary.size()));
             }
             inline void build_encode_string_data(const std::vector<std::string>& data, std::string& string_data)
             {
@@ -3260,8 +3318,8 @@ namespace msgpack {
             auto packed_data = encode_integer_packing(rl_encoded, byte_count, is_unsigned);
 
             pk.pack("data");
-            pk.pack_bin(packed_data.size());
-            pk.pack_bin_body(reinterpret_cast<const char*>(packed_data.data()), packed_data.size());
+            pk.pack_bin(static_cast<uint32_t>(packed_data.size()));
+            pk.pack_bin_body(reinterpret_cast<const char*>(packed_data.data()), static_cast<uint32_t>(packed_data.size()));
 
             // Encoding specification
             pk.pack("encoding");
@@ -3334,8 +3392,8 @@ namespace msgpack {
             auto packed_data = encode_integer_packing(rl_encoded, byte_count, is_unsigned);
 
             pk.pack("data");
-            pk.pack_bin(packed_data.size());
-            pk.pack_bin_body(reinterpret_cast<const char*>(packed_data.data()), packed_data.size());
+            pk.pack_bin(static_cast<uint32_t>(packed_data.size()));
+            pk.pack_bin_body(reinterpret_cast<const char*>(packed_data.data()), static_cast<uint32_t>(packed_data.size()));
 
             // Encoding specification
             pk.pack("encoding");
@@ -3429,6 +3487,29 @@ namespace chemfiles
 
     namespace
     {
+        struct DataProfile
+        {
+            DataProfile(const BCIFFormat::BCIFData& data)
+                :
+                atom_type_size_ok(data.atom_z.size() == data.atom_type_symbol.size()),
+                atom_authLabel_size_ok(data.atom_z.size() == data.auth_atom_label.size()),
+                atom_label_size_ok(data.atom_z.size() == data.atom_label.size()),
+                atom_id_size_ok(data.atom_z.size() == data.atom_id.size()),
+                residue_data_size_ok(data.atom_z.size() == data.residue_name.size()  &&
+                   data.atom_z.size() == data.residue_id.size()                      &&
+                   data.atom_z.size() == data.chain_id.size()                        &&
+                   data.atom_z.size() == data.insertion_code.size()                  &&
+                   data.atom_z.size() == data.auth_residue_id.size()                 &&
+                   data.atom_z.size() == data.auth_chain_id.size())
+            { }
+
+            bool atom_type_size_ok =         false;
+            bool atom_authLabel_size_ok =    false;
+            bool atom_label_size_ok =        false;
+            bool atom_id_size_ok =           false;
+            bool residue_data_size_ok =      false;
+        };
+
         inline void create_atoms(const BCIFFormat::BCIFData& data_, Frame& frame)
         {
             // Set up the frame
@@ -3468,6 +3549,15 @@ namespace chemfiles
             }
 
         }
+
+        inline void assign_secondary_structure(const BCIFFormat::BCIFData& data_, const std::string& chain_id, const int64_t& residue_id, chemfiles::Residue& residue)
+        {
+            BCIFFormat::BCIFData::ChainNameResId ss_mapKey{ chain_id, static_cast<uint32_t>(residue_id) };
+            if (data_.secondary_structure_map.count(ss_mapKey) > 0)
+            {
+                residue.set("secondary_structure", data_.secondary_structure_map.at(ss_mapKey));
+            }
+        }
         inline void create_residues(const BCIFFormat::BCIFData& data_, Frame& frame)
         {
             const size_t& natoms = data_.atom_x.size();
@@ -3490,6 +3580,15 @@ namespace chemfiles
                     Resid residue_id = data_.residue_id[i];
                     Resname residue_name = data_.residue_name[i];
                     std::string ins_code = (i < data_.insertion_code.size()) ? data_.insertion_code[i] : "";
+                    BCIFFormat::BCIFData::StructConn* struct_conn = nullptr;
+                    {
+                        //BCIFFormat::BCIFData::StructConnMap::key_type struct_conn_key = std::make_pair(
+                        //    chain_id.data(), residue_name.data()
+                        //);
+                        //if (data_.struct_conn_map.count(struct_conn_key) > 0)
+                        //    struct_conn = data_.struct_conn_map.at(struct_conn_key);
+                    }
+
 
                     // Normalize insertion code: treat empty string, "?", and "." as the same (no insertion)
                     if (ins_code == "?" || ins_code == ".") {
@@ -3509,36 +3608,16 @@ namespace chemfiles
                         }
 
                         // Store auth values as properties for round-trip writing
+                        std::string chaineName;
                         if (i < data_.auth_chain_id.size() && !data_.auth_chain_id[i].empty()) {
-                            residue.set("chainname", data_.auth_chain_id[i]);
+                            chaineName = data_.auth_chain_id[i];
                         }
+                        residue.set("chainname", chaineName);
                         if (i < data_.auth_residue_id.size()) {
                             residue.set("auth_seq_id", data_.auth_residue_id[i]);
                         }
 
-                        // Apply secondary structure if this residue is in a secondary structure range
-                        // Check if this residue is the start of a secondary structure
-                        BCIFFormat::BCIFData::SecondaryStructureKey ss_key = std::make_pair(chain_id, residue_id);
-                        auto ss_it = data_.secondary_structures.find(ss_key);
-                        if (ss_it != data_.secondary_structures.end()) {
-                            // This is the start of a secondary structure range
-                            const auto& [end_chain, end_resid, ss_type] = ss_it->second;
-                            residue.set("secondary_structure", ss_type);
-                        }
-                        else {
-                            // Check if this residue is within any secondary structure range
-                            for (const auto& [ss_start_key, ss_range] : data_.secondary_structures) {
-                                const auto& [start_chain, start_resid] = ss_start_key;
-                                const auto& [end_chain, end_resid, ss_type] = ss_range;
-
-                                // Check if this residue is in the range (same chain, between start and end)
-                                if (chain_id == start_chain && chain_id == end_chain &&
-                                    residue_id >= start_resid && residue_id <= end_resid) {
-                                    residue.set("secondary_structure", ss_type);
-                                    break;
-                                }
-                            }
-                        }
+                        assign_secondary_structure(data_, chain_id, residue_id, residue);
 
                         size_t residue_idx = residues.size();
                         residues.push_back(residue);
@@ -3565,6 +3644,7 @@ namespace chemfiles
             }
 
         }
+        /*
         inline void create_bonds_intraResidues(const BCIFFormat::BCIFData& data_, Frame& frame)
         {
             // Add bonds from _chem_comp_bond
@@ -3623,14 +3703,13 @@ namespace chemfiles
                         atom1_idx != atom2_idx &&  // Don't bond atom to itself
                         atom1_idx < frame.size() &&
                         atom2_idx < frame.size()) {
-                        frame.add_bond(atom1_idx, atom2_idx, bond_order);
+                        //frame.add_bond(atom1_idx, atom2_idx, bond_order); // TODO
                         bonds_applied++;
                     }
                 }
             }
 
         }
-
         inline void create_bonds_from_struct_conn(const BCIFFormat::BCIFData& data_, Frame& frame)
         {
             // Add bonds from _struct_conn
@@ -3739,23 +3818,44 @@ namespace chemfiles
                     atom1_idx != atom2_idx) {
 
                     Bond::BondOrder bond_order = parse_bond_order(conn.pdbx_value_order);
-                    frame.add_bond(atom1_idx, atom2_idx, bond_order);
+                    //frame.add_bond(atom1_idx, atom2_idx, bond_order);
                 } 
             }
         }
+        */
 
+        using AtomIndex = size_t;
         // Helper function to check if a residue is a nucleotide (RNA or DNA)
         inline bool is_nucleotide(const std::string& residue_name) {
-            // Common RNA nucleotides
-            if (residue_name == "A" || residue_name == "C" || residue_name == "G" || residue_name == "U" ||
-                residue_name == "DA" || residue_name == "DC" || residue_name == "DG" || residue_name == "DT") {
-                return true;
-            }
-            // Modified nucleotides often have single letter codes or variants
-            // We can expand this list if needed
-            return false;
+             return (residue_name == "A" || residue_name == "C" || residue_name == "G" || residue_name == "U" ||
+                    residue_name == "DA" || residue_name == "DC" || residue_name == "DG" || residue_name == "DT");
+        }
+        inline bool is_aminoacide(const std::string& residue_name) {
+            return
+                residue_name == "ALA" ||
+                residue_name == "ARG" ||
+                residue_name == "ASN" ||
+                residue_name == "ASP" ||
+                residue_name == "CYS" ||
+                residue_name == "GLN" ||
+                residue_name == "GLU" ||
+                residue_name == "GLY" ||
+                residue_name == "HIS" ||
+                residue_name == "ILE" ||
+                residue_name == "LEU" ||
+                residue_name == "LYS" ||
+                residue_name == "MET" ||
+                residue_name == "PHE" ||
+                residue_name == "PRO" ||
+                residue_name == "SER" ||
+                residue_name == "THR" ||
+                residue_name == "TRP" ||
+                residue_name == "TYR" ||
+                residue_name == "VAL"
+                ;
         }
 
+        /*
         inline void create_bonds_interResidues_chain(const BCIFFormat::BCIFData& data_, std::vector<size_t>& chain_residues, Frame& frame)
         {
             auto& residues = frame.topology().residues();
@@ -3848,7 +3948,7 @@ namespace chemfiles
                             }
 
                             if (!bond_exists) {
-                                frame.add_bond(c_atom_idx, n_atom_idx, Bond::SINGLE);
+                                //frame.add_bond(c_atom_idx, n_atom_idx, Bond::SINGLE); // TODO
                             }
                         }
                     }
@@ -3857,7 +3957,7 @@ namespace chemfiles
         }
         inline void create_bonds_interResidues(const BCIFFormat::BCIFData& data_, Frame& frame)
         {
-            // First, add explicit bonds from _struct_conn (inter-residue bonds, disulfides, etc.)
+            // First, add explicit bonds from _struct_conn (ligands bonds, disulfides, etc.)
             create_bonds_from_struct_conn(data_, frame);
 
             
@@ -3895,6 +3995,233 @@ namespace chemfiles
             create_bonds_intraResidues(data_, frame);
             create_bonds_interResidues(data_, frame);
         }
+        */
+
+        inline void create_intra_residue_bonds(const BCIFFormat::BCIFData::ChemCompMap& chemcomp_map, const std::string& resname, const std::map<BCIFFormat::BCIFData::AtomName, AtomIndex>& atoms, Frame& frame)
+        {
+            std::unordered_set<std::pair<AtomIndex, AtomIndex>> bounded_atoms; // Avoid bounding the same pair twice
+
+            for (auto& [it_atomName, it_atomIndex] : atoms)
+            {
+                std::pair< BCIFFormat::BCIFData::ResName, BCIFFormat::BCIFData::AtomName> key{resname, it_atomName };
+                auto [begin, end] = chemcomp_map.equal_range(key);
+                for (auto it2_bonds = begin; it2_bonds != end; ++it2_bonds)
+                {
+                    auto& [it2_resname, it2_AtomName1] = it2_bonds->first;
+                    auto& [it2_atomName2, it2_bondOrder] = it2_bonds->second;
+                    if (atoms.count(it2_atomName2) == 0)
+                        continue;
+
+                    std::pair<AtomIndex, AtomIndex> p12(it_atomIndex, atoms.at(it2_atomName2));
+                    std::pair<AtomIndex, AtomIndex> p21(atoms.at(it2_atomName2), it_atomIndex);
+
+                    if (bounded_atoms.count(p12) > 0 && bounded_atoms.count(p21))
+                        continue;
+
+                    Bond::BondOrder bond_order = parse_bond_order(it2_bondOrder);
+                    frame.add_bond(it_atomIndex, atoms.at(it2_atomName2), bond_order);
+                    bounded_atoms.insert(std::move(p12));
+                    bounded_atoms.insert(std::move(p21));
+                }
+            }
+
+        }
+        inline bool is_residue_forward_binder(const std::string& atomName)
+        {
+            return atomName == "C" || atomName == "O3'";
+        }
+        inline bool is_residue_backward_binder(const std::string& atomName)
+        {
+            return atomName == "N" || atomName == "P";
+        }
+        inline size_t get_inter_residue_binder(const std::map<BCIFFormat::BCIFData::AtomName, AtomIndex>& atoms)
+        {
+            for (auto& [it_atomName, it_atomIndex] : atoms)
+            {
+                if (is_residue_forward_binder(it_atomName))
+                    return it_atomIndex;
+            }
+            return 0xffffffffffffffff;
+        }
+        inline bool expect_implicit_inter_residue_bonding(const std::string& res_name)
+        {
+            return (is_nucleotide(res_name) || is_aminoacide(res_name));
+        }
+        // Check if residue data matches the placeholder pattern used for atoms without residues
+        inline bool is_placeholder_residue_data(const std::string& res_name, int32_t res_id, const std::string& chain_id) {
+            return res_name == "UNK" && res_id == 1 && chain_id == "A";
+        }
+
+        inline void create_residue(
+            const BCIFFormat::BCIFData& data,
+            Frame& frame,
+            const std::string& res_name,
+            const int32_t& res_id,
+            const std::map<BCIFFormat::BCIFData::AtomName, AtomIndex>& atoms_waiting_for_residue_data,
+            const size_t& it_atomIndex,
+            size_t& previous_inter_residue_forward_linking_atom,
+            size_t& current_inter_residue_forward_linking_atom
+        )
+        {
+            const size_t last_index = it_atomIndex - 1;
+
+            // Skip creating residues for atoms with placeholder residue data
+            // These are atoms that didn't belong to any residue in the original file
+            if (is_placeholder_residue_data(res_name, res_id, data.chain_id[last_index])) {
+                previous_inter_residue_forward_linking_atom = current_inter_residue_forward_linking_atom;
+                current_inter_residue_forward_linking_atom = 0xffffffffffffffff;
+                return;
+            }
+
+            create_intra_residue_bonds(data.chem_comp_bonds_map, res_name, atoms_waiting_for_residue_data, frame);
+            Residue residue(res_name, res_id);
+            residue.set("chainid", data.chain_id[last_index]);
+            residue.set("insertion_code", data.insertion_code[last_index]);
+            residue.set("chainname", data.auth_chain_id[last_index]);
+            residue.set("auth_seq_id", static_cast<double>(data.auth_residue_id[last_index]));
+            for (auto& [_, it_atomIdx] : atoms_waiting_for_residue_data)
+            {
+                residue.add_atom(it_atomIdx);
+            }
+            assign_secondary_structure(data, data.chain_id[last_index], data.residue_id[last_index], residue);
+            frame.add_residue(std::move(residue));
+
+            previous_inter_residue_forward_linking_atom = current_inter_residue_forward_linking_atom;
+            current_inter_residue_forward_linking_atom = 0xffffffffffffffff;
+
+        }
+        inline void fill_atomistic_data(const BCIFFormat::BCIFData& data, const DataProfile& profile, Frame& frame)
+        {
+            const size_t& natoms = data.atom_x.size();
+            frame.resize(natoms);
+            // TODO : make room in the bond collection for 3*natoms
+            auto positions = frame.positions();
+
+            std::map<BCIFFormat::BCIFData::StructConnMapKey, AtomIndex> atoms_waiting_for_struct_conn_bounding;
+            std::map<BCIFFormat::BCIFData::AtomName, AtomIndex> atoms_waiting_for_residue_data;
+            size_t previous_inter_residue_forward_linking_atom = 0xffffffffffffffff;
+            size_t current_inter_residue_forward_linking_atom = 0xffffffffffffffff;
+            bool just_changed_chain = false;
+            bool just_changed_residue = false;
+
+            const std::string* chain_name = nullptr;
+            const std::string*   res_name = nullptr;
+            const int32_t*         res_id = nullptr;
+
+            size_t it_atomIndex = 0; // We need the variable to survive after the loop to create the last residue
+            for (; it_atomIndex < natoms; ++it_atomIndex) {
+
+                just_changed_chain = it_atomIndex > 0 
+                    && profile.residue_data_size_ok 
+                    && data.chain_id[it_atomIndex - 1] != data.chain_id[it_atomIndex];
+                just_changed_residue = it_atomIndex > 0
+                    && (
+                        just_changed_chain || (
+                            profile.residue_data_size_ok 
+                            && (
+                                data.residue_id[it_atomIndex - 1] != data.residue_id[it_atomIndex]
+                                || data.residue_name[it_atomIndex - 1] != data.residue_name[it_atomIndex]
+                                )
+                            )
+                    );
+
+                // When I wrote the implementation, the version of chemfiles didn't allow to modify a residue once it was added to the frame.
+                // To work around it, we create the residue N - 1 once we iterate on the first atom of residue N. 
+                if (just_changed_residue)
+                {
+                    create_residue(data, frame, *res_name, *res_id, atoms_waiting_for_residue_data, it_atomIndex, previous_inter_residue_forward_linking_atom, current_inter_residue_forward_linking_atom);
+                    atoms_waiting_for_residue_data.clear();
+                    just_changed_residue = false;
+                }
+
+                chain_name = nullptr;
+                res_name = nullptr;
+                res_id = nullptr;
+
+                if (just_changed_chain)
+                {
+                    // we don't bound residues from different chains
+                    previous_inter_residue_forward_linking_atom = 0xffffffffffffffff;
+                    just_changed_chain = false;
+                }
+
+                if (profile.residue_data_size_ok)
+                {
+                    chain_name = &data.chain_id[it_atomIndex];
+                    res_name = &data.residue_name[it_atomIndex];
+                    res_id = &data.residue_id[it_atomIndex];
+                }
+                bool fetched_all_residue_data = res_name != nullptr && chain_name != nullptr && res_id != nullptr;
+                
+                std::string atom_type = "X";
+                std::string atom_name = "";
+
+                if (profile.atom_type_size_ok)
+                    atom_type = data.atom_type_symbol[it_atomIndex];
+                if (profile.atom_authLabel_size_ok)
+                    atom_name = data.auth_atom_label[it_atomIndex];
+                else if (profile.atom_label_size_ok)
+                    atom_name = data.atom_label[it_atomIndex];
+                else
+                    atom_name = atom_type;
+
+                auto atom = Atom(atom_name, atom_type);
+
+                if (profile.atom_id_size_ok)
+                    atom.set("id", data.atom_id[it_atomIndex]);
+
+                positions[it_atomIndex][0] = data.atom_x[it_atomIndex];
+                positions[it_atomIndex][1] = data.atom_y[it_atomIndex];
+                positions[it_atomIndex][2] = data.atom_z[it_atomIndex];
+
+                frame[it_atomIndex] = std::move(atom);
+                atoms_waiting_for_residue_data.emplace(std::make_pair(atom_name, it_atomIndex));
+                
+                if (res_name == nullptr)
+                    continue;
+
+                bool current_residue_has_implicit_neightbour_bonding = expect_implicit_inter_residue_bonding(*res_name);
+                if (current_inter_residue_forward_linking_atom == 0xffffffffffffffff && current_residue_has_implicit_neightbour_bonding && is_residue_forward_binder(atom_name))
+                    current_inter_residue_forward_linking_atom = it_atomIndex;
+                if (current_residue_has_implicit_neightbour_bonding && is_residue_backward_binder(atom_name) && previous_inter_residue_forward_linking_atom != 0xffffffffffffffff)
+                {
+                    frame.add_bond(previous_inter_residue_forward_linking_atom, it_atomIndex, Bond::SINGLE);
+                }
+
+                // We create implicit bound between contiguous residues
+                if (res_name != nullptr
+                    && (*res_name == "N" || *res_name == "P")
+                    && previous_inter_residue_forward_linking_atom != 0xffffffffffffffff
+                    && current_residue_has_implicit_neightbour_bonding
+                    )
+                {
+                    frame.add_bond(previous_inter_residue_forward_linking_atom, it_atomIndex, Bond::SINGLE);
+                }
+                if (fetched_all_residue_data && !atom_name.empty())
+                {
+                    // We store atom index related to some strut_conn bounding for quick access later.
+                    BCIFFormat::BCIFData::StructConnMapKey struct_conn_key{*chain_name, *res_name, *res_id, atom_name };
+                    if (data.struct_conn_map.count(struct_conn_key) > 0)
+                    {
+                        atoms_waiting_for_struct_conn_bounding[struct_conn_key] = it_atomIndex;
+                    }
+                }
+            }
+
+            // Since we only create the residue once its last atom is done iterating, we need a last round after the loop.
+            if (res_name != nullptr && res_id != nullptr && !atoms_waiting_for_residue_data.empty() && profile.residue_data_size_ok)
+                create_residue(data, frame, *res_name, *res_id, atoms_waiting_for_residue_data, it_atomIndex, previous_inter_residue_forward_linking_atom, current_inter_residue_forward_linking_atom);
+
+            for (auto& it_struct_conn : data.struct_conns)
+            {
+                    BCIFFormat::BCIFData::StructConnMapKey key1{it_struct_conn.ptnr1.label_asym_id, it_struct_conn.ptnr1.label_comp_id, it_struct_conn.ptnr1.label_seq_id, it_struct_conn.ptnr1.label_atom_id};
+                    BCIFFormat::BCIFData::StructConnMapKey key2{it_struct_conn.ptnr2.label_asym_id, it_struct_conn.ptnr2.label_comp_id, it_struct_conn.ptnr2.label_seq_id, it_struct_conn.ptnr2.label_atom_id};
+                    if (atoms_waiting_for_struct_conn_bounding.count(key1) > 0 && atoms_waiting_for_struct_conn_bounding.count(key2) > 0)
+                    {
+                        frame.add_bond(atoms_waiting_for_struct_conn_bounding[key1], atoms_waiting_for_struct_conn_bounding[key2]);
+                    }
+            }
+        }
 
     }
 
@@ -3912,9 +4239,8 @@ namespace chemfiles
         if (natoms != data_->atom_y.size() || natoms != data_->atom_z.size()) {
             throw format_error("BCIF atom coordinate arrays have inconsistent sizes");
         }
-
-        create_atoms(*data_, frame);
-        create_atoms(*data_, frame);
+        DataProfile profile(*data_);
+        fill_atomistic_data(*data_, profile, frame);
 
         // Set unit cell
         if (data_->cell_length_a > 0.0 && data_->cell_length_b > 0.0 && data_->cell_length_c > 0.0) {
@@ -3927,9 +4253,6 @@ namespace chemfiles
         if (!data_->entry_id.empty()) {
             frame.set("pdb_idcode", data_->entry_id);
         }
-
-        create_residues(*data_, frame);
-        create_bonds(*data_, frame);
 
         // For now, we only support single model
         model_index_++;
@@ -3955,7 +4278,6 @@ namespace chemfiles
 
         has_written_ = true;
     }
-
 
     void BCIFFormat::decode(const std::string& data) {
 
