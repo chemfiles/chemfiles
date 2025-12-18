@@ -19,6 +19,7 @@
 #include <iostream>
 #include <iomanip>
 #include <unordered_set>
+#include <thread>
 
 // Include msgpack headers
 #include <msgpack.hpp>
@@ -303,10 +304,10 @@ namespace msgpack {
         std::vector<int32_t> decode_run_length(const std::vector<int32_t>& data, int32_t src_size);
         std::vector<std::string> decode_string_array(const msgpack::object & encoding, const msgpack::object & data);
 
-        std::vector<int32_t> decode_integer_column(const msgpack::object & column);
         std::vector<int32_t> decode_mask(const msgpack::object & mask_obj);
-        std::vector<double> decode_float_column(const msgpack::object & column);
-        std::vector<std::string> decode_string_column(const msgpack::object & column);
+        void decode_column(const msgpack::object & column, std::vector<double>&);
+        void decode_column(const msgpack::object & column, std::vector<int32_t>&);
+        void decode_column(const msgpack::object & column, std::vector<std::string>&);
 
         void parse_atom_site(const msgpack::object & category, BCIFData & data);
         void parse_cell(const msgpack::object & category, BCIFData & data);
@@ -341,7 +342,6 @@ namespace msgpack {
             const std::string& column_name, const std::vector<std::string>& data);
         void encode_integer_column(msgpack::packer<msgpack::sbuffer>& pk,
             const std::string& column_name, const std::vector<int32_t>& data);
-
 
         // =============================================================================
         // Free function implementations in msgpack namespace
@@ -402,6 +402,8 @@ namespace msgpack {
         void parse_category(const std::string & category_name, const msgpack::object & category,
             BCIFData & data) {
             if (category_name == "_atom_site") {
+            /*
+            * TMP : taken care of using tasks
                 parse_atom_site(category, data);
 
                 // Fallback to auth fields when label fields are invalid
@@ -424,6 +426,7 @@ namespace msgpack {
                     // Use auth_asym_id when label_asym_id is invalid
                     data.chain_id = data.auth_chain_id;
                 }
+            */
             }
             else if (category_name == "_cell") {
                 parse_cell(category, data);
@@ -442,7 +445,7 @@ namespace msgpack {
             }
         }
 
-        std::vector<int32_t> apply_mask_to_integers(const std::vector<int32_t>& data,
+        std::vector<int32_t> apply_mask(const std::vector<int32_t>& data,
                                                       const std::vector<int32_t>& mask) {
             // Expand data array using mask
             // Mask: 0=present (use data), 1/2=missing (use default)
@@ -468,7 +471,7 @@ namespace msgpack {
             return result;
         }
 
-        std::vector<std::string> apply_mask_to_strings(const std::vector<std::string>& data,
+        std::vector<std::string> apply_mask(const std::vector<std::string>& data,
                                                          const std::vector<int32_t>& mask) {
             // Expand data array using mask
             // Mask: 0=present (use data), 1/2=missing (use "?")
@@ -525,78 +528,78 @@ namespace msgpack {
 
                 // Decode based on column name
                 if (column_name == "Cartn_x") {
-                    data.atom_x = decode_float_column(data_obj);
+                    decode_column(data_obj, data.atom_x);
                     // Masks for float columns would need special handling
                 }
                 else if (column_name == "Cartn_y") {
-                    data.atom_y = decode_float_column(data_obj);
+                    decode_column(data_obj, data.atom_y);
                 }
                 else if (column_name == "Cartn_z") {
-                    data.atom_z = decode_float_column(data_obj);
+                    decode_column(data_obj, data.atom_z);
                 }
                 else if (column_name == "type_symbol") {
-                    data.atom_type_symbol = decode_string_column(data_obj);
+                    decode_column(data_obj, data.atom_type_symbol);
                     if (has_mask && !mask.empty()) {
-                        data.atom_type_symbol = apply_mask_to_strings(data.atom_type_symbol, mask);
+                        data.atom_type_symbol = apply_mask(data.atom_type_symbol, mask);
                     }
                 }
                 else if (column_name == "label_atom_id") {
-                    data.atom_label = decode_string_column(data_obj);
+                    decode_column(data_obj, data.atom_label);
                     if (has_mask && !mask.empty()) {
-                        data.atom_label = apply_mask_to_strings(data.atom_label, mask);
+                        data.atom_label = apply_mask(data.atom_label, mask);
                     }
                 }
                 else if (column_name == "auth_atom_id") {
-                    data.auth_atom_label = decode_string_column(data_obj);
+                    decode_column(data_obj, data.auth_atom_label);
                     if (has_mask && !mask.empty()) {
-                        data.auth_atom_label = apply_mask_to_strings(data.auth_atom_label, mask);
+                        data.auth_atom_label = apply_mask(data.auth_atom_label, mask);
                     }
                 }
                 else if (column_name == "id") {
-                    data.atom_id = decode_integer_column(data_obj);
+                    decode_column(data_obj, data.atom_id);
                     if (has_mask && !mask.empty()) {
-                        data.atom_id = apply_mask_to_integers(data.atom_id, mask);
+                        data.atom_id = apply_mask(data.atom_id, mask);
                     }
                 }
                 // Residue information
                 else if (column_name == "label_comp_id") {
-                    data.residue_name = decode_string_column(data_obj);
+                    decode_column(data_obj, data.residue_name);
                     if (has_mask && !mask.empty()) {
-                        data.residue_name = apply_mask_to_strings(data.residue_name, mask);
+                        data.residue_name = apply_mask(data.residue_name, mask);
                     }
                 }
                 else if (column_name == "label_seq_id") {
                     // Use label_seq_id as primary residue ID (matches mmCIF implementation)
-                    data.residue_id = decode_integer_column(data_obj);
+                    decode_column(data_obj, data.residue_id);
                     if (has_mask && !mask.empty()) {
-                        data.residue_id = apply_mask_to_integers(data.residue_id, mask);
+                        data.residue_id = apply_mask(data.residue_id, mask);
                     }
                 }
                 else if (column_name == "auth_seq_id") {
                     // Store auth_seq_id for round-trip writing
-                    data.auth_residue_id = decode_integer_column(data_obj);
+                    decode_column(data_obj, data.auth_residue_id);
                     if (has_mask && !mask.empty()) {
-                        data.auth_residue_id = apply_mask_to_integers(data.auth_residue_id, mask);
+                        data.auth_residue_id = apply_mask(data.auth_residue_id, mask);
                     }
                 }
                 else if (column_name == "label_asym_id") {
                     // Use label_asym_id as primary chain ID (matches mmCIF implementation)
-                    data.chain_id = decode_string_column(data_obj);
+                    decode_column(data_obj, data.chain_id);
                     if (has_mask && !mask.empty()) {
-                        data.chain_id = apply_mask_to_strings(data.chain_id, mask);
+                        data.chain_id = apply_mask(data.chain_id, mask);
                     }
                 }
                 else if (column_name == "auth_asym_id") {
                     // Store auth_asym_id for round-trip writing
-                    data.auth_chain_id = decode_string_column(data_obj);
+                    decode_column(data_obj, data.auth_chain_id);
                     if (has_mask && !mask.empty()) {
-                        data.auth_chain_id = apply_mask_to_strings(data.auth_chain_id, mask);
+                        data.auth_chain_id = apply_mask(data.auth_chain_id, mask);
                     }
                 }
                 else if (column_name == "pdbx_PDB_ins_code") {
-                    data.insertion_code = decode_string_column(data_obj);
+                    decode_column(data_obj, data.insertion_code);
                     if (has_mask && !mask.empty()) {
-                        data.insertion_code = apply_mask_to_strings(data.insertion_code, mask);
+                        data.insertion_code = apply_mask(data.insertion_code, mask);
                     }
                 }
             }
@@ -643,7 +646,6 @@ namespace msgpack {
                 parse_atom_site_column(mask_obj, has_mask, data_obj, column_name, data);
             }
         }
-
         void parse_cell(const msgpack::object & category, BCIFData & data) {
             // Get columns array from category
             msgpack::object columns_obj;
@@ -715,7 +717,7 @@ namespace msgpack {
                     }
                 } else {
                     // Encoded data (map with encoding field)
-                    values = decode_float_column(data_obj);
+                     decode_column(data_obj, values);
                 }
 
                 if (values.empty()) {
@@ -771,63 +773,63 @@ namespace msgpack {
 
                 // Parse the columns we care about
                 if (column_name == "conf_type_id") {
-                    struct_data.conf_type_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.conf_type_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.conf_type_id = apply_mask_to_strings(struct_data.conf_type_id, mask);
+                        struct_data.conf_type_id = apply_mask(struct_data.conf_type_id, mask);
                     }
                 }
                 else if (column_name == "pdbx_PDB_helix_class") {
-                    struct_data.pdbx_PDB_helix_class = decode_integer_column(data_obj);
+                    decode_column(data_obj, struct_data.pdbx_PDB_helix_class);
                     if (has_mask && !mask.empty()) {
-                        struct_data.pdbx_PDB_helix_class = apply_mask_to_integers(struct_data.pdbx_PDB_helix_class, mask);
+                        struct_data.pdbx_PDB_helix_class = apply_mask(struct_data.pdbx_PDB_helix_class, mask);
                     }
                 }
                 else if (column_name == "beg_label_asym_id") {
-                    struct_data.beg_label_asym_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.beg_label_asym_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.beg_label_asym_id = apply_mask_to_strings(struct_data.beg_label_asym_id, mask);
+                        struct_data.beg_label_asym_id = apply_mask(struct_data.beg_label_asym_id, mask);
                     }
                 }
                 else if (column_name == "beg_label_seq_id") {
-                    struct_data.beg_label_seq_id = decode_integer_column(data_obj);
+                    decode_column(data_obj, struct_data.beg_label_seq_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.beg_label_seq_id = apply_mask_to_integers(struct_data.beg_label_seq_id, mask);
+                        struct_data.beg_label_seq_id = apply_mask(struct_data.beg_label_seq_id, mask);
                     }
                 }
                 else if (column_name == "end_label_asym_id") {
-                    struct_data.end_label_asym_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.end_label_asym_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.end_label_asym_id = apply_mask_to_strings(struct_data.end_label_asym_id, mask);
+                        struct_data.end_label_asym_id = apply_mask(struct_data.end_label_asym_id, mask);
                     }
                 }
                 else if (column_name == "end_label_seq_id") {
-                    struct_data.end_label_seq_id = decode_integer_column(data_obj);
+                    decode_column(data_obj, struct_data.end_label_seq_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.end_label_seq_id = apply_mask_to_integers(struct_data.end_label_seq_id, mask);
+                        struct_data.end_label_seq_id = apply_mask(struct_data.end_label_seq_id, mask);
                     }
                 }
                 else if (column_name == "beg_auth_asym_id") {
-                    struct_data.beg_auth_asym_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.beg_auth_asym_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.beg_auth_asym_id = apply_mask_to_strings(struct_data.beg_auth_asym_id, mask);
+                        struct_data.beg_auth_asym_id = apply_mask(struct_data.beg_auth_asym_id, mask);
                     }
                 }
                 else if (column_name == "beg_auth_seq_id") {
-                    struct_data.beg_auth_seq_id = decode_integer_column(data_obj);
+                    decode_column(data_obj, struct_data.beg_auth_seq_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.beg_auth_seq_id = apply_mask_to_integers(struct_data.beg_auth_seq_id, mask);
+                        struct_data.beg_auth_seq_id = apply_mask(struct_data.beg_auth_seq_id, mask);
                     }
                 }
                 else if (column_name == "end_auth_asym_id") {
-                    struct_data.end_auth_asym_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.end_auth_asym_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.end_auth_asym_id = apply_mask_to_strings(struct_data.end_auth_asym_id, mask);
+                        struct_data.end_auth_asym_id = apply_mask(struct_data.end_auth_asym_id, mask);
                     }
                 }
                 else if (column_name == "end_auth_seq_id") {
-                    struct_data.end_auth_seq_id = decode_integer_column(data_obj);
+                    decode_column(data_obj, struct_data.end_auth_seq_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.end_auth_seq_id = apply_mask_to_integers(struct_data.end_auth_seq_id, mask);
+                        struct_data.end_auth_seq_id = apply_mask(struct_data.end_auth_seq_id, mask);
                     }
                 }
             }
@@ -957,51 +959,51 @@ namespace msgpack {
 
                 // Parse the columns we care about
                 if (column_name == "beg_label_asym_id") {
-                    struct_data.beg_label_asym_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.beg_label_asym_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.beg_label_asym_id = apply_mask_to_strings(struct_data.beg_label_asym_id, mask);
+                        struct_data.beg_label_asym_id = apply_mask(struct_data.beg_label_asym_id, mask);
                     }
                 }
                 else if (column_name == "beg_label_seq_id") {
-                    struct_data.beg_label_seq_id = decode_integer_column(data_obj);
+                    decode_column(data_obj, struct_data.beg_label_seq_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.beg_label_seq_id = apply_mask_to_integers(struct_data.beg_label_seq_id, mask);
+                        struct_data.beg_label_seq_id = apply_mask(struct_data.beg_label_seq_id, mask);
                     }
                 }
                 else if (column_name == "end_label_asym_id") {
-                    struct_data.end_label_asym_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.end_label_asym_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.end_label_asym_id = apply_mask_to_strings(struct_data.end_label_asym_id, mask);
+                        struct_data.end_label_asym_id = apply_mask(struct_data.end_label_asym_id, mask);
                     }
                 }
                 else if (column_name == "end_label_seq_id") {
-                    struct_data.end_label_seq_id = decode_integer_column(data_obj);
+                    decode_column(data_obj, struct_data.end_label_seq_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.end_label_seq_id = apply_mask_to_integers(struct_data.end_label_seq_id, mask);
+                        struct_data.end_label_seq_id = apply_mask(struct_data.end_label_seq_id, mask);
                     }
                 }
                 else if (column_name == "beg_auth_asym_id") {
-                    struct_data.beg_auth_asym_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.beg_auth_asym_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.beg_auth_asym_id = apply_mask_to_strings(struct_data.beg_auth_asym_id, mask);
+                        struct_data.beg_auth_asym_id = apply_mask(struct_data.beg_auth_asym_id, mask);
                     }
                 }
                 else if (column_name == "beg_auth_seq_id") {
-                    struct_data.beg_auth_seq_id = decode_integer_column(data_obj);
+                    decode_column(data_obj, struct_data.beg_auth_seq_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.beg_auth_seq_id = apply_mask_to_integers(struct_data.beg_auth_seq_id, mask);
+                        struct_data.beg_auth_seq_id = apply_mask(struct_data.beg_auth_seq_id, mask);
                     }
                 }
                 else if (column_name == "end_auth_asym_id") {
-                    struct_data.end_auth_asym_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.end_auth_asym_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.end_auth_asym_id = apply_mask_to_strings(struct_data.end_auth_asym_id, mask);
+                        struct_data.end_auth_asym_id = apply_mask(struct_data.end_auth_asym_id, mask);
                     }
                 }
                 else if (column_name == "end_auth_seq_id") {
-                    struct_data.end_auth_seq_id = decode_integer_column(data_obj);
+                    decode_column(data_obj, struct_data.end_auth_seq_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.end_auth_seq_id = apply_mask_to_integers(struct_data.end_auth_seq_id, mask);
+                        struct_data.end_auth_seq_id = apply_mask(struct_data.end_auth_seq_id, mask);
                     }
                 }
             }
@@ -1114,45 +1116,45 @@ namespace msgpack {
 
                 // Parse the columns relevant to us
                 if (column_name == "comp_id") {
-                    bond_data.comp_id = decode_string_column(data_obj);
+                    decode_column(data_obj, bond_data.comp_id);
                     if (has_mask && !mask.empty()) {
-                        bond_data.comp_id = apply_mask_to_strings(bond_data.comp_id, mask);
+                        bond_data.comp_id = apply_mask(bond_data.comp_id, mask);
                     }
                 }
                 else if (column_name == "atom_id_1") {
-                    bond_data.atom_id_1 = decode_string_column(data_obj);
+                    decode_column(data_obj, bond_data.atom_id_1);
                     if (has_mask && !mask.empty()) {
-                        bond_data.atom_id_1 = apply_mask_to_strings(bond_data.atom_id_1, mask);
+                        bond_data.atom_id_1 = apply_mask(bond_data.atom_id_1, mask);
                     }
                 }
                 else if (column_name == "atom_id_2") {
-                    bond_data.atom_id_2 = decode_string_column(data_obj);
+                    decode_column(data_obj, bond_data.atom_id_2);
                     if (has_mask && !mask.empty()) {
-                        bond_data.atom_id_2 = apply_mask_to_strings(bond_data.atom_id_2, mask);
+                        bond_data.atom_id_2 = apply_mask(bond_data.atom_id_2, mask);
                     }
                 }
                 else if (column_name == "value_order") {
-                    bond_data.value_order = decode_string_column(data_obj);
+                    decode_column(data_obj, bond_data.value_order);
                     if (has_mask && !mask.empty()) {
-                        bond_data.value_order = apply_mask_to_strings(bond_data.value_order, mask);
+                        bond_data.value_order = apply_mask(bond_data.value_order, mask);
                     }
                 }
                 else if (column_name == "pdbx_aromatic_flag") {
-                    bond_data.pdbx_aromatic_flag = decode_string_column(data_obj);
+                    decode_column(data_obj, bond_data.pdbx_aromatic_flag);
                     if (has_mask && !mask.empty()) {
-                        bond_data.pdbx_aromatic_flag = apply_mask_to_strings(bond_data.pdbx_aromatic_flag, mask);
+                        bond_data.pdbx_aromatic_flag = apply_mask(bond_data.pdbx_aromatic_flag, mask);
                     }
                 }
                 else if (column_name == "pdbx_stereo_config") {
-                    bond_data.pdbx_stereo_config = decode_string_column(data_obj);
+                    decode_column(data_obj, bond_data.pdbx_stereo_config);
                     if (has_mask && !mask.empty()) {
-                        bond_data.pdbx_stereo_config = apply_mask_to_strings(bond_data.pdbx_stereo_config, mask);
+                        bond_data.pdbx_stereo_config = apply_mask(bond_data.pdbx_stereo_config, mask);
                     }
                 }
                 else if (column_name == "pdbx_ordinal") {
-                    bond_data.pdbx_ordinal = decode_integer_column(data_obj);
+                    decode_column(data_obj, bond_data.pdbx_ordinal);
                     if (has_mask && !mask.empty()) {
-                        bond_data.pdbx_ordinal = apply_mask_to_integers(bond_data.pdbx_ordinal, mask);
+                        bond_data.pdbx_ordinal = apply_mask(bond_data.pdbx_ordinal, mask);
                     }
                 }
             }
@@ -1283,63 +1285,63 @@ namespace msgpack {
 
                 // Parse the columns we care about
                 if (column_name == "conn_type_id") {
-                    struct_data.conn_type_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.conn_type_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.conn_type_id = apply_mask_to_strings(struct_data.conn_type_id, mask);
+                        struct_data.conn_type_id = apply_mask(struct_data.conn_type_id, mask);
                     }
                 }
                 else if (column_name == "ptnr1_auth_asym_id") {
-                    struct_data.ptnr1.auth_asym_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.ptnr1.auth_asym_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr1.auth_asym_id = apply_mask_to_strings(struct_data.ptnr1.auth_asym_id, mask);
+                        struct_data.ptnr1.auth_asym_id = apply_mask(struct_data.ptnr1.auth_asym_id, mask);
                     }
                 }
                 else if (column_name == "ptnr1_auth_comp_id") {
-                    struct_data.ptnr1.auth_comp_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.ptnr1.auth_comp_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr1.auth_comp_id = apply_mask_to_strings(struct_data.ptnr1.auth_comp_id, mask);
+                        struct_data.ptnr1.auth_comp_id = apply_mask(struct_data.ptnr1.auth_comp_id, mask);
                     }
                 }
                 else if (column_name == "ptnr1_auth_seq_id") {
-                    struct_data.ptnr1.auth_seq_id = decode_integer_column(data_obj);
+                    decode_column(data_obj, struct_data.ptnr1.auth_seq_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr1.auth_seq_id = apply_mask_to_integers(struct_data.ptnr1.auth_seq_id, mask);
+                        struct_data.ptnr1.auth_seq_id = apply_mask(struct_data.ptnr1.auth_seq_id, mask);
                     }
                 }
                 else if (column_name == "ptnr1_label_atom_id") {
-                    struct_data.ptnr1.label_atom_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.ptnr1.label_atom_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr1.label_atom_id = apply_mask_to_strings(struct_data.ptnr1.label_atom_id, mask);
+                        struct_data.ptnr1.label_atom_id = apply_mask(struct_data.ptnr1.label_atom_id, mask);
                     }
                 }
                 else if (column_name == "ptnr2_auth_asym_id") {
-                    struct_data.ptnr2.auth_asym_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.ptnr2.auth_asym_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr2.auth_asym_id = apply_mask_to_strings(struct_data.ptnr2.auth_asym_id, mask);
+                        struct_data.ptnr2.auth_asym_id = apply_mask(struct_data.ptnr2.auth_asym_id, mask);
                     }
                 }
                 else if (column_name == "ptnr2_auth_comp_id") {
-                    struct_data.ptnr2.auth_comp_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.ptnr2.auth_comp_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr2.auth_comp_id = apply_mask_to_strings(struct_data.ptnr2.auth_comp_id, mask);
+                        struct_data.ptnr2.auth_comp_id = apply_mask(struct_data.ptnr2.auth_comp_id, mask);
                     }
                 }
                 else if (column_name == "ptnr2_auth_seq_id") {
-                    struct_data.ptnr2.auth_seq_id = decode_integer_column(data_obj);
+                    decode_column(data_obj, struct_data.ptnr2.auth_seq_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr2.auth_seq_id = apply_mask_to_integers(struct_data.ptnr2.auth_seq_id, mask);
+                        struct_data.ptnr2.auth_seq_id = apply_mask(struct_data.ptnr2.auth_seq_id, mask);
                     }
                 }
                 else if (column_name == "ptnr2_label_atom_id") {
-                    struct_data.ptnr2.label_atom_id = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.ptnr2.label_atom_id);
                     if (has_mask && !mask.empty()) {
-                        struct_data.ptnr2.label_atom_id = apply_mask_to_strings(struct_data.ptnr2.label_atom_id, mask);
+                        struct_data.ptnr2.label_atom_id = apply_mask(struct_data.ptnr2.label_atom_id, mask);
                     }
                 }
                 else if (column_name == "pdbx_value_order") {
-                    struct_data.pdbx_value_order = decode_string_column(data_obj);
+                    decode_column(data_obj, struct_data.pdbx_value_order);
                     if (has_mask && !mask.empty()) {
-                        struct_data.pdbx_value_order = apply_mask_to_strings(struct_data.pdbx_value_order, mask);
+                        struct_data.pdbx_value_order = apply_mask(struct_data.pdbx_value_order, mask);
                     }
                 }
             }
@@ -1601,10 +1603,10 @@ namespace msgpack {
                 // because it converts int32 to double
             }
         }
-        std::vector<int32_t> decode_integer_column(const msgpack::object & column) {
+        void decode_column(const msgpack::object & column, std::vector<int32_t>& result) {
             // Column data structure: { data: <encoded>, encoding: [ {kind, ...}, ... ] }
             if (column.type != msgpack::type::MAP) {
-                return {};
+                return ;
             }
 
             msgpack::object data_obj;
@@ -1615,15 +1617,14 @@ namespace msgpack {
             get_data_and_encoding(column.via.map, data_obj, found_data, encoding_obj, found_encoding);
 
             if (!found_data || !found_encoding) {
-                return {};
+                return ;
             }
 
             if (encoding_obj.type != msgpack::type::ARRAY) {
-                return {};
+                return ;
             }
 
             // Decode through the encoding chain (applied in reverse order)
-            std::vector<int32_t> result;
             std::vector<uint8_t> byte_data;
             auto encodings = encoding_obj.via.array;
 
@@ -1647,7 +1648,7 @@ namespace msgpack {
                     decode_integer_column_next_steps(enc_map, encodings, data_obj, kind, result, byte_data);
                 }
             }
-            return result;
+            return ;
         }
 
         namespace
@@ -1728,11 +1729,10 @@ namespace msgpack {
                 }
             }
         }
-        std::vector<double> decode_float_column(const msgpack::object & column) {
+        void decode_column(const msgpack::object & column, std::vector<double>& result) {
             if (column.type != msgpack::type::MAP) {
-                return {};
+                return ;
             }
-            std::vector<double> result;
 
             msgpack::object data_obj;
             msgpack::object encoding_obj;
@@ -1742,7 +1742,7 @@ namespace msgpack {
             get_data_and_encoding(column.via.map, data_obj, found_data, encoding_obj, found_encoding);
 
             if (!found_data || !found_encoding || encoding_obj.type != msgpack::type::ARRAY) {
-                return {};
+                return ;
             }
 
             msgpack::object_array encodings = encoding_obj.via.array;
@@ -1750,11 +1750,11 @@ namespace msgpack {
             // Check if ByteArray has Float32/Float64 type (direct float encoding)
             if (encodings.size > 0 && encodings.ptr[encodings.size - 1].type == msgpack::type::MAP) {
                 decode_float_column_raw_float(data_obj, encodings, result);
-                return result;
+                return ;
             }
 
             // Otherwise, decode as integers first, then check for FixedPoint
-            auto int_values = decode_integer_column(column);
+            std::vector<int32_t> int_values; decode_column(column, int_values);
 
             // Look for FixedPoint encoding
             double factor = 1.0;
@@ -1790,7 +1790,8 @@ namespace msgpack {
 
             if (found_fixed_point) {
                 // srcType is informational; we always decode to double
-                return decode_fixed_point(int_values, factor);
+                result = decode_fixed_point(int_values, factor);
+                return;
             }
             else {
                 // No FixedPoint, convert integers to doubles
@@ -1798,14 +1799,14 @@ namespace msgpack {
                 for (size_t i = 0; i < int_values.size(); ++i) {
                     result[i] = static_cast<double>(int_values[i]);
                 }
-                return result;
+                return ;
             }
         }
 
-        std::vector<std::string> decode_string_column(const msgpack::object & column) {
+        void decode_column(const msgpack::object & column, std::vector<std::string>& result) {
             // Simple string array decoding. Might need some refinement in the future.
             if (column.type != msgpack::type::MAP) {
-                return {};
+                return ;
             }
 
             msgpack::object data_obj;
@@ -1816,11 +1817,11 @@ namespace msgpack {
             get_data_and_encoding(column.via.map, data_obj, found_data, encoding_obj, found_encoding);
 
             if (!found_data || !found_encoding) {
-                return {};
+                return ;
             }
 
             if (encoding_obj.type != msgpack::type::ARRAY) {
-                return {};
+                return ;
             }
 
             // Look for StringArray encoding
@@ -1842,11 +1843,12 @@ namespace msgpack {
                 }
 
                 if (kind == "StringArray") {
-                    return decode_string_array(encodings.ptr[i], data_obj);
+                    result = decode_string_array(encodings.ptr[i], data_obj);
+                    return;
                 }
             }
 
-            return {};
+            return ;
         }
 
         std::vector<int32_t> decode_byte_array(const msgpack::object & data) {
@@ -2042,7 +2044,9 @@ namespace msgpack {
         std::vector<int32_t> decode_mask(const msgpack::object & mask_obj) {
             // Mask is encoded just like a regular integer column
             // Mask values: 0=present, 1="." (not present), 2="?" (unknown)
-            return decode_integer_column(mask_obj);
+            std::vector<int32_t> result;
+            decode_column(mask_obj, result);
+            return result;
         }
 
         namespace
@@ -2632,7 +2636,6 @@ namespace msgpack {
             fill(frame, atom_site_data);
             pack(pk, atom_site_data);
         }
-
         void encode_cell_category(msgpack::packer<msgpack::sbuffer>& pk, const Frame& frame) {
             const auto& cell = frame.cell();
             auto lengths = cell.lengths();
@@ -2878,11 +2881,6 @@ namespace msgpack {
             encode_integer_column(pk, "beg_label_seq_id", beg_label_seq_ids);
             encode_string_column(pk, "end_label_asym_id", end_label_asym_ids);
             encode_integer_column(pk, "end_label_seq_id", end_label_seq_ids);
-        }
-
-        namespace
-        {
-
         }
         void encode_chem_comp_bond_category(msgpack::packer<msgpack::sbuffer>& pk, const Frame& frame) {
             const auto& bonds = frame.topology().bonds();
@@ -3457,7 +3455,6 @@ namespace chemfiles
             throw file_error("append mode ('a') is not supported for the BCIF format");
         }
     }
-
     BCIFFormat::BCIFFormat(std::shared_ptr<MemoryBuffer> memory, File::Mode mode, File::Compression compression) 
         : data_(new BCIFData()) 
     {
@@ -3470,7 +3467,6 @@ namespace chemfiles
         decode(data);
         memory_ = memory;
     }
-
 
     size_t BCIFFormat::size() {
         return data_->num_models;
@@ -3816,7 +3812,6 @@ namespace chemfiles
         }
 
     }
-
     void BCIFFormat::read(Frame& frame) {
         if (!decoded_) {
             throw file_error("the BCIF file has not been decoded");
@@ -3849,7 +3844,6 @@ namespace chemfiles
         // For now, we only support single model
         model_index_++;
     }
-
     void BCIFFormat::write(const Frame& frame) {
         if (mode_ != File::WRITE) {
             throw file_error("cannot write to BCIF file opened in read mode");
@@ -3870,7 +3864,248 @@ namespace chemfiles
 
         has_written_ = true;
     }
+   
+    namespace
+    {
+        class DecodeObject
+        {
+        public:
+            using Object = std::remove_const<std::remove_reference<decltype(((msgpack::object_handle*)(nullptr))->get())>::type>::type;
+        private:
+            const std::string* _data = nullptr;
+            msgpack::object_handle _oh;
+            Object _obj;
+        public:
+            DecodeObject(const std::string& data) : _data(&data) {
+                msgpack::unpack(_oh, data.data(), data.size());
+                _obj = _oh.get();
+            }
+            DecodeObject(Object&& obj) : _obj(std::move(obj)) {}
+            DecodeObject(Object& obj) : _obj(obj) {}
 
+            Object* operator->()
+            {
+                return &_obj;
+            }
+            const Object* operator->() const
+            {
+                return &_obj;
+            }
+            operator Object&()
+            {
+                return _obj;
+            }
+            operator const Object&() const
+            {
+                return _obj;
+            }
+        };
+        class Task {
+        public:
+            template <typename T>
+            struct Args {
+                DecodeObject object;
+                std::filesystem::path dataPath;
+                const char* column_name;
+                std::vector<T>* out = nullptr;
+                
+            };
+        private:
+            struct Interface {
+                virtual ~Interface() = default;
+                virtual void execute() = 0;
+            };
+            template<typename T>
+            class Wrapper : public Interface
+            {
+                Args<T> _args;
+                std::filesystem::path::iterator _target{ _args.dataPath.end()};
+                bool _data_extracted = false;
+
+                // Method called recursively to venture into the target path through the tree. Call extract data once the last node is reached.
+                void _dive(msgpack::object& src, std::filesystem::path::iterator it_current_location)
+                {
+                    if (it_current_location == _target)
+                    {
+                        _extract_data(src);
+                        return ;
+                    }
+
+                    std::string key = it_current_location->string();
+                    std::filesystem::path::iterator next_it = it_current_location; next_it++;
+
+                    if (src.type == msgpack::type::MAP)
+                    {
+                        auto block_map = src.via.map;
+                        for (uint32_t i = 0; i < block_map.size; ++i) {
+                            std::string current_key;
+                            block_map.ptr[i].key.convert(current_key);
+                            if (current_key == key) {
+                                _dive(block_map.ptr[i].val, next_it);
+                                if (_data_extracted) return ;
+                            }
+                        }
+                    }
+                    else if (src.type == msgpack::type::ARRAY)
+                    {
+                        std::string value{ key };
+                        size_t pos = value.find('=');
+                        bool return_map_having_keyvalue = false;
+                        if (pos != std::string::npos)
+                        {
+                            key = std::string(value.data(), pos);
+                            value = std::string(value.begin() + pos + 1, value.end());
+                            return_map_having_keyvalue = true;
+                        }
+
+                        auto array = src.via.array;
+                        for (uint32_t it_array_index = 0; it_array_index < array.size; ++it_array_index) {
+                            if (array.ptr[it_array_index].type != msgpack::type::MAP) {
+                                continue;
+                            }
+
+                            auto map = array.ptr[it_array_index].via.map;
+                            if (return_map_having_keyvalue)
+                            {
+                                for (uint32_t it_map_index = 0; it_map_index < map.size; ++it_map_index) {
+                                    std::string current_key;
+                                    std::string current_value;
+                                    map.ptr[it_map_index].key.convert(current_key);
+                                    if (current_key == key) {
+                                        map.ptr[it_map_index].val.convert(current_value);
+                                    }
+                                    if (current_value == value)
+                                    {
+                                        _dive(array.ptr[it_array_index], next_it);
+                                        if (_data_extracted) return ;
+                                    }
+                                    else
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                // Get category name
+                                std::string category_name;
+                                for (uint32_t j = 0; j < map.size; ++j) {
+                                    std::string current_key;
+                                    map.ptr[j].key.convert(current_key);
+                                    if (current_key == key) {
+                                        _dive( map.ptr[j].val, next_it);
+                                        return ;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    return ;
+                }
+
+                // Call with the node where we expect the data to be. 
+                // We expect the node to be an array of map with name and data node.
+                void _extract_data(const DecodeObject& obj)
+                {
+                    auto columns = obj->via.array;
+                    for (uint32_t i = 0; i < columns.size; ++i) {
+                        if (columns.ptr[i].type != msgpack::type::MAP) {
+                            continue;
+                        }
+
+                        std::string column_name;
+                        msgpack::object data_obj;
+                        msgpack::object mask_obj;
+                        bool found_data = false;
+                        bool has_mask = false;
+                        msgpack::get_name_and_data(columns.ptr[i].via.map, column_name, data_obj, found_data, mask_obj, has_mask);
+                        if (column_name != _args.column_name)
+                            continue;
+
+                        msgpack::decode_column(data_obj, *_args.out);
+                        if constexpr (!std::is_same_v<T, double>)
+                        {
+                            if (has_mask) {
+
+                                std::vector<int32_t> mask;
+                                mask = decode_mask(mask_obj);
+                                if (!mask.empty())
+                                    *_args.out = msgpack::apply_mask(*_args.out, mask);
+                            }
+                        }
+                        _data_extracted = true;
+                        break;
+                    }
+                }
+
+            public:
+                Wrapper(Args<T>&& args) : _args(std::forward<Args<T>>(args)) {}
+                virtual void execute() override
+                {
+                    _dive(_args.object, _args.dataPath.begin());
+                }
+            };
+        public:
+
+            template <typename T>
+            Task(Args<T>&& args)
+                : _ptr(new Wrapper<T>(std::forward<Args<T>>(args)))
+            { }
+
+            void execute()
+            {
+                if (_ptr) _ptr->execute();
+            }
+
+        private:
+            std::unique_ptr<Interface> _ptr = nullptr;
+        };
+        class TaskWorker
+        {
+        public:
+            TaskWorker(Task& task)
+                : _thr([task_ptr = &task]() {task_ptr->execute(); })
+            { }
+            ~TaskWorker()
+            {
+                if (_thr.joinable())
+                {
+                    _thr.join();
+                }
+            }
+            TaskWorker(TaskWorker&&) = default;
+            TaskWorker& operator=(TaskWorker&&) = default;
+            TaskWorker(const TaskWorker&) = delete;
+            TaskWorker& operator=(const TaskWorker&) = delete;
+        private:
+            std::thread _thr;
+        };
+
+        void cure_atom_site_data(BCIFFormat::BCIFData& data)
+        {
+
+            // Fallback to auth fields when label fields are invalid
+            // Some BCIF files (e.g., 1aga) have label_seq_id = -1 for all atoms
+            bool label_seq_invalid = !data.residue_id.empty() &&
+                std::all_of(data.residue_id.begin(), data.residue_id.end(),
+                    [](int32_t id) { return id < 0; });
+
+            if (label_seq_invalid && !data.auth_residue_id.empty()) {
+                // Use auth_seq_id when label_seq_id is invalid
+                data.residue_id = data.auth_residue_id;
+            }
+
+            // Similarly for chain IDs (though less common)
+            bool label_chain_invalid = !data.chain_id.empty() &&
+                std::all_of(data.chain_id.begin(), data.chain_id.end(),
+                    [](const std::string& s) { return s.empty() || s == "?" || s == "."; });
+
+            if (label_chain_invalid && !data.auth_chain_id.empty()) {
+                // Use auth_asym_id when label_asym_id is invalid
+                data.chain_id = data.auth_chain_id;
+            }
+
+        }
+    }
     void BCIFFormat::decode(const std::string& data) {
 
         // Quick note on the types when dealing with [packed] numbers : 
@@ -3885,10 +4120,35 @@ namespace chemfiles
         //  32 = Float32
         //  33 = Float64
         try {
-            // Unpack the MessagePack data (use C++03 style API like MMTF)
+            {
+                const size_t TASK_NUMBER = 13;
+                std::array<Task, TASK_NUMBER> tasks
+                {
+                    Task(Task::Args<double>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "Cartn_x", &data_->atom_x})
+                    , Task(Task::Args<double>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "Cartn_y", &data_->atom_y})
+                    , Task(Task::Args<double>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "Cartn_z", &data_->atom_z})
+                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "type_symbol", &data_->atom_type_symbol})
+                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "label_atom_id", &data_->atom_label})
+                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "auth_atom_id", &data_->auth_atom_label})
+                    , Task(Task::Args<int32_t>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "id", &data_->atom_id})
+                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "label_comp_id", &data_->residue_name})
+                    , Task(Task::Args<int32_t>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "label_seq_id", &data_->residue_id})
+                    , Task(Task::Args<int32_t>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "auth_seq_id", &data_->auth_residue_id})
+                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "label_asym_id", &data_->chain_id})
+                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "auth_asym_id", &data_->auth_chain_id})
+                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "pdbx_PDB_ins_code", &data_->insertion_code})
+                };
+                    
+                std::vector<TaskWorker> workers; workers.reserve(TASK_NUMBER);
+                for (auto& it_task : tasks)
+                    workers.emplace_back(it_task);
+
+            } // We want the workers to finish before the decode is put to true
+            cure_atom_site_data(*data_);
+
             msgpack::object_handle oh;
             msgpack::unpack(oh, data.data(), data.size());
-            
+
             auto obj = oh.get();
 
             // BCIF structure: { dataBlocks: [ { header, categories: [ ... ] } ] }
@@ -3923,6 +4183,7 @@ namespace chemfiles
             // Parse the first data block (single structure for Phase 1)
             // Call the free function in the msgpack namespace
             msgpack::parse_data_block(data_blocks.ptr[0], *data_);
+
 
             decoded_ = true;
 
