@@ -150,7 +150,7 @@ namespace chemfiles {
         {
             if (idx >= _data->indices.size()) return "";
             auto& actual_index = _data->indices[idx];
-            if (actual_index < 0 || actual_index + 1 >= _data->offsets.size()) return "";
+            if (actual_index < 0 || static_cast<size_t>(actual_index)+1 >= _data->offsets.size()) return "";
 
             size_t start = static_cast<size_t>(_data->offsets[actual_index]);
             size_t end = static_cast<size_t>(_data->offsets[actual_index + 1]);
@@ -495,8 +495,6 @@ namespace msgpack {
         void parse_category(const std::string & category_name, const msgpack::object & category,
             BCIFData & data) {
             if (category_name == "_atom_site") {
-            /*
-            * TMP : taken care of using tasks
                 parse_atom_site(category, data);
 
                 // Fallback to auth fields when label fields are invalid
@@ -512,14 +510,12 @@ namespace msgpack {
 
                 // Similarly for chain IDs (though less common)
                 bool label_chain_invalid = !data.chain_id.empty() &&
-                    std::all_of(data.chain_id.begin(), data.chain_id.end(),
-                        [](const std::string& s) { return s.empty() || s == "?" || s == "."; });
+                    data.chain_id.none_other_than("?.");
 
                 if (label_chain_invalid && !data.auth_chain_id.empty()) {
                     // Use auth_asym_id when label_asym_id is invalid
                     data.chain_id = data.auth_chain_id;
                 }
-            */
             }
             else if (category_name == "_cell") {
                 parse_cell(category, data);
@@ -1904,7 +1900,7 @@ namespace msgpack {
             if (column.type != msgpack::type::MAP) {
                 return ;
             }
-            auto __ = g_functionTimer.chrono("decode string column"); // TODO : remove this
+            auto __ = g_functionTimer.chrono("decode_column string"); // TODO : remove this
 
             msgpack::object data_obj;
             msgpack::object encoding_obj;
@@ -2180,6 +2176,7 @@ namespace msgpack {
                     else {
                         // Subsequent steps: apply encoding to result
                         if (kind == "IntegerPacking") {
+                auto __ = g_functionTimer.chrono("decode_string_array_with_indices IntegerPacking"); // TODO : remove this
                             // Extract parameters
                             int32_t byte_count = 4;
                             bool is_unsigned = false;
@@ -2201,6 +2198,7 @@ namespace msgpack {
                             result = decode_integer_packing(byte_data, byte_count, is_unsigned);
                         }
                         else if (kind == "RunLength") {
+                auto __ = g_functionTimer.chrono("decode_string_array_with_indices RunLength"); // TODO : remove this
                             // Extract srcSize parameter
                             int32_t src_size = 0;
                             for (uint32_t j = 0; j < enc_map.size; ++j) {
@@ -2214,6 +2212,7 @@ namespace msgpack {
                             result = decode_run_length(result, src_size);
                         }
                         else if (kind == "Delta") {
+                auto __ = g_functionTimer.chrono("decode_string_array_with_indices Delta"); // TODO : remove this
                             // Extract origin parameter
                             int32_t origin = 0;
                             for (uint32_t j = 0; j < enc_map.size; ++j) {
@@ -2484,6 +2483,9 @@ namespace msgpack {
                     // Decode the indices from the data using dataEncoding chain
                     std::vector<int32_t> indices;
                     if (data_encoding_obj.type == msgpack::type::ARRAY) {
+                    auto __ = g_functionTimer.chrono("decode string array indices"); // TODO : remove this
+
+                        //decode_column(data_obj, indices);
                         decode_string_array_with_indices(data_encoding_obj, data_obj, indices);
                     }
 
@@ -4345,63 +4347,7 @@ namespace chemfiles
         //  32 = Float32
         //  33 = Float64
         try {
-            {
-
-                auto& objectArg = data;
-                //std::thread thr1{ [&]() {
-                //} };
-                Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "Cartn_x", &data_->atom_x)).execute();
-                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "Cartn_y", & data_->atom_y)).execute();
-                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "Cartn_z", & data_->atom_z)).execute();
-                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "type_symbol", & data_->atom_type_symbol)).execute();
-                //std::thread thr2{ [&]() {
-                    //} };
-                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_atom_id",& data_->atom_label))     .execute();
-                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "auth_seq_id",& data_->auth_residue_id))      .execute();
-                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_asym_id",& data_->chain_id))       .execute();
-                //std::thread thr3{ [&]() {
-                    //} };
-                     Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "auth_atom_id",& data_->auth_atom_label))   .execute();
-                     Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "id",& data_->atom_id))                         .execute();
-                //std::thread thr4{ [&]() {
-                //} };
-                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_comp_id",& data_->residue_name))     .execute();
-                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "auth_asym_id",& data_->auth_chain_id))   .execute();
-                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_seq_id",& data_->residue_id))              .execute();
-                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "pdbx_PDB_ins_code",& data_->insertion_code)) .execute();
-
-                //thr1.join(); thr2.join(); thr3.join(); thr4.join();
-
-                /*
-                const size_t TASK_NUMBER = 13;
-                std::array<Task, 8> threaded_tasks{
-                    Task(Task::Args<double>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "Cartn_x", &data_->atom_x})
-                    , Task(Task::Args<double>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "Cartn_y", &data_->atom_y})
-                    , Task(Task::Args<double>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "Cartn_z", &data_->atom_z})
-                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "type_symbol", &data_->atom_type_symbol})
-                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "label_atom_id", &data_->atom_label})
-                    , Task(Task::Args<int32_t>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "auth_seq_id", &data_->auth_residue_id})
-                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "label_asym_id", &data_->chain_id})
-                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "auth_asym_id", &data_->auth_chain_id})
-                };
-                std::array<Task, TASK_NUMBER - 8> tasks
-                {
-                     Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "auth_atom_id", &data_->auth_atom_label})
-                    , Task(Task::Args<int32_t>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "id", &data_->atom_id})
-                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "label_comp_id", &data_->residue_name})
-                    , Task(Task::Args<int32_t>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "label_seq_id", &data_->residue_id})
-                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "pdbx_PDB_ins_code", &data_->insertion_code})
-                };
-                for (auto& t : tasks)
-                    t.execute();
-                std::vector<TaskWorker> workers; workers.reserve(TASK_NUMBER);
-                for (auto& it_task : threaded_tasks)
-                    workers.emplace_back(it_task);
-                */
-
-            } // We want the workers to finish before the decode is put to true
-            cure_atom_site_data(*data_);
-
+                
             msgpack::object_handle oh;
             msgpack::unpack(oh, data.data(), data.size());
 
@@ -4439,7 +4385,6 @@ namespace chemfiles
             // Parse the first data block (single structure for Phase 1)
             // Call the free function in the msgpack namespace
             msgpack::parse_data_block(data_blocks.ptr[0], *data_);
-
 
             decoded_ = true;
 
