@@ -19,6 +19,7 @@
 #include <iostream>
 #include <iomanip>
 #include <unordered_set>
+#include <chrono>
 #include <thread>
 
 // Include msgpack headers
@@ -134,48 +135,73 @@ namespace chemfiles {
     class StringCollection
     {
     public:
-        StringCollection(std::vector<uint32_t> indices,
-        std::vector<uint32_t> offsets,
-        std::string char_pool
-        ) : _indices(std::move(_indices)), _offsets(std::move(offsets)), _char_pool(std::move(char_pool))
+        StringCollection() = default;
+        StringCollection(
+            std::vector<int32_t> indices,
+            std::vector<int32_t> offsets,
+            std::string char_pool
+        ) : _data(std::make_shared<Data>(Data{ std::move(indices), std::move(offsets), std::move(char_pool) }))
         { }
-
+        StringCollection(const StringCollection&) = default;
+        StringCollection& operator=(const StringCollection&) = default;
+        StringCollection( StringCollection&&) = default;
+        StringCollection& operator=( StringCollection&&) = default;
         std::string operator[](const size_t& idx) const
         {
-            size_t start = static_cast<size_t>(_offsets[idx]);
-            size_t end = static_cast<size_t>(_offsets[idx + 1]);
-            if (start <= end && end <= _char_pool.size())
-                return _char_pool.substr(start, start - start);
+            if (idx >= _data->indices.size()) return "";
+            auto& actual_index = _data->indices[idx];
+            if (actual_index < 0 || actual_index + 1 >= _data->offsets.size()) return "";
+
+            size_t start = static_cast<size_t>(_data->offsets[actual_index]);
+            size_t end = static_cast<size_t>(_data->offsets[actual_index + 1]);
+            if (start <= end && end <= _data->char_pool.size())
+                return _data->char_pool.substr(start, end - start);
             return "";
         }
         size_t size() const
         {
-            return _indices.size();
+            return _data->indices.size();
+        }
+        bool empty() const 
+        {
+            return _data->char_pool.empty();
+        }
+        bool none_other_than(const std::string& char_list) const
+        {
+            for (auto& it_char : _data->char_pool)
+            {
+                if (char_list.find(it_char) == std::string::npos)
+                    return false;
+            }
+            return true;
         }
     private:
-        std::vector<uint32_t> _indices;
-        std::vector<uint32_t> _offsets;
-        std::string _char_pool;
+        struct Data {
+            std::vector<int32_t> indices;
+            std::vector<int32_t> offsets;
+            std::string char_pool;
+        };
+        std::shared_ptr<Data> _data = std::make_shared<Data>();
     };
     struct BCIFFormat::BCIFData {
         // Atom site data
         std::vector<double> atom_x;
         std::vector<double> atom_y;
         std::vector<double> atom_z;
-        std::vector<std::string> atom_type_symbol;
-        std::vector<std::string> atom_label;        // label_atom_id (primary)
-        std::vector<std::string> auth_atom_label;   // auth_atom_id (fallback)
+        StringCollection atom_type_symbol;
+        StringCollection atom_label;        // label_atom_id (primary)
+        StringCollection auth_atom_label;   // auth_atom_id (fallback)
         std::vector<int32_t> atom_id;
 
         // Residue data (from _atom_site category)
-        std::vector<std::string> residue_name;      // label_comp_id
+        StringCollection  residue_name;      // label_comp_id
         std::vector<int32_t> residue_id;            // label_seq_id (primary)
-        std::vector<std::string> chain_id;          // label_asym_id (primary)
-        std::vector<std::string> insertion_code;    // pdbx_PDB_ins_code
+        StringCollection chain_id;          // label_asym_id (primary)
+        StringCollection insertion_code;    // pdbx_PDB_ins_code
 
         // Author-provided identifiers (stored for round-trip writing)
         std::vector<int32_t> auth_residue_id;       // auth_seq_id
-        std::vector<std::string> auth_chain_id;     // auth_asym_id
+        StringCollection  auth_chain_id;     // auth_asym_id
 
         // Cell data
         double cell_length_a = 0.0;
@@ -608,19 +634,19 @@ namespace msgpack {
                 else if (column_name == "type_symbol") {
                     decode_column(data_obj, data.atom_type_symbol);
                     if (has_mask && !mask.empty()) {
-                        data.atom_type_symbol = apply_mask(data.atom_type_symbol, mask);
+                        //data.atom_type_symbol = apply_mask(data.atom_type_symbol, mask);
                     }
                 }
                 else if (column_name == "label_atom_id") {
                     decode_column(data_obj, data.atom_label);
                     if (has_mask && !mask.empty()) {
-                        data.atom_label = apply_mask(data.atom_label, mask);
+                        //data.atom_label = apply_mask(data.atom_label, mask);
                     }
                 }
                 else if (column_name == "auth_atom_id") {
                     decode_column(data_obj, data.auth_atom_label);
                     if (has_mask && !mask.empty()) {
-                        data.auth_atom_label = apply_mask(data.auth_atom_label, mask);
+                        //data.auth_atom_label = apply_mask(data.auth_atom_label, mask);
                     }
                 }
                 else if (column_name == "id") {
@@ -633,7 +659,7 @@ namespace msgpack {
                 else if (column_name == "label_comp_id") {
                     decode_column(data_obj, data.residue_name);
                     if (has_mask && !mask.empty()) {
-                        data.residue_name = apply_mask(data.residue_name, mask);
+                        //data.residue_name = apply_mask(data.residue_name, mask);
                     }
                 }
                 else if (column_name == "label_seq_id") {
@@ -654,20 +680,20 @@ namespace msgpack {
                     // Use label_asym_id as primary chain ID (matches mmCIF implementation)
                     decode_column(data_obj, data.chain_id);
                     if (has_mask && !mask.empty()) {
-                        data.chain_id = apply_mask(data.chain_id, mask);
+                        //data.chain_id = apply_mask(data.chain_id, mask);
                     }
                 }
                 else if (column_name == "auth_asym_id") {
                     // Store auth_asym_id for round-trip writing
                     decode_column(data_obj, data.auth_chain_id);
                     if (has_mask && !mask.empty()) {
-                        data.auth_chain_id = apply_mask(data.auth_chain_id, mask);
+                        //data.auth_chain_id = apply_mask(data.auth_chain_id, mask);
                     }
                 }
                 else if (column_name == "pdbx_PDB_ins_code") {
                     decode_column(data_obj, data.insertion_code);
                     if (has_mask && !mask.empty()) {
-                        data.insertion_code = apply_mask(data.insertion_code, mask);
+                        //data.insertion_code = apply_mask(data.insertion_code, mask);
                     }
                 }
             }
@@ -1921,9 +1947,6 @@ namespace msgpack {
 
             return ;
         }
-        void decode_column(const msgpack::object& column, StringCollection& result) {
-
-        }
 
         std::vector<int32_t> decode_byte_array(const msgpack::object & data) {
             // ByteArray decoder: converts byte array from MessagePack to int32 array
@@ -2371,6 +2394,111 @@ namespace msgpack {
             }
 
             return result;
+        }
+        void decode_column(const msgpack::object& column, StringCollection& result) {
+            // Simple string array decoding. Might need some refinement in the future.
+            if (column.type != msgpack::type::MAP) {
+                return;
+            }
+            auto __ = g_functionTimer.chrono("decode string collection"); // TODO : remove this
+
+            msgpack::object data_obj;
+            msgpack::object encoding_obj;
+            bool found_data = false;
+            bool found_encoding = false;
+
+            get_data_and_encoding(column.via.map, data_obj, found_data, encoding_obj, found_encoding);
+
+            if (!found_data || !found_encoding) {
+                return;
+            }
+
+            if (encoding_obj.type != msgpack::type::ARRAY) {
+                return;
+            }
+
+            // Look for StringArray encoding
+            auto encodings = encoding_obj.via.array;
+            for (uint32_t i = 0; i < encodings.size; ++i) {
+                if (encodings.ptr[i].type != msgpack::type::MAP) {
+                    continue;
+                }
+
+                std::string kind;
+                {
+                    auto enc_map = encodings.ptr[i].via.map;
+                    for (uint32_t j = 0; j < enc_map.size; ++j) {
+                        std::string key;
+                        enc_map.ptr[j].key.convert(key);
+                        if (key == "kind") {
+                            enc_map.ptr[j].val.convert(kind);
+                            break;
+                        }
+                    }
+                }
+
+                if (kind == "StringArray") {
+                    auto encoding = encodings.ptr[i];
+                    // StringArray decoder: decodes string arrays
+                    if (encoding.type != msgpack::type::MAP) {
+                        return;
+                    }
+
+
+                    auto __ = g_functionTimer.chrono("decode string array"); // TODO : remove this
+
+                    // Get dataEncoding, stringData, offsetEncoding, and offsets from encoding spec
+                    msgpack::object data_encoding_obj;
+                    msgpack::object string_data_obj;
+                    msgpack::object offset_encoding_obj;
+                    msgpack::object offsets_obj;
+
+                    auto enc_map = encoding.via.map;
+                    for (uint32_t i = 0; i < enc_map.size; ++i) {
+                        std::string key;
+                        enc_map.ptr[i].key.convert(key);
+                        if (key == "dataEncoding") {
+                            data_encoding_obj = enc_map.ptr[i].val;
+                        }
+                        else if (key == "stringData") {
+                            string_data_obj = enc_map.ptr[i].val;
+                        }
+                        else if (key == "offsetEncoding") {
+                            offset_encoding_obj = enc_map.ptr[i].val;
+                        }
+                        else if (key == "offsets") {
+                            offsets_obj = enc_map.ptr[i].val;
+                        }
+                    }
+
+                    // Decode string data
+                    std::string string_data;
+                    if (string_data_obj.type == msgpack::type::STR) {
+                        string_data_obj.convert(string_data);
+                    }
+                    else {
+                        return;
+                    }
+
+
+                    // Decode the indices from the data using dataEncoding chain
+                    std::vector<int32_t> indices;
+                    if (data_encoding_obj.type == msgpack::type::ARRAY) {
+                        decode_string_array_with_indices(data_encoding_obj, data_obj, indices);
+                    }
+
+                    // Decode the offsets using offsetEncoding chain
+                    std::vector<int32_t> offsets;
+                    if (offset_encoding_obj.type == msgpack::type::ARRAY) {
+                        decode_string_array_with_offset(offsets_obj, offset_encoding_obj, data_obj, offsets);
+                    }
+                    result = StringCollection(std::move(indices), std::move(offsets), std::move(string_data));
+                    return;
+                }
+            }
+
+            return;
+
         }
 
         // =============================================================================
@@ -3774,8 +3902,8 @@ namespace chemfiles
             bool just_changed_chain = false;
             bool just_changed_residue = false;
 
-            const std::string* chain_name = nullptr;
-            const std::string*   res_name = nullptr;
+            std::unique_ptr<std::string> chain_name = nullptr;
+            std::unique_ptr<std::string> res_name = nullptr;
             const int32_t*         res_id = nullptr;
 
             size_t it_atomIndex = 0; // We need the variable to survive after the loop to create the last residue
@@ -3817,8 +3945,8 @@ namespace chemfiles
 
                 if (profile.residue_data_size_ok)
                 {
-                    chain_name = &data.chain_id[it_atomIndex];
-                    res_name = &data.residue_name[it_atomIndex];
+                    chain_name = std::make_unique<std::string>(data.chain_id[it_atomIndex]);
+                    res_name = std::make_unique<std::string>(data.residue_name[it_atomIndex]);
                     res_id = &data.residue_id[it_atomIndex];
                 }
                 bool fetched_all_residue_data = res_name != nullptr && chain_name != nullptr && res_id != nullptr;
@@ -3993,6 +4121,14 @@ namespace chemfiles
                 std::vector<T>* out = nullptr;
                 
             };
+            template <>
+            struct Args< StringCollection>
+            {
+                DecodeObject object;
+                std::filesystem::path dataPath;
+                const char* column_name;
+                StringCollection* out = nullptr;
+            };
         private:
             struct Interface {
                 virtual ~Interface() = default;
@@ -4105,10 +4241,9 @@ namespace chemfiles
                             continue;
 
                         msgpack::decode_column(data_obj, *_args.out);
-                        if constexpr (!std::is_same_v<T, double>)
+                        if constexpr (!std::is_same_v<T, double> && !std::is_same_v<T, StringCollection>)
                         {
                             if (has_mask) {
-
                                 std::vector<int32_t> mask;
                                 mask = decode_mask(mask_obj);
                                 if (!mask.empty())
@@ -4142,6 +4277,15 @@ namespace chemfiles
         private:
             std::unique_ptr<Interface> _ptr = nullptr;
         };
+        template < typename T>
+        Task::Args<T> make_args(DecodeObject decode_object, const char* s1, const char* s2, std::vector<T>* obj)
+        {
+            return Task::Args<T>{std::move (decode_object), s1, s2, obj};
+        }
+        Task::Args<StringCollection> make_args(DecodeObject decode_object, const char* s1, const char* s2, StringCollection* obj)
+        {
+            return Task::Args<StringCollection>{std::move (decode_object), s1, s2, obj};
+        }
         class TaskWorker
         {
         public:
@@ -4178,9 +4322,7 @@ namespace chemfiles
             }
 
             // Similarly for chain IDs (though less common)
-            bool label_chain_invalid = !data.chain_id.empty() &&
-                std::all_of(data.chain_id.begin(), data.chain_id.end(),
-                    [](const std::string& s) { return s.empty() || s == "?" || s == "."; });
+            bool label_chain_invalid = !data.chain_id.empty() && data.chain_id.none_other_than("?.");
 
             if (label_chain_invalid && !data.auth_chain_id.empty()) {
                 // Use auth_asym_id when label_asym_id is invalid
@@ -4208,25 +4350,25 @@ namespace chemfiles
                 auto& objectArg = data;
                 //std::thread thr1{ [&]() {
                 //} };
-                    Task(Task::Args<double>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "Cartn_x",& data_->atom_x}).execute();
-                    Task(Task::Args<double>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "Cartn_y", & data_->atom_y}).execute();
-                    Task(Task::Args<double>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "Cartn_z", & data_->atom_z}).execute();
-                    Task(Task::Args<std::string>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "type_symbol", & data_->atom_type_symbol}).execute();
+                Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "Cartn_x", &data_->atom_x)).execute();
+                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "Cartn_y", & data_->atom_y)).execute();
+                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "Cartn_z", & data_->atom_z)).execute();
+                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "type_symbol", & data_->atom_type_symbol)).execute();
                 //std::thread thr2{ [&]() {
                     //} };
-                    Task(Task::Args<std::string>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_atom_id",& data_->atom_label})     .execute();
-                    Task(Task::Args<int32_t>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "auth_seq_id",& data_->auth_residue_id})      .execute();
-                    Task(Task::Args<std::string>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_asym_id",& data_->chain_id})       .execute();
+                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_atom_id",& data_->atom_label))     .execute();
+                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "auth_seq_id",& data_->auth_residue_id))      .execute();
+                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_asym_id",& data_->chain_id))       .execute();
                 //std::thread thr3{ [&]() {
                     //} };
-                     Task(Task::Args<std::string>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "auth_atom_id",& data_->auth_atom_label})   .execute();
-                     Task(Task::Args<int32_t>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "id",& data_->atom_id})                         .execute();
+                     Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "auth_atom_id",& data_->auth_atom_label))   .execute();
+                     Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "id",& data_->atom_id))                         .execute();
                 //std::thread thr4{ [&]() {
                 //} };
-                    Task(Task::Args<std::string>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_comp_id",& data_->residue_name})     .execute();
-                    Task(Task::Args<std::string>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "auth_asym_id",& data_->auth_chain_id})   .execute();
-                    Task(Task::Args<int32_t>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_seq_id",& data_->residue_id})              .execute();
-                    Task(Task::Args<std::string>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "pdbx_PDB_ins_code",& data_->insertion_code}) .execute();
+                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_comp_id",& data_->residue_name))     .execute();
+                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "auth_asym_id",& data_->auth_chain_id))   .execute();
+                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_seq_id",& data_->residue_id))              .execute();
+                    Task(make_args(DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "pdbx_PDB_ins_code",& data_->insertion_code)) .execute();
 
                 //thr1.join(); thr2.join(); thr3.join(); thr4.join();
 
