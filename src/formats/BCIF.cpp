@@ -90,7 +90,73 @@ namespace std {
     };
 }
 namespace chemfiles {
+    class FunctionTimer
+    {
+    public:
+        struct ElapsedTIme {
+            float timeMs = 0.f;
+            uint32_t numCall = 0;
+        };
+        class RaiiChrono
+        {
+            ElapsedTIme* _data = nullptr;
+            std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
+        public :
+            RaiiChrono() = delete;
+            RaiiChrono(ElapsedTIme& data)
+                :_data(&data)
+            {
+            }
+            ~RaiiChrono()
+            {
+                _data->timeMs += std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(std::chrono::steady_clock::now() - t0).count();
+                _data->numCall++;
+            }
+            RaiiChrono(const RaiiChrono&) = delete;
+            RaiiChrono& operator=(const RaiiChrono&) = delete;
+            RaiiChrono( RaiiChrono&&) = default;
+            RaiiChrono& operator=( RaiiChrono&&) = default;
+        };
+        RaiiChrono chrono(std::string id)
+        {
+            if (_data.count(id) == 0)
+                _data.emplace(id, ElapsedTIme());
+            return RaiiChrono(_data.at(id));
+        }
+        ~FunctionTimer()
+        {
+            for (auto& it_ : _data)
+                std::cout << it_.first << " : " << "\n\t Num call : " << it_.second.numCall << "\n\t Total elapsed time : " << it_.second.timeMs << "ms.\n\n";
+        }
+    private:
+        std::map<std::string, ElapsedTIme> _data;
+    } g_functionTimer;
+    class StringCollection
+    {
+    public:
+        StringCollection(std::vector<uint32_t> indices,
+        std::vector<uint32_t> offsets,
+        std::string char_pool
+        ) : _indices(std::move(_indices)), _offsets(std::move(offsets)), _char_pool(std::move(char_pool))
+        { }
 
+        std::string operator[](const size_t& idx) const
+        {
+            size_t start = static_cast<size_t>(_offsets[idx]);
+            size_t end = static_cast<size_t>(_offsets[idx + 1]);
+            if (start <= end && end <= _char_pool.size())
+                return _char_pool.substr(start, start - start);
+            return "";
+        }
+        size_t size() const
+        {
+            return _indices.size();
+        }
+    private:
+        std::vector<uint32_t> _indices;
+        std::vector<uint32_t> _offsets;
+        std::string _char_pool;
+    };
     struct BCIFFormat::BCIFData {
         // Atom site data
         std::vector<double> atom_x;
@@ -308,6 +374,7 @@ namespace msgpack {
         void decode_column(const msgpack::object & column, std::vector<double>&);
         void decode_column(const msgpack::object & column, std::vector<int32_t>&);
         void decode_column(const msgpack::object & column, std::vector<std::string>&);
+        void decode_column(const msgpack::object & column, StringCollection&);
 
         void parse_atom_site(const msgpack::object & category, BCIFData & data);
         void parse_cell(const msgpack::object & category, BCIFData & data);
@@ -496,6 +563,7 @@ namespace msgpack {
 
             return result;
         }
+        
         namespace
         {
             inline void get_name_and_data(msgpack::object_map& col_map, std::string& column_name, msgpack::object& data_obj, bool& found_data, msgpack::object& mask_obj, bool& has_mask)
@@ -1608,6 +1676,7 @@ namespace msgpack {
             if (column.type != msgpack::type::MAP) {
                 return ;
             }
+            auto __ = g_functionTimer.chrono("decode int32 column"); // TODO : remove this
 
             msgpack::object data_obj;
             msgpack::object encoding_obj;
@@ -1734,6 +1803,7 @@ namespace msgpack {
                 return ;
             }
 
+            auto __ = g_functionTimer.chrono("decode double column"); // TODO : remove this
             msgpack::object data_obj;
             msgpack::object encoding_obj;
             bool found_data = false;
@@ -1808,6 +1878,7 @@ namespace msgpack {
             if (column.type != msgpack::type::MAP) {
                 return ;
             }
+            auto __ = g_functionTimer.chrono("decode string column"); // TODO : remove this
 
             msgpack::object data_obj;
             msgpack::object encoding_obj;
@@ -1849,6 +1920,9 @@ namespace msgpack {
             }
 
             return ;
+        }
+        void decode_column(const msgpack::object& column, StringCollection& result) {
+
         }
 
         std::vector<int32_t> decode_byte_array(const msgpack::object & data) {
@@ -2053,6 +2127,7 @@ namespace msgpack {
         {
             inline void decode_string_array_with_indices(const msgpack::object& data_encoding_obj, const msgpack::object& data, std::vector<int32_t>& indices)
             {
+                auto __ = g_functionTimer.chrono("decode_string_array_with_indices"); // TODO : remove this
                 // Apply dataEncoding chain in reverse order
                 auto encodings = data_encoding_obj.via.array;
                 std::vector<int32_t> result;
@@ -2134,6 +2209,7 @@ namespace msgpack {
             }
             inline void decode_string_array_with_offset(const msgpack::object& offsets_obj,const msgpack::object& offset_encoding_obj, const msgpack::object& data, std::vector<int32_t>& offsets)
             {
+                auto __ = g_functionTimer.chrono("decode_string_array_with_offset"); // TODO : remove this
                 auto encodings = offset_encoding_obj.via.array;
                 std::vector<int32_t> result;
 
@@ -2215,6 +2291,9 @@ namespace msgpack {
                 return {};
             }
 
+
+            auto __ = g_functionTimer.chrono("decode string array"); // TODO : remove this
+
             // Get dataEncoding, stringData, offsetEncoding, and offsets from encoding spec
             msgpack::object data_encoding_obj;
             msgpack::object string_data_obj;
@@ -2261,15 +2340,17 @@ namespace msgpack {
                 decode_string_array_with_offset(offsets_obj, offset_encoding_obj, data, offsets);
             }
 
-
             if (offsets.empty() || indices.empty()) {
                 return {};
             }
 
-            // Map indices to strings using offsets
             std::vector<std::string> result;
             result.reserve(indices.size());
+            {
 
+                auto __ = g_functionTimer.chrono("decode_string_array end loop"); // TODO : remove this
+
+            // Map indices to strings using offsets
             for (size_t i = 0; i < indices.size(); ++i) {
                 int32_t idx = indices[i];
                 if (idx < 0 || idx >= static_cast<int32_t>(offsets.size()) - 1) {
@@ -2286,6 +2367,7 @@ namespace msgpack {
                 else {
                     result.push_back("");
                 }
+            }
             }
 
             return result;
@@ -3877,10 +3959,11 @@ namespace chemfiles
             Object _obj;
         public:
             DecodeObject(const std::string& data) : _data(&data) {
+                
                 msgpack::unpack(_oh, data.data(), data.size());
                 _obj = _oh.get();
             }
-            DecodeObject(Object&& obj) : _obj(std::move(obj)) {}
+            DecodeObject(Object&& obj) : _obj(obj) {}
             DecodeObject(Object& obj) : _obj(obj) {}
 
             Object* operator->()
@@ -4121,27 +4204,58 @@ namespace chemfiles
         //  33 = Float64
         try {
             {
+
+                auto& objectArg = data;
+                //std::thread thr1{ [&]() {
+                //} };
+                    Task(Task::Args<double>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "Cartn_x",& data_->atom_x}).execute();
+                    Task(Task::Args<double>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "Cartn_y", & data_->atom_y}).execute();
+                    Task(Task::Args<double>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "Cartn_z", & data_->atom_z}).execute();
+                    Task(Task::Args<std::string>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "type_symbol", & data_->atom_type_symbol}).execute();
+                //std::thread thr2{ [&]() {
+                    //} };
+                    Task(Task::Args<std::string>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_atom_id",& data_->atom_label})     .execute();
+                    Task(Task::Args<int32_t>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "auth_seq_id",& data_->auth_residue_id})      .execute();
+                    Task(Task::Args<std::string>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_asym_id",& data_->chain_id})       .execute();
+                //std::thread thr3{ [&]() {
+                    //} };
+                     Task(Task::Args<std::string>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "auth_atom_id",& data_->auth_atom_label})   .execute();
+                     Task(Task::Args<int32_t>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "id",& data_->atom_id})                         .execute();
+                //std::thread thr4{ [&]() {
+                //} };
+                    Task(Task::Args<std::string>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_comp_id",& data_->residue_name})     .execute();
+                    Task(Task::Args<std::string>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "auth_asym_id",& data_->auth_chain_id})   .execute();
+                    Task(Task::Args<int32_t>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "label_seq_id",& data_->residue_id})              .execute();
+                    Task(Task::Args<std::string>{DecodeObject(objectArg), "dataBlocks/categories/name=_atom_site/columns", "pdbx_PDB_ins_code",& data_->insertion_code}) .execute();
+
+                //thr1.join(); thr2.join(); thr3.join(); thr4.join();
+
+                /*
                 const size_t TASK_NUMBER = 13;
-                std::array<Task, TASK_NUMBER> tasks
-                {
+                std::array<Task, 8> threaded_tasks{
                     Task(Task::Args<double>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "Cartn_x", &data_->atom_x})
                     , Task(Task::Args<double>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "Cartn_y", &data_->atom_y})
                     , Task(Task::Args<double>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "Cartn_z", &data_->atom_z})
                     , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "type_symbol", &data_->atom_type_symbol})
                     , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "label_atom_id", &data_->atom_label})
-                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "auth_atom_id", &data_->auth_atom_label})
-                    , Task(Task::Args<int32_t>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "id", &data_->atom_id})
-                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "label_comp_id", &data_->residue_name})
-                    , Task(Task::Args<int32_t>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "label_seq_id", &data_->residue_id})
                     , Task(Task::Args<int32_t>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "auth_seq_id", &data_->auth_residue_id})
                     , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "label_asym_id", &data_->chain_id})
                     , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "auth_asym_id", &data_->auth_chain_id})
+                };
+                std::array<Task, TASK_NUMBER - 8> tasks
+                {
+                     Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "auth_atom_id", &data_->auth_atom_label})
+                    , Task(Task::Args<int32_t>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "id", &data_->atom_id})
+                    , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "label_comp_id", &data_->residue_name})
+                    , Task(Task::Args<int32_t>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "label_seq_id", &data_->residue_id})
                     , Task(Task::Args<std::string>{DecodeObject(data), "dataBlocks/categories/name=_atom_site/columns", "pdbx_PDB_ins_code", &data_->insertion_code})
                 };
-                    
+                for (auto& t : tasks)
+                    t.execute();
                 std::vector<TaskWorker> workers; workers.reserve(TASK_NUMBER);
-                for (auto& it_task : tasks)
+                for (auto& it_task : threaded_tasks)
                     workers.emplace_back(it_task);
+                */
 
             } // We want the workers to finish before the decode is put to true
             cure_atom_site_data(*data_);
