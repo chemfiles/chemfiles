@@ -91,47 +91,6 @@ namespace std {
     };
 }
 namespace chemfiles {
-    class FunctionTimer
-    {
-    public:
-        struct ElapsedTIme {
-            float timeMs = 0.f;
-            uint32_t numCall = 0;
-        };
-        class RaiiChrono
-        {
-            ElapsedTIme* _data = nullptr;
-            std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
-        public :
-            RaiiChrono() = delete;
-            RaiiChrono(ElapsedTIme& data)
-                :_data(&data)
-            {
-            }
-            ~RaiiChrono()
-            {
-                _data->timeMs += std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(std::chrono::steady_clock::now() - t0).count();
-                _data->numCall++;
-            }
-            RaiiChrono(const RaiiChrono&) = delete;
-            RaiiChrono& operator=(const RaiiChrono&) = delete;
-            RaiiChrono( RaiiChrono&&) = default;
-            RaiiChrono& operator=( RaiiChrono&&) = default;
-        };
-        RaiiChrono chrono(std::string id)
-        {
-            if (_data.count(id) == 0)
-                _data.emplace(id, ElapsedTIme());
-            return RaiiChrono(_data.at(id));
-        }
-        ~FunctionTimer()
-        {
-            for (auto& it_ : _data)
-                std::cout << it_.first << " : " << "\n\t Num call : " << it_.second.numCall << "\n\t Total elapsed time : " << it_.second.timeMs << "ms.\n\n";
-        }
-    private:
-        std::map<std::string, ElapsedTIme> _data;
-    } g_functionTimer;
     class StringCollection
     {
     public:
@@ -1698,7 +1657,6 @@ namespace msgpack {
             if (column.type != msgpack::type::MAP) {
                 return ;
             }
-            auto __ = g_functionTimer.chrono("decode int32 column"); // TODO : remove this
 
             msgpack::object data_obj;
             msgpack::object encoding_obj;
@@ -1825,7 +1783,6 @@ namespace msgpack {
                 return ;
             }
 
-            auto __ = g_functionTimer.chrono("decode double column"); // TODO : remove this
             msgpack::object data_obj;
             msgpack::object encoding_obj;
             bool found_data = false;
@@ -1900,7 +1857,6 @@ namespace msgpack {
             if (column.type != msgpack::type::MAP) {
                 return ;
             }
-            auto __ = g_functionTimer.chrono("decode_column string"); // TODO : remove this
 
             msgpack::object data_obj;
             msgpack::object encoding_obj;
@@ -2146,7 +2102,6 @@ namespace msgpack {
         {
             inline void decode_string_array_with_indices(const msgpack::object& data_encoding_obj, const msgpack::object& data, std::vector<int32_t>& indices)
             {
-                auto __ = g_functionTimer.chrono("decode_string_array_with_indices"); // TODO : remove this
                 // Apply dataEncoding chain in reverse order
                 auto encodings = data_encoding_obj.via.array;
                 std::vector<int32_t> result;
@@ -2176,7 +2131,6 @@ namespace msgpack {
                     else {
                         // Subsequent steps: apply encoding to result
                         if (kind == "IntegerPacking") {
-                auto __ = g_functionTimer.chrono("decode_string_array_with_indices IntegerPacking"); // TODO : remove this
                             // Extract parameters
                             int32_t byte_count = 4;
                             bool is_unsigned = false;
@@ -2198,7 +2152,6 @@ namespace msgpack {
                             result = decode_integer_packing(byte_data, byte_count, is_unsigned);
                         }
                         else if (kind == "RunLength") {
-                auto __ = g_functionTimer.chrono("decode_string_array_with_indices RunLength"); // TODO : remove this
                             // Extract srcSize parameter
                             int32_t src_size = 0;
                             for (uint32_t j = 0; j < enc_map.size; ++j) {
@@ -2212,7 +2165,6 @@ namespace msgpack {
                             result = decode_run_length(result, src_size);
                         }
                         else if (kind == "Delta") {
-                auto __ = g_functionTimer.chrono("decode_string_array_with_indices Delta"); // TODO : remove this
                             // Extract origin parameter
                             int32_t origin = 0;
                             for (uint32_t j = 0; j < enc_map.size; ++j) {
@@ -2231,7 +2183,6 @@ namespace msgpack {
             }
             inline void decode_string_array_with_offset(const msgpack::object& offsets_obj,const msgpack::object& offset_encoding_obj, const msgpack::object& data, std::vector<int32_t>& offsets)
             {
-                auto __ = g_functionTimer.chrono("decode_string_array_with_offset"); // TODO : remove this
                 auto encodings = offset_encoding_obj.via.array;
                 std::vector<int32_t> result;
 
@@ -2313,9 +2264,6 @@ namespace msgpack {
                 return {};
             }
 
-
-            auto __ = g_functionTimer.chrono("decode string array"); // TODO : remove this
-
             // Get dataEncoding, stringData, offsetEncoding, and offsets from encoding spec
             msgpack::object data_encoding_obj;
             msgpack::object string_data_obj;
@@ -2370,8 +2318,6 @@ namespace msgpack {
             result.reserve(indices.size());
             {
 
-                auto __ = g_functionTimer.chrono("decode_string_array end loop"); // TODO : remove this
-
             // Map indices to strings using offsets
             for (size_t i = 0; i < indices.size(); ++i) {
                 int32_t idx = indices[i];
@@ -2399,7 +2345,6 @@ namespace msgpack {
             if (column.type != msgpack::type::MAP) {
                 return;
             }
-            auto __ = g_functionTimer.chrono("decode string collection"); // TODO : remove this
 
             msgpack::object data_obj;
             msgpack::object encoding_obj;
@@ -2443,9 +2388,6 @@ namespace msgpack {
                         return;
                     }
 
-
-                    auto __ = g_functionTimer.chrono("decode string array"); // TODO : remove this
-
                     // Get dataEncoding, stringData, offsetEncoding, and offsets from encoding spec
                     msgpack::object data_encoding_obj;
                     msgpack::object string_data_obj;
@@ -2483,7 +2425,6 @@ namespace msgpack {
                     // Decode the indices from the data using dataEncoding chain
                     std::vector<int32_t> indices;
                     if (data_encoding_obj.type == msgpack::type::ARRAY) {
-                    auto __ = g_functionTimer.chrono("decode string array indices"); // TODO : remove this
 
                         //decode_column(data_obj, indices);
                         decode_string_array_with_indices(data_encoding_obj, data_obj, indices);
@@ -4075,263 +4016,6 @@ namespace chemfiles
         file.print("{}", std::string(binary_data.begin(), binary_data.end()));
 
         has_written_ = true;
-    }
-   
-    namespace
-    {
-        class DecodeObject
-        {
-        public:
-            using Object = std::remove_const<std::remove_reference<decltype(((msgpack::object_handle*)(nullptr))->get())>::type>::type;
-        private:
-            const std::string* _data = nullptr;
-            msgpack::object_handle _oh;
-            Object _obj;
-        public:
-            DecodeObject(const std::string& data) : _data(&data) {
-                
-                msgpack::unpack(_oh, data.data(), data.size());
-                _obj = _oh.get();
-            }
-            DecodeObject(Object&& obj) : _obj(obj) {}
-            DecodeObject(Object& obj) : _obj(obj) {}
-
-            Object* operator->()
-            {
-                return &_obj;
-            }
-            const Object* operator->() const
-            {
-                return &_obj;
-            }
-            operator Object&()
-            {
-                return _obj;
-            }
-            operator const Object&() const
-            {
-                return _obj;
-            }
-        };
-        class Task {
-        public:
-            template <typename T>
-            struct Args {
-                DecodeObject object;
-                std::filesystem::path dataPath;
-                const char* column_name;
-                std::vector<T>* out = nullptr;
-                
-            };
-            template <>
-            struct Args< StringCollection>
-            {
-                DecodeObject object;
-                std::filesystem::path dataPath;
-                const char* column_name;
-                StringCollection* out = nullptr;
-            };
-        private:
-            struct Interface {
-                virtual ~Interface() = default;
-                virtual void execute() = 0;
-            };
-            template<typename T>
-            class Wrapper : public Interface
-            {
-                Args<T> _args;
-                std::filesystem::path::iterator _target{ _args.dataPath.end()};
-                bool _data_extracted = false;
-
-                // Method called recursively to venture into the target path through the tree. Call extract data once the last node is reached.
-                void _dive(msgpack::object& src, std::filesystem::path::iterator it_current_location)
-                {
-                    if (it_current_location == _target)
-                    {
-                        _extract_data(src);
-                        return ;
-                    }
-
-                    std::string key = it_current_location->string();
-                    std::filesystem::path::iterator next_it = it_current_location; next_it++;
-
-                    if (src.type == msgpack::type::MAP)
-                    {
-                        auto block_map = src.via.map;
-                        for (uint32_t i = 0; i < block_map.size; ++i) {
-                            std::string current_key;
-                            block_map.ptr[i].key.convert(current_key);
-                            if (current_key == key) {
-                                _dive(block_map.ptr[i].val, next_it);
-                                if (_data_extracted) return ;
-                            }
-                        }
-                    }
-                    else if (src.type == msgpack::type::ARRAY)
-                    {
-                        std::string value{ key };
-                        size_t pos = value.find('=');
-                        bool return_map_having_keyvalue = false;
-                        if (pos != std::string::npos)
-                        {
-                            key = std::string(value.data(), pos);
-                            value = std::string(value.begin() + pos + 1, value.end());
-                            return_map_having_keyvalue = true;
-                        }
-
-                        auto array = src.via.array;
-                        for (uint32_t it_array_index = 0; it_array_index < array.size; ++it_array_index) {
-                            if (array.ptr[it_array_index].type != msgpack::type::MAP) {
-                                continue;
-                            }
-
-                            auto map = array.ptr[it_array_index].via.map;
-                            if (return_map_having_keyvalue)
-                            {
-                                for (uint32_t it_map_index = 0; it_map_index < map.size; ++it_map_index) {
-                                    std::string current_key;
-                                    std::string current_value;
-                                    map.ptr[it_map_index].key.convert(current_key);
-                                    if (current_key == key) {
-                                        map.ptr[it_map_index].val.convert(current_value);
-                                    }
-                                    if (current_value == value)
-                                    {
-                                        _dive(array.ptr[it_array_index], next_it);
-                                        if (_data_extracted) return ;
-                                    }
-                                    else
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                // Get category name
-                                std::string category_name;
-                                for (uint32_t j = 0; j < map.size; ++j) {
-                                    std::string current_key;
-                                    map.ptr[j].key.convert(current_key);
-                                    if (current_key == key) {
-                                        _dive( map.ptr[j].val, next_it);
-                                        return ;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    return ;
-                }
-
-                // Call with the node where we expect the data to be. 
-                // We expect the node to be an array of map with name and data node.
-                void _extract_data(const DecodeObject& obj)
-                {
-                    auto columns = obj->via.array;
-                    for (uint32_t i = 0; i < columns.size; ++i) {
-                        if (columns.ptr[i].type != msgpack::type::MAP) {
-                            continue;
-                        }
-
-                        std::string column_name;
-                        msgpack::object data_obj;
-                        msgpack::object mask_obj;
-                        bool found_data = false;
-                        bool has_mask = false;
-                        msgpack::get_name_and_data(columns.ptr[i].via.map, column_name, data_obj, found_data, mask_obj, has_mask);
-                        if (column_name != _args.column_name)
-                            continue;
-
-                        msgpack::decode_column(data_obj, *_args.out);
-                        if constexpr (!std::is_same_v<T, double> && !std::is_same_v<T, StringCollection>)
-                        {
-                            if (has_mask) {
-                                std::vector<int32_t> mask;
-                                mask = decode_mask(mask_obj);
-                                if (!mask.empty())
-                                    *_args.out = msgpack::apply_mask(*_args.out, mask);
-                            }
-                        }
-                        _data_extracted = true;
-                        break;
-                    }
-                }
-
-            public:
-                Wrapper(Args<T>&& args) : _args(std::forward<Args<T>>(args)) {}
-                virtual void execute() override
-                {
-                    _dive(_args.object, _args.dataPath.begin());
-                }
-            };
-        public:
-
-            template <typename T>
-            Task(Args<T>&& args)
-                : _ptr(new Wrapper<T>(std::forward<Args<T>>(args)))
-            { }
-
-            void execute()
-            {
-                if (_ptr) _ptr->execute();
-            }
-
-        private:
-            std::unique_ptr<Interface> _ptr = nullptr;
-        };
-        template < typename T>
-        Task::Args<T> make_args(DecodeObject decode_object, const char* s1, const char* s2, std::vector<T>* obj)
-        {
-            return Task::Args<T>{std::move (decode_object), s1, s2, obj};
-        }
-        Task::Args<StringCollection> make_args(DecodeObject decode_object, const char* s1, const char* s2, StringCollection* obj)
-        {
-            return Task::Args<StringCollection>{std::move (decode_object), s1, s2, obj};
-        }
-        class TaskWorker
-        {
-        public:
-            TaskWorker(Task& task)
-                : _thr([task_ptr = &task]() {task_ptr->execute(); })
-            { }
-            ~TaskWorker()
-            {
-                if (_thr.joinable())
-                {
-                    _thr.join();
-                }
-            }
-            TaskWorker(TaskWorker&&) = default;
-            TaskWorker& operator=(TaskWorker&&) = default;
-            TaskWorker(const TaskWorker&) = delete;
-            TaskWorker& operator=(const TaskWorker&) = delete;
-        private:
-            std::thread _thr;
-        };
-
-        void cure_atom_site_data(BCIFFormat::BCIFData& data)
-        {
-
-            // Fallback to auth fields when label fields are invalid
-            // Some BCIF files (e.g., 1aga) have label_seq_id = -1 for all atoms
-            bool label_seq_invalid = !data.residue_id.empty() &&
-                std::all_of(data.residue_id.begin(), data.residue_id.end(),
-                    [](int32_t id) { return id < 0; });
-
-            if (label_seq_invalid && !data.auth_residue_id.empty()) {
-                // Use auth_seq_id when label_seq_id is invalid
-                data.residue_id = data.auth_residue_id;
-            }
-
-            // Similarly for chain IDs (though less common)
-            bool label_chain_invalid = !data.chain_id.empty() && data.chain_id.none_other_than("?.");
-
-            if (label_chain_invalid && !data.auth_chain_id.empty()) {
-                // Use auth_asym_id when label_asym_id is invalid
-                data.chain_id = data.auth_chain_id;
-            }
-
-        }
     }
     void BCIFFormat::decode(const std::string& data) {
 
