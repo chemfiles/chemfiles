@@ -588,21 +588,12 @@ namespace msgpack {
                 }
                 else if (column_name == "type_symbol") {
                     decode_column(data_obj, data.atom_type_symbol);
-                    if (has_mask && !mask.empty()) {
-                        //data.atom_type_symbol = apply_mask(data.atom_type_symbol, mask);
-                    }
                 }
                 else if (column_name == "label_atom_id") {
                     decode_column(data_obj, data.atom_label);
-                    if (has_mask && !mask.empty()) {
-                        //data.atom_label = apply_mask(data.atom_label, mask);
-                    }
                 }
                 else if (column_name == "auth_atom_id") {
                     decode_column(data_obj, data.auth_atom_label);
-                    if (has_mask && !mask.empty()) {
-                        //data.auth_atom_label = apply_mask(data.auth_atom_label, mask);
-                    }
                 }
                 else if (column_name == "id") {
                     decode_column(data_obj, data.atom_id);
@@ -613,9 +604,6 @@ namespace msgpack {
                 // Residue information
                 else if (column_name == "label_comp_id") {
                     decode_column(data_obj, data.residue_name);
-                    if (has_mask && !mask.empty()) {
-                        //data.residue_name = apply_mask(data.residue_name, mask);
-                    }
                 }
                 else if (column_name == "label_seq_id") {
                     // Use label_seq_id as primary residue ID (matches mmCIF implementation)
@@ -634,22 +622,13 @@ namespace msgpack {
                 else if (column_name == "label_asym_id") {
                     // Use label_asym_id as primary chain ID (matches mmCIF implementation)
                     decode_column(data_obj, data.chain_id);
-                    if (has_mask && !mask.empty()) {
-                        //data.chain_id = apply_mask(data.chain_id, mask);
-                    }
                 }
                 else if (column_name == "auth_asym_id") {
                     // Store auth_asym_id for round-trip writing
                     decode_column(data_obj, data.auth_chain_id);
-                    if (has_mask && !mask.empty()) {
-                        //data.auth_chain_id = apply_mask(data.auth_chain_id, mask);
-                    }
                 }
                 else if (column_name == "pdbx_PDB_ins_code") {
                     decode_column(data_obj, data.insertion_code);
-                    if (has_mask && !mask.empty()) {
-                        //data.insertion_code = apply_mask(data.insertion_code, mask);
-                    }
                 }
             }
 
@@ -3644,20 +3623,23 @@ namespace chemfiles
                 atom_authLabel_size_ok(data.atom_z.size() == data.auth_atom_label.size()),
                 atom_label_size_ok(data.atom_z.size() == data.atom_label.size()),
                 atom_id_size_ok(data.atom_z.size() == data.atom_id.size()),
-                residue_data_size_ok(data.atom_z.size() == data.residue_name.size()  &&
-                   data.atom_z.size() == data.residue_id.size()                      &&
-                   data.atom_z.size() == data.chain_id.size()                        &&
-                   data.atom_z.size() == data.insertion_code.size()                  &&
-                   data.atom_z.size() == data.auth_residue_id.size()                 &&
-                   data.atom_z.size() == data.auth_chain_id.size())
-            { }
+                residue_data_size_ok(data.atom_z.size() == data.residue_name.size() &&
+                    data.atom_z.size() == data.residue_id.size() &&
+                    data.atom_z.size() == data.chain_id.size() &&
+                    data.atom_z.size() == data.auth_residue_id.size() &&
+                    data.atom_z.size() == data.auth_chain_id.size())
+                , insertion_code_ok(data.atom_z.size() == data.insertion_code.size())
+            {
+            }
 
-            bool atom_type_size_ok =         false;
-            bool atom_authLabel_size_ok =    false;
-            bool atom_label_size_ok =        false;
-            bool atom_id_size_ok =           false;
-            bool residue_data_size_ok =      false;
+            bool atom_type_size_ok = false;
+            bool atom_authLabel_size_ok = false;
+            bool atom_label_size_ok = false;
+            bool atom_id_size_ok = false;
+            bool residue_data_size_ok = false;
+            bool insertion_code_ok = false;
         };
+
 
         inline void create_atoms(const BCIFFormat::BCIFData& data_, Frame& frame)
         {
@@ -3817,7 +3799,8 @@ namespace chemfiles
             create_intra_residue_bonds(data.chem_comp_bonds_map, res_name, atoms_waiting_for_residue_data, frame);
             Residue residue(res_name, res_id);
             residue.set("chainid", data.chain_id[last_index]);
-            residue.set("insertion_code", data.insertion_code[last_index]);
+            if (data.insertion_code.size() > last_index)
+                residue.set("insertion_code", data.insertion_code[last_index]);
             residue.set("chainname", data.auth_chain_id[last_index]);
             residue.set("auth_seq_id", static_cast<double>(data.auth_residue_id[last_index]));
             for (auto& [_, it_atomIdx] : atoms_waiting_for_residue_data)

@@ -398,6 +398,12 @@ TEST_CASE("BCIF Format Detection") {
 
 
 TEST_CASE("Read files in BCIF format") {
+
+    SECTION("Read at works with 0 but throw at any other index") {
+        auto file = Trajectory("data/bcif/1aga.bcif");
+        Frame frame = file.read_at(0);
+        CHECK_THROWS(file.read_at(1));
+    }
     SECTION("Read single step - basic properties") {
         auto file = Trajectory("data/bcif/1aga.bcif");
         REQUIRE(file.size() == 1);
@@ -766,22 +772,6 @@ TEST_CASE("BCIF Compression Support", "[samples]") {
         CHECK(rslt.re_read.residue_chains);
         CHECK(rslt.re_read.bonds);
         CHECK(rslt.all_bonds_conserved);
-
-    }
-}
-
-TEST_CASE("Speed bench", "[.]") {
-    SECTION("3j3q") {
-        using namespace chemfiles;
-        auto t0 = std::chrono::steady_clock::now();
-
-
-        auto original_traj = Trajectory("C:\\Users\\Valen\\Desktop\\tmp\\3j3q.bcif.gz");
-        Frame original_frame = original_traj.read();
-
-
-        auto t1 = std::chrono::steady_clock::now();
-        std::cout << "3j3q test elapsed time : " << std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(t1 - t0).count() << "ms\n";
 
     }
 }
