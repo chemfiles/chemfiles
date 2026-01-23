@@ -158,20 +158,20 @@ jobs:
               - -DCHFL_BUILD_DOCTESTS=OFF
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 2
 
       - name: Set up MinGW
         if: ${{ matrix.use-mingw }}
-        uses: egor-tensin/setup-mingw@v2
+        uses: egor-tensin/setup-mingw@v3
         with:
           platform: x64
           version: 12.2.0
 
       # - name: Setup emsdk
       #   if: ${{ matrix.use-emsdk }}
-      #   uses: mymindstorm/setup-emsdk@v12
+      #   uses: mymindstorm/setup-emsdk@v14
       #   with:
       #     version: ${{ matrix.emscripten-version }}
       #     actions-cache-folder: "emsdk"
