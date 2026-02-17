@@ -80,7 +80,7 @@ namespace
         size_t idx = 0;
         for (auto& it_atom : frame.topology()) {
 
-            const uint64_t id = static_cast<uint64_t>(it_atom.get("id").value_or(0).as_double());
+            const uint32_t id = static_cast<uint32_t>(it_atom.get("id").value_or(0).as_double());
             if (args.specific_atom_positions.count(id) > 0)
             {
                 rslt.positions |= approx_eq(frame.positions()[idx], args.specific_atom_positions.at(id), 1.0E-3);
@@ -219,8 +219,8 @@ namespace
     {
         ReadWriteTestArgs::BondMap full_map;
         auto make_atom_id_pair = [&](const chemfiles::Bond& bond) {
-            size_t id0 = frame[bond[0]].get("id").value_or(0).as_double();
-            size_t id1 = frame[bond[1]].get("id").value_or(0).as_double();
+            size_t id0 = static_cast<size_t>(frame[bond[0]].get("id").value_or(0).as_double());
+            size_t id1 = static_cast<size_t>(frame[bond[1]].get("id").value_or(0).as_double());
             if (id0 > id1) return std::make_pair(id1, id0); return std::make_pair(id0, id1);  };
         for (auto& it_bond : frame.topology().bonds())
         {
