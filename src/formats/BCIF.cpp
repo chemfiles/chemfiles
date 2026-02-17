@@ -3764,7 +3764,7 @@ namespace chemfiles
                 if (is_residue_forward_binder(it_atomName))
                     return it_atomIndex;
             }
-            return MAXSIZE_T;
+            return SIZE_MAX;
         }
         inline bool expect_implicit_inter_residue_bonding(const std::string& res_name)
         {
@@ -3792,7 +3792,7 @@ namespace chemfiles
             // These are atoms that didn't belong to any residue in the original file
             if (is_placeholder_residue_data(res_name, res_id, data.chain_id[last_index])) {
                 previous_inter_residue_forward_linking_atom = current_inter_residue_forward_linking_atom;
-                current_inter_residue_forward_linking_atom = MAXSIZE_T;
+                current_inter_residue_forward_linking_atom = SIZE_MAX;
                 return;
             }
 
@@ -3811,7 +3811,7 @@ namespace chemfiles
             frame.add_residue(std::move(residue));
 
             previous_inter_residue_forward_linking_atom = current_inter_residue_forward_linking_atom;
-            current_inter_residue_forward_linking_atom = MAXSIZE_T;
+            current_inter_residue_forward_linking_atom = SIZE_MAX;
 
         }
         inline void fill_atomistic_data(const BCIFFormat::BCIFData& data, const DataProfile& profile, Frame& frame)
@@ -3823,8 +3823,8 @@ namespace chemfiles
 
             std::map<BCIFFormat::BCIFData::StructConnMapKey, AtomIndex> atoms_waiting_for_struct_conn_bounding;
             std::map<BCIFFormat::BCIFData::AtomName, AtomIndex> atoms_waiting_for_residue_data;
-            size_t previous_inter_residue_forward_linking_atom = MAXSIZE_T;
-            size_t current_inter_residue_forward_linking_atom = MAXSIZE_T;
+            size_t previous_inter_residue_forward_linking_atom = SIZE_MAX;
+            size_t current_inter_residue_forward_linking_atom = SIZE_MAX;
             bool just_changed_chain = false;
             bool just_changed_residue = false;
 
@@ -3865,7 +3865,7 @@ namespace chemfiles
                 if (just_changed_chain)
                 {
                     // we don't bound residues from different chains
-                    previous_inter_residue_forward_linking_atom = MAXSIZE_T;
+                    previous_inter_residue_forward_linking_atom = SIZE_MAX;
                     just_changed_chain = false;
                 }
 
@@ -3905,9 +3905,9 @@ namespace chemfiles
                     continue;
 
                 bool current_residue_has_implicit_neightbour_bonding = expect_implicit_inter_residue_bonding(*res_name);
-                if (current_inter_residue_forward_linking_atom == MAXSIZE_T && current_residue_has_implicit_neightbour_bonding && is_residue_forward_binder(atom_name))
+                if (current_inter_residue_forward_linking_atom == SIZE_MAX && current_residue_has_implicit_neightbour_bonding && is_residue_forward_binder(atom_name))
                     current_inter_residue_forward_linking_atom = it_atomIndex;
-                if (current_residue_has_implicit_neightbour_bonding && is_residue_backward_binder(atom_name) && previous_inter_residue_forward_linking_atom != MAXSIZE_T)
+                if (current_residue_has_implicit_neightbour_bonding && is_residue_backward_binder(atom_name) && previous_inter_residue_forward_linking_atom != SIZE_MAX)
                 {
                     frame.add_bond(previous_inter_residue_forward_linking_atom, it_atomIndex, Bond::SINGLE);
                 }
@@ -3915,7 +3915,7 @@ namespace chemfiles
                 // We create implicit bound between contiguous residues
                 if (res_name != nullptr
                     && (*res_name == "N" || *res_name == "P")
-                    && previous_inter_residue_forward_linking_atom != MAXSIZE_T
+                    && previous_inter_residue_forward_linking_atom != SIZE_MAX
                     && current_residue_has_implicit_neightbour_bonding
                     )
                 {
