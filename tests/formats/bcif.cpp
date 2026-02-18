@@ -1404,6 +1404,36 @@ TEST_CASE("BCIF impl - decode_integer_packing_2bytes") {
         CHECK(result[1] == 2);
     }
 
+    SECTION("Unsigned overflow - value exceeding UINT16_MAX") {
+        // 65540 unsigned: 0xFFFF (65535) + 0x0500 (5) = 65540
+        // Little-endian: {0xFF, 0xFF, 0x05, 0x00}
+        std::vector<uint8_t> data = {0xFF, 0xFF, 0x05, 0x00};
+        std::vector<int32_t> result;
+        decode_integer_packing_2bytes(data, 2, true, result);
+        REQUIRE(result.size() == 1);
+        CHECK(result[0] == 65540);
+    }
+
+    SECTION("Signed positive overflow - value exceeding INT16_MAX") {
+        // 40000 signed: 0x7FFF (32767) + remaining (7233 = 0x411C)
+        // Little-endian: {0xFF, 0x7F, 0x41, 0x1C}
+        std::vector<uint8_t> data = {0xFF, 0x7F, 0x41, 0x1C};
+        std::vector<int32_t> result;
+        decode_integer_packing_2bytes(data, 2, false, result);
+        REQUIRE(result.size() == 1);
+        CHECK(result[0] == 40000);
+    }
+
+    SECTION("Signed negative overflow - value below INT16_MIN") {
+        // -40000 signed: INT16_MIN (-32768 = 0x8000) + (-7232 = 0xE3C0)
+        // Little-endian: {0x00, 0x80, 0xC0, 0xE3}
+        std::vector<uint8_t> data = {0x00, 0x80, 0xC0, 0xE3};
+        std::vector<int32_t> result;
+        decode_integer_packing_2bytes(data, 2, false, result);
+        REQUIRE(result.size() == 1);
+        CHECK(result[0] == -40000);
+    }
+
     SECTION("Empty input") {
         std::vector<uint8_t> data;
         std::vector<int32_t> result;
