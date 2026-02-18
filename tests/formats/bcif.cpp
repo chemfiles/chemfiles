@@ -1210,3 +1210,350 @@ TEST_CASE("BCIF impl - round-trip secondary structure conversion") {
         }
     }
 }
+
+// =========================================================================
+// Tests for get_int_type_str
+// =========================================================================
+
+TEST_CASE("BCIF impl - get_int_type_str") {
+    std::string type_str;
+
+    SECTION("Integer types") {
+        get_int_type_str(1, type_str);
+        CHECK(type_str == "Int8");
+        get_int_type_str(2, type_str);
+        CHECK(type_str == "Int16");
+        get_int_type_str(4, type_str);
+        CHECK(type_str == "Int32");
+    }
+
+    SECTION("Unsigned integer types") {
+        get_int_type_str(5, type_str);
+        CHECK(type_str == "Uint8");
+        get_int_type_str(6, type_str);
+        CHECK(type_str == "Uint16");
+        get_int_type_str(8, type_str);
+        CHECK(type_str == "Uint32");
+    }
+
+    SECTION("Float types") {
+        get_int_type_str(32, type_str);
+        CHECK(type_str == "Float32");
+        get_int_type_str(33, type_str);
+        CHECK(type_str == "Float64");
+    }
+
+    SECTION("Unknown code falls back to Int32") {
+        get_int_type_str(99, type_str);
+        CHECK(type_str == "Int32");
+        get_int_type_str(0, type_str);
+        CHECK(type_str == "Int32");
+    }
+}
+
+// =========================================================================
+// Tests for decode_float_column_float32 / float64
+// =========================================================================
+
+TEST_CASE("BCIF impl - decode_float_column_float32") {
+    SECTION("Decode known float32 value") {
+        // 1.0f in little-endian IEEE 754: 0x3F800000
+        uint8_t bytes[] = {0x00, 0x00, 0x80, 0x3F};
+        std::vector<double> result;
+        decode_float_column_float32(bytes, 4, result);
+        REQUIRE(result.size() == 1);
+        CHECK(result[0] == Approx(1.0).epsilon(1e-6));
+    }
+
+    SECTION("Decode multiple float32 values") {
+        // 0.0f = 0x00000000, -1.0f = 0xBF800000
+        uint8_t bytes[] = {
+            0x00, 0x00, 0x00, 0x00,  // 0.0f
+            0x00, 0x00, 0x80, 0xBF   // -1.0f
+        };
+        std::vector<double> result;
+        decode_float_column_float32(bytes, 8, result);
+        REQUIRE(result.size() == 2);
+        CHECK(result[0] == Approx(0.0).epsilon(1e-6));
+        CHECK(result[1] == Approx(-1.0).epsilon(1e-6));
+    }
+
+    SECTION("Empty input") {
+        std::vector<double> result;
+        decode_float_column_float32(nullptr, 0, result);
+        CHECK(result.empty());
+    }
+}
+
+TEST_CASE("BCIF impl - decode_float_column_float64") {
+    SECTION("Decode known float64 value") {
+        // 1.0 in little-endian IEEE 754: 0x3FF0000000000000
+        uint8_t bytes[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0x3F};
+        std::vector<double> result;
+        decode_float_column_float64(bytes, 8, result);
+        REQUIRE(result.size() == 1);
+        CHECK(result[0] == Approx(1.0).epsilon(1e-12));
+    }
+
+    SECTION("Decode multiple float64 values") {
+        // 0.0 = all zeros, 3.14159... = 0x400921FB54442D18
+        uint8_t bytes[] = {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 0.0
+            0x18, 0x2D, 0x44, 0x54, 0xFB, 0x21, 0x09, 0x40   // pi
+        };
+        std::vector<double> result;
+        decode_float_column_float64(bytes, 16, result);
+        REQUIRE(result.size() == 2);
+        CHECK(result[0] == Approx(0.0).epsilon(1e-12));
+        CHECK(result[1] == Approx(3.14159265358979).epsilon(1e-10));
+    }
+
+    SECTION("Empty input") {
+        std::vector<double> result;
+        decode_float_column_float64(nullptr, 0, result);
+        CHECK(result.empty());
+    }
+}
+
+// =========================================================================
+// Tests for decode_integer_packing_1byte / 2bytes
+// =========================================================================
+
+TEST_CASE("BCIF impl - decode_integer_packing_1byte") {
+    SECTION("Simple unsigned values") {
+        std::vector<uint8_t> data = {5, 10, 42};
+        std::vector<int32_t> result;
+        decode_integer_packing_1byte(data, 1, true, result);
+        REQUIRE(result.size() == 3);
+        CHECK(result[0] == 5);
+        CHECK(result[1] == 10);
+        CHECK(result[2] == 42);
+    }
+
+    SECTION("Simple signed values") {
+        // -1 as signed int8 = 0xFF
+        std::vector<uint8_t> data = {0xFF, 5};
+        std::vector<int32_t> result;
+        decode_integer_packing_1byte(data, 1, false, result);
+        REQUIRE(result.size() == 2);
+        CHECK(result[0] == -1);
+        CHECK(result[1] == 5);
+    }
+
+    SECTION("Unsigned overflow handling - value exceeding 255") {
+        // 300 unsigned: 255, 45 (255 + 45 = 300)
+        std::vector<uint8_t> data = {255, 45};
+        std::vector<int32_t> result;
+        decode_integer_packing_1byte(data, 1, true, result);
+        REQUIRE(result.size() == 1);
+        CHECK(result[0] == 300);
+    }
+
+    SECTION("Signed overflow handling - value exceeding 127") {
+        // 200 signed: 127, 73 (127 + 73 = 200)
+        std::vector<uint8_t> data = {127, 73};
+        std::vector<int32_t> result;
+        decode_integer_packing_1byte(data, 1, false, result);
+        REQUIRE(result.size() == 1);
+        CHECK(result[0] == 200);
+    }
+
+    SECTION("Signed negative overflow - value below -128") {
+        // -200 signed: -128 (0x80), -72 (0xB8) -> -128 + (-72) = -200
+        std::vector<uint8_t> data = {0x80, 0xB8};
+        std::vector<int32_t> result;
+        decode_integer_packing_1byte(data, 1, false, result);
+        REQUIRE(result.size() == 1);
+        CHECK(result[0] == -200);
+    }
+
+    SECTION("Empty input") {
+        std::vector<uint8_t> data;
+        std::vector<int32_t> result;
+        decode_integer_packing_1byte(data, 1, false, result);
+        CHECK(result.empty());
+    }
+}
+
+TEST_CASE("BCIF impl - decode_integer_packing_2bytes") {
+    SECTION("Simple unsigned 16-bit value") {
+        // 256 = 0x0100 in little-endian
+        std::vector<uint8_t> data = {0x00, 0x01};
+        std::vector<int32_t> result;
+        decode_integer_packing_2bytes(data, 2, true, result);
+        REQUIRE(result.size() == 1);
+        CHECK(result[0] == 256);
+    }
+
+    SECTION("Simple signed 16-bit negative value") {
+        // -1 as signed int16 in little-endian = 0xFF, 0xFF
+        std::vector<uint8_t> data = {0xFF, 0xFF};
+        std::vector<int32_t> result;
+        decode_integer_packing_2bytes(data, 2, false, result);
+        REQUIRE(result.size() == 1);
+        CHECK(result[0] == -1);
+    }
+
+    SECTION("Multiple values") {
+        // 1 (0x01, 0x00), 2 (0x02, 0x00)
+        std::vector<uint8_t> data = {0x01, 0x00, 0x02, 0x00};
+        std::vector<int32_t> result;
+        decode_integer_packing_2bytes(data, 2, true, result);
+        REQUIRE(result.size() == 2);
+        CHECK(result[0] == 1);
+        CHECK(result[1] == 2);
+    }
+
+    SECTION("Empty input") {
+        std::vector<uint8_t> data;
+        std::vector<int32_t> result;
+        decode_integer_packing_2bytes(data, 2, false, result);
+        CHECK(result.empty());
+    }
+}
+
+// =========================================================================
+// Tests for residue classification utilities
+// =========================================================================
+
+TEST_CASE("BCIF impl - is_nucleotide") {
+    SECTION("RNA nucleotides") {
+        CHECK(is_nucleotide("A"));
+        CHECK(is_nucleotide("C"));
+        CHECK(is_nucleotide("G"));
+        CHECK(is_nucleotide("U"));
+    }
+
+    SECTION("DNA nucleotides") {
+        CHECK(is_nucleotide("DA"));
+        CHECK(is_nucleotide("DC"));
+        CHECK(is_nucleotide("DG"));
+        CHECK(is_nucleotide("DT"));
+    }
+
+    SECTION("Non-nucleotides") {
+        CHECK_FALSE(is_nucleotide("ALA"));
+        CHECK_FALSE(is_nucleotide("HOH"));
+        CHECK_FALSE(is_nucleotide(""));
+        CHECK_FALSE(is_nucleotide("X"));
+    }
+}
+
+TEST_CASE("BCIF impl - is_aminoacide") {
+    SECTION("Standard amino acids") {
+        CHECK(is_aminoacide("ALA"));
+        CHECK(is_aminoacide("ARG"));
+        CHECK(is_aminoacide("ASN"));
+        CHECK(is_aminoacide("ASP"));
+        CHECK(is_aminoacide("CYS"));
+        CHECK(is_aminoacide("GLN"));
+        CHECK(is_aminoacide("GLU"));
+        CHECK(is_aminoacide("GLY"));
+        CHECK(is_aminoacide("HIS"));
+        CHECK(is_aminoacide("ILE"));
+        CHECK(is_aminoacide("LEU"));
+        CHECK(is_aminoacide("LYS"));
+        CHECK(is_aminoacide("MET"));
+        CHECK(is_aminoacide("PHE"));
+        CHECK(is_aminoacide("PRO"));
+        CHECK(is_aminoacide("SER"));
+        CHECK(is_aminoacide("THR"));
+        CHECK(is_aminoacide("TRP"));
+        CHECK(is_aminoacide("TYR"));
+        CHECK(is_aminoacide("VAL"));
+    }
+
+    SECTION("Non-amino acids") {
+        CHECK_FALSE(is_aminoacide("HOH"));
+        CHECK_FALSE(is_aminoacide("A"));
+        CHECK_FALSE(is_aminoacide(""));
+        CHECK_FALSE(is_aminoacide("UNK"));
+    }
+}
+
+TEST_CASE("BCIF impl - is_residue_forward_binder") {
+    CHECK(is_residue_forward_binder("C"));
+    CHECK(is_residue_forward_binder("O3'"));
+    CHECK_FALSE(is_residue_forward_binder("N"));
+    CHECK_FALSE(is_residue_forward_binder("P"));
+    CHECK_FALSE(is_residue_forward_binder("CA"));
+    CHECK_FALSE(is_residue_forward_binder(""));
+}
+
+TEST_CASE("BCIF impl - is_residue_backward_binder") {
+    CHECK(is_residue_backward_binder("N"));
+    CHECK(is_residue_backward_binder("P"));
+    CHECK_FALSE(is_residue_backward_binder("C"));
+    CHECK_FALSE(is_residue_backward_binder("O3'"));
+    CHECK_FALSE(is_residue_backward_binder("CA"));
+    CHECK_FALSE(is_residue_backward_binder(""));
+}
+
+TEST_CASE("BCIF impl - expect_implicit_inter_residue_bonding") {
+    SECTION("Amino acids expect bonding") {
+        CHECK(expect_implicit_inter_residue_bonding("ALA"));
+        CHECK(expect_implicit_inter_residue_bonding("GLY"));
+        CHECK(expect_implicit_inter_residue_bonding("VAL"));
+    }
+
+    SECTION("Nucleotides expect bonding") {
+        CHECK(expect_implicit_inter_residue_bonding("A"));
+        CHECK(expect_implicit_inter_residue_bonding("DA"));
+        CHECK(expect_implicit_inter_residue_bonding("U"));
+    }
+
+    SECTION("Non-standard residues do not expect bonding") {
+        CHECK_FALSE(expect_implicit_inter_residue_bonding("HOH"));
+        CHECK_FALSE(expect_implicit_inter_residue_bonding("UNK"));
+        CHECK_FALSE(expect_implicit_inter_residue_bonding(""));
+    }
+}
+
+TEST_CASE("BCIF impl - is_placeholder_residue_data") {
+    CHECK(is_placeholder_residue_data("UNK", 1, "A"));
+    CHECK_FALSE(is_placeholder_residue_data("ALA", 1, "A"));
+    CHECK_FALSE(is_placeholder_residue_data("UNK", 2, "A"));
+    CHECK_FALSE(is_placeholder_residue_data("UNK", 1, "B"));
+    CHECK_FALSE(is_placeholder_residue_data("", 1, "A"));
+}
+
+// =========================================================================
+// Tests for build_encode_string_data
+// =========================================================================
+
+TEST_CASE("BCIF impl - build_encode_string_data") {
+    SECTION("Unique strings concatenated") {
+        std::vector<std::string> data = {"hello", "world"};
+        std::string result;
+        build_encode_string_data(data, result);
+        CHECK(result == "helloworld");
+    }
+
+    SECTION("Duplicate strings appear only once") {
+        std::vector<std::string> data = {"A", "B", "A", "C", "B"};
+        std::string result;
+        build_encode_string_data(data, result);
+        CHECK(result == "ABC");
+    }
+
+    SECTION("Empty input") {
+        std::vector<std::string> data;
+        std::string result;
+        build_encode_string_data(data, result);
+        CHECK(result.empty());
+    }
+
+    SECTION("Single repeated string") {
+        std::vector<std::string> data = {"X", "X", "X"};
+        std::string result;
+        build_encode_string_data(data, result);
+        CHECK(result == "X");
+    }
+
+    SECTION("Preserves insertion order of unique strings") {
+        std::vector<std::string> data = {"C", "A", "B"};
+        std::string result;
+        build_encode_string_data(data, result);
+        CHECK(result == "CAB");
+    }
+}
