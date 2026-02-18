@@ -375,6 +375,16 @@ namespace
 }
 
 
+TEST_CASE("BCIF Fwrite while open in read") {
+    auto file = Trajectory("data/bcif/1aga.bcif");
+
+    CHECK_THROWS(
+    file.write(Frame())
+    );
+
+}
+
+
 TEST_CASE("BCIF Format Detection") {
     SECTION("Detect BCIF by extension") {
         auto file = Trajectory("data/bcif/1aga.bcif");
