@@ -147,3 +147,6 @@ writting a frame, this property is written to the file."""
 PSF = """Name of the segment containing this resiude. A segment is typically a
 single chain of protein or DNA. Segments may also contain pure solvent or
 lipid."""
+
+[auth_seq_id]
+BCIF = "Residue ID assigned by the author of the file."
