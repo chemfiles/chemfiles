@@ -13,8 +13,10 @@
 #include "chemfiles.hpp"
 #include "chemfiles/files/MemoryBuffer.hpp"
 #include "chemfiles/formats/BCIF.hpp"
+#include "chemfiles/formats/BCIF_impl.hpp"
 
 using namespace chemfiles;
+using namespace chemfiles::bcif_impl;
 
 namespace
 {
@@ -1052,4 +1054,159 @@ TEST_CASE("Read-Write sample files","[samples]") {
         CHECK(rslt.all_ss_conserved);
     }
 
+}
+
+TEST_CASE("BCIF impl - bcif_to_pdb_secondary_structure") {
+    SECTION("All helix types") {
+        CHECK(std::string(bcif_to_pdb_secondary_structure("HELX_RH_AL_P")) == "right-handed alpha helix");
+        CHECK(std::string(bcif_to_pdb_secondary_structure("HELX_RH_OM_P")) == "right-handed omega helix");
+        CHECK(std::string(bcif_to_pdb_secondary_structure("HELX_RH_PI_P")) == "right-handed pi helix");
+        CHECK(std::string(bcif_to_pdb_secondary_structure("HELX_RH_GA_P")) == "right-handed gamma helix");
+        CHECK(std::string(bcif_to_pdb_secondary_structure("HELX_RH_3T_P")) == "right-handed 3-10 helix");
+        CHECK(std::string(bcif_to_pdb_secondary_structure("HELX_LH_AL_P")) == "left-handed alpha helix");
+        CHECK(std::string(bcif_to_pdb_secondary_structure("HELX_LH_OM_P")) == "left-handed omega helix");
+        CHECK(std::string(bcif_to_pdb_secondary_structure("HELX_LH_GA_P")) == "left-handed gamma helix");
+        CHECK(std::string(bcif_to_pdb_secondary_structure("HELX_RH_27_P")) == "2-7 ribbon/helix");
+        CHECK(std::string(bcif_to_pdb_secondary_structure("HELX_LH_PP_P")) == "polyproline");
+    }
+
+    SECTION("Generic helix") {
+        CHECK(std::string(bcif_to_pdb_secondary_structure("HELX_P")) == "right-handed alpha helix");
+    }
+
+    SECTION("Beta strand") {
+        CHECK(std::string(bcif_to_pdb_secondary_structure("STRN")) == "extended");
+    }
+
+    SECTION("Turn types") {
+        CHECK(std::string(bcif_to_pdb_secondary_structure("TURN_TY1_P")) == "turn");
+        CHECK(std::string(bcif_to_pdb_secondary_structure("TURN_TY2_P")) == "turn");
+        CHECK(std::string(bcif_to_pdb_secondary_structure("TURN_OTHER")) == "turn");
+    }
+
+    SECTION("Unknown type returns nullptr") {
+        CHECK(bcif_to_pdb_secondary_structure("UNKNOWN_TYPE") == nullptr);
+        CHECK(bcif_to_pdb_secondary_structure("") == nullptr);
+    }
+}
+
+TEST_CASE("BCIF impl - pdb_to_bcif_secondary_structure") {
+    SECTION("All helix types") {
+        CHECK(pdb_to_bcif_secondary_structure("right-handed alpha helix") == "HELX_RH_AL_P");
+        CHECK(pdb_to_bcif_secondary_structure("right-handed omega helix") == "HELX_RH_OM_P");
+        CHECK(pdb_to_bcif_secondary_structure("right-handed pi helix") == "HELX_RH_PI_P");
+        CHECK(pdb_to_bcif_secondary_structure("right-handed gamma helix") == "HELX_RH_GA_P");
+        CHECK(pdb_to_bcif_secondary_structure("right-handed 3-10 helix") == "HELX_RH_3T_P");
+        CHECK(pdb_to_bcif_secondary_structure("left-handed alpha helix") == "HELX_LH_AL_P");
+        CHECK(pdb_to_bcif_secondary_structure("left-handed omega helix") == "HELX_RH_OM_P");
+        CHECK(pdb_to_bcif_secondary_structure("left-handed gamma helix") == "HELX_LH_GA_P");
+        CHECK(pdb_to_bcif_secondary_structure("2-7 ribbon/helix") == "HELX_RH_27_P");
+        CHECK(pdb_to_bcif_secondary_structure("polyproline") == "HELX_LH_PP_P");
+    }
+
+    SECTION("Beta strand") {
+        CHECK(pdb_to_bcif_secondary_structure("extended") == "STRN");
+    }
+
+    SECTION("Turn") {
+        CHECK(pdb_to_bcif_secondary_structure("turn") == "TURN_TY1_P");
+    }
+
+    SECTION("Unknown defaults to generic helix") {
+        CHECK(pdb_to_bcif_secondary_structure("unknown_ss") == "HELX_P");
+        CHECK(pdb_to_bcif_secondary_structure("") == "HELX_P");
+    }
+}
+
+TEST_CASE("BCIF impl - get_helix_class_from_pdb_ss") {
+    SECTION("All helix classes 1-10") {
+        CHECK(get_helix_class_from_pdb_ss("right-handed alpha helix") == 1);
+        CHECK(get_helix_class_from_pdb_ss("right-handed omega helix") == 2);
+        CHECK(get_helix_class_from_pdb_ss("right-handed pi helix") == 3);
+        CHECK(get_helix_class_from_pdb_ss("right-handed gamma helix") == 4);
+        CHECK(get_helix_class_from_pdb_ss("right-handed 3-10 helix") == 5);
+        CHECK(get_helix_class_from_pdb_ss("left-handed alpha helix") == 6);
+        CHECK(get_helix_class_from_pdb_ss("left-handed omega helix") == 7);
+        CHECK(get_helix_class_from_pdb_ss("left-handed gamma helix") == 8);
+        CHECK(get_helix_class_from_pdb_ss("2-7 ribbon/helix") == 9);
+        CHECK(get_helix_class_from_pdb_ss("polyproline") == 10);
+    }
+
+    SECTION("Non-helix returns 0") {
+        CHECK(get_helix_class_from_pdb_ss("extended") == 0);
+        CHECK(get_helix_class_from_pdb_ss("turn") == 0);
+        CHECK(get_helix_class_from_pdb_ss("") == 0);
+        CHECK(get_helix_class_from_pdb_ss("unknown") == 0);
+    }
+}
+
+TEST_CASE("BCIF impl - parse_bond_order") {
+    SECTION("Uppercase bond orders") {
+        CHECK(parse_bond_order("SING") == Bond::SINGLE);
+        CHECK(parse_bond_order("DOUB") == Bond::DOUBLE);
+        CHECK(parse_bond_order("TRIP") == Bond::TRIPLE);
+        CHECK(parse_bond_order("QUAD") == Bond::QUADRUPLE);
+        CHECK(parse_bond_order("AROM") == Bond::AROMATIC);
+    }
+
+    SECTION("Lowercase bond orders") {
+        CHECK(parse_bond_order("sing") == Bond::SINGLE);
+        CHECK(parse_bond_order("doub") == Bond::DOUBLE);
+        CHECK(parse_bond_order("trip") == Bond::TRIPLE);
+        CHECK(parse_bond_order("quad") == Bond::QUADRUPLE);
+        CHECK(parse_bond_order("arom") == Bond::AROMATIC);
+    }
+
+    SECTION("Empty and unknown") {
+        CHECK(parse_bond_order("") == Bond::UNKNOWN);
+        CHECK(parse_bond_order("?") == Bond::UNKNOWN);
+        CHECK(parse_bond_order("unknown_order") == Bond::UNKNOWN);
+    }
+}
+
+TEST_CASE("BCIF impl - bond_order_to_string") {
+    CHECK(bond_order_to_string(Bond::SINGLE) == "SING");
+    CHECK(bond_order_to_string(Bond::DOUBLE) == "DOUB");
+    CHECK(bond_order_to_string(Bond::TRIPLE) == "TRIP");
+    CHECK(bond_order_to_string(Bond::QUADRUPLE) == "QUAD");
+    CHECK(bond_order_to_string(Bond::AROMATIC) == "AROM");
+    CHECK(bond_order_to_string(Bond::UNKNOWN) == "?");
+}
+
+TEST_CASE("BCIF impl - HELIX_TYPES and PDB_BETA_SHEET constants") {
+    CHECK(std::string(HELIX_TYPES[0]) == "right-handed alpha helix");
+    CHECK(std::string(HELIX_TYPES[9]) == "polyproline");
+    CHECK(std::string(PDB_BETA_SHEET) == "extended");
+}
+
+TEST_CASE("BCIF impl - round-trip secondary structure conversion") {
+    SECTION("All helix types round-trip through bcif->pdb->bcif") {
+        std::vector<std::string> bcif_types = {
+            "HELX_RH_AL_P", "HELX_RH_OM_P", "HELX_RH_PI_P", "HELX_RH_GA_P",
+            "HELX_RH_3T_P", "HELX_LH_AL_P", "HELX_LH_GA_P",
+            "HELX_RH_27_P", "HELX_LH_PP_P"
+        };
+        for (const auto& bcif_type : bcif_types) {
+            const char* pdb = bcif_to_pdb_secondary_structure(bcif_type);
+            REQUIRE(pdb != nullptr);
+            std::string back = pdb_to_bcif_secondary_structure(pdb);
+            CHECK(back == bcif_type);
+        }
+    }
+
+    SECTION("Beta strand round-trips") {
+        const char* pdb = bcif_to_pdb_secondary_structure("STRN");
+        REQUIRE(pdb != nullptr);
+        CHECK(pdb_to_bcif_secondary_structure(pdb) == "STRN");
+    }
+
+    SECTION("All bond orders round-trip") {
+        std::vector<Bond::BondOrder> orders = {
+            Bond::SINGLE, Bond::DOUBLE, Bond::TRIPLE, Bond::QUADRUPLE, Bond::AROMATIC
+        };
+        for (auto order : orders) {
+            std::string str = bond_order_to_string(order);
+            CHECK(parse_bond_order(str) == order);
+        }
+    }
 }
