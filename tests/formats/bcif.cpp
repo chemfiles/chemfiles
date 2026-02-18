@@ -11,6 +11,8 @@
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
+#include "chemfiles/files/MemoryBuffer.hpp"
+#include "chemfiles/formats/BCIF.hpp"
 
 using namespace chemfiles;
 
@@ -375,12 +377,25 @@ namespace
 }
 
 
-TEST_CASE("BCIF Fwrite while open in read") {
-    auto file = Trajectory("data/bcif/1aga.bcif");
+TEST_CASE("BCIF check throws") {
+    SECTION("write on read") {
 
-    CHECK_THROWS(
-    file.write(Frame())
-    );
+        auto file = Trajectory("data/bcif/1aga.bcif");
+
+        CHECK_THROWS(
+            file.write(Frame())
+        );
+    }
+    SECTION("write on memory buffer") {
+
+
+        auto typename_not_allowed_in_check_throw = []() {
+            std::shared_ptr<chemfiles::MemoryBuffer> buf = std::make_shared<chemfiles::MemoryBuffer>(100);
+            BCIFFormat fm(buf, File::Mode::WRITE, File::Compression::GZIP);
+        };
+        CHECK_THROWS(typename_not_allowed_in_check_throw()
+        );
+    }
 
 }
 
