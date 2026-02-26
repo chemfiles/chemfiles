@@ -149,4 +149,6 @@ single chain of protein or DNA. Segments may also contain pure solvent or
 lipid."""
 
 [auth_seq_id]
+type = "number"
+
 BCIF = "Residue ID assigned by the author of the file."

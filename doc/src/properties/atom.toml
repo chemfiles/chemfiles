@@ -84,4 +84,6 @@ type = "vector"
 TRR = "Force acting on an atom. In units of 'kJ / (mol * Å)'."
 
 [id]
+type = "number"
+
 BCIF = "Unique number descriptor identifying a specific atom."
