@@ -12,6 +12,7 @@
 #include <vector>
 #include <memory>
 #include <map>
+#include <span>
 #include <set>
 #include <stdexcept>
 #include <fstream>
@@ -3278,7 +3279,7 @@ namespace chemfiles
         if (mode == File::READ) {
             auto file = TextFile(std::move(path), mode, compression);
             auto buffer = file.readall();
-            decode(buffer);
+            decode(buffer.data(), buffer.size());
             filename_ = file.path();
             mode_ = mode;
         }
@@ -3302,8 +3303,7 @@ namespace chemfiles
         }
 
         memory->decompress(compression);
-        std::string data(memory->data(), memory->size());
-        decode(data);
+        decode(memory->data(), memory->size());
         memory_ = memory;
     }
 
@@ -3658,8 +3658,9 @@ namespace chemfiles
 
         has_written_ = true;
     }
-    void BCIFFormat::decode(const std::string& data) {
-
+    void BCIFFormat::decode(const char* data // TODO: When upgrading to c++20, use a span instead.
+        , const size_t& size) {
+        
         // Quick note on the types when dealing with [packed] numbers : 
         // I didn't found an "official" table that says what type number correspond to which number type. 
         // However, I was able to guess he following :
@@ -3674,7 +3675,7 @@ namespace chemfiles
         try {
                 
             msgpack::object_handle oh;
-            msgpack::unpack(oh, data.data(), data.size());
+            msgpack::unpack(oh, data, size);
 
             auto obj = oh.get();
 

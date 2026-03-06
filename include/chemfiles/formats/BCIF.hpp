@@ -41,7 +41,7 @@ public:
 
 private:
     /// Perform the BCIF decoding and parsing
-    void decode(const std::string& data);
+    void decode (const char* , const size_t& );
 
     /// Perform the BCIF encoding for writing
     std::vector<char> encode(const Frame& frame);
