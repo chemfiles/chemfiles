@@ -12,7 +12,6 @@
 #include <vector>
 #include <memory>
 #include <map>
-#include <span>
 #include <set>
 #include <stdexcept>
 #include <fstream>
@@ -91,21 +90,26 @@ namespace std {
         }
     };
 }
-namespace chemfiles {
+namespace {
+    /**
+     * @brief This class aims to reduce both memory and copy footprint of a string collection originated from bcif.
+     * Copies of this class's instance refers to the same collection.
+     */
     class StringCollection
     {
     public:
         StringCollection() = default;
+
         StringCollection(
             std::vector<int32_t> indices,
             std::vector<int32_t> offsets,
             std::string char_pool
         ) : _data(std::make_shared<Data>(Data{ std::move(indices), std::move(offsets), std::move(char_pool) }))
         { }
-        StringCollection(const StringCollection&) = default;
-        StringCollection& operator=(const StringCollection&) = default;
-        StringCollection( StringCollection&&) = default;
-        StringCollection& operator=( StringCollection&&) = default;
+
+        /**
+         * @brief Returns the string at index *idx*
+         */
         std::string operator[](const size_t& idx) const
         {
             if (idx >= _data->indices.size()) return "";
@@ -118,6 +122,7 @@ namespace chemfiles {
                 return _data->char_pool.substr(start, end - start);
             return "";
         }
+
         size_t size() const
         {
             return _data->indices.size();
@@ -126,6 +131,10 @@ namespace chemfiles {
         {
             return _data->char_pool.empty();
         }
+        /**
+         * @brief Returns true if all the characters in the string collection are limited to the input pool.
+         * @param char_list collection of character to check
+         */
         bool none_other_than(const std::string& char_list) const
         {
             for (auto& it_char : _data->char_pool)
@@ -143,6 +152,13 @@ namespace chemfiles {
         };
         std::shared_ptr<Data> _data = std::make_shared<Data>();
     };
+}
+
+namespace chemfiles {
+    /**
+     * @brief Data used by the BCIFFormat class to decode.
+     * Defining it that way allows to hide the implemention from the header perspective.
+     */
     struct BCIFFormat::BCIFData {
         // Atom site data
         std::vector<double> atom_x;
@@ -1150,7 +1166,9 @@ namespace msgpack {
             }
             generate_bonds(bond_data, data.chem_comp_bonds, data.chem_comp_bonds_map);
         }
-
+            /**
+             * @brief Raw struct_conn data
+             */
             struct StructConnData
             {
                 struct LinkPartner
@@ -1165,13 +1183,27 @@ namespace msgpack {
                 std::vector<std::string> pdbx_value_order;
 
             };
+            /**
+             * @brief Write an accelerating structure from the raw-ish StructConnData to a map that allow fast data retrieval.
+             * @param struct_data [IN] Raw data decoded from bcif
+             * @param out [OUT] Output connectivity data
+             * @param map [OUT] Accalerating structure for fast data accession later on.
+             */
             inline void generate_structconn(const StructConnData& struct_data, std::vector<BCIFFormat::BCIFData::StructConn>& out, BCIFFormat::BCIFData::StructConnMap& map)
             {
+                /*
+                * Data from StructConnData are horizontal. But to ease the Frame filling step that will occur later, we refactor those data to make them vertical, 
+                * and then we build a map to quickly retrieve that data regardless of the order.
+                */
+
                 // Build struct_conn entries
                 size_t num_conns = struct_data.conn_type_id.size();
                 out.reserve(num_conns);
                 for (size_t i = 0; i < num_conns; ++i) {
-                    out.push_back({});
+
+                    out.push_back({}); 
+
+                    // We fill the
                     BCIFData::StructConn& conn = out.back();
                     conn.conn_type_id = (i < struct_data.conn_type_id.size()) ? struct_data. conn_type_id[i] : "";
                     conn.ptnr1.label_asym_id = (i < struct_data.ptnr1.auth_asym_id.size()) ? struct_data. ptnr1.auth_asym_id[i] : "";
@@ -1183,12 +1215,12 @@ namespace msgpack {
                     conn.ptnr2.label_seq_id = (i < struct_data.ptnr2.auth_seq_id.size()) ? struct_data.ptnr2.auth_seq_id[i] : -1;
                     conn.ptnr2.label_atom_id = (i < struct_data.ptnr2.label_atom_id.size()) ? struct_data.ptnr2.label_atom_id[i] : "";
                     conn.pdbx_value_order = (i < struct_data.pdbx_value_order.size()) ? struct_data.pdbx_value_order[i] : "";
-                    // WIP
+
+                    // We assemble keys for fast data retrieval
                     BCIFFormat::BCIFData::StructConnMapKey k1{ conn.ptnr1.label_asym_id , conn.ptnr1.label_comp_id , conn.ptnr1.label_seq_id, conn.ptnr1.label_atom_id};
                     BCIFFormat::BCIFData::StructConnMapKey k2{ conn.ptnr2.label_asym_id , conn.ptnr2.label_comp_id , conn.ptnr2.label_seq_id, conn.ptnr2.label_atom_id};
                     map[k1] = &conn;
                     map[k2] = &conn;
-                    // !WIP
                 }
             }
             inline void parse_struct_conn_columns(const std::string& column_name, const msgpack::object& data_obj, const msgpack::object& mask_obj, const bool& has_mask, StructConnData& struct_data)
@@ -3268,7 +3300,6 @@ namespace msgpack {
 // =============================================================================
 // BCIFFormat member function implementations (non-msgpack dependent)
 // =============================================================================
-
 
 namespace chemfiles
 {
