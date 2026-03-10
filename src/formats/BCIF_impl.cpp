@@ -9,7 +9,9 @@
 #include <vector>
 #include <map>
 
+#include <fmt/format.h>
 #include "chemfiles/formats/BCIF_impl.hpp"
+#include "chemfiles/Error.hpp"
 
 namespace chemfiles {
 namespace bcif_impl {
@@ -118,7 +120,7 @@ void get_int_type_str(const int32_t& type_code, std::string& type_str) {
     else if (type_code == 8) type_str = "Uint32";
     else if (type_code == 32) type_str = "Float32";
     else if (type_code == 33) type_str = "Float64";
-    else type_str = "Int32";  // fallback
+    else throw FormatError(fmt::format("Unrocognized int type string <{}>", type_code));
 }
 
 // =========================================================================
