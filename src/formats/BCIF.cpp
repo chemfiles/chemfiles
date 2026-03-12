@@ -3426,37 +3426,49 @@ namespace chemfiles
             }
         }
         using AtomIndex = size_t;
+        using NameIndexAtomMap = std::multimap<BCIFFormat::BCIFData::AtomName, AtomIndex>;
 
-        inline void create_intra_residue_bonds(const BCIFFormat::BCIFData::ChemCompMap& chemcomp_map, const std::string& resname, const std::map<BCIFFormat::BCIFData::AtomName, AtomIndex>& atoms, Frame& frame)
+        inline void create_intra_residue_bonds(const BCIFFormat::BCIFData::ChemCompMap& chemcomp_map, const std::string& resname, const NameIndexAtomMap& atoms, Frame& frame)
         {
             std::unordered_set<std::pair<AtomIndex, AtomIndex>> bounded_atoms; // Avoid bounding the same pair twice
 
-            for (auto& [it_atomName, it_atomIndex] : atoms)
+            for (auto& [it_atomName, it_atomIndex] : atoms) // Loop over all atoms of the residue
             {
                 std::pair< BCIFFormat::BCIFData::ResName, BCIFFormat::BCIFData::AtomName> key{resname, it_atomName };
+
                 auto [begin, end] = chemcomp_map.equal_range(key);
-                for (auto it2_bonds = begin; it2_bonds != end; ++it2_bonds)
+                for (auto it2_bonds = begin; it2_bonds != end; ++it2_bonds) // Loop over the bond pattern found for this atom from this residue
                 {
                     auto& [it2_resname, it2_AtomName1] = it2_bonds->first;
                     auto& [it2_atomName2, it2_bondOrder] = it2_bonds->second;
                     if (atoms.count(it2_atomName2) == 0)
                         continue;
 
-                    std::pair<AtomIndex, AtomIndex> p12(it_atomIndex, atoms.at(it2_atomName2));
-                    std::pair<AtomIndex, AtomIndex> p21(atoms.at(it2_atomName2), it_atomIndex);
-
-                    if (bounded_atoms.count(p12) > 0 && bounded_atoms.count(p21))
-                        continue;
-
                     Bond::BondOrder bond_order = parse_bond_order(it2_bondOrder);
-                    frame.add_bond(it_atomIndex, atoms.at(it2_atomName2), bond_order);
-                    bounded_atoms.insert(std::move(p12));
-                    bounded_atoms.insert(std::move(p21));
+
+                    auto [it3_begin, it3_end] = atoms.equal_range(it2_atomName2);
+                    for (auto it3_atomNameIndex = it3_begin; it3_atomNameIndex != it3_end; ++it3_atomNameIndex) // Loop over the atoms that matches the partner's name for bonding
+                    {
+                        if (it3_atomNameIndex->second == it_atomIndex) // We want to avoid self bonding
+                            continue;
+
+                        std::pair<AtomIndex, AtomIndex> p12(it_atomIndex, it3_atomNameIndex->second);
+                        std::pair<AtomIndex, AtomIndex> p21(it3_atomNameIndex->second, it_atomIndex);
+
+                        if (bounded_atoms.count(p12) > 0 || bounded_atoms.count(p21) > 0) // We avoid bound the same atoms twice
+                            continue;
+
+                        frame.add_bond(it_atomIndex, it3_atomNameIndex->second, bond_order);
+
+                        // Now that we actually bound those atoms, we declare them so they don't get bound again.
+                        bounded_atoms.insert(std::move(p12));
+                        bounded_atoms.insert(std::move(p21));
+                    }
                 }
             }
 
         }
-        inline size_t get_inter_residue_binder(const std::map<BCIFFormat::BCIFData::AtomName, AtomIndex>& atoms)
+        inline size_t get_inter_residue_binder(const NameIndexAtomMap& atoms)
         {
             for (auto& [it_atomName, it_atomIndex] : atoms)
             {
@@ -3470,7 +3482,7 @@ namespace chemfiles
             Frame& frame,
             const std::string& res_name,
             const int32_t& res_id,
-            const std::map<BCIFFormat::BCIFData::AtomName, AtomIndex>& atoms_waiting_for_residue_data,
+            const NameIndexAtomMap& atoms_waiting_for_residue_data,
             const size_t& it_atomIndex,
             size_t& previous_inter_residue_forward_linking_atom,
             size_t& current_inter_residue_forward_linking_atom
@@ -3495,7 +3507,8 @@ namespace chemfiles
             residue.set("auth_seq_id", static_cast<double>(data.auth_residue_id[last_index]));
             for (auto& [_, it_atomIdx] : atoms_waiting_for_residue_data)
             {
-                residue.add_atom(it_atomIdx);
+                if (!residue.contains(it_atomIdx))
+                    residue.add_atom(it_atomIdx);
             }
             assign_secondary_structure(data, data.chain_id[last_index], data.residue_id[last_index], residue);
             frame.add_residue(std::move(residue));
@@ -3512,7 +3525,7 @@ namespace chemfiles
             auto positions = frame.positions();
 
             std::map<BCIFFormat::BCIFData::StructConnMapKey, AtomIndex> atoms_waiting_for_struct_conn_bounding;
-            std::map<BCIFFormat::BCIFData::AtomName, AtomIndex> atoms_waiting_for_residue_data;
+            NameIndexAtomMap atoms_waiting_for_residue_data;
             size_t previous_inter_residue_forward_linking_atom = SIZE_MAX;
             size_t current_inter_residue_forward_linking_atom = SIZE_MAX;
             bool just_changed_chain = false;

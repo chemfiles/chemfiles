@@ -734,6 +734,9 @@ TEST_CASE("Read files in BCIF format") {
         CHECK(rslt.original_frame[4778].name() == "O");
         CHECK(rslt.reread_frame[4778].name() == "O");
 
+        CHECK(rslt.original_frame[4777].name() == "O");
+        CHECK(rslt.reread_frame[4777].name() == "O");
+
         CHECK(rslt.original_frame.topology().residues()[580].size() == 56);
         CHECK(rslt.original_frame.topology().residues()[581].size() == 57);
         CHECK(rslt.original_frame.topology().residues()[582].size() == 59);
