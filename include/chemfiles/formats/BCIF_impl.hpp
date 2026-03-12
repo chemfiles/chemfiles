@@ -50,7 +50,7 @@ std::string bond_order_to_string(Bond::BondOrder order);
 // =========================================================================
 
 /// Map numeric type codes to type strings.
-/// Codes: 1=Int8, 2=Int16, 4=Int32, 5=Uint8, 6=Uint16, 8=Uint32, 32=Float32, 33=Float64
+/// Codes: 1=Int8, 2=Int16, 3=Int32, 4=Uint8, 5=Uint16, 6=Uint32, 32=Float32, 33=Float64
 void get_int_type_str(const int32_t& type_code, std::string& type_str);
 
 // =========================================================================

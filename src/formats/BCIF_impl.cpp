@@ -114,10 +114,10 @@ std::string bond_order_to_string(Bond::BondOrder order) {
 void get_int_type_str(const int32_t& type_code, std::string& type_str) {
     if (type_code == 1) type_str = "Int8";
     else if (type_code == 2) type_str = "Int16";
-    else if (type_code == 4) type_str = "Int32";
-    else if (type_code == 5) type_str = "Uint8";
-    else if (type_code == 6) type_str = "Uint16";
-    else if (type_code == 8) type_str = "Uint32";
+    else if (type_code == 3) type_str = "Int32";
+    else if (type_code == 4) type_str = "Uint8";
+    else if (type_code == 5) type_str = "Uint16";
+    else if (type_code == 6) type_str = "Uint32";
     else if (type_code == 32) type_str = "Float32";
     else if (type_code == 33) type_str = "Float64";
     else throw FormatError(fmt::format("Unrocognized int type string <{}>", type_code));

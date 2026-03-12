@@ -22,6 +22,7 @@ namespace
 {
     // We want to return a datastruct that hold each test types results to check them one by one and ease debug
     struct TestResults {
+        Frame original_frame, reread_frame;
         struct ReadResultsMatch {
             bool all_atom_count = false;
             bool specific_atom_count = false;
@@ -48,7 +49,7 @@ namespace
         std::map<uint32_t, Vector3D> specific_atom_positions;
         uint32_t residue_count = 0;
         std::map<std::string, uint32_t> specific_residue_counts;
-        std::map<size_t, std::string> residue_chain_ids;
+        std::map<size_t, std::string> residue_chain_ids; 
         // Map of residue index -> expected secondary structure string
         using ResId = size_t;
         using ChaineName = std::string;
@@ -309,34 +310,34 @@ namespace
 
         // Read original file
         auto original_traj = Trajectory(args.relative_path);
-        Frame original_frame = original_traj.read();
-        test(original_frame, args, out.first_read);
+        out. original_frame = original_traj.read();
+        test(out.original_frame, args, out.first_read);
         size_t first_read_hash;
-        out.first_read.all_atom_have_id = hash_atom_ids(original_frame, first_read_hash);
+        out.first_read.all_atom_have_id = hash_atom_ids(out.original_frame, first_read_hash);
 
         // Write to temp file
         {
             auto write_traj = Trajectory(tmpfile, 'w');
-            write_traj.write(original_frame);
+            write_traj.write(out.original_frame);
         }
 
         // Read back
         auto read_traj = Trajectory(tmpfile, 'r');
-        Frame reread_frame = read_traj.read();
-        test(reread_frame, args, out.re_read);
+        out.reread_frame = read_traj.read();
+        test(out.reread_frame, args, out.re_read);
         size_t re_read_hash;
-        out.re_read.all_atom_have_id = hash_atom_ids(reread_frame, re_read_hash);
+        out.re_read.all_atom_have_id = hash_atom_ids(out.reread_frame, re_read_hash);
         out.all_atom_id_conserved = re_read_hash == first_read_hash;
-        out.all_bonds_conserved = hash_bonds(original_frame) == hash_bonds(reread_frame);
+        out.all_bonds_conserved = hash_bonds(out.original_frame) == hash_bonds(out.reread_frame);
 
         // Check atom types match
-        for (size_t i = 0; i < reread_frame.size(); ++i) {
-            CHECK(reread_frame[i].type() == original_frame[i].type());
+        for (size_t i = 0; i < out.reread_frame.size(); ++i) {
+            CHECK(out.reread_frame[i].type() == out.original_frame[i].type());
         }
 
         // Check ss types match
-        auto& residues_orig = original_frame.topology().residues();
-        auto& residues_rere = reread_frame.topology().residues();
+        auto& residues_orig = out.original_frame.topology().residues();
+        auto& residues_rere = out.reread_frame.topology().residues();
         out.all_residues_conserved = residues_orig.size() == residues_rere.size();
         if (!out.all_residues_conserved)
         {
@@ -691,6 +692,53 @@ TEST_CASE("Read files in BCIF format") {
             total_atoms_in_residues += residue.size();
         }
         CHECK(total_atoms_in_residues == 126);
+    }
+
+    SECTION("Atom with same name in a residue") {
+        ReadWriteTestArgs test_args{ "data/bcif/4hhb.bcif.gz" };
+        test_args.atom_count = 4779;
+        test_args.specific_atom_counts.emplace("C", 2313);
+        test_args.specific_atom_counts.emplace("O", 847);
+        test_args.specific_atom_counts.emplace("N", 605);
+        test_args.specific_atom_counts.emplace("S", 9);
+        test_args.specific_atom_counts.emplace("FE", 4);
+        test_args.specific_atom_positions.emplace(4558, Vector3D(-1.727, 4.699, 23.942));
+        test_args.specific_atom_positions.emplace(4658, Vector3D(2.494, 5.651, 59.158));
+        test_args.residue_count = 584;
+        test_args.residue_chain_ids.emplace(146, "D");
+        test_args.residue_chain_ids.emplace(140, "C");
+
+        TestResults rslt = test_readwrite(test_args);
+
+        CHECK(rslt.first_read.all_atom_count);
+        CHECK(rslt.first_read.positions);
+        CHECK(rslt.first_read.specific_atom_count);
+        CHECK(rslt.first_read.all_residue_count);
+        CHECK(rslt.first_read.specific_residue_count);
+        CHECK(rslt.first_read.residue_chains);
+        CHECK(rslt.first_read.bonds);
+        CHECK(rslt.first_read.all_atom_have_id);
+        CHECK(rslt.re_read.all_atom_count);
+        CHECK(rslt.re_read.positions);
+        CHECK(rslt.re_read.specific_atom_count);
+        CHECK(rslt.re_read.all_residue_count);
+        CHECK(rslt.re_read.specific_residue_count);
+        CHECK(rslt.re_read.residue_chains);
+        CHECK(rslt.re_read.bonds);
+        CHECK(rslt.re_read.all_atom_have_id);
+        CHECK(rslt.all_atom_id_conserved);
+        CHECK(rslt.all_bonds_conserved);
+        CHECK(rslt.all_residues_conserved);
+        CHECK(rslt.all_ss_conserved);
+
+        CHECK(rslt.original_frame[4778].name() == "O");
+        CHECK(rslt.reread_frame[4778].name() == "O");
+
+        CHECK(rslt.original_frame.topology().residues()[580].size() == 56);
+        CHECK(rslt.original_frame.topology().residues()[581].size() == 57);
+        CHECK(rslt.original_frame.topology().residues()[582].size() == 59);
+        CHECK(rslt.original_frame.topology().residues()[583].size() == 49);
+
     }
 }
 
@@ -1223,16 +1271,16 @@ TEST_CASE("BCIF impl - get_int_type_str") {
         CHECK(type_str == "Int8");
         get_int_type_str(2, type_str);
         CHECK(type_str == "Int16");
-        get_int_type_str(4, type_str);
+        get_int_type_str(3, type_str);
         CHECK(type_str == "Int32");
     }
 
     SECTION("Unsigned integer types") {
-        get_int_type_str(5, type_str);
+        get_int_type_str(4, type_str);
         CHECK(type_str == "Uint8");
-        get_int_type_str(6, type_str);
+        get_int_type_str(5, type_str);
         CHECK(type_str == "Uint16");
-        get_int_type_str(8, type_str);
+        get_int_type_str(6, type_str);
         CHECK(type_str == "Uint32");
     }
 
@@ -1243,11 +1291,10 @@ TEST_CASE("BCIF impl - get_int_type_str") {
         CHECK(type_str == "Float64");
     }
 
-    SECTION("Unknown code falls back to Int32") {
-        get_int_type_str(99, type_str);
-        CHECK(type_str == "Int32");
-        get_int_type_str(0, type_str);
-        CHECK(type_str == "Int32");
+    SECTION("Unknown code throws") {
+        CHECK_THROWS_AS(get_int_type_str(99, type_str), FormatError);
+        CHECK_THROWS_AS(get_int_type_str(0, type_str), FormatError);
+        CHECK_THROWS_AS(get_int_type_str(8, type_str), FormatError);
     }
 }
 

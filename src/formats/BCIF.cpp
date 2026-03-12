@@ -1394,7 +1394,7 @@ namespace msgpack {
                 }
 
                 // Extract type parameter - can be string or integer
-                int32_t type_code = 4;  // default to Int32
+                int32_t type_code = 3;  // default to Int32
                 std::string type_str = "";
 
                 for (uint32_t j = 0; j < enc_map.size; ++j) {
