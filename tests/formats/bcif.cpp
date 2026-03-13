@@ -377,6 +377,32 @@ namespace
         return out;
     }
 
+    using UnboundingIdPairs = std::map<std::pair<uint32_t, uint32_t>, bool>; // value is true if the pair is bonded
+
+    // look at pair of atom id from non_bonding_pairs and set the value to true of the pair is bound
+    void test_bonds( UnboundingIdPairs& non_bonding_pairs, const Frame& frame) {
+        std::map <size_t, uint32_t> index_id_conversion;
+
+        for (size_t it_idx = 0; it_idx < frame.size(); it_idx++)
+        {
+            auto& it_atom = frame[it_idx];
+            uint32_t id = static_cast<uint32_t>(it_atom.get("id")->as_double());
+            index_id_conversion[it_idx] = id;
+        }
+
+        for (auto& bond : frame.topology().bonds())
+        {
+            uint32_t& b0 = index_id_conversion[bond[0]], b1 = index_id_conversion[bond[1]];
+            std::pair<uint32_t, uint32_t> p12{ b0,b1 };
+            std::pair<uint32_t, uint32_t> p21{ b1,b0 };
+            if (non_bonding_pairs.count(p12))
+                non_bonding_pairs[p12] = true;
+            if (non_bonding_pairs.count(p21))
+                non_bonding_pairs[p21] = true;
+
+        }
+    }
+
 }
 
 
@@ -741,6 +767,38 @@ TEST_CASE("Read files in BCIF format") {
         CHECK(rslt.original_frame.topology().residues()[581].size() == 57);
         CHECK(rslt.original_frame.topology().residues()[582].size() == 59);
         CHECK(rslt.original_frame.topology().residues()[583].size() == 49);
+
+    }
+
+    SECTION("Not bonding residues if there is a hole in the sequence number") {
+
+        auto file = Trajectory("data/bcif/6fxo.bcif.gz");
+        Frame frame = file.read();
+
+        UnboundingIdPairs pairs{
+            {{1231,  1234}, false}
+        };
+        test_bonds(pairs, frame);
+
+        CHECK(pairs.begin()->second == false);
+
+    }
+
+    SECTION("Not bonding different instances of the same template together") {
+        auto file = Trajectory("data/bcif/6fxo.bcif.gz");
+        Frame frame = file.read();
+
+        UnboundingIdPairs pairs{
+            {{3,  10}, false},
+            {{2426,  2421}, false}
+        };
+        test_bonds(pairs, frame);
+
+        auto it = pairs.begin();
+        CHECK(it->second == false);
+        it++;
+        CHECK(it->second == false);
+
 
     }
 }
