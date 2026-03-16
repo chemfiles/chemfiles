@@ -3505,6 +3505,7 @@ namespace chemfiles
                 residue.set("insertion_code", data.insertion_code[last_index]);
             residue.set("chainname", data.auth_chain_id[last_index]);
             residue.set("auth_seq_id", static_cast<double>(data.auth_residue_id[last_index]));
+            residue.set("label_seq_id", static_cast<double>(data.residue_id[last_index])); // TODO : add it in the doc
             for (auto& [_, it_atomIdx] : atoms_waiting_for_residue_data)
             {
                 if (!residue.contains(it_atomIdx))
@@ -3533,7 +3534,10 @@ namespace chemfiles
 
             std::unique_ptr<std::string> chain_name = nullptr;
             std::unique_ptr<std::string> res_name = nullptr;
-            const int32_t*         res_id = nullptr;
+            const int32_t*         label_res_id = nullptr;
+            const int32_t*         auth_res_id = nullptr;
+            const int32_t* previous_auth_resid = nullptr;
+            const int32_t* previous_label_resid = nullptr;
 
             size_t it_atomIndex = 0; // We need the variable to survive after the loop to create the last residue
             for (; it_atomIndex < natoms; ++it_atomIndex) {
@@ -3547,6 +3551,7 @@ namespace chemfiles
                             profile.residue_data_size_ok 
                             && (
                                 data.residue_id[it_atomIndex - 1] != data.residue_id[it_atomIndex]
+                                //|| data.auth_residue_id[it_atomIndex - 1] != data.auth_residue_id[it_atomIndex ]
                                 || data.residue_name[it_atomIndex - 1] != data.residue_name[it_atomIndex]
                                 )
                             )
@@ -3556,14 +3561,17 @@ namespace chemfiles
                 // To work around it, we create the residue N - 1 once we iterate on the first atom of residue N. 
                 if (just_changed_residue)
                 {
-                    create_residue(data, frame, *res_name, *res_id, atoms_waiting_for_residue_data, it_atomIndex, previous_inter_residue_forward_linking_atom, current_inter_residue_forward_linking_atom);
+                    create_residue(data, frame, *res_name, *label_res_id, atoms_waiting_for_residue_data, it_atomIndex, previous_inter_residue_forward_linking_atom, current_inter_residue_forward_linking_atom);
                     atoms_waiting_for_residue_data.clear();
                     just_changed_residue = false;
+                    previous_auth_resid = auth_res_id;
+                    previous_label_resid = label_res_id;
                 }
 
                 chain_name = nullptr;
                 res_name = nullptr;
-                res_id = nullptr;
+                label_res_id = nullptr;
+                auth_res_id = nullptr;
 
                 if (just_changed_chain)
                 {
@@ -3576,9 +3584,10 @@ namespace chemfiles
                 {
                     chain_name = std::make_unique<std::string>(data.chain_id[it_atomIndex]);
                     res_name = std::make_unique<std::string>(data.residue_name[it_atomIndex]);
-                    res_id = &data.residue_id[it_atomIndex];
+                    label_res_id = &data.residue_id[it_atomIndex];
+                    auth_res_id = &data.auth_residue_id[it_atomIndex];
                 }
-                bool fetched_all_residue_data = res_name != nullptr && chain_name != nullptr && res_id != nullptr;
+                bool fetched_all_residue_data = res_name != nullptr && chain_name != nullptr && label_res_id != nullptr && auth_res_id != nullptr;
                 
                 std::string atom_type = "X";
                 std::string atom_name = "";
@@ -3610,7 +3619,21 @@ namespace chemfiles
                 bool current_residue_has_implicit_neightbour_bonding = expect_implicit_inter_residue_bonding(*res_name);
                 if (current_inter_residue_forward_linking_atom == SIZE_MAX && current_residue_has_implicit_neightbour_bonding && is_residue_forward_binder(atom_name))
                     current_inter_residue_forward_linking_atom = it_atomIndex;
-                if (current_residue_has_implicit_neightbour_bonding && is_residue_backward_binder(atom_name) && previous_inter_residue_forward_linking_atom != SIZE_MAX)
+
+                if (current_residue_has_implicit_neightbour_bonding 
+                    && is_residue_backward_binder(atom_name) 
+                    && previous_inter_residue_forward_linking_atom != SIZE_MAX 
+                    && previous_auth_resid != nullptr 
+                    // We need to make sure the res_id are contiguous to avoid bonding residues through a gap in data (i.e. when the structure lacks coordinate data on some residues)
+                    // Initially, the insertion ID was supposed to carry this kind of information, but I never seen actual usage of the field in structure files.
+                    // We can get this piece of information by looking at the "_pdbx_poly_seq_scheme" table. 
+                    // However, by experience, any table that doesn't contain actual coordinate data are likely to be dropped by third-party file writer. 
+                    // Hence, although it would be a good solution to parse it, if we want to have the most inclusive parser we can get, relying on coordinate table data should be better.
+                    // The implementation I chose is checking if the resid are contiguous, and if there is a gap, it means that there is a gap in the sequence.
+                    // However, sometimes this piece of information is carried by the label_res_id, sometimes the auth_seq_id, so we need to check both.
+                    && (*previous_auth_resid + 1 == *auth_res_id)
+                    && (*previous_label_resid + 1 == *label_res_id)
+                    )
                 {
                     frame.add_bond(previous_inter_residue_forward_linking_atom, it_atomIndex, Bond::SINGLE);
                 }
@@ -3627,7 +3650,7 @@ namespace chemfiles
                 if (fetched_all_residue_data && !atom_name.empty())
                 {
                     // We store atom index related to some strut_conn bounding for quick access later.
-                    BCIFFormat::BCIFData::StructConnMapKey struct_conn_key{*chain_name, *res_name, *res_id, atom_name };
+                    BCIFFormat::BCIFData::StructConnMapKey struct_conn_key{*chain_name, *res_name, *label_res_id, atom_name };
                     if (data.struct_conn_map.count(struct_conn_key) > 0)
                     {
                         atoms_waiting_for_struct_conn_bounding[struct_conn_key] = it_atomIndex;
@@ -3636,8 +3659,8 @@ namespace chemfiles
             }
 
             // Since we only create the residue once its last atom is done iterating, we need a last round after the loop.
-            if (res_name != nullptr && res_id != nullptr && !atoms_waiting_for_residue_data.empty() && profile.residue_data_size_ok)
-                create_residue(data, frame, *res_name, *res_id, atoms_waiting_for_residue_data, it_atomIndex, previous_inter_residue_forward_linking_atom, current_inter_residue_forward_linking_atom);
+            if (res_name != nullptr && label_res_id != nullptr && !atoms_waiting_for_residue_data.empty() && profile.residue_data_size_ok)
+                create_residue(data, frame, *res_name, *label_res_id, atoms_waiting_for_residue_data, it_atomIndex, previous_inter_residue_forward_linking_atom, current_inter_residue_forward_linking_atom);
 
             for (auto& it_struct_conn : data.struct_conns)
             {
