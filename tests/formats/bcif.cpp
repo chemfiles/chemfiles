@@ -931,7 +931,7 @@ TEST_CASE("Read-Write sample files","[samples]") {
         test_args.specific_residue_counts.emplace("LEU", 72);
         test_args.specific_residue_counts.emplace("LYS", 84);
         test_args.specific_residue_counts.emplace("CYS", 20);
-        test_args.residue_count = 825;
+        test_args.residue_count = 1246;
         test_args.residue_chain_ids.emplace(76, "A");
         test_args.residue_chain_ids.emplace(486, "A");
         test_args.residue_chain_ids.emplace(76, "B");
@@ -981,7 +981,7 @@ TEST_CASE("Read-Write sample files","[samples]") {
         test_args.specific_residue_counts.emplace("PHE",21 );
         test_args.specific_residue_counts.emplace("THR",38 );
         test_args.specific_residue_counts.emplace("TRP",20 );
-        test_args.residue_count = 535;
+        test_args.residue_count = 707;
         test_args.residue_chain_ids.emplace(152, "C");
         test_args.residue_chain_ids.emplace(6, "A");
         test_args.residue_chain_ids.emplace(208, "A");
@@ -1080,7 +1080,7 @@ TEST_CASE("Read-Write sample files","[samples]") {
         test_args.specific_residue_counts.emplace("LEU", 220);
         test_args.specific_residue_counts.emplace("2H7", 2);
         test_args.specific_residue_counts.emplace("PEG", 7);
-        test_args.residue_count = 1936;
+        test_args.residue_count = 2085;
         test_args.residue_chain_ids.emplace(14, "A");
         test_args.residue_chain_ids.emplace(982, "A");
         test_args.residue_chain_ids.emplace(14, "B");
