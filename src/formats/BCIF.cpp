@@ -3481,7 +3481,8 @@ namespace chemfiles
             const BCIFFormat::BCIFData& data,
             Frame& frame,
             const std::string& res_name,
-            const int32_t& res_id,
+            const int32_t& label_residue_id,
+            const int32_t& auth_residue_id,
             const NameIndexAtomMap& atoms_waiting_for_residue_data,
             const size_t& it_atomIndex,
             size_t& previous_inter_residue_forward_linking_atom,
@@ -3492,20 +3493,20 @@ namespace chemfiles
 
             // Skip creating residues for atoms with placeholder residue data
             // These are atoms that didn't belong to any residue in the original file
-            if (is_placeholder_residue_data(res_name, res_id, data.chain_id[last_index])) {
+            if (is_placeholder_residue_data(res_name, label_residue_id, data.chain_id[last_index])) {
                 previous_inter_residue_forward_linking_atom = current_inter_residue_forward_linking_atom;
                 current_inter_residue_forward_linking_atom = SIZE_MAX;
                 return;
             }
 
             create_intra_residue_bonds(data.chem_comp_bonds_map, res_name, atoms_waiting_for_residue_data, frame);
-            Residue residue(res_name, res_id);
+            Residue residue(res_name, label_residue_id);
             residue.set("chainid", data.chain_id[last_index]);
             if (data.insertion_code.size() > last_index)
                 residue.set("insertion_code", data.insertion_code[last_index]);
             residue.set("chainname", data.auth_chain_id[last_index]);
-            residue.set("auth_seq_id", static_cast<double>(data.auth_residue_id[last_index]));
-            residue.set("label_seq_id", static_cast<double>(data.residue_id[last_index])); // TODO : add it in the doc
+            residue.set("auth_seq_id", static_cast<double>(auth_residue_id));
+            residue.set("label_seq_id", static_cast<double>(label_residue_id)); // TODO : add it in the doc 
             for (auto& [_, it_atomIdx] : atoms_waiting_for_residue_data)
             {
                 if (!residue.contains(it_atomIdx))
@@ -3551,7 +3552,7 @@ namespace chemfiles
                             profile.residue_data_size_ok 
                             && (
                                 data.residue_id[it_atomIndex - 1] != data.residue_id[it_atomIndex]
-                                //|| data.auth_residue_id[it_atomIndex - 1] != data.auth_residue_id[it_atomIndex ]
+                                || data.auth_residue_id[it_atomIndex - 1] != data.auth_residue_id[it_atomIndex ]
                                 || data.residue_name[it_atomIndex - 1] != data.residue_name[it_atomIndex]
                                 )
                             )
@@ -3561,7 +3562,9 @@ namespace chemfiles
                 // To work around it, we create the residue N - 1 once we iterate on the first atom of residue N. 
                 if (just_changed_residue)
                 {
-                    create_residue(data, frame, *res_name, *label_res_id, atoms_waiting_for_residue_data, it_atomIndex, previous_inter_residue_forward_linking_atom, current_inter_residue_forward_linking_atom);
+                    create_residue(data, frame, *res_name, *label_res_id, *auth_res_id, atoms_waiting_for_residue_data
+                        , it_atomIndex, previous_inter_residue_forward_linking_atom, current_inter_residue_forward_linking_atom);
+
                     atoms_waiting_for_residue_data.clear();
                     just_changed_residue = false;
                     previous_auth_resid = auth_res_id;
@@ -3660,7 +3663,7 @@ namespace chemfiles
 
             // Since we only create the residue once its last atom is done iterating, we need a last round after the loop.
             if (res_name != nullptr && label_res_id != nullptr && !atoms_waiting_for_residue_data.empty() && profile.residue_data_size_ok)
-                create_residue(data, frame, *res_name, *label_res_id, atoms_waiting_for_residue_data, it_atomIndex, previous_inter_residue_forward_linking_atom, current_inter_residue_forward_linking_atom);
+                create_residue(data, frame, *res_name, *label_res_id, *auth_res_id, atoms_waiting_for_residue_data, it_atomIndex, previous_inter_residue_forward_linking_atom, current_inter_residue_forward_linking_atom);
 
             for (auto& it_struct_conn : data.struct_conns)
             {

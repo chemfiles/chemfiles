@@ -730,9 +730,11 @@ TEST_CASE("Read files in BCIF format") {
         test_args.specific_atom_counts.emplace("FE", 4);
         test_args.specific_atom_positions.emplace(4558, Vector3D(-1.727, 4.699, 23.942));
         test_args.specific_atom_positions.emplace(4658, Vector3D(2.494, 5.651, 59.158));
-        test_args.residue_count = 584;
-        test_args.residue_chain_ids.emplace(146, "D");
-        test_args.residue_chain_ids.emplace(140, "C");
+        test_args.residue_count = 801;
+        test_args.residue_chain_ids.emplace(14, "A");
+        test_args.residue_chain_ids.emplace(141, "A");
+        test_args.residue_chain_ids.emplace(146, "B");
+        test_args.residue_chain_ids.emplace(141, "C");
 
         TestResults rslt = test_readwrite(test_args);
 
@@ -763,10 +765,11 @@ TEST_CASE("Read files in BCIF format") {
         CHECK(rslt.original_frame[4777].name() == "O");
         CHECK(rslt.reread_frame[4777].name() == "O");
 
-        CHECK(rslt.original_frame.topology().residues()[580].size() == 56);
-        CHECK(rslt.original_frame.topology().residues()[581].size() == 57);
-        CHECK(rslt.original_frame.topology().residues()[582].size() == 59);
-        CHECK(rslt.original_frame.topology().residues()[583].size() == 49);
+        CHECK(rslt.original_frame.topology().residues()[579].size() == 43);
+        CHECK(rslt.original_frame.topology().residues()[580].size() == 1);
+        CHECK(rslt.original_frame.topology().residues()[581].size() == 1);
+        CHECK(rslt.original_frame.topology().residues()[582].size() == 1);
+        CHECK(rslt.original_frame.topology().residues()[583].size() == 1);
 
     }
 
