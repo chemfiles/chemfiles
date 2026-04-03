@@ -880,7 +880,7 @@ TEST_CASE("Write files in BCIF format") {
 TEST_CASE("BCIF Compression Support", "[samples]") {
     SECTION("GZ compressed BCIF") {
         // Will be tested when .bcif.gz test files are available
-        ReadWriteTestArgs test_args{ "data/bcif/1aga.bcif.gz" };
+        ReadWriteTestArgs test_args{ "data/bcif/1AGA.bcif.gz" };
         test_args.atom_count = 126;
         test_args.specific_atom_counts.emplace("C", 72);
         test_args.specific_atom_counts.emplace("O", 54);

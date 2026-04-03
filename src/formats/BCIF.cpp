@@ -377,7 +377,7 @@ namespace msgpack {
                 // Some BCIF files (e.g., 1aga) have label_seq_id = -1 for all atoms
                 bool label_seq_invalid = !data.residue_id.empty() &&
                     std::all_of(data.residue_id.begin(), data.residue_id.end(),
-                        [](int32_t id) { return id < 0; });
+                        [](int32_t id) { return id <= 0; });
 
                 if (label_seq_invalid && !data.auth_residue_id.empty()) {
                     // Use auth_seq_id when label_seq_id is invalid
@@ -1394,7 +1394,7 @@ namespace msgpack {
                 }
 
                 // Extract type parameter - can be string or integer
-                int32_t type_code = 3;  // default to Int32
+                int32_t type_code = 4;  // default to Int32
                 std::string type_str = "";
 
                 for (uint32_t j = 0; j < enc_map.size; ++j) {
