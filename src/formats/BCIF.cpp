@@ -281,6 +281,7 @@ namespace msgpack {
 
         void parse_atom_site(const msgpack::object & category, BCIFData & data);
         void parse_cell(const msgpack::object & category, BCIFData & data);
+        void parse_single_string_column(const msgpack::object& category, const std::string& field, std::string& out);
         void parse_entry(const msgpack::object & category, BCIFData & data);
         void parse_struct(const msgpack::object & category, BCIFData & data);
         void parse_struct_conf(const msgpack::object & category, BCIFData & data);
@@ -699,7 +700,7 @@ namespace msgpack {
             }
         }
 
-        void parse_entry(const msgpack::object & category, BCIFData & data) {
+        void parse_single_string_column(const msgpack::object& category, const std::string& field, std::string& out) {
             msgpack::object columns_obj;
             bool found_columns = false;
 
@@ -729,54 +730,22 @@ namespace msgpack {
                 bool has_mask = false;
                 get_name_and_data(columns.ptr[i].via.map, column_name, data_obj, found_data, mask_obj, has_mask);
 
-                if (!found_data || column_name != "id") continue;
+                if (!found_data || column_name != field) continue;
 
                 std::vector<std::string> values;
                 decode_column(data_obj, values);
                 if (!values.empty() && !values[0].empty()) {
-                    data.entry_id = values[0];
+                    out = values[0];
                 }
             }
         }
 
+        void parse_entry(const msgpack::object & category, BCIFData & data) {
+            parse_single_string_column(category, "id", data.entry_id);
+        }
+
         void parse_struct(const msgpack::object & category, BCIFData & data) {
-            msgpack::object columns_obj;
-            bool found_columns = false;
-
-            auto cat_map = category.via.map;
-            for (uint32_t i = 0; i < cat_map.size; ++i) {
-                std::string key;
-                cat_map.ptr[i].key.convert(key);
-                if (key == "columns") {
-                    columns_obj = cat_map.ptr[i].val;
-                    found_columns = true;
-                    break;
-                }
-            }
-
-            if (!found_columns || columns_obj.type != msgpack::type::ARRAY) {
-                return;
-            }
-
-            auto columns = columns_obj.via.array;
-            for (uint32_t i = 0; i < columns.size; ++i) {
-                if (columns.ptr[i].type != msgpack::type::MAP) continue;
-
-                std::string column_name;
-                msgpack::object data_obj;
-                msgpack::object mask_obj;
-                bool found_data = false;
-                bool has_mask = false;
-                get_name_and_data(columns.ptr[i].via.map, column_name, data_obj, found_data, mask_obj, has_mask);
-
-                if (!found_data || column_name != "title") continue;
-
-                std::vector<std::string> values;
-                decode_column(data_obj, values);
-                if (!values.empty() && !values[0].empty()) {
-                    data.struct_title = values[0];
-                }
-            }
+            parse_single_string_column(category, "title", data.struct_title);
         }
 
             struct StructConfData
