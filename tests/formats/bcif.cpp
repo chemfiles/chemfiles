@@ -807,6 +807,99 @@ TEST_CASE("Read files in BCIF format") {
 }
 
 
+TEST_CASE("BCIF metadata") {
+    SECTION("Read pdb_idcode from _entry category") {
+        auto file = Trajectory("data/bcif/1aga.bcif");
+        auto frame = file.read();
+
+        auto pdb_id = frame.get("pdb_idcode");
+        REQUIRE(pdb_id);
+        CHECK(pdb_id->kind() == Property::STRING);
+        CHECK(pdb_id->as_string() == "1AGA");
+    }
+
+    SECTION("Read pdb_idcode from compressed file") {
+        auto file = Trajectory("data/bcif/1aga.bcif.gz");
+        auto frame = file.read();
+
+        auto pdb_id = frame.get("pdb_idcode");
+        REQUIRE(pdb_id);
+        CHECK(pdb_id->as_string() == "1AGA");
+    }
+
+    SECTION("Read name from _struct category") {
+        auto file = Trajectory("data/bcif/1aga.bcif");
+        auto frame = file.read();
+
+        auto name = frame.get("name");
+        REQUIRE(name);
+        CHECK(name->kind() == Property::STRING);
+        CHECK(name->as_string() == "THE AGAROSE DOUBLE HELIX AND ITS FUNCTION IN AGAROSE GEL STRUCTURE");
+    }
+
+    SECTION("Write and read back pdb_idcode round-trip") {
+        auto tmpfile = NamedTempPath(".bcif");
+
+        {
+            auto src = Trajectory("data/bcif/1aga.bcif");
+            auto frame = src.read();
+            // Overwrite with a known test value
+            frame.set("pdb_idcode", "TEST");
+
+            auto dst = Trajectory(tmpfile, 'w');
+            dst.write(frame);
+        }
+
+        auto dst = Trajectory(tmpfile, 'r');
+        auto frame = dst.read();
+        auto pdb_id = frame.get("pdb_idcode");
+        REQUIRE(pdb_id);
+        CHECK(pdb_id->as_string() == "TEST");
+    }
+
+    SECTION("Write and read back name round-trip") {
+        auto tmpfile = NamedTempPath(".bcif");
+
+        {
+            auto src = Trajectory("data/bcif/1aga.bcif");
+            auto frame = src.read();
+            // Overwrite with a known test value
+            frame.set("name", "My test system");
+
+            auto dst = Trajectory(tmpfile, 'w');
+            dst.write(frame);
+        }
+
+        auto dst = Trajectory(tmpfile, 'r');
+        auto frame = dst.read();
+        auto name = frame.get("name");
+        REQUIRE(name);
+        CHECK(name->as_string() == "My test system");
+    }
+
+    SECTION("Original metadata is preserved through read-write round-trip") {
+        auto tmpfile = NamedTempPath(".bcif");
+
+        {
+            auto src = Trajectory("data/bcif/1aga.bcif");
+            auto frame = src.read();
+            auto dst = Trajectory(tmpfile, 'w');
+            dst.write(frame);
+        }
+
+        auto dst = Trajectory(tmpfile, 'r');
+        auto frame = dst.read();
+
+        auto pdb_id = frame.get("pdb_idcode");
+        REQUIRE(pdb_id);
+        CHECK(pdb_id->as_string() == "1AGA");
+
+        auto name = frame.get("name");
+        REQUIRE(name);
+        CHECK(name->as_string() == "THE AGAROSE DOUBLE HELIX AND ITS FUNCTION IN AGAROSE GEL STRUCTURE");
+    }
+}
+
 TEST_CASE("Write files in BCIF format") {
     SECTION("Append mode not supported") {
         CHECK_THROWS_WITH(
@@ -1139,6 +1232,41 @@ TEST_CASE("Read-Write sample files","[samples]") {
 
         // standard intra-nucleic acid phosphate bonds
         test_args.atom_bonds.emplace(std::make_pair(619,622 ), chemfiles::Bond::SINGLE); 
+
+        TestResults rslt = test_readwrite(test_args);
+
+        CHECK(rslt.first_read.all_atom_count);
+        CHECK(rslt.first_read.positions);
+        CHECK(rslt.first_read.specific_atom_count);
+        //CHECK(rslt.first_read.all_residue_count);
+        CHECK(rslt.first_read.specific_residue_count);
+        CHECK(rslt.first_read.residue_chains);
+        CHECK(rslt.first_read.secondary_structures);
+        CHECK(rslt.first_read.bonds);
+        CHECK(rslt.first_read.all_atom_have_id);
+        CHECK(rslt.re_read.all_atom_count);
+        CHECK(rslt.re_read.positions);
+        CHECK(rslt.re_read.specific_atom_count);
+        //CHECK(rslt.re_read.all_residue_count);
+        CHECK(rslt.re_read.specific_residue_count);
+        CHECK(rslt.re_read.residue_chains);
+        CHECK(rslt.re_read.secondary_structures);
+        CHECK(rslt.re_read.bonds);
+        CHECK(rslt.re_read.all_atom_have_id);
+        CHECK(rslt.all_atom_id_conserved);
+        CHECK(rslt.all_bonds_conserved);
+        CHECK(rslt.all_residues_conserved);
+        CHECK(rslt.all_ss_conserved);
+    }
+    SECTION("5iv5") {
+        ReadWriteTestArgs test_args{ "data/bcif/5iv5.bcif.gz" };
+        test_args.atom_count = 10078 ;
+        test_args.specific_atom_counts.emplace("C", 6569);
+        test_args.specific_atom_counts.emplace("P", 63);
+        test_args.specific_atom_positions.emplace(10044, Vector3D(87.804,  211.745, 237.246));
+        //test_args.residue_count = ;
+
+        
 
         TestResults rslt = test_readwrite(test_args);
 

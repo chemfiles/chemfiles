@@ -189,6 +189,7 @@ namespace chemfiles {
 
         // Entry data
         std::string entry_id;
+        std::string struct_title;
 
         // Model tracking
         size_t num_models = 1;
@@ -280,6 +281,8 @@ namespace msgpack {
 
         void parse_atom_site(const msgpack::object & category, BCIFData & data);
         void parse_cell(const msgpack::object & category, BCIFData & data);
+        void parse_entry(const msgpack::object & category, BCIFData & data);
+        void parse_struct(const msgpack::object & category, BCIFData & data);
         void parse_struct_conf(const msgpack::object & category, BCIFData & data);
         void parse_struct_sheet_range(const msgpack::object & category, BCIFData & data);
         void parse_chem_comp_bond(const msgpack::object & category, BCIFData & data);
@@ -301,6 +304,8 @@ namespace msgpack {
         // Helper functions for encoding BCIF structure
         void encode_atom_site_category(msgpack::packer<msgpack::sbuffer>& pk, const Frame& frame);
         void encode_cell_category(msgpack::packer<msgpack::sbuffer>& pk, const Frame& frame);
+        void encode_entry_category(msgpack::packer<msgpack::sbuffer>& pk, const Frame& frame);
+        void encode_struct_category(msgpack::packer<msgpack::sbuffer>& pk, const Frame& frame);
         void encode_struct_conf_category(msgpack::packer<msgpack::sbuffer>& pk, const Frame& frame);
         void encode_struct_sheet_range_category(msgpack::packer<msgpack::sbuffer>& pk, const Frame& frame);
         void encode_chem_comp_bond_category(msgpack::packer<msgpack::sbuffer>& pk, const Frame& frame);
@@ -395,6 +400,12 @@ namespace msgpack {
             }
             else if (category_name == "_cell") {
                 parse_cell(category, data);
+            }
+            else if (category_name == "_entry") {
+                parse_entry(category, data);
+            }
+            else if (category_name == "_struct") {
+                parse_struct(category, data);
             }
             else if (category_name == "_struct_conf") {
                 parse_struct_conf(category, data);
@@ -684,6 +695,86 @@ namespace msgpack {
                 }
                 else if (column_name == "angle_gamma") {
                     data.cell_angle_gamma = values[0];
+                }
+            }
+        }
+
+        void parse_entry(const msgpack::object & category, BCIFData & data) {
+            msgpack::object columns_obj;
+            bool found_columns = false;
+
+            auto cat_map = category.via.map;
+            for (uint32_t i = 0; i < cat_map.size; ++i) {
+                std::string key;
+                cat_map.ptr[i].key.convert(key);
+                if (key == "columns") {
+                    columns_obj = cat_map.ptr[i].val;
+                    found_columns = true;
+                    break;
+                }
+            }
+
+            if (!found_columns || columns_obj.type != msgpack::type::ARRAY) {
+                return;
+            }
+
+            auto columns = columns_obj.via.array;
+            for (uint32_t i = 0; i < columns.size; ++i) {
+                if (columns.ptr[i].type != msgpack::type::MAP) continue;
+
+                std::string column_name;
+                msgpack::object data_obj;
+                msgpack::object mask_obj;
+                bool found_data = false;
+                bool has_mask = false;
+                get_name_and_data(columns.ptr[i].via.map, column_name, data_obj, found_data, mask_obj, has_mask);
+
+                if (!found_data || column_name != "id") continue;
+
+                std::vector<std::string> values;
+                decode_column(data_obj, values);
+                if (!values.empty() && !values[0].empty()) {
+                    data.entry_id = values[0];
+                }
+            }
+        }
+
+        void parse_struct(const msgpack::object & category, BCIFData & data) {
+            msgpack::object columns_obj;
+            bool found_columns = false;
+
+            auto cat_map = category.via.map;
+            for (uint32_t i = 0; i < cat_map.size; ++i) {
+                std::string key;
+                cat_map.ptr[i].key.convert(key);
+                if (key == "columns") {
+                    columns_obj = cat_map.ptr[i].val;
+                    found_columns = true;
+                    break;
+                }
+            }
+
+            if (!found_columns || columns_obj.type != msgpack::type::ARRAY) {
+                return;
+            }
+
+            auto columns = columns_obj.via.array;
+            for (uint32_t i = 0; i < columns.size; ++i) {
+                if (columns.ptr[i].type != msgpack::type::MAP) continue;
+
+                std::string column_name;
+                msgpack::object data_obj;
+                msgpack::object mask_obj;
+                bool found_data = false;
+                bool has_mask = false;
+                get_name_and_data(columns.ptr[i].via.map, column_name, data_obj, found_data, mask_obj, has_mask);
+
+                if (!found_data || column_name != "title") continue;
+
+                std::vector<std::string> values;
+                decode_column(data_obj, values);
+                if (!values.empty() && !values[0].empty()) {
+                    data.struct_title = values[0];
                 }
             }
         }
@@ -2558,6 +2649,36 @@ namespace msgpack {
             encode_float_column(pk, "angle_gamma", {angles[2]});
         }
 
+        void encode_entry_category(msgpack::packer<msgpack::sbuffer>& pk, const Frame& frame) {
+            std::string entry_id;
+            auto prop = frame.get("pdb_idcode");
+            if (prop) {
+                entry_id = prop->as_string();
+            }
+
+            pk.pack_map(2);
+            pk.pack("name");
+            pk.pack("_entry");
+            pk.pack("columns");
+            pk.pack_array(1);
+            encode_string_column(pk, "id", {entry_id});
+        }
+
+        void encode_struct_category(msgpack::packer<msgpack::sbuffer>& pk, const Frame& frame) {
+            std::string title;
+            auto prop = frame.get("name");
+            if (prop) {
+                title = prop->as_string();
+            }
+
+            pk.pack_map(2);
+            pk.pack("name");
+            pk.pack("_struct");
+            pk.pack("columns");
+            pk.pack_array(1);
+            encode_string_column(pk, "title", {title});
+        }
+
             struct SSRange {
                 std::string chain_id;
                 int32_t beg_seq_id;
@@ -3705,6 +3826,11 @@ namespace chemfiles
             frame.set("pdb_idcode", data_->entry_id);
         }
 
+        // Set system name if available
+        if (!data_->struct_title.empty()) {
+            frame.set("name", data_->struct_title);
+        }
+
         // For now, we only support single model
         model_index_++;
     }
@@ -3817,10 +3943,12 @@ namespace chemfiles
 
             // Categories array
             pk.pack("categories");
-            pk.pack_array(6); 
+            pk.pack_array(8);
 
             msgpack::encode_atom_site_category(pk, frame);
             msgpack::encode_cell_category(pk, frame);
+            msgpack::encode_entry_category(pk, frame);
+            msgpack::encode_struct_category(pk, frame);
             msgpack::encode_struct_conf_category(pk, frame);
             msgpack::encode_struct_sheet_range_category(pk, frame);
             msgpack::encode_chem_comp_bond_category(pk, frame);
