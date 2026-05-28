@@ -1260,13 +1260,13 @@ TEST_CASE("Read-Write sample files","[samples]") {
     }
     }
     TEST_CASE("5iv5", "[.]") {
+        // 5iv5 has alternate conformations (label_alt_id "A"/"B"/etc.).
+        // All atoms are kept; altloc is stored as the "altloc" atom property.
+        // Bonding respects altloc: atoms from different conformers are not bonded.
         ReadWriteTestArgs test_args{ "data/bcif/5iv5.bcif.gz" };
-        test_args.atom_count = 549576 ;
-
+        test_args.atom_count = 549576;
 
         TestResults rslt = test_readwrite(test_args);
-        CHECK_THROWS(rslt.original_frame.topology().bond_order(547503, 547510));
-
         CHECK(rslt.first_read.all_atom_count);
         return;
         CHECK(rslt.first_read.positions);

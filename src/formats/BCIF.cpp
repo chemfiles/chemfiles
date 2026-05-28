@@ -152,6 +152,7 @@ namespace {
         };
         std::shared_ptr<Data> _data = std::make_shared<Data>();
     };
+
 }
 
 namespace chemfiles {
@@ -167,6 +168,7 @@ namespace chemfiles {
         StringCollection atom_type_symbol;
         StringCollection atom_label;        // label_atom_id (primary)
         StringCollection auth_atom_label;   // auth_atom_id (fallback)
+        StringCollection atom_alt_id;       // label_alt_id (alternate conformation ID)
         std::vector<int32_t> atom_id;
 
         // Residue data (from _atom_site category)
@@ -556,6 +558,9 @@ namespace msgpack {
                 }
                 else if (column_name == "pdbx_PDB_ins_code") {
                     decode_column(data_obj, data.insertion_code);
+                }
+                else if (column_name == "label_alt_id") {
+                    decode_column(data_obj, data.atom_alt_id);
                 }
             }
 
@@ -2454,6 +2459,7 @@ namespace msgpack {
                     type_symbols.reserve(natoms);
                     atom_names.reserve(natoms);
                     atom_ids.reserve(natoms);
+                    alt_ids.reserve(natoms);
                     residue_names.reserve(natoms);
                     chain_ids.reserve(natoms);
                     residue_ids.reserve(natoms);
@@ -2466,6 +2472,7 @@ namespace msgpack {
                 std::vector<std::string> type_symbols;
                 std::vector<std::string> atom_names;          // label_atom_id
                 std::vector<int32_t> atom_ids;                // id
+                std::vector<std::string> alt_ids;             // label_alt_id
                 std::vector<std::string> residue_names;
                 std::vector<std::string> chain_ids;           // label_asym_id
                 std::vector<int32_t> residue_ids;             // label_seq_id
@@ -2486,7 +2493,7 @@ namespace msgpack {
                 pk.pack("_atom_site");
 
                 pk.pack("columns");
-                pk.pack_array(12);  // id, Cartn_x, Cartn_y, Cartn_z, type_symbol, label_atom_id, label_comp_id, label_asym_id, label_seq_id, auth_asym_id, auth_seq_id, pdbx_PDB_ins_code
+                pk.pack_array(13);  // id, Cartn_x, Cartn_y, Cartn_z, type_symbol, label_atom_id, label_alt_id, label_comp_id, label_asym_id, label_seq_id, auth_asym_id, auth_seq_id, pdbx_PDB_ins_code
 
                 // === id column (atom serial number) ===
                 encode_integer_column(pk, "id", atom_site_data.atom_ids);
@@ -2505,6 +2512,9 @@ namespace msgpack {
 
                 // === label_atom_id column (atom name) ===
                 encode_string_column(pk, "label_atom_id", atom_site_data.atom_names);
+
+                // === label_alt_id column (alternate conformation ID) ===
+                encode_string_column(pk, "label_alt_id", atom_site_data.alt_ids);
 
                 // === label_comp_id column (residue name) ===
                 encode_string_column(pk, "label_comp_id", atom_site_data.residue_names);
@@ -2550,6 +2560,10 @@ namespace msgpack {
                     auto id_prop = frame[i].get("id");
                     int32_t atom_id = id_prop ? static_cast<int32_t>(id_prop->as_double()) : static_cast<int32_t>(i + 1);
                     atom_site_data.atom_ids.push_back(atom_id);
+
+                    // Get alternate conformation ID from atom property (stored as "altloc", written as "." if absent)
+                    auto altloc_prop = frame[i].get("altloc");
+                    atom_site_data.alt_ids.push_back(altloc_prop ? altloc_prop->as_string() : ".");
 
                     // Extract residue information if atom belongs to a residue
                     if (atom_to_residue[i] != SIZE_MAX) {
@@ -3449,6 +3463,7 @@ namespace chemfiles
                 atom_authLabel_size_ok(data.atom_z.size() == data.auth_atom_label.size()),
                 atom_label_size_ok(data.atom_z.size() == data.atom_label.size()),
                 atom_id_size_ok(data.atom_z.size() == data.atom_id.size()),
+                atom_alt_id_size_ok(data.atom_z.size() == data.atom_alt_id.size()),
                 residue_data_size_ok(data.atom_z.size() == data.residue_name.size() &&
                     data.atom_z.size() == data.residue_id.size() &&
                     data.atom_z.size() == data.chain_id.size() &&
@@ -3462,6 +3477,7 @@ namespace chemfiles
             bool atom_authLabel_size_ok = false;
             bool atom_label_size_ok = false;
             bool atom_id_size_ok = false;
+            bool atom_alt_id_size_ok = false;
             bool residue_data_size_ok = false;
             bool insertion_code_ok = false;
         };
@@ -3547,6 +3563,15 @@ namespace chemfiles
 
                         if (bounded_atoms.count(p12) > 0 || bounded_atoms.count(p21) > 0) // We avoid bound the same atoms twice
                             continue;
+
+                        // Skip bonds between atoms from different alternate conformers.
+                        // Bond only if both have the same altloc, or at least one has no altloc.
+                        {
+                            auto alt1 = frame[it_atomIndex].get("altloc");
+                            auto alt2 = frame[it3_atomNameIndex->second].get("altloc");
+                            if (alt1 && alt2 && alt1->as_string() != alt2->as_string())
+                                continue;
+                        }
 
                         frame.add_bond(it_atomIndex, it3_atomNameIndex->second, bond_order);
 
@@ -3699,6 +3724,13 @@ namespace chemfiles
                 if (profile.atom_id_size_ok)
                     atom.set("id", data.atom_id[it_atomIndex]);
 
+                if (profile.atom_alt_id_size_ok) {
+                    const std::string alt = data.atom_alt_id[it_atomIndex];
+                    if (!alt.empty() && alt != "." && alt != "?") {
+                        atom.set("altloc", alt);
+                    }
+                }
+
                 positions[it_atomIndex][0] = data.atom_x[it_atomIndex];
                 positions[it_atomIndex][1] = data.atom_y[it_atomIndex];
                 positions[it_atomIndex][2] = data.atom_z[it_atomIndex];
@@ -3728,7 +3760,10 @@ namespace chemfiles
                     && (*previous_label_resid + 1 == *label_res_id)
                     )
                 {
-                    frame.add_bond(previous_inter_residue_forward_linking_atom, it_atomIndex, Bond::SINGLE);
+                    auto alt_prev = frame[previous_inter_residue_forward_linking_atom].get("altloc");
+                    auto alt_curr = frame[it_atomIndex].get("altloc");
+                    if (!alt_prev || !alt_curr || alt_prev->as_string() == alt_curr->as_string())
+                        frame.add_bond(previous_inter_residue_forward_linking_atom, it_atomIndex, Bond::SINGLE);
                 }
 
                 // We create implicit bound between contiguous residues
@@ -3738,7 +3773,10 @@ namespace chemfiles
                     && current_residue_has_implicit_neightbour_bonding
                     )
                 {
-                    frame.add_bond(previous_inter_residue_forward_linking_atom, it_atomIndex, Bond::SINGLE);
+                    auto alt_prev = frame[previous_inter_residue_forward_linking_atom].get("altloc");
+                    auto alt_curr = frame[it_atomIndex].get("altloc");
+                    if (!alt_prev || !alt_curr || alt_prev->as_string() == alt_curr->as_string())
+                        frame.add_bond(previous_inter_residue_forward_linking_atom, it_atomIndex, Bond::SINGLE);
                 }
                 if (fetched_all_residue_data && !atom_name.empty())
                 {
