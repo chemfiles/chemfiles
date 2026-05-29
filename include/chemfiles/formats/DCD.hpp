@@ -85,6 +85,9 @@ private:
     void write_header();
     void write_cell(const UnitCell& cell);
     void write_positions(const Frame& frame);
+    /// derive the timestep metadata from the first two frames carrying
+    /// `time` and `simulation_step` properties, and back-patch the header
+    void patch_timesteps_metadata(const Frame& frame);
 
     std::unique_ptr<BinaryFile> file_;
     /// which variant of the DCD format are we trying to read?
@@ -145,6 +148,12 @@ private:
 
     /// index of the next step to read
     size_t index_ = 0;
+
+    /// state used by `patch_timesteps_metadata` to back-patch `dt`/`start`/
+    /// `step` after the first two property-bearing frames are written
+    size_t write_observed_frames_ = 0;
+    double write_first_time_ = 0.0;
+    double write_first_step_ = 0.0;
 
     /// temporary buffer used when reading/writing coordinates
     std::vector<float> buffer_;
