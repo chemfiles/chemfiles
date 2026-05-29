@@ -476,3 +476,65 @@ TEST_CASE("Append to DCD files") {
         CHECK(approx_eq(positions[2], {-3, 0, 0}, 1e-12));
     }
 }
+
+
+TEST_CASE("DCD timestep round-trip") {
+    auto cell = UnitCell({10, 12, 11}, {90, 90, 90});
+    auto make_frame = [&](double time, double step) {
+        auto frame = Frame(cell);
+        frame.add_atom(Atom("N"), {1, 2, 3});
+        frame.add_atom(Atom("B"), {0, 0, 0});
+        frame.add_atom(Atom("N"), {0, 0, 0});
+        frame.set("time", time);
+        frame.set("simulation_step", step);
+        return frame;
+    };
+
+    SECTION("dt/start/step survive write -> read") {
+        auto tmpfile = NamedTempPath(".dcd");
+
+        // mimic a typical CHARMM/NAMD output: integration timestep 15 fs
+        // (delta = 15 / 48.88821 AKMA), NSAVC = 5000, NPRIV = 5000.
+        // frame 0 is at simulation step 5000, frame 1 at 10000, etc.
+        // delta is truncated to f32 to match the header's storage precision
+        const double delta = static_cast<double>(static_cast<float>(15.0 / 48.88821));
+        const size_t nsavc = 5000;
+        const size_t npriv = 5000;
+        {
+            auto file = Trajectory(tmpfile, 'w');
+            for (size_t i = 0; i < 4; i++) {
+                double sim_step = static_cast<double>(npriv + nsavc * i);
+                file.write(make_frame(delta * sim_step, sim_step));
+            }
+        }
+
+        auto check = Trajectory(tmpfile);
+        REQUIRE(check.size() == 4);
+        for (size_t i = 0; i < 4; i++) {
+            auto frame = check.read_at(i);
+            auto sim_step = static_cast<double>(npriv + nsavc * i);
+            auto time = frame.get<Property::DOUBLE>("time");
+            auto step = frame.get<Property::DOUBLE>("simulation_step");
+            REQUIRE(time);
+            REQUIRE(step);
+            CHECK(approx_eq(*time, delta * sim_step, 1e-12));
+            CHECK(approx_eq(*step, sim_step, 1e-12));
+        }
+    }
+
+    SECTION("single-frame writes leave header unchanged") {
+        // with only one frame we cannot derive dt, so the writer should
+        // leave the header values as zero (no round-trip possible).
+        auto tmpfile = NamedTempPath(".dcd");
+
+        {
+            auto file = Trajectory(tmpfile, 'w');
+            file.write(make_frame(1234.5, 5000.0));
+        }
+
+        auto check = Trajectory(tmpfile);
+        auto frame = check.read_at(0);
+        CHECK_FALSE(frame.get("time"));
+        CHECK_FALSE(frame.get("simulation_step"));
+    }
+}
