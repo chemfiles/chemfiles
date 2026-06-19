@@ -20,20 +20,20 @@ LAMMPS = "The time of the frame in time units."
 TNG = "The time of the frame in picoseconds."
 TRR = "The time of the frame in picoseconds."
 XTC = "The time of the frame in picoseconds."
-DCD = "The time of the frame in picoseconds. DCD stores DELTA in AKMA time units; chemfiles converts on read and write."
+DCD = "The time of the frame in picoseconds."
 "Amber NetCDF" = "The time of the frame in picoseconds."
 "Amber Restart" = "The time of the frame in picoseconds."
 
 [simulation_step]
 type = "number"
 
-LAMMPS = "The time of the frame in time units."
-TNG = "The time of the frame in picoseconds."
-TRR = "The time of the frame in picoseconds."
-XTC = "The time of the frame in picoseconds."
-DCD = "The time of the frame in picoseconds."
-"Amber NetCDF" = "The time of the frame in picoseconds."
-"Amber Restart" = "The time of the frame in picoseconds."
+LAMMPS = "The step index of the frame in the simulation."
+TNG = "The step index of the frame in the simulation."
+TRR = "The step index of the frame in the simulation."
+XTC = "The step index of the frame in the simulation."
+DCD = "The step index of the frame in the simulation."
+"Amber NetCDF" = "The step index of the frame in the simulation."
+"Amber Restart" = "The step index of the frame in the simulation."
 
 [classification]
 type = "string"
