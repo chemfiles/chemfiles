@@ -42,7 +42,12 @@ TEST_CASE("Read files in DCD format") {
 
     frame = file.read_at(2);
     CHECK(frame.size() == 297);
-    CHECK(frame.get<Property::DOUBLE>("time") == 2.0);
+    // DCD stores DELTA in AKMA time units; chemfiles returns Frame.time
+    // in picoseconds. The file's DELTA*(NPRIV+NSAVC*2) is 2.0 AKMA, which
+    // is 2.0 * 4.888821e-2 ps. approx_eq because the reader's evaluation
+    // order is (DELTA * AKMA_TO_PS) * sim_step, which is not associative
+    // with the literal 2.0 * AKMA_TO_PS.
+    CHECK(approx_eq(frame.get<Property::DOUBLE>("time").value(), 2.0 * 4.888821e-2, 1e-12));
 
     positions = frame.positions();
     CHECK(positions[0] == vector3d_float(0.29909524f, 8.31003f, 11.721462f));
@@ -474,5 +479,72 @@ TEST_CASE("Append to DCD files") {
         CHECK(approx_eq(positions[0], {1000, 20000, 300000}, 1e-12));
         CHECK(approx_eq(positions[1], {4, 5, 7.5}, 1e-12));
         CHECK(approx_eq(positions[2], {-3, 0, 0}, 1e-12));
+    }
+}
+
+
+TEST_CASE("DCD timestep round-trip") {
+    auto cell = UnitCell({10, 12, 11}, {90, 90, 90});
+    auto make_frame = [&](double time, double step) {
+        auto frame = Frame(cell);
+        frame.add_atom(Atom("N"), {1, 2, 3});
+        frame.add_atom(Atom("B"), {0, 0, 0});
+        frame.add_atom(Atom("N"), {0, 0, 0});
+        frame.set("time", time);
+        frame.set("simulation_step", step);
+        return frame;
+    };
+
+    SECTION("dt/start/step survive write -> read") {
+        auto tmpfile = NamedTempPath(".dcd");
+
+        // mimic a typical CHARMM/NAMD output: integration timestep 15 fs,
+        // NSAVC = 5000, NPRIV = 5000. Frame 0 is at simulation step 5000,
+        // frame 1 at 10000, etc. chemfiles uses picoseconds for Frame.time
+        // while DCD stores DELTA in AKMA time units on disk (1 AKMA =
+        // 4.888821e-2 ps), so 15 fs = 15/48.88821 AKMA on disk = 0.015 ps
+        // in memory. delta is truncated through f32 to match the on-disk
+        // DELTA precision so the round-trip is exact.
+        constexpr double AKMA_TO_PS = 4.888821e-2;
+        const double delta_akma = static_cast<double>(static_cast<float>(15.0 / 48.88821));
+        const double delta_ps = delta_akma * AKMA_TO_PS;
+        const size_t nsavc = 5000;
+        const size_t npriv = 5000;
+        {
+            auto file = Trajectory(tmpfile, 'w');
+            for (size_t i = 0; i < 4; i++) {
+                double sim_step = static_cast<double>(npriv + nsavc * i);
+                file.write(make_frame(delta_ps * sim_step, sim_step));
+            }
+        }
+
+        auto check = Trajectory(tmpfile);
+        REQUIRE(check.size() == 4);
+        for (size_t i = 0; i < 4; i++) {
+            auto frame = check.read_at(i);
+            auto sim_step = static_cast<double>(npriv + nsavc * i);
+            auto time = frame.get<Property::DOUBLE>("time");
+            auto step = frame.get<Property::DOUBLE>("simulation_step");
+            REQUIRE(time);
+            REQUIRE(step);
+            CHECK(approx_eq(*time, delta_ps * sim_step, 1e-12));
+            CHECK(approx_eq(*step, sim_step, 1e-12));
+        }
+    }
+
+    SECTION("single-frame writes leave header unchanged") {
+        // with only one frame we cannot derive dt, so the writer should
+        // leave the header values as zero (no round-trip possible).
+        auto tmpfile = NamedTempPath(".dcd");
+
+        {
+            auto file = Trajectory(tmpfile, 'w');
+            file.write(make_frame(1234.5, 5000.0));
+        }
+
+        auto check = Trajectory(tmpfile);
+        auto frame = check.read_at(0);
+        CHECK_FALSE(frame.get("time"));
+        CHECK_FALSE(frame.get("simulation_step"));
     }
 }

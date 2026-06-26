@@ -53,6 +53,12 @@ static size_t checked_cast(int64_t value) {
     return static_cast<size_t>(value);
 }
 
+// DCD stores time in AKMA units (CHARMM/NAMD convention); chemfiles uses
+// picoseconds internally (Frame.time, and the unit assumed by every other
+// trajectory format). 1 AKMA = 4.888821e-2 ps. We convert at the file I/O
+// boundary so `timesteps_.dt` is in ps everywhere in memory.
+static constexpr double AKMA_TO_PS = 4.888821e-2;
+
 
 using namespace chemfiles;
 
@@ -174,6 +180,7 @@ void DCDFormat::read_at(size_t index, Frame& frame) {
     if (timesteps_.dt != 0.0 && timesteps_.step != 0) {
         auto simulation_step = static_cast<double>(timesteps_.step * index_ + timesteps_.start);
         frame.set("time", timesteps_.dt * simulation_step);
+        frame.set("simulation_step", simulation_step);
     }
 
     if (!title_.empty()) {
@@ -218,7 +225,7 @@ void DCDFormat::read_header() {
     auto n_fixed_atoms = checked_cast(file_->read_single_i32());
 
     if (options_.charmm_format) {
-        timesteps_.dt = static_cast<double>(file_->read_single_f32());
+        timesteps_.dt = static_cast<double>(file_->read_single_f32()) * AKMA_TO_PS;
 
         if (file_->read_single_i32() != 0) {
             options_.charmm_unitcell = true;
@@ -229,7 +236,7 @@ void DCDFormat::read_header() {
         }
     } else {
         // `timesteps_.dt` uses a 64-bite float in X-PLOR format
-        timesteps_.dt = file_->read_single_f64();
+        timesteps_.dt = file_->read_single_f64() * AKMA_TO_PS;
     }
 
     file_->seek(header_start + 84);
@@ -552,11 +559,46 @@ void DCDFormat::write(const Frame& frame) {
     n_frames_ += 1;
     index_ += 1;
 
-    // update the number of frames in the header
+    // back-patch the header: number of frames (always) and, for the first
+    // two property-bearing frames, the timestep metadata
     auto current = file_->tell();
     file_->seek(8); // the number of frames is always at offset 8 (1 marker + CORD)
     file_->write_single_i32(static_cast<int32_t>(n_frames_));
+    this->patch_timesteps_metadata(frame);
     file_->seek(current);
+}
+
+void DCDFormat::patch_timesteps_metadata(const Frame& frame) {
+    if (write_observed_frames_ >= 2) {
+        return;
+    }
+    auto time = frame.get<Property::DOUBLE>("time");
+    auto step = frame.get<Property::DOUBLE>("simulation_step");
+    if (!time || !step) {
+        return;
+    }
+    if (write_observed_frames_ == 0) {
+        write_first_time_ = *time;
+        write_first_step_ = *step;
+        write_observed_frames_ = 1;
+        return;
+    }
+
+    double step_gap = *step - write_first_step_;
+    write_observed_frames_ = 2;
+    if (step_gap <= 0) {
+        return;
+    }
+    timesteps_.dt = (*time - write_first_time_) / step_gap;
+    timesteps_.start = static_cast<size_t>(write_first_step_);
+    timesteps_.step = static_cast<size_t>(step_gap);
+
+    // NPRIV at offset 12, NSAVC at offset 16, DELTA (f32) at offset 44
+    file_->seek(12);
+    file_->write_single_i32(static_cast<int32_t>(timesteps_.start));
+    file_->write_single_i32(static_cast<int32_t>(timesteps_.step));
+    file_->seek(44);
+    file_->write_single_f32(static_cast<float>(timesteps_.dt / AKMA_TO_PS));
 }
 
 void DCDFormat::write_header() {
@@ -572,10 +614,10 @@ void DCDFormat::write_header() {
 
     file_->write_single_i32(/* n_degree_of_freedom */ 3 * static_cast<int32_t>(n_atoms_));
     file_->write_single_i32(/* n_fixed_atoms */ 0);
-    // TODO: this might lose information: when writing to a file, this is always
-    // 0, even if the frame has a *time* property. If we read back, the
-    // resulting frame will not have a *time* property at all.
-    file_->write_single_f32(static_cast<float>(timesteps_.dt));
+    // dt is written as 0 here; the actual value is back-patched by `write()`
+    // after observing the `time` and `simulation_step` properties of the
+    // first two frames.
+    file_->write_single_f32(static_cast<float>(timesteps_.dt / AKMA_TO_PS));
 
     file_->write_single_i32(options_.charmm_unitcell ? 1 : 0);
     file_->write_single_i32(/* has_4d_data */ 0);
