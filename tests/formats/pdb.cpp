@@ -244,6 +244,10 @@ TEST_CASE("Read files in PDB format") {
         CHECK(topology.are_linked(topology.residue(3), topology.residue(4)));
         CHECK(!topology.are_linked(topology.residue(3), topology.residue(5)));
         CHECK(topology.bonds().size() == 815);
+
+        // O3' of residue 3 is bonded to P of residue 4
+        CHECK(contains(topology.bonds(), Bond(98, 123)));
+        CHECK(!contains(topology.bonds(), Bond(98, 131)));
     }
 
     SECTION("Read atomic insertion codes") {
