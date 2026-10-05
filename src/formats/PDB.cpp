@@ -586,7 +586,7 @@ void PDBFormat::link_standard_residue_bonds(Frame& frame) {
             resid == previous_residue_id + 1 )
         {
             link_previous_nucleic = false;
-            frame.add_bond(previous_carboxylic_id, three_prime_oxygen->second);
+            frame.add_bond(previous_carboxylic_id, five_prime_phosphorus->second);
         }
 
         if (three_prime_oxygen != atom_name_to_index.end() ) {
