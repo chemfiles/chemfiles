@@ -187,6 +187,16 @@ TEST_CASE("PBC functions") {
         frame.add_atom(Atom(), Vector3D(1, 2, 6));
 
         CHECK(approx_eq(frame.distance(0, 1), sqrt(6.0)));
+
+        // Independent fractional-coordinate rounding is not sufficient for
+        // skewed cells: the closest image may change multiple coordinates.
+        auto triclinic = Frame();
+        triclinic.set_cell(UnitCell({10.0, 10.0, 10.0}, {60.0, 60.0, 60.0}));
+        auto cell = triclinic.cell().matrix().transpose();
+        auto position = cell * Vector3D(0.49, 0.49, 0.49);
+        triclinic.add_atom(Atom("C"), {0, 0, 0});
+        triclinic.add_atom(Atom("C"), position);
+        CHECK(approx_eq(triclinic.distance(0, 1), 6.932532004974805, 1e-12));
     }
 
     SECTION("Angles") {

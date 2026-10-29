@@ -285,10 +285,62 @@ Vector3D UnitCell::wrap_orthorhombic(const Vector3D& vector) const {
 
 Vector3D UnitCell::wrap_triclinic(const Vector3D& vector) const {
     auto fractional = matrix_inv_transposed_ * vector;
-    fractional[0] -= round(fractional[0]);
-    fractional[1] -= round(fractional[1]);
-    fractional[2] -= round(fractional[2]);
-    return matrix_.transpose() * fractional;
+
+    // Rounding each fractional component independently is only a minimum
+    // image operation for orthogonal cells. In a skewed lattice, a nearby
+    // image can require changing two or more lattice coordinates together.
+    // Start with the component-wise image and use it to establish a finite
+    // sphere around the target in fractional space. The Frobenius norm of the
+    // inverse cell is an upper bound on the inverse operator norm, so every
+    // image that can improve the starting candidate lies in this sphere.
+    auto rounded = fractional;
+    rounded[0] -= round(rounded[0]);
+    rounded[1] -= round(rounded[1]);
+    rounded[2] -= round(rounded[2]);
+    auto best = matrix_.transpose() * rounded;
+    auto best_squared = dot(best, best);
+
+    auto inverse = matrix_inv_transposed_.transpose();
+    auto inverse_frobenius_squared = 0.0;
+    for (const auto& row: inverse) {
+        for (auto value: row) {
+            inverse_frobenius_squared += value * value;
+        }
+    }
+    auto radius = sqrt(best_squared * inverse_frobenius_squared);
+    auto radius_squared = radius * radius;
+
+    auto lower = [radius](double value) {
+        return static_cast<long long>(floor(value - radius));
+    };
+    auto upper = [radius](double value) {
+        return static_cast<long long>(ceil(value + radius));
+    };
+    auto i0 = lower(fractional[0]);
+    auto i1 = lower(fractional[1]);
+    auto i2 = lower(fractional[2]);
+    auto j0 = upper(fractional[0]);
+    auto j1 = upper(fractional[1]);
+    auto j2 = upper(fractional[2]);
+
+    for (auto a = i0; a <= j0; a++) {
+        for (auto b = i1; b <= j1; b++) {
+            for (auto c = i2; c <= j2; c++) {
+                auto candidate_fractional = Vector3D(
+                    fractional[0] - static_cast<double>(a),
+                    fractional[1] - static_cast<double>(b),
+                    fractional[2] - static_cast<double>(c)
+                );
+                auto candidate = matrix_.transpose() * candidate_fractional;
+                auto candidate_squared = dot(candidate, candidate);
+                if (candidate_squared < best_squared && candidate_squared <= radius_squared) {
+                    best = candidate;
+                    best_squared = candidate_squared;
+                }
+            }
+        }
+    }
+    return best;
 }
 
 Vector3D UnitCell::wrap(const Vector3D& vector) const {
