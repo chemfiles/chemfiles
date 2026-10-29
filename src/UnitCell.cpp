@@ -57,6 +57,9 @@ namespace chemfiles { namespace details {
 using namespace chemfiles::details;
 
 static void check_lengths(const Vector3D& lengths) {
+    if (!std::isfinite(lengths[0]) || !std::isfinite(lengths[1]) || !std::isfinite(lengths[2])) {
+        throw error("a unit cell can not have non-finite lengths");
+    }
     if (lengths[0] < 0 || lengths[1] < 0 || lengths[2] < 0) {
         throw error("a unit cell can not have negative lengths");
     }

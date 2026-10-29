@@ -136,6 +136,11 @@ TEST_CASE("Use the UnitCell type") {
             CHECK_THROWS_WITH(UnitCell({1, -1, 1}), message);
             CHECK_THROWS_WITH(UnitCell({1, 1, -1}), message);
 
+            message = "a unit cell can not have non-finite lengths";
+            CHECK_THROWS_WITH(UnitCell({NAN, 1, 1}), message);
+            CHECK_THROWS_WITH(UnitCell({1, INFINITY, 1}), message);
+            CHECK_THROWS_WITH(UnitCell({1, 1, -INFINITY}), message);
+
             message = "a unit cell can not have negative angles";
             CHECK_THROWS_WITH(UnitCell({1, 1, 1}, {-90, 90, 90}), message);
             CHECK_THROWS_WITH(UnitCell({1, 1, 1}, {90, -90, 90}), message);
@@ -177,6 +182,10 @@ TEST_CASE("Use the UnitCell type") {
             CHECK_THROWS_WITH(cell.set_lengths({-10, 10, 10}), message);
             CHECK_THROWS_WITH(cell.set_lengths({10, -10, 10}), message);
             CHECK_THROWS_WITH(cell.set_lengths({10, 10, -10}), message);
+
+            message = "a unit cell can not have non-finite lengths";
+            CHECK_THROWS_WITH(cell.set_lengths({NAN, 10, 10}), message);
+            CHECK_THROWS_WITH(cell.set_lengths({10, INFINITY, 10}), message);
 
             cell.set_shape(UnitCell::TRICLINIC);
             message = "a unit cell can not have negative angles";
