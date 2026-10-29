@@ -307,6 +307,11 @@ TEST_CASE("Residues in topologies") {
     residue.add_atom(2);
     CHECK_THROWS_AS(topology.add_residue(residue), Error);
 
+    auto out_of_range = Residue("invalid");
+    out_of_range.add_atom(10);
+    CHECK_THROWS_AS(topology.add_residue(out_of_range), Error);
+    CHECK(topology.residues().size() == 3);
+
     auto first = topology.residue_for_atom(0);
     CHECK(first);
     auto second = topology.residue_for_atom(2);

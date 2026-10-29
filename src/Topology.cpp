@@ -149,6 +149,13 @@ const std::vector<Improper>& Topology::impropers() const {
 
 void Topology::add_residue(Residue residue) {
     for (auto i: residue) {
+        if (i >= atoms_.size()) {
+            throw out_of_bounds(
+                "can not add this residue: atom {} is out of bounds for a topology "
+                "containing {} atoms",
+                i, atoms_.size()
+            );
+        }
         auto it = residue_mapping_.find(i);
         if (it != residue_mapping_.end()) {
             throw error(
