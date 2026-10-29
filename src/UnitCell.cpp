@@ -157,6 +157,13 @@ UnitCell::UnitCell(Vector3D lengths, Vector3D angles):
     UnitCell(cell_matrix_from_lenths_angles(lengths, angles)) {}
 
 UnitCell::UnitCell(Matrix3D matrix): matrix_(matrix), matrix_inv_transposed_(Matrix3D::unit()) {
+    for (const auto& row : matrix_) {
+        for (auto value : row) {
+            if (!std::isfinite(value)) {
+                throw error("a unit cell matrix can not contain non-finite values");
+            }
+        }
+    }
     auto determinant = matrix_.determinant();
     if (determinant < 0.0) {
         throw error("invalid unit cell matrix with negative determinant");

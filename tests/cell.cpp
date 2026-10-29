@@ -167,6 +167,12 @@ TEST_CASE("Use the UnitCell type") {
             );
             CHECK_THROWS_WITH(UnitCell(matrix),
                 "orthorhombic cell must have their a vector along x axis, b vector along y axis and c vector along z axis");
+
+            message = "a unit cell matrix can not contain non-finite values";
+            matrix = Matrix3D(NAN, 0, 0, 0, 2, 0, 0, 0, 3);
+            CHECK_THROWS_WITH(UnitCell(matrix), message);
+            matrix = Matrix3D(INFINITY, 0, 0, 0, 2, 0, 0, 0, 3);
+            CHECK_THROWS_WITH(UnitCell(matrix), message);
         }
 
         SECTION("setting lengths & angles") {
