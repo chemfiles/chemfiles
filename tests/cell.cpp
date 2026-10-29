@@ -146,6 +146,11 @@ TEST_CASE("Use the UnitCell type") {
             CHECK_THROWS_WITH(UnitCell({1, 1, 1}, {90, 0, 90}), message);
             CHECK_THROWS_WITH(UnitCell({1, 1, 1}, {90, 90, 0}), message);
 
+        CHECK_THROWS_WITH(
+            UnitCell({10, 10, 10}, {10, 10, 170}),
+            "unit cell angles do not define a valid triclinic cell"
+        );
+
             // bad matrix
             auto matrix = Matrix3D(
                 26.2553,  0.0000, -4.4843,
