@@ -210,6 +210,14 @@ void CMLFormat::read_atoms(Frame& frame, const pugi::xml_node& atoms) {
         double xf = 0;
         double yf = 0;
         double zf = 0;
+        bool has_x2 = false;
+        bool has_y2 = false;
+        bool has_x3 = false;
+        bool has_y3 = false;
+        bool has_z3 = false;
+        bool has_xf = false;
+        bool has_yf = false;
+        bool has_zf = false;
         std::string id;
         std::string element;
         std::string atom_title;
@@ -224,20 +232,28 @@ void CMLFormat::read_atoms(Frame& frame, const pugi::xml_node& atoms) {
                 element = attribute.as_string();
             } else if (name == "x2") {
                 x2 = attribute.as_double();
+                has_x2 = true;
             } else if (name == "y2") {
                 y2 = attribute.as_double();
+                has_y2 = true;
             } else if (name == "x3") {
                 x3 = attribute.as_double();
+                has_x3 = true;
             } else if (name == "y3") {
                 y3 = attribute.as_double();
+                has_y3 = true;
             } else if (name == "z3") {
                 z3 = attribute.as_double();
+                has_z3 = true;
             } else if (name == "xFract") {
                 xf = attribute.as_double();
+                has_xf = true;
             } else if (name == "yFract") {
                 yf = attribute.as_double();
+                has_yf = true;
             } else if (name == "zFract") {
                 zf = attribute.as_double();
+                has_zf = true;
             } else if (name == "title") { // special attributes
                 atom_title = attribute.as_string();
             } else if (name == "formalCharge") {
@@ -254,12 +270,14 @@ void CMLFormat::read_atoms(Frame& frame, const pugi::xml_node& atoms) {
         auto new_atom = Atom(atom_title, element);
 
         Vector3D position;
-        if (frame.cell().shape() != UnitCell::INFINITE && (xf != 0.0 || yf != 0.0 || zf != 0.0)) {
+        if (frame.cell().shape() != UnitCell::INFINITE && has_xf && has_yf && has_zf) {
             position = frame.cell().matrix().transpose() * Vector3D(xf, yf, zf);
-        } else if (x3 == 0.0 && y3 == 0.0 && z3 == 0.0) {
+        } else if (has_x3 && has_y3 && has_z3) {
+            position = Vector3D(x3, y3, z3);
+        } else if (has_x2 && has_y2) {
             position = Vector3D(x2, y2, 0);
         } else {
-            position = Vector3D(x3, y3, z3);
+            position = Vector3D(0, 0, 0);
         }
 
         // Set special attributes

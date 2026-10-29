@@ -75,6 +75,22 @@ TEST_CASE("Read files in CML format") {
     }
 }
 
+TEST_CASE("CML coordinate presence is independent of coordinate values") {
+    const auto content = R"(<?xml version="1.0"?>
+<cml xmlns="http://www.xml-cml.org/schema">
+  <molecule>
+  <crystal>
+    <scalar title="a">10</scalar><scalar title="b">10</scalar><scalar title="c">10</scalar>
+    <scalar title="alpha">90</scalar><scalar title="beta">90</scalar><scalar title="gamma">90</scalar>
+  </crystal>
+  <atomArray>
+    <atom id="a1" elementType="C" x2="7" y2="8" x3="7" y3="8" z3="9" xFract="0" yFract="0" zFract="0"/>
+  </atomArray></molecule>
+</cml>)";
+    auto frame = Trajectory::memory_reader(content.data(), content.size(), "CML").read();
+    CHECK(approx_eq(frame.positions()[0], Vector3D(0, 0, 0), 1e-12));
+}
+
 TEST_CASE("Write CML file") {
     auto tmpfile = NamedTempPath(".cml");
     auto frame = Frame();
