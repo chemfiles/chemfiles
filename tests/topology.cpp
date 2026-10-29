@@ -330,4 +330,19 @@ TEST_CASE("Residues in topologies") {
     CHECK(all_residues[1].contains(8));
     CHECK(!all_residues[1].contains(9));
     CHECK(all_residues[2].size() == 2); // Totally removed
+
+    // Removing an atom shifts residue indices and must update reverse lookup.
+    topology.remove(0);
+    auto shifted = topology.residue_for_atom(1);
+    REQUIRE(shifted);
+    CHECK(shifted->contains(1));
+
+    // Truncating the topology removes out-of-range atoms from residues too.
+    topology.resize(5);
+    for (const auto& res: topology.residues()) {
+        for (auto atom: res) {
+            CHECK(atom < topology.size());
+        }
+    }
+    CHECK_FALSE(topology.residue_for_atom(8));
 }
