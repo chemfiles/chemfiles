@@ -214,6 +214,11 @@ void SDFFormat::write_next(const Frame& frame) {
     // TODO: this line can contain more data (file creation time and energy in particular)
     file_.print("\n");
     file_.print("created by chemfiles\n");
+    if (frame.size() > 999 || topology.bonds().size() > 999) {
+        throw format_error(
+            "can not write SDF V2000 records with more than 999 atoms or bonds"
+        );
+    }
     file_.print("{:>3}{:>3}  0     0  0  0  0  0  0999 V2000\n", frame.size(), topology.bonds().size());
 
     for (size_t i = 0; i < frame.size(); i++) {
