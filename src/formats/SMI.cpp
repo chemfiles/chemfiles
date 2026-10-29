@@ -337,7 +337,7 @@ void SMIFormat::read_next(Frame& frame) {
         case '\\': current_bond_order_ = Bond::DOWN; break;
         case '~': current_bond_order_ = Bond::UNKNOWN; break;
         case '-':
-            if (i + 1 < smiles.size() && smiles[i] == '>') {
+            if (i + 1 < smiles.size() && smiles[i + 1] == '>') {
                 current_bond_order_ = Bond::DATIVE_R;
                 ++i;
             } else {
@@ -345,7 +345,7 @@ void SMIFormat::read_next(Frame& frame) {
             }
             break;
         case '<':
-            if (i + 1 < smiles.size() && smiles[i] == '-') {
+            if (i + 1 < smiles.size() && smiles[i + 1] == '-') {
                 current_bond_order_ = Bond::DATIVE_L;
                 ++i;
             } else {
