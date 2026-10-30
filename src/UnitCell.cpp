@@ -100,7 +100,11 @@ static Matrix3D cell_matrix_from_lenths_angles(Vector3D lengths, Vector3D angles
 
     matrix[2][0] = cosd(angles[1]);
     matrix[2][1] = (cosd(angles[0]) - cosd(angles[1]) * cosd(angles[2])) / sind(angles[2]);
-    matrix[2][2] = sqrt(1 - matrix[2][0] * matrix[2][0] - matrix[2][1] * matrix[2][1]);
+    auto cz_squared = 1 - matrix[2][0] * matrix[2][0] - matrix[2][1] * matrix[2][1];
+    if (cz_squared <= 0 || !std::isfinite(cz_squared)) {
+        throw error("unit cell angles do not define a valid triclinic cell");
+    }
+    matrix[2][2] = sqrt(cz_squared);
     matrix[2][0] *= lengths[2];
     matrix[2][1] *= lengths[2];
     matrix[2][2] *= lengths[2];
