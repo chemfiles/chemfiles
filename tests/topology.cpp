@@ -343,6 +343,10 @@ TEST_CASE("Residues in topologies") {
     CHECK(shifted->contains(1));
 
     // Truncating the topology removes out-of-range atoms from residues too.
+    // A surviving bond still prevents truncation until it is removed.
+    CHECK_THROWS_AS(topology.resize(5), Error);
+    CHECK(topology.size() == 8);
+    topology.remove_bond(5, 7);
     topology.resize(5);
     for (const auto& res: topology.residues()) {
         for (auto atom: res) {
