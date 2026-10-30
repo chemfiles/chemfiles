@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cassert>
 #include <array>
+#include <limits>
 
 #include "chemfiles/UnitCell.hpp"
 #include "chemfiles/types.hpp"
@@ -286,57 +287,64 @@ Vector3D UnitCell::wrap_orthorhombic(const Vector3D& vector) const {
 Vector3D UnitCell::wrap_triclinic(const Vector3D& vector) const {
     auto fractional = matrix_inv_transposed_ * vector;
 
-    // Rounding each fractional component independently is only a minimum
-    // image operation for orthogonal cells. In a skewed lattice, a nearby
-    // image can require changing two or more lattice coordinates together.
-    // Start with the component-wise image and use it to establish a finite
-    // sphere around the target in fractional space. The Frobenius norm of the
-    // inverse cell is an upper bound on the inverse operator norm, so every
-    // image that can improve the starting candidate lies in this sphere.
+    // First remove a lattice translation to keep the search near the origin.
     auto rounded = fractional;
     rounded[0] -= round(rounded[0]);
     rounded[1] -= round(rounded[1]);
     rounded[2] -= round(rounded[2]);
-    auto best = matrix_.transpose() * rounded;
+    auto target = matrix_.transpose() * rounded;
+    auto best = target;
     auto best_squared = dot(best, best);
-
-    auto inverse = matrix_inv_transposed_.transpose();
-    auto inverse_frobenius_squared = 0.0;
-    for (const auto& row: inverse) {
-        for (auto value: row) {
-            inverse_frobenius_squared += value * value;
-        }
+    if (best_squared == 0) {
+        return best;
     }
-    auto radius = sqrt(best_squared * inverse_frobenius_squared);
-    auto radius_squared = radius * radius;
 
-    auto lower = [radius](double value) {
-        return static_cast<long long>(floor(value - radius));
-    };
-    auto upper = [radius](double value) {
-        return static_cast<long long>(ceil(value + radius));
-    };
-    auto i0 = lower(fractional[0]);
-    auto i1 = lower(fractional[1]);
-    auto i2 = lower(fractional[2]);
-    auto j0 = upper(fractional[0]);
-    auto j1 = upper(fractional[1]);
-    auto j2 = upper(fractional[2]);
-
-    for (auto a = i0; a <= j0; a++) {
-        for (auto b = i1; b <= j1; b++) {
-            for (auto c = i2; c <= j2; c++) {
-                auto candidate_fractional = Vector3D(
-                    fractional[0] - static_cast<double>(a),
-                    fractional[1] - static_cast<double>(b),
-                    fractional[2] - static_cast<double>(c)
-                );
-                auto candidate = matrix_.transpose() * candidate_fractional;
-                auto candidate_squared = dot(candidate, candidate);
-                if (candidate_squared < best_squared && candidate_squared <= radius_squared) {
-                    best = candidate;
-                    best_squared = candidate_squared;
-                }
+    // QR sphere search: prune with perpendicular distances instead of scanning
+    // a three-dimensional bounding box. For each (b, c), the optimal a is the
+    // nearest integer, so the innermost enumeration is unnecessary.
+    // See Fincke and Pohst, Math. Comp. 44 (1985), 463-471.
+    auto a_vector = Vector3D(matrix_[0]);
+    auto b_vector = Vector3D(matrix_[1]);
+    auto c_vector = Vector3D(matrix_[2]);
+    auto r00 = a_vector.norm();
+    auto q0 = a_vector / r00;
+    auto r01 = dot(q0, b_vector);
+    auto b_perpendicular = b_vector - r01 * q0;
+    auto r11 = b_perpendicular.norm();
+    auto q1 = b_perpendicular / r11;
+    auto q2 = cross(q0, q1);
+    auto r02 = dot(q0, c_vector);
+    auto r12 = dot(q1, c_vector);
+    auto r22 = dot(q2, c_vector);
+    auto y0 = dot(q0, target);
+    auto y1 = dot(q1, target);
+    auto y2 = dot(q2, target);
+    auto tolerance = 64 * std::numeric_limits<double>::epsilon() *
+                     (dot(a_vector, a_vector) + dot(b_vector, b_vector) +
+                      dot(c_vector, c_vector) + best_squared);
+    auto c_center = y2 / r22;
+    auto c_radius = sqrt(best_squared + tolerance) / fabs(r22);
+    auto c_first = static_cast<long long>(ceil(c_center - c_radius));
+    auto c_last = static_cast<long long>(floor(c_center + c_radius));
+    for (auto c = c_first; c <= c_last; c++) {
+        auto dc = static_cast<double>(c);
+        auto residual2 = y2 - r22 * dc;
+        auto remaining = best_squared + tolerance - residual2 * residual2;
+        if (remaining < 0) {
+            continue;
+        }
+        auto b_center = (y1 - r12 * dc) / r11;
+        auto b_radius = sqrt(remaining) / r11;
+        auto b_first = static_cast<long long>(ceil(b_center - b_radius));
+        auto b_last = static_cast<long long>(floor(b_center + b_radius));
+        for (auto b = b_first; b <= b_last; b++) {
+            auto db = static_cast<double>(b);
+            auto a = round((y0 - r01 * db - r02 * dc) / r00);
+            auto candidate = target - a * a_vector - db * b_vector - dc * c_vector;
+            auto candidate_squared = dot(candidate, candidate);
+            if (candidate_squared < best_squared) {
+                best = candidate;
+                best_squared = candidate_squared;
             }
         }
     }
