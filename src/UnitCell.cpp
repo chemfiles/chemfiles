@@ -57,6 +57,9 @@ namespace chemfiles { namespace details {
 using namespace chemfiles::details;
 
 static void check_lengths(const Vector3D& lengths) {
+    if (!std::isfinite(lengths[0]) || !std::isfinite(lengths[1]) || !std::isfinite(lengths[2])) {
+        throw error("a unit cell can not have non-finite lengths");
+    }
     if (lengths[0] < 0 || lengths[1] < 0 || lengths[2] < 0) {
         throw error("a unit cell can not have negative lengths");
     }
@@ -158,6 +161,13 @@ UnitCell::UnitCell(Vector3D lengths, Vector3D angles):
     UnitCell(cell_matrix_from_lenths_angles(lengths, angles)) {}
 
 UnitCell::UnitCell(Matrix3D matrix): matrix_(matrix), matrix_inv_transposed_(Matrix3D::unit()) {
+    for (const auto& row : matrix_) {
+        for (auto value : row) {
+            if (!std::isfinite(value)) {
+                throw error("a unit cell matrix can not contain non-finite values");
+            }
+        }
+    }
     auto determinant = matrix_.determinant();
     if (determinant < 0.0) {
         throw error("invalid unit cell matrix with negative determinant");
