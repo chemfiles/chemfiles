@@ -104,6 +104,16 @@ TEST_CASE("Errors in SDF format") {
         Trajectory("data/sdf/bad/count-line-too-short.sdf"),
         "counts line must have at least 10 characters in SFD file, it has 6: '  0  0'"
     );
+
+    auto frame = Frame();
+    for (size_t i = 0; i < 1000; i++) {
+        frame.add_atom(Atom("C"), {double(i), 0, 0});
+    }
+    auto writer = Trajectory::memory_writer("SDF");
+    CHECK_THROWS_WITH(
+        writer.write(frame),
+        "can not write SDF V2000 records with more than 999 atoms or bonds"
+    );
 }
 
 TEST_CASE("Write files in SDF format") {
