@@ -27,6 +27,30 @@ void Topology::resize(size_t size) {
         }
     }
     atoms_.resize(size, Atom());
+
+    // Resizing can remove atoms from the end of the topology. Keep residue
+    // membership and the reverse lookup consistent with the new atom count.
+    for (auto& residue: residues_) {
+        std::vector<size_t> removed;
+        for (auto atom: residue) {
+            if (atom >= size) {
+                removed.push_back(atom);
+            }
+        }
+        for (auto atom: removed) {
+            residue.remove(atom);
+        }
+    }
+    rebuild_residue_mapping();
+}
+
+void Topology::rebuild_residue_mapping() {
+    residue_mapping_.clear();
+    for (size_t residue_index = 0; residue_index < residues_.size(); residue_index++) {
+        for (auto atom: residues_[residue_index]) {
+            residue_mapping_[atom] = residue_index;
+        }
+    }
 }
 
 void Topology::add_atom(Atom atom) {
@@ -100,6 +124,7 @@ void Topology::remove(size_t i) {
     for (auto& res : residues_) {
         res.atom_removed(i);
     }
+    rebuild_residue_mapping();
 }
 
 const std::vector<Bond>& Topology::bonds() const {
@@ -124,6 +149,13 @@ const std::vector<Improper>& Topology::impropers() const {
 
 void Topology::add_residue(Residue residue) {
     for (auto i: residue) {
+        if (i >= atoms_.size()) {
+            throw out_of_bounds(
+                "can not add this residue: atom {} is out of bounds for a topology "
+                "containing {} atoms",
+                i, atoms_.size()
+            );
+        }
         auto it = residue_mapping_.find(i);
         if (it != residue_mapping_.end()) {
             throw error(

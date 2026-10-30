@@ -132,6 +132,10 @@ TEST_CASE("chfl_residue") {
         CHECK_STATUS(chfl_topology_residues_count(topology, &size));
         CHECK(size == 0);
 
+        CHECK(chfl_topology_add_residue(topology, residue) == CHFL_OUT_OF_BOUNDS);
+        CHECK_STATUS(chfl_topology_residues_count(topology, &size));
+        CHECK(size == 0);
+        CHECK_STATUS(chfl_topology_resize(topology, 3));
         CHECK_STATUS(chfl_topology_add_residue(topology, residue));
         chfl_free(residue);
 
