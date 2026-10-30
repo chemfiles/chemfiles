@@ -3,6 +3,7 @@
 #include "catch.hpp"
 #include "helpers.hpp"
 #include "chemfiles.hpp"
+#include <string>
 using namespace chemfiles;
 
 TEST_CASE("Read files in CML format") {
@@ -76,7 +77,7 @@ TEST_CASE("Read files in CML format") {
 }
 
 TEST_CASE("CML coordinate presence is independent of coordinate values") {
-    const auto content = R"(<?xml version="1.0"?>
+    const std::string content = R"(<?xml version="1.0"?>
 <cml xmlns="http://www.xml-cml.org/schema">
   <molecule>
   <crystal>
@@ -85,10 +86,15 @@ TEST_CASE("CML coordinate presence is independent of coordinate values") {
   </crystal>
   <atomArray>
     <atom id="a1" elementType="C" x2="7" y2="8" x3="7" y3="8" z3="9" xFract="0" yFract="0" zFract="0"/>
+    <atom id="a2" elementType="C" x2="7" y2="8" x3="0" y3="0" z3="0"/>
+    <atom id="a3" elementType="C" x2="0" y2="0"/>
   </atomArray></molecule>
 </cml>)";
     auto frame = Trajectory::memory_reader(content.data(), content.size(), "CML").read();
+    REQUIRE(frame.size() == 3);
     CHECK(approx_eq(frame.positions()[0], Vector3D(0, 0, 0), 1e-12));
+    CHECK(approx_eq(frame.positions()[1], Vector3D(0, 0, 0), 1e-12));
+    CHECK(approx_eq(frame.positions()[2], Vector3D(0, 0, 0), 1e-12));
 }
 
 TEST_CASE("Write CML file") {
