@@ -88,6 +88,20 @@ TEST_CASE("Read files in SMI format") {
     }
 }
 
+TEST_CASE("Read dative bonds in SMI format") {
+    for (const auto& input : {std::string("N->[Zn]"), std::string("N<-[Zn]")}) {
+        auto file = Trajectory::memory_reader(input.c_str(), input.size(), "SMI");
+        auto frame = file.read();
+        REQUIRE(frame.topology().bonds().size() == 1);
+        auto order = frame.topology().bond_orders()[0];
+        if (input == "N->[Zn]") {
+            CHECK(order == Bond::DATIVE_R);
+        } else {
+            CHECK(order == Bond::DATIVE_L);
+        }
+    }
+}
+
 TEST_CASE("Check parsing results") {
     SECTION("Details") {
         auto file = Trajectory("data/smi/details.smi");
