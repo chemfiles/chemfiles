@@ -307,6 +307,11 @@ TEST_CASE("Residues in topologies") {
     residue.add_atom(2);
     CHECK_THROWS_AS(topology.add_residue(residue), Error);
 
+    auto out_of_range = Residue("invalid");
+    out_of_range.add_atom(10);
+    CHECK_THROWS_AS(topology.add_residue(out_of_range), Error);
+    CHECK(topology.residues().size() == 3);
+
     auto first = topology.residue_for_atom(0);
     CHECK(first);
     auto second = topology.residue_for_atom(2);
@@ -330,4 +335,23 @@ TEST_CASE("Residues in topologies") {
     CHECK(all_residues[1].contains(8));
     CHECK(!all_residues[1].contains(9));
     CHECK(all_residues[2].size() == 2); // Totally removed
+
+    // Removing an atom shifts residue indices and must update reverse lookup.
+    topology.remove(0);
+    auto shifted = topology.residue_for_atom(1);
+    REQUIRE(shifted);
+    CHECK(shifted->contains(1));
+
+    // Truncating the topology removes out-of-range atoms from residues too.
+    // A surviving bond still prevents truncation until it is removed.
+    CHECK_THROWS_AS(topology.resize(5), Error);
+    CHECK(topology.size() == 8);
+    topology.remove_bond(5, 7);
+    topology.resize(5);
+    for (const auto& res: topology.residues()) {
+        for (auto atom: res) {
+            CHECK(atom < topology.size());
+        }
+    }
+    CHECK_FALSE(topology.residue_for_atom(8));
 }

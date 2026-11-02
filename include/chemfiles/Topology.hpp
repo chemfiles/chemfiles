@@ -277,6 +277,9 @@ public:
     }
 
 private:
+    /// Rebuild the atom-to-residue index after atom indices have changed.
+    void rebuild_residue_mapping();
+
     /// Atoms in the system.
     std::vector<Atom> atoms_;
     /// Connectivity of the system.
