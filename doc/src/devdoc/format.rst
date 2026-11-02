@@ -60,3 +60,5 @@ These classes implement the format interface defined previously.
 .. doxygenclass:: chemfiles::SDFFormat
 
 .. doxygenclass:: chemfiles::SMIFormat
+
+.. doxygenclass:: chemfiles::ConFormat

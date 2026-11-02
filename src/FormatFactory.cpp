@@ -45,6 +45,7 @@
 #include "chemfiles/formats/XTC.hpp"
 #include "chemfiles/formats/CIF.hpp"
 #include "chemfiles/formats/DCD.hpp"
+#include "chemfiles/formats/_CON.hpp"
 
 #define SENTINEL_INDEX (static_cast<size_t>(-1))
 
@@ -71,6 +72,7 @@ FormatFactory::FormatFactory() {
     this->add_format<CIFFormat>();
 #endif
     this->add_format<CMLFormat>();
+    this->add_format<ConFormat>();
     this->add_format<CSSRFormat>();
     this->add_format<DCDFormat>();
     this->add_format<GROFormat>();
