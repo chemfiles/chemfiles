@@ -4,7 +4,43 @@
 #include <catch.hpp>
 #include "helpers.hpp"
 #include "chemfiles.hpp"
+#include <array>
 using namespace chemfiles;
+
+TEST_CASE("Triclinic minimum images match a lattice reference search") {
+    const auto cells = std::array<Matrix3D, 4>{{
+        Matrix3D(10, 0, 0, 5, 8, 0, 5, 2, 8),
+        Matrix3D(10, 0, 0, 9, 2, 0, 7, 1, 3),
+        Matrix3D(0, 10, 0, -8, 5, 0, -2, 5, 8),
+        Matrix3D(0, 0, 10, 0, 2, 9, -3, 1, 7)
+    }};
+    for (const auto& matrix: cells) {
+        auto cell = UnitCell(matrix);
+        for (auto x: {-0.49, 0.1, 0.49}) {
+            for (auto y: {-0.49, 0.1, 0.49}) {
+                for (auto z: {-0.49, 0.1, 0.49}) {
+                    auto position = matrix.transpose() * Vector3D(x, y, z);
+                    auto reference = dot(position, position);
+                    for (int a = -4; a <= 4; a++) {
+                        for (int b = -4; b <= 4; b++) {
+                            for (int c = -4; c <= 4; c++) {
+                                auto candidate = position - matrix.transpose() * Vector3D(a, b, c);
+                                auto squared = dot(candidate, candidate);
+                                if (squared < reference) {
+                                    reference = squared;
+                                }
+                            }
+                        }
+                    }
+                    auto wrapped = cell.wrap(position);
+                    CHECK(approx_eq(dot(wrapped, wrapped), reference, 1e-10));
+                    auto translated = cell.wrap(position + matrix.transpose() * Vector3D(8, -5, 3));
+                    CHECK(approx_eq(dot(translated, translated), reference, 1e-10));
+                }
+            }
+        }
+    }
+}
 
 TEST_CASE("Use the UnitCell type") {
     SECTION("Constructors") {
