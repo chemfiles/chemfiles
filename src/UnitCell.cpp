@@ -319,6 +319,12 @@ Vector3D UnitCell::wrap_triclinic(const Vector3D& vector) const {
     auto y0 = dot(q0, target);
     auto y1 = dot(q1, target);
     auto y2 = dot(q2, target);
+    // Inflate the squared search radius to avoid pruning boundary images due
+    // to round-off in the QR projections. The squared cell-vector norms keep
+    // this cushion in squared-distance units and scale it with the cell.
+    // 64 is a conservative heuristic safety factor, not a proven error bound
+    // for arbitrarily ill-conditioned bases; candidates still use a strict
+    // squared-distance comparison, so this only widens the search.
     auto tolerance = 64 * std::numeric_limits<double>::epsilon() *
                      (dot(a_vector, a_vector) + dot(b_vector, b_vector) +
                       dot(c_vector, c_vector) + best_squared);
