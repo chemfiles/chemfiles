@@ -436,6 +436,26 @@ TEST_CASE("Problematic PDB files") {
         auto file = Trajectory("data/pdb/ase.pdb");
         REQUIRE(file.size() == 156);
     }
+
+    SECTION("Invalid HELIX type") {
+        // Regression test for issue 535
+        auto content = read_text_file("data/pdb/1bcu.pdb");
+
+        auto helix_pos = content.find("\nHELIX ");
+        REQUIRE(helix_pos != std::string::npos);
+        helix_pos += 1;
+
+        // Set the first HELIX class to zero
+        content.replace(helix_pos + 38, 2, " 0");
+
+        auto file = Trajectory::memory_reader(content.data(), content.size(), "PDB");
+        auto frame = file.read();
+
+        const auto& topology = frame.topology();
+        CHECK_FALSE(topology.residue(9).get("secondary_structure"));
+        CHECK_FALSE(topology.residue(10).get("secondary_structure"));
+        CHECK_FALSE(topology.residue(11).get("secondary_structure"));
+    }
 }
 
 TEST_CASE("Write files in PDB format") {
