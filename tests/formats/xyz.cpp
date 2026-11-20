@@ -246,6 +246,21 @@ TEST_CASE("Errors in XYZ format") {
             std::cerr << "[chemfiles] " << message << std::endl;
         });
     }
+
+    SECTION("Invalid empty property name") {
+        // Regression test for malformed extended XYZ properties (empty property with = causes infinite loop)
+        auto xyz = std::string(R"(1
+Properties=species:S:1:pos:R:3 =invalid
+H 1.0 4.0 2.3
+)");
+
+        auto file = Trajectory::memory_reader(xyz.data(), xyz.size(), "XYZ");
+        auto frame = file.read();
+
+        CHECK(frame.size() == 1);
+        CHECK(frame[0].name() == "H");
+        CHECK_FALSE(frame.get(""));
+    }
 }
 
 TEST_CASE("Write files in XYZ format") {

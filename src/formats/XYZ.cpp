@@ -467,8 +467,18 @@ public:
         extended_xyz_properties_map_t properties;
         while (!done()) {
             skip_whitespace();
-            auto name = next_substring();
-            if (!name.empty() && current() == '=') {
+            if (done()) {
+                break;
+            }
+
+            const auto name = next_substring();
+
+            if (name.empty()) {
+                warning("Extended XYZ", "invalid property name: empty");
+                break;
+            }
+
+            if (current() == '=') {
                 advance();
             } else {
                 // properties without associated value are set to True by ASE
@@ -476,7 +486,7 @@ public:
                 continue;
             }
 
-            auto value = next_substring();
+            const auto value = next_substring();
             if (!is_ascii_whitespace(current()) && !done()) {
                 // missing a space after the value, bail out here
                 warning("Extended XYZ", "expected whitespace after the value for {}, got {}", name, current());
