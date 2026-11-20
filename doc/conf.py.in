@@ -14,7 +14,7 @@ def generate_properties_csv():
         data = toml.load(os.path.join(ROOT, "properties/{}.toml".format(path)))
 
         output = os.path.join(ROOT, "properties/{}.csv".format(path))
-        csvfile = open(output, 'w')
+        csvfile = open(output, 'w', encoding='utf-8')
         writer = csv.writer(csvfile)
         writer.writerow(['Name', 'Type', 'Format', 'Description'])
         for property, value in data.items():

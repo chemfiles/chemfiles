@@ -38,6 +38,7 @@
 #include "chemfiles/formats/GRO.hpp"
 #include "chemfiles/formats/MOL2.hpp"
 #include "chemfiles/formats/mmCIF.hpp"
+#include "chemfiles/formats/BCIF.hpp"
 #include "chemfiles/formats/CML.hpp"
 #include "chemfiles/formats/SMI.hpp"
 #include "chemfiles/formats/TPR.hpp"
@@ -67,6 +68,7 @@ FormatFactory::FormatFactory() {
     // add formats in alphabetic order
     this->add_format<AmberRestart>();
     this->add_format<AmberTrajectory>();
+    this->add_format<BCIFFormat>();
 #ifndef CHFL_DISABLE_GEMMI
     this->add_format<CIFFormat>();
 #endif
