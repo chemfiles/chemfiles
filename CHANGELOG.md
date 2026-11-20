@@ -36,6 +36,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Improved reading speed of XTC files by implementing a decoding routine
   proposed by [libxtc](https://doi.org/10.1186/s13104-021-05536-5)
 - Read and write forces from/to TRR files as atomic properties (#511)
+- Added read and write support for the Con files of [eOn](https://eondocs.org)
+  (.con) (#522)
 
 ### Changes to the API
 
