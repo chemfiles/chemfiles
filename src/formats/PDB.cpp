@@ -307,8 +307,8 @@ void PDBFormat::read_HELIX(std::string_view line) {
         warning("PDB reader", "could not parse helix type");
         return;
     }
-
-    if (helix_type <= 10) {
+    
+    if (helix_type > 0 && helix_type <= 10) {
         secinfo_.emplace(start, std::make_pair(end, HELIX_TYPES[helix_type - 1]));
     } else {
         warning("PDB reader", "invalid HELIX type {}", helix_type);
